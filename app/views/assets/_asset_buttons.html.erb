@@ -7,6 +7,7 @@
 <% show_doi_button = display_asset && (asset.supports_doi? && asset.is_published? && asset.can_manage? && display_asset.can_mint_doi?) %>
 <% show_publish_button = asset.is_in_isa_publishable? && asset.can_publish? %>
 
+<%= render partial: 'assets/request_contact', locals: { object: asset } if asset.respond_to?(:creators) -%>
 <%= render partial: 'subscriptions/subscribe', locals: { object: asset } -%>
 
 <% if asset.is_a?(DataFile) %>
@@ -43,11 +44,7 @@
         <%= button_link_to('Explore', 'spreadsheet', polymorphic_path(asset, version: version, action: :explore, code: params[:code])) %>
       <% else %>
         <% explanation = "This spreadsheet is too big to be explored (larger than #{Seek::Config.max_extractable_spreadsheet_size} MB), or the file does not exist." %>
-        <span data-tooltip='<%= tooltip(explanation) %>'>
-            <span class='disabled_icon disabled-button btn btn-default'>
-              <%= image('spreadsheet', { alt: 'Explore', class: 'disabled' }) %> Explore
-            </span>
-        </span>
+        <%= button_link_to('Explore', 'spreadsheet', nil, disabled_reason: explanation) %>
       <% end %>
     <% elsif show_view_content_btn %>
       <%= render partial: 'assets/view_content',
@@ -56,13 +53,13 @@
     <% end %>
   <% end -%>
 
-  <% if logged_in? && !can_download_asset?(asset, params[:code]) %>
-    <%= render partial: 'assets/request_resource', locals: { resource: asset } %>
-  <% end -%>
 <% end -%>
 
-<%= admin_dropdown do %>
-  <% edit_verb = asset.can_manage? ? 'manage' : 'edit' %>
+<% if asset.can_edit? %>
+  <%= add_to_dropdown(asset) %>
+<% end %>
+
+<%= item_actions_dropdown do %>
 
   <% if asset.can_edit? -%>
     <% if asset.versioned? -%>
@@ -75,8 +72,12 @@
       </li>
     <% end -%>
 
-    <li><%= image_tag_for_key(edit_verb, polymorphic_path(asset, action: :edit), nil, nil, "#{edit_verb.capitalize} #{human_name}") -%></li>
+    <li><%= image_tag_for_key('edit', polymorphic_path(asset, action: :edit), nil, nil, "Edit #{human_name}") -%></li>
   <% end -%>
+
+  <% if asset.can_manage? && (!asset.is_a?(Sample) || asset.can_edit?) #FIXME: strange case for Sample where you can manage but not edit (OPSK-2041). %>
+    <li><%= image_tag_for_key('manage', polymorphic_path(asset, action: :manage), nil, nil, "Manage #{human_name}") -%></li>
+  <% end %>
 
   <% if show_publish_button %>
     <li><%= image_tag_for_key('publish', polymorphic_path(asset, action: :check_related_items), nil, { method: :post }, "Publish #{human_name}") -%></li>

@@ -18,7 +18,7 @@
         <%= text_area_tag 'workflow[description]', workflow_description_value, :class=>"form-control" -%>
       </div>
 
-      <%= render :partial => "projects/project_selector", :locals => { :resource => @workflow, :allow_nil => Seek::Config.is_virtualliver } -%>
+      <%= render :partial => "projects/project_selector", :locals => { :resource => @workflow, :allow_nil => Seek::Config.is_virtualliver } %>
 
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @workflow } %>
 
@@ -26,12 +26,6 @@
 
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @workflow} -%>
 
-      <div>
-        <%= preview_permission_popup_link(@workflow)-%>
-        <%= create_button :id => "workflow_submit_btn",
-                       :onclick => "return validateResourceFields('workflow')",
-                       :class => 'btn btn-primary' -%>
-        or <%= cancel_button(workflows_path) -%>
-      </div>
+      <%= form_submit_buttons(@workflow) %>
     </div>
 <% end -%>

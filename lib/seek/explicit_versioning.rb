@@ -14,7 +14,7 @@ module Seek
         send :include, Seek::ExplicitVersioning::ActMethods
 
         cattr_accessor :versioned_class_name, :versioned_foreign_key, :versioned_table_name, :versioned_inheritance_column,
-                       :version_column, :version_sequence_name, :non_versioned_columns, :file_columns, :white_list_columns, :revision_comments_column,
+                       :version_column, :version_sequence_name, :file_columns, :white_list_columns, :revision_comments_column,
                        :version_association_options, :timestamp_columns, :sync_ignore_columns
 
         self.versioned_class_name         = options[:class_name]  || 'Version'
@@ -22,7 +22,6 @@ module Seek
         self.versioned_table_name         = options[:table_name]  || "#{table_name_prefix}#{base_class.name.demodulize.underscore}_versions#{table_name_suffix}"
         self.versioned_inheritance_column = options[:inheritance_column] || "versioned_#{inheritance_column}"
         self.version_column               = options[:version_column]     || 'version'
-        self.non_versioned_columns        = [primary_key, inheritance_column, 'version', 'lock_version', versioned_inheritance_column, version_column]
         self.file_columns                 = options[:file_columns] || []
         self.white_list_columns           = options[:white_list_columns] || []
         self.revision_comments_column     = options[:revision_comments_column] || 'revision_comments'
@@ -330,9 +329,13 @@ module Seek
           }.merge(options)
         end
 
+        def non_versioned_columns
+          @non_versioned_columns ||= [primary_key, inheritance_column, 'version', 'lock_version', versioned_inheritance_column, version_column]
+        end
+
         # Returns an array of columns that are versioned.  See non_versioned_columns
         def versioned_columns
-          columns.reject { |c| non_versioned_columns.include?(c.name) }
+          @versioned_columns ||= columns.reject { |c| non_versioned_columns.include?(c.name) }
         end
 
         # Returns an instance of the dynamic versioned model

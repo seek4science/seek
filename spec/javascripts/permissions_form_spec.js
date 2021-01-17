@@ -1,7 +1,7 @@
 describe('Permissions form and projects selector', function() {
     beforeEach(function() {
         this.timeout(10000);
-        MagicLamp.load('sops/edit');
+        MagicLamp.load('sops/manage');
 
         // This is necessary because script tags aren't processed when loading fixtures:
         this.permissionsTable = new Vue({

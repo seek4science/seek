@@ -9,17 +9,24 @@ class RdfHelperTest < ActionView::TestCase
 
     # blank for not supported
     @controller = InvestigationsController.new
+    @controller.action_name='show'
     assert schema_ld_script_block.blank?
 
-    # now some actual content
     @controller = PeopleController.new
-    block = schema_ld_script_block
-    refute block.blank?
+    @controller.action_name='new'
+    assert schema_ld_script_block.blank?
 
     # none ActiveRecord resource, e.g. for search (this imitates the behaviour)
     @search = ActiveSupport::SafeBuffer.new('fish')
     @controller = SearchController.new
+    @controller.action_name='show'
     assert schema_ld_script_block.blank?
+
+    # now some actual content
+    @controller = PeopleController.new
+    @controller.action_name='show'
+    block = schema_ld_script_block
+    refute block.blank?
 
 
     frag = Nokogiri::HTML::DocumentFragment.parse(block)

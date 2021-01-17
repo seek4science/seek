@@ -44,9 +44,9 @@
       </div>
     
       <div class="form-group">
-        <%= f.label :persons_id_in, "Persons", :class => 'control-label col-sm-2' %>
+        <%= f.label :people_id_in, "Persons", :class => 'control-label col-sm-2' %>
         <div class="col-sm-4">
-          <%= f.collection_select :persons_id_in, Person.all, :id, :name, {}, :class => 'form-control persons-multiselect', :multiple => 'multiple' %>
+          <%= f.collection_select :people_id_in, Person.all, :id, :name, {}, :class => 'form-control persons-multiselect', :multiple => 'multiple' %>
         </div>
         <%= f.label :publication_authors_last_name_cont, "Author last name contains", :class => 'control-label col-sm-2' %>
         <div class="col-sm-4">

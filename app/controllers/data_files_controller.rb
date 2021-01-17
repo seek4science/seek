@@ -12,7 +12,7 @@ class DataFilesController < ApplicationController
 
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, except: [:index, :new, :upload_for_tool, :upload_from_email, :create, :create_content_blob,
-                                                             :request_resource, :preview, :test_asset_url, :update_annotations_ajax, :rightfield_extraction_ajax, :provide_metadata]
+                                                             :preview, :test_asset_url, :update_annotations_ajax, :rightfield_extraction_ajax, :provide_metadata]
   before_action :find_display_asset, only: [:show, :explore, :download]
   before_action :xml_login_only, only: [:upload_for_tool, :upload_from_email]
   before_action :get_sample_type, only: :extract_samples
@@ -34,43 +34,8 @@ class DataFilesController < ApplicationController
 
   include Seek::IsaGraphExtensions
 
+  api_actions :index, :show, :create, :update, :destroy
 
-  # download for galaxy
-  def galaxize
-		## params = {
-		#'URL': fetch_url,
-		## You can set the dataset type, should be a Galaxy datatype name
-		#'type': 'tabular',
-		## And the output filename
-		#'name': 'SyncDataset Name',
-	  #}
-
-
-    data_file_id = params[:id]
-    df = DataFile.find_by(id: data_file_id)
-
-		content_type = df.content_blob.content_type;
-		original_filename = df.content_blob.original_filename;
-
-		uri =  URI.parse(params[:GALAXY_URL])
-
-    if ['application/vnd.ms-excel'].include? content_type
-    uri.query = [uri.query,
-                 'URL=' + root_url[0..-2] + "/data_files/#{df.id}" + "/content_blobs/#{df.content_blob.id}" + ".csv",
-                 "name=#{original_filename}"
-    ].compact.join('&')
-    else
-      uri.query = [uri.query,
-                   'URL=' + root_url + params[:fetch_url],
-                   "type=#{content_type}",
-                   "name=#{original_filename}",
-      ].compact.join('&')
-    end
-
-		Rails.logger.debug "The uri it will be redirected to"
-		Rails.logger.debug uri.to_s
-		redirect_to uri.to_s
-  end
 
   def plot
     sheet = params[:sheet] || 2
@@ -117,7 +82,7 @@ class DataFilesController < ApplicationController
           flash[:error] = 'Unable to save newflash[:error] version'
         end
         format.html { redirect_to @data_file }
-        format.json { render json: @data_file}
+        format.json { render json: @data_file, include: [params[:include]]}
       end
     else
       flash[:error] = flash.now[:error]
@@ -184,7 +149,7 @@ class DataFilesController < ApplicationController
           respond_to do |format|
             flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
             format.html { redirect_to data_file_path(@data_file) }
-            format.json { render json: @data_file }
+            format.json { render json: @data_file, include: [params[:include]] }
           end
         end
       else
@@ -207,7 +172,7 @@ class DataFilesController < ApplicationController
       if @data_file.update_attributes(data_file_params)
         flash[:notice] = "#{t('data_file')} metadata was successfully updated."
         format.html { redirect_to data_file_path(@data_file) }
-        format.json {render json: @data_file}
+        format.json {render json: @data_file, include: [params[:include]]}
       else
         format.html { render action: 'edit' }
         format.json { render json: json_api_errors(@data_file), status: :unprocessable_entity }
@@ -259,10 +224,7 @@ class DataFilesController < ApplicationController
     scope = scope.joins(:projects).where(projects: { id: current_user.person.projects }) unless (params[:all_projects] == 'true')
     scope = scope.where(simulation_data: true) if (params[:simulation_data] == 'true')
     scope = scope.with_extracted_samples if (params[:with_samples] == 'true')
-
-    @data_files = DataFile.authorize_asset_collection(
-      scope.where('data_files.title LIKE ?', "%#{params[:filter]}%").distinct, 'view'
-    ).first(20)
+    @data_files = scope.where('data_files.title LIKE ?', "%#{params[:filter]}%").distinct.authorized_for('view').first(20)
 
     respond_to do |format|
       format.html { render partial: 'data_files/association_preview', collection: @data_files, locals: { hide_sample_count: !params[:with_samples] } }
@@ -374,12 +336,10 @@ class DataFilesController < ApplicationController
   # handles the uploading of the file to create a content blob, which is then associated with a new unsaved datafile
   # and stored on the session
   def create_content_blob
-    @data_file = DataFile.new
+    @data_file = setup_new_asset
     respond_to do |format|
       if handle_upload_data && @data_file.content_blob.save
         session[:uploaded_content_blob_id] = @data_file.content_blob.id
-        # assay ids passed forwards, e.g from "Add Datafile" button
-        @source_assay_ids = (params[:assay_ids] || [] ).reject(&:blank?)
         format.html {}
       else
         session.delete(:uploaded_content_blob_id)
@@ -391,14 +351,14 @@ class DataFilesController < ApplicationController
   # AJAX call to trigger any RightField extraction (if appropriate), and pre-populates the associated @data_file and
   # @assay
   def rightfield_extraction_ajax
-    @data_file = DataFile.new
+    @data_file = setup_new_asset
     @assay = Assay.new
     @warnings = nil
     critical_error_msg = nil
     session.delete :extraction_exception_message
 
     begin
-      if params[:content_blob_id] == session[:uploaded_content_blob_id].to_s
+      if params[:content_blob_id].to_s == session[:uploaded_content_blob_id].to_s
         @data_file.content_blob = ContentBlob.find_by_id(params[:content_blob_id])
         @warnings = @data_file.populate_metadata_from_template
         @assay, warnings = @data_file.initialise_assay_from_template
@@ -430,7 +390,7 @@ class DataFilesController < ApplicationController
     @data_file ||= session[:processed_datafile]
     @assay ||= session[:processed_assay]
 
-    #this peculiar line avoids a no method error when calling super later on, when there are no assays in the database
+    # this peculiar line avoids a no method error when calling super later on, when there are no assays in the database
     # this I believe is caused by accessing the unmarshalled @assay before the Assay class has been encountered. Adding this line
     # avoids the error
     Assay.new
@@ -438,14 +398,6 @@ class DataFilesController < ApplicationController
     @exception_message ||= session[:extraction_exception_message]
     @create_new_assay = @assay && @assay.new_record? && !@assay.title.blank?
     @data_file.assay_assets.build(assay_id: @assay.id) if @assay.persisted?
-
-    # associate any assays passed through with :assay_ids param
-    if params[:assay_ids]
-      assays = Assay.authorize_asset_collection(Assay.find(params[:assay_ids]),:edit)
-      assays.each do |assay|
-        @data_file.assay_assets.build(assay_id: assay.id)
-      end
-    end
 
     respond_to do |format|
       format.html
@@ -460,6 +412,7 @@ class DataFilesController < ApplicationController
     @create_new_assay = assay_params.delete(:create_assay)
 
     update_sharing_policies(@data_file)
+    update_annotations(params[:tag_list], @data_file)
 
     @assay = Assay.new(assay_params)
     if sop_id
@@ -484,7 +437,6 @@ class DataFilesController < ApplicationController
     all_valid = all_valid && @data_file.save && blob.save
 
     if all_valid
-      update_annotations(params[:tag_list], @data_file)
 
       update_relationships(@data_file, params)
 
@@ -500,7 +452,7 @@ class DataFilesController < ApplicationController
         # the assay_id param can also contain the relationship type
         @data_file.assays << @assay if @create_new_assay
         format.html { redirect_to data_file_path(@data_file) }
-        format.json { render json: @data_file }
+        format.json { render json: @data_file, include: [params[:include]] }
       end
 
     else
@@ -517,6 +469,43 @@ class DataFilesController < ApplicationController
         end
       end
     end
+  end
+
+  # download for galaxy
+  def galaxize
+    ## params = {
+    #'URL': fetch_url,
+    ## You can set the dataset type, should be a Galaxy datatype name
+    #'type': 'tabular',
+    ## And the output filename
+    #'name': 'SyncDataset Name',
+    #}
+
+
+    data_file_id = params[:id]
+    df = DataFile.find_by(id: data_file_id)
+
+    content_type = df.content_blob.content_type;
+    original_filename = df.content_blob.original_filename;
+
+    uri =  URI.parse(params[:GALAXY_URL])
+
+    if ['application/vnd.ms-excel'].include? content_type
+      uri.query = [uri.query,
+                   'URL=' + root_url[0..-2] + "/data_files/#{df.id}" + "/content_blobs/#{df.content_blob.id}" + ".csv",
+                   "name=#{original_filename}"
+      ].compact.join('&')
+    else
+      uri.query = [uri.query,
+                   'URL=' + root_url + params[:fetch_url],
+                   "type=#{content_type}",
+                   "name=#{original_filename}",
+      ].compact.join('&')
+    end
+
+    Rails.logger.debug "The uri it will be redirected to"
+    Rails.logger.debug uri.to_s
+    redirect_to uri.to_s
   end
 
   protected
@@ -569,11 +558,12 @@ class DataFilesController < ApplicationController
   private
 
   def data_file_params
-    params.require(:data_file).permit(:title, :description, :simulation_data, { project_ids: [] }, :license, :other_creators,
-                                      :parent_name, { event_ids: [] },
+    params.require(:data_file).permit(:title, :description, :simulation_data, { project_ids: [] },
+                                      :license, :other_creators,{ event_ids: [] },
                                       { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                       { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
-                                      { scales: [] }, { publication_ids: [] })
+                                      { scales: [] }, { publication_ids: [] },
+                                      discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
   def data_file_assay_params

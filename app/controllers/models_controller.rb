@@ -7,7 +7,7 @@ class ModelsController < ApplicationController
 
   before_action :models_enabled?
   before_action :find_assets, :only => [:index]
-  before_action :find_and_authorize_requested_item, :except => [:build, :index, :new, :create, :request_resource, :preview, :test_asset_url, :update_annotations_ajax]
+  before_action :find_and_authorize_requested_item, :except => [:build, :index, :new, :create, :preview, :test_asset_url, :update_annotations_ajax]
   before_action :find_display_asset, :only => [:show, :download, :execute, :visualise, :export_as_xgmml, :compare_versions]
   before_action :find_other_version, :only => [:compare_versions]
 
@@ -19,12 +19,7 @@ class ModelsController < ApplicationController
 
   include Seek::IsaGraphExtensions
 
-  # override new to associate assays
-  def new
-    setup_new_asset
-    associate_presented_assays
-    respond_for_new
-  end
+  api_actions :index, :show, :create, :update, :destroy
 
   def find_other_version
     version = params[:other_version]
@@ -42,7 +37,8 @@ class ModelsController < ApplicationController
         json = compare @blob1.filepath, @blob2.filepath, ["reportHtml", "crnJson", "json", "SBML"]
         @crn = JSON.parse(json)["crnJson"]
         @comparison_html = JSON.parse(json)["reportHtml"]
-      rescue Exception => e
+      rescue StandardError => e
+        raise e unless Rails.env.production?
         flash.now[:error]="there was an error trying to compare the two versions - #{e.message}"
       end
     else
@@ -128,12 +124,11 @@ class ModelsController < ApplicationController
     update_annotations(params[:tag_list], @model)
     update_sharing_policies @model
     update_relationships(@model, params)
-
     respond_to do |format|
       if @model.update_attributes(model_params)
         flash[:notice] = "#{t('model')} metadata was successfully updated."
         format.html { redirect_to model_path(@model) }
-        format.json {render json: @model}
+        format.json {render json: @model, include: [params[:include]]}
       else
         format.html { render action: 'edit' }
         format.json { render json: json_api_errors(@model), status: :unprocessable_entity }
@@ -184,23 +179,16 @@ class ModelsController < ApplicationController
     latest_version.save
   end
 
-  # before_filter that links modelling analyses passed by assay_id, filtering out incorrect types and those none editable
-  def associate_presented_assays
-    return unless @model && params[:assay_ids] && params[:assay_ids].any?
-    assays = Assay.find(params[:assay_ids])
-    assays = assays.select{|assay| assay.assay_class.is_modelling?}.select{|assay| assay.can_edit?}
-    @model.assign_attributes({assay_ids:assays.collect(&:id)})
-  end
-
   private
 
   def model_params
     params.require(:model).permit(:imported_source, :imported_url, :title, :description, { project_ids: [] }, :license,
-                                  :model_type_id, :model_format_id, :recommended_environment_id, :organism_id,
+                                  :model_type_id, :model_format_id, :recommended_environment_id, :organism_id, { organism_ids: []},
                                   :other_creators,
                                   { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                   { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
-                                  { scale_extra_params: [] }, { publication_ids: [] })
+                                  { scale_extra_params: [] }, { publication_ids: [] },
+                                  discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
   alias_method :asset_params, :model_params

@@ -7,10 +7,10 @@
         "key": "EXP"
       },
       "assay_type": {
-        "uri": "http://www.mygrid.org.uk/ontology/JERMOntology#Transcriptomics"
+        "uri": "http://jermontology.org/ontology/JERMOntology#Transcriptomics"
       },
       "technology_type": {
-        "uri": "http://www.mygrid.org.uk/ontology/JERMOntology#RNA-Seq"
+        "uri": "http://jermontology.org/ontology/JERMOntology#RNA-Seq"
       },
       "other_creators": "Anonymous creator",
       "description": "A Western Blot Assay",
@@ -57,14 +57,6 @@
           {
             "id": "<%= Factory(:sop, policy: Factory(:public_policy)).id %>",
             "type": "sops"
-          }
-        ]
-      },
-      "models":{
-        "data": [
-          {
-            "id": "<%= Factory(:model, policy: Factory(:public_policy)).id %>",
-            "type": "models"
           }
         ]
       },

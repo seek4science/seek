@@ -69,7 +69,7 @@ module AssaysHelper
   # returns a map of the studies that can be selected, grouped by investigation
   # this includes the editable studies, plus the current associated study if it is not already included (i.e not edtiable)
   def selectable_studies_mapped_to_investigation(current_study)
-    studies = Study.all_authorized_for(:edit)
+    studies = Study.authorized_for('edit').to_a
     studies << current_study if current_study && !current_study.can_edit?
     investigation_map = {}
     studies.each do |study|

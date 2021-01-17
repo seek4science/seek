@@ -13,7 +13,7 @@
       </div>
 
       <div class="col-sm-6 hidden-xs">
-        <%= list_item_simple_list(resource.project_positions, "Roles", true) {|i| link_to i.title, people_path(:project_position_id => i.id)} %>
+        <%= list_item_simple_list(resource.project_positions, "Roles", true) {|i| link_to i.title, people_path(filter: { project_position:  i.id })} %>
         <%= list_item_simple_list(resource.expertise_annotations.map(&:value), "Expertise", true) {|i| link_for_ann(i, :type => :expertise)} %>
         <%= list_item_simple_list(resource.tool_annotations.map(&:value), "Tools", true) {|i| link_for_ann(i, :type => :tool)} %>
       </div>

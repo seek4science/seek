@@ -43,7 +43,7 @@
             "type": "people"
           },
           {
-            "id": "1039986744",
+            "id": "887473922",
             "type": "people"
           }
         ]
@@ -121,7 +121,7 @@
       "modified": "2017-10-06T09:53:31.000Z",
       "uuid": "23ac7610-8caa-0135-d381-745c89ac8d09",
       "base_url": "http://localhost:3000",
-      "api_version": "0.2"
+      "api_version": "0.3"
     }
   },
   "jsonapi": {

@@ -1,11 +1,10 @@
 class StrainsController < ApplicationController
   include Seek::IndexPager
-  include Seek::AnnotationCommon
-  include Seek::DestroyHandling
+  include Seek::AssetsCommon
 
   before_action :organisms_enabled?
   before_action :find_assets, only: [:index]
-  before_action :find_and_authorize_requested_item, only: [:show, :edit, :update, :destroy]
+  before_action :find_and_authorize_requested_item, only: [:show, :edit, :update, :destroy, :manage, :manage_update]
 
   before_action :get_strains_for_organism, only: [:existing_strains_for_assay_organism]
 
@@ -41,7 +40,7 @@ class StrainsController < ApplicationController
         flash[:notice] = 'Strain was successfully created.'
         format.html { redirect_to(@strain) }
         format.xml { render xml: @strain, status: :created, location: @strain }
-        format.json {render json: @strain, status: :created, location: @strain}
+        format.json {render json: @strain, status: :created, location: @strain, include: [params[:include]]}
 
       end
 
@@ -86,7 +85,7 @@ class StrainsController < ApplicationController
         flash[:notice] = 'Strain was successfully updated.'
         format.html { redirect_to(@strain) }
         format.xml { render xml: @strain, status: :created, location: @strain }
-        format.json {render json: @strain}
+        format.json {render json: @strain, include: [params[:include]]}
       end
 
     else

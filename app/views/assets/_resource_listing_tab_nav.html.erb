@@ -1,6 +1,6 @@
 <ul class="nav nav-pills" role="tablist">
   <% types.each_with_index do |type, i| -%>
-      <% if !(type[:items].empty? && type[:hidden_count] == 0) || show_empty_tabs %>
+      <% unless type[:items].empty? && type[:hidden_count] == 0 %>
           <li role="presentation" <%= 'class="active"'.html_safe if i == 0-%>>
             <a href="#<%= type[:tab_id] -%>" data-model-name="<%= type[:type] -%>" aria-controls="<%= type[:tab_id] -%>" role="tab" data-toggle="tab">
               <%= type[:tab_title] -%>

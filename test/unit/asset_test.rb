@@ -63,7 +63,6 @@ class AssetTest < ActiveSupport::TestCase
     assay = Factory :experimental_assay
     assay2 = Factory :modelling_assay
     assay3 = Factory :modelling_assay, assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Cell_cycle'
-    assay4 = Factory :modelling_assay, assay_type_uri: 'http://some-made-up-uri-not-resolvable-from-ontology.org/types#to_force_nil_label'
 
     disable_authorization_checks do
       assay.associate(df)
@@ -72,8 +71,6 @@ class AssetTest < ActiveSupport::TestCase
       assay2.reload
       assay3.associate(df)
       assay3.reload
-      assay4.associate(df)
-      assay4.reload
       df.reload
     end
 
@@ -250,8 +247,7 @@ class AssetTest < ActiveSupport::TestCase
     end
 
     df.policy = Factory(:public_policy)
-    df.doi = 'test_doi'
-    disable_authorization_checks { df.save }
+    df.find_version(1).update_column(:doi, 'test_doi')
     assert !df.find_version(1).can_mint_doi?
   end
 
@@ -259,8 +255,7 @@ class AssetTest < ActiveSupport::TestCase
     df = Factory :data_file
     assert !df.find_version(1).has_doi?
     assert !df.has_doi?
-    df.doi = 'test_doi'
-    disable_authorization_checks { df.save }
+    df.find_version(1).update_column(:doi, 'test_doi')
     assert df.find_version(1).has_doi?
     assert df.has_doi?
   end

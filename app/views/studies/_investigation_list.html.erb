@@ -1,10 +1,13 @@
 <%
  study ||= @study
+ study.investigation = nil unless study.investigation.try(:can_edit?)
  investigations = investigations | [study.investigation] if study.investigation
  investigations = investigations.select &:can_edit?
  investigation_value=(study && study.investigation) ? study.investigation.id : 0
  investigation_options = [["Select an #{t('investigation')}..",0]]|investigations.collect{|t| [h(t.title),t.id]}
 %>
+
+
 
 <%= select_tag :study_investigation_id,
   options_for_select(investigation_options,investigation_value),

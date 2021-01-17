@@ -55,26 +55,13 @@
     </div>
   </div>
 
-  <%= render :partial => 'projects/project_selector', :locals => {:resource => @strain} %>
+  <% if show_form_manage_specific_attributes? && @strain.can_manage? %>
+    <%= render :partial => 'projects/project_selector', :locals => {:resource => @strain} %>
 
-  <% if (action == 'create') || (action == 'edit' && @strain.can_manage?) %>
-    <%= render :partial => "sharing/form", :locals => {:object => @strain} -%>
+    <%= render partial: 'assets/manage_specific_attributes', locals:{f:f} %>
   <% end %>
 
-  <%
-    button_text=action=="edit" ? "Update" : "Create"
-    disabled_text=action=="edit" ? "Updating..." : "Creating..."
-  %>
-  <% if @strain.can_manage? %>
-    <%= preview_permission_popup_link(@strain) -%>
-    <%= f.submit button_text, :id => "strain_submit_btn",
-                 :onclick => "previewPermissions();return(false);",
-                 :class => 'btn btn-primary' -%>
-  <% else %>
-    <%= f.submit button_text, data: { disable_with: disabled_text }, :id => "strain_submit_btn",
-                 :class => 'btn btn-primary' -%>
-  <% end %>
-  or <%= cancel_button(@strain.id ? strain_path(@strain.id) : strains_path) %>
+  <%= form_submit_buttons(@strain, validate:false) %>
 </div>
 
 <script type="text/javascript">

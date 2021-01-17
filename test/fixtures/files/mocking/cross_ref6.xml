@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_records>
+  <doi_record owner="10.1117" timestamp="2018-10-04 09:06:16">
+    <crossref>
+      <conference>
+        <event_metadata>
+          <conference_name>Developments in X-Ray Tomography XI</conference_name>
+          <conference_location>San Diego, United States</conference_location>
+          <conference_date start_day="6" start_month="8" start_year="2017" end_day="10" end_month="8" end_year="2017"/>
+        </event_metadata>
+        <proceedings_metadata>
+          <proceedings_title>Developments in X-Ray Tomography XI</proceedings_title>
+          <publisher>
+            <publisher_name>SPIE</publisher_name>
+          </publisher>
+          <publication_date media_type="other">
+            <month>9</month>
+            <day>7</day>
+            <year>2017</year>
+          </publication_date>
+          <isbn>9781510612396</isbn>
+          <isbn media_type="electronic">9781510612402</isbn>
+        </proceedings_metadata>
+        <conference_paper>
+          <contributors>
+            <person_name sequence="first" contributor_role="author">
+              <given_name>Sebastian</given_name>
+              <surname>Schmelzle</surname>
+            </person_name>
+            <person_name sequence="first" contributor_role="author">
+              <given_name>Thomas</given_name>
+              <surname>van de Kamp</surname>
+            </person_name>
+            <person_name sequence="first" contributor_role="author">
+              <given_name>Michael</given_name>
+              <surname>Heethoff</surname>
+            </person_name>
+            <person_name sequence="first" contributor_role="author">
+              <given_name>Vincent</given_name>
+              <surname>Heuveline</surname>
+            </person_name>
+            <person_name sequence="first" contributor_role="author">
+              <given_name>Philipp</given_name>
+              <surname>Lösel</surname>
+            </person_name>
+            <person_name sequence="first" contributor_role="author">
+              <given_name>Jürgen</given_name>
+              <surname>Becker</surname>
+            </person_name>
+            <person_name sequence="first" contributor_role="author">
+              <given_name>Felix</given_name>
+              <surname>Beckmann</surname>
+            </person_name>
+            <person_name sequence="first" contributor_role="author">
+              <given_name>Frank</given_name>
+              <surname>Schluenzen</surname>
+            </person_name>
+            <person_name sequence="first" contributor_role="author">
+              <given_name>Jörg U.</given_name>
+              <surname>Hammel</surname>
+            </person_name>
+            <person_name sequence="first" contributor_role="author">
+              <given_name>Andreas</given_name>
+              <surname>Kopmann</surname>
+            </person_name>
+            <person_name sequence="first" contributor_role="author">
+              <given_name>Wolfgang</given_name>
+              <surname>Mexner</surname>
+            </person_name>
+            <person_name sequence="first" contributor_role="author">
+              <given_name>Matthias</given_name>
+              <surname>Vogelgesang</surname>
+            </person_name>
+            <person_name sequence="first" contributor_role="author">
+              <given_name>Nicholas T.</given_name>
+              <surname>Jerome</surname>
+            </person_name>
+            <person_name sequence="first" contributor_role="author">
+              <given_name>Oliver</given_name>
+              <surname>Betz</surname>
+            </person_name>
+            <person_name sequence="first" contributor_role="author">
+              <given_name>Rolf</given_name>
+              <surname>Beutel</surname>
+            </person_name>
+            <person_name sequence="first" contributor_role="author">
+              <given_name>Benjamin</given_name>
+              <surname>Wipfler</surname>
+            </person_name>
+            <person_name sequence="first" contributor_role="author">
+              <given_name>Alexander</given_name>
+              <surname>Blanke</surname>
+            </person_name>
+            <person_name sequence="first" contributor_role="author">
+              <given_name>Steffen</given_name>
+              <surname>Harzsch</surname>
+            </person_name>
+            <person_name sequence="first" contributor_role="author">
+              <given_name>Marie</given_name>
+              <surname>Hörnig</surname>
+            </person_name>
+            <person_name sequence="first" contributor_role="author">
+              <given_name>Tilo</given_name>
+              <surname>Baumbach</surname>
+            </person_name>
+            <person_name sequence="first" contributor_role="editor">
+              <given_name>Bert</given_name>
+              <surname>Müller</surname>
+            </person_name>
+            <person_name sequence="first" contributor_role="editor">
+              <given_name>Ge</given_name>
+              <surname>Wang</surname>
+            </person_name>
+          </contributors>
+          <titles>
+            <title>
+              The NOVA project: maximizing beam time efficiency through synergistic analyses of SRμCT data
+            </title>
+          </titles>
+          <publication_date>
+            <month>9</month>
+            <day>26</day>
+            <year>2017</year>
+          </publication_date>
+          <pages>
+            <first_page>24</first_page>
+          </pages>
+          <doi_data>
+            <doi>10.1117/12.2275959</doi>
+            <resource>
+              https://www.spiedigitallibrary.org/conference-proceedings-of-spie/10391/2275959/The-NOVA-project--maximizing-beam-time-efficiency-through-synergistic/10.1117/12.2275959.full
+            </resource>
+          </doi_data>
+          <citation_list>
+            <citation key="c1">
+              <doi>10.1111/jmi.2007.227.issue-1</doi>
+            </citation>
+            <citation key="c2">
+              <author>Friedrich</author>
+              <article_title>
+                Micro-computer tomography and a renaissance of insect morphology
+              </article_title>
+              <volume>7078</volume>
+              <first_page>70781U-1</first_page>
+              <cYear>2008</cYear>
+            </citation>
+            <citation key="c3">
+              <doi>10.1016/j.asd.2009.07.001</doi>
+            </citation>
+            <citation key="c4">
+              <doi>10.1016/j.jcz.2014.09.002</doi>
+            </citation>
+            <citation key="c5">
+              <doi>10.1002/jmor.v272.9</doi>
+            </citation>
+            <citation key="c6">
+              <author>van de Kamp</author>
+              <article_title>
+                Insect imaging at the ANKA Synchrotron Radiation Facility
+              </article_title>
+              <journal_title>Entomologie heute</journal_title>
+              <volume>25</volume>
+              <first_page>147</first_page>
+              <cYear>2013</cYear>
+            </citation>
+            <citation key="c7">
+              <doi>10.1002/jmor.v277.4</doi>
+            </citation>
+            <citation key="c8">
+              <author>Beutel</author>
+              <article_title>
+                Morphological and molecular evidence converging upon a robust phylogeny of the megadiverse Holometabola
+              </article_title>
+              <journal_title>Cladistics</journal_title>
+              <volume>26</volume>
+              <first_page>1</first_page>
+              <cYear>2011</cYear>
+            </citation>
+            <citation key="c9">
+              <author>Mexner</author>
+              <article_title>
+                OpenGL® API based analysis of large datasets in a cloud environment
+              </article_title>
+              <cYear>2017</cYear>
+            </citation>
+            <citation key="c10">
+              <author>Lösel</author>
+              <article_title>
+                Enhancing a diffusion algorithm for 4D image segmentation using local information
+              </article_title>
+              <volume>9784</volume>
+              <cYear>2016</cYear>
+            </citation>
+            <citation key="c11">
+              <doi>10.1007/978-3-319-52280-7</doi>
+            </citation>
+            <citation key="c12">
+              <doi>10.1111/cla.2012.28.issue-6</doi>
+            </citation>
+            <citation key="c13">
+              <doi>10.1007/s13127-012-0097-z</doi>
+            </citation>
+            <citation key="c14">
+              <doi>10.1111/syen.12012</doi>
+            </citation>
+            <citation key="c15">
+              <doi>10.1186/1742-9994-11-16</doi>
+            </citation>
+            <citation key="c16">
+              <doi>10.1016/j.asd.2013.10.003</doi>
+            </citation>
+            <citation key="c17">
+              <doi>10.1093/molbev/mst199</doi>
+            </citation>
+            <citation key="c18">
+              <doi>10.1111/syen.2015.40.issue-2</doi>
+            </citation>
+            <citation key="c19">
+              <author>Blanke</author>
+              <article_title>
+                Structural mouthpart interaction evolved already in the earliest lineages of insects
+              </article_title>
+              <volume>282</volume>
+              <first_page>20151033</first_page>
+              <cYear>2015</cYear>
+            </citation>
+            <citation key="c20">
+              <doi>10.1093/sysbio/sys091</doi>
+            </citation>
+            <citation key="c21">
+              <doi>10.1002/jmor.v270:12</doi>
+            </citation>
+            <citation key="c22">
+              <author>Weide</author>
+              <article_title>
+                Comparative morphology of the head of selected sporophagous and non-sporophagous aleocharinae (Coleoptera: Staphylinidae): Musculature and hypopharynx-prementum complex
+              </article_title>
+              <journal_title>J. Morph</journal_title>
+              <volume>271</volume>
+              <first_page>910</first_page>
+              <cYear>2010</cYear>
+            </citation>
+            <citation key="c23">
+              <doi>10.1111/azo.2013.95.issue-1</doi>
+            </citation>
+            <citation key="c24">
+              <doi>10.1242/jeb.092742</doi>
+            </citation>
+            <citation key="c25">
+              <doi>10.1016/j.asd.2012.09.005</doi>
+            </citation>
+            <citation key="c26">
+              <doi>10.1016/j.jcz.2012.09.003</doi>
+            </citation>
+            <citation key="c27">
+              <author>Meth</author>
+              <article_title>
+                Brain architecture of the Pacific White Shrimp Penaeus vannamei Boone, 1931 (Malacostraca, Dendrobranchiata): correspondence of brain structure and sensory input?
+              </article_title>
+              <journal_title>Cell and Tissue Research</journal_title>
+              <first_page>1</first_page>
+              <cYear>2017</cYear>
+            </citation>
+            <citation key="c28">
+              <doi>10.1002/cne.23741</doi>
+            </citation>
+            <citation key="c29">
+              <author>Hörnig</author>
+              <article_title>
+                What nymphal morphology can tell us about parental investment – a group of cockroach hatchlings in Baltic Amber documented by a multi-method approach
+              </article_title>
+              <journal_title>Palaeontologia Electronica 19.1.5A</journal_title>
+              <first_page>1</first_page>
+              <cYear>2016</cYear>
+            </citation>
+            <citation key="c30">
+              <doi>10.1038/s41598-017-01496-8</doi>
+            </citation>
+            <citation key="c31">
+              <doi>10.1038/srep42345</doi>
+            </citation>
+            <citation key="c32">
+              <doi>10.1073/pnas.1308650111</doi>
+            </citation>
+            <citation key="c33">
+              <author>van de Kamp</author>
+              <article_title>
+                X-ray radiography of a spraying stick insect (Phasmatodea)
+              </article_title>
+              <journal_title>Entomologie heute</journal_title>
+              <volume>27</volume>
+              <first_page>37</first_page>
+              <cYear>2015</cYear>
+            </citation>
+            <citation key="c34">
+              <doi>10.1111/zoj.2012.165.issue-4</doi>
+            </citation>
+            <citation key="c35">
+              <doi>10.1371/journal.pone.0080560</doi>
+            </citation>
+            <citation key="c36">
+              <doi>10.11646/zootaxa.3860.5</doi>
+            </citation>
+            <citation key="c37">
+              <author>van de Kamp</author>
+              <article_title>
+                Scanning the past –synchrotron X-ray microtomography of fossil wasps in amber
+              </article_title>
+              <journal_title>Entomologie heute</journal_title>
+              <volume>26</volume>
+              <first_page>151</first_page>
+              <cYear>2014</cYear>
+            </citation>
+            <citation key="c38">
+              <author>Schwermann</author>
+              <article_title>
+                Preservation of three-dimensional anatomy in phosphatized fossil arthropods enriches evolutionary inference
+              </article_title>
+              <journal_title>eLife</journal_title>
+              <volume>5</volume>
+              <issue>e12129</issue>
+              <first_page>1</first_page>
+              <cYear>2016</cYear>
+            </citation>
+            <citation key="c39">
+              <author>Schwermann</author>
+              <article_title>
+                The fossil insects of the Quercy region: a historical review
+              </article_title>
+              <journal_title>Entomologie heute</journal_title>
+              <volume>28</volume>
+              <first_page>127</first_page>
+              <cYear>2016</cYear>
+            </citation>
+            <citation key="c40">
+              <doi>10.1038/srep41413</doi>
+            </citation>
+            <citation key="c41">
+              <doi>10.1126/science.1204245</doi>
+            </citation>
+            <citation key="c42">
+              <doi>10.1371/journal.pone.0102355</doi>
+            </citation>
+            <citation key="c43">
+              <doi>10.1016/j.asd.2015.07.004</doi>
+            </citation>
+            <citation key="c44">
+              <author>Sandeman</author>
+              <article_title>
+                Adaptive trends in malacostracan brain form and function related to behavior
+              </article_title>
+              <volume>3</volume>
+              <cYear>2014</cYear>
+            </citation>
+            <citation key="c45">
+              <author>Beckmann</author>
+              <article_title>The GKSS Beamlines at PETRA III and DORIS III</article_title>
+              <cYear>2008</cYear>
+            </citation>
+            <citation key="c46">
+              <doi>10.1154/1.3428364</doi>
+            </citation>
+            <citation key="c47">
+              <author>Haibel</author>
+              <article_title>
+                Micro- and nano-tomography at the GKSS Imaging Beamline at PETRA III
+              </article_title>
+              <cYear>2010</cYear>
+            </citation>
+            <citation key="c48">
+              <author>Hipp</author>
+              <article_title>
+                Grating-Based X-Ray Phase-Contrast Imaging at PETRA III
+              </article_title>
+              <cYear>2014</cYear>
+            </citation>
+            <citation key="c49">
+              <author>Greving</author>
+              <article_title>P05 imaging beamline at PETRA III: first results</article_title>
+              <journal_title>Developments in X-Ray Tomography IX 9212</journal_title>
+              <first_page>92120O</first_page>
+              <cYear>2014</cYear>
+            </citation>
+            <citation key="c50">
+              <author>Hipp</author>
+              <article_title>
+                Single-grating interferometer for high-resolution phase-contrast imaging at synchrotron radiation sources
+              </article_title>
+              <journal_title>SPIE Optical Engineering + Applications</journal_title>
+              <volume>9967</volume>
+              <cYear>2016</cYear>
+            </citation>
+            <citation key="c51">
+              <author>Wilde</author>
+              <article_title>Micro-CT at the Imaging Beamline P05 at PETRA III</article_title>
+              <cYear>2015</cYear>
+            </citation>
+            <citation key="c52">
+              <author>Tan Jerome</author>
+              <article_title>
+                WAVE: a 3D online previewing framework for big data archives
+              </article_title>
+              <first_page>152</first_page>
+              <cYear>2017</cYear>
+            </citation>
+            <citation key="c53">
+              <doi>10.5220/0006262903300334</doi>
+            </citation>
+            <citation key="c54">
+              <author>Kühsel</author>
+              <article_title>Surface area–volume ratios in insects</article_title>
+              <journal_title>Insect Science</journal_title>
+              <first_page>1</first_page>
+              <cYear>2016</cYear>
+            </citation>
+          </citation_list>
+          <component_list>
+            <component parent_relation="isPartOf">
+              <description>
+                Conference presentation video: The NOVA project: maximizing beam time efficiency through synergistic analyses of SRμCT data
+              </description>
+              <format/>
+              <doi_data>
+                <doi>10.1117/12.2275959.5581167496001</doi>
+                <resource>
+                  https://www.spiedigitallibrary.org/conference-presentations/10391/103910P/The-NOVA-project--maximizing-beam-time-efficiency-through-synergistic/10.1117/12.2275959.5581167496001
+                </resource>
+              </doi_data>
+            </component>
+          </component_list>
+        </conference_paper>
+      </conference>
+    </crossref>
+  </doi_record>
+</doi_records>

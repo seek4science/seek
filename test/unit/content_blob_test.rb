@@ -524,7 +524,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'is_content_viewable?' do
-    Seek::Config.stub(:soffice_available?, true) do
+    Seek::Config.stub(:pdf_conversion_enabled, true) do
       viewable_formats = %w[application/pdf]
       viewable_formats << 'application/msword'
       viewable_formats << 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
@@ -543,39 +543,16 @@ class ContentBlobTest < ActiveSupport::TestCase
       end
       cb_with_no_viewable_format = Factory(:content_blob, content_type: 'application/excel', asset: Factory(:sop), data: File.new("#{Rails.root}/test/fixtures/files/spreadsheet.xls", 'rb').read)
       User.with_current_user cb_with_no_viewable_format.asset.contributor do
-        assert !cb_with_no_viewable_format.is_viewable_format?
-        assert !cb_with_no_viewable_format.is_content_viewable?
+        refute cb_with_no_viewable_format.is_viewable_format?
+        refute cb_with_no_viewable_format.is_content_viewable?
       end
-    end
-  end
 
-  test 'is_content_viewable? without soffice' do
-    Seek::Config.stub(:soffice_available?, false) do
-      viewable_formats = %w[pdf_content_blob] # Can still view PDFs
+      #correct format but file doesn't exist
+      blob = Factory(:content_blob, content_type: 'application/msword', asset: Factory(:sop))
+      FileUtils.rm blob.filepath
 
-      unviewable_formats = []
-      unviewable_formats << 'doc_content_blob'
-      unviewable_formats << 'docx_content_blob'
-      unviewable_formats << 'ppt_content_blob'
-      unviewable_formats << 'pptx_content_blob'
-      unviewable_formats << 'odt_content_blob'
-      unviewable_formats << 'odp_content_blob'
-      unviewable_formats << 'rtf_content_blob'
-
-      viewable_formats.each do |viewable_format|
-        cb_with_content_viewable_format = Factory(viewable_format.to_s, asset:Factory(:sop))
-        User.with_current_user cb_with_content_viewable_format.asset.contributor do
-          assert cb_with_content_viewable_format.is_viewable_format?
-          assert cb_with_content_viewable_format.is_content_viewable?
-        end
-      end
-      unviewable_formats.each do |unviewable_format|
-        cb_with_content_unviewable_format = Factory(unviewable_format.to_s, asset:Factory(:sop))
-        User.with_current_user cb_with_content_unviewable_format.asset.contributor do
-          refute cb_with_content_unviewable_format.is_viewable_format?
-          refute cb_with_content_unviewable_format.is_content_viewable?
-        end
-      end
+      assert blob.is_viewable_format?
+      refute blob.is_content_viewable?
     end
   end
 
@@ -969,6 +946,33 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     refute blob.is_extractable_spreadsheet?
     assert_equal 'image/png',blob.content_type
+  end
+
+  test 'tmp_io_objects in tmp dir are deleted' do
+    file = Tempfile.new('testing-content-blob')
+    file.write('test test test')
+    file.close
+
+    assert File.exists?(file.path)
+    tmp_object = File.open(file.path)
+    blob = ContentBlob.create(original_filename:'testing-content-blob.txt', tmp_io_object: tmp_object)
+    assert blob.file_exists?
+    assert_equal 14,blob.file_size
+    refute File.exists?(file.path)
+  end
+
+  test 'tmp_io_object not in tmp are not deleted' do
+    #files outside of tmp/ shouldn't be cleaned up as they may just be needed for copy
+    path = File.join(Seek::Config.temporary_filestore_path,'test-content-blob.txt')
+    file = File.open(path,'w')
+    file.write('test test test')
+    file.close
+    tmp_object = File.open(path)
+    blob = ContentBlob.create(original_filename:'testing-content-blob.txt', tmp_io_object: tmp_object)
+    assert blob.file_exists?
+    assert_equal 14,blob.file_size
+    assert File.exists?(path)
+    File.delete(path)
   end
 
 end

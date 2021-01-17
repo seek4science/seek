@@ -34,7 +34,7 @@ module Seek
 
       def initialize_structure
         pairs = @sample_type.sample_attributes.map do |attribute|
-          [attribute.hash_key, nil]
+          [attribute.accessor_name, nil]
         end
 
         update(pairs.to_h)

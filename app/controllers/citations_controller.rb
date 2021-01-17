@@ -1,4 +1,5 @@
 class CitationsController < ApplicationController
+  before_action :set_citation_style
 
   def fetch
     respond_to do |format|
@@ -6,4 +7,9 @@ class CitationsController < ApplicationController
     end
   end
 
+  private
+
+  def set_citation_style
+    session[:citation_style] = params[:style] if params[:style].present?
+  end
 end

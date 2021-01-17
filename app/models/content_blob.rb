@@ -129,8 +129,8 @@ class ContentBlob < ApplicationRecord
     nil
   end
 
-  def file_exists?
-    File.exist?(filepath)
+  def file_exists?(format = 'dat')
+    File.exist?(filepath(format))
   end
 
   def storage_filename(format = 'dat', uuid_to_use = nil)
@@ -251,7 +251,16 @@ class ContentBlob < ApplicationRecord
 
     if @tmp_io_object.respond_to?(:path)
       @tmp_io_object.flush if @tmp_io_object.respond_to? :flush
-      FileUtils.mv @tmp_io_object.path, filepath
+      if @tmp_io_object.path
+        FileUtils.cp @tmp_io_object.path, filepath
+
+        # only clean up if object is within the temp (/tmp/) directory, otherwise the original file should be kept
+        if @tmp_io_object.path.start_with?("#{Dir.tmpdir}#{File::SEPARATOR}")
+          File.delete(@tmp_io_object.path)
+        end
+
+      end
+
     else
       @tmp_io_object.rewind
       File.open(filepath, 'wb+') do |f|

@@ -4,7 +4,7 @@ module PeopleHelper
   end
 
   def contact_details_warning_message
-    msg = "This information is only visible to other people whom you share a #{t('project')}"
+    msg = "This information is only visible to other people with whom you share a #{t('project')}"
     msg << " or #{t('programme')}" if Seek::Config.programmes_enabled
     msg << '.'
     msg
@@ -40,19 +40,6 @@ module PeopleHelper
       logo = image(:orcid_id)
       link_to(logo + ' ' + person.orcid_display_format, person.orcid_uri, target: '_blank').html_safe
     end
-  end
-
-  def discipline_list(disciplines)
-    if disciplines.any?
-      text = ''
-      disciplines.each do |discipline|
-        text += link_to(h(discipline.title), people_path(discipline_id: discipline.id))
-        text += ', ' unless disciplines.last == discipline
-      end
-    else
-      text = content_tag(:span, class: 'none_text') { 'Not specified' }
-    end
-    text.html_safe
   end
 
   def admin_defined_project_roles_hash

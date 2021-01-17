@@ -16,23 +16,23 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
     sop = Factory :sop
     model = Factory :model
     AuthLookupUpdateQueue.destroy_all
-    assert !AuthLookupUpdateQueue.exists?(sop)
-    assert !AuthLookupUpdateQueue.exists?(model)
-    assert !AuthLookupUpdateQueue.exists?(nil)
+    assert !AuthLookupUpdateQueue.exists?(item: sop)
+    assert !AuthLookupUpdateQueue.exists?(item: model)
+    assert !AuthLookupUpdateQueue.exists?(item: nil)
 
     disable_authorization_checks do
       AuthLookupUpdateQueue.create item: sop
     end
 
-    assert AuthLookupUpdateQueue.exists?(sop)
-    assert !AuthLookupUpdateQueue.exists?(model)
-    assert !AuthLookupUpdateQueue.exists?(nil)
+    assert AuthLookupUpdateQueue.exists?(item: sop)
+    assert !AuthLookupUpdateQueue.exists?(item: model)
+    assert !AuthLookupUpdateQueue.exists?(item: nil)
 
     AuthLookupUpdateQueue.create item: nil
 
-    assert AuthLookupUpdateQueue.exists?(sop)
-    assert !AuthLookupUpdateQueue.exists?(model)
-    assert AuthLookupUpdateQueue.exists?(nil)
+    assert AuthLookupUpdateQueue.exists?(item: sop)
+    assert !AuthLookupUpdateQueue.exists?(item: model)
+    assert AuthLookupUpdateQueue.exists?(item: nil)
   end
 
   test 'updates to queue for sop' do
@@ -253,9 +253,73 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
       assert_difference('AuthLookupUpdateQueue.count', 1) do
         df.save!
       end
+    end
+  end
 
+  test 'enqueue' do
+    df = Factory(:data_file)
+    df2 = Factory(:data_file)
+    sop = Factory(:sop)
+    sop2 = Factory(:sop)
+
+    AuthLookupUpdateQueue.destroy_all
+
+    assert_difference('Delayed::Job.count', 1) do
+      assert_difference('AuthLookupUpdateQueue.count', 1) do
+        AuthLookupUpdateQueue.enqueue(df, priority: 2)
+      end
     end
 
+    assert_difference('AuthLookupUpdateQueue.count', 0, 'should not enqueue duplicate items') do
+      entry = AuthLookupUpdateQueue.enqueue(df, priority: 3).first
+      assert_equal 2, entry.priority, 'should not de-prioritize existing queue entry (lower priority executed first)'
+    end
 
+    assert_difference('AuthLookupUpdateQueue.count', 0, 'should not enqueue duplicate items') do
+      entry = AuthLookupUpdateQueue.enqueue(df, priority: 1).first
+      assert_equal 1, entry.priority, 'should change priority'
+    end
+
+    assert_difference('Delayed::Job.count', 0) do
+      assert_difference('AuthLookupUpdateQueue.count', 1) do
+        AuthLookupUpdateQueue.enqueue(df2, priority: 2, queue_job: false)
+      end
+    end
+
+    # Handle flattening
+    assert_difference('Delayed::Job.count', 1) do
+      assert_difference('AuthLookupUpdateQueue.count', 2) do
+        entries = AuthLookupUpdateQueue.enqueue([sop], [[[[sop2]]]], priority: 2).map(&:item)
+        assert_includes entries, sop
+        assert_includes entries, sop2
+      end
+    end
+  end
+
+  test 'dequeue' do
+    df = Factory(:data_file)
+    df2 = Factory(:data_file)
+    df3 = Factory(:data_file)
+    user = df.contributor.user
+
+    AuthLookupUpdateQueue.destroy_all
+
+    AuthLookupUpdateQueue.enqueue(df3, priority: 1)
+    AuthLookupUpdateQueue.enqueue(df2, priority: 3)
+    AuthLookupUpdateQueue.enqueue(user, df, priority: 2)
+
+    assert_difference('AuthLookupUpdateQueue.count', -4) do
+      items = AuthLookupUpdateQueue.dequeue(4)
+      assert_equal [df3, df, user, df2], items, "should be ordered by priority, type, then ID"
+    end
+
+    FactoryGirl.create_list(:document, 10)
+    with_config_value(:auth_lookup_update_batch_size, 6) do
+      assert_equal 6, Seek::Config.auth_lookup_update_batch_size
+      assert_difference('AuthLookupUpdateQueue.count', -Seek::Config.auth_lookup_update_batch_size,
+                        "should dequeue by `Seek::Config.auth_lookup_update_batch_size` amount by default") do
+        AuthLookupUpdateQueue.dequeue
+      end
+    end
   end
 end

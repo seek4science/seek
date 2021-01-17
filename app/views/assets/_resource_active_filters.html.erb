@@ -1,0 +1,16 @@
+<% if @active_filters&.any? %>
+  <div class="active-filters">
+    <% @active_filters.each do |key, active_filters| %>
+      <div class="active-filter-category">
+        <strong class="active-filter-category-title"><%= key.to_s.humanize %>:</strong>
+        <% first = true %>
+        <% active_filters.each do |filter| %>
+          <% unless first %>
+            or
+          <% end; first = false %>
+          <%= filter_link(key, filter) %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

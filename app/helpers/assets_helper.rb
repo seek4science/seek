@@ -1,5 +1,34 @@
 module AssetsHelper
   include ApplicationHelper
+  include BootstrapHelper
+  include SessionsHelper
+
+  def form_submit_buttons(item, options = {})
+    # defaults
+    options[:validate] = true if options[:validate].nil?
+    if options[:preview_permissions].nil?
+      options[:preview_permissions] = show_form_manage_specific_attributes?
+    end
+    options[:button_text] ||= submit_button_text(item)
+    options[:cancel_path] = polymorphic_path(item)
+    options[:resource_name] = item.class.name.underscore
+    options[:button_id] ||= "#{options[:resource_name]}_submit_btn"
+
+    render partial: 'assets/form_submit_buttons', locals: { item: item, **options }
+  end
+
+  # determine the text for the submit button, based on whether it is an edit or creation, and whether upload is required
+  def submit_button_text(item)
+    if item.new_record?
+      if item.is_downloadable?
+        t('submit_button.upload')
+      else
+        t('submit_button.create')
+      end
+    else
+      t('submit_button.update')
+    end
+  end
 
   # the prefix used on some field id's, e.g. data_files_data_url
   def asset_field_prefix
@@ -99,7 +128,7 @@ module AssetsHelper
     if resource.class.name.include?('::Version')
       polymorphic_path(resource.parent, version: resource.version)
     elsif resource.is_a?(Snapshot)
-      polymorphic_path([resource.resource,resource])
+      polymorphic_path([resource.resource, resource])
     else
       polymorphic_path(resource)
     end
@@ -113,11 +142,21 @@ module AssetsHelper
     end
   end
 
+  def manage_resource_path(resource)
+    if resource.class.name.include?('::Version')
+      polymorphic_path(resource.parent, action:'manage')
+    else
+      polymorphic_path(resource, action:'manage')
+    end
+  end
+
   # provides a list of assets, according to the class, that are authorized according the 'action' which defaults to view
   # if projects is provided, only authorizes the assets for that project
   # assets are sorted by title except if they are projects and scales (because of hierarchies)
   def authorised_assets(asset_class, projects = nil, action = 'view')
-    assets = asset_class.all_authorized_for action, User.current_user, projects
+    assets = asset_class
+    assets = assets.filter_by_projects(projects) if projects
+    assets = assets.authorized_for(action, User.current_user).to_a
     assets = assets.sort_by(&:title) if !assets.blank? && !%w[Project Scale].include?(assets.first.class.name)
     assets
   end
@@ -134,10 +173,6 @@ module AssetsHelper
   # code is for authorization of temporary link
   def can_view_asset?(asset, code = params[:code], can_view = asset.can_view?)
     can_view || (code && asset.auth_by_code?(code))
-  end
-
-  def asset_link_url(asset)
-    asset.single_content_blob.try(:url)
   end
 
   def download_or_link_button(asset, download_path, link_url, _human_name = nil, opts = {})
@@ -186,7 +221,7 @@ module AssetsHelper
   end
 
   def create_button(opts)
-    text = opts.delete(:button_text) || 'Upload and Save'
+    text = opts.delete(:button_text) || t('submit_button.upload')
     submit_tag(text, opts.merge('data-upload-button' => ''))
   end
 
@@ -210,5 +245,61 @@ module AssetsHelper
     return asset.content_blob.show_as_external_link? ? link_button_or_nil : galaxy_button if asset.respond_to?(:content_blob)
   end
 
+  def add_to_dropdown(item)
+    return unless Seek::AddButtons.add_dropdown_for(item)
+    tooltip = "This option allows you to add a new item, whilst associating it with this #{text_for_resource(item)}"
+    dropdown_button(t('add_new_dropdown.button'), 'attach', menu_options: {class: 'pull-right', id: 'item-admin-menu'}, tooltip:tooltip) do
+      add_item_to_options(item) do |text, path|
+        content_tag(:li) do
+          image_tag_for_key('add', path, text, nil, text)
+        end
+      end.join(" ").html_safe
+    end
+  end
+
+  def add_item_to_options(item)
+    elements = []
+    Seek::AddButtons.add_for_item(item).each do |type,param|
+
+      text="#{t('add_new_dropdown.option')} #{t(type.name.underscore)}"
+      path = new_polymorphic_path(type,param=>item.id)
+      elements << yield(text,path)
+    end
+    elements
+  end
+
+  # whether the viewable content is available, or converted to pdf, or capable to be converted to pdf
+  def view_content_available?(content_blob)
+    return true if content_blob.is_text? || content_blob.is_pdf? || content_blob.is_cwl? || content_blob.is_image?
+    if content_blob.is_pdf_viewable?
+      content_blob.file_exists?('pdf') || Seek::Config.soffice_available?
+    else
+      false
+    end
+  end
+
+  #if there are creators, the email will be sent only to them, otherwise sent to the contributor
+  #if the contact requester is one of the contirbutor/creators, the person is allowed to send request to others, but not to himself.
+  def get_email_recipients(resource)
+    if resource.creators.present?
+      email_recipients = resource.creators
+    else
+      email_recipients = [resource.contributor] unless resource.contributor.nil?
+    end
+    email_recipients = email_recipients - [ User.current_user.person ] unless email_recipients.nil?
+  end
+
+  # whether the request contact button should be showns
+  def request_contact_button_enabled?(resource)
+    Seek::Config.email_enabled && logged_in_and_registered? && get_email_recipients(resource).present? && MessageLog.recent_contact_requests(User.current_user.try(:person),resource).empty?
+  end
+
+  # whether the request contact has been made within 12 hours
+  def request_contact_pending?(resource)
+    return nil unless logged_in_and_registered?
+    return nil unless Seek::Config.email_enabled
+    return nil unless get_email_recipients(resource).present?
+    MessageLog.recent_contact_requests(current_user.try(:person), resource).first
+  end
 
 end

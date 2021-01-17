@@ -141,7 +141,7 @@ class ModelsControllerTest < ActionController::TestCase
     login_as(:aaron)
     get :index, params: { page: 'all' }
     assert_response :success
-    assert_equal assigns(:models).sort_by(&:id), Model.authorize_asset_collection(assigns(:models), 'view', users(:aaron)).sort_by(&:id), "models haven't been authorized properly"
+    assert_equal assigns(:models).sort_by(&:id), assigns(:models).authorized_for('view', users(:aaron)).sort_by(&:id), "models haven't been authorized properly"
   end
 
   test 'should contain only model assays ' do
@@ -154,11 +154,6 @@ class ModelsControllerTest < ActionController::TestCase
 
   test 'correct title and text for associating a modelling analysis for new' do
     login_as(Factory(:user))
-    as_virtualliver do
-      get :new
-      assert_response :success
-      assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.modelling_analysis')} or create new #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
-    end
     as_not_virtualliver do
       get :new
       assert_response :success
@@ -171,11 +166,6 @@ class ModelsControllerTest < ActionController::TestCase
   test 'correct title and text for associating a modelling analysis for edit' do
     model = Factory :model
     login_as(model.contributor.user)
-    as_virtualliver do
-      get :edit, params: { id: model.id }
-      assert_response :success
-      assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.modelling_analysis')} or create new #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
-    end
     as_not_virtualliver do
       get :edit, params: { id: model.id }
       assert_response :success
@@ -534,6 +524,21 @@ class ModelsControllerTest < ActionController::TestCase
     assert_select 'p.import_details', count: 0
   end
 
+  test 'should show request contact button' do
+    p1 = Factory :person
+    p2 = Factory :person
+    m = Factory(:model, title: 'a model', creators: [p1,p2], contributor:User.current_user.person, policy: Factory(:public_policy))
+
+    assert_difference('ActivityLog.count') do
+      get :show, params: { id: m }
+    end
+
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a', text: /Contact/, count: 1
+    end
+  end
+
   test 'should show model with multiple files' do
     m = Factory :model_2_files, policy: Factory(:public_policy)
 
@@ -644,9 +649,20 @@ class ModelsControllerTest < ActionController::TestCase
 
   def test_should_create_new_version
     m = Factory(:model, contributor:User.current_user.person)
+    assert_equal 1,m.version
+    assert_equal 1,m.versions[0].content_blobs.count
+    assert m.versions[0].content_blobs.first.file_exists?
+    assert_equal 'cronwright.xml',m.versions[0].content_blobs.first.original_filename
+
     assert_difference('Model::Version.count', 1) do
       post :new_version, params: { id: m, model: { title: m.title}, content_blobs: [{ data: fixture_file_upload('files/little_file.txt') }], revision_comments: 'This is a new revision' }
     end
+
+    # check previous version isn't affected
+    assert_equal 1,m.version
+    assert_equal 1,m.versions[0].content_blobs.count
+    assert m.versions[0].content_blobs.first.file_exists?
+    assert_equal 'cronwright.xml', m.versions[0].content_blobs.first.original_filename
 
     assert_redirected_to model_path(m)
     assert assigns(:model)
@@ -707,7 +723,7 @@ class ModelsControllerTest < ActionController::TestCase
 
   test 'filtering by person' do
     person = people(:person_for_model_owner)
-    get :index, params: { filter: { person: person.id }, page: 'all' }
+    get :index, params: { filter: { contributor: person.id }, page: 'all' }
     assert_response :success
     m = models(:model_with_format_and_type)
     m2 = models(:model_with_different_owner)
@@ -882,7 +898,7 @@ class ModelsControllerTest < ActionController::TestCase
     model = models(:teusink)
     model.other_creators = 'another creator'
     model.save
-    get :index
+    get :index, params: { page: 'T' }
 
     assert_select 'p.list_item_attribute', text: /, another creator/, count: 1
   end
@@ -956,16 +972,30 @@ class ModelsControllerTest < ActionController::TestCase
     model.save
     get :show, params: { id: model }
 
-    assert_select 'div', text: 'another creator', count: 1
+    assert_select 'li.author-list-item', text: 'another creator', count: 1
   end
 
   test 'should create new model version based on content_blobs of previous version' do
     m = Factory(:model_2_files, policy: Factory(:private_policy))
+
+    assert_equal 1,m.version
+    assert_equal 2,m.versions[0].content_blobs.count
+    assert m.versions[0].content_blobs[0].file_exists?
+    assert m.versions[0].content_blobs[1].file_exists?
+    assert_equal 'cronwright.xml', m.versions[0].content_blobs.first.original_filename
+
     retained_content_blob = m.content_blobs.first
     login_as(m.contributor)
     assert_difference('Model::Version.count', 1) do
       post :new_version, params: { id: m, model: { title: m.title }, content_blobs: [{ data: file_for_upload }], retained_content_blob_ids: [retained_content_blob.id] }
     end
+
+    # check previous version isn't affected
+    assert_equal 1,m.version
+    assert_equal 2,m.versions[0].content_blobs.count
+    assert m.versions[0].content_blobs[0].file_exists?
+    assert m.versions[0].content_blobs[1].file_exists?
+    assert_equal 'cronwright.xml', m.versions[0].content_blobs.first.original_filename
 
     assert_redirected_to model_path(m)
     assert assigns(:model)
@@ -1149,13 +1179,13 @@ class ModelsControllerTest < ActionController::TestCase
 
     get :show, params: { id: model }
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/, count:0
+    assert_select '#citation', text: /Bacall, F/, count:0
 
     model.latest_version.update_attribute(:doi,'doi:10.1.1.1/xxx')
 
     get :show, params: { id: model }
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/, count:1
+    assert_select '#citation', text: /Bacall, F/, count:1
   end
 
   test 'associated with assay_ids params' do
@@ -1167,8 +1197,8 @@ class ModelsControllerTest < ActionController::TestCase
 
     assert good_assay.can_edit?
     assert good_assay2.can_edit?
-    assert bad_assay2.can_edit?
     refute bad_assay.can_edit?
+    assert bad_assay2.can_edit?
 
     assert good_assay.is_modelling?
     assert good_assay2.is_modelling?
@@ -1178,13 +1208,15 @@ class ModelsControllerTest < ActionController::TestCase
 
     ids = [good_assay,good_assay2,bad_assay,bad_assay2].collect(&:id).collect(&:to_s)
 
-    get :new, params: { assay_ids: ids }
+    id_params = ids.collect{|id| {assay_id: id} }
+
+    get :new, params: {model: {assay_assets_attributes: id_params } }
 
     assert_response :success
 
     model = assigns(:model)
-    refute_empty model.assays
-    assert_equal [good_assay,good_assay2].sort,model.assays.sort
+    refute_empty model.assay_assets.collect(&:assay)
+    assert_equal [good_assay,good_assay2].collect(&:id).sort, model.assay_assets.collect(&:assay).collect(&:id).sort
 
     # dirty way to check that they end up in the embedded JSON script block.
     # Cannot test the elements itself as the javascript needs to execute first
@@ -1197,6 +1229,197 @@ class ModelsControllerTest < ActionController::TestCase
       end
     end
   end
+
+  test 'manage menu item appears according to permission' do
+    check_manage_edit_menu_for_type('model')
+  end
+
+  test 'can access manage page with manage rights' do
+    person = Factory(:person)
+    model = Factory(:model, contributor:person)
+    login_as(person)
+    assert model.can_manage?
+    get :manage, params: {id: model}
+    assert_response :success
+
+    # check the project form exists, studies and assays don't have this
+    assert_select 'div#add_projects_form', count:1
+
+    # check sharing form exists
+    assert_select 'div#sharing_form', count:1
+
+    # should be a temporary sharing link
+    assert_select 'div#temporary_links', count:1
+
+    assert_select 'div#author_form', count:1
+  end
+
+  test 'cannot access manage page with edit rights' do
+    person = Factory(:person)
+    model = Factory(:model, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:person, access_type:Policy::EDITING)]))
+    login_as(person)
+    assert model.can_edit?
+    refute model.can_manage?
+    get :manage, params: {id:model}
+    assert_redirected_to model
+    refute_nil flash[:error]
+  end
+
+  test 'manage_update' do
+    proj1=Factory(:project)
+    proj2=Factory(:project)
+    person = Factory(:person,project:proj1)
+    other_person = Factory(:person)
+    person.add_to_project_and_institution(proj2,person.institutions.first)
+    person.save!
+    other_creator = Factory(:person,project:proj1)
+    other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
+    other_creator.save!
+
+    model = Factory(:model, contributor:person, projects:[proj1], policy:Factory(:private_policy))
+
+    login_as(person)
+    assert model.can_manage?
+
+    patch :manage_update, params: {id: model,
+                                   model: {
+                                       creator_ids: [other_creator.id],
+                                       project_ids: [proj1.id, proj2.id]
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    assert_redirected_to model
+
+    model.reload
+    assert_equal [proj1,proj2],model.projects.sort_by(&:id)
+    assert_equal [other_creator],model.creators
+    assert_equal Policy::VISIBLE,model.policy.access_type
+    assert_equal 1,model.policy.permissions.count
+    assert_equal other_person,model.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING,model.policy.permissions.first.access_type
+
+  end
+
+  test 'manage_update fails without manage rights' do
+    proj1=Factory(:project)
+    proj2=Factory(:project)
+    person = Factory(:person, project:proj1)
+    person.add_to_project_and_institution(proj2,person.institutions.first)
+    person.save!
+
+    other_person = Factory(:person)
+
+    other_creator = Factory(:person,project:proj1)
+    other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
+    other_creator.save!
+
+    model = Factory(:model, projects:[proj1], policy:Factory(:private_policy,
+                                                                     permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+
+    login_as(person)
+    refute model.can_manage?
+    assert model.can_edit?
+
+    assert_equal [proj1],model.projects
+    assert_empty model.creators
+
+    patch :manage_update, params: {id: model,
+                                   model: {
+                                       creator_ids: [other_creator.id],
+                                       project_ids: [proj1.id, proj2.id]
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    refute_nil flash[:error]
+
+    model.reload
+    assert_equal [proj1],model.projects
+    assert_empty model.creators
+    assert_equal Policy::PRIVATE,model.policy.access_type
+    assert_equal 1,model.policy.permissions.count
+    assert_equal person,model.policy.permissions.first.contributor
+    assert_equal Policy::EDITING,model.policy.permissions.first.access_type
+  end
+
+  test 'preserves DOI on update' do
+    model = Factory(:teusink_model)
+    model.latest_version.update_column(:doi, '10.1000/doi/1')
+    login_as(model.contributor)
+
+    put :update, params: { id: model.id, model: { title: 'testy' } }
+
+    assert_equal '10.1000/doi/1', model.latest_version.reload.doi
+  end
+
+  test 'should create with discussion link' do
+    person = Factory(:person)
+    login_as(person)
+    model =  {title: 'Model', project_ids: [person.projects.first.id], discussion_links_attributes:[{url: "http://www.slack.com/", label:'the slack about this model'}]}
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('Model.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, params: {model: model, content_blobs: [{ data: file_for_upload }], policy_attributes: { access_type: Policy::VISIBLE }}
+        end
+      end
+    end
+    model = assigns(:model)
+    assert_equal 'http://www.slack.com/', model.discussion_links.first.url
+    assert_equal 'the slack about this model', model.discussion_links.first.label
+    assert_equal AssetLink::DISCUSSION, model.discussion_links.first.link_type
+  end
+
+  test 'should show discussion link' do
+    asset_link = Factory(:discussion_link)
+    model = Factory(:model, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    get :show, params: { id: model }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+  end
+
+  test 'should update model with new discussion link' do
+    person = Factory(:person)
+    model = Factory(:model, contributor: person)
+    login_as(person)
+    assert_nil model.discussion_links.first
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: model.id, model: { discussion_links_attributes:[{url: "http://www.slack.com/"}] }  }
+      end
+    end
+    assert_redirected_to model_path(model = assigns(:model))
+    assert_equal 'http://www.slack.com/', model.discussion_links.first.url
+  end
+
+  test 'should update model with edited discussion link' do
+    person = Factory(:person)
+    model = Factory(:model, contributor: person, discussion_links:[Factory(:discussion_link)])
+    login_as(person)
+    assert_equal 1,model.discussion_links.count
+    assert_no_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: model.id, model: { discussion_links_attributes:[{id:model.discussion_links.first.id, url: "http://www.wibble.com/"}] } }
+      end
+    end
+    model = assigns(:model)
+    assert_redirected_to model_path(model)
+    assert_equal 1,model.discussion_links.count
+    assert_equal 'http://www.wibble.com/', model.discussion_links.first.url
+  end
+
+  test 'should destroy related assetlink when the discussion link is removed ' do
+    person = Factory(:person)
+    login_as(person)
+    asset_link = Factory(:discussion_link)
+    model = Factory(:model, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
+    assert_difference('AssetLink.discussion.count', -1) do
+      put :update, params: { id: model.id, model: { discussion_links_attributes:[{id: asset_link.id, _destroy:'1'}] } }
+    end
+    assert_redirected_to model_path(model = assigns(:model))
+    assert_empty model.discussion_links
+  end
+
 
   private
 

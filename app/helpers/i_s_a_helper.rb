@@ -66,6 +66,7 @@ module ISAHelper
       item_type = item.is_a?(Seek::ObjectAggregation) ? "#{item.type} collection" : item.class.name
       data = { id: node_id(item) }
 
+      data['seek_id'] = item.rdf_resource.to_s if item.respond_to?(:rdf_resource)
       if node.can_view?
         data['description'] = if item.respond_to?(:description)
                                 truncate(item.description, length: 500)
@@ -98,18 +99,7 @@ module ISAHelper
                     { group: 'nodes', data: data, classes: 'resource resource-small' }
                   end
 
-      # If this node has children, but they aren't included in the set of nodes, create an info node that will load the children
-      #  when clicked
-      actual_child_count = hash[:edges].count { |source, _| source == item }
-      next unless node.child_count > actual_child_count
-      cc_id = child_count_id(item)
-      elements << { group: 'nodes', data: { id: cc_id,
-                                            name: "Show #{node.child_count - actual_child_count} more",
-                                            url: polymorphic_path(item, action: :isa_children) },
-                    classes: 'child-count' }
-      elements << { group: 'edges', data: { id: "#{cc_id}-edge",
-                                            source: data[:id],
-                                            target: cc_id } }
+
     end
 
     elements

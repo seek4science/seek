@@ -11,7 +11,7 @@ class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
         get "/#{type_name}/new"
         assert_select 'form div#temporary_links', count: 0
 
-        get "/#{type_name}/#{Factory(type_name.singularize.to_sym, policy: Factory(:public_policy)).id}/edit"
+        get "/#{type_name}/#{Factory(type_name.singularize.to_sym, policy: Factory(:public_policy)).id}/manage"
         assert_select 'form div#temporary_links'
       end
     end

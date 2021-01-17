@@ -23,6 +23,8 @@
 
     <p>The following Data Files are involved in this <%= resource_text -%>:</p>
 
+    <%= hidden_field_tag "#{field_name}[]" %>
+
     <% if has_direction -%>
         <%= associations_list_group('data_file_to_list', 'direction.value', associated_data_files_json) do %>
             <div class="row">

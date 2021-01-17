@@ -6,7 +6,7 @@ class WorkflowsController < ApplicationController
 
   # before_action Seek::Config.workflows_enabled
   before_action :find_assets, :only => [ :index ]
-  before_action :find_and_authorize_requested_item, :except => [ :index, :new, :create, :request_resource,:preview, :test_asset_url, :update_annotations_ajax]
+  before_action :find_and_authorize_requested_item, :except => [ :index, :new, :create, :preview, :test_asset_url, :update_annotations_ajax]
   before_action :find_display_asset, :only=>[:show, :download]
 
   include Seek::Publishing::PublishingCommon
@@ -47,7 +47,7 @@ class WorkflowsController < ApplicationController
       if @workflow.update_attributes(workflow_params)
         flash[:notice] = "#{t('Workflow')} metadata was successfully updated."
         format.html { redirect_to workflow_path(@workflow) }
-        format.json { render json: @workflow }
+        format.json { render json: @workflow, include: [params[:include]] }
       else
         format.html { render action: 'edit' }
         format.json { render json: json_api_errors(@workflow), status: :unprocessable_entity }

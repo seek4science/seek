@@ -34,9 +34,7 @@ class SampleType < ApplicationRecord
   validates :title, length: { maximum: 255 }
   validates :description, length: { maximum: 65_535 }
   validates :contributor, presence: true
-
-  validate :validate_one_title_attribute_present, :validate_attribute_title_unique
-
+  validate :validate_one_title_attribute_present, :validate_attribute_title_unique, :validate_attribute_accessor_names_unique
   validates :projects, presence: true, projects: { self: true }
 
   accepts_nested_attributes_for :sample_attributes, allow_destroy: true
@@ -93,7 +91,7 @@ class SampleType < ApplicationRecord
   def can_edit?(user = User.current_user)
     return false if user.nil? || user.person.nil? || !Seek::Config.samples_enabled
     return true if user.is_admin?
-    contributor == user.person || projects.detect { |project| project.can_be_administered_by?(user)}.present?
+    contributor == user.person || projects.detect { |project| project.can_manage?(user)}.present?
   end
 
   def can_delete?(user = User.current_user)
@@ -107,12 +105,6 @@ class SampleType < ApplicationRecord
   def can_view?(user = User.current_user, referring_sample = nil)
     project_membership = (user && user.person && (user.person.projects & projects).any?)
     project_membership || public_samples? || check_referring_sample_permission(user,referring_sample)
-  end
-
-  # ducktyping to behave like a Policy based authorized item, in particular the index view
-  def self.all_authorized_for action, user = User.current_user
-    action = "can_#{action.to_s}?"
-    SampleType.all.select{|st| st.send(action,user)}
   end
 
   def editing_constraints
@@ -163,6 +155,15 @@ class SampleType < ApplicationRecord
     if dups.any?
       dups_text=dups.join(', ')
       errors.add(:sample_attributes, "Attribute names must be unique, there are duplicates of #{dups_text}")
+    end
+  end
+
+  def validate_attribute_accessor_names_unique
+    groups = sample_attributes.to_a.group_by(&:accessor_name)
+    dups = groups.select { |k, v| v.length > 1 }
+    if dups.any?
+      dups_text = dups.map { |k, v| "(#{v.map(&:title).join(', ')})" }.join(', ')
+      errors.add(:sample_attributes, "Attribute names are too similar: #{dups_text}")
     end
   end
 

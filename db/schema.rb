@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_10_122522) do
+ActiveRecord::Schema.define(version: 2020_07_29_093059) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -100,6 +100,16 @@ ActiveRecord::Schema.define(version: 2019_04_10_122522) do
     t.index ["value_type", "value_id"], name: "index_annotations_on_value_type_and_value_id"
   end
 
+  create_table "api_tokens",  force: :cascade do |t|
+    t.bigint "user_id"
+    t.string "title"
+    t.string "encrypted_token"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["encrypted_token"], name: "index_api_tokens_on_encrypted_token"
+    t.index ["user_id"], name: "index_api_tokens_on_user_id"
+  end
+
   create_table "assay_assets", id: :integer,  force: :cascade do |t|
     t.integer "assay_id"
     t.integer "asset_id"
@@ -175,6 +185,17 @@ ActiveRecord::Schema.define(version: 2019_04_10_122522) do
     t.datetime "updated_at", null: false
     t.integer "user_id"
     t.string "doi"
+  end
+
+  create_table "asset_links",  force: :cascade do |t|
+    t.integer "asset_id"
+    t.string "asset_type"
+    t.text "url"
+    t.string "link_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "label"
+    t.index ["asset_id", "asset_type"], name: "index_asset_links_on_asset_id_and_asset_type"
   end
 
   create_table "assets", id: :integer,  force: :cascade do |t|
@@ -272,13 +293,38 @@ ActiveRecord::Schema.define(version: 2019_04_10_122522) do
     t.datetime "updated_at"
   end
 
+  create_table "custom_metadata",  force: :cascade do |t|
+    t.text "json_metadata"
+    t.string "item_type"
+    t.bigint "item_id"
+    t.bigint "custom_metadata_type_id"
+    t.index ["custom_metadata_type_id"], name: "index_custom_metadata_on_custom_metadata_type_id"
+    t.index ["item_type", "item_id"], name: "index_custom_metadata_on_item_type_and_item_id"
+  end
+
+  create_table "custom_metadata_attributes",  force: :cascade do |t|
+    t.bigint "custom_metadata_type_id"
+    t.bigint "sample_attribute_type_id"
+    t.boolean "required", default: false
+    t.integer "pos"
+    t.string "title"
+    t.index ["custom_metadata_type_id"], name: "index_custom_metadata_attributes_on_custom_metadata_type_id"
+    t.index ["sample_attribute_type_id"], name: "index_custom_metadata_attributes_on_sample_attribute_type_id"
+  end
+
+  create_table "custom_metadata_types",  force: :cascade do |t|
+    t.string "title"
+    t.integer "contributor_id"
+    t.text "supported_type"
+  end
+
   create_table "data_file_auth_lookup", id: false,  force: :cascade do |t|
     t.integer "user_id"
     t.integer "asset_id"
-    t.boolean "can_view"
-    t.boolean "can_manage"
-    t.boolean "can_edit"
-    t.boolean "can_download"
+    t.boolean "can_view", default: false
+    t.boolean "can_manage", default: false
+    t.boolean "can_edit", default: false
+    t.boolean "can_download", default: false
     t.boolean "can_delete", default: false
     t.index ["user_id", "asset_id", "can_view"], name: "index_data_file_auth_lookup_user_asset_view"
     t.index ["user_id", "can_view"], name: "index_data_file_auth_lookup_on_user_id_and_can_view"
@@ -375,7 +421,7 @@ ActiveRecord::Schema.define(version: 2019_04_10_122522) do
     t.index ["person_id"], name: "index_disciplines_people_on_person_id"
   end
 
-  create_table "document_auth_lookup", id: :integer,  force: :cascade do |t|
+  create_table "document_auth_lookup", id: false,  force: :cascade do |t|
     t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view", default: false
@@ -465,7 +511,7 @@ ActiveRecord::Schema.define(version: 2019_04_10_122522) do
     t.text "address", limit: 16777215
     t.string "city"
     t.string "country"
-    t.string "url"
+    t.text "url"
     t.text "description", limit: 16777215
     t.string "title"
     t.integer "policy_id"
@@ -624,11 +670,21 @@ ActiveRecord::Schema.define(version: 2019_04_10_122522) do
     t.datetime "updated_at"
   end
 
+  create_table "identities", id: :integer,  force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "provider"
+    t.string "uid"
+    t.integer "user_id"
+    t.index ["provider", "uid"], name: "index_identities_on_provider_and_uid"
+    t.index ["user_id"], name: "index_identities_on_user_id"
+  end
+
   create_table "institutions", id: :integer,  force: :cascade do |t|
     t.string "title"
     t.text "address", limit: 16777215
     t.string "city"
-    t.string "web_page"
+    t.text "web_page"
     t.string "country"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -906,6 +962,53 @@ ActiveRecord::Schema.define(version: 2019_04_10_122522) do
     t.datetime "updated_at"
   end
 
+  create_table "oauth_access_grants",  force: :cascade do |t|
+    t.bigint "resource_owner_id", null: false
+    t.bigint "application_id", null: false
+    t.string "token", null: false
+    t.integer "expires_in", null: false
+    t.text "redirect_uri", null: false
+    t.datetime "created_at", null: false
+    t.datetime "revoked_at"
+    t.string "scopes", default: "", null: false
+    t.string "code_challenge"
+    t.string "code_challenge_method"
+    t.index ["application_id"], name: "index_oauth_access_grants_on_application_id"
+    t.index ["resource_owner_id"], name: "index_oauth_access_grants_on_resource_owner_id"
+    t.index ["token"], name: "index_oauth_access_grants_on_token", unique: true
+  end
+
+  create_table "oauth_access_tokens",  force: :cascade do |t|
+    t.bigint "resource_owner_id"
+    t.bigint "application_id", null: false
+    t.string "token", null: false
+    t.string "refresh_token"
+    t.integer "expires_in"
+    t.datetime "revoked_at"
+    t.datetime "created_at", null: false
+    t.string "scopes"
+    t.string "previous_refresh_token", default: "", null: false
+    t.index ["application_id"], name: "index_oauth_access_tokens_on_application_id"
+    t.index ["refresh_token"], name: "index_oauth_access_tokens_on_refresh_token", unique: true
+    t.index ["resource_owner_id"], name: "index_oauth_access_tokens_on_resource_owner_id"
+    t.index ["token"], name: "index_oauth_access_tokens_on_token", unique: true
+  end
+
+  create_table "oauth_applications",  force: :cascade do |t|
+    t.string "name", null: false
+    t.string "uid", null: false
+    t.string "secret", null: false
+    t.text "redirect_uri", null: false
+    t.string "scopes", default: "", null: false
+    t.boolean "confidential", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "owner_id"
+    t.string "owner_type"
+    t.index ["owner_id", "owner_type"], name: "index_oauth_applications_on_owner_id_and_owner_type"
+    t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
+  end
+
   create_table "oauth_sessions", id: :integer,  force: :cascade do |t|
     t.integer "user_id"
     t.string "provider"
@@ -956,7 +1059,7 @@ ActiveRecord::Schema.define(version: 2019_04_10_122522) do
     t.string "email"
     t.string "phone"
     t.string "skype_name"
-    t.string "web_page"
+    t.text "web_page"
     t.text "description", limit: 16777215
     t.integer "avatar_id"
     t.integer "status_id", default: 0
@@ -1056,7 +1159,7 @@ ActiveRecord::Schema.define(version: 2019_04_10_122522) do
     t.string "title"
     t.text "description", limit: 16777215
     t.integer "avatar_id"
-    t.string "web_page"
+    t.text "web_page"
     t.string "first_letter", limit: 1
     t.string "uuid"
     t.datetime "created_at", null: false
@@ -1107,8 +1210,8 @@ ActiveRecord::Schema.define(version: 2019_04_10_122522) do
 
   create_table "projects", id: :integer,  force: :cascade do |t|
     t.string "title"
-    t.string "web_page"
-    t.string "wiki_page"
+    t.text "web_page"
+    t.text "wiki_page"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.text "description", limit: 16777215
@@ -1194,6 +1297,13 @@ ActiveRecord::Schema.define(version: 2019_04_10_122522) do
     t.integer "person_id"
   end
 
+  create_table "publication_types", id: :integer,  force: :cascade do |t|
+    t.string "title"
+    t.string "key"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "publications", id: :integer,  force: :cascade do |t|
     t.integer "pubmed_id"
     t.text "title", limit: 16777215
@@ -1208,9 +1318,14 @@ ActiveRecord::Schema.define(version: 2019_04_10_122522) do
     t.string "doi"
     t.string "uuid"
     t.integer "policy_id"
-    t.integer "publication_type", default: 1
-    t.string "citation"
+    t.text "citation"
     t.string "deleted_contributor"
+    t.integer "registered_mode"
+    t.text "booktitle"
+    t.string "publisher"
+    t.text "editor"
+    t.integer "publication_type_id"
+    t.text "url"
     t.index ["contributor_id"], name: "index_publications_on_contributor"
   end
 
@@ -1744,4 +1859,6 @@ ActiveRecord::Schema.define(version: 2019_04_10_122522) do
     t.integer "sheet_number"
   end
 
+  add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
+  add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
 end

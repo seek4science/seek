@@ -44,9 +44,9 @@ class InvestigationsControllerTest < ActionController::TestCase
       assay1 = Factory :assay, policy: Factory(:public_policy),contributor:person
       assay2 = Factory :assay, policy: Factory(:public_policy),contributor:person
 
-      pub1 = Factory :publication, title: 'pub 1',contributor:person
-      pub2 = Factory :publication, title: 'pub 2',contributor:person
-      pub3 = Factory :publication, title: 'pub 3',contributor:person
+      pub1 = Factory :publication, title: 'pub 1',contributor:person, publication_type: Factory(:journal)
+      pub2 = Factory :publication, title: 'pub 2',contributor:person, publication_type: Factory(:journal)
+      pub3 = Factory :publication, title: 'pub 3',contributor:person, publication_type: Factory(:journal)
       Factory :relationship, subject: assay1, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub1
       Factory :relationship, subject: assay1, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub2
 
@@ -128,6 +128,22 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert !assigns(:investigation).new_record?
   end
 
+  test 'should create an investigations and associate it with a publication without publication type' do
+    user = Factory(:user)
+    project = user.person.projects.first
+    p = Factory(:publication)
+    p.publication_type_id = nil
+    disable_authorization_checks { p.save! }
+    login_as(user)
+    assert_difference('Investigation.count',1) do
+      post :create, params: { investigation: { title: 'investigation with publication', project_ids: [project.id.to_s],publication_ids: [p.id.to_s] } }
+    end
+    investigation = assigns(:investigation)
+    assert_nil p.publication_type_id
+    assert p.investigations.include?(investigation)
+    assert investigation.publications.include?(p)
+  end
+
   test 'should create with policy' do
     user = Factory(:user)
     project = user.person.projects.first
@@ -193,12 +209,6 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     get :show, params: { id: inv }
     assert_select 'a', text: /Add a #{I18n.t('study')}/i, count: 0
-  end
-
-  test 'add study button for person that can edit' do
-    inv = investigations(:metabolomics_investigation)
-    get :show, params: { id: inv }
-    assert_select 'a[href=?]', new_study_path(investigation_id: inv), text: /Add a #{I18n.t('study')}/i, count: 1
   end
 
   test "unauthorized user can't edit investigation" do
@@ -302,7 +312,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     investigation = Factory(:investigation, policy: Factory(:public_policy))
     get :show, params: { id: investigation }
     assert_response :success
-    assert_select '.author_avatar' do
+    assert_select '.author-list-item' do
       assert_select 'a[href=?]', person_path(investigation.contributing_user.person) do
         assert_select 'img'
       end
@@ -320,15 +330,12 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert investigation.creators.include?(creator)
   end
 
-  test 'should have creators association box' do
+  test 'should not have creators association box when editing' do
     investigation = Factory(:investigation, policy: Factory(:public_policy))
 
     get :edit, params: { id: investigation.id }
     assert_response :success
-    assert_select '#creators_list'
-    assert_select "input[type='text'][name='creator-typeahead']"
-    # assert_select "input[type='hidden'][name='investigation[creator_ids][]']" This is set via JS
-    assert_select "input[type='text'][name='investigation[other_creators]']"
+    assert_select '#creators_list', count:0
   end
 
   test 'should show creators' do
@@ -341,19 +348,19 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     get :show, params: { id: investigation.id }
     assert_response :success
-    assert_select 'span.author_avatar a[href=?]', "/people/#{creator.id}"
+    assert_select 'li.author-list-item a[href=?]', "/people/#{creator.id}"
   end
 
   test 'should show other creators' do
     investigation = Factory(:investigation, policy: Factory(:public_policy))
-    other_creators = 'other creators'
+    other_creators = 'john smith'
     investigation.other_creators = other_creators
     investigation.save
     investigation.reload
 
     get :show, params: { id: investigation.id }
     assert_response :success
-    assert_select 'div.panel-body div', text: other_creators
+    assert_select 'li.author-list-item', text: 'john smith'
   end
 
   test 'programme investigations through nested routing' do
@@ -485,6 +492,117 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert_select '#citation-instructions', count: 0
+  end
+
+  test 'manage menu item appears according to permission' do
+    check_manage_edit_menu_for_type('investigation')
+  end
+
+  test 'can access manage page with manage rights' do
+    person = Factory(:person)
+    investigation = Factory(:investigation, contributor:person)
+    login_as(person)
+    assert investigation.can_manage?
+    get :manage, params: {id: investigation}
+    assert_response :success
+
+    # check the project form exists, studies and assays don't have this
+    assert_select 'div#add_projects_form', count:1
+
+    #no sharing link, not for Investigation, Study and Assay
+    assert_select 'div#temporary_links', count:0
+
+    assert_select 'div#author_form', count:1
+  end
+
+  test 'cannot access manage page with edit rights' do
+    person = Factory(:person)
+    investigation = Factory(:investigation, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:person, access_type:Policy::EDITING)]))
+    login_as(person)
+    assert investigation.can_edit?
+    refute investigation.can_manage?
+    get :manage, params: {id:investigation}
+    assert_redirected_to investigation_path(investigation)
+    refute_nil flash[:error]
+  end
+
+  test 'manage_update' do
+    proj1=Factory(:project)
+    proj2=Factory(:project)
+    person = Factory(:person,project:proj1)
+    other_person = Factory(:person)
+    person.add_to_project_and_institution(proj2,person.institutions.first)
+    person.save!
+    other_creator = Factory(:person,project:proj1)
+    other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
+    other_creator.save!
+
+    investigation = Factory(:investigation, contributor:person, projects:[proj1], policy:Factory(:private_policy))
+
+    login_as(person)
+    assert investigation.can_manage?
+
+    patch :manage_update, params: {id: investigation,
+                                 investigation: {
+                                     creator_ids: [other_creator.id],
+                                     project_ids: [proj1.id, proj2.id]
+                                 },
+                                 policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                 }}
+
+    assert_redirected_to investigation
+
+    investigation.reload
+    assert_equal [proj1,proj2],investigation.projects.sort_by(&:id)
+    assert_equal [other_creator],investigation.creators
+    assert_equal Policy::VISIBLE,investigation.policy.access_type
+    assert_equal 1,investigation.policy.permissions.count
+    assert_equal other_person,investigation.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING,investigation.policy.permissions.first.access_type
+
+  end
+
+  test 'manage_update fails without manage rights' do
+    proj1=Factory(:project)
+    proj2=Factory(:project)
+    person = Factory(:person, project:proj1)
+    person.add_to_project_and_institution(proj2,person.institutions.first)
+    person.save!
+
+    other_person = Factory(:person)
+
+    other_creator = Factory(:person,project:proj1)
+    other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
+    other_creator.save!
+
+    investigation = Factory(:investigation, projects:[proj1], policy:Factory(:private_policy,
+                                                                             permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+
+    login_as(person)
+    refute investigation.can_manage?
+    assert investigation.can_edit?
+
+    assert_equal [proj1],investigation.projects
+    assert_empty investigation.creators
+
+    patch :manage_update, params: {id: investigation,
+                                 investigation: {
+                                     creator_ids: [other_creator.id],
+                                     project_ids: [proj1.id, proj2.id]
+                                 },
+                                 policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                 }}
+
+    refute_nil flash[:error]
+
+    investigation.reload
+    assert_equal [proj1],investigation.projects
+    assert_empty investigation.creators
+    assert_equal Policy::PRIVATE,investigation.policy.access_type
+    assert_equal 1,investigation.policy.permissions.count
+    assert_equal person,investigation.policy.permissions.first.contributor
+    assert_equal Policy::EDITING,investigation.policy.permissions.first.access_type
+
   end
 
   def edit_max_object(investigation)

@@ -12,7 +12,7 @@ function addRemoteFile() {
         makeALocalCopy: make_local_copy_element.checked ? "1" : "0",
         originalFilename:  original_filename_element.value
     };
-    remoteFile.text = remoteFile.originalFilename.blank() ? remoteFile.dataURL : remoteFile.originalFilename;
+    remoteFile.text = remoteFile.originalFilename.trim() ? remoteFile.originalFilename : remoteFile.dataURL;
 
     var parsed = parseUri(remoteFile.dataURL);
     if (!parsed.host || parsed.host == "null") {
@@ -33,7 +33,7 @@ function addLocalFile() {
     var filename = this.value.split(/\\/)[this.value.split(/\\/).length - 1];
     var listItem = $j(HandlebarsTemplates['upload/local_file']({ text: filename }));
     $j('#pending-files').append(listItem);
-    listItem.append(this.hide());
+    listItem.append($j(this).hide());
 }
 
 function removeFile() {

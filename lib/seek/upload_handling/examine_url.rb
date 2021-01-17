@@ -8,11 +8,11 @@ module Seek
         @size = info[:file_size]
         if content_is_webpage?(@content_type)
           @is_webpage = true
-          if (is_myexperiment_url? url)
+          if is_myexperiment_url? url
           else
             page = summarize_webpage(url)
-            @title = page.title
-            @description = page.description
+            @title = page.title&.strip
+            @description = page.description&.strip
             @image = page.images.best
           end
         else
@@ -53,22 +53,16 @@ module Seek
           @error = true
           @error_msg = 'The URL appears to be invalid'
         else
-          fail exception
+          raise exception
         end
       end
 
-      def is_myexperiment_url? (url)
+      def is_myexperiment_url?(url)
         URI uri = URI(url)
         @is_workflow = false
-        if !uri.hostname.include? "myexperiment"
-          return false
-        end
-        if !uri.path.end_with? ".html"
-          return false
-        end
-        if uri.path.include? "/workflow"
-          @is_workflow = true
-        end
+        return false unless uri.hostname.include? 'myexperiment'
+        return false unless uri.path.end_with? '.html'
+        @is_workflow = true if uri.path.include? '/workflow'
         begin
           xml_url = url[0..-6] + '.xml'
 
@@ -82,15 +76,13 @@ module Seek
           xml_doc.xpath('/*/preview').each do |node|
             @image = node.text
           end
-
-
           return true
         rescue
           return false
         end
-
-        return false
+        false
       end
+
     end
   end
 end

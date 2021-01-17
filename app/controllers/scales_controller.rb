@@ -13,10 +13,9 @@ class ScalesController < ApplicationController
     type = params[:scale_type]
     scale = Scale.find_by_key(type)
 
-    assets = scale ? Scale.with_scale(scale) : everything_with_scale
-
+    @grouped_assets = scale ? scale.grouped_assets : everything_with_scale
     @scale_title = scale.try(:key) || 'all'
-    @resource_hash = build_resource_hash(assets)
+
     respond_to do |format|
       format.js
     end
@@ -29,34 +28,25 @@ class ScalesController < ApplicationController
   private
 
   def everything_with_scale
-    Scale.all.collect do |scale|
-      scale.assets
-    end.flatten.uniq
+    grouped = {}
+
+    Scale.find_each do |scale|
+      scale.grouped_asset_ids.each do |type, ids|
+        grouped[type] ||= []
+        grouped[type] |= ids
+      end
+    end
+
+    grouped.each do |key, ids|
+      grouped[key] = key.constantize.where(id: ids)
+    end
+
+    grouped
   end
 
   def everything_in_seek
     Seek::Util.user_creatable_types.map do |klass|
       klass.all
     end.flatten.uniq
-  end
-
-  def build_resource_hash(assets)
-    resource_hash={}
-    assets.each do |res|
-      resource_hash[res.class.name] = {:items => [], :hidden_count => 0} unless resource_hash[res.class.name]
-      resource_hash[res.class.name][:items] << res
-    end
-
-    resource_hash.each do |key, res|
-      res[:items] = res[:items].compact
-      unless res[:items].empty?
-        total_count = res[:items].size
-        all = res[:items]
-        res[:items] = key.constantize.authorize_asset_collection res[:items], "view"
-        res[:hidden_count] = total_count - res[:items].size
-        res[:hidden_items] = all - res[:items]
-      end
-    end
-    resource_hash
   end
 end

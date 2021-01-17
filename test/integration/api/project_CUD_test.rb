@@ -40,6 +40,70 @@ class ProjectCUDTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test 'adds members to project by PATCHing entire project' do
+    admin_login
+
+    project = Factory(:project)
+    new_institution = Factory(:institution)
+    new_person = Factory(:person)
+    new_person2 = Factory(:person)
+    new_person3 = Factory(:person)
+
+    assert_empty project.people
+
+    get project_path(project, format: :json)
+
+    project_json = JSON.parse(@response.body)
+
+    project_json['data']['attributes']['members'] = [
+        { person_id: "#{new_person.id}", institution_id: "#{new_institution.id}" },
+        { person_id: "#{new_person2.id}", institution_id: "#{new_institution.id}" },
+        { person_id: "#{new_person3.id}", institution_id: "#{new_institution.id}" }
+    ]
+
+    patch project_path(project, format: :json), params: project_json.to_json, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+    assert_response :success
+
+    people = project.reload.people.to_a
+
+    assert_includes people, new_person
+    assert_includes people, new_person2
+    assert_includes people, new_person3
+  end
+
+  test 'adds members to project' do
+    admin_login
+
+    project = Factory(:project)
+    new_institution = Factory(:institution)
+    new_person = Factory(:person)
+    new_person2 = Factory(:person)
+    new_person3 = Factory(:person)
+
+    assert_empty project.people
+
+    to_patch = {
+        data: {
+            type: "projects",
+            id: "#{project.id}",
+            attributes: {
+                members: [{ person_id: "#{new_person.id}", institution_id: "#{new_institution.id}" },
+                          { person_id: "#{new_person2.id}", institution_id: "#{new_institution.id}" },
+                          { person_id: "#{new_person3.id}", institution_id: "#{new_institution.id}" }]
+            }
+        }
+    }
+
+    patch project_path(project, format: :json), params: to_patch.to_json, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+    assert_response :success
+
+    people = project.reload.people.to_a
+
+    assert_includes people, new_person
+    assert_includes people, new_person2
+    assert_includes people, new_person3
+  end
+
   # TO DO: revisit after doing relationships linkage
   # def test_should_not_create_project_with_programme_if_not_programme_admin
   #   person = Factory(:person)

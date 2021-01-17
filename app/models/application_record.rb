@@ -1,6 +1,7 @@
 class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true
 
+  include HasFilters
   include Seek::AnnotatableExtensions
   include Seek::VersionedResource
   include Seek::ExplicitVersioning
@@ -20,6 +21,7 @@ class ApplicationRecord < ActiveRecord::Base
   include SiteAnnouncements
   include Seek::Permissions::AuthorizationEnforcement
   include Seek::Permissions::ActsAsAuthorized
+  include Seek::RelatedItems
 
   include Annotations::Acts::Annotatable
   include Annotations::Acts::AnnotationSource
@@ -28,7 +30,7 @@ class ApplicationRecord < ActiveRecord::Base
   def self.is_taggable?
     false # defaults to false, unless it includes Taggable which will override this and check the configuration
   end
-  
+
   # takes and ignores arguments for use in :after_add => :update_timestamp, etc.
   def update_timestamp(*_args)
     current_time = current_time_from_proper_timezone
@@ -88,4 +90,42 @@ class ApplicationRecord < ActiveRecord::Base
   def supports_doi?
     self.class.supports_doi?
   end
+
+  def self.with_search_query(q)
+    if searchable? && Seek::Config.solr_enabled
+      ids = solr_cache(q) do
+        search = search do |query|
+          query.keywords(q)
+          query.paginate(page: 1, per_page: unscoped.count)
+        end
+
+        search.hits.map(&:primary_key)
+      end
+
+      where(id: ids)
+    else
+      all
+    end
+  end
+
+  def self.solr_cache(query)
+    init_solr_cache
+    RequestStore.store[:solr][table_name][:last_query] = query
+    RequestStore.store[:solr][table_name][query] ||= yield if block_given?
+    RequestStore.store[:solr][table_name][query] || []
+  end
+
+  def self.last_solr_query
+    init_solr_cache
+    RequestStore.store[:solr][table_name][:last_query]
+  end
+
+  def self.init_solr_cache
+    RequestStore.store[:solr] ||= {}
+    RequestStore.store[:solr][table_name] ||= { results: {} }
+  end
+
+  has_filter query: Seek::Filtering::SearchFilter.new
+  has_filter created_at: Seek::Filtering::DateFilter.new(field: :created_at,
+                                                         presets: [24.hours, 1.week, 1.month, 1.year, 5.years])
 end

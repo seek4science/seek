@@ -1,6 +1,8 @@
 class NelsController < ApplicationController
 
   before_action :nels_enabled?
+  before_action :check_user_logged_in, only: :callback
+  before_action :check_code_present, only: :callback
   before_action :project_membership_required, except: :callback
   before_action :find_and_authorize_assay, except: :callback
   before_action :oauth_client
@@ -126,4 +128,17 @@ class NelsController < ApplicationController
                      message: 'An error occurred whilst accessing the NeLS API.' }, status: :internal_server_error
   end
 
+  def check_code_present
+    unless params[:code]
+      flash[:error] = 'Bad callback - No auth code provided.'
+      redirect_to root_path
+    end
+  end
+
+  def check_user_logged_in
+    unless current_user
+      flash[:error] = 'You must be logged in to access NeLS.'
+      redirect_to root_path
+    end
+  end
 end

@@ -13,10 +13,6 @@
   title ||= association_text.pluralize
   title += '<span class="required">*</span>'.html_safe if required
 
-  if with_new_link
-    new_association_path = eval "new_#{association.to_s.singularize}_path(:parent_name=>'#{controller_name.underscore.singularize}')"
-  end
-
   group_options_by ||= nil
   p = ->(o) { [truncate(o.send(text_method), length: 120), o.send(value_method)] }
 
@@ -49,11 +45,6 @@
       <%= associations_list(collection_id, 'associations/general', existing_json, 'data-field-name' => name, empty_text: "No #{association.to_s}") %>
 
       <div class="association_step">
-        <% if with_new_link  %>
-          <p style="color: #666666;">
-            You may select an existing <%= association_text %> or create <%= link_to "new #{association_text} here", new_association_path, :onclick => "window.open(this.href);return false;"%>  for the <%= object_type_text -%>.
-          </p>
-        <% end  %>
         <%# The JavaScript that handles adding items to the list is bound to elemnts with the 'data-association-list-id' property %>
         <div class="form-group">
           <% if other_projects_checkbox && unscoped_possibilities.any? %>

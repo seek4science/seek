@@ -1,5 +1,7 @@
 <%
-   return if resource.is_a?(Model) && !Seek::Config.modelling_analysis_enabled
+  resource_type = resource.class.name.underscore
+
+return if resource.is_a?(Model) && !Seek::Config.modelling_analysis_enabled
    return unless Seek::Config.assays_enabled
    return if resource.is_a?(Workflow)
    return if resource.is_a?(Node)
@@ -37,11 +39,7 @@
      end
    end
 
-   if Seek::Config.is_virtualliver
-     add_new_assay_title = " or create #{link_to(h("new #{single_assay_class_text}"), new_assay_path(:create_from_asset => :true), :onclick => "window.open(this.href);return false;")}".html_safe
-   else
-     add_new_assay_title = ""
-   end
+   add_new_assay_title = ""
 
   collapsed = associated_assays.blank? if collapsed.nil?
   assay_asset_json = associations_json_from_assay_assets(resource.assay_assets, type: resource.class.name.underscore)
@@ -57,7 +55,7 @@
         </p>
 
         <%= associations_list('assay_asset_list', 'associations/assay', assay_asset_json, empty_text: 'No assays',) %>
-
+        <%= hidden_field_tag "#{resource_type}[assay_assets_attributes][]" %>
         <div class="association_step">
           <hr/>
           <p style="color: #666666;">

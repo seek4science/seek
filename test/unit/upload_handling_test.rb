@@ -93,6 +93,8 @@ class UploadHandingTest < ActiveSupport::TestCase
     assert_equal 1111, headers[:file_size]
 
     stub_request(:head, 'http://not-there.com').to_return(status: 404, body: '', headers: {})
+    stub_request(:get, 'http://not-there.com').to_return(status: 404, body: '', headers: {})
+
     assert_equal 404, fetch_url_headers('http://not-there.com')[:code]
 
     # follows redirection

@@ -42,7 +42,7 @@ module Seek
         def find_and_authorize_assays
           @assays = []
           return unless @type_class
-          @assays = Assay.authorize_asset_collection(@type_class.assays, 'view')
+          @assays = @type_class.assays.authorized_for('view')
         end
 
         def invalid_label?

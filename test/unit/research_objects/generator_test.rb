@@ -105,7 +105,7 @@ class GeneratorTest < ActiveSupport::TestCase
     inv = Factory(:investigation, policy: Factory(:public_policy),contributor:contributor)
     study = Factory(:study, policy: Factory(:public_policy), investigation: inv, contributor:contributor)
 
-    expassay = Factory(:experimental_assay,
+    expassay = Factory(:modelling_assay,
                        assay_assets: [assay_asset1, assay_asset2, assay_asset3, assay_asset4],
                        policy: Factory(:public_policy),
                        study: study,
@@ -113,7 +113,7 @@ class GeneratorTest < ActiveSupport::TestCase
 
     Factory :relationship, subject: expassay, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication)
 
-    Factory(:experimental_assay,
+    Factory(:modelling_assay,
             assay_assets: [@assay_asset5, @assay_asset6],
             policy: Factory(:public_policy),
             study: study,

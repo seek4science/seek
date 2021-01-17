@@ -17,8 +17,8 @@
           <% unless locations.empty? -%>
               <b><%= locations.length == 1 ? 'Location' : 'Locations' %>:</b>
               <% locations.each do |location| %>
-                  <%= flag_icon(location) %>
-                  <%= link_to(location, country_path(location)) -%><%= ', ' unless location == locations.last -%>
+                  <%= country_text_or_not_specified(location) %>
+                  <%= ', ' unless location == locations.last -%>
               <% end -%>
           <% else -%>
               <b>Location:</b>

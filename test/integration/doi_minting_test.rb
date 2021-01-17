@@ -105,8 +105,9 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
     DOIABLE_ASSETS.each do |type|
       asset = Factory(type.to_sym, policy: Factory(:public_policy))
       doi = '10.5072/my_test'
-      asset.doi = doi
-      assert asset.save
+      version = asset.latest_version
+      version.doi = doi
+      assert version.save
 
       get "/#{type.pluralize}/#{asset.id}?version=#{asset.version}"
       assert_response :success
@@ -127,8 +128,9 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
       assert_equal 2, asset.version
 
       doi = '10.5072/my_test'
-      asset.doi = doi
-      assert asset.save
+      version = asset.latest_version
+      version.doi = doi
+      assert version.save
 
       get "/#{type.pluralize}/#{asset.id}?version=2"
       assert_response :success

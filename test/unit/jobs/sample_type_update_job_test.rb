@@ -27,7 +27,7 @@ class SampleTypeUpdateJobTest < ActiveSupport::TestCase
     sample = type.samples.first
     updated_at = sample.updated_at
     assert_equal 'Fred Blogs', sample.title
-    assert_equal 'M12 9LL', sample.get_attribute(:postcode)
+    assert_equal 'M12 9LL', sample.get_attribute_value(:postcode)
     type.sample_attributes.detect { |t| t.title == 'full name' }.is_title = false
     type.sample_attributes.detect { |t| t.title == 'postcode' }.is_title = true
     disable_authorization_checks { type.save! }
@@ -55,7 +55,7 @@ class SampleTypeUpdateJobTest < ActiveSupport::TestCase
     sample = type.samples.first
     updated_at = sample.updated_at
     assert_equal 'Fred Blogs', sample.title
-    assert_equal 'M12 9LL', sample.get_attribute(:postcode)
+    assert_equal 'M12 9LL', sample.get_attribute_value(:postcode)
     type.sample_attributes.detect { |t| t.title == 'full name' }.is_title = false
     type.sample_attributes.detect { |t| t.title == 'postcode' }.is_title = true
     disable_authorization_checks { type.save! }
@@ -76,26 +76,26 @@ class SampleTypeUpdateJobTest < ActiveSupport::TestCase
       project = person.projects.first
       sample_type = Factory(:patient_sample_type, project_ids: [project.id])
       sample = Sample.new sample_type: sample_type, project_ids: [project.id]
-      sample.set_attribute(:full_name, 'Fred Blogs')
-      sample.set_attribute(:age, 22)
-      sample.set_attribute(:weight, 12.2)
-      sample.set_attribute(:address, 'Somewhere')
-      sample.set_attribute(:postcode, 'M12 9LL')
+      sample.set_attribute_value(:full_name, 'Fred Blogs')
+      sample.set_attribute_value(:age, 22)
+      sample.set_attribute_value(:weight, 12.2)
+      sample.set_attribute_value(:address, 'Somewhere')
+      sample.set_attribute_value(:postcode, 'M12 9LL')
       sample.save!
 
       sample = Sample.new sample_type: sample_type, project_ids: [project.id]
-      sample.set_attribute(:full_name, 'Fred Jones')
-      sample.set_attribute(:age, 22)
-      sample.set_attribute(:weight, 12.2)
-      sample.set_attribute(:postcode, 'M12 9LJ')
+      sample.set_attribute_value(:full_name, 'Fred Jones')
+      sample.set_attribute_value(:age, 22)
+      sample.set_attribute_value(:weight, 12.2)
+      sample.set_attribute_value(:postcode, 'M12 9LJ')
       sample.save!
 
       sample = Sample.new sample_type: sample_type, project_ids: [project.id]
-      sample.set_attribute(:full_name, 'Fred Smith')
-      sample.set_attribute(:age, 22)
-      sample.set_attribute(:weight, 12.2)
-      sample.set_attribute(:address, 'Somewhere else')
-      sample.set_attribute(:postcode, 'M12 9LA')
+      sample.set_attribute_value(:full_name, 'Fred Smith')
+      sample.set_attribute_value(:age, 22)
+      sample.set_attribute_value(:weight, 12.2)
+      sample.set_attribute_value(:address, 'Somewhere else')
+      sample.set_attribute_value(:postcode, 'M12 9LA')
       sample.save!
 
       sample_type

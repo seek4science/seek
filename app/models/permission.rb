@@ -1,10 +1,14 @@
 class Permission < ApplicationRecord
+  # Valid permission types, in order of precedence. Highest precedence is listed first
+  PRECEDENCE = ['Person', 'FavouriteGroup', 'WorkGroup', 'Project', 'Programme', 'Institution'].freeze
+
   belongs_to :contributor, :polymorphic => true
   belongs_to :policy, :inverse_of => :permissions
 
   validates_presence_of :contributor
   validates_presence_of :policy
   validates_presence_of :access_type
+  validates :contributor_type, inclusion: { in: PRECEDENCE }
 
   after_commit :queue_update_auth_table
   after_commit :queue_rdf_generation_job
@@ -13,7 +17,7 @@ class Permission < ApplicationRecord
     unless (saved_changes.keys - ["updated_at"]).empty?
       assets = policy.assets
       assets = assets | (Policy.find_by_id(policy_id_before_last_save).try(:assets) || []) unless policy_id_before_last_save.blank?
-      AuthLookupUpdateJob.new.add_items_to_queue assets.compact
+      AuthLookupUpdateQueue.enqueue(assets.compact)
     end
   end
 
@@ -29,9 +33,6 @@ class Permission < ApplicationRecord
   def controls_access_for?(person)
     affected_people.any? { |p| p && (p.id == person.id) } # Checking by object doesn't work for some reason, have to use ID!
   end
-
-  #precedence of permission types. Highest precedence is listed first
-  PRECEDENCE = ['Person', 'FavouriteGroup', 'WorkGroup', 'Project', 'Programme', 'Institution'].freeze
 
   #takes a list of permissions, and gives you a list from the highest precedence to the lowest
   def self.sort_for person, list

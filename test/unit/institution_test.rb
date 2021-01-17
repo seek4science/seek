@@ -34,10 +34,6 @@ class InstitutionTest < ActiveSupport::TestCase
     refute_includes proj3.institutions.first.programmes, prog1
   end
 
-  def test_ordered_by_title
-    assert Institution.all.sort_by { |i| i.title.downcase } == Institution.default_order || Institution.all.sort_by(&:title) == Institution.default_order
-  end
-
   def test_avatar_key
     i = institutions(:one)
     assert_nil i.avatar_key
@@ -45,14 +41,12 @@ class InstitutionTest < ActiveSupport::TestCase
   end
 
   def test_title_trimmed
-    i = Institution.new(title: ' an institution', country: 'Ghana')
-    i.save!
+    i = Factory(:institution, title: ' an institution', country: 'LY')
     assert_equal('an institution', i.title)
   end
 
   def test_update_first_letter
-    i = Institution.new(title: 'an institution', country: 'Serbia')
-    i.save
+    i = Factory(:institution, title: 'an institution', country: 'NL')
     assert_equal 'A', i.first_letter
   end
 
@@ -60,12 +54,12 @@ class InstitutionTest < ActiveSupport::TestCase
     pm = Factory(:project_administrator)
     i = pm.institutions.first
     i2 = Factory(:institution)
-    assert i.can_be_edited_by?(pm.user), 'This institution should be editable as this user is project administrator of a project this institution is linked to'
-    assert !i2.can_be_edited_by?(pm.user), 'This institution should be not editable as this user is project administrator but not of a project this institution is linked to'
+    assert i.can_edit?(pm.user), 'This institution should be editable as this user is project administrator of a project this institution is linked to'
+    assert !i2.can_edit?(pm.user), 'This institution should be not editable as this user is project administrator but not of a project this institution is linked to'
 
     i = Factory(:institution)
     u = Factory(:admin).user
-    assert i.can_be_edited_by?(u), "Institution :one should be editable by this user, as he's an admin"
+    assert i.can_edit?(u), "Institution :one should be editable by this user, as he's an admin"
   end
 
   def test_valid
@@ -186,5 +180,49 @@ class InstitutionTest < ActiveSupport::TestCase
     person2 = Factory(:person, group_memberships: [Factory(:group_membership, work_group: work_group)])
 
     assert_includes work_group.institution.people, person
+  end
+
+  test 'country conversion and validation' do
+    institution = Factory.build(:institution, country:nil)
+    refute institution.valid?
+    assert institution.country.nil?
+
+    institution.country = ''
+    refute institution.valid?
+
+    institution.country = 'GB'
+    assert institution.valid?
+    assert_equal 'GB', institution.country
+
+    institution.country = 'gb'
+    assert institution.valid?
+    assert_equal 'GB', institution.country
+
+    institution.country = 'Germany'
+    assert institution.valid?
+    assert_equal 'DE', institution.country
+
+    institution.country = 'FRANCE'
+    assert institution.valid?
+    assert_equal 'FR', institution.country
+
+    institution.country = 'ZZ'
+    refute institution.valid?
+    assert_equal 'ZZ', institution.country
+
+    institution.country = 'Land of Oz'
+    refute institution.valid?
+    assert_equal 'Land of Oz', institution.country
+
+    # check the conversion gets saved
+    institution = Factory.build(:institution)
+    institution.country = "Germany"
+    disable_authorization_checks {
+      assert institution.save!
+    }
+    institution.reload
+    assert_equal 'DE',institution.country
+
+
   end
 end

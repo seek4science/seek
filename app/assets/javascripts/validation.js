@@ -23,7 +23,8 @@ function validateResourceFields(resourceName) {
 }
 
 function validateUploadFormFields() {
-    var files = $j('input[type="file"][name="content_blobs[][data]"]');
+    var files= $j('input[type="file"][name="content_blobs[][data]"], input[type="hidden"][name="content_blobs[][data_url]"]');
+
     var hasFiles = files.toArray().some(function (f) { return f.value }); // Count non-blank file fields
     var valid = true;
 

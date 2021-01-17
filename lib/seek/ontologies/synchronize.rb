@@ -49,7 +49,7 @@ module Seek
         disable_authorization_checks do
           assays_for_update.each do |assay|
             assay.send("use_default_#{type}_uri!")
-            assay.save
+            assay.save(validate:false)
           end
         end
       end

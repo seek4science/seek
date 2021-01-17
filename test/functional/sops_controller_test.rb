@@ -9,6 +9,7 @@ class SopsControllerTest < ActionController::TestCase
   include SharingFormTestHelper
   include RdfTestCases
   include HtmlHelper
+  include GeneralAuthorizationTestCases
 
   def setup
     @user = users(:quentin)
@@ -39,21 +40,6 @@ class SopsControllerTest < ActionController::TestCase
       end
       assert_select 'a[href=?]', person_path(p1), count: 0
     end
-  end
-
-  test 'request file button visibility when logged in and out' do
-    sop = Factory :sop, policy: Factory(:policy, access_type: Policy::VISIBLE)
-
-    assert !sop.can_download?, 'The SOP must not be downloadable for this test to succeed'
-
-    get :show, params: { id: sop }
-    assert_response :success
-    assert_select '#request_resource_button', text: /Request #{I18n.t('sop')}/, count: 1
-
-    logout
-    get :show, params: { id: sop }
-    assert_response :success
-    assert_select '#request_resource_button', text: /Request #{I18n.t('sop')}/, count: 0
   end
 
   test 'fail gracefullly when trying to access a missing sop' do
@@ -89,7 +75,7 @@ class SopsControllerTest < ActionController::TestCase
     login_as(:aaron)
     get :index, params: { page: 'all' }
     assert_response :success
-    assert_equal assigns(:sops).sort_by(&:id), Sop.authorize_asset_collection(assigns(:sops), 'view', users(:aaron)).sort_by(&:id), "sops haven't been authorized properly"
+    assert_equal assigns(:sops).sort_by(&:id), assigns(:sops).authorized_for('view', users(:aaron)).sort_by(&:id), "sops haven't been authorized properly"
   end
 
   test 'should not show private sop to logged out user' do
@@ -247,9 +233,6 @@ class SopsControllerTest < ActionController::TestCase
     get :edit, params: { id: sops(:my_first_sop) }
     assert_response :success
     assert_select 'h1', text: /Editing #{I18n.t('sop')}/
-
-    # this is to check the SOP is all upper case in the sharing form
-    assert_select 'div.alert-info', text: /the #{I18n.t('sop')}/i
   end
 
   test 'publications excluded in form for sops' do
@@ -281,6 +264,8 @@ class SopsControllerTest < ActionController::TestCase
       assert_difference('Sop.count', -1) do
         assert_no_difference('ContentBlob.count') do
           delete :destroy, params: { id: sops(:my_first_sop) }
+
+          assert flash[:notice].include?('deleted')
         end
       end
     end
@@ -293,6 +278,45 @@ class SopsControllerTest < ActionController::TestCase
 
     get :show, params: { id: s }
     assert_select 'a', text: /Edit experimental conditions/, count: 0
+  end
+
+
+  test 'should show request contact button' do
+    s = Factory(:sop, contributor: Factory(:person), policy: Factory(:public_policy))
+    get :show, params: { id: s }
+    assert_response :success
+    assert_select 'a.disabled', text: /Request Contact/, count: 0
+    assert_select 'a#request_contact_button', text: /Request Contact/, count: 1
+  end
+
+  test 'should not show request contact button when there is no contributor or creator' do
+    get :show, params: { id: sops(:sop_with_no_contributor), policy: Factory(:public_policy)}
+    assert_response :success
+    assert_select 'a.disabled', text: /Request Contact/, count: 0
+    assert_select 'a#request_contact_button', text: /Request Contact/, count: 0
+  end
+
+  test 'should not show request contact button when the current user is the only contributor or creator' do
+    s = Factory(:sop, contributor: @user.person)
+    get :show, params: { id: s }
+    assert_response :success
+    assert_select 'a.disabled', text: /Request Contact/, count: 0
+    assert_select 'a#request_contact_button', text: /Request Contact/, count: 0
+  end
+
+  test 'request contact' do
+    s = Factory(:sop, contributor: Factory(:person), policy: Factory(:public_policy))
+    assert_enqueued_emails(1) do
+      assert_difference('MessageLog.count') do
+        post :request_contact, format: :js, params: { id:s, details:'blah blah' }
+      end
+    end
+
+    log = MessageLog.last
+    assert_equal s, log.resource
+    assert_equal User.current_user.person,log.sender
+    assert_equal MessageLog::CONTACT_REQUEST,log.message_type
+
   end
 
   def test_should_show_version
@@ -433,6 +457,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+
   def test_can_show_edit_for_sop_with_no_contributor
     get :edit, params: { id: sops(:sop_with_no_contributor) }
     assert_response :success
@@ -476,7 +501,7 @@ class SopsControllerTest < ActionController::TestCase
     login_as(:owner_of_my_first_sop)
     person = people(:person_for_owner_of_my_first_sop)
     p = projects(:sysmo_project)
-    get :index, params: { filter: { person: person.id }, page: 'all' }
+    get :index, params: { filter: { contributor: person.id }, page: 'all' }
     assert_response :success
     sop  = sops(:downloadable_sop)
     sop2 = sops(:sop_with_fully_public_policy)
@@ -616,6 +641,7 @@ class SopsControllerTest < ActionController::TestCase
     get :show, params: { id: sop.id }
     assert_response :success
     assert_select 'a', text: /View content/, count: 1
+    assert_select 'a.disabled', text: /View content/, count: 0
   end
 
   test 'should be able to view ms/open office word content' do
@@ -628,12 +654,14 @@ class SopsControllerTest < ActionController::TestCase
       get :show, params: { id: ms_word_sop.id }
       assert_response :success
       assert_select 'a', text: /View content/, count: 1
+      assert_select 'a.disabled', text: /View content/, count: 0
 
       openoffice_word_sop = Factory(:odt_sop, policy: Factory(:all_sysmo_downloadable_policy))
       assert openoffice_word_sop.content_blob.is_content_viewable?
       get :show, params: { id: openoffice_word_sop.id }
       assert_response :success
       assert_select 'a', text: /View content/, count: 1
+      assert_select 'a.disabled', text: /View content/, count: 0
     end
   end
 
@@ -648,7 +676,7 @@ class SopsControllerTest < ActionController::TestCase
     assert !content_blob.is_content_viewable?
     get :show, params: { id: ms_word_sop.id }
     assert_response :success
-    assert_select 'a', text: /View content/, count: 0
+    assert_select 'a.disabled', text: /View content/, count: 1
 
     Seek::Config.pdf_conversion_enabled = tmp
   end
@@ -819,10 +847,10 @@ class SopsControllerTest < ActionController::TestCase
   test 'should not lose project assignment when an asset is managed by a person from different project' do
     sop = Factory(:sop)
     sop.policy.permissions << Factory(:permission, contributor: User.current_user.person, access_type: Policy::MANAGING)
-    assert sop.can_edit?
+    assert sop.can_manage?
     assert_not_equal sop.projects.first, User.current_user.person.projects.first
 
-    get :edit, params: { id: sop }
+    get :manage, params: { id: sop }
     assert_response :success
 
     selected = JSON.parse(select_node_contents('#project-selector-selected-json'))
@@ -910,17 +938,17 @@ class SopsControllerTest < ActionController::TestCase
   test 'permission popup setting set in sharing form' do
     sop = Factory :sop, contributor: User.current_user.person
     with_config_value :permissions_popup, Seek::Config::PERMISSION_POPUP_ON_CHANGE do
-      get :edit, params: { id: sop }
+      get :manage, params: { id: sop }
     end
     assert_select '#preview-permission-link-script', text: /var permissionPopupSetting = "on_change"/, count: 1
 
     with_config_value :permissions_popup, Seek::Config::PERMISSION_POPUP_ALWAYS do
-      get :edit, params: { id: sop }
+      get :manage, params: { id: sop }
     end
     assert_select '#preview-permission-link-script', text: /var permissionPopupSetting = "always"/, count: 1
 
     with_config_value :permissions_popup, Seek::Config::PERMISSION_POPUP_NEVER do
-      get :edit, params: { id: sop }
+      get :manage, params: { id: sop }
     end
     assert_select '#preview-permission-link-script', text: /var permissionPopupSetting = "never"/, count: 1
   end
@@ -933,13 +961,13 @@ class SopsControllerTest < ActionController::TestCase
 
     get :show, params: { id: sop }
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/, count:0
+    assert_select '#citation', text: /Bacall, F/, count:0
 
     sop.latest_version.update_attribute(:doi,'doi:10.1.1.1/xxx')
 
     get :show, params: { id: sop }
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/, count:1
+    assert_select '#citation', text: /Bacall, F/, count:1
   end
 
   def edit_max_object(sop)
@@ -1259,6 +1287,341 @@ class SopsControllerTest < ActionController::TestCase
       end
     end
 
+  end
+
+  test 'should destroy sop and redirect to my items page' do
+    person = people(:person_for_owner_of_my_first_sop)
+    login_as(person)
+    assert_difference('ActivityLog.count') do
+      assert_difference('Sop.count', -1) do
+        assert_no_difference('ContentBlob.count') do
+          delete :destroy, params: { id: sops(:my_first_sop), return_to: 'my_items' }
+
+          assert flash[:notice].include?('deleted')
+        end
+      end
+    end
+
+    assert_redirected_to items_person_path(person)
+  end
+
+  test 'manage menu item appears according to permission' do
+    check_manage_edit_menu_for_type('sop')
+  end
+
+  test 'can access manage page with manage rights' do
+    person = Factory(:person)
+    sop = Factory(:sop, contributor:person)
+    login_as(person)
+    assert sop.can_manage?
+    get :manage, params: {id: sop}
+    assert_response :success
+
+    # check the project form exists, studies and assays don't have this
+    assert_select 'div#add_projects_form', count:1
+
+    # check sharing form exists
+    assert_select 'div#sharing_form', count:1
+
+    # should be a temporary sharing link
+    assert_select 'div#temporary_links', count:1
+
+    assert_select 'div#author_form', count:1
+
+    # this is to check the SOP is all upper case in the sharing form
+    assert_select 'div.alert-info', text: /the #{I18n.t('sop')}/
+  end
+
+  test 'cannot access manage page with edit rights' do
+    person = Factory(:person)
+    sop = Factory(:sop, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:person, access_type:Policy::EDITING)]))
+    login_as(person)
+    assert sop.can_edit?
+    refute sop.can_manage?
+    get :manage, params: {id:sop}
+    assert_redirected_to sop
+    refute_nil flash[:error]
+  end
+
+  test 'manage_update' do
+    proj1=Factory(:project)
+    proj2=Factory(:project)
+    person = Factory(:person,project:proj1)
+    other_person = Factory(:person)
+    person.add_to_project_and_institution(proj2,person.institutions.first)
+    person.save!
+    other_creator = Factory(:person,project:proj1)
+    other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
+    other_creator.save!
+
+    sop = Factory(:sop, contributor:person, projects:[proj1], policy:Factory(:private_policy))
+
+    login_as(person)
+    assert sop.can_manage?
+
+    patch :manage_update, params: {id: sop,
+                                   sop: {
+                                       creator_ids: [other_creator.id],
+                                       project_ids: [proj1.id, proj2.id]
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    assert_redirected_to sop
+
+    sop.reload
+    assert_equal [proj1,proj2],sop.projects.sort_by(&:id)
+    assert_equal [other_creator],sop.creators
+    assert_equal Policy::VISIBLE,sop.policy.access_type
+    assert_equal 1,sop.policy.permissions.count
+    assert_equal other_person,sop.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING,sop.policy.permissions.first.access_type
+
+    assert_equal 'SOP was successfully updated.',flash[:notice]
+
+  end
+
+  test 'manage_update fails without manage rights' do
+    proj1=Factory(:project)
+    proj2=Factory(:project)
+    person = Factory(:person, project:proj1)
+    person.add_to_project_and_institution(proj2,person.institutions.first)
+    person.save!
+
+    other_person = Factory(:person)
+
+    other_creator = Factory(:person,project:proj1)
+    other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
+    other_creator.save!
+
+    sop = Factory(:sop, projects:[proj1], policy:Factory(:private_policy,
+                                                                     permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+
+    login_as(person)
+    refute sop.can_manage?
+    assert sop.can_edit?
+
+    assert_equal [proj1],sop.projects
+    assert_empty sop.creators
+
+    patch :manage_update, params: {id: sop,
+                                   sop: {
+                                       creator_ids: [other_creator.id],
+                                       project_ids: [proj1.id, proj2.id]
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    refute_nil flash[:error]
+
+    sop.reload
+    assert_equal [proj1],sop.projects
+    assert_empty sop.creators
+    assert_equal Policy::PRIVATE,sop.policy.access_type
+    assert_equal 1,sop.policy.permissions.count
+    assert_equal person,sop.policy.permissions.first.contributor
+    assert_equal Policy::EDITING,sop.policy.permissions.first.access_type
+
+  end
+
+  test 'sort by update by default on index' do
+    s1 = Factory(:sop, title: 'AAABSop', updated_at: 10.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s2 = Factory(:sop, title: 'AAAASop', updated_at: 9.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+
+    get :index
+
+    assert_equal '1', assigns(:page)
+    assert_equal [:updated_at_desc], assigns(:order)
+    assert_equal s1.id, assigns(:sops)[0].id
+    assert_equal s2.id, assigns(:sops)[1].id
+  end
+
+  test 'sort by title by default on A page' do
+    s1 = Factory(:sop, title: 'AAABSop', updated_at: 10.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s2 = Factory(:sop, title: 'AAAASop', updated_at: 9.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+
+    get :index, params: { page: 'A' }
+
+    assert_equal 'A', assigns(:page)
+    assert_equal [:title_asc], assigns(:order)
+    assert_equal s2.id, assigns(:sops)[0].id
+    assert_equal s1.id, assigns(:sops)[1].id
+  end
+
+  test 'custom sorting on top page' do
+    s1 = Factory(:sop, title: 'ZZZZZSop', updated_at: 10.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s2 = Factory(:sop, title: 'ZZZZXSop', updated_at: 9.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s3 = Factory(:sop, title: 'ZZZZYSop', updated_at: 8.minutes.from_now, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+
+    get :index, params: { order: 'title_desc' }
+
+    assert_equal '1', assigns(:page)
+    assert_equal [:title_desc], assigns(:order)
+    assert_equal s1.id, assigns(:sops)[0].id
+    assert_equal s3.id, assigns(:sops)[1].id
+    assert_equal s2.id, assigns(:sops)[2].id
+  end
+
+  test 'custom sorting on G page' do
+    s1 = Factory(:sop, title: 'GZSop', created_at: 2.years.ago, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s2 = Factory(:sop, title: 'GXSop', created_at: 1.years.ago, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s3 = Factory(:sop, title: 'GYSop', created_at: 10.years.ago, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+
+    get :index, params: { page: 'G', order: 'created_at_asc' }
+
+    assert_equal 'G', assigns(:page)
+    assert_equal [:created_at_asc], assigns(:order)
+    assert_equal s3.id, assigns(:sops)[0].id
+    assert_equal s1.id, assigns(:sops)[1].id
+    assert_equal s2.id, assigns(:sops)[2].id
+  end
+
+  test 'sorting on numeric paging' do
+    Sop.delete_all
+
+    s1 = Factory(:sop, title: 'GZSop', created_at: 2.years.ago, updated_at: 1.week.ago,
+                 policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s2 = Factory(:sop, title: 'GXSop', created_at: 1.years.ago, updated_at: 2.weeks.ago,
+                 policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s3 = Factory(:sop, title: 'GYSop', created_at: 10.years.ago, updated_at: 3.weeks.ago,
+                 policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+
+    with_config_value(:results_per_page_default, 2) do
+      get :index, params: { page: 1, order: 'created_at_desc' }
+      assert_equal [:created_at_desc], assigns(:order)
+      assert_equal 2, assigns(:sops).length
+      assert_equal [s2, s1], assigns(:sops).to_a
+      assert_equal '1', assigns(:page)
+
+      get :index, params: { page: 2, order: 'created_at_desc' }
+      assert_equal [:created_at_desc], assigns(:order)
+      assert_equal 1, assigns(:sops).length
+      assert_includes assigns(:sops), s3
+      assert_equal '2', assigns(:page)
+
+      get :index, params: { page: 1, order: 'title_asc' }
+      assert_equal [:title_asc], assigns(:order)
+      assert_equal 2, assigns(:sops).length
+      assert_equal [s2, s3], assigns(:sops).to_a
+      assert_equal '1', assigns(:page)
+
+      get :index, params: { page: 2, order: 'title_asc' }
+      assert_equal [:title_asc], assigns(:order)
+      assert_equal 1, assigns(:sops).length
+      assert_includes assigns(:sops), s1
+      assert_equal '2', assigns(:page)
+
+      get :index, params: { order: 'fish' }
+      assert_equal [:updated_at_desc], assigns(:order)
+      assert_equal 2, assigns(:sops).length
+      assert_equal [s1, s2], assigns(:sops).to_a
+      assert_equal '1', assigns(:page)
+
+      get :index, params: { page: 2, order: 'fish' }
+      assert_equal [:updated_at_desc], assigns(:order)
+      assert_equal 1, assigns(:sops).length
+      assert_includes assigns(:sops), s3
+      assert_equal '2', assigns(:page)
+    end
+  end
+
+  test 'JSON-API multiple sorting' do
+    s1 = Factory(:sop, title: 'ZZSop', created_at: 2.years.ago, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s2 = Factory(:sop, title: 'ZXSop', created_at: 1.years.ago, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s3 = Factory(:sop, title: 'ZXSop', created_at: 10.years.ago, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    s4 = Factory(:sop, title: 'ZYSop', created_at: 10.years.ago, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+
+    get :index, params: { page: 'Z', sort: 'title,-created_at' }
+
+    assert_equal 'Z', assigns(:page)
+    assert_equal [:title_asc, :created_at_desc], assigns(:order)
+    assert_equal s2.id, assigns(:sops)[0].id
+    assert_equal s3.id, assigns(:sops)[1].id
+    assert_equal s4.id, assigns(:sops)[2].id
+    assert_equal s1.id, assigns(:sops)[3].id
+  end
+
+  test 'should create with discussion link' do
+    person = Factory(:person)
+    login_as(person)
+    sop =  {title: 'SOP', project_ids: [person.projects.first.id], discussion_links_attributes:[{url: "http://www.slack.com/"}]}
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('Sop.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, params: {sop: sop, content_blobs: [{ data: file_for_upload }], policy_attributes: { access_type: Policy::VISIBLE }}
+        end
+      end
+    end
+    sop = assigns(:sop)
+    assert_equal 'http://www.slack.com/', sop.discussion_links.first.url
+    assert_equal AssetLink::DISCUSSION, sop.discussion_links.first.link_type
+  end
+
+
+  test 'should show discussion link' do
+    asset_link = Factory(:discussion_link)
+    sop = Factory(:sop, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    get :show, params: { id: sop }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+  end
+
+
+  test 'should update sop with new discussion link' do
+    person = Factory(:person)
+    sop = Factory(:sop, contributor: person)
+    login_as(person)
+    assert_nil sop.discussion_links.first
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: sop.id, sop: { discussion_links_attributes:[{url: "http://www.slack.com/"}] } }
+      end
+    end
+    assert_redirected_to sop_path(assigns(:sop))
+    assert_equal 'http://www.slack.com/', sop.discussion_links.first.url
+  end
+
+  test 'should update sop with edited discussion link' do
+    person = Factory(:person)
+    sop = Factory(:sop, contributor: person, discussion_links:[Factory(:discussion_link)])
+    login_as(person)
+    assert_equal 1,sop.discussion_links.count
+    assert_no_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: sop.id, sop: { discussion_links_attributes:[{id:sop.discussion_links.first.id, url: "http://www.wibble.com/",link_type: AssetLink::DISCUSSION}] } }
+      end
+    end
+    sop = assigns(:sop)
+    assert_redirected_to sop_path(sop)
+    assert_equal 1,sop.discussion_links.count
+    assert_equal 'http://www.wibble.com/', sop.discussion_links.first.url
+  end
+
+  test 'should destroy related assetlink when the discussion link is removed ' do
+    person = Factory(:person)
+    login_as(person)
+    asset_link = Factory(:discussion_link)
+    sop = Factory(:sop, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
+    assert_difference('AssetLink.discussion.count', -1) do
+      put :update, params: { id: sop.id, sop: { discussion_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
+    end
+    assert_redirected_to sop_path(sop = assigns(:sop))
+    assert_empty sop.discussion_links
+  end
+
+  test 'should immediately update auth for anon user' do
+    with_config_value(:auth_lookup_enabled, true) do
+      login_as(person = Factory(:person))
+      sop = Factory(:sop, contributor: person, policy: Factory(:private_policy))
+      AuthLookupUpdateQueue.destroy_all
+      refute sop.can_view?(nil)
+
+      put :update, params: { id: sop.id, sop: { title: 'Test2' }, policy_attributes: { access_type: Policy::ACCESSIBLE } }
+
+      sop = assigns(:sop)
+      assert_equal Policy::ACCESSIBLE, sop.policy.access_type
+      assert sop.can_view?(nil)
+    end
   end
 
   private

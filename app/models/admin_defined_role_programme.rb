@@ -13,7 +13,7 @@ class AdminDefinedRoleProgramme < ApplicationRecord
   private
 
   def queue_update_auth_table
-    AuthLookupUpdateJob.new.add_items_to_queue person
+    AuthLookupUpdateQueue.enqueue(person)
   end
 
   def remove_person_from_role

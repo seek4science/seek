@@ -6,7 +6,7 @@ module Seek
     include TagsHelper
 
     def update_annotations_ajax
-      entity = controller_name.classify.constantize.find(params[:id])
+      entity = controller_model.find(params[:id])
       if entity.can_view?
         update_owned_annotations(entity, current_user, 'tag', params[:tag_list])
         if entity.save

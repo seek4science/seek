@@ -154,7 +154,7 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     to_post = JSON.parse(template.result(binding))
     to_post['data']['attributes']['policy']['access'] = 'edit'
 
-    with_config_value(:max_all_visitors_access_type, Policy::EDITING) do
+    with_config_value(:max_all_visitors_access_type, Policy::VISIBLE) do
       assert_no_difference("#{@clz.classify}.count") do
         post "/#{@plural_clz}.json", params: to_post
         assert_response :unprocessable_entity
@@ -166,6 +166,7 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     h = JSON.parse(response.body)
     errors = h["errors"]
 
-    assert errors.any?
+    assert_equal [{"source"=>{"pointer"=>"/data/attributes/policy"},
+                   "detail"=>"access_type is too permissive"}],errors
   end
 end

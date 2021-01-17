@@ -11,16 +11,18 @@ class BaseSerializer < SimpleBaseSerializer
   end
 
   def associated(name)
-    unless @associated[name].blank?
-      items = @associated[name][:items]
-      items = items.sort_by(&:id) unless items.blank?
-      items
+    @associated ||= {}
+    if @associated.key?(name)
+      @associated[name]
+    else
+      items = (object.class.name.include?('::Version') ? object.parent : object).get_related(name).authorized_for('view')
+      @associated[name] = items.empty? ? nil : items
     end
   end
 
   def people
     associated('Person')
-   end
+  end
 
   def projects
     associated('Project')
@@ -36,7 +38,7 @@ class BaseSerializer < SimpleBaseSerializer
 
   def studies
     associated('Study')
-   end
+  end
 
   def assays
     associated('Assay')
@@ -70,6 +72,10 @@ class BaseSerializer < SimpleBaseSerializer
     associated('Document')
   end
 
+  def organisms
+    associated('Organism')
+  end
+
   def self_link
     polymorphic_path(object)
   end
@@ -88,17 +94,6 @@ class BaseSerializer < SimpleBaseSerializer
     meta[:uuid] = object.uuid if object.respond_to?('uuid')
     meta[:base_url] = base_url
     meta
-  end
-
-  def initialize(object, options = {})
-    super
-
-    # access related resources with proper authorization & ignore version subclass
-    @associated = if object.class.to_s.include?('::Version')
-                    associated_resources(object.parent)
-                  else
-                    associated_resources(object)
-                  end
   end
 
   def BaseSerializer.convert_policy policy

@@ -5,7 +5,6 @@ event_with_no_files:
   end_date: 2011-02-25 14:11:43
   address: MyText
   city: MyString
-  country: MyString
   url: http://www.google.com
   description: MyText
   title: MyString
@@ -18,7 +17,6 @@ private_event:
   end_date: 2011-02-25 14:11:43
   address: MyText
   city: MyString
-  country: MyString
   url: http://www.google.com
   description: MyText
   title: MyString

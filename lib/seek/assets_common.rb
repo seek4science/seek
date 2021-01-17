@@ -19,22 +19,22 @@ module Seek
     end
 
     def anonymous_request_for_previous_version?(asset, requested_version)
-      (!(User.logged_in_and_member?) && requested_version.to_i != asset.latest_version.version)
+      (!User.logged_in_and_member? && requested_version.to_i != asset.latest_version.version)
     end
 
     def update_relationships(asset, params)
       Relationship.set_attributions(asset, params[:attributions])
     end
-
-    def request_resource
+    
+    def request_contact
       resource = class_for_controller_name.find(params[:id])
       details = params[:details]
-      mail = Mailer.request_resource(current_user, resource, details)
+      mail = Mailer.request_contact(current_user, resource, details)
       mail.deliver_later
-
+      MessageLog.log_contact_request(current_user.person, resource, details)
       @resource = resource
       respond_to do |format|
-        format.js { render template: 'assets/request_resource' }
+        format.js { render template: 'assets/request_contact' }
       end
     end
 
@@ -43,7 +43,7 @@ module Seek
       model_name = controller_name.classify
       model_class = class_for_controller_name
 
-      results = model_class.authorize_asset_collection(model_class.where('title LIKE ?', "#{params[:query]}%"), 'view')
+      results = model_class.where('title LIKE ?', "#{params[:query]}%").authorized_for('view')
       items = results.first(params[:limit] || 10).map do |item|
         contributor_name = item.contributor.try(:person).try(:name)
         { id: item.id, name: item.title, hint: contributor_name, type: model_name, contributor: contributor_name }
@@ -52,6 +52,22 @@ module Seek
       respond_to do |format|
         format.json { render json: items.to_json }
       end
+    end
+
+    # the page to return to on an update validation failure, default to 'edit' if the referer is not found
+    def update_validation_error_return_action
+      previous = Rails.application.routes.recognize_path(request.referrer)
+      if previous && previous[:action]
+        previous[:action] || 'edit'
+      else
+        'edit'
+      end
+    end
+
+    def params_for_controller
+      name = controller_name.singularize
+      method = "#{name}_params"
+      send(method)
     end
   end
 end

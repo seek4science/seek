@@ -4,6 +4,8 @@ module Seek
 
     include ContentTypeDetection
     include SysMODB::SpreadsheetExtractor
+    include ContentSplit
+
 
     def pdf_contents_for_search
       content = []
@@ -15,6 +17,12 @@ module Seek
           convert_to_pdf
         end
         content = extract_text_from_pdf
+        if content.blank?
+          []
+        else
+          content = filter_text_content content
+          content = split_content(content, 10 , 5)
+        end
       else
         Rails.logger.info("No local file contents for content blob #{id}, so no pdf contents for search available")
       end
@@ -27,7 +35,7 @@ module Seek
         text = File.read(filepath, encoding: 'iso-8859-1')
         unless text.blank?
           content = filter_text_content text
-          content = split_content(content)
+          content = split_content(content,10,5)
         end
       end
       content
@@ -54,24 +62,18 @@ module Seek
     end
 
     def extract_text_from_pdf
-      return [] unless is_pdf? || is_pdf_convertable?
+      return "" unless is_pdf? || is_pdf_convertable?
       pdf_filepath = filepath('pdf')
       txt_filepath = filepath('txt')
 
       if File.exist?(pdf_filepath)
         begin
           Docsplit.extract_text(pdf_filepath, output: converted_storage_directory) unless File.exist?(txt_filepath)
-          content = File.read(txt_filepath)
-          if content.blank?
-            []
-          else
-            content = filter_text_content content
-            split_content content
-          end
+          File.read(txt_filepath)
         rescue Docsplit::ExtractionFailed => e
           extract_text_from_pdf if double_check_mime_type
           Rails.logger.error("Problem with extracting text from pdf #{id} #{e}")
-          []
+          ""
         end
       end
     end
@@ -109,9 +111,6 @@ module Seek
       end
     end
 
-    def split_content(content, delimiter = "\n")
-      content.split(delimiter).reject { |str| (str.blank? || str.length > 200) }.collect(&:strip).uniq
-    end
 
     # filters special characters, keeping alphanumeric characters, hyphen ('-'), underscore('_') and newlines
     def filter_text_content(content)

@@ -28,7 +28,9 @@
       "model_type": null,
       "model_format": null,
       "environment": null,
-      "other_creators": null
+      "model_image_link": null,
+      "other_creators": null,
+      "discussion_links": null
     },
     "relationships": {
       "creators": {
@@ -41,6 +43,9 @@
             "type": "people"
           }
         ]
+      },
+      "organisms": {
+        "data": []
       },
       "people": {
         "data": [
@@ -79,7 +84,7 @@
       "modified": "2017-10-06T09:53:31.000Z",
       "uuid": "23ac7610-8caa-0135-d381-745c89ac8d09",
       "base_url": "http://localhost:3000",
-      "api_version": "0.2"
+      "api_version": "0.3"
     }
   },
   "jsonapi": {

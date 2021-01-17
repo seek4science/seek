@@ -3,11 +3,6 @@ class SimpleBaseSerializer < ActiveModel::Serializer
     object.class.name.demodulize.tableize
   end
 
-  # def self_link
-  #   #{base_url}//#{type}/#{id}
-  #   "/#{type}/#{id}"
-  # end
-
   def base_url
     Seek::Config.site_base_host
   end
@@ -47,7 +42,9 @@ class SimpleBaseSerializer < ActiveModel::Serializer
   def attributes(*args)
     hash = super
     hash.each do |key, value|
-      hash[key] = value.presence
+      if !(value.equal? false)
+        hash[key] = value.presence
+      end
     end
     hash
   end

@@ -8,7 +8,7 @@
   </div>
 
   <div class="col-sm-6">
-    <%= list_item_attribute "Country", (text_or_not_specified resource.country, :link_as_country => true) %>
+    <%= list_item_attribute "Country", (country_text_or_not_specified resource.country) %>
     <%= list_item_optional_attribute "City", h(resource.city) %>
   </div>
 </div>

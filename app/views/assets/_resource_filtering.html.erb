@@ -1,0 +1,12 @@
+<% if @available_filters&.any? %>
+  <div class="index-filters">
+    <% @available_filters.each do |key, options| %>
+      <% filter = Seek::Filterer.new(controller_model).get_filter(key) %>
+      <% begin %>
+        <%= render partial: "filtering/#{filter.class.name.split('::').last.underscore}", locals: { key: key, options: options } %>
+      <% rescue ActionView::MissingTemplate %>
+        <%= render partial: 'filtering/filter', locals: { key: key, options: options } %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

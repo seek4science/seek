@@ -19,7 +19,10 @@ module Seek
       # attr can be the attribute accessor name, or the attribute itself
       # if attr is nil, indicates a new attribute. required is not allowed if there are already samples
       def allow_required?(attr)
-        attr = attr.accessor_name if attr.is_a?(SampleAttribute)
+        if attr.is_a?(SampleAttribute)
+          return true if attr.new_record?
+          attr = attr.accessor_name
+        end
         if attr
           !blanks?(attr)
         else
@@ -30,7 +33,10 @@ module Seek
       # an attribute could be removed if all are currently blank
       # attr can be the attribute accessor name, or the attribute itself
       def allow_attribute_removal?(attr)
-        attr = attr.accessor_name if attr.is_a?(SampleAttribute)
+        if attr.is_a?(SampleAttribute)
+          return true if attr.new_record?
+          attr = attr.accessor_name
+        end
         if attr
           all_blank?(attr)
         else
@@ -45,7 +51,10 @@ module Seek
 
       # whether the name of the attribute can be changed
       def allow_name_change?(attr)
-        attr = attr.accessor_name if attr.is_a?(SampleAttribute)
+        if attr.is_a?(SampleAttribute)
+          return true if attr.new_record?
+          attr = attr.accessor_name
+        end
         if attr
           !samples?
         else
@@ -55,7 +64,10 @@ module Seek
 
       # whether the type for the attribute can be changed
       def allow_type_change?(attr)
-        attr = attr.accessor_name if attr.is_a?(SampleAttribute)
+        if attr.is_a?(SampleAttribute)
+          return true if attr.new_record?
+          attr = attr.accessor_name
+        end
         if attr
           all_blank?(attr)
         else

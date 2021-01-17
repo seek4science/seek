@@ -6,7 +6,7 @@
         'on_change'
       else
         'always'
-        end -%>";
+      end %>";
 
     function previewPermissions() {
         var resource_id = <%= resource.new_record? ? 'null' : resource.id -%>;

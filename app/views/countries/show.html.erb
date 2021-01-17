@@ -1,58 +1,63 @@
-<h1><%= flag_icon(@country.titleize) + h(@country).titleize -%></h1>
+<% if @country %>
+  <h1><%= flag_icon(@country.titleize) + h(@country).titleize -%></h1>
 
-<div class="row">
-  <div class="col-md-9 col-sm-8">
-    <% unless @institutions.empty? -%>
-      <ul class="mini-resource-list">
-      <% @institutions.each do |i| -%>
-        <li>
-          <%= link_to(i, title: i.title, class: 'mini-resource-list-item') do %>
+  <div class="row">
+    <div class="col-md-9 col-sm-8">
+      <% unless @institutions.empty? -%>
+        <ul class="mini-resource-list">
+          <% @institutions.each do |i| -%>
+            <li>
+              <%= link_to(i, title: i.title, class: 'mini-resource-list-item') do %>
             <span class="mini-resource-list-text">
               <%= image_tag(icon_filename_for_key('institution_avatar'), class: 'mini-resource-list-avatar') %>
               <span class="mini-resource-list-title"><%= i.title %></span>
             </span>
-          <% end %>
-          <% inst_members = i.people %>
-          <% unless inst_members.empty? -%>
-            <ul class="mini-resource-list" style="margin-left: 2em;">
-              <% inst_members.each do |p| -%>
-                <li>
-                  <%= link_to(p, title: p.name, class: 'mini-resource-list-item') do %>
+              <% end %>
+              <% inst_members = i.people %>
+              <% unless inst_members.empty? -%>
+                <ul class="mini-resource-list" style="margin-left: 2em;">
+                  <% inst_members.each do |p| -%>
+                    <li>
+                      <%= link_to(p, title: p.name, class: 'mini-resource-list-item') do %>
                     <span class="mini-resource-list-text">
-                      <%= image_tag_for_key('person', nil, 'person', { class: 'mini-resource-list-avatar' }, "") -%>
+                      <%= image_tag_for_key('person', nil, 'person', {class: 'mini-resource-list-avatar'}, "") -%>
                       <span class="mini-resource-list-title"><%= p.name %></span>
                     </span>
+                      <% end -%>
+                    </li>
                   <% end -%>
-                </li>
+                </ul>
+              <% else -%>
+                <p class="none_text" style="margin-left: 2em;">There are no known members in this institution</p>
               <% end -%>
-            </ul>
-          <% else -%>
-            <p class="none_text" style="margin-left: 2em;">There are no known members in this institution</p>
-          <% end -%>
-          </li>
-        <% end %>
-      </ul>
-    <% else -%>
+            </li>
+          <% end %>
+        </ul>
+      <% else -%>
         <p class="none_text">
           Couldn't find any institutions for this country
         </p>
-    <% end -%>
-  </div>
+      <% end -%>
+    </div>
 
-  <div class="col-md-3 col-sm-4">
-    <%= panel("Institutions (#{@institutions.length})", :help_text => "Institutions that are situated in this country.") do %>
-      <ul class="mini-resource-list">
-        <% @institutions.each do |i| %>
-          <li>
-            <%= link_to(i, title: i.title, class: 'mini-resource-list-item') do %>
+    <div class="col-md-3 col-sm-4">
+      <%= panel("Institutions (#{@institutions.length})", :help_text => "Institutions that are situated in this country.") do %>
+        <ul class="mini-resource-list">
+          <% @institutions.each do |i| %>
+            <li>
+              <%= link_to(i, title: i.title, class: 'mini-resource-list-item') do %>
             <span class="mini-resource-list-text">
               <%= image_tag(icon_filename_for_key('institution_avatar'), class: 'mini-resource-list-avatar') %>
               <span class="mini-resource-list-title"><%= i.title %></span>
             </span>
-            <% end %>
-          </li>
-        <% end %>
-      </ul>
-    <% end %>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+    </div>
   </div>
-</div>
+<% else %>
+  <h1>Country wasn't recognised</h1>
+<% end %>
+

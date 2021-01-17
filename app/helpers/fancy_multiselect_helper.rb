@@ -50,7 +50,6 @@ module FancyMultiselectHelper
         group_options_by: nil,
         value_method: :id,
         text_method: :title,
-        with_new_link: false,
         object_type_text: object_type_text,
         association_text: association_text,
         association: association,

@@ -177,7 +177,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   test 'should show the other creators in -uploader and creators- box' do
     workflow = Factory(:workflow, policy: Factory(:public_policy), other_creators: 'another creator')
     get :show, params: { id: workflow }
-    assert_select 'div', text: 'another creator', count: 1
+    assert_select 'li.author-list-item', text: 'another creator', count: 1
   end
 
   test 'filter by people, including creators, using nested routes' do
@@ -265,6 +265,120 @@ class WorkflowsControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', workflow_path(workflow), text: workflow.title
       assert_select 'a[href=?]', workflow_path(workflow2), text: workflow2.title, count: 0
     end
+  end
+
+  test 'manage menu item appears according to permission' do
+    check_manage_edit_menu_for_type('workflow')
+  end
+
+  test 'can access manage page with manage rights' do
+    person = Factory(:person)
+    workflow = Factory(:workflow, contributor:person)
+    login_as(person)
+    assert workflow.can_manage?
+    get :manage, params: {id: workflow}
+    assert_response :success
+
+    # check the project form exists, studies and assays don't have this
+    assert_select 'div#add_projects_form', count:1
+
+    # check sharing form exists
+    assert_select 'div#sharing_form', count:1
+
+    # should be a temporary sharing link
+    assert_select 'div#temporary_links', count:1
+
+    assert_select 'div#author_form', count:1
+  end
+
+  test 'cannot access manage page with edit rights' do
+    person = Factory(:person)
+    workflow = Factory(:workflow, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:person, access_type:Policy::EDITING)]))
+    login_as(person)
+    assert workflow.can_edit?
+    refute workflow.can_manage?
+    get :manage, params: {id:workflow}
+    assert_redirected_to workflow
+    refute_nil flash[:error]
+  end
+
+  test 'manage_update' do
+    proj1=Factory(:project)
+    proj2=Factory(:project)
+    person = Factory(:person,project:proj1)
+    other_person = Factory(:person)
+    person.add_to_project_and_institution(proj2,person.institutions.first)
+    person.save!
+    other_creator = Factory(:person,project:proj1)
+    other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
+    other_creator.save!
+
+    workflow = Factory(:workflow, contributor:person, projects:[proj1], policy:Factory(:private_policy))
+
+    login_as(person)
+    assert workflow.can_manage?
+
+    patch :manage_update, params: {id: workflow,
+                                   workflow: {
+                                       creator_ids: [other_creator.id],
+                                       project_ids: [proj1.id, proj2.id]
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    assert_redirected_to workflow
+
+    workflow.reload
+    assert_equal [proj1,proj2],workflow.projects.sort_by(&:id)
+    assert_equal [other_creator],workflow.creators
+    assert_equal Policy::VISIBLE,workflow.policy.access_type
+    assert_equal 1,workflow.policy.permissions.count
+    assert_equal other_person,workflow.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING,workflow.policy.permissions.first.access_type
+
+  end
+
+  test 'manage_update fails without manage rights' do
+    proj1=Factory(:project)
+    proj2=Factory(:project)
+    person = Factory(:person, project:proj1)
+    person.add_to_project_and_institution(proj2,person.institutions.first)
+    person.save!
+
+    other_person = Factory(:person)
+
+    other_creator = Factory(:person,project:proj1)
+    other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
+    other_creator.save!
+
+    workflow = Factory(:workflow, projects:[proj1], policy:Factory(:private_policy,
+                                                                           permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+
+    login_as(person)
+    refute workflow.can_manage?
+    assert workflow.can_edit?
+
+    assert_equal [proj1],workflow.projects
+    assert_empty workflow.creators
+
+    patch :manage_update, params: {id: workflow,
+                                   workflow: {
+                                       creator_ids: [other_creator.id],
+                                       project_ids: [proj1.id, proj2.id]
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    refute_nil flash[:error]
+
+    workflow.reload
+    assert_equal [proj1],workflow.projects
+    assert_empty workflow.creators
+    assert_equal Policy::PRIVATE,workflow.policy.access_type
+    assert_equal 1,workflow.policy.permissions.count
+    assert_equal person,workflow.policy.permissions.first.contributor
+    assert_equal Policy::EDITING,workflow.policy.permissions.first.access_type
+
   end
 
   def edit_max_object(workflow)

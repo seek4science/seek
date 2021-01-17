@@ -109,7 +109,7 @@ class OpenbisEndpointsController < ApplicationController
   end
 
   def project_can_admin?
-    unless @project.can_be_administered_by?(current_user)
+    unless @project.can_manage?(current_user)
       error('Insufficient privileges', 'is invalid (insufficient_privileges)')
       false
     end

@@ -471,7 +471,7 @@ class SnapshotsControllerTest < ActionController::TestCase
 
     get :show, params: { investigation_id: @investigation, id: @snapshot }
     assert_response :success
-    assert_select '#snapshot-citation', text: /Bacall, F/
+    assert_select '#citation', text: /Bacall, F/
   end
 
   test "broken DOI metadata response doesn't raise exception" do
@@ -484,7 +484,7 @@ class SnapshotsControllerTest < ActionController::TestCase
       get :show, params: { investigation_id: @investigation, id: @snapshot }
     end
     assert_response :success
-    assert_select '#snapshot-citation', text: /error occurred/
+    assert_select '#citation', text: /error occurred/
   end
 
   test 'logs activities' do

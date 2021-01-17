@@ -40,7 +40,7 @@ module SuggestedTypesHelper
   end
 
   def all_types_text(join_word = 'and')
-    model_class = controller_name.classify.constantize
+    model_class = controller_model
     model_class.all_term_types.map { |type| type.split('_').join(' ') }.join(" #{join_word} ")
   end
 

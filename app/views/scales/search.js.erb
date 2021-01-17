@@ -1,8 +1,5 @@
 $j('#<%= @scale_title -%>_results').html('<%= escape_javascript(render(partial: 'assets/resource_listing_tabbed_by_class',
-  locals: { resource_hash: @resource_hash,
-            show_empty_tabs: true,
-            narrow_view: true,
-            authorization_already_done: true,
+  locals: { resource_hash: related_items_hash(@grouped_assets),
             limit: 20,
             tabs_id: "#{@scale_title}_resource_listing_tabbed_by_class",
             actions_partial_disable: true, display_immediately: true })) -%>');

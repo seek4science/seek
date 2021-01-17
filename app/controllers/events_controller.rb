@@ -1,6 +1,6 @@
 class EventsController < ApplicationController
   include Seek::PreviewHandling
-  include Seek::AssetsStandardControllerActions
+  include Seek::AssetsCommon
 
   before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview]
 
@@ -14,24 +14,13 @@ class EventsController < ApplicationController
 
   include Seek::BreadCrumbs
 
+  api_actions :index, :show, :create, :update, :destroy
+
   def show
     respond_to do |format|
       format.html # show.html.erb
       format.xml
-      format.json {render json: @event}
-    end
-  end
-
-  def new
-    @event = Event.new
-    @new = true
-    respond_to do |format|
-      if User.logged_in_and_member?
-        format.html { render 'events/form' }
-      else
-        flash[:error] = 'You are not authorized to create new Events. Only members of known projects, institutions or work groups are allowed to create new content.'
-        format.html { redirect_to events_path }
-      end
+      format.json {render json: @event, include: [params[:include]]}
     end
   end
 
@@ -40,18 +29,14 @@ class EventsController < ApplicationController
     handle_update_or_create(true)
   end
 
-  def edit
-    @new = false
-    render 'events/form'
-  end
-
   def update
     @new = false
     handle_update_or_create(false)
   end
 
   def handle_update_or_create(is_new)
-    @new = is_new
+
+    re_render_view = is_new ? 'events/new' : 'events/edit'
 
     update_sharing_policies @event
 
@@ -59,9 +44,9 @@ class EventsController < ApplicationController
       if @event.update(event_params) && @event.save
         flash.now[:notice] = "#{t('event')} was updated successfully." if flash.now[:notice].nil?
         format.html { redirect_to @event }
-        format.json { render json: @event }
+        format.json { render json: @event, include: [params[:include]] }
       else
-        format.html { render 'events/form' }
+        format.html { render re_render_view }
         format.json { render json: json_api_errors(@assay), status: :unprocessable_entity }
       end
     end

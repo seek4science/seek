@@ -5,6 +5,7 @@ module ApplicationHelper
   include FancyMultiselectHelper
   include Recaptcha::ClientHelper
   include VersionHelper
+  include ImagesHelper
 
   def no_items_to_list_text
     content_tag :div, id: 'no-index-items-text' do
@@ -52,7 +53,10 @@ module ApplicationHelper
 
   def date_as_string(date, show_time_of_day = false, year_only_1st_jan = false)
     # for publications, if it is the first of jan, then it can be assumed it is just the year (unlikely have a publication on New Years Day)
-    if year_only_1st_jan && !date.blank? && date.month == 1 && date.day == 1
+
+    if date.to_s == nil
+      str = "<span class='none_text'>No date defined</span>"
+    elsif year_only_1st_jan && !date.blank? && date.month == 1 && date.day == 1
       str = date.year.to_s
     else
       date = Time.parse(date.to_s) unless date.is_a?(Time) || date.blank?
@@ -70,18 +74,17 @@ module ApplicationHelper
   # provide the block that shows the URL to the resource, including the version if it is a versioned resource
   # label is based on the application name, for example <label>FAIRDOMHUB ID: </label>
   def persistent_resource_id(resource)
-
     # FIXME: this contains some duplication of Seek::Rdf::RdfGeneration#rdf_resource - however not every model includes that Module at this time.
     # ... its also a bit messy handling the version
-    url= if resource.class.name.include?("::Version")
-      URI.join(Seek::Config.site_base_host + "/", "#{resource.parent.class.name.tableize}/","#{resource.parent.id}?version=#{resource.version}").to_s
-    else
-      URI.join(Seek::Config.site_base_host + "/", "#{resource.class.name.tableize}/","#{resource.id}").to_s
+    url = if resource.class.name.include?('::Version')
+            URI.join(Seek::Config.site_base_host + '/', "#{resource.parent.class.name.tableize}/", "#{resource.parent.id}?version=#{resource.version}").to_s
+          else
+            URI.join(Seek::Config.site_base_host + '/', "#{resource.class.name.tableize}/", resource.id.to_s).to_s
     end
 
     content_tag :p, class: :id do
       content_tag(:strong) do
-        t('seek_id')+":"
+        t('seek_id') + ':'
       end + ' ' + link_to(url, url)
     end
   end
@@ -177,8 +180,13 @@ module ApplicationHelper
 
     result_collection.each do |res|
       tab = res.respond_to?(:tab) ? res.tab : res.class.name
-      results[tab] = { items: [], hidden_count: 0, is_external: (res.respond_to?(:is_external_search_result?) && res.is_external_search_result?) } unless results[tab]
+      results[tab] ||= { items: [],
+                         items_count: 0,
+                         hidden_count: 0,
+                         is_external: (res.respond_to?(:is_external_search_result?) && res.is_external_search_result?) }
+
       results[tab][:items] << res
+      results[tab][:items_count] += 1
     end
 
     results
@@ -215,7 +223,7 @@ module ApplicationHelper
       res = mail_to(res) if options[:email]
       res = link_to(res, res, popup: true) if options[:external_link]
       res = res + '&nbsp;' + flag_icon(text) if options[:flag]
-      res = '&nbsp;' + flag_icon(text) + link_to(res, country_path(res)) if options[:link_as_country]
+      res = '&nbsp;' + flag_icon(text) + link_to(res, country_path(CountryCodes.code(text))) if options[:link_as_country]
     end
     res.html_safe
   end
@@ -242,7 +250,7 @@ module ApplicationHelper
     list_item.html_safe
   end
 
-  def contributor(contributor, avatar = false, size = 100, you_text = false)
+  def contributor(contributor, _avatar = false, _size = 100, _you_text = false)
     return unless contributor
 
     contributor_name = h(contributor.name)
@@ -276,7 +284,16 @@ module ApplicationHelper
     if resource && resource.respond_to?(:title) && resource.title
       h(resource.title)
     elsif PAGE_TITLES[controller_name]
-      PAGE_TITLES[controller_name]
+      title = ''
+      if @parent_resource
+        title << "#{h(@parent_resource.title)} - "
+      end
+      t = PAGE_TITLES[controller_name]
+      if t.is_a?(Hash)
+        t = t[action_name] || t['*']
+      end
+      title << t
+      title
     else
       "The #{Seek::Config.application_name}"
     end
@@ -312,7 +329,7 @@ module ApplicationHelper
       truncated_result += "\n"
     end
     # Need some kind of whitespace before elipses or auto-link breaks
-    html = truncated_result.strip + ((truncated && ellipsis) ? "\n..." : '')
+    html = truncated_result.strip + (truncated && ellipsis ? "\n..." : '')
     html.html_safe
   end
 
@@ -410,21 +427,6 @@ module ApplicationHelper
     eval "@#{c.singularize}"
   end
 
-  # returns the count of the total visible items, and also the count of the all items, according to controller_name
-  # primarily used for the metrics on the item index page
-  def resource_count_stats
-    klass = klass_from_controller(controller_name)
-    full_total = klass.count
-    visible_total = if klass.authorization_supported?
-                      klass.all_authorized_for('view').count
-                    elsif klass.is_a?(Person) && Seek::Config.is_virtualliver && User.current_user.nil?
-                      0
-                    else
-                      klass.count
-                    end
-    [visible_total, full_total]
-  end
-
   def cancel_button(path, html_options = {})
     html_options[:class] ||= ''
     html_options[:class] << ' btn btn-default'
@@ -435,11 +437,11 @@ module ApplicationHelper
   # to display funding codes on the 'show' page if present
   def show_funding_codes(item)
     return if item.funding_codes.empty?
-    html = content_tag(:strong,'Funding codes:')
-    html << content_tag(:ul,class:'funding-codes') do
+    html = content_tag(:strong, 'Funding codes:')
+    html << content_tag(:ul, class: 'funding-codes') do
       inner = ''
       item.funding_codes.each do |code|
-        inner += content_tag(:li,code)
+        inner += content_tag(:li, code)
       end
       inner.html_safe
     end
@@ -455,7 +457,13 @@ module ApplicationHelper
     Rails::Html::WhiteListSanitizer.new.sanitize(text)
   end
 
-  PAGE_TITLES = { 'home' => 'Home', 'projects' => I18n.t('project').pluralize, 'institutions' => 'Institutions', 'people' => 'People', 'sessions' => 'Login', 'users' => 'Signup', 'search' => 'Search',
+  # whether manage attributes should be shown, dont show if editing (rather than new or managing)
+  def show_form_manage_specific_attributes?
+    !(action_name == 'edit' || action_name == 'update')
+  end
+
+  PAGE_TITLES = { 'home' => 'Home', 'projects' => I18n.t('project').pluralize, 'institutions' => 'Institutions',
+                  'people' => 'People', 'sessions' => 'Login', 'users' => { 'new' => 'Signup', '*' => 'Account' }, 'search' => 'Search',
                   'assays' => I18n.t('assays.assay').pluralize.capitalize, 'sops' => I18n.t('sop').pluralize, 'models' => I18n.t('model').pluralize, 'data_files' => I18n.t('data_file').pluralize,
                   'publications' => 'Publications', 'investigations' => I18n.t('investigation').pluralize, 'studies' => I18n.t('study').pluralize,
                   'samples' => 'Samples', 'strains' => 'Strains', 'organisms' => 'Organisms', 'biosamples' => 'Biosamples',

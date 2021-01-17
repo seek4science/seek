@@ -36,7 +36,7 @@ module RdfTestCases
   end
 
   def test_response_code_for_not_accessible_rdf
-    clz = @controller.controller_name.classify.constantize
+    clz = @controller.controller_model
     if clz.respond_to?(:authorization_supported?) && clz.authorization_supported?
       itemname = @controller.controller_name.singularize.underscore
       item = Factory itemname.to_sym, policy: Factory(:private_policy)
@@ -48,7 +48,7 @@ module RdfTestCases
   end
 
   def test_response_code_for_not_available_rdf
-    clz = @controller.controller_name.classify.constantize
+    clz = @controller.controller_model
     id = 9999
     id += 1 until clz.find_by_id(id).nil?
 

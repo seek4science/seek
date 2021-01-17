@@ -23,7 +23,9 @@ class AssaysControllerTest < ActionController::TestCase
     hidden = Factory(:experimental_assay, policy: Factory(:private_policy)) # ensure at least one hidden assay exists
     get :index, params: { page: 'all', format: 'xml' }
     assert_response :success
-    assert_equal assigns(:assays).sort_by(&:id), Assay.authorize_asset_collection(assigns(:assays), 'view', users(:aaron)).sort_by(&:id), "#{t('assays.assay').downcase.pluralize} haven't been authorized"
+    assert_equal assigns(:assays).sort_by(&:id),
+                 assigns(:assays).authorized_for('view', users(:aaron)).sort_by(&:id),
+                 "#{t('assays.assay').downcase.pluralize} haven't been authorized"
     assert !assigns(:assays).include?(hidden)
   end
 
@@ -31,6 +33,33 @@ class AssaysControllerTest < ActionController::TestCase
     get :index
     assert_select 'title', text: I18n.t('assays.assay').pluralize, count: 1
   end
+
+  test 'add model button' do
+    # should show for modelling analysis but not experimental
+    person = Factory(:person)
+    login_as(person)
+    exp = Factory(:experimental_assay, contributor:person)
+    mod = Factory(:modelling_assay, contributor: person)
+
+    assert exp.is_experimental?
+    assert mod.is_modelling?
+
+    assert exp.can_edit?
+    assert mod.can_edit?
+
+
+    get :show, params: { id: exp.id }
+    assert_response :success
+    assert_select "a[href=?]",new_model_path('model[assay_assets_attributes[][assay_id]]'=>exp.id),text:/#{I18n.t('add_new_dropdown.option')} Model/, count:0
+    assert_select "a[href=?]",new_data_file_path('data_file[assay_assets_attributes[][assay_id]]'=>exp.id),text:/#{I18n.t('add_new_dropdown.option')} Data file/
+
+    get :show, params: { id: mod.id }
+    assert_response :success
+    assert_select "a[href=?]",new_model_path('model[assay_assets_attributes[][assay_id]]'=>mod.id),text:/#{I18n.t('add_new_dropdown.option')} Model/
+    assert_select "a[href=?]",new_data_file_path('data_file[assay_assets_attributes[][assay_id]]'=>mod.id),text:/#{I18n.t('add_new_dropdown.option')} Data file/
+
+  end
+
 
   test 'should show index' do
     get :index
@@ -124,11 +153,12 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test 'should update timestamp when associating model' do
-    login_as(:model_owner)
-    assay = assays(:metabolomics_assay)
+    person = Factory(:person)
+    login_as(person.user)
+    assay = Factory(:modelling_assay, contributor:person)
     timestamp = assay.updated_at
 
-    model = models(:teusink)
+    model = Factory(:model, contributor:person)
     assert !assay.models.include?(model.latest_version)
     sleep(1)
     assert_difference('ActivityLog.count') do
@@ -187,7 +217,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   test 'should show new with study when id provided' do
     s = studies(:metabolomics_study)
-    get :new, params: { study_id: s }
+    get :new, params: {assay: { study_id: s.id }}
     assert_response :success
     assert_not_nil assigns(:assay)
     assert_equal s, assigns(:assay).study
@@ -611,7 +641,7 @@ class AssaysControllerTest < ActionController::TestCase
       assert_select 'div.list_item_title a[href=?]', sop_path(sops(:sop_with_private_policy_and_custom_sharing)), count: 0
       assert_select 'div.list_item_actions a[href=?]', download_sop_path(sops(:sop_with_private_policy_and_custom_sharing)), count: 0
 
-      assert_select 'div.list_item_title a[href=?]', data_file_path(data_files(:downloadable_data_file)), text: 'Download Only', count: 1
+      assert_select 'div.list_item_title a[href=?]', data_file_path(data_files(:downloadable_data_file)), text: 'Downloadable Only', count: 1
       assert_select 'div.list_item_actions a[href=?]', download_data_file_path(data_files(:downloadable_data_file)), count: 1
       assert_select 'div.list_item_title a[href=?]', data_file_path(data_files(:private_data_file)), count: 0
       assert_select 'div.list_item_actions a[href=?]', download_data_file_path(data_files(:private_data_file)), count: 0
@@ -784,7 +814,7 @@ class AssaysControllerTest < ActionController::TestCase
 
   test 'filtering by person' do
     person = people(:person_for_model_owner)
-    get :index, params: { filter: { person: person.id }, page: 'all' }
+    get :index, params: { filter: { contributor: person.id }, page: 'all' }
     assert_response :success
     a = assays(:metabolomics_assay)
     a2 = assays(:modelling_assay_with_data_and_relationship)
@@ -904,27 +934,6 @@ class AssaysControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'a[href=?]', data_file_path(df), text: df.title
     assert_select 'a[href=?]', model_path(model), text: model.title
-    assert_select 'a[href=?]', sop_path(sop), text: sop.title
-  end
-
-  test 'should have only associated datafiles and sops on assay index page for experimental assays' do
-    Assay.delete_all
-    df = Factory(:data_file, contributor: User.current_user.person)
-    model = Factory(:model, contributor: User.current_user.person)
-    sop = Factory(:sop, contributor: User.current_user.person)
-    investigation = Factory(:investigation, contributor:User.current_user.person)
-    assay = Factory(:experimental_assay, contributor: User.current_user.person,
-                    study: Factory(:study, investigation: investigation, contributor:User.current_user.person))
-    assay.data_files << df
-    assay.models << model
-    assay.sops << sop
-    assert assay.save
-    assert assay.is_experimental?
-
-    get :index
-    assert_response :success
-    assert_select 'a[href=?]', data_file_path(df), text: df.title
-    assert_select 'a[href=?]', model_path(model), text: model.title, count: 0
     assert_select 'a[href=?]', sop_path(sop), text: sop.title
   end
 
@@ -1225,18 +1234,6 @@ class AssaysControllerTest < ActionController::TestCase
     assert assay.creators.include?(creator)
   end
 
-  test 'should have creators association box' do
-    assay = Factory(:assay, policy: Factory(:public_policy))
-
-    get :edit, params: { id: assay.id }
-    assert_response :success
-
-    assert_select '#creators_list'
-    assert_select "input[type='text'][name='creator-typeahead']"
-    # assert_select "input[type='hidden'][name='creators']" This is set via JS
-    assert_select "input[type='text'][name='assay[other_creators]']"
-  end
-
   test 'should show creators' do
     assay = Factory(:assay, policy: Factory(:public_policy))
     creator = Factory(:person)
@@ -1247,19 +1244,20 @@ class AssaysControllerTest < ActionController::TestCase
 
     get :show, params: { id: assay.id }
     assert_response :success
-    assert_select 'span.author_avatar a[href=?]', "/people/#{creator.id}"
+    assert_select 'li.author-list-item a[href=?]', "/people/#{creator.id}"
   end
 
   test 'should show other creators' do
     assay = Factory(:assay, policy: Factory(:public_policy))
-    other_creators = 'other creators'
+    other_creators = 'john smith, jane smith'
     assay.other_creators = other_creators
     assay.save
     assay.reload
 
     get :show, params: { id: assay.id }
     assert_response :success
-    assert_select 'div.panel-body div', text: other_creators
+    assert_select 'li.author-list-item', text: 'john smith'
+    assert_select 'li.author-list-item', text: 'jane smith'
   end
 
   test 'programme assays through nested routing' do
@@ -1374,67 +1372,6 @@ class AssaysControllerTest < ActionController::TestCase
 
     org = Factory(:organism)
     assay.associate_organism(org)
-  end
-
-  test 'add data file button' do
-    assay=Factory(:experimental_assay)
-    person = assay.contributor
-    login_as(person)
-    assert assay.can_edit?
-    get :show, params: { id:assay }
-    assert_response :success
-    assert_select '#buttons' do
-      assert_select 'a.btn[href=?]',new_data_file_path('assay_ids[]' => assay.id),text:'Add Data file',count:1
-    end
-
-    assay=Factory(:modelling_assay,contributor:person)
-    assert assay.can_edit?
-    get :show, params: { id:assay }
-    assert_response :success
-    assert_select '#buttons' do
-      assert_select 'a.btn[href=?]',new_data_file_path('assay_ids[]' => assay.id),text:'Add Data file',count:1
-    end
-
-    assay=Factory(:experimental_assay,policy:Factory(:publicly_viewable_policy))
-    assert assay.can_view?
-    refute assay.can_edit?
-    get :show, params: { id:assay }
-    assert_response :success
-    assert_select '#buttons' do
-      assert_select 'a.btn[href=?]',new_data_file_path('assay_ids[]' => assay.id),text:'Add Data file',count:0
-    end
-  end
-
-  test 'add model button' do
-    assay=Factory(:modelling_assay)
-    person = assay.contributor
-    login_as(person)
-    assert assay.can_edit?
-    get :show, params: { id:assay }
-    assert_response :success
-    assert_select '#buttons' do
-      assert_select 'a.btn[href=?]',new_model_path('assay_ids[]' => assay.id),text:'Add Model',count:1
-    end
-
-    assay=Factory(:modelling_assay,policy:Factory(:publicly_viewable_policy))
-    assert assay.can_view?
-    refute assay.can_edit?
-    get :show, params: { id:assay }
-    assert_response :success
-    assert_select '#buttons' do
-      assert_select 'a.btn[href=?]',new_model_path('assay_ids[]' => assay.id),text:'Add Model',count:0
-    end
-
-    #shouldn't show for an experimental assay, even if editable
-    assay=Factory(:experimental_assay,policy:Factory(:publicly_viewable_policy),contributor:person)
-    assert assay.can_view?
-    assert assay.can_edit?
-    refute assay.is_modelling?
-    get :show, params: { id:assay }
-    assert_response :success
-    assert_select '#buttons' do
-      assert_select 'a.btn[href=?]',new_model_path('assay_ids[]' => assay.id),text:'Add Model',count:0
-    end
   end
 
   test 'can delete an assay with subscriptions' do
@@ -1738,6 +1675,107 @@ class AssaysControllerTest < ActionController::TestCase
     end
     assay = assigns(:assay)
     assert_equal [good_sop],assay.sops
+
+  end
+
+  test 'manage menu item appears according to permission' do
+    check_manage_edit_menu_for_type('assay')
+  end
+
+  test 'can access manage page with manage rights' do
+    person = Factory(:person)
+    assay = Factory(:assay, contributor:person)
+    login_as(person)
+    assert assay.can_manage?
+    get :manage, params: {id: assay}
+    assert_response :success
+
+    #shouldn't be a projects block
+    assert_select 'div#add_projects_form', count:0
+
+    # check sharing form exists
+    assert_select 'div#sharing_form', count:1
+
+    #no sharing link, not for Investigation, Study and Assay
+    assert_select 'div#temporary_links', count:0
+
+    assert_select 'div#author_form', count:1
+  end
+
+  test 'cannot access manage page with edit rights' do
+    person = Factory(:person)
+    assay = Factory(:assay, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:person, access_type:Policy::EDITING)]))
+    login_as(person)
+    assert assay.can_edit?
+    refute assay.can_manage?
+    get :manage, params: {id:assay}
+    assert_redirected_to assay
+    refute_nil flash[:error]
+  end
+
+  test 'manage_update' do
+    proj1=Factory(:project)
+    person = Factory(:person,project:proj1)
+    other_person = Factory(:person)
+
+    other_creator = Factory(:person,project:proj1)
+
+    assay = Factory(:assay, contributor:person, policy:Factory(:private_policy))
+
+    login_as(person)
+    assert assay.can_manage?
+
+    patch :manage_update, params: {id: assay,
+                                   assay: {
+                                       creator_ids: [other_creator.id],
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    assert_redirected_to assay
+
+    assay.reload
+    assert_equal [other_creator],assay.creators
+    assert_equal Policy::VISIBLE,assay.policy.access_type
+    assert_equal 1,assay.policy.permissions.count
+    assert_equal other_person,assay.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING,assay.policy.permissions.first.access_type
+
+  end
+
+  test 'manage_update fails without manage rights' do
+    proj1=Factory(:project)
+
+    person = Factory(:person, project:proj1)
+
+
+    other_person = Factory(:person)
+
+    other_creator = Factory(:person,project:proj1)
+
+
+    assay = Factory(:assay, policy:Factory(:private_policy, permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+
+    login_as(person)
+    refute assay.can_manage?
+    assert assay.can_edit?
+
+    assert_empty assay.creators
+
+    patch :manage_update, params: {id: assay,
+                                   assay: {
+                                       creator_ids: [other_creator.id],
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    refute_nil flash[:error]
+
+    assay.reload
+    assert_equal Policy::PRIVATE,assay.policy.access_type
+    assert_equal 1,assay.policy.permissions.count
+    assert_equal person,assay.policy.permissions.first.contributor
+    assert_equal Policy::EDITING,assay.policy.permissions.first.access_type
 
   end
 

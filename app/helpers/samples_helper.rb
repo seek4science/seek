@@ -9,9 +9,13 @@ module SamplesHelper
     when Seek::Samples::BaseType::TEXT
       text_area :sample, attribute_method_name, class: "form-control #{clz}"
     when Seek::Samples::BaseType::DATE_TIME
-      text_field :sample, attribute_method_name, data: { calendar: 'mixed' }, class: "calendar form-control #{clz}", placeholder: placeholder
+      content_tag :div, style:'position:relative' do
+        text_field :sample, attribute_method_name, data: { calendar: 'mixed' }, class: "calendar form-control #{clz}", placeholder: placeholder
+      end
     when Seek::Samples::BaseType::DATE
-      text_field :sample, attribute_method_name, data: { calendar: true }, class: "calendar form-control #{clz}", placeholder: placeholder
+      content_tag :div, style:'position:relative' do
+        text_field :sample, attribute_method_name, data: { calendar: true }, class: "calendar form-control #{clz}", placeholder: placeholder
+      end
     when Seek::Samples::BaseType::BOOLEAN
       check_box :sample, attribute_method_name, class: "#{clz}"
     when Seek::Samples::BaseType::SEEK_STRAIN
@@ -23,7 +27,7 @@ module SamplesHelper
       collection_select :sample, attribute_method_name, terms, :label, :label,
                         { include_blank: !attribute.required? }, class: "form-control #{clz}"
     when Seek::Samples::BaseType::SEEK_SAMPLE
-      terms = Sample.authorize_asset_collection(attribute.linked_sample_type.samples, :view)
+      terms = attribute.linked_sample_type.samples.authorized_for('view').to_a
       collection_select :sample, attribute_method_name, terms, :id, :title,
                         { include_blank: !attribute.required? }, class: "form-control #{clz}"
     else
@@ -44,7 +48,7 @@ module SamplesHelper
   end
 
   def display_attribute(sample, attribute, options = {})
-    value = sample.get_attribute(attribute.hash_key)
+    value = sample.get_attribute_value(attribute)
     if value.blank?
       text_or_not_specified(value)
     else

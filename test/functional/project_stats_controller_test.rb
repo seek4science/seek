@@ -40,4 +40,24 @@ class ProjectStatsControllerTest < ActionController::TestCase
     assert Rails.cache.exist?(key)
   end
 
+  test 'project member can get stats' do
+    person = Factory(:person)
+    project = person.projects.first
+    login_as(person)
+
+    get :contributors, params: { project_id: project.id, start_date: '2015-10-10', end_date: '2015-10-11', format: :json }
+
+    assert_response :success
+  end
+
+  test 'non-project member cannot get stats' do
+    person = Factory(:person)
+    project = Factory(:project)
+    login_as(person)
+
+    get :contributors, params: { project_id: project.id, start_date: '2015-10-10', end_date: '2015-10-11', format: :json }
+
+    assert_redirected_to project_path(project)
+    assert flash[:error].include?('not a member')
+  end
 end

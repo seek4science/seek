@@ -30,9 +30,9 @@ class StudiesControllerTest < ActionController::TestCase
     assay1 = Factory :assay, policy: Factory(:public_policy), contributor:person
     assay2 = Factory :assay, policy: Factory(:public_policy), contributor:person
 
-    pub1 = Factory :publication, title: 'pub 1'
-    pub2 = Factory :publication, title: 'pub 2'
-    pub3 = Factory :publication, title: 'pub 3'
+    pub1 = Factory :publication, title: 'pub 1', publication_type: Factory(:journal)
+    pub2 = Factory :publication, title: 'pub 2', publication_type: Factory(:journal)
+    pub3 = Factory :publication, title: 'pub 3', publication_type: Factory(:journal)
     Factory :relationship, subject: assay1, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub1
     Factory :relationship, subject: assay1, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: pub2
 
@@ -84,7 +84,7 @@ class StudiesControllerTest < ActionController::TestCase
     inv = investigations(:metabolomics_investigation)
 
     assert inv.can_edit?, 'model owner should be able to edit this investigation'
-    get :new, params: { investigation_id: inv }
+    get :new, params: { study: { investigation_id: inv } }
     assert_response :success
 
     assert_select 'select#study_investigation_id' do
@@ -97,7 +97,7 @@ class StudiesControllerTest < ActionController::TestCase
     inv = investigations(:metabolomics_investigation)
 
     assert inv.can_edit?, 'model owner should be able to edit this investigation'
-    get :new, params: { investigation_id: inv }
+    get :new, params: { study:{investigation_id: inv }}
     assert_response :success
 
     assert_select 'select#study_investigation_id' do
@@ -110,16 +110,14 @@ class StudiesControllerTest < ActionController::TestCase
     user = Factory(:user)
     login_as(user)
 
-    assert !inv.projects.map(&:people).flatten.include?(user.person), 'this person should not be a member of the investigations project'
-    assert !inv.can_edit?(user)
-    get :new, params: { investigation_id: inv }
+    refute inv.projects.map(&:people).flatten.include?(user.person), 'this person should not be a member of the investigations project'
+    refute inv.can_edit?(user)
+    get :new, params: { study: { investigation_id: inv } }
     assert_response :success
 
     assert_select 'select#study_investigation_id' do
       assert_select "option[selected='selected'][value='0']"
     end
-
-    assert_not_nil flash.now[:error]
   end
 
   test 'should get edit' do
@@ -224,7 +222,7 @@ class StudiesControllerTest < ActionController::TestCase
   test "unauthorized user can't update" do
     s = Factory :study, policy: Factory(:private_policy)
     login_as(Factory(:user))
-    Factory :permission, contributor: User.current_user, policy: s.policy, access_type: Policy::VISIBLE
+    Factory(:permission, contributor: User.current_user.person, policy: s.policy, access_type: Policy::VISIBLE)
 
     put :update, params: { id: s.id, study: { title: 'test' } }
 
@@ -298,7 +296,7 @@ class StudiesControllerTest < ActionController::TestCase
       assert_select 'div.list_item_title a[href=?]', sop_path(sops(:sop_with_private_policy_and_custom_sharing)), count: 0
       assert_select 'div.list_item_actions a[href=?]', download_sop_path(sops(:sop_with_private_policy_and_custom_sharing)), count: 0
 
-      assert_select 'div.list_item_title a[href=?]', data_file_path(data_files(:downloadable_data_file)), text: 'Download Only', count: 1
+      assert_select 'div.list_item_title a[href=?]', data_file_path(data_files(:downloadable_data_file)), text: 'Downloadable Only', count: 1
       assert_select 'div.list_item_actions a[href=?]', download_data_file_path(data_files(:downloadable_data_file)), count: 1
       assert_select 'div.list_item_title a[href=?]', data_file_path(data_files(:private_data_file)), count: 0
       assert_select 'div.list_item_actions a[href=?]', download_data_file_path(data_files(:private_data_file)), count: 0
@@ -355,7 +353,7 @@ class StudiesControllerTest < ActionController::TestCase
     study = Factory(:study, policy: Factory(:public_policy))
     get :show, params: { id: study }
     assert_response :success
-    assert_select '.author_avatar' do
+    assert_select 'li.author-list-item' do
       assert_select 'a[href=?]', person_path(study.contributing_user.person) do
         assert_select 'img'
       end
@@ -436,17 +434,6 @@ class StudiesControllerTest < ActionController::TestCase
     assert study.creators.include?(creator)
   end
 
-  test 'should have creators association box' do
-    study = Factory(:study, policy: Factory(:public_policy))
-
-    get :edit, params: { id: study.id }
-    assert_response :success
-    assert_select '#creators_list'
-    assert_select "input[type='text'][name='creator-typeahead']"
-    # assert_select "input[type='hidden'][name='creators']" This is set via JS
-    assert_select "input[type='text'][name='study[other_creators]']"
-  end
-
   test 'should show creators' do
     study = Factory(:study, policy: Factory(:public_policy))
     creator = Factory(:person)
@@ -457,19 +444,19 @@ class StudiesControllerTest < ActionController::TestCase
 
     get :show, params: { id: study.id }
     assert_response :success
-    assert_select 'span.author_avatar a[href=?]', "/people/#{creator.id}"
+    assert_select 'li.author-list-item a[href=?]', "/people/#{creator.id}"
   end
 
   test 'should show other creators' do
     study = Factory(:study, policy: Factory(:public_policy))
-    other_creators = 'other creators'
+    other_creators = 'frodo baggins'
     study.other_creators = other_creators
     study.save
     study.reload
 
     get :show, params: { id: study.id }
     assert_response :success
-    assert_select 'div.panel-body div', text: other_creators
+    assert_select 'li.author-list-item', text: 'frodo baggins'
   end
 
   test 'should not multiply creators after calling show' do
@@ -608,5 +595,143 @@ class StudiesControllerTest < ActionController::TestCase
     assert_difference('Study.count', 1) do
       post :create, params: { study: { title: 'test', investigation_id: investigation.id }, policy_attributes: valid_sharing }
     end
+  end
+
+  test 'manage menu item appears according to permission' do
+    check_manage_edit_menu_for_type('study')
+  end
+
+  test 'can access manage page with manage rights' do
+    person = Factory(:person)
+    study = Factory(:study, contributor:person)
+    login_as(person)
+    assert study.can_manage?
+    get :manage, params: {id: study}
+    assert_response :success
+
+    #shouldn't be a projects block
+    assert_select 'div#add_projects_form', count:0
+
+    # check sharing form exists
+    assert_select 'div#sharing_form', count:1
+
+    #no sharing link, not for Investigation, Study and Assay
+    assert_select 'div#temporary_links', count:0
+
+    assert_select 'div#author_form', count:1
+  end
+
+  test 'cannot access manage page with edit rights' do
+    person = Factory(:person)
+    study = Factory(:study, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:person, access_type:Policy::EDITING)]))
+    login_as(person)
+    assert study.can_edit?
+    refute study.can_manage?
+    get :manage, params: {id:study}
+    assert_redirected_to study
+    refute_nil flash[:error]
+  end
+
+  test 'manage_update' do
+    proj1=Factory(:project)
+    person = Factory(:person,project:proj1)
+    other_person = Factory(:person)
+
+    other_creator = Factory(:person,project:proj1)
+
+    study = Factory(:study, contributor:person, policy:Factory(:private_policy))
+
+    login_as(person)
+    assert study.can_manage?
+
+    patch :manage_update, params: {id: study,
+                                   study: {
+                                       creator_ids: [other_creator.id],
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    assert_redirected_to study
+
+    study.reload
+    assert_equal [other_creator],study.creators
+    assert_equal Policy::VISIBLE,study.policy.access_type
+    assert_equal 1,study.policy.permissions.count
+    assert_equal other_person,study.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING,study.policy.permissions.first.access_type
+
+  end
+
+  test 'manage_update fails without manage rights' do
+    proj1=Factory(:project)
+
+    person = Factory(:person, project:proj1)
+
+
+    other_person = Factory(:person)
+
+    other_creator = Factory(:person,project:proj1)
+
+
+    study = Factory(:study, policy:Factory(:private_policy, permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+
+    login_as(person)
+    refute study.can_manage?
+    assert study.can_edit?
+
+    assert_empty study.creators
+
+    patch :manage_update, params: {id: study,
+                                   study: {
+                                       creator_ids: [other_creator.id],
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    refute_nil flash[:error]
+
+    study.reload
+    assert_equal Policy::PRIVATE,study.policy.access_type
+    assert_equal 1,study.policy.permissions.count
+    assert_equal person,study.policy.permissions.first.contributor
+    assert_equal Policy::EDITING,study.policy.permissions.first.access_type
+
+  end
+
+  test 'experimentalists only shown if set' do
+    person = Factory(:person)
+    login_as(person)
+    study = Factory(:study,experimentalists:'some experimentalists',contributor:person)
+    refute study.experimentalists.blank?
+
+    get :edit, params:{id:study}
+    assert_response :success
+
+    assert_select 'input#study_experimentalists', count:1
+
+    get :show, params:{id:study}
+    assert_response :success
+
+    assert_select 'p',text:/Experimentalists:/,count:1
+
+    study = Factory(:study,contributor:person)
+    assert study.experimentalists.blank?
+
+    get :edit, params:{id:study}
+    assert_response :success
+
+    assert_select 'input#study_experimentalists', count:0
+
+    get :show, params:{id:study}
+    assert_response :success
+
+    assert_select 'p',text:/Experimentalists:/, count:0
+
+    get :new
+    assert_response :success
+
+    assert_select 'input#study_experimentalists', count:0
+
+
   end
 end

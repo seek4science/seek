@@ -256,4 +256,94 @@ $j(document).ready(function () {
             $j('[value=' + item.id + ']', listElement).parent().highlight('blue');
         }
     });
+
+    $j('#citation-style-select').change(function () {
+        var style = $j(this).val();
+        var url = $j(this).data('url');
+        var target = $j('#citation');
+        var currentStyle = $j('#citation').data('citationStyle');
+
+        if (style && style !== currentStyle) {
+            $j.ajax({
+                url: url,
+                data: { style: style },
+                dataType: 'html',
+                success: function (html) {
+                    target.html(html);
+                },
+                error: function () {
+                    target.html('Could not generate citation in that style.');
+                },
+                complete: function () {
+                    target.spinner('remove');
+                }
+            });
+            target.spinner('add');
+        }
+    }).change();
+
+    new Clipboard('.clipboard-btn');
+
+    $j('.expand-filter-category-link').click(function () {
+        var cat = $j(this).parents(".filter-category");
+        cat.toggleClass("collapsed");
+
+        if (cat.hasClass("collapsed")) {
+            $j(this).text("More...");
+        } else {
+            $j(this).text("Less");
+        }
+
+        return false;
+    })
+
+    $j('[data-role="seek-date-filter"]').each(function () {
+        var filter = $j(this);
+        var select = $j('[data-role="seek-date-filter-select"]', filter);
+        var custom = $j('[data-role="seek-date-filter-custom"]', filter);
+        var button = $j('[data-role="seek-date-filter-btn"]', filter);
+        var start = $j('[data-role="seek-date-filter-period-start"]', filter);
+        var end = $j('[data-role="seek-date-filter-period-end"]', filter);
+
+        if (select.val() === 'custom') {
+            custom.show();
+        } else {
+            custom.hide();
+        }
+
+        start.datetimepicker({ format: 'YYYY-MM-DD' });
+        end.datetimepicker({ format: 'YYYY-MM-DD' });
+
+        button.click(function () {
+            if (start.val()) {
+                var val = start.val();
+                if (end.val()) {
+                    val += ('/' + end.val());
+                }
+                window.location = filter.data('applyFilterUrl').replace('_date_',  val);
+            } else {
+                alert("Please supply a start date");
+                return false;
+            }
+        });
+
+        select.change(function () {
+            var val = $j(this).val();
+
+            if (val) {
+                if (val === 'other') {
+                    return false;
+                }
+                if (val === 'custom') {
+                    custom.fadeIn();
+                } else {
+                    custom.fadeOut();
+                    window.location = filter.data('applyFilterUrl').replace('_date_',  val);
+                }
+            } else {
+                custom.fadeOut();
+                window.location = filter.data('removeFilterUrl');
+            }
+        });
+    });
 });

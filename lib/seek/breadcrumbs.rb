@@ -43,7 +43,7 @@ module Seek
         add_show_breadcrumb @assay
       elsif %w[compounds suggested_assay_types suggested_technology_types site_announcements].include?(controller_name)
         add_index_breadcrumb('admin', 'Administration')
-      elsif controller_name == 'dashboards'
+      elsif controller_name == 'stats'
         add_index_breadcrumb 'projects'
         add_show_breadcrumb @project
         add_breadcrumb 'Dashboard'
@@ -63,23 +63,29 @@ module Seek
       when 'suggested_technology_types'
         add_index_breadcrumb(controller_name, 'Technology types')
       else
+        add_parent_breadcrumb if @parent_resource
         add_index_breadcrumb(controller_name)
       end
-      resource = eval('@' + controller_name.singularize) || try_block { controller_name.singularize.camelize.constantize.find_by_id(params[:id]) }
+      resource = instance_variable_get("@#{controller_name.singularize}")
 
       add_show_breadcrumb resource if resource && resource.respond_to?(:new_record?) && !resource.new_record?
-
       unless action_name == 'index' || action_name == 'show'
         case action_name
         when 'new_object_based_on_existing_one'
           breadcrumb_name = "New #{controller_name.humanize.singularize.downcase} based on this one"
         when 'create_content_blob'
           breadcrumb_name = "New #{controller_name.humanize.singularize.downcase} details"
+        when 'create'
+          breadcrumb_name = "New"
         else
           breadcrumb_name = action_name.capitalize.humanize
         end
         url = if resource.nil?
-                url_for(controller: controller_name, action: action_name)
+                if action_name == 'create'
+                  nil
+                else
+                  url_for(controller: controller_name, action: action_name)
+                end
               else
                 url_for(controller: controller_name, action: action_name, id: resource.try(:id))
               end
@@ -102,6 +108,11 @@ module Seek
     def add_edit_breadcrumb(resource, breadcrumb_name = nil)
       breadcrumb_name ||= 'Edit'
       add_breadcrumb breadcrumb_name, url_for(controller: resource.class.name.underscore.pluralize, action: 'edit', id: resource.id)
+    end
+
+    def add_parent_breadcrumb
+      add_index_breadcrumb @parent_resource.class.name.underscore.pluralize
+      add_show_breadcrumb @parent_resource
     end
   end
 end

@@ -6,7 +6,7 @@ class AssaysController < ApplicationController
   before_action :assays_enabled?
 
   before_action :find_assets, :only=>[:index]
-  before_action :find_and_authorize_requested_item, :only=>[:edit, :update, :destroy, :show,:new_object_based_on_existing_one]
+  before_action :find_and_authorize_requested_item, :only=>[:edit, :update, :destroy, :manage, :manage_update, :show, :new_object_based_on_existing_one]
 
   #project_membership_required_appended is an alias to project_membership_required, but is necessary to include the actions
   #defined in the application controller
@@ -17,6 +17,8 @@ class AssaysController < ApplicationController
   include Seek::BreadCrumbs
 
   include Seek::IsaGraphExtensions
+
+  api_actions :index, :show, :create, :update, :destroy
 
   def new_object_based_on_existing_one
     @existing_assay =  Assay.find(params[:id])
@@ -68,11 +70,9 @@ class AssaysController < ApplicationController
    end
 
   def new
-    @assay=Assay.new
-    @assay.create_from_asset = params[:create_from_asset]
-    study = Study.find(params[:study_id]) if params[:study_id]
-    @assay.study = study if params[:study_id] if study.try :can_edit?
+    @assay=setup_new_asset
     @assay_class=params[:class]
+    @permitted_params = assay_params if params[:assay]
 
     #jump straight to experimental if modelling analysis is disabled
     @assay_class ||= "experimental" unless Seek::Config.modelling_analysis_enabled
@@ -116,14 +116,10 @@ class AssaysController < ApplicationController
     update_relationships(@assay, params)
 
     if @assay.save
-      if @assay.create_from_asset =="true"
-        render :action => :update_assays_list
-      else
-        respond_to do |format|
-          flash[:notice] = "#{t('assays.assay')} was successfully created."
-          format.html { redirect_to(@assay) }
-          format.json {render json: @assay}
-        end
+      respond_to do |format|
+        flash[:notice] = "#{t('assays.assay')} was successfully created."
+        format.html { redirect_to(@assay) }
+        format.json {render json: @assay, include: [params[:include]]}
       end
     else
       respond_to do |format|
@@ -143,7 +139,7 @@ class AssaysController < ApplicationController
       if @assay.update_attributes(assay_params)
         flash[:notice] = "#{t('assays.assay')} was successfully updated."
         format.html { redirect_to(@assay) }
-        format.json {render json: @assay}
+        format.json {render json: @assay, include: [params[:include]]}
       else
         format.html { render :action => "edit", status: :unprocessable_entity }
         format.json { render json: json_api_errors(@assay), status: :unprocessable_entity }
@@ -167,7 +163,7 @@ class AssaysController < ApplicationController
       format.html
       format.xml
       format.rdf { render :template=>'rdf/show'}
-      format.json {render json: @assay}
+      format.json {render json: @assay, include: [params[:include]]}
 
     end
   end
@@ -176,7 +172,7 @@ class AssaysController < ApplicationController
 
   def assay_params
     params.require(:assay).permit(:title, :description, :study_id, :assay_class_id, :assay_type_uri, :technology_type_uri,
-                                  :license, :other_creators, :create_from_asset, { document_ids: []}, { creator_ids: [] },
+                                  :license, :other_creators, { document_ids: []}, { creator_ids: [] },
                                   { scales: [] }, { sop_ids: [] }, { model_ids: [] },
                                   { samples_attributes: [:asset_id, :direction] },
                                   { data_files_attributes: [:asset_id, :direction, :relationship_type_id] },

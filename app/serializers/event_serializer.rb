@@ -8,4 +8,14 @@ class EventSerializer < BaseSerializer
   has_many :data_files
   has_many :publications
   has_many :presentations
+
+  def country
+    if object.country
+      if object.country.length == 2 #a code
+        CountryCodes.country(object.country)
+      else
+        object.country
+      end
+    end
+  end
 end

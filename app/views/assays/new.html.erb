@@ -3,15 +3,16 @@
    investigations.each do |i|
      studies << i.studies.select(&:can_view?)
    end
+
 -%>
 <% if investigations.blank? %>
     <div class="text-center">
-      <%= button_link_to("New #{t('investigation')}", 'arrow_right', new_investigation_path(:create_from_asset=>@assay.create_from_asset)) -%>
+      <%= button_link_to("New #{t('investigation')}", 'arrow_right', new_investigation_path) -%>
     </div>
 <% else %>
     <% if studies.flatten.blank? %>
         <div class="text-center">
-          <%= button_link_to("New #{t('study')}", 'arrow_right', new_study_path(:create_from_asset=>@assay.create_from_asset)) -%>
+          <%= button_link_to("New #{t('study')}", 'arrow_right', new_study_path) -%>
         </div>
     <% else %>
         <div class="contribution_title">
@@ -22,13 +23,13 @@
             <div class="text-center">
               <p>Please select the class of <%= t('assays.assay') %> you wish to create</p>
 
-              <%= link_to new_assay_path(:class=>:experimental,:study_id=>params[:study_id],:create_from_asset=>@assay.create_from_asset),
+              <%= link_to new_assay_path(:class=>:experimental, :assay=>@permitted_params),
                           :class => 'select_assay_class' do %>
                   <%= image("assay_experimental_avatar") %>
                   An <%= t('assays.experimental_assay') -%>
               <% end %>
 
-              <%= link_to new_assay_path(:class=>:modelling,:study_id=>params[:study_id],:create_from_asset=>@assay.create_from_asset),
+              <%= link_to new_assay_path(:class=>:modelling, :assay=>@permitted_params),
                           :class => 'select_assay_class' do %>
                   <%= image("assay_modelling_avatar") %>
                   A <%= t('assays.modelling_analysis') -%>

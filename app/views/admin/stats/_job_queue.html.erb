@@ -9,7 +9,7 @@
 </p>
 
 <% if Delayed::Job.where('failed_at IS NOT NULL').count > 0 %>
-  <%= button_link_to "Clear failed jobs", 'clear', '#', id: 'clear-failed-btn', class: 'btn-primary' %>
+  <%= button_link_to "Clear failed jobs", 'destroy', '#', id: 'clear-failed-btn', class: 'btn-primary' %>
 <% end %>
 
 <table class="table table-hover">

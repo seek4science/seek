@@ -203,26 +203,26 @@ class SuggestedTechnologyTypeTest < ActiveSupport::TestCase
   end
 
   test 'updating a suggested tech type should update associated assays' do
-    type = Factory :suggested_technology_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
+    type = Factory :suggested_technology_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#UPLC'
     assay = Factory(:experimental_assay, suggested_technology_type: type)
     assay2 = Factory(:experimental_assay, suggested_technology_type: type)
 
     type.reload
     assert_equal [assay, assay2].sort, type.assays.sort
-    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', assay.technology_type_uri
-    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', assay2.technology_type_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#UPLC', assay.technology_type_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#UPLC', assay2.technology_type_uri
 
     Delayed::Job.destroy_all
 
-    type.ontology_uri = 'http://wibble.com/ontology#fish'
+    type.ontology_uri = 'http://jermontology.org/ontology/JERMOntology#Binding'
 
     type.save!
 
     assay.reload
     assay2.reload
 
-    assert_equal 'http://wibble.com/ontology#fish', assay.technology_type_uri
-    assert_equal 'http://wibble.com/ontology#fish', assay2.technology_type_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Binding', assay.technology_type_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#Binding', assay2.technology_type_uri
 
     # checks that rdf generation jobs have been created, to update the RDF for the assays
     rdfjobs = Delayed::Job.all.select{|j| j.handler.include?('RdfGenerationJob')}
@@ -231,10 +231,10 @@ class SuggestedTechnologyTypeTest < ActiveSupport::TestCase
   end
 
   test 'assay adopts ontology uri if suggested type destroyed' do
-    type = Factory :suggested_technology_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#Fluxomics'
+    type = Factory :suggested_technology_type, ontology_uri: 'http://jermontology.org/ontology/JERMOntology#UPLC'
     assay = Factory(:experimental_assay, suggested_technology_type: type)
     type.reload
-    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', assay.technology_type_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#UPLC', assay.technology_type_uri
 
     Delayed::Job.destroy_all
 
@@ -242,7 +242,7 @@ class SuggestedTechnologyTypeTest < ActiveSupport::TestCase
     assay.reload
 
     assert_nil assay.suggested_assay_type
-    assert_equal 'http://jermontology.org/ontology/JERMOntology#Fluxomics', assay.technology_type_uri
+    assert_equal 'http://jermontology.org/ontology/JERMOntology#UPLC', assay.technology_type_uri
 
     # checks that rdf generation jobs have been created, to update the RDF for the assays
     rdfjobs = Delayed::Job.all.select{|j| j.handler.include?('RdfGenerationJob')}

@@ -141,23 +141,23 @@ class SampleTypeEditingConstraintsTest < ActiveSupport::TestCase
       project = person.projects.first
       sample_type = Factory(:patient_sample_type, project_ids: [project.id])
       sample = Sample.new sample_type: sample_type, project_ids: [project.id]
-      sample.set_attribute(:full_name, 'Fred Blogs')
-      sample.set_attribute(:age, 22)
-      sample.set_attribute(:weight, 12.2)
-      sample.set_attribute(:address, 'Somewhere')
+      sample.set_attribute_value(:full_name, 'Fred Blogs')
+      sample.set_attribute_value(:age, 22)
+      sample.set_attribute_value(:weight, 12.2)
+      sample.set_attribute_value(:address, 'Somewhere')
       sample.save!
 
       sample = Sample.new sample_type: sample_type, project_ids: [project.id]
-      sample.set_attribute(:full_name, 'Fred Jones')
-      sample.set_attribute(:age, 22)
-      sample.set_attribute(:weight, 12.2)
+      sample.set_attribute_value(:full_name, 'Fred Jones')
+      sample.set_attribute_value(:age, 22)
+      sample.set_attribute_value(:weight, 12.2)
       sample.save!
 
       sample = Sample.new sample_type: sample_type, project_ids: [project.id]
-      sample.set_attribute(:full_name, 'Fred Smith')
-      sample.set_attribute(:age, 22)
-      sample.set_attribute(:weight, 12.2)
-      sample.set_attribute(:address, 'Somewhere else')
+      sample.set_attribute_value(:full_name, 'Fred Smith')
+      sample.set_attribute_value(:age, 22)
+      sample.set_attribute_value(:weight, 12.2)
+      sample.set_attribute_value(:address, 'Somewhere else')
       sample.save!
 
       sample_type

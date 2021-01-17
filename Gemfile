@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-gem 'rails', '~> 5.2.3'
+gem 'rails', '~> 5.2.4'
 gem 'rdoc'
 
 #database adaptors
@@ -12,9 +12,9 @@ gem 'sqlite3'
 gem 'feedjira', '~>1'
 gem 'google-analytics-rails'
 gem 'hpricot', '~>0.8.2'
-gem 'libxml-ruby', '2.8.0', require: 'libxml'
+gem 'libxml-ruby', '~>2.9.0', require: 'libxml'
 gem 'uuid', '~>2.3'
-gem 'RedCloth', '4.2.9'
+gem 'RedCloth', '>=4.3.0'
 gem 'simple-spreadsheet-extractor', '~>0.16.0'
 gem 'sample-template-generator', '~>0.5'
 gem 'rmagick', '2.15.2'
@@ -40,7 +40,7 @@ gem 'jbuilder-json_api'
 gem 'active_model_serializers', '~> 0.10.2'
 gem 'json-schema'
 gem 'json-diff'
-gem 'rubyzip', '~> 1.2.2'
+gem 'rubyzip'
 
 gem 'equivalent-xml'
 gem 'breadcrumbs_on_rails'
@@ -56,7 +56,7 @@ gem 'will_paginate', '~> 3.1'
 gem 'yaml_db'
 gem 'rails_autolink'
 gem 'rfc-822'
-gem 'nokogiri', '~> 1.8.1'
+gem 'nokogiri', '>= 1.10.4'
 gem 'rdf-virtuoso', git: 'https://github.com/ruby-rdf/rdf-virtuoso', branch: 'develop'
 gem 'terrapin'
 gem 'lograge'
@@ -65,7 +65,7 @@ gem 'validate_url'
 gem "attr_encrypted", "~> 3.0.0"
 
 # gem for BiVeS and BudHat
-gem 'bives'
+gem 'bives', "~> 2.0"
 
 # Linked to SysMO Git repositories
 gem 'my_responds_to_parent', git: 'https://github.com/SysMO-DB/my_responds_to_parent.git'
@@ -73,7 +73,6 @@ gem 'bioportal', '>=3.0', git: 'https://github.com/SysMO-DB/bioportal.git'
 gem 'doi_query_tool', git: 'https://github.com/seek4science/DOI-query-tool.git'
 gem 'convert_office', git: 'https://github.com/SysMO-DB/convert_office.git', ref: '753f2567dbd625bc89071e1150404efbb562e130'
 gem 'fleximage', git: 'https://github.com/SysMO-DB/fleximage.git', ref: 'bb1182f2716a9bf1b5d85e186d8bb7eec436797b'
-gem 'search_biomodel', '2.2.1', git: 'https://github.com/myGrid/search_biomodel.git'
 
 gem 'jquery-rails', '~> 4.2.2'
 gem 'jquery-ui-rails'
@@ -87,7 +86,7 @@ gem 'bootstrap-sass', '>=3.4.1'
 gem 'sass-rails', '~> 5.0'
 gem 'sprockets-rails'
 
-gem 'ro-bundle'
+gem 'ro-bundle', '~> 0.2.4'
 gem 'handlebars_assets'
 gem 'zenodo-client', git: 'https://github.com/seek4science/zenodo-client.git'
 
@@ -99,10 +98,12 @@ gem 'rspec-rails'
 gem 'citeproc-ruby', '~> 1.1.4'
 gem 'citeproc', '~> 1.0.4'
 gem 'csl-styles', '~> 1.0.1.7'
-gem 'bibtex-ruby', '~> 4.4.2'
+gem 'bibtex-ruby', '~> 5.1.0'
 
 gem 'omniauth', '~> 1.3.1'
 gem 'omniauth-ldap', '~> 1.0.5'
+gem 'omniauth_openid_connect'
+gem 'omniauth-rails_csrf_protection', '~> 0.1'
 
 gem 'ransack'
 
@@ -123,6 +124,14 @@ gem 'rails-html-sanitizer'
 # Rails 5.2 upgrade
 gem 'bootsnap', '>= 1.1.0', require: false
 
+gem 'activerecord-import'
+
+gem "puma", ">= 3.12.6"
+
+gem "doorkeeper", ">= 5.2.5"
+
+gem 'request_store'
+
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
 source 'https://rails-assets.org' do
@@ -139,7 +148,6 @@ end
 
 group :production do
   gem 'passenger'
-  gem 'puma'
 end
 
 group :development do
@@ -161,7 +169,7 @@ group :test do
   gem 'minitest', '5.10.3'
   gem 'minitest-reporters'
   gem 'sunspot_matchers'
-  gem 'database_cleaner'
+  gem 'database_cleaner', '~> 1.7.0'
   gem 'vcr', '~> 2.9'
   gem 'rails-controller-testing'
   gem 'simplecov'

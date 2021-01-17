@@ -117,4 +117,48 @@ class EventTest < ActiveSupport::TestCase
       
     end
   end
+
+  test 'country conversion and validation' do
+
+    event = Factory.build(:event)
+    assert event.valid?
+    assert event.country.nil?
+
+    event.country = ''
+    assert event.valid?
+
+    event.country = 'GB'
+    assert event.valid?
+    assert_equal 'GB', event.country
+
+    event.country = 'gb'
+    assert event.valid?
+    assert_equal 'GB', event.country
+
+    event.country = 'Germany'
+    assert event.valid?
+    assert_equal 'DE', event.country
+
+    event.country = 'FRANCE'
+    assert event.valid?
+    assert_equal 'FR', event.country
+
+    event.country = 'ZZ'
+    refute event.valid?
+    assert_equal 'ZZ', event.country
+
+    event.country = 'Land of Oz'
+    refute event.valid?
+    assert_equal 'Land of Oz', event.country
+
+    # check the conversion gets saved
+    event = Factory.build(:event)
+    event.country = "Germany"
+    disable_authorization_checks {
+      assert event.save!
+    }
+    event.reload
+    assert_equal 'DE',event.country
+
+  end
 end

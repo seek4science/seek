@@ -210,7 +210,7 @@ class PresentationsControllerTest < ActionController::TestCase
   test 'should show the other creators in -uploader and creators- box' do
     presentation = Factory(:presentation, policy: Factory(:public_policy), other_creators: 'another creator')
     get :show, params: { id: presentation }
-    assert_select 'div', text: 'another creator', count: 1
+    assert_select 'li.author-list-item', text: 'another creator', count: 1
   end
 
   test 'should be able to view ms/open office ppt content' do
@@ -220,28 +220,32 @@ class PresentationsControllerTest < ActionController::TestCase
       get :show, params: { id: ms_ppt_presentation.id }
       assert_response :success
       assert_select 'a', text: /View content/, count: 1
+      assert_select 'a.disabled', text: /View content/, count: 0
 
       openoffice_ppt_presentation = Factory(:odp_presentation, policy: Factory(:all_sysmo_downloadable_policy))
       assert openoffice_ppt_presentation.content_blob.is_content_viewable?
       get :show, params: { id: openoffice_ppt_presentation.id }
       assert_response :success
       assert_select 'a', text: /View content/, count: 1
+      assert_select 'a.disabled', text: /View content/, count: 0
     end
   end
 
-  test 'should not be able to view ms/open office ppt content if soffice not available' do
+  test 'view content disabled for ms/open office ppt content if soffice not available and conversion required' do
     Seek::Config.stub(:soffice_available?, false) do
       ms_ppt_presentation = Factory(:ppt_presentation, policy: Factory(:all_sysmo_downloadable_policy))
-      refute ms_ppt_presentation.content_blob.is_content_viewable?
+      assert ms_ppt_presentation.content_blob.file_exists?
+      refute ms_ppt_presentation.content_blob.file_exists?('pdf')
       get :show, params: { id: ms_ppt_presentation.id }
       assert_response :success
-      assert_select 'span.disabled-button', text: /View content/, count: 1
+      assert_select 'a.disabled', text: /View content/, count: 1
 
       openoffice_ppt_presentation = Factory(:odp_presentation, policy: Factory(:all_sysmo_downloadable_policy))
-      refute openoffice_ppt_presentation.content_blob.is_content_viewable?
+      assert openoffice_ppt_presentation.content_blob.file_exists?
+      refute openoffice_ppt_presentation.content_blob.file_exists?('pdf')
       get :show, params: { id: openoffice_ppt_presentation.id }
       assert_response :success
-      assert_select 'span.disabled-button', text: /View content/, count: 1
+      assert_select 'a.disabled', text: /View content/, count: 1
     end
   end
 
@@ -397,6 +401,186 @@ class PresentationsControllerTest < ActionController::TestCase
 
     assert_equal desired, ids
 
+  end
+
+  test 'manage menu item appears according to permission' do
+    check_manage_edit_menu_for_type('presentation')
+  end
+
+  test 'can access manage page with manage rights' do
+    person = Factory(:person)
+    presentation = Factory(:presentation, contributor:person)
+    login_as(person)
+    assert presentation.can_manage?
+    get :manage, params: {id: presentation}
+    assert_response :success
+
+    # check the project form exists, studies and assays don't have this
+    assert_select 'div#add_projects_form', count:1
+
+    # check sharing form exists
+    assert_select 'div#sharing_form', count:1
+
+    # should be a temporary sharing link
+    assert_select 'div#temporary_links', count:1
+
+    assert_select 'div#author_form', count:1
+  end
+
+  test 'cannot access manage page with edit rights' do
+    person = Factory(:person)
+    presentation = Factory(:presentation, policy:Factory(:private_policy, permissions:[Factory(:permission, contributor:person, access_type:Policy::EDITING)]))
+    login_as(person)
+    assert presentation.can_edit?
+    refute presentation.can_manage?
+    get :manage, params: {id:presentation}
+    assert_redirected_to presentation
+    refute_nil flash[:error]
+  end
+
+  test 'manage_update' do
+    proj1=Factory(:project)
+    proj2=Factory(:project)
+    person = Factory(:person,project:proj1)
+    other_person = Factory(:person)
+    person.add_to_project_and_institution(proj2,person.institutions.first)
+    person.save!
+    other_creator = Factory(:person,project:proj1)
+    other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
+    other_creator.save!
+
+    presentation = Factory(:presentation, contributor:person, projects:[proj1], policy:Factory(:private_policy))
+
+    login_as(person)
+    assert presentation.can_manage?
+
+    patch :manage_update, params: {id: presentation,
+                                   presentation: {
+                                       creator_ids: [other_creator.id],
+                                       project_ids: [proj1.id, proj2.id]
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    assert_redirected_to presentation
+
+    presentation.reload
+    assert_equal [proj1,proj2],presentation.projects.sort_by(&:id)
+    assert_equal [other_creator],presentation.creators
+    assert_equal Policy::VISIBLE,presentation.policy.access_type
+    assert_equal 1,presentation.policy.permissions.count
+    assert_equal other_person,presentation.policy.permissions.first.contributor
+    assert_equal Policy::MANAGING,presentation.policy.permissions.first.access_type
+
+  end
+
+  test 'manage_update fails without manage rights' do
+    proj1=Factory(:project)
+    proj2=Factory(:project)
+    person = Factory(:person, project:proj1)
+    person.add_to_project_and_institution(proj2,person.institutions.first)
+    person.save!
+
+    other_person = Factory(:person)
+
+    other_creator = Factory(:person,project:proj1)
+    other_creator.add_to_project_and_institution(proj2,other_creator.institutions.first)
+    other_creator.save!
+
+    presentation = Factory(:presentation, projects:[proj1], policy:Factory(:private_policy,
+                                                                           permissions:[Factory(:permission,contributor:person, access_type:Policy::EDITING)]))
+
+    login_as(person)
+    refute presentation.can_manage?
+    assert presentation.can_edit?
+
+    assert_equal [proj1],presentation.projects
+    assert_empty presentation.creators
+
+    patch :manage_update, params: {id: presentation,
+                                   presentation: {
+                                       creator_ids: [other_creator.id],
+                                       project_ids: [proj1.id, proj2.id]
+                                   },
+                                   policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
+                                   }}
+
+    refute_nil flash[:error]
+
+    presentation.reload
+    assert_equal [proj1],presentation.projects
+    assert_empty presentation.creators
+    assert_equal Policy::PRIVATE,presentation.policy.access_type
+    assert_equal 1,presentation.policy.permissions.count
+    assert_equal person,presentation.policy.permissions.first.contributor
+    assert_equal Policy::EDITING,presentation.policy.permissions.first.access_type
+
+  end
+
+  test 'should create with discussion link' do
+    person = Factory(:person)
+    login_as(person)
+    presentation =  {title: 'Presentation', project_ids: [person.projects.first.id], discussion_links_attributes:[{url: "http://www.slack.com/"}]}
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('Presentation.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, params: {presentation: presentation, content_blobs: [{ data: file_for_upload }], policy_attributes: { access_type: Policy::VISIBLE }}
+        end
+      end
+    end
+    presentation = assigns(:presentation)
+    assert_equal 'http://www.slack.com/', presentation.discussion_links.first.url
+    assert_equal AssetLink::DISCUSSION, presentation.discussion_links.first.link_type
+  end
+
+  test 'should show discussion link' do
+    asset_link = Factory(:discussion_link)
+    presentation = Factory(:presentation, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    get :show, params: { id: presentation }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+  end
+
+  test 'should update presentation with new discussion link' do
+    person = Factory(:person)
+    presentation = Factory(:presentation, contributor: person)
+    login_as(person)
+    assert_nil presentation.discussion_links.first
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: presentation.id, presentation: { discussion_links_attributes:[{url: "http://www.slack.com/"}] }  }
+      end
+    end
+    assert_redirected_to presentation_path(presentation = assigns(:presentation))
+    assert_equal 'http://www.slack.com/', presentation.discussion_links.first.url
+  end
+
+  test 'should update sop with edited discussion link' do
+    person = Factory(:person)
+    presentation = Factory(:presentation, contributor: person, discussion_links:[Factory(:discussion_link)])
+    login_as(person)
+    assert_equal 1,presentation.discussion_links.count
+    assert_no_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: presentation.id, presentation: { discussion_links_attributes:[{id:presentation.discussion_links.first.id, url: "http://www.wibble.com/"}] } }
+      end
+    end
+    presentation = assigns(:presentation)
+    assert_redirected_to presentation_path(presentation)
+    assert_equal 1,presentation.discussion_links.count
+    assert_equal 'http://www.wibble.com/', presentation.discussion_links.first.url
+  end
+
+  test 'should destroy related asset link when the discussion link is removed ' do
+    person = Factory(:person)
+    login_as(person)
+    asset_link = Factory(:discussion_link)
+    presentation = Factory(:presentation , discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
+    assert_difference('AssetLink.discussion.count', -1) do
+      put :update, params: { id: presentation.id, presentation: { discussion_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
+    end
+    assert_redirected_to presentation_path(presentation = assigns(:presentation ))
+    assert_empty presentation.discussion_links
   end
 
   def edit_max_object(presentation)

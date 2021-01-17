@@ -16,12 +16,12 @@ class InstitutionCUDTest < ActionDispatch::IntegrationTest
 
   def create_post_values
       i = Factory(:institution)
-      @post_values = {title: "Post "+i.title, country: i.country}
+      @post_values = {title: "Post "+i.title, country: 'United Kingdom'}
   end
 
   def create_patch_values
     i = Factory(:institution)
-    @patch_values = {id: i.id}
+    @patch_values = {id: i.id, country:'DE'}
   end
 
   def ignore_non_read_or_write_attributes
