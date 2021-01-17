@@ -29,26 +29,28 @@
                 <%= error_messages_for :assay -%>
                 <%= extraction_warnings_messages_for @warnings %>
 
-                <div id='step-1' class='multi-step-block'>
+                <% step = 0 %>
+                <%= content_tag(:div, id: "step-#{step += 1}", class: 'multi-step-block') do %>
                   <span class='multi-step-progress-indicator'></span>
                   <%= render partial: 'data_files/multi-steps/basic_metadata',locals:{f: f} %>
-                </div>
+                <% end %>
 
-                <div id='step-2' class='multi-step-block multi-step-datafile-block'>
+                <%= content_tag(:div, id: "step-#{step += 1}", class: 'multi-step-block') do %>
                   <span class='multi-step-progress-indicator'></span>
                   <%= render partial: 'data_files/multi-steps/license_and_permissions',locals:{f: f} %>
-                </div>
+                <% end %>
 
-                <div id='step-3' class='multi-step-block multi-step-datafile-block'>
-                  <span class='multi-step-progress-indicator'></span>
-                  <%= render partial: 'data_files/multi-steps/assays',locals:{f: f} %>
-                </div>
+                <% if Seek::Config.assays_enabled %>
+                  <%= content_tag(:div, id: "step-#{step += 1}", class: 'multi-step-block') do %>
+                    <span class='multi-step-progress-indicator'></span>
+                    <%= render partial: 'data_files/multi-steps/assays',locals:{f: f} %>
+                  <% end %>
+                <% end %>
 
-                <div id='step-4' class='multi-step-block multi-step-datafile-block'>
+                <%= content_tag(:div, id: "step-#{step += 1}", class: 'multi-step-block') do %>
                   <span class='multi-step-progress-indicator'></span>
                   <%= render partial: 'data_files/multi-steps/other_properties', locals:{f: f} %>
-                </div>
-
+                <% end %>
               </div>
             </div>
         <% end -%>

@@ -202,29 +202,22 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     refute cv.new_record?
     assert_equal [type], cv.sample_types
 
-    Delayed::Job.destroy_all
-
-    assert_difference('Delayed::Job.count', 1) do
+    type.template_generation_task.destroy!
+    assert_enqueued_with(job: SampleTemplateGeneratorJob, args: [type]) do
       cv.sample_controlled_vocab_terms.create(label: 'fsdfsdsdfsdf')
     end
-    assert SampleTemplateGeneratorJob.new(type).exists?
 
-    Delayed::Job.destroy_all
-
-    assert_difference('Delayed::Job.count', 1) do
+    type.template_generation_task.destroy!
+    assert_enqueued_with(job: SampleTemplateGeneratorJob, args: [type]) do
       term = cv.sample_controlled_vocab_terms.last
       cv.sample_controlled_vocab_terms.destroy(term)
     end
-    assert SampleTemplateGeneratorJob.new(type).exists?
 
-    Delayed::Job.destroy_all
-
+    type.template_generation_task.destroy!
     # changing the title has no effect
-    assert_no_difference('Delayed::Job.count') do
+    assert_no_enqueued_jobs(only: SampleTemplateGeneratorJob) do
       cv.title = 'new title'
       cv.save
     end
-
-    refute SampleTemplateGeneratorJob.new(type).exists?
   end
 end

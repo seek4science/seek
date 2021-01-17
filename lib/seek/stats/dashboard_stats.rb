@@ -1,16 +1,6 @@
 module Seek
   module Stats
     class DashboardStats
-
-      class InvalidScopeException < Exception; end
-
-      attr_reader :scope
-
-      def initialize(scope = nil)
-        raise InvalidScopeException,"Invalid scope, must be nil or Project" if scope && !scope.is_a?(Project)
-        @scope = scope
-      end
-
       def asset_activity(action, start_date, end_date, type: nil)
         resource_types = type || Seek::Util.asset_types.map(&:name)
         Rails.cache.fetch("#{cache_key_base}_#{type || 'all'}_activity_#{action}_#{start_date}_#{end_date}", expires_in: 12.hours) do
@@ -49,7 +39,7 @@ module Seek
                     '%Y-%m-%d'
                   end
 
-          assets = (scope.nil? ? (Programme.all + Project.all) : []) + scoped_resources
+          assets = scoped_resources
           assets.select! { |a| a.created_at >= start_date && a.created_at <= end_date }
           date_grouped = assets.group_by { |a| a.created_at.strftime(strft) }
           types = assets.map(&:class).uniq
@@ -68,9 +58,8 @@ module Seek
       end
 
       def asset_accessibility(start_date, end_date, type: nil)
-        project_scope = scope
         Rails.cache.fetch("#{cache_key_base}_#{type || 'all'}_asset_accessibility_#{start_date}_#{end_date}", expires_in: 3.hours) do
-          assets = scoped_resources
+          assets = scoped_isa + scoped_assets
           assets.select! {|a| a.class.name == type} if type
           assets.select! {|a| a.created_at >= start_date && a.created_at <= end_date}
           published_count = assets.count(&:is_published?)
@@ -90,39 +79,27 @@ module Seek
       private
 
       def cache_key_base
-        if scope
-          "#{scope.class.name}_#{scope.id}_dashboard_stats"
-        else
-          'admin_dashboard_stats'
-        end
+        'admin_dashboard_stats'
       end
 
       def scoped_activities
-        @activities ||= if scope
-                          ActivityLog.where(referenced_id: scope.id, referenced_type: scope.class.name)
-                        else
-                          ActivityLog
-                        end
+        @activities ||= ActivityLog
       end
 
       def scoped_resources
-        @resources ||= (scoped_isa + scoped_assets)
+        @resources ||= (Programme.all + Project.all + scoped_isa + scoped_assets)
       end
 
       def scoped_assets
-        @assets ||= if scope
-                      (scope.assets + scope.samples)
-                    else
-                      Seek::Util.asset_types.map(&:all).flatten
-                    end
+        @assets ||= Seek::Util.asset_types.map(&:all).flatten
       end
 
       def scoped_isa
-        @isa ||= if scope
-                   scope.investigations + scope.studies + scope.assays
-                 else
-                   Investigation.all + Study.all + Assay.all
-                 end
+        @isa ||= Investigation.all + Study.all + Assay.all
+      end
+
+      def project_scope
+        nil
       end
 
       def dates_between(start_date, end_date, interval = 'month')

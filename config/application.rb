@@ -52,8 +52,8 @@ module SEEK
 
     config.middleware.use Rack::Deflater,
                           include: %w(text/html application/xml application/json text/css application/javascript)
-
     config.middleware.use Rack::Attack
+    config.middleware.use I18n::JS::Middleware
 
     config.exceptions_app = self.routes
 
@@ -70,9 +70,11 @@ module SEEK
 
     config.action_mailer.deliver_later_queue_name = 'mailers'
 
-    config.active_job.queue_adapter = Rails.env.test? ? :test : :delayed_job
+    config.active_job.queue_adapter = :delayed_job
 
     config.active_record.sqlite3.represent_boolean_as_integer = true
 
+    # Ignore translation overrides when testing
+    config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'overrides', '**', '*.{rb,yml}')] unless Rails.env.test?
   end
 end

@@ -13,9 +13,7 @@ Factory.define(:min_content_blob, class: ContentBlob) do |f|
   f.asset { Factory(:pdf_sop, policy: Factory(:downloadable_public_policy)) }
 end
 
-Factory.define(:min_contentblob, parent: :min_content_blob) {}
-
-Factory.define(:max_contentblob, parent: :min_content_blob) do |f|
+Factory.define(:max_content_blob, parent: :min_content_blob) do |f|
   f.url 'http://example.com/remote.txt'
   f.file_size 8
   f.content_type 'text/plain'
@@ -206,6 +204,12 @@ Factory.define(:binary_content_blob, parent: :content_blob) do |f|
   f.data { File.new("#{Rails.root}/test/fixtures/files/little_file.txt", 'rb').read }
 end
 
+Factory.define(:study_template_content_blob, parent: :content_blob) do |f|
+  f.original_filename 'study_batch.zip'
+  f.content_type 'application/zip'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/study_batch.zip", 'rb').read }
+end
+
 Factory.define(:sample_type_template_content_blob, parent: :content_blob) do |f|
   f.original_filename 'sample-type-example.xlsx'
   f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -321,4 +325,62 @@ end
 Factory.define(:blank_txt_content_blob, parent: :blank_content_blob) do |f|
   f.original_filename 'a_txt_file.txt'
   f.content_type 'text/plain'
+end
+
+Factory.define(:cwl_content_blob, parent: :content_blob) do |f|
+  f.original_filename 'rp2-to-rp2path.cwl'
+  f.content_type 'application/x-yaml'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path.cwl", 'rb').read }
+end
+
+Factory.define(:cwl_packed_content_blob, parent: :content_blob) do |f|
+  f.original_filename 'rp2-to-rp2path-packed.cwl'
+  f.content_type 'application/x-yaml'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'rb').read }
+end
+
+Factory.define(:url_cwl_content_blob, parent: :content_blob) do |f|
+  f.url 'https://www.abc.com/workflow.cwl'
+  f.data nil
+end
+
+Factory.define(:blank_cwl_content_blob, parent: :blank_content_blob) do |f|
+  f.original_filename 'rp2-to-rp2path.cwl'
+  f.content_type 'application/x-yaml'
+end
+
+Factory.define(:existing_galaxy_ro_crate, parent: :content_blob) do |f|
+  f.original_filename '1-PreProcessing.crate.zip'
+  f.content_type 'application/zip'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/1-PreProcessing.crate.zip", 'rb').read }
+end
+
+Factory.define(:generated_galaxy_ro_crate, parent: :content_blob) do |f|
+  f.original_filename 'new-workflow.basic.crate.zip'
+  f.content_type 'application/zip'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/workflow-4-1.crate.zip", 'rb').read }
+end
+
+Factory.define(:generated_galaxy_no_diagram_ro_crate, parent: :content_blob) do |f|
+  f.original_filename 'new-workflow.basic.crate.zip'
+  f.content_type 'application/zip'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/workflow-4-1-no-diagram.crate.zip", 'rb').read }
+end
+
+Factory.define(:nf_core_ro_crate, parent: :content_blob) do |f|
+  f.original_filename 'ro-crate-nf-core-ampliseq.crate.zip'
+  f.content_type 'application/zip'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/ro-crate-nf-core-ampliseq.crate.zip", 'rb').read }
+end
+
+Factory.define(:just_cwl_ro_crate, parent: :content_blob) do |f|
+  f.original_filename 'just-cwl-workflow.crate.zip'
+  f.content_type 'application/zip'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/just-cwl-workflow.crate.zip", 'rb').read }
+end
+
+Factory.define(:fully_remote_ro_crate, parent: :content_blob) do |f|
+  f.original_filename 'all_remote.crate.zip'
+  f.content_type 'application/zip'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/all_remote.crate.zip", 'rb').read }
 end

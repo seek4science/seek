@@ -2,6 +2,13 @@ module Seek
   # Based heavily on the acts_as_versioned plugin
   module ExplicitVersioning
     CALLBACKS = [:sync_latest_version].freeze
+    VISIBILITY = {
+        0 => :private,
+        1 => :registered_users,
+        2 => :public
+    }.freeze
+    VISIBILITY_INV = VISIBILITY.invert.freeze
+
     def self.included(mod) # :nodoc:
       mod.extend(ClassMethods)
     end
@@ -61,6 +68,41 @@ module Seek
           def latest_version?
             parent.latest_version == self
           end
+
+          def is_a_version?
+            true
+          end
+
+          def visibility= key
+            super(Seek::ExplicitVersioning::VISIBILITY_INV[key.to_sym] || Seek::ExplicitVersioning::VISIBILITY_INV[self.class.default_visibility])
+          end
+
+          def visibility
+            Seek::ExplicitVersioning::VISIBILITY[super]
+          end
+
+          def can_change_visibility?
+            !latest_version? && (!respond_to?(:doi) || doi.blank?)
+          end
+
+          def visible?(user = User.current_user)
+            case visibility
+            when :public
+              true
+            when :private
+              parent.can_manage?(user)
+            when :registered_users
+              user&.person&.member?
+            end
+          end
+
+          def self.default_visibility
+            :public
+          end
+
+          def set_default_visibility
+            self.visibility ||= self.class.default_visibility
+          end
         end
 
         versioned_class.table_name = versioned_table_name
@@ -72,6 +114,8 @@ module Seek
         versioned_class.belongs_to :parent,
                                    class_name: "::#{self}",
                                    foreign_key: versioned_foreign_key
+
+        versioned_class.before_validation :set_default_visibility
 
         versioned_class.class_eval(&extension) if block_given?
       end
@@ -124,7 +168,7 @@ module Seek
 
         if rtn
           # if the latest version has been updated then update the main table as well
-          if version_number_to_update.to_i == eval(self.class.version_column.to_s)
+          if version_number_to_update.to_i == send(self.class.version_column)
             return update_main_to_version(version_number_to_update, true)
           else
             return true
@@ -140,7 +184,7 @@ module Seek
             # For fault tolerance (ie: to prevent data loss through premature deletion), first...
             # Check to see if the current (aka latest) version has to be deleted,
             # and if so update the main table with the data from the version that will become the latest
-            if version_number.to_i == eval(self.class.version_column.to_s)
+            if version_number.to_i == send(self.class.version_column)
               if versions.count > 1
                 to_be_latest_version = versions[versions.count - 2].version
               else
@@ -171,6 +215,18 @@ module Seek
       end
 
       def empty_callback() end #:nodoc:
+
+      def is_a_version?
+        false
+      end
+
+      def visible_versions(user = User.current_user)
+        scopes = [ExplicitVersioning::VISIBILITY_INV[:public]]
+        scopes << ExplicitVersioning::VISIBILITY_INV[:registered_users] if user&.person&.member?
+        scopes << ExplicitVersioning::VISIBILITY_INV[:private] if can_manage?(user)
+
+        versions.where(visibility: scopes)
+      end
 
       protected
 
@@ -253,7 +309,7 @@ module Seek
               timestamp_columns.include?(key) ||
               sync_ignore_columns.include?(key)
             next unless orig_model.respond_to?(key)
-            new_model.send("#{key}=", eval("orig_model.#{key}"))
+            new_model.send("#{key}=", orig_model.send(key))
           end
         end
 
@@ -262,13 +318,13 @@ module Seek
           begin
             file_columns.each do |key|
               if orig_model.has_attribute?(key)
-                if eval("orig_model.#{key}.nil?")
+                if orig_model.send(key).nil?
                   logger.debug('DEBUG: file column is nil')
                   new_model.send("#{key}=", nil)
                 else
                   logger.debug('DEBUG: file column is not nil')
-                  new_model.send("#{key}=", File.open(eval("orig_model.#{key}")))
-                  FileUtils.cp(eval("orig_model.#{key}"), eval("new_model.#{key}"))
+                  new_model.send("#{key}=", File.open(orig_model.send(key)))
+                  FileUtils.cp(orig_model.send(key), new_model.send(key))
                 end
               end
             end
@@ -282,10 +338,10 @@ module Seek
         begin
           white_list_columns.each do |key|
             if orig_model.has_attribute?(key)
-              if eval("orig_model.#{key}.nil?")
+              if orig_model.send(key).nil?
                 new_model.send("#{key}=", nil)
               else
-                new_model.send("#{key}=", eval("orig_model.#{key}"))
+                new_model.send("#{key}=", orig_model.send(key))
               end
             end
           end

@@ -1,7 +1,24 @@
 <%= render :partial => "general/item_title", :locals => {:item => @model, :version => @display_model.version,
                                                          :buttons_partial => 'models/buttons'} -%>
 
-<%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@model} -%>
+<% model_image_form = capture do %>
+  <hr/>
+  <div id="image_file_box">
+    <%= hidden_field_tag("model_id", @model.id) -%>
+    <div class="form-group">
+      <label>Image file</label>
+      <%= file_field "model_image", :image_file, :onchange => "detectFileFormat('model_image_image_file')" %>
+    </div>
+    <% if previous_version_image_file = @model.latest_version.model_image.try(:original_filename) -%>
+      <p>
+        The image file of previous version <span style="font-weight: bold;"><%= previous_version_image_file %></span>
+        will be used if you dont specify the image file
+        <%= hidden_field_tag 'previous_version_image', previous_version_image_file %>
+      </p>
+    <% end -%>
+  </div>
+<% end -%>
+<%= render(partial: 'assets/upload_new_version_form', locals: { resource: @model, extra_content: model_image_form })%>
 
 <div class="row">
   <div class="col-md-9 col-sm-8 box_about_actor">
@@ -21,6 +38,17 @@
               <span class="none_text">Not specified</span>
           <% end -%>
         </p>
+
+        <% if Seek::Config.human_diseases_enabled %>
+          <p>
+            <b>Human Disease:</b>
+            <% if @display_model.human_disease -%>
+                <%= human_disease_link_to @display_model.human_disease -%>
+            <% else -%>
+                <span class="none_text">Not specified</span>
+            <% end -%>
+          </p>
+        <% end %>
 
         <div id="format_info">
           <p id="model_type">

@@ -1,12 +1,32 @@
+# Workflow Class
+Factory.define(:cwl_workflow_class, class: WorkflowClass) do |f|
+  f.title I18n.t('workflows.cwl_workflow')
+  f.key 'CWL'
+  f.description 'Common Workflow Language'
+end
+
+Factory.define(:galaxy_workflow_class, class: WorkflowClass) do |f|
+  f.title I18n.t('workflows.galaxy_workflow')
+  f.key 'Galaxy'
+  f.description 'Galaxy'
+end
+
+Factory.define(:nextflow_workflow_class, class: WorkflowClass) do |f|
+  f.title I18n.t('workflows.nextflow_workflow')
+  f.key 'Nextflow'
+  f.description 'Nextflow'
+end
+
 # Workflow
 Factory.define(:workflow) do |f|
   f.title 'This Workflow'
   f.with_project_contributor
+  f.workflow_class { WorkflowClass.find_by_key('CWL') || Factory(:cwl_workflow_class) }
 
   f.after_create do |workflow|
     if workflow.content_blob.blank?
-      workflow.content_blob = Factory.create(:content_blob, original_filename: 'workflow.pdf',
-                                        content_type: 'application/pdf', asset: workflow, asset_version: workflow.version)
+      workflow.content_blob = Factory.create(:cwl_content_blob, original_filename: 'workflow.cwl',
+                                        asset: workflow, asset_version: workflow.version)
     else
       workflow.content_blob.asset = workflow
       workflow.content_blob.asset_version = workflow.version
@@ -15,12 +35,17 @@ Factory.define(:workflow) do |f|
   end
 end
 
+Factory.define(:public_workflow, parent: :workflow) do |f|
+  f.policy { Factory(:downloadable_public_policy) }
+end
+
 Factory.define(:min_workflow, class: Workflow) do |f|
   f.with_project_contributor
   f.title 'A Minimal Workflow'
-  f.projects { [Factory.build(:min_project)] }
+  f.workflow_class { WorkflowClass.find_by_key('CWL') || Factory(:cwl_workflow_class) }
+  f.projects { [Factory(:min_project)] }
   f.after_create do |workflow|
-    workflow.content_blob = Factory.create(:min_content_blob, content_type: 'application/pdf', asset: workflow, asset_version: workflow.version)
+    workflow.content_blob = Factory.create(:cwl_content_blob, asset: workflow, asset_version: workflow.version)
   end
 end
 
@@ -28,30 +53,28 @@ Factory.define(:max_workflow, class: Workflow) do |f|
   f.with_project_contributor
   f.title 'A Maximal Workflow'
   f.description 'How to run a simulation in GROMACS'
-  f.projects { [Factory.build(:max_project)] }
+  f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
+  f.workflow_class { WorkflowClass.find_by_key('CWL') || Factory(:cwl_workflow_class) }
+  f.projects { [Factory(:max_project)] }
   f.assays {[Factory.build(:max_assay, policy: Factory(:public_policy))]}
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
   f.after_create do |workflow|
-    workflow.content_blob = Factory.create(:min_content_blob, content_type: 'application/pdf', asset: workflow, asset_version: workflow.version)
+    workflow.content_blob = Factory.create(:cwl_content_blob, asset: workflow, asset_version: workflow.version)
   end
   f.other_creators 'Blogs, Joe'
 end
 
-Factory.define(:doc_workflow, parent: :workflow) do |f|
-  f.association :content_blob, factory: :doc_content_blob
+Factory.define(:cwl_workflow, parent: :workflow) do |f|
+  f.association :content_blob, factory: :cwl_content_blob
 end
 
-Factory.define(:odt_workflow, parent: :workflow) do |f|
-  f.association :content_blob, factory: :odt_content_blob
-end
-
-Factory.define(:pdf_workflow, parent: :workflow) do |f|
-  f.association :content_blob, factory: :pdf_content_blob
+Factory.define(:cwl_packed_workflow, parent: :workflow) do |f|
+  f.association :content_blob, factory: :cwl_packed_content_blob
 end
 
 # A Workflow that has been registered as a URI
-Factory.define(:url_workflow, parent: :workflow) do |f|
-  f.association :content_blob, factory: :url_content_blob
+Factory.define(:cwl_url_workflow, parent: :workflow) do |f|
+  f.association :content_blob, factory: :url_cwl_content_blob
 end
 
 # Workflow::Version
@@ -70,7 +93,7 @@ end
 Factory.define(:workflow_version_with_blob, parent: :workflow_version) do |f|
   f.after_create do |workflow_version|
     if workflow_version.content_blob.blank?
-      workflow_version.content_blob = Factory.create(:pdf_content_blob,
+      workflow_version.content_blob = Factory.create(:cwl_content_blob,
                                                 asset: workflow_version.workflow,
                                                 asset_version: workflow_version.version)
     else
@@ -81,6 +104,32 @@ Factory.define(:workflow_version_with_blob, parent: :workflow_version) do |f|
   end
 end
 
-Factory.define(:api_pdf_workflow, parent: :workflow) do |f|
-  f.association :content_blob, factory: :blank_pdf_content_blob
+Factory.define(:api_cwl_workflow, parent: :workflow) do |f|
+  f.association :content_blob, factory: :blank_cwl_content_blob
+end
+
+# A pre-made RO Crate
+Factory.define(:existing_galaxy_ro_crate_workflow, parent: :workflow) do |f|
+  f.association :content_blob, factory: :existing_galaxy_ro_crate
+  f.workflow_class { WorkflowClass.find_by_key('Galaxy') || Factory(:galaxy_workflow_class) }
+end
+
+# An RO crate generated by SEEK through the form on the workflow page
+Factory.define(:generated_galaxy_ro_crate_workflow, parent: :workflow) do |f|
+  f.association :content_blob, factory: :generated_galaxy_ro_crate
+  f.workflow_class { WorkflowClass.find_by_key('Galaxy') || Factory(:galaxy_workflow_class) }
+end
+
+Factory.define(:generated_galaxy_no_diagram_ro_crate_workflow, parent: :workflow) do |f|
+  f.association :content_blob, factory: :generated_galaxy_no_diagram_ro_crate
+  f.workflow_class { WorkflowClass.find_by_key('Galaxy') || Factory(:galaxy_workflow_class) }
+end
+
+Factory.define(:nf_core_ro_crate_workflow, parent: :workflow) do |f|
+  f.association :content_blob, factory: :nf_core_ro_crate
+  f.workflow_class { WorkflowClass.find_by_key('Nextflow') || Factory(:nextflow_workflow_class) }
+end
+
+Factory.define(:just_cwl_ro_crate_workflow, parent: :workflow) do |f|
+  f.association :content_blob, factory: :just_cwl_ro_crate
 end

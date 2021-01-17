@@ -10,7 +10,7 @@ module Seek
       if entity.can_view?
         update_owned_annotations(entity, current_user, 'tag', params[:tag_list])
         if entity.save
-          eval("@#{controller_name.singularize} = entity")
+          instance_variable_set("@#{controller_name.singularize}", entity)
           @entity = entity
           respond_to do |format|
             format.js { render template: 'assets/update_annotations'}

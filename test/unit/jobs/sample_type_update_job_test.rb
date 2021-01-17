@@ -7,21 +7,6 @@ class SampleTypeUpdateJobTest < ActiveSupport::TestCase
     SampleType.set_callback(:save, :after, :queue_sample_type_update_job)
   end
 
-  test 'exists' do
-    SampleTypeUpdateJob.new(@sample_type).queue_job
-    assert SampleTypeUpdateJob.new(@sample_type).exists?
-  end
-
-  test 'disallow duplicates' do
-    assert_difference('Delayed::Job.count', 1) do
-      SampleTypeUpdateJob.new(@sample_type).queue_job
-    end
-
-    assert_no_difference('Delayed::Job.count') do
-      SampleTypeUpdateJob.new(@sample_type).queue_job
-    end
-  end
-
   test 'perform' do
     type = sample_type_with_samples
     sample = type.samples.first
@@ -32,22 +17,15 @@ class SampleTypeUpdateJobTest < ActiveSupport::TestCase
     type.sample_attributes.detect { |t| t.title == 'postcode' }.is_title = true
     disable_authorization_checks { type.save! }
 
-    Delayed::Job.destroy_all
-
-    # check there is no existing job triggered from a sample.save
-    refute SampleTypeUpdateJob.new(type, false).exists?
-
-    job = SampleTypeUpdateJob.new(type)
     travel_to(Time.now + 1.minute) do
-      job.perform
+      assert_no_enqueued_jobs(only: SampleTypeUpdateJob) do # a new job shouldn't be created by the sample.save
+        SampleTypeUpdateJob.perform_now(type, true)
+      end
     end
     sample.reload
     assert_equal 'M12 9LL', sample.title
     # timestamps shouldn't change
     assert_equal updated_at, sample.updated_at
-
-    # a new job shouldn't be created by the sample.save
-    refute SampleTypeUpdateJob.new(type, false).exists?
   end
 
   test 'perform without refresh' do
@@ -59,9 +37,8 @@ class SampleTypeUpdateJobTest < ActiveSupport::TestCase
     type.sample_attributes.detect { |t| t.title == 'full name' }.is_title = false
     type.sample_attributes.detect { |t| t.title == 'postcode' }.is_title = true
     disable_authorization_checks { type.save! }
-    job = SampleTypeUpdateJob.new(type, false)
     travel_to(Time.now + 1.minute) do
-      job.perform
+      SampleTypeUpdateJob.perform_now(type, false)
     end
     sample.reload
     assert_equal 'Fred Blogs', sample.title
@@ -76,7 +53,7 @@ class SampleTypeUpdateJobTest < ActiveSupport::TestCase
       project = person.projects.first
       sample_type = Factory(:patient_sample_type, project_ids: [project.id])
       sample = Sample.new sample_type: sample_type, project_ids: [project.id]
-      sample.set_attribute_value(:full_name, 'Fred Blogs')
+      sample.set_attribute_value('full name', 'Fred Blogs')
       sample.set_attribute_value(:age, 22)
       sample.set_attribute_value(:weight, 12.2)
       sample.set_attribute_value(:address, 'Somewhere')
@@ -84,14 +61,14 @@ class SampleTypeUpdateJobTest < ActiveSupport::TestCase
       sample.save!
 
       sample = Sample.new sample_type: sample_type, project_ids: [project.id]
-      sample.set_attribute_value(:full_name, 'Fred Jones')
+      sample.set_attribute_value('full name', 'Fred Jones')
       sample.set_attribute_value(:age, 22)
       sample.set_attribute_value(:weight, 12.2)
       sample.set_attribute_value(:postcode, 'M12 9LJ')
       sample.save!
 
       sample = Sample.new sample_type: sample_type, project_ids: [project.id]
-      sample.set_attribute_value(:full_name, 'Fred Smith')
+      sample.set_attribute_value('full name', 'Fred Smith')
       sample.set_attribute_value(:age, 22)
       sample.set_attribute_value(:weight, 12.2)
       sample.set_attribute_value(:address, 'Somewhere else')

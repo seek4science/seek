@@ -12,8 +12,6 @@ class EventsController < ApplicationController
 
   include Seek::Publishing::PublishingCommon
 
-  include Seek::BreadCrumbs
-
   api_actions :index, :show, :create, :update, :destroy
 
   def show

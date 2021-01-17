@@ -598,15 +598,13 @@ class PeopleControllerTest < ActionController::TestCase
       sop = Factory(:sop, projects: [proj], policy: Factory(:public_policy))
       df = Factory(:data_file, projects: [proj], policy: Factory(:public_policy))
 
-
-
       # subscribe to project
       put :update, params: { id: current_person, receive_notifications: true, person: { project_subscriptions_attributes: { '0' => { project_id: proj.id, frequency: 'weekly', _destroy: '0' } } } }
       assert_redirected_to current_person
 
       project_subscription = ProjectSubscription.where({project_id:proj.id, person_id:current_person.id}).first
       assert_difference 'Subscription.count', 2 do
-        ProjectSubscriptionJob.new(project_subscription.id).perform
+        ProjectSubscriptionJob.perform_now(project_subscription)
       end
       assert sop.subscribed?(current_person)
       assert df.subscribed?(current_person)
@@ -615,7 +613,7 @@ class PeopleControllerTest < ActionController::TestCase
       assert_enqueued_emails 1 do
         Factory(:activity_log, activity_loggable: sop, action: 'update')
         Factory(:activity_log, activity_loggable: df, action: 'update')
-        SendPeriodicEmailsJob.new('weekly').perform
+        PeriodicSubscriptionEmailJob.perform_now('weekly')
       end
 
       # unsubscribe to project
@@ -632,7 +630,7 @@ class PeopleControllerTest < ActionController::TestCase
       assert_no_enqueued_emails do
         Factory(:activity_log, activity_loggable: sop, action: 'update')
         Factory(:activity_log, activity_loggable: df, action: 'update')
-        SendPeriodicEmailsJob.new('weekly').perform
+        PeriodicSubscriptionEmailJob.perform_now('weekly')
       end
     end
   end
@@ -889,29 +887,7 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
-  test 'should email admin and project administrators when specifying project' do
-    proj_man1 = Factory :project_administrator
-    proj_man2 = Factory :project_administrator
-    proj1 = proj_man1.projects.first
-    proj2 = proj_man2.projects.first
-    project_without_manager = Factory :project
 
-    # check there are 3 uniq projects
-    assert_equal 3, [proj1, proj2, project_without_manager].uniq.size
-
-    user = Factory :activated_user
-    assert_nil user.person
-    login_as(user)
-
-    # 3 emails - 1 to admin and 2 to project administrators
-    assert_enqueued_emails(3) do
-      post :create, params: { person: { first_name: 'Fred', last_name: 'BBB', email: 'fred.bbb@email.com' }, projects: [proj1.id, proj2.id, project_without_manager.id] }
-    end
-
-    assert assigns(:person)
-    user.reload
-    assert_equal user.person, assigns(:person)
-  end
   test 'redirect after destroy' do
     person1 = Factory(:person)
     person2 = Factory(:person)

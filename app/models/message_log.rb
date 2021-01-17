@@ -3,6 +3,8 @@ class MessageLog < ApplicationRecord
   # the different types of messages
   PROJECT_MEMBERSHIP_REQUEST = 1
   CONTACT_REQUEST = 2
+  PROGRAMME_CREATION_REQUEST = 3
+  PROJECT_CREATION_REQUEST = 4
 
   # the period concidered recent, which can be used to prevent a repeat message until that period has passed
   RECENT_PERIOD = 12.hours.freeze
@@ -13,19 +15,38 @@ class MessageLog < ApplicationRecord
   validates :resource, :message_type, :sender, presence: true
   validate :project_required_for_project_membership_request
 
-  scope :project_membership_requests, -> { where('message_type = ?', PROJECT_MEMBERSHIP_REQUEST) }
-  scope :contact_requests, -> { where('message_type = ?', CONTACT_REQUEST) }
-
   scope :recent, -> { where('created_at >= ?', RECENT_PERIOD.ago) }
+  scope :pending, -> { where(response:nil) }
+
+  scope :project_membership_requests, -> { where(message_type: PROJECT_MEMBERSHIP_REQUEST) }
+  scope :contact_requests, -> { where(message_type: CONTACT_REQUEST) }
+  scope :project_creation_requests, -> { where(message_type: PROJECT_CREATION_REQUEST) }
+
+  # project creation requests that haven't been responded to
+  scope :pending_project_creation_requests, -> { project_creation_requests.pending }
+  scope :pending_project_join_requests, -> (projects) {where(resource:projects).project_membership_requests.pending}
 
   # message logs created since the recent period, for that person and project
-  def self.recent_project_membership_requests(person, project)
-    MessageLog.where("resource_type = 'Project' AND resource_id = ?", project.id).where(sender: person).project_membership_requests.recent
+  scope :recent_project_membership_requests, ->(person,project) { where(resource:project).where(sender: person).project_membership_requests.recent }
+
+  def respond(comments)
+    self.update_column(:response,comments)
+  end
+
+  def self.log_project_creation_request(sender, programme, project, institution)
+    details = {}
+    details[:institution] = institution.attributes
+    details[:project] = project.attributes
+    details[:programme] = programme&.attributes
+    # FIXME: needs a resource, but can't use programme as it will save it if it is new
+    MessageLog.create(resource: sender, sender: sender, details: details.to_json, message_type: PROJECT_CREATION_REQUEST)
   end
 
   # records a project membership request for a sender and project, along with any details provided
-  def self.log_project_membership_request(sender, project, details)
-    MessageLog.create(resource: project, sender: sender, details: details, message_type: PROJECT_MEMBERSHIP_REQUEST)
+  def self.log_project_membership_request(sender, project, institution, comments)
+    details = {comments: comments}
+    details[:institution]=institution.attributes if institution
+    MessageLog.create(resource: project, sender: sender, details: details.to_json, message_type: PROJECT_MEMBERSHIP_REQUEST)
 
   end
 
@@ -48,6 +69,14 @@ class MessageLog < ApplicationRecord
   def hours_until_next_allowed_str
     number_hours = hours_until_next_allowed
     "#{number_hours} #{'hour'.pluralize(number_hours)}"
+  end
+
+  def responded?
+    response.present?
+  end
+
+  def sent_by_self?
+    sender == User.current_user&.person
   end
 
   private

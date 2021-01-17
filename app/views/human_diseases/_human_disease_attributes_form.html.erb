@@ -1,0 +1,24 @@
+<%= panel("Human disease details") do %>
+  <%= form_for(@human_disease) do |f| %>
+
+    <%= f.error_messages -%>
+
+    <div class="form-group">
+      <%= f.label :display_name, class: 'required' -%>
+      <%= f.text_field :title, :class => "form-control" -%>
+    </div>
+    <%= f.hidden_field :ontology_id -%>
+
+    <div class="form-group">
+      <label>HDO Taxonomy URI</label>
+      <span class='help-block'>A valid HDO taxonomy URI is required. This can be of the form http://purl.bioontology.org/obo/DOID_&lt;Number&gt;.<br/>
+        You can just enter the DOID number, and it will automatically be turned into a valid URI.
+      </span>
+      <%= f.text_field :concept_uri, :class => "form-control" -%>
+    </div>
+
+    <%= f.submit @human_disease.id ? "Update" : "Create",
+                 data: { disable_with: @human_disease.id ? "Updating..." : "Creating..." },
+                 :class => 'btn btn-primary' -%>
+  <% end %>
+<% end %>

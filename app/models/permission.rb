@@ -2,6 +2,14 @@ class Permission < ApplicationRecord
   # Valid permission types, in order of precedence. Highest precedence is listed first
   PRECEDENCE = ['Person', 'FavouriteGroup', 'WorkGroup', 'Project', 'Programme', 'Institution'].freeze
 
+  # define the contributor_type
+  PERSON = "Person"
+  FAVOURITEGROUP = "FavouriteGroup"
+  WORKGROUP = "WorkGroup"
+  PROJECT = "Project"
+  PROGRAMME = "Programme"
+  INSTITUTION = "Institution"
+
   belongs_to :contributor, :polymorphic => true
   belongs_to :policy, :inverse_of => :permissions
 

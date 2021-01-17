@@ -12,7 +12,7 @@ class BatchPublishingTest < ActionController::TestCase
     login_as(@user)
   end
 
-  test 'should have the -Publish your assets- only one your own profile' do
+  test 'should have the -Publish your assets- only on your own profile' do
     get :show, params: { id: User.current_user.person }
     assert_response :success
     assert_select 'a[href=?]', batch_publishing_preview_person_path, text: /Publish your assets/

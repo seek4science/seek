@@ -32,7 +32,7 @@ module Seek
         format.html
         format.xml
         format.rdf { render template: 'rdf/show' }
-        format.json { render json: asset, scope: { requested_version: params[:version] }, include: [params[:include]] }
+        format.json { render json: asset, scope: { requested_version: params[:version] }, include: json_api_include_param }
       end
     end
 
@@ -54,8 +54,8 @@ module Seek
         if User.logged_in_and_member?
           format.html # new.html.erb
         else
-          flash[:error] = "You are not authorized to upload a new #{t(controller_name.singularize)}. Only members of known projects, institutions or work groups are allowed to create new content."
-          format.html { redirect_to eval("#{controller_name}_path") }
+          flash[:error] = "You are not authorized to upload a new #{t(controller_name.singularize)}. Only members of #{t('project').downcase.pluralize} are allowed to create content."
+          format.html { redirect_to polymorphic_path(controller_name) }
         end
       end
     end
@@ -70,7 +70,7 @@ module Seek
         if item.save
           flash[:notice] = "#{t(item.class.name.underscore)} was successfully updated."
           format.html { redirect_to(item) }
-          format.json { render json: item, include: [params[:include]] }
+          format.json { render json: item, include: json_api_include_param }
         else
           format.html { render action: 'manage' }
           format.json { render json: json_api_errors(item), status: :unprocessable_entity }
@@ -110,7 +110,7 @@ module Seek
           flash[:notice] = "#{t(item.class.name.underscore)} was successfully uploaded and saved."
           respond_to do |format|
             format.html { redirect_to item }
-            format.json { render json: item, include: [params[:include]] }
+            format.json { render json: item, include: json_api_include_param }
           end
         end
       else
@@ -145,13 +145,14 @@ module Seek
       item
     end
 
-    def edit_version_comment
+    def edit_version
       item = class_for_controller_name.find(params[:id])
-      @comment = item.versions.find_by(version: params[:version])
-      if @comment.update(revision_comments: params[:revision_comments])
-        flash[:notice] = "The comment of version #{params[:version]} was successfully updated."
+      version = item.versions.find_by(version: params[:version])
+
+      if version&.update_attributes(edit_version_params(version))
+        flash[:notice] = "Version #{params[:version]} was successfully updated."
       else
-        flash[:error] = "Unable to update the comment of version #{params[:version]}. Please try again."
+        flash[:error] = "Unable to update version #{params[:version]}. Please try again."
       end
       redirect_to item
     end
@@ -160,6 +161,16 @@ module Seek
       return false unless item.respond_to?(:parent_name) && !item.parent_name.blank?
       render partial: 'assets/back_to_fancy_parent', locals: { child: item, parent_name: item.parent_name }
       true
+    end
+
+    def edit_version_params(version)
+      p = [:revision_comments]
+      p << :visibility if version.can_change_visibility?
+      params.permit(*p)
+    end
+
+    def json_api_include_param
+      [params[:include]]
     end
   end
 end

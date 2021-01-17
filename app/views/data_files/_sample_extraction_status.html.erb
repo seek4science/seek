@@ -1,5 +1,5 @@
-<% @job_status ||= SampleDataExtractionJob.get_status(data_file) %>
-<% in_progress = SampleDataExtractionJob.in_progress?(data_file) %>
+<% @job_status ||= data_file.sample_extraction_task&.status %>
+<% in_progress = data_file.sample_extraction_task&.in_progress? %>
 
 <div id="sample-extraction-status">
   <% if data_file.can_manage? && (in_progress || !Seek::Samples::Extractor.new(data_file).fetch.nil?) %>

@@ -19,8 +19,7 @@ class OpenbisEndpoint < ApplicationRecord
   validates :space_perm_id, uniqueness: { scope: %i[dss_endpoint as_endpoint space_perm_id project_id],
                                           message: 'the endpoints and the space must be unique for this project' }
 
-  after_create :create_refresh_metadata_job, :create_sync_metadata_job
-  after_destroy :remove_refresh_metadata_job, :remove_sync_metadata_job, :clear_metadata_store
+  after_destroy :clear_metadata_store
 
   after_initialize :default_policy, autosave: true
   after_initialize :add_meta_config, autosave: true
@@ -80,6 +79,8 @@ class OpenbisEndpoint < ApplicationRecord
     # syncJob = OpenbisSyncJob.new(self)
     # syncJob.queue_job unless syncJob.exists?
 
+    touch(:last_cache_refresh)
+
     self
   end
 
@@ -101,7 +102,7 @@ class OpenbisEndpoint < ApplicationRecord
   # def reindex_entities
   #  # ugly should reindex only those that have changed
   #  datafiles = registered_datafiles
-  #  ReindexingJob.new.add_items_to_queue datafiles unless datafiles.empty?
+  #  ReindexingQueue.enqueue(datafiles) unless datafiles.empty?
   # end
 
   def registered_datafiles
@@ -128,16 +129,8 @@ class OpenbisEndpoint < ApplicationRecord
     OpenbisEndpointCacheRefreshJob.new(self).queue_job
   end
 
-  def remove_refresh_metadata_job
-    OpenbisEndpointCacheRefreshJob.new(self).delete_jobs
-  end
-
   def create_sync_metadata_job
     OpenbisSyncJob.new(self).queue_job
-  end
-
-  def remove_sync_metadata_job
-    OpenbisSyncJob.new(self).delete_jobs
   end
 
   def default_policy
@@ -217,6 +210,14 @@ class OpenbisEndpoint < ApplicationRecord
 
   def reset_fatal_assets
     external_assets.fatal.update_all(sync_state: ExternalAsset.sync_states[:refresh])
+  end
+
+  def due_sync?
+    last_sync.nil? || last_sync < refresh_period_mins.minutes.ago
+  end
+
+  def due_cache_refresh?
+    last_cache_refresh.nil? || last_cache_refresh < refresh_period_mins.minutes.ago
   end
 
   private

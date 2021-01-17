@@ -2,7 +2,6 @@ class AdminDefinedRoleProject < ApplicationRecord
   belongs_to :project
   belongs_to :person
 
-
   validates :project,:person, presence:true
   validates :role_mask,numericality: {greater_than:0,less_than_or_equal_to:16}
   validate :project_belongs_to_person_or_subprojects
