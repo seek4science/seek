@@ -72,7 +72,7 @@ class GitController < ApplicationController
           end
         end
       end
-    rescue Git::GitExecuteError => e
+    rescue ::Git::GitExecuteError => e
 
     end
   end

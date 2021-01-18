@@ -44,38 +44,6 @@ module Seek
               latest_git_version.commit.present?
             end
 
-            # def git_working_path
-            #   File.join(Seek::Config.git_temporary_filestore_path, uuid)
-            # end
-            #
-            # def with_worktree
-            #   w = worktree
-            #   if w.nil?
-            #     add_worktree
-            #   elsif !File.exist(w.dir)
-            #     remove_worktree
-            #     add_worktree
-            #   end
-            #
-            #   yield
-            # end
-            #
-            # def worktree_id
-            #   "#{git_working_path} #{commit}"
-            # end
-            #
-            # def worktree
-            #   git_base.worktrees[worktree_id]
-            # end
-            #
-            # def add_worktree
-            #   git_base.worktree(git_working_path, commit).add
-            # end
-            #
-            # def remove_worktree
-            #   git_base.worktree(git_working_path, commit).remove
-            # end
-
             def self.proxy_class
               const_get(proxy_class_name)
             end

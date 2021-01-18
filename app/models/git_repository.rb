@@ -14,7 +14,7 @@ class GitRepository < ApplicationRecord
 
   def git_base
     return unless persisted?
-    @git_base ||= Seek::Git::Base.base_class.new(Git.open(local_path))
+    @git_base ||= Seek::Git::Base.base_class.new(local_path)
   end
 
   def fetch
@@ -93,7 +93,7 @@ class GitRepository < ApplicationRecord
   private
 
   def initialize_repository
-    Git.init(local_path)
+    Seek::Git::Base.base_class.init(local_path)
   end
 
   def setup_remote

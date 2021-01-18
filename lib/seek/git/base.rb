@@ -6,7 +6,7 @@ module Seek
                :remotes, :fetch, :checkout, :commit, :with_temp_working, to: :@git_base
 
       def initialize(git_base)
-        @git_base = git_base
+        @git_base = ::Git.open(git_base)
       end
 
       def self.base_class
@@ -15,6 +15,10 @@ module Seek
 
       def self.ls_remote(remote, ref = nil)
         ::Git.ls_remote(ref ? "#{remote} #{ref}" : remote)
+      end
+
+      def self.init(path)
+        ::Git.init(path)
       end
     end
   end

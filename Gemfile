@@ -137,6 +137,7 @@ gem 'bundler', '>= 1.8.4'
 gem 'ro-crate-ruby', git: 'https://github.com/fbacall/ro-crate-ruby.git'
 
 gem 'git', git: 'https://github.com/ruby-git/ruby-git.git'
+gem 'rugged'
 
 gem 'redcarpet'
 
