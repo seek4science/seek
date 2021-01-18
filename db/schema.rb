@@ -1479,6 +1479,15 @@ ActiveRecord::Schema.define(version: 2020_12_21_153232) do
     t.datetime "updated_at"
   end
 
+  create_table "repository_standards", id: :integer,  force: :cascade do |t|
+    t.string "title"
+    t.string "url"
+    t.string "group_tag"
+    t.string "repo_type"
+    t.text "description"
+    t.index ["title", "group_tag"], name: "index_repository_standards_title_group_tag"
+  end
+
   create_table "resource_publish_logs", id: :integer,  force: :cascade do |t|
     t.string "resource_type"
     t.integer "resource_id"
