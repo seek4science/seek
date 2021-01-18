@@ -35,7 +35,7 @@ class Presentation < ApplicationRecord
 
   # Returns the columns to be shown on the table view for the resource
   def columns_default
-    super + ['title','version','license']
+    ['title'] + super + ['version','license']
   end
   def columns_allowed
     super + ['title','last_used_at','version','other_creators','license']

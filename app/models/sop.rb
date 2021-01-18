@@ -33,7 +33,7 @@ class Sop < ApplicationRecord
   
   # Returns the columns to be shown on the table view for the resource
   def columns_default
-    super + ['title','version']
+    ['title'] + super + ['version']
   end
   def columns_allowed
     super + ['title','last_used_at','version','other_creators','doi','license','deleted_contributor']

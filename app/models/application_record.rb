@@ -36,7 +36,7 @@ class ApplicationRecord < ActiveRecord::Base
   
   # Returns the columns to be shown on the table view for the resource
   def columns_default
-    ['description','created_at']
+    ['created_at']
   end
   def columns_allowed
     ['description','created_at','updated_at']

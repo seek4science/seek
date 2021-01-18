@@ -82,7 +82,7 @@ class Assay < ApplicationRecord
   
   # Returns the columns to be shown on the table view for the resource
   def columns_default
-    super + ['title','assay_type_uri']
+    ['title'] + super + ['assay_type_uri']
   end
   def columns_allowed
     super + ['title','assay_type_uri', 'tags']
