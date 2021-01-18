@@ -591,13 +591,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def managed_programme_configured?
-    unless Programme.managed_programme
-      error("No managed #{t('programme')} is configured","No managed #{t('programme')} is configured")
-      return false
-    end
-  end
-
   def determine_custom_metadata_keys
     keys = []
     root_key = controller_name.singularize.to_sym

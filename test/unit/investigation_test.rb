@@ -210,4 +210,18 @@ class InvestigationTest < ActiveSupport::TestCase
     refute item.has_jerm_contributor?
     assert item2.has_jerm_contributor?
   end
+
+  test 'custom metadata attribute values for search' do
+    item = Factory(:investigation)
+    assert_equal [],item.custom_metadata_attribute_values_for_search
+
+    metadata_type = Factory(:simple_investigation_custom_metadata_type)
+    item = Factory(:investigation,
+                   custom_metadata:CustomMetadata.new(
+                     custom_metadata_type: metadata_type,
+                     data: { name: 'James', age: '25' }
+                   )
+    )
+    assert_equal ['James','25'].sort, item.custom_metadata_attribute_values_for_search.sort
+  end
 end

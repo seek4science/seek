@@ -8,7 +8,11 @@ namespace :seek do
   task upgrade_version_tasks: %i[
     environment
     update_samples_json
+    migrate_old_jobs
+    delete_redundant_jobs
     set_version_visibility
+    remove_old_project_join_logs
+    fix_negative_programme_role_mask
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -74,8 +78,43 @@ namespace :seek do
     puts " ... finished updating sample JSON"
   end
 
+  task(migrate_old_jobs: :environment) do
+    puts "Migrating RdfGenerationJobs..."
+    count = RdfGenerationQueue.count
+    Delayed::Job.where(failed_at: nil).where('handler LIKE ?', '%RdfGenerationJob%').find_each do |job|
+      data = YAML.load(job.handler.sub("--- !ruby/object:RdfGenerationJob\n",''))
+      item = nil
+      begin
+        item = data["item_type_name"].constantize.find(data["item_id"])
+      rescue StandardError => e
+        puts "Exception migrating job (#{job.id}) #{e.class} #{e.message}"
+        puts e.backtrace.join("\n")
+      else
+        RdfGenerationQueue.enqueue(item, refresh_dependents: data["refresh_dependents"], queue_job: false) if item
+        job.destroy
+      end
+    end
+    queued = (RdfGenerationQueue.count - count)
+    RdfGenerationJob.new.queue_job if queued > 0
+    puts "Queued RDF generation for #{queued} items"
+  end
+
+  task(delete_redundant_jobs: :environment) do
+    puts "Deleting redundant jobs..."
+    deleted = 0
+
+    ['SendPeriodicEmailsJob', 'ContentBlobCleanerJob', 'NewsFeedRefreshJob', 'ProjectLeavingJob',
+     'OpenbisEndpointCacheRefreshJob', 'OpenbisSyncJob', 'ReindexingJob'].each do |klass|
+      jobs = Delayed::Job.where(failed_at: nil).where('handler LIKE ?', "%#{klass}%")
+      deleted += jobs.count
+      jobs.destroy_all
+    end
+
+    puts "Deleted #{deleted} jobs"
+  end
+
   task(set_version_visibility: :environment) do
-    puts "Setting version visibility..."
+    puts "... Setting version visibility..."
     disable_authorization_checks do
       [DataFile::Version, Document::Version, Model::Version, Node::Version, Presentation::Version, Sop::Version, Workflow::Version].each do |klass|
         scope = klass.where(visibility: nil)
@@ -100,6 +139,30 @@ namespace :seek do
       end
     end
 
-    puts "Done"
+    puts "... Done"
+  end
+
+  task(remove_old_project_join_logs: :environment) do
+    puts "... Removing redundant project join request logs ..."
+    logs = MessageLog.project_membership_requests
+    logs.each do |log|
+      begin
+        JSON.parse(log.details)
+      rescue JSON::ParserError
+        log.destroy
+      end
+    end
+    puts "... Done"
+  end
+
+  task(fix_negative_programme_role_mask: :environment) do
+    problems = Person.all.select{|person| person.roles_mask < 0}
+    problems.each do |person|
+      mask = person.roles_mask
+      while mask < 0
+        mask = mask + 32
+      end
+      person.update_column(:roles_mask,mask)
+    end
   end
 end

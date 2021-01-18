@@ -69,17 +69,27 @@ class ProgrammesControllerTest < ActionController::TestCase
     programme = programme_administrator.programmes.first
 
     refute_empty programme.projects
+    assert programme_administrator.is_programme_administrator?(programme)
+
+    refute programme.can_delete?
 
     assert_no_difference('Programme.count') do
-      delete :destroy, params: { id: programme.id }
+      assert_no_difference('AdminDefinedRoleProgramme.count') do
+        delete :destroy, params: { id: programme.id }
+      end
     end
     refute_nil flash[:error]
 
     programme.projects = []
     programme.save!
+    assert programme_administrator.is_programme_administrator?(programme)
+
+    assert programme.can_delete?
 
     assert_difference('Programme.count', -1) do
-      delete :destroy, params: { id: programme.id }
+      assert_difference('AdminDefinedRoleProgramme.count',-1) do
+        delete :destroy, params: { id: programme.id }
+      end
     end
     assert_redirected_to programmes_path
   end
@@ -361,9 +371,11 @@ class ProgrammesControllerTest < ActionController::TestCase
   test 'user can create programme, and becomes programme administrator' do
     p = Factory(:person)
     login_as(p)
-    assert_difference('Programme.count') do
-      assert_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count", 1) do # activation email
-        post :create, params: { programme: { title: 'A programme', funding_codes: 'aaa,bbb', web_page: '', description: '', funding_details: '' } }
+    with_config_value(:email_enabled, true) do
+      assert_difference('Programme.count') do
+        assert_enqueued_emails(1) do # activation email
+          post :create, params: { programme: { title: 'A programme', funding_codes: 'aaa,bbb', web_page: '', description: '', funding_details: '' } }
+        end
       end
     end
     prog = assigns(:programme)
@@ -379,9 +391,11 @@ class ProgrammesControllerTest < ActionController::TestCase
   test "admin doesn't become programme administrator by default" do
     p = Factory(:admin)
     login_as(p)
-    assert_difference('Programme.count') do
-      assert_no_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count") do # no email for admin creation
-        post :create, params: { programme: { title: 'A programme' } }
+    with_config_value(:email_enabled, true) do
+      assert_difference('Programme.count') do
+        assert_no_enqueued_emails do # no email for admin creation
+          post :create, params: { programme: { title: 'A programme' } }
+        end
       end
     end
     prog = assigns(:programme)
@@ -438,8 +452,10 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute programme.is_activated?
     login_as(Factory(:admin))
 
-    assert_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count", 1) do
-      put :accept_activation, params: { id: programme }
+    with_config_value(:email_enabled, true) do
+      assert_enqueued_emails(1) do
+        put :accept_activation, params: { id: programme }
+      end
     end
 
     assert_redirected_to programme
@@ -457,8 +473,10 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute programme.is_activated?
     login_as(programme_administrator)
 
-    assert_no_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count") do
-      put :accept_activation, params: { id: programme }
+    with_config_value(:email_enabled, true) do
+      assert_no_enqueued_emails do
+        put :accept_activation, params: { id: programme }
+      end
     end
 
     assert_redirected_to :root
@@ -475,8 +493,10 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert programme.is_activated?
     login_as(Factory(:admin))
 
-    assert_no_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count") do
-      put :accept_activation, params: { id: programme }
+    with_config_value(:email_enabled, true) do
+      assert_no_enqueued_emails do
+        put :accept_activation, params: { id: programme }
+      end
     end
 
     assert_redirected_to :root
@@ -534,8 +554,10 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute programme.is_activated?
     login_as(Factory(:admin))
 
-    assert_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count", 1) do
-      put :reject_activation, params: { id: programme, programme: { activation_rejection_reason: 'rejection reason' } }
+    with_config_value(:email_enabled, true) do
+      assert_enqueued_emails(1) do
+        put :reject_activation, params: { id: programme, programme: { activation_rejection_reason: 'rejection reason' } }
+      end
     end
 
     assert_redirected_to programme
@@ -554,8 +576,10 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute programme.is_activated?
     login_as(programme_administrator)
 
-    assert_no_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count") do
-      put :reject_activation, params: { id: programme, programme: { activation_rejection_reason: 'rejection reason' } }
+    with_config_value(:email_enabled, true) do
+      assert_no_enqueued_emails do
+        put :reject_activation, params: { id: programme, programme: { activation_rejection_reason: 'rejection reason' } }
+      end
     end
 
     assert_redirected_to :root
@@ -573,8 +597,10 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert programme.is_activated?
     login_as(Factory(:admin))
 
-    assert_no_difference("Delayed::Job.where(\"handler LIKE '%Delayed::PerformableMailer%'\").count") do
-      put :reject_activation, params: { id: programme, programme: { activation_rejection_reason: 'rejection reason' } }
+    with_config_value(:email_enabled, true) do
+      assert_no_enqueued_emails do
+        put :reject_activation, params: { id: programme, programme: { activation_rejection_reason: 'rejection reason' } }
+      end
     end
 
     assert_redirected_to :root
@@ -719,8 +745,6 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_equal 0, assigns(:programme).funding_codes.length
   end
 
-
-
   def edit_max_object(programme)
     for i in 1..5 do
       Factory(:person).add_to_project_and_institution(programme.projects.first, Factory(:institution))
@@ -732,4 +756,58 @@ class ProgrammesControllerTest < ActionController::TestCase
     person.is_programme_administrator = true, programme
     disable_authorization_checks { person.save! }
   end
+
+  test 'should create with discussion link' do
+    person = Factory(:admin)
+    login_as(person)
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('Programme.count') do
+        post :create, params: { programme: { title: 'test',
+                                             administrator_ids: [person.id],
+                                         discussion_links_attributes: [{url: "http://www.slack.com/"}]}}
+      end
+    end
+    programme = assigns(:programme)
+    assert_equal 'http://www.slack.com/', programme.discussion_links.first.url
+    assert_equal AssetLink::DISCUSSION, programme.discussion_links.first.link_type
+  end
+
+  test 'should show discussion link' do
+    disc_link = Factory(:discussion_link)
+    programme = Factory(:programme)
+    programme.discussion_links = [disc_link]
+    get :show, params: { id: programme }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+  end
+
+  test 'should update node with discussion link' do
+    person = Factory(:admin)
+    programme = Factory(:programme)
+    programme.administrator_ids = [person.id]
+    login_as(person)
+    assert_nil programme.discussion_links.first
+    assert_difference('AssetLink.discussion.count') do
+      # assert_difference('ActivityLog.count') do
+        put :update, params: { id: programme.id, programme: { discussion_links_attributes: [{url: "http://www.slack.com/"}] } }
+      # end
+    end
+    assert_redirected_to programme_path(assigns(:programme))
+    assert_equal 'http://www.slack.com/', programme.discussion_links.first.url
+  end
+
+  test 'should destroy related assetlink when the discussion link is removed ' do
+    person = Factory(:admin)
+    login_as(person)
+    asset_link = Factory(:discussion_link)
+    programme = Factory(:programme)
+    programme.administrator_ids = [person.id]
+    programme.discussion_links = [asset_link]
+    assert_difference('AssetLink.discussion.count', -1) do
+      put :update, params: { id: programme.id, programme: { discussion_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
+    end
+    assert_redirected_to programme_path(programme = assigns(:programme))
+    assert_empty programme.discussion_links
+  end
+
 end

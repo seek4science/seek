@@ -54,6 +54,7 @@ human_diseases_enabled:
 jerm_enabled:
 email_enabled:
 jws_enabled:
+copasi_enabled:
 external_search_enabled:
 piwik_analytics_enabled:
 seek_video_link:
@@ -210,6 +211,5 @@ omniauth_github_enabled:
 omniauth_github_client_id:
 omniauth_github_secret:
   encrypt: true
-custom_metadata_enabled: false
 search_results_limit:
   convert: :to_i

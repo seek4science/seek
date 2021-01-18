@@ -1,48 +1,6 @@
 require 'test_helper'
 
 class ProjectSubscriptionJobTest < ActiveSupport::TestCase
-  def setup
-    Delayed::Job.destroy_all
-  end
-
-  def teardown
-    Delayed::Job.destroy_all
-  end
-
-  test 'exists' do
-    project_subscription_id = 1
-    assert !ProjectSubscriptionJob.new(project_subscription_id).exists?
-    assert_difference('Delayed::Job.count', 1) do
-      Delayed::Job.enqueue ProjectSubscriptionJob.new(project_subscription_id)
-    end
-
-    assert ProjectSubscriptionJob.new(project_subscription_id).exists?
-
-    job = Delayed::Job.first
-    assert_nil job.locked_at
-    job.locked_at = Time.now
-    job.save!
-    assert !ProjectSubscriptionJob.new(project_subscription_id).exists?, 'Should ignore locked jobs'
-
-    job.locked_at = nil
-    job.failed_at = Time.now
-    job.save!
-    assert !ProjectSubscriptionJob.new(project_subscription_id).exists?, 'Should ignore failed jobs'
-  end
-
-  test 'create job' do
-    assert_difference('Delayed::Job.count', 1) do
-      ProjectSubscriptionJob.new(1).queue_job
-    end
-
-    job = Delayed::Job.first
-    assert_equal 2, job.priority
-
-    assert_no_difference('Delayed::Job.count') do
-      ProjectSubscriptionJob.new(1).queue_job
-    end
-  end
-
   test 'all_in_project' do
     person = Factory(:person)
     project = person.projects.first
@@ -85,7 +43,7 @@ class ProjectSubscriptionJobTest < ActiveSupport::TestCase
     assert !s2.subscribed?(a_person)
 
     # perform
-    ProjectSubscriptionJob.new(ps.id).perform
+    ProjectSubscriptionJob.perform_now(ps)
 
     s1.reload
     s2.reload

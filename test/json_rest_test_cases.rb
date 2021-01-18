@@ -48,6 +48,7 @@ module JsonRestTestCases
   end
 
   def edit_max_object(object); end
+  def edit_min_object(object); end
 
   def test_json_content
     ['min', 'max'].each do |m|
@@ -58,6 +59,7 @@ module JsonRestTestCases
       json_to_compare = JSON.parse(File.read(json_file))
 
       edit_max_object(object) if m == 'max'
+      edit_min_object(object) if m == 'min'
 
       get :show, params: rest_show_url_options(object).merge(id: object, format: 'json')
 

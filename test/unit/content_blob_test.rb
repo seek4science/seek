@@ -977,4 +977,24 @@ class ContentBlobTest < ActiveSupport::TestCase
     File.delete(path)
   end
 
+  test 'enqueues remote content fetching job' do
+    content_blob = Factory.build(:url_content_blob, make_local_copy: true)
+    refute content_blob.remote_content_fetch_task.pending?
+    assert_difference('Task.count', 1) do
+      assert_enqueued_with(job: RemoteContentFetchingJob, args: [content_blob]) do
+        content_blob.save!
+        assert content_blob.remote_content_fetch_task.pending?
+      end
+    end
+  end
+
+  test 'does not enqueue remote content fetching job for local content blob' do
+    content_blob = Factory.build(:content_blob)
+    assert_no_difference('Task.count') do
+      assert_no_enqueued_jobs(only: RemoteContentFetchingJob) do
+        content_blob.save!
+        refute content_blob.remote_content_fetch_task.pending?
+      end
+    end
+  end
 end

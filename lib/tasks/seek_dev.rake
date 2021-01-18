@@ -261,6 +261,41 @@ namespace :seek_dev do
     end
   end
 
+  task build_basic_test_custom_metadata: :environment do
+    unless CustomMetadataType.where(supported_type: 'Investigation').any?
+      cmt = CustomMetadataType.new(title: 'test Investigation metadata', supported_type:'Investigation')
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'age', sample_attribute_type: SampleAttributeType.where(title:'Integer').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'name', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'date', sample_attribute_type: SampleAttributeType.where(title:'Date time').first)
+      cmt.save!
+      puts "Created test CMT for Investigation"
+    else
+      puts "CMT for Investigation already exists"
+    end
+
+    unless CustomMetadataType.where(supported_type: 'Study').any?
+      cmt = CustomMetadataType.new(title: 'test Study metadata', supported_type:'Study')
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'age', sample_attribute_type: SampleAttributeType.where(title:'Integer').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'name', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'date', sample_attribute_type: SampleAttributeType.where(title:'Date time').first)
+      cmt.save!
+      puts "Created test CMT for Study"
+    else
+      puts "CMT for Study already exists"
+    end
+
+    unless CustomMetadataType.where(supported_type: 'Assay').any?
+      cmt = CustomMetadataType.new(title: 'test Assay metadata', supported_type:'Assay')
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'age', sample_attribute_type: SampleAttributeType.where(title:'Integer').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'name', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'date', sample_attribute_type: SampleAttributeType.where(title:'Date time').first)
+      cmt.save!
+      puts "Created test CMT for Assay"
+    else
+      puts "CMT for Assay already exists"
+    end
+  end
+
   task build_test_custom_metadata: :environment do
     cmt_already_exist = CustomMetadataType.where(supported_type: 'Investigation').any?
     if cmt_already_exist
@@ -393,40 +428,14 @@ namespace :seek_dev do
     output.close
   end
 
-  task build_test_custom_metadata: :environment do
-    unless CustomMetadataType.where(supported_type: 'Investigation').any?
-      cmt = CustomMetadataType.new(title: 'test Investigation metadata', supported_type:'Investigation')
-      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'age', sample_attribute_type: SampleAttributeType.where(title:'Integer').first)
-      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'name', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
-      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'date', sample_attribute_type: SampleAttributeType.where(title:'Date time').first)
-      cmt.save!
-      puts "Created test CMT for Investigation"
-    else
-      puts "CMT for Investigation already exists"
+  task report_missing_related_items_routes: :environment do
+    Seek::RelatedItems::RELATABLE_TYPES.each do |type|
+      klass = type.constantize
+      methods = klass.related_type_methods
+      methods.each_key do |assoc|
+        x = Rails.application.routes.url_helpers.send("#{type.underscore}_#{assoc.pluralize.underscore}_path", 1) rescue nil
+        puts "Missing! #{type.underscore}_#{assoc.pluralize.underscore}_path" if x.nil?
+      end
     end
-
-    unless CustomMetadataType.where(supported_type: 'Study').any?
-      cmt = CustomMetadataType.new(title: 'test Study metadata', supported_type:'Study')
-      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'age', sample_attribute_type: SampleAttributeType.where(title:'Integer').first)
-      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'name', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
-      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'date', sample_attribute_type: SampleAttributeType.where(title:'Date time').first)
-      cmt.save!
-      puts "Created test CMT for Study"
-    else
-      puts "CMT for Study already exists"
-    end
-
-    unless CustomMetadataType.where(supported_type: 'Assay').any?
-      cmt = CustomMetadataType.new(title: 'test Assay metadata', supported_type:'Assay')
-      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'age', sample_attribute_type: SampleAttributeType.where(title:'Integer').first)
-      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'name', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
-      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'date', sample_attribute_type: SampleAttributeType.where(title:'Date time').first)
-      cmt.save!
-      puts "Created test CMT for Assay"
-    else
-      puts "CMT for Assay already exists"
-    end
-
   end
-
 end

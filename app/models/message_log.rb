@@ -75,6 +75,10 @@ class MessageLog < ApplicationRecord
     response.present?
   end
 
+  def sent_by_self?
+    sender == User.current_user&.person
+  end
+
   private
 
   def project_required_for_project_membership_request

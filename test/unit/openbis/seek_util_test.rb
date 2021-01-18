@@ -323,17 +323,15 @@ class SeekUtilTest < ActiveSupport::TestCase
 
     assert asset.save
 
-    Delayed::Job.destroy_all
     ReindexingQueue.destroy_all
-    assert_difference('Delayed::Job.count', 1) do
+    assert_enqueued_jobs(1, only: ReindexingJob) do
       @util.sync_asset_content(asset)
     end
     assert ReindexingQueue.exists?(item: data_file)
 
     asset.reload
-    Delayed::Job.destroy_all
     ReindexingQueue.destroy_all
-    assert_no_difference('Delayed::Job.count') do
+    assert_no_enqueued_jobs(only: ReindexingJob) do
       # same content no change
       @util.sync_asset_content(asset)
     end
@@ -380,17 +378,15 @@ class SeekUtilTest < ActiveSupport::TestCase
 
     assert asset.save
 
-    Delayed::Job.destroy_all
     ReindexingQueue.destroy_all
-    assert_difference('Delayed::Job.count', 1) do
+    assert_enqueued_jobs(1, only: ReindexingJob) do
       @util.sync_external_asset(asset)
     end
     assert ReindexingQueue.exists?(item: data_file)
 
     asset.reload
-    Delayed::Job.destroy_all
     ReindexingQueue.destroy_all
-    assert_no_difference('Delayed::Job.count') do
+    assert_no_enqueued_jobs(only: ReindexingJob) do
       # same content no change
       @util.sync_external_asset(asset)
     end

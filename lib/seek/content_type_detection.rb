@@ -73,6 +73,10 @@ module Seek
       check_content blob, '<sbml'
     end
 
+    def is_copasi?(blob = self)
+      check_content blob, '<copasi'
+    end
+
     def is_xgmml?(blob = self)
       check_content(blob, '<graph') && check_content(blob, '<node')
     end
@@ -145,6 +149,7 @@ module Seek
       begin
         File.open(filepath, 'r').each_line do |line|
           char_count += line.length
+          # Rails.logger.info("line=>"+line)
           return true if line.downcase.include?(str)
           break if char_count >= max_length
         end

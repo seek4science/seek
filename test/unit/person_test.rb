@@ -1145,6 +1145,29 @@ class PersonTest < ActiveSupport::TestCase
     assert_includes person.projects, project
   end
 
+  test 'can unflag as left project' do
+    person = Factory(:person)
+    project = person.projects.first
+
+    assert_not_includes person.former_projects, project
+    assert_includes person.current_projects, project
+    assert_includes person.projects, project
+
+    gm = person.group_memberships.first
+    gm.time_left_at = 1.day.ago
+    assert gm.save
+    gm.update_column(:has_left, true)
+    gm.reload
+    assert gm.has_left?
+    assert gm[:has_left]
+
+    gm.time_left_at = nil
+    assert gm.save
+    gm.reload
+    refute gm.has_left?
+    refute gm[:has_left]
+  end
+
   test 'trim spaces from email, first_name, last_name' do
     person = Factory(:brand_new_person)
     person.email = ' fish@email.com '

@@ -2,8 +2,8 @@ module Seek
   module RelatedItems
     extend ActiveSupport::Concern
 
-    RELATABLE_TYPES = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'DataFile', 'Document',
-                       'Model', 'Sop', 'Publication', 'Presentation', 'Event', 'Organism', 'Strain', 'Sample',
+    RELATABLE_TYPES = ['Person', 'Programme', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'DataFile',
+                       'Document', 'Model', 'Sop', 'Publication', 'Presentation', 'Event', 'Organism', 'Strain', 'Sample',
                        'Workflow', 'Node', 'Collection', 'HumanDisease'].freeze
 
     class_methods do
