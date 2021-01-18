@@ -655,6 +655,7 @@ SEEK::Application.routes.draw do
   resources :sample_controlled_vocabs do
     collection do
       get :typeahead
+      get :fetch_ols_terms
     end
   end
 

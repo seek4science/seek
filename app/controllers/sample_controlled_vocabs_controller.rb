@@ -74,6 +74,16 @@ class SampleControlledVocabsController < ApplicationController
     end
   end
 
+  def fetch_ols_terms
+    source_ontology = params[:source_ontology_id]
+    root_uri = params[:root_uri]
+    client = Ebi::OlsClient.new
+    terms = client.all_descendants(source_ontology, root_uri)
+    respond_to do |format|
+      format.json { render json:terms.to_json}
+    end
+  end
+
   def typeahead
     scv = SampleControlledVocab.find(params[:scv_id])
     results = scv.sample_controlled_vocab_terms.where("LOWER(label) like :query OR LOWER(iri) LIKE :query",

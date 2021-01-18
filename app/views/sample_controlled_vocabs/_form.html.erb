@@ -13,7 +13,7 @@
 
     <div class="form-group">
       <label>Description</label>
-      <%= f.text_area :description, :class=>"form-control rich-text-edit", :rows => 5 -%>
+      <%= f.text_area :description, :class=>"form-control rich-text-edit", :rows => 2 -%>
     </div>
 
     <h3>Ontology</h3>
@@ -29,10 +29,13 @@
         </div>
         <label>Root term</label>
         <%= f.text_field :ols_root_term_uri, :class => 'form-control', :placeholder => 'e.g. http://www.ebi.ac.uk/efo/EFO_0000635' %>
+        <%= submit_tag 'Fetch', id: 'fetch-ontology-terms-submit', :class => 'btn btn-primary' %>
       </div>
     </div>
 
     <h3>Terms</h3>
+
+    <span id='fetch-terms-spinner'></span>
 
     <table id="new-terms" class="table">
       <thead>
@@ -111,21 +114,42 @@
     $j(document).ready(function () {
         initialiseCVForm();
     });
+
+    function handleOntologyTermsJSONResponse(json) {
+        $j.each(json, function(key,term){
+            //make a new term
+            addNewTermRow();
+
+            //get the last row and its inputs
+            var row = $j('table#new-terms tr.sample-cv-term').last();
+            var inputs = $j(row).find('td input');
+
+            //inputs 0,1,2 are label, iri, and parent_iri
+            $j(inputs[0]).val(term.label);
+            $j(inputs[1]).val(term.iri);
+            $j(inputs[2]).val(term.parent_iri);
+        });
+    }
+
+    function addNewTermRow() {
+        var newTerm = $j('#new-term-row tbody').clone().html();
+
+        var index = 0;
+        $j('#new-terms tr.sample-cv-term').each(function () {
+            var newIndex = parseInt($j(this).data('index'));
+            if (newIndex > index) {
+                index = newIndex;
+            }
+        });
+        index++;
+
+        newTerm = newTerm.replace(/--index--/g, index);
+        $j('#add-term-button-row').before($j(newTerm));
+    }
+
     function initialiseCVForm() {
         $j('#add-term').click(function () {
-            var newTerm = $j('#new-term-row tbody').clone().html();
-
-            var index = 0;
-            $j('#new-terms tr.sample-cv-term').each(function () {
-                var newIndex = parseInt($j(this).data('index'));
-                if (newIndex > index) {
-                    index = newIndex;
-                }
-            });
-            index++;
-
-            newTerm = newTerm.replace(/--index--/g, index);
-            $j('#add-term-button-row').before($j(newTerm));
+            addNewTermRow();
             return false;
         });
 
@@ -162,6 +186,33 @@
               link.text(selected.text);
               link.attr('href','https://www.ebi.ac.uk/ols/ontologies/'+selected.value);
             }
+        });
+
+        $j('#fetch-ontology-terms-submit').click(function (e) {
+            $j('table#new-terms').hide();
+            $j('#fetch-terms-spinner').spinner('add');
+
+            var ontology_id=$j('select#sample_controlled_vocab_source_ontology').val();
+            var root_uri=$j('#sample_controlled_vocab_ols_root_term_uri').val();
+
+            $j.ajax({ url: '<%= fetch_ols_terms_sample_controlled_vocabs_path %>',
+                dataType: "json",
+                data:{
+                  source_ontology_id: ontology_id,
+                  root_uri: root_uri
+                },
+                success: function (resp) {
+                    handleOntologyTermsJSONResponse((resp))
+                },
+                error: function () {
+                    $j('#project-search-results').html('<div class="alert alert-danger">An error occurred whilst fetching your query.</div>');
+                },
+                complete: function () {
+                    $j('#fetch-terms-spinner').spinner('remove');
+                    $j('table#new-terms').show();
+                }
+            })
+            return false;
         });
     }
 
