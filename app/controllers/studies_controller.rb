@@ -212,6 +212,7 @@ class StudiesController < ApplicationController
                   'user_uuid'
                 end
 
+    @assay_assets = []
     data_file_names = params[:studies][:data_files][index].remove(' ').split(',')
     data_file_names.length.times do |data_file_index|
 
@@ -247,11 +248,11 @@ class StudiesController < ApplicationController
         assay: Assay.new(assay_params),
         asset: DataFile.new(data_file_params)
       }
-      @assay_asset = AssayAsset.new(assay_asset_params)
 
-      if @assay_asset.valid? && @assay_asset.save!
-        return true if @assay_asset.save
-      end
+      @assay_assets << AssayAsset.new(assay_asset_params)
+    end
+    if @assay_assets.each(&:valid?) && @assay_assets.each(&:save!)
+      @assay_assets.each(&:save)
     end
   end
 
