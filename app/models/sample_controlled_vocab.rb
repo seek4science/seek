@@ -18,8 +18,6 @@ class SampleControlledVocab < ApplicationRecord
   accepts_nested_attributes_for :sample_controlled_vocab_terms, allow_destroy: true
   accepts_nested_attributes_for :repository_standard, :reject_if => :check_repository_standard
 
-  before_save :fetch_ontology_terms
-
   grouped_pagination
 
   def labels
@@ -56,19 +54,5 @@ class SampleControlledVocab < ApplicationRecord
     end
     return false
   end
-
-  def fetch_ontology_terms
-    if source_ontology.present? && ols_root_term_uri.present? &&
-        (source_ontology_changed? || ols_root_term_uri_changed?) && Ebi::OlsClient.ontology_keys.include?(source_ontology)
-      self.sample_controlled_vocab_terms.each(&:mark_for_destruction)
-      client = Ebi::OlsClient.new
-      terms = client.all_descendants(source_ontology, ols_root_term_uri)
-      hash = {}
-      terms.each_with_index do |term, i|
-        hash[(i + 1).to_s] = term
-      end
-
-      self.sample_controlled_vocab_terms_attributes = hash
-    end
-  end
+  
 end
