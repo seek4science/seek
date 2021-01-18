@@ -3,10 +3,10 @@
 <%= git_breadcrumbs(@parent_resource, params[:path]) %>
 
 <ul class="pending-files">
-  <% @tree.trees.each do |name, tree| %>
-    <li><%= icon_link_to(name, 'organise', polymorphic_path([@parent_resource, :git_tree], path: [params[:path], name].compact)) %></li>
+  <% @tree.each_tree do |entry| %>
+    <li><%= icon_link_to(entry[:name], 'organise', polymorphic_path([@parent_resource, :git_tree], path: [params[:path], entry[:name]].compact)) %></li>
   <% end %>
-  <% @tree.blobs.each do |name, blob| %>
-    <li><%= icon_link_to(name, 'markup', polymorphic_path([@parent_resource, :git_blob], path: [params[:path], name].compact)) %></li>
+  <% @tree.each_blob do |entry| %>
+    <li><%= icon_link_to(entry[:name], 'markup', polymorphic_path([@parent_resource, :git_blob], path: [params[:path], entry[:name]].compact)) %></li>
   <% end %>
 </ul>

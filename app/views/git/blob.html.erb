@@ -5,7 +5,7 @@
   <div class="col-sm-6">
     <strong>Path: </strong> <%= params[:path] -%><br/>
     <strong>Size: </strong> <%= number_to_human_size @blob.size -%><br/>
-    <strong>SHA: </strong> <code><%= @blob.sha %></code><br/>
+    <strong>SHA: </strong> <code><%= @blob.oid %></code><br/>
   </div>
   <div class="col-sm-6 text-right">
     <%= button_link_to('Download', 'download', polymorphic_path([@parent_resource, :git_download], path: params[:path])) %>
@@ -15,5 +15,5 @@
 <hr/>
 
 <pre>
-  <%= raw @blob.contents %>
+  <%= raw @blob.content %>
 </pre>

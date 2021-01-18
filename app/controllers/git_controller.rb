@@ -11,7 +11,7 @@ class GitController < ApplicationController
   end
 
   def download
-    stream_blob(@blob, path_param.split('/').last)
+    send_data(@blob.content, filename: path_param.split('/').last, disposition: 'attachment')
   end
 
   def blob
@@ -22,16 +22,20 @@ class GitController < ApplicationController
 
   def raw
     respond_to do |format|
-      format.all { render plain: @blob.contents }
+      format.all { render plain: @blob.content }
     end
   end
 
   private
 
   def get_tree
-    @tree = @parent_resource.object(path_param)
+    if path_param.blank? || path_param == '/'
+      @tree = @parent_resource.tree
+    else
+      @tree = @parent_resource.object(path_param)
+    end
 
-    return if @tree&.tree?
+    return if @tree&.is_a?(Rugged::Tree)
 
     raise ActionController::RoutingError.new('Not Found')
   end
@@ -39,7 +43,7 @@ class GitController < ApplicationController
   def get_blob
     @blob = @parent_resource.object(path_param)
 
-    return if @blob&.blob?
+    return if @blob&.is_a?(Rugged::Blob)
 
     raise ActionController::RoutingError.new('Not Found')
   end
@@ -60,20 +64,17 @@ class GitController < ApplicationController
     end
   end
 
-  def stream_blob(blob, filename)
-    response.headers['Content-Disposition'] = "attachment; filename=#{filename}"
-    response.headers['Content-Length'] = blob.size.to_s
-
-    begin
-      self.response_body = Enumerator.new do |yielder|
-        blob.contents do |io|
-          while (bytes = io.read(1024))
-            yielder << bytes
-          end
-        end
-      end
-    rescue ::Git::GitExecuteError => e
-
-    end
-  end
+  # # Rugged does not allow streaming blobs
+  # def stream_blob(blob, filename)
+  #   response.headers['Content-Disposition'] = "attachment; filename=#{filename}"
+  #   response.headers['Content-Length'] = blob.size.to_s
+  #
+  #   self.response_body = Enumerator.new do |yielder|
+  #     blob.content do |io|
+  #       while (bytes = io.read(1024))
+  #         yielder << bytes
+  #       end
+  #     end
+  #   end
+  # end
 end
