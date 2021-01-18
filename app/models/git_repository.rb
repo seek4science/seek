@@ -18,7 +18,7 @@ class GitRepository < ApplicationRecord
   end
 
   def fetch
-    git_base.fetch
+    git_base.remote['origin'].fetch
   end
 
   # TODO: When active-job branch is merged, change this to use the TaskJob stuff instead:
@@ -82,7 +82,7 @@ class GitRepository < ApplicationRecord
     if remote?
       find_remote_ref(ref)
     else
-      git_base.revparse(ref)
+      git_base.ref(ref)&.target
     end
   end
 

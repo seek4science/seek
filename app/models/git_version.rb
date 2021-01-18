@@ -23,29 +23,40 @@ class GitVersion < ApplicationRecord
 
   def file_contents(path, &block)
     blob = object(path)
-    return unless blob&.blob?
+    return unless blob&.is_a?(Rugged::Blob)
 
     if block_given?
-      blob.contents(&block)
+      block.call(StringIO.new(blob.content)) # Rugged does not support streaming blobs :(
     else
-      blob.contents
+      blob.content
     end
   end
 
   def object(path)
-    git_base.object("#{commit}:#{path}") if commit
+    return nil unless commit
+    git_base.lookup(tree.path(path)[:oid])
+  rescue Rugged::TreeError
+    nil
   end
 
   def tree
-    git_base.gtree(commit) if commit
+    git_base.lookup(commit).tree if commit
   end
 
   def trees
-    tree&.trees || []
+    t = []
+    return t unless commit
+
+    tree.each_tree { |tree| t << tree }
+    t
   end
 
   def blobs
-    tree&.blobs || []
+    b = []
+    return b unless commit
+
+    tree.each_blob { |blob| b << blob }
+    b
   end
 
   def latest_git_version?
@@ -57,22 +68,14 @@ class GitVersion < ApplicationRecord
   end
 
   def file_exists?(path)
-    subtree = tree
-    path.split('/').each do |segment|
-      return false unless subtree && subtree.children.key?(segment)
-      subtree = subtree.children[segment]
-    end
-
-    true
+    !object(path).nil?
   end
 
   def add_file(path, io)
     message = file_exists?(path) ? 'Updated' : 'Added'
-    perform_commit("#{message} #{path}") do |dir|
-      fullpath = Pathname.new(dir.path).join(path)
-      FileUtils.mkdir_p(fullpath.dirname)
-      File.write(fullpath, io.read)
-      git_base.add(path)
+    perform_commit("#{message} #{path}") do |index|
+      oid = git_base.write(io.read, :blob) # Write the file into the object DB
+      index.add(path: path, oid: oid, mode: 0100644) # Add it to the index
     end
   end
 
@@ -99,14 +102,21 @@ class GitVersion < ApplicationRecord
   def perform_commit(message, &block)
     raise ImmutableVersionException unless mutable?
 
-    with_git_user do
-      git_base.with_temp_working do |dir|
-        git_base.checkout(commit) if commit
-        yield dir
-        git_base.commit(message)
-        self.commit = git_base.revparse('HEAD')
-      end
-    end
+    index = git_base.index
+
+    index.read_tree(git_base.head.target.tree) unless git_base.head_unborn?
+
+    yield index
+
+    options = {}
+    options[:tree] = index.write_tree(git_base.base) # Write a new tree with the changes in `index`, and get back the oid
+    options[:author] = git_author
+    options[:committer] = git_author
+    options[:message] ||= message
+    options[:parents] =  git_base.empty? ? [] : [git_base.head.target].compact
+    options[:update_ref] = ref
+
+    self.commit = Rugged::Commit.create(git_base.base, options)
   end
 
   def set_git_version_and_repo
