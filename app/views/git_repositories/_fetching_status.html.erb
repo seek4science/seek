@@ -1,5 +1,5 @@
-<% @job_status ||= git_repository.fetching_status %>
-<% in_progress = git_repository.fetching? %>
+<% @job_status ||= git_repository.remote_git_fetch_task&.status %>
+<% in_progress = git_repository.remote_git_fetch_task&.in_progress? %>
 
 <div id="fetching-status">
   <div class="alert alert-info" role="alert">
@@ -9,7 +9,7 @@
       <%= image 'spinner' %>
       <script>
           setTimeout(function () {
-              $j.ajax('<%= fetching_status_git_repository_path(git_repository) %>', {
+              $j.ajax('<%= fetch_status_git_repository_path(git_repository) %>', {
                       data: { 'previous_status': '<%= @job_status -%>' },
                       success: function (html) {
                           $j('#fetching-status').replaceWith(html);
@@ -19,7 +19,7 @@
           }, 5000);
       </script>
     <% else %>
-      Done
+      <%= render partial: 'select_ref', locals: { git_repository: git_repository } %>
     <% end %>
   </div>
 </div>

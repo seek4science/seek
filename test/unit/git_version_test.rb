@@ -12,7 +12,7 @@ class GitVersionTest < ActiveSupport::TestCase
     workflow = repo.resource
     # Could use rubyzip for this
     `unzip -qq #{repo.remote}.zip -d #{Pathname.new(repo.remote).parent}`
-    RemoteGitCheckoutJob.new(repo).perform
+    RemoteGitFetchJob.perform_now(repo)
 
     v = workflow.git_versions.create!(ref: 'refs/heads/master', mutable: true)
     assert_empty v.metadata

@@ -16,13 +16,13 @@ class GitRepositoryTest < ActiveSupport::TestCase
     repo = Factory(:remote_repository)
     # Could use rubyzip for this
     `unzip -qq #{repo.remote}.zip -d #{Pathname.new(repo.remote).parent}`
-    RemoteGitCheckoutJob.new(repo).perform
+    RemoteGitFetchJob.perform_now(repo)
     remote = repo.git_base.remotes.first
 
     assert_equal 'origin', remote.name
     assert remote.url.end_with?('nf-core/chipseq')
     assert File.exist?(File.join(repo.local_path, '.git', 'config'))
   ensure
-    FileUtils.rm_rf(repo.remote)
+    FileUtils.rm_rf(repo.remote) if repo
   end
 end

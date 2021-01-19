@@ -8,6 +8,8 @@ class GitRepository < ApplicationRecord
 
   acts_as_uniquely_identifiable
 
+  has_task :remote_git_fetch
+
   def local_path
     File.join(Seek::Config.git_filestore_path, remote.present? ? uuid : "#{resource_type}-#{resource_id}")
   end
@@ -21,27 +23,8 @@ class GitRepository < ApplicationRecord
     git_base.remotes['origin'].fetch
   end
 
-  # TODO: When active-job branch is merged, change this to use the TaskJob stuff instead:
-  def fetching_status
-    job = Delayed::Job.where("handler LIKE '%!ruby/object:RemoteGitCheckoutJob%'")
-              .where("handler LIKE '%git_repository: #{id}%'").last
-    if job
-      if job.locked_at
-        if job.failed_at
-          :failed
-        else
-          :running
-        end
-      else
-        :pending
-      end
-    else
-      nil
-    end
-  end
-
   def fetching?
-    [:pending, :running].include?(fetch_status)
+    remote_git_fetch_task && !remote_git_fetch_task.completed?
   end
 
   def remote_refs
@@ -98,6 +81,6 @@ class GitRepository < ApplicationRecord
 
   def setup_remote
     git_base.add_remote('origin', remote)
-    RemoteGitCheckoutJob.new(self).queue_job
+    RemoteGitFetchJob.perform_later(self)
   end
 end
