@@ -40,9 +40,9 @@ module Seek
               { name: "Version #{git_versions.count + 1}", ref: 'refs/heads/master' }
             end
 
-            def state_allows_download?(*args)
-              latest_git_version.commit.present?
-            end
+            # def state_allows_download?(*args)
+            #   latest_git_version.commit.present?
+            # end
 
             def self.proxy_class
               const_get(proxy_class_name)
