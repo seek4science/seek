@@ -28,6 +28,9 @@ bundle exec rake sunspot:solr:start
 sleep 5 # small delay to make sure SOLR has started up and ready
 bundle exec rake seek:workers:start
 
+echo "${GREEN} update crontab${NC}"
+bundle exec whenever --update-crontab
+
 echo "${GREEN} restart server${NC}"
 touch tmp/restart.txt
 bundle exec rake tmp:clear

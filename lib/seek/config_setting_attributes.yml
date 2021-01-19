@@ -54,6 +54,7 @@ human_diseases_enabled:
 jerm_enabled:
 email_enabled:
 jws_enabled:
+copasi_enabled:
 external_search_enabled:
 piwik_analytics_enabled:
 seek_video_link:

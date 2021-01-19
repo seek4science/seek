@@ -1552,12 +1552,12 @@ class DataFilesControllerTest < ActionController::TestCase
 
     df_param = { title: 'Test', project_ids: [proj.id] }
     blob = { data: picture_file }
-    post :create, params: { data_file: df_param, content_blobs: [blob], policy_attributes: valid_sharing }
-
+    assert_enqueued_with(job: SetSubscriptionsForItemJob) do
+      post :create, params: { data_file: df_param, content_blobs: [blob], policy_attributes: valid_sharing }
+    end
     df = assigns(:data_file)
 
-    assert SetSubscriptionsForItemJob.new(df, df.projects).exists?
-    SetSubscriptionsForItemJob.new(df, df.projects).perform
+    SetSubscriptionsForItemJob.perform_now(df, df.projects)
 
     assert df.subscribed?(current_person)
     refute df.subscribed?(a_person)
@@ -1769,7 +1769,7 @@ class DataFilesControllerTest < ActionController::TestCase
                                }],
                policy_attributes: valid_sharing }
 
-    assert_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
+    assert_enqueued_jobs(1, only: RemoteContentFetchingJob) do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
           post :create, params: params
@@ -1784,7 +1784,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'small.txt', blob.original_filename
     assert_equal 'text/plain', blob.content_type
     assert_equal 100, blob.file_size
-    assert blob.caching_job.exists?
+    assert blob.remote_content_fetch_task&.pending?
   end
 
   test 'should not create cache job if setting disabled' do
@@ -1800,7 +1800,7 @@ class DataFilesControllerTest < ActionController::TestCase
                policy_attributes: valid_sharing }
 
     with_config_value(:cache_remote_files, false) do
-      assert_no_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
+      assert_no_enqueued_jobs(only: RemoteContentFetchingJob) do
         assert_difference('DataFile.count') do
           assert_difference('ContentBlob.count') do
             post :create, params: params
@@ -1815,7 +1815,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_equal 'small.txt', blob.original_filename
       assert_equal 'text/plain', blob.content_type
       assert_equal 100, blob.file_size
-      assert !blob.caching_job.exists?
+      refute blob.remote_content_fetch_task&.pending?
     end
   end
 
@@ -1832,7 +1832,7 @@ class DataFilesControllerTest < ActionController::TestCase
                                }],
                policy_attributes: valid_sharing }
     with_config_value(:cache_remote_files, false) do
-      assert_no_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
+      assert_no_enqueued_jobs(only: RemoteContentFetchingJob) do
         assert_difference('DataFile.count') do
           assert_difference('ContentBlob.count') do
             post :create, params: params
@@ -1848,7 +1848,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_equal 'big.txt', blob.original_filename
       assert_equal 'text/plain', blob.content_type
       assert_equal 5000, blob.file_size
-      assert !blob.caching_job.exists?
+      refute blob.remote_content_fetch_task&.pending?
     end
   end
 
@@ -1864,7 +1864,7 @@ class DataFilesControllerTest < ActionController::TestCase
                                }],
                policy_attributes: valid_sharing }
 
-    assert_no_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
+    assert_no_enqueued_jobs(only: RemoteContentFetchingJob) do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
           post :create, params: params
@@ -1880,7 +1880,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'big.txt', blob.original_filename
     assert_equal 'text/plain', blob.content_type
     assert_equal 5000, blob.file_size
-    refute blob.caching_job.exists?
+    refute blob.remote_content_fetch_task&.pending?
   end
 
   test 'should not automatically create cache job for webpage links' do
@@ -1894,7 +1894,7 @@ class DataFilesControllerTest < ActionController::TestCase
                                }],
                policy_attributes: valid_sharing }
 
-    assert_no_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
+    assert_no_enqueued_jobs(only: RemoteContentFetchingJob) do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
           post :create, params: params
@@ -1908,7 +1908,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert !blob.url.blank?
     assert blob.original_filename.blank?
     assert_equal 'text/html', blob.content_type
-    assert !blob.caching_job.exists?
+    refute blob.remote_content_fetch_task&.pending?
   end
 
   test "should create cache job for large file if user requests 'make_local_copy'" do
@@ -1924,7 +1924,7 @@ class DataFilesControllerTest < ActionController::TestCase
                policy_attributes: valid_sharing
     }
 
-    assert_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
+    assert_enqueued_jobs(1, only: RemoteContentFetchingJob) do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
           post :create, params: params
@@ -1941,7 +1941,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'big.txt', blob.original_filename
     assert_equal 'text/plain', blob.content_type
     assert_equal 5000, blob.file_size
-    assert blob.caching_job.exists?
+    assert blob.remote_content_fetch_task&.pending?
   end
 
   test 'should create data file for remote URL that does not respond to HEAD' do
@@ -1956,7 +1956,7 @@ class DataFilesControllerTest < ActionController::TestCase
                                }],
                policy_attributes: valid_sharing }
 
-    assert_difference('Delayed::Job.where("handler LIKE ?", "%!ruby/object:RemoteContentFetchingJob%").count') do
+    assert_enqueued_jobs(1, only: RemoteContentFetchingJob) do
       assert_difference('DataFile.count') do
         assert_difference('ContentBlob.count') do
           post :create, params: params
@@ -1973,7 +1973,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal 'nohead.txt', blob.original_filename
     assert_equal 'text/plain', blob.content_type
     assert_equal 5000, blob.file_size
-    assert blob.caching_job.exists?
+    assert blob.remote_content_fetch_task&.pending?
   end
 
   test 'should create data file for remote URL with a space at the end' do
@@ -2347,7 +2347,8 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.sample_template?
     assert_empty data_file.possible_sample_types
 
-    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
+    # First matching type
+    sample_type = SampleType.new title: 'from template 1', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     # this is to force the full name to be 2 words, so that one row fails
@@ -2355,7 +2356,8 @@ class DataFilesControllerTest < ActionController::TestCase
     sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
     sample_type.save!
 
-    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
+    # Second matching type
+    sample_type = SampleType.new title: 'from template 2', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
     sample_type.content_blob = Factory(:sample_type_template_content_blob)
     sample_type.build_attributes_from_template
     # this is to force the full name to be 2 words, so that one row fails
@@ -2368,6 +2370,71 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_redirected_to select_sample_type_data_file_path(data_file) # Test for this is in data_files_controller_test
+  end
+
+  test 'show data file with "extract samples" button' do
+    create_sample_attribute_type
+    person = Factory(:project_administrator)
+    login_as(person)
+
+    data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
+                        policy: Factory(:private_policy), contributor: person
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    sample_type.save!
+
+    get :show, params: { id: data_file.id }
+
+    assert_select 'a.btn', text: /Extract samples/
+  end
+
+  test 'show data file with sample extraction in progress' do
+    create_sample_attribute_type
+    person = Factory(:project_administrator)
+    login_as(person)
+
+    data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
+                        policy: Factory(:private_policy), contributor: person
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    sample_type.save!
+
+    data_file.tasks.create!(key: 'sample_extraction', status: Task::STATUS_QUEUED)
+
+    get :show, params: { id: data_file.id }
+
+    assert_select '#sample-extraction-status', text: /Queued/
+  end
+
+  test 'show data file with sample extraction done and ready for review' do
+    create_sample_attribute_type
+    person = Factory(:project_administrator)
+    login_as(person)
+
+    data_file = Factory :data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
+                        policy: Factory(:private_policy), contributor: person
+    refute data_file.sample_template?
+    assert_empty data_file.possible_sample_types
+
+    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
+    sample_type.content_blob = Factory(:sample_type_template_content_blob)
+    sample_type.build_attributes_from_template
+    sample_type.save!
+
+    Seek::Samples::Extractor.new(data_file, sample_type).extract
+    data_file.tasks.create!(key: 'sample_extraction', status: Task::STATUS_DONE)
+
+    get :show, params: { id: data_file.id }
+
+    assert_select '#sample-extraction-status a[href=?]', confirm_extraction_data_file_path(data_file)
   end
 
   test 'extract from data file queues job' do
@@ -2389,8 +2456,12 @@ class DataFilesControllerTest < ActionController::TestCase
     sample_type.save!
 
     assert_no_difference('Sample.count') do
-      assert_difference("Delayed::Job.where(\"handler LIKE '%SampleDataExtractionJob%'\").count", 1) do
-        post :extract_samples, params: { id: data_file.id }
+      assert_difference('Task.count') do
+        assert_enqueued_jobs(1, only: SampleDataExtractionJob) do
+          post :extract_samples, params: { id: data_file.id }
+
+          assert data_file.reload.sample_extraction_task&.pending?
+        end
       end
     end
 
@@ -2597,11 +2668,13 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.content_blob.file_size
 
     assert_no_difference('Sample.count') do
-      assert_difference("Delayed::Job.where(\"handler LIKE '%SampleDataExtractionJob%'\").count", 1) do
-        VCR.use_cassette('nels/get_sample_metadata') do
-          post :retrieve_nels_sample_metadata, params: { id: data_file }
+      assert_enqueued_jobs(1, only: SampleDataExtractionJob) do
+        assert_difference('Task.count') do
+          VCR.use_cassette('nels/get_sample_metadata') do
+            post :retrieve_nels_sample_metadata, params: { id: data_file }
 
-          assert_redirected_to data_file
+            assert_redirected_to data_file
+          end
         end
       end
     end
@@ -2620,7 +2693,7 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.content_blob.file_size
 
     assert_no_difference('Sample.count') do
-      assert_no_difference("Delayed::Job.where(\"handler LIKE '%SampleDataExtractionJob%'\").count") do
+      assert_no_enqueued_jobs(only: SampleDataExtractionJob) do
         VCR.use_cassette('nels/missing_sample_metadata') do
           post :retrieve_nels_sample_metadata, params: { id: data_file }
 
@@ -2647,7 +2720,7 @@ class DataFilesControllerTest < ActionController::TestCase
                                             "data_file_id:#{data_file.id}")
 
     assert_no_difference('Sample.count') do
-      assert_no_difference("Delayed::Job.where(\"handler LIKE '%SampleDataExtractionJob%'\").count") do
+      assert_no_enqueued_jobs(only: SampleDataExtractionJob) do
         VCR.use_cassette('nels/get_sample_metadata') do
           post :retrieve_nels_sample_metadata, params: { id: data_file }
 

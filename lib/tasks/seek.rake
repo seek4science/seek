@@ -17,7 +17,7 @@ namespace :seek do
       end
     end
     # 5 is an arbitrary number to take advantage of there being more than 1 worker dedicated to auth refresh
-    5.times { AuthLookupUpdateJob.new.queue_job(1, 5.seconds.from_now) }
+    5.times { AuthLookupUpdateJob.set(priority: 1).perform_later }
   end
 
   desc 'Rebuild all authorization lookup table for all items.'
@@ -68,7 +68,7 @@ namespace :seek do
   desc 'Creates background jobs to reindex all searchable things'
   task(reindex_all: :environment) do
     Seek::Util.searchable_types.each do |type|
-      ReindexingJob.new.add_items_to_queue type.all, 5.seconds.from_now, 2
+      ReindexingQueue.enqueue(type.all)
     end
   end
 

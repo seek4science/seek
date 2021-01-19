@@ -24,7 +24,12 @@
       "technology_type": {
         "label": null,
         "uri": null
-      }
+      },
+      "discussion_links": [{
+        "id": 55,
+        "url": "http://www.slack.com/",
+        "label": "Slack"
+      }]
     },
     "relationships": {
       "creators": {

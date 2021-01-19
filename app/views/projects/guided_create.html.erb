@@ -2,29 +2,8 @@
   <div class="row">
     <div  style="margin:auto;width:70%;">
 
-      <% if Seek::Config.programmes_enabled %>
-        <div class="panel panel-default">
-          <div class="panel-heading"><%= t('programme') %></div>
-          <div class="panel-body">
-
-            <div class="help-block">
-              You can choose either to be linked to a <%= "#{Seek::Config.dm_project_name} managed #{t('programme')}" %>, <%= link_to Programme.managed_programme.title,Programme.managed_programme %>, or have one created for you.
-            </div>
-            <div class="help-block">
-              If you have a <%= t('programme') %> created, then you will then be able to freely create further <%= t('project').pluralize %> within
-              it. To have one created, then please provide the name. You will be able to provide additional details, if you wish, once it has been created.
-            </div>
-
-            <label>
-              <%= check_box_tag :managed_programme, '1', true %>
-              <%= "#{Seek::Config.dm_project_name} managed #{t('programme')}?" %>
-            </label>
-            <div id='programme-details' style="display:none;">
-              <%= label_tag :programme_title, "Title" %><span class="required">*</span>
-              <%= text_field_tag 'programme[title]', '', class: 'form-control' %>
-            </div>
-          </div>
-        </div>
+      <% if Seek::ProjectFormProgrammeOptions.show_programme_box? %>
+        <%= render partial: 'projects/guided_create/programme_box' %>
       <% end %>
 
       <div class="panel panel-default">
@@ -65,9 +44,9 @@
 <script type=application/javascript>
 
     function checkSubmitButtonEnabled() {
-        var progEnabled = <%= Seek::Config.programmes_enabled %>;
+        var progEnabled = <%= Seek::ProjectFormProgrammeOptions.show_programme_box? %>;
         var enabled = $j('#institution_id').val()
-            && !progEnabled || ($j('input#managed_programme:checked').length==1 || $j('input#programme_title').val())
+            && !progEnabled || ($j('#programme_id').val() || $j('input#programme_title').val())
             && $j('input#project_title').val()
             && $j('select#institution_country').val();
         $j('#submit-button').prop('disabled',!enabled);
@@ -81,16 +60,39 @@
             }
         });
 
-       $j('input#managed_programme').on('change', function() {
-           if ($j('input#managed_programme:checked').length == 0) {
-               $j('#programme-details').show();
-           }
-           else {
-               $j('#programme-details').hide();
-               $j('input#programme_title').val('');
-           }
-           checkSubmitButtonEnabled();
-       });
+       <% if Seek::ProjectFormProgrammeOptions.managed_checkbox? %>
+         $j('input#managed_programme').on('change', function() {
+             if ($j('input#managed_programme:checked').length == 0) {
+                 $j('#programme-details').show();
+                 $j('#programme_id').val('');
+             }
+             else {
+                 $j('#programme_id').val('<%= Programme.site_managed_programme.id %>');
+                 $j('#programme-details').hide();
+                 $j('input#programme_title').val('');
+             }
+             checkSubmitButtonEnabled();
+         });
+       <% end %>
+
+       <% if Seek::ProjectFormProgrammeOptions.creation_allowed? && Seek::ProjectFormProgrammeOptions.programme_dropdown? %>
+        $j('input#new_programme').on('change', function() {
+            if ($j('input#new_programme:checked').length == 1) {
+                $j('#programme-details').show();
+                $j('select#programme_id').prop('disabled',true);
+                $j('select#programme_id').attr('name','disabled-programme_id');
+                $j('select#programme_id').attr('id','disabled-programme_id');
+            }
+            else {
+                $j('#programme-details').hide();
+                $j('input#programme_title').val('');
+                $j('select#disabled-programme_id').attr('name','programme_id');
+                $j('select#disabled-programme_id').attr('id','programme_id');
+                $j('select#programme_id').prop('disabled',false);
+            }
+            checkSubmitButtonEnabled();
+        });
+       <% end %>
 
        $j('input#programme_title').on('input',function() {
           checkSubmitButtonEnabled();

@@ -1,7 +1,7 @@
 <%= admin_checkbox_setting(:email_enabled, 1, Seek::Config.email_enabled,
                            "Email enabled", "Enables email support for sending notifications, requesting feedback, and requesting access to other users files.",
                            :onchange=>toggle_appear_javascript('email_settings')) %>
-<div id="email_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.email_enabled) -%>;">
+<div id="email_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.email_enabled) -%>;" data-protected-settings-block>
   <div class="row">
     <div class="col-sm-7">
       <%= admin_text_setting(:address, Seek::Config.smtp_settings('address'), 'SMTP server address') %>

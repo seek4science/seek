@@ -5,7 +5,6 @@ class AuthLookupTableTest < ActiveSupport::TestCase
     @val = Seek::Config.auth_lookup_enabled
     Seek::Config.auth_lookup_enabled = true
     AuthLookupUpdateQueue.destroy_all
-    Delayed::Job.destroy_all
   end
 
   def teardown

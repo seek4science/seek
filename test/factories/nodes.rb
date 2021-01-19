@@ -18,7 +18,7 @@ end
 Factory.define(:min_node, class: Node) do |f|
   f.with_project_contributor
   f.title 'A Minimal Node'
-  f.projects { [Factory.build(:min_project)] }
+  f.projects { [Factory(:min_project)] }
   f.after_create do |node|
     node.content_blob = Factory.create(:min_content_blob, content_type: 'application/pdf', asset: node, asset_version: node.version)
   end
@@ -28,7 +28,7 @@ Factory.define(:max_node, class: Node) do |f|
   f.with_project_contributor
   f.title 'A Maximal Node'
   f.description 'How to run a simulation in GROMACS'
-  f.projects { [Factory.build(:max_project)] }
+  f.projects { [Factory(:max_project)] }
   f.assays {[Factory.build(:max_assay, policy: Factory(:public_policy))]}
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
   f.after_create do |node|

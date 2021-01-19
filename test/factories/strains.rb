@@ -2,14 +2,14 @@
 Factory.define(:strain) do |f|
   f.sequence(:title) { |n| "Strain#{n}" }
   f.association :organism
-  f.projects { [Factory.build(:project)] }
+  f.projects { [Factory(:project)] }
   f.association :contributor, factory: :person
 end
 
 Factory.define(:min_strain, class: Strain) do |f|
   f.title 'A Minimal Strain'
   f.association :organism, factory: :min_organism
-  f.projects {[Factory.build(:min_project)]}
+  f.projects { [Factory(:min_project)] }
 end
 
 # Phenotype

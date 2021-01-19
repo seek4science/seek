@@ -24,6 +24,7 @@ class Assay < ApplicationRecord
   acts_as_snapshottable
 
   belongs_to :institution
+  belongs_to :sample_type 
 
 
   belongs_to :assay_class

@@ -41,6 +41,7 @@ jobs:
           - rake teaspoon
           - rake assets:precompile
           - rake db:setup
+          - rake db:migrate
         include:
           - database: postgres
             suite: rails test test/unit
@@ -85,6 +86,11 @@ jobs:
       - name: Set MySQL char set and collation
         if: matrix.database == 'mysql'
         run: echo -e "ALTER DATABASE seek_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\n" | bundle exec rails dbconsole -p
+      - name: Checkout previous schema
+        if: github.event_name == 'push' && matrix.suite == 'rake db:migrate' && github.event.before != '0000000000000000000000000000000000000000'
+        run: |
+          git fetch origin ${{ github.event.before }}
+          git checkout ${{ github.event.before }} -- db/schema.rb
       - name: Load test database schema
         run: bundle exec rake db:schema:load
       - name: Run tests

@@ -22,7 +22,12 @@
       ],
       "start_date" : "2010-01-01",
       "end_date" : "2014-06-21",
-      "use_default_policy" : true
+      "use_default_policy" : true,
+      "discussion_links": [{
+        "id": 55,
+        "url": "http://www.slack.com/",
+        "label": "Slack"
+      }]
     },
     "relationships": {
       "organisms": {

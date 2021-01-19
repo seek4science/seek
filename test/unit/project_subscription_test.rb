@@ -14,7 +14,7 @@ class ProjectSubscriptionTest < ActiveSupport::TestCase
 
   test 'subscribing to a project subscribes to subscribable items in the project' do
     ps = current_person.project_subscriptions.create project: @proj
-    ProjectSubscriptionJob.new(ps.id).perform
+    ProjectSubscriptionJob.perform_now(ps)
     assert @subscribables_in_proj.all?(&:subscribed?)
   end
 
@@ -31,12 +31,14 @@ class ProjectSubscriptionTest < ActiveSupport::TestCase
 
   test 'subscribers to a project auto subscribe to new items in the project' do
     ps = current_person.project_subscriptions.create project: @proj
-    ProjectSubscriptionJob.new(ps.id).perform
+    ProjectSubscriptionJob.perform_now(ps)
     person = Factory(:person,project:@proj)
     person.add_to_project_and_institution(Factory(:project),person.institutions.first)
-    s = Factory(:subscribable, projects: person.projects,contributor:person)
-    assert SetSubscriptionsForItemJob.new(s, s.projects).exists?
-    SetSubscriptionsForItemJob.new(s, s.projects).perform
+    s = nil
+    assert_enqueued_with(job: SetSubscriptionsForItemJob) do
+      s = Factory(:subscribable, projects: person.projects,contributor:person)
+    end
+    SetSubscriptionsForItemJob.perform_now(s, s.projects)
 
     assert s.subscribed?
   end
@@ -44,7 +46,7 @@ class ProjectSubscriptionTest < ActiveSupport::TestCase
   test 'unsubscribers to a project auto unsubscribe to subscribable items in the project' do
     # subscribe
     ps = current_person.project_subscriptions.create project: @proj
-    ProjectSubscriptionJob.new(ps.id).perform
+    ProjectSubscriptionJob.perform_now(ps)
     assert @subscribables_in_proj.all?(&:subscribed?)
 
     # unsubscribe
@@ -56,21 +58,23 @@ class ProjectSubscriptionTest < ActiveSupport::TestCase
 
   test 'individual subscription frequency set by project subscription frequency' do
     ps = current_person.project_subscriptions.create project: @proj, frequency: 'daily'
-    ProjectSubscriptionJob.new(ps.id).perform
+    ProjectSubscriptionJob.perform_now(ps)
     assert @subscribables_in_proj.map(&:current_users_subscription).all?(&:daily?)
     ps.frequency = 'monthly'
     ps.save!
-    ProjectSubscriptionJob.new(ps.id).perform
+    ProjectSubscriptionJob.perform_now(ps)
     @subscribables_in_proj.each(&:reload)
     assert @subscribables_in_proj.map(&:current_users_subscription).all?(&:monthly?)
   end
 
   test 'subscribers to a project auto subscribe to new publication in the project' do
     ps = current_person.project_subscriptions.create project: @proj
-    ProjectSubscriptionJob.new(ps.id).perform
-    publication = Factory(:publication, projects: [Factory(:project), @proj])
-    assert SetSubscriptionsForItemJob.new(publication, publication.projects).exists?
-    SetSubscriptionsForItemJob.new(publication, publication.projects).perform
+    ProjectSubscriptionJob.perform_now(ps)
+    publication = nil
+    assert_enqueued_with(job: SetSubscriptionsForItemJob) do
+      publication = Factory(:publication, projects: [Factory(:project), @proj])
+    end
+    SetSubscriptionsForItemJob.perform_now(publication, publication.projects)
 
     assert publication.subscribed?
   end

@@ -439,6 +439,18 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_equal 12, session[:metadata][:internals][:inputs].length
   end
 
+  test 'extract metadata from remote should perform inline and cancel remote content fetch job' do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'https://www.abc.com/workflow.cwl'
+    cwl = Factory(:cwl_workflow_class)
+    blob = Factory(:url_cwl_content_blob)
+    blob.remote_content_fetch_task.start
+    session[:uploaded_content_blob_id] = blob.id.to_s
+    post :metadata_extraction_ajax, params: { content_blob_id: blob.id.to_s, format: 'js', workflow_class_id: cwl.id }
+    assert blob.reload.remote_content_fetch_task.cancelled?
+    assert_response :success
+    assert_equal 12, session[:metadata][:internals][:inputs].length
+  end
+
   test 'missing diagram and no CWL viewer available returns 404' do
     wf = Factory(:cwl_workflow)
     login_as(wf.contributor)

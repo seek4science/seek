@@ -238,4 +238,6 @@ class DataFile < ApplicationRecord
       return assay, Set.new
     end
   end
+
+  has_task :sample_extraction
 end

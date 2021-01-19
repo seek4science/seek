@@ -19,7 +19,7 @@ class ActivityLog < ApplicationRecord
 
   def send_notification
     if Seek::Config.email_enabled && activity_loggable.try(:subscribable?) && activity_loggable.subscribers_are_notified_of?(action)
-      SendImmediateEmailsJob.new(id).queue_job
+      ImmediateSubscriptionEmailJob.new(self).queue_job
     end
   end
 
