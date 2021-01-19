@@ -75,12 +75,26 @@ class SampleControlledVocabsController < ApplicationController
   end
 
   def fetch_ols_terms
-    source_ontology = params[:source_ontology_id]
-    root_uri = params[:root_uri]
-    client = Ebi::OlsClient.new
-    terms = client.all_descendants(source_ontology, root_uri)
+    error_msg = nil
+    begin
+      source_ontology = params[:source_ontology_id]
+      root_uri = params[:root_uri]
+
+      raise 'No root URI provided' if root_uri.blank?
+
+      client = Ebi::OlsClient.new
+      terms = client.all_descendants(source_ontology, root_uri)
+    rescue Exception=>e
+      error_msg = e.message
+    end
+
     respond_to do |format|
-      format.json { render json:terms.to_json}
+      if error_msg
+        format.json { render json:{errors:[{details:error_msg}]}, status: :unprocessable_entity}
+      else
+        format.json { render json:terms.to_json}
+      end
+
     end
   end
 

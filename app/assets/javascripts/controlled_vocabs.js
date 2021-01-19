@@ -41,6 +41,12 @@ function clearAllTerms() {
     });
 }
 
+function reportFetchError(json) {
+    var error_message = json.errors[0].details;
+    $j('div#fetch-error-message').text("An error occurred fetching the terms: "+error_message);
+    $j('div#fetch-error-message').show();
+}
+
 function initialiseCVForm(fetch_ajax_path) {
     fetch_ajax_path = fetch_ajax_path;
 
@@ -99,6 +105,7 @@ function initialiseCVForm(fetch_ajax_path) {
             return false;
         }
         $j('div#controlled-vocab-terms').hide();
+        $j('div#fetch-error-message').hide();
         $j('#fetch-terms-spinner').spinner('add');
         $j('input#submit-button').prop('disabled',true);
 
@@ -115,8 +122,8 @@ function initialiseCVForm(fetch_ajax_path) {
                 clearAllTerms();
                 handleOntologyTermsJSONResponse((resp));
             },
-            error: function () {
-                $j('#project-search-results').html('<div class="alert alert-danger">An error occurred whilst fetching your query.</div>');
+            error: function (resp) {
+                reportFetchError(resp.responseJSON);
             },
             complete: function () {
                 $j('#fetch-terms-spinner').spinner('remove');
