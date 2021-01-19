@@ -5,8 +5,23 @@
 <%= item_description @sample_controlled_vocab.description -%>
 
 <h3>Terms</h3>
-<ul>
-<% @sample_controlled_vocab.sample_controlled_vocab_terms.each do |term| %>
-  <li><%= term.label %></li>
-<% end %>
-</ul>
+<table class="table">
+  <thead>
+  <tr>
+    <th>Label</th>
+    <th>Ontology IRI</th>
+    <th>Parent IRI</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @sample_controlled_vocab.sample_controlled_vocab_terms.each do |term| %>
+    <tr>
+      <td><%= term.label %></td>
+      <td><%= term.iri %></td>
+      <td><%= term.parent_iri %></td>
+    </tr>
+  <% end %>
+  </tbody>
+
+</table>
+
