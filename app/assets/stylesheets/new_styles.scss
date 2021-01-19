@@ -1056,3 +1056,11 @@ span.disabled {
 .btn.disabled img.icon {
   opacity: 0.4;
 }
+/* controlled vocab term table */
+
+
+#controlled-vocab-terms-fixed {
+  display:block;
+  overflow-y: auto;
+  max-height: 20em;
+}
