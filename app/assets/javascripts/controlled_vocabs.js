@@ -32,8 +32,13 @@ function addNewTermRow() {
     $j('#add-term-button-row').before($j(newTerm));
 }
 
+function clearAllTerms() {
+    $j('#new-terms tr.sample-cv-term').remove();
+}
+
 function initialiseCVForm(fetch_ajax_path) {
     fetch_ajax_path = fetch_ajax_path;
+
     $j('#add-term').click(function () {
         addNewTermRow();
 
@@ -41,6 +46,12 @@ function initialiseCVForm(fetch_ajax_path) {
         $j('#controlled-vocab-terms-fixed').scrollTop($j('#controlled-vocab-terms-fixed').prop("scrollHeight"));
 
         return false;
+    });
+
+    $j('#clear-terms').click(function () {
+       if (confirm('Are you sure you wish to remove all the current terms?')) {
+           clearAllTerms();
+       }
     });
 
     CVTerms = {
@@ -79,6 +90,9 @@ function initialiseCVForm(fetch_ajax_path) {
     });
 
     $j('#fetch-ontology-terms-submit').click(function (e) {
+        if (!confirm('Are you sure? All current terms will be removed.')) {
+            return false;
+        }
         $j('div#controlled-vocab-terms').hide();
         $j('#fetch-terms-spinner').spinner('add');
         $j('input#submit-button').prop('disabled',true);
@@ -93,7 +107,8 @@ function initialiseCVForm(fetch_ajax_path) {
                 root_uri: root_uri
             },
             success: function (resp) {
-                handleOntologyTermsJSONResponse((resp))
+                clearAllTerms();
+                handleOntologyTermsJSONResponse((resp));
             },
             error: function () {
                 $j('#project-search-results').html('<div class="alert alert-danger">An error occurred whilst fetching your query.</div>');
