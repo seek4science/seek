@@ -89,7 +89,7 @@ function initialiseCVForm(fetch_ajax_path) {
 
     $j('select#sample_controlled_vocab_source_ontology').on('change', function() {
         var selected = this.selectedOptions[0];
-        if (selected == "") {
+        if (selected.value == "") {
             $j('#ontology-root-uri').hide();
         }
         else {
@@ -135,4 +135,7 @@ function initialiseCVForm(fetch_ajax_path) {
         })
         return false;
     });
+
+    //make sure the page is updated if there is already an ontology
+    $j('select#sample_controlled_vocab_source_ontology').trigger('change');
 }

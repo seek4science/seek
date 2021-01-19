@@ -15,12 +15,12 @@
   <%= panel('Ontology') do %>
     <div class="form-group">
       <label>Ontology</label>
-      <%= f.select :source_ontology, ebi_ontology_choices, { include_blank: 'no ontology' }, class: 'form-control' -%>
+      <%= f.select :source_ontology, ebi_ontology_choices, { include_blank: 'No Ontology' }, class: 'form-control' -%>
       <br/>
 
       <div id='ontology-root-uri' style="display:none;">
         <div class="help-block">
-          You have selected the <a id="selected-ols-link" href="" target="_blank"></a>,
+          You have selected the <a id="selected-ols-link" href="" target="_blank"></a> ontology,
           click the link to browse on the Ontology Lookup Service in another tab and find the suitable root term URI.
           You should then copy that URI into the field below.
         </div>
@@ -33,7 +33,6 @@
         </div>
       </div>
     </div>
-
   <% end %>
 
   <%= panel('Terms') do %>
