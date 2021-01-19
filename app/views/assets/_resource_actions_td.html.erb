@@ -6,7 +6,8 @@
                                 resource.single_content_blob.try(:url), nil, class: 'btn btn-default btn-xs' %>
   <% end -%>
 
-  <% if params[:GALAXY_URL] && can_download_asset?(resource, params[:code], permissions.can_download) %>
+<!--  Currently only support public accessible assets -->
+   <% if params[:GALAXY_URL] && resource.can_download?(nil) %>
     <%= download_or_galaxy_button resource, galaxize_resource_path(resource, params[:code],params[:GALAXY_URL]), nil, :class => 'btn btn-default btn-xs' %>
   <% end -%>
 

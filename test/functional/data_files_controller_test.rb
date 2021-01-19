@@ -613,6 +613,100 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_select 'div#add_publications_form', true
   end
 
+  test 'should not show galaxy button if the link is not redirect from galaxy'  do
+
+    get :index
+    assert_response :success
+    assert_select 'a', text: /Send to Galaxy/, count: 0
+
+    data = File.new("#{Rails.root}/test/fixtures/files/file_picture.png", 'rb').read
+    public_df = Factory :data_file,contributor: p,
+                        content_blob: Factory(:content_blob, data: data, content_type: 'images/png'),
+                        policy: Factory(:public_policy)
+    get :show, params: { id: public_df }
+    assert_select 'a', text: /Send to Galaxy/, count: 0
+
+  end
+
+  test 'should show galaxy button on a datafile page only when the datafile is publicly accessible' do
+
+    galaxy_url = 'http://somegalaxy.com/tool_runner?tool_id=ds_seek_test'
+
+    login_as(:datafile_owner) # can edit assay
+    assay = assays(:assay_can_edit_by_datafile_owner)
+    data_file, blob = valid_data_file
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_difference('DataFile::Version.count') do
+          assert_difference('ContentBlob.count') do
+            post :create, params: { data_file: data_file.merge(assay_assets_attributes: [{ assay_id: assay.id }]), content_blobs: [blob], policy_attributes: { access_type: Policy::ACCESSIBLE} }
+          end
+        end
+      end
+    end
+
+    df = assigns(:data_file)
+
+    get :show, params: { id: df, GALAXY_URL:galaxy_url }
+    assert_select 'a', text: /Send to Galaxy/, count: 1
+
+    df.policy.access_type = Policy::VISIBLE
+    df.save!
+
+    get :show, params: { id: df, GALAXY_URL:galaxy_url }
+    assert_select 'a', text: /Send to Galaxy/, count: 0
+
+  end
+
+
+  test 'should show galaxy button if the link is redirected from galaxy and only when datafiles are publicly accessible'  do
+
+    disable_authorization_checks { DataFile.all.each { |df| df.destroy } }
+
+    galaxy_url = 'http://somegalaxy.com/tool_runner?tool_id=ds_seek_test'
+    get :index,params: { GALAXY_URL:galaxy_url}
+
+    puts "downloadable datafiles created by fixtures:"+DataFile.all.select {|df| df.can_download?(nil)}.size.to_s
+
+    assert_response :success
+    assert_select 'a', text: /Send to Galaxy/, count: 0
+
+    login_as(:datafile_owner) # can edit assay
+    assay = assays(:assay_can_edit_by_datafile_owner)
+    data_file, blob = valid_data_file
+    assert_difference('ActivityLog.count') do
+      assert_difference('DataFile.count') do
+        assert_difference('DataFile::Version.count') do
+          assert_difference('ContentBlob.count') do
+            post :create, params: { data_file: data_file.merge(assay_assets_attributes: [{ assay_id: assay.id }]), content_blobs: [blob], policy_attributes: { access_type: Policy::ACCESSIBLE} }
+          end
+        end
+      end
+    end
+    puts "downloadable datafiles after a public datafile is created:"+DataFile.all.select {|df| df.can_download?(nil)}.size.to_s
+
+    get :index,params: { GALAXY_URL:galaxy_url}
+    assert_response :success
+    assert_select 'a', text: /Send to Galaxy/, count: 1
+
+    #even user is logged in, if the asset is not publicly downloadable, the button is still not shown.
+    assigns(:data_file).policy.access_type = Policy::VISIBLE
+    assigns(:data_file).save!
+
+    puts "downloadable datafiles after the public datafile changed its policy to VISIBLE:"+DataFile.all.select {|df| df.can_download?(nil)}.size.to_s
+    get :index,params: { GALAXY_URL:galaxy_url}
+    assert_response :success
+    assert_select 'a', text: /Send to Galaxy/, count: 0
+
+    logout
+    puts "downloadable datafiles after user logged out:"+DataFile.all.select {|df| df.can_download?(nil)}.size.to_s
+    get :index,params: { GALAXY_URL:galaxy_url}
+    assert_response :success
+    assert_select 'a', text: /Send to Galaxy/, count: 0
+
+  end
+
+
   test 'dont show download button or count for website/external_link data file' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html", 'http://webpage.com', 'Content-Type' => 'text/html'
     df = Factory :data_file, content_blob: Factory(:content_blob, url: 'http://webpage.com', external_link: true)
@@ -1760,12 +1854,12 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'should create cache job for small file' do
     mock_http
     params = { data_file: {
-        title: 'Small File',
-        project_ids: [projects(:sysmo_project).id]
+      title: 'Small File',
+      project_ids: [projects(:sysmo_project).id]
     },
                content_blobs: [{
-                                   data_url: 'http://mockedlocation.com/small.txt',
-                                   make_local_copy: '0'
+                                 data_url: 'http://mockedlocation.com/small.txt',
+                                 make_local_copy: '0'
                                }],
                policy_attributes: valid_sharing }
 
@@ -1790,12 +1884,12 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'should not create cache job if setting disabled' do
     mock_http
     params = { data_file: {
-        title: 'Small File',
-        project_ids: [projects(:sysmo_project).id]
+      title: 'Small File',
+      project_ids: [projects(:sysmo_project).id]
     },
                content_blobs: [{
-                                   data_url: 'http://mockedlocation.com/small.txt',
-                                   make_local_copy: '0'
+                                 data_url: 'http://mockedlocation.com/small.txt',
+                                 make_local_copy: '0'
                                }],
                policy_attributes: valid_sharing }
 
@@ -1822,13 +1916,13 @@ class DataFilesControllerTest < ActionController::TestCase
   test "should not create cache job if setting disabled even if user requests 'make_local_copy'" do
     mock_http
     params = { data_file: {
-        title: 'Big File',
-        project_ids: [projects(:sysmo_project).id]
+      title: 'Big File',
+      project_ids: [projects(:sysmo_project).id]
     },
                content_blobs: [{
-                                   data_url: 'http://mockedlocation.com/big.txt',
-                                   original_filename: '',
-                                   make_local_copy: '1'
+                                 data_url: 'http://mockedlocation.com/big.txt',
+                                 original_filename: '',
+                                 make_local_copy: '1'
                                }],
                policy_attributes: valid_sharing }
     with_config_value(:cache_remote_files, false) do
@@ -1855,12 +1949,12 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'should not automatically create cache job for large file' do
     mock_http
     params = { data_file: {
-        title: 'Big File',
-        project_ids: [projects(:sysmo_project).id]
+      title: 'Big File',
+      project_ids: [projects(:sysmo_project).id]
     },
                content_blobs: [{
-                                   data_url: 'http://mockedlocation.com/big.txt',
-                                   make_local_copy: '0'
+                                 data_url: 'http://mockedlocation.com/big.txt',
+                                 make_local_copy: '0'
                                }],
                policy_attributes: valid_sharing }
 
@@ -1886,11 +1980,11 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'should not automatically create cache job for webpage links' do
     mock_http
     params = { data_file: {
-        title: 'My Fav Website',
-        project_ids: [projects(:sysmo_project).id]
+      title: 'My Fav Website',
+      project_ids: [projects(:sysmo_project).id]
     },
                content_blobs: [{
-                                   data_url: 'http://mockedlocation.com'
+                                 data_url: 'http://mockedlocation.com'
                                }],
                policy_attributes: valid_sharing }
 
@@ -1947,12 +2041,12 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'should create data file for remote URL that does not respond to HEAD' do
     mock_http
     params = { data_file: {
-        title: 'No Head File',
-        project_ids: [projects(:sysmo_project).id]
+      title: 'No Head File',
+      project_ids: [projects(:sysmo_project).id]
     },
                content_blobs: [{
-                                   data_url: 'http://mockedlocation.com/nohead.txt',
-                                   make_local_copy: '1'
+                                 data_url: 'http://mockedlocation.com/nohead.txt',
+                                 make_local_copy: '1'
                                }],
                policy_attributes: valid_sharing }
 
@@ -1979,12 +2073,12 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'should create data file for remote URL with a space at the end' do
     mock_http
     params = { data_file: {
-        title: 'Remote File',
-        project_ids: [projects(:sysmo_project).id]
+      title: 'Remote File',
+      project_ids: [projects(:sysmo_project).id]
     },
                content_blobs: [{
-                                   data_url: 'http://mockedlocation.com/txt_test.txt ',
-                                   make_local_copy: '1'
+                                 data_url: 'http://mockedlocation.com/txt_test.txt ',
+                                 make_local_copy: '1'
                                }],
                policy_attributes: valid_sharing }
 
@@ -2001,12 +2095,12 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'should create data file for remote URL with no scheme' do
     mock_http
     params = { data_file: {
-        title: 'Remote File',
-        project_ids: [projects(:sysmo_project).id]
+      title: 'Remote File',
+      project_ids: [projects(:sysmo_project).id]
     },
                content_blobs: [{
-                                   data_url: 'mockedlocation.com/txt_test.txt',
-                                   make_local_copy: '1'
+                                 data_url: 'mockedlocation.com/txt_test.txt',
+                                 make_local_copy: '1'
                                }],
                policy_attributes: valid_sharing }
 
@@ -2487,9 +2581,9 @@ class DataFilesControllerTest < ActionController::TestCase
                                sample_type: sample_type,
                                originating_data_file: data_file, contributor: person),
 
-        assert_no_difference('Sample.count') do
-          post :extract_samples, params: { id: data_file, confirm: 'true' }
-        end
+      assert_no_difference('Sample.count') do
+        post :extract_samples, params: { id: data_file, confirm: 'true' }
+      end
 
     assert_redirected_to data_file_path(data_file)
     assert_not_empty flash[:error]
@@ -2809,8 +2903,8 @@ class DataFilesControllerTest < ActionController::TestCase
     blob = { data: picture_file }
     assert_difference('ContentBlob.count') do
       post :create_content_blob, params: {
-          content_blobs: [blob],
-          data_file: { assay_assets_attributes: [{ assay_id: assay.id.to_s }] }
+        content_blobs: [blob],
+        data_file: { assay_assets_attributes: [{ assay_id: assay.id.to_s }] }
       }
     end
     assert_response :success
@@ -2859,8 +2953,8 @@ class DataFilesControllerTest < ActionController::TestCase
     session[:uploaded_content_blob_id] = content_blob.id.to_s
 
     post :rightfield_extraction_ajax, params: {
-        content_blob_id: content_blob.id.to_s,
-        data_file: {assay_assets_attributes:[{assay_id:assay.id.to_s}]}
+      content_blob_id: content_blob.id.to_s,
+      data_file: {assay_assets_attributes:[{assay_id:assay.id.to_s}]}
     }, format: 'js'
 
     assert_response :success
@@ -2875,8 +2969,8 @@ class DataFilesControllerTest < ActionController::TestCase
     session[:uploaded_content_blob_id] = blob.id
     project = person.projects.last
     params = { data_file: {
-        title: 'Small File',
-        project_ids: [project.id]
+      title: 'Small File',
+      project_ids: [project.id]
     }, tag_list:'fish, soup',
                policy_attributes: valid_sharing,
                content_blob_id: blob.id.to_s,
@@ -2921,9 +3015,9 @@ class DataFilesControllerTest < ActionController::TestCase
     session[:uploaded_content_blob_id] = blob.id
     project = person.projects.last
     params = {data_file: {
-        title: 'Small File',
-        project_ids: [project.id],
-        assay_assets_attributes: [{ assay_id: assay.id }]
+      title: 'Small File',
+      project_ids: [project.id],
+      assay_assets_attributes: [{ assay_id: assay.id }]
     }, policy_attributes: valid_sharing,
               content_blob_id: blob.id.to_s
     }
@@ -2954,9 +3048,9 @@ class DataFilesControllerTest < ActionController::TestCase
     session[:uploaded_content_blob_id] = blob.id
     project = person.projects.last
     params = {data_file: {
-        title: 'Small File',
-        project_ids: [project.id],
-        assay_assets_attributes: [{ assay_id: assay.id }]
+      title: 'Small File',
+      project_ids: [project.id],
+      assay_assets_attributes: [{ assay_id: assay.id }]
     }, policy_attributes: valid_sharing,
               content_blob_id: blob.id.to_s
     }
@@ -2983,8 +3077,8 @@ class DataFilesControllerTest < ActionController::TestCase
     session.delete(:uploaded_content_blob_id)
     project = person.projects.last
     params = { data_file: {
-        title: 'Small File',
-        project_ids: [project.id]
+      title: 'Small File',
+      project_ids: [project.id]
     }, policy_attributes: valid_sharing,
                content_blob_id: blob.id.to_s }
 
@@ -3008,8 +3102,8 @@ class DataFilesControllerTest < ActionController::TestCase
     session[:uploaded_content_blob_id] = Factory(:content_blob).id
     project = person.projects.last
     params = { data_file: {
-        title: 'Small File',
-        project_ids: [project.id]
+      title: 'Small File',
+      project_ids: [project.id]
     }, policy_attributes: valid_sharing,
                content_blob_id: blob.id.to_s }
 
@@ -3032,7 +3126,7 @@ class DataFilesControllerTest < ActionController::TestCase
     session[:uploaded_content_blob_id] = blob.id
     project = person.projects.last
     params = { data_file: {
-        project_ids: [project.id]
+      project_ids: [project.id]
     }, policy_attributes: valid_sharing,
                content_blob_id: blob.id }
 
@@ -3057,7 +3151,7 @@ class DataFilesControllerTest < ActionController::TestCase
     session[:uploaded_content_blob_id] = blob.id
     project = Factory(:project)
     params = { data_file: {
-        project_ids: [project.id]
+      project_ids: [project.id]
     }, policy_attributes: valid_sharing,
                content_blob_id: blob.id }
 
@@ -3080,8 +3174,8 @@ class DataFilesControllerTest < ActionController::TestCase
     project = Factory(:project)
     refute_includes person.projects, project
     params = { data_file: {
-        title: 'Small File',
-        project_ids: [project.id]
+      title: 'Small File',
+      project_ids: [project.id]
     }, policy_attributes: valid_sharing,
                content_blob_id: blob.id }
 
@@ -3112,17 +3206,17 @@ class DataFilesControllerTest < ActionController::TestCase
     assert sop.can_view?
 
     params = { data_file: {
-        title: 'Small File',
-        project_ids: [project.id]
+      title: 'Small File',
+      project_ids: [project.id]
     }, assay: {
-        create_assay: true,
-        assay_class_id: assay_class.id,
-        title: 'my wonderful assay',
-        description: 'assay description',
-        study_id: study.id,
-        sop_id: sop.id,
-        assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Catabolic_response',
-        technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
+      create_assay: true,
+      assay_class_id: assay_class.id,
+      title: 'my wonderful assay',
+      description: 'assay description',
+      study_id: study.id,
+      sop_id: sop.id,
+      assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Catabolic_response',
+      technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
     },
                policy_attributes: valid_sharing,
                content_blob_id: blob.id.to_s }
@@ -3166,33 +3260,33 @@ class DataFilesControllerTest < ActionController::TestCase
     assert study.can_edit?
 
     sharing = {
-        access_type: Policy::PRIVATE,
-        permissions_attributes: {
-            '0' => {
-                contributor_type: 'Person',
-                contributor_id: manager.id,
-                access_type: Policy::MANAGING
-            },
-            '1' => {
-                contributor_type: 'Project',
-                contributor_id: other_project.id,
-                access_type: Policy::VISIBLE
-            }
+      access_type: Policy::PRIVATE,
+      permissions_attributes: {
+        '0' => {
+          contributor_type: 'Person',
+          contributor_id: manager.id,
+          access_type: Policy::MANAGING
+        },
+        '1' => {
+          contributor_type: 'Project',
+          contributor_id: other_project.id,
+          access_type: Policy::VISIBLE
         }
+      }
     }
 
     params = { data_file: {
-        title: 'Small File',
-        project_ids: [project.id]
+      title: 'Small File',
+      project_ids: [project.id]
     }, assay: {
-        create_assay: true,
-        assay_class_id: assay_class.id,
-        title: 'my wonderful assay',
-        description: 'assay description',
-        study_id: study.id,
-        sop_id: nil,
-        assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Catabolic_response',
-        technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
+      create_assay: true,
+      assay_class_id: assay_class.id,
+      title: 'my wonderful assay',
+      description: 'assay description',
+      study_id: study.id,
+      sop_id: nil,
+      assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Catabolic_response',
+      technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
     },
                policy_attributes: sharing,
                content_blob_id: blob.id.to_s }
@@ -3243,16 +3337,16 @@ class DataFilesControllerTest < ActionController::TestCase
     refute study.can_edit?
 
     params = { data_file: {
-        title: 'Small File',
-        project_ids: [project.id]
+      title: 'Small File',
+      project_ids: [project.id]
     }, assay: {
-        create_assay: true,
-        assay_class_id: assay_class.id,
-        title: 'my wonderful assay',
-        description: 'assay description',
-        study_id: study.id,
-        assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Catabolic_response',
-        technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
+      create_assay: true,
+      assay_class_id: assay_class.id,
+      title: 'my wonderful assay',
+      description: 'assay description',
+      study_id: study.id,
+      assay_type_uri: 'http://jermontology.org/ontology/JERMOntology#Catabolic_response',
+      technology_type_uri: 'http://jermontology.org/ontology/JERMOntology#Binding'
     },
                policy_attributes: valid_sharing,
                content_blob_id: blob.id.to_s }
@@ -3636,8 +3730,8 @@ class DataFilesControllerTest < ActionController::TestCase
 
     patch :manage_update, params: {id: data_file,
                                    data_file: {
-                                       creator_ids: [other_creator.id],
-                                       project_ids: [proj1.id, proj2.id]
+                                     creator_ids: [other_creator.id],
+                                     project_ids: [proj1.id, proj2.id]
                                    },
                                    policy_attributes: {access_type: Policy::VISIBLE, permissions_attributes: {'1' => {contributor_type: 'Person', contributor_id: other_person.id, access_type: Policy::MANAGING}}
                                    }}

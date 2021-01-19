@@ -29,7 +29,8 @@
   <% end %>
 <% end %>
 
-<% if params[:GALAXY_URL] && asset.is_downloadable?  && can_download_asset?(asset, params[:code])%>
+<!--  Currently only support public accessible assets -->
+<% if params[:GALAXY_URL] && asset.can_download?(nil) %>
   <%= download_or_galaxy_button asset, galaxize_resource_path(asset, params[:code], params[:GALAXY_URL]), nil, :class => 'btn btn-default' %>
 <% end %>
 
