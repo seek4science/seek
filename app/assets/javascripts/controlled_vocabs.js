@@ -33,7 +33,12 @@ function addNewTermRow() {
 }
 
 function clearAllTerms() {
-    $j('#new-terms tr.sample-cv-term').remove();
+    $j('#new-terms tr.sample-cv-term input.destroy-attribute').each(function() {
+        if (!$j(this).is(':checked')) {
+            $j(this).attr('checked',true);
+            $j(this).trigger('change');
+        }
+    });
 }
 
 function initialiseCVForm(fetch_ajax_path) {
