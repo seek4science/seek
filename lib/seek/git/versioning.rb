@@ -33,7 +33,7 @@ module Seek
             end
 
             def git_version_attributes
-              (@git_version_attributes || {}).with_indifferent_access.slice(:name, :description, :target, :root_path, :git_repository_remote).reverse_merge(default_git_version_attributes)
+              (@git_version_attributes || {}).with_indifferent_access.slice(:name, :description, :ref, :root_path, :git_repository_id).reverse_merge(default_git_version_attributes)
             end
 
             def default_git_version_attributes

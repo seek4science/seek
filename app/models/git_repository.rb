@@ -48,29 +48,17 @@ class GitRepository < ApplicationRecord
                      end
   end
 
-  def find_remote_ref(ref)
-    remote_refs.each_value do |refs|
-      refs.each do |val|
-        return val[:sha] if ref == 'HEAD' && val[:default]
-        return val[:sha] if val[:ref] == ref
-      end
-    end
-
-    raise 'Ref not found!'
-  end
-
   # Return the commit SHA for the given ref.
-  # If local, fetch from the git db; if it's a remote repo, fetch using `ls-remote` to get an up-to-date reference
   def resolve_ref(ref)
-    if remote?
-      find_remote_ref(ref)
-    else
-      git_base.ref(ref)&.target
-    end
+    git_base.ref(ref)&.target&.oid
   end
 
   def remote?
     remote.present?
+  end
+
+  def queue_fetch
+    RemoteGitFetchJob.perform_later(self)
   end
 
   private
@@ -81,6 +69,6 @@ class GitRepository < ApplicationRecord
 
   def setup_remote
     git_base.add_remote('origin', remote)
-    RemoteGitFetchJob.perform_later(self)
+    queue_fetch
   end
 end

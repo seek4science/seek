@@ -705,7 +705,8 @@ SEEK::Application.routes.draw do
 
   resources :git_repositories do
     member do
-      get :fetching_status
+      get :select_ref
+      get :fetch_status
     end
   end
 
