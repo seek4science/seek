@@ -13,6 +13,18 @@
   </div>
 
   <%= panel('Ontology') do %>
+
+    <div class="help-block">
+      You can, optionally, populate the terms from an ontology available from the <%= link_to('Ontology Lookup Service','https://www.ebi.ac.uk/ols/index',target: :_blank) %>.
+      To do so, select the ontology below, and then choose the root term - from which itself and all children will be added to the terms. You can choose the root term by following the
+      link provide to browse the ontology.
+      <br/>
+      Then click Fetch to populate the terms below. Note that for a large tree this can take several minutes. Afterwards you can remove or tweak individual terms, or add additional terms.
+      <br/>
+      If you wish to generate an Controlled Vocabularly for an ontology that isn't available on the Ontology Lookup Service, then please contact us using the
+      <%= link_to 'Feedback Form',feedback_home_path %>.
+    </div>
+
     <div class="form-group">
       <label>Ontology</label>
       <%= f.select :source_ontology, ebi_ontology_choices, { include_blank: 'No Ontology' }, class: 'form-control' -%>
