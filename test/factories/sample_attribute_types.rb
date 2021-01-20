@@ -105,3 +105,13 @@ end
 Factory.define(:sample_controlled_vocab, class: SampleControlledVocab) do |f|
   f.sequence(:title) { |n| "sample controlled vocab #{n}" }
 end
+
+Factory.define(:ontology_sample_controlled_vocab, parent: :sample_controlled_vocab) do |f|
+  f.source_ontology 'http://ontology.org'
+  f.ols_root_term_uri 'http://ontology.org/#parent'
+  f.after_build do |vocab|
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Parent',iri:'http://ontology.org/#parent',parent_iri:'')
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Mother',iri:'http://ontology.org/#mother',parent_iri:'http://ontology.org/#parent')
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Father',iri:'http://ontology.org/#father',parent_iri:'http://ontology.org/#parent')
+  end
+end
