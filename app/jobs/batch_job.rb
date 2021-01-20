@@ -5,9 +5,8 @@ class BatchJob < ApplicationJob
       begin
         perform_job(item)
       rescue Exception => exception
-        raise exception if Rails.env.test?
         unless item.respond_to?(:destroyed?) && item.destroyed?
-          self.class.report_exception(exception, nil, { item: item })
+          report_exception(exception, nil, { item: item })
         end
       end
     end
