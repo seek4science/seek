@@ -661,12 +661,10 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'should show galaxy button if the link is redirected from galaxy and only when datafiles are publicly accessible'  do
 
-    disable_authorization_checks { DataFile.all.each { |df| df.destroy } }
+    disable_authorization_checks { DataFile.delete_all }
 
     galaxy_url = 'http://somegalaxy.com/tool_runner?tool_id=ds_seek_test'
     get :index,params: { GALAXY_URL:galaxy_url}
-
-    puts "downloadable datafiles created by fixtures:"+DataFile.all.select {|df| df.can_download?(nil)}.size.to_s
 
     assert_response :success
     assert_select 'a', text: /Send to Galaxy/, count: 0
@@ -683,7 +681,6 @@ class DataFilesControllerTest < ActionController::TestCase
         end
       end
     end
-    puts "downloadable datafiles after a public datafile is created:"+DataFile.all.select {|df| df.can_download?(nil)}.size.to_s
 
     get :index,params: { GALAXY_URL:galaxy_url}
     assert_response :success
@@ -693,13 +690,11 @@ class DataFilesControllerTest < ActionController::TestCase
     assigns(:data_file).policy.access_type = Policy::VISIBLE
     assigns(:data_file).save!
 
-    puts "downloadable datafiles after the public datafile changed its policy to VISIBLE:"+DataFile.all.select {|df| df.can_download?(nil)}.size.to_s
     get :index,params: { GALAXY_URL:galaxy_url}
     assert_response :success
     assert_select 'a', text: /Send to Galaxy/, count: 0
 
     logout
-    puts "downloadable datafiles after user logged out:"+DataFile.all.select {|df| df.can_download?(nil)}.size.to_s
     get :index,params: { GALAXY_URL:galaxy_url}
     assert_response :success
     assert_select 'a', text: /Send to Galaxy/, count: 0
