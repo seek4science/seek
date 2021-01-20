@@ -1,4 +1,4 @@
-var fetch_ajax_path;
+<% environment.context_class.instance_eval { include Rails.application.routes.url_helpers } %>
 
 function handleOntologyTermsJSONResponse(json) {
     $j.each(json, function(key,term){
@@ -47,8 +47,7 @@ function reportFetchError(json) {
     $j('div#fetch-error-message').show();
 }
 
-function initialiseCVForm(fetch_ajax_path) {
-    fetch_ajax_path = fetch_ajax_path;
+function initialiseCVForm() {
 
     $j('#add-term').click(function () {
         addNewTermRow();
@@ -112,7 +111,7 @@ function initialiseCVForm(fetch_ajax_path) {
         var ontology_id=$j('select#sample_controlled_vocab_source_ontology').val();
         var root_uri=$j('#sample_controlled_vocab_ols_root_term_uri').val();
 
-        $j.ajax({ url: fetch_ajax_path,
+        $j.ajax({ url: '<%= fetch_ols_terms_sample_controlled_vocabs_path %>',
             dataType: "json",
             data:{
                 source_ontology_id: ontology_id,
