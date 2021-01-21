@@ -3,6 +3,7 @@
 <%
   # The user can keep a custom set of columns for each resource class
   resource = objects[0]
+  requiredColView = resource.columns_required
   defaultColView = resource.columns_default
 
   # # Update stored column names
@@ -12,14 +13,14 @@
 
   # Set columns to show, if none are selected, show defaults
   if session.has_key?("tableview_" + resource.class.name) && !session["tableview_"+resource.class.name].empty?
-    tableview_columns = session["tableview_"+resource.class.name]
+    tableview_columns = requiredColView + session["tableview_"+resource.class.name]
   else
-    tableview_columns = defaultColView
+    tableview_columns = requiredColView + defaultColView
   end
 
   # Prepare available columns for this particular resource type
-  # First show the shown columns in order, and then the available ones
-  availableColView = tableview_columns + (resource.columns_allowed - tableview_columns)
+  # First show the shown columns in order, and then the available ones. Required columns are never given as an option
+  availableColView = tableview_columns + (resource.columns_allowed - tableview_columns) - requiredColView
   # availableColView = resource.columns_allowed
 
 %>

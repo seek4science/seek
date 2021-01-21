@@ -134,10 +134,10 @@ class Project < ApplicationRecord
     
   # Returns the columns to be shown on the table view for the resource
   def columns_default
-    ['title'] + super + ['web_page']
+    super + ['web_page']
   end
   def columns_allowed
-    super + ['title','web_page','wiki_page','site_credentials','start_date','end_date']
+    super + ['web_page','wiki_page','site_credentials','start_date','end_date']
   end
 
   # returns people belong to the admin defined seek 'role' for this project

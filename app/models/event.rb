@@ -53,7 +53,7 @@ class Event < ApplicationRecord
 
   # Returns the columns to be shown on the table view for the resource
   def columns_default
-    ['title'] + super + ['start_date','end_date','city','country']
+    super + ['start_date','end_date','city','country']
   end
   def columns_allowed
     super + ['start_date','end_date','address','city','country','url','title','deleted_contributor']
