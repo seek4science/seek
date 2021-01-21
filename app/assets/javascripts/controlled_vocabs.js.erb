@@ -89,6 +89,7 @@ function initialiseCVForm() {
     $j('select#sample_controlled_vocab_source_ontology').on('change', function() {
         var selected = this.selectedOptions[0];
         if (selected.value == "") {
+            $j('#sample_controlled_vocab_ols_root_term_uri').val('');
             $j('#ontology-root-uri').hide();
         }
         else {
