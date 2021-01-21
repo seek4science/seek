@@ -235,9 +235,10 @@ class Project < ApplicationRecord
   end
 
   def can_delete?(user = User.current_user)
-    user && user.is_admin? && work_groups.collect(&:people).flatten.empty? &&
-      investigations.empty? && studies.empty? && assays.empty? && assets.empty? &&
-      samples.empty? && sample_types.empty?
+    user && can_manage?(user) &&
+      # work_groups.collect(&:people).flatten.empty? &&
+        investigations.empty? && studies.empty? && assays.empty? && assets.empty? &&
+        samples.empty? && sample_types.empty?
   end
 
   def self.can_create?(user = User.current_user)
