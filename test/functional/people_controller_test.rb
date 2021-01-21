@@ -1171,6 +1171,40 @@ class PeopleControllerTest < ActionController::TestCase
     assert_equal 'Testo' ,notif_params[:other_institutions]
   end
 
+  test 'result view selection via params' do
+    with_config_value(:results_per_page, { 'people' => 3 }) do
+      get :index, params: { view: 'table' }
+      assert_response :success
+      assert_select '.list_items_container tbody tr', count: 3
+    end
+    # no view param will resort to the last used one
+    with_config_value(:results_per_page, { 'people' => 3 }) do
+      get :index
+      assert_response :success
+      assert_select '.list_items_container tbody tr', count: 3
+    end
+    with_config_value(:results_per_page, { 'people' => 3 }) do
+      get :index, params: { view: 'condensed' }
+      assert_response :success
+      assert_select '.list_items_container .collapse', count: 3
+    end
+  end
+
+  test 'table view column selection' do
+    # Title is always added, and there is an extra header for dropdown selection
+    with_config_value(:results_per_page, { 'people' => 3 }) do
+      get :index, params: { view: 'table',table_cols:'created_at,first_name,last_name,description,email' }
+      assert_response :success
+      assert_select '.list_items_container thead th', count: 7
+    end
+    # When no columns are specified, resort to default, so it's never empty
+    with_config_value(:results_per_page, { 'people' => 3 }) do
+      get :index, params: { view: 'table',table_cols:'' }
+      assert_response :success
+      assert_select '.list_items_container thead th',  minimum: 3
+    end
+  end
+
   def edit_max_object(person)
     Factory :expertise, value: 'golf', annotatable: person
     Factory :expertise, value: 'fishing', annotatable: person

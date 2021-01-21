@@ -119,7 +119,7 @@ class ApplicationController < ActionController::Base
   def page_and_sort_params
     permitted = Seek::Filterer.new(controller_model).available_filter_keys.flat_map { |p| [p, { p => [] }] }
     permitted_filter_params = { filter: permitted }
-    params.permit(:page, :sort, :order, :view, permitted_filter_params)
+    params.permit(:page, :sort, :order, :view, :table_cols, permitted_filter_params)
   end
 
   helper_method :page_and_sort_params

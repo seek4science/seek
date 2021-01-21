@@ -44,7 +44,7 @@ class Organism < ApplicationRecord
 
   # Returns the columns to be shown on the table view for the resource
   def columns_default
-    super + ['title']
+    super
   end
   def columns_allowed
     super + ['title']

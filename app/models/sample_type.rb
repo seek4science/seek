@@ -75,10 +75,10 @@ class SampleType < ApplicationRecord
 
   # Returns the columns to be shown on the table view for the resource
   def columns_default
-    super + ['title','uploaded_template']
+    super + ['uploaded_template']
   end
   def columns_allowed
-    super + ['title','uploaded_template','deleted_contributor']
+    super + ['uploaded_template','deleted_contributor']
   end
 
   # fixes inconsistencies following form submission that could cause validation errors

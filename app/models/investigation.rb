@@ -26,10 +26,10 @@ class Investigation < ApplicationRecord
 
   # Returns the columns to be shown on the table view for the resource
   def columns_default
-    super + ['title']
+    super
   end
   def columns_allowed
-    super + ['title','other_creators','deleted_contributor']
+    super + ['other_creators','deleted_contributor']
   end
 
   def clone_with_associations
