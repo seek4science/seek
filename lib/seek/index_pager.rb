@@ -83,6 +83,24 @@ module Seek
 
     private
 
+    # Takes into account current view, and returns the appropriate max results per page
+    def get_results_per_page
+      condensed_view_count = false
+
+      # Check current view from param, or on its absence from session
+      if (params.has_key?(:view) && params[:view]!="default")||
+          (!params.has_key?(:view) && session.has_key?(:view) && session[:view]!="default")
+          condensed_view_count = Seek::Config.results_per_page_default_condensed
+      end
+
+      # Priorities for the results per page value
+      # per_page param > controller specific config > specific view default > general default
+      params[:per_page]&.to_i ||
+          Seek::Config.results_per_page_for(controller_name) ||
+          condensed_view_count ||
+          Seek::Config.results_per_page_default
+    end
+
     def assign_index_variables
       # Parent resource
       get_parent_resource
@@ -91,9 +109,7 @@ module Seek
       @page = page_and_sort_params[:page]
       @page ||= 'all' if json_api_request?
       @page ||= '1'
-      @per_page = params[:per_page]&.to_i ||
-          Seek::Config.results_per_page_for(controller_name) ||
-          Seek::Config.results_per_page_default
+      @per_page = get_results_per_page
 
       # Order
       @order = if page_and_sort_params[:sort]

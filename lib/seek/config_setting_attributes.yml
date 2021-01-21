@@ -182,6 +182,8 @@ filtering_enabled:
 sorting:
 results_per_page_default:
   convert: :to_i
+results_per_page_default_condensed:
+  convert: :to_i
 results_per_page:
 cwl_viewer_url:
 # Types enabled
