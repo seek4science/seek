@@ -531,8 +531,9 @@ SEEK::Application.routes.draw do
 
   resources :workflows, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
     collection do
-      post :create_content_blob
-      post :create_ro_crate
+      post :create_from_ro_crate
+      post :create_from_files
+      post :create_from_git
       get :provide_metadata
       post :metadata_extraction_ajax
       post :create_metadata

@@ -1,19 +1,18 @@
 class WorkflowsController < ApplicationController
-  
   include Seek::IndexPager
-
   include Seek::AssetsCommon
 
   before_action :workflows_enabled?
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview, :update_annotations_ajax]
   before_action :find_display_asset, only: [:show, :download, :diagram, :ro_crate]
-  before_action :login_required, only: [:create, :create_version, :new_version, :create_content_blob, :create_ro_crate, :create_metadata, :metadata_extraction_ajax, :provide_metadata]
+  before_action :login_required, only: [:create, :create_version, :new_version,
+                                        :create_from_files, :create_from_ro_crate,
+                                        :create_metadata, :provide_metadata]
+  before_action :find_or_initialize_workflow, only: [:create_from_files, :create_from_ro_crate]
 
   include Seek::Publishing::PublishingCommon
-
   include Seek::Doi::Minting
-
   include Seek::IsaGraphExtensions
   include RoCrateHandling
 
@@ -65,98 +64,65 @@ class WorkflowsController < ApplicationController
     end
   end
 
-  def clear_session_info
-    session.delete(:uploaded_content_blob_id)
-    session.delete(:metadata)
-    session.delete(:workflow_id)
-    session.delete(:revision_comments)
-  end
-
-  def create_content_blob
-    clear_session_info
-    # This Workflow instance is just to make `handle_upload_data` work. It is not persisted beyond this action.
-    @workflow = Workflow.new(workflow_class_id: params[:workflow_class_id])
+  # Takes a single RO-Crate zip file
+  def create_from_ro_crate
     respond_to do |format|
-      if handle_upload_data && @workflow.content_blob.save
-        session[:uploaded_content_blob_id] = @workflow.content_blob.id
-        session[:workflow_id] = params[:workflow_id]
-        session[:revision_comments] = params[:revision_comments]
-        format.html
+      if handle_upload_data(@workflow.persisted?) && @workflow.content_blob.save && extract_metadata
+        format.html { render :provide_metadata }
       else
         format.html { render action: :new, status: :unprocessable_entity }
       end
     end
   end
 
-  def create_ro_crate
-    clear_session_info
-    # This Workflow instance is just to make `handle_upload_data` work. It is not persisted beyond this action.
+  # Creates an RO-Crate zip file from several files
+  def create_from_files
     @workflow = Workflow.new(workflow_class_id: params[:workflow_class_id])
     @crate_builder = WorkflowCrateBuilder.new(ro_crate_params)
     @crate_builder.workflow_class = @workflow.workflow_class
     blob_params = @crate_builder.build
-    content_blob = @workflow.build_content_blob(blob_params)
+    @workflow.build_content_blob(blob_params)
 
     respond_to do |format|
-      if blob_params && content_blob.save
-        session[:uploaded_content_blob_id] = content_blob.id
-        session[:workflow_id] = params[:workflow_id]
-        session[:revision_comments] = params[:revision_comments]
-        format.html { render action: :create_content_blob }
+      if blob_params && @workflow.content_blob.save && extract_metadata
+        format.html { render :provide_metadata }
       else
         format.html { render action: :new, status: :unprocessable_entity }
       end
     end
   end
 
-  # AJAX call to trigger metadata extraction, and pre-populate the associated @workflow
-  def metadata_extraction_ajax
-    session[:metadata] = { workflow_class_id: params[:workflow_class_id] }
-    critical_error_msg = nil
-
+  def extract_metadata
     begin
-      if params[:content_blob_id] == session[:uploaded_content_blob_id].to_s
-        content_blob = ContentBlob.find_by_id(params[:content_blob_id])
-        # This Workflow instance is just to get the extractor. It is not persisted beyond this action.
-        workflow = Workflow.new(workflow_class_id: params[:workflow_class_id], content_blob: content_blob)
-        extractor = workflow.extractor
-        retrieve_content content_blob # Hack
-        session[:metadata] = session[:metadata].merge(extractor.metadata)
-      else
-        critical_error_msg = "The file that was requested to be processed doesn't match that which had been uploaded."
-      end
+      extractor = @workflow.extractor
+      retrieve_content @workflow.content_blob # Hack
+      @metadata = extractor.metadata
+      @warnings ||= @metadata.delete(:warnings) || []
+      @errors ||= @metadata.delete(:errors) || []
+      @workflow.assign_attributes(@metadata)
     rescue StandardError => e
       raise e unless Rails.env.production?
       Seek::Errors::ExceptionForwarder.send_notification(e, data: {
-          message: "Problem attempting to extract metadata for content blob #{params[:content_blob_id]}" })
-      critical_error_msg = 'An unexpected error occurred whilst extracting workflow metadata.'
+        message: "Problem attempting to extract metadata for content blob #{params[:content_blob_id]}" })
+      flash[:error] = 'An unexpected error occurred whilst extracting workflow metadata.'
+      return false
     end
 
-    respond_to do |format|
-      if critical_error_msg
-        format.js { render plain: critical_error_msg, status: :unprocessable_entity }
-      else
-        format.js { render plain: 'done', status: :ok }
-      end
-    end
+    true
   end
-
-  # Displays the form Wizard for providing the metadata for the workflow
-  def provide_metadata
-    metadata = session[:metadata]
-    @warnings ||= metadata.delete(:warnings) || []
-    @errors ||= metadata.delete(:errors) || []
-    if session[:workflow_id].present?
-      @workflow = Workflow.find(session[:workflow_id])
-      @workflow.assign_attributes(metadata)
-    else
-      @workflow ||= Workflow.new(metadata)
-    end
-
-    respond_to do |format|
-      format.html
-    end
-  end
+  #
+  # # Displays the form Wizard for providing the metadata for the workflow
+  # def provide_metadata
+  #   extract_metadata
+  #   metadata = @metadata
+  #   @warnings ||= metadata.delete(:warnings) || []
+  #   @errors ||= metadata.delete(:errors) || []
+  #   @workflow.assign_attributes(metadata)
+  #
+  #   respond_to do |format|
+  #     format.html
+  #   end
+  # end
 
   # Receives the submitted metadata and registers the workflow
   def create_metadata
@@ -164,19 +130,13 @@ class WorkflowsController < ApplicationController
     update_sharing_policies(@workflow)
     filter_associated_projects(@workflow)
 
-    # check the content blob id matches that previously uploaded and recorded on the session
-    uploaded_blob_matches = (params[:content_blob_id].to_s == session[:uploaded_content_blob_id].to_s)
-    @workflow.errors.add(:base, "The file uploaded doesn't match") unless uploaded_blob_matches
-
-    #associate the content blob with the workflow
-    blob = ContentBlob.find(params[:content_blob_id])
+    blob = ContentBlob.find_by_uuid(params[:content_blob_uuid])
+    @workflow.errors.add(:content_blob, 'was not found') unless blob
     @workflow.content_blob = blob
     update_annotations(params[:tag_list], @workflow) if params.key?(:tag_list)
 
-    if uploaded_blob_matches && @workflow.save && blob.save
+    if blob && @workflow.save && blob.save
       update_relationships(@workflow, params)
-
-      clear_session_info
 
       respond_to do |format|
         flash[:notice] = "#{t('workflow')} was successfully uploaded and saved." if flash.now[:notice].nil?
@@ -199,12 +159,9 @@ class WorkflowsController < ApplicationController
     update_sharing_policies(@workflow)
     filter_associated_projects(@workflow)
 
-    # check the content blob id matches that previously uploaded and recorded on the session
-    uploaded_blob_matches = (params[:content_blob_id].to_s == session[:uploaded_content_blob_id].to_s)
-    @workflow.errors.add(:base, "The file uploaded doesn't match") unless uploaded_blob_matches
-
     #associate the content blob with the workflow
-    blob = ContentBlob.find(params[:content_blob_id])
+    blob = ContentBlob.find_by_uuid(params[:content_blob_uuid])
+    @workflow.errors.add(:content_blob, 'was not found') unless blob
     new_version = @workflow.version += 1
     old_content_blob = @workflow.content_blob
     blob.asset_version = new_version
@@ -213,10 +170,8 @@ class WorkflowsController < ApplicationController
     old_content_blob.update_column(:asset_id, @workflow.id) if old_content_blob
     update_annotations(params[:tag_list], @workflow) if params.key?(:tag_list)
 
-    if uploaded_blob_matches && @workflow.save_as_new_version(session[:revision_comments]) && blob.save
+    if blob && @workflow.save_as_new_version(params[:revision_comments]) && blob.save
       update_relationships(@workflow, params)
-
-      clear_session_info
 
       respond_to do |format|
         flash[:notice] = "#{t('workflow')} was successfully uploaded and saved." if flash.now[:notice].nil?
@@ -262,8 +217,16 @@ class WorkflowsController < ApplicationController
 
   private
 
+  def find_or_initialize_workflow
+    if params[:workflow_id]
+      @workflow = Workflow.find(params[:workflow_id])
+    else
+      @workflow = Workflow.new(workflow_class_id: params[:workflow_class_id])
+    end
+  end
+
   def retrieve_content(blob)
-    if !blob.file_exists?
+    unless blob.file_exists?
       blob.remote_content_fetch_task&.cancel
       blob.retrieve
     end
