@@ -12,6 +12,11 @@
     <%= f.text_field :title, :class => 'form-control', :placeholder => 'Controlled vocabulary name' %>
   </div>
 
+  <div class="form-group">
+    <label>Description</label>
+    <%= f.text_area :description, :class=>"form-control rich-text-edit short-editor" -%>
+  </div>
+
   <%= panel('Ontology') do %>
 
     <div class="help-block">

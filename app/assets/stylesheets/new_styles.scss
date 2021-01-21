@@ -1056,9 +1056,14 @@ span.disabled {
 .btn.disabled img.icon {
   opacity: 0.4;
 }
+
+/* Rich editor box */
+.short-editor ~ .CodeMirror,
+.short-editor ~ .CodeMirror .CodeMirror-scroll {
+  min-height:4em;
+}
+
 /* controlled vocab term table */
-
-
 #controlled-vocab-terms-fixed {
   display:block;
   overflow-y: auto;
