@@ -41,6 +41,7 @@ def load_seek_config_defaults!
   Seek::Config.default :publish_button_enabled, true
   Seek::Config.default :auth_lookup_enabled,true
   Seek::Config.default :external_search_enabled, true
+  Seek::Config.default :project_single_page_enabled, false
   Seek::Config.default :project_browser_enabled,false
   Seek::Config.default :experimental_features_enabled,false
   Seek::Config.default :pdf_conversion_enabled,true
