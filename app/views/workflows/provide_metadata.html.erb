@@ -1,9 +1,9 @@
 <h1>New <%= t('workflow') %></h1>
 
 <%= form_tag(@workflow.new_record? ? create_metadata_workflows_path : create_version_metadata_workflow_path(@workflow), multipart: true) do -%>
-  <%= hidden_field_tag 'content_blob_uuid', @workflow.content_blob.uuid %>
-  <%= hidden_field_tag 'workflow[git_version_attributes][git_repository_id]', params[:git_repository_id] %>
-  <%= hidden_field_tag 'workflow[git_version_attributes][ref]', params[:ref] %>
+  <%= hidden_field_tag 'content_blob_uuid', @workflow.content_blob&.uuid %>
+  <%= hidden_field_tag 'workflow[git_version_attributes][git_repository_id]', @workflow.git_version_attributes[:git_repository_id] %>
+  <%= hidden_field_tag 'workflow[git_version_attributes][ref]', @workflow.git_version_attributes[:ref] %>
   <%= hidden_field_tag 'revision_comments', params[:revision_comments] %>
 
   <div class="asset_form">

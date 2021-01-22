@@ -92,6 +92,17 @@ class WorkflowsController < ApplicationController
     end
   end
 
+  # Takes a remote Git repository and target ref
+  def create_from_git
+    @workflow = Workflow.new(git_version_attributes: { git_repository_id: params[:git_repository_id], ref: params[:ref] })
+    @metadata = {}
+    @warnings ||= @metadata.delete(:warnings) || []
+    @errors ||= @metadata.delete(:errors) || []
+    respond_to do |format|
+      format.html { render :provide_metadata }
+    end
+  end
+
   def extract_metadata
     begin
       extractor = @workflow.extractor
@@ -134,8 +145,15 @@ class WorkflowsController < ApplicationController
     @workflow.errors.add(:content_blob, 'was not found') unless blob
     @workflow.content_blob = blob
     update_annotations(params[:tag_list], @workflow) if params.key?(:tag_list)
+    if params[:content_blob_uuid].present?
+      valid = blob && @workflow.save && blob.save
+    elsif @workflow.git_version_attributes.present?
+      valid = @workflow.save
+    else
+      valid = false
+    end
 
-    if blob && @workflow.save && blob.save
+    if valid
       update_relationships(@workflow, params)
 
       respond_to do |format|

@@ -30,7 +30,8 @@
     </div>
   </div>
 <% else %>
-  <%= form_tag(polymorphic_path([:new, params[:resource_type]])) do %>
+  <%= form_tag(polymorphic_path([:create_from_git, params[:resource_type].pluralize])) do %>
+    <%= hidden_field_tag :git_repository_id, @git_repository.id %>
     <%= render partial: 'ref_form', locals: { git_repository: @git_repository } %>
     <%= create_button class: 'btn btn-primary'-%>
   <% end %>
