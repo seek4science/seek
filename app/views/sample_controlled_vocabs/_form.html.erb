@@ -79,7 +79,7 @@
                     <label class="btn btn-danger">
                       Remove
                       <%= check_box_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][#{index}][_destroy]", '1', false,
-                                        :class => 'destroy-attribute', :autocomplete => 'off' %>
+                                        :class => 'destroy-attribute', :autocomplete => 'off',id:"sample_controlled_vocab-checkbox[sample_controlled_vocab_terms_attributes][#{index}][_destroy]" %>
                     </label>
                   </div>
 
@@ -129,7 +129,7 @@
         <label class="btn btn-danger">
           Remove
           <%= check_box_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][--index--][_destroy]", '1', false,
-                            :class => 'destroy-attribute', :autocomplete => 'off' %>
+                            :class => 'destroy-attribute', :autocomplete => 'off',id:"sample_controlled_vocab-checkbox[sample_controlled_vocab_terms_attributes][--index--][_destroy]" %>
         </label>
       </div>
 
