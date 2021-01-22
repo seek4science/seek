@@ -153,4 +153,14 @@ module SamplesHelper
     html.html_safe
   end
 
+  def ols_ontology_link(ols_id)
+    link = "https://www.ebi.ac.uk/ols/ontologies/#{ols_id}"
+    link_to(link,link,target: :_blank)
+  end
+
+  def ols_root_term_link(ols_id, term_uri)
+    ols_link = "https://www.ebi.ac.uk/ols/ontologies/#{ols_id}/terms?iri=#{term_uri}"
+    link_to(term_uri, ols_link, target: :_blank)
+  end
+
 end
