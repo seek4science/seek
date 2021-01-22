@@ -116,7 +116,6 @@ class SinglePagesController < ApplicationController
         source_sample_type = SampleType.find(flowchart.source_sample_type_id)
         source_sample_type_attributes = source_sample_type.sample_attributes.select(:required, :original_accessor_name,
            :sample_type_id, :id, :sample_controlled_vocab_id)
-        assay_sample_type = SampleType.find(assay.sample_type_id)
         all_samples = load_samples(assay, source_sample_type)
         rest_headers = load_headers(assay)
         all_headers = source_sample_type_attributes + rest_headers
