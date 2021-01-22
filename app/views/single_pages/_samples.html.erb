@@ -8,9 +8,10 @@
     <a class="btn btn-primary btn-sm pull-right" onclick="saveSamples()">Save</a>
     <div class="sampleTblContainer">
         <table>
-            <table class="table tableXs sampleTable">
+            <table style="width: auto;" class="table tableXs sampleTable">
                 <thead class="thead-dark">
-                    <tr></tr>
+                    <tr class="topHeader"></tr>
+                    <tr class="downHeader"></tr>
                 </thead>
                 <tbody>
                 </tbody>
@@ -35,6 +36,7 @@
             url: `/single_pages/${pid}/sample_table/${selectedItem.id}`,
             success: res => {
                 if (res.data) {
+                    console.log(res.data)
                     // Remove link_id for now --> Is it needed in the future??
                     // const header = $j.grep(res.data.header, (n, i) => n.original_accessor_name != "link_id")
                     loadSampleTableHeader(res.data.header)
@@ -51,7 +53,7 @@
     }
 
     function loadSampleTableHeader(headers) {
-        const headTr = $j('.sampleTable thead tr')
+        const headTr = $j('.sampleTable .downHeader')
         // Adds the select column
         headTr.empty().append("<th><input id='selectAll' onClick='selectAll(this)' type='checkbox'/></th>")
         $j(headers).each((i, x) => {
@@ -143,16 +145,17 @@
     function validateTable() {
         // Checks which cells are rquired and not yet filled
         let valid = true
-        const required = $j.map($j('.sampleTable thead tr th').get(), (x, i) => !x.children.length > 0)
+        const required = $j.map($j('.sampleTable .downHeader th').get(), (x, i) => !x.children.length > 0)
         const rows = $j('.sampleTable tbody tr').get()
         $j.each(rows, (i, row) => {
             if (!$j(row).attr("delete")) {
                 const tds = $j(row).find('td').get()
                 $j.each(tds, (j, td) => {
                     if (required[j] && $j(td).html() == "") {
-                        // $j(td).css('border-bottom', '2px solid red');
-                        $j(td).css('background-color', '#e8c5c3');
+                        $j(td).addClass('errorCell');
                         valid = false
+                    } else {
+                        $j(td).removeClass('errorCell');
                     }
                 })
             }
@@ -167,7 +170,7 @@
         }
 
         // Get the new list of sample types and samples with their attributes
-        let header = $j('.sampleTable thead tr th')
+        let header = $j('.sampleTable .downHeader th')
         const headerValue = $j.map(header, (x, i) => $j(x).html().replace(/<(?:.|\n)*?>/gm, '').trim())
         const _sampleTypes = $j.map(header, (x, i) => ({
             sampleTypeId: $j(x).attr("data-sampletypeid"),
@@ -387,7 +390,7 @@
         let rowCount = $j(table).rowcount() + 1;
         let newRow = "<td><input type='checkbox'/></td>";
         let rowId = uniqId()
-        $j(table + ' thead tr').find('th').each(function(k, v) {
+        $j(table + ' .downHeader').find('th').each(function(k, v) {
             if (k > 0) // Skips the select column
                 newRow += $j.trim($j(v).text().toLowerCase()) == "link_id" ? `<td>${rowId}</td>` :
                 '<td contenteditable></td>'
@@ -474,9 +477,9 @@
         let action =
             "<a href='' onclick='remove_tr(event)' class=''> <span class='glyphicon glyphicon-trash'></span></a>"
         $j(tblClass).each(function(i, t) {
-            if ($j(t).find('thead tr th:last').attr("class") != 'rem') $j(t).children('thead').children(
+            if ($j(t).find('.downHeader th:last').attr("class") != 'rem') $j(t).children('thead').children(
                 'tr').append("<th class='rem' style='width:50px;'></th>")
-            let headerCount = $j(t).find('thead tr th').length
+            let headerCount = $j(t).find('.downHeader th').length
             $j(t).children('tbody').children('tr').each(function(i, g) {
                 if ($j(g).find('td').length == headerCount) {
                     $j(g).find('td:last').html(action)
@@ -535,9 +538,14 @@
     })
 
     function hideAttributes() {
+        let colSpan = -1
+        let itemCounter = 0
         const hiddenAttrs = manageVisibility("get").toString()
         const hiddenSampleTypes = manageVisibility("get", null, "sampleTypes").toString()
-        $j.each($j('.sampleTable thead tr th'), (i, th) => {
+        $j('.sampleTable .topHeader').empty()
+        $j('.sampleTable .topHeader').append(`<th colspan=1></th>`)
+
+        $j.each($j('.sampleTable .downHeader th'), (i, th) => {
             const title = $j.trim($j(th).html().replace(/<a( |>).*?<\/a>/gi, ""))
             const sampleTypeId = $j(th).attr("data-sampletypeid")
             if (hiddenAttrs.includes(title) || (hiddenSampleTypes.includes(sampleTypeId) && title != "link_id")) { // Check with TH hidden list
@@ -546,23 +554,23 @@
                 });
                 $j(th).hide()
             } else {
+                colSpan++
                 $j.each($j('.sampleTable tbody tr'), (i, tr) => {
                     $j(tr).find(`td:eq(${$j(th).index()})`).show();
                 });
                 $j(th).show()
             }
             if (title == "link_id") {
-                if (!$j(th).hasClass("initialized")) {
-                    $j(th).addClass("initialized")
-                    $j(th).addClass("tableSeparate")
-                    // $j(th).css("position", "relative")
-                    const sampleTypeId = $j(th).attr("data-sampletypeid")
-                    $j(th).append(`<a onclick="toggleSampleType(${sampleTypeId})" style='text-decoration:none'><i style='color:black;font-size:14px;display:block;cursor:pointer'></i></a>`)
-                    $j(th).css("width", "20px")
-                    // $j(th).append("<p style='writing-mode: vertical-rl;color:black; display:block; position:absolute'>  Source sample </p>")
-                }
-                const status = hiddenSampleTypes.includes(sampleTypeId) ? "open" : "close"
-                $j(th).find("i").attr('class', `glyphicon glyphicon-eye-${status}`)
+                $j(th).addClass("tableSeparate")
+                const sampleTypeId = $j(th).attr("data-sampletypeid")
+
+                $j('.sampleTable .topHeader').append(`<th class="headerSeparator" colspan=${colSpan}><input type='checkbox' onchange="toggleSampleType(${sampleTypeId})"/> ${itemCounter==0?"Source ":"Assay " + itemCounter}</th>`)
+                colSpan = 0
+                itemCounter++
+
+                const status = hiddenSampleTypes.includes(sampleTypeId) ? false : true
+                $j('.sampleTable .topHeader th').eq(itemCounter).find("input").attr('checked', status);
+                // $j(th).find("i").attr('class', `glyphicon glyphicon-eye-${status}`)
                 $j.each($j('.sampleTable tbody tr'), (i, tr) => {
                     $j(tr).find(`td:eq(${$j(th).index()})`).addClass("tableSeparate")
                 });
@@ -571,7 +579,7 @@
     }
 
     function hideOptionalAttrs() {
-        $j.each($j('.sampleTable thead tr th'), (i, th) => {
+        $j.each($j('.sampleTable .downHeader th'), (i, th) => {
             const optional = $j(th).attr("optional")
             const title = $j.trim($j(th).html().replace(/<a( |>).*?<\/a>/gi, ""))
             if (optional == "true") {

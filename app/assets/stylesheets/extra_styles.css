@@ -381,10 +381,22 @@ th {
 
 .tableSeparate {
     color: transparent !important;
-    background-color: white !important;
-    border-right: 2px black dashed !important;
-    border-left: 2px black dashed !important;
+    /* background-color: white !important; */
+    border-right: 1px black dashed !important;
+    border-left: 1px black dashed !important;
     border-top-width: 0 !important;
     border-bottom-width: 0 !important;
-    max-width: 30px !important;
+    max-width: 0 !important;
+    width: 0 !important;
+    padding: 0 !important;
+    background-color:  #f0f0f0  !important
+}
+
+.headerSeparator {
+    border-right: 1px white dashed !important;
+}
+
+.errorCell{
+    background-color: #fffafb;
+    border-bottom: solid 1px #ff0044 !important;
 }
