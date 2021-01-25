@@ -141,7 +141,7 @@ class WorkflowsController < ApplicationController
     update_sharing_policies(@workflow)
     filter_associated_projects(@workflow)
 
-    blob = ContentBlob.find_by_uuid(params[:content_blob_uuid])
+    blob = ContentBlob.where(uuid: params[:content_blob_uuid], asset_id: nil).first
     @workflow.errors.add(:content_blob, 'was not found') unless blob
     @workflow.content_blob = blob
     update_annotations(params[:tag_list], @workflow) if params.key?(:tag_list)
@@ -178,7 +178,7 @@ class WorkflowsController < ApplicationController
     filter_associated_projects(@workflow)
 
     #associate the content blob with the workflow
-    blob = ContentBlob.find_by_uuid(params[:content_blob_uuid])
+    blob = ContentBlob.where(uuid: params[:content_blob_uuid], asset_id: nil).first
     @workflow.errors.add(:content_blob, 'was not found') unless blob
     new_version = @workflow.version += 1
     old_content_blob = @workflow.content_blob
