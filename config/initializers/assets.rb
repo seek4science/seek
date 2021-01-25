@@ -47,6 +47,7 @@ Rails.application.config.assets.precompile += [
     "tablesorter/blue/tablesorter_blue.css",
     "yui/index.css",
     "appended/*.css",
-    "publications"
+    "publications",
+    'controlled_vocabs.js'
 ]
 

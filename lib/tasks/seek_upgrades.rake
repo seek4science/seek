@@ -3,16 +3,18 @@
 require 'rubygems'
 require 'rake'
 
+
 namespace :seek do
   # these are the tasks required for this version upgrade
   task upgrade_version_tasks: %i[
-    environment
+    environment    
     update_samples_json
     migrate_old_jobs
     delete_redundant_jobs
     set_version_visibility
     remove_old_project_join_logs
     fix_negative_programme_role_mask
+    db:seed:sample_attribute_types
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -57,6 +59,7 @@ namespace :seek do
       attributes_for_update = sample_type.sample_attributes.select do |attr|
         attr.accessor_name != attr.original_accessor_name
       end
+      
 
       if attributes_for_update.any?
         # work through each sample
@@ -92,7 +95,7 @@ namespace :seek do
       else
         RdfGenerationQueue.enqueue(item, refresh_dependents: data["refresh_dependents"], queue_job: false) if item
         job.destroy
-      end
+      end      
     end
     queued = (RdfGenerationQueue.count - count)
     RdfGenerationJob.new.queue_job if queued > 0
@@ -165,4 +168,5 @@ namespace :seek do
       person.update_column(:roles_mask,mask)
     end
   end
+  
 end
