@@ -85,13 +85,8 @@ module Seek
 
     # Takes into account current view, and returns the appropriate max results per page
     def get_results_per_page
-      condensed_view_count = false
 
-      # Check current view from param, or on its absence from session
-      if (params.has_key?(:view) && params[:view]!="default")||
-          (!params.has_key?(:view) && session.has_key?(:view) && session[:view]!="default")
-          condensed_view_count = Seek::Config.results_per_page_default_condensed
-      end
+      condensed_view_count = is_condensed_view? ? Seek::Config.results_per_page_default_condensed : false
 
       # Priorities for the results per page value
       # per_page param > controller specific config > specific view default > general default

@@ -718,6 +718,33 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
+  test 'Condensed views should use a different results_per_page default' do
+    with_config_value(:results_per_page_default, 2) do
+      with_config_value(:results_per_page_default_condensed, 3) do
+        # Load a regular default view, and a condensed view, and check that the number of items in each are different
+        get :index
+        assert_response :success
+        assert_equal 2, assigns(:per_page)
+        assert_select '.pagination-container li.active', text: '1'
+        assert_select 'div.list_item_title', count: 2
+
+        get :index, params: { view: 'condensed' }
+        assert_response :success
+        assert_equal 3, assigns(:per_page)
+        assert_select '.pagination-container li.active', text: '1'
+        assert_select '.list_items_container .collapse', count: 3
+
+        
+        get :index, params: { view: 'table' }
+        assert_response :success
+        assert_equal 3, assigns(:per_page)
+        assert_select '.pagination-container li.active', text: '1'
+        assert_select '.list_items_container tbody tr', count: 3
+      end
+
+    end
+  end
+
   test 'people not in projects should be shown in index' do
     person_not_in_project = Factory(:brand_new_person, first_name: 'Person Not In Project', last_name: 'Petersen', updated_at: 1.second.from_now)
     person_in_project = Factory(:person, first_name: 'Person in Project', last_name: 'Petersen', updated_at: 1.second.from_now)
