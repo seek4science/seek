@@ -1,19 +1,30 @@
 module GitHelper
-  def jstree_from_tree(tree, text = '', opts = {})
-    h = {
-        text: text,
-        children: []
-    }.merge(opts)
+  def jstree_from_tree(tree, text = 'Root')
+    nodes = [{
+           id: 'repository-root',
+           parent: '#',
+           text: text,
+           state: { opened: true }
+         }]
 
-    tree.subtrees.each do |key, tree|
-      h[:children] << jstree_from_tree(tree, key, { state: { opened: false } })
+    tree.walk_trees(:preorder) do |root, entry|
+      nodes << {
+        id: "#{root}#{entry[:name]}",
+        parent: root.blank? ? 'repository-root' : root.chomp('/'),
+        text: entry[:name]
+      }
     end
 
-    tree.blobs.each do |key, blob|
-      h[:children] << { text: key, icon: asset_path(icon_filename_for_key('markup')) }
+    tree.walk_blobs(:preorder) do |root, entry|
+      nodes << {
+        id: "#{root}#{entry[:name]}",
+        parent: root.blank? ? 'repository-root' : root.chomp('/'),
+        text: entry[:name],
+        icon: asset_path(icon_filename_for_key('markup'))
+      }
     end
 
-    h
+    nodes
   end
 
   def git_breadcrumbs(resource, path = nil)

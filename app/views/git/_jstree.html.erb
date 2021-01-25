@@ -1,0 +1,16 @@
+<div id="git-js-tree"></div>
+
+<script type="text/javascript">
+    $j(document).ready(function () {
+
+        $j('#git-js-tree').jstree({
+            'core': {
+                'check_callback': true,
+                'force_text': true,
+                'multiple': false,
+                'dblclick_toggle': false,
+                'data': <%= raw jstree_from_tree(git.tree).to_json -%>
+            }
+        })
+    });
+</script>

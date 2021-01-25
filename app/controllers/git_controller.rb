@@ -2,7 +2,13 @@ class GitController < ApplicationController
   before_action :fetch_parent
   before_action :authorize_parent
   before_action :get_tree, only: [:tree]
-  before_action :get_blob, except: [:tree]
+  before_action :get_blob, except: [:tree, :browse]
+
+  def browse
+    respond_to do |format|
+      format.html
+    end
+  end
 
   def tree
     respond_to do |format|

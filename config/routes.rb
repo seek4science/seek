@@ -123,6 +123,7 @@ SEEK::Application.routes.draw do
         get 'blob/*path' => 'git#blob', as: :git_blob
         get 'raw/*path' => 'git#raw', as: :git_raw
         get 'download/*path' => 'git#download', as: :git_download
+        get 'browse' => 'git#browse', as: :git_browse
       end
     end
   end
