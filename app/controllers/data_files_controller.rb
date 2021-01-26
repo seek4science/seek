@@ -342,6 +342,7 @@ class DataFilesController < ApplicationController
         @warnings.merge(warnings)
       else
         critical_error_msg = "The file that was requested to be processed doesn't match that which had been uploaded"
+        notify_content_blob_mismatch(params[:content_blob_id], session[:uploaded_content_blob_id])
       end
     rescue Exception => e
       Seek::Errors::ExceptionForwarder.send_notification(e, data:{message: "Problem attempting to extract from RightField for content blob #{params[:content_blob_id]}"})
@@ -358,6 +359,18 @@ class DataFilesController < ApplicationController
       else
         format.js { render plain: 'done', status: :ok }
       end
+    end
+  end
+
+  def notify_content_blob_mismatch(param_id, session_id)
+    begin
+      raise 'Content blob mismatch during data file creation'
+    rescue RuntimeError => e
+      Seek::Errors::ExceptionForwarder.send_notification(e, data:{
+        message: "Parameter and Session Content Blob id don't match",
+        param_blob_id: param_id.inspect,
+        session_blob_id: session_id.inspect
+      })
     end
   end
 
@@ -402,6 +415,10 @@ class DataFilesController < ApplicationController
 
     # check the content blob id matches that previously uploaded and recorded on the session
     all_valid = uploaded_blob_matches = (params[:content_blob_id].to_s == session[:uploaded_content_blob_id].to_s)
+
+    unless uploaded_blob_matches
+      notify_content_blob_mismatch(params[:content_blob_id], session[:uploaded_content_blob_id])
+    end
 
     #associate the content blob with the data file
     blob = ContentBlob.find(params[:content_blob_id])
