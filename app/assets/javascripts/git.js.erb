@@ -63,11 +63,14 @@ $j(document).ready(function () {
             else {
                 jstreeElement.removeClass('only-select-blobs');
             }
-            jstreeElement.jstree(true).refresh(true, true);
+
+            jstreeElement.jstree(true).close_all();
+            jstreeElement.jstree(true).uncheck_all();
 
             if (input.val()) {
-              jstreeElement.jstree(true).select_node(input.val());
+                jstreeElement.jstree(true).select_node(input.val());
             }
+
             modal.modal();
             modal.modal('show');
             modal.data('targetInput', input);
@@ -82,5 +85,4 @@ $j(document).ready(function () {
             return true;
         });
     });
-
 });
