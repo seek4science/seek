@@ -1062,3 +1062,25 @@ span.disabled {
   overflow-y: scroll;
   box-shadow: 0px -2px 3px #ccc inset;
 }
+
+.jstree {
+  &.only-select-blobs {
+    .git-jstree-root, .git-jstree-tree {
+      &> i.jstree-checkbox {
+        display: none;
+      }
+    }
+  }
+}
+
+.git-browser-modal .modal-body {
+  max-height: calc(100vh - 190px);
+  overflow-y: auto;
+}
+
+input.git-path {
+  padding-left: 32px;
+  background-image: url(asset-path("famfamfam_silk/folder_magnify.png"));
+  background-repeat: no-repeat;
+  background-position: 8px 8px;
+}

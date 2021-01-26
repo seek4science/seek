@@ -1,30 +1,38 @@
 module GitHelper
-  def jstree_from_tree(tree, text = 'Root')
-    nodes = [{
-           id: 'repository-root',
-           parent: '#',
-           text: text,
-           state: { opened: true }
-         }]
+  def jstree_from_tree(tree, root_text: 'Root', include_root: false)
+    nodes = []
+    root_id = '#'
 
-    tree.walk_trees(:preorder) do |root, entry|
+    if include_root
       nodes << {
-        id: "#{root}#{entry[:name]}",
-        parent: root.blank? ? 'repository-root' : root.chomp('/'),
-        text: entry[:name]
+        id: '___repository-root',
+        parent: '#',
+        text: root_text,
+        type: 'root',
+        state: { opened: true }
       }
+      root_id = '___repository-root'
     end
 
-    tree.walk_blobs(:preorder) do |root, entry|
-      nodes << {
-        id: "#{root}#{entry[:name]}",
-        parent: root.blank? ? 'repository-root' : root.chomp('/'),
-        text: entry[:name],
-        icon: asset_path(icon_filename_for_key('markup'))
-      }
+    ['tree', 'blob'].each do |type|
+      tree.send("walk_#{type}s", :preorder) do |root, entry|
+        nodes << {
+          id: "#{root}#{entry[:name]}",
+          parent: root.blank? ? root_id : root.chomp('/'),
+          text: entry[:name],
+          type: type
+        }
+      end
     end
 
     nodes
+  end
+
+  def git_path_input(modal_id, name, value, opts)
+    select_trees = opts.delete(:select_trees) || false
+    text_field_tag(name, value, opts.reverse_merge(data: { role: 'seek-git-path-input',
+                                                           modal: modal_id,
+                                                         'select-trees' => select_trees }))
   end
 
   def git_breadcrumbs(resource, path = nil)

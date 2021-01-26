@@ -103,6 +103,16 @@ class WorkflowsController < ApplicationController
     end
   end
 
+  def annotate_repository
+    @git_repository = GitRepository.find(4)
+    @ref = "refs/remotes/origin/dev"
+    @commit = "fa4a3e874ae5effc5efcb934d0f81bd6c17d9ee6"
+    @tree = @git_repository.git_base.lookup(@commit).tree
+    respond_to do |format|
+      format.html
+    end
+  end
+
   def extract_metadata
     begin
       extractor = @workflow.extractor

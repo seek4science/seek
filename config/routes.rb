@@ -536,6 +536,7 @@ SEEK::Application.routes.draw do
       post :create_from_files
       post :create_from_git
       get :provide_metadata
+      get :annotate_repository
       post :metadata_extraction_ajax
       post :create_metadata
     end
