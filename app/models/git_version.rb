@@ -6,8 +6,11 @@ class GitVersion < ApplicationRecord
   attr_writer :git_repository_remote
   belongs_to :resource, polymorphic: true
   belongs_to :git_repository
+  has_many :git_annotations
   before_validation :set_git_version_and_repo, on: :create
   before_save :set_commit, unless: -> { ref.blank? }
+
+  include GitSupport
 
   def metadata
     JSON.parse(super || '{}')
@@ -15,48 +18,6 @@ class GitVersion < ApplicationRecord
 
   def metadata= m
     super(m.to_json)
-  end
-
-  def git_base
-    git_repository.git_base
-  end
-
-  def file_contents(path, &block)
-    blob = object(path)
-    return unless blob&.is_a?(Rugged::Blob)
-
-    if block_given?
-      block.call(StringIO.new(blob.content)) # Rugged does not support streaming blobs :(
-    else
-      blob.content
-    end
-  end
-
-  def object(path)
-    return nil unless commit
-    git_base.lookup(tree.path(path)[:oid])
-  rescue Rugged::TreeError
-    nil
-  end
-
-  def tree
-    git_base.lookup(commit).tree if commit
-  end
-
-  def trees
-    t = []
-    return t unless commit
-
-    tree.each_tree { |tree| t << tree }
-    t
-  end
-
-  def blobs
-    b = []
-    return b unless commit
-
-    tree.each_blob { |blob| b << blob }
-    b
   end
 
   def latest_git_version?
@@ -67,18 +28,6 @@ class GitVersion < ApplicationRecord
     true
   end
 
-  def file_exists?(path)
-    !object(path).nil?
-  end
-
-  def add_file(path, io)
-    message = file_exists?(path) ? 'Updated' : 'Added'
-    perform_commit("#{message} #{path}") do |index|
-      oid = git_base.write(io.read, :blob) # Write the file into the object DB
-      index.add(path: path, oid: oid, mode: 0100644) # Add it to the index
-    end
-  end
-
   def freeze_version
     self.metadata = resource.attributes
     self.mutable = false
@@ -87,6 +36,14 @@ class GitVersion < ApplicationRecord
 
   def proxy
     resource.class.proxy_class.new(resource, self)
+  end
+
+  def add_file(path, io)
+    message = file_exists?(path) ? 'Updated' : 'Added'
+    perform_commit("#{message} #{path}") do |index|
+      oid = git_base.write(io.read, :blob) # Write the file into the object DB
+      index.add(path: path, oid: oid, mode: 0100644) # Add it to the index
+    end
   end
 
   private

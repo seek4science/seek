@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_12_161021) do
+ActiveRecord::Schema.define(version: 2021_01_27_101541) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -687,6 +687,18 @@ ActiveRecord::Schema.define(version: 2021_01_12_161021) do
     t.text "comment"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "git_annotations",  force: :cascade do |t|
+    t.bigint "git_version_id"
+    t.bigint "contributor_id"
+    t.string "path"
+    t.string "key"
+    t.text "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["contributor_id"], name: "index_git_annotations_on_contributor_id"
+    t.index ["git_version_id"], name: "index_git_annotations_on_git_version_id"
   end
 
   create_table "git_repositories",  force: :cascade do |t|
