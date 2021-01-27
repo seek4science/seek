@@ -473,7 +473,7 @@ class DocumentsControllerTest < ActionController::TestCase
     FactoryGirl.create_list(:public_document, 20)
 
     with_config_value(:results_per_page_default, 5) do
-      get :index
+      get :index, params: { view: 'default' }
 
       assert_equal 5, assigns(:documents).length
       assert_equal '1', assigns(:page)

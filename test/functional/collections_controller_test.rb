@@ -297,7 +297,7 @@ class CollectionsControllerTest < ActionController::TestCase
     FactoryGirl.create_list(:public_collection, 20)
 
     with_config_value(:results_per_page_default, 5) do
-      get :index
+      get :index, params: { view: 'default' }
 
       assert_equal 5, assigns(:collections).length
       assert_equal '1', assigns(:page)

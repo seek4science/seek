@@ -694,7 +694,7 @@ class PeopleControllerTest < ActionController::TestCase
 
   test 'controller-specific results_per_page should override default' do
     with_config_value(:results_per_page_default, 2) do
-      get :index
+      get :index, params: { view: 'default' }
       assert_response :success
       assert_equal 2, assigns(:per_page)
       assert_select '.pagination-container li.active', text: '1'
@@ -722,7 +722,7 @@ class PeopleControllerTest < ActionController::TestCase
     with_config_value(:results_per_page_default, 2) do
       with_config_value(:results_per_page_default_condensed, 3) do
         # Load a regular default view, and a condensed view, and check that the number of items in each are different
-        get :index
+        get :index, params: { view: 'default' }
         assert_response :success
         assert_equal 2, assigns(:per_page)
         assert_select '.pagination-container li.active', text: '1'
