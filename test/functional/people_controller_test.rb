@@ -715,6 +715,8 @@ class PeopleControllerTest < ActionController::TestCase
         assert_select '.pagination-container li.active', text: '1'
         assert_select 'div.list_item_title', count: 2
       end
+      # Reset the view parameter
+      session.delete(:view)
     end
   end
 
@@ -741,7 +743,8 @@ class PeopleControllerTest < ActionController::TestCase
         assert_select '.pagination-container li.active', text: '1'
         assert_select '.list_items_container tbody tr', count: 3
       end
-
+      # Reset the view parameter
+      session.delete(:view)
     end
   end
 
@@ -1215,6 +1218,8 @@ class PeopleControllerTest < ActionController::TestCase
       assert_response :success
       assert_select '.list_items_container .collapse', count: 3
     end
+    # Reset the view parameter
+    session.delete(:view)
   end
 
   test 'table view column selection' do
@@ -1230,6 +1235,8 @@ class PeopleControllerTest < ActionController::TestCase
       assert_response :success
       assert_select '.list_items_container thead th',  minimum: 3
     end
+    # Reset the view parameter
+    session.delete(:view)
   end
 
   def edit_max_object(person)

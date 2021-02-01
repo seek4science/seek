@@ -1448,7 +1448,7 @@ class SopsControllerTest < ActionController::TestCase
                  policy: Factory(:public_policy, access_type: Policy::VISIBLE))
 
     with_config_value(:results_per_page_default, 2) do
-      get :index, params: { page: 1, order: 'created_at_desc', view: 'default'}
+      get :index, params: { page: 1, order: 'created_at_desc'}
       assert_equal [:created_at_desc], assigns(:order)
       assert_equal 2, assigns(:sops).length
       assert_equal [s2, s1], assigns(:sops).to_a
