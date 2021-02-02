@@ -47,17 +47,21 @@ module GitSupport
     !object(path).nil?
   end
 
-  def in_temp_dir
-    wd = nil
-    Dir.mktmpdir do |dir|
-      wd = git_base.workdir
-      git_base.workdir = dir
-      git_base.checkout_tree(git_base.lookup(commit).tree.oid, strategy: [:dont_update_index, :force, :no_refresh])
-      yield dir
-    end
+  # Checkout the commit into the given directory.
+  def in_dir(dir)
+    wd = git_base.workdir
+    git_base.workdir = dir
+    git_base.checkout_tree(tree.oid, strategy: [:dont_update_index, :force, :no_refresh])
   ensure
     if wd
       git_base.workdir = wd
+    end
+  end
+
+  def in_temp_dir
+    Dir.mktmpdir do |dir|
+      in_dir(dir)
+      yield dir
     end
   end
 end
