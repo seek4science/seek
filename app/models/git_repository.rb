@@ -20,7 +20,7 @@ class GitRepository < ApplicationRecord
   has_task :remote_git_fetch
 
   def local_path
-    File.join(Seek::Config.git_filestore_path, remote.present? ? uuid : "#{resource_type}-#{resource_id}")
+    File.join(Seek::Config.git_filestore_path, uuid)
   end
 
   def git_base
@@ -42,7 +42,7 @@ class GitRepository < ApplicationRecord
                        hash = Seek::Git::Base.base_class.ls_remote(remote)
                        head = hash['head'][:sha]
                        hash['branches'].each do |name, info|
-                         h = { name: name, ref: "refs/heads/#{name}", sha: info[:sha], default: info[:sha] == head }
+                         h = { name: name, ref: "refs/remotes/origin/#{name}", sha: info[:sha], default: info[:sha] == head }
                          refs[:branches] << h
                        end
                        hash['tags'].each do |name, info|
@@ -67,7 +67,7 @@ class GitRepository < ApplicationRecord
   end
 
   def queue_fetch
-    RemoteGitFetchJob.perform_later(self)
+    RemoteGitFetchJob.perform_later(self) if remote.present?
   end
 
   def at_ref(ref)
