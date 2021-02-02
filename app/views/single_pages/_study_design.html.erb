@@ -33,8 +33,6 @@
             <label>The source sample type will look like:</label>
             <%=  render partial: 'source_sample_type_table' %>
             <hr>
-
-            <span style="color:red; font-size:11px"><i class="glyphicon glyphicon-info-sign"></i> After saving the design, you can't change the source characteristic.</span><br />
             <input id="btn-save-study-design" onClick="saveDesign()" value="Save Design" type="button" class="btn btn-primary">
         </div>
     </div>
@@ -69,24 +67,67 @@
             $j("#sourceAttribs tbody").append(`<tr><td>${attr.title}</td><td>${attr.shortName}</td><td>${attr.des}</td></tr>`)
         })
 
-        $j('.tbl_sample_source thead tr').empty()
+        // $j('.tbl_sample_source thead tr').empty()
+        $j('.tbl_sample_source thead .downHeader').empty()
+        $j(".tbl_sample_source .downHeader").empty()
+        $j(".tbl_sample_source .topHeader").empty()
         $j.each(characteristics[sourceSelect.value].attributes, (k, attr) => {
-            $j(".tbl_sample_source thead tr").append(`<th>${attr.title}</th>`) //(customTD(attr.title,attr.required))
+            $j(".tbl_sample_source thead .downHeader").append(`<th>${attr.title}</th>`) //(customTD(attr.title,attr.required))
         })
+
+        $j(".tbl_sample_source thead .downHeader").prepend(`<th class="ins" style='color:red'>Sample name</th>`)
+        $j(".tbl_sample_source thead .downHeader").prepend(`<th class="ins" style='color:red'>Protocol REF</th>`)
+        $j(".tbl_sample_source thead .downHeader").prepend(`<th class="ins" style='color:red'>Source name</th>`)
+        $j(".tbl_sample_source thead .downHeader").prepend("<th><input id='selectAll' onClick='selectAll(this)' type='checkbox'/></th>")
+
+        $j(".tbl_sample_source tbody").empty()
+        let colspan = 1
+        let newRow = "<td><input type='checkbox'/></td>";
+        $j(".tbl_sample_source .downHeader").find('th').each(function(k, v) {
+            if (k > 0) {
+                colspan++
+                if ($j(v).hasClass("ins"))
+                    newRow += '<td contenteditable></td>'
+                else
+                    newRow += "<td style='background-color:#ccc'></td>"
+            }
+        });
+        $j(".tbl_sample_source tbody").append('<tr data-new="true">' + newRow + '</tr>')
+        $j(".tbl_sample_source .topHeader").append(`<th colspan=${colspan}>Source table</th>`)
     }
 
+
     function addColumn(options) {
-        let colCount = $j(`${options.tableClass} thead tr th:visible`).length;
+        // let colCount = $j(`${options.tableClass} thead tr th:visible`).length;
+        let colCount = $j(`${options.tableClass} thead tr:nth-child(2) th`).length;
         let thIndex = -1
-        $j.each($j(options.tableClass + ' thead tr th:hidden'), (i, k) => {
+        let existingCol = false;
+        $j.each($j(options.tableClass + ' thead tr:nth-child(2) th:hidden'), (i, k) => {
             if ($j.trim($j(k).html().replace(/<a( |>).*?<\/a>/gi, "")) == options.title) {
                 $j(k).show();
                 thIndex = $j(k).index()
+                existingCol = true;
                 return false;
             }
         })
+        // If no hidden th found, then add new column
+        if (!existingCol) {
+            console.log("ddd", colCount, options.tableClass, options.title)
+            let action = "<a href='' onclick='remove_col(event)'> <span style='color:white' class='glyphicon glyphicon-trash'></span></a>"
+            let element =
+                `<th data-sampletypeid="" sample_controlled_vocab_id="" optional="true">${options.title} ${action}</th>`
+            $j(options.tableClass).find('thead tr:nth-child(2)').find('th').eq(colCount - 1).after(element)
+
+            //increase first header last td colspan
+            const firstHeader = $j(options.tableClass).find('thead tr:first-child th:last-child')
+            firstHeader.attr('colspan', firstHeader.attr('colspan') + 1);
+        }
+
         $j(options.tableClass + ' tbody').find('tr').each(function() {
-            $j(this).find('td').eq(thIndex).show()
+            if (existingCol)
+                $j(this).find('td').eq(thIndex).show()
+            else
+                $j(this).find('td').eq(colCount - 1).after("<td contentEditable='true'></td>");
         });
 
         if (options.title)
@@ -137,7 +178,24 @@
                 }
             })
         }
-        const attr = characteristics[$j("#sourceSelect").children("option:selected").val()].attributes
+        let attr = characteristics[$j("#sourceSelect").children("option:selected").val()].attributes
+        // Add thise ISA stuff....
+        const ISAStuff = [{
+            id: null,
+            required: true,
+            title: "Source name"
+        }, {
+            id: null,
+            required: true,
+            title: "Protocol REF"
+        }, {
+            id: null,
+            required: true,
+            title: "Sample name"
+        }]
+
+        attr.unshift(...ISAStuff)
+
         // const sampleCVId = $j("#sourceSelect").children("option:selected").attr("samplecvid")
         const title = `${$j("#std-title span").html()}_source_sample_type`
         createSampleType(sampleTypeData(attr, title), callBack)

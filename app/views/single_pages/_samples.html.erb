@@ -1,10 +1,8 @@
 <div id="tbl_file_content">
-    <a class="btn btn-primary btn-sm" onclick="AddRow('.sampleTable')"> <i class="glyphicon glyphicon-plus"></i>Add Row</a>
-    <a id="sample_add_col" class="btn btn-primary btn-sm">
-        <i class="glyphicon glyphicon-plus"></i>Add Column</a>
-    <a id="sample_delete" class="btn btn-danger btn-sm">
-        <i class="glyphicon glyphicon-trash"></i>Delete Row(s)</a>
-    <a id="hide_optionals" class="btn btn-primary btn-sm">Hide optionals</a>
+    <%= button_link_to('Add Row', 'add', '#', {id: 'an', onclick: "AddRow('.sampleTable')"}) %>
+    <%= button_link_to('Add Column', 'add', '#', id: 'sample_add_col') %>
+    <%= button_link_to('Delete Row(s)', 'destroy', '#', id: 'sample_delete') %>
+    <%= button_link_to('Hide optionals', 'denied', '#', id: 'hide_optionals') %>
     <a class="btn btn-primary btn-sm pull-right" onclick="saveSamples()">Save</a>
     <div class="sampleTblContainer">
         <table>

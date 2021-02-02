@@ -1,35 +1,137 @@
-<div id="content-wrapper">
-    <div class="inner" style="overflow-x:scroll">
-        <table class="table tableXs tbl_sample_source">
-            <thead class="thead-dark">
-                <tr></tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
-    </div>
-    <a id="btn_add_col" class="btn btn-primary btn-sm"> <i class="glyphicon glyphicon-plus"></i>Add column</a>
+ <div id="tbl_file_content">
+     <%= button_link_to('Add Column', 'add', 'javascript:void(0)', id: 'btn_add_col') %>
+     <div class="sampleTblContainer">
+         <table>
+             <table style="width: auto;" class="table tableXs tbl_sample_source">
+                 <thead class="thead-dark">
+                     <tr class="topHeader"></tr>
+                     <tr class="downHeader"></tr>
+                 </thead>
+                 <tbody>
+                 </tbody>
+             </table>
+         </table>
+     </div>
+ </div>
+ <style>
+     .sampleTblContainer {
+         overflow-x: scroll;
+     }
 
-</div>
+     select {
+         min-width: 150px
+     }
+ </style>
+
 <script>
-    $j("#btn_add_col").on("click", function() {
-        showPreDefinedCols(event, '.tbl_sample_source', 1)
-    })
 
-    function showPreDefinedCols(e, tblClass, bias) {
-        $j('.arrow_box').toggle();
-        $j('.arrow_box').position({
-            my: "left top",
-            at: "right+12 top-10",
-            of: $j(e.target),
-            collision: "fit"
-        });
-        $j("#btn_custom_col").attr("onclick", `addCustomCol('${tblClass}','${bias}')`); // Custom Input
-        $j('#preDefinedList li:not(:first-child)').remove()
-        $j.each($j(`${tblClass} thead tr th:hidden`), (i, x) => {
-            const title = $j.trim($j(x).html().replace(/<a( |>).*?<\/a>/gi, ""))
-            $j('#preDefinedList').append(`<li><input type="button" class="btn btn-primary col-md-12 predef"
-                onClick= "addCustomCol('${tblClass}','${bias}','${title}')" value="${title}"></li>`)
+    function loadSampleTableHeader(headers) {
+        const headTr = $j('.sampleTable .downHeader')
+        // Adds the select column
+        headTr.empty().append("<th><input id='selectAll' onClick='selectAll(this)' type='checkbox'/></th>")
+        $j(headers).each((i, x) => {
+            const TH = customTD(x.sample_controlled_vocab_id, x.original_accessor_name, x.required, x.sample_type_id)
+            headTr.append(TH)
         })
     }
+
+    function createTD(sampleVal) {
+        const {
+            text,
+            sampleId,
+            editable
+        } = sampleVal
+        return `<td ${editable} data-sampleid=${sampleId}>` + text + "</td>"
+    }
+
+
+    // function addCustomCol2(tblClass, bias, text = '') {
+    //      console.log("tblClass",tblClass)
+    //     if (text.length == 0) text = $j.trim($j('.customCol').val())
+    //     $j(".arrow_box").css({
+    //         display: "none",
+    //     });
+    //     let options = {
+    //         title: text,
+    //         tableClass: tblClass,
+    //         bias
+    //     }
+    //     console.log(options)
+    //     addColumn(options)
+    // }
+
+
+    function uniqId() {
+        // return Math.random().toString(36).replace(/[^1-z]+/g, '').substr(0, 5);
+        var result = '';
+        var characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        var charactersLength = characters.length;
+        for (var i = 0; i < 8; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+    }
+
+    $j.fn.columnCount = function() {
+        return $j('th', $j(this).find('thead')).length;
+    };
+
+    $j.fn.rowcount = function() {
+        return $j('tr', $j(this).find('tbody')).length;
+    };
+
+
+    $j("#sample_add_col").on("click", () => {
+        showPreDefinedCols(event, '.sampleTable', 2)
+    })
 </script>
+
+
+
+
+
+
+
+
+
+<%
+=begin%>
+ 
+ <div id="content-wrapper">
+     <div class="inner" style="overflow-x:scroll">
+         <table class="table tableXs tbl_sample_source">
+             <thead class="thead-dark">
+                 <tr></tr>
+             </thead>
+             <tbody>
+             </tbody>
+         </table>
+     </div>
+     <a id="btn_add_col" class="btn btn-primary btn-sm"> <i class="glyphicon glyphicon-plus"></i>Add column</a>
+
+ </div> 
+<%
+=end%>
+ <script>
+     $j("#btn_add_col").on("click", function() {
+         showPreDefinedCols(event, '.tbl_sample_source', 1)
+     })
+
+     function showPreDefinedCols(e, tblClass, bias) {
+         $j('.arrow_box').toggle();
+         $j('.arrow_box').position({
+             my: "left top",
+             at: "right+12 top-10",
+             of: $j(e.target),
+             collision: "fit"
+         });
+         $j("#btn_custom_col").attr("onclick", `addCustomCol('${tblClass}','${bias}')`); // Custom Input
+         $j('#preDefinedList li:not(:first-child)').remove()
+         $j.each($j(`${tblClass} thead tr:nth-child(2) th:hidden`), (i, x) => {
+             const title = $j.trim($j(x).html().replace(/<a( |>).*?<\/a>/gi, ""))
+             $j('#preDefinedList').append(`<li><input type="button" class="btn btn-primary col-md-12 predef"
+                onClick= "addCustomCol('${tblClass}','${bias}','${title}')" value="${title}"></li>`)
+         })
+     }
+ </script> 
+ 
