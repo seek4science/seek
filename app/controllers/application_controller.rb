@@ -317,7 +317,7 @@ class ApplicationController < ActionController::Base
   def is_condensed_view?
     # Check current view from param, or on its absence from session
     return (params.has_key?(:view) && params[:view]!="default")||
-      (!params.has_key?(:view) && session.has_key?(:view) && session[:view]!="default")
+      (!params.has_key?(:view) && session.has_key?(:view) && !session[:view].nil? && session[:view]!="default")
   end
   
   helper_method :is_condensed_view
