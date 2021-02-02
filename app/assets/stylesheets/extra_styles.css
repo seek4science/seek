@@ -357,11 +357,18 @@
 }
 
 .sourceAttribs tbody tr:nth-child(odd) {
-    background-color: #eee;
+    background-color: #dcecf6;
+    border-top: 1px solid #c4e6ef;
+    border-bottom: 1px solid #c4e6ef
 }
 
 .sourceAttribs thead tr {
     background-color: #ccc;
+}
+
+.sourceAttribs thead tr:first-child>th {
+    position: sticky;
+    top: 0;
 }
 
 .sourceAttribs td,
@@ -372,6 +379,12 @@ th {
 .sourceAttribs th {
     padding: 6px;
     min-width: 100px;
+    background-color: #f5f5f5;
+
+}
+
+.sourceAttribs thead tr {
+    border-bottom: 1px #ddd solid
 }
 
 .highlight {
@@ -389,14 +402,14 @@ th {
     max-width: 0 !important;
     width: 0 !important;
     padding: 0 !important;
-    background-color:  #f0f0f0  !important
+    background-color: #f0f0f0 !important
 }
 
 .headerSeparator {
     border-right: 1px white dashed !important;
 }
 
-.errorCell{
+.errorCell {
     background-color: #fffafb;
     border-bottom: solid 1px #ff0044 !important;
 }

@@ -41,18 +41,32 @@
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
-                        <div style="margin-bottom:10px" class="row">
-                            <div class="col-md-6">
+                        <div class="row">
+                            <div class="col-md-12">
                                 <label>Type:</label>
                                 <select class="form-control" id="assayType" onchange="asyTypeChange(this);">
                                     <input type="hidden" id="method_type">
                                 </select>
                             </div>
-                            <div class="col-md-6">
-                                <label>Attributes:</label>
-                                <ul id="attribs" class="small_list"></ul>
+                        </div>
+
+                        <div style="margin-bottom:10px;padding:15px" class="row">
+                            <div style="height:200px;overflow:scroll;border-radius:5px;border:1px #ddd solid">
+                                <table class="sourceAttribs" id="assayAttribs" style="width:100%;">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:30%">Attribute</th>
+                                            <th>Short name</th>
+                                            <th style="width:50%">Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
+
+
                         <div>
                             <label>*Title:</label>
                             <input style="margin-bottom:10px" type="text" class="form-control" id="assayTitle">
@@ -212,7 +226,7 @@
     }
 
     const loadFlowchart = () => {
-        $j("#sourceSampleTypeTable").css("visibility","hidden");
+        $j("#sourceSampleTypeTable").css("visibility", "hidden");
         const $flowchart = $j('#chart_canvas');
         const {
             id,
@@ -257,7 +271,7 @@
 
 
     const hideFlowchart = () => {
-        $j("#sourceSampleTypeTable").css("visibility","visible");
+        $j("#sourceSampleTypeTable").css("visibility", "visible");
         $j("#flowchart-header").hide()
         window.location.href = "#study-details"
     }
@@ -427,16 +441,19 @@
         })
         if (AssayTypes[0])
             $j.each(AssayTypes[0].attributes, (k, attr) => {
-                $j("#attribs").append(`<li>${attr.title}</li>`)
+                // $j("#attribs").append(`<li>${attr.title}</li>`)
+                $j("#assayAttribs tbody").append(`<tr><td>${attr.title}</td><td>${attr.shortName}</td><td>${attr.des}</td></tr>`)
             })
     }
 
     const asyTypeChange = (i) => {
-        $j("#attribs").empty()
+        // $j("#attribs").empty()
+        $j("#assayAttribs tbody").empty()
         $j("#method_type").val(i.value)
         $j("#assayTitle").val(AssayTypes[i.value].title)
         $j.each(AssayTypes[i.value].attributes, (k, attr) => {
-            $j("#attribs").append(`<li>${attr.title}</li>`)
+            // $j("#attribs").append(`<li>${attr.title}</li>`)
+            $j("#assayAttribs tbody").append(`<tr><td>${attr.title}</td><td>${attr.shortName}</td><td>${attr.des}</td></tr>`)
         })
     }
 
@@ -617,7 +634,7 @@
             updateFlowchart(flowchartData);
             return
         }
-        
+
         $j.each(newAssays, (i, assay) => {
             if ($j.inArray(assay.id, $j.map(existingAssays, a => a.id)) == -1) {
                 const {
