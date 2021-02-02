@@ -52,6 +52,12 @@ class Workflow < ApplicationRecord
     end
   end
 
+  attr_reader :extracted_metadata
+  def provide_metadata(metadata)
+    @extracted_metadata = metadata
+    assign_attributes(metadata)
+  end
+
   def avatar_key
     workflow_class&.extractor&.present? ? "#{workflow_class.key.downcase}_workflow" : 'workflow'
   end

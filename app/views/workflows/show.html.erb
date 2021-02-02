@@ -33,7 +33,7 @@
       <% end %>
     <% rescue StandardError => e %>
       <% Rails.logger.error(e.inspect) %>
-      <% Rails.logger.error(e.backtrace.inspect) %>
+      <% Rails.logger.error(e.backtrace.join("\n")) %>
       <div class="alert alert-warning">Could not render the workflow diagram.</div>
     <% end %>
 

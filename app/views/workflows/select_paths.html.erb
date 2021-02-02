@@ -1,17 +1,16 @@
 <h1>New <%= t('workflow') %></h1>
 
-<%= form_tag do %>
-  <%= hidden_field_tag :git_repository_id, @git_repository.id %>
-  <%= hidden_field_tag :commit, @commit %>
-  <%= hidden_field_tag :ref, @ref %>
+<%= form_tag(create_from_git_workflows_path) do %>
+  <%= hidden_field_tag :git_repository_id, @workflow.initial_git_version.git_repository.id %>
+  <%= hidden_field_tag :ref, @workflow.initial_git_version.ref %>
 
-  <%= render partial: 'git/path_selector_modal', locals: { tree: @tree, id: 'git-path-select-modal' } %>
+  <%= render partial: 'git/path_selector_modal', locals: { tree: @workflow.initial_git_version.tree, id: 'git-path-select-modal' } %>
 
   <%= panel do %>
     <div class="form-group">
       <label class="required">Workflow</label>
       <p class="help-block">The main executable workflow.</p>
-      <%= git_path_input '#git-path-select-modal', :workflow, nil, class: 'form-control git-path' %>
+      <%= git_path_input '#git-path-select-modal', :main_workflow_path, nil, class: 'form-control git-path' %>
     </div>
 
     <div class="form-group">
@@ -24,7 +23,7 @@
     <div class="form-group">
       <label>Abstract CWL</label>
       <p class="help-block">(Optional) The abstract CWL that describes the workflow above.</p>
-      <%= git_path_input '#git-path-select-modal', :abstract_cwl, nil, class: 'form-control git-path' %>
+      <%= git_path_input '#git-path-select-modal', :abstract_cwl_path, nil, class: 'form-control git-path' %>
     </div>
   <% end %>
 
@@ -32,7 +31,9 @@
     <div class="form-group">
       <label>Diagram</label>
       <p class="help-block">(Optional) A diagram that illustrates the main workflow.</p>
-      <%= git_path_input '#git-path-select-modal', :diagram, nil, class: 'form-control git-path' %>
+      <%= git_path_input '#git-path-select-modal', :diagram_path, nil, class: 'form-control git-path' %>
     </div>
   <% end %>
+
+  <%= submit_tag('Continue', class: 'btn btn-primary') %>
 <% end %>

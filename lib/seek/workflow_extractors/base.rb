@@ -24,11 +24,11 @@ module Seek
       available_diagram_formats(png: 'image/png', svg: 'image/svg+xml', jpg: 'image/jpeg', default: :png)
 
       def initialize(io)
-        @io = io
+        @io = io.is_a?(String) ? StringIO.new(io) : io
       end
 
       def metadata
-        { warnings: [], errors: [] }
+        { }
       end
 
       def can_render_diagram?

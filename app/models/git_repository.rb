@@ -1,15 +1,6 @@
 require 'git'
 
 class GitRepository < ApplicationRecord
-  # The state of a git repository at a specific commit.
-  # Provides methods for listing/reading files.
-  class Version
-    include ActiveModel::Model
-    include GitSupport
-
-    attr_accessor :git_repository, :ref, :commit
-  end
-
   belongs_to :resource, polymorphic: true, optional: true
   has_many :git_versions
   after_create :initialize_repository
@@ -68,15 +59,6 @@ class GitRepository < ApplicationRecord
 
   def queue_fetch
     RemoteGitFetchJob.perform_later(self) if remote.present?
-  end
-
-  def at_ref(ref)
-    commit = resolve_ref(ref)
-    GitRepository::Version.new(git_repository: self, commit: commit, ref: ref)
-  end
-
-  def at_commit(commit)
-    GitRepository::Version.new(git_repository: self, commit: commit)
   end
 
   private

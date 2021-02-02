@@ -10,6 +10,8 @@ class GitVersion < ApplicationRecord
   before_validation :set_git_version_and_repo, on: :create
   before_save :set_commit, unless: -> { ref.blank? }
 
+  accepts_nested_attributes_for :git_annotations
+
   include GitSupport
 
   def metadata
@@ -44,6 +46,14 @@ class GitVersion < ApplicationRecord
       oid = git_base.write(io.read, :blob) # Write the file into the object DB
       index.add(path: path, oid: oid, mode: 0100644) # Add it to the index
     end
+  end
+
+  def path_for_key(annotation_key)
+    persisted? ? git_annotations.where(key: annotation_key.to_s).first&.path : git_annotations.detect { |ga| ga.key.to_s == annotation_key.to_s }&.path
+  end
+
+  def commit
+    super || get_commit
   end
 
   private

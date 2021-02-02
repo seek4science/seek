@@ -94,33 +94,18 @@ class WorkflowsController < ApplicationController
 
   # Takes a remote Git repository and target ref
   def create_from_git
-    @workflow = Workflow.new(git_version_attributes: { git_repository_id: params[:git_repository_id], ref: params[:ref] })
-    @metadata = {}
-    @warnings ||= @metadata.delete(:warnings) || []
-    @errors ||= @metadata.delete(:errors) || []
+    wizard = GitWorkflowWizard.new(git_workflow_wizard_params)
+    @workflow = wizard.run
     respond_to do |format|
-      format.html { render :provide_metadata }
-    end
-  end
-
-  def annotate_repository
-    @git_repository = GitRepository.find(4)
-    @ref = "refs/remotes/origin/dev"
-    @commit = "fa4a3e874ae5effc5efcb934d0f81bd6c17d9ee6"
-    @tree = @git_repository.git_base.lookup(@commit).tree
-    respond_to do |format|
-      format.html
+      format.html { render wizard.next_step }
     end
   end
 
   def extract_metadata
     begin
       extractor = @workflow.extractor
-      retrieve_content @workflow.content_blob # Hack
-      @metadata = extractor.metadata
-      @warnings ||= @metadata.delete(:warnings) || []
-      @errors ||= @metadata.delete(:errors) || []
-      @workflow.assign_attributes(@metadata)
+      retrieve_content(@workflow.content_blob) if @workflow.content_blob # Hack
+      @workflow.provide_metadata(extractor.metadata)
     rescue StandardError => e
       raise e unless Rails.env.production?
       Seek::Errors::ExceptionForwarder.send_notification(e, data: {
@@ -266,7 +251,8 @@ class WorkflowsController < ApplicationController
                                      { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                      { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
                                      { publication_ids: [] }, :internals, :maturity_level, :source_link_url,
-                                     discussion_links_attributes:[:id, :url, :label, :_destroy])
+                                     { discussion_links_attributes: [:id, :url, :label, :_destroy] },
+                                     { git_version_attributes: [:name, :description, :ref, :root_path, :git_repository_id, git_annotations_attributes: {}] })
   end
 
   alias_method :asset_params, :workflow_params
@@ -275,5 +261,9 @@ class WorkflowsController < ApplicationController
     params.require(:ro_crate).permit({ workflow: [:data, :data_url, :make_local_copy] },
                                      { abstract_cwl: [:data, :data_url, :make_local_copy] },
                                      { diagram: [:data, :data_url, :make_local_copy] })
+  end
+
+  def git_workflow_wizard_params
+    params.permit(:git_repository_id, :ref, :main_workflow_path, :abstract_cwl_path, :diagram_path, :workflow_class_id)
   end
 end

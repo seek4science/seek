@@ -16,24 +16,38 @@ module Seek
           class_eval do
             has_many :git_versions, as: :resource, dependent: :destroy
             has_one :local_git_repository, as: :resource, class_name: 'GitRepository'
-            delegate :git_base, :file_contents, :object, :commit, :tree, :trees, :blobs, to: :latest_git_version
+            delegate :git_base, :file_exists?, :file_contents, :object, :ref, :commit, :tree, :trees, :blobs, :in_dir, :in_temp_dir, to: :git_version
 
             attr_writer :git_version_attributes
 
             after_create :save_git_version_on_create
+
+            def is_git_versioned?
+              commit.present?
+            end
+
+            def git_version
+              persisted? ? latest_git_version : initial_git_version
+            end
 
             def latest_git_version
               git_versions.last
             end
 
             def save_git_version_on_create
-              version = self.git_versions.build(git_version_attributes)
+              version = initial_git_version
               version.metadata = self.attributes
               version.save
             end
 
+            def initial_git_version
+              self.git_versions.build(git_version_attributes)
+            end
+
             def git_version_attributes
-              (@git_version_attributes || {}).with_indifferent_access.slice(:name, :description, :ref, :root_path, :git_repository_id).reverse_merge(default_git_version_attributes)
+              (@git_version_attributes || {}).with_indifferent_access.slice(
+                  :name, :description, :ref, :root_path, :git_repository_id, :git_annotations_attributes
+              ).reverse_merge(default_git_version_attributes)
             end
 
             def default_git_version_attributes

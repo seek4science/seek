@@ -1,0 +1,12 @@
+<%= fields_for(name, git_version) do |f| %>
+  <%= f.hidden_field :name %>
+  <%= f.hidden_field :description %>
+  <%= f.hidden_field :root_path %>
+  <%= f.hidden_field :git_repository_id %>
+  <%= f.hidden_field :ref %>
+  <%= f.fields_for(:git_annotations) do |ann_f| %>
+    <%= ann_f.hidden_field :path %>
+    <%= ann_f.hidden_field :key %>
+    <%= ann_f.hidden_field :value %>
+  <% end %>
+<% end %>
