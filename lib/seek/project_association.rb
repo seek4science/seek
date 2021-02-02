@@ -39,7 +39,7 @@ module Seek
         end
 
         def self.filter_by_projects(projects)
-          joins(:projects).where(project_join_table => { project_id: projects })
+          joins(:projects).where(project_join_table => { project_id: projects }).distinct
         end
       end
     end

@@ -478,4 +478,15 @@ class AssetTest < ActiveSupport::TestCase
 
   end
 
+  test 'filter by project unique' do
+    projects = [Factory(:project),Factory(:project)]
+    investigation = Factory(:investigation,projects:projects)
+    other_investigation = Factory(:investigation)
+
+    assert_equal [investigation],Investigation.filter_by_projects(projects)
+
+    #check it's an relation and not just turned into an array
+    assert ActiveRecord::Relation,Investigation.filter_by_projects(projects).is_a?(ActiveRecord::Relation)
+  end
+
 end
