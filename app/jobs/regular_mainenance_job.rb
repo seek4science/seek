@@ -14,7 +14,7 @@ class RegularMainenanceJob < ApplicationJob
 
   # clean up dangling content blobs that are older than BLOB_GRACE_PERIOD and not associated with an asset
   def clean_content_blobs
-    ContentBlob.where('created_at < ?', BLOB_GRACE_PERIOD.ago).select do |blob|
+    ContentBlob.where(asset:nil).where('created_at < ?', BLOB_GRACE_PERIOD.ago).select do |blob|
       Rails.logger.info("Cleaning up content blob #{blob.id}")
       blob.reload
       blob.destroy if blob.asset.nil?
