@@ -1,11 +1,16 @@
 require 'test_helper'
 
-class ContentBlobCleanerJobTest < ActiveSupport::TestCase
+class RegularMaintenaceJobTest < ActiveSupport::TestCase
   def setup
     ContentBlob.destroy_all
   end
 
-  test 'perform' do
+  test 'run period' do
+    assert_equal 8.hours, RegularMainenanceJob::RUN_PERIOD
+  end
+
+  test 'cleans content blobs' do
+    assert_equal 8.hours, RegularMainenanceJob::BLOB_GRACE_PERIOD
     to_go, keep1, keep2, keep3, keep4 = nil
     travel_to(9.hours.ago) do
       to_go = Factory(:content_blob)
@@ -19,7 +24,7 @@ class ContentBlobCleanerJobTest < ActiveSupport::TestCase
     end
 
     assert_difference('ContentBlob.count', -1) do
-      ContentBlobCleanerJob.perform_now
+      RegularMainenanceJob.perform_now
     end
 
     refute ContentBlob.exists?(to_go.id)

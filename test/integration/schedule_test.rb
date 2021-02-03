@@ -22,7 +22,7 @@ class ScheduleTest < ActionDispatch::IntegrationTest
     # ContentBlob cleaner
     cleaner = @schedule.jobs[:runner].detect { |job| job[:task] == "ContentBlobCleanerJob.perform_later" }
     assert cleaner
-    assert_equal [ContentBlobCleanerJob::GRACE_PERIOD], cleaner[:every]
+    assert_equal [RegularMainenanceJob::GRACE_PERIOD], cleaner[:every]
 
     # Newsfeed refresh
     news_refresh = @schedule.jobs[:runner].detect { |job| job[:task] == "NewsFeedRefreshJob.set(priority: 3).perform_later" }
