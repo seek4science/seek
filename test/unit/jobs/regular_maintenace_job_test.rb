@@ -6,11 +6,11 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
   end
 
   test 'run period' do
-    assert_equal 8.hours, RegularMainenanceJob::RUN_PERIOD
+    assert_equal 8.hours, RegularMaintenanceJob::RUN_PERIOD
   end
 
   test 'cleans content blobs' do
-    assert_equal 8.hours, RegularMainenanceJob::BLOB_GRACE_PERIOD
+    assert_equal 8.hours, RegularMaintenanceJob::BLOB_GRACE_PERIOD
     to_go, keep1, keep2, keep3, keep4 = nil
     travel_to(9.hours.ago) do
       to_go = Factory(:content_blob)
@@ -24,7 +24,7 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
     end
 
     assert_difference('ContentBlob.count', -1) do
-      RegularMainenanceJob.perform_now
+      RegularMaintenanceJob.perform_now
     end
 
     refute ContentBlob.exists?(to_go.id)

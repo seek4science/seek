@@ -35,7 +35,7 @@ PeriodicSubscriptionEmailJob::DELAYS.each do |frequency, period|
   end
 end
 
-every RegularMainenanceJob::RUN_PERIOD do
+every RegularMaintenanceJob::RUN_PERIOD do
   runner "ContentBlobCleanerJob.perform_later"
 end
 

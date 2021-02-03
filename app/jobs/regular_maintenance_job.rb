@@ -2,7 +2,7 @@
 # the jobs is run periodically according to RUN_PERIOD
 # short running, simple, maintenance operations can be added here, complex, or longer running operations should spawn a
 # new job specific to the operation
-class RegularMainenanceJob < ApplicationJob
+class RegularMaintenanceJob < ApplicationJob
   RUN_PERIOD = 8.hours.freeze
   BLOB_GRACE_PERIOD = 8.hours.freeze
 
