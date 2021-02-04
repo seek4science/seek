@@ -56,6 +56,37 @@ class GitVersion < ApplicationRecord
     super || get_commit
   end
 
+  def visibility= key
+    super(Seek::ExplicitVersioning::VISIBILITY_INV[key.to_sym] || Seek::ExplicitVersioning::VISIBILITY_INV[self.class.default_visibility])
+  end
+
+  def visibility
+    Seek::ExplicitVersioning::VISIBILITY[super]
+  end
+
+  def can_change_visibility?
+    !latest_git_version? && doi.blank?
+  end
+
+  def visible?(user = User.current_user)
+    case visibility
+    when :public
+      true
+    when :private
+      parent.can_manage?(user)
+    when :registered_users
+      user&.person&.member?
+    end
+  end
+
+  def self.default_visibility
+    :public
+  end
+
+  def set_default_visibility
+    self.visibility ||= self.class.default_visibility
+  end
+
   private
 
   def set_commit
