@@ -54,7 +54,7 @@ class User < ApplicationRecord
 
   has_many :favourite_groups, dependent: :destroy
 
-  scope :not_activated, -> { where('activation_code IS NOT NULL') }
+  scope :not_activated, -> { where.not(activation_code:nil).where.not(person:nil) }
 
   acts_as_uniquely_identifiable
 
