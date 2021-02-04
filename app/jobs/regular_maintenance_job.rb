@@ -5,9 +5,11 @@
 class RegularMaintenanceJob < ApplicationJob
   RUN_PERIOD = 8.hours.freeze
   BLOB_GRACE_PERIOD = 8.hours.freeze
+  USER_GRACE_PERIOD = 1.week.freeze
 
   def perform
     clean_content_blobs
+    remove_unregistered_users
   end
 
   private
@@ -19,6 +21,12 @@ class RegularMaintenanceJob < ApplicationJob
       blob.reload
       blob.destroy if blob.asset.nil?
     end
+  end
+
+  # removes any users accounts that have not fully registered by creating an associated profile, and that were created
+  # longer ago than the USER_GRACE_PERIOD
+  def remove_unregistered_users
+    User.where(person:nil).where('created_at < ?',USER_GRACE_PERIOD.ago).destroy_all
   end
 
 end

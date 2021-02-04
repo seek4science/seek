@@ -33,4 +33,27 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
     assert ContentBlob.exists?(keep3.id)
     assert ContentBlob.exists?(keep4.id)
   end
+
+  test 'remove old unregistered users' do
+    assert_equal 1.week,RegularMaintenanceJob::USER_GRACE_PERIOD
+    to_go, keep1, keep2 = nil
+    travel_to(2.weeks.ago) do
+      to_go = Factory(:brand_new_user)
+      assert_nil to_go.person
+      keep1 = Factory(:person).user
+    end
+
+    travel_to(5.days.ago) do
+      keep2 = Factory(:brand_new_user)
+      assert_nil keep2.person
+    end
+
+    assert_difference('User.count',-1) do
+      RegularMaintenanceJob.perform_now
+    end
+
+    refute User.exists?(to_go.id)
+    assert User.exists?(keep1.id)
+    assert User.exists?(keep2.id)
+  end
 end
