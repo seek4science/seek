@@ -7,14 +7,14 @@ class MailerTest < ActionMailer::TestCase
     disable_authorization_checks { Person.where('first_name = ?', 'default admin').destroy_all }
   end
 
-  test 'signup' do
+  test 'activation_request' do
     @expected.subject = 'Sysmo SEEK account activation'
     @expected.to = 'Aaron Spiggle <aaron@email.com>'
     @expected.from    = 'no-reply@sysmo-db.org'
 
-    @expected.body    = read_fixture('signup')
+    @expected.body    = read_fixture('activation_request')
 
-    assert_equal encode_mail(@expected), encode_mail(Mailer.signup(users(:aaron)))
+    assert_equal encode_mail(@expected), encode_mail(Mailer.activation_request(users(:aaron)))
   end
 
   test 'announcement notification' do
