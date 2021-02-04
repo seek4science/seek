@@ -7,53 +7,45 @@ require 'seek/download_handling/http_streamer'
 class WorkflowCrateBuilder
   include ActiveModel::Model
 
-  attr_accessor :workflow, :abstract_cwl, :diagram, :workflow_class
+  attr_accessor :main_workflow, :abstract_cwl, :diagram, :workflow_class
 
-  validates :workflow, presence: true
+  validates :main_workflow, presence: true
   validate :resolve_remotes
   validate :workflow_data_present
 
   def build
+    @workflow = Workflow.new(workflow_class: workflow_class)
+
     if valid?
-      Rails.logger.info("Making new RO Crate")
-      crate = ROCrate::WorkflowCrate.new
-      crate.main_workflow = ROCrate::Workflow.new(crate, workflow[:data], get_unique_filename(crate, workflow))
-      crate.main_workflow.programming_language = crate.add_contextual_entity(ROCrate::ContextualEntity.new(crate, nil, workflow_class&.ro_crate_metadata || Seek::WorkflowExtractors::Base::NULL_CLASS_METADATA))
-      crate.main_workflow['url'] = workflow[:data_url] if workflow[:data_url].present?
+      annotations = {}
+      files = [[main_workflow[:data].original_filename, main_workflow[:data]]]
+      annotations['1'] = { key: 'main_workflow', path: main_workflow[:data].original_filename }
       if diagram[:data].present?
-        crate.main_workflow.diagram = ROCrate::WorkflowDiagram.new(crate, diagram[:data], get_unique_filename(crate, diagram))
-        crate.main_workflow.diagram['url'] = diagram[:data_url] if diagram[:data_url].present?
+        files << [diagram[:data].original_filename, diagram[:data]]
+        annotations['2'] = { key: 'diagram', path: diagram[:data].original_filename }
       end
-
       if abstract_cwl[:data].present?
-        crate.main_workflow.cwl_description = ROCrate::WorkflowDescription.new(crate, abstract_cwl[:data], get_unique_filename(crate, abstract_cwl))
-        crate.main_workflow.cwl_description['url'] = abstract_cwl[:data_url] if abstract_cwl[:data_url].present?
+        files << [abstract_cwl[:data].original_filename, abstract_cwl[:data]]
+        annotations['3'] = { key: 'abstract_cwl', path: abstract_cwl[:data].original_filename }
       end
-      crate.preview.template = WorkflowExtraction::PREVIEW_TEMPLATE
+      repo = GitRepository.create!
+      @workflow.git_version_attributes = @workflow.git_version_attributes.merge(git_repository_id: repo.id,
+                                                                                git_annotations_attributes: annotations)
+      @workflow.git_version.add_files(files)
 
-      f = Tempfile.new('crate.zip')
-      f.binmode
+      extractor = @workflow.extractor
+      @workflow.provide_metadata(extractor.metadata)
 
-      Rails.logger.info("Writing crate to #{f.path}")
-      ROCrate::Writer.new(crate).write_zip(f)
-      f.flush
-      File.size(f.path)
-      f.rewind
-
-      return { tmp_io_object: f,
-        original_filename: 'new-workflow.basic.crate.zip',
-        content_type: 'application/zip',
-        make_local_copy: true,
-        file_size: File.size(f.path) }
+      @workflow
     end
 
-    nil
+    @workflow
   end
 
   private
 
   def resolve_remotes
-    [:workflow, :abstract_cwl, :diagram].each do |attr|
+    [:main_workflow, :abstract_cwl, :diagram].each do |attr|
       val = send(attr)
       next if val.nil?
       if val[:data].blank? && val[:data_url].present?
@@ -79,8 +71,8 @@ class WorkflowCrateBuilder
   end
 
   def workflow_data_present
-    if workflow && workflow[:data].blank?
-      errors.add(:workflow, 'should be provided as a file or remote URL')
+    if main_workflow && main_workflow[:data].blank?
+      errors.add(:main_workflow, 'should be provided as a file or remote URL')
     end
   end
 

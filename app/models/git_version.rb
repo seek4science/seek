@@ -7,18 +7,18 @@ class GitVersion < ApplicationRecord
   belongs_to :resource, polymorphic: true
   belongs_to :git_repository
   has_many :git_annotations
-  before_validation :set_git_version_and_repo, on: :create
+  before_validation :set_default_visibility, on: :create
   before_save :set_commit, unless: -> { ref.blank? }
 
   accepts_nested_attributes_for :git_annotations
 
   include GitSupport
 
-  def metadata
+  def resource_attributes
     JSON.parse(super || '{}')
   end
 
-  def metadata= m
+  def resource_attributes= m
     super(m.to_json)
   end
 
@@ -31,20 +31,26 @@ class GitVersion < ApplicationRecord
   end
 
   def freeze_version
-    self.metadata = resource.attributes
+    self.resource_attributes = resource.attributes
     self.mutable = false
     save!
   end
 
-  def proxy
-    resource.class.proxy_class.new(resource, self)
-  end
-
-  def add_file(path, io)
-    message = file_exists?(path) ? 'Updated' : 'Added'
+  def add_file(path, io, message: nil)
+    message ||= (file_exists?(path) ? 'Updated' : 'Added')
     perform_commit("#{message} #{path}") do |index|
       oid = git_base.write(io.read, :blob) # Write the file into the object DB
       index.add(path: path, oid: oid, mode: 0100644) # Add it to the index
+    end
+  end
+
+  def add_files(path_io_pairs, message: nil)
+    message ||= "Added/updated #{path_io_pairs.count} files"
+    perform_commit(message) do |index|
+      path_io_pairs.each do |path, io|
+        oid = git_base.write(io.read, :blob) # Write the file into the object DB
+        index.add(path: path, oid: oid, mode: 0100644) # Add it to the index
+      end
     end
   end
 
@@ -117,11 +123,19 @@ class GitVersion < ApplicationRecord
     self.commit = Rugged::Commit.create(git_base.base, options)
   end
 
-  def set_git_version_and_repo
-    if @git_repository_remote
-      self.git_repository = GitRepository.where(remote: @git_repository_remote).first_or_initialize
+  # Check metadata, and parent resource for missing methods. Allows a Workflow::GitVersion to be used as a drop-in replacement for
+  #  Workflow::Version etc.
+  def respond_to_missing?(name, include_private = false)
+    resource_attributes.key?(name.to_s) || super
+  end
+
+  def method_missing(method, *args, &block)
+    if resource_attributes.key?(method.to_s) && args.empty?
+      resource_attributes[method.to_s]
+    elsif resource.respond_to?(method)
+      resource.public_send(method, *args, &block)
     else
-      self.git_repository = resource.local_git_repository || resource.build_local_git_repository
+      super
     end
   end
 end

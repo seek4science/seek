@@ -19,8 +19,17 @@ class Workflow < ApplicationRecord
   has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
 
   has_and_belongs_to_many :sops
+  #
+  # delegate :workflow_class_title, :extractor_class, :extractor, :default_diagram_format, :can_render_diagram,
+  #          :diagram_exists, :diagram, :is_git_ro_crate, :is_already_ro_crate, :is_basic_ro_crate,
+  #          :should_generate_crate, :populate_ro_crate, :ro_crate, :ro_crate_zip, :ro_crate_identifier,
+  #          :ro_crate_url, :internals, :internals, :inputs, :outputs, :steps, :main_workflow_path,
+  #          :diagram_path, :abstract_cwl_path, :cached_diagram_path, :ro_crate_path, to: :git_version
 
   git_versioning do
+    include WorkflowExtraction
+    include WorkflowProcessing
+
     def workflow_class
       WorkflowClass.find_by_id(workflow_class_id)
     end
@@ -83,6 +92,34 @@ class Workflow < ApplicationRecord
   def maturity_level= level
     super(Workflow::MATURITY_LEVELS_INV[level&.to_sym])
   end
+
+
+  def internals
+    JSON.parse(metadata || '{}').with_indifferent_access
+  end
+
+  def internals=(meta)
+    self.metadata = meta.is_a?(String) ? meta : meta.to_json
+  end
+
+  def inputs
+    (internals[:inputs] || []).map do |i|
+      WorkflowInput.new(self, **i.symbolize_keys)
+    end
+  end
+
+  def outputs
+    (internals[:outputs] || []).map do |o|
+      WorkflowOutput.new(self, **o.symbolize_keys)
+    end
+  end
+
+  def steps
+    (internals[:steps] || []).map do |s|
+      WorkflowStep.new(self, **s.symbolize_keys)
+    end
+  end
+
 
   has_filter maturity: Seek::Filtering::Filter.new(
       value_field: 'maturity_level',

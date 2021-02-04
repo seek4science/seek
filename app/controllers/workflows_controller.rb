@@ -77,14 +77,12 @@ class WorkflowsController < ApplicationController
 
   # Creates an RO-Crate zip file from several files
   def create_from_files
-    @workflow = Workflow.new(workflow_class_id: params[:workflow_class_id])
     @crate_builder = WorkflowCrateBuilder.new(ro_crate_params)
     @crate_builder.workflow_class = @workflow.workflow_class
-    blob_params = @crate_builder.build
-    @workflow.build_content_blob(blob_params)
+    @workflow = @crate_builder.build
 
     respond_to do |format|
-      if blob_params && @workflow.content_blob.save && extract_metadata
+      if @crate_builder.valid?
         format.html { render :provide_metadata }
       else
         format.html { render action: :new, status: :unprocessable_entity }
@@ -205,17 +203,13 @@ class WorkflowsController < ApplicationController
     diagram_format = params.key?(:diagram_format) ? params[:diagram_format] : @workflow.default_diagram_format
     @diagram = @display_workflow.diagram(diagram_format)
     response.set_header('Content-Security-Policy', "default-src 'self'")
-    respond_to do |format|
-      format.html do
-        if @diagram
-          send_file(@diagram.path,
-                    filename: @diagram.filename,
-                    type: @diagram.content_type,
-                    disposition: 'inline')
-        else
-          head :not_found
-        end
-      end
+    if @diagram
+      send_file(@diagram.path,
+                filename: @diagram.filename,
+                type: @diagram.content_type,
+                disposition: 'inline')
+    else
+      head :not_found
     end
   end
 
@@ -252,13 +246,13 @@ class WorkflowsController < ApplicationController
                                      { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
                                      { publication_ids: [] }, :internals, :maturity_level, :source_link_url,
                                      { discussion_links_attributes: [:id, :url, :label, :_destroy] },
-                                     { git_version_attributes: [:name, :description, :ref, :root_path, :git_repository_id, git_annotations_attributes: {}] })
+                                     { git_version_attributes: [:name, :description, :ref, :commit, :root_path, :git_repository_id, git_annotations_attributes: {}] })
   end
 
   alias_method :asset_params, :workflow_params
 
   def ro_crate_params
-    params.require(:ro_crate).permit({ workflow: [:data, :data_url, :make_local_copy] },
+    params.require(:ro_crate).permit({ main_workflow: [:data, :data_url, :make_local_copy] },
                                      { abstract_cwl: [:data, :data_url, :make_local_copy] },
                                      { diagram: [:data, :data_url, :make_local_copy] })
   end

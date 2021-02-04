@@ -16,7 +16,6 @@ class GitWorkflowWizard
                 :workflow_class_id
 
   validates :git_repository_id, presence: true
-  validates :ref, presence: true
   validates :main_workflow_path, presence: true
   validates :workflow_class_id, presence: true
 

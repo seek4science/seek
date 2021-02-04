@@ -8,10 +8,13 @@ module Seek
     include Seek::AssetsStandardControllerActions
 
     def find_display_asset(asset = instance_variable_get("@#{controller_name.singularize}"))
-      requested_version = params[:version] || asset.latest_version.version
-      found_version = asset.find_version(requested_version)
+      if asset.respond_to?(:git_versions)
+        found_version = params[:version] ? asset.find_git_version(params[:version]) : asset.latest_git_version
+      else
+        found_version = params[:version] ? asset.find_version(params[:version]) : asset.latest_version
+      end
       if found_version&.visible?
-        instance_variable_set("@display_#{asset.class.name.underscore}", asset.find_version(found_version))
+        instance_variable_set("@display_#{asset.class.name.underscore}", found_version)
       else
         error('This version is not available', 'invalid route')
         false

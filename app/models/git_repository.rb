@@ -15,7 +15,6 @@ class GitRepository < ApplicationRecord
   end
 
   def git_base
-    return unless persisted?
     @git_base ||= Seek::Git::Base.base_class.new(local_path)
   end
 

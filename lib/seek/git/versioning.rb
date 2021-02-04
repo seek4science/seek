@@ -10,8 +10,8 @@ module Seek
           # don't allow multiple calls
           return if reflect_on_association(:git_versions)
 
-          cattr_accessor :proxy_class_name
-          self.proxy_class_name = options[:proxy_class_name]  || 'ResourceProxy'
+          cattr_accessor :git_version_class_name
+          self.git_version_class_name = options[:git_version_class_name]  || 'GitVersion'
 
           class_eval do
             has_many :git_versions, as: :resource, dependent: :destroy
@@ -30,6 +30,10 @@ module Seek
               persisted? ? latest_git_version : initial_git_version
             end
 
+            def find_git_version(version)
+              git_versions.where(version: version).first
+            end
+
             def latest_git_version
               git_versions.last
             end
@@ -41,12 +45,12 @@ module Seek
             end
 
             def initial_git_version
-              self.git_versions.build(git_version_attributes)
+              self.git_versions.build(git_version_attributes.merge(mutable: git_version_attributes[:remote].blank?))
             end
 
             def git_version_attributes
               (@git_version_attributes || {}).with_indifferent_access.slice(
-                  :name, :description, :ref, :root_path, :git_repository_id, :git_annotations_attributes
+                  :name, :description, :ref, :commit, :root_path, :git_repository_id, :git_annotations_attributes
               ).reverse_merge(default_git_version_attributes)
             end
 
@@ -58,14 +62,13 @@ module Seek
             #   latest_git_version.commit.present?
             # end
 
-            def self.proxy_class
-              const_get(proxy_class_name)
+            def self.git_version_class
+              const_get(git_version_class_name)
             end
           end
 
-          # The proxy object that will behave like the resource, but using attributes stored in the GitVersion.
-          const_set(proxy_class_name, Class.new(::ResourceProxy))
-          proxy_class.class_eval(&extension) if block_given?
+          const_set(git_version_class_name, Class.new(::GitVersion))
+          git_version_class.class_eval(&extension) if block_given?
         end
       end
     end

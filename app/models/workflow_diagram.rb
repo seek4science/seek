@@ -1,25 +1,32 @@
 class WorkflowDiagram
+  include Seek::MimeTypes
+
   class UnsupportedFormat < RuntimeError; end
 
-  attr_reader :workflow, :version, :path, :format, :content_type
+  attr_reader :git_version, :path
 
-  def initialize(workflow, version, path, format, content_type)
-    @workflow = workflow
-    @version = version
+  def initialize(git_version, path)
+    @git_version = git_version
     @path = path
-    @format = format
-    @content_type = content_type
   end
 
   def filename
-    "workflow-diagram-#{@workflow.id}-#{@version}.#{@format}"
+    "workflow-diagram-#{@git_version.resource_id}-#{@git_version.version}.#{extension}"
+  end
+
+  def extension
+    path.split('.').last.downcase
+  end
+
+  def content_type
+    mime_types_for_extension(extension).first
   end
 
   def size
-    File.size(@path)
+    File.size(path)
   end
 
   def exists?
-    File.exist?(@path)
+    File.exist?(path)
   end
 end

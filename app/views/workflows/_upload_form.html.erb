@@ -21,7 +21,7 @@
             <div class="form-group">
               <label class="required">Workflow</label>
               <p class="help-block">The main executable workflow.</p>
-              <%= render partial: 'assets/upload', locals: { field_name: 'ro_crate[workflow]', param: params.dig(:ro_crate, :workflow) } -%>
+              <%= render partial: 'assets/upload', locals: { field_name: 'ro_crate[main_workflow]', param: params.dig(:ro_crate, :main_workflow) } -%>
             </div>
 
             <div class="form-group">
