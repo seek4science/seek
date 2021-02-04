@@ -2,6 +2,9 @@
 # the jobs is run periodically according to RUN_PERIOD
 # short running, simple, maintenance operations can be added here, complex, or longer running operations should spawn a
 # new job specific to the operation
+
+require 'rake'
+
 class RegularMaintenanceJob < ApplicationJob
   RUN_PERIOD = 8.hours.freeze
   BLOB_GRACE_PERIOD = 8.hours.freeze
@@ -10,6 +13,7 @@ class RegularMaintenanceJob < ApplicationJob
   def perform
     clean_content_blobs
     remove_unregistered_users
+    trim_session
   end
 
   private
@@ -27,6 +31,12 @@ class RegularMaintenanceJob < ApplicationJob
   # longer ago than the USER_GRACE_PERIOD
   def remove_unregistered_users
     User.where(person:nil).where('created_at < ?',USER_GRACE_PERIOD.ago).destroy_all
+  end
+
+  # trims old sessions, using the db:sessions:trim task
+  def trim_session
+    Rails.application.load_tasks
+    Rake::Task['db:sessions:trim'].invoke
   end
 
 end
