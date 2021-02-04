@@ -650,6 +650,10 @@ SEEK::Application.routes.draw do
     resources :projects, only: [:index]
   end
 
+  ### SAMPLE ATTRIBUTE TYPES ###
+
+  resources :sample_attribute_types, only: [:index, :show]
+
   ### SAMPLE CONTROLLED VOCABS ###
 
   resources :sample_controlled_vocabs do
