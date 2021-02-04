@@ -200,7 +200,7 @@ class WorkflowsController < ApplicationController
   end
 
   def diagram
-    diagram_format = params.key?(:diagram_format) ? params[:diagram_format] : @workflow.default_diagram_format
+    diagram_format = params.key?(:diagram_format) ? params[:diagram_format] : @display_workflow.default_diagram_format
     @diagram = @display_workflow.diagram(diagram_format)
     response.set_header('Content-Security-Policy', "default-src 'self'")
     if @diagram
