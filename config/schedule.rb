@@ -36,7 +36,7 @@ PeriodicSubscriptionEmailJob::DELAYS.each do |frequency, period|
 end
 
 every RegularMaintenanceJob::RUN_PERIOD do
-  runner "ContentBlobCleanerJob.perform_later"
+  runner "RegularMaintenanceJob.perform_later"
 end
 
 every Seek::Config.home_feeds_cache_timeout.minutes do # Crontab will need to be regenerated if this changes...
