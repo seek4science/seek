@@ -128,8 +128,6 @@ SEEK::Application.routes.draw do
     end
   end
 
-  resources :git_versions, concerns: [:git]
-
   resources :scales do
     collection do
       post :search
@@ -530,7 +528,7 @@ SEEK::Application.routes.draw do
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :workflows, :collections, only: [:index]
   end
 
-  resources :workflows, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
+  resources :workflows, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset, :git] do
     collection do
       post :create_from_ro_crate
       post :create_from_files

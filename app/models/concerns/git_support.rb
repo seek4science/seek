@@ -49,12 +49,13 @@ module GitSupport
 
   # Checkout the commit into the given directory.
   def in_dir(dir)
-    wd = git_base.workdir
-    git_base.workdir = dir
-    git_base.checkout_tree(tree.oid, strategy: [:dont_update_index, :force, :no_refresh])
+    base = git_base.base
+    wd = base.workdir
+    base.workdir = dir
+    base.checkout_tree(tree.oid, strategy: [:dont_update_index, :force, :no_refresh])
   ensure
-    if wd
-      git_base.workdir = wd
+    if base && wd
+      base.workdir = wd
     end
   end
 

@@ -14,7 +14,9 @@ module WorkflowExtraction
   end
 
   def extractor
-    if is_already_ro_crate?
+    if is_git_ro_crate?
+      Seek::WorkflowExtractors::ROCrate.new(is_a?(GitVersion) ? self : git_version, main_workflow_class: workflow_class)
+    elsif is_already_ro_crate?
       Seek::WorkflowExtractors::ROCrate.new(content_blob, main_workflow_class: workflow_class)
     elsif is_git_versioned?
       Seek::WorkflowExtractors::GitRepo.new(is_a?(GitVersion) ? self : git_version, main_workflow_class: workflow_class)
@@ -24,11 +26,11 @@ module WorkflowExtraction
   end
 
   def is_git_ro_crate?
-    is_git_versioned? && (file_exists?('.ro-crate-metadata.json') || file_exists?('.ro-crate-metadata.jsonld'))
+    is_git_versioned? && (file_exists?('ro-crate-metadata.json') || file_exists?('ro-crate-metadata.jsonld'))
   end
 
   def is_already_ro_crate?
-    content_blob && content_blob.original_filename.end_with?('.crate.zip') || is_git_ro_crate?
+    content_blob && content_blob.original_filename.end_with?('.crate.zip')
   end
 
   def is_basic_ro_crate?

@@ -66,8 +66,12 @@ class WorkflowsController < ApplicationController
 
   # Takes a single RO-Crate zip file
   def create_from_ro_crate
+    @crate_extractor = WorkflowCrateExtractor.new(ro_crate_extractor_params)
+    @crate_extractor.workflow_class = @workflow.workflow_class
+    @workflow = @crate_extractor.build
+
     respond_to do |format|
-      if handle_upload_data(@workflow.persisted?) && @workflow.content_blob.save && extract_metadata
+      if @crate_extractor.valid?
         format.html { render :provide_metadata }
       else
         format.html { render action: :new, status: :unprocessable_entity }
@@ -255,6 +259,10 @@ class WorkflowsController < ApplicationController
     params.require(:ro_crate).permit({ main_workflow: [:data, :data_url, :make_local_copy] },
                                      { abstract_cwl: [:data, :data_url, :make_local_copy] },
                                      { diagram: [:data, :data_url, :make_local_copy] })
+  end
+
+  def ro_crate_extractor_params
+    params.permit(ro_crate: [:data, :data_url, :make_local_copy])
   end
 
   def git_workflow_wizard_params
