@@ -86,7 +86,8 @@ class PeopleControllerTest < ActionController::TestCase
     assert_redirected_to person_path(person)
   end
 
-  def test_should_create_person
+  test 'should_create_person' do
+
     assert_difference('Person.count') do
       assert_difference('NotifieeInfo.count') do
         post :create, params: { person: { first_name: 'test', email: 'hghg@sdfsd.com' } }
@@ -96,6 +97,25 @@ class PeopleControllerTest < ActionController::TestCase
     assert_redirected_to person_path(assigns(:person))
     assert_equal 'T', assigns(:person).first_letter
     assert_not_nil Person.find(assigns(:person).id).notifiee_info
+  end
+
+  test 'activation required after create' do
+    Factory(:person) # make sure a person is present, first person would otherwise be the admin
+
+    login_as(Factory(:brand_new_user))
+    with_config_value(:activation_required_enabled,true) do
+      with_config_value(:email_enabled, true) do
+        assert_difference('Person.count') do
+          assert_enqueued_emails(2) do #1 to admin, and 1 email requesting activation
+            post :create, params: { person: { first_name: 'test', email: 'hghg@sdfsd.com' } }
+          end
+        end
+      end
+    end
+
+    person = assigns(:person)
+    assert_redirected_to activation_required_users_path
+    refute person.user.active?
   end
 
   test 'cannot access select form as registered user, even admin' do
