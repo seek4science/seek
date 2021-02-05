@@ -37,8 +37,8 @@ class UsersController < ApplicationController
 
   def activate
     self.current_user = params[:activation_code].blank? ? false : User.find_by_activation_code(params[:activation_code])
-    if logged_in? && !current_user.active?
-      current_user.activate
+    if logged_in? && !current_user.active? && current_user.person
+      current_user.activate      
       Mailer.welcome(current_user).deliver_later
       flash[:notice] = 'Registration complete and successfully activated!'
       redirect_to current_person

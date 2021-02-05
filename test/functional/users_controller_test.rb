@@ -198,10 +198,22 @@ class UsersControllerTest < ActionController::TestCase
     end
   end
 
-  def test_should_activate_user
-    user = Factory(:person, user: Factory(:brand_new_user)).user
+  test 'should activate user' do
+    user = Factory(:person, user: Factory(:brand_new_user)).user    
     refute user.active?
-    get :activate, params: { activation_code: user.activation_code }
+
+    #make some logs
+    MessageLog.log_activation_email(user.person)
+    MessageLog.log_activation_email(user.person)
+
+    assert_equal 2, MessageLog.activation_email_logs(user.person).count
+
+    assert_difference('MessageLog.count',-2) do
+      get :activate, params: { activation_code: user.activation_code }
+    end
+
+    assert_empty MessageLog.activation_email_logs(user.person)
+
     assert_redirected_to person_path(user.person)
     refute_nil flash[:notice]
     assert User.find(user.id).active?
