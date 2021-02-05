@@ -152,9 +152,10 @@ class UsersController < ApplicationController
   end
 
   def resend_activation_email
-    user = User.find(params[:id])
+    user = User.find(params[:id])    
     if user && user.person && !user.active?
       Mailer.activation_request(user).deliver_later
+      MessageLog.log_activation_email(user.person)
       flash[:notice] = "An email has been sent to user: #{user.person.name}"
     else
       flash[:notice] = 'No email sent. User was already activated.'
