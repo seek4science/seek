@@ -1,10 +1,12 @@
 # records and tracks messages that have been sent, and when
 class MessageLog < ApplicationRecord
+  #FIXME: this is being used for more types than expected and is getting overloaded, worthy of being split into subclasses
   # the different types of messages
   PROJECT_MEMBERSHIP_REQUEST = 1
   CONTACT_REQUEST = 2
   PROGRAMME_CREATION_REQUEST = 3
   PROJECT_CREATION_REQUEST = 4
+  ACTIVATION_EMAIL = 5
 
   # the period concidered recent, which can be used to prevent a repeat message until that period has passed
   RECENT_PERIOD = 12.hours.freeze
@@ -21,6 +23,7 @@ class MessageLog < ApplicationRecord
   scope :project_membership_requests, -> { where(message_type: PROJECT_MEMBERSHIP_REQUEST) }
   scope :contact_requests, -> { where(message_type: CONTACT_REQUEST) }
   scope :project_creation_requests, -> { where(message_type: PROJECT_CREATION_REQUEST) }
+  scope :activation_email_logs, -> (person) {where(message_type: ACTIVATION_EMAIL,resource:person).order(created_at: :desc)}
 
   # project creation requests that haven't been responded to
   scope :pending_project_creation_requests, -> { project_creation_requests.pending }
@@ -58,6 +61,11 @@ class MessageLog < ApplicationRecord
   # records a contact request for a sender and resource, along with any details provided
   def self.log_contact_request(sender, item, details)
      MessageLog.create(resource: item, sender: sender, details: details, message_type: CONTACT_REQUEST)
+  end
+
+  # logs when an activation email has been sent, and by whom
+  def self.log_activation_email(sender)
+    MessageLog.create(resource:sender,sender:sender,message_type: ACTIVATION_EMAIL)
   end
 
   # how many hours remaining since the message was created, and the RECENT_PERIOD has elapsed

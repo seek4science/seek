@@ -246,6 +246,43 @@ class MessageLogTest < ActiveSupport::TestCase
     end
   end
 
+  test 'log activation email sent' do
+    person = Factory(:person)
+    log = assert_difference('MessageLog.count') do
+      MessageLog.log_activation_email(person)
+    end    
+    assert_equal MessageLog::ACTIVATION_EMAIL,log.message_type
+    assert_equal person,log.sender
+    assert_equal person,log.resource
+  end
+
+  test 'activation email logs' do
+    log1,log2,log3,lo4 = nil
+    person = Factory(:person)
+    other_person = Factory(:person)
+
+    travel_to(2.days.ago) do
+      log2=MessageLog.log_activation_email(person)
+    end
+
+    travel_to(4.days.ago) do
+      log1=MessageLog.log_activation_email(person)
+    end
+
+    travel_to(1.days.ago) do
+      log3=MessageLog.log_activation_email(person)
+      log4=MessageLog.log_activation_email(other_person)
+    end
+
+    assert_equal [log3,log2,log1],MessageLog.activation_email_logs(person)
+    assert_equal [log3,log2,log1],person.activation_email_logs
+
+  end
+
+
+  
+
+
 
   private
 
