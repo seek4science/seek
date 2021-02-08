@@ -23,7 +23,7 @@ class MessageLog < ApplicationRecord
   scope :project_membership_requests, -> { where(message_type: PROJECT_MEMBERSHIP_REQUEST) }
   scope :contact_requests, -> { where(message_type: CONTACT_REQUEST) }
   scope :project_creation_requests, -> { where(message_type: PROJECT_CREATION_REQUEST) }
-  scope :activation_email_logs, -> (person) {where(message_type: ACTIVATION_EMAIL,resource:person).order(created_at: :desc)}
+  scope :activation_email_logs, -> (person) {where(message_type: ACTIVATION_EMAIL,resource:person).order(created_at: :asc)}
 
   # project creation requests that haven't been responded to
   scope :pending_project_creation_requests, -> { project_creation_requests.pending }

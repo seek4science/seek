@@ -199,7 +199,7 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test 'should activate user' do
-    user = Factory(:person, user: Factory(:brand_new_user)).user    
+    user = Factory(:not_activated_person).user    
     refute user.active?
 
     #make some logs

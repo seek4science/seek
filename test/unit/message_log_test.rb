@@ -278,11 +278,7 @@ class MessageLogTest < ActiveSupport::TestCase
     assert_equal [log3,log2,log1],person.activation_email_logs
 
   end
-
-
   
-
-
 
   private
 
