@@ -1,3 +1,4 @@
+<%= javascript_include_tag "prototype" %>
 <%= javascript_include_tag "project_folders" %>
 <%
     default_folder = initial_folder(@project)
@@ -88,113 +89,38 @@
     </div>
      <%=  render partial: 'attribute_list' %>
     <script type="text/javascript">
-    const customISAMerged = {
-            "nucleic acid extraction": [{
-                "name": "Extract Name",
-                "description": "User-defined names for each portion of extracted material.",
-                "dataType": "String",
-                "required": "false"
-            }],
-            "library construction": [{
-                    "name": "Parameter Value[library source]",
-                    "description": "The LIBRARY_SOURCE specifies the type of source material that is being sequenced. (SRA 1.2 documentation)",
-                    "dataType": "String",
-                    "required": "false"
-                },
-                {
-                    "name": "Parameter Value[library strategy]",
-                    "description": "Sequencing technique intended for this library (SRA 1.2 documentation)",
-                    "dataType": "List",
-                    "required": "false"
-                },
-                {
-                    "name": "Parameter Value[library selection]",
-                    "description": "Whether any method was used to select for or against, enrich, or screen the material being sequenced. (SRA 1.2 documentation)",
-                    "dataType": "String",
-                    "required": "false"
-                },
-                {
-                    "name": "Parameter Value[library layout]",
-                    "description": "specifies whether to expect single, paired, or other configuration of reads.",
-                    "dataType": "List",
-                    "required": "false"
-                }
-            ],
-            "nucleic acid sequencing": [{
-                    "name": "Parameter Value[sequencing instrument]",
-                    "description": "a parameter to report the sequencing instrument model and make",
-                    "dataType": "List",
-                    "required": "false"
-                },
-                {
-                    "name": "Parameter Value[quality scorer]",
-                    "description": "ENA term if applicable",
-                    "dataType": "Ontology term",
-                    "required": "false"
-                },
-                {
-                    "name": "Parameter Value[base caller]",
-                    "description": "ENA term if applicable",
-                    "dataType": "Ontology term",
-                    "required": "false"
-                },
-                {
-                    "name": "Assay Name",
-                    "description": "assayname",
-                    "dataType": "String",
-                    "required": "true"
-                },
-                {
-                    "name": "Comment[Export]",
-                    "description": "Use this field to select/set which records should be exported for a submission to SRA/ENA",
-                    "dataType": "List",
-                    "required": "false"
-                },
-                {
-                    "name": "Raw Data File",
-                    "description": "raw data",
-                    "dataType": "String",
-                    "required": "false"
-                }
-            ],
-            "sequence assembly": [{
-                    "name": "Normalization Name",
-                    "description": "User-defined name for each normalization applied",
-                    "dataType": "String",
-                    "required": "false"
-                },
-                {
-                    "name": "Data Transformation Name",
-                    "description": "a data transformation",
-                    "dataType": "String",
-                    "required": "false"
-                },
-                {
-                    "name": "Derived Data File",
-                    "description": "derived data such as an assembly file",
-                    "dataType": "String",
-                    "required": "false"
-                }
-            ]
-        }
 
         var selectedItem = {type:"",id:""}, pid, uid
         let AssayDetails = []
         let existingAssays = []
         const sourceTypes = <%= @sourceTypes.to_json.html_safe %>
         console.log("sourceTypes",sourceTypes)
-        const characteristics = $j(sourceTypes).map((i,x)=>{if(x.type=="study") return x}).get()
-        let AssayTypes = $j(sourceTypes).map((i,x)=>{if(x.type=="assay") return x}).get()
-        $j.each(customISAMerged, (i, k) => {
-            AssayTypes.push({
-                attributes: $j.map(k, (x, j) => ({
-                    id: 999,
+
+        // Simplifying for the prototype...
+        let characteristics =  $j(sourceTypes).map((i,x)=>{if(x.type=="study") return x}).get()
+         characteristics.push({
+                attributes: $j.map(ISAsource, (x, i) => ({
+                    id: 1,
                     title: x.name,
                     shortName: "",
                     des: x.description,
                     required: x.required
                 })),
-                repoId: 1000,
+                repoId: 1,
+                title: "ENA Source",
+                type: "study"
+            })
+        let AssayTypes = $j(sourceTypes).map((i,x)=>{if(x.type=="assay") return x}).get()
+        $j.each(customISAMerged, (i, k) => {
+            AssayTypes.push({
+                attributes: $j.map(k, (x, j) => ({
+                    id: 1,
+                    title: x.name,
+                    shortName: "",
+                    des: x.description,
+                    required: x.required
+                })),
+                repoId: 1,
                 title: i,
                 type: "assay"
             })

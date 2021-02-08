@@ -5,21 +5,20 @@
     <%= button_link_to('Hide optionals', 'denied', '#', id: 'hide_optionals') %>
     <a class="btn btn-primary btn-sm pull-right" onclick="saveSamples()">Save</a>
     <div class="sampleTblContainer">
-        <table>
-            <table style="width: auto;" class="table tableXs sampleTable">
-                <thead class="thead-dark">
-                    <tr class="topHeader"></tr>
-                    <tr class="downHeader"></tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
+        <table style="width: auto;margin-bottom:0" class="tableXs sampleTable">
+            <thead class="thead-dark">
+                <tr class="topHeader"></tr>
+                <tr class="downHeader"></tr>
+            </thead>
+            <tbody>
+            </tbody>
         </table>
     </div>
 </div>
 <style>
     .sampleTblContainer {
         overflow-x: scroll;
+        margin-top: 10px
     }
 
     select {
@@ -36,8 +35,8 @@
                 if (res.data) {
                     console.log(res.data)
                     // Remove link_id for now --> Is it needed in the future??
-                    // const header = $j.grep(res.data.header, (n, i) => n.original_accessor_name != "link_id")
-                    loadSampleTableHeader(res.data.header)
+                    // const header = $j.grep(res.data.header, (n, i) => n.title != "link_id")
+                    loadSampleTableHeader(res.data.header, ".sampleTable")
                     loadSampleData(res.data.samples, res.data.header)
                     hideAttributes()
                     validateTable()
@@ -50,14 +49,15 @@
         })
     }
 
-    function loadSampleTableHeader(headers) {
-        const headTr = $j('.sampleTable .downHeader')
+    function loadSampleTableHeader(headers, tableClass) {
+        const headTr = $j(`${tableClass} .downHeader`)
         // Adds the select column
         headTr.empty().append("<th><input id='selectAll' onClick='selectAll(this)' type='checkbox'/></th>")
         $j(headers).each((i, x) => {
-            const TH = customTD(x.sample_controlled_vocab_id, x.original_accessor_name, x.required, x.sample_type_id)
+            const TH = customTD(x.sample_controlled_vocab_id, x.title, x.required, x.sample_type_id)
             headTr.append(TH)
         })
+        $j(`${tableClass} .topHeader th`).attr("colspan", headers.length + 1)
     }
 
     function loadSampleData(data, headers) {
@@ -83,14 +83,14 @@
         let result = {
             text: "",
             sampleId: "",
-            editable: key.original_accessor_name == "link_id" ? "" : "contenteditable"
+            editable: key.title == "link_id" ? "" : "contenteditable"
         }
         let link_id = ""
         $j.each(row, (n, samplePart) => {
-            //samplePart.data[key.original_accessor_name] != undefined &&
-            if (!link_id && key.original_accessor_name == "link_id") link_id = samplePart.data[key.original_accessor_name]
+            //samplePart.data[key.title] != undefined &&
+            if (!link_id && key.title == "link_id") link_id = samplePart.data[key.title]
             if (key.sample_type_id == samplePart.sampleTypeid) {
-                result.text = samplePart.data[key.original_accessor_name]
+                result.text = samplePart.data[key.title]
                 result.sampleId = samplePart.sampleId
                 return
             }
@@ -503,14 +503,14 @@
     }
 
     function selectAll(e) {
-        const checkBoxes = $j('.sampleTable tr td:first-child input')
+        const checkBoxes = $j(e).closest('table').find('tr td:first-child input')
         $j.each(checkBoxes, (i, k) => {
             k.checked = e.checked
         })
     }
 
-    function deselectAll() {
-        const checkBoxes = $j('.sampleTable tr td:first-child input')
+    function deselectAll(e) {
+        const checkBoxes = $j(e).closest('table').find('tr td:first-child input')
         $j.each(checkBoxes, (i, k) => {
             k.checked = false
         })
@@ -531,7 +531,7 @@
                     })
                 }
             })
-            deselectAll()
+            deselectAll(this)
         }
     })
 
@@ -595,12 +595,12 @@
         hideAttributes()
     }
 
-    function manageVisibility(action, item, field = "attributes") {
+    function manageVisibility(action, item, field = "Attributes") {
         // localStorage.clear();
         // return
         if (item) item = item.toString()
         const std_id = selectedItem.parent.id
-        const key = `${uid}_${pid}_${std_id}_dynamicTableHidden${field == "attributes" ? "Attributes" : "SampleTypes"}`
+        const key = `${uid}_${pid}_${std_id}_dynamicTableHidden${field == "Attributes" ? field : "SampleTypes"}`
         if (!localStorage[key])
             localStorage[key] = JSON.stringify([]);
         let header = JSON.parse(localStorage[key])

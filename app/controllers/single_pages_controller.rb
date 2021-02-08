@@ -100,7 +100,8 @@ class SinglePagesController < ApplicationController
   def sample_source 
     flowchart = Flowchart.where(study_id: params[:study_id]).first
     if (flowchart)
-      source_sample_type = SampleType.find(flowchart.source_sample_type_id).sample_attributes.select(:required, :title)
+      source_sample_type = SampleType.find(flowchart.source_sample_type_id).sample_attributes.select(:required, :title,
+           :sample_type_id, :id, :sample_controlled_vocab_id)
       render json: { status: :ok, data: source_sample_type }
     else
       render json: { status: :unprocessable_entity, error: "There is no data yet!" }
@@ -114,7 +115,7 @@ class SinglePagesController < ApplicationController
       flowchart = Flowchart.where(study_id: assay.study.id).first
       if (flowchart)
         source_sample_type = SampleType.find(flowchart.source_sample_type_id)
-        source_sample_type_attributes = source_sample_type.sample_attributes.select(:required, :original_accessor_name,
+        source_sample_type_attributes = source_sample_type.sample_attributes.select(:required, :title,
            :sample_type_id, :id, :sample_controlled_vocab_id)
         all_samples = load_samples(assay, source_sample_type)
         rest_headers = load_headers(assay)
@@ -186,7 +187,7 @@ class SinglePagesController < ApplicationController
     all_assays = Study.find(assay.study.id).assays.where("position <= #{assay.position}").sort_by{|e| e[:position]}
     all_assays.each do |m|
       s = SampleType.find(m.sample_type_id)
-      final_header += s.sample_attributes.select(:required, :original_accessor_name, :sample_type_id, :id, :sample_controlled_vocab_id) if !s.nil?
+      final_header += s.sample_attributes.select(:required, :title, :sample_type_id, :id, :sample_controlled_vocab_id) if !s.nil?
     end
     final_header
   end

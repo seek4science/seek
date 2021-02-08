@@ -33,7 +33,7 @@
 
 
     <div id="assayInfo" class="modal in">
-        <div class="modal-dialog modal-m">
+        <div class="modal-dialog modal-m" style="width:800px">
             <div class="modal-content">
                 <div class="modal-header">
                     <button class="close" data-dismiss="modal"><span aria-hidden="true" onClick="removeBlock()">×</span></button>
@@ -49,24 +49,20 @@
                                 </select>
                             </div>
                         </div>
-
-                        <div style="margin-bottom:10px;padding:15px" class="row">
-                            <div style="height:200px;overflow:scroll;border-radius:5px;border:1px #ddd solid">
-                                <table class="sourceAttribs" id="assayAttribs" style="width:100%;">
-                                    <thead>
-                                        <tr>
-                                            <th style="width:30%">Attribute</th>
-                                            <th>Short name</th>
-                                            <th style="width:50%">Description</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    </tbody>
-                                </table>
-                            </div>
+                        <div style="max-height:200px;overflow-y:scroll;overflow-x:hidden;border-radius:5px;border:1px #ddd solid;margin-top:15px;margin-bottom:15px">
+                            <table class="tableXs" id="assayAttribs" style="width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th style="width:20px"></th>
+                                        <th style="width:30%">Attribute</th>
+                                        <th>Short name</th>
+                                        <th style="width:50%">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
                         </div>
-
-
                         <div>
                             <label>*Title:</label>
                             <input style="margin-bottom:10px" type="text" class="form-control" id="assayTitle">
@@ -226,7 +222,10 @@
     }
 
     const loadFlowchart = () => {
-        $j("#sourceSampleTypeTable").css("visibility", "hidden");
+        // $j("#sourceSampleTypeTable").css("visibility", "hidden");
+        $j("#source_characteristics_panel").addClass("disabled")
+        $j("#source_table_panel").removeClass("disabled")
+
         const $flowchart = $j('#chart_canvas');
         const {
             id,
@@ -271,7 +270,9 @@
 
 
     const hideFlowchart = () => {
-        $j("#sourceSampleTypeTable").css("visibility", "visible");
+        // $j("#sourceSampleTypeTable").css("visibility", "visible");
+        $j("#source_characteristics_panel").removeClass("disabled")
+        $j("#source_table_panel").addClass("disabled")
         $j("#flowchart-header").hide()
         window.location.href = "#study-details"
     }
@@ -441,8 +442,9 @@
         })
         if (AssayTypes[0])
             $j.each(AssayTypes[0].attributes, (k, attr) => {
-                // $j("#attribs").append(`<li>${attr.title}</li>`)
-                $j("#assayAttribs tbody").append(`<tr><td>${attr.title}</td><td>${attr.shortName}</td><td>${attr.des}</td></tr>`)
+              const newRow = attr.required ? "<td><input disabled checked type='checkbox'/></td>" : "<td><input type='checkbox'/></td>";
+            let title = attr.required ? "<strong>" + attr.title + "*" + "</strong>" : attr.title
+            $j("#assayAttribs tbody").append(`<tr>${newRow}<td>${title}</td><td>${attr.shortName}</td><td>${attr.des}</td></tr>`)
             })
     }
 
@@ -452,8 +454,9 @@
         $j("#method_type").val(i.value)
         $j("#assayTitle").val(AssayTypes[i.value].title)
         $j.each(AssayTypes[i.value].attributes, (k, attr) => {
-            // $j("#attribs").append(`<li>${attr.title}</li>`)
-            $j("#assayAttribs tbody").append(`<tr><td>${attr.title}</td><td>${attr.shortName}</td><td>${attr.des}</td></tr>`)
+            const newRow = attr.required ? "<td><input disabled checked type='checkbox'/></td>" : "<td><input type='checkbox'/></td>";
+            let title = attr.required ? "<strong>" + attr.title + "*" + "</strong>" : attr.title
+            $j("#assayAttribs tbody").append(`<tr>${newRow}<td>${title}</td><td>${attr.shortName}</td><td>${attr.des}</td></tr>`)
         })
     }
 

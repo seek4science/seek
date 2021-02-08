@@ -1,46 +1,32 @@
 <div id="content-wrapper">
     <div class="inner">
-        <div class="row">
-            <div class="col-md-4">
-                <label>Source characteristics:</label>
-                <div class="input-group">
-                    <select class="form-control" id="sourceSelect" onchange="sourceChange();">
-                    </select>
-                </div>
-            </div>
+        <%= folding_panel('Source characteristics', false, {help_text: "Characteristics help text here", :body_options => {:id => 'source_characteristics_panel'}}) do %>
+        <select class="form-control" id="sourceSelect" onchange="sourceChange();">
+        </select>
+        </br>
+        <div style="max-height:200px;overflow-y:scroll;overflow-x:hidden;border-radius:5px;border:1px #ddd solid">
+            <table class="tableXs" id="sourceAttribs" style="width:100%;">
+                <thead>
+                    <tr>
+                        <th style="width:20px"></th>
+                        <th style="width:30%">Attribute</th>
+                        <th>Short name</th>
+                        <th style="width:50%">Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
         </div>
-        <div class="row">
-            <br />
-            <div class="col-md-12">
-                <label>Attributes list:</label>
-                <div style="max-height:200px;overflow:scroll;border-radius:5px;border:1px #ddd solid">
-                    <table class="sourceAttribs" id="sourceAttribs" style="width:100%;">
-                        <thead>
-                            <tr>
-                                <th style="width:30%">Attribute</th>
-                                <th>Short name</th>
-                                <th style="width:50%">Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <div style="margin-top:10px">
+            <input id="btn-save-study-design" onClick="saveDesign()" value="Apply characteristics" type="button" class="btn btn-primary">
         </div>
-        <hr>
-        <div id="sourceSampleTypeTable">
-            <label>The source sample type will look like:</label>
-            <%=  render partial: 'source_sample_type_table' %>
-            <hr>
-            <input id="btn-save-study-design" onClick="saveDesign()" value="Save Design" type="button" class="btn btn-primary">
-        </div>
+        <% end %>
+        <%= folding_panel('Source table', false, {help_text: "Characteristics help text here", :body_options => {:id => 'source_table_panel'}}) do %>
+        <%=  render partial: 'source_sample_type_table' %>
+        <% end %>
     </div>
-
-
-
 </div>
-
 
 <script>
     function addSourcesOptions() {
@@ -52,10 +38,6 @@
                     // .attr("sampleCVId", value.sampleCVId)
                     .text(value.title));
         })
-        if (characteristics[0])
-            $j.each(characteristics[0].attributes, (k, attr) => {
-                $j("#sourceAttribs tbody").append(`<tr><td>${attr.title}</td><td>${attr.shortName}</td><td>${attr.des}</td></tr>`)
-            })
     }
 
     function sourceChange() {
@@ -64,36 +46,13 @@
         $j("#sourceAttribs tbody").empty()
         $j("#sourceSelect").val(i)
         $j.each(characteristics[i].attributes, (k, attr) => {
-            $j("#sourceAttribs tbody").append(`<tr><td>${attr.title}</td><td>${attr.shortName}</td><td>${attr.des}</td></tr>`)
+            const newRow = attr.required ? "<td><input disabled checked type='checkbox'/></td>" : "<td><input type='checkbox'/></td>";
+            let title = attr.required ? "<strong>" + attr.title + "*" + "</strong>" : attr.title
+            $j("#sourceAttribs tbody").append(`<tr>${newRow}<td>${title}</td><td>${attr.shortName}</td><td>${attr.des}</td></tr>`)
         })
+        loadSampleTableHeader(characteristics[sourceSelect.value].attributes, ".tbl_sample_source")
 
-        // $j('.tbl_sample_source thead tr').empty()
-        $j('.tbl_sample_source thead .downHeader').empty()
-        $j(".tbl_sample_source .downHeader").empty()
-        $j(".tbl_sample_source .topHeader").empty()
-        $j.each(characteristics[sourceSelect.value].attributes, (k, attr) => {
-            $j(".tbl_sample_source thead .downHeader").append(`<th>${attr.title}</th>`) //(customTD(attr.title,attr.required))
-        })
-
-        $j(".tbl_sample_source thead .downHeader").prepend(`<th class="ins" style='color:red'>Sample name</th>`)
-        $j(".tbl_sample_source thead .downHeader").prepend(`<th class="ins" style='color:red'>Protocol REF</th>`)
-        $j(".tbl_sample_source thead .downHeader").prepend(`<th class="ins" style='color:red'>Source name</th>`)
-        $j(".tbl_sample_source thead .downHeader").prepend("<th><input id='selectAll' onClick='selectAll(this)' type='checkbox'/></th>")
-
-        $j(".tbl_sample_source tbody").empty()
-        let colspan = 1
-        let newRow = "<td><input type='checkbox'/></td>";
-        $j(".tbl_sample_source .downHeader").find('th').each(function(k, v) {
-            if (k > 0) {
-                colspan++
-                if ($j(v).hasClass("ins"))
-                    newRow += '<td contenteditable></td>'
-                else
-                    newRow += "<td style='background-color:#ccc'></td>"
-            }
-        });
-        $j(".tbl_sample_source tbody").append('<tr data-new="true">' + newRow + '</tr>')
-        $j(".tbl_sample_source .topHeader").append(`<th colspan=${colspan}>Source table</th>`)
+        deselectAll(this)
     }
 
 
@@ -113,7 +72,7 @@
         // If no hidden th found, then add new column
         if (!existingCol) {
             console.log("ddd", colCount, options.tableClass, options.title)
-            let action = "<a href='' onclick='remove_col(event)'> <span style='color:white' class='glyphicon glyphicon-trash'></span></a>"
+            let action = "<a href='' onclick='remove_col(event)'> <span class='glyphicon glyphicon-trash'></span></a>"
             let element =
                 `<th data-sampletypeid="" sample_controlled_vocab_id="" optional="true">${options.title} ${action}</th>`
             $j(options.tableClass).find('thead tr:nth-child(2)').find('th').eq(colCount - 1).after(element)
@@ -154,6 +113,30 @@
     }
 
     function saveDesign() {
+
+        //  // Hide unchecked items in the preview table
+        // //------------------------------------------
+        // //--------------------TEMPORARY----------------------
+        // const selectedSamples = $j("#sourceAttribs tbody tr td:first-child")
+        // let hiddenColumns = []
+        // $j.each(selectedSamples, (i, k) => {
+        //     if (!($j(k).find("input")[0]).checked) {
+        //         hiddenColumns.push($j(k).parent().find("td:nth-child(2)").html())
+        //     }
+        // })
+        // $j.each($j(".tbl_sample_source .downHeader th"), (i, th) => {
+        //     const title = $j.trim($j(th).html().replace(/<a( |>).*?<\/a>/gi, ""))
+        //     if (hiddenColumns.includes(title)) {
+        //         $j.each($j('.tbl_sample_source tbody tr'), (i, tr) => {
+        //             $j(tr).find(`td:eq(${$j(th).index()})`).hide();
+        //         });
+        //         $j(th).hide()
+        //     }
+        // })
+        // //---------------------TEMPORARY---------------------
+        // //------------------------------------------
+
+
         const callBack = (s) => {
             const data = {
                 flowchart: {
@@ -180,21 +163,21 @@
         }
         let attr = characteristics[$j("#sourceSelect").children("option:selected").val()].attributes
         // Add thise ISA stuff....
-        const ISAStuff = [{
-            id: null,
-            required: true,
-            title: "Source name"
-        }, {
-            id: null,
-            required: true,
-            title: "Protocol REF"
-        }, {
-            id: null,
-            required: true,
-            title: "Sample name"
-        }]
+        // const ISAStuff = [{
+        //     id: null,
+        //     required: true,
+        //     title: "Source name"
+        // }, {
+        //     id: null,
+        //     required: true,
+        //     title: "Protocol REF"
+        // }, {
+        //     id: null,
+        //     required: true,
+        //     title: "Sample name"
+        // }]
 
-        attr.unshift(...ISAStuff)
+        // attr.unshift(...ISAStuff)
 
         // const sampleCVId = $j("#sourceSelect").children("option:selected").attr("samplecvid")
         const title = `${$j("#std-title span").html()}_source_sample_type`
@@ -209,13 +192,8 @@
             dataType: "json",
             url: `/single_pages/${pid}/sample_source/${selectedItem.id}`,
             success: s => {
-                $j('.tbl_sample_source thead tr').empty()
                 if (s.data)
-
-                    $j(s.data).each((i, x) => {
-                        const TD = customTD(x.title, x.required)
-                        $j('.tbl_sample_source thead tr').append(TD)
-                    })
+                    loadSampleTableHeader(s.data, ".tbl_sample_source")
                 else sourceChange()
             },
             error: e => {
@@ -226,7 +204,7 @@
 
     function customTD(sample_controlled_vocab_id, title, required = true, info = null) {
         const action = required ? "" :
-            "<a href='' onclick='remove_col(event)'> <span style='color:white' class='glyphicon glyphicon-trash'></span></a>"
+            "<a href='' onclick='remove_col(event)'> <span class='glyphicon glyphicon-trash'></span></a>"
         return `<th data-sampletypeid=${info} optional=${!required} sample_controlled_vocab_id="${sample_controlled_vocab_id}">${title} ${action}</th>`
     }
 
