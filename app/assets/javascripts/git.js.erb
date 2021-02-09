@@ -26,10 +26,17 @@ $j(document).ready(function () {
                 }
             },
             'conditionalselect' : function (node, event) {
-                if (element.hasClass('only-select-blobs')) {
-                    return node.type === 'blob'
+                if (element.hasClass('allow-tree-select') && node.type === 'tree') {
+                    return true;
                 }
-                return true;
+                if (element.hasClass('allow-blob-select') && node.type === 'blob') {
+                    return true;
+                }
+                if (element.hasClass('allow-root-select') && node.type === 'root') {
+                    return true;
+                }
+
+                return false;
             },
             'core': {
                 'check_callback': true,
@@ -55,14 +62,13 @@ $j(document).ready(function () {
         var input = $j(this);
         var modal = $j(input.data('modal'));
         var jstreeElement = $j('.jstree', modal);
-        var selectTrees = input.data('select-trees');
+        var selectTrees = input.data('select-trees') || false;
+        var selectBlobs = input.data('select-blobs') || false;
+        var selectRoot = input.data('select-root') || false;
         input.click(function () {
-            if (!selectTrees) {
-                jstreeElement.addClass('only-select-blobs');
-            }
-            else {
-                jstreeElement.removeClass('only-select-blobs');
-            }
+            jstreeElement.toggleClass('allow-tree-select', selectTrees);
+            jstreeElement.toggleClass('allow-blob-select', selectBlobs);
+            jstreeElement.toggleClass('allow-root-select', selectRoot);
 
             jstreeElement.jstree(true).close_all();
             jstreeElement.jstree(true).uncheck_all();

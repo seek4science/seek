@@ -1064,12 +1064,17 @@ span.disabled {
 }
 
 .jstree {
-  &.only-select-blobs {
-    .git-jstree-root, .git-jstree-tree {
-      &> i.jstree-checkbox {
-        display: none;
-      }
-    }
+  i.jstree-checkbox {
+    display: none;
+  }
+  &.allow-root-select .git-jstree-root > i.jstree-checkbox {
+    display: inherit;
+  }
+  &.allow-tree-select .git-jstree-tree > i.jstree-checkbox {
+    display: inherit;
+  }
+  &.allow-blob-select .git-jstree-blob > i.jstree-checkbox {
+    display: inherit;
   }
 }
 

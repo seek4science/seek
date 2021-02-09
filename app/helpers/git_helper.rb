@@ -29,10 +29,14 @@ module GitHelper
   end
 
   def git_path_input(modal_id, name, value, opts)
+    select_blobs = opts.delete(:select_blobs) || true
     select_trees = opts.delete(:select_trees) || false
+    select_root = opts.delete(:select_root) || false
     text_field_tag(name, value, opts.reverse_merge(data: { role: 'seek-git-path-input',
                                                            modal: modal_id,
-                                                         'select-trees' => select_trees }))
+                                                           'select-blobs' => select_blobs,
+                                                           'select-trees' => select_trees,
+                                                           'select-root' => select_root }))
   end
 
   def git_breadcrumbs(resource, path = nil)
