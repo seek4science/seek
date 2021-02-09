@@ -173,7 +173,7 @@ group :test do
   gem 'ruby-prof'
   gem 'test-prof'
   gem 'rails-perftest'
-  gem 'minitest', '5.10.3'
+  gem 'minitest', '5.14.1'
   gem 'minitest-reporters'
   gem 'sunspot_matchers'
   gem 'database_cleaner', '~> 1.7.0'
