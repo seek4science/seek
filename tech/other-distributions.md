@@ -222,7 +222,7 @@ found under the menu *Edit*, *Profile Preferences* and then under the tab
 *Title and Command*.
 
 # Installing SEEK for Mac OS X
-## Mavericks
+## Catalina
 
 This section will guide you to install prerequisite packages, for other steps
 please read the main [Install Guide](install.html)
@@ -239,22 +239,75 @@ https://www.macports.org/install.php
     sudo fink install libxml++2 sqlite3-dev sqlite3
     sudo fink install poppler-bin mysql-unified-dev
 
-    sudo port install mysql5-server
+    sudo port install mysql8-server
     sudo port install openssh ImageMagick libxslt
 
 For the following packages, you download the dmg image and install manually:
 
     Libreoffice (alternative open office): http://www.libreoffice.org/download
-    Java JDK: http://www.oracle.com/technetwork/java/javase/downloads/index.html
+    Java JDK: http://www.oracle.com/technetwork/java/javase/downloads/index.html or https://jdk.java.net/ (openjdk)
+    PostGres: https://www.postgresql.org/download/macosx/
+    Node.js: https://nodejs.org/en/download/
+    
+### Setting up MySQL:
+
+https://trac.macports.org/wiki/howto/MySQL
+
+Important steps after installation:
+
+Select mysql8 at the default mysql:
+
+    sudo port select mysql mysql8
+    
+Start the server:
+
+    sudo port load mysql8-server     
+    
+Initialize the database.
+
+Doing so will give you a temporary root password. You **need** to write it down as it will be (very) difficult to reset it afterwards. At the first actual use of mysql (using the mysql command), you will need to change the root password (see below).
+    
+    sudo /opt/local/lib/mysql8/bin/mysqld --initialize --user=_mysql
+
+First start of mysql:
+
+    mysql -uroot -p
+-> use given password
+
+You cannot do anything before you set up a new password for root:
+
+    ALTER USER 'root'@'localhost' IDENTIFIED BY 'newpassword';
+
+MySql has a new authentication method by default. To ensure that Seek can connect to it, you need to specify that the Seek DB user (set in Database.yml) can use the old "native password" method:
+
+    ALTER USER 'seekmainuser'@'localhost' IDENTIFIED WITH mysql_native_password
+
+Then activate the new privileges:
+
+    flush privileges;
+
+### PostGres Gem install
+
+To install PostGres support using Gem, it needs the path to the binaries of it:
+    sudo PATH=$PATH:/Library/PostgreSQL/x.y/bin gem install pg
+
+for PostGres 10 for instance, it would be:
+    sudo PATH=$PATH:/Library/PostgreSQL/10/bin gem install pg
+
+### Puma Gem install
+
+Puma needs an option to compile with the new Xcode:
+
+    gem install puma:4.3.5 -- --with-cflags="-Wno-error=implicit-function-declaration"
 
 ### Other notes
 
 By default, mysql client connects to mysql server through socket at
 /tmp/mysql.sock. However, you might install by default the .sock file at
-/opt/local/var/run/mysql56/mysqld.sock. Therefore, the .sock file needs to be
+/opt/local/var/run/mysql8/mysqld.sock. Therefore, the .sock file needs to be
 re-configured in database.yml
 
-    socket: /opt/local/var/run/mysql56/mysqld.sock
+    socket: /opt/local/var/run/mysql8/mysqld.sock
 
 And also when you want to run mysql client, you need to give the .sock file
 path under option -S
@@ -264,3 +317,48 @@ soffice command. E.g. you might add the following line into ~/.bashrc
 
     export PATH="$PATH:/Applications/LibreOffice.app/Contents/MacOS/"
 
+
+### Connect to MySQL from a client
+
+By default MacPorts deactivates fully remote connections, which are needed for most SQL clients. To activate it, you can edit the my.cnf:
+
+    sudo vim /opt/local/etc/mysql8/my.cnf
+
+```shell
+# Use default MacPorts settings
+# !include /opt/local/etc/mysql8/macports-default.cnf
+
+[client]
+port                   =  3306
+socket                 = /opt/local/var/run/mysql8/mysqld.sock
+default-character-set  =  utf8
+
+[mysqld_safe]
+socket                 = /opt/local/var/run/mysql8/mysqld.sock
+nice                   =  0 
+default-character-set  = utf8
+
+[mysqld]
+socket                 =  /opt/local/var/run/mysql8/mysqld.sock
+port                   = 3306
+bind-address           =  127.0.0.1
+skip-external-locking
+#skip-networking
+character-set-server   =  utf8
+
+[mysqldump]
+default-character-set  =  utf8
+```
+    
+Then restart MySQL (you might need to kill the process):
+
+    sudo port unload mysql8-server 
+    
+    ps -ax | grep mysql
+-> if mysqld still there, using the listed PID:
+
+    sudo kill PID
+   
+then
+
+    sudo port load mysql8-server 
