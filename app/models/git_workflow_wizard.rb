@@ -65,7 +65,7 @@ class GitWorkflowWizard
 
   def run
     @next_step = nil
-    workflow = Workflow.new(git_version_attributes: { git_repository_id: git_repository_id, git_commit: git_commit, ref: ref })
+    workflow = Workflow.new(git_version_attributes: { git_repository_id: git_repository_id, commit: git_commit, ref: ref })
     workflow_class = WorkflowClass.find_by_id(workflow_class_id)
     if workflow.file_exists?('ro-crate-metadata.json') ||  workflow.file_exists?('ro-crate-metadata.jsonld')
       workflow.in_temp_dir do |dir|
