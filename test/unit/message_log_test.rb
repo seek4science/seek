@@ -272,10 +272,10 @@ class MessageLogTest < ActiveSupport::TestCase
     travel_to(1.days.ago) do
       log3=MessageLog.log_activation_email(person)
       log4=MessageLog.log_activation_email(other_person)
-    end
-
-    assert_equal [log3,log2,log1],MessageLog.activation_email_logs(person)
-    assert_equal [log3,log2,log1],person.activation_email_logs
+    end    
+    
+    assert_equal [log1,log2,log3],MessageLog.activation_email_logs(person)
+    assert_equal [log1,log2,log3],person.activation_email_logs
 
   end
   
