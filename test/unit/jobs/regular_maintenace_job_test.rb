@@ -101,7 +101,7 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
     end
 
     logs = MessageLog.last(2)
-    assert_equal [person1, person4].sort, logs.collect(&:resource).sort
+    assert_equal [person1, person4].sort, logs.collect(&:subject).sort
 
     # running again should have no effect, as those due another email need to wait
     assert_enqueued_emails(0) do
@@ -118,8 +118,8 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
         end
       end
     end
-    assert_equal person4, MessageLog.last.resource
+    assert_equal person4, MessageLog.last.subject
     logs = MessageLog.last(2)
-    assert_equal [person3, person4].sort, logs.collect(&:resource).sort
+    assert_equal [person3, person4].sort, logs.collect(&:subject).sort
   end
 end

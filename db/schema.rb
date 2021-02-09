@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_21_153232) do
+ActiveRecord::Schema.define(version: 2021_02_09_142611) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -851,12 +851,12 @@ ActiveRecord::Schema.define(version: 2020_12_21_153232) do
     t.datetime "updated_at"
     t.integer "message_type"
     t.text "details"
-    t.integer "resource_id"
-    t.string "resource_type"
+    t.integer "subject_id"
+    t.string "subject_type"
     t.integer "sender_id"
     t.text "response"
-    t.index ["resource_type", "resource_id"], name: "index_message_logs_on_resource_type_and_resource_id"
     t.index ["sender_id"], name: "index_message_logs_on_sender_id"
+    t.index ["subject_type", "subject_id"], name: "index_message_logs_on_subject_type_and_subject_id"
   end
 
   create_table "model_auth_lookup", id: false,  force: :cascade do |t|
