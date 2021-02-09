@@ -29,6 +29,7 @@ def load_seek_config_defaults!
   Seek::Config.default :piwik_analytics_enabled, false
   Seek::Config.default :piwik_analytics_id_site, 1
   Seek::Config.default :piwik_analytics_url, 'localhost/piwik/'
+  Seek::Config.default :piwik_analytics_tracking_notice, true
   Seek::Config.default :bioportal_api_key,''
   Seek::Config.default :project_news_enabled,false
   Seek::Config.default :project_news_feed_urls,''

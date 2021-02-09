@@ -102,6 +102,8 @@
                            'Piwik analytics id site', "The ID of your website inside Piwik. It is the numeric value corresponding to the ID of the site created in Piwik.") %>
     <%= admin_text_setting(:piwik_analytics_url, Seek::Config.piwik_analytics_url,
                            'Piwik analytics url', "The URL to your Piwik installation, withouth the http:// or https://, e.g. #{Seek::Config.default_piwik_analytics_url} ") %>
+    <%= admin_checkbox_setting(:piwik_analytics_tracking_notice, 1, Seek::Config.piwik_analytics_tracking_notice,
+                           'Tracking notice', "Warn users about the use of analytics software.") %>
   </div>
 
   <%= render :partial => "admin/doi_settings" %>

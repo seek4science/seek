@@ -1216,6 +1216,11 @@ class PeopleControllerTest < ActionController::TestCase
         get :index
         assert_response :success
         assert_select '#tracking-banner', count: 1
+        with_config_value(:piwik_analytics_tracking_notice, false) do
+          get :index
+          assert_response :success
+          assert_select '#tracking-banner', count: 0
+        end
       end
     end
     with_config_value(:google_analytics_enabled, true) do
