@@ -266,6 +266,6 @@ class WorkflowsController < ApplicationController
   end
 
   def git_workflow_wizard_params
-    params.permit(:git_repository_id, :ref, :main_workflow_path, :abstract_cwl_path, :diagram_path, :workflow_class_id)
+    params.permit(:git_repository_id, :git_commit, :ref, :main_workflow_path, :abstract_cwl_path, :diagram_path, :workflow_class_id)
   end
 end

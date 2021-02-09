@@ -50,7 +50,7 @@ module Seek
 
             def git_version_attributes
               (@git_version_attributes || {}).with_indifferent_access.slice(
-                  :name, :description, :ref, :commit, :root_path, :git_repository_id, :git_annotations_attributes
+                  :name, :description, :ref, :git_commit, :root_path, :git_repository_id, :git_annotations_attributes
               ).reverse_merge(default_git_version_attributes)
             end
 

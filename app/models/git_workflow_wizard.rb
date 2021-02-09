@@ -8,22 +8,66 @@ require 'seek/download_handling/http_streamer'
 class GitWorkflowWizard
   include ActiveModel::Model
 
+  attr_reader :next_step, :workflow, :workflow_class, :git_repository
+
   attr_accessor :git_repository_id,
+                :git_commit,
                 :ref,
                 :main_workflow_path,
                 :abstract_cwl_path,
                 :diagram_path,
-                :workflow_class_id
+                :workflow_class_id,
+                :workflow_params
 
   validates :git_repository_id, presence: true
   validates :main_workflow_path, presence: true
   validates :workflow_class_id, presence: true
 
+  def setup_repository
+    # If remote
+    #   Queue fetch job
+    #   Render "waiting" page
+    # If local files
+    #   Create local repo
+    #   Add local files
+    #   Go to next
+    # If local RO-Crate
+    #   Create local repo
+    #   Extract crate
+    #   Add files to repo
+    #   Go to next
+  end
+
+  def select_paths
+    # If ro-crate-metadata present
+    #   Pick paths from file
+    #   If main workflow path not present
+    #     Render "select paths" page
+    #   Otherwise
+    #     Go to next
+    # If not
+    #   Render "select paths" page
+  end
+
+  def extract_metadata
+    # If abstract CWL present
+    #   Extract metadata from that
+    # If ro-crate-metadata present
+    #   Extract metadata from that
+    # Otherwise
+    #   Extract metadata from main workflow
+
+  end
+
+  def create_workflow
+    # Put everything into the workflow
+  end
+
   def run
     @next_step = nil
-    workflow = Workflow.new(git_version_attributes: { git_repository_id: git_repository_id, ref: ref })
+    workflow = Workflow.new(git_version_attributes: { git_repository_id: git_repository_id, git_commit: git_commit, ref: ref })
     workflow_class = WorkflowClass.find_by_id(workflow_class_id)
-    if workflow.file_exists?('.ro-crate-metadata.json') ||  workflow.file_exists?('.ro-crate-metadata.jsonld')
+    if workflow.file_exists?('ro-crate-metadata.json') ||  workflow.file_exists?('ro-crate-metadata.jsonld')
       workflow.in_temp_dir do |dir|
         crate = ROCrate::WorkflowCrateReader.read(dir)
         self.main_workflow_path = crate.main_workflow&.id if crate.main_workflow&.id
@@ -52,9 +96,5 @@ class GitWorkflowWizard
     @next_step = :provide_metadata
 
     workflow
-  end
-
-  def next_step
-    @next_step
   end
 end
