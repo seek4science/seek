@@ -12,7 +12,11 @@ class GitController < ApplicationController
 
   def tree
     respond_to do |format|
-      format.html
+      if request.xhr?
+        format.html { render partial: 'tree' }
+      else
+        format.html
+      end
     end
   end
 
@@ -22,7 +26,11 @@ class GitController < ApplicationController
 
   def blob
     respond_to do |format|
-      format.html
+      if request.xhr?
+        format.html { render partial: 'blob' }
+      else
+        format.html
+      end
     end
   end
 
