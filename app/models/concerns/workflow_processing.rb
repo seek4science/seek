@@ -4,9 +4,7 @@ module WorkflowProcessing
   extend ActiveSupport::Concern
 
   def default_diagram_format
-    Rails.cache.fetch("#{cache_key_with_version}/default_diagram_format", expires_in: 3.days) do
-      extractor.default_diagram_format
-    end
+    extractor.default_diagram_format
   end
 
   def can_render_diagram?
@@ -19,7 +17,7 @@ module WorkflowProcessing
 
   def diagram(format = default_diagram_format)
     path = Pathname.new(cached_diagram_path(format))
-    content_type = extractor_class.diagram_formats[format]
+    content_type = extractor.class.diagram_formats[format]
     raise(WorkflowDiagram::UnsupportedFormat, "Unsupported diagram format: #{format}") if content_type.nil?
 
     unless path.exist?

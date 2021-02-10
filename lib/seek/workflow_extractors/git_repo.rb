@@ -17,6 +17,16 @@ module Seek
         @git_version.path_for_key(:diagram).present?
       end
 
+      def default_diagram_format
+        diagram_path = @git_version.path_for_key(:diagram)
+        if diagram_path
+          ext = diagram_path.split('.').last
+          return ext if self.class.diagram_formats.key?(ext)
+        end
+
+        super
+      end
+
       def diagram(format = nil)
         @git_version.file_contents(@git_version.path_for_key(:diagram))
       end
