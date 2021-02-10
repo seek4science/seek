@@ -79,3 +79,4 @@ coverage/
 
 Test\ Results*.html
 
+.vscode/launch.json
