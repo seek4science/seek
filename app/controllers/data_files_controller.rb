@@ -313,6 +313,12 @@ class DataFilesController < ApplicationController
   # handles the uploading of the file to create a content blob, which is then associated with a new unsaved datafile
   # and stored on the session
   def create_content_blob
+    # clean up the session
+    session.delete(:uploaded_content_blob_id)
+    session.delete(:processed_datafile)
+    session.delete(:processed_assay)
+    session.delete(:processed_warnings)
+
     @data_file = setup_new_asset
     respond_to do |format|
       if handle_upload_data && @data_file.content_blob.save
@@ -432,12 +438,7 @@ class DataFilesController < ApplicationController
 
     if all_valid
 
-      update_relationships(@data_file, params)
-
-      session.delete(:uploaded_content_blob_id)
-      session.delete(:processed_datafile)
-      session.delete(:processed_assay)
-      session.delete(:processed_warnings)
+      update_relationships(@data_file, params)      
 
       respond_to do |format|
         flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
