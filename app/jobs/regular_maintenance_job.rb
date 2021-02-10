@@ -6,7 +6,7 @@
 require 'rake'
 
 class RegularMaintenanceJob < ApplicationJob
-  RUN_PERIOD = 8.hours.freeze
+  RUN_PERIOD = 4.hours.freeze
   BLOB_GRACE_PERIOD = 8.hours.freeze
   USER_GRACE_PERIOD = 1.week.freeze
   MAX_ACTIVATION_EMAILS = 3
@@ -46,11 +46,15 @@ class RegularMaintenanceJob < ApplicationJob
   # and a total maximum of MAX_ACTIVATION_EMAILS (which will include the first one)
   def resend_activation_emails
     User.where.not(person: nil).where.not(activation_code: nil).each do |user|
-      logs = user.person.activation_email_logs
-      if logs.count < MAX_ACTIVATION_EMAILS && (logs.empty? || logs.last.created_at < RESEND_ACTIVATION_EMAIL_DELAY.ago)
-        Mailer.activation_request(user).deliver_later
-        MessageLog.log_activation_email(user.person)
-      end
+      if user.person
+        logs = user.person.activation_email_logs
+        if logs.count < MAX_ACTIVATION_EMAILS && (logs.empty? || logs.last.created_at < RESEND_ACTIVATION_EMAIL_DELAY.ago)
+          Mailer.activation_request(user).deliver_later
+          MessageLog.log_activation_email(user.person)
+        end
+      else
+        Rails.logger.info("User with invalid person - #{user.id}")
+      end  
     end
   end
 end

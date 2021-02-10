@@ -6,7 +6,7 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
   end
 
   test 'run period' do
-    assert_equal 8.hours, RegularMaintenanceJob::RUN_PERIOD
+    assert_equal 4.hours, RegularMaintenanceJob::RUN_PERIOD
   end
 
   test 'cleans content blobs' do
@@ -92,6 +92,9 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
     # person5 - an activated person, with no logs
     person5 = Factory(:person)
     assert person5.user.active?
+
+    # an invalid user with missing person id, to test it is protected against
+    user = Factory(:brand_new_user,person_id:Person.last.id+1)
 
     # only person 1 and person 4 should have emails resent
     assert_enqueued_emails(2) do
