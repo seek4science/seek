@@ -54,7 +54,7 @@ class User < ApplicationRecord
 
   has_many :favourite_groups, dependent: :destroy
 
-  scope :not_activated, -> { where('activation_code IS NOT NULL') }
+  scope :not_activated, -> { where.not(activation_code:nil).where.not(person:nil) }
 
   acts_as_uniquely_identifiable
 
@@ -121,11 +121,14 @@ class User < ApplicationRecord
   end
 
   # Activates the user in the database.
-  def activate
+  def activate    
     @activated = true
     self.activated_at = Time.now.utc
     self.activation_code = nil
     save(validate: false)
+
+    #clear message logs if associated with a person (might not be when automatically activated when activation is required)
+    MessageLog.activation_email_logs(person).destroy_all unless person.nil?
   end
 
   def assets

@@ -42,6 +42,7 @@ jobs:
           - rake assets:precompile
           - rake db:setup
           - rake db:migrate
+          - rake seek:upgrade
         include:
           - database: postgres
             suite: rails test test/unit
@@ -93,5 +94,8 @@ jobs:
           git checkout ${{ github.event.before }} -- db/schema.rb
       - name: Load test database schema
         run: bundle exec rake db:schema:load
+      - name: Seed database
+        if: matrix.suite == 'rake seek:upgrade'
+        run: bundle exec rake db:seed
       - name: Run tests
         run: bundle exec ${{ matrix.suite }}

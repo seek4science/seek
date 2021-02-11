@@ -665,7 +665,7 @@ class ProjectsController < ApplicationController
     @message_log = MessageLog.find_by_id(params[:message_log_id])
 
     error_msg ||= "message log not found" unless @message_log
-    error_msg ||= ("message log doesn't match #{t('project')}" if @message_log.resource != @project)
+    error_msg ||= ("message log doesn't match #{t('project')}" if @message_log.subject != @project)
     error_msg ||= ("incorrect type of message log" unless @message_log.message_type==MessageLog::PROJECT_MEMBERSHIP_REQUEST)
     error_msg ||= ("message has already been responded to" if @message_log.responded?)
 

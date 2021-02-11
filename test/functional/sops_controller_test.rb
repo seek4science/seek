@@ -313,7 +313,7 @@ class SopsControllerTest < ActionController::TestCase
     end
 
     log = MessageLog.last
-    assert_equal s, log.resource
+    assert_equal s, log.subject
     assert_equal User.current_user.person,log.sender
     assert_equal MessageLog::CONTACT_REQUEST,log.message_type
 

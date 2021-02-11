@@ -199,12 +199,23 @@ class UserTest < ActiveSupport::TestCase
   end
 
   def test_not_activated
-    not_activated = User.not_activated
-    not_activated.each do |u|
-      assert !u.active?
-    end
-    assert not_activated.include?(users(:aaron))
-    assert !not_activated.include?(users(:quentin))
+    no_person = Factory(:brand_new_user)
+    assert_nil no_person.person
+    refute no_person.active?
+
+    activated_with_person = Factory(:user)
+    refute_nil activated_with_person.person
+    assert activated_with_person.active?
+
+    valid_not_activated = Factory(:brand_new_user,person:Factory(:person))
+    refute_nil valid_not_activated.person
+    refute valid_not_activated.active?
+
+    results = User.not_activated
+    assert_includes results,valid_not_activated
+    refute_includes results, no_person
+    refute_includes results, activated_with_person
+
   end
 
   def test_should_create_user

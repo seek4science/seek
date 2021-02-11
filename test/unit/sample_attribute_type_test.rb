@@ -230,4 +230,17 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
     type = Factory(:controlled_vocab_attribute_type)
     refute type.seek_sample?
   end
+
+  test 'is_seek_data_file?' do
+    type = Factory(:data_file_sample_attribute_type)
+    assert type.seek_data_file?
+    type = Factory(:sample_sample_attribute_type)
+    refute type.seek_data_file?
+    type = Factory(:text_sample_attribute_type)
+    refute type.seek_data_file?
+    type = Factory(:boolean_sample_attribute_type)
+    refute type.seek_data_file?
+    type = Factory(:controlled_vocab_attribute_type)
+    refute type.seek_data_file?
+  end
 end

@@ -416,6 +416,12 @@ class Person < ApplicationRecord
     projects.select{|proj| person.is_project_administrator?(proj)}
   end
 
+  # activation email logs associated with this person
+  def activation_email_logs
+    MessageLog.activation_email_logs(self)
+  end
+
+
   private
 
   # a before_save trigger, that checks if the person is the first one created, and if so defines it as admin

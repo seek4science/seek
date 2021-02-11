@@ -129,7 +129,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert model.creators.include?(p2)
     assert_select '.list_item_title a[href=?]', model_path(model), 'ZZZZZ', 'the data file for this test should appear as a list item'
 
-    # check for avatars: uploader won't be shown if he/she is not creator
+    # check for avatars: uploader won't be shown if they are not creator
     assert_select '.list_item_avatar' do
       assert_select 'a[href=?]', person_path(p2) do
         assert_select 'img'

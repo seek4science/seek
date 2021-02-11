@@ -1,7 +1,7 @@
 
 Hi <%= @admins.collect{|o| o.name}.join(", ") -%>,
 
-The <%= Seek::Config.application_name %> user <%= "#{@requester.name} (#{person_url(@requester)})" %>, has requested a new <%= t('programme') %> and <%= t('project')  %> -%>.
+The <%= Seek::Config.application_name %> user <%= "#{@requester.name} (#{person_url(@requester)})" %>, has requested a new <%= t('programme') %> and <%= t('project')  %>.
 
 They provided the following details about the <%= t('programme') %>
   <%= t('programme') %> title: '<%= @programme.title %>'

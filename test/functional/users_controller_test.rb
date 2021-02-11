@@ -84,17 +84,30 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test 'resend activation email only by admin' do
-    user = Factory :brand_new_user, person_id: Factory(:person).id
+    person = Factory(:person)
+    user = Factory :brand_new_user, person: person
     assert !user.active?
     login_as Factory(:user)
-    post :resend_activation_email, params: { id: user }
+    assert_enqueued_emails(0) do
+      assert_no_difference('MessageLog.count') do
+        post :resend_activation_email, params: { id: user }
+      end      
+    end
+    
+    assert_empty person.activation_email_logs
+
     assert_not_nil flash[:error]
     flash.clear
     logout
     admin = Factory(:user, person_id: Factory(:admin).id)
     login_as admin
-    post :resend_activation_email, params: { id: user }
+    assert_enqueued_emails(1) do
+      assert_difference('MessageLog.count') do
+        post :resend_activation_email, params: { id: user }
+      end
+    end
     assert_nil flash[:error]
+    assert_equal 1,person.activation_email_logs.count
   end
 
   test 'only admin can bulk_destroy' do
@@ -185,10 +198,22 @@ class UsersControllerTest < ActionController::TestCase
     end
   end
 
-  def test_should_activate_user
-    user = Factory(:person, user: Factory(:brand_new_user)).user
+  test 'should activate user' do
+    user = Factory(:not_activated_person).user    
     refute user.active?
-    get :activate, params: { activation_code: user.activation_code }
+
+    #make some logs
+    MessageLog.log_activation_email(user.person)
+    MessageLog.log_activation_email(user.person)
+
+    assert_equal 2, MessageLog.activation_email_logs(user.person).count
+
+    assert_difference('MessageLog.count',-2) do
+      get :activate, params: { activation_code: user.activation_code }
+    end
+
+    assert_empty MessageLog.activation_email_logs(user.person)
+
     assert_redirected_to person_path(user.person)
     refute_nil flash[:notice]
     assert User.find(user.id).active?

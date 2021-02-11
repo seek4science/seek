@@ -53,7 +53,7 @@ class Mailer < ActionMailer::Base
          subject: "A #{Seek::Config.application_name} member requests to discuss with you regarding #{resource.title}")
   end
 
-  def signup(user)
+  def activation_request(user)
     @username = user.login
     @name = user.person.name
     @admins = admins

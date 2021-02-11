@@ -43,6 +43,11 @@ Factory.define(:sample_sample_attribute_type, class: SampleAttributeType) do |f|
   f.base_type Seek::Samples::BaseType::SEEK_SAMPLE
 end
 
+Factory.define(:data_file_sample_attribute_type, class: SampleAttributeType) do |f|
+  f.sequence(:title) { |n| "Data file attribute type #{n}" }
+  f.base_type Seek::Samples::BaseType::SEEK_DATA_FILE
+end
+
 # very simple persons name, must be 2 words, first and second word starting with capital with all letters
 Factory.define(:full_name_sample_attribute_type, parent: :string_sample_attribute_type) do |f|
   f.regexp '[A-Z][a-z]+[ ][A-Z][a-z]+'
@@ -94,5 +99,19 @@ Factory.define(:apples_sample_controlled_vocab, class: SampleControlledVocab) do
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Golden Delicious')
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Bramley')
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: "Cox's Orange Pippin")
+  end
+end
+
+Factory.define(:sample_controlled_vocab, class: SampleControlledVocab) do |f|
+  f.sequence(:title) { |n| "sample controlled vocab #{n}" }
+end
+
+Factory.define(:ontology_sample_controlled_vocab, parent: :sample_controlled_vocab) do |f|
+  f.source_ontology 'http://ontology.org'
+  f.ols_root_term_uri 'http://ontology.org/#parent'
+  f.after_build do |vocab|
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Parent',iri:'http://ontology.org/#parent',parent_iri:'')
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Mother',iri:'http://ontology.org/#mother',parent_iri:'http://ontology.org/#parent')
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Father',iri:'http://ontology.org/#father',parent_iri:'http://ontology.org/#parent')
   end
 end

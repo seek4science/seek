@@ -1206,6 +1206,23 @@ class PublicationsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'list of investigations unique' do
+    #investigation should only be listed once even if in multiple matching projects
+    person = Factory(:person_in_multiple_projects)
+    assert person.projects.count > 1
+    investigation = Factory(:investigation,projects:person.projects,contributor:person)
+    publication = Factory(:publication, contributor:person)
+    login_as(person)
+
+    get :manage, params: { id: publication}
+    assert_response :success
+
+    assert_select 'select#possible_publication_investigation_ids' do
+      assert_select 'option[value=?]',investigation.id.to_s,count:1
+    end
+
+  end
+
   private
 
   def publication_for_export_tests
