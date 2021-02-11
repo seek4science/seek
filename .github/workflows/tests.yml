@@ -42,6 +42,7 @@ jobs:
           - rake assets:precompile
           - rake db:setup
           - rake db:migrate
+          - rake seek:upgrade
         include:
           - database: postgres
             suite: rails test test/unit
