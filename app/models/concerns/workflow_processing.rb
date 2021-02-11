@@ -21,7 +21,7 @@ module WorkflowProcessing
     raise(WorkflowDiagram::UnsupportedFormat, "Unsupported diagram format: #{format}") if content_type.nil?
 
     unless path.exist?
-      diagram = extractor.diagram(format)
+      diagram = extractor.generate_diagram(format)
       return nil if diagram.nil? || diagram.length <= 1
       path.parent.mkdir unless path.parent.exist?
       File.binwrite(path, diagram)
@@ -118,6 +118,6 @@ module WorkflowProcessing
   private
 
   def cached_diagram_path(format)
-    File.join(Seek::Config.converted_filestore_path, git_repository.uuid, "#{object(diagram_path).oid}.#{format}")
+    File.join(Seek::Config.converted_filestore_path, "git_version_#{git_version.id}_diagram.#{format}")
   end
 end

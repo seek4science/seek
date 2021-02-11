@@ -14,7 +14,7 @@ module Seek
       end
 
       def can_render_diagram?
-        @git_version.path_for_key(:diagram).present?
+        @git_version.path_for_key(:diagram).present? || main_workflow_extractor&.can_render_diagram? || abstract_cwl_extractor&.can_render_diagram?
       end
 
       def default_diagram_format
@@ -27,8 +27,16 @@ module Seek
         super
       end
 
-      def diagram(format = nil)
-        @git_version.file_contents(@git_version.path_for_key(:diagram))
+      def generate_diagram(format = nil)
+        if @git_version.path_for_key(:diagram).present?
+          @git_version.file_contents(@git_version.path_for_key(:diagram))
+        elsif main_workflow_extractor&.can_render_diagram?
+          main_workflow_extractor.generate_diagram(format)
+        elsif abstract_cwl_extractor&.can_render_diagram?
+          abstract_cwl_extractor.generate_diagram(format)
+        end
+
+        nil
       end
 
       def metadata

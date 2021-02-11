@@ -93,6 +93,10 @@ class GitVersion < ApplicationRecord
     self.visibility ||= self.class.default_visibility
   end
 
+  def git_version
+    self
+  end
+
   private
 
   def set_commit

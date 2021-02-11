@@ -35,7 +35,7 @@ module Seek
         false
       end
 
-      def diagram(format = default_diagram_format)
+      def generate_diagram(format = default_diagram_format)
         nil
       end
 

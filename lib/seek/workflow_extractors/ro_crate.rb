@@ -19,17 +19,17 @@ module Seek
         end
       end
 
-      def diagram(format = nil)
+      def generate_diagram(format = nil)
         open_crate do |crate|
           format ||= default_diagram_format
 
           return crate.main_workflow_diagram&.source&.read if crate.main_workflow_diagram
 
           extractor = main_workflow_extractor(crate)
-          return extractor.diagram(format) if extractor&.can_render_diagram?
+          return extractor.generate_diagram(format) if extractor&.can_render_diagram?
 
           extractor = abstract_cwl_extractor(crate)
-          return extractor.diagram(format) if extractor&.can_render_diagram?
+          return extractor.generate_diagram(format) if extractor&.can_render_diagram?
 
           return nil
         end
