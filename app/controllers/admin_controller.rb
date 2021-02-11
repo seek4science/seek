@@ -112,6 +112,7 @@ class AdminController < ApplicationController
 
     Seek::Config.google_analytics_tracker_id = params[:google_analytics_tracker_id]
     Seek::Config.google_analytics_enabled = string_to_boolean params[:google_analytics_enabled]
+    Seek::Config.google_analytics_tracking_notice = params[:google_analytics_tracking_notice]
 
     Seek::Config.piwik_analytics_enabled = string_to_boolean params[:piwik_analytics_enabled]
     Seek::Config.piwik_analytics_id_site = params[:piwik_analytics_id_site]
