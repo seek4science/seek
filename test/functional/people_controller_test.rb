@@ -1230,6 +1230,38 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
+  test 'tracking notice shown' do
+    with_config_value(:google_analytics_enabled, false) do
+      with_config_value(:piwik_analytics_enabled, false) do
+        get :index
+        assert_response :success
+        assert_select '#tracking-banner', count: 0
+      end
+      with_config_value(:piwik_analytics_enabled, true) do
+        get :index
+        assert_response :success
+        assert_select '#tracking-banner', count: 1
+        with_config_value(:piwik_analytics_tracking_notice, false) do
+          get :index
+          assert_response :success
+          assert_select '#tracking-banner', count: 0
+        end
+      end
+    end
+    with_config_value(:google_analytics_enabled, true) do
+      with_config_value(:piwik_analytics_enabled, false) do
+        get :index
+        assert_response :success
+        assert_select '#tracking-banner', count: 1
+        with_config_value(:google_analytics_tracking_notice, false) do
+          get :index
+          assert_response :success
+          assert_select '#tracking-banner', count: 0
+        end
+      end
+    end
+  end
+
   def edit_max_object(person)
     Factory :expertise, value: 'golf', annotatable: person
     Factory :expertise, value: 'fishing', annotatable: person
