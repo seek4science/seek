@@ -719,7 +719,7 @@ class PeopleControllerTest < ActionController::TestCase
 
   test 'controller-specific results_per_page should override default' do
     with_config_value(:results_per_page_default, 2) do
-      get :index
+      get :index, params: { view: 'default' }
       assert_response :success
       assert_equal 2, assigns(:per_page)
       assert_select '.pagination-container li.active', text: '1'
@@ -740,6 +740,36 @@ class PeopleControllerTest < ActionController::TestCase
         assert_select '.pagination-container li.active', text: '1'
         assert_select 'div.list_item_title', count: 2
       end
+      # Reset the view parameter
+      session.delete(:view)
+    end
+  end
+
+  test 'Condensed views should use a different results_per_page default' do
+    with_config_value(:results_per_page_default, 2) do
+      with_config_value(:results_per_page_default_condensed, 3) do
+        # Load a regular default view, and a condensed view, and check that the number of items in each are different
+        get :index, params: { view: 'default' }
+        assert_response :success
+        assert_equal 2, assigns(:per_page)
+        assert_select '.pagination-container li.active', text: '1'
+        assert_select 'div.list_item_title', count: 2
+
+        get :index, params: { view: 'condensed' }
+        assert_response :success
+        assert_equal 3, assigns(:per_page)
+        assert_select '.pagination-container li.active', text: '1'
+        assert_select '.list_items_container .collapse', count: 3
+
+        
+        get :index, params: { view: 'table' }
+        assert_response :success
+        assert_equal 3, assigns(:per_page)
+        assert_select '.pagination-container li.active', text: '1'
+        assert_select '.list_items_container tbody tr', count: 3
+      end
+      # Reset the view parameter
+      session.delete(:view)
     end
   end
 
@@ -1213,6 +1243,8 @@ class PeopleControllerTest < ActionController::TestCase
       assert_response :success
       assert_select '.list_items_container .collapse', count: 3
     end
+    # Reset the view parameter
+    session.delete(:view)
   end
 
   test 'table view column selection' do
@@ -1228,6 +1260,8 @@ class PeopleControllerTest < ActionController::TestCase
       assert_response :success
       assert_select '.list_items_container thead th',  minimum: 3
     end
+    # Reset the view parameter
+    session.delete(:view)
   end
 
   test 'tracking notice shown' do

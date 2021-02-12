@@ -228,6 +228,7 @@ def load_seek_config_defaults!
   Seek::Config.default :nels_use_dummy_client, false
 
   Seek::Config.default :results_per_page_default, 7
+  Seek::Config.default :results_per_page_default_condensed, 14
   Seek::Config.default :results_per_page, {}
   Seek::Config.default :sorting, {}
 
