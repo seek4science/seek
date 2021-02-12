@@ -313,6 +313,16 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # Checks whether the current view is "condensed" (short results or table)
+  def is_condensed_view?
+    # Check current view from param, or on its absence from session
+    return (params.has_key?(:view) && params[:view]!="default")||
+      (!params.has_key?(:view) && session.has_key?(:view) && !session[:view].nil? && session[:view]!="default")
+  end
+  
+  helper_method :is_condensed_view
+
+
   def log_event
     # FIXME: why is needed to wrap in this block when the around filter already does ?
     User.with_current_user current_user do

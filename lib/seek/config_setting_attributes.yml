@@ -34,6 +34,7 @@ header_image_title:
 header_image_enabled:
 header_image_avatar_id:
 google_analytics_enabled:
+google_analytics_tracking_notice:
 google_analytics_tracker_id:
 piwik_analytics_url:
 exception_notification_enabled:
@@ -56,6 +57,7 @@ jws_enabled:
 copasi_enabled:
 external_search_enabled:
 piwik_analytics_enabled:
+piwik_analytics_tracking_notice:
 seek_video_link:
 scales:
 delete_asset_version_enabled:
@@ -180,6 +182,8 @@ session_store_timeout:
 filtering_enabled:
 sorting:
 results_per_page_default:
+  convert: :to_i
+results_per_page_default_condensed:
   convert: :to_i
 results_per_page:
 cwl_viewer_url:

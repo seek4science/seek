@@ -72,5 +72,9 @@
 
 <%= render partial: 'layouts/piwik' if Seek::Config.piwik_analytics_enabled %>
 <%= analytics_init if Seek::Config.google_analytics_enabled %>
+<% if (Seek::Config.google_analytics_enabled && Seek::Config.google_analytics_tracking_notice) ||
+  (Seek::Config.piwik_analytics_enabled && Seek::Config.piwik_analytics_tracking_notice) %>
+  <%= render partial: 'layouts/tracking_notice'%>
+<% end %>
 </body>
 </html>

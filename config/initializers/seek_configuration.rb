@@ -26,9 +26,11 @@ def load_seek_config_defaults!
   Seek::Config.default :activation_required_enabled,false
   Seek::Config.default :google_analytics_enabled, false
   Seek::Config.default :google_analytics_tracker_id, '000-000'
+  Seek::Config.default :google_analytics_tracking_notice, true
   Seek::Config.default :piwik_analytics_enabled, false
   Seek::Config.default :piwik_analytics_id_site, 1
   Seek::Config.default :piwik_analytics_url, 'localhost/piwik/'
+  Seek::Config.default :piwik_analytics_tracking_notice, true
   Seek::Config.default :bioportal_api_key,''
   Seek::Config.default :project_news_enabled,false
   Seek::Config.default :project_news_feed_urls,''
@@ -226,6 +228,7 @@ def load_seek_config_defaults!
   Seek::Config.default :nels_use_dummy_client, false
 
   Seek::Config.default :results_per_page_default, 7
+  Seek::Config.default :results_per_page_default_condensed, 14
   Seek::Config.default :results_per_page, {}
   Seek::Config.default :sorting, {}
 
