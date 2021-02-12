@@ -114,7 +114,7 @@ module Seek
 
     # filters special characters, keeping alphanumeric characters, hyphen ('-'), underscore('_') and newlines
     def filter_text_content(content)
-      content.gsub(/[^-_0-9a-z \n]/i, '')
+      content.gsub(/[^-_0-9a-z \n]/i, ' ')
     end
   end
 end
