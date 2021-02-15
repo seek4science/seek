@@ -73,6 +73,10 @@
                            'CWL Viewer URL',
                            "The URL of a #{link_to('CWL Viewer', 'https://github.com/common-workflow-language/cwlviewer', target: :_blank)} instance to generate diagrams for CWL workflows.") %>
 
+    <%= admin_text_setting(:life_monitor_url, Seek::Config.life_monitor_url,
+                           'LifeMonitor URL',
+                           "The URL of a #{link_to('LifeMonitor', 'https://github.com/crs4/life_monitor/', target: :_blank)} instance to provide workflow health checking.") %>
+
     <%= admin_checkbox_setting(:ga4gh_trs_api_enabled, 1, Seek::Config.ga4gh_trs_api_enabled,
                                "GA4GH TRS API enabled", "Enable GA4GH Tool Registry Service API endpoints for accessing workflows.") %>
   </div>
