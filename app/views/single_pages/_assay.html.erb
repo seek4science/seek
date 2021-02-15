@@ -35,7 +35,7 @@
                 <%= render :partial => "method" -%>
             </div>
             <div id="assaySample" class="tab-pane fade" style="padding:10px">
-                <%= render :partial => "samples" -%>
+                <%= render :partial => "dynamic_table", :locals => { :table_class => "sampleTable" } -%>
             </div>
         </div>
     </div>

@@ -20,31 +20,9 @@
                    <input type="hidden" name="investigation[creator_ids][]">
                    <div id="inv-creators"></div>
                    <div id="investigation_sharing"></div>
-                   <input type="button" value="update" id="inv_update_btn" class="btn btn-primary">
+                   <input type="button" value="update" id="inv_update_btn" onclick="updateInvSharing()" class="btn btn-primary">
                </form>
            </div>
        </div>
 
    </div>
-
-   <script>
-       $j("#inv_update_btn").on("click", () => {
-           $j("#inv_update_btn").attr("disabled", "disabled")
-           var form = $j("#investigation-sharing-form");
-           var url = `/investigations/${selectedItem.id}/manage_update`
-           $j.ajax({
-               type: "POST",
-               url,
-               data: form.serialize(),
-               success: () => {
-                   alert("Sharing permissions updated!")
-               },
-               error: e => {
-                   alert("Can not perform the operation.")
-               },
-               complete: () => {
-                   $j("#inv_update_btn").removeAttr("disabled")
-               }
-           });
-       })
-   </script>

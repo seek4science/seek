@@ -27,26 +27,19 @@ function setupFoldersTree(dataJson, container_id, drop_accept_class) {
     })
     .on("activate_node.jstree", function (e, data) {
       var obj = $j(this).jstree(true).get_node(data.node.id).data;
-      var parent = $j(this).jstree(true).get_node(data.node.parent).data; 
+      var parent = $j(this).jstree(true).get_node(data.node.parent).data;
       var folder_id = obj.folder_id;
       var project_id = obj.project_id;
       var id = obj.id;
       var type = obj.type;
-      folder_id
-        ? folder_clicked(folder_id, project_id)
-        : item_clicked(type, id, parent);
+      folder_id ? folder_clicked(folder_id, project_id) : item_clicked(type, id, parent);
     });
 }
 
 function remove_item_from_assay(item_element) {
   var project_id = item_element.data("project-id");
   var origin_folder_id = item_element.data("origin-folder-id");
-  var path =
-    "/projects/" +
-    project_id +
-    "/folders/" +
-    origin_folder_id +
-    "/remove_asset";
+  var path = "/projects/" + project_id + "/folders/" + origin_folder_id + "/remove_asset";
 
   $j.ajax({
     url: path,
@@ -112,12 +105,7 @@ function item_dropped_to_folder(item_element, dest_folder_id) {
     var folder_element_id = "folder_" + dest_folder_id;
     var project_id = item_element.data("project-id");
     var origin_folder_id = item_element.data("origin-folder-id");
-    var path =
-      "/projects/" +
-      project_id +
-      "/folders/" +
-      origin_folder_id +
-      "/move_asset_to";
+    var path = "/projects/" + project_id + "/folders/" + origin_folder_id + "/move_asset_to";
 
     $j.ajax({
       url: path,
@@ -145,8 +133,7 @@ function folder_clicked(folder_id, project_id) {
   hideAll();
   $j("#folder_contents").show();
   $j("#folder_contents").spinner("add");
-  var path =
-    "/projects/" + project_id + "/folders/" + folder_id + "/display_contents";
+  var path = "/projects/" + project_id + "/folders/" + folder_id + "/display_contents";
   displayed_folder_id = folder_id;
   $j.ajax({ url: path, cache: false, dataType: "script" });
 }
@@ -158,20 +145,14 @@ function item_clicked(type, id, parent) {
   breadcrumb(type);
   selectedItem.id = id;
   selectedItem.type = type;
-  selectedItem.parent = parent
+  selectedItem.parent = parent;
 
   switch (type) {
     case "assay":
     case "investigation":
     case "study": {
       $j.ajax({
-        url:
-          "/single_pages/" +
-          pid +
-          "/render_sharing_form/" +
-          id +
-          "/type/" +
-          type,
+        url: "/single_pages/" + pid + "/render_sharing_form/" + id + "/type/" + type,
       });
       break;
     }
@@ -179,7 +160,8 @@ function item_clicked(type, id, parent) {
   if (type == "study") {
     loadFlowchart();
     loadDesign();
-  } else if (type == "assay") load_samples();
+
+  } else if (type == "assay") load_samples(".sampleTable");
 }
 
 function hideAll() {
@@ -203,7 +185,7 @@ function bounce(item, text) {
   }, 300);
 }
 
-(function ($, undefined) {
+(function ($) {
   "use strict";
   $j.jstree.plugins.separate = function (options, parent) {
     this.redraw_node = function (obj, deep, callback, force_draw) {
@@ -213,9 +195,7 @@ function bounce(item, text) {
       if (obj) {
         if (n.original.count) {
           obj.childNodes[1].innerHTML +=
-            " <span class='badge badge-secondary'>" +
-            n.original.count +
-            "</span>";
+            " <span class='badge badge-secondary'>" + n.original.count + "</span>";
         }
         if (n.data.type) $j(obj.childNodes[1]).attr("_type", n.data.type);
         if (n.data.id) $j(obj.childNodes[1]).attr("_id", n.data.id);

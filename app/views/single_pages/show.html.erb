@@ -1,4 +1,6 @@
-<%= javascript_include_tag "prototype" %>
+<%= javascript_include_tag "single_page/index" %>
+<%= javascript_include_tag "single_page/dynamic_table" %>
+<%= javascript_include_tag "single_page/flowchart" %>
 <%= javascript_include_tag "project_folders" %>
 <%
     default_folder = initial_folder(@project)
@@ -64,7 +66,7 @@
                 <div class="modal-body">
                     <%= render :partial=>"investigations/new" %>
                     <div class="row" style="padding:15px">
-                        <a id="submit_investigation" type="button" class="btn btn-primary">Create</a>
+                        <a id="submit_investigation" type="button" onclick="submitInvestigation()" class="btn btn-primary">Create</a>
                         &nbsp;
                         <a type="button" class="btn btn-default">Cancel</a>
                     </div>
@@ -79,7 +81,7 @@
                 <div class="modal-body">
                     <%= render :partial=>"studies/new" %>
                     <div class="row" style="padding:15px">
-                        <a id="submit_study" type="button" class="btn btn-primary">Create</a>
+                        <a id="submit_study" type="button" onclick="submitStudy()" class="btn btn-primary">Create</a>
                         &nbsp;
                         <a type="button" class="btn btn-default">Cancel</a>
                     </div>
@@ -89,44 +91,14 @@
     </div>
      <%=  render partial: 'attribute_list' %>
     <script type="text/javascript">
-
         var selectedItem = {type:"",id:""}, pid, uid
-        let AssayDetails = []
-        let existingAssays = []
+        // let existingAssays = []
         const sourceTypes = <%= @sourceTypes.to_json.html_safe %>
-        console.log("sourceTypes",sourceTypes)
-
-        // Simplifying for the prototype...
+        // console.log("sourceTypes",sourceTypes)
         let characteristics =  $j(sourceTypes).map((i,x)=>{if(x.type=="study") return x}).get()
-         characteristics.push({
-                attributes: $j.map(ISAsource, (x, i) => ({
-                    id: 1,
-                    title: x.name,
-                    shortName: "",
-                    des: x.description,
-                    required: x.required
-                })),
-                repoId: 1,
-                title: "ENA Source",
-                type: "study"
-            })
         let AssayTypes = $j(sourceTypes).map((i,x)=>{if(x.type=="assay") return x}).get()
-        $j.each(customISAMerged, (i, k) => {
-            AssayTypes.push({
-                attributes: $j.map(k, (x, j) => ({
-                    id: 1,
-                    title: x.name,
-                    shortName: "",
-                    des: x.description,
-                    required: x.required
-                })),
-                repoId: 1,
-                title: i,
-                type: "assay"
-            })
-        })
-        console.log("characteristics", characteristics)
-        console.log("AssayTypes", AssayTypes)
+        // console.log("characteristics", characteristics)
+        // console.log("AssayTypes", AssayTypes)
 
         $j(document).ready(function() {
             setupFoldersTree( <%= ((TreeviewBuilder.new(@project, @folders)).build_tree_data).html_safe -%> , 'demo_tree', 'draggable_folder_item');
@@ -134,257 +106,15 @@
              pid = <%= @project.id %>
              uid = <%= current_user.id if current_user %>
 
-             $j("a:contains('Cancel')").click(function (e) {
+            init_flowchart()
+            addAssayTypeOptions()
+            addSourcesOptions()
+
+            $j("a:contains('Cancel')").click(function (e) {
                 e.preventDefault();
-                $j('#data-file-modal-inv').modal('hide');
-                $j('#data-file-modal-std').modal('hide');
-            })
-
-            $j("#submit_investigation").click(function () {
-                if ($j("#investigation_title").val().length==0){
-                    alert("Please enter a title.")
-                    return;
-                }
-                $j("#submit_investigation").attr("disabled","disabled")
-                data = {
-                    "data": {
-                    "type": "investigations",
-                    "attributes": {
-                        "title": $j("#investigation_title").val(),
-                        "policy": {
-                        "access": "download",
-                        "permissions": [{
-                            "resource": {
-                            "id": pid,
-                            "type": "projects"
-                            },
-                            "access": "manage"
-                        }]
-                        },
-                        "description": $j("#investigation_description").val()
-                    },
-                    "relationships": {
-                        "projects": {
-                        "data": [{
-                            "id": pid,
-                            "type": "projects"
-                        }]
-                        },
-                        "publications": {
-                        "data": []
-                        },
-                        "creators": {
-                        "data": [{
-                            "id": uid,
-                            "type": "people"
-                        }]
-                        }
-                    }
-                }
-                }
-                $j.ajax({
-                    method: 'POST',
-                    "headers": {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
-                    },
-                    cache: false,
-                    url: '/investigations',
-                    data: JSON.stringify(data),
-                    success: s => {
-                        location.reload(true);
-                    },
-                    error: (e) => {
-                         console.log('error creating investigation!')
-                    }
-                })
-            })
-
-            $j("#submit_study").click(function () {
-                if ($j("#study_title").val().length==0){
-                    alert("Please enter a title.")
-                    return;
-                }
-                $j("#submit_study").attr("disabled","disabled")
-                let data = {
-                    "data": {
-                    "type": "studies",
-                    "attributes": {
-                        "title": $j("#study_title").val(),
-                        "description": $j("#study_description").val(),
-                        "policy": {
-                        "access": "download",
-                        "permissions": [{
-                            "resource": {
-                            "id": pid,
-                            "type": "projects"
-                            },
-                            "access": "manage"
-                        }]
-                        }
-                    },
-                    "relationships": {
-                        "investigation": {
-                        "data": {
-                            "id":selectedItem.id,
-                            "type": "investigations"
-                        }
-                        },
-                        "publications": {
-                        "data": []
-                        },
-                        "creators": {
-                        "data": [{
-                            "id": uid,
-                            "type": "people"
-                        }]
-                        }
-                    }
-                    }
-                }
-                console.log(data)
-                $j.ajax({
-                    method: 'POST',
-                    "headers": {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
-                    },
-                    cache: false,
-                    url: '/studies',
-                    data: JSON.stringify(data),
-                        success: s => {
-                        console.log('study created successfully!')
-                        location.reload(true);
-                    },
-                        error: (e) => {
-                        console.log('error creating study!')
-                    }
-                })
-            })
-             init_flowchart()
-             addAssayTypeOptions()
-             addSourcesOptions()
+                $j("#data-file-modal-inv").modal("hide");
+                $j("#data-file-modal-std").modal("hide");
+            });
         });
-
-        const addInvestigations = (t) => {
-            $j('#data-file-modal-inv').modal({
-                backdrop: 'static',
-                keyboard: true
-            });
-        }
-
-        const addStudies = (t) => {
-            //Change the JStree active item to the associated Investigation id
-            selectedItem.id = $j(t).parent().children('.jstree-anchor').attr('_id')
-            selectedItem.type = "investigation"
-            $j('#data-file-modal-std').modal({
-                backdrop: 'static',
-                keyboard: true
-            });
-        }
-
-        const deleteItem = (t) => {
-            event.preventDefault()
-            let {id, type} = selectedItem
-            if (type == "assay"){
-                deleteAssay(id, t)
-                return;
-            }
-            if (!id || !type) {
-                alert("Please select item.")
-                return;
-            }
-            if (confirm('Are you sure you want to delete the ' + type + '?')) {
-                $j(t).attr('disabled', true)
-                if (type == "study") type = "studies"
-                else type += "s";
-                $j.ajax({
-                    method: 'DELETE',
-                    "headers": {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
-                    },
-                    cache: false,
-                    url: `/${type}/${id}`,
-                    success: s => {
-                        location.reload(true);
-                    },
-                    error: e => {
-                        console.error(e)
-                         $j(t).attr('disabled', false)
-                        if (e.responseJSON.errors)
-                            alert(e.responseJSON.errors[0].title + '\n' +
-                             e.responseJSON.errors[0].details + '\n' + "There maybe some items associated with this item.")
-                        else
-                            alert('Cannot process the request')
-                    }
-                })
-            }
-        }
-
-        function deleteAssay(id, t){
-            if (confirm('Are you sure you want to delete the assay and all items associated with it?')) {
-                 const cb = (id) => {
-                    $j.ajax({
-                        method: 'DELETE',
-                        "headers": {
-                            "Content-Type": "application/json",
-                            "Accept": "application/json"
-                        },
-                        cache: false,
-                        url: `/assays/${id}`,
-                        success: s => {
-                            location.reload(true);
-                        },
-                        error: e => {
-                            console.error(e)
-                            $j(t).attr('disabled', false)
-                            if (e.responseJSON.errors)
-                                alert(e.responseJSON.errors[0].title + '\n' + e.responseJSON.errors[0].details)
-                            else
-                                alert('Cannot process the request')
-                        }
-                    })
-                }
-                // TO-DO: Add a method to the API that deletes all assets of the assay
-                // For now, if the assay has assets other than SOP, the situation will be a bit of mess!
-                $j(t).attr('disabled', true)
-                deleteSOP($j("#method-id").val(), () => cb(id))
-            }
-        }
-
-        function deleteSOP(id, cb) {
-            $j.ajax({
-                method: 'DELETE',
-                "headers": {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
-                },
-                cache: false,
-                url: `/sops/${id}`,
-                success: s => cb(),
-                error: e => e.responseJSON.errors ?
-                    alert(e.responseJSON.errors[0].title + '\n' + e.responseJSON.errors[0].details) : alert('Cannot process the request')
-            })
-        }
-
-        function breadcrumb(item) {
-            $j(".bcrumb li").hide()
-            switch (item) {
-                case "project":
-                    $j(".bcrumb li:first-child").show()
-                    break;
-                case "investigation":
-                    $j(".bcrumb li:first-child, li:nth-child(2)").show()
-                    break;
-                case "study":
-                    $j(".bcrumb li:first-child, li:nth-child(2), li:nth-child(3)").show()
-                    break;
-                case "assay":
-                    $j(".bcrumb li:first-child, li:nth-child(2), li:nth-child(3), li:nth-child(4)").show()
-                    break;
-            }
-        } 
-    
         
     </script>

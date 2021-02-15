@@ -16,41 +16,5 @@
         </div>
     </div>
     <hr>
-    <a class="btn btn-primary" id="btn_update_method">Update</a>
+    <a class="btn btn-primary" id="btn_update_method" onclick="updateMethod()">Update</a>
 </div>
-
-
-<script>
-    $j("#btn_update_method").on("click", () => {
-        $j("#btn_update_method").attr("disabled", "disabled")
-        const methodId = $j("#method-id").val()
-        let data = {
-            "data": {
-                "type": "sops",
-                "id": methodId,
-                "attributes": {
-                    "title": $j("#method-title").val(),
-                    "description": $j("#method_description").val()
-                }
-            }
-        }
-        $j.ajax({
-            method: 'PATCH',
-            "headers": {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            cache: false,
-            url: `/sops/${methodId}`,
-            data: JSON.stringify(data),
-            success: s => {
-                $j(this).removeAttr("disabled")
-                location.reload();
-            },
-            error: (e) => {
-                $j(this).removeAttr("disabled")
-                alert('An error occurred when updating the method')
-            }
-        })
-    })
-</script>

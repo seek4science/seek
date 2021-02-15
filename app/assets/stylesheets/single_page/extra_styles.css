@@ -382,8 +382,8 @@
 .tableSeparate {
     color: transparent !important;
     /* background-color: white !important; */
-    border-right: 1px black dashed !important;
-    border-left: 1px black dashed !important;
+    border-right: 1px #aaa dashed !important;
+    /* border-left: 1px #777 dashed !important; */
     border-top-width: 0 !important;
     border-bottom-width: 0 !important;
     max-width: 0 !important;
@@ -393,10 +393,24 @@
 }
 
 .headerSeparator {
-    border-right: 1px white dashed !important;
+    border-right: 1px #aaa dashed !important;
 }
 
 .errorCell {
     background-color: #fffafb;
     border-bottom: solid 1px #ff0044 !important;
+}
+
+.sampleTblContainer {
+    margin-top: 10px;
+    position: relative;
+    overflow-x: scroll;
+    overflow: scroll;
+    border-radius: 5px;
+    border: 1px #ddd solid
+}
+
+.disabled {
+    pointer-events: none;
+    opacity: 0.4;
 }
