@@ -6,7 +6,7 @@ module LifeMonitor
     class Client
       attr_accessor :verify_ssl
 
-      def initialize(client_id, client_secret, base = nil)
+      def initialize(client_id = nil, client_secret = nil, base = nil)
         @base = base || Seek::Config.life_monitor_url
         @client_id = client_id || Seek::Config.life_monitor_client_id
         @client_secret = client_secret || Seek::Config.life_monitor_client_secret
@@ -14,7 +14,7 @@ module LifeMonitor
       end
 
       def get_token
-        url = URI.join(@base, '/oauth2/token"')
+        url = URI.join(@base, '/oauth2/token')
 
         body = {
             client_id: @client_id,
