@@ -73,10 +73,6 @@
                            'CWL Viewer URL',
                            "The URL of a #{link_to('CWL Viewer', 'https://github.com/common-workflow-language/cwlviewer', target: :_blank)} instance to generate diagrams for CWL workflows.") %>
 
-    <%= admin_text_setting(:life_monitor_url, Seek::Config.life_monitor_url,
-                           'LifeMonitor URL',
-                           "The URL of a #{link_to('LifeMonitor', 'https://github.com/crs4/life_monitor/', target: :_blank)} instance to provide workflow health checking.") %>
-
     <%= admin_checkbox_setting(:ga4gh_trs_api_enabled, 1, Seek::Config.ga4gh_trs_api_enabled,
                                "GA4GH TRS API enabled", "Enable GA4GH Tool Registry Service API endpoints for accessing workflows.") %>
   </div>
@@ -146,6 +142,21 @@
           <label>grant_type</label><br/>
           <pre>authorization_code</pre>
         <% end %>
+      </div>
+    </div>
+  </div>
+  <%= admin_checkbox_setting(:life_monitor_enabled, 1, Seek::Config.life_monitor_enabled,
+                             "LifeMonitor integration enabled", "Whether monitoring of #{t('workflow').pluralize} using #{link_to('LifeMonitor', 'https://github.com/crs4/life_monitor/', target: :_blank)} is enabled.",
+                             onchange: toggle_appear_javascript('life_monitor_block')) %>
+  <div id="life_monitor_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.life_monitor_enabled -%>">
+    <div class="row">
+      <div class="col-sm-7">
+        <%= admin_text_setting(:life_monitor_url, Seek::Config.life_monitor_url,
+                               'LifeMonitor URL', "The URL of a LifeMonitor instance.") %>
+        <%= admin_text_setting(:life_monitor_client_id, Seek::Config.life_monitor_client_id,
+                               'LifeMonitor OAuth client ID', 'The ID for this application to authenticate users through the LifeMonitor OAuth provider.') %>
+        <%= admin_text_setting(:life_monitor_client_secret, Seek::Config.life_monitor_client_secret,
+                               'LifeMonitor OAuth client secret', 'The secret token for this application to authenticate users through the LifeMonitor OAuth provider.') %>
       </div>
     </div>
   </div>

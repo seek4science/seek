@@ -95,7 +95,6 @@ class AdminController < ApplicationController
     Seek::Config.external_help_url = params[:external_help_url]
 
     Seek::Config.cwl_viewer_url = params[:cwl_viewer_url]
-    Seek::Config.life_monitor_url = params[:life_monitor_url]
     Seek::Config.ga4gh_trs_api_enabled = string_to_boolean(params[:ga4gh_trs_api_enabled])
     # Types enabled
     Seek::Config.collections_enabled = string_to_boolean params[:collections_enabled]
@@ -136,11 +135,16 @@ class AdminController < ApplicationController
     Seek::Config.copasi_enabled = string_to_boolean(params[:copasi_enabled])
 
     Seek::Config.nels_enabled = string_to_boolean(params[:nels_enabled])
-    Seek::Config.nels_client_id = params[:nels_client_id].try(:strip)
-    Seek::Config.nels_client_secret = params[:nels_client_secret].try(:strip)
-    Seek::Config.nels_api_url = params[:nels_api_url].blank? ? nil : params[:nels_api_url].strip.chomp('/')
-    Seek::Config.nels_oauth_url = params[:nels_oauth_url].blank? ? nil : params[:nels_oauth_url].strip.chomp('/')
-    Seek::Config.nels_permalink_base = params[:nels_permalink_base].try(:strip)
+    Seek::Config.nels_client_id = params[:nels_client_id]&.strip
+    Seek::Config.nels_client_secret = params[:nels_client_secret]&.strip
+    Seek::Config.nels_api_url&.strip&.chomp('/')
+    Seek::Config.nels_oauth_url&.strip&.chomp('/')
+    Seek::Config.nels_permalink_base = params[:nels_permalink_base]&.strip
+
+    Seek::Config.life_monitor_enabled = string_to_boolean(params[:life_monitor_enabled])
+    Seek::Config.life_monitor_url = params[:life_monitor_url]&.strip&.chomp('/')
+    Seek::Config.life_monitor_client_id = params[:life_monitor_client_id]&.strip
+    Seek::Config.life_monitor_client_secret = params[:life_monitor_client_secret]&.strip
 
     time_lock_doi_for = params[:time_lock_doi_for]
     time_lock_is_integer = only_integer time_lock_doi_for, 'time lock doi for'

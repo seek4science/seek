@@ -17,7 +17,7 @@ class WorkflowsController < ApplicationController
   include Seek::IsaGraphExtensions
   include RoCrateHandling
 
-  api_actions :index, :show, :create, :update, :destroy
+  api_actions :index, :show, :create, :update, :destroy, :ro_crate
 
   rescue_from WorkflowDiagram::UnsupportedFormat do
     head :not_acceptable

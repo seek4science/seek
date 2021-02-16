@@ -184,7 +184,6 @@ results_per_page_default:
   convert: :to_i
 results_per_page:
 cwl_viewer_url:
-life_monitor_url:
 # Types enabled
 documents_enabled:
 events_enabled:
@@ -216,3 +215,7 @@ ga4gh_trs_api_enabled:
 custom_metadata_enabled: false
 search_results_limit:
   convert: :to_i
+life_monitor_enabled:
+life_monitor_url:
+life_monitor_client_id:
+life_monitor_client_secret:
