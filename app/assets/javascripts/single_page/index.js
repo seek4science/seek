@@ -32,12 +32,13 @@ const ajaxCall = (url, method, params) => {
   else _ajax();
 };
 
-const createSampleStruct = (attribute_map, sample_type_id, project_id) => {
+const createSampleStruct = (attribute_map, sample_type_id, link_id, project_id) => {
   return {
     data: {
       type: "samples",
       attributes: {
         title: "sample",
+        link_id,
         attribute_map,
         tags: null,
       },
@@ -55,6 +56,36 @@ const createSampleStruct = (attribute_map, sample_type_id, project_id) => {
               type: "projects",
             },
           ],
+        },
+      },
+    },
+  };
+};
+
+const batchSampleCreateStruct = (ex_id, attribute_map, sample_type_id, link_id, pid) => {
+  return {
+    ex_id,
+    data: {
+      type: "samples",
+      attributes: {
+        link_id,
+        attribute_map,
+      },
+      tags: null,
+      relationships: {
+        projects: {
+          data: [
+            {
+              id: pid,
+              type: "projects",
+            },
+          ],
+        },
+        sample_type: {
+          data: {
+            id: sample_type_id,
+            type: "sample_types",
+          },
         },
       },
     },
