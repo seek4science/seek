@@ -45,10 +45,11 @@ function loadSampleData(data, headers, cls) {
   const rows = consolidateSamples(data);
   $j(rows).each((i, row) => {
     let newRow = "<td><input type='checkbox'/></td>";
+
     $j.each(headers, (i, x) => {
-      const sampleVal = findSampleVal(row, x);
-      newRow += createTD(sampleVal);
+      newRow += findSampleVal(row, x);
     });
+
     $j(cls + " tbody").append(`<tr>` + newRow + "</tr>");
   });
   // Set the Auto Complete
@@ -61,28 +62,17 @@ function loadSampleData(data, headers, cls) {
 }
 
 function findSampleVal(row, key) {
-  let result = {
-    text: "",
-    sampleId: "",
-    editable: key.title == "link_id" ? "" : "contenteditable",
-  };
-  let link_id = "";
+  let sampleId = "";
+  let text = "";
   $j.each(row, (n, samplePart) => {
-    //samplePart.data[key.title] != undefined &&
-    if (!link_id && key.title == "link_id") link_id = samplePart.data[key.title];
+
     if (key.sample_type_id == samplePart.sampleTypeid) {
-      result.text = samplePart.data[key.title];
-      result.sampleId = samplePart.sampleId;
+      text = samplePart.data[key.title];
+      sampleId = samplePart.sampleId;
       return;
     }
   });
-  result.text = link_id ? link_id : result.text;
-  return result;
-}
-
-function createTD(sampleVal) {
-  const { text, sampleId, editable } = sampleVal;
-  return `<td ${editable} data-sampleid=${sampleId}>` + text + "</td>";
+  return `<td contenteditable data-sampleid=${sampleId}>${text}</td>`;
 }
 
 function consolidateSamples(data) {
@@ -93,17 +83,18 @@ function consolidateSamples(data) {
     let tableRow = [
       {
         sampleId: row.id,
-        data: JSON.parse(row.data),
+        data: JSON.parse(row.json_metadata),
         sampleTypeid: row.sample_type_id,
+        // link_id: row.link_id,
       },
     ];
     $j(Object.keys(data)).each((j, x) => {
       // TO_DO: check the following code in case of more sample existance
-      // TO_DO: Get sourceSamples Link_id and search it in other records...
+      // TO_DO: Get sourceSamples Link_id and search it in other records... : Samples are sorted based on their sample_type > assay position
       if (data[x][i]) {
         tableRow.push({
           sampleId: data[x][i].id,
-          data: JSON.parse(data[x][i].data),
+          data: JSON.parse(data[x][i].json_metadata),
           sampleTypeid: data[x][i].sample_type_id,
         });
       } else {
@@ -169,7 +160,7 @@ function saveSamples(cls) {
   //----------------SAMPLES CREATE-----------------
   const createSamples = $j.grep(samples, (x) => !x.sampleId && !x.delete);
   console.log("createSamples", createSamples);
-  createSample(createSamples);
+  createBatchSample(createSamples)
   //----------------SAMPLES DELETE-----------------
   const deleteSamples = $j.grep(samples, (x) => x.delete && x.sampleId);
   console.log("deleteSamples", deleteSamples);
@@ -195,6 +186,8 @@ function getSampleTypes(a) {
 
 function splitSamples(row, header) {
   let samples = [];
+  // Apply the row link_id to all samples in the row
+  const link_id = $j(row).attr("link_id");
   // consider select column
   $j.each($j(row).find("td").slice(1), (i, td) => {
     if (samples.length == 0 || header[i].sampleTypeId != samples[samples.length - 1].sampleTypeId) {
@@ -205,6 +198,7 @@ function splitSamples(row, header) {
           [`${header[i].text}`]: $j(td).html(),
         },
         delete: $j(td).parent().attr("delete") ? true : false,
+        link_id,
       });
     } else {
       $j.extend(true, samples[samples.length - 1].JSONMetadata, {
@@ -251,9 +245,23 @@ function updateSample(samples) {
   });
 }
 
+function createBatchSample(samples) {
+  let data = [];
+  $j.each(samples, (k, sample) => {
+    data.push(batchSampleCreateStruct(k, sample.JSONMetadata, sample.sampleTypeId, sample.link_id, pid));
+  });
+  let params = {};
+  params.onSuccess = (s) => {
+    console.log("Batch sample create result: " + s.data);
+  };
+  params.onError = (e) => console.log(e);
+  params.data = JSON.stringify(data);
+  ajaxCall("/samples/batch_create/", "POST", params);
+}
+
 function createSample(samples) {
   $j.each(samples, (k, sample) => {
-    let data = createSampleStruct(sample.JSONMetadata, sample.sampleTypeId, pid);
+    let data = createSampleStruct(sample.JSONMetadata, sample.sampleTypeId, sample.link_id, pid);
     let params = {};
     params.onSuccess = (s) => console.log("The sample was created successfully! : " + s.data.id);
     params.onError = (e) => console.log(e);
@@ -286,20 +294,15 @@ function addCustomCol(table, bias, text = "") {
 }
 
 function addRow(table) {
-  //   let rowCount = $j(table).rowcount() + 1;
   let newRow = "<td><input type='checkbox'/></td>";
-  let rowId = uniqId();
+  let link_id = uuidv4();
   $j(table + " .downHeader")
     .find("th")
     .each(function (k, v) {
-      if (k > 0)
-        // Skips the select column
-        newRow +=
-          $j.trim($j(v).text().toLowerCase()) == "link_id"
-            ? `<td>${rowId}</td>`
-            : "<td contenteditable></td>";
+      // Skips the select column
+      k > 0 && (newRow += "<td contenteditable></td>");
     });
-  $j(table + " tbody").append('<tr data-new="true">' + newRow + "</tr>");
+  $j(table + " tbody").append(`<tr link_id=${link_id} data-new="true">${newRow}</tr>`);
   // Set the Auto Complete
   $j.each($j(table + " tbody tr:last td:not(:first-child)"), (i, k) => {
     const sample_controlled_vocab_id = $j(k)
@@ -312,13 +315,12 @@ function addRow(table) {
   hideAttributes(table);
 }
 
-function uniqId() {
-  let result = "";
-  const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
-  for (let i = 0; i < 8; i++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return result;
+function uuidv4() {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    var r = (Math.random() * 16) | 0,
+      v = c == "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
 }
 
 function update_method(std_id, asy_id, content) {
@@ -380,19 +382,20 @@ function hideAttributes(cls) {
   $j(cls + " .topHeader")
     .empty()
     .append(`<th colspan=1></th>`);
+  let prevSampleTypeId = $j(cls + " .downHeader th:nth-child(2)").attr("data-sampletypeid");
+  const headerCount = $j(cls + " .downHeader th").length - 1;
   $j.each($j(cls + " .downHeader th"), (i, th) => {
     const title = getPlainText($j(th).html());
     const sampleTypeId = $j(th).attr("data-sampletypeid");
-    const condition =
-      hiddenAttrs.includes(title) || (hiddenSampleTypes.includes(sampleTypeId) && title != "link_id");
+    const condition = hiddenAttrs.includes(title) || hiddenSampleTypes.includes(sampleTypeId);
     !condition && colSpan++;
     hideCells(cls, condition, th);
-    if (title == "link_id") {
+    if (i > 0 && (sampleTypeId != prevSampleTypeId || i == headerCount)) {
       $j(th).addClass("tableSeparate");
-      addTopHeaderCell(cls, colSpan, sampleTypeId, itemCounter);
+      addTopHeaderCell(cls, colSpan, prevSampleTypeId, itemCounter);
       colSpan = 0;
       itemCounter++;
-      const status = hiddenSampleTypes.includes(sampleTypeId) ? false : true;
+      const status = hiddenSampleTypes.includes(prevSampleTypeId) ? false : true;
       $j(cls + " .topHeader th")
         .eq(itemCounter)
         .find("input")
@@ -402,6 +405,7 @@ function hideAttributes(cls) {
           .find(`td:eq(${$j(th).index()})`)
           .addClass("tableSeparate");
       });
+      prevSampleTypeId = sampleTypeId;
     }
   });
 }
@@ -608,7 +612,6 @@ function createSampleType(data, cb) {
 function sampleTypeData(attributes, title, assayId = null) {
   // Create the Source Sample Type
   // Add table columns as attribute types
-  // const headers = getHeaderText('.sourceSampleTable')
   const attributeMap = $j(attributes)
     .map((i, x) => ({
       title: x.title.toLowerCase(),
@@ -620,21 +623,8 @@ function sampleTypeData(attributes, title, assayId = null) {
       pos: (i + 1).toString(),
       unit_id: null,
       is_title: i == 0 ? true : false,
-      // "accessor_name": $j.trim(x.title.toLowerCase()).replace(/ /g, '_')
     }))
     .get();
-  //Add a custom ID attribute to the sample type, in order to link right samples of different sample types
-  attributeMap.push({
-    title: "link_id",
-    sample_attribute_type: {
-      id: "8", //string
-    },
-    required: true,
-    pos: (attributeMap.length + 1).toString(),
-    unit_id: null,
-    is_title: false,
-    // "accessor_name": "link_id"
-  });
   return createSampleTypeStruct(title, "", attributeMap, pid, assayId);
 }
 
