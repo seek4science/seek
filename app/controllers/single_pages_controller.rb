@@ -110,23 +110,15 @@ class SinglePagesController < ApplicationController
 
   #GET 
   def sample_table
-    begin
-      assay =  Assay.find(params[:assay_id])
-      flowchart = Flowchart.where(study_id: assay.study.id).first
-      if (flowchart)
-        source_sample_type = SampleType.find(flowchart.source_sample_type_id)
-        source_sample_type_attributes = source_sample_type.sample_attributes.select(:required, :title,
-           :sample_type_id, :id, :sample_controlled_vocab_id)
-        all_samples = load_samples(assay, source_sample_type)
-        rest_headers = load_headers(assay)
-        all_headers = source_sample_type_attributes + rest_headers
-        data = { header: all_headers, samples: all_samples }
-        render json: { status: :ok, data: data }
-      else
-        render json: { status: :unprocessable_entity, error: "The flowchart does not exist." }
-      end
-    rescue Exception => e
-       render json: {status: :unprocessable_entity, error: e.message } 
+    assay = Assay.find(params[:assay_id])
+    flowchart = Flowchart.where(study_id: assay.study.id).first
+    if (flowchart)
+      source_sample_type = SampleType.find(flowchart.source_sample_type_id)
+      samples = load_samples(assay, source_sample_type)
+      header = load_headers(assay, source_sample_type)
+      render json: { status: :ok, data: { header: header, samples: samples } }
+    else
+      render json: { status: :unprocessable_entity, error: "The flowchart does not exist." }
     end
   end
 
@@ -182,40 +174,24 @@ class SinglePagesController < ApplicationController
     source_list
   end
 
-  def load_headers assay
-    final_header = []
-    all_assays = Study.find(assay.study.id).assays.where("position <= #{assay.position}").sort_by{|e| e[:position]}
-    all_assays.each do |m|
-      s = SampleType.find(m.sample_type_id)
-      final_header += s.sample_attributes.select(:required, :title, :sample_type_id, :id, :sample_controlled_vocab_id) if !s.nil?
+  def load_headers (assay, source)
+    # No assay is associated with the source
+    header = source.sample_attributes.select(:required, :title, :sample_type_id, :id, :sample_controlled_vocab_id)
+    Study.find(assay.study.id).assays.where("position <= #{assay.position}").order(:position).each do |a|
+      header += a.sample_type.sample_attributes.select(:required, :title, :sample_type_id, :id, :sample_controlled_vocab_id)
     end
-    final_header
+    header
   end
 
 
-  def load_samples (assay, source_sample_type)
+  def load_samples (assay, source)
     return nil if assay.position.nil? 
-    final_samples = {0 => []}
-    link_ids = []
-    source_sample_type.samples.each do |s|
-      final_samples[0] << {"id" => s.id, "data" => s.json_metadata, "sample_type_id" => source_sample_type.id}
-      link_ids << s.get_attribute_value(:link_id)
+    samples_collection = {}
+    # No assay is associated with the source
+    samples_collection[0] = source.samples.select(:id, :json_metadata, :sample_type_id, :link_id)
+    Study.find(assay.study.id).assays.where("position <= #{assay.position}").order(:position).each_with_index do |a, i|
+      samples_collection[i + 1] = a.sample_type.samples.select(:id, :json_metadata, :sample_type_id, :link_id)
     end
-    # puts Study.find(assay.study.id).assays.length
-    all_assays = Study.find(assay.study.id).assays.where("position <= #{assay.position}").sort_by{|e| e[:position]}
-    all_assays.each_with_index do |m, i|
-      # puts m
-      final_samples[i+1] = []
-      s = SampleType.find(m.sample_type_id)
-      link_ids.each do |id|
-        s.samples.each do |n|
-          if (n.get_attribute_value(:link_id) == id)
-            final_samples[i+1] << {"id" => n.id, "data" => n.json_metadata, "sample_type_id" => s.id}
-            break
-          end
-        end
-      end
-    end
-    final_samples
+    samples_collection
   end
 end
