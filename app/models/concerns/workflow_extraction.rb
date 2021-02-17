@@ -80,6 +80,8 @@ module WorkflowExtraction
     rescue WorkflowDiagram::UnsupportedFormat
     end
 
+    merge_fields(crate.main_workflow, self.workflow)
+
     authors = creators.map { |person| crate.add_person(nil, person.ro_crate_metadata) }
     others = other_creators&.split(',')&.collect(&:strip)&.compact || []
     authors += others.map.with_index { |name, i| crate.add_person("creator-#{i + 1}", name: name) }
@@ -96,6 +98,13 @@ module WorkflowExtraction
     crate.preview.template = PREVIEW_TEMPLATE
   end
 
+  def merge_fields (crate_workflow, workflow)
+    workflow_struct = JSON.parse(Seek::BioSchema::Serializer.new(workflow).json_ld)
+    workflow_struct.each do |key, value|
+      crate_workflow[key] = value if crate_workflow[key].nil?
+    end
+  end
+  
   def ro_crate
     inner = proc do |crate|
       populate_ro_crate(crate) if should_generate_crate?
