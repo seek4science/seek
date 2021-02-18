@@ -27,6 +27,10 @@ module WorkflowExtraction
     end
   end
 
+  def has_tests?
+    extractor.has_tests?
+  end
+
   def can_render_diagram?
     extractor.can_render_diagram?
   end

@@ -13,6 +13,12 @@ module Seek
         @main_workflow_class = main_workflow_class
       end
 
+      def has_tests?
+        open_crate do |crate|
+          crate.test_directory.present?
+        end
+      end
+
       def can_render_diagram?
         open_crate do |crate|
           crate.main_workflow_diagram.present? || main_workflow_extractor(crate)&.can_render_diagram? || abstract_cwl_extractor(crate)&.can_render_diagram?

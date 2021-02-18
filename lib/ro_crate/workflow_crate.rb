@@ -36,6 +36,10 @@ module ROCrate
       main_workflow.cwl_description = entity
     end
 
+    def test_directory
+      dereference('test/')
+    end
+
     def readme
       dereference('README.md')
     end

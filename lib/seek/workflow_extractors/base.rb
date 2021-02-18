@@ -31,6 +31,10 @@ module Seek
         { warnings: [], errors: [] }
       end
 
+      def has_tests?
+        false
+      end
+
       def can_render_diagram?
         false
       end
