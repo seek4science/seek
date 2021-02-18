@@ -85,7 +85,7 @@ namespace :seek do
   task(migrate_old_jobs: :environment) do
     puts "Migrating RdfGenerationJobs..."
     count = RdfGenerationQueue.count
-    Delayed::Job.where(failed_at: nil).where('handler LIKE ?', '%RdfGenerationJob%').find_each do |job|
+    Delayed::Job.where(failed_at: nil).where('handler LIKE ?', '%RdfGenerationJob%').where('handler LIKE ?','%item_type_name%').find_each do |job|
       data = YAML.load(job.handler.sub("--- !ruby/object:RdfGenerationJob\n",''))
       item = nil
       begin
