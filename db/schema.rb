@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_29_093059) do
+ActiveRecord::Schema.define(version: 2021_02_02_162513) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -1231,6 +1231,11 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.date "end_date"
   end
 
+  create_table "projects_publication_versions", id: false,  force: :cascade do |t|
+    t.integer "project_id"
+    t.integer "version_id"
+  end
+
   create_table "projects_publications", id: false,  force: :cascade do |t|
     t.integer "project_id"
     t.integer "publication_id"
@@ -1304,6 +1309,38 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "publication_versions",  force: :cascade do |t|
+    t.integer "publication_id"
+    t.integer "version"
+    t.text "revision_comments"
+    t.integer "contributor_id"
+    t.text "title", limit: 16777215
+    t.text "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.datetime "last_used_at"
+    t.string "first_letter", limit: 1
+    t.text "other_creators"
+    t.string "uuid"
+    t.integer "policy_id"
+    t.string "doi"
+    t.string "license"
+    t.string "deleted_contributor"
+    t.integer "pubmed_id"
+    t.text "abstract", limit: 16777215
+    t.date "published_date"
+    t.string "journal"
+    t.text "citation"
+    t.integer "registered_mode"
+    t.text "booktitle"
+    t.string "publisher"
+    t.text "editor"
+    t.integer "publication_type_id"
+    t.text "url"
+    t.index ["contributor_id"], name: "index_publication_versions_on_contributor"
+    t.index ["publication_id"], name: "index_publication_versions_on_publication_id"
+  end
+
   create_table "publications", id: :integer,  force: :cascade do |t|
     t.integer "pubmed_id"
     t.text "title", limit: 16777215
@@ -1326,6 +1363,7 @@ ActiveRecord::Schema.define(version: 2020_07_29_093059) do
     t.text "editor"
     t.integer "publication_type_id"
     t.text "url"
+    t.integer "version", default: 1
     t.index ["contributor_id"], name: "index_publications_on_contributor"
   end
 

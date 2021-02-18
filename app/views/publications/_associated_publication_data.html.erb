@@ -8,6 +8,10 @@
   <%= text_area(:publication, :abstract, :cols => 90, :rows => 8, :class => 'form-control') %>
 </div>
 
+Add Upload part!
+
+<%= render partial: 'assets/upload_box',  :locals=>{:resource=>@publication} -%>
+
 <%= render partial: 'associate_authors_form', :locals => { :f=> publication_form, :publication => @publication} %>
 
 <%= render partial: 'scales/scales_selector', locals: { object: @publication } if show_scales?%>

@@ -23,6 +23,11 @@
     <% end %>
   </div>
 
+  <div class="col-md-9 col-sm-8 box_about_actor">
+    <%= debug @display_publication %>
+    Add the blob text here!
+  </div>
+
   <div class="col-sm-6 hidden-xs">
     <%= list_item_attribute "PubMed ID", resource.pubmed_id, resource.pubmed_uri, {:onclick => "window.open(this.href);return false;"} unless resource.pubmed_id.nil? %>
     <%= list_item_doi(resource) %>

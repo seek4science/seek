@@ -5,11 +5,14 @@ class PublicationsController < ApplicationController
   include Seek::AssetsCommon
   include Seek::PreviewHandling
 
+  include Seek::UploadHandling::DataUpload
+
   before_action :publications_enabled?
 
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, only: %i[show edit manage update destroy]
   before_action :suggest_authors, only: [:manage]
+  before_action :find_display_asset, :only=>[:show, :download] # :_resource_list_item,
 
   include Seek::BreadCrumbs
 
@@ -397,6 +400,8 @@ class PublicationsController < ApplicationController
       @publication.publication_authors << pa
     end
 
+    upload_blob
+
     if @publication.save
       create_or_update_associations assay_ids, 'Assay', 'edit'
       if !@publication.parent_name.blank?
@@ -418,6 +423,74 @@ class PublicationsController < ApplicationController
     end
   end
 
+  def upload_blob
+    @publication = setup_new_asset
+    respond_to do |format|
+      if handle_upload_data && @publication.content_blob.save
+        session[:uploaded_content_blob_id] = @publication.content_blob.id
+        format.html {}
+      else
+        session.delete(:uploaded_content_blob_id)
+        format.html { render action: :new }
+      end
+    end
+  end
+
+  def upload_blob3
+    setup_new_asset
+    #associate_by_presented_params
+    respond_for_new
+    createUpload
+  end
+
+  def setup_new_asset
+    attr={}
+    if params["#{controller_name.singularize}"]
+      attr = send("#{controller_name.singularize}_params")
+    end
+    item = class_for_controller_name.new(attr)
+    item.parent_name = params[:parent_name] if item.respond_to?(:parent_name)
+    set_shared_item_variable(item)
+    @content_blob = ContentBlob.new
+    @page_title = params[:page_title]
+    item
+  end
+
+  def respond_for_new
+    respond_to do |format|
+      if User.logged_in_and_member?
+        format.html # new.html.erb
+      else
+        flash[:error] = "You are not authorized to upload a new #{t(controller_name.singularize)}. Only members of known projects, institutions or work groups are allowed to create new content."
+        format.html { redirect_to eval("#{controller_name}_path") }
+      end
+    end
+  end
+
+  def createUpload
+    item = initialize_asset
+
+    if handle_upload_data
+      create_asset_and_respond(item)
+    else
+      handle_upload_data_failure
+    end
+  end
+
+  def initialize_asset
+    item = @publication
+    #item = class_for_controller_name.new(asset_params)
+    set_shared_item_variable(item)
+
+    item
+  end
+
+  def upload_blob2
+    controller_you_want = Seek::AssetsStandardControllerActions.new
+    controller_you_want.request = request
+    controller_you_want.response = response
+    controller_you_want.create
+  end
   # create a publication from a reference file, at the moment supports only bibtex
   # only sets the @publication and redirects to the create_publication with content from the bibtex file
   def import_publication
@@ -676,4 +749,25 @@ class PublicationsController < ApplicationController
     end
     replace_str
   end
+
+  def new_version
+    if handle_upload_data(true)
+      comments=params[:revision_comments]
+
+      respond_to do |format|
+        if @publication.save_as_new_version(comments)
+
+          flash[:notice]="New version uploaded - now on version #{@publication.version}"
+        else
+          flash[:error]="Unable to save new version"
+        end
+        format.html {redirect_to @publication }
+      end
+    else
+      flash[:error]=flash.now[:error]
+      redirect_to @publication
+    end
+
+  end
+
 end

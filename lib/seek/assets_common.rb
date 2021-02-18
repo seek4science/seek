@@ -8,8 +8,16 @@ module Seek
     include Seek::AssetsStandardControllerActions
 
     def find_display_asset(asset = eval("@#{controller_name.singularize}"))
+      #if !asset.latest_version
+      #  return
+      #end
+      #warning('Asset found is '+asset.latest_version)
       requested_version = params[:version] || asset.latest_version.version
       found_version = asset.find_version(requested_version)
+      warn('Asset found is '+found_version.to_s)
+      warn('Asset found is '+ "@display_#{asset.class.name.underscore}")
+      # Show methods
+
       if !found_version || anonymous_request_for_previous_version?(asset, requested_version)
         error('This version is not available', 'invalid route')
         return false

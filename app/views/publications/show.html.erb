@@ -1,10 +1,22 @@
-<%= render :partial => "general/item_title",:locals => { :item => @publication, :buttons_partial => 'publications/buttons' } %>
+<%= render :partial => "general/item_title",:locals => { :item => @publication, :version => @display_publication.version, :buttons_partial => 'publications/buttons' } %>
 
 <div class="row">
   <div class="col-md-9 col-sm-8 box_about_actor">
     <%= item_description @publication.abstract, :label => "Abstract", :none_text => "No abstract specified" %>
 
     <div class="row">
+      <%= item_description @display_publication.description %>
+
+      <div class="row">
+        <div class="col-md-6">
+          <%= persistent_resource_id(@display_publication) %>
+          <#%= debug @display_publication.content_blob.show_as_external_link %>
+          <%= render :partial => 'assets/fileinfo',:object=>@display_publication.content_blob -%>
+        </div>
+      </div>
+      <% if @display_publication.content_blob %>
+        <%= rendered_asset_view(@display_publication) %>
+      <%end %>
       <div class="col-md-6">
         <%= persistent_resource_id(@publication) %>
         <% unless @publication.pubmed_id.nil? %>

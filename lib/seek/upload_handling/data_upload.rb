@@ -5,6 +5,7 @@ module Seek
       include Seek::UploadHandling::ContentInspection
 
       def handle_upload_data(new_version = false)
+        #warn("In Handle Upload data with" + content_blobs.original_filename)
         blob_params = params[:content_blobs]
         allow_empty_content_blob = model_image_present? || json_api_request?
 
@@ -113,6 +114,7 @@ module Seek
 
       def process_upload(blob_params)
         data = blob_params[:data]
+        warn("AAAAAA - Processing the upload for file "+data.original_filename)
         blob_params.delete(:data_url)
         blob_params.delete(:original_filename)
         blob_params[:original_filename] = data.original_filename

@@ -448,6 +448,7 @@ SEEK::Application.routes.draw do
       get :preview
       post :test_asset_url
       post :items_for_result
+      post :new_version
     end
     member do
       post :check_related_items
@@ -458,7 +459,7 @@ SEEK::Application.routes.draw do
       post :publish
       post :request_contact
       post :update_annotations_ajax
-      post :new_version
+
       post :edit_version_comment
       delete :destroy_version
       get :manage
@@ -624,7 +625,7 @@ SEEK::Application.routes.draw do
               :data_files, :models, :sops, :workflows, :nodes, :presentations, :documents, :events, :publications, :organisms
   end
 
-  resources :publications do
+  resources :publications, concerns: [:has_content_blobs] do
     collection do
       get :typeahead
       get :preview
@@ -633,14 +634,19 @@ SEEK::Application.routes.draw do
       get :export
       post :fetch_preview
       post :update_metadata
+      post :test_asset_url
       post :items_for_result
     end
     member do
       get :manage
+      get :download
       post :update_annotations_ajax
       post :disassociate_authors
       post :update_metadata
       post :request_contact
+      post :new_version
+      post :edit_version_comment
+      delete :destroy_version
     end
     resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:documents, :presentations, :organisms, :events,:only=>[:index]
   end

@@ -83,9 +83,11 @@ module Seek
     def manage; end
 
     def create
+      #warn("BBBBBBBBBBB - Creating asset")
       item = initialize_asset
 
       if handle_upload_data
+        #warn("BBBBBBBBBBB - Uploaded")
         create_asset_and_respond(item)
       else
         handle_upload_data_failure
