@@ -22,7 +22,7 @@ module Seek
         end
 
         def schema_type
-          'ComputationalWorkflow'
+          ['File', 'SoftwareSourceCode', 'ComputationalWorkflow']
         end
 
         def programming_language
@@ -30,20 +30,21 @@ module Seek
         end
 
         def inputs
-          formal_parameters(resource.inputs)
+          formal_parameters(resource.inputs, 'inputs')
         end
 
         def outputs
-          formal_parameters(resource.outputs)
+          formal_parameters(resource.outputs, 'outputs')
         end
 
         private
 
-        def formal_parameters(properties)
+        def formal_parameters(properties, group_name)
           properties.collect do |property|
             {
               "@type": 'FormalParameter',
-              name: property.id
+              "@id": "#{url}/#{group_name}/#{property.id}",
+              name: property.name
             }
           end
         end

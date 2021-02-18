@@ -68,7 +68,7 @@ module WorkflowExtraction
     wf = crate.main_workflow || ROCrate::Workflow.new(crate, c.filepath, c.original_filename)
     wf.content_size = c.file_size
     crate.main_workflow = wf
-    crate.main_workflow.programming_language = ROCrate::ContextualEntity.new(crate, nil, extractor_class.ro_crate_metadata)
+#    crate.main_workflow.programming_language = ROCrate::ContextualEntity.new(crate, nil, extractor_class.ro_crate_metadata)
 
     begin
       d = diagram
@@ -82,27 +82,30 @@ module WorkflowExtraction
 
     merge_fields(crate.main_workflow, self.workflow)
 
-    authors = creators.map { |person| crate.add_person(nil, person.ro_crate_metadata) }
-    others = other_creators&.split(',')&.collect(&:strip)&.compact || []
-    authors += others.map.with_index { |name, i| crate.add_person("creator-#{i + 1}", name: name) }
-    crate.author = authors
-    crate['provider'] = projects.map { |project| crate.add_organization(nil, project.ro_crate_metadata).reference }
-    crate.license = license
-    crate.identifier = ro_crate_identifier
-    crate.url = ro_crate_url('ro_crate')
-    crate['isBasedOn'] = source_link_url if source_link_url
-    crate['sdPublisher'] = crate.add_person(nil, contributor.ro_crate_metadata).reference
-    crate['sdDatePublished'] = Time.now
-    crate['creativeWorkStatus'] = I18n.t("maturity_level.#{maturity_level}") if maturity_level
+#    authors = creators.map { |person| crate.add_person(nil, person.ro_crate_metadata) }
+#    others = other_creators&.split(',')&.collect(&:strip)&.compact || []
+#    authors += others.map.with_index { |name, i| crate.add_person("creator-#{i + 1}", name: name) }
+#    crate.author = authors
+#    crate['provider'] = projects.map { |project| crate.add_organization(nil, project.ro_crate_metadata).reference }
+#    crate.license = license
+#    crate.identifier = ro_crate_identifier
+#    crate.url = ro_crate_url('ro_crate')
+#    crate['isBasedOn'] = source_link_url if source_link_url
+#    crate['sdPublisher'] = crate.add_person(nil, contributor.ro_crate_metadata).reference
+#    crate['sdDatePublished'] = Time.now
+#    crate['creativeWorkStatus'] = I18n.t("maturity_level.#{maturity_level}") if maturity_level
 
     crate.preview.template = PREVIEW_TEMPLATE
   end
 
   def merge_fields (crate_workflow, workflow)
     workflow_struct = JSON.parse(Seek::BioSchema::Serializer.new(workflow).json_ld)
-    workflow_struct.each do |key, value|
-      crate_workflow[key] = value if crate_workflow[key].nil?
-    end
+#    workflow_struct['@context'] = 'https://schema.org/version/latest/schemaorg-current-http.jsonld'
+    fred = JSON::LD::API.flatten(workflow_struct, "schema.org")
+#    workflow_struct.each do |key, value|
+#      crate_workflow[key] = value if crate_workflow[key].nil?
+#    end
+    crate_workflow['bert'] = fred
   end
   
   def ro_crate
