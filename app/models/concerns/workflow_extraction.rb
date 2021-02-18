@@ -100,12 +100,15 @@ module WorkflowExtraction
 
   def merge_fields (crate_workflow, workflow)
     workflow_struct = JSON.parse(Seek::BioSchema::Serializer.new(workflow).json_ld)
-#    workflow_struct['@context'] = 'https://schema.org/version/latest/schemaorg-current-http.jsonld'
-    fred = JSON::LD::API.flatten(workflow_struct, "schema.org")
-#    workflow_struct.each do |key, value|
-#      crate_workflow[key] = value if crate_workflow[key].nil?
-#    end
-    crate_workflow['bert'] = fred
+    context = {
+      '@vocab' => 'https://somewhere.com/'
+    }
+    workflow_struct['@context'] = context
+    flattened = JSON::LD::API.flatten(workflow_struct, context)
+    flattened.except!('@context')
+    flattened.each do |key, value|
+      crate_workflow[key] = value if crate_workflow[key].nil?
+    end
   end
   
   def ro_crate
