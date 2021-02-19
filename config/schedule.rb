@@ -39,6 +39,10 @@ every ContentBlobCleanerJob::GRACE_PERIOD do
   runner "ContentBlobCleanerJob.perform_later"
 end
 
+every LifeMonitorStatusJob::PERIOD do
+  runner "LifeMonitorStatusJob.perform_later"
+end
+
 every Seek::Config.home_feeds_cache_timeout.minutes do # Crontab will need to be regenerated if this changes...
   runner "NewsFeedRefreshJob.set(priority: 3).perform_later"
 end

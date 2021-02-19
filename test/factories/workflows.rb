@@ -152,3 +152,10 @@ end
 Factory.define(:workflow_with_tests, parent: :workflow) do |f|
   f.association :content_blob, factory: :ro_crate_with_tests
 end
+
+Factory.define(:monitored_workflow, parent: :workflow) do |f|
+  f.association :content_blob, factory: :ro_crate_with_tests
+  f.after_create do |workflow|
+    workflow.latest_version.update_column(:monitored, true)
+  end
+end

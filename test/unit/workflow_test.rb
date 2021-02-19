@@ -177,15 +177,19 @@ class WorkflowTest < ActiveSupport::TestCase
     workflow = nil
     with_config_value(:life_monitor_enabled, true) do
       assert_enqueued_with(job: LifeMonitorSubmissionJob) do
-        workflow = Factory(:workflow_with_tests, policy: Factory(:public_policy))
+        workflow = Factory(:workflow_with_tests, uuid: '56c50ac0-529b-0139-9132-000c29a94011',
+                           policy: Factory(:public_policy))
         assert workflow.latest_version.has_tests?
         assert workflow.can_download?(nil)
       end
+
       VCR.use_cassette('life_monitor/get_token') do
         VCR.use_cassette('life_monitor/submit_workflow') do
           assert_nothing_raised do
             User.current_user = workflow.contributor.user
+            refute workflow.latest_version.monitored
             LifeMonitorSubmissionJob.perform_now(workflow.latest_version)
+            assert workflow.latest_version.reload.monitored
           end
         end
       end
