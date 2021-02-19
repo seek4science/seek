@@ -1,4 +1,4 @@
-require 'ro_crate_ruby'
+require 'ro_crate'
 
 module ROCrate
   class WorkflowCrateReader < ::ROCrate::Reader
@@ -6,6 +6,8 @@ module ROCrate
       ROCrate::WorkflowCrate.new.tap do |crate|
         crate.properties = entity_hash.delete(ROCrate::Crate::IDENTIFIER)
         crate.metadata.properties = entity_hash.delete(ROCrate::Metadata::IDENTIFIER)
+        preview_properties = entity_hash.delete(ROCrate::Preview::IDENTIFIER)
+        crate.preview.properties = preview_properties if preview_properties
         main_wf = entity_hash.delete(crate.properties.dig('mainEntity', '@id'))
         if main_wf && (['ComputationalWorkflow', 'Workflow'] & Array(main_wf['@type'])).any?
           crate.main_workflow = create_data_entity(crate, ROCrate::Workflow, source, main_wf)

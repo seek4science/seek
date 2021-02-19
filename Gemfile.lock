@@ -25,14 +25,6 @@ GIT
     my_responds_to_parent (1.0.0)
 
 GIT
-  remote: https://github.com/fbacall/ro-crate-ruby.git
-  revision: b3064850df7acf966b2964da46ee42b8526ac8be
-  specs:
-    ro-crate-ruby (0.3.0)
-      addressable
-      rubyzip
-
-GIT
   remote: https://github.com/ruby-rdf/rdf-virtuoso
   revision: 2c209c1dcd8c655f8f8dd06d11891b6dd0d21b6d
   branch: develop
@@ -643,6 +635,9 @@ GEM
       json (>= 2.3.0)
       ucf (~> 2.0.2)
       uuid (~> 2.3)
+    ro-crate (0.4.2)
+      addressable (~> 2.7.0)
+      rubyzip (~> 2.0.0)
     rsolr (2.2.1)
       builder (>= 2.1.2)
       faraday (>= 0.9.0)
@@ -677,7 +672,7 @@ GEM
     ruby-prof (1.4.2)
     ruby-progressbar (1.10.1)
     rubyntlm (0.3.4)
-    rubyzip (1.3.0)
+    rubyzip (2.0.0)
     sample-template-generator (0.5.1)
       rdoc (~> 6.0)
       terrapin (~> 0.6)
@@ -816,8 +811,8 @@ GEM
       rails (>= 3.0)
       rake (>= 0.8.7)
     yard (0.9.25)
-    zip-container (4.0.1)
-      rubyzip (~> 1.3.0)
+    zip-container (4.0.2)
+      rubyzip (~> 2.0.0)
 
 PLATFORMS
   ruby
@@ -931,7 +926,7 @@ DEPENDENCIES
   rfc-822
   rmagick (= 2.15.2)
   ro-bundle (~> 0.2.5)
-  ro-crate-ruby!
+  ro-crate (~> 0.4.2)
   rspec-rails
   rubocop
   ruby-prof
