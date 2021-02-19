@@ -54,7 +54,7 @@ namespace :seek do
 
   task(update_samples_json: :environment) do
     puts '... converting stored sample JSON ...'
-    SampleType.all.each do |sample_type|
+    SampleType.find_each do |sample_type|
 
       # gather the attributes that need updating
       attributes_for_update = sample_type.sample_attributes.select do |attr|
@@ -160,7 +160,7 @@ namespace :seek do
   end
 
   task(fix_negative_programme_role_mask: :environment) do
-    problems = Person.all.select{|person| person.roles_mask < 0}
+    problems = Person.where('roles_mask < 0')
     problems.each do |person|
       mask = person.roles_mask
       while mask < 0
