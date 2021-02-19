@@ -126,23 +126,70 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
       assert sop.authorized_for_view?(other_user)
       assert sop.authorized_for_download?(other_user)
       assert sop.authorized_for_edit?(other_user)
-      assert !sop.authorized_for_manage?(other_user)
-      assert !sop.authorized_for_delete?(other_user)
+      refute sop.authorized_for_manage?(other_user)
+      refute sop.authorized_for_delete?(other_user)
 
       sop.update_lookup_table(user)
       sop.update_lookup_table(other_user)
 
-      assert sop.authorized_for_view?(user)
-      assert sop.authorized_for_download?(user)
-      assert sop.authorized_for_edit?(user)
-      assert sop.authorized_for_manage?(user)
-      assert sop.authorized_for_delete?(user)
+      assert sop.can_view?(user)
+      assert sop.can_download?(user)
+      assert sop.can_edit?(user)
+      assert sop.can_manage?(user)
+      assert sop.can_delete?(user)
 
-      assert sop.authorized_for_view?(other_user)
-      assert sop.authorized_for_download?(other_user)
-      assert sop.authorized_for_edit?(other_user)
-      assert !sop.authorized_for_manage?(other_user)
-      assert !sop.authorized_for_delete?(other_user)
+      assert sop.can_view?(other_user)
+      assert sop.can_download?(other_user)
+      assert sop.can_edit?(other_user)
+      refute sop.can_manage?(other_user)
+      refute sop.can_delete?(other_user)
+
+       # directly check the lookup table
+       assert sop.lookup_for('view',user.id)
+       assert sop.lookup_for('download',user.id)
+       assert sop.lookup_for('edit',user.id)
+       assert sop.lookup_for('manage',user.id)
+       assert sop.lookup_for('delete',user.id)
+
+       assert sop.lookup_for('view',other_user.id)
+       assert sop.lookup_for('download',other_user.id)
+       assert sop.lookup_for('edit',other_user.id)
+       refute sop.lookup_for('manage',other_user.id)
+       refute sop.lookup_for('delete',other_user.id)
+
+      # change permissions
+      sop.policy=Factory(:private_policy)
+      disable_authorization_checks do
+        sop.save!
+      end
+
+      sop.update_lookup_table(user)
+      sop.update_lookup_table(other_user)
+
+      assert sop.can_view?(user)
+      assert sop.can_download?(user)
+      assert sop.can_edit?(user)
+      assert sop.can_manage?(user)
+      assert sop.can_delete?(user)
+
+      refute sop.can_view?(other_user)
+      refute sop.can_download?(other_user)
+      refute sop.can_edit?(other_user)
+      refute sop.can_manage?(other_user)
+      refute sop.can_delete?(other_user)
+
+      # directly check the lookup table
+      assert sop.lookup_for('view',user.id)
+      assert sop.lookup_for('download',user.id)
+      assert sop.lookup_for('edit',user.id)
+      assert sop.lookup_for('manage',user.id)
+      assert sop.lookup_for('delete',user.id)
+
+      refute sop.lookup_for('view',other_user.id)
+      refute sop.lookup_for('download',other_user.id)
+      refute sop.lookup_for('edit',other_user.id)
+      refute sop.lookup_for('manage',other_user.id)
+      refute sop.lookup_for('delete',other_user.id)
     end
   end
 
