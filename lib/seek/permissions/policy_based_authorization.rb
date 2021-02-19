@@ -179,11 +179,17 @@ module Seek
       # updates or creates the authorization lookup entries for this item and the provided user (nil indicating anonymous user)
       def update_lookup_table(user = nil)
         user_id = user.nil? ? 0 : user.id
-        auth_lookup.where(user_id: user_id).delete_all
+        records = auth_lookup.where(user_id: user_id)
 
         params = { user_id: user_id }
         AuthLookup::ABILITIES.each { |a| params["can_#{a}"] = authorized_for_action(user, a) }
-        auth_lookup.create!(params)
+
+        if records.any?
+          records.update_all(params)
+        else
+          auth_lookup.create!(params)
+        end
+    
       end
 
       def update_lookup_table_for_all_users
