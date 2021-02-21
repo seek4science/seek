@@ -15,7 +15,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => 'https://schema.org',
       '@type' => 'DataCatalog',
       'name' => 'Sysmo',
       'url' => 'http://fairyhub.org',
@@ -42,7 +42,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     @person.avatar = Factory(:avatar)
     disable_authorization_checks { @person.save! }
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => 'https://schema.org',
       '@id' => "http://localhost:3000/people/#{@person.id}",
       '@type' => 'Person',
       'name' => @person.name,
@@ -77,7 +77,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     refute df.content_blob.show_as_external_link?
 
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => 'https://schema.org',
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}",
       'name' => df.title,
@@ -126,7 +126,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     assert df.content_blob.show_as_external_link?
 
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => 'https://schema.org',
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}",
       'name' => df.title,
@@ -158,7 +158,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     organism = Factory(:organism, bioportal_concept: Factory(:bioportal_concept))
 
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => 'https://schema.org',
       '@type' => 'Taxon',
       '@id' => "http://localhost:3000/organisms/#{organism.id}",
       'name' => 'An Organism',
@@ -177,7 +177,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     @project.description = 'a lovely project'
     disable_authorization_checks { @project.save! }
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => 'https://schema.org',
       '@type' => %w[Project Organization],
       '@id' => "http://localhost:3000/projects/#{@project.id}",
       'name' => @project.title,
@@ -202,7 +202,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     disable_authorization_checks { sample.save! }
 
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => 'https://schema.org',
       '@type' => 'Sample',
       '@id' => "http://localhost:3000/samples/#{sample.id}",
       'name' => 'Fred Bloggs',
@@ -223,7 +223,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
   test 'event' do
     event = Factory(:max_event, contributor: @person)
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => 'https://schema.org',
       '@id' => "http://localhost:3000/events/#{event.id}",
       '@type' => 'Event',
       'name' => 'A Maximal Event',
@@ -259,7 +259,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => 'https://schema.org',
       '@type' => 'DigitalDocument',
       '@id' => "http://localhost:3000/documents/#{document.id}",
       'name' => 'This Document',
@@ -286,7 +286,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => 'https://schema.org',
       '@type' => 'PresentationDigitalDocument',
       '@id' => "http://localhost:3000/presentations/#{presentation.id}",
       'name' => 'This presentation',
@@ -322,7 +322,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       workflow
     end
 
-    expected = { '@context' => 'http://schema.org',
+    expected = { '@context' => 'https://schema.org',
                  '@type' => 'ComputationalWorkflow',
                  '@id' => "http://localhost:3000/workflows/#{workflow.id}",
                  'description' => 'This is a test workflow for bioschema generation',
