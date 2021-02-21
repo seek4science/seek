@@ -8,7 +8,7 @@ module Seek
         schema_mappings first_name: :givenName,
                         last_name: :familyName,
                         image: :image,
-                        member_of: :memberOf,
+#                        member_of: :memberOf,
                         orcid: :orcid
 
         def url

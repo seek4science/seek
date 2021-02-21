@@ -80,34 +80,55 @@ module WorkflowExtraction
     rescue WorkflowDiagram::UnsupportedFormat
     end
 
-    merge_fields(crate.main_workflow, self.workflow)
+    crate.identifier = ro_crate_identifier
+    crate.url = ro_crate_url('ro_crate')
 
+    merge_entities(crate, self.workflow)
+
+    crate['isBasedOn'] = source_link_url if source_link_url && !crate['isBasedOn']
+    crate['sdDatePublished'] = Time.now unless crate['sdDatePublished']
+    crate['creativeWorkStatus'] = I18n.t("maturity_level.#{maturity_level}") if maturity_level
 #    authors = creators.map { |person| crate.add_person(nil, person.ro_crate_metadata) }
 #    others = other_creators&.split(',')&.collect(&:strip)&.compact || []
 #    authors += others.map.with_index { |name, i| crate.add_person("creator-#{i + 1}", name: name) }
 #    crate.author = authors
 #    crate['provider'] = projects.map { |project| crate.add_organization(nil, project.ro_crate_metadata).reference }
 #    crate.license = license
-#    crate.identifier = ro_crate_identifier
-#    crate.url = ro_crate_url('ro_crate')
-#    crate['isBasedOn'] = source_link_url if source_link_url
 #    crate['sdPublisher'] = crate.add_person(nil, contributor.ro_crate_metadata).reference
-#    crate['sdDatePublished'] = Time.now
-#    crate['creativeWorkStatus'] = I18n.t("maturity_level.#{maturity_level}") if maturity_level
 
     crate.preview.template = PREVIEW_TEMPLATE
+    # brute force deletion as I cannot track down where it comes from
+    crate.contextual_entities.delete_if { |c| c['@id'] == '#ro-crate-preview.html' }
   end
 
-  def merge_fields (crate_workflow, workflow)
-    workflow_struct = JSON.parse(Seek::BioSchema::Serializer.new(workflow).json_ld)
+  def merge_entities (crate, workflow)
+    workflow_struct = Seek::BioSchema::Serializer.new(workflow).json_representation
+
     context = {
       '@vocab' => 'https://somewhere.com/'
     }
     workflow_struct['@context'] = context
+    workflow_struct.except!('encodingFormat')
+
     flattened = JSON::LD::API.flatten(workflow_struct, context)
     flattened.except!('@context')
-    flattened.each do |key, value|
-      crate_workflow[key] = value if crate_workflow[key].nil?
+
+    flattened['@graph'].each do |elem|
+      type = elem['@type']
+      type = [type] unless type.is_a?(Array)
+      if type.include?('ComputationalWorkflow')
+        merge_fields(crate.main_workflow, elem)
+      else
+        entity_class = ROCrate::ContextualEntity.specialize(elem)
+        entity = entity_class.new(crate, elem['@id'], elem)
+        crate.add_contextual_entity(entity)
+      end
+    end
+  end
+  
+  def merge_fields(crate_workflow, bioschemas_workflow)
+    bioschemas_workflow.each do |key, value|
+      crate_workflow[key] = value unless crate_workflow[key]
     end
   end
   

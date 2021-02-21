@@ -3,12 +3,13 @@ module Seek
     module ResourceDecorators
       # Decorator that provides extensions for a Workflow
       class Workflow < CreativeWork
-        associated_items sd_publisher: :contributors
+        associated_items sd_publisher: 'contributors'
 
         schema_mappings sd_publisher: :sdPublisher,
                         version: :version,
                         image: :image,
                         programming_language: :programmingLanguage,
+                        producer: :producer,
                         inputs: :input,
                         outputs: :output
 
@@ -40,10 +41,11 @@ module Seek
         private
 
         def formal_parameters(properties, group_name)
+          wf_name = self.title.downcase.gsub(/[^0-9a-z]/i, '_')
           properties.collect do |property|
             {
               "@type": 'FormalParameter',
-              "@id": "#{url}/#{group_name}/#{property.id}",
+              "@id": "##{wf_name}-#{group_name}-#{property.id}",
               name: property.name
             }
           end
