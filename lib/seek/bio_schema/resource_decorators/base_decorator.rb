@@ -26,7 +26,7 @@ module Seek
 
         # The @context to be used for the JSON-LD
         def context
-          'https://schema.org/'
+          'https://schema.org'
         end
 
         # The schema.org @type .
