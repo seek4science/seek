@@ -83,7 +83,8 @@ module WorkflowExtraction
     crate.identifier = ro_crate_identifier
     crate.url = ro_crate_url('ro_crate')
 
-    merge_entities(crate, self.workflow)
+    workflow = is_a_version? ? self.parent : self
+    merge_entities(crate, workflow) if workflow
 
     crate['isBasedOn'] = source_link_url if source_link_url && !crate['isBasedOn']
     crate['sdDatePublished'] = Time.now unless crate['sdDatePublished']
