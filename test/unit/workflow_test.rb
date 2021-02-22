@@ -67,11 +67,12 @@ class WorkflowTest < ActiveSupport::TestCase
     assert crate.main_workflow
     refute crate.main_workflow_diagram
     refute crate.main_workflow_cwl
+    puts crate.main_workflow.programming_language
     assert_equal 'Common Workflow Language', crate.main_workflow.programming_language['name']
 
     assert_equal 'MIT', crate.license
 
-    authors = crate.author.map(&:name)
+    authors = crate.main_workflow['creator'].map(&:name)
     assert_includes authors, 'John Smith'
     assert_includes authors, 'Jane Smith'
     assert crate.author.detect { |a| a['identifier'] == URI.join(Seek::Config.site_base_host, "people/#{creator.id}").to_s }
