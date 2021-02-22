@@ -46,7 +46,7 @@ module Seek
             {
               "@type": 'FormalParameter',
               "@id": "##{wf_name}-#{group_name}-#{property.id}",
-              name: property.name
+              name: property.name || property.id
             }
           end
         end

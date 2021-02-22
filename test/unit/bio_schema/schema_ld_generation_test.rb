@@ -304,7 +304,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     assert_equal expected, json
   end
 
-  test 'workflow' do
+
+test 'workflow' do
     creator2 = Factory(:person)
     workflow = travel_to(@current_time) do
       workflow = Factory(:cwl_packed_workflow,
@@ -323,7 +324,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = { '@context' => 'https://schema.org',
-                 '@type' => 'ComputationalWorkflow',
+                 '@type' => ['File', 'SoftwareSourceCode', 'ComputationalWorkflow'],
                  '@id' => "http://localhost:3000/workflows/#{workflow.id}",
                  'description' => 'This is a test workflow for bioschema generation',
                  'name' => 'This workflow',
@@ -356,36 +357,51 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                  'programmingLanguage' => 'CWL workflow',
                  'input' => [
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.cofsfile',
                      'name' => '#main/input.cofsfile' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.dmax',
                      'name' => '#main/input.dmax' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.dmin',
                      'name' => '#main/input.dmin' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.max-steps',
                      'name' => '#main/input.max-steps' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.mwmax-cof',
                      'name' => '#main/input.mwmax-cof' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.mwmax-source',
                      'name' => '#main/input.mwmax-source' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.rulesfile',
                      'name' => '#main/input.rulesfile' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.sinkfile',
                      'name' => '#main/input.sinkfile' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.sourcefile',
                      'name' => '#main/input.sourcefile' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.std_mode',
                      'name' => '#main/input.std_mode' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.stereo_mode',
                      'name' => '#main/input.stereo_mode' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.topx',
                      'name' => '#main/input.topx' }
                  ],
                  'output' => [
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-outputs-#main/solutionfile',
                      'name' => '#main/solutionfile' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-outputs-#main/sourceinsinkfile',
                      'name' => '#main/sourceinsinkfile' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-outputs-#main/stdout',
                      'name' => '#main/stdout' }
                  ] }
 
