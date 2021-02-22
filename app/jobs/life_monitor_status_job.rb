@@ -12,7 +12,7 @@ class LifeMonitorStatusJob < ApplicationJob
       versions.find_each do |workflow_version|
         response = client.status(workflow_version)
         if response['aggregate_test_status'].present?
-          workflow_version.workflow_statuses.create!(status: response['aggregate_test_status'])
+          workflow_version.test_status = response['aggregate_test_status']
         end
       end
     end

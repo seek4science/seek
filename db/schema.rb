@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_19_143153) do
+ActiveRecord::Schema.define(version: 2021_02_22_180839) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -1958,15 +1958,6 @@ ActiveRecord::Schema.define(version: 2021_02_19_143153) do
     t.index ["contributor_id"], name: "index_workflow_classes_on_contributor_id"
   end
 
-  create_table "workflow_statuses",  force: :cascade do |t|
-    t.bigint "workflow_id"
-    t.integer "version"
-    t.string "status"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["workflow_id"], name: "index_workflow_statuses_on_workflow_id"
-  end
-
   create_table "workflow_versions", id: :integer,  force: :cascade do |t|
     t.integer "workflow_id"
     t.integer "version"
@@ -1989,6 +1980,7 @@ ActiveRecord::Schema.define(version: 2021_02_19_143153) do
     t.integer "maturity_level"
     t.integer "visibility"
     t.boolean "monitored"
+    t.integer "test_status"
     t.index ["contributor_id"], name: "index_workflow_versions_on_contributor"
     t.index ["workflow_id"], name: "index_workflow_versions_on_workflow_id"
   end
@@ -2011,6 +2003,7 @@ ActiveRecord::Schema.define(version: 2021_02_19_143153) do
     t.text "metadata"
     t.integer "workflow_class_id"
     t.integer "maturity_level"
+    t.integer "test_status"
     t.index ["contributor_id"], name: "index_workflows_on_contributor"
   end
 

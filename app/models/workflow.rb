@@ -20,8 +20,6 @@ class Workflow < ApplicationRecord
 
   has_and_belongs_to_many :sops
 
-  has_many :workflow_statuses, -> (w) { where(version: w.version) }
-
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi']) do
     after_commit :submit_to_life_monitor
     acts_as_doi_mintable(proxy: :parent, general_type: 'Workflow')
@@ -30,8 +28,6 @@ class Workflow < ApplicationRecord
 
     has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND content_blobs.asset_type =?', r.version, r.parent.class.name) },
             :primary_key => :workflow_id, :foreign_key => :asset_id
-
-    has_many :workflow_statuses, -> (wv) { where(version: wv.version) }, primary_key: :workflow_id, foreign_key: :workflow_id
 
     serialize :metadata
 
@@ -44,6 +40,14 @@ class Workflow < ApplicationRecord
 
     def maturity_level= level
       super(Workflow::MATURITY_LEVELS_INV[level&.to_sym])
+    end
+
+    def test_status
+      Workflow::TEST_STATUS[super]
+    end
+
+    def test_status= stat
+      super(Workflow::TEST_STATUS_INV[stat&.to_sym])
     end
 
     def source_link_url
@@ -83,11 +87,36 @@ class Workflow < ApplicationRecord
     super(Workflow::MATURITY_LEVELS_INV[level&.to_sym])
   end
 
+  TEST_STATUS = {
+      0 => :not_available,
+      1 => :all_failing,
+      2 => :some_passing,
+      3 => :all_passing
+  }
+  TEST_STATUS_INV = TEST_STATUS.invert
+
+  def test_status
+    Workflow::TEST_STATUS[super]
+  end
+
+  def test_status= stat
+    super(Workflow::TEST_STATUS_INV[stat&.to_sym])
+  end
+
   has_filter maturity: Seek::Filtering::Filter.new(
       value_field: 'maturity_level',
       label_mapping: ->(values) {
         values.map do |value|
           I18n.translate("maturity_level.#{MATURITY_LEVELS[value]}")
+        end
+      }
+  )
+
+  has_filter tests: Seek::Filtering::Filter.new(
+      value_field: 'test_status',
+      label_mapping: ->(values) {
+        values.map do |value|
+          I18n.translate("test_status.#{TEST_STATUS[value]}")
         end
       }
   )

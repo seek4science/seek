@@ -130,10 +130,15 @@ en:
 
   oauth_session: 'OAuth Session'
   identity: 'Identity'
-  api_token: 'API token'
+  api_token: 'API token '
   maturity_level:
     released: 'Stable'
     work_in_progress: 'Work-in-progress'
+  test_status:
+    all_passing: 'Passing'
+    some_passing: 'Some failures'
+    all_failing: 'All failing'
+    not_available: 'Not available'
 
   joining_a_project: "<p>
     You need to be a member of a <strong>%{project}</strong> before you can register content.<br/>

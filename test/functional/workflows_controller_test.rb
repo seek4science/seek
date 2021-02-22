@@ -21,6 +21,9 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'index' do
+    Factory(:public_workflow, test_status: :all_passing)
+    Factory(:public_workflow, test_status: :all_failing)
+    Factory(:public_workflow, test_status: :some_passing)
     get :index
     assert_response :success
     assert_not_nil assigns(:workflows)
