@@ -237,7 +237,7 @@ class WorkflowTest < ActiveSupport::TestCase
         assert workflow.latest_version.has_tests?
         assert workflow.latest_version.monitored
         assert workflow.can_download?(nil)
-        workflow.save!
+        disable_authorization_checks { workflow.save! }
       end
     end
   end
@@ -255,7 +255,7 @@ class WorkflowTest < ActiveSupport::TestCase
 
       assert_enqueued_with(job: LifeMonitorSubmissionJob) do
         workflow.policy = Factory(:public_policy)
-        workflow.save!
+        disable_authorization_checks { workflow.save! }
         assert workflow.latest_version.has_tests?
         assert workflow.can_download?(nil)
         refute workflow.latest_version.monitored
