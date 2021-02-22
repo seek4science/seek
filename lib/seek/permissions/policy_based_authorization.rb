@@ -28,7 +28,8 @@ module Seek
             belongs_to :asset, class_name: klass.name, inverse_of: :auth_lookup
           end
 
-          has_many :auth_lookup, foreign_key: :asset_id, inverse_of: :asset, dependent: :destroy
+          has_many :auth_lookup, foreign_key: :asset_id, inverse_of: :asset
+          before_destroy :delete_auth_lookup_in_batches
         end
       end
       # the can_#{action}? methods are split into 2 parts, to differentiate between pure authorization and additional permissions based upon the state of the object or other objects it depends upon)
@@ -341,6 +342,11 @@ module Seek
       def lookup_for(action, user_id)
         auth_lookup.where(user_id: user_id).limit(1).pluck("can_#{action}").first
       end
+
+      def delete_auth_lookup_in_batches
+        auth_lookup.in_batches(of: 1000).delete_all
+      end
+
     end
   end
 end
