@@ -122,7 +122,7 @@ module Seek
 
         # removes all entries from the authorization lookup type for this authorized type
         def clear_lookup_table
-          lookup_class.delete_all
+          lookup_class.in_batches(of: 1000).delete_all
         end
 
         # the record count for entries within the authorization lookup table for a given user_id or user. Used to determine if the table is complete
