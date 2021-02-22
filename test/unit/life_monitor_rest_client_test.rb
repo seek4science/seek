@@ -24,4 +24,18 @@ class LifeMonitorRestClientTest < ActiveSupport::TestCase
       assert_equal @workflow.uuid, response.dig('workflow', 'uuid')
     end
   end
+
+  test 'submitted workflow exists' do
+    User.current_user = @workflow.contributor.user
+    VCR.use_cassette('life_monitor/existing_workflow_get') do
+      assert @client.exists?(@workflow.latest_version)
+    end
+  end
+
+  test 'not submitted workflow does not exist' do
+    User.current_user = @workflow.contributor.user
+    VCR.use_cassette('life_monitor/non_existing_workflow_get') do
+      refute @client.exists?(@workflow.latest_version)
+    end
+  end
 end

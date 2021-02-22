@@ -34,6 +34,30 @@ module LifeMonitor
                 })
       end
 
+      def replace(workflow_version)
+        raise 'not implemented' # Wait for this to be implemented by LifeMonitor
+        perform("/workflows/#{workflow_version.workflow.uuid}/#{workflow_version.version}", :put,
+                content_type: :json,
+                body: {
+                    uuid: workflow_version.workflow.uuid,
+                    version: workflow_version.version.to_s,
+                    roc_link: ro_crate_workflow_url(workflow_version.workflow, version: workflow_version.version,
+                                                    host: Seek::Config.host_with_port,
+                                                    protocol: Seek::Config.host_scheme),
+                    name: workflow_version.workflow.title,
+                    submitter_id: User.current_user.person.id.to_s
+                })
+      end
+
+      def exists?(workflow_version)
+        begin
+          perform("/workflows/#{workflow_version.workflow.uuid}/#{workflow_version.version}", :get)
+          true
+        rescue RestClient::NotFound
+          false
+        end
+      end
+
       private
 
       def perform(path, method, opts = {})

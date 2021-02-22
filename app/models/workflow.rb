@@ -23,7 +23,7 @@ class Workflow < ApplicationRecord
   has_many :workflow_statuses, -> (w) { where(version: w.version) }
 
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi']) do
-    after_commit :submit_to_life_monitor, on: :create
+    after_commit :submit_to_life_monitor
     acts_as_doi_mintable(proxy: :parent, general_type: 'Workflow')
     acts_as_versioned_resource
     acts_as_favouritable
@@ -51,7 +51,7 @@ class Workflow < ApplicationRecord
     end
 
     def submit_to_life_monitor
-      if Seek::Config.life_monitor_enabled && extractor.has_tests? && workflow.can_download?(nil)
+      if Seek::Config.life_monitor_enabled && !monitored && extractor.has_tests? && workflow.can_download?(nil)
         LifeMonitorSubmissionJob.perform_later(self)
       end
     end

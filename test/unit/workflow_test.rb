@@ -225,4 +225,51 @@ class WorkflowTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test 'does not create life monitor submission job if workflow already monitored' do
+    workflow = Factory(:workflow_with_tests, policy: Factory(:private_policy))
+    workflow.latest_version.update_column(:monitored, true)
+    workflow.policy.update_column(:access_type, Policy::ACCESSIBLE)
+    with_config_value(:life_monitor_enabled, true) do
+      assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
+        assert workflow.latest_version.has_tests?
+        assert workflow.latest_version.monitored
+        assert workflow.can_download?(nil)
+        workflow.save!
+      end
+    end
+  end
+
+  test 'creates life monitor submission job on update if workflow made public' do
+    workflow = nil
+    with_config_value(:life_monitor_enabled, true) do
+      assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
+        workflow = Factory(:workflow_with_tests, uuid: '56c50ac0-529b-0139-9132-000c29a94011', policy: Factory(:private_policy))
+        User.current_user = workflow.contributor.user
+        assert workflow.latest_version.has_tests?
+        refute workflow.can_download?(nil)
+        refute workflow.latest_version.monitored
+      end
+
+      assert_enqueued_with(job: LifeMonitorSubmissionJob) do
+        workflow.policy = Factory(:public_policy)
+        workflow.save!
+        assert workflow.latest_version.has_tests?
+        assert workflow.can_download?(nil)
+        refute workflow.latest_version.monitored
+      end
+
+      VCR.use_cassette('life_monitor/get_token') do
+        VCR.use_cassette('life_monitor/non_existing_workflow_get') do
+          VCR.use_cassette('life_monitor/submit_workflow') do
+            assert_nothing_raised do
+              refute workflow.latest_version.monitored
+              LifeMonitorSubmissionJob.perform_now(workflow.latest_version)
+              assert workflow.latest_version.reload.monitored
+            end
+          end
+        end
+      end
+    end
+  end
 end
