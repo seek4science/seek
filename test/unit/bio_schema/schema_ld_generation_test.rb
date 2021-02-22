@@ -84,7 +84,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'description' => df.description,
       'keywords' => 'keyword',
       'url' => "http://localhost:3000/data_files/#{df.id}",
-      'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
+      'creator' => [{ '@type' => 'Person', '@id' => 'blogs', 'name' => 'Blogs' }, { '@type' => 'Person', '@id' => 'joe', 'name' => 'Joe' }],
       'producer' => [{
         '@type' => %w[Project Organization],
         '@id' => "http://localhost:3000/projects/#{@project.id}",
@@ -132,7 +132,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'name' => df.title,
       'description' => df.description,
       'keywords' => 'keyword',
-      'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
+      'creator' => [{ '@type' => 'Person', '@id' => 'blogs', 'name' => 'Blogs' }, { '@type' => 'Person', '@id' => 'joe', 'name' => 'Joe' }],
       'url' => 'http://www.abc.com',
       'producer' => [{
         '@type' => %w[Project Organization],
@@ -339,8 +339,10 @@ test 'workflow' do
                        '@id' => "http://localhost:3000/people/#{creator2.id}",
                        'name' => creator2.name },
                      { '@type' => 'Person',
+                       '@id' => 'fred_bloggs',
                        'name' => 'Fred Bloggs' },
                      { '@type' => 'Person',
+                       '@id' => 'steve_smith',
                        'name' => 'Steve Smith' }],
                  'producer' =>
                     [{ '@type' => %w[Project Organization],
@@ -354,7 +356,14 @@ test 'workflow' do
                        '@id' => "http://localhost:3000/people/#{@person.id}",
                        'name' => @person.name }],
                  'version' => 1,
-                 'programmingLanguage' => 'CWL workflow',
+                 'programmingLanguage' => {
+                   '@id'=>'#cwl',
+                   '@type'=>'ComputerLanguage',
+                   'name'=>'Common Workflow Language',
+                   'alternateName'=>'CWL',
+                   'identifier'=> {
+                     '@id'=>'https://w3id.org/cwl/v1.0/'},
+                   'url'=>{'@id'=>'https://www.commonwl.org/'}},
                  'input' => [
                    { '@type' => 'FormalParameter',
                      '@id' => '#this_workflow-inputs-#main/input.cofsfile',
