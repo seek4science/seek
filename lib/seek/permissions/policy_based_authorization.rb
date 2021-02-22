@@ -28,7 +28,7 @@ module Seek
             belongs_to :asset, class_name: klass.name, inverse_of: :auth_lookup
           end
 
-          has_many :auth_lookup, foreign_key: :asset_id, inverse_of: :asset, dependent: :delete_all
+          has_many :auth_lookup, foreign_key: :asset_id, inverse_of: :asset, dependent: :destroy
         end
       end
       # the can_#{action}? methods are split into 2 parts, to differentiate between pure authorization and additional permissions based upon the state of the object or other objects it depends upon)
