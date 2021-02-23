@@ -33,6 +33,8 @@ jobs:
       matrix:
         database:
           - mysql
+          - postgres
+          - sqlite3
         suite:
           - rails test test/unit
           - rails test test/functional
@@ -42,12 +44,7 @@ jobs:
           - rake assets:precompile
           - rake db:setup
           - rake db:migrate
-          - rake seek:upgrade
-        include:
-          - database: postgres
-            suite: rails test test/unit
-          - database: sqlite3
-            suite: rails test test/unit
+          - rake seek:upgrade        
     steps:
       - name: Install system dependencies
         run: sudo apt update && sudo apt install libcurl4-gnutls-dev
