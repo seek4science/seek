@@ -20,8 +20,9 @@ class Workflow < ApplicationRecord
 
   has_and_belongs_to_many :sops
 
-  explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi']) do
-    after_commit :submit_to_life_monitor
+  explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi', 'test_status']) do
+    after_commit :submit_to_life_monitor, on: [:create, :update]
+    after_commit :sync_test_status, on: [:create, :update]
     acts_as_doi_mintable(proxy: :parent, general_type: 'Workflow')
     acts_as_versioned_resource
     acts_as_favouritable
@@ -58,6 +59,13 @@ class Workflow < ApplicationRecord
       if Seek::Config.life_monitor_enabled && !monitored && extractor.has_tests? && workflow.can_download?(nil)
         LifeMonitorSubmissionJob.perform_later(self)
       end
+    end
+
+    # This does two things:
+    # 1. If a version's test_status was updated, and it was the latest version, set the test_status on the parent too.
+    # 2. If a new version was created, set the parent's test_status to nil, since it will not apply anymore.
+    def sync_test_status
+      parent.update_column(:test_status, Workflow::TEST_STATUS_INV[test_status]) if latest_version?
     end
   end
 
@@ -99,8 +107,10 @@ class Workflow < ApplicationRecord
     Workflow::TEST_STATUS[super]
   end
 
-  def test_status= stat
-    super(Workflow::TEST_STATUS_INV[stat&.to_sym])
+  def update_test_status(status, ver = version)
+    v = find_version(ver)
+    v.test_status = status
+    v.save!
   end
 
   has_filter maturity: Seek::Filtering::Filter.new(

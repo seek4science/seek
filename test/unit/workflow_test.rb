@@ -287,4 +287,58 @@ class WorkflowTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test 'test_status is not carried over to new versions' do
+    workflow = Factory(:workflow_with_tests)
+    disable_authorization_checks { workflow.update_test_status(:all_passing) }
+    v1 = workflow.find_version(1)
+    assert_equal :all_passing, v1.test_status
+    assert_equal :all_passing, workflow.reload.test_status
+
+    disable_authorization_checks do
+      workflow.save_as_new_version('new version')
+    end
+
+    assert_nil workflow.reload.test_status
+    assert_nil workflow.latest_version.test_status
+    assert_equal :all_passing, v1.test_status
+  end
+
+  test 'update test status' do
+    # Default latest version
+    workflow = Factory(:workflow_with_tests, test_status: nil)
+    v1 = workflow.find_version(1)
+    disable_authorization_checks { workflow.save_as_new_version }
+    v2 = workflow.find_version(2)
+    assert_nil workflow.reload.test_status
+    assert_nil workflow.latest_version.reload.test_status
+    disable_authorization_checks { workflow.update_test_status(:all_failing) }
+    assert_equal :all_failing, workflow.reload.test_status
+    assert_nil v1.test_status
+    assert_equal :all_failing, v2.reload.test_status
+
+    # Explicit latest version
+    workflow = Factory(:workflow_with_tests, test_status: nil)
+    v1 = workflow.find_version(1)
+    disable_authorization_checks { workflow.save_as_new_version }
+    v2 = workflow.find_version(2)
+    assert_nil workflow.reload.test_status
+    assert_nil workflow.latest_version.reload.test_status
+    disable_authorization_checks { workflow.update_test_status(:all_failing, 2) }
+    assert_equal :all_failing, workflow.reload.test_status
+    assert_nil v1.reload.test_status
+    assert_equal :all_failing, v2.reload.test_status
+
+    # Explicit non-latest version
+    workflow = Factory(:workflow_with_tests, test_status: nil)
+    v1 = workflow.find_version(1)
+    disable_authorization_checks { workflow.save_as_new_version }
+    v2 = workflow.find_version(2)
+    assert_nil workflow.reload.test_status
+    assert_nil workflow.latest_version.reload.test_status
+    disable_authorization_checks { workflow.update_test_status(:all_failing, 1) }
+    assert_nil workflow.reload.test_status
+    assert_equal :all_failing, v1.reload.test_status
+    assert_nil v2.reload.test_status
+  end
 end

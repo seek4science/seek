@@ -808,6 +808,32 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_equal 12, session[:metadata][:internals][:inputs].length
   end
 
+  test 'filter by test status' do
+    w1, w2, w3 = nil
+    disable_authorization_checks do
+      w1 = Factory(:public_workflow)
+      w1.save_as_new_version
+      w1.update_test_status(:all_failing, 1)
+      w1.update_test_status(:all_passing, 2)
+      w2 = Factory(:public_workflow)
+      w2.update_test_status(:all_failing)
+      w3 = Factory(:public_workflow)
+      w3.update_test_status(:some_passing)
+    end
+
+    get :index, params: { filter: { tests: Workflow::TEST_STATUS_INV[:all_passing] } }
+    assert_response :success
+    assert_includes assigns(:workflows), w1
+
+    get :index, params: { filter: { tests: Workflow::TEST_STATUS_INV[:all_failing] } }
+    assert_response :success
+    assert_includes assigns(:workflows), w2
+
+    get :index, params: { filter: { tests: Workflow::TEST_STATUS_INV[:some_passing] } }
+    assert_response :success
+    assert_includes assigns(:workflows), w3
+  end
+
   def edit_max_object(workflow)
     add_tags_to_test_object(workflow)
     add_creator_to_test_object(workflow)
