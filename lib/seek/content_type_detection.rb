@@ -30,7 +30,7 @@ module Seek
     end
 
     def is_supported_spreadsheet_format?(blob = self)
-      is_excel?(blob)
+      is_excel?(blob) || is_csv?(blob)
     end
 
     def is_extractable_spreadsheet?(blob = self)
