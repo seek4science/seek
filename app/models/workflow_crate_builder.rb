@@ -1,4 +1,4 @@
-require 'ro_crate_ruby'
+require 'ro_crate'
 require 'seek/download_handling/http_streamer'
 
 # A kind of "form object" to create a simple Workflow RO-Crate from ~three files (Workflow, diagram, abstract CWL),
