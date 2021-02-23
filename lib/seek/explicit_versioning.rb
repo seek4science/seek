@@ -46,6 +46,9 @@ module Seek
           condition_ops = version_association_options.delete(:conditions) || ''
           has_many :versions, -> { order(order_opts).where(condition_ops) }, version_association_options
 
+          # Returns the most recent version
+          has_one :latest_version, -> { order(version: :desc).where(condition_ops) }, version_association_options
+
           before_create :set_new_version
           after_create :save_version_on_create
           after_update :sync_latest_version
@@ -131,11 +134,6 @@ module Seek
         return version if version.is_a?(self.class.versioned_class)
         return nil if version.is_a?(ActiveRecord::Base)
         find_versions(conditions: ['version = ?', version], limit: 1).first
-      end
-
-      # Returns the most recent version
-      def latest_version
-        versions.last
       end
 
       # Finds versions of this model.  Takes an options hash like <tt>find</tt>
