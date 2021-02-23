@@ -125,11 +125,11 @@ class AssetsHelperTest < ActionView::TestCase
     with_config_value(:email_enabled,true) do
       User.with_current_user(requester.user) do
         travel_to 16.hours.ago do
-          MessageLog.create(resource:presentation,sender:requester,message_type:MessageLog::CONTACT_REQUEST)
+          MessageLog.create(subject:presentation,sender:requester,message_type:MessageLog::CONTACT_REQUEST)
         end
         assert request_contact_button_enabled?(presentation)
         travel_to 1.hour.ago do
-          MessageLog.create(resource:presentation,sender:requester,message_type:MessageLog::CONTACT_REQUEST)
+          MessageLog.create(subject:presentation,sender:requester,message_type:MessageLog::CONTACT_REQUEST)
         end
         refute request_contact_button_enabled?(presentation)
       end

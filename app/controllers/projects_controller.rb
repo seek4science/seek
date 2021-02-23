@@ -572,7 +572,8 @@ class ProjectsController < ApplicationController
 
   def project_params
     permitted_params = [:title, :web_page, :wiki_page, :description, { organism_ids: [] }, :parent_id, :start_date,
-                        :end_date, :funding_codes, { human_disease_ids: [] }]
+                        :end_date, :funding_codes, { human_disease_ids: [] },
+                        discussion_links_attributes:[:id, :url, :label, :_destroy] ]
 
     if User.admin_logged_in?
       permitted_params += [:site_root_uri, :site_username, :site_password, :nels_enabled]
@@ -584,8 +585,11 @@ class ProjectsController < ApplicationController
                            { asset_gatekeeper_ids: [] }, { asset_housekeeper_ids: [] }, { pal_ids: [] }]
     end
 
-    if params[:project][:programme_id].present? && Programme.find_by_id(params[:project][:programme_id])&.can_manage?
-      permitted_params += [:programme_id]
+    if params[:project][:programme_id].present?
+      prog = Programme.find_by_id(params[:project][:programme_id])
+      if prog&.can_manage? || prog&.allows_user_projects?
+        permitted_params += [:programme_id]
+      end
     end
 
     params.require(:project).permit(permitted_params)
@@ -661,7 +665,7 @@ class ProjectsController < ApplicationController
     @message_log = MessageLog.find_by_id(params[:message_log_id])
 
     error_msg ||= "message log not found" unless @message_log
-    error_msg ||= ("message log doesn't match #{t('project')}" if @message_log.resource != @project)
+    error_msg ||= ("message log doesn't match #{t('project')}" if @message_log.subject != @project)
     error_msg ||= ("incorrect type of message log" unless @message_log.message_type==MessageLog::PROJECT_MEMBERSHIP_REQUEST)
     error_msg ||= ("message has already been responded to" if @message_log.responded?)
 

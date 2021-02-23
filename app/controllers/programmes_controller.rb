@@ -34,7 +34,7 @@ class ProgrammesController < ApplicationController
           current_person.is_programme_administrator = true, @programme
           disable_authorization_checks { current_person.save! }
           if Seek::Config.email_enabled
-            Mailer.delay.programme_activation_required(@programme,current_person)
+            Mailer.programme_activation_required(@programme,current_person).deliver_later
           end
         end
         format.html {respond_with(@programme)}
@@ -101,14 +101,14 @@ class ProgrammesController < ApplicationController
   def accept_activation
     @programme.activate
     flash[:notice]="The #{t('programme')} has been activated"
-    Mailer.delay.programme_activated(@programme) if Seek::Config.email_enabled
+    Mailer.programme_activated(@programme).deliver_later if Seek::Config.email_enabled
     redirect_to @programme
   end
 
   def reject_activation
     flash[:notice]="The #{t('programme')} has been rejected"
     @programme.update_attribute(:activation_rejection_reason,params[:programme][:activation_rejection_reason])
-    Mailer.delay.programme_rejected(@programme,@programme.activation_rejection_reason) if Seek::Config.email_enabled
+    Mailer.programme_rejected(@programme,@programme.activation_rejection_reason).deliver_later if Seek::Config.email_enabled
     redirect_to @programme
   end
 
@@ -155,7 +155,9 @@ class ProgrammesController < ApplicationController
 
     params.require(:programme).permit(:avatar_id, :description, :first_letter, :title, :uuid, :web_page,
                                       { project_ids: [] }, :funding_details, { administrator_ids: [] },
-                                      :activation_rejection_reason, :funding_codes)
+                                      :activation_rejection_reason, :funding_codes,
+                                      :open_for_projects,
+                                      discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
 end

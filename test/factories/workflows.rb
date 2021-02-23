@@ -43,7 +43,7 @@ Factory.define(:min_workflow, class: Workflow) do |f|
   f.with_project_contributor
   f.title 'A Minimal Workflow'
   f.workflow_class { WorkflowClass.find_by_key('CWL') || Factory(:cwl_workflow_class) }
-  f.projects { [Factory.build(:min_project)] }
+  f.projects { [Factory(:min_project)] }
   f.after_create do |workflow|
     workflow.content_blob = Factory.create(:cwl_content_blob, asset: workflow, asset_version: workflow.version)
   end
@@ -53,8 +53,9 @@ Factory.define(:max_workflow, class: Workflow) do |f|
   f.with_project_contributor
   f.title 'A Maximal Workflow'
   f.description 'How to run a simulation in GROMACS'
+  f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
   f.workflow_class { WorkflowClass.find_by_key('CWL') || Factory(:cwl_workflow_class) }
-  f.projects { [Factory.build(:max_project)] }
+  f.projects { [Factory(:max_project)] }
   f.assays {[Factory.build(:max_assay, policy: Factory(:public_policy))]}
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
   f.after_create do |workflow|

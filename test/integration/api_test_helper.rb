@@ -103,6 +103,7 @@ module ApiTestHelper
     end
 
     ['min','max'].each do |m|
+      puts m
       if defined? @post_values
         to_post = load_template("post_#{m}_#{@clz}.json.erb", @post_values)
       else

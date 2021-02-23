@@ -3,14 +3,19 @@
 require 'rubygems'
 require 'rake'
 
+
 namespace :seek do
   # these are the tasks required for this version upgrade
   task upgrade_version_tasks: %i[
-    environment
+    environment    
     update_samples_json
+    migrate_old_jobs
+    delete_redundant_jobs
     set_version_visibility
     remove_old_project_join_logs
     fix_negative_programme_role_mask
+    db:seed:sample_attribute_types
+    delete_users_with_invalid_person
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -49,12 +54,13 @@ namespace :seek do
 
   task(update_samples_json: :environment) do
     puts '... converting stored sample JSON ...'
-    SampleType.all.each do |sample_type|
+    SampleType.find_each do |sample_type|
 
       # gather the attributes that need updating
       attributes_for_update = sample_type.sample_attributes.select do |attr|
         attr.accessor_name != attr.original_accessor_name
       end
+      
 
       if attributes_for_update.any?
         # work through each sample
@@ -74,6 +80,41 @@ namespace :seek do
       end
     end
     puts " ... finished updating sample JSON"
+  end  
+
+  task(migrate_old_jobs: :environment) do
+    puts "Migrating RdfGenerationJobs..."
+    count = RdfGenerationQueue.count
+    Delayed::Job.where(failed_at: nil).where('handler LIKE ?', '%RdfGenerationJob%').where('handler LIKE ?','%item_type_name%').find_each do |job|
+      data = YAML.load(job.handler.sub("--- !ruby/object:RdfGenerationJob\n",''))
+      item = nil
+      begin
+        item = data["item_type_name"].constantize.find(data["item_id"])
+      rescue StandardError => e
+        puts "Exception migrating job (#{job.id}) #{e.class} #{e.message}"
+        puts e.backtrace.join("\n")
+      else
+        RdfGenerationQueue.enqueue(item, refresh_dependents: data["refresh_dependents"], queue_job: false) if item
+        job.destroy
+      end      
+    end
+    queued = (RdfGenerationQueue.count - count)
+    RdfGenerationJob.new.queue_job if queued > 0
+    puts "Queued RDF generation for #{queued} items"
+  end
+
+  task(delete_redundant_jobs: :environment) do
+    puts "Deleting redundant jobs..."
+    deleted = 0
+
+    ['SendPeriodicEmailsJob', 'ContentBlobCleanerJob', 'NewsFeedRefreshJob', 'ProjectLeavingJob',
+     'OpenbisEndpointCacheRefreshJob', 'OpenbisSyncJob', 'ReindexingJob'].each do |klass|
+      jobs = Delayed::Job.where(failed_at: nil).where('handler LIKE ?', "%#{klass}%")
+      deleted += jobs.count
+      jobs.destroy_all
+    end
+
+    puts "Deleted #{deleted} jobs"
   end
 
   task(set_version_visibility: :environment) do
@@ -119,7 +160,7 @@ namespace :seek do
   end
 
   task(fix_negative_programme_role_mask: :environment) do
-    problems = Person.all.select{|person| person.roles_mask < 0}
+    problems = Person.where('roles_mask < 0')
     problems.each do |person|
       mask = person.roles_mask
       while mask < 0
@@ -128,4 +169,14 @@ namespace :seek do
       person.update_column(:roles_mask,mask)
     end
   end
+
+  # removes users with a person_id which no longer exist
+  task(delete_users_with_invalid_person: :environment) do
+    found = User.where.not(person:nil).select{|u| u.person.nil?}
+    if found.any?
+      puts "... Removing #{found.count} users with a no longer existing person"
+      found.each(&:destroy)
+    end
+  end
+  
 end

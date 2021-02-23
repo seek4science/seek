@@ -49,4 +49,10 @@ module SampleTypesHelper
     tags = Annotation.with_attribute_name('sample_type_tag').collect(&:value)
     tags.uniq.sort_by(&:tag_count).reverse
   end
+
+  def ebi_ontology_choices
+    opts = Ebi::OlsClient.ontologies.map { |ontology| [ontology.dig('config', 'title'), ontology.dig('config', 'namespace')] }
+
+    opts.sort_by { |o| o[0] }
+  end
 end

@@ -6,9 +6,10 @@ class ApplicationRecord < ActiveRecord::Base
   include Seek::VersionedResource
   include Seek::ExplicitVersioning
   include Seek::Favouritable
+  include Seek::ActsAsDiscussable
   include Seek::ActsAsFleximageExtension
   include Seek::UniquelyIdentifiable
-  include Seek::YellowPages
+  include Seek::ActsAsYellowPages
   include Seek::GroupedPagination
   include Seek::Scalable
   include Seek::TitleTrimmer
@@ -23,6 +24,7 @@ class ApplicationRecord < ActiveRecord::Base
   include Seek::Permissions::AuthorizationEnforcement
   include Seek::Permissions::ActsAsAuthorized
   include Seek::RelatedItems
+  include HasTasks
 
   include Annotations::Acts::Annotatable
   include Annotations::Acts::AnnotationSource
@@ -33,12 +35,20 @@ class ApplicationRecord < ActiveRecord::Base
   end
   
   # Returns the columns to be shown on the table view for the resource
-  def columns_default
-    ['description','created_at']
+  # This columns will always be shown
+  def columns_required
+    ['title']
   end
+  # default columns to be shown after required columns
+  def columns_default
+    ['created_at']
+  end
+  # additional available columns to be shown as an option
   def columns_allowed
     ['description','created_at','updated_at']
   end
+
+  
 
   # takes and ignores arguments for use in :after_add => :update_timestamp, etc.
   def update_timestamp(*_args)
@@ -85,7 +95,7 @@ class ApplicationRecord < ActiveRecord::Base
   end
 
   def self.subscribable?
-    include? Seek::Subscribable
+    false
   end
 
   def subscribable?

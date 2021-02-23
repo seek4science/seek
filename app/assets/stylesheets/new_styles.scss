@@ -79,6 +79,10 @@ ul.feed li:first-child {
   border-radius: 4px;
 }
 
+.powered-by img {
+  margin-bottom: 0.25em;
+}
+
 #content {
   flex: 1 0 auto;
 }
@@ -1055,4 +1059,17 @@ span.disabled {
 
 .btn.disabled img.icon {
   opacity: 0.4;
+}
+
+/* Rich editor box */
+.short-editor ~ .CodeMirror,
+.short-editor ~ .CodeMirror .CodeMirror-scroll {
+  min-height:4em;
+}
+
+/* controlled vocab term table */
+#controlled-vocab-terms-fixed {
+  display:block;
+  overflow-y: auto;
+  max-height: 20em;
 }

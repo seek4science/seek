@@ -69,6 +69,7 @@ end
 Factory.define(:max_assay, class: Assay) do |f|
   f.title "A Maximal Modelling Assay"
   f.description "A Western Blot Assay"
+  f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
   f.other_creators "Anonymous creator"
   f.association :assay_class, factory: :modelling_assay_class
   f.association :contributor,  factory: :person

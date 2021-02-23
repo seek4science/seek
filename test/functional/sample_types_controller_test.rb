@@ -37,23 +37,29 @@ class SampleTypesControllerTest < ActionController::TestCase
     Factory :annotation, attribute_name: 'sample_type_tag', source: @person.user,
             annotatable: Factory(:simple_sample_type), value: 'golf'
 
-    assert_difference('ActivityLog.count') do
-      assert_difference('SampleType.count') do
-        post :create, params: { sample_type: { title: 'Hello!',
-                                     project_ids: @project_ids,
-                                     description: 'The description!!',
-                                     sample_attributes_attributes: {
-                                         '0' => {
-                                             pos: '1', title: 'a string', required: '1', is_title: '1',
-                                             sample_attribute_type_id: @string_type.id, _destroy: '0' },
-                                         '1' => {
-                                             pos: '2', title: 'a number', required: '1',
-                                             sample_attribute_type_id: @int_type.id, _destroy: '0'
-                                         }
-                                     },
-                                     tags: 'fish,golf'
+    assert_enqueued_with(job: SampleTemplateGeneratorJob) do
+      assert_enqueued_with(job: SampleTypeUpdateJob) do
+        assert_difference('ActivityLog.count') do
+          assert_difference('SampleType.count') do
+            assert_difference('Task.count') do
+              post :create, params: { sample_type: { title: 'Hello!',
+                                                     project_ids: @project_ids,
+                                                     description: 'The description!!',
+                                                     sample_attributes_attributes: {
+                                                         '0' => {
+                                                             pos: '1', title: 'a string', required: '1', is_title: '1',
+                                                             sample_attribute_type_id: @string_type.id, _destroy: '0' },
+                                                         '1' => {
+                                                             pos: '2', title: 'a number', required: '1',
+                                                             sample_attribute_type_id: @int_type.id, _destroy: '0'
+                                                         }
+                                                     },
+                                                     tags: 'fish,golf'
 
-        } }
+              } }
+            end
+          end
+        end
       end
     end
 
@@ -69,8 +75,6 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_equal [@project], type.projects
     refute type.uploaded_template?
     assert_equal %w(fish golf), type.tags.sort
-    assert SampleTemplateGeneratorJob.new(type).exists?
-    assert SampleTypeUpdateJob.new(type, true).exists?
 
     assert_equal type, ActivityLog.last.activity_loggable
     assert_equal 'create',ActivityLog.last.action
@@ -145,7 +149,10 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'should update sample_type' do
-    sample_type = Factory(:patient_sample_type, project_ids: @project_ids)
+    sample_type = nil
+    perform_enqueued_jobs(only: [SampleTemplateGeneratorJob, SampleTypeUpdateJob]) do
+      sample_type = Factory(:patient_sample_type, project_ids: @project_ids)
+    end
     assert_empty sample_type.tags
 
     golf = Factory :tag, source: @person.user, annotatable: Factory(:simple_sample_type), value: 'golf'
@@ -165,12 +172,21 @@ class SampleTypesControllerTest < ActionController::TestCase
     sample_attributes_fields[2][:_destroy] = '1'
     sample_attributes_fields = Hash[sample_attributes_fields.each_with_index.map { |f, i| [i.to_s, f] }]
 
-    assert_difference('ActivityLog.count',1) do
-      assert_difference('SampleAttribute.count', -1) do
-        put :update, params: { id: sample_type, sample_type: { title: 'Hello!',
-                                                     sample_attributes_attributes: sample_attributes_fields,
-                                                     tags: "fish,#{golf.value.text}"
-        } }
+    assert sample_type.template_generation_task.reload.completed?
+
+    assert_enqueued_with(job: SampleTemplateGeneratorJob, args: [sample_type]) do
+      assert_enqueued_with(job: SampleTypeUpdateJob, args: [sample_type, true]) do
+        assert_difference('ActivityLog.count',1) do
+          assert_difference('SampleAttribute.count', -1) do
+            put :update, params: { id: sample_type, sample_type: { title: 'Hello!',
+                                                                   sample_attributes_attributes: sample_attributes_fields,
+                                                                   tags: "fish,#{golf.value.text}"
+            } }
+
+
+            assert sample_type.template_generation_task.reload.pending?
+          end
+        end
       end
     end
     assert_redirected_to sample_type_path(assigns(:sample_type))
@@ -180,8 +196,6 @@ class SampleTypesControllerTest < ActionController::TestCase
     refute assigns(:sample_type).sample_attributes[0].is_title?
     assert assigns(:sample_type).sample_attributes[1].is_title?
     assert_equal %w(fish golf), assigns(:sample_type).tags.sort
-    assert SampleTemplateGeneratorJob.new(assigns(:sample_type)).exists?
-    assert SampleTypeUpdateJob.new(assigns(:sample_type), true).exists?
 
     assert_equal sample_type,ActivityLog.last.activity_loggable
     assert_equal 'update',ActivityLog.last.action

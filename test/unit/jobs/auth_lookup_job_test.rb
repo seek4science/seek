@@ -1,51 +1,15 @@
 require 'test_helper'
+require 'minitest/mock'
 
 class AuthLookupJobTest < ActiveSupport::TestCase
   def setup
     @val = Seek::Config.auth_lookup_enabled
     Seek::Config.auth_lookup_enabled = true
     AuthLookupUpdateQueue.destroy_all
-    Delayed::Job.destroy_all
   end
 
   def teardown
     Seek::Config.auth_lookup_enabled = @val
-  end
-
-  test 'exists' do
-    assert !AuthLookupUpdateJob.new.exists?
-    assert_difference('Delayed::Job.count', 1) do
-      Delayed::Job.enqueue AuthLookupUpdateJob.new
-    end
-
-    assert AuthLookupUpdateJob.new.exists?
-    job = Delayed::Job.first
-
-    assert_nil job.failed_at
-    job.failed_at = Time.now
-    job.save!
-    assert !AuthLookupUpdateJob.new.exists?, 'Should ignore failed jobs'
-
-    assert_nil job.locked_at
-    job.locked_at = Time.now
-    job.failed_at = nil
-    job.save!
-    assert !AuthLookupUpdateJob.new.exists?, 'Should ignore locked jobs'
-  end
-
-  test 'count' do
-    assert_equal 0, AuthLookupUpdateJob.new.count
-
-    Delayed::Job.enqueue AuthLookupUpdateJob.new
-
-    assert_equal 1, AuthLookupUpdateJob.new.count
-
-    job = Delayed::Job.first
-    assert_nil job.locked_at
-    job.locked_at = Time.now
-    job.save!
-    assert_equal 0, AuthLookupUpdateJob.new.count, 'Should ignore locked jobs'
-    assert_equal 1, AuthLookupUpdateJob.new.count(false), 'Should not ignore locked jobs when requested'
   end
 
   test 'add items to queue' do
@@ -54,9 +18,8 @@ class AuthLookupJobTest < ActiveSupport::TestCase
 
     # need to clear the queue for items added through callbacks in the creation of the test items
     AuthLookupUpdateQueue.destroy_all
-    Delayed::Job.destroy_all
 
-    assert_difference('Delayed::Job.count', 1) do
+    assert_enqueued_with(job: AuthLookupUpdateJob) do
       assert_difference('AuthLookupUpdateQueue.count', 2) do
         AuthLookupUpdateQueue.enqueue(sop, data, sop)
       end
@@ -69,8 +32,7 @@ class AuthLookupJobTest < ActiveSupport::TestCase
     assert_includes items, data
 
     AuthLookupUpdateQueue.destroy_all
-    Delayed::Job.destroy_all
-    assert_difference('Delayed::Job.count', 1) do
+    assert_enqueued_with(job: AuthLookupUpdateJob) do
       assert_difference('AuthLookupUpdateQueue.count', 1) do
         AuthLookupUpdateQueue.enqueue(nil)
       end
@@ -113,6 +75,32 @@ class AuthLookupJobTest < ActiveSupport::TestCase
     with_config_value(:auth_lookup_update_batch_size, 7) do
       assert_difference('AuthLookupUpdateQueue.count', -7) do
         AuthLookupUpdateJob.new.perform
+      end
+    end
+  end
+
+  test 'exception handling' do
+    Sop.delete_all
+    user = Factory :user
+    other_user = Factory :user
+    sop = Factory :sop, contributor: user.person, policy: Factory(:editing_public_policy)
+    AuthLookupUpdateQueue.destroy_all
+    AuthLookupUpdateQueue.enqueue(sop)
+    Sop.clear_lookup_table
+
+    with_config_value(:exception_notification_enabled, true) do
+      assert_difference('AuthLookupUpdateQueue.count', -1) do
+        job = AuthLookupUpdateJob.new
+        begin
+          # Stub because exception forwarding doesn't work in tests
+          Seek::Errors::ExceptionForwarder.stub(:send_notification, -> (exception, opts = {}, *_) { raise "Exception was: #{exception.inspect}, item id: #{opts[:data][:item].id}" }) do
+            job.stub(:perform_job, -> (*_) { raise 'job error!' }) do # Stub to throw an error
+              job.perform
+            end
+          end
+        end
+      rescue RuntimeError => e
+        assert_equal "#<RuntimeError: Exception was: #<RuntimeError: job error!>, item id: #{sop.id}>", e.inspect
       end
     end
   end

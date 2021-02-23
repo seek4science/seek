@@ -1,3 +1,7 @@
 class ReindexingQueue < ApplicationRecord
-  belongs_to :item, :polymorphic => true
+  include ResourceQueue
+
+  def self.job_class
+    ReindexingJob
+  end
 end

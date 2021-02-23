@@ -104,6 +104,10 @@ class Programme < ApplicationRecord
     user && user.is_admin? && !is_activated?
   end
 
+  def allows_user_projects?
+    open_for_projects?
+  end
+
   def self.can_create?
     return false unless Seek::Config.programmes_enabled
     User.admin_logged_in? || (User.logged_in_and_registered? && Seek::Config.programme_user_creation_enabled)
