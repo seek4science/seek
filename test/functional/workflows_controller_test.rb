@@ -416,7 +416,7 @@ class WorkflowsControllerTest < ActionController::TestCase
       post :create_ro_crate, params: {
           ro_crate: {
               workflow: { data: fixture_file_upload('files/checksums.txt') },
-              diagram: { data: fixture_file_upload('files/file_picture.png') },
+              #             diagram: { data: fixture_file_upload('files/file_picture.png') },
               abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
           },
           workflow_class_id: cwl.id
@@ -636,7 +636,7 @@ class WorkflowsControllerTest < ActionController::TestCase
       post :create_ro_crate, params: {
           ro_crate: {
               workflow: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') },
-              diagram: { data: fixture_file_upload('files/file_picture.png') },
+              #             diagram: { data: fixture_file_upload('files/file_picture.png') },
               abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
           },
           workflow_class_id: cwl.id
@@ -757,7 +757,7 @@ class WorkflowsControllerTest < ActionController::TestCase
       post :create_ro_crate, params: {
           ro_crate: {
               workflow: { data_url: 'https://github.com/bob/workflow/blob/master/workflow.txt' },
-              diagram: { data_url: 'https://github.com/bob/workflow/blob/master/diagram.png' },
+              #             diagram: { data_url: 'https://github.com/bob/workflow/blob/master/diagram.png' },
               abstract_cwl: { data_url: 'https://github.com/bob/workflow/blob/master/abstract.cwl' }
           },
           workflow_class_id: cwl.id

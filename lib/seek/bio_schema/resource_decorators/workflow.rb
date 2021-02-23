@@ -11,7 +11,8 @@ module Seek
                         programming_language: :programmingLanguage,
                         producer: :producer,
                         inputs: :input,
-                        outputs: :output
+                        outputs: :output,
+                        license: :license
 
         def contributors
           [contributor]
@@ -38,10 +39,18 @@ module Seek
           formal_parameters(resource.outputs, 'outputs')
         end
 
+        def license
+          resource.license
+        end
+
         private
 
         def formal_parameters(properties, group_name)
-          wf_name = self.title.downcase.gsub(/[^0-9a-z]/i, '_')
+          if self.title
+            wf_name = self.title.downcase.gsub(/[^0-9a-z]/i, '_')
+          else
+            wf_name = 'dummy'
+          end
           properties.collect do |property|
             {
               "@type": 'FormalParameter',
