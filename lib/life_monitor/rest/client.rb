@@ -13,7 +13,7 @@ module LifeMonitor
       def initialize(access_token, base = nil)
         @base = base || Seek::Config.life_monitor_url
         @access_token = access_token
-        @verify_ssl = true
+        @verify_ssl = Rails.env.production? || !@base.start_with?('https://localhost')
       end
 
       def status(workflow_version)
@@ -30,7 +30,7 @@ module LifeMonitor
                                                     host: Seek::Config.host_with_port,
                                                     protocol: Seek::Config.host_scheme),
                     name: workflow_version.workflow.title,
-                    submitter_id: User.current_user.person.id.to_s
+                    submitter_id: workflow_version.contributor.id.to_s
                 })
       end
 
@@ -45,7 +45,7 @@ module LifeMonitor
                                                     host: Seek::Config.host_with_port,
                                                     protocol: Seek::Config.host_scheme),
                     name: workflow_version.workflow.title,
-                    submitter_id: User.current_user.person.id.to_s
+                    submitter_id: workflow_version.contributor.id.to_s
                 })
       end
 

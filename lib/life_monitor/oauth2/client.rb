@@ -10,7 +10,7 @@ module LifeMonitor
         @base = base || Seek::Config.life_monitor_url
         @client_id = client_id || Seek::Config.life_monitor_client_id
         @client_secret = client_secret || Seek::Config.life_monitor_client_secret
-        @verify_ssl = true
+        @verify_ssl = Rails.env.production? || !@base.start_with?('https://localhost')
       end
 
       def get_token
