@@ -314,7 +314,7 @@ test 'workflow' do
                          creators: [@person, creator2],
                          other_creators: 'Fred Bloggs, Steve Smith',
                          contributor: @person,
-                         license: 'APSL-2.0')
+                         license: 'https://opensource.org/licenses/APSL-2.0')
 
       workflow.internals = workflow.extractor.metadata[:internals]
 
