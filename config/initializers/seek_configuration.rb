@@ -233,6 +233,8 @@ def load_seek_config_defaults!
   Seek::Config.default :results_per_page, {}
   Seek::Config.default :sorting, {}
 
+  Seek::Config.default :life_monitor_enabled, false
+
   load_seek_testing_defaults! if Rails.env.test?
 end
 
