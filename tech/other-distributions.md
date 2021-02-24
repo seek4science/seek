@@ -339,6 +339,7 @@ nice                   =  0
 default-character-set  = utf8
 
 [mysqld]
+basedir="/opt/local"
 socket                 =  /opt/local/var/run/mysql8/mysqld.sock
 port                   = 3306
 bind-address           =  127.0.0.1
