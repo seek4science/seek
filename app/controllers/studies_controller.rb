@@ -155,7 +155,7 @@ class StudiesController < ApplicationController
     # e.g: Study.new(title: 'title', investigation: investigations(:metabolomics_investigation), policy: Factory(:private_policy))
     # study.policy = Policy.create(name: 'default policy', access_type: 1)
     # render plain: params[:studies].inspect
-    metadata_types = CustomMetadataType.where(title: 'MIAPPE metadata', supported_type: 'Study')
+    metadata_types = CustomMetadataType.where(title: 'MIAPPE metadata', supported_type: 'Study').last
     studies_length = params[:studies][:title].length
     studies_uploaded = false
     data_file_uploaded = false
@@ -167,7 +167,7 @@ class StudiesController < ApplicationController
         investigation_id: params[:study][:investigation_id],
         person_responsible_id: params[:study][:person_responsible_id],
         custom_metadata: CustomMetadata.new(
-          custom_metadata_type: metadata_types.last,
+          custom_metadata_type: metadata_types,
           data: metadata
         )
       }
