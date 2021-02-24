@@ -635,7 +635,7 @@ GEM
       json (>= 2.3.0)
       ucf (~> 2.0.2)
       uuid (~> 2.3)
-    ro-crate (0.4.2)
+    ro-crate (0.4.4)
       addressable (~> 2.7.0)
       rubyzip (~> 2.0.0)
     rsolr (2.2.1)

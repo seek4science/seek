@@ -72,7 +72,7 @@ module Seek
             m[:other_creators] = a.join(', ')
           end
 
-          source_url = crate['url'] || crate.main_workflow['url']
+          source_url = crate['isBasedOn'] || crate['url'] || crate.main_workflow['url']
           if source_url
             handler = ContentBlob.remote_content_handler_for(source_url)
             if handler.respond_to?(:repository_url)
