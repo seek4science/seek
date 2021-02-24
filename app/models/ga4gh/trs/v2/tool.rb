@@ -31,8 +31,11 @@ module Ga4gh
         end
 
         def list_files
+          files = []
+
           ro_crate do |crate|
-            return crate.entries.map do |path, _|
+            crate.entries.each do |path, entry|
+              next if entry.directory?
               if crate.main_workflow && path == crate.main_workflow.id
                 type = 'PRIMARY_DESCRIPTOR'
               elsif path == 'Dockerfile'
@@ -41,9 +44,11 @@ module Ga4gh
                 type = 'OTHER'
               end
 
-              { path: path, file_type: type }
+              files << { path: path, file_type: type }
             end
           end
+
+          files
         end
       end
     end

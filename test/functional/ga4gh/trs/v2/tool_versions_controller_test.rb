@@ -174,7 +174,7 @@ module Ga4gh
 
           assert_response :success
           r = JSON.parse(@response.body)
-          assert_equal 33, r.length
+          assert_equal 32, r.length
           main_wf = r.detect { |f| f['path'] == 'main.nf' }
           dockerfile = r.detect { |f| f['path'] == 'Dockerfile' }
           config = r.detect { |f| f['path'] == 'nextflow.config' }
