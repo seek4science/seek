@@ -224,6 +224,7 @@ SEEK::Application.routes.draw do
     member do
       put :set_openid
       post :resend_activation_email
+      post :activate, to: 'users#activate_other', as: 'activate_other'
     end
     resources :oauth_sessions, only: [:index, :destroy]
     resources :identities, only: [:index, :destroy]

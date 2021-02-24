@@ -387,6 +387,56 @@ class UsersControllerTest < ActionController::TestCase
     end
   end
 
+  test 'admin can activate user' do
+    person = Factory(:not_activated_person)
+    user = person.user
+    refute user.active?
+    me = Factory(:admin).user
+    login_as me
+
+    assert_enqueued_email_with(Mailer, :welcome, args: [user]) do
+      post :activate_other, params: { id: user }
+    end
+
+    assert_redirected_to person_path(person)
+    assert user.reload.active?
+    assert_equal me, User.current_user
+  end
+
+  test 'non-admin cannot activate user' do
+    person = Factory(:not_activated_person)
+    user = person.user
+    refute user.active?
+    me = Factory(:person).user
+    login_as me
+
+    assert_no_enqueued_emails do
+      post :activate_other, params: { id: user }
+    end
+
+    assert_redirected_to :root
+    refute user.reload.active?
+    assert flash[:error].include?('Admin rights')
+    assert_equal me, User.current_user
+  end
+
+  test 'nothing happens when admin activates active user' do
+    person = Factory(:person)
+    user = person.user
+    assert user.active?
+    me = Factory(:admin).user
+    login_as me
+
+    assert_no_enqueued_emails do
+      post :activate_other, params: { id: user }
+    end
+
+    assert_redirected_to :root
+    assert user.reload.active?
+    assert flash[:error].include?('already')
+    assert_equal me, User.current_user
+  end
+
   protected
 
   def create_user(options = {})
