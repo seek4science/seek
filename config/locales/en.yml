@@ -130,7 +130,7 @@ en:
 
   oauth_session: 'OAuth Session'
   identity: 'Identity'
-  api_token: 'API token '
+  api_token: 'API token'
   maturity_level:
     released: 'Stable'
     work_in_progress: 'Work-in-progress'
