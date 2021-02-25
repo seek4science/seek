@@ -669,7 +669,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   
-  test 'show disabled explore button if spreadsheet not supported' do
+  test 'not show explore button if spreadsheet not supported' do
     df = Factory(:non_spreadsheet_datafile)
     login_as(df.contributor.user)
     with_config_value(:max_extractable_spreadsheet_size, 0) do
@@ -678,7 +678,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select '#buttons' do
       assert_select 'a[href=?]', explore_data_file_path(df, version: df.version), count: 0
-      assert_select 'a.disabled', text: 'Explore', count: 1
+      assert_select 'a', text: 'Explore', count: 0
     end
   end
 
