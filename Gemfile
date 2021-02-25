@@ -91,7 +91,7 @@ gem 'zenodo-client', git: 'https://github.com/seek4science/zenodo-client.git'
 gem 'unicorn-rails'
 gem 'seedbank'
 
-gem 'rspec-rails'
+gem 'rspec-rails','~> 3.6'
 
 gem 'citeproc-ruby', '~> 1.1.4'
 gem 'citeproc', '~> 1.0.4'
@@ -173,7 +173,7 @@ group :test do
   gem 'ruby-prof'
   gem 'test-prof'
   gem 'rails-perftest'
-  gem 'minitest', '5.10.3'
+  gem 'minitest', '~> 5.14'
   gem 'minitest-reporters'
   gem 'sunspot_matchers'
   gem 'database_cleaner', '~> 1.7.0'

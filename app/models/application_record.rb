@@ -35,12 +35,20 @@ class ApplicationRecord < ActiveRecord::Base
   end
   
   # Returns the columns to be shown on the table view for the resource
-  def columns_default
-    ['description','created_at']
+  # This columns will always be shown
+  def columns_required
+    ['title']
   end
+  # default columns to be shown after required columns
+  def columns_default
+    ['created_at']
+  end
+  # additional available columns to be shown as an option
   def columns_allowed
     ['description','created_at','updated_at']
   end
+
+  
 
   # takes and ignores arguments for use in :after_add => :update_timestamp, etc.
   def update_timestamp(*_args)

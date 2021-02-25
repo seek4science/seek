@@ -48,7 +48,7 @@
       <% end %>
     <% else  %>
       <% if resource.respond_to?(column) %>
-        <td><%= text_or_not_specified(resource.send(column),length: 300, auto_link: true) %></td>
+        <td><%= text_or_not_specified(resource.send(column),length: 300, auto_link: true, none_text: "") %></td>
       <% else %>
         <td>Unknown Column parameter</td>
       <% end %>

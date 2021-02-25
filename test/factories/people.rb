@@ -44,6 +44,10 @@ Factory.define(:person_not_in_project, parent: :brand_new_person) do |f|
   f.association :user, factory: :activated_user
 end
 
+Factory.define(:not_activated_person, parent: :brand_new_person) do |f|
+  f.association :user, factory: :brand_new_user
+end
+
 Factory.define(:person_in_multiple_projects, parent: :brand_new_person) do |f|
   f.association :user, factory: :activated_user
   f.group_memberships { [Factory.build(:group_membership), Factory.build(:group_membership), Factory.build(:group_membership)] }

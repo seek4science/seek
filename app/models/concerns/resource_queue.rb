@@ -4,7 +4,6 @@ module ResourceQueue
 
   included do
     belongs_to :item, polymorphic: true
-    validates :item_id, uniqueness: { scope:  [:item_type] }
   end
 
   class_methods do
@@ -37,7 +36,7 @@ module ResourceQueue
       entries = prioritized.limit(num)
       items = entries.map(&:item)
       entries.destroy_all
-      items
+      items.uniq
     end
   end
 end

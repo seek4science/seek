@@ -484,6 +484,12 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal x.uuid, uuid
   end
 
+  test 'project_admin_can_delete' do
+    u = Factory(:project_administrator).user
+    p = u.person.projects.first
+    assert p.can_delete?(u)
+  end
+
   test 'can_delete?' do
     project = Factory(:project)
 
@@ -493,14 +499,14 @@ class ProjectTest < ActiveSupport::TestCase
     assert project.work_groups.collect(&:people).flatten.empty?
     assert !project.can_delete?(user)
 
-    # can not delete if workgroups contain people
+    # can delete if workgroups contain people
     user = Factory(:admin).user
     assert user.is_admin?
     project = Factory(:project)
     work_group = Factory(:work_group, project: project)
     a_person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: work_group)])
     refute project.work_groups.collect(&:people).flatten.empty?
-    refute project.can_delete?(user)
+    assert project.can_delete?(user)
 
     # can delete if admin and workgroups are empty
     work_group.group_memberships.delete_all

@@ -20,9 +20,9 @@ class ScheduleTest < ActionDispatch::IntegrationTest
     assert_equal [1.month], monthly[:every]
 
     # ContentBlob cleaner
-    cleaner = @schedule.jobs[:runner].detect { |job| job[:task] == "ContentBlobCleanerJob.perform_later" }
+    cleaner = @schedule.jobs[:runner].detect { |job| job[:task] == "RegularMaintenanceJob.perform_later" }
     assert cleaner
-    assert_equal [ContentBlobCleanerJob::GRACE_PERIOD], cleaner[:every]
+    assert_equal [RegularMaintenanceJob::RUN_PERIOD], cleaner[:every]
 
     # LifeMonitor status
     lm_status = @schedule.jobs[:runner].detect { |job| job[:task] == "LifeMonitorStatusJob.perform_later" }

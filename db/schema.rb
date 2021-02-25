@@ -123,7 +123,7 @@ ActiveRecord::Schema.define(version: 2021_02_22_180839) do
     t.index ["asset_id", "asset_type"], name: "index_assay_assets_on_asset_id_and_asset_type"
   end
 
-  create_table "assay_auth_lookup", id: false,  force: :cascade do |t|
+  create_table "assay_auth_lookup",  force: :cascade do |t|
     t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view", default: false
@@ -383,7 +383,7 @@ ActiveRecord::Schema.define(version: 2021_02_22_180839) do
     t.text "supported_type"
   end
 
-  create_table "data_file_auth_lookup", id: false,  force: :cascade do |t|
+  create_table "data_file_auth_lookup",  force: :cascade do |t|
     t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view", default: false
@@ -487,7 +487,7 @@ ActiveRecord::Schema.define(version: 2021_02_22_180839) do
     t.index ["person_id"], name: "index_disciplines_people_on_person_id"
   end
 
-  create_table "document_auth_lookup", id: false,  force: :cascade do |t|
+  create_table "document_auth_lookup",  force: :cascade do |t|
     t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view", default: false
@@ -560,7 +560,7 @@ ActiveRecord::Schema.define(version: 2021_02_22_180839) do
     t.index ["project_id"], name: "index_documents_projects_on_project_id"
   end
 
-  create_table "event_auth_lookup", id: false,  force: :cascade do |t|
+  create_table "event_auth_lookup",  force: :cascade do |t|
     t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view", default: false
@@ -791,7 +791,7 @@ ActiveRecord::Schema.define(version: 2021_02_22_180839) do
     t.string "uuid"
   end
 
-  create_table "investigation_auth_lookup", id: false,  force: :cascade do |t|
+  create_table "investigation_auth_lookup",  force: :cascade do |t|
     t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view", default: false
@@ -851,15 +851,15 @@ ActiveRecord::Schema.define(version: 2021_02_22_180839) do
     t.datetime "updated_at"
     t.integer "message_type"
     t.text "details"
-    t.integer "resource_id"
-    t.string "resource_type"
+    t.integer "subject_id"
+    t.string "subject_type"
     t.integer "sender_id"
     t.text "response"
-    t.index ["resource_type", "resource_id"], name: "index_message_logs_on_resource_type_and_resource_id"
     t.index ["sender_id"], name: "index_message_logs_on_sender_id"
+    t.index ["subject_type", "subject_id"], name: "index_message_logs_on_subject_type_and_subject_id"
   end
 
-  create_table "model_auth_lookup", id: false,  force: :cascade do |t|
+  create_table "model_auth_lookup",  force: :cascade do |t|
     t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view", default: false
@@ -976,7 +976,7 @@ ActiveRecord::Schema.define(version: 2021_02_22_180839) do
     t.datetime "updated_at"
   end
 
-  create_table "node_auth_lookup", id: false,  force: :cascade do |t|
+  create_table "node_auth_lookup",  force: :cascade do |t|
     t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view", default: false
@@ -1202,7 +1202,7 @@ ActiveRecord::Schema.define(version: 2021_02_22_180839) do
     t.datetime "updated_at"
   end
 
-  create_table "presentation_auth_lookup", id: false,  force: :cascade do |t|
+  create_table "presentation_auth_lookup",  force: :cascade do |t|
     t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view", default: false
@@ -1382,7 +1382,7 @@ ActiveRecord::Schema.define(version: 2021_02_22_180839) do
     t.integer "workflow_id"
   end
 
-  create_table "publication_auth_lookup", id: false,  force: :cascade do |t|
+  create_table "publication_auth_lookup",  force: :cascade do |t|
     t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view", default: false
@@ -1479,6 +1479,15 @@ ActiveRecord::Schema.define(version: 2021_02_22_180839) do
     t.datetime "updated_at"
   end
 
+  create_table "repository_standards",  force: :cascade do |t|
+    t.string "title"
+    t.string "url"
+    t.string "group_tag"
+    t.string "repo_type"
+    t.text "description"
+    t.index ["title", "group_tag"], name: "index_repository_standards_title_group_tag"
+  end
+
   create_table "resource_publish_logs", id: :integer,  force: :cascade do |t|
     t.string "resource_type"
     t.integer "resource_id"
@@ -1521,7 +1530,7 @@ ActiveRecord::Schema.define(version: 2021_02_22_180839) do
     t.index ["unit_id"], name: "index_sample_attributes_on_unit_id"
   end
 
-  create_table "sample_auth_lookup", id: false,  force: :cascade do |t|
+  create_table "sample_auth_lookup",  force: :cascade do |t|
     t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view", default: false
@@ -1538,6 +1547,8 @@ ActiveRecord::Schema.define(version: 2021_02_22_180839) do
     t.integer "sample_controlled_vocab_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "iri"
+    t.string "parent_iri"
   end
 
   create_table "sample_controlled_vocabs", id: :integer,  force: :cascade do |t|
@@ -1546,6 +1557,11 @@ ActiveRecord::Schema.define(version: 2021_02_22_180839) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "first_letter", limit: 1
+    t.string "source_ontology"
+    t.string "ols_root_term_uri"
+    t.boolean "required"
+    t.string "short_name"
+    t.integer "repository_standard_id"
   end
 
   create_table "sample_resource_links", id: :integer,  force: :cascade do |t|
@@ -1663,7 +1679,7 @@ ActiveRecord::Schema.define(version: 2021_02_22_180839) do
     t.string "zenodo_record_url"
   end
 
-  create_table "sop_auth_lookup", id: false,  force: :cascade do |t|
+  create_table "sop_auth_lookup",  force: :cascade do |t|
     t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view", default: false
@@ -1731,7 +1747,7 @@ ActiveRecord::Schema.define(version: 2021_02_22_180839) do
     t.datetime "updated_at"
   end
 
-  create_table "strain_auth_lookup", id: false,  force: :cascade do |t|
+  create_table "strain_auth_lookup",  force: :cascade do |t|
     t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view", default: false
@@ -1805,7 +1821,7 @@ ActiveRecord::Schema.define(version: 2021_02_22_180839) do
     t.string "deleted_contributor"
   end
 
-  create_table "study_auth_lookup", id: false,  force: :cascade do |t|
+  create_table "study_auth_lookup",  force: :cascade do |t|
     t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view", default: false
@@ -1932,7 +1948,7 @@ ActiveRecord::Schema.define(version: 2021_02_22_180839) do
     t.index ["project_id"], name: "index_work_groups_on_project_id"
   end
 
-  create_table "workflow_auth_lookup", id: false,  force: :cascade do |t|
+  create_table "workflow_auth_lookup",  force: :cascade do |t|
     t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view", default: false

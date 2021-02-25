@@ -1,0 +1,190 @@
+<% environment.context_class.instance_eval { include Rails.application.routes.url_helpers } %>
+
+var SampleTypeControlledVocab = {
+    controlledVocabSelectionTagId: "",
+    blankControlledVocabModelForm: null,
+
+    //binds the show event to the modal dialogue, for determining which button, and therefore dropdown selection, is linked
+    //to the form
+    bindNewControlledVocabShowEvent: function () {
+        $j('#cv-modal').on('show.bs.modal', function (event) {
+            var button = $j(event.relatedTarget); // Button that triggered the modal
+            var dropdown = button.siblings('select');
+            SampleTypeControlledVocab.controlledVocabSelectionTagId = (dropdown.prop('id'));
+        });
+    },
+
+    //the select element associated with the last New button pressed
+    controlledVocabSelectionElement: function () {
+        return $j('#' + SampleTypeControlledVocab.controlledVocabSelectionTagId);
+    },
+
+    //resets the modal
+    resetModalControlledVocabForm: function () {
+        $j('#cv-modal').remove();
+        $j('#modal-dialogues').append(SampleTypeControlledVocab.blankControlledVocabModelForm.clone());
+        CVTerms.init();
+        SampleTypeControlledVocab.bindNewControlledVocabShowEvent();
+    },
+
+    //selected CV item changed
+    controlledVocabChanged: function () {
+        var id = $j(this).find(':selected')[0].value;
+        var editable = $j(this).find(':selected').data('editable');
+        var link = '/sample_controlled_vocabs/' + id + '/edit';
+        var button = $j(this).siblings('.cv-edit-button');
+        if (editable) {
+            button.show();
+            button.attr('disabled', false);
+        } else {
+            button.show();
+            button.attr('disabled', true);
+        }
+        button.prop('href', link);
+    }
+};
+
+CVTerms = {
+    init: function () {
+        CVTerms.bindEvents();
+    },
+    // handles the behaviour of clicking to remove a term from the rows, either marking for delete or removing immediately
+    removeTerm: function () {
+        var row = $j(this).parents('.sample-cv-term');
+        if ($j(this).is(':checked')) {
+            if (row.hasClass('success')) { // If it is a new attribute, just delete from the form - doesn't exist yet.
+                row.remove();
+            } else {
+                row.addClass('danger');
+                // This selects all the fields in the row, except the magic "_destroy" checkbox and the hidden ID field
+                $j(':input:not(.destroy-attribute):not([type=hidden])', row).prop('disabled', true);
+            }
+        } else {
+            row.removeClass('danger');
+            $j(':input:not(.destroy-attribute)', row).prop('disabled', false);
+        }
+    },
+    // processes the JSON response when fetching terms, and populates the term list
+    handleOntologyTermsJSONResponse: function (json) {
+        $j.each(json, function (key, term) {
+            //make a new term
+            CVTerms.addNewTermRow();
+
+            //get the last row and its inputs
+            var row = $j('table#new-terms tr.sample-cv-term').last();
+            var inputs = $j(row).find('td input');
+
+            //inputs 0,1,2 are label, iri, and parent_iri
+            $j(inputs[0]).val(term.label);
+            $j(inputs[1]).val(term.iri);
+            $j(inputs[2]).val(term.parent_iri);
+        });
+    },
+    // adds a new blank row to the terms list
+    addNewTermRow: function () {
+        var newTerm = $j('#new-term-row tbody').clone().html();
+
+        var index = 0;
+        $j('#new-terms tr.sample-cv-term').each(function () {
+            var newIndex = parseInt($j(this).data('index'));
+            if (newIndex > index) {
+                index = newIndex;
+            }
+        });
+        index++;
+
+        newTerm = newTerm.replace(/--index--/g, index);
+        $j('#add-term-button-row').before($j(newTerm));
+    },
+    // reports the error when the ajax method to fetch the terms is unsuccessful
+    reportFetchError: function (json) {
+        var error_message = json.errors[0].details;
+        $j('div#fetch-error-message').text("An error occurred fetching the terms: " + error_message);
+        $j('div#fetch-error-message').show();
+    },
+    // removes all the terms from the list
+    clearAllTerms: function () {
+        $j('#new-terms tr.sample-cv-term input.destroy-attribute').each(function () {
+            if (!$j(this).is(':checked')) {
+                $j(this).attr('checked', true);
+                $j(this).trigger('change');
+            }
+        });
+    },
+    // sets up and trigger the ajax call to fetch the terms list
+    fetchTermsAJAX: function () {
+        $j('div#controlled-vocab-terms').hide();
+        $j('div#fetch-error-message').hide();
+        $j('#fetch-terms-spinner').spinner('add');
+        $j('input#submit-button').prop('disabled', true);
+
+        var ontology_id = $j('select#sample_controlled_vocab_source_ontology').val();
+        var root_uri = $j('#sample_controlled_vocab_ols_root_term_uri').val();
+
+        $j.ajax({
+            url: '<%= fetch_ols_terms_sample_controlled_vocabs_path %>',
+            dataType: "json",
+            data: {
+                source_ontology_id: ontology_id,
+                root_uri: root_uri
+            },
+            success: function (resp) {
+                CVTerms.clearAllTerms();
+                CVTerms.handleOntologyTermsJSONResponse((resp));
+            },
+            error: function (resp) {
+                CVTerms.reportFetchError(resp.responseJSON);
+            },
+            complete: function () {
+                $j('#fetch-terms-spinner').spinner('remove');
+                $j('div#controlled-vocab-terms').show();
+                $j('input#submit-button').prop('disabled', false);
+                //scroll to end
+                $j('#controlled-vocab-terms-fixed').scrollTop($j('#controlled-vocab-terms-fixed').prop("scrollHeight"));
+            }
+        });
+    },
+    // sets up all the element bind events
+    bindEvents: function () {
+        $j('#add-term').click(function () {
+            CVTerms.addNewTermRow();
+
+            //scroll to end
+            $j('#controlled-vocab-terms-fixed').scrollTop($j('#controlled-vocab-terms-fixed').prop("scrollHeight"));
+
+            return false;
+        });
+
+        $j('#clear-terms').click(function () {
+            if (confirm('Are you sure you wish to remove all the current terms?')) {
+                CVTerms.clearAllTerms();
+            }
+        });
+
+        $j('#new-terms').on('change', '.destroy-attribute', CVTerms.removeTerm);
+
+        $j('select#sample_controlled_vocab_source_ontology').on('change', function () {
+            var selected = this.selectedOptions[0];
+            if (selected.value == "") {
+                $j('#sample_controlled_vocab_ols_root_term_uri').val('');
+                $j('#ontology-root-uri').hide();
+            } else {
+                $j('#ontology-root-uri').show();
+                var link = $j('a#selected-ols-link');
+                link.text(selected.text);
+                link.attr('href', 'https://www.ebi.ac.uk/ols/ontologies/' + selected.value);
+            }
+        });
+
+        $j('#fetch-ontology-terms-submit').click(function (e) {
+            if (!confirm('Are you sure? All current terms will be removed.')) {
+                return false;
+            }
+            CVTerms.fetchTermsAJAX();
+            return false;
+        });
+
+        //make sure the page is updated if there is already an ontology
+        $j('select#sample_controlled_vocab_source_ontology').trigger('change');
+    }
+};

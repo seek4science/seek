@@ -39,10 +39,10 @@ class Study < ApplicationRecord
   
   # Returns the columns to be shown on the table view for the resource
   def columns_default
-    super + ['title']
+    super
   end
   def columns_allowed
-    super + ['title','experimentalists','other_creators','deleted_contributor']
+    super + ['experimentalists','other_creators','deleted_contributor']
   end
 
   def state_allows_delete? *args

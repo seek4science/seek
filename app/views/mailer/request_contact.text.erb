@@ -3,7 +3,7 @@ Hi <%= @owners.collect{|o| o.name}.join(", ") -%>,
 
   The <%= Seek::Config.application_name %> user <%= @requester.name -%>, <%= person_url(@requester) -%>, has interest in the file "<%= @resource.title -%>": <%= url_for(:action=>:show,:controller=>controller,:id=>@resource, :only_path => false) -%>.
 
-  He/She would like to initiate a discussion with you.
+  They would like to initiate a discussion with you.
 
 <% unless @details.blank? -%>
   <%=@requester.first_name.capitalize -%> also provided some additional details:

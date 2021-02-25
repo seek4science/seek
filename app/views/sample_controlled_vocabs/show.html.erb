@@ -4,9 +4,35 @@
 
 <%= item_description @sample_controlled_vocab.description -%>
 
-<h3>Terms</h3>
-<ul>
-<% @sample_controlled_vocab.sample_controlled_vocab_terms.each do |term| %>
-  <li><%= term.label %></li>
+<% if @sample_controlled_vocab.source_ontology.present? %>
+  <p>
+    <strong>Ontology:</strong>
+    <%= ols_ontology_link(@sample_controlled_vocab.source_ontology) %>
+  </p>
+  <p>
+    <strong>Root IRI:</strong>
+    <%= ols_root_term_link(@sample_controlled_vocab.source_ontology,@sample_controlled_vocab.ols_root_term_uri) %>
+  </p>
 <% end %>
-</ul>
+
+<h3>Terms</h3>
+<table class="table table-striped table-bordered">
+  <thead>
+  <tr>
+    <th>Label</th>
+    <th>Ontology IRI</th>
+    <th>Parent IRI</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @sample_controlled_vocab.sample_controlled_vocab_terms.each do |term| %>
+    <tr>
+      <td><%= term.label %></td>
+      <td><%= term.iri %></td>
+      <td><%= term.parent_iri %></td>
+    </tr>
+  <% end %>
+  </tbody>
+
+</table>
+

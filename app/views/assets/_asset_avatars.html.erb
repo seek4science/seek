@@ -23,7 +23,8 @@
           <% end %>
         </div>
         <%= modal(id: "author-avatar-list#{resource.object_id}", class: 'text-left', size: 'lg') do %>
-            <%= modal_header('All contributors') %>
+            <% contributors_text = resource.class.name.underscore=='publication' ? 'All authors' : 'All creators' %>
+            <%= modal_header(contributors_text) %>
             <%= modal_body do %>
                 <% creators.each do |a|  -%>
                     <div class="popup-contributor">

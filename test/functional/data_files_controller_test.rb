@@ -2906,9 +2906,7 @@ class DataFilesControllerTest < ActionController::TestCase
     al = ActivityLog.last
     assert_equal 'create', al.action
     assert_equal df, al.activity_loggable
-    assert_equal person.user, al.culprit
-
-    assert_nil session[:uploaded_content_blob_id]
+    assert_equal person.user, al.culprit    
 
   end
 
