@@ -41,10 +41,10 @@ class AuthLookupUpdateJob < BatchJob
     item.update_lookup_table_for_all_users
   end
 
+  # spawns a new UserAuthLookupUpdateJob for the user and each type
   def update_assets_for_user(user)
     Seek::Util.authorized_types.each do |type|
-      type.lookup_class.where(user_id: user.id).delete_all
-      UserAuthLookupUpdateJob.perform_later(user, type)
+      UserAuthLookupUpdateJob.perform_later(user, type.name)
     end
   end
 end
