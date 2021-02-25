@@ -46,9 +46,9 @@ module Seek
       end
 
       def spreadsheet_csv
-        # Rails.cache.fetch("blob_ss_csv-#{content_blob.cache_key}") do
-        content_blob.extract_csv
-        # end
+        Rails.cache.fetch("blob_ss_csv-#{content_blob.cache_key}") do
+          content_blob.extract_csv
+        end
       end
 
       private
@@ -58,6 +58,8 @@ module Seek
           return parse_spreadsheet_xml(spreadsheet_xml)
         elsif content_blob.is_csv?
           return parse_spreadsheet_csv(spreadsheet_csv)
+        elsif content_blob.is_tsv?
+          return parse_spreadsheet_csv(spreadsheet_csv, col_sep: "\t")
         else
           return nil          
         end
@@ -139,10 +141,15 @@ module Seek
       
       # Takes in a string containing the csv representation of a spreadsheet and returns
       # a Workbook object
-      def parse_spreadsheet_csv(spreadsheet_csv)
+      def parse_spreadsheet_csv(spreadsheet_csv, col_sep=nil)
         workbook = Workbook.new
 
-        csv = CSV.parse(spreadsheet_csv)
+        if col_sep.nil?
+          csv = CSV.parse(spreadsheet_csv)
+        else
+          csv = CSV.parse(spreadsheet_csv, col_sep)
+        end
+
         sheet = Sheet.new('csv')
         workbook.sheets << sheet
 
@@ -157,6 +164,7 @@ module Seek
         min_cols = MIN_COLS
 
         # Initialise column width to default width
+        col_index=0
         csv[0].each_with_index do |c, index|
           col_index = index + 1
           col = Column.new(col_index, 2964.to_s)

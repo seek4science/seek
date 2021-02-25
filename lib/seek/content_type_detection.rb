@@ -30,7 +30,7 @@ module Seek
     end
 
     def is_supported_spreadsheet_format?(blob = self)
-      is_excel?(blob) || is_csv?(blob)
+      is_excel?(blob) || is_csv?(blob) || is_tsv?(blob)
     end
 
     def is_extractable_spreadsheet?(blob = self)
@@ -55,6 +55,10 @@ module Seek
 
     def is_csv?(blob = self)
       mime_extensions(blob.content_type).include?('csv')
+    end
+    
+    def is_tsv?(blob = self)
+      mime_extensions(blob.content_type).include?('tsv')
     end
 
     def is_binary?(blob = self)
