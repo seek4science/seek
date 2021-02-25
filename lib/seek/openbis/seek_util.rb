@@ -233,7 +233,7 @@ if automatic synchronization was selected.'}
                    user = p.user
                    p
                  else
-                   raise "Cannot add new entities unsuported current_user type #{user.class}"
+                   raise "Cannot add new entities unsupported current_user type #{user.class}"
                  end
 
         raise 'Cannot add new entities with guest current_user' if user.guest?
