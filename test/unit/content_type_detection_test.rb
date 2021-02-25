@@ -78,6 +78,10 @@ class ContentTypeDetectionTest < ActiveSupport::TestCase
     assert blob.is_supported_spreadsheet_format?
     assert is_supported_spreadsheet_format?(blob)
 
+    blob = Factory :csv_content_blob
+    assert blob.is_supported_spreadsheet_format?
+    assert is_supported_spreadsheet_format?(blob)
+
     blob = Factory :doc_content_blob
     refute blob.is_supported_spreadsheet_format?
     refute is_supported_spreadsheet_format?(blob)
