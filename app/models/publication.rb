@@ -36,19 +36,17 @@ class Publication < ApplicationRecord
   has_many :publication_authors, dependent: :destroy, autosave: true
   has_many :people, through: :publication_authors
 
-  has_one :content_blob, ->(r) { where('content_blobs.asset_version =?', r.version) }, as: :asset, foreign_key: :asset_id
+  has_one :content_blob, as: :asset, foreign_key: :asset_id
 
+=begin
   explicit_versioning(:version_column => "version", sync_ignore_columns: ['doi']) do
     acts_as_versioned_resource
     acts_as_favouritable
-=begin
-    for methodname in instance_methods
-      warn("---  "+methodname.to_s)
-    end
-=end
+
     has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND content_blobs.asset_type =?', r.version, r.parent.class.name) },
             :primary_key => :publication_id,:foreign_key => :asset_id
   end
+=end
 
   belongs_to :publication_type
 

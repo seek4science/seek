@@ -122,7 +122,6 @@
     </div>
   </div>
     <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@publication} -%>
-    <%= fields_for(@publication) { |f| render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f} }-%>
     <div class="form-group">
     <%= label_tag :abstract, nil, :class => 'control-label col-sm-2' %>
     <div class="col-sm-10">
@@ -174,7 +173,6 @@
     <div class="form-group">
       <div class="col-sm-2 col-sm-offset-2">
         <%= publication_form.submit 'Create', :name => "subaction", :value => 'Create', :class => 'btn btn-primary' %>
-        <%= form_submit_buttons(@publication) %>
       </div>
     </div>
 <% end %>

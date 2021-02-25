@@ -20,6 +20,9 @@ end
     <p>
       You can register a <%= asset_name -%> by either directly uploading a file,
        or registering a URL to either another page or remote file. Please test the URL before submitting.
+      <% if current_page?(controller: 'publications', action: 'new') || current_page?(controller: 'publications', action: 'manage')%>
+        <br>Please upload a PDF of your publication only if allowed by the publisher.
+      <% end -%>
     </p>
     <% if new_version -%>
         <p>
@@ -47,7 +50,11 @@ end
 
     <div role="tabpanel" class="tab-pane <%= 'active'.html_safe unless url_from_params -%>" id="local-file">
       <div class="form-group">
-        <label class="required">File to upload</label>
+        <% if current_page?(controller: 'publications', action: 'new') || current_page?(controller: 'publications', action: 'manage')%>
+          <label class="">File to upload</label>
+        <% else -%>
+          <label class="required">File to upload</label>
+        <% end -%>
         <%= file_field_tag "content_blobs[][data]", { "data-batch-upload" => batch } -%>
       </div>
     </div>

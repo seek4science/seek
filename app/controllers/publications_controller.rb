@@ -9,8 +9,25 @@ class PublicationsController < ApplicationController
 
   before_action :publications_enabled?
 
+  # no versioning for publication
+=begin
+  def find_version(version)
+    warn("BBBBBBBBBBBBBBBBB - there")
+    return self
+  end
+
+  def latest_version()
+    warn("BBBBBBBBBBBBBBBBB - there")
+    return self
+  end
+
+  def version()
+    return self
+  end
+=end
+
   before_action :find_assets, only: [:index]
-  before_action :find_and_authorize_requested_item, only: %i[show edit manage update destroy]
+  before_action :find_and_authorize_requested_item, only: %i[show edit manage update destroy download]
   before_action :suggest_authors, only: [:manage]
   before_action :find_display_asset, :only=>[:show, :download] # :_resource_list_item,
 
@@ -110,6 +127,8 @@ class PublicationsController < ApplicationController
   # PUT /publications/1.xml
   def update
     update_annotations(params[:tag_list], @publication) if params.key?(:tag_list)
+
+    upload_blob
 
     if @publication.update_attributes(publication_params)
       respond_to do |format|
@@ -425,22 +444,14 @@ class PublicationsController < ApplicationController
 
   def upload_blob
     @publication = setup_new_asset
-    respond_to do |format|
+    #respond_to do |format|
       if handle_upload_data && @publication.content_blob.save
         session[:uploaded_content_blob_id] = @publication.content_blob.id
-        format.html {}
+        #format.html {}
       else
         session.delete(:uploaded_content_blob_id)
-        format.html { render action: :new }
+        #format.html { render action: :new }
       end
-    end
-  end
-
-  def upload_blob3
-    setup_new_asset
-    #associate_by_presented_params
-    respond_for_new
-    createUpload
   end
 
   def setup_new_asset
@@ -485,12 +496,6 @@ class PublicationsController < ApplicationController
     item
   end
 
-  def upload_blob2
-    controller_you_want = Seek::AssetsStandardControllerActions.new
-    controller_you_want.request = request
-    controller_you_want.response = response
-    controller_you_want.create
-  end
   # create a publication from a reference file, at the moment supports only bibtex
   # only sets the @publication and redirects to the create_publication with content from the bibtex file
   def import_publication
@@ -748,26 +753,6 @@ class PublicationsController < ApplicationController
       end
     end
     replace_str
-  end
-
-  def new_version
-    if handle_upload_data(true)
-      comments=params[:revision_comments]
-
-      respond_to do |format|
-        if @publication.save_as_new_version(comments)
-
-          flash[:notice]="New version uploaded - now on version #{@publication.version}"
-        else
-          flash[:error]="Unable to save new version"
-        end
-        format.html {redirect_to @publication }
-      end
-    else
-      flash[:error]=flash.now[:error]
-      redirect_to @publication
-    end
-
   end
 
 end

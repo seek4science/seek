@@ -241,8 +241,13 @@ class ContentBlobsController < ApplicationController
   end
 
   def set_asset_version
-    if @content_blob.asset_version
+    warn("CCCCCCCCCCCC")
+    if  !@content_blob.asset.versioned?
+      return true # no version
+    elsif @content_blob.asset_version
       begin
+        warn("Our asset is " + @content_blob.asset)
+        warn("Our asset version is " + @content_blob.asset_version)
         @asset_version = @content_blob.asset.find_version(@content_blob.asset_version)
       rescue Exception => e
         error('Unable to find asset version', 'is invalid')
