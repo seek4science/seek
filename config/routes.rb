@@ -448,7 +448,6 @@ SEEK::Application.routes.draw do
       get :preview
       post :test_asset_url
       post :items_for_result
-      post :new_version
     end
     member do
       post :check_related_items
@@ -644,9 +643,9 @@ SEEK::Application.routes.draw do
       post :disassociate_authors
       post :update_metadata
       post :request_contact
-      post :new_version
-      post :edit_version_comment
-      delete :destroy_version
+      #post :new_version
+      #post :edit_version_comment
+      #delete :destroy_version
     end
     resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:documents, :presentations, :organisms, :events,:only=>[:index]
   end
