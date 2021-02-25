@@ -23,6 +23,7 @@ module ROCrate
           warn 'Main workflow not found!'
         end
 
+        crate.add_all(source, false)
         extract_data_entities(crate, source, entity_hash).each do |entity|
           crate.add_data_entity(entity)
         end

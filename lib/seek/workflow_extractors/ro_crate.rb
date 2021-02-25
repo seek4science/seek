@@ -98,7 +98,7 @@ module Seek
         end
 
         v = Dir.mktmpdir('ro-crate') do |dir|
-          @opened_crate = ::ROCrate::WorkflowCrateReader.read_zip(@io.is_a?(ContentBlob) ? @io.path : @io, target_dir: dir)
+          @opened_crate = ::ROCrate::WorkflowCrateReader.read_zip(@io.is_a?(ContentBlob) ? @io.data_io_object : @io, target_dir: dir)
           yield @opened_crate
         end
 
