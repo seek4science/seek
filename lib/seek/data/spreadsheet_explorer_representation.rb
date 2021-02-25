@@ -150,7 +150,7 @@ module Seek
           csv = CSV.parse(spreadsheet_csv, col_sep)
         end
 
-        sheet = Sheet.new('csv')
+        sheet = Sheet.new('Sheet1')
         workbook.sheets << sheet
 
         # set a default style
