@@ -274,7 +274,7 @@ namespace :seek_dev do
       end
     end
     if !cmt_already_exist && overwrite_cmt
-      cmt = CustomMetadataType.new(title: 'MIAPPE metadata v1', supported_type:'Investigation')
+      cmt = CustomMetadataType.new(title: 'MIAPPE metadata v1.1', supported_type:'Investigation')
       cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'id', required:true, sample_attribute_type: SampleAttributeType.where(title:'string').first)
       cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'submission_date', sample_attribute_type: SampleAttributeType.where(title:'Date').first)
       cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'license', sample_attribute_type: SampleAttributeType.where(title:'String').first)
@@ -297,7 +297,7 @@ namespace :seek_dev do
       end
     end
     if !cmt_already_exist && overwrite_cmt
-      cmt = CustomMetadataType.new(title: 'MIAPPE metadata v1', supported_type:'Study')
+      cmt = CustomMetadataType.new(title: 'MIAPPE metadata v1.1', supported_type:'Study')
       cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'id', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
       cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'study_start_date', required:true, sample_attribute_type: SampleAttributeType.where(title:'Date').first)
       cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'study_end_date', sample_attribute_type: SampleAttributeType.where(title:'Date').first)
@@ -333,7 +333,7 @@ namespace :seek_dev do
       end
     end
     if !cmt_already_exist && overwrite_cmt
-      cmt = CustomMetadataType.new(title: 'MIAPPE metadata v1', supported_type: 'Assay')
+      cmt = CustomMetadataType.new(title: 'MIAPPE metadata v1.1', supported_type: 'Assay')
       cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'level', sample_attribute_type: SampleAttributeType.where(title:'String').first)
       cmt.save!
       puts "Created test CMT for Assay"
