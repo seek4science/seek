@@ -196,10 +196,6 @@ class DataFile < ApplicationRecord
     content_blob && content_blob.nels?
   end
 
-  def supportsRightField?
-    contains_extractable_spreadsheet? && content_blob.is_excel?
-  end
-
   def openbis_dataset_json_details
     openbis? ? openbis_dataset.json : nil
   end
@@ -226,7 +222,7 @@ class DataFile < ApplicationRecord
   end
 
   def populate_metadata_from_template
-    if supportsRightField?
+    if contains_extractable_excel?
       Seek::Templates::Extract::DataFileRightFieldExtractor.new(self).populate(self)
     else
       Set.new
@@ -235,7 +231,7 @@ class DataFile < ApplicationRecord
 
   def initialise_assay_from_template
     assay = Assay.new
-    if supportsRightField?
+    if contains_extractable_excel?
       warnings = Seek::Templates::Extract::AssayRightfieldExtractor.new(self).populate(assay)
       return assay, warnings
     else

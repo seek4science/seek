@@ -16,6 +16,10 @@ module Seek
         supported_spreadsheet_format? && content_blob.is_extractable_spreadsheet?
       end
 
+      def contains_extractable_excel?
+        content_blob.is_extractable_excel?
+      end
+
       def spreadsheet_annotations
         content_blob.worksheets.collect { |w| w.cell_ranges.collect(&:annotations) }.flatten
       end
