@@ -69,6 +69,10 @@ Factory.define(:xlsm_spreadsheet_datafile, parent: :data_file) do |f|
   f.association :content_blob, factory: :xlsm_content_blob
 end
 
+Factory.define(:csv_spreadsheet_datafile, parent: :data_file) do |f|
+  f.association :content_blob, factory: :csv_content_blob
+end
+
 Factory.define(:small_test_spreadsheet_datafile, parent: :data_file) do |f|
   f.association :content_blob, factory: :small_test_spreadsheet_content_blob
 end
