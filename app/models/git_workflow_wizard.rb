@@ -1,4 +1,4 @@
-require 'ro_crate_ruby'
+require 'ro_crate'
 require 'seek/download_handling/http_streamer'
 
 # A kind of "form object" to instantiate a workflow from a given git repository, target ref, and several paths in that

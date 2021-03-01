@@ -1,4 +1,4 @@
-require 'ro_crate_ruby'
+require 'ro_crate'
 
 module WorkflowProcessing
   extend ActiveSupport::Concern
