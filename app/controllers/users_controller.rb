@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   before_action :is_current_user_auth, only: %i[edit update]
-  before_action :is_user_admin_auth, only: %i[impersonate resend_activation_email destroy]
+  before_action :is_user_admin_auth, only: %i[impersonate resend_activation_email destroy activate_other]
 
   skip_before_action :restrict_guest_user
   skip_before_action :project_membership_required
@@ -37,8 +37,8 @@ class UsersController < ApplicationController
 
   def activate
     self.current_user = params[:activation_code].blank? ? false : User.find_by_activation_code(params[:activation_code])
-    if logged_in? && !current_user.active?
-      current_user.activate
+    if logged_in? && !current_user.active? && current_user.person
+      current_user.activate      
       Mailer.welcome(current_user).deliver_later
       flash[:notice] = 'Registration complete and successfully activated!'
       redirect_to current_person
@@ -128,7 +128,7 @@ class UsersController < ApplicationController
         AuthLookupUpdateQueue.enqueue(@user) if do_auth_update
         # user has associated himself with a person, so activation email can now be sent
         if !current_user.active?
-          Mailer.signup(@user).deliver_later
+          Mailer.activation_request(@user).deliver_later
           flash[:notice] = 'An email has been sent to you to confirm your email address. You need to respond to this email before you can login'
           logout_user
           format.html { redirect_to action: 'activation_required' }
@@ -152,9 +152,10 @@ class UsersController < ApplicationController
   end
 
   def resend_activation_email
-    user = User.find(params[:id])
+    user = User.find(params[:id])    
     if user && user.person && !user.active?
-      Mailer.signup(user).deliver_later
+      Mailer.activation_request(user).deliver_later
+      MessageLog.log_activation_email(user.person)
       flash[:notice] = "An email has been sent to user: #{user.person.name}"
     else
       flash[:notice] = 'No email sent. User was already activated.'
@@ -173,6 +174,19 @@ class UsersController < ApplicationController
     else
       flash[:error] = 'User not found'
       redirect_to admin_path
+    end
+  end
+
+  def activate_other
+    user = User.find_by_id(params[:id])
+    if !user.active? && user.person
+      user.activate
+      Mailer.welcome(user).deliver_later
+      flash[:notice] = 'User activated successfully'
+      redirect_to user.person
+    else
+      flash[:error] = 'User is already activated, or has not created a profile'
+      redirect_back_or_default('/')
     end
   end
 

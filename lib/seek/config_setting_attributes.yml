@@ -32,9 +32,9 @@ dm_project_link:
 header_image_link:
 header_image_title:
 header_image_enabled:
-header_home_logo_image:
 header_image_avatar_id:
 google_analytics_enabled:
+google_analytics_tracking_notice:
 google_analytics_tracker_id:
 piwik_analytics_url:
 exception_notification_enabled:
@@ -57,6 +57,7 @@ jws_enabled:
 copasi_enabled:
 external_search_enabled:
 piwik_analytics_enabled:
+piwik_analytics_tracking_notice:
 seek_video_link:
 scales:
 delete_asset_version_enabled:
@@ -182,6 +183,8 @@ filtering_enabled:
 sorting:
 results_per_page_default:
   convert: :to_i
+results_per_page_default_condensed:
+  convert: :to_i
 results_per_page:
 cwl_viewer_url:
 # Types enabled
@@ -215,3 +218,7 @@ ga4gh_trs_api_enabled:
 custom_metadata_enabled: false
 search_results_limit:
   convert: :to_i
+life_monitor_enabled:
+life_monitor_url:
+life_monitor_client_id:
+life_monitor_client_secret:

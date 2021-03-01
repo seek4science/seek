@@ -58,10 +58,10 @@ class Model < ApplicationRecord
 
   # Returns the columns to be shown on the table view for the resource
   def columns_default
-    super + ['title','version']
+    super + ['version']
   end
   def columns_allowed
-    super + ['title','recommended_environment_id','last_used_at','version','other_creators','imported_source','imported_url','model_image_id','doi','license']
+    super + ['recommended_environment_id','last_used_at','version','other_creators','imported_source','imported_url','model_image_id','doi','license']
   end
 
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi']) do

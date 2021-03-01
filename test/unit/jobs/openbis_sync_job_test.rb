@@ -245,8 +245,8 @@ class OpenbisSyncJobTest < ActiveSupport::TestCase
     assert_equal 2, OpenbisEndpoint.all.select(&:due_sync?).count
 
     assert_enqueued_jobs(2, only: OpenbisSyncJob) do
-      assert_enqueued_with(job: OpenbisSyncJob, args: [@endpoint, OpenbisSyncJob::BATCH_SIZE]) do
-        assert_enqueued_with(job: OpenbisSyncJob, args: [endpoint2, OpenbisSyncJob::BATCH_SIZE]) do
+      assert_enqueued_with(job: OpenbisSyncJob, args: [@endpoint]) do
+        assert_enqueued_with(job: OpenbisSyncJob, args: [endpoint2]) do
           OpenbisSyncJob.queue_timed_jobs
         end
       end

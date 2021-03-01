@@ -3,6 +3,7 @@
 <%
   # The user can keep a custom set of columns for each resource class
   resource = objects[0]
+  requiredColView = resource.columns_required
   defaultColView = resource.columns_default
 
   # # Update stored column names
@@ -10,16 +11,21 @@
     session["tableview_" + resource.class.name] = params[:table_cols].split(',')
   end
 
-  # Set columns to show
-  if session.has_key?("tableview_" + resource.class.name)
-    tableview_columns = session["tableview_"+resource.class.name]
+  # Set columns to show, if none are selected, show defaults
+  if session.has_key?("tableview_" + resource.class.name) && !session["tableview_"+resource.class.name].empty?
+    tableview_columns = requiredColView + session["tableview_"+resource.class.name]
   else
-    tableview_columns = defaultColView
+    tableview_columns = requiredColView + defaultColView
   end
 
   # Prepare available columns for this particular resource type
-  availableColView = resource.columns_allowed
+  # First show the shown columns in order, and then the available ones. Required columns are never given as an option
+  availableColView = tableview_columns + (resource.columns_allowed - tableview_columns) - requiredColView
+  # availableColView = resource.columns_allowed
+
 %>
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
 
 <% content_for :pagination do %>
@@ -50,6 +56,7 @@
       <a href="#" view="table">Table</a>
     </li>
   </ul>
+
   <% if params[:view]=="condensed" %>
     <%= render partial: 'assets/resource_list_item_condensed', collection: objects %>
   <% elsif params[:view]=="table" %>
@@ -61,12 +68,11 @@
           <% end -%>
           <th>
             <div id="tableview-colselector" class="dropdown">
-                <a href="#" data-toggle="dropdown" class="dropdown-toggle"><span class="glyphicon glyphicon-cog"></span></a>
-                <ul class="dropdown-menu">
+                <a href="#" class="dropdown-toggle"><span class="glyphicon glyphicon-cog"></span></a>
+                <div id="sortable-colselector" class="dropdown-menu" style="padding:0px;">
                   <% for column in availableColView -%>
-                    <li>
-                      <div class="checkbox">
-                          <label>
+                      <div class="checkbox list-group-item" style="margin-top:0px;">
+                          <label style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;max-width: 110px;">
                               <input type="checkbox" value="<%= column %>"
                               <% if tableview_columns.include?(column) %>
                                 checked
@@ -74,10 +80,10 @@
                               >
                               <%= t(column, default: column.to_s).titleize %>
                           </label>
+                          <span class="glyphicon glyphicon-move handle" style="float: right;cursor: grab;"> </span>
                       </div>
-                    </li>
                   <% end -%>
-                </ul>
+                </div>
             </div>
           </th>
         </tr>
@@ -94,6 +100,11 @@
 <%= content_for :pagination %>
 
 <script>
+  /* Removing data-toggle="dropdown" from 'tableview-colselector a' we can prevent it from closing */
+  $j('#tableview-colselector a').on('click', function (event) {
+      $j(this).parent().toggleClass('open');
+  });
+
   $j('#view_tabs a').click(function () {
       const url = new URL(window.location.href);
       const search_params = url.searchParams;
@@ -101,7 +112,22 @@
       url.search = search_params.toString();
       window.location = url;
   });
-  $j('#tableview-colselector input[type="checkbox"]').click(function () {
+  $j('#tableview-colselector input[type="checkbox"]').click(function (event) {
+    event.stopPropagation();
+    refreshWithOptions();
+  });
+
+  new Sortable(document.getElementById('sortable-colselector'), {
+    animation: 150,
+    handle: '.handle',
+    ghostClass: 'blue-background-class',
+    onEnd: refreshWithOptions,
+  });
+
+  /**
+    * Refresh the page with the options selected from the dropdown menu
+  */
+  function refreshWithOptions(){
     table_cols = []
     $j('#tableview-colselector input:checked').each(function() {
       table_cols.push(this.value);
@@ -112,5 +138,5 @@
     search_params.set('table_cols', table_cols);
     url.search = search_params.toString();
     window.location = url;
-  });
+  }
 </script>

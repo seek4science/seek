@@ -1,0 +1,62 @@
+{
+  "data": {
+      "id": "11",
+      "type": "sample_controlled_vocabs",
+      "attributes": {
+          "title": "Organism",
+          "description": "Description for organism",
+          "source_ontology": "EFO",
+          "ols_root_term_uri": "",
+          "required": "true",
+          "short_name": "organism",
+          "sample_controlled_vocab_terms_attributes": [
+              {
+                "id": 17,
+                "label": "Archaea",
+                "iri": "http://purl.obolibrary.org/obo/NCBITaxon_2157",
+                "parent_iri": "http://purl.obolibrary.org/obo/OBI_0100026"
+              },
+              {
+                "id": 18,
+                "label": "Bacteria",
+                "iri": "http://purl.obolibrary.org/obo/NCBITaxon_2",
+                "parent_iri": "http://purl.obolibrary.org/obo/OBI_0100026"
+              }
+          ],
+            "repository_standard": {
+                "id": 7,
+                "title": "ArrayExpress",
+                "url": "some_url",
+                "group_tag": "Plant",
+                "repo_type": "assay",
+                "description": "some description"
+            }
+      },
+      "relationships": {
+          "sample_controlled_vocab_terms": {
+              "data": [
+                  {
+                      "id": "17",
+                      "type": "sample_controlled_vocab_terms"
+                  },
+                  {
+                      "id": "18",
+                      "type": "sample_controlled_vocab_terms"
+                  }
+              ]
+          }
+      },
+      "links": {
+          "self": "/sample_controlled_vocabs/11"
+      },
+      "meta": {
+          "created": "2020-10-27T19:56:52.000Z",
+          "modified": "2020-10-27T19:56:52.000Z",
+          "api_version": "0.3",
+          "base_url": "http://localhost:3000"
+      }
+  },
+  "jsonapi": {
+      "version": "1.0"
+  }
+}

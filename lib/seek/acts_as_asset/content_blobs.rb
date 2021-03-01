@@ -23,7 +23,8 @@ module Seek
 
         # the search terms coming from the content-blob(s)
         def content_blob_search_terms
-          all_content_blobs.map(&:search_terms).flatten.compact.uniq
+          max_terms = 920000 # an upper limit of terms, found with a large problematic file - greater than this seemed to crash solr
+          all_content_blobs.map(&:search_terms).flatten.compact.uniq[0..max_terms]
         end
 
         def cache_remote_content_blob

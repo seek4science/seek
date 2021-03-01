@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'minitest/mock'
 
 class AuthLookupJobTest < ActiveSupport::TestCase
   def setup
@@ -74,6 +75,32 @@ class AuthLookupJobTest < ActiveSupport::TestCase
     with_config_value(:auth_lookup_update_batch_size, 7) do
       assert_difference('AuthLookupUpdateQueue.count', -7) do
         AuthLookupUpdateJob.new.perform
+      end
+    end
+  end
+
+  test 'exception handling' do
+    Sop.delete_all
+    user = Factory :user
+    other_user = Factory :user
+    sop = Factory :sop, contributor: user.person, policy: Factory(:editing_public_policy)
+    AuthLookupUpdateQueue.destroy_all
+    AuthLookupUpdateQueue.enqueue(sop)
+    Sop.clear_lookup_table
+
+    with_config_value(:exception_notification_enabled, true) do
+      assert_difference('AuthLookupUpdateQueue.count', -1) do
+        job = AuthLookupUpdateJob.new
+        begin
+          # Stub because exception forwarding doesn't work in tests
+          Seek::Errors::ExceptionForwarder.stub(:send_notification, -> (exception, opts = {}, *_) { raise "Exception was: #{exception.inspect}, item id: #{opts[:data][:item].id}" }) do
+            job.stub(:perform_job, -> (*_) { raise 'job error!' }) do # Stub to throw an error
+              job.perform
+            end
+          end
+        end
+      rescue RuntimeError => e
+        assert_equal "#<RuntimeError: Exception was: #<RuntimeError: job error!>, item id: #{sop.id}>", e.inspect
       end
     end
   end

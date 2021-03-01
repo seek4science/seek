@@ -172,4 +172,173 @@ class WorkflowTest < ActiveSupport::TestCase
 
     assert workflow.valid?
   end
+
+  test 'creates life monitor submission job on create if tests present' do
+    workflow = nil
+    with_config_value(:life_monitor_enabled, true) do
+      assert_enqueued_with(job: LifeMonitorSubmissionJob) do
+        workflow = Factory(:workflow_with_tests, uuid: '56c50ac0-529b-0139-9132-000c29a94011',
+                           policy: Factory(:public_policy))
+        assert workflow.latest_version.has_tests?
+        assert workflow.can_download?(nil)
+      end
+
+      VCR.use_cassette('life_monitor/get_token') do
+        VCR.use_cassette('life_monitor/non_existing_workflow_get') do
+          VCR.use_cassette('life_monitor/submit_workflow') do
+            assert_nothing_raised do
+              User.current_user = workflow.contributor.user
+              refute workflow.latest_version.monitored
+              LifeMonitorSubmissionJob.perform_now(workflow.latest_version)
+              assert workflow.latest_version.reload.monitored
+            end
+          end
+        end
+      end
+    end
+  end
+
+  test 'does not create life monitor submission job if life monitor disabled' do
+    with_config_value(:life_monitor_enabled, false) do
+      assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
+        workflow = Factory(:workflow_with_tests, policy: Factory(:public_policy))
+        assert workflow.latest_version.has_tests?
+        assert workflow.can_download?(nil)
+      end
+    end
+  end
+
+  test 'does not create life monitor submission job if no tests' do
+    with_config_value(:life_monitor_enabled, true) do
+      assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
+        workflow = Factory(:generated_galaxy_no_diagram_ro_crate_workflow, policy: Factory(:public_policy))
+        refute workflow.latest_version.has_tests?
+        assert workflow.can_download?(nil)
+      end
+    end
+  end
+
+  test 'does not create life monitor submission job if workflow not publicly accessible' do
+    with_config_value(:life_monitor_enabled, true) do
+      assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
+        workflow = Factory(:workflow_with_tests, policy: Factory(:private_policy))
+        assert workflow.latest_version.has_tests?
+        refute workflow.can_download?(nil)
+      end
+    end
+  end
+
+  test 'does not create life monitor submission job if workflow already monitored' do
+    workflow = Factory(:workflow_with_tests, policy: Factory(:private_policy))
+    workflow.latest_version.update_column(:monitored, true)
+    workflow.policy.update_column(:access_type, Policy::ACCESSIBLE)
+    with_config_value(:life_monitor_enabled, true) do
+      assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
+        assert workflow.latest_version.has_tests?
+        assert workflow.latest_version.monitored
+        assert workflow.can_download?(nil)
+        disable_authorization_checks { workflow.save! }
+      end
+    end
+  end
+
+  test 'creates lifemonitor submission job on update if workflow made public' do
+    workflow = nil
+    with_config_value(:life_monitor_enabled, true) do
+      assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
+        workflow = Factory(:workflow_with_tests, uuid: '56c50ac0-529b-0139-9132-000c29a94011', policy: Factory(:private_policy))
+        User.current_user = workflow.contributor.user
+        assert workflow.latest_version.has_tests?
+        refute workflow.can_download?(nil)
+        refute workflow.latest_version.monitored
+      end
+
+      assert_enqueued_with(job: LifeMonitorSubmissionJob) do
+        workflow.policy = Factory(:public_policy)
+        disable_authorization_checks { workflow.save! }
+        assert workflow.latest_version.has_tests?
+        assert workflow.can_download?(nil)
+        refute workflow.latest_version.monitored
+      end
+
+      VCR.use_cassette('life_monitor/get_token') do
+        VCR.use_cassette('life_monitor/non_existing_workflow_get') do
+          VCR.use_cassette('life_monitor/submit_workflow') do
+            assert_nothing_raised do
+              refute workflow.latest_version.monitored
+              LifeMonitorSubmissionJob.perform_now(workflow.latest_version)
+              assert workflow.latest_version.reload.monitored
+            end
+          end
+        end
+      end
+    end
+  end
+
+  test 'does not resubmit if workflow is already on life monitor' do
+    workflow = Factory(:workflow_with_tests, uuid: '56c50ac0-529b-0139-9132-000c29a94011', policy: Factory(:public_policy))
+
+    VCR.use_cassette('life_monitor/get_token') do
+      VCR.use_cassette('life_monitor/existing_workflow_get') do
+        # If it actually submitted here it would raise a VCR exception since we haven't loaded the `submit_workflow` tape
+        assert_nothing_raised do
+          LifeMonitorSubmissionJob.perform_now(workflow.latest_version)
+        end
+      end
+    end
+  end
+
+  test 'test_status is not carried over to new versions' do
+    workflow = Factory(:workflow_with_tests)
+    disable_authorization_checks { workflow.update_test_status(:all_passing) }
+    v1 = workflow.find_version(1)
+    assert_equal :all_passing, v1.test_status
+    assert_equal :all_passing, workflow.reload.test_status
+
+    disable_authorization_checks do
+      workflow.save_as_new_version('new version')
+    end
+
+    assert_nil workflow.reload.test_status
+    assert_nil workflow.latest_version.test_status
+    assert_equal :all_passing, v1.test_status
+  end
+
+  test 'update test status' do
+    # Default latest version
+    workflow = Factory(:workflow_with_tests, test_status: nil)
+    v1 = workflow.find_version(1)
+    disable_authorization_checks { workflow.save_as_new_version }
+    v2 = workflow.find_version(2)
+    assert_nil workflow.reload.test_status
+    assert_nil workflow.latest_version.reload.test_status
+    disable_authorization_checks { workflow.update_test_status(:all_failing) }
+    assert_equal :all_failing, workflow.reload.test_status
+    assert_nil v1.test_status
+    assert_equal :all_failing, v2.reload.test_status
+
+    # Explicit latest version
+    workflow = Factory(:workflow_with_tests, test_status: nil)
+    v1 = workflow.find_version(1)
+    disable_authorization_checks { workflow.save_as_new_version }
+    v2 = workflow.find_version(2)
+    assert_nil workflow.reload.test_status
+    assert_nil workflow.latest_version.reload.test_status
+    disable_authorization_checks { workflow.update_test_status(:all_failing, 2) }
+    assert_equal :all_failing, workflow.reload.test_status
+    assert_nil v1.reload.test_status
+    assert_equal :all_failing, v2.reload.test_status
+
+    # Explicit non-latest version
+    workflow = Factory(:workflow_with_tests, test_status: nil)
+    v1 = workflow.find_version(1)
+    disable_authorization_checks { workflow.save_as_new_version }
+    v2 = workflow.find_version(2)
+    assert_nil workflow.reload.test_status
+    assert_nil workflow.latest_version.reload.test_status
+    disable_authorization_checks { workflow.update_test_status(:all_failing, 1) }
+    assert_nil workflow.reload.test_status
+    assert_equal :all_failing, v1.reload.test_status
+    assert_nil v2.reload.test_status
+  end
 end

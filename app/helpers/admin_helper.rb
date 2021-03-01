@@ -33,7 +33,7 @@ module AdminHelper
     case action
     when 'activate'
       if user_or_person.is_a?(User) && user_or_person.person
-        admin_activate_user_button = button_link_to('Activate now', 'activate', activate_path(activation_code: user_or_person.activation_code))
+        admin_activate_user_button = button_link_to('Activate now', 'activate', activate_other_user_path(user_or_person), method: :post)
         resend_activation_email_button = button_link_to('Resend activation email', 'message', resend_activation_email_user_path(user_or_person), method: :post)
         admin_activate_user_button + ' ' + resend_activation_email_button
       end

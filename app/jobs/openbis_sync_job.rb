@@ -8,10 +8,6 @@ class OpenbisSyncJob < BatchJob
   DEBUG = Seek::Config.openbis_debug ? true : false
   BATCH_SIZE = 20
 
-  def initialize(openbis_endpoint, batch_size = BATCH_SIZE)
-    super(openbis_endpoint, batch_size)
-  end
-
   def perform(*args)
     return unless Seek::Config.openbis_enabled
     return unless endpoint&.persisted?
@@ -119,7 +115,7 @@ class OpenbisSyncJob < BatchJob
   private
 
   def batch_size
-    arguments[1]
+    arguments[1] || BATCH_SIZE
   end
 
   def endpoint

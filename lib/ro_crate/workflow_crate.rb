@@ -1,4 +1,4 @@
-require 'ro_crate_ruby'
+require 'ro_crate'
 
 module ROCrate
   class WorkflowCrate < ::ROCrate::Crate
@@ -34,6 +34,10 @@ module ROCrate
       raise "No main workflow!" if main_workflow.nil?
 
       main_workflow.cwl_description = entity
+    end
+
+    def test_directory
+      dereference('test/')
     end
 
     def readme

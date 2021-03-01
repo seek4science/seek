@@ -15,7 +15,7 @@ class MessageLogTest < ActiveSupport::TestCase
     refute log.valid?
 
     log = valid_log
-    log.resource = nil
+    log.subject = nil
     refute log.valid?
 
     log = valid_log
@@ -28,20 +28,20 @@ class MessageLogTest < ActiveSupport::TestCase
     log.details = nil
     assert log.valid?
 
-    # resource must be a project for project membership request
+    # subject must be a project for project membership request
     log = valid_log
     log.message_type = MessageLog::PROJECT_MEMBERSHIP_REQUEST
-    log.resource = Factory(:data_file)
+    log.subject = Factory(:data_file)
     refute log.valid?
   end
 
   test 'project_membership_scope' do
     MessageLog.destroy_all
-    resource = Factory(:project)
+    subject = Factory(:project)
     sender = Factory(:person)
-    log1 = MessageLog.create(resource: resource, sender: sender, details: 'blah blah', message_type: MessageLog::PROJECT_MEMBERSHIP_REQUEST)
-    log2 = MessageLog.create(resource: resource, sender: sender, details: 'blah blah', message_type: MessageLog::PROJECT_MEMBERSHIP_REQUEST)
-    log3 = MessageLog.create(resource: resource, sender: sender, details: 'blah blah', message_type: 2)
+    log1 = MessageLog.create(subject: subject, sender: sender, details: 'blah blah', message_type: MessageLog::PROJECT_MEMBERSHIP_REQUEST)
+    log2 = MessageLog.create(subject: subject, sender: sender, details: 'blah blah', message_type: MessageLog::PROJECT_MEMBERSHIP_REQUEST)
+    log3 = MessageLog.create(subject: subject, sender: sender, details: 'blah blah', message_type: 2)
 
     logs = MessageLog.project_membership_requests
     assert_equal [log1, log2].sort, logs.sort
@@ -73,17 +73,17 @@ class MessageLogTest < ActiveSupport::TestCase
     log2.sender = Factory(:person)
     log2.save!
     log3 = valid_log
-    log3.resource = Factory(:project)
+    log3.subject = Factory(:project)
     log3.save!
     log4 = nil
     travel_to(Time.now - 18.hours) do
       log4 = valid_log
-      log4.resource = log.resource
+      log4.subject = log.subject
       log4.sender = log.sender
       log4.save!
     end
 
-    logs = MessageLog.recent_project_membership_requests(log.sender, log.resource)
+    logs = MessageLog.recent_project_membership_requests(log.sender, log.subject)
     assert_equal [log], logs
   end
 
@@ -95,7 +95,7 @@ class MessageLogTest < ActiveSupport::TestCase
       MessageLog.log_project_membership_request(sender, proj, institution, 'some comments')
     end
     log = MessageLog.last
-    assert_equal proj, log.resource
+    assert_equal proj, log.subject
     assert_equal sender, log.sender
     assert_equal MessageLog::PROJECT_MEMBERSHIP_REQUEST, log.message_type
     details = JSON.parse(log.details)
@@ -114,7 +114,7 @@ class MessageLogTest < ActiveSupport::TestCase
       MessageLog.log_project_creation_request(requester, programme, project, institution)
     end
     log = MessageLog.last
-    assert_equal requester, log.resource
+    assert_equal requester, log.subject
     assert_equal requester, log.sender
     assert_equal MessageLog::PROJECT_CREATION_REQUEST, log.message_type
     details = JSON.parse(log.details)
@@ -246,14 +246,46 @@ class MessageLogTest < ActiveSupport::TestCase
     end
   end
 
+  test 'log activation email sent' do
+    person = Factory(:person)
+    log = assert_difference('MessageLog.count') do
+      MessageLog.log_activation_email(person)
+    end    
+    assert_equal MessageLog::ACTIVATION_EMAIL,log.message_type
+    assert_equal person,log.sender
+    assert_equal person,log.subject
+  end
+
+  test 'activation email logs' do
+    log1,log2,log3,lo4 = nil
+    person = Factory(:person)
+    other_person = Factory(:person)
+
+    travel_to(2.days.ago) do
+      log2=MessageLog.log_activation_email(person)
+    end
+
+    travel_to(4.days.ago) do
+      log1=MessageLog.log_activation_email(person)
+    end
+
+    travel_to(1.days.ago) do
+      log3=MessageLog.log_activation_email(person)
+      log4=MessageLog.log_activation_email(other_person)
+    end    
+    
+    assert_equal [log1,log2,log3],MessageLog.activation_email_logs(person)
+    assert_equal [log1,log2,log3],person.activation_email_logs
+
+  end
+  
 
   private
 
   def valid_log
-    resource = Factory(:project)
+    subject = Factory(:project)
     sender = Factory(:person)
-    MessageLog.new(resource: resource, sender: sender, details: 'blah blah', message_type: MessageLog::PROJECT_MEMBERSHIP_REQUEST)
-
-
+    MessageLog.new(subject: subject, sender: sender, details: 'blah blah', message_type: MessageLog::PROJECT_MEMBERSHIP_REQUEST)
   end
+
 end

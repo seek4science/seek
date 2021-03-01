@@ -6,7 +6,7 @@ class ScheduleTest < ActionDispatch::IntegrationTest
   end
 
   test 'should read schedule file' do
-    assert_equal 6, @schedule.jobs[:runner].count, "Should be 8: 3x Periodic Subscription, 1x ContentBlob Cleaner, 1x Newsfeed Refresh, 1x General ApplicationJob"
+    assert_equal 7, @schedule.jobs[:runner].count, "Should be 7: 3x Periodic Subscription, 1x ContentBlob Cleaner, 1x LifeMonitor status fetcher, 1x Newsfeed Refresh, 1x General ApplicationJob"
 
     # Periodic emails
     daily = @schedule.jobs[:runner].detect { |job| job[:task] == "PeriodicSubscriptionEmailJob.new('daily').queue_job" }
@@ -20,9 +20,14 @@ class ScheduleTest < ActionDispatch::IntegrationTest
     assert_equal [1.month], monthly[:every]
 
     # ContentBlob cleaner
-    cleaner = @schedule.jobs[:runner].detect { |job| job[:task] == "ContentBlobCleanerJob.perform_later" }
+    cleaner = @schedule.jobs[:runner].detect { |job| job[:task] == "RegularMaintenanceJob.perform_later" }
     assert cleaner
-    assert_equal [ContentBlobCleanerJob::GRACE_PERIOD], cleaner[:every]
+    assert_equal [RegularMaintenanceJob::RUN_PERIOD], cleaner[:every]
+
+    # LifeMonitor status
+    lm_status = @schedule.jobs[:runner].detect { |job| job[:task] == "LifeMonitorStatusJob.perform_later" }
+    assert lm_status
+    assert_equal [LifeMonitorStatusJob::PERIOD], lm_status[:every]
 
     # Newsfeed refresh
     news_refresh = @schedule.jobs[:runner].detect { |job| job[:task] == "NewsFeedRefreshJob.set(priority: 3).perform_later" }

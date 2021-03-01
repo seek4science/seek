@@ -1,7 +1,7 @@
 require 'rest-client'
 require 'redcarpet'
 require 'redcarpet/render_strip'
-require 'ro_crate_ruby'
+require 'ro_crate'
 
 module Seek
   module WorkflowExtractors
@@ -11,6 +11,12 @@ module Seek
       def initialize(io, main_workflow_class: nil)
         @io = io
         @main_workflow_class = main_workflow_class
+      end
+
+      def has_tests?
+        open_crate do |crate|
+          crate.test_directory.present?
+        end
       end
 
       def can_render_diagram?
@@ -66,7 +72,7 @@ module Seek
             m[:other_creators] = a.join(', ')
           end
 
-          source_url = crate['url'] || crate.main_workflow['url']
+          source_url = crate['isBasedOn'] || crate['url'] || crate.main_workflow['url']
           if source_url
             handler = ContentBlob.remote_content_handler_for(source_url)
             if handler.respond_to?(:repository_url)
@@ -96,7 +102,7 @@ module Seek
             @io.in_dir(dir)
             @opened_crate = ::ROCrate::WorkflowCrateReader.read(dir)
           else
-            @opened_crate = ::ROCrate::WorkflowCrateReader.read_zip(@io.is_a?(ContentBlob) ? @io.path : @io, target_dir: dir)
+            @opened_crate = ::ROCrate::WorkflowCrateReader.read_zip(@io.is_a?(ContentBlob) ? @io.data_io_object : @io, target_dir: dir)
           end
           yield @opened_crate
         end

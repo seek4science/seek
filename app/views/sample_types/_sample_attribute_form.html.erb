@@ -93,7 +93,7 @@
         <label class="btn btn-danger">
           Remove
           <%= check_box_tag "#{field_name_prefix}[_destroy]", '1', false,
-                            class: 'destroy-attribute', autocomplete: 'off' %>
+                            class: 'destroy-attribute', autocomplete: 'off',id:"#{field_name_prefix}-checkbox[_destroy]" %>
         </label>
       </div>
         <% else %>

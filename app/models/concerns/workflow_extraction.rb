@@ -1,4 +1,4 @@
-require 'ro_crate_ruby'
+require 'ro_crate'
 
 module WorkflowExtraction
   PREVIEW_TEMPLATE = File.read(File.join(Rails.root, 'script', 'preview.html.erb'))

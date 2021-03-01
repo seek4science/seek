@@ -136,7 +136,9 @@ def load_seek_testing_defaults!
 
       Settings.defaults[:ga4gh_trs_api_enabled] = true
 
-      Settings.defaults[:custom_metadata_enabled] = true
+      Settings.defaults[:life_monitor_url] = 'https://localhost:8000'
+      Settings.defaults[:life_monitor_client_id] = 'xyz'
+      Settings.defaults[:life_monitor_client_secret] = 'xyzabc'
     end
 end
 

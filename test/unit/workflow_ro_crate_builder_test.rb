@@ -75,4 +75,25 @@ class WorkflowROCrateBuilderTest < ActiveSupport::TestCase
     assert builder.errors.any?
     assert builder.errors[:workflow].join.include?('URL could not be accessed')
   end
+
+  test 'does not create spurious entities' do
+    params = { workflow: { data: fixture_file_upload('files/workflows/1-PreProcessing.ga') },
+               diagram: { data: fixture_file_upload('files/file_picture.png') },
+               abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
+    }
+    builder = WorkflowCrateBuilder.new(params)
+    builder.workflow_class = @galaxy
+    cb_params = builder.build
+    crate = ROCrate::WorkflowCrateReader.read_zip(cb_params[:tmp_io_object])
+
+    assert_equal 8, crate.entities.count
+    assert crate.get("ro-crate-metadata.json").is_a?(ROCrate::Metadata)
+    assert crate.get("ro-crate-preview.html").is_a?(ROCrate::Preview)
+    assert crate.get("./").is_a?(ROCrate::WorkflowCrate)
+    assert crate.get("1-PreProcessing.ga").is_a?(ROCrate::Workflow)
+    assert crate.get("file_picture.png").is_a?(ROCrate::WorkflowDiagram)
+    assert crate.get("rp2-to-rp2path-packed.cwl").is_a?(ROCrate::WorkflowDescription)
+    assert crate.get("#galaxy").is_a?(ROCrate::ContextualEntity)
+    assert crate.get("#cwl").is_a?(ROCrate::ContextualEntity)
+  end
 end
