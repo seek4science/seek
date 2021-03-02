@@ -69,7 +69,7 @@ class WorkflowTest < ActiveSupport::TestCase
     refute crate.main_workflow_cwl
     assert_equal 'Common Workflow Language', crate.main_workflow.programming_language['name']
 
-    assert_equal 'MIT', crate.main_workflow['license']
+    assert_equal Seek::License.find('MIT')&.url, crate.main_workflow['license']
 
     # authors = crate.main_workflow['creator'].map(&:name)
     # assert_includes authors, 'John Smith'
