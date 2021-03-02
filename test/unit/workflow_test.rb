@@ -57,7 +57,7 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'generates fresh RO crate for individual workflow' do
-    workflow = Factory(:cwl_workflow, license: 'https://opensource.org/licenses/MIT', other_creators: 'Jane Smith, John Smith')
+    workflow = Factory(:cwl_workflow, license: 'MIT', other_creators: 'Jane Smith, John Smith')
     creator = Factory(:person)
     workflow.creators << creator
     assert workflow.should_generate_crate?
@@ -69,7 +69,7 @@ class WorkflowTest < ActiveSupport::TestCase
     refute crate.main_workflow_cwl
     assert_equal 'Common Workflow Language', crate.main_workflow.programming_language['name']
 
-    assert_equal 'https://opensource.org/licenses/MIT', crate.main_workflow['license']
+    assert_equal 'MIT', crate.main_workflow['license']
 
     # authors = crate.main_workflow['creator'].map(&:name)
     # assert_includes authors, 'John Smith'

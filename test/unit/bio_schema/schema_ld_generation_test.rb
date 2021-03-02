@@ -314,7 +314,7 @@ test 'workflow' do
                          creators: [@person, creator2],
                          other_creators: 'Fred Bloggs, Steve Smith',
                          contributor: @person,
-                         license: 'https://opensource.org/licenses/APSL-2.0')
+                         license: 'APSL-2.0')
 
       workflow.internals = workflow.extractor.metadata[:internals]
 
@@ -330,7 +330,7 @@ test 'workflow' do
                  'name' => 'This workflow',
                  'url' => "http://localhost:3000/workflows/#{workflow.id}",
                  'keywords' => 'wibble',
-                 'license' => 'https://opensource.org/licenses/APSL-2.0',
+                 'license' => Seek::License.find('APSL-2.0')&.url,
                  'creator' =>
                     [{ '@type' => 'Person',
                        '@id' => "http://localhost:3000/people/#{@person.id}",

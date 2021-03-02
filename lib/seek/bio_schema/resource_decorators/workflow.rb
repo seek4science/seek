@@ -40,7 +40,7 @@ module Seek
         end
 
         def license
-          resource.license
+          Seek::License.find(resource.license)&.url
         end
 
         private
