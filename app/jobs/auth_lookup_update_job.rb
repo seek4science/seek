@@ -2,7 +2,7 @@ class AuthLookupUpdateJob < BatchJob
   include CommonSweepers
 
   queue_as QueueNames::AUTH_LOOKUP
-  queue_with_priority 0
+  queue_with_priority 1
 
   def timelimit
     1.hour
@@ -41,13 +41,10 @@ class AuthLookupUpdateJob < BatchJob
     item.update_lookup_table_for_all_users
   end
 
+  # spawns a new UserAuthLookupUpdateJob for the user and each type
   def update_assets_for_user(user)
-    User.transaction(requires_new: true) do
-      Seek::Util.authorized_types.each do |type|
-        type.includes(policy: :permissions).find_each do |item|
-          item.update_lookup_table(user)
-        end
-      end
+    Seek::Util.authorized_types.each do |type|
+      UserAuthLookupUpdateJob.perform_later(user, type.name)
     end
   end
 end
