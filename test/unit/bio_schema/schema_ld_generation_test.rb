@@ -84,7 +84,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'description' => df.description,
       'keywords' => 'keyword',
       'url' => "http://localhost:3000/data_files/#{df.id}",
-      'creator' => [{ '@type' => 'Person', '@id' => 'blogs', 'name' => 'Blogs' }, { '@type' => 'Person', '@id' => 'joe', 'name' => 'Joe' }],
+      'creator' => [{ '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Blogs')}", 'name' => 'Blogs' }, { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Joe')}", 'name' => 'Joe' }],
       'producer' => [{
         '@type' => %w[Project Organization],
         '@id' => "http://localhost:3000/projects/#{@project.id}",
@@ -132,7 +132,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'name' => df.title,
       'description' => df.description,
       'keywords' => 'keyword',
-      'creator' => [{ '@type' => 'Person', '@id' => 'blogs', 'name' => 'Blogs' }, { '@type' => 'Person', '@id' => 'joe', 'name' => 'Joe' }],
+      'creator' => [{ '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Blogs')}", 'name' => 'Blogs' }, { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Joe')}", 'name' => 'Joe' }],
       'url' => 'http://www.abc.com',
       'producer' => [{
         '@type' => %w[Project Organization],
@@ -339,10 +339,10 @@ test 'workflow' do
                        '@id' => "http://localhost:3000/people/#{creator2.id}",
                        'name' => creator2.name },
                      { '@type' => 'Person',
-                       '@id' => 'fred_bloggs',
+                       '@id' => "##{ROCrate::Entity.format_id('Fred Bloggs')}",
                        'name' => 'Fred Bloggs' },
                      { '@type' => 'Person',
-                       '@id' => 'steve_smith',
+                       '@id' => "##{ROCrate::Entity.format_id('Steve Smith')}",
                        'name' => 'Steve Smith' }],
                  'producer' =>
                     [{ '@type' => %w[Project Organization],
