@@ -25,7 +25,7 @@ module Ebi
 
       if term_json['has_children']
         loop do
-          Rails.logger.info("[OLS] Fetching #{url}...")
+          Rails.logger.debug("[OLS] Fetching #{url}...")
           j = JSON.parse(RestClient.get(url, accept: :json))
           child_terms += (j.dig('_embedded', 'terms') || [])
           url = j.dig('_links', 'next', 'href')
@@ -37,6 +37,7 @@ module Ebi
 
       child_terms.each do |child_json|
         next if @collected_iris.include?(child_json['iri'])
+
         terms += all_children(child_json, term_json['iri'])
       end
 
@@ -45,9 +46,15 @@ module Ebi
 
     def self.ontologies
       return @ontologies if @ontologies
-      ontology_list = Rails.cache.fetch('ebi_ontology_options') do
-        JSON.parse(RestClient.get("https://www.ebi.ac.uk/ols/api/ontologies?size=1000", accept: :json))
-      end rescue nil
+
+      ontology_list = begin
+        Rails.cache.fetch('ebi_ontology_options') do
+          JSON.parse(RestClient.get('https://www.ebi.ac.uk/ols/api/ontologies?size=1000',
+                                    accept: :json))
+        end
+      rescue StandardError
+        nil
+      end
 
       ontology_list ||= JSON.parse(File.read(Rails.root.join('config', 'ontologies', 'ebi_ontologies.json')))
 
