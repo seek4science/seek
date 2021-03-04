@@ -25,6 +25,40 @@ module WorkflowExtraction
     end
   end
 
+  def default_diagram_format
+    Rails.cache.fetch("#{cache_key_with_version}/default_diagram_format", expires_in: 3.days) do
+      extractor.default_diagram_format
+    end
+  end
+
+  def has_tests?
+    extractor.has_tests?
+  end
+
+  def can_render_diagram?
+    extractor.can_render_diagram?
+  end
+
+  def diagram_exists?(format = default_diagram_format)
+    path = diagram_path(format)
+    File.exist?(path)
+  end
+
+  def diagram(format = default_diagram_format)
+    path = diagram_path(format)
+    content_type = extractor_class.diagram_formats[format]
+    raise(WorkflowDiagram::UnsupportedFormat, "Unsupported diagram format: #{format}") if content_type.nil?
+
+    unless File.exist?(path)
+      diagram = extractor.diagram(format)
+      return nil if diagram.nil? || diagram.length <= 1
+      File.binwrite(path, diagram)
+    end
+
+    workflow = is_a_version? ? self.parent : self
+    WorkflowDiagram.new(workflow, version, path, format, content_type)
+  end
+
   def is_git_ro_crate?
     is_git_versioned? && (file_exists?('ro-crate-metadata.json') || file_exists?('ro-crate-metadata.jsonld'))
   end
