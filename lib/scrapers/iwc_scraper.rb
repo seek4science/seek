@@ -32,7 +32,7 @@ module Scrapers
 
         # Set crate metadata
         crate.main_workflow = main_wf
-        crate.name = workflow_meta['name'] if workflow_meta['name']
+        crate.name = "#{workflow_meta['name']} (#{git.describe(nil, tags: true, abbrev: 0)})"
 
         crate
       end

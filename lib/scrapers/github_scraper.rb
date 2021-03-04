@@ -12,10 +12,18 @@ module Scrapers
 
     def initialize(organization, project, contributor, main_branch: 'master', debug: false)
       @organization = organization # The GitHub organization to scrape
+      raise "Missing GitHub organization" unless @organization
       @project = project # The SEEK project who will own the resources
+      raise "Missing project" unless @project
       @contributor = contributor # The SEEK person who will submit the resources
+      raise "Missing contributor" unless @contributor
       @debug = debug # If debug is set, don't persist anything to database
       @main_branch = main_branch # The name of the main/master branch
+      if @debug
+        puts "Org: #{@organization}"
+        puts "Project: #{@project.title} (ID: #{@project.id})"
+        puts "Contributor: #{@contributor.title} (ID: #{@contributor.id}, user ID: #{@contributor.user.id})"
+      end
     end
 
     def scrape
