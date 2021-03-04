@@ -12,12 +12,17 @@ module Seek
                         producer: :producer,
                         inputs: :input,
                         outputs: :output,
-                        license: :license
+                        license: :license,
+                        conformsTo: "dct:conformsTo"
 
         def contributors
           [contributor]
         end
 
+        def conformsTo
+          'https://bioschemas.org/profiles/ComputationalWorkflow/1.0-RELEASE/'
+        end
+        
         def image
           return unless resource.diagram_exists?
           diagram_workflow_url(resource, version: resource.version, host: Seek::Config.site_base_host)
@@ -55,7 +60,8 @@ module Seek
             {
               "@type": 'FormalParameter',
               "@id": "##{wf_name}-#{group_name}-#{property.id}",
-              name: property.name || property.id
+              name: property.name || property.id,
+              "dct:conformsTo": 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/'
             }
           end
         end

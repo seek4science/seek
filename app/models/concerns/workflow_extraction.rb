@@ -109,6 +109,9 @@ module WorkflowExtraction
       '@vocab' => 'https://somewhere.com/'
     }
     workflow_struct['@context'] = context
+    crate['name'] = "Research Object Crate for #{workflow_struct['name']}"
+    crate['description'] = workflow_struct['description']
+
     workflow_struct.except!('encodingFormat')
 
     flattened = JSON::LD::API.flatten(workflow_struct, context)
