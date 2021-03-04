@@ -100,9 +100,10 @@ module WorkflowExtraction
     crate.preview.template = PREVIEW_TEMPLATE
     # brute force deletion as I cannot track down where it comes from
     crate.contextual_entities.delete_if { |c| c['@id'] == '#ro-crate-preview.html' }
+    crate
   end
 
-  def merge_entities (crate, workflow)
+  def merge_entities(crate, workflow)
     workflow_struct = Seek::BioSchema::Serializer.new(workflow).json_representation
 
     context = {
