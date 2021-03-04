@@ -10,8 +10,13 @@ module Seek
                         end_date: :endDate,
                         event_type: :eventType,
                         location: :location,
-                        host_institution: :hostInstitution
+                        host_institution: :hostInstitution,
+                        conformsTo: "dct:conformsTo"
 
+        def conformsTo
+          'https://bioschemas.org/profiles/Event/0.2-DRAFT-2019_06_14/'
+        end
+        
         def contributors
           [contributor]
         end

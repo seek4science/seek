@@ -9,8 +9,14 @@ module Seek
                         last_name: :familyName,
                         image: :image,
                         member_of: :memberOf,
-                        orcid: :orcid
+                        orcid: :orcid,
+                        conformsTo: "dct:conformsTo"
 
+
+        def conformsTo
+          'https://bioschemas.org/profiles/Person/0.2-DRAFT-2019_07_19/'
+        end
+        
         def url
           web_page.blank? ? identifier : web_page
         end
