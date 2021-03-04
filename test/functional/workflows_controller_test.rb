@@ -416,7 +416,7 @@ class WorkflowsControllerTest < ActionController::TestCase
       post :create_ro_crate, params: {
           ro_crate: {
               workflow: { data: fixture_file_upload('files/checksums.txt') },
-              #             diagram: { data: fixture_file_upload('files/file_picture.png') },
+                          diagram: { data: fixture_file_upload('files/file_picture.png') },
               abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
           },
           workflow_class_id: cwl.id
@@ -573,7 +573,7 @@ class WorkflowsControllerTest < ActionController::TestCase
       post :create_ro_crate, params: {
           ro_crate: {
               workflow: { data: fixture_file_upload('files/file with spaces in name.txt') },
-#              diagram: { data: fixture_file_upload('files/file_picture.png') },
+              diagram: { data: fixture_file_upload('files/file_picture.png') },
               abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
           },
           workflow_class_id: cwl.id
@@ -581,7 +581,8 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
     assert_response :success
     assert wf = assigns(:workflow)
-    crate_workflow = wf.ro_crate.main_workflow
+    workflow_crate = ROCrate::WorkflowCrateReader.read_zip(wf.content_blob.path)
+    crate_workflow = workflow_crate.main_workflow
     assert crate_workflow
     assert_equal 'file%20with%20spaces%20in%20name.txt', crate_workflow.id
   end
@@ -636,16 +637,16 @@ class WorkflowsControllerTest < ActionController::TestCase
       post :create_ro_crate, params: {
           ro_crate: {
               workflow: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') },
-              #             diagram: { data: fixture_file_upload('files/file_picture.png') },
+                          diagram: { data: fixture_file_upload('files/file_picture.png') },
               abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
           },
           workflow_class_id: cwl.id
       }
     end
     assert_response :success
-    assert wf = assigns(:workflow)
-    crate_workflow = wf.ro_crate.main_workflow
-    crate_cwl = wf.ro_crate.main_workflow_cwl
+    workflow_crate = ROCrate::WorkflowCrateReader.read_zip(assigns(:workflow).content_blob.path)
+    crate_workflow = workflow_crate.main_workflow
+    crate_cwl = workflow_crate.main_workflow_cwl
     assert_not_equal crate_workflow.id, crate_cwl.id
   end
 
@@ -757,7 +758,7 @@ class WorkflowsControllerTest < ActionController::TestCase
       post :create_ro_crate, params: {
           ro_crate: {
               workflow: { data_url: 'https://github.com/bob/workflow/blob/master/workflow.txt' },
-              #             diagram: { data_url: 'https://github.com/bob/workflow/blob/master/diagram.png' },
+                          diagram: { data_url: 'https://github.com/bob/workflow/blob/master/diagram.png' },
               abstract_cwl: { data_url: 'https://github.com/bob/workflow/blob/master/abstract.cwl' }
           },
           workflow_class_id: cwl.id
@@ -765,7 +766,8 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
     assert_response :success
     assert wf = assigns(:workflow)
-    crate_workflow = wf.ro_crate.main_workflow
+    workflow_crate = ROCrate::WorkflowCrateReader.read_zip(wf.content_blob.path)
+    crate_workflow = workflow_crate.main_workflow
     assert crate_workflow
     assert_equal 'workflow.txt', crate_workflow.id
   end
