@@ -117,6 +117,7 @@ CVTerms = {
         $j('div#fetch-error-message').hide();
         $j('#fetch-terms-spinner').spinner('add');
         $j('input#submit-button').prop('disabled', true);
+        $j('input#fetch-ontology-terms-submit').prop('disabled', true);
 
         var ontology_id = $j('select#sample_controlled_vocab_source_ontology').val();
         var root_uri = $j('#sample_controlled_vocab_ols_root_term_uri').val();
@@ -139,6 +140,7 @@ CVTerms = {
                 $j('#fetch-terms-spinner').spinner('remove');
                 $j('div#controlled-vocab-terms').show();
                 $j('input#submit-button').prop('disabled', false);
+                $j('input#fetch-ontology-terms-submit').prop('disabled', false);
                 //scroll to end
                 $j('#controlled-vocab-terms-fixed').scrollTop($j('#controlled-vocab-terms-fixed').prop("scrollHeight"));
             }
