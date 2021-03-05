@@ -3,15 +3,15 @@ class WorkflowDiagram
 
   class UnsupportedFormat < RuntimeError; end
 
-  attr_reader :git_version, :path
+  attr_reader :workflow, :path
 
-  def initialize(git_version, path)
-    @git_version = git_version
+  def initialize(workflow, path)
+    @workflow = workflow
     @path = path
   end
 
   def filename
-    "workflow-diagram-#{@git_version.resource_id}-#{@git_version.version}.#{extension}"
+    "#{workflow.cache_key_fragment}-diagram.#{extension}"
   end
 
   def extension

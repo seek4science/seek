@@ -17,6 +17,7 @@ namespace :seek do
     fix_negative_programme_role_mask
     db:seed:sample_attribute_types
     delete_users_with_invalid_person
+    migrate_workflows_to_ro_crates
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change

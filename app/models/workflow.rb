@@ -28,7 +28,6 @@ class Workflow < ApplicationRecord
 
   git_versioning do
     include WorkflowExtraction
-    include WorkflowProcessing
 
     def workflow_class
       WorkflowClass.find_by_id(workflow_class_id)

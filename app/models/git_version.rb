@@ -30,6 +30,10 @@ class GitVersion < ApplicationRecord
     true
   end
 
+  def is_git_versioned?
+    true
+  end
+
   def freeze_version
     self.resource_attributes = resource.attributes
     self.mutable = false
@@ -52,10 +56,6 @@ class GitVersion < ApplicationRecord
         index.add(path: path, oid: oid, mode: 0100644) # Add it to the index
       end
     end
-  end
-
-  def path_for_key(annotation_key)
-    persisted? ? git_annotations.where(key: annotation_key.to_s).first&.path : git_annotations.detect { |ga| ga.key.to_s == annotation_key.to_s }&.path
   end
 
   def commit
@@ -95,6 +95,24 @@ class GitVersion < ApplicationRecord
 
   def git_version
     self
+  end
+
+  def cache_key_fragment
+    "#{resource_type.underscore}-#{resource_id}-#{commit}"
+  end
+
+  def path_for_key(key)
+    find_git_annotation(key)&.path
+  end
+
+  def find_git_annotation(key)
+    git_annotations.where(key: key).first ||
+        git_annotations.detect { |a| a.key.to_s == key.to_s }
+  end
+
+  def find_git_annotations(key)
+    git_annotations.where(key: key) ||
+        git_annotations.select { |a| a.key.to_s == key.to_s }
   end
 
   private

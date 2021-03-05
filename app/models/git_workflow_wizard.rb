@@ -84,11 +84,11 @@ class GitWorkflowWizard
     end
 
     workflow.workflow_class = workflow_class
-    annotations = {}
-    annotations['1'] = { key: 'main_workflow', path: main_workflow_path } unless main_workflow_path.blank?
-    annotations['2'] = { key: 'diagram', path: diagram_path } unless diagram_path.blank?
-    annotations['3'] = { key: 'abstract_cwl', path: abstract_cwl_path } unless abstract_cwl_path.blank?
-    workflow.git_version_attributes = workflow.git_version_attributes.merge(git_annotations_attributes: annotations)
+    annotations_attributes = {}
+    annotations_attributes['1'] = { key: 'main_workflow', path: main_workflow_path } unless main_workflow_path.blank?
+    annotations_attributes['2'] = { key: 'diagram', path: diagram_path } unless diagram_path.blank?
+    annotations_attributes['3'] = { key: 'abstract_cwl', path: abstract_cwl_path } unless abstract_cwl_path.blank?
+    workflow.git_version.git_annotations_attributes = annotations_attributes
 
     extractor = workflow.extractor
     workflow.provide_metadata(extractor.metadata)

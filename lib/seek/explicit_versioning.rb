@@ -73,6 +73,10 @@ module Seek
             true
           end
 
+          def is_git_versioned?
+            false
+          end
+
           def visibility= key
             super(Seek::ExplicitVersioning::VISIBILITY_INV[key.to_sym] || Seek::ExplicitVersioning::VISIBILITY_INV[self.class.default_visibility])
           end
@@ -102,6 +106,10 @@ module Seek
 
           def set_default_visibility
             self.visibility ||= self.class.default_visibility
+          end
+
+          def cache_key_fragment
+            "#{parent.class.underscore}-#{parent.id}-#{version}"
           end
         end
 
