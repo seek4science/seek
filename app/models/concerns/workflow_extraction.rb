@@ -89,20 +89,13 @@ module WorkflowExtraction
     crate['isBasedOn'] = source_link_url if source_link_url && !crate['isBasedOn']
     crate['sdDatePublished'] = Time.now unless crate['sdDatePublished']
     crate['creativeWorkStatus'] = I18n.t("maturity_level.#{maturity_level}") if maturity_level
-#    authors = creators.map { |person| crate.add_person(nil, person.ro_crate_metadata) }
-#    others = other_creators&.split(',')&.collect(&:strip)&.compact || []
-#    authors += others.map.with_index { |name, i| crate.add_person("creator-#{i + 1}", name: name) }
-#    crate.author = authors
-#    crate['provider'] = projects.map { |project| crate.add_organization(nil, project.ro_crate_metadata).reference }
-#    crate.license = license
-#    crate['sdPublisher'] = crate.add_person(nil, contributor.ro_crate_metadata).reference
 
-    crate.preview.template = PREVIEW_TEMPLATE
     # brute force deletion as I cannot track down where it comes from
     crate.contextual_entities.delete_if { |c| c['@id'] == '#ro-crate-preview.html' }
+    crate
   end
 
-  def merge_entities (crate, workflow)
+  def merge_entities(crate, workflow)
     workflow_struct = Seek::BioSchema::Serializer.new(workflow).json_representation
 
     context = {

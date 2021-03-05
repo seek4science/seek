@@ -3,6 +3,11 @@ module Seek
     module ResourceDecorators
       # Decorator that provides extensions for a Workflow
       class Workflow < CreativeWork
+
+        WORKFLOW_PROFILE = 'https://bioschemas.org/profiles/ComputationalWorkflow/1.0-RELEASE/'
+
+        FORMALPARAMETER_PROFILE = 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/'
+        
         associated_items sd_publisher: 'contributors'
 
         schema_mappings sd_publisher: :sdPublisher,
@@ -20,7 +25,7 @@ module Seek
         end
 
         def conformsTo
-          'https://bioschemas.org/profiles/ComputationalWorkflow/1.0-RELEASE/'
+          WORKFLOW_PROFILE
         end
         
         def image
@@ -61,7 +66,7 @@ module Seek
               "@type": 'FormalParameter',
               "@id": "##{wf_name}-#{group_name}-#{property.id}",
               name: property.name || property.id,
-              "dct:conformsTo": 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/'
+              "dct:conformsTo": FORMALPARAMETER_PROFILE
             }
           end
         end
