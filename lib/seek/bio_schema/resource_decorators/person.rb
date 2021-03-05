@@ -14,7 +14,6 @@ module Seek
                         orcid: :orcid,
                         conformsTo: "dct:conformsTo"
 
-
         def conformsTo
           PERSON_PROFILE
         end
