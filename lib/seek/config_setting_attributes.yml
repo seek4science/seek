@@ -199,6 +199,7 @@ publications_enabled:
 samples_enabled:
 workflows_enabled:
 collections_enabled:
+file_templates_enabled:
 # Omniauth
 omniauth_enabled:
 omniauth_user_create:

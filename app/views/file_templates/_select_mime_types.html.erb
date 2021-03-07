@@ -1,0 +1,17 @@
+<%   resource_type = resource.class.name.underscore
+     resource_type_text = text_for_resource(resource)
+     label ||= 'Mime types' %>
+
+<%= folding_panel(label, false,
+                  :help_text => "Here you can specify the mime types for this #{text_for_resource(resource)}.") do %>
+    <div class="form-group" id="mime-type-section">
+      <label><%= label %></label>
+
+      <div>
+      <%= select_tag "#{resource_type}[mime_types][]",
+	  options_for_select(MIME::Types.collect{ |m| [m.simplified, m.simplified]},	  :selected => resource.mime_types),
+      :multiple => true -%>
+      </div>
+    </div>
+<% end %>
+

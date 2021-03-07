@@ -2,6 +2,8 @@ class FileTemplatesController < ApplicationController
 
   include Seek::IndexPager
 
+  include Seek::AnnotationCommon
+
   include Seek::AssetsCommon
 
 #  before_action :file_templates_enabled?
@@ -19,6 +21,9 @@ class FileTemplatesController < ApplicationController
 
   def create_version
     if handle_upload_data(true)
+
+      set_formats(@file_template, params)
+      
       comments = params[:revision_comments]
 
       respond_to do |format|
@@ -37,9 +42,11 @@ class FileTemplatesController < ApplicationController
   end
 
   def update
-    update_annotations(params[:tag_list], @file_template) if params.key?(:tag_list)
+
     update_sharing_policies @file_template
     update_relationships(@file_template,params)
+
+    set_formats(@file_template, params)
 
     respond_to do |format|
       if @file_template.update_attributes(file_template_params)
@@ -59,8 +66,21 @@ class FileTemplatesController < ApplicationController
     params.require(:file_template).permit(:title, :description, { project_ids: [] }, :license, :other_creators,
                                 { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                 { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
+                                { mime_types: [] },
+                                { format_types: [] },
                                 { publication_ids: [] }, { event_ids: [] },
                                      discussion_links_attributes:[:id, :url, :label, :_destroy])
+  end
+
+  def set_formats(file_template, params)
+   mime_type_changed = file_template.add_annotations(params[:mime_type_list], 'mime_type') if params[:mime_type_list]
+   format_type_changed = file_template.add_annotations(params[:format_type_list], 'format_type') if params[:format_type_list]
+    if immediately_clear_tag_cloud?
+      expire_annotation_fragments('mime_type') if mime_type_changed
+      expire_annotation_fragments('format_type') if format_type_changed
+    else
+      RebuildTagCloudsJob.new.queue_job
+    end
   end
 
   alias_method :asset_params, :file_template_params

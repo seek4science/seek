@@ -34,6 +34,10 @@
   <% end %>
 <% end %>
 
+<% if resource.respond_to?(:mime_types) %>
+  <%= render :partial => "assets/mime_types_box", :locals => { :resource => resource, :versioned_resource=> versioned_resource } -%>
+<% end %>
+
 <% if resource.respond_to?(:license) %>
   <%= render :partial => "assets/license_box", :locals => { :resource => resource, :versioned_resource=> versioned_resource } -%>
 <% end %>

@@ -1,0 +1,73 @@
+<%   resource_type = resource.class.name.underscore
+     resource_type_text = text_for_resource(resource)
+     label ||= 'Format types' %>
+
+<%= folding_panel(label, false,
+                  :help_text => "Here you can specify the format types for this #{text_for_resource(resource)}.") do %>
+    <div class="form-group" id="format-type-section">
+      <label><%= label %></label>
+
+      <div>
+
+    <div id='new-link-form' style="display:none;">
+      <div class='link-row row'>
+        <div class="col-xs-6">
+          <%=  text_field_tag("#{resource_type}[format_types][]",'',class: 'form-control',placeholder:'URL') %>
+        </div>
+        <div class="col">
+          <label class="btn btn-danger">
+            Remove
+            <%= check_box_tag "", '1', false,
+                              class: 'destroy-link', autocomplete: 'off', style:'display:none;' %>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div id='format_type-links'>
+      <%= fields_for(resource) do |f| %>
+        <%= f.fields_for :format_types do |ff| %>
+          <div class='link-row row'>
+            <span class="col-xs-6">
+              <%= ff.text_field "#{resource_type}[format_types][]", class:'form-control', placeholder:'URL' %>
+            </span>
+            <span class="col">
+              <label class="btn btn-danger">
+                Remove
+                <%= ff.check_box :_destroy, class: 'destroy-link', autocomplete: 'off',style:'display:none;' %>
+              </label>
+            </span>
+          </div>
+        <% end %>
+      <% end %>
+      <div id='new-link-row'></div>
+    </div>
+
+    <%= button_link_to('Add new format type', 'add', '#', :id => 'add-format_type-link') %>
+
+<% end %>
+
+<script type="application/javascript">
+
+    $j(document).ready(function () {
+        $j('#add-format_type-link').click(function () {
+            var newRow = $j('#new-link-form').clone().html();
+            var currentRows = $j('.link-row').length - 2;
+            newRow = newRow.replace(/INDEX/g, currentRows+1);
+            $j('#format_type-links #new-link-row').before($j(newRow));
+            return false;
+        });
+
+        $j('form').submit(function () {
+          $j('#new-link-form').remove();
+          return;
+        });
+
+        $j('#format_type-links').on('change', '.destroy-link', function() {
+            $j(this).closest('.link-row').fadeOut(100);
+        });
+
+
+    });
+
+</script>

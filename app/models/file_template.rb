@@ -1,5 +1,9 @@
 class FileTemplate < ApplicationRecord
   
+  acts_as_annotation_source
+
+  include Seek::Annotatable
+
   include Seek::Rdf::RdfGeneration
   include Seek::BioSchema::Support
 
@@ -18,7 +22,7 @@ class FileTemplate < ApplicationRecord
     acts_as_favouritable
 
     has_one :content_blob, -> (r) { where('content_blobs.asset_version = ? AND content_blobs.asset_type = ?', r.version, r.parent.class.name) },
-            primary_key: :ft_id, foreign_key: :asset_id
+            primary_key: :file_template_id, foreign_key: :asset_id
   end
 
   # Returns the columns to be shown on the table view for the resource
@@ -28,6 +32,22 @@ class FileTemplate < ApplicationRecord
   def columns_allowed
     super + ['version','doi','license','last_used_at','other_creators','deleted_contributor']  
   end
+
+  has_annotation_type :mime_type
+  has_many :mime_types_as_text, through: :mime_type_annotations, source: :value, source_type: 'TextValue'
+  has_filter mime_type: Seek::Filtering::Filter.new(
+      value_field: 'text_values.id',
+      label_field: 'text_values.text',
+      joins: [:mime_types_as_text]
+  )
+
+  has_annotation_type :format_type
+  has_many :format_types_as_text, through: :format_type_annotations, source: :value, source_type: 'TextValue'
+  has_filter format_type: Seek::Filtering::Filter.new(
+      value_field: 'text_values.id',
+      label_field: 'text_values.text',
+      joins: [:format_types_as_text]
+  )
 
   def use_mime_type_for_avatar?
     true

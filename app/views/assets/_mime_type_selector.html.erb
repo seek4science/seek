@@ -1,0 +1,77 @@
+<%
+
+  resource_type = resource.class.name.underscore
+  resource_type_text = text_for_resource(resource)
+  collapsed = resource.mime_types.empty?
+  help_text = "You can add a MIME type for this #{resource_type_text}"
+%>
+
+<%= folding_panel('MIME Types', collapsed, :body_options => {:id => 'mime_types'},
+                  :help_text => help_text) do %>
+
+    <p class="help-block">
+      You can add one or more MIME types for this <%= resource_type_text %>:
+    </p>
+
+    <div id='new-link-form' style="display:none;">
+      <div class='link-row row'>
+        <div class="col-xs-6">
+	  <%= select_tag "#{resource_type}[mime_types][INDEX]", options_for_select(MIME::Types.collect{ |m| [m.simplified, m.simplified]}) -%>
+        </div>
+        <div class="col">
+          <label class="btn btn-danger">
+            Remove
+            <%= check_box_tag "#{resource_type}[mime_types][INDEX][_destroy]", '1', false,
+                              class: 'destroy-link', autocomplete: 'off', style:'display:none;' %>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div id='mime-types'>
+      <%= fields_for(resource) do |f| %>
+        <%= f.fields_for :mime_types do |ff| %>
+          <div class='link-row row'>
+            <span class="col-xs-6">
+              <%= ff.text_field :url, class:'form-control', placeholder:'MIME type' %>
+            </span>
+            <span class="col">
+              <label class="btn btn-danger">
+                Remove
+                <%= ff.check_box :_destroy, class: 'destroy-link', autocomplete: 'off',style:'display:none;' %>
+              </label>
+            </span>
+          </div>
+        <% end %>
+      <% end %>
+      <div id='new-link-row'></div>
+    </div>
+
+    <%= button_link_to('Add MIME type', 'add', '#', :id => 'add-mime-type') %>
+
+<% end %>
+
+<script type="application/javascript">
+
+    $j(document).ready(function () {
+        $j('#add-mime-type').click(function () {
+            var newRow = $j('#new-link-form').clone().html();
+            var currentRows = $j('.link-row').length - 2;
+            newRow = newRow.replace(/INDEX/g, currentRows+1);
+            $j('#mime-types #new-link-row').before($j(newRow));
+            return false;
+        });
+
+        $j('form').submit(function () {
+          $j('#new-link-form').remove();
+          return;
+        });
+
+        $j('#mime-types').on('change', '.destroy-link', function() {
+            $j(this).closest('.link-row').fadeOut(100);
+        });
+
+
+    });
+
+</script>

@@ -15,15 +15,15 @@
         <%= f.text_area :description, :class=>"form-control rich-text-edit", :rows => 5 -%>
       </div>
 
+        <%= render :partial => "select_mime_types", :locals => {:resource => (@file_template ? @file_template : FileTemplate.new) } -%>
+
+        <%= render :partial => "select_format_types", :locals => {:resource => (@file_template ? @file_template : FileTemplate.new) } -%>
+
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @file_template } %>
 
       <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @file_template} -%>
 
       <%= render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f}-%>
-
-      <%= render :partial => "assays/associate_assays", :locals=>{:resource => @file_template} -%>
-
-      <%= fancy_multiselect @file_template, :events, { other_projects_checkbox: true, sort_by: :start_date } if Seek::Config.events_enabled %>
 
       <%= form_submit_buttons(@file_template) %>
 
