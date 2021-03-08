@@ -77,11 +77,11 @@ module ApplicationHelper
   def persistent_resource_id(resource)
     # FIXME: this contains some duplication of Seek::Rdf::RdfGeneration#rdf_resource - however not every model includes that Module at this time.
     # ... its also a bit messy handling the version
-    url = if resource.class.name.include?('::Version')
-            URI.join(Seek::Config.site_base_host + '/', "#{resource.parent.class.name.tableize}/", "#{resource.parent.id}?version=#{resource.version}").to_s
+    url = if resource.is_a_version?
+            polymorphic_url(resource.parent, version: resource.version, host: Seek::Config.site_base_host)
           else
-            URI.join(Seek::Config.site_base_host + '/', "#{resource.class.name.tableize}/", resource.id.to_s).to_s
-    end
+            polymorphic_url(resource, host: Seek::Config.site_base_host)
+          end
 
     content_tag :p, class: :id do
       content_tag(:strong) do

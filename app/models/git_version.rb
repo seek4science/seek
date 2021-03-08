@@ -8,11 +8,14 @@ class GitVersion < ApplicationRecord
   belongs_to :git_repository
   has_many :git_annotations
   before_validation :set_default_visibility, on: :create
+  before_create :set_version
   before_save :set_commit, unless: -> { ref.blank? }
 
   accepts_nested_attributes_for :git_annotations
 
   include GitSupport
+
+  alias_method :parent, :resource # ExplicitVersioning compatibility
 
   def resource_attributes
     JSON.parse(super || '{}')
@@ -116,6 +119,10 @@ class GitVersion < ApplicationRecord
   end
 
   private
+
+  def set_version
+    self.version = (resource.git_versions.maximum(:version) || 0) + 1
+  end
 
   def set_commit
     self.commit ||= get_commit

@@ -224,10 +224,6 @@ module Seek
 
       def empty_callback() end #:nodoc:
 
-      def is_a_version?
-        false
-      end
-
       def visible_versions(user = User.current_user)
         scopes = [ExplicitVersioning::VISIBILITY_INV[:public]]
         scopes << ExplicitVersioning::VISIBILITY_INV[:registered_users] if user&.person&.member?
