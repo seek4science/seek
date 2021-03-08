@@ -5,15 +5,15 @@
     <%= item_description @publication.abstract, :label => "Abstract", :none_text => "No abstract specified" %>
 
     <div class="row">
-      <#%= item_description @display_publication.description %>
-
+      <% if Seek::Config.allow_publications_fulltext %>
       <div class="row">
         <div class="col-md-6">
           <%= persistent_resource_id(@publication) %>
-          <#%= debug @display_publication.content_blob.show_as_external_link %>
+
           <%= render :partial => 'assets/fileinfo',:object=>@publication.content_blob -%>
         </div>
       </div>
+      <% end %>
       <% if @publication.content_blob %>
         <%= rendered_asset_view(@publication) %>
       <%end %>

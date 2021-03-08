@@ -229,6 +229,18 @@ module AssetsHelper
     image_tag_for_key('download', polymorphic_path([fileinfo.asset, fileinfo], action: :download, code: params[:code]), 'Download', { title: 'Download this file' }, '')
   end
 
+  def mini_file_delete_icon(fileinfo, user)
+    item_name = text_for_resource fileinfo
+    if fileinfo.can_delete?(user)         # polymorphic_path(resource, action: :download, code: params[:code])
+      html = content_tag(:div) { image_tag_for_key('destroy', polymorphic_path([fileinfo.asset, fileinfo], method: :delete, code: params[:code]), "Delete #{item_name}", { data: { confirm: 'It cannot be undone. Are you sure?' }, method: :delete }, "Delete PDF (cannot be reverted)") }
+      return html.html_safe
+    elsif fileinfo.can_manage?(user)
+      explanation = unable_to_delete_text fileinfo
+      html = "<li><span class='disabled_icon disabled' onclick='javascript:alert(\"#{explanation}\")' data-tooltip='#{tooltip(explanation)}' >" + image('destroy', alt: 'Delete', class: 'disabled') + " Delete PDF (cannot be reverted) </span></li>"
+      return html.html_safe
+    end
+  end
+
   def add_to_dropdown(item)
     return unless Seek::AddButtons.add_dropdown_for(item)
     tooltip = "This option allows you to add a new item, whilst associating it with this #{text_for_resource(item)}"

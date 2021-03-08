@@ -15,6 +15,7 @@ SEEK::Application.routes.draw do
         get :view_content
         get :get_pdf
         get :download
+        delete :destroy
       end
     end
   end
@@ -458,7 +459,7 @@ SEEK::Application.routes.draw do
       post :publish
       post :request_contact
       post :update_annotations_ajax
-
+      post :new_version
       post :edit_version_comment
       delete :destroy_version
       get :manage
@@ -639,10 +640,12 @@ SEEK::Application.routes.draw do
     member do
       get :manage
       get :download
+      get :upload_fulltext
       post :update_annotations_ajax
       post :disassociate_authors
       post :update_metadata
       post :request_contact
+      post :uploadPdf
       #post :new_version
       #post :edit_version_comment
       #delete :destroy_version

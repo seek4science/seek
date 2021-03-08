@@ -28,6 +28,36 @@ class PublicationSerializer < PCSSerializer
       end
   end
 
+  attribute :content_blobs do
+    if Seek::Config.allow_publications_fulltext
+      requested_version = object # no version for full text pdf
+
+      if requested_version.respond_to?(:content_blobs)
+        blobs = requested_version.content_blobs
+      elsif requested_version.respond_to?(:content_blob)
+        blobs = [requested_version.content_blob].compact
+      else
+        blobs = []
+      end
+
+      blobs.map { |cb| convert_content_blob_to_json(cb) }
+    end
+  end
+
+  def convert_content_blob_to_json(cb)
+    path = polymorphic_path([cb.asset, cb])
+    {
+      original_filename: cb.original_filename,
+      url: cb.url,
+      md5sum: cb.md5sum,
+      sha1sum: cb.sha1sum,
+      content_type: cb.content_type,
+      link: "#{base_url}#{path}/download",
+      size: cb.file_size
+    }
+  end
+
+
   has_many :people
   has_many :projects
   has_many :investigations

@@ -27,7 +27,7 @@ class PublicationsController < ApplicationController
 =end
 
   before_action :find_assets, only: [:index]
-  before_action :find_and_authorize_requested_item, only: %i[show edit manage update destroy download]
+  before_action :find_and_authorize_requested_item, only: %i[show edit manage update destroy download upload_fulltext]
   before_action :suggest_authors, only: [:manage]
   before_action :find_display_asset, :only=>[:show, :download] # :_resource_list_item,
 
@@ -95,6 +95,10 @@ class PublicationsController < ApplicationController
   # GET /publications/1/manage
   def manage; end
 
+  # GET /publications/1/upload_fulltext
+  def upload_fulltext;
+    @publication = Publication.find(params[:id])
+  end
 
   # POST /publications
   # POST /publications.xml
@@ -127,8 +131,7 @@ class PublicationsController < ApplicationController
   # PUT /publications/1.xml
   def update
     update_annotations(params[:tag_list], @publication) if params.key?(:tag_list)
-
-    upload_blob
+    update_sharing_policies @publication
 
     if @publication.update_attributes(publication_params)
       respond_to do |format|
@@ -139,6 +142,28 @@ class PublicationsController < ApplicationController
       end
     else
       respond_to do |format|
+        format.html { render action: 'edit' }
+        format.xml  { render xml: @publication.errors, status: :unprocessable_entity }
+        format.json { render json: @publication.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  def uploadPdf
+    @publication = Publication.find(params[:id])
+
+    update_sharing_policies @publication
+
+    if handle_upload_data && @publication.content_blob.save # should be true if nothing needed to be uploaded
+      respond_to do |format|
+        flash[:notice] = 'Pdf was successfully uploaded.'
+        format.html { redirect_to(@publication) }
+        format.xml  { head :ok }
+        format.json { render json: @publication, status: :ok, include: [params[:include]]}
+      end
+    else
+      respond_to do |format|
+        flash[:error] = 'The document could not be uploaded.'
         format.html { render action: 'edit' }
         format.xml  { render xml: @publication.errors, status: :unprocessable_entity }
         format.json { render json: @publication.errors, status: :unprocessable_entity }
@@ -420,6 +445,7 @@ class PublicationsController < ApplicationController
     end
 
     upload_blob
+    update_sharing_policies @publication
 
     if @publication.save
       create_or_update_associations assay_ids, 'Assay', 'edit'
@@ -443,14 +469,14 @@ class PublicationsController < ApplicationController
   end
 
   def upload_blob
-    @publication = setup_new_asset
+    @publication_asset = setup_new_asset
     #respond_to do |format|
-      if handle_upload_data && @publication.content_blob.save
-        session[:uploaded_content_blob_id] = @publication.content_blob.id
-        #format.html {}
+      if handle_upload_data && @publication_asset.content_blob.save
+        #session[:uploaded_content_blob_id] = @publication.content_blob.id
+        return true
       else
-        session.delete(:uploaded_content_blob_id)
-        #format.html { render action: :new }
+        #session.delete(:uploaded_content_blob_id)
+        return false
       end
   end
 
@@ -467,6 +493,7 @@ class PublicationsController < ApplicationController
     item
   end
 
+  #### Unused ???
   def respond_for_new
     respond_to do |format|
       if User.logged_in_and_member?
@@ -495,6 +522,8 @@ class PublicationsController < ApplicationController
 
     item
   end
+
+  #### End unused
 
   # create a publication from a reference file, at the moment supports only bibtex
   # only sets the @publication and redirects to the create_publication with content from the bibtex file

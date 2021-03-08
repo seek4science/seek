@@ -140,6 +140,7 @@ class ApplicationController < ActionController::Base
   # returns the model asset assigned to the standard object for that controller, e.g. @model for models_controller
   def determine_asset_from_controller
     name = controller_name.singularize
+    warn("Controller is "+name)
     eval("@#{name}")
   end
 
@@ -247,7 +248,7 @@ class ApplicationController < ActionController::Base
       respond_to do |format|
         format.html do
           case privilege
-          when :publish, :manage, :edit, :download, :delete
+          when :publish, :manage, :edit, :download, :delete, :upload_fulltext
             if current_user.nil?
               flash[:error] = "You are not authorized to #{privilege} this #{name.humanize}, you may need to login first."
             else

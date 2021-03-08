@@ -23,7 +23,9 @@
   <% if item.can_manage? -%>
     <li><%= image_tag_for_key('manage', manage_publication_path(item), nil, nil, 'Manage Publication') -%></li>
   <% end -%>
-
+  <% if Seek::Config.allow_publications_fulltext %>
+  <li><%= image_tag_for_key('manage', upload_fulltext_publication_path(item), nil, nil, 'Upload full text PDF') -%></li>
+  <% end %>
   <% if item.can_delete? -%>
     <li><%= image_tag_for_key('destroy', publication_path(item), nil,
                               { data: { confirm: 'This will unregister this publication with SEEK. Are you sure wish to do this?' }, :method => :delete }, 'Unregister') -%></li>

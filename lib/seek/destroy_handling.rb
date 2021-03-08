@@ -3,6 +3,8 @@ module Seek
     # common controller methods for destroy
     def destroy
       asset = determine_asset_from_controller
+      warn("Asset is "+asset)
+      warn("Controller is "+asset.class.name)
       respond_to do |format|
         respond_to_destruction(asset, format)
       end
@@ -11,6 +13,7 @@ module Seek
     def respond_to_destruction(asset, format)
       can_delete = !asset.respond_to?(:can_delete?) || asset.can_delete?
       asset_type_text = t(asset.class.name.underscore)
+      warn("The current asset is "+asset.class.name)
       if can_delete && asset.destroy
         flash[:notice] = "#{asset_type_text} was successfully deleted."
         format.html { redirect_to(redirect_location_on_success) }

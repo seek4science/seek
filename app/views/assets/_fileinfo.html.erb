@@ -24,6 +24,8 @@
           <% if fileinfo.asset.can_download? %>
           <%= render :partial => "assets/view_content", :locals => { :content_blob => fileinfo, :icon_view => true } -%>
             <%= mini_file_download_icon(fileinfo) %>
+            <!-- conditional here! -->
+            <%= mini_file_delete_icon(fileinfo,current_user) %>
         <% end %>
       </span>
       </p>

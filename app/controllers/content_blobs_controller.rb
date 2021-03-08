@@ -128,6 +128,16 @@ class ContentBlobsController < ApplicationController
     end
   end
 
+  def destroy
+    respond_to do |format|
+      warn("Deleting Content_BLOB")
+      @content_blob = ContentBlob.find(params[:id])
+      @asset = @content_blob.asset
+      flash[:error]="Unable to delete this file" if !@content_blob.destroy
+      format.html { redirect_to @asset }
+    end
+  end
+
   private
 
   def pdf_url
@@ -241,8 +251,8 @@ class ContentBlobsController < ApplicationController
   end
 
   def set_asset_version
-    warn("CCCCCCCCCCCC")
     if  !@content_blob.asset.versioned?
+      @asset_version = @content_blob.asset
       return true # no version
     elsif @content_blob.asset_version
       begin
@@ -264,4 +274,5 @@ class ContentBlobsController < ApplicationController
       request.body
     end
   end
+
 end
