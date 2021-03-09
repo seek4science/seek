@@ -1,0 +1,5 @@
+<%= panel("Format types", :body_options => {:class => 'text-center'}) do %>
+  <% resource.format_types.each do |m| %>
+    <li class="author-list-item"><%= m -%></li>
+  <% end %>
+<% end %>

@@ -22,6 +22,8 @@
 
         <%= render :partial => "select_format_types", :locals => {:resource => (@file_template ? @file_template : FileTemplate.new) } -%>
 
+        <%= render :partial => "select_data_types", :locals => {:resource => (@file_template ? @file_template : FileTemplate.new) } -%>
+
       <%= render :partial => "projects/project_selector", :locals => { :resource => @file_template, :allow_nil => Seek::Config.is_virtualliver } %>
 
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @file_template } %>

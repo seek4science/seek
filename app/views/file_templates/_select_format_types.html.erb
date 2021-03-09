@@ -1,70 +1,74 @@
-<%   resource_type = resource.class.name.underscore
-     resource_type_text = text_for_resource(resource)
-     label ||= 'Format types' %>
+<!-- format_type_form -->
+<%
 
-<%= folding_panel(label, false,
-                  :help_text => "Here you can specify the format types for this #{text_for_resource(resource)}.") do %>
-    <div class="form-group" id="format-type-section">
-      <label><%= label %></label>
+  resource_type = resource.class.name.underscore
+  resource_type_text = text_for_resource(resource)
+  collapsed = resource.format_types.empty?
+  help_text = "You can add a URL of a format type for this #{resource_type_text}"
+%>
 
-      <div>
+<%= folding_panel('Format Types', collapsed, :body_options => {:id => 'format_type_urls'},
+                  :help_text => help_text) do %>
 
-    <div id='new-link-form' style="display:none;">
-      <div class='link-row row'>
+    <p class="help-block">
+      You can add one or more URL's to point to format types related to this <%= resource_type_text %>:
+    </p>
+
+    <div id='new-format-type-form' style="display:none;">
+      <div class='format-type-row row'>
         <div class="col-xs-6">
-          <%=  text_field_tag("#{resource_type}[format_types][]",'',class: 'form-control',placeholder:'URL') %>
+          <%=  url_field_tag("#{resource_type}[format_types][]",'',class: 'form-control',placeholder:'URL') %>
         </div>
         <div class="col">
           <label class="btn btn-danger">
             Remove
-            <%= check_box_tag "", '1', false,
+            <%= check_box_tag "#ignore", '1', false,
                               class: 'destroy-link', autocomplete: 'off', style:'display:none;' %>
           </label>
         </div>
       </div>
     </div>
 
-    <div id='format_type-links'>
-      <%= fields_for(resource) do |f| %>
-        <%= f.fields_for :format_types do |ff| %>
-          <div class='link-row row'>
-            <span class="col-xs-6">
-              <%= ff.text_field "#{resource_type}[format_types][]", class:'form-control', placeholder:'URL' %>
-            </span>
-            <span class="col">
+    <div id='format-types'>
+      <% resource.format_types.each do |f| %>
+          <div class='format-type-row row'>
+        <div class="col-xs-6">
+            <%=  url_field_tag("#{resource_type}[format_types][]",f,class: 'form-control',placeholder:'URL') %>
+            </div>
+            <div class="col">
               <label class="btn btn-danger">
                 Remove
-                <%= ff.check_box :_destroy, class: 'destroy-link', autocomplete: 'off',style:'display:none;' %>
+            <%= check_box_tag "#ignore", '1', false,
+                              class: 'destroy-link', autocomplete: 'off', style:'display:none;' %>
               </label>
-            </span>
+            </div>
           </div>
-        <% end %>
       <% end %>
-      <div id='new-link-row'></div>
+      <div id='new-format-type-row'></div>
     </div>
 
-    <%= button_link_to('Add new format type', 'add', '#', :id => 'add-format_type-link') %>
+    <%= button_link_to('Add new format type', 'add', '#', :id => 'add-format-type') %>
 
 <% end %>
 
 <script type="application/javascript">
 
     $j(document).ready(function () {
-        $j('#add-format_type-link').click(function () {
-            var newRow = $j('#new-link-form').clone().html();
-            var currentRows = $j('.link-row').length - 2;
+        $j('#add-format-type').click(function () {
+            var newRow = $j('#new-format-type-form').clone().html();
+            var currentRows = $j('.format-type-row').length - 2;
             newRow = newRow.replace(/INDEX/g, currentRows+1);
-            $j('#format_type-links #new-link-row').before($j(newRow));
+            $j('#format-types #new-format-type-row').before($j(newRow));
             return false;
         });
 
         $j('form').submit(function () {
-          $j('#new-link-form').remove();
+          $j('#new-format-type-form').remove();
           return;
         });
 
-        $j('#format_type-links').on('change', '.destroy-link', function() {
-            $j(this).closest('.link-row').fadeOut(100);
+        $j('#format-types').on('change', '.destroy-link', function() {
+            $j(this).closest('.format-type-row').remove();
         });
 
 

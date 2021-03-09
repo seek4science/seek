@@ -19,6 +19,8 @@
 
         <%= render :partial => "select_format_types", :locals => {:resource => (@file_template ? @file_template : FileTemplate.new) } -%>
 
+        <%= render :partial => "select_data_types", :locals => {:resource => (@file_template ? @file_template : FileTemplate.new) } -%>
+
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @file_template } %>
 
       <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @file_template} -%>

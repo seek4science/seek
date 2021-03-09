@@ -1,0 +1,5 @@
+<%= panel("Data types", :body_options => {:class => 'text-center'}) do %>
+  <% resource.data_types.each do |m| %>
+    <li class="author-list-item"><%= m -%></li>
+  <% end %>
+<% end %>

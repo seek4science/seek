@@ -68,6 +68,7 @@ class FileTemplatesController < ApplicationController
                                 { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
                                 { mime_types: [] },
                                 { format_types: [] },
+                                { data_types: [] },
                                 { publication_ids: [] }, { event_ids: [] },
                                      discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
@@ -75,9 +76,11 @@ class FileTemplatesController < ApplicationController
   def set_formats(file_template, params)
    mime_type_changed = file_template.add_annotations(params[:mime_type_list], 'mime_type') if params[:mime_type_list]
    format_type_changed = file_template.add_annotations(params[:format_type_list], 'format_type') if params[:format_type_list]
+   data_type_changed = file_template.add_annotations(params[:data_type_list], 'data_type') if params[:data_type_list]
     if immediately_clear_tag_cloud?
       expire_annotation_fragments('mime_type') if mime_type_changed
       expire_annotation_fragments('format_type') if format_type_changed
+      expire_annotation_fragments('data_type') if data_type_changed
     else
       RebuildTagCloudsJob.new.queue_job
     end

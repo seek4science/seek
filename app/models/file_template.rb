@@ -49,6 +49,14 @@ class FileTemplate < ApplicationRecord
       joins: [:format_types_as_text]
   )
 
+  has_annotation_type :data_type
+  has_many :data_types_as_text, through: :data_type_annotations, source: :value, source_type: 'TextValue'
+  has_filter data_type: Seek::Filtering::Filter.new(
+      value_field: 'text_values.id',
+      label_field: 'text_values.text',
+      joins: [:data_types_as_text]
+  )
+
   def use_mime_type_for_avatar?
     true
   end
