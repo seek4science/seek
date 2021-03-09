@@ -3,8 +3,6 @@ module Seek
     # common controller methods for destroy
     def destroy
       asset = determine_asset_from_controller
-      warn("Asset is "+asset)
-      warn("Controller is "+asset.class.name)
       respond_to do |format|
         respond_to_destruction(asset, format)
       end
