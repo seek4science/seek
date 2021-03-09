@@ -11,7 +11,6 @@ module Seek
 
         attr_reader :resource
 
-        PROJECT_ID = Seek::Config.dm_project_name.downcase.gsub(/[^0-9a-z]/i, '_')
         def initialize(resource)
           @resource = resource
         end
