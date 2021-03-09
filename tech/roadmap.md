@@ -16,13 +16,15 @@ They are expected to be added to SEEK in roughly the order they are presented he
 | --- | --- |
 | Generic Custom Metadata fields | Spring 2021  |
 | Extended Studies with extended metadata, supporting MIAPPE | Spring 2021 |
-| Ontology based metadata attributes, including for samples | Spring 2021 |
+| Ontology based metadata attributes, for samples and custom metadata | Spring 2021 |
 | Collections - grouping assets together under a topic or theme | Spring 2021 |
+| Smoother process for creating and joining Projects, for admins to handle the request | Spring 2021 |
 | Markdown formatting for descriptions | Spring 2021 |
 | Exploring CSV & TSV (as if Excel) | Spring 2021 |
 | Bulk Changing Sharing Permissions | Spring 2021 |
 | Sample and Sample Type API | Spring 2021 |
 | Project folders, to help organise files outside of the ISA structure | Summer 2021 |
+| UI for creating Custom Metadata Extensions | Summer 2021 |
 | Backend storage changes with better versioning support | Autumn 2021 |
 | Better support for GitHub | Autumn 2021 |
 | Support for Datasets containing multiple files organised into folders | Autumn 2021 |
