@@ -30,6 +30,15 @@ module Seek
           tags_as_text_array.join(', ') if resource.respond_to?(:tags_as_text_array)
         end
 
+        def provider
+          {
+            '@type' => 'Organization',
+            '@id' => Seek::Config.site_base_host,
+            'name' => Seek::Config.dm_project_name,
+            'url' => Seek::Config.site_base_host
+          }
+        end
+        
         def date_created
           resource.date_created.try(:utc) if resource.respond_to?(:date_created)
         end

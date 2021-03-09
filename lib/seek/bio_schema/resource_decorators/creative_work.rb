@@ -3,6 +3,7 @@ module Seek
     module ResourceDecorators
       # Decorator that provides extensions for a Event
       class CreativeWork < Thing
+
         associated_items producer: :projects
 
         schema_mappings license: :license,
@@ -11,7 +12,8 @@ module Seek
                         created_at: :dateCreated,
                         updated_at: :dateModified,
                         content_type: :encodingFormat,
-                        subject_of: :subjectOf
+                        subject_of: :subjectOf,
+                        provider: :sdPublisher
 
         def content_type
           return unless resource.respond_to?(:content_blob) && resource.content_blob

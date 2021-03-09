@@ -8,10 +8,7 @@ module Seek
 
         FORMALPARAMETER_PROFILE = 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/'
         
-        associated_items sd_publisher: 'contributors'
-
-        schema_mappings sd_publisher: :sdPublisher,
-                        version: :version,
+        schema_mappings version: :version,
                         image: :image,
                         programming_language: :programmingLanguage,
                         producer: :producer,

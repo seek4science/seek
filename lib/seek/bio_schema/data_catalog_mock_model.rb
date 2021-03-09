@@ -18,14 +18,14 @@ module Seek
         Seek::Config.project_keywords&.split(',')&.collect(&:strip)&.reject(&:blank?)&.join(', ')
       end
 
-      def provider
-        {
-          '@type' => 'Organization',
-          'name' => Seek::Config.dm_project_name,
-          'url' => Seek::Config.dm_project_link
-        }
-      end
-
+#      def provider
+#        {
+#          '@type' => 'Organization',
+#          'name' => Seek::Config.dm_project_name,
+#          'url' => Seek::Config.dm_project_link
+#        }
+#      end
+#
       def date_created
         ActivityLog.order(:id).first.try(:created_at)
       end
