@@ -21,6 +21,7 @@ They are expected to be added to SEEK in roughly the order they are presented he
 | Markdown formatting for descriptions | Spring 2021 |
 | Exploring CSV & TSV (as if Excel) | Spring 2021 |
 | Bulk Changing Sharing Permissions | Spring 2021 |
+| Sample and Sample Type API | Spring 2021 |
 | Project folders, to help organise files outside of the ISA structure | Summer 2021 |
 | Backend storage changes with better versioning support | Autumn 2021 |
 | Better support for GitHub | Autumn 2021 |
