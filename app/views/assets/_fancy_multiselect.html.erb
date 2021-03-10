@@ -37,11 +37,6 @@
     <div class="col-md-<%= preview_disabled ? '12' : '8'-%>">
       <p class="help-block"><%= intro %></p>
 
-      <%# This ensures that the parameter is always sent, even when nothing is selected.
-        It adds a "" as the first item in the array. So if items 1,2, and 3 are selected the
-        value of the parameter will be ["","1","2","3"]. This is compatible with the rails
-        association association_ids= methods, which reject 'blank' values automatically.%>
-      <%= hidden_field_tag "#{name}[]", "" %>
       <%= associations_list(collection_id, 'associations/general', existing_json, 'data-field-name' => name, empty_text: "No #{association.to_s}") %>
 
       <div class="association_step">
