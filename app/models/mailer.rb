@@ -176,16 +176,25 @@ class Mailer < ActionMailer::Base
   end
 
   def request_create_project_for_programme(user, programme, project_json, institution_json, message_log)
-    @admins = programme.programme_administrators
+    @recipients = programme.programme_administrators
     @programme = programme
     @requester = user.person
     @institution = Institution.new(JSON.parse(institution_json))
     @project = Project.new(JSON.parse(project_json))
     @message_log = message_log
+
     mail(from: Seek::Config.noreply_sender,
-         to: @admins.collect(&:email_with_name),
+         to: @recipients.collect(&:email_with_name),
          reply_to: @requester.email_with_name,
          subject: "NEW #{t('project')} request from #{@requester.name} for your #{t('programme')}: #{@project.title}")
+
+    # also admins if programme is managed
+    if @programme.site_managed?
+      mail(from: Seek::Config.noreply_sender,
+        to: admin_emails,
+        reply_to: @requester.email_with_name,
+        subject: "NEW #{t('project')} request from #{@requester.name} for your #{t('programme')}: #{@project.title}")  
+    end
   end
 
   def request_create_project_and_programme(user, programme_json, project_json, institution_json, message_log)

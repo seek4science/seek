@@ -1838,17 +1838,30 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   test 'request create project with site managed programme' do
+    Factory(:admin)
     person = Factory(:person_not_in_project)
     programme = Factory(:programme)
+
+    prog_admin = Factory(:person)
+    prog_admin.is_programme_administrator = true, programme
+    prog_admin.save!
+    another_prog_admin = Factory(:person)
+    another_prog_admin.is_programme_administrator = true, programme
+    another_prog_admin.save!
+    programme.reload
+    assert_equal 2, programme.programme_administrators.count
+
     institution = Factory(:institution)
+    
+    refute programme.programme_administrators.select(&:is_admin?).any?
     login_as(person)
     with_config_value(:managed_programme_id, programme.id) do
       params = {
           programme_id: programme.id,
-          project: { title: 'The Project',description:'description',web_page:'web_page'},
-          institution: {id: institution.id}
+          project: { title: 'The Project', description: 'description', web_page: 'web_page'},
+          institution: { id: institution.id }
       }
-      assert_enqueued_emails(1) do
+      assert_enqueued_emails(1) do # programme admins, and instance admins, will be mailed but from a single job
         assert_difference('MessageLog.count') do
           post :request_create, params: params
         end
@@ -1901,8 +1914,10 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   test 'request create project with new programme and institution' do
+    Factory(:admin)
     person = Factory(:person_not_in_project)
     programme = Factory(:programme)
+    assert Person.admins.count > 1
     login_as(person)
     with_config_value(:managed_programme_id, programme.id) do
       params = {
