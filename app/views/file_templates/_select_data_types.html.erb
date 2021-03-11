@@ -11,7 +11,7 @@
                   :help_text => help_text) do %>
 
     <p class="help-block">
-      You can add one or more URL's to point to data types related to this <%= resource_type_text %>:
+      You can add one or more URL's to point to data types related to this <%= resource_type_text %>. The data types may be browsed at <a href='https://ifb-elixirfr.github.io/edam-browser/#data_1916&data' target="_blank">EDAM ontology browser</a>
     </p>
 
     <div id='new-data-type-form' style="display:none;">
@@ -32,9 +32,15 @@
     <div id='data-types'>
       <% resource.data_types.each do |f| %>
           <div class='data-type-row row'>
-        <div class="col-xs-6">
-            <%=  url_field_tag("#{resource_type}[data_types][]",f,class: 'form-control',placeholder:'URL') %>
-            </div>
+            <%=  url_field_tag("#{resource_type}[data_types][]",f,class: 'col-xs-3',placeholder:'URL', readonly: true) %>
+	    <%=
+	      text=EdamHelper::url_to_text(f);
+	      if text.nil?
+	      text_field_tag("", "Not recognized", class: 'col-xs-3', readonly: true)
+	      else
+	        text_field_tag("", text, class: 'col-xs-3', readonly: true)
+	      end
+	      %>
             <div class="col">
               <label class="btn btn-danger">
                 Remove

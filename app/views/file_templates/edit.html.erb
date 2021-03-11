@@ -15,6 +15,8 @@
         <%= f.text_area :description, :class=>"form-control rich-text-edit", :rows => 5 -%>
       </div>
 
+      <a href="/app/views/edam-browser/index.html">Fred</a>
+
         <%= render :partial => "select_mime_types", :locals => {:resource => (@file_template ? @file_template : FileTemplate.new) } -%>
 
         <%= render :partial => "select_format_types", :locals => {:resource => (@file_template ? @file_template : FileTemplate.new) } -%>

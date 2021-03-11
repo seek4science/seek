@@ -11,7 +11,7 @@
                   :help_text => help_text) do %>
 
     <p class="help-block">
-      You can add one or more URL's to point to format types related to this <%= resource_type_text %>:
+      You can add one or more URL's to point to format types related to this <%= resource_type_text %>. The formats may be browsed at <a href='https://ifb-elixirfr.github.io/edam-browser/#format_1915&format' target="_blank">EDAM ontology browser</a>
     </p>
 
     <div id='new-format-type-form' style="display:none;">
@@ -32,9 +32,15 @@
     <div id='format-types'>
       <% resource.format_types.each do |f| %>
           <div class='format-type-row row'>
-        <div class="col-xs-6">
-            <%=  url_field_tag("#{resource_type}[format_types][]",f,class: 'form-control',placeholder:'URL') %>
-            </div>
+            <%=  url_field_tag("#{resource_type}[format_types][]",f,class: 'col-xs-3',placeholder:'URL',readonly: true) %>
+	    <%=
+	      text=EdamHelper::url_to_text(f);
+	      if text.nil?
+	      text_field_tag("", "Not recognized", class: 'col-xs-3', readonly: true)
+	      else
+		text_field_tag("", text, class: 'col-xs-3', readonly: true)
+	      end
+	      %>
             <div class="col">
               <label class="btn btn-danger">
                 Remove

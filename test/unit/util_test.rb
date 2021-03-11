@@ -18,7 +18,7 @@ class UtilTest < ActiveSupport::TestCase
   end
 
   test 'authorized types' do
-    expected = [Assay, Collection, DataFile, Document, Event, Investigation, Model, Node, Presentation, Publication, Sample, Sop, Strain, Study, Workflow].map(&:name).sort
+    expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, Investigation, Model, Node, Presentation, Publication, Sample, Sop, Strain, Study, Workflow].map(&:name).sort
     actual = Seek::Util.authorized_types.map(&:name).sort
     assert_equal expected, actual
   end
@@ -68,7 +68,7 @@ class UtilTest < ActiveSupport::TestCase
   test 'doiable asset types' do
     types = Seek::Util.doiable_asset_types
 
-    expected = [DataFile, Document, Model, Sop, Investigation, Study, Assay, Node, Workflow]
+    expected = [DataFile, Document, FileTemplate, Model, Sop, Investigation, Study, Assay, Node, Workflow]
 
     # first as strings for more readable failed assertion message
     assert_equal expected.map(&:to_s).sort, types.map(&:to_s).sort
