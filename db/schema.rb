@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_11_090204) do
+ActiveRecord::Schema.define(version: 2021_03_11_115522) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -738,70 +738,6 @@ ActiveRecord::Schema.define(version: 2021_03_11_090204) do
     t.index ["file_template_id", "project_id"], name: "index_ft_projects_on_ft_id_and_p_id"
     t.index ["file_template_id"], name: "index_ft_projects_on_ft_id"
     t.index ["project_id"], name: "index_ft_projects_on_p_id"
-  end
-
-  create_table "ft_projects",  force: :cascade do |t|
-    t.bigint "ft_id"
-    t.bigint "project_id"
-    t.index ["ft_id"], name: "index_ft_projects_on_ft_id"
-    t.index ["project_id"], name: "index_ft_projects_on_project_id"
-  end
-
-  create_table "ft_versions",  force: :cascade do |t|
-    t.bigint "ft_id"
-    t.integer "version"
-    t.text "revision_comments"
-    t.text "title"
-    t.text "description"
-    t.string "contributor_type"
-    t.bigint "contributor_id"
-    t.string "first_letter", limit: 1
-    t.string "uuid"
-    t.bigint "policy_id"
-    t.string "doi"
-    t.string "license"
-    t.datetime "last_used_at"
-    t.text "other_creators"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["contributor_type", "contributor_id"], name: "index_ft_versions_on_contributor_type_and_contributor_id"
-    t.index ["ft_id"], name: "index_ft_versions_on_ft_id"
-    t.index ["policy_id"], name: "index_ft_versions_on_policy_id"
-  end
-
-  create_table "ft_versions_projects",  force: :cascade do |t|
-    t.bigint "version_id"
-    t.bigint "project_id"
-    t.index ["project_id"], name: "index_ft_versions_projects_on_project_id"
-    t.index ["version_id", "project_id"], name: "index_ft_versions_projects_on_version_id_and_project_id"
-    t.index ["version_id"], name: "index_ft_versions_projects_on_version_id"
-  end
-
-  create_table "fts",  force: :cascade do |t|
-    t.text "title"
-    t.text "description"
-    t.string "contributor_type"
-    t.bigint "contributor_id"
-    t.integer "version"
-    t.string "first_letter", limit: 1
-    t.string "uuid"
-    t.bigint "policy_id"
-    t.string "doi"
-    t.string "license"
-    t.datetime "last_used_at"
-    t.text "other_creators"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["contributor_type", "contributor_id"], name: "index_fts_on_contributor_type_and_contributor_id"
-    t.index ["policy_id"], name: "index_fts_on_policy_id"
-  end
-
-  create_table "fts_projects",  force: :cascade do |t|
-    t.bigint "ft_id"
-    t.bigint "project_id"
-    t.index ["ft_id", "project_id"], name: "index_fts_projects_on_ft_id_and_project_id"
-    t.index ["ft_id"], name: "index_fts_projects_on_ft_id"
-    t.index ["project_id"], name: "index_fts_projects_on_project_id"
   end
 
   create_table "genes", id: :integer,  force: :cascade do |t|
