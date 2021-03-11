@@ -149,7 +149,7 @@ class ProjectsController < ApplicationController
     end
 
     # A Programme has been selected, or it is a Site Managed Programme
-    if params[:programme_id]
+    if params[:programme_id].present?
 
       @programme = Programme.find(params[:programme_id])
       raise "no #{t('programme')} can be found" if @programme.nil?
@@ -157,7 +157,7 @@ class ProjectsController < ApplicationController
         log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
       elsif @programme.site_managed?
         log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
-        Mailer.request_create_project_for_programme(current_user, @programme,@project.to_json, @institution.to_json, log).deliver_later
+        Mailer.request_create_project_for_programme(current_user, @programme, @project.to_json, @institution.to_json, log).deliver_later
         flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
       else
         raise 'Invalid Programme'
@@ -168,9 +168,9 @@ class ProjectsController < ApplicationController
       @programme = Programme.new(prog_params)
       log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
       unless User.admin_logged_in?
-        Mailer.request_create_project_and_programme(current_user, @programme.to_json,@project.to_json, @institution.to_json, log).deliver_later
+        Mailer.request_create_project_and_programme(current_user, @programme.to_json, @project.to_json, @institution.to_json, log).deliver_later
       end
-      flash.now[:notice]="Thank you, your request for a new #{t('programme')} and #{t('project')} has been sent"
+      flash.now[:notice] = "Thank you, your request for a new #{t('programme')} and #{t('project')} has been sent"
     # No Programme at all
     elsif !Seek::ProjectFormProgrammeOptions.show_programme_box?
       @programme=nil
@@ -182,7 +182,7 @@ class ProjectsController < ApplicationController
     end
 
     if (@programme && @programme.can_manage?) || User.admin_logged_in?
-      redirect_to administer_create_project_request_projects_path(message_log_id:log.id)
+      redirect_to administer_create_project_request_projects_path(message_log_id: log.id)
     else
       respond_to do |format|
         format.html

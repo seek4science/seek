@@ -1906,9 +1906,10 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
     with_config_value(:managed_programme_id, programme.id) do
       params = {
-          project: { title: 'The Project',description:'description',web_page:'web_page'},
-          institution: {title:'the inst',web_page:'the page',city:'London',country:'GB'},
-          programme: {title:'the prog'}
+          project: { title: 'The Project', description:'description', web_page:'web_page'},
+          institution: {title: 'the inst', web_page: 'the page', city: 'London', country: 'GB'},
+          programme_id: '',
+          programme: {title: 'the prog'}
       }
       assert_enqueued_emails(1) do
         assert_difference('MessageLog.count') do
