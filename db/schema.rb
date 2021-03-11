@@ -699,9 +699,9 @@ ActiveRecord::Schema.define(version: 2021_03_11_090204) do
     t.string "license"
     t.datetime "last_used_at"
     t.text "other_creators"
-    t.integer "visibility"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer "visibility"
     t.index ["contributor_id"], name: "index_ft_versions_on_contributor"
     t.index ["file_template_id"], name: "index_ft_versions_on_ft_id"
     t.index ["policy_id"], name: "index_file_template_versions_on_policy_id"
@@ -735,9 +735,9 @@ ActiveRecord::Schema.define(version: 2021_03_11_090204) do
   create_table "file_templates_projects",  force: :cascade do |t|
     t.bigint "file_template_id"
     t.bigint "project_id"
-    t.index ["file_template_id", "project_id"], name: "index_file_templates_projects_on_file_template_id_and_project_id"
-    t.index ["file_template_id"], name: "index_file_templates_projects_on_file_template_id"
-    t.index ["project_id"], name: "index_file_templates_projects_on_project_id"
+    t.index ["file_template_id", "project_id"], name: "index_ft_projects_on_ft_id_and_p_id"
+    t.index ["file_template_id"], name: "index_ft_projects_on_ft_id"
+    t.index ["project_id"], name: "index_ft_projects_on_p_id"
   end
 
   create_table "ft_projects",  force: :cascade do |t|
