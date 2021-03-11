@@ -176,7 +176,7 @@ class Mailer < ActionMailer::Base
   end
 
   def request_create_project_for_programme(user, programme, project_json, institution_json, message_log)
-    @recipients = programme.programme_administrators
+    @admins = programme.programme_administrators
     @programme = programme
     @requester = user.person
     @institution = Institution.new(JSON.parse(institution_json))
@@ -184,17 +184,27 @@ class Mailer < ActionMailer::Base
     @message_log = message_log
 
     mail(from: Seek::Config.noreply_sender,
-         to: @recipients.collect(&:email_with_name),
+         to: @admins.collect(&:email_with_name),
          reply_to: @requester.email_with_name,
          subject: "NEW #{t('project')} request from #{@requester.name} for your #{t('programme')}: #{@project.title}")
 
-    # also admins if programme is managed
-    if @programme.site_managed?
-      mail(from: Seek::Config.noreply_sender,
-        to: admin_emails,
-        reply_to: @requester.email_with_name,
-        subject: "NEW #{t('project')} request from #{@requester.name} for your #{t('programme')}: #{@project.title}")  
-    end
+  end
+
+  # same as request_create_project_for_programme but to notify the site admins rather instead of programme admins
+  def request_create_project_for_programme_admins(user, programme, project_json, institution_json, message_log)
+    @admins = admins
+    @programme = programme
+    @requester = user.person
+    @institution = Institution.new(JSON.parse(institution_json))
+    @project = Project.new(JSON.parse(project_json))
+    @message_log = message_log
+    
+    mail(from: Seek::Config.noreply_sender,
+         to: admin_emails,
+         reply_to: @requester.email_with_name,
+         subject: "NEW #{t('project')} request from #{@requester.name} for your #{t('programme')}: #{@project.title}",
+         template_name: :request_create_project_for_programme)
+    
   end
 
   def request_create_project_and_programme(user, programme_json, project_json, institution_json, message_log)
@@ -249,6 +259,10 @@ class Mailer < ActionMailer::Base
     admins.map(&:email_with_name)
   end
 
+  def admins
+    Person.admins
+  end
+
   def project_administrator_email(project_administrator)
     project_administrator.email_with_name
   rescue
@@ -276,8 +290,5 @@ class Mailer < ActionMailer::Base
          reply_to: publisher.email_with_name,
          subject: subject)
   end
-
-  def admins
-    Person.admins
-  end
+  
 end
