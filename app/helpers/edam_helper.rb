@@ -19,11 +19,6 @@ module EdamHelper
     result = nil
     row = @@edam_table.find {|row| row['Class ID'] == url}
     result = row['Preferred Label'] unless row.nil?
-    if result.nil?
-      puts "NIL from #{url}"
-    else
-      result
-    end
     return result
   end
 end

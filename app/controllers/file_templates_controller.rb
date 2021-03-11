@@ -22,8 +22,6 @@ class FileTemplatesController < ApplicationController
   def create_version
     if handle_upload_data(true)
 
-      set_formats(@file_template, params)
-      
       comments = params[:revision_comments]
 
       respond_to do |format|
@@ -46,9 +44,8 @@ class FileTemplatesController < ApplicationController
     update_sharing_policies @file_template
     update_relationships(@file_template,params)
 
-    set_formats(@file_template, params)
-
     respond_to do |format|
+
       if @file_template.update_attributes(file_template_params)
         flash[:notice] = "#{t('file_template')} metadata was successfully updated."
         format.html { redirect_to file_template_path(@file_template) }
@@ -71,19 +68,6 @@ class FileTemplatesController < ApplicationController
                                 { data_types: [] },
                                 { publication_ids: [] }, { event_ids: [] },
                                      discussion_links_attributes:[:id, :url, :label, :_destroy])
-  end
-
-  def set_formats(file_template, params)
-   mime_type_changed = file_template.add_annotations(params[:mime_type_list], 'mime_type') if params[:mime_type_list]
-   format_type_changed = file_template.add_annotations(params[:format_type_list], 'format_type') if params[:format_type_list]
-   data_type_changed = file_template.add_annotations(params[:data_type_list], 'data_type') if params[:data_type_list]
-    if immediately_clear_tag_cloud?
-      expire_annotation_fragments('mime_type') if mime_type_changed
-      expire_annotation_fragments('format_type') if format_type_changed
-      expire_annotation_fragments('data_type') if data_type_changed
-    else
-      RebuildTagCloudsJob.new.queue_job
-    end
   end
 
   alias_method :asset_params, :file_template_params
