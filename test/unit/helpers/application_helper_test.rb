@@ -250,6 +250,9 @@ class ApplicationHelperTest < ActionView::TestCase
     User.with_current_user(admin.user) do
       assert pending_project_creation_request?
     end
+    User.with_current_user(nil) do
+      refute pending_project_creation_request?
+    end
 
     # creating a project with a plain programme - prog admins notified
     MessageLog.delete_all
@@ -261,6 +264,9 @@ class ApplicationHelperTest < ActionView::TestCase
       assert pending_project_creation_request?
     end
     User.with_current_user(admin.user) do
+      refute pending_project_creation_request?
+    end
+    User.with_current_user(nil) do
       refute pending_project_creation_request?
     end
 
@@ -278,6 +284,9 @@ class ApplicationHelperTest < ActionView::TestCase
       User.with_current_user(admin.user) do
         assert pending_project_creation_request?
       end
+      User.with_current_user(nil) do
+        refute pending_project_creation_request?
+      end
     end
 
     # new programme, admins notified
@@ -291,6 +300,9 @@ class ApplicationHelperTest < ActionView::TestCase
     end
     User.with_current_user(admin.user) do
       assert pending_project_creation_request?
+    end
+    User.with_current_user(nil) do
+      refute pending_project_creation_request?
     end
     
   end
