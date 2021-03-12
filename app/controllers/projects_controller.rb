@@ -9,7 +9,7 @@ class ProjectsController < ApplicationController
   before_action :login_required, only: [:guided_join, :guided_create, :request_join, :request_create,
                                         :administer_join_request, :respond_join_request,
                                         :administer_create_project_request, :respond_create_project_request,
-                                        :project_join_requests]
+                                        :project_join_requests, :project_creation_requests]
 
   before_action :find_requested_item, only: %i[show admin edit update destroy asset_report admin_members
                                                admin_member_roles update_members storage_report
@@ -39,6 +39,16 @@ class ProjectsController < ApplicationController
   def project_join_requests
     person = current_person
     @requests = MessageLog.pending_project_join_requests(person.administered_projects)
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  def project_creation_requests
+    @requests = MessageLog.pending_project_creation_requests.select do |r|
+      r.can_respond_project_creation_request?(current_user)
+    end
+        
     respond_to do |format|
       format.html
     end
@@ -552,7 +562,7 @@ class ProjectsController < ApplicationController
 
       redirect_to :root
     end
-  end
+  end  
 
   private
 
@@ -678,10 +688,11 @@ class ProjectsController < ApplicationController
 
   def validate_message_log_for_create
     @message_log = MessageLog.find_by_id(params[:message_log_id])
+    error_msg ||= "you do not have permission to respond to this request" unless @message_log.can_respond_project_creation_request?(current_user)
     error_msg ||= "message log not found" unless @message_log
     error_msg ||= ("incorrect type of message log" unless @message_log.message_type==MessageLog::PROJECT_CREATION_REQUEST)
     error_msg ||= ("message has already been responded to" if @message_log.responded?)
-    #error_msg ||= ('you have no permission to create a project' unless Project.can_create?)
+    
     if error_msg
       error(error_msg, error_msg)
       return false

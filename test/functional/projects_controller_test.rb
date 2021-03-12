@@ -2753,6 +2753,73 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
+ test "project creation requests" do
+  admin = Factory(:admin)
+  prog_admin = Factory(:programme_administrator)
+  programme = prog_admin.programmes.first
+  person = Factory(:person)
+  institution = Factory(:institution)
+  project = Project.new(title: "new")
+
+  log_existing_programme = MessageLog.log_project_creation_request(person, programme, project, institution)
+  log_new_programme = MessageLog.log_project_creation_request(person, Programme.new(title: "new"), project, institution)
+
+  # no user
+  logout
+  get :project_creation_requests
+  assert_redirected_to :login
+  refute_nil flash[:error]
+
+  login_as(prog_admin)
+  get :project_creation_requests
+  assert_response :success
+
+  assert_select "h1", text: /1 pending project creation/i
+  assert_select "table#project-create-requests" do
+    assert_select "tbody tr", count: 1
+    assert_select "a[href=?]", person_path(person), text: person.title
+    assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_existing_programme.id)
+    assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_new_programme.id), count: 0
+  end
+
+  login_as(admin)
+  get :project_creation_requests
+  assert_response :success
+
+  assert_select "h1", text: /1 pending project creation/i
+  assert_select "table#project-create-requests" do
+    assert_select "tbody tr", count: 1
+    assert_select "a[href=?]", person_path(person), text: person.title
+    assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_new_programme.id)
+    assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_existing_programme.id), count: 0
+  end
+
+  with_config_value(:managed_programme_id, programme.id) do
+    get :project_creation_requests
+    assert_response :success
+
+    assert_select "h1", text: /2 pending project creation/i
+    assert_select "table#project-create-requests" do
+      assert_select "tbody tr", count: 2
+      assert_select "a[href=?]", person_path(person), text: person.title, count: 2
+      assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_new_programme.id)
+      assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_existing_programme.id)
+    end
+  end
+
+  login_as(person)
+  get :project_creation_requests
+  assert_response :success
+
+  assert_select "h1", text: /0 pending project creation/i
+  assert_select "table#project-create-requests" do
+    assert_select "tbody tr", count: 0
+    assert_select "a[href=?]", person_path(person), text: person.title, count: 0
+    assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_new_programme.id), count: 0
+    assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_existing_programme.id), count: 0
+  end
+end
+
 
 
   private

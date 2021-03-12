@@ -41,7 +41,7 @@
       <% cache [current_user, MessageLog.pending_project_creation_requests.last] do %>  
         <% if pending_project_creation_request? %>
           <div id='pending-project-creation-warning' class="alert alert-danger text-center">
-            There are pending <%= t('project') %> creation requests - <%= link_to('Full List',project_creation_requests_admin_path) %>
+            There are pending <%= t('project') %> creation requests - <%= link_to('Full List',project_creation_requests_projects_path) %>
           </div>
         <% end %>
       <% end %>  

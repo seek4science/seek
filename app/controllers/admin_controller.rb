@@ -13,14 +13,7 @@ class AdminController < ApplicationController
     respond_to do |format|
       format.html
     end
-  end
-
-  def project_creation_requests
-    @requests = MessageLog.pending_project_creation_requests
-    respond_to do |format|
-      format.html
-    end
-  end
+  end  
 
   def update_admins
     admin_ids = params[:admins].split(',') || []
