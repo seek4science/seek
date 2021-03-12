@@ -2753,88 +2753,71 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
- test "project creation requests" do
-  admin = Factory(:admin)
-  prog_admin = Factory(:programme_administrator)
-  programme = prog_admin.programmes.first
-  person = Factory(:person)
-  institution = Factory(:institution)
-  project = Project.new(title: "new")
+  test "project creation requests" do
+    admin = Factory(:admin)
+    prog_admin = Factory(:programme_administrator)
+    programme = prog_admin.programmes.first
+    person = Factory(:person)
+    institution = Factory(:institution)
+    project = Project.new(title: "new")
 
-  log_existing_programme = MessageLog.log_project_creation_request(person, programme, project, institution)
-  log_new_programme = MessageLog.log_project_creation_request(person, Programme.new(title: "new"), project, institution)
+    log_existing_programme = MessageLog.log_project_creation_request(person, programme, project, institution)
+    log_new_programme = MessageLog.log_project_creation_request(person, Programme.new(title: "new"), project, institution)
 
-  # no user
-  logout
-  get :project_creation_requests
-  assert_redirected_to :login
-  refute_nil flash[:error]
+    # no user
+    logout
+    get :project_creation_requests
+    assert_redirected_to :login
+    refute_nil flash[:error]
 
-  login_as(prog_admin)
-  get :project_creation_requests
-  assert_response :success
-
-  assert_select "h1", text: /1 pending project creation/i
-  assert_select "table#project-create-requests" do
-    assert_select "tbody tr", count: 1
-    assert_select "a[href=?]", person_path(person), text: person.title
-    assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_existing_programme.id)
-    assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_new_programme.id), count: 0
-  end
-
-  login_as(admin)
-  get :project_creation_requests
-  assert_response :success
-
-  assert_select "h1", text: /1 pending project creation/i
-  assert_select "table#project-create-requests" do
-    assert_select "tbody tr", count: 1
-    assert_select "a[href=?]", person_path(person), text: person.title
-    assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_new_programme.id)
-    assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_existing_programme.id), count: 0
-  end
-
-  with_config_value(:managed_programme_id, programme.id) do
+    login_as(prog_admin)
     get :project_creation_requests
     assert_response :success
 
-    assert_select "h1", text: /2 pending project creation/i
+    assert_select "h1", text: /1 pending project creation/i
     assert_select "table#project-create-requests" do
-      assert_select "tbody tr", count: 2
-      assert_select "a[href=?]", person_path(person), text: person.title, count: 2
-      assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_new_programme.id)
+      assert_select "tbody tr", count: 1
+      assert_select "a[href=?]", person_path(person), text: person.title
       assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_existing_programme.id)
+      assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_new_programme.id), count: 0
     end
-  end
 
-  login_as(person)
-  get :project_creation_requests
-  assert_response :success
+    login_as(admin)
+    get :project_creation_requests
+    assert_response :success
 
-  assert_select "h1", text: /0 pending project creation/i
-  assert_select "table#project-create-requests" do
-    assert_select "tbody tr", count: 0
-    assert_select "a[href=?]", person_path(person), text: person.title, count: 0
-    assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_new_programme.id), count: 0
-    assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_existing_programme.id), count: 0
-  end
-end
-
-
-
-  private
-
-  def edit_max_object(project)
-    for i in 1..5 do
-      Factory(:person).add_to_project_and_institution(project, Factory(:institution))
+    assert_select "h1", text: /1 pending project creation/i
+    assert_select "table#project-create-requests" do
+      assert_select "tbody tr", count: 1
+      assert_select "a[href=?]", person_path(person), text: person.title
+      assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_new_programme.id)
+      assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_existing_programme.id), count: 0
     end
-    project.default_policy = Factory(:private_policy)
-    project.programme_id = (Factory(:programme)).id
-    add_avatar_to_test_object(project)
-  end
 
-  def valid_project
-    { title: 'a title' }
+    with_config_value(:managed_programme_id, programme.id) do
+      get :project_creation_requests
+      assert_response :success
+
+      assert_select "h1", text: /2 pending project creation/i
+      assert_select "table#project-create-requests" do
+        assert_select "tbody tr", count: 2
+        assert_select "a[href=?]", person_path(person), text: person.title, count: 2
+        assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_new_programme.id)
+        assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_existing_programme.id)
+      end
+    end
+
+    login_as(person)
+    get :project_creation_requests
+    assert_response :success
+
+    assert_select "h1", text: /0 pending project creation/i
+    assert_select "table#project-create-requests" do
+      assert_select "tbody tr", count: 0
+      assert_select "a[href=?]", person_path(person), text: person.title, count: 0
+      assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_new_programme.id), count: 0
+      assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_existing_programme.id), count: 0
+    end
   end
 
   test 'should create with discussion link' do
@@ -2843,7 +2826,7 @@ end
     assert_difference('AssetLink.discussion.count') do
       assert_difference('Project.count') do
         post :create, params: { project: { title: 'test',
-                                           discussion_links_attributes: [{url: "http://www.slack.com/"}]}}
+                                          discussion_links_attributes: [{url: "http://www.slack.com/"}]}}
       end
     end
     project = assigns(:project)
@@ -2887,4 +2870,19 @@ end
     assert_empty project.discussion_links
   end
 
+    private
+
+  def edit_max_object(project)
+    for i in 1..5
+      Factory(:person).add_to_project_and_institution(project, Factory(:institution))
+    end
+    project.default_policy = Factory(:private_policy)
+    project.programme_id = (Factory(:programme)).id
+    add_avatar_to_test_object(project)
+  end
+
+  def valid_project
+    { title: "a title" }
+  end  
+  
 end
