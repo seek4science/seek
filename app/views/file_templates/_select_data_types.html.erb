@@ -1,83 +1,34 @@
 <!-- data_type_form -->
+<link rel="stylesheet" type="text/css" href="http://bioportal.bioontology.org/widgets/jquery.ncbo.tree.css">
+<script src="http://bioportal.bioontology.org/widgets/jquery.ncbo.tree-2.0.2.js"></script>
+
 <%
 
   resource_type = resource.class.name.underscore
   resource_type_text = text_for_resource(resource)
   collapsed = resource.data_types.empty?
-  help_text = "You can add a URL of a data type for this #{resource_type_text}"
+  help_text = "You can add a data type for this #{resource_type_text}"
 %>
 
-<%= folding_panel('Data Types', collapsed, :body_options => {:id => 'data_type_urls'},
+<%= folding_panel('Data Type', collapsed, :body_options => {:id => 'data_type_urls'},
                   :help_text => help_text) do %>
 
     <p class="help-block">
-      You can add one or more URL's to point to data types related to this <%= resource_type_text %>. The data types may be browsed at <a href='https://ifb-elixirfr.github.io/edam-browser/#data_1916&data' target="_blank">EDAM ontology browser</a>
+      Specify a data type for this <%= resource_type_text %>.
     </p>
 
-    <div id='new-data-type-form' style="display:none;">
-      <div class='data-type-row row'>
-        <div class="col-xs-6">
-          <%=  url_field_tag("#{resource_type}[data_types][]",'',class: 'form-control',placeholder:'URL') %>
-        </div>
-        <div class="col">
-          <label class="btn btn-danger">
-            Remove
-            <%= check_box_tag "#ignore", '1', false,
-                              class: 'destroy-link', autocomplete: 'off', style:'display:none;' %>
-          </label>
-        </div>
-      </div>
-    </div>
-
-    <div id='data-types'>
-      <% resource.data_types.each do |f| %>
-          <div class='data-type-row row'>
-            <%=  url_field_tag("#{resource_type}[data_types][]",f,class: 'col-xs-3',placeholder:'URL', readonly: true) %>
-	    <%=
-	      text=EdamHelper::url_to_text(f);
-	      if text.nil?
-	      text_field_tag("", "Not recognized", class: 'col-xs-3', readonly: true)
-	      else
-	        text_field_tag("", text, class: 'col-xs-3', readonly: true)
-	      end
-	      %>
-            <div class="col">
-              <label class="btn btn-danger">
-                Remove
-            <%= check_box_tag "#ignore", '1', false,
-                              class: 'destroy-link', autocomplete: 'off', style:'display:none;' %>
-              </label>
-            </div>
-          </div>
-      <% end %>
-      <div id='new-data-type-row'></div>
-    </div>
-
-    <%= button_link_to('Add new data type', 'add', '#', :id => 'add-data-type') %>
+    <div id="widget_tree"></div>
 
 <% end %>
 
 <script type="application/javascript">
 
-    $j(document).ready(function () {
-        $j('#add-data-type').click(function () {
-            var newRow = $j('#new-data-type-form').clone().html();
-            var currentRows = $j('.data-type-row').length - 2;
-            newRow = newRow.replace(/INDEX/g, currentRows+1);
-            $j('#data-types #new-data-type-row').before($j(newRow));
-            return false;
-        });
-
-        $j('form').submit(function () {
-          $j('#new-data-type-form').remove();
-          return;
-        });
-
-        $j('#data-types').on('change', '.destroy-link', function() {
-            $j(this).closest('.data-type-row').remove();
-        });
-
-
-    });
-
+  $j(document).ready(function(){
+      var widget_tree = $j("#widget_tree").NCBOTree({
+	  apikey: "58de558b-45df-4e96-8bfe-4d63af070bd0",
+	  ontology: "EDAM",
+          startingClass: "http://edamontology.org/data_0006",
+          startingRoot: "http://edamontology.org/data_0006"
+      });
+  });
 </script>

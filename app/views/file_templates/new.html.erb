@@ -18,8 +18,6 @@
         <%= text_area_tag 'file_template[description]', file_template_description_value, :class=>"form-control rich-text-edit" -%>
       </div>
 
-        <%= render :partial => "select_mime_types", :locals => {:resource => (@file_template ? @file_template : FileTemplate.new) } -%>
-
         <%= render :partial => "select_format_types", :locals => {:resource => (@file_template ? @file_template : FileTemplate.new) } -%>
 
         <%= render :partial => "select_data_types", :locals => {:resource => (@file_template ? @file_template : FileTemplate.new) } -%>

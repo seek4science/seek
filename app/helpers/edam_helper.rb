@@ -11,6 +11,11 @@ module EdamHelper
     end
   end
 
+  def self.edam_table
+    ensure_edam_table
+    return @@edam_table
+  end
+  
   def self.url_to_text(url)
     ensure_edam_table
     if url.include? '#'

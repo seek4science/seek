@@ -1,11 +1,6 @@
 <%= render :partial => "general/item_title",:locals => {:item => @file_template, :version => @display_file_template.version,
                                                         :buttons_partial => 'assets/asset_buttons'} -%>
 
-<% if !@file_template.mime_types.empty? &&
-   !(@file_template.mime_types.include? @file_template.content_blob.content_type) then %>
-<%= alert_box('danger') do "#{@file_template.content_blob.content_type} is not one of the File Template's MIME types" end %>
-<% end %>
-
 <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@file_template} -%>
 
 <div class="row">
