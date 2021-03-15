@@ -13,14 +13,7 @@ class AdminController < ApplicationController
     respond_to do |format|
       format.html
     end
-  end
-
-  def project_creation_requests
-    @requests = MessageLog.pending_project_creation_requests
-    respond_to do |format|
-      format.html
-    end
-  end
+  end  
 
   def update_admins
     admin_ids = params[:admins].split(',') || []
@@ -63,8 +56,10 @@ class AdminController < ApplicationController
     Seek::Config.set_smtp_settings('password', params[:smtp_password]) if params.key?(:smtp_password)
     Seek::Config.set_smtp_settings('enable_starttls_auto', params[:enable_starttls_auto] == '1') if params.key?(:enable_starttls_auto)
 
-    Seek::Config.support_email_address = params[:support_email_address]
-    Seek::Config.noreply_sender = params[:noreply_sender]
+    Seek::Config.support_email_address = params[:support_email_address] if params.key?(:support_email_address)
+    Seek::Config.noreply_sender = params[:noreply_sender] if params.key?(:noreply_sender)
+    Seek::Config.exception_notification_recipients = params[:exception_notification_recipients] if params.key?(:exception_notification_recipients)
+    Seek::Config.exception_notification_enabled = string_to_boolean params[:exception_notification_enabled] if params.key?(:exception_notification_enabled)
 
     Seek::Config.omniauth_enabled = string_to_boolean params[:omniauth_enabled]
     Seek::Config.omniauth_user_create = string_to_boolean params[:omniauth_user_create]
@@ -105,10 +100,7 @@ class AdminController < ApplicationController
     Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]
     Seek::Config.publications_enabled = string_to_boolean params[:publications_enabled]
     Seek::Config.samples_enabled = string_to_boolean params[:samples_enabled]
-    Seek::Config.workflows_enabled = string_to_boolean params[:workflows_enabled]
-
-    Seek::Config.exception_notification_recipients = params[:exception_notification_recipients]
-    Seek::Config.exception_notification_enabled = string_to_boolean params[:exception_notification_enabled]
+    Seek::Config.workflows_enabled = string_to_boolean params[:workflows_enabled]    
 
     Seek::Config.google_analytics_tracker_id = params[:google_analytics_tracker_id]
     Seek::Config.google_analytics_enabled = string_to_boolean params[:google_analytics_enabled]

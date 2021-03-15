@@ -119,8 +119,7 @@ SEEK::Application.routes.draw do
       get :settings
       get :get_stats
       get :registration_form
-      get :edit_tag
-      get :project_creation_requests
+      get :edit_tag      
       post :update_home_settings
       post :restart_server
       post :restart_delayed_job
@@ -287,6 +286,7 @@ SEEK::Application.routes.draw do
       get :administer_create_project_request
       post :respond_create_project_request
       get :project_join_requests
+      get :project_creation_requests
     end
     member do
       get :asset_report

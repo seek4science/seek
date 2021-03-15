@@ -60,22 +60,6 @@ module PeopleHelper
     !current_user.person.shares_project_or_programme?(displayed_person_or_project)
   end
 
-
-  def filter_items_in_ISA (all_related_items)
-    filtered_items_not_in_ISA  = {}
-    all_related_items.each do |resource_type, resource_items|
-      if !["Investigation","Study","Assay"].include? resource_type && resource_items[:items].size > 0
-        resource_items_not_in_ISA = []
-        resource_items[:items].each do |item|
-          if (item.respond_to? (:investigations)) && (item.investigations.any?)
-            resource_items_not_in_ISA << item
-          end
-        end
-        filtered_items_not_in_ISA[resource_type]= resource_items_not_in_ISA unless resource_items_not_in_ISA.empty?
-      end
-    end
-  end
-
   def filter_items_not_in_ISA (all_related_items)
     filtered_items_not_in_ISA  = {}
     items = all_related_items.except('Investigation','Study','Assay')
@@ -83,7 +67,7 @@ module PeopleHelper
       if resource_items[:items].size > 0
         resource_items_not_in_ISA = []
         resource_items[:items].each do |item|
-          if (item.respond_to? (:investigations)) && (!item.investigations.any?)
+          if (item.can_manage?) && (item.respond_to? (:investigations)) && (!item.investigations.any?)
             resource_items_not_in_ISA << item
           elsif !item.respond_to? (:investigations)
             resource_items_not_in_ISA << item

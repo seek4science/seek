@@ -289,21 +289,32 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_no_difference('Project.count') do
       delete :destroy, params: { id: project }
     end
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
   end
 
-  # test 'can not destroy project if it contains people' do
-  #   project = projects(:four)
-  #   work_group = Factory(:work_group, project: project)
-  #   a_person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: work_group)])
-  #   get :show, params: { id: project }
-  #   assert_select 'span.disabled_icon', text: /Delete #{I18n.t('project')}/, count: 1
-  #   assert_no_difference('Project.count') do
-  #     delete :destroy, params: { id: project }
-  #   end
-  #   refute_nil flash[:error]
-  # end
-  #
+  test 'can destroy project if it contains people' do
+    project = Factory(:person).projects.first
+
+    assert_equal 1,project.work_groups.count
+    assert_equal 1, project.people.count
+    assert_equal 1, project.group_memberships.count
+
+    login_as(Factory(:admin))
+
+    assert project.can_delete?
+
+    assert_difference('Project.count', -1) do
+      assert_difference('GroupMembership.count', -1) do
+        assert_no_difference('Person.count') do
+          assert_difference('WorkGroup.count',-1) do
+            delete :destroy, params: { id: project }
+          end
+        end
+      end
+    end
+
+  end
+  
   def test_non_admin_should_not_manage_projects
     login_as(:aaron)
     get :manage, params: { id: Factory(:project) }
@@ -1827,17 +1838,30 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   test 'request create project with site managed programme' do
+    Factory(:admin)
     person = Factory(:person_not_in_project)
     programme = Factory(:programme)
+
+    prog_admin = Factory(:person)
+    prog_admin.is_programme_administrator = true, programme
+    prog_admin.save!
+    another_prog_admin = Factory(:person)
+    another_prog_admin.is_programme_administrator = true, programme
+    another_prog_admin.save!
+    programme.reload
+    assert_equal 2, programme.programme_administrators.count
+
     institution = Factory(:institution)
+    
+    refute programme.programme_administrators.select(&:is_admin?).any?
     login_as(person)
     with_config_value(:managed_programme_id, programme.id) do
       params = {
           programme_id: programme.id,
-          project: { title: 'The Project',description:'description',web_page:'web_page'},
-          institution: {id: institution.id}
+          project: { title: 'The Project', description: 'description', web_page: 'web_page'},
+          institution: { id: institution.id }
       }
-      assert_enqueued_emails(1) do
+      assert_enqueued_emails(2) do # programme admins, and instance admins
         assert_difference('MessageLog.count') do
           post :request_create, params: params
         end
@@ -1890,14 +1914,17 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   test 'request create project with new programme and institution' do
+    Factory(:admin)
     person = Factory(:person_not_in_project)
     programme = Factory(:programme)
+    assert Person.admins.count > 1
     login_as(person)
     with_config_value(:managed_programme_id, programme.id) do
       params = {
-          project: { title: 'The Project',description:'description',web_page:'web_page'},
-          institution: {title:'the inst',web_page:'the page',city:'London',country:'GB'},
-          programme: {title:'the prog'}
+          project: { title: 'The Project', description:'description', web_page:'web_page'},
+          institution: {title: 'the inst', web_page: 'the page', city: 'London', country: 'GB'},
+          programme_id: '',
+          programme: {title: 'the prog'}
       }
       assert_enqueued_emails(1) do
         assert_difference('MessageLog.count') do
@@ -2726,21 +2753,71 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
+  test "project creation requests" do
+    admin = Factory(:admin)
+    prog_admin = Factory(:programme_administrator)
+    programme = prog_admin.programmes.first
+    person = Factory(:person)
+    institution = Factory(:institution)
+    project = Project.new(title: "new")
 
+    log_existing_programme = MessageLog.log_project_creation_request(person, programme, project, institution)
+    log_new_programme = MessageLog.log_project_creation_request(person, Programme.new(title: "new"), project, institution)
 
-  private
+    # no user
+    logout
+    get :project_creation_requests
+    assert_redirected_to :login
+    refute_nil flash[:error]
 
-  def edit_max_object(project)
-    for i in 1..5 do
-      Factory(:person).add_to_project_and_institution(project, Factory(:institution))
+    login_as(prog_admin)
+    get :project_creation_requests
+    assert_response :success
+
+    assert_select "h1", text: /1 pending project creation/i
+    assert_select "table#project-create-requests" do
+      assert_select "tbody tr", count: 1
+      assert_select "a[href=?]", person_path(person), text: person.title
+      assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_existing_programme.id)
+      assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_new_programme.id), count: 0
     end
-    project.default_policy = Factory(:private_policy)
-    project.programme_id = (Factory(:programme)).id
-    add_avatar_to_test_object(project)
-  end
 
-  def valid_project
-    { title: 'a title' }
+    login_as(admin)
+    get :project_creation_requests
+    assert_response :success
+
+    assert_select "h1", text: /1 pending project creation/i
+    assert_select "table#project-create-requests" do
+      assert_select "tbody tr", count: 1
+      assert_select "a[href=?]", person_path(person), text: person.title
+      assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_new_programme.id)
+      assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_existing_programme.id), count: 0
+    end
+
+    with_config_value(:managed_programme_id, programme.id) do
+      get :project_creation_requests
+      assert_response :success
+
+      assert_select "h1", text: /2 pending project creation/i
+      assert_select "table#project-create-requests" do
+        assert_select "tbody tr", count: 2
+        assert_select "a[href=?]", person_path(person), text: person.title, count: 2
+        assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_new_programme.id)
+        assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_existing_programme.id)
+      end
+    end
+
+    login_as(person)
+    get :project_creation_requests
+    assert_response :success
+
+    assert_select "h1", text: /0 pending project creation/i
+    assert_select "table#project-create-requests" do
+      assert_select "tbody tr", count: 0
+      assert_select "a[href=?]", person_path(person), text: person.title, count: 0
+      assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_new_programme.id), count: 0
+      assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_existing_programme.id), count: 0
+    end
   end
 
   test 'should create with discussion link' do
@@ -2749,7 +2826,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_difference('AssetLink.discussion.count') do
       assert_difference('Project.count') do
         post :create, params: { project: { title: 'test',
-                                           discussion_links_attributes: [{url: "http://www.slack.com/"}]}}
+                                          discussion_links_attributes: [{url: "http://www.slack.com/"}]}}
       end
     end
     project = assigns(:project)
@@ -2757,7 +2834,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal AssetLink::DISCUSSION, project.discussion_links.first.link_type
   end
 
-  test 'AAAAA_should show discussion link' do
+  test 'should show discussion link' do
     disc_link = Factory(:discussion_link)
     project = Factory(:project)
     project.discussion_links = [disc_link]
@@ -2793,4 +2870,19 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_empty project.discussion_links
   end
 
+    private
+
+  def edit_max_object(project)
+    for i in 1..5
+      Factory(:person).add_to_project_and_institution(project, Factory(:institution))
+    end
+    project.default_policy = Factory(:private_policy)
+    project.programme_id = (Factory(:programme)).id
+    add_avatar_to_test_object(project)
+  end
+
+  def valid_project
+    { title: "a title" }
+  end  
+  
 end

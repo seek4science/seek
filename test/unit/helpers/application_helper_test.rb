@@ -212,7 +212,7 @@ class ApplicationHelperTest < ActionView::TestCase
 
     person3 = Factory(:person)
 
-    log = MessageLog.log_project_membership_request(Factory(:person),project1,Factory(:institution),'')
+    log = MessageLog.log_project_membership_request(Factory(:person), project1, Factory(:institution),'')
 
     User.with_current_user(person3.user) do
       refute pending_project_join_request?
@@ -229,4 +229,82 @@ class ApplicationHelperTest < ActionView::TestCase
     end
 
   end
+
+  test 'pending project creation request?' do
+    admin = Factory(:admin)
+    prog_admin = Factory(:programme_administrator)
+    programme = prog_admin.programmes.first
+    person = Factory(:person)
+    institution = Factory(:institution)
+    project = Project.new(title:'new project')
+
+    MessageLog.delete_all
+    # creating just a project, admins notified
+    MessageLog.log_project_creation_request(person, nil, project, institution)
+    User.with_current_user(person.user) do
+      refute pending_project_creation_request?
+    end
+    User.with_current_user(prog_admin.user) do
+      refute pending_project_creation_request?
+    end
+    User.with_current_user(admin.user) do
+      assert pending_project_creation_request?
+    end
+    User.with_current_user(nil) do
+      refute pending_project_creation_request?
+    end
+
+    # creating a project with a plain programme - prog admins notified
+    MessageLog.delete_all
+    MessageLog.log_project_creation_request(person, programme, project, institution)
+    User.with_current_user(person.user) do
+      refute pending_project_creation_request?
+    end
+    User.with_current_user(prog_admin.user) do
+      assert pending_project_creation_request?
+    end
+    User.with_current_user(admin.user) do
+      refute pending_project_creation_request?
+    end
+    User.with_current_user(nil) do
+      refute pending_project_creation_request?
+    end
+
+    # creating a project with a managed programme - prog admins and admins notified
+    MessageLog.delete_all
+    MessageLog.log_project_creation_request(person, programme, project, institution)
+    with_config_value(:managed_programme_id, programme.id) do
+      assert programme.site_managed?
+      User.with_current_user(person.user) do
+        refute pending_project_creation_request?
+      end
+      User.with_current_user(prog_admin.user) do
+        assert pending_project_creation_request?
+      end
+      User.with_current_user(admin.user) do
+        assert pending_project_creation_request?
+      end
+      User.with_current_user(nil) do
+        refute pending_project_creation_request?
+      end
+    end
+
+    # new programme, admins notified
+    MessageLog.delete_all
+    MessageLog.log_project_creation_request(person, Programme.new(title: 'new'), project, institution)
+    User.with_current_user(person.user) do
+      refute pending_project_creation_request?
+    end
+    User.with_current_user(prog_admin.user) do
+      refute pending_project_creation_request?
+    end
+    User.with_current_user(admin.user) do
+      assert pending_project_creation_request?
+    end
+    User.with_current_user(nil) do
+      refute pending_project_creation_request?
+    end
+    
+  end
+  
 end
