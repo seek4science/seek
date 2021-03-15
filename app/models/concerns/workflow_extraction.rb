@@ -35,6 +35,10 @@ module WorkflowExtraction
     extractor.can_render_diagram?
   end
 
+  def can_run?
+    can_download?(nil) && workflow_class_title == 'Galaxy' && Seek::Config.galaxy_instance_trs_import_url.present?
+  end
+
   def diagram_exists?(format = default_diagram_format)
     path = diagram_path(format)
     File.exist?(path)
