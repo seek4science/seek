@@ -23,46 +23,43 @@
 
       <%= panel(t('project')) do %>
         <% if @project %>
-          Requesting to join <%= link_to(@project.title, @project) %>
+          You are requesting to join <%= link_to(@project.title, @project) %>
 
-          <%= check_box_tag 'projects[]',@project.id,true,class:'project-selected hidden' %>
+          <%= hidden_field_tag 'projects',@project.id %>
 
         <% else %>
-          <% if Seek::Config.solr_enabled %>
-            <div class="help-block">
-              Search for the <%= t('project') %>, either by name or details related to it.
-              If you cannot find the <%= t('project') %> here, you could try the
-              <%= link_to "#{t('project')} search and filtering", projects_path, target: :_blank %> first to find the
-              name.
-              <br/>
-              Once found, check the box next to the <%= t('project').pluralize %> you wish to request to join.
-            </div>
+          
+          <div class="help-block">
+            Type the name of the <%= t('project') %>, or part of the name or description. From the results listed below, select the <%= t('project') %> you wish to join.
+            You can select up to 3 at once.
+            <br/>
+            If you cannot find the <%= t('project') %> here, you could try the
+            <%= link_to "#{t('project')} search and filtering", projects_path, target: :_blank %> first to find and go to the
+            <%= t('project') %> page, and then Request Membership from the top of the page.
+            <br/>
+            
+          </div>
 
-            <%= label_tag :search_label, "#{t('project')} search" -%>
-            <div class="row">
-              <div class="col-md-10">
-                <%= text_field_tag 'project-search-terms', '', :class => "form-control" -%>
-              </div>
-              <div class="col">
-                <%= submit_tag 'Search', id: 'project-search-submit', :class => 'btn btn-primary' %>
-              </div>
+          <%= label_tag :search_label, "#{t('project')} search" -%>
+          <div class="row">
+            <div class="col-md-10">                
+              <%= objects_input('projects', [], 
+                  typeahead:  {query_url: typeahead_projects_path + '?query=%QUERY',
+                  handlebars_template:'typeahead/hint'}, 
+                  limit:3) -%>
             </div>
+            <div class="col">
+              <%= submit_tag 'Search', id: 'project-search-submit', :class => 'btn btn-primary' %>
+            </div>
+          </div>
 
 
-            <div id='project-search-results'>
-              <div class="alert alert-secondary text-center" role="alert">
-                <em>Search results</em>
-              </div>
+          <div id='project-search-results'>
+            <div class="alert alert-secondary text-center" role="alert">
+              <em>Search results</em>
             </div>
-          <% else %>
-            <div class="alert alert-warning">
-              Search is currently disabled, so you are unable to search for the <%=t('project') %> to join here.
-            </div>
-            <div class="help-block">
-              Instead you can <%= link_to("Browse #{t('project').pluralize}",projects_path) %>.
-              Once you find the one you wish to join, you can select the "Request Membership" button from its page.
-            </div>
-          <% end %>
+          </div>
+          
         <% end %>
       <% end %>
     </div>
@@ -98,7 +95,8 @@
       var enabled = $j('#institution_id').val()
           && $j('input.project-selected:checked').length > 0
           && $j('select#institution_country').val();
-      $j('#submit-button').prop('disabled',!enabled);
+      //$j('#submit-button').prop('disabled',!enabled);
+      $j('#submit-button').prop('disabled',false);
     }
 
     function handleJsonResults(json) {

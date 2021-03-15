@@ -287,6 +287,7 @@ SEEK::Application.routes.draw do
       post :respond_create_project_request
       get :project_join_requests
       get :project_creation_requests
+      get  :typeahead
     end
     member do
       get :asset_report
