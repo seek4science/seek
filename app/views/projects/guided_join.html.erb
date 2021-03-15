@@ -12,7 +12,7 @@
           
           <div class="help-block">
             Type the name of the <%= t('project') %>, or part of the name or description. From the results listed below, select the <%= t('project') %> you wish to join.
-            You can select up to 3 at once.
+            You can select up to a maximum of 3.
             <br/>
             If you cannot find the <%= t('project') %> here, you could try the
             <%= link_to "#{t('project')} search and filtering", projects_path, target: :_blank %> first to find and go to the
@@ -21,7 +21,8 @@
             
           </div>
 
-          <%= label_tag :search_label, "#{t('project')} title" -%>
+          <%= label_tag :project_label, "Type the names of the #{t('project').pluralize}" %>
+          <span class="required">*</span>
           <div class="row">        
             <div class="col-md-12">    
               <%= objects_input('projects', [], 

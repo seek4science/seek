@@ -1716,9 +1716,9 @@ class ProjectsControllerTest < ActionController::TestCase
 
     login_as(person)
 
-    get :guided_join, params:{id:project.id}
+    get :guided_join, params: { id: project.id }
     assert_response :success
-    assert_select "input[type=checkbox][name='projects[]'][checked=checked]",value:project.id
+    assert_select 'input#projects', value: project.id
   end
 
   test 'invalid guided join' do
