@@ -5,9 +5,19 @@ module AssociationsHelper
     options.reverse_merge!(:id => id, 'data-role' => 'seek-associations-list', 'data-template-name' => template_name,class:'box_editing_inner')
 
     content_tag(:div, options) do
-      content_tag(:ul, '', class: 'associations-list related_asset_list') +
-        content_tag(:span, empty_text, class: 'none_text no-item-text') +
-        content_tag(:script, existing.html_safe, :type => 'application/json', 'data-role' => 'seek-existing-associations')
+      content = content_tag(:ul, '', class: 'associations-list related_asset_list') +
+          content_tag(:span, empty_text, class: 'none_text no-item-text') +
+          content_tag(:script, existing.html_safe, :type => 'application/json', 'data-role' => 'seek-existing-associations')
+      # Add an empty hidden field to allow removal of all items
+      # This ensures that the parameter is always sent, even when nothing is selected.
+      # It adds a "" as the first item in the array. So if items 1,2, and 3 are selected the
+      # value of the parameter will be ["","1","2","3"]. This is compatible with the rails
+      # association association_ids= methods, which reject 'blank' values automatically.
+      if options['data-field-name']
+        hidden_field_tag("#{options['data-field-name']}[]", nil, id: nil) + content
+      else
+        content
+      end
     end
   end
 
