@@ -23,8 +23,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'keywords' => 'a, b, c, d',
       'provider' => {
         '@type' => 'Organization',
+        '@id' => 'http://fairyhub.org',
         'name' => 'SysMO-DB',
-        'url' => 'http://www.sysmo-db.org'
+        'url' => 'http://fairyhub.org'
       },
       'dateCreated' => @current_time.to_s
     }
@@ -100,6 +101,12 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
           '@id' => "http://localhost:3000/events/#{df.events.first.id}",
           'name' => df.events.first.title }
       ],
+      "sdPublisher" => {
+        "@type"=>"Organization",
+        "@id"=>"http://localhost:3000",
+        "name"=>"SysMO-DB",
+        "url"=>"http://localhost:3000"
+      },
       'distribution' => {
         '@type' => 'DataDownload',
         'contentSize' => '8.62 KB',
@@ -144,6 +151,12 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateModified' => @current_time.to_s,
       'encodingFormat' => 'text/html',
       'identifier' => 'https://doi.org/10.10.10.10/test.1',
+      "sdPublisher"=>{
+        "@type"=>"Organization",
+        "@id"=>"http://localhost:3000",
+        "name"=>"SysMO-DB",
+        "url"=>"http://localhost:3000"
+      },
       'subjectOf' => [
         { '@type' => 'Event',
           '@id' => "http://localhost:3000/events/#{df.events.first.id}",
@@ -272,7 +285,13 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'encodingFormat' => 'application/pdf',
       'producer' => [
         { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{document.projects.first.id}", 'name' => document.projects.first.title }
-      ]
+      ],
+      "sdPublisher"=>{
+        "@type"=>"Organization",
+        "@id"=>"http://localhost:3000",
+        "name"=>"SysMO-DB",
+        "url"=>"http://localhost:3000"
+      }
     }
 
     json = JSON.parse(document.to_schema_ld)
@@ -299,7 +318,13 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'encodingFormat' => 'application/pdf',
       'producer' => [
         { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{presentation.projects.first.id}", 'name' => presentation.projects.first.title }
-      ]
+      ],
+      "sdPublisher"=>{
+        "@type"=>"Organization",
+        "@id"=>"http://localhost:3000",
+        "name"=>"SysMO-DB",
+        "url"=>"http://localhost:3000"
+      }
     }
 
     json = JSON.parse(presentation.to_schema_ld)
@@ -354,10 +379,12 @@ test 'workflow' do
                  'dateCreated' => @current_time.to_s,
                  'dateModified' => @current_time.to_s,
                  'encodingFormat' => 'application/x-yaml',
-                 'sdPublisher' =>
-                    [{ '@type' => 'Person',
-                       '@id' => "http://localhost:3000/people/#{@person.id}",
-                       'name' => @person.name }],
+                 'sdPublisher'=> {
+                   '@type'=>'Organization',
+                   '@id'=>'http://localhost:3000',
+                   'name'=>'SysMO-DB',
+                   'url'=>'http://localhost:3000'
+                 },
                  'version' => 1,
                  'programmingLanguage' => {
                    '@id'=>'#cwl',
