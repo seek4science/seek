@@ -411,7 +411,9 @@ class PublicationsController < ApplicationController
 
   # create a publication from a form that contains all the data
   def create_publication
-    upload_blob # need to come first.
+
+    upload_blob
+    update_sharing_policies @publication
 
     @publication.registered_mode = @publication.registered_mode || 3
     assay_ids = params[:assay_ids] || []
@@ -426,8 +428,6 @@ class PublicationsController < ApplicationController
                                  author_index: index)
       @publication.publication_authors << pa
     end
-
-    update_sharing_policies @publication
 
     if @publication.save
       create_or_update_associations assay_ids, 'Assay', 'edit'
@@ -451,9 +451,7 @@ class PublicationsController < ApplicationController
   end
 
   def upload_blob
-    @publication_asset = setup_new_asset
-
-    return handle_upload_data && @publication_asset.content_blob.save
+    return handle_upload_data && @publication.content_blob.save
   end
 
   # create a publication from a reference file, at the moment supports only bibtex
