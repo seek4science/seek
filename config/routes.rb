@@ -532,6 +532,18 @@ SEEK::Application.routes.draw do
     resources :people, :programmes, :projects, :collections, only: [:index]
   end
 
+  resources :placeholders, concerns: [:asset] do
+    collection do
+      get :filter
+      get :provide_metadata
+      post :create_metadata
+    end
+    member do
+      get :explore
+    end
+    resources :people, :programmes, :projects, :collections, only: [:index]
+  end
+
   resources :content_blobs, except: [:show, :index, :update, :create, :destroy] do
     collection do
       post :examine_url

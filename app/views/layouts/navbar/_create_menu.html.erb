@@ -49,6 +49,7 @@
         <% end %>
         <% if Seek::Config.file_templates_enabled %>
           <li><%= link_to t("file_template"), new_file_template_path %></li>
+          <li><%= link_to t("placeholder"), new_placeholder_path %></li>
 	<% end %>
         <% if Seek::Config.collections_enabled %>
           <li><%= link_to t("collection"), new_collection_path %></li>

@@ -20,6 +20,7 @@ class FileTemplatesController < ApplicationController
   api_actions :index, :show, :create, :update, :destroy
 
   def create_version
+
     if handle_upload_data(true)
 
       comments = params[:revision_comments]
@@ -63,9 +64,8 @@ class FileTemplatesController < ApplicationController
     params.require(:file_template).permit(:title, :description, { project_ids: [] }, :license, :other_creators,
                                 { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                 { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
-                                { mime_types: [] },
-                                { format_types: [] },
-                                { data_types: [] },
+                                :format_type,
+                                :data_type,
                                 { publication_ids: [] }, { event_ids: [] },
                                      discussion_links_attributes:[:id, :url, :label, :_destroy])
   end

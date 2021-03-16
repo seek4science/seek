@@ -1,0 +1,25 @@
+<%= render :partial => "general/item_title",:locals => {:item => @placeholder,
+                                                        :buttons_partial => 'assets/asset_buttons'} -%>
+
+<div class="row">
+  <div class="col-md-9 col-sm-8 box_about_actor">
+    <%= item_description @display_placeholder.description -%>
+
+    <div class="row">
+      <div class="col-md-6">
+        <%= persistent_resource_id(@display_placeholder) %>
+
+        <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @placeholder} %>
+
+      </div>
+    </div>
+    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @placeholder, :deep => true, :include_parents => true} %>
+  </div>
+
+  <div class="col-md-3 col-sm-4">
+    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @placeholder } %>
+  </div>
+</div>
+
+<%# get, classify and authorize all assets for this project -%>
+<%= render :partial=>"general/items_related_to",:object => @placeholder %>

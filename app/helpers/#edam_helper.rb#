@@ -33,15 +33,15 @@ module EdamHelper
       parents.each do |p|
         parent_id = p.split('/')[-1]
         unless parent_id.starts_with?('data_')
-          parent_id = 'squiggle'
-        end
+          parent_id = '#'
+       end
         new_row = {"id" => row_id,
                    "parent" => parent_id,
-                   "text" => "fred"}
+                   "text" => text}
         @@data_json << new_row
       end
     end
-    return @@data_json
+    return @@data_json.to_json
   end
   
   def self.format_json

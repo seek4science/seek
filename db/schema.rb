@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_11_115522) do
+ActiveRecord::Schema.define(version: 2021_03_16_114303) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -729,6 +729,8 @@ ActiveRecord::Schema.define(version: 2021_03_11_115522) do
     t.text "other_creators"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string "data_type", default: "http://edamontology.org/data_0006", null: false
+    t.string "format_type", default: "http://edamontology.org/format_1915", null: false
     t.index ["policy_id"], name: "index_file_templates_on_policy_id"
   end
 
@@ -1258,6 +1260,46 @@ ActiveRecord::Schema.define(version: 2021_03_11_115522) do
     t.integer "strain_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "placeholder_auth_lookup",  force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view", default: false
+    t.boolean "can_manage", default: false
+    t.boolean "can_edit", default: false
+    t.boolean "can_download", default: false
+    t.boolean "can_delete", default: false
+    t.index ["user_id", "asset_id", "can_view"], name: "index_p_user_id_asset_id_can_view"
+    t.index ["user_id", "can_view"], name: "index_p_auth_lookup_on_user_id_and_can_view"
+  end
+
+  create_table "placeholders",  force: :cascade do |t|
+    t.text "title"
+    t.text "description"
+    t.integer "contributor_id"
+    t.string "first_letter", limit: 1
+    t.string "uuid"
+    t.bigint "policy_id"
+    t.string "license"
+    t.datetime "last_used_at"
+    t.text "other_creators"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.bigint "file_template_id"
+    t.string "data_type", default: "http://edamontology.org/data_0006", null: false
+    t.string "format_type", default: "http://edamontology.org/format_1915", null: false
+    t.index ["contributor_id"], name: "index_ps_on_c"
+    t.index ["file_template_id"], name: "index_placeholders_on_file_template_id"
+    t.index ["policy_id"], name: "index_placeholders_on_policy_id"
+  end
+
+  create_table "placeholders_projects",  force: :cascade do |t|
+    t.bigint "placeholder_id"
+    t.bigint "project_id"
+    t.index ["placeholder_id", "project_id"], name: "index_placeholders_projects_on_placeholder_id_and_project_id"
+    t.index ["placeholder_id"], name: "index_placeholders_projects_on_placeholder_id"
+    t.index ["project_id"], name: "index_placeholders_projects_on_project_id"
   end
 
   create_table "policies", id: :integer,  force: :cascade do |t|

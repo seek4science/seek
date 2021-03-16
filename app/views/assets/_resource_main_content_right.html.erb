@@ -34,11 +34,11 @@
   <% end %>
 <% end %>
 
-<% if resource.respond_to?(:format_types) %>
+<% if resource.respond_to?(:format_type) %>
   <%= render :partial => "assets/format_types_box", :locals => { :resource => resource, :versioned_resource=> versioned_resource } -%>
 <% end %>
 
-<% if resource.respond_to?(:data_types) %>
+<% if resource.respond_to?(:data_type) %>
   <%= render :partial => "assets/data_types_box", :locals => { :resource => resource, :versioned_resource=> versioned_resource } -%>
 <% end %>
 

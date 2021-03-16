@@ -26,7 +26,7 @@
     <%
       ['programmes', 'projects', 'people', 'institutions',
        'investigations', 'studies', 'assays',
-       'data_files', 'models', 'sops', 'publications', 'documents', 'presentations', 'events'].each do |controller| %>
+       'data_files', 'models', 'sops', 'publications', 'documents', 'presentations', 'events', 'file_templates', 'placeholders'].each do |controller| %>
       <% options = Seek::ListSorter.options_for_select(controller.classify) %>
       <% selected = Seek::Config.sorting_for(controller) || Seek::ListSorter.key_for_view(controller.classify, :index) %>
       <tr>

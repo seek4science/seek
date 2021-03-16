@@ -224,7 +224,7 @@ class AdminController < ApplicationController
 
   def update_pagination
     %w[people projects projects programmes institutions investigations
-        studies assays data_files models sops publications presentations events documents].each do |type|
+        studies assays data_files models sops publications presentations events documents file_templates placeholders].each do |type|
       Seek::Config.set_sorting_for(type, params[:sorting][type])
       Seek::Config.set_results_per_page_for(type, params[:results_per_page][type])
     end

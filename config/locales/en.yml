@@ -36,8 +36,8 @@ en:
   presentation: "Presentation"
   event: "Event"
   file_template: "File Template"
+  placeholder: "Placeholder"
   collection: "Collection"
-  file_template: "File Template"
 
   sample: "Sample"
   sample_type: "Sample type"
