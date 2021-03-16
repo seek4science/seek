@@ -2,7 +2,11 @@ module AssociationsHelper
 
   def associations_list(id, template_name, existing, options = {})
     empty_text = options.delete(:empty_text) || 'No items'
-    options.reverse_merge!(:id => id, 'data-role' => 'seek-associations-list', 'data-template-name' => template_name,class:'box_editing_inner')
+    options.reverse_merge!(id: id,
+                           class: 'box_editing_inner',
+                           blank_field: true,
+                           'data-role' => 'seek-associations-list',
+                           'data-template-name' => template_name)
 
     content_tag(:div, options) do
       content = content_tag(:ul, '', class: 'associations-list related_asset_list') +
@@ -13,7 +17,7 @@ module AssociationsHelper
       # It adds a "" as the first item in the array. So if items 1,2, and 3 are selected the
       # value of the parameter will be ["","1","2","3"]. This is compatible with the rails
       # association association_ids= methods, which reject 'blank' values automatically.
-      if options['data-field-name']
+      if options['data-field-name'] && options[:blank_field]
         hidden_field_tag("#{options['data-field-name']}[]", nil, id: nil) + content
       else
         content

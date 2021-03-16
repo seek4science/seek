@@ -10,11 +10,11 @@
     assay_assets = resource.assay_assets.select { |aa| aa.asset_type == 'DataFile' }
     field_name = "#{resource.class.name.underscore}[data_files_attributes]"
     collapse_panel = assay_assets.empty?
-    associated_data_files_json = associations_json_from_assay_assets(assay_assets, fieldName: field_name)
+    associated_data_files_json = associations_json_from_assay_assets(assay_assets)
   else
     field_name = "data_files"
     collapse_panel = resource.data_files.empty?
-    associated_data_files_json = associations_json_from_relationship(resource.data_files, fieldName: field_name)
+    associated_data_files_json = associations_json_from_relationship(resource.data_files)
   end
 -%>
 
