@@ -9,27 +9,10 @@ class PublicationsController < ApplicationController
 
   before_action :publications_enabled?
 
-  # no versioning for publication
-=begin
-  def find_version(version)
-    warn("BBBBBBBBBBBBBBBBB - there")
-    return self
-  end
-
-  def latest_version()
-    warn("BBBBBBBBBBBBBBBBB - there")
-    return self
-  end
-
-  def version()
-    return self
-  end
-=end
-
   before_action :find_assets, only: [:index]
-  before_action :find_and_authorize_requested_item, only: %i[show edit manage update destroy download upload_fulltext]
+  before_action :find_and_authorize_requested_item, only: %i[show edit manage update destroy download upload_fulltext uploadPdf]
   before_action :suggest_authors, only: [:manage]
-  before_action :find_display_asset, :only=>[:show, :download] # :_resource_list_item,
+  before_action :find_display_asset, :only=>[:show, :download]
 
   include Seek::BreadCrumbs
 
@@ -96,8 +79,9 @@ class PublicationsController < ApplicationController
   def manage; end
 
   # GET /publications/1/upload_fulltext
-  def upload_fulltext;
-    @publication = Publication.find(params[:id])
+  def upload_fulltext
+    # @publication = Publication.find(params[:id])
+    # publication is found via find_and_authorize_requested_item and return is authorized!
   end
 
   # POST /publications
@@ -150,11 +134,9 @@ class PublicationsController < ApplicationController
   end
 
   def uploadPdf
-    @publication = Publication.find(params[:id])
-
     update_sharing_policies @publication
 
-    if handle_upload_data && @publication.content_blob.save # should be true if nothing needed to be uploaded
+    if handle_upload_data && @publication.content_blob.save && @publication.save # should be true if nothing needed to be uploaded
       respond_to do |format|
         flash[:notice] = 'Pdf was successfully uploaded.'
         format.html { redirect_to(@publication) }
@@ -429,6 +411,7 @@ class PublicationsController < ApplicationController
 
   # create a publication from a form that contains all the data
   def create_publication
+    upload_blob # need to come first.
 
     @publication.registered_mode = @publication.registered_mode || 3
     assay_ids = params[:assay_ids] || []
@@ -444,7 +427,6 @@ class PublicationsController < ApplicationController
       @publication.publication_authors << pa
     end
 
-    upload_blob
     update_sharing_policies @publication
 
     if @publication.save
@@ -470,60 +452,9 @@ class PublicationsController < ApplicationController
 
   def upload_blob
     @publication_asset = setup_new_asset
-    #respond_to do |format|
-      if handle_upload_data && @publication_asset.content_blob.save
-        #session[:uploaded_content_blob_id] = @publication.content_blob.id
-        return true
-      else
-        #session.delete(:uploaded_content_blob_id)
-        return false
-      end
+
+    return handle_upload_data && @publication_asset.content_blob.save
   end
-
-  def setup_new_asset
-    attr={}
-    if params["#{controller_name.singularize}"]
-      attr = send("#{controller_name.singularize}_params")
-    end
-    item = class_for_controller_name.new(attr)
-    item.parent_name = params[:parent_name] if item.respond_to?(:parent_name)
-    set_shared_item_variable(item)
-    @content_blob = ContentBlob.new
-    @page_title = params[:page_title]
-    item
-  end
-
-  #### Unused ???
-  def respond_for_new
-    respond_to do |format|
-      if User.logged_in_and_member?
-        format.html # new.html.erb
-      else
-        flash[:error] = "You are not authorized to upload a new #{t(controller_name.singularize)}. Only members of known projects, institutions or work groups are allowed to create new content."
-        format.html { redirect_to eval("#{controller_name}_path") }
-      end
-    end
-  end
-
-  def createUpload
-    item = initialize_asset
-
-    if handle_upload_data
-      create_asset_and_respond(item)
-    else
-      handle_upload_data_failure
-    end
-  end
-
-  def initialize_asset
-    item = @publication
-    #item = class_for_controller_name.new(asset_params)
-    set_shared_item_variable(item)
-
-    item
-  end
-
-  #### End unused
 
   # create a publication from a reference file, at the moment supports only bibtex
   # only sets the @publication and redirects to the create_publication with content from the bibtex file
@@ -783,5 +714,4 @@ class PublicationsController < ApplicationController
     end
     replace_str
   end
-
 end

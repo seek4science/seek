@@ -6,17 +6,18 @@
 
     <div class="row">
       <% if Seek::Config.allow_publications_fulltext %>
-      <div class="row">
-        <div class="col-md-6">
-          <%= persistent_resource_id(@publication) %>
+        <div class="row">
+          <div class="col-md-6">
+            <%= persistent_resource_id(@publication) %>
 
-          <%= render :partial => 'assets/fileinfo',:object=>@publication.content_blob -%>
+            <%= render :partial => 'assets/fileinfo',:object=>@publication.content_blob -%>
+          </div>
         </div>
-      </div>
+        <% if @publication.content_blob %>
+          <%= rendered_asset_view(@publication) %>
+        <%end %>
       <% end %>
-      <% if @publication.content_blob %>
-        <%= rendered_asset_view(@publication) %>
-      <%end %>
+
       <div class="col-md-6">
         <%= persistent_resource_id(@publication) %>
         <% unless @publication.pubmed_id.nil? %>

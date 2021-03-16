@@ -231,7 +231,7 @@ module AssetsHelper
 
   def mini_file_delete_icon(fileinfo, user)
     item_name = text_for_resource fileinfo
-    if fileinfo.can_delete?(user)         # polymorphic_path(resource, action: :download, code: params[:code])
+    if fileinfo.can_delete?(user)
       html = content_tag(:div) { image_tag_for_key('destroy', polymorphic_path([fileinfo.asset, fileinfo], method: :delete, code: params[:code]), "Delete #{item_name}", { data: { confirm: 'It cannot be undone. Are you sure?' }, method: :delete }, "Delete PDF (cannot be reverted)") }
       return html.html_safe
     elsif fileinfo.can_manage?(user)

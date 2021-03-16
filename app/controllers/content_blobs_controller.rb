@@ -130,7 +130,6 @@ class ContentBlobsController < ApplicationController
 
   def destroy
     respond_to do |format|
-      warn("Deleting Content_BLOB")
       @content_blob = ContentBlob.find(params[:id])
       @asset = @content_blob.asset
       flash[:error]="Unable to delete this file" if !@content_blob.destroy
@@ -256,8 +255,6 @@ class ContentBlobsController < ApplicationController
       return true # no version
     elsif @content_blob.asset_version
       begin
-        warn("Our asset is " + @content_blob.asset)
-        warn("Our asset version is " + @content_blob.asset_version)
         @asset_version = @content_blob.asset.find_version(@content_blob.asset_version)
       rescue Exception => e
         error('Unable to find asset version', 'is invalid')
@@ -274,5 +271,4 @@ class ContentBlobsController < ApplicationController
       request.body
     end
   end
-
 end

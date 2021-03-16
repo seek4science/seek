@@ -646,9 +646,6 @@ SEEK::Application.routes.draw do
       post :update_metadata
       post :request_contact
       post :uploadPdf
-      #post :new_version
-      #post :edit_version_comment
-      #delete :destroy_version
     end
     resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:documents, :presentations, :organisms, :events,:only=>[:index]
   end

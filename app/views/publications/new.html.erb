@@ -122,8 +122,8 @@
     </div>
   </div>
     <% if Seek::Config.allow_publications_fulltext %>
-    <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@publication} -%>
-    <%= fields_for(@publication) { |f| render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f} }-%>
+      <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@publication} -%>
+      <%= fields_for(@publication) { |f| render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f} }-%>
     <% end %>
     <div class="form-group">
     <%= label_tag :abstract, nil, :class => 'control-label col-sm-2' %>

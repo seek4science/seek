@@ -140,7 +140,6 @@ class ApplicationController < ActionController::Base
   # returns the model asset assigned to the standard object for that controller, e.g. @model for models_controller
   def determine_asset_from_controller
     name = controller_name.singularize
-    warn("Controller is "+name)
     eval("@#{name}")
   end
 
