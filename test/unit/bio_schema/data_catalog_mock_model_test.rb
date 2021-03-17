@@ -28,16 +28,16 @@ class DataCatalogMockModelTest < ActiveSupport::TestCase
     end
   end
 
-  test 'sdPublisher' do
+  test 'provider' do
     with_config_value(:dm_project_name, 'WIBBLE') do
       with_config_value(:dm_project_link, 'http://wibble.eu') do
         expected = {
           "@type"=>"Organization",
           "@id"=>"http://wibble.eu",
-          "name"=>"SysMO-DB",
+          "name"=>"WIBBLE",
           "url"=>"http://wibble.eu"
         }
-        assert_equal expected, @data_catalogue.sdPublisher
+        assert_equal expected, @data_catalogue.provider
       end
     end
   end
