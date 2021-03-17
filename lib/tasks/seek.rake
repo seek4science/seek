@@ -107,6 +107,7 @@ namespace :seek do
         end
       end
     end
+  end
 
   desc "Clear encrypted settings"
   task clear_encrypted_settings: :environment do
