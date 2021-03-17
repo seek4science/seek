@@ -10,7 +10,7 @@ class PublicationsController < ApplicationController
   before_action :publications_enabled?
 
   before_action :find_assets, only: [:index]
-  before_action :find_and_authorize_requested_item, only: %i[show edit manage update destroy download upload_fulltext uploadPdf]
+  before_action :find_and_authorize_requested_item, only: %i[show edit manage update destroy download upload_fulltext upload_pdf]
   before_action :suggest_authors, only: [:manage]
   before_action :find_display_asset, :only=>[:show, :download]
 
@@ -133,7 +133,7 @@ class PublicationsController < ApplicationController
     end
   end
 
-  def uploadPdf
+  def upload_pdf
     update_sharing_policies @publication
 
     if handle_upload_data && @publication.content_blob.save && @publication.save # should be true if nothing needed to be uploaded

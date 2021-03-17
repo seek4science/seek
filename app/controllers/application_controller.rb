@@ -247,7 +247,7 @@ class ApplicationController < ActionController::Base
       respond_to do |format|
         format.html do
           case privilege
-          when :publish, :manage, :edit, :download, :delete, :upload_fulltext
+          when :publish, :manage, :edit, :download, :delete
             if current_user.nil?
               flash[:error] = "You are not authorized to #{privilege} this #{name.humanize}, you may need to login first."
             else

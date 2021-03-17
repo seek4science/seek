@@ -645,7 +645,7 @@ SEEK::Application.routes.draw do
       post :disassociate_authors
       post :update_metadata
       post :request_contact
-      post :uploadPdf
+      post :upload_pdf
     end
     resources :people,:projects,:investigations,:assays,:studies,:models,:data_files,:documents, :presentations, :organisms, :events,:only=>[:index]
   end
