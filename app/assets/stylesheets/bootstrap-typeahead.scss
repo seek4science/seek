@@ -15,7 +15,7 @@
 }
 
 .tt-dropdown-menu {
-    min-width: 160px;
+    min-width: 320px;
     margin-top: 2px;
     padding: 5px 0;
     background-color: $dropdown-bg;
@@ -31,13 +31,13 @@
 }
 
 .tt-suggestion.tt-cursor {
-    color: $dropdown-link-active-color;
+    //color: $dropdown-link-active-color;
     background-color: $dropdown-link-active-bg;
     cursor: pointer;
 }
 
 .tt-suggestion.tt-cursor a {
-    color: $dropdown-link-active-color;
+    //color: $dropdown-link-active-color;
 }
 
 .tt-suggestion p {
