@@ -11,7 +11,6 @@ require 'bio'
 require 'bio_extensions'
 require 'uuid'
 require 'sunspot_rails'
-require 'seek/breadcrumbs'
 require 'string_extensions'
 require 'recaptcha'
 require 'acts_as_list'
@@ -29,9 +28,25 @@ require 'mimemagic'
 require 'private_address_check_monkeypatch'
 
 SEEK::Application.configure do
-  ASSET_ORDER = ['Person', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'Strain', 'DataFile', 'Model', 'Sop', 'Publication', 'Presentation','SavedSearch', 'Organism', 'Event']
+  ASSET_ORDER = ['Person', 'Programme', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'Strain', 'DataFile', 'Model', 'Sop', 'Publication', 'Presentation','SavedSearch', 'Organism', 'HumanDisease', 'Event']
 
-  Seek::Config.propagate_all
+  begin
+    Seek::Config.propagate_all
+  rescue Settings::DecryptionError
+    puts "\n" * 3
+    puts "#" * 40
+    puts
+    puts "WARNING - Could not decrypt settings!"
+    puts
+    puts "Please check the encryption key (filestore/attr_encrypted/key) is"
+    puts "is present and is the same key used to encrypt the settings originally."
+    puts
+    puts "If you no longer have access to the original key you can clear any encrypted"
+    puts "settings by running: rake seek:clear_encrypted_settings"
+    puts
+    puts "#" * 40
+    puts "\n" * 3
+  end
 
   #Need to load defaut_locale file for internationalization used in Inflector below
   #coz this file is loaded at a later point
@@ -66,11 +81,6 @@ SEEK::Application.configure do
 
   begin
     if ActiveRecord::Base.connection.data_source_exists?'delayed_jobs'
-      SendPeriodicEmailsJob.create_initial_jobs
-      NewsFeedRefreshJob.create_initial_job
-      ContentBlobCleanerJob.create_initial_job
-      OpenbisEndpointCacheRefreshJob.create_initial_jobs
-      OpenbisSyncJob.create_initial_jobs
       # OpenbisFakeJob.create_initial_jobs
       # OpenbisGarbageJob.create_initial_jobs
     end

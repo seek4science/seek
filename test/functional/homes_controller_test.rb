@@ -10,7 +10,7 @@ class HomesControllerTest < ActionController::TestCase
     # check accessible outside
     get :funding
     assert_response :success
-    assert_select 'h1', /seek funding/i
+    assert_select 'h1', /seek.*funding/i
   end
 
   test 'test should be accessible to seek even if not logged in' do
@@ -289,8 +289,8 @@ class HomesControllerTest < ActionController::TestCase
 
   test 'recently added and download should include snapshot' do
     person = Factory(:person)
-    snapshot1 = Factory(:investigation, title: 'inv with snap', contributor: person).create_snapshot
-    snapshot2 = Factory(:assay, title: 'assay with snap', contributor: person).create_snapshot
+    snapshot1 = Factory(:investigation, policy: Factory(:publicly_viewable_policy), title: 'inv with snap', contributor: person).create_snapshot
+    snapshot2 = Factory(:assay, policy: Factory(:publicly_viewable_policy), title: 'assay with snap', contributor: person).create_snapshot
     assert_difference 'ActivityLog.count', 2 do
       Factory(:activity_log, action: 'create', activity_loggable: snapshot1, created_at: 1.day.ago, culprit: person.user)
       Factory(:activity_log, action: 'download', activity_loggable: snapshot2, created_at: 1.day.ago, culprit: person.user)
@@ -317,18 +317,6 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_select 'span.headline_announcement_title', count: 0
-  end
-
-  test 'should not show external search without crossref' do
-    with_config_value :solr_enabled, true do
-      with_config_value :external_search_enabled, true do
-        with_config_value :crossref_api_email, '' do
-          get :index
-          assert_response :success
-          assert_select 'div#search_box input#include_external_search', count: 0
-        end
-      end
-    end
   end
 
   test 'should show external search when not logged in' do
@@ -524,6 +512,39 @@ class HomesControllerTest < ActionController::TestCase
       assert_select 'div.ft-info a[href=?]', privacy_home_path, text: /Privacy Policy/
     end
   end
+
+  test "alert for pending project creation" do
+  project = Project.new(title: "my project")
+  person = Factory(:person)
+  prog_admin = Factory(:programme_administrator)
+  programme = prog_admin.programmes.first
+  institution = Factory(:institution)
+
+  MessageLog.destroy_all
+
+  login_as(prog_admin)
+
+  get :index
+  assert_select "div#pending-project-creation-warning", text: /There are pending/, count: 0
+
+  log1 = MessageLog.log_project_creation_request(person, programme, project, institution)
+
+  get :index
+  assert_select "div#pending-project-creation-warning", text: /There are pending/, count: 1
+
+  login_as(Factory(:person))
+
+  get :index
+  assert_select "div#pending-project-creation-warning", text: /There are pending/, count: 0
+
+  login_as(prog_admin)
+  get :index
+  assert_select "div#pending-project-creation-warning", text: /There are pending/, count: 1
+
+  log1.respond("fish")
+  get :index
+  assert_select "div#pending-project-creation-warning", text: /There are pending/, count: 0
+end
 
   def uri_to_guardian_feedtest
     uri_to_feed 'guardian_atom.xml'

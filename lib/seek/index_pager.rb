@@ -67,36 +67,44 @@ module Seek
     end
 
     def paginate_assets(assets)
-      if @page.match?(/[0-9]+/) # Standard pagination
+      if @page.match?(/^[0-9]+$/) # Standard pagination
         assets.paginate(page: @page,
                         per_page: @per_page)
       elsif @page == 'all' # No pagination
         assets.paginate(page: 1, per_page: 1_000_000)
-      else # Alphabetical pagination
+      elsif @page.match?(/^[A-Z]$/) || @page=='?' || @page=='top' # Alphabetical pagination
         controller_model.paginate_after_fetch(assets, page_and_sort_params)
+      else #default to 1 if invalid page
+        @page=1
+        assets.paginate(page: @page,
+                        per_page: @per_page)
       end
     end
 
     private
 
+    # Takes into account current view, and returns the appropriate max results per page
+    def get_results_per_page
+
+      condensed_view_count = is_condensed_view? ? Seek::Config.results_per_page_default_condensed : false
+
+      # Priorities for the results per page value
+      # per_page param > controller specific config > specific view default > general default
+      params[:per_page]&.to_i ||
+          Seek::Config.results_per_page_for(controller_name) ||
+          condensed_view_count ||
+          Seek::Config.results_per_page_default
+    end
+
     def assign_index_variables
       # Parent resource
-      parent_id_param = request.path_parameters.keys.detect { |k| k.to_s.end_with?('_id') }
-      if parent_id_param
-        parent_type = parent_id_param.to_s.chomp('_id')
-        parent_class = parent_type.camelize.constantize
-        if parent_class
-          @parent_resource = parent_class.find(params[parent_id_param])
-        end
-      end
+      get_parent_resource
 
       # Page
       @page = page_and_sort_params[:page]
       @page ||= 'all' if json_api_request?
       @page ||= '1'
-      @per_page = params[:per_page]&.to_i ||
-          Seek::Config.results_per_page_for(controller_name) ||
-          Seek::Config.results_per_page_default
+      @per_page = get_results_per_page
 
       # Order
       @order = if page_and_sort_params[:sort]
@@ -110,6 +118,7 @@ module Seek
         @order = :updated_at_desc if @page == 'top' && Seek::ListSorter.options(controller_model.name).include?(:updated_at_desc)
         # Sort by `title` if on an alphabetical page, and its a valid sort option for this type.
         @order = :title_asc if @page.match?(/[?A-Z]+/) && Seek::ListSorter.options(controller_model.name).include?(:title_asc)
+        @order ||= :relevance if page_and_sort_params.dig(:filter, :query).present? && Seek::Config.solr_enabled
         @order ||= Seek::Config.sorting_for(controller_name)&.to_sym
         @order ||= Seek::ListSorter.key_for_view(controller_model.name, :index)
       end

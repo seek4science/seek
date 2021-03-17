@@ -14,9 +14,7 @@
       <div>
         <%= create_button id:"data_file_submit_btn",
                           onclick:"return validateResourceFields('data_file');",
-                          class:'btn btn-primary',
-                          button_text:'Upload',
-                          'data-upload-file-text' => 'Upload' %>
+                          class:'btn btn-primary' %>
         or <%= cancel_button(data_files_path) -%>
       </div>
     </div>

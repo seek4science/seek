@@ -1,6 +1,6 @@
 <%
   entity=controller_name.singularize
-  object=eval("@"+entity)
+  object=instance_variable_get("@#{entity}")
   display_asset = nil
   path_to_create_from_existing = nil
   if asset == "data_file"

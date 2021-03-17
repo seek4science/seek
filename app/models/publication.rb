@@ -9,7 +9,7 @@ class Publication < ApplicationRecord
   # searchable must come before acts_as_asset is called
   if Seek::Config.solr_enabled
     searchable(auto_index: false) do
-      text :journal, :pubmed_id, :doi, :published_date
+      text :journal, :pubmed_id, :doi, :published_date, :human_disease_terms
       text :publication_authors do
         seek_authors.map(&:person).collect(&:name)
       end
@@ -29,6 +29,9 @@ class Publication < ApplicationRecord
   has_many :investigations, through: :related_relationships, source: :subject, source_type: 'Investigation'
   has_many :presentations, through: :related_relationships, source: :subject, source_type: 'Presentation'
 
+  has_and_belongs_to_many :human_diseases
+  has_filter :human_disease
+
   acts_as_asset
   validates :title, length: { maximum: 65_535 }
 
@@ -43,7 +46,7 @@ class Publication < ApplicationRecord
 
   validates :doi, format: { with: VALID_DOI_REGEX, message: 'is invalid' }, allow_blank: true
   validates :pubmed_id, numericality: { greater_than: 0, message: 'is invalid' }, allow_blank: true
-  validates :publication_type_id, presence: true
+  validates :publication_type_id, presence: true, on: :create
 
   # validation differences between OpenSEEK and the VLN SEEK
   validates_uniqueness_of :pubmed_id, allow_nil: true, allow_blank: true, if: -> { Seek::Config.is_virtualliver }
@@ -109,6 +112,14 @@ class Publication < ApplicationRecord
 
   end
 
+  # Returns the columns to be shown on the table view for the resource
+  def columns_default
+    super + ['abstract','published_date','journal']
+  end
+  def columns_allowed
+    super + ['abstract','published_date','journal','last_used_at','doi','citation','deleted_contributor','registered_mode','booktitle','publisher','editor','url']
+  end
+
   def pubmed_uri
     "https://www.ncbi.nlm.nih.gov/pubmed/#{pubmed_id}" if pubmed_id
   end
@@ -121,6 +132,10 @@ class Publication < ApplicationRecord
   def doi=(doi)
     doi = doi.gsub(/(https?:\/\/)?(dx\.)?doi\.org\//,'') if doi
     super(doi)
+  end
+
+  def human_disease_terms
+    human_diseases.collect(&:searchable_terms).flatten
   end
 
   def default_policy
@@ -399,9 +414,6 @@ class Publication < ApplicationRecord
      self.citation += url.blank? ? '': url
     end
     self.citation =  self.citation.try(:to_s).strip.gsub(/^,/,'').strip
-
-    Rails.logger.info("Citation:"+publication_type.title+":" + self.citation)
-
   end
 
   def fetch_pubmed_or_doi_result(pubmed_id, doi)
@@ -421,8 +433,6 @@ class Publication < ApplicationRecord
       begin
         query = DOI::Query.new(Seek::Config.crossref_api_email)
         result = query.fetch(doi)
-
-        Rails.logger.debug("fetch_pubmed_or_doi_result:#{result.citation}")
 
         @error = 'Unable to get result' if result.blank?
         @error = 'Unable to get DOI' if result.title.blank?
@@ -493,10 +503,15 @@ class Publication < ApplicationRecord
   end
 
   has_filter organism: Seek::Filtering::Filter.new(
-      value_field: 'organisms.id',
-      label_field: 'organisms.title',
-      joins: [:assays_organisms, :models_organisms]
+    value_field: 'organisms.id',
+    label_field: 'organisms.title',
+    joins: [:assays_organisms, :models_organisms]
   )
+
+  # returns a list of related human diseases, related through either the assay or the model
+  def related_human_diseases
+    (assays.collect(&:human_diseases).flatten | models.collect(&:human_disease).flatten).uniq
+  end
 
   def self.subscribers_are_notified_of?(action)
     action == 'create'
@@ -571,7 +586,6 @@ class Publication < ApplicationRecord
 
   def check_bibtex_file (bibtex_record)
 
-    Rails.logger.info("publication_type:"+ self.publication_type.title)
 
     if self.title.blank?
       errors.add(:base, "Please check your bibtex files, each publication should contain a title or a chapter name.")

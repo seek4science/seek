@@ -42,21 +42,6 @@ class SopsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'request file button visibility when logged in and out' do
-    sop = Factory :sop, policy: Factory(:policy, access_type: Policy::VISIBLE)
-
-    assert !sop.can_download?, 'The SOP must not be downloadable for this test to succeed'
-
-    get :show, params: { id: sop }
-    assert_response :success
-    assert_select '#request_resource_button', text: /Request #{I18n.t('sop')}/, count: 1
-
-    logout
-    get :show, params: { id: sop }
-    assert_response :success
-    assert_select '#request_resource_button', text: /Request #{I18n.t('sop')}/, count: 0
-  end
-
   test 'fail gracefullly when trying to access a missing sop' do
     get :show, params: { id: 99_999 }
     assert_response :not_found
@@ -295,13 +280,52 @@ class SopsControllerTest < ActionController::TestCase
     assert_select 'a', text: /Edit experimental conditions/, count: 0
   end
 
+
+  test 'should show request contact button' do
+    s = Factory(:sop, contributor: Factory(:person), policy: Factory(:public_policy))
+    get :show, params: { id: s }
+    assert_response :success
+    assert_select 'a.disabled', text: /Request Contact/, count: 0
+    assert_select 'a#request_contact_button', text: /Request Contact/, count: 1
+  end
+
+  test 'should not show request contact button when there is no contributor or creator' do
+    get :show, params: { id: sops(:sop_with_no_contributor), policy: Factory(:public_policy)}
+    assert_response :success
+    assert_select 'a.disabled', text: /Request Contact/, count: 0
+    assert_select 'a#request_contact_button', text: /Request Contact/, count: 0
+  end
+
+  test 'should not show request contact button when the current user is the only contributor or creator' do
+    s = Factory(:sop, contributor: @user.person)
+    get :show, params: { id: s }
+    assert_response :success
+    assert_select 'a.disabled', text: /Request Contact/, count: 0
+    assert_select 'a#request_contact_button', text: /Request Contact/, count: 0
+  end
+
+  test 'request contact' do
+    s = Factory(:sop, contributor: Factory(:person), policy: Factory(:public_policy))
+    assert_enqueued_emails(1) do
+      assert_difference('MessageLog.count') do
+        post :request_contact, format: :js, params: { id:s, details:'blah blah' }
+      end
+    end
+
+    log = MessageLog.last
+    assert_equal s, log.subject
+    assert_equal User.current_user.person,log.sender
+    assert_equal MessageLog::CONTACT_REQUEST,log.message_type
+
+  end
+
   def test_should_show_version
     s = Factory(:sop, contributor: @user.person)
 
     # !!!description cannot be changed in new version but revision comments and file name,etc
 
     # create new version
-    post :new_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: fixture_file_upload('files/little_file_v2.txt', 'text/plain') }] }
+    post :create_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: fixture_file_upload('files/little_file_v2.txt', 'text/plain') }] }
     assert_redirected_to sop_path(assigns(:sop))
 
     s = Sop.find(s.id)
@@ -342,7 +366,7 @@ class SopsControllerTest < ActionController::TestCase
     s = Factory(:sop, contributor: @user.person)
 
     assert_difference('Sop::Version.count', 1) do
-      post :new_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' }
+      post :create_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' }
     end
 
     assert_redirected_to sop_path(s)
@@ -368,7 +392,7 @@ class SopsControllerTest < ActionController::TestCase
     refute s.can_edit?
 
     assert_no_difference('Sop::Version.count') do
-      post :new_version, params: { id: s, data: fixture_file_upload('files/file_picture.png'), revision_comments: 'This is a new revision' }
+      post :create_version, params: { id: s, data: fixture_file_upload('files/file_picture.png'), revision_comments: 'This is a new revision' }
     end
 
     assert_redirected_to sop_path(s)
@@ -388,7 +412,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal 1, s.experimental_conditions.count
     assert_difference('Sop::Version.count', 1) do
       assert_difference('ExperimentalCondition.count', 1) do
-        post :new_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' } # v2
+        post :create_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' } # v2
       end
     end
 
@@ -404,7 +428,7 @@ class SopsControllerTest < ActionController::TestCase
                                               start_value: 1, sop_id: s.id, sop_version: s.version)
     assert_difference('Sop::Version.count', 1) do
       assert_difference('ExperimentalCondition.count', 1) do
-        post :new_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' } # v2
+        post :create_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' } # v2
       end
     end
 
@@ -432,6 +456,7 @@ class SopsControllerTest < ActionController::TestCase
     get :show, params: { id: sops(:sop_with_no_contributor) }
     assert_response :success
   end
+
 
   def test_can_show_edit_for_sop_with_no_contributor
     get :edit, params: { id: sops(:sop_with_no_contributor) }
@@ -542,45 +567,6 @@ class SopsControllerTest < ActionController::TestCase
     assert_select 'p.list_item_attribute', text: /#{I18n.t('creator').pluralize.capitalize}: None/, count: no_other_creator_sops.count
   end
 
-  test 'breadcrumb for sop index' do
-    get :index
-    assert_response :success
-    assert_select 'div.breadcrumbs', text: /Home #{I18n.t('sop').pluralize} Index/, count: 1 do
-      assert_select 'a[href=?]', root_path, count: 1
-    end
-  end
-
-  test 'breadcrumb for showing sop' do
-    sop = sops(:sop_with_fully_public_policy)
-    get :show, params: { id: sop }
-    assert_response :success
-    assert_select 'div.breadcrumbs', text: /Home #{I18n.t('sop').pluralize} Index #{sop.title}/, count: 1 do
-      assert_select 'a[href=?]', root_path, count: 1
-      assert_select 'a[href=?]', sops_url, count: 1
-    end
-  end
-
-  test 'breadcrumb for editing sop' do
-    sop = sops(:sop_with_all_sysmo_users_policy)
-    assert sop.can_edit?
-    get :edit, params: { id: sop }
-    assert_response :success
-    assert_select 'div.breadcrumbs', text: /Home SOPs Index #{sop.title} Edit/, count: 1 do
-      assert_select 'a[href=?]', root_path, count: 1
-      assert_select 'a[href=?]', sops_url, count: 1
-      assert_select 'a[href=?]', sop_url(sop), count: 1
-    end
-  end
-
-  test 'breadcrumb for creating new sop' do
-    get :new
-    assert_response :success
-    assert_select 'div.breadcrumbs', text: /Home #{I18n.t('sop').pluralize} Index New/, count: 1 do
-      assert_select 'a[href=?]', root_path, count: 1
-      assert_select 'a[href=?]', sops_url, count: 1
-    end
-  end
-
   test 'should set the policy to projects_policy if the item is requested to be published, when creating new sop' do
     as_not_virtualliver do
       gatekeeper = Factory(:asset_gatekeeper)
@@ -616,6 +602,7 @@ class SopsControllerTest < ActionController::TestCase
     get :show, params: { id: sop.id }
     assert_response :success
     assert_select 'a', text: /View content/, count: 1
+    assert_select 'a.disabled', text: /View content/, count: 0
   end
 
   test 'should be able to view ms/open office word content' do
@@ -628,12 +615,14 @@ class SopsControllerTest < ActionController::TestCase
       get :show, params: { id: ms_word_sop.id }
       assert_response :success
       assert_select 'a', text: /View content/, count: 1
+      assert_select 'a.disabled', text: /View content/, count: 0
 
       openoffice_word_sop = Factory(:odt_sop, policy: Factory(:all_sysmo_downloadable_policy))
       assert openoffice_word_sop.content_blob.is_content_viewable?
       get :show, params: { id: openoffice_word_sop.id }
       assert_response :success
       assert_select 'a', text: /View content/, count: 1
+      assert_select 'a.disabled', text: /View content/, count: 0
     end
   end
 
@@ -648,7 +637,7 @@ class SopsControllerTest < ActionController::TestCase
     assert !content_blob.is_content_viewable?
     get :show, params: { id: ms_word_sop.id }
     assert_response :success
-    assert_select 'a', text: /View content/, count: 0
+    assert_select 'a.disabled', text: /View content/, count: 1
 
     Seek::Config.pdf_conversion_enabled = tmp
   end
@@ -664,7 +653,7 @@ class SopsControllerTest < ActionController::TestCase
     s = assigns(:sop)
     assert_difference('ActivityLog.count', 1) do
       assert_difference('Sop::Version.count', 1) do
-        post :new_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' }
+        post :create_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' }
       end
     end
     al2 = ActivityLog.last
@@ -677,7 +666,7 @@ class SopsControllerTest < ActionController::TestCase
   test 'should not create duplication sop_versions_projects when uploading new version' do
     sop = Factory(:sop)
     login_as(sop.contributor)
-    post :new_version, params: { id: sop, sop: { title: sop.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' }
+    post :create_version, params: { id: sop, sop: { title: sop.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' }
 
     sop.reload
     assert_equal 2, sop.versions.count
@@ -1200,7 +1189,7 @@ class SopsControllerTest < ActionController::TestCase
 
     login_as(person)
     assert_no_difference('Sop::Version.count', 1) do
-      post :new_version, params: { id: sop.id, sop: { title: "haha!" }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision' }
+      post :create_version, params: { id: sop.id, sop: { title: "haha!" }, content_blobs: [{ data: file_for_upload }], revision_comments: 'This is a new revision' }
     end
   end
 
@@ -1349,6 +1338,8 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal other_person,sop.policy.permissions.first.contributor
     assert_equal Policy::MANAGING,sop.policy.permissions.first.access_type
 
+    assert_equal 'SOP was successfully updated.',flash[:notice]
+
   end
 
   test 'manage_update fails without manage rights' do
@@ -1457,7 +1448,7 @@ class SopsControllerTest < ActionController::TestCase
                  policy: Factory(:public_policy, access_type: Policy::VISIBLE))
 
     with_config_value(:results_per_page_default, 2) do
-      get :index, params: { page: 1, order: 'created_at_desc' }
+      get :index, params: { page: 1, order: 'created_at_desc'}
       assert_equal [:created_at_desc], assigns(:order)
       assert_equal 2, assigns(:sops).length
       assert_equal [s2, s1], assigns(:sops).to_a
@@ -1509,6 +1500,150 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal s3.id, assigns(:sops)[1].id
     assert_equal s4.id, assigns(:sops)[2].id
     assert_equal s1.id, assigns(:sops)[3].id
+  end
+
+  test 'should create with discussion link' do
+    person = Factory(:person)
+    login_as(person)
+    sop =  {title: 'SOP', project_ids: [person.projects.first.id], discussion_links_attributes:[{url: "http://www.slack.com/"}]}
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('Sop.count') do
+        assert_difference('ContentBlob.count') do
+          post :create, params: {sop: sop, content_blobs: [{ data: file_for_upload }], policy_attributes: { access_type: Policy::VISIBLE }}
+        end
+      end
+    end
+    sop = assigns(:sop)
+    assert_equal 'http://www.slack.com/', sop.discussion_links.first.url
+    assert_equal AssetLink::DISCUSSION, sop.discussion_links.first.link_type
+  end
+
+
+  test 'should show discussion link' do
+    asset_link = Factory(:discussion_link)
+    sop = Factory(:sop, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    get :show, params: { id: sop }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+  end
+
+
+  test 'should update sop with new discussion link' do
+    person = Factory(:person)
+    sop = Factory(:sop, contributor: person)
+    login_as(person)
+    assert_nil sop.discussion_links.first
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: sop.id, sop: { discussion_links_attributes:[{url: "http://www.slack.com/"}] } }
+      end
+    end
+    assert_redirected_to sop_path(assigns(:sop))
+    assert_equal 'http://www.slack.com/', sop.discussion_links.first.url
+  end
+
+  test 'should update sop with edited discussion link' do
+    person = Factory(:person)
+    sop = Factory(:sop, contributor: person, discussion_links:[Factory(:discussion_link)])
+    login_as(person)
+    assert_equal 1,sop.discussion_links.count
+    assert_no_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: sop.id, sop: { discussion_links_attributes:[{id:sop.discussion_links.first.id, url: "http://www.wibble.com/",link_type: AssetLink::DISCUSSION}] } }
+      end
+    end
+    sop = assigns(:sop)
+    assert_redirected_to sop_path(sop)
+    assert_equal 1,sop.discussion_links.count
+    assert_equal 'http://www.wibble.com/', sop.discussion_links.first.url
+  end
+
+  test 'should destroy related assetlink when the discussion link is removed ' do
+    person = Factory(:person)
+    login_as(person)
+    asset_link = Factory(:discussion_link)
+    sop = Factory(:sop, discussion_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
+    assert_difference('AssetLink.discussion.count', -1) do
+      put :update, params: { id: sop.id, sop: { discussion_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
+    end
+    assert_redirected_to sop_path(sop = assigns(:sop))
+    assert_empty sop.discussion_links
+  end
+
+  test 'should immediately update auth for anon user' do
+    with_config_value(:auth_lookup_enabled, true) do
+      login_as(person = Factory(:person))
+      sop = Factory(:sop, contributor: person, policy: Factory(:private_policy))
+      AuthLookupUpdateQueue.destroy_all
+      refute sop.can_view?(nil)
+
+      put :update, params: { id: sop.id, sop: { title: 'Test2' }, policy_attributes: { access_type: Policy::ACCESSIBLE } }
+
+      sop = assigns(:sop)
+      assert_equal Policy::ACCESSIBLE, sop.policy.access_type
+      assert sop.can_view?(nil)
+    end
+  end
+
+  test 'can edit version revision comments' do
+    sop = Factory(:sop)
+    login_as(sop.contributor)
+    disable_authorization_checks do
+      sop.save_as_new_version('something')
+    end
+
+    assert_not_equal 'modified', sop.find_version(2).revision_comments
+
+    post :edit_version, params: { id: sop.id, version: 2, revision_comments: 'modified' }
+    assert_redirected_to sop
+
+    assert_equal 'modified', sop.find_version(2).reload.revision_comments
+  end
+
+  test 'can edit version visibility' do
+    sop = Factory(:sop)
+    login_as(sop.contributor)
+    disable_authorization_checks do
+      sop.save_as_new_version('new v')
+    end
+
+    assert_not_equal :registered_users, sop.find_version(1).visibility
+
+    post :edit_version, params: { id: sop.id, version: 1, visibility: 'registered_users' }
+    assert_redirected_to sop
+
+    assert_equal :registered_users, sop.find_version(1).reload.visibility
+  end
+
+  test 'cannot edit version visibility if doi minted' do
+    sop = Factory(:sop)
+    login_as(sop.contributor)
+    disable_authorization_checks do
+      sop.save_as_new_version('yep')
+      sop.find_version(1).update_column(:doi, '10.5072/wtf')
+    end
+
+    assert_equal :public, sop.find_version(1).visibility
+
+    post :edit_version, params: { id: sop.id, version: 1, visibility: 'private' }
+    assert_redirected_to sop
+
+    assert_equal :public, sop.find_version(1).reload.visibility, 'Should not have changed visibility - DOI present'
+  end
+
+  test 'cannot edit version visibility if latest version' do
+    sop = Factory(:sop)
+    login_as(sop.contributor)
+    disable_authorization_checks do
+      sop.save_as_new_version('fhsdkjhfgjlk')
+    end
+
+    assert_equal :public, sop.find_version(2).visibility
+
+    post :edit_version, params: { id: sop.id, version: 2, visibility: 'private' }
+    assert_redirected_to sop
+
+    assert_equal :public, sop.find_version(2).reload.visibility, 'Should not have changed visibility - latest version'
   end
 
   private

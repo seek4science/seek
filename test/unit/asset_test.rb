@@ -247,8 +247,7 @@ class AssetTest < ActiveSupport::TestCase
     end
 
     df.policy = Factory(:public_policy)
-    df.doi = 'test_doi'
-    disable_authorization_checks { df.save }
+    df.find_version(1).update_column(:doi, 'test_doi')
     assert !df.find_version(1).can_mint_doi?
   end
 
@@ -256,8 +255,7 @@ class AssetTest < ActiveSupport::TestCase
     df = Factory :data_file
     assert !df.find_version(1).has_doi?
     assert !df.has_doi?
-    df.doi = 'test_doi'
-    disable_authorization_checks { df.save }
+    df.find_version(1).update_column(:doi, 'test_doi')
     assert df.find_version(1).has_doi?
     assert df.has_doi?
   end
@@ -461,7 +459,7 @@ class AssetTest < ActiveSupport::TestCase
     df.policy.permissions.create(contributor:project2, access_type:Policy::ACCESSIBLE)
     assert df.projects_accessible?(project2)
     assert df.projects_accessible?([project1,project2])
-    refute refute df.projects_accessible?([project1,project2, Factory(:project)])
+    refute df.projects_accessible?([project1,project2, Factory(:project)])
   end
 
   test 'update_timestamps with new version' do
@@ -478,6 +476,17 @@ class AssetTest < ActiveSupport::TestCase
       end
     end
 
+  end
+
+  test 'filter by project unique' do
+    projects = [Factory(:project),Factory(:project)]
+    investigation = Factory(:investigation,projects:projects)
+    other_investigation = Factory(:investigation)
+
+    assert_equal [investigation],Investigation.filter_by_projects(projects)
+
+    #check it's an relation and not just turned into an array
+    assert ActiveRecord::Relation,Investigation.filter_by_projects(projects).is_a?(ActiveRecord::Relation)
   end
 
 end

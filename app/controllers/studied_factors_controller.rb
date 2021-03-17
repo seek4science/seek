@@ -9,8 +9,6 @@ class StudiedFactorsController < ApplicationController
   before_action :create_new_studied_factor, only: [:index]
   before_action -> { no_comma_for_decimal(studied_factor_params) }, only: %i[create update]
 
-  include Seek::BreadCrumbs
-
   def index
     respond_to do |format|
       format.html

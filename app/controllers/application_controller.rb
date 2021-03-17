@@ -30,14 +30,13 @@ class ApplicationController < ActionController::Base
 
   before_action :check_doorkeeper_scopes, if: :doorkeeper_token
   before_action :check_json_id_type, only: [:create, :update], if: :json_api_request?
-  before_action :convert_json_params, only: [:update, :destroy, :create, :new_version], if: :json_api_request?
+  before_action :convert_json_params, only: [:update, :destroy, :create, :create_version], if: :json_api_request?
 
   before_action :rdf_enabled? #only allows through rdf calls to supported types
 
   helper :all
 
   layout Seek::Config.main_layout
-
 
   def with_current_user
     User.with_current_user current_user do
@@ -120,7 +119,7 @@ class ApplicationController < ActionController::Base
   def page_and_sort_params
     permitted = Seek::Filterer.new(controller_model).available_filter_keys.flat_map { |p| [p, { p => [] }] }
     permitted_filter_params = { filter: permitted }
-    params.permit(:page, :sort, :order, permitted_filter_params)
+    params.permit(:page, :sort, :order, :view, :table_cols, permitted_filter_params)
   end
 
   helper_method :page_and_sort_params
@@ -140,7 +139,7 @@ class ApplicationController < ActionController::Base
   # returns the model asset assigned to the standard object for that controller, e.g. @model for models_controller
   def determine_asset_from_controller
     name = controller_name.singularize
-    eval("@#{name}")
+    instance_variable_get("@#{name}")
   end
 
   def restrict_guest_user
@@ -152,7 +151,7 @@ class ApplicationController < ActionController::Base
 
   def project_membership_required
     unless User.logged_in_and_member? || admin_logged_in?
-      flash[:error] = 'Only members of known projects, institutions or work groups are allowed to create new content.'
+      flash[:error] = "Only members of #{t('project').downcase.pluralize} can create content."
       respond_to do |format|
         format.html do
           object = determine_asset_from_controller
@@ -161,7 +160,7 @@ class ApplicationController < ActionController::Base
           else
             path = nil
             begin
-              path = eval("main_app.#{controller_name}_path")
+              path = main_app.polymorphic_path(controller_name)
             rescue NoMethodError => e
               logger.error("No path found for controller - #{controller_name}")
               path = main_app.root_path
@@ -224,10 +223,10 @@ class ApplicationController < ActionController::Base
         format.json { render json: { errors: [{ title: 'Not found',
                                                 detail: "Couldn't find #{name.camelize} with 'id'=[#{params[:id]}]" }] },
                              status: :not_found }
-        format.html { redirect_to eval "#{controller_name}_path" }
+        format.html { redirect_to polymorphic_path(controller_name) }
       end
     else
-      eval "@#{name} = object"
+      instance_variable_set("@#{name}", object)
     end
   end
 
@@ -241,7 +240,7 @@ class ApplicationController < ActionController::Base
     object = controller_model.find(params[:id])
 
     if is_auth?(object, privilege)
-      eval "@#{name} = object"
+      instance_variable_set("@#{name}", object)
       params.delete :policy_attributes unless object.can_manage?(current_user)
     else
       respond_to do |format|
@@ -253,7 +252,7 @@ class ApplicationController < ActionController::Base
             else
               flash[:error] = "You are not authorized to #{privilege} this #{name.humanize}."
             end
-            redirect_to(eval("#{controller_name.singularize}_path(#{object.id})"))
+            redirect_to(object)
           else
             render template: 'general/landing_page_for_hidden_item', locals: { item: object }, status: :forbidden
           end
@@ -313,6 +312,16 @@ class ApplicationController < ActionController::Base
       false
     end
   end
+
+  # Checks whether the current view is "condensed" (short results or table)
+  def is_condensed_view?
+    # Check current view from param, or on its absence from session
+    return (params.has_key?(:view) && params[:view]!="default")||
+      (!params.has_key?(:view) && session.has_key?(:view) && !session[:view].nil? && session[:view]!="default")
+  end
+  
+  helper_method :is_condensed_view
+
 
   def log_event
     # FIXME: why is needed to wrap in this block when the around filter already does ?
@@ -377,7 +386,7 @@ class ApplicationController < ActionController::Base
         end
       when *Seek::Util.authorized_types.map { |t| t.name.underscore.pluralize.split('/').last } + ["sample_types"] # TODO: Find a nicer way of doing this...
         action = 'create' if action == 'upload_for_tool' || action == 'create_metadata' || action == 'create_from_template'
-        action = 'update' if action == 'new_version'
+        action = 'update' if action == 'create_version'
         action = 'inline_view' if action == 'explore'
         if %w(show create update destroy download inline_view).include?(action)
           check_log_exists(action, controller_name, object)
@@ -411,9 +420,7 @@ class ApplicationController < ActionController::Base
 
   # determines and returns the object related to controller, e.g. @data_file
   def object_for_request
-    c = controller_name.downcase
-
-    eval('@' + c.singularize)
+    instance_variable_get("@#{controller_name.singularize}")
   end
 
   def expire_activity_fragment_cache(controller, action)
@@ -564,5 +571,47 @@ class ApplicationController < ActionController::Base
                        details: 'This action is not permitted for API clients using OAuth.' }] }, status: :forbidden }
       end
     end
+  end
+
+  def determine_custom_metadata_keys
+    keys = []
+    root_key = controller_name.singularize.to_sym
+    attribute_params = params[root_key][:custom_metadata_attributes]
+    if attribute_params && attribute_params[:custom_metadata_type_id].present?
+      metadata_type = CustomMetadataType.find(attribute_params[:custom_metadata_type_id])
+      if metadata_type
+        keys = [:custom_metadata_type_id] + metadata_type.custom_metadata_attributes.collect(&:method_name)
+      end
+    end
+    keys
+  end
+
+  # Dynamically get parent resource from URL.
+  # i.e. /data_files/123/some_sub_resource/456
+  # would fetch DataFile with ID 123
+  #
+  def get_parent_resource
+    parent_id_param = request.path_parameters.keys.detect { |k| k.to_s.end_with?('_id') }
+    if parent_id_param
+      parent_type = parent_id_param.to_s.chomp('_id')
+      parent_class = parent_type.camelize.constantize
+      if parent_class
+        @parent_resource = parent_class.find(params[parent_id_param])
+      end
+    end
+  end
+
+  def determine_custom_metadata_keys
+    keys = []
+    root_key = controller_name.singularize.to_sym
+    attribute_params = params[root_key][:custom_metadata_attributes]
+    if attribute_params && attribute_params[:custom_metadata_type_id].present?
+      metadata_type = CustomMetadataType.find(attribute_params[:custom_metadata_type_id])
+      if metadata_type
+        keys = [:custom_metadata_type_id]
+        keys = keys + [{data:[metadata_type.custom_metadata_attributes.collect(&:title)]}]
+      end
+    end
+    keys
   end
 end

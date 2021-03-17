@@ -10,6 +10,7 @@ end
 Factory.define(:max_project, class: Project) do |f|
   f.title "A Maximal Project"
   f.description "A Taverna project"
+  f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
   f.web_page "http://www.taverna.org.uk"
   f.wiki_page "http://www.mygrid.org.uk"
   f.default_license "Other (Open)"

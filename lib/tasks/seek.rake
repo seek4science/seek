@@ -9,6 +9,7 @@ require 'csv'
 namespace :seek do
   desc 'Creates background jobs to rebuild all authorization lookup table for all items.'
   task(repopulate_auth_lookup_tables: :environment) do
+    puts "..... repopulating auth lookup tables ..."
     Seek::Util.authorized_types.each do |type|
       type.remove_invalid_auth_lookup_entries
       type.find_each do |item|
@@ -16,7 +17,7 @@ namespace :seek do
       end
     end
     # 5 is an arbitrary number to take advantage of there being more than 1 worker dedicated to auth refresh
-    5.times { AuthLookupUpdateJob.new.queue_job(1, 5.seconds.from_now) }
+    5.times { AuthLookupUpdateJob.set(priority: 1).perform_later }
   end
 
   desc 'Rebuild all authorization lookup table for all items.'
@@ -67,12 +68,13 @@ namespace :seek do
   desc 'Creates background jobs to reindex all searchable things'
   task(reindex_all: :environment) do
     Seek::Util.searchable_types.each do |type|
-      ReindexingJob.new.add_items_to_queue type.all, 5.seconds.from_now, 2
+      ReindexingQueue.enqueue(type.all)
     end
   end
 
   desc('clears temporary files from filestore/tmp')
   task(clear_filestore_tmp: :environment) do
+    puts "..... clearing the filestore tmp directory ..."
     FileUtils.rm_r(Dir["#{Seek::Config.temporary_filestore_path}/*"])
   end
 
@@ -105,5 +107,11 @@ namespace :seek do
         end
       end
     end
+
+  desc "Clear encrypted settings"
+  task clear_encrypted_settings: :environment do
+    Settings.where(var: Seek::Config.encrypted_settings).destroy_all
+    puts 'Encrypted settings cleared'
   end
+
 end

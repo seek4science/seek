@@ -114,6 +114,72 @@ namespace :seek_dev do
     end
   end
 
+  task :add_covid_map_people, [:path, :project_id, :admin_user_id] => :environment do |_t, args|
+    path = args.path
+    project_id = args.project_id
+    admin_user = args.admin_user_id
+    user = User.find(admin_user)
+    project = Project.find(project_id)
+    raise "Wrong project" unless project.title == "COVID-19 Disease Map" #sanity check
+
+    puts "Using CSV at #{path}"
+    errors = []
+    added = 0
+    associated = 0
+    CSV.foreach(path) do |row|
+      name = row[0]&.strip
+      email = row[1]&.strip
+      institution_id = row[2].strip
+      expertise = row[3]
+      first, last = name.split(' ',2)
+
+      puts "Processing #{name}"
+
+      User.with_current_user(user) do
+        if (RFC822::EMAIL =~ email) && first
+          person = Person.where(email:email).first
+          unless person
+            puts "creating profile for #{name}"
+            person = Person.new(first_name: first,last_name: last,email: email)
+            person.expertise = expertise if expertise
+            if person.valid?
+              person.save!
+              added +=1
+            else
+              person = nil
+              errors << ["person invalid", row]
+            end
+          end
+          unless person.nil? || person.member_of?(project)
+            institution = Institution.find_by_id(institution_id)
+            if institution
+              puts "adding #{name} to #{institution.title}"
+              person.add_to_project_and_institution(project, institution)
+              person.save!
+              associated+=1
+            else
+              errors << ["institution not found",row]
+            end
+          else
+            if person
+              puts "#{name} already in project"
+            end
+          end
+        else
+          errors << ["bad email or no first name",row]
+        end
+      end
+    end
+    puts "Errors:" unless errors.empty?
+    errors.each do |error|
+      puts error[0]
+      puts error[1].inspect
+      puts "---------------"
+    end
+    puts "#{added} people added"
+    puts "#{associated} linked to project"
+  end
+
   task :add_people_from_spreadsheet, [:path] => :environment do |_t, args|
     path = args.path
     file = open(path)
@@ -194,4 +260,230 @@ namespace :seek_dev do
       end
     end
   end
+
+  task build_basic_test_custom_metadata: :environment do
+    unless CustomMetadataType.where(supported_type: 'Investigation').any?
+      cmt = CustomMetadataType.new(title: 'test Investigation metadata', supported_type:'Investigation')
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'age', sample_attribute_type: SampleAttributeType.where(title:'Integer').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'name', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'date', sample_attribute_type: SampleAttributeType.where(title:'Date time').first)
+      cmt.save!
+      puts "Created test CMT for Investigation"
+    else
+      puts "CMT for Investigation already exists"
+    end
+
+    unless CustomMetadataType.where(supported_type: 'Study').any?
+      cmt = CustomMetadataType.new(title: 'test Study metadata', supported_type:'Study')
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'age', sample_attribute_type: SampleAttributeType.where(title:'Integer').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'name', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'date', sample_attribute_type: SampleAttributeType.where(title:'Date time').first)
+      cmt.save!
+      puts "Created test CMT for Study"
+    else
+      puts "CMT for Study already exists"
+    end
+
+    unless CustomMetadataType.where(supported_type: 'Assay').any?
+      cmt = CustomMetadataType.new(title: 'test Assay metadata', supported_type:'Assay')
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'age', sample_attribute_type: SampleAttributeType.where(title:'Integer').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'name', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'date', sample_attribute_type: SampleAttributeType.where(title:'Date time').first)
+      cmt.save!
+      puts "Created test CMT for Assay"
+    else
+      puts "CMT for Assay already exists"
+    end
+  end
+
+  task build_test_custom_metadata: :environment do
+    cmt_already_exist = CustomMetadataType.where(supported_type: 'Investigation').any?
+    if cmt_already_exist
+      puts "CMT for Investigation already exists do want to overwrite with your modification y/N"
+      answer = STDIN.gets.chomp.to_s.downcase
+      if (!answer == "y" || !answer == "yes")
+        cmt_already_exist = true
+      elsif (answer == "y" || answer == "yes")
+        old_cmt = CustomMetadataType.where(supported_type: 'Investigation')
+        old_cmt.destroy_all
+        cmt_already_exist = false
+      end
+    end
+    unless cmt_already_exist
+      cmt = CustomMetadataType.new(title: 'MIAPPE metadata', supported_type:'Investigation')
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'id', required:true, sample_attribute_type: SampleAttributeType.where(title:'string').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'submission_date', sample_attribute_type: SampleAttributeType.where(title:'Date').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'license', sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'miappe_version', required:true, sample_attribute_type: SampleAttributeType.where(title:'Integer').first)
+      cmt.save!
+      puts "Created test CMT for Investigation"
+    else
+      puts "CMT for Investigation already exists"
+    end
+
+    cmt_already_exist =  CustomMetadataType.where(supported_type: 'Study').any?
+    if cmt_already_exist
+      puts "CMT for Study already exists do want to overwrite with your modification y/N"
+      answer = STDIN.gets.chomp.to_s.downcase
+      if (!answer == "y" || !answer == "yes")
+        cmt_already_exist = true
+      elsif (answer == "y" || answer == "yes")
+        old_cmt =  CustomMetadataType.where(supported_type: 'Study')
+        old_cmt.destroy_all
+        cmt_already_exist = false
+      end
+    end
+    unless cmt_already_exist
+      cmt = CustomMetadataType.new(title: 'MIAPPE metadata', supported_type:'Study')
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'id', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'study_start_date', required:true, sample_attribute_type: SampleAttributeType.where(title:'Date').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'study_end_date', sample_attribute_type: SampleAttributeType.where(title:'Date').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'contact_institution', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'geographic_location_country', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'experimental_site_name', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'latitude', sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'longitude', sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'altitude', sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'description_of_the_experimental_design', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'type_of_experimental_design', sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'observation_unit_level_hierarchy', sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'observation_unit_description', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'description_of_growth_facility', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'type_of_growth_facility', sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'cultural_practices', sample_attribute_type: SampleAttributeType.where(title:'String').first)
+
+      cmt.save!
+      puts "Created test CMT for Study"
+    else
+      puts "CMT for Study already exists"
+    end
+
+    cmt_already_exist =  CustomMetadataType.where(supported_type: 'Assay').any?
+    if cmt_already_exist
+      puts "CMT for Assay already exists do want to overwrite with your modification y/N"
+      answer = STDIN.gets.chomp.to_s.downcase
+      if (!answer == "y" || !answer == "yes")
+        cmt_already_exist = true
+      elsif (answer == "y" || !answer == "yes")
+        old_cmt =  CustomMetadataType.where(supported_type: 'Assay')
+        old_cmt.destroy_all
+        cmt_already_exist = false
+      end
+    end
+    unless cmt_already_exist
+      cmt = CustomMetadataType.new(title: 'test Assay metadata', supported_type:'Assay')
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'age', sample_attribute_type: SampleAttributeType.where(title:'Integer').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'name', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'date', sample_attribute_type: SampleAttributeType.where(title:'Date time').first)
+      cmt.save!
+      puts "Created test CMT for Assay"
+    else
+      puts "CMT for Assay already exists"
+    end
+
+  end
+
+  task find_duplicate_users_by_name_match: :environment do
+    File.delete("./log/duplicate_users.log") if File.exist?("./log/duplicate_users.log")
+    output = File.open( "./log/duplicate_users.log","w" )
+    duplicated_users = Person.select(:first_name,:last_name).group(:first_name,:last_name).having("count(*)>1")
+    #pp duplicated_users
+    duplicated_users.each do |duplicated_user|
+      matches = Person.where(first_name: duplicated_user.first_name, last_name: duplicated_user.last_name)
+      puts duplicated_user.first_name+" "+duplicated_user.last_name+"("+matches.size.to_s+")"
+      output << duplicated_user.first_name+" "+duplicated_user.last_name+"("+matches.size.to_s+")"+"\n"
+      matches.each do |match|
+        puts "ID "+ match.id.to_s+":"+ match.email
+        output << "ID "+ match.id.to_s+":"+ match.email+"\n"
+      end
+      output << "\n"
+    end
+    output.close
+  end
+
+  task find_publications_without_publication_types: :environment do
+     base_url = "https://fairdomhub.org/"
+     #base_url = "https://0.0.0.0:3002/"
+    File.delete("./log/publications_without_publication_types.log") if File.exist?("./log/publications_without_publication_types.log")
+    output = File.open( "./log/publications_without_publication_types.log","w" )
+     pj_has_pubs = Project.all.select { |p| p.publications.size > 0 }
+     pj_has_pubs_without_type = pj_has_pubs.select{|p| p.publications.map(&:publication_type_id).any?{ |e| e.nil? } }
+      pp pj_has_pubs.map(&:id)
+      pp pj_has_pubs_without_type.map(&:id)
+      pj_has_pubs_without_type.each do |project|
+        pp "====================="
+        pp project.title + '('+base_url+"projects/"+project.id.to_s+ ')'
+        output << "====================="+"\n"
+        output << "Project:"+ project.title+"\n"
+        output << base_url+"projects/"+project.id.to_s+"\n"
+        output << "====================="+"\n"
+        project.publications.each do |publication|
+          if  publication.publication_type_id.blank?
+            pp base_url+"publications/"+publication.id.to_s
+            output << base_url+"publications/"+publication.id.to_s+"\n"
+          end
+        end
+        output << "\n"
+      end
+    output.close
+  end
+
+  task build_test_custom_metadata: :environment do
+    unless CustomMetadataType.where(supported_type: 'Investigation').any?
+      cmt = CustomMetadataType.new(title: 'test Investigation metadata', supported_type:'Investigation')
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'age', sample_attribute_type: SampleAttributeType.where(title:'Integer').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'name', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'date', sample_attribute_type: SampleAttributeType.where(title:'Date time').first)
+      cmt.save!
+      puts "Created test CMT for Investigation"
+    else
+      puts "CMT for Investigation already exists"
+    end
+
+    unless CustomMetadataType.where(supported_type: 'Study').any?
+      cmt = CustomMetadataType.new(title: 'test Study metadata', supported_type:'Study')
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'age', sample_attribute_type: SampleAttributeType.where(title:'Integer').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'name', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'date', sample_attribute_type: SampleAttributeType.where(title:'Date time').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'date file', sample_attribute_type: SampleAttributeType.where(title:'SEEK Data file').first)
+      cmt.save!
+      puts "Created test CMT for Study"
+    else
+      puts "CMT for Study already exists"
+    end
+
+    unless CustomMetadataType.where(supported_type: 'Assay').any?
+      cmt = CustomMetadataType.new(title: 'test Assay metadata', supported_type:'Assay')
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'age', sample_attribute_type: SampleAttributeType.where(title:'Integer').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'name', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+      cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'date', sample_attribute_type: SampleAttributeType.where(title:'Date time').first)
+      cmt.save!
+      puts "Created test CMT for Assay"
+    else
+      puts "CMT for Assay already exists"
+    end
+
+  end
+
+  task make_ontology_study_cmt: :environment do
+    cmt = CustomMetadataType.new(title: 'Study Ontology CMT', supported_type:'Study')
+    cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'name', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
+    cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'ontology',
+                                                                  required:true,
+                                                                  sample_attribute_type:SampleAttributeType.where(title:'Controlled Vocabulary').first,
+                                                                  sample_controlled_vocab: SampleControlledVocab.find(4))
+    cmt.save!
+  end
+
+  task report_missing_related_items_routes: :environment do
+    Seek::RelatedItems::RELATABLE_TYPES.each do |type|
+      klass = type.constantize
+      methods = klass.related_type_methods
+      methods.each_key do |assoc|
+        x = Rails.application.routes.url_helpers.send("#{type.underscore}_#{assoc.pluralize.underscore}_path", 1) rescue nil
+        puts "Missing! #{type.underscore}_#{assoc.pluralize.underscore}_path" if x.nil?
+      end
+    end
+  end
+
 end

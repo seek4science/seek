@@ -12,12 +12,12 @@ class DataFilesController < ApplicationController
 
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, except: [:index, :new, :upload_for_tool, :upload_from_email, :create, :create_content_blob,
-                                                             :request_resource, :preview, :test_asset_url, :update_annotations_ajax, :rightfield_extraction_ajax, :provide_metadata]
+                                                             :preview, :update_annotations_ajax, :rightfield_extraction_ajax, :provide_metadata]
   before_action :find_display_asset, only: [:show, :explore, :download]
   before_action :xml_login_only, only: [:upload_for_tool, :upload_from_email]
   before_action :get_sample_type, only: :extract_samples
   before_action :check_already_extracted, only: :extract_samples
-  before_action :forbid_new_version_if_samples, :only => :new_version
+  before_action :forbid_new_version_if_samples, :only => :create_version
 
   before_action :oauth_client, only: :retrieve_nels_sample_metadata
   before_action :nels_oauth_session, only: :retrieve_nels_sample_metadata
@@ -27,8 +27,6 @@ class DataFilesController < ApplicationController
 
   # has to come after the other filters
   include Seek::Publishing::PublishingCommon
-
-  include Seek::BreadCrumbs
 
   include Seek::Doi::Minting
 
@@ -63,7 +61,7 @@ class DataFilesController < ApplicationController
     end
   end
 
-  def new_version
+  def create_version
     if handle_upload_data(true)
       comments = params[:revision_comments]
 
@@ -267,7 +265,7 @@ class DataFilesController < ApplicationController
 
   def extraction_status
     @previous_status = params[:previous_status]
-    @job_status = SampleDataExtractionJob.get_status(@data_file)
+    @job_status = @data_file.sample_extraction_task.status
 
     respond_to do |format|
       format.html { render partial: 'data_files/sample_extraction_status', locals: { data_file: @data_file } }
@@ -315,6 +313,12 @@ class DataFilesController < ApplicationController
   # handles the uploading of the file to create a content blob, which is then associated with a new unsaved datafile
   # and stored on the session
   def create_content_blob
+    # clean up the session
+    session.delete(:uploaded_content_blob_id)
+    session.delete(:processed_datafile)
+    session.delete(:processed_assay)
+    session.delete(:processed_warnings)
+
     @data_file = setup_new_asset
     respond_to do |format|
       if handle_upload_data && @data_file.content_blob.save
@@ -344,6 +348,7 @@ class DataFilesController < ApplicationController
         @warnings.merge(warnings)
       else
         critical_error_msg = "The file that was requested to be processed doesn't match that which had been uploaded"
+        notify_content_blob_mismatch(params[:content_blob_id], session[:uploaded_content_blob_id])
       end
     rescue Exception => e
       Seek::Errors::ExceptionForwarder.send_notification(e, data:{message: "Problem attempting to extract from RightField for content blob #{params[:content_blob_id]}"})
@@ -360,6 +365,18 @@ class DataFilesController < ApplicationController
       else
         format.js { render plain: 'done', status: :ok }
       end
+    end
+  end
+
+  def notify_content_blob_mismatch(param_id, session_id)
+    begin
+      raise 'Content blob mismatch during data file creation'
+    rescue RuntimeError => e
+      Seek::Errors::ExceptionForwarder.send_notification(e, data:{
+        message: "Parameter and Session Content Blob id don't match",
+        param_blob_id: param_id.inspect,
+        session_blob_id: session_id.inspect
+      })
     end
   end
 
@@ -405,6 +422,10 @@ class DataFilesController < ApplicationController
     # check the content blob id matches that previously uploaded and recorded on the session
     all_valid = uploaded_blob_matches = (params[:content_blob_id].to_s == session[:uploaded_content_blob_id].to_s)
 
+    unless uploaded_blob_matches
+      notify_content_blob_mismatch(params[:content_blob_id], session[:uploaded_content_blob_id])
+    end
+
     #associate the content blob with the data file
     blob = ContentBlob.find(params[:content_blob_id])
     @data_file.content_blob = blob
@@ -417,12 +438,7 @@ class DataFilesController < ApplicationController
 
     if all_valid
 
-      update_relationships(@data_file, params)
-
-      session.delete(:uploaded_content_blob_id)
-      session.delete(:processed_datafile)
-      session.delete(:processed_assay)
-      session.delete(:processed_warnings)
+      update_relationships(@data_file, params)      
 
       respond_to do |format|
         flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
@@ -504,7 +520,8 @@ class DataFilesController < ApplicationController
                                       :license, :other_creators,{ event_ids: [] },
                                       { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                       { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
-                                      { scales: [] }, { publication_ids: [] })
+                                      { scales: [] }, { publication_ids: [] },
+                                      discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
   def data_file_assay_params

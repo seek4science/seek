@@ -59,11 +59,14 @@ solr/default/data
 
 public/help_images/*
 public/javascripts/*_cached.js
+public/javascripts/i18n.js
+public/javascripts/translations.js
 public/stylesheets/*_cached.css
 public/system/
 
 public/assets/
 public/assets_dev/
+public/javascripts/
 
 .bundle/config
 
@@ -78,3 +81,6 @@ coverage/
 
 Test\ Results*.html
 
+docker-compose.override.yml
+
+.vscode/

@@ -17,12 +17,12 @@ class ProjectFolder < ApplicationRecord
   end
 
   def assets
-    project_folder_assets.collect{|pfa| pfa.asset}
+    project_folder_assets.collect(&:asset).reject{|a| a.class.name=='Collection'}
   end
 
   #assets that are authorized to be shown for the current user
   def authorized_assets
-    assets.select{|a| a.can_view?}
+    assets.select(&:can_view?)
   end
 
   #what is displayed in the tree

@@ -4,22 +4,22 @@ class DocumentsController < ApplicationController
 
   include Seek::AssetsCommon
 
+  before_action :documents_enabled?
   before_action :find_assets, :only => [ :index ]
-  before_action :find_and_authorize_requested_item, :except => [ :index, :new, :create, :request_resource,:preview, :test_asset_url, :update_annotations_ajax]
+  before_action :find_and_authorize_requested_item, :except => [ :index, :new, :create,:preview, :update_annotations_ajax]
   before_action :find_display_asset, :only=>[:show, :download]
 
   include Seek::Publishing::PublishingCommon
 
-  include Seek::BreadCrumbs
   include Seek::Doi::Minting
 
   include Seek::IsaGraphExtensions
 
   api_actions :index, :show, :create, :update, :destroy
 
-  def new_version
+  def create_version
     if handle_upload_data(true)
-      comments = params[:revision_comment]
+      comments = params[:revision_comments]
 
       respond_to do |format|
         if @document.save_as_new_version(comments)
@@ -60,7 +60,8 @@ class DocumentsController < ApplicationController
     params.require(:document).permit(:title, :description, { project_ids: [] }, :license, :other_creators,
                                 { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                 { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
-                                { publication_ids: [] }, { event_ids: [] })
+                                { publication_ids: [] }, { event_ids: [] },
+                                     discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
   alias_method :asset_params, :document_params

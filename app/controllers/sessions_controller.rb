@@ -22,8 +22,8 @@ class SessionsController < ApplicationController
   end
 
   def create
-   auth = request.env['omniauth.auth'] # `omniauth.auth` comes from the omniauth rack middleware.
-                                       # See: https://github.com/omniauth/omniauth/wiki/Auth-Hash-Schema for schema.
+    auth = request.env['omniauth.auth'] # `omniauth.auth` comes from the omniauth rack middleware.
+    # See: https://github.com/omniauth/omniauth/wiki/Auth-Hash-Schema for schema.
     if auth && Seek::Config.omniauth_enabled
       # This check is only necessary if the server has not been restarted after an omniauth option was disabled.
       # Should be handled by `config/initializers/seek_omniauth.rb`.
@@ -36,7 +36,7 @@ class SessionsController < ApplicationController
                            true
                          end
       if provider_enabled
-        create_omniauth(auth)
+        omniauth_authentication(auth)
         return
       end
     end
@@ -65,7 +65,7 @@ class SessionsController < ApplicationController
     if @user = User.authenticate(params[:login], params[:password])
       check_login
     else
-      failed_login "Invalid username/password. Have you <b> #{view_context.link_to 'forgotten your password?', main_app.forgot_password_url}</b>".html_safe
+      failed_login "Invalid username/password. Have you <b> #{view_context.link_to 'forgotten your password?', main_app.forgot_password_path}</b>".html_safe
     end
   end
 
@@ -112,6 +112,8 @@ class SessionsController < ApplicationController
       else
         return_to_url = url_for(controller: params[:called_from][:controller], action: params[:called_from][:action], id: params[:called_from][:id])
       end
+    elsif request.env.dig('omniauth.params', 'state')&.start_with?('return_to:')
+      return_to_url = request.env['omniauth.params']['state'].match(/return_to:(.+)/)&.captures&.last
     else
       return_to_url = session[:return_to] || request.env['HTTP_REFERER']
     end
@@ -133,7 +135,7 @@ class SessionsController < ApplicationController
     end
   end
 
-  def create_omniauth(auth)
+  def omniauth_authentication(auth)
     # Check if there is an existing identity for this provider/uid, or initialize a new one.
     @identity = Identity.from_omniauth(auth)
 
@@ -143,7 +145,7 @@ class SessionsController < ApplicationController
     else # The identity does not have an associated user.
       # *** LEGACY SUPPORT ***
       if auth.provider.to_s == 'ldap' # If using LDAP, attempt to find user by login.
-        @user = User.find_by_login(auth['info']['nickname'])
+        @user = User.find_by_login(auth.info.nickname)
         if @user
           @identity.user = @user
           @identity.save! # Update identity so we don't have to do this again.
@@ -153,31 +155,39 @@ class SessionsController < ApplicationController
       end
 
       if logged_in? # There is a user logged in, so link the identity to the current user.
-        @user = current_user
-        @identity.user = @user
-        @identity.save!
-        flash[:notice] = "Successfully linked #{t("login.#{auth.provider}")} identity to your account."
-        redirect_to user_identities_path(@user)
-        return
+        link_identity_to_user(auth)
       else # There is no user currently logged in.
         if Seek::Config.omniauth_user_create # Create a new user if allowed.
-          @user = User.from_omniauth(auth)
-          saved = nil
-          @user.check_email_present = false
-          disable_authorization_checks { saved = @user.save }
-          if saved
-            # should we activate the user?
-            @user.activate if Seek::Config.omniauth_user_activate && !@user.active?
-            @identity.user = @user
-            @identity.save!
-            check_login(nil, person_params: auth['info'].slice(:first_name, :last_name, :email))
-          else # An unexpected error occurred whilst saving the user.
-            failed_login "Cannot create a new user: #{@user.errors.full_messages.join(', ')}."
-          end
+          create_user_from_omniauth(auth)
         else # If user creation is not allowed, too bad.
-          failed_login "The authenticated user: #{auth['info']['nickname']} does not have a #{Seek::Config.application_name} account."
+          failed_login "The authenticated user: #{auth.info.nickname} does not have a #{Seek::Config.application_name} account."
         end
       end
+    end
+  end
+
+  def link_identity_to_user(auth)
+    @user = current_user
+    @identity.user = @user
+    @identity.save!
+    flash[:notice] = "Successfully linked #{t("login.#{auth.provider}")} identity to your account."
+    redirect_to user_identities_path(@user)
+  end
+
+  def create_user_from_omniauth(auth)
+    @user = User.from_omniauth(auth)
+    saved = nil
+    @user.check_email_present = false
+    disable_authorization_checks { saved = @user.save }
+    if saved
+      # should we activate the user?
+      @user.activate if Seek::Config.omniauth_user_activate && !@user.active?
+      @identity.user = @user
+      @identity.save!
+      person_params = auth.info.with_indifferent_access.slice(:first_name, :last_name, :email, :name)
+      check_login(nil, person_params: person_params)
+    else # An unexpected error occurred whilst saving the user.
+      failed_login "Cannot create a new user: #{@user.errors.full_messages.join(', ')}."
     end
   end
 end

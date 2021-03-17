@@ -8,7 +8,12 @@
       "description": "A very exciting programme",
       "web_page": "http://www.synbiochem.co.uk",
       "funding_details": "Someone is funding this for me",
-      "funding_codes": ["DFG"]
+      "funding_codes": ["DFG"],
+      "discussion_links": [{
+        "id": 55,
+        "url": "http://www.slack.com/",
+        "label": "Slack"
+      }]
     },
     "relationships": {
       "administrators": {
@@ -116,7 +121,7 @@
       "modified": "2017-10-06T09:53:31.000Z",
       "uuid": "23ac7610-8caa-0135-d381-745c89ac8d09",
       "base_url": "http://localhost:3000",
-      "api_version": "0.2"
+      "api_version": "0.3"
     }
   },
   "jsonapi": {

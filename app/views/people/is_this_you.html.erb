@@ -7,7 +7,7 @@
 <p>
 There is already a profile setup, with no associated user, that matches your email address of <em><%= params[:email] %></em>.
 </p><p>
-Below are some details about the profile, and the related <%= t('project').pluralize %> and Institutions. It is likely an Administrator has already described you as part of those
+Below are some details about the profile, and the related <%= t('project').pluralize %> and <%= t('institution').pluralize %>. It is likely an Administrator has already described you as part of those
   <%= t('project').pluralize %> and you can immediately claim that profile.
 </p>
 <p>
@@ -31,7 +31,7 @@ Below are some details about the profile, and the related <%= t('project').plura
             <b>Name:</b><%= person.name %><br/>
         </p>
         <%= list_item_simple_list person.projects, t('project').pluralize %>
-        <%= list_item_simple_list person.institutions, "Institutions" %>
+        <%= list_item_simple_list person.institutions, t('institution').pluralize %>
       </div>
     </div>
     <div style="padding-top:0.5em;">

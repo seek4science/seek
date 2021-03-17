@@ -15,7 +15,7 @@ end
 Factory.define(:patient_sample, parent: :sample) do |f|
   f.association :sample_type, factory: :patient_sample_type
   f.after_build do |sample|
-    sample.set_attribute_value(:full_name, 'Fred Bloggs')
+    sample.set_attribute_value('full name', 'Fred Bloggs')
     sample.set_attribute_value(:age, 44)
     sample.set_attribute_value(:weight, 88.7)
   end
@@ -34,4 +34,22 @@ Factory.define(:sample_from_file, parent: :sample) do |f|
     sample.originating_data_file = Factory(:strain_sample_data_file, projects:sample.projects, contributor:sample.contributor) if sample.originating_data_file.nil?
   end
 
+end
+
+
+Factory.define(:min_sample, parent: :sample) do |f|
+  f.association :sample_type, factory: :min_sample_type
+  f.after_build do |sample|
+    sample.set_attribute_value(:full_name, 'Fred Bloggs')
+  end
+end
+
+
+Factory.define(:max_sample, parent: :sample) do |f|
+  f.association :sample_type, factory: :max_sample_type
+  f.after_build do |sample|
+    sample.set_attribute_value(:full_name, 'Fred Bloggs')
+    sample.set_attribute_value(:address, "HD")
+    sample.set_attribute_value(:postcode, "M13 9PL")
+  end
 end

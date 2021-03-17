@@ -1,0 +1,27 @@
+{
+    "data": {
+        "type": "samples",
+        "attributes": {
+            "attribute_map": {
+                "the_title": "Hello",
+                "a_real_number": "2.6"
+            }
+        },
+        "relationships": {
+            "sample_type": {
+                "data": {
+                     "id": "<%= sample_type_id %>",
+                    "type": "sample_types"
+                }
+            },
+            "projects": {
+                "data": [
+                    {
+                         "id": "<%= project_id %>",
+                        "type": "projects"
+                    }
+                ]
+            }
+        }
+    }
+}

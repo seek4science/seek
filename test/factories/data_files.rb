@@ -14,20 +14,25 @@ Factory.define(:data_file) do |f|
   end
 end
 
-Factory.define(:min_datafile, class: DataFile) do |f|
+Factory.define(:public_data_file, parent: :data_file) do |f|
+  f.policy { Factory(:downloadable_public_policy) }
+end
+
+Factory.define(:min_data_file, class: DataFile) do |f|
   f.with_project_contributor
   f.title 'A Minimal DataFile'
-  f.projects { [Factory.build(:min_project)] }
+  f.projects { [Factory(:min_project)] }
   f.after_create do |data_file|
     data_file.content_blob = Factory.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
   end
 end
 
-Factory.define(:max_datafile, class: DataFile) do |f|
+Factory.define(:max_data_file, class: DataFile) do |f|
   f.with_project_contributor
   f.title 'A Maximal DataFile'
   f.description 'Results - Sampling conformations of ATP-Mg inside the binding pocket'
-  f.projects { [Factory.build(:max_project)] }
+  f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
+  f.projects { [Factory(:max_project)] }
   f.assays {[Factory.build(:max_assay, policy: Factory(:public_policy))]}
   f.events {[Factory.build(:event, policy: Factory(:public_policy))]}
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
@@ -64,6 +69,10 @@ Factory.define(:xlsm_spreadsheet_datafile, parent: :data_file) do |f|
   f.association :content_blob, factory: :xlsm_content_blob
 end
 
+Factory.define(:csv_spreadsheet_datafile, parent: :data_file) do |f|
+  f.association :content_blob, factory: :csv_content_blob
+end
+
 Factory.define(:small_test_spreadsheet_datafile, parent: :data_file) do |f|
   f.association :content_blob, factory: :small_test_spreadsheet_content_blob
 end
@@ -75,7 +84,7 @@ end
 Factory.define(:jerm_data_file, class: DataFile) do |f|
   f.sequence(:title) { |n| "A Data File_#{n}" }
   f.contributor nil
-  f.projects { [Factory.build(:project)] }
+  f.projects { [Factory(:project)] }
   f.association :content_blob, factory: :url_content_blob
 
   f.after_create do |data_file|

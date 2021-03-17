@@ -87,6 +87,10 @@ module Seek
       end
     end
 
+    def extract_csv()
+      File.read(filepath)
+    end
+
     def to_spreadsheet_xml
       begin
         spreadsheet_to_xml(File.open(filepath), Seek::Config.jvm_memory_allocation)
@@ -114,7 +118,7 @@ module Seek
 
     # filters special characters, keeping alphanumeric characters, hyphen ('-'), underscore('_') and newlines
     def filter_text_content(content)
-      content.gsub(/[^-_0-9a-z \n]/i, '')
+      content.gsub(/[^-_0-9a-z \n]/i, ' ')
     end
   end
 end

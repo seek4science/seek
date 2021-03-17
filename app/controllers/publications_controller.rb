@@ -6,12 +6,9 @@ class PublicationsController < ApplicationController
   include Seek::PreviewHandling
 
   before_action :publications_enabled?
-
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, only: %i[show edit manage update destroy]
   before_action :suggest_authors, only: [:manage]
-
-  include Seek::BreadCrumbs
 
   include Seek::IsaGraphExtensions
   include PublicationsHelper
@@ -106,7 +103,7 @@ class PublicationsController < ApplicationController
   # PUT /publications/1
   # PUT /publications/1.xml
   def update
-    update_annotations(params[:tag_list], @publication)
+    update_annotations(params[:tag_list], @publication) if params.key?(:tag_list)
 
     if @publication.update_attributes(publication_params)
       respond_to do |format|
@@ -161,15 +158,14 @@ class PublicationsController < ApplicationController
 
   def update_metadata
 
-    @publication = Publication.new(publication_params)
+    @publication = Publication.find(params[:publication][:id])
     publication_type_id= params[:publication][:publication_type_id]
     doi= params[:publication][:doi]
     pubmed_id = params[:publication][:pubmed_id]
-    id= params[:publication][:id]
     if publication_type_id.blank?
       @error = "Please choose a publication type."
     else
-      result = get_data(@publication, pubmed_id, doi)
+      get_data(@publication, pubmed_id, doi)
     end
     @error =  @publication.errors.full_messages.join('<br>') if @publication.errors.any?
     if !@error.nil?
@@ -194,6 +190,8 @@ class PublicationsController < ApplicationController
         format.json { render json: { error: error }, status: 422 }
         format.xml  { render xml: { error: error }, status: 422 }
       end
+
+      return
     end
 
     authors = []
@@ -232,7 +230,7 @@ class PublicationsController < ApplicationController
     end
 
     respond_to do |format|
-      format.json { render json: authors }
+      format.json { render json: authors.to_json }
       format.xml  { render xml: authors }
     end
   end
@@ -245,6 +243,8 @@ class PublicationsController < ApplicationController
         format.json { render json: { error: error }, status: 422 }
         format.xml  { render xml: { error: error }, status: 422 }
       end
+
+      return
     end
 
     first_name, last_name = PublicationAuthor.split_full_name full_name
@@ -266,7 +266,7 @@ class PublicationsController < ApplicationController
     author = PublicationAuthor.where(first_name: first_name, last_name: last_name).limit(1)
 
     respond_to do |format|
-      format.json { render json: authors }
+      format.json { render json: authors.to_json }
       format.xml  { render xml: authors }
     end
   end
@@ -274,7 +274,7 @@ class PublicationsController < ApplicationController
   # Try and relate non_seek_authors to people in SEEK based on name and project
   def suggest_authors
     @publication.publication_authors.each do |author|
-      author.suggested_person = find_person_for_author(author, @publication.projects)
+      author.suggested_person = find_person_for_author(author, @publication.projects,false)
     end
   end
 
@@ -326,7 +326,7 @@ class PublicationsController < ApplicationController
     params.require(:publication).permit(:publication_type_id, :pubmed_id, :doi, :parent_name, :abstract, :title, :journal, :citation,:url,:editor,
                                         :published_date, :bibtex_file, :registered_mode, :publisher, :booktitle, { project_ids: [] }, { event_ids: [] }, { model_ids: [] },
                                         { investigation_ids: [] }, { study_ids: [] }, { assay_ids: [] }, { presentation_ids: [] },
-                                        { data_file_ids: [] }, { scales: [] },
+                                        { data_file_ids: [] }, { scales: [] }, { human_disease_ids: [] },
                                         { publication_authors_attributes: [:person_id, :id, :first_name, :last_name ] }).tap do |pub_params|
       filter_association_params(pub_params, :assay_ids, Assay, :can_edit?)
       filter_association_params(pub_params, :study_ids, Study, :can_view?)
@@ -482,6 +482,7 @@ class PublicationsController < ApplicationController
             publications_with_errors << current_publication
           else
             if current_publication.save
+              Rails.logger.info(current_publication.id.inspect+":"+current_publication.citation)
               publications << current_publication
               associsate_authors_with_users(current_publication)
               current_publication.creators = current_publication.seek_authors.map(&:person)
@@ -534,7 +535,7 @@ class PublicationsController < ApplicationController
 
   def associsate_authors_with_users(current_publication)
     current_publication.publication_authors.each do |author|
-      author.suggested_person = find_person_for_author(author, current_publication.projects)
+      author.suggested_person = find_person_for_author(author, current_publication.projects, true)
       unless author.suggested_person.nil?
         author.person_id = author.suggested_person.id
         author.save
@@ -573,8 +574,10 @@ class PublicationsController < ApplicationController
   # if there are still too many matches, they will be narrowed down by the first name initials
   # @param author [PublicationAuthor] the author to find a matching person for
   # @param projects [Array<Project>] projects to narrow matches is necessary
+  # @param  exact [Boolean] if the match should be exact match or not
   # @return [Person] the first match is returned or nil
-  def find_person_for_author(author, projects)
+  def find_person_for_author(author, projects, exact)
+
     matches = []
     # Get author by last name
     last_name_matches = Person.where(last_name: author.last_name)
@@ -606,6 +609,19 @@ class PublicationsController < ApplicationController
       last_name_matches = Person.where(last_name: ascii)
       matches = last_name_matches
     end
+    # when importing multiple bibtex file, the name matching need to be exact
+    if exact
+      unless  matches.empty?
+        first_and_last_name_matches = matches.select { |p| p.first_name.casecmp(author.first_name.upcase).zero? }
+        unless first_and_last_name_matches.empty?
+          return first_and_last_name_matches.first
+        else
+          return nil
+        end
+      else
+        return nil
+      end
+  end
 
     # If more than one result, filter by project
     if matches.size > 1
@@ -635,7 +651,7 @@ class PublicationsController < ApplicationController
   end
 
   def replace_to_non_umlaut (str)
-    str.gsub!(/[äöüß]/) do |match|
+    replace_str = str.gsub(/[äöüß]/) do |match|
       case match
       when "ä" then 'ae'
       when "ö" then 'oe'
@@ -643,11 +659,11 @@ class PublicationsController < ApplicationController
       when "ß" then 'ss'
       end
     end
-    str
+    replace_str
   end
 
   def replace_to_umlaut (str)
-    str.gsub!(/(ae|oe|ue|ss)/) do |match|
+    replace_str = str.gsub(/(ae|oe|ue|ss)/) do |match|
       case match
       when "ae" then 'ä'
       when "oe" then 'ö'
@@ -655,6 +671,6 @@ class PublicationsController < ApplicationController
       when "ss" then 'ß'
       end
     end
-    str
+    replace_str
   end
 end

@@ -23,6 +23,11 @@
   <div id="programme_details" class="additional_settings" style="<%= show_or_hide_block Seek::Config.programmes_enabled -%>">
     <%= admin_checkbox_setting(:programme_user_creation_enabled, 1, Seek::Config.programme_user_creation_enabled,
                                "User creation of #{t('programme').pluralize} enabled", "Controls whether standard users can create their own #{t('programme').pluralize}. If disabled only full administrators will be able to create #{t('programme').pluralize}. If enabled a full administrator is still required to allow and activate the #{t('programme')}") %>
+    <% managed_programme_options = options_for_select(Programme.all.map{|p|[p.title, p.id]}, Seek::Config.managed_programme_id) %>
+    <%= admin_dropdown_setting(:managed_programme_id, managed_programme_options,
+                               "Site mananaged #{t('programme')}",
+                               "The #{t('programme')} the users can request to have a #{t('project')} created and associated with, without the need to create and manage their own",
+                               include_blank:'None') %>
   </div>
   <%= admin_checkbox_setting(:samples_enabled, 1, Seek::Config.samples_enabled,
                              "Samples enabled", "Whether the Samples framework is enabled. The framework allows users to create their own custom Sample types to describe their biological samples and other metadata.",:onchange=>toggle_appear_javascript('sample_type_pa_only')) %>
@@ -42,9 +47,32 @@
                            'Help URL', "This is the URL for the external help e.g #{Seek::Config.default_external_help_url}.") %>
   </div>
 
+  <%= admin_checkbox_setting(:collections_enabled, 1, Seek::Config.collections_enabled,
+                             "Collections enabled", "Whether the users can create collections of assets in SEEK.") %>
+
+  <%= admin_checkbox_setting(:documents_enabled, 1, Seek::Config.documents_enabled,
+                             "Documents enabled", "Whether the users can register documents in SEEK.") %>
+
+  <%= admin_checkbox_setting(:isa_enabled, 1, Seek::Config.isa_enabled,
+                             "ISA enabled", "Whether the ISA framework is enabled. The ISA framework allows users to create Investigations, Studies and Assays to organize their work.") %>
+
+  <%= admin_checkbox_setting(:models_enabled, 1, Seek::Config.models_enabled,
+                             "Models enabled", "Whether the users can register computational models in SEEK.") %>
+
+  <%= admin_checkbox_setting(:organisms_enabled, 1, Seek::Config.organisms_enabled,
+                             "Organisms enabled", "Whether the users can register organisms in SEEK.") %>
+
+  <%= admin_checkbox_setting(:publications_enabled, 1, Seek::Config.publications_enabled,
+                             "Publications enabled", "Whether the users can register publications in SEEK.") %>
+
   <%= admin_checkbox_setting(:workflows_enabled, 1, Seek::Config.workflows_enabled,
-                             "Workflows enabled",
-                             "Whether the Workflow framework is enabled.") %>
+                             'Workflows enabled', 'Whether the Workflow framework is enabled.',
+                             onchange: toggle_appear_javascript('workflow_cwl_Settings')) %>
+  <div id="workflow_cwl_Settings" class="additional_settings" style="<%= show_or_hide_block Seek::Config.workflows_enabled -%>">
+    <%= admin_text_setting(:cwl_viewer_url, Seek::Config.cwl_viewer_url,
+                           'CWL Viewer URL',
+                           "The URL of a #{link_to('CWL Viewer', 'https://github.com/common-workflow-language/cwlviewer', target: :_blank)} instance to generate diagrams for CWL workflows.") %>
+  </div>
 
   <h2>Integrations</h2>
   <%= admin_checkbox_setting(:jws_enabled, 1, Seek::Config.jws_enabled,
@@ -55,12 +83,17 @@
                            'JWS Online Root URL', "This is the root URL for the JWS Online server SEEK communicates with, e.g. #{Seek::Config.default_jws_online_root} .") %>
   </div>
 
+  <%= admin_checkbox_setting(:copasi_enabled, 1, Seek::Config.copasi_enabled,
+                             "Copasi enabled", "Whether support for running a publicly available model in Copasi is enabled.") %>
+
   <%= admin_checkbox_setting(:google_analytics_enabled, 1, Seek::Config.google_analytics_enabled,
                              "Google analytics enabled", "Allows you to keep track of site traffic using Google Analytics. You need to register with Google Analytics and get a tracker ID.",
                              :onchange=>toggle_appear_javascript('google_anaylitics_block')) %>
   <div id="google_anaylitics_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.google_analytics_enabled -%>">
     <%= admin_text_setting(:google_analytics_tracker_id, Seek::Config.google_analytics_tracker_id,
                            'Google analytics tracker id', "The tracker ID provided to you by Google.") %>
+    <%= admin_checkbox_setting(:google_analytics_tracking_notice, 1, Seek::Config.google_analytics_tracking_notice,
+                           'Google analytics tracking notice', "Warn users about the use of analytics software.") %>
   </div>
 
   <%= admin_checkbox_setting(:piwik_analytics_enabled, 1, Seek::Config.piwik_analytics_enabled,
@@ -71,6 +104,8 @@
                            'Piwik analytics id site', "The ID of your website inside Piwik. It is the numeric value corresponding to the ID of the site created in Piwik.") %>
     <%= admin_text_setting(:piwik_analytics_url, Seek::Config.piwik_analytics_url,
                            'Piwik analytics url', "The URL to your Piwik installation, withouth the http:// or https://, e.g. #{Seek::Config.default_piwik_analytics_url} ") %>
+    <%= admin_checkbox_setting(:piwik_analytics_tracking_notice, 1, Seek::Config.piwik_analytics_tracking_notice,
+                           'Piwik tracking notice', "Warn users about the use of analytics software.") %>
   </div>
 
   <%= render :partial => "admin/doi_settings" %>

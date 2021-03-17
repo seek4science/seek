@@ -9,7 +9,7 @@
    all_tags.sort_by(&:text)
    type ||= 'tag'
    input_name = "#{name}_list"
-   existing_tags = item_tags.map {|t| t.text}
+   existing_tags ||= item_tags.map {|t| t.text}
 %>
 
 <%= tags_input(input_name, existing_tags, :typeahead => {:type => type}) %>

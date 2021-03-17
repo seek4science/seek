@@ -4,6 +4,7 @@ class InvestigationsController < ApplicationController
   include Seek::DestroyHandling
   include Seek::AssetsCommon
 
+  before_action :investigations_enabled?
   before_action :find_assets, :only=>[:index]
   before_action :find_and_authorize_requested_item,:only=>[:edit, :manage, :update, :manage_update, :destroy, :show,:new_object_based_on_existing_one]
 
@@ -16,8 +17,6 @@ class InvestigationsController < ApplicationController
   include Seek::Publishing::PublishingCommon
 
   include Seek::AnnotationCommon
-
-  include Seek::BreadCrumbs
 
   include Seek::IsaGraphExtensions
 
@@ -132,12 +131,16 @@ class InvestigationsController < ApplicationController
     end
   end
 
+
+
   private
 
   def investigation_params
     params.require(:investigation).permit(:title, :description, { project_ids: [] }, :other_creators,
                                           :position,
-                                          { creator_ids: [] },{ scales: [] }, { publication_ids: [] })
+                                          { creator_ids: [] },{ scales: [] }, { publication_ids: [] },
+                                          { discussion_links_attributes:[:id, :url, :label, :_destroy] },
+                                          { custom_metadata_attributes: determine_custom_metadata_keys })
   end
 
   def check_studies_are_for_this_investigation

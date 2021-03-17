@@ -22,10 +22,18 @@
       ],
       "start_date" : "2010-01-01",
       "end_date" : "2014-06-21",
-      "use_default_policy" : true
+      "use_default_policy" : true,
+      "discussion_links": [{
+        "id": 55,
+        "url": "http://www.slack.com/",
+        "label": "Slack"
+      }]
     },
     "relationships": {
       "organisms": {
+        "data": []
+      },
+      "human_diseases": {
         "data": []
       },
       "pals": {
@@ -143,7 +151,7 @@
       "modified": "2017-10-06T09:53:31.000Z",
       "uuid": "23ac7610-8caa-0135-d381-745c89ac8d09",
       "base_url": "http://localhost:3000",
-      "api_version": "0.2"
+      "api_version": "0.3"
     }
   },
   "jsonapi": {

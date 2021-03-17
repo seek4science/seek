@@ -24,6 +24,14 @@ class Investigation < ApplicationRecord
     related_data_files + related_sops + related_models + related_publications + related_documents
   end
 
+  # Returns the columns to be shown on the table view for the resource
+  def columns_default
+    super
+  end
+  def columns_allowed
+    super + ['other_creators','deleted_contributor']
+  end
+
   def clone_with_associations
     new_object = dup
     new_object.policy = policy.deep_copy
@@ -38,5 +46,9 @@ class Investigation < ApplicationRecord
 
   def positioned_studies
     studies.order(position: :asc)
+  end
+  
+  def self.user_creatable?
+    Seek::Config.investigations_enabled
   end
 end

@@ -51,15 +51,15 @@ ul.feed li:first-child {
   padding-top: 0;
 }
 
-ul.feed .file-type-icon {
+.file-type-icon {
   display: block;
   float: left;
   margin: 0 0.5em 0.5em 0;
 }
 
-ul.feed .file-type-icon img {
-  width: 32px;
-  height: 32px;
+.file-type-icon img {
+  max-width: 32px;
+  max-height: 32px;
 }
 
 .subtle {
@@ -77,6 +77,10 @@ ul.feed .file-type-icon img {
   width: 90px;
   display: block;
   border-radius: 4px;
+}
+
+.powered-by img {
+  margin-bottom: 0.25em;
 }
 
 #content {
@@ -326,16 +330,19 @@ a.seek-homepage-button {
   border-radius: 4px;
   padding: 20px;
   margin: 5px;
+  text-decoration: none;
+
   &:hover {
-    text-decoration: none;
     background-color: #f0f0f0;
   }
 }
 
-.seek-homepage-button img {
-  width: 120px;
-  height: 120px;
-
+.seek-homepage-button img, .seek-homepage-button span.glyphicon  {
+  display: block;
+  font-size: 80px;
+  margin: auto;
+  line-height: 120px;
+  color: #666;
 }
 
 @media (min-width: $screen-sm-min) {
@@ -814,6 +821,7 @@ div.index-container {
 
 div.index-content {
   flex-grow: 1;
+  min-width: 0; /* This seems to prevent content overflowing parent. Not sure why... */
 }
 
 div.index-filters {
@@ -967,6 +975,28 @@ div.index-filters {
   clear: both;
 }
 
+.remote-content-preview-result {
+  border-left: 3px solid #ccc;
+  padding: 0.5em 1em;
+  margin: 0.5em 1em;
+}
+
+li.upload-field-tab {
+  cursor: pointer;
+}
+
+img.github-logo {
+  width: 16px;
+  height: 16px;
+}
+
+.github-path {
+  padding: 8px 15px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  display: inline-block;
+}
+
 #application-owner .list_item {
   .hidden-xs {
     display: none;
@@ -980,4 +1010,66 @@ div.index-filters {
   .list_item_content {
     width: 70%;
   }
+}
+
+.workflow-diagram img {
+  max-width: 100%;
+}
+
+.list_item_content .maturity-level {
+  font-size: 100%;
+}
+
+ul.list.collapsed li.hidden-item {
+  display: none;
+}
+
+h5.author-list-title {
+  margin-top: 0;
+  font-weight: bold;
+}
+
+ul.author-list {
+  padding-left: 0;
+}
+
+li.author-list-item {
+  display: inline;
+  &:not(:last-child):after {
+    content: ", ";
+  }
+}
+
+hr.discussion-links-divider {
+  margin: 0.5em;
+}
+
+div.discussion-link {
+  word-wrap: break-word;
+}
+
+.typeahead-new-item {
+  color:darkblue;
+  font-style: bold;
+}
+
+span.disabled {
+  opacity: 0.65;
+}
+
+.btn.disabled img.icon {
+  opacity: 0.4;
+}
+
+/* Rich editor box */
+.short-editor ~ .CodeMirror,
+.short-editor ~ .CodeMirror .CodeMirror-scroll {
+  min-height:4em;
+}
+
+/* controlled vocab term table */
+#controlled-vocab-terms-fixed {
+  display:block;
+  overflow-y: auto;
+  max-height: 20em;
 }

@@ -36,7 +36,7 @@ module Seek
           end
 
           results.each do |value, count, label|
-            next if value.nil?
+            next if value.blank?
             value = value.to_s
             active = active_options.delete(value)
             options << Seek::Filtering::Option.new(label || value, value, count, active)

@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-gem 'rails', '~> 5.2.3'
+gem 'rails', '~> 5.2.4'
 gem 'rdoc'
 
 #database adaptors
@@ -12,7 +12,7 @@ gem 'sqlite3'
 gem 'feedjira', '~>1'
 gem 'google-analytics-rails'
 gem 'hpricot', '~>0.8.2'
-gem 'libxml-ruby', '2.8.0', require: 'libxml'
+gem 'libxml-ruby', '~>2.9.0', require: 'libxml'
 gem 'uuid', '~>2.3'
 gem 'RedCloth', '>=4.3.0'
 gem 'simple-spreadsheet-extractor', '~>0.16.0'
@@ -31,7 +31,6 @@ gem 'daemons'
 gem 'linkeddata'
 gem 'rdf'
 
-
 gem 'openseek-api'
 # for fancy content escaping in openbis integration
 gem 'loofah'
@@ -43,7 +42,6 @@ gem 'json-diff'
 gem 'rubyzip'
 
 gem 'equivalent-xml'
-gem 'breadcrumbs_on_rails'
 gem 'docsplit'
 gem 'pothoven-attachment_fu'
 gem 'exception_notification'
@@ -56,7 +54,7 @@ gem 'will_paginate', '~> 3.1'
 gem 'yaml_db'
 gem 'rails_autolink'
 gem 'rfc-822'
-gem 'nokogiri', '>= 1.10.4'
+gem 'nokogiri', '>= 1.11.0.rc4'
 gem 'rdf-virtuoso', git: 'https://github.com/ruby-rdf/rdf-virtuoso', branch: 'develop'
 gem 'terrapin'
 gem 'lograge'
@@ -65,7 +63,7 @@ gem 'validate_url'
 gem "attr_encrypted", "~> 3.0.0"
 
 # gem for BiVeS and BudHat
-gem 'bives'
+gem 'bives', "~> 2.0"
 
 # Linked to SysMO Git repositories
 gem 'my_responds_to_parent', git: 'https://github.com/SysMO-DB/my_responds_to_parent.git'
@@ -73,7 +71,6 @@ gem 'bioportal', '>=3.0', git: 'https://github.com/SysMO-DB/bioportal.git'
 gem 'doi_query_tool', git: 'https://github.com/seek4science/DOI-query-tool.git'
 gem 'convert_office', git: 'https://github.com/SysMO-DB/convert_office.git', ref: '753f2567dbd625bc89071e1150404efbb562e130'
 gem 'fleximage', git: 'https://github.com/SysMO-DB/fleximage.git', ref: 'bb1182f2716a9bf1b5d85e186d8bb7eec436797b'
-gem 'search_biomodel', '2.2.1', git: 'https://github.com/myGrid/search_biomodel.git'
 
 gem 'jquery-rails', '~> 4.2.2'
 gem 'jquery-ui-rails'
@@ -87,24 +84,25 @@ gem 'bootstrap-sass', '>=3.4.1'
 gem 'sass-rails', '~> 5.0'
 gem 'sprockets-rails'
 
-gem 'ro-bundle', '~> 0.2.4'
+gem 'ro-bundle', '~> 0.2.5'
 gem 'handlebars_assets'
 gem 'zenodo-client', git: 'https://github.com/seek4science/zenodo-client.git'
 
 gem 'unicorn-rails'
 gem 'seedbank'
 
-gem 'rspec-rails'
+gem 'rspec-rails','~> 3.6'
 
 gem 'citeproc-ruby', '~> 1.1.4'
 gem 'citeproc', '~> 1.0.4'
 gem 'csl-styles', '~> 1.0.1.7'
-gem 'bibtex-ruby', '~> 4.4.2'
+gem 'bibtex-ruby', '~> 5.1.0'
 
 gem 'omniauth', '~> 1.3.1'
 gem 'omniauth-ldap', '~> 1.0.5'
 gem 'omniauth_openid_connect'
 gem 'omniauth-rails_csrf_protection', '~> 0.1'
+gem 'omniauth-github', '~> 1.2.0'
 
 gem 'ransack'
 
@@ -127,12 +125,22 @@ gem 'bootsnap', '>= 1.1.0', require: false
 
 gem 'activerecord-import'
 
-gem 'puma' # Used for docker, and also teaspoon tests
+gem "puma", ">= 3.12.6"
 
-gem 'doorkeeper'
+gem "doorkeeper", ">= 5.2.5"
+
+gem 'request_store'
 
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
+
+gem 'ro-crate-ruby', git: 'https://github.com/fbacall/ro-crate-ruby.git'
+
+gem 'git'
+gem 'redcarpet'
+gem 'i18n-js'
+gem 'whenever', '~> 1.0.0', require: false
+
 source 'https://rails-assets.org' do
   gem 'rails-assets-bootstrap-multiselect', '~> 0.9.13'
   gem 'rails-assets-bootstrap-tagsinput', '~> 0.8.0'
@@ -155,23 +163,24 @@ group :development do
   gem 'pry-remote'
   gem 'request-log-analyzer'
   gem 'rubocop', require: false
-  gem 'rubycritic', require: false
-  gem 'guard-rubycritic', require: false
   gem 'rails_best_practices'
   gem 'gem-licenses'
+  gem "better_errors"
+  gem "binding_of_caller"
 end
 
 group :test do
-  gem 'ruby-prof', '0.15.9'
+  gem 'ruby-prof'
   gem 'test-prof'
   gem 'rails-perftest'
-  gem 'minitest', '5.10.3'
+  gem 'minitest', '~> 5.14'
   gem 'minitest-reporters'
   gem 'sunspot_matchers'
   gem 'database_cleaner', '~> 1.7.0'
   gem 'vcr', '~> 2.9'
   gem 'rails-controller-testing'
   gem 'simplecov'
+  gem 'whenever-test'
 end
 
 group :test, :development do

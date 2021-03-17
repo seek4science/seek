@@ -56,6 +56,7 @@ describe Model do
   it { should have_searchable_field(:assay_type_titles) }
   it { should have_searchable_field(:technology_type_titles) }
   it { should have_searchable_field(:organism_terms) }
+  it { should have_searchable_field(:human_disease_terms) }
   it { should have_searchable_field(:model_contents_for_search) }
   it { should have_searchable_field(:model_format) }
   it { should have_searchable_field(:model_type) }
@@ -91,6 +92,7 @@ describe Publication do
   it { should have_searchable_field(:publication_authors) }
 #  it { should have_searchable_field(:published_date) }
 #  it { should have_searchable_field(:organism_terms) }
+#  it { should have_searchable_field(:human_disease_terms) }
 end
 
 #acts_as_isa
@@ -102,6 +104,7 @@ describe Assay do
   it { should have_searchable_field(:projects) }
 
   it { should have_searchable_field(:organism_terms) }
+  it { should have_searchable_field(:human_disease_terms) }
   it { should have_searchable_field(:assay_type_label) }
   it { should have_searchable_field(:technology_type_label) }
   it { should have_searchable_field(:strains) }
@@ -156,6 +159,7 @@ describe Project do
   it { should have_searchable_field(:locations) }
 #  it { should have_searchable_field(:web_page) }
 #  it { should have_searchable_field(:organism) }
+#  it { should have_searchable_field(:human_disease) }
 #  it { should have_searchable_field(:institutions) }
 #  it { should have_searchable_field(:programme) }
   #all the assets associated with the project
@@ -203,6 +207,7 @@ describe Strain do
 
 #  it { should have_searchable_field(:specimens) }
 #  it { should have_searchable_field(:organism_terms) }
+#  it { should have_searchable_field(:human_disease_terms) }
   it { should have_searchable_field(:synonym) }
 #  it { should have_searchable_field(:parent) }
 #  it { should have_searchable_field(:children) }

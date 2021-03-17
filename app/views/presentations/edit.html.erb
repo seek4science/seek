@@ -11,7 +11,7 @@
 
       <div class="form-group">
         <label>Description</label>
-        <%= f.text_area :description, :class=>"form-control", :rows => 5 -%>
+        <%= f.text_area :description, :class=>"form-control rich-text-edit", :rows => 5 -%>
       </div>
 
       <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>
@@ -24,6 +24,8 @@
       <% end %>
 
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @presentation } %>
+
+      <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @presentation} -%>
 
 
       <%= render :partial=>"assets/asset_form_bottom", :locals=> {:f => f} -%>

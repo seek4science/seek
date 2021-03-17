@@ -105,8 +105,9 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
     DOIABLE_ASSETS.each do |type|
       asset = Factory(type.to_sym, policy: Factory(:public_policy))
       doi = '10.5072/my_test'
-      asset.doi = doi
-      assert asset.save
+      version = asset.latest_version
+      version.doi = doi
+      assert version.save
 
       get "/#{type.pluralize}/#{asset.id}?version=#{asset.version}"
       assert_response :success
@@ -127,8 +128,9 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
       assert_equal 2, asset.version
 
       doi = '10.5072/my_test'
-      asset.doi = doi
-      assert asset.save
+      version = asset.latest_version
+      version.doi = doi
+      assert version.save
 
       get "/#{type.pluralize}/#{asset.id}?version=2"
       assert_response :success
@@ -170,7 +172,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
       get "/#{type.pluralize}/#{asset.id}"
 
-      assert_select "a[class='disabled']", text: /Upload new version/
+      assert_select "a[class='disabled']", text: /Register new version/
     end
   end
 
@@ -182,7 +184,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
       assert latest_version.save
       assert latest_version.has_doi?
 
-      post "/#{type.pluralize}/#{asset.id}/new_version", params: { data_file: {}, content_blobs: [{ data: {} }], revision_comments: 'This is a new revision' }
+      post "/#{type.pluralize}/#{asset.id}/create_version", params: { data_file: {}, content_blobs: [{ data: {} }], revision_comments: 'This is a new revision' }
 
       assert_redirected_to :root
       assert_not_nil flash[:error]

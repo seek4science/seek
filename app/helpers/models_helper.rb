@@ -42,4 +42,8 @@ module ModelsHelper
   def jws_online_logo
     image(:jws_online_logo, style: 'background-color:black;padding:1em;', class: 'img-responsive')
   end
+
+  def show_copasi_button?
+    Seek::Config.copasi_enabled && (@display_model.policy.access_type == Policy::ALL_USERS) && @display_model.is_copasi_supported?
+  end
 end

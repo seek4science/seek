@@ -13,9 +13,10 @@
   sharing_link = sharing_link && f.try(:object).try(:is_a?, (Seek::Permissions::CodeBasedAuthorization)) && !f.try(:object).try(:new_record?)
 
   existing_creators ||= f.object.try(:creators)
-  existing_creators = [current_user.person] if existing_creators.blank?
+  existing_creators = [current_user.person] if existing_creators.blank? && action_name == 'new'
 
   other_creators ||= f.object.try(:other_creators)
+
 %>
 
 <% if sharing_enable %>

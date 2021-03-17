@@ -2,8 +2,6 @@ class AuthorizedOauthApplicationsController < Doorkeeper::AuthorizedApplications
   before_action :check_user
   before_action :assign_person
 
-  include Seek::BreadCrumbs
-
   private
 
   def check_user

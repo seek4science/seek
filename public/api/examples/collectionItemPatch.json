@@ -1,0 +1,10 @@
+{
+    "data": {
+        "type": "collection_item",
+        "id": "8",
+        "attributes": {
+            "comment": "Run this workflow first",
+            "order": 1
+        }
+    }
+}

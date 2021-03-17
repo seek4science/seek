@@ -7,34 +7,30 @@ module Seek
     include Seek::PreviewHandling
     include Seek::AssetsStandardControllerActions
 
-    def find_display_asset(asset = eval("@#{controller_name.singularize}"))
+    def find_display_asset(asset = instance_variable_get("@#{controller_name.singularize}"))
       requested_version = params[:version] || asset.latest_version.version
       found_version = asset.find_version(requested_version)
-      if !found_version || anonymous_request_for_previous_version?(asset, requested_version)
-        error('This version is not available', 'invalid route')
-        return false
+      if found_version&.visible?
+        instance_variable_set("@display_#{asset.class.name.underscore}", asset.find_version(found_version))
       else
-        eval "@display_#{asset.class.name.underscore} = asset.find_version(found_version)"
+        error('This version is not available', 'invalid route')
+        false
       end
-    end
-
-    def anonymous_request_for_previous_version?(asset, requested_version)
-      (!User.logged_in_and_member? && requested_version.to_i != asset.latest_version.version)
     end
 
     def update_relationships(asset, params)
       Relationship.set_attributions(asset, params[:attributions])
     end
-
-    def request_resource
+    
+    def request_contact
       resource = class_for_controller_name.find(params[:id])
       details = params[:details]
-      mail = Mailer.request_resource(current_user, resource, details)
+      mail = Mailer.request_contact(current_user, resource, details)
       mail.deliver_later
-
+      MessageLog.log_contact_request(current_user.person, resource, details)
       @resource = resource
       respond_to do |format|
-        format.js { render template: 'assets/request_resource' }
+        format.js { render template: 'assets/request_contact' }
       end
     end
 

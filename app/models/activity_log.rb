@@ -19,7 +19,7 @@ class ActivityLog < ApplicationRecord
 
   def send_notification
     if Seek::Config.email_enabled && activity_loggable.try(:subscribable?) && activity_loggable.subscribers_are_notified_of?(action)
-      SendImmediateEmailsJob.new(id).queue_job
+      ImmediateSubscriptionEmailJob.new(self).queue_job
     end
   end
 
@@ -33,13 +33,19 @@ class ActivityLog < ApplicationRecord
     end
   end
 
-  def check_loggable_is_viewable
-    result = true
-    if activity_loggable && !activity_loggable.can_view?
-      errors.add(:base, 'the asset is not viewable')
-      result = false
+  def can_render_link?
+    if activity_loggable
+      base = activity_loggable.can_view?
+      if activity_loggable.class.name.include?('::Version')
+        base && activity_loggable.parent&.can_view?
+      elsif activity_loggable.is_a?(Snapshot)
+        base && activity_loggable.resource&.can_view?
+      else
+        base
+      end
+    else
+      false
     end
-    result
   end
 
   #clears caches for the front page activity

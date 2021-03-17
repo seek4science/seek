@@ -6,6 +6,13 @@ class BaseSerializer < SimpleBaseSerializer
 
   attribute :policy, if: :show_policy?
 
+  attribute :discussion_links,  if: -> { object.is_discussable? } do
+    object.discussion_links.collect do |link|
+      {id:link.id, label: link.label, url: link.url}
+    end
+  end
+
+
   def policy
     BaseSerializer.convert_policy object.policy
   end
@@ -70,6 +77,10 @@ class BaseSerializer < SimpleBaseSerializer
 
   def documents
     associated('Document')
+  end
+
+  def organisms
+    associated('Organism')
   end
 
   def self_link
