@@ -4,6 +4,11 @@ module SampleTypesHelper
     if sample_type_attribute.seek_sample?
       type += ' - ' + link_to(sample_type_attribute.linked_sample_type.title, sample_type_attribute.linked_sample_type)
     end
+
+    if sample_type_attribute.controlled_vocab?
+      type += ' - ' + link_to(sample_type_attribute.sample_controlled_vocab.title, sample_type_attribute.sample_controlled_vocab)
+    end
+
     unit = sample_type_attribute.unit ? "( #{sample_type_attribute. unit.symbol} )" : ''
     req = sample_type_attribute.required? ? required_span : ''
     attribute_css = 'sample-attribute'
