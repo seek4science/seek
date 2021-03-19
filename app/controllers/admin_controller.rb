@@ -222,6 +222,10 @@ class AdminController < ApplicationController
 
     valid = only_positive_integer(params[:results_per_page_default], 'default items per page')
     Seek::Config.results_per_page_default = params[:results_per_page_default] if valid
+
+    valid = only_positive_integer(params[:results_per_page_default_condensed], 'default items per page')
+    Seek::Config.results_per_page_default_condensed = params[:results_per_page_default_condensed] if valid
+
     Seek::Config.related_items_limit = params[:related_items_limit]
     Seek::Config.search_results_limit = params[:search_results_limit]
 
