@@ -69,6 +69,10 @@ module WorkflowExtraction
     end
   end
 
+  def can_run?
+    can_download?(nil) && workflow_class_title == 'Galaxy' && Seek::Config.galaxy_instance_trs_import_url.present?
+  end
+
   def diagram_exists?(format = default_diagram_format)
     if is_git_versioned?
       file_exists?(cached_diagram_path(format))
