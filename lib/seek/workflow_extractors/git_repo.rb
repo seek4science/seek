@@ -50,7 +50,7 @@ module Seek
         m[:source_link_url] = @git_version.git_repository&.remote
 
         if @git_version.file_exists?('README.md')
-          m[:description] ||= @git_version.file_contents('README.md')
+          m[:description] ||= @git_version.file_contents('README.md').force_encoding('utf-8')
         end
 
         return m
