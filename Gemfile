@@ -134,7 +134,7 @@ gem 'request_store'
 # javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
 
-gem 'ro-crate-ruby', git: 'https://github.com/fbacall/ro-crate-ruby.git'
+gem 'ro-crate-ruby', git: 'https://github.com/ResearchObject/ro-crate-ruby.git', ref: '70804d34264481e70d0fe83ecc6ad76eda164e74'
 
 gem 'git'
 gem 'redcarpet'
