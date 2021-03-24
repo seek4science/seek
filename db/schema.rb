@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_22_180839) do
+ActiveRecord::Schema.define(version: 2021_03_24_154026) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -714,7 +714,7 @@ ActiveRecord::Schema.define(version: 2021_02_22_180839) do
     t.bigint "resource_id"
     t.integer "version"
     t.string "name"
-    t.text "description"
+    t.text "comment"
     t.string "ref"
     t.string "commit"
     t.boolean "mutable"
