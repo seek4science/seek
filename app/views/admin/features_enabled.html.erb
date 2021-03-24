@@ -68,6 +68,10 @@
   <%= admin_checkbox_setting(:workflows_enabled, 1, Seek::Config.workflows_enabled,
                              'Workflows enabled', 'Whether the Workflow framework is enabled.',
                              onchange: toggle_appear_javascript('workflow_cwl_Settings')) %>
+                             
+  <%= admin_checkbox_setting(:project_browser_enabled, 1, Seek::Config.project_browser_enabled,
+                             'Project browser enabled', 'Whether the project folder browser is enabled.') %>
+
   <div id="workflow_cwl_Settings" class="additional_settings" style="<%= show_or_hide_block Seek::Config.workflows_enabled -%>">
     <%= admin_text_setting(:cwl_viewer_url, Seek::Config.cwl_viewer_url,
                            'CWL Viewer URL',

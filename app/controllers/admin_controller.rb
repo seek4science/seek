@@ -100,7 +100,8 @@ class AdminController < ApplicationController
     Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]
     Seek::Config.publications_enabled = string_to_boolean params[:publications_enabled]
     Seek::Config.samples_enabled = string_to_boolean params[:samples_enabled]
-    Seek::Config.workflows_enabled = string_to_boolean params[:workflows_enabled]    
+    Seek::Config.workflows_enabled = string_to_boolean params[:workflows_enabled]
+    Seek::Config.project_browser_enabled = string_to_boolean params[:project_browser_enabled]
 
     Seek::Config.google_analytics_tracker_id = params[:google_analytics_tracker_id]
     Seek::Config.google_analytics_enabled = string_to_boolean params[:google_analytics_enabled]
