@@ -15,8 +15,8 @@ class GitVersionTest < ActiveSupport::TestCase
     RemoteGitFetchJob.perform_now(repo)
 
     v = workflow.git_versions.create!(ref: 'refs/heads/master', mutable: true)
-    assert_empty v.metadata
-    assert_equal 'This Workflow', v.proxy.title
+    assert_empty v.resource_attributes
+    assert_equal 'This Workflow', v.title
     assert v.mutable?
 
     v.send(:freeze_version)
@@ -24,10 +24,10 @@ class GitVersionTest < ActiveSupport::TestCase
     new_class = Factory(:galaxy_workflow_class)
     workflow.update_column(:workflow_class_id, new_class.id)
 
-    assert_not_empty v.metadata
-    assert_equal 'This Workflow', v.metadata['title']
-    assert_equal 'This Workflow', v.proxy.title
-    assert_equal 'cwl', v.proxy.workflow_class.key
+    assert_not_empty v.resource_attributes
+    assert_equal 'This Workflow', v.resource_attributes['title']
+    assert_equal 'This Workflow', v.title
+    assert_equal 'cwl', v.workflow_class.key
     assert_equal 'galaxy', workflow.workflow_class.key
     refute v.mutable?
   ensure
@@ -39,7 +39,7 @@ class GitVersionTest < ActiveSupport::TestCase
     workflow = repo.resource
 
     v = workflow.git_versions.create!(mutable: true)
-    assert_equal 'This Workflow', v.proxy.title
+    assert_equal 'This Workflow', v.title
     assert v.mutable?
     assert v.commit.blank?
 
@@ -57,7 +57,7 @@ class GitVersionTest < ActiveSupport::TestCase
     workflow = repo.resource
 
     v = workflow.git_versions.create!(mutable: false)
-    assert_equal 'This Workflow', v.proxy.title
+    assert_equal 'This Workflow', v.title
     refute v.mutable?
     assert v.commit.blank?
 
@@ -79,8 +79,8 @@ class GitVersionTest < ActiveSupport::TestCase
   end
 
   test 'automatically link existing remote git repos' do
-    w = Factory(:workflow, git_version_attributes: { git_repository_remote: 'https://git.git/git.git' })
-    w2 = Factory(:workflow, git_version_attributes: { git_repository_remote: 'https://git.git/git.git' })
+    w = Factory(:workflow, git_version_attributes: { remote: 'https://git.git/git.git' })
+    w2 = Factory(:workflow, git_version_attributes: { remote: 'https://git.git/git.git' })
 
     assert_nil w.local_git_repository
     assert_nil w2.local_git_repository
@@ -89,19 +89,19 @@ class GitVersionTest < ActiveSupport::TestCase
 
   test 'create git version on create' do
     # Make sure remote repo exists
-    Factory(:workflow, git_version_attributes: { git_repository_remote: 'https://git.git/git.git' })
+    Factory(:workflow, git_version_attributes: { remote: 'https://git.git/git.git' })
 
     assert_difference('GitVersion.count', 1) do
       assert_no_difference('GitRepository.count') do
         w = Factory(:workflow, title: 'Test', description: 'Testy', git_version_attributes: {
             ref: 'refs/heads/master',
-            git_repository_remote: 'https://git.git/git.git'
+            remote: 'https://git.git/git.git'
         })
         assert_equal 1, w.git_versions.count
 
         v = w.git_versions.last
-        assert_equal 'Test', v.proxy.title
-        assert_equal 'Testy', v.proxy.description
+        assert_equal 'Test', v.title
+        assert_equal 'Testy', v.description
         assert_equal 'https://git.git/git.git', v.git_repository.remote
         assert_equal 'refs/heads/master', v.ref
       end
@@ -115,8 +115,8 @@ class GitVersionTest < ActiveSupport::TestCase
         assert_equal 1, w.git_versions.count
 
         v = w.git_versions.last
-        assert_equal 'Test', v.proxy.title
-        assert_equal 'Testy', v.proxy.description
+        assert_equal 'Test', v.title
+        assert_equal 'Testy', v.description
         assert_nil v.git_repository.remote
         assert_equal 'refs/heads/master', v.ref, 'Ref should be master by default'
         assert_equal 'Version 1', v.name
@@ -130,9 +130,9 @@ class GitVersionTest < ActiveSupport::TestCase
     workflow = remote.resource
     # v = workflow.git_versions.create!(mutable: false)
     # assert_equal '068cecdfce022aa98532026957a0c9519402e156', v.commit
-    v = workflow.git_versions.create!(git_repository_remote: remote.remote, ref: 'refs/heads/master')
+    v = workflow.git_versions.create!(remote: remote.remote, ref: 'refs/heads/master')
     assert_equal '068cecdfce022aa98532026957a0c9519402e156', v.commit
-    v = workflow.git_versions.create!(git_repository_remote: remote.remote, ref: 'refs/tags/v1.10.0')
+    v = workflow.git_versions.create!(remote: remote.remote, ref: 'refs/tags/v1.10.0')
     assert_equal 'cc448436c3352c48e94e15e563c7639093e7f4ef', v.commit
   end
 end

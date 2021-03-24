@@ -1,29 +1,26 @@
 class GitVersion < ApplicationRecord
   class ImmutableVersionException < StandardError; end
+  DEFAULT_LOCAL_REF = 'refs/heads/master'
 
   include Seek::Git::Util
 
-  attr_writer :git_repository_remote
   belongs_to :resource, polymorphic: true
   belongs_to :git_repository
   has_many :git_annotations
-  before_validation :set_default_visibility, on: :create
   before_create :set_version
+  before_validation :set_git_info, on: :create
+  before_validation :set_default_visibility, on: :create
   before_save :set_commit, unless: -> { ref.blank? }
 
   accepts_nested_attributes_for :git_annotations
+
+  store :resource_attributes, coder: JSON
 
   include GitSupport
 
   alias_method :parent, :resource # ExplicitVersioning compatibility
 
-  def resource_attributes
-    JSON.parse(super || '{}')
-  end
-
-  def resource_attributes= m
-    super(m.to_json)
-  end
+  attr_writer :remote
 
   def latest_git_version?
     resource.latest_git_version == self
@@ -122,6 +119,18 @@ class GitVersion < ApplicationRecord
 
   def set_version
     self.version = (resource.git_versions.maximum(:version) || 0) + 1
+    self.name ||= "v#{version}"
+  end
+
+  def set_git_info
+    if @remote.present?
+      self.git_repository ||= GitRepository.find_or_create_by(remote: @remote)
+    else
+      self.git_repository ||= (resource.local_git_repository || resource.create_local_git_repository)
+      self.ref ||= DEFAULT_LOCAL_REF
+    end
+    self.git_repository ||= @remote.present? ? GitRepository.find_or_create_by(remote: @remote) : resource.local_git_repository || resource.create_local_git_repository
+    self.mutable ||= git_repository&.remote&.blank?
   end
 
   def set_commit

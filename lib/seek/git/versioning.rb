@@ -25,7 +25,7 @@ module Seek
             after_create :save_git_version_on_create
 
             def is_git_versioned?
-              git_version&.commit&.present?
+              git_version.present?
             end
 
             def git_version
@@ -48,17 +48,7 @@ module Seek
             end
 
             def initial_git_version
-              @initial_git_version ||= self.git_versions.build(git_version_attributes.merge(mutable: git_version_attributes[:remote].blank?))
-            end
-
-            def git_version_attributes
-              (@git_version_attributes || {}).with_indifferent_access.slice(
-                  :name, :description, :ref, :git_commit, :root_path, :git_repository_id, :git_annotations_attributes
-              ).reverse_merge(default_git_version_attributes)
-            end
-
-            def default_git_version_attributes
-              { name: "Version #{git_versions.count + 1}", ref: 'refs/heads/master' }
+              @initial_git_version ||= self.git_versions.build(@git_version_attributes)
             end
 
             # def state_allows_download?(*args)

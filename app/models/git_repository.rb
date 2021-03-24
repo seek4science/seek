@@ -6,6 +6,8 @@ class GitRepository < ApplicationRecord
   after_create :initialize_repository
   after_create :setup_remote, if: -> { remote.present? }
 
+  validates :remote, uniqueness: { allow_nil: true }
+
   acts_as_uniquely_identifiable
 
   has_task :remote_git_fetch
