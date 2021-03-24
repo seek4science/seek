@@ -20,7 +20,7 @@ module Seek
                      :in_temp_dir, :git_annotations, :path_for_key, :find_git_annotation, :find_git_annotations,
                      to: :git_version
 
-            attr_writer :git_version_attributes
+            attr_accessor :git_version_attributes
 
             after_create :save_git_version_on_create
 

@@ -22,10 +22,11 @@ class WorkflowCrateExtractor
       annotations['2'] = { key: 'diagram', path: crate.main_workflow.diagram.source.path } if crate.main_workflow&.diagram
       annotations['3'] = { key: 'abstract_cwl', path: crate.main_workflow.cwl_description.source.path } if crate.main_workflow&.cwl_description
       repo = GitRepository.create!
-      @workflow.git_version_attributes = @workflow.git_version_attributes.merge(git_repository_id: repo.id,
-                                                                                git_annotations_attributes: annotations)
+      @workflow.git_version.git_repository = repo
+      @workflow.git_version.git_annotations_attributes = annotations
       files = []
       crate.entries.each do |path, entry|
+        next if entry.directory?
         files << [path, entry.source]
       end
       @workflow.git_version.add_files(files)

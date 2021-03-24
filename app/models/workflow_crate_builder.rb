@@ -33,8 +33,8 @@ class WorkflowCrateBuilder
       end
       repo = GitRepository.create!
       @workflow.local_git_repository = repo
-      @workflow.git_version_attributes = @workflow.git_version_attributes.merge(git_repository_id: repo.id,
-                                                                                git_annotations_attributes: annotations)
+      @workflow.git_version.git_repository = repo
+      @workflow.git_version.git_annotations_attributes = annotations
       @workflow.git_version.add_files(files)
 
       extractor = @workflow.extractor
