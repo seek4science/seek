@@ -32,7 +32,7 @@ module WorkflowExtraction
   end
 
   def is_already_ro_crate?
-    content_blob && content_blob.original_filename.end_with?('.crate.zip')
+    content_blob && content_blob.original_filename.end_with?('.crate.zip') || is_git_ro_crate?
   end
 
   def is_basic_ro_crate?
@@ -100,10 +100,10 @@ module WorkflowExtraction
     if is_git_versioned?
       file = file_contents(main_workflow_path)
       crate.main_workflow = ROCrate::Workflow.new(crate, StringIO.new(file), main_workflow_path, content_size: file.length)
-      if file_exists?(diagram_path)
+      if diagram_path && file_exists?(diagram_path)
         crate.main_workflow.diagram = ROCrate::WorkflowDiagram.new(crate, StringIO.new(file_contents(diagram_path)), diagram_path)
       end
-      if file_exists?(abstract_cwl_path)
+      if abstract_cwl_path && file_exists?(abstract_cwl_path)
         crate.main_workflow.cwl_description = ROCrate::WorkflowDescription.new(crate, StringIO.new(file_contents(abstract_cwl_path)), abstract_cwl_path)
       end
     else
@@ -143,7 +143,15 @@ module WorkflowExtraction
       populate_ro_crate(crate) if should_generate_crate?
 
       if block_given?
-        yield crate
+        # TODO: Find a way to do this in populate_ro_crate (Without tmpdir disappearing when it comes to writing)
+        if should_generate_crate? && is_git_versioned?
+          in_temp_dir do |tmpdir|
+            crate.add_all(tmpdir, false, include_hidden: true)
+            yield crate
+          end
+        else
+          yield crate
+        end
       else
         return crate
       end
@@ -194,7 +202,7 @@ module WorkflowExtraction
 
   def ro_crate_path
     if is_git_versioned?
-      "git_version_#{git_version.id}_diagram.#{format}"
+      File.join(Seek::Config.converted_filestore_path, "git_version_#{git_version.id}.crate.zip")
     else
       content_blob.filepath('crate.zip')
     end

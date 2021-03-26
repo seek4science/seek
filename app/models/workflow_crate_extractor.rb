@@ -18,9 +18,9 @@ class WorkflowCrateExtractor
     if valid?
       crate = ROCrate::WorkflowCrateReader.read_zip(ro_crate[:data].tempfile)
       annotations = {}
-      annotations['1'] = { key: 'main_workflow', path: crate.main_workflow.source.path } if crate.main_workflow
-      annotations['2'] = { key: 'diagram', path: crate.main_workflow.diagram.source.path } if crate.main_workflow&.diagram
-      annotations['3'] = { key: 'abstract_cwl', path: crate.main_workflow.cwl_description.source.path } if crate.main_workflow&.cwl_description
+      annotations['1'] = { key: 'main_workflow', path: crate.main_workflow.id } if crate.main_workflow && !crate.main_workflow.remote?
+      annotations['2'] = { key: 'diagram', path: crate.main_workflow.diagram.id } if crate.main_workflow&.diagram && !crate.main_workflow.diagram.remote?
+      annotations['3'] = { key: 'abstract_cwl', path: crate.main_workflow.cwl_description.id } if crate.main_workflow&.cwl_description && !crate.main_workflow.diagram.remote?
       repo = GitRepository.create!
       @workflow.git_version.git_repository = repo
       @workflow.git_version.git_annotations_attributes = annotations
