@@ -47,6 +47,17 @@ module GitSupport
     !object(path).nil?
   end
 
+  def total_size
+    total = 0
+
+    tree.walk_blobs do |_, entry|
+      blob = git_base.lookup(entry[:oid])
+      total += blob.size
+    end
+
+    total
+  end
+
   # Checkout the commit into the given directory.
   def in_dir(dir)
     base = git_base.base

@@ -81,6 +81,7 @@
             <% end -%>
           <% end %>
 
+          <strong>Total size: </strong> <%= number_to_human_size @display_workflow.total_size -%><br/>
           <%= render partial: 'git/jstree', locals: { tree: @display_workflow.tree, opts: { id: 'workflow-jstree' } } %>
 
           <script>
