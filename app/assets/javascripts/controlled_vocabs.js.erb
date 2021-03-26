@@ -29,18 +29,27 @@ var SampleTypeControlledVocab = {
 
     //selected CV item changed
     controlledVocabChanged: function () {
-        var id = $j(this).find(':selected')[0].value;
-        var editable = $j(this).find(':selected').data('editable');
-        var link = '/sample_controlled_vocabs/' + id + '/edit';
-        var button = $j(this).siblings('.cv-edit-button');
-        if (editable) {
-            button.show();
-            button.attr('disabled', false);
+        var id = $j(this).find(':selected')[0].value;        
+        var editable = $j(this).find(':selected').data('editable');        
+        var edit_button = $j(this).siblings('.cv-edit-button');
+        if (editable) {            
+            var link = '/sample_controlled_vocabs/' + id + '/edit';
+            edit_button.prop('href', link);
+            edit_button.attr('disabled', false);
+        } else {            
+            edit_button.attr('disabled', true);
+        }        
+
+        
+        var show_button = $j(this).siblings('.cv-show-button');
+        show_button.data('cv-id',id);
+        if (!id) {
+            show_button.attr('disabled', true);                                
         } else {
-            button.show();
-            button.attr('disabled', true);
-        }
-        button.prop('href', link);
+            var link = '/sample_controlled_vocabs/' + id;
+            show_button.prop('href', link);
+            show_button.attr('disabled', false);
+        }        
     }
 };
 

@@ -1716,9 +1716,9 @@ class ProjectsControllerTest < ActionController::TestCase
 
     login_as(person)
 
-    get :guided_join, params:{id:project.id}
+    get :guided_join, params: { id: project.id }
     assert_response :success
-    assert_select "input[type=checkbox][name='projects[]'][checked=checked]",value:project.id
+    assert_select 'input#projects', value: project.id
   end
 
   test 'invalid guided join' do
@@ -1780,7 +1780,7 @@ class ProjectsControllerTest < ActionController::TestCase
     institution = Factory(:institution)
     login_as(person)
     params = {
-        projects: [project.id.to_s],
+        projects: project.id.to_s,
         institution:{
             id:institution.id
         },
@@ -1814,7 +1814,7 @@ class ProjectsControllerTest < ActionController::TestCase
         web_page:'http://google.com'
     }
     params = {
-        projects: [project.id.to_s],
+        projects: project.id.to_s,
         institution: institution_params,
         comments: 'some comments'
     }
@@ -1829,6 +1829,43 @@ class ProjectsControllerTest < ActionController::TestCase
     assert flash[:notice]
     log = MessageLog.last
     details = JSON.parse(log.details)
+    assert_equal 'some comments', details['comments']
+    institution_details = details['institution']
+    assert_nil institution_details['id']
+    assert_equal 'GB', institution_details['country']
+    assert_equal 'Sheffield', institution_details['city']
+    assert_equal 'http://google.com', institution_details['web_page']
+  end
+
+  test 'request join multiple projects' do
+    person = Factory(:person_not_in_project)
+    project1 = Factory(:project_administrator).projects.first #project needs to have an admin
+    project2 = Factory(:project_administrator).projects.first
+    login_as(person)
+
+    institution_params = {
+      title:'fish',
+      city:'Sheffield',
+      country:'GB',
+      web_page:'http://google.com'
+    }
+    params = {
+      projects: "#{project1.id},#{project2.id}",
+      institution: institution_params,
+      comments: 'some comments'
+    }
+
+    assert_enqueued_emails(2) do
+      assert_difference('MessageLog.count', 2) do
+        post :request_join, params: params
+      end
+    end
+
+    assert_response :success
+    assert flash[:notice]
+    log = MessageLog.last
+    details = JSON.parse(log.details)
+    assert_equal project2, log.subject
     assert_equal 'some comments', details['comments']
     institution_details = details['institution']
     assert_nil institution_details['id']

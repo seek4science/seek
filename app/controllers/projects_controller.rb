@@ -9,7 +9,7 @@ class ProjectsController < ApplicationController
   before_action :login_required, only: [:guided_join, :guided_create, :request_join, :request_create,
                                         :administer_join_request, :respond_join_request,
                                         :administer_create_project_request, :respond_create_project_request,
-                                        :project_join_requests, :project_creation_requests]
+                                        :project_join_requests, :project_creation_requests, :typeahead]
 
   before_action :find_requested_item, only: %i[show admin edit update destroy asset_report admin_members
                                                admin_member_roles update_members storage_report
@@ -125,7 +125,7 @@ class ProjectsController < ApplicationController
   end
 
   def request_join
-    @projects = params[:projects].collect{|id| Project.find(id)}
+    @projects = params[:projects].split(',').collect{|id| Project.find(id)}
     raise 'no projects defined' if @projects.empty?
     raise 'email is disabled' unless Seek::Config.email_enabled
     @institution = Institution.find_by_id(params[:institution][:id])
@@ -557,12 +557,27 @@ class ProjectsController < ApplicationController
         @message_log.respond(comments)
         project_name = JSON.parse(@message_log.details)['project']['title']
         Mailer.create_project_rejected(requester,project_name,comments).deliver_later
-        flash[:notice]="Request rejected and #{requester.name} has been notified"
+        flash[:notice] = "Request rejected and #{requester.name} has been notified"
       end
 
       redirect_to :root
     end
-  end  
+  end
+
+  def typeahead
+    results = Project.where("LOWER(title) LIKE :query
+                                    OR LOWER(description) LIKE :query",
+                            query: "%#{params[:query].downcase}%").limit(params[:limit] || 10)
+    items = results.map do |project|
+      { id: project.id,
+        name: project.title,
+        hint: project.description&.truncate(90, omission: '...') }
+    end
+
+    respond_to do |format|
+      format.json { render json: items.to_json }
+    end
+  end
 
   private
 
