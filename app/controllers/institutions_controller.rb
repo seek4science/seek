@@ -107,7 +107,7 @@ class InstitutionsController < ApplicationController
     end
 
     if params[:include_new]
-      items.unshift({id:-1, name:params[:query],web_page:'',country:'', country_name:'',city:'',hint:"new item", new:true})
+      items.unshift({id:-1, name:params[:query], web_page: '', country: '', country_name: '', city: '', hint:"new item", new: true })
     end
 
     respond_to do |format|

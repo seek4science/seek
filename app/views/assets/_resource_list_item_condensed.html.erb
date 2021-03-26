@@ -33,7 +33,7 @@
   <div class="panel-heading rli-head">
     <div class="container">
       <div class="row">
-        <div class="col-sm-4">
+        <div class="col-sm-3">
           <div class="row">
             <div class="col-sm-2">
               <a href="#"
@@ -49,6 +49,12 @@
             </div>
           </div>
         </div>
+        <% for column in resource.columns_default.first(3) -%>
+          <% if resource.respond_to?(column) %>
+            <div class="col-sm-3"><%= text_or_not_specified(resource.send(column),length: 300, auto_link: true, none_text: "") %></div>
+          <% end %>
+        <% end -%>
+
         <% if resource.respond_to?('creators') %>
           <div class="col-sm-4">
             <%= list_item_person_list resource.creators %>

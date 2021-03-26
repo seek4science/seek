@@ -56,9 +56,11 @@
                      class: 'form-control controlled-vocab-selection',
                      disabled: !allow_type_change %>
       <% if allow_type_change %>
-        <a class="btn btn-default cv-edit-button" href="#" role="button" disabled="true" target="_blank">Edit</a>
-        <%= create_sample_controlled_vocab_model_button  %>
+        <%= button_link_to('Edit', 'edit', '#', class:'cv-edit-button', disabled: true, target: :_blank) %>        
+        <%= create_sample_controlled_vocab_modal_button  %>
       <% end %>
+      <%= button_link_to('View current', 'show', '#', class:'cv-show-button', disabled: true, target: :_blank) %>
+      <%= button_link_to('Browse', 'index', sample_controlled_vocabs_path, target: :_blank) %>
 
     </div>
     <div class='sample-type-block' style="<%= 'display:none;' unless sample_attribute.try(:seek_sample?) %>">

@@ -3,20 +3,40 @@ require 'test_helper'
 class ProjectTest < ActiveSupport::TestCase
   fixtures :projects, :institutions, :work_groups, :group_memberships, :people, :users, :publications, :assets, :organisms
 
-  # checks that the dependent work_groups are destroyed when the project s
-  def test_delete_work_groups_when_project_deleted
-    p = Factory(:person).projects.first
-    assert_equal 1, p.work_groups.size
-    wg = p.work_groups.first
 
-    wg.people = []
-    wg.save!
-    User.current_user = Factory(:admin).user
-    assert_difference('WorkGroup.count', -1) do
-      p.destroy
+  test 'workgroups destroyed with project' do
+    project = Factory(:person).projects.first
+    person = Factory(:person)
+    disable_authorization_checks do
+      person.add_to_project_and_institution(project, project.institutions.first)
+      person.save!
+
+      wg = project.work_groups.last
+      assert_equal 2, wg.people.count
+
+      person2 = Factory(:person)
+      person2.add_to_project_and_institution(project, Factory(:institution))
+      person2.save!
+
+      assert_equal 2, project.work_groups.count
+      assert_equal 3, project.people.count
+      assert_equal 3, project.group_memberships.count
+
+      assert_difference('WorkGroup.count', -2) do
+        assert_difference('GroupMembership.count', -3) do
+          assert_no_difference('Person.count') do
+            assert_difference('Project.count', -1) do
+              project.destroy
+            end
+          end
+        end
+      end
+
+      assert_nil WorkGroup.find_by_id(wg.id)
+      assert_nil Project.find_by_id(project.id)
+      refute_nil Person.find_by_id(person.id)
+      refute_nil Person.find_by_id(person2.id)
     end
-
-    assert_nil WorkGroup.find_by_id(wg.id)
   end
 
   test 'validate title and decription length' do

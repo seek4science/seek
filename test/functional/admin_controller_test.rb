@@ -116,7 +116,7 @@ class AdminControllerTest < ActionController::TestCase
       assert_select '#address[value=?]', '255.255.255.255'
       assert_select '#domain[value=?]', 'email.example.com'
     end
-  end
+  end  
 
   test 'update visible tags and threshold' do
     Seek::Config.max_visible_tags = 2
@@ -433,6 +433,40 @@ class AdminControllerTest < ActionController::TestCase
         assert_equal 'DC=secret,DC=com', Seek::Config.omniauth_ldap_settings('bind_dn')
         assert_equal '123456', Seek::Config.omniauth_ldap_config['password']
         assert_equal '123456', Seek::Config.omniauth_ldap_settings('password')
+      end
+    end
+  end
+
+  test 'email settings preserved if not sent' do
+
+    Seek::Config.set_smtp_settings('address', 'smtp.address.org') 
+    Seek::Config.set_smtp_settings('port', 1)
+    Seek::Config.set_smtp_settings('domain', 'the-domain')
+    Seek::Config.set_smtp_settings('authentication', 'auth')
+    Seek::Config.set_smtp_settings('user_name', 'fred')
+    Seek::Config.set_smtp_settings('password', 'blogs') 
+    Seek::Config.set_smtp_settings('enable_starttls_auto', true)
+
+    with_config_value(:support_email_address, 'support@email.com') do
+      with_config_value(:noreply_sender, 'no-reply@sender.com') do
+        with_config_value(:exception_notification_recipients, 'errors@fred.org, errors@john.org') do
+          with_config_value(:exception_notification_enabled, true) do
+            post :update_features_enabled, params: {}
+
+            assert_equal 'smtp.address.org', Seek::Config.smtp_settings('address')
+            assert_equal 1, Seek::Config.smtp_settings('port')
+            assert_equal 'the-domain', Seek::Config.smtp_settings('domain')
+            assert_equal 'auth', Seek::Config.smtp_settings('authentication')
+            assert_equal 'fred', Seek::Config.smtp_settings('user_name')
+            assert_equal 'blogs', Seek::Config.smtp_settings('password')
+            assert_equal true, Seek::Config.smtp_settings('enable_starttls_auto')
+
+            assert_equal 'support@email.com', Seek::Config.support_email_address
+            assert_equal 'no-reply@sender.com', Seek::Config.noreply_sender
+            assert_equal 'errors@fred.org, errors@john.org', Seek::Config.exception_notification_recipients
+            assert_equal true, Seek::Config.exception_notification_enabled
+          end
+        end
       end
     end
   end

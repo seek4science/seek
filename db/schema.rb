@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_22_125310) do
+ActiveRecord::Schema.define(version: 2021_03_18_115608) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -1543,7 +1543,7 @@ ActiveRecord::Schema.define(version: 2021_02_22_125310) do
   end
 
   create_table "sample_controlled_vocab_terms", id: :integer,  force: :cascade do |t|
-    t.string "label"
+    t.text "label"
     t.integer "sample_controlled_vocab_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

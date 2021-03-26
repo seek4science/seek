@@ -11,7 +11,7 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
     @project = @current_user.person.projects.first
     @sample_type = Factory(:simple_sample_type, project_ids: [@project.id], contributor:@current_person)
     @sample_type_attribute = @sample_type.sample_attributes.first
-    @to_post = load_template("post_min_#{@clz}.json.erb", {project_id: @project.id, sample_attribute_type_id: @sample_type_attribute.sample_attribute_type_id})
+    @to_post = load_template("post_min_#{@clz}.json.erb", {project_id: @project.id, sample_attribute_type_title: @sample_type_attribute.sample_attribute_type.title})
     @assay = Factory(:assay, contributor:@current_person)
   end
 
@@ -81,7 +81,7 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
 
   def create_post_values
     @post_values = {
-        sample_attribute_type_id: @sample_type_attribute.sample_attribute_type_id,
+        sample_attribute_type_title: @sample_type_attribute.sample_attribute_type.title,
         creator_id: @current_person.id,
         project_id: @project.id,
         assay_id: @assay.id}
@@ -93,7 +93,7 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
         title: "This is a new title.",
         attribute_title: "This is a new attribute title",
         project_id: @project.id,
-        sample_attribute_type_id: @sample_type_attribute.sample_attribute_type_id,
+        sample_attribute_type_title: @sample_type_attribute.sample_attribute_type.title,
         sample_attribute_id: @sample_type_attribute.id,
         assay_id: @assay.id
     }

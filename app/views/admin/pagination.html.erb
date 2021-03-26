@@ -11,6 +11,10 @@
                          'Default items per page', "The number of items shown per page on index pages by default.",
                          onkeypress: "javascript: return onlyNumbers(event);") %>
 
+  <%= admin_text_setting(:results_per_page_default_condensed, Seek::Config.results_per_page_default_condensed,
+                         'Default items per page in condensed views', "The number of items shown per page on index pages by default in condensed views.",
+                         onkeypress: "javascript: return onlyNumbers(event);") %>
+
   <table class="table table-condensed" style="width: auto">
     <thead>
     <tr>

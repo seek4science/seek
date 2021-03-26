@@ -10,11 +10,11 @@
     assay_assets = resource.assay_assets.select { |aa| aa.asset_type == 'DataFile' }
     field_name = "#{resource.class.name.underscore}[data_files_attributes]"
     collapse_panel = assay_assets.empty?
-    associated_data_files_json = associations_json_from_assay_assets(assay_assets, fieldName: field_name)
+    associated_data_files_json = associations_json_from_assay_assets(assay_assets)
   else
     field_name = "data_files"
     collapse_panel = resource.data_files.empty?
-    associated_data_files_json = associations_json_from_relationship(resource.data_files, fieldName: field_name)
+    associated_data_files_json = associations_json_from_relationship(resource.data_files)
   end
 -%>
 
@@ -22,8 +22,6 @@
                   :help_text => "Here you associate Data Files in SEEK to this #{resource_text}.") do %>
 
     <p>The following Data Files are involved in this <%= resource_text -%>:</p>
-
-    <%= hidden_field_tag "#{field_name}[]" %>
 
     <% if has_direction -%>
         <%= associations_list_group('data_file_to_list', 'direction.value', associated_data_files_json) do %>

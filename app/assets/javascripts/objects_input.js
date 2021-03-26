@@ -20,6 +20,8 @@ function loadObjectInputs() {
                 opts.remote = { url: queryUrl };
             if(localValues = $j(this).data('typeahead-local-values'))
                 opts.local = localValues;
+            
+            opts.limit=20;                
 
             var d = new Bloodhound(opts);
             d.initialize();
@@ -28,7 +30,7 @@ function loadObjectInputs() {
 
             options.typeaheadjs = {
                 displayKey: 'name',
-                source: d.ttAdapter(),
+                source: d.ttAdapter(),                
                 templates: {
                     suggestion: HandlebarsTemplates[template]
                 }
