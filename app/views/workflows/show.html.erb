@@ -10,9 +10,11 @@
       <li class="active">
         <a href="#overview" aria-controls="overview" role="tab" data-toggle="tab">Overview</a>
       </li>
-      <li>
-        <a href="#files" aria-controls="files" role="tab" data-toggle="tab">Files</a>
-      </li>
+      <% if @display_workflow.is_git_versioned? %>
+        <li>
+          <a href="#files" aria-controls="files" role="tab" data-toggle="tab">Files</a>
+        </li>
+      <% end %>
     </ul>
 
     <div class="tab-content">
@@ -69,35 +71,37 @@
         <% end %>
       </div>
 
-      <div role="tabpanel" class="tab-pane" id="files">
-        <%= modal(size: 'lg', id: 'git-preview-modal', class: 'git-browser-modal') do %>
-          <%= modal_header('Preview') %>
+      <% if @display_workflow.is_git_versioned? %>
+        <div role="tabpanel" class="tab-pane" id="files">
+          <%= modal(size: 'lg', id: 'git-preview-modal', class: 'git-browser-modal') do %>
+            <%= modal_header('Preview') %>
 
-          <%= modal_body do %>
+            <%= modal_body do %>
 
-          <% end -%>
-        <% end %>
+            <% end -%>
+          <% end %>
 
-        <%= render partial: 'git/jstree', locals: { tree: @display_workflow.tree, opts: { id: 'workflow-jstree' } } %>
+          <%= render partial: 'git/jstree', locals: { tree: @display_workflow.tree, opts: { id: 'workflow-jstree' } } %>
 
-        <script>
-            $j(document).ready(function () {
-                $j("#workflow-jstree").on('dblclick','.jstree-anchor', function (e) {
-                    var jstree = $j.jstree.reference(this);
-                    var node = jstree.get_node(this);
-                    if (node.type === 'blob') {
-                        var path = '<%= workflow_git_blob_path(@workflow, path: '__replaceme__') %>'.replace('__replaceme__', node.id)
-                        $j.ajax(path, {
-                            success: function (html) {
-                                $j('#git-preview-modal .modal-body').html(html);
-                                $j('#git-preview-modal').modal('show');
-                            }
-                        });
-                    }
-                });
-            })
-        </script>
-      </div>
+          <script>
+              $j(document).ready(function () {
+                  $j("#workflow-jstree").on('dblclick','.jstree-anchor', function (e) {
+                      var jstree = $j.jstree.reference(this);
+                      var node = jstree.get_node(this);
+                      if (node.type === 'blob') {
+                          var path = '<%= workflow_git_blob_path(@workflow, path: '__replaceme__') %>'.replace('__replaceme__', node.id)
+                          $j.ajax(path, {
+                              success: function (html) {
+                                  $j('#git-preview-modal .modal-body').html(html);
+                                  $j('#git-preview-modal').modal('show');
+                              }
+                          });
+                      }
+                  });
+              })
+          </script>
+        </div>
+      <% end %>
     </div>
   </div>
 
