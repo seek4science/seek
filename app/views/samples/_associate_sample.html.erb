@@ -19,6 +19,7 @@
 
     <p>The following Samples are involved in this <%= resource_text -%>:</p>
 
+    <%= hidden_field_tag "#{field_name}[]" %>
     <%= associations_list_group('sample_to_list', 'direction.value', associated_samples_json) do %>
         <div class="row">
           <div class="col-md-4">

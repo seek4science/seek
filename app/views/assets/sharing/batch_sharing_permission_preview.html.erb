@@ -8,7 +8,7 @@
   #remove the public items which don't need change sharing permissions
   all_related_items_hash = get_related_resources(current_user.person).except!('Project', 'Institution','Publication')
   items_not_in_isa = filter_items_not_in_ISA(all_related_items_hash)
-  flash.discard(:notice)
+
   @policy_params = params[:policy_attributes]
 
 %>
@@ -53,8 +53,8 @@
       <%  resource_items[:items].each do |item| %>
         <% options ||= { depth: 4, parent_depth: nil, sibling_depth: nil, include_self: true } %>
         <%  hash = Seek::IsaGraphGenerator.new(item).generate(options) %>
-        <% tree = JSON.parse(tree_json(hash, item)) %>
-        <% tree = add_permissions_to_tree_json (remove_publication_node(tree)) %>
+        <% tree = JSON.parse(build_tree_json(hash, item)) %>
+        <% tree = add_permissions_to_tree_json (tree) %>
         <% investigation_tree =  eval(tree.join) %>
         <% all_investigations_hash[:children].append (investigation_tree) %>
       <% end %>

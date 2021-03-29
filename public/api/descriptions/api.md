@@ -87,6 +87,6 @@ A placeholder can then be satisfied by uploading a file to the location URI. For
 ],
 ```
 
-may be satisfied by uploading a file to http://fairdomhub.org/data_files/57/content_blobs/313 using the <a href="#uploadDataFileContent">uploadDataFileContent</a> operation
+may be satisfied by uploading a file to http://fairdomhub.org/data_files/57/content_blobs/313 using the <a href="#uploadAssetContent">uploadAssetContent</a> operation
 
 The content of a resource may be downloaded by first *reading* the resource and then *downloading* the ContentBlobs from their URI.

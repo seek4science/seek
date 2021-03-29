@@ -4,6 +4,11 @@ module SampleTypesHelper
     if sample_type_attribute.seek_sample?
       type += ' - ' + link_to(sample_type_attribute.linked_sample_type.title, sample_type_attribute.linked_sample_type)
     end
+
+    if sample_type_attribute.controlled_vocab?
+      type += ' - ' + link_to(sample_type_attribute.sample_controlled_vocab.title, sample_type_attribute.sample_controlled_vocab)
+    end
+
     unit = sample_type_attribute.unit ? "( #{sample_type_attribute. unit.symbol} )" : ''
     req = sample_type_attribute.required? ? required_span : ''
     attribute_css = 'sample-attribute'
@@ -13,10 +18,10 @@ module SampleTypesHelper
     end
   end
 
-  def create_sample_controlled_vocab_model_button
+  def create_sample_controlled_vocab_modal_button
     modal_id = 'cv-modal'
-    button_link_to('New', 'add', '#', 'data-toggle' => 'modal', 'data-target' => "##{modal_id}")
-  end
+    button_link_to('New', 'add', '#', 'data-toggle':'modal', 'data-target': "##{modal_id}")
+  end  
 
   def sample_controlled_vocab_model_dialog(modal_id)
     modal_options = { id: modal_id, size: 'xl', 'data-role' => 'create-sample-controlled-vocab-form' }

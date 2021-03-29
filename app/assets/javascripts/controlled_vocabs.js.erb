@@ -29,18 +29,27 @@ var SampleTypeControlledVocab = {
 
     //selected CV item changed
     controlledVocabChanged: function () {
-        var id = $j(this).find(':selected')[0].value;
-        var editable = $j(this).find(':selected').data('editable');
-        var link = '/sample_controlled_vocabs/' + id + '/edit';
-        var button = $j(this).siblings('.cv-edit-button');
-        if (editable) {
-            button.show();
-            button.attr('disabled', false);
+        var id = $j(this).find(':selected')[0].value;        
+        var editable = $j(this).find(':selected').data('editable');        
+        var edit_button = $j(this).siblings('.cv-edit-button');
+        if (editable) {            
+            var link = '/sample_controlled_vocabs/' + id + '/edit';
+            edit_button.prop('href', link);
+            edit_button.attr('disabled', false);
+        } else {            
+            edit_button.attr('disabled', true);
+        }        
+
+        
+        var show_button = $j(this).siblings('.cv-show-button');
+        show_button.data('cv-id',id);
+        if (!id) {
+            show_button.attr('disabled', true);                                
         } else {
-            button.show();
-            button.attr('disabled', true);
-        }
-        button.prop('href', link);
+            var link = '/sample_controlled_vocabs/' + id;
+            show_button.prop('href', link);
+            show_button.attr('disabled', false);
+        }        
     }
 };
 
@@ -117,6 +126,7 @@ CVTerms = {
         $j('div#fetch-error-message').hide();
         $j('#fetch-terms-spinner').spinner('add');
         $j('input#submit-button').prop('disabled', true);
+        $j('input#fetch-ontology-terms-submit').prop('disabled', true);
 
         var ontology_id = $j('select#sample_controlled_vocab_source_ontology').val();
         var root_uri = $j('#sample_controlled_vocab_ols_root_term_uri').val();
@@ -139,6 +149,7 @@ CVTerms = {
                 $j('#fetch-terms-spinner').spinner('remove');
                 $j('div#controlled-vocab-terms').show();
                 $j('input#submit-button').prop('disabled', false);
+                $j('input#fetch-ontology-terms-submit').prop('disabled', false);
                 //scroll to end
                 $j('#controlled-vocab-terms-fixed').scrollTop($j('#controlled-vocab-terms-fixed').prop("scrollHeight"));
             }

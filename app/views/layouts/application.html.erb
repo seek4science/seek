@@ -37,11 +37,15 @@
         <% end %>
     <% end %>
 
-    <% if pending_project_creation_request? %>
-      <div id='pending-project-creation-warning' class="alert alert-danger text-center">
-        There are pending <%= t('project') %> creation requests - <%= link_to('Full List',project_creation_requests_admin_path) %>
-      </div>
-    <% end %>
+    <% if current_user && MessageLog.pending_project_creation_requests.limit(1).any? %>
+      <% cache [current_user, MessageLog.pending_project_creation_requests.last] do %>  
+        <% if pending_project_creation_request? %>
+          <div id='pending-project-creation-warning' class="alert alert-danger text-center">
+            There are pending <%= t('project') %> creation requests - <%= link_to('Full List',project_creation_requests_projects_path) %>
+          </div>
+        <% end %>
+      <% end %>  
+    <% end %>  
 
     <% if pending_project_join_request? %>
       <div id='pending-project-join-warning' class="alert alert-danger text-center">

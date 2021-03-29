@@ -224,3 +224,6 @@ life_monitor_client_id:
 life_monitor_client_secret:
 galaxy_instance_name:
 galaxy_instance_trs_import_url:
+# Controlled vocabs
+cv_dropdown_limit:
+  convert: :to_i

@@ -222,7 +222,7 @@ class DataFile < ApplicationRecord
   end
 
   def populate_metadata_from_template
-    if contains_extractable_spreadsheet?
+    if contains_extractable_excel?
       Seek::Templates::Extract::DataFileRightFieldExtractor.new(self).populate(self)
     else
       Set.new
@@ -231,7 +231,7 @@ class DataFile < ApplicationRecord
 
   def initialise_assay_from_template
     assay = Assay.new
-    if contains_extractable_spreadsheet?
+    if contains_extractable_excel?
       warnings = Seek::Templates::Extract::AssayRightfieldExtractor.new(self).populate(assay)
       return assay, warnings
     else
