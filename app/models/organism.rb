@@ -47,7 +47,7 @@ class Organism < ApplicationRecord
     super
   end
   def columns_allowed
-    super + ['title']
+    columns_default + ['title']
   end
 
   def can_delete?(user = User.current_user)

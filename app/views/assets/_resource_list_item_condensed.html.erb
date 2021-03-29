@@ -51,23 +51,20 @@
         </div>
         <% for column in resource.columns_default.first(3) -%>
           <% if resource.respond_to?(column) %>
-            <div class="col-sm-3"><%= text_or_not_specified(resource.send(column),length: 300, auto_link: true, none_text: "") %></div>
+            <%# if the number of columns is less than 3, increase width slightly %>
+            <div class="col-sm-<%= resource.columns_default.length()<3 ? '4' : '3' %>">
+              <% if column == 'creators'%>
+                <%= list_item_person_list resource.creators %>
+              <% elsif column == 'projects'  && ![Event, Person, Project, Institution, Programme, Collection].include?(resource.class)%>
+                <b> Project: </b>
+                <%= resource.projects.uniq.map {|p| link_to p.title, p }.join(', ').html_safe %>
+              <% else %>
+                <b><%= t(column, default: column.to_s).titleize %>: </b>
+                <%= text_or_not_specified(resource.send(column),length: 300, auto_link: true, none_text: "") %>
+              <% end %>
+            </div>
           <% end %>
         <% end -%>
-
-        <% if resource.respond_to?('creators') %>
-          <div class="col-sm-4">
-            <%= list_item_person_list resource.creators %>
-          </div>
-        <% end %>
-        <% if resource.respond_to?(:projects) && ![Event, Person, Project, Institution, Programme, Collection].include?(resource.class) %>
-          <div class="col-sm-4 text-right">
-            <div class="rli-project-list">
-            <b> Project: </b>
-              <%= resource.projects.uniq.map {|p| link_to p.title, p }.join(', ').html_safe %>
-            </div>  
-          </div>
-        <% end %>
       </div>
     </div>
   </div>
