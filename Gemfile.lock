@@ -1,13 +1,4 @@
 GIT
-  remote: https://github.com/ResearchObject/ro-crate-ruby.git
-  revision: 70804d34264481e70d0fe83ecc6ad76eda164e74
-  ref: 70804d34264481e70d0fe83ecc6ad76eda164e74
-  specs:
-    ro-crate-ruby (0.3.0)
-      addressable
-      rubyzip
-
-GIT
   remote: https://github.com/SysMO-DB/bioportal.git
   revision: 0f80b4281af3f71234a425d40981b1185a3e5d0b
   specs:
