@@ -127,16 +127,23 @@
   /**
     * Refresh the page with the options selected from the dropdown menu
   */
+  var debounceTimeout;
   function refreshWithOptions(){
-    table_cols = []
-    $j('#tableview-colselector input:checked').each(function() {
-      table_cols.push(this.value);
-    });
-    console.log(table_cols);
-    const url = new URL(window.location.href);
-    const search_params = url.searchParams;
-    search_params.set('table_cols', table_cols);
-    url.search = search_params.toString();
-    window.location = url;
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout)
+    }
+    debounceTimeout = setTimeout(function() {
+      table_cols = []
+      $j('#tableview-colselector input:checked').each(function() {
+        table_cols.push(this.value);
+      });
+      console.log(table_cols);
+      const url = new URL(window.location.href);
+      const search_params = url.searchParams;
+      search_params.set('table_cols', table_cols);
+      url.search = search_params.toString();
+      window.location = url;
+    }, 700);
+    return true;
   }
 </script>

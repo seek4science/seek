@@ -17,6 +17,8 @@ namespace :seek do
     fix_negative_programme_role_mask
     db:seed:sample_attribute_types
     delete_users_with_invalid_person
+    delete_specimen_activity_logs
+    update_session_store
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -178,6 +180,19 @@ namespace :seek do
       puts "... Removing #{found.count} users with a no longer existing person"
       found.each(&:destroy)
     end
+  end
+
+  task(delete_specimen_activity_logs: :environment) do
+    logs = ActivityLog.where(activity_loggable_type: 'Specimen')
+    if logs.any?
+      puts "... removing #{logs.count} redundant Specimen related #{'log'.pluralize(logs.count)}"
+      logs.delete_all
+    end
+  end
+
+  task(update_session_store: :environment) do
+    puts '... Updating session store'
+    Rake::Task['db:sessions:upgrade'].invoke
   end
   
 end

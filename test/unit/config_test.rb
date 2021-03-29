@@ -260,6 +260,11 @@ class ConfigTest < ActiveSupport::TestCase
   test 'results_per_page_default' do
     assert_equal 7, Seek::Config.results_per_page_default
   end
+
+  test 'results_per_page_default_condensed' do
+    assert_equal 14, Seek::Config.results_per_page_default_condensed
+  end
+
   # others
   test 'type_managers' do
     assert_equal 'admins', Seek::Config.type_managers

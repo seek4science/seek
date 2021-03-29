@@ -34,10 +34,10 @@ class Institution < ApplicationRecord
 
   # Returns the columns to be shown on the table view for the resource
   def columns_default
-    super + ['web_page']
+    super + ['city','country','web_page']
   end
   def columns_allowed
-    super + ['web_page','address','city','country']
+    super + ['city','country','web_page','address']
   end
 
   # get a listing of all known institutions

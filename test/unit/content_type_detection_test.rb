@@ -58,10 +58,50 @@ class ContentTypeDetectionTest < ActiveSupport::TestCase
     refute blob.is_extractable_spreadsheet?
     refute is_extractable_spreadsheet?(blob)
 
+    blob = Factory :csv_content_blob
+    assert blob.is_extractable_spreadsheet?
+    assert is_extractable_spreadsheet?(blob)
+
+    blob = Factory :tsv_content_blob
+    assert blob.is_extractable_spreadsheet?
+    assert is_extractable_spreadsheet?(blob)
+
     with_config_value(:max_extractable_spreadsheet_size, 0) do
       blob = Factory :xlsx_content_blob
       refute blob.is_extractable_spreadsheet?
       refute is_extractable_spreadsheet?(blob)
+    end
+  end
+
+  test 'is_extractable_excel' do
+    blob = Factory :spreadsheet_content_blob
+    assert blob.is_extractable_excel?
+    assert is_extractable_excel?(blob)
+
+    blob = Factory :xlsx_content_blob
+    assert blob.is_extractable_excel?
+    assert is_extractable_excel?(blob)
+
+    blob = Factory :xlsm_content_blob
+    assert blob.is_extractable_excel?
+    assert is_extractable_excel?(blob) 
+
+    blob = Factory :doc_content_blob
+    refute blob.is_extractable_excel?
+    refute is_extractable_excel?(blob)
+
+    blob = Factory :csv_content_blob
+    refute blob.is_extractable_excel?
+    refute is_extractable_excel?(blob)
+
+    blob = Factory :tsv_content_blob
+    refute blob.is_extractable_excel?
+    refute is_extractable_excel?(blob)
+
+    with_config_value(:max_extractable_spreadsheet_size, 0) do
+      blob = Factory :xlsx_content_blob
+      refute blob.is_extractable_excel?
+      refute is_extractable_excel?(blob)
     end
   end
 
@@ -75,6 +115,10 @@ class ContentTypeDetectionTest < ActiveSupport::TestCase
     assert is_supported_spreadsheet_format?(blob)
 
     blob = Factory :xlsm_content_blob
+    assert blob.is_supported_spreadsheet_format?
+    assert is_supported_spreadsheet_format?(blob)
+
+    blob = Factory :csv_content_blob
     assert blob.is_supported_spreadsheet_format?
     assert is_supported_spreadsheet_format?(blob)
 

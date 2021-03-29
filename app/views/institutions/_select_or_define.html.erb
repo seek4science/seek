@@ -48,7 +48,7 @@
             checkSubmitButtonEnabled();
         });
 
-        $j('input').on('itemAdded', function(event) {
+        $j('input#institution_id').on('itemAdded', function(event) {
             console.log(event.item.id)
             if (event.item.id=='-1') {
                 toggleUserInput(false);
@@ -63,7 +63,7 @@
             checkSubmitButtonEnabled();
         });
 
-        $j('input').on('itemRemoved', function(event) {
+        $j('input#institution_id').on('itemRemoved', function(event) {
             toggleUserInput(true);
             $j('#institution_title').val('');
             $j('#institution_web_page').val('');

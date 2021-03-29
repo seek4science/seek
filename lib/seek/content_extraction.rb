@@ -87,6 +87,10 @@ module Seek
       end
     end
 
+    def extract_csv()
+      File.read(filepath)
+    end
+
     def to_spreadsheet_xml
       begin
         spreadsheet_to_xml(File.open(filepath), Seek::Config.jvm_memory_allocation)
