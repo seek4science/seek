@@ -11,6 +11,9 @@ You should make titles as descriptive as possible.
 
 ## Description
 The description allows you to further expand important details.
+Descriptions can be formatted using markdown, either via markup or using the various options above the text input (e.g. bold, italics, hyperlinks...).
+![Markdown ribbon UI](/images/user-guide/description_markdown_ribbon.png){:.screenshot}
+
 
 ## Projects
 Assets can be assigned to projects in which they were created using the drop down menu.
