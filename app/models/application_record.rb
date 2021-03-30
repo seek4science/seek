@@ -41,11 +41,11 @@ class ApplicationRecord < ActiveRecord::Base
   end
   # default columns to be shown after required columns
   def columns_default
-    ['created_at']
+    []
   end
   # additional available columns to be shown as an option
   def columns_allowed
-    ['description','created_at','updated_at']
+    columns_default + ['description','created_at','updated_at']
   end
 
   
