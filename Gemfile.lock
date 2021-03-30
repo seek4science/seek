@@ -391,7 +391,7 @@ GEM
       nokogiri (~> 1.11.2)
     mini_mime (1.0.2)
     mini_portile2 (2.5.0)
-    minitest (5.14.3)
+    minitest (5.14.4)
     minitest-reporters (1.1.14)
       ansi
       builder
@@ -623,7 +623,7 @@ GEM
       rdf (~> 3.0)
     rdf-xsd (3.0.1)
       rdf (~> 3.0)
-    rdoc (6.0.3)
+    rdoc (6.3.0)
     recaptcha (4.1.0)
       json
     redcarpet (3.5.1)
