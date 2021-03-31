@@ -273,3 +273,8 @@ VCR.configure do |config|
 end
 
 WebMock.disable_net_connect!(allow_localhost: true) # Need to comment this line out when running VCRs for the first time
+
+# Clear testing filestore before test run (but check its under tmp for safety)
+if File.expand_path(Seek::Config.filestore_path).start_with?(File.expand_path(File.join(Rails.root, 'tmp')))
+  FileUtils.rm_r(Seek::Config.filestore_path)
+end
