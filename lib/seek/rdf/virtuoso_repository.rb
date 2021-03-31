@@ -1,4 +1,4 @@
-require 'rdf/virtuoso'
+#require 'rdf/virtuoso'
 require 'rdf/rdfxml'
 
 module Seek
@@ -8,7 +8,7 @@ module Seek
       include Singleton
 
       class Config < Struct.new(:username, :password, :uri, :update_uri, :private_graph, :public_graph); end
-      QUERY = RDF::Virtuoso::Query
+      #QUERY = RDF::Virtuoso::Query
 
       def get_query_object
         QUERY
@@ -41,15 +41,16 @@ module Seek
       end
 
       def connect_to_repository
-        @repo = RDF::Virtuoso::Repository.new(get_configuration.uri,
-                                              update_uri: get_configuration.update_uri,
-                                              username: get_configuration.username,
-                                              password: get_configuration.password,
-                                              auth_method: 'digest')
+        # @repo = RDF::Virtuoso::Repository.new(get_configuration.uri,
+        #                                       update_uri: get_configuration.update_uri,
+        #                                       username: get_configuration.username,
+        #                                       password: get_configuration.password,
+        #                                       auth_method: 'digest')
       end
 
       def enabled_for_environment?
-        !yaml[Rails.env].nil? && !yaml[Rails.env]['disabled']
+        #!yaml[Rails.env].nil? && !yaml[Rails.env]['disabled']
+        false
       end
 
       def config_filename

@@ -37,7 +37,7 @@ class Institution < ApplicationRecord
     super + ['city','country','web_page']
   end
   def columns_allowed
-    super + ['city','country','web_page','address']
+    columns_default + ['address']
   end
 
   # get a listing of all known institutions

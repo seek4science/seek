@@ -19,13 +19,26 @@ var SampleTypeControlledVocab = {
         return $j('#' + SampleTypeControlledVocab.controlledVocabSelectionTagId);
     },
 
+    //initialises the rich editor, which needs to be deferred until after the modal diagram is cloned
+    initialise_deferred_rich_editor_modal: function() {
+        $j(".rich-text-edit-deferred").removeClass('rich-text-edit-deferred').addClass('rich-text-edit');
+        initialise_rich_text_editors("#cv-modal .rich-text-edit");
+    },
+
+    initialise_deferred_rich_editor: function() {
+        $j(".rich-text-edit-deferred").removeClass('rich-text-edit-deferred').addClass('rich-text-edit');
+        initialise_rich_text_editors(".rich-text-edit");            
+    },
+
     //resets the modal
     resetModalControlledVocabForm: function () {
         $j('#cv-modal').remove();
         $j('#modal-dialogues').append(SampleTypeControlledVocab.blankControlledVocabModelForm.clone());
         CVTerms.init();
         SampleTypeControlledVocab.bindNewControlledVocabShowEvent();
-    },
+        SampleTypeControlledVocab.initialise_deferred_rich_editor_modal();
+        
+    },    
 
     //selected CV item changed
     controlledVocabChanged: function () {
