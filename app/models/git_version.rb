@@ -138,7 +138,7 @@ class GitVersion < ApplicationRecord
       self.ref ||= DEFAULT_LOCAL_REF
     end
     self.git_repository ||= @remote.present? ? GitRepository.find_or_create_by(remote: @remote) : resource.local_git_repository || resource.create_local_git_repository
-    self.mutable ||= git_repository&.remote.blank?
+    self.mutable = git_repository&.remote.blank? if self.mutable.nil?
   end
 
   def set_commit

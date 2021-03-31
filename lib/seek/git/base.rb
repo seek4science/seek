@@ -18,7 +18,7 @@ module Seek
       end
 
       def self.base_class
-        Rails.env.test? ? Seek::Git::MockBase : self
+        self
       end
 
       # Rugged cannot do this without initializing a repo on disk, so use ruby git.

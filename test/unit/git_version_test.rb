@@ -2,17 +2,11 @@ require 'test_helper'
 
 class GitVersionTest < ActiveSupport::TestCase
   setup do
-    WebMock.disable_net_connect!
-    FileUtils.rm_r(Seek::Config.git_filestore_path)
-    FileUtils.rm_r(Seek::Config.git_temporary_filestore_path)
   end
 
   test 'freeze version attributes' do
-    repo = Factory(:remote_repository)
+    repo = Factory(:local_repository)
     workflow = repo.resource
-    # Could use rubyzip for this
-    `unzip -qq #{repo.remote}.zip -d #{Pathname.new(repo.remote).parent}`
-    RemoteGitFetchJob.perform_now(repo)
 
     v = workflow.git_versions.create!(ref: 'refs/heads/master', mutable: true)
     assert_empty v.resource_attributes
@@ -30,8 +24,6 @@ class GitVersionTest < ActiveSupport::TestCase
     assert_equal 'cwl', v.workflow_class.key
     assert_equal 'galaxy', workflow.workflow_class.key
     refute v.mutable?
-  ensure
-    FileUtils.rm_rf(repo.remote)
   end
 
   test 'add files' do
@@ -109,6 +101,7 @@ class GitVersionTest < ActiveSupport::TestCase
   end
 
   test 'create git version with local repo and defaults on create' do
+    skip "Not doing this for now"
     assert_difference('GitVersion.count', 1) do
       assert_difference('GitRepository.count', 1) do
         w = Factory(:workflow, title: 'Test', description: 'Testy')
@@ -126,13 +119,13 @@ class GitVersionTest < ActiveSupport::TestCase
 
   test 'resolve refs' do
     remote = Factory(:remote_repository)
-
-    workflow = remote.resource
+    workflow = Factory(:workflow, git_version_attributes: { git_repository_id: remote.id })
     # v = workflow.git_versions.create!(mutable: false)
+
     # assert_equal '068cecdfce022aa98532026957a0c9519402e156', v.commit
-    v = workflow.git_versions.create!(remote: remote.remote, ref: 'refs/heads/master')
-    assert_equal '068cecdfce022aa98532026957a0c9519402e156', v.commit
-    v = workflow.git_versions.create!(remote: remote.remote, ref: 'refs/tags/v1.10.0')
-    assert_equal 'cc448436c3352c48e94e15e563c7639093e7f4ef', v.commit
+    v = workflow.git_versions.create!(remote: remote.remote, ref: 'refs/remotes/origin/main')
+    assert_equal 'b6312caabe582d156dd351fab98ce78356c4b74c', v.commit
+    v = workflow.git_versions.create!(remote: remote.remote, ref: 'refs/tags/v0.01')
+    assert_equal '3f2c23e92da3ccbc89d7893b4af6039e66bdaaaf', v.commit
   end
 end
