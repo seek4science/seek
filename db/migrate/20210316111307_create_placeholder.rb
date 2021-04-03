@@ -13,6 +13,7 @@ class CreatePlaceholder < ActiveRecord::Migration[5.2]
       t.datetime "created_at"
       t.datetime "updated_at"
       t.references :file_template
+      t.references :project
     end
 
     add_index "placeholders", ["contributor_id"], name: "index_ps_on_c", using: :btree

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_16_114303) do
+ActiveRecord::Schema.define(version: 2021_03_22_212940) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -441,6 +441,9 @@ ActiveRecord::Schema.define(version: 2021_03_16_114303) do
     t.string "license"
     t.boolean "simulation_data", default: false
     t.string "deleted_contributor"
+    t.string "data_type", default: "http://edamontology.org/data_0006", null: false
+    t.string "format_type", default: "http://edamontology.org/format_1915", null: false
+    t.integer "file_template_id"
     t.index ["contributor_id"], name: "index_data_files_on_contributor"
   end
 
@@ -1287,19 +1290,21 @@ ActiveRecord::Schema.define(version: 2021_03_16_114303) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.bigint "file_template_id"
+    t.bigint "project_id"
     t.string "data_type", default: "http://edamontology.org/data_0006", null: false
     t.string "format_type", default: "http://edamontology.org/format_1915", null: false
     t.index ["contributor_id"], name: "index_ps_on_c"
     t.index ["file_template_id"], name: "index_placeholders_on_file_template_id"
     t.index ["policy_id"], name: "index_placeholders_on_policy_id"
+    t.index ["project_id"], name: "index_placeholders_on_project_id"
   end
 
   create_table "placeholders_projects",  force: :cascade do |t|
     t.bigint "placeholder_id"
     t.bigint "project_id"
-    t.index ["placeholder_id", "project_id"], name: "index_placeholders_projects_on_placeholder_id_and_project_id"
-    t.index ["placeholder_id"], name: "index_placeholders_projects_on_placeholder_id"
-    t.index ["project_id"], name: "index_placeholders_projects_on_project_id"
+    t.index ["placeholder_id", "project_id"], name: "index_ph_projects_on_ph_id_and_p_id"
+    t.index ["placeholder_id"], name: "index_ph_projects_on_ph_id"
+    t.index ["project_id"], name: "index_ph_projects_on_p_id"
   end
 
   create_table "policies", id: :integer,  force: :cascade do |t|

@@ -16,6 +16,4 @@
 
 <%= render :partial => 'projects/project_selector', :locals => {:resource => @placeholder,:allow_nil=>false} if show_form_manage_specific_attributes? -%>
 
-<%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @investigation} -%>
-
 <%= form_submit_buttons(@placeholder) %>

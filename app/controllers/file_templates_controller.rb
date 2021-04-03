@@ -67,7 +67,7 @@ class FileTemplatesController < ApplicationController
                                 :format_type,
                                 :data_type,
                                 { publication_ids: [] }, { event_ids: [] },
-                                     discussion_links_attributes:[:id, :url, :label, :_destroy])
+                                discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
   alias_method :asset_params, :file_template_params

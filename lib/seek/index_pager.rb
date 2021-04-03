@@ -19,6 +19,7 @@ module Seek
     end
 
     def find_assets
+      puts 'Into find_assets'
       assign_index_variables
 
       assets = nil
@@ -127,6 +128,7 @@ module Seek
       # Filters
       @filters = page_and_sort_params[:filter].to_h
       @active_filters = {}
+      puts '@active_filters set to empty'
       @available_filters = {}
     end
 

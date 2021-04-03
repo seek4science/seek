@@ -183,6 +183,7 @@ class AssaysController < ApplicationController
                                   { scales: [] }, { sop_ids: [] }, { model_ids: [] },
                                   { samples_attributes: [:asset_id, :direction] },
                                   { data_files_attributes: [:asset_id, :direction, :relationship_type_id] },
+                                  { placeholders_attributes: [:asset_id, :direction, :relationship_type_id] },
                                   { publication_ids: [] },				  	
                                   { custom_metadata_attributes: determine_custom_metadata_keys },
 				  { discussion_links_attributes:[:id, :url, :label, :_destroy] }

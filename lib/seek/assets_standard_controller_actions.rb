@@ -85,6 +85,7 @@ module Seek
     def create
       item = initialize_asset
 
+      puts 'Freddy fred fred'
       if handle_upload_data
         create_asset_and_respond(item)
       else
@@ -105,6 +106,9 @@ module Seek
     # the standard response block after created a new asset
     def create_asset_and_respond(item)
       item = create_asset(item)
+      puts item.to_json
+      puts 'ids ' + item.project_ids*","
+      puts 'params ' + params.inspect
       if item.save
         unless return_to_fancy_parent(item)
           flash[:notice] = "#{t(item.class.name.underscore)} was successfully uploaded and saved."
@@ -138,9 +142,13 @@ module Seek
     end
 
     def create_asset(item)
+      puts '1'
       update_sharing_policies item
+      puts '2'
       update_annotations(params[:tag_list], item)
+      puts '3'
       update_relationships(item, params)
+      puts '4'
       build_model_image item, model_image_params if item.is_a?(Model) && model_image_present?
       item
     end

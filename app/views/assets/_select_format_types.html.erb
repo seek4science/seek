@@ -7,10 +7,9 @@
   resource_type = resource.class.name.underscore
   resource_type_text = text_for_resource(resource)
   help_text = "You can add a format type for this #{resource_type_text}"
-
 %>
 
-<%= folding_panel('Format Type', false, :body_options => {:id => 'format_type_urls'},
+<%= folding_panel('Format Type', true, :body_options => {:id => 'format_type_urls'},
                   :help_text => help_text) do %>
 
     <p class="help-block">
@@ -34,7 +33,7 @@
           startingRoot: "http://edamontology.org/format_1915"
       });
       format_type_tree.on("afterSelect", function(event, classId, prefLabel, selectedNode) {
-	  document.getElementById("file_template_format_type").value = classId;
+	  document.getElementById('<%= "#{resource_type}_format_type" %>').value = classId;
       })
 	     });
 </script>

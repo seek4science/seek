@@ -1,13 +1,26 @@
+<% unless @placeholder.file_template.nil? %>
+<% if @placeholder.data_type != @placeholder.file_template.data_type -%>
+    <%= alert_box('warning') do %>
+        The data type of the placeholder does not match that of the template
+    <% end %>
+<% end %>
+<% if @placeholder.format_type != @placeholder.file_template.format_type -%>
+    <%= alert_box('warning') do %>
+        The format type of the placeholder does not match that of the template
+    <% end %>
+<% end %>
+<% end %>
+
 <%= render :partial => "general/item_title",:locals => {:item => @placeholder,
                                                         :buttons_partial => 'assets/asset_buttons'} -%>
 
 <div class="row">
   <div class="col-md-9 col-sm-8 box_about_actor">
-    <%= item_description @display_placeholder.description -%>
+    <%= item_description @placeholder.description -%>
 
     <div class="row">
       <div class="col-md-6">
-        <%= persistent_resource_id(@display_placeholder) %>
+        <%= persistent_resource_id(@placeholder) %>
 
         <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @placeholder} %>
 

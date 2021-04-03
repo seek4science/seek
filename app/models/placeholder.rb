@@ -2,19 +2,24 @@ class Placeholder < ApplicationRecord
   
   include Seek::Rdf::RdfGeneration
 
-  has_many :projects
+  acts_as_asset
+
   validates :projects, presence: true, projects: { self: true }
 
+  belongs_to :project
+  belongs_to :file_template
+  
   # Returns the columns to be shown on the table view for the resource
   def columns_default
+    super
   end
 
   def columns_allowed
     super + ['license','last_used_at','other_creators','deleted_contributor']  
   end
 
-  def use_mime_type_for_avatar?
-    true
+  def avatar_key
+    :programme
   end
 
   def self.can_create?

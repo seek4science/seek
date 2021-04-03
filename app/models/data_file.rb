@@ -24,6 +24,7 @@ class DataFile < ApplicationRecord
   has_one :content_blob, ->(r) { where('content_blobs.asset_version =?', r.version) }, as: :asset, foreign_key: :asset_id
   has_one :external_asset, as: :seek_entity, dependent: :destroy
 
+  belongs_to :file_template
   has_many :studied_factors, ->(r) { where('studied_factors.data_file_version =?', r.version) }
   has_many :extracted_samples, class_name: 'Sample', foreign_key: :originating_data_file_id
 
@@ -42,7 +43,7 @@ class DataFile < ApplicationRecord
       joins: [:assays]
   )
 
-  explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi']) do
+  explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi', 'data_type', 'format_type', 'file_template_id']) do
     include Seek::Data::SpreadsheetExplorerRepresentation
     acts_as_doi_mintable(proxy: :parent, type: 'Dataset', general_type: 'Dataset')
     acts_as_versioned_resource

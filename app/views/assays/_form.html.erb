@@ -92,6 +92,10 @@
         <%= f.fancy_multiselect :models, other_projects_checkbox: true %>
     <% end -%>
 
+    <%= render :partial => "assets/associate_placeholder",:locals=>{:f=>f, :resource => @assay,
+                                                                  :has_relationships => @assay.is_modelling?,
+                                                                  :has_direction => !@assay.is_modelling?} -%>
+
     <%= render :partial => "assets/associate_data_file",:locals=>{:f=>f, :resource => @assay,
                                                                   :has_relationships => @assay.is_modelling?,
                                                                   :has_direction => !@assay.is_modelling?} -%>

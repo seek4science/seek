@@ -34,6 +34,10 @@
   <% end %>
 <% end %>
 
+<% if resource.respond_to?(:file_template) && !resource.file_template.nil? %>
+  <%= render :partial => "assets/file_template_box", :locals => { :resource => resource } -%>
+<% end %>
+
 <% if resource.respond_to?(:format_type) %>
   <%= render :partial => "assets/format_types_box", :locals => { :resource => resource, :versioned_resource=> versioned_resource } -%>
 <% end %>

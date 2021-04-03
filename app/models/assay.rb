@@ -41,6 +41,7 @@ class Assay < ApplicationRecord
   has_many :assay_assets, dependent: :destroy, inverse_of: :assay, autosave: true
 
   has_many :data_files, through: :assay_assets, source: :asset, source_type: 'DataFile', inverse_of: :assays
+  has_many :placeholders, through: :assay_assets, source: :asset, source_type: 'Placeholder', inverse_of: :assays
   has_many :sops, through: :assay_assets, source: :asset, source_type: 'Sop', inverse_of: :assays
   has_many :models, through: :assay_assets, source: :asset, source_type: 'Model', inverse_of: :assays
   has_many :samples, through: :assay_assets, source: :asset, source_type: 'Sample', inverse_of: :assays
@@ -133,7 +134,7 @@ class Assay < ApplicationRecord
 
   # Associations where there is additional metadata on the association, i.e. `direction`
   def self.complex_associated_asset_types
-    [:data_files, :samples]
+    [:data_files, :samples, :placeholders]
   end
 
   def assets
@@ -238,6 +239,10 @@ class Assay < ApplicationRecord
 
   def data_files_attributes= attributes
     set_assay_assets_for('DataFile', attributes)
+  end
+
+  def placeholders_attributes= attributes
+    set_assay_assets_for('Placeholder', attributes)
   end
 
   def self.filter_by_projects(projects)
