@@ -14,7 +14,7 @@ class GitRepositoryTest < ActiveSupport::TestCase
     remote = repo.git_base.remotes.first
 
     assert_equal 'origin', remote.name
-    assert remote.url.end_with?('nf-core/chipseq')
+    assert remote.url.end_with?('seek4science/workflow-test-fixture.git')
     assert File.exist?(File.join(repo.local_path, '.git', 'config'))
   ensure
     FileUtils.rm_rf(repo.remote) if repo
