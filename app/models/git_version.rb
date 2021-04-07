@@ -66,6 +66,20 @@ class GitVersion < ApplicationRecord
     end
   end
 
+  def remove_file(path)
+    perform_commit("Deleted #{path}") do |index|
+      index.remove(path)
+    end
+  end
+
+  def move_file(oldpath, newpath)
+    perform_commit("Moved #{oldpath} -> #{newpath}") do |index|
+      existing = index[oldpath]
+      index.add(path: newpath, oid: existing[:oid], mode: 0100644)
+      index.remove(oldpath)
+    end
+  end
+
   def commit
     super || get_commit
   end
