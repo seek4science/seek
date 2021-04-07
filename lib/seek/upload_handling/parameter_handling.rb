@@ -20,8 +20,7 @@ module Seek
       end
 
       def model_image_present?
-#        params[:model_image] && params[:model_image][:image_file]
-        true
+        params[:model_image] && params[:model_image][:image_file]
       end
 
       def check_for_data_or_url(blob_param)
