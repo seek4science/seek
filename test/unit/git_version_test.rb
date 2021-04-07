@@ -131,4 +131,40 @@ class GitVersionTest < ActiveSupport::TestCase
     v = workflow.git_versions.create!(remote: remote.remote, ref: 'refs/tags/v0.01')
     assert_equal '3f2c23e92da3ccbc89d7893b4af6039e66bdaaaf', v.commit
   end
+
+  test 'remove file' do
+    workflow = Factory(:workflow)
+    repo = Factory(:local_repository, resource: workflow)
+
+    v = workflow.git_versions.create!(mutable: true)
+    old_commit = v.commit
+    old_blob_count = v.blobs.length
+    assert v.file_exists?('diagram.png')
+
+    v.remove_file('diagram.png')
+
+    v.reload
+
+    refute v.file_exists?('diagram.png')
+    assert_equal old_blob_count - 1, v.blobs.count
+    assert_not_equal old_commit, v.commit
+  end
+
+  test 'rename file' do
+    workflow = Factory(:workflow)
+    repo = Factory(:local_repository, resource: workflow)
+
+    v = workflow.git_versions.create!(mutable: true)
+    old_commit = v.commit
+    assert v.file_exists?('diagram.png')
+    refute v.file_exists?('images/lookatme.png')
+
+    v.move_file('diagram.png', 'images/lookatme.png')
+
+    v.reload
+
+    refute v.file_exists?('diagram.png')
+    assert v.file_exists?('images/lookatme.png')
+    assert_not_equal old_commit, v.commit
+  end
 end
