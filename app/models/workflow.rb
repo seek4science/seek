@@ -28,6 +28,7 @@ class Workflow < ApplicationRecord
 
   git_versioning do
     include WorkflowExtraction
+    acts_as_doi_mintable(proxy: :parent, general_type: 'Workflow')
 
     def workflow_class
       WorkflowClass.find_by_id(workflow_class_id)

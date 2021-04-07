@@ -135,7 +135,7 @@ class GitVersion < ApplicationRecord
       self.git_repository ||= GitRepository.find_or_create_by(remote: @remote)
     else
       self.git_repository ||= (resource.local_git_repository || resource.create_local_git_repository)
-      self.ref ||= DEFAULT_LOCAL_REF
+      self.ref = DEFAULT_LOCAL_REF if self.ref.blank?
     end
     self.git_repository ||= @remote.present? ? GitRepository.find_or_create_by(remote: @remote) : resource.local_git_repository || resource.create_local_git_repository
     self.mutable = git_repository&.remote.blank? if self.mutable.nil?
@@ -154,7 +154,9 @@ class GitVersion < ApplicationRecord
 
     index = git_base.index
 
-    index.read_tree(git_base.head.target.tree) unless git_base.head_unborn?
+    is_initial = git_base.head_unborn?
+
+    index.read_tree(git_base.head.target.tree) unless is_initial
 
     yield index
 
@@ -164,9 +166,17 @@ class GitVersion < ApplicationRecord
     options[:committer] = git_author
     options[:message] ||= message
     options[:parents] =  git_base.empty? ? [] : [git_base.head.target].compact
-    options[:update_ref] = ref
+    options[:update_ref] = ref unless is_initial
 
     self.commit = Rugged::Commit.create(git_base.base, options)
+
+    if is_initial
+      r = ref.blank? ? DEFAULT_LOCAL_REF : ref
+      git_base.references.create(r, self.commit)
+      git_base.head = r if git_base.head.blank?
+    end
+
+    self.commit
   end
 
   # Check metadata, and parent resource for missing methods. Allows a Workflow::GitVersion to be used as a drop-in replacement for

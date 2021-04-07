@@ -2,11 +2,10 @@ module Seek
   module Git
     # A class to wrap ruby-git operations, in order to make testing easier.
     # Maybe we can remove this at some point if we figure out how to make git operations use VCR.
-    class Base
-      delegate :lookup, :write, :empty?, :head, :ref, :add_remote, :index, :remotes, :fetch, :head_unborn?, to: :@git_base
-
+    class Base < SimpleDelegator
       def initialize(path)
         @git_base = Rugged::Repository.new(path)
+        super(@git_base)
       end
 
       def base

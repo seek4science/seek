@@ -27,13 +27,14 @@ class GitVersionTest < ActiveSupport::TestCase
   end
 
   test 'add files' do
-    repo = Factory(:local_repository)
-    workflow = repo.resource
+    workflow = Factory(:workflow)
+    repo = Factory(:blank_repository, resource: workflow)
 
     v = workflow.git_versions.create!(mutable: true)
     assert_equal 'This Workflow', v.title
     assert v.mutable?
     assert v.commit.blank?
+    assert_empty v.blobs
 
     v.add_file('blah.txt', StringIO.new('blah'))
     v.add_file('hello/whatever.txt', StringIO.new('whatever'))
@@ -42,6 +43,7 @@ class GitVersionTest < ActiveSupport::TestCase
     assert v.file_exists?('hello/whatever.txt')
     assert_equal 'blah', v.file_contents('blah.txt')
     assert_equal 'whatever', v.file_contents('hello/whatever.txt')
+    assert_not_empty v.blobs
   end
 
   test 'cannot add file to immutable version' do
@@ -51,14 +53,15 @@ class GitVersionTest < ActiveSupport::TestCase
     v = workflow.git_versions.create!(mutable: false)
     assert_equal 'This Workflow', v.title
     refute v.mutable?
-    assert v.commit.blank?
+    commit = v.commit
+    blobs = v.blobs
 
     assert_raise(GitVersion::ImmutableVersionException) do
       v.add_file('blah.txt', StringIO.new('blah'))
     end
 
-    assert v.commit.blank?
-    assert_empty v.blobs
+    assert_equal commit, v.commit
+    assert_equal blobs, v.blobs
   end
 
   test 'automatically init local git repo' do

@@ -1,7 +1,13 @@
+Factory.define(:blank_repository, class: GitRepository) do |f|
+  f.after_create do |r|
+    FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'blank-repository', '_git', '.'), File.join(r.local_path, '.git'))
+  end
+end
+
 Factory.define(:local_repository, class: GitRepository) do |f|
   f.resource { Factory(:workflow) }
   f.after_create do |r|
-    FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'fixture-workflow', '_git', '.'), File.join(r.local_path, '.git'))
+    FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'local-fixture-workflow', '_git', '.'), File.join(r.local_path, '.git'))
   end
 end
 
