@@ -103,7 +103,7 @@ module ApiTestHelper
     end
 
     ['min','max'].each do |m|
-      puts m
+      puts m if debug
       if defined? @post_values
         to_post = load_template("post_#{m}_#{@clz}.json.erb", @post_values)
       else
