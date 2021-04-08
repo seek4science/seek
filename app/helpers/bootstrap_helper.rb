@@ -173,14 +173,14 @@ module BootstrapHelper
   def modal_body(options = {})
     opts = merge_options({ class: 'modal-body' }, options)
     content_tag(:div, opts) do
-      yield
+      yield if block_given?
     end
   end
 
   def modal_footer(options = {})
     opts = merge_options({ class: 'modal-footer' }, options)
     content_tag(:div, opts) do
-      yield
+      yield if block_given?
     end
   end
 

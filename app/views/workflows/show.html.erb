@@ -73,34 +73,7 @@
 
       <% if @display_workflow.is_git_versioned? %>
         <div role="tabpanel" class="tab-pane" id="files">
-          <%= modal(size: 'lg', id: 'git-preview-modal', class: 'git-browser-modal') do %>
-            <%= modal_header('Preview') %>
-
-            <%= modal_body do %>
-
-            <% end -%>
-          <% end %>
-
-          <strong>Total size: </strong> <%= number_to_human_size @display_workflow.total_size -%><br/>
-          <%= render partial: 'git/jstree', locals: { tree: @display_workflow.tree, opts: { id: 'workflow-jstree' } } %>
-
-          <script>
-              $j(document).ready(function () {
-                  $j("#workflow-jstree").on('dblclick','.jstree-anchor', function (e) {
-                      var jstree = $j.jstree.reference(this);
-                      var node = jstree.get_node(this);
-                      if (node.type === 'blob') {
-                          var path = '<%= workflow_git_blob_path(@workflow, path: '__replaceme__') %>'.replace('__replaceme__', node.id)
-                          $j.ajax(path, {
-                              success: function (html) {
-                                  $j('#git-preview-modal .modal-body').html(html);
-                                  $j('#git-preview-modal').modal('show');
-                              }
-                          });
-                      }
-                  });
-              })
-          </script>
+          <%= render partial: 'git/files', locals: { resource: @workflow, git_version: @display_workflow } %>
         </div>
       <% end %>
     </div>

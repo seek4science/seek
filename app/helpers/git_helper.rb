@@ -39,7 +39,7 @@ module GitHelper
                                                            'select-root' => select_root }))
   end
 
-  def git_breadcrumbs(resource, path = nil)
+  def git_breadcrumbs(resource, version, path = nil)
     segments = (path || '').split("/")
     trees = segments[0..-2]
 
@@ -49,12 +49,12 @@ module GitHelper
           c = content_tag(:li, 'Root', class: 'breadcrumb-item active')
         else
           c = content_tag(:li, class: 'breadcrumb-item') do
-            link_to('Root', polymorphic_path([resource, :git_tree]))
+            link_to('Root', polymorphic_path([resource, :git_tree], version: version))
           end
         end
         trees.each_with_index do |tree, i|
           c += content_tag(:li, class: 'breadcrumb-item') do
-            link_to(tree, polymorphic_path([resource, :git_tree], path: trees[0..i].join('/')))
+            link_to(tree, polymorphic_path([resource, :git_tree], path: trees[0..i].join('/'), version: version))
           end
         end
         if segments.last

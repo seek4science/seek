@@ -67,8 +67,9 @@ class GitWorkflowWizard
     @next_step = nil
     workflow = Workflow.new(git_version_attributes: { git_repository_id: git_repository_id, commit: git_commit, ref: ref })
     workflow_class = WorkflowClass.find_by_id(workflow_class_id)
-    if workflow.file_exists?('ro-crate-metadata.json') ||  workflow.file_exists?('ro-crate-metadata.jsonld')
-      workflow.in_temp_dir do |dir|
+    git_version = workflow.git_version
+    if git_version.file_exists?('ro-crate-metadata.json') ||  git_version.file_exists?('ro-crate-metadata.jsonld')
+      git_version.in_temp_dir do |dir|
         crate = ROCrate::WorkflowCrateReader.read(dir)
         self.main_workflow_path = crate.main_workflow&.id if crate.main_workflow&.id
         self.diagram_path = crate.main_workflow&.diagram&.id if crate.main_workflow&.diagram&.id
@@ -88,7 +89,7 @@ class GitWorkflowWizard
     annotations_attributes['1'] = { key: 'main_workflow', path: main_workflow_path } unless main_workflow_path.blank?
     annotations_attributes['2'] = { key: 'diagram', path: diagram_path } unless diagram_path.blank?
     annotations_attributes['3'] = { key: 'abstract_cwl', path: abstract_cwl_path } unless abstract_cwl_path.blank?
-    workflow.git_version.git_annotations_attributes = annotations_attributes
+    git_version.git_annotations_attributes = annotations_attributes
 
     extractor = workflow.extractor
     workflow.provide_metadata(extractor.metadata)

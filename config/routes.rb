@@ -118,12 +118,15 @@ SEEK::Application.routes.draw do
 
   concern :git do
     nested do
-      scope controller: :git, path: '/git', constraints: { path: /.+/ }, format: false, defaults: { format: :html }  do
+      scope controller: :git, path: '/git(/*version)', constraints: { path: /.+/ }, format: false, defaults: { format: :html }  do
         get 'tree(/*path)' => 'git#tree', as: :git_tree
         get 'blob/*path' => 'git#blob', as: :git_blob
         get 'raw/*path' => 'git#raw', as: :git_raw
         get 'download/*path' => 'git#download', as: :git_download
         get 'browse' => 'git#browse', as: :git_browse
+        post 'add' => 'git#add_file', as: :git_add_file
+        delete 'remove' => 'git#remove_file', as: :git_remove_file
+        patch 'move' => 'git#move_file', as: :git_move_file
       end
     end
   end

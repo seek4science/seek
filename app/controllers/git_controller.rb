@@ -1,8 +1,12 @@
 class GitController < ApplicationController
   before_action :fetch_parent
   before_action :authorize_parent
+  before_action :authorized_to_edit, only: [:add_file, :remove_file, :move_file]
+  before_action :fetch_git_version
   before_action :get_tree, only: [:tree]
-  before_action :get_blob, except: [:tree, :browse]
+  before_action :get_blob, only: [:blob, :download, :raw]
+
+  rescue_from GitVersion::ImmutableVersionException, with: :render_immutable_error
 
   def browse
     respond_to do |format|
@@ -40,13 +44,44 @@ class GitController < ApplicationController
     end
   end
 
+  def add_file
+    @git_version.add_file(file_params[:path], file_params[:data])
+    @git_version.save!
+
+    flash[:notice] = "Uploaded #{file_params[:path]}"
+    redirect_to @parent_resource, anchor: 'files'
+  end
+
+  def remove_file
+    @git_version.remove_file(file_params[:path])
+    @git_version.save!
+
+    flash[:notice] = "Removed #{file_params[:path]}"
+    redirect_to @parent_resource, anchor: 'files'
+  end
+
+  def move_file
+    @git_version.move_file(file_params[:path], file_params[:new_path])
+    @git_version.save!
+
+    flash[:notice] = "Moved #{file_params[:path]} to #{file_params[:new_path]}"
+    redirect_to @parent_resource, anchor: 'files'
+  end
+
   private
+
+  def render_immutable_error
+    flash[:error] = 'This version cannot be modified.'
+    respond_to do |format|
+      format.html { render status: :unprocessable_entity }
+    end
+  end
 
   def get_tree
     if path_param.blank? || path_param == '/'
-      @tree = @parent_resource.tree
+      @tree = @git_version.tree
     else
-      @tree = @parent_resource.object(path_param)
+      @tree = @git_version.object(path_param)
     end
 
     return if @tree&.is_a?(Rugged::Tree)
@@ -55,7 +90,7 @@ class GitController < ApplicationController
   end
 
   def get_blob
-    @blob = @parent_resource.object(path_param)
+    @blob = @git_version.object(path_param)
 
     return if @blob&.is_a?(Rugged::Blob)
 
@@ -76,6 +111,22 @@ class GitController < ApplicationController
       flash[:error] = "Not authorized."
       redirect_to :root
     end
+  end
+
+  def authorized_to_edit
+    unless @parent_resource.can_edit?
+      flash[:error] = "Not authorized."
+      redirect_to :root
+    end
+  end
+
+  def file_params
+    params.require(:file).permit(:path, :data, :new_path)
+  end
+
+  def fetch_git_version
+    @git_version = params[:version] ? @parent_resource.find_git_version(params[:version]) : @parent_resource.git_version
+    raise ActiveRecord::RecordNotFound unless @git_version
   end
 
   # # Rugged does not allow streaming blobs

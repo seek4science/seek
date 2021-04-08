@@ -1,0 +1,10 @@
+<%= form_tag(polymorphic_path([resource, :git_move_file], version: version), method: :patch) do %>
+  <%= hidden_field_tag('file[path]', path) %>
+  <div class="form-group">
+    <label class="required">Filename</label>
+    <%= text_field_tag 'file[new_path]', path, class: 'form-control' -%>
+    <p class="help-block">Use <code>/</code> to move the file into a directory.</p>
+  </div>
+
+  <%= submit_tag('Move/rename', class: 'btn btn-primary') %>
+<% end %>

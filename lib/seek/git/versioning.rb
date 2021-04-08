@@ -16,9 +16,6 @@ module Seek
           class_eval do
             has_many :git_versions, as: :resource, dependent: :destroy
             has_one :local_git_repository, as: :resource, class_name: 'GitRepository'
-            delegate :git_base, :file_exists?, :file_contents, :object, :ref, :commit, :tree, :trees, :blobs, :in_dir,
-                     :in_temp_dir, :git_annotations, :path_for_key, :find_git_annotation, :find_git_annotations,
-                     to: :git_version
 
             attr_accessor :git_version_attributes
 
