@@ -13,6 +13,7 @@ layout: page
 - [Editing your profile](editing-profile.html)
 - [Managing your account](managing-account.html)
      - [Managing your identities/alternative login methods](managing-identities.html)
+- [Browsing content](browsing.html)
 - [Requesting to join a Project](request-to-join-project.html)
 - [Adding assets (data, models, SOPs, publications) to SEEK](adding-assets.html)
 - [Creating new asset versions](uploading-new-versions.html)
