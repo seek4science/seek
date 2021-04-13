@@ -19,12 +19,6 @@ class Workflow < ApplicationRecord
   has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
 
   has_and_belongs_to_many :sops
-  #
-  # delegate :workflow_class_title, :extractor_class, :extractor, :default_diagram_format, :can_render_diagram,
-  #          :diagram_exists, :diagram, :is_git_ro_crate, :is_already_ro_crate, :is_basic_ro_crate,
-  #          :should_generate_crate, :populate_ro_crate, :ro_crate, :ro_crate_zip, :ro_crate_identifier,
-  #          :ro_crate_url, :internals, :internals, :inputs, :outputs, :steps, :main_workflow_path,
-  #          :diagram_path, :abstract_cwl_path, :cached_diagram_path, :ro_crate_path, to: :git_version
 
   git_versioning do
     include WorkflowExtraction

@@ -74,11 +74,7 @@ module WorkflowExtraction
   end
 
   def diagram_exists?(format = default_diagram_format)
-    if is_git_versioned?
-      file_exists?(cached_diagram_path(format))
-    else
-      File.exist?(cached_diagram_path(format))
-    end
+    File.exist?(cached_diagram_path(format))
   end
 
   def diagram(format = default_diagram_format)
@@ -98,13 +94,13 @@ module WorkflowExtraction
 
   def populate_ro_crate(crate)
     if is_git_versioned?
-      file = file_contents(main_workflow_path)
+      file = git_version.file_contents(main_workflow_path)
       crate.main_workflow = ROCrate::Workflow.new(crate, StringIO.new(file), main_workflow_path, content_size: file.length)
-      if diagram_path && file_exists?(diagram_path)
-        crate.main_workflow.diagram = ROCrate::WorkflowDiagram.new(crate, StringIO.new(file_contents(diagram_path)), diagram_path)
+      if diagram_path && git_version.file_exists?(diagram_path)
+        crate.main_workflow.diagram = ROCrate::WorkflowDiagram.new(crate, StringIO.new(git_version.file_contents(diagram_path)), diagram_path)
       end
-      if abstract_cwl_path && file_exists?(abstract_cwl_path)
-        crate.main_workflow.cwl_description = ROCrate::WorkflowDescription.new(crate, StringIO.new(file_contents(abstract_cwl_path)), abstract_cwl_path)
+      if abstract_cwl_path && git_version.file_exists?(abstract_cwl_path)
+        crate.main_workflow.cwl_description = ROCrate::WorkflowDescription.new(crate, StringIO.new(git_version.file_contents(abstract_cwl_path)), abstract_cwl_path)
       end
     else
       unless crate.main_workflow
@@ -145,7 +141,7 @@ module WorkflowExtraction
       if block_given?
         # TODO: Find a way to do this in populate_ro_crate (Without tmpdir disappearing when it comes to writing)
         if should_generate_crate? && is_git_versioned?
-          in_temp_dir do |tmpdir|
+          git_version.in_temp_dir do |tmpdir|
             crate.add_all(tmpdir, false, include_hidden: true)
             yield crate
           end
@@ -187,15 +183,15 @@ module WorkflowExtraction
   end
 
   def main_workflow_path
-    find_git_annotation('main_workflow')&.path
+    git_version.find_git_annotation('main_workflow')&.path
   end
 
   def diagram_path
-    find_git_annotation('diagram')&.path
+    git_version.find_git_annotation('diagram')&.path
   end
 
   def abstract_cwl_path
-    find_git_annotation('abstract_cwl')&.path
+    git_version.find_git_annotation('abstract_cwl')&.path
   end
 
   private
