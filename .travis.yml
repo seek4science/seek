@@ -13,8 +13,7 @@ addons:
       - python3-pip
       - python3-setuptools
 
-services:
-  - docker
+services:  
   - mysql
   - postgresql
   - xvfb
@@ -34,8 +33,6 @@ env:
 
 before_install:
   - pip3 install -r requirements.txt
-  # starts up a virtuoso docker repository and sets up the config to use it, for the rdf repository related integration tests
-  - sh -c "if [ '$SUITE' = 'rails test test/integration' ]; then sh -e script/virtuoso-docker-for-travis.sh; fi"
 
 before_script:
   - sh -c "if [ '$DB_TYPE' = 'pgsql' ]; then psql -c 'create database travis_ci_test; create database travis_ci_dev; create database travis_ci_prod;' -U postgres; fi"
