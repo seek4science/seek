@@ -68,7 +68,7 @@ class GitWorkflowWizard
     workflow = Workflow.new(git_version_attributes: { git_repository_id: git_repository_id, commit: git_commit, ref: ref })
     workflow_class = WorkflowClass.find_by_id(workflow_class_id)
     git_version = workflow.git_version
-    if git_version.file_exists?('ro-crate-metadata.json') ||  git_version.file_exists?('ro-crate-metadata.jsonld')
+    if git_version.ro_crate?
       git_version.in_temp_dir do |dir|
         crate = ROCrate::WorkflowCrateReader.read(dir)
         self.main_workflow_path = crate.main_workflow&.id if crate.main_workflow&.id

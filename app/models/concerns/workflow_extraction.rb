@@ -28,7 +28,7 @@ module WorkflowExtraction
   delegate :default_diagram_format, :can_render_diagram?, :has_tests?, to: :extractor
 
   def is_git_ro_crate?
-    is_git_versioned? && (git_version.file_exists?('ro-crate-metadata.json') || git_version.file_exists?('ro-crate-metadata.jsonld'))
+    is_git_versioned? && git_version.ro_crate?
   end
 
   def is_already_ro_crate?

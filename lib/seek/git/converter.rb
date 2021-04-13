@@ -36,14 +36,32 @@ module Seek
             args = [path_io_pairs]
             args << version.revision_comments if version.revision_comments.present?
             git_version.add_files(*args)
-            git_version.save
+            annotate_version(git_version)
+            git_version.save!
             git_version
-
-            # TODO: Add annotations?
           end
         end
 
         repo
+      end
+
+      private
+
+      def annotate_version(git_version)
+        if git_version.ro_crate? && asset.is_a?(Workflow)
+          git_version.in_temp_dir do |dir|
+            crate = ROCrate::WorkflowCrateReader.read(dir)
+            main_workflow_path = crate.main_workflow&.id
+            diagram_path = crate.main_workflow&.diagram&.id
+            abstract_cwl_path = crate.main_workflow&.cwl_description&.id
+
+            annotations_attributes = {}
+            annotations_attributes['1'] = { key: 'main_workflow', path: main_workflow_path } unless main_workflow_path.blank?
+            annotations_attributes['2'] = { key: 'diagram', path: diagram_path } unless diagram_path.blank?
+            annotations_attributes['3'] = { key: 'abstract_cwl', path: abstract_cwl_path } unless abstract_cwl_path.blank?
+            git_version.git_annotations_attributes = annotations_attributes
+          end
+        end
       end
     end
   end

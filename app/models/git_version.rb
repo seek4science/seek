@@ -137,6 +137,10 @@ class GitVersion < ApplicationRecord
         git_annotations.select { |a| a.key.to_s == key.to_s }
   end
 
+  def ro_crate?
+    file_exists?('ro-crate-metadata.json') || file_exists?('ro-crate-metadata.jsonld')
+  end
+
   private
 
   def set_version
