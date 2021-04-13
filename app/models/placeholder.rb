@@ -26,4 +26,7 @@ class Placeholder < ApplicationRecord
     User.logged_in_and_member?
   end
 
+  def is_discussable?
+    false
+  end
 end

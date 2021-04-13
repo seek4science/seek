@@ -266,7 +266,7 @@ SEEK::Application.routes.draw do
       post :batch_change_permssion_for_selected_items
       post :batch_sharing_permission_changed
     end
-    resources :projects, :programmes, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :nodes, :data_files, :presentations, :publications, :documents, :events, :samples, :specimens, :strains, :file_templates, :collections, only: [:index]
+    resources :projects, :programmes, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :nodes, :data_files, :presentations, :publications, :documents, :events, :samples, :specimens, :strains, :file_templates, :placeholders, :collections, only: [:index]
     resources :avatars do
       member do
         post :select
@@ -300,7 +300,7 @@ SEEK::Application.routes.draw do
       get :guided_join
     end
     resources :programmes, :people, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :nodes, :data_files, :presentations,
-              :publications, :events, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :file_templates, :collections, only: [:index]
+              :publications, :events, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :file_templates, :placeholders, :collections, only: [:index]
 
     resources :openbis_endpoints do
       collection do
@@ -418,7 +418,7 @@ SEEK::Application.routes.draw do
         post :register
       end
     end
-    resources :people, :programmes, :projects, :investigations, :samples, :studies, :models, :sops, :workflows, :nodes, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, only: [:index]
+    resources :people, :programmes, :projects, :investigations, :samples, :studies, :models, :sops, :workflows, :nodes, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, :placeholders, only: [:index]
   end
 
   # to be removed as STI does not work in too many places
