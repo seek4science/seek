@@ -15,7 +15,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'DataCatalog',
       'name' => 'Sysmo',
       'url' => 'http://fairyhub.org',
@@ -23,8 +23,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'keywords' => 'a, b, c, d',
       'provider' => {
         '@type' => 'Organization',
+        '@id' => 'http://fairyhub.org',
         'name' => 'SysMO-DB',
-        'url' => 'http://www.sysmo-db.org'
+        'url' => 'http://fairyhub.org'
       },
       'dateCreated' => @current_time.to_s
     }
@@ -42,9 +43,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     @person.avatar = Factory(:avatar)
     disable_authorization_checks { @person.save! }
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@id' => "http://localhost:3000/people/#{@person.id}",
       '@type' => 'Person',
+      'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Person::PERSON_PROFILE,
       'name' => @person.name,
       'givenName' => @person.first_name,
       'familyName' => @person.last_name,
@@ -77,14 +79,14 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     refute df.content_blob.show_as_external_link?
 
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}",
       'name' => df.title,
       'description' => df.description,
       'keywords' => 'keyword',
       'url' => "http://localhost:3000/data_files/#{df.id}",
-      'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
+      'creator' => [{ '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Blogs')}", 'name' => 'Blogs' }, { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Joe')}", 'name' => 'Joe' }],
       'producer' => [{
         '@type' => %w[Project Organization],
         '@id' => "http://localhost:3000/projects/#{@project.id}",
@@ -99,6 +101,12 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
           '@id' => "http://localhost:3000/events/#{df.events.first.id}",
           'name' => df.events.first.title }
       ],
+      "sdPublisher" => {
+        "@type"=>"Organization",
+        "@id"=>"http://localhost:3000",
+        "name"=>"SysMO-DB",
+        "url"=>"http://localhost:3000"
+      },
       'distribution' => {
         '@type' => 'DataDownload',
         'contentSize' => '8.62 KB',
@@ -126,13 +134,13 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     assert df.content_blob.show_as_external_link?
 
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}",
       'name' => df.title,
       'description' => df.description,
       'keywords' => 'keyword',
-      'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
+      'creator' => [{ '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Blogs')}", 'name' => 'Blogs' }, { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Joe')}", 'name' => 'Joe' }],
       'url' => 'http://www.abc.com',
       'producer' => [{
         '@type' => %w[Project Organization],
@@ -143,6 +151,12 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateModified' => @current_time.to_s,
       'encodingFormat' => 'text/html',
       'identifier' => 'https://doi.org/10.10.10.10/test.1',
+      "sdPublisher"=>{
+        "@type"=>"Organization",
+        "@id"=>"http://localhost:3000",
+        "name"=>"SysMO-DB",
+        "url"=>"http://localhost:3000"
+      },
       'subjectOf' => [
         { '@type' => 'Event',
           '@id' => "http://localhost:3000/events/#{df.events.first.id}",
@@ -158,7 +172,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     organism = Factory(:organism, bioportal_concept: Factory(:bioportal_concept))
 
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'Taxon',
       '@id' => "http://localhost:3000/organisms/#{organism.id}",
       'name' => 'An Organism',
@@ -177,7 +191,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     @project.description = 'a lovely project'
     disable_authorization_checks { @project.save! }
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => %w[Project Organization],
       '@id' => "http://localhost:3000/projects/#{@project.id}",
       'name' => @project.title,
@@ -202,7 +216,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     disable_authorization_checks { sample.save! }
 
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'Sample',
       '@id' => "http://localhost:3000/samples/#{sample.id}",
       'name' => 'Fred Bloggs',
@@ -223,8 +237,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
   test 'event' do
     event = Factory(:max_event, contributor: @person)
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@id' => "http://localhost:3000/events/#{event.id}",
+      'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Event::EVENT_PROFILE,
       '@type' => 'Event',
       'name' => 'A Maximal Event',
       'description' => 'All you ever wanted to know about headaches',
@@ -259,7 +274,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'DigitalDocument',
       '@id' => "http://localhost:3000/documents/#{document.id}",
       'name' => 'This Document',
@@ -270,7 +285,13 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'encodingFormat' => 'application/pdf',
       'producer' => [
         { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{document.projects.first.id}", 'name' => document.projects.first.title }
-      ]
+      ],
+      "sdPublisher"=>{
+        "@type"=>"Organization",
+        "@id"=>"http://localhost:3000",
+        "name"=>"SysMO-DB",
+        "url"=>"http://localhost:3000"
+      }
     }
 
     json = JSON.parse(document.to_schema_ld)
@@ -286,7 +307,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'PresentationDigitalDocument',
       '@id' => "http://localhost:3000/presentations/#{presentation.id}",
       'name' => 'This presentation',
@@ -297,14 +318,21 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'encodingFormat' => 'application/pdf',
       'producer' => [
         { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{presentation.projects.first.id}", 'name' => presentation.projects.first.title }
-      ]
+      ],
+      "sdPublisher"=>{
+        "@type"=>"Organization",
+        "@id"=>"http://localhost:3000",
+        "name"=>"SysMO-DB",
+        "url"=>"http://localhost:3000"
+      }
     }
 
     json = JSON.parse(presentation.to_schema_ld)
     assert_equal expected, json
   end
 
-  test 'workflow' do
+
+test 'workflow' do
     creator2 = Factory(:person)
     workflow = travel_to(@current_time) do
       workflow = Factory(:cwl_packed_workflow,
@@ -322,14 +350,15 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       workflow
     end
 
-    expected = { '@context' => 'http://schema.org',
-                 '@type' => 'ComputationalWorkflow',
+    expected = { '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+                 '@type' => ['File', 'SoftwareSourceCode', 'ComputationalWorkflow'],
                  '@id' => "http://localhost:3000/workflows/#{workflow.id}",
+                 'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::WORKFLOW_PROFILE,
                  'description' => 'This is a test workflow for bioschema generation',
                  'name' => 'This workflow',
                  'url' => "http://localhost:3000/workflows/#{workflow.id}",
                  'keywords' => 'wibble',
-                 'license' => 'https://opensource.org/licenses/APSL-2.0',
+                 'license' => Seek::License.find('APSL-2.0')&.url,
                  'creator' =>
                     [{ '@type' => 'Person',
                        '@id' => "http://localhost:3000/people/#{@person.id}",
@@ -338,8 +367,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                        '@id' => "http://localhost:3000/people/#{creator2.id}",
                        'name' => creator2.name },
                      { '@type' => 'Person',
+                       '@id' => "##{ROCrate::Entity.format_id('Fred Bloggs')}",
                        'name' => 'Fred Bloggs' },
                      { '@type' => 'Person',
+                       '@id' => "##{ROCrate::Entity.format_id('Steve Smith')}",
                        'name' => 'Steve Smith' }],
                  'producer' =>
                     [{ '@type' => %w[Project Organization],
@@ -348,44 +379,83 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                  'dateCreated' => @current_time.to_s,
                  'dateModified' => @current_time.to_s,
                  'encodingFormat' => 'application/x-yaml',
-                 'sdPublisher' =>
-                    [{ '@type' => 'Person',
-                       '@id' => "http://localhost:3000/people/#{@person.id}",
-                       'name' => @person.name }],
+                 'sdPublisher'=> {
+                   '@type'=>'Organization',
+                   '@id'=>'http://localhost:3000',
+                   'name'=>'SysMO-DB',
+                   'url'=>'http://localhost:3000'
+                 },
                  'version' => 1,
-                 'programmingLanguage' => 'Common Workflow Language',
+                 'programmingLanguage' => {
+                   '@id'=>'#cwl',
+                   '@type'=>'ComputerLanguage',
+                   'name'=>'Common Workflow Language',
+                   'alternateName'=>'CWL',
+                   'identifier'=> {
+                     '@id'=>'https://w3id.org/cwl/v1.0/'},
+                   'url'=>{'@id'=>'https://www.commonwl.org/'}},
                  'input' => [
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.cofsfile',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/input.cofsfile' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.dmax',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/input.dmax' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.dmin',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/input.dmin' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.max-steps',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/input.max-steps' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.mwmax-cof',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/input.mwmax-cof' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.mwmax-source',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/input.mwmax-source' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.rulesfile',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/input.rulesfile' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.sinkfile',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/input.sinkfile' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.sourcefile',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/input.sourcefile' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.std_mode',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/input.std_mode' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.stereo_mode',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/input.stereo_mode' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.topx',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/input.topx' }
                  ],
                  'output' => [
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-outputs-#main/solutionfile',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/solutionfile' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-outputs-#main/sourceinsinkfile',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/sourceinsinkfile' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-outputs-#main/stdout',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/stdout' }
                  ] }
 

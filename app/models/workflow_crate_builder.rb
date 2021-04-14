@@ -20,7 +20,7 @@ class WorkflowCrateBuilder
       crate.main_workflow = ROCrate::Workflow.new(crate, workflow[:data], get_unique_filename(crate, workflow))
       crate.main_workflow.programming_language = crate.add_contextual_entity(ROCrate::ContextualEntity.new(crate, nil, workflow_class&.ro_crate_metadata || Seek::WorkflowExtractors::Base::NULL_CLASS_METADATA))
       crate.main_workflow['url'] = workflow[:data_url] if workflow[:data_url].present?
-      if diagram[:data].present?
+      if diagram && diagram[:data].present?
         crate.main_workflow.diagram = ROCrate::WorkflowDiagram.new(crate, diagram[:data], get_unique_filename(crate, diagram))
         crate.main_workflow.diagram['url'] = diagram[:data_url] if diagram[:data_url].present?
       end
