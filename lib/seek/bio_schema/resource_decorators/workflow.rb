@@ -35,7 +35,7 @@ module Seek
         end
 
         def programming_language
-          resource.workflow_class&.extractor_class.ro_crate_metadata
+          resource.workflow_class&.ro_crate_metadata
         end
 
         def inputs
