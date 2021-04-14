@@ -1,16 +1,22 @@
 require 'rest-client'
 require 'redcarpet'
 require 'redcarpet/render_strip'
-require 'ro_crate_ruby'
+require 'ro_crate'
 
 module Seek
   module WorkflowExtractors
     class ROCrate < Base
       available_diagram_formats(png: 'image/png', svg: 'image/svg+xml', jpg: 'image/jpeg', default: :svg)
 
-      def initialize(io, inner_extractor_class: nil)
+      def initialize(io, main_workflow_class: nil)
         @io = io
-        @main_workflow_extractor_class = inner_extractor_class
+        @main_workflow_class = main_workflow_class
+      end
+
+      def has_tests?
+        open_crate do |crate|
+          crate.test_directory.present?
+        end
       end
 
       def can_render_diagram?
@@ -43,7 +49,7 @@ module Seek
               else
                 main_workflow_extractor(crate).metadata
               end
-          m[:workflow_class_id] ||= main_workflow_extractor(crate).class.workflow_class&.id
+          m[:workflow_class_id] ||= main_workflow_class(crate)&.id
 
           # Metadata from crate
           if crate['keywords'] && m[:tags].blank?
@@ -66,7 +72,7 @@ module Seek
             m[:other_creators] = a.join(', ')
           end
 
-          source_url = crate['url'] || crate.main_workflow['url']
+          source_url = crate['isBasedOn'] || crate['url'] || crate.main_workflow['url']
           if source_url
             handler = ContentBlob.remote_content_handler_for(source_url)
             if handler.respond_to?(:repository_url)
@@ -92,7 +98,7 @@ module Seek
         end
 
         v = Dir.mktmpdir('ro-crate') do |dir|
-          @opened_crate = ::ROCrate::WorkflowCrateReader.read_zip(@io.is_a?(ContentBlob) ? @io.path : @io, target_dir: dir)
+          @opened_crate = ::ROCrate::WorkflowCrateReader.read_zip(@io.is_a?(ContentBlob) ? @io.data_io_object : @io, target_dir: dir)
           yield @opened_crate
         end
 
@@ -112,39 +118,19 @@ module Seek
         end
       end
 
-      def self.determine_extractor_class(language)
-        matchable = ['identifier', 'name', 'alternateName', '@id', 'url']
-        @extractor_matcher ||= [Seek::WorkflowExtractors::CWL,
-                                Seek::WorkflowExtractors::Galaxy,
-                                Seek::WorkflowExtractors::Nextflow,
-                                Seek::WorkflowExtractors::Snakemake,
-                                Seek::WorkflowExtractors::KNIME].map do |extractor|
-          [extractor.ro_crate_metadata.slice(*matchable), extractor]
-        end
-
-        matchable.each do |key|
-          extractor = @extractor_matcher.detect do |hash, extractor|
-            !language[key].nil? && !hash[key].nil? && language[key] == hash[key]
-          end
-
-          return extractor[1] if extractor
-        end
-
-        nil
-      end
-
       private
 
-      def main_workflow_extractor_class(crate)
-        return @main_workflow_extractor_class if @main_workflow_extractor_class
+      def main_workflow_class(crate)
+        return @main_workflow_class if @main_workflow_class
 
-        self.class.determine_extractor_class(crate&.main_workflow&.programming_language) || Seek::WorkflowExtractors::Base
+        WorkflowClass.match_from_metadata(crate&.main_workflow&.programming_language&.properties || {})
       end
 
       def main_workflow_extractor(crate)
-        return @main_workflow_extractor if @main_workflow_extractor
+        workflow_class = main_workflow_class(crate)
+        extractor_class = workflow_class&.extractor_class || Seek::WorkflowExtractors::Base
 
-        main_workflow_extractor_class(crate).new(crate&.main_workflow&.source)
+        extractor_class.new(crate&.main_workflow&.source)
       end
 
       def abstract_cwl_extractor(crate)

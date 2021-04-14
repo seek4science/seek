@@ -1,4 +1,4 @@
-require 'ro_crate_ruby'
+require 'ro_crate'
 
 module ROCrate
   class WorkflowCrate < ::ROCrate::Crate
@@ -36,8 +36,16 @@ module ROCrate
       main_workflow.cwl_description = entity
     end
 
+    def test_directory
+      dereference('test/')
+    end
+
     def readme
       dereference('README.md')
+    end
+
+    def find_entry(path)
+      entries[path]
     end
   end
 end

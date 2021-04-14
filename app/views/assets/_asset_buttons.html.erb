@@ -34,6 +34,9 @@
     <% if asset.is_a?(Workflow) %>
       <% if asset.content_blob.file_exists? %>
         <%= button_link_to('Download RO Crate', 'ro_crate_file', ro_crate_workflow_path(asset, version: version, code: params[:code])) %>
+        <% if asset.can_run? %>
+          <%= button_link_to("Run on #{Seek::Config.galaxy_instance_name || 'Galaxy'}", 'run_galaxy', run_workflow_url(display_asset)) %>
+        <% end %>
       <% else %>
         <%= button_link_to('Download RO Crate', 'ro_crate_file', nil,
                            disabled_reason: 'This workflow is still being processed, check back later.') %>

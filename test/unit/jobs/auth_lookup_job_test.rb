@@ -79,6 +79,39 @@ class AuthLookupJobTest < ActiveSupport::TestCase
     end
   end
 
+  test 'spawns a new user auth job for each type' do
+    expected = Seek::Util.authorized_types.count
+    person = Factory(:person)
+    AuthLookupUpdateQueue.delete_all
+    AuthLookupUpdateQueue.enqueue(person)
+
+    assert_enqueued_jobs(expected, only: UserAuthLookupUpdateJob, queue: 'authlookup') do
+      AuthLookupUpdateJob.new.perform
+    end
+  end
+
+  test 'user auth lookup job perform' do
+    with_config_value :auth_lookup_enabled, true do
+      user = Factory :user
+      sop = Factory :sop, contributor: user.person, policy: Factory(:editing_public_policy)
+      Sop.clear_lookup_table
+
+      assert_nil sop.lookup_for('view', user.id)
+      assert_nil  sop.lookup_for('download', user.id)
+      assert_nil  sop.lookup_for('edit', user.id)
+      assert_nil  sop.lookup_for('manage', user.id)
+      assert_nil  sop.lookup_for('delete', user.id)
+
+      UserAuthLookupUpdateJob.new.perform(user, 'Sop')
+
+      assert sop.lookup_for('view', user.id)
+      assert  sop.lookup_for('download', user.id)
+      assert  sop.lookup_for('edit', user.id)
+      assert  sop.lookup_for('manage', user.id)
+      assert  sop.lookup_for('delete', user.id)
+    end
+  end
+
   test 'exception handling' do
     Sop.delete_all
     user = Factory :user
@@ -91,14 +124,16 @@ class AuthLookupJobTest < ActiveSupport::TestCase
     with_config_value(:exception_notification_enabled, true) do
       assert_difference('AuthLookupUpdateQueue.count', -1) do
         job = AuthLookupUpdateJob.new
-        begin
-          # Stub because exception forwarding doesn't work in tests
-          Seek::Errors::ExceptionForwarder.stub(:send_notification, -> (exception, opts = {}, *_) { raise "Exception was: #{exception.inspect}, item id: #{opts[:data][:item].id}" }) do
-            job.stub(:perform_job, -> (*_) { raise 'job error!' }) do # Stub to throw an error
-              job.perform
-            end
+
+        # Stub because exception forwarding doesn't work in tests
+        Seek::Errors::ExceptionForwarder.stub(:send_notification, lambda { |exception, opts = {}, *_|
+                                                                    raise "Exception was: #{exception.inspect}, item id: #{opts[:data][:item].id}"
+                                                                  }) do
+          job.stub(:perform_job, ->(*_) { raise 'job error!' }) do # Stub to throw an error
+            job.perform
           end
         end
+
       rescue RuntimeError => e
         assert_equal "#<RuntimeError: Exception was: #<RuntimeError: job error!>, item id: #{sop.id}>", e.inspect
       end

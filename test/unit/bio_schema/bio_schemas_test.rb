@@ -122,6 +122,14 @@ class BioSchemaTest < ActiveSupport::TestCase
     end
   end
 
+  test 'collection json_ld' do
+    p = Factory(:max_collection)
+    json = Seek::BioSchema::Serializer.new(p).json_ld
+    json = JSON.parse(json)
+    assert_equal "http://localhost:3000/collections/#{p.id}", json['@id']
+    assert json['hasPart']
+  end
+
   private
 
   # an instance of a model that doesn't support bio_schema / schema

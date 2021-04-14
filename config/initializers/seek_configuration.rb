@@ -147,6 +147,7 @@ def load_seek_config_defaults!
   Seek::Config.default :site_base_host,"http://localhost:3000"
   Seek::Config.default :open_id_authentication_store,:memory
   Seek::Config.default :session_store_timeout, 1.hour
+  Seek::Config.default :cv_dropdown_limit, 100
 
   #MERGENOTE - why are these here? they should be in the database under the Scale model. Maybe an old relic
   Seek::Config.default :scales,["organism","liver","liverLobule","intercellular","cell"]
@@ -231,6 +232,8 @@ def load_seek_config_defaults!
   Seek::Config.default :results_per_page_default_condensed, 14
   Seek::Config.default :results_per_page, {}
   Seek::Config.default :sorting, {}
+
+  Seek::Config.default :life_monitor_enabled, false
 
   load_seek_testing_defaults! if Rails.env.test?
 end

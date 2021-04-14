@@ -38,7 +38,7 @@ jobs:
           - rails test test/functional
           - rails test test/integration
           - rspec spec
-          - rake teaspoon
+          # - rake teaspoon
           - rake assets:precompile
           - rake db:setup
           - rake db:migrate

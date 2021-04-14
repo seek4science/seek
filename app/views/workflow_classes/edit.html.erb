@@ -1,0 +1,12 @@
+<h1>Editing:  <%= @workflow_class.title %></h1>
+
+<%= form_for(@workflow_class) do |f| %>
+  <%= f.error_messages %>
+
+  <%= render partial: 'workflow_classes/workflow_class_fields', locals: { f: f } %>
+
+  <div>
+    <%= submit_tag "Update", data: { disable_with: 'Updating...' }, class: 'btn btn-primary' %>
+    or <%= cancel_button workflow_classes_path -%>
+  </div>
+<% end -%>

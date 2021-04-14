@@ -13,9 +13,12 @@ namespace :seek do
     delete_redundant_jobs
     set_version_visibility
     remove_old_project_join_logs
+    db:seed:workflow_classes
     fix_negative_programme_role_mask
     db:seed:sample_attribute_types
     delete_users_with_invalid_person
+    delete_specimen_activity_logs
+    update_session_store
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -54,7 +57,7 @@ namespace :seek do
 
   task(update_samples_json: :environment) do
     puts '... converting stored sample JSON ...'
-    SampleType.all.each do |sample_type|
+    SampleType.find_each do |sample_type|
 
       # gather the attributes that need updating
       attributes_for_update = sample_type.sample_attributes.select do |attr|
@@ -85,7 +88,7 @@ namespace :seek do
   task(migrate_old_jobs: :environment) do
     puts "Migrating RdfGenerationJobs..."
     count = RdfGenerationQueue.count
-    Delayed::Job.where(failed_at: nil).where('handler LIKE ?', '%RdfGenerationJob%').find_each do |job|
+    Delayed::Job.where(failed_at: nil).where('handler LIKE ?', '%RdfGenerationJob%').where('handler LIKE ?','%item_type_name%').find_each do |job|
       data = YAML.load(job.handler.sub("--- !ruby/object:RdfGenerationJob\n",''))
       item = nil
       begin
@@ -160,7 +163,7 @@ namespace :seek do
   end
 
   task(fix_negative_programme_role_mask: :environment) do
-    problems = Person.all.select{|person| person.roles_mask < 0}
+    problems = Person.where('roles_mask < 0')
     problems.each do |person|
       mask = person.roles_mask
       while mask < 0
@@ -177,6 +180,19 @@ namespace :seek do
       puts "... Removing #{found.count} users with a no longer existing person"
       found.each(&:destroy)
     end
+  end
+
+  task(delete_specimen_activity_logs: :environment) do
+    logs = ActivityLog.where(activity_loggable_type: 'Specimen')
+    if logs.any?
+      puts "... removing #{logs.count} redundant Specimen related #{'log'.pluralize(logs.count)}"
+      logs.delete_all
+    end
+  end
+
+  task(update_session_store: :environment) do
+    puts '... Updating session store'
+    Rake::Task['db:sessions:upgrade'].invoke
   end
   
 end

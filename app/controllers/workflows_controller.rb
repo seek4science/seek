@@ -15,8 +15,9 @@ class WorkflowsController < ApplicationController
   include Seek::Doi::Minting
 
   include Seek::IsaGraphExtensions
+  include RoCrateHandling
 
-  api_actions :index, :show, :create, :update, :destroy
+  api_actions :index, :show, :create, :update, :destroy, :ro_crate
 
   rescue_from WorkflowDiagram::UnsupportedFormat do
     head :not_acceptable
@@ -92,7 +93,7 @@ class WorkflowsController < ApplicationController
     # This Workflow instance is just to make `handle_upload_data` work. It is not persisted beyond this action.
     @workflow = Workflow.new(workflow_class_id: params[:workflow_class_id])
     @crate_builder = WorkflowCrateBuilder.new(ro_crate_params)
-    @crate_builder.workflow_extractor_class = @workflow&.extractor_class
+    @crate_builder.workflow_class = @workflow.workflow_class
     blob_params = @crate_builder.build
     content_blob = @workflow.build_content_blob(blob_params)
 
@@ -194,6 +195,7 @@ class WorkflowsController < ApplicationController
 
   def create_version_metadata
     @workflow = Workflow.find(params[:id])
+    @workflow.assign_attributes(workflow_params)
     update_sharing_policies(@workflow)
     filter_associated_projects(@workflow)
 
@@ -254,16 +256,8 @@ class WorkflowsController < ApplicationController
   end
 
   def ro_crate
-    path = @display_workflow.ro_crate_zip
-    response.headers['Content-Length'] = File.size(path).to_s
-    respond_to do |format|
-      format.html do
-        send_file(path,
-                  filename: "workflow-#{@workflow.id}-#{@display_workflow.version}.crate.zip",
-                  type: 'application/zip',
-                  disposition: 'inline')
-      end
-    end
+    send_ro_crate(@display_workflow.ro_crate_zip,
+                  "workflow-#{@workflow.id}-#{@display_workflow.version}.crate.zip")
   end
 
   private

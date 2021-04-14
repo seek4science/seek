@@ -1,6 +1,10 @@
 require 'test_helper'
 
 class NextflowExtractionTest < ActiveSupport::TestCase
+  setup do
+    @nextflow = WorkflowClass.find_by_key('nextflow') || Factory(:nextflow_workflow_class)
+  end
+
   test 'extracts metadata from nextflow config file' do
     wf = open_fixture_file('workflows/ampliseq-nextflow.config')
     extractor = Seek::WorkflowExtractors::Nextflow.new(wf)

@@ -1,4 +1,4 @@
-require 'ro_crate_ruby'
+require 'ro_crate'
 
 module WorkflowExtraction
   PREVIEW_TEMPLATE = File.read(File.join(Rails.root, 'script', 'preview.html.erb'))
@@ -15,7 +15,7 @@ module WorkflowExtraction
 
   def extractor
     if is_already_ro_crate?
-      Seek::WorkflowExtractors::ROCrate.new(content_blob, inner_extractor_class: workflow_class ? extractor_class : nil)
+      Seek::WorkflowExtractors::ROCrate.new(content_blob, main_workflow_class: workflow_class)
     else
       extractor_class.new(content_blob)
     end
@@ -27,8 +27,16 @@ module WorkflowExtraction
     end
   end
 
+  def has_tests?
+    extractor.has_tests?
+  end
+
   def can_render_diagram?
     extractor.can_render_diagram?
+  end
+
+  def can_run?
+    can_download?(nil) && workflow_class_title == 'Galaxy' && Seek::Config.galaxy_instance_trs_import_url.present?
   end
 
   def diagram_exists?(format = default_diagram_format)
