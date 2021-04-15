@@ -6,6 +6,8 @@ class GitController < ApplicationController
   before_action :get_tree, only: [:tree]
   before_action :get_blob, only: [:blob, :download, :raw]
 
+  user_content_actions :raw
+
   rescue_from GitVersion::ImmutableVersionException, with: :render_immutable_error
 
   def browse

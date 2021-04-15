@@ -17,6 +17,7 @@ class WorkflowsController < ApplicationController
   include RoCrateHandling
 
   api_actions :index, :show, :create, :update, :destroy, :ro_crate
+  user_content_actions :diagram
 
   rescue_from WorkflowDiagram::UnsupportedFormat do
     head :not_acceptable
@@ -206,7 +207,6 @@ class WorkflowsController < ApplicationController
   def diagram
     diagram_format = params.key?(:diagram_format) ? params[:diagram_format] : @display_workflow.default_diagram_format
     @diagram = @display_workflow.diagram(diagram_format)
-    response.set_header('Content-Security-Policy', "default-src 'self'")
     if @diagram
       send_file(@diagram.path,
                 filename: @diagram.filename,
