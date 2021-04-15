@@ -49,7 +49,7 @@ class GitController < ApplicationController
     @git_version.save!
 
     flash[:notice] = "Uploaded #{file_params[:path]}"
-    redirect_to @parent_resource, anchor: 'files'
+    redirect_to polymorphic_path(@parent_resource, anchor: 'files')
   end
 
   def remove_file
@@ -57,7 +57,7 @@ class GitController < ApplicationController
     @git_version.save!
 
     flash[:notice] = "Removed #{file_params[:path]}"
-    redirect_to @parent_resource, anchor: 'files'
+    redirect_to polymorphic_path(@parent_resource, anchor: 'files')
   end
 
   def move_file
@@ -65,7 +65,7 @@ class GitController < ApplicationController
     @git_version.save!
 
     flash[:notice] = "Moved #{file_params[:path]} to #{file_params[:new_path]}"
-    redirect_to @parent_resource, anchor: 'files'
+    redirect_to polymorphic_path(@parent_resource, anchor: 'files')
   end
 
   private
