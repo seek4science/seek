@@ -1,8 +1,11 @@
 var upload_url_field;
+var keep_title_field;
 var examine_url_href;
 
 function setup_url_field(examine_url_path,examine_button_id) {
     upload_url_field = $j('#data_url_field');
+    keep_title_field = $j('#keep_title_field');
+
     examine_url_href = examine_url_path;
     $j('#'+examine_button_id).on('click', function(event){
         submit_url_for_examination();
@@ -21,7 +24,9 @@ function submit_url_for_examination() {
     disallow_copy_option();
     $j('#test_url_result')[0].innerHTML="<p class='large_spinner'/>";
     var data_url = upload_url_field.val();
-    $j.post(examine_url_href, { data_url: data_url }, function(data){} );
+    var keep_title = keep_title_field.val();
+
+    $j.post(examine_url_href, { data_url: data_url , keep_title: keep_title}, function(data){} );
 }
 
 function allow_copy_option() {

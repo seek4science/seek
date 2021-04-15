@@ -423,4 +423,15 @@ class AdminControllerTest < ActionController::TestCase
       end
     end
   end
+
+  test 'publication fulltext enabled' do
+    with_config_value(:allow_publications_fulltext, false) do
+      post :update_features_enabled, params: { allow_publications_fulltext: '1' }
+      assert Seek::Config.allow_publications_fulltext
+    end
+    with_config_value(:allow_publications_fulltext, true) do
+      post :update_features_enabled, params: { allow_publications_fulltext: '0' }
+      refute Seek::Config.allow_publications_fulltext
+    end
+  end
 end

@@ -52,7 +52,7 @@ class PublicationSerializer < PCSSerializer
       md5sum: cb.md5sum,
       sha1sum: cb.sha1sum,
       content_type: cb.content_type,
-      link: "#{base_url}#{path}/download",
+      link: "#{base_url}#{path}",
       size: cb.file_size
     }
   end

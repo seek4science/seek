@@ -20,7 +20,7 @@ end
     <p>
       You can register a <%= asset_name -%> by either directly uploading a file,
        or registering a URL to either another page or remote file. Please test the URL before submitting.
-      <% if (controller_name.eql? "publications")%>
+      <% if (resource.is_a?(Publication))%>
         <br>Please upload a PDF of your publication only if allowed by the publisher.
       <% end -%>
     </p>
@@ -50,7 +50,7 @@ end
 
     <div role="tabpanel" class="tab-pane <%= 'active'.html_safe unless url_from_params -%>" id="local-file">
       <div class="form-group">
-        <% if (controller_name.eql? "publications")%>
+        <% if (resource.is_a?(Publication))%>
           <label class="">File to upload</label>
         <% else -%>
           <label class="required">File to upload</label>
@@ -72,11 +72,15 @@ end
             <% else %>
                 <div class="input-group">
                   <%= text_field_tag 'content_blobs[][data_url]', url_from_params, id: 'data_url_field', class: 'form-control' -%>
+                  <% if (resource.is_a?(Publication)) %>
+                    <%= hidden_field_tag 'content_blobs[][keep_title]', true, id: 'keep_title_field'  %>
+                  <% end -%>
                   <span class="input-group-btn">
                     <%= button_link_to 'Test', 'test', '#', id: 'examine_url' %>
                   </span>
                 </div>
             <% end %>
+
           </div>
         </div>
       </div>

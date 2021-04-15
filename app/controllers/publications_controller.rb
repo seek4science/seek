@@ -356,7 +356,8 @@ class PublicationsController < ApplicationController
 
   def publication_params
     params.require(:publication).permit(:publication_type_id, :pubmed_id, :doi, :parent_name, :abstract, :title, :journal, :citation,:url,:editor,
-                                        :published_date, :bibtex_file, :registered_mode, :publisher, :booktitle, { project_ids: [] }, { event_ids: [] }, { model_ids: [] },
+                                        :published_date, :bibtex_file, :registered_mode, :publisher, :booktitle, :keep_title,
+                                        { project_ids: [] }, { event_ids: [] }, { model_ids: [] },
                                         { investigation_ids: [] }, { study_ids: [] }, { assay_ids: [] }, { presentation_ids: [] },
                                         { data_file_ids: [] }, { scales: [] },
                                         { publication_authors_attributes: [:person_id, :id, :first_name, :last_name ] }).tap do |pub_params|
@@ -412,9 +413,6 @@ class PublicationsController < ApplicationController
   # create a publication from a form that contains all the data
   def create_publication
 
-    upload_blob
-    update_sharing_policies @publication
-
     @publication.registered_mode = @publication.registered_mode || 3
     assay_ids = params[:assay_ids] || []
     # create publication authors
@@ -430,6 +428,10 @@ class PublicationsController < ApplicationController
     end
 
     if @publication.save
+
+      upload_blob
+      update_sharing_policies @publication
+
       create_or_update_associations assay_ids, 'Assay', 'edit'
       if !@publication.parent_name.blank?
         render partial: 'assets/back_to_fancy_parent', locals: { child: @publication, parent_name: @publication.parent_name }

@@ -3,7 +3,7 @@ module Seek
     module ExamineUrl
       include Seek::UploadHandling::ContentInspection
 
-      def handle_good_http_response(url, info)
+      def handle_good_http_response(url, info, keeptitle = false)
         @content_type = info[:content_type]
         @size = info[:file_size]
         if content_is_webpage?(@content_type)
@@ -11,7 +11,9 @@ module Seek
           if is_myexperiment_url? url
           else
             page = summarize_webpage(url)
-            @title = page.title&.strip
+            unless keeptitle
+              @title = page.title&.strip
+            end
             @description = page.description&.strip
             @image = page.images.best
           end

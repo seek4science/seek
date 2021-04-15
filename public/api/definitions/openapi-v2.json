@@ -8165,6 +8165,9 @@
                                 "authors": {
                                     "$ref": "#/definitions/nullableNonEmptyStringList"
                                 },
+                                "content_blobs": {
+                                    "$ref": "#/definitions/contentBlobsList"
+                                },
                                 "policy": {
                                     "$ref": "#/definitions/policy"
                                 }

@@ -71,6 +71,8 @@ class ContentBlobsController < ApplicationController
   def examine_url
     # check content type and size
     url = params[:data_url]
+    keep_title = !params['keep_title'].nil?
+
     begin
       uri = URI(url)
       case scheme = uri.scheme
@@ -82,7 +84,7 @@ class ContentBlobsController < ApplicationController
         handler = Seek::DownloadHandling::HTTPHandler.new(url)
         info = handler.info
         if info[:code] == 200
-          handle_good_http_response(url, info)
+          handle_good_http_response(url, info, keep_title)
         else
           handle_bad_http_response(info[:code])
         end
@@ -129,6 +131,7 @@ class ContentBlobsController < ApplicationController
   end
 
   def destroy
+    warn("Trying to destroy")
     respond_to do |format|
       @content_blob = ContentBlob.find(params[:id])
       @asset = @content_blob.asset
