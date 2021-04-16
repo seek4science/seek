@@ -5,6 +5,7 @@ class ProjectsController < ApplicationController
   include CommonSweepers
   include Seek::DestroyHandling
   include ApiHelper
+  include Seek::BPMNGenerator
 
   before_action :login_required, only: [:guided_join, :guided_create, :request_join, :request_create,
                                         :administer_join_request, :respond_join_request,
@@ -395,6 +396,14 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def bpmn
+    @project = Project.find(params[:id]) if params[:id]
+    puts @project.id
+    generated = build(@project)
+    puts generated.to_xml.to_s
+    send_data generated.to_xml.to_s
+  end
+  
   # returns a list of institutions for a project in JSON format
   def request_institutions
     # listing institutions for a project is public data, but still

@@ -108,6 +108,7 @@ class AdminController < ApplicationController
     Seek::Config.samples_enabled = string_to_boolean params[:samples_enabled]
     Seek::Config.workflows_enabled = string_to_boolean params[:workflows_enabled]
 
+    Seek::Config.bpmn_enabled = string_to_boolean params[:bpmn_enabled]
     Seek::Config.exception_notification_recipients = params[:exception_notification_recipients]
     Seek::Config.exception_notification_enabled = string_to_boolean params[:exception_notification_enabled]
 
