@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://test.datacite.org/mds/doi/non-existing
+    uri: https://mds.test.datacite.org/doi/non-existing
     body:
       encoding: US-ASCII
       string: ''

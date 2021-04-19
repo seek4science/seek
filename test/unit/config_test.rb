@@ -364,7 +364,7 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'datacite_url' do
-    assert_equal 'https://test.datacite.org/mds/', Seek::Config.datacite_url
+    assert_equal 'https://mds.test.datacite.org/', Seek::Config.datacite_url
   end
 
   test 'datacite_username' do
