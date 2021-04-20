@@ -10,9 +10,9 @@ module Seek
     def find_display_asset(asset = eval("@#{controller_name.singularize}"))
       requested_version = params[:version] || asset.latest_version.version
       found_version = asset.find_version(requested_version)
-      if !found_version || anonymous_request_for_previous_version?(asset, requested_version)
+      if !found_version || (anonymous_request_for_previous_version?(asset, requested_version) && found_version.doi.blank?)         
         error('This version is not available', 'invalid route')
-        return false
+        return false        
       else
         eval "@display_#{asset.class.name.underscore} = asset.find_version(found_version)"
       end
