@@ -162,7 +162,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test 'after DOI is minted, the -Upload new version- button is disabled' do
+  test 'after DOI is minted, the -Upload new version- button is not disabled' do
     DOIABLE_ASSETS.each do |type|
       asset = Factory(type.to_sym, policy: Factory(:public_policy))
       latest_version = asset.latest_version
@@ -172,24 +172,10 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
       get "/#{type.pluralize}/#{asset.id}"
 
-      assert_select "a[class='disabled']", text: /Upload new version/
+      assert_select "a", text: /Upload new version/
+      assert_select "a[class='disabled']", text: /Upload new version/, count:0
     end
-  end
-
-  test 'can not upload new version after DOI is minted' do
-    DOIABLE_ASSETS.each do |type|
-      asset = Factory(type.to_sym, policy: Factory(:public_policy))
-      latest_version = asset.latest_version
-      latest_version.doi = '10.5072/my_test'
-      assert latest_version.save
-      assert latest_version.has_doi?
-
-      post "/#{type.pluralize}/#{asset.id}/new_version", params: { data_file: {}, content_blobs: [{ data: {} }], revision_comments: 'This is a new revision' }
-
-      assert_redirected_to :root
-      assert_not_nil flash[:error]
-    end
-  end
+  end  
 
   test 'after DOI is minted, the -Delete- button is disabled' do
     DOIABLE_ASSETS.each do |type|
