@@ -101,8 +101,7 @@ module Seek
         versioned? &&
           is_downloadable? &&
           !(respond_to?(:extracted_samples) && extracted_samples.any?) &&
-          !(respond_to?(:openbis?) && openbis?) &&
-          !(supports_doi? && has_doi?)
+          !(respond_to?(:openbis?) && openbis?)
       end
     end
   end
