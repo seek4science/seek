@@ -406,7 +406,9 @@ GEM
     mime-types (3.2.2)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2018.0812)
-    mimemagic (0.3.2)
+    mimemagic (0.3.10)
+      nokogiri (~> 1)
+      rake
     mini_mime (1.0.2)
     mini_portile2 (2.4.0)
     minitest (5.10.3)
@@ -904,7 +906,7 @@ DEPENDENCIES
   magic_lamp
   mechanize
   metainspector
-  mimemagic (= 0.3.2)
+  mimemagic (~> 0.3.7)
   minitest (= 5.10.3)
   minitest-reporters
   my_responds_to_parent!
