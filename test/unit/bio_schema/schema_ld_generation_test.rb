@@ -114,7 +114,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'dataset without content blob' do
     df = travel_to(@current_time) do
-      df = Factory(:max_datafile, contributor: @person, projects: [@project], policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
+      df = Factory(:max_data_file, contributor: @person, projects: [@project], policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
       df.add_annotations('keyword', 'tag', User.first)
       df.content_blob=nil
       disable_authorization_checks { 
@@ -135,8 +135,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'description' => df.description,
       'keywords' => 'keyword',
       'url' => "http://localhost:3000/data_files/#{df.id}",
-      'provider' => [{
-        '@type' => ['Project','Organization'],
+      'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
+      'producer' => [{
+        '@type' => %w[Project Organization],
         '@id' => "http://localhost:3000/projects/#{@project.id}",
         'name' => @project.title
       }],

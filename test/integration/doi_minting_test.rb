@@ -172,8 +172,8 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
       get "/#{type.pluralize}/#{asset.id}"
 
-      assert_select "a", text: /Upload new version/
-      assert_select "a[class='disabled']", text: /Upload new version/, count:0
+      assert_select "a", text: /Register new version/
+      assert_select "a[class='disabled']", text: /Register new version/, count:0
     end
   end  
 
