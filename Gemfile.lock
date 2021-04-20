@@ -375,7 +375,7 @@ GEM
     method_source (1.0.0)
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2018.0812)
+    mime-types-data (3.2021.0225)
     mimemagic (0.3.10)
       nokogiri (~> 1)
       rake
@@ -402,7 +402,7 @@ GEM
     net-ldap (0.16.0)
     netrc (0.11.0)
     nio4r (2.5.5)
-    nokogiri (1.11.2)
+    nokogiri (1.11.3)
       mini_portile2 (~> 2.5.0)
       racc (~> 1.4)
     nokogumbo (1.5.0)
