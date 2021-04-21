@@ -40,7 +40,9 @@
         "id": 55,
         "url": "http://www.slack.com/",
         "label": "Slack"
-      }]
+      }],
+	"data_type":"http://edamontology.org/data_3842",
+	"format_type":"http://edamontology.org/format_3970"
     },
     "relationships": {
       "creators": {

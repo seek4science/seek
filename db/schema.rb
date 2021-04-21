@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_22_212940) do
+ActiveRecord::Schema.define(version: 2021_04_19_213915) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -1293,6 +1293,7 @@ ActiveRecord::Schema.define(version: 2021_03_22_212940) do
     t.bigint "project_id"
     t.string "data_type", default: "http://edamontology.org/data_0006", null: false
     t.string "format_type", default: "http://edamontology.org/format_1915", null: false
+    t.integer "data_file_id"
     t.index ["contributor_id"], name: "index_ps_on_c"
     t.index ["file_template_id"], name: "index_placeholders_on_file_template_id"
     t.index ["policy_id"], name: "index_placeholders_on_policy_id"
@@ -1658,7 +1659,7 @@ ActiveRecord::Schema.define(version: 2021_03_22_212940) do
   end
 
   create_table "sample_controlled_vocab_terms", id: :integer,  force: :cascade do |t|
-    t.string "label"
+    t.text "label"
     t.integer "sample_controlled_vocab_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

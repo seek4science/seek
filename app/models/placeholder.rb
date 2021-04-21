@@ -8,6 +8,7 @@ class Placeholder < ApplicationRecord
 
   belongs_to :project
   belongs_to :file_template
+  belongs_to :data_file
   
   # Returns the columns to be shown on the table view for the resource
   def columns_default

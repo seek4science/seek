@@ -8,13 +8,12 @@ class PlaceholderSerializer < PCSSerializer
   has_many :people
   has_many :projects
   has_many :assays
-#  has_one :data_file
   has_one :file_template
 
   attribute :data_type
   attribute :format_type
 
-`  def self_link
+  def self_link
     polymorphic_path(object)
   end
 

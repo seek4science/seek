@@ -18,14 +18,14 @@ module BPMNGenerator
                                       'targetNamespace' => '') do
         process = @xml.process do
           linkStart = xml.startEvent
-          linkStart['id'] = p.id.to_s + "-Start"
-          @p_link_source = linkStart['id']
+          @p_link_source = p.id.to_s + "-Start"
+          linkStart['id'] = @p_link_source
           next_i = 1
           p.investigations.each do |i|
             investigation = @xml.subProcess do
               sLinkStart = xml.startEvent
-              sLinkStart['id'] = 'I' + next_i.to_s + '-Start'
-              @s_link_source = sLinkStart['id']
+              @s_link_source = 'I' + next_i.to_s + '-Start'
+              sLinkStart['id'] = @s_link_source
 
               next_s = 1
               i.studies.each do |s|
@@ -45,9 +45,9 @@ module BPMNGenerator
 
                     flow = @xml.sequenceFlow
                     flow['sourceRef'] = @a_link_source
-                    flow['targetRef'] = assay.id.to_s
+                    flow['targetRef'] = assay['id']
                     flow['id'] = flow['sourceRef'] + '-to-' + flow['targetRef'].to_s
-                    @a_link_source = assay.id
+                    @a_link_source = assay['id']
 
                   end
                   linkEnd = xml.endEvent
@@ -56,7 +56,7 @@ module BPMNGenerator
                   flow = @xml.sequenceFlow
                   flow['sourceRef'] = @a_link_source
                   flow['targetRef'] = linkEnd['id'].to_s
-                  flow['id'] = flow['sourceRef'].to_xml.to_s + '-to-' + flow['targetRef'].to_xml.to_s
+                  flow['id'] = flow['sourceRef'] + '-to-' + flow['targetRef']
                 end
                 study['id'] = 'I' + next_i.to_s + '-S' + next_s.to_s
                 next_s = next_s + 1
@@ -65,7 +65,7 @@ module BPMNGenerator
                 flow = @xml.sequenceFlow
                 flow['sourceRef'] = @s_link_source
                 flow['targetRef'] = study['id'].to_s
-                flow['id'] = flow['sourceRef'].to_xml.to_s + '-to-' + flow['targetRef'].to_xml.to_s
+                flow['id'] = flow['sourceRef'] + '-to-' + flow['targetRef']
                 @s_link_source = study['id']
               end
               linkEnd = xml.endEvent
@@ -74,7 +74,7 @@ module BPMNGenerator
               flow = @xml.sequenceFlow
               flow['sourceRef'] = @s_link_source
               flow['targetRef'] = linkEnd['id'].to_s
-              flow['id'] = flow['sourceRef'].to_xml.to_s + '-to-' + flow['targetRef'].to_xml.to_s
+              flow['id'] = flow['sourceRef'] + '-to-' + flow['targetRef']
             end
 
             investigation['id'] = 'I' + next_i.to_s
@@ -84,7 +84,7 @@ module BPMNGenerator
             flow = @xml.sequenceFlow
             flow['sourceRef'] = @p_link_source
             flow['targetRef'] = investigation['id'].to_s
-            flow['id'] = flow['sourceRef'].to_xml.to_s + '-to-' + flow['targetRef'].to_xml.to_s
+            flow['id'] = flow['sourceRef'] + '-to-' + flow['targetRef']
             @p_link_source = investigation['id']
           end
           linkEnd = xml.endEvent
@@ -92,8 +92,8 @@ module BPMNGenerator
 
           flow = @xml.sequenceFlow
           flow['sourceRef'] = @p_link_source
-          flow['targetRef'] = linkEnd['id'].to_xml.to_s
-          flow['id'] = flow['sourceRef'].to_xml.to_s + '-to-' + flow['targetRef'].to_xml.to_s
+          flow['targetRef'] = linkEnd['id']
+          flow['id'] = flow['sourceRef'] + '-to-' + flow['targetRef']
 
         end
         process['id'] = p.id
