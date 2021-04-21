@@ -1,7 +1,7 @@
-<%= button_link_to('Share with a programme', 'add', '#', id: 'add-programme-permission-button') %>
+<%= button_link_to("Share with a #{t('programme').downcase}", 'add', '#', id: 'add-programme-permission-button') %>
 
 <%= modal(id: 'add-programme-permission-modal', size: 'm') do %>
-    <%= modal_header('Share with programmes') %>
+    <%= modal_header("Share with #{t('programme').downcase.pluralize}") %>
     <%= modal_body do %>
         <div class="form-group">
           <label>The following <%= t('programme').downcase.pluralize -%>...</label>
