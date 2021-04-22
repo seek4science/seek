@@ -32,8 +32,6 @@ class AuthLookupUpdateJob < BatchJob
   end
 
   def gather_items
-    # including item_type in the order, encourages assets to be processed before users (since they are much quicker), due to the happy coincidence
-    # that User falls last alphabetically. Its not that important if a new authorized type is added after User in the future.
     AuthLookupUpdateQueue.dequeue(Seek::Config.auth_lookup_update_batch_size)
   end
 

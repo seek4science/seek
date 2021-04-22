@@ -12,6 +12,9 @@ module ResourceQueue
     end
 
     def prioritized
+      # including item_type in the order, encourages assets to be processed before users
+      #  (since they are much quicker, in the case of auth lookup processing), due to the happy coincidence that User
+      #  falls last alphabetically. Its not that important if a new authorized type is added after User in the future.
       order(:priority, :item_type, :id)
     end
 
