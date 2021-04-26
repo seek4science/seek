@@ -22,5 +22,9 @@
 
   <div class="col-sm-6 hidden-xs">
     <%= list_item_simple_list resource.organisms, "Organisms" %>
+
+    <% if Seek::Config.human_diseases_enabled and !resource.human_diseases.empty? %>
+      <%= list_item_simple_list resource.human_diseases, "Human Diseases" %>
+    <% end %>
   </div>
 </div>

@@ -184,6 +184,11 @@ class AdminControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'get auth consistency stats' do
+    get :get_stats, xhr: true, params: { page: 'auth_consistency' }
+    assert_response :success
+  end
+
   test 'The configuration should stay the same after test_email_configuration' do
     smtp_hash = ActionMailer::Base.smtp_settings
     raise_delivery_errors_setting = ActionMailer::Base.raise_delivery_errors
@@ -298,12 +303,10 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'clear failed jobs' do
-
     Delayed::Job.destroy_all
-    ContentBlobCleanerJob.new.queue_job
-    job = Delayed::Job.last
+    job = Delayed::Job.create!
     job.update_column(:failed_at,Time.now)
-    ContentBlobCleanerJob.new.queue_job
+    Delayed::Job.create!
     assert_equal 2,Delayed::Job.count
     assert_difference('Delayed::Job.count',-1) do
       post :clear_failed_jobs, format: 'json'
@@ -318,10 +321,9 @@ class AdminControllerTest < ActionController::TestCase
     person = Factory(:person)
 
     Delayed::Job.destroy_all
-    ContentBlobCleanerJob.new.queue_job
-    job = Delayed::Job.last
+    job = Delayed::Job.create!
     job.update_column(:failed_at,Time.now)
-    ContentBlobCleanerJob.new.queue_job
+    Delayed::Job.create!
     assert_equal 2,Delayed::Job.count
 
     assert_no_difference('Delayed::Job.count') do
@@ -339,13 +341,18 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'update branding' do
+    assert_nil Seek::Config.header_image_avatar_id
     settings = {project_name: 'project name', project_type: 'project type', project_description: 'project description', project_keywords: 'project,    keywords, ',
                 project_link: 'http://project-link.com',application_name: 'app name',
                 dm_project_name: 'dm project name', dm_project_link: 'http://dm-project-link.com',
                 header_image_link: 'http://header-link.com/image.jpg', header_image_title: 'header image title',
                 copyright_addendum_content: 'copyright content', imprint_description: 'imprint description',
-                terms_page: 'terms page', privacy_page: 'privacy page', about_page: 'about page'}
-    post :update_rebrand, params: settings
+                terms_page: 'terms page', privacy_page: 'privacy page', about_page: 'about page',
+                header_image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
+
+    assert_difference('Avatar.count', 1) do
+      post :update_rebrand, params: settings
+    end
     assert_redirected_to admin_path
 
     assert_equal 'project name', Seek::Config.project_name
@@ -363,11 +370,14 @@ class AdminControllerTest < ActionController::TestCase
     assert_equal 'terms page', Seek::Config.terms_page
     assert_equal 'privacy page', Seek::Config.privacy_page
     assert_equal 'about page', Seek::Config.about_page
+    assert Seek::Config.header_image_avatar_id > 0
   end
 
   test 'update pagination' do
     post :update_pagination, params: {
         results_per_page_default: 9,
+        search_results_limit: '45',
+        related_items_limit: 123,
         results_per_page: { people: 6, 'models' => '300', publications: '', sops: nil },
         sorting: { people: 'created_at_asc', models: :created_at_desc,
                    data_files: 'published_at_desc', sops: 'bananabread' } }
@@ -386,6 +396,9 @@ class AdminControllerTest < ActionController::TestCase
     assert_nil Seek::Config.results_per_page_for('publications')
     assert_nil Seek::Config.results_per_page_for('sops')
     assert_nil Seek::Config.results_per_page_for('data_files'), "Shouldn't set to a value that is not a valid sorting option."
+
+    assert_equal 45, Seek::Config.search_results_limit
+    assert_equal 123, Seek::Config.related_items_limit
   end
 
   test 'update LDAP settings' do

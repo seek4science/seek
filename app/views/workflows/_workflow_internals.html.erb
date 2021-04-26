@@ -1,0 +1,75 @@
+<div class="workflow-internals">
+  <% if workflow.inputs.any? %>
+    <h2>Inputs</h2>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover steps">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Type</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% workflow.inputs.each do |input| %>
+          <tr>
+            <td class="id"><%= text_or_not_specified(input.id, none_text: 'n/a') %></td>
+            <td class="name"><%= text_or_not_specified(input.name, none_text: 'n/a') %></td>
+            <td class="description"><%= text_or_not_specified(input.description, none_text: 'n/a') %></td>
+            <td class="type"><%= port_types(input) %></td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+  <% if workflow.steps.any? %>
+    <h2>Steps</h2>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover steps">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% workflow.steps.each do |step| %>
+          <tr>
+            <td class="id"><%= step.id %></td>
+            <td class="name"><%= step.name %></td>
+            <td class="description"><%= step.description %></td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+  <% if workflow.outputs.any? %>
+    <h2>Outputs</h2>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover steps">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Type</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% workflow.outputs.each do |output| %>
+          <tr>
+            <td class="id"><%= text_or_not_specified(output.id, none_text: 'n/a') %></td>
+            <td class="name"><%= text_or_not_specified(output.name, none_text: 'n/a') %></td>
+            <td class="description"><%= text_or_not_specified(output.description, none_text: 'n/a') %></td>
+            <td class="type"><%= port_types(output) %></td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+</div>

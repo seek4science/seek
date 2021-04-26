@@ -1,0 +1,60 @@
+<% if admin_logged_in? -%>
+    <% content_for(:buttons) do -%>
+        <%= item_actions_dropdown do %>
+          <li><%= image_tag_for_key('edit', edit_human_disease_path(@human_disease), "Edit Human Disease", nil, 'Edit Human Disease') -%></li>
+          <li><%= image_tag_for_key('new', new_human_disease_path, "Add Human Disease", nil, 'Add Human Disease') -%></li>
+          <li><%= delete_human_disease_icon(@human_disease)%></li>
+        <% end %>
+    <% end %>
+<% elsif can_create_human_diseases? %>
+    <% content_for(:buttons) do -%>
+        <%= item_actions_dropdown do %>
+            <li><%= image_tag_for_key('new', new_human_disease_path, "Add Human Disease", nil, 'Add Human Disease') -%></li>
+            <li><%= delete_human_disease_icon(@human_disease)%></li>
+        <% end %>
+    <% end %>
+<% end %>
+
+
+<%= render :partial => "general/item_title",:locals=>{:item=>@human_disease} %>
+
+<div class="show_basic">
+
+  <% if @human_disease.concept -%>
+    <h2>Details about this human disease</h2>
+    <%= render :partial=>"bioportal_concept_details",:locals=>{:concept=>@human_disease.concept} -%>
+    <br/>
+  <% end -%>
+
+  <% if @human_disease.doid_id %>
+    <p><%= link_to_obo_taxonomy_browser @human_disease,"OBO taxonomy browser", popup: true, target: '_blank' %></p>
+    <br/>
+  <% end %>
+
+  <div class="panel panel-default" style="clear:both;">
+    <div class="panel-heading clickable collapsible" data-toggle="collapse-next">
+      <strong>Human Disease Hierarchy</strong> <span class="caret-up"></span>
+    </div>
+    <div class="panel-collapse collapse in" aria-expanded="true">
+      <div id="human-disease-jstree"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    $j(document).ready(function () {
+      $j('#human-disease-jstree').jstree({
+        'core': {
+          'check_callback': true,
+          'force_text': true,
+          'multiple': false,
+          'dblclick_toggle': false,
+          'data': { url: '<%= url_for(action: :tree, controller: :human_diseases) %>' },
+        }
+      }).bind('select_node.jstree', function(e, data) {
+        document.location.href = '<%= url_for(action: 'index', controller: 'human_diseases') %>/' + data.node.id
+      })
+    });
+  </script>
+
+  <%= render :partial => "items_related_to", :object => @human_disease %>
+</div>

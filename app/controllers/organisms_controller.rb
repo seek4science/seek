@@ -16,7 +16,6 @@ class OrganismsController < ApplicationController
   include BioPortal::RestAPI
   include Seek::ExternalServiceWrapper
   include Seek::IndexPager
-  include Seek::BreadCrumbs
 
   api_actions :index, :show
 

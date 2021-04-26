@@ -50,30 +50,32 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal type, assigns(:sample).sample_type
   end
 
-  #FIXME: there is an inconstency between the existing tests, and how the form behaved - see https://jira-bsse.ethz.ch/browse/OPSK-1205
   test 'create from form' do
     person = Factory(:person)
     creator = Factory(:person)
     login_as(person)
     type = Factory(:patient_sample_type)
-    assert_difference('Sample.count') do
-      post :create, params: { sample: { sample_type_id: type.id,
-                              __sample_data_full_name: 'Fred Smith', __sample_data_age: '22', __sample_data_weight: '22.1', __sample_data_postcode: 'M13 9PL' ,
-                              project_ids: [person.projects.first.id], other_creators:'frank, mary', creator_ids: [creator.id] } }
+    assert_enqueued_with(job: SampleTypeUpdateJob, args: [type, false]) do
+      assert_difference('Sample.count') do
+        post :create, params: { sample: { sample_type_id: type.id,
+                                          data:{
+                                "full name": 'Fred Smith',
+                                "age": '22',
+                                "weight": '22.1',
+                                "postcode": 'M13 9PL'} ,
+                                project_ids: [person.projects.first.id], other_creators:'frank, mary', creator_ids: [creator.id] } }
+      end
     end
     assert assigns(:sample)
     sample = assigns(:sample)
     assert_equal 'Fred Smith', sample.title
-    assert_equal 'Fred Smith', sample.get_attribute_value(:full_name)
+    assert_equal 'Fred Smith', sample.get_attribute_value('full name')
     assert_equal '22', sample.get_attribute_value(:age)
     assert_equal '22.1', sample.get_attribute_value(:weight)
     assert_equal 'M13 9PL', sample.get_attribute_value(:postcode)
     assert_equal person, sample.contributor
     assert_equal [creator], sample.creators
     assert_equal 'frank, mary',sample.other_creators
-
-    # job should have been triggered
-    assert SampleTypeUpdateJob.new(type, false).exists?
   end
 
   test 'create' do
@@ -81,23 +83,42 @@ class SamplesControllerTest < ActionController::TestCase
     creator = Factory(:person)
     login_as(person)
     type = Factory(:patient_sample_type)
-    assert_difference('Sample.count') do
-      post :create, params: { sample: { sample_type_id: type.id,
-                              data: { full_name: 'Fred Smith', age: '22', weight: '22.1', postcode: 'M13 9PL' },
-                              project_ids: [person.projects.first.id], creator_ids: [creator.id] } }
+    assert_enqueued_with(job: SampleTypeUpdateJob, args: [type, false]) do
+      assert_difference('Sample.count') do
+        post :create, params: { sample: { sample_type_id: type.id,
+                                data: { 'full name': 'Fred Smith', age: '22', weight: '22.1', postcode: 'M13 9PL' },
+                                project_ids: [person.projects.first.id], creator_ids: [creator.id] } }
+      end
     end
     assert assigns(:sample)
     sample = assigns(:sample)
     assert_equal 'Fred Smith', sample.title
-    assert_equal 'Fred Smith', sample.get_attribute_value(:full_name)
+    assert_equal 'Fred Smith', sample.get_attribute_value('full name')
     assert_equal '22', sample.get_attribute_value(:age)
     assert_equal '22.1', sample.get_attribute_value(:weight)
     assert_equal 'M13 9PL', sample.get_attribute_value(:postcode)
     assert_equal person, sample.contributor
     assert_equal [creator], sample.creators
+  end
 
-    # job should have been triggered
-    assert SampleTypeUpdateJob.new(type, false).exists?
+  test 'create with validation error' do
+    person = Factory(:person)
+    creator = Factory(:person)
+    login_as(person)
+    type = Factory(:patient_sample_type)
+    assert_no_difference('Sample.count') do
+      post :create, params: { sample: { sample_type_id: type.id,
+                                        data: { 'full name': 'Fred Smith', age: 'Fish' },
+                                        project_ids: [person.projects.first.id], creator_ids: [creator.id] } }
+    end
+    assert assigns(:sample)
+    sample = assigns(:sample)
+    assert_equal 'Fred Smith', sample.title
+    assert_equal 'Fred Smith', sample.get_attribute_value('full name')
+    assert_equal 'Fish', sample.get_attribute_value(:age)
+
+    refute sample.valid?
+
   end
 
   #FIXME: there is an inconstency between the existing tests, and how the form behaved - see https://jira-bsse.ethz.ch/browse/OPSK-1205
@@ -108,7 +129,10 @@ class SamplesControllerTest < ActionController::TestCase
     type.sample_attributes << Factory(:sample_attribute, title: 'bool', sample_attribute_type: Factory(:boolean_sample_attribute_type), required: false, sample_type: type)
     type.save!
     assert_difference('Sample.count') do
-      post :create, params: { sample: { sample_type_id: type.id, __sample_data_the_title: 'ttt', __sample_data_bool: '1' ,
+      post :create, params: { sample: { sample_type_id: type.id,
+                                        data: {
+                              the_title: 'ttt',
+                              bool: '1'} ,
                               project_ids: [person.projects.first.id] } }
     end
     assert_not_nil sample = assigns(:sample)
@@ -120,6 +144,25 @@ class SamplesControllerTest < ActionController::TestCase
     assert_not_nil sample = assigns(:sample)
     assert_equal 'ttt', sample.get_attribute_value(:the_title)
     assert !sample.get_attribute_value(:bool)
+  end
+
+  test 'create with symbols' do
+    person = Factory(:person)
+    login_as(person)
+    type = Factory(:sample_type_with_symbols)
+    assert_difference('Sample.count') do
+      post :create, params: { sample: { sample_type_id: type.id,
+                                        data:{
+                                            "title&": 'A',
+                                            "name ++##!": 'B' ,
+                                            "size range (bp)":'C'
+                                        },
+                                        project_ids: [person.projects.first.id] } }
+    end
+    assert_not_nil sample = assigns(:sample)
+    assert_equal 'A',sample.get_attribute_value('title&')
+    assert_equal 'B',sample.get_attribute_value('name ++##!')
+    assert_equal 'C',sample.get_attribute_value('size range (bp)')
   end
 
   test 'create and update with boolean' do
@@ -185,10 +228,16 @@ class SamplesControllerTest < ActionController::TestCase
 
     assert_empty sample.creators
 
-    assert_no_difference('Sample.count') do
-      put :update, params: { id: sample.id, sample: { __sample_data_full_name: 'Jesus Jones', __sample_data_age: '47', __sample_data_postcode: 'M13 9QL',
-          creator_ids: [creator.id] } }
-      assert_equal [creator], sample.creators
+    assert_enqueued_with(job: SampleTypeUpdateJob, args: [sample.sample_type, false]) do
+      assert_no_difference('Sample.count') do
+        put :update, params: {id: sample.id, sample: {
+            data: {
+            "full name": 'Jesus Jones',
+            "age": '47',
+            "postcode": 'M13 9QL'},
+            creator_ids: [creator.id]}}
+        assert_equal [creator], sample.creators
+      end
     end
 
     assert assigns(:sample)
@@ -197,12 +246,10 @@ class SamplesControllerTest < ActionController::TestCase
     updated_sample = Sample.find(updated_sample.id)
     assert_equal type_id, updated_sample.sample_type.id
     assert_equal 'Jesus Jones', updated_sample.title
-    assert_equal 'Jesus Jones', updated_sample.get_attribute_value(:full_name)
+    assert_equal 'Jesus Jones', updated_sample.get_attribute_value('full name')
     assert_equal '47', updated_sample.get_attribute_value(:age)
     assert_nil updated_sample.get_attribute_value(:weight)
     assert_equal 'M13 9QL', updated_sample.get_attribute_value(:postcode)
-    # job should have been triggered
-    assert SampleTypeUpdateJob.new(sample.sample_type, false).exists?
   end
 
   test 'update' do
@@ -213,10 +260,12 @@ class SamplesControllerTest < ActionController::TestCase
 
     assert_empty sample.creators
 
-    assert_no_difference('Sample.count') do
-      put :update, params: { id: sample.id, sample: { data: { full_name: 'Jesus Jones', age: '47', postcode: 'M13 9QL' },
-                                            creator_ids: [creator.id] } }
-      assert_equal [creator], sample.creators
+    assert_enqueued_with(job: SampleTypeUpdateJob, args: [sample.sample_type, false]) do
+      assert_no_difference('Sample.count') do
+        put :update, params: { id: sample.id, sample: { data: { 'full name': 'Jesus Jones', age: '47', postcode: 'M13 9QL' },
+                                              creator_ids: [creator.id] } }
+        assert_equal [creator], sample.creators
+      end
     end
 
     assert assigns(:sample)
@@ -225,12 +274,10 @@ class SamplesControllerTest < ActionController::TestCase
     updated_sample = Sample.find(updated_sample.id)
     assert_equal type_id, updated_sample.sample_type.id
     assert_equal 'Jesus Jones', updated_sample.title
-    assert_equal 'Jesus Jones', updated_sample.get_attribute_value(:full_name)
+    assert_equal 'Jesus Jones', updated_sample.get_attribute_value('full name')
     assert_equal '47', updated_sample.get_attribute_value(:age)
     assert_nil updated_sample.get_attribute_value(:weight)
     assert_equal 'M13 9QL', updated_sample.get_attribute_value(:postcode)
-    # job should have been triggered
-    assert SampleTypeUpdateJob.new(sample.sample_type, false).exists?
   end
 
   #FIXME: there is an inconstency between the existing tests, and how the form behaved - see https://jira-bsse.ethz.ch/browse/OPSK-1205
@@ -242,8 +289,13 @@ class SamplesControllerTest < ActionController::TestCase
     project_ids = person.projects[0..1].collect(&:id)
     assert_difference('Sample.count') do
       post :create, params: { sample: { sample_type_id: type.id, title: 'My Sample',
-                              __sample_data_full_name: 'Fred Smith', __sample_data_age: '22', __sample_data_weight: '22.1', __sample_data_postcode: 'M13 9PL',
-                              project_ids: project_ids } }
+                                        data: {
+                                            'full name': 'Fred Smith',
+                                            age: '22',
+                                            weight: '22.1',
+                                            postcode: 'M13 9PL'
+                                        },
+                                        project_ids: project_ids } }
     end
     assert sample = assigns(:sample)
     assert_equal person.projects[0..1].sort, sample.projects.sort
@@ -257,7 +309,7 @@ class SamplesControllerTest < ActionController::TestCase
     project_ids = person.projects[0..1].collect(&:id)
     assert_difference('Sample.count') do
       post :create, params: { sample: { sample_type_id: type.id, title: 'My Sample',
-                              data: { full_name: 'Fred Smith', age: '22', weight: '22.1', postcode: 'M13 9PL' },
+                              data: { 'full name': 'Fred Smith', age: '22', weight: '22.1', postcode: 'M13 9PL' },
                               project_ids: project_ids } }
     end
     assert sample = assigns(:sample)
@@ -354,7 +406,12 @@ class SamplesControllerTest < ActionController::TestCase
 
     assert_difference('Sample.count') do
       post :create, params: { sample: { sample_type_id: type.id, title: 'My Sample',
-                              __sample_data_full_name: 'Fred Smith', __sample_data_age: '22', __sample_data_weight: '22.1', __sample_data_postcode: 'M13 9PL' ,
+                                        data:{
+                                            "full name": 'Fred Smith',
+                                            "age": '22',
+                                            "weight": '22.1',
+                                            "postcode": 'M13 9PL'
+                                        },
                               project_ids: [person.projects.first.id] }, policy_attributes: valid_sharing }
     end
     assert sample = assigns(:sample)
@@ -369,7 +426,7 @@ class SamplesControllerTest < ActionController::TestCase
 
     assert_difference('Sample.count') do
       post :create, params: { sample: { sample_type_id: type.id, title: 'My Sample',
-                              data: { full_name: 'Fred Smith', age: '22', weight: '22.1', postcode: 'M13 9PL' },
+                              data: { 'full name': 'Fred Smith', age: '22', weight: '22.1', postcode: 'M13 9PL' },
                               project_ids: [person.projects.first.id] }, policy_attributes: valid_sharing }
     end
     assert sample = assigns(:sample)
@@ -565,12 +622,12 @@ class SamplesControllerTest < ActionController::TestCase
     type = sample.sample_type
     login_as(person.user)
     assert sample.can_delete?
-    assert_difference('Sample.count', -1) do
-      delete :destroy, params: { id: sample }
+    assert_enqueued_with(job: SampleTypeUpdateJob, args: [type, false]) do
+      assert_difference('Sample.count', -1) do
+        delete :destroy, params: { id: sample }
+      end
     end
     assert_redirected_to root_path
-    # job should have been triggered
-    assert SampleTypeUpdateJob.new(type, false).exists?
   end
 
   test 'linked samples show up in related items, for both directions' do
@@ -824,7 +881,7 @@ class SamplesControllerTest < ActionController::TestCase
     type = Factory(:patient_sample_type)
 
     sample =  {sample_type_id: type.id,
-               data: { full_name: 'Fred Smith', age: '22', weight: '22.1', postcode: 'M13 9PL' },
+               data: { 'full name': 'Fred Smith', age: '22', weight: '22.1', postcode: 'M13 9PL' },
                project_ids: [person.projects.first.id],
                discussion_links_attributes:[{url: "http://www.slack.com/"}]}
     assert_difference('AssetLink.discussion.count') do
@@ -869,7 +926,7 @@ class SamplesControllerTest < ActionController::TestCase
                         project_ids:person.projects.collect(&:id),contributor:person
     sample.sample_type = Factory(:patient_sample_type)
     sample.title = 'My sample'
-    sample.set_attribute_value(:full_name, 'Fred Bloggs')
+    sample.set_attribute_value('full name', 'Fred Bloggs')
     sample.set_attribute_value(:age, 22)
     sample.save!
     sample

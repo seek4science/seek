@@ -2,7 +2,6 @@ require 'delayed/command'
 
 class AdminController < ApplicationController
   include CommonSweepers
-  include Seek::BreadCrumbs
 
   RESTART_MSG = "Your settings have been updated. If you changed some settings e.g. search, you need to restart some processes.
                  Please see the buttons and explanations below.".freeze
@@ -11,6 +10,13 @@ class AdminController < ApplicationController
   before_action :is_user_admin_auth
 
   def index
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  def project_creation_requests
+    @requests = MessageLog.pending_project_creation_requests
     respond_to do |format|
       format.html
     end
@@ -37,21 +43,25 @@ class AdminController < ApplicationController
   end
 
   def update_features_enabled
-    Seek::Config.events_enabled = string_to_boolean params[:events_enabled]
     Seek::Config.email_enabled = string_to_boolean params[:email_enabled]
     Seek::Config.pdf_conversion_enabled = string_to_boolean params[:pdf_conversion_enabled]
     # Seek::Config.delete_asset_version_enabled = string_to_boolean params[:delete_asset_version_enabled]
-    Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]
-    Seek::Config.samples_enabled = string_to_boolean params[:samples_enabled]
     Seek::Config.project_admin_sample_type_restriction = string_to_boolean params[:project_admin_sample_type_restriction]
     Seek::Config.programme_user_creation_enabled = string_to_boolean params[:programme_user_creation_enabled]
+    Seek::Config.managed_programme_id = params[:managed_programme_id]
 
-    Seek::Config.set_smtp_settings 'address', params[:address]
-    Seek::Config.set_smtp_settings 'domain', params[:domain]
-    Seek::Config.set_smtp_settings 'authentication', params[:authentication]
-    Seek::Config.set_smtp_settings 'user_name', params[:smtp_user_name]
-    Seek::Config.set_smtp_settings 'password', params[:smtp_password]
-    Seek::Config.set_smtp_settings 'enable_starttls_auto', params[:enable_starttls_auto] == '1'
+    Seek::Config.set_smtp_settings('address', params[:address]) if params.key?(:address)
+    port_is_integer = true
+    if params.key?(:port)
+      port = params[:port]
+      port_is_integer = only_integer(port, 'port')
+      Seek::Config.set_smtp_settings('port', port) if port_is_integer
+    end
+    Seek::Config.set_smtp_settings('domain', params[:domain]) if params.key?(:domain)
+    Seek::Config.set_smtp_settings('authentication', params[:authentication]) if params.key?(:authentication)
+    Seek::Config.set_smtp_settings('user_name', params[:smtp_user_name]) if params.key?(:smtp_user_name)
+    Seek::Config.set_smtp_settings('password', params[:smtp_password]) if params.key?(:smtp_password)
+    Seek::Config.set_smtp_settings('enable_starttls_auto', params[:enable_starttls_auto] == '1') if params.key?(:enable_starttls_auto)
 
     Seek::Config.support_email_address = params[:support_email_address]
     Seek::Config.noreply_sender = params[:noreply_sender]
@@ -72,6 +82,10 @@ class AdminController < ApplicationController
     Seek::Config.omniauth_elixir_aai_client_id = params[:omniauth_elixir_aai_client_id]
     Seek::Config.omniauth_elixir_aai_secret = params[:omniauth_elixir_aai_secret]
 
+    Seek::Config.omniauth_github_enabled = string_to_boolean params[:omniauth_github_enabled]
+    Seek::Config.omniauth_github_client_id = params[:omniauth_github_client_id]
+    Seek::Config.omniauth_github_secret = params[:omniauth_github_secret]
+
     Seek::Config.solr_enabled = string_to_boolean params[:solr_enabled]
     Seek::Config.filtering_enabled = string_to_boolean params[:filtering_enabled]
     Seek::Config.jws_enabled = string_to_boolean params[:jws_enabled]
@@ -80,6 +94,17 @@ class AdminController < ApplicationController
     Seek::Config.internal_help_enabled = string_to_boolean params[:internal_help_enabled]
     Seek::Config.external_help_url = params[:external_help_url]
 
+    Seek::Config.cwl_viewer_url = params[:cwl_viewer_url]
+    # Types enabled
+    Seek::Config.collections_enabled = string_to_boolean params[:collections_enabled]
+    Seek::Config.documents_enabled = string_to_boolean params[:documents_enabled]
+    Seek::Config.events_enabled = string_to_boolean params[:events_enabled]
+    Seek::Config.isa_enabled = string_to_boolean params[:isa_enabled]
+    Seek::Config.models_enabled = string_to_boolean params[:models_enabled]
+    Seek::Config.organisms_enabled = string_to_boolean params[:organisms_enabled]
+    Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]
+    Seek::Config.publications_enabled = string_to_boolean params[:publications_enabled]
+    Seek::Config.samples_enabled = string_to_boolean params[:samples_enabled]
     Seek::Config.workflows_enabled = string_to_boolean params[:workflows_enabled]
 
     Seek::Config.exception_notification_recipients = params[:exception_notification_recipients]
@@ -106,6 +131,7 @@ class AdminController < ApplicationController
     Seek::Config.zenodo_client_secret = params[:zenodo_client_secret].try(:strip)
 
     Seek::Config.openbis_enabled = string_to_boolean(params[:openbis_enabled])
+    Seek::Config.copasi_enabled = string_to_boolean(params[:copasi_enabled])
 
     Seek::Config.nels_enabled = string_to_boolean(params[:nels_enabled])
     Seek::Config.nels_client_id = params[:nels_client_id].try(:strip)
@@ -117,10 +143,6 @@ class AdminController < ApplicationController
     time_lock_doi_for = params[:time_lock_doi_for]
     time_lock_is_integer = only_integer time_lock_doi_for, 'time lock doi for'
     Seek::Config.time_lock_doi_for = time_lock_doi_for.to_i if time_lock_is_integer
-
-    port = params[:port]
-    port_is_integer = only_integer(port, 'port')
-    Seek::Config.set_smtp_settings('port', port) if port_is_integer
 
     Seek::Util.clear_cached
 
@@ -206,6 +228,9 @@ class AdminController < ApplicationController
 
     valid = only_positive_integer(params[:results_per_page_default], 'default items per page')
     Seek::Config.results_per_page_default = params[:results_per_page_default] if valid
+    Seek::Config.related_items_limit = params[:related_items_limit]
+    Seek::Config.search_results_limit = params[:search_results_limit]
+
     update_redirect_to(valid, 'pagination')
   end
 

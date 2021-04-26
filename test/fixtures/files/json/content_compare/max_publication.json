@@ -32,7 +32,13 @@
           "link": "http://localhost:3000/sops/883654268/content_blobs/1050452533",
           "size": 8
         }
-      ]
+      ],
+      "authors": ["Author1 Last", "Author2 Last"],
+      "discussion_links": [{
+        "id": 55,
+        "url": "http://www.slack.com/",
+        "label": "Slack"
+      }]
     },
     "relationships": {
       "creators": {

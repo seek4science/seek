@@ -8,13 +8,10 @@ class PublicationsController < ApplicationController
   include Seek::UploadHandling::DataUpload
 
   before_action :publications_enabled?
-
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, only: %i[show edit manage update destroy download upload_fulltext upload_pdf]
   before_action :suggest_authors, only: [:manage]
   before_action :find_display_asset, :only=>[:show, :download]
-
-  include Seek::BreadCrumbs
 
   include Seek::IsaGraphExtensions
   include PublicationsHelper
@@ -262,7 +259,7 @@ class PublicationsController < ApplicationController
     end
 
     respond_to do |format|
-      format.json { render json: authors }
+      format.json { render json: authors.to_json }
       format.xml  { render xml: authors }
     end
   end
@@ -298,7 +295,7 @@ class PublicationsController < ApplicationController
     author = PublicationAuthor.where(first_name: first_name, last_name: last_name).limit(1)
 
     respond_to do |format|
-      format.json { render json: authors }
+      format.json { render json: authors.to_json }
       format.xml  { render xml: authors }
     end
   end
@@ -359,7 +356,7 @@ class PublicationsController < ApplicationController
                                         :published_date, :bibtex_file, :registered_mode, :publisher, :booktitle, :keep_title,
                                         { project_ids: [] }, { event_ids: [] }, { model_ids: [] },
                                         { investigation_ids: [] }, { study_ids: [] }, { assay_ids: [] }, { presentation_ids: [] },
-                                        { data_file_ids: [] }, { scales: [] },
+                                        { data_file_ids: [] }, { scales: [] }, { human_disease_ids: [] },
                                         { publication_authors_attributes: [:person_id, :id, :first_name, :last_name ] }).tap do |pub_params|
       filter_association_params(pub_params, :assay_ids, Assay, :can_edit?)
       filter_association_params(pub_params, :study_ids, Study, :can_view?)

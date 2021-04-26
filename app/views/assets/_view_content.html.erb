@@ -2,13 +2,7 @@
 
 <% asset = content_blob.asset %>
 <% if Seek::Util.inline_viewable_content_types.include?(asset.class) %>
-  <% if asset.is_a?(Workflow)%>
-    <% if asset.is_github_cwl? %>
-      <%= button_link_to('View content', "show", asset.cwl_viewer_url, html_options = {:target=>'_blank'} ) %>
-    <% elsif asset.is_myexperiment? %>
-      <%= button_link_to('View content', "show", content_blob.url, html_options = {:target=>'_blank'} ) %>
-    <% end %>
-  <% elsif content_blob.is_content_viewable? %>
+  <% if content_blob.is_content_viewable? %>
     <%#FIXME: this decision of whether to display image can be made in view_content controller method, as it does between text and pdf %>
     <% if content_blob.is_image? %>
       <%

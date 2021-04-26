@@ -50,7 +50,7 @@ module Seek
         end
 
         def link_to_alternative
-          path = eval("#{controller_name}_path(:uri=>@type_class.uri, :label=> @type_class.label)")
+          path = polymorphic_path(controller_name, uri: @type_class.uri, label: @type_class.label)
           view_context.link_to(@type_class.label, path, style: 'font-style:italic;font-weight:bold;')
         end
 

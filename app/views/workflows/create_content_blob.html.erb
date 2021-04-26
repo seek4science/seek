@@ -1,0 +1,38 @@
+<div id="in-progress" class="text-center">
+  <p class="alert alert-info">Please wait whilst the uploaded file is processed ...</p>
+  <%= image('large_spinner') %>
+</div>
+
+<div id="response-error" class="alert alert-danger" style="display:none;">
+  <p>
+  Unfortunately a problem occurred processing the file. The problem was been reported.
+  </p>
+  <p>
+    Please try again later.
+  </p>
+  Error:
+  <pre id="error-message"></pre>
+</div>
+
+<script type="application/javascript">
+    $j(document).ready(function () {
+        $j.ajax({
+            type: "POST",
+            dataType: "html",
+            timeout: 0,
+            url: '<%= metadata_extraction_ajax_workflows_path -%>',
+            data: {
+                content_blob_id: <%= @workflow.content_blob.id -%>,
+                workflow_class_id: <%= @workflow.workflow_class_id || 'null' -%>
+            },
+            error: function (jqXHR, textStatus,errorThrown) {
+              $j('#in-progress').hide();
+              $j('#response-error').show();
+              $j('#error-message').html(jqXHR.responseText);
+            },
+            success: function () {
+              window.location='<%= provide_metadata_workflows_path(workflow_class_id: @workflow.workflow_class_id) %>'
+            }
+        });
+    })
+</script>

@@ -38,7 +38,7 @@ class Policy < ApplicationRecord
   def queue_rdf_generation_job
     supported_assets = assets.select(&:rdf_supported?)
     unless (saved_changes.keys - ['updated_at']).empty? || supported_assets.empty?
-      supported_assets.each { |asset| RdfGenerationJob.new(asset).queue_job }
+      RdfGenerationQueue.enqueue(supported_assets)
     end
   end
 
@@ -139,6 +139,38 @@ class Policy < ApplicationRecord
 
           # Get the unused permissions and mark them for destruction (after policy is saved)
           (current_permissions - new_permissions).each(&:mark_for_destruction)
+        end
+      end
+    end
+  end
+
+  def update_attributes_with_bulk_sharing_policy(policy_params)
+
+    tap do |policy|
+      if policy_params
+        # Set attributes on the policy
+        policy.access_type = policy_params[:access_type] unless policy_params[:access_type].nil?
+
+        if policy.access_type.nil? || policy.access_type > Policy::NO_ACCESS
+          policy.sharing_scope = nil # This field should not be used anymore
+        end
+
+        # Set attributes on the policy's permissions
+        if policy_params[:permissions_attributes]
+          current_permissions = policy.permissions
+
+          policy_params[:permissions_attributes].values.map do |perm_params|
+            permission = current_permissions.detect do |p|
+              p.contributor_type == perm_params[:contributor_type] &&
+                  p.contributor_id == perm_params[:contributor_id].to_i
+            end
+
+            permission ||= policy.permissions.create
+            permission.tap {|p| p.assign_attributes(perm_params)}
+            permission.save
+
+            current_permissions = policy.permissions
+          end
         end
       end
     end

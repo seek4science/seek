@@ -35,6 +35,13 @@
               <%= organisms_link_list @project.organisms -%>
             </p>
         <% end %>
+        <% if Seek::Config.human_diseases_enabled %>
+            <p>
+              <strong>Human Diseases:</strong>
+              <%= human_diseases_link_list @project.human_diseases -%>
+            </p>
+        <% end %>
+
       </div>
 
       <div class="col-md-6">
@@ -91,17 +98,27 @@
 
   <div class="col-md-3 col-sm-4">
     <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @project } -%>
+
+    <% if @project.is_discussable? -%>
+      <% if @project.discussion_links.select{|link| link.url.present?}.any?  %>
+        <%= render partial: 'assets/discussion_links_box', locals: {resource: @project } -%>
+      <% end -%>
+    <% end -%>
+
+    
+
     <% if @project.can_manage? %>
       <%= render :partial => 'general/storage_usage_box', locals: { programme: @project,
                                                                     url: storage_report_project_path(@project)} %>
     <% end %>
+
   </div>
 </div>
 
 <% if Seek::Config.project_hierarchy_enabled && logged_in_and_member? -%>
     <div style="clear:both;">
       <b>
-        Project Hierarchies
+        <%= t('project') -%> Hierarchies
         (<%= link_to "hide", '#', id: 'project-hierarchy-toggle' -%>):
       </b><br/><br/>
 
@@ -123,10 +140,6 @@
 
 <%# get, classify and authorize all assets for this project -%>
 <%= render :partial=>"general/items_related_to",:object => @project %>
-
-<% if request_project_membership_button_enabled?(@project) %>
-    <%= render partial: 'request_membership_form', locals: { project: @project } %>
-<% end %>
 
 <script>
   $j('#project-hierarchy-toggle').click(function () {

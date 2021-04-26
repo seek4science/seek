@@ -1,0 +1,38 @@
+
+
+<%= panel('Search the Human Disease Ontology (HDO)') do %>
+    <p>
+      Search below for the name of the human disease. You can use its official name, or its common name or one of its synonyms.
+    </p>
+    <%= form_tag_with_callbacks(search_ajax_human_diseases_path,
+                                { id: "search_human_disease",
+                                  before: "$j('#search_results').spinner('add');",
+                                  update: { success: 'search_results', error: 'search_results' },
+                                  remote: true }) do -%>
+
+        <%= hidden_field_tag :pagenum, 1 -%>
+
+        <div class="form-group">
+          <label>Search for</label>
+          <%= text_field_tag :search_term, @human_disease.title, :class => "form-control" %>
+        </div>
+
+        <%= submit_tag "Search", data: { disable_with: 'Searching ...' }, :class => 'btn btn-primary' %>
+    <% end -%>
+
+    <div id="search_results">
+
+    </div>
+<% end %>
+
+<script type="text/javascript">
+    function add_concept(label, ont_acronym, conc_id) {
+        $j('#human_disease_title').val(label);
+        $j('#human_disease_ontology_id').val(ont_acronym);
+        $j('#human_disease_concept_uri').val(conc_id);
+        // jump to the details tab and highlight the fields
+        $j('.nav-tabs a[href="#details"]').tab('show');
+        $j("#human_disease_title").highlight();
+        $j("#human_disease_concept_uri").highlight();
+    }
+</script>

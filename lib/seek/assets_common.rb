@@ -7,24 +7,20 @@ module Seek
     include Seek::PreviewHandling
     include Seek::AssetsStandardControllerActions
 
-    def find_display_asset(asset = eval("@#{controller_name.singularize}"))
+    def find_display_asset(asset = instance_variable_get("@#{controller_name.singularize}"))
       unless asset.versioned?
-        # No version, the display_ is the main asset, non-versionned
+        # No version, the display_ is the main asset, non-versioned
         instance_variable_set("@display_#{asset.class.name.underscore}", asset)
         return
       end
       requested_version = params[:version] || asset.latest_version.version
       found_version = asset.find_version(requested_version)
-      if !found_version || anonymous_request_for_previous_version?(asset, requested_version)
-        error('This version is not available', 'invalid route')
-        return false
-      else
+      if found_version&.visible?
         instance_variable_set("@display_#{asset.class.name.underscore}", asset.find_version(found_version))
+      else
+        error('This version is not available', 'invalid route')
+        false
       end
-    end
-
-    def anonymous_request_for_previous_version?(asset, requested_version)
-      (!User.logged_in_and_member? && requested_version.to_i != asset.latest_version.version)
     end
 
     def update_relationships(asset, params)

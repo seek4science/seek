@@ -12,12 +12,12 @@ class DataFilesController < ApplicationController
 
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, except: [:index, :new, :upload_for_tool, :upload_from_email, :create, :create_content_blob,
-                                                             :preview, :test_asset_url, :update_annotations_ajax, :rightfield_extraction_ajax, :provide_metadata]
+                                                             :preview, :update_annotations_ajax, :rightfield_extraction_ajax, :provide_metadata]
   before_action :find_display_asset, only: [:show, :explore, :download]
   before_action :xml_login_only, only: [:upload_for_tool, :upload_from_email]
   before_action :get_sample_type, only: :extract_samples
   before_action :check_already_extracted, only: :extract_samples
-  before_action :forbid_new_version_if_samples, :only => :new_version
+  before_action :forbid_new_version_if_samples, :only => :create_version
 
   before_action :oauth_client, only: :retrieve_nels_sample_metadata
   before_action :nels_oauth_session, only: :retrieve_nels_sample_metadata
@@ -27,8 +27,6 @@ class DataFilesController < ApplicationController
 
   # has to come after the other filters
   include Seek::Publishing::PublishingCommon
-
-  include Seek::BreadCrumbs
 
   include Seek::Doi::Minting
 
@@ -63,7 +61,7 @@ class DataFilesController < ApplicationController
     end
   end
 
-  def new_version
+  def create_version
     if handle_upload_data(true)
       comments = params[:revision_comments]
 
@@ -267,7 +265,7 @@ class DataFilesController < ApplicationController
 
   def extraction_status
     @previous_status = params[:previous_status]
-    @job_status = SampleDataExtractionJob.get_status(@data_file)
+    @job_status = @data_file.sample_extraction_task.status
 
     respond_to do |format|
       format.html { render partial: 'data_files/sample_extraction_status', locals: { data_file: @data_file } }

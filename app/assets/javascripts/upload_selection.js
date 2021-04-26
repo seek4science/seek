@@ -2,6 +2,7 @@ var upload_url_field;
 var keep_title_field;
 var examine_url_href;
 
+// Delete after check up!!!
 function setup_url_field(examine_url_path,examine_button_id) {
     upload_url_field = $j('#data_url_field');
     keep_title_field = $j('#keep_title_field');

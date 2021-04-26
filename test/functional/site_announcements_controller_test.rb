@@ -60,12 +60,15 @@ class SiteAnnouncementsControllerTest < ActionController::TestCase
     registered_receivers = Person.registered.select { |p| p.notifiee_info.try :receive_notifications? }
     assert registered_receivers.count >= 5
 
-    assert_enqueued_emails(registered_receivers.count) do
+    site_announcement = nil
+
+    assert_enqueued_with(job: SendAnnouncementEmailsJob) do
       post :create, params: { site_announcement: { title: 'fred', email_notification: true } }
       site_announcement = assigns(:site_announcement)
-      assert SendAnnouncementEmailsJob.new(site_announcement.id, 1).exists?
-      first_id = people.collect(&:notifiee_info).collect(&:id).min
-      SendAnnouncementEmailsJob.new(site_announcement.id, first_id).perform
+    end
+
+    assert_enqueued_emails(registered_receivers.count) do
+      SendAnnouncementEmailsJob.perform_now(site_announcement)
     end
   end
 

@@ -1145,6 +1145,29 @@ class PersonTest < ActiveSupport::TestCase
     assert_includes person.projects, project
   end
 
+  test 'can unflag as left project' do
+    person = Factory(:person)
+    project = person.projects.first
+
+    assert_not_includes person.former_projects, project
+    assert_includes person.current_projects, project
+    assert_includes person.projects, project
+
+    gm = person.group_memberships.first
+    gm.time_left_at = 1.day.ago
+    assert gm.save
+    gm.update_column(:has_left, true)
+    gm.reload
+    assert gm.has_left?
+    assert gm[:has_left]
+
+    gm.time_left_at = nil
+    assert gm.save
+    gm.reload
+    refute gm.has_left?
+    refute gm[:has_left]
+  end
+
   test 'trim spaces from email, first_name, last_name' do
     person = Factory(:brand_new_person)
     person.email = ' fish@email.com '
@@ -1296,6 +1319,22 @@ class PersonTest < ActiveSupport::TestCase
         refute_nil v.deleted_contributor, "#{v.class.name} deleted_contributor shouldn't be nil"
       end
     end
+  end
+
+  test 'administered projects' do
+    person = Factory(:project_administrator)
+    project = person.projects.first
+
+    assert_equal [project],person.administered_projects
+
+    project2 = Factory(:project)
+    person.add_to_project_and_institution(project2,Factory(:institution))
+    person.is_project_administrator = true, project2
+    project3 = Factory(:project)
+    person.add_to_project_and_institution(project3,Factory(:institution))
+    person.save!
+
+    assert_equal [project,project2],person.administered_projects.sort_by(&:id)
   end
 
 end

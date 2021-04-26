@@ -12,7 +12,7 @@
 <% content_for(:buttons) do %>
     <%= button_link_to("Return to #{item}", 'back', url_for(@avatar_owner_instance))%>
     <% if editable -%>
-        <%= button_link_to('Upload New Picture', 'avatar', new_avatar_link(@avatar_owner_instance))%>
+        <%= button_link_to('Upload New Picture', 'avatar', polymorphic_path([:new, @avatar_owner_instance, :avatar]))%>
     <% end %>
 <% end -%>
 
@@ -21,19 +21,19 @@
 <div class="avatar-gallery">
   <% @avatars.each do |avatar| %>
       <div class="avatar">
-        <%= link_to avatar_url(@avatar_owner_instance, avatar.id, "large") do -%>
-            <%= image_tag avatar_url(@avatar_owner_instance, avatar.id, 100), :alt => @avatar_owner_instance.title, :class => 'framed' -%>
+        <%= link_to avatar_url(@avatar_owner_instance, avatar, "large") do -%>
+            <%= image_tag avatar_url(@avatar_owner_instance, avatar, 100), :alt => @avatar_owner_instance.title, :class => 'framed' -%>
         <% end %>
         <% if avatar.selected? -%><br/>(Current)<% end -%>
         <% if editable %>
             <% unless avatar.selected? -%>
                 <%
-                   change_path = eval("select_#{@avatar_owner_instance.class.name.downcase}_avatar_path(@avatar_owner_instance,avatar)")
+                   change_path = polymorphic_path([:select, @avatar_owner_instance, avatar])
                 %>
                 <br/><%= image_tag_for_key "avatar", change_path, nil, { :method => :post }, "Set as Main Picture" -%>
             <% end -%>
 
-            <% avatar_path = eval("#{@avatar_owner_instance.class.name.downcase}_avatar_path(@avatar_owner_instance,avatar)") %>
+            <% avatar_path = polymorphic_path([@avatar_owner_instance, avatar]) %>
             <br/><%= image_tag_for_key "destroy", avatar_path, nil, { data: { confirm: 'Are you sure?' }, :method => :delete }, "Delete" -%>
         <% end -%>
       </div>

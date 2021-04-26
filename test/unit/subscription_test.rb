@@ -7,11 +7,9 @@ class SubscriptionTest < ActiveSupport::TestCase
     User.current_user = Factory(:user)
     @val = Seek::Config.email_enabled
     Seek::Config.email_enabled = true
-    Delayed::Job.delete_all
   end
 
   def teardown
-    Delayed::Job.delete_all
     Seek::Config.email_enabled = @val
   end
 
@@ -82,7 +80,7 @@ class SubscriptionTest < ActiveSupport::TestCase
 
     assert_enqueued_emails(1) do
       al = Factory(:activity_log, activity_loggable: s, action: 'update')
-      SendImmediateEmailsJob.new(al.id).perform
+      ImmediateSubscriptionEmailJob.perform_now(al)
     end
 
     other_guy = Factory(:person)
@@ -94,7 +92,7 @@ class SubscriptionTest < ActiveSupport::TestCase
 
     assert_enqueued_emails(2) do
       al = Factory(:activity_log, activity_loggable: s, action: 'update')
-      SendImmediateEmailsJob.new(al.id).perform
+      ImmediateSubscriptionEmailJob.perform_now(al)
     end
   end
 
@@ -119,7 +117,7 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert_no_emails do
       User.with_current_user(person) do
         al = Factory(:activity_log, activity_loggable: s, action: 'update')
-        SendImmediateEmailsJob.new(al.id).perform
+        ImmediateSubscriptionEmailJob.perform_now(al)
       end
     end
   end
@@ -140,7 +138,7 @@ class SubscriptionTest < ActiveSupport::TestCase
 
     assert_no_emails do
       al = Factory(:activity_log, activity_loggable: s, action: 'update')
-      SendImmediateEmailsJob.new(al.id).perform
+      ImmediateSubscriptionEmailJob.perform_now(al)
     end
   end
 
@@ -157,7 +155,7 @@ class SubscriptionTest < ActiveSupport::TestCase
 
     assert_no_emails do
       al = Factory(:activity_log, activity_loggable: s, action: 'update')
-      SendImmediateEmailsJob.new(al.id).perform
+      ImmediateSubscriptionEmailJob.perform_now(al)
     end
   end
 
@@ -166,9 +164,11 @@ class SubscriptionTest < ActiveSupport::TestCase
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
     assert Subscription.all.empty?
 
-    s = Factory(:subscribable, projects: [proj], policy: Factory(:public_policy),contributor:current_person)
-    assert SetSubscriptionsForItemJob.new(s, s.projects).exists?
-    SetSubscriptionsForItemJob.new(s, s.projects).perform
+    s = nil
+    assert_enqueued_with(job: SetSubscriptionsForItemJob) do
+      s = Factory(:subscribable, projects: [proj], policy: Factory(:public_policy),contributor:current_person)
+    end
+    SetSubscriptionsForItemJob.perform_now(s, s.projects)
 
     assert s.subscribed?(current_person)
     assert_equal 1, current_person.subscriptions.count
@@ -181,14 +181,15 @@ class SubscriptionTest < ActiveSupport::TestCase
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
     assert Subscription.all.empty?
 
-    investigation = Factory(:investigation, contributor: person, projects: [proj])
-    study = Factory(:study, contributor: person, investigation: investigation, policy: Factory(:public_policy))
+    investigation = nil
+    study = nil
+    assert_enqueued_jobs(2, only: SetSubscriptionsForItemJob) do
+      investigation = Factory(:investigation, contributor: person, projects: [proj])
+      study = Factory(:study, contributor: person, investigation: investigation, policy: Factory(:public_policy))
+    end
 
-    assert SetSubscriptionsForItemJob.new(study, study.projects).exists?
-    assert SetSubscriptionsForItemJob.new(investigation, investigation.projects).exists?
-
-    SetSubscriptionsForItemJob.new(study, study.projects).perform
-    SetSubscriptionsForItemJob.new(investigation, investigation.projects).perform
+    SetSubscriptionsForItemJob.perform_now(study, study.projects)
+    SetSubscriptionsForItemJob.perform_now(investigation, investigation.projects)
 
     assert study.subscribed?(current_person)
     assert investigation.subscribed?(current_person)
@@ -203,17 +204,18 @@ class SubscriptionTest < ActiveSupport::TestCase
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
     assert Subscription.all.empty?
 
-    assay = Factory(:assay, contributor: person, policy: Factory(:public_policy))
-    study = assay.study
-    investigation = assay.investigation
+    investigation = nil
+    study = nil
+    assay = nil
+    assert_enqueued_jobs(3, only: SetSubscriptionsForItemJob) do
+      assay = Factory(:assay, contributor: person, policy: Factory(:public_policy))
+      study = assay.study
+      investigation = assay.investigation
+    end
 
-    assert SetSubscriptionsForItemJob.new(assay, assay.projects).exists?
-    assert SetSubscriptionsForItemJob.new(study, study.projects).exists?
-    assert SetSubscriptionsForItemJob.new(investigation, investigation.projects).exists?
-
-    SetSubscriptionsForItemJob.new(assay, assay.projects).perform
-    SetSubscriptionsForItemJob.new(study, study.projects).perform
-    SetSubscriptionsForItemJob.new(investigation, investigation.projects).perform
+    SetSubscriptionsForItemJob.perform_now(assay, assay.projects)
+    SetSubscriptionsForItemJob.perform_now(study, study.projects)
+    SetSubscriptionsForItemJob.perform_now(investigation, investigation.projects)
 
     assert assay.subscribed?(current_person)
     assert study.subscribed?(current_person)
@@ -221,11 +223,11 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert_equal proj, current_person.subscriptions.first.project_subscription.project
 
     # changing study
-    assay.study = Factory(:study, contributor: person, investigation: Factory(:investigation, contributor: person, projects: [project2]))
-    disable_authorization_checks { assay.save }
-
-    RemoveSubscriptionsForItemJob.new(assay, assay.projects).exists?
-    RemoveSubscriptionsForItemJob.new(assay, [proj]).perform
+    assert_enqueued_with(job: RemoveSubscriptionsForItemJob, args: [assay, [proj]]) do
+      assay.study = Factory(:study, contributor: person, investigation: Factory(:investigation, contributor: person, projects: [project2]))
+      disable_authorization_checks { assay.save }
+    end
+    RemoveSubscriptionsForItemJob.perform_now(assay, [proj])
 
     assay.reload
     refute assay.subscribed?(current_person)
@@ -243,7 +245,7 @@ class SubscriptionTest < ActiveSupport::TestCase
     refute s2.subscribed?(current_person)
 
     project_subscription = current_person.project_subscriptions.create project: proj, frequency: 'weekly'
-    ProjectSubscriptionJob.new(project_subscription.id).perform
+    ProjectSubscriptionJob.perform_now(project_subscription)
     s1.reload
     s2.reload
     assert s1.subscribed?(current_person)
@@ -258,10 +260,12 @@ class SubscriptionTest < ActiveSupport::TestCase
     proj = current_person.projects.first
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
     projects = [proj]
-    s = Factory(:subscribable, projects: projects, policy: Factory(:public_policy), contributor:current_person)
+    s = nil
+    assert_enqueued_jobs(1, only: SetSubscriptionsForItemJob) do
+      s = Factory(:subscribable, projects: projects, policy: Factory(:public_policy), contributor:current_person)
+    end
 
-    assert SetSubscriptionsForItemJob.new(s, s.projects).exists?
-    SetSubscriptionsForItemJob.new(s, s.projects).perform
+    SetSubscriptionsForItemJob.perform_now(s, s.projects)
 
     assert s.subscribed?(current_person)
     assert_equal 1, current_person.subscriptions.count
@@ -271,17 +275,18 @@ class SubscriptionTest < ActiveSupport::TestCase
     updated_project = Factory(:project)
     current_person.add_to_project_and_institution(updated_project,Factory(:institution))
 
-    disable_authorization_checks do
-      s.projects = [updated_project]
-      s.save
+    assert_enqueued_with(job: RemoveSubscriptionsForItemJob, args: [s, [projects.first]]) do
+      assert_enqueued_with(job: SetSubscriptionsForItemJob, args: [s, [updated_project]]) do
+        disable_authorization_checks do
+          s.projects = [updated_project]
+          s.save
+        end
+      end
     end
     s.reload
 
-    assert RemoveSubscriptionsForItemJob.new(s, [projects.first]).exists?
-    RemoveSubscriptionsForItemJob.new(s, [projects.first]).perform
-
-    assert SetSubscriptionsForItemJob.new(s, [updated_project]).exists?
-    SetSubscriptionsForItemJob.new(s, [updated_project]).perform
+    RemoveSubscriptionsForItemJob.perform_now(s, [projects.first])
+    SetSubscriptionsForItemJob.perform_now(s, [updated_project])
 
     assert_equal 1, s.projects.count
     assert_equal updated_project, s.projects.first
@@ -291,11 +296,13 @@ class SubscriptionTest < ActiveSupport::TestCase
   end
 
   test 'should update subscription when associating the project to the item and a person subscribed to this project' do
-    s = Factory(:subscribable, policy: Factory(:public_policy))
+    s = nil
+    assert_enqueued_with(job: SetSubscriptionsForItemJob) do
+      s = Factory(:subscribable, policy: Factory(:public_policy))
+    end
     project = s.projects.first
 
-    assert SetSubscriptionsForItemJob.new(s, s.projects).exists?
-    SetSubscriptionsForItemJob.new(s, s.projects).perform
+    SetSubscriptionsForItemJob.perform_now(s, s.projects)
 
     refute s.subscribed?(current_person)
 
@@ -303,13 +310,14 @@ class SubscriptionTest < ActiveSupport::TestCase
     proj = Factory(:project)
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
 
-    disable_authorization_checks do
-      s.projects << proj
-      s.save
+    assert_enqueued_with(job: SetSubscriptionsForItemJob, args: [s, [proj]]) do
+      disable_authorization_checks do
+        s.projects << proj
+        s.save
+      end
     end
 
-    assert SetSubscriptionsForItemJob.new(s, [proj]).exists?
-    SetSubscriptionsForItemJob.new(s, [proj]).perform
+    SetSubscriptionsForItemJob.perform_now(s, [proj])
 
     s.reload
     assert s.subscribed?(current_person)
@@ -328,16 +336,19 @@ class SubscriptionTest < ActiveSupport::TestCase
     current_person.project_subscriptions.create project: proj1, frequency: 'weekly'
     current_person.project_subscriptions.create project: proj2, frequency: 'weekly'
 
-    disable_authorization_checks do
-      s.projects = [proj1, proj2]
-      s.save
+    assert_enqueued_with(job: SetSubscriptionsForItemJob, args: [s, [proj1]]) do
+      assert_enqueued_with(job: SetSubscriptionsForItemJob, args: [s, [proj2]]) do
+        assert_enqueued_with(job: RemoveSubscriptionsForItemJob, args: [s, [project]]) do
+          disable_authorization_checks do
+            s.projects = [proj1, proj2]
+            s.save
+          end
+        end
+      end
     end
 
-    assert SetSubscriptionsForItemJob.new(s, [proj1]).exists?
-    assert SetSubscriptionsForItemJob.new(s, [proj2]).exists?
-    assert RemoveSubscriptionsForItemJob.new(s, [project]).exists?
-    SetSubscriptionsForItemJob.new(s, [proj1]).perform
-    SetSubscriptionsForItemJob.new(s, [proj2]).perform
+    SetSubscriptionsForItemJob.perform_now(s, [proj1])
+    SetSubscriptionsForItemJob.perform_now(s, [proj2])
 
     s.reload
     assert s.subscribed?(current_person)
@@ -352,16 +363,16 @@ class SubscriptionTest < ActiveSupport::TestCase
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
     assert Subscription.all.empty?
 
-    assay = Factory(:assay, contributor: person, policy: Factory(:public_policy))
+    assay = nil
+    assert_enqueued_jobs(3, only: SetSubscriptionsForItemJob) do
+      assay = Factory(:assay, contributor: person, policy: Factory(:public_policy))
+    end
     study = assay.study
     investigation = assay.investigation
 
-    assert SetSubscriptionsForItemJob.new(assay, assay.projects).exists?
-    assert SetSubscriptionsForItemJob.new(study, study.projects).exists?
-    assert SetSubscriptionsForItemJob.new(investigation, investigation.projects).exists?
-    SetSubscriptionsForItemJob.new(assay, assay.projects).perform
-    SetSubscriptionsForItemJob.new(study, study.projects).perform
-    SetSubscriptionsForItemJob.new(investigation, investigation.projects).perform
+    SetSubscriptionsForItemJob.perform_now(assay, assay.projects)
+    SetSubscriptionsForItemJob.perform_now(study, study.projects)
+    SetSubscriptionsForItemJob.perform_now(investigation, investigation.projects)
 
     assert investigation.subscribed?(current_person)
     assert study.subscribed?(current_person)
@@ -369,16 +380,18 @@ class SubscriptionTest < ActiveSupport::TestCase
 
     # changing projects associated with the investigation
     investigation.reload
-    disable_authorization_checks do
-      investigation.projects = [project2]
-      investigation.save
+
+    assert_enqueued_with(job: SetSubscriptionsForItemJob, args: [investigation, investigation.projects]) do
+      assert_enqueued_with(job: RemoveSubscriptionsForItemJob, args: [investigation, [proj]]) do
+        disable_authorization_checks do
+          investigation.projects = [project2]
+          investigation.save
+        end
+      end
     end
 
-    assert SetSubscriptionsForItemJob.new(investigation, investigation.projects).exists?
-    SetSubscriptionsForItemJob.new(investigation, investigation.projects).perform
-
-    assert RemoveSubscriptionsForItemJob.new(investigation, [proj]).exists?
-    RemoveSubscriptionsForItemJob.new(investigation, [proj]).perform
+    SetSubscriptionsForItemJob.perform_now(investigation, investigation.projects)
+    RemoveSubscriptionsForItemJob.perform_now(investigation, [proj])
 
     investigation.reload
     study.reload
@@ -396,16 +409,17 @@ class SubscriptionTest < ActiveSupport::TestCase
 
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
     assert Subscription.all.empty?
-    investigation = Factory(:investigation, contributor: person, projects: [project2])
-    study = Factory(:study, contributor: person, investigation: investigation)
-    assay = Factory(:assay, contributor: person, study: study, policy: Factory(:public_policy))
-
-    assert SetSubscriptionsForItemJob.new(assay, assay.projects).exists?
-    assert SetSubscriptionsForItemJob.new(study, study.projects).exists?
-    assert SetSubscriptionsForItemJob.new(investigation, investigation.projects).exists?
-    SetSubscriptionsForItemJob.new(assay, assay.projects).perform
-    SetSubscriptionsForItemJob.new(study, study.projects).perform
-    SetSubscriptionsForItemJob.new(investigation, investigation.projects).perform
+    investigation = nil
+    study = nil
+    assay = nil
+    assert_enqueued_jobs(3, only: SetSubscriptionsForItemJob) do
+      investigation = Factory(:investigation, contributor: person, projects: [project2])
+      study = Factory(:study, contributor: person, investigation: investigation)
+      assay = Factory(:assay, contributor: person, study: study, policy: Factory(:public_policy))
+    end
+    SetSubscriptionsForItemJob.perform_now(assay, assay.projects)
+    SetSubscriptionsForItemJob.perform_now(study, study.projects)
+    SetSubscriptionsForItemJob.perform_now(investigation, investigation.projects)
 
     refute investigation.subscribed?(current_person)
     refute study.subscribed?(current_person)
@@ -413,13 +427,14 @@ class SubscriptionTest < ActiveSupport::TestCase
 
     # changing projects associated with the investigation
     investigation.reload
-    disable_authorization_checks do
-      investigation.projects = [proj]
-      investigation.save
+    assert_enqueued_with(job: SetSubscriptionsForItemJob, args: [investigation, [proj]]) do
+      disable_authorization_checks do
+        investigation.projects = [proj]
+        investigation.save
+      end
     end
 
-    assert SetSubscriptionsForItemJob.new(investigation, [proj]).exists?
-    SetSubscriptionsForItemJob.new(investigation, [proj]).perform
+    SetSubscriptionsForItemJob.perform_now(investigation, [proj])
 
     investigation.reload
     study.reload
@@ -438,16 +453,18 @@ class SubscriptionTest < ActiveSupport::TestCase
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
     assert Subscription.all.empty?
 
-    assay = Factory(:assay, contributor: person, policy: Factory(:public_policy))
-    study = assay.study
-    investigation = assay.investigation
+    investigation = nil
+    study = nil
+    assay = nil
+    assert_enqueued_jobs(3, only: SetSubscriptionsForItemJob) do
+      assay = Factory(:assay, contributor: person, policy: Factory(:public_policy))
+      study = assay.study
+      investigation = assay.investigation
+    end
 
-    assert SetSubscriptionsForItemJob.new(assay, assay.projects).exists?
-    assert SetSubscriptionsForItemJob.new(study, study.projects).exists?
-    assert SetSubscriptionsForItemJob.new(investigation, investigation.projects).exists?
-    SetSubscriptionsForItemJob.new(assay, assay.projects).perform
-    SetSubscriptionsForItemJob.new(study, study.projects).perform
-    SetSubscriptionsForItemJob.new(investigation, investigation.projects).perform
+    SetSubscriptionsForItemJob.perform_now(assay, assay.projects)
+    SetSubscriptionsForItemJob.perform_now(study, study.projects)
+    SetSubscriptionsForItemJob.perform_now(investigation, investigation.projects)
 
     assert investigation.subscribed?(current_person)
     assert study.subscribed?(current_person)
@@ -455,17 +472,20 @@ class SubscriptionTest < ActiveSupport::TestCase
 
     # changing investigation associated with the study
     study.reload
-    new_investigation = Factory(:investigation, contributor: person, projects: [project2])
-    disable_authorization_checks do
-      study.investigation = new_investigation
-      study.save
+    assert_enqueued_jobs(2, only: RemoveSubscriptionsForItemJob) do
+      assert_enqueued_with(job: RemoveSubscriptionsForItemJob, args: [assay, [proj]]) do
+        assert_enqueued_with(job: RemoveSubscriptionsForItemJob, args: [study, [proj]]) do
+          new_investigation = Factory(:investigation, contributor: person, projects: [project2])
+          disable_authorization_checks do
+            study.investigation = new_investigation
+            study.save
+          end
+        end
+      end
     end
 
-    assert RemoveSubscriptionsForItemJob.new(assay, [proj]).exists?
-    assert RemoveSubscriptionsForItemJob.new(study, [proj]).exists?
-    refute RemoveSubscriptionsForItemJob.new(investigation, [proj]).exists?
-    RemoveSubscriptionsForItemJob.new(assay, [proj]).perform
-    RemoveSubscriptionsForItemJob.new(study, [proj]).perform
+    RemoveSubscriptionsForItemJob.perform_now(assay, [proj])
+    RemoveSubscriptionsForItemJob.perform_now(study, [proj])
 
     investigation.reload
     study.reload
@@ -484,16 +504,18 @@ class SubscriptionTest < ActiveSupport::TestCase
     current_person.project_subscriptions.create project: proj, frequency: 'weekly'
     assert Subscription.all.empty?
 
-    investigation = Factory(:investigation, contributor: person, projects: [proj])
-    study = Factory(:study, contributor: person, investigation: Factory(:investigation, contributor: person, projects: [project2]))
-    assay = Factory(:assay, contributor: person, study: study, policy: Factory(:public_policy))
+    investigation = nil
+    study = nil
+    assay = nil
+    assert_enqueued_jobs(4, only: SetSubscriptionsForItemJob) do # 2 investigations, 1 study, 1 assay
+      investigation = Factory(:investigation, contributor: person, projects: [proj])
+      study = Factory(:study, contributor: person, investigation: Factory(:investigation, contributor: person, projects: [project2]))
+      assay = Factory(:assay, contributor: person, study: study, policy: Factory(:public_policy))
+    end
 
-    assert SetSubscriptionsForItemJob.new(assay, assay.projects).exists?
-    assert SetSubscriptionsForItemJob.new(study, study.projects).exists?
-    assert SetSubscriptionsForItemJob.new(investigation, investigation.projects).exists?
-    SetSubscriptionsForItemJob.new(assay, assay.projects).perform
-    SetSubscriptionsForItemJob.new(study, study.projects).perform
-    SetSubscriptionsForItemJob.new(investigation, investigation.projects).perform
+    SetSubscriptionsForItemJob.perform_now(assay, assay.projects)
+    SetSubscriptionsForItemJob.perform_now(study, study.projects)
+    SetSubscriptionsForItemJob.perform_now(investigation, investigation.projects)
 
     assert investigation.subscribed?(current_person)
     refute study.subscribed?(current_person)
@@ -501,18 +523,20 @@ class SubscriptionTest < ActiveSupport::TestCase
 
     # changing investigation associated with the study
     study.reload
-    disable_authorization_checks do
-      study.investigation = investigation
-      study.save!
+    assert_enqueued_with(job: SetSubscriptionsForItemJob, args: [assay, investigation.projects]) do
+      assert_enqueued_with(job: SetSubscriptionsForItemJob, args: [study, investigation.projects]) do
+        disable_authorization_checks do
+          study.investigation = investigation
+          study.save!
+        end
+      end
     end
 
     investigation.reload
     assay.reload
 
-    assert SetSubscriptionsForItemJob.new(assay, assay.projects).exists?
-    assert SetSubscriptionsForItemJob.new(study, study.projects).exists?
-    SetSubscriptionsForItemJob.new(assay, assay.projects).perform
-    SetSubscriptionsForItemJob.new(study, study.projects).perform
+    SetSubscriptionsForItemJob.perform_now(assay, assay.projects)
+    SetSubscriptionsForItemJob.perform_now(study, study.projects)
 
     investigation.reload
     study.reload

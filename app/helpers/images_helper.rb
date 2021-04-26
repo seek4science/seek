@@ -68,7 +68,7 @@ module ImagesHelper
   end
 
   def model_image_url(model_instance, model_image_id, size = nil)
-    basic_url = eval("model_model_image_path(#{model_instance.id}, #{model_image_id})")
+    basic_url = model_model_image_path(model_instance, model_image_id)
 
     basic_url = append_size_parameter(basic_url, size)
 
@@ -86,7 +86,12 @@ module ImagesHelper
   def delete_icon(model_item, user)
     item_name = text_for_resource model_item
     if model_item.can_delete?(user)
-      html = content_tag(:li) { image_tag_for_key('destroy', url_for(model_item), "Delete #{item_name}", { data: { confirm: 'Are you sure?' }, method: :delete }, "Delete #{item_name}") }
+      fullURL = url_for(model_item)
+
+      ## Add return path if available
+      fullURL = polymorphic_url(model_item,:return_to=>URI(request.referer).path) if request.referer
+
+      html = content_tag(:li) { image_tag_for_key('destroy', fullURL, "Delete #{item_name}", { data: { confirm: 'Are you sure?' }, method: :delete}, "Delete #{item_name}") }
       return html.html_safe
     elsif model_item.can_manage?(user)
       explanation = unable_to_delete_text model_item

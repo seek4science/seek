@@ -3,11 +3,9 @@ module Seek
     module StateBasedPermissions
       def self.included(_klass)
         Seek::Permissions::ActsAsAuthorized::AUTHORIZATION_ACTIONS.each do |action|
-          eval <<-END_EVAL
-            def state_allows_#{action}? user = User.current_user
-                return true
-            end
-          END_EVAL
+          define_method "state_allows_#{action}?" do |_user = User.current_user|
+            true
+          end
         end
       end
     end
