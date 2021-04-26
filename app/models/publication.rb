@@ -550,7 +550,8 @@ class Publication < ApplicationRecord
       Bio::Reference.new({ title: title, journal: journal, abstract: abstract,
                            authors: publication_authors.map { |e| e.person ? [e.person.last_name, e.person.first_name].join(', ') : [e.last_name, e.first_name].join(', ') },
                            year: published_date.try(:year),
-                           url: url
+                           url: url,
+                           doi: doi
                            }.with_indifferent_access)
     end
   end
