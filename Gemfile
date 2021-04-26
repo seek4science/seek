@@ -5,7 +5,7 @@ gem 'rails', '~> 5.2.4'
 gem 'rdoc'
 
 #database adaptors
-gem 'mysql2'
+gem 'mysql2', '0.5.2'
 gem 'pg'
 gem 'sqlite3'
 
@@ -32,7 +32,8 @@ gem 'linkeddata'
 gem 'rdf'
 
 
-gem 'openseek-api'
+#gem 'openseek-api'
+gem "openseek-api", :git=>"https://github.com/FAIRdom/openseek-api-gem.git"
 # for fancy content escaping in openbis integration
 gem 'loofah'
 gem 'jbuilder'
@@ -166,7 +167,7 @@ group :test do
   gem 'ruby-prof', '0.15.9'
   gem 'test-prof'
   gem 'rails-perftest'
-  gem 'minitest', '5.10.3'
+  gem 'minitest', '5.14.4'
   gem 'minitest-reporters'
   gem 'sunspot_matchers'
   gem 'database_cleaner', '~> 1.7.0'
