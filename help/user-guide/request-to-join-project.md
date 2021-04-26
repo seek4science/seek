@@ -5,6 +5,8 @@ layout: page
 
 # Requesting membership of a Project
 
+For details about what a Project and Programme is, please see [Creating a Project](./create-a-project.html)
+
 If you didn't specify a Project during [registration](registering.html), and you don't know how to contact the [Project administrators](roles.html#project-administrator),
 you can request to join a project.
 

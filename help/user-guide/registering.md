@@ -4,7 +4,7 @@ layout: page
 ---
 
 # Registering in SEEK
-In order to register yourself in SEEK, you need to click Register button in the top right hand corner of SEEK.
+In order to register yourself in SEEK, you need to click the Register button in the top right hand corner of SEEK.
 
 ![Registration 1](/images/user-guide/register_1.png){:.screenshot}
 
