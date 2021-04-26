@@ -140,7 +140,7 @@ class Person < ApplicationRecord
     super + ['first_name','last_name']
   end
   def columns_allowed
-    super + ['first_name','last_name','email','phone','skype_name','web_page','orcid']
+    columns_default + ['email','phone','skype_name','web_page','orcid']
   end
 
   # not registered profiles that match this email
@@ -212,6 +212,11 @@ class Person < ApplicationRecord
     shares_project?(other_item) || shares_programme?(other_item)
   end
 
+  # Do not allow discussion of people
+  def self.is_discussable?
+    return false
+  end
+  
   def self.userless_people
     Person.includes(:user).select { |p| p.user.nil? }
   end
@@ -410,6 +415,12 @@ class Person < ApplicationRecord
   def administered_projects
     projects.select{|proj| person.is_project_administrator?(proj)}
   end
+
+  # activation email logs associated with this person
+  def activation_email_logs
+    MessageLog.activation_email_logs(self)
+  end
+
 
   private
 

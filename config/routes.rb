@@ -119,8 +119,7 @@ SEEK::Application.routes.draw do
       get :settings
       get :get_stats
       get :registration_form
-      get :edit_tag
-      get :project_creation_requests
+      get :edit_tag      
       post :update_home_settings
       post :restart_server
       post :restart_delayed_job
@@ -224,6 +223,7 @@ SEEK::Application.routes.draw do
     member do
       put :set_openid
       post :resend_activation_email
+      post :activate, to: 'users#activate_other', as: 'activate_other'
     end
     resources :oauth_sessions, only: [:index, :destroy]
     resources :identities, only: [:index, :destroy]
@@ -286,6 +286,8 @@ SEEK::Application.routes.draw do
       get :administer_create_project_request
       post :respond_create_project_request
       get :project_join_requests
+      get :project_creation_requests
+      get  :typeahead
     end
     member do
       get :asset_report
@@ -650,9 +652,18 @@ SEEK::Application.routes.draw do
     resources :projects, only: [:index]
   end
 
+  ### SAMPLE ATTRIBUTE TYPES ###
+
+  resources :sample_attribute_types, only: [:index, :show]
+
   ### SAMPLE CONTROLLED VOCABS ###
 
-  resources :sample_controlled_vocabs
+  resources :sample_controlled_vocabs do
+    collection do
+      get :typeahead
+      get :fetch_ols_terms
+    end
+  end
 
   ### DOCUMENTS
 

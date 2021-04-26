@@ -2,7 +2,7 @@
 
   <% if @sample_type.template %>
       <%= @sample_type.template.original_filename %> -    <%= link_to 'Download',download_sample_type_content_blob_path(@sample_type,@sample_type.template)  %>
-  <% elsif SampleTemplateGeneratorJob.new(@sample_type).exists?(false) %>
+  <% elsif @sample_type.template_generation_task&.pending? %>
       <div class="alert alert-info" role="alert">
         A template for this Sample type is being generated and will be available soon.
         <%= image 'spinner' %>

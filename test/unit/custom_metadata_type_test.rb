@@ -55,4 +55,18 @@ class CustomMetadataTypeTest < ActiveSupport::TestCase
     refute_nil (attr = cmt.attribute_by_title('full name'))
     assert_equal 'full name', attr.title
   end
+  
+  test 'destroy' do
+    cmt = Factory(:simple_investigation_custom_metadata_type)
+    attributes = cmt.custom_metadata_attributes
+    assert_equal [], attributes.select(&:destroyed?)
+    assert_equal 3, attributes.count
+    assert_difference('CustomMetadataType.count',-1) do
+      assert_difference('CustomMetadataAttribute.count',-3) do
+        cmt.destroy
+      end
+    end
+    assert cmt.destroyed?
+    assert_equal attributes, attributes.select(&:destroyed?)
+  end
 end

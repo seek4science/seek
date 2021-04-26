@@ -728,55 +728,78 @@ class SampleTypeTest < ActiveSupport::TestCase
 
   test 'queue template generation' do
     # avoid the callback, which will automatically call queue_template_generation
-    SampleType.skip_callback(:save, :after, :queue_template_generation)
-
     type = Factory(:simple_sample_type, project_ids: @project_ids)
-    assert_difference('Delayed::Job.count', 1) do
-      type.queue_template_generation
+    type.template_generation_task.destroy!
+    type.reload
+
+    assert_difference('Task.count', 1) do
+      assert_enqueued_with(job: SampleTemplateGeneratorJob, args: [type]) do
+        type.queue_template_generation
+      end
     end
 
     type_with_uploaded_template = Factory(:simple_sample_type,
                                           content_blob: Factory(:sample_type_template_content_blob),
                                           uploaded_template: true,
                                           project_ids: @project_ids)
-    assert_no_difference('Delayed::Job.count') do
-      assert_no_difference('ContentBlob.count') do
-        type_with_uploaded_template.queue_template_generation
-        type_with_uploaded_template = SampleType.find(type_with_uploaded_template.id)
-        refute_nil type_with_uploaded_template.content_blob
+    refute type_with_uploaded_template.template_generation_task.pending?
+
+    assert_no_difference('Task.count') do
+      assert_no_enqueued_jobs(only: SampleTemplateGeneratorJob) do
+        assert_no_difference('ContentBlob.count') do
+          type_with_uploaded_template.queue_template_generation
+          type_with_uploaded_template = SampleType.find(type_with_uploaded_template.id)
+          refute_nil type_with_uploaded_template.content_blob
+          refute type_with_uploaded_template.template_generation_task.pending?
+        end
       end
     end
 
-    type_with_blob = Factory(:simple_sample_type, content_blob: Factory(:sample_type_template_content_blob))
-    assert_difference('Delayed::Job.count', 1) do
-      assert_difference('ContentBlob.count', -1) do
-        type_with_blob.queue_template_generation
-        type_with_blob = SampleType.find(type_with_blob.id)
-        assert_nil type_with_blob.content_blob
+    type_with_blob = Factory(:simple_sample_type)
+    type_with_blob.template_generation_task.destroy!
+    type_with_blob.reload
+    type_with_blob.content_blob = Factory(:sample_type_template_content_blob)
+    assert_difference('Task.count', 1) do
+      assert_enqueued_with(job: SampleTemplateGeneratorJob, args: [type_with_blob]) do
+        assert_difference('ContentBlob.count', -1) do
+          type_with_blob.queue_template_generation
+          type_with_blob = SampleType.find(type_with_blob.id)
+          assert_nil type_with_blob.content_blob
+          assert type_with_blob.template_generation_task.pending?
+        end
       end
     end
-
-    SampleType.set_callback(:save, :after, :queue_template_generation)
   end
 
   test 'trigger template generation on save' do
-    Delayed::Job.destroy_all
-    sample_type = Factory.build(:simple_sample_type, project_ids: @project_ids)
-    refute SampleTemplateGeneratorJob.new(sample_type).exists?
+    sample_type = nil
+    assert_no_enqueued_jobs(only: SampleTemplateGeneratorJob) do
+      sample_type = Factory.build(:simple_sample_type, project_ids: @project_ids)
+    end
 
     assert sample_type.valid?
-
     assert sample_type.new_record?
-    disable_authorization_checks { sample_type.save! }
-    assert SampleTemplateGeneratorJob.new(sample_type).exists?
+    refute sample_type.template_generation_task.pending?
+
+    assert_difference('Task.count', 1) do
+      assert_enqueued_with(job: SampleTemplateGeneratorJob, args: [sample_type]) do
+        disable_authorization_checks { sample_type.save! }
+        assert sample_type.reload.template_generation_task.pending?
+      end
+    end
 
     sample_type = Factory(:simple_sample_type)
-    Delayed::Job.destroy_all
-    refute SampleTemplateGeneratorJob.new(sample_type).exists?
+    assert sample_type.template_generation_task
+    sample_type.template_generation_task.destroy!
+    refute sample_type.reload.template_generation_task.pending?
 
-    sample_type.title = 'sample type test job'
-    disable_authorization_checks { sample_type.save! }
-    assert SampleTemplateGeneratorJob.new(sample_type).exists?
+    assert_difference('Task.count', 1) do
+      assert_enqueued_with(job: SampleTemplateGeneratorJob, args: [sample_type]) do
+        sample_type.title = 'sample type test job'
+        disable_authorization_checks { sample_type.save! }
+        assert sample_type.reload.template_generation_task.pending?
+      end
+    end
   end
 
   test 'generate template' do

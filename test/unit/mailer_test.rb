@@ -7,14 +7,14 @@ class MailerTest < ActionMailer::TestCase
     disable_authorization_checks { Person.where('first_name = ?', 'default admin').destroy_all }
   end
 
-  test 'signup' do
+  test 'activation_request' do
     @expected.subject = 'Sysmo SEEK account activation'
     @expected.to = 'Aaron Spiggle <aaron@email.com>'
     @expected.from    = 'no-reply@sysmo-db.org'
 
-    @expected.body    = read_fixture('signup')
+    @expected.body    = read_fixture('activation_request')
 
-    assert_equal encode_mail(@expected), encode_mail(Mailer.signup(users(:aaron)))
+    assert_equal encode_mail(@expected), encode_mail(Mailer.activation_request(users(:aaron)))
   end
 
   test 'announcement notification' do
@@ -343,6 +343,28 @@ class MailerTest < ActionMailer::TestCase
         email = Mailer.request_create_project_for_programme(sender.user, programme, project.to_json, institution.to_json,log)
         refute_nil email
         refute_nil email.body
+        assert_equal [programme_admin.email],email.to
+      end
+    end
+  end
+
+  test 'request create project for programme admins' do
+    admin = Factory(:admin)
+    programme_admin = Factory(:programme_administrator)
+    programme = programme_admin.programmes.first
+    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+      with_config_value(:site_base_host, 'https://securefred.com:1337') do        
+        with_config_value(:managed_programme_id, programme.id) do
+          refute_empty programme.programme_administrators
+          project = Project.new(title:'My lovely project')
+          institution = Factory(:institution)
+          sender = Factory(:person)
+          log = MessageLog.log_project_creation_request(sender,programme,project,institution)
+          email = Mailer.request_create_project_for_programme_admins(sender.user, programme, project.to_json, institution.to_json,log)
+          refute_nil email
+          refute_nil email.body
+          assert_equal Person.admins.collect(&:email), email.to
+        end        
       end
     end
   end
@@ -371,7 +393,7 @@ class MailerTest < ActionMailer::TestCase
         log = MessageLog.log_project_creation_request(sender,programme,project,institution)
         email = Mailer.request_create_project_and_programme(sender.user, programme.to_json, project.to_json, institution.to_json,log)
         refute_nil email
-        refute_nil email.body
+        refute_nil email.body        
       end
     end
   end

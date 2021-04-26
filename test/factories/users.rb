@@ -9,7 +9,8 @@ end
 # activated_user mainly exists for :person to use in its association
 Factory.define(:activated_user, parent: :brand_new_user) do |f|
   f.after_create do |u|
-    u.activate
+    u.update_column(:activated_at,Time.now.utc)
+    u.update_column(:activation_code, nil)
   end
 end
 

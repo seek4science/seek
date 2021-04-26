@@ -1,0 +1,33 @@
+{
+    "data": {
+        "id": "41",
+        "type": "sample_controlled_vocabs",
+        "attributes": {
+            "title": "Organism",
+            "description": null,
+            "source_ontology": null,
+            "ols_root_term_uri": null,
+            "required": null,
+            "short_name": null,
+            "sample_controlled_vocab_terms_attributes": null,
+            "repository_standard": null
+        },
+        "relationships": {
+            "sample_controlled_vocab_terms": {
+                "data": []
+            }
+        },
+        "links": {
+            "self": "/sample_controlled_vocabs/41"
+        },
+        "meta": {
+            "created": "2020-11-11T11:25:46.000Z",
+            "modified": "2020-11-11T11:25:46.000Z",
+            "api_version": "0.3",
+            "base_url": "http://localhost:3000"
+        }
+    },
+    "jsonapi": {
+        "version": "1.0"
+    }
+}

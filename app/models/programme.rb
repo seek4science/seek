@@ -41,6 +41,8 @@ class Programme < ApplicationRecord
   after_save :handle_administrator_ids, if: -> { @administrator_ids }
   before_create :activate_on_create
 
+
+
   # scopes
   scope :activated, -> { where(is_activated: true) }
   scope :not_activated, -> { where(is_activated: false) }
@@ -100,6 +102,10 @@ class Programme < ApplicationRecord
 
   def can_activate?(user = User.current_user)
     user && user.is_admin? && !is_activated?
+  end
+
+  def allows_user_projects?
+    open_for_projects?
   end
 
   def self.can_create?

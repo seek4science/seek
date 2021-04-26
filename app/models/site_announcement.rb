@@ -18,7 +18,7 @@ class SiteAnnouncement < ApplicationRecord
 
   def send_announcement_emails
     if email_notification?
-      SendAnnouncementEmailsJob.new(id).queue_job
+      SendAnnouncementEmailsJob.new(self).queue_job
     end
   end
 

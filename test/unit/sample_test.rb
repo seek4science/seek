@@ -1064,4 +1064,29 @@ class SampleTest < ActiveSupport::TestCase
     assert_equal 'B', sample.get_attribute_value('name ++##!')
     assert_equal 'C', sample.get_attribute_value('size range (bp)')
   end
+
+  test 'data file sample' do
+    project = Factory(:project)
+    sample_type = Factory(:data_file_sample_type, project_ids:[project.id])
+    sample = Sample.new(sample_type: sample_type, project_ids: [project.id])
+    df = Factory(:data_file)
+
+    sample.update_attributes(data:{'data file':df.id})
+    assert sample.valid?
+    sample.save!
+
+    sample.reload
+    expected = {id:df.id,type:'DataFile',title:df.title}.with_indifferent_access
+    assert_equal expected, sample.get_attribute_value('data file')
+
+    sample = Sample.new(sample_type: sample_type, project_ids: [project.id])
+    sample.set_attribute_value('data file',df.id)
+    assert sample.valid?
+    sample.save!
+
+    sample.reload
+    expected = {'id':df.id,type:'DataFile',title:df.title}.with_indifferent_access
+    assert_equal expected, sample.get_attribute_value('data file')
+
+  end
 end

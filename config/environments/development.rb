@@ -30,6 +30,8 @@ SEEK::Application.configure do
   # Debug mode disables concatenation and preprocessing of assets.
   config.assets.debug = true
 
+  #config.assets.check_precompiled_asset = false
+
   # Asset digests allow you to set far-future HTTP expiration dates on all assets,
   # yet still be able to expire them through the digest params.
   config.assets.digest = true
@@ -46,10 +48,7 @@ SEEK::Application.configure do
   # Raises error for missing translations
   config.action_view.raise_on_missing_translations = true
 
-  # config.log_level = :warn
-  # disable SQL logs from active record by TZ
-  ActiveRecord::Base.logger = Logger.new(STDOUT)
-  ActiveRecord::Base.logger.level = 1
+  config.log_level = :info
 
   # Don't log asset requests
   config.assets.quiet = true

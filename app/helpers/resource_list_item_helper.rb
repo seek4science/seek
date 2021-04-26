@@ -271,6 +271,30 @@ module ResourceListItemHelper
     end
   end
 
+  def table_item_person_list(contributors, other_contributors = nil, key = t('creator').capitalize)
+    contributor_count = contributors.count
+    contributor_count += 1 unless other_contributors.blank?
+    html = ''
+    other_html = ''
+    if (key == 'Author')
+      html << contributors.map do |author|
+        if author.person
+          link_to author.full_name, show_resource_path(author.person)
+        else
+          author.full_name
+        end
+      end.join(', ')
+    else
+      html << contributors.map {|c| link_to truncate(c.title, length: 75), show_resource_path(c), title: get_object_title(c)}.join(', ')
+    end
+    unless other_contributors.blank?
+      other_html << ', ' unless contributors.empty?
+      other_html << other_contributors
+    end
+    other_html << 'None' if contributor_count == 0
+    html.html_safe + other_html
+  end
+
   def list_item_author_list(all_authors)
     list_item_person_list(all_authors, nil, 'Author')
   end

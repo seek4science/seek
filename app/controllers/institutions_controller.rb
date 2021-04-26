@@ -107,7 +107,7 @@ class InstitutionsController < ApplicationController
     end
 
     if params[:include_new]
-      items.unshift({id:-1, name:params[:query],web_page:'',country:'', country_name:'',city:'',hint:"new item", new:true})
+      items.unshift({id:-1, name:params[:query], web_page: '', country: '', country_name: '', city: '', hint:"new item", new: true })
     end
 
     respond_to do |format|
@@ -130,7 +130,8 @@ class InstitutionsController < ApplicationController
   private
 
   def institution_params
-    params.require(:institution).permit(:title, :web_page, :address, :city, :country)
+    params.require(:institution).permit(:title, :web_page, :address, :city, :country,
+                                        discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
   def editable_by_user

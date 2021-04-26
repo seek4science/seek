@@ -43,6 +43,8 @@
 
 <%= f.fancy_multiselect :publications, { other_projects_checkbox: true } %>
 
+<%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @study} -%>
+
 <%#= render partial: 'custom_metadata/custom_metadata_fields_form_input', locals:{f:f, resource:@study} %>
 
 <%= form_submit_buttons(@study) %>

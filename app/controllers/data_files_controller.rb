@@ -265,7 +265,7 @@ class DataFilesController < ApplicationController
 
   def extraction_status
     @previous_status = params[:previous_status]
-    @job_status = SampleDataExtractionJob.get_status(@data_file)
+    @job_status = @data_file.sample_extraction_task.status
 
     respond_to do |format|
       format.html { render partial: 'data_files/sample_extraction_status', locals: { data_file: @data_file } }
@@ -313,6 +313,12 @@ class DataFilesController < ApplicationController
   # handles the uploading of the file to create a content blob, which is then associated with a new unsaved datafile
   # and stored on the session
   def create_content_blob
+    # clean up the session
+    session.delete(:uploaded_content_blob_id)
+    session.delete(:processed_datafile)
+    session.delete(:processed_assay)
+    session.delete(:processed_warnings)
+
     @data_file = setup_new_asset
     respond_to do |format|
       if handle_upload_data && @data_file.content_blob.save
@@ -342,6 +348,7 @@ class DataFilesController < ApplicationController
         @warnings.merge(warnings)
       else
         critical_error_msg = "The file that was requested to be processed doesn't match that which had been uploaded"
+        notify_content_blob_mismatch(params[:content_blob_id], session[:uploaded_content_blob_id])
       end
     rescue Exception => e
       Seek::Errors::ExceptionForwarder.send_notification(e, data:{message: "Problem attempting to extract from RightField for content blob #{params[:content_blob_id]}"})
@@ -358,6 +365,18 @@ class DataFilesController < ApplicationController
       else
         format.js { render plain: 'done', status: :ok }
       end
+    end
+  end
+
+  def notify_content_blob_mismatch(param_id, session_id)
+    begin
+      raise 'Content blob mismatch during data file creation'
+    rescue RuntimeError => e
+      Seek::Errors::ExceptionForwarder.send_notification(e, data:{
+        message: "Parameter and Session Content Blob id don't match",
+        param_blob_id: param_id.inspect,
+        session_blob_id: session_id.inspect
+      })
     end
   end
 
@@ -403,6 +422,10 @@ class DataFilesController < ApplicationController
     # check the content blob id matches that previously uploaded and recorded on the session
     all_valid = uploaded_blob_matches = (params[:content_blob_id].to_s == session[:uploaded_content_blob_id].to_s)
 
+    unless uploaded_blob_matches
+      notify_content_blob_mismatch(params[:content_blob_id], session[:uploaded_content_blob_id])
+    end
+
     #associate the content blob with the data file
     blob = ContentBlob.find(params[:content_blob_id])
     @data_file.content_blob = blob
@@ -415,12 +438,7 @@ class DataFilesController < ApplicationController
 
     if all_valid
 
-      update_relationships(@data_file, params)
-
-      session.delete(:uploaded_content_blob_id)
-      session.delete(:processed_datafile)
-      session.delete(:processed_assay)
-      session.delete(:processed_warnings)
+      update_relationships(@data_file, params)      
 
       respond_to do |format|
         flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
