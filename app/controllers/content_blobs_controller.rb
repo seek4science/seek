@@ -67,6 +67,7 @@ class ContentBlobsController < ApplicationController
       format.csv { csv_data }
     end
   end
+=begin
 
   def examine_url
     # check content type and size
@@ -96,6 +97,7 @@ class ContentBlobsController < ApplicationController
       handle_exception_response(e)
     end
   end
+=end
 
   def get_pdf
     if @content_blob.file_exists?

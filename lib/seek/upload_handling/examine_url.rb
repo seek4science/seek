@@ -7,6 +7,8 @@ module Seek
         # add the keep_title parameter!
         # check content type and size
         url = params[:data_url]
+        keep_title = !params['keep_title'].nil?
+
         @info = {}
         @type = 'file'
         @content_blob = ContentBlob.new(url: url)
@@ -14,6 +16,7 @@ module Seek
           uri = URI(url)
           handler = @content_blob.remote_content_handler
           if handler
+            handler.set_keep_title(keep_title)
             @info = handler.info
             if @info[:code]
               if @info[:code] == 200
@@ -57,8 +60,8 @@ module Seek
         elsif content_is_webpage?(@info[:content_type])
           @type = 'webpage'
           page = summarize_webpage(handler.url)
-          keeptitle = handler.keeptitle
-          unless keeptitle
+
+          unless handler.does_keep_title
             @info[:title] = page.title&.strip
           end
           @info[:description] = page.description&.strip
