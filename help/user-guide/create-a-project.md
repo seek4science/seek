@@ -3,6 +3,8 @@ title: SEEK User Guide - Creating a project
 layout: page
 ---
 
+Testing
+
 # What is a Project
 
 A Project represents a group of one or more people collaborating together on a particular activity. The Project provides the ability to describe and promote the activity, and also give credit back to the team. The Project will have a title, and optionally a description, public website and avatar graphic. Users need to be a member of a Project before they can register items, which will then be related to that Project and a user can be in many Projects without limit.
