@@ -29,8 +29,11 @@ class AssaySerializer < SnapshottableSerializer
   has_one :investigation
   has_one :study
   has_many :data_files
+  has_many :incoming
+  has_many :outgoing
   has_many :models
   has_many :sops
   has_many :publications
   has_many :documents
+  has_many :placeholders
 end

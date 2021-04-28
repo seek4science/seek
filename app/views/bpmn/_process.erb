@@ -1,0 +1,6 @@
+<process id="project-<%= project.id %>" name="<%= project.title %>" isExecutable="true">
+
+<% project.investigations.each do |i| %>
+  <%= render :partial => "bpmn/investigation", :locals => { :investigation => i } -%>
+<% end %>
+</process>

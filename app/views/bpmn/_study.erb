@@ -1,0 +1,6 @@
+<subProcess id="study-<%= study.id %>" name="<%= study.title %>">
+
+<% study.assays.each do |a| %>
+  <%= render :partial => "bpmn/assay", :locals => { :assay => a } -%>
+<% end %>
+</subProcess>

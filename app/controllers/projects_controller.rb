@@ -398,10 +398,12 @@ class ProjectsController < ApplicationController
 
   def bpmn
     @project = Project.find(params[:id]) if params[:id]
-    puts @project.id
-    generated = build(@project)
-    puts generated.to_xml.to_s
-    send_data generated.to_xml.to_s
+    send_data render_to_string(
+      "bpmn/convert.erb", locals: { :project => @project}, layout: false
+    )
+#    generated = build(@project)
+#    puts generated.to_xml.to_s
+#    send_data generated.to_xml.to_s
   end
   
   # returns a list of institutions for a project in JSON format
