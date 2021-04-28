@@ -78,6 +78,7 @@ def load_seek_config_defaults!
   Seek::Config.default :publications_enabled,true
   Seek::Config.default :samples_enabled, true
   Seek::Config.default :workflows_enabled, false
+  Seek::Config.default :collections_enabled, false
 
   Seek::Config.default :doi_minting_enabled, false
   Seek::Config.default :time_lock_doi_for, 0
