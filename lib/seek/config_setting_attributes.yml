@@ -216,3 +216,6 @@ omniauth_github_secret:
   encrypt: true
 search_results_limit:
   convert: :to_i
+# Controlled vocabs  
+cv_dropdown_limit:
+  convert: :to_i

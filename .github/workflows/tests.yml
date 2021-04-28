@@ -28,6 +28,15 @@ jobs:
         ports:
           - 33306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+      virtuoso:
+        image: tenforce/virtuoso
+        env:
+          DBA_PASSWORD: tester
+          SPARQL_UPDATE: true
+          DEFAULT_GRAPH: http://www.example.com/my-graph
+        ports:
+          - 8890:8890
+          - 1111:1111
     strategy:
       fail-fast: false
       matrix:
@@ -97,5 +106,8 @@ jobs:
       - name: Seed database
         if: matrix.suite == 'rake seek:upgrade'
         run: bundle exec rake db:seed
+      - name: Virtuoso config
+        if: matrix.suite == 'rails test test/integration'
+        run: cp test/config/virtuoso_test_settings.yml config/virtuoso_settings.yml
       - name: Run tests
         run: bundle exec ${{ matrix.suite }}

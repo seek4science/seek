@@ -1,7 +1,13 @@
 class SampleControlledVocabTerm < ApplicationRecord
-  # attr_accessible :label, :sample_controlled_vocab_id, :sample_controlled_vocab, :_destroy
-
   belongs_to :sample_controlled_vocab, inverse_of: :sample_controlled_vocab_terms
 
-  validates :label, presence: true
+  validates :label, presence: true, length: { maximum: 500 }
+
+  before_validation :truncate_label
+
+  private
+
+  def truncate_label
+    self.label = label.truncate(500) if label && label.length > 500
+  end
 end

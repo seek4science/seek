@@ -162,7 +162,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test 'after DOI is minted, the -Upload new version- button is disabled' do
+  test 'after DOI is minted, the -Upload new version- button is not disabled' do
     DOIABLE_ASSETS.each do |type|
       asset = Factory(type.to_sym, policy: Factory(:public_policy))
       latest_version = asset.latest_version
@@ -172,24 +172,10 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
       get "/#{type.pluralize}/#{asset.id}"
 
-      assert_select "a[class='disabled']", text: /Register new version/
+      assert_select "a", text: /Register new version/
+      assert_select "a[class='disabled']", text: /Register new version/, count:0
     end
-  end
-
-  test 'can not upload new version after DOI is minted' do
-    DOIABLE_ASSETS.each do |type|
-      asset = Factory(type.to_sym, policy: Factory(:public_policy))
-      latest_version = asset.latest_version
-      latest_version.doi = '10.5072/my_test'
-      assert latest_version.save
-      assert latest_version.has_doi?
-
-      post "/#{type.pluralize}/#{asset.id}/create_version", params: { data_file: {}, content_blobs: [{ data: {} }], revision_comments: 'This is a new revision' }
-
-      assert_redirected_to :root
-      assert_not_nil flash[:error]
-    end
-  end
+  end  
 
   test 'after DOI is minted, the -Delete- button is disabled' do
     DOIABLE_ASSETS.each do |type|
@@ -256,9 +242,9 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   private
 
   def mock_datacite_request
-    stub_request(:post, 'https://test.datacite.org/mds/metadata').with(basic_auth: ['test', 'test']).to_return(body: 'OK (10.5072/my_test)', status: 201)
-    stub_request(:post, 'https://test.datacite.org/mds/doi').with(basic_auth: ['test', 'test']).to_return(body: 'OK', status: 201)
-    stub_request(:post, 'https://test.datacite.org/mds/metadata').with(basic_auth: ['invalid', 'test']).to_return(body: '401 Bad credentials', status: 401)
+    stub_request(:post, 'https://mds.test.datacite.org/metadata').with(basic_auth: ['test', 'test']).to_return(body: 'OK (10.5072/my_test)', status: 201)
+    stub_request(:post, 'https://mds.test.datacite.org/doi').with(basic_auth: ['test', 'test']).to_return(body: 'OK', status: 201)
+    stub_request(:post, 'https://mds.test.datacite.org/metadata').with(basic_auth: ['invalid', 'test']).to_return(body: '401 Bad credentials', status: 401)
   end
 
   def asset_url(asset)

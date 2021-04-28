@@ -17,6 +17,8 @@ namespace :seek do
     db:seed:sample_attribute_types
     delete_users_with_invalid_person
     delete_specimen_activity_logs
+    update_session_store
+    update_cv_sample_templates
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -187,5 +189,18 @@ namespace :seek do
       logs.delete_all
     end
   end
+
+  task(update_session_store: :environment) do
+    puts '... Updating session store'
+    Rake::Task['db:sessions:upgrade'].invoke
+  end
   
+  task(update_cv_sample_templates: :environment) do
+    puts '... Queue jobs for Sample templates containing controlled vocabularies'
+    SampleType.all.each do |st|
+      if st.template && st.sample_attributes.detect(&:controlled_vocab?)
+        st.queue_template_generation
+      end
+    end
+  end
 end

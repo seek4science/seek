@@ -127,6 +127,16 @@ class InstitutionsController < ApplicationController
     end
   end
 
+  # request all institutions, but specific to the sharing form which expects an array
+  def request_all_sharing_form
+    institution_list = Institution.order(:id).collect{ |institution| [institution.title, institution.id] }
+    respond_to do |format|
+      format.json do       
+        render json: { status: 200, institution_list: institution_list }       
+      end
+    end
+  end
+
   private
 
   def institution_params
