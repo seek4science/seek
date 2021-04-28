@@ -1,8 +1,9 @@
 AllCops:
+  SuggestExtensions: false
   Exclude:
     - test/unit/assay_test.rb
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 120
 
 # Don't enforce frozen string literals

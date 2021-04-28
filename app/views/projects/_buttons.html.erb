@@ -41,8 +41,9 @@
     <% if Seek::Config.bpmn_enabled -%>
       <li>Hello <%= image_tag_for_key('manage', bpmn_project_path(item), "Generate BPMN", nil, "Generate BPMN") -%></li>
     <% end -%>
+      <li><%= image_tag_for_key('order', order_investigations_project_path(item), "Order investigations", nil, "Order investigations") -%></li>
     <% if admin_logged_in? || item.can_manage? -%>
-      <%= delete_icon(item,current_user) %>
+      <%= delete_icon(item,current_user,"Any members will also be removed from the #{t('project')}, are you sure?") %>
     <% end -%>
   <% end -%>
 <% end -%>

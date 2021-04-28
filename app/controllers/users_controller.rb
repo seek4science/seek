@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   before_action :is_current_user_auth, only: %i[edit update]
-  before_action :is_user_admin_auth, only: %i[impersonate resend_activation_email destroy]
+  before_action :is_user_admin_auth, only: %i[impersonate resend_activation_email destroy activate_other]
 
   skip_before_action :restrict_guest_user
   skip_before_action :project_membership_required
@@ -174,6 +174,19 @@ class UsersController < ApplicationController
     else
       flash[:error] = 'User not found'
       redirect_to admin_path
+    end
+  end
+
+  def activate_other
+    user = User.find_by_id(params[:id])
+    if !user.active? && user.person
+      user.activate
+      Mailer.welcome(user).deliver_later
+      flash[:notice] = 'User activated successfully'
+      redirect_to user.person
+    else
+      flash[:error] = 'User is already activated, or has not created a profile'
+      redirect_back_or_default('/')
     end
   end
 

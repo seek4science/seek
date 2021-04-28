@@ -1,4 +1,4 @@
-
+<% n_terms = @sample_controlled_vocab.sample_controlled_vocab_terms.count %>
 
 <%= render :partial => "general/item_title", :locals => {:item => @sample_controlled_vocab,:buttons_partial => 'buttons'} %>
 
@@ -15,7 +15,7 @@
   </p>
 <% end %>
 
-<h3>Terms</h3>
+<h3><%= "#{n_terms} #{'Term'.pluralize(n_terms)}" %></h3>
 <table class="table table-striped table-bordered">
   <thead>
   <tr>

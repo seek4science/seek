@@ -62,7 +62,7 @@ def load_seek_testing_defaults!
       Settings.defaults[:doi_minting_enabled]=true
       Settings.defaults[:doi_prefix] = "10.5072"
       Settings.defaults[:doi_suffix] = "Sysmo.SEEK"
-      Settings.defaults[:datacite_url] = "https://test.datacite.org/mds/"
+      Settings.defaults[:datacite_url] = "https://mds.test.datacite.org/"
       Settings.defaults[:datacite_username] = 'test'
       Settings.defaults[:datacite_password] = 'test'
       Settings.defaults[:time_lock_doi_for] = 0

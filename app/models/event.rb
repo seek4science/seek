@@ -53,10 +53,10 @@ class Event < ApplicationRecord
 
   # Returns the columns to be shown on the table view for the resource
   def columns_default
-    super + ['start_date','end_date','city','country']
+    super + ['city','country','start_date','end_date']
   end
   def columns_allowed
-    super + ['start_date','end_date','address','city','country','url','title','deleted_contributor']
+    columns_default + ['address','url','title','deleted_contributor']
   end
 
   # defines that this is a user_creatable object type, and appears in the "New Object" gadget

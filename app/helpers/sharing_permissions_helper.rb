@@ -38,16 +38,60 @@ module SharingPermissionsHelper
       }
   }
 
+  def build_tree_json(hash, root_item)
 
-  def remove_publication_node (parent_node)
-    parent_node.each_with_index  do |node, index|
-      if !node["children"].nil? && node["children"].size > 0
-        remove_publication_node (node["children"])
-      elsif node["id"].start_with?("Publication")
-        parent_node.delete_at(index)
-      end
+    objects = hash[:nodes].map(&:object)
+    real_edges = hash[:edges].select { |e| objects.include?(e[0]) }
+
+    roots = hash[:nodes].select do |n|
+      real_edges.none? { |_parent, child| child == n.object }
     end
-    parent_node
+
+    nodes = roots.map { |root| create_tree_node(hash, root.object, root_item) }.flatten
+    nodes.to_json
+  end
+
+  def create_tree_node(hash, object, root_item = nil)
+
+      child_edges = hash[:edges].select do |parent, _child|
+        parent == object
+      end
+
+      node = hash[:nodes].detect { |n| n.object == object }
+
+      entry = {
+        id: unique_node_id(object),
+        data: { loadable: false },
+        li_attr: { 'data-node-id' => node_id(object) },
+        children: []
+      }
+
+      entry[:text] = object.title
+      entry[:icon] = asset_path(resource_avatar_path(object) || icon_filename_for_key("#{object.class.name.downcase}_avatar"))
+
+      filtered_child_edges = child_edges.reject { |c| (c[1].instance_of? Publication) || (c[1].instance_of?(Seek::ObjectAggregation))}
+      child_edges_with_permission = filtered_child_edges.select { |c| c[1].can_manage? }
+
+      unless child_edges_with_permission.blank?
+        entry[:children] += child_edges_with_permission.map { |c| create_tree_node(hash, c[1], root_item) }
+      end
+
+      if node.child_count > 0
+        if node.child_count > child_edges.count
+          entry[:children] << {
+            id: unique_child_count_id(object),
+            parent: entry[:id],
+            text: "Show #{node.child_count - child_edges.count} more",
+            a_attr: { class: 'child-count-leaf' },
+            li_attr: { 'data-node-id' => child_count_id(object) },
+            data: { child_count: true }
+          }
+        end
+        entry[:state] = { opened: false }
+      else
+        entry[:state] = { opened: false }
+      end
+    entry
   end
 
   def add_permissions_to_tree_json (parent_node)

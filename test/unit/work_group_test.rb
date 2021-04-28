@@ -10,16 +10,20 @@ class WorkGroupTest < ActiveSupport::TestCase
     wg = assert_equal [@person], @wg.people
   end
 
-  def test_cannot_destroy_with_people
+  def test_can_destroy_with_people
     refute @wg.people.empty?
 
-    assert_raise(Exception) { @wg.destroy }
+    assert_difference('WorkGroup.count',-1) do
+      @wg.destroy
+    end
   end
 
   def test_can_destroy_with_no_people
     @wg.people = []
     assert @wg.people.empty?
-    @wg.destroy
+    assert_difference('WorkGroup.count',-1) do
+      @wg.destroy
+    end
   end
 
   def test_description

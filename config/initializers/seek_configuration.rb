@@ -78,6 +78,7 @@ def load_seek_config_defaults!
   Seek::Config.default :publications_enabled,true
   Seek::Config.default :samples_enabled, true
   Seek::Config.default :workflows_enabled, false
+  Seek::Config.default :collections_enabled, false
 
   Seek::Config.default :doi_minting_enabled, false
   Seek::Config.default :time_lock_doi_for, 0
@@ -147,6 +148,7 @@ def load_seek_config_defaults!
   Seek::Config.default :site_base_host,"http://localhost:3000"
   Seek::Config.default :open_id_authentication_store,:memory
   Seek::Config.default :session_store_timeout, 1.hour
+  Seek::Config.default :cv_dropdown_limit, 100
 
   #MERGENOTE - why are these here? they should be in the database under the Scale model. Maybe an old relic
   Seek::Config.default :scales,["organism","liver","liverLobule","intercellular","cell"]

@@ -133,23 +133,18 @@ en:
     released: 'Stable'
     work_in_progress: 'Work-in-progress'
 
-  joining_a_project: "<p>
-    You need to be a member of a <strong>%{project}</strong> before you can register content.<br/>
-    A %{project} can contain one or more people, and gives some additional background details, and credit, about the content is being registered.
-    Being in a %{project} allows you to easily share with others whilst collaborating, and also provides useful defaults such as Sharing permissions and License.
-    </p>
-    <p>
-    You have the option to either <strong>Join</strong> a %{project} you already know about, or <b>Create</b> a new one.
-    </p>
-    <p>
-    If you choose to create, you will have the option to be part of a site managed <strong>%{programme}</strong>, or create your own. If you create your own you will become an administrator of it, which will allow you to freely create your own additional %{projects} within it now or in the future.
-    </p>"
+  about_project: "You need to be a member of a <strong>%{project}</strong> before you can register content.
+    A %{project} can contain one or more people, and gives some additional background details, and credit, about the content being registered. It can be used to describe and promote
+    the work you are doing.
+    Being in a %{project} allows you to easily share with others whilst collaborating, and also provides useful defaults such as Sharing permissions and License."
 
-  joining_a_project_programmes_disabled: "<p>
-      You need to be a member of a <strong>%{project}</strong> before you can register content.<br/>
-      A %{project} can contain one or more people, and gives some additional background details, and credit, about the content is being registered.
-      Being in a %{project} allows you to easily share with others whilst collaborating, and also provides useful defaults such as Sharing permissions and License.
-      </p>
-      <p>
-      You have the option to either <strong>Join</strong> a %{project} you already know about, or <b>Create</b> a new one.
-      </p>"
+  create_join_project_options: "You have the option to either <strong>Join</strong> a %{project} you already know about, or <b>Create</b> a new one."    
+    
+
+  about_programme: "A <strong>%{programme}</strong> holds a collection of one or more %{projects}. If you create a %{programme} you become its administrator and you have the ability to
+create and administer additional %{projects} within it without additional approval from a site administrator. A %{programme} can describe and promote
+an activity that is larger than a %{project}, and can be associated with a funding."
+
+  about_managed_programme: "If you don't think a %{programme} is necessary, and you won't expect to need to create additional %{projects} in the future, 
+you can choose to have a %{project} linked to a site managed %{programme} instead."
+

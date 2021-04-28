@@ -16,6 +16,10 @@ module Seek
         supported_spreadsheet_format? && content_blob.is_extractable_spreadsheet?
       end
 
+      def contains_extractable_excel?
+        content_blob.is_extractable_excel?
+      end
+
       def spreadsheet_annotations
         content_blob.worksheets.collect { |w| w.cell_ranges.collect(&:annotations) }.flatten
       end
@@ -24,7 +28,7 @@ module Seek
       # If it doesn't exist yet, it gets created
       def spreadsheet
         if contains_extractable_spreadsheet?
-          workbook = parse_spreadsheet_xml(spreadsheet_xml)
+          workbook = parse_spreadsheet
           if content_blob.worksheets.empty?
             workbook.sheets.each_with_index do |sheet, sheet_number|
               content_blob.worksheets << Worksheet.create(sheet_number: sheet_number, last_row: sheet.last_row, last_column: sheet.last_col)
@@ -45,7 +49,25 @@ module Seek
         end
       end
 
+      def spreadsheet_csv
+        Rails.cache.fetch("blob_ss_csv-#{content_blob.cache_key}") do
+          content_blob.extract_csv
+        end
+      end
+
       private
+
+      def parse_spreadsheet
+        if content_blob.is_excel?
+          return parse_spreadsheet_xml(spreadsheet_xml)
+        elsif content_blob.is_csv?
+          return parse_spreadsheet_csv(spreadsheet_csv)
+        elsif content_blob.is_tsv?
+          return parse_spreadsheet_csv(spreadsheet_csv, col_sep: "\t")
+        else
+          return nil          
+        end
+      end
 
       # Takes in a string containing the xml representation of a spreadsheet and returns
       # a Workbook object
@@ -120,6 +142,83 @@ module Seek
 
         workbook
       end
+      
+      # Takes in a string containing the csv representation of a spreadsheet and returns
+      # a Workbook object
+      def parse_spreadsheet_csv(spreadsheet_csv, col_sep=nil)
+        workbook = Workbook.new
+
+        if col_sep.nil?
+          csv = CSV.parse(spreadsheet_csv)
+        else
+          csv = CSV.parse(spreadsheet_csv, col_sep)
+        end
+
+        sheet = Sheet.new('Sheet1')
+        workbook.sheets << sheet
+
+        # set a default style
+        style = Style.new("default")
+        style.attributes["font-size"] = "11pt"
+        style.attributes["color"] = "#000000"
+        workbook.styles[style.name] = style
+
+        # Load into memory
+        min_rows = MIN_ROWS
+        min_cols = MIN_COLS
+
+        # Initialise column width to default width
+        col_index=0
+        csv[0].each_with_index do |c, index|
+          col_index = index + 1
+          col = Column.new(col_index, 2964.to_s)
+          sheet.columns << col
+        end
+
+        # Pad columns (so it's at least 10 cols wide)
+        if csv[0].length < min_cols
+          for i in ((col_index + 1)..min_cols)
+            col = Column.new(i, 2964.to_s)
+            sheet.columns << col
+          end
+        else
+          min_cols = csv[0].length
+        end
+        
+        # Grab rows
+        row_index = 0
+        csv.each_with_index do |r, index|
+          # row = Row.new(row_index, r['height'])
+          row_index = index + 1
+          row = Row.new(row_index)
+          sheet.rows[row_index] = row
+          # Add cells
+          r.each_with_index do |c, index|
+            # col_index = c['column'].to_i
+            col_index = index + 1
+            content = c
+            # csv won't have formulas or style
+            cell = Cell.new(content, row_index, col_index, nil, 'default')
+            row.cells[col_index] = cell
+          end
+        end
+
+        # Pad rows
+        if row_index < min_rows
+          for i in ((row_index + 1)..min_rows)
+            row = Row.new(i, 1000.to_s)
+            sheet.rows << row
+          end
+          min_rows = MIN_ROWS
+        else
+          min_rows = row_index
+        end
+        sheet.last_row = min_rows
+        sheet.last_col = min_cols
+
+        workbook
+      end
+
 
       # Turns a numeric column ID into an Excel letter representation
       # eg. 1 > A, 10 > J, 28 > AB etc.

@@ -10,7 +10,7 @@ class ProjectsController < ApplicationController
   before_action :login_required, only: [:guided_join, :guided_create, :request_join, :request_create,
                                         :administer_join_request, :respond_join_request,
                                         :administer_create_project_request, :respond_create_project_request,
-                                        :project_join_requests]
+                                        :project_join_requests, :project_creation_requests, :typeahead]
 
   before_action :find_requested_item, only: %i[show admin edit update destroy asset_report admin_members
                                                admin_member_roles update_members storage_report
@@ -19,7 +19,9 @@ class ProjectsController < ApplicationController
   before_action :auth_to_create, only: %i[new create,:administer_create_project_request, :respond_create_project_request]
   before_action :is_user_admin_auth, only: %i[manage destroy]
   before_action :editable_by_user, only: %i[edit update]
+  before_action :check_investigations_are_for_this_project, only: %i[update]
   before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles update_members storage_report administer_join_request respond_join_request]
+
   before_action :member_of_this_project, only: [:asset_report], unless: :admin_logged_in?
 
   before_action :validate_message_log_for_join, only: [:administer_join_request, :respond_join_request]
@@ -40,6 +42,16 @@ class ProjectsController < ApplicationController
   def project_join_requests
     person = current_person
     @requests = MessageLog.pending_project_join_requests(person.administered_projects)
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  def project_creation_requests
+    @requests = MessageLog.pending_project_creation_requests.select do |r|
+      r.can_respond_project_creation_request?(current_user)
+    end
+        
     respond_to do |format|
       format.html
     end
@@ -116,7 +128,7 @@ class ProjectsController < ApplicationController
   end
 
   def request_join
-    @projects = params[:projects].collect{|id| Project.find(id)}
+    @projects = params[:projects].split(',').collect{|id| Project.find(id)}
     raise 'no projects defined' if @projects.empty?
     raise 'email is disabled' unless Seek::Config.email_enabled
     @institution = Institution.find_by_id(params[:institution][:id])
@@ -150,7 +162,7 @@ class ProjectsController < ApplicationController
     end
 
     # A Programme has been selected, or it is a Site Managed Programme
-    if params[:programme_id]
+    if params[:programme_id].present?
 
       @programme = Programme.find(params[:programme_id])
       raise "no #{t('programme')} can be found" if @programme.nil?
@@ -158,7 +170,8 @@ class ProjectsController < ApplicationController
         log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
       elsif @programme.site_managed?
         log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
-        Mailer.request_create_project_for_programme(current_user, @programme,@project.to_json, @institution.to_json, log).deliver_later
+        Mailer.request_create_project_for_programme(current_user, @programme, @project.to_json, @institution.to_json, log).deliver_later
+        Mailer.request_create_project_for_programme_admins(current_user, @programme, @project.to_json, @institution.to_json, log).deliver_later
         flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
       else
         raise 'Invalid Programme'
@@ -169,9 +182,9 @@ class ProjectsController < ApplicationController
       @programme = Programme.new(prog_params)
       log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
       unless User.admin_logged_in?
-        Mailer.request_create_project_and_programme(current_user, @programme.to_json,@project.to_json, @institution.to_json, log).deliver_later
+        Mailer.request_create_project_and_programme(current_user, @programme.to_json, @project.to_json, @institution.to_json, log).deliver_later
       end
-      flash.now[:notice]="Thank you, your request for a new #{t('programme')} and #{t('project')} has been sent"
+      flash.now[:notice] = "Thank you, your request for a new #{t('programme')} and #{t('project')} has been sent"
     # No Programme at all
     elsif !Seek::ProjectFormProgrammeOptions.show_programme_box?
       @programme=nil
@@ -183,7 +196,7 @@ class ProjectsController < ApplicationController
     end
 
     if (@programme && @programme.can_manage?) || User.admin_logged_in?
-      redirect_to administer_create_project_request_projects_path(message_log_id:log.id)
+      redirect_to administer_create_project_request_projects_path(message_log_id: log.id)
     else
       respond_to do |format|
         format.html
@@ -359,9 +372,32 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def order_investigations
+    @project = Project.find(params[:id])
+    respond_to do |format|
+      format.html
+    end
+  end
+
   # PUT /projects/1   , polymorphic: [:organism]
   # PUT /projects/1.xml
   def update
+    if params[:project][:ordered_investigation_ids]
+      a1 = params[:project][:ordered_investigation_ids]
+      a1.permit!
+      pos = 0
+      a1.each_pair do |key, value |
+        investigation = Investigation.find (value)
+        investigation.position = pos
+        pos += 1
+        investigation.save!
+      end
+      respond_to do |format|
+        format.html { redirect_to(@project) }
+      end
+      return
+    end
+
     if @project.can_manage?(current_user)
       @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
     end
@@ -557,10 +593,25 @@ class ProjectsController < ApplicationController
         @message_log.respond(comments)
         project_name = JSON.parse(@message_log.details)['project']['title']
         Mailer.create_project_rejected(requester,project_name,comments).deliver_later
-        flash[:notice]="Request rejected and #{requester.name} has been notified"
+        flash[:notice] = "Request rejected and #{requester.name} has been notified"
       end
 
       redirect_to :root
+    end
+  end
+
+  def typeahead
+    results = Project.where("LOWER(title) LIKE :query
+                                    OR LOWER(description) LIKE :query",
+                            query: "%#{params[:query].downcase}%").limit(params[:limit] || 10)
+    items = results.map do |project|
+      { id: project.id,
+        name: project.title,
+        hint: project.description&.truncate(90, omission: '...') }
+    end
+
+    respond_to do |format|
+      format.json { render json: items.to_json }
     end
   end
 
@@ -605,6 +656,25 @@ class ProjectsController < ApplicationController
 
     params.require(:project).permit(permitted_params)
   end
+
+  def check_investigations_are_for_this_project
+    project_id = params[:id]
+    if params[:project][:ordered_investigation_ids]
+      a1 = params[:project][:ordered_investigation_ids]
+      a1.permit!
+      valid = true
+      a1.each_pair do |key, value |
+        a = Investigation.find (value)
+        valid = valid && a.projects.detect(@project)
+      end
+      unless valid
+        error("Each ordered #{"Investigation"} must be associated with the Project", "is invalid (invalid #{"Investigation"})")
+        return false
+      end
+    end
+    return true
+  end
+
 
   def add_and_remove_members_and_institutions
     groups_to_remove = params[:group_memberships_to_remove] || []
@@ -688,10 +758,11 @@ class ProjectsController < ApplicationController
 
   def validate_message_log_for_create
     @message_log = MessageLog.find_by_id(params[:message_log_id])
+    error_msg ||= "you do not have permission to respond to this request" unless @message_log.can_respond_project_creation_request?(current_user)
     error_msg ||= "message log not found" unless @message_log
     error_msg ||= ("incorrect type of message log" unless @message_log.message_type==MessageLog::PROJECT_CREATION_REQUEST)
     error_msg ||= ("message has already been responded to" if @message_log.responded?)
-    #error_msg ||= ('you have no permission to create a project' unless Project.can_create?)
+    
     if error_msg
       error(error_msg, error_msg)
       return false

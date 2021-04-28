@@ -14,7 +14,7 @@ module SamplesHelper
         text_field_tag element_name, value, data: { calendar: 'mixed' }, class: "calendar form-control #{clz}", placeholder: placeholder
       end
     when Seek::Samples::BaseType::DATE
-      content_tag :div, style:'position:relative' do
+      content_tag :div, style: 'position:relative' do
         text_field_tag element_name, value, data: { calendar: true }, class: "calendar form-control #{clz}", placeholder: placeholder
       end
     when Seek::Samples::BaseType::BOOLEAN
@@ -29,17 +29,36 @@ module SamplesHelper
                                                          :title, value.try(:[],'id'))
       select_tag(element_name, options, include_blank: !attribute.required?, class: "form-control #{clz}")
     when Seek::Samples::BaseType::CV
-      scv_id = attribute.sample_controlled_vocab.id
-      existing_objects = []
-      existing_objects << Struct.new(:id,:name).new(value,value) if value
-      objects_input(element_name, existing_objects, typeahead:  {query_url: typeahead_sample_controlled_vocabs_path + "?query=%QUERY&scv_id=#{scv_id}",handlebars_template:'typeahead/controlled_vocab_term'}, limit:1)
+      controlled_vocab_form_field attribute, element_name, value
     when Seek::Samples::BaseType::SEEK_SAMPLE
       terms = attribute.linked_sample_type.samples.authorized_for('view').to_a
-      options = options_from_collection_for_select(terms, :id, :title, value.try(:[],'id'))
+      options = options_from_collection_for_select(terms, :id, :title, value.try(:[], 'id'))
       select_tag element_name, options,
                  include_blank: !attribute.required? , class: "form-control #{clz}"
     else
       text_field_tag element_name,value, class: "form-control #{clz}", placeholder: placeholder
+    end
+  end
+
+  def controlled_vocab_form_field(attribute, element_name, value)    
+    if attribute.sample_controlled_vocab.sample_controlled_vocab_terms.count < Seek::Config.cv_dropdown_limit
+      options = options_from_collection_for_select(
+        attribute.sample_controlled_vocab.sample_controlled_vocab_terms.sort_by(&:label),
+        :label, :label,
+        value
+      )
+      select_tag element_name,
+                 options,
+                 include_blank: !attribute.required?,
+                 class: "form-control"
+    else
+      scv_id = attribute.sample_controlled_vocab.id
+      existing_objects = []
+      existing_objects << Struct.new(:id, :name).new(value, value) if value
+      objects_input(element_name, existing_objects,
+                    typeahead: { query_url: typeahead_sample_controlled_vocabs_path + "?query=%QUERY&scv_id=#{scv_id}", 
+                    handlebars_template: 'typeahead/controlled_vocab_term' }, 
+                    limit: 1)
     end
   end
 
