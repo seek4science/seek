@@ -149,7 +149,9 @@ an activity that is larger than a %{project}, and can be associated with a fundi
 you can choose to have a %{project} linked to a site managed %{programme} instead."
 
   report_a_bug: '<p>
-  To report a bug or other issue, it is preferable to use the %{issue_tracker_link}. A Github account is required, and your report will be public and open to comments.
+  To report a bug or other issue, it is preferable to use the %{issue_tracker_link}. A Github account is required, and your report will be public and open 
+  to comments. Before reporting the issue, have a look and search through the current issues to see if the problem has already been raised - if so, add a comment so
+   we know it is also affecting you.
   </p>
   <p>
   Alternatively, if you are unable to use the %{issue_tracker_link}, or the issue is of a private nature, then you can use the %{feedback_link}.
