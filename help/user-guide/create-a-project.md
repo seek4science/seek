@@ -25,7 +25,7 @@ For users that just require a single Project, and don't require a Programme, a s
 
 # Creating a Project
 
-You will first be prompted to create (or [join](./request-to-join-project.html)) a Project following registering a new FAIRDOM-SEEK account. If you are already a member and wish to add additional Projects, you can choose to create a Project from the _Create_ menu in the top bar.
+You will first be prompted to create (or [Join a Project](./join-a-project.html)) following registering a new FAIRDOM-SEEK account. If you are already a member and wish to add additional Projects, you can choose to create a Project from the _Create_ menu in the top bar.
 
 ## Choosing a Programme
 

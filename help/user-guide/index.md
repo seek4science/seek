@@ -14,7 +14,7 @@ layout: page
 - [Managing your account](managing-account.html)
      - [Managing your identities/alternative login methods](managing-identities.html)
 - [Browsing content](browsing.html)
-- [Requesting to join a Project](request-to-join-project.html)
+- [Joining a Project](join-a-project.html)
 - [Creating a Project](create-a-project.html)
 - [Adding assets (data, models, SOPs, publications) to SEEK](adding-assets.html)
 - [Creating new asset versions](uploading-new-versions.html)

@@ -38,5 +38,5 @@ After you have registered the rest of your information, in most installations of
 
 Once you have activated your account and logged in, you will need to either create or join a Project before you can register content, for more information please see:
 
-  * [Join an existing Project](./request-to-join-project.html)
+  * [Join an existing Project](./join-a-project.html)
   * [Create a new Project](./create-a-project.html)
