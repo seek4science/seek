@@ -48,7 +48,7 @@ To become a member you also have to describe the institution (or affiliation) th
 
 Start to type the name of your institution, and existing options will be displayed that contain the text you type (or related to the Institution such as City). Hopefully your institution is found and you can just select it. If not, you can choose the top option to define a new one.
 
-Once again, at this stage only the title is required, but you can also provide details about its website, city and country. You will also be able to edit and add additional information afterwards.
+If describing a new Institution only the title is required, but you can also provide details about its website, city and country. You will also be able to edit and add additional information afterwards.
 
 ![Define Institution](/images/user-guide/create-project-define-institution.png){:.screenshot}
 
