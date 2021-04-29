@@ -186,6 +186,7 @@ class AdminController < ApplicationController
 
     Seek::Config.dm_project_name = params[:dm_project_name]
     Seek::Config.dm_project_link = params[:dm_project_link]
+    Seek::Config.issue_tracker = params[:issue_tracker]
 
     Seek::Config.application_name = params[:application_name]
 
