@@ -19,7 +19,7 @@ layout: page
 - [Adding assets (data, models, SOPs, publications) to SEEK](adding-assets.html)
 - [Creating new asset versions](uploading-new-versions.html)
 - [Comparing two versions of a Model](model-comparison.html)
-- [Executing a model on JWS Online](simulate-on-jws-online.html)
+- [Simulate a model on JWS Online](simulate-on-jws-online.html)
 - [Licenses](licenses.html)
 - [Generating the ISA structure](generating-the-isa-structure.html)
      - [Creating an Investigation](generating-the-isa-structure.html#creating-an-investigation)
