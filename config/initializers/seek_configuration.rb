@@ -103,6 +103,7 @@ def load_seek_config_defaults!
   Seek::Config.default :header_image_link,"http://www.fair-dom.org"
   Seek::Config.default :copyright_addendum_enabled,false
   Seek::Config.default :copyright_addendum_content,'Additions copyright ...'
+  Seek::Config.default :issue_tracker, 'https://github.com/seek4science/seek/issues'
 
   #Imprint
   Settings.defaults[:imprint_enabled]= false

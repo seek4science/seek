@@ -65,11 +65,12 @@ en:
     documentation: "Help"
     admin: "Server administration"
     help: "Help documentation"
-    api: "API documentation"
+    api: "API documentation"    
     account: "Account"
     faq: "FAQ"
     jerm_templates: "JERM templates"
     feedback: "Provide feedback"
+    report_issue: 'Report an issue'
     isa_best_practice: "ISA best practice"
     vocabularies: "Vocabularies"
 
@@ -146,4 +147,11 @@ an activity that is larger than a %{project}, and can be associated with a fundi
 
   about_managed_programme: "If you don't think a %{programme} is necessary, and you won't expect to need to create additional %{projects} in the future, 
 you can choose to have a %{project} linked to a site managed %{programme} instead."
+
+  report_a_bug: '<p>
+  To report a bug or other issue, it is preferable to use the %{issue_tracker_link}. A Github account is required, and your report will be public and open to comments.
+  </p>
+  <p>
+  Alternatively, if you are unable to use the %{issue_tracker_link}, or the issue is of a private nature, then you can use the %{feedback_link}.
+  <p>'
 

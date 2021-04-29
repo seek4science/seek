@@ -148,6 +148,7 @@ SEEK::Application.routes.draw do
       get :privacy
       get :about
       get :create_or_join_project
+      get :report_issue
     end
   end
 
