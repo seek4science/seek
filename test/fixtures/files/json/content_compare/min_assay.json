@@ -80,6 +80,15 @@
       "data_files": {
         "data": []
       },
+      "placeholders": {
+        "data": []
+      },
+      "incoming": {
+        "data": []
+      },
+      "outgoing": {
+        "data": []
+      },
       "models": {
         "data": []
       },

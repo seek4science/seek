@@ -14,7 +14,9 @@
       "license": null,
       "created_at": "2017-10-06T09:53:31.000Z",
       "updated_at": "2017-10-06T09:53:31.000Z",
-      "other_creators": null
+      "other_creators": null,
+	"data_type":"http://edamontology.org/data_0006",
+	"format_type":"http://edamontology.org/format_1915"
     },
     "relationships": {
       "creators": {
@@ -46,7 +48,10 @@
       },
       "assays": {
         "data": []
-      }
+      },
+      "file_template":  {
+	    "data" : null
+	}
     },
     "links": {
       "self": "/placeholders/883654268"

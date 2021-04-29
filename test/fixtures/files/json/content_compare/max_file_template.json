@@ -41,8 +41,8 @@
         "url": "http://www.slack.com/",
         "label": "Slack"
       }],
-	"data_type":"http://edamontology.org/data_3842",
-	"format_type":"http://edamontology.org/format_3970"
+	"data_type":"http://edamontology.org/data_0006",
+	"format_type":"http://edamontology.org/format_1915"
     },
     "relationships": {
       "creators": {
@@ -80,6 +80,12 @@
             "type": "projects"
           }
         ]
+      },
+      "data_files": {
+        "data": []
+      },
+      "placeholders": {
+        "data": []
       }
     },
     "links": {

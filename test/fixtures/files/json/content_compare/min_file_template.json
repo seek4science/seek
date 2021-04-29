@@ -36,7 +36,9 @@
         }
       ],
       "other_creators": null,
-      "discussion_links": null
+      "discussion_links": null,
+	"data_type":"http://edamontology.org/data_0006",
+	"format_type":"http://edamontology.org/format_1915"
     },
     "relationships": {
       "creators": {
@@ -65,6 +67,12 @@
             "type": "projects"
           }
         ]
+      },
+      "data_files": {
+        "data": []
+      },
+      "placeholders": {
+        "data": []
       }
     },
     "links": {
