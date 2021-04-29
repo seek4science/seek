@@ -43,8 +43,11 @@ class GitVersion < ApplicationRecord
   end
 
   def freeze_version
+    raise ImmutableVersionException unless mutable?
+
     self.resource_attributes = resource.attributes
     self.mutable = false
+    self.ref = git_base.tags.create(unique_git_tag, commit).canonical_name
     save!
   end
 
@@ -195,6 +198,24 @@ class GitVersion < ApplicationRecord
     end
 
     self.commit
+  end
+
+  def unique_git_tag
+    [name.gsub(/[ :~^]/,'-'), "version-#{version}", "_seek_git_version_#{id}"].each do |t|
+      if Rugged::Reference.valid_name?("refs/tags/#{t}") && !git_base.tags[t]
+        return t
+      end
+    end
+
+    x = 1
+    while true
+      t = "_seek_unique_tag_#{x}"
+      if Rugged::Reference.valid_name?("refs/tags/#{t}") && !git_base.tags[t]
+        return t
+      end
+
+      x += 1
+    end
   end
 
   # Check metadata, and parent resource for missing methods. Allows a Workflow::GitVersion to be used as a drop-in replacement for

@@ -4,13 +4,14 @@ class GitVersionTest < ActiveSupport::TestCase
   setup do
   end
 
-  test 'freeze version attributes' do
+  test 'freeze version' do
     repo = Factory(:local_repository)
     workflow = repo.resource
 
-    v = workflow.git_versions.create!(ref: 'refs/heads/master', mutable: true)
+    v = workflow.git_versions.create!(name: 'version 1.0.0', ref: 'refs/heads/master', mutable: true)
     assert_empty v.resource_attributes
     assert_equal 'This Workflow', v.title
+    refute v.git_base.tags['version-1.0.0']
     assert v.mutable?
 
     v.send(:freeze_version)
@@ -18,6 +19,8 @@ class GitVersionTest < ActiveSupport::TestCase
     new_class = Factory(:galaxy_workflow_class)
     workflow.update_column(:workflow_class_id, new_class.id)
 
+    assert_equal 'refs/tags/version-1.0.0', v.ref
+    assert v.git_base.tags['version-1.0.0']
     assert_not_empty v.resource_attributes
     assert_equal 'This Workflow', v.resource_attributes['title']
     assert_equal 'This Workflow', v.title
