@@ -105,7 +105,7 @@ class Programme < ApplicationRecord
   end
 
   def allows_user_projects?
-    open_for_projects?
+    open_for_projects? && Seek::Config.programmes_open_for_projects_enabled
   end
 
   def self.can_create?
