@@ -71,6 +71,7 @@ layout: page
      - [Legacy Biosamples](legacy-biosamples.html)
 - [Using SEEK with openBIS](openbis.html)
 - [API Introduction](api.html)
+- [Reporting a bug or feature request](/tech/reporting-bugs-and-features.html)
 - [Contributing to these SEEK Documents](/contributing.html)
 
 
