@@ -111,3 +111,24 @@ using the new docker-compose.yml do:
     docker-compose down
     docker-compose up -d
  
+
+## Moving from a standalone installation to Docker Compose
+
+If you have an existing SEEK installation running on "Bare Metal" and would like to move to using Docker compose, we have a script that can help migrate the data. The script was created to help move some of our own services, but hasn't been heavily tested beyond that so please use with care. Please feel free to [Contribute](/contributing-to-seek.html) any improvements.
+
+First a dump of the mysql database is needed, which can be created using _mysqldump_
+
+    mysqldump -u<user> -p <dbname> > seek.sql
+
+Copy both _seek.sql_ and the _filestore/_ directory in to a separate directory, e.g:
+
+    mkdir /tmp/seek-migration
+    cp -rf filestore/ /tmp/seek-migration/
+    cp seek.sql /tmp/seek-migration/
+
+The script to use can be found at [https://github.com/seek4science/seek/blob/seek-{{ site.current_docker_tag }}/script/import-docker-data.sh](https://github.com/seek4science/seek/blob/seek-{{ site.current_docker_tag }}/script/import-docker-data.sh)
+
+Start with a clean Docker Compose setup described above. Running the script, passing the location of the directory, will drop any existing volumes, recreate new ones and populate them with the sql and filestore data.
+
+    wget https://github.com/seek4science/seek/raw/seek-{{ site.current_docker_tag }}/script/import-docker-data.sh
+    sh ./import-docker-data.sh /tmp/seek-migration/
