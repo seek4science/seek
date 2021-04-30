@@ -119,6 +119,7 @@ zenodo_oauth_url:
 zenodo_client_id:
 zenodo_client_secret:
 programme_user_creation_enabled:
+programmes_open_for_projects_enabled:
 cache_remote_files:
 orcid_required:
 max_cachable_size:
