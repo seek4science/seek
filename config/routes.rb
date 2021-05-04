@@ -166,6 +166,7 @@ SEEK::Application.routes.draw do
       get :privacy
       get :about
       get :create_or_join_project
+      get :report_issue
     end
   end
 
@@ -376,6 +377,7 @@ SEEK::Application.routes.draw do
   resources :institutions do
     collection do
       get :request_all
+      get :request_all_sharing_form
       post :items_for_result
       get  :typeahead
     end

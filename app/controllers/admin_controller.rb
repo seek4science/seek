@@ -99,6 +99,7 @@ class AdminController < ApplicationController
     Seek::Config.models_enabled = string_to_boolean params[:models_enabled]
     Seek::Config.organisms_enabled = string_to_boolean params[:organisms_enabled]
     Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]
+    Seek::Config.programmes_open_for_projects_enabled = string_to_boolean params[:programmes_open_for_projects_enabled]
     Seek::Config.publications_enabled = string_to_boolean params[:publications_enabled]
     Seek::Config.samples_enabled = string_to_boolean params[:samples_enabled]
     Seek::Config.workflows_enabled = string_to_boolean params[:workflows_enabled]    
@@ -192,6 +193,7 @@ class AdminController < ApplicationController
 
     Seek::Config.dm_project_name = params[:dm_project_name]
     Seek::Config.dm_project_link = params[:dm_project_link]
+    Seek::Config.issue_tracker = params[:issue_tracker]
 
     Seek::Config.application_name = params[:application_name]
 

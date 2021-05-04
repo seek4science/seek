@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://test.datacite.org/mds/metadata/10.5072/MY_TEST
+    uri: https://mds.test.datacite.org/metadata/10.5072/MY_TEST
     body:
       encoding: US-ASCII
       string: ''

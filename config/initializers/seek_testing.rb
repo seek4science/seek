@@ -30,6 +30,8 @@ def load_seek_testing_defaults!
       Settings.defaults[:factors_studied_enabled] = true
       Settings.defaults[:experimental_conditions_enabled] = true
       Settings.defaults[:programme_user_creation_enabled] = true
+      Settings.defaults[:programmes_open_for_projects_enabled] = true
+
       Settings.defaults[:project_hierarchy_enabled] = true
       Settings.defaults[:tabs_lazy_load_enabled] = false
 
@@ -62,7 +64,7 @@ def load_seek_testing_defaults!
       Settings.defaults[:doi_minting_enabled]=true
       Settings.defaults[:doi_prefix] = "10.5072"
       Settings.defaults[:doi_suffix] = "Sysmo.SEEK"
-      Settings.defaults[:datacite_url] = "https://test.datacite.org/mds/"
+      Settings.defaults[:datacite_url] = "https://mds.test.datacite.org/"
       Settings.defaults[:datacite_username] = 'test'
       Settings.defaults[:datacite_password] = 'test'
       Settings.defaults[:time_lock_doi_for] = 0
