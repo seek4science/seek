@@ -27,10 +27,10 @@ class ProjectsValidator < ActiveModel::EachValidator
     if options[:self]
       new_projects = record.project_additions
       return if (new_projects - valid_projects).empty? # Are ALL newly-associated projects part of the valid_projects set?
-      record.errors[:base] << (options[:message] || 'Can only associate projects that you are an active member of.')
+      record.errors[:base] << (options[:message] || "Can only associate #{t('project').downcase.pluralize} that you are an active member of.")
     else
       return unless (value.projects & valid_projects).empty? # Does the associated item belong to ANY of the valid_projects?
-      record.errors[attribute] << (options[:message] || 'must be associated with one of your projects.')
+      record.errors[attribute] << (options[:message] || "must be associated with one of your #{t('project').downcase.pluralize}.")
     end
   end
 end

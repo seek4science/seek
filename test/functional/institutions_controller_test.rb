@@ -218,4 +218,65 @@ class InstitutionsControllerTest < ActionController::TestCase
     end
     add_avatar_to_test_object(inst)
   end
+
+  test 'should create with discussion link' do
+    person = Factory(:admin)
+    login_as(person)
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('Institution.count') do
+        post :create, params: { institution: { title: 'test',
+                                               discussion_links_attributes: [{url: "http://www.slack.com/"}]}, }
+      end
+    end
+    institution = assigns(:institution)
+    assert_equal 'http://www.slack.com/', institution.discussion_links.first.url
+    assert_equal AssetLink::DISCUSSION, institution.discussion_links.first.link_type
+  end
+
+  test 'should show discussion link' do
+    disc_link = Factory(:discussion_link)
+    institution = Factory(:institution)
+    institution.discussion_links = [disc_link]
+    get :show, params: { id: institution }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+  end
+
+  test 'should update node with discussion link' do
+    person = Factory(:admin)
+    institution = Factory(:institution)
+    login_as(person)
+    assert_nil institution.discussion_links.first
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: institution.id, institution: { discussion_links_attributes:[{url: "http://www.slack.com/"}] } }
+      end
+    end
+    assert_redirected_to institution_path(assigns(:institution))
+    assert_equal 'http://www.slack.com/', institution.discussion_links.first.url
+  end
+
+  test 'should destroy related assetlink when the discussion link is removed ' do
+    person = Factory(:admin)
+    login_as(person)
+    asset_link = Factory(:discussion_link)
+    institution = Factory(:institution)
+    institution.discussion_links = [asset_link]
+    assert_difference('AssetLink.discussion.count', -1) do
+      put :update, params: { id: institution.id, institution: { discussion_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
+    end
+    assert_redirected_to institution_path(institution = assigns(:institution))
+    assert_empty institution.discussion_links
+  end
+
+  test 'request all sharing form' do
+    Institution.delete_all
+    institutions = [Factory(:institution),Factory(:institution),Factory(:institution)]
+    get :request_all_sharing_form, format: :json
+    assert_response :success
+    expected = institutions.collect{|i| [i.title, i.id]}
+    actual = JSON.parse(response.body)['institution_list']
+    assert_equal expected, actual
+  end
+
 end

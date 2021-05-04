@@ -11,7 +11,7 @@ module VlnProjectsTreeHelper
     roots = type.roots.sort { |a, b| a.title.downcase <=> b.title.downcase }
     list = []
     roots.each do |root|
-      related_resource = eval "root.#{related_resource_type.downcase.pluralize}"
+      related_resource = root.send(related_resource_type.downcase.pluralize)
       depth = 1
       display_style = (foldable == true) ? 'display:none' : 'display:block'
       display_style = 'display:block' if (foldable == true) && (!selected_display_items.nil?) && selected_display_items.include?(root)
@@ -60,7 +60,7 @@ module VlnProjectsTreeHelper
           folder = depth > 0 ? ' └ ' : ' '
         end
 
-        related_resource = eval "child.#{related_resource_type.downcase.pluralize}"
+        related_resource = child.send(related_resource_type.downcase.pluralize)
         result << "<li style=\"margin-left:#{12 * depth}px;#{child.id == selected_id ? 'background-color: lightblue;' : "#{(selected_display_items && selected_display_items.include?(child)) ? 'font-weight: bold;' : ''}"};\">" + folder + (link_to child.title, child) + ' ' +
           (show_edit ? link_to(image('edit'), edit_polymorphic_path(child), style: 'vertical-align:middle') : '') + ' ' +
           (show_delete ? link_to(image('destroy'), child, data: { confirm: "Are you sure you want to remove this #{child.class.name}?  This cannot be undone." },

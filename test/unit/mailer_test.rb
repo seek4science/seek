@@ -7,14 +7,14 @@ class MailerTest < ActionMailer::TestCase
     disable_authorization_checks { Person.where('first_name = ?', 'default admin').destroy_all }
   end
 
-  test 'signup' do
+  test 'activation_request' do
     @expected.subject = 'Sysmo SEEK account activation'
     @expected.to = 'Aaron Spiggle <aaron@email.com>'
     @expected.from    = 'no-reply@sysmo-db.org'
 
-    @expected.body    = read_fixture('signup')
+    @expected.body    = read_fixture('activation_request')
 
-    assert_equal encode_mail(@expected), encode_mail(Mailer.signup(users(:aaron)))
+    assert_equal encode_mail(@expected), encode_mail(Mailer.activation_request(users(:aaron)))
   end
 
   test 'announcement notification' do
@@ -172,108 +172,24 @@ class MailerTest < ActionMailer::TestCase
     assert_equal encode_mail(@expected), encode_mail(Mailer.forgot_password(users(:aaron)))
   end
 
-  test 'contact_admin_new_user - project has no administrator' do
+  test 'contact_admin_new_user' do
+
+    new_registree = Factory(:person,first_name:'Fred',last_name:'Jones', email:'fredjones@email.com')
+
     @expected.subject = 'Sysmo SEEK member signed up'
     @expected.to = 'Quentin Jones <quentin@email.com>'
     @expected.from = 'no-reply@sysmo-db.org'
-    @expected.reply_to = 'Aaron Spiggle <aaron@email.com>'
+    @expected.reply_to = 'Fred Jones <fredjones@email.com>'
 
-    @expected.body = read_fixture('contact_admin_new_user_no_project_admin')
-
-    params = {}
-    params[:projects] = [Factory(:project, title: 'Project X').id.to_s, Factory(:project, title: 'Project Y').id.to_s]
-    params[:institutions] = [Factory(:institution, title: 'The Institute').id.to_s]
-    params[:other_projects] = 'Another Project'
-    params[:other_institutions] = 'Another Institute'
+    @expected.body = read_fixture('contact_admin_new_user')
 
     expected_text = encode_mail(@expected)
-    expected_text.gsub!('-person_id-', users(:aaron).person.id.to_s)
+    expected_text.gsub!('-person_id-', new_registree.id.to_s)
 
     assert_equal expected_text,
-                 encode_mail(Mailer.contact_admin_new_user(params, users(:aaron)))
+                 encode_mail(Mailer.contact_admin_new_user(new_registree.user))
   end
 
-  test 'contact_admin_new_user - project has administrator' do
-    @expected.subject = 'Sysmo SEEK member signed up'
-    @expected.to = 'Quentin Jones <quentin@email.com>'
-    @expected.from = 'no-reply@sysmo-db.org'
-    @expected.reply_to = 'Aaron Spiggle <aaron@email.com>'
-
-    @expected.body = read_fixture('contact_admin_new_user_has_project_admin')
-
-    params = {}
-
-    project_admin = Factory(:project_administrator)
-    project = project_admin.projects.first
-    project.title = 'Project X'
-    disable_authorization_checks { project.save! }
-
-    params[:projects] = [project.id.to_s, Factory(:project, title: 'Project Y').id.to_s]
-    params[:institutions] = [Factory(:institution, title: 'The Institute').id.to_s]
-    params[:other_projects] = 'Another Project'
-    params[:other_institutions] = 'Another Institute'
-
-    expected_text = encode_mail(@expected)
-    expected_text.gsub!('-person_id-', users(:aaron).person.id.to_s)
-    expected_text.gsub!('-project_path-', "http://localhost:3000/projects/#{project.id}")
-
-    assert_equal expected_text,
-                 encode_mail(Mailer.contact_admin_new_user(params, users(:aaron)))
-  end
-
-  test 'contact_project_administrator_new_user' do
-    project_administrator = Factory(:project_administrator)
-    admin_project = project_administrator.projects.first
-
-    assert project_administrator.is_project_administrator?(admin_project)
-    @expected.subject = 'Sysmo SEEK member signed up, please assign this person to the projects of which you are Project Administrator'
-    @expected.to = project_administrator.email_with_name
-    @expected.from = 'no-reply@sysmo-db.org'
-    @expected.reply_to = 'Aaron Spiggle <aaron@email.com>'
-
-    params = {}
-    params[:projects] = [Factory(:project, title: 'Project X').id.to_s, admin_project.id.to_s]
-    params[:institutions] = [Factory(:institution, title: 'The Institute').id.to_s]
-    params[:other_projects] = 'Another Project'
-    params[:other_institutions] = 'Another Institute'
-
-    @expected.body = read_fixture('contact_project_administrator_new_user')
-
-    expected_text = encode_mail(@expected)
-    expected_text.gsub!('-pr_name-', admin_project.title)
-    expected_text.gsub!('-pr_id-', admin_project.id.to_s)
-    expected_text.gsub!('-person_id-', users(:aaron).person.id.to_s)
-    actual_text = encode_mail(Mailer.contact_project_administrator_new_user(project_administrator, params, users(:aaron)))
-
-    assert_equal expected_text, actual_text
-  end
-
-  test 'contact_project_administrator_new_user no other institutions' do
-    project_administrator = Factory(:project_administrator)
-    admin_project = project_administrator.projects.first
-
-    assert project_administrator.is_project_administrator?(admin_project)
-    @expected.subject = 'Sysmo SEEK member signed up, please assign this person to the projects of which you are Project Administrator'
-    @expected.to = project_administrator.email_with_name
-    @expected.from = 'no-reply@sysmo-db.org'
-    @expected.reply_to = 'Aaron Spiggle <aaron@email.com>'
-
-    params = {}
-    params[:projects] = [Factory(:project, title: 'Project X').id.to_s, admin_project.id.to_s]
-    params[:institutions] = [Factory(:institution, title: 'The Institute').id.to_s]
-    params[:other_projects] = ''
-    params[:other_institutions] = ''
-
-    @expected.body = read_fixture('contact_project_administrator_new_user_no_other')
-
-    expected_text = encode_mail(@expected)
-    expected_text.gsub!('-pr_name-', admin_project.title)
-    expected_text.gsub!('-pr_id-', admin_project.id.to_s)
-    expected_text.gsub!('-person_id-', users(:aaron).person.id.to_s)
-    actual_text = encode_mail(Mailer.contact_project_administrator_new_user(project_administrator, params, users(:aaron)))
-
-    assert_equal expected_text, actual_text
-  end
 
   test 'welcome' do
     @expected.subject = 'Welcome to Sysmo SEEK'
@@ -382,6 +298,125 @@ class MailerTest < ActionMailer::TestCase
       end
     end
   end
+
+  test 'request join project with new institution' do
+    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+      with_config_value(:site_base_host, 'https://hub.com') do
+        project = Factory(:project)
+        institution = Institution.new({title:'My lovely institution', web_page:'http://inst.org', country:'DE'})
+        comments = 'some comments'
+        person = Factory(:person)
+        log = MessageLog.log_project_membership_request(person, project, institution, comments)
+        email = Mailer.request_join_project(person.user, project, institution.to_json,comments, log)
+        refute_nil email
+        refute_nil email.body
+      end
+    end
+  end
+
+  test 'request join project existing institution' do
+    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+      with_config_value(:site_base_host, 'https://securefred.com:1337') do
+        project = Factory(:project)
+        institution = Factory(:institution)
+        comments = 'some comments'
+        person = Factory(:person)
+        log = MessageLog.log_project_membership_request(person, project, institution, comments)
+        email = Mailer.request_join_project(person.user, project, institution.to_json,comments, log)
+        refute_nil email
+        refute_nil email.body
+
+      end
+    end
+  end
+
+  test 'request create project for programme' do
+    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+      with_config_value(:site_base_host, 'https://securefred.com:1337') do
+        programme_admin = Factory(:programme_administrator)
+        programme = programme_admin.programmes.first
+        refute_empty programme.programme_administrators
+        project = Project.new(title:'My lovely project')
+        institution = Factory(:institution)
+        sender = Factory(:person)
+        log = MessageLog.log_project_creation_request(sender,programme,project,institution)
+        email = Mailer.request_create_project_for_programme(sender.user, programme, project.to_json, institution.to_json,log)
+        refute_nil email
+        refute_nil email.body
+        assert_equal [programme_admin.email],email.to
+      end
+    end
+  end
+
+  test 'request create project for programme admins' do
+    admin = Factory(:admin)
+    programme_admin = Factory(:programme_administrator)
+    programme = programme_admin.programmes.first
+    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+      with_config_value(:site_base_host, 'https://securefred.com:1337') do        
+        with_config_value(:managed_programme_id, programme.id) do
+          refute_empty programme.programme_administrators
+          project = Project.new(title:'My lovely project')
+          institution = Factory(:institution)
+          sender = Factory(:person)
+          log = MessageLog.log_project_creation_request(sender,programme,project,institution)
+          email = Mailer.request_create_project_for_programme_admins(sender.user, programme, project.to_json, institution.to_json,log)
+          refute_nil email
+          refute_nil email.body
+          assert_equal Person.admins.collect(&:email), email.to
+        end        
+      end
+    end
+  end
+
+  test 'request create project' do
+    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+      with_config_value(:site_base_host, 'https://securefred.com:1337') do
+        project = Project.new(title:'My lovely project')
+        institution = Factory(:institution)
+        sender = Factory(:person)
+        log = MessageLog.log_project_creation_request(sender,nil,project,institution)
+        email = Mailer.request_create_project(sender.user, project.to_json, institution.to_json,log)
+        refute_nil email
+        refute_nil email.body
+      end
+    end
+  end
+
+  test 'request create project and programme' do
+    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+      with_config_value(:site_base_host, 'https://securefred.com:1337') do
+        institution = Institution.new({title:'My lovely institution', web_page:'http://inst.org', country:'DE'})
+        project = Project.new(title:'My lovely project')
+        programme = Programme.new(title:'My lovely programme')
+        sender = Factory(:person)
+        log = MessageLog.log_project_creation_request(sender,programme,project,institution)
+        email = Mailer.request_create_project_and_programme(sender.user, programme.to_json, project.to_json, institution.to_json,log)
+        refute_nil email
+        refute_nil email.body        
+      end
+    end
+  end
+
+  test 'join project rejected' do
+    project = Factory(:project,title:'project to join')
+    requester = Factory(:person)
+    comments = "You are evil"
+    email = Mailer.join_project_rejected(requester, project, comments)
+    refute_nil email
+    refute_nil email.body
+    assert_equal "Your request to join the Project, project to join, hasn't been approved",email.subject
+  end
+
+  test 'create project rejected' do
+    requester = Factory(:person)
+    project_name='My Project'
+    comments = 'load of rubbish'
+    email = Mailer.create_project_rejected(requester,project_name,comments)
+    refute_nil email
+    refute_nil email.body
+  end
+
 
   private
 

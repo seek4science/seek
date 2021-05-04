@@ -83,24 +83,28 @@ module Seek
 
     private
 
+    # Takes into account current view, and returns the appropriate max results per page
+    def get_results_per_page
+
+      condensed_view_count = is_condensed_view? ? Seek::Config.results_per_page_default_condensed : false
+
+      # Priorities for the results per page value
+      # per_page param > controller specific config > specific view default > general default
+      params[:per_page]&.to_i ||
+          Seek::Config.results_per_page_for(controller_name) ||
+          condensed_view_count ||
+          Seek::Config.results_per_page_default
+    end
+
     def assign_index_variables
       # Parent resource
-      parent_id_param = request.path_parameters.keys.detect { |k| k.to_s.end_with?('_id') }
-      if parent_id_param
-        parent_type = parent_id_param.to_s.chomp('_id')
-        parent_class = parent_type.camelize.constantize
-        if parent_class
-          @parent_resource = parent_class.find(params[parent_id_param])
-        end
-      end
+      get_parent_resource
 
       # Page
       @page = page_and_sort_params[:page]
       @page ||= 'all' if json_api_request?
       @page ||= '1'
-      @per_page = params[:per_page]&.to_i ||
-          Seek::Config.results_per_page_for(controller_name) ||
-          Seek::Config.results_per_page_default
+      @per_page = get_results_per_page
 
       # Order
       @order = if page_and_sort_params[:sort]

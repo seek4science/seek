@@ -53,7 +53,7 @@ class Mailer < ActionMailer::Base
          subject: "A #{Seek::Config.application_name} member requests to discuss with you regarding #{resource.title}")
   end
 
-  def signup(user)
+  def activation_request(user)
     @username = user.login
     @name = user.person.name
     @admins = admins
@@ -80,13 +80,10 @@ class Mailer < ActionMailer::Base
          subject: "Welcome to #{Seek::Config.application_name}")
   end
 
-  def contact_admin_new_user(params, user)
-    new_member_details = Seek::Mail::NewMemberAffiliationDetails.new(params)
-    @details = new_member_details.message
+  def contact_admin_new_user(user)
+
     @person = user.person
     @user = user
-    @projects = new_member_details.projects
-    @projects_with_admins = @projects.select{|p| p.project_administrators.any?}
 
     mail(from: Seek::Config.noreply_sender,
          to: admin_emails,
@@ -105,21 +102,6 @@ class Mailer < ActionMailer::Base
     )
   end
 
-  def contact_project_administrator_new_user(project_administrator, params, user)
-    new_member_details = Seek::Mail::NewMemberAffiliationDetails.new(params)
-    @details = new_member_details.message
-    @other_institutions = params[:other_institutions]
-    @person = user.person
-    @projects = new_member_details.projects.select{|project| project_administrator.is_project_administrator?(project)}
-    @user = user
-    mail(from: Seek::Config.noreply_sender,
-         to: project_administrator_email(project_administrator),
-         reply_to: user.person.email_with_name,
-         subject: "#{Seek::Config.application_name} member signed up, please assign this person to the #{I18n.t('project').pluralize.downcase} of which you are #{I18n.t('project')} Administrator")
-  end
-
-
-
   def resources_harvested(harvester_responses, user)
     @resources = harvester_resources
     @person = user.person
@@ -130,7 +112,6 @@ class Mailer < ActionMailer::Base
   end
 
   def announcement_notification(site_announcement, notifiee_info)
-    # FIXME: this should really be part of the site_announcements plugin
     @site_announcement  = site_announcement
     @notifiee_info = notifiee_info
     mail(from: Seek::Config.noreply_sender,
@@ -181,24 +162,105 @@ class Mailer < ActionMailer::Base
     )
   end
 
-  def request_membership(user, project, details)
+  def request_join_project(user, project, institution_json, comments, message_log)
     @owners = project.project_administrators
     @requester = user.person
-    @resource = project
-    @details = details
+    @institution = Institution.new(JSON.parse(institution_json))
+    @project = project
+    @comments = comments
+    @message_log = message_log
     mail(from: Seek::Config.noreply_sender,
-         to: project.project_administrators.collect(&:email_with_name),
-         reply_to: user.person.email_with_name,
-         subject: "#{@requester.email_with_name} requested membership of project: #{@resource.title}")
+         to: @owners.collect(&:email_with_name),
+         reply_to: @requester.email_with_name,
+         subject: "JOIN #{t('project')} request to #{@project.title} from #{@requester.name}")
+  end
+
+  def request_create_project_for_programme(user, programme, project_json, institution_json, message_log)
+    @admins = programme.programme_administrators
+    @programme = programme
+    @requester = user.person
+    @institution = Institution.new(JSON.parse(institution_json))
+    @project = Project.new(JSON.parse(project_json))
+    @message_log = message_log
+
+    mail(from: Seek::Config.noreply_sender,
+         to: @admins.collect(&:email_with_name),
+         reply_to: @requester.email_with_name,
+         subject: "NEW #{t('project')} request from #{@requester.name} for your #{t('programme')}: #{@project.title}")
+
+  end
+
+  # same as request_create_project_for_programme but to notify the site admins rather instead of programme admins
+  def request_create_project_for_programme_admins(user, programme, project_json, institution_json, message_log)
+    @admins = admins
+    @programme = programme
+    @requester = user.person
+    @institution = Institution.new(JSON.parse(institution_json))
+    @project = Project.new(JSON.parse(project_json))
+    @message_log = message_log
+    
+    mail(from: Seek::Config.noreply_sender,
+         to: admin_emails,
+         reply_to: @requester.email_with_name,
+         subject: "NEW #{t('project')} request from #{@requester.name} for your #{t('programme')}: #{@project.title}",
+         template_name: :request_create_project_for_programme)
+    
+  end
+
+  def request_create_project_and_programme(user, programme_json, project_json, institution_json, message_log)
+    @admins = admins
+    @programme = Programme.new(JSON.parse(programme_json))
+    @requester = user.person
+    @institution = Institution.new(JSON.parse(institution_json))
+    @project = Project.new(JSON.parse(project_json))
+    @message_log = message_log
+    mail(from: Seek::Config.noreply_sender,
+         to: admin_emails,
+         reply_to: @requester.email_with_name,
+         subject: "New #{t('project')} and #{t('programme')} request from #{@requester.name}: #{@project.title}")
+  end
+
+  def request_create_project(user, project_json, institution_json, message_log)
+    @admins = admins
+    @requester = user.person
+    @institution = Institution.new(JSON.parse(institution_json))
+    @project = Project.new(JSON.parse(project_json))
+    @message_log = message_log
+    mail(from: Seek::Config.noreply_sender,
+         to: admin_emails,
+         reply_to: @requester.email_with_name,
+         subject: "New #{t('project')} request from #{@requester.name}: #{@project.title}",
+         template_name: :request_create_project_for_programme)
+  end
+
+  def join_project_rejected(requester, project, comments)
+    @requester = requester
+    @project = project
+    @comments = comments
+    subject = "Your request to join the #{t('project')}, #{project.title}, hasn't been approved"
+    mail(from: Seek::Config.noreply_sender,
+         to: requester.email_with_name,
+         subject: subject)
+  end
+
+  def create_project_rejected(requester,project_name,comments)
+    @requester = requester
+    @project_name = project_name
+    @comments = comments
+    subject = "Your request to create the #{t('project')}, #{project_name}, hasn't been approved"
+    mail(from: Seek::Config.noreply_sender,
+         to: requester.email_with_name,
+         subject: subject)
   end
 
   private
 
   def admin_emails
     admins.map(&:email_with_name)
-  rescue
-    Rails.logger.error('Error determining admin email addresses')
-    ['sowen@cs.man.ac.uk']
+  end
+
+  def admins
+    Person.admins
   end
 
   def project_administrator_email(project_administrator)
@@ -228,8 +290,5 @@ class Mailer < ActionMailer::Base
          reply_to: publisher.email_with_name,
          subject: subject)
   end
-
-  def admins
-    Person.admins
-  end
+  
 end

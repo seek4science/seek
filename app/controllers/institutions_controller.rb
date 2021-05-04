@@ -11,8 +11,7 @@ class InstitutionsController < ApplicationController
 
   skip_before_action :project_membership_required
 
-  cache_sweeper :institutions_sweeper, only: [:update, :create, :destroy]
-  include Seek::BreadCrumbs
+  cache_sweeper :institutions_sweeper, only: [:update, :create, :destroy]  
 
   api_actions :index, :show, :create, :update, :destroy
 
@@ -61,7 +60,7 @@ class InstitutionsController < ApplicationController
     @institution = Institution.new(institution_params)
     respond_to do |format|
       if @institution.save
-        flash[:notice] = 'Institution was successfully created.'
+        flash[:notice] = "#{t('institution')} was successfully created."
         format.html { redirect_to(@institution) }
         format.xml  { render xml: @institution, status: :created, location: @institution }
         format.json {render json: @institution, status: :created, location: @institution, include: [params[:include]]}
@@ -79,7 +78,7 @@ class InstitutionsController < ApplicationController
     respond_to do |format|
       if @institution.update_attributes(institution_params)
         expire_resource_list_item_content
-        flash[:notice] = 'Institution was successfully updated.'
+        flash[:notice] = "#{t('institution')} was successfully updated."
         format.html { redirect_to(@institution) }
         format.xml  { head :ok }
         format.json {render json: @institution, include: [params[:include]]}
@@ -88,6 +87,31 @@ class InstitutionsController < ApplicationController
         format.xml  { render xml: @institution.errors, status: :unprocessable_entity }
         format.json { render json: json_api_errors(@institution), status: :unprocessable_entity }
       end
+    end
+  end
+
+  # For use in autocompleters
+  def typeahead
+    results = Institution.where("LOWER(title) LIKE :query
+                                  OR LOWER(city) LIKE :query
+                                  OR LOWER(address) LIKE :query",
+                           query: "%#{params[:query].downcase}%").limit(params[:limit] || 10)
+    items = results.map do |institution|
+      { id: institution.id,
+        name: institution.title,
+        web_page: institution.web_page,
+        city: institution.city,
+        country:institution.country,
+        country_name: CountryCodes.country(institution.country),
+        hint: institution.typeahead_hint }
+    end
+
+    if params[:include_new]
+      items.unshift({id:-1, name:params[:query], web_page: '', country: '', country_name: '', city: '', hint:"new item", new: true })
+    end
+
+    respond_to do |format|
+      format.json { render json: items.to_json }
     end
   end
 
@@ -103,10 +127,21 @@ class InstitutionsController < ApplicationController
     end
   end
 
+  # request all institutions, but specific to the sharing form which expects an array
+  def request_all_sharing_form
+    institution_list = Institution.order(:id).collect{ |institution| [institution.title, institution.id] }
+    respond_to do |format|
+      format.json do       
+        render json: { status: 200, institution_list: institution_list }       
+      end
+    end
+  end
+
   private
 
   def institution_params
-    params.require(:institution).permit(:title, :web_page, :address, :city, :country)
+    params.require(:institution).permit(:title, :web_page, :address, :city, :country,
+                                        discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
   def editable_by_user

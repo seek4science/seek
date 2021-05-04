@@ -1,4 +1,32 @@
 <% objects = resources_numerical_paginated %>
+<%# All tableview_columns values need to have a corresponding match in _resource_list_item_table.html.erb %>
+<%
+  # The user can keep a custom set of columns for each resource class
+  resource = objects[0]
+  requiredColView = resource.columns_required
+  defaultColView = resource.columns_default
+
+  # # Update stored column names
+  if params.has_key?(:table_cols)
+    session["tableview_" + resource.class.name] = params[:table_cols].split(',')
+  end
+
+  # Set columns to show, if none are selected, show defaults
+  if session.has_key?("tableview_" + resource.class.name) && !session["tableview_"+resource.class.name].empty?
+    tableview_columns = requiredColView + session["tableview_"+resource.class.name]
+  else
+    tableview_columns = requiredColView + defaultColView
+  end
+
+  # Prepare available columns for this particular resource type
+  # First show the shown columns in order, and then the available ones. Required columns are never given as an option
+  availableColView = tableview_columns + (resource.columns_allowed - tableview_columns) - requiredColView
+  # availableColView = resource.columns_allowed
+
+%>
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
 
 <% content_for :pagination do %>
   <%= render partial: 'general/paginate_numerical', locals: { objects: objects } if objects.respond_to?(:current_page) %>
@@ -6,8 +34,116 @@
 
 <%= content_for :pagination %>
 
+<%# If there is no param for view, try to retrieve from session information %>
+<% if !params.has_key?(:view) && session.has_key?(:view) %>
+  <% params[:view] = session[:view]%>
+<% elsif params.has_key?(:view)%>
+  <% session[:view] = params[:view]%>
+<% else %>
+  <% params[:view] =="default"%>
+  <% session[:view] = params[:view]%>
+<% end%>
+
 <div class="list_items_container">
-  <%= render partial: 'assets/resource_list_item', collection: objects %>
+  <ul id="view_tabs" class="nav nav-tabs">
+    <li role="presentation" <% if params[:view]=="default" || !params.has_key?(:view) %> class="active" <%end%>>
+      <a href="#" view="default">Default</a>
+    </li>
+    <li role="presentation" <% if params[:view]=="condensed" %> class="active" <%end%>>
+      <a href="#" view="condensed">Condensed</a>
+    </li>
+    <li role="presentation"  <% if params[:view]=="table" %> class="active" <%end%>>
+      <a href="#" view="table">Table</a>
+    </li>
+  </ul>
+
+  <% if params[:view]=="condensed" %>
+    <%= render partial: 'assets/resource_list_item_condensed', collection: objects %>
+  <% elsif params[:view]=="table" %>
+    <table class="table table-hover table-bordered">
+      <thead>
+        <tr>
+          <% for column in tableview_columns -%>
+            <th style="width:<%= 100/tableview_columns.length %>%"><%= t(column, default: column.to_s).titleize %></th>
+          <% end -%>
+          <th>
+            <div id="tableview-colselector" class="dropdown">
+                <a href="#" class="dropdown-toggle"><span class="glyphicon glyphicon-cog"></span></a>
+                <div id="sortable-colselector" class="dropdown-menu" style="padding:0px;">
+                  <% for column in availableColView -%>
+                      <div class="checkbox list-group-item" style="margin-top:0px;">
+                          <label style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;max-width: 110px;">
+                              <input type="checkbox" value="<%= column %>"
+                              <% if tableview_columns.include?(column) %>
+                                checked
+                              <% end %>
+                              >
+                              <%= t(column, default: column.to_s).titleize %>
+                          </label>
+                          <span class="glyphicon glyphicon-move handle" style="float: right;cursor: grab;"> </span>
+                      </div>
+                  <% end -%>
+                </div>
+            </div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <%= render partial: 'assets/resource_list_item_table', collection: objects, locals: { tableview_columns: tableview_columns } %>
+      </tbody>
+    </table>
+  <% else %>
+    <%= render partial: 'assets/resource_list_item', collection: objects %>
+  <% end %>
 </div>
 
 <%= content_for :pagination %>
+
+<script>
+  /* Removing data-toggle="dropdown" from 'tableview-colselector a' we can prevent it from closing */
+  $j('#tableview-colselector a').on('click', function (event) {
+      $j(this).parent().toggleClass('open');
+  });
+
+  $j('#view_tabs a').click(function () {
+      const url = new URL(window.location.href);
+      const search_params = url.searchParams;
+      search_params.set('view', $j(this).attr('view'));
+      url.search = search_params.toString();
+      window.location = url;
+  });
+  $j('#tableview-colselector input[type="checkbox"]').click(function (event) {
+    event.stopPropagation();
+    refreshWithOptions();
+  });
+
+  new Sortable(document.getElementById('sortable-colselector'), {
+    animation: 150,
+    handle: '.handle',
+    ghostClass: 'blue-background-class',
+    onEnd: refreshWithOptions,
+  });
+
+  /**
+    * Refresh the page with the options selected from the dropdown menu
+  */
+  var debounceTimeout;
+  function refreshWithOptions(){
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout)
+    }
+    debounceTimeout = setTimeout(function() {
+      table_cols = []
+      $j('#tableview-colselector input:checked').each(function() {
+        table_cols.push(this.value);
+      });
+      console.log(table_cols);
+      const url = new URL(window.location.href);
+      const search_params = url.searchParams;
+      search_params.set('table_cols', table_cols);
+      url.search = search_params.toString();
+      window.location = url;
+    }, 700);
+    return true;
+  }
+</script>

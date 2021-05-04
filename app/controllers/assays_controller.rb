@@ -4,7 +4,6 @@ class AssaysController < ApplicationController
   include Seek::AssetsCommon
 
   before_action :assays_enabled?
-
   before_action :find_assets, :only=>[:index]
   before_action :find_and_authorize_requested_item, :only=>[:edit, :update, :destroy, :manage, :manage_update, :show, :new_object_based_on_existing_one]
 
@@ -13,8 +12,6 @@ class AssaysController < ApplicationController
   before_action :project_membership_required_appended, :only=>[:new_object_based_on_existing_one]
 
   include Seek::Publishing::PublishingCommon
-
-  include Seek::BreadCrumbs
 
   include Seek::IsaGraphExtensions
 
@@ -110,6 +107,7 @@ class AssaysController < ApplicationController
     @assay = Assay.new(assay_params)
 
     update_assay_organisms @assay, params
+    update_assay_human_diseases @assay, params
     @assay.contributor=current_person
     update_sharing_policies @assay
     update_annotations(params[:tag_list], @assay)
@@ -131,6 +129,7 @@ class AssaysController < ApplicationController
 
   def update
     update_assay_organisms @assay, params
+    update_assay_human_diseases @assay, params
     update_annotations(params[:tag_list], @assay)
     update_sharing_policies @assay
     update_relationships(@assay, params)
@@ -158,6 +157,14 @@ class AssaysController < ApplicationController
     end
   end
 
+  def update_assay_human_diseases assay,params
+    human_diseases             = params[:assay_human_disease_ids] || params[:assay][:human_disease_ids] || []
+    assay.assay_human_diseases = []
+    Array(human_diseases).each do |human_disease_id|
+      assay.associate_human_disease(human_disease_id)
+    end
+  end
+
   def show
     respond_to do |format|
       format.html
@@ -176,7 +183,9 @@ class AssaysController < ApplicationController
                                   { scales: [] }, { sop_ids: [] }, { model_ids: [] },
                                   { samples_attributes: [:asset_id, :direction] },
                                   { data_files_attributes: [:asset_id, :direction, :relationship_type_id] },
-                                  { publication_ids: [] }
+                                  { publication_ids: [] },				  	
+                                  { custom_metadata_attributes: determine_custom_metadata_keys },
+				  { discussion_links_attributes:[:id, :url, :label, :_destroy] }
                                   ).tap do |assay_params|
       assay_params[:document_ids].select! { |id| Document.find_by_id(id).try(:can_view?) } if assay_params.key?(:document_ids)
       assay_params[:sop_ids].select! { |id| Sop.find_by_id(id).try(:can_view?) } if assay_params.key?(:sop_ids)

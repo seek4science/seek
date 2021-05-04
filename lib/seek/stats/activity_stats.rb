@@ -24,7 +24,7 @@ module Seek
           PERIODS.keys.each do |period_key|
             if log.created_at > PERIODS[period_key]
               attribute = "@#{period_key}_#{log.activity_loggable_type.downcase.pluralize}_#{action}"
-              eval("#{attribute} += 1")
+              instance_variable_set(attribute, instance_variable_get(attribute) + 1)
             end
           end
         end

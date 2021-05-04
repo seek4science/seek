@@ -15,4 +15,5 @@ Factory.define(:max_institution, class: Institution) do |f|
   f.city "Manchester"
   f.address "Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom"
   f.web_page "http://www.mib.ac.uk/"
+  f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
 end

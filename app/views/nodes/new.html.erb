@@ -4,7 +4,7 @@
     <div class="asset_form">
       <%= error_messages_for :node -%>
 
-      <%= render :partial=>"assets/reference_box",:locals=>{:resource=>@node} -%>
+      <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@node, action: 'Register'} -%>
 
       <div class="form-group">
         <label>Title <span class="required">*</span></label>
@@ -15,7 +15,7 @@
       <div class="form-group">
         <label>Description</label>
         <% node_description_value = (params[:node].blank? || params[:node][:description].blank?) ? nil : params[:node][:description] -%>
-        <%= text_area_tag 'node[description]', node_description_value, :class=>"form-control" -%>
+        <%= text_area_tag 'node[description]', node_description_value, :class=>"form-control rich-text-edit" -%>
       </div>
 
       <%= render :partial => "projects/project_selector", :locals => { :resource => @node, :allow_nil => Seek::Config.is_virtualliver } %>

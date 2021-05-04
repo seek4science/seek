@@ -15,7 +15,7 @@ module Seek
   module ProjectHierarchies
     module ProjectExtension
       extend ActiveSupport::Concern
-      RELATED_RESOURCE_TYPES = %w(Investigation Study Assay DataFile Model Sop Publication Event Presentation Organism)
+      RELATED_RESOURCE_TYPES = %w(Investigation Study Assay DataFile Model Sop Publication Event Presentation Organism HumanDisease)
 
       included do
         include ActsAsCachedTree

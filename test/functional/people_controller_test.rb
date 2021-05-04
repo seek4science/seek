@@ -86,7 +86,8 @@ class PeopleControllerTest < ActionController::TestCase
     assert_redirected_to person_path(person)
   end
 
-  def test_should_create_person
+  test 'should_create_person' do
+
     assert_difference('Person.count') do
       assert_difference('NotifieeInfo.count') do
         post :create, params: { person: { first_name: 'test', email: 'hghg@sdfsd.com' } }
@@ -96,6 +97,30 @@ class PeopleControllerTest < ActionController::TestCase
     assert_redirected_to person_path(assigns(:person))
     assert_equal 'T', assigns(:person).first_letter
     assert_not_nil Person.find(assigns(:person).id).notifiee_info
+  end
+
+  test 'activation required after create' do
+    Factory(:person) # make sure a person is present, first person would otherwise be the admin
+
+    login_as(Factory(:brand_new_user))
+    with_config_value(:activation_required_enabled,true) do
+      with_config_value(:email_enabled, true) do
+        assert_difference('Person.count') do
+          assert_difference('MessageLog.count') do
+            assert_enqueued_emails(2) do #1 to admin, and 1 email requesting activation
+              post :create, params: { person: { first_name: 'test', email: 'hghg@sdfsd.com' } }
+            end
+          end
+        end
+      end
+    end
+
+    person = assigns(:person)
+    assert_redirected_to activation_required_users_path
+    refute person.user.active?
+    assert_equal 1,MessageLog.activation_email_logs(person).count
+    assert_equal person,MessageLog.activation_email_logs(person).last.subject
+    assert_equal 1,person.activation_email_logs.count
   end
 
   test 'cannot access select form as registered user, even admin' do
@@ -598,15 +623,13 @@ class PeopleControllerTest < ActionController::TestCase
       sop = Factory(:sop, projects: [proj], policy: Factory(:public_policy))
       df = Factory(:data_file, projects: [proj], policy: Factory(:public_policy))
 
-
-
       # subscribe to project
       put :update, params: { id: current_person, receive_notifications: true, person: { project_subscriptions_attributes: { '0' => { project_id: proj.id, frequency: 'weekly', _destroy: '0' } } } }
       assert_redirected_to current_person
 
       project_subscription = ProjectSubscription.where({project_id:proj.id, person_id:current_person.id}).first
       assert_difference 'Subscription.count', 2 do
-        ProjectSubscriptionJob.new(project_subscription.id).perform
+        ProjectSubscriptionJob.perform_now(project_subscription)
       end
       assert sop.subscribed?(current_person)
       assert df.subscribed?(current_person)
@@ -615,7 +638,7 @@ class PeopleControllerTest < ActionController::TestCase
       assert_enqueued_emails 1 do
         Factory(:activity_log, activity_loggable: sop, action: 'update')
         Factory(:activity_log, activity_loggable: df, action: 'update')
-        SendPeriodicEmailsJob.new('weekly').perform
+        PeriodicSubscriptionEmailJob.perform_now('weekly')
       end
 
       # unsubscribe to project
@@ -632,7 +655,7 @@ class PeopleControllerTest < ActionController::TestCase
       assert_no_enqueued_emails do
         Factory(:activity_log, activity_loggable: sop, action: 'update')
         Factory(:activity_log, activity_loggable: df, action: 'update')
-        SendPeriodicEmailsJob.new('weekly').perform
+        PeriodicSubscriptionEmailJob.perform_now('weekly')
       end
     end
   end
@@ -696,7 +719,7 @@ class PeopleControllerTest < ActionController::TestCase
 
   test 'controller-specific results_per_page should override default' do
     with_config_value(:results_per_page_default, 2) do
-      get :index
+      get :index, params: { view: 'default' }
       assert_response :success
       assert_equal 2, assigns(:per_page)
       assert_select '.pagination-container li.active', text: '1'
@@ -717,6 +740,36 @@ class PeopleControllerTest < ActionController::TestCase
         assert_select '.pagination-container li.active', text: '1'
         assert_select 'div.list_item_title', count: 2
       end
+      # Reset the view parameter
+      session.delete(:view)
+    end
+  end
+
+  test 'Condensed views should use a different results_per_page default' do
+    with_config_value(:results_per_page_default, 2) do
+      with_config_value(:results_per_page_default_condensed, 3) do
+        # Load a regular default view, and a condensed view, and check that the number of items in each are different
+        get :index, params: { view: 'default' }
+        assert_response :success
+        assert_equal 2, assigns(:per_page)
+        assert_select '.pagination-container li.active', text: '1'
+        assert_select 'div.list_item_title', count: 2
+
+        get :index, params: { view: 'condensed' }
+        assert_response :success
+        assert_equal 3, assigns(:per_page)
+        assert_select '.pagination-container li.active', text: '1'
+        assert_select '.list_items_container .collapse', count: 3
+
+        
+        get :index, params: { view: 'table' }
+        assert_response :success
+        assert_equal 3, assigns(:per_page)
+        assert_select '.pagination-container li.active', text: '1'
+        assert_select '.list_items_container tbody tr', count: 3
+      end
+      # Reset the view parameter
+      session.delete(:view)
     end
   end
 
@@ -889,29 +942,7 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
-  test 'should email admin and project administrators when specifying project' do
-    proj_man1 = Factory :project_administrator
-    proj_man2 = Factory :project_administrator
-    proj1 = proj_man1.projects.first
-    proj2 = proj_man2.projects.first
-    project_without_manager = Factory :project
 
-    # check there are 3 uniq projects
-    assert_equal 3, [proj1, proj2, project_without_manager].uniq.size
-
-    user = Factory :activated_user
-    assert_nil user.person
-    login_as(user)
-
-    # 3 emails - 1 to admin and 2 to project administrators
-    assert_enqueued_emails(3) do
-      post :create, params: { person: { first_name: 'Fred', last_name: 'BBB', email: 'fred.bbb@email.com' }, projects: [proj1.id, proj2.id, project_without_manager.id] }
-    end
-
-    assert assigns(:person)
-    user.reload
-    assert_equal user.person, assigns(:person)
-  end
   test 'redirect after destroy' do
     person1 = Factory(:person)
     person2 = Factory(:person)
@@ -1193,6 +1224,76 @@ class PeopleControllerTest < ActionController::TestCase
     assert_equal [wg1.institution_id, wg2.institution_id].sort, notif_params[:institutions].map(&:to_i).sort
     assert_equal 'Testy', notif_params[:other_projects]
     assert_equal 'Testo' ,notif_params[:other_institutions]
+  end
+
+  test 'result view selection via params' do
+    with_config_value(:results_per_page, { 'people' => 3 }) do
+      get :index, params: { view: 'table' }
+      assert_response :success
+      assert_select '.list_items_container tbody tr', count: 3
+    end
+    # no view param will resort to the last used one
+    with_config_value(:results_per_page, { 'people' => 3 }) do
+      get :index
+      assert_response :success
+      assert_select '.list_items_container tbody tr', count: 3
+    end
+    with_config_value(:results_per_page, { 'people' => 3 }) do
+      get :index, params: { view: 'condensed' }
+      assert_response :success
+      assert_select '.list_items_container .collapse', count: 3
+    end
+    # Reset the view parameter
+    session.delete(:view)
+  end
+
+  test 'table view column selection' do
+    # Title is always added, and there is an extra header for dropdown selection
+    with_config_value(:results_per_page, { 'people' => 3 }) do
+      get :index, params: { view: 'table',table_cols:'created_at,first_name,last_name,description,email' }
+      assert_response :success
+      assert_select '.list_items_container thead th', count: 7
+    end
+    # When no columns are specified, resort to default, so it's never empty
+    with_config_value(:results_per_page, { 'people' => 3 }) do
+      get :index, params: { view: 'table',table_cols:'' }
+      assert_response :success
+      assert_select '.list_items_container thead th',  minimum: 3
+    end
+    # Reset the view parameter
+    session.delete(:view)
+  end
+
+  test 'tracking notice shown' do
+    with_config_value(:google_analytics_enabled, false) do
+      with_config_value(:piwik_analytics_enabled, false) do
+        get :index
+        assert_response :success
+        assert_select '#tracking-banner', count: 0
+      end
+      with_config_value(:piwik_analytics_enabled, true) do
+        get :index
+        assert_response :success
+        assert_select '#tracking-banner', count: 1
+        with_config_value(:piwik_analytics_tracking_notice, false) do
+          get :index
+          assert_response :success
+          assert_select '#tracking-banner', count: 0
+        end
+      end
+    end
+    with_config_value(:google_analytics_enabled, true) do
+      with_config_value(:piwik_analytics_enabled, false) do
+        get :index
+        assert_response :success
+        assert_select '#tracking-banner', count: 1
+        with_config_value(:google_analytics_tracking_notice, false) do
+          get :index
+          assert_response :success
+          assert_select '#tracking-banner', count: 0
+        end
+      end
+    end
   end
 
   def edit_max_object(person)

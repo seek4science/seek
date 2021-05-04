@@ -1,12 +1,12 @@
-<%= button_link_to('Share with a programme', 'add', '#', id: 'add-programme-permission-button') %>
+<%= button_link_to("Share with a #{t('programme').downcase}", 'add', '#', id: 'add-programme-permission-button') %>
 
 <%= modal(id: 'add-programme-permission-modal', size: 'm') do %>
-    <%= modal_header('Share with programmes') %>
+    <%= modal_header("Share with #{t('programme').downcase.pluralize}") %>
     <%= modal_body do %>
         <div class="form-group">
-          <label>The following programmes...</label>
+          <label>The following <%= t('programme').downcase.pluralize -%>...</label>
           <%= objects_input('permission-programmes-ids', [], typeahead: { values: Programme.all.map { |p| { id: p.id, name: p.title } } }, name: nil) -%>
-          <p class="help-block">Start typing a programme's title and select from the list that appears. You can select multiple programmes.</p>
+          <p class="help-block">Start typing a <%= t('programme').downcase -%>'s title and select from the list that appears. You can select multiple <%= t('programme').downcase.pluralize -%>.</p>
         </div>
         <div class="form-group">
           <label>can...</label>

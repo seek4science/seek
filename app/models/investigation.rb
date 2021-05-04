@@ -24,6 +24,14 @@ class Investigation < ApplicationRecord
     related_data_files + related_sops + related_models + related_publications + related_documents
   end
 
+  # Returns the columns to be shown on the table view for the resource
+  def columns_default
+    super + ['creators','projects']
+  end
+  def columns_allowed
+    columns_default+ ['other_creators','deleted_contributor']
+  end
+
   def clone_with_associations
     new_object = dup
     new_object.policy = policy.deep_copy
@@ -34,5 +42,9 @@ class Investigation < ApplicationRecord
 
   def related_publication_ids
     publication_ids | study_publication_ids | assay_publication_ids
+  end
+
+  def self.user_creatable?
+    Seek::Config.investigations_enabled
   end
 end

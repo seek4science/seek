@@ -2,6 +2,7 @@ class PeopleController < ApplicationController
   include Seek::IndexPager
   include Seek::AnnotationCommon
   include Seek::Publishing::PublishingCommon
+  include Seek::Sharing::SharingCommon
   include Seek::Publishing::GatekeeperPublish
   include Seek::FacetedBrowsing
   include Seek::DestroyHandling
@@ -9,7 +10,7 @@ class PeopleController < ApplicationController
   include RelatedItemsHelper
 
   before_action :find_assets, only: [:index]
-  before_action :find_and_authorize_requested_item, only: %i[show edit update destroy items]
+  before_action :find_and_authorize_requested_item, only: %i[show edit update destroy items batch_sharing_permission_preview]
   before_action :current_user_exists, only: %i[register create new]
   before_action :is_during_registration, only: [:register]
   before_action :is_user_admin_auth, only: [:destroy]
@@ -21,7 +22,6 @@ class PeopleController < ApplicationController
   skip_after_action :request_publish_approval, :log_publishing, only: %i[create update]
 
   cache_sweeper :people_sweeper, only: %i[update create destroy]
-  include Seek::BreadCrumbs
 
   protect_from_forgery only: []
 
@@ -100,10 +100,12 @@ class PeopleController < ApplicationController
   # people yet to be assigned, or create a new one if you don't exist
   def register
     email = params[:email]
+    @existing_email = email && Person.where(email: email).any?
     if email && Person.not_registered_with_matching_email(email).any?
       render :is_this_you, locals: { email: email }
     else
       p = { email: email }
+      p[:first_name], p[:last_name] = params[:name].split(' ') if params[:name].present?
       p[:first_name] = params[:first_name] if params[:first_name]
       p[:last_name] = params[:last_name] if params[:last_name]
       @person = Person.new(p)
@@ -126,19 +128,25 @@ class PeopleController < ApplicationController
     respond_to do |format|
       if @person.save && current_user.save
         if Seek::Config.email_enabled && during_registration
-          notify_admin_and_project_administrators_of_new_user
+          Mailer.contact_admin_new_user(current_user).deliver_later
         end
         if current_user.active?
           flash[:notice] = 'Person was successfully created.'
           if @person.only_first_admin_person?
             format.html { redirect_to registration_form_admin_path(during_setup: 'true') }
           else
-            format.html { redirect_to(@person) }
+            if Seek::Config.programmes_enabled && Programme.site_managed_programme
+              format.html { redirect_to(create_or_join_project_home_path)}
+            else
+              format.html { redirect_to(@person) }
+            end
+
           end
           format.xml { render xml: @person, status: :created, location: @person }
           format.json {render json: @person, status: :created, location: @person, include: [params[:include]] }
         else
-          Mailer.signup(current_user).deliver_later
+          Mailer.activation_request(current_user).deliver_later
+          MessageLog.log_activation_email(@person)
           flash[:notice] = 'An email has been sent to you to confirm your email address. You need to respond to this email before you can login'
           logout_user
           format.html { redirect_to controller: 'users', action: 'activation_required' }
@@ -149,16 +157,6 @@ class PeopleController < ApplicationController
         format.xml { render xml: @person.errors, status: :unprocessable_entity }
         format.json { render json: json_api_errors(@person), status: :unprocessable_entity }
       end
-    end
-  end
-
-  def notify_admin_and_project_administrators_of_new_user
-    Mailer.contact_admin_new_user(notification_params.to_h, current_user).deliver_later
-
-    # send mail to project managers
-    project_administrators = project_administrators_of_selected_projects params[:projects]
-    project_administrators.each do |project_administrator|
-      Mailer.contact_project_administrator_new_user(project_administrator, notification_params.to_h, current_user).deliver_later
     end
   end
 

@@ -3,20 +3,40 @@ require 'test_helper'
 class ProjectTest < ActiveSupport::TestCase
   fixtures :projects, :institutions, :work_groups, :group_memberships, :people, :users, :publications, :assets, :organisms
 
-  # checks that the dependent work_groups are destroyed when the project s
-  def test_delete_work_groups_when_project_deleted
-    p = Factory(:person).projects.first
-    assert_equal 1, p.work_groups.size
-    wg = p.work_groups.first
 
-    wg.people = []
-    wg.save!
-    User.current_user = Factory(:admin).user
-    assert_difference('WorkGroup.count', -1) do
-      p.destroy
+  test 'workgroups destroyed with project' do
+    project = Factory(:person).projects.first
+    person = Factory(:person)
+    disable_authorization_checks do
+      person.add_to_project_and_institution(project, project.institutions.first)
+      person.save!
+
+      wg = project.work_groups.last
+      assert_equal 2, wg.people.count
+
+      person2 = Factory(:person)
+      person2.add_to_project_and_institution(project, Factory(:institution))
+      person2.save!
+
+      assert_equal 2, project.work_groups.count
+      assert_equal 3, project.people.count
+      assert_equal 3, project.group_memberships.count
+
+      assert_difference('WorkGroup.count', -2) do
+        assert_difference('GroupMembership.count', -3) do
+          assert_no_difference('Person.count') do
+            assert_difference('Project.count', -1) do
+              project.destroy
+            end
+          end
+        end
+      end
+
+      assert_nil WorkGroup.find_by_id(wg.id)
+      assert_nil Project.find_by_id(project.id)
+      refute_nil Person.find_by_id(person.id)
+      refute_nil Person.find_by_id(person2.id)
     end
-
-    assert_nil WorkGroup.find_by_id(wg.id)
   end
 
   test 'validate title and decription length' do
@@ -484,6 +504,12 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal x.uuid, uuid
   end
 
+  test 'project_admin_can_delete' do
+    u = Factory(:project_administrator).user
+    p = u.person.projects.first
+    assert p.can_delete?(u)
+  end
+
   test 'can_delete?' do
     project = Factory(:project)
 
@@ -493,14 +519,14 @@ class ProjectTest < ActiveSupport::TestCase
     assert project.work_groups.collect(&:people).flatten.empty?
     assert !project.can_delete?(user)
 
-    # can not delete if workgroups contain people
+    # can delete if workgroups contain people
     user = Factory(:admin).user
     assert user.is_admin?
     project = Factory(:project)
     work_group = Factory(:work_group, project: project)
     a_person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: work_group)])
     refute project.work_groups.collect(&:people).flatten.empty?
-    refute project.can_delete?(user)
+    assert project.can_delete?(user)
 
     # can delete if admin and workgroups are empty
     work_group.group_memberships.delete_all

@@ -32,6 +32,7 @@ module Seek
         acts_as_authorized
         acts_as_uniquely_identifiable
         acts_as_favouritable
+        acts_as_discussable
         grouped_pagination
         title_trimmer
 

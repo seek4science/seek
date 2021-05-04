@@ -1,59 +1,113 @@
 <% remote ||= false %>
 
-<%= form_for(@sample_controlled_vocab, remote:remote) do |f| %>
+<%= form_for(@sample_controlled_vocab, remote: remote) do |f| %>
 
-    <span id="controlled-vocab-errors">
+  <span id="controlled-vocab-errors">
         <%= f.error_messages %>
     </span>
 
-    <div class="form-group">
-      <label>Title</label><%= required_span %>
-      <%= f.text_field :title, :class => 'form-control', :placeholder => 'Controlled vocabulary name' %>
+  <div class="form-group">
+    <label>Title</label><%= required_span %>
+    <%= f.text_field :title, :class => 'form-control', :placeholder => 'Controlled vocabulary name' %>
+  </div>
+
+  <div class="form-group">
+    <label>Description</label>
+    <%= f.text_area :description, :class=>"form-control rich-text-edit-deferred short-editor" -%>
+  </div>
+
+  <%= panel('Ontology') do %>
+
+    <div class="help-block">
+      You can, optionally, populate the terms from an ontology available from the <%= link_to('Ontology Lookup Service','https://www.ebi.ac.uk/ols/index',target: :_blank) %>.
+      To do so, select the ontology below, and then choose the root term - from which itself and all children will be added to the terms. You can choose the root term by following the
+      link provide to browse the ontology.
+      <br/>
+      Then click Fetch to populate the terms below. Note that for a large tree this can take several minutes. Afterwards you can remove or tweak individual terms, or add additional terms.
+      <br/>
+      If you wish to generate an Controlled Vocabularly for an ontology that isn't available on the Ontology Lookup Service, then please contact us using the
+      <%= link_to 'Feedback Form',feedback_home_path %>.
     </div>
 
     <div class="form-group">
-      <label>Description</label>
-      <%= f.text_area :description, :class=>"form-control", :rows => 5 -%>
-    </div>
+      <label>Ontology</label>
+      <%= f.select :source_ontology, ebi_ontology_choices, { include_blank: 'No Ontology' }, class: 'form-control' -%>
+      <br/>
 
-    <h3>Terms</h3>
-    <table id="new-terms" class="table">
-      <tbody>
-      <% @sample_controlled_vocab.sample_controlled_vocab_terms.each_with_index do |term, index| %>
-          <%= f.fields_for :sample_controlled_vocab_terms, term do |terms_f| %>
+      <div id='ontology-root-uri' style="display:none;">
+        <div class="help-block">
+          You have selected the <a id="selected-ols-link" href="" target="_blank"></a> ontology,
+          click the link to browse on the Ontology Lookup Service in another tab and find the suitable root term URI.
+          You should then copy that URI into the field below.
+        </div>
+        <div>
+          <label>Root term</label>
+          <%= f.text_field :ols_root_term_uri, :class => 'form-control', :placeholder => 'e.g. http://www.ebi.ac.uk/efo/EFO_0000635' %>
+        </div>
+        <div>
+          <%= submit_tag 'Fetch', id: 'fetch-ontology-terms-submit', :class => 'btn btn-primary' %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <%= panel('Terms') do %>
+
+    <span id='fetch-terms-spinner'></span>
+    <div id='fetch-error-message' class="alert alert-danger" style="display:none;"></div>
+
+    <div id='controlled-vocab-terms'>
+      <div id='controlled-vocab-terms-fixed'>
+        <table id="new-terms" class="table" style="width:100%;">
+          <thead>
+          <th>Label<span class="required">*</span></th>
+          <th>IRI</th>
+          <th>Parent IRI</th>
+          <th></th>
+          </thead>
+          <tbody>
+          <% @sample_controlled_vocab.sample_controlled_vocab_terms.each_with_index do |term, index| %>
+            <%= f.fields_for :sample_controlled_vocab_terms, term do |terms_f| %>
+
               <tr class="sample-cv-term" data-index="<%= index %>">
                 <td><%= terms_f.text_field :label, :class => 'form-control' %></td>
+                <td><%= terms_f.text_field :iri, :class => 'form-control' %></td>
+                <td><%= terms_f.text_field :parent_iri, :class => 'form-control' %></td>
                 <td>
                   <div class="btn-group" data-toggle="buttons">
+                    <%= hidden_field_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][#{index}][_destroy]", '0', :autocomplete => 'off' %>
                     <label class="btn btn-danger">
                       Remove
-                      <%= hidden_field_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][#{index}][_destroy]", '0', :autocomplete => 'off' %>
                       <%= check_box_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][#{index}][_destroy]", '1', false,
-                                        :class => 'destroy-attribute', :autocomplete => 'off' %>
+                                        :class => 'destroy-attribute', :autocomplete => 'off',id:"sample_controlled_vocab-checkbox[sample_controlled_vocab_terms_attributes][#{index}][_destroy]" %>
                     </label>
                   </div>
 
                 </td>
               </tr>
+            <% end %>
           <% end %>
-      <% end %>
-      <tr id='add-term-button-row'>
-        <td>
-          <%= button_link_to('Add new term', 'add', '#', :id => 'add-term') %>
-        </td>
-      </tr>
-      </tbody>
-    </table>
+          <tr id='add-term-button-row'>
+
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <%= button_link_to('Add new term', 'add', '#', :id => 'add-term') %>
+        <%= button_link_to('Remove all terms', 'destroy', '#', :id => 'clear-terms', class:'btn btn-danger') %>
+      </div>
+    </div>
+  <% end %>
 
 
-    <p class="actions">
-      <%= f.submit (@sample_controlled_vocab.new_record? ? 'Create' : 'Update'), :class => 'btn btn-primary' %>
-      <% unless remote %>
+  <div class="actions">
+    <%= f.submit (@sample_controlled_vocab.new_record? ? 'Create' : 'Update'), :class => 'btn btn-primary', id: 'submit-button' %>
+    <% unless remote %>
       or
       <%= cancel_button(@sample_controlled_vocab.new_record? ? sample_controlled_vocabs_path : sample_controlled_vocab_path(@sample_controlled_vocab)) %>
-      <% end %>
-    </p>
-
+    <% end %>
+  </div>
 
 <% end %>
 
@@ -64,12 +118,18 @@
       <input class="form-control" id="sample_controlled_vocab_sample_controlled_vocab_terms_attributes_--index--_label" name="sample_controlled_vocab[sample_controlled_vocab_terms_attributes][--index--][label]" type="text">
     </td>
     <td>
+      <input class="form-control" id="sample_controlled_vocab_sample_controlled_vocab_terms_attributes_--index--_iri" name="sample_controlled_vocab[sample_controlled_vocab_terms_attributes][--index--][iri]" type="text">
+    </td>
+    <td>
+      <input class="form-control" id="sample_controlled_vocab_sample_controlled_vocab_terms_attributes_--index--_parent_iri" name="sample_controlled_vocab[sample_controlled_vocab_terms_attributes][--index--][parent_iri]" type="text">
+    </td>
+    <td>
       <div class="btn-group" data-toggle="buttons">
         <%= hidden_field_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][--index--][_destroy]", '0', :autocomplete => 'off' %>
         <label class="btn btn-danger">
           Remove
           <%= check_box_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][--index--][_destroy]", '1', false,
-                            :class => 'destroy-attribute', :autocomplete => 'off' %>
+                            :class => 'destroy-attribute', :autocomplete => 'off',id:"sample_controlled_vocab-checkbox[sample_controlled_vocab_terms_attributes][--index--][_destroy]" %>
         </label>
       </div>
 
@@ -80,47 +140,6 @@
 
 <script>
     $j(document).ready(function () {
-        initialiseCVForm();
+        CVTerms.init();
     });
-    function initialiseCVForm() {
-        $j('#add-term').click(function () {
-            var newTerm = $j('#new-term-row tbody').clone().html();
-
-            var index = 0;
-            $j('#new-terms tr.sample-cv-term').each(function () {
-                var newIndex = parseInt($j(this).data('index'));
-                if (newIndex > index) {
-                    index = newIndex;
-                }
-            });
-            index++;
-
-            newTerm = newTerm.replace(/--index--/g, index);
-            $j('#add-term-button-row').before($j(newTerm));
-            return false;
-        });
-
-        CVTerms = {
-            removeTerm: function () {
-                var row = $j(this).parents('.sample-cv-term');
-                if ($j(this).is(':checked')) {
-                    if (row.hasClass('success')) { // If it is a new attribute, just delete from the form - doesn't exist yet.
-                        row.remove();
-                        //SampleTypes.recalculatePositions();
-                    } else {
-                        row.addClass('danger');
-                        // This selects all the fields in the row, except the magic "_destroy" checkbox and the hidden ID field
-                        $j(':input:not(.destroy-attribute):not([type=hidden])', row).prop('disabled', true);
-                    }
-                }
-                else {
-                    row.removeClass('danger');
-                    $j(':input:not(.destroy-attribute)', row).prop('disabled', false);
-                }
-            }
-        };
-
-        $j('#new-terms').on('change', '.destroy-attribute', CVTerms.removeTerm);
-    }
-
 </script>

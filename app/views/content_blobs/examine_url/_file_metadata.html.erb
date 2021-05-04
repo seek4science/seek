@@ -1,0 +1,18 @@
+<ul>
+  <li>
+    The size of the file is
+    <% if @info[:file_size] %>
+      expected to be <strong><%= number_to_human_size(@info[:file_size]) -%></strong>
+    <% else %>
+      <span class="none_text">unknown</span>
+    <% end %>
+  </li>
+
+  <% if @info[:file_name] %>
+    <li>The filename is <strong><%= @info[:file_name] %></strong></li>
+  <% end %>
+</ul>
+
+<%= content_tag :script,
+                @info.merge(allow_copy: (@info[:file_size].blank? || (@info[:file_size] <= Seek::Config.hard_max_cachable_size))).to_json.html_safe,
+                type: 'application/json' %>

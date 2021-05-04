@@ -24,7 +24,8 @@
       "technology_type": {
         "label":"Technology type",
         "uri":"http://jermontology.org/ontology/JERMOntology#Technology_type"
-      }
+      },
+      "discussion_links" : null
     },
     "relationships": {
       "creators": {
@@ -40,6 +41,9 @@
       },
       "organisms": {
         "data":[]
+      },
+      "human_diseases": {
+        "data": []
       },
       "people": {
         "data": [

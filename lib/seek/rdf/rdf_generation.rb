@@ -8,7 +8,7 @@ module Seek
       include CSVMappingsHandling
 
       def self.included(base)
-        base.after_save :create_rdf_generation_job
+        base.after_commit :queue_rdf_generation, on: [:create, :update]
         base.before_destroy :remove_rdf
       end
 
@@ -103,22 +103,20 @@ module Seek
         }
       end
 
-      def create_rdf_generation_job(force = false, refresh_dependents = true)
+      def queue_rdf_generation(force = false, refresh_dependents = true)
         unless !force && (saved_changes.keys - %w[updated_at last_used_at]).empty?
-          RdfGenerationJob.new(self, refresh_dependents).queue_job
+          RdfGenerationQueue.enqueue(self, refresh_dependents: refresh_dependents)
         end
       end
 
       def remove_rdf
         remove_rdf_from_repository if rdf_repository_configured?
         delete_rdf_file
-        refresh_dependents_rdf
+        queue_dependents_rdf_generation
       end
 
-      def refresh_dependents_rdf
-        dependent_items.each do |item|
-          item.refresh_rdf if item.respond_to?(:refresh_rdf)
-        end
+      def queue_dependents_rdf_generation
+        RdfGenerationQueue.enqueue(dependent_items, priority: 3)
       end
 
       def dependent_items
@@ -137,15 +135,13 @@ module Seek
           items |= deps
         end
 
-        items.compact.uniq
-
         items |= related_items_from_sparql if rdf_repository_configured?
 
         items.compact.uniq
       end
 
       def refresh_rdf
-        create_rdf_generation_job(true, false)
+        queue_rdf_generation(true, false)
       end
     end
   end

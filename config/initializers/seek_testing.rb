@@ -11,11 +11,9 @@ def load_seek_testing_defaults!
       Settings.defaults[:crossref_api_email] = "sowen@cs.man.ac.uk"
 
       Settings.defaults[:jws_enabled] = true
-      Settings.defaults[:events_enabled] = true
       Settings.defaults[:jws_online_root] = "http://jws.sysmo-db.org"
       Settings.defaults[:internal_help_enabled] = false
       Settings.defaults[:external_help_url] = "http://seek4science.github.io/seek/help"
-      Settings.defaults[:workflows_enabled] = true
 
       Settings.defaults[:email_enabled] = true
 
@@ -28,17 +26,26 @@ def load_seek_testing_defaults!
       Settings.defaults[:authorization_checks_enabled] = true
       Settings.defaults[:magic_guest_enabled] = false
       Settings.defaults[:modelling_analysis_enabled] = true
-      Settings.defaults[:assays_enabled] = true
-      Settings.defaults[:models_enabled] = true
       Settings.defaults[:show_as_external_link_enabled] = false
-      Settings.defaults[:biosamples_enabled] = true
-      Settings.defaults[:publications_enabled] = true
       Settings.defaults[:factors_studied_enabled] = true
       Settings.defaults[:experimental_conditions_enabled] = true
-      Settings.defaults[:programmes_enabled] = true
       Settings.defaults[:programme_user_creation_enabled] = true
+      Settings.defaults[:programmes_open_for_projects_enabled] = true
+
       Settings.defaults[:project_hierarchy_enabled] = true
       Settings.defaults[:tabs_lazy_load_enabled] = false
+
+      # Types
+      Settings.defaults[:collections_enabled] = true
+      Settings.defaults[:documents_enabled] = true
+      Settings.defaults[:events_enabled] = true
+      Settings.defaults[:isa_enabled] = true
+      Settings.defaults[:models_enabled] = true
+      Settings.defaults[:organisms_enabled] = true
+      Settings.defaults[:programmes_enabled] = true
+      Settings.defaults[:publications_enabled] = true
+      Settings.defaults[:samples_enabled] = true
+      Settings.defaults[:workflows_enabled] = true
 
       Settings.defaults[:project_link] = 'http://www.sysmo.net'
       Settings.defaults[:application_name] = 'Sysmo SEEK'
@@ -57,7 +64,7 @@ def load_seek_testing_defaults!
       Settings.defaults[:doi_minting_enabled]=true
       Settings.defaults[:doi_prefix] = "10.5072"
       Settings.defaults[:doi_suffix] = "Sysmo.SEEK"
-      Settings.defaults[:datacite_url] = "https://test.datacite.org/mds/"
+      Settings.defaults[:datacite_url] = "https://mds.test.datacite.org/"
       Settings.defaults[:datacite_username] = 'test'
       Settings.defaults[:datacite_password] = 'test'
       Settings.defaults[:time_lock_doi_for] = 0
@@ -87,7 +94,7 @@ def load_seek_testing_defaults!
 
       Settings.defaults[:cache_remote_files] = true
       Settings.defaults[:max_cachable_size] = 2000
-      Settings.defaults[:hard_max_cachable_size] = 5000
+      Settings.defaults[:hard_max_cachable_size] = 50000
 
       Settings.defaults[:orcid_required] = false
       Settings.defaults[:site_base_host] = "http://localhost:3000"
@@ -125,6 +132,9 @@ def load_seek_testing_defaults!
           password: '',
           bind_dn: ''
       }
+      Settings.defaults[:omniauth_github_enabled] = true
+      Settings.defaults[:omniauth_github_client_id] = 'abc'
+      Settings.defaults[:omniauth_github_secret] = '456'
     end
 end
 

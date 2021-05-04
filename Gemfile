@@ -31,7 +31,6 @@ gem 'daemons'
 gem 'linkeddata'
 gem 'rdf'
 
-
 gem 'openseek-api'
 # for fancy content escaping in openbis integration
 gem 'loofah'
@@ -43,7 +42,6 @@ gem 'json-diff'
 gem 'rubyzip'
 
 gem 'equivalent-xml'
-gem 'breadcrumbs_on_rails'
 gem 'docsplit'
 gem 'pothoven-attachment_fu'
 gem 'exception_notification'
@@ -56,8 +54,8 @@ gem 'will_paginate', '~> 3.1'
 gem 'yaml_db'
 gem 'rails_autolink'
 gem 'rfc-822'
-gem 'nokogiri', '>= 1.10.4'
-gem 'rdf-virtuoso', git: 'https://github.com/ruby-rdf/rdf-virtuoso', branch: 'develop'
+gem 'nokogiri', '~> 1.11.2'
+gem 'rdf-virtuoso', '>= 0.2.0'
 gem 'terrapin'
 gem 'lograge'
 gem 'psych'
@@ -79,21 +77,21 @@ gem 'jquery-ui-rails'
 gem 'recaptcha', '~> 4.1.0'
 gem 'metainspector'
 gem 'mechanize'
-gem 'mimemagic', '~> 0.3.7'
+gem 'mimemagic','~> 0.3.7'
 gem 'auto_strip_attributes'
 gem 'coffee-rails', '~> 4.2'
 gem 'bootstrap-sass', '>=3.4.1'
 gem 'sass-rails', '~> 5.0'
 gem 'sprockets-rails'
 
-gem 'ro-bundle', '~> 0.2.4'
+gem 'ro-bundle', '~> 0.2.5'
 gem 'handlebars_assets'
 gem 'zenodo-client', git: 'https://github.com/seek4science/zenodo-client.git'
 
 gem 'unicorn-rails'
 gem 'seedbank'
 
-gem 'rspec-rails'
+gem 'rspec-rails','~> 3.6'
 
 gem 'citeproc-ruby', '~> 1.1.4'
 gem 'citeproc', '~> 1.0.4'
@@ -104,6 +102,7 @@ gem 'omniauth', '~> 1.3.1'
 gem 'omniauth-ldap', '~> 1.0.5'
 gem 'omniauth_openid_connect'
 gem 'omniauth-rails_csrf_protection', '~> 0.1'
+gem 'omniauth-github', '~> 1.2.0'
 
 gem 'ransack'
 
@@ -132,19 +131,14 @@ gem "doorkeeper", ">= 5.2.5"
 
 gem 'request_store'
 
-# javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
-source 'https://rails-assets.org' do
-  gem 'rails-assets-bootstrap-multiselect', '~> 0.9.13'
-  gem 'rails-assets-bootstrap-tagsinput', '~> 0.8.0'
-  gem 'rails-assets-typeahead.js', '~> 0.10.5'
-  gem 'rails-assets-clipboard', '~> 1.5.12'
-  gem 'rails-assets-vue', '~> 2.1.8'
-  gem 'rails-assets-eonasdan-bootstrap-datetimepicker', '~> 4.17.42'
-  gem 'rails-assets-x-editable', '~> 1.5.1'
-  gem 'rails-assets-chartjs', '~> 2.7.2'
-  gem 'rails-assets-lightbox2', '~> 2.10.0'
-end
+
+gem 'ro-crate-ruby', git: 'https://github.com/ResearchObject/ro-crate-ruby.git', ref: '70804d34264481e70d0fe83ecc6ad76eda164e74'
+
+gem 'git'
+gem 'redcarpet'
+gem 'i18n-js'
+gem 'whenever', '~> 1.0.0', require: false
 
 group :production do
   gem 'passenger'
@@ -156,23 +150,24 @@ group :development do
   gem 'pry-remote'
   gem 'request-log-analyzer'
   gem 'rubocop', require: false
-  gem 'rubycritic', require: false
-  gem 'guard-rubycritic', require: false
   gem 'rails_best_practices'
   gem 'gem-licenses'
+  gem "better_errors"
+  gem "binding_of_caller"
 end
 
 group :test do
-  gem 'ruby-prof', '0.15.9'
+  gem 'ruby-prof'
   gem 'test-prof'
   gem 'rails-perftest'
-  gem 'minitest', '5.10.3'
+  gem 'minitest', '~> 5.14'
   gem 'minitest-reporters'
   gem 'sunspot_matchers'
   gem 'database_cleaner', '~> 1.7.0'
   gem 'vcr', '~> 2.9'
   gem 'rails-controller-testing'
   gem 'simplecov'
+  gem 'whenever-test'
 end
 
 group :test, :development do

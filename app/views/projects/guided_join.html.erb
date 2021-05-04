@@ -1,0 +1,90 @@
+<%= form_tag request_join_projects_path do %>
+  <div class="row">
+    <div style="margin:auto;width:70%;">
+
+      <%= panel(t('project')) do %>
+        <% if @project %>
+          You are requesting to join <%= link_to(@project.title, @project) %>
+
+          <%= hidden_field_tag 'projects',@project.id %>
+
+        <% else %>
+          
+          <div class="help-block">
+            Type the name of the <%= t('project') %>, or part of the name or description. From the results listed below, select the <%= t('project') %> you wish to join.
+            You can select up to a maximum of 3.
+            <br/>
+            If you cannot find the <%= t('project') %> here, you could try the
+            <%= link_to "#{t('project')} search and filtering", projects_path, target: :_blank %> first to find and go to the
+            <%= t('project') %> page, and then Request Membership from the top of the page.
+            <br/>
+            
+          </div>
+
+          <%= label_tag :project_label, "Type the names of the #{t('project').pluralize}" %>
+          <span class="required">*</span>
+          <div class="row">        
+            <div class="col-md-12">    
+              <%= objects_input('projects', [], 
+                  typeahead:  {query_url: typeahead_projects_path + '?query=%QUERY',
+                  handlebars_template:'typeahead/hint'}, 
+                  limit:3) -%>            
+            </div>
+          </div>                    
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="row">
+    <div style="margin:auto;width:70%;">
+
+      <%= panel(t('institution')) do %>
+        <div class="form-group">
+          <%= render partial: 'institutions/select_or_define' %>
+        </div>
+      <% end %>
+
+      <%= panel('Comments') do %>
+        <div class="help-block">
+          Provide any additional details that you think will be useful with your request.
+        </div>
+        <div class="form-group">
+          <%= text_area_tag :comments, '', rows: 3, :class => "form-control" %>
+        </div>
+      <% end %>
+
+      <%= submit_tag('Submit', class: 'btn btn-primary', id: 'submit-button', disabled: true) %>
+    </div>
+  </div>
+<% end %>
+
+<script type='application/javascript'>
+
+  function checkSubmitButtonEnabled() {
+    var enabled = $j('#institution_id').val()
+      && $j('input#projects').val()
+      && $j('select#institution_country').val();
+    $j('#submit-button').prop('disabled',!enabled);    
+  }
+  
+  $j(document).ready(function () {
+
+    $j('form').on('submit',function() {
+      //clear the id if -1 before submitting
+      if ($j('#institution_id').val()=='-1') {
+          $j('#institution_id').val('');
+      }
+    });
+    
+    $j('input#projects').on('itemAdded', function(event) {
+      checkSubmitButtonEnabled();        
+    });
+
+    $j('input#projects').on('itemRemoved', function(event) {
+      checkSubmitButtonEnabled();        
+    });
+  });
+
+
+</script>

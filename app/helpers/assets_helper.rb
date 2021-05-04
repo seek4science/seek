@@ -87,6 +87,29 @@ module AssetsHelper
     "publish[#{item.class.name}][#{item.id}]"
   end
 
+  def sharing_item_param(item)
+    if item.try(:is_isa?)
+      "share_isa[#{item.class.name}][#{item.id}]"
+    elsif  (item.respond_to? (:investigations)) && (!item.investigations.any?)
+      "share_not_isa[#{item.class.name}][#{item.id}]"
+    elsif !item.respond_to? (:investigations)
+      "share_not_isa[#{item.class.name}][#{item.id}]"
+    else
+      "share_isa[#{item.class.name}][#{item.id}]"
+    end
+  end
+
+  def include_downloadable_item?(items)
+    has_downloadable_item = false
+    items.each do |item|
+      if (item.try(:is_downloadable?))
+        has_downloadable_item = true
+      end
+      break if has_downloadable_item
+    end
+    has_downloadable_item
+  end
+
   def text_for_resource(resource_or_text)
     if resource_or_text.is_a?(String)
       text = resource_or_text.underscore.humanize
@@ -199,6 +222,19 @@ module AssetsHelper
     end
   end
 
+  def open_with_copasi_button (asset)
+
+    files =   asset.content_blobs
+    download_path = polymorphic_path([files.first.asset, files.first], action: :download, code: params[:code])
+    copasi_download_path =  "copasi://process?downloadUrl=http://"+request.host_with_port+download_path+"&activate=Time%20Course&createPlot=Concentrations%2C%20Volumes%2C%20and%20Global%20Quantity%20Values&runTask=Time-Course"
+
+    tooltip_text_copasi_button = "Simulate the publicly accessible model in your local installed Copasi. "
+
+    button= button_link_to('Simulate Model in Copasi', 'copasi', copasi_download_path, class: 'btn btn-default', disabled: asset.download_disabled?, 'data-tooltip' => tooltip(tooltip_text_copasi_button))
+
+    button
+  end
+
   def view_content_button(asset)
     render partial: 'assets/view_content', locals: { content_blob: asset.single_content_blob, button_style: true }
   end
@@ -260,6 +296,20 @@ module AssetsHelper
     else
       false
     end
+  end
+
+  def source_link_button(source_link)
+    url = source_link.url
+    uri = URI.parse(url)
+    if uri.hostname.include?('github.com')
+      image = 'github'
+      text = 'View on GitHub'
+    else
+      image = 'external_link'
+      text = 'Visit source'
+    end
+
+    button_link_to(text, image, source_link.url, target: :_blank)
   end
 
   #if there are creators, the email will be sent only to them, otherwise sent to the contributor

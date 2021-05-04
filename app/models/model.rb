@@ -4,7 +4,7 @@ class Model < ApplicationRecord
 
   #searchable must come before acts_as_asset call
   searchable(:auto_index=>false) do
-    text :organism_terms,:model_contents_for_search
+    text :organism_terms, :human_disease_terms, :model_contents_for_search
     text :model_format do
       model_format.try(:title)
     end
@@ -33,6 +33,7 @@ class Model < ApplicationRecord
   has_many :content_blobs, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
 
   belongs_to :organism
+  belongs_to :human_disease
   belongs_to :recommended_environment,:class_name=>"RecommendedModelEnvironment"
   belongs_to :model_type
   belongs_to :model_format
@@ -54,6 +55,15 @@ class Model < ApplicationRecord
       joins: [:assays]
   )
 
+
+  # Returns the columns to be shown on the table view for the resource
+  def columns_default
+    super + ['creators','projects','version']
+  end
+  def columns_allowed
+    columns_default + ['recommended_environment_id','last_used_at','other_creators','imported_source','imported_url','model_image_id','doi','license']
+  end
+
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi']) do
     include Seek::Models::ModelExtraction
     acts_as_doi_mintable(proxy: :parent, general_type: 'Model')
@@ -62,6 +72,7 @@ class Model < ApplicationRecord
 
     belongs_to :model_image
     belongs_to :organism
+    belongs_to :human_disease
     belongs_to :recommended_environment,:class_name=>"RecommendedModelEnvironment"
     belongs_to :model_type
     belongs_to :model_format
@@ -87,6 +98,14 @@ class Model < ApplicationRecord
   def organism_terms
     if organism
       organism.searchable_terms
+    else
+      []
+    end
+  end
+
+  def human_disease_terms
+    if human_disease
+      human_disease.searchable_terms
     else
       []
     end

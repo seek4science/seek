@@ -30,6 +30,14 @@ class Sop < ApplicationRecord
       label_mapping: Seek::Filterer::MAPPINGS[:technology_type_label],
       joins: [:assays]
   )
+  
+  # Returns the columns to be shown on the table view for the resource
+  def columns_default
+    super + ['version']
+  end
+  def columns_allowed
+    columns_default + ['last_used_at','other_creators','doi','license','deleted_contributor']
+  end
 
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi']) do
     acts_as_doi_mintable(proxy: :parent, general_type: 'Text')
@@ -45,6 +53,10 @@ class Sop < ApplicationRecord
 
   def organism_title
     organism.nil? ? "" : organism.title
+  end
+
+  def human_disease_title
+    human_disease.nil? ? "" : human_disease.title
   end
 
   def use_mime_type_for_avatar?

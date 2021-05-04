@@ -280,6 +280,8 @@ class SnapshotTest < ActiveSupport::TestCase
   test 're-indexes parent model when DOI created' do
     snapshot = @assay.create_snapshot
 
+    ReindexingQueue.destroy_all
+
     assert_difference('ReindexingQueue.count', 1) do
       snapshot.doi = '10.5072/test'
       snapshot.save
@@ -289,6 +291,18 @@ class SnapshotTest < ActiveSupport::TestCase
 
     assert_equal snapshot.resource_type, reindex_job.item_type
     assert_equal snapshot.resource_id, reindex_job.item_id
+  end
+
+  test 'snapshots destroyed with parent object' do
+    snapshot1 = @study.create_snapshot
+    snapshot2 = @study.create_snapshot
+
+    assert_difference('Snapshot.count', -2) do
+      disable_authorization_checks { @study.destroy }
+    end
+
+    assert snapshot1.destroyed?
+    assert snapshot2.destroyed?
   end
 
   private

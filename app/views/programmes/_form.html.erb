@@ -15,7 +15,7 @@
 
     <div class="form-group">
       <%= f.label :description -%>
-      <%= f.text_area :description, :rows => 5, :class=>"form-control"  %>
+      <%= f.text_area :description, :rows => 5, :class=>"form-control rich-text-edit"  %>
     </div>
 
     <div class="form-group">
@@ -40,6 +40,21 @@
 <%= panel("#{t('programme')} Administrators") do %>
         <%= programme_administrators_input_box(@programme) %>
 <% end %>
+
+<% if Seek::Config.programmes_open_for_projects_enabled %>
+  <%= panel("#{"Project"} creation") do %>
+    <div class="form-group">
+      <div class="checkbox">
+        <label>
+          <%= f.check_box(:open_for_projects, autocomplete: 'off') %>
+          <%= "Allow #{"Users"} to create #{"Projects"}" %>
+        </label>
+      </div>
+    </div>
+  <% end %>
+<% end %>  
+
+  <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @programme} -%>
 
 
 <% end %>

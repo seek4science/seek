@@ -47,6 +47,7 @@ tmp/testing-seek-cache
 tmp/rubycritic
 tmp/fleximage
 tmp/performance
+tmp/user_uuid_studies_upload
 *.tmp*
 *~
 
@@ -59,6 +60,8 @@ solr/default/data
 
 public/help_images/*
 public/javascripts/*_cached.js
+public/javascripts/i18n.js
+public/javascripts/translations.js
 public/stylesheets/*_cached.css
 public/system/
 
@@ -79,4 +82,6 @@ coverage/
 
 Test\ Results*.html
 
-.vscode/launch.json
+docker-compose.override.yml
+
+.vscode/

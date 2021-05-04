@@ -25,6 +25,11 @@
                 <a href="#ldap_login" aria-controls="ldap_login" role="tab" data-toggle="tab"><%= t('login.ldap') %> login</a>
               </li>
             <% end %>
+            <% if show_github_login? %>
+              <li role="presentation">
+                <a href="#github_login" aria-controls="github_login" role="tab" data-toggle="tab"><%= t('login.github') %> login</a>
+              </li>
+            <% end %>
           </ul>
         <% end #omniauth enabled and providers available %>
 
@@ -68,6 +73,13 @@
             <% if show_ldap_login? %>
               <div role="tabpanel" class="tab-pane" id="ldap_login">
                 <%= render partial: 'identities/ldap_form', locals: { original_path: original_path } %>
+              </div>
+            <% end %>
+            <% if show_github_login? %>
+              <div role="tabpanel" class="tab-pane" id="github_login">
+                <div class='text-center'>
+                  <%= button_link_to 'Sign in with GitHub', 'github_large', omniauth_authorize_path(:github, state: "return_to:#{original_path}"), method: :post %>
+                </div>
               </div>
             <% end %>
           <% end #omniauth enabled and providers available %>

@@ -55,7 +55,7 @@ module Seek
       end
 
       def set_content_blobs(new_version = false)
-        asset = eval "@#{controller_name.downcase.singularize}"
+        asset = instance_variable_get("@#{controller_name.downcase.singularize}")
         version = asset.respond_to?(:version) ? asset.version : nil
         version += 1 if new_version
 

@@ -35,11 +35,9 @@ module Seek #:nodoc:
 
       # Sets up the basic interface for authorization hooks. All AR instances get these methods, and by default they return true.
       AUTHORIZATION_ACTIONS.each do |action|
-        eval <<-END_EVAL
-          def can_#{action}? user=User.current_user
-            true
-          end
-        END_EVAL
+        define_method "can_#{action}?" do |_user = User.current_user|
+          true
+        end
       end
 
       def can_perform?(action, *args)

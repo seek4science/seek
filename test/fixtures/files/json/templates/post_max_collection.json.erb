@@ -1,0 +1,42 @@
+{
+  "data": {
+    "type": "collections",
+    "attributes": {
+      "title": "A Maximal Collection",
+      "description": "This is the description",
+      "tags": ["tag1", "tag2"],
+      "license": "CC-BY-4.0",
+      "other_creators": "John Smith, Jane Smith",
+      "policy": {
+        "access": "view",
+        "permissions": [
+          {
+            "resource": {
+              "id" : "<%= @project.id %>",
+              "type": "projects"
+            },
+            "access": "edit"
+          }
+        ]
+      }
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "<%= @creator.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= @project.id %>",
+            "type": "projects"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -39,12 +39,19 @@ class Document < ApplicationRecord
             primary_key: :document_id, foreign_key: :asset_id
   end
 
+  # Returns the columns to be shown on the table view for the resource
+  def columns_default
+    super + ['version']
+  end
+  def columns_allowed
+    columns_default + ['doi','license','last_used_at','other_creators','deleted_contributor']  
+  end
+
   def use_mime_type_for_avatar?
     true
   end
 
   def self.user_creatable?
-    true
+    Seek::Config.documents_enabled
   end
-
 end

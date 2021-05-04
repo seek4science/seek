@@ -9,6 +9,8 @@ class ProjectSubscription < ApplicationRecord
   validates_inclusion_of :frequency, :in => Subscription::FREQUENCIES, :message => "must be one of: #{Subscription::FREQUENCIES.join(', ')}"
 
   after_initialize :default_frequency
+  after_create :subscribe_to_all_in_project
+
   def default_frequency
     self.frequency = 'weekly' if self.frequency.blank?
     self.unsubscribed_types = [] if self.unsubscribed_types.nil?
@@ -20,7 +22,7 @@ class ProjectSubscription < ApplicationRecord
 
   # Project subscription can be deleted if the person of this project subscription subscribes none of descendants of the project
   def has_children?
-     Seek::Config.project_hierarchy_enabled &&  !ProjectSubscription.where( "person_id = #{person_id}").where("project_id  IN (?)", project.descendants.map(&:id)).empty?
+    Seek::Config.project_hierarchy_enabled &&  !ProjectSubscription.where( "person_id = #{person_id}").where("project_id  IN (?)", project.descendants.map(&:id)).empty?
   end
   #accessors for 'subscribed types' which is just the inverse of unsubscribed_types
   def subscribed_types
@@ -49,9 +51,7 @@ class ProjectSubscription < ApplicationRecord
     end
   end
 
-  after_create :subscribe_to_all_in_project
-
   def subscribe_to_all_in_project
-      ProjectSubscriptionJob.new(id).queue_job
+    ProjectSubscriptionJob.new(self).queue_job
   end
 end

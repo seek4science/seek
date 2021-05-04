@@ -36,6 +36,14 @@ class Study < ApplicationRecord
   def assets
     related_data_files + related_sops + related_models + related_publications + related_documents
   end
+  
+  # Returns the columns to be shown on the table view for the resource
+  def columns_default
+    super + ['creators','projects']
+  end
+  def columns_allowed
+    columns_default + ['experimentalists','other_creators','deleted_contributor']
+  end
 
   def state_allows_delete? *args
     assays.empty? && super
@@ -53,7 +61,7 @@ class Study < ApplicationRecord
   end
 
   def self.filter_by_projects(projects)
-    joins(:projects).where(investigations: { investigations_projects: { project_id: projects } })
+    joins(:projects).where(investigations: {investigations_projects: {project_id: projects}})
   end
 
   def related_publication_ids
@@ -64,5 +72,9 @@ class Study < ApplicationRecord
     ids = super
     ids << person_responsible_id if person_responsible_id
     ids.uniq
+  end
+
+  def self.user_creatable?
+    Seek::Config.studies_enabled
   end
 end

@@ -17,10 +17,6 @@ class PublicationsControllerTest < ActionController::TestCase
     @object = Factory(:publication, published_date: Date.new(2013, 1, 1), publication_type: Factory(:journal))
   end
 
-  def test_json_content
-    super
-  end
-
   def test_title
     get :index
     assert_select 'title', text: 'Publications', count: 1
@@ -1009,7 +1005,7 @@ class PublicationsControllerTest < ActionController::TestCase
     get :query_authors_typeahead, params: { format: :json, full_name: query }
     assert_response :success
     authors = JSON.parse(@response.body)
-    assert_equal 0, authors['data'].length
+    assert_equal 0, authors.length
   end
 
   test 'query authors for initialization' do

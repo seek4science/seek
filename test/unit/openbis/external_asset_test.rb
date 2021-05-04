@@ -293,8 +293,7 @@ class ExternalAssetTest < ActiveSupport::TestCase
     asset1.external_mod_stamp = 'ALA'
     asset1.sync_options = { 'sync': false }
 
-    Delayed::Job.destroy_all
-    assert_difference('Delayed::Job.count', 1) do
+    assert_enqueued_jobs(1, only: ReindexingJob) do
       asset1.save
     end
     assert ReindexingQueue.exists?(item: assay)
@@ -306,13 +305,12 @@ class ExternalAssetTest < ActiveSupport::TestCase
     asset1.sync_options = { 'sync': false }
     asset1.synchronized_at = DateTime.now
 
-    assert_no_difference('Delayed::Job.count') do
+    assert_no_enqueued_jobs(only: ReindexingJob) do
       asset1.save
     end
 
     asset1.content = { 'key1': 'value1' }
-    Delayed::Job.destroy_all
-    assert_difference('Delayed::Job.count', 1) do
+    assert_enqueued_jobs(1, only: ReindexingJob) do
       asset1.save
     end
     assert ReindexingQueue.exists?(item: assay)

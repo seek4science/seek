@@ -14,6 +14,7 @@
 %>
 
 <%= panel(title, :help_text => "These are the people that uploaded the item, along with other people involved in creating it. Sometimes the uploader may have uploaded the item on behalf of its contributors.") do %>
+  <% unless resource.class.name.underscore == "publication" %>
   <h5 class="author-list-title"><%= t('creator').capitalize.pluralize(total_creator_count) -%></h5>
   <% if total_creator_count == 0 %>
     <span class="none_text">Not specified</span>
@@ -30,6 +31,7 @@
   </ul>
 
   <h5 class="author-list-title"><%= t('contributor').capitalize -%></h5>
+  <% end %>
   <ul class="author-list">
     <li class="author-list-item">
       <% if contributor %>

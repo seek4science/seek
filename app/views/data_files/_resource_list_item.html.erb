@@ -6,11 +6,13 @@
     <%= list_item_doi(resource) %>
     <%= @assay ? (list_item_optional_attribute "Relationship type", resource.relationship_type(@assay).try(:title)) : "" %>
   </div>
-  <div class="col-sm-6 hidden-xs">
-    <%= list_item_authorized_list resource.investigations, t('investigation').pluralize, true, 50, true %>
-    <%= list_item_authorized_list resource.studies, t('study').pluralize, true, 50, true %>
-    <%= list_item_authorized_list resource.assays, t('assay').pluralize, true, 50, true %>
-  </div>
+  <% if Seek::Config.isa_enabled %>
+    <div class="col-sm-6 hidden-xs">
+      <%= list_item_authorized_list resource.investigations, t('investigation').pluralize, true, 50, true %>
+      <%= list_item_authorized_list resource.studies, t('study').pluralize, true, 50, true %>
+      <%= list_item_authorized_list resource.assays, t('assay').pluralize, true, 50, true %>
+    </div>
+  <% end  %>
 </div>
 
 <div class="hidden-xs">

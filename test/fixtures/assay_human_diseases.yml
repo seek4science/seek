@@ -1,0 +1,7 @@
+melanoma:
+  assay: metabolomics_assay
+  human_disease: melanoma
+
+Gangliocytoma:
+  assay: metabolomics_assay
+  human_disease: Gangliocytoma

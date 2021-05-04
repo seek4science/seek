@@ -459,7 +459,7 @@ class AssetTest < ActiveSupport::TestCase
     df.policy.permissions.create(contributor:project2, access_type:Policy::ACCESSIBLE)
     assert df.projects_accessible?(project2)
     assert df.projects_accessible?([project1,project2])
-    refute refute df.projects_accessible?([project1,project2, Factory(:project)])
+    refute df.projects_accessible?([project1,project2, Factory(:project)])
   end
 
   test 'update_timestamps with new version' do

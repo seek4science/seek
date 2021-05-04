@@ -8,7 +8,7 @@ require 'rest-client'
 class ContentBlob < ApplicationRecord
   include Seek::ContentTypeDetection
   include Seek::ContentExtraction
-  include Seek::UrlValidation
+  extend Seek::UrlValidation
   prepend Seek::Openbis::Blob
   prepend Nels::Blob
 
@@ -180,16 +180,6 @@ class ContentBlob < ApplicationRecord
       file_size < Seek::Config.max_cachable_size
   end
 
-  def caching_job(ignore_locked = true)
-    job_yaml = RemoteContentFetchingJob.new(self).to_yaml
-
-    if ignore_locked
-      Delayed::Job.where(['handler = ? AND locked_at IS NULL AND failed_at IS NULL', job_yaml]) # possibly a better way of doing this...
-    else
-      Delayed::Job.where(['handler = ? AND failed_at IS NULL', job_yaml])
-    end
-  end
-
   def search_terms
     if is_text?
       if is_indexable_text?
@@ -228,6 +218,31 @@ class ContentBlob < ApplicationRecord
   def no_content?
     (!file_size || file_size == 0) && url.blank?
   end
+
+  def remote_content_handler
+    self.class.remote_content_handler_for(url)
+  end
+
+  def self.remote_content_handler_for(url)
+    return nil unless valid_url?(url)
+    uri = URI(url)
+    case uri.scheme
+    when 'ftp'
+      Seek::DownloadHandling::FTPHandler.new(url)
+    when 'http', 'https'
+      if uri.hostname.include?('github.com') || uri.hostname.include?('raw.githubusercontent.com')
+        Seek::DownloadHandling::GithubHTTPHandler.new(url)
+      else
+        Seek::DownloadHandling::HTTPHandler.new(url)
+      end
+    end
+  end
+
+  def valid_url?(url)
+    self.class.valid_url?(url)
+  end
+
+  has_task :remote_content_fetch
 
   private
 
@@ -282,18 +297,8 @@ class ContentBlob < ApplicationRecord
 
   def create_retrieval_job
     if Seek::Config.cache_remote_files && !file_exists? && !url.blank? && (make_local_copy || cachable?) && remote_content_handler
-      RemoteContentFetchingJob.new(self).queue_job
+      RemoteContentFetchingJob.perform_later(self)
     end
-  end
-
-  def remote_content_handler
-    return nil unless valid_url?(url)
-    case URI(url).scheme
-    when 'ftp'
-      Seek::DownloadHandling::FTPHandler.new(url)
-    when 'http', 'https'
-      Seek::DownloadHandling::HTTPHandler.new(url)
-      end
   end
 
   def clear_sample_type_matches

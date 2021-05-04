@@ -65,7 +65,7 @@ class Person < ApplicationRecord
   has_many :assets_creators, dependent: :destroy, foreign_key: 'creator_id'
 
   RELATED_RESOURCE_TYPES = %w[DataFile Sop Model Document Publication Presentation
-                              Sample Event Investigation Study Assay Strain Workflow Node].freeze
+                              Sample Event Investigation Study Assay Strain Workflow Node Collection].freeze
 
   RELATED_RESOURCE_TYPES.each do |type|
     plural = type.tableize
@@ -102,6 +102,8 @@ class Person < ApplicationRecord
 
   has_many :publication_authors
 
+  has_many :sent_message_logs, class_name: 'MessageLog', foreign_key: :sender_id, dependent: :destroy
+
   if Seek::Config.solr_enabled
     searchable(auto_index: false) do
       text :project_positions
@@ -131,6 +133,14 @@ class Person < ApplicationRecord
   # to make it look like a User
   def person
     self
+  end
+    
+  # Returns the columns to be shown on the table view for the resource
+  def columns_default
+    super + ['first_name','last_name']
+  end
+  def columns_allowed
+    columns_default + ['email','phone','skype_name','web_page','orcid']
   end
 
   # not registered profiles that match this email
@@ -202,6 +212,11 @@ class Person < ApplicationRecord
     shares_project?(other_item) || shares_programme?(other_item)
   end
 
+  # Do not allow discussion of people
+  def self.is_discussable?
+    return false
+  end
+  
   def self.userless_people
     Person.includes(:user).select { |p| p.user.nil? }
   end
@@ -387,6 +402,25 @@ class Person < ApplicationRecord
 
     group_memberships << membership
   end
+
+  def ro_crate_metadata
+    {
+        '@id' => orcid.present? ? orcid : "#person-#{id}",
+        name: name,
+        identifier: orcid.present? ? orcid : rdf_seek_id
+    }
+  end
+
+  # projects this person is project admin of
+  def administered_projects
+    projects.select{|proj| person.is_project_administrator?(proj)}
+  end
+
+  # activation email logs associated with this person
+  def activation_email_logs
+    MessageLog.activation_email_logs(self)
+  end
+
 
   private
 

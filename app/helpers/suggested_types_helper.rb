@@ -45,8 +45,7 @@ module SuggestedTypesHelper
   end
 
   def cancel_link
-    manage_path = eval "#{controller_name}_path"
-    cancel_button(manage_path)
+    cancel_button(polymorphic_path(controller_name))
   end
 
   def ontology_editor_display(types, selected_uri = nil)

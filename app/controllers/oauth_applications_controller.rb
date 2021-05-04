@@ -1,8 +1,6 @@
 class OauthApplicationsController < Doorkeeper::ApplicationsController
   before_action :check_user
 
-  include Seek::BreadCrumbs
-
   layout Seek::Config.main_layout
   def index
     @applications = current_user.oauth_applications.ordered_by(:created_at)
@@ -43,16 +41,6 @@ class OauthApplicationsController < Doorkeeper::ApplicationsController
       flash[:error] = 'This page is only available to members.'
       redirect_to root_path
     end
-  end
-
-  def add_breadcrumbs
-    add_breadcrumb 'Home', root_path
-    add_index_breadcrumb 'people'
-    add_show_breadcrumb current_user&.person
-    add_index_breadcrumb 'oauth_applications'
-    add_breadcrumb 'New' if action_name == 'new'
-    add_breadcrumb @application.name, oauth_application_path(@application) if defined? @application
-    add_breadcrumb 'Edit' if action_name == 'edit'
   end
 
   def application_params

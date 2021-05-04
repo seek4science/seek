@@ -37,9 +37,10 @@
             </div>
         <% else %>
             <%= suggested_type_modal_boxes %>
-            <%= form_for @assay do |f| %>
+      <%= form_for @assay do |f| %>
                 <%= render :partial => "form", :locals => { :f => f, :action=>:new } -%>
             <% end -%>
-        <% end %>
+     <% end %>
     <% end -%>
+
 <% end %>

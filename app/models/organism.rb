@@ -42,6 +42,14 @@ class Organism < ApplicationRecord
     end
   end
 
+  # Returns the columns to be shown on the table view for the resource
+  def columns_default
+    super
+  end
+  def columns_allowed
+    columns_default + ['title']
+  end
+
   def can_delete?(user = User.current_user)
     !user.nil? && user.is_admin_or_project_administrator? && models.empty? && assays.empty? && projects.empty?
   end
