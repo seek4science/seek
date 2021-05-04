@@ -44,6 +44,10 @@ class SessionsController < ApplicationController
     password_authentication
   end
 
+  def failure
+    failed_login "Invalid username/password.".html_safe
+  end
+
   def destroy
     logout_user
     flash[:notice] = 'You have been logged out.'
