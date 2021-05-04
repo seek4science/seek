@@ -28,6 +28,9 @@
                                "Site mananaged #{t('programme')}",
                                "The #{t('programme')} the users can request to have a #{t('project')} created and associated with, without the need to create and manage their own",
                                include_blank:'None') %>
+    <%= admin_checkbox_setting(:programmes_open_for_projects_enabled, 1, Seek::Config.programmes_open_for_projects_enabled,
+        "#{t('programme').pluralize} open for #{t(:project).pluralize} enabled",
+        "When enabled, gives the ability for individual #{t(:programme).pluralize} to be configured to allow any other registered user to create a #{t(:project)} linked to that #{t(:programme)} without requiring approval or admin rights. Use with care if open user registration is enabled, as it could allow any user to register, create a project and start adding content to that Programme.") %>  
   </div>
   <%= admin_checkbox_setting(:samples_enabled, 1, Seek::Config.samples_enabled,
                              "Samples enabled", "Whether the Samples framework is enabled. The framework allows users to create their own custom Sample types to describe their biological samples and other metadata.",:onchange=>toggle_appear_javascript('sample_type_pa_only')) %>

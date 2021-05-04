@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: post
-    uri: https://test.datacite.org/mds/doi
+    uri: https://mds.test.datacite.org/doi
     body:
       encoding: UTF-8
       string: |-
@@ -36,7 +36,7 @@ http_interactions:
       - no-cache
       - no-store
       Location:
-      - https://test.datacite.org/mds/doi/10.5072/MY_TEST
+      - https://mds.test.datacite.org/doi/10.5072/MY_TEST
       Content-Type:
       - application/xml;charset=UTF-8
       Content-Length:
@@ -48,7 +48,7 @@ http_interactions:
   recorded_at: Tue, 04 Nov 2014 13:58:39 GMT
 - request:
     method: get
-    uri: https://test.datacite.org/mds/doi/10.5072/MY_TEST
+    uri: https://mds.test.datacite.org/doi/10.5072/MY_TEST
     body:
       encoding: US-ASCII
       string: ''
@@ -86,7 +86,7 @@ http_interactions:
   recorded_at: Tue, 04 Nov 2014 13:33:26 GMT
 - request:
     method: post
-    uri: https://test.datacite.org/mds/metadata
+    uri: https://mds.test.datacite.org/metadata
     body:
       encoding: UTF-8
       string: |
@@ -144,7 +144,7 @@ http_interactions:
       - no-cache
       - no-store
       Location:
-      - https://test.datacite.org/mds/metadata/10.5072/my_test
+      - https://mds.test.datacite.org/metadata/10.5072/my_test
       Content-Type:
       - application/xml;charset=UTF-8
       Content-Length:

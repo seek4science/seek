@@ -2,7 +2,7 @@ class HomesController < ApplicationController
   helper HumanDiseasesHelper
 
   before_action :redirect_to_sign_up_when_no_user
-  before_action :login_required, only: %i[feedback send_feedback create_or_join_project]
+  before_action :login_required, only: %i[feedback send_feedback create_or_join_project report_issue]
   before_action :redirect_to_create_or_join_if_no_member, only: %i[index]
 
   respond_to :html, only: [:index]
@@ -20,6 +20,12 @@ class HomesController < ApplicationController
   end
 
   def feedback
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  def report_issue
     respond_to do |format|
       format.html
     end
