@@ -107,7 +107,7 @@ class InstitutionsController < ApplicationController
     end
 
     if params[:include_new]
-      items.unshift({id:-1, name:params[:query],web_page:'',country:'', country_name:'',city:'',hint:"new item", new:true})
+      items.unshift({id:-1, name:params[:query], web_page: '', country: '', country_name: '', city: '', hint:"new item", new: true })
     end
 
     respond_to do |format|
@@ -124,6 +124,16 @@ class InstitutionsController < ApplicationController
        format.json do
          render json: institution_list
        end
+    end
+  end
+
+  # request all institutions, but specific to the sharing form which expects an array
+  def request_all_sharing_form
+    institution_list = Institution.order(:id).collect{ |institution| [institution.title, institution.id] }
+    respond_to do |format|
+      format.json do       
+        render json: { status: 200, institution_list: institution_list }       
+      end
     end
   end
 

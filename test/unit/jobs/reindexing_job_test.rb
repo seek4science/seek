@@ -26,4 +26,22 @@ class ReindexingJobTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test 'gather_items strips deleted (nil) items' do
+    model1 = Factory(:model)
+    model2 = Factory(:model)
+    document = Factory(:document)
+    ReindexingQueue.delete_all
+    ReindexingQueue.enqueue([model1, model2], queue_job: false)
+    ReindexingQueue.enqueue(document, queue_job: false)
+
+    disable_authorization_checks { model1.destroy! }
+
+    items = ReindexingJob.new.gather_items
+
+    assert_equal 2, items.length
+    assert_not_includes items, model1
+    assert_includes items, model2
+    assert_includes items, document
+  end
 end

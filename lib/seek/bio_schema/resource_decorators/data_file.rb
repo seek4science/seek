@@ -15,7 +15,8 @@ module Seek
         end
 
         def distribution
-          return if resource.content_blob && resource.content_blob.show_as_external_link?
+          return unless resource.content_blob
+          return if resource.content_blob.show_as_external_link?
           blob = resource.content_blob
           data = {
             '@type': 'DataDownload',

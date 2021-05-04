@@ -26,10 +26,7 @@ module CustomMetadataHelper
                                                    :title, value.try(:[],'id'))
       select_tag(element_name, options, include_blank: !attribute.required?, class: "form-control #{clz}")
     when Seek::Samples::BaseType::CV
-      scv_id = attribute.sample_controlled_vocab.id
-      existing_objects = []
-      existing_objects << Struct.new(:id,:name).new(value,value) if value
-      objects_input(element_name, existing_objects, typeahead:  {query_url: typeahead_sample_controlled_vocabs_path + "?query=%QUERY&scv_id=#{scv_id}",handlebars_template:'typeahead/controlled_vocab_term'}, limit:1)
+      controlled_vocab_form_field attribute, element_name, value
     else
       text_field_tag element_name, value, class: "form-control #{clz}", placeholder: placeholder
     end

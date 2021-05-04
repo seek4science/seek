@@ -47,6 +47,7 @@ tmp/testing-seek-cache
 tmp/rubycritic
 tmp/fleximage
 tmp/performance
+tmp/user_uuid_studies_upload
 *.tmp*
 *~
 

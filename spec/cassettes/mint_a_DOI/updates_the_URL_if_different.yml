@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: post
-    uri: https://test.datacite.org/mds/metadata
+    uri: https://mds.test.datacite.org/metadata
     body:
       encoding: UTF-8
       string: |
@@ -63,7 +63,7 @@ http_interactions:
       - no-cache
       - no-store
       Location:
-      - https://test.datacite.org/mds/metadata/10.5072/test_doi
+      - https://mds.test.datacite.org/metadata/10.5072/test_doi
       Content-Type:
       - application/xml;charset=UTF-8
       Content-Length:
@@ -75,7 +75,7 @@ http_interactions:
   recorded_at: Tue, 04 Nov 2014 15:06:57 GMT
 - request:
     method: post
-    uri: https://test.datacite.org/mds/doi
+    uri: https://mds.test.datacite.org/doi
     body:
       encoding: UTF-8
       string: |-
@@ -109,7 +109,7 @@ http_interactions:
       - no-cache
       - no-store
       Location:
-      - https://test.datacite.org/mds/doi/10.5072/TEST_DOI
+      - https://mds.test.datacite.org/doi/10.5072/TEST_DOI
       Content-Type:
       - application/xml;charset=UTF-8
       Content-Length:
@@ -121,7 +121,7 @@ http_interactions:
   recorded_at: Tue, 04 Nov 2014 15:15:03 GMT
 - request:
     method: get
-    uri: https://test.datacite.org/mds/doi/10.5072/test_doi
+    uri: https://mds.test.datacite.org/doi/10.5072/test_doi
     body:
       encoding: US-ASCII
       string: ''
@@ -159,7 +159,7 @@ http_interactions:
   recorded_at: Tue, 04 Nov 2014 15:16:41 GMT
 - request:
     method: post
-    uri: https://test.datacite.org/mds/doi
+    uri: https://mds.test.datacite.org/doi
     body:
       encoding: UTF-8
       string: |-
@@ -193,7 +193,7 @@ http_interactions:
       - no-cache
       - no-store
       Location:
-      - https://test.datacite.org/mds/doi/10.5072/TEST_DOI
+      - https://mds.test.datacite.org/doi/10.5072/TEST_DOI
       Content-Type:
       - application/xml;charset=UTF-8
       Content-Length:
@@ -205,7 +205,7 @@ http_interactions:
   recorded_at: Tue, 04 Nov 2014 15:01:57 GMT
 - request:
     method: get
-    uri: https://test.datacite.org/mds/doi/10.5072/test_doi
+    uri: https://mds.test.datacite.org/doi/10.5072/test_doi
     body:
       encoding: US-ASCII
       string: ''

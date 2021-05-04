@@ -76,7 +76,7 @@ module WorkflowExtraction
     wf = crate.main_workflow || ROCrate::Workflow.new(crate, c.filepath, c.original_filename)
     wf.content_size = c.file_size
     crate.main_workflow = wf
-    crate.main_workflow.programming_language = ROCrate::ContextualEntity.new(crate, nil, workflow_class&.ro_crate_metadata || Seek::WorkflowExtractors::Base::NULL_CLASS_METADATA)
+#    crate.main_workflow.programming_language = ROCrate::ContextualEntity.new(crate, nil, extractor_class.ro_crate_metadata)
 
     begin
       d = diagram
@@ -88,22 +88,55 @@ module WorkflowExtraction
     rescue WorkflowDiagram::UnsupportedFormat
     end
 
-    authors = creators.map { |person| crate.add_person(nil, person.ro_crate_metadata) }
-    others = other_creators&.split(',')&.collect(&:strip)&.compact || []
-    authors += others.map.with_index { |name, i| crate.add_person("creator-#{i + 1}", name: name) }
-    crate.author = authors
-    crate['provider'] = projects.map { |project| crate.add_organization(nil, project.ro_crate_metadata).reference }
-    crate.license = license
     crate.identifier = ro_crate_identifier
     crate.url = ro_crate_url('ro_crate')
-    crate['isBasedOn'] = source_link_url if source_link_url
-    crate['sdPublisher'] = crate.add_person(nil, contributor.ro_crate_metadata).reference
-    crate['sdDatePublished'] = Time.now
+
+    workflow = is_a_version? ? self.parent : self
+    merge_entities(crate, workflow) if workflow
+
+    crate['isBasedOn'] = source_link_url if source_link_url && !crate['isBasedOn']
+    crate['sdDatePublished'] = Time.now unless crate['sdDatePublished']
     crate['creativeWorkStatus'] = I18n.t("maturity_level.#{maturity_level}") if maturity_level
 
-    crate.preview.template = PREVIEW_TEMPLATE
+    # brute force deletion as I cannot track down where it comes from
+    crate.contextual_entities.delete_if { |c| c['@id'] == '#ro-crate-preview.html' }
+    crate
   end
 
+  def merge_entities(crate, workflow)
+    workflow_struct = Seek::BioSchema::Serializer.new(workflow).json_representation
+
+    context = {
+      '@vocab' => 'https://somewhere.com/'
+    }
+    workflow_struct['@context'] = context
+    crate['name'] = "Research Object Crate for #{workflow_struct['name']}"
+    crate['description'] = workflow_struct['description']
+
+    workflow_struct.except!('encodingFormat')
+
+    flattened = JSON::LD::API.flatten(workflow_struct, context)
+    flattened.except!('@context')
+
+    flattened['@graph'].each do |elem|
+      type = elem['@type']
+      type = [type] unless type.is_a?(Array)
+      if type.include?('ComputationalWorkflow')
+        merge_fields(crate.main_workflow, elem)
+      else
+        entity_class = ROCrate::ContextualEntity.specialize(elem)
+        entity = entity_class.new(crate, elem['@id'], elem)
+        crate.add_contextual_entity(entity)
+      end
+    end
+  end
+  
+  def merge_fields(crate_workflow, bioschemas_workflow)
+    bioschemas_workflow.each do |key, value|
+      crate_workflow[key] = value unless crate_workflow[key]
+    end
+  end
+  
   def ro_crate
     inner = proc do |crate|
       populate_ro_crate(crate) if should_generate_crate?

@@ -66,6 +66,7 @@ def load_seek_config_defaults!
   Seek::Config.default :project_hierarchy_enabled, false
   Seek::Config.default :show_announcements, true
   Seek::Config.default :programme_user_creation_enabled, false
+  Seek::Config.default :programmes_open_for_projects_enabled, false
   Seek::Config.default :project_admin_sample_type_restriction, false #only project admins can create and edit sample types and controlled vocabs
 
   # Types
@@ -78,6 +79,7 @@ def load_seek_config_defaults!
   Seek::Config.default :publications_enabled,true
   Seek::Config.default :samples_enabled, true
   Seek::Config.default :workflows_enabled, false
+  Seek::Config.default :collections_enabled, false
 
   Seek::Config.default :doi_minting_enabled, false
   Seek::Config.default :time_lock_doi_for, 0
@@ -102,6 +104,7 @@ def load_seek_config_defaults!
   Seek::Config.default :header_image_link,"http://www.fair-dom.org"
   Seek::Config.default :copyright_addendum_enabled,false
   Seek::Config.default :copyright_addendum_content,'Additions copyright ...'
+  Seek::Config.default :issue_tracker, 'https://fair-dom.org/issues'
 
   #Imprint
   Settings.defaults[:imprint_enabled]= false
@@ -147,6 +150,7 @@ def load_seek_config_defaults!
   Seek::Config.default :site_base_host,"http://localhost:3000"
   Seek::Config.default :open_id_authentication_store,:memory
   Seek::Config.default :session_store_timeout, 1.hour
+  Seek::Config.default :cv_dropdown_limit, 100
 
   #MERGENOTE - why are these here? they should be in the database under the Scale model. Maybe an old relic
   Seek::Config.default :scales,["organism","liver","liverLobule","intercellular","cell"]

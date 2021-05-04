@@ -7,7 +7,6 @@ module Seek
       end
 
       def batch_change_permssion_for_selected_items
-        flash[:notice] = nil
         @items_for_sharing = resolve_sharing_params(params)
         if @items_for_sharing.empty?
           flash[:error] = "Please choose at least one item!"
@@ -31,17 +30,24 @@ module Seek
 
         @items_for_sharing = resolve_sharing_params(params)
           @batch_sharing_permission_changed = true
+        notice_count = 0
+        error_count = 0
           flash[:notice] = "The sharing policies for your selected #{"item".pluralize(@items_for_sharing.size)} were successfully updated:<ul> "
+          flash[:error] = "The sharing policies for your selected #{"item".pluralize(@items_for_sharing.size)} were not successfully updated:<ul> "
           @items_for_sharing.each do |item|
             item.policy.update_attributes_with_bulk_sharing_policy(policy_params) if policy_params.present?
-            if item.save
+            begin
+              item.save!
+              notice_count +=1
               flash[:notice] += "<li>#{item.title}</li>"
-            else
-              flash[:error] = "The sharing policy of <b>#{item.title}</b> was not successfully updated, please try it again.<br>"
+            rescue Exception => e
+              error_count += 1
+              flash[:error] += "<li>#{item.title}<br>"
+              flash[:error] += "The reason:  #{e.message}</li>"
             end
           end
-              flash[:notice] = (flash[:notice]+"</ul>").html_safe
-              flash[:error] =  flash[:error].html_safe unless flash[:error].nil?
+              flash.now[:notice] = notice_count==0 ? nil: (flash[:notice]+"</ul>").html_safe
+              flash.now[:error] = error_count==0 ? nil: (flash[:error]+"</ul>").html_safe
           respond_to do |format|
             format.html { render template: 'assets/sharing/batch_sharing_permission_preview' }
           end

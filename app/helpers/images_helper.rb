@@ -83,7 +83,7 @@ module ImagesHelper
     url
   end
 
-  def delete_icon(model_item, user)
+  def delete_icon(model_item, user, confirm_msg='Are you sure?')
     item_name = text_for_resource model_item
     if model_item.can_delete?(user)
       fullURL = url_for(model_item)
@@ -91,12 +91,14 @@ module ImagesHelper
       ## Add return path if available
       fullURL = polymorphic_url(model_item,:return_to=>URI(request.referer).path) if request.referer
 
-      html = content_tag(:li) { image_tag_for_key('destroy', fullURL, "Delete #{item_name}", { data: { confirm: 'Are you sure?' }, method: :delete}, "Delete #{item_name}") }
-      return html.html_safe
+      html = content_tag(:li) do
+        image_tag_for_key('destroy', fullURL, "Delete #{item_name}", { data: { confirm: confirm_msg }, method: :delete}, "Delete #{item_name}")
+      end
+      html.html_safe
     elsif model_item.can_manage?(user)
       explanation = unable_to_delete_text model_item
       html = "<li><span class='disabled_icon disabled' onclick='javascript:alert(\"#{explanation}\")' data-tooltip='#{tooltip(explanation)}' >" + image('destroy', alt: 'Delete', class: 'disabled') + " Delete #{item_name} </span></li>"
-      return html.html_safe
+      html.html_safe
     end
   end
 

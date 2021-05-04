@@ -137,7 +137,7 @@ class Project < ApplicationRecord
     super + ['web_page']
   end
   def columns_allowed
-    super + ['web_page','wiki_page','site_credentials','start_date','end_date']
+    columns_default + ['wiki_page','site_credentials','start_date','end_date']
   end
 
   # returns people belong to the admin defined seek 'role' for this project
@@ -236,7 +236,6 @@ class Project < ApplicationRecord
 
   def can_delete?(user = User.current_user)
     user && can_manage?(user) &&
-      # work_groups.collect(&:people).flatten.empty? &&
         investigations.empty? && studies.empty? && assays.empty? && assets.empty? &&
         samples.empty? && sample_types.empty?
   end

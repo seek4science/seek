@@ -656,6 +656,31 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select 'a.disabled', text: 'Explore', count: 0
     end
   end
+  
+  test 'show explore button for csv file' do
+    df = Factory(:csv_spreadsheet_datafile)
+    login_as(df.contributor.user)
+    get :show, params: { id: df }
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a[href=?]', explore_data_file_path(df, version: df.version), count: 1
+      assert_select 'a.disabled', text: 'Explore', count: 0
+    end
+  end
+
+  
+  test 'not show explore button if spreadsheet not supported' do
+    df = Factory(:non_spreadsheet_datafile)
+    login_as(df.contributor.user)
+    with_config_value(:max_extractable_spreadsheet_size, 0) do
+      get :show, params: { id: df }
+    end
+    assert_response :success
+    assert_select '#buttons' do
+      assert_select 'a[href=?]', explore_data_file_path(df, version: df.version), count: 0
+      assert_select 'a', text: 'Explore', count: 0
+    end
+  end
 
   test 'show disabled explore button if spreadsheet too big' do
     df = Factory(:small_test_spreadsheet_datafile)

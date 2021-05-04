@@ -473,8 +473,9 @@ module ApplicationHelper
   end
 
   def pending_project_creation_request?
-    return false unless admin_logged_in?
-    return MessageLog.pending_project_creation_requests.any?
+    MessageLog.pending_project_creation_requests.collect do |log|
+      log.can_respond_project_creation_request?(User.current_user)
+    end.any?
   end
 
   def pending_project_join_request?
