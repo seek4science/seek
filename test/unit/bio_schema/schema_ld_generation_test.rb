@@ -136,14 +136,14 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     assert_nil df.content_blob
 
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}",
       'name' => df.title,
       'description' => df.description,
       'keywords' => 'keyword',
       'url' => "http://localhost:3000/data_files/#{df.id}",
-      'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
+      'creator' => [{ '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Blogs')}", 'name' => 'Blogs' }, { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Joe')}", 'name' => 'Joe' }],
       'producer' => [{
         '@type' => %w[Project Organization],
         '@id' => "http://localhost:3000/projects/#{@project.id}",
@@ -156,7 +156,13 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         { '@type' => 'Event',
           '@id' => "http://localhost:3000/events/#{df.events.first.id}",
           'name' => df.events.first.title }
-      ]
+      ],
+      "sdPublisher" => {
+          "@type"=>"Organization",
+          "@id"=>"http://localhost:3000",
+          "name"=>"SysMO-DB",
+          "url"=>"http://localhost:3000"
+      },
     }
 
     json = JSON.parse(df.to_schema_ld)
