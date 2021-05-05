@@ -69,7 +69,7 @@
   <hr/>
   <h3>Alternatively...</h3>
   <ul>
-    <% if show_elixir_login? %>
+    <% if show_elixir_aai_login? %>
       <li>
         <%= link_to(omniauth_authorize_path(:elixir_aai, state: "return_to:/"), method: :post) do %>
           Log in using <%= t('login.elixir_aai') -%><br/>
