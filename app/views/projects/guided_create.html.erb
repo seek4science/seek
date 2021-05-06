@@ -42,7 +42,7 @@
         var enabled = $j('#institution_id').val()
             && !progEnabled || ($j('#programme_id').val() || $j('input#programme_title').val())
             && $j('input#project_title').val()
-            && $j('select#institution_country').val();
+            && $j('input#institution_title').val();
         $j('#submit-button').prop('disabled',!enabled);
     }
 
