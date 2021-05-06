@@ -70,6 +70,12 @@ Installing these packages now will make installing Ruby easier later on:
 
     sudo apt install autoconf automake bison curl gawk libffi-dev libgdbm-dev \
         libncurses5-dev libsqlite3-dev libyaml-dev sqlite3
+        
+SEEK's Solr implementation currently requires Java 8, so you may need to switch the system's default Java runtime:
+
+    sudo update-alternatives --config java
+    
+...and select the version named `/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java` or similar.
 
 ## Development or Production?
 
