@@ -2248,6 +2248,22 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'administer create request project with institution already created' do
+    # when a new institution when requested, but it has then been created before the request is handled 
+    person = Factory(:admin)
+    login_as(person)
+    project = Project.new(title:'new project')
+    programme = Programme.new(title:'new programme')
+    institution = Institution.new(title:'my institution')
+    log = MessageLog.log_project_creation_request(Factory(:person),programme, project,institution)
+    created_inst = Factory(:institution,title:'my institution')
+    get :administer_create_project_request, params:{message_log_id:log.id}
+    assert_response :success
+
+    assert_select 'input#institution_title', count: 0
+    assert_select 'input#institution_id', value: created_inst.id, count: 1
+  end
+
   test 'admininister create request can be accessed by programme admin' do
     person = Factory(:programme_administrator)
     login_as(person)
