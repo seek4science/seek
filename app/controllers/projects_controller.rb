@@ -76,7 +76,12 @@ class ProjectsController < ApplicationController
     details = JSON.parse(@message_log.details)
     @comments = details['comments']
     @institution = Institution.new(details['institution'])
-    @institution = Institution.find(@institution.id) unless @institution.id.nil?
+    if @institution.id
+      @institution = Institution.find(@institution.id)
+    else
+      # override with existing institution if already exists with same title, it could have been created since the request was made
+      @institution = Institution.find_by(title: @institution.title) if Institution.find_by(title: @institution.title)
+    end
 
     respond_to do |format|
       format.html
@@ -726,9 +731,13 @@ class ProjectsController < ApplicationController
     @project = Project.find(@project.id) unless @project.id.nil?
 
     @institution = Institution.new(details['institution'])
-    @institution = Institution.find(@institution.id) unless @institution.id.nil?
 
-
+    if @institution.id
+      @institution = Institution.find(@institution.id)
+    else
+      # override with existing institution if already exists with same title, it could have been created since the request was made
+      @institution = Institution.find_by(title: @institution.title) if Institution.find_by(title: @institution.title)
+    end 
   end
 
   # check programme permissions for responding to a MesasgeLog
