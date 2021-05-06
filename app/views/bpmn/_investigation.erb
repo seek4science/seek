@@ -1,6 +1,21 @@
 <subProcess id="investigation-<%= investigation.id %>" name="<%= investigation.title %>">
 
+<% link_start = "investigation-#{investigation.id}-start" %>
+<startEvent id="<%= link_start %>"/>
+
 <% investigation.studies.each do |s| %>
   <%= render :partial => "bpmn/study", :locals => { :study => s } -%>
+
+
+  <% link_end = "study-#{s.id}" %>
+  <sequenceFlow sourceRef="<%= link_start %>" targetRef="<%= link_end %>" id="<%= link_start %>-to-<%= link_end %>"/>
+
+  <% link_start = "study-#{s.id}" %>
 <% end %>
+
+<% link_end="investigatiion-#{investigation.id}-end" %>
+<endEvent id="<%=link_end %>"/>
+
+<sequenceFlow sourceRef="<%= link_start %>" targetRef="<%= link_end %>" id="<%= link_start %>-to-<%= link_end %>"/>
+
 </subProcess>

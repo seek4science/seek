@@ -1,11 +1,13 @@
 require 'seek/custom_exception'
+require 'zip'
+require 'securerandom'
+require 'json'
 
 class ProjectsController < ApplicationController
   include Seek::IndexPager
   include CommonSweepers
   include Seek::DestroyHandling
   include ApiHelper
-  include Seek::BPMNGenerator
 
   before_action :login_required, only: [:guided_join, :guided_create, :request_join, :request_create,
                                         :administer_join_request, :respond_join_request,
@@ -434,12 +436,49 @@ class ProjectsController < ApplicationController
 
   def bpmn
     @project = Project.find(params[:id]) if params[:id]
-    send_data render_to_string(
-      "bpmn/convert.erb", locals: { :project => @project}, layout: false
-    )
-#    generated = build(@project)
-#    puts generated.to_xml.to_s
-#    send_data generated.to_xml.to_s
+
+    app_id = SecureRandom.uuid
+    app_hash = {}
+    app_hash['id'] = app_id
+    app_hash['name'] = @project.title.parameterize.underscore + '_app'
+    app_hash['key'] = app_hash['name']
+    app_hash['description'] = @project.description.blank? ? "" : @project.description 
+    app_hash['editorJson'] = {}
+
+    model_id = SecureRandom.uuid
+    model_name = @project.title.parameterize.underscore + '_model'
+    app_hash['editorJson']['models'] =
+      [{"id" => model_id,
+        "name" => model_name,
+        "version" => 1,
+        "modelType" => 0,
+        "description" => app_hash['description'],
+        "stencilSetId" => nil,
+        "createdBy" => "admin",
+        "lastUpdatedBy" => "admin",
+        "lastUpdated":"2021-05-04T19:32:05.797+00:00"}]
+    app_hash['editorJson']['theme']  = "theme-1"
+    app_hash['editorJson']['icon']  = "glyphicon-asterisk"
+    
+    model_hash = {"id" => model_id,
+                  "name" => model_name,
+                  "key" => model_name,
+                  "description" => app_hash['description'],
+                  "editorJson" => nil
+                 }
+    stringio = Zip::OutputStream.write_buffer do |zio|
+      zio.put_next_entry("#{app_hash['name']}.json")
+      zio.write JSON.pretty_generate(app_hash)
+      zio.put_next_entry("bpmn_models/#{model_name}.bpmn")
+      zio.write render_to_string(
+      "bpmn/convert.erb", locals: { :id => model_id, :name => model_name, :project => @project}, layout: false
+                )
+      zio.put_next_entry("bpmn_models/#{model_name}.json")
+      zio.write JSON.pretty_generate(model_hash)
+    end
+    stringio.rewind
+    binary_data = stringio.sysread
+    send_data binary_data, filename: "#{app_hash['name']}.zip", type: 'application/octet-stream', disposition: 'attachment'
   end
   
   # returns a list of institutions for a project in JSON format

@@ -1,0 +1,26 @@
+<serviceTask id="<%= id %>" name="<%= name %>" flowable:parallelInSameTransaction="true" flowable:type="http">
+<extensionElements>
+<flowable:field name="requestMethod">
+<flowable:string>
+<![CDATA[ POST ]]>
+</flowable:string>
+</flowable:field>
+<flowable:field name="requestUrl">
+<flowable:string>
+<![CDATA[
+https://hooks.slack.com/services/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
+]]>
+</flowable:string>
+</flowable:field>
+<flowable:field name="requestHeaders">
+<flowable:string>
+<![CDATA[ Content-type: application/json ]]>
+</flowable:string>
+</flowable:field>
+<flowable:field name="requestBody">
+<flowable:string>
+<![CDATA[ {"text":"<%= name %> is ready to start"} ]]>
+</flowable:string>
+</flowable:field>
+</extensionElements>
+</serviceTask>

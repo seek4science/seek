@@ -6,12 +6,16 @@ module ImagesHelper
 
   def image_tag_for_key(key, url = nil, alt = nil, html_options = {}, label = key.humanize, remote = false, size = nil)
     label = 'Delete' if label == 'Destroy'
-
+puts(key)
+puts('1')
     return nil unless (filename = icon_filename_for_key(key.downcase))
+puts(filename)
+puts('2')
 
     image_options = alt ? { alt: alt } : { alt: key.humanize }
     image_options[:size] = "#{size}x#{size}" unless size.blank?
     img_tag = image_tag(filename, image_options).html_safe
+puts('3')
 
     inner = img_tag.html_safe
     inner = "#{img_tag} #{label}".html_safe unless label.blank?

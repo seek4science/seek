@@ -1,3 +1,11 @@
 <subProcess id="assay-<%= assay.id %>" name="<%= assay.title %>">
 
+<% link_start = "assay-#{assay.id}-start" %>
+<startEvent id="<%= link_start %>"/>
+
+<% link_end="assay-#{assay.id}-end" %>
+<endEvent id="<%=link_end %>"/>
+
+<sequenceFlow sourceRef="<%= link_start %>" targetRef="<%= link_end %>" id="<%= link_start %>-to-<%= link_end %>"/>
+
 </subProcess>

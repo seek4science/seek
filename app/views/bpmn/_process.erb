@@ -1,6 +1,27 @@
-<process id="project-<%= project.id %>" name="<%= project.title %>" isExecutable="true">
+<process id="<%= id %>" name="<%= name %>" isExecutable="true">
+
+<% link_start = "project-#{project.id}-start" %>
+<startEvent id="<%= link_start %>"/>
+
+<% start_notify = "project-#{project.id}-start-notify" %>
+  <%= render :partial => "bpmn/notify", :locals => {:id => start_notify, :name => project.title } -%>
+
+  <sequenceFlow sourceRef="<%= link_start %>" targetRef="<%= start_notify %>" id="<%= link_start %>-to-<%= start_notify %>"/>
+
+<% link_start = start_notify %>
 
 <% project.investigations.each do |i| %>
   <%= render :partial => "bpmn/investigation", :locals => { :investigation => i } -%>
+
+  <% link_end = "investigation-#{i.id}" %>
+  <sequenceFlow sourceRef="<%= link_start %>" targetRef="<%= link_end %>" id="<%= link_start %>-to-<%= link_end %>"/>
+
+  <% link_start = "investigation-#{i.id}" %>
 <% end %>
+
+<% link_end="project-#{project.id}-end" %>
+<endEvent id="<%=link_end %>"/>
+
+<sequenceFlow sourceRef="<%= link_start %>" targetRef="<%= link_end %>" id="<%= link_start %>-to-<%= link_end %>"/>
+
 </process>
