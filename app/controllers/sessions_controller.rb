@@ -44,8 +44,11 @@ class SessionsController < ApplicationController
     password_authentication
   end
 
-  def failure
-    failed_login "Invalid username/password.".html_safe
+  def omniauth_failure
+    flash[:error] = "#{t("login.#{params[:strategy]}")} authentication failure (Invalid username/password?)"
+    respond_to do |format|
+      format.html { render :new }
+    end
   end
 
   def destroy
