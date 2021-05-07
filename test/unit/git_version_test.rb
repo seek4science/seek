@@ -14,7 +14,7 @@ class GitVersionTest < ActiveSupport::TestCase
     refute v.git_base.tags['version-1.0.0']
     assert v.mutable?
 
-    v.send(:freeze_version)
+    v.send(:freeze)
     workflow.update_column(:title, 'Something else')
     new_class = Factory(:galaxy_workflow_class)
     workflow.update_column(:workflow_class_id, new_class.id)

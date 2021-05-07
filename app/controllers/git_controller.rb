@@ -1,7 +1,7 @@
 class GitController < ApplicationController
   before_action :fetch_parent
   before_action :authorize_parent
-  before_action :authorized_to_edit, only: [:add_file, :remove_file, :move_file]
+  before_action :authorized_to_edit, only: [:add_file, :remove_file, :move_file, :freeze]
   before_action :fetch_git_version
   before_action :get_tree, only: [:tree]
   before_action :get_blob, only: [:blob, :download, :raw]
@@ -70,6 +70,20 @@ class GitController < ApplicationController
     redirect_to polymorphic_path(@parent_resource, anchor: 'files')
   end
 
+  def freeze_preview
+
+  end
+
+  def freeze
+    if @git_version.update_attributes(git_version_params) && @git_version.freeze
+      flash[:notice] = "#{@git_version.name} was frozen"
+    else
+      flash[:error] = "Could not freeze #{@git_version.name} - #{@git_version.errors.full_messages.join(', ')}"
+    end
+
+    redirect_to polymorphic_path(@parent_resource)
+  end
+
   private
 
   def render_immutable_error
@@ -129,6 +143,10 @@ class GitController < ApplicationController
   def fetch_git_version
     @git_version = params[:version] ? @parent_resource.find_git_version(params[:version]) : @parent_resource.git_version
     raise ActiveRecord::RecordNotFound unless @git_version
+  end
+
+  def git_version_params
+    params.require(:git_version).permit(:name, :comment)
   end
 
   # # Rugged does not allow streaming blobs

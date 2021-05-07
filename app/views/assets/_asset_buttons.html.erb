@@ -79,6 +79,11 @@
 
 <%= item_actions_dropdown do %>
   <% if asset.can_edit? -%>
+    <% if asset.is_git_versioned? -%>
+      <% if display_asset.mutable? %>
+        <li><%= image_tag_for_key('snapshot', polymorphic_path([asset, :git_freeze_preview], version: display_asset.version), nil, nil, "Freeze version") -%></li>
+      <% end %>
+    <% end %>
     <% if asset.versioned? -%>
       <li>
         <% if asset.new_version_supported? %>

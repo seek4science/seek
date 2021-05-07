@@ -127,6 +127,8 @@ SEEK::Application.routes.draw do
         post 'add' => 'git#add_file', as: :git_add_file
         delete 'remove' => 'git#remove_file', as: :git_remove_file
         patch 'move' => 'git#move_file', as: :git_move_file
+        get 'freeze' => 'git#freeze_preview', as: :git_freeze_preview
+        post 'freeze' => 'git#freeze', as: :git_freeze
       end
     end
   end
