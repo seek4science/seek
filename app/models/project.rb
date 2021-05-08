@@ -95,6 +95,10 @@ class Project < ApplicationRecord
     data_files | sops | models | publications | presentations | documents | workflows | nodes | collections
   end
 
+ def spreadsheets
+    data_files.select { |d| d.contains_extractable_spreadsheet?}
+  end
+
   def institutions=(new_institutions)
     new_institutions = Array(new_institutions).map do |i|
       i.is_a?(Institution) ? i : Institution.find(i)

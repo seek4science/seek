@@ -291,6 +291,8 @@ SEEK::Application.routes.draw do
     end
     member do
       get :asset_report
+      get :populate
+      post :populate_from_spreadsheet
       get :admin_members
       get :admin_member_roles
       get :storage_report

@@ -5,6 +5,7 @@ class ProjectsController < ApplicationController
   include CommonSweepers
   include Seek::DestroyHandling
   include ApiHelper
+  include Seek::Projects::Population
 
   before_action :login_required, only: [:guided_join, :guided_create, :request_join, :request_create,
                                         :administer_join_request, :respond_join_request,
@@ -12,8 +13,12 @@ class ProjectsController < ApplicationController
                                         :project_join_requests, :project_creation_requests, :typeahead]
 
   before_action :find_requested_item, only: %i[show admin edit update destroy asset_report admin_members
+                                               populate populate_from_spreadsheet
                                                admin_member_roles update_members storage_report
                                                overview administer_join_request respond_join_request]
+
+  before_action :has_spreadsheets, only: %i[:populate populate_from_spreadsheet]
+
   before_action :find_assets, only: [:index]
   before_action :auth_to_create, only: %i[new create,:administer_create_project_request, :respond_create_project_request]
   before_action :is_user_admin_auth, only: %i[manage destroy]
@@ -459,6 +464,19 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def populate
+    respond_with(@project)
+  end
+
+  def populate_from_spreadsheet
+    ActiveRecord::Base.transaction do
+    populate_from_spreadsheet_impl
+    end
+    respond_with(@project) do |format|
+      format.html { redirect_to project_path(@project) }
+    end
+  end
+  
   def admin_members
     respond_with(@project)
   end
@@ -710,6 +728,11 @@ class ProjectsController < ApplicationController
       error('Insufficient privileges', 'is invalid (insufficient_privileges)', :forbidden)
       return false
     end
+  end
+
+  def has_spreadsheets
+    @project = Project.find(params[:id])
+    return !@project.spreadsheets.empty?
   end
 
   def member_of_this_project
