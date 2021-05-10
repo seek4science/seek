@@ -95,9 +95,24 @@ namespace :seek do
     puts 'Done'
   end
 
+  desc "populate the postions of assays"
+  task populate_positions: :environment do
+    Study.all.each do |s|
+      position = 1
+      s.assays.each do |a|
+        a.position = position
+        position += 1
+        disable_authorization_checks do
+          puts a.save
+        end
+      end
+    end
+  end
+
   desc "Clear encrypted settings"
   task clear_encrypted_settings: :environment do
     Settings.where(var: Seek::Config.encrypted_settings).destroy_all
     puts 'Encrypted settings cleared'
   end
+
 end

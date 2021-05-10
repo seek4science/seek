@@ -1,0 +1,42 @@
+<%= form_for(@investigation, html: { multipart: true }) do |f| %>
+  <%= f.error_messages %>
+
+      <h3>Studies</h3>
+      <p class="help-block">Re-arrange studies by clicking and dragging the button on the left-hand side.</p>
+      <table class="table" id="study-table">
+        <thead>
+        <tr>
+          <th width="5em"></th>
+          <th>Study name</th>
+        </tr>
+        </thead>
+        <tbody class="ui-sortable">
+        <% @investigation.positioned_studies.each_with_index do |study, index| %>
+          <tr class="investigation-study ui-sortable-handle" data-index="<%= index-%>">
+            <th scope="row" class="study-position">
+              <div class="btn btn-info attribute-handle">
+                <span class="glyphicon glyphicon-sort" aria-hidden="true"></span>
+              </div>
+              <%= hidden_field_tag "investigation[ordered_study_ids][#{index}]", study.id, {readonly: true} %>
+            </th>
+            <td>
+              <%= text_field_tag "study_name", study.title, class: 'form-control',disabled: true %>
+            </td>
+          </tr>
+         <% end %>
+
+        </tbody>
+      </table>
+
+  <script type="text/javascript">
+        jQuery(function() {
+  $j( "tbody" ).sortable();
+});
+</script>
+
+  <p class="actions">
+    <%= f.submit ('Order'), :class => 'btn btn-primary' %>
+    or
+    <%= cancel_button(investigation_path(@investigation)) %>
+  </p>
+<% end %>

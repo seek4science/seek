@@ -182,6 +182,7 @@ ActiveRecord::Schema.define(version: 2021_03_18_115608) do
     t.integer "suggested_technology_type_id"
     t.text "other_creators"
     t.string "deleted_contributor"
+    t.integer "position"
     t.integer "sample_type_id"
     t.index ["sample_type_id"], name: "index_assays_on_sample_type_id"
   end
@@ -814,6 +815,7 @@ ActiveRecord::Schema.define(version: 2021_03_18_115608) do
     t.integer "contributor_id"
     t.text "other_creators"
     t.string "deleted_contributor"
+    t.integer "position"
   end
 
   create_table "investigations_projects", id: false,  force: :cascade do |t|
@@ -1819,6 +1821,7 @@ ActiveRecord::Schema.define(version: 2021_03_18_115608) do
     t.integer "contributor_id"
     t.text "other_creators"
     t.string "deleted_contributor"
+    t.integer "position"
   end
 
   create_table "study_auth_lookup",  force: :cascade do |t|

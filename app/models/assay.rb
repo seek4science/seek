@@ -1,4 +1,5 @@
 class Assay < ApplicationRecord
+
   include Seek::Rdf::RdfGeneration
   include Seek::Ontologies::AssayOntologyTypes
   include Seek::Taggable

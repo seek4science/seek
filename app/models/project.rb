@@ -310,6 +310,10 @@ class Project < ApplicationRecord
     errors.add(:end_date, 'is before start date.') unless end_date.nil? || start_date.nil? || end_date >= start_date
   end
 
+  def positioned_investigations
+    investigations.order(position: :asc)
+  end
+
   def ro_crate_metadata
     {
         '@id' => "#project-#{id}",

@@ -10,6 +10,7 @@
         "permissions":[]
       },
       "other_creators":  "Anonymous creator",
+      "position": null,
       "title": "A Maximal Modelling Assay",
       "description": "A Western Blot Assay",
       "assay_class": {

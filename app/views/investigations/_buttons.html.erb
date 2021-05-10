@@ -11,6 +11,7 @@
 <%= item_actions_dropdown do %>
     <% if item.can_edit? %>
       <li><%= image_tag_for_key('edit', edit_investigation_path(item), "Edit #{t('investigation')}", nil, "Edit #{t('investigation')}") -%></li>
+      <li><%= image_tag_for_key('order', order_studies_investigation_path(item), "Order studies", nil, "Order studies") -%></li>
     <% end %>
 
     <% if item.can_manage? -%>

@@ -4,6 +4,8 @@
   creators_enable = creators_enable && f.object.respond_to?(:creators)
   other_creators ||= nil
 
+  assays_enable = f.object.respond_to?(:positioned_assays)
+
   sharing_enable = true if sharing_enable.nil?
   sharing_enable = sharing_enable && f.object.can_manage?
 
