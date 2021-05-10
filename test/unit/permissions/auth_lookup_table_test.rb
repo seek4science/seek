@@ -182,4 +182,31 @@ class AuthLookupTableTest < ActiveSupport::TestCase
     assert_equal [true, false, false, false, false], sop.auth_lookup.where(user: user).first.as_array
     assert_equal [true, false, false, false, false], sop.auth_lookup.where(user: anon).first.as_array
   end
+
+  test 'deletes records when assets removed' do
+    Person.destroy_all
+    User.destroy_all
+    Sop.destroy_all
+
+    person = Factory(:person)
+    Factory(:person)
+
+    sop=Factory(:sop, contributor:person)
+    sop2=Factory(:sop, contributor:person)
+
+    sop.update_lookup_table_for_all_users
+    sop2.update_lookup_table_for_all_users
+
+    assert_equal 3,sop.auth_lookup.count
+    assert_equal 3,sop2.auth_lookup.count
+
+    disable_authorization_checks do
+      assert_difference('Sop::AuthLookup.count',-3) do
+        sop.destroy
+      end
+    end
+
+    assert_equal 3,sop2.auth_lookup.count
+
+  end
 end

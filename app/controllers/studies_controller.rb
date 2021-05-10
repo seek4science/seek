@@ -126,20 +126,28 @@ class StudiesController < ApplicationController
                 else
                   'user_uuid'
                 end
-    tempzip_path = params[:content_blobs][0][:data].tempfile.path
-    data_files, studies = StudyBatchUpload.unzip_batch(tempzip_path, user_uuid)
-    study_filename = File.basename(studies.first.to_s)
-    studies_file = ContentBlob.new
-    studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{study_filename}")
-    studies_file.original_filename = "#{study_filename}"
-    studies_file.save!
-    @studies = StudyBatchUpload.extract_studies_from_file(studies_file)
-    @study = @studies[0]
-    @studies_datafiles = StudyBatchUpload.extract_study_data_from_file(studies_file)
-    @license = StudyBatchUpload.get_license_id(studies_file)
-    @existing_studies = JSON.parse(StudyBatchUpload.get_existing_studies(@studies))
 
-    render 'studies/batch_preview'
+    unless params[:content_blobs][0][:data].nil?
+      tempzip_path = params[:content_blobs][0][:data].tempfile.path
+      data_files, studies = StudyBatchUpload.unzip_batch(tempzip_path, user_uuid)
+      study_filename = File.basename(studies.first.to_s)
+      studies_file = ContentBlob.new
+      studies_file.tmp_io_object = File.open("#{Rails.root}/tmp/#{user_uuid}_studies_upload/#{study_filename}")
+      studies_file.original_filename = "#{study_filename}"
+      studies_file.save!
+      @studies = StudyBatchUpload.extract_studies_from_file(studies_file)
+      @study = @studies[0]
+      @studies_datafiles = StudyBatchUpload.extract_study_data_from_file(studies_file)
+      @license = StudyBatchUpload.get_license_id(studies_file)
+      @existing_studies = JSON.parse(StudyBatchUpload.get_existing_studies(@studies))
+
+      render 'studies/batch_preview'
+
+    else
+      flash.now[:error] = 'Please select a file to upload or provide a URL to the data.'
+      render 'studies/batch_uploader'
+    end
+
   end
 
   def batch_create
@@ -147,7 +155,7 @@ class StudiesController < ApplicationController
     # e.g: Study.new(title: 'title', investigation: investigations(:metabolomics_investigation), policy: Factory(:private_policy))
     # study.policy = Policy.create(name: 'default policy', access_type: 1)
     # render plain: params[:studies].inspect
-    metadata_types = CustomMetadataType.where(title: 'MIAPPE metadata', supported_type: 'Study')
+    metadata_types = CustomMetadataType.where(title: 'MIAPPE metadata', supported_type: 'Study').last
     studies_length = params[:studies][:title].length
     studies_uploaded = false
     data_file_uploaded = false
@@ -159,7 +167,7 @@ class StudiesController < ApplicationController
         investigation_id: params[:study][:investigation_id],
         person_responsible_id: params[:study][:person_responsible_id],
         custom_metadata: CustomMetadata.new(
-          custom_metadata_type: metadata_types.last,
+          custom_metadata_type: metadata_types,
           data: metadata
         )
       }
@@ -204,6 +212,7 @@ class StudiesController < ApplicationController
                   'user_uuid'
                 end
 
+    @assay_assets = []
     data_file_names = params[:studies][:data_files][index].remove(' ').split(',')
     data_file_names.length.times do |data_file_index|
 
@@ -239,11 +248,11 @@ class StudiesController < ApplicationController
         assay: Assay.new(assay_params),
         asset: DataFile.new(data_file_params)
       }
-      @assay_asset = AssayAsset.new(assay_asset_params)
 
-      if @assay_asset.valid? && @assay_asset.save!
-        return true if @assay_asset.save
-      end
+      @assay_assets << AssayAsset.new(assay_asset_params)
+    end
+    if @assay_assets.each(&:valid?) && @assay_assets.each(&:save!)
+      @assay_assets.each(&:save)
     end
   end
 

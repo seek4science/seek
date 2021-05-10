@@ -34,6 +34,13 @@ Factory.define(:strain_sample_type, parent: :sample_type) do |f|
   end
 end
 
+Factory.define(:data_file_sample_type, parent: :sample_type) do |f|
+  f.title 'DataFile type'
+  f.after_build do |type|
+    type.sample_attributes << Factory.build(:data_file_sample_attribute, title:'data file', is_title: true, sample_type:type)
+  end
+end
+
 Factory.define(:optional_strain_sample_type, parent: :strain_sample_type) do |f|
   f.after_build do |type|
     type.sample_attributes = [Factory.build(:sample_attribute, template_column_index: 1, title: 'name', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, is_title: true, sample_type: type),

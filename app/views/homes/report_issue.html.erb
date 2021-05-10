@@ -1,0 +1,12 @@
+<%= show_title(t('menu.report_issue')) %>
+<p class='alert alert-info'>
+    Before submitting a bug or feature request, please visit our guidelines available in the <%= help_link(:report_bugs_and_features, link_text:'User Guide') %>
+</p>
+
+<%
+    issue_tracker_link = link_to('Issue tracker', Seek::Config.issue_tracker, target: :blank).html_safe
+    feedback_link = link_to('Feedback form',feedback_home_path).html_safe
+%>
+
+<%= t(:report_a_bug, issue_tracker_link: issue_tracker_link, feedback_link: feedback_link).html_safe %>
+

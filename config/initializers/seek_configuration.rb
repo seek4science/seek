@@ -26,9 +26,11 @@ def load_seek_config_defaults!
   Seek::Config.default :activation_required_enabled,false
   Seek::Config.default :google_analytics_enabled, false
   Seek::Config.default :google_analytics_tracker_id, '000-000'
+  Seek::Config.default :google_analytics_tracking_notice, true
   Seek::Config.default :piwik_analytics_enabled, false
   Seek::Config.default :piwik_analytics_id_site, 1
   Seek::Config.default :piwik_analytics_url, 'localhost/piwik/'
+  Seek::Config.default :piwik_analytics_tracking_notice, true
   Seek::Config.default :bioportal_api_key,''
   Seek::Config.default :project_news_enabled,false
   Seek::Config.default :project_news_feed_urls,''
@@ -64,6 +66,7 @@ def load_seek_config_defaults!
   Seek::Config.default :project_hierarchy_enabled, false
   Seek::Config.default :show_announcements, true
   Seek::Config.default :programme_user_creation_enabled, false
+  Seek::Config.default :programmes_open_for_projects_enabled, false
   Seek::Config.default :project_admin_sample_type_restriction, false #only project admins can create and edit sample types and controlled vocabs
 
   # Types
@@ -76,6 +79,7 @@ def load_seek_config_defaults!
   Seek::Config.default :publications_enabled,true
   Seek::Config.default :samples_enabled, true
   Seek::Config.default :workflows_enabled, false
+  Seek::Config.default :collections_enabled, false
 
   Seek::Config.default :doi_minting_enabled, false
   Seek::Config.default :time_lock_doi_for, 0
@@ -98,9 +102,9 @@ def load_seek_config_defaults!
   Seek::Config.default :header_image_enabled,true
   Seek::Config.default :header_image_title, "FAIRDOM"
   Seek::Config.default :header_image_link,"http://www.fair-dom.org"
-  Seek::Config.default :header_home_logo_image,'seek-logo-smaller.png'
   Seek::Config.default :copyright_addendum_enabled,false
   Seek::Config.default :copyright_addendum_content,'Additions copyright ...'
+  Seek::Config.default :issue_tracker, 'https://fair-dom.org/issues'
 
   #Imprint
   Settings.defaults[:imprint_enabled]= false
@@ -146,6 +150,7 @@ def load_seek_config_defaults!
   Seek::Config.default :site_base_host,"http://localhost:3000"
   Seek::Config.default :open_id_authentication_store,:memory
   Seek::Config.default :session_store_timeout, 1.hour
+  Seek::Config.default :cv_dropdown_limit, 100
 
   #MERGENOTE - why are these here? they should be in the database under the Scale model. Maybe an old relic
   Seek::Config.default :scales,["organism","liver","liverLobule","intercellular","cell"]
@@ -227,6 +232,7 @@ def load_seek_config_defaults!
   Seek::Config.default :nels_use_dummy_client, false
 
   Seek::Config.default :results_per_page_default, 7
+  Seek::Config.default :results_per_page_default_condensed, 14
   Seek::Config.default :results_per_page, {}
   Seek::Config.default :sorting, {}
 

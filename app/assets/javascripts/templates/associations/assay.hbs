@@ -1,11 +1,11 @@
 <li class="association-list-item">
-    <input type="hidden" name="{{type}}[assay_assets_attributes][][assay_id]" value="{{assay.id}}"/>
+    <input type="hidden" name="{{fieldName}}[][assay_id]" value="{{assay.id}}"/>
     {{assay.title}}
     {{#if direction}}
-        <input type="hidden" name="{{type}}[assay_assets_attributes][][direction]" value="{{direction.value}}"/>
+        <input type="hidden" name="{{fieldName}}[][direction]" value="{{direction.value}}"/>
     {{/if}}
     {{#if relationship_type}}
-        <input type="hidden" name="{{type}}[assay_assets_attributes][][relationship_type_id]" value="{{relationship_type.value}}"/>
+        <input type="hidden" name="{{fieldName}}[][relationship_type_id]" value="{{relationship_type.value}}"/>
         <small>({{relationship_type.text}})</small>
     {{/if}}
     <a class="remove-association clickable" title="Remove assay">

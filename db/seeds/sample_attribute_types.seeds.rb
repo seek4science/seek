@@ -73,6 +73,9 @@ doi_type.update_attributes(base_type: Seek::Samples::BaseType::STRING, regexp: '
 ncbi_type = SampleAttributeType.find_or_initialize_by(title:'NCBI ID')
 ncbi_type.update_attributes(base_type: Seek::Samples::BaseType::STRING, regexp: '[0-9]+', placeholder: '23234', resolution:'https://identifiers.org/taxonomy/\\0')
 
+data_file_type = SampleAttributeType.find_or_initialize_by(title: 'SEEK Data file')
+data_file_type.update_attributes(base_type: Seek::Samples::BaseType::SEEK_DATA_FILE)
+
 puts "Seeded #{SampleAttributeType.count - count} sample attribute types"
 
 # Sample types
