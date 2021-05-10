@@ -27,8 +27,6 @@ def load_seek_testing_defaults!
       Settings.defaults[:magic_guest_enabled] = false
       Settings.defaults[:modelling_analysis_enabled] = true
       Settings.defaults[:show_as_external_link_enabled] = false
-      Settings.defaults[:biosamples_enabled] = true
-      Settings.defaults[:publications_enabled] = true
       Settings.defaults[:allow_publications_fulltext] = true
       Settings.defaults[:factors_studied_enabled] = true
       Settings.defaults[:experimental_conditions_enabled] = true

@@ -50,10 +50,6 @@ sabiork_ws_base_url:
 filestore_path:
 tagline_prefix:
 modelling_analysis_enabled:
-organisms_enabled:
-models_enabled:
-assays_enabled:
-publications_enabled:
 allow_publications_fulltext:
 human_diseases_enabled:
 jerm_enabled:
