@@ -7,7 +7,7 @@ layout: page
 
 You can change the sharing policy and permissions for your assets in batch.
 
-Find the button “Batch permission changes” by clicking the menu “My profile”;
+Find the button “Batch permission changes” by clicking the menu “My profile”.
 
 ![My profile](images/user-guide/bulk-permission-change/link-to-button.png){:.screenshot}
 
@@ -16,11 +16,11 @@ By clicking "Batch permission changes",
 ![Batch permission changes button](images/user-guide/bulk-permission-change/button.png){:.screenshot}
 
 you can see all the items you own in two lists: 
-* Items are grouped to those included and those not included in the ISA (Investigation-Study-Assay) structure.
-* The item list excludes Project, Institution and Publication since these are always publicly visible
-* You can view current permissions of each item by clicking the item's name.
-* Select items you want to change their sharing permissions by checking the checkbox
-* If no items are selected before clicking the “next” button, the error message “Please choose at least one item!” will pop up;
+* Items are grouped to those included and those not included in the ISA (Investigation-Study-Assay) structure;
+* The item list excludes **Project**, **Institution** and **Publication** since these are always publicly visible;
+* You can view current permissions of each item by clicking the item's name;
+* Select items you want to change their sharing permissions by checking the checkbox;
+* If no items are selected before clicking the “next” button, the error message “Please choose at least one item!” will pop up.
 
 ![my items in two lists](images/user-guide/bulk-permission-change/two-lists.png){:.screenshot}
 
