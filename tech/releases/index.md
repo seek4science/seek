@@ -404,7 +404,7 @@ Release date: _March 17th 2017_
 
 ![new_sharing_matrix](/images/release-notes/openbis.png)
 
-This is the first public release that supports [openBIS](http://fairdom.eu/platform/openbis/) integration. This version includes
+This is the first public release that supports [openBIS](http://fair-dom.org/platform/openbis/) integration. This version includes
 
   * Ability to link and browse an openBIS space and datastore, and browse DataSets
   * Easily register an openBIS DataSet with SEEK as a DataFile

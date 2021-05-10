@@ -13,11 +13,13 @@ layout: page
 - [Editing your profile](editing-profile.html)
 - [Managing your account](managing-account.html)
      - [Managing your identities/alternative login methods](managing-identities.html)
-- [Requesting to join a Project](request-to-join-project.html)
+- [Browsing content](browsing.html)
+- [Joining a Project](join-a-project.html)
+- [Creating a Project](create-a-project.html)
 - [Adding assets (data, models, SOPs, publications) to SEEK](adding-assets.html)
 - [Creating new asset versions](uploading-new-versions.html)
 - [Comparing two versions of a Model](model-comparison.html)
-- [Executing a model on JWS Online](simulate-on-jws-online.html)
+- [Simulate a model on JWS Online](simulate-on-jws-online.html)
 - [Licenses](licenses.html)
 - [Generating the ISA structure](generating-the-isa-structure.html)
      - [Creating an Investigation](generating-the-isa-structure.html#creating-an-investigation)
@@ -70,6 +72,7 @@ layout: page
 - [Bulk changing of sharing permissions](bulk-change-sharing-permission.md)
 - [Using SEEK with openBIS](openbis.html)
 - [API Introduction](api.html)
+- [Reporting a bug or feature request](/tech/reporting-bugs-and-features.html)
 - [Contributing to these SEEK Documents](/contributing.html)
 
 
