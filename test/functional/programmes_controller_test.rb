@@ -810,4 +810,21 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_empty programme.discussion_links
   end
 
+  test 'hide open for projects if disabled' do
+    person = Factory(:admin)
+    login_as(person)
+    programme = Factory(:programme)
+    programme.administrator_ids = [person.id]
+    programme.save!
+    with_config_value :programmes_open_for_projects_enabled, false do
+      get :new
+      assert_response :success
+      assert_select 'input#programme_open_for_projects', count: 0
+
+      get :edit, params: {id: programme}
+      assert_response :success
+      assert_select 'input#programme_open_for_projects', count: 0
+    end
+  end
+
 end

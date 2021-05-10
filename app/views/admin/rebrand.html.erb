@@ -25,6 +25,9 @@
   <%= admin_text_setting(:dm_project_link, Seek::Config.dm_project_link,
                          "Data management #{t('project')} link", "A URL that is used in links to the data management #{t('project')}.") %>
 
+  <%= admin_text_setting(:issue_tracker, Seek::Config.issue_tracker,
+                         "Issue tracker link", "A URL for an issue tracker, which users can use to report bugs or other issues. Leave blank if not required") %>
+
   <%= admin_checkbox_setting(:header_image_enabled, 1, Seek::Config.header_image_enabled,
                              "Header logo image enabled", "Whether a header logo image appears on the right in the header.",
                              :onchange => toggle_appear_javascript('header_image_details')) %>

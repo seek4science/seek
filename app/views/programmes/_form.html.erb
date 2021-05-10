@@ -41,16 +41,18 @@
         <%= programme_administrators_input_box(@programme) %>
 <% end %>
 
+<% if Seek::Config.programmes_open_for_projects_enabled %>
   <%= panel("#{"Project"} creation") do %>
     <div class="form-group">
-    <div class="checkbox">
-      <label>
-        <%= f.check_box(:open_for_projects, autocomplete: 'off') %>
-        <%= "Allow #{"Users"} to create #{"Projects"}" %>
-      </label>
+      <div class="checkbox">
+        <label>
+          <%= f.check_box(:open_for_projects, autocomplete: 'off') %>
+          <%= "Allow #{"Users"} to create #{"Projects"}" %>
+        </label>
+      </div>
     </div>
-   </div>
-<% end %>
+  <% end %>
+<% end %>  
 
   <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @programme} -%>
 

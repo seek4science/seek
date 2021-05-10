@@ -29,6 +29,7 @@ project_description:
 project_keywords:
 dm_project_name:
 dm_project_link:
+issue_tracker:
 header_image_link:
 header_image_title:
 header_image_enabled:
@@ -118,6 +119,7 @@ zenodo_oauth_url:
 zenodo_client_id:
 zenodo_client_secret:
 programme_user_creation_enabled:
+programmes_open_for_projects_enabled:
 cache_remote_files:
 orcid_required:
 max_cachable_size:
