@@ -3,7 +3,7 @@ require 'rest-client'
 module DataCite
   class Client
     ENDPOINT = 'https://mds.datacite.org'.freeze
-    TEST_ENDPOINT = 'https://test.datacite.org/mds'.freeze
+    TEST_ENDPOINT = 'https://mds.test.datacite.org'.freeze
 
     def initialize(user_name, password, endpoint = nil)
       endpoint ||= ENDPOINT

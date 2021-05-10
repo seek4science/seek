@@ -6,34 +6,28 @@
         <%= render partial: 'projects/guided_create/programme_box' %>
       <% end %>
 
-      <div class="panel panel-default">
-        <div class="panel-heading"><%= t('project') %></div>
-        <div class="panel-body">
-          <div class="help-block">
-            Please provide some basic details about the <%= t('project') %> that will be created. You will be able to update and add additional
-            information once it has been created.
-          </div>
-
-          <%= label_tag :project_title, "Title" %><span class="required">*</span>
-          <%= text_field_tag 'project[title]', '', class: 'form-control' %>
-          <%= label_tag :project_title, "Description" %>
-          <%= text_area_tag 'project[description]', '', rows:2, class: 'form-control' %>
-          <%= label_tag :project_title, "Web page" %>
-          <%= text_field_tag 'project[web_page]', '', class: 'form-control' %>
-
+      <%= panel(t(:project)) do %>
+        
+        <div class="help-block">
+          Please provide some basic details about the <%= t('project') %> that will be created. You will be able to update and add additional
+          information once it has been created.
         </div>
-      </div>
 
-      <div class="panel panel-default">
-        <div class="panel-heading"><%= t('institution') %></div>
-        <div class="panel-body">
+        <%= label_tag :project_title, "Title" %><span class="required">*</span>
+        <%= text_field_tag 'project[title]', '', class: 'form-control' %>
+        <%= label_tag :project_title, "Description" %>
+        <%= text_area_tag 'project[description]', '', rows:2, class: 'form-control' %>
+        <%= label_tag :project_title, "Web page" %>
+        <%= text_field_tag 'project[web_page]', '', class: 'form-control' %>
 
-          <div class="form-group">
-            <%= render partial: 'institutions/select_or_define' %>
-          </div>
+      <% end %>  
+      
 
+      <%= panel(t(:institution)) do %>
+        <div class="form-group">
+          <%= render partial: 'institutions/select_or_define' %>
         </div>
-      </div>
+      <% end %>
 
       <%= submit_tag('Submit', class: 'btn btn-primary',id:'submit-button',disabled:true) %>
     </div>
@@ -48,7 +42,7 @@
         var enabled = $j('#institution_id').val()
             && !progEnabled || ($j('#programme_id').val() || $j('input#programme_title').val())
             && $j('input#project_title').val()
-            && $j('select#institution_country').val();
+            && $j('input#institution_title').val();
         $j('#submit-button').prop('disabled',!enabled);
     }
 

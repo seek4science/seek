@@ -269,4 +269,14 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_empty institution.discussion_links
   end
 
+  test 'request all sharing form' do
+    Institution.delete_all
+    institutions = [Factory(:institution),Factory(:institution),Factory(:institution)]
+    get :request_all_sharing_form, format: :json
+    assert_response :success
+    expected = institutions.collect{|i| [i.title, i.id]}
+    actual = JSON.parse(response.body)['institution_list']
+    assert_equal expected, actual
+  end
+
 end

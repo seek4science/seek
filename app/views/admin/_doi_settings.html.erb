@@ -10,7 +10,7 @@
   
 
   <%= admin_text_setting(:datacite_url, Seek::Config.datacite_url,
-                         'Datacite URL', "The root URL for the Datacite rest service. If it is not set, #{Seek::Config.default_datacite_url} will be used. You can also set the test url, https://test.datacite.org/mds/, for generating test DOIs.") %>
+                         'Datacite URL', "The root URL for the Datacite rest service. If it is not set, #{Seek::Config.default_datacite_url} will be used. You can also set the test url, https://mds.test.datacite.org/, for generating test DOIs.") %>
 
   <%= admin_text_setting(:doi_prefix, Seek::Config.doi_prefix,
                          'DOI prefix', 'The DOI prefix that will have been provided to you by DataCite for your organization.') %>

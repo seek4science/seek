@@ -102,7 +102,7 @@ module ApiTestHelper
     rescue NameError
     end
 
-    ['min','max'].each do |m|
+    ['min','max'].each do |m|      
       if defined? @post_values
         to_post = load_template("post_#{m}_#{@clz}.json.erb", @post_values)
       else

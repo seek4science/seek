@@ -260,6 +260,11 @@ class ConfigTest < ActiveSupport::TestCase
   test 'results_per_page_default' do
     assert_equal 7, Seek::Config.results_per_page_default
   end
+
+  test 'results_per_page_default_condensed' do
+    assert_equal 14, Seek::Config.results_per_page_default_condensed
+  end
+
   # others
   test 'type_managers' do
     assert_equal 'admins', Seek::Config.type_managers
@@ -359,7 +364,7 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'datacite_url' do
-    assert_equal 'https://test.datacite.org/mds/', Seek::Config.datacite_url
+    assert_equal 'https://mds.test.datacite.org/', Seek::Config.datacite_url
   end
 
   test 'datacite_username' do

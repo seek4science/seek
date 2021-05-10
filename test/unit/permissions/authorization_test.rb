@@ -843,6 +843,8 @@ class AuthorizationTest < ActiveSupport::TestCase
     assert datafile.errors[:base].any? { |e| e.include?('active member') }
   end
 
+
+
   private 
 
   def actions
@@ -868,4 +870,5 @@ class AuthorizationTest < ActiveSupport::TestCase
     # Use favourite_group_membership in place of permission. It has access_type so duck typing will save us.
     person.favourite_group_memberships.select { |x| favourite_group_ids.include?(x.favourite_group_id) }
   end
+
 end

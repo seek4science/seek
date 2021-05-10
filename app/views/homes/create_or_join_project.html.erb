@@ -2,24 +2,30 @@
 <div class='row'>
     <div class="panel panel-warning text-center">
       <div class="panel-body alert-warning">
-        <%
-          explanation_text = Seek::Config.programmes_enabled ?
-                                 t('joining_a_project',
-                                                      project:t('project'),
-                                                      projects:t('project').pluralize,
-                                                      programme:t('programme')) :
-                                 t('joining_a_project_programmes_disabled',
-                                   project:t('project'),
-                                   projects:t('project').pluralize
-                                 )
-        %>
-        <%= explanation_text.html_safe %>
+        <p>
+          <%= t(:about_project, project:t(:project)).html_safe %>
+        </p>
+        <% if Seek::Config.programmes_enabled %>
+          <p>
+            <%= t(:about_programme, programme:t(:programme), project:t(:project), projects:t(:project).pluralize).html_safe %>
+          <p>
+          <% if Programme.site_managed_programme %>
+            <p>
+              <%= t(:about_managed_programme, programme:t(:programme), project:t(:project), projects:t(:project).pluralize).html_safe %>
+            <p>
+          <% end %>
+        <% end %>
+        <p>
+          <%= t(:create_join_project_options, project:t(:project)).html_safe %>
+        </p>
+                
       </div>
     </div>
 </div>
 
 
 <div class="row seek-homepage-button-container">
+
   <div class="col-md-6">
     <%= frontpage_button(guided_join_projects_path) do %>
       <span class="glyphicon glyphicon-link" aria-hidden="true"></span>
@@ -33,6 +39,7 @@
       Create a <%=t('project') %>
     <% end %>
   </div>
+
 </div>
 
 
