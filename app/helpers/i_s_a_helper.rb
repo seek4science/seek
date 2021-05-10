@@ -84,7 +84,7 @@ module ISAHelper
         data['fullName'] = item.title
         avatar = resource_avatar_path(item) || icon_filename_for_key("#{item.class.name.downcase}_avatar")
         data['imageUrl'] = asset_path(avatar)
-        data['url'] = item.is_a?(Seek::ObjectAggregation) ? polymorphic_path([item.object, item.type]) : polymorphic_path(item)
+        data['url'] = item.is_a?(Seek::ObjectAggregation) ? polymorphic_path([item.object, item.type.to_sym]) : polymorphic_path(item)
         data['type'] = item.is_a?(Assay) ? item.assay_class.title : item_type.humanize
         data['faveColor'] = FILL_COLOURS[item.is_a?(Seek::ObjectAggregation) ? item.type.to_s.singularize.capitalize : item.class.name] || FILL_COLOURS.default
       else
