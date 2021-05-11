@@ -183,7 +183,7 @@ GEM
     crass (1.0.6)
     csl (1.4.5)
       namae (~> 0.7)
-    csl-styles (1.0.1.7)
+    csl-styles (1.0.1.11)
       csl (~> 1.0)
     curb (0.9.10)
     daemons (1.1.9)
@@ -825,7 +825,7 @@ DEPENDENCIES
   coffee-rails (~> 4.2)
   convert_office!
   country_select
-  csl-styles (~> 1.0.1.7)
+  csl-styles (~> 1.0.1.11)
   daemons
   database_cleaner (~> 1.7.0)
   delayed_job_active_record

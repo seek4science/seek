@@ -121,7 +121,7 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
         end
       end
     end
-    assert_equal person4, MessageLog.last.subject
+    
     logs = MessageLog.last(2)
     assert_equal [person3, person4].sort, logs.collect(&:subject).sort
   end
