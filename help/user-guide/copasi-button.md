@@ -9,13 +9,13 @@ You can download a public SBML format **model** to a locally installed Copasi ap
 
 ## Prerequisites:
 * Install Copasi in your local machine. 
-  You can download the latest Copasi version [here](http://bqfrank.spdns.org/).
-
-
+  You can download the latest Copasi version [here](http://copasi.org/Download/). 
+  Find more information about the COPASI scheme [here](http://copasi.org/Support/Technical_Documentation/COPASI_Scheme/).
+  
+  
 * Enable Copasi button in SEEK. 
   By default the Copasi button is disabled. To enable the functionality described below, first go to the Admin pages (available from the user menu in the top right). Then select Site Configuration and the **Enable/disable features**. There is a checkbox to enable Copasi.
 
-* Additional steps for windows and linux [here](http://bqfrank.spdns.org/).
  
 
 ## Find a SBML format model 
