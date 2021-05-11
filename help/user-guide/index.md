@@ -71,6 +71,7 @@ layout: page
      - [Legacy Biosamples](legacy-biosamples.html)
 - [Bulk changing of sharing permissions](bulk-change-sharing-permission.html)
 - [Using SEEK with openBIS](openbis.html)
+- [Using Copasi in SEEEK](copasi-button.html)  
 - [API Introduction](api.html)
 - [Reporting a bug or feature request](/tech/reporting-bugs-and-features.html)
 - [Contributing to these SEEK Documents](/contributing.html)
