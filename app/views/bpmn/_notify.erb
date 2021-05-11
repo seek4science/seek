@@ -1,25 +1,28 @@
-<serviceTask id="<%= id %>" name="<%= name %>" flowable:parallelInSameTransaction="true" flowable:type="http">
+<serviceTask id="<%= id %>" name="<%= name %>" flowable:type="mail">
 <extensionElements>
-<flowable:field name="requestMethod">
+<flowable:field name="to">
 <flowable:string>
-<![CDATA[ POST ]]>
+<![CDATA[ <%= assignee %> ]]>
 </flowable:string>
 </flowable:field>
-<flowable:field name="requestUrl">
+<flowable:field name="from">
 <flowable:string>
-<![CDATA[
-https://hooks.slack.com/services/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
-]]>
+<![CDATA[ ibisbahub@inra.fr ]]>
 </flowable:string>
 </flowable:field>
-<flowable:field name="requestHeaders">
+<flowable:field name="subject">
 <flowable:string>
-<![CDATA[ Content-type: application/json ]]>
+<![CDATA[ <%= name %> is ready to start]]>
 </flowable:string>
 </flowable:field>
-<flowable:field name="requestBody">
+<flowable:field name="cc">
 <flowable:string>
-<![CDATA[ {"text":"<%= name %> is ready to start"} ]]>
+<![CDATA[ alan.r.williams@manchester.ac.uk ]]>
+</flowable:string>
+</flowable:field>
+<flowable:field name="text">
+<flowable:string>
+<![CDATA[ This is sent from a flowable mail task ]]>
 </flowable:string>
 </flowable:field>
 </extensionElements>

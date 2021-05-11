@@ -68,6 +68,7 @@ class InvestigationsController < ApplicationController
 
   def create
     @investigation = Investigation.new(investigation_params)
+    @investigation.status = :planned
     update_sharing_policies @investigation
     update_relationships(@investigation, params)
 

@@ -20,6 +20,16 @@
           <b><%= "Study position" %>: </b>
           <%= @study.position %>
         </p>
+	<% if Seek::Config.bpmn_enabled %>
+  	<p>
+	  <strong>Status:</strong>
+	  <% if @study.status %>
+  	  <%= @study.status -%>
+	  <% else %>
+	  Not planned
+	  <% end %>
+	</p>
+	<% end %>
         <p>
           <label><%= t('person_responsible').capitalize %>:</label>
           <% if @study.person_responsible.try :can_view? -%>

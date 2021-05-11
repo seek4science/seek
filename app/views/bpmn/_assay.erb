@@ -3,6 +3,13 @@
 <% link_start = "assay-#{assay.id}-start" %>
 <startEvent id="<%= link_start %>"/>
 
+<% start_notify = "assay-#{assay.id}-start-notify" %>
+  <%= render :partial => "bpmn/notify", :locals => {:id => start_notify, :name => "#{assay.title}", :assignee => "alan.r.williams@manchester.ac.uk" } -%>
+
+  <sequenceFlow sourceRef="<%= link_start %>" targetRef="<%= start_notify %>" id="<%= link_start %>-to-<%= start_notify %>"/>
+
+<% link_start = start_notify %>
+
 <% link_end="assay-#{assay.id}-end" %>
 <endEvent id="<%=link_end %>"/>
 

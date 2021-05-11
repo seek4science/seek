@@ -1,5 +1,6 @@
 class AssaySerializer < SnapshottableSerializer
   attributes :title, :description, :other_creators, :position
+  attributes :started_at, :finished_at, :status
   attribute :assay_class do
     { title: object.assay_class.title,
       key: object.assay_class.key,
@@ -36,4 +37,5 @@ class AssaySerializer < SnapshottableSerializer
   has_many :publications
   has_many :documents
   has_many :placeholders
+  has_one :assignee
 end

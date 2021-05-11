@@ -11,6 +11,9 @@ class Investigation < ApplicationRecord
 
   validates :projects, presence: true, projects: { self: true }
 
+  enum status: [:planned, :running, :completed, :cancelled, :failed]
+  belongs_to :assignee, class_name: 'Person'
+  
   def state_allows_delete?(*args)
     studies.empty? && super
   end

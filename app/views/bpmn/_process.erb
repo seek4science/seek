@@ -4,7 +4,7 @@
 <startEvent id="<%= link_start %>"/>
 
 <% start_notify = "project-#{project.id}-start-notify" %>
-  <%= render :partial => "bpmn/notify", :locals => {:id => start_notify, :name => project.title } -%>
+  <%= render :partial => "bpmn/notify", :locals => {:id => start_notify, :name => "#{project.title}", :assignee => "alan.r.williams@manchester.ac.uk" } -%>
 
   <sequenceFlow sourceRef="<%= link_start %>" targetRef="<%= start_notify %>" id="<%= link_start %>-to-<%= start_notify %>"/>
 

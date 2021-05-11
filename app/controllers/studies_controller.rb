@@ -97,6 +97,7 @@ class StudiesController < ApplicationController
 
   def create
     @study = Study.new(study_params)
+    @study.status = :planned
     update_sharing_policies @study
     update_relationships(@study, params)
     ### TO DO: what about validation of person responsible? is it already included (for json?)
@@ -214,6 +215,7 @@ class StudiesController < ApplicationController
         )
       }
       @study = Study.new(study_params)
+      @study.status = :planned
       StudyBatchUpload.check_study_is_MIAPPE_compliant(@study, metadata)
       if @study.valid? && @study.save! && @study.custom_metadata.valid?
         studies_uploaded = true if @study.save

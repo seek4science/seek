@@ -106,6 +106,7 @@ class AssaysController < ApplicationController
     params[:assay_class_id] ||= AssayClass.for_type("experimental").id
     @assay = Assay.new(assay_params)
 
+    @assay.status = :planned
     update_assay_organisms @assay, params
     update_assay_human_diseases @assay, params
     @assay.contributor=current_person

@@ -161,6 +161,7 @@ class ProjectsController < ApplicationController
   def request_create
     proj_params = params.require(:project).permit([:title, :web_page, :description])
     @project = Project.new(proj_params)
+    @project.status = :planned
 
     @institution = Institution.find_by_id(params[:institution][:id])
     if @institution.nil?
@@ -280,6 +281,7 @@ class ProjectsController < ApplicationController
   # GET /projects/new.xml
   def new
     @project = Project.new
+    @project.status = :planned
 
     possible_unsaved_data = "unsaved_#{@project.class.name}_#{@project.id}".to_sym
     if session[possible_unsaved_data]
@@ -343,6 +345,7 @@ class ProjectsController < ApplicationController
   # POST /projects.xml
   def create
     @project = Project.new
+    @project.status = :planned
     @project.assign_attributes(project_params)
     @project.build_default_policy.set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
 
@@ -601,6 +604,7 @@ class ProjectsController < ApplicationController
       end
 
       @project = Project.new(params.require(:project).permit([:title, :web_page, :description]))
+      @project.status = :planned
       @project.programme = @programme
 
       validate_error_msg = []
@@ -841,6 +845,7 @@ class ProjectsController < ApplicationController
 
     @project = Project.new(details['project'])
     @project = Project.find(@project.id) unless @project.id.nil?
+    @project.status = :planned
 
     @institution = Institution.new(details['institution'])
     @institution = Institution.find(@institution.id) unless @institution.id.nil?

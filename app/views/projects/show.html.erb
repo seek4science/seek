@@ -42,6 +42,16 @@
             </p>
         <% end %>
 
+	<% if Seek::Config.bpmn_enabled %>
+  	<p>
+	  <strong>Status:</strong>
+	  <% if @project.status %>
+  	  <%= @project.status -%>
+	  <% else %>
+	  Not planned
+	  <% end %>
+	</p>
+	<% end %>
       </div>
 
       <div class="col-md-6">

@@ -3,9 +3,15 @@
 <% link_start = "investigation-#{investigation.id}-start" %>
 <startEvent id="<%= link_start %>"/>
 
+<% start_notify = "investigation-#{investigation.id}-start-notify" %>
+  <%= render :partial => "bpmn/notify", :locals => {:id => start_notify, :name => "#{investigation.title}", :assignee => "alan.r.williams@manchester.ac.uk" } -%>
+
+  <sequenceFlow sourceRef="<%= link_start %>" targetRef="<%= start_notify %>" id="<%= link_start %>-to-<%= start_notify %>"/>
+
+<% link_start = start_notify %>
+
 <% investigation.studies.each do |s| %>
   <%= render :partial => "bpmn/study", :locals => { :study => s } -%>
-
 
   <% link_end = "study-#{s.id}" %>
   <sequenceFlow sourceRef="<%= link_start %>" targetRef="<%= link_end %>" id="<%= link_start %>-to-<%= link_end %>"/>

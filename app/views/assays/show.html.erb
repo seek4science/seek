@@ -49,6 +49,17 @@
           <b><%= "Assay position" %>: </b>
           <%= @assay.position %>
         </p>
+	<% if Seek::Config.bpmn_enabled %>
+  	<p>
+	  <strong>Status:</strong>
+	  <% if @assay.status %>
+  	  <%= @assay.status -%>
+	  <% else %>
+	  Not planned
+	  <% end %>
+	</p>
+	<% end %>
+
         <p id="assay_type">
           <b><%= assay_type_text -%>:</b>
           <%= link_to_assay_type(@assay) -%>
@@ -72,15 +83,8 @@
     <% if @assay.external_asset %>
       <div class="row">
         <div class="col-md-12">
-          <%= external_asset_details(@assay) %>tudy.all.each do |s|
-  position = 1
-  s.assays.each do |a|
-    a.position = position
-    position += 1
-    a.save!
-  end
-end
-        </div>
+          <%= external_asset_details(@assay) %>
+	</div>
       </div>
     <% end %>
 
@@ -88,15 +92,8 @@ end
 
     <% if ((@assay.is_modelling?) && !@assay.models.empty? && !@assay.data_files.empty?) %><%#MODELLING ASSAY %>
         <div class="data_model_relationship">
-          <% unless @assay.models.empty? %>tudy.all.each do |s|
-  position = 1
-  s.assays.each do |a|
-    a.position = position
-    position += 1
-    a.save!
-  end
-end
-              <b><%= @assay.models.size > 1 ? t('model').pluralize : t('model') %>:</b>
+          <% unless @assay.models.empty? %>
+	  <b><%= @assay.models.size > 1 ? t('model').pluralize : t('model') %>:</b>
               <br/>
               <ul class="related_models">
                 <% @assay.models.each do |m| %>
