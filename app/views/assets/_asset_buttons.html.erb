@@ -35,10 +35,11 @@
       <% if asset.content_blob.file_exists? %>
         <%= button_link_to('Download RO Crate', 'ro_crate_file', ro_crate_workflow_path(asset, version: version, code: params[:code])) %>
         <% if asset.can_run? %>
-          <%= button_link_to("Run on #{Seek::Config.galaxy_instance_name || 'Galaxy'}", 'run_galaxy', run_workflow_url(display_asset)) %>
+          <%= button_link_to("Run on #{Seek::Config.galaxy_instance_name || 'Galaxy'}", 'run_galaxy', run_workflow_url(display_asset)),
+              'data-tooltip' => tooltip("The Workflow RO-Crate is a package containing the workflow definition, its metadata and supporting resources like test data") ) %>
         <% end %>
       <% else %>
-        <%= button_link_to('Download RO Crate', 'ro_crate_file', nil,
+        <%= button_link_to('Download RO-Crate', 'ro_crate_file', nil,
                            disabled_reason: 'This workflow is still being processed, check back later.') %>
       <% end %>
     <% else %>
