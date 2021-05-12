@@ -21,14 +21,14 @@ class CitationStyleTest < ActionDispatch::IntegrationTest
       assert_select "option[selected='selected'][value=?]", Seek::Citations::DEFAULT
     end
 
-    new_style = 'international-journal-of-infectious-diseases'
+    new_style = 'journal-of-infectious-diseases'
 
     get citation_path(@doi, style: new_style, format: :js)
 
     get model_path(@model)
     assert_select '#citation' do
       assert_select 'div[data-citation-style=?]', Seek::Citations::DEFAULT, count: 0
-      assert_select 'div[data-citation-style=?]', new_style, text: /Bacall Finn/, count: 1
+      assert_select 'div[data-citation-style=?]', new_style, text: /Bacall F/, count: 1
     end
     assert_select '#citation-style-select' do
       assert_select "option[selected='selected'][value=?]", new_style
