@@ -15,7 +15,10 @@
       "other_creators": null,
       "position": null,
       "person_responsible_id": null,
-      "discussion_links" : null
+      "discussion_links" : null,
+	"started_at" : null,
+	"finished_at" : null,
+	"status" : null
     },
     "relationships": {
       "creators": {
@@ -69,7 +72,10 @@
       },
       "documents": {
         "data": []
-      }
+      },
+	"assignee" : {
+	    "data" : null
+	}
     },
     "links": {
       "self": "/studies/1039986486"

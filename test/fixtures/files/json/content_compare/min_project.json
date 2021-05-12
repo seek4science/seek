@@ -12,7 +12,10 @@
       "members": null,
       "start_date": null,
       "end_date": null,
-      "discussion_links" : null
+	"discussion_links" : null,
+	"started_at" : null,
+	"finished_at" : null,
+	"status" : null
     },
     "relationships": {
       "organisms": {
@@ -71,6 +74,15 @@
       },
       "documents": {
         "data": []
+      },
+      "file_templates": {
+        "data": []
+      },
+      "placeholders": {
+        "data": []
+      },
+      "assignee": {
+        "data": null
       }
     },
     "links": {

@@ -26,7 +26,10 @@
         "label":"Technology type",
         "uri":"http://jermontology.org/ontology/JERMOntology#Technology_type"
       },
-      "discussion_links" : null
+      "discussion_links" : null,
+	"started_at" : null,
+	"finished_at" : null,
+	"status" : null
     },
     "relationships": {
       "creators": {
@@ -100,7 +103,10 @@
       },
       "documents": {
         "data": []
-      }
+      },
+	"assignee" : {
+	    "data" : null
+	}
     },
     "links": {
       "self": "/assays/1039986486"
