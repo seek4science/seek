@@ -78,7 +78,7 @@ class SampleType < ApplicationRecord
     super + ['uploaded_template']
   end
   def columns_allowed
-    columns_default + ['deleted_contributor']
+    columns_default + []
   end
 
   # fixes inconsistencies following form submission that could cause validation errors
