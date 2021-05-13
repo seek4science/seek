@@ -145,6 +145,12 @@
           }
         ]
       },
+	"file_templates" : {
+	    "data" : []
+	},
+	"placeholders" : {
+	    "data" : []
+	},
 	"assignee" : {
 	    "data" : null
 	}
