@@ -55,7 +55,7 @@ class WorkflowTest < ActiveSupport::TestCase
     assert_not_nil workflow.uuid
   end
 
-  test 'generates fresh RO crate for individual workflow' do
+  test 'generates fresh RO-Crate for individual workflow' do
     workflow = Factory(:cwl_workflow, license: 'MIT', other_creators: 'Jane Smith, John Smith')
     creator = Factory(:person)
     workflow.creators << creator
@@ -78,7 +78,7 @@ class WorkflowTest < ActiveSupport::TestCase
     assert_equal URI.join(Seek::Config.site_base_host, "projects/#{workflow.projects.first.id}").to_s, crate.main_workflow['producer']['@id']
   end
 
-  test 'generates fresh RO crate for workflow/diagram/abstract workflow' do
+  test 'generates fresh RO-Crate for workflow/diagram/abstract workflow' do
     workflow = Factory(:generated_galaxy_ro_crate_workflow, other_creators: 'Jane Smith, John Smith')
     assert workflow.should_generate_crate?
 
@@ -92,13 +92,13 @@ class WorkflowTest < ActiveSupport::TestCase
     assert_equal 'Common Workflow Language', crate.main_workflow_cwl.programming_language['name']
   end
 
-  test 'serves existing RO crate for RO crate workflow' do
+  test 'serves existing RO-Crate for RO-Crate workflow' do
     workflow = Factory(:existing_galaxy_ro_crate_workflow, other_creators: 'Jane Smith, John Smith')
     refute workflow.should_generate_crate?
 
     crate = workflow.ro_crate
 
-    assert_nil crate.author, 'Changes in SEEK should not be reflected in RO crate.'
+    assert_nil crate.author, 'Changes in SEEK should not be reflected in RO-Crate.'
 
     assert_not_equal crate.canonical_id, workflow.ro_crate.canonical_id
   end
@@ -134,7 +134,7 @@ class WorkflowTest < ActiveSupport::TestCase
     assert_nil workflow.reload.source_link
   end
 
-  test 'generates RO crate and diagram for workflow/abstract workflow' do
+  test 'generates RO-Crate and diagram for workflow/abstract workflow' do
     with_config_value(:cwl_viewer_url, 'http://localhost:8080/cwl_viewer') do
       workflow = Factory(:generated_galaxy_no_diagram_ro_crate_workflow)
       assert workflow.should_generate_crate?
@@ -150,7 +150,7 @@ class WorkflowTest < ActiveSupport::TestCase
     end
   end
 
-  test 'generates RO crate and gracefully handles diagram error for workflow/abstract workflow' do
+  test 'generates RO-Crate and gracefully handles diagram error for workflow/abstract workflow' do
     with_config_value(:cwl_viewer_url, 'http://localhost:8080/cwl_viewer') do
       workflow = Factory(:generated_galaxy_no_diagram_ro_crate_workflow)
       assert workflow.should_generate_crate?

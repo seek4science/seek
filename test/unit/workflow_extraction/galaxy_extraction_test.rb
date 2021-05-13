@@ -22,7 +22,7 @@ class GalaxyExtractionTest < ActiveSupport::TestCase
 
   end
 
-  test 'extracts metadata from Galaxy workflow RO crate' do
+  test 'extracts metadata from Galaxy workflow RO-Crate' do
     wf = open_fixture_file('workflows/1-PreProcessing.crate.zip')
     extractor = Seek::WorkflowExtractors::ROCrate.new(wf)
     metadata = extractor.metadata

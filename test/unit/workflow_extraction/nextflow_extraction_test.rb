@@ -15,7 +15,7 @@ class NextflowExtractionTest < ActiveSupport::TestCase
     assert_equal 'Daniel Straub, Alexander Peltzer', metadata[:other_creators]
   end
 
-  test 'extracts metadata from nextflow workflow RO crate' do
+  test 'extracts metadata from nextflow workflow RO-Crate' do
     wf = open_fixture_file('workflows/ro-crate-nf-core-ampliseq.crate.zip')
     extractor = Seek::WorkflowExtractors::ROCrate.new(wf)
     metadata = extractor.metadata
