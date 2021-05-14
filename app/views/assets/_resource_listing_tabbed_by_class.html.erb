@@ -34,9 +34,9 @@
                       <div class="list_items_container">
                         <div class="hidden_list_item" id="view_list_items">
                           <% if item %>
-                              <%= link_to "View all #{pluralize(type[:total_visible], 'item')}", [item, type[:type].tableize] -%>
+                              <%= link_to "View all #{pluralize(type[:total_visible], 'item')}", [item, type[:type].tableize.to_sym] -%>
                           <% elsif !hide_view_all %>
-                              <%= link_to "View all #{pluralize(type[:total_visible], 'item')}", polymorphic_path(type[:type].pluralize.underscore, index_params) %>
+                              <%= link_to "View all #{pluralize(type[:total_visible], 'item')}", polymorphic_path(type[:type].pluralize.underscore.to_sym, index_params) %>
                           <% end-%>
                         </div>
                       </div>
