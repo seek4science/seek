@@ -32,16 +32,6 @@ GIT
       rchardet (~> 1.8)
 
 GIT
-  remote: https://github.com/ruby-rdf/rdf-virtuoso
-  revision: 2c209c1dcd8c655f8f8dd06d11891b6dd0d21b6d
-  branch: develop
-  specs:
-    rdf-virtuoso (0.1.6)
-      api_smith (~> 1.3.0)
-      httparty (~> 0.18.1)
-      rdf (>= 3.1)
-
-GIT
   remote: https://github.com/seek4science/DOI-query-tool.git
   revision: e7a8790f666b9b20e22149d6a450ed85e60504d3
   specs:
