@@ -42,7 +42,7 @@ class Study < ApplicationRecord
     super + ['creators','projects']
   end
   def columns_allowed
-    columns_default + ['experimentalists','other_creators','deleted_contributor']
+    columns_default + ['other_creators']
   end
 
   def state_allows_delete? *args
