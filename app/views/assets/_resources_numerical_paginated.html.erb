@@ -64,7 +64,11 @@
       <thead>
         <tr>
           <% for column in tableview_columns -%>
-            <th style="width:<%= 100/tableview_columns.length %>%"><%= t(column, default: column.to_s).titleize %></th>
+            <% if column=="assay_type_uri" %>
+              <th style="width:<%= 100/tableview_columns.length %>%"> Assay Type </th>   
+            <% else %>
+              <th style="width:<%= 100/tableview_columns.length %>%"><%= t(column, default: column.to_s).titleize %></th>
+            <% end %>
           <% end -%>
           <th>
             <div id="tableview-colselector" class="dropdown">
@@ -78,11 +82,18 @@
                                 checked
                               <% end %>
                               >
-                              <%= t(column, default: column.to_s).titleize %>
+                              <% if column=="assay_type_uri" %>
+                                Assay Type
+                              <% else %>
+                                <%= t(column, default: column.to_s).titleize %>
+                              <% end %>
                           </label>
                           <span class="glyphicon glyphicon-move handle" style="float: right;cursor: grab;"> </span>
                       </div>
                   <% end -%>
+                  <button id="table_view_update" type="button" class="btn btn-default" style="width: 100%;height: 100%;margin: 0">
+                    Update <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                  </button>
                 </div>
             </div>
           </th>
@@ -114,36 +125,31 @@
   });
   $j('#tableview-colselector input[type="checkbox"]').click(function (event) {
     event.stopPropagation();
-    refreshWithOptions();
   });
 
   new Sortable(document.getElementById('sortable-colselector'), {
     animation: 150,
     handle: '.handle',
-    ghostClass: 'blue-background-class',
-    onEnd: refreshWithOptions,
+    ghostClass: 'blue-background-class'
   });
 
+  $j('#tableview-colselector #table_view_update').click(function (event) {
+    refreshWithOptions();
+  });
+  
   /**
     * Refresh the page with the options selected from the dropdown menu
   */
-  var debounceTimeout;
   function refreshWithOptions(){
-    if (debounceTimeout) {
-      clearTimeout(debounceTimeout)
-    }
-    debounceTimeout = setTimeout(function() {
-      table_cols = []
-      $j('#tableview-colselector input:checked').each(function() {
-        table_cols.push(this.value);
-      });
-      console.log(table_cols);
-      const url = new URL(window.location.href);
-      const search_params = url.searchParams;
-      search_params.set('table_cols', table_cols);
-      url.search = search_params.toString();
-      window.location = url;
-    }, 700);
+    table_cols = []
+    $j('#tableview-colselector input:checked').each(function() {
+      table_cols.push(this.value);
+    });
+    const url = new URL(window.location.href);
+    const search_params = url.searchParams;
+    search_params.set('table_cols', table_cols);
+    url.search = search_params.toString();
+    window.location = url;
     return true;
   }
 </script>

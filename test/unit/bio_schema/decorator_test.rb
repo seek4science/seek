@@ -10,7 +10,7 @@ class DecoratorTest < ActiveSupport::TestCase
     identifier = "http://localhost:3000/data_files/#{data_file.id}"
     assert_equal identifier, decorator.identifier
     assert_equal identifier, decorator.url
-    assert_equal 'http://schema.org', decorator.context
+    assert_equal Seek::BioSchema::Serializer::SCHEMA_ORG, decorator.context
     assert_equal %w[blue green red], decorator.keywords.split(',').collect(&:strip).sort
 
     properties = decorator.attributes.collect(&:property).collect(&:to_s).sort
@@ -36,6 +36,6 @@ class DecoratorTest < ActiveSupport::TestCase
     assert_equal [{ :@type => 'Person', :@id => "http://localhost:3000/people/#{person.id}", :name => person.title }], decorator.all_creators
 
     properties = decorator.attributes.collect(&:property).collect(&:to_s).sort
-    assert_equal ['@id', 'creator', 'dateCreated', 'dateModified', 'description', 'encodingFormat', 'keywords', 'license', 'name', 'producer', 'subjectOf', 'url'], properties
+    assert_equal ['@id', 'creator', 'dateCreated', 'dateModified', 'description', 'encodingFormat', 'keywords', 'license', 'name', 'producer', 'sdPublisher', 'subjectOf', 'url'], properties
   end
 end

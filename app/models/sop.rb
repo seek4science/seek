@@ -36,7 +36,7 @@ class Sop < ApplicationRecord
     super + ['version']
   end
   def columns_allowed
-    super + ['last_used_at','version','other_creators','doi','license','deleted_contributor']
+    columns_default + ['last_used_at','other_creators','doi','license']
   end
 
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi']) do

@@ -13,8 +13,8 @@ module Seek
     end
 
     def self.style_pairs
-      Rails.cache.fetch('citation-style-pairs') do
-        CSL::Style.list.map { |key| [CSL::Style.load(key).title.truncate(50), key] }.sort_by { |s| s[0] }
+      Rails.cache.fetch("citation-style-pairs-#{CSL::Styles::VERSION}") do
+        CSL::Style.list.map { |key| [CSL::Style.load(key).title, key] }.sort_by { |s| s[0] }
       end
     end
 

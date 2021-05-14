@@ -63,8 +63,7 @@
 
   function checkSubmitButtonEnabled() {
     var enabled = $j('#institution_id').val()
-      && $j('input#projects').val()
-      && $j('select#institution_country').val();
+      && $j('input#projects').val()      
     $j('#submit-button').prop('disabled',!enabled);    
   }
   

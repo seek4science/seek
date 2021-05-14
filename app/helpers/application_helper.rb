@@ -473,6 +473,7 @@ module ApplicationHelper
   end
 
   def pending_project_creation_request?
+    return false unless logged_in_and_registered?   
     MessageLog.pending_project_creation_requests.collect do |log|
       log.can_respond_project_creation_request?(User.current_user)
     end.any?

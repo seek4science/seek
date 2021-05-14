@@ -17,7 +17,7 @@ class CWLExtractionTest < ActiveSupport::TestCase
     assert_equal ['null', 'int'].sort, input[:type].sort
   end
 
-  test 'extracts metadata from CWL in workflow RO crate' do
+  test 'extracts metadata from CWL in workflow RO-Crate' do
     wf = open_fixture_file('workflows/rp2.crate.zip')
     extractor = Seek::WorkflowExtractors::ROCrate.new(wf)
     metadata = extractor.metadata

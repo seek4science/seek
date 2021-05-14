@@ -117,7 +117,7 @@ class Publication < ApplicationRecord
     super + ['published_date','journal']
   end
   def columns_allowed
-    super + ['abstract','published_date','journal','last_used_at','doi','citation','deleted_contributor','registered_mode','booktitle','publisher','editor','url']
+    columns_default + ['abstract','last_used_at','doi','citation','booktitle','publisher','editor','url']
   end
 
   def pubmed_uri

@@ -126,12 +126,51 @@ module WorkflowExtraction
     crate.license = license
     crate.identifier = ro_crate_identifier
     crate.url = ro_crate_url('ro_crate')
-    crate['isBasedOn'] = source_link_url if source_link_url
-    crate['sdPublisher'] = crate.add_person(nil, contributor.ro_crate_metadata).reference if contributor
-    crate['sdDatePublished'] = Time.now
+
+    workflow = is_a_version? ? self.parent : self
+    merge_entities(crate, workflow) if workflow
+
+    crate['isBasedOn'] = source_link_url if source_link_url && !crate['isBasedOn']
+    crate['sdDatePublished'] = Time.now unless crate['sdDatePublished']
     crate['creativeWorkStatus'] = I18n.t("maturity_level.#{maturity_level}") if maturity_level
 
-    crate.preview.template = PREVIEW_TEMPLATE
+    # brute force deletion as I cannot track down where it comes from
+    crate.contextual_entities.delete_if { |c| c['@id'] == '#ro-crate-preview.html' }
+    crate
+  end
+
+  def merge_entities(crate, workflow)
+    workflow_struct = Seek::BioSchema::Serializer.new(workflow).json_representation
+
+    context = {
+      '@vocab' => 'https://somewhere.com/'
+    }
+    workflow_struct['@context'] = context
+    crate['name'] = "Research Object Crate for #{workflow_struct['name']}"
+    crate['description'] = workflow_struct['description']
+
+    workflow_struct.except!('encodingFormat')
+
+    flattened = JSON::LD::API.flatten(workflow_struct, context)
+    flattened.except!('@context')
+
+    flattened['@graph'].each do |elem|
+      type = elem['@type']
+      type = [type] unless type.is_a?(Array)
+      if type.include?('ComputationalWorkflow')
+        merge_fields(crate.main_workflow, elem)
+      else
+        entity_class = ROCrate::ContextualEntity.specialize(elem)
+        entity = entity_class.new(crate, elem['@id'], elem)
+        crate.add_contextual_entity(entity)
+      end
+    end
+  end
+
+  def merge_fields(crate_workflow, bioschemas_workflow)
+    bioschemas_workflow.each do |key, value|
+      crate_workflow[key] = value unless crate_workflow[key]
+    end
   end
 
   def ro_crate

@@ -411,7 +411,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_response :redirect
   end
 
-  test 'create ro crate with local content' do
+  test 'create RO-Crate with local content' do
     cwl = Factory(:cwl_workflow_class)
     person = Factory(:person)
     login_as(person)
@@ -419,7 +419,7 @@ class WorkflowsControllerTest < ActionController::TestCase
       post :create_ro_crate, params: {
           ro_crate: {
               workflow: { data: fixture_file_upload('files/checksums.txt') },
-              diagram: { data: fixture_file_upload('files/file_picture.png') },
+                          diagram: { data: fixture_file_upload('files/file_picture.png') },
               abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
           },
           workflow_class_id: cwl.id
@@ -492,7 +492,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'picks diagram from RO crate' do
+  test 'picks diagram from RO-Crate' do
     wf = Factory(:existing_galaxy_ro_crate_workflow)
     login_as(wf.contributor)
     refute wf.diagram_exists?
@@ -505,7 +505,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert wf.diagram_exists?
   end
 
-  test 'generates diagram from CWL workflow in RO crate' do
+  test 'generates diagram from CWL workflow in RO-Crate' do
     with_config_value(:cwl_viewer_url, 'http://localhost:8080/cwl_viewer') do
       wf = Factory(:just_cwl_ro_crate_workflow)
       login_as(wf.contributor)
@@ -523,7 +523,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'generates diagram from abstract CWL in RO crate' do
+  test 'generates diagram from abstract CWL in RO-Crate' do
     with_config_value(:cwl_viewer_url, 'http://localhost:8080/cwl_viewer') do
       wf = Factory(:generated_galaxy_no_diagram_ro_crate_workflow)
       login_as(wf.contributor)
@@ -556,7 +556,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'does not render diagram if not in RO crate' do
+  test 'does not render diagram if not in RO-Crate' do
     wf = Factory(:nf_core_ro_crate_workflow)
     login_as(wf.contributor)
     refute wf.diagram_exists?
@@ -584,12 +584,13 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
     assert_response :success
     assert wf = assigns(:workflow)
-    crate_workflow = wf.ro_crate.main_workflow
+    workflow_crate = ROCrate::WorkflowCrateReader.read_zip(wf.content_blob.path)
+    crate_workflow = workflow_crate.main_workflow
     assert crate_workflow
     assert_equal 'file%20with%20spaces%20in%20name.txt', crate_workflow.id
   end
 
-  test 'downloads valid generated RO crate' do
+  test 'downloads valid generated RO-Crate' do
     workflow = Factory(:generated_galaxy_ro_crate_workflow, policy: Factory(:public_policy))
 
     get :ro_crate, params: { id: workflow.id }
@@ -603,7 +604,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'downloads valid existing RO crate' do
+  test 'downloads valid existing RO-Crate' do
     workflow = Factory(:existing_galaxy_ro_crate_workflow, policy: Factory(:public_policy))
 
     get :ro_crate, params: { id: workflow.id }
@@ -617,7 +618,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'downloads valid RO crate for single workflow file' do
+  test 'downloads valid RO-Crate for single workflow file' do
     workflow = Factory(:cwl_packed_workflow, policy: Factory(:public_policy))
 
     get :ro_crate, params: { id: workflow.id }
@@ -631,7 +632,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'create ro crate even with with duplicated filenames' do
+  test 'create RO-Crate even with with duplicated filenames' do
     cwl = Factory(:cwl_workflow_class)
     person = Factory(:person)
     login_as(person)
@@ -639,16 +640,16 @@ class WorkflowsControllerTest < ActionController::TestCase
       post :create_ro_crate, params: {
           ro_crate: {
               workflow: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') },
-              diagram: { data: fixture_file_upload('files/file_picture.png') },
+                          diagram: { data: fixture_file_upload('files/file_picture.png') },
               abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
           },
           workflow_class_id: cwl.id
       }
     end
     assert_response :success
-    assert wf = assigns(:workflow)
-    crate_workflow = wf.ro_crate.main_workflow
-    crate_cwl = wf.ro_crate.main_workflow_cwl
+    workflow_crate = ROCrate::WorkflowCrateReader.read_zip(assigns(:workflow).content_blob.path)
+    crate_workflow = workflow_crate.main_workflow
+    crate_cwl = workflow_crate.main_workflow_cwl
     assert_not_equal crate_workflow.id, crate_cwl.id
   end
 
@@ -748,7 +749,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_empty workflow.discussion_links
   end
 
-  test 'should be able to handle remote files when creating RO crate' do
+  test 'should be able to handle remote files when creating RO-Crate' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/file with spaces in name.txt", 'https://raw.githubusercontent.com/bob/workflow/master/workflow.txt'
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'https://raw.githubusercontent.com/bob/workflow/master/diagram.png'
     mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'https://raw.githubusercontent.com/bob/workflow/master/abstract.cwl'
@@ -760,7 +761,7 @@ class WorkflowsControllerTest < ActionController::TestCase
       post :create_ro_crate, params: {
           ro_crate: {
               workflow: { data_url: 'https://github.com/bob/workflow/blob/master/workflow.txt' },
-              diagram: { data_url: 'https://github.com/bob/workflow/blob/master/diagram.png' },
+                          diagram: { data_url: 'https://github.com/bob/workflow/blob/master/diagram.png' },
               abstract_cwl: { data_url: 'https://github.com/bob/workflow/blob/master/abstract.cwl' }
           },
           workflow_class_id: cwl.id
@@ -768,7 +769,8 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
     assert_response :success
     assert wf = assigns(:workflow)
-    crate_workflow = wf.ro_crate.main_workflow
+    workflow_crate = ROCrate::WorkflowCrateReader.read_zip(wf.content_blob.path)
+    crate_workflow = workflow_crate.main_workflow
     assert crate_workflow
     assert_equal 'workflow.txt', crate_workflow.id
   end
@@ -795,7 +797,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_equal blob, workflow.versions.last.content_blob
   end
 
-  test 'should be able to handle remote files in existing RO crate' do
+  test 'should be able to handle remote files in existing RO-Crate' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/file with spaces in name.txt", 'https://raw.githubusercontent.com/bob/workflow/master/workflow.txt'
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'https://raw.githubusercontent.com/bob/workflow/master/diagram.png'
     mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'https://raw.githubusercontent.com/bob/workflow/master/abstract.cwl'

@@ -82,8 +82,8 @@
 
 <script>
     //used to hold the element Id that needs updating after creating a new CV
-    $j(document).ready(function () {
-        SampleTypeControlledVocab.blankControlledVocabModelForm=$j('#cv-modal').clone();
+    $j(document).ready(function () {        
+        SampleTypeControlledVocab.blankControlledVocabModelForm=$j('#cv-modal').clone();        
         SampleTypeControlledVocab.resetModalControlledVocabForm();
         // Make rows sortable
         SampleTypes.bindSortable();
@@ -111,5 +111,6 @@
         $j('#attribute-table').on('change', '.sample-type-is-title', SampleTypes.singleIsTitle);
         $j('#attribute-table').on('change', '.sample-type-attribute-type', SampleTypes.attributeTypeChanged);
         $j('#attribute-table').on('change', '.controlled-vocab-selection', SampleTypeControlledVocab.controlledVocabChanged);
+        $j('.controlled-vocab-selection').change();
     });
 </script>

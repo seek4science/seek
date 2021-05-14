@@ -44,7 +44,7 @@ class Document < ApplicationRecord
     super + ['version']
   end
   def columns_allowed
-    super + ['version','doi','license','last_used_at','other_creators','deleted_contributor']  
+    columns_default + ['doi','license','last_used_at','other_creators']  
   end
 
   def use_mime_type_for_avatar?
