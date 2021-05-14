@@ -1,6 +1,6 @@
 <% asset ||= item %>
 <% human_name = text_for_resource(asset) %>
-<% display_asset = version ? asset.is_git_versioned? ? asset.find_git_version(version) : asset.find_version(version) : nil %>
+<% display_asset = version ? asset.find_version(version) : nil %>
 
 <% show_explore_btn = display_asset && (asset.is_a?(DataFile) && display_asset.supported_spreadsheet_format?) %>
 <% show_view_content_btn = display_asset && (!asset.is_a?(Workflow) && (display_asset.single_content_blob && !display_asset.single_content_blob.show_as_external_link?)) %>

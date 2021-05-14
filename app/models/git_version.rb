@@ -144,6 +144,14 @@ class GitVersion < ApplicationRecord
     file_exists?('ro-crate-metadata.json') || file_exists?('ro-crate-metadata.jsonld')
   end
 
+  def revision_comments
+    comment
+  end
+
+  def commit_object
+    git_base.lookup(commit)
+  end
+
   private
 
   def set_version

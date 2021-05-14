@@ -44,8 +44,23 @@ module Seek
               version.save
             end
 
+            def save_as_new_git_version
+              return if @git_version_attributes.blank?
+              version = self.git_versions.build(@git_version_attributes)
+              version.resource_attributes = self.attributes
+              version.save
+            end
+
             def initial_git_version
               @initial_git_version ||= self.git_versions.build(@git_version_attributes)
+            end
+
+            def visible_git_versions(user = User.current_user)
+              scopes = [ExplicitVersioning::VISIBILITY_INV[:public]]
+              scopes << ExplicitVersioning::VISIBILITY_INV[:registered_users] if user&.person&.member?
+              scopes << ExplicitVersioning::VISIBILITY_INV[:private] if can_manage?(user)
+
+              git_versions.where(visibility: scopes)
             end
 
             # def state_allows_download?(*args)

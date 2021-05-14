@@ -549,6 +549,7 @@ SEEK::Application.routes.draw do
       get :diagram
       get :ro_crate
       get :new_version
+      get :new_git_version
       post :create_version_metadata
     end
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :sops, :collections, only: [:index]

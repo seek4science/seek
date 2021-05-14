@@ -8,11 +8,7 @@ module Seek
     include Seek::AssetsStandardControllerActions
 
     def find_display_asset(asset = instance_variable_get("@#{controller_name.singularize}"))
-      if asset.is_git_versioned?
-        found_version = params[:version] ? asset.find_git_version(params[:version]) : asset.latest_git_version
-      else
-        found_version = params[:version] ? asset.find_version(params[:version]) : asset.latest_version
-      end
+      found_version = params[:version] ? asset.find_version(params[:version]) : asset.latest_version
       if found_version&.visible?
         instance_variable_set("@display_#{asset.class.name.underscore}", found_version)
       else

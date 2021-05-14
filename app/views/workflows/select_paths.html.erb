@@ -1,11 +1,12 @@
 <h1>New <%= t('workflow') %></h1>
 
 <%= form_tag(create_from_git_workflows_path) do %>
-  <%= hidden_field_tag :git_repository_id, @workflow.initial_git_version.git_repository.id %>
-  <%= hidden_field_tag :ref, @workflow.initial_git_version.ref %>
-  <%= hidden_field_tag :git_commit, @workflow.initial_git_version.commit %>
+  <%= hidden_field_tag :git_repository_id, @workflow.git_version.git_repository.id %>
+  <%= hidden_field_tag :ref, @workflow.git_version.ref %>
+  <%= hidden_field_tag :git_commit, @workflow.git_version.commit %>
+  <%= hidden_field_tag :resource_id, @workflow.id %>
 
-  <%= render partial: 'git/path_selector_modal', locals: { tree: @workflow.initial_git_version.tree, id: 'git-path-select-modal' } %>
+  <%= render partial: 'git/path_selector_modal', locals: { tree: @workflow.git_version.tree, id: 'git-path-select-modal' } %>
 
   <%= panel do %>
     <div class="form-group">

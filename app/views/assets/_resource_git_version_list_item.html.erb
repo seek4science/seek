@@ -1,0 +1,37 @@
+<div class="list-group-item <%= 'list-group-item-info' if version.version == displayed_resource.version -%>">
+  <div class="row">
+    <div class="col-sm-8">
+      <h4 class="list-group-item-heading">
+        <%= link_to "Version #{version.version} #{resource.describe_version(version.version)}", {:version => version.version} %>
+        <small>
+          Created <%= date_as_string(version.created_at,true) %>
+          by <%= contributor version.contributor %>
+        </small>
+      </h4>
+
+      <p class="list-group-item-text">
+        <% if version.comment.blank? %>
+          <% commit_comment = version.commit_object.message %>
+          <% if commit_comment.blank? %>
+            <span class="subtle">No revision comments</span>
+          <% else %>
+            <%= white_list(commit_comment) -%>
+          <% end %>
+        <% else %>
+          <%= white_list(version.comment) -%>
+        <% end %>
+      </p>
+      <br/>
+      <% unless version.ref.blank? %>
+        <code><%= git_target_icon(version.ref) %><%= version.ref.split('/').last %></code>
+      <% end %>
+       <code><%= version.commit&.first(7) %></code>
+      <% unless version.visibility == :public %>
+        <div class="subtle">
+          <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+          <%= VersionHelper::VISIBILITY_LABELS[version.visibility] %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

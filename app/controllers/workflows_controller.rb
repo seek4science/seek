@@ -23,6 +23,17 @@ class WorkflowsController < ApplicationController
     head :not_acceptable
   end
 
+  def new_git_version
+    @git_repository = @workflow.latest_git_version.git_repository
+    if @git_repository&.remote?
+      @git_repository.queue_fetch
+
+      respond_to do |format|
+        format.html { redirect_to select_ref_git_repository_path(@git_repository, resource_type: :workflow, resource_id: @workflow.id) }
+      end
+    end
+  end
+
   def new_version
     respond_to do |format|
       format.html
@@ -174,19 +185,26 @@ class WorkflowsController < ApplicationController
     @workflow.assign_attributes(workflow_params)
     update_sharing_policies(@workflow)
     filter_associated_projects(@workflow)
-
-    #associate the content blob with the workflow
-    blob = ContentBlob.where(uuid: params[:content_blob_uuid], asset_id: nil).first
-    @workflow.errors.add(:content_blob, 'was not found') unless blob
-    new_version = @workflow.version += 1
-    old_content_blob = @workflow.content_blob
-    blob.asset_version = new_version
-    @workflow.content_blob = blob
-    # asset_id on the previous content blob gets blanked out after the above command is run, so need to do:
-    old_content_blob.update_column(:asset_id, @workflow.id) if old_content_blob
     update_annotations(params[:tag_list], @workflow) if params.key?(:tag_list)
 
-    if blob && @workflow.save_as_new_version(params[:revision_comments]) && blob.save
+    if params[:content_blob_uuid].present?
+      #associate the content blob with the workflow
+      blob = ContentBlob.where(uuid: params[:content_blob_uuid], asset_id: nil).first
+      @workflow.errors.add(:content_blob, 'was not found') unless blob
+      new_version = @workflow.version += 1
+      old_content_blob = @workflow.content_blob
+      blob.asset_version = new_version
+      @workflow.content_blob = blob
+      # asset_id on the previous content blob gets blanked out after the above command is run, so need to do:
+      old_content_blob.update_column(:asset_id, @workflow.id) if old_content_blob
+      valid = blob && @workflow.save_as_new_version(params[:revision_comments]) && blob.save
+    elsif @workflow.git_version_attributes.present?
+      valid = @workflow.save_as_new_git_version
+    else
+      valid = false
+    end
+
+    if valid
       update_relationships(@workflow, params)
 
       respond_to do |format|
@@ -266,6 +284,6 @@ class WorkflowsController < ApplicationController
   end
 
   def git_workflow_wizard_params
-    params.permit(:git_repository_id, :git_commit, :ref, :main_workflow_path, :abstract_cwl_path, :diagram_path, :workflow_class_id)
+    params.permit(:git_repository_id, :git_commit, :ref, :main_workflow_path, :abstract_cwl_path, :diagram_path, :workflow_class_id, :resource_id)
   end
 end

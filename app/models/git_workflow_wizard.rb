@@ -8,7 +8,7 @@ require 'seek/download_handling/http_streamer'
 class GitWorkflowWizard
   include ActiveModel::Model
 
-  attr_reader :next_step, :workflow, :workflow_class, :git_repository
+  attr_reader :next_step, :workflow_class, :git_repository
 
   attr_accessor :git_repository_id,
                 :git_commit,
@@ -17,7 +17,8 @@ class GitWorkflowWizard
                 :abstract_cwl_path,
                 :diagram_path,
                 :workflow_class_id,
-                :workflow_params
+                :workflow_params,
+                :resource_id
 
   validates :git_repository_id, presence: true
   validates :main_workflow_path, presence: true
@@ -65,9 +66,16 @@ class GitWorkflowWizard
 
   def run
     @next_step = nil
-    workflow = Workflow.new(git_version_attributes: { git_repository_id: git_repository_id, commit: git_commit, ref: ref })
-    workflow_class = WorkflowClass.find_by_id(workflow_class_id)
-    git_version = workflow.git_version
+    if resource_id
+      workflow = Workflow.find(resource_id)
+      workflow_class = workflow.workflow_class
+      git_version = workflow.git_versions.build(git_repository_id: git_repository_id, commit: git_commit, ref: ref)
+    else
+      workflow = Workflow.new(git_version_attributes: { git_repository_id: git_repository_id, commit: git_commit, ref: ref })
+      workflow_class = WorkflowClass.find_by_id(workflow_class_id)
+      git_version = workflow.git_version
+    end
+
     if git_version.ro_crate?
       git_version.in_temp_dir do |dir|
         crate = ROCrate::WorkflowCrateReader.read(dir)

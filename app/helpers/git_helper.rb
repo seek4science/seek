@@ -65,4 +65,12 @@ module GitHelper
     end
   end
 
+  def git_target_icon(ref)
+    r = ref.sub('refs/', '')
+    if r.start_with?('tags/')
+      icon_tag('git_tag')
+    elsif r.start_with?('remotes/origin/') || r.start_with?('heads/')
+      icon_tag('git_branch')
+    end
+  end
 end
