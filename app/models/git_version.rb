@@ -22,6 +22,10 @@ class GitVersion < ApplicationRecord
 
   attr_writer :remote
 
+  delegate :tag_counts, :scales, :managers, :attributions, :creators, :assets_creators, :is_asset?,
+           :authorization_supported?, :defines_own_avatar?, :use_mime_type_for_avatar?, :avatar_key,
+           :show_contributor_avatars?, :can_see_hidden_item?, :related_people, :projects, :programmes, to: :parent
+
   def latest_git_version?
     resource.latest_git_version == self
   end
