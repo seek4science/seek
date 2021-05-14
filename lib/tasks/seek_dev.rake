@@ -409,4 +409,7 @@ namespace :seek_dev do
     end
   end
 
+  task rebuild_csl_style_list: :environment do
+    File.write(Seek::Citations.style_dictionary_path, Seek::Citations.generate_style_pairs.to_yaml)
+  end
 end
