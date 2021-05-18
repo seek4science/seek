@@ -5,11 +5,14 @@ class GitVersion < ApplicationRecord
   include Seek::Git::Util
 
   belongs_to :resource, polymorphic: true
+  belongs_to :contributor, class_name: 'Person'
   belongs_to :git_repository
   has_many :git_annotations
+
   before_create :set_version
   before_validation :set_git_info, on: :create
   before_validation :set_default_visibility, on: :create
+  before_validation :assign_contributor, on: :create
   before_save :set_commit, unless: -> { ref.blank? }
 
   accepts_nested_attributes_for :git_annotations
@@ -228,6 +231,10 @@ class GitVersion < ApplicationRecord
 
       x += 1
     end
+  end
+
+  def assign_contributor
+    self.contributor ||= User.current_user&.person
   end
 
   # Check metadata, and parent resource for missing methods. Allows a Workflow::GitVersion to be used as a drop-in replacement for
