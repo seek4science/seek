@@ -150,7 +150,7 @@ class SampleType < ApplicationRecord
   # rather than clearing the selected sample type each time
   def resolve_seek_samples_inconsistencies
     sample_attributes.each do |attribute|
-      attribute.linked_sample_type = nil unless attribute.seek_sample?
+      attribute.linked_sample_type = nil unless attribute.seek_sample? || attribute.seek_sample_multi?
     end
   end
 

@@ -77,7 +77,11 @@ class Sample < ApplicationRecord
     sample_type.sample_attributes.select(&:seek_resource?).map do |sa|
       value = get_attribute_value(sa)
       type = sa.sample_attribute_type.base_type_handler.type
-      type.constantize.find_by_id(value['id']) if value && type
+      if value.kind_of?(Array)
+        value.map {|v| type.constantize.find_by_id(v['id']) if v && type} 
+      else
+        type.constantize.find_by_id(value['id']) if value && type
+      end
     end.compact
   end
 

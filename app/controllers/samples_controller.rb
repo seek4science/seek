@@ -126,12 +126,30 @@ class SamplesController < ApplicationController
     end
   end
 
+  def typeahead
+    sample_type = SampleType.find(params[:linked_sample_type_id])
+    results = sample_type.samples.where("LOWER(title) like :query",
+              query: "%#{params[:query].downcase}%").limit(params[:limit] || 100)
+    items = results.map do |sa|
+      { id: sa.id,
+        name: sa.title }
+    end
+
+    respond_to do |format|
+      format.json { render json: items.to_json }
+    end
+  end
+
   private
 
   def sample_params(sample_type=nil)
     sample_type_param_keys = sample_type ? sample_type.sample_attributes.map(&:title).collect(&:to_sym) : []
     if params[:sample][:attribute_map]
         params[:sample][:data] = params[:sample].delete(:attribute_map)
+    end
+    sample_type_param_keys.each_with_index do |p,i|
+      par = params[:sample][:data][p]
+      sample_type_param_keys[i] = {"#{p}":[]} if par && par.kind_of?(Array)
     end
     params.require(:sample).permit(:sample_type_id, :other_creators, { project_ids: [] },
                               { data: sample_type_param_keys }, { creator_ids: [] },
