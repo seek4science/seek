@@ -364,7 +364,9 @@ class StudiesController < ApplicationController
 
   def study_params
     params.require(:study).permit(:title, :description, :experimentalists, :investigation_id, :person_responsible_id,
-                                  :other_creators, :position, { creator_ids: [] }, { scales: [] }, { publication_ids: [] },
+                                  :other_creators, :position, { creator_ids: [] 
+}, { scales: [] }, { publication_ids: [] },
+                        :started_at, :finished_at, :status, :assignee_id,
                                   { discussion_links_attributes:[:id, :url, :label, :_destroy] },
                                   { custom_metadata_attributes: determine_custom_metadata_keys })
   end

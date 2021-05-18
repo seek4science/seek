@@ -49,16 +49,7 @@
           <b><%= "Assay position" %>: </b>
           <%= @assay.position %>
         </p>
-	<% if Seek::Config.bpmn_enabled %>
-  	<p>
-	  <strong>Status:</strong>
-	  <% if @assay.status %>
-  	  <%= @assay.status -%>
-	  <% else %>
-	  Not planned
-	  <% end %>
-	</p>
-	<% end %>
+	<%= render :partial => "general/bpmn_info",:locals => {:item=>@assay} %>
 
         <p id="assay_type">
           <b><%= assay_type_text -%>:</b>

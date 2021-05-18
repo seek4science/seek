@@ -73,7 +73,6 @@ class Study < ApplicationRecord
 
   def related_person_ids
     ids = super
-    ids << person_responsible_id if person_responsible_id
     ids.uniq
   end
 
