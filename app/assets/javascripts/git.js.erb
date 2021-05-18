@@ -6,7 +6,28 @@ $j(document).ready(function () {
         var element = $j('[data-role="seek-git-jstree"]', container);
         var json = JSON.parse($j('script[data-role="seek-git-jstree-data"]', container).html());
 
-        element.jstree({
+        element.on('loaded.jstree', function(e, data) {
+            var annotationMap = {};
+            if ($j('script[data-role="seek-git-jstree-annotation-data"]', container).length) {
+                annotationMap = JSON.parse($j('script[data-role="seek-git-jstree-annotation-data"]', container).html());
+            }
+            if (annotationMap) {
+                for (var path of Object.keys(annotationMap)) {
+                    var node = $j(this).jstree(true).get_node(path, true);
+                    if (node) {
+                        var annotations = annotationMap[path];
+                        if (annotations.length) {
+                            node.addClass('git-annotated');
+                            for (var annotation of annotations) {
+                                var template = HandlebarsTemplates["git/annotations/" + annotation.key] ||
+                                    HandlebarsTemplates["git/annotations/default"];
+                                node.append(template(annotation));
+                            }
+                        }
+                    }
+                }
+            }
+        }).jstree({
             'plugins': ['wholerow', 'checkbox', 'types', 'conditionalselect'],
             'checkbox': {
                 'three_state': false
@@ -45,7 +66,7 @@ $j(document).ready(function () {
                 'dblclick_toggle': true,
                 'data': json
             }
-        })
+        });
     });
 
     $j('[data-role="seek-git-browser-modal-btn"]').click(function () {

@@ -1,5 +1,5 @@
 module GitHelper
-  def jstree_from_tree(tree, root_text: 'Root', include_root: false)
+  def jstree_json_from_git_tree(tree, root_text: 'Root', include_root: false)
     nodes = []
     root_id = '#'
 
@@ -26,6 +26,20 @@ module GitHelper
     end
 
     nodes
+  end
+
+  def json_from_git_annotations(git_annotations)
+    h = {}
+
+    git_annotations.each do |ga|
+      h[ga.path] ||= []
+      h[ga.path] << {
+          key: ga.key,
+          label: t("git_annotation_label.#{ga.key}")
+      }
+    end
+
+    h
   end
 
   def git_path_input(modal_id, name, value, opts)

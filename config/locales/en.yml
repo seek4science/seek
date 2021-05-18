@@ -141,6 +141,10 @@ en:
     some_passing: 'Some failures'
     all_failing: 'All failing'
     not_available: 'Not available'
+  git_annotation_label:
+    main_workflow: 'Main Workflow'
+    abstract_cwl: 'Abstract CWL'
+    diagram: 'Diagram'
 
   about_project: "You need to be a member of a <strong>%{project}</strong> before you can register content.
     A %{project} can contain one or more people, and gives some additional background details, and credit, about the content being registered. It can be used to describe and promote
