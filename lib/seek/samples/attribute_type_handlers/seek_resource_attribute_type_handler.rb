@@ -12,6 +12,11 @@ module Seek
         end
 
         def convert(value)
+          return get_conversion value if !value.kind_of?(Array)
+          value.map {|v| get_conversion v}
+        end
+
+        def get_conversion(value)
           resource = find_resource(value)
           hash = { id: resource ? resource.id : value, type: type }.with_indifferent_access
           hash[:title] = resource.title if resource

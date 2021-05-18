@@ -35,6 +35,8 @@ module SamplesHelper
       options = options_from_collection_for_select(terms, :id, :title, value.try(:[], 'id'))
       select_tag element_name, options,
                  include_blank: !attribute.required? , class: "form-control #{clz}"
+    when Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
+      sample_multi_form_field attribute, element_name, value
     else
       text_field_tag element_name,value, class: "form-control #{clz}", placeholder: placeholder
     end
@@ -60,6 +62,25 @@ module SamplesHelper
                     handlebars_template: 'typeahead/controlled_vocab_term' }, 
                     limit: 1)
     end
+  end
+
+  def sample_multi_form_field(attribute, element_name, value)  
+    
+    # terms = attribute.linked_sample_type.samples.authorized_for('view').to_a
+    # options = options_from_collection_for_select(terms, :id, :title, value.try(:[], 'id'))
+    # select_tag element_name, options,
+    #            include_blank: !attribute.required? , class: "form-control #{clz}"
+
+               
+    # existing_objects = []
+    # existing_objects << Struct.new(:id, :name).new(value, value) if value
+    
+    objects_input(element_name, [],
+                  typeahead: { query_url: typeahead_samples_path + "?query=%QUERY&linked_sample_type_id=#{attribute.linked_sample_type.id}", 
+                  handlebars_template: 'typeahead/controlled_vocab_term' }, 
+                  limit: 5)
+    # html << hidden_field("sample[data]", attribute.title)
+    # html.html_safe
   end
 
   def authorised_samples(projects = nil)
@@ -88,6 +109,8 @@ module SamplesHelper
         seek_strain_attribute_display(value)
       when Seek::Samples::BaseType::SEEK_SAMPLE
         seek_sample_attribute_display(value)
+      when Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
+        seek_sample_attribute_display(value)
       when Seek::Samples::BaseType::SEEK_DATA_FILE
         seek_data_file_attribute_display(value)
       when Seek::Samples::BaseType::CV
@@ -108,7 +131,11 @@ module SamplesHelper
   end
 
   def seek_sample_attribute_display(value)
-    seek_resource_attribute_display(Sample,value)
+    if value.kind_of?(Array)
+      value.map {|v| seek_resource_attribute_display(Sample,v)} .join(", ").html_safe
+    else
+      seek_resource_attribute_display(Sample,value)
+    end
   end
 
   def seek_data_file_attribute_display(value)

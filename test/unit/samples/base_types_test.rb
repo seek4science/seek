@@ -16,6 +16,7 @@ class BaseTypeTest < ActiveSupport::TestCase
     assert_equal 'Boolean', Seek::Samples::BaseType::BOOLEAN
     assert_equal 'SeekStrain', Seek::Samples::BaseType::SEEK_STRAIN
     assert_equal 'SeekSample', Seek::Samples::BaseType::SEEK_SAMPLE
+    assert_equal 'SeekSampleMulti', Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
     assert_equal 'CV', Seek::Samples::BaseType::CV
     assert_equal 'SeekDataFile',Seek::Samples::BaseType::SEEK_DATA_FILE
   end
