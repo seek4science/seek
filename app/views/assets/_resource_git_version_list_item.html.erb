@@ -9,18 +9,10 @@
         </small>
       </h4>
 
-      <p class="list-group-item-text">
-        <% if version.comment.blank? %>
-          <% commit_comment = version.commit_object.message %>
-          <% if commit_comment.blank? %>
-            <span class="subtle">No revision comments</span>
-          <% else %>
-            <%= white_list(commit_comment) -%>
-          <% end %>
-        <% else %>
-          <%= white_list(version.comment) -%>
-        <% end %>
-      </p>
+      <div class="list-group-item-text auto-collapse">
+        <% commit_comment = version.comment || version.commit_object.message %>
+        <%= text_or_not_specified(commit_comment, description: true, auto_link: false, none_text: 'No revision comments', markdown: true) %>
+      </div>
       <br/>
       <% unless version.ref.blank? %>
         <code><%= git_target_icon(version.ref) %><%= version.ref.split('/').last %></code>
