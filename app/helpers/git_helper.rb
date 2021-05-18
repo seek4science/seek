@@ -87,4 +87,9 @@ module GitHelper
       icon_tag('git_branch')
     end
   end
+
+  def is_image_path?(path)
+    ext = path.split('/').last&.split('.')&.last&.downcase
+    Seek::ContentTypeDetection::IMAGE_VIEWABLE_FORMAT.include?(ext)
+  end
 end

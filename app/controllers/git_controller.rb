@@ -41,8 +41,12 @@ class GitController < ApplicationController
   end
 
   def raw
-    respond_to do |format|
-      format.all { render plain: @blob.content }
+    if @blob.binary?
+      send_data(@blob.content, filename: path_param.split('/').last, disposition: 'inline')
+    else
+      respond_to do |format|
+        format.all { render plain: @blob.content }
+      end
     end
   end
 
