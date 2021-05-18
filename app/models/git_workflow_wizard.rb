@@ -69,7 +69,13 @@ class GitWorkflowWizard
     if resource_id
       workflow = Workflow.find(resource_id)
       workflow_class = workflow.workflow_class
+      current_version = workflow.git_version
       git_version = workflow.git_versions.build(git_repository_id: git_repository_id, commit: git_commit, ref: ref)
+      # Assign existing paths if they still exist in the new version
+      [:main_workflow_path, :abstract_cwl_path, :diagram_path].each do |path_attr|
+        path = current_version.send(path_attr)
+        self.send("#{path_attr}=", path) if path && git_version.file_exists?(path)
+      end
     else
       workflow = Workflow.new(git_version_attributes: { git_repository_id: git_repository_id, commit: git_commit, ref: ref })
       workflow_class = WorkflowClass.find_by_id(workflow_class_id)
@@ -80,24 +86,24 @@ class GitWorkflowWizard
       git_version.in_temp_dir do |dir|
         crate = ROCrate::WorkflowCrateReader.read(dir)
         self.main_workflow_path = crate.main_workflow&.id if crate.main_workflow&.id
-        self.diagram_path = crate.main_workflow&.diagram&.id if crate.main_workflow&.diagram&.id
         self.abstract_cwl_path = crate.main_workflow&.cwl_description&.id if crate.main_workflow&.cwl_description&.id
+        self.diagram_path = crate.main_workflow&.diagram&.id if crate.main_workflow&.diagram&.id
 
         workflow_class ||= WorkflowClass.match_from_metadata(crate&.main_workflow&.programming_language&.properties || {})
       end
     end
 
-    unless main_workflow_path
-      @next_step = :select_paths
-      return workflow
-    end
-
     workflow.workflow_class = workflow_class
     annotations_attributes = {}
     annotations_attributes['1'] = { key: 'main_workflow', path: main_workflow_path } unless main_workflow_path.blank?
-    annotations_attributes['2'] = { key: 'diagram', path: diagram_path } unless diagram_path.blank?
-    annotations_attributes['3'] = { key: 'abstract_cwl', path: abstract_cwl_path } unless abstract_cwl_path.blank?
+    annotations_attributes['2'] = { key: 'abstract_cwl', path: abstract_cwl_path } unless abstract_cwl_path.blank?
+    annotations_attributes['3'] = { key: 'diagram', path: diagram_path } unless diagram_path.blank?
     git_version.git_annotations_attributes = annotations_attributes
+
+    if main_workflow_path.blank?
+      @next_step = :select_paths
+      return workflow
+    end
 
     extractor = workflow.extractor
     workflow.provide_metadata(extractor.metadata)

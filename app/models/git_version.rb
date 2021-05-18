@@ -178,7 +178,7 @@ class GitVersion < ApplicationRecord
   end
 
   def set_commit
-    self.commit ||= get_commit
+    self.commit = get_commit if commit.blank?
   end
 
   def get_commit
