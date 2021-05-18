@@ -65,22 +65,10 @@ module SamplesHelper
   end
 
   def sample_multi_form_field(attribute, element_name, value)  
-    
-    # terms = attribute.linked_sample_type.samples.authorized_for('view').to_a
-    # options = options_from_collection_for_select(terms, :id, :title, value.try(:[], 'id'))
-    # select_tag element_name, options,
-    #            include_blank: !attribute.required? , class: "form-control #{clz}"
-
-               
-    # existing_objects = []
-    # existing_objects << Struct.new(:id, :name).new(value, value) if value
-    
     objects_input(element_name, [],
                   typeahead: { query_url: typeahead_samples_path + "?query=%QUERY&linked_sample_type_id=#{attribute.linked_sample_type.id}", 
                   handlebars_template: 'typeahead/controlled_vocab_term' }, 
                   limit: 5)
-    # html << hidden_field("sample[data]", attribute.title)
-    # html.html_safe
   end
 
   def authorised_samples(projects = nil)
