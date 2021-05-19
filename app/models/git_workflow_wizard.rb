@@ -66,7 +66,7 @@ class GitWorkflowWizard
 
   def run
     @next_step = nil
-    if resource_id
+    if new_version?
       workflow = Workflow.find(resource_id)
       workflow_class = workflow.workflow_class
       current_version = workflow.git_version
@@ -111,5 +111,11 @@ class GitWorkflowWizard
     @next_step = :provide_metadata
 
     workflow
+  end
+
+  private
+
+  def new_version?
+    resource_id.present?
   end
 end
