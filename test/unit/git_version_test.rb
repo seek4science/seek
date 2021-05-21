@@ -16,7 +16,7 @@ class GitVersionTest < ActiveSupport::TestCase
 
     v.send(:freeze)
     workflow.update_column(:title, 'Something else')
-    new_class = Factory(:galaxy_workflow_class)
+    new_class = WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class)
     workflow.update_column(:workflow_class_id, new_class.id)
 
     assert_equal 'refs/tags/version-1.0.0', v.ref
