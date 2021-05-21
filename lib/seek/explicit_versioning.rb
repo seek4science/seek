@@ -109,7 +109,7 @@ module Seek
           end
 
           def cache_key_fragment
-            "#{parent.class.underscore}-#{parent.id}-#{version}"
+            "#{parent.class.name.underscore}-#{parent.id}-#{version}"
           end
         end
 

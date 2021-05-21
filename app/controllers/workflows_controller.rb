@@ -15,6 +15,7 @@ class WorkflowsController < ApplicationController
   include Seek::Doi::Minting
   include Seek::IsaGraphExtensions
   include RoCrateHandling
+  include Legacy::WorkflowSupport
 
   api_actions :index, :show, :create, :update, :destroy, :ro_crate
   user_content_actions :diagram
@@ -115,21 +116,7 @@ class WorkflowsController < ApplicationController
     end
   end
 
-  def extract_metadata
-    begin
-      extractor = @workflow.extractor
-      retrieve_content(@workflow.content_blob) if @workflow.content_blob # Hack
-      @workflow.provide_metadata(extractor.metadata)
-    rescue StandardError => e
-      raise e unless Rails.env.production?
-      Seek::Errors::ExceptionForwarder.send_notification(e, data: {
-        message: "Problem attempting to extract metadata for content blob #{params[:content_blob_id]}" })
-      flash[:error] = 'An unexpected error occurred whilst extracting workflow metadata.'
-      return false
-    end
 
-    true
-  end
   #
   # # Displays the form Wizard for providing the metadata for the workflow
   # def provide_metadata

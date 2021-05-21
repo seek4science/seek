@@ -544,8 +544,10 @@ SEEK::Application.routes.draw do
       post :create_from_git
       get :provide_metadata
       get :annotate_repository
-      post :metadata_extraction_ajax
       post :create_metadata
+
+      post :create_content_blob # Legacy
+      post :create_ro_crate # Legacy
     end
     member do
       get :diagram

@@ -34,25 +34,10 @@ class WorkflowVersioningTest < ActionDispatch::IntegrationTest
 
     assert_difference('ContentBlob.count', 1) do
       post create_ro_crate_workflows_path, params: params
-
-      assert_response :success
     end
 
-    assert_equal workflow.id, session[:workflow_id].to_i
-    assert_equal 'A new version!', session[:revision_comments]
-    workflow = assigns(:workflow)
-    assert session[:uploaded_content_blob_id].present?
-    assert_equal workflow.content_blob.id, session[:uploaded_content_blob_id]
-
-    post metadata_extraction_ajax_workflows_path(format: :js), params: { workflow_class_id: workflow.workflow_class_id,
-                                                                         content_blob_id: workflow.content_blob.id }
-    assert_response :success
-    assert session[:metadata][:internals].present?
-
-    meta = session[:metadata].except(:errors, :warnings).with_indifferent_access
-    meta[:internals] = meta[:internals].to_json
-
-    get provide_metadata_workflows_path
+    metadata = assigns(:metadata).merge(title: 'Something something')
+    metadata[:internals] = metadata[:internals].to_json
 
     assert_response :success
     assert_select 'form[action=?]', create_version_metadata_workflow_path(workflow_id)
@@ -62,8 +47,9 @@ class WorkflowVersioningTest < ActionDispatch::IntegrationTest
       assert_no_difference('Workflow.count', ) do
         assert_no_difference('ContentBlob.count', ) do
           post create_version_metadata_workflow_path(workflow_id),
-               params: { workflow: meta.merge(title: 'Something something'),
-                         content_blob_id: session[:uploaded_content_blob_id] }
+               params: { workflow: metadata,
+                         revision_comments: params[:revision_comments],
+                         content_blob_uuid: workflow.content_blob.uuid }
 
           assert_redirected_to workflow_path(workflow_id)
 

@@ -395,7 +395,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_response :success
     assert wf = assigns(:workflow)
     refute_nil wf.content_blob
-    assert_equal wf.content_blob.id, session[:uploaded_content_blob_id]
+    assert_select '#content_blob_uuid[value=?]', wf.content_blob.uuid
     assert_equal cwl, wf.workflow_class
   end
 
@@ -428,30 +428,24 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_response :success
     assert wf = assigns(:workflow)
     refute_nil wf.content_blob
-    assert_equal wf.content_blob.id, session[:uploaded_content_blob_id]
     assert_equal cwl, wf.workflow_class
     assert_equal 'new-workflow.basic.crate.zip', wf.content_blob.original_filename
   end
 
   test 'extract metadata' do
     cwl = Factory(:cwl_workflow_class)
-    blob = Factory(:cwl_packed_content_blob)
-    session[:uploaded_content_blob_id] = blob.id.to_s
-    post :metadata_extraction_ajax, params: { content_blob_id: blob.id.to_s, format: 'js', workflow_class_id: cwl.id }
+    post :create_content_blob, params: { content_blobs: [{ data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl', 'text/plain') }], workflow_class_id: cwl.id }
     assert_response :success
-    assert_equal 12, session[:metadata][:internals][:inputs].length
+    assert_equal 12, assigns[:metadata][:internals][:inputs].length
   end
 
   test 'extract metadata from remote should perform inline and cancel remote content fetch job' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'https://www.abc.com/workflow.cwl'
     cwl = Factory(:cwl_workflow_class)
-    blob = Factory(:url_cwl_content_blob)
-    blob.remote_content_fetch_task.start
-    session[:uploaded_content_blob_id] = blob.id.to_s
-    post :metadata_extraction_ajax, params: { content_blob_id: blob.id.to_s, format: 'js', workflow_class_id: cwl.id }
-    assert blob.reload.remote_content_fetch_task.cancelled?
+    post :create_content_blob, params: { content_blobs: [{ data_url: 'https://www.abc.com/workflow.cwl' }], workflow_class_id: cwl.id }
+    assert assigns[:workflow].content_blob.reload.remote_content_fetch_task.cancelled?
     assert_response :success
-    assert_equal 12, session[:metadata][:internals][:inputs].length
+    assert_equal 12, assigns[:metadata][:internals][:inputs].length
   end
 
   test 'missing diagram and no CWL viewer available returns 404' do
@@ -661,7 +655,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     workflow =  {title: 'workflow', project_ids: [person.projects.first.id], discussion_links_attributes:[{url: "http://www.slack.com/", label:'our slack'}]}
     assert_difference('AssetLink.discussion.count') do
       assert_difference('Workflow.count') do
-          post :create_metadata, params: {workflow: workflow, content_blob_id: blob.id.to_s, policy_attributes: { access_type: Policy::VISIBLE }}
+          post :create_metadata, params: {workflow: workflow, content_blob_uuid: blob.uuid.to_s, policy_attributes: { access_type: Policy::VISIBLE }}
       end
     end
     workflow = assigns(:workflow)
@@ -787,7 +781,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     assert_no_difference('ContentBlob.count') do
       assert_difference('Workflow::Version.count') do
-        post :create_version_metadata, params: { id: workflow.id, workflow: workflow_params, content_blob_id: blob.id.to_s }
+        post :create_version_metadata, params: { id: workflow.id, workflow: workflow_params, content_blob_uuid: blob.uuid.to_s }
       end
     end
 
@@ -803,11 +797,9 @@ class WorkflowsControllerTest < ActionController::TestCase
     mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'https://raw.githubusercontent.com/bob/workflow/master/abstract.cwl'
 
     galaxy = Factory(:galaxy_workflow_class)
-    blob = Factory(:fully_remote_ro_crate)
-    session[:uploaded_content_blob_id] = blob.id.to_s
-    post :metadata_extraction_ajax, params: { content_blob_id: blob.id.to_s, format: 'js', workflow_class_id: galaxy.id }
+    post :create_content_blob, params: { content_blobs: [{ data: fixture_file_upload('files/workflows/all_remote.crate.zip', 'application/zip') }], workflow_class_id: galaxy.id }
     assert_response :success
-    assert_equal 12, session[:metadata][:internals][:inputs].length
+    assert_equal 12, assigns[:metadata][:internals][:inputs].length
   end
 
   test 'filter by test status' do
