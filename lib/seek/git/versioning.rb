@@ -22,7 +22,7 @@ module Seek
             after_create :save_git_version_on_create
 
             def is_git_versioned?
-              git_version&.persisted?
+              git_version&.git_repository&.persisted? || !@git_version_attributes.blank?
             end
 
             def git_version
