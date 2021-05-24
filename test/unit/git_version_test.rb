@@ -170,4 +170,18 @@ class GitVersionTest < ActiveSupport::TestCase
     assert v.file_exists?('images/lookatme.png')
     assert_not_equal old_commit, v.commit
   end
+
+  test 'sync attributes' do
+    repo = Factory(:local_repository)
+    workflow = Factory(:workflow, description: 'Test ABC', git_version_attributes: { git_repository_id: repo.id })
+    v = workflow.latest_git_version
+
+    assert_equal 'Test ABC', workflow.description
+    assert_equal 'Test ABC', v.description
+
+    disable_authorization_checks { workflow.update_attribute(:description, 'Test 123') }
+
+    assert_equal 'Test 123', workflow.reload.description
+    assert_equal 'Test 123', v.reload.description
+  end
 end

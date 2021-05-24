@@ -20,6 +20,7 @@ module Seek
             attr_accessor :git_version_attributes
 
             after_create :save_git_version_on_create
+            after_update :sync_resource_attributes
 
             def is_git_versioned?
               git_version&.git_repository&.persisted? || !@git_version_attributes.blank?
@@ -49,6 +50,12 @@ module Seek
               version = self.git_versions.build(@git_version_attributes)
               version.resource_attributes = self.attributes
               version.save
+            end
+
+            def sync_resource_attributes
+              version = latest_git_version
+              return unless version&.mutable?
+              version.update_attribute(:resource_attributes, self.attributes)
             end
 
             def initial_git_version
