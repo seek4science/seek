@@ -8,9 +8,9 @@ module Legacy
     end
 
     def create_ro_crate
-      @crate_builder = Legacy::WorkflowCrateBuilder.new(legacy_ro_crate_params)
-      @crate_builder.workflow_class = @workflow.workflow_class
-      blob_params = @crate_builder.build
+      crate_builder = Legacy::WorkflowCrateBuilder.new(legacy_ro_crate_params)
+      crate_builder.workflow_class = @workflow.workflow_class
+      blob_params = crate_builder.build
       @workflow.build_content_blob(blob_params)
 
       respond_to do |format|

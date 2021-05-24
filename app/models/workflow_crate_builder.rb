@@ -21,12 +21,12 @@ class WorkflowCrateBuilder
       main_workflow_filename = get_filename(main_workflow)
       files = [[main_workflow_filename, main_workflow[:data]]]
       annotations['1'] = { key: 'main_workflow', path: main_workflow_filename }
-      if diagram[:data].present?
+      if diagram && diagram[:data].present?
         diagram_filename = get_filename(diagram)
         files << [diagram_filename, diagram[:data]]
         annotations['2'] = { key: 'diagram', path: diagram_filename }
       end
-      if abstract_cwl[:data].present?
+      if abstract_cwl && abstract_cwl[:data].present?
         abstract_cwl_filename = get_filename(abstract_cwl)
         files << [abstract_cwl_filename, abstract_cwl[:data]]
         annotations['3'] = { key: 'abstract_cwl', path: abstract_cwl_filename }
