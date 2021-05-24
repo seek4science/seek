@@ -19,14 +19,14 @@ $j(document).ready(function () {
                         var annotations = annotationMap[path];
                         if (annotations.length) {
                             node.addClass('git-annotated');
-                            for (var annotation of annotations) {
+                            annotations.forEach(function(annotation) {
                                 var template = HandlebarsTemplates["git/annotations/" + annotation.key] ||
                                     HandlebarsTemplates["git/annotations/default"];
                                 node.append(template(annotation));
-                            }
+                            });
                         }
                     }
-                })
+                });
             }
         }).jstree({
             'plugins': ['wholerow', 'checkbox', 'types', 'conditionalselect'],
