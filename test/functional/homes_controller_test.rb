@@ -18,6 +18,14 @@ class HomesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'rdf and json not acceptable' do
+    get :index, format: :rdf
+    assert_response :not_acceptable
+
+    get :index, format: :json
+    assert_response :not_acceptable
+  end
+
   test 'test title' do
     login_as(:quentin)
     get :index
