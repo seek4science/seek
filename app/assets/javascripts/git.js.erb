@@ -12,8 +12,9 @@ $j(document).ready(function () {
                 annotationMap = JSON.parse($j('script[data-role="seek-git-jstree-annotation-data"]', container).html());
             }
             if (annotationMap) {
-                for (var path of Object.keys(annotationMap)) {
-                    var node = $j(this).jstree(true).get_node(path, true);
+                var tree = $j(this);
+                Object.keys(annotationMap).forEach(function(path) {
+                    var node = tree.jstree(true).get_node(path, true);
                     if (node) {
                         var annotations = annotationMap[path];
                         if (annotations.length) {
@@ -25,7 +26,7 @@ $j(document).ready(function () {
                             }
                         }
                     }
-                }
+                })
             }
         }).jstree({
             'plugins': ['wholerow', 'checkbox', 'types', 'conditionalselect'],
