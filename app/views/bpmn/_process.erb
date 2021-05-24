@@ -3,12 +3,21 @@
 <% link_start = "project-#{project.id}-start" %>
 <startEvent id="<%= link_start %>"/>
 
-<% start_notify = "project-#{project.id}-start-notify" %>
-  <%= render :partial => "bpmn/notify", :locals => {:id => start_notify, :name => "#{project.title}", :assignee => "alan.r.williams@manchester.ac.uk" } -%>
+<% start_sentry = "project-#{project.id}-start-sentry" %>
 
-  <sequenceFlow sourceRef="<%= link_start %>" targetRef="<%= start_notify %>" id="<%= link_start %>-to-<%= start_notify %>"/>
+  <%= render :partial => "bpmn/start_sentry",
+      	     :locals => {:id => start_sentry,
+	     	     	 :name => "#{project.title} Start Sentry",
+			 :pisa_assignee => "alan.r.williams@manchester.ac.uk",
+			 :pisa_type => "Project",
+			 :pisa_name => "#{project.title}",
+			 :pisa_description => "#{project.description}",
+			 :pisa_protocol => "",
+			 :pisa_url => "#{ Seek::Config.site_base_host}#{polymorphic_path(project)}" } -%>
 
-<% link_start = start_notify %>
+  <sequenceFlow sourceRef="<%= link_start %>" targetRef="<%= start_sentry %>" id="<%= link_start %>-to-<%= start_sentry %>"/>
+
+<% link_start = start_sentry %>
 
 <% project.investigations.each do |i| %>
   <%= render :partial => "bpmn/investigation", :locals => { :investigation => i } -%>

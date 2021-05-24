@@ -1,0 +1,10 @@
+    <callActivity id="<%= id %>" name="<%= name %>" calledElement="pisastartsentry" flowable:calledElementType="key" flowable:fallbackToDefaultTenant="false">
+      <extensionElements>
+        <flowable:in sourceExpression="<%= pisa_assignee %>" target="pisa_assignee"></flowable:in>
+        <flowable:in sourceExpression="<%= pisa_type %>" target="pisa_type"></flowable:in>
+        <flowable:in sourceExpression="<%= pisa_name %>" target="pisa_name"></flowable:in>
+        <flowable:in sourceExpression="<%= pisa_description %>" target="pisa_description"></flowable:in>
+        <flowable:in sourceExpression="<%= pisa_protocol %>" target="pisa_protocol"></flowable:in>
+        <flowable:in sourceExpression="<%= pisa_url %>" target="pisa_url"></flowable:in>
+      </extensionElements>
+    </callActivity>
