@@ -70,6 +70,5 @@ class GitRepository < ApplicationRecord
 
   def setup_remote
     git_base.add_remote('origin', remote)
-    queue_fetch
   end
 end
