@@ -82,7 +82,7 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
         // SEEK sample columns
         var seekSampleColumns = [];
         $j('table thead th', selector).each(function (index, column) {
-            if($j(column).data('columnType') == 'SeekSample') {
+            if(['SeekSample','SeekSampleMulti'].includes($j(column).data('columnType'))) {
                 seekSampleColumns.push(index);
             }
         });
@@ -95,6 +95,8 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
                             return '<a href="/samples/' + data.id + '">' + data.title + '</a>';
                         else
                             return '<span class="none_text">' + (data.id || data.title) + '</span>';
+                    }else if (data && Array.isArray(data)){
+                        return $j.map(data, item => '<a href="/samples/' + item.id + '">' + item.title + '</a>').join(", ")
                     } else {
                         return '<span class="none_text">Not specified</span>';
                     }
