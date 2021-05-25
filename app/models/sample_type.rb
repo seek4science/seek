@@ -39,7 +39,8 @@ class SampleType < ApplicationRecord
   validates :title, length: { maximum: 255 }
   validates :description, length: { maximum: 65_535 }
   validates :contributor, presence: true
-  validate :validate_one_title_attribute_present, :validate_attribute_title_unique, :validate_attribute_accessor_names_unique
+  validate :validate_one_title_attribute_present, :validate_attribute_title_unique, :validate_attribute_accessor_names_unique, 
+           :validate_title_is_not_type_of_seek_sample_multi
   validates :projects, presence: true, projects: { self: true }
 
   accepts_nested_attributes_for :sample_attributes, allow_destroy: true
@@ -192,6 +193,14 @@ class SampleType < ApplicationRecord
   def detect_link_back_to_self(sample_attribute)
     if sample_attribute.deferred_link_to_self
       sample_attribute.linked_sample_type = self
+    end
+  end
+
+  def validate_title_is_not_type_of_seek_sample_multi
+    base_type = Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
+    is_title_seek_sample_multi = sample_attributes.find(&:is_title)&.sample_attribute_type&.base_type == base_type
+    if is_title_seek_sample_multi
+      errors.add(:sample_attributes, "Attribute type of #{base_type.underscore.humanize} can not be selected as the sample type title.")
     end
   end
 
