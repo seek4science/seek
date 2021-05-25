@@ -12,6 +12,8 @@ class GitRepository < ApplicationRecord
 
   has_task :remote_git_fetch
 
+  FETCH_SPACING = 15.minutes
+
   def local_path
     File.join(Seek::Config.git_filestore_path, uuid)
   end
@@ -22,6 +24,7 @@ class GitRepository < ApplicationRecord
 
   def fetch
     git_base.remotes['origin'].fetch
+    touch(:last_fetch)
   end
 
   def fetching?
@@ -58,8 +61,12 @@ class GitRepository < ApplicationRecord
     remote.present?
   end
 
-  def queue_fetch
-    RemoteGitFetchJob.perform_later(self) if remote.present?
+  def queue_fetch(force = false)
+    if remote.present?
+      if force || (last_fetch < FETCH_SPACING.ago)
+        RemoteGitFetchJob.perform_later(self)
+      end
+    end
   end
 
   private

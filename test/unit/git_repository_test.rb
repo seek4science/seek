@@ -7,9 +7,8 @@ class GitRepositoryTest < ActiveSupport::TestCase
     assert File.exist?(File.join(repo.local_path, '.git', 'config'))
   end
 
-  test 'fetch remote' do # Remote in this case is a local path, because we don't want to use the network
+  test 'fetch remote' do
     repo = Factory(:remote_repository)
-    # Could use rubyzip for this
     RemoteGitFetchJob.perform_now(repo)
     remote = repo.git_base.remotes.first
 
@@ -18,5 +17,32 @@ class GitRepositoryTest < ActiveSupport::TestCase
     assert File.exist?(File.join(repo.local_path, '.git', 'config'))
   ensure
     FileUtils.rm_rf(repo.remote) if repo
+  end
+
+  test "don't fetch if recently fetched" do
+    repo = Factory(:remote_repository, last_fetch: 5.minutes.ago)
+    assert_no_difference('Task.count') do
+      assert_no_enqueued_jobs(only: RemoteGitFetchJob) do
+        repo.queue_fetch
+      end
+    end
+  end
+
+  test "fetch even if recently fetched with force option set" do
+    repo = Factory(:remote_repository, last_fetch: 5.minutes.ago)
+    assert_difference('Task.count', 1) do
+      assert_enqueued_jobs(1, only: RemoteGitFetchJob) do
+        repo.queue_fetch(true)
+      end
+    end
+  end
+
+  test "fetch if not recently fetched" do
+    repo = Factory(:remote_repository, last_fetch: 30.minutes.ago)
+    assert_difference('Task.count', 1) do
+      assert_enqueued_jobs(1, only: RemoteGitFetchJob) do
+        repo.queue_fetch
+      end
+    end
   end
 end
