@@ -28,11 +28,11 @@
   <script type="text/javascript">
   // Get the value of all tags inputs of type sample_multi as an array and set their sibling hidden input values
    const tagsInputMulti = $j("#sample_attributes input[data-role='seek-objectsinput']")
-    $j("#new_sample").on("submit", e => {
+    $j("form[id*='sample']").on("submit", function(e){
         $j.each(tagsInputMulti, (i,item) => {
           const valuesArray = $j(item).val().split(",");
           $j.each(valuesArray, (j,value) => {
-            $j("#new_sample").append(`<input type='hidden' name='${$j(item).attr('name')}[]' value='${value}'>`)
+            $j(this).append(`<input type='hidden' name='${$j(item).attr('name')}[]' value='${value}'>`)
           })
           $j(item).siblings('input:hidden:first').val(JSON.stringify(valuesArray))
           $j(item).attr('name', '')
