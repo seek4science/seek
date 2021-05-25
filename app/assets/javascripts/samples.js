@@ -96,7 +96,7 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
                         else
                             return '<span class="none_text">' + (data.id || data.title) + '</span>';
                     }else if (data && Array.isArray(data)){
-                        return $j.map(data, item => '<a href="/samples/' + item.id + '">' + item.title + '</a>').join(", ")
+                        return $j.map(data, function(item,i) { return '<a href="/samples/' + item.id + '">' + item.title + '</a>'} ).join(", ")
                     } else {
                         return '<span class="none_text">Not specified</span>';
                     }
