@@ -159,11 +159,26 @@ class GitVersion < ApplicationRecord
     git_base.lookup(commit)
   end
 
+  def set_default_metadata
+    if git_repository.remote?
+      self.name ||= (ref.split('/').last + ((branch? && commit) ? " @ #{commit.first(7)}" : ''))
+      self.comment ||= commit_object&.message
+    end
+  end
+
+  def tag?
+    ref.start_with?('refs/tags')
+  end
+
+  def branch?
+    ref.start_with?('refs/heads') || ref.start_with?('refs/remotes')
+  end
+
   private
 
   def set_version
     self.version = (resource.git_versions.maximum(:version) || 0) + 1
-    self.name ||= "v#{version}"
+    self.name ||= "Version #{version}"
   end
 
   def set_git_info

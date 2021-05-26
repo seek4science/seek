@@ -28,6 +28,22 @@
               <%= render partial: 'workflows/workflow_class_form', locals: { selected: @workflow.workflow_class_id } %>
               <p class="help-block">The type of the above workflow.</p>
             </div>
+
+            <script>
+                // Auto-select workflow class based on file extension.
+                $j(document).ready(function () {
+                    $j('#ro_crate_main_workflow_data').change(function () {
+                        var parts = $j(this).val().split('.');
+                        var ext = parts[parts.length - 1];
+                        $j('#workflow_class_id option').each(function () {
+                            var o = $j(this);
+                            if (o.data('fileExtensions') && o.data('fileExtensions').includes(ext)) {
+                                $j('#workflow_class_id').val(o.val());
+                            }
+                        });
+                    });
+                });
+            </script>
           <% end %>
 
           <%= panel do %>

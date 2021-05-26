@@ -1,41 +1,46 @@
 <h1>New <%= t('workflow') %><%= ' Version' if @workflow.persisted? %></h1>
 
 <%= form_tag(create_from_git_workflows_path) do %>
-  <%= hidden_field_tag :git_repository_id, @workflow.git_version.git_repository.id %>
-  <%= hidden_field_tag :ref, @workflow.git_version.ref %>
-  <%= hidden_field_tag :git_commit, @workflow.git_version.commit %>
   <%= hidden_field_tag :resource_id, @workflow.id %>
 
-  <%= render partial: 'git/path_selector_modal', locals: { tree: @workflow.git_version.tree, id: 'git-path-select-modal' } %>
 
-  <%= panel do %>
-    <div class="form-group">
-      <label class="required">Workflow</label>
-      <p class="help-block">The main executable workflow.</p>
-      <%= git_path_input '#git-path-select-modal', :main_workflow_path, @workflow.git_version.main_workflow_path, class: 'form-control git-path' %>
-    </div>
+  <%= fields_for('workflow[git_version_attributes]', @workflow.git_version) do |f| %>
+    <% if false %>
+      <h2>Version Metadata</h2>
 
-    <div class="form-group">
-      <%= render partial: 'workflows/workflow_class_form', locals: { selected: @workflow.git_version.main_workflow_path ? @workflow.workflow_class&.id : nil } %>
-      <p class="help-block">The type of the above workflow.</p>
-    </div>
+      <% if @workflow.git_version.git_repository.remote? %>
+        <div class="form-group">
+          <label>Git Info</label>
+          <p class="form-control-static">
+            <%= @workflow.git_version.git_repository.remote %><br/>
+            <% unless @workflow.git_version.ref.blank? %>
+              <code><%= git_target_icon(@workflow.git_version.ref) %><%= @workflow.git_version.ref.split('/').last %></code> @
+            <% end %>
+            <code><%= @workflow.git_version.commit&.first(7) %></code>
+          </p>
+        </div>
+      <% end %>
+
+      <div class="form-group">
+        <label>Version Name</label>
+        <%= f.text_field(:name, class: 'form-control') %>
+        <p class="help-block">A name for this version of the workflow.</p>
+      </div>
+
+      <div class="form-group">
+        <label>Version Description</label>
+        <%= f.text_area(:comment, class: 'form-control') %>
+        <p class="help-block">An optional description for this specific version of the workflow.</p>
+      </div>
+    <% end %>
+
+    <%= f.hidden_field :git_repository_id %>
+    <%= f.hidden_field :ref %>
+    <%= f.hidden_field :commit %>
   <% end %>
 
-  <%= panel do %>
-    <div class="form-group">
-      <label>Abstract CWL</label>
-      <p class="help-block">(Optional) The abstract CWL that describes the workflow above.</p>
-      <%= git_path_input '#git-path-select-modal', :abstract_cwl_path, @workflow.git_version.abstract_cwl_path, class: 'form-control git-path' %>
-    </div>
-  <% end %>
-
-  <%= panel do %>
-    <div class="form-group">
-      <label>Diagram</label>
-      <p class="help-block">(Optional) A diagram that illustrates the main workflow.</p>
-      <%= git_path_input '#git-path-select-modal', :diagram_path, @workflow.git_version.diagram_path, class: 'form-control git-path' %>
-    </div>
-  <% end %>
+  <h2>Files</h2>
+  <%= render partial: 'workflows/select_paths', locals: { workflow: @workflow, git_version: @workflow.git_version } %>
 
   <%= submit_tag('Continue', class: 'btn btn-primary') %>
 <% end %>

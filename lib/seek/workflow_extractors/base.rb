@@ -50,6 +50,10 @@ module Seek
       def self.workflow_class
         WorkflowClass.find_by_key(name.demodulize.underscore)
       end
+
+      def self.file_extensions
+        []
+      end
     end
   end
 end

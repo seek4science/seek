@@ -49,4 +49,15 @@ module WorkflowsHelper
       "#{Seek::Config.galaxy_instance_trs_import_url}&trs_id=#{workflow_version.parent.id}&trs_version=#{workflow_version.version}"
     end
   end
+
+  def workflow_class_options_for_select(selected = nil)
+    opts = WorkflowClass.order(:title).map do |c|
+      extra = {}
+      exts = c.extractor_class&.file_extensions
+      extra['data-file-extensions'] = exts.join(' ') if exts.any?
+      [c.title, c.id, extra]
+    end
+
+    options_for_select(opts, selected)
+  end
 end

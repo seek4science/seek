@@ -5,9 +5,7 @@
   <%= f.hidden_field :git_repository_id %>
   <%= f.hidden_field :ref %>
   <%= f.hidden_field :commit %>
-  <%= f.fields_for(:git_annotations) do |ann_f| %>
-    <%= ann_f.hidden_field :path %>
-    <%= ann_f.hidden_field :key %>
-    <%= ann_f.hidden_field :value %>
-  <% end %>
+  <%= f.hidden_field :main_workflow_path %>
+  <%= f.hidden_field :diagram_path %>
+  <%= f.hidden_field :abstract_cwl_path %>
 <% end %>

@@ -83,9 +83,10 @@
     <% if asset.is_git_versioned? -%>
       <% if display_asset.mutable? %>
         <li><%= image_tag_for_key('snapshot', polymorphic_path([asset, :git_freeze_preview], version: display_asset.version), nil, nil, "Freeze version") -%></li>
+      <% else %>
+        <li><%= image_tag_for_key('new', polymorphic_path([:new_git_version, asset]), nil, nil, "New version") -%></li>
       <% end %>
-    <% end %>
-    <% if asset.versioned? -%>
+    <% elsif asset.versioned? -%>
       <li>
         <% if asset.new_version_supported? %>
           <% if asset.is_a?(Workflow) %>

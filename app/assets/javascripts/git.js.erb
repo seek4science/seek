@@ -75,6 +75,7 @@ $j(document).ready(function () {
         var input = modal.data('targetInput');
         var jstree = $j('.jstree', modal).jstree(true);
         input.val(jstree.get_selected());
+        input.change();
         modal.modal('hide');
 
         return false;

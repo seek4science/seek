@@ -221,16 +221,29 @@ module WorkflowExtraction
     url
   end
 
-  def main_workflow_path
-    git_version.find_git_annotation('main_workflow')&.path
-  end
+  [:main_workflow, :diagram, :abstract_cwl].each do |type|
+    s_type = type.to_s
 
-  def diagram_path
-    git_version.find_git_annotation('diagram')&.path
-  end
+    define_method("#{s_type}_annotation") do
+      git_version.find_git_annotation(s_type)
+    end
 
-  def abstract_cwl_path
-    git_version.find_git_annotation('abstract_cwl')&.path
+    define_method("#{s_type}_path") do
+      git_version.send("#{s_type}_annotation")&.path
+    end
+
+    define_method("#{type}_path=") do |path|
+      exist = git_version.send("#{type}_annotation")
+      if path.blank?
+        if exist
+          exist.mark_for_destruction
+        end
+
+        return
+      end
+
+      (exist || git_version.git_annotations.build(key: s_type)).path = path
+    end
   end
 
   private

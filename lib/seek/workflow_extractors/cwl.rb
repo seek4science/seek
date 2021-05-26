@@ -15,6 +15,10 @@ module Seek
 
       available_diagram_formats(png: 'image/png', svg: 'image/svg+xml', default: :svg)
 
+      def self.file_extensions
+        ['cwl']
+      end
+
       def can_render_diagram?
         Seek::Config.cwl_viewer_url.present?
       end

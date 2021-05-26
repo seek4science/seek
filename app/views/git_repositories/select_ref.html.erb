@@ -32,8 +32,9 @@
 <% else %>
   <%= form_tag(polymorphic_path([:create_from_git, params[:resource_type].pluralize.to_sym])) do %>
     <%= hidden_field_tag :resource_id, params[:resource_id] %>
-    <%= hidden_field_tag :git_repository_id, @git_repository.id %>
-    <%= render partial: 'ref_form', locals: { git_repository: @git_repository } %>
+    <%= hidden_field_tag "#{params[:resource_type]}[git_version_attributes][git_repository_id]", @git_repository.id %>
+    <%= render partial: 'ref_form', locals: { name: "#{params[:resource_type]}[git_version_attributes][ref]",
+                                              git_repository: @git_repository } %>
     <%= create_button class: 'btn btn-primary'-%>
   <% end %>
 <% end %>

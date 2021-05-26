@@ -37,14 +37,22 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
     get select_ref_git_repository_path(repo, resource_type: 'workflow') # Should get ref selection page...
     assert_select '#fetching-status', count: 0
 
-    post create_from_git_workflows_path, params: { git_repository_id: repo.id, ref: 'refs/remotes/origin/main' } # Should go to path selection page..
+    post create_from_git_workflows_path, params: {
+        workflow: { git_version_attributes: { git_repository_id: repo.id, ref: 'refs/remotes/origin/main' } } }# Should go to path selection page..
     assert_select 'input[data-role="seek-git-path-input"]', count: 3
     assert_select 'input[name="workflow[title]"]', count: 0
 
-    post create_from_git_workflows_path, params: { git_repository_id: repo.id, ref: 'refs/remotes/origin/main',
-                                        main_workflow_path: 'concat_two_files.ga',
-                                        diagram_path: 'diagram.png',
-                                        workflow_class_id: galaxy.id } # Should go to metadata page...
+    post create_from_git_workflows_path, params: {
+        workflow: {
+            workflow_class_id: galaxy.id,
+            git_version_attributes: {
+                git_repository_id: repo.id, ref: 'refs/remotes/origin/main',
+                main_workflow_path: 'concat_two_files.ga',
+                diagram_path: 'diagram.png',
+                workflow_class_id: galaxy.id
+            }
+        }
+    } # Should go to metadata page...
 
     assert_select 'input[name="workflow[title]"]', count: 1
 
@@ -59,10 +67,8 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
                                                       root_path: '/',
                                                       git_repository_id: repo.id,
                                                       ref: 'refs/remotes/origin/main',
-                                                      git_annotations_attributes: {
-                                                          '0' => { path: 'concat_two_files.ga', key: 'main_workflow' },
-                                                          '1' => { path: 'diagram.png', key: 'diagram' }
-                                                      }
+                                                      main_workflow_path: 'concat_two_files.ga',
+                                                      diagram_path: 'diagram.png'
                                                   }
                                               }
           } # Should go to workflow page...
@@ -124,10 +130,8 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
                       root_path: '/',
                       git_repository_id: repo.id,
                       ref: 'refs/heads/master',
-                      git_annotations_attributes: {
-                          '0' => { path: 'rp2-to-rp2path-packed.cwl', key: 'main_workflow' },
-                          '1' => { path: 'file_picture.png', key: 'diagram' }
-                      }
+                      main_workflow_path: 'rp2-to-rp2path-packed.cwl',
+                      diagram_path: 'file_picture.png'
                   }
               }
           } # Should go to workflow page...
@@ -185,9 +189,7 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
                       root_path: '/',
                       git_repository_id: repo.id,
                       ref: 'refs/heads/master',
-                      git_annotations_attributes: {
-                          '0' => { path: 'main.nf', key: 'main_workflow' }
-                      }
+                      main_workflow_path: 'main.nf'
                   }
               }
           } # Should go to workflow page...

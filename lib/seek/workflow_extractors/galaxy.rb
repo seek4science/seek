@@ -1,6 +1,10 @@
 module Seek
   module WorkflowExtractors
     class Galaxy < Base
+      def self.file_extensions
+        ['ga']
+      end
+
       def metadata
         metadata = super
         galaxy_string = @io.read

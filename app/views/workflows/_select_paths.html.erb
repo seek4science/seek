@@ -1,0 +1,51 @@
+<%= render partial: 'git/path_selector_modal', locals: { tree: git_version.tree, id: 'git-path-select-modal' } %>
+
+<%= panel do %>
+  <div class="form-group">
+    <label class="required">Workflow</label>
+    <p class="help-block">The main executable workflow.</p>
+    <%= git_path_input '#git-path-select-modal', 'workflow[git_version_attributes][main_workflow_path]',
+                       git_version.main_workflow_path, id: 'main-workflow-path-field', class: 'form-control git-path' %>
+  </div>
+
+  <div class="form-group">
+    <%= render partial: 'workflows/workflow_class_form',
+               locals: { name: 'workflow[workflow_class_id]',
+                         selected: git_version.main_workflow_path ? workflow.workflow_class&.id : nil } %>
+    <p class="help-block">The type of the above workflow.</p>
+  </div>
+<% end %>
+
+<%= panel do %>
+  <div class="form-group">
+    <label>Abstract CWL</label>
+    <p class="help-block">(Optional) The abstract CWL that describes the workflow above.</p>
+    <%= git_path_input '#git-path-select-modal', 'workflow[git_version_attributes][abstract_cwl_path]',
+                       git_version.abstract_cwl_path, class: 'form-control git-path' %>
+  </div>
+<% end %>
+
+<%= panel do %>
+  <div class="form-group">
+    <label>Diagram</label>
+    <p class="help-block">(Optional) A diagram that illustrates the main workflow.</p>
+    <%= git_path_input '#git-path-select-modal', 'workflow[git_version_attributes][diagram_path]',
+                       git_version.diagram_path, class: 'form-control git-path' %>
+  </div>
+<% end %>
+
+<script>
+  // Auto-select workflow class based on file extension.
+  $j(document).ready(function () {
+     $j('#main-workflow-path-field').change(function () {
+         var parts = $j(this).val().split('.');
+         var ext = parts[parts.length - 1];
+         $j('#workflow_class_id option').each(function () {
+             var o = $j(this);
+             if (o.data('fileExtensions') && o.data('fileExtensions').includes(ext)) {
+                 $j('#workflow_class_id').val(o.val());
+             }
+         });
+     });
+  });
+</script>

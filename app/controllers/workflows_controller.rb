@@ -109,7 +109,7 @@ class WorkflowsController < ApplicationController
 
   # Takes a remote Git repository and target ref
   def create_from_git
-    wizard = GitWorkflowWizard.new(git_workflow_wizard_params)
+    wizard = GitWorkflowWizard.new(params: workflow_params, id: params[:resource_id])
     @workflow = wizard.run
     respond_to do |format|
       format.html { render wizard.next_step }
@@ -255,7 +255,9 @@ class WorkflowsController < ApplicationController
                                      { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
                                      { publication_ids: [] }, :internals, :maturity_level, :source_link_url,
                                      { discussion_links_attributes: [:id, :url, :label, :_destroy] },
-                                     { git_version_attributes: [:name, :description, :ref, :commit, :root_path, :git_repository_id, git_annotations_attributes: {}] })
+                                     { git_version_attributes: [:name, :description, :ref, :commit, :root_path,
+                                                                :git_repository_id, :main_workflow_path,
+                                                                :abstract_cwl_path, :diagram_path] })
   end
 
   alias_method :asset_params, :workflow_params
@@ -268,9 +270,5 @@ class WorkflowsController < ApplicationController
 
   def ro_crate_extractor_params
     params.permit(ro_crate: [:data, :data_url, :make_local_copy])
-  end
-
-  def git_workflow_wizard_params
-    params.permit(:git_repository_id, :git_commit, :ref, :main_workflow_path, :abstract_cwl_path, :diagram_path, :workflow_class_id, :resource_id)
   end
 end

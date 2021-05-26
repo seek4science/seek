@@ -1,5 +1,6 @@
 <%
   refs = git_repository.remote_refs
+  name ||= 'ref'
 %>
 
 <ul class="nav nav-tabs" role="tablist">
@@ -17,7 +18,7 @@
       <% refs[:branches].map do |ref| %>
         <div class="radio">
           <label>
-            <%= radio_button_tag(:ref, ref[:ref], ref[:default]) -%>
+            <%= radio_button_tag(name, ref[:ref], ref[:default]) -%>
             <%= ref[:name] %>
           </label>
         </div>
@@ -30,7 +31,7 @@
       <% refs[:tags].map do |ref| %>
         <div class="radio">
           <label>
-            <%= radio_button_tag(:ref, ref[:ref]) -%>
+            <%= radio_button_tag(name, ref[:ref]) -%>
             <%= ref[:name] %>
           </label>
         </div>
