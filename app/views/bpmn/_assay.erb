@@ -5,19 +5,50 @@
 
 <% start_sentry = "assay-#{assay.id}-start-sentry" %>
 
+  <%
+	if assay.description.blank?
+     description = "Description withheld"
+     else
+     description = assay.description
+     end
+     if assay.sops.empty?
+       protocol = "No protocol"
+     else
+       protocol = Seek::Config.site_base_host + polymorphic_path(assay.sops[0])
+     end
+     %>
+
   <%= render :partial => "bpmn/start_sentry",
       	     :locals => {:id => start_sentry,
 	     	     	 :name => "#{assay.title} Start Sentry",
 			 :pisa_assignee => "alan.r.williams@manchester.ac.uk",
 			 :pisa_type => "Assay",
 			 :pisa_name => "#{assay.title}",
-			 :pisa_description => "#{assay.description}",
-			 :pisa_protocol => "",
-			 :pisa_url => "#{ Seek::Config.site_base_host}#{polymorphic_path(assay)}" } -%>
+			 :pisa_description => "#{description}",
+			 :pisa_protocol => "#{protocol}",
+			 :pisa_url => "#{ Seek::Config.site_base_host}#{polymorphic_path(assay)}",
+			 :project_id => project_id } -%>
 
   <sequenceFlow sourceRef="<%= link_start %>" targetRef="<%= start_sentry %>" id="<%= link_start %>-to-<%= start_sentry %>"/>
 
 <% link_start = start_sentry %>
+
+<% finish_sentry = "assay-#{assay.id}-finish-sentry" %>
+
+  <%= render :partial => "bpmn/finish_sentry",
+      	     :locals => {:id => finish_sentry,
+	     	     	 :name => "#{assay.title} Finish Sentry",
+			 :pisa_assignee => "alan.r.williams@manchester.ac.uk",
+			 :pisa_type => "Assay",
+			 :pisa_name => "#{assay.title}",
+			 :pisa_description => "#{description}",
+			 :pisa_protocol => "#{protocol}",
+			 :pisa_url => "#{ Seek::Config.site_base_host}#{polymorphic_path(assay)}",
+			 :project_id => project_id} -%>
+
+  <sequenceFlow sourceRef="<%= link_start %>" targetRef="<%= finish_sentry %>" id="<%= link_start %>-to-<%= finish_sentry %>"/>
+
+  <% link_start = finish_sentry %>
 
 <% link_end="assay-#{assay.id}-end" %>
 <endEvent id="<%=link_end %>"/>
