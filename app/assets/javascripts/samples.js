@@ -90,16 +90,18 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
             options["columnDefs"].push({
                 "targets": seekSampleColumns,
                 "render": function (data, type, row) {
-                    if(data && data.id) {
-                        if (data.title)
-                            return '<a href="/samples/' + data.id + '">' + data.title + '</a>';
-                        else
-                            return '<span class="none_text">' + (data.id || data.title) + '</span>';
-                    }else if (data && Array.isArray(data)){
-                        return $j.map(data, function(item,i) { return '<a href="/samples/' + item.id + '">' + item.title + '</a>'} ).join(", ")
-                    } else {
-                        return '<span class="none_text">Not specified</span>';
-                    }
+                    let values = Array.isArray(data) ? data : [data];
+                    let result = $j.map(values, function(value, i) {
+                        if(value && value.id) {
+                            if (value.title)
+                                return '<a href="/samples/' + value.id + '">' + value.title + '</a>';
+                            else
+                                return '<span class="none_text">' + (value.id || value.title) + '</span>';
+                        } else {
+                            return '<span class="none_text">Not specified</span>';
+                        }
+                    })
+                    return result.join(", ")
                 }
             });
         }
