@@ -260,22 +260,26 @@ class WorkflowsController < ApplicationController
                   "workflow-#{@workflow.id}-#{@display_workflow.version}.crate.zip")
   end
 
-  def post_ro_crate
-    extractor = Seek::WorkflowExtractors::ROCrate.new(ro_crate_api_params[:ro_crate])
-    workflow = Workflow.new(extractor.metadata.except(:errors, :warnings))
-    workflow.projects = Project.where(id: ro_crate_api_params[:project_id])
-    crate_upload = ro_crate_api_params[:ro_crate]
-    workflow.build_content_blob(data: crate_upload.data,
-                                original_filename: crate_upload.original_filename,
-                                content_type: crate_upload.content_type)
-    respond_to do |format|
-      format.html do
-        if workflow.save && workflow.content_blob.save
-          head :ok
-        else
-          head :not_found
-        end
+  def create
+    if params[:ro_crate]
+      @workflow = Workflow.new
+      extractor = Seek::WorkflowExtractors::ROCrate.new(params[:ro_crate])
+
+      @workflow.assign_attributes(extractor.metadata.except(:errors, :warnings))
+      @workflow.assign_attributes(workflow_params)
+      crate_upload = params[:ro_crate]
+      @workflow.build_content_blob(data: crate_upload,
+                                   original_filename: crate_upload.original_filename,
+                                   content_type: crate_upload.content_type)
+
+      create_asset(@workflow)
+      if @workflow.save
+        render json: @workflow, include: json_api_include_param
+      else
+        render json: json_api_errors(@workflow), status: :unprocessable_entity
       end
+    else
+      super
     end
   end
 
@@ -303,9 +307,5 @@ class WorkflowsController < ApplicationController
     params.require(:ro_crate).permit({ workflow: [:data, :data_url, :make_local_copy] },
                                      { abstract_cwl: [:data, :data_url, :make_local_copy] },
                                      { diagram: [:data, :data_url, :make_local_copy] })
-  end
-
-  def ro_crate_api_params
-    params.permit(:ro_crate, :project_id)
   end
 end
