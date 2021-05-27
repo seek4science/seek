@@ -15,7 +15,7 @@ class WorkflowCrateBuilder
 
   def build
     if valid?
-      Rails.logger.info("Making new RO Crate")
+      Rails.logger.info("Making new RO-Crate")
       crate = ROCrate::WorkflowCrate.new
       crate.main_workflow = ROCrate::Workflow.new(crate, workflow[:data], get_unique_filename(crate, workflow))
       crate.main_workflow.programming_language = crate.add_contextual_entity(ROCrate::ContextualEntity.new(crate, nil, workflow_class&.ro_crate_metadata || Seek::WorkflowExtractors::Base::NULL_CLASS_METADATA))

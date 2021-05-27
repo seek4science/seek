@@ -29,7 +29,7 @@ class Investigation < ApplicationRecord
     super + ['creators','projects']
   end
   def columns_allowed
-    columns_default+ ['other_creators','deleted_contributor']
+    columns_default+ ['other_creators']
   end
 
   def clone_with_associations

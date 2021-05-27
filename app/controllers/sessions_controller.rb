@@ -44,6 +44,13 @@ class SessionsController < ApplicationController
     password_authentication
   end
 
+  def omniauth_failure
+    flash[:error] = "#{t("login.#{params[:strategy]}")} authentication failure (Invalid username/password?)"
+    respond_to do |format|
+      format.html { render :new }
+    end
+  end
+
   def destroy
     logout_user
     flash[:notice] = 'You have been logged out.'

@@ -63,7 +63,7 @@ module Seek
         elsif content_blob.is_csv?
           return parse_spreadsheet_csv(spreadsheet_csv)
         elsif content_blob.is_tsv?
-          return parse_spreadsheet_csv(spreadsheet_csv, col_sep: "\t")
+          return parse_spreadsheet_csv(spreadsheet_csv, "\t")
         else
           return nil          
         end
@@ -149,9 +149,9 @@ module Seek
         workbook = Workbook.new
 
         if col_sep.nil?
-          csv = CSV.parse(spreadsheet_csv)
+          csv = CSV.parse(spreadsheet_csv, quote_char: "\x00")
         else
-          csv = CSV.parse(spreadsheet_csv, col_sep)
+          csv = CSV.parse(spreadsheet_csv, col_sep: col_sep, quote_char: "\x00")
         end
 
         sheet = Sheet.new('Sheet1')

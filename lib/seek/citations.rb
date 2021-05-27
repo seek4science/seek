@@ -13,8 +13,8 @@ module Seek
     end
 
     def self.style_pairs
-      Rails.cache.fetch('citation-style-pairs') do
-        CSL::Style.list.map { |key| [CSL::Style.load(key).title.truncate(50), key] }.sort_by { |s| s[0] }
+      Rails.cache.fetch("citation-style-pairs") do
+        YAML.load(File.open(style_dictionary_path))
       end
     end
 
@@ -23,6 +23,14 @@ module Seek
         resp = RestClient.get(URI.escape("https://doi.org/#{doi}"), accept: 'application/vnd.citationstyles.csl+json')
         JSON.parse(resp)
       end
+    end
+
+    def self.generate_style_pairs
+      CSL::Style.list.map { |key| [CSL::Style.load(key).title, key] }.sort_by { |s| s[0] }
+    end
+
+    def self.style_dictionary_path
+      Rails.root.join('config/default_data/csl_styles.yml')
     end
   end
 end

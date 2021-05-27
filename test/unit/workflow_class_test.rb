@@ -70,7 +70,7 @@ class WorkflowClassTest < ActiveSupport::TestCase
     assert WorkflowClass.unextractable.include?(un)
   end
 
-  test 'ro crate metadata' do
+  test 'RO-Crate metadata' do
     WorkflowClass.destroy_all
 
     cwl = Factory(:cwl_workflow_class).ro_crate_metadata
