@@ -1,7 +1,7 @@
 module Seek
   module Samples
     module AttributeTypeHandlers
-      class SeekSampleMultiAttributeTypeHandler < SeekResourceAttributeTypeHandler
+      class SeekSampleMultiAttributeTypeHandler < SeekSampleAttributeTypeHandler
         class MissingLinkedSampleTypeException < AttributeHandlerException; end
 
         def type
@@ -17,25 +17,11 @@ module Seek
         end
 
         def convert(value)
-          if value.kind_of?(Array)
-            value.uniq.map {|v| get_conversion v}
-          else
-            if value.include? ','
-              value.split(',').map(&:strip).uniq.map {|v| get_conversion v}
-            else
-              get_conversion value
-            end
-          end
+          value = value.split(',') if value.is_a?(String)
+          value.uniq.map { |v| super(v) }
         end
 
         private
-
-        def get_conversion(value)
-          resource = find_resource(value)
-          hash = { id: resource ? resource.id : value, type: type }.with_indifferent_access
-          hash[:title] = resource.title if resource
-          hash
-        end
 
         def test_value_item(value)
           if additional_options[:required]
