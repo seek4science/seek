@@ -90,8 +90,8 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
             options["columnDefs"].push({
                 "targets": seekSampleColumns,
                 "render": function (data, type, row) {
-                    let values = Array.isArray(data) ? data : [data];
-                    let result = $j.map(values, function(value, i) {
+                    var values = Array.isArray(data) ? data : [data];
+                    var result = $j.map(values, function(value, i) {
                         if(value && value.id) {
                             if (value.title)
                                 return '<a href="/samples/' + value.id + '">' + value.title + '</a>';
