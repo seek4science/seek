@@ -8,17 +8,17 @@ namespace :seek_publ_export do
     include ApplicationHelper
     include Gem::Text
 
-    fileAllPeoples = File.join(Rails.root, 'tmp', Seek::Config.project_name.parameterize.underscore + '_all_peoples.txt')
+    file_all_peoples = File.join(Rails.root, 'tmp', Seek::Config.project_name.parameterize.underscore + '_all_peoples.txt')
 
     all_peoples_hash = Hash.new # to find a matched person
     all_peoples_array = Array.new # to fuzzy-match persons
 
-    fileAllAuthors = File.join(Rails.root, 'tmp', Seek::Config.project_name.parameterize.underscore + '_all_authors.txt')
-    fileAllPubl = File.join(Rails.root, 'tmp', Seek::Config.project_name.parameterize.underscore + '_all_publ.txt')
+    file_all_authors = File.join(Rails.root, 'tmp', Seek::Config.project_name.parameterize.underscore + '_all_authors.txt')
+    file_all_publ = File.join(Rails.root, 'tmp', Seek::Config.project_name.parameterize.underscore + '_all_publ.txt')
 
-    all_authors_report = File.open(fileAllAuthors, 'w')
-    all_publ_report = File.open(fileAllPubl, 'w')
-    all_people_report = File.open(fileAllPeoples, 'w')
+    all_authors_report = File.open(file_all_authors, 'w')
+    all_publ_report = File.open(file_all_publ, 'w')
+    all_people_report = File.open(file_all_peoples, 'w')
 
     file = File.join(Rails.root, 'tmp', Seek::Config.project_name.parameterize.underscore + '_low_score_report.txt')
 
