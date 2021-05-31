@@ -468,29 +468,10 @@ class PublicationsController < ApplicationController
 
   def upload_blob
     if handle_upload_data(true)
-      comments = params[:revision_comments]
-
-      respond_to do |format|
+        comments = params[:revision_comments]
         create_new_version comments
-        format.html { redirect_to @publication }
-      end
     else
       flash[:error]=flash.now[:error]
-      redirect_to @publication
-    end
-  end
-
-  def create_version
-    if handle_upload_data(true)
-      comments = params[:revision_comments]
-
-      respond_to do |format|
-        create_new_version comments
-        format.html { redirect_to @publication }
-      end
-    else
-      flash[:error]=flash.now[:error]
-      redirect_to @publication
     end
   end
 
