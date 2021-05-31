@@ -52,10 +52,6 @@ class AssayTest < ActiveSupport::TestCase
     assert !assays(:metabolomics_assay).is_asset?
   end
 
-  test 'sort by updated_at' do
-    assert_equal Assay.all.sort_by { |a| a.updated_at.to_i * -1 }, Assay.all
-  end
-
   test 'authorization supported?' do
     assert Assay.authorization_supported?
     assert assays(:metabolomics_assay).authorization_supported?
