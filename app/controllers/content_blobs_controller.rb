@@ -67,37 +67,6 @@ class ContentBlobsController < ApplicationController
       format.csv { csv_data }
     end
   end
-=begin
-
-  def examine_url
-    # check content type and size
-    url = params[:data_url]
-    keep_title = !params['keep_title'].nil?
-
-    begin
-      uri = URI(url)
-      case scheme = uri.scheme
-      when 'ftp'
-        handler = Seek::DownloadHandling::FTPHandler.new(url)
-        info = handler.info
-        handle_good_ftp_response(url, info)
-      when 'http', 'https', nil
-        handler = Seek::DownloadHandling::HTTPHandler.new(url)
-        info = handler.info
-        if info[:code] == 200
-          handle_good_http_response(url, info, keep_title)
-        else
-          handle_bad_http_response(info[:code])
-        end
-      else
-        @warning = true
-        @warning_msg = "Unhandled URL scheme: #{scheme}. The given URL will be presented as a clickable link."
-      end
-    rescue Exception => e
-      handle_exception_response(e)
-    end
-  end
-=end
 
   def get_pdf
     if @content_blob.file_exists?
@@ -127,16 +96,6 @@ class ContentBlobsController < ApplicationController
         format.pdf { get_pdf }
         format.json { handle_download(disposition, image_size) }
       end
-    end
-  end
-
-  def destroy
-    warn("Trying to destroy")
-    respond_to do |format|
-      @content_blob = ContentBlob.find(params[:id])
-      @asset = @content_blob.asset
-      flash[:error]="Unable to delete this file" if !@content_blob.destroy
-      format.html { redirect_to @asset }
     end
   end
 
@@ -253,10 +212,7 @@ class ContentBlobsController < ApplicationController
   end
 
   def set_asset_version
-    if  !@content_blob.asset.versioned?
-      @asset_version = @content_blob.asset
-      return true # no version
-    elsif @content_blob.asset_version
+    if @content_blob.asset_version
       begin
         @asset_version = @content_blob.asset.find_version(@content_blob.asset_version)
       rescue Exception => e

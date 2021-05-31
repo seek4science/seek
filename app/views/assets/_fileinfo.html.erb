@@ -10,7 +10,7 @@
           %>
           <%= link_to link_text, fileinfo.url, :target => "_blank" -%>
           <% if (controller_name.eql? "publications") %>
-            <%= mini_file_delete_icon(fileinfo,current_user) %>
+            <%= mini_file_soft_delete_icon(fileinfo,current_user) %>
           <% end -%>
         </p>
       <% end -%>
@@ -28,7 +28,7 @@
           <%= render :partial => "assets/view_content", :locals => { :content_blob => fileinfo, :icon_view => true } -%>
             <%= mini_file_download_icon(fileinfo) %>
             <% if (controller_name.eql? "publications") %>
-              <%= mini_file_delete_icon(fileinfo,current_user) %>
+              <%= mini_file_soft_delete_icon(fileinfo,current_user) %>
             <% end -%>
         <% end %>
       </span>

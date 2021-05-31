@@ -38,7 +38,13 @@ class Publication < ApplicationRecord
   has_many :publication_authors, dependent: :destroy, autosave: true
   has_many :people, through: :publication_authors
 
-  has_one :content_blob, as: :asset, foreign_key: :asset_id
+  has_one :content_blob, ->(r) { where('content_blobs.asset_version =?', r.version) }, as: :asset, foreign_key: :asset_id
+
+  explicit_versioning(:version_column => "version") do
+    acts_as_versioned_resource
+    has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND content_blobs.asset_type =?', r.version, r.parent.class.name) },
+            :primary_key => :publication_id,:foreign_key => :asset_id
+  end
 
   belongs_to :publication_type
 
@@ -155,6 +161,10 @@ class Publication < ApplicationRecord
   end
 
   def contributor_credited?
+    false
+  end
+
+  def is_in_isa_publishable?
     false
   end
 
@@ -536,6 +546,12 @@ class Publication < ApplicationRecord
 
   def latest_citable_resource
     self
+  end
+
+  def can_soft_delete_full_text?(user = User.current_user)
+    return false if user.nil? || user.person.nil? || !Seek::Config.allow_publications_fulltext
+    return true if user.is_admin?
+    contributor == user.person || projects.detect { |project| project.can_manage?(user) }.present?
   end
 
   private

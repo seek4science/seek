@@ -11,16 +11,6 @@ module Seek
 
       attr_reader :url
 
-      @keep_title = false
-
-      def set_keep_title(keep_title)
-        @keep_title = keep_title
-      end
-
-      def does_keep_title
-        @keep_title
-      end
-
       def initialize(url, fallback_to_get: true)
         @url = url
         @fallback_to_get = fallback_to_get

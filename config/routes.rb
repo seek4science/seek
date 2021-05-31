@@ -563,6 +563,7 @@ SEEK::Application.routes.draw do
       get :manage
       get :download
       get :upload_fulltext
+      get :soft_delete_fulltext
       post :update_annotations_ajax
       post :disassociate_authors
       post :update_metadata

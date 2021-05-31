@@ -9,7 +9,7 @@ class PublicationsController < ApplicationController
 
   before_action :publications_enabled?
   before_action :find_assets, only: [:index]
-  before_action :find_and_authorize_requested_item, only: %i[show edit manage update destroy download upload_fulltext upload_pdf]
+  before_action :find_and_authorize_requested_item, only: %i[show edit manage update destroy download upload_fulltext upload_pdf soft_delete_fulltext]
   before_action :suggest_authors, only: [:manage]
   before_action :find_display_asset, :only=>[:show, :download]
 
@@ -133,20 +133,38 @@ class PublicationsController < ApplicationController
   def upload_pdf
     update_sharing_policies @publication
 
-    if handle_upload_data && @publication.content_blob.save && @publication.save # should be true if nothing needed to be uploaded
+    if handle_upload_data(true)
+      comments = params[:revision_comments]
+
       respond_to do |format|
-        flash[:notice] = 'Pdf was successfully uploaded.'
-        format.html { redirect_to(@publication) }
-        format.xml  { head :ok }
-        format.json { render json: @publication, status: :ok, include: [params[:include]]}
+        create_new_version comments
+        format.html { redirect_to @publication }
       end
     else
+      flash[:error]=flash.now[:error]
+      redirect_to @publication
+    end
+  end
+
+  def create_new_version comments
+    if @publication.save_as_new_version(comments)
+      flash[:notice]="New full text uploaded #{@publication.version}"
+    else
+      flash[:error]="Unable to save new fulltext"
+    end
+  end
+
+  def soft_delete_fulltext
+    # replace this version as a new empty version
+    if @publication.can_soft_delete_full_text?
+      # create an empty version
       respond_to do |format|
-        flash[:error] = 'The document could not be uploaded.'
-        format.html { render action: 'edit' }
-        format.xml  { render xml: @publication.errors, status: :unprocessable_entity }
-        format.json { render json: @publication.errors, status: :unprocessable_entity }
+        create_new_version 'Soft delete'
+        format.html { redirect_to @publication }
       end
+    else
+      flash[:error]=flash.now[:error]
+      redirect_to @publication
     end
   end
 
@@ -353,8 +371,7 @@ class PublicationsController < ApplicationController
 
   def publication_params
     params.require(:publication).permit(:publication_type_id, :pubmed_id, :doi, :parent_name, :abstract, :title, :journal, :citation,:url,:editor,
-                                        :published_date, :bibtex_file, :registered_mode, :publisher, :booktitle, :keep_title,
-                                        { project_ids: [] }, { event_ids: [] }, { model_ids: [] },
+                                        :published_date, :bibtex_file, :registered_mode, :publisher, :booktitle, { project_ids: [] }, { event_ids: [] }, { model_ids: [] },
                                         { investigation_ids: [] }, { study_ids: [] }, { assay_ids: [] }, { presentation_ids: [] },
                                         { data_file_ids: [] }, { scales: [] }, { human_disease_ids: [] },
                                         { publication_authors_attributes: [:person_id, :id, :first_name, :last_name ] }).tap do |pub_params|
@@ -450,7 +467,31 @@ class PublicationsController < ApplicationController
   end
 
   def upload_blob
-    return handle_upload_data && @publication.content_blob.save
+    if handle_upload_data(true)
+      comments = params[:revision_comments]
+
+      respond_to do |format|
+        create_new_version comments
+        format.html { redirect_to @publication }
+      end
+    else
+      flash[:error]=flash.now[:error]
+      redirect_to @publication
+    end
+  end
+
+  def create_version
+    if handle_upload_data(true)
+      comments = params[:revision_comments]
+
+      respond_to do |format|
+        create_new_version comments
+        format.html { redirect_to @publication }
+      end
+    else
+      flash[:error]=flash.now[:error]
+      redirect_to @publication
+    end
   end
 
   # create a publication from a reference file, at the moment supports only bibtex
