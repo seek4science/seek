@@ -4,7 +4,7 @@ module CustomMetadataHelper
   def custom_metadata_form_field_for_attribute(attribute, resource)
     base_type = attribute.sample_attribute_type.base_type
     clz = "custom_metadata_attribute_#{base_type.downcase}"
-    element_name = "#{resource.class.name.parameterize}[custom_metadata_attributes][data][#{attribute.title}]"
+    element_name = "#{resource.class.name.underscore}[custom_metadata_attributes][data][#{attribute.title}]"
     value = resource.custom_metadata.try(:get_attribute_value,attribute.title)
     placeholder = "e.g. #{attribute.sample_attribute_type.placeholder}" unless attribute.sample_attribute_type.placeholder.blank?
 
