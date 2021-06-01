@@ -57,10 +57,6 @@ class Sample < ApplicationRecord
     User.logged_in_and_member? && Seek::Config.samples_enabled
   end
 
-  def self.user_creatable?
-    true
-  end
-
   def related_data_file
     originating_data_file
   end

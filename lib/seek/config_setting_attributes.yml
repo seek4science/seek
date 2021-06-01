@@ -190,6 +190,7 @@ results_per_page_default_condensed:
 results_per_page:
 cwl_viewer_url:
 # Types enabled
+data_files_enabled:
 documents_enabled:
 events_enabled:
 isa_enabled:
@@ -197,8 +198,10 @@ models_enabled:
 organisms_enabled:
 programmes_enabled:
 managed_programme_id:
+presentations_enabled:
 publications_enabled:
 samples_enabled:
+sops_enabled:
 workflows_enabled:
 collections_enabled:
 # Omniauth

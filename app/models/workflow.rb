@@ -73,10 +73,6 @@ class Workflow < ApplicationRecord
     workflow_class&.extractor&.present? ? "#{workflow_class.key.downcase}_workflow" : 'workflow'
   end
 
-  def self.user_creatable?
-    Seek::Config.workflows_enabled
-  end
-
   def contributor_credited?
     false
   end

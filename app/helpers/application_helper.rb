@@ -495,6 +495,19 @@ module ApplicationHelper
     return Seek::Config.programmes_enabled && Programme.site_managed_programme
   end
 
+  def render_menu_group(title, options)
+    return unless options.any? { |opt_title, url, enabled| enabled }
+    html = content_tag(:li, title, role: 'presentation', class: 'dropdown-header')
+    options.each do |opt_title, url, enabled|
+      next unless enabled
+      html += content_tag(:li) do
+        link_to(opt_title, url)
+      end
+    end
+
+    html
+  end
+
   PAGE_TITLES = { 'home' => 'Home', 'projects' => I18n.t('project').pluralize, 'institutions' => I18n.t('institution').pluralize,
                   'people' => 'People', 'sessions' => 'Login', 'users' => { 'new' => 'Signup', '*' => 'Account' }, 'search' => 'Search',
                   'assays' => I18n.t('assays.assay').pluralize.capitalize, 'sops' => I18n.t('sop').pluralize, 'models' => I18n.t('model').pluralize, 'data_files' => I18n.t('data_file').pluralize, 'documents' => 'Documents',

@@ -631,7 +631,6 @@ class Publication < ApplicationRecord
     pub_url
   end
 
-  # defines that this is a user_creatable object type, and appears in the "New Object" gadget
   def self.user_creatable?
     Seek::Config.publications_enabled
   end
