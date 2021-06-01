@@ -514,37 +514,67 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test "alert for pending project creation" do
-  project = Project.new(title: "my project")
-  person = Factory(:person)
-  prog_admin = Factory(:programme_administrator)
-  programme = prog_admin.programmes.first
-  institution = Factory(:institution)
+    project = Project.new(title: "my project")
+    person = Factory(:person)
+    prog_admin = Factory(:programme_administrator)
+    programme = prog_admin.programmes.first
+    institution = Factory(:institution)
 
-  MessageLog.destroy_all
+    MessageLog.destroy_all
 
-  login_as(prog_admin)
+    login_as(prog_admin)
 
-  get :index
-  assert_select "div#pending-project-creation-warning", text: /There are pending/, count: 0
+    get :index
+    assert_select "div#pending-project-creation-warning", text: /There are pending/, count: 0
 
-  log1 = MessageLog.log_project_creation_request(person, programme, project, institution)
+    log1 = MessageLog.log_project_creation_request(person, programme, project, institution)
 
-  get :index
-  assert_select "div#pending-project-creation-warning", text: /There are pending/, count: 1
+    get :index
+    assert_select "div#pending-project-creation-warning", text: /There are pending/, count: 1
 
-  login_as(Factory(:person))
+    login_as(Factory(:person))
 
-  get :index
-  assert_select "div#pending-project-creation-warning", text: /There are pending/, count: 0
+    get :index
+    assert_select "div#pending-project-creation-warning", text: /There are pending/, count: 0
 
-  login_as(prog_admin)
-  get :index
-  assert_select "div#pending-project-creation-warning", text: /There are pending/, count: 1
+    login_as(prog_admin)
+    get :index
+    assert_select "div#pending-project-creation-warning", text: /There are pending/, count: 1
 
-  log1.respond("fish")
-  get :index
-  assert_select "div#pending-project-creation-warning", text: /There are pending/, count: 0
-end
+    log1.respond("fish")
+    get :index
+    assert_select "div#pending-project-creation-warning", text: /There are pending/, count: 0
+  end
+
+  test 'can disable tag cloud' do
+    with_config_value :tagging_enabled, true do
+      with_config_value :tag_cloud_enabled, false do
+        get :index
+        assert_select 'div#sidebar_tag_cloud', count: 0
+      end
+    end
+  end
+
+  test 'can show workflow class list' do
+    WorkflowClass.delete_all
+    Factory(:galaxy_workflow_class)
+    Factory(:cwl_workflow_class)
+    p = Factory(:person)
+    disable_authorization_checks do
+      WorkflowClass.create!(title: 'bla', contributor: p)
+      WorkflowClass.create!(title: 'bla2', contributor: p)
+    end
+
+    with_config_value :workflows_enabled, true do
+      with_config_value :workflow_class_list_enabled, true do
+        get :index
+
+        assert_select '#workflow-class-list', count: 1
+        assert_select '#workflow-class-list ul li', count: 2
+        assert_select '#workflow-class-list a[href=?]', workflow_classes_path, text: '...and 2 others'
+      end
+    end
+  end
 
   def uri_to_guardian_feedtest
     uri_to_feed 'guardian_atom.xml'

@@ -195,8 +195,9 @@ def load_seek_config_defaults!
   Seek::Config.default :news_feed_urls,''
   Seek::Config.default :news_number_of_entries,10
   Seek::Config.default :recent_contributions_number_of_entries, 20
-
   Seek::Config.default :front_page_buttons_enabled, false
+  Seek::Config.default :tag_cloud_enabled,true
+  Seek::Config.default :workflow_class_list_enabled,false
 
   # omniauth settings and behaviour
   Seek::Config.default :omniauth_enabled, false

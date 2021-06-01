@@ -229,3 +229,5 @@ galaxy_instance_trs_import_url:
 # Controlled vocabs
 cv_dropdown_limit:
   convert: :to_i
+tag_cloud_enabled:
+workflow_class_list_enabled:
