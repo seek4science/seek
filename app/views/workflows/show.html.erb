@@ -13,6 +13,8 @@
     </div>
   <% end %>
   <div class="col-md-9 col-sm-8 box_about_actor">
+    <strong><%= WorkflowClass.model_name.human %>: </strong> <%= @display_workflow.workflow_class_title -%>
+
     <div style="margin-bottom: 5px;">
       <% if @display_workflow.maturity_level %>
         <%= maturity_badge(@display_workflow.maturity_level) %>
