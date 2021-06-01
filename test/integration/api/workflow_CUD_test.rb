@@ -80,13 +80,31 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
           }
       }
 
-      pp @response
-      pp @response.body
-      pp @response.headers
-
       assert_response :success
       assert_equal 'Nextflow', assigns(:workflow).workflow_class.title
       assert_equal 'nf-core/ampliseq', assigns(:workflow).title
+    end
+  end
+
+  test 'can post RO crate as new version' do
+    Factory(:nextflow_workflow_class)
+    workflow = Factory(:workflow, policy: Factory(:public_policy), contributor: @current_person)
+
+    assert_no_difference('Workflow.count', 1) do
+      assert_difference('Workflow::Version.count', 1) do
+        post create_version_workflow_path(workflow.id), params: {
+            ro_crate: fixture_file_upload('files/workflows/ro-crate-nf-core-ampliseq.crate.zip'),
+            workflow: {
+                project_ids: [@project.id]
+            },
+            revision_comments: 'new ver'
+        }
+
+        assert_response :success
+        assert_equal 2, assigns(:workflow).version
+        assert_equal 'Nextflow', assigns(:workflow).workflow_class.title
+        assert_equal 'nf-core/ampliseq', assigns(:workflow).title
+      end
     end
   end
 
