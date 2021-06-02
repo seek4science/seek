@@ -1757,19 +1757,43 @@ class ProjectsControllerTest < ActionController::TestCase
 
   test 'guided create with administered programmes' do
     person = Factory(:programme_administrator)
-    prog = Factory(:programme, title:'THE MANAGED ONE')
+    managed_prog = Factory(:programme, title:'THE MANAGED ONE')
     person_prog = person.programmes.first
     another_prog = Factory(:programme)
     login_as(person)
-    with_config_value(:managed_programme_id, prog.id) do
+    with_config_value(:managed_programme_id, managed_prog.id) do
       get :guided_create
     end
     assert_response :success
     assert_select 'input#managed_programme', count:0
     assert_select 'select#programme_id' do
       assert_select 'option',count:2
-      assert_select 'option',value:prog.id,text:prog.title
+      assert_select 'option',value:managed_prog.id,text:managed_prog.title
       assert_select 'option',value:person_prog.id,text:person_prog.title
+      assert_select 'option',value:another_prog.id,text:another_prog.title, count:0
+    end
+  end
+
+  test 'guided create with administered programmes as admin' do
+    person = Factory(:programme_administrator)
+    managed_prog = Factory(:programme, title:'THE MANAGED ONE')
+    person_prog = person.programmes.first
+    another_prog = Factory(:programme)
+    admin = Factory(:admin)
+    admin_prog = Factory(:programme)
+    admin.is_programme_administrator = true, admin_prog
+    admin.save!
+    login_as(admin)
+    with_config_value(:managed_programme_id, managed_prog.id) do
+      get :guided_create
+    end
+    assert_response :success
+    assert_select 'input#managed_programme', count:0
+    assert_select 'select#programme_id' do
+      assert_select 'option',count:2      
+      assert_select 'option',value:managed_prog.id,text:managed_prog.title
+      assert_select 'option',value:admin_prog.id,text:admin_prog.title
+      assert_select 'option',value:person_prog.id,text:person_prog.title, count:0
       assert_select 'option',value:another_prog.id,text:another_prog.title, count:0
     end
   end
