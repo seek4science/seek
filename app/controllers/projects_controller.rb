@@ -474,19 +474,10 @@ class ProjectsController < ApplicationController
                   "description" => app_hash['description'],
                   "editorJson" => nil
                  }
-    stringio = Zip::OutputStream.write_buffer do |zio|
-      zio.put_next_entry("#{app_hash['name']}.json")
-      zio.write JSON.pretty_generate(app_hash)
-      zio.put_next_entry("bpmn_models/#{model_name}.bpmn")
-      zio.write render_to_string(
+    bpmn_string = render_to_string(
       "bpmn/convert.erb", locals: { :id => model_id, :name => model_name, :project => @project}, layout: false
                 )
-      zio.put_next_entry("bpmn_models/#{model_name}.json")
-      zio.write JSON.pretty_generate(model_hash)
-    end
-    stringio.rewind
-    binary_data = stringio.sysread
-    send_data binary_data, filename: "#{app_hash['name']}.zip", type: 'application/octet-stream', disposition: 'attachment'
+    send_data bpmn_string, filename: "#{model_name}.bpmn", type: 'application/xml', disposition: 'attachment'
   end
   
   # returns a list of institutions for a project in JSON format
