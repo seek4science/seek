@@ -1125,14 +1125,14 @@ ActiveRecord::Schema.define(version: 2021_06_03_135200) do
 
   create_table "observed_variable_sets",  force: :cascade do |t|
     t.string "title"
-    t.string "contributor_id"
+    t.integer "contributor_id"
     t.string "project_ids"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
   create_table "observed_variables",  force: :cascade do |t|
-    t.string "observed_variable_set_id"
+    t.integer "observed_variable_set_id"
     t.string "variable_id"
     t.string "variable_name"
     t.string "variable_an"
@@ -1144,7 +1144,7 @@ ActiveRecord::Schema.define(version: 2021_06_03_135200) do
     t.string "trait_attribute_an"
     t.string "method"
     t.string "method_an"
-    t.string "method_description"
+    t.text "method_description"
     t.string "method_reference"
     t.string "scale"
     t.string "scale_an"

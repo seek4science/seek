@@ -1,7 +1,7 @@
 class CreateObservedVariables < ActiveRecord::Migration[5.2]
   def change
     create_table :observed_variables do |t|
-      t.string :observed_variable_set_id
+      t.integer :observed_variable_set_id
       t.string :variable_id
       t.string :variable_name
       t.string :variable_an
@@ -13,7 +13,7 @@ class CreateObservedVariables < ActiveRecord::Migration[5.2]
       t.string :trait_attribute_an
       t.string :method
       t.string :method_an
-      t.string :method_description
+      t.text :method_description
       t.string :method_reference
       t.string :scale
       t.string :scale_an
