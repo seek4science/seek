@@ -17,25 +17,24 @@ class WorkflowCrateBuilder
     @workflow = Workflow.new(workflow_class: workflow_class)
 
     if valid?
-      annotations = {}
+      gv = @workflow.git_version
       main_workflow_filename = get_filename(main_workflow)
       files = [[main_workflow_filename, main_workflow[:data]]]
-      annotations['1'] = { key: 'main_workflow', path: main_workflow_filename }
+      gv.main_workflow_path = main_workflow_filename
       if diagram && diagram[:data].present?
         diagram_filename = get_filename(diagram)
         files << [diagram_filename, diagram[:data]]
-        annotations['2'] = { key: 'diagram', path: diagram_filename }
+        gv.diagram_path = diagram_filename
       end
       if abstract_cwl && abstract_cwl[:data].present?
         abstract_cwl_filename = get_filename(abstract_cwl)
         files << [abstract_cwl_filename, abstract_cwl[:data]]
-        annotations['3'] = { key: 'abstract_cwl', path: abstract_cwl_filename }
+        gv.abstract_cwl_path = abstract_cwl_filename
       end
       repo = GitRepository.create!
       @workflow.local_git_repository = repo
-      @workflow.git_version.git_repository = repo
-      @workflow.git_version.git_annotations_attributes = annotations
-      @workflow.git_version.add_files(files)
+      gv.git_repository = repo
+      gv.add_files(files)
 
       extractor = @workflow.extractor
       @workflow.provide_metadata(extractor.metadata)

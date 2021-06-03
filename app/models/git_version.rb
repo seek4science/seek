@@ -7,7 +7,7 @@ class GitVersion < ApplicationRecord
   belongs_to :resource, polymorphic: true
   belongs_to :contributor, class_name: 'Person'
   belongs_to :git_repository
-  has_many :git_annotations
+  has_many :git_annotations, inverse_of: :git_version
 
   before_create :set_version
   before_validation :set_git_info, on: :create

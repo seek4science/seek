@@ -21,3 +21,12 @@ Factory.define(:remote_repository, parent: :unfetched_remote_repository) do |f|
   end
 end
 
+# GitVersions
+Factory.define(:git_version, class: GitVersion) do |f|
+  f.git_repository { Factory(:local_repository) }
+  f.resource { self.git_repository.resource }
+  f.name 'version 1.0.0'
+  f.ref 'refs/heads/master'
+  f.mutable true
+end
+

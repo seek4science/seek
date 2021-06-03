@@ -17,19 +17,18 @@ class WorkflowCrateExtractor
 
     if valid?
       crate = ROCrate::WorkflowCrateReader.read_zip(ro_crate[:data].tempfile)
-      annotations = {}
-      annotations['1'] = { key: 'main_workflow', path: crate.main_workflow.id } if crate.main_workflow && !crate.main_workflow.remote?
-      annotations['2'] = { key: 'diagram', path: crate.main_workflow.diagram.id } if crate.main_workflow&.diagram && !crate.main_workflow.diagram.remote?
-      annotations['3'] = { key: 'abstract_cwl', path: crate.main_workflow.cwl_description.id } if crate.main_workflow&.cwl_description && !crate.main_workflow.diagram.remote?
       repo = GitRepository.create!
-      @workflow.git_version.git_repository = repo
-      @workflow.git_version.git_annotations_attributes = annotations
+      gv = @workflow.git_version
+      gv.git_repository = repo
+      gv.main_workflow_path = crate.main_workflow.id if crate.main_workflow && !crate.main_workflow.remote?
+      gv.diagram_path = crate.main_workflow.diagram.id if crate.main_workflow&.diagram && !crate.main_workflow.diagram.remote?
+      gv.abstract_cwl_path = crate.main_workflow.cwl_description.id if crate.main_workflow&.cwl_description && !crate.main_workflow.diagram.remote?
       files = []
       crate.entries.each do |path, entry|
         next if entry.directory?
         files << [path, entry.source]
       end
-      @workflow.git_version.add_files(files)
+      gv.add_files(files)
 
       extractor = @workflow.extractor
       @workflow.provide_metadata(extractor.metadata)

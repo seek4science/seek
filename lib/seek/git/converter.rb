@@ -56,11 +56,9 @@ module Seek
           diagram_path = crate.main_workflow&.diagram&.id
           abstract_cwl_path = crate.main_workflow&.cwl_description&.id
 
-          annotations_attributes = {}
-          annotations_attributes['1'] = { key: 'main_workflow', path: main_workflow_path } unless main_workflow_path.blank?
-          annotations_attributes['2'] = { key: 'diagram', path: diagram_path } unless diagram_path.blank?
-          annotations_attributes['3'] = { key: 'abstract_cwl', path: abstract_cwl_path } unless abstract_cwl_path.blank?
-          git_version.git_annotations_attributes = annotations_attributes
+          git_version.main_workflow_path = main_workflow_path unless main_workflow_path.blank?
+          git_version.diagram_path = diagram_path unless diagram_path.blank?
+          git_version.abstract_cwl_path = abstract_cwl_path unless abstract_cwl_path.blank?
         end
       end
     end
