@@ -1,0 +1,8 @@
+<tr>
+  <td><%= item_type %></td>
+  <td><%= link_to(item.title.truncate(40), item) %></td>
+  <td><%= item.assignee.nil? ? '' : link_to(item.assignee.name, item.assignee) -%></td>
+  <td><%= item.status.presence || '' -%></td>
+  <td><%= item.started_at || '' -%></td>
+  <td><%= item.finished_at || '' -%></td>
+</tr>

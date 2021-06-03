@@ -27,7 +27,7 @@ class ProjectsController < ApplicationController
   before_action :is_user_admin_auth, only: %i[manage destroy]
   before_action :editable_by_user, only: %i[edit update]
   before_action :check_investigations_are_for_this_project, only: %i[update]
-  before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles update_members storage_report administer_join_request respond_join_request]
+  before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles update_members storage_report administer_join_request respond_join_request populate populate_from_spreadsheet bpmn bpmn_report]
 
   before_action :member_of_this_project, only: [:asset_report], unless: :admin_logged_in?
 
@@ -266,6 +266,16 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def bpmn_report
+    project = Project.find(params[:id])
+    project.status = :running
+    project.started_at = Time.new(2021,1)
+    project.finished_at = Time.now
+    respond_to do |format|
+      format.html { render template: 'bpmn/report', locals: { :project => project}}
+    end
+  end
+  
   # GET /projects/1
   # GET /projects/1.xml
   def show

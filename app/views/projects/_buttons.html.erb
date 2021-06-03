@@ -43,6 +43,7 @@
     <% end -%>
     <% if Seek::Config.bpmn_enabled -%>
       <li><%= image_tag_for_key('flowable', bpmn_project_path(item), "Generate BPMN", nil, "Generate BPMN") -%></li>
+      <li><%= image_tag_for_key('report', bpmn_report_project_path(item), "BPMN", nil, "BPMN report") -%></li>
     <% end -%>
     <% if item.investigations.size > 1 %>
       <li><%= image_tag_for_key('order', order_investigations_project_path(item), "Order investigations", nil, "Order investigations") -%></li>
