@@ -6,6 +6,7 @@
     <%= button_link_to("Simulate #{t('model')} on JWS", 'execute',
                        simulate_model_path(item, :version => @display_model.version, :code => params[:code]), :method=>:post,:title => "Simulate #{t('model')} on JWS") %>
 <% end %>
+
 <% if Seek::Config.sycamore_enabled && @display_model.contains_sbml? %>
     <% excutable_content_blob =  @display_model.content_blobs.detect{|cb| cb.is_sbml?}
        if excutable_content_blob.is_in_simulatable_size_limit? && can_download_asset?(@model, params[:code]) -%>
@@ -14,14 +15,6 @@
             <%= hidden_field_tag 'sender', 'seek' -%>
             <%= button_link_to "Simulate #{t('model')} on Sycamore", 'execute', url_for(:action => 'submit_to_sycamore', :id => @model.id, :version => @display_model.version), :remote => true, :method => :post -%>
         <% end -%>
-    <% end -%>
-<% end %>
-
-<% if cytoscapeweb_supported?(@display_model) %>
-    <% if can_download_asset?(item, params[:code]) -%>
-        <%= button_link_to("Visualize", 'cytoscape_web',
-                           visualise_model_path(item, :version => @display_model.version, :code => params[:code]),
-                           :target => :_blank, :title => "Visualise #{t('model')} with Cytoscape Web") %>
     <% end -%>
 <% end %>
 

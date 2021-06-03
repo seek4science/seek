@@ -903,29 +903,6 @@ class ModelsControllerTest < ActionController::TestCase
     assert_select 'p.list_item_attribute', text: /, another creator/, count: 1
   end
 
-  test 'should display cytoscape button for supported models' do
-    model = Factory :xgmml_model
-    login_as(model.contributor)
-    get :show, params: { id: model.id }
-    assert_response :success
-    assert_select 'a[href=?]', visualise_model_path(model, version: model.version), text: 'Visualize'
-  end
-
-  test 'should not display cytoscape button for supported models' do
-    model = Factory :teusink_jws_model
-    login_as(model.contributor)
-    get :show, params: { id: model.id }
-    assert_response :success
-    assert_select 'a[href=?]', visualise_model_path(model, version: model.version), count: 0
-  end
-
-  test 'visualise with cytoscape' do
-    model = Factory :xgmml_model
-    login_as(model.contributor)
-    get :visualise, params: { id: model.id, version: model.version }
-    assert_response :success
-  end
-
   test 'should show sycamore button for sbml' do
     with_config_value :sycamore_enabled, true do
       model = Factory :teusink_model
