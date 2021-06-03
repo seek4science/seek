@@ -1,0 +1,2 @@
+class ObservedVariableSetsController < ApplicationController
+end

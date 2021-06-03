@@ -1,0 +1,2 @@
+class ObservedVariable < ApplicationRecord
+end
