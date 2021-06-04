@@ -115,7 +115,7 @@ module Seek
         end
       else
         respond_to do |format|
-          format.html { render action: 'new' }
+          format.html @observed_variable_set
           format.json { render json: json_api_errors(item), status: :unprocessable_entity }
         end
       end
