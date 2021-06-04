@@ -27,7 +27,7 @@ require 'json_test_helper'
 Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new(fast_fail: true,
                                                                    color: true,
                                                                    detailed_skip: false,
-                                                                   slow_count: 10)]
+                                                                   slow_count: 10)] unless ENV['RM_INFO']
 
 Minitest::Test.i_suck_and_my_tests_are_order_dependent!
 
