@@ -1,0 +1,12 @@
+<h2>BPMN report for Project <%= project.title %> at <%= DateTime.now %></h2>
+<table class="table">
+  <tr>
+    <th>Type</th>
+    <th>Title</th>
+    <th>Assignee</th>
+    <th>Status</th>
+    <th>Started</th>
+    <th>Finished</th>
+  </tr>
+  <%= render :partial => "bpmn/project_report", :locals => {:project => project} -%>
+</table>

@@ -1,12 +1,15 @@
-<h2>BPMN report for Project <%= project.title %></h2>
-<table class="table">
-  <tr>
-    <th>Type</th>
-    <th>Title</th>
-    <th>Assignee</th>
-    <th>Status</th>
-    <th>Started</th>
-    <th>Finished</th>
-  </tr>
-  <%= render :partial => "bpmn/project_report", :locals => {:project => project} -%>
-</table>
+<div id="bpmn_table">
+  <%= render :partial => "bpmn/bpmn_table", :locals => {:project => project} -%>
+</div>
+
+<script>
+  function updateTable(){
+      $j("#bpmn_table").load(location.href + " #bpmn_table>*", "");
+  }
+  
+  $j(document).ready(function() {
+    setInterval(updateTable,300000);
+  }
+		    );
+
+</script>

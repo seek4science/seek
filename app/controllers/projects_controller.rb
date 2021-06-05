@@ -268,11 +268,8 @@ class ProjectsController < ApplicationController
 
   def bpmn_report
     project = Project.find(params[:id])
-    project.status = :running
-    project.started_at = Time.new(2021,1)
-    project.finished_at = Time.now
     respond_to do |format|
-      format.html { render template: 'bpmn/report', locals: { :project => project}}
+      format.html { render template: 'bpmn/report', locals: { :project => project} }
     end
   end
   
