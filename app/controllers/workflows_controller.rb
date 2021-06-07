@@ -79,12 +79,12 @@ class WorkflowsController < ApplicationController
 
   # Takes a single RO-Crate zip file
   def create_from_ro_crate
-    crate_extractor = WorkflowCrateExtractor.new(ro_crate_extractor_params)
-    crate_extractor.workflow_class = @workflow.workflow_class
-    @workflow = crate_extractor.build
+    @crate_extractor = WorkflowCrateExtractor.new(ro_crate_extractor_params)
+    @crate_extractor.workflow_class = @workflow.workflow_class
+    @workflow = @crate_extractor.build
 
     respond_to do |format|
-      if crate_extractor.valid?
+      if @crate_extractor.valid?
         format.html { render :provide_metadata }
       else
         format.html { render action: :new, status: :unprocessable_entity }

@@ -828,6 +828,16 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_includes assigns(:workflows), w3
   end
 
+  test 'RO-Crate with no main workflow throws error' do
+    assert_no_difference('GitRepository.count') do
+      post :create_from_ro_crate, params: {
+        ro_crate: { data: fixture_file_upload('files/workflows/no-main-workflow.crate.zip', 'application/zip') }
+      }
+    end
+
+    assert assigns(:crate_extractor).errors.added?(:ro_crate, 'did not specify a main workflow.')
+  end
+
   def edit_max_object(workflow)
     add_tags_to_test_object(workflow)
     add_creator_to_test_object(workflow)

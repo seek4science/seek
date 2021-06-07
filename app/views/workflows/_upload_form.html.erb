@@ -106,6 +106,7 @@
       <%= form_tag({ action: :create_from_ro_crate, anchor: 'existing-ro-crate' }, multipart: true) do -%>
         <div class="asset_form">
           <%= error_messages_for :workflow -%>
+          <%= error_messages_for :crate_extractor -%>
 
           <%= panel do %>
             <div class="form-group">
