@@ -15,6 +15,7 @@ namespace :seek do
     remove_old_project_join_logs
     fix_negative_programme_role_mask
     db:seed:sample_attribute_types
+    db:seed:miappe_custom_metadata
     delete_users_with_invalid_person
     delete_specimen_activity_logs
     update_session_store
