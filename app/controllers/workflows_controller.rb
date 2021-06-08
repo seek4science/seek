@@ -5,7 +5,7 @@ class WorkflowsController < ApplicationController
   before_action :workflows_enabled?
   before_action :find_assets, only: [:index]
   before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview, :update_annotations_ajax]
-  before_action :find_display_asset, only: [:show, :download, :diagram, :ro_crate]
+  before_action :find_display_asset, only: [:show, :download, :diagram, :ro_crate, :edit_paths, :update_paths]
   before_action :login_required, only: [:create, :create_version, :new_version,
                                         :create_from_files, :create_from_ro_crate,
                                         :create_metadata, :provide_metadata]
@@ -231,6 +231,29 @@ class WorkflowsController < ApplicationController
                   "workflow-#{@workflow.id}-#{@display_workflow.version}.crate.zip")
   end
 
+  def edit_paths
+
+  end
+
+  def update_paths
+    respond_to do |format|
+      if @display_workflow.update_attributes(git_version_path_params) && @workflow.update_attributes(workflow_params)
+        if params[:extract_metadata] == '1'
+          extractor = @workflow.extractor
+          @workflow.provide_metadata(extractor.metadata)
+          format.html { render :provide_metadata }
+        else
+          flash[:notice] = "#{t('workflow')} paths were successfully updated."
+          format.html { redirect_to workflow_path(@workflow) }
+          format.json { render json: @workflow, include: [params[:include]] }
+        end
+      else
+        format.html { render action: 'edit' }
+        format.json { render json: json_api_errors(@workflow), status: :unprocessable_entity }
+      end
+    end
+  end
+
   private
 
   def find_or_initialize_workflow
@@ -270,5 +293,9 @@ class WorkflowsController < ApplicationController
 
   def ro_crate_extractor_params
     params.permit(ro_crate: [:data, :data_url, :make_local_copy])
+  end
+
+  def git_version_path_params
+    params.require(:git_version).permit(:main_workflow_path, :abstract_cwl_path, :diagram_path)
   end
 end

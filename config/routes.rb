@@ -555,6 +555,8 @@ SEEK::Application.routes.draw do
       get :new_version
       get :new_git_version
       post :create_version_metadata
+      get :edit_paths
+      patch :update_paths
     end
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :sops, :collections, only: [:index]
   end
