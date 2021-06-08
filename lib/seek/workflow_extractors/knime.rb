@@ -2,7 +2,7 @@ module Seek
   module WorkflowExtractors
     class KNIME < Base
       def self.file_extensions
-        ['ga']
+        ['knwf']
       end
 
       def metadata
