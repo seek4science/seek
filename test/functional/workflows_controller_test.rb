@@ -854,8 +854,8 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'can get edit paths page' do
-    login_as(workflow.contributor)
     workflow = Factory(:git_version).resource
+    login_as(workflow.contributor)
 
     get :edit_paths, params: { id: workflow.id }
 
