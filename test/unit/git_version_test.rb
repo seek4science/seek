@@ -4,7 +4,7 @@ class GitVersionTest < ActiveSupport::TestCase
   setup do
   end
 
-  test 'freeze version' do
+  test 'lock version' do
     repo = Factory(:local_repository)
     workflow = repo.resource
 
@@ -14,7 +14,7 @@ class GitVersionTest < ActiveSupport::TestCase
     refute v.git_base.tags['version-1.0.0']
     assert v.mutable?
 
-    v.send(:freeze)
+    v.send(:lock)
     workflow.update_column(:title, 'Something else')
     new_class = WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class)
     workflow.update_column(:workflow_class_id, new_class.id)

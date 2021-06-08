@@ -49,7 +49,7 @@ class GitVersion < ApplicationRecord
     end
   end
 
-  def freeze
+  def lock
     raise ImmutableVersionException unless mutable?
 
     self.resource_attributes = resource.attributes
