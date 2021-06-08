@@ -81,6 +81,7 @@
 <%= item_actions_dropdown do %>
   <% if asset.can_edit? -%>
     <% if asset.is_git_versioned? -%>
+      <li><%= image_tag_for_key('spreadsheet_annotation_edit', edit_paths_workflow_path(asset, version: display_asset.version), nil, nil, "Annotate files") -%></li>
       <% if display_asset.mutable? %>
         <li><%= image_tag_for_key('snapshot', polymorphic_path([asset, :git_freeze_preview], version: display_asset.version), nil, nil, "Freeze version") -%></li>
       <% else %>

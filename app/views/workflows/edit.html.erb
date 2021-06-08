@@ -36,6 +36,8 @@
     <%= render partial: 'assets/asset_form_bottom', locals: { show_publications: false, f: f }-%>
     <%= render partial: 'assays/associate_assays', locals: { resource: @workflow } -%>
 
+    <%= hidden_field_tag 'workflow[internals]', raw(@workflow.internals.to_json) -%>
+
     <%= form_submit_buttons(@workflow) %>
   </div>
 <% end %>

@@ -464,7 +464,7 @@ module ApplicationHelper
 
   # whether manage attributes should be shown, dont show if editing (rather than new or managing)
   def show_form_manage_specific_attributes?
-    !(action_name == 'edit' || action_name == 'update')
+    !(action_name == 'edit' || action_name == 'update' || action_name == 'update_paths') # TODO: Figure out a better check here...
   end
 
   def pending_project_creation_request?

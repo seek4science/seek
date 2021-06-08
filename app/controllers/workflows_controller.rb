@@ -241,9 +241,10 @@ class WorkflowsController < ApplicationController
         if params[:extract_metadata] == '1'
           extractor = @workflow.extractor
           @workflow.provide_metadata(extractor.metadata)
-          format.html { render :provide_metadata }
+          flash[:notice] = "#{t('workflow')} files annotated and metadata was re-extracted. Please review the changes and confirm (or cancel to keep the existing metadata)."
+          format.html { render :edit }
         else
-          flash[:notice] = "#{t('workflow')} paths were successfully updated."
+          flash[:notice] = "#{t('workflow')} files were annotated successfully."
           format.html { redirect_to workflow_path(@workflow) }
           format.json { render json: @workflow, include: [params[:include]] }
         end
