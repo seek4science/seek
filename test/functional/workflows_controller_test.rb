@@ -853,6 +853,72 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert assigns(:crate_extractor).errors.added?(:ro_crate, 'did not specify a main workflow.')
   end
 
+  test 'can get edit paths page' do
+    login_as(workflow.contributor)
+    workflow = Factory(:git_version).resource
+
+    get :edit_paths, params: { id: workflow.id }
+
+    assert_response :success
+  end
+
+  test 'cannot get edit paths page if not authorized' do
+    logout
+    workflow = Factory(:git_version).resource
+
+    get :edit_paths, params: { id: workflow.id }
+
+    assert_redirected_to workflow_path(workflow)
+  end
+
+  test 'can update paths' do
+    workflow = Factory(:git_version).resource
+    login_as(workflow.contributor)
+
+    assert_difference('GitAnnotation.count', 2) do
+      patch :update_paths, params: { id: workflow.id,
+                                     git_version: { diagram_path: 'diagram.png',
+                                                    main_workflow_path: 'concat_two_files.ga' },
+                                     workflow: { workflow_class_id: Factory(:galaxy_workflow_class).id } }
+
+      assert_redirected_to workflow_path(workflow)
+    end
+  end
+
+  test 'cannot update paths if not authorized' do
+    workflow = Factory(:git_version).resource
+    logout
+
+    assert_no_difference('GitAnnotation.count') do
+      patch :update_paths, params: { id: workflow.id,
+                                     git_version: { diagram_path: 'diagram.png',
+                                                    main_workflow_path: 'concat_two_files.ga' },
+                                     workflow: { workflow_class_id: Factory(:galaxy_workflow_class).id } }
+
+      assert_redirected_to workflow_path(workflow)
+      assert flash[:error].include?('authorized')
+    end
+  end
+
+  test 'can update paths and extract metadata' do
+    workflow = Factory(:git_version).resource
+    login_as(workflow.contributor)
+
+    assert_not_equal 'Concat two files', workflow.title
+
+    assert_difference('GitAnnotation.count', 2) do
+      patch :update_paths, params: { id: workflow.id,
+                                     git_version: { diagram_path: 'diagram.png',
+                                                    main_workflow_path: 'concat_two_files.ga' },
+                                     workflow: { workflow_class_id: Factory(:galaxy_workflow_class).id },
+                                     extract_metadata: '1' }
+
+      assert_response :success
+    end
+
+    assert_equal 'Concat two files', assigns(:workflow).title
+  end
+
   def edit_max_object(workflow)
     add_tags_to_test_object(workflow)
     add_creator_to_test_object(workflow)
