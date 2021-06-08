@@ -20,7 +20,7 @@
       <%= button_link_to('Delete', 'destroy',
                          polymorphic_path([@parent_resource, :git_remove_file], version: @git_version.version, file: { path: params[:path] }),
                          method: :delete,
-                         confirm: "Are you sure you wish to delete this file?") %>
+                         data: { confirm: "Are you sure you wish to delete this file?" }) %>
     <% end %>
   </div>
 </div>
