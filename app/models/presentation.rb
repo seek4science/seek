@@ -27,12 +27,6 @@ class Presentation < ApplicationRecord
   # Parameters:
   # - user - user that performs the action; this is required for authorization
 
-
-   #defines that this is a user_creatable object type, and appears in the "New Object" gadget
-  def self.user_creatable?
-    true
-  end
-
   # Returns the columns to be shown on the table view for the resource
   def columns_default
     super + ['version','license']

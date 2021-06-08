@@ -19,6 +19,8 @@
 
     <div class="tab-content">
       <div role="tabpanel" class="tab-pane active" id="overview">
+        <strong><%= WorkflowClass.model_name.human %>: </strong> <%= @display_workflow.workflow_class_title -%>
+
         <div style="margin-bottom: 5px;">
           <% if @display_workflow.maturity_level %>
             <%= maturity_badge(@display_workflow.maturity_level) %>

@@ -2,7 +2,7 @@
 <% name ||= 'workflow_class_id' %>
 
 <div id="workflow-class-form">
-  <label class="required">Workflow type</label>
+  <label class="required"><%= WorkflowClass.model_name.human %></label>
   <%= icon_link_to('New workflow type', 'new', '#', 'data-toggle' => 'modal', 'data-target' => "#workflow-class-modal") %>
   <%= select_tag name, workflow_class_options_for_select(selected),
                  include_blank: 'Other',

@@ -162,4 +162,14 @@ class ApplicationRecord < ActiveRecord::Base
     base << "-#{version}" if versioned?
     base
   end
+
+  def self.feature_enabled?
+    method = "#{name.underscore.pluralize}_enabled"
+    !Seek::Config.respond_to?(method) || Seek::Config.send(method)
+  end
+
+  # TODO: Decide what this should actually do, since it doesn't check user roles etc.
+  def self.user_creatable?
+    false
+  end
 end

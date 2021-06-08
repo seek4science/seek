@@ -208,7 +208,7 @@ module WorkflowExtraction
   end
 
   def ro_crate_identifier
-    doi.present? ? doi : ro_crate_url
+    doi.present? ? "https://doi.org/#{doi}" : ro_crate_url
   end
 
   def ro_crate_url(action = nil)

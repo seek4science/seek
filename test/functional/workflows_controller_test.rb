@@ -828,6 +828,21 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_includes assigns(:workflows), w3
   end
 
+  test 'should update workflow class ' do
+    g = Factory(:galaxy_workflow_class)
+    user = Factory(:user)
+    workflow = Factory(:cwl_workflow, contributor: user.person)
+    login_as(user)
+    assert workflow.can_manage?
+
+    assert_equal 'Common Workflow Language', workflow.workflow_class_title
+
+    put :update, params: { id: workflow.id, workflow: { workflow_class_id: g.id } }
+
+    assert_equal 'Galaxy', assigns(:workflow).workflow_class_title
+    assert_equal g.id, assigns(:workflow).workflow_class_id
+  end
+
   test 'RO-Crate with no main workflow throws error' do
     assert_no_difference('GitRepository.count') do
       post :create_from_ro_crate, params: {
