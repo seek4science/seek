@@ -8,16 +8,16 @@ module Legacy
     end
 
     def create_ro_crate
-      crate_builder = Legacy::WorkflowCrateBuilder.new(legacy_ro_crate_params)
-      crate_builder.workflow_class = @workflow.workflow_class
-      blob_params = crate_builder.build
+      @crate_builder = Legacy::WorkflowCrateBuilder.new(legacy_ro_crate_params)
+      @crate_builder.workflow_class = @workflow.workflow_class
+      blob_params = @crate_builder.build
       @workflow.build_content_blob(blob_params)
 
       respond_to do |format|
         if blob_params && @workflow.content_blob.save && extract_metadata
           format.html { render :provide_metadata }
         else
-          format.html { render action: :new, status: :unprocessable_entity }
+          format.html { render action: @workflow.persisted? ? :new_version : :new, status: :unprocessable_entity }
         end
       end
     end
@@ -27,7 +27,7 @@ module Legacy
         if handle_upload_data(@workflow.persisted?) && @workflow.content_blob.save && extract_metadata
           format.html { render :provide_metadata }
         else
-          format.html { render action: :new, status: :unprocessable_entity }
+          format.html { render action: @workflow.persisted? ? :new_version : :new, status: :unprocessable_entity }
         end
       end
     end

@@ -229,3 +229,4 @@ galaxy_instance_trs_import_url:
 # Controlled vocabs
 cv_dropdown_limit:
   convert: :to_i
+git_support_enabled:

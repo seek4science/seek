@@ -19,7 +19,7 @@ module Seek
 
             attr_accessor :git_version_attributes
 
-            after_create :save_git_version_on_create
+            after_create :save_git_version_on_create, if: -> { Seek::Config.git_support_enabled }
             after_update :sync_resource_attributes
 
             def is_git_versioned?
