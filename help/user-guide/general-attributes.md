@@ -11,7 +11,7 @@ You should make titles as descriptive as possible.
 
 ## Description
 The description allows you to further expand important details.
-Descriptions can be formatted using markdown, either via markup or using the various options above the text input (e.g. bold, italics, hyperlinks...).
+Descriptions can be formatted using [markdown](https://www.markdownguide.org/basic-syntax/), either via markup or using the various options above the text input (e.g. bold, italics, hyperlinks...).
 ![Markdown ribbon UI](/images/user-guide/description_markdown_ribbon.png){:.screenshot}
 
 
