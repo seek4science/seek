@@ -3,15 +3,20 @@
   <%= modal_body %>
 <% end %>
 
-<% if git_version.mutable? && git_version.can_edit? %>
-  <%= modal(size: 'md', id: 'git-add-modal', class: 'git-browser-modal') do %>
-    <%= modal_header('Add File') %>
+<% if git_version.can_edit? %>
+  <div class="pull-right">
+    <%= button_link_to('Annotate files', 'spreadsheet_annotation_edit', edit_paths_workflow_path(resource, version: git_version.version)) -%>
+    <% if git_version.mutable? %>
+      <%= modal(size: 'md', id: 'git-add-modal', class: 'git-browser-modal') do %>
+        <%= modal_header('Add File') %>
 
-    <%= modal_body do %>
-      <%= render partial: 'git/add_file_form', locals: { resource: resource, version: git_version.version } %>
-    <% end -%>
-  <% end %>
-  <%= button_link_to('Add file', 'add', '#', { class: 'pull-right', 'data-toggle' => 'modal', 'data-target' => '#git-add-modal' }) %>
+        <%= modal_body do %>
+          <%= render partial: 'git/add_file_form', locals: { resource: resource, version: git_version.version } %>
+        <% end -%>
+      <% end %>
+      <%= button_link_to('Add file', 'add', '#', { 'data-toggle' => 'modal', 'data-target' => '#git-add-modal' }) %>
+    <% end %>
+  </div>
 <% end %>
 
 <strong>Total size: </strong> <%= number_to_human_size git_version.total_size -%><br/>

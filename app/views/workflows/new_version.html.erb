@@ -10,7 +10,7 @@
   Currently supported workflow types are: <%= WorkflowClass.order(:title).pluck(:title).join(', ') %>.
 <% end %>
 
-<% if Seek::Config.git_support_enabled %>
+<% if @workflow.is_git_versioned? %>
   <%= render partial: 'upload_form', locals: { new_version: true, cancel_path: workflow_path(@workflow) } %>
 <% else %>
   <%= render partial: 'legacy_upload_form', locals: { new_version: true, cancel_path: workflow_path(@workflow) } %>

@@ -20,7 +20,7 @@
 <%= panel do %>
   <div class="form-group">
     <label>Abstract CWL</label>
-    <p class="help-block">(Optional) The abstract CWL that describes the workflow above.</p>
+    <p class="help-block">(Optional) The abstract CWL that describes the main workflow.</p>
     <%= git_path_input '#git-path-select-modal', "#{field_prefix}[abstract_cwl_path]",
                        git_version.abstract_cwl_path, class: 'form-control git-path' %>
   </div>

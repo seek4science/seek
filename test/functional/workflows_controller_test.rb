@@ -919,6 +919,54 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_equal 'Concat two files', assigns(:workflow).title
   end
 
+  test 'get new version form for git-versioned workflow' do
+    with_config_value(:git_support_enabled, false) do
+      workflow = Factory(:git_version).resource
+      login_as(workflow.contributor)
+
+      assert workflow.is_git_versioned?
+
+      get :new_version, params: { id: workflow.id }
+
+      assert_select 'a[href=?]', '#new-ro-crate'
+      assert_select 'a[href=?]', '#git-repo'
+      assert_select 'a[href=?]', '#existing-ro-crate'
+    end
+  end
+
+  test 'get new version form for non-git-versioned workflow' do
+    workflow = Factory(:workflow)
+    login_as(workflow.contributor)
+
+    refute workflow.is_git_versioned?
+
+    get :new_version, params: { id: workflow.id }
+
+    assert_select 'a[href=?]', '#new-ro-crate'
+    assert_select 'a[href=?]', '#git-repo', count: 0
+    assert_select 'a[href=?]', '#existing-ro-crate'
+  end
+
+  test 'get new workflow form' do
+    with_config_value(:git_support_enabled, false) do
+      get :new
+    end
+
+    assert_select 'a[href=?]', '#new-ro-crate'
+    assert_select 'a[href=?]', '#git-repo', count: 0
+    assert_select 'a[href=?]', '#existing-ro-crate'
+  end
+
+  test 'get new workflow form with git support enabled' do
+    with_config_value(:git_support_enabled, true) do
+      get :new
+    end
+
+    assert_select 'a[href=?]', '#new-ro-crate'
+    assert_select 'a[href=?]', '#git-repo'
+    assert_select 'a[href=?]', '#existing-ro-crate'
+  end
+
   def edit_max_object(workflow)
     add_tags_to_test_object(workflow)
     add_creator_to_test_object(workflow)
