@@ -18,6 +18,12 @@
   <div class="col-md-9 col-sm-8 box_about_actor">
     <%= item_description @placeholder.description -%>
 
+    <strong>Resolution: </strong>
+    <% if @placeholder.data_file %>
+      <%= link_to(@placeholder.data_file.title, @placeholder.data_file) %>
+      <%  else %>
+      Not specified
+      <% end %>
     <div class="row">
       <div class="col-md-6">
         <%= persistent_resource_id(@placeholder) %>

@@ -21,6 +21,8 @@
 
         <%= render :partial => "assets/select_data_types", :locals => {:resource => (@placeholder ? @placeholder : Placeholder.new) } -%>
 
+	<%= render :partial => "resolve", :locals => {:resource => (@placeholder ? @placeholder : Placeholder.new) } -%>
+	
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @placeholder } %>
 
       <%= render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f}-%>
