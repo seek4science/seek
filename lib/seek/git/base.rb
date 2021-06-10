@@ -20,11 +20,6 @@ module Seek
         self
       end
 
-      # Rugged cannot do this without initializing a repo on disk, so use ruby git.
-      def self.ls_remote(remote, ref = nil)
-        ::Git.ls_remote(ref ? "#{remote} #{ref}" : remote)
-      end
-
       def self.init(path)
         ::Rugged::Repository.init_at(path)
       end

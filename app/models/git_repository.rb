@@ -34,18 +34,21 @@ class GitRepository < ApplicationRecord
   def remote_refs
     @remote_refs ||= if remote.present?
                        refs = { branches: [], tags: [] }
-                       hash = Seek::Git::Base.base_class.ls_remote(remote)
-                       head = hash['head'][:sha]
-                       hash['branches'].each do |name, info|
-                         h = { name: name, ref: "refs/remotes/origin/#{name}", sha: info[:sha], default: info[:sha] == head }
+
+                       git_base.branches.each do |branch|
+                         next unless branch.remote?
+                         # TODO: Fix the default branch check. Does not seem to be a way to do in Rugged.
+                         name = branch.name.sub(/\A#{branch.remote_name}\//, '')
+                         h = { name: name, ref: branch.canonical_name, sha: branch.target.oid, default: ['main', 'master', 'develop'].include?(name) }
                          refs[:branches] << h
                        end
-                       hash['tags'].each do |name, info|
-                         h = { name: name, ref: "refs/tags/#{name}", sha: info[:sha] }
+
+                       git_base.tags.each do |tag|
+                         h = { name: tag.name, ref: tag.canonical_name, sha: tag.target.oid }
                          refs[:tags] << h
                        end
 
-                       refs[:branches] = refs[:branches].sort_by { |x| [x[:default] ? 0 : 1, x[:name]] }
+                       refs[:branches] = refs[:branches].sort_by { |x| [x[:default] ? 0 : 1, x[:name].downcase] }
                        refs[:tags] = refs[:tags].sort_by { |x| x[:name] }
 
                        refs

@@ -1,12 +1,10 @@
-<h1><%= @git_repository.remote %></h1>
-
 <% job_status ||= @git_repository.remote_git_fetch_task&.status %>
 <% in_progress = @git_repository.remote_git_fetch_task&.in_progress? %>
 
 <% if in_progress %>
   <div id="fetching-status">
     <div class="alert alert-info" role="alert">
-      <strong>Checkout:</strong>
+      <strong>Checking out <%= @git_repository.remote %></strong><br/>
       <span id="fetch-status"><%= job_status.to_s.humanize %></span>
       <%= image 'spinner' %>
       <script>
@@ -30,11 +28,15 @@
     </div>
   </div>
 <% else %>
+  <h1>Select Target</h1>
   <%= form_tag(polymorphic_path([:create_from_git, params[:resource_type].pluralize.to_sym])) do %>
     <%= hidden_field_tag :resource_id, params[:resource_id] %>
     <%= hidden_field_tag "#{params[:resource_type]}[git_version_attributes][git_repository_id]", @git_repository.id %>
     <%= render partial: 'ref_form', locals: { name: "#{params[:resource_type]}[git_version_attributes][ref]",
                                               git_repository: @git_repository } %>
+
+    <hr/>
+
     <%= create_button class: 'btn btn-primary'-%>
   <% end %>
 <% end %>
