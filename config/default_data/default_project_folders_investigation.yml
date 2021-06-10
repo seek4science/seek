@@ -1,0 +1,11 @@
+root:
+  title: Investigation
+  children: Study
+  deletable: false
+
+study:
+  title: Study
+  children: assay
+
+assay:
+  title: "Published"

@@ -33,6 +33,9 @@ Rails.application.config.assets.precompile += [
     'exhibit/exhibit-api.js',
     'flot/index.js',
     'project_folders',
+    'single_page/index',
+    'single_page/dynamic_table',
+    'single_page/flowchart',
     'tablesorter/jquery-latest.js',
     'tablesorter/jquery.tablesorter.js',
     'multi_step_wizard.js',
@@ -47,6 +50,8 @@ Rails.application.config.assets.precompile += [
     "tablesorter/blue/tablesorter_blue.css",
     "yui/index.css",
     "appended/*.css",
+    "jquery.flowchart.js",
+    "jquery.flowchart.css",
     "publications",
     'controlled_vocabs.js'
 ]

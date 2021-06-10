@@ -2,15 +2,13 @@
 
 <div id="project_folders"></div>
 
-<hr/>
-<hr/>
+<div id="isa_tree"  class="new-design"></div>
 
 <div id="assay_folders"></div>
 
 <script type="text/javascript">
-  $j(document).ready(function () {
-    setupFoldersTree(<%= folder_tree_json(@folders).html_safe -%>,'project_folders','draggable_folder_item');
-    setupFoldersTree(<%= folder_tree_json(Seek::AssayFolder.assay_folders(@project)).html_safe -%>,'assay_folders','exp_assay_accepted_item');
-  });
+  // $j(document).ready(function () {
+  //   setupFoldersTree(<%= folder_tree_json(@folders).html_safe -%>,'project_folders','draggable_folder_item');
+  // });
 
 </script>

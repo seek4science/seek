@@ -1,9 +1,13 @@
+<%= javascript_include_tag "single_page/index" %>
+<%= javascript_include_tag "single_page/dynamic_table" %>
+<%= javascript_include_tag "single_page/flowchart" %>
 <%= javascript_include_tag "project_folders" %>
 
 <%
     default_folder = initial_folder(@project)
     help_icon = image_tag(icon_filename_for_key("help"), :alt=>"help", 'data-tooltip' => tooltip("Click to toggle information on how to use the #{t('project')} asset browser"))
     help_button = link_to help_icon, '#', onclick: "$j('#folders_help').slideToggle(); return false;"
+    isa_active = true
 %>
 
 <%= render :partial => "general/page_title",:locals=>{:title=>"#{t('project')} item browser for the #{t('project')} '#{link_to @project.title,@project}'&nbsp;#{help_button}".html_safe} -%>
@@ -25,12 +29,51 @@
         <%= render :partial => "contents", :locals => {:folder => default_folder} if default_folder -%>
       </div>
     </div>
+    <% if isa_active %>
+      <div id="investigation_contents" class="row" style="display:none">
+        <%= render :partial => "investigation" -%>
+      </div>
+      <div id="study_contents" class="row" style="display:none">
+        <%= render :partial => "study" -%>
+      </div>
+      <div id="assay_contents" class="row" style="display:none">
+        <%= render :partial => "assay" -%>
+      </div>
+    <%end%>
   </div>
 
 </div>
 
 <div>
-  <h3>Dev tools</h3>
+  <h3>Reset folder structure</h3>
   <%= link_to "Nuke",nuke_project_folders_path(@project),:method=>:post %>
 </div>
 
+<script type="text/javascript">
+    var selectedItem = {type:"",id:""}, pid, uid
+    // let existingAssays = []
+    const sourceTypes = <%= @sourceTypes.to_json.html_safe %>
+    // console.log("sourceTypes",sourceTypes)
+    let characteristics =  $j(sourceTypes).map((i,x)=>{if(x.type=="study") return x}).get()
+    let AssayTypes = $j(sourceTypes).map((i,x)=>{if(x.type=="assay") return x}).get()
+    // console.log("characteristics", characteristics)
+    // console.log("AssayTypes", AssayTypes)
+
+    $j(document).ready(function() {
+        setupFoldersTree( <%= ((TreeviewBuilder.new(@project, @folders)).build_tree_data_folder({display_isatree:false})).html_safe -%> , 'isa_tree', 'draggable_folder_item');
+        $j(`#project_contents`).show();
+          pid = <%= @project.id %>
+          uid = <%= current_user.id if current_user %>
+
+          // init_flowchart()
+          // addAssayTypeOptions()
+          // addSourcesOptions()
+
+          $j("a:contains('Cancel')").click(function (e) {
+              e.preventDefault();
+              $j("#data-file-modal-inv").modal("hide");
+              $j("#data-file-modal-std").modal("hide");
+          });
+    });
+    
+</script>

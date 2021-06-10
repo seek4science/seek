@@ -1,0 +1,100 @@
+<%=javascript_include_tag('jquery.flowchart.js')%>
+<%= stylesheet_link_tag 'application', 'jquery.flowchart.css' %>
+
+<div id="content-wrapper">
+    <div class="inner">
+        <div class="flowchartex" style="overflow-x:scroll">
+            <div class="flowchartex-container" id="chart_canvas">
+                <div id="operator_properties" class="flowchartPopup">
+                    <label for="operator_title">Change title: </label><input style="margin-bottom:10px" type="text" id="operator_title" class="form-control">
+                    <a class="pgclose" href="javascript:void(0);" onclick="$j('#operator_properties').hide()"><i class="glyphicon glyphicon-remove"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="draggable_operators" style="font-size:12px">
+            <div style="float:left;margin-right:20px;display:none">
+                <span style="color:#888"><i class="glyphicon glyphicon-info-sign"></i> Set input and output count of
+                    items:</span><br />
+                <div class="form-inline">
+                    Inputs: <input id="inputs_num" type="number" class="form-control" style="width:50px;font-size:12px" value="1" min="0" max="3" onclick="setInputNum()"> &nbsp;
+                    Outputs: <input id="outputs_num" type="number" class="form-control" style="width:50px;font-size:12px" value="1" min="0" max="3" onclick="setOutputNum()">
+                </div>
+            </div>
+            <div class="draggable_operators_divs">
+                <span style="color:#888"><i class="glyphicon glyphicon-info-sign"></i> Drag & Drop into
+                    the canvas:</span><br />
+                <div class="draggable_operator ui-draggable ui-draggable-handle wf_btn" data-nb-inputs="1" data-nb-outputs="1" data-shape='rectangle' data-shape_id='na'>Assay</div>
+            </div>
+            <hr>
+            <a class="btn btn-primary" id="btn_save_flowchart" onclick="saveFlowchart()">Update</a>
+            <br />
+        </div>
+    </div>
+
+
+    <div id="assayInfo" class="modal in">
+        <div class="modal-dialog modal-m" style="width:800px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close" data-dismiss="modal"><span aria-hidden="true" onClick="removeBlock()">×</span></button>
+                    <h4 class="modal-title">Assay</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>Type:</label>
+                                <select class="form-control" id="assayType" onchange="asyTypeChange(this);">
+                                    <input type="hidden" id="method_type">
+                                </select>
+                            </div>
+                        </div>
+                        <div style="max-height:200px;overflow-y:scroll;overflow-x:hidden;border-radius:5px;border:1px #ddd solid;margin-top:15px;margin-bottom:15px">
+                            <table class="tableXs" id="assayAttribs" style="width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th style="width:20px"></th>
+                                        <th style="width:30%">Attribute</th>
+                                        <th>Short name</th>
+                                        <th style="width:50%">Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div>
+                            <label>*Title:</label>
+                            <input style="margin-bottom:10px" type="text" class="form-control" id="assayTitle">
+                        </div>
+                        <div><label>Description: </label>
+                            <textarea id="assayDes" class="form-control" style="max-height:50px"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-header">
+                    <h4 class="modal-title">Method</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div>
+                            <label>*File:</label>
+                            <input style="margin-bottom:10px" type="file" class="form-control" id="modalMethodfile">
+                        </div>
+                        <div>
+                            <label>*Title:</label>
+                            <input style="margin-bottom:10px" type="text" class="form-control" id="modalMethodTitle">
+                        </div>
+                        <div><label>Description: </label>
+                            <textarea id="modalMethodDes" class="form-control" style="max-height:50px"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input id="btnSaveAssay" type="button" value="Save" class="btn btn-primary" data-dismiss="modal" onclick="saveAssay()" />
+                    <input id="btnCancelAssay" type="button" value="Cancel" class="btn btn-default" data-dismiss="modal" onclick="cancelAssay()" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

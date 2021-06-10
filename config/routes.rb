@@ -331,6 +331,17 @@ SEEK::Application.routes.draw do
     concerns :has_dashboard, controller: :project_stats
   end
 
+  resources :projects_folders do
+    member do
+        get "/render_sharing_form/:id/type/:type" => "folders#render_sharing_form"
+        get "/flowchart/:study_id" => "folders#flowchart"
+        get "/sample_table/:assay_id" => "folders#sample_table"
+        get "/sample_source/:study_id" => "folders#sample_source"
+        get "/ontology" => "folders#ontology"
+        post "/update_flowchart" => "folders#update_flowchart"
+     end
+  end
+
   resources :openbis_endpoints do
     get :test_endpoint, on: :member
     get :fetch_spaces, on: :member

@@ -30,6 +30,10 @@ class ProjectFolder < ApplicationRecord
     "#{title} (#{authorized_assets.count})"
   end
 
+  def count
+    authorized_assets.count
+  end
+
   def self.new_items_folder project
     ProjectFolder.where(:project_id=>project.id,:incoming=>true).first
   end

@@ -2,6 +2,9 @@ var tree;
 var elementFolderIds = [];
 var displayed_folder_id = 0;
 
+// will it display an ISA breadcrumb?
+const use_breadcrumb = false
+
 function setupFoldersTree(dataJson, container_id, drop_accept_class) {
   $j("#" + container_id)
     .bind("loaded.jstree", function () {
@@ -142,7 +145,7 @@ function item_clicked(type, id, parent) {
   hideAll();
   if (type == "folder") $j("#folder_contents").show();
   else $j("#" + type + "_contents").show();
-  breadcrumb(type);
+  if (use_breadcrumb) breadcrumb(type);
   selectedItem.id = id;
   selectedItem.type = type;
   selectedItem.parent = parent;
@@ -152,8 +155,8 @@ function item_clicked(type, id, parent) {
     case "investigation":
     case "study": {
       $j.ajax({
-        url: "/single_pages/" + pid + "/render_sharing_form/" + id + "/type/" + type,
-      });
+        url: "/projects_folders/" + pid + "/render_sharing_form/" + id + "/type/" + type,
+        dataType: "script" });
       break;
     }
   }
@@ -199,7 +202,7 @@ function bounce(item, text) {
         }
         if (n.data.type) $j(obj.childNodes[1]).attr("_type", n.data.type);
         if (n.data.id) $j(obj.childNodes[1]).attr("_id", n.data.id);
-        if (n.state.separate) {
+        if (n.state.separate && n.state.separate.label) {
           var p = d.createElement("p");
           p.innerHTML = n.state.separate.label;
           p.className = "separator";
@@ -208,7 +211,8 @@ function bounce(item, text) {
             a.href = n.state.separate.action;
             a.className = "treeaction glyphicon glyphicon-plus";
             $j(a).attr("onclick", "add" + n.state.separate.label + "(this)");
-            obj.prepend(a);
+            // obj.prepend(a);
+            $j(p).prepend(a)
           }
           obj.prepend(p);
         }

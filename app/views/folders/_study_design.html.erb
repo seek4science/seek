@@ -1,0 +1,29 @@
+<div id="content-wrapper">
+    <div class="inner">
+        <%= folding_panel('Source characteristics', false, {help_text: "Characteristics help text here", :body_options => {:id => 'source_characteristics_panel'}}) do %>
+        <select class="form-control" id="sourceSelect" onchange="sourceChange();">
+        </select>
+        </br>
+        <div style="max-height:200px;overflow-y:scroll;overflow-x:hidden;border-radius:5px;border:1px #ddd solid">
+            <table class="tableXs" id="sourceAttribs" style="width:100%;">
+                <thead>
+                    <tr>
+                        <th style="width:20px"></th>
+                        <th style="width:30%">Attribute</th>
+                        <th>Short name</th>
+                        <th style="width:50%">Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <div style="margin-top:10px">
+            <input id="btn-save-study-design" onClick="saveDesign()" value="Apply characteristics" type="button" class="btn btn-primary">
+        </div>
+        <% end %>
+        <%= folding_panel('Source table', false, {help_text: "Characteristics help text here", :body_options => {:id => 'source_table_panel'}}) do %>
+        <%= render :partial => "dynamic_table", :locals => { :table_class => "sourceSampleTable" } -%>
+        <% end %>
+    </div>
+</div>

@@ -1,0 +1,17 @@
+<%= button_link_to("Add Row", "add", "#", { id: "an", onclick: "addRow('.#{table_class}')" }) %>
+<%= button_link_to("Add Column", "add", "#", { onclick: "showPreDefinedCols('.#{table_class}',2)" }) %>
+<%= button_link_to("Delete Row(s)", "destroy", "#", { onclick: "deleteSampleClick('.#{table_class}')" }) %>
+<%= button_link_to("Hide optionals", "denied", "#", { onclick: "hideOptionalAttrs('.#{table_class}')" }) %>
+<%= button_link_to("Unhide all", "denied", "#", { onclick: "VM().clear()" }) %>
+<%= button_link_to("Save", "save", "#", { onclick: "saveSamples('.#{table_class}')", class: "pull-right" }) %>
+
+<div class="sampleTblContainer">
+    <table style="width: auto;margin-bottom:0" class= "tableXs <%= table_class %>">
+        <thead class="thead-dark">
+            <tr class="topHeader"></tr>
+            <tr class="downHeader"></tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
