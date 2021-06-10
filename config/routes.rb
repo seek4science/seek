@@ -474,10 +474,8 @@ SEEK::Application.routes.draw do
   resources :models, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
     member do
       get :compare_versions
-      post :compare_versions
-      get :visualise
-      post :submit_to_sycamore
-      post :export_as_xgmml
+      post :compare_versions      
+      post :submit_to_sycamore      
       post :execute
       get :simulate
       post :simulate
