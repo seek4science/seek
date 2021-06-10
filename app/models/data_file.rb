@@ -78,6 +78,10 @@ class DataFile < ApplicationRecord
     def event_ids=(_events_ids); end
   end
 
+  def placeholder
+    Placeholder.find_by data_file: self
+  end
+  
   # Returns the columns to be shown on the table view for the resource
   def columns_default
     super + ['creators','projects','version']

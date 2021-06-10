@@ -3,8 +3,6 @@
 <% link_start = "assay-#{assay.id}-start" %>
 <startEvent id="<%= link_start %>"/>
 
-Hello Alson
-
 <% start_sentry = "assay-#{assay.id}-start-sentry" %>
 
   <%
@@ -26,7 +24,7 @@ Hello Alson
         next
       end
       incoming_names.append(i.title)
-      incoming_names.append(Seek::Config.site_base_host + polymorphic_path(i))
+      incoming_links.append(Seek::Config.site_base_host + polymorphic_path(i))
     end
     outgoing_names = []
     outgoing_links = []

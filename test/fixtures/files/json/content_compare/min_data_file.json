@@ -85,6 +85,9 @@
       },
 	"file_template": {
 	    "data" : null
+	},
+	"placeholder": {
+	    "data" : null
 	}
     },
     "links": {

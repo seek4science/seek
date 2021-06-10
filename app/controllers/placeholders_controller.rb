@@ -5,13 +5,14 @@ class PlaceholdersController < ApplicationController
   include Seek::AssetsCommon
 
   before_action :find_assets, :only=>[:index]
-  before_action :find_and_authorize_requested_item,:only=>[:edit, :manage, :update, :manage_update, :destroy, :show,:new_object_based_on_existing_one]
+  before_action :find_and_authorize_requested_item,:only=>[:edit, :manage, :update, :manage_update, :destroy, :show,:new_object_based_on_existing_one ]
 
   api_actions :index, :show, :create, :update, :destroy
 
   def create
     item = initialize_asset
     update_template() if params.key?(:file_template_id)
+    resolve() if params.key?(:data_file_id)
     create_asset_and_respond(item)
   end
   
@@ -29,11 +30,24 @@ class PlaceholdersController < ApplicationController
       end
     end
 
+  def data_file
+    @placeholder = Placeholder.find(params[:id])
+    unless @placeholder.data_file.blank?
+      respond_to do |format|
+        format.html { redirect_to data_file_path(@placeholder.data_file) }
+      end
+    else
+      flash[:error] = 'Unable to view contents of the data file'
+      format.html { redirect_to placeholder_path(@placeholder) }
+    end
+  end
+  
   def update
 
     update_sharing_policies @placeholder
     update_relationships(@placeholder,params)
     update_template() if params.key?(:file_template_id)
+    resolve() # if params.key?(:data_file_id)
 
     respond_to do |format|
 
@@ -58,6 +72,26 @@ class PlaceholdersController < ApplicationController
     end
   end
   
+  def resolve
+    if params.key?(:data_file_id)
+      df = DataFile.find(params[:data_file_id])
+    else
+      df = DataFile.find(10)
+    end
+      @placeholder.data_file = df
+      puts('Resolving to ' + df.id.to_s)
+      puts('There are ' + @placeholder.assays.length.to_s + ' assays')
+      @placeholder.assays.each do |a|
+        puts
+        puts(a.title);
+        assay_asset = a.assay_assets.detect { |aa| aa.asset == @placeholder }
+        direction = assay_asset.direction
+        a.associate(df, direction: direction)
+        a.save!
+      end
+      @placeholder.save!
+  end
+  
   def filter
     scope = Placeholder
     scope = scope.joins(:projects).where(projects: { id: current_user.person.projects }) unless (params[:all_projects] == 'true')
@@ -75,6 +109,7 @@ class PlaceholdersController < ApplicationController
                                 { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                 { creator_ids: [] }, { assay_assets_attributes: [:assay_id] },
                                 :file_template_id,
+                                :data_file_id,
                                 :format_type,
                                 :data_type,
                                 discussion_links_attributes:[:id, :url, :label, :_destroy])

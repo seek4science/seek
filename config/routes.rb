@@ -552,6 +552,7 @@ SEEK::Application.routes.draw do
     end
     member do
       get :explore
+      get :data_file
     end
     resources :people, :programmes, :projects, :collections, only: [:index]
   end
