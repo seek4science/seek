@@ -2,7 +2,7 @@
 
 <div class="row">
   <div class="col-sm-6">
-    <h2>Information</h2>
+    <h2>Version Information</h2>
     <%= form_for(@git_version, as: :git_version, url: polymorphic_path([@parent_resource, :git_freeze], version: @git_version.version), method: :post) do |f| %>
       <div class="form-group">
         <label>Name</label>
@@ -10,7 +10,7 @@
       </div>
 
       <div class="form-group">
-        <label>Description</label>
+        <label>Comment</label>
         <%= f.text_area(:comment, class: 'form-control') %>
       </div>
 

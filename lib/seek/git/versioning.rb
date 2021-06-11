@@ -45,9 +45,9 @@ module Seek
               version.save
             end
 
-            def save_as_new_git_version
-              return if @git_version_attributes.blank?
-              version = self.git_versions.build(@git_version_attributes)
+            def save_as_new_git_version(extra_git_version_attributes = {})
+              extra_git_version_attributes.merge!(@git_version_attributes)
+              version = self.git_versions.build(extra_git_version_attributes)
               version.resource_attributes = self.attributes
               version.save
             end

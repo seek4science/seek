@@ -32,6 +32,16 @@ class WorkflowsController < ApplicationController
       respond_to do |format|
         format.html { redirect_to select_ref_git_repository_path(@git_repository, resource_type: :workflow, resource_id: @workflow.id) }
       end
+    else
+      @git_version = @workflow.latest_git_version.next_version(mutable: true, name: 'development')
+      if @git_version.save
+        flash[:notice] = "New development version created."
+      else
+        flash[:error] = "Couldn't save new version: #{@git_version.errors.full_messages.join(',')}."
+      end
+      respond_to do |format|
+        format.html { redirect_to workflow_path(@workflow) }
+      end
     end
   end
 

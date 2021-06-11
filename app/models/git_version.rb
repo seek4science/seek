@@ -49,6 +49,10 @@ class GitVersion < ApplicationRecord
     end
   end
 
+  def remote?
+    git_repository&.remote.present?
+  end
+
   def lock
     raise ImmutableVersionException unless mutable?
 
@@ -172,6 +176,19 @@ class GitVersion < ApplicationRecord
 
   def branch?
     ref.start_with?('refs/heads') || ref.start_with?('refs/remotes')
+  end
+
+  # Initialize a follow-up version to this one, with the version number bumped.
+  def next_version(extra_attributes = {})
+    git_version = self.dup
+    git_version.name = nil
+    git_version.comment = nil
+    git_version.ref = nil
+    git_version.version = (version + 1)
+    git_version.resource_attributes = resource.attributes
+    git_version.assign_attributes(extra_attributes)
+    git_version.git_annotations = git_annotations.map(&:dup)
+    git_version
   end
 
   private
