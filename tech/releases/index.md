@@ -1,5 +1,5 @@
 ---
-title: SEEK releases
+title: FAIRDOM-SEEK releases
 layout: page
 ---
 
