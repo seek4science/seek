@@ -17,20 +17,53 @@ Release date: _June 2021_
 
 This version includes:
 
-  * **Changes to joining a project during registration**. During registration a user will no longer be asked to select a Project and Institution, as this was often missed. Instead, they will be prompted to either Join or Create a Project after registration and until they are a member. [Joining a Project](/help/user-guide/join-a-project.html) now has an easier interface to search and select the projects they wish to join, and define either a new or existing Institution. The Project administrator is notified by email, and is provided with a single page to accept the request more easily, and is also prompted through the FAIRDOM-SEEK interface if there are outstanding requests.
-  * **Simplified Project and Programme creation.** Similar to joining a Project, a user can now more easily request to [create a Project](/help/user-guide/create-a-project.html), together with a Programme if enabled, along with defining a new or existing Institution. If a Programme or site administrator is needed to approve this request, once again there is a simpler interface to accept or reject quickly, and they are prompted through the FAIRDOM-SEEK interface as well as email.
-  * **Site managed Programme.** FAIRDOM-SEEK can be configured to include a site managed Programme. This can be selected by users wishing to create a Project but feel they do not need an overall Programme to self administer and need create future Projects within.
-  * **Markdown formatting of descriptions.** Support for [markdown elements in descriptions](/help/user-guide/general-attributes#description), including an editor with shortcuts for common formatting options, along with a preview option.
-  * **Ontology based controlled vocabularies.** Sample attributes can currently include a controlled vocabulary linked to a basic list of strings. This has been extended to support ontology backed CV’s which can be easily populated in the UI via the Ontology Lookup Service, or populated manually to include term IRI's.
-  * **Spreadsheet view for exploring Comma and Tab separated value files (CSV or TSV).** Supports exploring CSV/TSV files uploaded as a DataFile in a table view, reusing the existing Excel file explore feature.
-  * **Condensed view of lists.** When viewing the standard index page for items, an alternative [condensed view](/help/user-guide/browsing.html) can be selected, with collapsible items, that makes it easier to fit and browse more results in a single results page.
-  * **Table view of lists.** When viewing the standard index page for items, an alternative view can be selected, to display [items in a table](/help/user-guide/browsing.html). A small set of columns are shown by default, which can be extended and customised to include attributes related to that item type.
-  * **MIAPPE support with custom metadata extensions.** The ability to extend FAIRDOM-SEEK entities with additional metadata attributes (quite similar to sample types, using the same attributes, but as attributes that extend the item). The focus is currently on extending metadata for Investigations, Studies and Assays to support [MIAPPE](https://github.com/MIAPPE/MIAPPE). However the ability is generic and can be used to define custom metadata extensions for any item type to support different standards. Future plans are to provide a UI to make it is possible to define new extensions, pre-defined definitions for repository standards, and also provide support for MIAPPE observed variables.
-  * **Bulk changing of sharing permissions.** The ability to [bulk change the sharing permissions](/help/user-guide/bulk-change-sharing-permission.html) of many of your items at once in a single step.
-  * **Simplified deleting of Projects.** Projects can now be deleted, by the Project admin, even if it still contains members. The members will automatically be removed. Projects that contain assets cannot be deleted without first removing those assets.
-  * **Run with Copasi button.** A button, which can download a publically downloadable model to a local installed Copasi application and start the simulation in Copasi 
-  * **Changing visibility of item versions.** Historically past versions have been visible to registered users, but not to those logged out (anonymous).
-This has now been changed so that all past versions can be made visible (in accordance with the sharing permissions of the item), and their visibility can be controlled by the user - completely hiding individual versions if wished. Exiting versions to continue to follow the original permissions until explicitly changed.
+  * **Changes to joining a project during registration**. 
+    * During registration a user will no longer be asked to select a Project and Institution, (this was often missed). Instead, after registration they will be prompted to either Join or Create a Project after registration and until they are a member. 
+    * [Joining a Project](/help/user-guide/join-a-project.html) now has an easier interface to search and select the projects the users want to join, and to define either a new Institution or select an existing one
+    * The Project administrator is notified by email, and is provided with a single page to accept the join request more easily, and is also prompted through the FAIRDOM-SEEK interface if there are outstanding requests.
+  * **Simplified Project and Programme creation.** 
+    * A user can now more easily request to [create a Project](/help/user-guide/create-a-project.html). The Project creation request can include a Programme if enabled, along with defining a new Institution or selecting an existing one. 
+    * If a Programme or site administrator is needed to approve the request, there is a simpler interface to accept or reject quickly, and the administrators are prompted through the FAIRDOM-SEEK interface as well as email.
+  * **Site managed Programme.** 
+    * FAIRDOM-SEEK can now configured to include a site managed Programme.
+    * This can be selected by users who do not want to a Programme to self administer and add additional Projects.
+  * **Markdown formatting of descriptions.** 
+    * Support has been added for [markdown elements in descriptions](/help/user-guide/general-attributes#description).
+    * It includes an editor with shortcuts for common formatting options, together with a preview option.
+  * **Ontology based controlled vocabularies.** 
+    * FAIRDOM-SEEK now supports Sample attributes limited to controlled vocabularies (CVs) backed by an ontology.
+    * This extends the current capability for a controlled vocabulary to be specified by a list of strings.
+    * The ontology backed CV's can be easily populated in the User Interface via the Ontology Lookup Service. They may also be populated manually with Internationalized Resource Identifiers (IRI's).
+  * **Spreadsheet view for exploring Comma and Tab separated value files (CSV or TSV).** 
+    * FAIRDOM-SEEK adds support for exploring CSV/TSV files uploaded as a DataFile.
+    * The exploration presents a table view of data.
+    * The exploration extends the existing Excel file explore feature.
+  * **Condensed view of lists.** 
+    * When viewing the standard index page for items, FAIRDOM-SEEK now has an alternative  [condensed view](/help/user-guide/browsing.html) that can be selected.
+    * The condensed view has collapsible items, that make it easier to view and browse more results in a single results page.
+  * **Table view of lists.** 
+    * When viewing the standard index page for items, there is now an alternative view that can displays [items in a table](/help/user-guide/browsing.html).
+    * By default, a small set of columns of data about the items are shown. This set can be extended and customised to include attributes related to that item type.
+  * **MIAPPE support with custom metadata extensions.** 
+    * FAIRDOM-SEEK now adds the ability to extend entities with additional metadata attributes. The focus is currently on extending metadata for Investigations, Studies and Assays to support [MIAPPE](https://github.com/MIAPPE/MIAPPE).
+    * The ability is generic and can be used to define custom metadata extensions for any item type; this allows FAIRDOM-SEEK to support different standards.
+    * Future versions plan to provide 
+      * a UI to allow the  definition of new extensions,
+      * pre-defined definitions for repository standards, and also
+      * support for MIAPPE observed variables.
+  * **Bulk changing of sharing permissions.** 
+    * FAIRDOM-SEEK 1.11 adds the ability to [bulk change the sharing permissions](/help/user-guide/bulk-change-sharing-permission.html) of many items in a single step.    
+  * **Simplified deleting of Projects.** 
+    * FAIRDOM-SEEK now allows the deletion of Projects by the Project administrator, even if the project still has members.
+    * The members will automatically be removed
+    * Projects that contain assets or Investigations, Studies or Assays cannot be deleted without first removing them.
+  * **Run with Copasi button.** 
+    * Added ability to download a publicly downloadable model to a local installed Copasi application and to start the simulation in Copasi 
+  * **Changing visibility of item versions.** 
+    * Historically past versions of an item have been visible to registered users, but not to those logged out (anonymous).
+    * FAIRDOM-SEEK now supports all past versions being visible (in accordance with the sharing permissions of the item),
+    * The visibility of specific versions can be controlled by the user - completely hiding individual versions if wished.
+    * Existing versions continue to follow the original permissions until explicitly changed.
 
 
 ## Version 1.10.3
