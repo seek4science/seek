@@ -14,22 +14,14 @@ They are expected to be added to SEEK in roughly the order they are presented he
 
 | Feature | Milestone date |
 | --- | --- |
-| Generic Custom Metadata fields | Spring 2021  |
-| Extended Studies with extended metadata, supporting MIAPPE | Spring 2021 |
-| Ontology based metadata attributes, for samples and custom metadata | Spring 2021 |
-| Collections - grouping assets together under a topic or theme | Spring 2021 |
-| Smoother process for creating and joining Projects, for admins to handle the request | Spring 2021 |
-| Markdown formatting for descriptions | Spring 2021 |
-| Exploring CSV & TSV (as if Excel) | Spring 2021 |
-| Bulk Changing Sharing Permissions | Spring 2021 |
-| Sample and Sample Type API | Spring 2021 |
+| Collections - grouping assets together under a topic or theme | Summer 2021 |
+| Sample and Sample Type API | Summer 2021 |
 | Project folders, to help organise files outside of the ISA structure | Summer 2021 |
 | UI for creating Custom Metadata Extensions | Summer 2021 |
 | Backend storage changes with better versioning support | Autumn 2021 |
 | Better support for GitHub | Autumn 2021 |
 | Support for Datasets containing multiple files organised into folders | Autumn 2021 |
 | API support for creating new versions | Autumn 2021 |
-
 
 <br/>
 
@@ -50,6 +42,13 @@ You can find more details about each release in our [Change Logs](/tech/releases
 
 | Feature | SEEK version |
 | --- | --- | 
+| Generic Custom Metadata fields | 1.11.0  |
+| Extended Studies with extended metadata, supporting MIAPPE | 1.11.0 |
+| Ontology based metadata attributes, for samples and custom metadata | 1.11.0 |
+| Smoother process for creating and joining Projects, for admins to handle the request | 1.11.0 |
+| Markdown formatting for descriptions | 1.11.0 |
+| Exploring CSV & TSV (as if Excel) | 1.11.0 |
+| Bulk Changing Sharing Permissions | 1.11.0 |
 | Metadata search and querying | 1.10.0 |
 | Bioschemas.org support | 1.9.1 |
 | Rails 5.2 upgrade | 1.9 |
