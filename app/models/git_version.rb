@@ -169,7 +169,7 @@ class GitVersion < ApplicationRecord
 
   def set_default_metadata
     if git_repository.remote?
-      self.name ||= (ref.split('/').last + ((branch? && commit) ? " @ #{commit.first(7)}" : ''))
+      self.name = (ref.split('/').last + ((branch? && commit) ? " @ #{commit.first(7)}" : '')) if self[:name].blank?
       self.comment ||= commit_object&.message
     end
   end
