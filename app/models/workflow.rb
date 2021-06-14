@@ -24,6 +24,10 @@ class Workflow < ApplicationRecord
     include WorkflowExtraction
     acts_as_doi_mintable(proxy: :parent, general_type: 'Workflow')
 
+    def maturity_level
+      Workflow::MATURITY_LEVELS[super]
+    end
+
     def workflow_class
       WorkflowClass.find_by_id(workflow_class_id)
     end
