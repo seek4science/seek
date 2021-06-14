@@ -53,6 +53,10 @@ module Seek
 
         # create the dynamic versioned model
         const_set(versioned_class_name, Class.new(ApplicationRecord)).class_eval do
+          def name
+            "Version #{version}"
+          end
+
           def self.reloadable?
             false
           end

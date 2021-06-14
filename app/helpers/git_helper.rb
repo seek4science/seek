@@ -92,4 +92,11 @@ module GitHelper
     ext = path.split('/').last&.split('.')&.last&.downcase
     Seek::ContentTypeDetection::IMAGE_VIEWABLE_FORMAT.include?(ext)
   end
+
+  def mutability_badge(git_version)
+    content_tag(:span,
+                git_version.mutable? ? 'Open' : 'Locked',
+                class: "mutability label #{git_version.mutable? ? 'label-warning' : 'label-success'}",
+                title: git_version.mutable? ? 'This version is open and may change over time.' : 'This version is locked and will not change.')
+  end
 end
