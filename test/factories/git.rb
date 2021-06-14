@@ -28,5 +28,14 @@ Factory.define(:git_version, class: GitVersion) do |f|
   f.name 'version 1.0.0'
   f.ref 'refs/heads/master'
   f.mutable true
+  end
+
+Factory.define(:remote_git_version, class: GitVersion) do |f|
+  f.git_repository { Factory(:remote_repository) }
+  f.resource { Factory(:workflow) }
+  f.name 'v0.01'
+  f.ref 'refs/tags/v0.01'
+  f.commit '3f2c23e92da3ccbc89d7893b4af6039e66bdaaaf'
+  f.mutable false
 end
 

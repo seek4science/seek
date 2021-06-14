@@ -919,7 +919,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_equal 'Concat two files', assigns(:workflow).title
   end
 
-  test 'get new version form for git-versioned workflow' do
+  test 'new version form for git-versioned workflow redirect to new_git_version' do
     with_config_value(:git_support_enabled, false) do
       workflow = Factory(:git_version).resource
       login_as(workflow.contributor)
@@ -928,9 +928,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
       get :new_version, params: { id: workflow.id }
 
-      assert_select 'a[href=?]', '#new-ro-crate'
-      assert_select 'a[href=?]', '#git-repo'
-      assert_select 'a[href=?]', '#existing-ro-crate'
+      assert_redirected_to new_git_version_workflow_path(workflow)
     end
   end
 
@@ -965,6 +963,36 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_select 'a[href=?]', '#new-ro-crate'
     assert_select 'a[href=?]', '#git-repo'
     assert_select 'a[href=?]', '#existing-ro-crate'
+  end
+
+  test 'get new git version page for remote git repo' do
+    workflow = Factory(:remote_git_version).resource
+    login_as(workflow.contributor)
+
+    assert workflow.is_git_versioned?
+
+    assert_no_difference('GitVersion.count') do
+      assert_enqueued_jobs(1, only: RemoteGitFetchJob) do
+        post :new_git_version, params: { id: workflow.id }
+      end
+    end
+
+    assert_redirected_to select_ref_git_repository_path(workflow.git_version.git_repository, resource_type: 'workflow', resource_id: workflow.id)
+  end
+
+  test 'get new git version page for local git repo' do
+    workflow = Factory(:git_version).resource
+    login_as(workflow.contributor)
+
+    assert workflow.is_git_versioned?
+
+    assert_difference('GitVersion.count', 1) do
+      assert_no_enqueued_jobs(only: RemoteGitFetchJob) do
+        post :new_git_version, params: { id: workflow.id }
+      end
+    end
+
+    assert_redirected_to workflow_path(workflow)
   end
 
   def edit_max_object(workflow)

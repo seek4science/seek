@@ -46,8 +46,12 @@ class WorkflowsController < ApplicationController
   end
 
   def new_version
-    respond_to do |format|
-      format.html
+    if @workflow.is_git_versioned?
+      redirect_to new_git_version_workflow_path(@workflow)
+    else
+      respond_to do |format|
+        format.html
+      end
     end
   end
 
