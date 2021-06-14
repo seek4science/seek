@@ -199,7 +199,7 @@ class GitVersion < ApplicationRecord
 
   def set_version
     self.version = (resource.git_versions.maximum(:version) || 0) + 1
-    self.name ||= "Version #{version}"
+    self.name = "Version #{self.version}" if self[:name].blank?
   end
 
   def set_git_info
