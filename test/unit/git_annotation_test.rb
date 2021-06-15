@@ -40,4 +40,25 @@ class GitAnnotationTest < ActiveSupport::TestCase
 
     assert_nil workflow.reload.main_workflow_path
   end
+
+  test 'destroy annotation' do
+    workflow = Factory(:git_version).resource
+    wgv = workflow.git_version
+
+    assert wgv.is_a?(Workflow::GitVersion)
+
+    assert_nil workflow.main_workflow_path
+
+    assert_difference('GitAnnotation.count', 1) do
+      wgv.main_workflow_path = 'concat_two_files.ga'
+      assert wgv.save
+    end
+
+    assert_difference('GitAnnotation.count', -1) do
+      wgv.main_workflow_path = ''
+      assert wgv.save
+    end
+
+    assert_nil workflow.reload.main_workflow_path
+  end
 end

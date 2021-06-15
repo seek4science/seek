@@ -236,7 +236,7 @@ module WorkflowExtraction
       exist = git_version.send("#{type}_annotation")
       if path.blank?
         if exist
-          exist.mark_for_destruction
+          exist.destroy
         end
 
         return
