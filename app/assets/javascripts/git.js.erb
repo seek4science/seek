@@ -1,32 +1,90 @@
 <% environment.context_class.instance_eval { include ImagesHelper } %>
 
 $j(document).ready(function () {
+
     $j('[data-role="seek-git-jstree-container"]').each(function () {
         var container = $j(this);
         var element = $j('[data-role="seek-git-jstree"]', container);
         var json = JSON.parse($j('script[data-role="seek-git-jstree-data"]', container).html());
+        var annotationMap = {};
+        if ($j('script[data-role="seek-git-jstree-annotation-data"]', container).length) {
+          annotationMap = JSON.parse($j('script[data-role="seek-git-jstree-annotation-data"]', container).html());
+        }
+
+        var redrawAnnotations = function (nodeIds) {
+            if (annotationMap) {
+                var tree = element.jstree(true);
+                nodeIds.forEach(function (nodeId) {
+                    var node = tree.get_node(nodeId);
+                    var element = tree.get_node(nodeId, true);
+                    if (!element || !node.data) {
+                        return;
+                    }
+                    // Remove existing annotations
+                    $j('> .git-annotation', element).remove();
+                    element.addClass('git-annotated');
+                    if (node.data.annotations && node.data.annotations.length) {
+                        node.data.annotations.forEach(function(annotation) {
+                            var template = HandlebarsTemplates["git/annotations/" + annotation.key] ||
+                                HandlebarsTemplates["git/annotations/default"];
+                            element.append(template(annotation));
+                        });
+                    }
+
+                    if (tree.is_closed(node) && node.data.childAnnotations && node.data.childAnnotations.length) {
+                        element.addClass('git-annotated-parent');
+                        node.data.childAnnotations.forEach(function(annotation) {
+                            var template = HandlebarsTemplates["git/annotations/" + annotation.key] ||
+                                HandlebarsTemplates["git/annotations/default"];
+                            element.append(template(annotation));
+                        });
+                    }
+                })
+            }
+        }
+
+        element.on('after_close.jstree', function (e, data) {
+            if (annotationMap) {
+                var nodes = $j(this).jstree(true).get_node(data.node.id).children || [];
+                redrawAnnotations(nodes.concat(data.node.id));
+            }
+        });
+
+        element.on('open_node.jstree', function (e, data) {
+            if (annotationMap) {
+                var nodes = $j(this).jstree(true).get_node(data.node.id).children || [];
+                redrawAnnotations(nodes.concat(data.node.id));
+            }
+        });
 
         element.on('loaded.jstree', function(e, data) {
-            var annotationMap = {};
-            if ($j('script[data-role="seek-git-jstree-annotation-data"]', container).length) {
-                annotationMap = JSON.parse($j('script[data-role="seek-git-jstree-annotation-data"]', container).html());
-            }
             if (annotationMap) {
-                var tree = $j(this);
+                var annotated = [];
+                var tree = $j(this).jstree(true);
                 Object.keys(annotationMap).forEach(function(path) {
-                    var node = tree.jstree(true).get_node(path, true);
+                    var annotations = annotationMap[path];
+                    var node = tree.get_node(path);
                     if (node) {
-                        var annotations = annotationMap[path];
-                        if (annotations.length) {
-                            node.addClass('git-annotated');
-                            annotations.forEach(function(annotation) {
-                                var template = HandlebarsTemplates["git/annotations/" + annotation.key] ||
-                                    HandlebarsTemplates["git/annotations/default"];
-                                node.append(template(annotation));
-                            });
+                        annotated.push(path);
+                        node.data ||= {}
+                        node.data.annotations = annotations;
+                        var nodeId = node.id;
+                        var i = 0;
+                        while ((nodeId = tree.get_parent(nodeId)) !== '#') {
+                            if (i++ > 100) {
+                                break;
+                            }
+                            node = tree.get_node(nodeId);
+                            if (node) {
+                              annotated.push(nodeId);
+                                node.data ||= {}
+                                node.data.childAnnotations = annotations;
+                            }
                         }
                     }
                 });
+
+                redrawAnnotations(annotated);
             }
         }).jstree({
             'plugins': ['wholerow', 'checkbox', 'types', 'conditionalselect'],

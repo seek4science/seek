@@ -1114,8 +1114,12 @@ input.git-path {
   cursor: pointer;
 }
 
-.git-annotated {
+.git-annotated > a {
   font-weight: bold;
+}
+
+.git-annotated-parent > .git-annotation {
+  opacity: 0.3;
 }
 
 .git-annotation {
