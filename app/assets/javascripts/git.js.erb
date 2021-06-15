@@ -43,6 +43,17 @@ $j(document).ready(function () {
             }
         }
 
+        var addAnnotations = function (node, annotations, isParent) {
+            node.data ||= {};
+            var key = isParent ? 'childAnnotations' : 'annotations';
+            node.data[key] ||= [];
+            annotations.forEach(function (annotation) {
+                if (!node.data[key].find(function (a) { a.key === annotation.key })) {
+                    node.data[key].push(annotation);
+                }
+            })
+        }
+
         element.on('after_close.jstree', function (e, data) {
             if (annotationMap) {
                 var nodes = $j(this).jstree(true).get_node(data.node.id).children || [];
@@ -66,8 +77,7 @@ $j(document).ready(function () {
                     var node = tree.get_node(path);
                     if (node) {
                         annotated.push(path);
-                        node.data ||= {}
-                        node.data.annotations = annotations;
+                        addAnnotations(node, annotations, false);
                         var nodeId = node.id;
                         var i = 0;
                         while ((nodeId = tree.get_parent(nodeId)) !== '#') {
@@ -76,9 +86,8 @@ $j(document).ready(function () {
                             }
                             node = tree.get_node(nodeId);
                             if (node) {
-                              annotated.push(nodeId);
-                                node.data ||= {}
-                                node.data.childAnnotations = annotations;
+                                annotated.push(nodeId);
+                                addAnnotations(node, annotations, true);
                             }
                         }
                     }
