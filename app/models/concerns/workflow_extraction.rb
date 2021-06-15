@@ -232,6 +232,10 @@ module WorkflowExtraction
       git_version.send("#{s_type}_annotation")&.path
     end
 
+    define_method("#{s_type}_path_changed?") do
+      instance_variable_get(:"@#{s_type}_path_changed") || false
+    end
+
     define_method("#{type}_path=") do |path|
       exist = git_version.send("#{type}_annotation")
       if path.blank?
@@ -243,6 +247,7 @@ module WorkflowExtraction
       end
 
       if exist
+        instance_variable_set(:"@#{s_type}_path_changed", exist.path != path)
         exist.update_attribute(:path, path)
       else
         git_version.git_annotations.build(key: s_type, path: path)

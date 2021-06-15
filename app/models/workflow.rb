@@ -23,6 +23,9 @@ class Workflow < ApplicationRecord
   git_versioning do
     include WorkflowExtraction
     acts_as_doi_mintable(proxy: :parent, general_type: 'Workflow')
+    after_save do
+      FileUtils.rm(Dir.glob(cached_diagram_path('*'))) if diagram_path_changed?
+    end
 
     def maturity_level
       Workflow::MATURITY_LEVELS[super]
