@@ -45,4 +45,14 @@ class GitRepositoryTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test 'redundant repositories' do
+    redundant = GitRepository.create!
+    not_redundant = Factory(:git_version).git_repository
+
+    repositories = GitRepository.redundant.to_a
+
+    assert_includes repositories, redundant
+    assert_not_includes repositories, not_redundant
+  end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_25_131907) do
+ActiveRecord::Schema.define(version: 2021_06_15_083955) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -707,6 +707,8 @@ ActiveRecord::Schema.define(version: 2021_05_25_131907) do
     t.string "uuid"
     t.text "remote"
     t.datetime "last_fetch"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["resource_type", "resource_id"], name: "index_git_repositories_on_resource_type_and_resource_id"
   end
 

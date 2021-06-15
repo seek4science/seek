@@ -8,12 +8,14 @@ require 'rake'
 class RegularMaintenanceJob < ApplicationJob
   RUN_PERIOD = 4.hours.freeze
   BLOB_GRACE_PERIOD = 8.hours.freeze
+  REPO_GRACE_PERIOD = 8.hours.freeze
   USER_GRACE_PERIOD = 1.week.freeze
   MAX_ACTIVATION_EMAILS = 3
   RESEND_ACTIVATION_EMAIL_DELAY = 4.hours.freeze
 
   def perform
     clean_content_blobs
+    clean_git_repositories
     resend_activation_emails
     remove_unregistered_users
     trim_session
@@ -27,6 +29,14 @@ class RegularMaintenanceJob < ApplicationJob
       Rails.logger.info("Cleaning up content blob #{blob.id}")
       blob.reload
       blob.destroy if blob.asset.nil?
+    end
+  end
+
+  # Remove GitRepositories that were never used
+  def clean_git_repositories
+    GitRepository.redundant.where('git_repositories.created_at < ?', REPO_GRACE_PERIOD.ago).select do |repo|
+      Rails.logger.info("Cleaning up GitRepository #{repo.id}")
+      repo.destroy
     end
   end
 

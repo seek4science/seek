@@ -5,6 +5,7 @@ class GitRepository < ApplicationRecord
   has_many :git_versions
   after_create :initialize_repository
   after_create :setup_remote, if: -> { remote.present? }
+  after_destroy :disk_cleanup
 
   validates :remote, uniqueness: { allow_nil: true }
 
@@ -13,6 +14,10 @@ class GitRepository < ApplicationRecord
   has_task :remote_git_fetch
 
   FETCH_SPACING = 15.minutes
+
+  def self.redundant
+    self.left_outer_joins(:git_versions).where(git_versions: { id: nil })
+  end
 
   def local_path
     File.join(Seek::Config.git_filestore_path, uuid)
@@ -80,5 +85,9 @@ class GitRepository < ApplicationRecord
 
   def setup_remote
     git_base.add_remote('origin', remote)
+  end
+
+  def disk_cleanup
+    FileUtils.rm_rf(local_path) if local_path && local_path.length > 36 # Length check for safety
   end
 end
