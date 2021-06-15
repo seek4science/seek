@@ -81,6 +81,7 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
     assert assigns(:workflow).latest_git_version.commit.present?
     assert_equal 'refs/remotes/origin/main', assigns(:workflow).latest_git_version.ref
     assert assigns(:workflow).latest_git_version.git_repository.remote?
+    assert_nil assigns(:workflow).latest_git_version.git_repository.resource
 
     # Check there wasn't anything extra created in the whole flow...
     assert_equal repo_count + 1, GitRepository.count
@@ -144,6 +145,7 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
     assert assigns(:workflow).latest_git_version.commit.present?
     assert_equal 'refs/heads/master', assigns(:workflow).latest_git_version.ref
     refute assigns(:workflow).latest_git_version.git_repository.remote?
+    assert_equal assigns(:workflow), assigns(:workflow).latest_git_version.git_repository.resource
 
     # Check there wasn't anything extra created in the whole flow...
     assert_equal repo_count + 1, GitRepository.count
@@ -202,6 +204,7 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
     assert assigns(:workflow).latest_git_version.commit.present?
     assert_equal 'refs/heads/master', assigns(:workflow).latest_git_version.ref
     refute assigns(:workflow).latest_git_version.git_repository.remote?
+    assert_equal assigns(:workflow), assigns(:workflow).latest_git_version.git_repository.resource
 
     # Check there wasn't anything extra created in the whole flow...
     assert_equal repo_count + 1, GitRepository.count

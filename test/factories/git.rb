@@ -4,11 +4,14 @@ Factory.define(:blank_repository, class: GitRepository) do |f|
   end
 end
 
-Factory.define(:local_repository, class: GitRepository) do |f|
-  f.resource { Factory(:workflow) }
+Factory.define(:unlinked_local_repository, class: GitRepository) do |f|
   f.after_create do |r|
     FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'local-fixture-workflow', '_git', '.'), File.join(r.local_path, '.git'))
   end
+end
+
+Factory.define(:local_repository, parent: :unlinked_local_repository) do |f|
+  f.resource { Factory(:workflow) }
 end
 
 Factory.define(:unfetched_remote_repository, class: GitRepository) do |f|

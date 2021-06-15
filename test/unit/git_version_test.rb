@@ -172,7 +172,7 @@ class GitVersionTest < ActiveSupport::TestCase
   end
 
   test 'sync attributes' do
-    repo = Factory(:local_repository)
+    repo = Factory(:unlinked_local_repository)
     workflow = Factory(:workflow, description: 'Test ABC', git_version_attributes: { git_repository_id: repo.id })
     v = workflow.latest_git_version
 
@@ -183,5 +183,12 @@ class GitVersionTest < ActiveSupport::TestCase
 
     assert_equal 'Test 123', workflow.reload.description
     assert_equal 'Test 123', v.reload.description
+  end
+
+  test 'cannot link to existing local repository' do
+    repo = Factory(:local_repository)
+    gv = Factory.build(:git_version, git_repository_id: repo.id)
+    refute gv.save
+    assert gv.errors.added?(:git_repository, 'already linked to another resource')
   end
 end

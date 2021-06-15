@@ -14,10 +14,12 @@ class GitVersion < ApplicationRecord
   before_validation :set_default_visibility, on: :create
   before_validation :assign_contributor, on: :create
   before_save :set_commit, unless: -> { ref.blank? }
+  after_create :set_git_repository_resource
 
   accepts_nested_attributes_for :git_annotations
 
   store :resource_attributes, coder: JSON
+  validate :git_repository_linkable
 
   include GitSupport
 
@@ -287,5 +289,15 @@ class GitVersion < ApplicationRecord
     else
       super
     end
+  end
+
+  def git_repository_linkable
+    unless git_repository.remote? || git_repository.resource.blank? || git_repository.resource == resource
+      errors.add(:git_repository, 'already linked to another resource')
+    end
+  end
+
+  def set_git_repository_resource
+    git_repository.update_attribute(:resource, resource) unless git_repository.remote?
   end
 end
