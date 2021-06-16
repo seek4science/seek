@@ -17,11 +17,13 @@ module LifeMonitor
       end
 
       def status(workflow_version)
-        perform("/workflows/#{workflow_version.workflow.uuid}/#{workflow_version.version}/status", :get)
+        perform("/workflows/#{workflow_version.workflow.uuid}/status", :get, {
+          version: workflow_version.version
+        })
       end
 
       def submit(workflow_version)
-        perform("/workflows", :post,
+        perform("/users/#{workflow_version.contributor.id}/workflows", :post,
                 content_type: :json,
                 body: {
                     uuid: workflow_version.workflow.uuid,
@@ -29,29 +31,15 @@ module LifeMonitor
                     roc_link: ro_crate_workflow_url(workflow_version.workflow, version: workflow_version.version,
                                                     host: Seek::Config.host_with_port,
                                                     protocol: Seek::Config.host_scheme),
-                    name: workflow_version.workflow.title,
-                    submitter_id: workflow_version.contributor.id.to_s
-                })
-      end
-
-      def replace(workflow_version)
-        raise 'not implemented' # Wait for this to be implemented by LifeMonitor
-        perform("/workflows/#{workflow_version.workflow.uuid}/#{workflow_version.version}", :put,
-                content_type: :json,
-                body: {
-                    uuid: workflow_version.workflow.uuid,
-                    version: workflow_version.version.to_s,
-                    roc_link: ro_crate_workflow_url(workflow_version.workflow, version: workflow_version.version,
-                                                    host: Seek::Config.host_with_port,
-                                                    protocol: Seek::Config.host_scheme),
-                    name: workflow_version.workflow.title,
-                    submitter_id: workflow_version.contributor.id.to_s
+                    name: workflow_version.workflow.title
                 })
       end
 
       def exists?(workflow_version)
         begin
-          perform("/workflows/#{workflow_version.workflow.uuid}/#{workflow_version.version}", :get)
+          perform("/workflows/#{workflow_version.workflow.uuid}", :get, params: {
+            version: workflow_version.version
+          })
           true
         rescue RestClient::NotFound
           false

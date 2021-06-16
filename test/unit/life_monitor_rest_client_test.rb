@@ -8,7 +8,7 @@ class LifeMonitorRestClientTest < ActiveSupport::TestCase
   end
 
   test 'submit workflow' do
-    VCR.use_cassette('life_monitor/submit_workflow') do
+    VCR.use_cassette('life_monitor/submit_workflow', match_requests_on: [:method]) do
       response = @client.submit(@workflow.latest_version)
       assert_equal @workflow.uuid, response['wf_uuid']
     end
