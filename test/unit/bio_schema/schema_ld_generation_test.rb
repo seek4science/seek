@@ -67,7 +67,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'dataset' do
     df = travel_to(@current_time) do
-      df = Factory(:max_data_file, contributor: @person, projects: [@project], policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
+      df = Factory(:max_data_file, description: 'short desc', contributor: @person, projects: [@project], policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
       df.add_annotations('keyword', 'tag', User.first)
       disable_authorization_checks { df.save! }
       df
@@ -81,7 +81,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}",
       'name' => df.title,
-      'description' => df.description,
+      'description' => df.description.ljust(50,'.'),
       'keywords' => 'keyword',
       'url' => "http://localhost:3000/data_files/#{df.id}",
       'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
@@ -108,7 +108,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       }
     }
 
-    json = JSON.parse(df.to_schema_ld)
+    json = JSON.parse(df.to_schema_ld)    
     assert_equal expected, json
   end
 
