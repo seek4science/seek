@@ -163,24 +163,22 @@
       </div>
     </div>
   </div>
-  <%# Waiting for LifeMonitor to be production-ready before enabling settings %>
-  <% if false %>
-    <%= admin_checkbox_setting(:life_monitor_enabled, 1, Seek::Config.life_monitor_enabled,
-                               "LifeMonitor integration enabled", "Whether monitoring of #{t('workflow').pluralize} using #{link_to('LifeMonitor', 'https://github.com/crs4/life_monitor/', target: :_blank)} is enabled.",
-                               onchange: toggle_appear_javascript('life_monitor_block')) %>
-    <div id="life_monitor_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.life_monitor_enabled -%>">
-      <div class="row">
-        <div class="col-sm-7">
-          <%= admin_text_setting(:life_monitor_url, Seek::Config.life_monitor_url,
-                                 'LifeMonitor URL', "The URL of a LifeMonitor instance.") %>
-          <%= admin_text_setting(:life_monitor_client_id, Seek::Config.life_monitor_client_id,
-                                 'LifeMonitor OAuth client ID', 'The ID for this application to authenticate users through the LifeMonitor OAuth provider.') %>
-          <%= admin_text_setting(:life_monitor_client_secret, Seek::Config.life_monitor_client_secret,
-                                 'LifeMonitor OAuth client secret', 'The secret token for this application to authenticate users through the LifeMonitor OAuth provider.') %>
-        </div>
+  <%= admin_checkbox_setting(:life_monitor_enabled, 1, Seek::Config.life_monitor_enabled,
+                             "LifeMonitor integration enabled", "Whether monitoring of #{t('workflow').pluralize} using #{link_to('LifeMonitor', 'https://github.com/crs4/life_monitor/', target: :_blank)} is enabled.",
+                             onchange: toggle_appear_javascript('life_monitor_block')) %>
+
+  <div id="life_monitor_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.life_monitor_enabled -%>">
+    <div class="row">
+      <div class="col-sm-7">
+        <%= admin_text_setting(:life_monitor_url, Seek::Config.life_monitor_url,
+                               'LifeMonitor URL', "The URL of a LifeMonitor instance.") %>
+        <%= admin_text_setting(:life_monitor_client_id, Seek::Config.life_monitor_client_id,
+                               'LifeMonitor OAuth client ID', 'The ID for this application to authenticate users through the LifeMonitor OAuth provider.') %>
+        <%= admin_text_setting(:life_monitor_client_secret, Seek::Config.life_monitor_client_secret,
+                               'LifeMonitor OAuth client secret', 'The secret token for this application to authenticate users through the LifeMonitor OAuth provider.') %>
       </div>
     </div>
-  <% end %>
+  </div>
 
   <%= submit_tag "Update", data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' -%> or
   <%= cancel_button admin_path-%>
