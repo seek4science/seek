@@ -26,7 +26,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         'name' => 'SysMO-DB',
         'url' => 'http://www.sysmo-db.org'
       },
-      'dateCreated' => @current_time.to_s
+      'dateCreated' => @current_time.iso8601
     }
     with_config_value(:project_description, 'a lovely project') do
       with_config_value(:project_keywords, 'a,  b, ,,c,d') do
@@ -67,7 +67,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'dataset' do
     df = travel_to(@current_time) do
-      df = Factory(:max_data_file, contributor: @person, projects: [@project], policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
+      df = Factory(:max_data_file, description: 'short desc', contributor: @person, projects: [@project], policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
       df.add_annotations('keyword', 'tag', User.first)
       disable_authorization_checks { df.save! }
       df
@@ -81,7 +81,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}",
       'name' => df.title,
-      'description' => df.description,
+      'description' => df.description.ljust(50,'.'),
       'keywords' => 'keyword',
       'url' => "http://localhost:3000/data_files/#{df.id}",
       'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
@@ -90,8 +90,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         '@id' => "http://localhost:3000/projects/#{@project.id}",
         'name' => @project.title
       }],
-      'dateCreated' => @current_time.to_s,
-      'dateModified' => @current_time.to_s,
+      'dateCreated' => @current_time.iso8601,
+      'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'application/pdf',
       'identifier' => 'https://doi.org/10.10.10.10/test.1',
       'subjectOf' => [
@@ -108,7 +108,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       }
     }
 
-    json = JSON.parse(df.to_schema_ld)
+    json = JSON.parse(df.to_schema_ld)    
     assert_equal expected, json
   end
 
@@ -141,8 +141,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         '@id' => "http://localhost:3000/projects/#{@project.id}",
         'name' => @project.title
       }],
-      'dateCreated' => @current_time.to_s,
-      'dateModified' => @current_time.to_s,      
+      'dateCreated' => @current_time.iso8601,
+      'dateModified' => @current_time.iso8601,      
       'identifier' => 'https://doi.org/10.10.10.10/test.1',
       'subjectOf' => [
         { '@type' => 'Event',
@@ -183,8 +183,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         '@id' => "http://localhost:3000/projects/#{@project.id}",
         'name' => @project.title
       }],
-      'dateCreated' => @current_time.to_s,
-      'dateModified' => @current_time.to_s,
+      'dateCreated' => @current_time.iso8601,
+      'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'text/html',
       'identifier' => 'https://doi.org/10.10.10.10/test.1',
       'subjectOf' => [
@@ -309,8 +309,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'name' => 'This Document',
       'url' => "http://localhost:3000/documents/#{document.id}",
       'keywords' => 'wibble',
-      'dateCreated' => @current_time.to_s,
-      'dateModified' => @current_time.to_s,
+      'dateCreated' => @current_time.iso8601,
+      'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'application/pdf',
       'producer' => [
         { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{document.projects.first.id}", 'name' => document.projects.first.title }
@@ -336,8 +336,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'name' => 'This presentation',
       'url' => "http://localhost:3000/presentations/#{presentation.id}",
       'keywords' => 'wibble',
-      'dateCreated' => @current_time.to_s,
-      'dateModified' => @current_time.to_s,
+      'dateCreated' => @current_time.iso8601,
+      'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'application/pdf',
       'producer' => [
         { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{presentation.projects.first.id}", 'name' => presentation.projects.first.title }
@@ -389,8 +389,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                     [{ '@type' => %w[Project Organization],
                        '@id' => "http://localhost:3000/projects/#{@project.id}",
                        'name' => @project.title }],
-                 'dateCreated' => @current_time.to_s,
-                 'dateModified' => @current_time.to_s,
+                 'dateCreated' => @current_time.iso8601,
+                 'dateModified' => @current_time.iso8601,
                  'encodingFormat' => 'application/x-yaml',
                  'sdPublisher' =>
                     [{ '@type' => 'Person',

@@ -38,4 +38,16 @@ class DecoratorTest < ActiveSupport::TestCase
     properties = decorator.attributes.collect(&:property).collect(&:to_s).sort
     assert_equal ['@id', 'creator', 'dateCreated', 'dateModified', 'description', 'encodingFormat', 'keywords', 'license', 'name', 'producer', 'subjectOf', 'url'], properties
   end
+
+  test 'Dataset pads or truncates description' do
+    df = Factory(:data_file, description:'')
+    assert_equal 'Description not specified.........................', Seek::BioSchema::ResourceDecorators::DataFile.new(df).description
+    df = Factory(:data_file, description:'fish')
+    assert_equal 'fish..............................................', Seek::BioSchema::ResourceDecorators::DataFile.new(df).description
+    df = Factory(:data_file, description:'m'*100)
+    assert_equal 'm'*100, Seek::BioSchema::ResourceDecorators::DataFile.new(df).description
+    df = Factory(:data_file, description:'m'*10000)
+    assert_equal 4999, Seek::BioSchema::ResourceDecorators::DataFile.new(df).description.length
+    assert_equal 'm'*4996 + '...', Seek::BioSchema::ResourceDecorators::DataFile.new(df).description
+  end
 end
