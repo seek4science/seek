@@ -25,6 +25,11 @@ class GitConverterTest < ActiveSupport::TestCase
     assert_equal 'Genomics-1-PreProcessing_without_downloading_from_SRA.ga', workflow.latest_git_version.main_workflow_path
     assert_equal 'Genomics-1-PreProcessing_without_downloading_from_SRA.cwl', workflow.latest_git_version.abstract_cwl_path
     assert_equal 'Genomics-1-PreProcessing_without_downloading_from_SRA.svg', workflow.latest_git_version.diagram_path
+
+    author = workflow.latest_git_version.git_base.lookup(workflow.latest_git_version.commit).author
+    assert_equal workflow.contributor.name, author[:name]
+    assert_equal workflow.contributor.email, author[:email]
+    assert_equal workflow.latest_version.created_at.to_time, author[:time]
   end
 
   test 'convert provided RO-Crate' do
@@ -49,5 +54,10 @@ class GitConverterTest < ActiveSupport::TestCase
     assert workflow.latest_git_version.file_exists?('pp_wf.png')
     assert_equal '1-PreProcessing.ga', workflow.latest_git_version.main_workflow_path
     assert_equal 'pp_wf.png', workflow.latest_git_version.diagram_path
+
+    author = workflow.latest_git_version.git_base.lookup(workflow.latest_git_version.commit).author
+    assert_equal workflow.contributor.name, author[:name]
+    assert_equal workflow.contributor.email, author[:email]
+    assert_equal workflow.latest_version.created_at.to_time, author[:time]
   end
 end

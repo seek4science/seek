@@ -1,3 +1,4 @@
+# A class for converting a ContentBlob-backed asset to use a Git repository.
 module Seek
   module Git
     class Converter
@@ -38,7 +39,11 @@ module Seek
             end
             args = [path_io_pairs]
             args << version.revision_comments if version.revision_comments.present?
-            git_version.add_files(*args)
+            git_version.with_git_author(name: version.contributor.name,
+                                        email: version.contributor.email,
+                                        time: version.created_at.to_time) do
+              git_version.add_files(*args)
+            end
             git_version.save!
             git_version
           end

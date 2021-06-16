@@ -49,6 +49,36 @@ class GitVersionTest < ActiveSupport::TestCase
     assert_not_empty v.blobs
   end
 
+  test 'change git author' do
+    workflow = Factory(:workflow)
+    repo = Factory(:blank_repository, resource: workflow)
+
+    v = workflow.git_versions.create!(mutable: true)
+    assert_equal 'This Workflow', v.title
+    assert v.mutable?
+    assert v.commit.blank?
+    assert_empty v.blobs
+
+    User.with_current_user(workflow.contributor.user) do
+      v.add_file('blah.txt', StringIO.new('blah'))
+    end
+
+    author = repo.git_base.lookup(v.commit).author
+
+    assert_equal workflow.contributor.name, author[:name]
+    assert_equal workflow.contributor.email, author[:email]
+
+    v.with_git_author(email: 'bob@example.com', name: 'bob', time: 10.years.ago.to_time) do
+      v.add_file('blah2.txt', StringIO.new('blah'))
+    end
+
+    author = repo.git_base.lookup(v.commit).author
+
+    assert_equal 'bob', author[:name]
+    assert_equal 'bob@example.com', author[:email]
+    assert author[:time] < 9.years.ago.to_time
+  end
+
   test 'cannot add file to immutable version' do
     repo = Factory(:local_repository)
     workflow = repo.resource
@@ -59,7 +89,7 @@ class GitVersionTest < ActiveSupport::TestCase
     commit = v.commit
     blobs = v.blobs
 
-    assert_raise(GitVersion::ImmutableVersionException) do
+    assert_raise(Seek::Git::ImmutableVersionException) do
       v.add_file('blah.txt', StringIO.new('blah'))
     end
 

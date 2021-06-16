@@ -1,7 +1,4 @@
 class GitVersion < ApplicationRecord
-  class ImmutableVersionException < StandardError; end
-  DEFAULT_LOCAL_REF = 'refs/heads/master'
-
   include Seek::Git::Util
 
   belongs_to :resource, polymorphic: true
@@ -60,44 +57,15 @@ class GitVersion < ApplicationRecord
   end
 
   def lock
-    raise ImmutableVersionException unless mutable?
+    unless mutable?
+      errors.add(:base, 'is already frozen')
+      return false
+    end
 
     self.resource_attributes = resource.attributes
     self.mutable = false
     self.ref = git_base.tags.create(unique_git_tag, commit).canonical_name
     save!
-  end
-
-  def add_file(path, io, message: nil)
-    message ||= (file_exists?(path) ? 'Updated' : 'Added')
-    perform_commit("#{message} #{path}") do |index|
-      oid = git_base.write(io.read, :blob) # Write the file into the object DB
-      index.add(path: path, oid: oid, mode: 0100644) # Add it to the index
-    end
-  end
-
-  def add_files(path_io_pairs, message: nil)
-    message ||= "Added/updated #{path_io_pairs.count} files"
-    perform_commit(message) do |index|
-      path_io_pairs.each do |path, io|
-        oid = git_base.write(io.read, :blob) # Write the file into the object DB
-        index.add(path: path, oid: oid, mode: 0100644) # Add it to the index
-      end
-    end
-  end
-
-  def remove_file(path)
-    perform_commit("Deleted #{path}") do |index|
-      index.remove(path)
-    end
-  end
-
-  def move_file(oldpath, newpath)
-    perform_commit("Moved #{oldpath} -> #{newpath}") do |index|
-      existing = index[oldpath]
-      index.add(path: newpath, oid: existing[:oid], mode: 0100644)
-      index.remove(oldpath)
-    end
   end
 
   def commit
@@ -221,36 +189,6 @@ class GitVersion < ApplicationRecord
 
   def get_commit
     git_repository.resolve_ref(ref) if ref
-  end
-
-  def perform_commit(message, &block)
-    raise ImmutableVersionException unless mutable?
-
-    index = git_base.index
-
-    is_initial = git_base.head_unborn?
-
-    index.read_tree(git_base.head.target.tree) unless is_initial
-
-    yield index
-
-    options = {}
-    options[:tree] = index.write_tree(git_base.base) # Write a new tree with the changes in `index`, and get back the oid
-    options[:author] = git_author
-    options[:committer] = git_author
-    options[:message] ||= message
-    options[:parents] =  git_base.empty? ? [] : [git_base.head.target].compact
-    options[:update_ref] = ref unless is_initial
-
-    self.commit = Rugged::Commit.create(git_base.base, options)
-
-    if is_initial
-      r = ref.blank? ? DEFAULT_LOCAL_REF : ref
-      git_base.references.create(r, self.commit)
-      git_base.head = r if git_base.head.blank?
-    end
-
-    self.commit
   end
 
   def unique_git_tag

@@ -8,7 +8,7 @@ class GitController < ApplicationController
 
   user_content_actions :raw
 
-  rescue_from GitVersion::ImmutableVersionException, with: :render_immutable_error
+  rescue_from Seek::Git::ImmutableVersionException, with: :render_immutable_error
 
   def browse
     respond_to do |format|
