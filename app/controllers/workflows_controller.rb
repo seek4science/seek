@@ -30,20 +30,24 @@ class WorkflowsController < ApplicationController
   end
 
   def create_version
-    if handle_upload_data(true)
-      comments = params[:revision_comments]
-      respond_to do |format|
-        if @workflow.save_as_new_version(comments)
-
-          flash[:notice]="New version uploaded - now on version #{@workflow.version}"
-        else
-          flash[:error]="Unable to save new version"
-        end
-        format.html {redirect_to @workflow }
-      end
+    if params[:ro_crate]
+      handle_ro_crate_post(true)
     else
-      flash[:error] = flash.now[:error]
-      redirect_to @workflow
+      if handle_upload_data(true)
+        comments = params[:revision_comments]
+        respond_to do |format|
+          if @workflow.save_as_new_version(comments)
+
+            flash[:notice]="New version uploaded - now on version #{@workflow.version}"
+          else
+            flash[:error]="Unable to save new version"
+          end
+          format.html {redirect_to @workflow }
+        end
+      else
+        flash[:error] = flash.now[:error]
+        redirect_to @workflow
+      end
     end
   end
 
@@ -260,7 +264,46 @@ class WorkflowsController < ApplicationController
                   "workflow-#{@workflow.id}-#{@display_workflow.version}.crate.zip")
   end
 
+  def create
+    if params[:ro_crate]
+      handle_ro_crate_post
+    else
+      super
+    end
+  end
+
   private
+
+  def handle_ro_crate_post(new_version = false)
+    @workflow = Workflow.new unless new_version
+    extractor = Seek::WorkflowExtractors::ROCrate.new(params[:ro_crate])
+
+    @workflow.assign_attributes(extractor.metadata.except(:errors, :warnings))
+    @workflow.assign_attributes(workflow_params)
+    crate_upload = params[:ro_crate]
+    old_content_blob = new_version ? @workflow.content_blob : nil
+    version = new_version ? @workflow.version + 1 : 1
+    @workflow.build_content_blob(data: crate_upload,
+                                 original_filename: crate_upload.original_filename,
+                                 content_type: crate_upload.content_type,
+                                 asset_version: version)
+    if old_content_blob
+      old_content_blob.update_column(:asset_id, @workflow.id)
+    end
+
+    if new_version
+      success = @workflow.save_as_new_version(params[:revision_comments])
+    else
+      create_asset(@workflow)
+      success = @workflow.save
+    end
+
+    if success
+      render json: @workflow, include: json_api_include_param
+    else
+      render json: json_api_errors(@workflow), status: :unprocessable_entity
+    end
+  end
 
   def retrieve_content(blob)
     if !blob.file_exists?

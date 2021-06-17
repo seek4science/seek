@@ -68,4 +68,72 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
     hash_comparison(@to_post['data']['relationships'], h['data']['relationships'])
     hash_comparison(populate_extra_relationships(@to_post), h['data']['relationships'])
   end
+
+  test 'can post RO crate' do
+    Factory(:nextflow_workflow_class)
+
+    assert_difference('Workflow.count', 1) do
+      post workflows_path, params: {
+          ro_crate: fixture_file_upload('files/workflows/ro-crate-nf-core-ampliseq.crate.zip'),
+          workflow: {
+              project_ids: [@project.id]
+          }
+      }
+
+      assert_response :success
+      assert_equal 'Nextflow', assigns(:workflow).workflow_class.title
+      assert_equal 'nf-core/ampliseq', assigns(:workflow).title
+    end
+  end
+
+  test 'can post RO crate as new version' do
+    Factory(:nextflow_workflow_class)
+    workflow = Factory(:workflow, policy: Factory(:public_policy), contributor: @current_person)
+
+    assert_no_difference('Workflow.count', 1) do
+      assert_difference('Workflow::Version.count', 1) do
+        post create_version_workflow_path(workflow.id), params: {
+            ro_crate: fixture_file_upload('files/workflows/ro-crate-nf-core-ampliseq.crate.zip'),
+            workflow: {
+                project_ids: [@project.id]
+            },
+            revision_comments: 'new ver'
+        }
+
+        assert_response :success
+        assert_equal 2, assigns(:workflow).version
+        assert_equal 'Nextflow', assigns(:workflow).workflow_class.title
+        assert_equal 'nf-core/ampliseq', assigns(:workflow).title
+      end
+    end
+  end
+
+  test 'cannot post RO crate with missing metadata' do
+    assert_no_difference('Workflow.count') do
+      post workflows_path, params: {
+          ro_crate: fixture_file_upload('files/workflows/workflow-4-1.crate.zip'),
+          workflow: {
+              project_ids: [@project.id]
+          }
+      }
+
+      assert_response :unprocessable_entity
+      assert @response.body.include?("can't be blank")
+    end
+  end
+
+  test 'can supplement metadata when posting RO crate' do
+    assert_difference('Workflow.count', 1) do
+      post workflows_path, params: {
+          ro_crate: fixture_file_upload('files/workflows/workflow-4-1.crate.zip'),
+          workflow: {
+              title: 'Alternative title',
+              project_ids: [@project.id]
+          }
+      }
+
+      assert_response :success
+      assert_equal 'Alternative title', assigns(:workflow).title
+    end
+  end
 end
