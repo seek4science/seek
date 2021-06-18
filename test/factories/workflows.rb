@@ -33,6 +33,11 @@ Factory.define(:unextractable_workflow_class, class: WorkflowClass) do |f|
   f.description 'Mysterious'
 end
 
+Factory.define(:jupyter_workflow_class, class: WorkflowClass) do |f|
+  f.title 'Jupyter Notebook'
+  f.description 'Jupyter Notebook'
+end
+
 # Workflow
 Factory.define(:workflow) do |f|
   f.title 'This Workflow'
@@ -158,4 +163,9 @@ Factory.define(:monitored_workflow, parent: :workflow) do |f|
   f.after_create do |workflow|
     workflow.latest_version.update_column(:monitored, true)
   end
+end
+
+Factory.define(:spaces_ro_crate_workflow, parent: :workflow) do |f|
+  f.association :content_blob, factory: :spaces_ro_crate
+  f.workflow_class { WorkflowClass.find_by_title('Jupyter Notebook') || Factory(:jupyter_workflow_class) }
 end

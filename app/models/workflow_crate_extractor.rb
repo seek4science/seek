@@ -19,9 +19,9 @@ class WorkflowCrateExtractor
       repo = GitRepository.create!
       gv = @workflow.git_version
       gv.git_repository = repo
-      gv.main_workflow_path = @crate.main_workflow.id if @crate.main_workflow && !@crate.main_workflow.remote?
-      gv.diagram_path = @crate.main_workflow.diagram.id if @crate.main_workflow&.diagram && !@crate.main_workflow.diagram.remote?
-      gv.abstract_cwl_path = @crate.main_workflow.cwl_description.id if @crate.main_workflow&.cwl_description && !@crate.main_workflow.diagram.remote?
+      gv.main_workflow_path = URI.decode_www_form_component(@crate.main_workflow.id) if @crate.main_workflow && !@crate.main_workflow.remote?
+      gv.diagram_path = URI.decode_www_form_component(@crate.main_workflow.diagram.id) if @crate.main_workflow&.diagram && !@crate.main_workflow.diagram.remote?
+      gv.abstract_cwl_path = URI.decode_www_form_component(@crate.main_workflow.cwl_description.id) if @crate.main_workflow&.cwl_description && !@crate.main_workflow.diagram.remote?
       files = []
       @crate.entries.each do |path, entry|
         next if entry.directory?

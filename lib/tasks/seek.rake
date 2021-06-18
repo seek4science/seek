@@ -100,4 +100,22 @@ namespace :seek do
     Settings.where(var: Seek::Config.encrypted_settings).destroy_all
     puts 'Encrypted settings cleared'
   end
+
+  desc "Convert workflows to use git backend"
+  task convert_workflows_to_git: :environment do
+    puts 'Converting Workflows to git: '
+    count = 0
+    gv_count = GitVersion.count
+    gr_count = GitRepository.count
+    Workflow.includes(:git_versions).find_each do |workflow|
+      next if workflow.is_git_versioned?
+      Seek::Git::Converter.new(workflow).convert(unzip: true)
+      count += 1
+      print '.'
+    end
+    puts
+    puts "Converted #{count} Workflows"
+    puts "Created #{GitRepository.count - gr_count} GitRepositories"
+    puts "Created #{GitVersion.count - gv_count} GitVersions"
+  end
 end

@@ -24,12 +24,15 @@ module Seek
                 blob_dir = File.join(tmp_dir, "blob_#{blob.id}")
                 Dir.mkdir(blob_dir)
                 Dir.chdir(blob_dir) do
-                  Zip::File.open(blob.filepath) do |zipfile|
-                    zipfile.each_with_index do |entry, index|
-                      zipfile.extract(entry, entry.name)
-                      path_io_pairs << [entry.name, File.open(entry.name)]
-                    end
+                  ROCrate::Reader.unzip_file_to(blob.filepath, blob_dir)
+                  files = Dir.glob('**/*').select { |e| File.file? e }
+                  # Don't include generated RO-Crate files for basic crates
+                  if blob.original_filename.end_with?('.basic.crate.zip')
+                    files.delete('ro-crate-metadata.json')
+                    files.delete('ro-crate-metadata.jsonld')
+                    files.delete('ro-crate-preview.html')
                   end
+                  path_io_pairs += files.map { |f| [f, File.open(f)] }
 
                   annotate_version(git_version) if blob.original_filename.end_with?('crate.zip')
                 end
@@ -37,14 +40,14 @@ module Seek
                 path_io_pairs << [blob.original_filename, blob.data_io_object]
               end
             end
-            args = [path_io_pairs]
-            args << version.revision_comments if version.revision_comments.present?
-            git_version.with_git_author(name: version.contributor.name,
-                                        email: version.contributor.email,
-                                        time: version.created_at.to_time) do
-              git_version.add_files(*args)
+            User.with_current_user(version.contributor.user) do
+              git_version.with_git_author(name: version.contributor.name,
+                                          email: version.contributor.email,
+                                          time: version.created_at.to_time) do
+                git_version.add_files(path_io_pairs, message: version.revision_comments.present? ? version.revision_comments : nil)
+              end
+              git_version.save!
             end
-            git_version.save!
             git_version
           end
         end
@@ -61,9 +64,9 @@ module Seek
           diagram_path = crate.main_workflow&.diagram&.id
           abstract_cwl_path = crate.main_workflow&.cwl_description&.id
 
-          git_version.main_workflow_path = main_workflow_path unless main_workflow_path.blank?
-          git_version.diagram_path = diagram_path unless diagram_path.blank?
-          git_version.abstract_cwl_path = abstract_cwl_path unless abstract_cwl_path.blank?
+          git_version.main_workflow_path = URI.decode_www_form_component(main_workflow_path) unless main_workflow_path.blank?
+          git_version.diagram_path = URI.decode_www_form_component(diagram_path) unless diagram_path.blank?
+          git_version.abstract_cwl_path = URI.decode_www_form_component(abstract_cwl_path) unless abstract_cwl_path.blank?
         end
       end
     end
