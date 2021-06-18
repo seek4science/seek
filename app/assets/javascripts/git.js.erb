@@ -44,9 +44,13 @@ $j(document).ready(function () {
         }
 
         var addAnnotations = function (node, annotations, isParent) {
-            node.data ||= {};
+            if (!node.data) {
+                node.data = {}
+            }
             var key = isParent ? 'childAnnotations' : 'annotations';
-            node.data[key] ||= [];
+            if (!node.data[key]) {
+                node.data[key] = []
+            }
             annotations.forEach(function (annotation) {
                 if (!node.data[key].find(function (a) { a.key === annotation.key })) {
                     node.data[key].push(annotation);
