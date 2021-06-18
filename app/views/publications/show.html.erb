@@ -137,6 +137,11 @@
   </div>
   <div class="col-md-3 col-sm-4">
     <%= render :partial => "assets/resource_main_content_right", :locals => { :resource => @publication, :authors_title=>"Submitter", creators: nil } -%>
+    <p>
+      <% if @publication.misc_links.select{|link| link.url.present?}.any?  %>
+        <%= render partial: 'assets/misc_links_box', locals: {resource: @publication } -%>
+      <% end -%>
+    </p>
   </div>
 </div>
 

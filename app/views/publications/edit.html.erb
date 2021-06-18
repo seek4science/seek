@@ -6,6 +6,13 @@
   <%= form_for @publication do |f| %>
     <%= render :partial => 'publication_editor', :locals => {:publication_form => f }%>
   <% end %>
-<% elsif !@publication.doi.blank? || !@publication.pubmed_id.blank? %>
-  <%= render :partial => 'publication_doi_refetch_metadata', :locals => { :publication => @publication } %>
+<% else  %>
+  <% if Seek::Config.allow_edit_of_registered_publ %>
+    <%= form_for @publication do |f| %>
+      <%= render :partial => 'publication_editor', :locals => {:publication_form => f }%>
+    <% end %>
+  <% end %>
+  <% if !@publication.doi.blank? || !@publication.pubmed_id.blank? %>
+    <%= render :partial => 'publication_doi_refetch_metadata', :locals => { :publication => @publication } %>
+  <%end %>
 <%end %>

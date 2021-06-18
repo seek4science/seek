@@ -361,7 +361,18 @@ class PublicationsController < ApplicationController
   def get_data(publication, pubmed_id, doi = nil)
     result = publication.extract_metadata(pubmed_id, doi)
     result
+    end
+
+=begin
+  def can_edit?(user = User.current_user)
+    warn("Checking if we can edit")
+    # created (non-imported) publications cannot be edited (yet)
+    return false if @publication.registered_mode == 3
+    return false if user.nil? || user.person.nil? || !Seek::Config.publications_enabled
+    return true if user.is_admin?
+    contributor == user.person || projects.detect { |project| project.can_manage?(user) }.present?
   end
+=end
 
   private
 
@@ -374,6 +385,7 @@ class PublicationsController < ApplicationController
                                         :published_date, :bibtex_file, :registered_mode, :publisher, :booktitle, { project_ids: [] }, { event_ids: [] }, { model_ids: [] },
                                         { investigation_ids: [] }, { study_ids: [] }, { assay_ids: [] }, { presentation_ids: [] },
                                         { data_file_ids: [] }, { scales: [] }, { human_disease_ids: [] },
+                                        { misc_links_attributes: [:id, :url, :label, :_destroy] },
                                         { publication_authors_attributes: [:person_id, :id, :first_name, :last_name ] }).tap do |pub_params|
       filter_association_params(pub_params, :assay_ids, Assay, :can_edit?)
       filter_association_params(pub_params, :study_ids, Study, :can_view?)
@@ -401,7 +413,7 @@ class PublicationsController < ApplicationController
     params[key]
   end
 
-  # the original way of creating a bublication by either doi or pubmedid, where all data is set server-side
+  # the original way of creating a publication by either doi or pubmedid, where all data is set server-side
   def register_publication
     get_data(@publication, @publication.pubmed_id, @publication.doi)
 
@@ -442,7 +454,6 @@ class PublicationsController < ApplicationController
     end
 
     if @publication.save
-
       upload_blob
       update_sharing_policies @publication
 
