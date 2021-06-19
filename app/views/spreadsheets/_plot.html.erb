@@ -14,7 +14,7 @@
   <%= form_tag(spreadsheet_annotations_path, method: :post, class: 'spreadsheet-annotation-ctrl',
                id: "plot_panel_form", remote: true) do  %>
     <div style="display:none;">
-      <%= hidden_field_tag :annotation_content_blob_id, @display_data_file.content_blob.id %>
+      <%= hidden_field_tag :annotation_content_blob_id, resource.content_blob.id %>
       <%= hidden_field_tag :annotation_sheet_id, "0" %>
 
       <%= text_field_tag :annotation_cell_coverage, nil,:class=>"annotation_cell_coverage_class" %>

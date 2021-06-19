@@ -4,6 +4,7 @@ class FileTemplate < ApplicationRecord
 
   include Seek::Annotatable
 
+  include Seek::Data::SpreadsheetExplorerRepresentation
   include Seek::Rdf::RdfGeneration
   include Seek::BioSchema::Support
 
@@ -20,6 +21,7 @@ class FileTemplate < ApplicationRecord
   has_many :placeholders, inverse_of: :file_template
 
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi', 'data_type', 'format_type']) do
+    include Seek::Data::SpreadsheetExplorerRepresentation
     acts_as_doi_mintable(proxy: :parent, general_type: 'Text')
     acts_as_versioned_resource
     acts_as_favouritable
