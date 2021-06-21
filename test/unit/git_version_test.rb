@@ -8,13 +8,13 @@ class GitVersionTest < ActiveSupport::TestCase
     repo = Factory(:local_repository)
     workflow = repo.resource
 
-    v = workflow.git_versions.create!(name: 'version 1.0.0', ref: 'refs/heads/master', mutable: true)
+    v = disable_authorization_checks { workflow.git_versions.create!(name: 'version 1.0.0', ref: 'refs/heads/master', mutable: true) }
     assert_empty v.resource_attributes
     assert_equal 'This Workflow', v.title
     refute v.git_base.tags['version-1.0.0']
     assert v.mutable?
 
-    v.send(:lock)
+    disable_authorization_checks { v.send(:lock) }
     workflow.update_column(:title, 'Something else')
     new_class = WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class)
     workflow.update_column(:workflow_class_id, new_class.id)
@@ -33,7 +33,8 @@ class GitVersionTest < ActiveSupport::TestCase
     workflow = Factory(:workflow)
     repo = Factory(:blank_repository, resource: workflow)
 
-    v = workflow.git_versions.create!(mutable: true)
+
+    v = disable_authorization_checks { workflow.git_versions.create!(mutable: true) }
     assert_equal 'This Workflow', v.title
     assert v.mutable?
     assert v.commit.blank?
@@ -53,7 +54,7 @@ class GitVersionTest < ActiveSupport::TestCase
     workflow = Factory(:workflow)
     repo = Factory(:blank_repository, resource: workflow)
 
-    v = workflow.git_versions.create!(mutable: true)
+    v = disable_authorization_checks { workflow.git_versions.create!(mutable: true) }
     assert_equal 'This Workflow', v.title
     assert v.mutable?
     assert v.commit.blank?
@@ -83,7 +84,7 @@ class GitVersionTest < ActiveSupport::TestCase
     repo = Factory(:local_repository)
     workflow = repo.resource
 
-    v = workflow.git_versions.create!(mutable: false)
+    v = disable_authorization_checks { workflow.git_versions.create!(mutable: false) }
     assert_equal 'This Workflow', v.title
     refute v.mutable?
     commit = v.commit
@@ -156,12 +157,12 @@ class GitVersionTest < ActiveSupport::TestCase
   test 'resolve refs' do
     remote = Factory(:remote_repository)
     workflow = Factory(:workflow, git_version_attributes: { git_repository_id: remote.id })
-    # v = workflow.git_versions.create!(mutable: false)
+    v = # disable_authorization_checks { workflow.git_versions.create!(mutable: false) }
 
     # assert_equal '068cecdfce022aa98532026957a0c9519402e156', v.commit
-    v = workflow.git_versions.create!(remote: remote.remote, ref: 'refs/remotes/origin/main')
+    v = disable_authorization_checks { workflow.git_versions.create!(remote: remote.remote, ref: 'refs/remotes/origin/main') }
     assert_equal 'b6312caabe582d156dd351fab98ce78356c4b74c', v.commit
-    v = workflow.git_versions.create!(remote: remote.remote, ref: 'refs/tags/v0.01')
+    v = disable_authorization_checks { workflow.git_versions.create!(remote: remote.remote, ref: 'refs/tags/v0.01') }
     assert_equal '3f2c23e92da3ccbc89d7893b4af6039e66bdaaaf', v.commit
   end
 
@@ -169,7 +170,7 @@ class GitVersionTest < ActiveSupport::TestCase
     workflow = Factory(:workflow)
     repo = Factory(:local_repository, resource: workflow)
 
-    v = workflow.git_versions.create!(mutable: true)
+    v = disable_authorization_checks { workflow.git_versions.create!(mutable: true) }
     old_commit = v.commit
     old_blob_count = v.blobs.length
     assert v.file_exists?('diagram.png')
@@ -187,7 +188,7 @@ class GitVersionTest < ActiveSupport::TestCase
     workflow = Factory(:workflow)
     repo = Factory(:local_repository, resource: workflow)
 
-    v = workflow.git_versions.create!(mutable: true)
+    v = disable_authorization_checks { workflow.git_versions.create!(mutable: true) }
     old_commit = v.commit
     assert v.file_exists?('diagram.png')
     refute v.file_exists?('images/lookatme.png')
@@ -220,5 +221,33 @@ class GitVersionTest < ActiveSupport::TestCase
     gv = Factory.build(:git_version, git_repository_id: repo.id)
     refute gv.save
     assert gv.errors.added?(:git_repository, 'already linked to another resource')
+  end
+
+  test 'authorization' do
+    gv = Factory(:git_version)
+
+    refute gv.can_view?
+    refute gv.resource.can_view?
+    refute gv.can_download?
+    refute gv.resource.can_download?
+    refute gv.can_edit?
+    refute gv.resource.can_edit?
+    refute gv.can_manage?
+    refute gv.resource.can_manage?
+    refute gv.can_delete?
+    refute gv.resource.can_delete?
+
+    disable_authorization_checks { gv.resource.policy = Factory(:public_policy); gv.resource.save! }
+
+    assert gv.can_view?
+    assert gv.resource.can_view?
+    assert gv.can_download?
+    assert gv.resource.can_download?
+    assert gv.can_edit?
+    assert gv.resource.can_edit?
+    assert gv.can_manage?
+    assert gv.resource.can_manage?
+    assert gv.can_delete?
+    assert gv.resource.can_delete?
   end
 end

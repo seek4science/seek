@@ -28,6 +28,8 @@ class GitVersion < ApplicationRecord
            :authorization_supported?, :defines_own_avatar?, :use_mime_type_for_avatar?, :avatar_key,
            :show_contributor_avatars?, :can_see_hidden_item?, :related_people, :projects, :programmes, to: :parent
 
+  delegate_auth_to :parent
+
   def name
     super || "Version #{version}"
   end
