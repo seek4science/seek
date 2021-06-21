@@ -18,7 +18,7 @@ Release date: 21st _June 2021_
 This version includes:
 
   * **Changes to joining a project during registration**. 
-    * During registration a user will no longer be asked to select a Project and Institution, (this was often missed). Instead, after registration they will be prompted to either Join or Create a Project after registration and until they are a member. 
+    * During registration a user will no longer be asked to select a Project and Institution, (this was often missed). Instead, they will be prompted to either Join or Create a Project after registration and until they are a member. 
     * [Joining a Project](/help/user-guide/join-a-project.html) now has an easier interface to search and select the projects the users want to join, and to define either a new Institution or select an existing one
     * The Project administrator is notified by email, and is provided with a single page to accept the join request more easily, and is also prompted through the FAIRDOM-SEEK interface if there are outstanding requests.
   * **Simplified Project and Programme creation.** 
