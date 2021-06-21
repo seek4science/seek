@@ -13,7 +13,7 @@ If you have any comments or feedback about a release, then please [Contact Us](/
 
 ## Version 1.11.0
 
-Release date: _June 2021_
+Release date: 21st _June 2021_
 
 This version includes:
 
@@ -65,6 +65,7 @@ This version includes:
     * The visibility of specific versions can be controlled by the user - completely hiding individual versions if wished.
     * Existing versions continue to follow the original permissions until explicitly changed.
 
+[Closed issues for 1.11.0](https://github.com/seek4science/seek/milestone/2?closed=1)
 
 ## Version 1.10.3
 
