@@ -1,9 +1,9 @@
 ---
-title: SEEK User Guide
+title: FAIRDOM-SEEK User Guide
 layout: page
 ---
 
-# SEEK user documentation
+# FAIRDOM-SEEK user documentation
 
 ## Content
 
@@ -13,11 +13,13 @@ layout: page
 - [Editing your profile](editing-profile.html)
 - [Managing your account](managing-account.html)
      - [Managing your identities/alternative login methods](managing-identities.html)
-- [Requesting to join a Project](request-to-join-project.html)
+- [Browsing content](browsing.html)
+- [Joining a Project](join-a-project.html)
+- [Creating a Project](create-a-project.html)
 - [Adding assets (data, models, SOPs, publications) to SEEK](adding-assets.html)
 - [Creating new asset versions](uploading-new-versions.html)
 - [Comparing two versions of a Model](model-comparison.html)
-- [Executing a model on JWS Online](simulate-on-jws-online.html)
+- [Simulate a model on JWS Online](simulate-on-jws-online.html)
 - [Licenses](licenses.html)
 - [Generating the ISA structure](generating-the-isa-structure.html)
      - [Creating an Investigation](generating-the-isa-structure.html#creating-an-investigation)
@@ -67,8 +69,12 @@ layout: page
      - [Create a Sample Type](create-sample-type.html)
      - [Create a Sample](create-sample.html)
      - [Legacy Biosamples](legacy-biosamples.html)
+- [Collections](collections.html)
+- [Bulk changing of sharing permissions](bulk-change-sharing-permission.html)
 - [Using SEEK with openBIS](openbis.html)
+- [Using Copasi in SEEK](copasi-button.html)  
 - [API Introduction](api.html)
+- [Reporting a bug or feature request](/tech/reporting-bugs-and-features.html)
 - [Contributing to these SEEK Documents](/contributing.html)
 
 

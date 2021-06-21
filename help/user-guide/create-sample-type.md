@@ -122,12 +122,11 @@ the link from the Sample description. However, in this case, the Sample Type won
 
 ## Editing Sample Types
 
-The sample type may be edited by the original creator or the Project Administrator.
+The Sample Type may be edited by the original creator, or somebody that can administer the related projects.
 
-If no samples have yet been created, you can freely edit the sample type and its attributes. Once samples have started to
-be instantiated for a sample type, what you can change is restricted. You can change the title field, and also rename the attributes.
+If no samples have yet been created, you can freely edit the Sample Type and its attributes. Once Samples have been created for a Sample Type, it is no longer possible to modify the attributes - however other details about the Sample Type can be changed.
  
 
-For details on how to create a sample please go to [Creating a Sample](create-sample.html) 
+For details on how to create a Sample please go to [Creating a Sample](create-sample.html) 
 
 

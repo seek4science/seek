@@ -40,15 +40,15 @@ When upgrading between patch versions, it should only be necessary to run
     
     bundle install
     bundle exec rake seek:upgrade 
-    
-## Steps to upgrade from 1.9.x to 1.10.x
+
+## Steps to upgrade from 1.10.x to 1.11.x
 
 ### Upgrading Ruby
 
-You will need to upgrade Ruby to Ruby 2.4.10. If you are using [RVM](https://rvm.io/) (according to the [Installation Guide](install.html) )you should be prompted to install during the standard installation steps that follow.
+You will need to upgrade Ruby to Ruby 2.6.6. If you are using [RVM](https://rvm.io/) (according to the [Installation Guide](install.html) )you should be prompted to install during the standard installation steps that follow.
 If you are not prompted you can install with the command:
 
-    rvm install ruby-2.4.10
+    rvm install ruby-2.6.6
 
 ### Set RAILS_ENV
               
@@ -68,17 +68,17 @@ If you have an existing installation linked to our GitHub, you can fetch the
 files with:
 
     git pull
-    git checkout v1.10.3
+    git checkout v1.11.0
 
 ### Updating using the tarball
 
 You can download the file from
-<https://github.com/seek4science/seek/archive/v1.10.3.tar.gz> You can
+<https://github.com/seek4science/seek/archive/v1.11.0.tar.gz> You can
 unpack this file using:
 
-    tar zxvf seek-1.10.3.tar.gz
+    tar zxvf seek-1.11.0.tar.gz
     mv seek seek-previous
-    mv seek-1.10.3 seek
+    mv seek-1.11.0 seek
     cd seek/
 
 and then copy across your existing filestore and database configuration file
@@ -99,15 +99,21 @@ content.
     bundle install --deployment
     bundle exec rake seek:upgrade
     bundle exec rake assets:precompile # this task will take a while       
-       
+
+### Setup Cron Services
+
+This version includes an update to ActiveJob and requires some cron jobs for periodic background jobs to run. To set these up run:
+
+    bundle exec whenever --update-crontab
 
 ### Restarting services
 
     bundle exec rake sunspot:solr:start
     bundle exec rake seek:workers:start                
     
-    bundle exec rake tmp:clear                
-    
+    bundle exec rake tmp:clear  
+
+           
 ---
     
 ## Earlier upgrade notes
