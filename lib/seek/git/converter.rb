@@ -33,12 +33,11 @@ module Seek
                     files.delete('ro-crate-preview.html')
                   end
                   path_io_pairs += files.map { |f| [f, File.open(f)] }
-
-                  annotate_version(git_version) if blob.original_filename.end_with?('crate.zip')
                 end
               else
                 path_io_pairs << [blob.original_filename, blob.data_io_object]
               end
+              annotate_version(blob, git_version)
             end
             User.with_current_user(version.contributor.user) do
               git_version.with_git_author(name: version.contributor.name,
@@ -57,16 +56,21 @@ module Seek
 
       private
 
-      def annotate_version(git_version)
+      def annotate_version(blob, git_version)
         if asset.is_a?(Workflow)
-          crate = ROCrate::WorkflowCrateReader.read(Dir.pwd)
-          main_workflow_path = crate.main_workflow&.id
-          diagram_path = crate.main_workflow&.diagram&.id
-          abstract_cwl_path = crate.main_workflow&.cwl_description&.id
+          if blob.original_filename.end_with?('crate.zip')
+            crate = ROCrate::WorkflowCrateReader.read(blob)
+            main_workflow_path = crate.main_workflow&.id
+            diagram_path = crate.main_workflow&.diagram&.id
+            abstract_cwl_path = crate.main_workflow&.cwl_description&.id
 
-          git_version.main_workflow_path = URI.decode_www_form_component(main_workflow_path) unless main_workflow_path.blank?
-          git_version.diagram_path = URI.decode_www_form_component(diagram_path) unless diagram_path.blank?
-          git_version.abstract_cwl_path = URI.decode_www_form_component(abstract_cwl_path) unless abstract_cwl_path.blank?
+            git_version.main_workflow_path ||= URI.decode_www_form_component(main_workflow_path) unless main_workflow_path.blank?
+            git_version.diagram_path ||= URI.decode_www_form_component(diagram_path) unless diagram_path.blank?
+            git_version.abstract_cwl_path ||= URI.decode_www_form_component(abstract_cwl_path) unless abstract_cwl_path.blank?
+          # If it's a workflow with just a single file that isn't an RO-Crate, use that as the main workflow
+          elsif asset.all_content_blobs.count == 1
+            git_version.main_workflow_path ||= blob.original_filename
+          end
         end
       end
     end

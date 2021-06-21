@@ -86,4 +86,26 @@ class GitConverterTest < ActiveSupport::TestCase
     assert_equal 'biobb_MDsetup_tutorial.ipynb', workflow.latest_git_version.main_workflow_path
     assert_equal 'Protein MD Setup screenshot.png', workflow.latest_git_version.diagram_path
   end
+
+  test 'convert workflow that is just a single file' do
+    workflow = Factory(:cwl_workflow)
+
+    converter = Seek::Git::Converter.new(workflow)
+
+    refute workflow.local_git_repository
+    refute workflow.latest_git_version
+
+    assert_difference('GitAnnotation.count', 1) do
+      assert_difference('GitRepository.count', 1) do
+        assert_difference('GitVersion.count', 1) do
+          converter.convert(unzip: true)
+        end
+      end
+    end
+
+    assert workflow.local_git_repository
+    assert_equal 1, workflow.git_versions.count
+    assert workflow.latest_git_version.file_exists?('rp2-to-rp2path.cwl')
+    assert_equal 'rp2-to-rp2path.cwl', workflow.latest_git_version.main_workflow_path
+  end
 end
