@@ -24,7 +24,7 @@
 
 <script>
     $j(document).ready(function () {
-        $j("#git-browser-jstree").on('dblclick','.jstree-anchor', function (e) {
+        $j("#git-browser-jstree").on('click','.jstree-anchor', function (e) {
             var jstree = $j.jstree.reference(this);
             var node = jstree.get_node(this);
             if (node.type === 'blob') {
