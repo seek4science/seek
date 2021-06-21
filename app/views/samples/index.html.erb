@@ -2,26 +2,30 @@
 
 <% if @data_file || @sample_type %>
   <% if @sample_type %>
+    <p>
+      Showing for Sample Type: <%= link_to @sample_type.title,@sample_type %>
+    </p>
     <% resource_hash = get_related_resources(@sample_type) %>
     <% @total_count = resource_hash["Sample"][:items].count + resource_hash["Sample"][:hidden_count] %>
     <% @visible_count = resource_hash["Sample"][:items].count %>
-    <%= render partial: 'assets/resource_counts' %>
-  Sample <%= "instance".pluralize(@total_count)%> of <%= link_to @sample_type.title,@sample_type %>.
+    <p>
+      <%= render partial: 'assets/resource_counts' %>
+    </p>  
   <% end %>
-    <% if @samples.any? %>
-        <div id="samples-table">
-          <% if @data_file %>
-              <%= render partial: "samples/table_view", locals: { samples: @samples, link: true, source_url: samples_table_data_file_path(@data_file) }%>
-          <% else %>
-              <%= render partial: "samples/table_view", locals: { samples: @samples, link: true }%>
-          <% end %>
-        </div>
-        <script>
-          $j(document).ready(function () {
-            Samples.initTable($j('#samples-table'));
-          });
-        </script>
-    <% end %>
+  <% if @samples.any? %>
+      <div id="samples-table">
+        <% if @data_file %>
+            <%= render partial: "samples/table_view", locals: { samples: @samples, link: true, source_url: samples_table_data_file_path(@data_file) }%>
+        <% else %>
+            <%= render partial: "samples/table_view", locals: { samples: @samples, link: true }%>
+        <% end %>
+      </div>
+      <script>
+        $j(document).ready(function () {
+          Samples.initTable($j('#samples-table'));
+        });
+      </script>
+  <% end %>
 <% else %>
     <%= render partial: "general/index_facets_or_paged" %>
 <% end %>
