@@ -1,9 +1,9 @@
 ---
-title: SEEK User Guide
+title: FAIRDOM-SEEK User Guide
 layout: page
 ---
 
-# SEEK user documentation
+# FAIRDOM-SEEK user documentation
 
 ## Content
 

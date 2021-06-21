@@ -7,7 +7,7 @@ layout: page
 
 **Latest version - {{ site.current_seek_version }}**
 
-Please see [Getting SEEK](/get-seek.html) for details about installing SEEK
+Please see [Getting FAIRDOM-SEEK](/get-seek.html) for details about installing SEEK
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html)
 
