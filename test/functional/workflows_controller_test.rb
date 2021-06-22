@@ -465,8 +465,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     get :diagram, params: { id: wf.id }
 
-    assert_response :redirect
-    assert flash[:error].include?('You are not authorized')
+    assert_response :forbidden
   end
 
   test 'generates diagram if CWL viewer available' do
