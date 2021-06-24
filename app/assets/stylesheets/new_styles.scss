@@ -1083,8 +1083,7 @@ span.disabled {
   &.allow-blob-select .git-jstree-blob > i.jstree-checkbox {
     display: inherit;
   }
-
-  &.downloadable .jstree-leaf:hover .git-jstree-blob {
+  &.allow-blob-preview .jstree-leaf:hover .git-jstree-blob {
     text-decoration: underline;
   }
 }
