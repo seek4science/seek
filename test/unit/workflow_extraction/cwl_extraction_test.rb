@@ -32,4 +32,18 @@ class CWLExtractionTest < ActiveSupport::TestCase
     assert_equal ['workflow', 'knime', 'CWL', 'reaction'].sort, metadata[:tags].sort
     assert_equal 'Thomas Duigou, Stefan Helfrich', metadata[:other_creators]
   end
+
+  test 'structure test' do
+    wf = open_fixture_file('workflows/rp2-to-rp2path-packed-v2.cwl')
+    extractor = Seek::WorkflowExtractors::CWL.new(wf)
+    metadata = extractor.metadata
+    internals = metadata[:internals]
+
+    structure = WorkflowInternals::Structure.new(internals)
+
+    assert_equal 5, structure.inputs.count
+    assert_equal 3, structure.outputs.count
+    assert_equal 2, structure.steps.count
+    assert_equal 6, structure.links.count
+  end
 end

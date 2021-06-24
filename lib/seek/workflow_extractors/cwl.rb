@@ -24,11 +24,12 @@ module Seek
       end
 
       def generate_diagram(format = self.class.default_digram_format)
-        return nil unless Seek::Config.cwl_viewer_url.present?
-        content_type = self.class.diagram_formats[format]
-        url = URI.join(Seek::Config.cwl_viewer_url, DIAGRAM_PATH % { format: format }).to_s
         begin
-          RestClient.post(url, @io.read, content_type: 'text/plain', accept: content_type)
+          f = Tempfile.new('diagram.dot')
+          wf = WorkflowInternals::Structure.new(metadata[:internals])
+          Seek::WorkflowExtractors::CwlDotGenerator.new(f).write_graph(wf)
+          f.rewind
+          `cat #{f.path} | dot -T#{format}`
         rescue RestClient::Exception => e
           nil
         end
@@ -68,6 +69,8 @@ module Seek
 
       def parse_metadata(existing_metadata, yaml_or_json_string)
         cwl = YAML.load(yaml_or_json_string)
+        cwl = (cwl['$graph'].detect { |w| w['id'] == '#main' } || {}) if cwl.key?('$graph')
+
         if cwl.key?('label')
           existing_metadata[:title] = cwl['label']
         end
@@ -78,18 +81,25 @@ module Seek
           existing_metadata[:license] = cwl['s:license']
         end
 
-        existing_metadata[:internals] = {}
+        existing_metadata[:internals] = {
+          inputs: [],
+          outputs: [],
+          steps: [],
+          links: []
+
+        }
 
         existing_metadata[:internals][:inputs] = iterate(cwl['inputs']).map do |id, input|
           { id: id, name: input['label'], description: input['doc'], type: input['type'], default_value: input['default'] }
         end
 
         existing_metadata[:internals][:outputs] = iterate(cwl['outputs']).map do |id, output|
-          { id: id, name: output['label'], description: output['doc'], type: output['type'] }
+          { id: id, name: output['label'], description: output['doc'], type: output['type'], sources: output['outputSource'] ? Array(output['outputSource']) : [] }
         end
 
         existing_metadata[:internals][:steps] = iterate(cwl['steps']).map do |id, step|
-          { id: id, name: step['label'], description: step['doc'] }
+          existing_metadata[:internals][:links] += build_links(step['in'], id)
+          { id: id, name: step['label'], description: step['doc'], sinks: extract_sinks(step['out']) }
         end
       end
 
@@ -108,6 +118,24 @@ module Seek
             yield(item['id'], item)
           end
         end
+      end
+
+      def build_links(obj, sink_id)
+        return [] if obj.nil?
+
+        if obj.is_a?(Hash)
+          obj.map { |id, source_id| { id: id, source_id: source_id, sink_id: sink_id } }
+        else
+          Array(obj).flat_map do |s|
+            (s['source'].is_a?(Array) ? s['source'] : [s['source']]).map do |source|
+              { id: s['id'], source_id: source, sink_id: sink_id, name: s['label'], default_value: s['default'] }
+            end
+          end
+        end
+      end
+
+      def extract_sinks(obj)
+        obj.is_a?(Hash) ? obj['id'] : obj
       end
     end
   end

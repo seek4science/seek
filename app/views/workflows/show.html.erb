@@ -61,7 +61,7 @@
         <% unless @display_workflow.internals.empty? %>
           <div class="row">
             <div class="col-md-12">
-              <%= render partial: 'workflows/workflow_internals', locals: { workflow: @display_workflow } %>
+              <%= render partial: 'workflows/workflow_internals', locals: { structure: @display_workflow.structure } %>
             </div>
           </div>
         <% end %>

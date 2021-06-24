@@ -51,23 +51,11 @@ module WorkflowExtraction
     self.metadata = meta.is_a?(String) ? meta : meta.to_json
   end
 
-  def inputs
-    (internals[:inputs] || []).map do |i|
-      WorkflowInput.new(self, **i.symbolize_keys)
-    end
+  def structure
+    WorkflowInternals::Structure.new(internals)
   end
 
-  def outputs
-    (internals[:outputs] || []).map do |o|
-      WorkflowOutput.new(self, **o.symbolize_keys)
-    end
-  end
-
-  def steps
-    (internals[:steps] || []).map do |s|
-      WorkflowStep.new(self, **s.symbolize_keys)
-    end
-  end
+  delegate :inputs, :outputs, :steps, to: :structure
 
   def can_run?
     can_download?(nil) && workflow_class_title == 'Galaxy' && Seek::Config.galaxy_instance_trs_import_url.present?
