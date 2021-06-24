@@ -8,14 +8,9 @@
   <%= text_area(:publication, :abstract, :cols => 90, :rows => 8, :class => 'form-control') %>
 </div>
 
-<% if Seek::Config.allow_publications_fulltext %>
-  <%= fields_for(@publication) { |f| render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f} }-%>
-<% end %>
 <%= render partial: 'associate_authors_form', :locals => { :f=> publication_form, :publication => @publication} %>
 
 <%= render partial: 'scales/scales_selector', locals: { object: @publication } if show_scales?%>
-
-<%= render :partial=> "assets/misc_links_form", :locals=>{:resource => @publication} -%>
 
 <%= render partial: 'assets/select_tags' -%>
 

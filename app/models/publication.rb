@@ -75,6 +75,12 @@ class Publication < ApplicationRecord
 
   accepts_nested_attributes_for :publication_authors
 
+  # Types of registration
+  REGISTRATION_BY_PUBMED = 1
+  REGISTRATION_BY_DOI    = 2
+  REGISTRATION_MANUALLY = 3
+  REGISTRATION_FROM_BIBTEX = 4
+
   # http://bioruby.org/rdoc/Bio/Reference.html#method-i-format
   # key for the file-extension and format used in the route
   # value contains the format used by bioruby that name for the view and mimetype for the response
@@ -128,10 +134,10 @@ class Publication < ApplicationRecord
 
   # Returns the columns to be shown on the table view for the resource
   def columns_default
-    super + ['published_date','journal']
+    super + ['title','abstract','published_date','journal']
   end
   def columns_allowed
-    columns_default + ['abstract','last_used_at','doi','citation','deleted_contributor','registered_mode','booktitle','publisher','editor','url']
+    super + ['title','abstract','published_date','journal','last_used_at','doi','citation','deleted_contributor','registered_mode','booktitle','publisher','editor','url']
   end
 
   def pubmed_uri
@@ -153,7 +159,7 @@ class Publication < ApplicationRecord
   end
 
   def default_policy
-    Policy.new(name: 'publication_policy', access_type: Policy::VISIBLE).tap do |policy|
+    Policy.new(name: 'publication_policy', access_type: Policy::ACCESSIBLE).tap do |policy|
       populate_policy_from_authors(policy)
     end
   end
@@ -167,10 +173,6 @@ class Publication < ApplicationRecord
   end
 
   def contributor_credited?
-    false
-  end
-
-  def is_in_isa_publishable?
     false
   end
 
@@ -199,7 +201,7 @@ class Publication < ApplicationRecord
   # @param reference Bio::Reference
   # @see https://github.com/bioruby/bioruby/blob/master/lib/bio/reference.rb
   def extract_pubmed_metadata(reference)
-    self.registered_mode = 1
+    self.registered_mode = Publication::REGISTRATION_BY_PUBMED
     self.title = reference.title.chomp # remove full stop
     self.abstract = reference.abstract
     self.journal = reference.journal
@@ -217,7 +219,7 @@ class Publication < ApplicationRecord
   # @see https://github.com/SysMO-DB/doi_query_tool/blob/master/lib/doi_record.rb
   def extract_doi_metadata(doi_record)
 
-    self.registered_mode = 2
+    self.registered_mode = Publication::REGISTRATION_BY_DOI
     self.title = doi_record.title
     self.published_date = doi_record.date_published
     self.journal = doi_record.journal
@@ -231,7 +233,7 @@ class Publication < ApplicationRecord
   # @param bibtex_record BibTeX entity from bibtex-ruby gem
   def extract_bibtex_metadata(bibtex_record)
 
-    self.registered_mode = 4
+    self.registered_mode = Publication::REGISTRATION_FROM_BIBTEX
     self.publication_type_id = PublicationType.get_publication_type_id(bibtex_record)
     self.title           = bibtex_record[:title].try(:to_s).gsub /{|}/, '' unless bibtex_record[:title].nil?
     self.title           = bibtex_record[:chapter].try(:to_s).gsub /{|}/, '' if (self.title.nil? && !bibtex_record[:chapter].nil?)
@@ -557,7 +559,7 @@ class Publication < ApplicationRecord
   def can_soft_delete_full_text?(user = User.current_user)
     return false if user.nil? || user.person.nil? || !Seek::Config.allow_publications_fulltext
     return true if user.is_admin?
-    contributor == user.person || projects.detect { |project| project.can_manage?(user) }.present?
+    contributor == can_edit(user) || projects.detect { |project| project.can_manage?(user) }.present?
   end
 
   private

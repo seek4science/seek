@@ -13,7 +13,6 @@
 
           <%= render :partial => 'assets/fileinfo', :object => @publication.content_blob -%>
 
-
           <% if @publication.content_blob %>
             <%= rendered_asset_view(@publication) %>
           <% end %>

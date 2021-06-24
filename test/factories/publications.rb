@@ -24,17 +24,6 @@ Factory.define(:publication) do |f|
   f.projects { [Factory(:project)] }
   f.association :contributor, factory: :person
   f.association :publication_type, factory: :journal
-  f.policy { Factory(:downloadable_public_policy) }
-end
-
-Factory.define(:private_publication, class: Publication) do |f|
-  f.title 'A Minimal Publication'
-  f.doi 'https://doi.org/10.5072/abcd'
-  f.projects { [Factory(:project)] }
-  f.association :contributor, factory: :person
-  f.association :publication_type, factory: :journal
-  f.policy { Factory(:private_policy) }
-  #f.is_downloadable true
 end
 
 Factory.define(:min_publication, class: Publication) do |f|

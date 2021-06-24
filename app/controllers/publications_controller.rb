@@ -131,7 +131,6 @@ class PublicationsController < ApplicationController
   end
 
   def upload_pdf
-    update_sharing_policies @publication
 
     if handle_upload_data(true)
       comments = params[:revision_comments]
@@ -361,18 +360,7 @@ class PublicationsController < ApplicationController
   def get_data(publication, pubmed_id, doi = nil)
     result = publication.extract_metadata(pubmed_id, doi)
     result
-    end
-
-=begin
-  def can_edit?(user = User.current_user)
-    warn("Checking if we can edit")
-    # created (non-imported) publications cannot be edited (yet)
-    return false if @publication.registered_mode == 3
-    return false if user.nil? || user.person.nil? || !Seek::Config.publications_enabled
-    return true if user.is_admin?
-    contributor == user.person || projects.detect { |project| project.can_manage?(user) }.present?
   end
-=end
 
   private
 
@@ -439,7 +427,7 @@ class PublicationsController < ApplicationController
   # create a publication from a form that contains all the data
   def create_publication
 
-    @publication.registered_mode = @publication.registered_mode || 3
+    @publication.registered_mode = @publication.registered_mode || Publication::REGISTRATION_MANUALLY
     assay_ids = params[:assay_ids] || []
     # create publication authors
     plain_authors = params[:publication][:publication_authors]
@@ -455,7 +443,6 @@ class PublicationsController < ApplicationController
 
     if @publication.save
       upload_blob
-      update_sharing_policies @publication
 
       create_or_update_associations assay_ids, 'Assay', 'edit'
       if !@publication.parent_name.blank?

@@ -64,7 +64,7 @@ class PublicationTest < ActiveSupport::TestCase
     assert_equal publication_hash[:date_published], publication.published_date
     assert_nil publication.pubmed_id
     assert_nil publication.doi
-    assert_equal 2, publication.registered_mode
+    assert_equal Publication::REGISTRATION_BY_DOI, publication.registered_mode
   end
 
   test 'create publication from metadata pubmed' do
@@ -81,7 +81,7 @@ class PublicationTest < ActiveSupport::TestCase
     assert_equal publication_hash[:journal.to_s], publication.journal
     assert_nil publication.pubmed_id
     assert_nil publication.doi
-    assert_equal 1, publication.registered_mode
+    assert_equal Publication::REGISTRATION_BY_PUBMED, publication.registered_mode
   end
 
   test 'create publication from metadata bibtex' do
@@ -105,7 +105,7 @@ class PublicationTest < ActiveSupport::TestCase
     assert_equal 'Proteins', publication.journal
     assert_equal Date.new(2015, 1, 1), publication.published_date
     assert_equal 5, publication.publication_authors.length
-    assert_equal 4, publication.registered_mode
+    assert_equal Publication::REGISTRATION_FROM_BIBTEX, publication.registered_mode
   end
 
   test 'event association' do
