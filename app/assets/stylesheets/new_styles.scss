@@ -1084,7 +1084,7 @@ span.disabled {
     display: inherit;
   }
 
-  .jstree-leaf:hover .git-jstree-blob {
+  &.downloadable .jstree-leaf:hover .git-jstree-blob {
     text-decoration: underline;
   }
 }
