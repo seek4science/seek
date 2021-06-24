@@ -20,11 +20,7 @@ module ModelsHelper
 
   def authorised_models(projects = nil)
     authorised_assets(Model, projects)
-  end
-
-  def cytoscapeweb_supported?(model)
-    model.contains_xgmml?
-  end
+  end  
 
   def allow_model_comparison(displayed_version_model, other_version_model, user = User.current_user)
     return false if (displayed_version_model.version == other_version_model.version) ||

@@ -27,7 +27,7 @@
       <div class="form-group">
         <label>Description</label>
         <% model_description_value = (params[:model].blank? || params[:model][:description].blank?) ? nil : params[:model][:description] -%>
-        <%= text_area_tag 'model[description]', model_description_value, :class=>"form-control" -%>
+        <%= text_area_tag 'model[description]', model_description_value, :class=>"form-control rich-text-edit" -%>
       </div>
 
       <%= render :partial => "projects/project_selector", :locals => { :resource => @model, :allow_nil => Seek::Config.is_virtualliver } -%>

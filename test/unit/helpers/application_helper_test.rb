@@ -235,6 +235,8 @@ class ApplicationHelperTest < ActionView::TestCase
     prog_admin = Factory(:programme_administrator)
     programme = prog_admin.programmes.first
     person = Factory(:person)
+    unregistered_user = Factory(:brand_new_user)
+    assert_nil unregistered_user.person
     institution = Factory(:institution)
     project = Project.new(title:'new project')
 
@@ -253,6 +255,9 @@ class ApplicationHelperTest < ActionView::TestCase
     User.with_current_user(nil) do
       refute pending_project_creation_request?
     end
+    User.with_current_user(unregistered_user) do
+      refute pending_project_creation_request?
+    end
 
     # creating a project with a plain programme - prog admins notified
     MessageLog.delete_all
@@ -267,6 +272,9 @@ class ApplicationHelperTest < ActionView::TestCase
       refute pending_project_creation_request?
     end
     User.with_current_user(nil) do
+      refute pending_project_creation_request?
+    end
+    User.with_current_user(unregistered_user) do
       refute pending_project_creation_request?
     end
 
@@ -287,6 +295,9 @@ class ApplicationHelperTest < ActionView::TestCase
       User.with_current_user(nil) do
         refute pending_project_creation_request?
       end
+      User.with_current_user(unregistered_user) do
+        refute pending_project_creation_request?
+      end
     end
 
     # new programme, admins notified
@@ -302,6 +313,9 @@ class ApplicationHelperTest < ActionView::TestCase
       assert pending_project_creation_request?
     end
     User.with_current_user(nil) do
+      refute pending_project_creation_request?
+    end
+    User.with_current_user(unregistered_user) do
       refute pending_project_creation_request?
     end
     

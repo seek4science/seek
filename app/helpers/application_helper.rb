@@ -218,16 +218,11 @@ module ApplicationHelper
       res = text.html_safe
       res = white_list(res)
       res = truncate_without_splitting_words(res, options[:length]) if options[:length]
-      res = simple_format(res, {}, sanitize: false).html_safe if options[:description] == true || options[:address] == true
-      if options[:description] == true && options[:markdown] == true
+      if options[:markdown]
         markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, tables: true)
-        # replace br with newlines to fix list render issues
-        res.gsub!(/<br\s*\/>/, "\n")
-        # remove <p> and <br> tags, Redcarpet markdown render cannot handle them
-        scrubber = Rails::Html::TargetScrubber.new
-        scrubber.tags = ['p','br']
-        res = Loofah.fragment(res).scrub!(scrubber).to_s
         res = markdown.render(res)
+      elsif options[:description] || options[:address]
+        res = simple_format(res, {}, sanitize: false).html_safe
       end
       res = auto_link(res, html: { rel: 'nofollow' }, sanitize: false) if options[:auto_link]
       res = mail_to(res) if options[:email]
@@ -473,6 +468,7 @@ module ApplicationHelper
   end
 
   def pending_project_creation_request?
+    return false unless logged_in_and_registered?   
     MessageLog.pending_project_creation_requests.collect do |log|
       log.can_respond_project_creation_request?(User.current_user)
     end.any?
