@@ -176,6 +176,10 @@ class Publication < ApplicationRecord
     false
   end
 
+  def is_in_isa_publishable?
+    false
+  end
+
   def extract_metadata(pubmed_id, doi)
 
     reference = fetch_pubmed_or_doi_result(pubmed_id, doi)
