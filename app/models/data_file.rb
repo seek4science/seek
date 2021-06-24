@@ -82,7 +82,7 @@ class DataFile < ApplicationRecord
     super + ['creators','projects','version']
   end
   def columns_allowed
-    columns_default + ['last_used_at','other_creators','doi','license','simulation_data','deleted_contributor']
+    columns_default + ['last_used_at','other_creators','doi','license','simulation_data']
   end
 
   def included_to_be_copied?(symbol)

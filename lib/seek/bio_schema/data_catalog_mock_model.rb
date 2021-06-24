@@ -26,7 +26,7 @@ module Seek
         }
       end
 
-      def date_created
+      def created_at
         ActivityLog.order(:id).first.try(:created_at)
       end
 

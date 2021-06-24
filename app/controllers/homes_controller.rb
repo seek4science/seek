@@ -10,6 +10,7 @@ class HomesController < ApplicationController
   def index
     respond_with do |format|
       format.html
+      format.json { render status: :not_acceptable }
     end
   end
 
