@@ -20,7 +20,7 @@ module Seek
       end
 
       def can_render_diagram?
-        Seek::Config.cwl_viewer_url.present?
+        true
       end
 
       def generate_diagram(format = self.class.default_digram_format)
@@ -30,12 +30,13 @@ module Seek
           Seek::WorkflowExtractors::CwlDotGenerator.new(f).write_graph(wf)
           f.rewind
           `cat #{f.path} | dot -T#{format}`
-        rescue RestClient::Exception => e
+        rescue StandardError => e
           nil
         end
       end
 
       def metadata
+        return @metadata if @metadata
         meta = super
         if @io.is_a?(Pathname)
           cwl_string = nil
@@ -52,7 +53,7 @@ module Seek
           path = f.path
         end
 
-        packed_cwl_string = `cwltool --quiet --pack #{path}`
+        packed_cwl_string = `cwltool --skip-schemas --quiet --enable-dev --non-strict --pack #{path}`
         if $?.success?
           cwl_string = packed_cwl_string
         else
@@ -62,7 +63,7 @@ module Seek
 
         parse_metadata(meta, cwl_string)
 
-        meta
+        @metadata = meta
       end
 
       private
@@ -86,7 +87,6 @@ module Seek
           outputs: [],
           steps: [],
           links: []
-
         }
 
         existing_metadata[:internals][:inputs] = iterate(cwl['inputs']).map do |id, input|
@@ -99,7 +99,7 @@ module Seek
 
         existing_metadata[:internals][:steps] = iterate(cwl['steps']).map do |id, step|
           existing_metadata[:internals][:links] += build_links(step['in'], id)
-          { id: id, name: step['label'], description: step['doc'], sinks: extract_sinks(step['out']) }
+          { id: id, name: step['label'], description: step['doc'], sinks: extract_sinks(step['out'], id) }
         end
       end
 
@@ -134,8 +134,12 @@ module Seek
         end
       end
 
-      def extract_sinks(obj)
-        obj.is_a?(Hash) ? obj['id'] : obj
+      def extract_sinks(obj, id)
+        obj.map do |o|
+          sink = o.is_a?(Hash) ? o['id'] : o
+          sink = "#{id}/#{sink}"unless sink.start_with?("#{id}/")
+          sink
+        end
       end
     end
   end

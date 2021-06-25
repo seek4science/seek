@@ -436,7 +436,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     cwl = Factory(:cwl_workflow_class)
     post :create_content_blob, params: { content_blobs: [{ data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl', 'text/plain') }], workflow_class_id: cwl.id }
     assert_response :success
-    assert_equal 12, assigns[:metadata][:internals][:inputs].length
+    assert_equal 5, assigns[:metadata][:internals][:inputs].length
   end
 
   test 'extract metadata from remote should perform inline and cancel remote content fetch job' do
@@ -445,18 +445,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     post :create_content_blob, params: { content_blobs: [{ data_url: 'https://www.abc.com/workflow.cwl' }], workflow_class_id: cwl.id }
     assert assigns[:workflow].content_blob.reload.remote_content_fetch_task.cancelled?
     assert_response :success
-    assert_equal 12, assigns[:metadata][:internals][:inputs].length
-  end
-
-  test 'missing diagram and no CWL viewer available returns 404' do
-    wf = Factory(:cwl_workflow)
-    login_as(wf.contributor)
-    refute wf.diagram_exists?
-    refute wf.can_render_diagram?
-
-    get :diagram, params: { id: wf.id }
-
-    assert_response :not_found
+    assert_equal 5, assigns[:metadata][:internals][:inputs].length
   end
 
   test 'cannot see diagram of private workflow' do
@@ -468,21 +457,17 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_response :forbidden
   end
 
-  test 'generates diagram if CWL viewer available' do
-    with_config_value(:cwl_viewer_url, 'http://localhost:8080/cwl_viewer') do
-      wf = Factory(:cwl_workflow)
-      login_as(wf.contributor)
-      refute wf.diagram_exists?
-      assert wf.can_render_diagram?
+  test 'generates diagram' do
+    wf = Factory(:cwl_workflow)
+    login_as(wf.contributor)
+    refute wf.diagram_exists?
+    assert wf.can_render_diagram?
 
-      VCR.use_cassette('workflows/cwl_viewer_cwl_workflow_diagram') do
-        get :diagram, params: { id: wf.id }
-      end
+    get :diagram, params: { id: wf.id }
 
-      assert_response :success
-      assert_equal 'image/svg+xml', response.headers['Content-Type']
-      assert wf.diagram_exists?
-    end
+    assert_response :success
+    assert_equal 'image/svg+xml', response.headers['Content-Type']
+    assert wf.diagram_exists?
   end
 
   test 'picks diagram from RO-Crate' do
@@ -499,50 +484,44 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'generates diagram from CWL workflow in RO-Crate' do
-    with_config_value(:cwl_viewer_url, 'http://localhost:8080/cwl_viewer') do
-      wf = Factory(:just_cwl_ro_crate_workflow)
-      login_as(wf.contributor)
-      refute wf.diagram_exists?
-      assert_nil wf.ro_crate.main_workflow_diagram
-      assert wf.can_render_diagram?
+    wf = Factory(:just_cwl_ro_crate_workflow)
+    login_as(wf.contributor)
+    refute wf.diagram_exists?
+    assert_nil wf.ro_crate.main_workflow_diagram
+    assert wf.can_render_diagram?
 
-      VCR.use_cassette('workflows/cwl_viewer_cwl_workflow_from_crate_diagram') do
-        get :diagram, params: { id: wf.id }
-      end
+    get :diagram, params: { id: wf.id }
 
-      assert_response :success
-      assert_equal 'image/svg+xml', response.headers['Content-Type']
-      assert wf.diagram_exists?
-    end
+    assert_response :success
+    assert_equal 'image/svg+xml', response.headers['Content-Type']
+    assert wf.diagram_exists?
   end
 
   test 'generates diagram from abstract CWL in RO-Crate' do
-    with_config_value(:cwl_viewer_url, 'http://localhost:8080/cwl_viewer') do
-      wf = Factory(:generated_galaxy_no_diagram_ro_crate_workflow)
-      login_as(wf.contributor)
-      refute wf.diagram_exists?
-      assert wf.can_render_diagram?
+    wf = Factory(:generated_galaxy_no_diagram_ro_crate_workflow)
+    login_as(wf.contributor)
+    refute wf.diagram_exists?
+    assert wf.can_render_diagram?
 
-      VCR.use_cassette('workflows/cwl_viewer_galaxy_workflow_abstract_cwl_diagram') do
-        get :diagram, params: { id: wf.id }
-      end
+    get :diagram, params: { id: wf.id }
 
-      assert_response :success
-      assert_equal 'image/svg+xml', response.headers['Content-Type']
-      assert wf.diagram_exists?
-    end
+    assert_response :success
+    assert_equal 'image/svg+xml', response.headers['Content-Type']
+    assert wf.diagram_exists?
   end
 
   test 'handles error when generating diagram from CWL' do
-    with_config_value(:cwl_viewer_url, 'http://localhost:8080/cwl_viewer') do
+    bad_generator = MiniTest::Mock.new
+    def bad_generator.write_graph(struct)
+      raise 'oh dear'
+    end
+
+    Seek::WorkflowExtractors::CwlDotGenerator.stub :new, bad_generator do
       wf = Factory(:generated_galaxy_no_diagram_ro_crate_workflow)
       login_as(wf.contributor)
       refute wf.diagram_exists?
-      assert wf.can_render_diagram?
 
-      VCR.use_cassette('workflows/cwl_viewer_error') do
-        get :diagram, params: { id: wf.id }
-      end
+      get :diagram, params: { id: wf.id }
 
       assert_response :not_found
       refute wf.diagram_exists?
@@ -798,7 +777,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     galaxy = Factory(:galaxy_workflow_class)
     post :create_content_blob, params: { content_blobs: [{ data: fixture_file_upload('files/workflows/all_remote.crate.zip', 'application/zip') }], workflow_class_id: galaxy.id }
     assert_response :success
-    assert_equal 12, assigns[:metadata][:internals][:inputs].length
+    assert_equal 5, assigns[:metadata][:internals][:inputs].length
   end
 
   test 'filter by test status' do

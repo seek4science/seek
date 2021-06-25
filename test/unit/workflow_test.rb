@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'minitest/mock'
 
 class WorkflowTest < ActiveSupport::TestCase
   test 'validations' do
@@ -64,7 +65,7 @@ class WorkflowTest < ActiveSupport::TestCase
     crate = workflow.ro_crate
 
     assert crate.main_workflow
-    refute crate.main_workflow_diagram
+    assert crate.main_workflow_diagram
     refute crate.main_workflow_cwl
     assert_equal 'Common Workflow Language', crate.main_workflow.programming_language['name']
 
@@ -135,30 +136,29 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'generates RO-Crate and diagram for workflow/abstract workflow' do
-    with_config_value(:cwl_viewer_url, 'http://localhost:8080/cwl_viewer') do
-      workflow = Factory(:generated_galaxy_no_diagram_ro_crate_workflow)
-      assert workflow.should_generate_crate?
-      crate = nil
+    workflow = Factory(:generated_galaxy_no_diagram_ro_crate_workflow)
+    assert workflow.should_generate_crate?
+    crate = nil
 
-      VCR.use_cassette('workflows/cwl_viewer_galaxy_workflow_abstract_cwl_diagram') do
-        crate = workflow.ro_crate
-      end
+    crate = workflow.ro_crate
 
-      assert crate.main_workflow
-      assert crate.main_workflow_diagram
-      assert crate.main_workflow_cwl
-    end
+    assert crate.main_workflow
+    assert crate.main_workflow_diagram
+    assert crate.main_workflow_cwl
   end
 
   test 'generates RO-Crate and gracefully handles diagram error for workflow/abstract workflow' do
-    with_config_value(:cwl_viewer_url, 'http://localhost:8080/cwl_viewer') do
+    bad_generator = MiniTest::Mock.new
+    def bad_generator.write_graph(struct)
+      raise 'oh dear'
+    end
+
+    Seek::WorkflowExtractors::CwlDotGenerator.stub :new, bad_generator do
       workflow = Factory(:generated_galaxy_no_diagram_ro_crate_workflow)
       assert workflow.should_generate_crate?
       crate = nil
 
-      VCR.use_cassette('workflows/cwl_viewer_error') do
-        crate = workflow.ro_crate
-      end
+      crate = workflow.ro_crate
 
       assert crate.main_workflow
       refute crate.main_workflow_diagram

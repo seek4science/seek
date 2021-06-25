@@ -134,7 +134,7 @@ module Seek
         # Write the links between nodes
         # Write links between outputs and penultimate steps
         structure.outputs.each do |output|
-          output.source_ids.each do |source_id|
+          output.sources.each do |source_id|
             write_line("  \"#{source_id}\" -> \"#{output.id}\";")
           end
         end
