@@ -55,8 +55,8 @@ class WorkflowVersioningTest < ActionDispatch::IntegrationTest
 
           assert_equal 'A new version!', assigns(:workflow).versions.last.revision_comments
           assert_equal 'Something something', assigns(:workflow).title
-          assert_equal 12, assigns(:workflow).inputs.count
-          assert_equal 12, assigns(:workflow).versions.last.inputs.count
+          assert_equal 5, assigns(:workflow).inputs.count
+          assert_equal 5, assigns(:workflow).versions.last.inputs.count
           assert_equal 0, assigns(:workflow).versions.first.inputs.count
         end
       end
