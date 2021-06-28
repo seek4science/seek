@@ -1,12 +1,12 @@
 class AddFullPublicationVersion < ActiveRecord::Migration[5.2]
   def change
     create_table "publication_versions", force: :cascade do |t|
-      t.integer  "publication_id",              limit: 4
-      t.integer  "version",             limit: 4
-      t.text     "revision_comments",   limit: 65535
+      t.integer  "publication_id"
+      t.integer  "version"
+      t.text     "revision_comments"
       t.integer "pubmed_id"
-      t.text "title", limit: 4294967295
-      t.text "abstract", limit: 4294967295
+      t.text "title"
+      t.text "abstract"
       t.date "published_date"
       t.string "journal"
       t.string "first_letter", limit: 1
@@ -17,22 +17,22 @@ class AddFullPublicationVersion < ActiveRecord::Migration[5.2]
       t.string "doi"
       t.string "uuid"
       t.integer "policy_id"
-      t.text "citation", limit: 16777215
+      t.text "citation"
       t.string "deleted_contributor"
       t.integer "registered_mode"
-      t.text "booktitle", limit: 16777215
+      t.text "booktitle"
       t.string "publisher"
-      t.text "editor", limit: 16777215
+      t.text "editor"
       t.integer "publication_type_id"
-      t.text "url", limit: 16777215
+      t.text "url"
     end
 
     add_index "publication_versions", ["contributor_id"], name: "index_publication_versions_on_contributor", using: :btree
     add_index "publication_versions", ["publication_id"], name: "index_publication_versions_on_publication_id", using: :btree
 
     create_table "projects_publication_versions", id: false, force: :cascade do |t|
-      t.integer "project_id", limit: 4
-      t.integer "publication_id", limit: 4
+      t.integer "project_id"
+      t.integer "publication_id"
     end
   end
 end
