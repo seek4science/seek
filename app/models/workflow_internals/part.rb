@@ -10,5 +10,9 @@ module WorkflowInternals
     def nice_id
       id.split(/[\#\/]/).last
     end
+
+    def inspect
+      "#<#{self.class.name} id=\"#{id}\">"
+    end
   end
 end

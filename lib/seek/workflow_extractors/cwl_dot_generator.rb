@@ -15,8 +15,8 @@ module Seek
 
         # Overall graph style
         write_line("  graph [")
-        write_line("    bgcolor = \"#eeeeee\"")
         write_line("    color = \"black\"")
+        write_line("    fontname = \"Helvetica\"")
         write_line("    fontsize = \"10\"")
         write_line("    labeljust = \"left\"")
         write_line("    clusterrank = \"local\"")
@@ -134,8 +134,8 @@ module Seek
         # Write the links between nodes
         # Write links between outputs and penultimate steps
         structure.outputs.each do |output|
-          output.sources.each do |source_id|
-            write_line("  \"#{source_id}\" -> \"#{output.id}\";")
+          output.sources.each do |source|
+            write_line("  \"#{source.id}\" -> \"#{output.id}\";")
           end
         end
       end

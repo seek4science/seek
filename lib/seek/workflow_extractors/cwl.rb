@@ -94,12 +94,12 @@ module Seek
         end
 
         existing_metadata[:internals][:outputs] = iterate(cwl['outputs']).map do |id, output|
-          { id: id, name: output['label'], description: output['doc'], type: output['type'], sources: output['outputSource'] ? Array(output['outputSource']) : [] }
+          { id: id, name: output['label'], description: output['doc'], type: output['type'], source_ids: output['outputSource'] ? Array(output['outputSource']) : [] }
         end
 
         existing_metadata[:internals][:steps] = iterate(cwl['steps']).map do |id, step|
           existing_metadata[:internals][:links] += build_links(step['in'], id)
-          { id: id, name: step['label'], description: step['doc'], sinks: extract_sinks(step['out'], id) }
+          { id: id, name: step['label'], description: step['doc'], sink_ids: extract_sinks(step['out'], id) }
         end
       end
 

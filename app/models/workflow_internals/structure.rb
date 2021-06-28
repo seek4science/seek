@@ -28,7 +28,7 @@ module WorkflowInternals
       end
 
       steps.each do |step|
-        return step if step.sinks.include?(id)
+        return step if step.sink_ids.include?(id)
       end
     end
 
@@ -38,6 +38,10 @@ module WorkflowInternals
           return part if part.id == id
         end
       end
+    end
+
+    def inspect
+      "#<#{self.class.name} #{[:inputs, :outputs, :steps, :links].map { |group| "#{group}=#{send(group).length}" }.join(' ')}>"
     end
   end
 end
