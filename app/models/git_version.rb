@@ -230,10 +230,11 @@ class GitVersion < ApplicationRecord
       method = s_method.to_sym
     end
     if resource_attributes.key?(s_method)
+      args.unshift(s_method)
       if setter
-        resource_attributes[s_method] = *args
+        resource_attributes.send(:[]=, *args)
       else
-        resource_attributes[s_method]
+        resource_attributes.send(:[], *args)
       end
     elsif !setter && resource.respond_to?(method)
       resource.public_send(method, *args, &block)
