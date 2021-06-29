@@ -162,6 +162,8 @@ class PublicationTest < ActiveSupport::TestCase
     assert_equal [assay], publication.assays
     assert_equal [data_file], publication.data_files
     assert_equal [model], publication.models
+  rescue ActiveRecord::RecordNotSaved => e
+    publication.errors.full_message
   end
 
   test 'related organisms' do
@@ -179,6 +181,8 @@ class PublicationTest < ActiveSupport::TestCase
     publication.save!
 
     assert_equal [organism1, organism2].sort, publication.related_organisms.sort
+  rescue ActiveRecord::RecordNotSaved => e
+    publication.errors.full_message
   end
 
   test 'assay association' do
