@@ -44,6 +44,9 @@ RUN chown -R www-data solr config docker public /var/www db/schema.rb
 USER www-data
 RUN touch config/using-docker #allows us to see within SEEK we are running in a container
 
+# Workaround for deprecated Python 3.5 from Debian base image, 
+# latest compatible cwltool version is from 2020-08
+RUN sed -i s/cwltool.*/cwltool==3.0.20200807132242/ requirements.txt
 # Python dependencies from requirements.txt
 RUN pip3 install -r requirements.txt
 
