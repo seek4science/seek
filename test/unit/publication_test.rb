@@ -157,13 +157,12 @@ class PublicationTest < ActiveSupport::TestCase
     publication.associate(assay)
     publication.associate(data_file)
     publication.associate(model)
-    publication.save!
+    #publication.save!
+    publication.errors unless publication.save
 
     assert_equal [assay], publication.assays
     assert_equal [data_file], publication.data_files
     assert_equal [model], publication.models
-  rescue ActiveRecord::RecordNotSaved => e
-    publication.errors.full_message
   end
 
   test 'related organisms' do
@@ -178,11 +177,10 @@ class PublicationTest < ActiveSupport::TestCase
     publication.associate(model2)
     publication.associate(assay1)
     publication.associate(assay2)
-    publication.save!
+    #publication.save!
+    publication.errors unless publication.save
 
     assert_equal [organism1, organism2].sort, publication.related_organisms.sort
-  rescue ActiveRecord::RecordNotSaved => e
-    publication.errors.full_message
   end
 
   test 'assay association' do
