@@ -243,6 +243,10 @@ module WorkflowExtraction
     end
   end
 
+  def refresh_internals
+    self.internals = extractor.metadata[:internals] || {}
+  end
+
   private
 
   def ro_crate_path

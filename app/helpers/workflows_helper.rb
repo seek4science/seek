@@ -1,23 +1,38 @@
 module WorkflowsHelper
   def port_types(port)
     return content_tag(:span, 'n/a', class: 'none_text') if port.type.nil?
+    port_type_description(port.type)
+  end
 
-    if port.type.is_a?(Array) && port.type.length > 1
-      type_tag = content_tag(:ul) do
-        port.type.map do |type|
-          content_tag(:li, type)
+  def port_type_description(types)
+    types = [types] unless types.is_a?(Array)
+
+    html = ''
+    classes = ['workflow-port-type']
+
+    actual_types = 0
+    types.each do |type|
+      case type['type']
+      when 'enum'
+        html += content_tag(:li) do
+          '<strong>enum</strong> of: ' + type['symbols'].join(', ')
         end
+      when 'array'
+        html += content_tag(:li) do
+          ('<strong>array</strong> containing ' + port_type_description(type['items'])).html_safe
+        end
+      when 'record'
+        html += content_tag(:li) do
+          ('<strong>record</strong> containing ' + port_type_description(type['fields'])).html_safe
+        end
+      when 'null'
+        classes << 'optional'
+      else
+        html += content_tag(:li, content_tag(:strong, type['type']))
       end
-    else
-      type = port.type.is_a?(Array) ? port.type.first : port.type
-      type_tag = content_tag(:span, type)
     end
 
-    if port.optional?
-      type_tag + content_tag(:span, ' (Optional)', class: 'subtle')
-    else
-      type_tag
-    end
+    content_tag(:ul, html.html_safe, class: classes.join(' '))
   end
 
   def maturity_badge(level)

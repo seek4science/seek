@@ -8,7 +8,7 @@ module WorkflowInternals
     end
 
     def nice_id
-      id.split(/[\#\/]/).last
+      id.split(/[\#\/]/).last if id
     end
 
     def inspect

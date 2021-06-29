@@ -35,7 +35,7 @@ module Seek
             metadata[:internals][:outputs] << { id: output['name'], name: output['label'] || output['name'], type: output['type'] }
           end
 
-          metadata[:internals][:steps] << { id: step['id'], name: step['label'] || step['name'], description: (step['annotation'] || '') + "\n " + (step['tool_id'] || '') }
+          metadata[:internals][:steps] << { id: step['id'].to_s, name: step['label'] || step['name'], description: (step['annotation'] || '') + "\n " + (step['tool_id'] || '') }
         end
 
         metadata[:tags] = galaxy['tags']

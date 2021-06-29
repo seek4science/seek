@@ -1133,3 +1133,17 @@ input.git-path {
 .git-image-preview {
   max-width: 100%;
 }
+
+ul.workflow-port-type {
+  padding-left: 0;
+  li {
+    list-style-type: none;
+  }
+  li + li:before {
+    content: 'or';
+    color: #ccc;
+  }
+  ul.workflow-port-type {
+    padding-left: 2em;
+  }
+}
