@@ -141,7 +141,7 @@ const loadFlowchart = () => {
   };
   params.onError = (e) => hideFlowchart();
   params.dataType = "json";
-  ajaxCall(`/projects/${pid}/flowchart/${id}`, "GET", params);
+  ajaxCall(`/projects_folders/${pid}/flowchart/${id}`, "GET", params);
 };
 
 const hideFlowchart = () => {
@@ -389,7 +389,7 @@ const updateFlowchart = (flowchartData) => {
   params.onError = (e) => console.error("error updating Flowchart!");
   params.data = JSON.stringify(data);
   params.dataType = "json";
-  ajaxCall(`/projects/${pid}/update_flowchart`, "POST", params);
+  ajaxCall(`/projects_folders/${pid}/update_flowchart`, "POST", params);
 };
 
 function saveFlowchart() {

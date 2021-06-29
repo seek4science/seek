@@ -35,13 +35,14 @@ $j("#assay_sharing").html("")
    for (const id in creator_ids){
       $j("#assay-creators").append(`<input type="hidden" value="${creator_ids[id]}" name="assay[creator_ids][]">`)
    }
-   $j("#method-title input").val("<%= @sop.title %>")
-   $j("#method-description input").val("<%= @sop.description %>")
+   <%if @sop != nil%>
+      $j("#method-title input").val("<%= @sop.title %>")
+      $j("#method-description input").val("<%= @sop.description %>")
 
-   let image = "<%= '/assets/' + resource_avatar_path(@sop) %>"
-   $j("#method-icon").html(`<li class='asset_card_item' data-toggle='tooltip'><p class='asset_card_title'> <img class='asset_card_avatar' width='100' src='${image}'/></p></li>`)
-   $j("#method-id").val("<%= @sop.id %>")
-    
+      let image = "<%= '/assets/' + resource_avatar_path(@sop) %>"
+      $j("#method-icon").html(`<li class='asset_card_item' data-toggle='tooltip'><p class='asset_card_title'> <img class='asset_card_avatar' width='100' src='${image}'/></p></li>`)
+      $j("#method-id").val("<%= @sop.id %>")
+   <% end %>
 <% end %>
 
 loadObjectInputs()

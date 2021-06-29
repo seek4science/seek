@@ -639,7 +639,7 @@ function saveDesign() {
     params.onSuccess = (s) => loadFlowchart();
     params.onError = () => hideFlowchart();
     params.data = JSON.stringify(data);
-    ajaxCall(`/projects/folders/${pid}/update_flowchart`, "POST", params);
+    ajaxCall(`/projects_folders/${pid}/update_flowchart`, "POST", params);
   };
   let attr = characteristics[$j("#sourceSelect").children("option:selected").val()].attributes;
   const title = `${$j("#std-title span").html()}_source_sample_type`;
@@ -655,5 +655,5 @@ function loadDesign() {
   };
   params.onError = (e) => console.error(e);
   params.dataType = "json";
-  ajaxCall(`/projects/folders/${pid}/sample_source/${selectedItem.id}`, "GET", params);
+  ajaxCall(`/projects_folders/${pid}/sample_source/${selectedItem.id}`, "GET", params);
 }
