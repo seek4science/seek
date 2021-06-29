@@ -163,7 +163,7 @@ class PublicationTest < ActiveSupport::TestCase
     assert_equal [data_file], publication.data_files
     assert_equal [model], publication.models
   rescue ActiveRecord::RecordNotSaved => e
-    e.inspect
+    puts "Rescued: #{e.inspect}"
   end
 
   test 'related organisms' do
@@ -182,7 +182,7 @@ class PublicationTest < ActiveSupport::TestCase
 
     assert_equal [organism1, organism2].sort, publication.related_organisms.sort
   rescue ActiveRecord::RecordNotSaved => e
-    e.inspect
+    puts "Rescued: #{e.inspect}"
   end
 
   test 'assay association' do
