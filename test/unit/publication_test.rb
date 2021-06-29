@@ -164,6 +164,8 @@ class PublicationTest < ActiveSupport::TestCase
     assert_equal [model], publication.models
   rescue ActiveRecord::RecordNotSaved => e
     puts "Rescued: #{e.inspect}"
+    puts e.backtrace
+    raise
   end
 
   test 'related organisms' do
@@ -183,6 +185,8 @@ class PublicationTest < ActiveSupport::TestCase
     assert_equal [organism1, organism2].sort, publication.related_organisms.sort
   rescue ActiveRecord::RecordNotSaved => e
     puts "Rescued: #{e.inspect}"
+    puts e.backtrace
+    raise
   end
 
   test 'assay association' do
