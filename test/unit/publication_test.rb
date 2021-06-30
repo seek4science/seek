@@ -145,8 +145,8 @@ class PublicationTest < ActiveSupport::TestCase
     data_file = Factory(:data_file)
     model = Factory(:model)
 
-    publication.associate(assay)
-    publication.associate(data_file)
+    #publication.associate(assay)
+    #publication.associate(data_file)
     #publication.associate(model)
     publication.save!
 
@@ -164,11 +164,11 @@ class PublicationTest < ActiveSupport::TestCase
     organism1 = Factory(:organism)
     organism2 = Factory(:organism)
     publication = Factory(:publication)
-    model1 = Factory(:model, organism: organism1)
+    #model1 = Factory(:model, organism: organism1)
     #assay1 = Factory(:assay, organisms: [organism1])
     #model2 = Factory(:model, organism: organism2)
     #assay2 = Factory(:assay, organisms: [organism2])
-    publication.associate(model1)
+    #publication.associate(model1)
     #publication.associate(model2)
     #publication.associate(assay1)
     #publication.associate(assay2)
