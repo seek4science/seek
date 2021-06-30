@@ -154,14 +154,6 @@ class PublicationTest < ActiveSupport::TestCase
     assert_equal [data_file], publication.data_files
     assert_equal [model], publication.models
 
-    publication.associate(assay)
-    publication.associate(data_file)
-    publication.associate(model)
-    publication.save!
-
-    assert_equal [assay], publication.assays
-    assert_equal [data_file], publication.data_files
-    assert_equal [model], publication.models
   rescue ActiveRecord::RecordNotSaved => e
     puts "Rescued: #{e.inspect}"
     puts e.backtrace
@@ -180,6 +172,9 @@ class PublicationTest < ActiveSupport::TestCase
     publication.associate(model2)
     publication.associate(assay1)
     publication.associate(assay2)
+    puts("Publication is not valid") unless publication.valid?
+    pp publication
+
     publication.save!
 
     assert_equal [organism1, organism2].sort, publication.related_organisms.sort
