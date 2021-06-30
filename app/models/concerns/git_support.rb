@@ -98,12 +98,16 @@ module GitSupport
   end
 
   def remove_file(path)
+    raise Seek::Git::PathNotFoundException.new(path: path) unless file_exists?(path)
+
     perform_commit("Deleted #{path}") do |index|
       index.remove(path)
     end
   end
 
   def move_file(oldpath, newpath)
+    raise Seek::Git::PathNotFoundException.new(path: oldpath) unless file_exists?(oldpath)
+
     perform_commit("Moved #{oldpath} -> #{newpath}") do |index|
       existing = index[oldpath]
       index.add(path: newpath, oid: existing[:oid], mode: 0100644)
