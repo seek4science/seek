@@ -1,4 +1,6 @@
 class GitController < ApplicationController
+  include Seek::MimeTypes
+
   before_action :fetch_parent
   before_action :authorize_parent
   before_action :authorized_to_edit, only: [:add_file, :remove_file, :move_file, :freeze]
@@ -45,9 +47,14 @@ class GitController < ApplicationController
     if @blob.binary?
       send_data(@blob.content, filename: path_param.split('/').last, disposition: 'inline')
     else
-      respond_to do |format|
-        format.all { render plain: @blob.content }
-      end
+      # Set Content-Type if it's an image to allow use in img tags
+      ext = path_param.split('/').last&.split('.')&.last&.downcase
+      content_type = if Seek::ContentTypeDetection::IMAGE_VIEWABLE_FORMAT.include?(ext)
+                       mime_types_for_extension(path_param.split('.').last).first
+                     else
+                       'text/plain'
+                     end
+      render body: @blob.content, content_type: content_type
     end
   end
 

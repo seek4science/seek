@@ -175,6 +175,7 @@ class GitControllerTest < ActionController::TestCase
 
     assert_response :success
     assert @response.body.include?('galaxy_workflow')
+    assert response.headers['Content-Type'].include?('text/plain')
   end
 
   test 'download text file' do
@@ -196,6 +197,7 @@ class GitControllerTest < ActionController::TestCase
     get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'diagram.png' }
 
     assert_response :success
+    assert response.headers['Content-Type'].include?('image/png')
   end
 
   test 'download binary file' do
