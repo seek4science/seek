@@ -134,7 +134,7 @@ class Publication < ApplicationRecord
 
   # Returns the columns to be shown on the table view for the resource
   def columns_default
-    super + ['title','abstract','published_date','journal']
+    super + ['published_date','journal']
   end
 
   def columns_allowed
@@ -160,7 +160,7 @@ class Publication < ApplicationRecord
   end
 
   def default_policy
-    Policy.new(name: 'publication_policy', access_type: Policy::ACCESSIBLE).tap do |policy|
+    Policy.new(name: 'publication_policy', access_type: Policy::VISIBLE).tap do |policy|
       populate_policy_from_authors(policy)
     end
   end
