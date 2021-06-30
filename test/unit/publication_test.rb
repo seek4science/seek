@@ -148,7 +148,7 @@ class PublicationTest < ActiveSupport::TestCase
     publication.associate(assay)
     publication.associate(data_file)
     publication.associate(model)
-    User.with_current_user p.contributor do
+    User.with_current_user publication.contributor do
       saved = publication.save
       pp publication.errors.inspect
       assert saved
