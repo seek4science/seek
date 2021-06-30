@@ -27,13 +27,13 @@
 
 <hr/>
 
-<% if @blob.binary? %>
-  <% if is_image_path?(params[:path]) %>
-    <% raw_path = polymorphic_path([@parent_resource, :git_raw], version: @git_version.version, path: params[:path]) %>
-    <%= link_to image_tag(raw_path, class: 'git-image-preview'), raw_path, title: 'Click for full' %>
-  <% else %>
-    <span class="subtle">Binary content not displayed</span>
-  <% end %>
+<% if is_image_path?(params[:path]) %>
+  <% raw_path = polymorphic_path([@parent_resource, :git_raw], version: @git_version.version, path: params[:path]) %>
+  <%= link_to image_tag(raw_path, class: 'git-image-preview'), raw_path, title: 'Click for full' %>
 <% else %>
-  <%= content_tag :pre, @blob.content %>
+  <% if @blob.binary? %>
+    <span class="subtle">Binary content not displayed</span>
+  <% else %>
+    <%= content_tag :pre, @blob.content %>
+  <% end %>
 <% end %>
