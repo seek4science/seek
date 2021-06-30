@@ -147,12 +147,12 @@ class PublicationTest < ActiveSupport::TestCase
 
     publication.associate(assay)
     publication.associate(data_file)
-    publication.associate(model)
+    #publication.associate(model)
     publication.save!
 
     assert_equal [assay], publication.assays
     assert_equal [data_file], publication.data_files
-    assert_equal [model], publication.models
+    #assert_equal [model], publication.models
 
   rescue ActiveRecord::RecordNotSaved => e
     puts "Rescued: #{e.inspect}"
@@ -165,17 +165,17 @@ class PublicationTest < ActiveSupport::TestCase
     organism2 = Factory(:organism)
     publication = Factory(:publication)
     model1 = Factory(:model, organism: organism1)
-    assay1 = Factory(:assay, organisms: [organism1])
-    model2 = Factory(:model, organism: organism2)
-    assay2 = Factory(:assay, organisms: [organism2])
+    #assay1 = Factory(:assay, organisms: [organism1])
+    #model2 = Factory(:model, organism: organism2)
+    #assay2 = Factory(:assay, organisms: [organism2])
     publication.associate(model1)
-    publication.associate(model2)
-    publication.associate(assay1)
-    publication.associate(assay2)
+    #publication.associate(model2)
+    #publication.associate(assay1)
+    #publication.associate(assay2)
     puts("Publication is not valid") unless publication.valid?
     pp publication
 
-    publication.save_with_validations(false)
+    publication.save!
 
     assert_equal [organism1, organism2].sort, publication.related_organisms.sort
   rescue ActiveRecord::RecordNotSaved => e

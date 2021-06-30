@@ -160,7 +160,7 @@ class Publication < ApplicationRecord
   end
 
   def default_policy
-    Policy.new(name: 'publication_policy', access_type: Policy::VISIBLE).tap do |policy|
+    Policy.new(name: 'publication_policy', access_type: Policy::ACCESSIBLE).tap do |policy|
       populate_policy_from_authors(policy)
     end
   end
