@@ -175,7 +175,7 @@ class PublicationTest < ActiveSupport::TestCase
     puts("Publication is not valid") unless publication.valid?
     pp publication
 
-    publication.save!
+    publication.save_with_validations(false)
 
     assert_equal [organism1, organism2].sort, publication.related_organisms.sort
   rescue ActiveRecord::RecordNotSaved => e
