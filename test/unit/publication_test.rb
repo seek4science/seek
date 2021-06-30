@@ -145,6 +145,8 @@ class PublicationTest < ActiveSupport::TestCase
     data_file = Factory(:data_file)
     model = Factory(:model)
 
+    login_as(publication.contributor)
+
     publication.associate(assay)
     publication.associate(data_file)
     publication.associate(model)
