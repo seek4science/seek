@@ -145,15 +145,14 @@ class PublicationTest < ActiveSupport::TestCase
     data_file = Factory(:data_file)
     model = Factory(:model)
 
-    login_as(publication.contributor)
-
     publication.associate(assay)
     publication.associate(data_file)
     publication.associate(model)
-    saved = publication.save
-    pp publication.errors.inspect
-    assert saved
-
+    User.with_current_user p.contributor do
+      saved = publication.save
+      pp publication.errors.inspect
+      assert saved
+    end
     assert_equal [assay], publication.assays
     assert_equal [data_file], publication.data_files
     assert_equal [model], publication.models
