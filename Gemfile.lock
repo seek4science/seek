@@ -726,7 +726,6 @@ GEM
     sunspot_rails (2.2.8)
       rails (>= 3)
       sunspot (= 2.2.8)
-    sunspot_solr (2.2.7)
     swd (1.1.2)
       activesupport (>= 3)
       attr_required (>= 0.0.5)
@@ -916,7 +915,6 @@ DEPENDENCIES
   sqlite3
   sunspot_matchers
   sunspot_rails (~> 2.2.7)
-  sunspot_solr (~> 2.2.0)
   teaspoon
   teaspoon-mocha
   terrapin
