@@ -17,13 +17,3 @@
     class: 'form-control'
   }
 -%>
-
-<script>
-  $j('#study_investigation_id').change(function () {
-      var people = $j('#person_responsible_collection');
-      people.html('').spinner('add');
-      $j.post(
-          '<%= investigation_selected_ajax_studies_path -%>',
-          { investigation_id: this.value }).done(function (html) { people.html(html); });
-  });
-</script>

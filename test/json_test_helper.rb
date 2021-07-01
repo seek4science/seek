@@ -69,7 +69,7 @@ module JsonTestHelper
     end
 
     diff.delete_if do |el|
-      el['path'] =~ /\/id|person_responsible_id|created|updated|modified|uuid|jsonapi|self|download|md5sum|sha1sum|project_id|position_id|tags|members|links\/items/
+      el['path'] =~ /\/id|created|updated|modified|uuid|jsonapi|self|download|md5sum|sha1sum|project_id|position_id|tags|members|links\/items/
     end
 
     assert_equal [], diff

@@ -48,8 +48,7 @@ module SamplesHelper
         value
       )
       select_tag element_name,
-                 options,
-                 include_blank: !attribute.required?,
+                 options,                 
                  class: "form-control",
                  include_blank: ""
     else
