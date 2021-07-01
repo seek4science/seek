@@ -493,8 +493,7 @@ class StudiesControllerTest < ActionController::TestCase
     end
   end
 
-  def edit_max_object(study)
-    study.person_responsible = Factory(:max_person)
+  def edit_max_object(study)    
     add_creator_to_test_object(study)
   end
 
