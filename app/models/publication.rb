@@ -134,7 +134,7 @@ class Publication < ApplicationRecord
 
   # Returns the columns to be shown on the table view for the resource
   def columns_default
-    super + ['title','abstract','published_date','journal']
+    super + ['published_date','journal']
   end
 
   def columns_allowed
