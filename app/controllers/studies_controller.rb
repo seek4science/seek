@@ -88,18 +88,7 @@ class StudiesController < ApplicationController
         format.json { render json: json_api_errors(@study), status: :unprocessable_entity }
       end
     end
-  end
-
-  def investigation_selected_ajax
-    if (investigation_id = params[:investigation_id]).present? && params[:investigation_id] != '0'
-      investigation = Investigation.find(investigation_id)
-      people = investigation.projects.collect(&:people).flatten
-    end
-
-    people ||= []
-
-    render partial: 'studies/person_responsible_list', locals: { people: people }
-  end
+  end  
 
   def check_assays_are_not_already_associated_with_another_study
     assay_ids = params[:study][:assay_ids]
