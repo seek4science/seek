@@ -7,7 +7,6 @@
   <%else %>
     <%= form_for @publication, :html => { :multipart => true }, :url => url_for( :action => :upload_pdf), method: :post do |publication_form|  %>
         <%= render partial: 'assets/upload_box',  :locals=>{:resource=>@publication} -%>
-        <%= fields_for(@publication) { |f| render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f} }-%>
 
         <%= publication_form.submit 'Upload', :name => "subaction", :value => 'Upload', :class => 'btn btn-primary' %>
     <%end %>

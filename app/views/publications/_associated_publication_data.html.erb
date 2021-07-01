@@ -12,6 +12,8 @@
 
 <%= render partial: 'scales/scales_selector', locals: { object: @publication } if show_scales?%>
 
+<%= render :partial=> "assets/misc_links_form", :locals=>{:resource => @publication} -%>
+
 <%= render partial: 'assets/select_tags' -%>
 
 <% if Seek::Config.human_diseases_enabled %>
