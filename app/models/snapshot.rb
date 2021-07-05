@@ -63,10 +63,11 @@ class Snapshot < ApplicationRecord
     people = []
 
     node.each do |k, v|
+      next if v.nil?
       if k == 'contributor'
         people << Person.find_by_id(v['uri'].match(/people\/([1-9][0-9]*)/)[1])
       elsif k == 'creators'
-        people |= v.map { |p| Person.find_by_id(p['uri'].match(/people\/([1-9][0-9]*)/)[1]) }
+        people |= v.compact.map { |p| Person.find_by_id(p['uri'].match(/people\/([1-9][0-9]*)/)[1]) }
       elsif v.is_a?(Hash)
         people |= all_related_people(v)
       elsif v.is_a?(Array)

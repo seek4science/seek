@@ -14,6 +14,14 @@ module Seek
           "https://doi.org/#{resource.doi}" if resource.doi
         end
 
+        def description
+          description = resource.description&.truncate(4999)
+          if description.blank?
+            description = 'Description not specified'
+          end
+          description.ljust(50,'.')
+        end
+
         def distribution
           return unless resource.content_blob
           return if resource.content_blob.show_as_external_link?

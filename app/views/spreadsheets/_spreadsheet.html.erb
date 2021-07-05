@@ -82,9 +82,16 @@
 </div>
 <br/>
 
-<div id="rows_per_page" style="display:none">
-  Display <%= text_field_tag :per_page, per_page, :size => 4, :onkeypress => 'return onlyNumbers(event);' %> rows per page
-  <input type='button' value='Update' onclick='changeRowsPerPage()'/>
+<div id="rows_per_page" style="display:none" class='form-group'> 
+  <label>
+    Rows per page to display:
+  </label> 
+  <div class='row'>
+    <div class='col-sm-1'>
+      <%= text_field_tag :per_page, per_page, :onkeypress => 'return onlyNumbers(event);', class:'form-control' %>
+    </div>    
+    <input type='button' value='Update' onclick='changeRowsPerPage()' class='btn btn-primary'/>
+  </div>      
 </div>
 
 <script type = "text/javascript">

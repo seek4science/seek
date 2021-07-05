@@ -48,9 +48,9 @@ module SamplesHelper
         value
       )
       select_tag element_name,
-                 options,
-                 include_blank: !attribute.required?,
-                 class: "form-control"
+                 options,                 
+                 class: "form-control",
+                 include_blank: ""
     else
       scv_id = attribute.sample_controlled_vocab.id
       existing_objects = []
