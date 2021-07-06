@@ -20,8 +20,6 @@
     end
   end
 
-  possible_projects = possible_projects - selected_projects
-
   possible_projects_json, selected_projects_json = [possible_projects, selected_projects].map do |projects|
     projects.to_a.map { |p| { id: p.id, title: p.title }}.to_json
   end
@@ -31,6 +29,52 @@
   title += '<span class="required">*</span>'.html_safe unless allow_nil
 
   object_type_text = resource.class.name.underscore.humanize
+
+  # Recursive function to extract the full list of folders in . notation
+  def tree_get_children(parent,node_list)
+    children_list = []
+    node_list.each{|node|
+      children_list.push({id: node[:data][:folder_id], title: parent+node[:text]})
+      children_list.concat(tree_get_children(parent+node[:text]+"->", node[:children]))
+    }
+    return children_list
+  end
+
+  # For each possible project, extract the list of folders and process them
+  possible_folders = []
+  possible_projects.each { |project|
+    folders =  ProjectFolder.root_folders(project)
+    tree = TreeviewBuilder.new(project, folders).get_folder_tree
+    possible_folders.concat(tree_get_children(project.title+"->",tree))
+  }
+
+
+
+  # # Retrieve the project's folders
+  # @project = Project.find(id)
+  # @folders = project_folders
+  # possible_projects = possible_projects - selected_projects
+
+  possible_folders_json = 
+        {
+          "Default project": [
+            { id: 1, title: "Front-end" },
+            { id: 1, title: "Front-end" }
+          ],
+         "Vaccines project": [
+            { id: 1, title: "Front-end" },
+            { id: 1, title: "Front-end" }
+          ],
+          "Covid project": [
+            { id: 1, title: "Front-end" },
+            { id: 1, title: "Front-end" }
+          ]
+        }
+  possible_folders_json = possible_folders
+
+  selected_folders_json =  []
+  title_folders = t('folder').pluralize
+
 %>
 
 <%= folding_panel(title, false, id: "add_projects_form",
@@ -66,6 +110,120 @@
       </div>
     </div>
 <% end %>
+
+<%= folding_panel(title_folders, false, id: "add_folders_form",
+                  help_text: "Here you can associate the #{object_type_text} with a specific folder within a #{t('project').downcase}.") do %>
+    <p class="help-block">
+      The following <%= t('folder').downcase.pluralize -%> are associated with this <%= object_type_text -%>:
+    </p>
+    <div id="folder-selector">
+      <%= hidden_field_tag field_name, '' %>
+      <div class="box_editing_inner">
+        <ul class="related_asset_list">
+          <span v-if="selected.length == 0" class="none_text">None</span>
+          <li class="association-list-item" v-for="(project, index) in selected">
+            <span :title="project.title">{{ project.title }}</span>
+            <a class="remove-association clickable" @click="remove(project, index)">
+              <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+            </a>
+            <input type="hidden" name="<%= field_name -%>" v-model="project.id"/>
+          </li>
+        </ul>
+      </div>
+      <div class="association_step">
+        <div class="form-group">
+          <select autocomplete="off" class="form-control" id="folder-selector-select">
+            <option selected="selected">Select a <%= t('project').downcase -%>...</option>
+            <option v-for="option in possibilities" :value="option.id">{{ option.title }}</option>
+            <%# <optgroup v-for="(group, name) in optionGroups" :label="name">
+              <option v-for="option in group" :value="option.id">
+                {{ option.title }}
+              </option>
+            </optgroup> %>
+          </select>
+        </div>
+    </div>
+<% end %>
+
+<%#################### FOLDER selection code%>
+<%= content_tag :script, possible_folders_json, type: 'application/json', id: 'test-folder-selector-possibilities-json' %>
+<%= content_tag :script, possible_folders_json.to_json, type: 'application/json', id: 'test2-folder-selector-possibilities-json' %>
+
+
+<%= content_tag :script, possible_folders_json.to_json.html_safe, type: 'application/json', id: 'folder-selector-possibilities-json' %>
+<%= content_tag :script, selected_folders_json.to_json.html_safe, type: 'application/json', id: 'folder-selector-selected-json' %>
+
+<script id="folder-selector-script">
+
+// folder_selector= new Vue({
+//     el: '#folder-selector',
+//     data: {
+//       optionGroups: 
+//          {
+//           Default: [
+//             { "id": 1, "title": "Front-end" },
+//             { "id": 1, "title": "Front-end" }
+//           ]
+//         },
+//         {
+//          Vaccines: [
+//             { "id": 1, "title": "Front-end" },
+//             { "id": 1, "title": "Front-end" }
+//           ]
+//         },
+//         {
+//           Covid: [
+//             { "id": 1, "title": "Front-end" },
+//             { "id": 1, "title": "Front-end" }
+//           ]
+//         }
+      
+//       // ,
+//       // selected: JSON.parse($j('#folder-selector-selected-json').text())
+//     },
+//   });
+// test = new Vue({
+//   el: '#folder-selector',
+//   data: {
+//   selected: 'A',
+//   optionGroups: {
+//     First: [
+//       { text: '1234', value: 'A' },
+//       { text: 'Two', value: 'B' }
+//     ],
+//     Second: [
+//       { text: 'Three', value: 'C' }
+//     ]
+//   }
+// }
+// })
+
+// test = new Vue({
+//   el: '#folder-selector',
+//   data: {
+//   selected: 'A',
+//   optionGroups: {
+//     First: [
+//       { id: '1234', title: 'A' },
+//       { id: 'Two', title: 'B' }
+//     ],
+//     Second: [
+//       { id: 'Three', title: 'C' }
+//     ]
+//   }
+// }
+// })
+
+folder_selector= new Vue({
+    el: '#folder-selector',
+    data: {
+      possibilities: JSON.parse($j('#folder-selector-possibilities-json').text()),
+      selected: JSON.parse($j('#folder-selector-selected-json').text())
+    },
+  });
+</script>
+
+<%# Project seelction code %>
 <%= content_tag :script, possible_projects_json.html_safe, type: 'application/json', id: 'project-selector-possibilities-json' %>
 <%= content_tag :script, selected_projects_json.html_safe, type: 'application/json', id: 'project-selector-selected-json' %>
 <%= content_tag :script, project_policies_json(possible_projects | selected_projects), type: 'application/json', id: 'project-default-policies-json' %>
