@@ -118,4 +118,29 @@ namespace :seek do
     puts "Created #{GitRepository.count - gr_count} GitRepositories"
     puts "Created #{GitVersion.count - gv_count} GitVersions"
   end
+
+  desc "Rebuild workflow internals"
+  task rebuild_workflow_internals: :environment do
+    puts 'Rebuilding workflow internals: '
+    count = 0
+    disable_authorization_checks do
+      Workflow.includes(:git_versions, :versions).find_each do |workflow|
+        ([workflow] + workflow.versions.to_a + workflow.git_versions.to_a).each do |wf|
+          begin
+            wf.refresh_internals
+            if wf.save(touch: false)
+              print '.'
+              count += 1
+            else
+              print 'E'
+            end
+          rescue StandardError => e
+            puts "Error for #{wf.class} #{wf.id}: #{e.class.name} (#{e.message})#{e.backtrace.join("\n")}"
+          end
+        end
+      end
+    end
+    puts
+    puts "Refreshed #{count} Workflows/versions"
+  end
 end
