@@ -83,6 +83,8 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
       assert_response :success
       assert_equal 'Nextflow', assigns(:workflow).workflow_class.title
       assert_equal 'nf-core/ampliseq', assigns(:workflow).title
+      assert assigns(:workflow).content_blob.file_size > 100
+      assert_equal 'main.nf', assigns(:workflow).ro_crate.main_workflow.id
     end
   end
 
@@ -104,6 +106,8 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
         assert_equal 2, assigns(:workflow).version
         assert_equal 'Nextflow', assigns(:workflow).workflow_class.title
         assert_equal 'nf-core/ampliseq', assigns(:workflow).title
+        assert assigns(:workflow).content_blob.file_size > 100
+        assert_equal 'main.nf', assigns(:workflow).ro_crate.main_workflow.id
       end
     end
   end

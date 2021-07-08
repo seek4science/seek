@@ -283,7 +283,7 @@ class WorkflowsController < ApplicationController
     crate_upload = params[:ro_crate]
     old_content_blob = new_version ? @workflow.content_blob : nil
     version = new_version ? @workflow.version + 1 : 1
-    @workflow.build_content_blob(data: crate_upload,
+    @workflow.build_content_blob(tmp_io_object: crate_upload,
                                  original_filename: crate_upload.original_filename,
                                  content_type: crate_upload.content_type,
                                  asset_version: version)
