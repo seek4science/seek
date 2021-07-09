@@ -499,7 +499,7 @@ class ProjectsController < ApplicationController
   def respond_create_project_request
 
     requester = @message_log.sender
-    make_programme_admin=false
+    make_programme_admin = false
 
     if params['accept_request']=='1'
 
@@ -527,9 +527,19 @@ class ProjectsController < ApplicationController
         validate_error_msg << "The #{t('institution')} is invalid, #{@institution.errors.full_messages.join(', ')}"
       end
 
+      unless Institution.can_create?
+        validate_error_msg << "The #{t('institution')} cannot be created, as you do not have access rights"
+      end
+
+      unless Project.can_create?
+        validate_error_msg << "The #{t('project')} cannot be created, as you do not have access rights"
+      end
+
       validate_error_msg = validate_error_msg.join('<br/>').html_safe
 
-      if validate_error_msg.blank?        
+      if validate_error_msg.blank?
+        @project.save!
+        @institution.save!
         requester.add_to_project_and_institution(@project, @institution)
         requester.is_project_administrator = true,@project
         requester.is_programme_administrator = true, @programme if make_programme_admin
