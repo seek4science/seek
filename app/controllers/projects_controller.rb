@@ -529,7 +529,7 @@ class ProjectsController < ApplicationController
 
       validate_error_msg = validate_error_msg.join('<br/>').html_safe
 
-      if validate_error_msg.blank?
+      if validate_error_msg.blank?        
         requester.add_to_project_and_institution(@project, @institution)
         requester.is_project_administrator = true,@project
         requester.is_programme_administrator = true, @programme if make_programme_admin
