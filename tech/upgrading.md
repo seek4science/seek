@@ -94,6 +94,8 @@ After updating the files, the following steps will update the database, gems,
 and other necessary changes. Note that seek:upgrade may take longer than usual if you have data stored that points to remote
 content.
 
+**Please note** - during the upgrade the step _Updating session store_ can take a long time and appear that it has frozen, so please be patient. 
+
     cd . #this is to allow RVM to pick up the ruby and gemset changes
     gem install bundler
     bundle install --deployment
