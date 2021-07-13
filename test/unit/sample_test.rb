@@ -1089,4 +1089,38 @@ class SampleTest < ActiveSupport::TestCase
     assert_equal expected, sample.get_attribute_value('data file')
 
   end
+
+  test 'multi linked sample validation' do
+    patient = Factory(:patient_sample)
+    patient2 = Factory(:patient_sample, sample_type:patient.sample_type )
+    multi_linked_sample_type = Factory(:multi_linked_sample_type, project_ids: [Factory(:project).id])
+    multi_linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
+    multi_linked_sample_type.save!
+
+    sample = Sample.new(sample_type: multi_linked_sample_type, project_ids: [Factory(:project).id])
+    sample.set_attribute_value(:title, 'blah')
+    sample.set_attribute_value(:patient, "")
+    refute sample.valid?
+    sample.set_attribute_value(:patient, [])
+    refute sample.valid?
+    sample.set_attribute_value(:patient, [patient.id])
+    assert sample.valid?
+    sample.set_attribute_value(:patient, [patient.id, patient2.id])
+    assert sample.valid?
+    sample.set_attribute_value(:patient, "#{patient.id}, #{patient2.id}")
+    assert sample.valid?
+    sample.save!
+    assert sample.get_attribute_value("patient").kind_of?(Array)
+    assert_equal  patient.id, sample.get_attribute_value("patient")[0]["id"]
+    assert_equal  patient2.id, sample.get_attribute_value("patient")[1]["id"]
+  end
+
+  test 'refuse multi linked sample as title' do
+    patient = Factory(:patient_sample)
+    multi_linked_sample_type = Factory(:multi_linked_sample_type, project_ids: [Factory(:project).id])
+    multi_linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
+    multi_linked_sample_type.sample_attributes.first.is_title = false
+    multi_linked_sample_type.sample_attributes.last.is_title = true
+    refute multi_linked_sample_type.valid?
+  end
 end

@@ -81,6 +81,11 @@ var SampleTypes = {
         var seek_sample_element = $j(this).siblings('.sample-type-block');
         if (is_seek_sample) {
             seek_sample_element.show();
+            const is_seek_sample_multi = $j(this).find(':selected').text() == "SEEK Sample Multi"
+            if(is_seek_sample_multi) {
+                $j(this).closest(".sample-attribute").find(".sample-type-is-title")
+                    .prop('checked', false).attr("disabled", true)
+            }
         }
         else {
             seek_sample_element.hide();

@@ -223,6 +223,8 @@ class SampleAttributeTypeTest < ActiveSupport::TestCase
   test 'is_seek_sample?' do
     type = Factory(:sample_sample_attribute_type)
     assert type.seek_sample?
+    type = Factory(:sample_multi_sample_attribute_type)
+    refute type.seek_sample?
     type = Factory(:text_sample_attribute_type)
     refute type.seek_sample?
     type = Factory(:boolean_sample_attribute_type)

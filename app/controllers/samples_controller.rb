@@ -126,6 +126,20 @@ class SamplesController < ApplicationController
     end
   end
 
+  def typeahead
+    sample_type = SampleType.find(params[:linked_sample_type_id])
+    results = sample_type.samples.where("LOWER(title) like :query",
+              query: "%#{params[:query].downcase}%").limit(params[:limit] || 100)
+    items = results.map do |sa|
+      { id: sa.id,
+        name: sa.title }
+    end
+
+    respond_to do |format|
+      format.json { render json: items.to_json }
+    end
+  end
+
   private
 
   def sample_params(sample_type=nil)

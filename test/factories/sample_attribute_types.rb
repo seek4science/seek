@@ -43,6 +43,11 @@ Factory.define(:sample_sample_attribute_type, class: SampleAttributeType) do |f|
   f.base_type Seek::Samples::BaseType::SEEK_SAMPLE
 end
 
+Factory.define(:sample_multi_sample_attribute_type, class: SampleAttributeType) do |f|
+  f.sequence(:title) { |n| "Sample multi attribute type #{n}" }
+  f.base_type Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
+end
+
 Factory.define(:data_file_sample_attribute_type, class: SampleAttributeType) do |f|
   f.sequence(:title) { |n| "Data file attribute type #{n}" }
   f.base_type Seek::Samples::BaseType::SEEK_DATA_FILE
