@@ -1,7 +1,9 @@
 class SampleSerializer < PCSSerializer
   attribute :title
-  attribute :attribute_map
-  attribute :data, key: :attribute_map
+  attribute :attribute_map, key_format: :unaltered do
+    object.data.to_hash
+  end
+
   attribute :tags do
     serialize_annotations(object)
   end
