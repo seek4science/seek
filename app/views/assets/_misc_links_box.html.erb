@@ -1,0 +1,9 @@
+<% misc_links = resource.misc_links %>
+<%= panel("Related links".pluralize(misc_links.size), :body_options => {:class => 'text-center'}) do %>
+  <% misc_links.collect do |link| %>
+    <div class="misc-link">
+      <%= link_to link.display_label.truncate(70), link.url, target: :_blank %>
+      <% unless link==misc_links.last %><hr class="misc-links-divider"/><% end %>
+    </div>
+  <% end  %>
+<% end %>

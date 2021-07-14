@@ -6,3 +6,7 @@ end
 Factory.define(:discussion_link, parent: :asset_link) do |f|
   f.link_type AssetLink::DISCUSSION
 end
+
+Factory.define(:misc_link, parent: :asset_link) do |f|
+  f.link_type AssetLink::MISC_LINKS
+end

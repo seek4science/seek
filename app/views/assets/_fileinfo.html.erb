@@ -1,41 +1,49 @@
 <div class='fileinfo'>
-<% if fileinfo.show_as_external_link?  -%>
-    <% if fileinfo.asset.can_download? %>
+  <% unless fileinfo.nil? -%>
+    <% if fileinfo.show_as_external_link? %>
+      <% if fileinfo.asset.can_download? %>
         <p>
           <b>Link:</b>
           <%
             link_text = fileinfo.url
-            link_text = truncate(link_text,:length=>550) if fileinfo.asset.respond_to?(:content_blobs)
+            link_text = truncate(link_text, :length => 550) if fileinfo.asset.respond_to?(:content_blobs)
           %>
-          <%= link_to link_text, fileinfo.url, :target=>"_blank" -%>
+          <%= link_to link_text, fileinfo.url, :target => "_blank" -%>
+          <% if (controller_name.eql? "publications") %>
+            <%= mini_file_soft_delete_icon(fileinfo,current_user) %>
+          <% end -%>
         </p>
-    <% end -%>
-<% elsif fileinfo.nels? %>
+      <% end -%>
+    <% elsif fileinfo.nels? %>
       <p>
         <b>NeLS URL:</b>
         <%= link_to fileinfo.url, fileinfo.url, target: '_blank' -%>
       </p>
-<% else %>
-    <p>
-      <b>Filename:</b>
-      <span class='filename'>
-        <%=h fileinfo.original_filename %>&nbsp;
-        <% if fileinfo.asset.can_download? %>
-          <%= render :partial => "assets/view_content", :locals => {:content_blob => fileinfo, :icon_view => true} -%>
-          <%= mini_file_download_icon(fileinfo) %>
+    <% else %>
+      <p>
+        <b>Filename:</b>
+        <span class='filename'>
+        <%= h fileinfo.original_filename %>&nbsp;
+          <% if fileinfo.asset.can_download? %>
+          <%= render :partial => "assets/view_content", :locals => { :content_blob => fileinfo, :icon_view => true } -%>
+            <%= mini_file_download_icon(fileinfo) %>
+            <% if (controller_name.eql? "publications") %>
+              <%= mini_file_soft_delete_icon(fileinfo,current_user) %>
+            <% end -%>
         <% end %>
       </span>
-    </p>
+      </p>
 
-    <p>
-      <b>Format:</b>
-      <span class="format"><%=h fileinfo.human_content_type -%></span>
-    </p>
+      <p>
+        <b>Format:</b>
+        <span class="format"><%= h fileinfo.human_content_type -%></span>
+      </p>
 
-    <p>
-      <b>Size:</b>
-      <span class="filesize"><%= filesize_as_text(fileinfo) %></span>
-    </p>
+      <p>
+        <b>Size:</b>
+        <span class="filesize"><%= filesize_as_text(fileinfo) %></span>
+      </p>
 
-<% end -%>
+    <% end -%>
+  <% end -%>
 </div>

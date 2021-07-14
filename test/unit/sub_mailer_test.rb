@@ -10,7 +10,8 @@ class SubMailerTest < ActionMailer::TestCase
 
     log = Factory :activity_log, activity_loggable: df, action: 'create', controller_name: 'data_files', created_at: 2.hour.ago, culprit: p2.user
 
-    log2 = Factory :activity_log, activity_loggable: model, action: 'update', controller_name: 'data_files', created_at: DateTime.new(2012, 12, 25, 13, 15, 0), culprit: p2.user
+    dateForPastLog = DateTime.new(2012, 12, 25, 13, 15, 0)
+    log2 = Factory :activity_log, activity_loggable: model, action: 'update', controller_name: 'data_files', created_at: dateForPastLog, culprit: p2.user
     email = nil
 
     now = Time.now.in_time_zone('UTC')
@@ -32,7 +33,11 @@ class SubMailerTest < ActionMailer::TestCase
     assert email.body.include?('Resources Updated:')
     assert email.body.include?('Date Created')
     assert email.body.include?('Date Updated')
-    assert email.body.include?('25th Dec 2012 at 13:15')
+
+    expectedDate = dateForPastLog.localtime.strftime("#{dateForPastLog.day.ordinalize} %b %Y")
+    expectedDate = dateForPastLog.localtime.strftime("#{expectedDate} at %H:%M")
+
+    assert email.body.include?(expectedDate)
   end
 
   test 'send immediate email' do

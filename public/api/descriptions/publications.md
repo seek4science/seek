@@ -15,6 +15,7 @@ The response to a read of a **Publication** includes the following information:
 * Publisher (optional)
 * Booktitle (optional)
 * An extra URL for publications without DOI or PubMed ID (optional)
+* **The specification for the <a href="#ContentBlob">ContentBlobs</a> in the Publication (full text article) if allowed and activated**  
 * The sharing <a href="#Policy">**Policy**</a> for the **Publication**
 * References to the <a href="#people">**People**</a> who wrote the **Publication**
 * References to the <a href="#projects">**Projects**</a> described in the **Publication**

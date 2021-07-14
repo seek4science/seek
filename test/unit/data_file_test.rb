@@ -57,10 +57,6 @@ class DataFileTest < ActiveSupport::TestCase
     end
   end
 
-  test 'sort by updated_at' do
-    assert_equal DataFile.all.sort_by { |df| df.updated_at.to_i * -1 }, DataFile.all
-  end
-
   test 'validation' do
     asset = DataFile.new title: 'fred', projects: [projects(:sysmo_project)], policy: Factory(:private_policy)
     assert asset.valid?

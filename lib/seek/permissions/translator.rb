@@ -28,6 +28,7 @@ module Seek
         manage: Set.new(%i[
                           manage manage_update notification read_interaction write_interaction report_problem storage_report
                           select_sample_type extraction_status extract_samples confirm_extraction cancel_extraction
+                          upload_fulltext upload_pdf soft_delete_fulltext
                         ]).freeze
       }.freeze
 

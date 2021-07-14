@@ -312,7 +312,7 @@ class PublicationsControllerTest < ActionController::TestCase
     ]
 
     assert_difference('Publication.count',2) do
-        post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('files/bibtex/author_match.bib'), project_ids: [projects(:one).id] } }
+      post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('files/bibtex/author_match.bib'), project_ids: [projects(:one).id] } }
     end
 
 
@@ -1050,7 +1050,7 @@ class PublicationsControllerTest < ActionController::TestCase
                                    published_date: '2017-05-23',
                                    publication_type_id: journal.id
 
-                                  }, subaction: 'Create'}
+                                  }, subaction: 'Create' }
 
 
     end
@@ -1214,7 +1214,7 @@ class PublicationsControllerTest < ActionController::TestCase
     publication = Factory(:publication, contributor:person)
     login_as(person)
 
-    get :manage, params: { id: publication}
+    get :manage, params: { id: publication }
     assert_response :success
 
     assert_select 'select#possible_publication_investigation_ids' do
@@ -1244,4 +1244,306 @@ class PublicationsControllerTest < ActionController::TestCase
                           publication_type: Factory(:journal)
             )
   end
+
+
+  test 'can create with valid url' do
+    project = Factory(:project)
+
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://somewhere.com/piccy.png'
+    publication_attrs = Factory.attributes_for(:publication,
+                                                project_ids: [project.id],
+                                                doi: '10.1371/journal.pone.0004803',
+                                                title: 'Clickstream Data Yields High-Resolution Maps of Science',
+                                                abstract: 'Intricate maps of science have been created from citation data to visualize the structure of scientific activity. However, most scientific publications are now accessed online. Scholarly web portals record detailed log data at a scale that exceeds the number of all existing citations combined. Such log data is recorded immediately upon publication and keeps track of the sequences of user requests (clickstreams) that are issued by a variety of users across many different domains. Given these advantages of log datasets over citation data, we investigate whether they can produce high-resolution, more current maps of science.',
+                                                publication_authors: ['Johan Bollen', 'Herbert Van de Sompel', 'Aric Hagberg', 'Luis Bettencourt', 'Ryan Chute', 'Marko A. Rodriguez', 'Lyudmila Balakireva'],
+                                                journal: 'Public Library of Science (PLoS)',
+                                                published_date: Date.new(2011, 3),
+                                                publication_type_id: Factory(:journal).id
+    )
+
+    assert_difference 'Publication.count' do
+      post :create, params: { subaction: 'Create', publication: publication_attrs, content_blobs: [{ data_url: 'http://somewhere.com/piccy.png', data: nil }], sharing: valid_sharing }
+    end
+
+    assert_redirected_to manage_publication_path(assigns(:publication))
+    p = assigns(:publication)
+
+    #assert_nil p.pubmed_id
+    assert_equal publication_attrs[:doi], p.doi
+    assert_equal publication_attrs[:title], p.title
+    assert_equal publication_attrs[:abstract], p.abstract
+    assert_equal publication_attrs[:journal], p.journal
+    assert_equal publication_attrs[:published_date], p.published_date
+    assert_equal publication_attrs[:publication_authors], p.publication_authors.collect(&:full_name)
+    assert_equal publication_attrs[:project_ids], p.projects.collect(&:id)
+
+    content_blob_id = p.content_blob.id
+    assert_not_nil ContentBlob.find_by_id(content_blob_id)
+  end
+
+  test 'can create with local file' do
+    project = Factory(:project)
+
+    publication_attrs = Factory.attributes_for(:publication,
+                                                contributor: User.current_user,
+                                                project_ids: [project.id],
+                                                doi: '10.1371/journal.pone.0004803',
+                                                title: 'Clickstream Data Yields High-Resolution Maps of Science - 2',
+                                                abstract: 'Intricate maps of science have been created from citation data to visualize the structure of scientific activity. However, most scientific publications are now accessed online. Scholarly web portals record detailed log data at a scale that exceeds the number of all existing citations combined. Such log data is recorded immediately upon publication and keeps track of the sequences of user requests (clickstreams) that are issued by a variety of users across many different domains. Given these advantages of log datasets over citation data, we investigate whether they can produce high-resolution, more current maps of science.',
+                                                publication_authors: ['Johan Bollen', 'Herbert Van de Sompel', 'Aric Hagberg', 'Luis Bettencourt', 'Ryan Chute', 'Marko A. Rodriguez', 'Lyudmila Balakireva'],
+                                                journal: 'Public Library of Science (PLoS)',
+                                                published_date: Date.new(2011, 3),
+                                                publication_type_id: Factory(:journal).id)
+
+    assert_difference 'ActivityLog.count' do
+      assert_difference 'Publication.count' do
+        assert_difference 'ContentBlob.count' do
+          post :create, params: { subaction: 'Create', publication: publication_attrs, content_blobs: [{ data: file_for_upload }], sharing: valid_sharing }
+        end
+      end
+    end
+
+    assert_redirected_to manage_publication_path(assigns(:publication))
+    p = assigns(:publication)
+
+    assert_equal publication_attrs[:doi], p.doi
+    assert_equal publication_attrs[:title], p.title
+    assert_equal publication_attrs[:abstract], p.abstract
+    assert_equal publication_attrs[:journal], p.journal
+    assert_equal publication_attrs[:published_date], p.published_date
+    assert_equal publication_attrs[:publication_authors], p.publication_authors.collect(&:full_name)
+    assert_equal publication_attrs[:project_ids], p.projects.collect(&:id)
+
+    content_blob_id = p.content_blob.id
+    assert_not_nil ContentBlob.find_by_id(content_blob_id)
+  end
+
+  test 'can create publication without uploading if invalid url' do
+    project = Factory(:project)
+
+    stub_request(:head, 'http://www.blah.de/images/logo.png').to_raise(SocketError)
+
+    publication_attrs = Factory.attributes_for(:publication,
+                                       contributor: User.current_user.person,
+                                       project_ids: [project.id],
+                                       doi: '10.1371/journal.pone.0004803',
+                                       title: 'Clickstream Data Yields High-Resolution Maps of Science - 2',
+                                       abstract: 'Intricate maps of science have been created from citation data to visualize the structure of scientific activity. However, most scientific publications are now accessed online. Scholarly web portals record detailed log data at a scale that exceeds the number of all existing citations combined. Such log data is recorded immediately upon publication and keeps track of the sequences of user requests (clickstreams) that are issued by a variety of users across many different domains. Given these advantages of log datasets over citation data, we investigate whether they can produce high-resolution, more current maps of science.',
+                                       publication_authors: ['Johan Bollen', 'Herbert Van de Sompel', 'Aric Hagberg', 'Luis Bettencourt', 'Ryan Chute', 'Marko A. Rodriguez', 'Lyudmila Balakireva'],
+                                       journal: 'Public Library of Science (PLoS)',
+                                       published_date: Date.new(2011, 3),
+                                       publication_type_id: Factory(:journal).id) # .symbolize_keys(turn string key to symbol)
+
+    assert_difference 'Publication.count' do
+      assert_no_difference('ContentBlob.count') do
+        post :create, params: { subaction: 'Create', publication: publication_attrs, content_blobs: [{ data_url: 'http://www.blah.de/images/logo.png' }] }
+      end
+    end
+    assert_response :redirect
+  end
+
+  test 'cannot upload with invalid url - 2' do
+    publication = Factory :publication, contributor: User.current_user.person
+
+    login_as(publication.contributor)
+    with_config_value(:allow_publications_fulltext, true) do
+      assert_no_difference 'Publication.count' do
+        assert_no_difference('ContentBlob.count') do
+          post :upload_pdf, params: { id: publication, publication: publication, content_blobs:
+            [{ data_url: 'notanurl',
+               data: nil }], sharing: valid_sharing }
+        end
+      end
+    end
+
+    assert_response :redirect
+
+    assert_nil publication.content_blob
+
+  end
+
+  test 'can upload with valid url' do
+    publication = Factory :publication, contributor: User.current_user.person
+
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://somewhere.com/piccy.png'
+
+    login_as(publication.contributor)
+    with_config_value(:allow_publications_fulltext, true) do
+      assert_no_difference 'Publication.count' do
+        assert_difference('ContentBlob.count', +1) do
+          post :upload_pdf, params: { id: publication, publication: publication, content_blobs:
+                                                                    [{ data_url: 'http://somewhere.com/piccy.png',
+                                                                       data: nil }], sharing: valid_sharing }
+        end
+      end
+    end
+
+    assert_response :redirect
+
+    assert_not_nil publication.latest_version.content_blob
+
+    content_blob_id = publication.latest_version.content_blob.id
+
+    assert_not_nil ContentBlob.find_by_id(content_blob_id)
+  end
+
+  test 'cannot upload with invalid url' do
+    publication = Factory :publication, contributor: User.current_user.person
+
+    stub_request(:head, 'http://www.blah.de/images/logo.png').to_raise(SocketError)
+
+    login_as(publication.contributor)
+    with_config_value(:allow_publications_fulltext, true) do
+      assert_no_difference 'Publication.count' do
+        assert_no_difference('ContentBlob.count') do
+          post :upload_pdf, params: { id: publication, publication: publication, content_blobs:
+                                        [{ data_url: 'http://www.blah.de/images/logo.png',
+                                                data: nil }], sharing: valid_sharing }
+        end
+      end
+    end
+    assert_response :redirect
+    assert_nil publication.content_blob
+  end
+
+  test 'can upload with local file' do
+    publication = Factory :publication, contributor: User.current_user.person
+
+    login_as(publication.contributor)
+    with_config_value(:allow_publications_fulltext, true) do
+
+      assert_no_difference 'Publication.count' do
+        assert_difference('ContentBlob.count', +1) do
+          post :upload_pdf, params: { id: publication, publication: publication, content_blobs: [{ data: file_for_upload }],
+                                  sharing: valid_sharing }
+        end
+      end
+      assert_response :redirect
+
+      content_blob_id = publication.latest_version.content_blob.id
+      assert_not_nil ContentBlob.find_by_id(content_blob_id)
+    end
+  end
+
+  test 'can soft-delete content_blob' do
+    publication = Factory :max_publication, contributor: User.current_user.person
+
+    login_as(User.current_user.person)
+
+    with_config_value(:allow_publications_fulltext, true) do
+      assert_difference('Publication::Version.count', 1) do
+        assert_no_difference('Publication.count') do
+          assert_no_difference('ContentBlob.count') do
+            get :soft_delete_fulltext, params: {id: publication.id}
+          end
+        end
+      end
+    end
+
+    assert_response :redirect
+    # there should be a new version with empty content blob.
+
+    assert_nil(publication.latest_version.content_blob)
+  end
+
+  test 'cannot upload with anonymous user' do
+    publication = Factory :publication, policy: Factory(:public_policy, access_type: Policy::VISIBLE)
+
+    User.current_user = nil
+
+    with_config_value(:allow_publications_fulltext, true) do
+
+      assert_no_difference 'Publication.count' do
+        assert_no_difference'ContentBlob.count' do
+          post :upload_pdf, params: { id: publication, publication: publication, content_blobs: [{ data: file_for_upload }],
+                                      sharing: valid_sharing }
+        end
+      end
+      assert_response :redirect
+
+      assert_nil publication.content_blob
+    end
+  end
+
+
+  test 'should create with misc link' do
+    person = Factory(:person)
+    login_as(person)
+
+    project = Factory(:project)
+
+    publication_attrs = Factory.attributes_for(:publication,
+                                               contributor: User.current_user.person,
+                                               project_ids: [project.id],
+                                               doi: '10.1371/journal.pone.0004803',
+                                               title: 'Clickstream Data Yields High-Resolution Maps of Science - 2',
+                                               abstract: 'Intricate maps of science have been created from citation data to visualize the structure of scientific activity. However, most scientific publications are now accessed online. Scholarly web portals record detailed log data at a scale that exceeds the number of all existing citations combined. Such log data is recorded immediately upon publication and keeps track of the sequences of user requests (clickstreams) that are issued by a variety of users across many different domains. Given these advantages of log datasets over citation data, we investigate whether they can produce high-resolution, more current maps of science.',
+                                               publication_authors: ['Johan Bollen', 'Herbert Van de Sompel', 'Aric Hagberg', 'Luis Bettencourt', 'Ryan Chute', 'Marko A. Rodriguez', 'Lyudmila Balakireva'],
+                                               journal: 'Public Library of Science (PLoS)',
+                                               published_date: Date.new(2011, 3),
+                                               publication_type_id: Factory(:journal).id,
+                                               misc_links_attributes: { '0' => { url: "http://www.slack.com/",
+                                                label:'the slack about this publication' } })
+
+    assert_difference('AssetLink.misc_link.count') do
+      assert_difference('Publication.count') do
+          post :create, params: { subaction: 'Create', publication: publication_attrs }
+      end
+    end
+    publication = assigns(:publication)
+    assert_equal 'http://www.slack.com/', publication.misc_links.first.url
+    assert_equal 'the slack about this publication', publication.misc_links.first.label
+    assert_equal AssetLink::MISC_LINKS, publication.misc_links.first.link_type
+  end
+
+  test 'should show misc link' do
+    asset_link = Factory(:misc_link)
+    publication = Factory(:publication, misc_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    get :show, params: { id: publication }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Related links/, count: 1
+  end
+
+  test 'should update publication with new misc link' do
+    person = Factory(:person)
+    publication = Factory(:publication, contributor: person)
+    login_as(person)
+    assert_nil publication.misc_links.first
+    assert_difference('AssetLink.misc_link.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: publication.id, publication: { misc_links_attributes:[{ url: "http://www.slack.com/" }] }  }
+      end
+    end
+    assert_redirected_to publication_path(publication = assigns(:publication))
+    assert_equal 'http://www.slack.com/', publication.misc_links.first.url
+  end
+
+  test 'should update publication with edited misc link' do
+    person = Factory(:person)
+    publication = Factory(:publication, contributor: person, misc_links:[Factory(:misc_link)])
+    login_as(person)
+    assert_equal 1,publication.misc_links.count
+    assert_no_difference('AssetLink.misc_link.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: publication.id, publication: { misc_links_attributes:[{ id:publication.misc_links.first.id, url: "http://www.wibble.com/" }] } }
+      end
+    end
+    publication = assigns(:publication)
+    assert_redirected_to publication_path(publication)
+    assert_equal 1,publication.misc_links.count
+    assert_equal 'http://www.wibble.com/', publication.misc_links.first.url
+  end
+
+  test 'should destroy related assetlink when the misc link is removed ' do
+    person = Factory(:person)
+    login_as(person)
+    asset_link = Factory(:misc_link)
+    publication = Factory(:publication, misc_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
+    assert_difference('AssetLink.misc_link.count', -1) do
+      put :update, params: { id: publication.id, publication: { misc_links_attributes:[{ id: asset_link.id, _destroy:'1' }] } }
+    end
+    assert_redirected_to publication_path(publication = assigns(:publication))
+    assert_empty publication.misc_links
+  end
+
 end

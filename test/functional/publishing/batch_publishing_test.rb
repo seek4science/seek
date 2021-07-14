@@ -83,7 +83,9 @@ class BatchPublishingTest < ActionController::TestCase
   end
 
   test 'do not have not_publishable_type item in batch_publishing_preview' do
-    item = Factory(:publication, contributor: User.current_user.person)
+    item = Factory(:publication,
+                   contributor: User.current_user.person,
+                   policy: Factory(:public_policy))
     refute item.can_publish?, 'This item must not be publishable for the test to be meaningful'
 
     get :batch_publishing_preview, params: { id: User.current_user.person.id }
