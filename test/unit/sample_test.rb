@@ -1089,4 +1089,14 @@ class SampleTest < ActiveSupport::TestCase
     assert_equal expected, sample.get_attribute_value('data file')
 
   end
+
+  test 'json api doesnt format attribute_map keys' do
+    sample = User.with_current_user(Factory(:user)) do
+      Factory(:max_sample)
+    end
+    json = JSON.parse(ActiveModelSerializers::SerializableResource.new(sample).adapter.to_json)
+    attribute_map = json['data']['attributes']['attribute_map']
+    assert attribute_map.key?('CAPITAL key')
+    assert_equal 'key must remain capitalised', attribute_map['CAPITAL key']
+  end
 end

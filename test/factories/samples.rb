@@ -51,6 +51,6 @@ Factory.define(:max_sample, parent: :sample) do |f|
     sample.set_attribute_value(:full_name, 'Fred Bloggs')
     sample.set_attribute_value(:address, "HD")
     sample.set_attribute_value(:postcode, "M13 9PL")
-    #sample.set_attribute_value('CAPITAL key', "checking the key inst formatted")
+    sample.set_attribute_value('CAPITAL key', 'key must remain capitalised')
   end
 end
