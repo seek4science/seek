@@ -1,7 +1,8 @@
 class SampleSerializer < PCSSerializer
   attribute :title
-  attribute :attribute_map
-  attribute :data, key: :attribute_map
+  attribute :attribute_map do
+    object.data.to_hash
+  end
   attribute :tags do
     serialize_annotations(object)
   end
@@ -13,5 +14,6 @@ class SampleSerializer < PCSSerializer
   has_many :creators
   has_one :policy
   has_many :people
+
 end
  
