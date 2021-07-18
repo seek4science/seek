@@ -66,6 +66,7 @@ def load_seek_config_defaults!
   Seek::Config.default :project_hierarchy_enabled, false
   Seek::Config.default :show_announcements, true
   Seek::Config.default :programme_user_creation_enabled, false
+  Seek::Config.default :programmes_open_for_projects_enabled, false
   Seek::Config.default :project_admin_sample_type_restriction, false #only project admins can create and edit sample types and controlled vocabs
 
   # Types
@@ -103,6 +104,7 @@ def load_seek_config_defaults!
   Seek::Config.default :header_image_link,"http://www.fair-dom.org"
   Seek::Config.default :copyright_addendum_enabled,false
   Seek::Config.default :copyright_addendum_content,'Additions copyright ...'
+  Seek::Config.default :issue_tracker, 'https://fair-dom.org/issues'
 
   #Imprint
   Settings.defaults[:imprint_enabled]= false

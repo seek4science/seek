@@ -344,7 +344,7 @@ class AdminControllerTest < ActionController::TestCase
     assert_nil Seek::Config.header_image_avatar_id
     settings = {project_name: 'project name', project_type: 'project type', project_description: 'project description', project_keywords: 'project,    keywords, ',
                 project_link: 'http://project-link.com',application_name: 'app name',
-                dm_project_name: 'dm project name', dm_project_link: 'http://dm-project-link.com',
+                dm_project_name: 'dm project name', dm_project_link: 'http://dm-project-link.com', issue_tracker: 'https://issues-galore.com',
                 header_image_link: 'http://header-link.com/image.jpg', header_image_title: 'header image title',
                 copyright_addendum_content: 'copyright content', imprint_description: 'imprint description',
                 terms_page: 'terms page', privacy_page: 'privacy page', about_page: 'about page',
@@ -363,6 +363,7 @@ class AdminControllerTest < ActionController::TestCase
     assert_equal 'app name', Seek::Config.application_name
     assert_equal 'dm project name', Seek::Config.dm_project_name
     assert_equal 'http://dm-project-link.com', Seek::Config.dm_project_link
+    assert_equal 'https://issues-galore.com', Seek::Config.issue_tracker
     assert_equal 'http://header-link.com/image.jpg', Seek::Config.header_image_link
     assert_equal 'header image title', Seek::Config.header_image_title
     assert_equal 'copyright content', Seek::Config.copyright_addendum_content
