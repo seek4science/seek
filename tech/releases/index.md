@@ -11,9 +11,21 @@ Please see [Getting FAIRDOM-SEEK](/get-seek.html) for details about installing S
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html)
 
+## Version 1.11.1
+
+Release date: _19th July 2021_
+
+A small update release with a few small changes and bug fixes, in particular:
+
+  * Fix to a rarely encountered bug that caused a user to be added to a project with a nil Institution, which could then lead to other problems
+  * Fix to remove some warning messages about a duplicate definition of _include_blank_
+  * Person responsible for Study has been deprecated and removed from the user interface 
+
+[Closed issues for 1.11.1](https://github.com/seek4science/seek/milestone/5?closed=1)
+
 ## Version 1.11.0
 
-Release date: 21st _June 2021_
+Release date: _21st June 2021_
 
 This version includes:
 
