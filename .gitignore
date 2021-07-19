@@ -13,7 +13,6 @@ config/initializers/seek_local.rb
 config/environment_local.rb
 config/virtuoso_settings.yml
 config/initializers/taverna_server.rb
-config/sunspot.yml
 config/using-docker
 
 *.DS_Store
@@ -47,6 +46,7 @@ tmp/testing-seek-cache
 tmp/rubycritic
 tmp/fleximage
 tmp/performance
+tmp/user_uuid_studies_upload
 *.tmp*
 *~
 

@@ -69,7 +69,7 @@ module JsonTestHelper
     end
 
     diff.delete_if do |el|
-      el['path'] =~ /\/id|person_responsible_id|created|updated|modified|uuid|jsonapi|self|download|md5sum|sha1sum|project_id|position_id|tags|members|links\/items/
+      el['path'] =~ /\/id|created|updated|modified|uuid|jsonapi|self|download|md5sum|sha1sum|project_id|position_id|tags|members|links\/items/
     end
 
     assert_equal [], diff
@@ -80,6 +80,7 @@ module JsonTestHelper
     assert_equal 'application/vnd.api+json', @response.content_type
     assert JSON::Validator.validate(JSONAPI_SCHEMA_FILE_PATH, @response.body), 'Response did not validate against JSON-API schema'
   end
+
   # check if this current controller type doesn't support read
   def check_for_501_read_return
     clz = @controller.controller_model.to_s

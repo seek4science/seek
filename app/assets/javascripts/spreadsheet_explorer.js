@@ -689,7 +689,7 @@ function changeRowsPerPage(){
     if (current_href.endsWith('#'))
         current_href = current_href.substring(0,current_href.length-1);
 
-    var update_per_page = $j('per_page')[0].value;
+    var update_per_page = $j('#per_page')[0].value;
     var update_href = '';
     if (current_href.match('page_rows') == null){
         update_href = current_href.concat('&page_rows='+update_per_page);

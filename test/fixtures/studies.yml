@@ -1,13 +1,11 @@
 metabolomics_study:
   title: A Metabolomics Study  
-  investigation: metabolomics_investigation
-  person_responsible: person_without_group
+  investigation: metabolomics_investigation  
   policy: editing_for_all_sysmo_users_policy
 
 metabolomics_study2:
   title: A Metabolomics Study2
-  investigation: metabolomics_investigation2
-  person_responsible: person_without_group
+  investigation: metabolomics_investigation2  
   policy: editing_for_all_sysmo_users_policy
 
 study_with_overlapping_assay_sops:

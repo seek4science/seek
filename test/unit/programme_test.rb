@@ -488,4 +488,17 @@ class ProgrammeTest < ActiveSupport::TestCase
       refute prog2.site_managed?
     end
   end
+
+  test 'allows_user_projects?' do
+    prog = Factory(:programme, open_for_projects:true)
+    prog2 = Factory(:programme, open_for_projects:false)
+    with_config_value(:programmes_open_for_projects_enabled, true) do
+      assert prog.allows_user_projects?
+      refute prog2.allows_user_projects?
+    end
+    with_config_value(:programmes_open_for_projects_enabled, false) do
+      refute prog.allows_user_projects?
+      refute prog2.allows_user_projects?
+    end
+  end
 end

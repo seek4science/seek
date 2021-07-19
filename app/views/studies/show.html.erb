@@ -20,14 +20,6 @@
           <b><%= "Study position" %>: </b>
           <%= @study.position %>
         </p>
-        <p>
-          <label><%= t('person_responsible').capitalize %>:</label>
-          <% if @study.person_responsible.try :can_view? -%>
-              <%= link_to @study.person_responsible.name,@study.person_responsible %>
-          <% else -%>
-              <span class="none_text">Not available</span>
-          <% end -%>
-        </p>
 
         <% unless @study.experimentalists.blank? %>
           <p>

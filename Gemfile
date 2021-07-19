@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-gem 'rails', '~> 5.2.4'
+gem 'rails', '~> 5.2.4.0'
 gem 'rdoc'
 
 #database adaptors
@@ -21,8 +21,7 @@ gem 'rmagick', '2.15.2'
 gem 'rest-client', '~>2.0'
 gem 'factory_girl', '2.6.4'
 gem 'bio', '~> 1.5.1'
-gem 'sunspot_rails', '~>2.2.7'
-gem 'sunspot_solr', '~>2.2.0'
+gem 'sunspot_rails'
 gem 'progress_bar'
 gem 'savon', '1.1.0'
 gem 'dynamic_form'
@@ -54,7 +53,7 @@ gem 'will_paginate', '~> 3.1'
 gem 'yaml_db'
 gem 'rails_autolink'
 gem 'rfc-822'
-gem 'nokogiri', '~> 1.11.2'
+gem 'nokogiri', '~> 1.11.4'
 gem 'rdf-virtuoso', '>= 0.2.0'
 gem 'terrapin'
 gem 'lograge'
@@ -95,7 +94,7 @@ gem 'rspec-rails','~> 3.6'
 
 gem 'citeproc-ruby', '~> 1.1.4'
 gem 'citeproc', '~> 1.0.4'
-gem 'csl-styles', '~> 1.0.1.7'
+gem 'csl-styles', '~> 1.0.1.11'
 gem 'bibtex-ruby', '~> 5.1.0'
 
 gem 'omniauth', '~> 1.3.1'

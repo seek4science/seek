@@ -30,6 +30,8 @@ def load_seek_testing_defaults!
       Settings.defaults[:factors_studied_enabled] = true
       Settings.defaults[:experimental_conditions_enabled] = true
       Settings.defaults[:programme_user_creation_enabled] = true
+      Settings.defaults[:programmes_open_for_projects_enabled] = true
+
       Settings.defaults[:project_hierarchy_enabled] = true
       Settings.defaults[:tabs_lazy_load_enabled] = false
 

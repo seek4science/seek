@@ -63,7 +63,7 @@ module Seek
 
       def unpublish_auth
         asset = @asset_version.parent
-        is_unpublish_request = asset.is_published? && params[:policy_attributes] && params[:policy_attributes][:access_type].to_i != Policy::NO_ACCESS
+        is_unpublish_request = asset.is_published? && params[:policy_attributes] && params[:policy_attributes][:access_type].to_i < Policy::ACCESSIBLE
         if is_unpublish_request && asset.has_doi?
           error('Un-publishing this asset is not possible', 'is invalid')
           return false

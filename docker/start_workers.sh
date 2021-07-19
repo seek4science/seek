@@ -1,7 +1,5 @@
 #!/bin/bash
 . docker/shared_functions.sh
-#Stop the search reverting to disabled if its setting hasn't been changed
-enable_search
 
 cp docker/database.docker.mysql.yml config/database.yml
 
@@ -13,7 +11,7 @@ wait_for_database
 start_soffice
 
 # Search
-start_or_setup_search
+start_search
 
 echo "STARTING WORKERS"
 bundle exec rake seek:workers:start

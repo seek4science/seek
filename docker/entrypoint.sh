@@ -3,9 +3,6 @@
 # import some shared functions
 . docker/shared_functions.sh
 
-# Set the search to be enabled by default
-enable_search
-
 # DB config
 check_mysql
 
@@ -13,7 +10,7 @@ check_mysql
 start_soffice
 
 # Search
-start_or_setup_search
+start_search
 
 # SETUP for OpenSEEK only, to link to openBIS if necessary
 if [ ! -z $OPENBIS_USERNAME ]

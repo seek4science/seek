@@ -351,7 +351,7 @@ class User < ApplicationRecord
 
   def remove_from_auth_tables
     Seek::Util.authorized_types.each do |type|
-      type.lookup_class.where(user: id).delete_all
+      type.lookup_class.where(user: id).in_batches(of:1000).delete_all
     end
   end
 

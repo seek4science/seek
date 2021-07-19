@@ -175,7 +175,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
       assert_select "a", text: /Register new version/
       assert_select "a[class='disabled']", text: /Register new version/, count:0
     end
-  end  
+  end
 
   test 'after DOI is minted, the -Delete- button is disabled' do
     DOIABLE_ASSETS.each do |type|
@@ -210,7 +210,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
     skip 'This test no longer works with the dynamic permissions form'
 
     DOIABLE_ASSETS.each do |type|
-      asset = Factory(type.to_sym, policy: Factory(:public_policy))
+      asset = Factory(type.to_sym, contributor: User.current_user.person, policy: Factory(:public_policy))
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
       assert latest_version.save
@@ -224,7 +224,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
   test 'can not unpublish asset after DOI is minted' do
     DOIABLE_ASSETS.each do |type|
-      asset = Factory(type.to_sym, policy: Factory(:public_policy))
+      asset = Factory(type.to_sym, contributor: User.current_user.person, policy: Factory(:public_policy))
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
       assert latest_version.save
@@ -237,6 +237,38 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
       assert_redirected_to :root
       assert_not_nil flash[:error]
     end
+  end
+
+  test 'can update asset with DOI if current version does not have one' do
+    asset = Factory(:workflow, contributor: User.current_user.person, policy: Factory(:public_policy))
+    latest_version = asset.latest_version
+    latest_version.doi = '10.5072/my_test'
+    assert latest_version.save
+    assert latest_version.has_doi?
+
+    assert asset.save_as_new_version
+    assert_nil asset.latest_version.doi
+
+    put workflow_path(asset), params: { workflow: { title: 'test 123' }, policy_attributes: { access_type: Policy::ACCESSIBLE } }
+
+    assert_nil flash[:error]
+    assert_equal 'test 123', asset.reload.title
+  end
+
+  test 'cannot update asset with DOI to be private, even if current version does not have a DOI' do
+    asset = Factory(:workflow, contributor: User.current_user.person, policy: Factory(:public_policy))
+    latest_version = asset.latest_version
+    latest_version.doi = '10.5072/my_test'
+    assert latest_version.save
+    assert latest_version.has_doi?
+
+    assert asset.save_as_new_version
+    assert_nil asset.latest_version.doi
+
+    put workflow_path(asset), params: { workflow: { title: 'test 123' }, policy_attributes: { access_type: Policy::NO_ACCESS } }
+
+    assert flash[:error].include?('not possible')
+    assert_not_equal 'test 123', asset.reload.title
   end
 
   private

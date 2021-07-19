@@ -1757,19 +1757,43 @@ class ProjectsControllerTest < ActionController::TestCase
 
   test 'guided create with administered programmes' do
     person = Factory(:programme_administrator)
-    prog = Factory(:programme, title:'THE MANAGED ONE')
+    managed_prog = Factory(:programme, title:'THE MANAGED ONE')
     person_prog = person.programmes.first
     another_prog = Factory(:programme)
     login_as(person)
-    with_config_value(:managed_programme_id, prog.id) do
+    with_config_value(:managed_programme_id, managed_prog.id) do
       get :guided_create
     end
     assert_response :success
     assert_select 'input#managed_programme', count:0
     assert_select 'select#programme_id' do
       assert_select 'option',count:2
-      assert_select 'option',value:prog.id,text:prog.title
+      assert_select 'option',value:managed_prog.id,text:managed_prog.title
       assert_select 'option',value:person_prog.id,text:person_prog.title
+      assert_select 'option',value:another_prog.id,text:another_prog.title, count:0
+    end
+  end
+
+  test 'guided create with administered programmes as admin' do
+    person = Factory(:programme_administrator)
+    managed_prog = Factory(:programme, title:'THE MANAGED ONE')
+    person_prog = person.programmes.first
+    another_prog = Factory(:programme)
+    admin = Factory(:admin)
+    admin_prog = Factory(:programme)
+    admin.is_programme_administrator = true, admin_prog
+    admin.save!
+    login_as(admin)
+    with_config_value(:managed_programme_id, managed_prog.id) do
+      get :guided_create
+    end
+    assert_response :success
+    assert_select 'input#managed_programme', count:0
+    assert_select 'select#programme_id' do
+      assert_select 'option',count:2      
+      assert_select 'option',value:managed_prog.id,text:managed_prog.title
+      assert_select 'option',value:admin_prog.id,text:admin_prog.title
+      assert_select 'option',value:person_prog.id,text:person_prog.title, count:0
       assert_select 'option',value:another_prog.id,text:another_prog.title, count:0
     end
   end
@@ -2050,6 +2074,20 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'administer join request with new institution that was since created' do
+    person = Factory(:project_administrator)
+    project = person.projects.first
+    login_as(person)
+    institution = Institution.new(title:'my institution')
+    log = MessageLog.log_project_membership_request(Factory(:person),project,institution,'some comments')
+    created_inst = Factory(:institution,title:'my institution')
+    get :administer_join_request, params:{id:project.id,message_log_id:log.id}
+    assert_response :success
+    
+    assert_select 'input#institution_title', count: 0
+    assert_select 'input#institution_id', value: created_inst.id, count: 1
+  end
+
   test 'admininster join request blocked for different admin' do
     person = Factory(:project_administrator)
     another_admin = Factory(:project_administrator)
@@ -2248,6 +2286,22 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'administer create request project with institution already created' do
+    # when a new institution when requested, but it has then been created before the request is handled 
+    person = Factory(:admin)
+    login_as(person)
+    project = Project.new(title:'new project')
+    programme = Programme.new(title:'new programme')
+    institution = Institution.new(title:'my institution')
+    log = MessageLog.log_project_creation_request(Factory(:person),programme, project,institution)
+    created_inst = Factory(:institution,title:'my institution')
+    get :administer_create_project_request, params:{message_log_id:log.id}
+    assert_response :success
+
+    assert_select 'input#institution_title', count: 0
+    assert_select 'input#institution_id', value: created_inst.id, count: 1
+  end
+
   test 'admininister create request can be accessed by programme admin' do
     person = Factory(:programme_administrator)
     login_as(person)
@@ -2334,7 +2388,9 @@ class ProjectsControllerTest < ActionController::TestCase
         assert_difference('Project.count') do
           assert_difference('Institution.count') do
             assert_difference('GroupMembership.count') do
-              post :respond_create_project_request, params:params
+              assert_difference('WorkGroup.count') do
+                post :respond_create_project_request, params:params
+              end              
             end
           end
         end
@@ -2344,6 +2400,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = Project.last
     programme = Programme.last
     institution = Institution.last
+    requester.reload
 
     assert_redirected_to(project_path(project))
     assert_equal "Request accepted and #{log.sender.name} added to Project and notified",flash[:notice]
@@ -2357,6 +2414,10 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_includes project.institutions, institution
     assert_includes programme.programme_administrators, requester
     assert_includes project.project_administrators, requester
+
+    assert_equal WorkGroup.last, requester.work_groups.last
+    assert_equal institution, requester.work_groups.last.institution
+    assert_equal project, requester.work_groups.last.project
 
     log.reload
     assert log.responded?
@@ -2483,7 +2544,9 @@ class ProjectsControllerTest < ActionController::TestCase
         assert_no_difference('Project.count') do
           assert_no_difference('Institution.count') do
             assert_no_difference('GroupMembership.count') do
-              post :respond_create_project_request, params:params
+              assert_no_difference('WorkGroup.count') do
+                post :respond_create_project_request, params:params
+              end              
             end
           end
         end
