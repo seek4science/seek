@@ -97,15 +97,17 @@ module GitSupport
     end
   end
 
-  def remove_file(path)
+  def remove_file(path, update_annotations: true)
     raise Seek::Git::PathNotFoundException.new(path: path) unless file_exists?(path)
 
     perform_commit("Deleted #{path}") do |index|
       index.remove(path)
     end
+
+    git_annotations.where(path: path).destroy_all if update_annotations
   end
 
-  def move_file(oldpath, newpath)
+  def move_file(oldpath, newpath, update_annotations: true)
     raise Seek::Git::PathNotFoundException.new(path: oldpath) unless file_exists?(oldpath)
 
     perform_commit("Moved #{oldpath} -> #{newpath}") do |index|
@@ -113,6 +115,8 @@ module GitSupport
       index.add(path: newpath, oid: existing[:oid], mode: 0100644)
       index.remove(oldpath)
     end
+
+    git_annotations.where(path: oldpath).update_all(path: newpath) if update_annotations
   end
 
   private
