@@ -10,7 +10,6 @@
         "permissions":[]
       },
       "other_creators": null,
-      "position": null,
       "title": "A Minimal Assay",
       "description": null,
       "assay_class": {
@@ -26,10 +25,7 @@
         "label":"Technology type",
         "uri":"http://jermontology.org/ontology/JERMOntology#Technology_type"
       },
-      "discussion_links" : null,
-	"started_at" : null,
-	"finished_at" : null,
-	"status" : null
+      "discussion_links" : null
     },
     "relationships": {
       "creators": {
@@ -83,15 +79,6 @@
       "data_files": {
         "data": []
       },
-      "placeholders": {
-        "data": []
-      },
-      "incoming": {
-        "data": []
-      },
-      "outgoing": {
-        "data": []
-      },
       "models": {
         "data": []
       },
@@ -103,10 +90,7 @@
       },
       "documents": {
         "data": []
-      },
-	"assignee" : {
-	    "data" : null
-	}
+      }
     },
     "links": {
       "self": "/assays/1039986486"

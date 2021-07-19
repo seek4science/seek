@@ -6,10 +6,4 @@ class DataFileSerializer < ContributedResourceSerializer
   has_many :assays
   has_many :publications
   has_many :events
-  has_one :file_template
-  has_one :placeholder
-
-  attribute :data_type
-  attribute :format_type
-
 end

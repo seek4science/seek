@@ -400,7 +400,6 @@ var ISA = {
 
                     // Need to do this due to a little hack we used when drawing the tree
                     //  (to show a node as "openable" despite having no children)
-		    tree.rename_node(this.id, 'fred');
                     tree.redraw_node(this.id);
                 });
 

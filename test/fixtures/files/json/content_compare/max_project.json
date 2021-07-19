@@ -27,10 +27,7 @@
         "id": 55,
         "url": "http://www.slack.com/",
         "label": "Slack"
-      }],
-	"started_at" : null,
-	"finished_at" : null,
-	"status" : null
+      }]
     },
     "relationships": {
       "organisms": {
@@ -144,16 +141,7 @@
             "type": "documents"
           }
         ]
-      },
-	"file_templates" : {
-	    "data" : []
-	},
-	"placeholders" : {
-	    "data" : []
-	},
-	"assignee" : {
-	    "data" : null
-	}
+      }
     },
     "links": {
       "self": "/projects/927855014"

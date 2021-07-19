@@ -36,9 +36,7 @@
         }
       ],
       "other_creators": null,
-      "discussion_links": null,
-	"data_type":"http://edamontology.org/data_0006",
-	"format_type":"http://edamontology.org/format_1915"
+      "discussion_links": null
     },
     "relationships": {
       "creators": {
@@ -82,13 +80,7 @@
       },
       "events": {
         "data": []
-      },
-	"file_template": {
-	    "data" : null
-	},
-	"placeholder": {
-	    "data" : null
-	}
+      }
     },
     "links": {
       "self": "/data_files/883654268"

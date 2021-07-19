@@ -10,7 +10,6 @@
         "permissions":[]
       },
       "other_creators":  "Anonymous creator",
-      "position": null,
       "title": "A Maximal Modelling Assay",
       "description": "A Western Blot Assay",
       "assay_class": {
@@ -30,10 +29,7 @@
         "id": 55,
         "url": "http://www.slack.com/",
         "label": "Slack"
-      }],
-	"started_at" : null,
-	"finished_at" : null,
-	"status" : null
+      }]
     },
     "relationships": {
       "creators": {
@@ -103,15 +99,6 @@
           }
         ]
       },
-      "placeholders": {
-        "data": []
-      },
-      "incoming": {
-        "data": []
-      },
-      "outgoing": {
-        "data": []
-      },
       "models": {
         "data": [
           {
@@ -143,10 +130,7 @@
             "type": "documents"
           }
         ]
-      },
-	"assignee" : {
-	    "data" : null
-	}
+      }
     },
     "links": {
       "self": "/assays/1039986486"

@@ -3,7 +3,6 @@ class ProjectSerializer < AvatarObjSerializer
   # class ProjectSerializer < ActiveModel::Serializer
   attributes :title, :description,
              :web_page, :wiki_page, :default_license, :start_date, :end_date
-  attributes :started_at, :finished_at, :status
 
   attribute :default_policy, if: :show_default_policy?
 
@@ -39,15 +38,12 @@ class ProjectSerializer < AvatarObjSerializer
   has_many :studies
   has_many :assays
   has_many :data_files
-  has_many :file_templates
-  has_many :placeholders
   has_many :models
   has_many :sops
   has_many :publications
   has_many :presentations
   has_many :events
   has_many :documents
-  has_one :assignee
 
   def show_default_policy?
     has_default_policy = !object.default_policy.nil?
