@@ -1,6 +1,6 @@
 class GroupMembership < ApplicationRecord
   belongs_to :person, inverse_of: :group_memberships
-  belongs_to :work_group, inverse_of: :group_memberships
+  belongs_to :work_group, inverse_of: :group_memberships, validate: true
   has_one :project, through: :work_group, inverse_of: :group_memberships
   has_one :institution, through: :work_group, inverse_of: :group_memberships
 

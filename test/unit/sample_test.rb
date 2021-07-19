@@ -1123,4 +1123,15 @@ class SampleTest < ActiveSupport::TestCase
     multi_linked_sample_type.sample_attributes.last.is_title = true
     refute multi_linked_sample_type.valid?
   end
+
+  test 'json api doesnt format attribute_map keys' do
+    sample = User.with_current_user(Factory(:user)) do
+      Factory(:max_sample)
+    end
+    json = JSON.parse(ActiveModelSerializers::SerializableResource.new(sample).adapter.to_json)
+    attribute_map = json['data']['attributes']['attribute_map']
+    assert attribute_map.key?('CAPITAL key')
+    assert_equal 'key must remain capitalised', attribute_map['CAPITAL key']
+  end
+
 end
