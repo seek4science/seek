@@ -21,8 +21,6 @@
           <%= @study.position %>
         </p>
 
-	<%= render :partial => "general/bpmn_info",:locals => {:item=>@study} %>
-
         <% unless @study.experimentalists.blank? %>
           <p>
             <b>Experimentalists:</b>

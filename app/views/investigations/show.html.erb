@@ -14,7 +14,6 @@
       <b><%= "Investigation position" %>: </b>
       <%= @investigation.position %>
     </p>
-	<%= render :partial => "general/bpmn_info",:locals => {:item=>@investigation} %>
     <%= render partial: 'custom_metadata/custom_metadata_attribute_values', locals: {resource: @investigation} %>
     <%= render partial: 'general/isa_graph', locals: { root_item: @investigation, options: { depth: 4 } } %>
   </div>

@@ -92,9 +92,6 @@
   <%= admin_checkbox_setting(:copasi_enabled, 1, Seek::Config.copasi_enabled,
                              "Copasi enabled", "Whether support for running a publicly available model in Copasi is enabled.") %>
 
-  <%= admin_checkbox_setting(:bpmn_enabled, 1, Seek::Config.bpmn_enabled,
-                             "BPMN enabled", "Whether BPMN models can be generated.") %>
-
   <%= admin_checkbox_setting(:google_analytics_enabled, 1, Seek::Config.google_analytics_enabled,
                              "Google analytics enabled", "Allows you to keep track of site traffic using Google Analytics. You need to register with Google Analytics and get a tracker ID.",
                              :onchange=>toggle_appear_javascript('google_anaylitics_block')) %>

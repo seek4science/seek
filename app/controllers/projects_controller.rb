@@ -27,7 +27,7 @@ class ProjectsController < ApplicationController
   before_action :is_user_admin_auth, only: %i[manage destroy]
   before_action :editable_by_user, only: %i[edit update]
   before_action :check_investigations_are_for_this_project, only: %i[update]
-  before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles update_members storage_report administer_join_request respond_join_request populate populate_from_spreadsheet bpmn bpmn_report]
+  before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles update_members storage_report administer_join_request respond_join_request populate populate_from_spreadsheet]
 
   before_action :member_of_this_project, only: [:asset_report], unless: :admin_logged_in?
 
@@ -271,12 +271,6 @@ class ProjectsController < ApplicationController
     end
   end
 
-  def bpmn_report
-    project = Project.find(params[:id])
-    respond_to do |format|
-      format.html { render template: 'bpmn/report', locals: { :project => project} }
-    end
-  end
   
   # GET /projects/1
   # GET /projects/1.xml
@@ -454,44 +448,6 @@ class ProjectsController < ApplicationController
     end
   end
 
-  def bpmn
-    @project = Project.find(params[:id]) if params[:id]
-
-    app_id = SecureRandom.uuid
-    app_hash = {}
-    app_hash['id'] = app_id
-    app_hash['name'] = @project.title.parameterize.underscore + '_app'
-    app_hash['key'] = app_hash['name']
-    app_hash['description'] = @project.description.blank? ? "" : @project.description 
-    app_hash['editorJson'] = {}
-
-    model_id = SecureRandom.uuid
-    model_name = @project.title.parameterize.underscore + '_model'
-    app_hash['editorJson']['models'] =
-      [{"id" => model_id,
-        "name" => model_name,
-        "version" => 1,
-        "modelType" => 0,
-        "description" => app_hash['description'],
-        "stencilSetId" => nil,
-        "createdBy" => "admin",
-        "lastUpdatedBy" => "admin",
-        "lastUpdated":"2021-05-04T19:32:05.797+00:00"}]
-    app_hash['editorJson']['theme']  = "theme-1"
-    app_hash['editorJson']['icon']  = "glyphicon-asterisk"
-    
-    model_hash = {"id" => model_id,
-                  "name" => model_name,
-                  "key" => model_name,
-                  "description" => app_hash['description'],
-                  "editorJson" => nil
-                 }
-    bpmn_string = render_to_string(
-      "bpmn/convert.erb", locals: { :id => model_id, :name => model_name, :project => @project}, layout: false
-                )
-    send_data bpmn_string, filename: "#{model_name}.bpmn", type: 'application/xml', disposition: 'attachment'
-  end
-  
   # returns a list of institutions for a project in JSON format
   def request_institutions
     # listing institutions for a project is public data, but still
