@@ -1,15 +1,14 @@
 <%= list_item_description resource.description %>
 
 <div class="row">
-  <div class="col-sm-6">
-    <%= list_item_authorized_attribute t('person_responsible').capitalize, resource.person_responsible %>
-    <%= list_item_snapshot_list resource %>
-    <%= list_item_doi(resource) %>
+  <div class="col-sm-6">    
+    <%= list_item_authorized_list [resource.investigation], t('investigation'), true, 50, true  %>
+    <%= list_item_authorized_list resource.assays, t('assays.assay').pluralize %>    
   </div>
 
   <div class="col-sm-6 hidden-xs">
-    <%= list_item_authorized_list [resource.investigation], t('investigation'), true, 50, true  %>
-    <%= list_item_authorized_list resource.assays, t('assays.assay').pluralize %>
+    <%= list_item_snapshot_list resource %>
+    <%= list_item_doi(resource) %>
   </div>
 </div>
 

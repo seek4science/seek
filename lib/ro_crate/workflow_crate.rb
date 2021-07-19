@@ -6,7 +6,7 @@ module ROCrate
 
     validates :main_workflow, presence: true
 
-    properties(%w[mainEntity])
+    properties(%w[mainEntity mentions about])
 
     def main_workflow
       main_entity
@@ -36,8 +36,8 @@ module ROCrate
       main_workflow.cwl_description = entity
     end
 
-    def test_directory
-      dereference('test/')
+    def test_suites
+      ((mentions || []) | (about || [])).select { |entity| entity.has_type?('TestSuite') }
     end
 
     def readme

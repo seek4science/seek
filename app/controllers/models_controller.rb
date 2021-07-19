@@ -8,7 +8,7 @@ class ModelsController < ApplicationController
   before_action :models_enabled?
   before_action :find_assets, :only => [:index]
   before_action :find_and_authorize_requested_item, :except => [:build, :index, :new, :create, :preview, :update_annotations_ajax]
-  before_action :find_display_asset, :only => [:show, :download, :execute, :visualise, :export_as_xgmml, :compare_versions]
+  before_action :find_display_asset, :only => [:show, :download, :execute, :compare_versions]
   before_action :find_other_version, :only => [:compare_versions]
 
   include Seek::Jws::Simulator
@@ -52,33 +52,6 @@ class ModelsController < ApplicationController
     end
     @blob1=blobs[0]
     @blob2=blobs[1]
-  end
-
-  def export_as_xgmml
-    type = params[:type]
-    body = @_request.body.read
-    orig_doc = find_xgmml_doc @display_model
-    head = orig_doc.to_s.split("<graph").first
-    xgmml_doc = head + body
-
-    xgmml_file = "model_#{@model.id}_version_#{@display_model.version}_export.xgmml"
-    tmp_file= Tempfile.new("#{xgmml_file}", "#{Rails.root}/tmp/")
-    File.open(tmp_file.path, "w") do |tmp|
-      tmp.write xgmml_doc
-    end
-
-    send_file tmp_file.path, :type => "#{type}", :disposition => 'attachment', :filename => xgmml_file
-    tmp_file.close
-  end
-
-  def visualise
-    raise Exception.new("This #{t('model')} does not support Cytoscape") unless @display_model.contains_xgmml?
-    # for xgmml file
-    doc = find_xgmml_doc @display_model
-    # convert " to \" and newline to \n
-    #e.g.  "... <att type=\"string\" name=\"canonicalName\" value=\"CHEMBL178301\"/>\n ...  "
-    @graph = %Q("#{doc.root.to_s.gsub(/"/, '\"').gsub!("\n", '\n')}")
-    render :cytoscape_web, :layout => false
   end
 
   # GET /models
@@ -162,13 +135,6 @@ class ModelsController < ApplicationController
         model: model_object,
         content_type: params_model_image[:image_file].content_type,
         original_filename: params_model_image[:image_file].original_filename))
-  end
-
-  def find_xgmml_doc model
-    xgmml_content_blob = model.xgmml_content_blobs.first
-    file = open(xgmml_content_blob.filepath)
-    doc = LibXML::XML::Parser.string(file.read).parse
-    doc
   end
 
   def create_model_image model_object, params_model_image

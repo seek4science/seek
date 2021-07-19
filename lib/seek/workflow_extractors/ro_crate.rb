@@ -15,7 +15,7 @@ module Seek
 
       def has_tests?
         open_crate do |crate|
-          crate.test_directory.present?
+          crate.test_suites.any?
         end
       end
 

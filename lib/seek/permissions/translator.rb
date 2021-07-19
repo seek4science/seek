@@ -10,9 +10,9 @@ module Seek
                       ]).freeze,
 
         download: Set.new(%i[
-                            download named_download launch submit_job data execute plot explore visualise
-                            export_as_xgmml download_log download_results input output download_output download_input
-                            view_result compare_versions simulate ro_crate
+                            download named_download launch submit_job data execute plot explore
+                            download_log download_results input output download_output download_input
+                            view_result compare_versions simulate diagram ro_crate
                           ]).freeze,
 
         edit: Set.new(%i[
