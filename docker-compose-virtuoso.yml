@@ -62,7 +62,7 @@ services:
       - virtuoso
 
   solr:
-    image: fairdom/seek-solr
+    image: fairdom/seek-solr:6.6
     container_name: seek-solr
     restart: always
     environment:
