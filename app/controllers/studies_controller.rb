@@ -97,7 +97,6 @@ class StudiesController < ApplicationController
 
   def create
     @study = Study.new(study_params)
-    @study.status = :planned
     update_sharing_policies @study
     update_relationships(@study, params)
     ### TO DO: what about validation of person responsible? is it already included (for json?)
@@ -215,7 +214,6 @@ class StudiesController < ApplicationController
         )
       }
       @study = Study.new(study_params)
-      @study.status = :planned
       StudyBatchUpload.check_study_is_MIAPPE_compliant(@study, metadata)
       if @study.valid? && @study.save! && @study.custom_metadata.valid?
         studies_uploaded = true if @study.save
@@ -354,19 +352,10 @@ class StudiesController < ApplicationController
   end
 
   private
-  def validate_person_responsible(p)
-    if (!p[:person_responsible_id].nil?) && (!Person.exists?(p[:person_responsible_id]))
-      render json: {error: 'Person responsible does not exist', status: :unprocessable_entity}, status: :unprocessable_entity
-      return false
-    end
-    true
-  end
-
   def study_params
-    params.require(:study).permit(:title, :description, :experimentalists, :investigation_id, :person_responsible_id,
+    params.require(:study).permit(:title, :description, :experimentalists, :investigation_id,
                                   :other_creators, :position, { creator_ids: [] 
 }, { scales: [] }, { publication_ids: [] },
-                        :started_at, :finished_at, :status, :assignee_id,
                                   { discussion_links_attributes:[:id, :url, :label, :_destroy] },
                                   { custom_metadata_attributes: determine_custom_metadata_keys })
   end

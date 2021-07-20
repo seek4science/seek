@@ -106,7 +106,6 @@ class AssaysController < ApplicationController
     params[:assay_class_id] ||= AssayClass.for_type("experimental").id
     @assay = Assay.new(assay_params)
 
-    @assay.status = :planned
     update_assay_organisms @assay, params
     update_assay_human_diseases @assay, params
     @assay.contributor=current_person
@@ -181,7 +180,6 @@ class AssaysController < ApplicationController
   def assay_params
     params.require(:assay).permit(:title, :description, :study_id, :assay_class_id, :assay_type_uri, :technology_type_uri,
                                   :license, :other_creators, :position,
-                                  :started_at, :finished_at, :status, :assignee_id,
                                   { document_ids: []}, { creator_ids: [] },
                                   { scales: [] }, { sop_ids: [] }, { model_ids: [] },
                                   { samples_attributes: [:asset_id, :direction] },

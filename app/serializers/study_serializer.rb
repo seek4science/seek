@@ -1,9 +1,5 @@
 class StudySerializer < SnapshottableSerializer
   attributes :title, :description, :experimentalists, :other_creators, :position
-  attributes :started_at, :finished_at, :status
-  attribute :person_responsible_id do
-    object.person_responsible_id.to_s
-  end
 
   has_many :people
   has_many :projects

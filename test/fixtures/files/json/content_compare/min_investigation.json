@@ -13,10 +13,7 @@
       "other_creators": null,
       "position": null,
       "description": null,
-      "discussion_links" : null,
-	"started_at" : null,
-	"finished_at" : null,
-	"status" : null
+      "discussion_links" : null
     },
     "relationships": {
       "creators": {

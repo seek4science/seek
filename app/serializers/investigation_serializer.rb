@@ -1,6 +1,5 @@
 class InvestigationSerializer < SnapshottableSerializer
   attributes :title, :description, :other_creators, :position
-  attributes :started_at, :finished_at, :status
 
   has_many :people
   has_many :projects

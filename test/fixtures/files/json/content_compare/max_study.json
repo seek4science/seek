@@ -14,15 +14,11 @@
       "experimentalists": "Wet lab people",
       "other_creators": "Marie Curie",
       "position": null,
-      "person_responsible_id": "887473922",
       "discussion_links": [{
         "id": 55,
         "url": "http://www.slack.com/",
         "label": "Slack"
-      }],
-	"started_at" : null,
-	"finished_at" : null,
-	"status" : null
+      }]
     },
     "relationships": {
       "creators": {

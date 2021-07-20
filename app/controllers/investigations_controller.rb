@@ -68,7 +68,6 @@ class InvestigationsController < ApplicationController
 
   def create
     @investigation = Investigation.new(investigation_params)
-    @investigation.status = :planned
     update_sharing_policies @investigation
     update_relationships(@investigation, params)
 
@@ -139,7 +138,6 @@ class InvestigationsController < ApplicationController
   def investigation_params
     params.require(:investigation).permit(:title, :description, { project_ids: [] }, :other_creators,
                                           :position,
-                                          :started_at, :finished_at, :status, :assignee_id,
                                           { creator_ids: [] },{ scales: [] }, { publication_ids: [] },
                                           { discussion_links_attributes:[:id, :url, :label, :_destroy] },
                                           { custom_metadata_attributes: determine_custom_metadata_keys })

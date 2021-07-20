@@ -14,11 +14,7 @@
       "experimentalists": null,
       "other_creators": null,
       "position": null,
-      "person_responsible_id": null,
-      "discussion_links" : null,
-	"started_at" : null,
-	"finished_at" : null,
-	"status" : null
+      "discussion_links" : null
     },
     "relationships": {
       "creators": {
