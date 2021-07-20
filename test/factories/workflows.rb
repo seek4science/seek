@@ -169,3 +169,18 @@ Factory.define(:spaces_ro_crate_workflow, parent: :workflow) do |f|
   f.association :content_blob, factory: :spaces_ro_crate
   f.workflow_class { WorkflowClass.find_by_title('Jupyter Notebook') || Factory(:jupyter_workflow_class) }
 end
+
+Factory.define(:remote_git_workflow, class: Workflow) do |f|
+  f.title 'Concat two files'
+  f.with_project_contributor
+  f.workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
+  f.git_version_attributes {
+    repo = Factory(:remote_repository)
+    { git_repository_id: repo.id,
+      ref: 'refs/heads/main',
+      commit: 'b6312caabe582d156dd351fab98ce78356c4b74c',
+      main_workflow_path: 'concat_two_files.ga',
+      diagram_path: 'diagram.png',
+    }
+  }
+end

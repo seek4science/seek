@@ -1,0 +1,6 @@
+# Basic galaxy workflow with abstract CWL
+# Branches: master
+# Files on branch "main":
+Concat_two_files.cwl
+concat_two_files.ga
+diagram.png

@@ -220,6 +220,43 @@ module Ga4gh
           r = JSON.parse(@response.body)
           assert_equal [], r
         end
+
+        # Git
+
+        test 'should list tool version files for correct descriptor on git workflow' do
+          workflow = Factory(:remote_git_workflow, policy: Factory(:public_policy))
+
+          get :files, params: { id: workflow.id, version_id: 1, type: 'GALAXY' }
+
+          assert_response :success
+          r = JSON.parse(@response.body)
+          assert_equal 6, r.length
+          galaxy = r.detect { |f| f['path'] == 'concat_two_files.ga' }
+          diagram = r.detect { |f| f['path'] == 'diagram.png' }
+          assert galaxy
+          assert_equal 'PRIMARY_DESCRIPTOR', galaxy['file_type']
+          assert diagram
+          assert_equal 'OTHER', diagram['file_type']
+        end
+
+        test 'should get main workflow as primary descriptor on git workflow' do
+          workflow = Factory(:remote_git_workflow, policy: Factory(:public_policy))
+
+          get :descriptor, params: { id: workflow.id, version_id: 1, type: 'GALAXY' }
+
+          assert_response :success
+          assert @response.body.include?('a_galaxy_workflow')
+        end
+
+        test 'should get descriptor file via relative path on git workflow' do
+          workflow = Factory(:remote_git_workflow, policy: Factory(:public_policy))
+
+          get :descriptor, params: { id: workflow.id, version_id: 1, type: 'GALAXY', relative_path: 'concat_two_files.ga' }
+
+          assert_response :success
+          assert_equal 'application/json; charset=utf-8', @response.headers['Content-Type']
+          assert @response.body.include?('a_galaxy_workflow')
+        end
       end
     end
   end

@@ -134,7 +134,6 @@ class WorkflowsController < ApplicationController
     end
   end
 
-
   #
   # # Displays the form Wizard for providing the metadata for the workflow
   # def provide_metadata

@@ -31,7 +31,7 @@ Factory.define(:git_version, class: GitVersion) do |f|
   f.name 'version 1.0.0'
   f.ref 'refs/heads/master'
   f.mutable true
-  end
+end
 
 Factory.define(:remote_git_version, class: GitVersion) do |f|
   f.git_repository { Factory(:remote_repository) }

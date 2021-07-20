@@ -15,11 +15,15 @@ module Seek
       end
 
       def describe_version(version_number)
-        vs = is_git_versioned? ? git_versions : versions
+        vs = all_versions
 
         return '(earliest)' if version_number == vs.first.version
         return '(latest)' if version_number == vs.last.version
         ''
+      end
+
+      def all_versions
+        is_git_versioned? ? git_versions : versions
       end
     end
   end

@@ -26,7 +26,7 @@ module Ga4gh
         end
 
         def name
-          title
+          @workflow_version.is_a?(GitVersion) ? @workflow_version.name : title
         end
 
         def authors
