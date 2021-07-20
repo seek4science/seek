@@ -294,7 +294,6 @@ SEEK::Application.routes.draw do
       get :asset_report
       get :populate
       post :populate_from_spreadsheet
-      get :bpmn_report
       get :admin_members
       get :admin_member_roles
       get :storage_report
@@ -305,7 +304,6 @@ SEEK::Application.routes.draw do
       get :administer_join_request
       post :respond_join_request
       get :guided_join
-      get :bpmn
     end
     resources :programmes, :people, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :nodes, :data_files, :presentations,
               :publications, :events, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :file_templates, :placeholders, :collections, only: [:index]

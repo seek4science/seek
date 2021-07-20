@@ -41,7 +41,9 @@
     <% end %>
     <% if Seek::Config.file_templates_enabled %>
       <li><%= link_to t("file_template").pluralize, file_templates_path %></li>
-      <li><%= link_to t("placeholder").pluralize, placeholders_path %></li>
+      <% if Seek::Config.placeholders_enabled %>
+        <li><%= link_to t("placeholder").pluralize, placeholders_path %></li>
+      <% end %>
     <% end %>
     <% if Seek::Config.collections_enabled %>
       <li><%= link_to t("collection").pluralize, collections_path %></li>

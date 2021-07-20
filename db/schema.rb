@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_11_134503) do
+ActiveRecord::Schema.define(version: 2021_07_20_162342) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -184,10 +184,6 @@ ActiveRecord::Schema.define(version: 2021_05_11_134503) do
     t.string "deleted_contributor"
     t.integer "sample_type_id"
     t.integer "position"
-    t.datetime "started_at"
-    t.datetime "finished_at"
-    t.integer "status"
-    t.integer "assignee_id"
     t.index ["sample_type_id"], name: "index_assays_on_sample_type_id"
   end
 
@@ -893,10 +889,6 @@ ActiveRecord::Schema.define(version: 2021_05_11_134503) do
     t.text "other_creators"
     t.string "deleted_contributor"
     t.integer "position"
-    t.datetime "started_at"
-    t.datetime "finished_at"
-    t.integer "status"
-    t.integer "assignee_id"
   end
 
   create_table "investigations_projects", id: false,  force: :cascade do |t|
@@ -1462,10 +1454,6 @@ ActiveRecord::Schema.define(version: 2021_05_11_134503) do
     t.boolean "use_default_policy", default: false
     t.date "start_date"
     t.date "end_date"
-    t.datetime "started_at"
-    t.datetime "finished_at"
-    t.integer "status"
-    t.integer "assignee_id"
   end
 
   create_table "projects_publications", id: false,  force: :cascade do |t|
@@ -1940,7 +1928,6 @@ ActiveRecord::Schema.define(version: 2021_05_11_134503) do
     t.integer "investigation_id"
     t.text "experimentalists"
     t.datetime "begin_date"
-    t.integer "person_responsible_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "first_letter", limit: 1
@@ -1950,10 +1937,6 @@ ActiveRecord::Schema.define(version: 2021_05_11_134503) do
     t.text "other_creators"
     t.string "deleted_contributor"
     t.integer "position"
-    t.datetime "started_at"
-    t.datetime "finished_at"
-    t.integer "status"
-    t.integer "assignee_id"
   end
 
   create_table "study_auth_lookup",  force: :cascade do |t|
