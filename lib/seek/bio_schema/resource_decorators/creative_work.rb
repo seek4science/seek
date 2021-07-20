@@ -8,8 +8,8 @@ module Seek
         schema_mappings license: :license,
                         all_creators: :creator,
                         producer: :producer,
-                        created_at: :dateCreated,
-                        updated_at: :dateModified,
+                        date_created: :dateCreated,
+                        date_modified: :dateModified,
                         content_type: :encodingFormat,
                         subject_of: :subjectOf
 

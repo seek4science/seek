@@ -7,10 +7,7 @@ class Study < ApplicationRecord
   belongs_to :assignee, class_name: 'Person'
   
   searchable(:auto_index => false) do
-    text :experimentalists
-    text :person_responsible do
-      person_responsible.try(:name)
-    end
+    text :experimentalists    
   end if Seek::Config.solr_enabled
 
   belongs_to :investigation
@@ -23,9 +20,7 @@ class Study < ApplicationRecord
 
   has_many :assays
   has_many :assay_publications, through: :assays, source: :publications
-  has_one :external_asset, as: :seek_entity, dependent: :destroy
-
-  belongs_to :person_responsible, :class_name => "Person"
+  has_one :external_asset, as: :seek_entity, dependent: :destroy  
 
   validates :investigation, presence: { message: "Investigation is blank or invalid" }, projects: true
 
@@ -45,7 +40,7 @@ class Study < ApplicationRecord
     super + ['creators','projects']
   end
   def columns_allowed
-    columns_default + ['experimentalists','other_creators','deleted_contributor']
+    columns_default + ['other_creators']
   end
 
   def state_allows_delete? *args

@@ -112,18 +112,7 @@ class StudiesController < ApplicationController
         format.json { render json: json_api_errors(@study), status: :unprocessable_entity }
       end
     end
-  end
-
-  def investigation_selected_ajax
-    if (investigation_id = params[:investigation_id]).present? && params[:investigation_id] != '0'
-      investigation = Investigation.find(investigation_id)
-      people = investigation.projects.collect(&:people).flatten
-    end
-
-    people ||= []
-
-    render partial: 'studies/person_responsible_list', locals: { people: people }
-  end
+  end  
 
   def check_assays_are_for_this_study
     study_id = params[:id]
@@ -206,8 +195,7 @@ class StudiesController < ApplicationController
       study_params = {
         title: params[:studies][:title][index],
         description: params[:studies][:description][index],
-        investigation_id: params[:study][:investigation_id],
-        person_responsible_id: params[:study][:person_responsible_id],
+        investigation_id: params[:study][:investigation_id],        
         custom_metadata: CustomMetadata.new(
           custom_metadata_type: metadata_types,
           data: metadata

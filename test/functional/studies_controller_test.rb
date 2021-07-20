@@ -16,7 +16,7 @@ class StudiesControllerTest < ActionController::TestCase
   def rest_api_test_object
     @object = Factory :study, policy: Factory(:public_policy)
   end
-
+  
   test 'should get index' do
     Factory :study, policy: Factory(:public_policy)
     get :index

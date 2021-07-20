@@ -125,7 +125,10 @@ class ApplicationController < ActionController::Base
   helper_method :page_and_sort_params
 
   def controller_model
-    @controller_model ||= controller_name.classify.constantize
+    begin
+      @controller_model ||= controller_name.classify.constantize
+    rescue NameError
+    end
   end
 
   helper_method :controller_model
