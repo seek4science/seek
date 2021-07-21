@@ -29,7 +29,7 @@ module Seek
           data = {
             '@type': 'DataDownload',
             'contentSize': number_to_human_size(blob.file_size),
-            'contentUrl': polymorphic_url([resource, blob], action: :download, host: Seek::Config.site_base_host),
+            'contentUrl': resource_url([resource, blob], action: :download, host: Seek::Config.site_base_host),
             'encodingFormat': blob.content_type,
             'name': blob.original_filename
           }

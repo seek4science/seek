@@ -14,9 +14,6 @@ module Seek
 
       # returns the JSON-LD as a String, for the resource
       def json_ld
-        unless supported?
-          raise UnsupportedTypeException, "Bioschema not supported for #{resource.class.name}"
-        end
         json = {
           '@context' => resource_decorator.context,
           '@type' => resource_decorator.schema_type
