@@ -2388,7 +2388,9 @@ class ProjectsControllerTest < ActionController::TestCase
         assert_difference('Project.count') do
           assert_difference('Institution.count') do
             assert_difference('GroupMembership.count') do
-              post :respond_create_project_request, params:params
+              assert_difference('WorkGroup.count') do
+                post :respond_create_project_request, params:params
+              end              
             end
           end
         end
@@ -2398,6 +2400,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = Project.last
     programme = Programme.last
     institution = Institution.last
+    requester.reload
 
     assert_redirected_to(project_path(project))
     assert_equal "Request accepted and #{log.sender.name} added to Project and notified",flash[:notice]
@@ -2411,6 +2414,10 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_includes project.institutions, institution
     assert_includes programme.programme_administrators, requester
     assert_includes project.project_administrators, requester
+
+    assert_equal WorkGroup.last, requester.work_groups.last
+    assert_equal institution, requester.work_groups.last.institution
+    assert_equal project, requester.work_groups.last.project
 
     log.reload
     assert log.responded?
@@ -2537,7 +2544,9 @@ class ProjectsControllerTest < ActionController::TestCase
         assert_no_difference('Project.count') do
           assert_no_difference('Institution.count') do
             assert_no_difference('GroupMembership.count') do
-              post :respond_create_project_request, params:params
+              assert_no_difference('WorkGroup.count') do
+                post :respond_create_project_request, params:params
+              end              
             end
           end
         end

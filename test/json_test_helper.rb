@@ -80,6 +80,7 @@ module JsonTestHelper
     assert_equal 'application/vnd.api+json', @response.content_type
     assert JSON::Validator.validate(JSONAPI_SCHEMA_FILE_PATH, @response.body), 'Response did not validate against JSON-API schema'
   end
+
   # check if this current controller type doesn't support read
   def check_for_501_read_return
     clz = @controller.controller_model.to_s

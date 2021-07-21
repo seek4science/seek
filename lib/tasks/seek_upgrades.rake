@@ -193,7 +193,7 @@ namespace :seek do
   end
 
   task(update_session_store: :environment) do
-    puts '... Updating session store'
+    puts '... Updating session store (this can take some time so please be patient)'
     Rake::Task['db:sessions:upgrade'].invoke
   end
 
