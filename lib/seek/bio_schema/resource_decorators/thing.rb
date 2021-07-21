@@ -27,15 +27,15 @@ module Seek
 
         # list of comma seperated tags, it the resource supports it
         def keywords
-          tags_as_text_array.join(', ') if resource.respond_to?(:tags_as_text_array)
+          tags_as_text_array.join(', ') if respond_to?(:tags_as_text_array)
         end
 
         def date_created
-          resource.created_at&.iso8601 if resource.respond_to?(:created_at)
+          resource.created_at&.iso8601 if respond_to?(:created_at)
         end
 
         def date_modified
-          resource.updated_at&.iso8601 if resource.respond_to?(:updated_at)
+          resource.updated_at&.iso8601 if respond_to?(:updated_at)
         end
       end
     end

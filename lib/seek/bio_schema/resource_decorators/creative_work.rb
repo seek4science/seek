@@ -14,8 +14,8 @@ module Seek
                         subject_of: :subjectOf
 
         def content_type
-          return unless resource.respond_to?(:content_blob) && resource.content_blob
-          resource.content_blob.content_type
+          return unless respond_to?(:content_blob) && content_blob
+          content_blob.content_type
         end
 
         def license
