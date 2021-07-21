@@ -36,7 +36,7 @@ module Seek
         end
 
         def rdf_resource
-          uri = polymorphic_url(resource, host: Seek::Config.site_base_host)
+          uri = resource_url(resource, host: Seek::Config.site_base_host)
           RDF::Resource.new(uri).to_s
         end
 
@@ -48,6 +48,20 @@ module Seek
             '@id': identifier,
             'name': sanitize(title)
           }
+        end
+
+        def resource_url(resource, opts = {})
+          strip_version = opts.delete(:strip_version)
+          resource = Array(resource).map do |r|
+            if r.is_a_version?
+              opts[:version] = r.version unless strip_version
+              r.parent
+            else
+              r
+            end
+          end
+
+          polymorphic_url(resource, opts)
         end
 
         instance_eval do
@@ -93,12 +107,14 @@ module Seek
         end
 
         def respond_to_missing?(name, include_private = false)
-          resource.respond_to?(name, include_private)
+          resource.respond_to?(name, include_private) || resource.is_a_version? && resource.parent.respond_to?(name, include_private)
         end
 
         def method_missing(method, *args, &block)
           if resource.respond_to?(method)
             resource.send(method, *args, &block)
+          elsif resource.is_a_version? && resource.parent.respond_to?(method)
+            resource.parent.send(method, *args, &block)
           else
             super
           end

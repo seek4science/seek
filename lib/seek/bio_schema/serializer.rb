@@ -12,22 +12,21 @@ module Seek
         @resource = resource
       end
 
+     def json_representation
+        repr = {
+          '@context' => resource_decorator.context,
+          '@type' => resource_decorator.schema_type
+        }.merge(attributes_json)
+        if (resource_decorator.respond_to? 'conformance')
+          repr['dct:conformsTo'] = resource_decorator.conformance
+        end
+        repr = repr.merge(attributes_json)
+        repr.deep_stringify_keys
+      end
+      
       # returns the JSON-LD as a String, for the resource
       def json_ld
-        unless supported?
-          raise UnsupportedTypeException, "Bioschema not supported for #{resource.class.name}"
-        end
-        json = {
-          '@context' => resource_decorator.context,
-          '@type' => resource_decorator.schema_type,
-        }
-        if (resource_decorator.respond_to? 'conformance')
-          json['dct:conformsTo'] = resource_decorator.conformance
-        end
-        json = json.merge(attributes_json)
-
-        puts JSON.pretty_generate(json)
-        JSON.pretty_generate(json)
+        JSON.pretty_generate(json_representation)
       end
 
       # whether the resource BioSchema was initialized with is supported
