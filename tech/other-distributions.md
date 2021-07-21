@@ -222,6 +222,9 @@ found under the menu *Edit*, *Profile Preferences* and then under the tab
 *Title and Command*.
 
 # Installing SEEK for Mac OS X
+
+*Though you can run Seek on Mac OS, you might encounter random issues and need to do several adaptations, some listed below. Some versions of several Ruby Gems are not fully functional or cannot be installed on Mac OS. It is thus strongly recommended to install Seek in a virtual machine, preferably running Ubuntu.*
+
 ## Catalina
 
 This section will guide you to install prerequisite packages, for other steps
