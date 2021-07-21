@@ -141,6 +141,12 @@
             "type": "documents"
           }
         ]
+      },
+      "file_templates" : {
+        "data" : []
+      },
+      "placeholders" : {
+        "data" : []
       }
     },
     "links": {

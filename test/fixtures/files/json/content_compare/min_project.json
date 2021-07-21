@@ -71,6 +71,12 @@
       },
       "documents": {
         "data": []
+      },
+      "file_templates" : {
+        "data" : []
+      },
+      "placeholders" : {
+        "data" : []
       }
     },
     "links": {
