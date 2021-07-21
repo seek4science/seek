@@ -38,6 +38,10 @@ module Seek
       def schema_org_supported?
         true
       end
+
+      def is_a_version?
+        false
+      end
     end
   end
 end

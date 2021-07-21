@@ -118,6 +118,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     json = JSON.parse(df.to_schema_ld)    
     assert_equal expected, json
+    check_version(df.latest_version, expected)
   end
 
   test 'dataset without content blob' do
@@ -167,7 +168,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     json = JSON.parse(df.to_schema_ld)
     assert_equal expected, json
-    
+    check_version(df.latest_version, expected)
   end
 
   test 'dataset with weblink' do
@@ -216,6 +217,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     json = JSON.parse(df.to_schema_ld)
     assert_equal expected, json
+    check_version(df.latest_version, expected)
   end
 
   test 'taxon' do
@@ -346,6 +348,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     json = JSON.parse(document.to_schema_ld)
     assert_equal expected, json
+    check_version(document.latest_version, expected)
   end
 
   test 'presentation' do
@@ -379,6 +382,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     json = JSON.parse(presentation.to_schema_ld)
     assert_equal expected, json
+    check_version(presentation.latest_version, expected)
   end
 
 
@@ -510,6 +514,104 @@ test 'workflow' do
                  ] }
 
     json = JSON.parse(workflow.to_schema_ld)
+    assert_equal expected, json
+    check_version(workflow.latest_version, expected)
+  end
+
+  test 'version of dataset' do
+    df = travel_to(@current_time) do
+      df = Factory(:max_data_file, description: 'version 1 description', title: 'version 1 title', contributor: @person, projects: [@project], policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
+      df.add_annotations('keyword', 'tag', User.first)
+      disable_authorization_checks do
+        df.save!
+        df.save_as_new_version
+        df.update_attributes(description: 'version 2 description', title: 'version 2 title')
+        Factory.create(:image_content_blob, asset: df, asset_version: 2)
+        df.latest_version.update_column(:doi, '10.10.10.10/test.2')
+      end
+      df
+    end
+
+    assert df.can_download?
+    refute df.content_blob.show_as_external_link?
+
+    v1_expected = {
+      '@context' => 'http://schema.org',
+      '@type' => 'Dataset',
+      '@id' => "http://localhost:3000/data_files/#{df.id}?version=1",
+      'name' => 'version 1 title',
+      'description' => 'version 1 description'.ljust(50,'.'),
+      'keywords' => 'keyword',
+      'url' => "http://localhost:3000/data_files/#{df.id}?version=1",
+      'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
+      'producer' => [{
+                       '@type' => %w[Project Organization],
+                       '@id' => "http://localhost:3000/projects/#{@project.id}",
+                       'name' => @project.title
+                     }],
+      'dateCreated' => @current_time.iso8601,
+      'dateModified' => @current_time.iso8601,
+      'encodingFormat' => 'application/pdf',
+      #'identifier' => 'https://doi.org/10.10.10.10/test.1', # Should not have a DOI, since it was defined on the parent resource
+      'subjectOf' => [
+        { '@type' => 'Event',
+          '@id' => "http://localhost:3000/events/#{df.events.first.id}",
+          'name' => df.events.first.title }
+      ],
+      'distribution' => {
+        '@type' => 'DataDownload',
+        'contentSize' => '8.62 KB',
+        'contentUrl' => "http://localhost:3000/data_files/#{df.id}/content_blobs/#{df.find_version(1).content_blob.id}/download",
+        'encodingFormat' => 'application/pdf',
+        'name' => 'a_pdf_file.pdf'
+      }
+    }
+
+    v2_expected = {
+      '@context' => 'http://schema.org',
+      '@type' => 'Dataset',
+      '@id' => "http://localhost:3000/data_files/#{df.id}?version=2",
+      'name' => 'version 2 title',
+      'description' => 'version 2 description'.ljust(50,'.'),
+      'keywords' => 'keyword',
+      'url' => "http://localhost:3000/data_files/#{df.id}?version=2",
+      'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
+      'producer' => [{
+                       '@type' => %w[Project Organization],
+                       '@id' => "http://localhost:3000/projects/#{@project.id}",
+                       'name' => @project.title
+                     }],
+      'dateCreated' => @current_time.iso8601,
+      'dateModified' => @current_time.iso8601,
+      'encodingFormat' => 'image/png',
+      'identifier' => 'https://doi.org/10.10.10.10/test.2',  # This DOI was added to the version itself
+      'subjectOf' => [
+        { '@type' => 'Event',
+          '@id' => "http://localhost:3000/events/#{df.events.first.id}",
+          'name' => df.events.first.title }
+      ],
+      'distribution' => {
+        '@type' => 'DataDownload',
+        'contentSize' => '2.66 KB',
+        'contentUrl' => "http://localhost:3000/data_files/#{df.id}/content_blobs/#{df.find_version(2).content_blob.id}/download",
+        'encodingFormat' => 'image/png',
+        'name' => 'image_file.png'
+      }
+    }
+
+    json = JSON.parse(df.find_version(1).to_schema_ld)
+    assert_equal v1_expected, json
+    json = JSON.parse(df.find_version(2).to_schema_ld)
+    assert_equal v2_expected, json
+  end
+
+  private
+
+  def check_version(version, expected)
+    json = JSON.parse(version.to_schema_ld)
+    expected['@id'] += "?version=#{version.version}"
+    expected['url'] += "?version=#{version.version}" if expected['url'].include?(Seek::Config.site_base_host)
+    expected.delete('identifier') unless version.respond_to?(:doi) && version.doi.present?
     assert_equal expected, json
   end
 end
