@@ -32,10 +32,10 @@ class FileTemplate < ApplicationRecord
 
   # Returns the columns to be shown on the table view for the resource
   def columns_default
-    super + ['version']
+    super + ['version', 'format_type', 'data_type']
   end
   def columns_allowed
-    super + ['version','doi','license','last_used_at','other_creators','deleted_contributor']  
+    super + ['version', 'format_type', 'data_type', 'doi','license','last_used_at','other_creators','deleted_contributor']
   end
 
   def use_mime_type_for_avatar?

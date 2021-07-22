@@ -84,7 +84,7 @@ class DataFile < ApplicationRecord
   
   # Returns the columns to be shown on the table view for the resource
   def columns_default
-    super + ['creators','projects','version']
+    super + ['creators','projects','version', 'format_type', 'data_type']
   end
   def columns_allowed
     columns_default + ['last_used_at','other_creators','doi','license','simulation_data']
