@@ -220,6 +220,37 @@ module Ga4gh
           r = JSON.parse(@response.body)
           assert_equal [], r
         end
+
+        test 'should list tool version files for given version' do
+          workflow = Factory(:generated_galaxy_ro_crate_workflow, policy: Factory(:public_policy))
+          disable_authorization_checks do
+            workflow.save_as_new_version
+            Factory(:generated_galaxy_no_diagram_ro_crate, asset: workflow, asset_version: 2)
+          end
+
+          get :files, params: { id: workflow.id, version_id: 1, type: 'GALAXY' }
+
+          assert_response :success
+          r = JSON.parse(@response.body)
+          assert_equal 5, r.length
+          galaxy = r.detect { |f| f['path'] == 'Genomics-1-PreProcessing_without_downloading_from_SRA.ga' }
+          diagram = r.detect { |f| f['path'] == 'Genomics-1-PreProcessing_without_downloading_from_SRA.svg' }
+          assert galaxy
+          assert_equal 'PRIMARY_DESCRIPTOR', galaxy['file_type']
+          assert diagram
+          assert_equal 'OTHER', diagram['file_type']
+
+          get :files, params: { id: workflow.id, version_id: 2, type: 'GALAXY' }
+
+          assert_response :success
+          r = JSON.parse(@response.body)
+          assert_equal 4, r.length
+          galaxy = r.detect { |f| f['path'] == 'Genomics-1-PreProcessing_without_downloading_from_SRA.ga' }
+          diagram = r.detect { |f| f['path'] == 'Genomics-1-PreProcessing_without_downloading_from_SRA.svg' }
+          assert galaxy
+          assert_equal 'PRIMARY_DESCRIPTOR', galaxy['file_type']
+          refute diagram
+        end
       end
     end
   end

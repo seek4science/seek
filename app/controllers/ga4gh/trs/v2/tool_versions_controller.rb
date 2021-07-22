@@ -52,7 +52,7 @@ module Ga4gh
           if request.query_parameters[:format] == 'zip'
             send_ro_crate(@tool_version.ro_crate_zip, "workflow-#{@tool.id}-#{@tool_version.version}.crate.zip")
           else
-            respond_with(@tool.list_files.to_json)
+            respond_with(@tool_version.list_files.to_json)
           end
         end
 
