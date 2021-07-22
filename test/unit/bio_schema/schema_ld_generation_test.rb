@@ -536,19 +536,32 @@ test 'workflow' do
     refute df.content_blob.show_as_external_link?
 
     v1_expected = {
-      '@context' => 'http://schema.org',
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}?version=1",
       'name' => 'version 1 title',
       'description' => 'version 1 description'.ljust(50,'.'),
       'keywords' => 'keyword',
       'url' => "http://localhost:3000/data_files/#{df.id}?version=1",
-      'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
+      'creator' => [
+        { '@type' => 'Person',
+          '@id' => "##{ROCrate::Entity.format_id('Blogs')}",
+          'name' => 'Blogs' },
+        { '@type' => 'Person',
+          '@id' => "##{ROCrate::Entity.format_id('Joe')}",
+          'name' => 'Joe' }
+      ],
       'producer' => [{
                        '@type' => %w[Project Organization],
                        '@id' => "http://localhost:3000/projects/#{@project.id}",
                        'name' => @project.title
                      }],
+      'sdPublisher'=> {
+        '@type'=>'Organization',
+        '@id'=>'http://localhost:3000',
+        'name'=>'SysMO-DB',
+        'url'=>'http://localhost:3000'
+      },
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'application/pdf',
@@ -568,19 +581,32 @@ test 'workflow' do
     }
 
     v2_expected = {
-      '@context' => 'http://schema.org',
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}?version=2",
       'name' => 'version 2 title',
       'description' => 'version 2 description'.ljust(50,'.'),
       'keywords' => 'keyword',
       'url' => "http://localhost:3000/data_files/#{df.id}?version=2",
-      'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
+      'creator' => [
+        { '@type' => 'Person',
+          '@id' => "##{ROCrate::Entity.format_id('Blogs')}",
+          'name' => 'Blogs' },
+        { '@type' => 'Person',
+          '@id' => "##{ROCrate::Entity.format_id('Joe')}",
+          'name' => 'Joe' }
+      ],
       'producer' => [{
                        '@type' => %w[Project Organization],
                        '@id' => "http://localhost:3000/projects/#{@project.id}",
                        'name' => @project.title
                      }],
+      'sdPublisher'=> {
+        '@type'=>'Organization',
+        '@id'=>'http://localhost:3000',
+        'name'=>'SysMO-DB',
+        'url'=>'http://localhost:3000'
+      },
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'image/png',
