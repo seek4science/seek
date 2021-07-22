@@ -16,6 +16,7 @@ class GitVersion < ApplicationRecord
   accepts_nested_attributes_for :git_annotations
 
   store :resource_attributes, coder: JSON
+  validates :git_repository, presence: true
   validate :git_repository_linkable
 
   include GitSupport
@@ -167,6 +168,14 @@ class GitVersion < ApplicationRecord
     git_version
   end
 
+  def to_schema_ld
+    Seek::BioSchema::Serializer.new(self).json_ld
+  end
+
+  def schema_org_supported?
+    Seek::BioSchema::Serializer.supported?(resource)
+  end
+
   private
 
   def set_version
@@ -186,7 +195,7 @@ class GitVersion < ApplicationRecord
   end
 
   def set_commit
-    self.commit = get_commit if commit.blank?
+    self.commit = get_commit if self[:commit].blank?
   end
 
   def get_commit
