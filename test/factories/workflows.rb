@@ -184,3 +184,19 @@ Factory.define(:remote_git_workflow, class: Workflow) do |f|
     }
   }
 end
+
+Factory.define(:local_git_workflow, class: Workflow) do |f|
+  f.title 'Concat two files'
+  f.with_project_contributor
+  f.workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
+  f.git_version_attributes {
+    repo = Factory(:local_repository)
+    { git_repository_id: repo.id,
+      ref: 'refs/heads/master',
+      commit: '8eaac19a9e8bf17c787310422ad77d0dab1bfb33',
+      main_workflow_path: 'concat_two_files.ga',
+      diagram_path: 'diagram.png',
+      mutable: true
+    }
+  }
+end

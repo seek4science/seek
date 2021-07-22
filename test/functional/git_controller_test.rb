@@ -18,8 +18,8 @@ class GitControllerTest < ActionController::TestCase
                                       data: fixture_file_upload('files/little_file.txt') } }
 
     assert_redirected_to workflow_path(@workflow, anchor: 'files')
-    assert @git_version.file_exists?('new-file.txt')
-    assert_equal 'little file', @git_version.file_contents('new-file.txt')
+    assert assigns(:git_version).file_exists?('new-file.txt')
+    assert_equal 'little file', assigns(:git_version).file_contents('new-file.txt')
   end
 
   test 'adding file with no paths defaults to filename' do
@@ -30,8 +30,8 @@ class GitControllerTest < ActionController::TestCase
                                       data: fixture_file_upload('files/little_file.txt') } }
 
     assert_redirected_to workflow_path(@workflow, anchor: 'files')
-    assert @git_version.file_exists?('little_file.txt')
-    assert_equal 'little file', @git_version.file_contents('little_file.txt')
+    assert assigns(:git_version).file_exists?('little_file.txt')
+    assert_equal 'little file', assigns(:git_version).file_contents('little_file.txt')
   end
 
   test 'cannot add file if not authorized' do
@@ -44,7 +44,7 @@ class GitControllerTest < ActionController::TestCase
 
     assert_redirected_to root_path
     assert flash[:error].include?('authorized')
-    refute @git_version.file_exists?('new-file.txt')
+    refute @git_version.reload.file_exists?('new-file.txt')
   end
 
   test 'cannot add file if immutable' do
@@ -57,7 +57,7 @@ class GitControllerTest < ActionController::TestCase
 
     assert_redirected_to workflow_path(@workflow, anchor: 'files')
     assert flash[:error].include?('cannot be modified')
-    refute @git_version.file_exists?('new-file.txt')
+    refute assigns(:git_version).file_exists?('new-file.txt')
   end
 
   test 'move file' do
@@ -68,8 +68,8 @@ class GitControllerTest < ActionController::TestCase
                               file: { path: 'diagram.png', new_path: 'cool-pic.png' } }
 
     assert_redirected_to workflow_path(@workflow, anchor: 'files')
-    refute @git_version.file_exists?('diagram.png')
-    assert @git_version.file_exists?('cool-pic.png')
+    refute assigns(:git_version).file_exists?('diagram.png')
+    assert assigns(:git_version).file_exists?('cool-pic.png')
   end
 
   test 'move file into directory' do
@@ -80,8 +80,8 @@ class GitControllerTest < ActionController::TestCase
                               file: { path: 'diagram.png', new_path: 'mydir/cool-pic.png' } }
 
     assert_redirected_to workflow_path(@workflow, anchor: 'files')
-    refute @git_version.file_exists?('diagram.png')
-    assert @git_version.file_exists?('mydir/cool-pic.png')
+    refute assigns(:git_version).file_exists?('diagram.png')
+    assert assigns(:git_version).file_exists?('mydir/cool-pic.png')
   end
 
   test 'error when moving non-existent path' do
@@ -89,7 +89,7 @@ class GitControllerTest < ActionController::TestCase
                               file: { path: 'doesnotexist.png', new_path: 'mydir/cool-pic.png' } }
 
     assert flash[:error].include?("Couldn't find path: doesnotexist.png")
-    refute @git_version.file_exists?('mydir/cool-pic.png')
+    refute assigns(:git_version).file_exists?('mydir/cool-pic.png')
   end
 
   test 'cannot move file if no permissions' do
@@ -102,8 +102,8 @@ class GitControllerTest < ActionController::TestCase
 
     assert_redirected_to root_path
     assert flash[:error].include?('authorized')
-    assert @git_version.file_exists?('diagram.png')
-    refute @git_version.file_exists?('cool-pic.png')
+    assert @git_version.reload.file_exists?('diagram.png')
+    refute @git_version.reload.file_exists?('cool-pic.png')
   end
 
   test 'cannot move file if immutable' do
@@ -116,8 +116,8 @@ class GitControllerTest < ActionController::TestCase
 
     assert_redirected_to workflow_path(@workflow, anchor: 'files')
     assert flash[:error].include?('cannot be modified')
-    assert @git_version.file_exists?('diagram.png')
-    refute @git_version.file_exists?('cool-pic.png')
+    assert assigns(:git_version).file_exists?('diagram.png')
+    refute assigns(:git_version).file_exists?('cool-pic.png')
   end
 
   test 'remove file' do
@@ -127,7 +127,7 @@ class GitControllerTest < ActionController::TestCase
                                 file: { path: 'diagram.png' } }
 
     assert_redirected_to workflow_path(@workflow, anchor: 'files')
-    refute @git_version.file_exists?('diagram.png')
+    refute assigns(:git_version).file_exists?('diagram.png')
   end
 
   test 'error when removing non-existent path' do
@@ -137,7 +137,7 @@ class GitControllerTest < ActionController::TestCase
                                 file: { path: 'doesnotexist.png' } }
 
     assert flash[:error].include?("Couldn't find path: doesnotexist.png")
-    refute @git_version.file_exists?('doesnotexist.png')
+    refute assigns(:git_version).file_exists?('doesnotexist.png')
   end
 
   test 'cannot remove file if no permissions' do
@@ -149,7 +149,7 @@ class GitControllerTest < ActionController::TestCase
 
     assert_redirected_to root_path
     assert flash[:error].include?('authorized')
-    assert @git_version.file_exists?('diagram.png')
+    assert @git_version.reload.file_exists?('diagram.png')
   end
 
   test 'cannot remove file if immutable' do
