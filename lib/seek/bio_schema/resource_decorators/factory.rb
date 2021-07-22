@@ -11,7 +11,7 @@ module Seek
 
         # get the Decorator for the given resource, throws an UnsupportedTypeException if that resource isn't supported
         def get(resource)
-          type = resource.class
+          type = resource.is_a_version? ? resource.parent.class : resource.class
           unless resource.schema_org_supported?
             raise UnsupportedTypeException, "Bioschema not supported for #{type.name}"
           end

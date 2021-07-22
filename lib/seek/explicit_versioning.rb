@@ -115,6 +115,14 @@ module Seek
           def cache_key_fragment
             "#{parent.class.name.underscore}-#{parent.id}-#{version}"
           end
+
+          def to_schema_ld
+            Seek::BioSchema::Serializer.new(self).json_ld
+          end
+
+          def schema_org_supported?
+            Seek::BioSchema::Serializer.supported?(parent)
+          end
         end
 
         versioned_class.table_name = versioned_table_name
