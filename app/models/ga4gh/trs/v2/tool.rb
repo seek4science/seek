@@ -29,27 +29,6 @@ module Ga4gh
         def toolclass
           ToolClass::WORKFLOW
         end
-
-        def list_files
-          files = []
-
-          ro_crate do |crate|
-            crate.entries.each do |path, entry|
-              next if entry.directory?
-              if crate.main_workflow && path == crate.main_workflow.id
-                type = 'PRIMARY_DESCRIPTOR'
-              elsif path == 'Dockerfile'
-                type = 'CONTAINERFILE'
-              else
-                type = 'OTHER'
-              end
-
-              files << { path: path, file_type: type }
-            end
-          end
-
-          files
-        end
       end
     end
   end

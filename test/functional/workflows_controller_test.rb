@@ -604,6 +604,44 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'downloads RO-Crate with metadata for correct version' do
+    workflow = Factory(:cwl_workflow, title: 'V1 title', description: 'V1 description',
+                       license: 'MIT', other_creators: 'Jane Smith, John Smith', policy: Factory(:public_policy))
+    disable_authorization_checks do
+      workflow.save_as_new_version
+      workflow.update_attributes(title: 'V2 title', description: 'V2 description', workflow_class_id: Factory(:galaxy_workflow_class).id)
+      Factory(:generated_galaxy_ro_crate, asset: workflow, asset_version: 2)
+    end
+
+    get :ro_crate, params: { id: workflow.id, version: 1 }
+
+    assert_response :success
+    assert @response.header['Content-Length'].present?
+    assert @response.header['Content-Length'].to_i > 500
+    Dir.mktmpdir do |dir|
+      crate = ROCrate::WorkflowCrateReader.read_zip(response.stream.to_path, target_dir: dir)
+      assert crate.main_workflow
+      assert_equal 'V1 title', crate.main_workflow['name']
+      assert_equal 'V1 description', crate.main_workflow['description']
+      assert_equal 'Common Workflow Language', crate.main_workflow.programming_language['name']
+      assert crate.main_workflow.source.read.include?('cwlVersion')
+    end
+
+    get :ro_crate, params: { id: workflow.id, version: 2 }
+
+    assert_response :success
+    assert @response.header['Content-Length'].present?
+    assert @response.header['Content-Length'].to_i > 500
+    Dir.mktmpdir do |dir|
+      crate = ROCrate::WorkflowCrateReader.read_zip(response.stream.to_path, target_dir: dir)
+      assert crate.main_workflow
+      assert_equal 'V2 title', crate.main_workflow['name']
+      assert_equal 'V2 description', crate.main_workflow['description']
+      assert_equal 'Galaxy', crate.main_workflow.programming_language['name']
+      assert crate.main_workflow.source.read.include?('a_galaxy_workflow')
+    end
+  end
+
   test 'create RO-Crate even with with duplicated filenames' do
     cwl = Factory(:cwl_workflow_class)
     person = Factory(:person)
