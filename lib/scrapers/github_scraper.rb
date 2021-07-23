@@ -159,7 +159,7 @@ module Scrapers
 
     # Get all the repositories in the given org from the GitHub API.
     def list_repositories
-      JSON.parse(cached('iwc/repo-list.json') { github["users/#{@organization}/repos?sort=updated&direction=desc"].get.body })
+      JSON.parse(github["users/#{@organization}/repos?sort=updated&direction=desc"].get.body)
     end
 
     # Clone the given repositories (from above call), or make sure already-cloned repos are fetched.
