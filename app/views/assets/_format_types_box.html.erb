@@ -1,4 +1,4 @@
-<%= panel("Format types", :body_options => {:class => 'text-center'}) do %>
+<%= panel("Format type", :body_options => {:class => 'text-center'}) do %>
   <% text = EdamHelper::url_to_text(resource.format_type);
      if text.nil? %>
 <li class="author-list-item"><%= resource.format_type -%></li>

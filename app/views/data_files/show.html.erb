@@ -6,7 +6,7 @@
 <% end %>
 <% if @data_file.format_type != @data_file.file_template.format_type -%>
     <%= alert_box('warning') do %>
-        The format type of the data file does not match that of the template
+        The format of the data file is not compatible with that of the template
     <% end %>
 <% end %>
 <% end %>

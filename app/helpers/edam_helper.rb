@@ -56,28 +56,42 @@ module EdamHelper
 #    return result
 #  end
 
-   def self.url_to_text(url)
+  def self.find_row(url)
     ensure_edam_table
     if url.include? '#'
       url = url.partition('#').last
     end
     result = nil
     row = @@edam_table.find {|row| row['Class ID'] == url}
+    return row
+  end
+  
+   def self.url_to_text(url)
+    row = find_row(url)
     result = row['Preferred Label'] unless row.nil?
     return result
   end
 
    def self.ancestry(ancestor_id, descendant_id)
-     return false
-    ensure_jsons
-    ancestor = @@all_jsons.find { |entry| entry['id'] == ancestor_id }
-    descendant =  @@all_jsons.find { |entry| entry['id'] == descendant_id }
-    result = descendant['id'] == ancestor['id']
-    while !result do
-      descendant = @@all_jsons.find { |entry| entry['id'] == descendant['parent'] }
-      break if descendant.nil?
-      result = descendant['id'] == ancestor['id']
+   ensure edam_table
+     ancestors = [descendant_id]
+     to_consider = [descendant_id]
+    while (!ancestors.include? ancestor_id) && !to_consider.empty? do
+      considering = to_consider.pop
+      considering_row = find_row(considering)
+      if considering_row.nil?
+        break
+      end
+      new_parents = considering_row['Parents']
+      unless new_parents.empty?
+        new_parents.split.each do |p|
+          unless (ancestors.include?(p) || to_consider.include?(p))
+            to_consider << p
+          end
+        end
+      end
+      to_consider = to_consider - [considering]
     end
-    return result
+    return ancestors.include? ancestor_id 
   end
 end
