@@ -12,11 +12,11 @@ class Placeholder < ApplicationRecord
   
   # Returns the columns to be shown on the table view for the resource
   def columns_default
-    super
+    super + ['format_type', 'data_type']
   end
 
   def columns_allowed
-    super + ['license','last_used_at','other_creators','deleted_contributor']  
+    super  + ['format_type', 'data_type', 'license','last_used_at','other_creators','deleted_contributor']  
   end
 
   def avatar_key
