@@ -61,6 +61,10 @@ module Seek
             parent.latest_version
           end
 
+          def previous_version
+            parent.previous_version(self.version)
+          end
+
           def versions
             parent.versions
           end
@@ -144,6 +148,11 @@ module Seek
       # Returns the most recent version
       def latest_version
         versions.last
+      end
+
+      # Returns the previous version
+      def previous_version(base = self.version)
+        versions.where('version < ?', base).last
       end
 
       # Finds versions of this model.  Takes an options hash like <tt>find</tt>

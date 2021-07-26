@@ -611,6 +611,7 @@ test 'workflow' do
       'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'image/png',
       'identifier' => 'https://doi.org/10.10.10.10/test.2',  # This DOI was added to the version itself
+      'isBasedOn' => "http://localhost:3000/data_files/#{df.id}?version=1",
       'subjectOf' => [
         { '@type' => 'Event',
           '@id' => "http://localhost:3000/events/#{df.events.first.id}",
