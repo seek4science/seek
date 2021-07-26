@@ -11,7 +11,8 @@ module Seek
                         date_created: :dateCreated,
                         date_modified: :dateModified,
                         content_type: :encodingFormat,
-                        subject_of: :subjectOf
+                        subject_of: :subjectOf,
+                        previous_version_url: :isBasedOn
 
         def content_type
           return unless respond_to?(:content_blob) && content_blob
@@ -29,6 +30,11 @@ module Seek
           all = (mini_definitions(creators) || []) + others
           return if all.empty?
           all
+        end
+
+        def previous_version_url
+          return unless respond_to?(:previous_version) && resource.previous_version
+          resource_url(resource.previous_version)
         end
       end
     end

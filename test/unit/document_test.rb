@@ -129,6 +129,32 @@ class DocumentTest < ActiveSupport::TestCase
     assert_equal 'Updated Document', document.find_version(2).title
   end
 
+  test 'get previous version' do
+    disable_authorization_checks do
+      document = Factory(:document, title: 'First version')
+
+      document.title = 'Second Version'
+      document.save_as_new_version('Second version')
+      document.title = 'Third Version'
+      document.save_as_new_version('Third version')
+      document.title = 'Fourth Version'
+      document.save_as_new_version('Fourth version')
+
+      document.find_version(3).destroy!
+      assert_equal 3, document.versions.length
+
+      v1 = document.find_version(1)
+      v2 = document.find_version(2)
+      v3 = document.find_version(3)
+      v4 = document.find_version(4)
+
+      assert_nil v3
+      assert_equal v1, v2.previous_version
+      assert_equal v2, v4.previous_version
+      assert_nil v1.previous_version
+    end
+  end
+
   test 'project for document and document version match' do
     person = Factory(:person)
     project = person.projects.first
