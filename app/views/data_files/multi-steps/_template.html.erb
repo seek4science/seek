@@ -1,0 +1,19 @@
+<div class='panel panel-default'>
+  <div class='panel-heading'>
+    Data type and format
+  </div>
+
+  <div class='panel-body'>
+        <%= render :partial => "assets/select_format_types", :locals => {:resource => (@data_file ? @data_file : DataFile.new) } -%>
+
+        <%= render :partial => "assets/select_data_types", :locals => {:resource => (@data_file ? @data_file : DataFile.new) } -%>
+    <%= cancel_button(data_files_path) -%>
+    <div class='multi-step-buttons'>
+      <%= multi_step_forward_button %>
+
+      <%= multi_step_end_button %>
+    </div>
+  </div>
+</div>
+<%= wizard_footer_tips %>
+
