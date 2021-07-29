@@ -131,8 +131,10 @@ class PublicationsController < ApplicationController
   end
 
   def upload_pdf
-
-    if handle_upload_data(true)
+    blob_params = params[:content_blobs]
+    if !blob_params || blob_params.empty? || blob_params.none? { |p| check_for_data_or_url(p) }
+      redirect_to @publication
+    elsif handle_upload_data(true)
       comments = params[:revision_comments]
 
       respond_to do |format|
@@ -140,7 +142,7 @@ class PublicationsController < ApplicationController
         format.html { redirect_to @publication }
       end
     else
-      flash[:error]=flash.now[:error]
+      flash[:error] = flash.now[:error]
       redirect_to @publication
     end
   end
@@ -465,11 +467,14 @@ class PublicationsController < ApplicationController
   end
 
   def upload_blob
-    if handle_upload_data(true)
-        comments = params[:revision_comments]
-        create_new_version comments
+    blob_params = params[:content_blobs]
+    if !blob_params || blob_params.empty? || blob_params.none? { |p| check_for_data_or_url(p) }
+      nil # Empty content is allowed for full text publication.
+    elsif handle_upload_data(true)
+      comments = params[:revision_comments]
+      create_new_version comments
     else
-      flash[:error]=flash.now[:error]
+      flash[:error] = flash.now[:error]
     end
   end
 
@@ -505,7 +510,7 @@ class PublicationsController < ApplicationController
         format.json { render json: @publication.errors, status: :unprocessable_entity }
       end
     else
-        @subaction = 'Create'
+      @subaction = 'Create'
         respond_to do |format|
           format.html { render action: 'new' }
           format.json { render json: @publication, status: :ok, include: [params[:include]] }
