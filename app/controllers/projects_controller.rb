@@ -594,6 +594,13 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def download_ena_tsv
+    client = Seek::Ena::EnaClient.new
+    tsv_files = client.generate_ena_tsv ["ENA_study", "ENA_experiment", "ENA_run", "ENA_sample"]
+    zipfile = client.zip_files(tsv_files[:files])
+    send_file zipfile, filename: "ena_export.zip", type: "application/zip", deposition: "attachment"
+  end
+
   private
 
   def project_role_params

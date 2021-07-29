@@ -5,6 +5,9 @@
     <%= button_link_to("Browse openBIS", :openbis_square, openbis_endpoint_path(item.openbis_endpoints.last),{icon_options:{height:'18px'}}) %>
 <% end %>
 <% if item.try(:has_member?,current_user) %>
+    <%= button_link_to("ENA export", 'download', download_ena_tsv_project_path(item)) %>
+<% end -%>
+<% if item.try(:has_member?,current_user) %>
     <%= button_link_to("Dashboard", 'project_dashboard', dashboard_project_stats_path(item)) %>
 <% end -%>
 <%= button_link_to('Overview', 'graph_nodes', overview_project_path(item)) -%>
