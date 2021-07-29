@@ -445,7 +445,6 @@ class DataFilesController < ApplicationController
     # if creating a new assay, check it is valid and the associated study is editable
     all_valid = all_valid && !@create_new_assay || (@assay.study.try(:can_edit?) && @assay.save)
 
-    puts("File template id is #{params[:file_template_id]}")
     update_template() if params.key?(:file_template_id)
 
     # check the datafile can be saved, and also the content blob can be saved
