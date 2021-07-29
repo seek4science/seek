@@ -1,4 +1,4 @@
-<%= panel("Data type", :body_options => {:class => 'text-center'}) do %>
+<%= panel("Type of Data in #{suffix}", :body_options => {:class => 'text-center'}) do %>
   <% text = EdamHelper::url_to_text(resource.data_type);
      if text.nil? %>
 <li class="author-list-item"><%= resource.data_type -%></li>

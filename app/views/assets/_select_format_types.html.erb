@@ -6,14 +6,14 @@
 
   resource_type = resource.class.name.underscore
   resource_type_text = text_for_resource(resource)
-  help_text = "You can add a format type for this #{resource_type_text}"
+  help_text = "You can add a format for this #{resource_type_text}"
 %>
 
-<%= folding_panel('Format Type', true, :body_options => {:id => 'format_type_urls'},
+<%= folding_panel('Format', true, :body_options => {:id => 'format_type_urls'},
                   :help_text => help_text) do %>
 
     <p class="help-block">
-      Specify a format type for this <%= resource_type_text %>.
+      Specify a format for this <%= resource_type_text %>.
     </p>
 
     <%= text_field_tag("#{resource_type}[format_type]", "#{resource.format_type}", hidden: true) %>

@@ -4,7 +4,7 @@
         The data type of the data file is not compatible with that of the template
     <% end %>
 <% end %>
-<% if @data_file.format_type != @data_file.file_template.format_type -%>
+<% unless EdamHelper::ancestry(@data_file.format_type, @data_file.file_template.format_type) -%>
     <%= alert_box('warning') do %>
         The format of the data file is not compatible with that of the template
     <% end %>

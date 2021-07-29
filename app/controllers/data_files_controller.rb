@@ -451,6 +451,7 @@ class DataFilesController < ApplicationController
     if all_valid
 
       update_relationships(@data_file, params)      
+      update_template() if params.key?(:file_template_id)
 
       respond_to do |format|
         flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?

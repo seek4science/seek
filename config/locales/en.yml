@@ -103,7 +103,8 @@ en:
   asset_housekeeper: 'Asset housekeeper'
   asset_gatekeeper: 'Asset gatekeeper'
   project_administrator: 'Project administrator'
-  pal: 'PAL'
+  admin: 'Administrator'
+  pal: 'Project owner'
   programme_administrator: 'Programme administrator'
 
   contributor: 'submitter' # A person who submitted the resource to SEEK
