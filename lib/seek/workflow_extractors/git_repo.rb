@@ -29,7 +29,7 @@ module Seek
 
       def generate_diagram(format = nil)
         if @git_version.path_for_key(:diagram).present?
-          @git_version.file_contents(@git_version.path_for_key(:diagram)).tap {|x| puts x}
+          @git_version.file_contents(@git_version.path_for_key(:diagram))
         elsif main_workflow_extractor&.can_render_diagram?
           main_workflow_extractor.generate_diagram(format)
         elsif abstract_cwl_extractor&.can_render_diagram?
