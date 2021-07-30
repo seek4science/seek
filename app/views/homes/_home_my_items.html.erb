@@ -1,0 +1,41 @@
+<div class="panel panel-default" id="home_my_items" style="padding: 20px;height:100%;">
+  <% current_person = current_user.person %>
+  <h1 class="text-center"><a href="<%=person_path(current_person)%>/items">My FAIRDOMHub </a> </h1>
+  <div class="row" style="display: flex;flex-wrap: wrap;">
+    <div class="col-md-6" style="border-right: 2px solid #ccc;">
+      <h2>My Programmes</h3>
+        <ul>
+          <% for programme in current_person.programmes %>
+            <li><a href="/programmes/<%=programme.id%>"><%= programme.title %> </a></li>
+          <% end %>
+        </ul>
+      <h2>My Projects</h3>
+        <ul>
+          <% projectCount = 0%>
+          <% for project in current_person.projects.reverse() %>
+            <% if current_person.is_project_administrator?(project) && projectCount < 5 %>
+              <% projectCount += 1%>
+              <li><a href="/projects/<%=project.id%>"><%= project.title %> </a></li>
+            <% end %>
+          <% end %>
+          <% if current_person.projects.length() > 5 %>
+            <li><a href="<%=person_path(current_person)%>/items#projects">...</a></li>
+          <% end %>
+        </ul>
+      <h2>Shared with me</h3>
+      <% resource_hash = get_related_resources(current_person, 5) %>
+      <ul>      
+        <% projectCount = 0%>
+          <% for project in current_person.projects.reverse() %>
+            <% if !current_person.is_project_administrator?(project) && projectCount < 5 %>
+              <% projectCount += 1%>
+              <li><a href="/projects/<%=project.id%>"><%= project.title %> </a></li>
+            <% end %>
+          <% end %>
+      </ul>
+    </div>
+    <div class="col-md-6">
+      <%= render :partial=>"home_my_recent" -%>
+    </div>
+  </div>
+</div>
