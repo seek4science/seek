@@ -597,7 +597,7 @@ class ProjectsController < ApplicationController
   def download_ena_tsv
     client = Ena::EnaClient.new
     # TODO Person > has_many :sample_types, foreign_key: :contributor_id
-    sample_types = SampleType.where(title: ["ENA_study", "ENA_experiment", "ENA_run", "ENA_sample"], contributor_id: current_user.id)
+    sample_types = SampleType.where(title: ["ENA_study", "ENA_experiment", "ENA_run", "ENA_sample"])
     if !sample_types.any?
       respond_to do |format|
         flash[:error] = "No data to download!"
@@ -605,7 +605,7 @@ class ProjectsController < ApplicationController
       end
     else
       tsv_files = client.generate_ena_tsv sample_types
-      zipfile = client.zip_files(tsv_files[:files])
+      zipfile = client.zip_files(tsv_files[:files], tsv_files[:folder])
       send_file zipfile, filename: "ena_export.zip", type: "application/zip", deposition: "attachment"
     end
   end

@@ -5,25 +5,29 @@ module Ena
   class EnaClient
     def generate_ena_tsv sample_types
       tsv_files = []
+      folder = UUID.generate
+      dir = File.join(tmp_zip_file_dir, folder)
+      FileUtils.mkdir_p dir unless File.exist?(dir)
+      
       sample_types.each do |st|
         atrs = st.sample_attributes
-        row = atrs.map(&:title).join("\t") + "\n"
+        row = atrs.map(&:title).join("\t")
         # s.samples.map{|item| item.map{|val| atrs.map{|atr| item.get_attribute_value(atr) }.join("\t") }.join("\n") }
         st.samples.each do |s|
-          atrs.each{ |atr| row << "#{s.get_attribute_value(atr)}\t" }
           row << "\n"
+          row <<  atrs.map{ |atr| "#{s.get_attribute_value(atr)}" }.join("\t")
         end
-        tsv_files << file_name = "#{Time.now.to_f}_#{st.title}.tsv"
-        File.write(File.join(tmp_zip_file_dir, file_name), row)
+        tsv_files << file_name = "#{st.title}.tsv"
+        File.write(File.join(tmp_zip_file_dir, folder, file_name), row)
       end
-      { files: tsv_files }
+      { files: tsv_files, folder: folder }
     end
     
-    def zip_files(input_filenames)
-      zipfile_name = File.join(tmp_zip_file_dir, "#{Time.now.to_f}_ena_export.zip")
+    def zip_files(input_filenames, folder)
+      zipfile_name = File.join(tmp_zip_file_dir, folder, "ena_export.zip")
       Zip::File.open(zipfile_name, create: true) do |zipfile|
         input_filenames.each do |filename|
-          zipfile.add(filename, File.join(tmp_zip_file_dir, filename))
+          zipfile.add(filename, File.join(tmp_zip_file_dir, folder, filename))
         end
       end
       zipfile_name
