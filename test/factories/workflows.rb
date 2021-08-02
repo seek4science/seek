@@ -27,6 +27,15 @@ Factory.define(:nextflow_workflow_class, class: WorkflowClass) do |f|
   f.url 'https://www.nextflow.io/'
 end
 
+Factory.define(:knime_workflow_class, class: WorkflowClass) do |f|
+  f.title 'KNIME'
+  f.key 'knime'
+  f.extractor 'KNIME'
+  f.description 'KNIME'
+  f.identifier 'https://www.knime.com/'
+  f.url 'https://www.knime.com/'
+end
+
 Factory.define(:unextractable_workflow_class, class: WorkflowClass) do |f|
   f.title 'Mystery'
   f.key 'Mystery'
