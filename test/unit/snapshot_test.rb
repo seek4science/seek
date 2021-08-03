@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'minitest/mock'
 
 class SnapshotTest < ActiveSupport::TestCase
   include MockHelper
@@ -316,6 +317,15 @@ class SnapshotTest < ActiveSupport::TestCase
     snapshot = @assay.create_snapshot
 
     assert_includes snapshot.all_related_people, @assay.investigation.contributor
+  end
+
+  test 'does not crash on exception' do
+    class SpecialSnapshotTestException < StandardError; end
+    Seek::ResearchObjects::Generator.stub(:new, -> (_) { raise SpecialSnapshotTestException }) do
+      assert_raise(SpecialSnapshotTestException) do
+        snapshot = @assay.create_snapshot
+      end
+    end
   end
 
   private

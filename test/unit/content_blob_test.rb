@@ -997,4 +997,10 @@ class ContentBlobTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test 'can destroy unsaved content blob without Cannot Modify Frozen Hash error' do
+    assert_nothing_raised do
+      ContentBlob.new.destroy
+    end
+  end
 end
