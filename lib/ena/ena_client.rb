@@ -6,7 +6,7 @@ module Ena
     def generate_ena_tsv pid
       sample_types = SampleType.where(id: [1, 2, 3, 5])
       if !sample_types.any?
-        return { error: "No sample type" }
+        return nil
       end
 
       tsv_files = []
@@ -26,21 +26,27 @@ module Ena
         tsv_files << file_name = "#{st.title}.tsv"
         File.write(File.join(tmp_zip_file_dir, folder, file_name), row)
       end
-      { files: tsv_files, folder: folder }
+      zip_files(tsv_files, folder)
     end
     
     def zip_files(input_filenames, folder)
-      zipfile_name = File.join(tmp_zip_file_dir, folder, "ena_export.zip")
+      base_folder = File.join(tmp_zip_file_dir, folder)
+      zipfile_name = File.join(tmp_zip_file_dir, "ena_export_#{UUID.generate}.zip")
       Zip::File.open(zipfile_name, create: true) do |zipfile|
         input_filenames.each do |filename|
-          zipfile.add(filename, File.join(tmp_zip_file_dir, folder, filename))
+          zipfile.add(filename, File.join(base_folder, filename))
         end
       end
+      # clean_up base_folder
       zipfile_name
     end 
 
     private 
 
+    def clean_up folder
+      FileUtils.rm_r(folder)
+    end
+    
     def tmp_zip_file_dir
       dir = if Rails.env.test?
               File.join(Dir.tmpdir, 'seek-tmp', 'zip-files')
