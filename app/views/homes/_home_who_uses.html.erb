@@ -27,7 +27,7 @@
       <% who_uses_content.each do |item| %>
         <div class="card col-sm-12 text-center" style="flex-shrink: 0;">
           <a class="image-link" target="_blank" href="<%= item['url'] %>">
-            <img style="width:auto;height:200px;" src='<%= item['logo'] %>'>
+            <img style="width:auto;height:200px;" src='<%= item['logo'] %>'  alt='<%= item['title'] %>'>
           </a>
           <h3> <%= item['title'] %> </h3>
           <p style="font-size: larger;"> <%= item['description'] %> </p>
