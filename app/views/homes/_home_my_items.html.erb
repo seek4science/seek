@@ -3,12 +3,6 @@
   <h1 class="text-center"><a href="<%=person_path(current_person)%>/items">My FAIRDOMHub </a> </h1>
   <div class="row" style="display: flex;flex-wrap: wrap;">
     <div class="col-md-6" style="border-right: 2px solid #ccc;">
-      <h2>My Programmes</h3>
-        <ul>
-          <% for programme in current_person.programmes %>
-            <li><a href="/programmes/<%=programme.id%>"><%= programme.title %> </a></li>
-          <% end %>
-        </ul>
       <h2>My Projects</h3>
         <ul>
           <% projectCount = 0%>
