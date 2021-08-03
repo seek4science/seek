@@ -14,6 +14,10 @@ module Seek
           'DataCatalog'
         end
 
+        def conformance
+          'https://bioschemas.org/profiles/DataCatalog/0.3-RELEASE-2019_07_01/'
+        end
+        
         def url
           resource.url
         end

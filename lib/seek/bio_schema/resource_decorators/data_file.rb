@@ -10,6 +10,8 @@ module Seek
         schema_mappings doi: :identifier,
                         distribution: :distribution
 
+        DATASET_PROFILE = 'https://bioschemas.org/profiles/Dataset/0.3-RELEASE-2019_06_14/'
+                                                                
         def doi
           "https://doi.org/#{resource.doi}" if resource.doi
         end
@@ -47,6 +49,10 @@ module Seek
 
         def schema_type
           'Dataset'
+        end
+
+        def conformance
+          DATASET_PROFILE
         end
       end
     end

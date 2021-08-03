@@ -19,9 +19,14 @@ module Seek
         end
         json = {
           '@context' => resource_decorator.context,
-          '@type' => resource_decorator.schema_type
-        }.merge(attributes_json)
+          '@type' => resource_decorator.schema_type,
+        }
+        if (resource_decorator.respond_to? 'conformance')
+          json['dct:conformsTo'] = resource_decorator.conformance
+        end
+        json = json.merge(attributes_json)
 
+        puts JSON.pretty_generate(json)
         JSON.pretty_generate(json)
       end
 
@@ -32,6 +37,7 @@ module Seek
 
       # test directly (without initializing) whether a resource is supported
       def self.supported?(resource)
+        puts('testing ' + resource.class.name)
         supported_types.include?(resource.class)
       end
 

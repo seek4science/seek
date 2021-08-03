@@ -17,6 +17,10 @@ module Seek
         def schema_type
           'Taxon'
         end
+
+        def conformance
+          'https://bioschemas.org/profiles/Taxon/0.6-RELEASE/'
+        end
       end
     end
   end

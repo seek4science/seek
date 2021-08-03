@@ -11,10 +11,9 @@ module Seek
                         last_name: :familyName,
                         image: :image,
                         member_of: :memberOf,
-                        orcid: :orcid,
-                        conformsTo: "dct:conformsTo"
+                        orcid: :orcid
 
-        def conformsTo
+        def conformance
           PERSON_PROFILE
         end
   

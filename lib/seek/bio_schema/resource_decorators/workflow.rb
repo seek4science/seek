@@ -13,14 +13,13 @@ module Seek
                         producer: :producer,
                         inputs: :input,
                         outputs: :output,
-                        license: :license,
-                        conformsTo: "dct:conformsTo"
+                        license: :license
 
         def contributors
           [contributor]
         end
 
-        def conformsTo
+        def conformance
           WORKFLOW_PROFILE
         end
     
