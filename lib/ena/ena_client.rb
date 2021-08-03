@@ -3,17 +3,23 @@ require 'zip'
 
 module Ena
   class EnaClient
-    def generate_ena_tsv sample_types
+    def generate_ena_tsv pid
+      sample_types = SampleType.where(id: [1, 2, 3, 5])
+      if !sample_types.any?
+        return { error: "No sample type" }
+      end
+
       tsv_files = []
       folder = UUID.generate
       dir = File.join(tmp_zip_file_dir, folder)
       FileUtils.mkdir_p dir unless File.exist?(dir)
-      
+
       sample_types.each do |st|
         atrs = st.sample_attributes
         row = atrs.map(&:title).join("\t")
         # s.samples.map{|item| item.map{|val| atrs.map{|atr| item.get_attribute_value(atr) }.join("\t") }.join("\n") }
-        st.samples.each do |s|
+        samples = Project.find(pid).samples.where(sample_type_id:st.id)
+        samples.authorized_for('view').each do |s|
           row << "\n"
           row <<  atrs.map{ |atr| "#{s.get_attribute_value(atr)}" }.join("\t")
         end
