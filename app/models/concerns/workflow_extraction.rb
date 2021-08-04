@@ -263,4 +263,8 @@ module WorkflowExtraction
       content_blob.filepath("diagram.#{format}")
     end
   end
+
+  def clear_cached_diagram
+    FileUtils.rm(Dir.glob(cached_diagram_path('*')))
+  end
 end

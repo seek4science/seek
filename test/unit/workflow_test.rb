@@ -341,4 +341,59 @@ class WorkflowTest < ActiveSupport::TestCase
     assert_equal :all_failing, v1.reload.test_status
     assert_nil v2.reload.test_status
   end
+
+  test 'changing main workflow path refreshes internals structure' do
+    workflow = Factory(:local_git_workflow)
+    v = workflow.git_version
+
+    disable_authorization_checks do
+      v.refresh_internals
+      v.save!
+      v.add_file('1-PreProcessing.ga', open_fixture_file('workflows/1-PreProcessing.ga'))
+    end
+
+    assert_equal 'concat_two_files.ga', v.main_workflow_path
+    assert_equal 2, v.inputs.count
+    assert_equal 3, v.steps.count
+    assert_equal 1, v.outputs.count
+
+    disable_authorization_checks do
+      v.main_workflow_path = '1-PreProcessing.ga'
+      assert v.main_workflow_path_changed?
+      v.save!
+    end
+
+    assert_equal '1-PreProcessing.ga', v.main_workflow_path
+    assert_equal 1, v.inputs.length
+    assert_equal 17, v.steps.length
+    assert_equal 31, v.outputs.length
+  end
+
+  test 'changing diagram path clears the cached diagram' do
+    workflow = Factory(:local_git_workflow)
+    v = workflow.git_version
+    original_diagram = v.diagram
+    assert original_diagram
+
+    disable_authorization_checks do
+      v.add_file('new-diagram.png', open_fixture_file('file_picture.png'))
+    end
+
+    assert_equal 'diagram.png', v.diagram_path
+    assert original_diagram.exists?
+    assert_equal 32248, original_diagram.size
+
+    disable_authorization_checks do
+      v.diagram_path = 'new-diagram.png'
+      assert v.diagram_path_changed?
+      v.save!
+    end
+
+    assert_equal 'new-diagram.png', v.diagram_path
+    refute v.diagram_exists?('png')
+    new_diagram = v.diagram
+
+    assert new_diagram.exists?
+    assert_equal 2728, new_diagram.size
+  end
 end
