@@ -59,7 +59,7 @@ module Seek
             def sync_resource_attributes
               version = latest_git_version
               return unless version&.mutable?
-              version.update_attribute(:resource_attributes, self.attributes)
+              version.sync_resource_attributes
             end
 
             def initial_git_version

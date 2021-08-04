@@ -242,4 +242,17 @@ class GitVersionTest < ActiveSupport::TestCase
     assert gv.can_delete?
     assert gv.resource.can_delete?
   end
+
+  test 'attributes synced for factory' do
+    gv = Factory(:git_version)
+    r = gv.resource
+    keys = r.attributes.keys.map(&:to_sym) - [:id, :created_at, :updated_at, :contributor_id]
+    keys.each do |k|
+      if r[k].nil?
+        assert_nil gv.send(k), "#{k} did not match"
+      else
+        assert_equal r[k], gv.send(k), "#{k} did not match"
+      end
+    end
+  end
 end

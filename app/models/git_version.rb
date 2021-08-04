@@ -176,6 +176,10 @@ class GitVersion < ApplicationRecord
     Seek::BioSchema::Serializer.supported?(resource)
   end
 
+  def sync_resource_attributes
+    update_attribute(:resource_attributes, resource.attributes)
+  end
+
   private
 
   def set_version

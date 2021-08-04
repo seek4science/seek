@@ -31,9 +31,15 @@ Factory.define(:git_version, class: GitVersion) do |f|
   f.name 'version 1.0.0'
   f.ref 'refs/heads/master'
   f.mutable true
+  f.after_build do |v|
+    v.contributor ||= v.resource.contributor
+  end
+  f.after_create do |v|
+    v.sync_resource_attributes
+  end
 end
 
-Factory.define(:remote_git_version, class: GitVersion) do |f|
+Factory.define(:remote_git_version, parent: :git_version) do |f|
   f.git_repository { Factory(:remote_repository) }
   f.resource { Factory(:workflow) }
   f.name 'v0.01'
