@@ -1,5 +1,6 @@
 
-<div id="home_latest_additions" style="padding: 20px;height:100%;">
+<%# adapted _home_activity_notifications removing downloaded items for new landing page %>
+<div id="recently_added" style="padding: 20px;height:100%;">
   <h2>Latest additions</h2>
   <ul class="feed">
     <% recently_added_item_logs_hash(1.years.ago, 8).each do |added_item_log| -%>

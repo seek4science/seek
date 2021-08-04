@@ -1,4 +1,4 @@
-<div id="home_home_my_recent">
+<div id="my-recent-contributions">
   <h2>My recent</h2>
   <ul class="feed">
     <% activity = current_user.person.recent_activity(Seek::Config.recent_contributions_number_of_entries).select {|a| a.activity_loggable} %>

@@ -1,97 +1,6 @@
 <style>
-.bcrumb {
-    list-style: none;
-    overflow: hidden;
-    font-size: 18px;
-    font-weight: bold;
-    padding: 0;
-}
-
-
-.bcrumb li a {
-    color: white;
-    text-decoration: none;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-left: 20px;
-    background: #000634;
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
-    background: #000634;
-    position: relative;
-    display: block;
-    float: left;
-    width: 25%;
-    text-align: center
-}
-
-.bcrumb li a::after {
-    content: " ";
-    display: block;
-    width: 0;
-    height: 0;
-    border-top: 50px solid transparent;
-    border-bottom: 50px solid transparent;
-    border-left: 30px solid #000634;
-    position: absolute;
-    top: 50%;
-    margin-top: -50px;
-    left: 100%;
-    z-index: 2;
-}
-
-.bcrumb li a::before {
-    content: " ";
-    display: block;
-    width: 0;
-    height: 0;
-    border-top: 50px solid transparent;
-    border-bottom: 50px solid transparent;
-    border-left: 30px solid white;
-    position: absolute;
-    top: 50%;
-    margin-top: -50px;
-    margin-left: 1px;
-    left: 100%;
-    z-index: 1;
-}
 
 .breadcrumb li:first-child a {}
-
-.bcrumb li:nth-child(2) a {
-    background: #346090
-}
-
-.bcrumb li:nth-child(2) a:after {
-    border-left-color: #346090
-}
-
-.bcrumb li:nth-child(3) a {
-    background: #9cbede
-}
-
-.bcrumb li:nth-child(3) a:after {
-    border-left-color: #9cbede
-}
-
-.bcrumb li:nth-child(4) a {
-    background: #cbe2f7;
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
-
-}
-
-.bcrumb li:nth-child(4) a:after {
-    border: none
-}
-
-.bcrumb li a:hover {
-    cursor: default
-}
-
-.bcrumb li a:hover:after {
-    cursor: default
-}
 
 </style>
 
@@ -110,14 +19,6 @@
     <% end %>
 </div>
 <% if logged_in_and_registered? %>
-  <div class="row">
-    <ul class="bcrumb">
-      <li><a href="#">Project</a></li>
-      <li><a href="#">Investigation</a></li>
-      <li><a href="#">Study</a></li>
-      <li><a href="#">Assay</a></li>
-    </ul>
-  </div>
   <div class="row">
     <div class="col-md-9">
       <%= render :partial=>"home_my_items" -%>

@@ -307,7 +307,8 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_select 'div#recently_added ul>li>a[href=?]', investigation_snapshot_path(snapshot1.resource, snapshot1), text: /inv with snap/
-    assert_select 'div#recently_downloaded ul>li>a[href=?]', assay_snapshot_path(snapshot2.resource, snapshot2), text: /assay with snap/
+    # recently_downloaded was removed from newer landing page version
+    # assert_select 'div#recently_downloaded ul>li>a[href=?]', assay_snapshot_path(snapshot2.resource, snapshot2), text: /assay with snap/
   end
 
   test 'should show headline announcement' do
@@ -424,23 +425,23 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
 
-    assert_select 'div#my-recent-contributions .panel-body ul li', 4
-    assert_select 'div#my-recent-contributions .panel-body ul>li a[href=?]', data_file_path(df), text: /A new data file/
-    assert_select 'div#my-recent-contributions .panel-body ul li a[href=?]', sop_path(sop), text: /A new sop/
-    assert_select 'div#my-recent-contributions .panel-body ul li a[href=?]', assay_path(assay), text: /A new assay/
-    assert_select 'div#my-recent-contributions .panel-body ul li a[href=?]', assay_snapshot_path(assay, snapshot), text: /A new assay/
+    assert_select 'div#my-recent-contributions ul li', 4
+    assert_select 'div#my-recent-contributions ul>li a[href=?]', data_file_path(df), text: /A new data file/
+    assert_select 'div#my-recent-contributions ul li a[href=?]', sop_path(sop), text: /A new sop/
+    assert_select 'div#my-recent-contributions ul li a[href=?]', assay_path(assay), text: /A new assay/
+    assert_select 'div#my-recent-contributions ul li a[href=?]', assay_snapshot_path(assay, snapshot), text: /A new assay/
 
     sop.update_attributes(title: 'An old sop')
     Factory :activity_log, activity_loggable: sop, controller_name: 'assays', culprit: person.user, action: 'update'
 
     get :index
     assert_response :success
-    assert_select 'div#my-recent-contributions .panel-body ul li', 4
-    assert_select 'div#my-recent-contributions .panel-body ul>li a[href=?]', sop_path(sop), text: /An old sop/
-    assert_select 'div#my-recent-contributions .panel-body ul li a[href=?]', data_file_path(df), text: /A new data file/
-    assert_select 'div#my-recent-contributions .panel-body ul li a[href=?]', assay_path(assay), text: /A new assay/
-    assert_select 'div#my-recent-contributions .panel-body ul li a[href=?]', assay_snapshot_path(assay, snapshot), text: /A new assay/
-    assert_select 'div#my-recent-contributions .panel-body ul li a[href=?]', sop_path(sop), text: /A new sop/, count: 0
+    assert_select 'div#my-recent-contributions ul li', 4
+    assert_select 'div#my-recent-contributions ul>li a[href=?]', sop_path(sop), text: /An old sop/
+    assert_select 'div#my-recent-contributions ul li a[href=?]', data_file_path(df), text: /A new data file/
+    assert_select 'div#my-recent-contributions ul li a[href=?]', assay_path(assay), text: /A new assay/
+    assert_select 'div#my-recent-contributions ul li a[href=?]', assay_snapshot_path(assay, snapshot), text: /A new assay/
+    assert_select 'div#my-recent-contributions ul li a[href=?]', sop_path(sop), text: /A new sop/, count: 0
   end
 
   test 'can enabled/disable front page buttons' do
