@@ -2970,7 +2970,28 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_empty project.discussion_links
   end
 
-    private
+  test 'get ena export' do
+    # no ena sample_types
+    project = Factory(:project)
+    project_ids = [project.id]
+    get :download_ena_tsv, params: { id: project.id }
+    assert_redirected_to project
+    assert_equal "No data to download!", flash[:error]
+
+    # with ena sample_types
+    # TODO fix this to get ena sample_types from the DB
+    ena_run_sample_type = Factory(:simple_sample_type, id: 1, project_ids: project_ids)
+    ena_experiment_sample_type = Factory(:simple_sample_type, id: 2, project_ids: project_ids)
+    ena_study_sample_type = Factory(:simple_sample_type, id: 3, project_ids: project_ids)
+    ena_sample_sample_type = Factory(:simple_sample_type, id: 4, project_ids: project_ids)
+
+    response = get :download_ena_tsv, params: { id: project.id }
+
+    assert_response :success
+    assert_equal 'application/zip', response.header['Content-Type']
+  end
+
+  private
 
   def edit_max_object(project)
     for i in 1..5

@@ -4,7 +4,8 @@ require 'zip'
 module Ena
   class EnaClient
     def generate_ena_tsv pid
-      sample_types = SampleType.where(id: [1, 2, 3, 5])
+      # TODO fix this to get ena sample_types from the DB
+      sample_types = SampleType.where(id: [1, 2, 3, 4])
       if !sample_types.any?
         return nil
       end
@@ -17,7 +18,6 @@ module Ena
       sample_types.each do |st|
         atrs = st.sample_attributes
         row = atrs.map(&:title).join("\t")
-        # s.samples.map{|item| item.map{|val| atrs.map{|atr| item.get_attribute_value(atr) }.join("\t") }.join("\n") }
         samples = Project.find(pid).samples.where(sample_type_id:st.id)
         samples.authorized_for('view').each do |s|
           row << "\n"
@@ -31,13 +31,13 @@ module Ena
     
     def zip_files(input_filenames, folder)
       base_folder = File.join(tmp_zip_file_dir, folder)
-      zipfile_name = File.join(tmp_zip_file_dir, "ena_export_#{UUID.generate}.zip")
+      zipfile_name = File.join(tmp_zip_file_dir, "ena_export_#{folder}.zip")
       Zip::File.open(zipfile_name, create: true) do |zipfile|
         input_filenames.each do |filename|
           zipfile.add(filename, File.join(base_folder, filename))
         end
       end
-      # clean_up base_folder
+      clean_up base_folder
       zipfile_name
     end 
 
