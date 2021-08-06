@@ -127,7 +127,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="1"
      inkscape:cx="-326.54185"
-     inkscape:cy="164.06238"
+     inkscape:cy="165.2"
      inkscape:document-units="mm"
      inkscape:current-layer="g1248"
      showgrid="false"
@@ -146,7 +146,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -171,7 +171,7 @@
            sodipodi:nodetypes="ccccc" />
       </g>
       <path
-         style="fill:none;stroke:#2c3e50;stroke-width:3.40941525;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:8;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+         style="fill:#ffffff;stroke:#2c3e50;stroke-width:3.40962997;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:8;stroke-dasharray:none;stroke-opacity:1;paint-order:normal;fill-opacity:1"
          d="m 71.060709,-28.985025 v 51.922548 h 78.492631 v -45.348288 h -40.16947 l -14.278895,-6.57426 z"
          id="path3044"
          inkscape:connector-curvature="0"
@@ -181,7 +181,7 @@
          inkscape:connector-curvature="0"
          id="path3078"
          d="M 71.060709,48.049993 V 99.972517 H 149.55334 V 54.624252 H 109.38387 L 95.104975,48.049993 Z"
-         style="fill:none;stroke:#2c3e50;stroke-width:3.40941525;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:8;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers" />
+         style="fill:#ffffff;stroke:#2c3e50;stroke-width:3.40962997;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:8;stroke-dasharray:none;stroke-opacity:1;paint-order:normal;fill-opacity:1" />
     </g>
   </g>
 </svg>
