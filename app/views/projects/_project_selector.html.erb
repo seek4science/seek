@@ -43,6 +43,8 @@
   # For each possible project, extract the list of folders and process them
   # This hash will keep an array of folders for each project
   possible_folders = {}
+  selected_folders = {}
+
   # Keep a list of project id->title for quick retrieval
   folders_project_list = {}
   possible_projects.each { |project|
@@ -50,35 +52,16 @@
     folders_project_list[project.id]=project.title
     folders =  ProjectFolder.root_folders(project)
     tree = TreeviewBuilder.new(project, folders).get_folder_tree
-    possible_folders[project.id].concat(tree_get_children(project.title+"->",tree))
+    # possible_folders[project.id].concat(tree_get_children(project.title+"->",tree))
+    possible_folders[project.id].concat(tree_get_children("",tree))
+
+    # populate selected_folders_json
+    link = ProjectFolderAsset.select{|pfa| pfa.asset_id==resource.id && pfa.project_folder.try(:project_id)==project.id}.first
+    selected_folders[project.id] = link.project_folder_id rescue ''
   }
 
-
-
-  # # Retrieve the project's folders
-  # @project = Project.find(id)
-  # @folders = project_folders
-  # possible_projects = possible_projects - selected_projects
-
-  possible_folders_json = 
-        {
-          "Default project": [
-            { id: 1, title: "Front-end" },
-            { id: 1, title: "Front-end" }
-          ],
-         "Vaccines project": [
-            { id: 1, title: "Front-end" },
-            { id: 1, title: "Front-end" }
-          ],
-          "Covid project": [
-            { id: 1, title: "Front-end" },
-            { id: 1, title: "Front-end" }
-          ]
-        }
-  possible_folders_json = possible_folders
-
-  selected_folders_json =  []
   title_folders = t('folder').pluralize
+  field_name_folders = "#{resource.class.name.underscore}[folder_ids][]"
 
 %>
 
@@ -123,25 +106,13 @@
     </p>
     <%# Create a folder selector for each project %>
     <% possible_folders.each do |k,folder_list| %>
-      <div id="folder-selector-<%=k%>">
+      <div id="folder-selector-<%=k%>" class="folder-selector">
         <label> <%=folders_project_list[k]  %></label>
-        <%= hidden_field_tag field_name, '' %>
-        <div class="box_editing_inner">
-          <ul class="related_asset_list">
-            <span v-if="selected.length == 0" class="none_text">None</span>
-            <li class="association-list-item" v-for="(project, index) in selected">
-              <span :title="project.title">{{ project.title }}</span>
-              <a class="remove-association clickable" @click="remove(project, index)">
-                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-              </a>
-              <input type="hidden" name="<%= field_name -%>" v-model="project.id"/>
-            </li>
-          </ul>
-        </div>
+        <%= hidden_field_tag field_name_folders, ''  %>
         <div class="association_step">
           <div class="form-group">
-            <select autocomplete="off" class="form-control" id="folder-selector-select">
-              <option selected="selected">Select a <%= t('project').downcase -%>...</option>
+            <select v-model="selected" autocomplete="off" class="form-control" id="folder-selector-select">
+              <option value="">Select a <%= t('folder').downcase -%>...</option>
               <option v-for="option in possibilities" :value="option.id">{{ option.title }}</option>
             </select>
           </div>
@@ -156,33 +127,38 @@
 <% possible_folders.each do |k,folder_list| %>
 
   <%= content_tag :script, folder_list.to_json.html_safe, type: 'application/json', id: 'folder-selector-possibilities-json-'+k.to_s %>
-  <%= content_tag :script, folder_list.to_json.html_safe, type: 'application/json', id: 'folder-selector-selected-json-'+k.to_s %>
+  <%= content_tag :script, selected_folders[k].to_json.html_safe, type: 'application/json', id: 'folder-selector-selected-json-'+k.to_s %>
 
   <script id="folder-selector-script-<%=k%>">
-  folder_selector= new Vue({
+    folder_selector= new Vue({
       el: '#folder-selector-<%=k%>',
       data: {
         possibilities: JSON.parse($j('#folder-selector-possibilities-json-<%=k%>').text()),
+        // selected_folders uses the same key as possible_folders
         selected: JSON.parse($j('#folder-selector-selected-json-<%=k%>').text())
-      },
-      methods: {
-        remove: function (project, index) {
-          this.possibilities.push(project);
-          this.selected.splice(index, 1);
-        },
-        add: function (projectId, skipPrompt) {
-          for (var i = 0; i < this.possibilities.length; i++) {
-            var project = this.possibilities[i];
-            if (project.id == projectId) {
-              this.selected.push(project);
-              this.possibilities.splice(i, 1);
-            }
-          }
-        }
       }
     });
+    // Sets the value of the hidden input when the selector changes
+    $j("#folder-selector-<%=k%> #folder-selector-select").change(function () {
+      console.log("folder-selector-<%=k%> selected with value:"+$j(this).val())
+      if ($j(this).val()) {
+        $j("#folder-selector-<%=k%> input[name='<%=field_name_folders%>']").val($j(this).val())
+      }
+    });
+
   </script>
 <%end %>
+
+<script>
+  // Update the displayed folders depending on the selected projects
+  function refreshFolders(){
+    $j(".folder-selector").hide()
+    Sharing.projectsSelector.selected.forEach(prj =>{
+      console.log("displaying folder-selector-"+prj.id )
+      $j("#folder-selector-"+prj.id).show()
+    });
+  }
+</script>
 
 <%# Project selection code %>
 <%= content_tag :script, possible_projects_json.html_safe, type: 'application/json', id: 'project-selector-possibilities-json' %>
@@ -223,11 +199,13 @@
             this.possibilities.splice(i, 1);
           }
         }
+        refreshFolders();
       }
     }
   });
 
   $j(document).ready(function () {
+      // TODO: Add autoselection of folders
       <% if params[:project_ids] && resource && resource.new_record? %>
       // Auto select projects from params if this is a new object
       <% params[:project_ids].each do |project_id| %>
@@ -245,5 +223,8 @@
         $j(this).prop('selectedIndex', 0); // Reset the select
       }
     })
+
+    
+    refreshFolders();
   });
 </script>

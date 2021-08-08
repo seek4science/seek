@@ -108,6 +108,26 @@ class ProjectFolder < ApplicationRecord
     end
   end
 
+  # Assigns the given folder to the asset
+  # TODO: It works if the folder link already exists
+  # TODO: I might have to remove the dest_folder_id, and instead create a folder based on this id first, and then just call "assign folder" with just the asset
+  def assign_folder(asset)
+    # We'll use "self" instead of dest_folder as a param
+    # dest_folder = ProjectFolder.find(dest_folder_id)
+    # Check that the asset and folder correspond to the same project
+    if (asset.project_ids.include? self.project_id)
+      # Find the link for the given asset in that project
+      link = ProjectFolderAsset.select{|pfa| pfa.asset_id==asset.id && pfa.project_folder.try(:project_id)==self.project_id}.first
+      if link.nil?
+        # no link exists yet, create one
+        link = ProjectFolderAsset.new :asset=>asset,:project_folder=>self
+      else
+        link.project_folder=self
+      end
+      link.save!
+    end
+  end
+
   #temporary method to destroy folders for a project, useful whilst developing
   def self.nuke project
     folders = ProjectFolder.where(project_id: project.id)
