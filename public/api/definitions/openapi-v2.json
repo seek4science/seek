@@ -9511,6 +9511,9 @@
                                 },
                                 "events": {
                                     "$ref": "#/definitions/eventReferencesList"
+                                },
+                                "workflows": {
+                                    "$ref": "#/definitions/workflowReferencesList"
                                 }
                             },
                             "required": [
