@@ -436,17 +436,6 @@ class DataFilesController < ApplicationController
     # check the datafile can be saved, and also the content blob can be saved
     all_valid = all_valid && @data_file.save && blob.save
 
-    # assign each folder id
-    params[:data_file][:folder_ids].each do |folder_id|
-      # TODO: Add check for int and not empty
-      # TODO: Call the project folder assign_folder function
-      folder_id = Integer(folder_id) rescue nil
-      unless folder_id.nil?
-        puts "assigning folderid: " + folder_id.to_s
-        dest_folder = ProjectFolder.find(folder_id)
-        dest_folder.assign_folder(@data_file)
-      end
-    end
 
     if all_valid
 
