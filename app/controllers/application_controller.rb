@@ -619,14 +619,16 @@ class ApplicationController < ActionController::Base
   end
   
   def register_folder_tree
-    object = object_for_request
-    # assign each folder id
-    folder_params.each do |folder_id|
-      folder_id = Integer(folder_id) rescue nil
-      unless folder_id.nil?
-        puts "assigning folderid: " + folder_id.to_s
-        dest_folder = ProjectFolder.find(folder_id)
-        dest_folder.assign_folder(object)
+    if respond_to?(:folder_params)
+      object = object_for_request
+      # assign each folder id
+      folder_params.each do |folder_id|
+        folder_id = Integer(folder_id) rescue nil
+        unless folder_id.nil?
+          # puts "assigning folderid: " + folder_id.to_s
+          dest_folder = ProjectFolder.find(folder_id)
+          dest_folder.assign_folder(object)
+        end
       end
     end
   end
