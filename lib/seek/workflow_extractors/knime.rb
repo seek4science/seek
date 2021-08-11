@@ -15,6 +15,7 @@ module Seek
         if title.present?
           metadata[:title] = title.to_s
         else
+          metadata[:warnings] ||= []
           metadata[:warnings] << 'Unable to determine title of workflow'
         end
 
