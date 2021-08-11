@@ -119,6 +119,14 @@
             "type": "events"
           }
         ]
+      },
+      "workflows": {
+        "data": [
+          {
+            "id": "1022250817",
+            "type": "workflows"
+          }
+        ]
       }
     },
     "links": {

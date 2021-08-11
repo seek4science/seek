@@ -11,17 +11,15 @@ module Seek
         knime = LibXML::XML::Parser.string(knime_string).parse
         knime.root.namespaces.default_prefix = 'k'
 
-        title = knime.find('/k:config/k:entry[not(@isnull="true")][@key="name"]/@value').first.value
-        if !title.nil?
+        title = knime.find('/k:config/k:entry[not(@isnull="true")][@key="name"]/@value').first&.value
+        if title.present?
           metadata[:title] = title.to_s
         else
-          metadata[:title] = "missing_title"
-          metadata[:warnings] = 'Unable to determine title of workflow'
+          metadata[:warnings] << 'Unable to determine title of workflow'
         end
-        description = knime.find('/k:config/k:entry[not(@isnull="true")][@key="customDescription"]/@value').first.value
-        if !description.nil?
-          metadata[:description] = description
-        end
+
+        description = knime.find('/k:config/k:entry[not(@isnull="true")][@key="customDescription"]/@value').first&.value
+        metadata[:description] = description if description.present?
 
         metadata
       end

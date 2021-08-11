@@ -13,15 +13,15 @@ module Scrapers
         # Add everything from the Git repository to the RO-Crate, except main workflow which is added later.
         main_wf_path = workflow_meta['primaryDescriptorPath'].sub(/\A\.?\//, '')
         Dir.glob('**/*', File::FNM_DOTMATCH).each do |path| # Include things beginning with . except .git, . and ..
-        next if ['.git', '.', '..', main_wf_path].include?(path)
-        next if path.end_with?('/.')
-        next if path.start_with?('.git/')
-        if File.directory?(path)
-          crate.add_directory(path, path)
-        else
-          f = crate.add_file(path, path)
-          f.content_size = File.size(path)
-        end
+          next if ['.git', '.', '..', main_wf_path].include?(path)
+          next if path.end_with?('/.')
+          next if path.start_with?('.git/')
+          if File.directory?(path)
+            crate.add_directory(path, path)
+          else
+            f = crate.add_file(path, path)
+            f.content_size = File.size(path)
+          end
         end
 
         # Add main workflow and metadata from workflow extractor & .dockstore.yml
@@ -32,7 +32,8 @@ module Scrapers
 
         # Set crate metadata
         crate.main_workflow = main_wf
-        crate.name = "#{workflow_meta['name']} (#{git.describe(nil, tags: true, abbrev: 0)})"
+        repo_name = Pathname.new(dir).basename
+        crate.name = "#{repo_name}/#{workflow_meta['name']} (#{git.describe(nil, tags: true, abbrev: 0)})"
 
         crate
       end
