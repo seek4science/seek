@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/seek4science/seek.svg?branch=master)](https://travis-ci.org/seek4science/seek)
 
-# SEEK
+# FAIRDOM-SEEK
 
 ## License
 
@@ -8,28 +8,28 @@ Copyright © 2009-2021, University of Manchester and HITS gGmbH
 
 [BSD 3-clause](BSD-LICENSE)
 
-## About SEEK
+## About FAIRDOM-SEEK
 
-The SEEK platform is a web-based resource for sharing heterogeneous scientific research datasets,models or simulations, processes and research outcomes. It preserves associations between them, along with information about the people and organisations involved.
+The FAIRDOM-SEEK platform is a web-based resource for sharing heterogeneous scientific research datasets,models or simulations, processes and research outcomes. It preserves associations between them, along with information about the people and organisations involved.
 Underpinning SEEK is the ISA infrastructure, a standard format for describing how individual experiments are aggregated into wider studies and investigations. Within SEEK, ISA has been extended and is configurable to allow the structure to be used outside of Biology.
 
-SEEK is incorporating semantic technology allowing sophisticated queries over the data, yet without getting in the way of your users.
+FAIRDOM-SEEK is incorporating semantic technology allowing sophisticated queries over the data, yet without getting in the way of your users.
 
-For an example of SEEK please visit our [Demo](http://demo.seek4science.org/).
+For an example of FAIRDOM-SEEK please visit our [Demo](http://demo.seek4science.org/).
 
-To see SEEK being used for real science, as part of [FAIRDOM](http://fair-dom.org) please visit [FAIRDOM SEEK](http://fairdomhub.org)
+To see FAIRDOM-SEEK being used for real science, as part of [FAIRDOM](http://fair-dom.org) please visit [FAIRDOMHub](http://fairdomhub.org)
 
 For more information please visit: [SEEK for Science](http://www.seek4science.org/)
 
 ## FAIRDOM
 
-SEEK is being developed and funded as part of the FAIRDOM initiative.
+FAIRDOM-SEEK is being developed and funded as part of the FAIRDOM initiative.
 For more information please visit: [FAIRDOM](http://fair-dom.org).
 
 
 ## Installation
 
-We recommend installing SEEK on Debian or Ubuntu.
+We recommend installing FAIRDOM-SEEK on Debian or Ubuntu.
 
 To install the latest release please visit:
 [SEEK install guide](http://docs.seek4science.org/tech/install.html)
@@ -43,7 +43,7 @@ The documentation is available on the *ghpages* branch.
 
 For details about how to contact us, to raise bugs or offer suggestion, please visit [Contacting Us](http://docs.seek4science.org/contacting_us.html)
 
-## Contributing to SEEK
+## Contributing to FAIRDOM-SEEK
 
 In general :
 
