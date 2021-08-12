@@ -1,13 +1,4 @@
 GIT
-  remote: https://github.com/ResearchObject/ro-crate-ruby.git
-  revision: 70804d34264481e70d0fe83ecc6ad76eda164e74
-  ref: 70804d34264481e70d0fe83ecc6ad76eda164e74
-  specs:
-    ro-crate-ruby (0.3.0)
-      addressable
-      rubyzip
-
-GIT
   remote: https://github.com/SysMO-DB/bioportal.git
   revision: 0f80b4281af3f71234a425d40981b1185a3e5d0b
   specs:
@@ -621,6 +612,9 @@ GEM
       json (>= 2.3.0)
       ucf (~> 2.0.2)
       uuid (~> 2.3)
+    ro-crate (0.4.11)
+      addressable (~> 2.7.0)
+      rubyzip (~> 2.0.0)
     rsolr (2.3.0)
       builder (>= 2.1.2)
       faraday (>= 0.9.0)
@@ -655,7 +649,7 @@ GEM
     ruby-prof (1.4.2)
     ruby-progressbar (1.10.1)
     rubyntlm (0.3.4)
-    rubyzip (1.3.0)
+    rubyzip (2.0.0)
     sample-template-generator (0.6.0)
       rdoc (~> 6.0)
       terrapin (~> 0.6)
@@ -794,8 +788,8 @@ GEM
       rails (>= 3.0)
       rake (>= 0.8.7)
     yard (0.9.25)
-    zip-container (4.0.1)
-      rubyzip (~> 1.3.0)
+    zip-container (4.0.2)
+      rubyzip (~> 2.0.0)
 
 PLATFORMS
   ruby
@@ -900,7 +894,7 @@ DEPENDENCIES
   rfc-822
   rmagick (= 2.15.2)
   ro-bundle (~> 0.2.5)
-  ro-crate-ruby!
+  ro-crate (~> 0.4.9)
   rspec-rails (~> 3.6)
   rubocop
   ruby-prof

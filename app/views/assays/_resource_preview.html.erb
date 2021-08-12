@@ -16,8 +16,9 @@
 
   <%= list_item_authorized_list([resource.study], t('study'), false, 50, true ) %>
 
-  <%= list_item_authorized_list(resource.models, t('model').pluralize, true, 50, true) if resource.is_modelling? %>
-
+  <% if Seek::Config.models_enabled %>
+    <%= list_item_authorized_list(resource.models, t('model').pluralize, true, 50, true) if resource.is_modelling? %>
+  <% end %>
 
   <%= list_item_attribute t('contributor').capitalize, resource.contributor.name, resource.contributor %>
 
@@ -30,7 +31,11 @@
     <%= list_item_simple_list(resource.assay_human_diseases, "Human Disease") { |ao| assay_human_disease_list_item(ao) } %>
   <% end %>
 
-  <%= list_item_authorized_list resource.sops, t('sop').pluralize, true, 50, true %>
+  <% if Seek::Config.sops_enabled %>
+    <%= list_item_authorized_list resource.sops, t('sop').pluralize, true, 50, true %>
+  <% end %>
 
-  <%= list_item_authorized_list resource.data_files, t('data_file').pluralize, true, 50, true %>
+  <% if Seek::Config.data_files_enabled %>
+    <%= list_item_authorized_list resource.data_files, t('data_file').pluralize, true, 50, true %>
+  <% end %>
 

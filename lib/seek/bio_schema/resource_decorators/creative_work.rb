@@ -12,6 +12,7 @@ module Seek
                         date_modified: :dateModified,
                         content_type: :encodingFormat,
                         subject_of: :subjectOf,
+                        provider: :sdPublisher,
                         previous_version_url: :isBasedOn
 
         def content_type
@@ -26,7 +27,7 @@ module Seek
 
         def all_creators
           others = other_creators&.split(',')&.collect(&:strip)&.compact || []
-          others = others.collect { |name| { "@type": 'Person', "name": name } }
+          others = others.collect { |name| { "@type": 'Person', "@id": "##{ROCrate::Entity.format_id(name)}", "name": name } }
           all = (mini_definitions(creators) || []) + others
           return if all.empty?
           all

@@ -132,7 +132,7 @@ gem 'request_store'
 
 gem 'bundler', '>= 1.8.4'
 
-gem 'ro-crate-ruby', git: 'https://github.com/ResearchObject/ro-crate-ruby.git', ref: '70804d34264481e70d0fe83ecc6ad76eda164e74'
+gem 'ro-crate', '~> 0.4.9'
 
 gem 'git'
 gem 'redcarpet'

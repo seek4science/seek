@@ -59,10 +59,6 @@ ActiveRecord::FixtureSet.create_fixtures(File.join(Rails.root, "config/default_d
 
 puts "Seeded assay classes"
 
-ActiveRecord::FixtureSet.create_fixtures(File.join(Rails.root, "config/default_data"), "workflow_classes")
-
-puts "Seeded workflow classes"
-
 File.open('config/default_data/expertise.list').each do |item|
   unless item.blank?
     item=item.chomp

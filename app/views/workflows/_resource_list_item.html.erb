@@ -1,4 +1,12 @@
-<p><%= maturity_badge(resource.maturity_level) if resource.maturity_level %></p>
+<div>
+  <% if resource.maturity_level %>
+    <%= maturity_badge(resource.maturity_level) %>
+  <% end %>
+
+  <% if resource.test_status %>
+    <%= test_status_badge(resource.test_status) %>
+  <% end %>
+</div>
 
 <%= list_item_description resource.description %>
 

@@ -1967,6 +1967,12 @@ ActiveRecord::Schema.define(version: 2021_08_10_211320) do
     t.string "key"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string "extractor"
+    t.bigint "contributor_id"
+    t.string "alternate_name"
+    t.text "identifier"
+    t.text "url"
+    t.index ["contributor_id"], name: "index_workflow_classes_on_contributor_id"
   end
 
   create_table "workflow_versions", id: :integer,  force: :cascade do |t|
@@ -1990,6 +1996,8 @@ ActiveRecord::Schema.define(version: 2021_08_10_211320) do
     t.integer "workflow_class_id"
     t.integer "maturity_level"
     t.integer "visibility"
+    t.boolean "monitored"
+    t.integer "test_status"
     t.index ["contributor_id"], name: "index_workflow_versions_on_contributor"
     t.index ["workflow_id"], name: "index_workflow_versions_on_workflow_id"
   end
@@ -2012,6 +2020,7 @@ ActiveRecord::Schema.define(version: 2021_08_10_211320) do
     t.text "metadata"
     t.integer "workflow_class_id"
     t.integer "maturity_level"
+    t.integer "test_status"
     t.index ["contributor_id"], name: "index_workflows_on_contributor"
   end
 

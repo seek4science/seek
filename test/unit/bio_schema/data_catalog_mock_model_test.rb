@@ -32,9 +32,10 @@ class DataCatalogMockModelTest < ActiveSupport::TestCase
     with_config_value(:dm_project_name, 'WIBBLE') do
       with_config_value(:dm_project_link, 'http://wibble.eu') do
         expected = {
-          '@type' => 'Organization',
-          'name' => 'WIBBLE',
-          'url' => 'http://wibble.eu'
+          "@type"=>"Organization",
+          "@id"=>"http://wibble.eu",
+          "name"=>"WIBBLE",
+          "url"=>"http://wibble.eu"
         }
         assert_equal expected, @data_catalogue.provider
       end

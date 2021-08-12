@@ -114,11 +114,15 @@ en:
   null_license: 'No license - no permission to use unless the owner grants a licence'
 
   activerecord:
+    models:
+      workflow_class: Workflow Type
     attributes:
       person:
         title: "Full name"
       collection:
         creators: 'Maintainers'
+      workflow_class:
+        url: URL
 
   activemodel:
     attributes:
@@ -131,6 +135,11 @@ en:
   maturity_level:
     released: 'Stable'
     work_in_progress: 'Work-in-progress'
+  test_status:
+    all_passing: 'Passing'
+    some_passing: 'Some failures'
+    all_failing: 'All failing'
+    not_available: 'Not available'
 
   about_project: "You need to be a member of a <strong>%{project}</strong> before you can register content.
     A %{project} can contain one or more people, and gives some additional background details, and credit, about the content being registered. It can be used to describe and promote

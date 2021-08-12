@@ -13,6 +13,7 @@ namespace :seek do
     delete_redundant_jobs
     set_version_visibility
     remove_old_project_join_logs
+    db:seed:workflow_classes
     fix_negative_programme_role_mask
     db:seed:007_sample_attribute_types
     db:seed:008_miappe_custom_metadata

@@ -1,0 +1,53 @@
+<table class="table table-hover">
+  <thead>
+  <tr>
+    <th>Title</th>
+    <th>Identifier</th>
+    <th>URL</th>
+    <th># Workflows</th>
+    <th>Contributor</th>
+    <th></th>
+  </tr>
+  </thead>
+  <tbody>
+  <% workflow_classes.each do |wc| %>
+    <tr>
+      <td>
+        <%= wc.title -%>
+        <% if wc.alternate_name.present? %>
+          <span class="subtle">(<%= wc.alternate_name -%>)</span>
+        <% end %>
+      </td>
+      <td>
+        <% if wc.identifier.present? %>
+          <%= link_to wc.identifier, wc.identifier, target: :_blank -%>
+        <% else %>
+          <span class="none_text">Not specified</span>
+        <% end %>
+      </td>
+      <td>
+        <% if wc.url.present? %>
+          <%= link_to wc.url, wc.url, target: :_blank -%>
+        <% else %>
+          <span class="none_text">Not specified</span>
+        <% end %>
+      </td>
+      <td><%= wc.workflows.count -%></td>
+      <td>
+        <% if wc.contributor %>
+          <%= link_to wc.contributor.name, wc.contributor -%>
+        <% end %>
+      </td>
+      <td>
+        <% if wc.can_edit? %>
+          <%= button_link_to('Edit', 'edit', edit_workflow_class_path(wc), class: 'btn-xs') -%>
+        <%end %>
+        <% if wc.can_delete? %>
+          <%= button_link_to('Delete', 'destroy', workflow_class_path(wc), class: 'btn-xs', method: :delete,
+                             data: { confirm: "Are you sure you wish to delete this type?" }) -%>
+        <%end %>
+      </td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
