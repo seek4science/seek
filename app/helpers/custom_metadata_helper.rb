@@ -32,3 +32,10 @@ module CustomMetadataHelper
     end
   end
 end
+
+def custom_metadata_attribute_description(description)
+  html = '<p class="help-block">'
+  html += '<small>'+description+'</small>'
+  html += '</p>'
+  html.html_safe
+end
