@@ -9223,6 +9223,9 @@
                                 },
                                 "programmes": {
                                     "$ref": "#/definitions/programmeReferencesList"
+                                },
+                                "workflows": {
+                                    "$ref": "#/definitions/workflowReferencesList"
                                 }
                             },
                             "required": [
@@ -9508,6 +9511,9 @@
                                 },
                                 "events": {
                                     "$ref": "#/definitions/eventReferencesList"
+                                },
+                                "workflows": {
+                                    "$ref": "#/definitions/workflowReferencesList"
                                 }
                             },
                             "required": [

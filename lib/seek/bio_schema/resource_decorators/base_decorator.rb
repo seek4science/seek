@@ -5,6 +5,7 @@ module Seek
       # The Decorator is an extension to the resource that provided or alters the properties of that resource
       # for Schema.org (Bioschemas.org)
       class BaseDecorator
+          
         include ActionView::Helpers::SanitizeHelper
         include Rails.application.routes.url_helpers
 
@@ -26,7 +27,7 @@ module Seek
 
         # The @context to be used for the JSON-LD
         def context
-          'http://schema.org'
+          Seek::BioSchema::Serializer::SCHEMA_ORG
         end
 
         # The schema.org @type .

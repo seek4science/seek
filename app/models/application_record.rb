@@ -151,4 +151,14 @@ class ApplicationRecord < ActiveRecord::Base
   has_filter query: Seek::Filtering::SearchFilter.new
   has_filter created_at: Seek::Filtering::DateFilter.new(field: :created_at,
                                                          presets: [24.hours, 1.week, 1.month, 1.year, 5.years])
+
+  def self.feature_enabled?
+    method = "#{name.underscore.pluralize}_enabled"
+    !Seek::Config.respond_to?(method) || Seek::Config.send(method)
+  end
+
+  # TODO: Decide what this should actually do, since it doesn't check user roles etc.
+  def self.user_creatable?
+    false
+  end
 end

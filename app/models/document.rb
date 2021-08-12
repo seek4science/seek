@@ -50,8 +50,4 @@ class Document < ApplicationRecord
   def use_mime_type_for_avatar?
     true
   end
-
-  def self.user_creatable?
-    Seek::Config.documents_enabled
-  end
 end

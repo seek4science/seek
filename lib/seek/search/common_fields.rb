@@ -24,6 +24,9 @@ module Seek
               text :projects do
                 projects.collect(&:title) if respond_to?(:projects)
               end
+              text :programmes do
+                programmes.collect(&:title) if respond_to?(:programmes)
+              end
 
               text :external_asset do
                 external_asset_search_terms if respond_to?(:external_asset_search_terms)

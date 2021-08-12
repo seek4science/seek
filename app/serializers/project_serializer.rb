@@ -44,6 +44,7 @@ class ProjectSerializer < AvatarObjSerializer
   has_many :presentations
   has_many :events
   has_many :documents
+  has_many :workflows
 
   def show_default_policy?
     has_default_policy = !object.default_policy.nil?
