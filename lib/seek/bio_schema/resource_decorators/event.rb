@@ -7,16 +7,20 @@ module Seek
         EVENT_PROFILE = 'https://bioschemas.org/profiles/Event/0.2-DRAFT-2019_06_14/'
 
         associated_items contact: :contributors,
-                         host_institution: :projects
+                         host_institution: :projects,
+                         all_assets: :about_assets
+        
         schema_mappings contact: :contact,
                         start_date: :startDate,
                         end_date: :endDate,
                         event_type: :eventType,
                         location: :location,
                         host_institution: :hostInstitution,
-                        conformsTo: "dct:conformsTo"
+                        all_assets: :about,
+                        created_at: :dateCreated,
+                        updated_at: :dateModified
 
-        def conformsTo
+        def conformance
           EVENT_PROFILE
         end
         
@@ -25,6 +29,10 @@ module Seek
           [contributor]
         end
 
+        def datafiles2
+          data_files
+        end
+        
         def end_date
           if (end_date = resource.end_date).blank?
             resource.start_date
@@ -43,6 +51,10 @@ module Seek
 
         def country
           CountryCodes.country(resource.country)
+        end
+
+        def about_assets
+          data_files + documents + presentations + publications
         end
       end
     end

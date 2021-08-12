@@ -37,11 +37,11 @@ module Seek
         end
 
         def inputs
-          formal_parameters(resource.inputs)
+          formal_parameters(resource.inputs, 'inputs')
         end
 
         def outputs
-          formal_parameters(resource.outputs)
+          formal_parameters(resource.outputs, 'outputs')
         end
 
         def license

@@ -4,6 +4,7 @@ module Seek
       # Decorator that provides extensions for a DataCatalogue
       class DataCatalog < Thing
         schema_mappings date_created: :dateCreated,
+                        date_modified: :dateModified,
                         provider: :provider
 
         def rdf_resource

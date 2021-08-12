@@ -16,7 +16,7 @@ module Seek
         repr = {
           '@context' => resource_decorator.context,
           '@type' => resource_decorator.schema_type
-        }.merge(attributes_json)
+       }
         if (resource_decorator.respond_to? 'conformance')
           repr['dct:conformsTo'] = resource_decorator.conformance
         end
@@ -36,7 +36,6 @@ module Seek
 
       # test directly (without initializing) whether a resource is supported
       def self.supported?(resource)
-        puts('testing ' + resource.class.name)
         supported_types.include?(resource.class)
       end
 
@@ -49,8 +48,9 @@ module Seek
       private
 
       SUPPORTED_TYPES = [Person, Project, Event, DataFile, Organism, HumanDisease,
-                         Seek::BioSchema::DataCatalogMockModel, Sample,
-                         Document, Presentation, Workflow, Collection].freeze
+                         Seek::BioSchema::DataCatalogMockModel,
+                         Document, Presentation, Workflow, Collection,
+                         Institution, Programme].freeze
 
       def resource_decorator
         @decorator ||= ResourceDecorators::Factory.instance.get(resource)
