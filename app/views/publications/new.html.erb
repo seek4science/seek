@@ -27,8 +27,8 @@
             <span id="publication_type_info" style="display:none;"></span>
              <span id="publication_type_selection">
               <%= collection_select :publication, :publication_type_id, PublicationType.order(:title), :id, :title,
-                              {:include_blank => "Publication type"},
-                              {:class => 'form-control'} -%>
+                                    {:selected => PublicationType.Journal.id},
+                              {:class => 'form-control'}  -%>
       </span>
           </div>
         </div>
@@ -76,7 +76,7 @@
         <span id="publication_type_info" style="display:none;"></span>
         <span id="publication_type_selection">
         <%= collection_select :publication, :publication_type_id, PublicationType.order(:title), :id, :title,
-                              {:include_blank => "Publication type"},
+                              {:selected => PublicationType.Journal.id},
                               {:class => 'form-control'} -%>
       </span>
       </div>

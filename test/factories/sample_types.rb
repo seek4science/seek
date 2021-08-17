@@ -87,6 +87,13 @@ Factory.define(:linked_optional_sample_type, parent: :sample_type) do |f|
   end
 end
 
+Factory.define(:multi_linked_sample_type, parent: :sample_type) do |f|
+  f.sequence(:title) { |n| "multi linked sample type #{n}" }
+  f.after_build do |type|
+    type.sample_attributes << Factory.build(:sample_attribute, title: 'title', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, is_title: true, sample_type: type)
+    type.sample_attributes << Factory.build(:sample_multi_sample_attribute, title: 'patient', linked_sample_type: Factory(:patient_sample_type,projects:type.projects,contributor:type.contributor), required: true, sample_type: type)
+  end
+end
 
 Factory.define(:min_sample_type, parent: :sample_type) do |f|
   f.title 'A Minimal SampleType'

@@ -47,7 +47,7 @@ function check_mysql {
 function enable_search {
     if [ ! -f config/initializers/seek_local.rb ]
     then
-        cp docker/seek_local.rb config/initializers/seek_local.rb
+        cp docker/seek_local_search_enabled.rb config/initializers/seek_local_search_enabled.rb
     fi
 }
 
@@ -56,13 +56,13 @@ function start_soffice {
     soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard &
 }
 
-function start_or_setup_search {
+function start_search {
     if [ ! -z $SOLR_PORT ]
     then
       echo "USING SOLR CONTAINER"
+      enable_search
       cp docker/sunspot.docker.yml config/sunspot.yml
     else
-      echo "STARTING SOLR"
-      bundle exec rake sunspot:solr:start
+      echo "SINGLE CONTAINER SO SOLR IS DISABLED BY DEFAULT"      
     fi
 }

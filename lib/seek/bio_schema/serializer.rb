@@ -21,7 +21,7 @@ module Seek
         }.merge(attributes_json)
         repr.deep_stringify_keys
       end
-      
+
       # returns the JSON-LD as a String, for the resource
       def json_ld
         JSON.pretty_generate(json_representation)

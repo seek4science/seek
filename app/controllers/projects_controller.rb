@@ -339,7 +339,7 @@ class ProjectsController < ApplicationController
   def create
     @project = Project.new
     @project.assign_attributes(project_params)
-    @project.build_default_policy.set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
+    @project.build_default_policy.set_attributes_with_sharing(policy_params) if params[:policy_attributes]
 
     respond_to do |format|
       if @project.save
@@ -378,7 +378,7 @@ class ProjectsController < ApplicationController
   # PUT /projects/1.xml
   def update
     if @project.can_manage?(current_user)
-      @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing(params[:policy_attributes]) if params[:policy_attributes]
+      @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing(policy_params) if params[:policy_attributes]
     end
 
     begin

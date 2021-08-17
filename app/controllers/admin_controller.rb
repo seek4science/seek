@@ -134,8 +134,8 @@ class AdminController < ApplicationController
     Seek::Config.nels_enabled = string_to_boolean(params[:nels_enabled])
     Seek::Config.nels_client_id = params[:nels_client_id]&.strip
     Seek::Config.nels_client_secret = params[:nels_client_secret]&.strip
-    Seek::Config.nels_api_url&.strip&.chomp('/')
-    Seek::Config.nels_oauth_url&.strip&.chomp('/')
+    Seek::Config.nels_api_url = params[:nels_api_url]&.strip&.chomp('/')
+    Seek::Config.nels_oauth_url = params[:nels_oauth_url]&.strip&.chomp('/')
     Seek::Config.nels_permalink_base = params[:nels_permalink_base]&.strip
 
     Seek::Config.life_monitor_enabled = string_to_boolean(params[:life_monitor_enabled])

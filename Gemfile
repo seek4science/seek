@@ -21,8 +21,7 @@ gem 'rmagick', '2.15.2'
 gem 'rest-client', '~>2.0'
 gem 'factory_girl', '2.6.4'
 gem 'bio', '~> 1.5.1'
-gem 'sunspot_rails', '~>2.2.7'
-gem 'sunspot_solr', '~>2.2.0'
+gem 'sunspot_rails'
 gem 'progress_bar'
 gem 'savon', '1.1.0'
 gem 'dynamic_form'
@@ -141,6 +140,7 @@ gem 'rugged'
 gem 'redcarpet'
 gem 'i18n-js'
 gem 'whenever', '~> 1.0.0', require: false
+gem 'dotenv-rails', '~> 2.7.6'
 
 group :production do
   gem 'passenger'
