@@ -583,20 +583,25 @@ class PeopleControllerTest < ActionController::TestCase
     assert_equal 'fred1', assigns(:person).first_name
   end
 
-  test 'if not admin login should not show the registered date for this person' do
-    login_as(:aaron)
+  test 'should show joined date to non admin, and include time for admin' do
+    login_as(Factory(:person))
     a_person = Factory(:person)
     get :show, params: { id: a_person }
     assert_response :success
-    assert_select 'p', text: /#{date_as_string(a_person.user.created_at)}/, count: 0
+    assert_select 'p', text: /#{date_as_string(a_person.user.created_at)}/, count: 1
+    assert_select 'p', text: /#{date_as_string(a_person.user.created_at, true)}/, count: 0
 
-    get :index
+    login_as(Factory(:admin))
+    get :show, params: { id: a_person }
     assert_response :success
-    assigns(:people).each do |person|
-      unless person.try(:user).try(:created_at).nil?
-        assert_select 'p', text: /#{date_as_string(person.user.created_at)}/, count: 0
-      end
-    end
+    assert_select 'p', text: /#{date_as_string(a_person.user.created_at)}/, count: 1
+    assert_select 'p', text: /#{date_as_string(a_person.user.created_at, true)}/, count: 1
+
+    logout
+    get :show, params: { id: a_person }
+    assert_response :success
+    assert_select 'p', text: /#{date_as_string(a_person.user.created_at)}/, count: 1
+    assert_select 'p', text: /#{date_as_string(a_person.user.created_at, true)}/, count: 0
   end
 
   test 'should have gatekeeper role on person show page' do
