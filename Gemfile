@@ -138,6 +138,7 @@ gem 'git'
 gem 'redcarpet'
 gem 'i18n-js'
 gem 'whenever', '~> 1.0.0', require: false
+gem 'dotenv-rails', '~> 2.7.6'
 
 group :production do
   gem 'passenger'
