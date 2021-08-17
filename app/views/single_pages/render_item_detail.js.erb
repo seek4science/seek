@@ -1,0 +1,25 @@
+$j("*[id*=-related-items]").empty();
+$j("*[id*=-details]").empty();
+ 
+<% if @study %>
+   $j("#study-related-items").html("<%= escape_javascript(render partial: 'general/items_related_to', object: @study ) %>");
+   $j("#study-details").html("<%= escape_javascript(render partial: 'studies/show', locals: { single_page: true }) %>");
+<% elsif @investigation %>
+   $j("#investigation-related-items").html("<%= escape_javascript(render partial: 'general/items_related_to', object: @investigation ) %>");
+   $j("#investigation-details").html("<%= escape_javascript(render partial: 'investigations/show', locals: { single_page: true }) %>");
+<% elsif @assay %>
+   <% if @sop %>
+      $j("#sop-related-items").html("<%= escape_javascript(render partial: 'general/items_related_to', object: @sop ) %>");
+      $j("#sop-details").html("<%= escape_javascript(render partial: 'sops/show', locals: { single_page: true }) %>");
+   <% elsif @data_file %>
+      $j("#data_file-related-items").html("<%= escape_javascript(render partial: 'general/items_related_to', object: @data_file ) %>");
+      $j("#data_file-details").html("<%= escape_javascript(render partial: 'data_files/show', locals: { single_page: true }) %>");
+   <% elsif @document %>
+      $j("#document-related-items").html("<%= escape_javascript(render partial: 'general/items_related_to', object: @document ) %>");
+      $j("#document-details").html("<%= escape_javascript(render partial: 'documents/show', locals: { single_page: true }) %>");
+   <% else %>
+      $j("#assay-related-items").html("<%= escape_javascript(render partial: 'general/items_related_to', object: @assay ) %>");
+      $j("#assay-details").html("<%= escape_javascript(render partial: 'assays/show', locals: { single_page: true }) %>");
+      $j("#samples-details").html("<%= escape_javascript(render partial: 'general/index_facets_or_paged', locals: { items: @assay.samples, single_page: true }) %>");
+   <% end %>
+<% end %>

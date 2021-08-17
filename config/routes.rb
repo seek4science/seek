@@ -681,6 +681,14 @@ SEEK::Application.routes.draw do
     end
   end
 
+   ### SINGLE PAGE
+
+  resources :single_pages do
+    member do
+      get "/render_item_detail/:id/type/:type" => "single_pages#render_item_detail"
+    end
+  end
+
   ### ASSAY AND TECHNOLOGY TYPES ###
 
   get '/assay_types/', to: 'assay_types#show', as: 'assay_types'

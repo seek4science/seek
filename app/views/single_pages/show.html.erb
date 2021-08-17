@@ -1,0 +1,115 @@
+<%= javascript_include_tag "single_page/index" %>
+<%= javascript_include_tag "project_folders" %>
+<%
+    default_folder = initial_folder(@project)
+%>
+<div class="show_basic single-page-folder">
+    <div class="row">
+        <div class="col-md-4">
+            <div id="folder_column">
+                <div id="folders">
+                    <ul class="bcrumb">
+                    <li><a class="active" href="#"><span>Project</span></a></li>
+                    <li ><a href="#"><span>Investigation</span></a></li>
+                    <li ><a href="#"><span>Study</span></a></li>
+                    <li ><a href="#"><span>Assay</span></a></li>
+                    </ul>
+                    <div id="demo_tree" class="new-design"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div id="container" style="position:relative" class="tv">
+                <div id="loader"></div>
+                <div id="project_contents" class="row">
+                    <div class="col-lg-8">
+                        <div class="simpleForm">
+                            <%= render :partial => "project_details" -%>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @project } -%>
+                        <% if @project.can_manage? %>
+                        <%= render :partial => 'general/storage_usage_box', locals: { programme: @project,
+                            url: storage_report_project_path(@project)} %>
+                        <% end %>
+                    </div>
+                </div>
+                <div id="folder_contents" class="row" style="display:none">
+                     <%= render :partial => "folders/contents", :locals => {:folder => default_folder } -%>
+                </div>
+                <div id="investigation_contents" class="row" style="display:none">
+                    <%= render :partial => "investigation" -%>
+                </div>
+                <div id="study_contents" class="row" style="display:none">
+                    <%= render :partial => "study" -%>
+                </div>
+                <div id="assay_contents" class="row" style="display:none">
+                    <%= render :partial => "assay" -%>
+                </div>
+                <div id="sample_contents" class="row" style="display:none">
+                    <%= render :partial => "sample" -%>
+                </div>
+                <div id="sop_contents" class="row" style="display:none">
+                    <%= render :partial => "sop" -%>
+                </div>
+                <div id="data_file_contents" class="row" style="display:none">
+                    <%= render :partial => "data_file" -%>
+                </div>
+                <div id="document_contents" class="row" style="display:none">
+                    <%= render :partial => "document" -%>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="provide-metadata-content">
+     </div>
+
+    <div class="modal" tabindex="-1" role="dialog" id="data-file-modal-inv">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <%= render :partial=>"investigations/new" %>
+                    <div class="row" style="padding:15px">
+                        <a id="submit_investigation" type="button" onclick="submitInvestigation()" class="btn btn-primary">Create</a>
+                        &nbsp;
+                        <a type="button" class="btn btn-default">Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" tabindex="-1" role="dialog" id="data-file-modal-std">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <%= render :partial=>"studies/new" %>
+                    <div class="row" style="padding:15px">
+                        <a id="submit_study" type="button" onclick="submitStudy()" class="btn btn-primary">Create</a>
+                        &nbsp;
+                        <a type="button" class="btn btn-default">Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        var selectedItem = {type:"",id:""}, pid, uid
+        $j(document).ready(function() {
+            setupFoldersTree( <%= ((TreeviewBuilder.new(@project, @folders)).build_tree_data).html_safe -%> , 'demo_tree', 'draggable_folder_item');
+            $j(`#project_contents`).show();
+             pid = <%= @project.id %>
+             uid = <%= current_user.id if current_user %>
+
+            $j("a:contains('Cancel')").click(function (e) {
+                e.preventDefault();
+                $j("#data-file-modal-inv").modal("hide");
+                $j("#data-file-modal-std").modal("hide");
+            });
+        });
+        
+    </script>
