@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Test Docker Image Build
 
 on: [push, pull_request]
 
