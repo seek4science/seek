@@ -309,9 +309,15 @@ class ContentBlob < ApplicationRecord
 
   # cleans up any files converted to txt or pdf, if they exist
   def delete_converted_files
+    return unless self[:uuid].present?
     %w[pdf txt].each do |format|
       path = filepath(format)
       FileUtils.rm(path) if File.exist?(path)
     end
+  end
+
+  def delete_image_file
+    return unless self[:uuid].present?
+    super
   end
 end
