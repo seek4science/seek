@@ -1,0 +1,44 @@
+<p id="projectTitle">
+    <strong style="text-align: center;">Title:</strong> 
+    <span><%= @project.title %></span>
+</p>
+<p id="projectDes"> <strong>Description:</strong> <span ><%= @project.description %></span> </p>
+<div id="projectDetails">
+    <% if @project.respond_to?(:project_coordinators) %>
+    <p class="project_coordinators">
+        <strong>Project Coordinators:</strong>
+        <%= project_coordinators_link_list @project %>
+    </p>
+    <% end%>
+    <% if logged_in_and_registered? %>
+    <p class="project_administrators">
+        <strong><%= t('project_administrator').pluralize %>:</strong>
+        <%= project_administrator_link_list @project %>
+    </p>
+    <% end %>
+    <% if admin_logged_in? || @project.has_member?(current_user) %>
+    <p class="asset_housekeepers">
+        <strong><%= t('asset_housekeeper').pluralize %>:</strong>
+        <%= asset_housekeepers_link_list @project %>
+    </p>
+    <p class="asset_gatekeepers">
+        <strong><%= t('asset_gatekeeper').pluralize %>:</strong>
+        <%= gatekeepers_link_list @project %>
+    </p>
+    <% end %>
+    <p>
+        <% if @project.start_date %>
+        <strong><%= t('project') -%> start date:</strong>
+        <%= date_as_string(@project.start_date, false) -%>
+        <% else %>
+        <strong><%= t('project') -%> created:</strong>
+        <%= date_as_string(@project.created_at, false) %>
+        <% end %>
+    </p>
+    <% if @project.end_date %>
+    <p>
+        <strong><%= t('project') -%> end date:</strong>
+        <%= date_as_string(@project.end_date, false) -%>
+    </p>
+    <% end %>
+</div>

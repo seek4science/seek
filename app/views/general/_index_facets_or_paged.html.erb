@@ -1,10 +1,11 @@
+<% single_page ||= false %>
 <% items ||= instance_variable_get("@#{controller_name}") %>
 
 <% if items.any? %>
   <% if items.is_a?(Seek::GroupedPagination::Collection) %>
     <%= render partial: 'assets/resources_alphabetical_paginated', object: items %>
   <% else %>
-    <%= render partial: 'assets/resources_numerical_paginated', object: items %>
+    <%= render partial: 'assets/resources_numerical_paginated', object: items, locals: { single_page: single_page } %>
   <% end %>
 <% else %>
   <%= no_items_to_list_text %>

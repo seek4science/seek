@@ -1,5 +1,7 @@
+<% single_page ||=nil %>
+<% ctrl = single_page ? @asset_controller : controller_name %>
 <%= panel('Edit version', id: 'edit_version_form_'+"#{version.version}", style: 'display: none') do %>
-  <%= form_tag({ action: :edit_version, version: version.version }) do -%>
+  <%= form_tag({ controller: ctrl , action: :edit_version, version: version.version }) do -%>
     <div class="form-group">
       <label>Revision comments</label>
       <%= text_area_tag :revision_comments, version.revision_comments, size: '55x4', class: 'form-control' -%>

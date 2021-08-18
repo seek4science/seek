@@ -31,7 +31,7 @@ class FoldersControllerTest < ActionController::TestCase
       delete :destroy, params: { id: folder.id, project_id: @project.id }
     end
 
-    assert_redirected_to :project_folders
+    assert_redirected_to  Seek::Config.project_single_page_enabled ? single_page_path(@project) : :project_folders
     unsorted_folder.reload
     @project.reload
     assert_equal [unsorted_folder], ProjectFolder.where(project_id: @project.id).to_a
@@ -50,7 +50,7 @@ class FoldersControllerTest < ActionController::TestCase
       delete :destroy, params: { id: folder.id, project_id: @project.id }
     end
 
-    assert_redirected_to :project_folders
+    assert_redirected_to  Seek::Config.project_single_page_enabled ? single_page_path(@project) : :project_folders
     assert_not_nil flash[:error]
     unsorted_folder.reload
     folder.reload
