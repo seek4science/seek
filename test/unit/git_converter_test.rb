@@ -108,4 +108,31 @@ class GitConverterTest < ActiveSupport::TestCase
     assert workflow.latest_git_version.file_exists?('rp2-to-rp2path.cwl')
     assert_equal 'rp2-to-rp2path.cwl', workflow.latest_git_version.main_workflow_path
   end
+
+  test 'convert workflow that is a remote file' do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'https://www.abc.com/workflow.cwl'
+    workflow = Factory(:cwl_url_workflow)
+
+    converter = Seek::Git::Converter.new(workflow)
+
+    refute workflow.local_git_repository
+    refute workflow.latest_git_version
+
+    assert_difference('GitAnnotation.count', 2) do
+      assert_difference('GitRepository.count', 1) do
+        assert_difference('GitVersion.count', 1) do
+          converter.convert(unzip: true)
+        end
+      end
+    end
+
+    assert workflow.local_git_repository
+    assert_equal 1, workflow.git_versions.count
+    assert workflow.latest_git_version.file_exists?('rp2-to-rp2path.cwl')
+    assert_equal 'rp2-to-rp2path.cwl', workflow.latest_git_version.main_workflow_path
+    remote_sources = workflow.latest_git_version.find_git_annotations('remote_source')
+    assert_equal 1, remote_sources.length
+    assert_equal 'rp2-to-rp2path.cwl', remote_sources.first.path
+    assert_equal 'https://www.abc.com/workflow.cwl', remote_sources.first.value
+  end
 end

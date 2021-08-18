@@ -340,6 +340,7 @@ Factory.define(:cwl_packed_content_blob, parent: :content_blob) do |f|
 end
 
 Factory.define(:url_cwl_content_blob, parent: :content_blob) do |f|
+  f.original_filename 'rp2-to-rp2path.cwl'
   f.url 'https://www.abc.com/workflow.cwl'
   f.data nil
 end

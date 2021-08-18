@@ -18,7 +18,7 @@ module Seek
                                                    comment: version.revision_comments,
                                                    created_at: version.created_at)
             git_version.resource_attributes = version.attributes.slice(asset.class.versioned_columns)
-            path_io_pairs = []
+            path_io_url_triples = []
             version.all_content_blobs.map do |blob|
               if unzip && blob.original_filename.end_with?('.zip')
                 blob_dir = File.join(tmp_dir, "blob_#{blob.id}")
@@ -32,18 +32,27 @@ module Seek
                     files.delete('ro-crate-metadata.jsonld')
                     files.delete('ro-crate-preview.html')
                   end
-                  path_io_pairs += files.map { |f| [f, File.open(f)] }
+                  path_io_url_triples += files.map { |f| [f, File.open(f)] }
                 end
               else
-                path_io_pairs << [blob.original_filename, blob.data_io_object]
+                tuple = [blob.original_filename, blob.data_io_object || StringIO.new('')]
+                tuple << blob.url if blob.url
+                path_io_url_triples << tuple
               end
+
               annotate_version(blob, git_version)
             end
+
             User.with_current_user(version.contributor.user) do
               git_version.with_git_author(name: version.contributor.name,
                                           email: version.contributor.email,
                                           time: version.created_at.to_time) do
-                git_version.add_files(path_io_pairs, message: version.revision_comments.present? ? version.revision_comments : nil)
+                git_version.add_files(path_io_url_triples, message: version.revision_comments.present? ? version.revision_comments : nil)
+
+                # Create annotations indicating which files came from URLs
+                path_io_url_triples.each do |path, _, url|
+                  git_version.git_annotations.build(path: path, key: 'remote_source', value: url) if url
+                end
               end
               git_version.save!
             end
