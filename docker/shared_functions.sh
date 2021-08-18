@@ -60,8 +60,7 @@ function start_search {
     if [ ! -z $SOLR_PORT ]
     then
       echo "USING SOLR CONTAINER"
-      enable_search
-      cp docker/sunspot.docker.yml config/sunspot.yml
+      enable_search      
     else
       echo "SINGLE CONTAINER SO SOLR IS DISABLED BY DEFAULT"      
     fi

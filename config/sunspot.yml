@@ -1,7 +1,7 @@
 production:
   solr:
-    hostname: localhost
-    port: 8983
+    hostname: <%= ENV['SOLR_HOST'] || 'localhost' %>
+    port: <%= ENV['SOLR_PORT'] || 8983 %>
     log_level: WARNING
     memory: 1G
     path: <%= ENV['SOLR_PATH'] || '/solr/seek' %>
@@ -10,14 +10,14 @@ production:
 
 development:
   solr:
-    hostname: localhost
-    port: 8983
+    hostname: <%= ENV['SOLR_HOST'] || 'localhost' %>
+    port: <%= ENV['SOLR_PORT'] || 8983 %>
     log_level: INFO
     path: <%= ENV['SOLR_PATH'] || '/solr/seek' %>
 
 test:
   solr:
-    hostname: localhost
+    hostname: <%= ENV['SOLR_HOST'] || 'localhost' %>
     port: 8981
     log_level: WARNING
     path: /solr/test
