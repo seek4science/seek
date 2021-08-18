@@ -18,23 +18,37 @@ class WorkflowCrateBuilder
 
     if valid?
       gv = @workflow.git_version
+      files = []
+
       main_workflow_filename = get_filename(main_workflow)
-      files = [[main_workflow_filename, main_workflow[:data]]]
+      tuple = [main_workflow_filename, main_workflow[:data]]
+      tuple << main_workflow[:url] if main_workflow[:url]
+      files << tuple
       gv.main_workflow_path = main_workflow_filename
+
       if diagram && diagram[:data].present?
         diagram_filename = get_filename(diagram)
-        files << [diagram_filename, diagram[:data]]
+        tuple = [diagram_filename, diagram[:data]]
+        tuple << diagram[:url] if diagram[:url]
+        files << tuple
         gv.diagram_path = diagram_filename
       end
+
       if abstract_cwl && abstract_cwl[:data].present?
         abstract_cwl_filename = get_filename(abstract_cwl)
-        files << [abstract_cwl_filename, abstract_cwl[:data]]
+        tuple = [abstract_cwl_filename, abstract_cwl[:data]]
+        tuple << abstract_cwl[:url] if abstract_cwl[:url]
+        files << tuple
         gv.abstract_cwl_path = abstract_cwl_filename
       end
+
       repo = GitRepository.create!
       @workflow.local_git_repository = repo
       gv.git_repository = repo
       gv.add_files(files)
+      files.each do |path, _, url|
+        gv.git_annotations.build(path: path, key: 'remote_source', value: url) if url
+      end
 
       extractor = @workflow.extractor
       @workflow.provide_metadata(extractor.metadata)
@@ -57,7 +71,7 @@ class WorkflowCrateBuilder
           info = handler.info
           data = handler.fetch
           data.rewind
-          assign_attributes(attr => val.merge(data: data, original_filename: info[:file_name]))
+          assign_attributes(attr => val.merge(data: data, original_filename: info[:file_name], url: val[:data_url]))
         rescue Seek::DownloadHandling::BadResponseCodeException => e
           errors.add(attr, "URL could not be accessed: #{e.message}")
           return false

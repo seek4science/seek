@@ -337,7 +337,8 @@ class WorkflowsController < ApplicationController
                                      { discussion_links_attributes: [:id, :url, :label, :_destroy] },
                                      { git_version_attributes: [:name, :description, :ref, :commit, :root_path,
                                                                 :git_repository_id, :main_workflow_path,
-                                                                :abstract_cwl_path, :diagram_path] })
+                                                                :abstract_cwl_path, :diagram_path,
+                                                                { remote_sources: [:path, :url] }] })
   end
 
   alias_method :asset_params, :workflow_params

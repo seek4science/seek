@@ -78,6 +78,20 @@ class GitAnnotationTest < ActiveSupport::TestCase
     end
   end
 
+  test 'annotations are deleted if git version is deleted' do
+    workflow = Factory(:git_version).resource
+    wgv = workflow.git_version
+    assert_difference('GitAnnotation.count', 1) do
+      wgv.main_workflow_path = 'concat_two_files.ga'
+      assert wgv.save
+      assert wgv.git_annotations.where(path: 'concat_two_files.ga', key: 'main_workflow').exists?
+    end
+
+    assert_difference('GitAnnotation.count', -1) do
+      disable_authorization_checks { wgv.destroy }
+    end
+  end
+
   test 'annotations are not removed if option set' do
     workflow = Factory(:git_version).resource
     wgv = workflow.git_version
@@ -125,5 +139,40 @@ class GitAnnotationTest < ActiveSupport::TestCase
       assert wgv.git_annotations.where(path: 'concat_two_files.ga', key: 'main_workflow').exists?
       refute wgv.git_annotations.where(path: 'concat_2_files.ga', key: 'main_workflow').exists?
     end
+  end
+
+  test 'get and set remote source annotations' do
+    workflow = Factory(:annotationless_local_git_workflow)
+    wgv = workflow.git_version
+
+    assert wgv.is_a?(Workflow::GitVersion)
+
+    assert_nil workflow.main_workflow_path
+
+    assert_difference('GitAnnotation.count', 2) do
+      wgv.main_workflow_path = 'concat_two_files.ga'
+      wgv.remote_sources = [{ path: 'concat_two_files.ga', url: 'https://workflows.example.com/concat_two_files.ga' }]
+      disable_authorization_checks { assert wgv.save }
+    end
+
+    assert_equal 'concat_two_files.ga', workflow.reload.main_workflow_path
+    assert_equal [{ path: 'concat_two_files.ga', url: 'https://workflows.example.com/concat_two_files.ga' }], wgv.reload.remote_sources
+
+    assert_no_difference('GitAnnotation.count') do
+      wgv.main_workflow_path = 'Concat_two_files.cwl'
+      wgv.workflow_class_id = (WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class)).id
+      wgv.remote_sources = [{ path: 'Concat_two_files.cwl', url: 'https://workflows.example.com/concat_two_files.cwl' }]
+      disable_authorization_checks { assert wgv.save }
+    end
+
+    assert_equal 'Concat_two_files.cwl', workflow.reload.main_workflow_path
+    assert_equal [{ path: 'Concat_two_files.cwl', url: 'https://workflows.example.com/concat_two_files.cwl' }], wgv.reload.remote_sources
+
+    assert_difference('GitAnnotation.count', -1) do
+      wgv.remote_sources = []
+      disable_authorization_checks { assert wgv.save }
+    end
+
+    assert_equal [], wgv.reload.remote_sources
   end
 end

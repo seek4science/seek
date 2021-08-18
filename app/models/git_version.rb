@@ -4,7 +4,7 @@ class GitVersion < ApplicationRecord
   belongs_to :resource, polymorphic: true
   belongs_to :contributor, class_name: 'Person'
   belongs_to :git_repository
-  has_many :git_annotations, inverse_of: :git_version
+  has_many :git_annotations, inverse_of: :git_version, dependent: :destroy
 
   before_create :set_version
   before_validation :set_git_info, on: :create
@@ -124,7 +124,7 @@ class GitVersion < ApplicationRecord
   end
 
   def find_git_annotations(key)
-    git_annotations.where(key: key) ||
+    git_annotations.where(key: key).to_a |
         git_annotations.select { |a| a.key.to_s == key.to_s }
   end
 
@@ -178,6 +178,31 @@ class GitVersion < ApplicationRecord
 
   def sync_resource_attributes
     update_attribute(:resource_attributes, resource.attributes)
+  end
+
+  def remote_sources= attributes_list
+    attributes_list = attributes_list.values if attributes_list.is_a?(Hash)
+    to_keep = []
+    existing = find_git_annotations('remote_source').to_a
+
+    attributes_list.each do |attributes|
+      path = attributes[:path]
+      url = attributes[:url]
+      annotation = existing.detect { |a| a.path == path } || git_annotations.build(key: 'remote_source', path: path, value: url)
+      to_keep << annotation
+    end
+
+    to_destroy = existing - to_keep
+
+    to_destroy.each(&:destroy)
+
+    to_keep
+  end
+
+  def remote_sources
+    find_git_annotations('remote_source').to_a.map do |ann|
+      { path: ann.path, url: ann.value }
+    end
   end
 
   private
