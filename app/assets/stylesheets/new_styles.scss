@@ -1128,6 +1128,8 @@ input.git-path {
 .git-annotation {
   position: relative;
   margin-right: 2px;
+  background-color: $label-default-bg;
+  &[data-annotation-key="main_workflow"] { background-color: $label-primary-bg; }
 }
 
 .git-image-preview {

@@ -20,29 +20,42 @@ module GitSupport
 
   def object(path)
     return nil unless commit
-    git_base.lookup(tree.path(path)[:oid])
+    o = git_base.lookup(tree.entry(path)[:oid])
+    if o.is_a?(Rugged::Blob)
+      Seek::Git::Blob.new(self, o, path)
+    elsif o.is_a?(Rugged::Tree)
+      Seek::Git::Tree.new(self, o, path)
+    else
+      o
+    end
   rescue Rugged::TreeError
     nil
   end
 
+  def get_blob(path)
+    return nil unless commit
+    tree.get_blob(path)
+  end
+
+  def get_tree(path)
+    return nil unless commit
+    tree.get_tree(path)
+  end
+
   def tree
-    git_base.lookup(commit).tree if commit
+    Seek::Git::Tree.new(self, git_base.lookup(commit).tree) if commit
   end
 
   def trees
-    t = []
-    return t unless commit
+    return [] unless commit
 
-    tree.each_tree { |tree| t << tree }
-    t
+    tree.trees
   end
 
   def blobs
-    b = []
-    return b unless commit
+    return [] unless commit
 
-    tree.each_blob { |blob| b << blob }
-    b
+    blob.blobs
   end
 
   def file_exists?(path)
@@ -50,14 +63,7 @@ module GitSupport
   end
 
   def total_size
-    total = 0
-
-    tree.walk_blobs do |_, entry|
-      blob = git_base.lookup(entry[:oid])
-      total += blob.size
-    end
-
-    total
+    tree.total_size
   end
 
   # Checkout the commit into the given directory.

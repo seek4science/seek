@@ -25,8 +25,7 @@ $j(document).ready(function () {
                     element.addClass('git-annotated');
                     if (node.data.annotations && node.data.annotations.length) {
                         node.data.annotations.forEach(function(annotation) {
-                            var template = HandlebarsTemplates["git/annotations/" + annotation.key] ||
-                                HandlebarsTemplates["git/annotations/default"];
+                            var template = HandlebarsTemplates["git/annotation"];
                             element.append(template(annotation));
                         });
                     }
@@ -34,8 +33,7 @@ $j(document).ready(function () {
                     if (tree.is_closed(node) && node.data.childAnnotations && node.data.childAnnotations.length) {
                         element.addClass('git-annotated-parent');
                         node.data.childAnnotations.forEach(function(annotation) {
-                            var template = HandlebarsTemplates["git/annotations/" + annotation.key] ||
-                                HandlebarsTemplates["git/annotations/default"];
+                            var template = HandlebarsTemplates["git/annotation"];
                             element.append(template(annotation));
                         });
                     }
