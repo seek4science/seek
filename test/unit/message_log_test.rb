@@ -39,13 +39,13 @@ class MessageLogTest < ActiveSupport::TestCase
     MessageLog.destroy_all
     subject = Factory(:project)
     sender = Factory(:person)
-    log1 = MessageLog.create(subject: subject, sender: sender, details: 'blah blah',
+    log1 = ProjectMembershipMessageLog.create(subject: subject, sender: sender, details: 'blah blah',
                              message_type: MessageLog::PROJECT_MEMBERSHIP_REQUEST)
-    log2 = MessageLog.create(subject: subject, sender: sender, details: 'blah blah',
+    log2 = ProjectMembershipMessageLog.create(subject: subject, sender: sender, details: 'blah blah',
                              message_type: MessageLog::PROJECT_MEMBERSHIP_REQUEST)
-    log3 = MessageLog.create(subject: subject, sender: sender, details: 'blah blah', message_type: 2)
+    log3 = ProjectMembershipMessageLog.create(subject: subject, sender: sender, details: 'blah blah', message_type: 2)
 
-    logs = MessageLog.project_membership_requests
+    logs = ProjectMembershipMessageLog.project_membership_requests
     assert_equal [log1, log2].sort, logs.sort
   end
 
@@ -63,7 +63,7 @@ class MessageLogTest < ActiveSupport::TestCase
       older.save!
     end
 
-    logs = MessageLog.recent
+    logs = ProjectMembershipMessageLog.recent
     assert_includes logs, recent
     refute_includes logs, older
   end
@@ -85,7 +85,7 @@ class MessageLogTest < ActiveSupport::TestCase
       log4.save!
     end
 
-    logs = MessageLog.recent_project_membership_requests(log.sender, log.subject)
+    logs = ProjectMembershipMessageLog.recent_project_membership_requests(log.sender, log.subject)
     assert_equal [log], logs
   end
 
@@ -94,7 +94,7 @@ class MessageLogTest < ActiveSupport::TestCase
     sender = Factory(:person)
     institution = Institution.new(title: 'new inst', country: 'DE')
     assert_difference('MessageLog.count') do
-      MessageLog.log_project_membership_request(sender, proj, institution, 'some comments')
+      ProjectMembershipMessageLog.log_project_membership_request(sender, proj, institution, 'some comments')
     end
     log = MessageLog.last
     assert_equal proj, log.subject
@@ -113,9 +113,9 @@ class MessageLogTest < ActiveSupport::TestCase
     project = Project.new(title: 'a project', web_page: 'http://page')
     institution = Institution.new(title: 'an inst', country: 'FR')
     assert_difference('MessageLog.count') do
-      MessageLog.log_project_creation_request(requester, programme, project, institution)
+      ProjectCreationMessageLog.log_project_creation_request(requester, programme, project, institution)
     end
-    log = MessageLog.last
+    log = ProjectCreationMessageLog.last
     assert_equal requester, log.subject
     assert_equal requester, log.sender
     assert_equal MessageLog::PROJECT_CREATION_REQUEST, log.message_type
@@ -161,15 +161,15 @@ class MessageLogTest < ActiveSupport::TestCase
     admin = Factory(:admin)
     institution = Factory(:institution)
 
-    log1 = MessageLog.log_project_creation_request(person, Factory(:programme), project, institution)
-    log2 = MessageLog.log_project_creation_request(person, Factory(:programme), project2, institution)
+    log1 = ProjectCreationMessageLog.log_project_creation_request(person, Factory(:programme), project, institution)
+    log2 = ProjectCreationMessageLog.log_project_creation_request(person, Factory(:programme), project2, institution)
 
-    assert_equal [log1, log2], MessageLog.project_creation_requests.sort_by(&:id)
-    assert_equal [log1, log2], MessageLog.pending_project_creation_requests.sort_by(&:id)
+    assert_equal [log1, log2], ProjectCreationMessageLog.project_creation_requests.sort_by(&:id)
+    assert_equal [log1, log2], ProjectCreationMessageLog.pending_project_creation_requests.sort_by(&:id)
 
     log1.respond('Accepted')
-    assert_equal [log1, log2], MessageLog.project_creation_requests.sort_by(&:id)
-    assert_equal [log2], MessageLog.pending_project_creation_requests
+    assert_equal [log1, log2], ProjectCreationMessageLog.project_creation_requests.sort_by(&:id)
+    assert_equal [log2], ProjectCreationMessageLog.pending_project_creation_requests
   end
 
   test 'pending project join requests' do
@@ -179,24 +179,24 @@ class MessageLogTest < ActiveSupport::TestCase
     project2 = person2.projects.first
     project3 = Factory(:project)
 
-    log1a = MessageLog.log_project_membership_request(Factory(:person), project1, Factory(:institution), '')
-    log1b = MessageLog.log_project_membership_request(Factory(:person), project1, Factory(:institution), '')
-    log2 = MessageLog.log_project_membership_request(Factory(:person), project2, Factory(:institution), '')
+    log1a = ProjectMembershipMessageLog.log_project_membership_request(Factory(:person), project1, Factory(:institution), '')
+    log1b = ProjectMembershipMessageLog.log_project_membership_request(Factory(:person), project1, Factory(:institution), '')
+    log2 = ProjectMembershipMessageLog.log_project_membership_request(Factory(:person), project2, Factory(:institution), '')
 
-    assert_equal [log1a, log1b], MessageLog.pending_project_join_requests([project1]).sort_by(&:id)
-    assert_equal [log1a, log1b, log2], MessageLog.pending_project_join_requests([project1, project2]).sort_by(&:id)
-    assert_equal [log2], MessageLog.pending_project_join_requests([project2]).sort_by(&:id)
+    assert_equal [log1a, log1b], ProjectMembershipMessageLog.pending_project_join_requests([project1]).sort_by(&:id)
+    assert_equal [log1a, log1b, log2], ProjectMembershipMessageLog.pending_project_join_requests([project1, project2]).sort_by(&:id)
+    assert_equal [log2], ProjectMembershipMessageLog.pending_project_join_requests([project2]).sort_by(&:id)
 
     log1a.respond('Rejected')
-    assert_equal [log1b], MessageLog.pending_project_join_requests([project1]).sort_by(&:id)
-    assert_equal [log1b, log2], MessageLog.pending_project_join_requests([project1, project2]).sort_by(&:id)
+    assert_equal [log1b], ProjectMembershipMessageLog.pending_project_join_requests([project1]).sort_by(&:id)
+    assert_equal [log1b, log2], ProjectMembershipMessageLog.pending_project_join_requests([project1, project2]).sort_by(&:id)
     log1b.respond('Accepted')
-    assert_empty MessageLog.pending_project_join_requests([project1])
-    assert_equal [log2], MessageLog.pending_project_join_requests([project1, project2])
+    assert_empty ProjectMembershipMessageLog.pending_project_join_requests([project1])
+    assert_equal [log2], ProjectMembershipMessageLog.pending_project_join_requests([project1, project2])
     log2.respond('Rejected')
-    assert_empty MessageLog.pending_project_join_requests([project2])
+    assert_empty ProjectMembershipMessageLog.pending_project_join_requests([project2])
 
-    assert_empty MessageLog.pending_project_join_requests([])
+    assert_empty ProjectMembershipMessageLog.pending_project_join_requests([])
   end
 
   test 'destroy when person is' do
@@ -208,12 +208,12 @@ class MessageLogTest < ActiveSupport::TestCase
     project = Project.new(title: 'my project')
     institution = Factory(:institution)
 
-    MessageLog.log_project_creation_request(person1, Factory(:programme), project, institution)
-    MessageLog.log_project_creation_request(person2, Factory(:programme), project, institution)
+    ProjectCreationMessageLog.log_project_creation_request(person1, Factory(:programme), project, institution)
+    ProjectCreationMessageLog.log_project_creation_request(person2, Factory(:programme), project, institution)
 
     project = Factory(:project)
-    MessageLog.log_project_membership_request(person1, project, Factory(:institution), '')
-    MessageLog.log_project_membership_request(person2, project, Factory(:institution), '')
+    ProjectMembershipMessageLog.log_project_membership_request(person1, project, Factory(:institution), '')
+    ProjectMembershipMessageLog.log_project_membership_request(person2, project, Factory(:institution), '')
 
     assert_difference('MessageLog.count', -2) do
       assert_difference('Person.count', -1) do
@@ -229,7 +229,7 @@ class MessageLogTest < ActiveSupport::TestCase
 
   test 'sent by self' do
     person = Factory(:person)
-    log = MessageLog.log_project_creation_request(person, Factory(:programme), Factory(:project), Factory(:institution))
+    log = ProjectCreationMessageLog.log_project_creation_request(person, Factory(:programme), Factory(:project), Factory(:institution))
     User.with_current_user(person.user) do
       assert log.sent_by_self?
     end
@@ -244,7 +244,7 @@ class MessageLogTest < ActiveSupport::TestCase
   test 'log activation email sent' do
     person = Factory(:person)
     log = assert_difference('MessageLog.count') do
-      MessageLog.log_activation_email(person)
+      ActivationEmailMessageLog.log_activation_email(person)
     end
     assert_equal MessageLog::ACTIVATION_EMAIL, log.message_type
     assert_equal person, log.sender
@@ -257,19 +257,19 @@ class MessageLogTest < ActiveSupport::TestCase
     other_person = Factory(:person)
 
     travel_to(2.days.ago) do
-      log2 = MessageLog.log_activation_email(person)
+      log2 = ActivationEmailMessageLog.log_activation_email(person)
     end
 
     travel_to(4.days.ago) do
-      log1 = MessageLog.log_activation_email(person)
+      log1 = ActivationEmailMessageLog.log_activation_email(person)
     end
 
     travel_to(1.days.ago) do
-      log3 = MessageLog.log_activation_email(person)
-      log4 = MessageLog.log_activation_email(other_person)
+      log3 = ActivationEmailMessageLog.log_activation_email(person)
+      log4 = ActivationEmailMessageLog.log_activation_email(other_person)
     end
 
-    assert_equal [log1, log2, log3], MessageLog.activation_email_logs(person)
+    assert_equal [log1, log2, log3], ActivationEmailMessageLog.activation_email_logs(person)
     assert_equal [log1, log2, log3], person.activation_email_logs
   end
 
@@ -282,28 +282,28 @@ class MessageLogTest < ActiveSupport::TestCase
     project = Project.new(title: 'new project')
 
     # no programme
-    log = MessageLog.log_project_creation_request(person, nil, project, institution)
+    log = ProjectCreationMessageLog.log_project_creation_request(person, nil, project, institution)
     assert log.can_respond_project_creation_request?(admin)
     assert log.can_respond_project_creation_request?(admin.user)
     refute log.can_respond_project_creation_request?(prog_admin)
     refute log.can_respond_project_creation_request?(person)
 
     # normal programme
-    log = MessageLog.log_project_creation_request(person, programme, project, institution)
+    log = ProjectCreationMessageLog.log_project_creation_request(person, programme, project, institution)
     refute log.can_respond_project_creation_request?(admin)
     assert log.can_respond_project_creation_request?(prog_admin)
     refute log.can_respond_project_creation_request?(person)
 
     with_config_value(:managed_programme_id, programme.id) do
       # managed programme
-      log = MessageLog.log_project_creation_request(person, programme, project, institution)
+      log = ProjectCreationMessageLog.log_project_creation_request(person, programme, project, institution)
       assert log.can_respond_project_creation_request?(admin)
       assert log.can_respond_project_creation_request?(prog_admin)
       refute log.can_respond_project_creation_request?(person)
     end
 
     # new programme
-    log = MessageLog.log_project_creation_request(person, Programme.new(title: 'new programme'), project, institution)
+    log = ProjectCreationMessageLog.log_project_creation_request(person, Programme.new(title: 'new programme'), project, institution)
     assert log.can_respond_project_creation_request?(admin)
     refute log.can_respond_project_creation_request?(prog_admin)
     refute log.can_respond_project_creation_request?(person)
@@ -314,7 +314,7 @@ class MessageLogTest < ActiveSupport::TestCase
   def valid_log
     subject = Factory(:project)
     sender = Factory(:person)
-    MessageLog.new(subject: subject, sender: sender, details: 'blah blah',
+    ProjectMembershipMessageLog.new(subject: subject, sender: sender, details: 'blah blah',
                    message_type: MessageLog::PROJECT_MEMBERSHIP_REQUEST)
   end
 end

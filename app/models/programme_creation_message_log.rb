@@ -1,0 +1,3 @@
+class ProgrammeCreationMessageLog < MessageLog
+
+end
