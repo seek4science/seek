@@ -45,7 +45,7 @@ class MessageLogTest < ActiveSupport::TestCase
                              message_type: MessageLog::PROJECT_MEMBERSHIP_REQUEST)
     log3 = ProjectMembershipMessageLog.create(subject: subject, sender: sender, details: 'blah blah', message_type: 2)
 
-    logs = ProjectMembershipMessageLog.project_membership_requests
+    logs = ProjectMembershipMessageLog.all
     assert_equal [log1, log2].sort, logs.sort
   end
 
@@ -93,7 +93,7 @@ class MessageLogTest < ActiveSupport::TestCase
     proj = Factory(:project)
     sender = Factory(:person)
     institution = Institution.new(title: 'new inst', country: 'DE')
-    assert_difference('MessageLog.count') do
+    assert_difference('ProjectMembershipMessageLog.count') do
       ProjectMembershipMessageLog.log_project_membership_request(sender, proj, institution, 'some comments')
     end
     log = MessageLog.last
@@ -112,7 +112,7 @@ class MessageLogTest < ActiveSupport::TestCase
     programme = Factory(:programme)
     project = Project.new(title: 'a project', web_page: 'http://page')
     institution = Institution.new(title: 'an inst', country: 'FR')
-    assert_difference('MessageLog.count') do
+    assert_difference('ProjectCreationMessageLog.count') do
       ProjectCreationMessageLog.log_project_creation_request(requester, programme, project, institution)
     end
     log = ProjectCreationMessageLog.last
@@ -130,7 +130,7 @@ class MessageLogTest < ActiveSupport::TestCase
   end
 
   test 'responded' do
-    log = MessageLog.new
+    log = ProjectCreationMessageLog.new
     assert_nil log.response
     refute log.responded?
 
@@ -164,11 +164,11 @@ class MessageLogTest < ActiveSupport::TestCase
     log1 = ProjectCreationMessageLog.log_project_creation_request(person, Factory(:programme), project, institution)
     log2 = ProjectCreationMessageLog.log_project_creation_request(person, Factory(:programme), project2, institution)
 
-    assert_equal [log1, log2], ProjectCreationMessageLog.project_creation_requests.sort_by(&:id)
+    assert_equal [log1, log2], ProjectCreationMessageLog.all.sort_by(&:id)
     assert_equal [log1, log2], ProjectCreationMessageLog.pending_project_creation_requests.sort_by(&:id)
 
     log1.respond('Accepted')
-    assert_equal [log1, log2], ProjectCreationMessageLog.project_creation_requests.sort_by(&:id)
+    assert_equal [log1, log2], ProjectCreationMessageLog.all.sort_by(&:id)
     assert_equal [log2], ProjectCreationMessageLog.pending_project_creation_requests
   end
 
@@ -215,15 +215,18 @@ class MessageLogTest < ActiveSupport::TestCase
     ProjectMembershipMessageLog.log_project_membership_request(person1, project, Factory(:institution), '')
     ProjectMembershipMessageLog.log_project_membership_request(person2, project, Factory(:institution), '')
 
-    assert_difference('MessageLog.count', -2) do
-      assert_difference('Person.count', -1) do
-        disable_authorization_checks do
-          person1.destroy
+    assert_difference('ProjectCreationMessageLog.count', -1) do
+      assert_difference('ProjectMembershipMessageLog.count', -1) do
+        assert_difference('Person.count', -1) do
+          disable_authorization_checks do
+            person1.destroy
+          end
         end
       end
     end
 
-    assert_equal 2, MessageLog.all.count
+    assert_equal 1, ProjectCreationMessageLog.count
+    assert_equal 1, ProjectMembershipMessageLog.count
     assert_equal [person2], MessageLog.all.collect(&:sender).uniq
   end
 
@@ -243,7 +246,7 @@ class MessageLogTest < ActiveSupport::TestCase
 
   test 'log activation email sent' do
     person = Factory(:person)
-    log = assert_difference('MessageLog.count') do
+    log = assert_difference('ActivationEmailMessageLog.count') do
       ActivationEmailMessageLog.log_activation_email(person)
     end
     assert_equal MessageLog::ACTIVATION_EMAIL, log.message_type

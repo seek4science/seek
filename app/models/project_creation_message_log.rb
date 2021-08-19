@@ -1,8 +1,9 @@
 class ProjectCreationMessageLog < MessageLog
 
-  scope :project_creation_requests, -> { where(message_type: PROJECT_CREATION_REQUEST) }
+  default_scope { where(message_type: PROJECT_CREATION_REQUEST) }
+
   # project creation requests that haven't been responded to
-  scope :pending_project_creation_requests, -> { project_creation_requests.pending }
+  scope :pending_project_creation_requests, -> { pending }
 
   def self.log_project_creation_request(sender, programme, project, institution)
     details = {}
@@ -10,7 +11,7 @@ class ProjectCreationMessageLog < MessageLog
     details[:project] = project.attributes
     details[:programme] = programme&.attributes
     # FIXME: needs a subject, but can't use programme as it will save it if it is new
-    ProjectCreationMessageLog.create(subject: sender, sender: sender, details: details.to_json, message_type: PROJECT_CREATION_REQUEST)
+    ProjectCreationMessageLog.create(subject: sender, sender: sender, details: details.to_json)
   end
 
   # whether the person can respond to the creation request

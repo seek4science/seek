@@ -3,11 +3,11 @@ class ActivationEmailMessageLog < MessageLog
   default_scope { where(message_type: ACTIVATION_EMAIL) }
 
   scope :activation_email_logs, lambda { |person|
-    where(message_type: ACTIVATION_EMAIL, subject: person).order(created_at: :asc)
+    where(subject: person).order(created_at: :asc)
   }
 
   # logs when an activation email has been sent, and by whom
   def self.log_activation_email(sender)
-    ActivationEmailMessageLog.create(subject: sender, sender: sender, message_type: ACTIVATION_EMAIL)
+    ActivationEmailMessageLog.create(subject: sender, sender: sender)
   end
 end
