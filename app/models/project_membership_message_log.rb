@@ -1,5 +1,4 @@
 class ProjectMembershipMessageLog < MessageLog
-
   default_scope { where(message_type: PROJECT_MEMBERSHIP_REQUEST) }
   scope :pending_requests, ->(projects) { where(subject: projects).pending }
 

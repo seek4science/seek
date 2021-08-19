@@ -1,5 +1,4 @@
 class ProjectCreationMessageLog < MessageLog
-
   default_scope { where(message_type: PROJECT_CREATION_REQUEST) }
 
   # project creation requests that haven't been responded to
@@ -34,5 +33,4 @@ class ProjectCreationMessageLog < MessageLog
       (person.is_admin? && programme.site_managed?) || person.is_programme_administrator?(programme)
     end
   end
-
 end

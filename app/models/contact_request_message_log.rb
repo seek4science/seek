@@ -1,10 +1,9 @@
 class ContactRequestMessageLog < MessageLog
-
   default_scope { where(message_type: CONTACT_REQUEST) }
   scope :pending_requests, ->(projects) { where(subject: projects).pending }
 
   # message logs created since the recent period, for that person and interested item
-  scope :recent_requests, ->(person, item) {
+  scope :recent_requests, lambda { |person, item|
     where(subject: item).where(sender: person).recent
   }
 

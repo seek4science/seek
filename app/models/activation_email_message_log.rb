@@ -1,5 +1,4 @@
 class ActivationEmailMessageLog < MessageLog
-
   default_scope { where(message_type: ACTIVATION_EMAIL) }
 
   scope :activation_email_logs, lambda { |person|

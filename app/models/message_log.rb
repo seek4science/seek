@@ -1,7 +1,6 @@
 # records and tracks messages that have been sent, and when
 
 class MessageLog < ApplicationRecord
-
   PROJECT_MEMBERSHIP_REQUEST = 1
   CONTACT_REQUEST = 2
   PROGRAMME_CREATION_REQUEST = 3
@@ -34,8 +33,6 @@ class MessageLog < ApplicationRecord
     "#{number_hours} #{'hour'.pluralize(number_hours)}"
   end
 
-
-
   def responded?
     response.present?
   end
@@ -43,6 +40,4 @@ class MessageLog < ApplicationRecord
   def sent_by_self?
     sender == User.current_user&.person
   end
-
-
 end
