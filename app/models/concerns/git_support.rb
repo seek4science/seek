@@ -80,8 +80,8 @@ module GitSupport
   end
 
   def add_file(path, io, message: nil)
-    message ||= (file_exists?(path) ? 'Updated' : 'Added')
-    perform_commit("#{message} #{path}") do |index|
+    message ||= "#{file_exists?(path) ? 'Updated' : 'Added'} #{path}"
+    perform_commit(message) do |index|
       oid = git_base.write(io.read, :blob) # Write the file into the object DB
       index.add(path: path, oid: oid, mode: 0100644) # Add it to the index
     end
