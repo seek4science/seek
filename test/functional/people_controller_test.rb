@@ -118,8 +118,8 @@ class PeopleControllerTest < ActionController::TestCase
     person = assigns(:person)
     assert_redirected_to activation_required_users_path
     refute person.user.active?
-    assert_equal 1,MessageLog.activation_email_logs(person).count
-    assert_equal person,MessageLog.activation_email_logs(person).last.subject
+    assert_equal 1,ActivationEmailMessageLog.activation_email_logs(person).count
+    assert_equal person,ActivationEmailMessageLog.activation_email_logs(person).last.subject
     assert_equal 1,person.activation_email_logs.count
   end
 

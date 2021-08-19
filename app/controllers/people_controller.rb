@@ -146,7 +146,7 @@ class PeopleController < ApplicationController
           format.json {render json: @person, status: :created, location: @person, include: [params[:include]] }
         else
           Mailer.activation_request(current_user).deliver_later
-          MessageLog.log_activation_email(@person)
+          ActivationEmailMessageLog.log_activation_email(@person)
           flash[:notice] = 'An email has been sent to you to confirm your email address. You need to respond to this email before you can login'
           logout_user
           format.html { redirect_to controller: 'users', action: 'activation_required' }

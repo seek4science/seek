@@ -203,16 +203,16 @@ class UsersControllerTest < ActionController::TestCase
     refute user.active?
 
     #make some logs
-    MessageLog.log_activation_email(user.person)
-    MessageLog.log_activation_email(user.person)
+    ActivationEmailMessageLog.log_activation_email(user.person)
+    ActivationEmailMessageLog.log_activation_email(user.person)
 
-    assert_equal 2, MessageLog.activation_email_logs(user.person).count
+    assert_equal 2, ActivationEmailMessageLog.activation_email_logs(user.person).count
 
     assert_difference('MessageLog.count',-2) do
       get :activate, params: { activation_code: user.activation_code }
     end
 
-    assert_empty MessageLog.activation_email_logs(user.person)
+    assert_empty ActivationEmailMessageLog.activation_email_logs(user.person)
 
     assert_redirected_to person_path(user.person)
     refute_nil flash[:notice]

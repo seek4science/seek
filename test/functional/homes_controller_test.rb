@@ -535,7 +535,7 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_select "div#pending-project-creation-warning", text: /There are pending/, count: 0
 
-    log1 = MessageLog.log_project_creation_request(person, programme, project, institution)
+    log1 = ProjectCreationMessageLog.log_request(person, programme, project, institution)
 
     get :index
     assert_select "div#pending-project-creation-warning", text: /There are pending/, count: 1

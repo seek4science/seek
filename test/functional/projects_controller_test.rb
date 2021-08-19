@@ -1736,7 +1736,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = Factory(:project_administrator).projects.first
 
     # already requested
-    MessageLog.log_project_membership_request(person, project, Factory(:institution), '')
+    ProjectMembershipMessageLog.log_request(person, project, Factory(:institution), '')
     get :guided_join, params:{id:project.id}
     assert_redirected_to project
     assert flash[:error]
@@ -2069,7 +2069,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = person.projects.first
     login_as(person)
     institution = Institution.new(title:'my institution')
-    log = MessageLog.log_project_membership_request(Factory(:person),project,institution,'some comments')
+    log = ProjectMembershipMessageLog.log_request(Factory(:person),project,institution,'some comments')
     get :administer_join_request, params:{id:project.id,message_log_id:log.id}
     assert_response :success
   end
@@ -2079,7 +2079,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = person.projects.first
     login_as(person)
     institution = Institution.new(title:'my institution')
-    log = MessageLog.log_project_membership_request(Factory(:person),project,institution,'some comments')
+    log = ProjectMembershipMessageLog.log_request(Factory(:person),project,institution,'some comments')
     created_inst = Factory(:institution,title:'my institution')
     get :administer_join_request, params:{id:project.id,message_log_id:log.id}
     assert_response :success
@@ -2094,7 +2094,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = person.projects.first
     login_as(another_admin)
     institution = Institution.new(title:'my institution')
-    log = MessageLog.log_project_membership_request(Factory(:person),project,institution,'some comments')
+    log = ProjectMembershipMessageLog.log_request(Factory(:person),project,institution,'some comments')
     get :administer_join_request, params:{id:project.id,message_log_id:log.id}
     assert_redirected_to :root
     refute_nil flash[:error]
@@ -2106,7 +2106,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = person.projects.first
     institution = Factory(:institution)
     sender = Factory(:person)
-    log = MessageLog.log_project_membership_request(sender,project,institution,'some comments')
+    log = ProjectMembershipMessageLog.log_request(sender,project,institution,'some comments')
 
     params = {
         message_log_id: log.id,
@@ -2141,7 +2141,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = person.projects.first
     institution = Factory(:institution)
     sender = Factory(:person)
-    log = MessageLog.log_project_membership_request(sender,project,institution,'some comments')
+    log = ProjectMembershipMessageLog.log_request(sender,project,institution,'some comments')
 
     params = {
         message_log_id: log.id,
@@ -2173,7 +2173,7 @@ class ProjectsControllerTest < ActionController::TestCase
                                       title:'institution',
                                    country:'DE'
                                   })
-    log = MessageLog.log_project_membership_request(sender,project,institution,'some comments')
+    log = ProjectMembershipMessageLog.log_request(sender,project,institution,'some comments')
 
     params = {
         message_log_id: log.id,
@@ -2215,7 +2215,7 @@ class ProjectsControllerTest < ActionController::TestCase
                                       title:'institution',
                                       country:'DE'
                                   })
-    log = MessageLog.log_project_membership_request(sender,project,institution,'some comments')
+    log = ProjectMembershipMessageLog.log_request(sender,project,institution,'some comments')
 
     params = {
         message_log_id: log.id,
@@ -2247,7 +2247,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = person.projects.first
     institution = Factory(:institution)
     sender = Factory(:person)
-    log = MessageLog.log_project_membership_request(sender,project,institution,'some comments')
+    log = ProjectMembershipMessageLog.log_request(sender,project,institution,'some comments')
 
     params = {
         message_log_id: log.id,
@@ -2281,7 +2281,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = Project.new(title:'new project')
     programme = Programme.new(title:'new programme')
     institution = Institution.new(title:'my institution')
-    log = MessageLog.log_project_creation_request(Factory(:person),programme, project,institution)
+    log = ProjectCreationMessageLog.log_request(Factory(:person),programme, project,institution)
     get :administer_create_project_request, params:{message_log_id:log.id}
     assert_response :success
   end
@@ -2293,7 +2293,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = Project.new(title:'new project')
     programme = Programme.new(title:'new programme')
     institution = Institution.new(title:'my institution')
-    log = MessageLog.log_project_creation_request(Factory(:person),programme, project,institution)
+    log = ProjectCreationMessageLog.log_request(Factory(:person),programme, project,institution)
     created_inst = Factory(:institution,title:'my institution')
     get :administer_create_project_request, params:{message_log_id:log.id}
     assert_response :success
@@ -2308,7 +2308,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = Project.new(title:'new project')
     programme = person.programmes.first
     institution = Institution.new(title:'my institution')
-    log = MessageLog.log_project_creation_request(Factory(:person),programme, project,institution)
+    log = ProjectCreationMessageLog.log_request(Factory(:person),programme, project,institution)
     get :administer_create_project_request, params:{message_log_id:log.id}
     assert_response :success
 
@@ -2327,7 +2327,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = Project.new(title:'new project')
     programme = person.programmes.first
     institution = Institution.new(title:'my institution')
-    log = MessageLog.log_project_creation_request(Factory(:person),programme, project,institution)
+    log = ProjectCreationMessageLog.log_request(Factory(:person),programme, project,institution)
     get :administer_create_project_request, params:{message_log_id:log.id}
 
     assert_redirected_to :root
@@ -2340,7 +2340,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = Project.new(title:'new project')
     programme = Programme.new(title:'new programme')
     institution = Institution.new(title:'my institution')
-    log = MessageLog.log_project_creation_request(Factory(:person),programme, project,institution)
+    log = ProjectCreationMessageLog.log_request(Factory(:person),programme, project,institution)
     get :administer_create_project_request, params:{message_log_id:log.id}
     assert_response :success
   end
@@ -2351,7 +2351,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = Project.new(title:'new project')
     programme = Programme.new(title:'new programme')
     institution = Institution.new(title:'my institution')
-    log = MessageLog.log_project_creation_request(Factory(:person),programme, project,institution)
+    log = ProjectCreationMessageLog.log_request(Factory(:person),programme, project,institution)
     get :administer_create_project_request, params:{message_log_id:log.id}
 
     assert_redirected_to :root
@@ -2365,7 +2365,7 @@ class ProjectsControllerTest < ActionController::TestCase
     programme = Programme.new(title:'new programme')
     institution = Institution.new({title:'institution', country:'DE'})
     requester = Factory(:person)
-    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    log = ProjectCreationMessageLog.log_request(requester,programme,project,institution)
     params = {
         message_log_id:log.id,
         accept_request: '1',
@@ -2432,7 +2432,7 @@ class ProjectsControllerTest < ActionController::TestCase
     programme = Programme.new(title:'new programme')
     institution = Institution.new({title:'institution', country:'DE'})
     requester = Factory(:person)
-    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    log = ProjectCreationMessageLog.log_request(requester,programme,project,institution)
     params = {
         message_log_id:log.id,
         accept_request: '1',
@@ -2477,7 +2477,7 @@ class ProjectsControllerTest < ActionController::TestCase
     programme = Programme.new(title:'new programme')
     institution = Institution.new({title:'institution', country:'DE'})
     requester = Factory(:person)
-    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    log = ProjectCreationMessageLog.log_request(requester,programme,project,institution)
     params = {
         message_log_id:log.id,
         accept_request: '1',
@@ -2522,7 +2522,7 @@ class ProjectsControllerTest < ActionController::TestCase
     programme = Programme.new(title:'new programme')
     institution = Institution.new({title:'institution', country:'DE'})
     requester = Factory(:person)
-    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    log = ProjectCreationMessageLog.log_request(requester,programme,project,institution)
     params = {
         message_log_id:log.id,
         accept_request: '1',
@@ -2566,7 +2566,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
     project = Project.new(title:'new project',web_page:'my new project')
     requester = Factory(:person)
-    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    log = ProjectCreationMessageLog.log_request(requester,programme,project,institution)
     params = {
         message_log_id:log.id,
         accept_request: '1',
@@ -2619,7 +2619,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
     project = Project.new(title:'new project',web_page:'my new project')
     requester = person
-    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    log = ProjectCreationMessageLog.log_request(requester,programme,project,institution)
     assert log.sent_by_self?
     params = {
       message_log_id:log.id,
@@ -2670,7 +2670,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
     project = Project.new(title:'new project',web_page:'my new project')
     requester = person
-    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    log = ProjectCreationMessageLog.log_request(requester,programme,project,institution)
     assert log.sent_by_self?
     params = {
       message_log_id:log.id,
@@ -2712,7 +2712,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(another_admin)
     project = Project.new(title:'new project',web_page:'my new project')
     requester = Factory(:person)
-    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    log = ProjectCreationMessageLog.log_request(requester,programme,project,institution)
     params = {
         message_log_id:log.id,
         accept_request: '1',
@@ -2756,7 +2756,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
     project = Project.new(title:'new project',web_page:'my new project')
     requester = Factory(:person)
-    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    log = ProjectCreationMessageLog.log_request(requester,programme,project,institution)
     params = {
         message_log_id:log.id,
         reject_details:'not very good',
@@ -2805,9 +2805,9 @@ class ProjectsControllerTest < ActionController::TestCase
     requester2 = Factory(:person)
     requester3 = Factory(:person)
 
-    log1 = MessageLog.log_project_membership_request(requester1,project1,Factory(:institution),'')
-    log2 = MessageLog.log_project_membership_request(requester2,project1,Factory(:institution),'')
-    log3 = MessageLog.log_project_membership_request(Factory(:person),project2,Factory(:institution),'')
+    log1 = ProjectMembershipMessageLog.log_request(requester1,project1,Factory(:institution),'')
+    log2 = ProjectMembershipMessageLog.log_request(requester2,project1,Factory(:institution),'')
+    log3 = ProjectMembershipMessageLog.log_request(Factory(:person),project2,Factory(:institution),'')
 
     logout
     get :project_join_requests
@@ -2861,8 +2861,8 @@ class ProjectsControllerTest < ActionController::TestCase
     institution = Factory(:institution)
     project = Project.new(title: "new")
 
-    log_existing_programme = MessageLog.log_project_creation_request(person, programme, project, institution)
-    log_new_programme = MessageLog.log_project_creation_request(person, Programme.new(title: "new"), project, institution)
+    log_existing_programme = ProjectCreationMessageLog.log_request(person, programme, project, institution)
+    log_new_programme = ProjectCreationMessageLog.log_request(person, Programme.new(title: "new"), project, institution)
 
     # no user
     logout

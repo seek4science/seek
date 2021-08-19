@@ -38,14 +38,14 @@ class ProjectsController < ApplicationController
 
   def project_join_requests
     person = current_person
-    @requests = MessageLog.pending_project_join_requests(person.administered_projects)
+    @requests = ProjectMembershipMessageLog.pending_requests(person.administered_projects)
     respond_to do |format|
       format.html
     end
   end
 
   def project_creation_requests
-    @requests = MessageLog.pending_project_creation_requests.select do |r|
+    @requests = ProjectCreationMessageLog.pending_requests.select do |r|
       r.can_respond_project_creation_request?(current_user)
     end
         
@@ -142,7 +142,7 @@ class ProjectsController < ApplicationController
     @comments = params[:comments]
     @projects.each do |project|
       if project.allow_request_membership? # protects against malicious spamming
-        log = MessageLog.log_project_membership_request(current_user.person, project, @institution, @comments)
+        log = ProjectMembershipMessageLog.log_request(current_user.person, project, @institution, @comments)
         Mailer.request_join_project(current_user, project, @institution.to_json, @comments, log).deliver_later
       end
     end
@@ -169,9 +169,9 @@ class ProjectsController < ApplicationController
       @programme = Programme.find(params[:programme_id])
       raise "no #{t('programme')} can be found" if @programme.nil?
       if @programme.can_manage?
-        log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
+        log = ProjectCreationMessageLog.log_request(current_person, @programme, @project,@institution)
       elsif @programme.site_managed?
-        log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
+        log = ProjectCreationMessageLog.log_request(current_person, @programme, @project,@institution)
         Mailer.request_create_project_for_programme(current_user, @programme, @project.to_json, @institution.to_json, log).deliver_later
         Mailer.request_create_project_for_programme_admins(current_user, @programme, @project.to_json, @institution.to_json, log).deliver_later
         flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
@@ -182,7 +182,7 @@ class ProjectsController < ApplicationController
     elsif Seek::ProjectFormProgrammeOptions.creation_allowed?
       prog_params = params.require(:programme).permit([:title])
       @programme = Programme.new(prog_params)
-      log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
+      log = ProjectCreationMessageLog.log_request(current_person, @programme, @project,@institution)
       unless User.admin_logged_in?
         Mailer.request_create_project_and_programme(current_user, @programme.to_json, @project.to_json, @institution.to_json, log).deliver_later
       end
@@ -190,7 +190,7 @@ class ProjectsController < ApplicationController
     # No Programme at all
     elsif !Seek::ProjectFormProgrammeOptions.show_programme_box?
       @programme=nil
-      log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
+      log = ProjectCreationMessageLog.log_request(current_person, @programme, @project,@institution)
       unless User.admin_logged_in?
         Mailer.request_create_project(current_user, @project.to_json, @institution.to_json, log).deliver_later
       end
@@ -717,7 +717,7 @@ class ProjectsController < ApplicationController
   end
 
   def validate_message_log_for_create
-    @message_log = MessageLog.find_by_id(params[:message_log_id])
+    @message_log = ProjectCreationMessageLog.find_by_id(params[:message_log_id])
     error_msg ||= "you do not have permission to respond to this request" unless @message_log.can_respond_project_creation_request?(current_user)
     error_msg ||= "message log not found" unless @message_log
     error_msg ||= ("incorrect type of message log" unless @message_log.message_type==MessageLog::PROJECT_CREATION_REQUEST)
