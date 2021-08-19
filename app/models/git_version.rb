@@ -180,29 +180,29 @@ class GitVersion < ApplicationRecord
     update_attribute(:resource_attributes, resource.attributes)
   end
 
-  def remote_sources= attributes_list
-    attributes_list = attributes_list.values if attributes_list.is_a?(Hash)
+  def remote_sources= hash
     to_keep = []
     existing = find_git_annotations('remote_source').to_a
 
-    attributes_list.each do |attributes|
-      path = attributes[:path]
-      url = attributes[:url]
+    hash.each do |path, url|
       annotation = existing.detect { |a| a.path == path } || git_annotations.build(key: 'remote_source', path: path, value: url)
       to_keep << annotation
     end
 
     to_destroy = existing - to_keep
-
     to_destroy.each(&:destroy)
 
-    to_keep
+    hash
   end
 
   def remote_sources
-    find_git_annotations('remote_source').to_a.map do |ann|
-      { path: ann.path, url: ann.value }
+    h = {}
+
+    find_git_annotations('remote_source').each do |ann|
+      h[ann.path] = ann.value
     end
+
+    h
   end
 
   private

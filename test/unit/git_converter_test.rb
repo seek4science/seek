@@ -130,9 +130,10 @@ class GitConverterTest < ActiveSupport::TestCase
     assert_equal 1, workflow.git_versions.count
     assert workflow.latest_git_version.file_exists?('rp2-to-rp2path.cwl')
     assert_equal 'rp2-to-rp2path.cwl', workflow.latest_git_version.main_workflow_path
-    remote_sources = workflow.latest_git_version.find_git_annotations('remote_source')
-    assert_equal 1, remote_sources.length
-    assert_equal 'rp2-to-rp2path.cwl', remote_sources.first.path
-    assert_equal 'https://www.abc.com/workflow.cwl', remote_sources.first.value
+    ann = workflow.latest_git_version.find_git_annotations('remote_source')
+    assert_equal 1, ann.length
+    assert_equal 'rp2-to-rp2path.cwl', ann.first.path
+    assert_equal 'https://www.abc.com/workflow.cwl', ann.first.value
+    assert_equal 'https://www.abc.com/workflow.cwl', workflow.latest_git_version.remote_sources['rp2-to-rp2path.cwl']
   end
 end

@@ -9,14 +9,14 @@ class RemoteGitContentFetchingJobTest < ActiveSupport::TestCase
     gv = Factory(:git_version)
     disable_authorization_checks do
       gv.add_file('remote-file.txt', StringIO.new(''))
-      gv.remote_sources = [{ path: 'remote-file.txt', url: 'http://somewhere.com/text.txt' }]
+      gv.remote_sources = { 'remote-file.txt' => 'http://somewhere.com/text.txt' }
       gv.save
       gv.reload
     end
 
     old_commit = gv.commit
 
-    assert_includes gv.remote_sources, { path: 'remote-file.txt', url: 'http://somewhere.com/text.txt' }
+    assert_equal 'http://somewhere.com/text.txt', gv.remote_sources['remote-file.txt']
     assert_equal '', gv.file_contents('remote-file.txt')
 
     RemoteGitContentFetchingJob.perform_now(gv, 'remote-file.txt', 'http://somewhere.com/text.txt')
@@ -31,14 +31,14 @@ class RemoteGitContentFetchingJobTest < ActiveSupport::TestCase
     gv = Factory(:git_version)
     disable_authorization_checks do
       gv.add_file('remote-file.txt', StringIO.new(''))
-      gv.remote_sources = [{ path: 'remote-file.txt', url: 'http://somewhere.com/text.txt' }]
+      gv.remote_sources = { 'remote-file.txt' => 'http://somewhere.com/text.txt' }
       gv.save
       gv.reload
     end
 
     old_commit = gv.commit
 
-    assert_includes gv.remote_sources, { path: 'remote-file.txt', url: 'http://somewhere.com/text.txt' }
+    assert_equal 'http://somewhere.com/text.txt', gv.remote_sources['remote-file.txt']
     assert_equal '', gv.file_contents('remote-file.txt')
 
     RemoteGitContentFetchingJob.perform_now(gv, 'remote-file.txt', 'http://somewhere.com/text.txt')

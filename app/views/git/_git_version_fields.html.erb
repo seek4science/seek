@@ -8,8 +8,7 @@
   <%= f.hidden_field :main_workflow_path %>
   <%= f.hidden_field :diagram_path %>
   <%= f.hidden_field :abstract_cwl_path %>
-  <% git_version.remote_sources.each_with_index do |rs, i| %>
-    <%= hidden_field_tag "#{f.object_name}[remote_sources][#{i}][path]", rs[:path] %>
-    <%= hidden_field_tag "#{f.object_name}[remote_sources][#{i}][url]", rs[:url] %>
+  <% git_version.remote_sources.each do |path, url| %>
+    <%= hidden_field_tag "#{f.object_name}[remote_sources][#{path}]", url %>
   <% end %>
 <% end %>
