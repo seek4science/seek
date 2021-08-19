@@ -3,9 +3,9 @@ class ProjectCreationMessageLog < MessageLog
   default_scope { where(message_type: PROJECT_CREATION_REQUEST) }
 
   # project creation requests that haven't been responded to
-  scope :pending_project_creation_requests, -> { pending }
+  scope :pending_requests, -> { pending }
 
-  def self.log_project_creation_request(sender, programme, project, institution)
+  def self.log_request(sender, programme, project, institution)
     details = {}
     details[:institution] = institution.attributes
     details[:project] = project.attributes

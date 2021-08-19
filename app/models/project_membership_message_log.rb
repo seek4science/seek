@@ -1,17 +1,17 @@
 class ProjectMembershipMessageLog < MessageLog
 
   default_scope { where(message_type: PROJECT_MEMBERSHIP_REQUEST) }
-  scope :pending_project_join_requests, ->(projects) { where(subject: projects).pending }
+  scope :pending_requests, ->(projects) { where(subject: projects).pending }
 
   validate :project_required_for_project_membership_request
 
   # message logs created since the recent period, for that person and project
-  scope :recent_project_membership_requests, lambda { |person, project|
+  scope :recent_requests, lambda { |person, project|
     where(subject: project).where(sender: person).recent
   }
 
   # records a project membership request for a sender and project, along with any details provided
-  def self.log_project_membership_request(sender, project, institution, comments)
+  def self.log_request(sender, project, institution, comments)
     details = { comments: comments }
     details[:institution] = institution.attributes if institution
     ProjectMembershipMessageLog.create(subject: project, sender: sender, details: details.to_json)
