@@ -212,7 +212,7 @@ class ApplicationHelperTest < ActionView::TestCase
 
     person3 = Factory(:person)
 
-    log = MessageLog.log_project_membership_request(Factory(:person), project1, Factory(:institution),'')
+    log = ProjectMembershipMessageLog.log_request(Factory(:person), project1, Factory(:institution),'')
 
     User.with_current_user(person3.user) do
       refute pending_project_join_request?
@@ -242,7 +242,7 @@ class ApplicationHelperTest < ActionView::TestCase
 
     MessageLog.delete_all
     # creating just a project, admins notified
-    MessageLog.log_project_creation_request(person, nil, project, institution)
+    ProjectCreationMessageLog.log_request(person, nil, project, institution)
     User.with_current_user(person.user) do
       refute pending_project_creation_request?
     end
@@ -261,7 +261,7 @@ class ApplicationHelperTest < ActionView::TestCase
 
     # creating a project with a plain programme - prog admins notified
     MessageLog.delete_all
-    MessageLog.log_project_creation_request(person, programme, project, institution)
+    ProjectCreationMessageLog.log_request(person, programme, project, institution)
     User.with_current_user(person.user) do
       refute pending_project_creation_request?
     end
@@ -280,7 +280,7 @@ class ApplicationHelperTest < ActionView::TestCase
 
     # creating a project with a managed programme - prog admins and admins notified
     MessageLog.delete_all
-    MessageLog.log_project_creation_request(person, programme, project, institution)
+    ProjectCreationMessageLog.log_request(person, programme, project, institution)
     with_config_value(:managed_programme_id, programme.id) do
       assert programme.site_managed?
       User.with_current_user(person.user) do
@@ -302,7 +302,7 @@ class ApplicationHelperTest < ActionView::TestCase
 
     # new programme, admins notified
     MessageLog.delete_all
-    MessageLog.log_project_creation_request(person, Programme.new(title: 'new'), project, institution)
+    ProjectCreationMessageLog.log_request(person, Programme.new(title: 'new'), project, institution)
     User.with_current_user(person.user) do
       refute pending_project_creation_request?
     end

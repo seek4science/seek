@@ -303,7 +303,7 @@ class Project < ApplicationRecord
     user.present? &&
       project_administrators.any? &&
       !has_member?(user) &&
-      MessageLog.recent_project_membership_requests(user.try(:person),self).empty?
+      ProjectMembershipMessageLog.recent_requests(user.try(:person),self).empty?
   end
 
   def validate_end_date

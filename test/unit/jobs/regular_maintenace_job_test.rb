@@ -65,25 +65,25 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
     person1 = Factory(:not_activated_person)
     refute person1.user.active?
     travel_to(5.hours.ago) do
-      MessageLog.log_activation_email(person1)
-      MessageLog.log_activation_email(person1)
+      ActivationEmailMessageLog.log_activation_email(person1)
+      ActivationEmailMessageLog.log_activation_email(person1)
     end
 
     # person 2 - not activated, but 3 messages sent over 1 day ago
     person2 = Factory(:not_activated_person)
     travel_to(2.days.ago) do
-      MessageLog.log_activation_email(person2)
-      MessageLog.log_activation_email(person2)
-      MessageLog.log_activation_email(person2)
+      ActivationEmailMessageLog.log_activation_email(person2)
+      ActivationEmailMessageLog.log_activation_email(person2)
+      ActivationEmailMessageLog.log_activation_email(person2)
     end
 
     # person 3 - not activated, but 2 message sent, one 1 days ago but the latest 1 hour ago
     person3 = Factory(:not_activated_person)
     travel_to(1.day.ago) do
-      MessageLog.log_activation_email(person3)
+      ActivationEmailMessageLog.log_activation_email(person3)
     end
     travel_to(1.hour.ago) do
-      MessageLog.log_activation_email(person3)
+      ActivationEmailMessageLog.log_activation_email(person3)
     end
 
     # person 4 - not activated, and no message logs
@@ -103,7 +103,7 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
       end
     end
 
-    logs = MessageLog.last(2)
+    logs = ActivationEmailMessageLog.last(2)
     assert_equal [person1, person4].sort, logs.collect(&:subject).sort
 
     # running again should have no effect, as those due another email need to wait
@@ -122,7 +122,7 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
       end
     end
     
-    logs = MessageLog.last(2)
+    logs = ActivationEmailMessageLog.last(2)
     assert_equal [person3, person4].sort, logs.collect(&:subject).sort
   end
 end
