@@ -1,5 +1,5 @@
 class ProjectCreationMessageLog < MessageLog
-  default_scope { where(message_type: PROJECT_CREATION_REQUEST) }
+  default_scope { where(message_type: :project_creation_request) }
 
   # project creation requests that haven't been responded to
   scope :pending_requests, -> { pending }
@@ -16,7 +16,7 @@ class ProjectCreationMessageLog < MessageLog
   # whether the person can respond to the creation request
   # TODO: this will be refactored into a more general method
   def can_respond_project_creation_request?(user_or_person)
-    return false unless message_type == PROJECT_CREATION_REQUEST
+    return false unless project_creation_request?
     return false if user_or_person.nil?
 
     person = user_or_person.person

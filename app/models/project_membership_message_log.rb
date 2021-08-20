@@ -1,5 +1,5 @@
 class ProjectMembershipMessageLog < MessageLog
-  default_scope { where(message_type: PROJECT_MEMBERSHIP_REQUEST) }
+  default_scope { where(message_type: :project_membership_request) }
   scope :pending_requests, ->(projects) { where(subject: projects).pending }
 
   validate :project_required_for_project_membership_request
@@ -19,7 +19,7 @@ class ProjectMembershipMessageLog < MessageLog
   private
 
   def project_required_for_project_membership_request
-    if message_type == PROJECT_MEMBERSHIP_REQUEST && !subject.is_a?(Project)
+    if project_membership_request? && !subject.is_a?(Project)
       errors.add(:subject, 'must be a project for a project membership request')
     end
   end

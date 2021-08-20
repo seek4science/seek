@@ -30,7 +30,7 @@ class MessageLogTest < ActiveSupport::TestCase
 
     # subject must be a project for project membership request
     log = valid_log
-    log.message_type = MessageLog::PROJECT_MEMBERSHIP_REQUEST
+    assert log.project_membership_request?
     log.subject = Factory(:data_file)
     refute log.valid?
   end
@@ -39,10 +39,8 @@ class MessageLogTest < ActiveSupport::TestCase
     MessageLog.destroy_all
     subject = Factory(:project)
     sender = Factory(:person)
-    log1 = ProjectMembershipMessageLog.create(subject: subject, sender: sender, details: 'blah blah',
-                             message_type: MessageLog::PROJECT_MEMBERSHIP_REQUEST)
-    log2 = ProjectMembershipMessageLog.create(subject: subject, sender: sender, details: 'blah blah',
-                             message_type: MessageLog::PROJECT_MEMBERSHIP_REQUEST)
+    log1 = ProjectMembershipMessageLog.create(subject: subject, sender: sender, details: 'blah blah')
+    log2 = ProjectMembershipMessageLog.create(subject: subject, sender: sender, details: 'blah blah')
     log3 = ProjectMembershipMessageLog.create(subject: subject, sender: sender, details: 'blah blah', message_type: 2)
 
     logs = ProjectMembershipMessageLog.all
@@ -99,7 +97,7 @@ class MessageLogTest < ActiveSupport::TestCase
     log = ProjectMembershipMessageLog.last
     assert_equal proj, log.subject
     assert_equal sender, log.sender
-    assert_equal MessageLog::PROJECT_MEMBERSHIP_REQUEST, log.message_type
+    assert_equal 'project_membership_request', log.message_type
     details = JSON.parse(log.details)
     assert_equal 'some comments', details['comments']
     assert_equal 'new inst', details['institution']['title']
@@ -118,7 +116,8 @@ class MessageLogTest < ActiveSupport::TestCase
     log = ProjectCreationMessageLog.last
     assert_equal requester, log.subject
     assert_equal requester, log.sender
-    assert_equal MessageLog::PROJECT_CREATION_REQUEST, log.message_type
+    assert_equal 'project_creation_request', log.message_type
+    assert log.project_creation_request?
     details = JSON.parse(log.details)
     assert_equal programme.title, details['programme']['title']
     assert_equal programme.id, details['programme']['id']
@@ -249,7 +248,7 @@ class MessageLogTest < ActiveSupport::TestCase
     log = assert_difference('ActivationEmailMessageLog.count') do
       ActivationEmailMessageLog.log_activation_email(person)
     end
-    assert_equal MessageLog::ACTIVATION_EMAIL, log.message_type
+    assert_equal 'activation_email', log.message_type
     assert_equal person, log.sender
     assert_equal person, log.subject
   end
@@ -317,7 +316,6 @@ class MessageLogTest < ActiveSupport::TestCase
   def valid_log
     subject = Factory(:project)
     sender = Factory(:person)
-    ProjectMembershipMessageLog.new(subject: subject, sender: sender, details: 'blah blah',
-                   message_type: MessageLog::PROJECT_MEMBERSHIP_REQUEST)
+    ProjectMembershipMessageLog.new(subject: subject, sender: sender, details: 'blah blah')
   end
 end

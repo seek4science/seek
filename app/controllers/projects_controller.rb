@@ -707,7 +707,7 @@ class ProjectsController < ApplicationController
 
     error_msg ||= "message log not found" unless @message_log
     error_msg ||= ("message log doesn't match #{t('project')}" if @message_log.subject != @project)
-    error_msg ||= ("incorrect type of message log" unless @message_log.message_type==MessageLog::PROJECT_MEMBERSHIP_REQUEST)
+    error_msg ||= ("incorrect type of message log" unless @message_log.project_membership_request?)
     error_msg ||= ("message has already been responded to" if @message_log.responded?)
 
     if error_msg
@@ -720,7 +720,7 @@ class ProjectsController < ApplicationController
     @message_log = ProjectCreationMessageLog.find_by_id(params[:message_log_id])
     error_msg ||= "you do not have permission to respond to this request" unless @message_log.can_respond_project_creation_request?(current_user)
     error_msg ||= "message log not found" unless @message_log
-    error_msg ||= ("incorrect type of message log" unless @message_log.message_type==MessageLog::PROJECT_CREATION_REQUEST)
+    error_msg ||= ("incorrect type of message log" unless @message_log.project_creation_request?)
     error_msg ||= ("message has already been responded to" if @message_log.responded?)
     
     if error_msg

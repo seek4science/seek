@@ -1,11 +1,14 @@
 # records and tracks messages that have been sent, and when
 
 class MessageLog < ApplicationRecord
-  PROJECT_MEMBERSHIP_REQUEST = 1
-  CONTACT_REQUEST = 2
-  PROGRAMME_CREATION_REQUEST = 3
-  PROJECT_CREATION_REQUEST = 4
-  ACTIVATION_EMAIL = 5
+
+  enum message_type: {
+    project_membership_request: 1,
+    contact_request: 2,
+    programme_creation_request: 3, # no longer used
+    project_creation_request: 4,
+    activation_email: 5
+  }
 
   # the period concidered recent, which can be used to prevent a repeat message until that period has passed
   RECENT_PERIOD = 12.hours.freeze

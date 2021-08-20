@@ -315,7 +315,7 @@ class SopsControllerTest < ActionController::TestCase
     log = ContactRequestMessageLog.last
     assert_equal s, log.subject
     assert_equal User.current_user.person,log.sender
-    assert_equal MessageLog::CONTACT_REQUEST,log.message_type
+    assert log.contact_request?
 
   end
 
