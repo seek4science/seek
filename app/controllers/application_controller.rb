@@ -172,6 +172,7 @@ class ApplicationController < ActionController::Base
           end
         end
         format.json { render json: {"title": "Unauthorized", "detail": flash[:error].to_s}, status: :unauthorized}
+        format.js { render json: {"title": "Unauthorized", "detail": flash[:error].to_s}, status: :unauthorized}
       end
     end
   end
