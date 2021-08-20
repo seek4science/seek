@@ -34,8 +34,8 @@ class RegularMaintenanceJob < ApplicationJob
 
   # Remove GitRepositories that were never used
   def clean_git_repositories
-    GitRepository.redundant.where('git_repositories.created_at < ?', REPO_GRACE_PERIOD.ago).select do |repo|
-      Rails.logger.info("Cleaning up GitRepository #{repo.id}")
+    Git::Repository.redundant.where('git_repositories.created_at < ?', REPO_GRACE_PERIOD.ago).select do |repo|
+      Rails.logger.info("Cleaning up Git::Repository #{repo.id}")
       repo.destroy
     end
   end

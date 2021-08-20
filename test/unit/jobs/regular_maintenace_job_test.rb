@@ -131,11 +131,11 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
     redundant_but_in_grace = Factory(:blank_repository, created_at: 1.second.ago)
     not_redundant = Factory(:git_version).git_repository
 
-    assert_difference('GitRepository.count', -1) do
+    assert_difference('Git::Repository.count', -1) do
       RegularMaintenanceJob.perform_now
     end
 
-    assert_nil GitRepository.find_by_id(redundant.id)
+    assert_nil Git::Repository.find_by_id(redundant.id)
     refute redundant_but_in_grace.destroyed?
     refute not_redundant.destroyed?
 

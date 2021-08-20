@@ -25,13 +25,6 @@ GIT
     my_responds_to_parent (1.0.0)
 
 GIT
-  remote: https://github.com/ruby-git/ruby-git.git
-  revision: d1908f69f3248a8afbe7fa6e55f647eb8f669619
-  specs:
-    git (1.7.0)
-      rchardet (~> 1.8)
-
-GIT
   remote: https://github.com/seek4science/DOI-query-tool.git
   revision: e7a8790f666b9b20e22149d6a450ed85e60504d3
   specs:
@@ -538,7 +531,6 @@ GEM
       activerecord (>= 5.0)
       activesupport (>= 5.0)
       i18n
-    rchardet (1.8.0)
     rdf (3.1.13)
       hamster (~> 3.0)
       link_header (~> 0.0, >= 0.0.8)
@@ -844,7 +836,6 @@ DEPENDENCIES
   fleximage!
   fssm
   gem-licenses
-  git!
   google-analytics-rails
   handlebars_assets
   hpricot (~> 0.8.2)

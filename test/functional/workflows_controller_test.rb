@@ -860,7 +860,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'RO-Crate with no main workflow throws error' do
-    assert_no_difference('GitRepository.count') do
+    assert_no_difference('Git::Repository.count') do
       post :create_from_ro_crate, params: {
         ro_crate: { data: fixture_file_upload('files/workflows/no-main-workflow.crate.zip', 'application/zip') }
       }
@@ -891,7 +891,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     workflow = Factory(:git_version).resource
     login_as(workflow.contributor)
 
-    assert_difference('GitAnnotation.count', 2) do
+    assert_difference('Git::Annotation.count', 2) do
       patch :update_paths, params: { id: workflow.id,
                                      git_version: { diagram_path: 'diagram.png',
                                                     main_workflow_path: 'concat_two_files.ga' },
@@ -905,7 +905,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     workflow = Factory(:git_version).resource
     logout
 
-    assert_no_difference('GitAnnotation.count') do
+    assert_no_difference('Git::Annotation.count') do
       patch :update_paths, params: { id: workflow.id,
                                      git_version: { diagram_path: 'diagram.png',
                                                     main_workflow_path: 'concat_two_files.ga' },
@@ -922,7 +922,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     assert_not_equal 'Concat two files', workflow.title
 
-    assert_difference('GitAnnotation.count', 2) do
+    assert_difference('Git::Annotation.count', 2) do
       patch :update_paths, params: { id: workflow.id,
                                      git_version: { diagram_path: 'diagram.png',
                                                     main_workflow_path: 'concat_two_files.ga' },
@@ -987,7 +987,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     assert workflow.is_git_versioned?
 
-    assert_no_difference('GitVersion.count') do
+    assert_no_difference('Git::Version.count') do
       assert_enqueued_jobs(1, only: RemoteGitFetchJob) do
         post :new_git_version, params: { id: workflow.id }
       end
@@ -1002,7 +1002,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     assert workflow.is_git_versioned?
 
-    assert_difference('GitVersion.count', 1) do
+    assert_difference('Git::Version.count', 1) do
       assert_no_enqueued_jobs(only: RemoteGitFetchJob) do
         post :new_git_version, params: { id: workflow.id }
       end

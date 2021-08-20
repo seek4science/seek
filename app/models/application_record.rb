@@ -5,7 +5,7 @@ class ApplicationRecord < ActiveRecord::Base
   include Seek::AnnotatableExtensions
   include Seek::VersionedResource
   include Seek::ExplicitVersioning
-  include Seek::Git::Versioning
+  include Git::Versioning
   include Seek::Favouritable
   include Seek::ActsAsDiscussable
   include Seek::ActsAsFleximageExtension

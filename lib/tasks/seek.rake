@@ -105,18 +105,18 @@ namespace :seek do
   task convert_workflows_to_git: :environment do
     puts 'Converting Workflows to git: '
     count = 0
-    gv_count = GitVersion.count
-    gr_count = GitRepository.count
+    gv_count = Git::Version.count
+    gr_count = Git::Repository.count
     Workflow.includes(:git_versions).find_each do |workflow|
       next if workflow.is_git_versioned?
-      Seek::Git::Converter.new(workflow).convert(unzip: true)
+      Git::Converter.new(workflow).convert(unzip: true)
       count += 1
       print '.'
     end
     puts
     puts "Converted #{count} Workflows"
-    puts "Created #{GitRepository.count - gr_count} GitRepositories"
-    puts "Created #{GitVersion.count - gv_count} GitVersions"
+    puts "Created #{Git::Repository.count - gr_count} GitRepositories"
+    puts "Created #{Git::Version.count - gv_count} GitVersions"
   end
 
   desc "Rebuild workflow internals"

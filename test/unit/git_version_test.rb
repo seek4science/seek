@@ -90,7 +90,7 @@ class GitVersionTest < ActiveSupport::TestCase
     commit = v.commit
     blobs = v.blobs
 
-    assert_raise(Seek::Git::ImmutableVersionException) do
+    assert_raise(Git::ImmutableVersionException) do
       v.add_file('blah.txt', StringIO.new('blah'))
     end
 
@@ -120,8 +120,8 @@ class GitVersionTest < ActiveSupport::TestCase
     # Make sure remote repo exists
     Factory(:workflow, git_version_attributes: { remote: 'https://git.git/git.git' })
 
-    assert_difference('GitVersion.count', 1) do
-      assert_no_difference('GitRepository.count') do
+    assert_difference('Git::Version.count', 1) do
+      assert_no_difference('Git::Repository.count') do
         w = Factory(:workflow, title: 'Test', description: 'Testy', git_version_attributes: {
             ref: 'refs/heads/master',
             remote: 'https://git.git/git.git'
@@ -139,8 +139,8 @@ class GitVersionTest < ActiveSupport::TestCase
 
   test 'create git version with local repo and defaults on create' do
     skip "Not doing this for now"
-    assert_difference('GitVersion.count', 1) do
-      assert_difference('GitRepository.count', 1) do
+    assert_difference('Git::Version.count', 1) do
+      assert_difference('Git::Repository.count', 1) do
         w = Factory(:workflow, title: 'Test', description: 'Testy')
         assert_equal 1, w.git_versions.count
 

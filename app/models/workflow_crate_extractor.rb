@@ -16,7 +16,7 @@ class WorkflowCrateExtractor
     @workflow = Workflow.new(workflow_class: workflow_class)
 
     if resolve_crate && extract_crate && valid?
-      repo = GitRepository.create!
+      repo = Git::Repository.create!
       gv = @workflow.git_version
       gv.git_repository = repo
       gv.main_workflow_path = URI.decode_www_form_component(@crate.main_workflow.id) if @crate.main_workflow && !@crate.main_workflow.remote?

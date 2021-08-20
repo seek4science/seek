@@ -42,7 +42,7 @@ class WorkflowCrateBuilder
         gv.abstract_cwl_path = abstract_cwl_filename
       end
 
-      repo = GitRepository.create!
+      repo = Git::Repository.create!
       @workflow.local_git_repository = repo
       gv.git_repository = repo
       gv.add_files(files)

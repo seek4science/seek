@@ -3,10 +3,10 @@ require 'test_helper'
 class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
 
   test 'can register a remote git repository as a workflow' do
-    repo_count = GitRepository.count
+    repo_count = Git::Repository.count
     workflow_count = Workflow.count
-    version_count = GitVersion.count
-    annotation_count = GitAnnotation.count
+    version_count = Git::Version.count
+    annotation_count = Git::Annotation.count
 
     person = Factory(:person)
     galaxy = WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class)
@@ -15,7 +15,7 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
     get new_workflow_path
 
     assert_enqueued_jobs(1, only: RemoteGitFetchJob) do
-      assert_difference('GitRepository.count', 1) do
+      assert_difference('Git::Repository.count', 1) do
         assert_difference('Task.count', 1) do
           post git_repositories_path, params: { resource_type: 'workflow', remote: 'https://github.com/seek4science/workflow-test-fixture.git' }
 
@@ -57,8 +57,8 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
     assert_select 'input[name="workflow[title]"]', count: 1
 
     assert_difference('Workflow.count', 1) do
-      assert_difference('GitVersion.count', 1) do
-        assert_difference('GitAnnotation.count', 2) do
+      assert_difference('Git::Version.count', 1) do
+        assert_difference('Git::Annotation.count', 2) do
           post create_metadata_workflows_path, params: { workflow: {
                                                   workflow_class_id: galaxy.id,
                                                   title: 'blabla',
@@ -84,17 +84,17 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
     assert_nil assigns(:workflow).latest_git_version.git_repository.resource
 
     # Check there wasn't anything extra created in the whole flow...
-    assert_equal repo_count + 1, GitRepository.count
+    assert_equal repo_count + 1, Git::Repository.count
     assert_equal workflow_count + 1, Workflow.count
-    assert_equal version_count + 1, GitVersion.count
-    assert_equal annotation_count + 2, GitAnnotation.count
+    assert_equal version_count + 1, Git::Version.count
+    assert_equal annotation_count + 2, Git::Annotation.count
   end
 
   test 'can upload local files to create a local git repository for a workflow' do
-    repo_count = GitRepository.count
+    repo_count = Git::Repository.count
     workflow_count = Workflow.count
-    version_count = GitVersion.count
-    annotation_count = GitAnnotation.count
+    version_count = Git::Version.count
+    annotation_count = Git::Annotation.count
 
     person = Factory(:person)
     cwl = WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class)
@@ -103,7 +103,7 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
     get new_workflow_path
 
     assert_enqueued_jobs(0) do
-      assert_difference('GitRepository.count', 1) do
+      assert_difference('Git::Repository.count', 1) do
         assert_no_difference('Task.count') do
           post create_from_files_workflows_path, params: {
               ro_crate: {
@@ -120,8 +120,8 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
     assert_select 'input[name="workflow[title]"]', count: 1
 
     assert_difference('Workflow.count', 1) do
-      assert_difference('GitVersion.count', 1) do
-        assert_difference('GitAnnotation.count', 2) do
+      assert_difference('Git::Version.count', 1) do
+        assert_difference('Git::Annotation.count', 2) do
           post create_metadata_workflows_path, params: {
               workflow: {
                   workflow_class_id: cwl.id,
@@ -148,17 +148,17 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
     assert_equal assigns(:workflow), assigns(:workflow).latest_git_version.git_repository.resource
 
     # Check there wasn't anything extra created in the whole flow...
-    assert_equal repo_count + 1, GitRepository.count
+    assert_equal repo_count + 1, Git::Repository.count
     assert_equal workflow_count + 1, Workflow.count
-    assert_equal version_count + 1, GitVersion.count
-    assert_equal annotation_count + 2, GitAnnotation.count
+    assert_equal version_count + 1, Git::Version.count
+    assert_equal annotation_count + 2, Git::Annotation.count
   end
 
   test 'can upload local RO-Crate to create a local git repository for a workflow' do
-    repo_count = GitRepository.count
+    repo_count = Git::Repository.count
     workflow_count = Workflow.count
-    version_count = GitVersion.count
-    annotation_count = GitAnnotation.count
+    version_count = Git::Version.count
+    annotation_count = Git::Annotation.count
 
     person = Factory(:person)
     nextflow = WorkflowClass.find_by_key('nextflow') || Factory(:nextflow_workflow_class)
@@ -167,7 +167,7 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
     get new_workflow_path
 
     assert_enqueued_jobs(0) do
-      assert_difference('GitRepository.count', 1) do
+      assert_difference('Git::Repository.count', 1) do
         assert_no_difference('Task.count') do
           post create_from_ro_crate_workflows_path, params: {
               ro_crate: { data: fixture_file_upload('files/workflows/ro-crate-nf-core-ampliseq.crate.zip', 'application/zip') }
@@ -180,8 +180,8 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
     assert_select 'input[name="workflow[title]"]', count: 1
 
     assert_difference('Workflow.count', 1) do
-      assert_difference('GitVersion.count', 1) do
-        assert_difference('GitAnnotation.count', 1) do
+      assert_difference('Git::Version.count', 1) do
+        assert_difference('Git::Annotation.count', 1) do
           post create_metadata_workflows_path, params: {
               workflow: {
                   workflow_class_id: nextflow.id,
@@ -207,10 +207,10 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
     assert_equal assigns(:workflow), assigns(:workflow).latest_git_version.git_repository.resource
 
     # Check there wasn't anything extra created in the whole flow...
-    assert_equal repo_count + 1, GitRepository.count
+    assert_equal repo_count + 1, Git::Repository.count
     assert_equal workflow_count + 1, Workflow.count
-    assert_equal version_count + 1, GitVersion.count
-    assert_equal annotation_count + 1, GitAnnotation.count
+    assert_equal version_count + 1, Git::Version.count
+    assert_equal annotation_count + 1, Git::Annotation.count
   end
 
   private

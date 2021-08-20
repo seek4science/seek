@@ -2,7 +2,7 @@
 <div class="list-group">
   <% visible_versions = resource.visible_versions %>
   <% visible_versions.reverse.each do |version| %>
-    <% if version.is_a?(GitVersion) %>
+    <% if version.is_a?(Git::Version) %>
       <%= render partial: 'assets/resource_git_version_list_item', locals: { visible_versions: visible_versions, displayed_resource: displayed_resource, resource: resource, version: version } %>
     <% else %>
       <%= render partial: 'assets/resource_version_list_item', locals: { visible_versions: visible_versions, displayed_resource: displayed_resource, resource: resource, version: version } %>

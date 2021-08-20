@@ -8,7 +8,7 @@ class GitRepositoriesController < ApplicationController
   end
 
   def create
-    @git_repository = GitRepository.find_or_create_by(remote: params[:remote])
+    @git_repository = Git::Repository.find_or_create_by(remote: params[:remote])
     @git_repository.queue_fetch
 
     respond_to do |format|
@@ -31,7 +31,7 @@ class GitRepositoriesController < ApplicationController
   private
 
   def get_repository
-    @git_repository = GitRepository.find(params[:id])
+    @git_repository = Git::Repository.find(params[:id])
   end
 
 end

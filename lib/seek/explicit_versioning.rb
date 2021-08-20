@@ -148,7 +148,7 @@ module Seek
     module ActMethods
       def self.included(base) # :nodoc:
         base.extend ClassMethods
-        base.include Seek::Git::VersioningCompatibility
+        base.include Git::VersioningCompatibility
       end
 
       # Finds a specific version of this model.
