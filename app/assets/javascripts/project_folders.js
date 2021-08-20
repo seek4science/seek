@@ -139,42 +139,37 @@ function folder_clicked(folder_id, project_id) {
 
 function item_clicked(type, id, parent) {
   hideAllViews();
-  $j(`#${type}_contents`).show();
   updateBreadcrumb(type);
   selectedItem.id = id;
   selectedItem.type = type;
   selectedItem.parent = parent;
-
-  if (isAsset(type)) {
-    const params = type === "sample" ? { view: "default" } : { asset_id: id, asset_type: type };
-    loadItemDetails(pid, parent.id, parent.type, params);
+  if (type == "sample") {
+    $j("#sample_contents").show();
+    loadItemDetails(pid, parent.id, parent.type, { view: "default" });
   } else {
-    loadItemDetails(pid, id, type);
+    $j("#item_contents").show();
+    loadItemDetails(pid, id, type, { view: "default" });
   }
 }
 
-const isAsset = (type) => !["project", "investigation", "study", "assay"].includes(type);
-
-const loadAssayAssets = (view, table_cols) =>
+const loadAssaySamples = (view, table_cols) =>
   loadItemDetails(pid, selectedItem.parent.id, selectedItem.parent.type, { view, table_cols });
 
 const loadItemDetails = (pid, id, type, params = {}) => {
   const p = Object.keys(params)
     .map((x) => `${x}=${params[x]}`)
     .join("&");
-  const url = `/single_pages/${pid}/render_item_detail/${id}/type/${type}?${p}`;
   $j.ajax({
-    url,
+    url: `/single_pages/${pid}/render_item_detail/${id}/type/${type}?${p}`,
     cache: false,
     type: "GET",
     dataType: "script",
     beforeSend: () => $j("#loader").show(),
     complete: () => $j("#loader").fadeOut(100),
     error: (e) => {
-      if (e.status !== 200) {
-        if (e.responseText === "not logged in") alert("You are not logged in!");
-        else alert(`An error occurred during processing the request.\nDetails: ${e.responseText}`);
-      }
+      if (e.status === 401) alert("You are not logged in!");
+      else if (e.status !== 200)
+        alert(`An error occurred during processing the request.\nDetails: ${e.responseText}`);
     }
   });
 };
@@ -187,12 +182,10 @@ function hideAllViews() {
 function bounce(item, text) {
   item.addClass("animate");
   setTimeout(function () {
-    item.css("transform", "scale(2)");
-    item.css("opacity", "0");
+    item.css({ transform: "scale(2)", opacity: "0" });
   }, 1);
   setTimeout(function () {
-    item.css("transform", "scale(1)");
-    item.css("opacity", "1");
+    item.css({ transform: "scale(1)", opacity: "1" });
     item.text(text);
   }, 300);
 }

@@ -396,13 +396,8 @@
     transition: all 200ms ease-in-out;
 }
 
-#investigation_contents,
-#study_contents,
-#assay_contents,
-#sample_contents,
-#sop_contents,
-#data_file_contents,
-#document_contents {
+#item_contents,
+#sample_contents {
     padding: 0em 0em 0em 0em;
     margin: 0em 0em 0em 0em;
     min-height: 50em;
