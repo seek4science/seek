@@ -28,5 +28,11 @@ module Git
         content
       end
     end
+
+    def ==(other)
+      git_version == other.git_version &&
+        path == other.path &&
+        oid == other.oid
+    end
   end
 end

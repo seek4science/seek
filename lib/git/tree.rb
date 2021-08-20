@@ -16,15 +16,17 @@ module Git
     def get_tree(path)
       entry = entry(path)
       return nil unless entry[:type] == :tree
-      o = git_base.lookup(entry[:oid])
-      Git::Tree.new(git_version, o, path) if o
+      Git::Tree.new(git_version, git_base.lookup(entry[:oid]), path)
+    rescue Rugged::TreeError
+      nil
     end
 
     def get_blob(path)
       entry = entry(path)
       return nil unless entry[:type] == :blob
-      o = git_base.lookup(entry[:oid])
-      Git::Blob.new(git_version, o, path) if o
+      Git::Blob.new(git_version, git_base.lookup(entry[:oid]), path)
+    rescue Rugged::TreeError
+      nil
     end
 
     def entry(path)
@@ -32,15 +34,23 @@ module Git
     end
 
     def trees
-      each_tree.map do |entry|
-        Git::Tree.new(git_version, object(entry[:path]), entry[:path])
+      t = []
+
+      each_tree do |entry|
+        t << Git::Tree.new(git_version, git_base.lookup(entry[:oid]), entry[:path])
       end
+
+      t
     end
 
     def blobs
-      each_blob.map do |entry|
-        Git::Blob.new(git_version, object(entry[:path]), entry[:path])
+      b = []
+
+      each_blob do |entry|
+        b << Git::Blob.new(git_version, git_base.lookup(entry[:oid]), entry[:path])
       end
+
+      b
     end
 
     def total_size

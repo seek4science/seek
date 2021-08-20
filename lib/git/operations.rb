@@ -49,7 +49,7 @@ module Git
     def blobs
       return [] unless commit
 
-      blob.blobs
+      tree.blobs
     end
 
     def file_exists?(path)
