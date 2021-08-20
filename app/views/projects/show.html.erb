@@ -139,7 +139,7 @@
 <% end %>
 
 <%# get, classify and authorize all assets for this project -%>
-<%= render :partial=>"general/items_related_to",:object => @project %>
+<%= render :partial=>"general/items_related_to",:object => @project if !@single_page%>
 
 <script>
   $j('#project-hierarchy-toggle').click(function () {

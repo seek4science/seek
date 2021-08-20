@@ -22,43 +22,16 @@
         <div class="col-md-8">
             <div id="container" style="position:relative" class="tv">
                 <div id="loader"></div>
-                <div id="project_contents" class="row">
-                    <div class="col-lg-8">
-                        <div class="simpleForm">
-                            <%= render :partial => "project_details" -%>
-                        </div>
-                    </div>
-                    <div class="col-lg-4">
-                        <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @project } -%>
-                        <% if @project.can_manage? %>
-                        <%= render :partial => 'general/storage_usage_box', locals: { programme: @project,
-                            url: storage_report_project_path(@project)} %>
-                        <% end %>
-                    </div>
-                </div>
                 <div id="folder_contents" class="row" style="display:none">
                      <%= render :partial => "folders/contents", :locals => {:folder => default_folder } -%>
                 </div>
-                <div id="investigation_contents" class="row" style="display:none">
-                    <%= render :partial => "investigation" -%>
-                </div>
-                <div id="study_contents" class="row" style="display:none">
-                    <%= render :partial => "study" -%>
-                </div>
-                <div id="assay_contents" class="row" style="display:none">
-                    <%= render :partial => "assay" -%>
-                </div>
                 <div id="sample_contents" class="row" style="display:none">
-                    <%= render :partial => "sample" -%>
+                    <div class="simpleForm">
+                        <div id="samples-details"></div>
+                    </div>
                 </div>
-                <div id="sop_contents" class="row" style="display:none">
-                    <%= render :partial => "sop" -%>
-                </div>
-                <div id="data_file_contents" class="row" style="display:none">
-                    <%= render :partial => "data_file" -%>
-                </div>
-                <div id="document_contents" class="row" style="display:none">
-                    <%= render :partial => "document" -%>
+                <div id="item_contents" class="row" style="display:none">
+                 <%= render :partial => "item" -%>
                 </div>
             </div>
         </div>
@@ -101,9 +74,11 @@
         var selectedItem = {type:"",id:""}, pid, uid
         $j(document).ready(function() {
             setupFoldersTree( <%= ((TreeviewBuilder.new(@project, @folders)).build_tree_data).html_safe -%> , 'demo_tree', 'draggable_folder_item');
-            $j(`#project_contents`).show();
-             pid = <%= @project.id %>
-             uid = <%= current_user.id if current_user %>
+            $j("#item-details").html("<%= escape_javascript(render template: 'projects/show' ) %>");
+            $j("#item-related-items").html("<%= escape_javascript(render partial: 'general/items_related_to', object: @project ) %>");
+            $j("#item_contents").show();
+            pid = <%= @project.id %>
+            uid = <%= current_user.id if current_user %>
 
             $j("a:contains('Cancel')").click(function (e) {
                 e.preventDefault();
