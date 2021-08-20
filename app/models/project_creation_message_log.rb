@@ -1,16 +1,15 @@
 class ProjectCreationMessageLog < MessageLog
+  include Seek::ProjectMessageLogDetails
+
   default_scope { where(message_type: :project_creation_request) }
 
   # project creation requests that haven't been responded to
   scope :pending_requests, -> { pending }
 
   def self.log_request(sender, programme, project, institution)
-    details = {}
-    details[:institution] = institution.attributes
-    details[:project] = project.attributes
-    details[:programme] = programme&.attributes
+    details = details_json(programme: programme, project: project, institution: institution)
     # FIXME: needs a subject, but can't use programme as it will save it if it is new
-    ProjectCreationMessageLog.create(subject: sender, sender: sender, details: details.to_json)
+    ProjectCreationMessageLog.create(subject: sender, sender: sender, details: details)
   end
 
   # whether the person can respond to the creation request
@@ -21,11 +20,9 @@ class ProjectCreationMessageLog < MessageLog
 
     person = user_or_person.person
 
-    log_details = JSON.parse(details)
+    programme = parsed_details.programme
 
-    return person.is_admin? if log_details['programme'].blank?
-
-    programme = Programme.new(log_details['programme'])
+    return person.is_admin? if programme.blank?
 
     if programme.id.nil?
       person.is_admin?

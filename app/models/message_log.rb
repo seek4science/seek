@@ -1,7 +1,6 @@
 # records and tracks messages that have been sent, and when
 
 class MessageLog < ApplicationRecord
-
   enum message_type: {
     project_membership_request: 1,
     contact_request: 2,

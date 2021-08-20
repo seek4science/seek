@@ -98,11 +98,12 @@ class MessageLogTest < ActiveSupport::TestCase
     assert_equal proj, log.subject
     assert_equal sender, log.sender
     assert_equal 'project_membership_request', log.message_type
-    details = JSON.parse(log.details)
-    assert_equal 'some comments', details['comments']
-    assert_equal 'new inst', details['institution']['title']
-    assert_nil details['institution']['id']
-    assert_equal 'DE', details['institution']['country']
+    details = log.parsed_details
+    assert_equal 'some comments', details.comments
+    assert_equal 'new inst', details.institution.title
+    assert_nil details.institution.id
+    assert_equal 'DE', details.institution.country
+    assert details.institution.new_record?
   end
 
   test 'log project creation request' do
@@ -118,14 +119,17 @@ class MessageLogTest < ActiveSupport::TestCase
     assert_equal requester, log.sender
     assert_equal 'project_creation_request', log.message_type
     assert log.project_creation_request?
-    details = JSON.parse(log.details)
-    assert_equal programme.title, details['programme']['title']
-    assert_equal programme.id, details['programme']['id']
-    assert_equal 'a project', details['project']['title']
-    assert_nil details['project']['id']
-    assert_equal 'an inst', details['institution']['title']
-    assert_nil details['institution']['id']
-    assert_equal 'FR', details['institution']['country']
+    details = log.parsed_details
+    assert_equal programme.title, details.programme.title
+    assert_equal programme.id, details.programme.id
+    refute details.programme.new_record?
+    assert_equal 'a project', details.project.title
+    assert_nil details.project.id
+    assert details.project.new_record?
+    assert_equal 'an inst', details.institution.title
+    assert_nil details.institution.id
+    assert details.institution.new_record?
+    assert_equal 'FR', details.institution.country
   end
 
   test 'responded' do

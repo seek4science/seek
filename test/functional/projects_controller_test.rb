@@ -1819,10 +1819,10 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :success
     assert flash[:notice]
     log = ProjectMembershipMessageLog.last
-    details = JSON.parse(log.details)
-    assert_equal 'some comments', details['comments']
-    assert_equal institution.title, details['institution']['title']
-    assert_equal institution.id, details['institution']['id']
+    details = log.parsed_details
+    assert_equal 'some comments', details.comments
+    assert_equal institution.title, details.institution.title
+    assert_equal institution.id, details.institution.id
 
   end
 
@@ -1852,13 +1852,13 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :success
     assert flash[:notice]
     log = ProjectMembershipMessageLog.last
-    details = JSON.parse(log.details)
-    assert_equal 'some comments', details['comments']
-    institution_details = details['institution']
-    assert_nil institution_details['id']
-    assert_equal 'GB', institution_details['country']
-    assert_equal 'Sheffield', institution_details['city']
-    assert_equal 'http://google.com', institution_details['web_page']
+
+    details = log.parsed_details
+    assert_equal 'some comments', details.comments
+    assert_nil details.institution.id
+    assert_equal 'GB', details.institution.country
+    assert_equal 'Sheffield', details.institution.city
+    assert_equal 'http://google.com', details.institution.web_page
   end
 
   test 'request join multiple projects' do
@@ -1888,14 +1888,13 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :success
     assert flash[:notice]
     log = ProjectMembershipMessageLog.last
-    details = JSON.parse(log.details)
+    details = log.parsed_details
     assert_equal project2, log.subject
-    assert_equal 'some comments', details['comments']
-    institution_details = details['institution']
-    assert_nil institution_details['id']
-    assert_equal 'GB', institution_details['country']
-    assert_equal 'Sheffield', institution_details['city']
-    assert_equal 'http://google.com', institution_details['web_page']
+    assert_equal 'some comments', details.comments
+    assert_nil details.institution.id
+    assert_equal 'GB', details.institution.country
+    assert_equal 'Sheffield', details.institution.city
+    assert_equal 'http://google.com', details.institution.web_page
   end
 
   test 'request create project with site managed programme' do
@@ -1931,15 +1930,14 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_response :success
       assert flash[:notice]
       log = ProjectCreationMessageLog.last
-      details = JSON.parse(log.details)
-      assert_equal institution.title, details['institution']['title']
-      assert_equal institution.id, details['institution']['id']
-      assert_equal institution.country, details['institution']['country']
-      assert_equal programme.title, details['programme']['title']
-      assert_equal programme.id, details['programme']['id']
-      project_details = details['project']
-      assert_equal 'description', project_details['description']
-      assert_equal 'The Project', project_details['title']
+      details = log.parsed_details
+      assert_equal institution.title, details.institution.title
+      assert_equal institution.id, details.institution.id
+      assert_equal institution.country, details.institution.country
+      assert_equal programme.title, details.programme.title
+      assert_equal programme.id, details.programme.id
+      assert_equal 'description', details.project.description
+      assert_equal 'The Project', details.project.title
     end
   end
 
@@ -1962,15 +1960,15 @@ class ProjectsControllerTest < ActionController::TestCase
       log = ProjectCreationMessageLog.last
       assert_redirected_to administer_create_project_request_projects_path(message_log_id:log.id)
 
-      details = JSON.parse(log.details)
-      assert_equal institution.title, details['institution']['title']
-      assert_equal institution.id, details['institution']['id']
-      assert_equal institution.country, details['institution']['country']
-      assert_equal programme.title, details['programme']['title']
-      assert_equal programme.id, details['programme']['id']
-      project_details = details['project']
-      assert_equal 'description', project_details['description']
-      assert_equal 'The Project', project_details['title']
+      details = log.parsed_details
+      assert_equal institution.title, details.institution.title
+      assert_equal institution.id, details.institution.id
+      assert_equal institution.country, details.institution.country
+      assert_equal programme.title, details.programme.title
+      assert_equal programme.id, details.programme.id
+
+      assert_equal 'description', details.project.description
+      assert_equal 'The Project', details.project.title
     end
   end
 
@@ -2002,24 +2000,20 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_response :success
       assert flash[:notice]
       log = ProjectCreationMessageLog.last
-      details = JSON.parse(log.details)
-      project_details = details['project']
-      programme_details = details['programme']
-      institution_details = details['institution']
+      details = log.parsed_details
 
+      assert_equal 'GB',details.institution.country
+      assert_equal 'London',details.institution.city
+      assert_equal 'the page',details.institution.web_page
+      assert_equal 'the inst',details.institution.title
+      assert_nil details.institution.id
 
-      assert_equal 'GB',institution_details['country']
-      assert_equal 'London',institution_details['city']
-      assert_equal 'the page',institution_details['web_page']
-      assert_equal 'the inst',institution_details['title']
-      assert_nil institution_details['id']
+      assert_equal 'description', details.project.description
+      assert_equal 'The Project', details.project.title
+      assert_nil  details.project.id
 
-      assert_equal 'description', project_details['description']
-      assert_equal 'The Project', project_details['title']
-      assert_nil  project_details['id']
-
-      assert_equal 'the prog',programme_details['title']
-      assert_nil programme_details['id']
+      assert_equal 'the prog',details.programme.title
+      assert_nil details.programme.id
     end
   end
 
@@ -2045,22 +2039,19 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_response :success
       assert flash[:notice]
       log = ProjectCreationMessageLog.last
-      details = JSON.parse(log.details)
-      project_details = details['project']
-      institution_details = details['institution']
+      details = log.parsed_details
 
+      assert_equal 'GB',details.institution.country
+      assert_equal 'London',details.institution.city
+      assert_equal 'the page',details.institution.web_page
+      assert_equal 'the inst',details.institution.title
+      assert_nil details.institution.id
 
-      assert_equal 'GB',institution_details['country']
-      assert_equal 'London',institution_details['city']
-      assert_equal 'the page',institution_details['web_page']
-      assert_equal 'the inst',institution_details['title']
-      assert_nil institution_details['id']
+      assert_equal 'description', details.project.description
+      assert_equal 'The Project', details.project.title
+      assert_nil  details.project.id
 
-      assert_equal 'description', project_details['description']
-      assert_equal 'The Project', project_details['title']
-      assert_nil  project_details['id']
-
-      assert_nil details['programme']
+      assert_nil details.programme
     end
   end
 

@@ -1,4 +1,6 @@
 class ProjectMembershipMessageLog < MessageLog
+  include Seek::ProjectMessageLogDetails
+
   default_scope { where(message_type: :project_membership_request) }
   scope :pending_requests, ->(projects) { where(subject: projects).pending }
 
@@ -11,9 +13,8 @@ class ProjectMembershipMessageLog < MessageLog
 
   # records a project membership request for a sender and project, along with any details provided
   def self.log_request(sender, project, institution, comments)
-    details = { comments: comments }
-    details[:institution] = institution.attributes if institution
-    ProjectMembershipMessageLog.create(subject: project, sender: sender, details: details.to_json)
+    details = details_json(project: project, institution: institution, comments: comments)
+    ProjectMembershipMessageLog.create(subject: project, sender: sender, details: details)
   end
 
   private

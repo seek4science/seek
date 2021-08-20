@@ -73,12 +73,10 @@ class ProjectsController < ApplicationController
   end
 
   def administer_join_request
-    details = JSON.parse(@message_log.details)
-    @comments = details['comments']
-    @institution = Institution.new(details['institution'])
-    if @institution.id
-      @institution = Institution.find(@institution.id)
-    else
+    details = @message_log.parsed_details
+    @comments = details.comments
+    @institution = details.institution
+    unless @institution.id
       # override with existing institution if already exists with same title, it could have been created since the request was made
       @institution = Institution.find_by(title: @institution.title) if Institution.find_by(title: @institution.title)
     end
@@ -731,26 +729,19 @@ class ProjectsController < ApplicationController
   end
 
   def parse_message_log_details
-    details = JSON.parse(@message_log.details)
-    if details['programme']
-      @programme = Programme.new(details['programme'])
-      @programme = Programme.find(@programme.id) unless @programme.id.nil?
-    end
+    details = @message_log.parsed_details
 
-    @project = Project.new(details['project'])
-    @project = Project.find(@project.id) unless @project.id.nil?
+    @programme = details.programme
+    @project = details.project
+    @institution = details.institution
 
-    @institution = Institution.new(details['institution'])
-
-    if @institution.id
-      @institution = Institution.find(@institution.id)
-    else
+    if @institution.new_record?
       # override with existing institution if already exists with same title, it could have been created since the request was made
       @institution = Institution.find_by(title: @institution.title) if Institution.find_by(title: @institution.title)
     end 
   end
 
-  # check programme permissions for responding to a MesasgeLog
+  # check programme permissions for responding to a MessageLog
   def check_message_log_programme_permissions
     error_msg = nil
     return unless @programme || params['programme']
