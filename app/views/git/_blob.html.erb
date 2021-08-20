@@ -21,7 +21,9 @@
 
   <strong>Path: </strong> <%= @blob.path -%><br/>
   <strong>Size: </strong> <%= number_to_human_size @blob.size -%><br/>
-  <strong>SHA: </strong> <code><%= @blob.oid %></code><br/>
+  <div class="hidden">
+    <strong>SHA: </strong> <code><%= @blob.oid %></code><br/>
+  </div>
   <% url = @blob.url %>
   <% if url %>
     <strong>Source: </strong> <%= link_to url, url, target: :_blank %><br/>
