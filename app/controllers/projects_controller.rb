@@ -703,7 +703,7 @@ class ProjectsController < ApplicationController
   end
 
   def validate_message_log_for_join
-    @message_log = MessageLog.find_by_id(params[:message_log_id])
+    @message_log = ProjectMembershipMessageLog.find_by_id(params[:message_log_id])
 
     error_msg ||= "message log not found" unless @message_log
     error_msg ||= ("message log doesn't match #{t('project')}" if @message_log.subject != @project)

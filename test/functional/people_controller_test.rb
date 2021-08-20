@@ -106,7 +106,7 @@ class PeopleControllerTest < ActionController::TestCase
     with_config_value(:activation_required_enabled,true) do
       with_config_value(:email_enabled, true) do
         assert_difference('Person.count') do
-          assert_difference('MessageLog.count') do
+          assert_difference('ActivationEmailMessageLog.count') do
             assert_enqueued_emails(2) do #1 to admin, and 1 email requesting activation
               post :create, params: { person: { first_name: 'test', email: 'hghg@sdfsd.com' } }
             end

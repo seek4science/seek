@@ -307,12 +307,12 @@ class SopsControllerTest < ActionController::TestCase
   test 'request contact' do
     s = Factory(:sop, contributor: Factory(:person), policy: Factory(:public_policy))
     assert_enqueued_emails(1) do
-      assert_difference('MessageLog.count') do
+      assert_difference('ContactRequestMessageLog.count') do
         post :request_contact, format: :js, params: { id:s, details:'blah blah' }
       end
     end
 
-    log = MessageLog.last
+    log = ContactRequestMessageLog.last
     assert_equal s, log.subject
     assert_equal User.current_user.person,log.sender
     assert_equal MessageLog::CONTACT_REQUEST,log.message_type

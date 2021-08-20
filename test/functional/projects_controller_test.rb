@@ -1811,14 +1811,14 @@ class ProjectsControllerTest < ActionController::TestCase
         comments: 'some comments'
     }
     assert_enqueued_emails(1) do
-      assert_difference('MessageLog.count') do
+      assert_difference('ProjectMembershipMessageLog.count') do
         post :request_join, params: params
       end
     end
 
     assert_response :success
     assert flash[:notice]
-    log = MessageLog.last
+    log = ProjectMembershipMessageLog.last
     details = JSON.parse(log.details)
     assert_equal 'some comments', details['comments']
     assert_equal institution.title, details['institution']['title']
@@ -1844,14 +1844,14 @@ class ProjectsControllerTest < ActionController::TestCase
     }
 
     assert_enqueued_emails(1) do
-      assert_difference('MessageLog.count') do
+      assert_difference('ProjectMembershipMessageLog.count') do
         post :request_join, params: params
       end
     end
 
     assert_response :success
     assert flash[:notice]
-    log = MessageLog.last
+    log = ProjectMembershipMessageLog.last
     details = JSON.parse(log.details)
     assert_equal 'some comments', details['comments']
     institution_details = details['institution']
@@ -1880,14 +1880,14 @@ class ProjectsControllerTest < ActionController::TestCase
     }
 
     assert_enqueued_emails(2) do
-      assert_difference('MessageLog.count', 2) do
+      assert_difference('ProjectMembershipMessageLog.count', 2) do
         post :request_join, params: params
       end
     end
 
     assert_response :success
     assert flash[:notice]
-    log = MessageLog.last
+    log = ProjectMembershipMessageLog.last
     details = JSON.parse(log.details)
     assert_equal project2, log.subject
     assert_equal 'some comments', details['comments']
@@ -1923,14 +1923,14 @@ class ProjectsControllerTest < ActionController::TestCase
           institution: { id: institution.id }
       }
       assert_enqueued_emails(2) do # programme admins, and instance admins
-        assert_difference('MessageLog.count') do
+        assert_difference('ProjectCreationMessageLog.count') do
           post :request_create, params: params
         end
       end
 
       assert_response :success
       assert flash[:notice]
-      log = MessageLog.last
+      log = ProjectCreationMessageLog.last
       details = JSON.parse(log.details)
       assert_equal institution.title, details['institution']['title']
       assert_equal institution.id, details['institution']['id']
@@ -1955,11 +1955,11 @@ class ProjectsControllerTest < ActionController::TestCase
         institution: {id: institution.id}
       }
       assert_enqueued_emails(0) do
-        assert_difference('MessageLog.count',1) do
+        assert_difference('ProjectCreationMessageLog.count',1) do
           post :request_create, params: params
         end
       end
-      log = MessageLog.last
+      log = ProjectCreationMessageLog.last
       assert_redirected_to administer_create_project_request_projects_path(message_log_id:log.id)
 
       details = JSON.parse(log.details)
@@ -1988,7 +1988,7 @@ class ProjectsControllerTest < ActionController::TestCase
           programme: {title: 'the prog'}
       }
       assert_enqueued_emails(1) do
-        assert_difference('MessageLog.count') do
+        assert_difference('ProjectCreationMessageLog.count') do
           assert_no_difference('Institution.count') do
             assert_no_difference('Project.count') do
               assert_no_difference('Programme.count') do
@@ -2001,7 +2001,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
       assert_response :success
       assert flash[:notice]
-      log = MessageLog.last
+      log = ProjectCreationMessageLog.last
       details = JSON.parse(log.details)
       project_details = details['project']
       programme_details = details['programme']
@@ -2033,7 +2033,7 @@ class ProjectsControllerTest < ActionController::TestCase
         institution: {title:'the inst',web_page:'the page',city:'London',country:'GB'}
       }
       assert_enqueued_emails(1) do
-        assert_difference('MessageLog.count') do
+        assert_difference('ProjectCreationMessageLog.count') do
           assert_no_difference('Institution.count') do
             assert_no_difference('Project.count') do
               post :request_create, params: params
@@ -2044,7 +2044,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
       assert_response :success
       assert flash[:notice]
-      log = MessageLog.last
+      log = ProjectCreationMessageLog.last
       details = JSON.parse(log.details)
       project_details = details['project']
       institution_details = details['institution']
@@ -2641,7 +2641,7 @@ class ProjectsControllerTest < ActionController::TestCase
         assert_difference('Project.count') do
           assert_no_difference('Institution.count') do
             assert_difference('GroupMembership.count') do
-              assert_difference('MessageLog.count',-1) do
+              assert_difference('ProjectCreationMessageLog.count',-1) do
                 post :respond_create_project_request, params:params
               end
             end
@@ -2691,7 +2691,7 @@ class ProjectsControllerTest < ActionController::TestCase
         assert_no_difference('Project.count') do
           assert_no_difference('Institution.count') do
             assert_no_difference('GroupMembership.count') do
-              assert_difference('MessageLog.count',-1) do
+              assert_difference('ProjectCreationMessageLog.count',-1) do
                 post :respond_create_project_request, params:params
               end
             end

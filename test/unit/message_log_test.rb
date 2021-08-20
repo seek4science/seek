@@ -96,7 +96,7 @@ class MessageLogTest < ActiveSupport::TestCase
     assert_difference('ProjectMembershipMessageLog.count') do
       ProjectMembershipMessageLog.log_request(sender, proj, institution, 'some comments')
     end
-    log = MessageLog.last
+    log = ProjectMembershipMessageLog.last
     assert_equal proj, log.subject
     assert_equal sender, log.sender
     assert_equal MessageLog::PROJECT_MEMBERSHIP_REQUEST, log.message_type

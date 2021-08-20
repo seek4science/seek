@@ -98,7 +98,7 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
 
     # only person 1 and person 4 should have emails resent
     assert_enqueued_emails(2) do
-      assert_difference('MessageLog.count', 2) do
+      assert_difference('ActivationEmailMessageLog.count', 2) do
         RegularMaintenanceJob.perform_now
       end
     end
@@ -108,7 +108,7 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
 
     # running again should have no effect, as those due another email need to wait
     assert_enqueued_emails(0) do
-      assert_no_difference('MessageLog.count') do
+      assert_no_difference('ActivationEmailMessageLog.count') do
         RegularMaintenanceJob.perform_now
       end
     end
@@ -116,7 +116,7 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
     # again in 5 hours forward, and person 3 and person 4 should get one, person1 has had the 3 max
     travel(5.hours) do
       assert_enqueued_emails(2) do
-        assert_difference('MessageLog.count', 2) do
+        assert_difference('ActivationEmailMessageLog.count', 2) do
           RegularMaintenanceJob.perform_now
         end
       end
