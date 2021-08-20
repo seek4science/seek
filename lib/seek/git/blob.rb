@@ -21,6 +21,14 @@ module Seek
       def url
         git_version.remote_sources[path]
       end
+
+      def file_contents(&block)
+        if block_given?
+          block.call(StringIO.new(content)) # Rugged does not support streaming blobs :(
+        else
+          content
+        end
+      end
     end
   end
 end

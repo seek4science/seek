@@ -8,14 +8,7 @@ module GitSupport
   end
 
   def file_contents(path, &block)
-    blob = object(path)
-    return unless blob&.is_a?(Rugged::Blob)
-
-    if block_given?
-      block.call(StringIO.new(blob.content)) # Rugged does not support streaming blobs :(
-    else
-      blob.content
-    end
+    get_blob(path)&.file_contents(&block)
   end
 
   def object(path)
@@ -110,7 +103,7 @@ module GitSupport
       index.remove(path)
     end
 
-    git_annotations.where(path: path).destroy_all if update_annotations
+    git_annotations.where(path: path).destroy_all if respond_to?(:git_annotations) && update_annotations
   end
 
   def move_file(oldpath, newpath, update_annotations: true)
@@ -122,7 +115,7 @@ module GitSupport
       index.remove(oldpath)
     end
 
-    git_annotations.where(path: oldpath).update_all(path: newpath) if update_annotations
+    git_annotations.where(path: oldpath).update_all(path: newpath) if respond_to?(:git_annotations) && update_annotations
   end
 
   private
