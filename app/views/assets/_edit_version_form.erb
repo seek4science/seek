@@ -1,5 +1,4 @@
-<% single_page ||=nil %>
-<% ctrl = single_page ? @asset_controller : controller_name %>
+<% ctrl = @item_controller||controller_name %>
 <%= panel('Edit version', id: 'edit_version_form_'+"#{version.version}", style: 'display: none') do %>
   <%= form_tag({ controller: ctrl , action: :edit_version, version: version.version }) do -%>
     <div class="form-group">

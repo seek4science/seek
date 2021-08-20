@@ -1,8 +1,6 @@
 <%
-   # Make this partial work when calling from views of different controllers by passing 'ctrl_name' param
-   ctrl_name||=nil
-   resource_id||=nil
-   entity=ctrl_name&.singularize||controller_name.singularize
+   ctrl_name = @item_controller||controller_name
+   entity=ctrl_name.singularize
    object=instance_variable_get("@#{entity}")
    title||="Tags"
    all_tags,all_item_tags = fetch_tags_for_item object
@@ -21,9 +19,7 @@
     </div>
 
     <div id="create_a_tag" style="display:none;">
-      <%= form_tag_with_callbacks({:action => :update_annotations_ajax}
-                                  .merge(ctrl_name ? {:controller => ctrl_name } : {})
-                                  .merge(params[:asset_id] ? {:id => params[:asset_id] } : {}), 
+      <%= form_tag_with_callbacks({:action => :update_annotations_ajax, :controller => ctrl_name},
                                   {:method =>:post,
                                    :id=>"create_tag",
                                    :loading =>"$j('tags_spinner').show();",

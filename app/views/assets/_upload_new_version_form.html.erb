@@ -1,8 +1,7 @@
 <%
   asset_name = text_for_resource(resource)
   extra_content ||= nil
-  single_page ||=nil
-  ctrl = single_page ? @asset_controller : controller_name
+  ctrl = @item_controller || controller_name
 %>
 
 <% if logged_in_and_member? -%>

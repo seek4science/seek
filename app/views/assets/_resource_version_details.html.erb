@@ -1,4 +1,3 @@
-<% single_page ||= false %>
 <h2>Version History</h2>
 <div class="list-group">
   <% visible_versions = resource.visible_versions %>
@@ -29,7 +28,7 @@
           <% end %>
 
           <% if resource.can_manage? %>
-            <%= render partial: 'assets/edit_version_form', locals: { version: version, single_page: single_page } %>
+            <%= render partial: 'assets/edit_version_form', locals: { version: version } %>
           <% end %>
         </div>
         <div class="col-sm-4 text-right">

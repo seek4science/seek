@@ -2,8 +2,6 @@
 <% versioned_resource ||= resource -%>
 <% creators ||= nil %>
 <% authors_title||=nil %>
-<% single_page ||=nil %>
-<% ctrl_name = single_page ? @asset_controller : nil -%>
 
 <% if creators || resource.respond_to?("creators") %>
   <%= render partial: 'assets/resource_authors_box', locals: { resource: versioned_resource,
@@ -43,7 +41,7 @@
 <%= render :partial => "assets/usage_info_box",:locals => { :resource => resource } -%>
 
 <% if resource.class.is_taggable? %>
-    <%= render :partial=>"assets/tags_box", :no_tags_message=>"Add tags (comma separated) ...", :locals=> { :ctrl_name => ctrl_name} -%>
+    <%= render :partial=>"assets/tags_box", :no_tags_message=>"Add tags (comma separated) ..." -%>
 <% end -%>
 
 <% if resource.respond_to? :attributions_objects -%>
