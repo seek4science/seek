@@ -23,6 +23,15 @@ module Seek
         params[:model_image] && params[:model_image][:image_file]
       end
 
+      def folder_params
+        controller_param = controller_name.downcase.singularize.to_sym
+        if params[controller_param] && params[controller_param][:folder_ids]
+          return params[controller_param][:folder_ids]
+        else
+          return []
+        end
+      end
+
       def check_for_data_or_url(blob_param)
         if blob_param[:data].blank? && blob_param[:data_url].blank?  && blob_param[:base64_data].blank?
           if blob_param.include?(:data_url)

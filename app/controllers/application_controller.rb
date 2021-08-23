@@ -34,6 +34,9 @@ class ApplicationController < ActionController::Base
 
   before_action :rdf_enabled? #only allows through rdf calls to supported types
 
+  # TODO: Review actions that can affect folder_trees
+  after_action :register_folder_tree, only: [:create, :create_metadata, :manage_update]
+
   helper :all
 
   layout Seek::Config.main_layout
@@ -637,6 +640,18 @@ class ApplicationController < ActionController::Base
       end
     end
     keys
+  end
+  
+  def register_folder_tree
+    object = object_for_request
+    # assign each folder id
+    folder_params.each do |folder_id|
+      folder_id = Integer(folder_id) rescue nil
+      unless folder_id.nil?
+        dest_folder = ProjectFolder.find(folder_id)
+        dest_folder.assign_folder(object)
+      end
+    end
   end
 
   def displaying_single_page?
