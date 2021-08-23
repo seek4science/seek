@@ -68,7 +68,7 @@ class SinglePagesControllerTest < ActionController::TestCase
       assert @response.body.include?('Activity')
       assert @response.body.include?('related-items')
       assert_equal assay, assigns(:assay)
-      assert_equal assay, assigns(:asset)
+      assert_equal assay, assigns(:item)
     end
   end
 
@@ -85,7 +85,7 @@ class SinglePagesControllerTest < ActionController::TestCase
         assert_response :success
         assert @response.body.include?(v)
         assert_equal assay, assigns(:assay)
-        assert_equal assay, assigns(:asset)
+        assert_equal assay, assigns(:item)
       end     
     end
   end
@@ -97,7 +97,7 @@ class SinglePagesControllerTest < ActionController::TestCase
       study = Factory(:study, investigation: investigation)
       data_file = Factory(:data_file, contributor: User.current_user.person)
       assay = Factory(:assay, study: study, data_files: [data_file])
-      get :render_item_detail, xhr: true, params: { id: assay.id, type: "assay", asset_id: data_file.id, asset_type: "data_file"  }
+      get :render_item_detail, xhr: true, params: { id: data_file.id, type: "data_file"  }
       assert_response :success
       assert @response.body.include?("contribution-header")
       assert @response.body.include?("box_about_actor")
@@ -105,7 +105,7 @@ class SinglePagesControllerTest < ActionController::TestCase
       assert @response.body.include?("Tags")
       assert @response.body.include?("Attributions")
       assert_equal data_file, assigns(:data_file)
-      assert_equal data_file, assigns(:asset)
+      assert_equal data_file, assigns(:item)
     end
   end
 
@@ -116,7 +116,7 @@ class SinglePagesControllerTest < ActionController::TestCase
       study = Factory(:study, investigation: investigation)
       sop = Factory(:sop, contributor: User.current_user.person)
       assay = Factory(:assay, study: study, sops: [sop])
-      get :render_item_detail, xhr: true, params: { id: assay.id, type: "assay", asset_id: sop.id, asset_type: "sop"  }
+      get :render_item_detail, xhr: true, params: { id: sop.id, type: "sop"  }
       assert_response :success
       assert @response.body.include?("contribution-header")
       assert @response.body.include?("box_about_actor")
@@ -124,7 +124,7 @@ class SinglePagesControllerTest < ActionController::TestCase
       assert @response.body.include?("Tags")
       assert @response.body.include?("Attributions")
       assert_equal sop, assigns(:sop)
-      assert_equal sop, assigns(:asset)
+      assert_equal sop, assigns(:item)
     end
   end
 
@@ -135,7 +135,7 @@ class SinglePagesControllerTest < ActionController::TestCase
       study = Factory(:study, investigation: investigation)
       document = Factory(:document, contributor: User.current_user.person)
       assay = Factory(:assay, study: study, documents: [document])
-      get :render_item_detail, xhr: true, params: { id: assay.id, type: "assay", asset_id: document.id, asset_type: "document"  }
+      get :render_item_detail, xhr: true, params: { id: document.id, type: "document" }
       assert_response :success
       assert @response.body.include?("contribution-header")
       assert @response.body.include?("box_about_actor")
@@ -143,7 +143,7 @@ class SinglePagesControllerTest < ActionController::TestCase
       assert @response.body.include?("Tags")
       assert @response.body.include?("Attributions")
       assert_equal document, assigns(:document)
-      assert_equal document, assigns(:asset)
+      assert_equal document, assigns(:item)
     end
   end
   
