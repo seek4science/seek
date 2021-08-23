@@ -68,6 +68,21 @@ class TreeviewBuilder
 
     private
 
+    # TODO: add function that returns the simplified folder tree
+    def get_folder_tree()
+      prj = Array.new()
+      # Documents folder
+      if @folders.respond_to? :each
+          chld = @folders.reverse_each.map do |folder|
+              puts folder.title
+              prj.unshift(folder_node(folder))
+          end
+      else
+          chld = @folders
+      end
+      prj
+    end
+
     def folder_node(folder)
         obj={id:"folder_#{folder.id}" ,text: folder.title,_type: 'folder',count: folder.count.to_s,
             children: folder.children.map { |child| folder_node(child) }, folder_id: folder.id,
