@@ -1,7 +1,11 @@
 <%
-   ctrl_name = @item_controller||controller_name
-   entity=ctrl_name.singularize
-   object=instance_variable_get("@#{entity}")
+   if displaying_single_page?
+      object=instance_variable_get("@item")
+   else
+      entity=controller_name.singularize
+      object=instance_variable_get("@#{entity}")
+   end
+
    title||="Tags"
    all_tags,all_item_tags = fetch_tags_for_item object
    owner_item_tags = current_user ? object.annotations.with_attribute_name("tag").by_source("User",User.current_user.id).collect{|a| a.value}.uniq : []
@@ -19,7 +23,7 @@
     </div>
 
     <div id="create_a_tag" style="display:none;">
-      <%= form_tag_with_callbacks({:action => :update_annotations_ajax, :controller => ctrl_name},
+      <%= form_tag_with_callbacks(polymorphic_path([:update_annotations_ajax, object]),
                                   {:method =>:post,
                                    :id=>"create_tag",
                                    :loading =>"$j('tags_spinner').show();",

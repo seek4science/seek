@@ -1,12 +1,11 @@
 <%
   asset_name = text_for_resource(resource)
   extra_content ||= nil
-  ctrl = @item_controller || controller_name
 %>
 
 <% if logged_in_and_member? -%>
   <%= panel('New version', :id => 'upload_new_version_form', :style => 'display: none') do %>
-    <%= form_tag({controller: ctrl, :action=>"create_version", :id=>resource}, :multipart => true) do -%>
+    <%= form_tag(polymorphic_path([:create_version, resource]), :multipart => true) do -%>
       <p>
         You are about to upload a new version of this <%= asset_name -%>.
         You should only upload a new version if you have made minor modifications,
