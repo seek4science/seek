@@ -1,3 +1,5 @@
+# Message logs related to activation emails - to keep track of when the activation email
+# was sent and how many times, to determine whether a reminder should be sent
 class ActivationEmailMessageLog < MessageLog
   default_scope { where(message_type: :activation_email) }
 

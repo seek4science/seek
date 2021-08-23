@@ -140,7 +140,7 @@ class ProjectsController < ApplicationController
     @comments = params[:comments]
     @projects.each do |project|
       if project.allow_request_membership? # protects against malicious spamming
-        log = ProjectMembershipMessageLog.log_request(current_user.person, project, @institution, @comments)
+        log = ProjectMembershipMessageLog.log_request(sender:current_user.person, project:project, institution:@institution, comments:@comments)
         Mailer.request_join_project(current_user, project, @institution.to_json, @comments, log).deliver_later
       end
     end
@@ -167,9 +167,9 @@ class ProjectsController < ApplicationController
       @programme = Programme.find(params[:programme_id])
       raise "no #{t('programme')} can be found" if @programme.nil?
       if @programme.can_manage?
-        log = ProjectCreationMessageLog.log_request(current_person, @programme, @project,@institution)
+        log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
       elsif @programme.site_managed?
-        log = ProjectCreationMessageLog.log_request(current_person, @programme, @project,@institution)
+        log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
         Mailer.request_create_project_for_programme(current_user, @programme, @project.to_json, @institution.to_json, log).deliver_later
         Mailer.request_create_project_for_programme_admins(current_user, @programme, @project.to_json, @institution.to_json, log).deliver_later
         flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
@@ -180,7 +180,7 @@ class ProjectsController < ApplicationController
     elsif Seek::ProjectFormProgrammeOptions.creation_allowed?
       prog_params = params.require(:programme).permit([:title])
       @programme = Programme.new(prog_params)
-      log = ProjectCreationMessageLog.log_request(current_person, @programme, @project,@institution)
+      log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
       unless User.admin_logged_in?
         Mailer.request_create_project_and_programme(current_user, @programme.to_json, @project.to_json, @institution.to_json, log).deliver_later
       end
@@ -188,7 +188,7 @@ class ProjectsController < ApplicationController
     # No Programme at all
     elsif !Seek::ProjectFormProgrammeOptions.show_programme_box?
       @programme=nil
-      log = ProjectCreationMessageLog.log_request(current_person, @programme, @project,@institution)
+      log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
       unless User.admin_logged_in?
         Mailer.request_create_project(current_user, @project.to_json, @institution.to_json, log).deliver_later
       end

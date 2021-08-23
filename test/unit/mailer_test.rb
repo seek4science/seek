@@ -306,7 +306,7 @@ class MailerTest < ActionMailer::TestCase
         institution = Institution.new({title:'My lovely institution', web_page:'http://inst.org', country:'DE'})
         comments = 'some comments'
         person = Factory(:person)
-        log = ProjectMembershipMessageLog.log_request(person, project, institution, comments)
+        log = ProjectMembershipMessageLog.log_request(sender:person, project:project, institution:institution, comments:comments)
         email = Mailer.request_join_project(person.user, project, institution.to_json,comments, log)
         refute_nil email
         refute_nil email.body
@@ -321,7 +321,7 @@ class MailerTest < ActionMailer::TestCase
         institution = Factory(:institution)
         comments = 'some comments'
         person = Factory(:person)
-        log = ProjectMembershipMessageLog.log_request(person, project, institution, comments)
+        log = ProjectMembershipMessageLog.log_request(sender:person, project:project, institution:institution, comments:comments)
         email = Mailer.request_join_project(person.user, project, institution.to_json,comments, log)
         refute_nil email
         refute_nil email.body
@@ -339,7 +339,7 @@ class MailerTest < ActionMailer::TestCase
         project = Project.new(title:'My lovely project')
         institution = Factory(:institution)
         sender = Factory(:person)
-        log = ProjectCreationMessageLog.log_request(sender,programme,project,institution)
+        log = ProjectCreationMessageLog.log_request(sender:sender, programme:programme, project:project, institution:institution)
         email = Mailer.request_create_project_for_programme(sender.user, programme, project.to_json, institution.to_json,log)
         refute_nil email
         refute_nil email.body
@@ -359,7 +359,7 @@ class MailerTest < ActionMailer::TestCase
           project = Project.new(title:'My lovely project')
           institution = Factory(:institution)
           sender = Factory(:person)
-          log = ProjectCreationMessageLog.log_request(sender,programme,project,institution)
+          log = ProjectCreationMessageLog.log_request(sender:sender, programme:programme, project:project, institution: institution)
           email = Mailer.request_create_project_for_programme_admins(sender.user, programme, project.to_json, institution.to_json,log)
           refute_nil email
           refute_nil email.body
@@ -375,7 +375,7 @@ class MailerTest < ActionMailer::TestCase
         project = Project.new(title:'My lovely project')
         institution = Factory(:institution)
         sender = Factory(:person)
-        log = ProjectCreationMessageLog.log_request(sender,nil,project,institution)
+        log = ProjectCreationMessageLog.log_request(sender:sender, project:project, institution:institution)
         email = Mailer.request_create_project(sender.user, project.to_json, institution.to_json,log)
         refute_nil email
         refute_nil email.body
@@ -390,7 +390,7 @@ class MailerTest < ActionMailer::TestCase
         project = Project.new(title:'My lovely project')
         programme = Programme.new(title:'My lovely programme')
         sender = Factory(:person)
-        log = ProjectCreationMessageLog.log_request(sender,programme,project,institution)
+        log = ProjectCreationMessageLog.log_request(sender:sender, programme:programme, project:project, institution:institution)
         email = Mailer.request_create_project_and_programme(sender.user, programme.to_json, project.to_json, institution.to_json,log)
         refute_nil email
         refute_nil email.body        

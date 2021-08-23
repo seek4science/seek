@@ -27,7 +27,7 @@ module Seek
       details = params[:details]
       mail = Mailer.request_contact(current_user, resource, details)
       mail.deliver_later
-      ContactRequestMessageLog.log_request(current_user.person, resource, details)
+      ContactRequestMessageLog.log_request(sender:current_user.person, item:resource, details:details)
       @resource = resource
       respond_to do |format|
         format.js { render template: 'assets/request_contact' }

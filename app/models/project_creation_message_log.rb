@@ -1,3 +1,4 @@
+# Message logs related to Project creation requests
 class ProjectCreationMessageLog < MessageLog
   include Seek::ProjectMessageLogDetails
 
@@ -6,7 +7,7 @@ class ProjectCreationMessageLog < MessageLog
   # project creation requests that haven't been responded to
   scope :pending_requests, -> { pending }
 
-  def self.log_request(sender, programme, project, institution)
+  def self.log_request(sender:, project:, institution:, programme: nil)
     details = details_json(programme: programme, project: project, institution: institution)
     # FIXME: needs a subject, but can't use programme as it will save it if it is new
     ProjectCreationMessageLog.create(subject: sender, sender: sender, details: details)

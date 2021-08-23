@@ -1,3 +1,4 @@
+# Message logs related to users requesting to join a project
 class ProjectMembershipMessageLog < MessageLog
   include Seek::ProjectMessageLogDetails
 
@@ -12,7 +13,7 @@ class ProjectMembershipMessageLog < MessageLog
   }
 
   # records a project membership request for a sender and project, along with any details provided
-  def self.log_request(sender, project, institution, comments)
+  def self.log_request(sender:, project:, institution:, comments: '')
     details = details_json(project: project, institution: institution, comments: comments)
     ProjectMembershipMessageLog.create(subject: project, sender: sender, details: details)
   end
