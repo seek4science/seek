@@ -1,7 +1,2 @@
-$j("*[id*=-related-items]").empty();
-$j("*[id*=-details]").empty();
-$j("#item-details").html("<%= escape_javascript(render template: @item.model_name.to_s.pluralize.underscore + '/show') %>");
-$j("#item-related-items").html("<%= escape_javascript(render partial: 'general/items_related_to', object: @item ) %>");  
-<% if @assay %>
-   $j("#samples-details").html("<%= escape_javascript(render partial: 'general/index_facets_or_paged', locals: { items: @assay.samples }) %>");
-<% end %>
+$j("#item-layout").html("<%= escape_javascript(render template: @item.model_name.to_s.pluralize.underscore + '/show') %>");
+$j("#samples-details").html("<%= escape_javascript(render partial: 'general/index_facets_or_paged', locals: { items: @assay.samples }) if @assay %> ");

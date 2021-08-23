@@ -1,13 +1,11 @@
 class SinglePagesController < ApplicationController
   include Seek::AssetsCommon
+  before_action :set_up_instance_variable
   before_action :single_page_enabled
   before_action :project_membership_required, only: [:render_item_detail]
   respond_to :html, :js
   
-  
-  
   def show
-    @single_page = true
     @project = Project.find(params[:id])
     @folders = project_folders
     # For creating new investigation and study in Project view page
@@ -25,7 +23,6 @@ class SinglePagesController < ApplicationController
 
   def render_item_detail
     begin
-      @single_page = true
       instance_variable_set("@item", params[:type].camelize.constantize.find(params[:id]))
       # To be accessed in associated template (e.g. Projects/view => @project)
       instance_variable_set("@#{params[:type]}", @item)
@@ -57,6 +54,10 @@ class SinglePagesController < ApplicationController
       ProjectFolderAsset.assign_existing_assets @project
     end
     project_folders
+  end
+
+  def set_up_instance_variable
+    @single_page = true
   end
 
 end

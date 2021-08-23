@@ -31,7 +31,7 @@
                     </div>
                 </div>
                 <div id="item_contents" class="row" style="display:none">
-                 <%= render :partial => "item" -%>
+                    <div class="simpleForm" id="item-layout"></div>
                 </div>
             </div>
         </div>
@@ -74,8 +74,7 @@
         var selectedItem = {type:"",id:""}, pid, uid
         $j(document).ready(function() {
             setupFoldersTree( <%= ((TreeviewBuilder.new(@project, @folders)).build_tree_data).html_safe -%> , 'demo_tree', 'draggable_folder_item');
-            $j("#item-details").html("<%= escape_javascript(render template: 'projects/show' ) %>");
-            $j("#item-related-items").html("<%= escape_javascript(render partial: 'general/items_related_to', object: @project ) %>");
+            $j("#item-layout").html("<%= escape_javascript(render template: 'projects/show' ) %>");
             $j("#item_contents").show();
             pid = <%= @project.id %>
             uid = <%= current_user.id if current_user %>
