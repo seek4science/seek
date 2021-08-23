@@ -34,8 +34,6 @@ class ApplicationController < ActionController::Base
 
   before_action :rdf_enabled? #only allows through rdf calls to supported types
 
-  # TODO: Review actions that can affect folder_trees
-  after_action :register_folder_tree, only: [:create, :create_metadata, :manage_update]
 
   helper :all
 
