@@ -1,5 +1,3 @@
-<% object ||= nil %>
-
 <%= error_messages_for :study %>
 
 <div class="form-group">
@@ -21,7 +19,7 @@
   </div>
 <% end %>
 
-<% if !@single_page %>
+<% if !displaying_single_page? %>
   <%= folding_panel("#{t('investigation')} details") do %>
       <label class="required"><%= t('investigation') %></label>
       <div id="investigation_collection">
@@ -32,21 +30,27 @@
 
 <%= render partial: 'custom_metadata/custom_metadata_attribute_input', locals:{f:f,resource:@study} %>
 
+<% if !displaying_single_page? %> 
 
-<% if show_scales? && !@single_page %>
-    <%= render :partial => "scales/scales_selector",:locals=>{:object=>@study} %>
+  <% if show_scales? %>
+      <%= render :partial => "scales/scales_selector",:locals=>{:object=>@study} %>
+  <% end %>
+
+  <%= render partial: 'assets/manage_specific_attributes', locals:{f:f} if show_form_manage_specific_attributes? %>
+
+  <%= f.fancy_multiselect :publications, { other_projects_checkbox: true } %>
+
 <% end %>
-
-<%= render partial: 'assets/manage_specific_attributes', locals:{f:f, :object => object} if show_form_manage_specific_attributes? && !@single_page %>
-
-<%= f.fancy_multiselect :publications, { other_projects_checkbox: true } if !@single_page %>
 
 <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @study} -%>
 
 <%#= render partial: 'custom_metadata/custom_metadata_fields_form_input', locals:{f:f, resource:@study} %>
 
-<%= form_submit_buttons(@study) if !@single_page %>
+<% if !displaying_single_page? %>
 
-<%= render partial: 'projects/implicit_project_selector', locals: { action: action,
-                                                                    select_id: '#study_investigation_id',
-                                                                    parents: Investigation.authorized_for('edit') } if !@single_page %>
+  <%= form_submit_buttons(@study) %>
+
+  <%= render partial: 'projects/implicit_project_selector', locals: { action: action,
+                                                                      select_id: '#study_investigation_id',
+                                                                      parents: Investigation.authorized_for('edit') } %>
+<% end %>

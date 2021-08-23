@@ -638,4 +638,17 @@ class ApplicationController < ActionController::Base
     end
     keys
   end
+
+  def displaying_single_page?
+    instance_variable_get("@single_page")||false
+  end
+  
+  helper_method :displaying_single_page?
+  
+  def display_isa_graph?
+    displaying_single_page?
+  end
+  
+  helper_method :display_isa_graph?
+  
 end

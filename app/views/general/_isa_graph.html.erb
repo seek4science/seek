@@ -1,4 +1,5 @@
 <%
+  return if display_isa_graph?
   options ||= { depth: 4, parent_depth: nil, sibling_depth: nil, include_self: true }
   hash = Seek::IsaGraphGenerator.new(root_item).generate(options)
   elements = cytoscape_elements(hash)

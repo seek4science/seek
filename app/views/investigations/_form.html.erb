@@ -14,18 +14,22 @@
 
 <%= render partial: 'custom_metadata/custom_metadata_type_selection', locals:{f:f, resource:@investigation} %>
 
-<%= render :partial => 'projects/project_selector', :locals => {:resource => @investigation,:allow_nil=>false} if show_form_manage_specific_attributes? && !@single_page -%>
+<%= render :partial => 'projects/project_selector', :locals => {:resource => @investigation,:allow_nil=>false} if show_form_manage_specific_attributes? && !displaying_single_page? -%>
 
 <%= render partial: 'custom_metadata/custom_metadata_attribute_input', locals:{f:f,resource:@investigation} %>
 
-<%= render :partial => "scales/scales_selector",:locals=>{:object=>@investigation} if show_scales? && !@single_page  %>
+<% if !displaying_single_page?%>
 
-<%= render partial: 'assets/manage_specific_attributes', locals:{f:f, :object => object} if show_form_manage_specific_attributes? && !@single_page %>
+  <%= render :partial => "scales/scales_selector",:locals=>{:object=>@investigation} if show_scales?  %>
 
-<%= f.fancy_multiselect :publications, { other_projects_checkbox: true } if !@single_page %>
+  <%= render partial: 'assets/manage_specific_attributes', locals:{f:f, :object => object} if show_form_manage_specific_attributes? %>
 
-<%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @investigation} if !@single_page -%>
+  <%= f.fancy_multiselect :publications, { other_projects_checkbox: true } %>
 
-<!-- custom metadata experiment end -->
+  <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @investigation} -%>
 
-<%= form_submit_buttons(@investigation) if !@single_page %>
+  <!-- custom metadata experiment end -->
+
+  <%= form_submit_buttons(@investigation) %>
+
+<% end %>

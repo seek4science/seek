@@ -123,7 +123,7 @@
   });
 
   $j('#view_tabs a').click(function () {
-    <% if @single_page %>
+    <% if displaying_single_page? %>
       loadAssaySamples($j(this).attr('view'))
     <% else %>
       const url = new URL(window.location.href);
@@ -155,7 +155,7 @@
     $j('#tableview-colselector input:checked').each(function() {
       table_cols.push(this.value);
     });
-    <% if @single_page %>
+    <% if displaying_single_page? %>
       loadAssaySamples("table", encodeURIComponent(table_cols.toString()))
     <% else %>
       const url = new URL(window.location.href);
