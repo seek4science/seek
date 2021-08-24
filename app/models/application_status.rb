@@ -1,12 +1,13 @@
 class ApplicationStatus < ApplicationRecord
     self.table_name = 'application_status'
-    validates :running_jobs, :soffice_running, presence: true
+    validates :running_jobs, presence: true
+    validates :soffice_running, inclusion: { in: [true, false] }
     before_create :validate_singleton
 
     def refresh
         update(
             running_jobs: Seek::Util.delayed_job_pids.count, 
-            soffice_running:Seek::Config.soffice_available?(false),            
+            soffice_running:Seek::Config.soffice_available?(false)            
          )
     end
 
