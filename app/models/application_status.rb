@@ -1,6 +1,6 @@
 class ApplicationStatus < ApplicationRecord
     self.table_name = 'application_status'
-    validates :running_jobs, :soffice_running, :search_enabled, presence: true
+    validates :running_jobs, :soffice_running, presence: true
     before_create :validate_singleton
 
     def refresh
