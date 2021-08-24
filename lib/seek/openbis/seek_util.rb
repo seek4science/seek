@@ -441,6 +441,14 @@ if automatic synchronization was selected.'}
 
         Seek::Openbis::EntityType.ExperimentType(openbis_endpoint).find_by_codes(study_codes)
       end
+
+      def delayed_job_pids
+        directory = "#{Rails.root}/tmp/pids"
+        Daemons::PidFile.find_files(directory, 'delayed_job').collect do |path|
+          file = path.sub("#{directory}/", '').sub('.pid', '')
+          Daemons::PidFile.new(directory, file)
+        end
+      end
     end
   end
 end

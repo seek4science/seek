@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_08_10_211320) do
+ActiveRecord::Schema.define(version: 2021_08_24_125640) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -108,6 +108,13 @@ ActiveRecord::Schema.define(version: 2021_08_10_211320) do
     t.datetime "updated_at", null: false
     t.index ["encrypted_token"], name: "index_api_tokens_on_encrypted_token"
     t.index ["user_id"], name: "index_api_tokens_on_user_id"
+  end
+
+  create_table "application_status",  force: :cascade do |t|
+    t.integer "running_jobs"
+    t.boolean "soffice_running"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "assay_assets", id: :integer,  force: :cascade do |t|
