@@ -18,11 +18,8 @@ then
     bundle exec rake db:seed:openseek:default_openbis_endpoint
 fi
 
-echo "GENERATING CRONTAB"
-bundle exec whenever > /seek/seek.crontab
-
-echo "STARTING SUPERCRONIC"
-supercronic /seek/seek.crontab &
+# Cron tasks
+setup_and_start_cron
 
 # Start Rails
 echo "STARTING SEEK"
