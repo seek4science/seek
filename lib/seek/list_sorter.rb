@@ -35,6 +35,7 @@ module Seek
       created_at_desc: { title: 'Creation date (Descending)', order: 'created_at DESC' },
       relevance: { title: 'Relevance', order: '--relevance', proc: -> (items) {
         ids = items.solr_cache(items.last_solr_query)
+        return [] if ids.empty?
         case ActiveRecord::Base.connection.instance_values["config"][:adapter]
         when 'mysql2'
           Arel.sql("FIELD(#{items.arel_table.name}.id,#{ids.join(',')})")
