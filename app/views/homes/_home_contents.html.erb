@@ -18,67 +18,27 @@
         <%= render :partial=>"home_buttons" -%>
     <% end %>
 </div>
-<% if logged_in_and_registered? %>
-  <div class="row">
-    <div class="col-md-9">
-      <%= render :partial=>"home_my_items" -%>
-    </div>
-    <div class="col-md-3">
-      <%= render :partial=>"home_quick_start" -%>
-    </div>
-  </div>
-  <br>
-<% end %>
-
 
 <% if !logged_in_and_registered? %>
-  <div class="row">
-    <div class="col-md-12">
-      <%= render :partial=>"home_features" -%>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-md-12">
-      <%= render :partial=>"home_who_uses" -%>
-    </div>
-  </div>
+  <%= render :partial=>"home_features" -%>
 <% end %>
-
-<div class="row">
-  <div class="col-md-12">
-    <%= render :partial=>"home_integrations" -%>
-  </div>
-</div>
 
 <div class="row">
   <div class="col-md-9">
-    <div class="panel panel-default" id="home_explore_projects">
-      <div class="panel-heading">
-      <h2>Explore existing projects</h2>
-      </div>
-      <div class="row">
-        <div class="col-md-6" style="border-right: 2px solid #ccc;">
-          <%= render :partial=>"home_activity_notifications_projects" -%>
-        </div>
-        <div class="col-md-6">
-          <% if Seek::Config.tagging_enabled %>
-              <div id="sidebar_tag_cloud">
-                <% cache 'sidebar_tag_cloud', skip_digest: true do -%>
-                    <%= render :partial=>"gadgets/tag_cloud_gadget_home" %>
-                <% end -%>
-              </div>
-            <div style="text-align: center;"><h2>or</h2></div>
-          <% end %>
-          <% if Seek::Config.programmes_enabled %>
-            <div style="text-align: center;"><a class="btn btn-primary btn-lg" target="_blank" href="<%=programmes_path %>" role="button" style="white-space: normal;width: 80%;"> Browse programmes </a></div>
-            <br>
-          <% end %>
-          <div style="text-align: center;"><a class="btn btn-primary btn-lg" target="_blank" href="<%=projects_path %>" role="button" style="white-space: normal;width: 80%;"> Browse projects </a></div>
-        </div>
-      </div>
-    </div>
+    <% if logged_in_and_registered? %>
+      <%= render :partial=>"home_my_items" -%>
+    <% end %>
+    <% if !logged_in_and_registered? %>
+      <%= render :partial=>"home_who_uses" -%>
+    <% end %>
+    <%= render :partial=>"home_explore_projects" -%>
+    <%= render :partial=>"home_integrations" -%>
   </div>
+
   <div class="col-md-3">
+    <% if logged_in_and_registered? %>
+      <%= render :partial=>"home_quick_start" -%>
+    <% end %>
     <%= render :partial=>"gadgets/announcements_gadget" if show_announcements? %>
     <%= home_news_feeds %>
     <a class="logo_link" href="/">
@@ -87,6 +47,7 @@
     </a>
   </div>
 </div>
+<br>
 
 <% if Seek::Config.human_diseases_enabled  %>
   <%= render :partial => 'human_diseases/overview_plot' %>

@@ -1,0 +1,25 @@
+<div class="panel panel-default" id="home_explore_projects">
+  <div class="panel-heading">
+  <h2>Explore existing projects</h2>
+  </div>
+  <div class="row">
+    <div class="col-md-6" style="border-right: 2px solid #ccc;">
+      <%= render :partial=>"home_activity_notifications_projects" -%>
+    </div>
+    <div class="col-md-6">
+      <% if Seek::Config.tagging_enabled %>
+          <div id="sidebar_tag_cloud">
+            <% cache 'sidebar_tag_cloud', skip_digest: true do -%>
+                <%= render :partial=>"gadgets/tag_cloud_gadget_home" %>
+            <% end -%>
+          </div>
+        <div style="text-align: center;"><h2>or</h2></div>
+      <% end %>
+      <% if Seek::Config.programmes_enabled %>
+        <div style="text-align: center;"><a class="btn btn-primary btn-lg" target="_blank" href="<%=programmes_path %>" role="button" style="white-space: normal;width: 80%;"> Browse programmes </a></div>
+        <br>
+      <% end %>
+      <div style="text-align: center;"><a class="btn btn-primary btn-lg" target="_blank" href="<%=projects_path %>" role="button" style="white-space: normal;width: 80%;"> Browse projects </a></div>
+    </div>
+  </div>
+</div>
