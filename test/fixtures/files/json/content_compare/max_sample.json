@@ -1,0 +1,80 @@
+{
+  "data": {
+    "id": "190",
+    "type": "samples",
+    "attributes": {
+      "discussion_links": null,
+      "title": "Fred Bloggs",
+      "attribute_map": {
+        "full_name": "Fred Bloggs",
+        "address": "HD",
+        "postcode": "M13 9PL",
+        "CAPITAL key": "key must remain capitalised"
+      },
+      "tags": null
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "733",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "713",
+            "type": "projects"
+          }
+        ]
+      },
+      "sample_type": {
+        "data": {
+          "id": "258",
+          "type": "sample_types"
+        }
+      },
+      "data_files": {
+        "data": [
+
+        ]
+      },
+      "policy": {
+        "data": {
+          "access": "view",
+          "permissions": [
+
+          ]
+        }
+      },
+      "people": {
+        "data": [
+          {
+            "id": "733",
+            "type": "people"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/samples/190"
+    },
+    "meta": {
+      "created": "2021-08-31T12:51:17.000Z",
+      "modified": "2021-08-31T12:51:17.000Z",
+      "api_version": "0.3",
+      "uuid": "0e99d0e0-ec88-0139-256e-000c29095f88",
+      "base_url": "http://localhost:3000"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

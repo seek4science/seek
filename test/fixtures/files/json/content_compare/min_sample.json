@@ -1,0 +1,77 @@
+{
+  "data": {
+    "id": "180",
+    "type": "samples",
+    "attributes": {
+      "discussion_links": null,
+      "title": "Fred Bloggs",
+      "attribute_map": {
+        "full_name": "Fred Bloggs"
+      },
+      "tags": null
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "692",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "672",
+            "type": "projects"
+          }
+        ]
+      },
+      "sample_type": {
+        "data": {
+          "id": "248",
+          "type": "sample_types"
+        }
+      },
+      "data_files": {
+        "data": [
+
+        ]
+      },
+      "policy": {
+        "data": {
+          "access": "view",
+          "permissions": [
+
+          ]
+        }
+      },
+      "people": {
+        "data": [
+          {
+            "id": "692",
+            "type": "people"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/samples/180"
+    },
+    "meta": {
+      "created": "2021-08-31T10:29:09.000Z",
+      "modified": "2021-08-31T10:29:09.000Z",
+      "api_version": "0.3",
+      "uuid": "33864a20-ec74-0139-2565-000c29095f88",
+      "base_url": "http://localhost:3000"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}
