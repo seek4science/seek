@@ -39,6 +39,7 @@ end
 
 Factory.define(:min_sample, parent: :sample) do |f|
   f.association :sample_type, factory: :min_sample_type
+  f.association :contributor, factory: :person
   f.after_build do |sample|
     sample.set_attribute_value(:full_name, 'Fred Bloggs')
   end
@@ -47,7 +48,7 @@ end
 
 Factory.define(:max_sample, parent: :sample) do |f|
   f.association :sample_type, factory: :max_sample_type
-  f.association :policy, factory: :public_policy
+  f.association :contributor, factory: :person
   f.after_build do |sample|
     sample.set_attribute_value(:full_name, 'Fred Bloggs')
     sample.set_attribute_value(:address, "HD")
