@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'minitest/mock'
 
 class SnapshotTest < ActiveSupport::TestCase
   include MockHelper
@@ -303,6 +304,28 @@ class SnapshotTest < ActiveSupport::TestCase
 
     assert snapshot1.destroyed?
     assert snapshot2.destroyed?
+  end
+
+  test 'all_related_people handles case where contributor is deleted' do
+    sop = Factory(:sop, policy: Factory(:public_policy))
+    disable_authorization_checks do
+      sop.deleted_contributor = "#{sop.contributor.class}:#{sop.contributor.id}"
+      sop.contributor = nil
+      sop.save!
+    end
+    @assay.associate(sop)
+    snapshot = @assay.create_snapshot
+
+    assert_includes snapshot.all_related_people, @assay.investigation.contributor
+  end
+
+  test 'does not crash on exception' do
+    class SpecialSnapshotTestException < StandardError; end
+    Seek::ResearchObjects::Generator.stub(:new, -> (_) { raise SpecialSnapshotTestException }) do
+      assert_raise(SpecialSnapshotTestException) do
+        snapshot = @assay.create_snapshot
+      end
+    end
   end
 
   private

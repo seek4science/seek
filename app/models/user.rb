@@ -128,7 +128,7 @@ class User < ApplicationRecord
     save(validate: false)
 
     #clear message logs if associated with a person (might not be when automatically activated when activation is required)
-    MessageLog.activation_email_logs(person).destroy_all unless person.nil?
+    ActivationEmailMessageLog.activation_email_logs(person).destroy_all unless person.nil?
   end
 
   def assets
@@ -351,7 +351,7 @@ class User < ApplicationRecord
 
   def remove_from_auth_tables
     Seek::Util.authorized_types.each do |type|
-      type.lookup_class.where(user: id).delete_all
+      type.lookup_class.where(user: id).in_batches(of:1000).delete_all
     end
   end
 

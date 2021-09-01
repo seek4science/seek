@@ -162,7 +162,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test 'after DOI is minted, the -Upload new version- button is disabled' do
+  test 'after DOI is minted, the -Upload new version- button is not disabled' do
     DOIABLE_ASSETS.each do |type|
       asset = Factory(type.to_sym, policy: Factory(:public_policy))
       latest_version = asset.latest_version
@@ -172,22 +172,8 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
       get "/#{type.pluralize}/#{asset.id}"
 
-      assert_select "a[class='disabled']", text: /Register new version/
-    end
-  end
-
-  test 'can not upload new version after DOI is minted' do
-    DOIABLE_ASSETS.each do |type|
-      asset = Factory(type.to_sym, policy: Factory(:public_policy))
-      latest_version = asset.latest_version
-      latest_version.doi = '10.5072/my_test'
-      assert latest_version.save
-      assert latest_version.has_doi?
-
-      post "/#{type.pluralize}/#{asset.id}/create_version", params: { data_file: {}, content_blobs: [{ data: {} }], revision_comments: 'This is a new revision' }
-
-      assert_redirected_to :root
-      assert_not_nil flash[:error]
+      assert_select "a", text: /Register new version/
+      assert_select "a[class='disabled']", text: /Register new version/, count:0
     end
   end
 
@@ -224,7 +210,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
     skip 'This test no longer works with the dynamic permissions form'
 
     DOIABLE_ASSETS.each do |type|
-      asset = Factory(type.to_sym, policy: Factory(:public_policy))
+      asset = Factory(type.to_sym, contributor: User.current_user.person, policy: Factory(:public_policy))
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
       assert latest_version.save
@@ -238,7 +224,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
   test 'can not unpublish asset after DOI is minted' do
     DOIABLE_ASSETS.each do |type|
-      asset = Factory(type.to_sym, policy: Factory(:public_policy))
+      asset = Factory(type.to_sym, contributor: User.current_user.person, policy: Factory(:public_policy))
       latest_version = asset.latest_version
       latest_version.doi = '10.5072/my_test'
       assert latest_version.save
@@ -253,12 +239,44 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test 'can update asset with DOI if current version does not have one' do
+    asset = Factory(:workflow, contributor: User.current_user.person, policy: Factory(:public_policy))
+    latest_version = asset.latest_version
+    latest_version.doi = '10.5072/my_test'
+    assert latest_version.save
+    assert latest_version.has_doi?
+
+    assert asset.save_as_new_version
+    assert_nil asset.latest_version.doi
+
+    put workflow_path(asset), params: { workflow: { title: 'test 123' }, policy_attributes: { access_type: Policy::ACCESSIBLE } }
+
+    assert_nil flash[:error]
+    assert_equal 'test 123', asset.reload.title
+  end
+
+  test 'cannot update asset with DOI to be private, even if current version does not have a DOI' do
+    asset = Factory(:workflow, contributor: User.current_user.person, policy: Factory(:public_policy))
+    latest_version = asset.latest_version
+    latest_version.doi = '10.5072/my_test'
+    assert latest_version.save
+    assert latest_version.has_doi?
+
+    assert asset.save_as_new_version
+    assert_nil asset.latest_version.doi
+
+    put workflow_path(asset), params: { workflow: { title: 'test 123' }, policy_attributes: { access_type: Policy::NO_ACCESS } }
+
+    assert flash[:error].include?('not possible')
+    assert_not_equal 'test 123', asset.reload.title
+  end
+
   private
 
   def mock_datacite_request
-    stub_request(:post, 'https://test.datacite.org/mds/metadata').with(basic_auth: ['test', 'test']).to_return(body: 'OK (10.5072/my_test)', status: 201)
-    stub_request(:post, 'https://test.datacite.org/mds/doi').with(basic_auth: ['test', 'test']).to_return(body: 'OK', status: 201)
-    stub_request(:post, 'https://test.datacite.org/mds/metadata').with(basic_auth: ['invalid', 'test']).to_return(body: '401 Bad credentials', status: 401)
+    stub_request(:post, 'https://mds.test.datacite.org/metadata').with(basic_auth: ['test', 'test']).to_return(body: 'OK (10.5072/my_test)', status: 201)
+    stub_request(:post, 'https://mds.test.datacite.org/doi').with(basic_auth: ['test', 'test']).to_return(body: 'OK', status: 201)
+    stub_request(:post, 'https://mds.test.datacite.org/metadata').with(basic_auth: ['invalid', 'test']).to_return(body: '401 Bad credentials', status: 401)
   end
 
   def asset_url(asset)

@@ -218,16 +218,11 @@ module ApplicationHelper
       res = text.html_safe
       res = white_list(res)
       res = truncate_without_splitting_words(res, options[:length]) if options[:length]
-      res = simple_format(res, {}, sanitize: false).html_safe if options[:description] == true || options[:address] == true
-      if options[:description] == true && options[:markdown] == true
+      if options[:markdown]
         markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, tables: true)
-        # replace br with newlines to fix list render issues
-        res.gsub!(/<br\s*\/>/, "\n")
-        # remove <p> and <br> tags, Redcarpet markdown render cannot handle them
-        scrubber = Rails::Html::TargetScrubber.new
-        scrubber.tags = ['p','br']
-        res = Loofah.fragment(res).scrub!(scrubber).to_s
         res = markdown.render(res)
+      elsif options[:description] || options[:address]
+        res = simple_format(res, {}, sanitize: false).html_safe
       end
       res = auto_link(res, html: { rel: 'nofollow' }, sanitize: false) if options[:auto_link]
       res = mail_to(res) if options[:email]
@@ -437,6 +432,11 @@ module ApplicationHelper
     instance_variable_get("@#{c.singularize}")
   end
 
+  # returns the current version of the resource for the controller, e.g @display_data_file for data_files
+  def versioned_resource_for_controller(c = controller_name)
+    instance_variable_get("@display_#{c.singularize}")
+  end
+
   def cancel_button(path, html_options = {})
     html_options[:class] ||= ''
     html_options[:class] << ' btn btn-default'
@@ -473,7 +473,8 @@ module ApplicationHelper
   end
 
   def pending_project_creation_request?
-    MessageLog.pending_project_creation_requests.collect do |log|
+    return false unless logged_in_and_registered?   
+    ProjectCreationMessageLog.pending_requests.collect do |log|
       log.can_respond_project_creation_request?(User.current_user)
     end.any?
   end
@@ -482,7 +483,7 @@ module ApplicationHelper
     return false unless project_administrator_logged_in?
     person = User.current_user.person
     projects = person.administered_projects
-    return MessageLog.pending_project_join_requests(projects).any?
+    return ProjectMembershipMessageLog.pending_requests(projects).any?
   end
 
   #whether to show a banner encouraging you to join or create a project
@@ -497,6 +498,19 @@ module ApplicationHelper
     return false if ['request_join','request_create'].include?(action_name)
 
     return Seek::Config.programmes_enabled && Programme.site_managed_programme
+  end
+
+  def render_menu_group(title, options)
+    return unless options.any? { |opt_title, url, enabled| enabled }
+    html = content_tag(:li, title, role: 'presentation', class: 'dropdown-header')
+    options.each do |opt_title, url, enabled|
+      next unless enabled
+      html += content_tag(:li) do
+        link_to(opt_title, url)
+      end
+    end
+
+    html
   end
 
   PAGE_TITLES = { 'home' => 'Home', 'projects' => I18n.t('project').pluralize, 'institutions' => I18n.t('institution').pluralize,

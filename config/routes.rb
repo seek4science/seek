@@ -7,6 +7,24 @@ SEEK::Application.routes.draw do
   mount MagicLamp::Genie, at: (SEEK::Application.config.relative_url_root || '/') + 'magic_lamp' if defined?(MagicLamp)
   # mount Teaspoon::Engine, :at => (SEEK::Application.config.relative_url_root || "/") + "teaspoon" if defined?(Teaspoon)
 
+  # TRS
+  namespace :ga4gh do
+    namespace :trs do
+      namespace :v2 do
+        get 'tools' => 'tools#index'
+        get 'tools/:id' => 'tools#show'
+        get 'tools/:id/versions' => 'tool_versions#index'
+        get 'tools/:id/versions/:version_id' => 'tool_versions#show'
+        get 'tools/:id/versions/:version_id/containerfile' => 'tool_versions#containerfile'
+        get 'tools/:id/versions/:version_id/:type/descriptor(/:relative_path)' => 'tool_versions#descriptor', constraints: { relative_path: /.+/ }
+        get 'tools/:id/versions/:version_id/:type/files' => 'tool_versions#files', format: false
+        get 'tools/:id/versions/:version_id/:type/tests' => 'tool_versions#tests'
+        get 'toolClasses' => 'general#tool_classes'
+        get 'service-info' => 'general#service_info'
+      end
+    end
+  end
+
   # Concerns
   concern :has_content_blobs do
     member do
@@ -148,6 +166,7 @@ SEEK::Application.routes.draw do
       get :privacy
       get :about
       get :create_or_join_project
+      get :report_issue
     end
   end
 
@@ -358,6 +377,7 @@ SEEK::Application.routes.draw do
   resources :institutions do
     collection do
       get :request_all
+      get :request_all_sharing_form
       post :items_for_result
       get  :typeahead
     end
@@ -472,10 +492,8 @@ SEEK::Application.routes.draw do
   resources :models, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
     member do
       get :compare_versions
-      post :compare_versions
-      get :visualise
-      post :submit_to_sycamore
-      post :export_as_xgmml
+      post :compare_versions      
+      post :submit_to_sycamore      
       post :execute
       get :simulate
       post :simulate
@@ -516,6 +534,8 @@ SEEK::Application.routes.draw do
     end
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :sops, :collections, only: [:index]
   end
+
+  resources :workflow_classes, except: [:show]
 
   resources :nodes, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, only: [:index]
@@ -718,6 +738,7 @@ SEEK::Application.routes.draw do
   post '/auth/:provider' => 'sessions#create', as: :omniauth_authorize # For security, ONLY POST should be enabled on this route.
   match '/auth/:provider/callback' => 'sessions#create', as: :omniauth_callback, via: [:get, :post] # Callback routes need both GET and POST enabled.
   match '/identities/auth/:provider/callback' => 'sessions#create', via: [:get, :post] # Needed for legacy support..
+  get '/auth/failure' => 'sessions#omniauth_failure', as: :omniauth_failure
 
   get '/activate(/:activation_code)' => 'users#activate', as: :activate
   get '/forgot_password' => 'users#forgot_password', as: :forgot_password

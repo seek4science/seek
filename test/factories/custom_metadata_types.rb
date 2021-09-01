@@ -3,6 +3,12 @@ Factory.define(:age_custom_metadata_attribute,class:CustomMetadataAttribute) do 
   f.association :sample_attribute_type, factory: :integer_sample_attribute_type
 end
 
+Factory.define(:age_custom_metadata_attribute_with_description,class:CustomMetadataAttribute) do |f|
+  f.title 'age'
+  f.association :sample_attribute_type, factory: :integer_sample_attribute_type
+  f.description "You need to enter age."
+end
+
 Factory.define(:name_custom_metadata_attribute,class:CustomMetadataAttribute) do |f|
   f.title 'name'
   f.association :sample_attribute_type, factory: :string_sample_attribute_type
@@ -18,6 +24,16 @@ Factory.define(:simple_investigation_custom_metadata_type,class: CustomMetadataT
   f.supported_type 'Investigation'
   f.after_build do |a|
     a.custom_metadata_attributes << Factory(:age_custom_metadata_attribute)
+    a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, required: true)
+    a.custom_metadata_attributes << Factory(:datetime_custom_metadata_attribute)
+  end
+end
+
+Factory.define(:simple_investigation_custom_metadata_type_with_description,class: CustomMetadataType) do |f|
+  f.title 'simple investigation custom metadata type'
+  f.supported_type 'Investigation'
+  f.after_build do |a|
+    a.custom_metadata_attributes << Factory(:age_custom_metadata_attribute_with_description)
     a.custom_metadata_attributes << Factory(:name_custom_metadata_attribute, required: true)
     a.custom_metadata_attributes << Factory(:datetime_custom_metadata_attribute)
   end

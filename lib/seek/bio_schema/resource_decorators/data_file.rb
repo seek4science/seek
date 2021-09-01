@@ -14,13 +14,22 @@ module Seek
           "https://doi.org/#{resource.doi}" if resource.doi
         end
 
+        def description
+          description = resource.description&.truncate(4999)
+          if description.blank?
+            description = 'Description not specified'
+          end
+          description.ljust(50,'.')
+        end
+
         def distribution
-          return if resource.content_blob && resource.content_blob.show_as_external_link?
+          return unless resource.content_blob
+          return if resource.content_blob.show_as_external_link?
           blob = resource.content_blob
           data = {
             '@type': 'DataDownload',
             'contentSize': number_to_human_size(blob.file_size),
-            'contentUrl': polymorphic_url([resource, blob], action: :download, host: Seek::Config.site_base_host),
+            'contentUrl': resource_url([resource, blob], action: :download, host: Seek::Config.site_base_host, strip_version: true),
             'encodingFormat': blob.content_type,
             'name': blob.original_filename
           }

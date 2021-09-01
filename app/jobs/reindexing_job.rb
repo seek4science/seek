@@ -16,7 +16,7 @@ class ReindexingJob < BatchJob
   end
 
   def gather_items
-    ReindexingQueue.dequeue(BATCHSIZE)
+    ReindexingQueue.dequeue(BATCHSIZE).compact
   end
 
   def follow_on_job?

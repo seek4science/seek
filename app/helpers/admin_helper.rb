@@ -21,13 +21,7 @@ module AdminHelper
     words.join(', ').html_safe
   end
 
-  def delayed_job_pids
-    directory = "#{Rails.root}/tmp/pids"
-    Daemons::PidFile.find_files(directory, 'delayed_job').collect do |path|
-      file = path.sub("#{directory}/", '').sub('.pid', '')
-      Daemons::PidFile.new(directory, file)
-    end
-  end
+  
 
   def action_buttons(user_or_person, action)
     case action

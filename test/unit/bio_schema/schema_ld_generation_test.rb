@@ -15,7 +15,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'DataCatalog',
       'name' => 'Sysmo',
       'url' => 'http://fairyhub.org',
@@ -23,10 +23,11 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'keywords' => 'a, b, c, d',
       'provider' => {
         '@type' => 'Organization',
+        '@id' => 'http://fairyhub.org',
         'name' => 'SysMO-DB',
-        'url' => 'http://www.sysmo-db.org'
+        'url' => 'http://fairyhub.org'
       },
-      'dateCreated' => @current_time.to_s
+      'dateCreated' => @current_time.iso8601
     }
     with_config_value(:project_description, 'a lovely project') do
       with_config_value(:project_keywords, 'a,  b, ,,c,d') do
@@ -42,9 +43,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     @person.avatar = Factory(:avatar)
     disable_authorization_checks { @person.save! }
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@id' => "http://localhost:3000/people/#{@person.id}",
       '@type' => 'Person',
+      'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Person::PERSON_PROFILE,
       'name' => @person.name,
       'givenName' => @person.first_name,
       'familyName' => @person.last_name,
@@ -67,7 +69,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'dataset' do
     df = travel_to(@current_time) do
-      df = Factory(:max_data_file, contributor: @person, projects: [@project], policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
+      df = Factory(:max_data_file, description: 'short desc', contributor: @person, projects: [@project], policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
       df.add_annotations('keyword', 'tag', User.first)
       disable_authorization_checks { df.save! }
       df
@@ -77,21 +79,21 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     refute df.content_blob.show_as_external_link?
 
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}",
       'name' => df.title,
-      'description' => df.description,
+      'description' => df.description.ljust(50,'.'),
       'keywords' => 'keyword',
       'url' => "http://localhost:3000/data_files/#{df.id}",
-      'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
+      'creator' => [{ '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Blogs')}", 'name' => 'Blogs' }, { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Joe')}", 'name' => 'Joe' }],
       'producer' => [{
         '@type' => %w[Project Organization],
         '@id' => "http://localhost:3000/projects/#{@project.id}",
         'name' => @project.title
       }],
-      'dateCreated' => @current_time.to_s,
-      'dateModified' => @current_time.to_s,
+      'dateCreated' => @current_time.iso8601,
+      'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'application/pdf',
       'identifier' => 'https://doi.org/10.10.10.10/test.1',
       'subjectOf' => [
@@ -99,6 +101,12 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
           '@id' => "http://localhost:3000/events/#{df.events.first.id}",
           'name' => df.events.first.title }
       ],
+      "sdPublisher" => {
+        "@type"=>"Organization",
+        "@id"=>"http://localhost:3000",
+        "name"=>"SysMO-DB",
+        "url"=>"http://localhost:3000"
+      },
       'distribution' => {
         '@type' => 'DataDownload',
         'contentSize' => '8.62 KB',
@@ -108,8 +116,59 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       }
     }
 
+    json = JSON.parse(df.to_schema_ld)    
+    assert_equal expected, json
+    check_version(df.latest_version, expected)
+  end
+
+  test 'dataset without content blob' do
+    df = travel_to(@current_time) do
+      df = Factory(:max_data_file, contributor: @person, projects: [@project], policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
+      df.add_annotations('keyword', 'tag', User.first)
+      df.content_blob=nil
+      disable_authorization_checks { 
+        df.content_blob=nil
+        df.save! 
+      }
+      df
+    end
+    
+    df.reload
+    assert_nil df.content_blob
+
+    expected = {
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@type' => 'Dataset',
+      '@id' => "http://localhost:3000/data_files/#{df.id}",
+      'name' => df.title,
+      'description' => df.description,
+      'keywords' => 'keyword',
+      'url' => "http://localhost:3000/data_files/#{df.id}",
+      'creator' => [{ '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Blogs')}", 'name' => 'Blogs' }, { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Joe')}", 'name' => 'Joe' }],
+      'producer' => [{
+        '@type' => %w[Project Organization],
+        '@id' => "http://localhost:3000/projects/#{@project.id}",
+        'name' => @project.title
+      }],
+      'dateCreated' => @current_time.iso8601,
+      'dateModified' => @current_time.iso8601,      
+      'identifier' => 'https://doi.org/10.10.10.10/test.1',
+      'subjectOf' => [
+        { '@type' => 'Event',
+          '@id' => "http://localhost:3000/events/#{df.events.first.id}",
+          'name' => df.events.first.title }
+      ],
+      "sdPublisher" => {
+          "@type"=>"Organization",
+          "@id"=>"http://localhost:3000",
+          "name"=>"SysMO-DB",
+          "url"=>"http://localhost:3000"
+      },
+    }
+
     json = JSON.parse(df.to_schema_ld)
     assert_equal expected, json
+    check_version(df.latest_version, expected)
   end
 
   test 'dataset with weblink' do
@@ -126,23 +185,29 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     assert df.content_blob.show_as_external_link?
 
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}",
       'name' => df.title,
       'description' => df.description,
       'keywords' => 'keyword',
-      'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
+      'creator' => [{ '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Blogs')}", 'name' => 'Blogs' }, { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Joe')}", 'name' => 'Joe' }],
       'url' => 'http://www.abc.com',
       'producer' => [{
         '@type' => %w[Project Organization],
         '@id' => "http://localhost:3000/projects/#{@project.id}",
         'name' => @project.title
       }],
-      'dateCreated' => @current_time.to_s,
-      'dateModified' => @current_time.to_s,
+      'dateCreated' => @current_time.iso8601,
+      'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'text/html',
       'identifier' => 'https://doi.org/10.10.10.10/test.1',
+      "sdPublisher"=>{
+        "@type"=>"Organization",
+        "@id"=>"http://localhost:3000",
+        "name"=>"SysMO-DB",
+        "url"=>"http://localhost:3000"
+      },
       'subjectOf' => [
         { '@type' => 'Event',
           '@id' => "http://localhost:3000/events/#{df.events.first.id}",
@@ -152,13 +217,14 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     json = JSON.parse(df.to_schema_ld)
     assert_equal expected, json
+    check_version(df.latest_version, expected)
   end
 
   test 'taxon' do
     organism = Factory(:organism, bioportal_concept: Factory(:bioportal_concept))
 
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'Taxon',
       '@id' => "http://localhost:3000/organisms/#{organism.id}",
       'name' => 'An Organism',
@@ -177,7 +243,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     @project.description = 'a lovely project'
     disable_authorization_checks { @project.save! }
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => %w[Project Organization],
       '@id' => "http://localhost:3000/projects/#{@project.id}",
       'name' => @project.title,
@@ -202,7 +268,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     disable_authorization_checks { sample.save! }
 
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'Sample',
       '@id' => "http://localhost:3000/samples/#{sample.id}",
       'name' => 'Fred Bloggs',
@@ -223,8 +289,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
   test 'event' do
     event = Factory(:max_event, contributor: @person)
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@id' => "http://localhost:3000/events/#{event.id}",
+      'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Event::EVENT_PROFILE,
       '@type' => 'Event',
       'name' => 'A Maximal Event',
       'description' => 'All you ever wanted to know about headaches',
@@ -259,22 +326,29 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'DigitalDocument',
       '@id' => "http://localhost:3000/documents/#{document.id}",
       'name' => 'This Document',
       'url' => "http://localhost:3000/documents/#{document.id}",
       'keywords' => 'wibble',
-      'dateCreated' => @current_time.to_s,
-      'dateModified' => @current_time.to_s,
+      'dateCreated' => @current_time.iso8601,
+      'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'application/pdf',
       'producer' => [
         { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{document.projects.first.id}", 'name' => document.projects.first.title }
-      ]
+      ],
+      "sdPublisher"=>{
+        "@type"=>"Organization",
+        "@id"=>"http://localhost:3000",
+        "name"=>"SysMO-DB",
+        "url"=>"http://localhost:3000"
+      }
     }
 
     json = JSON.parse(document.to_schema_ld)
     assert_equal expected, json
+    check_version(document.latest_version, expected)
   end
 
   test 'presentation' do
@@ -286,25 +360,33 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'PresentationDigitalDocument',
       '@id' => "http://localhost:3000/presentations/#{presentation.id}",
       'name' => 'This presentation',
       'url' => "http://localhost:3000/presentations/#{presentation.id}",
       'keywords' => 'wibble',
-      'dateCreated' => @current_time.to_s,
-      'dateModified' => @current_time.to_s,
+      'dateCreated' => @current_time.iso8601,
+      'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'application/pdf',
       'producer' => [
         { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{presentation.projects.first.id}", 'name' => presentation.projects.first.title }
-      ]
+      ],
+      "sdPublisher"=>{
+        "@type"=>"Organization",
+        "@id"=>"http://localhost:3000",
+        "name"=>"SysMO-DB",
+        "url"=>"http://localhost:3000"
+      }
     }
 
     json = JSON.parse(presentation.to_schema_ld)
     assert_equal expected, json
+    check_version(presentation.latest_version, expected)
   end
 
-  test 'workflow' do
+
+test 'workflow' do
     creator2 = Factory(:person)
     workflow = travel_to(@current_time) do
       workflow = Factory(:cwl_packed_workflow,
@@ -322,14 +404,15 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       workflow
     end
 
-    expected = { '@context' => 'http://schema.org',
-                 '@type' => 'ComputationalWorkflow',
+    expected = { '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+                 '@type' => ['File', 'SoftwareSourceCode', 'ComputationalWorkflow'],
                  '@id' => "http://localhost:3000/workflows/#{workflow.id}",
+                 'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::WORKFLOW_PROFILE,
                  'description' => 'This is a test workflow for bioschema generation',
                  'name' => 'This workflow',
                  'url' => "http://localhost:3000/workflows/#{workflow.id}",
                  'keywords' => 'wibble',
-                 'license' => 'https://opensource.org/licenses/APSL-2.0',
+                 'license' => Seek::License.find('APSL-2.0')&.url,
                  'creator' =>
                     [{ '@type' => 'Person',
                        '@id' => "http://localhost:3000/people/#{@person.id}",
@@ -338,58 +421,224 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                        '@id' => "http://localhost:3000/people/#{creator2.id}",
                        'name' => creator2.name },
                      { '@type' => 'Person',
+                       '@id' => "##{ROCrate::Entity.format_id('Fred Bloggs')}",
                        'name' => 'Fred Bloggs' },
                      { '@type' => 'Person',
+                       '@id' => "##{ROCrate::Entity.format_id('Steve Smith')}",
                        'name' => 'Steve Smith' }],
                  'producer' =>
                     [{ '@type' => %w[Project Organization],
                        '@id' => "http://localhost:3000/projects/#{@project.id}",
                        'name' => @project.title }],
-                 'dateCreated' => @current_time.to_s,
-                 'dateModified' => @current_time.to_s,
+                 'dateCreated' => @current_time.iso8601,
+                 'dateModified' => @current_time.iso8601,
                  'encodingFormat' => 'application/x-yaml',
-                 'sdPublisher' =>
-                    [{ '@type' => 'Person',
-                       '@id' => "http://localhost:3000/people/#{@person.id}",
-                       'name' => @person.name }],
+                 'sdPublisher'=> {
+                   '@type'=>'Organization',
+                   '@id'=>'http://localhost:3000',
+                   'name'=>'SysMO-DB',
+                   'url'=>'http://localhost:3000'
+                 },
                  'version' => 1,
-                 'programmingLanguage' => 'CWL workflow',
+                 'programmingLanguage' => {
+                   '@id'=>'#cwl',
+                   '@type'=>'ComputerLanguage',
+                   'name'=>'Common Workflow Language',
+                   'alternateName'=>'CWL',
+                   'identifier'=> {
+                     '@id'=>'https://w3id.org/cwl/v1.0/'},
+                   'url'=>{'@id'=>'https://www.commonwl.org/'}},
                  'input' => [
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.cofsfile',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/input.cofsfile' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.dmax',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/input.dmax' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.dmin',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/input.dmin' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.max-steps',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/input.max-steps' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.mwmax-cof',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/input.mwmax-cof' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.mwmax-source',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/input.mwmax-source' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.rulesfile',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/input.rulesfile' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.sinkfile',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/input.sinkfile' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.sourcefile',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/input.sourcefile' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.std_mode',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/input.std_mode' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.stereo_mode',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/input.stereo_mode' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-inputs-#main/input.topx',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/input.topx' }
                  ],
                  'output' => [
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-outputs-#main/solutionfile',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/solutionfile' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-outputs-#main/sourceinsinkfile',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/sourceinsinkfile' },
                    { '@type' => 'FormalParameter',
+                     '@id' => '#this_workflow-outputs-#main/stdout',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/stdout' }
                  ] }
 
     json = JSON.parse(workflow.to_schema_ld)
+    assert_equal expected, json
+    check_version(workflow.latest_version, expected)
+  end
+
+  test 'version of dataset' do
+    df = travel_to(@current_time) do
+      df = Factory(:max_data_file, description: 'version 1 description', title: 'version 1 title', contributor: @person, projects: [@project], policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
+      df.add_annotations('keyword', 'tag', User.first)
+      disable_authorization_checks do
+        df.save!
+        df.save_as_new_version
+        df.update_attributes(description: 'version 2 description', title: 'version 2 title')
+        Factory.create(:image_content_blob, asset: df, asset_version: 2)
+        df.latest_version.update_column(:doi, '10.10.10.10/test.2')
+      end
+      df
+    end
+
+    assert df.can_download?
+    refute df.content_blob.show_as_external_link?
+
+    v1_expected = {
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@type' => 'Dataset',
+      '@id' => "http://localhost:3000/data_files/#{df.id}?version=1",
+      'name' => 'version 1 title',
+      'description' => 'version 1 description'.ljust(50,'.'),
+      'keywords' => 'keyword',
+      'url' => "http://localhost:3000/data_files/#{df.id}?version=1",
+      'creator' => [
+        { '@type' => 'Person',
+          '@id' => "##{ROCrate::Entity.format_id('Blogs')}",
+          'name' => 'Blogs' },
+        { '@type' => 'Person',
+          '@id' => "##{ROCrate::Entity.format_id('Joe')}",
+          'name' => 'Joe' }
+      ],
+      'producer' => [{
+                       '@type' => %w[Project Organization],
+                       '@id' => "http://localhost:3000/projects/#{@project.id}",
+                       'name' => @project.title
+                     }],
+      'sdPublisher'=> {
+        '@type'=>'Organization',
+        '@id'=>'http://localhost:3000',
+        'name'=>'SysMO-DB',
+        'url'=>'http://localhost:3000'
+      },
+      'dateCreated' => @current_time.iso8601,
+      'dateModified' => @current_time.iso8601,
+      'encodingFormat' => 'application/pdf',
+      #'identifier' => 'https://doi.org/10.10.10.10/test.1', # Should not have a DOI, since it was defined on the parent resource
+      'subjectOf' => [
+        { '@type' => 'Event',
+          '@id' => "http://localhost:3000/events/#{df.events.first.id}",
+          'name' => df.events.first.title }
+      ],
+      'distribution' => {
+        '@type' => 'DataDownload',
+        'contentSize' => '8.62 KB',
+        'contentUrl' => "http://localhost:3000/data_files/#{df.id}/content_blobs/#{df.find_version(1).content_blob.id}/download",
+        'encodingFormat' => 'application/pdf',
+        'name' => 'a_pdf_file.pdf'
+      }
+    }
+
+    v2_expected = {
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@type' => 'Dataset',
+      '@id' => "http://localhost:3000/data_files/#{df.id}?version=2",
+      'name' => 'version 2 title',
+      'description' => 'version 2 description'.ljust(50,'.'),
+      'keywords' => 'keyword',
+      'url' => "http://localhost:3000/data_files/#{df.id}?version=2",
+      'creator' => [
+        { '@type' => 'Person',
+          '@id' => "##{ROCrate::Entity.format_id('Blogs')}",
+          'name' => 'Blogs' },
+        { '@type' => 'Person',
+          '@id' => "##{ROCrate::Entity.format_id('Joe')}",
+          'name' => 'Joe' }
+      ],
+      'producer' => [{
+                       '@type' => %w[Project Organization],
+                       '@id' => "http://localhost:3000/projects/#{@project.id}",
+                       'name' => @project.title
+                     }],
+      'sdPublisher'=> {
+        '@type'=>'Organization',
+        '@id'=>'http://localhost:3000',
+        'name'=>'SysMO-DB',
+        'url'=>'http://localhost:3000'
+      },
+      'dateCreated' => @current_time.iso8601,
+      'dateModified' => @current_time.iso8601,
+      'encodingFormat' => 'image/png',
+      'identifier' => 'https://doi.org/10.10.10.10/test.2',  # This DOI was added to the version itself
+      'isBasedOn' => "http://localhost:3000/data_files/#{df.id}?version=1",
+      'subjectOf' => [
+        { '@type' => 'Event',
+          '@id' => "http://localhost:3000/events/#{df.events.first.id}",
+          'name' => df.events.first.title }
+      ],
+      'distribution' => {
+        '@type' => 'DataDownload',
+        'contentSize' => '2.66 KB',
+        'contentUrl' => "http://localhost:3000/data_files/#{df.id}/content_blobs/#{df.find_version(2).content_blob.id}/download",
+        'encodingFormat' => 'image/png',
+        'name' => 'image_file.png'
+      }
+    }
+
+    json = JSON.parse(df.find_version(1).to_schema_ld)
+    assert_equal v1_expected, json
+    json = JSON.parse(df.find_version(2).to_schema_ld)
+    assert_equal v2_expected, json
+  end
+
+  private
+
+  def check_version(version, expected)
+    json = JSON.parse(version.to_schema_ld)
+    expected['@id'] += "?version=#{version.version}"
+    expected['url'] += "?version=#{version.version}" if expected['url'].include?(Seek::Config.site_base_host)
+    expected.delete('identifier') unless version.respond_to?(:doi) && version.doi.present?
     assert_equal expected, json
   end
 end

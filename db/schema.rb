@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_03_18_115608) do
+ActiveRecord::Schema.define(version: 2021_08_27_122113) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -108,6 +108,13 @@ ActiveRecord::Schema.define(version: 2021_03_18_115608) do
     t.datetime "updated_at", null: false
     t.index ["encrypted_token"], name: "index_api_tokens_on_encrypted_token"
     t.index ["user_id"], name: "index_api_tokens_on_user_id"
+  end
+
+  create_table "application_status",  force: :cascade do |t|
+    t.integer "running_jobs"
+    t.boolean "soffice_running"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "assay_assets", id: :integer,  force: :cascade do |t|
@@ -372,6 +379,7 @@ ActiveRecord::Schema.define(version: 2021_03_18_115608) do
     t.integer "pos"
     t.string "title"
     t.bigint "sample_controlled_vocab_id"
+    t.text "description"
     t.index ["custom_metadata_type_id"], name: "index_custom_metadata_attributes_on_custom_metadata_type_id"
     t.index ["sample_attribute_type_id"], name: "index_custom_metadata_attributes_on_sample_attribute_type_id"
     t.index ["sample_controlled_vocab_id"], name: "index_custom_metadata_attributes_on_sample_controlled_vocab_id"
@@ -1810,7 +1818,6 @@ ActiveRecord::Schema.define(version: 2021_03_18_115608) do
     t.integer "investigation_id"
     t.text "experimentalists"
     t.datetime "begin_date"
-    t.integer "person_responsible_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "first_letter", limit: 1
@@ -1966,6 +1973,12 @@ ActiveRecord::Schema.define(version: 2021_03_18_115608) do
     t.string "key"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string "extractor"
+    t.bigint "contributor_id"
+    t.string "alternate_name"
+    t.text "identifier"
+    t.text "url"
+    t.index ["contributor_id"], name: "index_workflow_classes_on_contributor_id"
   end
 
   create_table "workflow_versions", id: :integer,  force: :cascade do |t|
@@ -1989,6 +2002,8 @@ ActiveRecord::Schema.define(version: 2021_03_18_115608) do
     t.integer "workflow_class_id"
     t.integer "maturity_level"
     t.integer "visibility"
+    t.boolean "monitored"
+    t.integer "test_status"
     t.index ["contributor_id"], name: "index_workflow_versions_on_contributor"
     t.index ["workflow_id"], name: "index_workflow_versions_on_workflow_id"
   end
@@ -2011,6 +2026,7 @@ ActiveRecord::Schema.define(version: 2021_03_18_115608) do
     t.text "metadata"
     t.integer "workflow_class_id"
     t.integer "maturity_level"
+    t.integer "test_status"
     t.index ["contributor_id"], name: "index_workflows_on_contributor"
   end
 

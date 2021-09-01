@@ -28,6 +28,7 @@ class Publication < ApplicationRecord
   has_many :studies, through: :related_relationships, source: :subject, source_type: 'Study'
   has_many :investigations, through: :related_relationships, source: :subject, source_type: 'Investigation'
   has_many :presentations, through: :related_relationships, source: :subject, source_type: 'Presentation'
+  has_many :workflows, through: :related_relationships, source: :subject, source_type: 'Workflow'
 
   has_and_belongs_to_many :human_diseases
   has_filter :human_disease
@@ -117,7 +118,7 @@ class Publication < ApplicationRecord
     super + ['published_date','journal']
   end
   def columns_allowed
-    super + ['abstract','published_date','journal','last_used_at','doi','citation','deleted_contributor','registered_mode','booktitle','publisher','editor','url']
+    columns_default + ['abstract','last_used_at','doi','citation','booktitle','publisher','editor','url']
   end
 
   def pubmed_uri
@@ -631,7 +632,6 @@ class Publication < ApplicationRecord
     pub_url
   end
 
-  # defines that this is a user_creatable object type, and appears in the "New Object" gadget
   def self.user_creatable?
     Seek::Config.publications_enabled
   end

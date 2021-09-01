@@ -58,9 +58,7 @@
 
         <% if Seek::Config.organisms_enabled %>
             <%= list_assay_organisms("Organisms", @assay.assay_organisms,{:id=>"organism"}) %>
-        <% end %>
-
-        <%= render partial: 'custom_metadata/custom_metadata_attribute_values', locals: {resource: @assay} %>
+        <% end %>        
 
         <% if Seek::Config.human_diseases_enabled %>
             <%= list_assay_human_diseases("Human Diseases", @assay.assay_human_diseases,{:id=>"human_disease"}) %>
@@ -74,6 +72,9 @@
         </div>
       </div>
     <% end %>
+
+    <%= render partial: 'custom_metadata/custom_metadata_attribute_values', locals: {resource: @assay} %>
+
     <% if ((@assay.is_modelling?) && !@assay.models.empty? && !@assay.data_files.empty?) %><%#MODELLING ASSAY %>
         <div class="data_model_relationship">
           <% unless @assay.models.empty? %>

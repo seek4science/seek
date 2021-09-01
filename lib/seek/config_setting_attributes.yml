@@ -29,6 +29,7 @@ project_description:
 project_keywords:
 dm_project_name:
 dm_project_link:
+issue_tracker:
 header_image_link:
 header_image_title:
 header_image_enabled:
@@ -118,6 +119,7 @@ zenodo_oauth_url:
 zenodo_client_id:
 zenodo_client_secret:
 programme_user_creation_enabled:
+programmes_open_for_projects_enabled:
 cache_remote_files:
 orcid_required:
 max_cachable_size:
@@ -188,6 +190,7 @@ results_per_page_default_condensed:
 results_per_page:
 cwl_viewer_url:
 # Types enabled
+data_files_enabled:
 documents_enabled:
 events_enabled:
 isa_enabled:
@@ -195,8 +198,10 @@ models_enabled:
 organisms_enabled:
 programmes_enabled:
 managed_programme_id:
+presentations_enabled:
 publications_enabled:
 samples_enabled:
+sops_enabled:
 workflows_enabled:
 collections_enabled:
 # Omniauth
@@ -214,8 +219,18 @@ omniauth_github_enabled:
 omniauth_github_client_id:
 omniauth_github_secret:
   encrypt: true
+ga4gh_trs_api_enabled:
+custom_metadata_enabled: false
 search_results_limit:
   convert: :to_i
-# Controlled vocabs  
+life_monitor_enabled:
+life_monitor_url:
+life_monitor_client_id:
+life_monitor_client_secret:
+galaxy_instance_name:
+galaxy_instance_trs_import_url:
+# Controlled vocabs
 cv_dropdown_limit:
   convert: :to_i
+tag_cloud_enabled:
+workflow_class_list_enabled:

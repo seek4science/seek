@@ -36,7 +36,7 @@ class Sop < ApplicationRecord
     super + ['version']
   end
   def columns_allowed
-    super + ['last_used_at','version','other_creators','doi','license','deleted_contributor']
+    columns_default + ['last_used_at','other_creators','doi','license']
   end
 
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi']) do
@@ -60,11 +60,6 @@ class Sop < ApplicationRecord
   end
 
   def use_mime_type_for_avatar?
-    true
-  end
-
-  #defines that this is a user_creatable object type, and appears in the "New Object" gadget
-  def self.user_creatable?
     true
   end
 end

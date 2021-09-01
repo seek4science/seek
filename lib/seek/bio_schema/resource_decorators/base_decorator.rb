@@ -5,6 +5,7 @@ module Seek
       # The Decorator is an extension to the resource that provided or alters the properties of that resource
       # for Schema.org (Bioschemas.org)
       class BaseDecorator
+          
         include ActionView::Helpers::SanitizeHelper
         include Rails.application.routes.url_helpers
 
@@ -26,7 +27,7 @@ module Seek
 
         # The @context to be used for the JSON-LD
         def context
-          'http://schema.org'
+          Seek::BioSchema::Serializer::SCHEMA_ORG
         end
 
         # The schema.org @type .
@@ -36,7 +37,7 @@ module Seek
         end
 
         def rdf_resource
-          uri = polymorphic_url(resource, host: Seek::Config.site_base_host)
+          uri = resource_url(resource)
           RDF::Resource.new(uri).to_s
         end
 
@@ -48,6 +49,21 @@ module Seek
             '@id': identifier,
             'name': sanitize(title)
           }
+        end
+
+        def resource_url(resource, opts = {})
+          strip_version = opts.delete(:strip_version)
+          opts[:host] ||= Seek::Config.site_base_host
+          resource = Array(resource).map do |r|
+            if r.is_a_version?
+              opts[:version] = r.version unless strip_version
+              r.parent
+            else
+              r
+            end
+          end
+
+          polymorphic_url(resource, opts)
         end
 
         instance_eval do
@@ -93,12 +109,14 @@ module Seek
         end
 
         def respond_to_missing?(name, include_private = false)
-          resource.respond_to?(name, include_private)
+          resource.respond_to?(name, include_private) || resource.is_a_version? && resource.parent.respond_to?(name, include_private)
         end
 
         def method_missing(method, *args, &block)
           if resource.respond_to?(method)
             resource.send(method, *args, &block)
+          elsif resource.is_a_version? && resource.parent.respond_to?(method)
+            resource.parent.send(method, *args, &block)
           else
             super
           end

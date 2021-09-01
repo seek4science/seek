@@ -46,6 +46,10 @@
       <% else %>
         <td> Field not found </td>
       <% end %>
+    <% when "creators"%>
+      <td><%= table_item_person_list resource.creators %></td>
+    <% when "assay_type_uri"%>
+      <td><%= link_to_assay_type(resource) %></td>
     <% else  %>
       <% if resource.respond_to?(column) %>
         <td><%= text_or_not_specified(resource.send(column),length: 300, auto_link: true, none_text: "") %></td>

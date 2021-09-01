@@ -116,7 +116,7 @@ class Policy < ApplicationRecord
     # if no data about sharing is given, it should be some user (not the owner!)
     # who is editing the asset - no need to do anything with policy / permissions: return success
     tap do |policy|
-      if policy_params
+      if policy_params.present?
         # Set attributes on the policy
         policy.access_type = policy_params[:access_type]
         if policy.access_type.nil? || policy.access_type > Policy::NO_ACCESS

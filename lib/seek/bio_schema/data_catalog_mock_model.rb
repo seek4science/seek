@@ -22,11 +22,12 @@ module Seek
         {
           '@type' => 'Organization',
           'name' => Seek::Config.dm_project_name,
-          'url' => Seek::Config.dm_project_link
+          'url' => Seek::Config.dm_project_link,
+          '@id' => Seek::Config.dm_project_link
         }
       end
 
-      def date_created
+      def created_at
         ActivityLog.order(:id).first.try(:created_at)
       end
 
@@ -36,6 +37,10 @@ module Seek
 
       def schema_org_supported?
         true
+      end
+
+      def is_a_version?
+        false
       end
     end
   end

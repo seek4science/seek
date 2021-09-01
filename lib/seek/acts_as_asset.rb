@@ -78,6 +78,10 @@ module Seek
         with_contributors.to_json
       end
 
+      def user_creatable?
+        feature_enabled?
+      end
+
       def can_create?
         User.logged_in_and_member?
       end
@@ -101,8 +105,7 @@ module Seek
         versioned? &&
           is_downloadable? &&
           !(respond_to?(:extracted_samples) && extracted_samples.any?) &&
-          !(respond_to?(:openbis?) && openbis?) &&
-          !(supports_doi? && has_doi?)
+          !(respond_to?(:openbis?) && openbis?)
       end
     end
   end

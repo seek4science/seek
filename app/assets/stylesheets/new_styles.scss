@@ -1016,10 +1016,6 @@ img.github-logo {
   max-width: 100%;
 }
 
-.list_item_content .maturity-level {
-  font-size: 100%;
-}
-
 ul.list.collapsed li.hidden-item {
   display: none;
 }
@@ -1072,4 +1068,8 @@ span.disabled {
   display:block;
   overflow-y: auto;
   max-height: 20em;
+}
+
+.citation-box {
+  overflow-x: auto;
 }
