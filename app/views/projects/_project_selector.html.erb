@@ -36,7 +36,7 @@
     node_list.each{|node|
       children_list.push({id: node[:data][:folder_id], title: parent+node[:text]})
       children_list.concat(tree_get_children(parent+node[:text]+"->", node[:children]))
-    }
+    } unless node_list.nil?
     return children_list
   end
 
@@ -53,6 +53,8 @@
     folders =  ProjectFolder.root_folders(project)
     tree = TreeviewBuilder.new(project, folders).get_folder_tree
     # possible_folders[project.id].concat(tree_get_children(project.title+"->",tree))
+    puts "######################################"
+    puts project.id
     possible_folders[project.id].concat(tree_get_children("",tree))
 
     # populate selected_folders_json

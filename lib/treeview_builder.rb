@@ -66,8 +66,6 @@ class TreeviewBuilder
         JSON[prj]
     end
 
-    private
-
     # TODO: add function that returns the simplified folder tree
     def get_folder_tree()
       prj = Array.new()
@@ -82,6 +80,8 @@ class TreeviewBuilder
       end
       prj
     end
+
+    private
 
     def folder_node(folder)
         obj={id:"folder_#{folder.id}" ,text: folder.title,_type: 'folder',count: folder.count.to_s,
