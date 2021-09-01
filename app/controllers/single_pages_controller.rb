@@ -23,7 +23,7 @@ class SinglePagesController < ApplicationController
 
   def render_item_detail
     begin
-      instance_variable_set("@item", params[:type].camelize.constantize.find(params[:id]))
+      @item = params[:type].camelize.constantize.find(params[:id])
       # To be accessed in associated template (e.g. Projects/view => @project)
       instance_variable_set("@#{params[:type]}", @item)
       find_display_asset(@item) if @item.respond_to?('latest_version')
