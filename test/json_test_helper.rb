@@ -98,7 +98,11 @@ module JsonTestHelper
     type = @controller.controller_name.classify
     opts = type.constantize.method_defined?(:policy) ? { policy: Factory(:publicly_viewable_policy) } : {}
     opts[:publication_type] = Factory(:journal) if type.constantize.method_defined?(:publication_type)
-    Factory("#{m}_#{type.underscore}".to_sym, opts)
+
+    # some factories require a user to be logged in to create, such as those with tags
+    User.with_current_user(User.current_user || Factory(:person).user) do
+      Factory("#{m}_#{type.underscore}".to_sym, opts)
+    end
   end
 
   def response_code_for_not_available(format)

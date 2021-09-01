@@ -11,6 +11,11 @@ class ProgrammesControllerTest < ActionController::TestCase
     Factory(:programme)
   end
 
+  def test_json_content
+    login_as(Factory(:admin))
+    super
+  end
+
   # for now just admins can create programmes, later we will change this
   test 'new page accessible admin' do
     login_as(Factory(:admin))
