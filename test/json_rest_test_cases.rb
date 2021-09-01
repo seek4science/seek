@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # mixin to automate testing of Rest services per controller test
 
 require 'json-schema'
@@ -48,10 +49,11 @@ module JsonRestTestCases
   end
 
   def edit_max_object(object); end
+
   def edit_min_object(object); end
 
   def test_json_content
-    ['min', 'max'].each do |m|
+    %w[min max].each do |m|
       object = get_test_object(m)
       json_file = File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'content_compare',
                             "#{m}_#{@controller.controller_name.singularize}.json")
@@ -65,7 +67,7 @@ module JsonRestTestCases
 
       assert_response :success
       parsed_response = JSON.parse(@response.body)
-      # puts JSON.pretty_generate(parsed_response)
+      #puts JSON.pretty_generate(parsed_response)
       check_content_diff(json_to_compare, parsed_response)
     end
   end
