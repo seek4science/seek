@@ -5,6 +5,10 @@ module Seek
       class Sample < Thing
         schema_mappings properties: :additionalProperty
 
+        def schema_type
+          ['Thing', 'Sample']
+        end
+
         def conformance
           'https://bioschemas.org/profiles/Sample/0.2-RELEASE-2018_11_10/'
         end

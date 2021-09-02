@@ -50,7 +50,7 @@ module Seek
       SUPPORTED_TYPES = [Person, Project, Event, DataFile, Organism, HumanDisease,
                          Seek::BioSchema::DataCatalogMockModel,
                          Document, Presentation, Workflow, Collection,
-                         Institution, Programme].freeze
+                         Institution, Programme, Sample].freeze
 
       def resource_decorator
         @decorator ||= ResourceDecorators::Factory.instance.get(resource)

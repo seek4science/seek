@@ -7,7 +7,7 @@ module Seek
 
         FORMALPARAMETER_PROFILE = 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/'
         
-        associated_items part_of: :collectons
+        associated_items part_of: :collections
         
         schema_mappings version: :version,
                         image: :image,

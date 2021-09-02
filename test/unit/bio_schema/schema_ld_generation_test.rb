@@ -27,7 +27,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         'name' => 'SysMO-DB',
         'url' => 'http://www.sysmo-db.org'
       },
-      'dateCreated' => @current_time.iso8601
+      'dateCreated' => @current_time.iso8601,
+      'dateModified' => @current_time.iso8601
     }
     with_config_value(:project_description, 'a lovely project') do
       with_config_value(:project_keywords, 'a,  b, ,,c,d') do
@@ -42,10 +43,12 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
   test 'person' do
     @person.avatar = Factory(:avatar)
     disable_authorization_checks { @person.save! }
+    institution = @person.institutions.first
     expected = {
       '@context' => 'http://schema.org',
       '@id' => "http://localhost:3000/people/#{@person.id}",
       '@type' => 'Person',
+      'dct:conformsTo' => 'https://bioschemas.org/profiles/Person/0.2-DRAFT-2019_07_19/',
       'name' => @person.name,
       'givenName' => @person.first_name,
       'familyName' => @person.last_name,
@@ -57,6 +60,13 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
           '@type' => %w[Project Organization],
           '@id' => "http://localhost:3000/projects/#{@project.id}",
           'name' => @project.title
+        }
+      ],
+      'worksFor' => [
+        {
+          '@type' => 'ResearchOrganization',
+          '@id' => "http://localhost:3000/institutions/#{institution.id}",
+          'name' => institution.title
         }
       ],
       'orcid' => 'https://orcid.org/0000-0001-9842-9718'
@@ -209,6 +219,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@context' => 'http://schema.org',
       '@type' => 'Taxon',
       '@id' => "http://localhost:3000/organisms/#{organism.id}",
+      'dct:conformsTo' => 'https://bioschemas.org/profiles/Taxon/0.6-RELEASE/',
       'name' => 'An Organism',
       'url' => "http://localhost:3000/organisms/#{organism.id}",
       'sameAs' => 'http://purl.bioontology.org/ontology/NCBITAXON/2287',
@@ -224,10 +235,12 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     @project.web_page = 'http://testing.com'
     @project.description = 'a lovely project'
     disable_authorization_checks { @project.save! }
+    institution = @project.institutions.first
     expected = {
       '@context' => 'http://schema.org',
       '@type' => %w[Project Organization],
       '@id' => "http://localhost:3000/projects/#{@project.id}",
+      'dct:conformsTo' => 'https://schema.org/Project',
       'name' => @project.title,
       'description' => 'a lovely project',
       'logo' => "http://localhost:3000/projects/#{@project.id}/avatars/#{@project.avatar.id}?size=250",
@@ -235,7 +248,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'member' => [
         { '@type' => 'Person',
           '@id' => "http://localhost:3000/people/#{@person.id}",
-          'name' => @person.name }
+          'name' => @person.name },
+        { '@type' => 'ResearchOrganization',
+          '@id' => "http://localhost:3000/institutions/#{institution.id}",
+          'name' => institution.title }
       ]
     }
     json = JSON.parse(@project.to_schema_ld)
@@ -251,8 +267,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     expected = {
       '@context' => 'http://schema.org',
-      '@type' => 'Sample',
+      '@type' => ['Thing', 'Sample'],
       '@id' => "http://localhost:3000/samples/#{sample.id}",
+      'dct:conformsTo' => 'https://bioschemas.org/profiles/Sample/0.2-RELEASE-2018_11_10/',
       'name' => 'Fred Bloggs',
       'url' => "http://localhost:3000/samples/#{sample.id}",
       'keywords' => 'keyword',
@@ -270,10 +287,13 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'event' do
     event = Factory(:max_event, contributor: @person)
+    data_file = event.data_files.first
+    presentation = event.presentations.first
     expected = {
       '@context' => 'http://schema.org',
       '@id' => "http://localhost:3000/events/#{event.id}",
       '@type' => 'Event',
+      'dct:conformsTo' => 'https://bioschemas.org/profiles/Event/0.2-DRAFT-2019_06_14/',
       'name' => 'A Maximal Event',
       'description' => 'All you ever wanted to know about headaches',
       'url' => "http://localhost:3000/events/#{event.id}",
@@ -292,9 +312,24 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
           '@id' => "http://localhost:3000/projects/#{event.projects.first.id}",
           'name' => event.projects.first.title
         }
-      ]
+      ],
+      'about' => [
+        {
+          '@type' => 'Dataset',
+          '@id' => "http://localhost:3000/data_files/#{data_file.id}",
+          'name' => data_file.title
+        },
+        {
+          '@type' => 'PresentationDigitalDocument',
+          '@id' => "http://localhost:3000/presentations/#{presentation.id}",
+          'name' => presentation.title
+        }
+      ],
+      'dateCreated' => event.created_at&.iso8601,
+      'dateModified' => event.updated_at&.iso8601
     }
     json = JSON.parse(event.to_schema_ld)
+    expected.each {|k, v| assert_equal v, json[k]}
     assert_equal expected, json
   end
 
@@ -338,6 +373,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@context' => 'http://schema.org',
       '@type' => 'PresentationDigitalDocument',
       '@id' => "http://localhost:3000/presentations/#{presentation.id}",
+      'dct:conformsTo' => 'https://schema.org/PresentationDigitalDocument',
       'name' => 'This presentation',
       'url' => "http://localhost:3000/presentations/#{presentation.id}",
       'keywords' => 'wibble',
@@ -372,8 +408,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = { '@context' => 'http://schema.org',
-                 '@type' => 'ComputationalWorkflow',
+                 '@type' => %w[File SoftwareSourceCode ComputationalWorkflow],
                  '@id' => "http://localhost:3000/workflows/#{workflow.id}",
+                 'dct:conformsTo' => 'https://bioschemas.org/profiles/ComputationalWorkflow/1.0-RELEASE/',
                  'description' => 'This is a test workflow for bioschema generation',
                  'name' => 'This workflow',
                  'url' => "http://localhost:3000/workflows/#{workflow.id}",
@@ -439,6 +476,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                  ] }
 
     json = JSON.parse(workflow.to_schema_ld)
+    expected.each {|k, v| assert_equal v, json[k]}
     assert_equal expected, json
   end
 end

@@ -5,12 +5,9 @@ module Seek
       class Document < CreativeWork
         include ActionView::Helpers::NumberHelper
 
-        associated_items subject_of: :events,
-                         part_of: :collections
+        associated_items part_of: :collections
 
-        schema_mappings part_of: :isPartOf,
-                        subject_of: :subjectOf
-
+        schema_mappings part_of: :isPartOf
         
         def schema_type
           'DigitalDocument'
