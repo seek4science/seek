@@ -58,7 +58,7 @@ module Seek
         end
 
         def about_assets
-          data_files + documents + presentations + publications
+          data_files + documents + presentations # + publications
         end
       end
     end
