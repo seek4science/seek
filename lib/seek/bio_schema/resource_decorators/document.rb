@@ -9,7 +9,7 @@ module Seek
                          part_of: :collections
 
         schema_mappings part_of: :isPartOf,
-                        subject_of: :subjectOf
+`                       subject_of: :subjectOf
         
         def schema_type
           'DigitalDocument'

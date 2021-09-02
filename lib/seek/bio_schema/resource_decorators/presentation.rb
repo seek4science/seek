@@ -6,6 +6,10 @@ module Seek
         def schema_type
           'PresentationDigitalDocument'
         end
+
+        def conformance
+          'https://schema.org/PresentationDigitalDocument'
+        end
       end
     end
   end

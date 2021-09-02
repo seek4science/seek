@@ -13,6 +13,12 @@ module Seek
           'https://schema.org/FundingScheme'
         end
 
+        def url
+          puts web_page
+          puts identifier
+          web_page.blank? ? identifier : web_page
+        end
+
         def avatar_url
           avatar&.public_asset_url
         end

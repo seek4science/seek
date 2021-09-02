@@ -7,13 +7,16 @@ module Seek
 
         FORMALPARAMETER_PROFILE = 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/'
         
+        associated_items part_of: :collectons
+        
         schema_mappings version: :version,
                         image: :image,
                         programming_language: :programmingLanguage,
                         producer: :producer,
                         inputs: :input,
                         outputs: :output,
-                        license: :license
+                        license: :license,
+                        part_of: :isPartOf
 
         def contributors
           [contributor]

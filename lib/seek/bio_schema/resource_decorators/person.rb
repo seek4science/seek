@@ -6,15 +6,19 @@ module Seek
         PERSON_PROFILE = 'https://bioschemas.org/profiles/Person/0.2-DRAFT-2019_07_19/'
 
         associated_items member_of: :projects,
-                         work_location: :institutions
+                         works_for: :institutions
 
         schema_mappings first_name: :givenName,
                         last_name: :familyName,
                         image: :image,
                         member_of: :memberOf,
                         orcid: :orcid,
-                        work_location: :workLocation
+                        works_for: :worksFor
 
+        def schema_type
+          'Person'
+        end
+        
         def conformance
           PERSON_PROFILE
         end
