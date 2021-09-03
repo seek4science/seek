@@ -1,6 +1,6 @@
 <%
    if displaying_single_page?
-      object=instance_variable_get("@item")
+      object=@item
    else
       entity=controller_name.singularize
       object=instance_variable_get("@#{entity}")

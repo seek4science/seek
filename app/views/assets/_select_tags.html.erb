@@ -1,6 +1,6 @@
 <%
    if displaying_single_page?
-      entity=instance_variable_get("@item_controller").singularize
+      entity=@item_controller.singularize
    else
       entity=controller_name.singularize
    end

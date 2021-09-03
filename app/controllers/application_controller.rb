@@ -640,7 +640,7 @@ class ApplicationController < ActionController::Base
   end
 
   def displaying_single_page?
-    instance_variable_get("@single_page")||false
+    @single_page || false
   end
   
   helper_method :displaying_single_page?
