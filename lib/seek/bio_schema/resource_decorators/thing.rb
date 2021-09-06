@@ -22,6 +22,7 @@ module Seek
         # If the resource has an avatar, then returns the image url
         def image
           return unless resource.respond_to?(:avatar)
+          return if resource.avatar.blank?
           "#{Seek::Config.site_base_host}/#{resource.class.table_name}" \
             "/#{resource.id}/avatars/#{resource.avatar.id}?size=250"
         end
