@@ -5,13 +5,8 @@ module Seek
       class DataFile < CreativeWork
         include ActionView::Helpers::NumberHelper
 
-        associated_items subject_of: :events,
-                         part_of: :collections
-
         schema_mappings doi: :identifier,
-                        distribution: :distribution,
-                        part_of: :isPartOf,
-                        subject_of: :subjectOf
+                        distribution: :distribution
 
         DATASET_PROFILE = 'https://bioschemas.org/profiles/Dataset/0.3-RELEASE-2019_06_14/'
                                                                 

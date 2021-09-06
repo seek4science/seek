@@ -95,6 +95,12 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'name' => df.title,
       'description' => df.description.ljust(50,'.'),
       'keywords' => 'keyword',
+      'sdPublisher' =>
+      { '@type' => 'Organization',
+        '@id' => Seek::Config.site_base_host,
+        'name' => Seek::Config.project_name,
+        'url' => Seek::Config.site_base_host},
+      'version' => 1,
       'url' => "http://localhost:3000/data_files/#{df.id}",
       'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
       'producer' => [{
@@ -147,6 +153,12 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'name' => df.title,
       'description' => df.description,
       'keywords' => 'keyword',
+      'sdPublisher' =>
+      { '@type' => 'Organization',
+        '@id' => Seek::Config.site_base_host,
+        'name' => Seek::Config.project_name,
+        'url' => Seek::Config.site_base_host},
+      'version' => 1,
       'url' => "http://localhost:3000/data_files/#{df.id}",
       'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
       'producer' => [{
@@ -190,6 +202,12 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'name' => df.title,
       'description' => df.description,
       'keywords' => 'keyword',
+      'sdPublisher' =>
+      { '@type' => 'Organization',
+        '@id' => Seek::Config.site_base_host,
+        'name' => Seek::Config.project_name,
+        'url' => Seek::Config.site_base_host},
+      'version' => 1,
       'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
       'url' => 'http://www.abc.com',
       'producer' => [{
@@ -244,6 +262,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'name' => @project.title,
       'description' => 'a lovely project',
       'logo' => "http://localhost:3000/projects/#{@project.id}/avatars/#{@project.avatar.id}?size=250",
+      'image' => "http://localhost:3000/projects/#{@project.id}/avatars/#{@project.avatar.id}?size=250",
       'url' => @project.web_page,
       'member' => [
         { '@type' => 'Person',
@@ -349,12 +368,19 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'name' => 'This Document',
       'url' => "http://localhost:3000/documents/#{document.id}",
       'keywords' => 'wibble',
+      'sdPublisher' =>
+      { '@type' => 'Organization',
+        '@id' => Seek::Config.site_base_host,
+        'name' => Seek::Config.project_name,
+        'url' => Seek::Config.site_base_host},
+      'version' => 1,
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'application/pdf',
       'producer' => [
         { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{document.projects.first.id}", 'name' => document.projects.first.title }
-      ]
+      ],
+      'subjectOf' => []
     }
 
     json = JSON.parse(document.to_schema_ld)
@@ -377,12 +403,19 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'name' => 'This presentation',
       'url' => "http://localhost:3000/presentations/#{presentation.id}",
       'keywords' => 'wibble',
+      'sdPublisher' =>
+      { '@type' => 'Organization',
+        '@id' => Seek::Config.site_base_host,
+        'name' => Seek::Config.project_name,
+        'url' => Seek::Config.site_base_host},
+      'version' => 1,
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'application/pdf',
       'producer' => [
         { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{presentation.projects.first.id}", 'name' => presentation.projects.first.title }
-      ]
+      ],
+      'subjectOf' => []
     }
 
     json = JSON.parse(presentation.to_schema_ld)
@@ -406,6 +439,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       disable_authorization_checks { workflow.save! }
       workflow
     end
+
+    expected_wf_prefix = workflow.title.downcase.gsub(/[^0-9a-z]/i, '_')
 
     expected = { '@context' => 'http://schema.org',
                  '@type' => %w[File SoftwareSourceCode ComputationalWorkflow],
@@ -435,43 +470,74 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                  'dateModified' => @current_time.iso8601,
                  'encodingFormat' => 'application/x-yaml',
                  'sdPublisher' =>
-                    [{ '@type' => 'Person',
-                       '@id' => "http://localhost:3000/people/#{@person.id}",
-                       'name' => @person.name }],
+                    { '@type' => 'Organization',
+                       '@id' => Seek::Config.site_base_host,
+                       'name' => Seek::Config.project_name,
+                       'url' => Seek::Config.site_base_host},
                  'version' => 1,
                  'programmingLanguage' => 'CWL workflow',
                  'input' => [
                    { '@type' => 'FormalParameter',
+                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.cofsfile",
+                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
                      'name' => '#main/input.cofsfile' },
                    { '@type' => 'FormalParameter',
+                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.dmax",
                      'name' => '#main/input.dmax' },
                    { '@type' => 'FormalParameter',
+                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.dmin",
                      'name' => '#main/input.dmin' },
                    { '@type' => 'FormalParameter',
+                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.max-steps",
                      'name' => '#main/input.max-steps' },
                    { '@type' => 'FormalParameter',
+                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.mwmax-cof",
                      'name' => '#main/input.mwmax-cof' },
                    { '@type' => 'FormalParameter',
+                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.mwmax-source",
                      'name' => '#main/input.mwmax-source' },
                    { '@type' => 'FormalParameter',
+                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.rulesfile",
                      'name' => '#main/input.rulesfile' },
                    { '@type' => 'FormalParameter',
+                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.sinkfile",
                      'name' => '#main/input.sinkfile' },
                    { '@type' => 'FormalParameter',
+                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.sourcefile",
                      'name' => '#main/input.sourcefile' },
                    { '@type' => 'FormalParameter',
+                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.std_mode",
                      'name' => '#main/input.std_mode' },
                    { '@type' => 'FormalParameter',
+                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.stereo_mode",
                      'name' => '#main/input.stereo_mode' },
                    { '@type' => 'FormalParameter',
+                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.topx",
                      'name' => '#main/input.topx' }
                  ],
                  'output' => [
                    { '@type' => 'FormalParameter',
+                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     '@id' => "\##{expected_wf_prefix}-outputs-\#main/solutionfile",
                      'name' => '#main/solutionfile' },
                    { '@type' => 'FormalParameter',
+                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     '@id' => "\##{expected_wf_prefix}-outputs-\#main/sourceinsinkfile",
                      'name' => '#main/sourceinsinkfile' },
                    { '@type' => 'FormalParameter',
+                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     '@id' => "\##{expected_wf_prefix}-outputs-\#main/stdout",
                      'name' => '#main/stdout' }
                  ] }
 

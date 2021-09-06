@@ -7,6 +7,7 @@ module Seek
         schema_mappings description: :description,
                         title: :name,
                         url: :url,
+                        image: :image,
                         keywords: :keywords
 
         def url
@@ -20,7 +21,7 @@ module Seek
 
         # If the resource has an avatar, then returns the image url
         def image
-          return unless resource.avatar
+          return unless resource.respond_to?(:avatar)
           "#{Seek::Config.site_base_host}/#{resource.class.table_name}" \
             "/#{resource.id}/avatars/#{resource.avatar.id}?size=250"
         end

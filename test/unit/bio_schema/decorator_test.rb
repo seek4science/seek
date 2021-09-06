@@ -14,7 +14,7 @@ class DecoratorTest < ActiveSupport::TestCase
     assert_equal %w[blue green red], decorator.keywords.split(',').collect(&:strip).sort
 
     properties = decorator.attributes.collect(&:property).collect(&:to_s).sort
-    assert_equal ['@id', 'description', 'keywords', 'name', 'url'], properties
+    assert_equal ['@id', 'description', 'image', 'keywords', 'name', 'url'], properties
   end
 
   test 'CreativeWork' do
@@ -36,7 +36,7 @@ class DecoratorTest < ActiveSupport::TestCase
     assert_equal [{ :@type => 'Person', :@id => "http://localhost:3000/people/#{person.id}", :name => person.title }], decorator.all_creators
 
     properties = decorator.attributes.collect(&:property).collect(&:to_s).sort
-    assert_equal ['@id', 'creator', 'dateCreated', 'dateModified', 'description', 'encodingFormat', 'isPartOf', 'keywords', 'license', 'name', 'producer', 'subjectOf', 'url'], properties
+    assert_equal ['@id', 'creator', 'dateCreated', 'dateModified', 'description', 'encodingFormat', 'image', 'isPartOf', 'keywords', 'license', 'name', 'producer', 'sdPublisher', 'subjectOf', 'url', 'version'], properties
   end
 
   test 'Dataset pads or truncates description' do

@@ -102,6 +102,7 @@ module Seek
         def mini_definitions(collection)
           return if collection.empty?
           collection.collect do |item|
+            next if item.respond_to?(:public?) && !item.public?
             Seek::BioSchema::ResourceDecorators::Factory.instance.get(item).mini_definition
           end
         end
