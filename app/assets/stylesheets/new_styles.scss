@@ -412,7 +412,7 @@ div.isa_graph {
 a.remove-association {
   text-decoration: none;
   vertical-align: middle;
-  color: $brand-danger;
+  color: $brand-danger !important;
   &:hover {
     text-decoration: none;
   }

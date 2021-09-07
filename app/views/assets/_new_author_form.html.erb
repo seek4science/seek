@@ -1,0 +1,191 @@
+<%# This partial is expecting 3 parameters to be defined: -%>
+<%# - form - the form object -%>
+<%# - existing_creators - list of creators for the current resource (this should be collection of Person objects) -%>
+<%# - other_creators - list of non-SEEK creators for the current resource (this should be a string) -%>
+
+<%
+  resource_type = form.object.class.name.underscore
+  resource_type_text = text_for_resource(form.object)
+  collapsed = existing_creators.blank? if collapsed.nil?
+  assoc_text ||= form.object.class.human_attribute_name('creators', default: t('creator').pluralize).downcase
+  field_name_prefix = 'author'
+%>
+
+<%= folding_panel(assoc_text.capitalize, collapsed, id: 'author-form', body_options: { id: 'creator_fold_content' },
+                  help_text: "Here you attribute this #{resource_type_text} to other people.") do %>
+  <%= text_field_tag(nil, nil, placeholder: 'Search...', id: 'author-search-field') %>
+
+  <div id="author-list" class="author-list"></div>
+
+  <%= button_link_to('Add', 'add', '#', id: 'new-author') %>
+
+  <%= modal(id: 'new-author-modal', size: 'm') do %>
+    <%= modal_header('New Author') %>
+    <%= modal_body do %>
+      <div class="form-group">
+        <label class="required">Given Name</label>
+        <%= text_field_tag(nil, nil, placeholder: 'John', data: { field: 'given_name' }, id: 'author-given-name', class: 'form-control', autocomplete: 'off') -%>
+      </div>
+
+      <div class="form-group">
+        <label class="required">Family Name</label>
+        <%= text_field_tag(nil, nil, placeholder: 'Smith', data: { field: 'family_name' }, id: 'author-family-name', class: 'form-control', autocomplete: 'off') -%>
+      </div>
+
+      <div class="form-group">
+        <label>Affiliation</label>
+        <%= text_field_tag(nil, nil, placeholder: 'University of Manchester', data: { field: 'affiliation' }, id: 'author-affiliation', class: 'form-control', autocomplete: 'off') -%>
+      </div>
+
+      <div class="form-group">
+        <label>ORCID</label>
+        <%= text_field_tag(nil, nil, placeholder: '0000-0002-1825-0097', data: { field: 'orcid' }, id: 'author-orcid', class: 'form-control', autocomplete: 'off') -%>
+      </div>
+    <% end %>
+    <%= modal_footer do %>
+      <%= link_to('Add', '#', id: 'add-author', class: 'btn btn-success pull-right') %>
+    <% end %>
+  <% end %>
+<% end %>
+
+<script type="text/javascript">
+    var creators = <%= form.object.assets_creators.map do |c|
+    { id: c.id,
+      creator_id: c.creator_id,
+      family_name: c.family_name,
+      given_name: c.given_name,
+      affiliation: c.affiliation,
+      orcid: c.orcid }
+    end.to_json.html_safe -%>;
+
+    var AuthorForm = {
+        recalculatePositions: function () {
+            $j('#author-form .author').each(function (index, item) {
+                $j('.author-position-label', $j(item)).html(index + 1);
+                $j('.author-handle input', $j(item)).val(index + 1);
+            });
+        },
+
+        bindSortable: function () {
+            $j('.author-list').sortable({
+                items: '.author',
+                handle: '.author-handle',
+                helper: function(e, ui) {
+                    ui.children().each(function () {
+                        $j(this).width($j(this).width());
+                    });
+                    return ui;
+                }
+            }).on('sortupdate', function () {
+                AuthorForm.recalculatePositions();
+            });
+        },
+
+        add: function(creator) {
+            console.log(creator);
+            $j('#author-list').append(HandlebarsTemplates['assets_creator'](creator));
+            AuthorForm.recalculatePositions();
+        },
+
+        remove: function () {
+            var author = $j(this).parents('.author');
+            var destroyToggle = $j('input[data-role="destroy"]', author);
+            if (destroyToggle.length) {
+                destroyToggle.val('1');
+                author.hide();
+            } else {
+                author.remove();
+            }
+
+            author.toggleClass('author'); // Needed or it will still affect the positions of remaining authors.
+
+            AuthorForm.recalculatePositions();
+        }
+    }
+
+    $j(document).ready(function () {
+        // Make rows sortable
+        AuthorForm.bindSortable();
+        AuthorForm.recalculatePositions();
+
+        $j('#new-author').click(function () {
+            $j('#new-author-modal').modal('show');
+            return false;
+        });
+
+        $j('#add-author').click(function () {
+            var inputs = $j('#new-author-modal :input[type=text]');
+            var obj = {};
+            inputs.each(function (index, input) {
+                var i = $j(input);
+                obj[i.data('field')] = i.val();
+                i.val('');
+            });
+
+            AuthorForm.add(obj);
+            $j('#new-author-modal').modal('hide');
+            return false;
+        });
+
+        $j('#author-form').on('click', '.remove-association', AuthorForm.remove);
+
+
+        creators.forEach(function (c) { AuthorForm.add(c)})
+
+        var registeredBloodhound = new Bloodhound({
+            datumTokenizer: Bloodhound.tokenizers.obj.whitespace(['given_name', 'family_name']),
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            remote: {
+                url: '<%= registered_creators_path(format: :json, query: 'QUERY') %>',
+                wildcard: 'QUERY'
+            },
+            limit: 10
+        });
+        registeredBloodhound.initialize();
+
+        var unRegisteredBloodhound = new Bloodhound({
+            datumTokenizer: Bloodhound.tokenizers.obj.whitespace(['given_name', 'family_name']),
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            remote: {
+                url: '<%= unregistered_creators_path(format: :json, query: 'QUERY') %>',
+                wildcard: 'QUERY'
+            },
+            limit: 10
+        });
+        unRegisteredBloodhound.initialize();
+
+
+        $j('#author-search-field').typeahead(
+            {
+                minLength: 3,
+                highlight: true
+            },
+            [
+                {
+                    name: "registered",
+                    displayKey: function (item) {
+                        return item.given_name + " " + item.family_name;
+                    },
+                    source: registeredBloodhound.ttAdapter(),
+                    templates: {
+                        header: 'Registered',
+                        suggestion: HandlebarsTemplates['typeahead/registered_author']
+                    }
+                },
+                {
+                    name: "unregistered",
+                    displayKey: function (item) {
+                        return item.given_name + " " + item.family_name;
+                    },
+                    source: unRegisteredBloodhound.ttAdapter(),
+                    templates: {
+                        header: 'Unregistered',
+                        suggestion: HandlebarsTemplates['typeahead/unregistered_author']
+                    }
+                }
+            ]
+        ).bind('typeahead:select', function(ev, suggestion) {
+            console.log('Selection: ' + suggestion);
+        });
+    });
+</script>
