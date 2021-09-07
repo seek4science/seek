@@ -3726,6 +3726,10 @@
                 "description": {
                     "$ref": "../descriptions/updateSampleType.md"
                 },
+                "tags": [
+                    "update",
+                    "sampleType"
+                ],
                 "parameters": [
                     {
                         "in": "body",
@@ -3735,10 +3739,6 @@
                             "$ref": "#/definitions/sampleTypePatch"
                         }
                     }
-                ],
-                "tags": [
-                    "update",
-                    "sampleType"
                 ],
                 "responses": {
                     "403": {
@@ -5576,20 +5576,7 @@
             ],
             "additionalProperties": false
         },
-        "sampleTypeReferencesList": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/sampleTypeReferences"
-                }
-            },
-            "required": [
-                "data"
-            ],
-            "additionalProperties": false
-        },
         "sampleTypeAttributes": {
-            "type": "array",
             "type": "array",
             "minItems": 1,
             "uniqueItems": true,
@@ -5597,10 +5584,23 @@
                 "$ref": "#/definitions/sampleTypeAttribute"
             }
         },
+        "sampleTypeAttributesReferences": {
+            "type": "array",
+            "minItems": 0,
+            "uniqueItems": true,
+            "items": {
+                "$ref": "#/definitions/sampleTypeAttributeReference"
+            }
+        },
         "sampleTypeAttributeReference": {
             "type": "object",
             "properties": {
-
+                "id": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "title": {
+                    "$ref": "#/definitions/nonEmptyString"
+                }
             }
         },
         "sampleTypeAttribute": {
@@ -11839,6 +11839,9 @@
                                 },
                                 "description": {
                                     "$ref": "#/definitions/nullableNonEmptyString"
+                                },
+                                "attribute_map": {
+                                    "$ref": "#/definitions/sampleTypeAttributes"
                                 }
                             },
                             "required": [
@@ -11887,7 +11890,6 @@
                         "attributes": {
                             "type": "object",
                             "properties": {
-
                                 "tags": {
                                     "$ref": "#/definitions/nullableNonEmptyStringList"
                                 },
@@ -11896,6 +11898,9 @@
                                 },
                                 "description": {
                                     "$ref": "#/definitions/nullableNonEmptyString"
+                                },
+                                "attribute_map": {
+                                    "$ref": "#/definitions/sampleTypeAttributesReferences"
                                 }
                             },
                             "required": [
