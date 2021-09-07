@@ -1,0 +1,42 @@
+{
+  "data": {
+    "type": "sample_types",
+    "attributes": {
+      "title": "A Maximal SampleType",
+      "description": "A very new research",
+      "attribute_map": [
+        {
+          "title": "full name",
+          "sample_attribute_type": {
+            "title":"String"
+          },
+          "required": true,
+          "pos": "1",
+          "unit": null,
+          "is_title": true
+
+        },
+        {
+          "title": "details",
+          "sample_attribute_type": {
+            "title":"Text"
+          },
+          "required": false,
+          "pos": "2",
+          "unit": null,
+          "is_title": false
+        }
+      ]
+    },
+    "relationships": {
+      "projects": {
+        "data": [
+          {
+            "id": "1",
+            "type": "projects"
+          }
+        ]
+      }
+    }
+  }
+}
