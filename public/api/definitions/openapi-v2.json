@@ -11903,9 +11903,6 @@
                                     "$ref": "#/definitions/sampleTypeAttributesReferences"
                                 }
                             },
-                            "required": [
-                                "title"
-                            ],
                             "additionalProperties": false
                         },
                         "relationships": {
@@ -11915,9 +11912,6 @@
                                     "$ref": "#/definitions/projectReferencesList"
                                 }
                             },
-                            "required": [
-                                "projects"
-                            ],
                             "additionalProperties": false
                         }
                     },
