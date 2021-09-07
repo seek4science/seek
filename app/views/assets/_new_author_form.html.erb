@@ -13,11 +13,15 @@
 
 <%= folding_panel(assoc_text.capitalize, collapsed, id: 'author-form', body_options: { id: 'creator_fold_content' },
                   help_text: "Here you attribute this #{resource_type_text} to other people.") do %>
-  <%= text_field_tag(nil, nil, placeholder: 'Search...', id: 'author-search-field') %>
+
+  <div class="author-form-search">
+    <%= text_field_tag(nil, nil, placeholder: 'Type to search for authors...', id: 'author-search-field', style: 'width: 30em;') %>
+  </div>
+  or
+  <%= button_link_to('Add New Author', 'add', '#', id: 'new-author') %>
+  <hr/>
 
   <div id="author-list" class="author-list"></div>
-
-  <%= button_link_to('Add', 'add', '#', id: 'new-author') %>
 
   <%= modal(id: 'new-author-modal', size: 'm') do %>
     <%= modal_header('New Author') %>
@@ -69,13 +73,7 @@
         bindSortable: function () {
             $j('.author-list').sortable({
                 items: '.author',
-                handle: '.author-handle',
-                helper: function(e, ui) {
-                    ui.children().each(function () {
-                        $j(this).width($j(this).width());
-                    });
-                    return ui;
-                }
+                handle: '.author-handle'
             }).on('sortupdate', function () {
                 AuthorForm.recalculatePositions();
             });
@@ -129,7 +127,6 @@
 
         $j('#author-form').on('click', '.remove-association', AuthorForm.remove);
 
-
         creators.forEach(function (c) { AuthorForm.add(c)})
 
         var registeredBloodhound = new Bloodhound({
@@ -154,38 +151,45 @@
         });
         unRegisteredBloodhound.initialize();
 
-
-        $j('#author-search-field').typeahead(
-            {
-                minLength: 3,
-                highlight: true
-            },
-            [
+        $j('#author-search-field').tagsinput({
+            itemValue: function(item) { return item },
+            typeaheadjs: [
                 {
-                    name: "registered",
-                    displayKey: function (item) {
-                        return item.given_name + " " + item.family_name;
-                    },
-                    source: registeredBloodhound.ttAdapter(),
-                    templates: {
-                        header: 'Registered',
-                        suggestion: HandlebarsTemplates['typeahead/registered_author']
-                    }
+                    highlight: true,
+                    minLength: 1
                 },
-                {
-                    name: "unregistered",
-                    displayKey: function (item) {
-                        return item.given_name + " " + item.family_name;
+                [
+                    {
+                        name: "registered",
+                        displayKey: function (item) {
+                            return item.given_name + " " + item.family_name;
+                        },
+                        source: registeredBloodhound.ttAdapter(),
+                        templates: {
+                            header: 'Registered',
+                            suggestion: HandlebarsTemplates['typeahead/registered_author']
+                        }
                     },
-                    source: unRegisteredBloodhound.ttAdapter(),
-                    templates: {
-                        header: 'Unregistered',
-                        suggestion: HandlebarsTemplates['typeahead/unregistered_author']
+                    {
+                        name: "unregistered",
+                        displayKey: function (item) {
+                            return item.given_name + " " + item.family_name;
+                        },
+                        source: unRegisteredBloodhound.ttAdapter(),
+                        templates: {
+                            header: 'Unregistered',
+                            suggestion: HandlebarsTemplates['typeahead/unregistered_author']
+                        }
                     }
-                }
+                ]
             ]
-        ).bind('typeahead:select', function(ev, suggestion) {
-            console.log('Selection: ' + suggestion);
         });
+
+        $j('#author-search-field').on('itemAdded', function (event) {
+            AuthorForm.add(event.item)
+            $j(this).tagsinput('removeAll'); // clear the input
+        });
+
+        $j('#author-search-field').tagsinput('removeAll'); // clear the input
     });
 </script>
