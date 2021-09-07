@@ -14,8 +14,6 @@ module Seek
         end
 
         def url
-          puts web_page
-          puts identifier
           web_page.blank? ? identifier : web_page
         end
 

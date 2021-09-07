@@ -101,10 +101,12 @@ module Seek
 
         def mini_definitions(collection)
           return if collection.empty?
-          collection.collect do |item|
+          mini_col = []
+          collection.each do |item|
             next if item.respond_to?(:public?) && !item.public?
-            Seek::BioSchema::ResourceDecorators::Factory.instance.get(item).mini_definition
+            mini_col << Seek::BioSchema::ResourceDecorators::Factory.instance.get(item).mini_definition
           end
+          mini_col
         end
 
         def respond_to_missing?(name, include_private = false)

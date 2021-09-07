@@ -545,4 +545,155 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     expected.each {|k, v| assert_equal v, json[k]}
     assert_equal expected, json
   end
+
+  test 'collection' do
+    collection = travel_to(@current_time) do
+      collection = Factory(:max_collection)
+      disable_authorization_checks { collection.save! }
+      collection
+    end
+
+    project = collection.projects.first
+    sel_assets = []
+    collection.assets.each { |a|
+      next if a.blank?
+      next unless a.schema_org_supported?
+      next if a.respond_to?(:public?) && !a.public?
+      sel_assets << a
+    }
+
+    doc1 = sel_assets[0]
+    df1 = sel_assets[1]
+    df2 = sel_assets[2]
+    
+    expected = {'@context'=>'http://schema.org',
+                '@type'=>'Collection',
+                'dct:conformsTo'=>'https://schema.org/Collection',
+                '@id'=>"http://localhost:3000/collections/#{collection.id}",
+                'description'=>'A collection of very interesting things',
+                'name'=>'A Maximal Collection',
+                'url'=>"http://localhost:3000/collections/#{collection.id}",
+                'keywords'=>'',
+                'sdPublisher' =>
+                    { '@type' => 'Organization',
+                       '@id' => Seek::Config.site_base_host,
+                       'name' => Seek::Config.project_name,
+                       'url' => Seek::Config.site_base_host},
+                'creator'=>[
+                  {'@type'=>'Person',
+                   'name'=>'Joe Bloggs'}
+                ],
+                'producer'=>[
+                  {'@type'=>['Project', 'Organization'],
+                   '@id'=>"http://localhost:3000/projects/#{project.id}",
+                   'name'=>"#{project.title}"}],
+                 'dateCreated' => @current_time.iso8601,
+                 'dateModified' => @current_time.iso8601,
+                'hasPart'=>[
+                  {'@type'=>'DigitalDocument',
+                   '@id'=>"http://localhost:3000/documents/#{doc1.id}",
+                   'name'=>"#{doc1.title}"},
+                  {'@type'=>'Dataset',
+                   '@id'=>"http://localhost:3000/data_files/#{df1.id}",
+                   'name'=>"#{df1.title}"},
+                  {'@type'=>'Dataset',
+                   '@id'=>"http://localhost:3000/data_files/#{df2.id}",
+                   'name'=>"#{df2.title}"}
+                ]
+               }
+
+    json = JSON.parse(collection.to_schema_ld)
+    assert_equal expected, json
+  end
+
+  test 'human_disease' do
+    human_disease = travel_to(@current_time) do
+      human_disease = Factory(:max_humandisease)
+      disable_authorization_checks { human_disease.save! }
+      human_disease
+    end
+
+    expected = {
+      '@context'=>'http://schema.org',
+      '@type'=>'Taxon',
+      'dct:conformsTo'=>'https://bioschemas.org/profiles/Taxon/0.6-RELEASE/',
+      '@id'=>"http://localhost:3000/human_diseases/#{human_disease.id}",
+      'name'=>'A Maximal Human Disease',
+      'url'=>"http://localhost:3000/human_diseases/#{human_disease.id}",
+      'alternateName'=>[],
+      'sameAs'=>'http://purl.bioontology.org/ontology/NCBITAXON/1909'
+    }
+
+    json = JSON.parse(human_disease.to_schema_ld)
+    assert_equal expected, json
+  end
+
+  test 'institution' do
+    institution = travel_to(@current_time) do
+      institution = Factory(:max_institution)
+      disable_authorization_checks { institution.save! }
+      institution
+    end
+
+    expected = {
+      '@context'=>'http://schema.org',
+      '@type'=>'ResearchOrganization',
+      'dct:conformsTo'=>'https://schema.org/ResearchOrganization',
+      '@id'=>"http://localhost:3000/institutions/#{institution.id}",
+      'name'=>'A Maximal Institution',
+      'url'=>'http://www.mib.ac.uk/',
+      'address'=>{
+        'address_country'=>'GB',
+        'address_locality'=>'Manchester',
+        'street_address'=>'Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom' 
+      }
+    }
+
+    json = JSON.parse(institution.to_schema_ld)
+    assert_equal expected, json
+  end
+
+  test 'organism' do
+    organism = travel_to(@current_time) do
+      organism = Factory(:max_organism)
+      disable_authorization_checks { organism.save! }
+      organism
+    end
+
+    expected = {
+      '@context'=>'http://schema.org',
+      '@type'=>'Taxon',
+      'dct:conformsTo'=>'https://bioschemas.org/profiles/Taxon/0.6-RELEASE/',
+      '@id'=>"http://localhost:3000/organisms/#{organism.id}",
+      'name'=>'A Maximal Organism',
+      'url'=>"http://localhost:3000/organisms/#{organism.id}",
+      'alternateName'=>[],
+      'sameAs'=>'http://purl.bioontology.org/ontology/NCBITAXON/9606'
+    }
+
+    json = JSON.parse(organism.to_schema_ld)
+    assert_equal expected, json
+  end
+
+  test 'programme' do
+    programme = travel_to(@current_time) do
+      programme = Factory(:max_programme)
+      disable_authorization_checks { programme.save! }
+      programme
+    end
+
+    expected = {
+      '@context'=>'http://schema.org',
+      '@type'=>'FundingScheme',
+      'dct:conformsTo'=>'https://schema.org/FundingScheme',
+      '@id'=>"http://localhost:3000/programmes/#{programme.id}",
+      'description'=>'A very exciting programme',
+      'name'=>'A Maximal Programme',
+      'url'=>'http://www.synbiochem.co.uk'
+    }
+
+    json = JSON.parse(programme.to_schema_ld)
+    assert_equal expected, json
+  end
+
 end
