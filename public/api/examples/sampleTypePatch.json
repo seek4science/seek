@@ -1,7 +1,7 @@
 {
   "data": {
     "type": "sample_types",
-    "id": "5",
+    "id": "3",
     "attributes": {
       "title": "updated sample type",
       "attribute_map": [
@@ -9,7 +9,7 @@
           "id":"22",
           "title": "new title",
           "sample_attribute_type": {
-            "title":"String"
+            "title":"Text"
           }
         }
       ],
