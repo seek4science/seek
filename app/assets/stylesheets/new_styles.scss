@@ -1078,3 +1078,11 @@ span.disabled {
   width: 30em;
   display: inline-block;
 }
+
+a.orcid-link {
+  background-image: url(image-path('logos/orcid_16x16.png'));
+  background-repeat: no-repeat;
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+}
