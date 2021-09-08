@@ -7,6 +7,8 @@ module Seek
                         date_modified: :dateModified,
                         provider: :provider
 
+        DATACATALOG_PROFILE = 'https://bioschemas.org/profiles/DataCatalog/0.3-RELEASE-2019_07_01/'
+
         def rdf_resource
           nil
         end
@@ -16,7 +18,7 @@ module Seek
         end
 
         def conformance
-          'https://bioschemas.org/profiles/DataCatalog/0.3-RELEASE-2019_07_01/'
+          DATACATALOG_PROFILE
         end
         
         def url

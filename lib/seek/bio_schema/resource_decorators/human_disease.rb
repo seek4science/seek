@@ -6,6 +6,8 @@ module Seek
         schema_mappings synonyms: :alternateName,
                         ncbi_uri: :sameAs
 
+        TAXON_PROFILE = 'https://bioschemas.org/profiles/Taxon/0.6-RELEASE/'
+        
         def synonyms
           if concept && concept[:synonyms]
             concept[:synonyms]
@@ -19,7 +21,7 @@ module Seek
         end
 
         def conformance
-          'https://bioschemas.org/profiles/Taxon/0.6-RELEASE/'
+          TAXON_PROFILE
         end
       end
     end

@@ -12,10 +12,6 @@ module Seek
                         funder: :funder,
                         event: :event
 
-        def schema_type
-          'Project'
-        end
-        
         def conformance
           'https://schema.org/Project'
         end
