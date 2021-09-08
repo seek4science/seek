@@ -31,11 +31,7 @@ module Seek
 
         def contributors
           [contributor]
-        end
-
-        def datafiles2
-          data_files
-        end
+        end        
         
         def end_date
           if (end_date = resource.end_date).blank?

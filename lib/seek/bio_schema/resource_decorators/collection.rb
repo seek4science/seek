@@ -14,13 +14,7 @@ module Seek
         end
 
         def schema_enabled_assets
-          sel_assets = []
-          assets.each { |a|
-            next if a.blank?
-            next unless a.schema_org_supported?
-            sel_assets << a
-          }
-          sel_assets
+          assets.reject(&:blank?).select(&:schema_org_supported?)          
         end
       end
     end

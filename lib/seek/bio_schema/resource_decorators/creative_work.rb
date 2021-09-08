@@ -28,13 +28,8 @@ module Seek
 
         def subject_of
           return unless resource.respond_to?(:events)
-          all_events = []
-          resource.events.each { |e|
-            all_events << { :@type => 'Event',
-                            :@id => resource_url(e, host: Seek::Config.site_base_host),
-                            :name => sanitize(e.title) }
-          }
-          all_events
+          return [] if resource.events.empty?
+          mini_definitions(resource.events)
         end
         
         def all_creators

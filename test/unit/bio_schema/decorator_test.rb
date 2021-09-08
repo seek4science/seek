@@ -18,7 +18,7 @@ class DecoratorTest < ActiveSupport::TestCase
   end
 
   test 'CreativeWork' do
-    event = Factory(:event)
+    event = Factory(:event, policy: Factory(:public_policy))
     document = Factory(:document, events: [event], license: 'CC-BY-4.0', creators: [Factory(:person)])
     document.add_annotations('yellow, lorry', 'tag', User.first)
     disable_authorization_checks { document.save! }

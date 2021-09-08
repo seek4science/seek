@@ -1,7 +1,7 @@
 module Seek
   module BioSchema
     module ResourceDecorators
-      # Decorator that provides extensions for a Organism
+      # Decorator that provides extensions for an Institution
       class Institution < Thing
         schema_mappings full_address: :address,
                         image: :logo

@@ -17,7 +17,7 @@ module Seek
         end
         
         def programme_set
-          programme.blank? ? [] : [programme]
+          [programme].reject(&:blank?)
         end
 
         def url
