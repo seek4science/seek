@@ -17,7 +17,7 @@ class AssetsCreator < ApplicationRecord
   end
 
   def name
-    creator ? creator.name : "#{give_name} #{family_name}"
+    creator ? creator.name : "#{given_name} #{family_name}"
   end
 
   def affiliation
