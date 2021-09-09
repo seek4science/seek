@@ -21,15 +21,10 @@ module Seek
         def full_address
           full = {}
           full[:address_country] = country
-          unless city.blank?
-            full[:address_locality] = city
-          end
-          unless address.blank?
-            full[:street_address] = address
-          end
+          full[:address_locality] = city unless city.blank?
+          full[:street_address] = address unless address.blank?
           full
         end
-        
       end
     end
   end

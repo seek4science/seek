@@ -15,7 +15,7 @@ module Seek
         def conformance
           'https://schema.org/Project'
         end
-        
+
         def programme_set
           [programme].reject(&:blank?)
         end
@@ -27,7 +27,7 @@ module Seek
         def all_members
           people + institutions
         end
-        
+
         def schema_type
           %w[Project Organization]
         end

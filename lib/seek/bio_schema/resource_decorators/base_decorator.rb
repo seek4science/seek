@@ -101,16 +101,20 @@ module Seek
 
         def mini_definitions(collection)
           return [] if collection.empty?
+
           mini_col = []
           collection.each do |item|
             next if item.respond_to?(:public?) && !item.public?
+
             mini_col << Seek::BioSchema::ResourceDecorators::Factory.instance.get(item).mini_definition
           end
           mini_col
         end
 
         def respond_to_missing?(name, include_private = false)
-          resource.respond_to?(name, include_private) || resource.is_a_version? && resource.parent.respond_to?(name, include_private)
+          resource.respond_to?(name,
+                               include_private) || resource.is_a_version? && resource.parent.respond_to?(name,
+                                                                                                         include_private)
         end
 
         def method_missing(method, *args, &block)

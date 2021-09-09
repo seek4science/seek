@@ -3,7 +3,7 @@ module Seek
     module ResourceDecorators
       # Decorator that provides extensions for a Person
       class Person < Thing
-        PERSON_PROFILE = 'https://bioschemas.org/profiles/Person/0.2-DRAFT-2019_07_19/'
+        PERSON_PROFILE = 'https://bioschemas.org/profiles/Person/0.2-DRAFT-2019_07_19/'.freeze
 
         associated_items member_of: :projects,
                          works_for: :institutions
@@ -18,11 +18,11 @@ module Seek
         def schema_type
           'Person'
         end
-        
+
         def conformance
           PERSON_PROFILE
         end
-  
+
         def url
           web_page.blank? ? identifier : web_page
         end

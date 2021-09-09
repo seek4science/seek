@@ -3,13 +3,12 @@ module Seek
     module ResourceDecorators
       # Decorator that provides extensions for a Event
       class Event < Thing
-
-        EVENT_PROFILE = 'https://bioschemas.org/profiles/Event/0.2-DRAFT-2019_06_14/'
+        EVENT_PROFILE = 'https://bioschemas.org/profiles/Event/0.2-DRAFT-2019_06_14/'.freeze
 
         associated_items contact: :contributors,
                          host_institution: :projects,
                          all_assets: :about_assets
-        
+
         schema_mappings contact: :contact,
                         start_date: :startDate,
                         end_date: :endDate,
@@ -27,12 +26,11 @@ module Seek
         def conformance
           EVENT_PROFILE
         end
-        
 
         def contributors
           [contributor]
-        end        
-        
+        end
+
         def end_date
           if (end_date = resource.end_date).blank?
             resource.start_date

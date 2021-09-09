@@ -8,24 +8,22 @@ module Seek
         schema_mappings doi: :identifier,
                         distribution: :distribution
 
+        DATASET_PROFILE = 'https://bioschemas.org/profiles/Dataset/0.3-RELEASE-2019_06_14/'.freeze
 
-        DATASET_PROFILE = 'https://bioschemas.org/profiles/Dataset/0.3-RELEASE-2019_06_14/'
-                                                                
         def doi
           "https://doi.org/#{resource.doi}" if resource.doi
         end
 
         def description
           description = resource.description&.truncate(4999)
-          if description.blank?
-            description = 'Description not specified'
-          end
-          description.ljust(50,'.')
+          description = 'Description not specified' if description.blank?
+          description.ljust(50, '.')
         end
 
         def distribution
           return unless resource.content_blob
           return if resource.content_blob.show_as_external_link?
+
           blob = resource.content_blob
           data = {
             '@type': 'DataDownload',

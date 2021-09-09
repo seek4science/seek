@@ -3,10 +3,10 @@ module Seek
     module ResourceDecorators
       # Decorator that provides extensions for a Workflow
       class Workflow < CreativeWork
-        WORKFLOW_PROFILE = 'https://bioschemas.org/profiles/ComputationalWorkflow/1.0-RELEASE/'
+        WORKFLOW_PROFILE = 'https://bioschemas.org/profiles/ComputationalWorkflow/1.0-RELEASE/'.freeze
 
-        FORMALPARAMETER_PROFILE = 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/'
-        
+        FORMALPARAMETER_PROFILE = 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/'.freeze
+
         schema_mappings programming_language: :programmingLanguage,
                         inputs: :input,
                         outputs: :output
@@ -18,14 +18,15 @@ module Seek
         def conformance
           WORKFLOW_PROFILE
         end
-    
+
         def image
           return unless resource.diagram_exists?
+
           diagram_workflow_url(resource, version: resource.version, host: Seek::Config.site_base_host)
         end
 
-         def schema_type
-          ['File', 'SoftwareSourceCode', 'ComputationalWorkflow']
+        def schema_type
+          %w[File SoftwareSourceCode ComputationalWorkflow]
         end
 
         def programming_language
@@ -47,11 +48,11 @@ module Seek
         private
 
         def formal_parameters(properties, group_name)
-          if self.title
-            wf_name = self.title.downcase.gsub(/[^0-9a-z]/i, '_')
-          else
-            wf_name = 'dummy'
-          end
+          wf_name = if title
+                      title.downcase.gsub(/[^0-9a-z]/i, '_')
+                    else
+                      'dummy'
+                    end
           properties.collect do |property|
             {
               "@type": 'FormalParameter',

@@ -19,6 +19,7 @@ module Seek
 
         def content_type
           return unless resource.respond_to?(:content_blob) && resource.content_blob
+
           resource.content_blob.content_type
         end
 
@@ -27,25 +28,23 @@ module Seek
 
           Seek::License.find(resource.license)&.url
         end
-        
+
         def all_creators
           # This should be greatly improved but would rely on SEEK being changed
-           others = other_creators&.split(',')&.collect(&:strip)&.compact || []
-           others = others.collect { |name| { "@type": 'Person', "name": name } }
+          others = other_creators&.split(',')&.collect(&:strip)&.compact || []
+          others = others.collect { |name| { "@type": 'Person', "name": name } }
           all = (mini_definitions(creators) || []) + others
           return if all.empty?
+
           all
         end
 
         def sd_publisher
-          sdp = { :@type => 'Organization',
-                  :@id => Seek::Config.site_base_host,
-                  :name => Seek::Config.project_name,
-                  :url => Seek::Config.site_base_host
-                }
-          sdp
+          { :@type => 'Organization',
+            :@id => Seek::Config.site_base_host,
+            :name => Seek::Config.project_name,
+            :url => Seek::Config.site_base_host }
         end
-        
       end
     end
   end

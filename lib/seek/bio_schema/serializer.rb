@@ -12,18 +12,16 @@ module Seek
         @resource = resource
       end
 
-     def json_representation
+      def json_representation
         repr = {
           '@context' => resource_decorator.context,
           '@type' => resource_decorator.schema_type
-       }
-        if (resource_decorator.respond_to? 'conformance')
-          repr['dct:conformsTo'] = resource_decorator.conformance
-        end
+        }
+        repr['dct:conformsTo'] = resource_decorator.conformance if resource_decorator.respond_to? 'conformance'
         repr = repr.merge(attributes_json)
         repr.deep_stringify_keys
       end
-      
+
       # returns the JSON-LD as a String, for the resource
       def json_ld
         JSON.pretty_generate(json_representation)

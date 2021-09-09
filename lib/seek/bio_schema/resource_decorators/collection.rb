@@ -14,7 +14,7 @@ module Seek
         end
 
         def schema_enabled_assets
-          assets.reject(&:blank?).select(&:schema_org_supported?)          
+          assets.reject(&:blank?).select(&:schema_org_supported?)
         end
       end
     end
