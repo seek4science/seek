@@ -3598,7 +3598,56 @@
         },
         "/samples": {
             "post": {
-                "operationId": "createSample"
+                "operationId": "createSample",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
+                "description": {
+                    "$ref": "../descriptions/createSample.md"
+                },
+                "tags": [
+                    "create",
+                    "samples"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "samples",
+                        "description": "The sample to create.",
+                        "schema": {
+                            "$ref": "#/definitions/samplePost"
+                        }
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/bad_request"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable entity",
+                        "schema": {
+                            "$ref": "#/definitions/unprocessable_entity"
+                        }
+                    },
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/samplePostResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "$ref": "../examples/samplePostResponse.json"
+                            }
+                        }
+                    }
+                }
             }
         },
         "/samples/{:id}": {
@@ -11957,6 +12006,77 @@
                 "jsonapi"
             ],
             "additionalProperties": false
+        },
+        "samplePost": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "$ref": "#/definitions/sampleType"
+                        },
+                        "attributes": {
+                            "type": "object",
+                            "properties": {
+                                "tags": {
+                                    "$ref": "#/definitions/tagsType"
+                                },
+                                "other_creators": {
+                                    "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "attribute_map": {
+                                    "$ref": "#/definitions/sampleAttributeMap"
+                                }
+                            },
+                            "required": [
+                                "attribute_map"
+                            ],
+                            "additionalProperties": false
+                        },
+                        "relationships": {
+                            "type": "object",
+                            "properties": {
+                                "creators": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "people": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "projects": {
+                                    "$ref": "#/definitions/projectReferencesList"
+                                },
+                                "data_files": {
+                                    "$ref": "#/definitions/dataFileReferencesList"
+                                },
+                                "sample_type": {
+                                    "$ref": "#/definitions/sampleTypeReferences"
+                                }
+                            },
+                            "required": [
+                                "projects",
+                                "sample_type"
+                            ],
+                            "additionalProperties": false
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "type"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "data"
+            ],
+            "additionalProperties": false,
+            "example": {
+                "$ref": "../examples/samplePost.json"
+            }
+        },
+        "samplePostResponse": {
+            "$ref": "#/definitions/sampleResponse"
         },
         "samplePatch": {
             "type": "object",
