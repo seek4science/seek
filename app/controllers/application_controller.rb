@@ -639,6 +639,10 @@ class ApplicationController < ActionController::Base
     keys
   end
 
+  def set_displaying_single_page
+    @single_page = true
+  end
+
   def displaying_single_page?
     @single_page || false
   end
@@ -646,7 +650,7 @@ class ApplicationController < ActionController::Base
   helper_method :displaying_single_page?
   
   def display_isa_graph?
-    displaying_single_page?
+    !displaying_single_page?
   end
   
   helper_method :display_isa_graph?

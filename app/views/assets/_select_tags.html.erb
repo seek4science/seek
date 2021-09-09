@@ -1,9 +1,5 @@
 <%
-   if displaying_single_page?
-      entity=@item_controller.singularize
-   else
-      entity=controller_name.singularize
-   end
+   entity=controller_name.singularize
    object=instance_variable_get("@#{entity}")
    model_class=entity.camelize.constantize
    #FIXME: this is required for some cases where the page is rendered from an error, but the @entity doesn't exist. Mainly when rendering from a caught Exception AssetsCommon.handle_data
@@ -17,8 +13,6 @@
    all_tags,item_tags = fetch_tags_for_item(object)
   collapsed = item_tags.blank? if collapsed.nil?
 %>
-
-
 <%= folding_panel('Tags', collapsed,
                   :help_text => "Here you can provide some tags to help describe, and allow other people to find, your #{type_name}.") do %>
     <p>

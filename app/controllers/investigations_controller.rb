@@ -12,6 +12,9 @@ class InvestigationsController < ApplicationController
   #defined in the application controller
   before_action :project_membership_required_appended, :only=>[:new_object_based_on_existing_one]
 
+  before_action :set_displaying_single_page, only: [:show]
+
+  
   include Seek::Publishing::PublishingCommon
 
   include Seek::AnnotationCommon
@@ -42,9 +45,9 @@ class InvestigationsController < ApplicationController
 
   def show
     @investigation=Investigation.find(params[:id])
-
+    
     respond_to do |format|
-      format.html
+      format.html { render(params[:only_content] ? { layout: false } : {})}
       format.xml
       format.rdf { render :template=>'rdf/show' }
       format.json {render json: @investigation}

@@ -12,6 +12,8 @@ class StudiesController < ApplicationController
 
   before_action :check_assays_are_not_already_associated_with_another_study, only: %i[create update]
 
+  before_action :set_displaying_single_page, only: [:show]
+
   include Seek::Publishing::PublishingCommon
   include Seek::AnnotationCommon
   include Seek::IsaGraphExtensions
@@ -64,7 +66,7 @@ class StudiesController < ApplicationController
     @study = Study.find(params[:id])
 
     respond_to do |format|
-      format.html
+      format.html { render(params[:only_content] ? { layout: false } : {})}
       format.xml
       format.rdf { render template: 'rdf/show' }
       format.json {render json: @study, include: [params[:include]]}
