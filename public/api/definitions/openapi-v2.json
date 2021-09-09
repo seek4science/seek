@@ -303,6 +303,7 @@
             "tags": [
                 "organisms",
                 "sampleTypes",
+                "sampleAttributeTypes",
                 "samples"
             ]
         }
@@ -3779,6 +3780,34 @@
                 }
             }
         },
+        "sample_attribute_types": {
+            "get": {
+                "operationId": "listSampleAttributeTypes",
+                "description": {
+                    "$ref": "../descriptions/listSampleAttributeTypes.md"
+                },
+                "tags": [
+                    "list",
+                    "sampleAttributeTypes"
+                ],
+                "responses": {
+                    "501": {
+                        "description": "Not implemented"
+                    },
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sampleAttributeTypesResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "$ref": "../examples/sampleAttributeTypesResponse.json"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/sample_types": {
             "get": {
                 "operationId": "listSampleTypes",
@@ -5752,6 +5781,23 @@
                 "samples"
             ]
         },
+        "sampleAttributeBaseType": {
+            "type": "string",
+            "minLength": 1,
+            "enum": [
+                "Integer",
+                "Float",
+                "String",
+                "DateTime",
+                "Date",
+                "Text",
+                "Boolean",
+                "SeekStrain",
+                "SeekSample",
+                "CV",
+                "SeekDataFile"
+            ]
+        },
         "sampleTypeReference": {
             "properties": {
                 "id": {
@@ -5813,21 +5859,7 @@
                             "$ref": "#/definitions/nonEmptyString"
                         },
                         "base_type": {
-                            "type": "string",
-                            "minLength": 1,
-                            "enum": [
-                                "Integer",
-                                "Float",
-                                "String",
-                                "DateTime",
-                                "Date",
-                                "Text",
-                                "Boolean",
-                                "SeekStrain",
-                                "SeekSample",
-                                "CV",
-                                "SeekDataFile"
-                            ]
+                            "$ref": "#/definitions/sampleAttributeBaseType"
                         },
                         "regular_expression": {
                             "$ref": "#/definitions/nullableNonEmptyString"
@@ -11904,6 +11936,92 @@
         "sampleAttributeMap": {
             "type": "object",
             "additionalProperties": {"type": "string"}
+        },
+        "sampleAttributeTypeType": {
+            "type": "string",
+            "minLength": 1,
+            "enum": [
+                "sample_attribute_types"
+            ]
+        },
+        "sampleAttributeType": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "type": {
+                    "$ref": "#/definitions/sampleAttributeTypeType"
+                },
+                "attributes": {
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        },
+                        "base_type": {
+                            "$ref": "#/definitions/sampleAttributeBaseType"
+                        },
+                        "regexp": {
+                            "$ref": "#/definitions/nonEmptyString",
+                            "default": ".*"
+                        }
+                    },
+                    "required": [
+                        "title",
+                        "base_type",
+                        "regexp"
+                    ],
+                    "additionalProperties": false
+                },
+                "meta": {
+                    "$ref": "#/definitions/baseMetaType"
+                },
+                "links": {
+                    "$ref": "#/definitions/indexLinks"
+                }
+            },
+            "required": [
+                "id",
+                "type",
+                "attributes",
+                "links",
+                "meta"
+            ]
+        },
+        "sampleAttributeTypes": {
+            "type": "array",
+            "minItems": 0,
+            "uniqueItems": true,
+            "items": {
+                "$ref": "#/definitions/sampleAttributeType"
+            },
+            "jsonapi": {
+                "$ref": "#/definitions/JsonApiVersion"
+            }
+        },
+        "sampleAttributeTypesResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/sampleAttributeTypes"
+                },
+                "jsonapi": {
+                    "$ref": "#/definitions/JsonApiVersion"
+                },
+                "meta": {
+                    "$ref": "#/definitions/baseMetaType"
+                },
+                "links": {
+                    "$ref": "#/definitions/indexLinks"
+                }
+            },
+            "required": [
+                "data",
+                "jsonapi",
+                "meta"
+            ],
+            "additionalProperties": false
         },
         "sampleResponse": {
             "type": "object",
