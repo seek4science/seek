@@ -158,7 +158,7 @@ const loadAssaySamples = (view, table_cols) =>
 const loadItemDetails = (url, params = {}) => {
   $j.ajax({
     url,
-    data: { ...params, only_content: true },
+    data: $j.extend(params, { only_content: true }),
     cache: false,
     type: "get",
     success: (s) => $j("#item-layout").html(s),
