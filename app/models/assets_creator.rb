@@ -23,7 +23,7 @@ class AssetsCreator < ApplicationRecord
   def affiliation
     a = super
     return a unless a.nil?
-    creator.projects.map(&:title).join(", ") if creator
+    creator.institutions.map(&:title).join(', ') if creator
   end
 
   def orcid
