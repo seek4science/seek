@@ -11,8 +11,8 @@ module Seek
                         license: :license,
                         all_creators: :creator,
                         producer: :producer,
-                        date_created: :dateCreated,
-                        date_modified: :dateModified,
+                        created_at: :dateCreated,
+                        updated_at: :dateModified,
                         content_type: :encodingFormat,
                         subject_of: :subjectOf,
                         part_of: :isPartOf

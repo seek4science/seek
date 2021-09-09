@@ -3,8 +3,8 @@ module Seek
     module ResourceDecorators
       # Decorator that provides extensions for a DataCatalogue
       class DataCatalog < Thing
-        schema_mappings date_created: :dateCreated,
-                        date_modified: :dateModified,
+        schema_mappings created_at: :dateCreated,
+                        updated_at: :dateModified,
                         provider: :provider
 
         DATACATALOG_PROFILE = 'https://bioschemas.org/profiles/DataCatalog/0.3-RELEASE-2019_07_01/'

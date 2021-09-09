@@ -17,8 +17,8 @@ module Seek
                         location: :location,
                         host_institution: :hostInstitution,
                         all_assets: :about,
-                        date_created: :dateCreated,
-                        date_modified: :dateModified
+                        created_at: :dateCreated,
+                        updated_at: :dateModified
 
         def schema_type
           'Event'

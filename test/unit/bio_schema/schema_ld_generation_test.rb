@@ -327,8 +327,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         '@id' => "http://localhost:3000/people/#{@person.id}",
         'name' => 'Maximilian Maxi-Mum'
       }],
-      'startDate' => '2017-01-01 00:20:00 UTC',
-      'endDate' => '2017-01-01 00:22:00 UTC',
+      'startDate' => '2017-01-01T00:20:00Z',
+      'endDate' => '2017-01-01T00:22:00Z',
       'eventType' => [],
       'location' => 'Sofienstr 2, Heidelberg, Germany',
       'hostInstitution' => [

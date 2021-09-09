@@ -8,6 +8,7 @@ module Seek
         schema_mappings doi: :identifier,
                         distribution: :distribution
 
+
         DATASET_PROFILE = 'https://bioschemas.org/profiles/Dataset/0.3-RELEASE-2019_06_14/'
                                                                 
         def doi

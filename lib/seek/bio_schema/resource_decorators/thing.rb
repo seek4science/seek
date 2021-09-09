@@ -32,13 +32,6 @@ module Seek
           tags_as_text_array.join(', ') if resource.respond_to?(:tags_as_text_array)
         end
 
-        def date_created
-          resource.created_at&.iso8601 if resource.respond_to?(:created_at)
-        end
-
-        def date_modified
-          resource.updated_at&.iso8601 if resource.respond_to?(:updated_at)
-        end
       end
     end
   end
