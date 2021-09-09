@@ -3,7 +3,8 @@ module Seek
     module ResourceDecorators
       class CreativeWork < Thing
         associated_items producer: :projects,
-                         part_of: :collections
+                         part_of: :collections,
+                         subject_of: :events
 
         schema_mappings version: :version,
                         sd_publisher: :sdPublisher,
@@ -25,12 +26,6 @@ module Seek
           return unless resource.license
 
           Seek::License.find(resource.license)&.url
-        end
-
-        def subject_of
-          return unless resource.respond_to?(:events)
-
-          mini_definitions(resource.events)
         end
         
         def all_creators

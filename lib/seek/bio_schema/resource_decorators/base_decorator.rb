@@ -76,7 +76,7 @@ module Seek
           def associated_items(**pairs)
             pairs.each do |method, collection|
               define_method(method) do
-                mini_definitions(send(collection))
+                mini_definitions(send(collection)) if respond_to?(collection)
               end
             end
           end
