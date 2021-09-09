@@ -100,7 +100,7 @@ module Seek
         private
 
         def mini_definitions(collection)
-          return if collection.empty?
+          return [] if collection.empty?
           mini_col = []
           collection.each do |item|
             next if item.respond_to?(:public?) && !item.public?

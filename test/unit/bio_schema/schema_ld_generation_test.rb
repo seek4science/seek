@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class SchemaLdGenerationTest < ActiveSupport::TestCase
-
   def setup
     @person = Factory(:max_person, description: 'a lovely person')
     @project = @person.projects.first
@@ -78,7 +77,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'dataset' do
     df = travel_to(@current_time) do
-      df = Factory(:max_data_file, description: 'short desc', contributor: @person, projects: [@project], policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
+      df = Factory(:max_data_file, description: 'short desc', contributor: @person, projects: [@project],
+                                   policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
       df.add_annotations('keyword', 'tag', User.first)
       disable_authorization_checks { df.save! }
       df
@@ -93,13 +93,13 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@id' => "http://localhost:3000/data_files/#{df.id}",
       'dct:conformsTo' => 'https://bioschemas.org/profiles/Dataset/0.3-RELEASE-2019_06_14/',
       'name' => df.title,
-      'description' => df.description.ljust(50,'.'),
+      'description' => df.description.ljust(50, '.'),
       'keywords' => 'keyword',
       'sdPublisher' =>
       { '@type' => 'Organization',
         '@id' => Seek::Config.site_base_host,
         'name' => Seek::Config.project_name,
-        'url' => Seek::Config.site_base_host},
+        'url' => Seek::Config.site_base_host },
       'version' => 1,
       'url' => "http://localhost:3000/data_files/#{df.id}",
       'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
@@ -117,6 +117,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
           '@id' => "http://localhost:3000/events/#{df.events.first.id}",
           'name' => df.events.first.title }
       ],
+      'isPartOf' => [],
       'distribution' => {
         '@type' => 'DataDownload',
         'contentSize' => '8.62 KB',
@@ -126,22 +127,23 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       }
     }
 
-    json = JSON.parse(df.to_schema_ld)    
+    json = JSON.parse(df.to_schema_ld)
     assert_equal expected, json
   end
 
   test 'dataset without content blob' do
     df = travel_to(@current_time) do
-      df = Factory(:max_data_file, contributor: @person, projects: [@project], policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
+      df = Factory(:max_data_file, contributor: @person, projects: [@project], policy: Factory(:public_policy),
+                                   doi: '10.10.10.10/test.1')
       df.add_annotations('keyword', 'tag', User.first)
-      df.content_blob=nil
-      disable_authorization_checks { 
-        df.content_blob=nil
-        df.save! 
-      }
+      df.content_blob = nil
+      disable_authorization_checks do
+        df.content_blob = nil
+        df.save!
+      end
       df
     end
-    
+
     df.reload
     assert_nil df.content_blob
 
@@ -157,7 +159,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       { '@type' => 'Organization',
         '@id' => Seek::Config.site_base_host,
         'name' => Seek::Config.project_name,
-        'url' => Seek::Config.site_base_host},
+        'url' => Seek::Config.site_base_host },
       'version' => 1,
       'url' => "http://localhost:3000/data_files/#{df.id}",
       'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
@@ -167,8 +169,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         'name' => @project.title
       }],
       'dateCreated' => @current_time.iso8601,
-      'dateModified' => @current_time.iso8601,      
+      'dateModified' => @current_time.iso8601,
       'identifier' => 'https://doi.org/10.10.10.10/test.1',
+      'isPartOf' => [],
       'subjectOf' => [
         { '@type' => 'Event',
           '@id' => "http://localhost:3000/events/#{df.events.first.id}",
@@ -178,14 +181,13 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     json = JSON.parse(df.to_schema_ld)
     assert_equal expected, json
-    
   end
 
   test 'dataset with weblink' do
     df = travel_to(@current_time) do
       df = Factory(:max_data_file, content_blob: Factory(:website_content_blob),
-                                  contributor: @person, projects: [@project],
-                                  policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
+                                   contributor: @person, projects: [@project],
+                                   policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
       df.add_annotations('keyword', 'tag', User.first)
       disable_authorization_checks { df.save! }
       df
@@ -206,7 +208,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       { '@type' => 'Organization',
         '@id' => Seek::Config.site_base_host,
         'name' => Seek::Config.project_name,
-        'url' => Seek::Config.site_base_host},
+        'url' => Seek::Config.site_base_host },
       'version' => 1,
       'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
       'url' => 'http://www.abc.com',
@@ -219,6 +221,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'text/html',
       'identifier' => 'https://doi.org/10.10.10.10/test.1',
+      'isPartOf' => [],
       'subjectOf' => [
         { '@type' => 'Event',
           '@id' => "http://localhost:3000/events/#{df.events.first.id}",
@@ -271,7 +274,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         { '@type' => 'ResearchOrganization',
           '@id' => "http://localhost:3000/institutions/#{institution.id}",
           'name' => institution.title }
-      ]
+      ],
+      'funder' => [],
+      'event' => []
     }
     json = JSON.parse(@project.to_schema_ld)
     assert_equal expected, json
@@ -286,7 +291,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     expected = {
       '@context' => 'http://schema.org',
-      '@type' => ['Thing', 'Sample'],
+      '@type' => %w[Thing Sample],
       '@id' => "http://localhost:3000/samples/#{sample.id}",
       'dct:conformsTo' => 'https://bioschemas.org/profiles/Sample/0.2-RELEASE-2018_11_10/',
       'name' => 'Fred Bloggs',
@@ -295,7 +300,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'additionalProperty' => [
         { '@type' => 'PropertyValue', 'name' => 'full name', 'value' => 'Fred Bloggs' },
         { '@type' => 'PropertyValue', 'name' => 'age', 'value' => '44' },
-        { '@type' => 'PropertyValue', 'name' => 'weight', 'value' => '88700.2', 'unitCode' => 'g', 'unitText' => 'gram' },
+        { '@type' => 'PropertyValue', 'name' => 'weight', 'value' => '88700.2', 'unitCode' => 'g',
+          'unitText' => 'gram' },
         { '@type' => 'PropertyValue', 'name' => 'address', 'value' => '' },
         { '@type' => 'PropertyValue', 'name' => 'postcode', 'value' => 'M13 4PP' }
       ]
@@ -348,7 +354,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateModified' => event.updated_at&.iso8601
     }
     json = JSON.parse(event.to_schema_ld)
-    expected.each {|k, v| assert_equal v, json[k]}
+    expected.each { |k, v| assert_equal v, json[k] }
     assert_equal expected, json
   end
 
@@ -372,14 +378,16 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       { '@type' => 'Organization',
         '@id' => Seek::Config.site_base_host,
         'name' => Seek::Config.project_name,
-        'url' => Seek::Config.site_base_host},
+        'url' => Seek::Config.site_base_host },
       'version' => 1,
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'application/pdf',
       'producer' => [
-        { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{document.projects.first.id}", 'name' => document.projects.first.title }
+        { '@type' => %w[Project Organization],
+          '@id' => "http://localhost:3000/projects/#{document.projects.first.id}", 'name' => document.projects.first.title }
       ],
+      'isPartOf' => [],
       'subjectOf' => []
     }
 
@@ -407,14 +415,16 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       { '@type' => 'Organization',
         '@id' => Seek::Config.site_base_host,
         'name' => Seek::Config.project_name,
-        'url' => Seek::Config.site_base_host},
+        'url' => Seek::Config.site_base_host },
       'version' => 1,
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'application/pdf',
       'producer' => [
-        { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{presentation.projects.first.id}", 'name' => presentation.projects.first.title }
+        { '@type' => %w[Project Organization],
+          '@id' => "http://localhost:3000/projects/#{presentation.projects.first.id}", 'name' => presentation.projects.first.title }
       ],
+      'isPartOf' => [],
       'subjectOf' => []
     }
 
@@ -471,11 +481,12 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                  'encodingFormat' => 'application/x-yaml',
                  'sdPublisher' =>
                     { '@type' => 'Organization',
-                       '@id' => Seek::Config.site_base_host,
-                       'name' => Seek::Config.project_name,
-                       'url' => Seek::Config.site_base_host},
+                      '@id' => Seek::Config.site_base_host,
+                      'name' => Seek::Config.project_name,
+                      'url' => Seek::Config.site_base_host },
                  'version' => 1,
                  'programmingLanguage' => 'CWL workflow',
+                 'isPartOf' => [],
                  'input' => [
                    { '@type' => 'FormalParameter',
                      '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.cofsfile",
@@ -542,7 +553,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                  ] }
 
     json = JSON.parse(workflow.to_schema_ld)
-    expected.each {|k, v| assert_equal v, json[k]}
+    expected.each { |k, v| assert_equal v, json[k] }
     assert_equal expected, json
   end
 
@@ -555,52 +566,54 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     project = collection.projects.first
     sel_assets = []
-    collection.assets.each { |a|
+    collection.assets.each do |a|
       next if a.blank?
       next unless a.schema_org_supported?
       next if a.respond_to?(:public?) && !a.public?
+
       sel_assets << a
-    }
+    end
 
     doc1 = sel_assets[0]
     df1 = sel_assets[1]
     df2 = sel_assets[2]
-    
-    expected = {'@context'=>'http://schema.org',
-                '@type'=>'Collection',
-                'dct:conformsTo'=>'https://schema.org/Collection',
-                '@id'=>"http://localhost:3000/collections/#{collection.id}",
-                'description'=>'A collection of very interesting things',
-                'name'=>'A Maximal Collection',
-                'url'=>"http://localhost:3000/collections/#{collection.id}",
-                'keywords'=>'',
-                'sdPublisher' =>
+
+    expected = { '@context' => 'http://schema.org',
+                 '@type' => 'Collection',
+                 'dct:conformsTo' => 'https://schema.org/Collection',
+                 '@id' => "http://localhost:3000/collections/#{collection.id}",
+                 'description' => 'A collection of very interesting things',
+                 'name' => 'A Maximal Collection',
+                 'url' => "http://localhost:3000/collections/#{collection.id}",
+                 'keywords' => '',
+                 'sdPublisher' =>
                     { '@type' => 'Organization',
-                       '@id' => Seek::Config.site_base_host,
-                       'name' => Seek::Config.project_name,
-                       'url' => Seek::Config.site_base_host},
-                'creator'=>[
-                  {'@type'=>'Person',
-                   'name'=>'Joe Bloggs'}
-                ],
-                'producer'=>[
-                  {'@type'=>['Project', 'Organization'],
-                   '@id'=>"http://localhost:3000/projects/#{project.id}",
-                   'name'=>"#{project.title}"}],
+                      '@id' => Seek::Config.site_base_host,
+                      'name' => Seek::Config.project_name,
+                      'url' => Seek::Config.site_base_host },
+                 'creator' => [
+                   { '@type' => 'Person',
+                     'name' => 'Joe Bloggs' }
+                 ],
+                 'producer' => [
+                   { '@type' => %w[Project Organization],
+                     '@id' => "http://localhost:3000/projects/#{project.id}",
+                     'name' => project.title.to_s }
+                 ],
                  'dateCreated' => @current_time.iso8601,
                  'dateModified' => @current_time.iso8601,
-                'hasPart'=>[
-                  {'@type'=>'DigitalDocument',
-                   '@id'=>"http://localhost:3000/documents/#{doc1.id}",
-                   'name'=>"#{doc1.title}"},
-                  {'@type'=>'Dataset',
-                   '@id'=>"http://localhost:3000/data_files/#{df1.id}",
-                   'name'=>"#{df1.title}"},
-                  {'@type'=>'Dataset',
-                   '@id'=>"http://localhost:3000/data_files/#{df2.id}",
-                   'name'=>"#{df2.title}"}
-                ]
-               }
+                 'isPartOf' => [],
+                 'hasPart' => [
+                   { '@type' => 'DigitalDocument',
+                     '@id' => "http://localhost:3000/documents/#{doc1.id}",
+                     'name' => doc1.title.to_s },
+                   { '@type' => 'Dataset',
+                     '@id' => "http://localhost:3000/data_files/#{df1.id}",
+                     'name' => df1.title.to_s },
+                   { '@type' => 'Dataset',
+                     '@id' => "http://localhost:3000/data_files/#{df2.id}",
+                     'name' => df2.title.to_s }
+                 ] }
 
     json = JSON.parse(collection.to_schema_ld)
     assert_equal expected, json
@@ -614,14 +627,14 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context'=>'http://schema.org',
-      '@type'=>'Taxon',
-      'dct:conformsTo'=>'https://bioschemas.org/profiles/Taxon/0.6-RELEASE/',
-      '@id'=>"http://localhost:3000/human_diseases/#{human_disease.id}",
-      'name'=>'A Maximal Human Disease',
-      'url'=>"http://localhost:3000/human_diseases/#{human_disease.id}",
-      'alternateName'=>[],
-      'sameAs'=>'http://purl.bioontology.org/ontology/NCBITAXON/1909'
+      '@context' => 'http://schema.org',
+      '@type' => 'Taxon',
+      'dct:conformsTo' => 'https://bioschemas.org/profiles/Taxon/0.6-RELEASE/',
+      '@id' => "http://localhost:3000/human_diseases/#{human_disease.id}",
+      'name' => 'A Maximal Human Disease',
+      'url' => "http://localhost:3000/human_diseases/#{human_disease.id}",
+      'alternateName' => [],
+      'sameAs' => 'http://purl.bioontology.org/ontology/NCBITAXON/1909'
     }
 
     json = JSON.parse(human_disease.to_schema_ld)
@@ -636,16 +649,16 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context'=>'http://schema.org',
-      '@type'=>'ResearchOrganization',
-      'dct:conformsTo'=>'https://schema.org/ResearchOrganization',
-      '@id'=>"http://localhost:3000/institutions/#{institution.id}",
-      'name'=>'A Maximal Institution',
-      'url'=>'http://www.mib.ac.uk/',
-      'address'=>{
-        'address_country'=>'GB',
-        'address_locality'=>'Manchester',
-        'street_address'=>'Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom' 
+      '@context' => 'http://schema.org',
+      '@type' => 'ResearchOrganization',
+      'dct:conformsTo' => 'https://schema.org/ResearchOrganization',
+      '@id' => "http://localhost:3000/institutions/#{institution.id}",
+      'name' => 'A Maximal Institution',
+      'url' => 'http://www.mib.ac.uk/',
+      'address' => {
+        'address_country' => 'GB',
+        'address_locality' => 'Manchester',
+        'street_address' => 'Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom'
       }
     }
 
@@ -661,14 +674,14 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context'=>'http://schema.org',
-      '@type'=>'Taxon',
-      'dct:conformsTo'=>'https://bioschemas.org/profiles/Taxon/0.6-RELEASE/',
-      '@id'=>"http://localhost:3000/organisms/#{organism.id}",
-      'name'=>'A Maximal Organism',
-      'url'=>"http://localhost:3000/organisms/#{organism.id}",
-      'alternateName'=>[],
-      'sameAs'=>'http://purl.bioontology.org/ontology/NCBITAXON/9606'
+      '@context' => 'http://schema.org',
+      '@type' => 'Taxon',
+      'dct:conformsTo' => 'https://bioschemas.org/profiles/Taxon/0.6-RELEASE/',
+      '@id' => "http://localhost:3000/organisms/#{organism.id}",
+      'name' => 'A Maximal Organism',
+      'url' => "http://localhost:3000/organisms/#{organism.id}",
+      'alternateName' => [],
+      'sameAs' => 'http://purl.bioontology.org/ontology/NCBITAXON/9606'
     }
 
     json = JSON.parse(organism.to_schema_ld)
@@ -683,17 +696,16 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context'=>'http://schema.org',
-      '@type'=>'FundingScheme',
-      'dct:conformsTo'=>'https://schema.org/FundingScheme',
-      '@id'=>"http://localhost:3000/programmes/#{programme.id}",
-      'description'=>'A very exciting programme',
-      'name'=>'A Maximal Programme',
-      'url'=>'http://www.synbiochem.co.uk'
+      '@context' => 'http://schema.org',
+      '@type' => 'FundingScheme',
+      'dct:conformsTo' => 'https://schema.org/FundingScheme',
+      '@id' => "http://localhost:3000/programmes/#{programme.id}",
+      'description' => 'A very exciting programme',
+      'name' => 'A Maximal Programme',
+      'url' => 'http://www.synbiochem.co.uk'
     }
 
     json = JSON.parse(programme.to_schema_ld)
     assert_equal expected, json
   end
-
 end

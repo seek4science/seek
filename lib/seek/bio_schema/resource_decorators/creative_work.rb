@@ -23,12 +23,13 @@ module Seek
 
         def license
           return unless resource.license
+
           Seek::License.find(resource.license)&.url
         end
 
         def subject_of
           return unless resource.respond_to?(:events)
-          return [] if resource.events.empty?
+
           mini_definitions(resource.events)
         end
         
