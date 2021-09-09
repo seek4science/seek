@@ -3647,7 +3647,87 @@
                 }
             },
             "patch": {
-                "operationId": "updateSample"
+                "operationId": "updateSample",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
+                "description": {
+                    "$ref": "../descriptions/updateSample.md"
+                },
+                "tags": [
+                    "update",
+                    "samples"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "sample",
+                        "description": "The sample to update.",
+                        "schema": {
+                            "$ref": "#/definitions/samplePatch"
+                        }
+                    }
+                ],
+                "responses": {
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/not_found"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable entity",
+                        "schema": {
+                            "$ref": "#/definitions/unprocessable_entity"
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sampleResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "$ref": "../examples/samplePatchResponse.json"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "deleteSample",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
+                "description": {
+                    "$ref": "../descriptions/deleteSample.md"
+                },
+                "tags": [
+                    "delete",
+                    "samples"
+                ],
+                "responses": {
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/not_found"
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ok"
+                        }
+                    }
+                }
             }
         },
         "/sample_types": {
@@ -11806,13 +11886,17 @@
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
                                 },
-                                "attibute_map": {
+                                "attribute_map": {
                                     "$ref": "#/definitions/sampleAttributeMap"
                                 }
                             },
                             "required": [
                                 "title",
-                                "attribute_map"
+                                "attribute_map",
+                                "tags",
+                                "other_creators",
+                                "created_at",
+                                "updated_at"
                             ],
                             "additionalProperties": false
                         },
@@ -11833,11 +11917,17 @@
                                 },
                                 "data_files": {
                                     "$ref": "#/definitions/dataFileReferencesList"
+                                },
+                                "sample_type": {
+                                    "$ref": "#/definitions/sampleTypeReferences"
                                 }
                             },
                             "required": [
                                 "submitter",
-                                "projects"
+                                "projects",
+                                "people",
+                                "creators",
+                                "sample_type"
                             ],
                             "additionalProperties": false
                         },
@@ -11867,6 +11957,70 @@
                 "jsonapi"
             ],
             "additionalProperties": false
+        },
+        "samplePatch": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        },
+                        "type": {
+                            "$ref": "#/definitions/sampleTypeType"
+                        },
+                        "attributes": {
+                            "type": "object",
+                            "properties": {
+                                "tags": {
+                                    "$ref": "#/definitions/tagsType"
+                                },
+                                "other_creators": {
+                                    "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "attribute_map": {
+                                    "$ref": "#/definitions/sampleAttributeMap"
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        "relationships": {
+                            "type": "object",
+                            "properties": {
+                                "creators": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "people": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "projects": {
+                                    "$ref": "#/definitions/projectReferencesList"
+                                },
+                                "data_files": {
+                                    "$ref": "#/definitions/dataFileReferencesList"
+                                },
+                                "sample_type": {
+                                    "$ref": "#/definitions/sampleTypeReference"
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    },
+                    "required": [
+                        "type",
+                        "id"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "data"
+            ],
+            "additionalProperties": false,
+            "example": {
+                "$ref": "../examples/samplePatch.json"
+            }
         },
         "sampleTypeSkeleton": {
             "properties": {
