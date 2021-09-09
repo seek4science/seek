@@ -302,7 +302,8 @@
             "name": "Samples",
             "tags": [
                 "organisms",
-                "sampleTypes"
+                "sampleTypes",
+                "samples"
             ]
         }
     ],
@@ -3595,6 +3596,60 @@
                 }
             }
         },
+        "/samples": {
+            "post": {
+                "operationId": "createSample"
+            }
+        },
+        "/samples/{:id}": {
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "description": "The sample to fetch, patch or delete",
+                    "type": "integer"
+                }
+            ],
+            "get": {
+                "operationId": "readSample",
+                "description": {
+                    "$ref": "../descriptions/readSample.md"
+                },
+                "tags": [
+                    "read",
+                    "samples"
+                ],
+                "responses": {
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/not_found"
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sampleResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "$ref": "../examples/sampleResponse.json"
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "updateSample"
+            }
+        },
         "/sample_types": {
             "get": {
                 "operationId": "listSampleTypes",
@@ -3728,7 +3783,7 @@
                 },
                 "tags": [
                     "update",
-                    "sampleType"
+                    "sampleTypes"
                 ],
                 "parameters": [
                     {
@@ -5559,6 +5614,13 @@
             "minLength": 1,
             "enum": [
                 "sample_types"
+            ]
+        },
+        "sampleType": {
+            "type": "string",
+            "minLength": 1,
+            "enum": [
+                "samples"
             ]
         },
         "sampleTypeReference": {
@@ -11673,6 +11735,136 @@
                 "data",
                 "jsonapi",
                 "meta"
+            ],
+            "additionalProperties": false
+        },
+        "sampleSkeletons": {
+            "type": "array",
+            "minItems": 0,
+            "uniqueItems": true,
+            "items": {
+                "$ref": "#/definitions/sampleSkeleton"
+            }
+        },
+        "sampleSkeleton": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "type": {
+                    "$ref": "#/definitions/sampleType"
+                },
+                "attributes": {
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        }
+                    },
+                    "required": [
+                        "title"
+                    ],
+                    "additionalProperties": false
+                },
+                "links": {
+                    "$ref": "#/definitions/linksType"
+                }
+            }
+        },
+        "sampleAttributeMap": {
+            "type": "object",
+            "additionalProperties": {"type": "string"}
+        },
+        "sampleResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        },
+                        "type": {
+                            "$ref": "#/definitions/sampleType"
+                        },
+                        "attributes": {
+                            "type": "object",
+                            "properties": {
+                                "tags": {
+                                    "$ref": "#/definitions/tagsType"
+                                },
+                                "title": {
+                                    "$ref": "#/definitions/nonEmptyString"
+                                },
+                                "created_at": {
+                                    "$ref": "#/definitions/dateTimeString"
+                                },
+                                "updated_at": {
+                                    "$ref": "#/definitions/dateTimeString"
+                                },
+                                "other_creators": {
+                                    "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "attibute_map": {
+                                    "$ref": "#/definitions/sampleAttributeMap"
+                                }
+                            },
+                            "required": [
+                                "title",
+                                "attribute_map"
+                            ],
+                            "additionalProperties": false
+                        },
+                        "relationships": {
+                            "type": "object",
+                            "properties": {
+                                "creators": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "submitter": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "people": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "projects": {
+                                    "$ref": "#/definitions/projectReferencesList"
+                                },
+                                "data_files": {
+                                    "$ref": "#/definitions/dataFileReferencesList"
+                                }
+                            },
+                            "required": [
+                                "submitter",
+                                "projects"
+                            ],
+                            "additionalProperties": false
+                        },
+                        "links": {
+                            "$ref": "#/definitions/linksType"
+                        },
+                        "meta": {
+                            "$ref": "#/definitions/metaType"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "type",
+                        "attributes",
+                        "relationships",
+                        "links",
+                        "meta"
+                    ],
+                    "additionalProperties": false
+                },
+                "jsonapi": {
+                    "$ref": "#/definitions/JsonApiVersion"
+                }
+            },
+            "required": [
+                "data",
+                "jsonapi"
             ],
             "additionalProperties": false
         },
