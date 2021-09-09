@@ -1741,7 +1741,7 @@ class AssaysControllerTest < ActionController::TestCase
     #no sharing link, not for Investigation, Study and Assay
     assert_select 'div#temporary_links', count:0
 
-    assert_select 'div#author_form', count:1
+    assert_select 'div#author-form', count:1
   end
 
   test 'cannot access manage page with edit rights' do

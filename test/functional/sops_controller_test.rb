@@ -1287,7 +1287,7 @@ class SopsControllerTest < ActionController::TestCase
     # should be a temporary sharing link
     assert_select 'div#temporary_links', count:1
 
-    assert_select 'div#author_form', count:1
+    assert_select 'div#author-form', count:1
 
     # this is to check the SOP is all upper case in the sharing form
     assert_select 'div.alert-info', text: /the #{I18n.t('sop')}/
