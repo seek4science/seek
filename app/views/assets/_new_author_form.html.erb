@@ -1,30 +1,32 @@
-<%# This partial is expecting 3 parameters to be defined: -%>
+<%# This partial is expecting 1 parameter to be defined, and 1 optional. -%>
 <%# - form - the form object -%>
-<%# - existing_creators - list of creators for the current resource (this should be collection of Person objects) -%>
-<%# - other_creators - list of non-SEEK creators for the current resource (this should be a string) -%>
+<%# - assoc_text - (optional) The displayed name of the association. Comes from I18n by default. ("creators"?) -%>
+<%# - field_name - (optional) The name of the intermediate association between the object and creators. Default e.g.: workflow[assets_creators_attributes] -%>
 
 <%
   resource_type = form.object.class.name.underscore
   resource_type_text = text_for_resource(form.object)
   collapsed = existing_creators.blank? if collapsed.nil?
   assoc_text ||= form.object.class.human_attribute_name('creators', default: t('creator').pluralize).downcase
-  field_name_prefix = 'author'
+  field_name ||= "#{resource_type}[assets_creators_attributes]"
 %>
 
 <%= folding_panel(assoc_text.capitalize, collapsed, id: 'author-form', body_options: { id: 'creator_fold_content' },
                   help_text: "Here you attribute this #{resource_type_text} to other people.") do %>
 
   <div class="author-form-search">
-    <%= text_field_tag(nil, nil, placeholder: 'Type to search for authors...', id: 'author-search-field', style: 'width: 30em;') %>
+    <%= text_field_tag(nil, nil, placeholder: "Type to search for #{assoc_text}...", id: 'author-search-field', style: 'width: 30em;') %>
   </div>
   or
-  <%= button_link_to('Add New Author', 'add', '#', id: 'new-author') %>
+  <%= button_link_to("Add new #{assoc_text.singularize}", 'add', '#', id: 'new-author') %>
+
   <hr/>
 
-  <div id="author-list" class="author-list"></div>
+  <div id="author-list" class="author-list" data-field-name="<%= field_name -%>"></div>
+  <span id="empty-change-list" class="subtle">No <%= assoc_text -%></span>
 
   <%= modal(id: 'new-author-modal', size: 'm') do %>
-    <%= modal_header('New Author') %>
+    <%= modal_header("New #{assoc_text.singularize.capitalize}") %>
     <%= modal_body do %>
       <div class="form-group">
         <label class="required">Given Name</label>
@@ -50,6 +52,13 @@
       <%= link_to('Add', '#', id: 'add-author', class: 'btn btn-success pull-right') %>
     <% end %>
   <% end %>
+
+  <hr/>
+
+  <div class="form-group">
+    <label><%= form.object.class.human_attribute_name('other_creators') -%></label>
+    <%= text_field_tag "#{resource_type}[other_creators]", form.object.other_creators, class: 'form-control' %>
+  </div>
 <% end %>
 
 <script type="text/javascript">
@@ -80,8 +89,18 @@
         },
 
         add: function(creator) {
-            console.log(creator);
-            $j('#author-list').append(HandlebarsTemplates['assets_creator'](creator));
+            var list = $j('#author-list');
+            var index = 0;
+            $j('.author', list).each(function () {
+                var newIndex = parseInt($j(this).data('index'));
+                if (newIndex > index) {
+                    index = newIndex;
+                }
+            });
+            index++;
+            creator.field = list.data('fieldName');
+            creator.index = index;
+            list.append(HandlebarsTemplates['assets_creator'](creator));
             AuthorForm.recalculatePositions();
         },
 

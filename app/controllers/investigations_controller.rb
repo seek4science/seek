@@ -112,8 +112,8 @@ class InvestigationsController < ApplicationController
   private
 
   def investigation_params
-    params.require(:investigation).permit(:title, :description, { project_ids: [] }, :other_creators,
-                                          { creator_ids: [] },{ scales: [] }, { publication_ids: [] },
+    params.require(:investigation).permit(:title, :description, { project_ids: [] }, *creator_related_params,
+                                          { scales: [] }, { publication_ids: [] },
                                           { discussion_links_attributes:[:id, :url, :label, :_destroy] },
                                           { custom_metadata_attributes: determine_custom_metadata_keys })
   end

@@ -6,7 +6,7 @@ class AssetsCreator < ApplicationRecord
   include Seek::OrcidSupport
   update_rdf_on_change :asset
 
-  default_scope { order(:id) }
+  default_scope { order(:pos) }
 
   def family_name
     creator ? creator.last_name : super
@@ -14,6 +14,10 @@ class AssetsCreator < ApplicationRecord
 
   def given_name
     creator ? creator.first_name : super
+  end
+
+  def name
+    creator ? creator.name : "#{give_name} #{family_name}"
   end
 
   def affiliation

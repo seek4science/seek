@@ -637,4 +637,9 @@ class ApplicationController < ActionController::Base
     end
     keys
   end
+
+  def creator_related_params
+    [:other_creators, { creator_ids: [] },
+     { assets_creators_attributes: [:id, :creator_id, :given_name, :family_name, :affiliation, :orcid, :pos, :_destroy] }]
+  end
 end

@@ -60,13 +60,13 @@ module Seek
                    inverse_of: :other_object
 
           has_many :assets_creators, dependent: :destroy, as: :asset, foreign_key: :asset_id
+          accepts_nested_attributes_for :assets_creators, allow_destroy: true
           has_many :creators, class_name: 'Person', through: :assets_creators, after_remove: %i[update_timestamp record_creators_changed], after_add: %i[update_timestamp record_creators_changed]
-          
-          has_many :discussion_links, -> { where(AssetLink.discussion.where_values_hash) }, class_name: 'AssetLink', as: :asset, dependent: :destroy, inverse_of: :asset
-          accepts_nested_attributes_for :discussion_links, allow_destroy:true
-          has_one :source_link, -> { where(link_type: AssetLink::SOURCE) }, class_name: 'AssetLink', as: :asset, dependent: :destroy, inverse_of: :asset, autosave: true
-
           has_filter :creator
+
+          has_many :discussion_links, -> { where(AssetLink.discussion.where_values_hash) }, class_name: 'AssetLink', as: :asset, dependent: :destroy, inverse_of: :asset
+          accepts_nested_attributes_for :discussion_links, allow_destroy: true
+          has_one :source_link, -> { where(link_type: AssetLink::SOURCE) }, class_name: 'AssetLink', as: :asset, dependent: :destroy, inverse_of: :asset, autosave: true
 
           has_many :publication_relationships, -> { where(predicate: Relationship::RELATED_TO_PUBLICATION) },
                    class_name: 'Relationship', as: :subject, dependent: :destroy, inverse_of: :subject
