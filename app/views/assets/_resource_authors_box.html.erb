@@ -29,7 +29,7 @@
           <li class="author-list-item" title="<%= assets_creator.name -%><%= ", #{assets_creator.affiliation}" if assets_creator.affiliation -%>">
             <%= assets_creator.name -%>
             <% if assets_creator.orcid %>
-              <% link_to '', assets_creator.orcid, target: :_blank, title: 'ORCID', class: 'orcid-link' -%>
+              <%= orcid_link(assets_creator.orcid) %>
             <% end %></li> <%# This closing tag is aligned here deliberately to stop whitespace before comma (Due to inline-block style) %>
         <% end %>
       <% end %>
