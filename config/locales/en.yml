@@ -114,7 +114,7 @@ en:
   null_license: 'No license - no permission to use unless the owner grants a licence'
 
   attributes: # Applies to attributes for any model
-    other_creators: Additional credits
+    other_creators: Additional credit
 
   activerecord:
     models:

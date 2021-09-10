@@ -22,17 +22,22 @@
 
 <%= folding_panel(assoc_text.capitalize, collapsed, id: 'author-form', help_text: "Here you attribute this #{resource_type_text} to other people.") do %>
   <div class="author-form-search">
-    <%= text_field_tag(nil, nil, placeholder: "Type to search for #{assoc_text}...", id: 'author-search-field', style: 'width: 30em;') %>
+    <%= text_field_tag(nil, nil, placeholder: "Type to search for #{assoc_text}...", id: 'author-search-field') %>
   </div>
   or
   <%= button_link_to("Add new #{assoc_text.singularize}", 'add', '#', id: 'new-author') %>
 
-  <hr/>
+  <div class="row">
+    <div class="col-md-8">
+      <div id="author-list" class="assets-creator-list" data-field-name="<%= field_name -%>"></div>
+      <span id="empty-change-list" class="none_text">No <%= assoc_text -%> specified</span>
+    </div>
+    <div class="col-md-4">
 
-  <div id="author-list" class="author-list" data-field-name="<%= field_name -%>"></div>
-  <span id="empty-change-list" class="none_text">No <%= assoc_text -%> specified</span>
+    </div>
+  </div>
+
   <%= content_tag(:script, existing.to_json.html_safe, type: 'application/json', id: 'existing-assets-creators') %>
-
   <%= modal(id: 'new-author-modal', size: 'm') do %>
     <%= modal_header("New #{assoc_text.singularize.capitalize}") %>
     <%= modal_body do %>
@@ -61,11 +66,10 @@
     <% end %>
   <% end %>
 
-  <hr/>
-
   <div class="form-group">
     <label><%= resource.class.human_attribute_name('other_creators') -%></label>
     <%= text_field_tag "#{resource_type}[other_creators]", resource.other_creators, class: 'form-control' %>
+    <p class="help-block">A free-text field to specify additional credit for the creation of this <%= resource_type_text %>.</p>
   </div>
 <% end %>
 
@@ -79,7 +83,7 @@
         },
 
         bindSortable: function () {
-            $j('.author-list').sortable({
+            $j('#author-list').sortable({
                 items: '.author',
                 handle: '.author-handle'
             }).on('sortupdate', function () {
@@ -99,7 +103,7 @@
             index++;
             creator.field = list.data('fieldName');
             creator.index = index;
-            list.append(HandlebarsTemplates['assets_creator'](creator));
+            list.append(HandlebarsTemplates['associations/assets_creator'](creator));
 
             AuthorForm.recalculatePositions();
             AuthorForm.toggleEmptyListText();

@@ -1,5 +1,5 @@
 <div class="author row" data-index="{{index}}">
-    <div class="col-sm-3">
+    <div class="col-sm-5">
         <div class="btn btn-info btn-xs author-handle">
             <span class="glyphicon glyphicon-sort" aria-hidden="true"></span>
             <span class="author-position-label">{{ pos }}</span>
@@ -20,7 +20,7 @@
         {{/if}}
     </div>
 
-    <div class="col-sm-3">
+    <div class="col-sm-5">
         {{#if affiliation}}
             <em>{{affiliation}}</em>
         {{else}}
@@ -28,7 +28,7 @@
         {{/if}}
     </div>
 
-    <div class="col-sm-6">
+    <div class="col-sm-2 text-right">
         <input type="hidden" name="{{field}}[{{index}}][creator_id]" value="{{creator_id}}"/>
         <input type="hidden" name="{{field}}[{{index}}][family_name]" value="{{family_name}}"/>
         <input type="hidden" name="{{field}}[{{index}}][given_name]" value="{{given_name}}"/>
