@@ -1,6 +1,7 @@
 class AssetsCreator < ApplicationRecord
   belongs_to :asset, polymorphic: true
   belongs_to :creator, class_name: 'Person', optional: true
+  alias_method :person, :creator
 
   include Seek::Rdf::ReactToAssociatedChange
   include Seek::OrcidSupport
@@ -19,6 +20,7 @@ class AssetsCreator < ApplicationRecord
   def name
     creator ? creator.name : "#{given_name} #{family_name}"
   end
+  alias_method :title, :name
 
   def affiliation
     a = super
