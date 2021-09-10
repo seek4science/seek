@@ -5813,34 +5813,15 @@
             ],
             "additionalProperties": false
         },
-        "sampleTypeAttributes": {
+        "sampleTypeSampleAttributesResponse": {
             "type": "array",
             "minItems": 1,
             "uniqueItems": true,
             "items": {
-                "$ref": "#/definitions/sampleTypeAttribute"
+                "$ref": "#/definitions/sampleTypeSampleAttributeResponse"
             }
         },
-        "sampleTypeAttributesReferences": {
-            "type": "array",
-            "minItems": 0,
-            "uniqueItems": true,
-            "items": {
-                "$ref": "#/definitions/sampleTypeAttributeReference"
-            }
-        },
-        "sampleTypeAttributeReference": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "$ref": "#/definitions/nonEmptyString"
-                },
-                "title": {
-                    "$ref": "#/definitions/nonEmptyString"
-                }
-            }
-        },
-        "sampleTypeAttribute": {
+        "sampleTypeSampleAttributeResponse": {
             "type": "object",
             "properties": {
                 "id": {
@@ -5861,19 +5842,13 @@
                         "base_type": {
                             "$ref": "#/definitions/sampleAttributeBaseType"
                         },
-                        "regular_expression": {
-                            "$ref": "#/definitions/nullableNonEmptyString"
-                        },
-                        "placeholder": {
-                            "$ref": "#/definitions/nullableNonEmptyString"
-                        },
-                        "resolution": {
-                            "$ref": "#/definitions/nullableNonEmptyString"
+                        "regexp": {
+                            "$ref": "#/definitions/nonEmptyString",
+                            "default": ".*"
                         }
                     },
                     "required": [
-                        "id",
-                        "base_type"
+
                     ]
                 },
                 "required": {
@@ -5883,7 +5858,7 @@
                     "$ref": "#/definitions/nullableInteger"
                 },
                 "unit": {
-
+                    "$ref": "#/definitions/nullableNonEmptyString"
                 },
                 "is_title": {
                     "type": "boolean"
@@ -5896,7 +5871,62 @@
                 }
             },
             "required": [
-                "id",
+                "title",
+                "sample_attribute_type"
+            ],
+            "additionalProperties": false
+        },
+        "sampleTypeSampleAttributesPost": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+                "$ref": "#/definitions/sampleTypeSampleAttributePost"
+            }
+        },
+        "sampleTypeSampleAttributePost": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "title": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "sample_attribute_type": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        },
+                        "title": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        }
+                    },
+                    "required": [
+                        "title"
+                    ]
+                },
+                "required": {
+                    "type": "boolean"
+                },
+                "pos": {
+                    "$ref": "#/definitions/nullableInteger"
+                },
+                "unit": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "is_title": {
+                    "type": "boolean"
+                },
+                "sample_controlled_vocab_id": {
+                    "$ref": "#/definitions/nullableInteger"
+                },
+                "linked_sample_type_id": {
+                    "$ref": "#/definitions/nullableInteger"
+                }
+            },
+            "required": [
                 "title",
                 "sample_attribute_type"
             ],
@@ -12344,8 +12374,8 @@
                                 "description": {
                                     "$ref": "#/definitions/nullableNonEmptyString"
                                 },
-                                "attribute_map": {
-                                    "$ref": "#/definitions/sampleTypeAttributes"
+                                "sample_attributes": {
+                                    "$ref": "#/definitions/sampleTypeSampleAttributesResponse"
                                 },
                                 "tags": {
                                     "$ref": "#/definitions/tagsType"
@@ -12424,12 +12454,13 @@
                                 "description": {
                                     "$ref": "#/definitions/nullableNonEmptyString"
                                 },
-                                "attribute_map": {
-                                    "$ref": "#/definitions/sampleTypeAttributes"
+                                "sample_attributes": {
+                                    "$ref": "#/definitions/sampleTypeSampleAttributesPost"
                                 }
                             },
                             "required": [
-                                "title"
+                                "title",
+                                "sample_attributes"
                             ],
                             "additionalProperties": false
                         },
@@ -12483,8 +12514,8 @@
                                 "description": {
                                     "$ref": "#/definitions/nullableNonEmptyString"
                                 },
-                                "attribute_map": {
-                                    "$ref": "#/definitions/sampleTypeAttributesReferences"
+                                "sample_attributes": {
+                                    "$ref": "#/definitions/sampleTypeSampleAttributesPost"
                                 }
                             },
                             "additionalProperties": false

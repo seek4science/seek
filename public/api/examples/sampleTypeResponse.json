@@ -1,21 +1,19 @@
 {
   "data": {
-    "id": "8",
+    "id": "60",
     "type": "sample_types",
     "attributes": {
-      "title": "A Maximal SampleType",
-      "description": "A very new research",
-      "attribute_map": [
+      "title": "In vivo biometrics",
+      "description": "Template for in vivo biometrics data",
+      "sample_attributes": [
         {
-          "id": "523",
-          "title": "full_name",
+          "id": "370",
+          "title": "Fish ID",
           "sample_attribute_type": {
-            "id": "808",
-            "title": "Full name",
-            "base_type": "String",
-            "regular_expression": "[A-Z][a-z]+[ ][A-Z][a-z]+",
-            "placeholder": null,
-            "resolution": null
+            "id": "4",
+            "title": "Integer",
+            "base_type": "Integer",
+            "regexp": ".*"
           },
           "required": true,
           "pos": "1",
@@ -25,15 +23,13 @@
           "linked_sample_type_id": null
         },
         {
-          "id": "526",
-          "title": "address",
+          "id": "371",
+          "title": "Date",
           "sample_attribute_type": {
-            "id": "811",
-            "title": "Address",
-            "base_type": "Text",
-            "regular_expression": ".*",
-            "placeholder": null,
-            "resolution": null
+            "id": "2",
+            "title": "Date",
+            "base_type": "Date",
+            "regexp": ".*"
           },
           "required": false,
           "pos": "2",
@@ -43,17 +39,15 @@
           "linked_sample_type_id": null
         },
         {
-          "id": "527",
-          "title": "postcode",
+          "id": "372",
+          "title": "Exposure",
           "sample_attribute_type": {
-            "id": "812",
-            "title": "Post Code",
+            "id": "8",
+            "title": "String",
             "base_type": "String",
-            "regular_expression": "^([A-PR-UWYZ0-9][A-HK-Y0-9][AEHMNPRTVXY0-9]?[ABEHMNPRVWXY0-9]? {1,2}[0-9][ABD-HJLN-UW-Z]{2}|GIR 0AA)$",
-            "placeholder": null,
-            "resolution": null
+            "regexp": ".*"
           },
-          "required": false,
+          "required": true,
           "pos": "3",
           "unit": null,
           "is_title": false,
@@ -61,76 +55,59 @@
           "linked_sample_type_id": null
         },
         {
-          "id": "645",
-          "title": "CAPITAL key",
+          "id": "373",
+          "title": "Weight (g)",
           "sample_attribute_type": {
-            "id": "",
-            "title": "String",
-            "base_type": "String",
-            "regular_expression": ".*",
-            "placeholder": null,
-            "resolution": null
+            "id": "3",
+            "title": "Real number",
+            "base_type": "Float",
+            "regexp": ".*"
           },
           "required": false,
           "pos": "4",
-          "unit": null,
+          "unit": "g",
           "is_title": false,
           "sample_controlled_vocab_id": null,
           "linked_sample_type_id": null
         }
       ],
-      "tags": [
-        "tag1",
-        "tag2"
-      ]
+      "tags": null
     },
     "relationships": {
       "projects": {
         "data": [
           {
-            "id": "2",
+            "id": "60",
             "type": "projects"
           }
         ]
       },
       "samples": {
         "data": [
-          {
-            "id": "4",
-            "type": "samples"
-          },
-          {
-            "id": "5",
-            "type": "samples"
-          }
+
         ]
       },
       "submitter": {
         "data": [
           {
-            "id": "1",
+            "id": "848",
             "type": "people"
           }
         ]
       },
       "assays": {
-        "data": [
-          {
-            "id": "1",
-            "type": "assays"
-          }
-        ]
+        "data": []
       }
     },
     "links": {
-      "self": "/sample_types/8"
+      "self": "/sample_types/60"
     },
     "meta": {
-      "created": "2020-05-12T11:53:07.000Z",
-      "modified": "2020-05-12T12:38:15.000Z",
+      "created": "2018-11-08T12:02:47.000Z",
+      "modified": "2018-11-08T12:02:47.000Z",
       "api_version": "0.3",
-      "uuid": "11d0c360-7675-0138-c960-2cde48001122",
-      "base_url": "http://localhost:3000"
+      "uuid": "2170ca20-c57c-0136-5159-549f350973c0",
+      "base_url": "https://fairdomhub.org"
     }
   },
   "jsonapi": {

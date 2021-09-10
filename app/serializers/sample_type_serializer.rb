@@ -7,8 +7,8 @@ class SampleTypeSerializer < BaseSerializer
   end
 
   def sample_attributes
-     object.sample_attributes.collect do |attribute|
-       get_sample_attribute(attribute)
+    object.sample_attributes.collect do |attribute|
+      get_sample_attribute(attribute)
     end
   end
 
@@ -19,15 +19,15 @@ class SampleTypeSerializer < BaseSerializer
 
   def get_sample_attribute(attribute)
     {
-        "id": attribute.id.to_s,
-        "title": attribute.title,
-        "sample_attribute_type": get_sample_attribute_type(attribute),
-        "required": attribute.required,
-        "pos": attribute.pos.to_s,
-        "unit": attribute.unit.nil? ? nil : attribute.unit.symbol,
-        "is_title": attribute.is_title,
-        "sample_controlled_vocab_id": attribute.sample_controlled_vocab_id.nil? ? nil : attribute.sample_controlled_vocab_id.to_s,
-        "linked_sample_type_id": attribute.linked_sample_type_id.nil? ? nil : attribute.linked_sample_type_id.to_s
+      "id": attribute.id.to_s,
+      "title": attribute.title,
+      "sample_attribute_type": get_sample_attribute_type(attribute),
+      "required": attribute.required,
+      "pos": attribute.pos.to_s,
+      "unit": attribute.unit.nil? ? nil : attribute.unit.symbol,
+      "is_title": attribute.is_title,
+      "sample_controlled_vocab_id": attribute.sample_controlled_vocab_id.nil? ? nil : attribute.sample_controlled_vocab_id.to_s,
+      "linked_sample_type_id": attribute.linked_sample_type_id.nil? ? nil : attribute.linked_sample_type_id.to_s
     }
   end
 
@@ -35,4 +35,3 @@ class SampleTypeSerializer < BaseSerializer
     JSON.parse(SampleAttributeTypeSerializer.new(attribute.sample_attribute_type).to_json)
   end
 end
-

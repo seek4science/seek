@@ -1,63 +1,97 @@
 {
   "data": {
-    "id": "3",
+    "id": "70",
     "type": "sample_types",
     "attributes": {
-      "title": "A Maximal SampleType",
-      "description": "A very new research",
-      "attribute_map": [
+      "title": "In vivo biometrics",
+      "description": "Template for in vivo biometrics data",
+      "sample_attributes": [
         {
-          "id": "22",
-          "title": "full name",
+          "id": "3",
+          "title": "Fish ID",
           "sample_attribute_type": {
-            "title":"String"
+            "id": "4",
+            "title": "Integer",
+            "base_type": "Integer",
+            "regexp": ".*"
           },
           "required": true,
           "pos": "1",
           "unit": null,
-          "is_title": true
-
+          "is_title": true,
+          "sample_controlled_vocab_id": null,
+          "linked_sample_type_id": null
         },
         {
-          "id": "23",
-          "title": "details",
+          "id": "4",
+          "title": "Date",
           "sample_attribute_type": {
-            "title":"Text"
+            "id": "2",
+            "title": "Date",
+            "base_type": "Date",
+            "regexp": ".*"
           },
           "required": false,
           "pos": "2",
           "unit": null,
-          "is_title": false
+          "is_title": false,
+          "sample_controlled_vocab_id": null,
+          "linked_sample_type_id": null
+        },
+        {
+          "id": "5",
+          "title": "Exposure",
+          "sample_attribute_type": {
+            "id": "8",
+            "title": "String",
+            "base_type": "String",
+            "regexp": ".*"
+          },
+          "required": true,
+          "pos": "3",
+          "unit": null,
+          "is_title": false,
+          "sample_controlled_vocab_id": null,
+          "linked_sample_type_id": null
         }
-      ]
+      ],
+      "tags": null
     },
     "relationships": {
       "projects": {
         "data": [
           {
-            "id": "1",
+            "id": "60",
             "type": "projects"
           }
+        ]
+      },
+      "samples": {
+        "data": [
+
         ]
       },
       "submitter": {
         "data": [
           {
-            "id": "1",
+            "id": "33",
             "type": "people"
           }
         ]
+      },
+      "assays": {
+        "data": []
       }
     },
     "links": {
-      "self": "/sample_types/3"
+      "self": "/sample_types/70"
     },
     "meta": {
-      "created": "2020-05-12T11:53:07.000Z",
-      "modified": "2020-05-12T12:38:15.000Z",
+      "created": "2020-11-08T12:02:47.000Z",
+      "modified": "2020-11-08T12:02:47.000Z",
       "api_version": "0.3",
-      "uuid": "11d0c360-7675-0138-c960-2cde48001122",
-      "base_url": "http://localhost:3000"
+      "uuid": "2190ca20-c57c-0136-5159-549f350973c0",
+      "base_url": "https://seekhub.org"
     }
   },
   "jsonapi": {
