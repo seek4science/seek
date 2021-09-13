@@ -12078,6 +12078,9 @@
                                 },
                                 "attribute_map": {
                                     "$ref": "#/definitions/sampleAttributeMap"
+                                },
+                                "policy": {
+                                    "$ref": "#/definitions/policy"
                                 }
                             },
                             "required": [
@@ -12168,6 +12171,9 @@
                                 },
                                 "attribute_map": {
                                     "$ref": "#/definitions/sampleAttributeMap"
+                                },
+                                "policy": {
+                                    "$ref": "#/definitions/policy"
                                 }
                             },
                             "required": [
@@ -12242,6 +12248,9 @@
                                 },
                                 "attribute_map": {
                                     "$ref": "#/definitions/sampleAttributeMap"
+                                },
+                                "policy": {
+                                    "$ref": "#/definitions/policy"
                                 }
                             },
                             "additionalProperties": false
