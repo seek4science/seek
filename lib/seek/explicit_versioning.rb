@@ -103,6 +103,14 @@ module Seek
           def set_default_visibility
             self.visibility ||= self.class.default_visibility
           end
+
+          def to_schema_ld
+            Seek::BioSchema::Serializer.new(self).json_ld
+          end
+
+          def schema_org_supported?
+            Seek::BioSchema::Serializer.supported?(parent)
+          end
         end
 
         versioned_class.table_name = versioned_table_name
@@ -216,10 +224,6 @@ module Seek
 
       def empty_callback() end #:nodoc:
 
-      def is_a_version?
-        false
-      end
-
       def visible_versions(user = User.current_user)
         scopes = [ExplicitVersioning::VISIBILITY_INV[:public]]
         scopes << ExplicitVersioning::VISIBILITY_INV[:registered_users] if user&.person&.member?
@@ -309,6 +313,7 @@ module Seek
               timestamp_columns.include?(key) ||
               sync_ignore_columns.include?(key)
             next unless orig_model.respond_to?(key)
+            next unless new_model.respond_to?("#{key}=")
             new_model.send("#{key}=", orig_model.send(key))
           end
         end

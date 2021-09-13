@@ -3,14 +3,29 @@ module Seek
     module ResourceDecorators
       # Decorator that provides extensions for a Event
       class Event < Thing
+        EVENT_PROFILE = 'https://bioschemas.org/profiles/Event/0.2-DRAFT-2019_06_14/'.freeze
+
         associated_items contact: :contributors,
-                         host_institution: :projects
+                         host_institution: :projects,
+                         all_assets: :about_assets
+
         schema_mappings contact: :contact,
                         start_date: :startDate,
                         end_date: :endDate,
                         event_type: :eventType,
                         location: :location,
-                        host_institution: :hostInstitution
+                        host_institution: :hostInstitution,
+                        all_assets: :about,
+                        created_at: :dateCreated,
+                        updated_at: :dateModified
+
+        def schema_type
+          'Event'
+        end
+
+        def conformance
+          EVENT_PROFILE
+        end
 
         def contributors
           [contributor]
@@ -34,6 +49,10 @@ module Seek
 
         def country
           CountryCodes.country(resource.country)
+        end
+
+        def about_assets
+          data_files + documents + presentations # + publications
         end
       end
     end
