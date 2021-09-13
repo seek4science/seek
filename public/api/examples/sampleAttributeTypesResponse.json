@@ -10,12 +10,6 @@
       },
       "links": {
         "self": "/sample_attribute_types/1"
-      },
-      "meta": {
-        "created": "2017-01-24T20:25:10.000Z",
-        "modified": "2017-01-24T20:25:10.000Z",
-        "api_version": "0.3",
-        "base_url": "https://fairdomhub.org"
       }
     },
     {
@@ -28,12 +22,6 @@
       },
       "links": {
         "self": "/sample_attribute_types/2"
-      },
-      "meta": {
-        "created": "2017-01-24T20:25:10.000Z",
-        "modified": "2017-01-24T20:25:10.000Z",
-        "api_version": "0.3",
-        "base_url": "https://fairdomhub.org"
       }
     },
     {
@@ -46,12 +34,6 @@
       },
       "links": {
         "self": "/sample_attribute_types/3"
-      },
-      "meta": {
-        "created": "2017-01-24T20:25:10.000Z",
-        "modified": "2017-01-24T20:25:10.000Z",
-        "api_version": "0.3",
-        "base_url": "https://fairdomhub.org"
       }
     },
     {
@@ -64,12 +46,6 @@
       },
       "links": {
         "self": "/sample_attribute_types/4"
-      },
-      "meta": {
-        "created": "2017-01-24T20:25:10.000Z",
-        "modified": "2017-01-24T20:25:10.000Z",
-        "api_version": "0.3",
-        "base_url": "https://fairdomhub.org"
       }
     },
     {
@@ -82,12 +58,6 @@
       },
       "links": {
         "self": "/sample_attribute_types/5"
-      },
-      "meta": {
-        "created": "2017-01-24T20:25:10.000Z",
-        "modified": "2021-05-04T14:41:39.000Z",
-        "api_version": "0.3",
-        "base_url": "https://fairdomhub.org"
       }
     },
     {
@@ -100,12 +70,6 @@
       },
       "links": {
         "self": "/sample_attribute_types/6"
-      },
-      "meta": {
-        "created": "2017-01-24T20:25:10.000Z",
-        "modified": "2021-05-04T14:41:39.000Z",
-        "api_version": "0.3",
-        "base_url": "https://fairdomhub.org"
       }
     },
     {
@@ -118,12 +82,6 @@
       },
       "links": {
         "self": "/sample_attribute_types/7"
-      },
-      "meta": {
-        "created": "2017-01-24T20:25:10.000Z",
-        "modified": "2017-01-24T20:25:10.000Z",
-        "api_version": "0.3",
-        "base_url": "https://fairdomhub.org"
       }
     },
     {
@@ -136,12 +94,6 @@
       },
       "links": {
         "self": "/sample_attribute_types/8"
-      },
-      "meta": {
-        "created": "2017-01-24T20:25:10.000Z",
-        "modified": "2017-01-24T20:25:10.000Z",
-        "api_version": "0.3",
-        "base_url": "https://fairdomhub.org"
       }
     },
     {
@@ -154,12 +106,6 @@
       },
       "links": {
         "self": "/sample_attribute_types/9"
-      },
-      "meta": {
-        "created": "2017-01-24T20:25:10.000Z",
-        "modified": "2017-01-24T20:25:10.000Z",
-        "api_version": "0.3",
-        "base_url": "https://fairdomhub.org"
       }
     },
     {
@@ -172,12 +118,6 @@
       },
       "links": {
         "self": "/sample_attribute_types/10"
-      },
-      "meta": {
-        "created": "2017-01-24T20:25:10.000Z",
-        "modified": "2017-01-24T20:25:10.000Z",
-        "api_version": "0.3",
-        "base_url": "https://fairdomhub.org"
       }
     },
     {
@@ -190,12 +130,6 @@
       },
       "links": {
         "self": "/sample_attribute_types/11"
-      },
-      "meta": {
-        "created": "2017-01-24T20:25:10.000Z",
-        "modified": "2017-01-24T20:25:10.000Z",
-        "api_version": "0.3",
-        "base_url": "https://fairdomhub.org"
       }
     },
     {
@@ -208,12 +142,6 @@
       },
       "links": {
         "self": "/sample_attribute_types/12"
-      },
-      "meta": {
-        "created": "2017-01-24T20:25:10.000Z",
-        "modified": "2017-01-24T20:25:10.000Z",
-        "api_version": "0.3",
-        "base_url": "https://fairdomhub.org"
       }
     },
     {
@@ -226,12 +154,6 @@
       },
       "links": {
         "self": "/sample_attribute_types/13"
-      },
-      "meta": {
-        "created": "2017-01-24T20:25:10.000Z",
-        "modified": "2017-01-24T20:25:10.000Z",
-        "api_version": "0.3",
-        "base_url": "https://fairdomhub.org"
       }
     },
     {
@@ -244,12 +166,6 @@
       },
       "links": {
         "self": "/sample_attribute_types/14"
-      },
-      "meta": {
-        "created": "2017-01-24T20:25:10.000Z",
-        "modified": "2021-05-04T14:41:39.000Z",
-        "api_version": "0.3",
-        "base_url": "https://fairdomhub.org"
       }
     },
     {
@@ -262,12 +178,6 @@
       },
       "links": {
         "self": "/sample_attribute_types/15"
-      },
-      "meta": {
-        "created": "2018-10-08T16:00:34.000Z",
-        "modified": "2018-10-08T16:00:34.000Z",
-        "api_version": "0.3",
-        "base_url": "https://fairdomhub.org"
       }
     },
     {
@@ -280,12 +190,6 @@
       },
       "links": {
         "self": "/sample_attribute_types/16"
-      },
-      "meta": {
-        "created": "2021-05-04T14:41:39.000Z",
-        "modified": "2021-05-04T14:41:39.000Z",
-        "api_version": "0.3",
-        "base_url": "https://fairdomhub.org"
       }
     },
     {
@@ -298,12 +202,6 @@
       },
       "links": {
         "self": "/sample_attribute_types/17"
-      },
-      "meta": {
-        "created": "2021-05-04T14:41:39.000Z",
-        "modified": "2021-05-04T14:41:39.000Z",
-        "api_version": "0.3",
-        "base_url": "https://fairdomhub.org"
       }
     },
     {
@@ -316,12 +214,6 @@
       },
       "links": {
         "self": "/sample_attribute_types/18"
-      },
-      "meta": {
-        "created": "2021-05-04T14:41:39.000Z",
-        "modified": "2021-05-04T14:41:39.000Z",
-        "api_version": "0.3",
-        "base_url": "https://fairdomhub.org"
       }
     },
     {
@@ -334,12 +226,6 @@
       },
       "links": {
         "self": "/sample_attribute_types/19"
-      },
-      "meta": {
-        "created": "2021-05-04T14:41:39.000Z",
-        "modified": "2021-05-04T14:41:39.000Z",
-        "api_version": "0.3",
-        "base_url": "https://fairdomhub.org"
       }
     },
     {
@@ -352,12 +238,6 @@
       },
       "links": {
         "self": "/sample_attribute_types/20"
-      },
-      "meta": {
-        "created": "2021-05-04T14:41:39.000Z",
-        "modified": "2021-05-04T14:41:39.000Z",
-        "api_version": "0.3",
-        "base_url": "https://fairdomhub.org"
       }
     },
     {
@@ -370,12 +250,6 @@
       },
       "links": {
         "self": "/sample_attribute_types/21"
-      },
-      "meta": {
-        "created": "2021-05-04T14:41:39.000Z",
-        "modified": "2021-05-04T14:41:39.000Z",
-        "api_version": "0.3",
-        "base_url": "https://fairdomhub.org"
       }
     },
     {
@@ -388,12 +262,6 @@
       },
       "links": {
         "self": "/sample_attribute_types/22"
-      },
-      "meta": {
-        "created": "2021-05-04T14:41:39.000Z",
-        "modified": "2021-05-04T14:41:39.000Z",
-        "api_version": "0.3",
-        "base_url": "https://fairdomhub.org"
       }
     },
     {
@@ -406,16 +274,17 @@
       },
       "links": {
         "self": "/sample_attribute_types/23"
-      },
-      "meta": {
-        "created": "2021-05-04T14:41:39.000Z",
-        "modified": "2021-05-04T14:41:39.000Z",
-        "api_version": "0.3",
-        "base_url": "https://fairdomhub.org"
       }
     }
   ],
   "jsonapi": {
     "version": "1.0"
+  },
+  "links": {
+    "self": "/sample_attribute_types"
+  },
+  "meta": {
+    "base_url": "http://fairdomhub.org",
+    "api_version": "0.3"
   }
 }

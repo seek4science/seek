@@ -12004,9 +12004,6 @@
                     ],
                     "additionalProperties": false
                 },
-                "meta": {
-                    "$ref": "#/definitions/baseMetaType"
-                },
                 "links": {
                     "$ref": "#/definitions/indexLinks"
                 }
@@ -12015,8 +12012,7 @@
                 "id",
                 "type",
                 "attributes",
-                "links",
-                "meta"
+                "links"
             ]
         },
         "sampleAttributeTypes": {
@@ -12025,9 +12021,6 @@
             "uniqueItems": true,
             "items": {
                 "$ref": "#/definitions/sampleAttributeType"
-            },
-            "jsonapi": {
-                "$ref": "#/definitions/JsonApiVersion"
             }
         },
         "sampleAttributeTypesResponse": {
@@ -12349,7 +12342,8 @@
             "required": [
                 "data",
                 "jsonapi",
-                "meta"
+                "meta",
+                "links"
             ],
             "additionalProperties": false
         },
