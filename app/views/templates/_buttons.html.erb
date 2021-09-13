@@ -1,0 +1,6 @@
+<% template = item %>
+ <%= item_actions_dropdown do %>
+    <% if template.can_delete? %>
+        <%= delete_icon(template, current_user) %>
+    <% end %>
+<% end %> 

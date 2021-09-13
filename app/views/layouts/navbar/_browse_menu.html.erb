@@ -31,6 +31,7 @@
 
     <%= render_menu_group(t('menu.samples'), [
         [t('sample').pluralize, select_sample_types_path, Seek::Config.samples_enabled],
+        [t('template').pluralize, templates_path, Seek::Config.samples_enabled],
         [t('sample_type').pluralize, sample_types_path, Seek::Config.samples_enabled],
         [t('strain').pluralize, strains_path,  Seek::Config.organisms_enabled],
         [t('organism').pluralize, organisms_path,  Seek::Config.organisms_enabled],

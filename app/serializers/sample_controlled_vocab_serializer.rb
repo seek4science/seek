@@ -1,12 +1,12 @@
 class SampleControlledVocabSerializer < BaseSerializer
   attributes :title, :description, :source_ontology, :ols_root_term_uri, :required, :short_name
   attributes :sample_controlled_vocab_terms_attributes
-  attributes :repository_standard_attributes
+  attributes :template_attributes
   
   has_many :sample_controlled_vocab_terms
 
-  def repository_standard_attributes
-    repo = object.repository_standard
+  def template_attributes
+    repo = object.template
      if repo
       {
         id: repo.id,

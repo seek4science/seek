@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_08_10_211320) do
+ActiveRecord::Schema.define(version: 2021_09_09_153252) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -1373,6 +1373,13 @@ ActiveRecord::Schema.define(version: 2021_08_10_211320) do
     t.integer "strain_id"
   end
 
+  create_table "projects_templates",  force: :cascade do |t|
+    t.bigint "template_id"
+    t.bigint "project_id"
+    t.index ["project_id"], name: "index_projects_templates_on_project_id"
+    t.index ["template_id"], name: "index_projects_templates_on_template_id"
+  end
+
   create_table "projects_workflow_versions", id: false,  force: :cascade do |t|
     t.integer "project_id"
     t.integer "version_id"
@@ -1480,15 +1487,6 @@ ActiveRecord::Schema.define(version: 2021_08_10_211320) do
     t.datetime "updated_at"
   end
 
-  create_table "repository_standards",  force: :cascade do |t|
-    t.string "title"
-    t.string "url"
-    t.string "group_tag"
-    t.string "repo_type"
-    t.text "description"
-    t.index ["title", "group_tag"], name: "index_repository_standards_title_group_tag"
-  end
-
   create_table "resource_publish_logs", id: :integer,  force: :cascade do |t|
     t.string "resource_type"
     t.integer "resource_id"
@@ -1562,7 +1560,7 @@ ActiveRecord::Schema.define(version: 2021_08_10_211320) do
     t.string "ols_root_term_uri"
     t.boolean "required"
     t.string "short_name"
-    t.integer "repository_standard_id"
+    t.integer "template_id"
   end
 
   create_table "sample_resource_links", id: :integer,  force: :cascade do |t|
@@ -1583,6 +1581,7 @@ ActiveRecord::Schema.define(version: 2021_08_10_211320) do
     t.boolean "uploaded_template", default: false
     t.integer "contributor_id"
     t.string "deleted_contributor"
+    t.integer "template_id"
   end
 
   create_table "samples", id: :integer,  force: :cascade do |t|
@@ -1896,6 +1895,54 @@ ActiveRecord::Schema.define(version: 2021_08_10_211320) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["resource_type", "resource_id"], name: "index_tasks_on_resource_type_and_resource_id"
+  end
+
+  create_table "template_attributes",  force: :cascade do |t|
+    t.string "title"
+    t.string "short_name"
+    t.boolean "required", default: false
+    t.string "ontology_version"
+    t.text "description"
+    t.integer "template_id"
+    t.integer "sample_controlled_vocab_id"
+    t.integer "sample_attribute_type_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["template_id", "title"], name: "index_template_id_asset_id_title"
+  end
+
+  create_table "template_auth_lookup", id: :integer,  force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view", default: false
+    t.boolean "can_manage", default: false
+    t.boolean "can_edit", default: false
+    t.boolean "can_download", default: false
+    t.boolean "can_delete", default: false
+    t.index ["user_id", "asset_id", "can_view"], name: "index_template_auth_lookup_user_id_asset_id"
+    t.index ["user_id", "can_view"], name: "index_template_auth_lookup_on_user_id_and_can_view"
+  end
+
+  create_table "templates",  force: :cascade do |t|
+    t.string "title"
+    t.string "group"
+    t.integer "group_order"
+    t.string "temporary_name"
+    t.string "template_version"
+    t.string "isa_config"
+    t.string "isa_measurement_type"
+    t.string "isa_technology_type"
+    t.string "isa_protocol_type"
+    t.string "repo_schema_id"
+    t.string "organism"
+    t.string "level"
+    t.text "description"
+    t.integer "policy_id"
+    t.integer "contributor_id"
+    t.string "deleted_contributor"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["title", "group"], name: "index_templates_title_group"
   end
 
   create_table "text_values", id: :integer,  force: :cascade do |t|

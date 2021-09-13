@@ -701,6 +701,13 @@ SEEK::Application.routes.draw do
     end
   end
 
+  ### TEMPLATES ###
+  resources :templates do
+    resources :projects, only: [:index]
+    member do
+    end
+  end
+
   ### ASSAY AND TECHNOLOGY TYPES ###
 
   get '/assay_types/', to: 'assay_types#show', as: 'assay_types'

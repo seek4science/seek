@@ -1,0 +1,42 @@
+<% tab = @tab || 'manual' %>
+
+<h1>New Template</h1>
+
+<p>
+  Templates can be defined manually through the form below or based on repository templates.
+</p>
+
+<div>
+  <ul id="sample-type-tabs" class="nav nav-tabs" role="tablist">
+    <li role="presentation" <%= 'class="active"'.html_safe if tab == 'manual' -%>>
+      <a href="#manual" aria-controls="from-template" role="tab" data-toggle="tab">Form</a>
+    </li>
+     <li role="presentation" <%= 'class="active"'.html_safe if tab == 'from-existing-templates' -%>>
+      <a href="#from-existing-templates" aria-controls="from-existing-templates" role="tab" data-toggle="tab">Based on repositories templates</a>
+    </li>
+  </ul>
+
+  <%= render partial: 'templates/form', locals: { tab: tab } %>
+</div>
+
+<script>
+  $j(document).ready(function () {
+    // A function to switch the form action depending on which tab is selected.
+    // Also disables form elements in the hidden tab.
+    var switchFormTarget = function () {
+      var form = $j('#new_template');
+      // var id = $j('.tab-pane.active', form)[0].id;
+      $j('.tab-pane :input:not(".template-input")', form).attr('disabled', true);
+      $j('.tab-pane.active :input:not(".template-input")', form).attr('disabled', false);
+
+      // if (id == 'from-existing-templates'){ }
+      //  else {
+      //   form[0].action = '<%= templates_path -%>';
+      // }
+    };
+
+    $j('#sample-type-tabs a[data-toggle="tab"]').on('shown.bs.tab', switchFormTarget);
+
+    switchFormTarget();
+  });
+</script>

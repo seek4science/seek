@@ -21,6 +21,7 @@ class Project < ApplicationRecord
   has_and_belongs_to_many :sample_types
   has_and_belongs_to_many :documents
   has_and_belongs_to_many :collections
+  has_and_belongs_to_many :templates
 
   has_many :work_groups, dependent: :destroy, inverse_of: :project
   has_many :institutions, through: :work_groups, inverse_of: :projects

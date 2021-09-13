@@ -23,7 +23,7 @@
                 "parent_iri": "http://purl.obolibrary.org/obo/OBI_0100026"
               }
           ],
-            "repository_standard": {
+            "template": {
                 "id": 7,
                 "title": "ArrayExpress",
                 "url": "some_url",

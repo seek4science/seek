@@ -1,0 +1,198 @@
+<%= javascript_include_tag "select2.full.min" %>
+<%= stylesheet_link_tag "select2.min.css" %>
+<%= stylesheet_link_tag "select2.bootstrap.min.css" %>
+<% tab ||= 'manual' %>
+
+<span id='modal-dialogues'>
+    <%= sample_controlled_vocab_model_dialog('cv-modal') %>
+</span>
+
+<%= form_for(@template, html: { multipart: true }) do |f| %>
+<%= f.error_messages %>
+
+<div class="form-group">
+    <label>Title</label><%= required_span %>
+    <%= f.text_field :title, :class => 'form-control', :placeholder => 'Template name' %>
+</div>
+
+<div class="form-group">
+    <label>Description</label>
+    <%= f.text_area :description, :class=>"form-control rich-text-edit", :rows => 5 -%>
+</div>
+
+<%= render :partial => "projects/project_selector", :locals => { :resource => @template } -%>
+
+<div class="tab-content">
+    <div role="tabpanel" class="tab-pane<%= ' active'.html_safe if tab == 'manual' -%>" id="manual">
+        <h3>Attributes</h3>
+        <table class="table" id="attribute-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th width="5em">Required?</th>
+                     <th>Type</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% @template.template_attributes.each_with_index do |attribute, index| %>
+                <%= render :partial => 'template_attribute_form', :locals => { :index => index,
+                                                                           :attribute => attribute,
+                                                                           :template=>@template} %>
+                <% end %>
+                <tr id="add-attribute-row">
+                    <td colspan="6">
+                        <%= button_link_to('Add new attribute', 'add', '#', :id => 'add-attribute') %>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div role="tabpanel" class="tab-pane fade" id="from-existing-templates">
+        <h3>Repositories templates</h3>
+        <%= folding_panel('Create template using existing template', false, {help_text: "Create template based on repositories templates", :body_options => {:id => 'add_custom_attribute_panel'}}) do %>
+        <label for="sourceSelect" style="width:100%">
+            <select class="templates form-control" style="width: 100%" id="sourceSelect" onchange="applyTemplate();">
+            </select>
+        </label>
+
+        <div class="attributeTable" style="max-height:300px">
+            <table class="tableXs" id="sourceAttribs" style="width:100%;">
+                <thead>
+                    <tr>
+                        <th style="width:20px;">Required</th>
+                        <th style="width:30%">Attribute</th>
+                        <th style="width:70%">Description</th>
+                        <th style="width:20px"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <% end %>
+    </div>
+</div>
+
+<p class="actions">
+    <%= f.submit (@template.new_record? ? 'Create' : 'Update'), :class => 'btn btn-primary' %>
+    or
+    <%= cancel_button(@template.new_record? ? templates_path : template_path(@template)) %>
+</p>
+<% end %>
+
+<table id="new-attribute-row" style="display: none">
+    <tbody>
+        <%= render :partial => 'template_attribute_form', :locals=> {:template=>@template} %>
+    </tbody>
+</table>
+
+<script>
+    //used to hold the element Id that needs updating after creating a new CV
+    $j(document).ready(function() {
+        SampleTypeControlledVocab.blankControlledVocabModelForm = $j('#cv-modal').clone();
+        SampleTypeControlledVocab.resetModalControlledVocabForm();
+        // // Make rows sortable
+        // SampleTypes.bindSortable();
+        // SampleTypes.recalculatePositions();
+
+        $j('#add-attribute').click(function() {
+            var newRow = $j('#new-attribute-row tbody').clone().html();
+            var index = 0;
+            $j('#attribute-table tr.sample-attribute').each(function() {
+                var newIndex = parseInt($j(this).data('index'));
+                if (newIndex > index) {
+                    index = newIndex;
+                }
+            });
+            index++;
+            newRow = newRow.replace(/replace-me/g, index);
+            // SampleTypes.unbindSortable();
+            $j('#attribute-table #add-attribute-row').before($j(newRow));
+            // SampleTypes.recalculatePositions();
+            // SampleTypes.bindSortable();
+            return false;
+        });
+
+        $j('#attribute-table').on('change', '.destroy-attribute', SampleTypes.removeAttribute);
+        // $j('#attribute-table').on('change', '.sample-type-is-title', SampleTypes.singleIsTitle);
+        $j('#attribute-table').on('change', '.sample-type-attribute-type', SampleTypes.attributeTypeChanged);
+        $j('#attribute-table').on('change', '.controlled-vocab-selection', SampleTypeControlledVocab.controlledVocabChanged);
+        $j('.templates').select2({theme: "bootstrap"});
+        populateTemplates()
+        applyTemplate()
+    });
+
+    function populateTemplates() {
+        $j("#sourceSelect").empty();
+        let organized = templates.reduce((obj, item) => {
+            obj[item.group] = obj[item.group] || [];
+            obj[item.group].push(item);
+            return obj;
+        }, {});
+
+        let counter = 0
+        $j.each(Object.keys(organized), (i, item) => {
+            const elem = $j(`<optgroup label=${item}></optgroup>`);
+            $j.each(organized[item], (j, subItem) => {
+                elem.append(
+                    $j(`<option>${subItem.title}</option>`)
+                    .attr("value", counter)
+                    .text(item.title)
+                );
+                counter++
+            });
+            $j("#sourceSelect").append(elem);
+        });
+    }
+
+    const removeBtn = "<td><a href='javascript:void(0)' onClick='remove(this)'><i style='color:#b01515' class='glyphicon glyphicon-remove'></i></a></td>"
+
+    function applyTemplate() {
+        let i = $j('#sourceSelect').find(':selected').val()
+        $j("#sourceAttribs tbody").empty();
+        if (templates.length === 0) return;
+        $j.each(templates[i].attributes, (k, attr) => {
+            const newRow = `<td><input class='template-input' ${attr.required?'disabled checked':''} type='checkbox'/></td>`
+            const title = attr.required ? "<strong>" + attr.title + "*" + "</strong>" : attr.title;
+            $j("#sourceAttribs tbody").append(
+                `<tr val='${attr.title}' attribute_type_id=${attr.attribute_type_id} cv_id=${attr.cv_id}>${newRow}<td>${title}</td>
+          <td>${attr.description}</td>${attr.required?'<td></td>':removeBtn}</tr>`
+            );
+        });
+    }
+
+    $j('#new_template').submit(function() {
+        if ($j("#from-existing-templates").hasClass('active')) {
+            const baseElement = '<input hidden type="text" name="template[template_attributes_attributes][%][##]"/>'
+            const createElement = (i, name) => $j(baseElement.replace('%', i).replace('##', name))
+            $j('#sourceAttribs tbody tr').each((i, tr) => {
+                const cv_id = $j(tr).attr("cv_id")
+                // $j(this).append(createElement(i, "pos").val(i));
+                $j(this).append(createElement(i, "title").val($j(tr).attr("val")));
+                $j(this).append(createElement(i, "required").val($j(tr).find("td:first-child input").is(":checked")));
+                // $j(this).append(createElement(i, "is_title").val(i == 0));
+                $j(this).append(createElement(i, "sample_attribute_type_id").val($j(tr).attr("attribute_type_id")));
+                $j(this).append(createElement(i, "sample_controlled_vocab_id").val(cv_id === "null" ? null : cv_id));
+            })
+        }
+        return true;
+    });
+
+    // $j("#add_new_attribute").on("click", function() {
+    //     const select = "<input checked type='checkbox'>"
+    //     const name = $j("#attribute-name").val()
+    //     if (!name) {
+    //         alert("The value should not be empty!")
+    //         return
+    //     }
+    //     $j("#sourceAttribs tbody").append(`<tr val='${name}' required=true><td>${select}</td><td>${name}</td><td></td>${removeBtn}</tr>`)
+    // })
+
+    function remove(e) {
+        $j(e).closest("tr").remove()
+    }
+
+    const templates = <%= load_templates().to_json.html_safe %>
+
+</script>

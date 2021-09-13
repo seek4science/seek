@@ -1,0 +1,7 @@
+<%= list_item_description h(resource.description) %>
+<p class="list_item_attribute">
+  <label>Attributes: </label>
+  <%=
+      resource.template_attributes.collect{|attr| template_attribute_details(attr)}.join(", ").html_safe
+  %>
+</p>
