@@ -76,5 +76,8 @@ module SEEK
 
     # Ignore translation overrides when testing
     config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'overrides', '**', '*.{rb,yml}')] unless Rails.env.test?
+
+    config.recommended_data_licenses = []
+    config.recommended_software_licenses = []
   end
 end

@@ -3,6 +3,7 @@
 <% selected_license = resource.send(accessor) %>
 <% selected_license = (resource.new_record? ? default_license : Seek::License::NULL_LICENSE) if selected_license.nil? %>
 <% license_group ||= :data %>
+<% recommended_licenses ||= Seek::Config.recommended_data_licenses %>
 <% label ||= 'License' %>
 
 <%= folding_panel(label, false,
@@ -12,7 +13,8 @@
 
       <%= grouped_license_select("#{resource.class.name.underscore}[#{accessor.to_s}]", selected_license,
                                  :id => 'license-select', :class => 'form-control',
-                                 :source => Seek::License::OPENDEFINITION[license_group]) %>
+      :source => Seek::License::OPENDEFINITION[license_group],
+      :recommended => recommended_licenses) %>
 
       <span class="help-block license-url-block">
         For more information on this license, please visit <a id="license-url" href="" target="_blank"></a>
