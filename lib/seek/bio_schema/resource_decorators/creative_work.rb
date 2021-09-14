@@ -40,10 +40,7 @@ module Seek
         end
 
         def sd_publisher
-          { :@type => 'Organization',
-            :@id => Seek::Config.site_base_host,
-            :name => Seek::Config.project_name,
-            :url => Seek::Config.site_base_host }
+          DataCatalogMockModel.new.provider
         end
       end
     end
