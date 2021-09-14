@@ -15,6 +15,14 @@ module Seek
       project_name
     end
 
+    def recommended_data_licenses_fallback
+      ['CC-BY-4.0']
+    end
+    
+    def recommended_software_licenses_fallback
+      ['CC0-1.0']
+    end
+    
     def dm_project_link_fallback
       project_link
     end
