@@ -49,6 +49,16 @@ class ContributedResourceSerializer < PCSSerializer
     blobs.map { |cb| convert_content_blob_to_json(cb) }
   end
 
+  attribute :creators, if: -> { object.respond_to?(:assets_creators) } do
+    object.assets_creators.map do |c|
+      { profile: c.creator_id ? person_path(c.creator_id) : nil,
+        family_name: c.family_name,
+        given_name: c.given_name,
+        affiliation: c.affiliation,
+        orcid: c.orcid }
+    end
+  end
+
   attribute :other_creators
 
   def convert_content_blob_to_json(cb)
