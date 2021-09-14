@@ -98,10 +98,11 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'description' => df.description.ljust(50, '.'),
       'keywords' => 'keyword',
       'sdPublisher' =>
-      { '@type' => 'Organization',
-        '@id' => Seek::Config.site_base_host,
-        'name' => Seek::Config.project_name,
-        'url' => Seek::Config.site_base_host },
+        {
+          '@type' => 'Organization',
+          '@id' => Seek::Config.dm_project_link,
+          'name' => Seek::Config.dm_project_name,
+          'url' => Seek::Config.dm_project_link },
       'version' => 1,
       'url' => "http://localhost:3000/data_files/#{df.id}",
       'creator' => [{
@@ -167,10 +168,11 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'description' => df.description,
       'keywords' => 'keyword',
       'sdPublisher' =>
-      { '@type' => 'Organization',
-        '@id' => Seek::Config.site_base_host,
-        'name' => Seek::Config.project_name,
-        'url' => Seek::Config.site_base_host },
+        {
+          '@type' => 'Organization',
+          '@id' => Seek::Config.dm_project_link,
+          'name' => Seek::Config.dm_project_name,
+          'url' => Seek::Config.dm_project_link },
       'version' => 1,
       'url' => "http://localhost:3000/data_files/#{df.id}",
       'creator' => [{ '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Blogs')}", 'name' => 'Blogs' }, { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Joe')}", 'name' => 'Joe' }],
@@ -217,10 +219,11 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'description' => df.description,
       'keywords' => 'keyword',
       'sdPublisher' =>
-      { '@type' => 'Organization',
-        '@id' => Seek::Config.site_base_host,
-        'name' => Seek::Config.project_name,
-        'url' => Seek::Config.site_base_host },
+        {
+          '@type' => 'Organization',
+          '@id' => Seek::Config.dm_project_link,
+          'name' => Seek::Config.dm_project_name,
+          'url' => Seek::Config.dm_project_link },
       'version' => 1,	
       'creator' => [{ '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Blogs')}", 'name' => 'Blogs' }, { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Joe')}", 'name' => 'Joe' }],
       'url' => 'http://www.abc.com',
@@ -388,10 +391,11 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'url' => "http://localhost:3000/documents/#{document.id}",
       'keywords' => 'wibble',
       'sdPublisher' =>
-      { '@type' => 'Organization',
-        '@id' => Seek::Config.site_base_host,
-        'name' => Seek::Config.project_name,
-        'url' => Seek::Config.site_base_host },
+        {
+          '@type' => 'Organization',
+          '@id' => Seek::Config.dm_project_link,
+          'name' => Seek::Config.dm_project_name,
+          'url' => Seek::Config.dm_project_link },
       'version' => 1,
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
@@ -426,10 +430,11 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'url' => "http://localhost:3000/presentations/#{presentation.id}",
       'keywords' => 'wibble',
       'sdPublisher' =>
-      { '@type' => 'Organization',
-        '@id' => Seek::Config.site_base_host,
-        'name' => Seek::Config.project_name,
-        'url' => Seek::Config.site_base_host },
+        {
+          '@type' => 'Organization',
+          '@id' => Seek::Config.dm_project_link,
+          'name' => Seek::Config.dm_project_name,
+          'url' => Seek::Config.dm_project_link },
       'version' => 1,
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
@@ -497,10 +502,11 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                  'dateModified' => @current_time.iso8601,
                  'encodingFormat' => 'application/x-yaml',
                  'sdPublisher' =>
-                    { '@type' => 'Organization',
-                      '@id' => Seek::Config.site_base_host,
-                      'name' => Seek::Config.project_name,
-                      'url' => Seek::Config.site_base_host },
+                   {
+                     '@type' => 'Organization',
+                     '@id' => Seek::Config.dm_project_link,
+                     'name' => Seek::Config.dm_project_name,
+                     'url' => Seek::Config.dm_project_link },
                  'version' => 1,
                  'programmingLanguage' => {
                    '@id'=>'#cwl',
@@ -610,11 +616,11 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                  'name' => 'A Maximal Collection',
                  'url' => "http://localhost:3000/collections/#{collection.id}",
                  'keywords' => '',
-                 'sdPublisher' =>
-                    { '@type' => 'Organization',
-                      '@id' => Seek::Config.site_base_host,
-                      'name' => Seek::Config.project_name,
-                      'url' => Seek::Config.site_base_host },
+                 'sdPublisher' => {
+                      '@type' => 'Organization',
+                      '@id' => Seek::Config.dm_project_link,
+                      'name' => Seek::Config.dm_project_name,
+                      'url' => Seek::Config.dm_project_link },
                  'creator' => [
                    { '@type' => 'Person',
                      '@id' => '#Joe%20Bloggs',
@@ -774,11 +780,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                        'name' => @project.title
                      }],
       'sdPublisher'=> {
-        '@type'=>'Organization',
-        '@id'=>'http://localhost:3000',
-        'name'=>'Sysmo',
-        'url'=>'http://localhost:3000'
-      },
+        '@type' => 'Organization',
+        '@id' => Seek::Config.dm_project_link,
+        'name' => Seek::Config.dm_project_name,
+        'url' => Seek::Config.dm_project_link },
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'application/pdf',
@@ -822,11 +827,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                        'name' => @project.title
                      }],
       'sdPublisher'=> {
-        '@type'=>'Organization',
-        '@id'=>'http://localhost:3000',
-        'name'=>'Sysmo',
-        'url'=>'http://localhost:3000'
-      },
+        '@type' => 'Organization',
+        '@id' => Seek::Config.dm_project_link,
+        'name' => Seek::Config.dm_project_name,
+        'url' => Seek::Config.dm_project_link },
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'image/png',
