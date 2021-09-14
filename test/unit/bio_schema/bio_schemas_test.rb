@@ -98,7 +98,7 @@ class BioSchemaTest < ActiveSupport::TestCase
     assert_equal 'http://project.com', json['url']
     member_json = json['member']
     refute_nil member_json
-    assert_equal 2, member_json.count
+    assert_equal 4, member_json.count # should have institutions and people
 
     expected = { '@type' => 'Person', '@id' => member.rdf_resource, 'name' => member.title }
     assert_equal expected, member_json[0]

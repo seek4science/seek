@@ -14,11 +14,11 @@ class DecoratorTest < ActiveSupport::TestCase
     assert_equal %w[blue green red], decorator.keywords.split(',').collect(&:strip).sort
 
     properties = decorator.attributes.collect(&:property).collect(&:to_s).sort
-    assert_equal ['@id', 'description', 'keywords', 'name', 'url'], properties
+    assert_equal ['@id', 'description', 'image', 'keywords', 'name', 'url'], properties
   end
 
   test 'CreativeWork' do
-    event = Factory(:event)
+    event = Factory(:event, policy: Factory(:public_policy))
     document = Factory(:document, events: [event], license: 'CC-BY-4.0', creators: [Factory(:person)])
     document.add_annotations('yellow, lorry', 'tag', User.first)
     disable_authorization_checks { document.save! }
@@ -36,7 +36,7 @@ class DecoratorTest < ActiveSupport::TestCase
     assert_equal [{ :@type => 'Person', :@id => "http://localhost:3000/people/#{person.id}", :name => person.title }], decorator.all_creators
 
     properties = decorator.attributes.collect(&:property).collect(&:to_s).sort
-    assert_equal ['@id', 'creator', 'dateCreated', 'dateModified', 'description', 'encodingFormat', 'isBasedOn', 'keywords', 'license', 'name', 'producer', 'sdPublisher', 'subjectOf', 'url'], properties
+    assert_equal ['@id', 'creator', 'dateCreated', 'dateModified', 'description', 'encodingFormat', 'image', 'isBasedOn', 'isPartOf', 'keywords', 'license', 'name', 'producer', 'sdPublisher', 'subjectOf', 'url', 'version'].sort, properties.sort
   end
 
   test 'Dataset pads or truncates description' do
