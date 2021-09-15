@@ -18,7 +18,9 @@ class ProjectsController < ApplicationController
   before_action :auth_to_create, only: %i[new create,:administer_create_project_request, :respond_create_project_request]
   before_action :is_user_admin_auth, only: %i[manage destroy]
   before_action :editable_by_user, only: %i[edit update]
+  before_action :check_investigations_are_for_this_project, only: %i[update]
   before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles update_members storage_report administer_join_request respond_join_request]
+
   before_action :member_of_this_project, only: [:asset_report], unless: :admin_logged_in?
 
   before_action :validate_message_log_for_join, only: [:administer_join_request, :respond_join_request]
@@ -372,9 +374,32 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def order_investigations
+    @project = Project.find(params[:id])
+    respond_to do |format|
+      format.html
+    end
+  end
+
   # PUT /projects/1   , polymorphic: [:organism]
   # PUT /projects/1.xml
   def update
+    if params[:project][:ordered_investigation_ids]
+      a1 = params[:project][:ordered_investigation_ids]
+      a1.permit!
+      pos = 0
+      a1.each_pair do |key, value |
+        investigation = Investigation.find (value)
+        investigation.position = pos
+        pos += 1
+        investigation.save!
+      end
+      respond_to do |format|
+        format.html { redirect_to(@project) }
+      end
+      return
+    end
+
     if @project.can_manage?(current_user)
       @project.default_policy = (@project.default_policy || Policy.default).set_attributes_with_sharing(policy_params) if params[:policy_attributes]
     end
@@ -633,6 +658,25 @@ class ProjectsController < ApplicationController
 
     params.require(:project).permit(permitted_params)
   end
+
+  def check_investigations_are_for_this_project
+    project_id = params[:id]
+    if params[:project][:ordered_investigation_ids]
+      a1 = params[:project][:ordered_investigation_ids]
+      a1.permit!
+      valid = true
+      a1.each_pair do |key, value |
+        a = Investigation.find (value)
+        valid = valid && a.projects.detect(@project)
+      end
+      unless valid
+        error("Each ordered #{"Investigation"} must be associated with the Project", "is invalid (invalid #{"Investigation"})")
+        return false
+      end
+    end
+    return true
+  end
+
 
   def add_and_remove_members_and_institutions
     groups_to_remove = params[:group_memberships_to_remove] || []

@@ -12,7 +12,8 @@
       "title": "A Maximal Study",
       "description": "The Study of many things",
       "experimentalists": "Wet lab people",
-      "other_creators": "Marie Curie",      
+      "other_creators": "Marie Curie",
+      "position": null,
       "discussion_links": [{
         "id": 55,
         "url": "http://www.slack.com/",

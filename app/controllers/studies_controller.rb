@@ -12,6 +12,8 @@ class StudiesController < ApplicationController
 
   before_action :check_assays_are_not_already_associated_with_another_study, only: %i[create update]
 
+  before_action :check_assays_are_for_this_study, only: %i[update]
+
   include Seek::Publishing::PublishingCommon
   include Seek::AnnotationCommon
   include Seek::IsaGraphExtensions
@@ -42,20 +44,42 @@ class StudiesController < ApplicationController
     end
   end
 
+  def order_assays
+    @study = Study.find(params[:id])
+    respond_to do |format|
+      format.html
+    end
+  end
+
   def update
     @study = Study.find(params[:id])
-    @study.attributes = study_params
-    update_sharing_policies @study
-    update_relationships(@study, params)
+    if params[:study][:ordered_assay_ids]
+      a1 = params[:study][:ordered_assay_ids]
+      a1.permit!
+      pos = 0
+      a1.each_pair do |key, value |
+        assay = Assay.find (value)
+        assay.position = pos
+        pos += 1
+        assay.save!
+      end
+      respond_to do |format|
+         format.html { redirect_to(@study) }
+       end
+    else
+      @study.attributes = study_params
+      update_sharing_policies @study
+      update_relationships(@study, params)
 
-    respond_to do |format|
-      if @study.save
-        flash[:notice] = "#{t('study')} was successfully updated."
-        format.html { redirect_to(@study) }
-        format.json {render json: @study, include: [params[:include]]}
-      else
-        format.html { render action: 'edit', status: :unprocessable_entity }
-        format.json { render json: json_api_errors(@study), status: :unprocessable_entity }
+      respond_to do |format|
+        if @study.save
+          flash[:notice] = "#{t('study')} was successfully updated."
+          format.html { redirect_to(@study) }
+          format.json {render json: @study, include: [params[:include]]}
+        else
+          format.html { render action: 'edit', status: :unprocessable_entity }
+          format.json { render json: json_api_errors(@study), status: :unprocessable_entity }
+        end
       end
     end
   end
@@ -90,9 +114,27 @@ class StudiesController < ApplicationController
     end
   end  
 
-  def check_assays_are_not_already_associated_with_another_study
-    assay_ids = params[:study][:assay_ids]
+  def check_assays_are_for_this_study
     study_id = params[:id]
+    if params[:study][:ordered_assay_ids]
+      a1 = params[:study][:ordered_assay_ids]
+      a1.permit!
+      valid = true
+      a1.each_pair do |key, value |
+        a = Assay.find (value)
+        valid = valid && !a.study.nil? && a.study_id.to_s == study_id
+      end
+      unless valid
+        error("Each ordered #{t('assays.assay')} must be associated with the Study", "is invalid (invalid #{t('assays.assay')})")
+        return false
+      end
+    end
+    return true
+  end
+
+  def check_assays_are_not_already_associated_with_another_study
+    study_id = params[:id]
+    assay_ids = params[:study][:assay_ids]
     if assay_ids
       valid = !assay_ids.detect do |a_id|
         a = Assay.find(a_id)
@@ -301,7 +343,7 @@ class StudiesController < ApplicationController
 
   def study_params
     params.require(:study).permit(:title, :description, :experimentalists, :investigation_id,
-                                  :other_creators, { creator_ids: [] }, { scales: [] }, { publication_ids: [] },
+                                  :other_creators, :position, { creator_ids: [] }, { scales: [] }, { publication_ids: [] },
                                   { discussion_links_attributes:[:id, :url, :label, :_destroy] },
                                   { custom_metadata_attributes: determine_custom_metadata_keys })
   end

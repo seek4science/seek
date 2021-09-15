@@ -14,7 +14,12 @@
           <%= investigation_link(@study.investigation) %>
         </p>
 
-        <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @study}%>        
+        <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @study}%>
+
+        <p id="position">
+          <b><%= "Study position" %>: </b>
+          <%= @study.position %>
+        </p>
 
         <% unless @study.experimentalists.blank? %>
           <p>

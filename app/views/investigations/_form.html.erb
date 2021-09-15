@@ -14,6 +14,11 @@
 
 <%= render :partial => 'projects/project_selector', :locals => {:resource => @investigation,:allow_nil=>false} if show_form_manage_specific_attributes? -%>
 
+<div class="form-group">
+  <%= f.label "Investigation position" -%><br/>
+  <%= f.number_field :position, :rows => 5, :class=>"form-control"  -%>
+</div>
+
 <%= render partial: 'custom_metadata/custom_metadata_attribute_input', locals:{f:f,resource:@investigation} %>
 
 <%= render :partial => "scales/scales_selector",:locals=>{:object=>@investigation} if show_scales? %>
