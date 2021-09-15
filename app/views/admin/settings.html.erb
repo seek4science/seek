@@ -58,11 +58,11 @@
                              class: 'form-control', source: Seek::License::OPENDEFINITION[:data])
     end %>
 
-    <%= admin_setting_block('Recommended data Licenses', "The licenses to recommend when a data asset is created.") do
+    <%= admin_setting_block('Recommended data licenses', "The licenses to recommend when data, such as a #{t('data_file')} or #{t('document')}, is registered.") do
 	select_tag :recommended_data_licenses, options_for_select(Seek::License::OPENDEFINITION[:data].map { |l| [l['title'], l['id']]}, Seek::Config.recommended_data_licenses), multiple: true, class: 'form-control'
     end %>
 
-    <%= admin_setting_block('Recommended software Licenses', "The licenses to recommend when a software asset is created.") do
+    <%= admin_setting_block('Recommended software licenses', "The licenses to recommend when software such as a #{t('workflow')}, is registered.") do
 	select_tag :recommended_software_licenses, options_for_select(Seek::License::OPENDEFINITION[:software].map { |l| [l['title'], l['id']]}, Seek::Config.recommended_software_licenses), multiple: true, class: 'form-control'
     end %>
 
