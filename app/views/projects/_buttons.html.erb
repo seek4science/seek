@@ -1,3 +1,6 @@
+<% if Seek::Config.project_single_page_enabled && logged_in_and_registered? && current_user.person.member_of?(item) %>
+    <%= button_link_to("Single Page", 'sop', single_page_path(item.id)) -%>
+<% end -%>
 <% if Seek::Config.project_browser_enabled && logged_in_and_registered? && current_user.person.member_of?(item) %>
     <%= button_link_to("Organize", 'organise', project_folders_path(item.id)) -%>
 <% end -%>

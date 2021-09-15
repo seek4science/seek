@@ -706,6 +706,11 @@ SEEK::Application.routes.draw do
     end
   end
 
+   ### SINGLE PAGE
+
+  resources :single_pages do
+  end
+
   ### ASSAY AND TECHNOLOGY TYPES ###
 
   get '/assay_types/', to: 'assay_types#show', as: 'assay_types'

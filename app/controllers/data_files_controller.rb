@@ -25,6 +25,9 @@ class DataFilesController < ApplicationController
 
   before_action :login_required, only: [:create, :create_content_blob, :create_metadata, :rightfield_extraction_ajax, :provide_metadata]
 
+  before_action :set_displaying_single_page, only: [:show]
+
+  
   # has to come after the other filters
   include Seek::Publishing::PublishingCommon
 
@@ -323,9 +326,11 @@ class DataFilesController < ApplicationController
     respond_to do |format|
       if handle_upload_data && @data_file.content_blob.save
         session[:uploaded_content_blob_id] = @data_file.content_blob.id
+        format.js
         format.html {}
       else
         session.delete(:uploaded_content_blob_id)
+        format.js
         format.html { render action: :new }
       end
     end
@@ -396,6 +401,7 @@ class DataFilesController < ApplicationController
     @data_file.assay_assets.build(assay_id: @assay.id) if @assay.persisted?
 
     respond_to do |format|
+      format.js
       format.html
     end
   end

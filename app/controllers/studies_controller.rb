@@ -12,6 +12,7 @@ class StudiesController < ApplicationController
 
   before_action :check_assays_are_not_already_associated_with_another_study, only: %i[create update]
 
+  before_action :set_displaying_single_page, only: [:show]
   before_action :check_assays_are_for_this_study, only: %i[update]
 
   include Seek::Publishing::PublishingCommon
@@ -88,7 +89,7 @@ class StudiesController < ApplicationController
     @study = Study.find(params[:id])
 
     respond_to do |format|
-      format.html
+      format.html { render(params[:only_content] ? { layout: false } : {})}
       format.xml
       format.rdf { render template: 'rdf/show' }
       format.json {render json: @study, include: [params[:include]]}
@@ -133,8 +134,8 @@ class StudiesController < ApplicationController
   end
 
   def check_assays_are_not_already_associated_with_another_study
-    study_id = params[:id]
     assay_ids = params[:study][:assay_ids]
+    study_id = params[:id]
     if assay_ids
       valid = !assay_ids.detect do |a_id|
         a = Assay.find(a_id)
