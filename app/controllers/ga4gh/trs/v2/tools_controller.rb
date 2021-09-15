@@ -26,8 +26,8 @@ module Ga4gh
           # Filtering
           workflows = relationify_collection(Workflow.authorized_for('view'))
           workflows = workflows.where(id: tools_index_params[:id]) if tools_index_params[:id].present?
-          workflows = workflows.where('workflows.title LIKE ?', "%#{tools_index_params[:name]}%") if tools_index_params[:name].present?
-          workflows = workflows.where('workflows.description LIKE ?', "%#{tools_index_params[:description]}%") if tools_index_params[:description].present?
+          workflows = workflows.where('LOWER(workflows.title) LIKE ?', "%#{tools_index_params[:name].downcase}%") if tools_index_params[:name].present?
+          workflows = workflows.where('LOWER(workflows.description) LIKE ?', "%#{tools_index_params[:description].downcase}%") if tools_index_params[:description].present?
           workflows = workflows.none if tools_index_params[:toolClass].present? && tools_index_params[:toolClass] != ToolClass::WORKFLOW.name
           if tools_index_params[:descriptorType].present?
             class_key = ToolVersion::DESCRIPTOR_TYPE_MAPPING.invert[tools_index_params[:descriptorType].upcase]

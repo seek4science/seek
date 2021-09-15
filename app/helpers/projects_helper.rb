@@ -141,6 +141,6 @@ module ProjectsHelper
   def request_project_memberhip_pending?(project)
     return nil unless logged_in?
     return nil if project.has_member?(current_user)
-    MessageLog.recent_project_membership_requests(current_user.try(:person), project).first
+    ProjectMembershipMessageLog.recent_requests(current_user.try(:person), project).first
   end
 end

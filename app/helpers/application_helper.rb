@@ -474,7 +474,7 @@ module ApplicationHelper
 
   def pending_project_creation_request?
     return false unless logged_in_and_registered?   
-    MessageLog.pending_project_creation_requests.collect do |log|
+    ProjectCreationMessageLog.pending_requests.collect do |log|
       log.can_respond_project_creation_request?(User.current_user)
     end.any?
   end
@@ -483,7 +483,7 @@ module ApplicationHelper
     return false unless project_administrator_logged_in?
     person = User.current_user.person
     projects = person.administered_projects
-    return MessageLog.pending_project_join_requests(projects).any?
+    return ProjectMembershipMessageLog.pending_requests(projects).any?
   end
 
   #whether to show a banner encouraging you to join or create a project

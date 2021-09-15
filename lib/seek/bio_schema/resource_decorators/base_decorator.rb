@@ -78,7 +78,7 @@ module Seek
           def associated_items(**pairs)
             pairs.each do |method, collection|
               define_method(method) do
-                mini_definitions(send(collection))
+                mini_definitions(send(collection)) if respond_to?(collection)
               end
             end
           end
@@ -102,14 +102,21 @@ module Seek
         private
 
         def mini_definitions(collection)
-          return if collection.empty?
-          collection.collect do |item|
-            Seek::BioSchema::ResourceDecorators::Factory.instance.get(item).mini_definition
+          return [] if collection.empty?
+
+          mini_col = []
+          collection.each do |item|
+            next if item.respond_to?(:public?) && !item.public?
+
+            mini_col << Seek::BioSchema::ResourceDecorators::Factory.instance.get(item).mini_definition
           end
+          mini_col
         end
 
         def respond_to_missing?(name, include_private = false)
-          resource.respond_to?(name, include_private) || resource.is_a_version? && resource.parent.respond_to?(name, include_private)
+          resource.respond_to?(name,
+                               include_private) || resource.is_a_version? && resource.parent.respond_to?(name,
+                                                                                                         include_private)
         end
 
         def method_missing(method, *args, &block)

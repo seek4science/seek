@@ -38,14 +38,14 @@ class ProjectsController < ApplicationController
 
   def project_join_requests
     person = current_person
-    @requests = MessageLog.pending_project_join_requests(person.administered_projects)
+    @requests = ProjectMembershipMessageLog.pending_requests(person.administered_projects)
     respond_to do |format|
       format.html
     end
   end
 
   def project_creation_requests
-    @requests = MessageLog.pending_project_creation_requests.select do |r|
+    @requests = ProjectCreationMessageLog.pending_requests.select do |r|
       r.can_respond_project_creation_request?(current_user)
     end
         
@@ -73,12 +73,10 @@ class ProjectsController < ApplicationController
   end
 
   def administer_join_request
-    details = JSON.parse(@message_log.details)
-    @comments = details['comments']
-    @institution = Institution.new(details['institution'])
-    if @institution.id
-      @institution = Institution.find(@institution.id)
-    else
+    details = @message_log.parsed_details
+    @comments = details.comments
+    @institution = details.institution
+    unless @institution.id
       # override with existing institution if already exists with same title, it could have been created since the request was made
       @institution = Institution.find_by(title: @institution.title) if Institution.find_by(title: @institution.title)
     end
@@ -142,7 +140,7 @@ class ProjectsController < ApplicationController
     @comments = params[:comments]
     @projects.each do |project|
       if project.allow_request_membership? # protects against malicious spamming
-        log = MessageLog.log_project_membership_request(current_user.person, project, @institution, @comments)
+        log = ProjectMembershipMessageLog.log_request(sender:current_user.person, project:project, institution:@institution, comments:@comments)
         Mailer.request_join_project(current_user, project, @institution.to_json, @comments, log).deliver_later
       end
     end
@@ -169,9 +167,9 @@ class ProjectsController < ApplicationController
       @programme = Programme.find(params[:programme_id])
       raise "no #{t('programme')} can be found" if @programme.nil?
       if @programme.can_manage?
-        log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
+        log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
       elsif @programme.site_managed?
-        log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
+        log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
         Mailer.request_create_project_for_programme(current_user, @programme, @project.to_json, @institution.to_json, log).deliver_later
         Mailer.request_create_project_for_programme_admins(current_user, @programme, @project.to_json, @institution.to_json, log).deliver_later
         flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
@@ -182,7 +180,7 @@ class ProjectsController < ApplicationController
     elsif Seek::ProjectFormProgrammeOptions.creation_allowed?
       prog_params = params.require(:programme).permit([:title])
       @programme = Programme.new(prog_params)
-      log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
+      log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
       unless User.admin_logged_in?
         Mailer.request_create_project_and_programme(current_user, @programme.to_json, @project.to_json, @institution.to_json, log).deliver_later
       end
@@ -190,7 +188,7 @@ class ProjectsController < ApplicationController
     # No Programme at all
     elsif !Seek::ProjectFormProgrammeOptions.show_programme_box?
       @programme=nil
-      log = MessageLog.log_project_creation_request(current_person, @programme, @project,@institution)
+      log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
       unless User.admin_logged_in?
         Mailer.request_create_project(current_user, @project.to_json, @institution.to_json, log).deliver_later
       end
@@ -703,11 +701,11 @@ class ProjectsController < ApplicationController
   end
 
   def validate_message_log_for_join
-    @message_log = MessageLog.find_by_id(params[:message_log_id])
+    @message_log = ProjectMembershipMessageLog.find_by_id(params[:message_log_id])
 
     error_msg ||= "message log not found" unless @message_log
     error_msg ||= ("message log doesn't match #{t('project')}" if @message_log.subject != @project)
-    error_msg ||= ("incorrect type of message log" unless @message_log.message_type==MessageLog::PROJECT_MEMBERSHIP_REQUEST)
+    error_msg ||= ("incorrect type of message log" unless @message_log.project_membership_request?)
     error_msg ||= ("message has already been responded to" if @message_log.responded?)
 
     if error_msg
@@ -717,10 +715,10 @@ class ProjectsController < ApplicationController
   end
 
   def validate_message_log_for_create
-    @message_log = MessageLog.find_by_id(params[:message_log_id])
+    @message_log = ProjectCreationMessageLog.find_by_id(params[:message_log_id])
     error_msg ||= "you do not have permission to respond to this request" unless @message_log.can_respond_project_creation_request?(current_user)
     error_msg ||= "message log not found" unless @message_log
-    error_msg ||= ("incorrect type of message log" unless @message_log.message_type==MessageLog::PROJECT_CREATION_REQUEST)
+    error_msg ||= ("incorrect type of message log" unless @message_log.project_creation_request?)
     error_msg ||= ("message has already been responded to" if @message_log.responded?)
     
     if error_msg
@@ -731,26 +729,19 @@ class ProjectsController < ApplicationController
   end
 
   def parse_message_log_details
-    details = JSON.parse(@message_log.details)
-    if details['programme']
-      @programme = Programme.new(details['programme'])
-      @programme = Programme.find(@programme.id) unless @programme.id.nil?
-    end
+    details = @message_log.parsed_details
 
-    @project = Project.new(details['project'])
-    @project = Project.find(@project.id) unless @project.id.nil?
+    @programme = details.programme
+    @project = details.project
+    @institution = details.institution
 
-    @institution = Institution.new(details['institution'])
-
-    if @institution.id
-      @institution = Institution.find(@institution.id)
-    else
+    if @institution.new_record?
       # override with existing institution if already exists with same title, it could have been created since the request was made
       @institution = Institution.find_by(title: @institution.title) if Institution.find_by(title: @institution.title)
     end 
   end
 
-  # check programme permissions for responding to a MesasgeLog
+  # check programme permissions for responding to a MessageLog
   def check_message_log_programme_permissions
     error_msg = nil
     return unless @programme || params['programme']
