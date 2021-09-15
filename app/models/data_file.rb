@@ -42,7 +42,7 @@ class DataFile < ApplicationRecord
       joins: [:assays]
   )
 
-  explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi']) do
+  explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi', 'data_type', 'format_type']) do
     include Seek::Data::SpreadsheetExplorerRepresentation
     acts_as_doi_mintable(proxy: :parent, type: 'Dataset', general_type: 'Dataset')
     acts_as_versioned_resource
@@ -100,11 +100,6 @@ class DataFile < ApplicationRecord
   end
 
   def use_mime_type_for_avatar?
-    true
-  end
-
-  # defines that this is a user_creatable object type, and appears in the "New Object" gadget
-  def self.user_creatable?
     true
   end
 

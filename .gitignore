@@ -84,3 +84,6 @@ Test\ Results*.html
 docker-compose.override.yml
 
 .vscode/
+
+.env.*.local
+.env.local

@@ -3,12 +3,11 @@ module Seek
     module ResourceDecorators
       # Decorator that provides extensions for a Workflow
       class Workflow < CreativeWork
-        associated_items sd_publisher: :contributors
+        WORKFLOW_PROFILE = 'https://bioschemas.org/profiles/ComputationalWorkflow/1.0-RELEASE/'.freeze
 
-        schema_mappings sd_publisher: :sdPublisher,
-                        version: :version,
-                        image: :image,
-                        programming_language: :programmingLanguage,
+        FORMALPARAMETER_PROFILE = 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/'.freeze
+
+        schema_mappings programming_language: :programmingLanguage,
                         inputs: :input,
                         outputs: :output
 
@@ -16,34 +15,46 @@ module Seek
           [contributor]
         end
 
+        def conformance
+          WORKFLOW_PROFILE
+        end
+
         def image
           return unless resource.diagram_exists?
+
           diagram_workflow_url(resource, version: resource.version, host: Seek::Config.site_base_host)
         end
 
         def schema_type
-          'ComputationalWorkflow'
+          %w[File SoftwareSourceCode ComputationalWorkflow]
         end
 
         def programming_language
-          resource.workflow_class&.title
+          resource.workflow_class&.ro_crate_metadata
         end
 
         def inputs
-          formal_parameters(resource.inputs)
+          formal_parameters(resource.inputs, 'inputs')
         end
 
         def outputs
-          formal_parameters(resource.outputs)
+          formal_parameters(resource.outputs, 'outputs')
         end
 
         private
 
-        def formal_parameters(properties)
+        def formal_parameters(properties, group_name)
+          wf_name = if title
+                      title.downcase.gsub(/[^0-9a-z]/i, '_')
+                    else
+                      'dummy'
+                    end
           properties.collect do |property|
             {
               "@type": 'FormalParameter',
-              name: property.id
+              "@id": "##{wf_name}-#{group_name}-#{property.id}",
+              name: property.name || property.id,
+              "dct:conformsTo": FORMALPARAMETER_PROFILE
             }
           end
         end

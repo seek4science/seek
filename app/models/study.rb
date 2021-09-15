@@ -4,7 +4,7 @@ class Study < ApplicationRecord
   include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
 
   searchable(:auto_index => false) do
-    text :experimentalists    
+    text :experimentalists
   end if Seek::Config.solr_enabled
 
   belongs_to :investigation
@@ -17,7 +17,7 @@ class Study < ApplicationRecord
 
   has_many :assays
   has_many :assay_publications, through: :assays, source: :publications
-  has_one :external_asset, as: :seek_entity, dependent: :destroy  
+  has_one :external_asset, as: :seek_entity, dependent: :destroy
 
   validates :investigation, presence: { message: "Investigation is blank or invalid" }, projects: true
 
@@ -61,7 +61,7 @@ class Study < ApplicationRecord
 
   def related_publication_ids
     publication_ids | assay_publication_ids
-  end  
+  end
 
   def positioned_assays
     assays.order(position: :asc)

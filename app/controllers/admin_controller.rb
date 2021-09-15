@@ -90,8 +90,10 @@ class AdminController < ApplicationController
     Seek::Config.external_help_url = params[:external_help_url]
 
     Seek::Config.cwl_viewer_url = params[:cwl_viewer_url]
+    Seek::Config.ga4gh_trs_api_enabled = string_to_boolean(params[:ga4gh_trs_api_enabled])
     # Types enabled
     Seek::Config.collections_enabled = string_to_boolean params[:collections_enabled]
+    Seek::Config.data_files_enabled = string_to_boolean params[:data_files_enabled]
     Seek::Config.documents_enabled = string_to_boolean params[:documents_enabled]
     Seek::Config.events_enabled = string_to_boolean params[:events_enabled]
     Seek::Config.isa_enabled = string_to_boolean params[:isa_enabled]
@@ -99,9 +101,11 @@ class AdminController < ApplicationController
     Seek::Config.organisms_enabled = string_to_boolean params[:organisms_enabled]
     Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]
     Seek::Config.programmes_open_for_projects_enabled = string_to_boolean params[:programmes_open_for_projects_enabled]
+    Seek::Config.presentations_enabled = string_to_boolean params[:presentations_enabled]
     Seek::Config.publications_enabled = string_to_boolean params[:publications_enabled]
     Seek::Config.samples_enabled = string_to_boolean params[:samples_enabled]
-    Seek::Config.workflows_enabled = string_to_boolean params[:workflows_enabled]    
+    Seek::Config.sops_enabled = string_to_boolean params[:sops_enabled]
+    Seek::Config.workflows_enabled = string_to_boolean params[:workflows_enabled]
 
     Seek::Config.google_analytics_tracker_id = params[:google_analytics_tracker_id]
     Seek::Config.google_analytics_enabled = string_to_boolean params[:google_analytics_enabled]
@@ -129,11 +133,16 @@ class AdminController < ApplicationController
     Seek::Config.copasi_enabled = string_to_boolean(params[:copasi_enabled])
 
     Seek::Config.nels_enabled = string_to_boolean(params[:nels_enabled])
-    Seek::Config.nels_client_id = params[:nels_client_id].try(:strip)
-    Seek::Config.nels_client_secret = params[:nels_client_secret].try(:strip)
-    Seek::Config.nels_api_url = params[:nels_api_url].blank? ? nil : params[:nels_api_url].strip.chomp('/')
-    Seek::Config.nels_oauth_url = params[:nels_oauth_url].blank? ? nil : params[:nels_oauth_url].strip.chomp('/')
-    Seek::Config.nels_permalink_base = params[:nels_permalink_base].try(:strip)
+    Seek::Config.nels_client_id = params[:nels_client_id]&.strip
+    Seek::Config.nels_client_secret = params[:nels_client_secret]&.strip
+    Seek::Config.nels_api_url = params[:nels_api_url]&.strip&.chomp('/')
+    Seek::Config.nels_oauth_url = params[:nels_oauth_url]&.strip&.chomp('/')
+    Seek::Config.nels_permalink_base = params[:nels_permalink_base]&.strip
+
+    Seek::Config.life_monitor_enabled = string_to_boolean(params[:life_monitor_enabled])
+    Seek::Config.life_monitor_url = params[:life_monitor_url]&.strip&.chomp('/')
+    Seek::Config.life_monitor_client_id = params[:life_monitor_client_id]&.strip
+    Seek::Config.life_monitor_client_secret = params[:life_monitor_client_secret]&.strip
 
     time_lock_doi_for = params[:time_lock_doi_for]
     time_lock_is_integer = only_integer time_lock_doi_for, 'time lock doi for'
@@ -167,6 +176,8 @@ class AdminController < ApplicationController
     tag_threshold = params[:tag_threshold]
     Seek::Config.tag_threshold = tag_threshold if only_integer tag_threshold, 'tag threshold'
     Seek::Config.max_visible_tags = max_visible_tags if only_positive_integer max_visible_tags, 'maximum visible tags'
+    Seek::Config.tag_cloud_enabled = string_to_boolean params[:tag_cloud_enabled]
+    Seek::Config.workflow_class_list_enabled = string_to_boolean params[:workflow_class_list_enabled]
 
     update_redirect_to (is_entries_integer && (only_integer tag_threshold, 'tag threshold') && (only_positive_integer max_visible_tags, 'maximum visible tags')), 'home_settings'
   end

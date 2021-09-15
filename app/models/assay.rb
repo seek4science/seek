@@ -188,10 +188,6 @@ class Assay < ApplicationRecord
     human_diseases.collect(&:searchable_terms).flatten
   end
 
-  def self.user_creatable?
-    Seek::Config.assays_enabled
-  end
-
   # Associates and organism with the assay
   # organism may be either an ID or Organism instance
   # strain_id should be the id of the strain

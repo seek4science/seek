@@ -255,7 +255,7 @@ class ApplicationController < ActionController::Base
             else
               flash[:error] = "You are not authorized to #{privilege} this #{name.humanize}."
             end
-            redirect_to(object)
+            handle_authorization_failure_redirect(object, privilege)
           else
             render template: 'general/landing_page_for_hidden_item', locals: { item: object }, status: :forbidden
           end
@@ -268,6 +268,10 @@ class ApplicationController < ActionController::Base
       end
       return false
     end
+  end
+
+  def handle_authorization_failure_redirect(object, privilege)
+    redirect_to(object)
   end
 
   def auth_to_create
@@ -601,6 +605,22 @@ class ApplicationController < ActionController::Base
       if parent_class
         @parent_resource = parent_class.find(params[parent_id_param])
       end
+    end
+  end
+
+  def managed_programme_configured?
+    unless Programme.managed_programme
+      error("No managed #{t('programme')} is configured","No managed #{t('programme')} is configured")
+      return false
+    end
+  end
+
+  # This is a silly method to turn an Array of AR objects back into an AR relation so we can do joins etc. on it.
+  def relationify_collection(collection)
+    if collection.is_a?(Array)
+      controller_model.where(id: collection.map(&:id))
+    else
+      collection
     end
   end
 

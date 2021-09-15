@@ -48,7 +48,7 @@ Factory.define(:max_collection, class: Collection) do |f|
         Factory(:collection_item, comment: 'Bad data', collection: c, asset: Factory(:data_file, policy: Factory(:private_policy), title: 'Readme'))
     ]
   end
-  f.other_creators 'Blogs, Joe'
+  f.other_creators 'Joe Bloggs'
 end
 
 # CollectionItem
