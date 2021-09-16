@@ -102,8 +102,6 @@ module LicenseHelper
 
   def group_licenses(opts)
     
-    puts opts[:recommended]
-    puts opts.keys
     grouped = license_values(opts).group_by do |l|
       if opts[:recommended]&.include?(l['id'])
         'Recommended'
