@@ -4437,6 +4437,40 @@
                 }
             }
         },
+        "assetsCreator": {
+            "type": "object",
+            "properties": {
+                "pos": {
+                    "type": "integer"
+                },
+                "profile": {
+                    "$ref": "#/definitions/uriString"
+                },
+                "given_name": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "family_name": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "orcid": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "affiliation": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                }
+            },
+            "required": [
+                "given_name",
+                "family_name"
+            ]
+        },
+        "assetsCreatorsList": {
+            "type": "array",
+            "minItems": 0,
+            "items": {
+                "$ref": "#/definitions/assetsCreator"
+            }
+        },
         "nonEmptyProjectPositionsList": {
             "type": "array",
             "minItems": 1,
@@ -4822,6 +4856,9 @@
                 },
                 "other_creators": {
                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                },
+                "creators": {
+                    "$ref": "#/definitions/assetsCreatorsList"
                 }
             },
             "required": [
@@ -4907,6 +4944,9 @@
                 },
                 "other_creators": {
                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                },
+                "creators": {
+                    "$ref": "#/definitions/assetsCreatorsList"
                 }
             },
             "required": [
@@ -6286,6 +6326,9 @@
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
                                 },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
+                                },
                                 "assay_class": {
                                     "type": "object",
                                     "properties": {
@@ -6454,6 +6497,9 @@
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
                                 },
+                                "creators":{
+                                    "$ref": "#/definitions/assetsCreatorsList"
+                                },
                                 "assay_class": {
                                     "type": "object",
                                     "properties": {
@@ -6579,6 +6625,9 @@
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
                                 },
+                                "creators":{
+                                    "$ref": "#/definitions/assetsCreatorsList"
+                                },
                                 "assay_class": {
                                     "type": "object",
                                     "properties": {
@@ -6699,6 +6748,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 }
                             },
                             "required": [
@@ -6771,6 +6823,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 }
                             },
                             "additionalProperties": false
@@ -7022,6 +7077,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 }
                             },
                             "required": [
@@ -7103,6 +7161,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 }
                             },
                             "additionalProperties": false
@@ -7258,6 +7319,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 }
                             },
                             "required": [
@@ -7333,6 +7397,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 }
                             },
                             "additionalProperties": false
@@ -7854,6 +7921,9 @@
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
                                 },
+                                "creators":{
+                                    "$ref": "#/definitions/assetsCreatorsList"
+                                },
                                 "policy": {
                                     "$ref": "#/definitions/policy"
                                 }
@@ -7966,6 +8036,9 @@
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
                                 },
+                                "creators":{
+                                    "$ref": "#/definitions/assetsCreatorsList"
+                                },
                                 "policy": {
                                     "$ref": "#/definitions/policy"
                                 }
@@ -8023,6 +8096,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators":{
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 },
                                 "policy": {
                                     "$ref": "#/definitions/policy"
@@ -8183,6 +8259,9 @@
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
                                 },
+                                "creators":{
+                                    "$ref": "#/definitions/assetsCreatorsList"
+                                },
                                 "model_type": {
                                     "$ref": "#/definitions/nullableNonEmptyString"
                                 },
@@ -8269,6 +8348,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators":{
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 },
                                 "model_type": {
                                     "$ref": "#/definitions/nullableNonEmptyString"
@@ -8791,6 +8873,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 }
                             },
                             "required": [
@@ -8869,6 +8954,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 }
                             },
                             "additionalProperties": false
@@ -9671,6 +9759,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 }
                             },
                             "required": [
@@ -9746,6 +9837,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 }
                             },
                             "additionalProperties": false
@@ -9810,7 +9904,10 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
-                                },                                
+                                },
+                                "creators":{
+                                    "$ref": "#/definitions/assetsCreatorsList"
+                                },
                                 "policy": {
                                     "$ref": "#/definitions/policy"
                                 }
@@ -9922,7 +10019,10 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
-                                },                                
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
+                                },
                                 "policy": {
                                     "$ref": "#/definitions/policy"
                                 }
@@ -9993,7 +10093,10 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
-                                },                                
+                                },
+                                "creators":{
+                                        "$ref": "#/definitions/assetsCreatorsList"
+                                },
                                 "policy": {
                                     "$ref": "#/definitions/policy"
                                 }
@@ -10124,6 +10227,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 },
                                 "internals": {
                                     "type": "object",
@@ -10288,6 +10394,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 }
                             },
                             "required": [
@@ -10380,6 +10489,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 }
                             },
                             "additionalProperties": false
