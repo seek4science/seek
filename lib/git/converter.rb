@@ -15,8 +15,15 @@ module Git
                                                  version: version.version,
                                                  name: "Version #{version.version}",
                                                  comment: version.revision_comments,
-                                                 created_at: version.created_at)
-          git_version.resource_attributes = version.attributes.slice(asset.class.versioned_columns)
+                                                 doi: version.doi,
+                                                 contributor_id: version.contributor_id,
+                                                 visibility: version.visibility,
+                                                 created_at: version.created_at,
+                                                 updated_at: version.updated_at)
+          attribute_keys = asset.class.versioned_columns.map(&:name)
+          attribute_keys.delete('revision_comments')
+          attribute_keys.delete('contributor_id')
+          git_version.set_resource_attributes(version.attributes.slice(*attribute_keys))
           path_io_url_triples = []
           version.all_content_blobs.map do |blob|
             if unzip && blob.original_filename.end_with?('.zip')

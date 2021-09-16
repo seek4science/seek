@@ -20,7 +20,7 @@ class Workflow < ApplicationRecord
 
   has_and_belongs_to_many :sops
 
-  git_versioning do
+  git_versioning(sync_ignore_columns: ['test_status']) do
     include WorkflowExtraction
 
     acts_as_doi_mintable(proxy: :parent, general_type: 'Workflow')

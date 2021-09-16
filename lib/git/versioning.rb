@@ -90,6 +90,7 @@ module Git
         end
         base.const_set(klass, Class.new(::Git::Version))
         git_version_class.class_eval(&extension) if block_given?
+        git_version_class.git_sync_ignore_attributes = options[:sync_ignore_columns] || []
       end
     end
   end

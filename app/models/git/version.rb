@@ -1,5 +1,9 @@
 module Git
   class Version < ApplicationRecord
+    # Attributes that should not be copied in from parent resource
+    SYNC_IGNORE_ATTRIBUTES = %w(id version doi visibility created_at updated_at).freeze
+    cattr_accessor :git_sync_ignore_attributes
+
     belongs_to :resource, polymorphic: true
     belongs_to :contributor, class_name: 'Person'
     belongs_to :git_repository, class_name: 'Git::Repository'
@@ -64,7 +68,7 @@ module Git
         return false
       end
 
-      self.resource_attributes = resource.attributes
+      self.set_resource_attributes(resource.attributes)
       self.mutable = false
       self.ref = git_base.tags.create(unique_git_tag, commit).canonical_name
       save!
@@ -161,7 +165,7 @@ module Git
       git_version.comment = nil
       git_version.ref = nil
       git_version.version = (version + 1)
-      git_version.resource_attributes = resource.attributes
+      git_version.set_resource_attributes(resource.attributes)
       git_version.assign_attributes(extra_attributes)
       git_version.git_annotations = git_annotations.map(&:dup)
       git_version
@@ -176,7 +180,8 @@ module Git
     end
 
     def sync_resource_attributes
-      update_attribute(:resource_attributes, resource.attributes)
+      set_resource_attributes(resource.attributes)
+      save(validate: false)
     end
 
     def remote_sources= hash
@@ -202,6 +207,14 @@ module Git
       end
 
       h
+    end
+
+    def set_resource_attributes(attrs)
+      self.resource_attributes = attrs.with_indifferent_access.except(*self.class.sync_ignore_attributes)
+    end
+
+    def self.sync_ignore_attributes
+      git_sync_ignore_attributes + SYNC_IGNORE_ATTRIBUTES
     end
 
     private

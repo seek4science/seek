@@ -136,4 +136,60 @@ class GitConverterTest < ActiveSupport::TestCase
     assert_equal 'https://www.abc.com/workflow.cwl', ann.first.value
     assert_equal 'https://www.abc.com/workflow.cwl', workflow.latest_git_version.remote_sources['rp2-to-rp2path.cwl']
   end
+
+  test 'ensure version metadata is ported correctly' do
+    workflow = Factory(:cwl_workflow, license: 'CC0-1.0',
+                       title: 'First Title',
+                       description: '123',
+                       maturity_level: :work_in_progress,
+                       other_creators: 'Dave')
+    v1 = workflow.latest_version
+    v2 = nil
+    disable_authorization_checks do
+      v1.update_attributes(visibility: :private)
+      Factory(:cwl_content_blob, asset: workflow, asset_version: 2)
+      workflow.save_as_new_version
+      v2 = workflow.latest_version
+      v2.update_attributes(doi: '10.81082/dev-workflowhub.workflow.136.1',
+                           license: 'CC-BY-4.0',
+                           title: 'Second Title',
+                           description: 'abcxyz',
+                           maturity_level: :released,
+                           visibility: :public,
+                           other_creators: 'Steve')
+    end
+
+    converter = Git::Converter.new(workflow)
+    assert_difference('Git::Version.count', 2) do
+      converter.convert(unzip: true)
+    end
+
+    assert workflow.local_git_repository
+    assert_equal 2, workflow.git_versions.count
+    gv1 = workflow.git_versions.first
+    gv2 = workflow.git_versions.last
+
+    assert_nil v1.doi
+    assert_equal 'CC0-1.0', gv1.license
+    assert_equal 'First Title', gv1.title
+    assert_equal '123', gv1.description
+    assert_equal 'Dave', gv1.other_creators
+    assert_equal :work_in_progress, gv1.maturity_level
+    assert_equal :private, gv1.visibility
+
+    assert_equal '10.81082/dev-workflowhub.workflow.136.1', gv2.doi
+    assert_equal 'CC-BY-4.0', gv2.license
+    assert_equal 'Second Title', gv2.title
+    assert_equal 'abcxyz', gv2.description
+    assert_equal 'Steve', gv2.other_creators
+    assert_equal :released, gv2.maturity_level
+    assert_equal :public, gv2.visibility
+
+    keys = gv2.resource_attributes.keys.map(&:to_s)
+    assert_not_includes keys, 'id'
+    assert_not_includes keys, 'created_at'
+    assert_not_includes keys, 'updated_at'
+    assert_not_includes keys, 'version'
+    assert_not_includes keys, 'doi'
+  end
 end
