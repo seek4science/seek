@@ -11,9 +11,6 @@
     <li role="presentation" <%= 'class="active"'.html_safe if tab == 'manual' -%>>
       <a href="#manual" aria-controls="from-template" role="tab" data-toggle="tab">Form</a>
     </li>
-     <li role="presentation" <%= 'class="active"'.html_safe if tab == 'from-existing-templates' -%>>
-      <a href="#from-existing-templates" aria-controls="from-existing-templates" role="tab" data-toggle="tab">Based on repositories templates</a>
-    </li>
   </ul>
 
   <%= render partial: 'templates/form', locals: { tab: tab } %>
