@@ -7,6 +7,7 @@ namespace :seek do
   task :populate_templates => :environment do
     begin
       Template.delete_all
+      TemplateAttribute.delete_all
       SampleControlledVocab.delete_all
       SampleControlledVocabTerm.delete_all
 
@@ -34,7 +35,7 @@ namespace :seek do
             level: metadata["level"],
             projects:[project]})
 
-            policy = Policy.default
+            policy = Policy.public_policy
             policy.save
             repo.policy_id = policy.id
             repo.update_column(:policy_id,policy.id)
@@ -86,7 +87,8 @@ namespace :seek do
                 description: attribute["description"],
                 sample_controlled_vocab_id: scv.blank? ? nil : scv.id,
                 template_id: repo.id,
-                sample_attribute_type_id: is_ontology ? 23 : is_CV ? 18 : 7 #Based on sample_attribute_type table
+                sample_attribute_type_id: is_ontology ? get_sample_attribute_type("Ontology") : is_CV ? 
+                get_sample_attribute_type("Controlled Vocabulary") : get_sample_attribute_type("Text") #Based on sample_attribute_type table
               })
 
             end
@@ -97,5 +99,9 @@ namespace :seek do
     rescue Exception => e
       puts e
     end
+  end
+
+  def get_sample_attribute_type(title)
+    SampleAttributeType.where(title: title).first.id
   end
 end
