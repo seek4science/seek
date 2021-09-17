@@ -16,23 +16,23 @@ module TemplatesHelper
   end
 
   def load_templates
-    source_list = []
-    Template.all().order(:group, :group_order).each do |item|
-      source_list.push({ title: item.title, type: item.level, group: item.group,
-        template_id: item.id, attributes: 
-        item.template_attributes.map do |attribute|
+    Template.all().order(:group, :group_order).map { |item|
+      { title: item.title, type: item.level, group: item.group,
+        organism: item.organism, template_id: item.id, level: item.level,
+        description: item.description, attributes: 
+        item.template_attributes.map { |attribute|
           { 
             attribute_type_id: attribute.sample_attribute_type_id,
             cv_id: attribute.sample_controlled_vocab_id,
             title: attribute.title,
-            shortName: attribute.short_name,
+            short_name: attribute.short_name,
             description: attribute.description,
-            required: attribute.required 
+            required: attribute.required,
+            unit_id: attribute.unit_id 
           }
-        end
-      })
-    end
-    source_list
+        }
+      }
+    }
   end
   
 end

@@ -1,9 +1,14 @@
 class TemplatesController < ApplicationController
     respond_to :html
+
     include Seek::IndexPager
-    before_action :find_template, only: [:show]
+    include Seek::AssetsCommon
+  
+    before_action :find_template, only: [:show, :destroy, :edit, :update]
     before_action :find_assets, only: [:index]
     before_action :auth_to_create, only: [:new, :create]
+    before_action :find_and_authorize_requested_item,:only=>[:manage, :manage_update, :show]
+
 
   
     def show
@@ -20,7 +25,9 @@ class TemplatesController < ApplicationController
   
     def create
       @template = Template.new(template_params)
+      update_sharing_policies @template
       @template.contributor = User.current_user.person
+      
       @tab = 'manual'
   
       respond_to do |format|
@@ -28,6 +35,24 @@ class TemplatesController < ApplicationController
           format.html { redirect_to @template, notice: 'Template was successfully created.' }
         else
           format.html { render action: 'new' }
+        end
+      end
+    end
+
+    def edit
+      respond_with(@template)
+    end
+
+    def update
+      @template.update_attributes(template_params)
+      @template.resolve_inconsistencies
+      respond_to do |format|
+        if @template.save
+          format.html { redirect_to @template, notice: 'Template was successfully updated.' }
+          format.json {render json: @template, include: [params[:include]]}
+        else
+          format.html { render action: 'edit', status: :unprocessable_entity }
+          format.json { render json: @template.errors, status: :unprocessable_entity}
         end
       end
     end
@@ -41,13 +66,15 @@ class TemplatesController < ApplicationController
       end
       end
     end
+
+    def manage; end
   
     private
   
     def template_params
-      params.require(:template).permit(:title, :description, :tags, :template_id,
+      params.require(:template).permit(:title, :description, :tags, :template_id, :group, :level, :organism,
                                           { project_ids: [],
-                                            template_attributes_attributes: [:id, :title, :required,
+                                            template_attributes_attributes: [:id, :title, :required, :description,
                                                                           :sample_attribute_type_id, :isa_tag_id,
                                                                           :sample_controlled_vocab_id,
                                                                           :unit_id, :_destroy]})

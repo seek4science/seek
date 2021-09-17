@@ -1,59 +1,80 @@
-<% attribute ||= nil %>
+<% template_attribute ||= nil %>
 <% index ||= 'replace-me' %>
-<% id = attribute ? attribute.id : '' %>
-<% title = attribute ? attribute.title : '' %>
-<% required = attribute ? attribute.required : false %>
-<% attribute_type_id = attribute ? attribute.sample_attribute_type_id : nil %> 
-<% sample_controlled_vocab_id = attribute ? attribute.sample_controlled_vocab_id : nil %>
+<% id = template_attribute ? template_attribute.id : '' %>
+<% title = template_attribute ? template_attribute.title : '' %>
+<% description = template_attribute ? template_attribute.description : '' %>
+<% pos = template_attribute ? template_attribute.pos : '' %>
+<% required = template_attribute ? template_attribute.required : false %>
+<% allow_attribute_removal = !required  %>
+
+<% attribute_type_id = template_attribute ? template_attribute.sample_attribute_type_id : nil %>
+<% sample_controlled_vocab_id = template_attribute ? template_attribute.sample_controlled_vocab_id : nil %>
+
+<% unit_id = template_attribute ? template_attribute.unit_id : nil %>
+
 <% field_name_prefix = "template[template_attributes_attributes][#{index}]" %> 
 
-<tr class="sample-attribute <%= 'success' if attribute.nil? -%>" data-index="<%= index-%>">
+<tr class="sample-attribute <%= 'success' if template_attribute.nil? -%>" data-index="<%= index-%>">
+  <th scope="row" class="attribute-position">
+    <div class="btn btn-info attribute-handle">
+      <span class="glyphicon glyphicon-sort" aria-hidden="true"></span>
+      <span class="attribute-position-label"><%= pos %></span>
+    </div>
+    <%= hidden_field_tag "#{field_name_prefix}[pos]", pos, readonly: true %>
+  </th>
   <td>
     <%= text_field_tag "#{field_name_prefix}[title]", title, class: 'form-control',
-                       placeholder: 'Attribute name' %>
+                       placeholder: 'Attribute name', id: "template_attribute_title" %>
   </td>
   <td class="text-center">
     <div class="checkbox-inline">
       <%= hidden_field_tag "#{field_name_prefix}[required]", '0' %>
-      <%= check_box_tag "#{field_name_prefix}[required]", '1', required %>
+      <%= check_box_tag "#{field_name_prefix}[required]", '1', required, id: "template_attribute_required" %>
     </div>
   </td>
   <td>
     <%= select_tag "#{field_name_prefix}[sample_attribute_type_id]",
-                   options_for_select(SampleAttributeType.all.sort_by { |t| t.default? ? 0 : 1 }.map { |t| [t.title, t.id,{'data-is-cv'=>t.controlled_vocab?, 'data-is-seek-sample'=>t.seek_sample? }] },
-                                      attribute_type_id),
-                   class: 'form-control sample-type-attribute-type'%>
-    <div class='controlled-vocab-block' style="<%= 'display:none;' unless attribute.try(:controlled_vocab?) %>">
+                   options_for_select(SampleAttributeType.all.sort_by { |t| t.default? ? 0 : 1 }.map { |t| [t.title, t.id,{'data-is-cv'=>t.controlled_vocab?}] }, attribute_type_id),
+                   class: 'form-control sample-type-attribute-type', id: "template_attribute_type" %>
+
+    <div class='controlled-vocab-block' style="<%= 'display:none;' unless template_attribute.try(:controlled_vocab?) %>">
       <br/>
       <%= select_tag "#{field_name_prefix}[sample_controlled_vocab_id]",
                      options_for_select(SampleControlledVocab.all.map { |t| [t.title, t.id, {'data-editable'=>t.can_edit?}] },
-                                        sample_controlled_vocab_id),
-                     include_blank: true,
-                     class: 'form-control controlled-vocab-selection'%>
+                      sample_controlled_vocab_id),include_blank: true,
+                     class: 'form-control controlled-vocab-selection' , id: "template_attribute_cv_id" %>
 
       <%= button_link_to('Edit', 'edit', '#', class:'cv-edit-button', disabled: true, target: :_blank) %>        
-      <%= create_sample_controlled_vocab_modal_button %>
+      <%= create_sample_controlled_vocab_modal_button  %>
 
       <%= button_link_to('View current', 'show', '#', class:'cv-show-button', disabled: true, target: :_blank) %>
       <%= button_link_to('Browse', 'index', sample_controlled_vocabs_path, target: :_blank) %>
 
     </div>
-    <div class='sample-type-block' style="<%= 'display:none;' unless attribute.try(:seek_sample?) %>">
-      <br/>
-    </div>
+
+  </td>
+  <td>
+    <%= select_tag "#{field_name_prefix}[unit_id]",
+                   options_for_select(Unit.order(:order).map { |u| ["#{u.symbol} #{u.title}", "#{u.id}"] },
+                   unit_id),include_blank: true, class: 'form-control' , id: "template_attribute_unit" %>
+  </td>
+  <td>
+    <%= text_field_tag "#{field_name_prefix}[description]", description, class: 'form-control',
+                       placeholder: 'Description', id: "template_attribute_description" %>
   </td>
 
   <td>
-      <div class="btn-group" data-toggle="buttons">
-        <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', autocomplete: 'off' %>
-        <label class="btn btn-danger">
-          Remove
-          <%= check_box_tag "#{field_name_prefix}[_destroy]", '1', false,
-                            class: 'destroy-attribute', autocomplete: 'off',id:"#{field_name_prefix}-checkbox[_destroy]" %>
-        </label>
-      </div>
+    <div class="btn-group" data-toggle="buttons">
+      <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', autocomplete: 'off' %>
+      <label class="btn btn-danger">
+        Remove
+        <%= check_box_tag "#{field_name_prefix}[_destroy]", '1', false,
+                          class: 'destroy-attribute', autocomplete: 'off',id:"#{field_name_prefix}-checkbox[_destroy]" %>
+      </label>
+    </div>
   </td>
-  <% if attribute %>
+
+  <% if template_attribute %>
       <%= hidden_field_tag("#{field_name_prefix}[id]", id) %>
   <% end %>
 </tr>

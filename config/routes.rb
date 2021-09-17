@@ -705,6 +705,8 @@ SEEK::Application.routes.draw do
   resources :templates do
     resources :projects, only: [:index]
     member do
+      get :manage
+      patch :manage_update
     end
   end
 
