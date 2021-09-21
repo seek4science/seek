@@ -9,7 +9,7 @@
     font-weight: normal;
     float: right;
     text-align: right;
-    padding-right: 35px;
+    padding-right: 45px;
     position: absolute;
     pointer-events: none
 }
@@ -59,7 +59,8 @@
     margin-bottom: 5px;
     border-radius: 5px;
     padding: 15px;
-    border: #ddd solid 1px
+    border: #ddd solid 1px;
+    min-height: 50em;
 }
 
 .fileManager li {
@@ -103,14 +104,6 @@
     padding: 6px;
 }
 
-.tableXs td:first-child {
-    text-align: center;
-}
-
-.tableXs td:first-child>input:enabled {
-    cursor: pointer
-}
-
 .tableXs tbody>tr:last-child td {
     border-bottom: none
 }
@@ -122,11 +115,7 @@
     white-space: nowrap;
     font-weight: normal;
     padding: 6px;
-    position: sticky;
-    top: 0;
-    z-index: 1;
 }
-
 
 .tableXs thead>tr:nth-child(1) th {
     text-align: left;
@@ -150,7 +139,6 @@
 /* .tableXs th:first-child {
     border-top-left-radius: 5px
 }
-
 .tableXs th:last-child {
     border-top-right-radius: 5px
 } */
@@ -233,28 +221,50 @@
 .bcrumb {
     list-style: none;
     overflow: hidden;
-    font-size: 18px;
+    font-size: 13px;
     font-weight: bold;
     padding: 0;
 }
 
 
 .bcrumb li a {
-    color: white;
+    color: #333;
     text-decoration: none;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-left: 20px;
-    background: #000634;
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
-    background: #000634;
+    padding-top: 6px;
+    padding-bottom: 8px;
+    padding-left: 10px;
+    background: #ddd;
+    border-top-left-radius: 5px;
     position: relative;
     display: block;
     float: left;
     width: 25%;
-    text-align: center
+    text-align: center;
+    transition: all ease-in-out 200ms;
+
 }
+
+.bcrumb li a.active {
+    background: #303e4e;
+    color: #fff
+}
+
+.bcrumb li a.active::after {
+    border-left: 30px solid #303e4e;
+    content: " ";
+    display: block;
+    width: 0;
+    height: 0;
+    border-top: 50px solid transparent;
+    border-bottom: 50px solid transparent;
+    position: absolute;
+    top: 50%;
+    margin-top: -50px;
+    left: 100%;
+    z-index: 2;
+    transition: all ease-in-out 200ms;
+}
+
 
 .bcrumb li a::after {
     content: " ";
@@ -263,12 +273,13 @@
     height: 0;
     border-top: 50px solid transparent;
     border-bottom: 50px solid transparent;
-    border-left: 30px solid #000634;
+    border-left: 30px solid #ddd;
     position: absolute;
     top: 50%;
     margin-top: -50px;
     left: 100%;
     z-index: 2;
+    transition: all ease-in-out 200ms;
 }
 
 .bcrumb li a::before {
@@ -287,34 +298,35 @@
     z-index: 1;
 }
 
-.breadcrumb li:first-child a {}
-
-.bcrumb li:nth-child(2) a {
-    background: #346090
+.bcrumb li:nth-child(2) a span,
+.bcrumb li:nth-child(3) a span {
+    width: 100%;
+    margin-left: 20px;
+    display: block;
+    text-align: center;
 }
 
-.bcrumb li:nth-child(2) a:after {
-    border-left-color: #346090
+.bcrumb li:first-child a {
+    width: 20%;
+}
+
+.bcrumb li:nth-child(2) a {
+    width: 30%;
 }
 
 .bcrumb li:nth-child(3) a {
-    background: #9cbede
+    width: 22%;
 }
 
-.bcrumb li:nth-child(3) a:after {
-    border-left-color: #9cbede
+.bcrumb li:last-child a {
+    width: 28%;
 }
 
-.bcrumb li:nth-child(4) a {
-    background: #cbe2f7;
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
-
+.bcrumb li:last-child a.active {
+    border-top-right-radius: 5px;
 }
 
-.bcrumb li:nth-child(4) a:after {
-    border: none
-}
+
 
 .bcrumb li a:hover {
     cursor: default
@@ -323,6 +335,12 @@
 .bcrumb li a:hover:after {
     cursor: default
 }
+
+/* @media only screen and (min-width: 1000px) {
+    .bcrumb li a {
+        font-size: 10px;
+    }
+} */
 
 .small_list {
     margin-bottom: 10px;
@@ -378,9 +396,8 @@
     transition: all 200ms ease-in-out;
 }
 
-#investigation_contents,
-#study_contents,
-#assay_contents {
+#item_contents,
+#sample_contents {
     padding: 0em 0em 0em 0em;
     margin: 0em 0em 0em 0em;
     min-height: 50em;
@@ -392,7 +409,16 @@
 }
 
 .tableSeparate {
-    border-left: 1px #aaa dashed !important;
+    color: transparent !important;
+    /* background-color: white !important; */
+    border-right: 1px #aaa dashed !important;
+    /* border-left: 1px #777 dashed !important; */
+    border-top-width: 0 !important;
+    border-bottom-width: 0 !important;
+    max-width: 0 !important;
+    width: 0 !important;
+    padding: 0 !important;
+    background-color: #f0f0f0 !important
 }
 
 .headerSeparator {
@@ -416,14 +442,4 @@
 .disabled {
     pointer-events: none;
     opacity: 0.4;
-}
-
-.attributeTable {
-    max-height: 200px;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    border-radius: 5px;
-    border: 1px #ddd solid;
-    margin-top: 10px;
-    margin-bottom: 10px
 }

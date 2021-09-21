@@ -6,7 +6,7 @@ class ScheduleTest < ActionDispatch::IntegrationTest
   end
 
   test 'should read schedule file' do
-    assert_equal 7, @schedule.jobs[:runner].count, "Should be 7: 3x Periodic Subscription, 1x ContentBlob Cleaner, 1x LifeMonitor status fetcher, 1x Newsfeed Refresh, 1x General ApplicationJob"
+    assert_equal 8, @schedule.jobs[:runner].count, "Should be 7: 3x Periodic Subscription, 1x ContentBlob Cleaner, 1x LifeMonitor status fetcher, 1x Newsfeed Refresh, 1x General ApplicationJob"
 
     # Periodic emails
     daily = @schedule.jobs[:runner].detect { |job| job[:task] == "PeriodicSubscriptionEmailJob.new('daily').queue_job" }
@@ -44,6 +44,11 @@ class ScheduleTest < ActionDispatch::IntegrationTest
     general = @schedule.jobs[:runner].detect { |job| job[:task] == "ApplicationJob.queue_timed_jobs" }
     assert general
     assert_equal [10.minutes], general[:every]
+
+    # ApplicationStatus
+    app_status = @schedule.jobs[:runner].detect { |job| job[:task] == "ApplicationStatus.instance.refresh" }
+    assert app_status
+    assert_equal [1.minute], app_status[:every]
   end
 
   test 'executes tasks in schedule' do

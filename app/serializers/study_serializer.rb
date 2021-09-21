@@ -1,5 +1,5 @@
 class StudySerializer < SnapshottableSerializer
-  attributes :title, :description, :experimentalists, :other_creators  
+  attributes :title, :description, :experimentalists, :other_creators , :position
 
   has_many :people
   has_many :projects

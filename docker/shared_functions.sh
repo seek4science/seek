@@ -65,3 +65,11 @@ function start_search {
       echo "SINGLE CONTAINER SO SOLR IS DISABLED BY DEFAULT"      
     fi
 }
+
+function setup_and_start_cron {
+    echo "GENERATING CRONTAB"
+    bundle exec whenever > /seek/seek.crontab
+
+    echo "STARTING SUPERCRONIC"
+    supercronic /seek/seek.crontab &
+}

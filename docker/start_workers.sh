@@ -13,6 +13,9 @@ start_soffice
 # Search
 start_search
 
+# Cron
+setup_and_start_cron
+
 echo "STARTING WORKERS"
 bundle exec rake seek:workers:start
 

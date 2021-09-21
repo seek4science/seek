@@ -50,3 +50,7 @@ end
 every 10.minutes do
   runner "ApplicationJob.queue_timed_jobs"
 end
+
+every 1.minute do
+  runner 'ApplicationStatus.instance.refresh'
+end

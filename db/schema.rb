@@ -110,6 +110,13 @@ ActiveRecord::Schema.define(version: 2021_09_17_134928) do
     t.index ["user_id"], name: "index_api_tokens_on_user_id"
   end
 
+  create_table "application_status",  force: :cascade do |t|
+    t.integer "running_jobs"
+    t.boolean "soffice_running"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "assay_assets", id: :integer,  force: :cascade do |t|
     t.integer "assay_id"
     t.integer "asset_id"
@@ -182,6 +189,7 @@ ActiveRecord::Schema.define(version: 2021_09_17_134928) do
     t.integer "suggested_technology_type_id"
     t.text "other_creators"
     t.string "deleted_contributor"
+    t.integer "position"
     t.integer "sample_type_id"
     t.index ["sample_type_id"], name: "index_assays_on_sample_type_id"
   end
@@ -815,6 +823,7 @@ ActiveRecord::Schema.define(version: 2021_09_17_134928) do
     t.integer "contributor_id"
     t.text "other_creators"
     t.string "deleted_contributor"
+    t.integer "position"
   end
 
   create_table "investigations_projects", id: false,  force: :cascade do |t|
@@ -1810,7 +1819,6 @@ ActiveRecord::Schema.define(version: 2021_09_17_134928) do
     t.integer "investigation_id"
     t.text "experimentalists"
     t.datetime "begin_date"
-    t.integer "person_responsible_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "first_letter", limit: 1
@@ -1819,6 +1827,7 @@ ActiveRecord::Schema.define(version: 2021_09_17_134928) do
     t.integer "contributor_id"
     t.text "other_creators"
     t.string "deleted_contributor"
+    t.integer "position"
   end
 
   create_table "study_auth_lookup",  force: :cascade do |t|

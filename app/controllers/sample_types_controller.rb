@@ -138,18 +138,18 @@ class SampleTypesController < ApplicationController
   private
 
   def sample_type_params
-    attribute_map = params[:sample_type][:attribute_map]
-      if (attribute_map)
-      params[:sample_type][:sample_attributes_attributes] =[]
-      attribute_map.each do |attribute|
-        attribute[:sample_attribute_type_id] = SampleAttributeType.where(title:attribute[:sample_attribute_type][:title]).first.id
-        attribute[:unit_id] = Unit.where(symbol:attribute[:unit_symbol]).first.id unless attribute[:unit_symbol].nil?
+    attributes = params[:sample_type][:sample_attributes]
+    if (attributes)
+      params[:sample_type][:sample_attributes_attributes] = []
+      attributes.each do |attribute|
+        attribute[:sample_attribute_type_id] = SampleAttributeType.where(title: attribute[:sample_attribute_type][:title]).first.id
+        attribute[:unit_id] = Unit.where(symbol: attribute[:unit_symbol]).first.id unless attribute[:unit_symbol].nil?
         params[:sample_type][:sample_attributes_attributes] << attribute
-        end
       end
+    end
 
-    if(params[:sample_type][:assay_assets_attributes])
-      params[:sample_type][:assay_ids] = params[:sample_type][:assay_assets_attributes].map{|x| x[:assay_id]}
+    if (params[:sample_type][:assay_assets_attributes])
+      params[:sample_type][:assay_ids] = params[:sample_type][:assay_assets_attributes].map { |x| x[:assay_id] }
     end
 
     params.require(:sample_type).permit(:title, :description, :tags, :template_id,
