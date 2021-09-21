@@ -713,6 +713,7 @@ SEEK::Application.routes.draw do
       get :manage
       patch :manage_update
     end
+  end  
 
   ### SINGLE PAGE
   resources :single_pages do
