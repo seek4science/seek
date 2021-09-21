@@ -4,6 +4,7 @@ class TemplatesController < ApplicationController
     include Seek::IndexPager
     include Seek::AssetsCommon
   
+    before_action :templates_enabled
     before_action :find_assets, only: [:index]
     before_action :auth_to_create, only: [:new, :create]
     before_action :find_and_authorize_requested_item,:only=>[:manage, :manage_update, :show, :edit, :destroy, :update]
@@ -83,5 +84,13 @@ class TemplatesController < ApplicationController
     def find_template
       @template = Template.find(params[:id])
     end
+
+    def templates_enabled
+      unless Seek::Config.sample_type_template_enabled
+        flash[:error]="Not available"
+        redirect_to root_url
+      end
+    end
+
   end
   

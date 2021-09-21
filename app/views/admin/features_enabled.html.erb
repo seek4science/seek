@@ -105,6 +105,9 @@
 
   <%= admin_checkbox_setting(:project_single_page_enabled, 1, Seek::Config.project_single_page_enabled,
                              "Single page enabled", "The single page UI for projects") %>
+
+  <%= admin_checkbox_setting(:sample_type_template_enabled, 1, Seek::Config.sample_type_template_enabled,
+                             "Sample type template enabled", "Whether users can create and manage Templates for Sample Types") %>
                              
   <%= admin_checkbox_setting(:google_analytics_enabled, 1, Seek::Config.google_analytics_enabled,
                              "Google analytics enabled", "Allows you to keep track of site traffic using Google Analytics. You need to register with Google Analytics and get a tracker ID.",
