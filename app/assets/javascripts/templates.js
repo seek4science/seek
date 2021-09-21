@@ -124,19 +124,12 @@ const applyTemplate = () => {
     });
     index++;
     newRow = $j(newRow.replace(/replace-me/g, index));
-    const elements = [
-      "#template_attribute_required",
-      "#template_attribute_title",
-      "#template_attribute_description",
-      "#template_attribute_type",
-      "#template_attribute_cv_id",
-      "#template_attribute_unit"
-    ];
-
-    $j.each(elements, (i, elem) => {
-      $j(newRow).find(elem).prop("checked", row[i]);
-    });
-
+    $j(newRow).find("#template_attribute_required").prop("checked", row[0]);
+    $j(newRow).find("#template_attribute_title").val(row[1]);
+    $j(newRow).find("#template_attribute_description").val(row[2]);
+    $j(newRow).find("#template_attribute_type").val(row[3]);
+    $j(newRow).find("#template_attribute_cv_id").val(row[4]);
+    $j(newRow).find("#template_attribute_unit").val(row[5]);
     $j("#attribute-table #add-attribute-row").before(newRow);
   });
 

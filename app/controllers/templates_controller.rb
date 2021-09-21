@@ -4,16 +4,16 @@ class TemplatesController < ApplicationController
     include Seek::IndexPager
     include Seek::AssetsCommon
   
-    before_action :find_template, only: [:show, :destroy, :edit, :update]
     before_action :find_assets, only: [:index]
     before_action :auth_to_create, only: [:new, :create]
-    before_action :find_and_authorize_requested_item,:only=>[:manage, :manage_update, :show]
+    before_action :find_and_authorize_requested_item,:only=>[:manage, :manage_update, :show, :edit, :destroy, :update]
 
 
   
     def show
       respond_to do |format|
         format.html
+        format.json {render json: @template}  
       end
     end
   
@@ -72,9 +72,9 @@ class TemplatesController < ApplicationController
     private
   
     def template_params
-      params.require(:template).permit(:title, :description, :tags, :template_id, :group, :level, :organism,
+      params.require(:template).permit(:title, :description, :group, :level, :organism,
                                           { project_ids: [],
-                                            template_attributes_attributes: [:id, :title, :required, :description,
+                                            template_attributes_attributes: [:id, :title, :pos, :required, :description,
                                                                           :sample_attribute_type_id, :isa_tag_id,
                                                                           :sample_controlled_vocab_id,
                                                                           :unit_id, :_destroy]})
