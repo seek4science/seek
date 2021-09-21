@@ -1,4 +1,5 @@
 <%
+hide_title ||= 0
 version ||= params[:version]
 avatar = favouritable_icon(version ? item.find_version(version) : item, 120)
 title_prefix||=""

@@ -41,4 +41,5 @@
 *= require multi-step-wizard.css.erb
 *= require lightbox2
 *= require simplemde.min
+*= require single_page
 */

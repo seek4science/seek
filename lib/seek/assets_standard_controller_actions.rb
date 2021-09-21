@@ -29,7 +29,7 @@ module Seek
       asset.just_used
       asset_version = find_display_asset asset
       respond_to do |format|
-        format.html
+        format.html { render(params[:only_content] ? { layout: false } : {})}
         format.xml
         format.rdf { render template: 'rdf/show' }
         format.json { render json: asset, scope: { requested_version: params[:version] }, include: json_api_include_param }
