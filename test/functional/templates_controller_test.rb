@@ -2,9 +2,11 @@ require 'test_helper'
 
 class TemplatesControllerTest < ActionController::TestCase
 
-  include AuthenticatedTestHelper
-  include SharingFormTestHelper
-  include GeneralAuthorizationTestCases
+  with_config_value(:sample_type_template_enabled, true) do
+    include AuthenticatedTestHelper
+    include SharingFormTestHelper
+    include GeneralAuthorizationTestCases
+  end
 
   setup do
     Factory(:person) # to prevent person being first person and therefore admin
