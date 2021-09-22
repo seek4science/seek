@@ -1,3 +1,4 @@
+<% is_modal ||= false %>
 <div class='panel panel-default'>
   <div class='panel-heading'>
     License and permissions
@@ -7,7 +8,11 @@
     <%= render :partial => 'assets/license_selector', locals: {resource: @data_file} %>
     <%= render :partial => 'sharing/form' -%>
     <%= render :partial => 'assets/author_form', locals: { form: f, collapsed: true } %>
-    <%= cancel_button(data_files_path) -%>
+     <%if(is_modal)%>
+      <a class=" btn btn-default" onClick="location.reload();">Cancel</a>
+    <%else%>
+      <%= cancel_button(data_files_path) -%>
+    <%end%>
     <div class='multi-step-buttons'>
       <%= multi_step_start_button %>
       <%= multi_step_back_button %>

@@ -10,7 +10,7 @@
       "city": null,
       "address": null,
       "web_page": null,
-      "discussion_links" : null
+      "discussion_links" : []
     },
     "relationships": {
       "people": {

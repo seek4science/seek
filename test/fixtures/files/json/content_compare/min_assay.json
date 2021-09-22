@@ -3,13 +3,14 @@
     "id": "1039986486",
     "type": "assays",
     "attributes": {
-      "snapshots": null,
+      "snapshots": [],
       "policy":
       {
         "access":"no_access",
         "permissions":[]
       },
       "other_creators": null,
+      "position": null,
       "title": "A Minimal Assay",
       "description": null,
       "assay_class": {
@@ -25,7 +26,7 @@
         "label":"Technology type",
         "uri":"http://jermontology.org/ontology/JERMOntology#Technology_type"
       },
-      "discussion_links" : null
+      "discussion_links" : []
     },
     "relationships": {
       "creators": {

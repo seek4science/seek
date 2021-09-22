@@ -37,7 +37,7 @@
                 <%= text_field_tag 'institution[city]',@institution.city, class:'form-control' %>
 
                 <%= label_tag 'Country' %>
-                <%= country_select 'institution', 'country', {}, {class:'form-control'} %>
+                <%= country_select 'institution', 'country', { include_blank: 'Select a country' }, {class:'form-control'} %>
               </div>
             </div>
           <% else %>
