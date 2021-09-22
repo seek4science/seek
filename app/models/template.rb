@@ -1,7 +1,7 @@
 class Template < ApplicationRecord
   acts_as_authorized
   
-  has_many :template_attributes, inverse_of: :template, dependent: :destroy
+  has_many :template_attributes, -> { order(:pos) }, inverse_of: :template, dependent: :destroy
   has_many :sample_types
   validates :title, presence: true
   validates :title, uniqueness: { scope: :group }
