@@ -8,7 +8,7 @@
         "access":"no_access",
         "permissions":[]
       },
-      "tags": null,
+      "tags": [],
       "title": "A Minimal Model",
       "description": null,
       "license": null,
@@ -30,7 +30,7 @@
       "environment": null,
       "model_image_link": null,
       "other_creators": null,
-      "discussion_links": null
+      "discussion_links": []
     },
     "relationships": {
       "creators": {

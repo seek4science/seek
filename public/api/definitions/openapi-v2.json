@@ -6080,7 +6080,7 @@
             }
         },
         "tagsType": {
-            "$ref": "#/definitions/nullableNonEmptyStringList"
+            "$ref": "#/definitions/nonEmptyStringList"
         },
         "anySkeleton": {
             "properties": {
@@ -6799,7 +6799,7 @@
                                     "$ref": "#/definitions/nullableSnapshotsList"
                                 },
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -6967,7 +6967,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -7092,7 +7092,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -7204,7 +7204,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -7279,7 +7279,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -7527,7 +7527,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -7611,7 +7611,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -7763,7 +7763,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -7841,7 +7841,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -8687,7 +8687,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -8777,7 +8777,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -9296,7 +9296,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -9377,7 +9377,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -10176,7 +10176,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -10254,7 +10254,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -12515,7 +12515,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"

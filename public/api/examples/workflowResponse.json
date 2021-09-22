@@ -19,7 +19,7 @@
             "description": "Testing CWL upload",
             "license": "CC-BY-4.0",
             "latest_version": 1,
-            "tags": null,
+            "tags": [],
             "versions": [
                 {
                     "version": 1,
