@@ -95,11 +95,6 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'name' => df.title,
       'description' => df.description.ljust(50, '.'),
       'keywords' => 'keyword',
-      'sdPublisher' =>
-        {
-          '@type' => 'Organization',
-          'name' => Seek::Config.dm_project_name,
-          'url' => Seek::Config.dm_project_link },
       'version' => 1,
       'url' => "http://localhost:3000/data_files/#{df.id}",
       'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
@@ -155,11 +150,6 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'name' => df.title,
       'description' => df.description,
       'keywords' => 'keyword',
-      'sdPublisher' =>
-        {
-          '@type' => 'Organization',
-          'name' => Seek::Config.dm_project_name,
-          'url' => Seek::Config.dm_project_link },
       'version' => 1,
       'url' => "http://localhost:3000/data_files/#{df.id}",
       'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
@@ -204,11 +194,6 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'name' => df.title,
       'description' => df.description,
       'keywords' => 'keyword',
-      'sdPublisher' =>
-        {
-          '@type' => 'Organization',
-          'name' => Seek::Config.dm_project_name,
-          'url' => Seek::Config.dm_project_link },
       'version' => 1,
       'creator' => [{ '@type' => 'Person', 'name' => 'Blogs' }, { '@type' => 'Person', 'name' => 'Joe' }],
       'url' => 'http://www.abc.com',
@@ -374,11 +359,6 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'name' => 'This Document',
       'url' => "http://localhost:3000/documents/#{document.id}",
       'keywords' => 'wibble',
-      'sdPublisher' =>
-        {
-          '@type' => 'Organization',
-          'name' => Seek::Config.dm_project_name,
-          'url' => Seek::Config.dm_project_link },
       'version' => 1,
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
@@ -411,11 +391,6 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'name' => 'This presentation',
       'url' => "http://localhost:3000/presentations/#{presentation.id}",
       'keywords' => 'wibble',
-      'sdPublisher' =>
-        {
-          '@type' => 'Organization',
-          'name' => Seek::Config.dm_project_name,
-          'url' => Seek::Config.dm_project_link },
       'version' => 1,
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
@@ -586,11 +561,6 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                  'name' => 'A Maximal Collection',
                  'url' => "http://localhost:3000/collections/#{collection.id}",
                  'keywords' => '',
-                 'sdPublisher' =>
-                   {
-                     '@type' => 'Organization',
-                     'name' => Seek::Config.dm_project_name,
-                     'url' => Seek::Config.dm_project_link },
                  'creator' => [
                    { '@type' => 'Person',
                      'name' => 'Joe Bloggs' }

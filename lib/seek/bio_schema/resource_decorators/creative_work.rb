@@ -7,7 +7,6 @@ module Seek
                          subject_of: :events
 
         schema_mappings version: :version,
-                        sd_publisher: :sdPublisher,
                         license: :license,
                         all_creators: :creator,
                         producer: :producer,
@@ -39,9 +38,6 @@ module Seek
           all
         end
 
-        def sd_publisher
-          DataCatalogMockModel.new.provider
-        end
       end
     end
   end

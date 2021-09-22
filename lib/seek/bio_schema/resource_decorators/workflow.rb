@@ -9,7 +9,8 @@ module Seek
 
         schema_mappings programming_language: :programmingLanguage,
                         inputs: :input,
-                        outputs: :output
+                        outputs: :output,
+                        sd_publisher: :sdPublisher
 
         def contributors
           [contributor]
@@ -43,6 +44,10 @@ module Seek
 
         def license
           Seek::License.find(resource.license)&.url
+        end
+
+        def sd_publisher
+          DataCatalogMockModel.new.provider
         end
 
         private
