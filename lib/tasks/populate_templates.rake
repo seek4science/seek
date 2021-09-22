@@ -49,6 +49,8 @@ namespace :seek do
                 ols_root_term_uri: is_ontology ? attribute["ontology"]["rootTermURI"] : nil
               }) if is_ontology || is_CV
               
+              attribute_description=''
+
               if is_ontology
                 if !attribute["ontology"]["rootTermURI"].blank?
                   begin
@@ -59,9 +61,14 @@ namespace :seek do
                   end
                   terms.each_with_index do |term, i|
                     puts "#{j}) #{i+1} FROM #{terms.length}"
-                    if (!term[:label].blank? && !term[:iri].blank?)
-                      cvt = SampleControlledVocabTerm.new({ label: term[:label], iri: term[:iri], parent_iri: term[:parent_iri] })
-                      scv.sample_controlled_vocab_terms << cvt
+                    if i==0 # Skip the parent name
+                      des = term[:description]
+                      scv[:description] = des.kind_of?(Array) ? des[0] : des
+                    else
+                      if (!term[:label].blank? && !term[:iri].blank?) 
+                        cvt = SampleControlledVocabTerm.new({ label: term[:label], iri: term[:iri], parent_iri: term[:parent_iri] })
+                        scv.sample_controlled_vocab_terms << cvt
+                      end
                     end
                   end
                 end
