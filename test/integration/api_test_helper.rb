@@ -364,7 +364,7 @@ module ApiTestHelper
         deep_comparison(sub_value, sorted_result[index], "#{key}[#{index}]")
       end
     elsif source.nil?
-      assert_nil result
+      assert_nil result, "Expected #{key} to be nil but was `#{result}`"
     else
       assert_equal source, result, "Expected #{key} to be `#{source}` but was `#{result}`"
     end

@@ -3,7 +3,7 @@
     "id": "1039986486",
     "type": "assays",
     "attributes": {
-      "snapshots": null,
+      "snapshots": [],
       "policy":
       {
         "access":"no_access",

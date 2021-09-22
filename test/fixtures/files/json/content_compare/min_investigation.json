@@ -3,7 +3,7 @@
     "id": "1039986486",
     "type": "investigations",
     "attributes": {
-      "snapshots": null,
+      "snapshots": [],
       "policy":
       {
         "access":"no_access",
@@ -13,7 +13,7 @@
       "other_creators": null,
       "position": null,
       "description": null,
-      "discussion_links" : null
+      "discussion_links" : []
     },
     "relationships": {
       "creators": {
