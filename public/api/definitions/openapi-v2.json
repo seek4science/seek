@@ -12117,6 +12117,9 @@
                                 "data_files": {
                                     "$ref": "#/definitions/dataFileReferencesList"
                                 },
+                                "assays": {
+                                    "$ref": "#/definitions/assayReferencesList"
+                                },
                                 "sample_type": {
                                     "$ref": "#/definitions/sampleTypeReferences"
                                 }
@@ -12126,6 +12129,8 @@
                                 "projects",
                                 "people",
                                 "creators",
+                                "assays",
+                                "data_files",
                                 "sample_type"
                             ],
                             "additionalProperties": false
@@ -12202,6 +12207,9 @@
                                 "data_files": {
                                     "$ref": "#/definitions/dataFileReferencesList"
                                 },
+                                "assays": {
+                                    "$ref": "#/definitions/assayReferencesList"
+                                },
                                 "sample_type": {
                                     "$ref": "#/definitions/sampleTypeReferences"
                                 }
@@ -12275,6 +12283,9 @@
                                 },
                                 "data_files": {
                                     "$ref": "#/definitions/dataFileReferencesList"
+                                },
+                                "assays": {
+                                    "$ref": "#/definitions/assayReferencesList"
                                 },
                                 "sample_type": {
                                     "$ref": "#/definitions/sampleTypeReference"
