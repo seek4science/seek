@@ -180,7 +180,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   test 'should show the other creators in -uploader and creators- box' do
     workflow = Factory(:workflow, policy: Factory(:public_policy), other_creators: 'another creator')
     get :show, params: { id: workflow }
-    assert_select 'li.author-list-item', text: 'another creator', count: 1
+    assert_select '#author-box .additional-credit', text: 'another creator', count: 1
   end
 
   test 'filter by people, including creators, using nested routes' do

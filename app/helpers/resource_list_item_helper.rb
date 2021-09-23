@@ -249,7 +249,7 @@ module ResourceListItemHelper
     contributor_count += 1 unless other_contributors.blank?
     html = ''
     other_html = ''
-    content_tag(:p, class: 'list_item_attribute') do
+    content_tag(:p, class: 'list_item_attribute rli-person-list') do
       html << content_tag(:b, "#{key.pluralize(contributor_count)}: ")
       html << contributors.map do |author|
         title = author.name

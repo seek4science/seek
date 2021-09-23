@@ -10,7 +10,8 @@
   avatar_size ||= 20
 %>
 
-<%= panel(title, help_text: "These are the people that created the item, along with the person who submitted it. Sometimes the submitter may have uploaded the item on behalf of its contributors, but was not involved in creating it.") do %>
+<%= panel(title, id: 'author-box',
+          help_text: "These are the people that created the item, along with the person who submitted it. Sometimes the submitter may have uploaded the item on behalf of its contributors, but was not involved in creating it.") do %>
   <% unless resource.class.name.underscore == "publication" %>
     <h5 class="author-list-title"><%= t('creator').capitalize.pluralize(assets_creators.count) -%></h5>
 
@@ -37,7 +38,7 @@
 
     <% if other_creators.present? %>
       <h5 class="author-list-title"><%= resource.class.human_attribute_name('other_creators') -%></h5>
-      <p><%= other_creators -%></p>
+      <p class="additional-credit"><%= other_creators -%></p>
     <% end %>
 
     <h5 class="author-list-title"><%= t('contributor').capitalize -%></h5>
