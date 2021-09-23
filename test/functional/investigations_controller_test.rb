@@ -360,7 +360,7 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     get :show, params: { id: investigation.id }
     assert_response :success
-    assert_select 'li.author-list-item', text: 'john smith'
+    assert_select '#author-box .additional-credit', text: 'john smith', count: 1
   end
 
   test 'programme investigations through nested routing' do

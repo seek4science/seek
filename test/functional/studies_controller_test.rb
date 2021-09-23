@@ -456,7 +456,7 @@ class StudiesControllerTest < ActionController::TestCase
 
     get :show, params: { id: study.id }
     assert_response :success
-    assert_select 'li.author-list-item', text: 'frodo baggins'
+    assert_select '#author-box .additional-credit', text: 'frodo baggins', count: 1
   end
 
   test 'should not multiply creators after calling show' do

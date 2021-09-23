@@ -1298,8 +1298,7 @@ class AssaysControllerTest < ActionController::TestCase
 
     get :show, params: { id: assay.id }
     assert_response :success
-    assert_select 'li.author-list-item', text: 'john smith'
-    assert_select 'li.author-list-item', text: 'jane smith'
+    assert_select '#author-box .additional-credit', text: 'john smith, jane smith', count: 1
   end
 
   test 'programme assays through nested routing' do
