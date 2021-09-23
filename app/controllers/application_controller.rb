@@ -657,7 +657,17 @@ class ApplicationController < ActionController::Base
 
 
   def creator_related_params
-    [:other_creators, { creator_ids: [] },
-     { assets_creators_attributes: [:id, :creator_id, :given_name, :family_name, :affiliation, :orcid, :pos, :_destroy] }]
+    [:other_creators,
+     # For directly assigning SEEK people (API):
+     { creator_ids: [] },
+     # For directly setting SEEK and non-SEEK people (API):
+     { api_assets_creators: [:creator_id, :given_name,
+                             :family_name, :affiliation,
+                             :orcid, :pos] },
+     # For incrementally adding, removing, modifying  SEEK and non-SEEK people (UI):
+     { assets_creators_attributes: [:id, :creator_id, :given_name,
+                                    :family_name, :affiliation,
+                                    :orcid, :pos, :_destroy] }
+    ]
   end
 end

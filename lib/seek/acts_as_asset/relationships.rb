@@ -15,14 +15,6 @@ module Seek
           attributions.map(&:other_object)
         end
 
-        def record_creators_changed(_assets_creator)
-          @creators_changed = true
-        end
-
-        def creators_changed?
-          @creators_changed
-        end
-
         def source_link_url= url
           (source_link || build_source_link).assign_attributes(url: url)
 
@@ -59,10 +51,7 @@ module Seek
                    dependent: :destroy,
                    inverse_of: :other_object
 
-          has_many :assets_creators, dependent: :destroy, as: :asset, foreign_key: :asset_id
-          accepts_nested_attributes_for :assets_creators, allow_destroy: true
-          has_many :creators, class_name: 'Person', through: :assets_creators, after_remove: %i[update_timestamp record_creators_changed], after_add: %i[update_timestamp record_creators_changed]
-          has_filter :creator
+          include Seek::Creators
 
           has_many :discussion_links, -> { where(AssetLink.discussion.where_values_hash) }, class_name: 'AssetLink', as: :asset, dependent: :destroy, inverse_of: :asset
           accepts_nested_attributes_for :discussion_links, allow_destroy: true

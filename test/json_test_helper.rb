@@ -65,6 +65,9 @@ module JsonTestHelper
         diff.delete(el)
       elsif el['path'] =~ /policy/
         diff.delete(el)
+      elsif el['path'] =~ /attributes\/creators\/\d+\/profile|given_name|family_name|orcid|affiliation/
+        assert_equal 'replace', el['op'], "Unexpected difference in creator: #{el.inspect}"
+        diff.delete(el)
       end
     end
 
