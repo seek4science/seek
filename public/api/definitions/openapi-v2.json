@@ -236,6 +236,12 @@
             }
         },
         {
+            "name": "samples",
+            "description": {
+                "$ref": "../descriptions/samples.md"
+            }
+        },
+        {
             "name": "workflows",
             "description": {
                 "$ref": "../descriptions/workflows.md"
