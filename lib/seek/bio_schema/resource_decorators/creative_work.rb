@@ -34,7 +34,7 @@ module Seek
           # This should be greatly improved but would rely on SEEK being changed
           others = other_creators&.split(',')&.collect(&:strip)&.compact || []
           others = others.collect { |name| { "@type": 'Person',"@id": "##{ROCrate::Entity.format_id(name)}", "name": name } }
-          all = (mini_definitions(creators) || []) + others
+          all = mini_definitions(assets_creators) + others
           return if all.empty?
           all
         end

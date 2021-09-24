@@ -5,6 +5,8 @@ class AssetsCreator < ApplicationRecord
 
   include Seek::Rdf::ReactToAssociatedChange
   include Seek::OrcidSupport
+  include Seek::BioSchema::Support
+
   update_rdf_on_change :asset
 
   default_scope { order(:pos) }
@@ -12,10 +14,12 @@ class AssetsCreator < ApplicationRecord
   def family_name
     creator ? creator.last_name : super
   end
+  alias_method :last_name, :family_name
 
   def given_name
     creator ? creator.first_name : super
   end
+  alias_method :first_name, :given_name
 
   def name
     creator ? creator.name : "#{given_name} #{family_name}"
@@ -50,8 +54,20 @@ class AssetsCreator < ApplicationRecord
     AssetsCreator.where("#{concat_clause} LIKE :query OR LOWER(assets_creators.given_name) LIKE :query OR LOWER(assets_creators.family_name) LIKE :query",
                  query: "#{name.downcase}%")
   end
-  
+
   def needs_orcid?
     false
   end
+
+  # For compatibility with ROBundle Agent generation (lib/seek/research_objects/json_metadata.rb)
+  def rdf_resource
+    if creator
+      creator.rdf_resource
+    elsif orcid
+      RDF::Resource.new(orcid)
+    else
+      RDF::Resource.new(ROCrate::Person.format_id(name))
+    end
+  end
+
 end
