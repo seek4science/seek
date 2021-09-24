@@ -18,22 +18,18 @@ module Seek
           'Person'
         end
 
-        def url
-          if orcid
-            orcid
-          elsif creator
-            resource_url(creator)
-          else
-            nil
-          end
-        end
-
         def rdf_resource
           RDF::Resource.new(identifier)
         end
 
         def identifier
-          url || ROCrate::Person.format_id(name)
+          if creator
+            resource_url(creator)
+          elsif orcid
+            orcid
+          else
+            ROCrate::Person.format_id(name)
+          end
         end
       end
     end
