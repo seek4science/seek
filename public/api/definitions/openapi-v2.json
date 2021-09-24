@@ -309,8 +309,8 @@
             "tags": [
                 "organisms",
                 "sampleTypes",
-                "sampleAttributeTypes",
-                "samples"
+                "samples",
+                "sampleAttributeTypes"
             ]
         }
     ],
@@ -5945,7 +5945,7 @@
                 }
             },
             "required": [
-                
+
             ],
             "additionalProperties": false
         },

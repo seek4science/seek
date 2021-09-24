@@ -9,16 +9,13 @@ A **Sample** has the following associated information:
 * References to the <a href="#people">**People**</a> who created the **Sample**
 * References to the <a href="#assays">**Assays**</a> relevant to the **Sample**
 * References to the <a href="#data_files">**Data files**</a> relevant to the **Sample**
-* A references to the <a href="#sample_types">**Sample type**</a> relevant to the **Sample**
+* A references to the <a href="#sampleTypes">**Sample type**</a> relevant to the **Sample**
 
 A response for a **Sample** such as that for a <a href="#create">**Create**</a>, <a href="#read">**Read**</a> or <a href="#update">**Update**</a> includes the additional information
 
 * The time when the **Sample** was **created**
 * The last time the **Sample** was **updated**
-* References to the <a href="#people">**People**</a> who created the **Sample**
-* References to the <a href="#assays">**Assays**</a> relevant to the **Sample**
-* References to the <a href="#data_files">**Data files**</a> relevant to the **Sample**
-* A references to the <a href="#sample_types">**Sample type**</a> relevant to the **Sample**
+* A references to the **Submitter**</a> who created the **Sample**
 
 **Samples** differ slightly from other payloads due to the flexible nature of the attributes and their values,
 which are handled through the **attribute_map** property.
