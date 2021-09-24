@@ -41,7 +41,10 @@ class SampleCUDTest < ActionDispatch::IntegrationTest
         }
       }
     }.to_json
-    patch sample_path(sample.id, format: :json), params: params,headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+    assert_no_difference('Sample.count') do
+      patch sample_path(sample.id, format: :json), params: params,headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+    end
+
     assert_response :success
     sample = Sample.find(sample.id)
     assert_equal "Jack Frost", sample.get_attribute_value("full name")
@@ -83,7 +86,9 @@ class SampleCUDTest < ActionDispatch::IntegrationTest
         }
       }
     }.to_json
-    post samples_path(format: :json), params: params,headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+    assert_difference('Sample.count') do
+      post samples_path(format: :json), params: params, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+    end
     assert_response :success
     sample = Sample.last
     assert_equal patient_sample_type, sample.sample_type

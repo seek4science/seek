@@ -5909,8 +5909,17 @@
                             "$ref": "#/definitions/nonEmptyString"
                         }
                     },
-                    "required": [
-                        "title"
+                    "oneOf": [
+                        {
+                            "required": [
+                                "id"
+                            ]
+                        },
+                        {
+                            "required": [
+                                "title"
+                            ]
+                        }
                     ]
                 },
                 "required": {

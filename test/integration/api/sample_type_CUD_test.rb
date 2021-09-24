@@ -79,6 +79,100 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test 'create using attribute_type name' do
+    attribute_type = Factory(:string_sample_attribute_type)
+    params = {
+      "data": {
+        "type": "sample_types",
+        "attributes": {
+          "title": "In vivo biometrics",
+          "description": "Template for in vivo biometrics data",
+          "sample_attributes": [
+            {
+              "title": "Fish ID",
+              "sample_attribute_type": {
+                "id": "#{attribute_type.id}"
+              },
+              "required": true,
+              "pos": "1",
+              "is_title": true
+            }
+          ]
+        },
+        "relationships": {
+          "projects": {
+            "data": [
+              {
+                "id": "#{@current_person.projects.first.id}",
+                "type": "projects"
+              }
+            ]
+          }
+        }
+      }
+    }
+    assert_difference('SampleType.count') do
+      assert_difference('SampleAttribute.count') do
+        post sample_types_path(format: :json), params: params.to_json, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+      end
+    end
+    assert_response :success
+
+    sample_type = SampleType.last
+    assert_equal 'In vivo biometrics', sample_type.title
+    assert_equal 1,sample_type.sample_attributes.count
+    assert_equal "Fish ID", sample_type.sample_attributes.first.title
+    assert_equal attribute_type, sample_type.sample_attributes.first.sample_attribute_type
+
+  end
+
+  test 'create using attribute_type id' do
+    attribute_type = Factory(:string_sample_attribute_type)
+    params = {
+      "data": {
+        "type": "sample_types",
+        "attributes": {
+          "title": "In vivo biometrics",
+          "description": "Template for in vivo biometrics data",
+          "sample_attributes": [
+            {
+              "title": "Fish ID",
+              "sample_attribute_type": {
+                "id": "#{attribute_type.id}"
+              },
+              "required": true,
+              "pos": "1",
+              "is_title": true
+            }
+          ]
+        },
+        "relationships": {
+          "projects": {
+            "data": [
+              {
+                "id": "#{@current_person.projects.first.id}",
+                "type": "projects"
+              }
+            ]
+          }
+        }
+      }
+    }
+    assert_difference('SampleType.count') do
+      assert_difference('SampleAttribute.count') do
+        post sample_types_path(format: :json), params: params.to_json, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+      end
+    end
+    assert_response :success
+
+    sample_type = SampleType.last
+    assert_equal 'In vivo biometrics', sample_type.title
+    assert_equal 1,sample_type.sample_attributes.count
+    assert_equal "Fish ID", sample_type.sample_attributes.first.title
+    assert_equal attribute_type, sample_type.sample_attributes.first.sample_attribute_type
+
+  end
+
   def create_post_values
     @post_values = {
         sample_attribute_type_title: @sample_type_attribute.sample_attribute_type.title,
