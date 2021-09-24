@@ -1,14 +1,13 @@
 module Seek
   module BioSchema
     module ResourceDecorators
-      # Decorator that provides extensions for a Event
+      # Decorator that provides extensions for a CreativeWork
       class CreativeWork < Thing
         associated_items producer: :projects,
                          part_of: :collections,
                          subject_of: :events
 
         schema_mappings version: :version,
-                        sd_publisher: :sdPublisher,
                         license: :license,
                         all_creators: :creator,
                         producer: :producer,
@@ -27,6 +26,7 @@ module Seek
 
         def license
           return unless resource.license
+
           Seek::License.find(resource.license)&.url
         end
 
@@ -39,15 +39,15 @@ module Seek
           all
         end
 
+
 	      def previous_version_url
           return unless respond_to?(:previous_version) && resource.previous_version
-          resource_url(resource.previous_version)
-        end
 
-        def sd_publisher
-          DataCatalogMockModel.new.provider
+          resource_url(resource.previous_version)
         end
       end
     end
   end
 end
+
+
