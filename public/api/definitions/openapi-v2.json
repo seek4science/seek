@@ -5882,6 +5882,73 @@
             ],
             "additionalProperties": false
         },
+        "sampleTypeSampleAttributesPatch": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+                "$ref": "#/definitions/sampleTypeSampleAttributePatch"
+            }
+        },
+        "sampleTypeSampleAttributePatch": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "title": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "sample_attribute_type": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        },
+                        "title": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        }
+                    },
+                    "oneOf": [
+                        {
+                            "required": [
+                                "id"
+                            ]
+                        },
+                        {
+                            "required": [
+                                "title"
+                            ]
+                        }
+                    ]
+                },
+                "required": {
+                    "type": "boolean"
+                },
+                "pos": {
+                    "$ref": "#/definitions/nullableInteger"
+                },
+                "unit": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "is_title": {
+                    "type": "boolean"
+                },
+                "sample_controlled_vocab_id": {
+                    "$ref": "#/definitions/nullableInteger"
+                },
+                "linked_sample_type_id": {
+                    "$ref": "#/definitions/nullableInteger"
+                },
+                "_destroy": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+                
+            ],
+            "additionalProperties": false
+        },
         "sampleTypeSampleAttributesPost": {
             "type": "array",
             "minItems": 1,
@@ -12544,7 +12611,7 @@
                                     "$ref": "#/definitions/nullableNonEmptyString"
                                 },
                                 "sample_attributes": {
-                                    "$ref": "#/definitions/sampleTypeSampleAttributesPost"
+                                    "$ref": "#/definitions/sampleTypeSampleAttributesPatch"
                                 }
                             },
                             "additionalProperties": false

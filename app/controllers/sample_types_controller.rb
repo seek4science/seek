@@ -142,10 +142,12 @@ class SampleTypesController < ApplicationController
     if (attributes)
       params[:sample_type][:sample_attributes_attributes] = []
       attributes.each do |attribute|
-        if attribute[:sample_attribute_type][:id]
-          attribute[:sample_attribute_type_id] = attribute[:sample_attribute_type][:id].to_i
-        elsif attribute[:sample_attribute_type][:title]
-          attribute[:sample_attribute_type_id] = SampleAttributeType.where(title: attribute[:sample_attribute_type][:title]).first.id
+        if attribute[:sample_attribute_type]
+          if attribute[:sample_attribute_type][:id]
+            attribute[:sample_attribute_type_id] = attribute[:sample_attribute_type][:id].to_i
+          elsif attribute[:sample_attribute_type][:title]
+            attribute[:sample_attribute_type_id] = SampleAttributeType.where(title: attribute[:sample_attribute_type][:title]).first.id
+          end
         end
         attribute[:unit_id] = Unit.where(symbol: attribute[:unit_symbol]).first.id unless attribute[:unit_symbol].nil?
         params[:sample_type][:sample_attributes_attributes] << attribute
