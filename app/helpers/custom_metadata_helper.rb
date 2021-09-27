@@ -7,6 +7,7 @@ module CustomMetadataHelper
     element_name = "#{resource.class.name.underscore}[custom_metadata_attributes][data][#{attribute.title}]"
     value = resource.custom_metadata.try(:get_attribute_value,attribute.title)
     placeholder = "e.g. #{attribute.sample_attribute_type.placeholder}" unless attribute.sample_attribute_type.placeholder.blank?
+    include_blank = attribute.required? ? false : 'No value'
 
     case base_type
     when Seek::Samples::BaseType::TEXT
@@ -20,11 +21,13 @@ module CustomMetadataHelper
         text_field_tag element_name, value, data: { calendar: true }, class: "calendar form-control #{clz}", placeholder: placeholder
       end
     when Seek::Samples::BaseType::BOOLEAN
-      check_box_tag element_name, value, class: clz.to_s
+      content_tag :div, style:'width: 10em; position:relative' do
+        select_tag(element_name, options_for_select(["true","false"],value&.to_s), include_blank: include_blank, class: "form-control #{clz}")
+      end
     when Seek::Samples::BaseType::SEEK_DATA_FILE
       options = options_from_collection_for_select(DataFile.authorized_for(:view), :id,
                                                    :title, value.try(:[],'id'))
-      select_tag(element_name, options, include_blank: !attribute.required?, class: "form-control #{clz}")
+      select_tag(element_name, options, include_blank: include_blank, class: "form-control #{clz}")
     when Seek::Samples::BaseType::CV
       controlled_vocab_form_field attribute, element_name, value
     else

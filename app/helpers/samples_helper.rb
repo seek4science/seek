@@ -5,6 +5,7 @@ module SamplesHelper
     element_name = "sample[data][#{attribute.title}]"
     value = @sample.get_attribute_value(attribute.title)
     placeholder = "e.g. #{attribute.sample_attribute_type.placeholder}" unless attribute.sample_attribute_type.placeholder.blank?
+    include_blank = attribute.required? ? false : 'No value'
 
     case base_type
     when Seek::Samples::BaseType::TEXT
@@ -18,23 +19,25 @@ module SamplesHelper
         text_field_tag element_name, value, data: { calendar: true }, class: "calendar form-control #{clz}", placeholder: placeholder
       end
     when Seek::Samples::BaseType::BOOLEAN
-      check_box_tag element_name, value, class: "#{clz}"
+      content_tag :div, style:'width: 10em; position:relative' do
+        select_tag(element_name, options_for_select(["true","false"],value&.to_s), include_blank: include_blank, class: "form-control #{clz}")
+      end
     when Seek::Samples::BaseType::SEEK_STRAIN
       options = option_groups_from_collection_for_select(Organism.all, :strains,
                                                          :title, :id,
                                                          :title, value.try(:[],'id'))
-      select_tag(element_name, options, include_blank: !attribute.required?, class: "form-control #{clz}")
+      select_tag(element_name, options, include_blank: include_blank, class: "form-control #{clz}")
     when Seek::Samples::BaseType::SEEK_DATA_FILE
       options = options_from_collection_for_select(DataFile.authorized_for(:view), :id,
                                                          :title, value.try(:[],'id'))
-      select_tag(element_name, options, include_blank: !attribute.required?, class: "form-control #{clz}")
+      select_tag(element_name, options, include_blank: include_blank, class: "form-control #{clz}")
     when Seek::Samples::BaseType::CV
       controlled_vocab_form_field attribute, element_name, value
     when Seek::Samples::BaseType::SEEK_SAMPLE
       terms = attribute.linked_sample_type.samples.authorized_for('view').to_a
       options = options_from_collection_for_select(terms, :id, :title, value.try(:[], 'id'))
       select_tag element_name, options,
-                 include_blank: !attribute.required? , class: "form-control #{clz}"
+                 include_blank: include_blank , class: "form-control #{clz}"
     else
       text_field_tag element_name,value, class: "form-control #{clz}", placeholder: placeholder
     end
