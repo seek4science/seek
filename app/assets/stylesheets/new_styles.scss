@@ -1087,3 +1087,7 @@ span.disabled {
   overflow-x: auto;
 }
 
+a[href^="http://"]:after, a[href^="https://"]:after {
+  content: url("/assets/misc_icons/new_window.png"); /*url of your image*/
+}
+
