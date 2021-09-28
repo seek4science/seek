@@ -8,7 +8,7 @@ class WorkflowsController < ApplicationController
   before_action :find_display_asset, only: [:show, :download, :diagram, :ro_crate, :edit_paths, :update_paths]
   before_action :login_required, only: [:create, :create_version, :new_version,
                                         :create_from_files, :create_from_ro_crate,
-                                        :create_metadata, :provide_metadata]
+                                        :create_metadata, :provide_metadata, :create_from_git, :create_version_from_git]
   before_action :find_or_initialize_workflow, only: [:create_from_files, :create_from_ro_crate]
 
   include Seek::Publishing::PublishingCommon
@@ -30,7 +30,7 @@ class WorkflowsController < ApplicationController
       @git_repository.queue_fetch
 
       respond_to do |format|
-        format.html { redirect_to select_ref_git_repository_path(@git_repository, resource_type: :workflow, resource_id: @workflow.id) }
+        format.html
       end
     else
       @git_version = @workflow.latest_git_version.next_version(mutable: true, name: 'development')
@@ -127,7 +127,16 @@ class WorkflowsController < ApplicationController
 
   # Takes a remote Git repository and target ref
   def create_from_git
-    wizard = GitWorkflowWizard.new(params: workflow_params, id: params[:resource_id])
+    wizard = GitWorkflowWizard.new(params: workflow_params)
+    @workflow = wizard.run
+    respond_to do |format|
+      format.html { render wizard.next_step }
+    end
+  end
+
+  # Takes a remote Git repository and target ref
+  def create_version_from_git
+    wizard = GitWorkflowWizard.new(params: workflow_params, workflow: @workflow)
     @workflow = wizard.run
     respond_to do |format|
       format.html { render wizard.next_step }
@@ -337,7 +346,7 @@ class WorkflowsController < ApplicationController
                                      { discussion_links_attributes: [:id, :url, :label, :_destroy] },
                                      { git_version_attributes: [:name, :description, :ref, :commit, :root_path,
                                                                 :git_repository_id, :main_workflow_path,
-                                                                :abstract_cwl_path, :diagram_path,
+                                                                :abstract_cwl_path, :diagram_path, :remote,
                                                                 { remote_sources: {} }] })
   end
 

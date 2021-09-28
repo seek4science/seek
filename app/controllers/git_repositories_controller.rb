@@ -1,5 +1,5 @@
 class GitRepositoriesController < ApplicationController
-  before_action :get_repository, only: [:show, :select_ref, :fetch_status]
+  before_action :get_repository, except: [:create]
 
   def show
     respond_to do |format|
@@ -21,6 +21,12 @@ class GitRepositoriesController < ApplicationController
 
     respond_to do |format|
       format.json { render json: { status: status, text: status.to_s.humanize } }
+    end
+  end
+
+  def refs
+    respond_to do |format|
+      format.json { render json: @git_repository.remote_refs.to_json }
     end
   end
 
