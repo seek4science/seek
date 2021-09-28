@@ -73,9 +73,10 @@ module RelatedItemsHelper
 
   def related_items_hash(items_hash, limit = nil)
     hash = {}
-    items_hash.each do |type, items|
+    items_hash.each_key do |type|
+
       hash[type] = {}
-      hash[type][:items] = items
+      hash[type][:items] = items_hash[type]
       hash[type][:items_count] = hash[type][:items].count
       hash[type][:hidden_items] = []
       hash[type][:hidden_count] = 0

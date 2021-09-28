@@ -42,7 +42,7 @@ module Seek
       # FIXME: the user_creatable? is a bit mis-leading since we now support creation of people, projects, programmes by certain people in certain roles.
       cache('creatable_model_classes') do
         persistent_classes.select do |c|
-          c.respond_to?('user_creatable?') && c.user_creatable?
+          c.user_creatable?
         end.sort_by { |a| [a.is_asset? ? -1 : 1, a.is_isa? ? -1 : 1, a.name] }
       end
     end
@@ -140,6 +140,14 @@ module Seek
       ActiveRecord::Base.connection.instance_values['config'][:adapter]
     end
 
+    def self.delayed_job_pids
+      directory = "#{Rails.root}/tmp/pids"
+      Daemons::PidFile.find_files(directory, 'delayed_job').collect do |path|
+        file = path.sub("#{directory}/", '').sub('.pid', '')
+        Daemons::PidFile.new(directory, file)
+      end
+    end
+
     private
 
     def self.cache(name, &block)
@@ -152,16 +160,7 @@ module Seek
     end
 
     def self.filter_disabled(types)
-      disabled = %w[workflow event programme publication sample].collect do |setting|
-        unless Seek::Config.send("#{setting.pluralize}_enabled")
-          setting.classify.constantize
-        end
-      end.compact
-
-      # special case
-      disabled += [Node] unless Seek::Config.workflows_enabled
-
-      types - disabled
+      types.select(&:feature_enabled?)
     end
 
   end

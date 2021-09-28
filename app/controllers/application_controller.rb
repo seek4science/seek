@@ -172,6 +172,7 @@ class ApplicationController < ActionController::Base
           end
         end
         format.json { render json: {"title": "Unauthorized", "detail": flash[:error].to_s}, status: :unauthorized}
+        format.js { render json: {"title": "Unauthorized", "detail": flash[:error].to_s}, status: :unauthorized}
       end
     end
   end
@@ -255,7 +256,7 @@ class ApplicationController < ActionController::Base
             else
               flash[:error] = "You are not authorized to #{privilege} this #{name.humanize}."
             end
-            redirect_to(object)
+            handle_authorization_failure_redirect(object, privilege)
           else
             render template: 'general/landing_page_for_hidden_item', locals: { item: object }, status: :forbidden
           end
@@ -268,6 +269,10 @@ class ApplicationController < ActionController::Base
       end
       return false
     end
+  end
+
+  def handle_authorization_failure_redirect(object, privilege)
+    redirect_to(object)
   end
 
   def auth_to_create
@@ -604,6 +609,22 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def managed_programme_configured?
+    unless Programme.managed_programme
+      error("No managed #{t('programme')} is configured","No managed #{t('programme')} is configured")
+      return false
+    end
+  end
+
+  # This is a silly method to turn an Array of AR objects back into an AR relation so we can do joins etc. on it.
+  def relationify_collection(collection)
+    if collection.is_a?(Array)
+      controller_model.where(id: collection.map(&:id))
+    else
+      collection
+    end
+  end
+
   def determine_custom_metadata_keys
     keys = []
     root_key = controller_name.singularize.to_sym
@@ -617,4 +638,21 @@ class ApplicationController < ActionController::Base
     end
     keys
   end
+
+  def set_displaying_single_page
+    @single_page = true
+  end
+
+  def displaying_single_page?
+    @single_page || false
+  end
+  
+  helper_method :displaying_single_page?
+  
+  def display_isa_graph?
+    !displaying_single_page?
+  end
+  
+  helper_method :display_isa_graph?
+  
 end

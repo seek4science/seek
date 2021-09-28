@@ -3,13 +3,14 @@
     "id": "1039986486",
     "type": "assays",
     "attributes": {
-      "snapshots": null,
+      "snapshots": [],
       "policy":
       {
         "access":"no_access",
         "permissions":[]
       },
       "other_creators":  "Anonymous creator",
+      "position": null,
       "title": "A Maximal Modelling Assay",
       "description": "A Western Blot Assay",
       "assay_class": {

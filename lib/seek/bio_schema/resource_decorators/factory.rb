@@ -11,7 +11,7 @@ module Seek
 
         # get the Decorator for the given resource, throws an UnsupportedTypeException if that resource isn't supported
         def get(resource)
-          type = resource.class
+          type = resource.is_a_version? ? resource.parent.class : resource.class
           unless resource.schema_org_supported?
             raise UnsupportedTypeException, "Bioschema not supported for #{type.name}"
           end
@@ -23,9 +23,7 @@ module Seek
 
         def decorator_class(type)
           type_name = type.name
-          if type == Seek::BioSchema::DataCatalogMockModel
-            type_name = 'DataCatalog'
-          end
+          type_name = 'DataCatalog' if type == Seek::BioSchema::DataCatalogMockModel
           @decorator_classes[type] ||
             @decorator_classes[type] = "Seek::BioSchema::ResourceDecorators::#{type_name}".constantize
         end

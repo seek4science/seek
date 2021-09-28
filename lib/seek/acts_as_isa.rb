@@ -48,9 +48,8 @@ module Seek
     end
 
     module SingletonMethods
-      # defines that this is a user_creatable object type, and appears in the "New Object" gadget
       def user_creatable?
-        true
+        feature_enabled?
       end
 
       def can_create?

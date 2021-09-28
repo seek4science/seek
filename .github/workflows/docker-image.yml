@@ -1,0 +1,22 @@
+name: Test Docker Image Build
+
+on:
+  push:
+    branches:
+      - master
+      - workflow
+      - workflowhub
+      - seek-1.11
+      - seek-1.12
+  pull_request:
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag test-image:$(date +%s)

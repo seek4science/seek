@@ -3,7 +3,7 @@
 {
     "data": {
         "attributes": {
-            "tags": null,
+            "tags": [],
             "title": "An assay 27",
             "description": null,
             "assay_class": {

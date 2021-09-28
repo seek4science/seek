@@ -1,7 +1,7 @@
 
 unless CustomMetadataType.where(title:'MIAPPE metadata v1.1', supported_type:'Investigation').any?
   cmt = CustomMetadataType.new(title: 'MIAPPE metadata v1.1', supported_type:'Investigation')
-  cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'id', required:true, sample_attribute_type: SampleAttributeType.where(title:'string').first)
+  cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'id', required:true, sample_attribute_type: SampleAttributeType.where(title:'String').first)
   cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'submission_date', sample_attribute_type: SampleAttributeType.where(title:'Date').first)
   cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'license', sample_attribute_type: SampleAttributeType.where(title:'String').first)
   cmt.custom_metadata_attributes << CustomMetadataAttribute.new(title: 'miappe_version', required:true, sample_attribute_type: SampleAttributeType.where(title:'Integer').first)

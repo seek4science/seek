@@ -16,14 +16,21 @@ module Seek
         # validates that the attribute type is SeekSample if linked_sample_type is set, and vice-versa
         validate :linked_sample_type_and_attribute_type_consistency
 
-        delegate :controlled_vocab?, :seek_sample?, :seek_strain?, :seek_resource?, to: :sample_attribute_type, allow_nil: true
+        delegate :controlled_vocab?, :seek_sample?, :seek_sample_multi?, :seek_strain?, :seek_resource?, to: :sample_attribute_type, allow_nil: true
+      end
+
+      # checks whether the value is blank against the attribute type and base type
+      def test_blank?(value)
+        sample_attribute_type.test_blank?(value)
       end
 
       def validate_value?(value)
-        return false if required? && value.blank?
-        (value.blank? && !required?) || sample_attribute_type.validate_value?(value, required: required?,
-                                                                                     controlled_vocab: sample_controlled_vocab,
-                                                                                     linked_sample_type: linked_sample_type)
+        return false if required? && test_blank?(value)
+        return true if test_blank?(value) && !required?
+
+        sample_attribute_type.validate_value?(value, required: required?,
+                                                     controlled_vocab: sample_controlled_vocab,
+                                                     linked_sample_type: linked_sample_type)
       end
 
       def accessor_name
@@ -53,10 +60,10 @@ module Seek
       end
 
       def linked_sample_type_and_attribute_type_consistency
-        if sample_attribute_type && linked_sample_type && !seek_sample?
+        if sample_attribute_type && linked_sample_type && !seek_sample? && !seek_sample_multi?
           errors.add(:sample_attribute_type, 'Attribute type must be SeekSample if linked sample type set')
         end
-        if seek_sample? && linked_sample_type.nil?
+        if (seek_sample? || seek_sample_multi?) && linked_sample_type.nil?
           errors.add(:sample_controlled_vocab, 'Linked Sample Type must be set if attribute type is SeekSample')
         end
       end

@@ -21,8 +21,7 @@ gem 'rmagick', '2.15.2'
 gem 'rest-client', '~>2.0'
 gem 'factory_girl', '2.6.4'
 gem 'bio', '~> 1.5.1'
-gem 'sunspot_rails', '~>2.2.7'
-gem 'sunspot_solr', '~>2.2.0'
+gem 'sunspot_rails'
 gem 'progress_bar'
 gem 'savon', '1.1.0'
 gem 'dynamic_form'
@@ -54,7 +53,7 @@ gem 'will_paginate', '~> 3.1'
 gem 'yaml_db'
 gem 'rails_autolink'
 gem 'rfc-822'
-gem 'nokogiri', '~> 1.11.4'
+gem 'nokogiri', '~> 1.12.5'
 gem 'rdf-virtuoso', '>= 0.2.0'
 gem 'terrapin'
 gem 'lograge'
@@ -133,12 +132,13 @@ gem 'request_store'
 
 gem 'bundler', '>= 1.8.4'
 
-gem 'ro-crate-ruby', git: 'https://github.com/ResearchObject/ro-crate-ruby.git', ref: '70804d34264481e70d0fe83ecc6ad76eda164e74'
+gem 'ro-crate', '~> 0.4.9'
 
 gem 'git'
 gem 'redcarpet'
 gem 'i18n-js'
 gem 'whenever', '~> 1.0.0', require: false
+gem 'dotenv-rails', '~> 2.7.6'
 
 group :production do
   gem 'passenger'

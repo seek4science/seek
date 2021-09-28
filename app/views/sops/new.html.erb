@@ -29,7 +29,8 @@
       <%= fields_for(@sop) { |f| render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f} }-%>
 
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop} -%>
-      <%= fancy_multiselect @sop, :workflows, { other_projects_checkbox: false } if Seek::Config.workflows_enabled -%>
+
+      <%= fancy_multiselect @sop, :workflows, { other_projects_checkbox: false } -%>
 
       <%= form_submit_buttons(@sop) %>
 

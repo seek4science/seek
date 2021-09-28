@@ -17,12 +17,10 @@ echo "${GREEN}bundle install${NC}"
 bundle install --deployment
 
 bundle exec rake seek:workers:stop
-bundle exec rake sunspot:solr:stop
 
 echo "${GREEN} seek:upgrade${NC}"
 bundle exec rake seek:upgrade
 
-bundle exec rake sunspot:solr:start
 sleep 5 # small delay to make sure SOLR has started up and ready
 bundle exec rake seek:workers:start &
 

@@ -45,8 +45,10 @@ module Seek #:nodoc:
           rescue StandardError => e
             # Clean up
             snapshot.destroy
-            blob.destroy
-            File.delete(blob.filepath) if File.exist?(blob.filepath)
+            if blob.persisted?
+              blob.destroy
+              File.delete(blob.filepath) if File.exist?(blob.filepath)
+            end
             raise e
           ensure
             if ro_file

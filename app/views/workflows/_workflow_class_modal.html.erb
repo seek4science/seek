@@ -1,0 +1,14 @@
+<%= modal({ id: 'workflow-class-modal', size: 's' }) do %>
+  <% modal_header('New Workflow Type') %>
+  <% modal_body do %>
+    <%= form_for(WorkflowClass.new, remote: true) do |f| %>
+
+      <%= render partial: 'workflow_classes/workflow_class_fields', locals: { f: f } %>
+
+      <div>
+        <%= submit_tag "Create", data: { disable_with: 'Creating...' }, class: 'btn btn-primary' %>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+      </div>
+    <% end -%>
+  <% end %>
+<% end %>

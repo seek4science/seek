@@ -16,7 +16,7 @@ class StudiesControllerTest < ActionController::TestCase
   def rest_api_test_object
     @object = Factory :study, policy: Factory(:public_policy)
   end
-
+  
   test 'should get index' do
     Factory :study, policy: Factory(:public_policy)
     get :index
@@ -493,8 +493,7 @@ class StudiesControllerTest < ActionController::TestCase
     end
   end
 
-  def edit_max_object(study)
-    study.person_responsible = Factory(:max_person)
+  def edit_max_object(study)    
     add_creator_to_test_object(study)
   end
 

@@ -4,4 +4,6 @@ class AssetsCreator < ApplicationRecord
 
   include Seek::Rdf::ReactToAssociatedChange
   update_rdf_on_change :asset
+
+  default_scope { order(:id) }
 end

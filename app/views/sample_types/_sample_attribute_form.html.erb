@@ -16,7 +16,7 @@
 <% allow_attribute_removal = constraints.allow_attribute_removal?(sample_attribute)  %>
 <% allow_type_change = constraints.allow_type_change?(sample_attribute) %>
 <% allow_name_change = constraints.allow_name_change?(sample_attribute) %>
-
+<% seek_sample_multi = sample_attribute.try(:seek_sample_multi?) %>
 <tr class="sample-attribute <%= 'success' if sample_attribute.nil? -%>" data-index="<%= index-%>">
   <th scope="row" class="attribute-position">
     <div class="btn btn-info attribute-handle">
@@ -38,13 +38,12 @@
   <td class="text-center">
     <div class="checkbox-inline">
       <%= hidden_field_tag "#{field_name_prefix}[is_title]", '0' %>
-      <%= check_box_tag "#{field_name_prefix}[is_title]", '1', is_title, class:'sample-type-is-title',disabled: !allow_required %>
+      <%= check_box_tag "#{field_name_prefix}[is_title]", '1', is_title, class:'sample-type-is-title',disabled: seek_sample_multi || !allow_required %>
     </div>
   </td>
   <td>
     <%= select_tag "#{field_name_prefix}[sample_attribute_type_id]",
-                   options_for_select(SampleAttributeType.all.sort_by { |t| t.default? ? 0 : 1 }.map { |t| [t.title, t.id,{'data-is-cv'=>t.controlled_vocab?, 'data-is-seek-sample'=>t.seek_sample? }] },
-                                      attribute_type_id),
+                   options_for_select(SampleAttributeType.all.sort_by { |t| t.default? ? 0 : 1 }.map { |t| [t.title, t.id,{'data-is-cv'=>t.controlled_vocab?, 'data-is-seek-sample'=>t.seek_sample? || t.seek_sample_multi? }] }, attribute_type_id),
                    class: 'form-control sample-type-attribute-type',
                    disabled: !allow_type_change %>
     <div class='controlled-vocab-block' style="<%= 'display:none;' unless sample_attribute.try(:controlled_vocab?) %>">
@@ -63,7 +62,7 @@
       <%= button_link_to('Browse', 'index', sample_controlled_vocabs_path, target: :_blank) %>
 
     </div>
-    <div class='sample-type-block' style="<%= 'display:none;' unless sample_attribute.try(:seek_sample?) %>">
+    <div class='sample-type-block' style="<%= 'display:none;' unless sample_attribute.try(:seek_sample?) || seek_sample_multi %>">
       <br/>
       <%
         options = sample_type_grouped_options

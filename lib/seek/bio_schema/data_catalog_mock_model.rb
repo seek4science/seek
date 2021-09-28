@@ -21,13 +21,18 @@ module Seek
       def provider
         {
           '@type' => 'Organization',
+          '@id' => Seek::Config.dm_project_link,
           'name' => Seek::Config.dm_project_name,
           'url' => Seek::Config.dm_project_link
         }
       end
 
-      def date_created
+      def created_at
         ActivityLog.order(:id).first.try(:created_at)
+      end
+
+      def updated_at
+        ActivityLog.order(:id).last.try(:updated_at)
       end
 
       def url
@@ -36,6 +41,10 @@ module Seek
 
       def schema_org_supported?
         true
+      end
+
+      def is_a_version?
+        false
       end
     end
   end

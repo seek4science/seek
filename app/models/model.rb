@@ -111,10 +111,6 @@ class Model < ApplicationRecord
     end
   end
 
-  #defines that this is a user_creatable object, and appears in the "New Object" gadget
-  def self.user_creatable?
-    Seek::Config.models_enabled
-  end
 
   def model_format
     if read_attribute(:model_format_id).nil? && contains_sbml?

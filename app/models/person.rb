@@ -397,6 +397,7 @@ class Person < ApplicationRecord
     group = WorkGroup.where(project_id: project.id, institution_id: institution.id).first
     group ||= WorkGroup.new project: project, institution: institution
 
+
     membership = GroupMembership.where(person_id: id, work_group_id: group.id).first
     membership ||= GroupMembership.new person: self, work_group: group
 
@@ -418,7 +419,7 @@ class Person < ApplicationRecord
 
   # activation email logs associated with this person
   def activation_email_logs
-    MessageLog.activation_email_logs(self)
+    ActivationEmailMessageLog.activation_email_logs(self)
   end
 
 

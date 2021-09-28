@@ -59,7 +59,6 @@ class Event < ApplicationRecord
     columns_default + ['address','url','title']
   end
 
-  # defines that this is a user_creatable object type, and appears in the "New Object" gadget
   def self.user_creatable?
     Seek::Config.events_enabled
   end

@@ -18,7 +18,18 @@ module SamplesHelper
         text_field_tag element_name, value, data: { calendar: true }, class: "calendar form-control #{clz}", placeholder: placeholder
       end
     when Seek::Samples::BaseType::BOOLEAN
-      check_box_tag element_name, value, class: "#{clz}"
+      content_tag :div, class: 'form-check' do
+        unless attribute.required?
+          concat(text_field_tag(element_name, '', class: 'form-check-input', type: :radio, checked: value != true && value != false))
+          concat(label_tag(nil, "Unset", class: 'form-check-label', style:'padding-left:0.25em;padding-right:1em;'))
+        end
+
+        concat(text_field_tag(element_name, 'true', class: 'form-check-input', type: :radio, checked: value == true))
+        concat(label_tag(nil, "true", class: 'form-check-label', style:'padding-left:0.25em;padding-right:1em;'))
+
+        concat(text_field_tag(element_name, 'false', class: 'form-check-input', type: :radio, checked: value == false))
+        concat(label_tag(nil, "false", class: 'form-check-label', style:'padding-left:0.25em;padding-right:1em;'))
+      end
     when Seek::Samples::BaseType::SEEK_STRAIN
       options = option_groups_from_collection_for_select(Organism.all, :strains,
                                                          :title, :id,
@@ -35,6 +46,8 @@ module SamplesHelper
       options = options_from_collection_for_select(terms, :id, :title, value.try(:[], 'id'))
       select_tag element_name, options,
                  include_blank: !attribute.required? , class: "form-control #{clz}"
+    when Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
+      sample_multi_form_field attribute, element_name, value
     else
       text_field_tag element_name,value, class: "form-control #{clz}", placeholder: placeholder
     end
@@ -48,9 +61,9 @@ module SamplesHelper
         value
       )
       select_tag element_name,
-                 options,
-                 include_blank: !attribute.required?,
-                 class: "form-control"
+                 options,                 
+                 class: "form-control",
+                 include_blank: ""
     else
       scv_id = attribute.sample_controlled_vocab.id
       existing_objects = []
@@ -60,6 +73,16 @@ module SamplesHelper
                     handlebars_template: 'typeahead/controlled_vocab_term' }, 
                     limit: 1)
     end
+  end
+
+  def sample_multi_form_field(attribute, element_name, value)  
+    existing_objects = []
+    str = Struct.new(:id, :name)
+    value.each {|v| existing_objects << str.new(v[:id], v[:title]) if v} if value
+    objects_input(element_name, existing_objects,
+                  typeahead: { query_url: typeahead_samples_path + "?query=%QUERY&linked_sample_type_id=#{attribute.linked_sample_type.id}", 
+                  handlebars_template: 'typeahead/controlled_vocab_term' }, 
+                  limit: 5)
   end
 
   def authorised_samples(projects = nil)
@@ -88,6 +111,8 @@ module SamplesHelper
         seek_strain_attribute_display(value)
       when Seek::Samples::BaseType::SEEK_SAMPLE
         seek_sample_attribute_display(value)
+      when Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
+        seek_sample_attribute_display(value)
       when Seek::Samples::BaseType::SEEK_DATA_FILE
         seek_data_file_attribute_display(value)
       when Seek::Samples::BaseType::CV
@@ -108,7 +133,11 @@ module SamplesHelper
   end
 
   def seek_sample_attribute_display(value)
-    seek_resource_attribute_display(Sample,value)
+    if value.kind_of?(Array)
+      value.map {|v| seek_resource_attribute_display(Sample,v)} .join(", ").html_safe
+    else
+      seek_resource_attribute_display(Sample,value)
+    end
   end
 
   def seek_data_file_attribute_display(value)

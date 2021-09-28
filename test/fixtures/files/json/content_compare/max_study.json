@@ -3,7 +3,7 @@
     "id": "1039986486",
     "type": "studies",
     "attributes": {
-      "snapshots": null,
+      "snapshots": [],
       "policy":
       {
         "access":"no_access",
@@ -13,7 +13,7 @@
       "description": "The Study of many things",
       "experimentalists": "Wet lab people",
       "other_creators": "Marie Curie",
-      "person_responsible_id": "887473922",
+      "position": null,
       "discussion_links": [{
         "id": 55,
         "url": "http://www.slack.com/",
@@ -42,11 +42,7 @@
           {
             "id": "1039986548",
             "type": "people"
-          },
-          {
-            "id": "1039986744",
-            "type": "people"
-          },
+          },          
           {
             "id": "887473922",
             "type": "people"

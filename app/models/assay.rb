@@ -1,4 +1,5 @@
 class Assay < ApplicationRecord
+
   include Seek::Rdf::RdfGeneration
   include Seek::Ontologies::AssayOntologyTypes
   include Seek::Taggable
@@ -185,10 +186,6 @@ class Assay < ApplicationRecord
 
   def human_disease_terms
     human_diseases.collect(&:searchable_terms).flatten
-  end
-
-  def self.user_creatable?
-    Seek::Config.assays_enabled
   end
 
   # Associates and organism with the assay

@@ -1,6 +1,6 @@
-FROM ruby:2.6-stretch
+FROM ruby:2.6-buster
 
-MAINTAINER Stuart Owen <orcid.org/0000-0003-2130-0865>, Finn Bacall
+LABEL maintainer="Stuart Owen <orcid.org/0000-0003-2130-0865>, Finn Bacall"
 
 ENV APP_DIR /seek
 ENV RAILS_ENV=production
@@ -12,7 +12,7 @@ RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends build-essential git \
 		libcurl4-gnutls-dev libmagick++-dev libpq-dev libreadline-dev \
 		libreoffice libsqlite3-dev libssl-dev libxml++2.6-dev \
-		libxslt1-dev locales default-mysql-client nginx nodejs openjdk-8-jdk \
+		libxslt1-dev locales default-mysql-client nginx nodejs openjdk-11-jdk-headless \
 		python3 python3-pip python3-setuptools python3-wheel python3-psutil python3-dev \
 		poppler-utils postgresql-client sqlite3 links telnet vim-tiny zip && \
     apt-get clean && \
