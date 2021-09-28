@@ -7,7 +7,6 @@ module Seek
                          subject_of: :events
 
         schema_mappings version: :version,
-                        sd_publisher: :sdPublisher,
                         license: :license,
                         all_creators: :creator,
                         producer: :producer,
@@ -39,12 +38,6 @@ module Seek
           all
         end
 
-        def sd_publisher
-          { :@type => 'Organization',
-            :@id => Seek::Config.site_base_host,
-            :name => Seek::Config.project_name,
-            :url => Seek::Config.site_base_host }
-        end
       end
     end
   end

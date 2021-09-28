@@ -19,11 +19,18 @@ module Seek
         delegate :controlled_vocab?, :seek_sample?, :seek_strain?, :seek_resource?, to: :sample_attribute_type, allow_nil: true
       end
 
+      # checks whether the value is blank against the attribute type and base type
+      def test_blank?(value)
+        sample_attribute_type.test_blank?(value)
+      end
+
       def validate_value?(value)
-        return false if required? && value.blank?
-        (value.blank? && !required?) || sample_attribute_type.validate_value?(value, required: required?,
-                                                                                     controlled_vocab: sample_controlled_vocab,
-                                                                                     linked_sample_type: linked_sample_type)
+        return false if required? && test_blank?(value)
+        return true if test_blank?(value) && !required?
+
+        sample_attribute_type.validate_value?(value, required: required?,
+                                                     controlled_vocab: sample_controlled_vocab,
+                                                     linked_sample_type: linked_sample_type)
       end
 
       def accessor_name

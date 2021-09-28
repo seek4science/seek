@@ -1,18 +1,18 @@
 {
   "data": {
     "type": "samples",
-    "id": "<%=id%>",
+    "id": "292",
     "attributes": {
       "attribute_map": {
-        "the_title": "<%=the_title%>"
+        "full_name": "John Doe",
+        "address": "5 School Lane"
       },
-      "tags": null
     },
     "relationships": {
       "projects": {
         "data": [
           {
-            "id": "<%= project_id %>",
+            "id": "5",
             "type": "projects"
           }
         ]
