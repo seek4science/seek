@@ -48,6 +48,14 @@
 
         ]
       },
+      "assays": {
+        "data": [
+          {
+            "id": "25",
+            "type": "assays"
+          }
+        ]
+      },
       "people": {
         "data": [
           {

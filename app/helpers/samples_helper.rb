@@ -18,7 +18,18 @@ module SamplesHelper
         text_field_tag element_name, value, data: { calendar: true }, class: "calendar form-control #{clz}", placeholder: placeholder
       end
     when Seek::Samples::BaseType::BOOLEAN
-      check_box_tag element_name, value, class: "#{clz}"
+      content_tag :div, class: 'form-check' do
+        unless attribute.required?
+          concat(text_field_tag(element_name, '', class: 'form-check-input', type: :radio, checked: value != true && value != false))
+          concat(label_tag(nil, "Unset", class: 'form-check-label', style:'padding-left:0.25em;padding-right:1em;'))
+        end
+
+        concat(text_field_tag(element_name, 'true', class: 'form-check-input', type: :radio, checked: value == true))
+        concat(label_tag(nil, "true", class: 'form-check-label', style:'padding-left:0.25em;padding-right:1em;'))
+
+        concat(text_field_tag(element_name, 'false', class: 'form-check-input', type: :radio, checked: value == false))
+        concat(label_tag(nil, "false", class: 'form-check-label', style:'padding-left:0.25em;padding-right:1em;'))
+      end
     when Seek::Samples::BaseType::SEEK_STRAIN
       options = option_groups_from_collection_for_select(Organism.all, :strains,
                                                          :title, :id,

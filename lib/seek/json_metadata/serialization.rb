@@ -28,12 +28,6 @@ module Seek
         data[attr] = value
       end
 
-      def blank_attribute?(attr)
-        attr = attr.accessor_name if attr.is_a?(attribute_class)
-
-        data[attr].blank? || (data[attr].is_a?(Hash) && data[attr]['id'].blank? && data[attr]['title'].blank?)
-      end
-
       def update_json_metadata
         self.json_metadata = data.to_json
       end

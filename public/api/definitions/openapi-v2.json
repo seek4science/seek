@@ -236,6 +236,12 @@
             }
         },
         {
+            "name": "samples",
+            "description": {
+                "$ref": "../descriptions/samples.md"
+            }
+        },
+        {
             "name": "workflows",
             "description": {
                 "$ref": "../descriptions/workflows.md"
@@ -303,8 +309,8 @@
             "tags": [
                 "organisms",
                 "sampleTypes",
-                "sampleAttributeTypes",
-                "samples"
+                "samples",
+                "sampleAttributeTypes"
             ]
         }
     ],
@@ -5849,6 +5855,73 @@
             ],
             "additionalProperties": false
         },
+        "sampleTypeSampleAttributesPatch": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+                "$ref": "#/definitions/sampleTypeSampleAttributePatch"
+            }
+        },
+        "sampleTypeSampleAttributePatch": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "title": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "sample_attribute_type": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        },
+                        "title": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        }
+                    },
+                    "oneOf": [
+                        {
+                            "required": [
+                                "id"
+                            ]
+                        },
+                        {
+                            "required": [
+                                "title"
+                            ]
+                        }
+                    ]
+                },
+                "required": {
+                    "type": "boolean"
+                },
+                "pos": {
+                    "$ref": "#/definitions/nullableInteger"
+                },
+                "unit": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "is_title": {
+                    "type": "boolean"
+                },
+                "sample_controlled_vocab_id": {
+                    "$ref": "#/definitions/nullableInteger"
+                },
+                "linked_sample_type_id": {
+                    "$ref": "#/definitions/nullableInteger"
+                },
+                "_destroy": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+
+            ],
+            "additionalProperties": false
+        },
         "sampleTypeSampleAttributesPost": {
             "type": "array",
             "minItems": 1,
@@ -5876,8 +5949,17 @@
                             "$ref": "#/definitions/nonEmptyString"
                         }
                     },
-                    "required": [
-                        "title"
+                    "oneOf": [
+                        {
+                            "required": [
+                                "id"
+                            ]
+                        },
+                        {
+                            "required": [
+                                "title"
+                            ]
+                        }
                     ]
                 },
                 "required": {
@@ -12090,6 +12172,9 @@
                                 "data_files": {
                                     "$ref": "#/definitions/dataFileReferencesList"
                                 },
+                                "assays": {
+                                    "$ref": "#/definitions/assayReferencesList"
+                                },
                                 "sample_type": {
                                     "$ref": "#/definitions/sampleTypeReferences"
                                 }
@@ -12099,6 +12184,8 @@
                                 "projects",
                                 "people",
                                 "creators",
+                                "assays",
+                                "data_files",
                                 "sample_type"
                             ],
                             "additionalProperties": false
@@ -12175,6 +12262,9 @@
                                 "data_files": {
                                     "$ref": "#/definitions/dataFileReferencesList"
                                 },
+                                "assays": {
+                                    "$ref": "#/definitions/assayReferencesList"
+                                },
                                 "sample_type": {
                                     "$ref": "#/definitions/sampleTypeReferences"
                                 }
@@ -12248,6 +12338,9 @@
                                 },
                                 "data_files": {
                                     "$ref": "#/definitions/dataFileReferencesList"
+                                },
+                                "assays": {
+                                    "$ref": "#/definitions/assayReferencesList"
                                 },
                                 "sample_type": {
                                     "$ref": "#/definitions/sampleTypeReference"
@@ -12497,7 +12590,7 @@
                                     "$ref": "#/definitions/nullableNonEmptyString"
                                 },
                                 "sample_attributes": {
-                                    "$ref": "#/definitions/sampleTypeSampleAttributesPost"
+                                    "$ref": "#/definitions/sampleTypeSampleAttributesPatch"
                                 }
                             },
                             "additionalProperties": false

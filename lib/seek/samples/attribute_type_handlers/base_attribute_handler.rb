@@ -11,6 +11,11 @@ module Seek
           value
         end
 
+        # whether the value is considered blank when full filling being required
+        def test_blank?(value)
+          value.blank?
+        end
+
         def validate_value?(value)
           begin
             test_value(value)
