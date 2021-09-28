@@ -144,26 +144,24 @@ function item_clicked(type, id, parent) {
   selectedItem.type = type;
   selectedItem.parent = parent;
   if (type == "sample") {
-    $j("#sample_contents").show();
-    loadItemDetails(pid, parent.id, parent.type, { view: "default" });
+    loadItemDetails(`/assays/${parent.id}/samples`, { view: "default" });
   } else {
-    $j("#item_contents").show();
-    loadItemDetails(pid, id, type, { view: "default" });
+    loadItemDetails(`/${pluralize(type)}/${id}`, { view: "default" });
   }
+
+  $j("#item_contents").show();
 }
 
 const loadAssaySamples = (view, table_cols) =>
-  loadItemDetails(pid, selectedItem.parent.id, selectedItem.parent.type, { view, table_cols });
+  loadItemDetails(`/assays/${selectedItem.parent.id}/samples`, { view, table_cols });
 
-const loadItemDetails = (pid, id, type, params = {}) => {
-  const p = Object.keys(params)
-    .map((x) => `${x}=${params[x]}`)
-    .join("&");
+const loadItemDetails = (url, params = {}) => {
   $j.ajax({
-    url: `/single_pages/${pid}/render_item_detail/${id}/type/${type}?${p}`,
+    url,
+    data: $j.extend(params, { only_content: true }),
     cache: false,
-    type: "GET",
-    dataType: "script",
+    type: "get",
+    success: (s) => $j("#item-layout").html(s),
     beforeSend: () => $j("#loader").show(),
     complete: () => $j("#loader").fadeOut(100),
     error: (e) => {
@@ -177,6 +175,10 @@ const loadItemDetails = (pid, id, type, params = {}) => {
 function hideAllViews() {
   $j("*[id*=_contents]").hide();
   updateBreadcrumb();
+}
+
+function pluralize(str) {
+  return str == "study" ? "studies" : str + "s";
 }
 
 function bounce(item, text) {

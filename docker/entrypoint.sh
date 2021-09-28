@@ -18,21 +18,17 @@ then
     bundle exec rake db:seed:openseek:default_openbis_endpoint
 fi
 
-echo "GENERATING CRONTAB"
-bundle exec whenever > /seek/seek.crontab
-
-echo "STARTING SUPERCRONIC"
-supercronic /seek/seek.crontab &
-
 # Start Rails
 echo "STARTING SEEK"
 bundle exec puma -C docker/puma.rb -d
 
-# Workers
+# Workers and Cron
 if [ -z $NO_ENTRYPOINT_WORKERS ] #Don't start if flag set, for use with docker-compose
 then
     echo "STARTING WORKERS"
     bundle exec rake seek:workers:start &
+    
+    setup_and_start_cron
 fi
 
 # Ensure things have started up and logs are available before tailing

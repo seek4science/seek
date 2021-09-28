@@ -3,7 +3,7 @@
         "id": "139",
         "type": "models",
         "attributes": {
-            "tags": null,
+            "tags": [],
             "title": "GLCtr Kinetic model",
             "description": "Mathematica notebook for the parameterisation of the glucose transport rate equation based on SEEK linked experimental data.",
             "license": null,

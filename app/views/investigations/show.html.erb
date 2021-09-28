@@ -1,10 +1,10 @@
 <ul class="nav nav-tabs">
     <li class="active ">
-        <a data-toggle="tab" href="#details"><i class="glyphicon glyphicon-list-alt"></i>&nbsp;Details</a>
+        <a data-toggle="tab" href="#details"><i class="glyphicon glyphicon-list-alt"></i> Details</a>
     </li>
     <li>
         <a data-toggle="tab" href="#related-items">
-            <i class="glyphicon glyphicon-th-list"></i>&nbsp;Related items
+            <i class="glyphicon glyphicon-th-list"></i> Related items
         </a>
     </li>
 </ul>
@@ -22,6 +22,10 @@
               <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @investigation}  %>
             </div>
           </div>
+	  <p id="position">
+      		<b><%= "Investigation position" %>: </b>
+      		<%= @investigation.position %>
+    	  </p>	
           <%= render partial: 'custom_metadata/custom_metadata_attribute_values', locals: {resource: @investigation} %>
           <%= render partial: 'general/isa_graph', locals: { root_item: @investigation, options: { depth: 4 } } -%>
         </div>

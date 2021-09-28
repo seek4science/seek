@@ -419,7 +419,7 @@ class Person < ApplicationRecord
 
   # activation email logs associated with this person
   def activation_email_logs
-    MessageLog.activation_email_logs(self)
+    ActivationEmailMessageLog.activation_email_logs(self)
   end
 
 

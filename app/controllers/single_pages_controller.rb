@@ -8,7 +8,6 @@ class SinglePagesController < ApplicationController
   def show
     @project = Project.find(params[:id])
     @folders = project_folders
-    # For creating new investigation and study in Project view page
     @investigation = Investigation.new
     @study = Study.new
     @assay = Assay.new
@@ -19,25 +18,6 @@ class SinglePagesController < ApplicationController
   end
   
   def index
-  end
-
-  def render_item_detail
-    begin
-      instance_variable_set("@item", params[:type].camelize.constantize.find(params[:id]))
-      # To be accessed in associated template (e.g. Projects/view => @project)
-      instance_variable_set("@#{params[:type]}", @item)
-      find_display_asset(@item) if @item.respond_to?('latest_version')
-      @item_controller = @item.class.name.underscore.pluralize
-    rescue Exception => e
-      error = e.message
-    end
-    respond_to do |format|
-      if error
-        format.js { render plain: error, status: :unprocessable_entity }
-      else
-        format.js
-      end
-    end
   end
 
   def single_page_enabled

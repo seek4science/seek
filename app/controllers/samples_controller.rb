@@ -8,21 +8,24 @@ class SamplesController < ApplicationController
   before_action :samples_enabled?
   before_action :find_index_assets, only: :index
   before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview]
-
+  
   before_action :auth_to_create, only: [:new, :create]
 
+  before_action :set_displaying_single_page, only: [:index]
+
+  
   include Seek::IsaGraphExtensions
 
   def index
     # There must be better ways of coding this
     if @data_file || @sample_type
       respond_to do |format|
-        format.html
+        format.html { render(params[:only_content] ? { layout: false } : {})}
         format.json {render json: :not_implemented, status: :not_implemented }
       end
     else
       respond_to do |format|
-        format.html {super}
+        format.html {params[:only_content] ? render({ layout: false }) : super}
         format.json {render json: :not_implemented, status: :not_implemented }
       end
     end

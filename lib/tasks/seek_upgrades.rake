@@ -153,7 +153,7 @@ namespace :seek do
 
   task(remove_old_project_join_logs: :environment) do
     puts "... Removing redundant project join request logs ..."
-    logs = MessageLog.project_membership_requests
+    logs = ProjectMembershipMessageLog.all
     logs.each do |log|
       begin
         JSON.parse(log.details)

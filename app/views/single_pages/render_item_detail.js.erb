@@ -1,2 +1,0 @@
-$j("#item-layout").html("<%= escape_javascript(render template: @item.model_name.to_s.pluralize.underscore + '/show') %>");
-$j("#samples-details").html("<%= escape_javascript(render partial: 'general/index_facets_or_paged', locals: { items: @assay.samples }) if @assay %> ");

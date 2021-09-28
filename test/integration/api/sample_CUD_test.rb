@@ -25,6 +25,78 @@ class SampleCUDTest < ActionDispatch::IntegrationTest
     @to_post = load_template("post_min_#{@clz}.json.erb", {project_id: @min_project.id, sample_type_id: @sample_type.id})
   end
 
+  test 'patching a couple of attributes retains others' do
+    admin_login
+    sample = Factory(:patient_sample, contributor: @current_person, policy: Factory(:public_policy))
+    params = {
+      "data": {
+        "type": "samples",
+        "id": "#{sample.id}",
+        "attributes": {
+          "attribute_map": {
+            "full name": "Jack Frost",
+            "weight": 12.4,
+            "postcode": "Z50 8GG"
+          }
+        }
+      }
+    }.to_json
+    assert_no_difference('Sample.count') do
+      patch sample_path(sample.id, format: :json), params: params,headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+    end
+
+    assert_response :success
+    sample = Sample.find(sample.id)
+    assert_equal "Jack Frost", sample.get_attribute_value("full name")
+    assert_equal 12.4, sample.get_attribute_value("weight")
+    assert_equal "Z50 8GG", sample.get_attribute_value("postcode")
+    assert_equal 44, sample.get_attribute_value("age")
+  end
+
+  test 'set sample_type and attributes in post' do
+    admin_login
+    patient_sample_type = Factory(:patient_sample_type)
+    params = {
+      "data": {
+        "type": "samples",
+        "attributes": {
+          "title": "Jack Frost",
+          "attribute_map": {
+            "full name": "Jack Frost",
+            "weight": 12.4,
+            "age": 12
+          }
+        },
+        "relationships": {
+          "projects": {
+            "data":
+              [
+                {
+                  "type": "projects",
+                  "id": "#{@current_person.projects.first.id}"
+                }
+              ]
+          },
+          "sample_type": {
+            "data": {
+              "id": "#{patient_sample_type.id}",
+              "type": "sample_types"
+            }
+          }
+        }
+      }
+    }.to_json
+    assert_difference('Sample.count') do
+      post samples_path(format: :json), params: params, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+    end
+    assert_response :success
+    sample = Sample.last
+    assert_equal patient_sample_type, sample.sample_type
+    assert_equal "Jack Frost", sample.get_attribute_value("full name")
+    assert_equal 12.4, sample.get_attribute_value("weight")
+    assert_equal 12, sample.get_attribute_value("age")
+  end
+
   def create_post_values
       @post_values = {
          sample_type_id: @sample_type.id,
@@ -38,7 +110,7 @@ class SampleCUDTest < ActionDispatch::IntegrationTest
       sample_type_id: @sample_type.id,
       project_id: @min_project.id,
       creator_ids: [@current_person.id],
-      title: @sample.title}
+      the_title: @sample.get_attribute_value("the_title")}
   end
 
 end

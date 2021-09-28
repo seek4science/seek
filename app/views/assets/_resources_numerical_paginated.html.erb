@@ -25,9 +25,6 @@
 
 %>
 
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-
-
 <% content_for :pagination do %>
   <%= render partial: 'general/paginate_numerical', locals: { objects: objects } if objects.respond_to?(:current_page) %>
 <% end %>
@@ -137,6 +134,8 @@
     event.stopPropagation();
   });
 
+  var colselector = document.getElementById('sortable-colselector')
+  if (colselector)
   new Sortable(document.getElementById('sortable-colselector'), {
     animation: 150,
     handle: '.handle',
@@ -156,7 +155,7 @@
       table_cols.push(this.value);
     });
     <% if displaying_single_page? %>
-      loadAssaySamples("table", encodeURIComponent(table_cols.toString()))
+      loadAssaySamples("table", table_cols.toString())
     <% else %>
       const url = new URL(window.location.href);
       const search_params = url.searchParams;
