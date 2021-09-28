@@ -993,7 +993,9 @@ class WorkflowsControllerTest < ActionController::TestCase
       end
     end
 
-    assert_redirected_to select_ref_git_repository_path(workflow.git_version.git_repository, resource_type: 'workflow', resource_id: workflow.id)
+    assert_response :success
+    assert_select '#repo-ref-form'
+    assert_select 'form[action=?]', create_version_from_git_workflow_path(workflow.id)
   end
 
   test 'get new git version page for local git repo' do

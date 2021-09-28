@@ -1,6 +1,6 @@
-<div id="repo-ref-form" data-field-name="<%= name -%>">
-  <% in_progress = git_repository.remote_git_fetch_task&.in_progress? %>
+<% in_progress = git_repository.remote_git_fetch_task&.in_progress? %>
 
+<div id="repo-ref-form" data-field-name="<%= name -%>">
   <div id="repo-fetching-status" style="display: none">
     <div class="alert alert-info" role="alert">
       <strong>Checking out <%= git_repository.remote %></strong><br/>
@@ -67,7 +67,7 @@
         var field = $j('#repo-ref-form').data('fieldName');
         $j('#repo-fetching-status').hide();
         $j('#repo-ref-list').show();
-        var branches = $j('#refs-branches ul');
+        var branches = $j('#refs-branches');
         refs.branches.forEach(function (ref) {
             branches.append(HandlebarsTemplates['git/ref']({ ref: ref, field: field }));
         });
