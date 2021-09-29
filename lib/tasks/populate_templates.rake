@@ -5,7 +5,7 @@ require 'rake'
 namespace :seek do
   desc "Fetch ontology terms from EBI API"
   task :populate_templates => :environment do
-    begin
+    # begin
       Template.delete_all
       TemplateAttribute.delete_all
       SampleControlledVocab.delete_all
@@ -89,13 +89,15 @@ namespace :seek do
               
               TemplateAttribute.create({
                 title: attribute["name"], 
+                is_title: attribute["title"]||0, 
+                isa_tag_id: get_isa_tag_id(attribute["isaTag"]),
                 short_name: attribute["short_name"],
                 required: attribute["required"],
                 description: attribute["description"],
                 sample_controlled_vocab_id: scv.blank? ? nil : scv.id,
                 template_id: repo.id,
-                sample_attribute_type_id: is_ontology ? get_sample_attribute_type("Ontology") : is_CV ? 
-                get_sample_attribute_type("Controlled Vocabulary") : get_sample_attribute_type("Text") #Based on sample_attribute_type table
+                iri: attribute["iri"],
+                sample_attribute_type_id: get_sample_attribute_type(attribute["dataType"]) #Based on sample_attribute_type table
               })
 
             end
@@ -103,12 +105,17 @@ namespace :seek do
           end
         end
       end
-    rescue Exception => e
-      puts e
-    end
+    # rescue Exception => e
+    #   puts e
+    # end
   end
 
   def get_sample_attribute_type(title)
     SampleAttributeType.where(title: title).first.id
+  end
+
+  def get_isa_tag_id(title)
+    return nil if title.blank?
+    IsaTag.where(title: title).first.id
   end
 end
