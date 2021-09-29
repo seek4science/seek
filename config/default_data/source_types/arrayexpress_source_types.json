@@ -4,29 +4,43 @@
       "metadata": {
         "name": "library construction",
         "group": "arrayexpress",
-        "group_order": 3,
-        "temporary_name": "3_arrayexpress_library_construction",
-        "template_version": "1.1.0",
+        "group_order": 4,
+        "temporary_name": "4_arrayexpress_library_construction",
+        "template_version": "1.2.0",
         "isa_config": "genome_seq_default_v2015-07-02",
-        "isa_measurement_type": "genome sequencing",
+        "isa_measurement_type": "transcription profiling",
         "isa_technology_type": "nucleotide sequencing",
         "isa_protocol_type": "library construction",
-        "repo_schema_id": "ENA General experiment information 2021",
+        "repo_schema_id": "General experiment information 2021",
         "organism": "any",
         "level": "assay"
       },
       "data": [
         {
-          "name": "protocol type",
-          "description": "type of assay or experimental step performed.",
+          "iri": null,
+          "name": "Input",
+          "description": "Existing Samples in DataHub that represent input for this protocol.",
+          "dataType": "SEEK Sample Multi",
           "required": true,
-          "ontology": null,
-          "CVList": ["library construction"]
+          "isaTag": null
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0004184",
+          "name": "library construction",
+          "description": "A protocol that describes the processes performed and equipment used to prepare nucleic acid sequencing library.",
+          "required": true,
+          "isaTag": "protocol",
+          "ontology": null,
+          "dataType": "String",
+          "CVList": null
+        },
+        {
+          "iri": null,
           "name": "library source",
           "description": "The LIBRARY_SOURCE specifies the type of source material that is being sequenced. (SRA 1.2 documentation)",
+          "dataType": "Controlled Vocabulary",
           "required": true,
+          "isaTag": "parameter_value",
           "ontology": null,
           "CVList": [
             "GENOMIC",
@@ -41,9 +55,12 @@
           ]
         },
         {
+          "iri": null,
           "name": "library strategy",
           "description": "Sequencing technique intended for this library (SRA 1.2 documentation)",
+          "dataType": "Controlled Vocabulary",
           "required": true,
+          "isaTag": "parameter_value",
           "ontology": null,
           "CVList": [
             "WGS",
@@ -84,9 +101,12 @@
           ]
         },
         {
+          "iri": null,
           "name": "library selection",
           "description": "Whether any method was used to select for or against, enrich, or screen the material being sequenced. (SRA 1.2 documentation)",
+          "dataType": "Controlled Vocabulary",
           "required": true,
+          "isaTag": "parameter_value",
           "ontology": null,
           "CVList": [
             "RANDOM",
@@ -123,25 +143,43 @@
           ]
         },
         {
+          "iri": null,
           "name": "library layout",
           "description": "specifies whether to expect single, paired, or other configuration of reads.",
+          "dataType": "Controlled Vocabulary",
           "required": true,
+          "isaTag": "parameter_value",
           "ontology": null,
           "CVList": ["SINGLE", "PAIRED"]
         },
         {
+          "iri": null,
           "name": "library strand",
           "description": "",
+          "dataType": "Controlled Vocabulary",
           "required": false,
+          "isaTag": "parameter_value",
           "ontology": null,
           "CVList": ["first strand", "second strand", "not applicable"]
         },
         {
           "name": "orientation",
           "description": "",
+          "dataType": "Controlled Vocabulary",
           "required": false,
+          "isaTag": "parameter_value",
           "ontology": null,
           "CVList": ["5'-3'-3'-5'", "5'-3'-5'-3'"]
+        },
+        {
+          "name": "library name",
+          "description": "name given to the generated library.",
+          "dataType": "String",
+          "title": true,
+          "required": true,
+          "isaTag": "otherMaterial",
+          "ontology": null,
+          "CVList": null
         }
       ]
     },
@@ -149,11 +187,11 @@
       "metadata": {
         "name": "nucleic acid extraction",
         "group": "arrayexpress",
-        "group_order": 2,
-        "temporary_name": "2_arrayexpress_nucleic_acid_extraction",
-        "template_version": "1.1.0",
+        "group_order": 3,
+        "temporary_name": "3_arrayexpress_nucleic_acid_extraction",
+        "template_version": "1.2.0",
         "isa_config": "genome_seq_default_v2015-07-02",
-        "isa_measurement_type": "genome sequencing",
+        "isa_measurement_type": "transcription profiling",
         "isa_technology_type": "nucleotide sequencing",
         "isa_protocol_type": "nucleic acid extraction",
         "repo_schema_id": "NA",
@@ -162,30 +200,51 @@
       },
       "data": [
         {
-          "name": "protocol type",
-          "description": "type of assay or experimental step performed.",
+          "iri": null,
+          "name": "Input",
+          "description": "Existing Samples in DataHub that represent input for this protocol.",
+          "dataType": "SEEK Sample Multi",
           "required": true,
-          "ontology": null,
-          "CVList": ["nucleic acid extraction"]
+          "isaTag": null
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0002944",
+          "name": "nucleic acid extraction",
+          "description": "A protocol that describes in which a material separation to recover the nucleic acid fraction of an input material is performed.",
+          "dataType": "String",
+          "required": true,
+          "isaTag": "protocol",
+          "ontology": null,
+          "CVList": []
+        },
+        {
+          "iri": null,
           "name": "sample volume or weight for DNA extraction",
           "description": "Volume (mL) or weight (g) of sample processed for DNA extraction",
+          "dataType": "String",
           "required": false,
+          "isaTag": "parameter_value",
           "ontology": null,
           "unit": null
         },
         {
+          "iri": null,
           "name": "Extract Name",
           "description": "User-defined names for each portion of extracted material.",
+          "dataType": "String",
+          "title": true,
           "required": true,
+          "isaTag": "otherMaterial",
           "ontology": null,
           "CVList": null
         },
         {
+          "iri": null,
           "name": "Material type",
           "description": "This column contains terms describing the type of each material, for examples: whole organism, organism part, cell, total RNA.",
+          "dataType": "Controlled Vocabulary",
           "required": true,
+          "isaTag": "otherMaterial_characteristic",
           "ontology": null,
           "CVList": ["whole organism", "organism part", "RNA", "DNA", "cell"]
         }
@@ -195,11 +254,11 @@
       "metadata": {
         "name": "nucleic acid sequencing",
         "group": "arrayexpress",
-        "group_order": 4,
-        "temporary_name": "4_arrayexpress_nucleic_acid_sequencing",
-        "template_version": "1.1.0",
+        "group_order": 5,
+        "temporary_name": "5_arrayexpress_nucleic_acid_sequencing",
+        "template_version": "1.2.0",
         "isa_config": "genome_seq_default_v2015-07-02",
-        "isa_measurement_type": "genome sequencing",
+        "isa_measurement_type": "transcription profiling",
         "isa_technology_type": "nucleotide sequencing",
         "isa_protocol_type": "nucleic acid sequencing",
         "repo_schema_id": "ENA General experiment information 2021",
@@ -208,16 +267,30 @@
       },
       "data": [
         {
-          "name": "protocol type",
-          "description": "type of assay or experimental step performed.",
+          "iri": null,
+          "name": "Input",
+          "description": "Existing Samples in DataHub that represent input for this protocol.",
+          "dataType": "SEEK Sample Multi",
           "required": true,
-          "ontology": null,
-          "CVList": ["nucleic acid sequencing"]
+          "isaTag": null
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0004170",
+          "name": "nucleic acid sequencing",
+          "description": "A protocol that describes the processes performed and equipment used to determine the order of nucleotide bases in a nucleic acid sample.",
+          "dataType": "String",
+          "required": true,
+          "isaTag": "protocol",
+          "ontology": null,
+          "CVList": null
+        },
+        {
+          "iri": null,
           "name": "sequencing instrument",
           "description": "a parameter to report the sequencing instrument model and make",
-          "required": false,
+          "dataType": "Controlled Vocabulary",
+          "required": true,
+          "isaTag": "parameter_value",
           "ontology": null,
           "CVList": [
             "454 GS",
@@ -270,37 +343,53 @@
           ]
         },
         {
+          "iri": null,
           "name": "quality scorer",
           "description": "Name and version of the quality scoring software.",
+          "dataType": "String",
           "required": false,
+          "isaTag": "parameter_value",
           "ontology": null,
           "CVList": null
         },
         {
+          "iri": null,
           "name": "base caller",
           "description": "Name and version of the base or color calling software.",
+          "dataType": "String",
           "required": false,
+          "isaTag": "parameter_value",
           "ontology": null,
           "CVList": null
         },
         {
+          "iri": null,
           "name": "Assay Name",
           "description": "User-defined name for an assay.",
+          "dataType": "String",
           "required": true,
+          "isaTag": "otherMaterial",
           "ontology": null,
           "CVList": null
         },
         {
+          "iri": null,
           "name": "Technology type",
           "description": "",
+          "dataType": "String",
           "required": true,
+          "isaTag": "otherMaterial_characteristic",
           "ontology": null,
           "CVList": ["sequencing assay"]
         },
         {
+          "iri": null,
           "name": "Raw Data File",
           "description": "or Array Data File: Name (or URI) of the raw data file generated by an assay.",
+          "dataType": "String",
+          "title": true,
           "required": true,
+          "isaTag": "dataFile",
           "ontology": null,
           "CVList": null
         }
@@ -308,29 +397,99 @@
     },
     {
       "metadata": {
-        "name": "plant",
+        "name": "sample_collection",
         "group": "arrayexpress",
-        "group_order": 1,
-        "temporary_name": "1_arrayexpress_plant",
-        "template_version": "1.1.0",
+        "group_order": 2,
+        "temporary_name": "2_arrayexpress_sample_collection",
+        "template_version": "1.2.0",
         "isa_config": "studySample_default_v2015-07-02",
         "isa_measurement_type": "Sample",
-        "isa_technology_type": "NA",
+        "isa_technology_type": null,
         "isa_protocol_type": "sample collection",
+        "repo_schema_id": "Annotare-default.properties",
+        "organism": "any",
+        "level": "study"
+      },
+      "data": [
+        {
+          "iri": null,
+          "name": "Input",
+          "description": "Existing Samples in DataHub that represent input for this protocol.",
+          "dataType": "SEEK Sample Multi",
+          "required": true,
+          "isaTag": null
+        },
+        {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0005518",
+          "name": "sample collection",
+          "description": "A protocol that describes the procedure whereby biological samples for an experiment are sourced. Examples of this are: collection of clinical samples from patients, collection of plant materials in a forest, collection of larvae from lab-grown Drosophila flies.",
+          "dataType": "String",
+          "required": true,
+          "isaTag": "protocol",
+          "ontology": null,
+          "CVList": null
+        },
+        {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000688",
+          "name": "sampling site",
+          "description": "A site from which a sample, i.e. a statistically representative of the whole, is extracted from the whole. e.g. a liver sample.",
+          "dataType": "String",
+          "required": false,
+          "isaTag": "parameter_value"
+        },
+        {
+          "iri": null,
+          "name": "Sample Name",
+          "description": "Name of the major output resulting from the application of the protocol.",
+          "dataType": "String",
+          "title": true,
+          "required": true,
+          "isaTag": "sample",
+          "ontology": null
+        },
+        {
+          "iri": null,
+          "name": "material type",
+          "description": "Used as an attribute column following Source Name, Sample Name, Extract Name, or Labeled Extract Name. This column contains terms describing the type of each material, for examples: whole organism, organism part, cell, total RNA.",
+          "dataType": "Controlled Vocabulary",
+          "required": true,
+          "isaTag": "sample_characteristic",
+          "ontology": null,
+          "CVList": ["whole organism", "organism part", "RNA", "DNA", "cell"]
+        }
+      ]
+    },
+    {
+      "metadata": {
+        "name": "source_plant",
+        "group": "arrayexpress",
+        "group_order": 1,
+        "temporary_name": "1_arrayexpress_source_plant",
+        "template_version": "1.2.0",
+        "isa_config": "studySample_default_v2015-07-02",
+        "isa_measurement_type": null,
+        "isa_technology_type": null,
         "repo_schema_id": "Annotare-default.properties",
         "organism": "plant",
         "level": "study"
       },
       "data": [
         {
+          "iri": null,
           "name": "Source Name",
           "description": "Sources are considered as the starting biological material used in a study.",
-          "required": true
+          "dataType": "String",
+          "title": true,
+          "required": true,
+          "isaTag": "source"
         },
         {
+          "iri": "http://purl.obolibrary.org/obo/OBI_0100026",
           "name": "organism",
           "description": "A material entity that is an individual living system, such as animal, plant, bacteria or virus, that is capable of replicating or reproducing, growth and maintenance in the right environment. An organism may be unicellular or made up, like humans, of many billions of cells divided into specialized tissues and organs. E.g Drosophila melanogaster.",
+          "dataType": "Ontology",
           "required": true,
+          "isaTag": "source_characteristic",
           "ontology": {
             "name": "efo",
             "version": "1",
@@ -339,9 +498,12 @@
           }
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000635",
           "name": "organism part",
           "description": "The part of organism's anatomy or substance arising from an organism from which the biomaterial was derived, excludes cells. E.g. tissue, organ, system, sperm, blood or body location (arm).",
+          "dataType": "Ontology",
           "required": true,
+          "isaTag": "source_characteristic",
           "ontology": {
             "name": "efo",
             "version": "1",
@@ -350,9 +512,12 @@
           }
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000399",
           "name": "developmental stage",
           "description": "A developmental stage is spatiotemporal region encompassing some part of the life cycle of an organism, e.g. blastula stage",
+          "dataType": "Ontology",
           "required": true,
+          "isaTag": "source_characteristic",
           "ontology": {
             "name": "efo",
             "version": "1",
@@ -361,9 +526,12 @@
           }
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000246",
           "name": "age",
           "description": "A temporal measurement of the time period elapsed since an identifiable point in the life cycle of an organism. If a developmental stage is specified, the identifiable point would be the beginning of that stage. Otherwise the identifiable point must be specified such as planting (e.g. 3 days post planting).",
+          "dataType": "Ontology",
           "required": true,
+          "isaTag": "source_characteristic",
           "ontology": {
             "name": "efo",
             "version": "1",
@@ -372,9 +540,12 @@
           }
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000513",
           "name": "genotype",
           "description": "The total sum of the genetic information of an organism that is known and relevant to the experiment being performed, including chromosomal, plasmid, viral or other genetic material which has been introduced into the organism either prior to or during the experiment.",
+          "dataType": "Ontology",
           "required": true,
+          "isaTag": "source_characteristic",
           "ontology": {
             "name": "efo",
             "version": "1",
@@ -383,20 +554,20 @@
           }
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0005136",
           "name": "cultivar",
           "description": "A cultivated plant variety selected and given a name because it has desirable characteristics that distinguish it from otherwise similar plants of the same species.",
+          "dataType": "String",
           "required": true,
-          "ontology": {
-            "name": "efo",
-            "version": "1",
-            "description": "Experimental Factor Ontology",
-            "rootTermURI": "http://www.ebi.ac.uk/efo/EFO_0005136"
-          }
+          "isaTag": "source_characteristic"
         },
         {
+          "iri": "http://purl.obolibrary.org/obo/CL_0000010",
           "name": "cultured cell",
           "description": "A cell in vitro that is or has been maintained or propagated as part of a cell culture.",
+          "dataType": "Ontology",
           "required": false,
+          "isaTag": "source_characteristic",
           "ontology": {
             "name": "efo",
             "version": "1",
@@ -405,9 +576,12 @@
           }
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000324",
           "name": "cell type",
           "description": "A cell type is a distinct morphological or functional form of cell. Examples are epithelial, glial etc.",
+          "dataType": "Ontology",
           "required": false,
+          "isaTag": "source_characteristic",
           "ontology": {
             "name": "efo",
             "version": "1",
@@ -416,9 +590,12 @@
           }
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000352",
           "name": "clinical history",
           "description": "Is an information entity about the material's (i.e., the patient's) medical record as background information relevant to the experiment.",
+          "dataType": "Ontology",
           "required": false,
+          "isaTag": "source_characteristic",
           "ontology": {
             "name": "efo",
             "version": "1",
@@ -427,9 +604,12 @@
           }
         },
         {
+          "iri": "http://purl.obolibrary.org/obo/CHEBI_24431",
           "name": "chemical entity",
           "description": "A drug, solvent, chemical, etc., with a property that can be measured such as concentration. A molecular entity consisting of two or more chemical elements.",
+          "dataType": "Ontology",
           "required": false,
+          "isaTag": "source_characteristic",
           "ontology": {
             "name": "efo",
             "version": "1",
@@ -438,9 +618,12 @@
           }
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0002755",
           "name": "diet",
           "description": "The customary allowance of food and drink taken by a person or an animal from day to day, particularly one especially planned to meet specific requirements of the individual, including or excluding certain items of food; a prescribed course of eating and drinking in which the amount and kind of food, as well as the times at which it is to be taken, are regulated for therapeutic purposes or selected with reference to a particular state of health. Regular course of eating and drinking adopted by a person or animal. This does not include DIET THERAPY, a specific diet prescribed in the treatment of a disease.",
+          "dataType": "Ontology",
           "required": false,
+          "isaTag": "source_characteristic",
           "ontology": {
             "name": "efo",
             "version": "1",
@@ -449,9 +632,12 @@
           }
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000408",
           "name": "disease",
           "description": "A disease is a disposition to undergo pathological processes that exists in an organism because of one or more disorders in that organism. [ OGMS:0000031 ]",
+          "dataType": "Ontology",
           "required": false,
+          "isaTag": "source_characteristic",
           "ontology": {
             "name": "efo",
             "version": "1",
@@ -460,9 +646,12 @@
           }
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000410",
           "name": "disease staging",
           "description": "The stage or progression of a disease in an organism. Includes pathological staging of cancers and other disease progression. E.g. Dukes C stage describing colon cancer.",
+          "dataType": "Ontology",
           "required": false,
+          "isaTag": "source_characteristic",
           "ontology": {
             "name": "efo",
             "version": "1",
@@ -471,20 +660,20 @@
           }
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000428",
           "name": "dose",
           "description": "The total quantity or strength of a substance administered at one time.",
+          "dataType": "String",
           "required": false,
-          "ontology": {
-            "name": "efo",
-            "version": "1",
-            "description": "Experimental Factor Ontology",
-            "rootTermURI": "http://www.ebi.ac.uk/efo/EFO_0000428"
-          }
+          "isaTag": "source_characteristic"
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000434",
           "name": "ecotype",
           "description": "A biotype resulting from selection in a particular habitat, e.g. the A. thaliana Ecotype Ler.",
+          "dataType": "Ontology",
           "required": false,
+          "isaTag": "source_characteristic",
           "ontology": {
             "name": "efo",
             "version": "1",
@@ -493,42 +682,36 @@
           }
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0004444",
           "name": "enviromental history",
           "description": "Information concerning the envinonrment a material entity has been exposed to, such as an organism from a lake.",
+          "dataType": "String",
           "required": false,
-          "ontology": {
-            "name": "efo",
-            "version": "1",
-            "description": "Experimental Factor Ontology",
-            "rootTermURI": "http://www.ebi.ac.uk/efo/EFO_0004444"
-          }
+          "isaTag": "source_characteristic"
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000470",
           "name": "enviromental stress treatment",
           "description": "Environmental stress is a treatment where some aspect of the environment is perturbed in order to stress the organism or culture, e.g. change in temperature, change in watering regime.",
+          "dataType": "String",
           "required": false,
-          "ontology": {
-            "name": "efo",
-            "version": "1",
-            "description": "Experimental Factor Ontology",
-            "rootTermURI": "http://www.ebi.ac.uk/efo/EFO_0000470"
-          }
+          "isaTag": "source_characteristic"
         },
         {
+          "iri": "http://purl.obolibrary.org/obo/UO_0000191",
           "name": "fraction",
           "description": "Definition: A dimensionless ratio unit which relates the part (the numerator) to the whole (the denominator). [Wikipedia]",
+          "dataType": "String",
           "required": false,
-          "ontology": {
-            "name": "efo",
-            "version": "1",
-            "description": "Experimental Factor Ontology",
-            "rootTermURI": "http://purl.obolibrary.org/obo/UO_0000191"
-          }
+          "isaTag": "source_characteristic"
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000510",
           "name": "genetic modification",
           "description": "A genetic modification of the genome of an organism which may occur naturally by spontaneous mutation, or be introduced by some experimental means. Examples of genetic modification include specification of a transgene or the gene knocked-out or details of transient transfection.",
+          "dataType": "Ontology",
           "required": false,
+          "isaTag": "source_characteristic",
           "ontology": {
             "name": "efo",
             "version": "1",
@@ -537,9 +720,12 @@
           }
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000523",
           "name": "growth condition",
           "description": "A role that a material entity can play which enables particular conditions used to grow organisms or parts of the organism. This includes isolated environments such as cultures and open environments such as field studies.",
+          "dataType": "Ontology",
           "required": false,
+          "isaTag": "source_characteristic",
           "ontology": {
             "name": "efo",
             "version": "1",
@@ -548,9 +734,12 @@
           }
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000541",
           "name": "immunoprecipitate",
           "description": "The precipitate antibody bound target molecules generated when precipitating an antigen out of a solution during the process of immunoprecipitation.",
+          "dataType": "Ontology",
           "required": false,
+          "isaTag": "source_characteristic",
           "ontology": {
             "name": "efo",
             "version": "1",
@@ -559,42 +748,36 @@
           }
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000542",
           "name": "individual",
           "description": "An individual used a specimen in an experiment, from which a material sample was derived.",
+          "dataType": "String",
           "required": false,
-          "ontology": {
-            "name": "efo",
-            "version": "1",
-            "description": "Experimental Factor Ontology",
-            "rootTermURI": "http://www.ebi.ac.uk/efo/EFO_0000542"
-          }
+          "isaTag": "source_characteristic"
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000544",
           "name": "infection",
           "description": "The state of being infected such as from the introduction of a foreign agent such as serum, vaccine, antigenic substance or organism.",
+          "dataType": "String",
           "required": false,
-          "ontology": {
-            "name": "efo",
-            "version": "1",
-            "description": "Experimental Factor Ontology",
-            "rootTermURI": "http://www.ebi.ac.uk/efo/EFO_0000544"
-          }
+          "isaTag": "source_characteristic"
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0010196",
           "name": "inferred cell type",
           "description": "A cell type classification that is determined as result of a single-cell analysis, such as cell clustering or trajectory analysis.",
+          "dataType": "String",
           "required": false,
-          "ontology": {
-            "name": "efo",
-            "version": "1",
-            "description": "Experimental Factor Ontology",
-            "rootTermURI": "http://www.ebi.ac.uk/efo/EFO_0010196"
-          }
+          "isaTag": "source_characteristic"
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000546",
           "name": "injury",
           "description": "Damage inflicted on the body as the direct or indirect result of an external force, with or without disruption of structural continuity. [ NCIT:C3671 ]",
+          "dataType": "Ontology",
           "required": false,
+          "isaTag": "source_characteristic",
           "ontology": {
             "name": "efo",
             "version": "1",
@@ -603,31 +786,28 @@
           }
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000554",
           "name": "irradiate",
           "description": "The process of treating a material with radiation.",
+          "dataType": "String",
           "required": false,
-          "ontology": {
-            "name": "efo",
-            "version": "1",
-            "description": "Experimental Factor Ontology",
-            "rootTermURI": "http://www.ebi.ac.uk/efo/EFO_0000554"
-          }
+          "isaTag": "source_characteristic"
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0004426",
           "name": "karyotype",
           "description": "A karyotype is the number and appearance of chromosomes in the nucleus of a eukaryotic cell.",
+          "dataType": "String",
           "required": false,
-          "ontology": {
-            "name": "efo",
-            "version": "1",
-            "description": "Experimental Factor Ontology",
-            "rootTermURI": "http://www.ebi.ac.uk/efo/EFO_0004426"
-          }
+          "isaTag": "source_characteristic"
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000651",
           "name": "phenotype",
           "description": "The observable form taken by some character (or group of characters) in an individual or an organism, excluding pathology and disease. The detectable outward manifestations of a specific genotype.",
+          "dataType": "Ontology",
           "required": false,
+          "isaTag": "source_characteristic",
           "ontology": {
             "name": "efo",
             "version": "1",
@@ -636,20 +816,20 @@
           }
         },
         {
+          "iri": "http://purl.obolibrary.org/obo/GO_0016246",
           "name": "RNA interference",
           "description": "The process in which double-stranded RNAs silence cognate genes. Involves posttranscriptional gene inactivation ('silencing') both of transgenes or dsRNA introduced into a germline, and of the host gene(s) homologous to the transgenes or dsRNA. This silencing is triggered by the introduction of transgenes or double-stranded RNA (dsRNA), and can occur through a specific decrease in the level of mRNA, or by negative regulation of translation, of both host genes and transgenes.",
+          "dataType": "String",
           "required": false,
-          "ontology": {
-            "name": "efo",
-            "version": "1",
-            "description": "Experimental Factor Ontology",
-            "rootTermURI": "http://purl.obolibrary.org/obo/GO_0016246"
-          }
+          "isaTag": "source_characteristic"
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000683",
           "name": "replicate",
           "description": "A role played by a a biological sample in the context of an experiment where the intent is that biological or technical variation is measured.",
+          "dataType": "Ontology",
           "required": false,
+          "isaTag": "source_characteristic",
           "ontology": {
             "name": "efo",
             "version": "1",
@@ -658,20 +838,12 @@
           }
         },
         {
-          "name": "sampling site",
-          "description": "A site from which a sample, i.e. a statistically representative of the whole, is extracted from the whole. e.g. a liver sample.",
-          "required": false,
-          "ontology": {
-            "name": "efo",
-            "version": "1",
-            "description": "Experimental Factor Ontology",
-            "rootTermURI": "http://www.ebi.ac.uk/efo/EFO_0000688"
-          }
-        },
-        {
+          "iri": "http://purl.obolibrary.org/obo/PATO_0000047",
           "name": "sex",
           "description": "The assemblage of physical properties or qualities by which male is distinguished from female; the physical difference between male and female; the distinguishing peculiarity of male or female. An organismal quality inhering in a bearer by virtue of the bearer's ability to undergo sexual reproduction in order to differentiate the individuals or types involved. Term applied to any organism able to undergo sexual reproduction in order to differentiate the individuals or types involved. Sexual reproduction is defined as the ability to exchange genetic material with the potential of recombinant progeny.",
+          "dataType": "Ontology",
           "required": false,
+          "isaTag": "source_characteristic",
           "ontology": {
             "name": "efo",
             "version": "1",
@@ -680,20 +852,20 @@
           }
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0010197",
           "name": "single cell identifier",
           "description": "A unique identifier for a single cell specimen.",
+          "dataType": "String",
           "required": false,
-          "ontology": {
-            "name": "efo",
-            "version": "1",
-            "description": "Experimental Factor Ontology",
-            "rootTermURI": "http://www.ebi.ac.uk/efo/EFO_0010197"
-          }
+          "isaTag": "source_characteristic"
         },
         {
+          "iri": "http://purl.obolibrary.org/obo/OBI_0001472",
           "name": "specimen with known storage state",
           "description": "A specimen for which it is known whether it has been subjected to storage of a specified type.",
+          "dataType": "Ontology",
           "required": false,
+          "isaTag": "source_characteristic",
           "ontology": {
             "name": "efo",
             "version": "1",
@@ -702,31 +874,28 @@
           }
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0005135",
           "name": "strain",
           "description": "A population of organisms that is geneticaly different from others of the same species and possessing a set of defined characteristics.",
+          "dataType": "String",
           "required": false,
-          "ontology": {
-            "name": "efo",
-            "version": "1",
-            "description": "Experimental Factor Ontology",
-            "rootTermURI": "http://www.ebi.ac.uk/efo/EFO_0005135"
-          }
+          "isaTag": "source_characteristic"
         },
         {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000721",
           "name": "time",
           "description": "",
+          "dataType": "String",
           "required": false,
-          "ontology": {
-            "name": "efo",
-            "version": "1",
-            "description": "Experimental Factor Ontology",
-            "rootTermURI": "http://www.ebi.ac.uk/efo/EFO_0000721"
-          }
+          "isaTag": "source_characteristic"
         },
         {
+          "iri": "http://purl.obolibrary.org/obo/OBI_0600002",
           "name": "tumor grading",
           "description": "An assay that determines the grade (severity/stage) of a tumor sample, used in cancer biology to describe abnormalities/qualities of tumor cells or tissues. Values can be described by terms from NCI Thesaurus. Determination of the grade (severity/stage) of a tumor sample, used in cancer biology to describe abnormalities/qualities of tumor cells or tissues. Values can be described by terms from NCI Thesaurus.",
+          "dataType": "Ontology",
           "required": false,
+          "isaTag": "source_characteristic",
           "ontology": {
             "name": "efo",
             "version": "1",
@@ -735,24 +904,14 @@
           }
         },
         {
+          "iri": null,
           "name": "material type",
           "description": "Used as an attribute column following Source Name, Sample Name, Extract Name, or Labeled Extract Name. This column contains terms describing the type of each material, for examples: whole organism, organism part, cell, total RNA.",
+          "dataType": "Controlled Vocabulary",
           "required": true,
+          "isaTag": "source_characteristic",
           "ontology": null,
           "CVList": ["whole organism", "organism part", "RNA", "DNA", "cell"]
-        },
-        {
-          "name": "protocol type",
-          "description": "type of assay or experimental step performed.",
-          "required": true,
-          "ontology": null,
-          "CVList": ["sample collection"]
-        },
-        {
-          "name": "Sample Name",
-          "description": "Samples represent major outputs resulting from a protocol application other than the special case outputs of Extract or a Labeled Extract.",
-          "required": true,
-          "ontology": null
         }
       ]
     }
