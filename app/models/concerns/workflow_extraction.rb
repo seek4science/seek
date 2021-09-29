@@ -121,8 +121,8 @@ module WorkflowExtraction
     crate['sdDatePublished'] = Time.now unless crate['sdDatePublished']
     crate['creativeWorkStatus'] = I18n.t("maturity_level.#{maturity_level}") if maturity_level
 
-    # brute force deletion as I cannot track down where it comes from
-    crate.contextual_entities.delete_if { |c| c['@id'] == '#ro-crate-preview.html' }
+    crate.preview.template = WorkflowExtraction::PREVIEW_TEMPLATE
+
     crate
   end
 
