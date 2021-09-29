@@ -2,7 +2,7 @@ var Templates = { table: null };
 
 Templates.init = function (elem) {
   const columnDefs = [
-    { orderable: false, targets: [0, 9] },
+    { orderable: false, targets: [0, 7, 9] },
     {
       targets: [3, 4],
       visible: false,
