@@ -12,6 +12,8 @@ class SinglePagesController < ApplicationController
     @study = Study.new
     @assay = Assay.new
 
+    @is_folders = params[:is_folders]
+
     respond_to do |format|
       format.html
     end
