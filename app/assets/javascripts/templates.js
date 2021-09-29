@@ -2,7 +2,7 @@ var Templates = { table: null };
 
 Templates.init = function (elem) {
   const columnDefs = [
-    { orderable: false, targets: [0, 6] },
+    { orderable: false, targets: [0, 9] },
     {
       targets: [3, 4],
       visible: false,
@@ -14,7 +14,7 @@ Templates.init = function (elem) {
   const columns = [
     {
       title: "Required",
-      width: "10%",
+      width: "5%",
       className: "text-center",
       mRender: function (data, type, full) {
         return `<td><input class='template-input' ${
@@ -22,14 +22,24 @@ Templates.init = function (elem) {
         } type='checkbox' onClick='handleClick(this)'/></td>`;
       }
     },
-    { title: "Attribute name", width: "20%" },
-    { title: "Description", width: "60%" },
+    { title: "Attribute name", width: "18%" },
+    { title: "Description", width: "40%" },
     { title: "attribute_type_id" },
     { title: "cv_id" },
-    { title: "Unit" },
+    { title: "Unit", width: "5%" },
+    { title: "Data type", width: "10%" },
+    {
+      title: "Is title",
+      className: "text-center",
+      mRender: function (data) {
+        return `<td><input class='template-input' disabled ${data ? "checked" : ""} type='checkbox' /></td>`;
+      },
+      width: "7%"
+    },
+    { title: "IRI", width: "10%" },
     {
       title: "Remove",
-      width: "10%",
+      width: "5%",
       className: "text-center",
       mRender: function (data, type, full) {
         return full[0]
@@ -83,7 +93,17 @@ function setTemplate() {
 }
 
 Templates.mapData = (data) =>
-  data.map((item) => [item.required, item.title, item.description, item.attribute_type_id, item.cv_id]);
+  data.map((item) => [
+    item.required,
+    item.title,
+    item.description,
+    item.attribute_type_id,
+    item.cv_id,
+    item.unit_id,
+    item.data_type,
+    item.is_title,
+    item.iri
+  ]);
 
 function loadFilterSelectors(data) {
   $j.each($j("select[id^='templates_']"), (i, elem) => {
@@ -130,6 +150,8 @@ const applyTemplate = () => {
     $j(newRow).find("#template_attribute_type").val(row[3]);
     $j(newRow).find("#template_attribute_cv_id").val(row[4]);
     $j(newRow).find("#template_attribute_unit").val(row[5]);
+    $j(newRow).find(".sample-type-is-title").prop("checked", row[7]);
+    $j(newRow).find("#template_attribute_iri").val(row[8]);
     $j("#attribute-table #add-attribute-row").before(newRow);
   });
 

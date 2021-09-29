@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_09_17_134928) do
+ActiveRecord::Schema.define(version: 2021_09_29_100214) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -831,6 +831,11 @@ ActiveRecord::Schema.define(version: 2021_09_17_134928) do
     t.integer "investigation_id"
     t.index ["investigation_id", "project_id"], name: "index_investigations_projects_inv_proj_id"
     t.index ["project_id"], name: "index_investigations_projects_on_project_id"
+  end
+
+  create_table "isa_tags",  force: :cascade do |t|
+    t.string "title"
+    t.index ["title"], name: "index_isa_tags_title"
   end
 
   create_table "mapping_links", id: :integer,  force: :cascade do |t|
@@ -1919,6 +1924,9 @@ ActiveRecord::Schema.define(version: 2021_09_17_134928) do
     t.datetime "updated_at", null: false
     t.integer "unit_id"
     t.integer "pos"
+    t.boolean "is_title", default: false
+    t.integer "isa_tag_id"
+    t.string "iri"
     t.index ["template_id", "title"], name: "index_template_id_asset_id_title"
   end
 

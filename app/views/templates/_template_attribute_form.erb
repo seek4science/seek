@@ -6,13 +6,13 @@
 <% pos = template_attribute ? template_attribute.pos : '' %>
 <% required = template_attribute ? template_attribute.required : false %>
 <% allow_attribute_removal = !required  %>
-
 <% attribute_type_id = template_attribute ? template_attribute.sample_attribute_type_id : nil %>
 <% sample_controlled_vocab_id = template_attribute ? template_attribute.sample_controlled_vocab_id : nil %>
-
 <% unit_id = template_attribute ? template_attribute.unit_id : nil %>
-
 <% field_name_prefix = "template[template_attributes_attributes][#{index}]" %> 
+<% seek_sample_multi = template_attribute.try(:seek_sample_multi?) %>
+<% is_title = template_attribute ? template_attribute.is_title : false %>
+
 
 <tr class="sample-attribute <%= 'success' if template_attribute.nil? -%>" data-index="<%= index-%>">
   <th scope="row" class="attribute-position">
@@ -30,6 +30,12 @@
     <div class="checkbox-inline">
       <%= hidden_field_tag "#{field_name_prefix}[required]", '0' %>
       <%= check_box_tag "#{field_name_prefix}[required]", '1', required, id: "template_attribute_required" %>
+    </div>
+  </td>
+   <td class="text-center">
+    <div class="checkbox-inline">
+      <%= hidden_field_tag "#{field_name_prefix}[is_title]", '0' %>
+      <%= check_box_tag "#{field_name_prefix}[is_title]", '1', is_title, class:'sample-type-is-title',disabled: seek_sample_multi %>
     </div>
   </td>
   <td>
@@ -61,6 +67,11 @@
   <td>
     <%= text_field_tag "#{field_name_prefix}[description]", description, class: 'form-control',
                        placeholder: 'Description', id: "template_attribute_description" %>
+  </td>
+
+   <td>
+    <%= text_field_tag "#{field_name_prefix}[iri]", description, class: 'form-control',
+                       placeholder: 'IRI', id: "template_attribute_iri" %>
   </td>
 
   <td>

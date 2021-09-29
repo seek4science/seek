@@ -76,8 +76,8 @@ class TemplatesController < ApplicationController
       params.require(:template).permit(:title, :description, :group, :level, :organism,
                                           { project_ids: [],
                                             template_attributes_attributes: [:id, :title, :pos, :required, :description,
-                                                                          :sample_attribute_type_id, :isa_tag_id,
-                                                                          :sample_controlled_vocab_id,
+                                                                          :sample_attribute_type_id, :isa_tag_id, :is_title,
+                                                                          :sample_controlled_vocab_id, :iri,
                                                                           :unit_id, :_destroy]})
     end
   

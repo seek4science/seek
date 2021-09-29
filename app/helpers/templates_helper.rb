@@ -23,10 +23,13 @@ module TemplatesHelper
         item.template_attributes.map { |attribute|
           { 
             attribute_type_id: attribute.sample_attribute_type_id,
+            data_type: SampleAttributeType.find(attribute.sample_attribute_type_id).title,
             cv_id: attribute.sample_controlled_vocab_id,
             title: attribute.title,
+            is_title: attribute.is_title,
             short_name: attribute.short_name,
             description: attribute.description,
+            iri: attribute.iri,
             required: attribute.required,
             unit_id: attribute.unit_id 
           }
