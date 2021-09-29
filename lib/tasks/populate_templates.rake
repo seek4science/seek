@@ -5,7 +5,7 @@ require 'rake'
 namespace :seek do
   desc "Fetch ontology terms from EBI API"
   task :populate_templates => :environment do
-    # begin
+    begin
       Template.delete_all
       TemplateAttribute.delete_all
       SampleControlledVocab.delete_all
@@ -105,9 +105,9 @@ namespace :seek do
           end
         end
       end
-    # rescue Exception => e
-    #   puts e
-    # end
+    rescue Exception => e
+      puts e
+    end
   end
 
   def get_sample_attribute_type(title)
