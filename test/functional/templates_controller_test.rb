@@ -2,13 +2,12 @@ require 'test_helper'
 
 class TemplatesControllerTest < ActionController::TestCase
 
-  with_config_value(:sample_type_template_enabled, true) do
-    include AuthenticatedTestHelper
-    include SharingFormTestHelper
-    include GeneralAuthorizationTestCases
-  end
+  include AuthenticatedTestHelper
+  include SharingFormTestHelper
+  include GeneralAuthorizationTestCases
 
   setup do
+    Seek::Config.send("sample_type_template_enabled=", true)
     Factory(:person) # to prevent person being first person and therefore admin
     @person = Factory(:project_administrator)
     @project = @person.projects.first
@@ -103,6 +102,7 @@ class TemplatesControllerTest < ActionController::TestCase
 
   test 'update changing from a CV attribute' do
     template = Factory(:apples_controlled_vocab_template, project_ids: @project_ids, contributor: @person)
+    puts template.inspect
     assert template.valid?
     assert template.can_edit?
     assert_equal 1, template.template_attributes.count
@@ -118,7 +118,7 @@ class TemplatesControllerTest < ActionController::TestCase
       }
     ]
     put :update, params: { id: template, template: { title: template.title,
-                                                 template_attributes_attributes: attribute_fields
+                                                template_attributes_attributes: attribute_fields
     } }
     assert_redirected_to template_path(assigns(:template))
     assert_nil flash[:error]
@@ -142,6 +142,7 @@ class TemplatesControllerTest < ActionController::TestCase
   test 'should not destroy template if has existing sample_types' do
     Factory(:simple_sample_type, template: @template)
     refute @template.can_delete?
+    
     assert_no_difference('Template.count') do
       delete :destroy, params: { id: @template }
     end
