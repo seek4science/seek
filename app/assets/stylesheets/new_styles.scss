@@ -31,6 +31,10 @@ body {
     color: $ibisba-dark-green;
 }
 
+h1 {
+     color: $ibisba-dark-green;
+}
+
 .logo_link {
   margin-right: 1em;
 }
@@ -1087,7 +1091,4 @@ span.disabled {
   overflow-x: auto;
 }
 
-a[href^="http://"]:after, a[href^="https://"]:after {
-  content: url("/assets/misc_icons/new_window.png"); /*url of your image*/
-}
 
