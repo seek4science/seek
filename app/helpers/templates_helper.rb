@@ -6,10 +6,8 @@ module TemplatesHelper
       type += ' - ' + link_to(template_attribute.sample_controlled_vocab.title, template_attribute.sample_controlled_vocab)
     end
 
-    # unit = template_attribute.unit ? "( #{template_attribute.unit.symbol} )" : ''
     req = template_attribute.required? ? required_span : ''
     attribute_css = 'sample-attribute'
-    # attribute_css << ' sample-attribute-title' if sample_type_attribute.is_title?
     content_tag :span, class: attribute_css do
       "#{h template_attribute.title} (#{type}) #{req}".html_safe
     end
@@ -17,13 +15,13 @@ module TemplatesHelper
 
   def load_templates
     Template.all().order(:group, :group_order).map { |item|
-      { title: item.title, type: item.level, group: item.group,
-        organism: item.organism, template_id: item.id, level: item.level,
+      { title: item.title, group: item.group, level: item.level,
+        organism: item.organism, template_id: item.id,
         description: item.description, attributes: 
         item.template_attributes.map { |attribute|
           { 
             attribute_type_id: attribute.sample_attribute_type_id,
-            data_type: SampleAttributeType.find(attribute.sample_attribute_type_id).title,
+            data_type: SampleAttributeType.find(attribute.sample_attribute_type_id)&.title,
             cv_id: attribute.sample_controlled_vocab_id,
             title: attribute.title,
             is_title: attribute.is_title,
