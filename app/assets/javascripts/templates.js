@@ -131,6 +131,7 @@ const applyTemplate = () => {
   const codeMirror = $j("#template-description").nextAll(".CodeMirror")[0].CodeMirror;
   if (data.description) codeMirror.getDoc().setValue(data.description);
 
+  $j("#template_parent_id").val(data.template_id)
   $j("#attribute-table tbody").find("tr:not(:last)").remove();
   SampleTypes.unbindSortable();
   $j.each(Templates.table.rows().data(), (i, row) => {

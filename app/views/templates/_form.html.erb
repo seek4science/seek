@@ -30,6 +30,7 @@
 
     <%= render partial: 'assets/manage_specific_attributes', locals:{f:f} if show_form_manage_specific_attributes? %>
 
+    <%= f.hidden_field :parent_id %>
 
     <div class="tab-content">
         <div role="tabpanel" class="tab-pane<%= ' active'.html_safe if tab == 'manual' -%>" id="manual">
@@ -163,5 +164,5 @@
     });
 
     const templates = <%= load_templates().to_json.html_safe %>
-
+    console.log(templates)
 </script>
