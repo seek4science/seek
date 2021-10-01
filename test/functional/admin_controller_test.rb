@@ -489,7 +489,7 @@ class AdminControllerTest < ActionController::TestCase
     assert_equal new_value, Seek::Config.recommended_software_licenses
     new_value = []
     post :update_settings, params: {recommended_software_licenses: new_value}
-    assert_equal ['CC0-1.0'], Seek::Config.recommended_software_licenses
+    assert_equal ['Apache-2.0'], Seek::Config.recommended_software_licenses
   end
 
 end
