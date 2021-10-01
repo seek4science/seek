@@ -20,7 +20,7 @@ module Seek
     end
     
     def recommended_software_licenses_fallback
-      ['CC0-1.0']
+      ['Apache-2.0']
     end
     
     def dm_project_link_fallback
