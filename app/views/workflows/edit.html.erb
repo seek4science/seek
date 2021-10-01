@@ -26,7 +26,7 @@
       <p class="help-block">This field is used to indicate to users what level of stability they can expect from the workflow.</p>
     </div>
 
-    <%= render partial: 'assets/license_selector', locals: { resource: @workflow, license_group: :software, recommended_licenses: Seek::Config.recommended_software_licenses, default_license: 'Apache-2.0' } %>
+    <%= render partial: 'assets/license_selector', locals: { resource: @workflow, license_group: :software, default_license: 'Apache-2.0' } %>
     <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @workflow} -%>
     <%= render :partial => 'sharing/form' -%>
     <%= render :partial => 'assets/asset_form_bottom', :locals=> {:show_publications=>false, :f => f}-%>

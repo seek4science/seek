@@ -3,7 +3,11 @@
 <% selected_license = resource.send(accessor) %>
 <% selected_license = (resource.new_record? ? default_license : Seek::License::NULL_LICENSE) if selected_license.nil? %>
 <% license_group ||= :data %>
-<% recommended_licenses ||= Seek::Config.recommended_data_licenses %>
+<% if license_group == :data %>
+  <% recommended_licenses ||= Seek::Config.recommended_data_licenses %>
+<% else %>
+  <% recommended_licenses ||= Seek::Config.recommended_software_licenses %>
+<% end %>
 <% label ||= 'License' %>
 
 <%= folding_panel(label, false,
