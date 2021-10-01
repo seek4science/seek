@@ -107,8 +107,6 @@ module LicenseHelper
         'Recommended'
       elsif l.key?('is_generic') && l['is_generic']
         'Generic'
-      elsif l.key?('od_recommended') && l['od_recommended']
-        'Recommended'
       else
         'Other'
       end
