@@ -17,25 +17,21 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
     assert_enqueued_jobs(1, only: RemoteGitFetchJob) do
       assert_difference('Git::Repository.count', 1) do
         assert_difference('Task.count', 1) do
-          post git_repositories_path, params: { resource_type: 'workflow', remote: 'https://github.com/seek4science/workflow-test-fixture.git' }
+          post create_from_git_workflows_path, params: { workflow: { git_version_attributes: { remote: 'https://github.com/seek4science/workflow-test-fixture.git' } } }
 
-          assert_redirected_to select_ref_git_repository_path(assigns(:git_repository), resource_type: 'workflow')
+          assert_response :success
+          assert_select 'h1', text: 'Select Target'
         end
       end
     end
 
-    follow_redirect!
-
-    repo = assigns(:git_repository)
+    repo = assigns(:workflow).git_version.git_repository
     assert repo.remote_git_fetch_task&.in_progress?
-    assert_select '#fetching-status'
+    assert_select '#repo-fetching-status'
 
     # Simulate repository being fetched
     repo.remote_git_fetch_task.update_column(:status, Task::STATUS_DONE)
     FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'fixture-workflow', '_git', '.'), File.join(repo.local_path, '.git'))
-
-    get select_ref_git_repository_path(repo, resource_type: 'workflow') # Should get ref selection page...
-    assert_select '#fetching-status', count: 0
 
     post create_from_git_workflows_path, params: {
         workflow: { git_version_attributes: { git_repository_id: repo.id, ref: 'refs/remotes/origin/main' } } }# Should go to path selection page..

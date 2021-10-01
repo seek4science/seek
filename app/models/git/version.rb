@@ -217,6 +217,15 @@ module Git
       git_sync_ignore_attributes + SYNC_IGNORE_ATTRIBUTES
     end
 
+    def set_default_git_repository
+      if @remote.present?
+        self.git_repository ||= Git::Repository.find_or_create_by(remote: @remote)
+      else
+        self.git_repository ||= (resource.local_git_repository || resource.create_local_git_repository)
+        self.ref = DEFAULT_LOCAL_REF if self.ref.blank?
+      end
+    end
+
     private
 
     def set_version
@@ -225,13 +234,7 @@ module Git
     end
 
     def set_git_info
-      if @remote.present?
-        self.git_repository ||= Git::Repository.find_or_create_by(remote: @remote)
-      else
-        self.git_repository ||= (resource.local_git_repository || resource.create_local_git_repository)
-        self.ref = DEFAULT_LOCAL_REF if self.ref.blank?
-      end
-      self.git_repository ||= @remote.present? ? Git::Repository.find_or_create_by(remote: @remote) : resource.local_git_repository || resource.create_local_git_repository
+      set_default_git_repository
       self.mutable = git_repository&.remote.blank? if self.mutable.nil?
     end
 

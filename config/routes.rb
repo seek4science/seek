@@ -553,6 +553,7 @@ SEEK::Application.routes.draw do
       get :new_version
       post :new_git_version
       post :create_version_metadata
+      post :create_version_from_git
       get :edit_paths
       patch :update_paths
     end
@@ -725,10 +726,10 @@ SEEK::Application.routes.draw do
     end
   end
 
-  resources :git_repositories do
+  resources :git_repositories, only: [] do
     member do
-      get :select_ref
-      get :fetch_status
+      get :status
+      get :refs
     end
   end
 

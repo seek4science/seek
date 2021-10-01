@@ -10,56 +10,16 @@ class GitWorkflowWizard
 
   attr_reader :next_step, :workflow_class, :git_repository
 
-  attr_accessor :params, :id
+  attr_accessor :params, :workflow
 
   validates :git_repository_id, presence: true
   validates :main_workflow_path, presence: true
   validates :workflow_class_id, presence: true
 
-  def setup_repository
-    # If remote
-    #   Queue fetch job
-    #   Render "waiting" page
-    # If local files
-    #   Create local repo
-    #   Add local files
-    #   Go to next
-    # If local RO-Crate
-    #   Create local repo
-    #   Extract crate
-    #   Add files to repo
-    #   Go to next
-  end
-
-  def select_paths
-    # If ro-crate-metadata present
-    #   Pick paths from file
-    #   If main workflow path not present
-    #     Render "select paths" page
-    #   Otherwise
-    #     Go to next
-    # If not
-    #   Render "select paths" page
-  end
-
-  def extract_metadata
-    # If abstract CWL present
-    #   Extract metadata from that
-    # If ro-crate-metadata present
-    #   Extract metadata from that
-    # Otherwise
-    #   Extract metadata from main workflow
-
-  end
-
-  def create_workflow
-    # Put everything into the workflow
-  end
-
   def run
     @next_step = nil
+
     if new_version?
-      workflow = Workflow.find(id)
       workflow_class = workflow.workflow_class
       current_version = workflow.git_version
       git_version = workflow.git_versions.build(params.delete(:git_version_attributes))
@@ -69,11 +29,21 @@ class GitWorkflowWizard
         git_version.send("#{path_attr}=", path) if git_version.send(path_attr).blank? && path && git_version.file_exists?(path)
       end
     else
-      workflow = Workflow.new
+      self.workflow = Workflow.new
     end
 
     workflow.assign_attributes(params)
     git_version ||= workflow.git_version
+
+    if git_version.git_repository.blank?
+      git_version.set_default_git_repository
+      git_version.git_repository.queue_fetch
+    end
+
+    if git_version.ref.blank?
+      @next_step = :select_ref
+      return workflow
+    end
 
     git_version.set_default_metadata
 
@@ -104,6 +74,6 @@ class GitWorkflowWizard
   private
 
   def new_version?
-    id.present?
+    workflow.present? && workflow.persisted?
   end
 end
