@@ -80,9 +80,7 @@
     </div>
 
     <div id="git-repo" role="tabpanel" class="tab-pane">
-      <%= form_tag(git_repositories_path) do -%>
-        <%= hidden_field_tag(:resource_type, 'workflow') %>
-
+      <%= form_tag({ action: :create_from_git, anchor: 'from_git' }) do -%>
         <div class="asset_form">
           <%= error_messages_for :git_repository -%>
 
@@ -90,7 +88,7 @@
             <div class="form-group">
               <label class="required">URL</label>
               <p class="help-block">URL to the git repository. Should end in ".git".</p>
-              <%= text_field_tag :remote, nil, placeholder: 'https://github.com/example/repository.git', class: 'form-control' -%>
+              <%= text_field_tag 'workflow[git_version_attributes][remote]', nil, placeholder: 'https://github.com/example/repository.git', class: 'form-control' -%>
             </div>
           <% end %>
         </div>

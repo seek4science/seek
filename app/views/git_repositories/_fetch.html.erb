@@ -6,7 +6,7 @@
     <%= image 'spinner' %>
     <script>
         var interval = setInterval(function () {
-            $j.ajax('<%= fetch_status_git_repository_path(@git_repository) %>', {
+            $j.ajax('<%= status_git_repository_path(@git_repository) %>', {
                 success: function (json) {
                     $j('#fetch-status').html(json.text)
                     if (json.status === 'done') {

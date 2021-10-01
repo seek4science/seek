@@ -134,7 +134,6 @@ class WorkflowsController < ApplicationController
     end
   end
 
-  # Takes a remote Git repository and target ref
   def create_version_from_git
     wizard = GitWorkflowWizard.new(params: workflow_params, workflow: @workflow)
     @workflow = wizard.run

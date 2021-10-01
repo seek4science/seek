@@ -16,48 +16,9 @@ class GitWorkflowWizard
   validates :main_workflow_path, presence: true
   validates :workflow_class_id, presence: true
 
-  def setup_repository
-    # If remote
-    #   Queue fetch job
-    #   Render "waiting" page
-    # If local files
-    #   Create local repo
-    #   Add local files
-    #   Go to next
-    # If local RO-Crate
-    #   Create local repo
-    #   Extract crate
-    #   Add files to repo
-    #   Go to next
-  end
-
-  def select_paths
-    # If ro-crate-metadata present
-    #   Pick paths from file
-    #   If main workflow path not present
-    #     Render "select paths" page
-    #   Otherwise
-    #     Go to next
-    # If not
-    #   Render "select paths" page
-  end
-
-  def extract_metadata
-    # If abstract CWL present
-    #   Extract metadata from that
-    # If ro-crate-metadata present
-    #   Extract metadata from that
-    # Otherwise
-    #   Extract metadata from main workflow
-
-  end
-
-  def create_workflow
-    # Put everything into the workflow
-  end
-
   def run
     @next_step = nil
+
     if new_version?
       workflow_class = workflow.workflow_class
       current_version = workflow.git_version
@@ -113,6 +74,6 @@ class GitWorkflowWizard
   private
 
   def new_version?
-    workflow.present?
+    workflow.present? && workflow.persisted?
   end
 end
