@@ -37,7 +37,7 @@ module Seek
         include Seek::Subscribable
         include Seek::ResearchObjects::Packaging
         include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
-        has_many :programmes, through: :projects
+        has_many :programmes, ->{ distinct }, through: :projects
 
         extend Seek::ActsAsISA::SingletonMethods
       end
