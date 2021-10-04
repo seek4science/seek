@@ -10,12 +10,17 @@
   <div class="pull-right">
     <%= button_link_to('Download', 'download', polymorphic_path([@parent_resource, :git_download], version: @git_version.version, path: @blob.path)) %>
     <%= button_link_to('Raw', 'markup', polymorphic_path([@parent_resource, :git_raw], version: @git_version.version, path: @blob.path)) %>
-    <% if @git_version.mutable? && @git_version.can_edit? %>
-      <%= button_link_to('Move/rename', 'move', '#', { 'data-toggle' => 'modal', 'data-target' => '#git-move-modal' }) %>
-      <%= button_link_to('Delete', 'destroy',
-                         polymorphic_path([@parent_resource, :git_remove_file], version: @git_version.version, file: { path: @blob.path }),
-                         method: :delete,
-                         data: { confirm: "Are you sure you wish to delete this file?" }) %>
+    <% if @git_version.can_edit? %>
+      <% if @git_version.mutable? %>
+        <%= button_link_to('Move/rename', 'move', '#', { 'data-toggle' => 'modal', 'data-target' => '#git-move-modal' }) %>
+        <%= button_link_to('Delete', 'destroy',
+                           polymorphic_path([@parent_resource, :git_remove_file], version: @git_version.version, file: { path: @blob.path }),
+                           method: :delete,
+                           data: { confirm: "Are you sure you wish to delete this file?" }) %>
+      <% else %>
+        <%= button_link_to('Move/rename', 'move', nil, disabled_reason: @git_version.immutable_error) %>
+        <%= button_link_to('Delete', 'destroy', nil, disabled_reason: @git_version.immutable_error) %>
+      <% end %>
     <% end %>
   </div>
 

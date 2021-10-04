@@ -226,6 +226,15 @@ module Git
       end
     end
 
+    def immutable_error
+      return nil if mutable?
+      if remote?
+        I18n.t('git.modify_immutable_remote_error')
+      else
+        I18n.t('git.modify_immutable_error')
+      end
+    end
+
     private
 
     def set_version

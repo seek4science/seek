@@ -101,7 +101,7 @@ class GitController < ApplicationController
   private
 
   def render_immutable_error
-    flash[:error] = 'This version cannot be modified.'
+    flash[:error] = @git_version.immutable_error
     respond_to do |format|
       format.html { redirect_to polymorphic_path(@parent_resource, anchor: 'files') }
     end

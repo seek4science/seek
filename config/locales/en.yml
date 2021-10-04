@@ -145,6 +145,9 @@ en:
     abstract_cwl: 'Abstract CWL'
     diagram: 'Diagram'
     remote_source: 'Remote'
+  git:
+    modify_immutable_remote_error: 'You cannot make changes to an imported repository.'
+    modify_immutable_error: 'You cannot make changes to a frozen version.'
 
   about_project: "You need to be a member of a <strong>%{project}</strong> before you can register content.
     A %{project} can contain one or more people, and gives some additional background details, and credit, about the content being registered. It can be used to describe and promote

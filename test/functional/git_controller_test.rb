@@ -56,7 +56,8 @@ class GitControllerTest < ActionController::TestCase
                                       data: fixture_file_upload('files/little_file.txt') } }
 
     assert_redirected_to workflow_path(@workflow, anchor: 'files')
-    assert flash[:error].include?('cannot be modified')
+    pp flash[:error]
+    assert flash[:error].include?('cannot make changes')
     refute assigns(:git_version).file_exists?('new-file.txt')
   end
 
@@ -115,7 +116,7 @@ class GitControllerTest < ActionController::TestCase
                                 file: { path: 'diagram.png', new_path: 'cool-pic.png' } }
 
     assert_redirected_to workflow_path(@workflow, anchor: 'files')
-    assert flash[:error].include?('cannot be modified')
+    assert flash[:error].include?('cannot make changes')
     assert assigns(:git_version).file_exists?('diagram.png')
     refute assigns(:git_version).file_exists?('cool-pic.png')
   end
@@ -160,7 +161,7 @@ class GitControllerTest < ActionController::TestCase
                                   file: { path: 'diagram.png'} }
 
     assert_redirected_to workflow_path(@workflow, anchor: 'files')
-    assert flash[:error].include?('cannot be modified')
+    assert flash[:error].include?('cannot make changes')
   end
 
   test 'get text file blob' do
@@ -301,7 +302,7 @@ class GitControllerTest < ActionController::TestCase
     assert_select 'a.btn[href=?]', workflow_git_remove_file_path(@workflow, version: @git_version.version, file: { path: 'concat_two_files.ga' }), count: 1
   end
 
-  test 'does not show move and delete buttons if immutable' do
+  test 'disables move and delete buttons if immutable' do
     @git_version.update_column(:mutable, false)
 
     get :blob, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'concat_two_files.ga' }
@@ -311,6 +312,8 @@ class GitControllerTest < ActionController::TestCase
     assert_select 'a.btn[href=?]', workflow_git_download_path(@workflow, version: @git_version.version, path: 'concat_two_files.ga'), count: 1
     assert_select "a.btn[data-target='#git-move-modal']", count: 0
     assert_select 'a.btn[href=?]', workflow_git_remove_file_path(@workflow, version: @git_version.version, file: { path: 'concat_two_files.ga' }), count: 0
+    assert_select "a.btn.disabled", text: 'Move/rename', count: 1
+    assert_select "a.btn.disabled", text: 'Delete', count: 1
   end
 
   test 'browse tree' do

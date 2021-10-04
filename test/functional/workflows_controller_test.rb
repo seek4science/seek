@@ -1013,6 +1013,30 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_redirected_to workflow_path(workflow)
   end
 
+  test 'should list files for git workflow' do
+    workflow = Factory(:local_git_workflow)
+    login_as(workflow.contributor)
+    assert workflow.git_version.mutable?
+
+    get :show, params: { id: workflow.id }
+
+    assert_response :success
+
+    assert_select "#files a.btn[data-target='#git-add-modal']", text: 'Add file', count: 1
+  end
+
+  test 'should disable Add File button if git version is immutable' do
+    workflow = Factory(:remote_git_workflow)
+    login_as(workflow.contributor)
+    refute workflow.git_version.mutable?
+
+    get :show, params: { id: workflow.id }
+
+    assert_response :success
+
+    assert_select "#files a.btn.disabled", text: 'Add file', count: 1
+  end
+
   def edit_max_object(workflow)
     add_tags_to_test_object(workflow)
     add_creator_to_test_object(workflow)
