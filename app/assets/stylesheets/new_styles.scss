@@ -334,6 +334,7 @@ label.admin-checkbox {
 .seek-homepage-button-container {
   margin-bottom: 1em;
   margin-top: 1em;
+  color: $ibisba-dark-green;
 }
 
 a.seek-homepage-button {
@@ -344,6 +345,7 @@ a.seek-homepage-button {
   padding: 20px;
   margin: 5px;
   text-decoration: none;
+  color: $ibisba-dark-green;
 
   &:hover {
     background-color: #f0f0f0;
