@@ -2,18 +2,22 @@
 <%= javascript_include_tag "project_folders" %>
 <%
     default_folder = initial_folder(@project)
+    # Define folder view view options
+    show_isa = !@is_folders # Hide isa related views
 %>
 <div class="show_basic single-page-folder">
     <div class="row">
         <div class="col-md-4">
             <div id="folder_column">
                 <div id="folders">
-                    <ul class="bcrumb">
-                    <li><a class="active" href="#"><span>Project</span></a></li>
-                    <li ><a href="#"><span>Investigation</span></a></li>
-                    <li ><a href="#"><span>Study</span></a></li>
-                    <li ><a href="#"><span>Assay</span></a></li>
-                    </ul>
+                    <% if !@is_folders %>
+                      <ul class="bcrumb">
+                      <li><a class="active" href="#"><span>Project</span></a></li>
+                      <li ><a href="#"><span>Investigation</span></a></li>
+                      <li ><a href="#"><span>Study</span></a></li>
+                      <li ><a href="#"><span>Assay</span></a></li>
+                      </ul>
+                    <% end %>
                     <div id="demo_tree" class="new-design"></div>
                 </div>
             </div>
@@ -72,8 +76,9 @@
 
     <script type="text/javascript">
         var selectedItem = {type:"",id:""}, pid, uid
+          
         $j(document).ready(function() {
-            setupFoldersTree( <%= ((TreeviewBuilder.new(@project, @folders)).build_tree_data).html_safe -%> , 'demo_tree', 'draggable_folder_item');
+            setupFoldersTree( <%= ((TreeviewBuilder.new(@project, @folders)).build_tree_data(display_isatree=show_isa)).html_safe -%> , 'demo_tree', 'draggable_folder_item');
             $j("#item-layout").html("<%= escape_javascript(render template: 'projects/show' ) %>");
             $j("#item_contents").show();
             pid = <%= @project.id %>

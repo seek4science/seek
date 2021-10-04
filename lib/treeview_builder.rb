@@ -5,50 +5,52 @@ class TreeviewBuilder
     @folders = folders
     end
 
-    def build_tree_data
+    def build_tree_data(display_isatree=true)
         inv, std, prj, asy, assay_assets = Array.new(5) {[]}
         bold = { 'style': 'font-weight:bold' }
-        @project.investigations.each do |investigation|
-            investigation.studies.each do |study|
-                next unless study.assays
-                study.assays.each do |assay|
-                    samples = assay.assets.select{|a| a.class == Sample}
-                    assay_assets.push(create_node({text: "samples", 
-                                        _type: "sample", 
-                                        resource: samples[0], 
-                                        count: samples.length })) if samples.length > 0
-                    (assay.assets - samples).each do |asset|
-                        assay_assets.push(create_node({text: asset.title, 
-                                        _type: asset.class.name.underscore.downcase, 
-                                        _id: asset.id, 
-                                        resource: asset }))
-                    end
-                    asy.push(create_node({text: assay.title, 
-                                        _type: 'assay', 
-                                        _id: assay.id, 
-                                        a_attr: bold, 
-                                        children: assay_assets, 
-                                        resource: assay}))
-                    assay_assets = []
-                end
-                std.push(create_node({text: study.title,
-                                        _type: 'study', 
-                                        _id: study.id, 
-                                        a_attr: bold, 
-                                        label: asy.length>0 ? 'Assays' : nil, 
-                                        children: asy, 
-                                        resource: study}))
-                asy = []
-            end
-            inv.push(create_node({text: investigation.title, 
-                                        _type: 'investigation', 
-                                        _id: investigation.id, 
-                                        a_attr: bold, 
-                                        label: 'Studies', 
-                                        action: '#', 
-                                        children: std, 
-                                        resource: investigation}))
-            std = []
+        if display_isatree
+          @project.investigations.each do |investigation|
+              investigation.studies.each do |study|
+                  next unless study.assays
+                  study.assays.each do |assay|
+                      samples = assay.assets.select{|a| a.class == Sample}
+                      assay_assets.push(create_node({text: "samples",
+                                          _type: "sample",
+                                          resource: samples[0],
+                                          count: samples.length })) if samples.length > 0
+                      (assay.assets - samples).each do |asset|
+                          assay_assets.push(create_node({text: asset.title,
+                                          _type: asset.class.name.underscore.downcase,
+                                          _id: asset.id,
+                                          resource: asset }))
+                      end
+                      asy.push(create_node({text: assay.title,
+                                          _type: 'assay',
+                                          _id: assay.id,
+                                          a_attr: bold,
+                                          children: assay_assets,
+                                          resource: assay}))
+                      assay_assets = []
+                  end
+                  std.push(create_node({text: study.title,
+                                          _type: 'study',
+                                          _id: study.id,
+                                          a_attr: bold,
+                                          label: asy.length>0 ? 'Assays' : nil,
+                                          children: asy,
+                                          resource: study}))
+                  asy = []
+              end
+              inv.push(create_node({text: investigation.title,
+                                          _type: 'investigation',
+                                          _id: investigation.id,
+                                          a_attr: bold,
+                                          label: 'Studies',
+                                          action: '#',
+                                          children: std,
+                                          resource: investigation}))
+              std = []
+          end
         end
         
         # Documents folder
@@ -57,16 +59,15 @@ class TreeviewBuilder
         prj.push(create_node({text: @project.title,
                                         _type: 'project',
                                         _id: @project.id,
-                                        a_attr: bold, 
-                                        label: 'Investigations',
-                                        action: '#', 
-                                        children: inv, 
+                                        a_attr: bold,
+                                        label: display_isatree ? 'Investigations' : nil,
+                                        action: display_isatree ? '#' : nil,
+                                        children: inv,
                                         resource: @project}))
 
         JSON[prj]
     end
 
-    # TODO: add function that returns the simplified folder tree
     def get_folder_tree()
       prj = Array.new()
       # Documents folder

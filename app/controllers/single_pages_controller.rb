@@ -12,7 +12,7 @@ class SinglePagesController < ApplicationController
     @study = Study.new
     @assay = Assay.new
 
-    @is_folders = params[:is_folders]
+    @is_folders = params.has_key?(:is_folders) ? params[:is_folders] : false
 
     respond_to do |format|
       format.html
