@@ -42,6 +42,7 @@ module Seek
         validates :title, presence: true
         validates :title, length: { maximum: 255 }, unless: -> { is_a?(Publication) }
         validates :description, length: { maximum: 65_535 }, if: -> { respond_to?(:description) }
+        validates :license, license:true, allow_blank: true
 
 
         include Seek::Stats::ActivityCounts
