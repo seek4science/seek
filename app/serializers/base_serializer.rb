@@ -132,4 +132,14 @@ class BaseSerializer < SimpleBaseSerializer
       return [result]
     end
   end
+
+  def serialize_assets_creators
+    object.assets_creators.map do |c|
+      { profile: c.creator_id ? person_path(c.creator_id) : nil,
+        family_name: c.family_name,
+        given_name: c.given_name,
+        affiliation: c.affiliation,
+        orcid: c.orcid }
+    end
+  end
 end
