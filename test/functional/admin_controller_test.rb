@@ -479,7 +479,7 @@ class AdminControllerTest < ActionController::TestCase
     assert_equal new_value, Seek::Config.recommended_data_licenses
     new_value = []
     post :update_settings, params: {recommended_data_licenses: new_value}
-    assert_equal ['CC-BY-4.0'], Seek::Config.recommended_data_licenses
+    assert_equal nil, Seek::Config.recommended_data_licenses
   end
 
   test 'recommended software licenses' do
@@ -489,7 +489,7 @@ class AdminControllerTest < ActionController::TestCase
     assert_equal new_value, Seek::Config.recommended_software_licenses
     new_value = []
     post :update_settings, params: {recommended_software_licenses: new_value}
-    assert_equal ['Apache-2.0'], Seek::Config.recommended_software_licenses
+    assert_equal nil, Seek::Config.recommended_software_licenses
   end
 
 end
