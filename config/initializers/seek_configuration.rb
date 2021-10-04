@@ -69,7 +69,7 @@ def load_seek_config_defaults!
   Seek::Config.default :programmes_open_for_projects_enabled, false
   Seek::Config.default :project_admin_sample_type_restriction, false #only project admins can create and edit sample types and controlled vocabs
   Seek::Config.default :recommended_data_licenses, []
-  Seek::Config.default :recommended_software_licenses, []
+  Seek::Config.default :recommended_software_licenses, ['Apache-2.0','GPL-3.0','MIT','BSD-2-Clause','BSD-3-Clause','LGPL-2.1']
 
   # Types
   Seek::Config.default :documents_enabled,true
