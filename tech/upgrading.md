@@ -68,17 +68,17 @@ If you have an existing installation linked to our GitHub, you can fetch the
 files with:
 
     git pull
-    git checkout v1.11.1
+    git checkout v1.11.2
 
 ### Updating using the tarball
 
 You can download the file from
-<https://github.com/seek4science/seek/archive/v1.11.1.tar.gz> You can
+<https://github.com/seek4science/seek/archive/v1.11.2.tar.gz> You can
 unpack this file using:
 
-    tar zxvf seek-1.11.1.tar.gz
+    tar zxvf seek-1.11.2.tar.gz
     mv seek seek-previous
-    mv seek-1.11.1 seek
+    mv seek-1.11.2 seek
     cd seek/
 
 and then copy across your existing filestore and database configuration file
@@ -98,7 +98,7 @@ content.
 
     cd . #this is to allow RVM to pick up the ruby and gemset changes
     gem install bundler
-    bundle install --deployment
+    bundle install --deployment --without development test
     bundle exec rake seek:upgrade
     bundle exec rake assets:precompile # this task will take a while       
 

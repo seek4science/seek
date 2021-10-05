@@ -145,7 +145,7 @@ First install bundler, which is used to manage gem versions
 
 Next install the ruby gems SEEK needs:
 
-    bundle install
+    bundle install --deployment --without development test
 
 ## Setting up the Database
 
