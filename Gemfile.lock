@@ -104,7 +104,7 @@ GEM
       activerecord (>= 3.0.0)
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
-    aes_key_wrap (1.0.1)
+    aes_key_wrap (1.1.0)
     akami (1.2.2)
       gyoku (>= 0.4.0)
       nokogiri
@@ -279,7 +279,7 @@ GEM
       railties (>= 3.2.16)
     json (2.5.1)
     json-diff (0.4.1)
-    json-jwt (1.11.0)
+    json-jwt (1.13.0)
       activesupport (>= 4.2)
       aes_key_wrap
       bindata
@@ -374,7 +374,7 @@ GEM
     mimemagic (0.3.10)
       nokogiri (~> 1)
       rake
-    mini_mime (1.1.0)
+    mini_mime (1.1.1)
     mini_portile2 (2.6.1)
     minitest (5.14.4)
     minitest-reporters (1.1.14)
@@ -427,12 +427,12 @@ GEM
     omniauth-rails_csrf_protection (0.1.2)
       actionpack (>= 4.2)
       omniauth (>= 1.3.1)
-    omniauth_openid_connect (0.2.4)
+    omniauth_openid_connect (0.3.1)
       addressable (~> 2.5)
       omniauth (~> 1.3)
       openid_connect (~> 1.1)
     open4 (1.3.0)
-    openid_connect (1.1.6)
+    openid_connect (1.3.0)
       activemodel
       attr_required (>= 1.0.0)
       json-jwt (>= 1.5.0)
@@ -476,12 +476,12 @@ GEM
     rack (2.2.3)
     rack-attack (5.0.1)
       rack
-    rack-oauth2 (1.9.3)
+    rack-oauth2 (1.19.0)
       activesupport
       attr_required
       httpclient
-      json-jwt (>= 1.9.0)
-      rack
+      json-jwt (>= 1.11.0)
+      rack (>= 2.1.0)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
     rails (5.2.4.6)
@@ -724,7 +724,7 @@ GEM
     sunspot_rails (2.5.0)
       rails (>= 3)
       sunspot (= 2.5.0)
-    swd (1.1.2)
+    swd (1.3.0)
       activesupport (>= 3)
       attr_required (>= 0.0.5)
       httpclient (>= 2.4)
@@ -771,7 +771,7 @@ GEM
     wasabi (2.5.1)
       httpi (~> 1.0)
       nokogiri (>= 1.4.0)
-    webfinger (1.1.0)
+    webfinger (1.2.0)
       activesupport
       httpclient (>= 2.4)
     webmock (3.10.0)
