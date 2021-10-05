@@ -11,7 +11,7 @@ redirect_from: "/jerm.html"
 The JERM (Just Enough Results Model) allows us to exchange, interpret and
 compare between different types of data and results files across SEEK.
 
-For more non technical background on JERM please visit [http://fair-dom.org/JERM](http://fair-dom.org/JERM)
+For more background on JERM please visit [https://jermontology.org](https://jermontology.org)
 
 
 
