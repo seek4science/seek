@@ -167,6 +167,8 @@ openbis_debug:
 openbis_autosync:
 openbis_check_new_arrivals:
 default_license:
+recommended_data_licenses:
+recommended_software_licenses:
 about_page_enabled:
 about_page:
 terms_enabled:

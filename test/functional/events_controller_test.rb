@@ -333,5 +333,18 @@ class EventsControllerTest < ActionController::TestCase
 
   end
 
+  test 'should not duplicate related programmes' do
+    person = Factory(:admin)
+    login_as(person)
+    projects = [Factory(:project),Factory(:project)]
+    programme = Factory(:programme,projects:projects)
+    event = Factory(:event, projects:projects, policy:Factory(:public_policy))
+
+    get :show, params: { id: event }
+    assert_response :success
+
+    assert_select('div.related-items div#programmes div.list_item_title a[href=?]',programme_path(programme),count:1)
+  end
+
 
 end
