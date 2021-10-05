@@ -11,6 +11,24 @@ Please see [Getting FAIRDOM-SEEK](/get-seek.html) for details about installing S
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html)
 
+## Version 1.11.2
+
+Release date: _6th October 2021_
+
+A small update release with minor changes and bug fixes, in particular:
+
+* Finalised Sample and Sample Type read/write API, along with completed documentation.
+* Bioschemas improvements with greater compliance, and the addition of _conformsTo_ clause to indicate which version is
+currently being used.
+* Recommended licenses, which appear at the top of the list. The FAIRDOM-SEEK admin has the ability to set and change these under Settings.
+  The license ID is now also validated that it is recognised when set through the API.
+* Fix to a critical issue with Sample and Custom metadata attributes of type Boolean, which prevented them being set through the UI.
+  This also includes a fix to allows an empty value if the attribute is optional.
+* Allow project join requests to be approved where the optional Institution Country is missing.
+* Show the date a user joined on their profile page, visible to all logged in registered users.
+
+For a full list, see [closed issues for 1.11.2](https://github.com/seek4science/seek/milestone/7?closed=1)
+
 ## Version 1.11.1
 
 Release date: _19th July 2021_
@@ -21,7 +39,7 @@ A small update release with a few small changes and bug fixes, in particular:
   * Fix to remove some warning messages about a duplicate definition of _include_blank_
   * Person responsible for Study has been deprecated and removed from the user interface 
 
-[Closed issues for 1.11.1](https://github.com/seek4science/seek/milestone/5?closed=1)
+For a full list, see  [closed issues for 1.11.1](https://github.com/seek4science/seek/milestone/5?closed=1)
 
 ## Version 1.11.0
 
@@ -77,7 +95,7 @@ This version includes:
     * The visibility of specific versions can be controlled by the user - completely hiding individual versions if wished.
     * Existing versions continue to follow the original permissions until explicitly changed.
 
-[Closed issues for 1.11.0](https://github.com/seek4science/seek/milestone/2?closed=1)
+For a full list, see [Closed issues for 1.11.0](https://github.com/seek4science/seek/milestone/2?closed=1)
 
 ## Version 1.10.3
 
