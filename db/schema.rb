@@ -233,6 +233,11 @@ ActiveRecord::Schema.define(version: 2021_09_29_111617) do
     t.string "asset_type"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer "pos", default: 0
+    t.string "family_name"
+    t.string "given_name"
+    t.string "orcid"
+    t.text "affiliation"
     t.index ["asset_id", "asset_type"], name: "index_assets_creators_on_asset_id_and_asset_type"
   end
 

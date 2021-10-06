@@ -3,9 +3,9 @@
     "id": "292",
     "type": "samples",
     "attributes": {
-      "discussion_links": null,
+      "discussion_links": [],
       "title": "Fred Bloggs",
-      "tags": null,
+      "tags": [],
       "created_at": "2021-08-31T13:38:39.000Z",
       "updated_at": "2021-08-31T13:38:39.000Z",
       "other_creators": null,
@@ -51,6 +51,14 @@
           {
             "id": "15",
             "type": "data_files"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "25",
+            "type": "assays"
           }
         ]
       },

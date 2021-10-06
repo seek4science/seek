@@ -949,7 +949,7 @@ class ModelsControllerTest < ActionController::TestCase
     model.save
     get :show, params: { id: model }
 
-    assert_select 'li.author-list-item', text: 'another creator', count: 1
+    assert_select '#author-box .additional-credit', text: 'another creator', count: 1
   end
 
   test 'should create new model version based on content_blobs of previous version' do
@@ -1228,7 +1228,7 @@ class ModelsControllerTest < ActionController::TestCase
     # should be a temporary sharing link
     assert_select 'div#temporary_links', count:1
 
-    assert_select 'div#author_form', count:1
+    assert_select 'div#author-form', count:1
   end
 
   test 'cannot access manage page with edit rights' do

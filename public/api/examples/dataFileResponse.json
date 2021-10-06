@@ -3,7 +3,7 @@
         "id": "1152",
         "type": "data_files",
         "attributes": {
-            "tags": null,
+            "tags": [],
             "title": "G3PDH Kinetic data",
             "description": "Experimental data set for the kinetic characterisation of G3PDH",
             "license": null,

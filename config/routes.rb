@@ -705,15 +705,22 @@ SEEK::Application.routes.draw do
       end
     end
   end
+  
+  resources :creators, only: [] do
+    collection do
+      get :registered
+      get :unregistered
+    end
+  end
 
   ### TEMPLATES ###
   resources :templates do
-    resources :projects, only: [:index]
+  resources :projects, only: [:index]
     member do
       get :manage
       patch :manage_update
     end
-  end  
+  end
 
   ### SINGLE PAGE
   resources :single_pages do

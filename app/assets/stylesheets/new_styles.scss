@@ -412,7 +412,7 @@ div.isa_graph {
 a.remove-association {
   text-decoration: none;
   vertical-align: middle;
-  color: $brand-danger;
+  color: $brand-danger !important;
   &:hover {
     text-decoration: none;
   }
@@ -1072,4 +1072,38 @@ span.disabled {
 
 .citation-box {
   overflow-x: auto;
+}
+
+a.orcid-link {
+  background-image: url(image-path('logos/orcid_16x16.png'));
+  background-repeat: no-repeat;
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  vertical-align: text-top;
+}
+
+#author-form {
+  .author-form-search {
+    display: inline-block;
+    .bootstrap-tagsinput {
+      width: 20em;
+    }
+  }
+
+  .assets-creator-list {
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    padding: 10px 0;
+    margin: 10px 0;
+
+    .author {
+      padding: 3px;
+      border-radius: 4px;
+      &.ui-sortable-helper {
+        background-color: $hover-highlight;
+        opacity: 0.7;
+      }
+    }
+  }
 }
