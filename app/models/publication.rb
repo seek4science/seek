@@ -46,7 +46,7 @@ class Publication < ApplicationRecord
 
   has_one :content_blob, ->(r) { where('content_blobs.asset_version =?', r.version) }, as: :asset, foreign_key: :asset_id
 
-  explicit_versioning(:version_column => "version") do
+  explicit_versioning(:version_column => "version", sync_ignore_columns: ['license','other_creators']) do
     acts_as_versioned_resource
     has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND content_blobs.asset_type =?', r.version, r.parent.class.name) },
             :primary_key => :publication_id,:foreign_key => :asset_id

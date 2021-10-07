@@ -339,7 +339,10 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'should show the publication with unspecified publication type as Not specified' do
-    get :show, params: { id: publications(:no_publication_type) }
+    publication = Factory(:publication, published_date: Date.new(2013, 1, 1), title: 'Publication without type')
+    publication.publication_type = nil
+    publication.save(validate: false)
+    get :show, params: { id: publication.id }
     assert_response :success
     assert_select 'p' do
       assert_select 'strong', { text: 'Publication type:' }
@@ -362,7 +365,11 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'should show publication' do
-    get :show, params: { id: publications(:one) }
+    publication = Factory :publication, contributor: User.current_user.person
+    publication.save
+
+    get :show, params: { id: publication.id }
+    puts response.body
     assert_response :success
   end
 

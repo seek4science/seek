@@ -16,10 +16,12 @@ namespace :seek do
     fix_negative_programme_role_mask
     db:seed:007_sample_attribute_types
     db:seed:008_miappe_custom_metadata
+    db:seed:010_ena_custom_metadata
     delete_users_with_invalid_person
     delete_specimen_activity_logs
     update_session_store
     update_cv_sample_templates
+    update_missing_publication_versions
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -168,7 +170,7 @@ namespace :seek do
     problems.each do |person|
       mask = person.roles_mask
       while mask < 0
-        mask = mask + 32
+        mask += 32
       end
       person.update_column(:roles_mask,mask)
     end
@@ -199,9 +201,27 @@ namespace :seek do
   task(update_cv_sample_templates: :environment) do
     puts '... Queue jobs for Sample templates containing controlled vocabularies'
     SampleType.all.each do |st|
-      if st.template && st.sample_attributes.detect(&:controlled_vocab?)
-        st.queue_template_generation
+      st.queue_template_generation if st.template && st.sample_attributes.detect(&:controlled_vocab?)
+    end
+  end
+
+  task(update_missing_publication_versions: :environment) do
+    puts '... creating missing publications versions ...'
+    create = 0
+    disable_authorization_checks do
+      Publication.find_each do |publication|
+        puts "Publication #{publication.title} with version #{publication.version.to_s} latest version is #{publication.latest_version.nil?.to_s}"
+        # check if the publication has a version
+        # then create one if missing
+        if publication.latest_version.nil?
+          publication.save_as_new_version 'Version for legacy entries'
+          unless publication.latest_version.nil?
+            create += 1
+          end
+        end
+        # publication.save
       end
     end
+    puts " ... finished creating missing publications versions for #{create.to_s} publications"
   end
 end
