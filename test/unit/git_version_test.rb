@@ -14,7 +14,7 @@ class GitVersionTest < ActiveSupport::TestCase
     refute v.git_base.tags['version-1.0.0']
     assert v.mutable?
 
-    disable_authorization_checks { v.send(:lock) }
+    disable_authorization_checks { v.lock }
     workflow.update_column(:title, 'Something else')
     new_class = WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class)
     workflow.update_column(:workflow_class_id, new_class.id)
@@ -254,5 +254,20 @@ class GitVersionTest < ActiveSupport::TestCase
         assert_equal r[k], gv.send(k), "#{k} did not match"
       end
     end
+  end
+
+  test 'can initialize next version of an immutable git_version' do
+    gv = Factory(:git_version)
+    disable_authorization_checks { gv.lock }
+
+    next_ver = gv.next_version
+
+    refute next_ver.persisted?
+    assert_equal gv.version + 1, next_ver.version
+    assert next_ver[:name].blank?
+    assert next_ver[:comment].blank?
+    assert_equal gv.resource_attributes['title'], next_ver.resource_attributes['title']
+    assert_equal gv.commit, next_ver.commit
+    assert_equal gv.git_repository, next_ver.git_repository
   end
 end

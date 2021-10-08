@@ -112,7 +112,7 @@ class WorkflowsController < ApplicationController
 
   # Creates an RO-Crate zip file from several files
   def create_from_files
-    crate_builder = WorkflowCrateBuilder.new(ro_crate_params)
+    crate_builder = WorkflowRepositoryBuilder.new(ro_crate_params)
     crate_builder.workflow_class = @workflow.workflow_class
     @workflow = crate_builder.build
 

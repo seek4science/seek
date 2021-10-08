@@ -31,10 +31,6 @@ module Git
       touch(:last_fetch)
     end
 
-    def fetching?
-      remote_git_fetch_task && !remote_git_fetch_task.completed?
-    end
-
     def remote_refs
       @remote_refs ||= if remote.present?
                          refs = { branches: [], tags: [] }

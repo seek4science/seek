@@ -1,10 +1,9 @@
 require 'ro_crate'
 require 'seek/download_handling/http_streamer'
 
-# A kind of "form object" to create a simple Workflow RO-Crate from ~three files (Workflow, diagram, abstract CWL),
-# perform validation (and hold appropriate error messages), and provide output as hash of params that can be used to
-# create a ContentBlob.
-class WorkflowCrateBuilder
+# A kind of "form object" to create a Git repository + version from ~three files (Workflow, diagram, abstract CWL),
+# perform validation (and hold appropriate error messages).
+class WorkflowRepositoryBuilder
   include ActiveModel::Model
 
   attr_accessor :main_workflow, :abstract_cwl, :diagram, :workflow_class

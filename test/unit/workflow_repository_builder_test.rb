@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class WorkflowROCrateBuilderTest < ActiveSupport::TestCase
+class WorkflowRepositoryBuilderTest < ActiveSupport::TestCase
   setup do
     @galaxy = WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class)
   end
@@ -10,7 +10,7 @@ class WorkflowROCrateBuilderTest < ActiveSupport::TestCase
                diagram: { data: fixture_file_upload('files/file_picture.png') },
                abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
     }
-    builder = WorkflowCrateBuilder.new(params)
+    builder = WorkflowRepositoryBuilder.new(params)
     builder.workflow_class = @galaxy
     workflow = builder.build
     assert workflow
@@ -30,7 +30,7 @@ class WorkflowROCrateBuilderTest < ActiveSupport::TestCase
                diagram: { data_url: 'http://somewhere.com/piccy.png' },
                abstract_cwl: { data_url: 'http://workflow.com/rp2.cwl' }
     }
-    builder = WorkflowCrateBuilder.new(params)
+    builder = WorkflowRepositoryBuilder.new(params)
     builder.workflow_class = @galaxy
     workflow = builder.build
     assert workflow
@@ -45,7 +45,7 @@ class WorkflowROCrateBuilderTest < ActiveSupport::TestCase
     params = { diagram: { data: fixture_file_upload('files/file_picture.png') },
                abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
     }
-    builder = WorkflowCrateBuilder.new(params)
+    builder = WorkflowRepositoryBuilder.new(params)
     refute builder.valid?
     assert builder.errors.any?
     assert builder.errors[:main_workflow].join.include?('blank')
@@ -56,7 +56,7 @@ class WorkflowROCrateBuilderTest < ActiveSupport::TestCase
                diagram: { data: fixture_file_upload('files/file_picture.png') },
                abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
     }
-    builder = WorkflowCrateBuilder.new(params)
+    builder = WorkflowRepositoryBuilder.new(params)
     refute builder.valid?
     assert builder.errors.any?
     assert builder.errors[:main_workflow].join.include?('file or remote')
@@ -72,7 +72,7 @@ class WorkflowROCrateBuilderTest < ActiveSupport::TestCase
                diagram: { data_url: 'http://somewhere.com/piccy.png' },
                abstract_cwl: { data_url: 'http://workflow.com/rp2.cwl' }
     }
-    builder = WorkflowCrateBuilder.new(params)
+    builder = WorkflowRepositoryBuilder.new(params)
     refute builder.valid?
     assert builder.errors.any?
     assert builder.errors[:main_workflow].join.include?('URL could not be accessed')
@@ -83,7 +83,7 @@ class WorkflowROCrateBuilderTest < ActiveSupport::TestCase
                diagram: { data: fixture_file_upload('files/file_picture.png') },
                abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
     }
-    builder = WorkflowCrateBuilder.new(params)
+    builder = WorkflowRepositoryBuilder.new(params)
     builder.workflow_class = @galaxy
     workflow = builder.build
     crate = workflow.ro_crate
