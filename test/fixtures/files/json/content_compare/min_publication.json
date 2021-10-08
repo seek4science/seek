@@ -73,28 +73,28 @@
         ]
       },
       "investigations":{
-        "data":null
+        "data":[]
       },
       "studies":{
-        "data":null
+        "data":[]
       },
       "assays":{
-        "data":null
+        "data":[]
       },
       "data_files":{
-        "data":null
+        "data":[]
       },
       "models":{
-        "data":null
+        "data":[]
       },
       "publications":{
-        "data":null
+        "data":[]
       },
       "presentations":{
-        "data":null
+        "data":[]
       },
       "events":{
-        "data":null
+        "data":[]
       }
     },
     "links":{
