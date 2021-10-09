@@ -26,7 +26,7 @@ module Git
 
     alias_method :parent, :resource # ExplicitVersioning compatibility
 
-    attr_writer :remote
+    attr_accessor :remote
 
     delegate :tag_counts, :scales, :managers, :attributions, :creators, :assets_creators, :is_asset?,
              :authorization_supported?, :defines_own_avatar?, :use_mime_type_for_avatar?, :avatar_key,

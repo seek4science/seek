@@ -1,21 +1,19 @@
 require 'ro_crate'
 require 'seek/download_handling/http_streamer'
 
-# A kind of "form object" to create a simple Workflow RO-Crate from ~three files (Workflow, diagram, abstract CWL),
-# perform validation (and hold appropriate error messages), and provide output as hash of params that can be used to
-# create a ContentBlob.
+# A kind of "form object" to create a Git repository + version + annotations from a Workflow RO-Crate.
 class WorkflowCrateExtractor
   include ActiveModel::Model
 
   attr_accessor :ro_crate, :workflow_class
 
-  validates :ro_crate, presence: true
-  validate :main_workflow_present?
+  validate :resolve_crate
+  validate :main_workflow_present?, if: -> { @crate.present? }
 
   def build
     @workflow = Workflow.new(workflow_class: workflow_class)
 
-    if resolve_crate && extract_crate && valid?
+    if valid?
       repo = Git::Repository.create!
       gv = @workflow.git_version
       gv.git_repository = repo
@@ -45,32 +43,40 @@ class WorkflowCrateExtractor
   end
 
   def extract_crate
-    @crate = ROCrate::WorkflowCrateReader.read_zip(ro_crate[:data].tempfile)
+    begin
+      @crate = ROCrate::WorkflowCrateReader.read_zip(ro_crate[:data])
+    rescue Zip::Error
+      errors.add(:ro_crate, 'could not be extracted, please check it is a valid RO-Crate.')
+    end
   end
 
   def resolve_crate
     if ro_crate.nil?
       errors.add(:ro_crate, 'missing')
-      false
-    elsif ro_crate[:data].blank? && ro_crate[:data_url].present?
-      begin
-        handler = ContentBlob.remote_content_handler_for(ro_crate[:data_url])
-        info = handler.info
-        data = handler.fetch
-        data.rewind
-        ro_crate[:data] = data
-        ro_crate[:original_filename] = info[:file_name]
-      rescue Seek::DownloadHandling::BadResponseCodeException => e
-        errors.add(:ro_crate, "URL could not be accessed: #{e.message}")
-        return false
-      rescue StandardError => e
-        raise e unless Rails.env.production?
-        Rails.logger.error("#{e} occurred whilst trying to fetch: #{ro_crate[:data_url]}\n\t#{e.backtrace.join("\n\t")}")
-        errors.add(:ro_crate, "URL could not be accessed")
+      return false
+    elsif ro_crate[:data].blank?
+      if ro_crate[:data_url].present?
+        begin
+          handler = ContentBlob.remote_content_handler_for(ro_crate[:data_url])
+          info = handler.info
+          data = handler.fetch
+          data.rewind
+          ro_crate[:data] = data
+          ro_crate[:original_filename] = info[:file_name]
+        rescue Seek::DownloadHandling::BadResponseCodeException => e
+          errors.add(:ro_crate, "URL could not be accessed: #{e.message}")
+          return false
+        rescue StandardError => e
+          Rails.logger.error("#{e} occurred whilst trying to fetch: #{ro_crate[:data_url]}\n\t#{e.backtrace.join("\n\t")}")
+          errors.add(:ro_crate, "URL could not be accessed")
+          return false
+        end
+      else
+        errors.add(:ro_crate, 'should be provided as a file or remote URL')
         return false
       end
     end
 
-    true
+    extract_crate
   end
 end

@@ -3,11 +3,13 @@
 <div id="repo-ref-form" data-field-name="<%= name -%>">
   <div id="repo-fetching-status" style="display: none">
     <div class="alert alert-info" role="alert">
-      <strong>Checking out <%= git_repository.remote %></strong><br/>
+      <strong>Checking out: <%= git_repository.remote %></strong><br/>
       <span id="fetch-status">Waiting...</span>
       <%= image 'spinner' %>
     </div>
   </div>
+
+  <div id="repo-fetching-error" class="alert alert-danger" role="alert" style="display: none"></div>
 
   <div id="repo-ref-list" style="display: none">
     <ul class="nav nav-tabs" role="tablist">
@@ -32,6 +34,11 @@
 
 <script>
     var GitRepository = {};
+    GitRepository.error = function (message) {
+        $j('#repo-fetching-status').hide();
+        $j('#repo-fetching-error').html(message).show();
+    };
+
     GitRepository.fetchStatus = function () {
         $j('#repo-fetching-status').show();
         $j.ajax('<%= status_git_repository_path(git_repository) %>', {
@@ -41,12 +48,12 @@
                     GitRepository.fetchRefs();
                     clearInterval(GitRepository.pollInterval);
                 } else if (json.status === 'failed') {
-                    alert("Failed to fetch git repository.");
+                    GitRepository.error("Failed to fetch git repository, please check the URL is correct.");
                     clearInterval(GitRepository.pollInterval);
                 }
             },
             error: function () {
-                alert("A server error occurred whilst trying to fetch the git repository.");
+                 GitRepository.error("A server error occurred whilst trying to fetch the git repository.");
                 clearInterval(GitRepository.pollInterval);
             }
         });
@@ -58,7 +65,7 @@
                 GitRepository.renderRefs(json);
             },
             error: function () {
-                alert("A server error occurred whilst trying to fetch the git repository refs.");
+                GitRepository.error("A server error occurred whilst trying to fetch the git repository refs.");
             }
         });
     };

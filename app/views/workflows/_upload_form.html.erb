@@ -80,9 +80,9 @@
     </div>
 
     <div id="git-repo" role="tabpanel" class="tab-pane">
-      <%= form_tag({ action: :create_from_git, anchor: 'from_git' }) do -%>
+      <%= form_tag({ action: :create_from_git, anchor: 'git-repo' }) do -%>
         <div class="asset_form">
-          <%= error_messages_for :git_repository -%>
+          <%= error_messages_for :workflow -%>
 
           <%= panel do %>
             <div class="form-group">

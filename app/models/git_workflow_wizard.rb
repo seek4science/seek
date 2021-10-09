@@ -11,13 +11,13 @@ class GitWorkflowWizard
   attr_reader :next_step, :workflow_class, :git_repository
 
   attr_accessor :params, :workflow
-
-  validates :git_repository_id, presence: true
-  validates :main_workflow_path, presence: true
-  validates :workflow_class_id, presence: true
+  #
+  # validates :git_repository_id, presence: true
+  # validates :main_workflow_path, presence: true
+  # validates :workflow_class_id, presence: true
 
   def run
-    @next_step = nil
+    @next_step = :new
 
     if new_version?
       workflow_class = workflow.workflow_class
@@ -36,8 +36,13 @@ class GitWorkflowWizard
     git_version ||= workflow.git_version
 
     if git_version.git_repository.blank?
-      git_version.set_default_git_repository
-      git_version.git_repository.queue_fetch
+      if git_version.remote.blank?
+        workflow.errors.add(:base, 'Git URL was blank.')
+        return workflow
+      else
+        git_version.set_default_git_repository
+        git_version.git_repository.queue_fetch
+      end
     end
 
     if git_version.ref.blank?
