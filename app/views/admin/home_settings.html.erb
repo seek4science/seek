@@ -32,6 +32,22 @@
                            'Maximum visible tags', 'The maximum number of tags that will appear in the left hand tag cloud in its collapsed state.',
                            :onkeypress => "javascript: return onlyNumbers(event);") %>
 
+    <h2>Panels</h2>
+    <%# Allows amdins to enable/disable a number of panels in the homepage %>
+    
+    <%= admin_checkbox_setting(:home_show_features, 1, Seek::Config.home_show_features,
+                               "Feature showcase enabled", "Whether the feature showcase panel is displayed.") %>
+    <%= admin_checkbox_setting(:home_show_quickstart, 1, Seek::Config.home_show_quickstart,
+                               "Quickstart enabled", "Whether the quickstart panel is displayed.") %>
+    <%= admin_checkbox_setting(:home_show_my_items, 1, Seek::Config.home_show_my_items,
+                               "My items enabled", "Whether the my items panel is displayed.") %>
+    <%= admin_checkbox_setting(:home_show_who_uses, 1, Seek::Config.home_show_who_uses,
+                               "Who uses enabled", "Whether the Who uses panel is displayed.") %>
+    <%= admin_checkbox_setting(:home_show_integrations, 1, Seek::Config.home_show_integrations,
+                               "Integrations enabled", "Whether the Integrations panel is displayed.") %>
+                               
+                               
+
     <%= submit_tag "Update", data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' -%> or
     <%= cancel_button admin_path -%>
 <% end %>

@@ -25,18 +25,20 @@
 
 <div class="row">
   <div class="col-md-9">
-    <% if logged_in_and_registered? %>
+    <% if logged_in_and_registered? && Seek::Config.home_show_my_items%>
       <%= render :partial=>"home_my_items" -%>
     <% end %>
-    <% if !logged_in_and_registered? %>
+    <% if !logged_in_and_registered? && Seek::Config.home_show_who_uses %>
       <%= render :partial=>"home_who_uses" -%>
     <% end %>
     <%= render :partial=>"home_explore_projects" -%>
-    <%= render :partial=>"home_integrations" -%>
+    <% if Seek::Config.home_show_integrations %>
+      <%= render :partial=>"home_integrations" -%>
+    <% end %>
   </div>
 
   <div class="col-md-3">
-    <% if logged_in_and_registered? %>
+    <% if logged_in_and_registered?  && Seek::Config.home_show_quickstart %>
       <%= render :partial=>"home_quick_start" -%>
     <% end %>
     <%= render :partial=>"gadgets/announcements_gadget" if show_announcements? %>

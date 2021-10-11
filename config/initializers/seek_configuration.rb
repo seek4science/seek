@@ -198,6 +198,13 @@ def load_seek_config_defaults!
 
   Seek::Config.default :front_page_buttons_enabled, false
 
+  # Home page panel settings
+  Seek::Config.default :home_show_features,true
+  Seek::Config.default :home_show_quickstart,true
+  Seek::Config.default :home_show_my_items,true
+  Seek::Config.default :home_show_who_uses,true
+  Seek::Config.default :home_show_integrations,true
+
   # omniauth settings and behaviour
   Seek::Config.default :omniauth_enabled, false
   Seek::Config.default :omniauth_user_create, true

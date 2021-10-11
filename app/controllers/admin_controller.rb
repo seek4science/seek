@@ -157,6 +157,13 @@ class AdminController < ApplicationController
     Seek::Config.home_description = params[:home_description]
 
     #    Seek::Config.front_page_buttons_enabled = params[:front_page_buttons_enabled]
+
+    Seek::Config.home_show_features = string_to_boolean params[:home_show_features]
+    Seek::Config.home_show_quickstart = string_to_boolean params[:home_show_quickstart]
+    Seek::Config.home_show_my_items = string_to_boolean params[:home_show_my_items]
+    Seek::Config.home_show_who_uses = string_to_boolean params[:home_show_who_uses]
+    Seek::Config.home_show_integrations = string_to_boolean params[:home_show_integrations]
+
     begin
       Seek::FeedReader.clear_cache
     rescue => e
