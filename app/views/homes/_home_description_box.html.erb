@@ -1,6 +1,8 @@
-<div class="panel panel-default" id="home_description">
-  <div class="panel-body">
-    <% link_to_demo = link_to h("demos here"),Seek::Config.seek_video_link,:popup => true %>
-    <%= home_description_text -%>
+<% if !home_description_text.blank? %>
+  <div class="panel panel-default" id="home_description">
+    <div class="panel-body">
+      <% link_to_demo = link_to h("demos here"),Seek::Config.seek_video_link,:popup => true %>
+      <%= home_description_text -%>
+    </div>
   </div>
-</div>
+<% end %>

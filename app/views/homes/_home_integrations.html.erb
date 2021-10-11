@@ -1,7 +1,7 @@
 <% integrations_content = YAML.load(File.read(File.join(Rails.root, 'config/home', 'integrations.yml'))) %>
 
 <div class="panel panel-default" id="home_features" style="padding: 20px;">
-  <h2 class="text-center">Linked tools</h2>
+  <h2 class="text-center">Integrations</h2>
   <div class="row seek-homepage-button-container" style="display: flex;align-items: center;">
     <% integrations_content.each do |item| %>
       <div class="col-sm-<%= (12/integrations_content.length).floor %> text-center">
