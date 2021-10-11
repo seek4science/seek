@@ -223,3 +223,18 @@ Factory.define(:local_git_workflow, class: Workflow) do |f|
     }
   end
 end
+
+Factory.define(:ro_crate_git_workflow, class: Workflow) do |f|
+  f.title 'Sort and change case'
+  f.with_project_contributor
+  f.workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
+  f.git_version_attributes do
+    repo = Factory(:remote_workflow_ro_crate_repository)
+    { git_repository_id: repo.id,
+      ref: 'refs/heads/master',
+      commit: 'a321b6e',
+      main_workflow_path: 'sort-and-change-case.ga',
+      mutable: false
+    }
+  end
+end

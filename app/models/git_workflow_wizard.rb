@@ -11,10 +11,6 @@ class GitWorkflowWizard
   attr_reader :next_step, :workflow_class, :git_repository
 
   attr_accessor :params, :workflow
-  #
-  # validates :git_repository_id, presence: true
-  # validates :main_workflow_path, presence: true
-  # validates :workflow_class_id, presence: true
 
   def run
     @next_step = :new

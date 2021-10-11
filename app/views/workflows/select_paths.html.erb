@@ -3,7 +3,6 @@
 <%= form_tag(create_from_git_workflows_path) do %>
   <%= hidden_field_tag :resource_id, @workflow.id %>
 
-
   <%= fields_for('workflow[git_version_attributes]', @workflow.git_version) do |f| %>
     <% if false %>
       <h2>Version Metadata</h2>
