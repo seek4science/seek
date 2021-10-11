@@ -5,7 +5,7 @@
 <% end %>
 
 <div class="row">
-  <div class="col-md-9">
+  <div class="col-md-12">
     <%= render :partial=>"home_description_box" -%>
 
     <% if Seek::Config.front_page_buttons_enabled %>
@@ -24,13 +24,14 @@
 
     <%= home_news_feeds %>
 
-    <% if Seek::Config.tagging_enabled %>
+<!--    <% if Seek::Config.tagging_enabled %>
         <div id="sidebar_tag_cloud">
           <% cache 'sidebar_tag_cloud', skip_digest: true do -%>
               <%= render :partial=>"gadgets/tag_cloud_gadget" %>
           <% end -%>
         </div>
     <% end %>
+-->
   </div>
 </div>
 

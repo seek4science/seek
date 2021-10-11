@@ -23,6 +23,25 @@ body {
   max-width: 1400px;
 }
 
+#top-description {
+    background-color: $ibisba-light-green;
+}
+
+#top-description > h1 {
+    text-align: center;
+    color: white;
+}
+
+#top-description > h2 {
+    text-align: center;
+    color: black;
+}
+
+#top-description > p {
+    text-align: center;
+    color: white;
+}
+
 .navbar-default .navbar-nav > li > a {
     color: $ibisba-dark-green;
 }
