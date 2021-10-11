@@ -1,33 +1,27 @@
-<div class="panel panel-default" id="home_features" style="padding: 20px;height:100%;">
-  <h2 class="text-center">Quick start</h2>
-    <% if Seek::Config.programmes_enabled && can_create_programmes? %>
-      <div class="row" style="display: flex;align-items: center;">
-        <div class="col-sm-5 text-center">
-            <a class="btn btn-success" href="<%=new_programme_path%>" role="button" aria-label="Left Align" style="white-space: normal;width:100%;"> Create programme </a>
-        </div>
-        <div class="col-sm-7">
-          Create new programme to group your projects
-        </div>
-      </div>
-      <br>
-    <% end %>
-    <% if can_create_projects? %>
-      <div class="row" style="display: flex;align-items: center;">
-        <div class="col-sm-5 text-center">
-          <a class="btn btn-success" href="<%=new_project_path%>" role="button" aria-label="Left Align" style="white-space: normal;width:100%;"> Create project </a>
-        </div>
-        <div class="col-sm-7">
-          Create new project
-        </div>
-      </div>
-      <br>
-    <% end %>
-    <div class="row" style="display: flex;align-items: center;">
+<%
+  path_create_project = "/projects/guided_create"
+  path_join_project = "/projects/guided_join"
+%>
+<div class="panel panel-default" id="home_quick_start">
+  <div class="panel-heading">
+    <h2>Quick start</h2>
+  </div>
+  <% if can_create_projects? %>
+    <div class="row" style="display: flex;align-items: center; padding: 20px;">
       <div class="col-sm-5 text-center">
-        <a class="btn btn-success" href="<%=projects_path%>" role="button" aria-label="Left Align" style="white-space: normal;width:100%;"> Join <br> project </a>       
+        <a class="btn btn-success" href="<%=path_create_project%>" role="button" aria-label="Left Align" style="white-space: normal;width:100%;"> Create project </a>
       </div>
       <div class="col-sm-7">
-        Request membership of already existing project
+        Create new project
       </div>
     </div>
+  <% end %>
+  <div class="row" style="display: flex;align-items: center; padding: 20px;">
+    <div class="col-sm-5 text-center">
+      <a class="btn btn-success" href="<%=path_join_project%>" role="button" aria-label="Left Align" style="white-space: normal;width:100%;"> Join <br> project </a>       
+    </div>
+    <div class="col-sm-7">
+      Request membership of already existing project
+    </div>
+  </div>
 </div>
