@@ -189,8 +189,8 @@ ActiveRecord::Schema.define(version: 2021_09_02_100010) do
     t.integer "suggested_technology_type_id"
     t.text "other_creators"
     t.string "deleted_contributor"
-    t.integer "position"
     t.integer "sample_type_id"
+    t.integer "position"
     t.index ["sample_type_id"], name: "index_assays_on_sample_type_id"
   end
 
