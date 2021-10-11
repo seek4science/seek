@@ -29,7 +29,7 @@
     <li><%= link_to t("sop").pluralize, sops_path %></li>
     <% if Seek::Config.workflows_enabled %>
       <li><%= link_to t("workflow").pluralize, workflows_path %></li>
-      <% if false %>
+      <% if true %>
         <li><%= link_to t("node").pluralize, nodes_path %></li>
       <% end %>
     <% end %>

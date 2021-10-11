@@ -21,7 +21,7 @@ en:
   discipline: "Discipline"
   document: "Document"
   model: "Model"
-  sop: "SOP"
+  sop: "Protocol"
   workflow: "Workflow"
   workflows:
     workflow: "Workflow"
@@ -104,7 +104,7 @@ en:
   asset_gatekeeper: 'Asset gatekeeper'
   project_administrator: 'Project administrator'
   admin: 'Administrator'
-  pal: 'PAL'
+  pal: 'Project manager'
   programme_administrator: 'Programme administrator'
 
   contributor: 'submitter' # A person who submitted the resource to SEEK
