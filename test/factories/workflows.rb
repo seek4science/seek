@@ -202,7 +202,7 @@ Factory.define(:annotationless_local_git_workflow, class: Workflow) do |f|
     repo = Factory(:unlinked_local_repository)
     { git_repository_id: repo.id,
       ref: 'refs/heads/master',
-      commit: '8eaac19a9e8bf17c787310422ad77d0dab1bfb33',
+      commit: '96aee188b2f9c145860f21dc182608fec5084a8a',
       mutable: true
     }
   end
@@ -216,7 +216,7 @@ Factory.define(:local_git_workflow, class: Workflow) do |f|
     repo = Factory(:unlinked_local_repository)
     { git_repository_id: repo.id,
       ref: 'refs/heads/master',
-      commit: '8eaac19a9e8bf17c787310422ad77d0dab1bfb33',
+      commit: '96aee188b2f9c145860f21dc182608fec5084a8a',
       main_workflow_path: 'concat_two_files.ga',
       diagram_path: 'diagram.png',
       mutable: true

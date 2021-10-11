@@ -56,7 +56,6 @@ class GitControllerTest < ActionController::TestCase
                                       data: fixture_file_upload('files/little_file.txt') } }
 
     assert_redirected_to workflow_path(@workflow, anchor: 'files')
-    pp flash[:error]
     assert flash[:error].include?('cannot make changes')
     refute assigns(:git_version).file_exists?('new-file.txt')
   end

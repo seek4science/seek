@@ -130,7 +130,6 @@ class GitWorkflowWizardTest < ActiveSupport::TestCase
 
     wizard = GitWorkflowWizard.new(params: params[:workflow])
     workflow = wizard.run
-    pp workflow.errors
     assert workflow.errors.added?(:base, 'Git URL was blank.')
     assert_equal :new, wizard.next_step
   end
