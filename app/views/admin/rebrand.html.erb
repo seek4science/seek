@@ -95,6 +95,9 @@
                                Below is an example.", :rows => 30) %>
   </div>
 
+  <%= admin_text_setting(:funding_link, Seek::Config.funding_link,
+                        "Funding link", "A external link pointing to the funding information.") %>
+
   <%= submit_tag "Update", data: {disable_with: 'Updating...'}, :class => 'btn btn-primary' -%> or
   <%= cancel_button admin_path %>
 <% end -%>

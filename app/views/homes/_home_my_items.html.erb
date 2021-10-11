@@ -30,7 +30,7 @@
             <li><a href="<%=person_path(current_person)%>/items#projects">...</a></li>
           <% end %>
         </ul>
-      <h3> Projects shared with me</h3>
+      <h3> Other projects I am a member of</h3>
       <% resource_hash = get_related_resources(current_person, 5) %>
       <ul>      
         <% projectCount = 0%>

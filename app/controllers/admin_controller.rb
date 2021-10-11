@@ -212,6 +212,8 @@ class AdminController < ApplicationController
     Seek::Config.about_page_enabled = string_to_boolean params[:about_page_enabled]
     Seek::Config.about_page = params[:about_page]
 
+    Seek::Config.funding_link = params[:funding_link]
+
     Seek::Config.terms_enabled = string_to_boolean params[:terms_enabled]
     Seek::Config.terms_page = params[:terms_page]
 
