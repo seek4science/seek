@@ -2,7 +2,6 @@ require "test_helper"
 
 class TreeviewBuilderTest < ActionController::TestCase
   fixtures :all
-  include AuthenticatedTestHelper
   include ActionView::Helpers::SanitizeHelper
 
   test "create node" do
@@ -67,15 +66,15 @@ class TreeviewBuilderTest < ActionController::TestCase
   end
 
   test "should sanitize the titles" do
-    p = Factory(:project)
-    f = Factory :project_folder, project_id: p.id
-    f.save!
+    project = Factory(:project)
+    investigation = Factory(:investigation, policy: Factory(:publicly_viewable_policy), 
+      title: '<style><script></style>alert("XSS");<style><</style>/</style><style>script></style>',
+      projects: [project])
 
-    i = Factory(:investigation,title: '<style><script></style>alert("XSS");<style><</style>/</style><style>script></style>', projects: [p])
-
-    controller = TreeviewBuilder.new p, f
+    controller = TreeviewBuilder.new project, nil
     result = controller.send(:build_tree_data)
     text = JSON.parse(result)[0]["children"][0]["text"]
+
     assert_equal '&lt;script&gt;alert("XSS");&lt;/script&gt;', text
   end
 end
