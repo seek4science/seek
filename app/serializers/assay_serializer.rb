@@ -33,4 +33,8 @@ class AssaySerializer < SnapshottableSerializer
   has_many :sops
   has_many :publications
   has_many :documents
+
+  attribute :creators do
+    serialize_assets_creators
+  end
 end

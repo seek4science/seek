@@ -65,9 +65,9 @@ module Seek
         orderings.each do |ordering|
           if ordering.is_a?(Arel::Nodes::Ordering)
             expr = ordering.expr
-            # Don't need to SELECT columns that are already covered by "*"  and MySQL will error if you try!
+            # Don't need to SELECT columns that are already covered by "*" and MySQL will error if you try!
             unless expr.respond_to?(:relation) && expr.relation == items.arel_table
-              columns << ordering.expr
+              columns << expr
             end
           else
             columns << ordering

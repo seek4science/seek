@@ -78,4 +78,8 @@ module PeopleHelper
     end
     filtered_items_not_in_ISA
   end
+
+  def orcid_link(orcid)
+    link_to('', orcid, target: :_blank, title: 'ORCID', class: 'orcid-link')
+  end
 end
