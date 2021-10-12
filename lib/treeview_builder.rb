@@ -1,5 +1,6 @@
 class TreeviewBuilder
     include ImagesHelper
+    include ActionView::Helpers::SanitizeHelper
     def initialize(project, folders)
     @project = project
     @folders = folders
@@ -63,7 +64,7 @@ class TreeviewBuilder
                                         children: inv, 
                                         resource: @project}))
 
-        JSON[prj]
+        sanitize(JSON[prj])
     end
 
     private
