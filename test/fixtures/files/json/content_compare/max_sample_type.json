@@ -5,7 +5,7 @@
     "attributes": {
       "title": "A Maximal SampleType",
       "description": "A very new research",
-      "attribute_map": [
+      "sample_attributes": [
         {
           "id": "523",
           "title": "full_name",
@@ -13,9 +13,7 @@
             "id": "808",
             "title": "Full name",
             "base_type": "String",
-            "regular_expression": "[A-Z][a-z]+[ ][A-Z][a-z]+",
-            "placeholder": null,
-            "resolution": null
+            "regexp": "[A-Z][a-z]+[ ][A-Z][a-z]+"
           },
           "required": true,
           "pos": "1",
@@ -31,9 +29,7 @@
             "id": "811",
             "title": "Address",
             "base_type": "Text",
-            "regular_expression": ".*",
-            "placeholder": null,
-            "resolution": null
+            "regexp": ".*"
           },
           "required": false,
           "pos": "2",
@@ -49,9 +45,7 @@
             "id": "812",
             "title": "Post Code",
             "base_type": "String",
-            "regular_expression": "^([A-PR-UWYZ0-9][A-HK-Y0-9][AEHMNPRTVXY0-9]?[ABEHMNPRVWXY0-9]? {1,2}[0-9][ABD-HJLN-UW-Z]{2}|GIR 0AA)$",
-            "placeholder": null,
-            "resolution": null
+            "regexp": "^([A-PR-UWYZ0-9][A-HK-Y0-9][AEHMNPRTVXY0-9]?[ABEHMNPRVWXY0-9]? {1,2}[0-9][ABD-HJLN-UW-Z]{2}|GIR 0AA)$"
           },
           "required": false,
           "pos": "3",
@@ -67,9 +61,7 @@
             "id": "",
             "title": "String",
             "base_type": "String",
-            "regular_expression": ".*",
-            "placeholder": null,
-            "resolution": null
+            "regexp": ".*"
           },
           "required": false,
           "pos": "4",

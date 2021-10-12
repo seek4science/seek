@@ -1,0 +1,92 @@
+{
+  "data": {
+    "id": "292",
+    "type": "samples",
+    "attributes": {
+      "discussion_links": null,
+      "title": "Fred Bloggs",
+      "tags": null,
+      "created_at": "2021-08-31T13:38:39.000Z",
+      "updated_at": "2021-08-31T13:38:39.000Z",
+      "other_creators": null,
+      "attribute_map": {
+        "full_name": "Fred Bloggs",
+        "address": "3 Oxford Road",
+        "postcode": "M13 9PL"
+      }
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "5",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "1056",
+            "type": "people"
+          }
+        ]
+      },
+      "sample_type": {
+        "data": {
+          "id": "354",
+          "type": "sample_types"
+        }
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "1042",
+            "type": "projects"
+          }
+        ]
+      },
+      "data_files": {
+        "data": [
+          {
+            "id": "15",
+            "type": "data_files"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "25",
+            "type": "assays"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "1056",
+            "type": "people"
+          },
+          {
+            "id": "5",
+            "type": "people"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/samples/292"
+    },
+    "meta": {
+      "created": "2021-08-31T13:38:39.000Z",
+      "modified": "2021-08-31T13:38:39.000Z",
+      "api_version": "0.3",
+      "uuid": "ac934970-ec8e-0139-2586-000c29095f88",
+      "base_url": "http://localhost:3000"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

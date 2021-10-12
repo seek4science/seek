@@ -1,0 +1,22 @@
+{
+  "data": {
+    "type": "samples",
+    "id": "292",
+    "attributes": {
+      "attribute_map": {
+        "full_name": "John Doe",
+        "address": "5 School Lane"
+      },
+    },
+    "relationships": {
+      "projects": {
+        "data": [
+          {
+            "id": "5",
+            "type": "projects"
+          }
+        ]
+      }
+    }
+  }
+}

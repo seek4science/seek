@@ -13,7 +13,7 @@ git pull
 
 cd . #this is to allow RVM to pick up the ruby and gemset changes
 echo "${GREEN}bundle install${NC}"
-bundle install --deployment
+bundle install --deployment --without development test
 
 echo "${GREEN} precompile assets${NC}"
 bundle exec rake assets:precompile # this task will take a while

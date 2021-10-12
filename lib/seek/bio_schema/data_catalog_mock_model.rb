@@ -31,6 +31,10 @@ module Seek
         ActivityLog.order(:id).first.try(:created_at)
       end
 
+      def updated_at
+        ActivityLog.order(:id).last.try(:updated_at)
+      end
+
       def url
         Seek::Config.site_base_host
       end

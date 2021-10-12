@@ -14,7 +14,7 @@ git pull
 
 cd . - #this is to allow RVM to pick up the ruby and gemset changes
 echo "${GREEN}bundle install${NC}"
-bundle install --deployment
+bundle install --deployment --without development test
 
 bundle exec rake seek:workers:stop
 

@@ -8,7 +8,7 @@ module Seek
         has_and_belongs_to_many :projects, join_table: @project_join_table,
                                            before_add: :react_to_project_addition,
                                            before_remove: :react_to_project_removal
-        has_many :programmes, through: :projects
+        has_many :programmes, ->{ distinct }, through: :projects
         has_filter :project, :programme
 
         after_save -> { @project_additions = [] }
