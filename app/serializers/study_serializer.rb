@@ -1,8 +1,5 @@
 class StudySerializer < SnapshottableSerializer
-  attributes :title, :description, :experimentalists, :other_creators
-  attribute :person_responsible_id do
-    object.person_responsible_id.to_s
-  end
+  attributes :title, :description, :experimentalists, :other_creators , :position
 
   has_many :people
   has_many :projects
@@ -13,4 +10,8 @@ class StudySerializer < SnapshottableSerializer
   has_many :sops
   has_many :publications
   has_many :documents
+
+  attribute :creators do
+    serialize_assets_creators
+  end
 end

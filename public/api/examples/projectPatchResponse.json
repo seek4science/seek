@@ -88,6 +88,9 @@
             },
             "documents": {
                 "data": []
+            },
+            "workflows": {
+                "data": []
             }
         },
         "links": {

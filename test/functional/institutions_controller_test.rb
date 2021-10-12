@@ -225,6 +225,7 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_difference('AssetLink.discussion.count') do
       assert_difference('Institution.count') do
         post :create, params: { institution: { title: 'test',
+                                               country: 'TH',
                                                discussion_links_attributes: [{url: "http://www.slack.com/"}]}, }
       end
     end

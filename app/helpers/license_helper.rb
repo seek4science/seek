@@ -3,6 +3,8 @@ require 'seek/license'
 
 module LicenseHelper
   def license_select(name, selected = nil, opts = {})
+    puts opts[:multiple]
+    puts opts
     select_tag(name, options_for_select(license_options(opts), selected), opts)
   end
 
@@ -99,14 +101,16 @@ module LicenseHelper
   end
 
   def group_licenses(opts)
-    license_values(opts).group_by do |l|
-      if l.key?('is_generic') && l['is_generic']
-        'Generic'
-      elsif l.key?('od_recommended') && l['od_recommended']
+    
+    grouped = license_values(opts).group_by do |l|
+      if opts[:recommended]&.include?(l['id'])
         'Recommended'
+      elsif l.key?('is_generic') && l['is_generic']
+        'Generic'
       else
         'Other'
       end
     end.to_a
   end
+  
 end

@@ -5,6 +5,16 @@ module Seek
       class Sample < Thing
         schema_mappings properties: :additionalProperty
 
+        SAMPLE_PROFILE = 'https://bioschemas.org/profiles/Sample/0.2-RELEASE-2018_11_10/'.freeze
+
+        def schema_type
+          %w[Thing Sample]
+        end
+
+        def conformance
+          SAMPLE_PROFILE
+        end
+
         def properties
           sample_type.sample_attributes.collect do |attr|
             describe_attribute(attr)

@@ -56,6 +56,9 @@ module Seek
       end
 
       def pre_process_value(attribute_name, value)
+        if attribute_for_attribute_name(attribute_name).nil?
+          raise "Attribute with name '#{attribute_name}' not found"
+        end
         attribute_for_attribute_name(attribute_name).pre_process_value(value)
       end
 

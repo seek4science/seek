@@ -64,7 +64,7 @@ class PoliciesController < ApplicationController
     resource = nil
     resource = resource_class.find_by_id(params[:resource_id]) if params[:resource_id]
     resource ||= resource_class.new
-    policy = resource.policy.set_attributes_with_sharing(params[:policy_attributes])
+    policy = resource.policy.set_attributes_with_sharing(policy_params)
     contributor_person = resource.new_record? ? current_person : resource.contributor.try(:person)
     creators = Person.find((params[:creators] || '').split(',').compact.uniq)
     projects = Project.where(id: (params[:project_ids] || '').split(','))

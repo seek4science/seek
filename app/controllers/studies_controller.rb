@@ -12,6 +12,9 @@ class StudiesController < ApplicationController
 
   before_action :check_assays_are_not_already_associated_with_another_study, only: %i[create update]
 
+  before_action :set_displaying_single_page, only: [:show]
+  before_action :check_assays_are_for_this_study, only: %i[update]
+
   include Seek::Publishing::PublishingCommon
   include Seek::AnnotationCommon
   include Seek::IsaGraphExtensions
@@ -42,20 +45,42 @@ class StudiesController < ApplicationController
     end
   end
 
+  def order_assays
+    @study = Study.find(params[:id])
+    respond_to do |format|
+      format.html
+    end
+  end
+
   def update
     @study = Study.find(params[:id])
-    @study.attributes = study_params
-    update_sharing_policies @study
-    update_relationships(@study, params)
+    if params[:study][:ordered_assay_ids]
+      a1 = params[:study][:ordered_assay_ids]
+      a1.permit!
+      pos = 0
+      a1.each_pair do |key, value |
+        assay = Assay.find (value)
+        assay.position = pos
+        pos += 1
+        assay.save!
+      end
+      respond_to do |format|
+         format.html { redirect_to(@study) }
+       end
+    else
+      @study.attributes = study_params
+      update_sharing_policies @study
+      update_relationships(@study, params)
 
-    respond_to do |format|
-      if @study.save
-        flash[:notice] = "#{t('study')} was successfully updated."
-        format.html { redirect_to(@study) }
-        format.json {render json: @study, include: [params[:include]]}
-      else
-        format.html { render action: 'edit', status: :unprocessable_entity }
-        format.json { render json: json_api_errors(@study), status: :unprocessable_entity }
+      respond_to do |format|
+        if @study.save
+          flash[:notice] = "#{t('study')} was successfully updated."
+          format.html { redirect_to(@study) }
+          format.json {render json: @study, include: [params[:include]]}
+        else
+          format.html { render action: 'edit', status: :unprocessable_entity }
+          format.json { render json: json_api_errors(@study), status: :unprocessable_entity }
+        end
       end
     end
   end
@@ -64,7 +89,7 @@ class StudiesController < ApplicationController
     @study = Study.find(params[:id])
 
     respond_to do |format|
-      format.html
+      format.html { render(params[:only_content] ? { layout: false } : {})}
       format.xml
       format.rdf { render template: 'rdf/show' }
       format.json {render json: @study, include: [params[:include]]}
@@ -88,17 +113,24 @@ class StudiesController < ApplicationController
         format.json { render json: json_api_errors(@study), status: :unprocessable_entity }
       end
     end
-  end
+  end  
 
-  def investigation_selected_ajax
-    if (investigation_id = params[:investigation_id]).present? && params[:investigation_id] != '0'
-      investigation = Investigation.find(investigation_id)
-      people = investigation.projects.collect(&:people).flatten
+  def check_assays_are_for_this_study
+    study_id = params[:id]
+    if params[:study][:ordered_assay_ids]
+      a1 = params[:study][:ordered_assay_ids]
+      a1.permit!
+      valid = true
+      a1.each_pair do |key, value |
+        a = Assay.find (value)
+        valid = valid && !a.study.nil? && a.study_id.to_s == study_id
+      end
+      unless valid
+        error("Each ordered #{t('assays.assay')} must be associated with the Study", "is invalid (invalid #{t('assays.assay')})")
+        return false
+      end
     end
-
-    people ||= []
-
-    render partial: 'studies/person_responsible_list', locals: { people: people }
+    return true
   end
 
   def check_assays_are_not_already_associated_with_another_study
@@ -164,8 +196,7 @@ class StudiesController < ApplicationController
       study_params = {
         title: params[:studies][:title][index],
         description: params[:studies][:description][index],
-        investigation_id: params[:study][:investigation_id],
-        person_responsible_id: params[:study][:person_responsible_id],
+        investigation_id: params[:study][:investigation_id],        
         custom_metadata: CustomMetadata.new(
           custom_metadata_type: metadata_types,
           data: metadata
@@ -310,17 +341,10 @@ class StudiesController < ApplicationController
   end
 
   private
-  def validate_person_responsible(p)
-    if (!p[:person_responsible_id].nil?) && (!Person.exists?(p[:person_responsible_id]))
-      render json: {error: 'Person responsible does not exist', status: :unprocessable_entity}, status: :unprocessable_entity
-      return false
-    end
-    true
-  end
 
   def study_params
-    params.require(:study).permit(:title, :description, :experimentalists, :investigation_id, :person_responsible_id,
-                                  :other_creators, { creator_ids: [] }, { scales: [] }, { publication_ids: [] },
+    params.require(:study).permit(:title, :description, :experimentalists, :investigation_id,
+                                  *creator_related_params, :position, { scales: [] }, { publication_ids: [] },
                                   { discussion_links_attributes:[:id, :url, :label, :_destroy] },
                                   { custom_metadata_attributes: determine_custom_metadata_keys })
   end

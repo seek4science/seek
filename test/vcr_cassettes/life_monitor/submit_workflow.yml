@@ -1,0 +1,47 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://localhost:8000/workflows
+    body:
+      encoding: UTF-8
+      string: '{"uuid":"56c50ac0-529b-0139-9132-000c29a94011","version":"1","roc_link":"https://myseek:3000/workflows/10/ro_crate?version=1","name":"This
+        Workflow","submitter_id":"1"}'
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (linux-gnu x86_64) ruby/2.6.6p146
+      Content-Type:
+      - application/json
+      Authorization:
+      - Bearer 0KFv5bXGD4FhEFTuqLJ8uAaJVNI0cNIgYeIeWR5XqR
+      Content-Length:
+      - '168'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - localhost:8000
+  response:
+    status:
+      code: 201
+      message: CREATED
+    headers:
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '77'
+      Server:
+      - Werkzeug/1.0.1 Python/3.7.9
+      Date:
+      - Tue, 16 Feb 2021 15:41:33 GMT
+    body:
+      encoding: UTF-8
+      string: |
+        {
+          "wf_uuid": "56c50ac0-529b-0139-9132-000c29a94011",
+          "wf_version": "1"
+        }
+    http_version: 
+  recorded_at: Tue, 16 Feb 2021 15:41:33 GMT
+recorded_with: VCR 2.9.3

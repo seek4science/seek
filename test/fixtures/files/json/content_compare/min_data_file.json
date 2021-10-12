@@ -8,7 +8,7 @@
         "access":"no_access",
         "permissions":[]
       },
-      "tags": null,
+      "tags": [],
       "title": "A Minimal DataFile",
       "description": null,
       "license": null,
@@ -36,7 +36,8 @@
         }
       ],
       "other_creators": null,
-      "discussion_links": null
+      "creators": [],
+      "discussion_links": []
     },
     "relationships": {
       "creators": {

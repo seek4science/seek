@@ -1,3 +1,5 @@
+require 'redcarpet/render_strip'
+
 module Seek
   module Search
     module CommonFields
@@ -11,7 +13,7 @@ module Seek
                 title if respond_to?(:title)
               end
               text :description do
-                description if respond_to?(:description)
+                strip_markdown(description) if respond_to?(:description)
               end
               text :searchable_tags do
                 searchable_tags if respond_to?(:searchable_tags)
@@ -22,11 +24,20 @@ module Seek
               text :projects do
                 projects.collect(&:title) if respond_to?(:projects)
               end
+              text :programmes do
+                programmes.collect(&:title) if respond_to?(:programmes)
+              end
 
               text :external_asset do
                 external_asset_search_terms if respond_to?(:external_asset_search_terms)
               end
             end
+          end
+
+          private 
+
+          def strip_markdown text
+            Redcarpet::Markdown.new(Redcarpet::Render::StripDown, tables: true).render(text || '')
           end
         end
       end

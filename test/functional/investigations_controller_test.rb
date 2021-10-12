@@ -360,7 +360,7 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     get :show, params: { id: investigation.id }
     assert_response :success
-    assert_select 'li.author-list-item', text: 'john smith'
+    assert_select '#author-box .additional-credit', text: 'john smith', count: 1
   end
 
   test 'programme investigations through nested routing' do
@@ -512,7 +512,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     #no sharing link, not for Investigation, Study and Assay
     assert_select 'div#temporary_links', count:0
 
-    assert_select 'div#author_form', count:1
+    assert_select 'div#author-form', count:1
   end
 
   test 'cannot access manage page with edit rights' do

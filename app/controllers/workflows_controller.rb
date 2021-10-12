@@ -15,8 +15,9 @@ class WorkflowsController < ApplicationController
   include Seek::Doi::Minting
 
   include Seek::IsaGraphExtensions
+  include RoCrateHandling
 
-  api_actions :index, :show, :create, :update, :destroy
+  api_actions :index, :show, :create, :update, :destroy, :ro_crate
 
   rescue_from WorkflowDiagram::UnsupportedFormat do
     head :not_acceptable
@@ -29,20 +30,24 @@ class WorkflowsController < ApplicationController
   end
 
   def create_version
-    if handle_upload_data(true)
-      comments = params[:revision_comments]
-      respond_to do |format|
-        if @workflow.save_as_new_version(comments)
-
-          flash[:notice]="New version uploaded - now on version #{@workflow.version}"
-        else
-          flash[:error]="Unable to save new version"
-        end
-        format.html {redirect_to @workflow }
-      end
+    if params[:ro_crate]
+      handle_ro_crate_post(true)
     else
-      flash[:error] = flash.now[:error]
-      redirect_to @workflow
+      if handle_upload_data(true)
+        comments = params[:revision_comments]
+        respond_to do |format|
+          if @workflow.save_as_new_version(comments)
+
+            flash[:notice]="New version uploaded - now on version #{@workflow.version}"
+          else
+            flash[:error]="Unable to save new version"
+          end
+          format.html {redirect_to @workflow }
+        end
+      else
+        flash[:error] = flash.now[:error]
+        redirect_to @workflow
+      end
     end
   end
 
@@ -92,7 +97,7 @@ class WorkflowsController < ApplicationController
     # This Workflow instance is just to make `handle_upload_data` work. It is not persisted beyond this action.
     @workflow = Workflow.new(workflow_class_id: params[:workflow_class_id])
     @crate_builder = WorkflowCrateBuilder.new(ro_crate_params)
-    @crate_builder.workflow_extractor_class = @workflow&.extractor_class
+    @crate_builder.workflow_class = @workflow.workflow_class
     blob_params = @crate_builder.build
     content_blob = @workflow.build_content_blob(blob_params)
 
@@ -194,6 +199,7 @@ class WorkflowsController < ApplicationController
 
   def create_version_metadata
     @workflow = Workflow.find(params[:id])
+    @workflow.assign_attributes(workflow_params)
     update_sharing_policies(@workflow)
     filter_associated_projects(@workflow)
 
@@ -254,19 +260,50 @@ class WorkflowsController < ApplicationController
   end
 
   def ro_crate
-    path = @display_workflow.ro_crate_zip
-    response.headers['Content-Length'] = File.size(path).to_s
-    respond_to do |format|
-      format.html do
-        send_file(path,
-                  filename: "workflow-#{@workflow.id}-#{@display_workflow.version}.crate.zip",
-                  type: 'application/zip',
-                  disposition: 'inline')
-      end
+    send_ro_crate(@display_workflow.ro_crate_zip,
+                  "workflow-#{@workflow.id}-#{@display_workflow.version}.crate.zip")
+  end
+
+  def create
+    if params[:ro_crate]
+      handle_ro_crate_post
+    else
+      super
     end
   end
 
   private
+
+  def handle_ro_crate_post(new_version = false)
+    @workflow = Workflow.new unless new_version
+    extractor = Seek::WorkflowExtractors::ROCrate.new(params[:ro_crate])
+
+    @workflow.assign_attributes(extractor.metadata.except(:errors, :warnings))
+    @workflow.assign_attributes(workflow_params)
+    crate_upload = params[:ro_crate]
+    old_content_blob = new_version ? @workflow.content_blob : nil
+    version = new_version ? @workflow.version + 1 : 1
+    @workflow.build_content_blob(tmp_io_object: crate_upload,
+                                 original_filename: crate_upload.original_filename,
+                                 content_type: crate_upload.content_type,
+                                 asset_version: version)
+    if old_content_blob
+      old_content_blob.update_column(:asset_id, @workflow.id)
+    end
+
+    if new_version
+      success = @workflow.save_as_new_version(params[:revision_comments])
+    else
+      create_asset(@workflow)
+      success = @workflow.save
+    end
+
+    if success
+      render json: @workflow, include: json_api_include_param
+    else
+      render json: json_api_errors(@workflow), status: :unprocessable_entity
+    end
+  end
 
   def retrieve_content(blob)
     if !blob.file_exists?
@@ -277,11 +314,12 @@ class WorkflowsController < ApplicationController
 
   def workflow_params
     params.require(:workflow).permit(:title, :description, :workflow_class_id, # :metadata,
-                                     { project_ids: [] }, :license, :other_creators,
+                                     { project_ids: [] }, :license,
                                      { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                     { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
+                                     { assay_assets_attributes: [:assay_id] }, { scales: [] },
                                      { publication_ids: [] }, :internals, :maturity_level, :source_link_url,
-                                     discussion_links_attributes:[:id, :url, :label, :_destroy])
+                                     { discussion_links_attributes: [:id, :url, :label, :_destroy] },
+                                     *creator_related_params)
   end
 
   alias_method :asset_params, :workflow_params

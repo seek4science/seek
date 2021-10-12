@@ -13,15 +13,19 @@
     </div>
   <% end %>
   <div class="col-md-9 col-sm-8 box_about_actor">
-    <% if @display_workflow.maturity_level %>
-      <p>
-        <%= maturity_badge(@display_workflow.maturity_level) %>
-      </p>
-    <% end %>
+    <strong><%= WorkflowClass.model_name.human %>: </strong> <%= @display_workflow.workflow_class_title -%>
 
-    <div id="description">
-      <%= item_description(@display_workflow.description) %>
+    <div style="margin-bottom: 5px;">
+      <% if @display_workflow.maturity_level %>
+        <%= maturity_badge(@display_workflow.maturity_level) %>
+      <% end %>
+
+      <% if @display_workflow.test_status %>
+        <%= test_status_badge(@display_workflow.test_status) %>
+      <% end %>
     </div>
+
+    <%= item_description(@display_workflow.description) %>
 
     <% begin %>
       <% if @display_workflow.diagram_exists? || @display_workflow.can_render_diagram? %>

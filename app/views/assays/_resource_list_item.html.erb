@@ -12,16 +12,13 @@
     <% unless resource.is_modelling? -%>
         <%= "<p class=\"list_item_attribute\"><b>Technology type</b>: #{link_to_technology_type(resource)}</p>".html_safe %>
     <% end -%>
-
-    <%= list_item_snapshot_list resource %>
-    <%= list_item_doi(resource) %>
-  </div>
-
-  <div class="col-sm-6 hidden-xs">
     <%= list_item_authorized_list [resource.investigation], t('investigation'), true, 50, true %>
 
     <%= list_item_authorized_list [resource.study], t('study'), true, 50, true %>
 
+  </div>
+
+  <div class="col-sm-6 hidden-xs">
     <% if Seek::Config.organisms_enabled %>
         <%= list_assay_organisms("Organisms", resource.assay_organisms,{:class=>"list_item_attribute"}) %>
     <% end %>
@@ -30,9 +27,18 @@
         <%= list_assay_human_diseases("Human Diseases", resource.assay_human_diseases,{:class=>"list_item_attribute"}) %>
     <% end %>
 
-    <%= list_item_authorized_list(resource.models, t('model').pluralize, true, 50, true) if resource.is_modelling? %>
-    <%= list_item_authorized_list resource.sops, t('sop').pluralize, true, 50, true %>
-    <%= list_item_authorized_list resource.data_files, t('data_file').pluralize, true, 50, true %>
+    <% if Seek::Config.models_enabled %>
+      <%= list_item_authorized_list(resource.models, t('model').pluralize, true, 50, true) if resource.is_modelling? %>
+    <% end %>
+    <% if Seek::Config.sops_enabled %>
+      <%= list_item_authorized_list resource.sops, t('sop').pluralize, true, 50, true %>
+    <% end %>
+    <% if Seek::Config.data_files_enabled %>
+      <%= list_item_authorized_list resource.data_files, t('data_file').pluralize, true, 50, true %>
+    <% end %>
+
+    <%= list_item_snapshot_list resource %>
+    <%= list_item_doi(resource) %>
   </div>
 </div>
 

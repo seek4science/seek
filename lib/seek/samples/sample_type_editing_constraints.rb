@@ -94,36 +94,26 @@ module Seek
         @analysis_hash
       end
 
-      def attribute_keys
-        sample_type.sample_attributes.collect(&:accessor_name).collect(&:to_sym)
-      end
-
       def do_analysis
-        #Rails.cache.fetch(cache_key) do
-          analysis = {}
-          attribute_keys.each do |attr|
-            analysis[attr] = analyse_for_attribute(attr)
-          end
-          analysis
-        #end
+        analysis = {}
+        sample_type.sample_attributes.each do |attr|
+          analysis[attr.accessor_name.to_sym] = analyse_for_attribute(attr)
+        end
+        analysis
       end
 
       def analyse_for_attribute(attr)
         has_blanks = false
         all_blank = true
         samples.each do |sample|
-          has_blanks = sample.blank_attribute?(attr) unless has_blanks
-          all_blank &&= sample.blank_attribute?(attr)
+          value = sample.get_attribute_value(attr)
+          has_blanks = attr.test_blank?(value) unless has_blanks
+          all_blank &&= attr.test_blank?(value)
           break if has_blanks && !all_blank # no need to continue
         end
         { has_blanks: has_blanks, all_blank: all_blank }
       end
 
-      def cache_key
-        last_sample = samples.order(:updated_at).last
-        key = last_sample ? last_sample.id : '0'
-        "#{sample_type.cache_key}/#{key}"
-      end
     end
   end
 end

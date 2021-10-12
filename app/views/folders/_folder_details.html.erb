@@ -3,12 +3,12 @@
 -%>
 
 <ul id="folder_details">
-  <li class="title_and_description">
-    <% if @folder.editable? -%>
+    <li class="title_and_description">
+        <% if @folder.editable? -%>
 
         <p>
-          <span id="title_label"><b>Title: </b></span>
-          <%= link_to @folder.title, '#',
+            <span id="title_label"><b>Title: </b></span>
+            <%= link_to @folder.title, '#',
                       data: { inplace: true,
                               type: 'text',
                               pk: @folder.id,
@@ -17,8 +17,8 @@
         </p>
 
         <p>
-          <span id="description_label"><b>Description: </b></span>
-          <%= link_to @folder.description, '#',
+            <span id="description_label"><b>Description: </b></span>
+            <%= link_to @folder.description, '#',
                       data: { inplace: true,
                               type: 'textarea',
                               pk: @folder.id,
@@ -26,65 +26,120 @@
                               value: @folder.description,
                               title: 'Enter description'} %>
         </p>
-    <% else -%>
+        <% else -%>
         <p>
             <b>Title: </b><%= h(@folder.title) -%>
         </p>
         <p>
             <b>Description: </b><%= h(@folder.description) -%>
         </p>
-    <% end -%>
-  </li>
+        <% end -%>
+    </li>
 
-  <li class="actions">
-    <% if @folder.deletable? -%>
+    <li class="actions">
+        <% if @folder.deletable? -%>
         <% unsorted_folder = ProjectFolder.new_items_folder(@project).try(:title) -%>
         <div>
         <%= image_tag_for_key "destroy", project_folder_path(@project, @folder),
-                              "Delete this folder",
-                              { data: { confirm: "Deleting this folder will remove all subfolders, and move any files to the #{unsorted_folder}. It is not reversible. Are you sure you want to delete?" },
-                               :method => :delete},
-                              "Delete this folder"
+            "Delete this folder",
+            { data: { confirm: "Deleting this folder will remove all subfolders, and move any files to the #{unsorted_folder}. It is not reversible. Are you sure you want to delete?" },
+            :method => :delete},
+            "Delete this folder"
         -%>
         </div>
-    <% end -%>
+        <% end -%>
 
-    <% if @folder.editable? %>
-      <%= button_link_to('Add subfolder', 'add', '#', id: 'add-subfolder-btn') %>
-    <% end -%>
-  </li>
+        <% if @folder.editable? %>
+        <%= button_link_to('Add subfolder', 'add', '#', id: 'add-subfolder-btn') %>
+        <%= button_link_to('Upload file', 'add', '#', id: 'upload-file-btn') %>
+        <input type="file" id="upload-file-input" style="display:none">
+        <% end -%>
+    </li>
 </ul>
 
-<div style='clear:both;'>&nbsp;</div>
-
 <% if @folder.editable? -%>
-  <div id='new_child' style='display:none;'>
-    <div id="error_text" class='error_div alert alert-danger' style="display:none;"></div>
-    <%= form_tag(create_folder_project_folder_path(@project, @folder), { id: :create_child_form, remote: true }) do -%>
-      <div class="input-group">
-        <%= text_field_tag :title, nil, id: 'subfolder-title', placeholder: 'Enter sub-folder name...', class: 'form-control' -%>
-        <div class="input-group-btn">
-          <%= submit_tag "Create", data: { disable_with: 'Creating...' }, class: 'btn btn-primary' %>
-        </div>
-      </div>
-    <% end -%>
-  </div>
-  <script>
-      $j(document).ready(function () {
-          $j('#add-subfolder-btn').click(function () {
-              $j('#new_child').fadeIn();
-              $j('#subfolder-title').focus();
-              return false;
-          });
-          $j('#create_child_form').on("ajax:before", function () {
-              $j('#new_child').spinner('add');
-          }).on("ajax:success", function (_, data) {
-              location.reload();
-          }).on("ajax:error", function (_, data) {
-              $j('#new_child').spinner('remove');
-              $j('#error_text').html(data).show();
-          });
-      });
-  </script>
-<% end -%>
+    <div id='new_child' style='display:none;'>
+        <div id="error_text" class='error_div alert alert-danger' style="display:none;"></div>
+        <%= form_tag(create_folder_project_folder_path(@project, @folder), { id: :create_child_form, remote: true }) do -%>
+        <div class="input-group">
 
+            <%= text_field_tag :title, nil, id: 'subfolder-title', placeholder: 'Enter sub-folder name...', class: 'form-control' -%>
+            <div class="input-group-btn">
+                <%= button_tag "Cancel", type: 'button', class: 'btn btn-default', onclick: '$j("#new_child").hide()' %>
+                <%= submit_tag "Create", id: 'create-subfolder-btn', data: { disable_with: 'Creating...' }, class: 'btn btn-primary' %>
+            </div>
+        </div>
+        <% end -%>
+    </div>
+<% end -%>
+<script>
+
+    function moveFile(asset_id) {
+        var folder_element_id = "folder_" + displayed_folder_id;
+        var project_id = <%=@project.id%>
+        <%
+            fld = ProjectFolder.where(:project_id=>@project.id, :title=>"Unsorted items").first
+            folder_id = fld.id unless fld.nil?
+        %>
+    
+        var path = "/projects/" + project_id + "/folders/" + <%= folder_id%> + "/move_asset_to";
+        const data = {
+            asset_id,
+            asset_type: "DataFile",
+            dest_folder_id: displayed_folder_id,
+            dest_folder_element_id: folder_element_id,
+            }
+        $j.ajax({
+            url: path,
+            type: "POST",
+            dataType: "script",
+            data
+        });
+    }
+
+    $j(document).ready(function() {
+        $j('#create-subfolder-btn').click(function (e) {
+            if($j('#subfolder-title').val().length<3)
+            {
+                alert('The name is too short, it must be 2 or more characters');
+                e.preventDefault();
+            }
+        })
+        $j('#add-subfolder-btn').click(function() {
+            $j('#new_child').fadeIn();
+            $j('#subfolder-title').focus();
+            return false;
+        });
+        $j("#upload-file-btn").on('click', () => {
+            $j('#upload-file-input').click();
+        })
+
+        $j('#upload-file-input').on('change', (e) => {
+            let file = $j('#upload-file-input')[0].files[0]
+            $j('#upload-file-input').val('');
+            let data = new FormData();
+            data.append("content_blobs[][data]", file);
+            data.append("utf8", "✓");
+            $j.ajax({
+                type: "POST",
+                url: "/data_files/create_content_blob",
+                data,
+                cache: false,
+                contentType: false,
+                processData: false,
+                error: e => {
+                    console.log(e)
+                }
+            });
+        })
+
+        $j('#create_child_form').on("ajax:before", function() {
+            $j('#new_child').spinner('add');
+        }).on("ajax:success", function(_, data) {
+            location.reload();
+        }).on("ajax:error", function(_, data) {
+            $j('#new_child').spinner('remove');
+            $j('#error_text').html(data).show();
+        });
+    });
+</script>

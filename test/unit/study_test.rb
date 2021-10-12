@@ -87,11 +87,6 @@ class StudyTest < ActiveSupport::TestCase
     assert study.related_sops.include?(sops(:sop_for_test_with_workgroups))
   end
 
-  test 'person responisble' do
-    study = studies(:metabolomics_study)
-    assert_equal people(:person_without_group), study.person_responsible
-  end
-
   test 'project from investigation' do
     study = studies(:metabolomics_study)
     assert_equal projects(:sysmo_project), study.projects.first

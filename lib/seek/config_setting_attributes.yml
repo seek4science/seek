@@ -67,6 +67,7 @@ project_hierarchy_enabled:
 tabs_lazy_load_enabled:
 publish_button_enabled:
 project_browser_enabled:
+project_single_page_enabled:
 experimental_features_enabled:
 pdf_conversion_enabled:
 admin_impersonation_enabled:
@@ -166,6 +167,8 @@ openbis_debug:
 openbis_autosync:
 openbis_check_new_arrivals:
 default_license:
+recommended_data_licenses:
+recommended_software_licenses:
 about_page_enabled:
 about_page:
 terms_enabled:
@@ -190,6 +193,7 @@ results_per_page_default_condensed:
 results_per_page:
 cwl_viewer_url:
 # Types enabled
+data_files_enabled:
 documents_enabled:
 events_enabled:
 isa_enabled:
@@ -197,8 +201,10 @@ models_enabled:
 organisms_enabled:
 programmes_enabled:
 managed_programme_id:
+presentations_enabled:
 publications_enabled:
 samples_enabled:
+sops_enabled:
 workflows_enabled:
 collections_enabled:
 # Omniauth
@@ -216,8 +222,18 @@ omniauth_github_enabled:
 omniauth_github_client_id:
 omniauth_github_secret:
   encrypt: true
+ga4gh_trs_api_enabled:
+custom_metadata_enabled: false
 search_results_limit:
   convert: :to_i
-# Controlled vocabs  
+life_monitor_enabled:
+life_monitor_url:
+life_monitor_client_id:
+life_monitor_client_secret:
+galaxy_instance_name:
+galaxy_instance_trs_import_url:
+# Controlled vocabs
 cv_dropdown_limit:
   convert: :to_i
+tag_cloud_enabled:
+workflow_class_list_enabled:

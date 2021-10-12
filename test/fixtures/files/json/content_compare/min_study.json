@@ -3,7 +3,7 @@
     "id": "1039986486",
     "type": "studies",
     "attributes": {
-      "snapshots": null,
+      "snapshots": [],
       "policy":
       {
         "access":"no_access",
@@ -13,8 +13,9 @@
       "description": null,
       "experimentalists": null,
       "other_creators": null,
-      "person_responsible_id": null,
-      "discussion_links" : null
+      "creators": [],
+      "position": null,
+      "discussion_links" : []
     },
     "relationships": {
       "creators": {

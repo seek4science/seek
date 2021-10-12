@@ -35,7 +35,16 @@
           "size": 8827
         }
       ],
-      "other_creators" : "Blogs, Joe",
+      "other_creators": "Blogs, Joe",
+      "creators": [
+        {
+          "profile": "/people/1039986827",
+          "family_name": "Last",
+          "given_name": "Person336",
+          "affiliation": "An Institution: 363",
+          "orcid": null
+        }
+      ],
       "discussion_links": [{
         "id": 55,
         "url": "http://www.slack.com/",
@@ -46,7 +55,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039986841",
+            "id": "1039986827",
             "type": "people"
           }
         ]
@@ -66,7 +75,7 @@
             "type": "people"
           },
           {
-            "id": "1039986841",
+            "id": "1039986827",
             "type": "people"
           }
         ]

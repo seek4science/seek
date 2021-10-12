@@ -1,0 +1,9 @@
+{
+  "aggregate_test_status": "not_available",
+  "latest_builds": [],
+  "workflow": {
+    "name": "This Workflow",
+    "uuid": "56c50ac0-529b-0139-9132-000c29a94011",
+    "version": "1"
+  }
+}
