@@ -2,6 +2,7 @@ module Seek
   # defines what can be added to a particular item, and the params used
   class AddButtons
     DEFINITIONS = {
+      'Project' => [[Investigation, 'investigation[project_id]']],
       'Investigation' => [[Study, 'study[investigation_id]']],
       'Study' => [[Assay, 'assay[study_id]']],
       'Modelling Analysis' => [[DataFile, 'data_file[assay_assets_attributes[][assay_id]]'],
