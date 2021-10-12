@@ -38,36 +38,6 @@
     </div>
 
     <div id="provide-metadata-content">
-     </div>
-
-    <div class="modal" tabindex="-1" role="dialog" id="data-file-modal-inv">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <%= render :partial=>"investigations/new" %>
-                    <div class="row" style="padding:15px">
-                        <a id="submit_investigation" type="button" onclick="submitInvestigation()" class="btn btn-primary">Create</a>
-                        &nbsp;
-                        <a type="button" class="btn btn-default">Cancel</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal" tabindex="-1" role="dialog" id="data-file-modal-std">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <%= render :partial=>"studies/new" %>
-                    <div class="row" style="padding:15px">
-                        <a id="submit_study" type="button" onclick="submitStudy()" class="btn btn-primary">Create</a>
-                        &nbsp;
-                        <a type="button" class="btn btn-default">Cancel</a>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <script type="text/javascript">
@@ -78,12 +48,6 @@
             $j("#item_contents").show();
             pid = <%= @project.id %>
             uid = <%= current_user.id if current_user %>
-
-            $j("a:contains('Cancel')").click(function (e) {
-                e.preventDefault();
-                $j("#data-file-modal-inv").modal("hide");
-                $j("#data-file-modal-std").modal("hide");
-            });
         });
         
     </script>

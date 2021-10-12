@@ -46,7 +46,6 @@ class TreeviewBuilder
                                         _id: investigation.id, 
                                         a_attr: bold, 
                                         label: 'Studies', 
-                                        action: '#', 
                                         children: std, 
                                         resource: investigation}))
             std = []
@@ -60,7 +59,6 @@ class TreeviewBuilder
                                         _id: @project.id,
                                         a_attr: bold, 
                                         label: 'Investigations',
-                                        action: '#', 
                                         children: inv, 
                                         resource: @project}))
 
@@ -80,12 +78,11 @@ class TreeviewBuilder
         if(!obj[:resource].can_view?)
             obj[:text] = "hidden item"
             obj[:a_attr] = { 'style': 'font-style:italic;font-weight:bold;color:#ccc' }
-            obj[:action] = nil
         end
 
         node = { id: obj[:id], text: obj[:text], a_attr: obj[:a_attr], count: obj[:count],
             data: { id:obj[:_id], type: obj[:_type], project_id: obj[:project_id], folder_id: obj[:folder_id]},
-            state: { opened: true, separate: { label: obj[:label], action: obj[:action]}},
+            state: { opened: true, separate: { label: obj[:label]}},
             children: obj[:children], icon: get_icon(obj[:resource]) }
         deep_compact(node)
     end
