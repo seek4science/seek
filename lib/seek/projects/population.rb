@@ -17,10 +17,15 @@ module Seek
         study_index = values.find_index('Study')
         assay_index = values.find_index('Assay')
         description_index = values.find_index('Description')
+        assignee_indices = []
         protocol_index = nil
         values.each_with_index {
           |val,i|
-          if val.start_with?('Protocol')
+          if val.start_with?('Assign')
+          then
+            assignee_indices << i
+          end
+             if val.start_with?('Protocol')
           then
             protocol_index = i
           end
@@ -104,8 +109,22 @@ module Seek
             assay.position = assay_position
             assay_position += 1
             assay.assay_class = AssayClass.for_type('experimental')
+            assignees = []
+            assignee_indices.each do |x|
+              unless r.cell(x).nil?
+                assignees += r.cell(x).value.split(';')
+              end
+            end
             known_creators = []
             other_creators = []
+            assignees.each do |a|
+              creator = Person.find_by email: a
+              if creator.nil?
+                other_creators += [a]
+              else
+                known_creators += [creator]
+              end
+            end
             assay.creators = known_creators
             assay.other_creators = other_creators.join(';')
             unless r.cell(protocol_index).nil?
