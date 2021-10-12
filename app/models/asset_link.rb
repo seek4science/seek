@@ -11,7 +11,15 @@ class AssetLink < ApplicationRecord
   validates :label, length: {maximum: 100}
   validates :asset, presence: true
 
+  before_validation :strip_url
+
   def display_label
     label.blank? ? url : label
+  end
+
+  private
+
+  def strip_url
+    url&.strip!
   end
 end

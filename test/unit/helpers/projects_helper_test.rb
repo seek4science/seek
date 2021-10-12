@@ -48,11 +48,11 @@ class ProjectsHelperTest < ActionView::TestCase
     with_config_value(:email_enabled,true) do
       User.with_current_user(another_person) do
         travel_to 16.hours.ago do
-          MessageLog.create(subject:project_with_admins,sender:another_person,message_type:MessageLog::PROJECT_MEMBERSHIP_REQUEST)
+          ProjectMembershipMessageLog.create(subject:project_with_admins,sender:another_person)
         end
         assert request_join_project_button_enabled?(project_with_admins)
         travel_to 1.hour.ago do
-          MessageLog.create(subject:project_with_admins,sender:another_person,message_type:MessageLog::PROJECT_MEMBERSHIP_REQUEST)
+          ProjectMembershipMessageLog.create(subject:project_with_admins,sender:another_person)
         end
         refute request_join_project_button_enabled?(project_with_admins)
       end

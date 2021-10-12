@@ -110,6 +110,13 @@ ActiveRecord::Schema.define(version: 2021_09_17_094247) do
     t.index ["user_id"], name: "index_api_tokens_on_user_id"
   end
 
+  create_table "application_status",  force: :cascade do |t|
+    t.integer "running_jobs"
+    t.boolean "soffice_running"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "assay_assets", id: :integer,  force: :cascade do |t|
     t.integer "assay_id"
     t.integer "asset_id"
@@ -183,6 +190,7 @@ ActiveRecord::Schema.define(version: 2021_09_17_094247) do
     t.text "other_creators"
     t.string "deleted_contributor"
     t.integer "sample_type_id"
+    t.integer "position"
     t.index ["sample_type_id"], name: "index_assays_on_sample_type_id"
   end
 
@@ -225,6 +233,11 @@ ActiveRecord::Schema.define(version: 2021_09_17_094247) do
     t.string "asset_type"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer "pos", default: 0
+    t.string "family_name"
+    t.string "given_name"
+    t.string "orcid"
+    t.text "affiliation"
     t.index ["asset_id", "asset_type"], name: "index_assets_creators_on_asset_id_and_asset_type"
   end
 
@@ -372,6 +385,7 @@ ActiveRecord::Schema.define(version: 2021_09_17_094247) do
     t.integer "pos"
     t.string "title"
     t.bigint "sample_controlled_vocab_id"
+    t.text "description"
     t.index ["custom_metadata_type_id"], name: "index_custom_metadata_attributes_on_custom_metadata_type_id"
     t.index ["sample_attribute_type_id"], name: "index_custom_metadata_attributes_on_sample_attribute_type_id"
     t.index ["sample_controlled_vocab_id"], name: "index_custom_metadata_attributes_on_sample_controlled_vocab_id"
@@ -814,6 +828,7 @@ ActiveRecord::Schema.define(version: 2021_09_17_094247) do
     t.integer "contributor_id"
     t.text "other_creators"
     t.string "deleted_contributor"
+    t.integer "position"
   end
 
   create_table "investigations_projects", id: false,  force: :cascade do |t|
@@ -1848,7 +1863,6 @@ ActiveRecord::Schema.define(version: 2021_09_17_094247) do
     t.integer "investigation_id"
     t.text "experimentalists"
     t.datetime "begin_date"
-    t.integer "person_responsible_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "first_letter", limit: 1
@@ -1857,6 +1871,7 @@ ActiveRecord::Schema.define(version: 2021_09_17_094247) do
     t.integer "contributor_id"
     t.text "other_creators"
     t.string "deleted_contributor"
+    t.integer "position"
   end
 
   create_table "study_auth_lookup",  force: :cascade do |t|
@@ -2004,6 +2019,12 @@ ActiveRecord::Schema.define(version: 2021_09_17_094247) do
     t.string "key"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string "extractor"
+    t.bigint "contributor_id"
+    t.string "alternate_name"
+    t.text "identifier"
+    t.text "url"
+    t.index ["contributor_id"], name: "index_workflow_classes_on_contributor_id"
   end
 
   create_table "workflow_versions", id: :integer,  force: :cascade do |t|
@@ -2027,6 +2048,8 @@ ActiveRecord::Schema.define(version: 2021_09_17_094247) do
     t.integer "workflow_class_id"
     t.integer "maturity_level"
     t.integer "visibility"
+    t.boolean "monitored"
+    t.integer "test_status"
     t.index ["contributor_id"], name: "index_workflow_versions_on_contributor"
     t.index ["workflow_id"], name: "index_workflow_versions_on_workflow_id"
   end
@@ -2049,6 +2072,7 @@ ActiveRecord::Schema.define(version: 2021_09_17_094247) do
     t.text "metadata"
     t.integer "workflow_class_id"
     t.integer "maturity_level"
+    t.integer "test_status"
     t.index ["contributor_id"], name: "index_workflows_on_contributor"
   end
 

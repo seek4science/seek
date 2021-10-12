@@ -16,7 +16,7 @@ class StudiesControllerTest < ActionController::TestCase
   def rest_api_test_object
     @object = Factory :study, policy: Factory(:public_policy)
   end
-
+  
   test 'should get index' do
     Factory :study, policy: Factory(:public_policy)
     get :index
@@ -456,7 +456,7 @@ class StudiesControllerTest < ActionController::TestCase
 
     get :show, params: { id: study.id }
     assert_response :success
-    assert_select 'li.author-list-item', text: 'frodo baggins'
+    assert_select '#author-box .additional-credit', text: 'frodo baggins', count: 1
   end
 
   test 'should not multiply creators after calling show' do
@@ -493,8 +493,7 @@ class StudiesControllerTest < ActionController::TestCase
     end
   end
 
-  def edit_max_object(study)
-    study.person_responsible = Factory(:max_person)
+  def edit_max_object(study)    
     add_creator_to_test_object(study)
   end
 
@@ -618,7 +617,7 @@ class StudiesControllerTest < ActionController::TestCase
     #no sharing link, not for Investigation, Study and Assay
     assert_select 'div#temporary_links', count:0
 
-    assert_select 'div#author_form', count:1
+    assert_select 'div#author-form', count:1
   end
 
   test 'cannot access manage page with edit rights' do

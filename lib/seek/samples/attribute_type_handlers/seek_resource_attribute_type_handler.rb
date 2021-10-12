@@ -11,6 +11,10 @@ module Seek
           raise 'Not implemented'
         end
 
+        def test_blank?(value)
+          value.blank? || (value.is_a?(Hash) && value[:id].blank? && value[:title].blank?)
+        end
+
         def convert(value)
           resource = find_resource(value)
           hash = { id: resource ? resource.id : value, type: type }.with_indifferent_access

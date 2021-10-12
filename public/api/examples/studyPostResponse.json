@@ -18,8 +18,7 @@
             "title": "A Maximal Study",
             "description": "The Study of many things",
             "experimentalists": "Wet lab people",
-            "other_creators": "Marie Curie",
-            "person_responsible_id": "1092"
+            "other_creators": "Marie Curie",            
         },
         "relationships": {
             "creators": {

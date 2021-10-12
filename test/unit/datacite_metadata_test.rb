@@ -81,6 +81,7 @@ class DataciteMetadataTest < ActiveSupport::TestCase
                     creators: [someone],
                     contributor: Factory(:person, first_name: 'Joe', last_name: 'Bloggs', orcid: 'https://orcid.org/0000-0002-1694-233X')
     ).latest_version
+    thing.assets_creators.create!(given_name: 'Phil', family_name: 'Collins', orcid: 'https://orcid.org/0000-0002-1694-233X')
 
     metadata = thing.datacite_metadata
     xml = metadata.build
@@ -92,10 +93,10 @@ class DataciteMetadataTest < ActiveSupport::TestCase
     assert_equal 'The title', resource.xpath('./xmlns:titles/xmlns:title').first.text
     assert_equal 'The description', resource.xpath('./xmlns:descriptions/xmlns:description').first.text
     assert_equal 2, resource.xpath('./xmlns:creators/xmlns:creator').length
-    joe = parsed.xpath("//xmlns:resource/xmlns:creators/xmlns:creator[xmlns:creatorName/text()='Bloggs, Joe']").first
+    phil = parsed.xpath("//xmlns:resource/xmlns:creators/xmlns:creator[xmlns:creatorName/text()='Collins, Phil']").first
     jane = parsed.xpath("//xmlns:resource/xmlns:creators/xmlns:creator[xmlns:creatorName/text()='Bloggs, Jane']").first
-    assert_equal 'Bloggs, Joe', joe.xpath('./xmlns:creatorName').first.text
-    assert_equal 'https://orcid.org/0000-0002-1694-233X', joe.xpath('./xmlns:nameIdentifier').first.text
+    assert_equal 'Collins, Phil', phil.xpath('./xmlns:creatorName').first.text
+    assert_equal 'https://orcid.org/0000-0002-1694-233X', phil.xpath('./xmlns:nameIdentifier').first.text
     assert_equal 'Bloggs, Jane', jane.xpath('./xmlns:creatorName').first.text
     assert_nil jane.xpath('./xmlns:nameIdentifier').first
     assert_equal 'ORCID', resource.xpath('./xmlns:creators/xmlns:creator/xmlns:nameIdentifier/@nameIdentifierScheme').first.text

@@ -30,6 +30,10 @@ class SampleAttributeType < ApplicationRecord
     self == self.class.default
   end
 
+  def test_blank?(value)
+    base_type_handler({}).test_blank?(value)
+  end
+
   def validate_value?(value, additional_options = {})
     check_value_against_base_type(value, additional_options) && check_value_against_regular_expression(value)
   end
@@ -79,6 +83,10 @@ class SampleAttributeType < ApplicationRecord
 
   def seek_sample?
     base_type == Seek::Samples::BaseType::SEEK_SAMPLE
+  end
+
+  def seek_sample_multi?
+    base_type == Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
   end
 
   def seek_strain?

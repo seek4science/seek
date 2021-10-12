@@ -1,0 +1,22 @@
+<div class="form-group">
+  <%= f.label :title, class: 'required' -%><br/>
+  <%= f.text_field :title, class: 'form-control' %>
+</div>
+
+<div class="form-group">
+  <%= f.label :alternate_name -%><br/>
+  <%= f.text_field :alternate_name, class: 'form-control' %>
+  <p class="help-block">If this <%= WorkflowClass.model_name.human %> is known by another name, you can specify it here.</p>
+</div>
+
+<div class="form-group">
+  <%= f.label :identifier -%><br/>
+  <%= f.text_field :identifier, class: 'form-control' %>
+  <p class="help-block">An optional URI to identify this <%= WorkflowClass.model_name.human %>.</p>
+</div>
+
+<div class="form-group">
+  <%= f.label :url -%><br/>
+  <%= f.text_field :url, class: 'form-control' %>
+  <p class="help-block">An optional URL to the official web page of this <%= WorkflowClass.model_name.human %>.</p>
+</div>

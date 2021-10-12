@@ -61,6 +61,9 @@ strain_type.update_attributes(base_type: Seek::Samples::BaseType::SEEK_STRAIN)
 seek_sample_type = SampleAttributeType.find_or_initialize_by(title:'SEEK Sample')
 seek_sample_type.update_attributes(base_type: Seek::Samples::BaseType::SEEK_SAMPLE)
 
+seek_sample_multi_type = SampleAttributeType.find_or_initialize_by(title:'SEEK Sample Multi')
+seek_sample_multi_type.update_attributes(base_type: Seek::Samples::BaseType::SEEK_SAMPLE_MULTI)
+
 cv_type = SampleAttributeType.find_or_initialize_by(title:'Controlled Vocabulary')
 cv_type.update_attributes(base_type: Seek::Samples::BaseType::CV)
 

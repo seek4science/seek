@@ -236,6 +236,12 @@
             }
         },
         {
+            "name": "samples",
+            "description": {
+                "$ref": "../descriptions/samples.md"
+            }
+        },
+        {
             "name": "workflows",
             "description": {
                 "$ref": "../descriptions/workflows.md"
@@ -302,7 +308,9 @@
             "name": "Samples",
             "tags": [
                 "organisms",
-                "sampleTypes"
+                "sampleTypes",
+                "samples",
+                "sampleAttributeTypes"
             ]
         }
     ],
@@ -529,8 +537,7 @@
                     "in": "path",
                     "required": true,
                     "description": "The assay to be fetched, updated or deleted",
-                    "type": "integer",
-                    "default": 267
+                    "type": "integer"
                 }
             ],
             "patch": {
@@ -3596,6 +3603,217 @@
                 }
             }
         },
+        "/samples": {
+            "post": {
+                "operationId": "createSample",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
+                "description": {
+                    "$ref": "../descriptions/createSample.md"
+                },
+                "tags": [
+                    "create",
+                    "samples"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "samples",
+                        "description": "The sample to create.",
+                        "schema": {
+                            "$ref": "#/definitions/samplePost"
+                        }
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/bad_request"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable entity",
+                        "schema": {
+                            "$ref": "#/definitions/unprocessable_entity"
+                        }
+                    },
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/samplePostResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "$ref": "../examples/samplePostResponse.json"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/samples/{:id}": {
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "description": "The sample to fetch, patch or delete",
+                    "type": "integer"
+                }
+            ],
+            "get": {
+                "operationId": "readSample",
+                "description": {
+                    "$ref": "../descriptions/readSample.md"
+                },
+                "tags": [
+                    "read",
+                    "samples"
+                ],
+                "responses": {
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/not_found"
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sampleResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "$ref": "../examples/sampleResponse.json"
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "updateSample",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
+                "description": {
+                    "$ref": "../descriptions/updateSample.md"
+                },
+                "tags": [
+                    "update",
+                    "samples"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "sample",
+                        "description": "The sample to update.",
+                        "schema": {
+                            "$ref": "#/definitions/samplePatch"
+                        }
+                    }
+                ],
+                "responses": {
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/not_found"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable entity",
+                        "schema": {
+                            "$ref": "#/definitions/unprocessable_entity"
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sampleResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "$ref": "../examples/samplePatchResponse.json"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "deleteSample",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
+                "description": {
+                    "$ref": "../descriptions/deleteSample.md"
+                },
+                "tags": [
+                    "delete",
+                    "samples"
+                ],
+                "responses": {
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/not_found"
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ok"
+                        }
+                    }
+                }
+            }
+        },
+        "sample_attribute_types": {
+            "get": {
+                "operationId": "listSampleAttributeTypes",
+                "description": {
+                    "$ref": "../descriptions/listSampleAttributeTypes.md"
+                },
+                "tags": [
+                    "list",
+                    "sampleAttributeTypes"
+                ],
+                "responses": {
+                    "501": {
+                        "description": "Not implemented"
+                    },
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sampleAttributeTypesResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "$ref": "../examples/sampleAttributeTypesResponse.json"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/sample_types": {
             "get": {
                 "operationId": "listSampleTypes",
@@ -3619,6 +3837,187 @@
                             "application/json": {
                                 "$ref": "../examples/sampleTypesResponse.json"
                             }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "operationId": "createSampleType",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
+                "description": {
+                    "$ref": "../descriptions/createSampleType.md"
+                },
+                "tags": [
+                    "create",
+                    "sampleTypes"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "sampleType",
+                        "description": "The sampleType to create.",
+                        "schema": {
+                            "$ref": "#/definitions/sampleTypePost"
+                        }
+                    }
+                ],
+                "responses": {
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/bad_request"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable entity",
+                        "schema": {
+                            "$ref": "#/definitions/unprocessable_entity"
+                        }
+                    },
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/sampleTypeResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "$ref": "../examples/sampleTypePostResponse.json"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/sample_types/{id}": {
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "description": "The sample type to be fetched, updated or deleted",
+                    "type": "integer"
+                }
+            ],
+            "get": {
+                "operationId": "readSampleType",
+                "description": {
+                    "$ref": "../descriptions/readSampleType.md"
+                },
+                "tags": [
+                    "read",
+                    "sampleTypes"
+                ],
+                "responses": {
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/not_found"
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sampleTypeResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "$ref": "../examples/sampleTypeResponse.json"
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "updateSampleType",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
+                "description": {
+                    "$ref": "../descriptions/updateSampleType.md"
+                },
+                "tags": [
+                    "update",
+                    "sampleTypes"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "sample_type",
+                        "description": "The sample type to patch",
+                        "schema": {
+                            "$ref": "#/definitions/sampleTypePatch"
+                        }
+                    }
+                ],
+                "responses": {
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/not_found"
+                        }
+                    },
+                    "422": {
+                        "description": "Unprocessable entity",
+                        "schema": {
+                            "$ref": "#/definitions/unprocessable_entity"
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sampleTypeResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "$ref": "../examples/sampleTypePatchResponse.json"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "operationId": "deleteSampleType",
+                "security": [{ "OAuth2": ["write"] }, { "apiToken": [] }, { "basicAuth": [] }],
+                "description": {
+                    "$ref": "../descriptions/deleteSampleType.md"
+                },
+                "tags": [
+                    "delete",
+                    "sampleTypes"
+                ],
+                "responses": {
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/forbidden"
+                        }
+                    },
+                    "404": {
+                        "description": "Not found",
+                        "schema": {
+                            "$ref": "#/definitions/not_found"
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/ok"
                         }
                     }
                 }
@@ -4418,7 +4817,6 @@
         },
         "nonEmptyStringList": {
             "type": "array",
-            "minItems": 1,
             "items": {
                 "$ref": "#/definitions/nonEmptyString"
             }
@@ -4437,20 +4835,45 @@
                 }
             }
         },
-        "nonEmptyProjectPositionsList": {
+        "assetsCreator": {
+            "type": "object",
+            "properties": {
+                "pos": {
+                    "type": "integer"
+                },
+                "profile": {
+                    "$ref": "#/definitions/uriString"
+                },
+                "given_name": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "family_name": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "orcid": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "affiliation": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                }
+            },
+            "required": [
+                "given_name",
+                "family_name"
+            ]
+        },
+        "assetsCreatorsList": {
             "type": "array",
-            "minItems": 1,
+            "minItems": 0,
+            "items": {
+                "$ref": "#/definitions/assetsCreator"
+            }
+        },
+        "projectPositionsList": {
+            "type": "array",
             "items": {
                 "$ref": "#/definitions/projectPosition"
             }
-        },
-        "nullableProjectPositionsList": {
-            "allOf": [
-                {
-                    "$ref": "#/definitions/nonEmptyProjectPositionsList"
-                }
-            ],
-            "x-nullable": true
         },
         "snapshotSkeleton": {
             "type": "object",
@@ -4468,28 +4891,11 @@
                 "url"
             ]
         },
-        "nonEmptySnapshotsList": {
+        "snapshotsList": {
             "type": "array",
-            "minItems": 1,
             "items": {
                 "$ref": "#/definitions/snapshotSkeleton"
             }
-        },
-        "nullableSnapshotsList": {
-            "allOf": [
-                {
-                    "$ref": "#/definitions/nonEmptySnapshotsList"
-                }
-            ],
-            "x-nullable": true
-        },
-        "nullableNonEmptyStringList": {
-            "allOf": [
-                {
-                    "$ref": "#/definitions/nonEmptyStringList"
-                }
-            ],
-            "x-nullable": true
         },
         "uriString": {
             "type": "string",
@@ -4822,6 +5228,9 @@
                 },
                 "other_creators": {
                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                },
+                "creators": {
+                    "$ref": "#/definitions/assetsCreatorsList"
                 }
             },
             "required": [
@@ -4907,6 +5316,9 @@
                 },
                 "other_creators": {
                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                },
+                "creators": {
+                    "$ref": "#/definitions/assetsCreatorsList"
                 }
             },
             "required": [
@@ -5381,6 +5793,30 @@
                 "sample_types"
             ]
         },
+        "sampleType": {
+            "type": "string",
+            "minLength": 1,
+            "enum": [
+                "samples"
+            ]
+        },
+        "sampleAttributeBaseType": {
+            "type": "string",
+            "minLength": 1,
+            "enum": [
+                "Integer",
+                "Float",
+                "String",
+                "DateTime",
+                "Date",
+                "Text",
+                "Boolean",
+                "SeekStrain",
+                "SeekSample",
+                "CV",
+                "SeekDataFile"
+            ]
+        },
         "sampleTypeReference": {
             "properties": {
                 "id": {
@@ -5396,15 +5832,198 @@
             ],
             "additionalProperties": false
         },
-        "sampleTypeReferencesList": {
+        "sampleTypeSampleAttributesResponse": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+                "$ref": "#/definitions/sampleTypeSampleAttributeResponse"
+            }
+        },
+        "sampleTypeSampleAttributeResponse": {
             "type": "object",
             "properties": {
-                "data": {
-                    "$ref": "#/definitions/sampleTypeReferences"
+                "id": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "title": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "sample_attribute_type": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        },
+                        "title": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        },
+                        "base_type": {
+                            "$ref": "#/definitions/sampleAttributeBaseType"
+                        },
+                        "regexp": {
+                            "$ref": "#/definitions/nonEmptyString",
+                            "default": ".*"
+                        }
+                    },
+                    "required": [
+
+                    ]
+                },
+                "required": {
+                    "type": "boolean"
+                },
+                "pos": {
+                    "$ref": "#/definitions/nullableInteger"
+                },
+                "unit": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "is_title": {
+                    "type": "boolean"
+                },
+                "sample_controlled_vocab_id": {
+                    "$ref": "#/definitions/nullableInteger"
+                },
+                "linked_sample_type_id": {
+                    "$ref": "#/definitions/nullableInteger"
                 }
             },
             "required": [
-                "data"
+                "title",
+                "sample_attribute_type"
+            ],
+            "additionalProperties": false
+        },
+        "sampleTypeSampleAttributesPatch": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+                "$ref": "#/definitions/sampleTypeSampleAttributePatch"
+            }
+        },
+        "sampleTypeSampleAttributePatch": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "title": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "sample_attribute_type": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        },
+                        "title": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        }
+                    },
+                    "oneOf": [
+                        {
+                            "required": [
+                                "id"
+                            ]
+                        },
+                        {
+                            "required": [
+                                "title"
+                            ]
+                        }
+                    ]
+                },
+                "required": {
+                    "type": "boolean"
+                },
+                "pos": {
+                    "$ref": "#/definitions/nullableInteger"
+                },
+                "unit": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "is_title": {
+                    "type": "boolean"
+                },
+                "sample_controlled_vocab_id": {
+                    "$ref": "#/definitions/nullableInteger"
+                },
+                "linked_sample_type_id": {
+                    "$ref": "#/definitions/nullableInteger"
+                },
+                "_destroy": {
+                    "type": "boolean"
+                }
+            },
+            "required": [
+
+            ],
+            "additionalProperties": false
+        },
+        "sampleTypeSampleAttributesPost": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+                "$ref": "#/definitions/sampleTypeSampleAttributePost"
+            }
+        },
+        "sampleTypeSampleAttributePost": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "title": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "sample_attribute_type": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        },
+                        "title": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        }
+                    },
+                    "oneOf": [
+                        {
+                            "required": [
+                                "id"
+                            ]
+                        },
+                        {
+                            "required": [
+                                "title"
+                            ]
+                        }
+                    ]
+                },
+                "required": {
+                    "type": "boolean"
+                },
+                "pos": {
+                    "$ref": "#/definitions/nullableInteger"
+                },
+                "unit": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "is_title": {
+                    "type": "boolean"
+                },
+                "sample_controlled_vocab_id": {
+                    "$ref": "#/definitions/nullableInteger"
+                },
+                "linked_sample_type_id": {
+                    "$ref": "#/definitions/nullableInteger"
+                }
+            },
+            "required": [
+                "title",
+                "sample_attribute_type"
             ],
             "additionalProperties": false
         },
@@ -5556,7 +6175,7 @@
             }
         },
         "tagsType": {
-            "$ref": "#/definitions/nullableNonEmptyStringList"
+            "$ref": "#/definitions/nonEmptyStringList"
         },
         "anySkeleton": {
             "properties": {
@@ -6272,10 +6891,10 @@
                             "type": "object",
                             "properties": {
                                 "snapshots": {
-                                    "$ref": "#/definitions/nullableSnapshotsList"
+                                    "$ref": "#/definitions/snapshotsList"
                                 },
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -6285,6 +6904,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 },
                                 "assay_class": {
                                     "type": "object",
@@ -6443,7 +7065,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -6453,6 +7075,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators":{
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 },
                                 "assay_class": {
                                     "type": "object",
@@ -6568,7 +7193,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -6578,6 +7203,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators":{
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 },
                                 "assay_class": {
                                     "type": "object",
@@ -6680,7 +7308,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -6699,6 +7327,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 }
                             },
                             "required": [
@@ -6755,7 +7386,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -6771,6 +7402,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 }
                             },
                             "additionalProperties": false
@@ -7003,7 +7637,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -7022,6 +7656,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 }
                             },
                             "required": [
@@ -7087,7 +7724,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -7103,6 +7740,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 }
                             },
                             "additionalProperties": false
@@ -7239,7 +7879,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -7258,6 +7898,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 }
                             },
                             "required": [
@@ -7317,7 +7960,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -7333,6 +7976,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 }
                             },
                             "additionalProperties": false
@@ -7843,7 +8489,7 @@
                             "type": "object",
                             "properties": {
                                 "snapshots": {
-                                    "$ref": "#/definitions/nullableSnapshotsList"
+                                    "$ref": "#/definitions/snapshotsList"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -7853,6 +8499,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators":{
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 },
                                 "policy": {
                                     "$ref": "#/definitions/policy"
@@ -7966,6 +8615,9 @@
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
                                 },
+                                "creators":{
+                                    "$ref": "#/definitions/assetsCreatorsList"
+                                },
                                 "policy": {
                                     "$ref": "#/definitions/policy"
                                 }
@@ -8023,6 +8675,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators":{
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 },
                                 "policy": {
                                     "$ref": "#/definitions/policy"
@@ -8163,7 +8818,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -8182,6 +8837,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators":{
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 },
                                 "model_type": {
                                     "$ref": "#/definitions/nullableNonEmptyString"
@@ -8253,7 +8911,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -8269,6 +8927,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators":{
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 },
                                 "model_type": {
                                     "$ref": "#/definitions/nullableNonEmptyString"
@@ -8435,10 +9096,10 @@
                                     "$ref": "#/definitions/nullableSha1sumString"
                                 },
                                 "expertise": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/nonEmptyStringList"
                                 },
                                 "tools": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/nonEmptyStringList"
                                 },
                                 "phone": {
                                     "$ref": "#/definitions/nullableNonEmptyString"
@@ -8447,7 +9108,7 @@
                                     "$ref": "#/definitions/nullableNonEmptyString"
                                 },
                                 "project_positions": {
-                                    "$ref": "#/definitions/nullableProjectPositionsList"
+                                    "$ref": "#/definitions/projectPositionsList"
                                 }
                             },
                             "required": [
@@ -8575,10 +9236,10 @@
                                     "$ref": "#/definitions/nullableNonEmptyString"
                                 },
                                 "expertise": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/nonEmptyStringList"
                                 },
                                 "tools": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/nonEmptyStringList"
                                 },
                                 "phone": {
                                     "$ref": "#/definitions/nullableNonEmptyString"
@@ -8587,7 +9248,7 @@
                                     "$ref": "#/definitions/nullableNonEmptyString"
                                 },
                                 "project_positions": {
-                                    "$ref": "#/definitions/nullableProjectPositionsList"
+                                    "$ref": "#/definitions/projectPositionsList"
                                 }
                             },
                             "additionalProperties": false
@@ -8639,10 +9300,10 @@
                                     "$ref": "#/definitions/nullableNonEmptyString"
                                 },
                                 "expertise": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/nonEmptyStringList"
                                 },
                                 "tools": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/nonEmptyStringList"
                                 },
                                 "phone": {
                                     "$ref": "#/definitions/nullableNonEmptyString"
@@ -8772,7 +9433,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -8791,6 +9452,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 }
                             },
                             "required": [
@@ -8853,7 +9517,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -8869,6 +9533,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 }
                             },
                             "additionalProperties": false
@@ -9223,6 +9890,9 @@
                                 },
                                 "programmes": {
                                     "$ref": "#/definitions/programmeReferencesList"
+                                },
+                                "workflows": {
+                                    "$ref": "#/definitions/workflowReferencesList"
                                 }
                             },
                             "required": [
@@ -9459,7 +10129,7 @@
                                     "$ref": "#/definitions/nonEmptyString"
                                 },
                                 "authors": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/nonEmptyStringList"
                                 },
                                 "content_blobs": {
                                     "$ref": "#/definitions/contentBlobsList"
@@ -9511,6 +10181,9 @@
                                 },
                                 "events": {
                                     "$ref": "#/definitions/eventReferencesList"
+                                },
+                                "workflows": {
+                                    "$ref": "#/definitions/workflowReferencesList"
                                 }
                             },
                             "required": [
@@ -9649,7 +10322,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -9668,6 +10341,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 }
                             },
                             "required": [
@@ -9727,7 +10403,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -9743,6 +10419,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 }
                             },
                             "additionalProperties": false
@@ -9794,7 +10473,7 @@
                             "type": "object",
                             "properties": {
                                 "snapshots": {
-                                    "$ref": "#/definitions/nullableSnapshotsList"
+                                    "$ref": "#/definitions/snapshotsList"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -9808,16 +10487,15 @@
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
                                 },
-                                "person_responsible_id": {
-                                    "$ref": "#/definitions/nullableNonEmptyString"
+                                "creators":{
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 },
                                 "policy": {
                                     "$ref": "#/definitions/policy"
                                 }
                             },
                             "required": [
-                                "title",
-                                "person_responsible_id"
+                                "title"                                
                             ],
                             "additionalProperties": false
                         },
@@ -9924,8 +10602,8 @@
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
                                 },
-                                "person_responsible_id": {
-                                    "$ref": "#/definitions/nullableNonEmptyString"
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 },
                                 "policy": {
                                     "$ref": "#/definitions/policy"
@@ -9998,8 +10676,8 @@
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
                                 },
-                                "person_responsible_id": {
-                                    "$ref": "#/definitions/nullableNonEmptyString"
+                                "creators":{
+                                        "$ref": "#/definitions/assetsCreatorsList"
                                 },
                                 "policy": {
                                     "$ref": "#/definitions/policy"
@@ -10131,6 +10809,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 },
                                 "internals": {
                                     "type": "object",
@@ -10265,7 +10946,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -10295,6 +10976,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 }
                             },
                             "required": [
@@ -10360,7 +11044,7 @@
                             "type": "object",
                             "properties": {
                                 "tags": {
-                                    "$ref": "#/definitions/nullableNonEmptyStringList"
+                                    "$ref": "#/definitions/tagsType"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -10387,6 +11071,9 @@
                                 },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "creators": {
+                                    "$ref": "#/definitions/assetsCreatorsList"
                                 }
                             },
                             "additionalProperties": false
@@ -11418,6 +12105,380 @@
             ],
             "additionalProperties": false
         },
+        "sampleSkeletons": {
+            "type": "array",
+            "minItems": 0,
+            "uniqueItems": true,
+            "items": {
+                "$ref": "#/definitions/sampleSkeleton"
+            }
+        },
+        "sampleSkeleton": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "type": {
+                    "$ref": "#/definitions/sampleType"
+                },
+                "attributes": {
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        }
+                    },
+                    "required": [
+                        "title"
+                    ],
+                    "additionalProperties": false
+                },
+                "links": {
+                    "$ref": "#/definitions/linksType"
+                }
+            }
+        },
+        "sampleAttributeMap": {
+            "type": "object",
+            "additionalProperties": {"type": "string"}
+        },
+        "sampleAttributeTypeType": {
+            "type": "string",
+            "minLength": 1,
+            "enum": [
+                "sample_attribute_types"
+            ]
+        },
+        "sampleAttributeType": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "type": {
+                    "$ref": "#/definitions/sampleAttributeTypeType"
+                },
+                "attributes": {
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        },
+                        "base_type": {
+                            "$ref": "#/definitions/sampleAttributeBaseType"
+                        },
+                        "regexp": {
+                            "$ref": "#/definitions/nonEmptyString",
+                            "default": ".*"
+                        }
+                    },
+                    "required": [
+                        "title",
+                        "base_type",
+                        "regexp"
+                    ],
+                    "additionalProperties": false
+                },
+                "links": {
+                    "$ref": "#/definitions/indexLinks"
+                }
+            },
+            "required": [
+                "id",
+                "type",
+                "attributes",
+                "links"
+            ]
+        },
+        "sampleAttributeTypes": {
+            "type": "array",
+            "minItems": 0,
+            "uniqueItems": true,
+            "items": {
+                "$ref": "#/definitions/sampleAttributeType"
+            }
+        },
+        "sampleAttributeTypesResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/sampleAttributeTypes"
+                },
+                "jsonapi": {
+                    "$ref": "#/definitions/JsonApiVersion"
+                },
+                "meta": {
+                    "$ref": "#/definitions/baseMetaType"
+                },
+                "links": {
+                    "$ref": "#/definitions/indexLinks"
+                }
+            },
+            "required": [
+                "data",
+                "jsonapi",
+                "meta"
+            ],
+            "additionalProperties": false
+        },
+        "sampleResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        },
+                        "type": {
+                            "$ref": "#/definitions/sampleType"
+                        },
+                        "attributes": {
+                            "type": "object",
+                            "properties": {
+                                "tags": {
+                                    "$ref": "#/definitions/tagsType"
+                                },
+                                "title": {
+                                    "$ref": "#/definitions/nonEmptyString"
+                                },
+                                "created_at": {
+                                    "$ref": "#/definitions/dateTimeString"
+                                },
+                                "updated_at": {
+                                    "$ref": "#/definitions/dateTimeString"
+                                },
+                                "other_creators": {
+                                    "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "attribute_map": {
+                                    "$ref": "#/definitions/sampleAttributeMap"
+                                },
+                                "policy": {
+                                    "$ref": "#/definitions/policy"
+                                }
+                            },
+                            "required": [
+                                "title",
+                                "attribute_map",
+                                "tags",
+                                "other_creators",
+                                "created_at",
+                                "updated_at"
+                            ],
+                            "additionalProperties": false
+                        },
+                        "relationships": {
+                            "type": "object",
+                            "properties": {
+                                "creators": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "submitter": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "people": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "projects": {
+                                    "$ref": "#/definitions/projectReferencesList"
+                                },
+                                "data_files": {
+                                    "$ref": "#/definitions/dataFileReferencesList"
+                                },
+                                "assays": {
+                                    "$ref": "#/definitions/assayReferencesList"
+                                },
+                                "sample_type": {
+                                    "$ref": "#/definitions/sampleTypeReferences"
+                                }
+                            },
+                            "required": [
+                                "submitter",
+                                "projects",
+                                "people",
+                                "creators",
+                                "assays",
+                                "data_files",
+                                "sample_type"
+                            ],
+                            "additionalProperties": false
+                        },
+                        "links": {
+                            "$ref": "#/definitions/linksType"
+                        },
+                        "meta": {
+                            "$ref": "#/definitions/metaType"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "type",
+                        "attributes",
+                        "relationships",
+                        "links",
+                        "meta"
+                    ],
+                    "additionalProperties": false
+                },
+                "jsonapi": {
+                    "$ref": "#/definitions/JsonApiVersion"
+                }
+            },
+            "required": [
+                "data",
+                "jsonapi"
+            ],
+            "additionalProperties": false
+        },
+        "samplePost": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "$ref": "#/definitions/sampleType"
+                        },
+                        "attributes": {
+                            "type": "object",
+                            "properties": {
+                                "tags": {
+                                    "$ref": "#/definitions/tagsType"
+                                },
+                                "other_creators": {
+                                    "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "attribute_map": {
+                                    "$ref": "#/definitions/sampleAttributeMap"
+                                },
+                                "policy": {
+                                    "$ref": "#/definitions/policy"
+                                }
+                            },
+                            "required": [
+                                "attribute_map"
+                            ],
+                            "additionalProperties": false
+                        },
+                        "relationships": {
+                            "type": "object",
+                            "properties": {
+                                "creators": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "people": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "projects": {
+                                    "$ref": "#/definitions/projectReferencesList"
+                                },
+                                "data_files": {
+                                    "$ref": "#/definitions/dataFileReferencesList"
+                                },
+                                "assays": {
+                                    "$ref": "#/definitions/assayReferencesList"
+                                },
+                                "sample_type": {
+                                    "$ref": "#/definitions/sampleTypeReferences"
+                                }
+                            },
+                            "required": [
+                                "projects",
+                                "sample_type"
+                            ],
+                            "additionalProperties": false
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "type"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "data"
+            ],
+            "additionalProperties": false,
+            "example": {
+                "$ref": "../examples/samplePost.json"
+            }
+        },
+        "samplePostResponse": {
+            "$ref": "#/definitions/sampleResponse"
+        },
+        "samplePatch": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        },
+                        "type": {
+                            "$ref": "#/definitions/sampleTypeType"
+                        },
+                        "attributes": {
+                            "type": "object",
+                            "properties": {
+                                "tags": {
+                                    "$ref": "#/definitions/tagsType"
+                                },
+                                "other_creators": {
+                                    "$ref": "#/definitions/nullableOtherCreatorsString"
+                                },
+                                "attribute_map": {
+                                    "$ref": "#/definitions/sampleAttributeMap"
+                                },
+                                "policy": {
+                                    "$ref": "#/definitions/policy"
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        "relationships": {
+                            "type": "object",
+                            "properties": {
+                                "creators": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "people": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "projects": {
+                                    "$ref": "#/definitions/projectReferencesList"
+                                },
+                                "data_files": {
+                                    "$ref": "#/definitions/dataFileReferencesList"
+                                },
+                                "assays": {
+                                    "$ref": "#/definitions/assayReferencesList"
+                                },
+                                "sample_type": {
+                                    "$ref": "#/definitions/sampleTypeReference"
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    },
+                    "required": [
+                        "type",
+                        "id"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "data"
+            ],
+            "additionalProperties": false,
+            "example": {
+                "$ref": "../examples/samplePatch.json"
+            }
+        },
         "sampleTypeSkeleton": {
             "properties": {
                 "id": {
@@ -11477,9 +12538,202 @@
             "required": [
                 "data",
                 "jsonapi",
-                "meta"
+                "meta",
+                "links"
             ],
             "additionalProperties": false
+        },
+        "sampleTypeResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        },
+                        "type": {
+                            "$ref": "#/definitions/sampleTypeType"
+                        },
+                        "attributes": {
+                            "type": "object",
+                            "properties": {
+                                "title": {
+                                    "$ref": "#/definitions/nonEmptyString"
+                                },
+                                "description": {
+                                    "$ref": "#/definitions/nullableNonEmptyString"
+                                },
+                                "sample_attributes": {
+                                    "$ref": "#/definitions/sampleTypeSampleAttributesResponse"
+                                },
+                                "tags": {
+                                    "$ref": "#/definitions/tagsType"
+                                }
+                            },
+                            "required": [
+                                "title"
+                            ],
+                            "additionalProperties": false
+                        },
+                        "relationships": {
+                            "type": "object",
+                            "properties": {
+                                "submitter": {
+                                    "$ref": "#/definitions/peopleReferenceList"
+                                },
+                                "projects": {
+                                    "$ref": "#/definitions/projectReferencesList"
+                                },
+                                "assays": {
+                                    "$ref": "#/definitions/assayReferencesList"
+                                }
+                            },
+                            "required": [
+                                "submitter",
+                                "projects",
+                                "assays"
+                            ],
+                            "additionalProperties": false
+                        },
+                        "links": {
+                            "$ref": "#/definitions/linksType"
+                        },
+                        "meta": {
+                            "$ref": "#/definitions/metaType"
+                        }
+                    },
+                    "required": [
+                        "id",
+                        "type",
+                        "attributes",
+                        "relationships",
+                        "links",
+                        "meta"
+                    ],
+                    "additionalProperties": false
+                },
+                "jsonapi": {
+                    "$ref": "#/definitions/JsonApiVersion"
+                }
+            },
+            "required": [
+                "data",
+                "jsonapi"
+            ],
+            "additionalProperties": false
+        },
+        "sampleTypePost": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "$ref": "#/definitions/sampleTypeType"
+                        },
+                        "attributes": {
+                            "type": "object",
+                            "properties": {
+                                "tags": {
+                                    "$ref": "#/definitions/tagsType"
+                                },
+                                "title": {
+                                    "$ref": "#/definitions/nonEmptyString"
+                                },
+                                "description": {
+                                    "$ref": "#/definitions/nullableNonEmptyString"
+                                },
+                                "sample_attributes": {
+                                    "$ref": "#/definitions/sampleTypeSampleAttributesPost"
+                                }
+                            },
+                            "required": [
+                                "title",
+                                "sample_attributes"
+                            ],
+                            "additionalProperties": false
+                        },
+                        "relationships": {
+                            "type": "object",
+                            "properties": {
+                                "projects": {
+                                    "$ref": "#/definitions/projectReferencesList"
+                                }
+                            },
+                            "required": [
+                                "projects"
+                            ],
+                            "additionalProperties": false
+                        }
+                    },
+                    "required": [
+                        "type",
+                        "attributes",
+                        "relationships"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "data"
+            ],
+            "additionalProperties": false
+        },
+        "sampleTypePatch": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "properties": {
+                        "id": {
+                            "$ref": "#/definitions/nonEmptyString"
+                        },
+                        "type": {
+                            "$ref": "#/definitions/sampleTypeType"
+                        },
+                        "attributes": {
+                            "type": "object",
+                            "properties": {
+                                "tags": {
+                                    "$ref": "#/definitions/tagsType"
+                                },
+                                "title": {
+                                    "$ref": "#/definitions/nonEmptyString"
+                                },
+                                "description": {
+                                    "$ref": "#/definitions/nullableNonEmptyString"
+                                },
+                                "sample_attributes": {
+                                    "$ref": "#/definitions/sampleTypeSampleAttributesPatch"
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        "relationships": {
+                            "type": "object",
+                            "properties": {
+                                "projects": {
+                                    "$ref": "#/definitions/projectReferencesList"
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    },
+                    "required": [
+                        "type",
+                        "id"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "required": [
+                "data"
+            ],
+            "additionalProperties": false,
+            "example": {
+                "$ref": "../examples/sampleTypePatch.json"
+            }
         },
         "studySkeleton": {
             "properties": {

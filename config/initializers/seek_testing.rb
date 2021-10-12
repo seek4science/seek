@@ -41,6 +41,7 @@ def load_seek_testing_defaults!
       Settings.defaults[:collections_enabled] = true
       Settings.defaults[:documents_enabled] = true
       Settings.defaults[:events_enabled] = true
+      Settings.defaults[:human_diseases_enabled] = true
       Settings.defaults[:isa_enabled] = true
       Settings.defaults[:models_enabled] = true
       Settings.defaults[:organisms_enabled] = true
@@ -137,6 +138,12 @@ def load_seek_testing_defaults!
       Settings.defaults[:omniauth_github_enabled] = true
       Settings.defaults[:omniauth_github_client_id] = 'abc'
       Settings.defaults[:omniauth_github_secret] = '456'
+
+      Settings.defaults[:ga4gh_trs_api_enabled] = true
+
+      Settings.defaults[:life_monitor_url] = 'https://localhost:8000'
+      Settings.defaults[:life_monitor_client_id] = 'xyz'
+      Settings.defaults[:life_monitor_client_secret] = 'xyzabc'
     end
 end
 

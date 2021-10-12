@@ -5,8 +5,7 @@ module Seek
     class BioSchemaAttribute
       include ActionView::Helpers::SanitizeHelper
 
-      attr_reader :method
-      attr_reader :property
+      attr_reader :method, :property
 
       def initialize(method, property)
         @method = method
@@ -18,6 +17,8 @@ module Seek
         value = decorator.send(method) if decorator.respond_to?(method)
         if value.is_a?(String)
           sanitize(value)
+        elsif value.respond_to?(:iso8601) # convert all dates to the ISO8601 format
+          value.iso8601
         else
           value
         end

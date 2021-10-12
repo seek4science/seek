@@ -441,6 +441,8 @@ if automatic synchronization was selected.'}
 
         Seek::Openbis::EntityType.ExperimentType(openbis_endpoint).find_by_codes(study_codes)
       end
+
+      
     end
   end
 end

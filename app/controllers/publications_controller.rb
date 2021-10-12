@@ -374,7 +374,7 @@ class PublicationsController < ApplicationController
     params.require(:publication).permit(:publication_type_id, :pubmed_id, :doi, :parent_name, :abstract, :title, :journal, :citation,:url,:editor,
                                         :published_date, :bibtex_file, :registered_mode, :publisher, :booktitle, { project_ids: [] }, { event_ids: [] }, { model_ids: [] },
                                         { investigation_ids: [] }, { study_ids: [] }, { assay_ids: [] }, { presentation_ids: [] },
-                                        { data_file_ids: [] }, { scales: [] }, { human_disease_ids: [] },
+                                        { data_file_ids: [] }, { scales: [] }, { human_disease_ids: [] }, { workflow_ids: [] },
                                         { misc_links_attributes: [:id, :url, :label, :_destroy] },
                                         { publication_authors_attributes: [:person_id, :id, :first_name, :last_name ] }).tap do |pub_params|
       filter_association_params(pub_params, :assay_ids, Assay, :can_edit?)

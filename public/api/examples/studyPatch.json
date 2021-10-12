@@ -5,8 +5,7 @@
         "attributes": {
             "title": "A Maximal Study",
             "description": "The Study of many things",
-            "experimentalists": "Wet lab people",
-            "person_responsible_id": "1161",
+            "experimentalists": "Wet lab people",            
             "other_creators": "Marie Curie",
             "policy": {
                 "access": "download",

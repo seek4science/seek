@@ -1,0 +1,89 @@
+<%= javascript_include_tag :multi_step_wizard, id: "multi-step-script" %>
+<style>
+  .modal {
+    overflow-y:auto;
+  }
+</style>
+
+<div class="modal" tabindex="-1" role="dialog" id="data-file-modal">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">
+          <h4>New <%= t('data_file') %>:
+            <% if @data_file.content_blob.nels? %>
+              <small><%= @data_file.title %></small>
+            <% else %>
+              <small><%= @data_file.content_blob.original_filename %></small>
+            <% end %>
+          </h4>
+        </div>
+      </div>
+      <div class="modal-body">
+        <%= form_for(@data_file, url: {controller: :data_files, action: :create_metadata}) do |f| -%>
+            <%= hidden_field_tag 'content_blob_id', @data_file.content_blob.id %>
+            <div id='datafile-multi-set' class='multi-step'>
+              <div class="asset_form">
+                <%= extraction_exception_message @exception_message %>
+                <%= error_messages_for :data_file -%>
+                <%= error_messages_for :assay -%>
+                <%= extraction_warnings_messages_for @warnings %>
+
+                <% step = 0 %>
+                <%= content_tag(:div, id: "step-#{step += 1}", class: 'multi-step-block') do %>
+                  <span class='multi-step-progress-indicator'></span>
+                  <%= render partial: 'data_files/multi-steps/basic_metadata',locals:{f: f, is_modal: true} %>
+                <% end %>
+
+                <%= content_tag(:div, id: "step-#{step += 1}", class: 'multi-step-block') do %>
+                  <span class='multi-step-progress-indicator'></span>
+                  <%= render partial: 'data_files/multi-steps/license_and_permissions',locals:{f: f, is_modal: true} %>
+                <% end %>
+
+                <% if Seek::Config.assays_enabled %>
+                  <%= content_tag(:div, id: "step-#{step += 1}", class: 'multi-step-block') do %>
+                    <span class='multi-step-progress-indicator'></span>
+                    <%= render partial: 'data_files/multi-steps/assays',locals:{f: f, is_modal: true} %>
+                  <% end %>
+                <% end %>
+
+                <%= content_tag(:div, id: "step-#{step += 1}", class: 'multi-step-block') do %>
+                  <span class='multi-step-progress-indicator'></span>
+                  <%= render partial: 'data_files/multi-steps/other_properties', locals:{f: f, is_modal: true} %>
+                <% end %>
+              </div>
+            </div>
+        <% end -%>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" id="fileMetadataModalScript">
+    $j('#data-file-modal').modal({backdrop: 'static', keyboard: false});
+    //these are to prevent the entire modal being closed, when these inner modals from the permission table are closed
+    $j('#add-project-permission-modal').on('click', '[data-dismiss="modal"]', function(e) { e.stopPropagation(); });
+    $j('#add-person-permission-modal').on('click', '[data-dismiss="modal"]', function(e) { e.stopPropagation(); });
+    $j('#add-programme-permission-modal').on('click', '[data-dismiss="modal"]', function(e) { e.stopPropagation(); });
+
+    $j("#data_file_post_btn").on("click",()=>{
+        // previewPermissions();
+        let form = $j("form.new_data_file");
+        let url = form.attr('action')
+        $j.ajax({
+           type: "POST",
+           dataType: 'json',
+           url: url,
+           data: form.serialize(),
+           success: function(data)
+           {
+              moveFile(data.data.id);
+              location.reload()
+           }
+         });
+        return(false);
+    })
+</script>
+
+
+

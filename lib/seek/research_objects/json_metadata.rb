@@ -17,7 +17,7 @@ module Seek
 
         json[:contributor] = create_agent(item.contributor)
 
-        json[:creators] = item.creators.map { |creator| create_agent(creator) } if item.respond_to?(:creators)
+        json[:creators] = item.assets_creators.map { |assets_creator| create_agent(assets_creator) } if item.respond_to?(:creators)
 
         if item.is_a?(Investigation)
           json[:studies] = collect_permitted_package_paths(item.studies, item, parents)

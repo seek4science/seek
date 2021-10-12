@@ -49,8 +49,9 @@ Factory.define(:max_publication, class: Publication) do |f|
   f.publisher 'Heidelberg University Library, heiBOOKS'
   f.publication_type_id  Factory(:journal).id
   f.projects { [Factory(:max_project)] }
-  f.events { [Factory.build(:event, policy: Factory(:public_policy))] }
-  f.relationships { [Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))] }
+  f.events {[Factory.build(:event, policy: Factory(:public_policy))]}
+  f.workflows {[Factory.build(:workflow, policy: Factory(:public_policy))]}
+  f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
   f.association :publication_type, factory: :journal
   f.after_create do |publication|
     publication.content_blob = Factory.create(:min_content_blob, content_type: 'application/pdf', asset: publication, asset_version: 1)

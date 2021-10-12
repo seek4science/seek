@@ -33,6 +33,11 @@
   <%= assay_study_selection('assay[study_id]',@assay.study) %>
 </div>
 
+<div class="form-group">
+  <%= f.label "Assay position" -%><br/>
+  <%= f.number_field :position, :rows => 5, :class=>"form-control"  -%>
+</div>
+
 
 <%= f.hidden_field :assay_class_id -%>
 
@@ -82,13 +87,11 @@
         <%= render :partial=>"assets/select_tags" %>
     <% end %>
 
-    <% if Seek::Config.samples_enabled %>
-      <%= render :partial=>"samples/associate_sample",:locals=>{:f=>f, :resource => @assay} %>
-    <% end %>
+    <%= render :partial=>"samples/associate_sample",:locals=>{:f=>f, :resource => @assay} %>
 
-    <%= f.fancy_multiselect :sops, other_projects_checkbox: true %>
+    <%= f.fancy_multiselect(:sops, other_projects_checkbox: true) %>
 
-    <%  if @assay.is_modelling? -%>
+    <% if @assay.is_modelling? %>
         <%= f.fancy_multiselect :models, other_projects_checkbox: true %>
     <% end -%>
 

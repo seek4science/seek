@@ -23,12 +23,11 @@ class Node < ApplicationRecord
     true
   end
 
-  #defines that this is a user_creatable object type, and appears in the "New Object" gadget
-  def self.user_creatable?
-    Seek::Config.workflows_enabled
-  end
-
   def is_github_cwl?
     return (!content_blob.url.nil?) && (content_blob.url.include? 'github.com') && (content_blob.url.end_with? 'cwl')
+  end
+
+  def self.feature_enabled?
+    Workflow.feature_enabled?
   end
 end

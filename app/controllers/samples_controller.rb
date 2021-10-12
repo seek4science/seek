@@ -8,21 +8,24 @@ class SamplesController < ApplicationController
   before_action :samples_enabled?
   before_action :find_index_assets, only: :index
   before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview]
-
+  
   before_action :auth_to_create, only: [:new, :create]
 
+  before_action :set_displaying_single_page, only: [:index]
+
+  
   include Seek::IsaGraphExtensions
 
   def index
     # There must be better ways of coding this
     if @data_file || @sample_type
       respond_to do |format|
-        format.html
+        format.html { render(params[:only_content] ? { layout: false } : {})}
         format.json {render json: :not_implemented, status: :not_implemented }
       end
     else
       respond_to do |format|
-        format.html {super}
+        format.html {params[:only_content] ? render({ layout: false }) : super}
         format.json {render json: :not_implemented, status: :not_implemented }
       end
     end
@@ -58,6 +61,7 @@ class SamplesController < ApplicationController
   def show
     @sample = Sample.find(params[:id])
     respond_to do |format|
+      format.js
       format.html
       format.json {render json: @sample, include: [params[:include]]}
     end
@@ -126,6 +130,20 @@ class SamplesController < ApplicationController
     end
   end
 
+  def typeahead
+    sample_type = SampleType.find(params[:linked_sample_type_id])
+    results = sample_type.samples.where("LOWER(title) like :query",
+              query: "%#{params[:query].downcase}%").limit(params[:limit] || 100)
+    items = results.map do |sa|
+      { id: sa.id,
+        name: sa.title }
+    end
+
+    respond_to do |format|
+      format.json { render json: items.to_json }
+    end
+  end
+
   private
 
   def sample_params(sample_type=nil)
@@ -133,8 +151,8 @@ class SamplesController < ApplicationController
     if params[:sample][:attribute_map]
         params[:sample][:data] = params[:sample].delete(:attribute_map)
     end
-    params.require(:sample).permit(:sample_type_id, :other_creators, { project_ids: [] },
-                              { data: sample_type_param_keys }, { creator_ids: [] },
+    params.require(:sample).permit(:sample_type_id, *creator_related_params, { project_ids: [] },
+                              { data: sample_type_param_keys },
                               { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                               discussion_links_attributes:[:id, :url, :label, :_destroy])
   end

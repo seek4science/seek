@@ -10,10 +10,6 @@ class Collection < ApplicationRecord
   accepts_nested_attributes_for :items, allow_destroy: true
   include HasCustomAvatar
 
-  def self.user_creatable?
-    Seek::Config.collections_enabled
-  end
-
   def assets
     items.map(&:asset)
   end

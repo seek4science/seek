@@ -471,6 +471,26 @@ class AdminControllerTest < ActionController::TestCase
     end
   end
 
+  test 'recommended data licenses' do
+    Seek::Config.recommended_data_licenses = []
+    new_value = ['CC-BY-4.0']
+    post :update_settings, params: {recommended_data_licenses: new_value}
+    assert_equal new_value, Seek::Config.recommended_data_licenses
+    new_value = []
+    post :update_settings, params: {recommended_data_licenses: new_value}
+    assert_equal nil, Seek::Config.recommended_data_licenses
+  end
+
+  test 'recommended software licenses' do
+    Seek::Config.recommended_software_licenses = []
+    new_value = ['BitTorrent-1.1']
+    post :update_settings, params: {recommended_software_licenses: new_value}
+    assert_equal new_value, Seek::Config.recommended_software_licenses
+    new_value = []
+    post :update_settings, params: {recommended_software_licenses: new_value}
+    assert_equal nil, Seek::Config.recommended_software_licenses
+  end
+
   test 'publication fulltext enabled' do
     with_config_value(:allow_publications_fulltext, false) do
       post :update_settings, params: { allow_publications_fulltext: '1' }

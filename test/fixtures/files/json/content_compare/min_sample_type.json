@@ -5,7 +5,7 @@
     "attributes": {
       "title": "A Minimal SampleType",
       "description": null,
-      "attribute_map": [
+      "sample_attributes": [
         {
           "id": "504",
           "title": "full_name",
@@ -13,9 +13,7 @@
             "id": "777",
             "title": "Full name",
             "base_type": "String",
-            "regular_expression": "[A-Z][a-z]+[ ][A-Z][a-z]+",
-            "placeholder": null,
-            "resolution": null
+            "regexp": "[A-Z][a-z]+[ ][A-Z][a-z]+"
           },
           "required": true,
           "pos": "1",
@@ -25,7 +23,7 @@
           "linked_sample_type_id": null
         }
       ],
-      "tags": null
+      "tags": []
     },
     "relationships": {
       "projects": {

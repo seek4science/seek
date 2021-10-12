@@ -3,7 +3,7 @@
         "id": "253",
         "type": "presentations",
         "attributes": {
-            "tags": null,
+            "tags": [],
             "title": "Data and model Management in Systems Biology",
             "description": "Presentation at the 10th anniversary of SABIO-RK, Heidelberg 2016",
             "license": null,

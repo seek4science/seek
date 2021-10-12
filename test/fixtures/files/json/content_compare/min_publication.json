@@ -40,7 +40,8 @@
       "url":null,
       "link_to_pub":"https://doi.org/10.5072/abcd",
       "publication_type":"Journal",
-      "authors":null
+      "authors": [],
+      "discussion_links" : []
     },
     "relationships":{
       "creators":{
@@ -93,8 +94,11 @@
       "presentations":{
         "data":[]
       },
-      "events":{
-        "data":[]
+      "events": {
+        "data": []
+      },
+      "workflows": {
+        "data": []
       }
     },
     "links":{
