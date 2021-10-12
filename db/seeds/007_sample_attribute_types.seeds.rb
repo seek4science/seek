@@ -79,6 +79,9 @@ ncbi_type.update_attributes(base_type: Seek::Samples::BaseType::STRING, regexp: 
 data_file_type = SampleAttributeType.find_or_initialize_by(title: 'SEEK Data file')
 data_file_type.update_attributes(base_type: Seek::Samples::BaseType::SEEK_DATA_FILE)
 
+ontology_type = SampleAttributeType.find_or_initialize_by(title:'Ontology')
+ontology_type.update_attributes(base_type: Seek::Samples::BaseType::CV)
+
 puts "Seeded #{SampleAttributeType.count - count} sample attribute types"
 
 # Sample types

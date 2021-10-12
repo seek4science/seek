@@ -61,3 +61,4 @@
 //= require simplemde.min
 //= require sortable.min
 //= require admin
+//= require templates
