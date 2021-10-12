@@ -207,8 +207,8 @@ module ApplicationHelper
   end
 
   def render_markdown(markdown)
-    doc = CommonMarker.render_doc(markdown, :DEFAULT, [:tagfilter, :table, :strikethrough, :autolink])
-    renderer = CommonMarker::SeekHtmlRenderer.new(options: :GITHUB_PRE_LANG)
+    doc = CommonMarker.render_doc(markdown, :UNSAFE, [:tagfilter, :table, :strikethrough, :autolink])
+    renderer = CommonMarker::SeekHtmlRenderer.new(options: [:UNSAFE, :GITHUB_PRE_LANG], extensions: [:tagfilter, :table, :strikethrough, :autolink])
     renderer.render(doc)
   end
 
