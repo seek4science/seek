@@ -8,7 +8,8 @@ class InternationalizationTest < ActiveSupport::TestCase
   end
 
   test 'sop' do
-    assert_equal 'SOP', (I18n.t 'sop')
+## This needs checking
+    assert_equal 'Protocol', (I18n.t 'sop')
   end
 
   test 'presentation' do

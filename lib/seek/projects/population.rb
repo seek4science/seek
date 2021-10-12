@@ -17,26 +17,18 @@ module Seek
         study_index = values.find_index('Study')
         assay_index = values.find_index('Assay')
         description_index = values.find_index('Description')
-        assignee_indices = []
         protocol_index = nil
         values.each_with_index {
           |val,i|
-          if val.start_with?('Assign')
-          then
-            assignee_indices << i
-          end
           if val.start_with?('Protocol')
           then
             protocol_index = i
           end
         }
 
-        if investigation_index.nil? || study_index.nil? || assay_index.nil? || assignee_indices.empty?
+        if investigation_index.nil? || study_index.nil? || assay_index.nil?
           flash[:notice]= 'indices missing'
         end
-
-        @project.status = 'planned'
-        @project.assignee = @project.project_administrators[0]
 
         investigation = nil
         study = nil
@@ -57,29 +49,18 @@ module Seek
           unless r.cell(investigation_index).nil? || r.cell(investigation_index).value.empty?
             title = r.cell(investigation_index).value.to_s.strip
             description = 'Description withheld'
-            s_description = r.cell(description_index)&.value&.to_s&.strip
-            unless s_description.blank?
-              description = s_description
+            unless description_index.nil?
+              s_description = r.cell(description_index)&.value&.to_s&.strip
+              unless s_description.blank?
+                description = s_description
+              end
             end
             investigation = @project.investigations.select { |i| i.title == title }.first
             if investigation.nil?
               investigation = Investigation.new(title: title, projects: [@project], policy: policy.deep_copy)
             end
             investigation.description = description
-            assignee_emails = []
-            assignee_indices.each do |x|
-              unless r.cell(x).nil?
-                assignee_emails = assignee_emails + r.cell(x).value.split(';')
-              end
-            end
-            unless assignee_emails.empty?
-              investigation.assignee = Person.find_by(email: assignee_emails[0])
-            end
-            if investigation.assignee.nil?
-              investigation.assignee = @project.assignee
-            end
             investigation.position = investigation_position
-            investigation.status = 'planned'
             investigation_position += 1
             study_position = 1
             assay_position = 1
@@ -88,9 +69,11 @@ module Seek
           unless r.cell(study_index).nil? || r.cell(study_index).value.empty?
             title = r.cell(study_index).value.to_s.strip
             description = 'Description withheld'
-            s_description = r.cell(description_index)&.value&.to_s&.strip
-            unless s_description.blank?
-              description = s_description
+            unless description_index.nil?
+              s_description = r.cell(description_index)&.value&.to_s&.strip
+              unless s_description.blank?
+                description = s_description
+              end
             end
             study = investigation.studies.select { |i| i.title == title }.first
             if study.nil?
@@ -98,20 +81,7 @@ module Seek
                                 policy: policy.deep_copy )
             end
             study.description = description
-            assignee_emails = []
-            assignee_indices.each do |x|
-              unless r.cell(x).nil?
-                assignee_emails = assignee_emails + r.cell(x).value.split(';')
-              end
-            end
-            unless assignee_emails.empty?
-              study.assignee = Person.find_by(email: assignee_emails[0])
-            end
-            if study.assignee.nil?
-              study.assignee = investigation.assignee
-            end
             study.position = study_position
-            study.status = 'planned'
             study_position += 1
             assay_position = 1
             study.save!
@@ -119,9 +89,11 @@ module Seek
           unless r.cell(assay_index).nil? || r.cell(assay_index).value.empty?
             title = r.cell(assay_index).value.to_s.strip
             description = 'Description withheld'
-            s_description = r.cell(description_index)&.value&.to_s&.strip
-            unless s_description.blank?
-              description = s_description
+            unless description_index.nil?
+              s_description = r.cell(description_index)&.value&.to_s&.strip
+              unless s_description.blank?
+                description = s_description
+              end
             end
             assay = study.assays.select { |i| i.title == title }.first
             if assay.nil?
@@ -129,20 +101,7 @@ module Seek
                                 policy: policy.deep_copy )
             end
             assay.description = description
-            assignee_emails = []
-            assignee_indices.each do |x|
-              unless r.cell(x).nil?
-                assignee_emails = assignee_emails + r.cell(x).value.split(';')
-              end
-            end
-            unless assignee_emails.empty?
-              assay.assignee = Person.find_by(email: assignee_emails[0])
-            end
-            if assay.assignee.nil?
-              assay.assignee = study.assignee
-            end
             assay.position = assay_position
-            assay.status = 'planned'
             assay_position += 1
             assay.assay_class = AssayClass.for_type('experimental')
             known_creators = []

@@ -61,7 +61,8 @@ class DataciteMetadataTest < ActiveSupport::TestCase
     assert_equal 'Model', thing.datacite_resource_type_general
 
     thing = Factory(:sop, policy: Factory(:public_policy)).latest_version
-    assert_equal 'SOP', thing.datacite_resource_type
+## This needs checking
+    assert_equal 'Protocol', thing.datacite_resource_type
     assert_equal 'Text', thing.datacite_resource_type_general
 
     thing = Factory(:workflow, policy: Factory(:public_policy)).latest_version
