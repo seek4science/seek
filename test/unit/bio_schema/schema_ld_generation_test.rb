@@ -46,7 +46,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     disable_authorization_checks { @person.save! }
     institution = @person.institutions.first
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@id' => "http://localhost:3000/people/#{@person.id}",
       '@type' => 'Person',
       'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Person::PERSON_PROFILE,
@@ -74,6 +74,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     }
 
     json = JSON.parse(@person.to_schema_ld)
+    fine_json_comparison expected, json
     assert_equal expected, json
   end
 
@@ -476,7 +477,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                    'alternateName'=>'CWL',
                    'identifier'=> {
                      '@id'=>'https://w3id.org/cwl/v1.0/'},
-                   'url'=>{'@id'=>'https://www.commonwl.org/'}},
+                      'url'=>{'@id'=>'https://www.commonwl.org/'}},
+                 'isPartOf' => [],
                  'input' => [
                    { '@type' => 'FormalParameter',
                      '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.cofsfile",
@@ -660,7 +662,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     end
 
     expected = {
-      '@context' => 'http://schema.org',
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'Taxon',
       'dct:conformsTo' => 'https://bioschemas.org/profiles/Taxon/0.6-RELEASE/',
       '@id' => "http://localhost:3000/organisms/#{organism.id}",
@@ -716,6 +718,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}?version=1",
+      'dct:conformsTo' => 'https://bioschemas.org/profiles/Dataset/0.3-RELEASE-2019_06_14/',
       'name' => 'version 1 title',
       'description' => 'version 1 description'.ljust(50,'.'),
       'keywords' => 'keyword',
@@ -733,15 +736,11 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                        '@id' => "http://localhost:3000/projects/#{@project.id}",
                        'name' => @project.title
                      }],
-      'sdPublisher'=> {
-        '@type'=>'Organization',
-        '@id'=>'http://localhost:3000',
-        'name'=>'SysMO-DB',
-        'url'=>'http://localhost:3000'
-      },
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'application/pdf',
+      'version' => 1,
+      'isPartOf' => [],
       #'identifier' => 'https://doi.org/10.10.10.10/test.1', # Should not have a DOI, since it was defined on the parent resource
       'subjectOf' => [
         { '@type' => 'Event',
@@ -761,6 +760,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'Dataset',
       '@id' => "http://localhost:3000/data_files/#{df.id}?version=2",
+      'dct:conformsTo' => 'https://bioschemas.org/profiles/Dataset/0.3-RELEASE-2019_06_14/',
       'name' => 'version 2 title',
       'description' => 'version 2 description'.ljust(50,'.'),
       'keywords' => 'keyword',
@@ -778,15 +778,11 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                        '@id' => "http://localhost:3000/projects/#{@project.id}",
                        'name' => @project.title
                      }],
-      'sdPublisher'=> {
-        '@type'=>'Organization',
-        '@id'=>'http://localhost:3000',
-        'name'=>'SysMO-DB',
-        'url'=>'http://localhost:3000'
-      },
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'image/png',
+      'version' => 2,
+      'isPartOf' => [],
       'identifier' => 'https://doi.org/10.10.10.10/test.2',  # This DOI was added to the version itself
       'isBasedOn' => "http://localhost:3000/data_files/#{df.id}?version=1",
       'subjectOf' => [
@@ -816,8 +812,12 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     expected['@id'] += "?version=#{version.version}"
     expected['url'] += "?version=#{version.version}" if expected['url'].include?(Seek::Config.site_base_host)
     expected.delete('identifier') unless version.respond_to?(:doi) && version.doi.present?
-    expected.each { |k, v| assert_equal v, json[k] }
-    json.each { |k, v| assert_equal v, expected[k] }
+    fine_json_comparison expected, json
     assert_equal expected, json
+  end
+
+  def fine_json_comparison expected, json
+    expected.each { |k, v| assert_equal v, json[k], "mismatch with key #{k}" }
+    json.each { |k, v| assert_equal v, expected[k], "mismatch with key #{k}" }
   end
 end
