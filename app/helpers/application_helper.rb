@@ -206,6 +206,10 @@ module ApplicationHelper
     return "<li><div class='none_text'> None specified</div></li>".html_safe if is_nil_or_empty?(list)
   end
 
+  def render_markdown(markdown)
+    CommonMarker.render_html(markdown, :GITHUB_PRE_LANG, [:tagfilter, :table, :strikethrough, :autolink])
+  end
+
   def text_or_not_specified(text, options = {})
     text = text.to_s
     if text.nil? || text.chomp.empty?
@@ -219,12 +223,11 @@ module ApplicationHelper
       res = white_list(res)
       res = truncate_without_splitting_words(res, options[:length]) if options[:length]
       if options[:markdown]
-        markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, tables: true)
-        res = markdown.render(res)
+        res = render_markdown(res)
       elsif options[:description] || options[:address]
         res = simple_format(res, {}, sanitize: false).html_safe
       end
-      res = auto_link(res, html: { rel: 'nofollow' }, sanitize: false) if options[:auto_link]
+      res = auto_link(res, html: { rel: 'nofollow' }, sanitize: false) if options[:auto_link] && !options[:markdown]
       res = mail_to(res) if options[:email]
       res = link_to(res, res, popup: true, target: :_blank) if options[:external_link]
       res = res + '&nbsp;' + flag_icon(text) if options[:flag]
