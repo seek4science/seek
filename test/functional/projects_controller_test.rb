@@ -586,7 +586,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = pal.projects.first
     get :show, params: { id: project }
     assert_select 'div.box_about_actor p.pals' do
-      assert_select 'strong', text: 'SysMO-DB PALs:', count: 1
+      assert_select 'strong', text: 'SysMO-DB Project managers:', count: 1
       assert_select 'a', count: 1
       assert_select 'a[href=?]', person_path(pal), text: 'A PAL', count: 1
     end
@@ -647,7 +647,7 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_select 'strong', text: 'Asset gatekeepers:', count: 0
       assert_select 'a[href=?]', person_path(gatekeeper), text: gatekeeper.name, count: 0
 
-      assert_select 'strong', text: 'SysMO-DB PALs:', count: 1
+      assert_select 'strong', text: 'SysMO-DB Project managers:', count: 1
       assert_select 'a[href=?]', person_path(pal), text: pal.name, count: 1
 
       assert_select 'strong', text: 'Project administrators:', count: 1
@@ -669,9 +669,9 @@ class ProjectsControllerTest < ActionController::TestCase
   test 'no pals displayed for project with no pals' do
     get :show, params: { id: projects(:myexperiment_project) }
     assert_select 'div.box_about_actor p.pals' do
-      assert_select 'strong', text: 'SysMO-DB PALs:', count: 1
+      assert_select 'strong', text: 'SysMO-DB Project managers:', count: 1
       assert_select 'a', count: 0
-      assert_select 'span.none_text', text: "No PALs for this #{I18n.t('project')}", count: 1
+      assert_select 'span.none_text', text: "No Project managers for this #{I18n.t('project')}", count: 1
     end
   end
 

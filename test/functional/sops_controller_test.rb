@@ -833,7 +833,7 @@ class SopsControllerTest < ActionController::TestCase
   test 'title for index should be SOPs' do
     get :index
     assert_response :success
-    assert_select 'h1', text: 'SOPs'
+    assert_select 'h1', text: 'Protocols'
   end
 
   test 'should display null license text' do
@@ -958,7 +958,7 @@ class SopsControllerTest < ActionController::TestCase
 
       assert_response :success
       assert_select '#citation-instructions a[href=?]', mint_doi_confirm_sop_path(sop, version: sop.version), count: 0
-      assert_select '#citation-instructions', text: /SOPs must be older than 10 days/
+      assert_select '#citation-instructions', text: /Protocols must be older than 10 days/
     end
   end
 
@@ -1338,7 +1338,7 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal other_person,sop.policy.permissions.first.contributor
     assert_equal Policy::MANAGING,sop.policy.permissions.first.access_type
 
-    assert_equal 'SOP was successfully updated.',flash[:notice]
+    assert_equal 'Protocol was successfully updated.',flash[:notice]
 
   end
 

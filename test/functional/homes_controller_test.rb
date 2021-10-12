@@ -99,13 +99,13 @@ class HomesControllerTest < ActionController::TestCase
 
     as_virtualliver do
       get :index
-      assert_select '#browse-menu li>a[href=?]', '/sops', text: 'SOPs', count: 1
+      assert_select '#browse-menu li>a[href=?]', '/sops', text: 'Protocols', count: 1
     end
     as_not_virtualliver do
       get :index
       assert_select '#browse-menu' do
         assert_select 'li' do
-          assert_select 'a[href=?]', sops_path, text: 'SOPs'
+          assert_select 'a[href=?]', sops_path, text: 'Protocols'
         end
       end
     end
