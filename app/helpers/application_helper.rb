@@ -207,7 +207,9 @@ module ApplicationHelper
   end
 
   def render_markdown(markdown)
-    CommonMarker.render_html(markdown, :GITHUB_PRE_LANG, [:tagfilter, :table, :strikethrough, :autolink])
+    doc = CommonMarker.render_doc(markdown, :DEFAULT, [:tagfilter, :table, :strikethrough, :autolink])
+    renderer = CommonMarker::SeekHtmlRenderer.new(options: :GITHUB_PRE_LANG)
+    renderer.render(doc)
   end
 
   def text_or_not_specified(text, options = {})
