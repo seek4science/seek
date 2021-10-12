@@ -11,8 +11,6 @@ class SamplesController < ApplicationController
   
   before_action :auth_to_create, only: [:new, :create]
 
-  before_action :set_displaying_single_page, only: [:index]
-
   
   include Seek::IsaGraphExtensions
 

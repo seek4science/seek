@@ -25,8 +25,6 @@ class DataFilesController < ApplicationController
 
   before_action :login_required, only: [:create, :create_content_blob, :create_metadata, :rightfield_extraction_ajax, :provide_metadata]
 
-  before_action :set_displaying_single_page, only: [:show]
-
   
   # has to come after the other filters
   include Seek::Publishing::PublishingCommon

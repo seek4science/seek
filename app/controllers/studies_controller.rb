@@ -12,7 +12,6 @@ class StudiesController < ApplicationController
 
   before_action :check_assays_are_not_already_associated_with_another_study, only: %i[create update]
 
-  before_action :set_displaying_single_page, only: [:show]
   before_action :check_assays_are_for_this_study, only: %i[update]
 
   include Seek::Publishing::PublishingCommon
