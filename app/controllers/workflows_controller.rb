@@ -33,7 +33,7 @@ class WorkflowsController < ApplicationController
         format.html
       end
     else
-      @git_version = @workflow.latest_git_version.next_version(mutable: true, name: 'development')
+      @git_version = @workflow.latest_git_version.next_version(mutable: true)
       if @git_version.save
         flash[:notice] = "New development version created."
       else

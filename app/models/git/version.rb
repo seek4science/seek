@@ -34,9 +34,9 @@ module Git
 
     delegate_auth_to :parent
 
-    def name
-      super || "Version #{version}"
-    end
+    # def name
+    #   super || "Version #{version}"
+    # end
 
     def latest_git_version?
       resource.latest_git_version == self
@@ -161,10 +161,10 @@ module Git
     # Initialize a follow-up version to this one, with the version number bumped.
     def next_version(extra_attributes = {})
       git_version = self.dup
-      git_version.name = nil
       git_version.comment = nil
       git_version.ref = nil
       git_version.version = (version + 1)
+      git_version.name = "Version #{git_version.version}"
       git_version.set_resource_attributes(resource.attributes)
       git_version.assign_attributes(extra_attributes)
       git_version.git_annotations = git_annotations.map(&:dup)

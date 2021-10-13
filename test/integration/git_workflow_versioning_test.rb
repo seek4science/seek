@@ -120,7 +120,7 @@ class GitWorkflowVersioningTest < ActionDispatch::IntegrationTest
     end
 
     assert_equal version + 1, workflow.reload.latest_git_version.version
-    assert_equal 'development', workflow.latest_git_version.name
+    assert_equal 'Version 2', workflow.latest_git_version.name
     ann1 = workflow.find_git_version(1).git_annotations.map { |a| { key: a.key, path: a.path } }
     ann2 = workflow.find_git_version(2).git_annotations.map { |a| { key: a.key, path: a.path } }
     assert_equal ann1, ann2, 'Annotations should have been copied'

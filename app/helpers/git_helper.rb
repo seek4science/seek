@@ -95,8 +95,8 @@ module GitHelper
 
   def mutability_badge(git_version)
     content_tag(:span,
-                git_version.mutable? ? 'Open' : 'Locked',
+                git_version.mutable? ? 'Open' : 'Frozen',
                 class: "mutability label #{git_version.mutable? ? 'label-warning' : 'label-success'}",
-                title: git_version.mutable? ? 'This version is open and may change over time.' : 'This version is locked and will not change.')
+                title: git_version.mutable? ? 'This version is open and may change over time.' : 'This version is frozen and will not change.')
   end
 end

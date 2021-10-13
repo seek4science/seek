@@ -1,7 +1,9 @@
 require 'test_helper'
 
 class GitVersionTest < ActiveSupport::TestCase
-  setup do
+  test 'git version default name' do
+    workflow = Factory(:local_git_workflow)
+    assert_equal 'Version 1', workflow.git_version.name
   end
 
   test 'lock version' do
@@ -264,7 +266,7 @@ class GitVersionTest < ActiveSupport::TestCase
 
     refute next_ver.persisted?
     assert_equal gv.version + 1, next_ver.version
-    assert next_ver[:name].blank?
+    assert_equal "Version #{gv.version + 1}", next_ver.name
     assert next_ver[:comment].blank?
     assert_equal gv.resource_attributes['title'], next_ver.resource_attributes['title']
     assert_equal gv.commit, next_ver.commit
