@@ -335,6 +335,7 @@ module Seek
               timestamp_columns.include?(key) ||
               sync_ignore_columns.include?(key)
             next unless orig_model.respond_to?(key)
+            next unless new_model.respond_to?("#{key}=")
             new_model.send("#{key}=", orig_model.send(key))
           end
         end

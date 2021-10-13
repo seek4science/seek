@@ -9,8 +9,12 @@ module Seek
           'Collection'
         end
 
+        def conformance
+          'https://schema.org/Collection'
+        end
+
         def schema_enabled_assets
-          assets.select(&:schema_org_supported?)
+          assets.reject(&:blank?).select(&:schema_org_supported?)
         end
       end
     end

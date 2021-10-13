@@ -3,10 +3,14 @@ module Seek
     module ResourceDecorators
       # Decorator that provides extensions for a Document
       class Document < CreativeWork
-        associated_items subject_of: :events
+        include ActionView::Helpers::NumberHelper
 
         def schema_type
           'DigitalDocument'
+        end
+
+        def conformance
+          'https://schema.org/DigitalDocument'
         end
       end
     end

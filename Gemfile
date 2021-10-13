@@ -135,11 +135,10 @@ gem 'bundler', '>= 1.8.4'
 gem 'ro-crate', '~> 0.4.13'
 
 gem 'rugged'
-
-gem 'redcarpet'
 gem 'i18n-js'
 gem 'whenever', '~> 1.0.0', require: false
 gem 'dotenv-rails', '~> 2.7.6'
+gem 'commonmarker'
 
 group :production do
   gem 'passenger'

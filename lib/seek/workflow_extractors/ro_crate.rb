@@ -1,6 +1,4 @@
 require 'rest-client'
-require 'redcarpet'
-require 'redcarpet/render_strip'
 require 'ro_crate'
 
 module Seek

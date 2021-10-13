@@ -794,4 +794,6 @@ SEEK::Application.routes.draw do
   get '/citation/(*doi)' => 'citations#fetch', as: :citation, constraints: { doi: /.+/ }
 
   get '/home/isa_colours' => 'homes#isa_colours'
+
+  post '/previews/markdown' => 'previews#markdown'
 end

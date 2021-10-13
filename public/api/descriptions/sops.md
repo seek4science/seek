@@ -17,10 +17,10 @@ A **SOP** has the following associated information:
 
 A response for a **SOP** such as that for a <a href="#create">**Create**</a>, <a href="#read">**Read**</a> or <a href="#update">**Update**</a> includes the additional information
 
-* ** An array of the versions of the SOP**
-* ** A number indicating the latest version**
-* ** The time when the SOP was created**
-* ** The last time the SOP was updated**
+* An array of the versions of the **SOP**
+* A number indicating the latest **version**
+* The time when the SOP was **created**
+* The last time the SOP was **updated**
 * A reference to the <a href="#people">**Person**</a> who submitted the **SOP**
 * References to the <a href="#investigations">**Investigations**</a> associated with the **SOP**
 * References to the <a href="#studies">**Studies**</a> associated with the **SOP**
