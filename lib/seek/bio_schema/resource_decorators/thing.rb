@@ -7,6 +7,7 @@ module Seek
         schema_mappings description: :description,
                         title: :name,
                         url: :url,
+                        image: :image,
                         keywords: :keywords
 
         def url
@@ -20,31 +21,17 @@ module Seek
 
         # If the resource has an avatar, then returns the image url
         def image
-          return unless resource.avatar
+          return unless resource.respond_to?(:avatar)
+          return if resource.avatar.blank?
+
           "#{Seek::Config.site_base_host}/#{resource.class.table_name}" \
             "/#{resource.id}/avatars/#{resource.avatar.id}?size=250"
         end
 
         # list of comma seperated tags, it the resource supports it
         def keywords
-          tags_as_text_array.join(', ') if respond_to?(:tags_as_text_array)
-        end
-
-        def provider
-          {
-            '@type' => 'Organization',
-            '@id' => Seek::Config.site_base_host,
-            'name' => Seek::Config.dm_project_name,
-            'url' => Seek::Config.site_base_host
-          }
-        end
-        
-        def date_created
-          resource.created_at&.iso8601 if respond_to?(:created_at)
-        end
-
-        def date_modified
-          resource.updated_at&.iso8601 if respond_to?(:updated_at)
+          obj = resource.is_a_version? ? resource.parent : resource
+          obj.tags_as_text_array.join(', ') if obj.respond_to?(:tags_as_text_array)
         end
       end
     end

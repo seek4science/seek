@@ -1,7 +1,6 @@
-  require 'test_helper'
+require 'test_helper'
 
 class SampleTypesControllerTest < ActionController::TestCase
-
   include RestTestCases
   include AuthenticatedTestHelper
 
@@ -15,11 +14,11 @@ class SampleTypesControllerTest < ActionController::TestCase
     @sample_type = Factory(:simple_sample_type, project_ids: @project_ids)
     @string_type = Factory(:string_sample_attribute_type)
     @int_type = Factory(:integer_sample_attribute_type)
-    @controlled_vocab_type=Factory(:controlled_vocab_attribute_type)
+    @controlled_vocab_type = Factory(:controlled_vocab_attribute_type)
   end
 
   def rest_api_test_object
-    @object = @sample_type #Factory(:sample_type, project_ids: @project_ids)
+    @object = @sample_type # Factory(:sample_type, project_ids: @project_ids)
   end
 
   test 'should get index' do
@@ -35,7 +34,7 @@ class SampleTypesControllerTest < ActionController::TestCase
 
   test 'should create sample_type' do
     Factory :annotation, attribute_name: 'sample_type_tag', source: @person.user,
-            annotatable: Factory(:simple_sample_type), value: 'golf'
+                         annotatable: Factory(:simple_sample_type), value: 'golf'
 
     assert_enqueued_with(job: SampleTemplateGeneratorJob) do
       assert_enqueued_with(job: SampleTypeUpdateJob) do
@@ -46,40 +45,39 @@ class SampleTypesControllerTest < ActionController::TestCase
                                                      project_ids: @project_ids,
                                                      description: 'The description!!',
                                                      sample_attributes_attributes: {
-                                                         '0' => {
-                                                             pos: '1', title: 'a string', required: '1', is_title: '1',
-                                                             sample_attribute_type_id: @string_type.id, _destroy: '0' },
-                                                         '1' => {
-                                                             pos: '2', title: 'a number', required: '1',
-                                                             sample_attribute_type_id: @int_type.id, _destroy: '0'
-                                                         }
+                                                       '0' => {
+                                                         pos: '1', title: 'a string', required: '1', is_title: '1',
+                                                         sample_attribute_type_id: @string_type.id, _destroy: '0'
+                                                       },
+                                                       '1' => {
+                                                         pos: '2', title: 'a number', required: '1',
+                                                         sample_attribute_type_id: @int_type.id, _destroy: '0'
+                                                       }
                                                      },
-                                                     tags: 'fish,golf'
-
-              } }
+                                                     tags: 'fish,golf' } }
             end
           end
         end
       end
     end
 
-    refute_nil type=assigns(:sample_type)
+    refute_nil type = assigns(:sample_type)
     assert_redirected_to sample_type_path(type)
 
     assert_equal @person, type.contributor
-    assert_equal 'Hello!',type.title
-    assert_equal 'The description!!',type.description
-    assert_equal @project_ids.sort,type.project_ids.sort
+    assert_equal 'Hello!', type.title
+    assert_equal 'The description!!', type.description
+    assert_equal @project_ids.sort, type.project_ids.sort
     assert_equal 2, type.sample_attributes.size
     assert_equal 'a string', type.sample_attributes.title_attributes.first.title
     assert_equal [@project], type.projects
     refute type.uploaded_template?
-    assert_equal %w(fish golf), type.tags.sort
+    assert_equal %w[fish golf], type.tags.sort
 
     assert_equal type, ActivityLog.last.activity_loggable
-    assert_equal 'create',ActivityLog.last.action
+    assert_equal 'create', ActivityLog.last.action
     assert_equal @person.user, ActivityLog.last.culprit
-    assert_equal 'Hello!',ActivityLog.last.data
+    assert_equal 'Hello!', ActivityLog.last.data
     assert_equal @person.projects.first, ActivityLog.last.referenced
     assert_equal 'sample_types', ActivityLog.last.controller_name
   end
@@ -88,17 +86,17 @@ class SampleTypesControllerTest < ActionController::TestCase
     linked_sample_type = Factory(:sample_sample_attribute_type)
     assert_difference('SampleType.count') do
       post :create, params: { sample_type: { title: 'Hello!',
-                                   project_ids: [@project.id],
-                                   sample_attributes_attributes: {
-                                     '0' => {
-                                       pos: '1', title: 'a string', required: '1', is_title: '1',
-                                       sample_attribute_type_id: @string_type.id, _destroy: '0' },
-                                     '1' => {
-                                       pos: '2', title: 'a sample', required: '1',
-                                       sample_attribute_type_id: linked_sample_type.id, linked_sample_type_id: @sample_type.id, _destroy: '0'
-                                     }
-                                   }
-      } }
+                                             project_ids: [@project.id],
+                                             sample_attributes_attributes: {
+                                               '0' => {
+                                                 pos: '1', title: 'a string', required: '1', is_title: '1',
+                                                 sample_attribute_type_id: @string_type.id, _destroy: '0'
+                                               },
+                                               '1' => {
+                                                 pos: '2', title: 'a sample', required: '1',
+                                                 sample_attribute_type_id: linked_sample_type.id, linked_sample_type_id: @sample_type.id, _destroy: '0'
+                                               }
+                                             } } }
     end
     refute_nil sample_type = assigns(:sample_type)
     assert_redirected_to sample_type_path(sample_type)
@@ -113,17 +111,17 @@ class SampleTypesControllerTest < ActionController::TestCase
     linked_sample_type = Factory(:sample_sample_attribute_type)
     assert_difference('SampleType.count') do
       post :create, params: { sample_type: { title: 'Hello!',
-                                   project_ids: @project_ids,
-                                   sample_attributes_attributes: {
-                                     '0' => {
-                                       pos: '1', title: 'a string', required: '1', is_title: '1',
-                                       sample_attribute_type_id: @string_type.id, _destroy: '0' },
-                                     '1' => {
-                                       pos: '2', title: 'a sample', required: '1',
-                                       sample_attribute_type_id: linked_sample_type.id, linked_sample_type_id: 'self', _destroy: '0'
-                                     }
-                                   }
-      } }
+                                             project_ids: @project_ids,
+                                             sample_attributes_attributes: {
+                                               '0' => {
+                                                 pos: '1', title: 'a string', required: '1', is_title: '1',
+                                                 sample_attribute_type_id: @string_type.id, _destroy: '0'
+                                               },
+                                               '1' => {
+                                                 pos: '2', title: 'a sample', required: '1',
+                                                 sample_attribute_type_id: linked_sample_type.id, linked_sample_type_id: 'self', _destroy: '0'
+                                               }
+                                             } } }
     end
     refute_nil sample_type = assigns(:sample_type)
     assert_redirected_to sample_type_path(sample_type)
@@ -135,12 +133,12 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'should show sample_type' do
-    assert_difference('ActivityLog.count',1) do
+    assert_difference('ActivityLog.count', 1) do
       get :show, params: { id: @sample_type }
       assert_response :success
     end
-    assert_equal @sample_type,ActivityLog.last.activity_loggable
-    assert_equal 'show',ActivityLog.last.action
+    assert_equal @sample_type, ActivityLog.last.activity_loggable
+    assert_equal 'show', ActivityLog.last.action
   end
 
   test 'should get edit' do
@@ -162,8 +160,7 @@ class SampleTypesControllerTest < ActionController::TestCase
         required: (attribute.required ? '1' : '0'),
         sample_attribute_type_id: attribute.sample_attribute_type_id,
         _destroy: '0',
-        id: attribute.id
-      }
+        id: attribute.id }
     end
 
     sample_attributes_fields[0][:is_title] = '0'
@@ -176,13 +173,11 @@ class SampleTypesControllerTest < ActionController::TestCase
 
     assert_enqueued_with(job: SampleTemplateGeneratorJob, args: [sample_type]) do
       assert_enqueued_with(job: SampleTypeUpdateJob, args: [sample_type, true]) do
-        assert_difference('ActivityLog.count',1) do
+        assert_difference('ActivityLog.count', 1) do
           assert_difference('SampleAttribute.count', -1) do
             put :update, params: { id: sample_type, sample_type: { title: 'Hello!',
                                                                    sample_attributes_attributes: sample_attributes_fields,
-                                                                   tags: "fish,#{golf.value.text}"
-            } }
-
+                                                                   tags: "fish,#{golf.value.text}" } }
 
             assert sample_type.template_generation_task.reload.pending?
           end
@@ -195,10 +190,10 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_includes assigns(:sample_type).sample_attributes.map(&:title), 'hello'
     refute assigns(:sample_type).sample_attributes[0].is_title?
     assert assigns(:sample_type).sample_attributes[1].is_title?
-    assert_equal %w(fish golf), assigns(:sample_type).tags.sort
+    assert_equal %w[fish golf], assigns(:sample_type).tags.sort
 
-    assert_equal sample_type,ActivityLog.last.activity_loggable
-    assert_equal 'update',ActivityLog.last.action
+    assert_equal sample_type, ActivityLog.last.activity_loggable
+    assert_equal 'update', ActivityLog.last.action
   end
 
   test 'update changing from a CV attribute' do
@@ -215,12 +210,10 @@ class SampleTypesControllerTest < ActionController::TestCase
         required: (attribute.required ? '1' : '0'),
         sample_attribute_type_id: @string_type.id,
         _destroy: '0',
-        id: attribute.id
-      }
+        id: attribute.id }
     ]
     put :update, params: { id: sample_type, sample_type: { title: sample_type.title,
-                                                 sample_attributes_attributes: attribute_fields
-    } }
+                                                           sample_attributes_attributes: attribute_fields } }
     assert_redirected_to sample_type_path(assigns(:sample_type))
     assert_nil flash[:error]
     sample_type = assigns(:sample_type)
@@ -247,18 +240,15 @@ class SampleTypesControllerTest < ActionController::TestCase
         required: (first_attribute.required ? '1' : '0'),
         sample_attribute_type_id: first_attribute.sample_attribute_type.id,
         _destroy: '0',
-        id: first_attribute.id
-      },
+        id: first_attribute.id },
       { pos: attribute.pos, title: 'A String',
         required: (attribute.required ? '1' : '0'),
         sample_attribute_type_id: @string_type.id,
         _destroy: '0',
-        id: attribute.id
-      }
+        id: attribute.id }
     ]
     put :update, params: { id: sample_type, sample_type: { title: sample_type.title,
-                                                 sample_attributes_attributes: attribute_fields
-    } }
+                                                           sample_attributes_attributes: attribute_fields } }
     assert_redirected_to sample_type_path(assigns(:sample_type))
     assert_nil flash[:error]
     sample_type = assigns(:sample_type)
@@ -291,7 +281,6 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   test 'should destroy sample_type' do
-
     assert @sample_type.can_delete?
 
     assert_difference('ActivityLog.count') do
@@ -321,10 +310,11 @@ class SampleTypesControllerTest < ActionController::TestCase
   test 'create from template' do
     blob = { data: template_for_upload }
 
-    assert_difference('ActivityLog.count',1) do
+    assert_difference('ActivityLog.count', 1) do
       assert_difference('SampleType.count', 1) do
         assert_difference('ContentBlob.count', 1) do
-          post :create_from_template, params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
+          post :create_from_template,
+               params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
         end
       end
     end
@@ -334,8 +324,7 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert assigns(:sample_type).uploaded_template?
 
     assert_equal assigns(:sample_type), ActivityLog.last.activity_loggable
-    assert_equal 'create',ActivityLog.last.action
-
+    assert_equal 'create', ActivityLog.last.action
   end
 
   test 'create from template with some blank columns' do
@@ -343,7 +332,8 @@ class SampleTypesControllerTest < ActionController::TestCase
 
     assert_difference('SampleType.count', 1) do
       assert_difference('ContentBlob.count', 1) do
-        post :create_from_template, params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
+        post :create_from_template,
+             params: { sample_type: { title: 'Hello!', project_ids: @project_ids }, content_blobs: [blob] }
       end
     end
 
@@ -463,14 +453,15 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert assigns(:sample_types)
     assert_empty assigns(:sample_types)
 
-    get :filter_for_select, params: { projects: (st1.projects + st3.projects).collect(&:id), tags: %w(fred mary) }
+    get :filter_for_select, params: { projects: (st1.projects + st3.projects).collect(&:id), tags: %w[fred mary] }
     assert_response :success
     assert assigns(:sample_types)
     assert_includes assigns(:sample_types), st3
     refute_includes assigns(:sample_types), st2
     refute_includes assigns(:sample_types), st1
 
-    get :filter_for_select, params: { projects: (st1.projects + st3.projects).collect(&:id), tags: %w(fred mary monkey) }
+    get :filter_for_select,
+        params: { projects: (st1.projects + st3.projects).collect(&:id), tags: %w[fred mary monkey] }
 
     assert_includes assigns(:sample_types), st1
     assert_includes assigns(:sample_types), st3
@@ -488,37 +479,44 @@ class SampleTypesControllerTest < ActionController::TestCase
     st2.save!
     st3.save!
 
-    get :filter_for_select, params: { projects: (st1.projects + st3.projects).collect(&:id), tags: %w(fred bob) }
+    get :filter_for_select, params: { projects: (st1.projects + st3.projects).collect(&:id), tags: %w[fred bob] }
     assert_response :success
     assert results = assigns(:sample_types)
     results.sort!
     assert_equal [st1, st2].sort, results
 
-    get :filter_for_select, params: { projects: (st1.projects + st3.projects).collect(&:id), tags: %w(fred bob), exclusive_tags: '0' }
+    get :filter_for_select,
+        params: { projects: (st1.projects + st3.projects).collect(&:id), tags: %w[fred bob], exclusive_tags: '0' }
     assert_response :success
     assert results = assigns(:sample_types)
     results.sort!
     assert_equal [st1, st2].sort, results
 
-    get :filter_for_select, params: { projects: (st1.projects + st3.projects).collect(&:id), tags: %w(fred bob), exclusive_tags: '1' }
+    get :filter_for_select,
+        params: { projects: (st1.projects + st3.projects).collect(&:id), tags: %w[fred bob], exclusive_tags: '1' }
     assert_response :success
     assert results = assigns(:sample_types)
     results.sort!
     assert_equal [st2], results
 
-    get :filter_for_select, params: { projects: (st1.projects + st3.projects).collect(&:id), tags: %w(jane frank), exclusive_tags: '1' }
+    get :filter_for_select,
+        params: { projects: (st1.projects + st3.projects).collect(&:id), tags: %w[jane frank], exclusive_tags: '1' }
     assert_response :success
     assert results = assigns(:sample_types)
     results.sort!
     assert_equal [st3], results
 
-    get :filter_for_select, params: { projects: (st1.projects + st3.projects).collect(&:id), tags: %w(peter frank jane), exclusive_tags: '1' }
+    get :filter_for_select,
+        params: { projects: (st1.projects + st3.projects).collect(&:id), tags: %w[peter frank jane],
+                  exclusive_tags: '1' }
     assert_response :success
     assert results = assigns(:sample_types)
     results.sort!
     assert_equal [st3], results
 
-    get :filter_for_select, params: { projects: (st1.projects + st3.projects).collect(&:id), tags: %w(frank jane bob), exclusive_tags: '1' }
+    get :filter_for_select,
+        params: { projects: (st1.projects + st3.projects).collect(&:id), tags: %w[frank jane bob],
+                  exclusive_tags: '1' }
     assert_response :success
     assert results = assigns(:sample_types)
     assert_empty results
@@ -526,39 +524,38 @@ class SampleTypesControllerTest < ActionController::TestCase
 
   test 'create sample type with a controlled vocab' do
     cv = Factory(:apples_sample_controlled_vocab)
-    assert_difference('ActivityLog.count',1) do
+    assert_difference('ActivityLog.count', 1) do
       assert_difference('SampleType.count') do
         post :create, params: { sample_type: { title: 'Hello!',
-                                     project_ids: @project_ids,
-                                     sample_attributes_attributes: {
-                                         '0' => {
-                                             pos: '1', title: 'a string', required: '1', is_title: '1',
-                                             sample_attribute_type_id: @string_type.id, _destroy: '0' },
-                                         '1' => {
-                                             pos: '2', title: 'cv', required: '1',
-                                             sample_attribute_type_id:@controlled_vocab_type.id,
-                                             sample_controlled_vocab_id:cv.id,
-                                             destroy: '0'
-                                         }
-                                     }
-        } }
+                                               project_ids: @project_ids,
+                                               sample_attributes_attributes: {
+                                                 '0' => {
+                                                   pos: '1', title: 'a string', required: '1', is_title: '1',
+                                                   sample_attribute_type_id: @string_type.id, _destroy: '0'
+                                                 },
+                                                 '1' => {
+                                                   pos: '2', title: 'cv', required: '1',
+                                                   sample_attribute_type_id: @controlled_vocab_type.id,
+                                                   sample_controlled_vocab_id: cv.id,
+                                                   destroy: '0'
+                                                 }
+                                               } } }
       end
     end
 
-    refute_nil type=assigns(:sample_type)
+    refute_nil type = assigns(:sample_type)
     assert_redirected_to sample_type_path(type)
-    assert_equal 2,type.sample_attributes.count
-    attr=type.sample_attributes.last
+    assert_equal 2, type.sample_attributes.count
+    attr = type.sample_attributes.last
     assert attr.controlled_vocab?
-    assert_equal cv,attr.sample_controlled_vocab
-
+    assert_equal cv, attr.sample_controlled_vocab
   end
 
   test 'only visible sample types are listed' do
     person = Factory(:person)
-    st1 = Factory(:simple_sample_type,projects:person.projects)
+    st1 = Factory(:simple_sample_type, projects: person.projects)
     st2 = Factory(:simple_sample_type)
-    st3 = Factory(:sample,policy:Factory(:public_policy)).sample_type # type with a public sample associated
+    st3 = Factory(:sample, policy: Factory(:public_policy)).sample_type # type with a public sample associated
     login_as(person.user)
 
     assert st1.can_view?
@@ -568,30 +565,29 @@ class SampleTypesControllerTest < ActionController::TestCase
     get :index
 
     assert_select 'div.list_items_container' do
-      assert_select 'div.list_item_title a[href=?]',sample_type_path(st1)
-      assert_select 'div.list_item_title a[href=?]',sample_type_path(st2),count:0
-      assert_select 'div.list_item_title a[href=?]',sample_type_path(st3)
+      assert_select 'div.list_item_title a[href=?]', sample_type_path(st1)
+      assert_select 'div.list_item_title a[href=?]', sample_type_path(st2), count: 0
+      assert_select 'div.list_item_title a[href=?]', sample_type_path(st3)
     end
-
   end
-
-
 
   test 'cannot view private sample type' do
     st = Factory(:simple_sample_type)
     refute st.can_view?
 
-    get :show, params: { id:st.id }
+    get :show, params: { id: st.id }
 
     assert_response :forbidden
 
-    assert_select 'h2.forbidden', text:/The Sample type is not visible to you/
-
+    assert_select 'h2.forbidden', text: /The Sample type is not visible to you/
   end
 
   test 'visible with referring sample' do
     person = Factory(:person)
-    sample = Factory(:sample,policy:Factory(:private_policy,permissions:[Factory(:permission,contributor:person, access_type:Policy::VISIBLE)]))
+    sample = Factory(:sample,
+                     policy: Factory(:private_policy,
+                                     permissions: [Factory(:permission, contributor: person,
+                                                                        access_type: Policy::VISIBLE)]))
     sample_type = sample.sample_type
     login_as(person.user)
 
@@ -599,16 +595,15 @@ class SampleTypesControllerTest < ActionController::TestCase
     refute sample_type.can_view?
     assert sample_type.can_view?(person.user, sample)
 
-    get :show, params: { id:sample_type.id }
+    get :show, params: { id: sample_type.id }
     assert_response :forbidden
 
-    get :show, params: { id:sample_type.id, referring_sample_id:sample.id }
+    get :show, params: { id: sample_type.id, referring_sample_id: sample.id }
     assert_response :success
 
-    #sample type must match
-    get :show, params: { id:Factory(:simple_sample_type).id, referring_sample_id:sample.id }
+    # sample type must match
+    get :show, params: { id: Factory(:simple_sample_type).id, referring_sample_id: sample.id }
     assert_response :forbidden
-
   end
 
   private
@@ -631,9 +626,9 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   def edit_max_object(object)
-      s1 = Factory(:max_sample, policy: Factory(:public_policy))
-      s2 = Factory(:max_sample, policy: Factory(:public_policy))
-      object.samples << s1
-      object.samples << s2
+    s1 = Factory(:max_sample, policy: Factory(:public_policy))
+    s2 = Factory(:max_sample, policy: Factory(:public_policy))
+    object.samples << s1
+    object.samples << s2
   end
 end

@@ -1,5 +1,7 @@
 class ContributedResourceSerializer < PCSSerializer
-  attributes :title, :description, :license
+  attributes :title
+  attribute :license, if: -> {object.respond_to?(:license)}
+  attribute :description, if: -> {object.respond_to?(:description)}
 
   attribute :version, key: :latest_version, if: -> { object.respond_to?(:version) }
 
@@ -77,6 +79,6 @@ class ContributedResourceSerializer < PCSSerializer
   private
 
   def version_number
-    @scope[:requested_version] || object.try(:version)
+    @scope.try(:[],:requested_version) || object.try(:version)
   end
 end
