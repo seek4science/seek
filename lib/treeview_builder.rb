@@ -1,5 +1,6 @@
 class TreeviewBuilder
     include ImagesHelper
+    include ActionView::Helpers::SanitizeHelper
     def initialize(project, folders)
     @project = project
     @folders = folders
@@ -63,7 +64,7 @@ class TreeviewBuilder
                                         children: inv, 
                                         resource: @project}))
 
-        JSON[prj]
+        sanitize(JSON[prj])
     end
 
     private
@@ -76,6 +77,12 @@ class TreeviewBuilder
     end
 
     def create_node(obj) 
+        if(!obj[:resource].can_view?)
+            obj[:text] = "hidden item"
+            obj[:a_attr] = { 'style': 'font-style:italic;font-weight:bold;color:#ccc' }
+            obj[:action] = nil
+        end
+
         node = { id: obj[:id], text: obj[:text], a_attr: obj[:a_attr], count: obj[:count],
             data: { id:obj[:_id], type: obj[:_type], project_id: obj[:project_id], folder_id: obj[:folder_id]},
             state: { opened: true, separate: { label: obj[:label], action: obj[:action]}},

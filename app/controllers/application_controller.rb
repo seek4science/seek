@@ -14,6 +14,8 @@ class ApplicationController < ActionController::Base
   # if the logged in user is currently partially registered, force the continuation of the registration process
   before_action :partially_registered?
 
+  before_action :check_displaying_single_page
+
   after_action :log_event
 
   include AuthenticatedSystem
@@ -639,8 +641,10 @@ class ApplicationController < ActionController::Base
     keys
   end
 
-  def set_displaying_single_page
-    @single_page = true
+  def check_displaying_single_page
+    if params[:single_page]
+      @single_page = true
+    end
   end
 
   def displaying_single_page?

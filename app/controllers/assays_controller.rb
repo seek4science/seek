@@ -11,8 +11,6 @@ class AssaysController < ApplicationController
   #defined in the application controller
   before_action :project_membership_required_appended, :only=>[:new_object_based_on_existing_one]
 
-  before_action :set_displaying_single_page, only: [:show]
-
 
   include Seek::Publishing::PublishingCommon
 

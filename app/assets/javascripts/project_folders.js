@@ -158,7 +158,7 @@ const loadAssaySamples = (view, table_cols) =>
 const loadItemDetails = (url, params = {}) => {
   $j.ajax({
     url,
-    data: $j.extend(params, { only_content: true }),
+    data: $j.extend(params, { only_content: true, single_page: true }),
     cache: false,
     type: "get",
     success: (s) => $j("#item-layout").html(s),
@@ -166,8 +166,10 @@ const loadItemDetails = (url, params = {}) => {
     complete: () => $j("#loader").fadeOut(100),
     error: (e) => {
       if (e.status === 401) alert("You are not logged in!");
+      else if (e.status === 403) alert("You do not have permission to view this content!");
       else if (e.status !== 200)
-        alert(`An error occurred during processing the request.\nDetails: ${e.responseText}`);
+        alert(`An error occurred while processing the request.\nDetails: ${e.responseText}`);
+      $j("#item-layout").html("Unavailable")
     }
   });
 };
