@@ -1,6 +1,6 @@
 {
   "data":{
-    "id":"980191590",
+    "id":"980190982",
     "type":"publications",
     "attributes":{
       "policy":{
@@ -9,7 +9,9 @@
 
         ]
       },
-      "discussion_links":null,
+      "discussion_links":[
+
+      ],
       "title":"A Minimal Publication",
       "description":null,
       "license":null,
@@ -19,7 +21,7 @@
         {
           "version":1,
           "revision_comments":null,
-          "url":"http://localhost:3000/publications/980191590?version=1"
+          "url":"http://localhost:3000/publications/980190982?version=1"
         }
       ],
       "version":1,
@@ -52,7 +54,7 @@
       "submitter":{
         "data":[
           {
-            "id":"1039999918",
+            "id":"1039986549",
             "type":"people"
           }
         ]
@@ -102,13 +104,13 @@
       }
     },
     "links":{
-      "self":"/publications/980191590?version=1"
+      "self":"/publications/980190982?version=1"
     },
     "meta":{
       "created":"2021-08-28T14:54:42.000Z",
       "modified":"2015-01-01T12:00:00.000Z",
       "api_version":"0.3",
-      "uuid":"2d628290-08de-013a-eb74-2cde48001122",
+      "uuid":"bfdd9a20-0e29-013a-4db7-2cde48001122",
       "base_url":"http://localhost:3000"
     }
   },
