@@ -57,4 +57,26 @@ class LicenseTest < ActiveSupport::TestCase
     assert_equal license,Seek::License.new(license_json)
   end
 
+  test 'license key is validated' do
+    sop = Factory(:sop, license: 'CC0-1.0')
+    assert sop.valid?
+
+    sop.license = 'CCZZ'
+    refute sop.valid?
+    assert_equal 1,sop.errors.count
+    error = sop.errors.first
+    assert_equal :license, error[0]
+    assert_equal "isn't a valid license ID",error[1]
+
+    #allow blank
+    sop.license=nil
+    assert sop.valid?
+    sop.license=''
+    assert sop.valid?
+
+    # allow a known software license, if it comes through the api
+    sop.license = 'MIT'
+    assert sop.valid?
+  end
+
 end

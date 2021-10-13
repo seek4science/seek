@@ -177,7 +177,7 @@ class NodesControllerTest < ActionController::TestCase
   test 'should show the other creators in -uploader and creators- box' do
     node = Factory(:node, policy: Factory(:public_policy), other_creators: 'another creator')
     get :show, params: { id: node }
-    assert_select 'li.author-list-item', text: 'another creator', count: 1
+    assert_select '#author-box .additional-credit', text: 'another creator', count: 1
   end
 
   test 'filter by people, including creators, using nested routes' do
@@ -288,7 +288,7 @@ class NodesControllerTest < ActionController::TestCase
     # should be a temporary sharing link
     assert_select 'div#temporary_links', count:1
 
-    assert_select 'div#author_form', count:1
+    assert_select 'div#author-form', count:1
   end
 
   test 'cannot access manage page with edit rights' do

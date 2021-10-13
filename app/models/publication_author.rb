@@ -12,6 +12,7 @@ class PublicationAuthor < ApplicationRecord
   def full_name
     "#{first_name} #{last_name}"
   end
+  alias_method :name, :full_name
 
   # @param full_name e.g. "Joe J. Shmoe"
   # @return [first_name, last_name] eg . ["Joe J.", "Shmoe"]

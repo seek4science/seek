@@ -19,6 +19,9 @@ class AssetLinkTest < ActiveSupport::TestCase
     link.url = 'fish.com'
     refute link.valid?
 
+    link.url = 'https://fish.com '
+    assert link.valid? # it will have been stripped
+
     link.url = 'https://fish.com'
     assert link.valid?
 
@@ -49,6 +52,13 @@ class AssetLinkTest < ActiveSupport::TestCase
       end
     end
 
+  end
+
+  test 'strip link before validate' do
+    asset = Factory(:sop)
+    link = AssetLink.new(url:'  http://fish.com ', asset:asset)
+    assert link.valid?
+    assert_equal 'http://fish.com', link.url
   end
 
   test 'link_type' do

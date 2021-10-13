@@ -11,7 +11,7 @@ class AssaysController < ApplicationController
   #defined in the application controller
   before_action :project_membership_required_appended, :only=>[:new_object_based_on_existing_one]
 
-  
+
   include Seek::Publishing::PublishingCommon
 
   include Seek::IsaGraphExtensions
@@ -180,8 +180,7 @@ class AssaysController < ApplicationController
 
   def assay_params
     params.require(:assay).permit(:title, :description, :study_id, :assay_class_id, :assay_type_uri, :technology_type_uri,
-                                  :license, :other_creators, :position,
-                                  { document_ids: []}, { creator_ids: [] },
+                                  :license, *creator_related_params, :position, { document_ids: []},
                                   { scales: [] }, { sop_ids: [] }, { model_ids: [] },
                                   { samples_attributes: [:asset_id, :direction] },
                                   { data_files_attributes: [:asset_id, :direction, :relationship_type_id] },

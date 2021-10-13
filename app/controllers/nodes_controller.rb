@@ -56,9 +56,9 @@ class NodesController < ApplicationController
   private
 
   def node_params
-    params.require(:node).permit(:title, :description, { project_ids: [] }, :license, :other_creators,
+    params.require(:node).permit(:title, :description, { project_ids: [] }, :license, *creator_related_params,
                                 { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
+                                { assay_assets_attributes: [:assay_id] }, { scales: [] },
                                 { publication_ids: [] },
                                  discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
