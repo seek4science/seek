@@ -1,5 +1,3 @@
-require 'redcarpet/render_strip'
-
 module Seek
   module Search
     module CommonFields
@@ -37,7 +35,7 @@ module Seek
           private 
 
           def strip_markdown text
-            Redcarpet::Markdown.new(Redcarpet::Render::StripDown, tables: true).render(text || '')
+            CommonMarker.render_doc(text || '').to_plaintext
           end
         end
       end
