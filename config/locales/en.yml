@@ -23,6 +23,7 @@ en:
   model: "Model"
   sop: "SOP"
   workflow: "Workflow"
+  workflow_class: "Workflow Type"
   workflows:
     workflow: "Workflow"
     cwl_workflow: "CWL workflow"
