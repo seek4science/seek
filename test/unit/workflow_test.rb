@@ -396,4 +396,86 @@ class WorkflowTest < ActiveSupport::TestCase
     assert new_diagram.exists?
     assert_equal 2728, new_diagram.size
   end
+
+  test 'adding diagram path clears the cached auto-generated diagram' do
+    workflow = Factory(:annotationless_local_git_workflow,
+                       workflow_class: WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class))
+
+    v = workflow.git_version
+    disable_authorization_checks do
+      v.main_workflow_path = 'Concat_two_files.cwl'
+      v.save!
+    end
+
+    assert v.can_render_diagram?
+    original_diagram = v.diagram # Generates a diagram from the CWL
+    assert original_diagram
+
+    disable_authorization_checks do
+      v.add_file('new-diagram.png', open_fixture_file('file_picture.png'))
+    end
+
+    assert_nil v.diagram_path, 'Diagram path should not be set, it is generated.'
+    assert original_diagram.exists?
+    original_size = original_diagram.size
+    assert original_size > 100
+    assert original_size < 50000
+    original_sha1sum = original_diagram.sha1sum
+
+    disable_authorization_checks do
+      v.diagram_path = 'new-diagram.png'
+      assert v.diagram_path_changed?
+      v.save!
+    end
+
+    assert_equal 'new-diagram.png', v.diagram_path
+    refute v.diagram_exists?('png')
+    new_diagram = v.diagram
+
+    assert new_diagram.exists?
+    assert_equal 2728, new_diagram.size
+    assert_not_equal original_sha1sum, new_diagram.sha1sum
+  end
+
+
+  test 'removing diagram path reverts to the auto-generated diagram' do
+    workflow = Factory(:annotationless_local_git_workflow,
+                       workflow_class: WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class))
+
+    v = workflow.git_version
+    disable_authorization_checks do
+      v.main_workflow_path = 'Concat_two_files.cwl'
+      v.diagram_path = 'diagram.png'
+      v.save!
+    end
+
+    v = workflow.git_version
+    original_diagram = v.diagram
+    assert original_diagram
+
+    disable_authorization_checks do
+      v.add_file('new-diagram.png', open_fixture_file('file_picture.png'))
+    end
+
+    assert_equal 'diagram.png', v.diagram_path
+    assert original_diagram.exists?
+    assert_equal 32248, original_diagram.size
+    original_sha1sum = original_diagram.sha1sum
+
+    disable_authorization_checks do
+      v.diagram_path = nil
+      assert v.diagram_path_changed?
+      v.save!
+    end
+
+    assert_nil v.diagram_path
+    refute v.diagram_exists?('png')
+    assert v.can_render_diagram?
+    new_diagram = v.diagram # Generates diagram
+
+    assert new_diagram.exists?
+    assert new_diagram.size > 100
+    assert new_diagram.size < 50000
+    assert_not_equal original_sha1sum, new_diagram.sha1sum
+  end
 end

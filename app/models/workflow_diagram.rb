@@ -29,4 +29,10 @@ class WorkflowDiagram
   def exists?
     File.exist?(path)
   end
+
+  def sha1sum
+    digest = Digest::SHA1.new
+    digest.file(path)
+    digest.hexdigest
+  end
 end
