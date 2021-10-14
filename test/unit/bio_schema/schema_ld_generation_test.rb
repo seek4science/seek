@@ -176,7 +176,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'subjectOf' => [
         { '@type' => 'Event',
           '@id' => "http://localhost:3000/events/#{df.events.first.id}",
-          'name' => df.events.first.title }
+          'name' => df.events.first.title }]
     }
 
     json = JSON.parse(df.to_schema_ld)
@@ -462,7 +462,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                        '@id' => "##{ROCrate::Entity.format_id('Fred Bloggs')}",
                        'name' => 'Fred Bloggs' },
                      { '@type' => 'Person',
-                       '@id' => "##{ROCrate::Entity.format_id('Steve Smith')}",
+                       '@id' => "https://orcid.org/0000-0002-1694-233X",
                        'name' => 'Steve Smith' }],
                  'producer' =>
                     [{ '@type' => %w[Project Organization],
@@ -553,6 +553,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                  ] }
 
     json = JSON.parse(workflow.to_schema_ld)
+    fine_json_comparison expected, json
     assert_equal expected, json
     check_version(workflow.latest_version, expected)
   end
