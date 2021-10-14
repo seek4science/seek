@@ -29,6 +29,10 @@ module Git
       end
     end
 
+    def empty?
+      size == 0
+    end
+
     def ==(other)
       git_version == other.git_version &&
         path == other.path &&

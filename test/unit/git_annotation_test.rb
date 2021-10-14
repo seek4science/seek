@@ -29,6 +29,8 @@ class GitAnnotationTest < ActiveSupport::TestCase
     end
 
     assert_equal 'Concat_two_files.cwl', workflow.reload.main_workflow_path
+    assert_equal 687, workflow.main_workflow_blob.size
+    assert_equal '0b311dd91d0e485d73d88f8d1c750c7344a16785', workflow.main_workflow_blob.oid
   end
 
   test 'cannot set git annotation to non-existent path' do

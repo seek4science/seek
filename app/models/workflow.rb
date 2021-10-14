@@ -25,7 +25,7 @@ class Workflow < ApplicationRecord
 
     acts_as_doi_mintable(proxy: :parent, general_type: 'Workflow')
 
-    before_save :refresh_internals, if: -> { main_workflow_path_changed? }
+    before_save :refresh_internals, if: -> { main_workflow_path_changed? && !main_workflow_blob.empty? }
     after_save :clear_cached_diagram, if: -> { diagram_path_changed? }
 
     def maturity_level
