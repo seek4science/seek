@@ -891,6 +891,10 @@ class WorkflowsControllerTest < ActionController::TestCase
     workflow = Factory(:git_version).resource
     login_as(workflow.contributor)
 
+    assert_equal 'Common Workflow Language', workflow.workflow_class.title
+    assert_equal 'Common Workflow Language', workflow.latest_git_version.workflow_class.title
+    assert_nil workflow.main_workflow_path
+    assert_nil workflow.latest_git_version.main_workflow_path
     assert_difference('Git::Annotation.count', 2) do
       patch :update_paths, params: { id: workflow.id,
                                      git_version: { diagram_path: 'diagram.png',
@@ -898,6 +902,11 @@ class WorkflowsControllerTest < ActionController::TestCase
                                      workflow: { workflow_class_id: Factory(:galaxy_workflow_class).id } }
 
       assert_redirected_to workflow_path(workflow)
+      workflow.reload
+      assert_equal 'Galaxy', workflow.workflow_class.title
+      assert_equal 'Galaxy', workflow.latest_git_version.workflow_class.title
+      assert_equal 'concat_two_files.ga', workflow.main_workflow_path
+      assert_equal 'concat_two_files.ga', workflow.latest_git_version.main_workflow_path
     end
   end
 

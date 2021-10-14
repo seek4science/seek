@@ -261,7 +261,7 @@ class WorkflowsController < ApplicationController
 
   def update_paths
     respond_to do |format|
-      if @display_workflow.update_attributes(git_version_path_params) && @workflow.update_attributes(workflow_params)
+      if @workflow.update_attributes(workflow_params) && @display_workflow.reload.update_attributes(git_version_path_params)
         if params[:extract_metadata] == '1'
           extractor = @workflow.extractor
           @workflow.provide_metadata(extractor.metadata)
