@@ -53,6 +53,11 @@ class ProgrammeTest < ActiveSupport::TestCase
     assert p.valid?
     p.web_page = 'https://google.com'
     assert p.valid?
+
+    # strips before validation
+    p.web_page = '   https://google.com   '
+    assert p.valid?
+    assert_equal 'https://google.com', p.web_page
   end
 
   test 'validate title and decription length' do
