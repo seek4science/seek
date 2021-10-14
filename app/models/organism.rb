@@ -19,7 +19,7 @@ class Organism < ApplicationRecord
 
   has_and_belongs_to_many :projects
   has_many :programmes, through: :projects
-
+  
   before_validation :convert_concept_uri
 
   validates_presence_of :title
