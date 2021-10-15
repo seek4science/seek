@@ -11,13 +11,24 @@
                 <%= render :partial=>"gadgets/tag_cloud_gadget_home" %>
             <% end -%>
           </div>
-          <div style="text-align: center;"><h3>or</h3></div>
         <% end %>
-        <% if Seek::Config.programmes_enabled %>
-          <div style="text-align: center;"><a class="btn btn-primary btn-lg" target="_blank" href="<%=programmes_path %>" role="button" style="white-space: normal;width: 80%;"> Browse programmes </a></div>
-          <br>
-        <% end %>
-        <div style="text-align: center;"><a class="btn btn-primary btn-lg" target="_blank" href="<%=projects_path %>" role="button" style="white-space: normal;width: 80%;"> Browse projects </a></div>
+        <div class="row">
+          <% if Seek::Config.programmes_enabled %>
+            <div class="col-md-6">
+              <div style="text-align: center;">
+                <a class="btn btn-primary btn-lg" target="_blank" href="<%=programmes_path %>" role="button" style="white-space: normal; width: 100%;"> Browse programmes <br> <img src="assets/avatars/avatar-programme.png" class="mini-resource-list-avatar" style="height:100px"></a>
+              </div>
+              <br>
+            </div>
+            <div class="col-md-6">
+          <% else %>
+            <div class="col-md-12">
+          <% end %>
+            <div style="text-align: center;">
+              <a class="btn btn-primary btn-lg" target="_blank" href="<%=projects_path %>" role="button" style="white-space: normal; width: 100%;"> Browse projects <br> <img src="assets/avatars/avatar-project.png" class="mini-resource-list-avatar" style="height:100px"></a>
+            </div>
+          </div>
+        </div>
       <% end %>
     </div>
   </div>
