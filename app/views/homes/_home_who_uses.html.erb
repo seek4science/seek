@@ -20,15 +20,22 @@
 
 <% who_uses_content = YAML.load(File.read(File.join(Rails.root, 'config/home', 'who_uses.yml'))) %>
 
-<div class="panel panel-default" id="home_who_uses" style="padding: 20px; position:relative">
-  <h1 class="text-center">Who is using it?</h1>
-  <div class="row">
-    <div id="carousel-control" class="carousel">
-      <% who_uses_content.each do |item| %>
-        <div class="card col-sm-12 text-center" style="flex-shrink: 0;">
-          <a class="image-link" target="_blank" href="<%= item['url'] %>">
-            <img style="width:auto;height:100px;" src='<%= item['logo'] %>'  alt='<%= item['title'] %>'>
-          </a>
+<%= panel("Who is using it?", id: 'home_who_uses', body_options: { class: '' }) do %>
+  <div id="home_who_uses_carousel" class="carousel slide" data-ride="carousel">
+    <!-- Indicators: removed indicators as to not to obstruct the text -->
+    <!--<ol class="carousel-indicators">
+      <% who_uses_content.each_with_index  do |item, index| %>
+        <li data-target="#home_who_uses_carousel" data-slide-to="<%=index%>" <%= 'class="active"' if index==0 %>></li>
+      <% end %>
+    </ol>-->
+
+    <!-- Wrapper for slides -->
+    <div class="carousel-inner" role="listbox">
+      <% who_uses_content.each_with_index  do |item, index| %>
+        <div class="item <%= 'active' if index==0 %>" style="text-align: center;">
+          <div>
+            <img src="<%= item['logo'] %>" alt="<%= item['title'] %>" class="<%=index%>" style="width:auto;height:100px;">
+          </div>
           <h3> <%= item['title'] %> </h3>
           <p style="font-size: larger;"> <%= item['description'] %> </p>
           <i> <%= item['author'] %> </i>
@@ -36,11 +43,15 @@
       <% end %>
     </div>
 
-    <a id="carousel-left" href="/">
-      <span class="glyphicon glyphicon-chevron-left"></span>
+    <!-- Controls -->
+    <a class="left carousel-control" href="#home_who_uses_carousel" role="button" data-slide="prev" style="background-image: none; color:black;"
+}>
+      <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+      <span class="sr-only">Previous</span>
     </a>
-    <a id="carousel-right" href="/">
-      <span class="glyphicon glyphicon-chevron-right"></span>
+    <a class="right carousel-control" href="#home_who_uses_carousel" role="button" data-slide="next" style="background-image: none; color:black;">
+      <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+      <span class="sr-only">Next</span>
     </a>
   </div>
-</div>
+<% end %>

@@ -23,7 +23,7 @@
             <% if !Seek::Config.funding_link.blank? %>
               <a href="<%=Seek::Config.funding_link%>" target="_blank">
                 <%=Seek::Config.funding_link%>
-              </a>
+              </a> |
             <% end %>
             <%= link_to 'Credits', Seek::Help::HelpDictionary.instance.help_link(:credits), :target => '_blank' -%>
             <% if Seek::Config.terms_enabled %>
