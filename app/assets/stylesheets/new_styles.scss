@@ -116,6 +116,29 @@ ul.feed li:first-child {
   margin-bottom: 0.25em;
 }
 
+#announcement_gadget  {
+    background-color: white;
+    border: none;
+}
+
+a.seek-homepage-button {
+    background-color: white;
+}
+
+.panel-default {
+    border: none;
+}
+
+#announcement_gadget .panel-heading {
+    background-color: white;
+    border: none;
+}
+
+#sidebar_tag_cloud .panel-heading {
+    background-color: white;
+    border: none;
+}
+
 #content {
   flex: 1 0 auto;
 }
