@@ -34,12 +34,13 @@ body {
 
 #top-description > h2 {
     text-align: center;
-    color: black;
 }
 
 #top-description > p {
     text-align: center;
     color: white;
+    font-weight: bold;
+    font-size: 22px;
 }
 
 .navbar-default .navbar-nav > li > a {
@@ -364,7 +365,7 @@ a.seek-homepage-button {
   padding: 20px;
   margin: 5px;
   text-decoration: none;
-  color: $ibisba-dark-green;
+  color: #333333;
 
   &:hover {
     background-color: #f0f0f0;

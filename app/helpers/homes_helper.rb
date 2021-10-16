@@ -192,7 +192,7 @@ module HomesHelper
   def frontpage_button(link, image_path = nil, opts = {})
     link_to link, opts.reverse_merge(class: 'seek-homepage-button') do
       if image_path
-        object_tag(image_path) +
+        image_tag(image_path) +
             content_tag(:span) do
               yield
             end

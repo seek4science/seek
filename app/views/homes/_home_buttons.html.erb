@@ -1,20 +1,27 @@
 <div class="row seek-homepage-button-container">
-  <div class="col-sm-4">
+  <div class="col-sm-3">
     <%= frontpage_button(help_link(:get_started,url_only:true),
-                         '/assets/front_page/home-get-started-3.svg') do %>
+                         '/assets/front_page/home-get-started-ibisba.svg') do %>
         Get started
     <% end %>
   </div>
-  <div class="col-sm-4">
-    <%= frontpage_button(Seek::Config.programmes_enabled ? programmes_path : projects_path,
-                         '/assets/front_page/home-who-2.svg') do %>
-      Who is using it?
+  <div class="col-sm-3">
+    <%= frontpage_button(projects_path,
+                         '/assets/front_page/home-who-ibisba.svg') do %>
+      Who uses it?
     <% end %>
   </div>
-  <div class="col-sm-4">
-    <%= frontpage_button(help_link(:get_involved,url_only:true),
-                         '/assets/front_page/home-participate-3.svg') do %>
+  <div class="col-sm-3">
+    <%= frontpage_button('https://www.ibisba.eu/Join-Us',
+                         '/assets/front_page/home-participate-ibisba.svg') do %>
         Get involved
     <% end %>
+  </div>
+  <div class="col-sm-3">
+        <div id="sidebar_tag_cloud">
+          <% cache 'sidebar_tag_cloud', skip_digest: true do -%>
+              <%= render :partial=>"gadgets/tag_cloud_gadget" %>
+          <% end -%>
+        </div>
   </div>
 </div>

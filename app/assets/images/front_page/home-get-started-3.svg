@@ -19,6 +19,6 @@
 <circle style="fill:none;stroke:#2C3E50;stroke-width:0.9182;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" cx="22" cy="31.284" r="2.5"/>
 <circle style="fill:none;stroke:#2C3E50;stroke-width:0.9182;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;" cx="22" cy="40.851" r="2.5"/>
 
-<rect x="19.593" y="20.524" transform="matrix(0.7071 0.7071 -0.7071 0.7071 21.2194 -8.6794)" fill="param(tick-colour) red" width="2.988" height="1.5"/>
-<rect x="22.723" y="18.082" transform="matrix(0.7071 0.7071 -0.7071 0.7071 21.6059 -10.4963)" class="body" width="1.5" height="5.5"/>
+<rect x="19.593" y="20.524" transform="matrix(0.7071 0.7071 -0.7071 0.7071 21.2194 -8.6794)" fill="#3B97D3" width="2.988" height="1.5"/>
+<rect x="22.723" y="18.082" transform="matrix(0.7071 0.7071 -0.7071 0.7071 21.6059 -10.4963)" fill="#3B97D3" class="body" width="1.5" height="5.5"/>
 </svg>
