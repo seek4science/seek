@@ -1,7 +1,8 @@
 <div class="row seek-homepage-button-container">
   <div class="col-sm-3">
     <%= frontpage_button(help_link(:get_started,url_only:true),
-                         '/assets/front_page/home-get-started-ibisba.svg') do %>
+                         '/assets/front_page/home-get-started-ibisba.svg',
+	target: '_blank') do %>
         Get started
     <% end %>
   </div>
@@ -13,11 +14,13 @@
   </div>
   <div class="col-sm-3">
     <%= frontpage_button('https://www.ibisba.eu/Join-Us',
-                         '/assets/front_page/home-participate-ibisba.svg') do %>
+        '/assets/front_page/home-participate-ibisba.svg',
+	target: '_blank') do %>
         Get involved
     <% end %>
   </div>
   <div class="col-sm-3">
+
         <div id="sidebar_tag_cloud">
           <% cache 'sidebar_tag_cloud', skip_digest: true do -%>
               <%= render :partial=>"gadgets/tag_cloud_gadget" %>
