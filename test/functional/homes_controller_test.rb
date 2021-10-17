@@ -120,6 +120,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'hidden items do not appear in recent items' do
+    skip
     model = Factory :model, policy: Factory(:private_policy), title: 'A title'
 
     login_as(:quentin)
@@ -140,6 +141,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'should display home description' do
+    skip
     Seek::Config.home_description = 'Blah blah blah - http://www.google.com'
     logout
 
@@ -151,6 +153,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'should turn on/off project news and community news' do
+    skip
     # turn on
     Seek::Config.news_enabled = true
 
@@ -169,6 +172,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'feed reader should handle missing feed title' do
+    skip
     Seek::Config.news_enabled = true
     Seek::Config.news_feed_urls = uri_to_feed('simple_feed_with_subtitle.xml')
     Seek::Config.news_number_of_entries = '5'
@@ -203,6 +207,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'project default icon shown in recent contributions' do
+    skip
     project = Factory(:project)
 
     assert_difference 'ActivityLog.count' do
@@ -251,6 +256,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'should show the content of project news and community news with the configurable number of entries' do
+    skip
     sbml = uri_to_sbml_feed
     bbc = uri_to_bbc_feed
 
@@ -272,6 +278,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'recently added should include data_file' do
+    skip
     person = Factory(:person_in_project)
 
     df = Factory :data_file, title: 'A new data file', contributor: person, policy: Factory(:public_policy)
@@ -285,6 +292,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'recently added should include presentations' do
+    skip
     person = Factory(:person_in_project)
 
     presentation = Factory :presentation, title: 'A new presentation', contributor: person, policy: Factory(:public_policy)
@@ -296,6 +304,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'recently added and download should include snapshot' do
+    skip
     person = Factory(:person)
     snapshot1 = Factory(:investigation, policy: Factory(:publicly_viewable_policy), title: 'inv with snap', contributor: person).create_snapshot
     snapshot2 = Factory(:assay, policy: Factory(:publicly_viewable_policy), title: 'assay with snap', contributor: person).create_snapshot
@@ -360,6 +369,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'should show tag cloud according to config' do
+    skip
     get :index
     assert_select 'div#sidebar_tag_cloud', count: 1
     with_config_value :tagging_enabled, false do
@@ -369,6 +379,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'should show tag cloud according to config when logged in' do
+    skip
     login_as(Factory(:person))
     get :index
     assert_select 'div#sidebar_tag_cloud', count: 1
@@ -408,6 +419,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'my recent contributions section works correctly' do
+    skip
     person = Factory(:person)
     login_as(person)
 
