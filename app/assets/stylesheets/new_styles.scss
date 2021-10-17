@@ -2,7 +2,8 @@
 @import 'mixins';
 
 html, body {
-  height: 100%;
+    height: 100%;
+    font-family: $ibisba-font-family;
 }
 
 body {
@@ -20,6 +21,38 @@ body {
 #navbar > .container-fluid,
 #ft > .container-fluid {
   max-width: 1400px;
+}
+
+#top-description {
+    background-color: $ibisba-light-green;
+}
+
+#top-description > h1 {
+    text-align: center;
+    color: white;
+}
+
+#top-description > h2 {
+    text-align: center;
+}
+
+#top-description > p {
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    font-size: 22px;
+}
+
+.navbar-default .navbar-nav > li > a {
+    color: $ibisba-dark-green;
+}
+
+.panel-default > .panel-heading {
+    color: $ibisba-dark-green;
+}
+
+h1 {
+     color: $ibisba-dark-green;
 }
 
 .logo_link {
@@ -81,6 +114,29 @@ ul.feed li:first-child {
 
 .powered-by img {
   margin-bottom: 0.25em;
+}
+
+#announcement_gadget  {
+    background-color: white;
+    border: none;
+}
+
+a.seek-homepage-button {
+    background-color: white;
+}
+
+.panel-default {
+    border: none;
+}
+
+#announcement_gadget .panel-heading {
+    background-color: white;
+    border: none;
+}
+
+#sidebar_tag_cloud .panel-heading {
+    background-color: white;
+    border: none;
 }
 
 #content {
@@ -321,6 +377,7 @@ label.admin-checkbox {
 .seek-homepage-button-container {
   margin-bottom: 1em;
   margin-top: 1em;
+  color: $ibisba-dark-green;
 }
 
 a.seek-homepage-button {
@@ -331,6 +388,7 @@ a.seek-homepage-button {
   padding: 20px;
   margin: 5px;
   text-decoration: none;
+  color: #333333;
 
   &:hover {
     background-color: #f0f0f0;
@@ -1077,3 +1135,5 @@ span.disabled {
 .citation-box {
   overflow-x: auto;
 }
+
+
