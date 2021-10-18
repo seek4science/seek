@@ -32,7 +32,7 @@ body {
     padding: 7px;
     border-style: solid;
     border-color: gray;
-    border-width: medium;
+    border-width: thin;
 }
 
 #middle-description {
@@ -81,6 +81,14 @@ h1 {
 .front-page-panel {
   max-height: 280px;
   overflow-y: auto;
+}
+
+.front-info-block {
+    text-align: center;
+    padding:0.5em;
+    border:solid white 0.5em;
+    min-height:11em;
+    background-color: #f5f5f5;
 }
 
 ul.feed {
