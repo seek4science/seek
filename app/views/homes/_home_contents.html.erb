@@ -7,9 +7,12 @@
 <div class="row">
   <div class="col-md-12">
     <%= render :partial=>"ibisba_home_description_box" -%>
-
+  </div>
     <% if Seek::Config.front_page_buttons_enabled %>
-        <%= render :partial=>"home_buttons" -%>
+        <div class="col-md-12">
+          <%= render :partial=>"home_buttons" -%>
+        </div>
+      <div>
     <% end %>
 
     <% if logged_in_and_registered? %>
@@ -17,7 +20,3 @@
     <% end %>
   </div>
 </div>
-
-<% if Seek::Config.human_diseases_enabled  %>
-  <%= render :partial => 'human_diseases/overview_plot' %>
-<% end %>
