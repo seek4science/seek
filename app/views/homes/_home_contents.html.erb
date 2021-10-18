@@ -5,18 +5,13 @@
 <% end %>
 
 <div class="row">
-  <div class="col-md-12">
+  <div class="col-md-9">
     <%= render :partial=>"ibisba_home_description_box" -%>
+    <%= render :partial=>"home_buttons" -%>
   </div>
-    <% if Seek::Config.front_page_buttons_enabled %>
-        <div class="col-md-12">
-          <%= render :partial=>"home_buttons" -%>
-        </div>
-      <div>
-    <% end %>
 
-    <% if logged_in_and_registered? %>
-        <%= render :partial=>"user_activity" -%>
-    <% end %>
+  <div class="col-md-3">
+<!--    <%= render :partial=>"gadgets/announcements_gadget" %> -->
+    <%= render :partial=>"gadgets/tag_cloud_gadget" %>
   </div>
 </div>
