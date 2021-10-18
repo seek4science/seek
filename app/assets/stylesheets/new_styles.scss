@@ -31,8 +31,9 @@ body {
     box-sizing: border-box;
     padding: 7px;
     border-style: solid;
-    border-color: gray;
-    border-width: thin;
+    border-color: lightgray;
+    border-width: 1px;
+    border-radius: 4px;
 }
 
 #middle-description {
@@ -40,8 +41,9 @@ body {
     box-sizing: border-box;
     padding: 7px;
     border-style: solid;
-    border-color: gray;
-    border-width: thin;
+    border-color: lightgray;
+    border-width: 1px;
+    border-radius: 4px;
 }
 
 #top-description > h1 {
@@ -139,11 +141,6 @@ ul.feed li:first-child {
   margin-bottom: 0.25em;
 }
 
-#announcement_gadget  {
-    background-color: white;
-    border: none;
-}
-
 a.seek-homepage-button {
     background-color: white;
 }
@@ -153,7 +150,6 @@ a.seek-homepage-button {
 }
 
 #announcement_gadget .panel-heading {
-    background-color: white;
     border: none;
 }
 
@@ -401,11 +397,7 @@ label.admin-checkbox {
   margin-bottom: 1em;
   margin-top: 1em;
   background-color: white;
-  box-sizing: border-box;
   padding: 7px;
-  border-style: solid;
-  border-color: gray;
-  border-width: thin;
 }
 
 a.seek-homepage-button {
