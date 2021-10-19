@@ -619,7 +619,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as gatekeeper.user
     get :show, params: { id: gatekeeper.projects.first }
     assert_select 'div.box_about_actor p.asset_gatekeepers' do
-      assert_select 'strong', text: 'Asset gatekeepers:', count: 1
+      assert_select 'strong', text: I18n.t('asset_gatekeeper').pluralize+':', count: 1
       assert_select 'a', count: 1
       assert_select 'a[href=?]', person_path(gatekeeper), text: gatekeeper.name, count: 1
     end
@@ -644,7 +644,8 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_select 'strong', text: 'Asset housekeepers:', count: 0
       assert_select 'a[href=?]', person_path(asset_manager), text: asset_manager.name, count: 0
 
-      assert_select 'strong', text: 'Asset gatekeepers:', count: 0
+
+      assert_select 'strong', text: I18n.t('asset_gatekeeper').pluralize+':', count: 0
       assert_select 'a[href=?]', person_path(gatekeeper), text: gatekeeper.name, count: 0
 
       assert_select 'strong', text: 'SysMO-DB PALs:', count: 1

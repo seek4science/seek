@@ -14,7 +14,7 @@ module Seek
     def dm_project_name_fallback
       project_name
     end
-
+    
     def dm_project_link_fallback
       project_link
     end

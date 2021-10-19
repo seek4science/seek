@@ -249,19 +249,21 @@ module ResourceListItemHelper
     contributor_count += 1 unless other_contributors.blank?
     html = ''
     other_html = ''
-    content_tag(:p, class: 'list_item_attribute') do
+    content_tag(:p, class: 'list_item_attribute rli-person-list') do
       html << content_tag(:b, "#{key.pluralize(contributor_count)}: ")
-      if (key == 'Author')
-        html << contributors.map do |author|
-          if author.person
-            link_to author.full_name, show_resource_path(author.person)
-          else
-            author.full_name
-          end
-        end.join(', ')
-      else
-        html << contributors.map {|c| link_to truncate(c.title, length: 75), show_resource_path(c), title: get_object_title(c)}.join(', ')
-      end
+      html << contributors.map do |author|
+        title = author.name
+        if author.is_a?(AssetsCreator)
+          title += ", #{author.affiliation}" if author.affiliation.present?
+        end
+        if author.person
+          link_to author.name, show_resource_path(author.person), title: title
+        elsif author.respond_to?(:orcid) && author.orcid.present?
+          link_to author.name, author.orcid, title: title
+        else
+          content_tag(:span, author.name, title: title)
+        end
+      end.join(', ')
       unless other_contributors.blank?
         other_html << ', ' unless contributors.empty?
         other_html << other_contributors

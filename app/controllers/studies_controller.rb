@@ -12,7 +12,6 @@ class StudiesController < ApplicationController
 
   before_action :check_assays_are_not_already_associated_with_another_study, only: %i[create update]
 
-  before_action :set_displaying_single_page, only: [:show]
   before_action :check_assays_are_for_this_study, only: %i[update]
 
   include Seek::Publishing::PublishingCommon
@@ -344,7 +343,7 @@ class StudiesController < ApplicationController
 
   def study_params
     params.require(:study).permit(:title, :description, :experimentalists, :investigation_id,
-                                  :other_creators, :position, { creator_ids: [] }, { scales: [] }, { publication_ids: [] },
+                                  *creator_related_params, :position, { scales: [] }, { publication_ids: [] },
                                   { discussion_links_attributes:[:id, :url, :label, :_destroy] },
                                   { custom_metadata_attributes: determine_custom_metadata_keys })
   end

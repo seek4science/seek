@@ -706,6 +706,13 @@ SEEK::Application.routes.draw do
     end
   end
 
+  resources :creators, only: [] do
+    collection do
+      get :registered
+      get :unregistered
+    end
+  end
+
    ### SINGLE PAGE
 
   resources :single_pages do

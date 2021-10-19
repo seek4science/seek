@@ -11,8 +11,6 @@ class SamplesController < ApplicationController
   
   before_action :auth_to_create, only: [:new, :create]
 
-  before_action :set_displaying_single_page, only: [:index]
-
   
   include Seek::IsaGraphExtensions
 
@@ -151,8 +149,8 @@ class SamplesController < ApplicationController
     if params[:sample][:attribute_map]
         params[:sample][:data] = params[:sample].delete(:attribute_map)
     end
-    params.require(:sample).permit(:sample_type_id, :other_creators, { project_ids: [] },
-                              { data: sample_type_param_keys }, { creator_ids: [] },
+    params.require(:sample).permit(:sample_type_id, *creator_related_params, { project_ids: [] },
+                              { data: sample_type_param_keys },
                               { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                               discussion_links_attributes:[:id, :url, :label, :_destroy])
   end

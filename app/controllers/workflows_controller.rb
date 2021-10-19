@@ -314,11 +314,12 @@ class WorkflowsController < ApplicationController
 
   def workflow_params
     params.require(:workflow).permit(:title, :description, :workflow_class_id, # :metadata,
-                                     { project_ids: [] }, :license, :other_creators,
+                                     { project_ids: [] }, :license,
                                      { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                     { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
+                                     { assay_assets_attributes: [:assay_id] }, { scales: [] },
                                      { publication_ids: [] }, :internals, :maturity_level, :source_link_url,
-                                     discussion_links_attributes:[:id, :url, :label, :_destroy])
+                                     { discussion_links_attributes: [:id, :url, :label, :_destroy] },
+                                     *creator_related_params)
   end
 
   alias_method :asset_params, :workflow_params

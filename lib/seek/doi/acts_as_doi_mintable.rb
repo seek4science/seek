@@ -65,7 +65,7 @@ module Seek
               identifier: suggested_doi,
               title: title,
               description: description,
-              creators: related_people,
+              creators: respond_to?(:assets_creators) ? assets_creators : creators,
               year: Time.now.year.to_s,
               publisher: Seek::Config.project_name,
               resource_type: [datacite_resource_type, datacite_resource_type_general]

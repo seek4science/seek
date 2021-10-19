@@ -429,9 +429,11 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                          title: 'This workflow',
                          description: 'This is a test workflow for bioschema generation',
                          creators: [@person, creator2],
-                         other_creators: 'Fred Bloggs, Steve Smith',
                          contributor: @person,
                          license: 'APSL-2.0')
+
+      workflow.assets_creators.create!(given_name: 'Fred', family_name: 'Bloggs')
+      workflow.assets_creators.create!(given_name: 'Steve', family_name: 'Smith', orcid: 'https://orcid.org/0000-0002-1694-233X')
 
       workflow.internals = workflow.extractor.metadata[:internals]
 
@@ -462,7 +464,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                        '@id' => "##{ROCrate::Entity.format_id('Fred Bloggs')}",
                        'name' => 'Fred Bloggs' },
                      { '@type' => 'Person',
-                       '@id' => "##{ROCrate::Entity.format_id('Steve Smith')}",
+                       '@id' => "https://orcid.org/0000-0002-1694-233X",
                        'name' => 'Steve Smith' }],
                  'producer' =>
                     [{ '@type' => %w[Project Organization],

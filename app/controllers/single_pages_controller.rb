@@ -2,7 +2,6 @@ class SinglePagesController < ApplicationController
   include Seek::AssetsCommon
   before_action :set_up_instance_variable
   before_action :single_page_enabled
-  before_action :project_membership_required, only: [:render_item_detail]
   respond_to :html, :js
   
   def show
