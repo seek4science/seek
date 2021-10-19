@@ -102,6 +102,11 @@ class CustomMetadataAttributeTest < ActiveSupport::TestCase
     assert_equal 'Apple pie',attribute.label
     assert_equal 'fish_soup',attribute.title
 
+    attribute.label = nil
+    attribute.title = nil
+
+    assert_nil attribute.label
+
   end
 
 

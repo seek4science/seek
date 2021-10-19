@@ -13,6 +13,6 @@ class CustomMetadataAttribute < ApplicationRecord
   end
 
   def label
-    super || title.humanize
+    super || title&.humanize
   end
 end
