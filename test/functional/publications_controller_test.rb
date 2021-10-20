@@ -513,16 +513,10 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'should filter publications sort by published date for export' do
-    #FactoryGirl.create_list(:publication_with_author, 6)
-    Factory(:publication_with_author)
-    Factory(:publication_with_author)
-    Factory(:publication_with_author)
-    Factory(:publication_with_author)
-    Factory(:publication_with_author)
+    FactoryGirl.create_list(:publication_with_date, 6)
 
     # sort by published_date asc
     get :export, params: { query: { s: [{ name: :published_date, dir: :asc }] } }
-    pp response
     assert_response :success
     p = assigns(:publications)
     assert_operator p[0].published_date, :<=, p[1].published_date
