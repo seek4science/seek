@@ -513,8 +513,12 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'should filter publications sort by published date for export' do
-    FactoryGirl.create_list(:publication_with_author, 6)
-    #Factory(:publication)
+    #FactoryGirl.create_list(:publication_with_author, 6)
+    Factory(:publication_with_author)
+    Factory(:publication_with_author)
+    Factory(:publication_with_author)
+    Factory(:publication_with_author)
+    Factory(:publication_with_author)
 
     # sort by published_date asc
     get :export, params: { query: { s: [{ name: :published_date, dir: :asc }] } }
@@ -565,13 +569,13 @@ class PublicationsControllerTest < ActionController::TestCase
 
     publ = Factory(:publication)
     original_assay = Factory :assay, contributor: User.current_user.person, publications: [publ]
-
+    publ.assays = [original_assay]
     refute_nil publ.contributor
 
     assert publ.assays.include?(original_assay)
     assert original_assay.publications.include?(publ)
 
-    new_assay = assays(:metabolomics_assay)
+    new_assay = Factory :assay, contributor: User.current_user.person
     assert new_assay.publications.empty?
 
     put :update, params: { id: publ, publication: { abstract: publ.abstract, assay_ids: [new_assay.id.to_s] } }
