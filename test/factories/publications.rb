@@ -84,6 +84,16 @@ Factory.define(:publication_with_model_and_data_file, class: Publication) do |f|
   #f.association :data_files, factory: :data_file
 end
 
+Factory.define(:publication_with_date, class: Publication) do |f|
+  f.sequence(:title) { |n| "A Publication #{n}" }
+  f.journal 'Journal of Molecular Biology'
+  f.sequence( :published_date) { |n| "2017-10-#{n}" }
+  f.sequence(:pubmed_id) { |n| n }
+  f.projects { [Factory(:project)] } # max_project does not use sequence in the title so cannot be reused.
+  f.association :contributor, factory: :person
+  f.association :publication_type, factory: :journal
+end
+
 # PublicationAuthor
 Factory.define :publication_author do |f|
   f.sequence(:first_name) { |n| "Author#{n}" }
