@@ -1029,7 +1029,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert authors[0].key?('first_name'), 'missing author first name'
     assert authors[0].key?('last_name'), 'missing author last name'
     assert authors[0].key?('count'), 'missing author publication count'
-    assert_equal 'Author7', authors[0]['first_name']
+    assert authors[0]['first_name'].start_with?('Author')
     assert_equal 'Last', authors[0]['last_name']
     assert_nil authors[0]['person_id']
     assert_equal 1, authors[0]['count']
