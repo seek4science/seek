@@ -35,8 +35,12 @@
             <% if Seek::Config.imprint_enabled %>
                 | <%= link_to("Imprint", imprint_home_path) %>
             <% end %>
-            | <%= link_to 'Cite us', "https://fair-dom.org/cite", target: :_blank -%>
-            | <%= link_to 'Contact us', "https://fair-dom.org/contact.html", target: :_blank -%>
+            <% if !Seek::Config.cite_link.blank? %>
+              | <%= link_to "Cite us", Seek::Config.cite_link, :target => '_blank' -%>
+            <% end %>
+            <% if !Seek::Config.contact_link.blank? %>
+              | <%= link_to "Contact us", Seek::Config.contact_link, :target => '_blank' -%>
+            <% end %>
 
           </div>
           <div class="ft-info">

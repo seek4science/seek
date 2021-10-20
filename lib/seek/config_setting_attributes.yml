@@ -173,6 +173,9 @@ openbis_check_new_arrivals:
 default_license:
 about_page_enabled:
 about_page:
+about_link:
+cite_link:
+contact_link:
 funding_link:
 terms_enabled:
 terms_page:

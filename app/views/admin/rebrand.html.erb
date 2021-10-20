@@ -85,6 +85,8 @@
                                Below is an example.", :rows => 30) %>
   </div>
 
+  <h2>Information links</h2>
+
   <%= admin_checkbox_setting(:about_page_enabled, 1, Seek::Config.about_page_enabled,
                              '"About" page enabled', 'Add a custom "About" page link to the Help menu where users can find out more information about this SEEK instance.',
                              :onchange => toggle_appear_javascript('about_page_details')) %>
@@ -95,8 +97,18 @@
                                Below is an example.", :rows => 30) %>
   </div>
 
+
+  <%= admin_text_setting(:about_link, Seek::Config.about_link,
+                        "About link", "Optional external link providing additional information.",:placeholder=>"http://use-full-URLs.com") %>
+
+  <%= admin_text_setting(:cite_link, Seek::Config.cite_link,
+                        "Cite link", "Optional external link providing instructions on how to cite you.",:placeholder=>"http://use-full-URLs.com") %>
+
+  <%= admin_text_setting(:contact_link, Seek::Config.contact_link,
+                        "Contact link", "Optional external link providing contact information.",:placeholder=>"http://use-full-URLs.com") %>
+
   <%= admin_text_setting(:funding_link, Seek::Config.funding_link,
-                        "Funding link", "A external link pointing to the funding information.") %>
+                        "Funding link", "Optional external link providing funding information.",:placeholder=>"http://use-full-URLs.com") %>
 
   <%= submit_tag "Update", data: {disable_with: 'Updating...'}, :class => 'btn btn-primary' -%> or
   <%= cancel_button admin_path %>

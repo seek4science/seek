@@ -114,6 +114,10 @@ def load_seek_config_defaults!
   Settings.defaults[:about_page_enabled]= false
   Seek::Config.default :about_page, File.read(Rails.root.join('config/default_data/about_page_example'))
 
+  Seek::Config.default :about_link, ''
+  Seek::Config.default :cite_link, ''
+  Seek::Config.default :contact_link, ''
+
   Seek::Config.default :funding_link, ''
   
   #Terms and conditions page
