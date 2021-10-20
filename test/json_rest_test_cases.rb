@@ -60,8 +60,7 @@ module JsonRestTestCases
                             "#{m}_#{@controller.controller_name.singularize}.json")
       # parse such that backspace is eliminated and null turns to nil
       json_to_compare = JSON.parse(File.read(json_file))
-      puts JSON.pretty_generate(json_to_compare)
-      puts "<----->"
+
       edit_max_object(object) if m == 'max'
       edit_min_object(object) if m == 'min'
 
@@ -69,8 +68,7 @@ module JsonRestTestCases
 
       assert_response :success
       parsed_response = JSON.parse(@response.body)
-      puts JSON.pretty_generate(parsed_response)
-      # puts JSON.pretty_generate(parsed_response)
+      #puts JSON.pretty_generate(parsed_response)
       check_content_diff(json_to_compare, parsed_response)
     end
   end
