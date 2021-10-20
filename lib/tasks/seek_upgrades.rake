@@ -53,7 +53,6 @@ namespace :seek do
     create = 0
     disable_authorization_checks do
       Publication.find_each do |publication|
-        puts "Publication #{publication.title} with version #{publication.version.to_s} latest version is #{publication.latest_version.nil?.to_s}"
         # check if the publication has a version
         # then create one if missing
         if publication.latest_version.nil?
