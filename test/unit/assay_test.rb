@@ -229,7 +229,9 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'publications' do
-    assert_equal 1, assays(:assay_with_a_publication).publications.size
+    one_assay_with_publication = Factory :assay, contributor: User.current_user.person, publications: [Factory(:publication)]
+
+    assert_equal 1, one_assay_with_publication.publications.size
   end
 
   test 'can delete?' do
@@ -254,7 +256,8 @@ class AssayTest < ActiveSupport::TestCase
     assay = Factory(:assay, contributor: another_project_person)
     assert !assay.can_delete?(pal.user)
 
-    assert !assays(:assay_with_a_publication).can_delete?(users(:model_owner))
+    one_assay_with_publication = Factory :assay, contributor: User.current_user.person, publications: [Factory(:publication)]
+    assert !assays(one_assay_with_publication).can_delete?(users(:model_owner))
   end
 
   test 'assets' do

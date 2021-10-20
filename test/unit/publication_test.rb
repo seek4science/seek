@@ -176,8 +176,8 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test 'assay association' do
-    publication = publications(:pubmed_2)
-    assay = assays(:modelling_assay_with_data_and_relationship)
+    publication = Factory(:publication)
+    assay = Factory (:assay)
 
     assert_not_includes publication.assays, assay
 
@@ -255,16 +255,31 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test 'model and datafile association' do
-    publication = publications(:pubmed_2)
-    assert publication.models.include?(models(:teusink))
-    assert publication.data_files.include?(data_files(:picture))
+    publication = Factory(:publication)
+
+    model = Factory(:model)
+    datafile = Factory(:data_file)
+
+    assert_not_includes publication.models, model
+    assert_not_includes publication.data_files, datafile
+
+    assert_difference('Relationship.count', 2) do
+      User.with_current_user(model.contributor.user) { publication.associate(model) }
+      User.with_current_user(datafile.contributor.user) { publication.associate(datafile) }
+    end
+
+    assert_includes publication.models, model
+    assert_includes publication.data_files, datafile
   end
 
   test 'test uuid generated' do
-    x = publications(:one)
-    assert_nil x.attributes['uuid']
-    x.save
-    assert_not_nil x.attributes['uuid']
+    publ = Factory( :publication )
+    publ.uuid = nil
+    assert_nil publ.attributes['uuid']
+    #publ.save(validate: false)
+
+    publ.save
+    assert_not_nil publ.attributes['uuid']
   end
 
   test 'title trimmed' do
@@ -336,11 +351,11 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test "uuid doesn't change" do
-    x = publications(:one)
-    x.save
-    uuid = x.attributes['uuid']
-    x.save
-    assert_equal x.uuid, uuid
+    publ = Factory ( :publication )
+    publ.save
+    uuid = publ.attributes['uuid']
+    publ.save
+    assert_equal publ.uuid, uuid
   end
 
   test 'project_not_required' do

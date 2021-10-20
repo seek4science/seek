@@ -19,7 +19,7 @@ class EventTest < ActiveSupport::TestCase
 
   test 'publication association' do
     assert @event.publications.empty?
-    publication = publications(:one)
+    publication = Factory(:publication)
     @event.publications << publication
     assert @event.valid?
     assert @event.save

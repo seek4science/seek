@@ -199,13 +199,18 @@ class ProjectTest < ActiveSupport::TestCase
   end
 
   def test_publications_association
-    project = projects(:sysmo_project)
+    project = Factory(:project)
+    onePubl = Factory(:publication, projects: [project])
+    twoPubl = Factory(:publication, projects: [project])
+    threePubl = Factory(:publication, projects: [project])
+    Factory(:publication, projects: [project])
+    Factory(:publication, projects: [project])
 
     assert_equal 5, project.publications.count
 
-    assert project.publications.include?(publications(:one))
-    assert project.publications.include?(publications(:pubmed_2))
-    assert project.publications.include?(publications(:taverna_paper_pubmed))
+    assert project.publications.include?(onePubl)
+    assert project.publications.include?(twoPubl)
+    assert project.publications.include?(threePubl)
   end
 
   def test_can_be_edited_by
