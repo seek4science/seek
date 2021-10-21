@@ -23,7 +23,7 @@ class BaseSerializer < SimpleBaseSerializer
       @associated[name]
     else
       items = (object.class.name.include?('::Version') ? object.parent : object).get_related(name).authorized_for('view')
-      @associated[name] = items.empty? ? nil : items
+      @associated[name] = items.empty? ? [] : items
     end
   end
 
