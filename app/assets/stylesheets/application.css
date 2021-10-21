@@ -40,6 +40,7 @@
 *= require cytoscape_isa_graph
 *= require multi-step-wizard.css.erb
 *= require lightbox2
-*= require simplemde.min
+*= require simplemde-markdown-editor-1.11.2/simplemde.min
+*= require github-markdown-css/github-markdown
 *= require single_page
 */

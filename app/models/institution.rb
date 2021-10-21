@@ -3,6 +3,8 @@ class Institution < ApplicationRecord
   acts_as_yellow_pages
   title_trimmer
 
+  auto_strip_attributes :web_page
+
   validates :title, uniqueness: true
   validates :web_page, url: { allow_nil: true, allow_blank: true }
   validates :country, country: true

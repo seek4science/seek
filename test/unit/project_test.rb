@@ -433,7 +433,7 @@ class ProjectTest < ActiveSupport::TestCase
     assert_equal 'T', p.first_letter
   end
 
-  def test_valid
+  test 'validation' do
     p = projects(:one)
 
     p.web_page = nil
@@ -450,6 +450,11 @@ class ProjectTest < ActiveSupport::TestCase
 
     p.web_page = 'https://google.com'
     assert p.valid?
+
+    # gets stripped before validation
+    p.web_page = '   https://google.com   '
+    assert p.valid?
+    assert_equal 'https://google.com', p.web_page
 
     p.web_page = 'http://google.com/fred'
     assert p.valid?
@@ -474,6 +479,11 @@ class ProjectTest < ActiveSupport::TestCase
 
     p.wiki_page = 'https://google.com'
     assert p.valid?
+
+    # gets stripped before validation
+    p.wiki_page = '   https://google.com   '
+    assert p.valid?
+    assert_equal 'https://google.com', p.wiki_page
 
     p.wiki_page = 'http://google.com/fred'
     assert p.valid?
