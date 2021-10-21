@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "980191005",
+    "id": "980194972",
     "type": "publications",
     "attributes": {
       "policy": {
@@ -23,7 +23,7 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/publications/980191005?version=1"
+          "url": "http://localhost:3000/publications/980194972?version=1"
         }
       ],
       "version": 1,
@@ -47,7 +47,7 @@
       "booktitle": null,
       "publisher": null,
       "url": null,
-      "link_to_pub": "https://doi.org/10.5072/abcd",
+      "link_to_pub": "https://doi.org/10.5075/abcd",
       "publication_type": "Journal",
       "authors": [
 
@@ -62,7 +62,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039989122",
+            "id": "1040034824",
             "type": "people"
           }
         ]
@@ -70,7 +70,7 @@
       "people": {
         "data": [
           {
-            "id": "1039989122",
+            "id": "1040034824",
             "type": "people"
           }
         ]
@@ -78,7 +78,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022253314",
+            "id": "1022304213",
             "type": "projects"
           }
         ]
@@ -130,7 +130,7 @@
       }
     },
     "links": {
-      "self": "/publications/980191005?version=1"
+      "self": "/publications/980194972?version=1"
     },
     "meta": {
       "created": "2021-10-13T09:40:59.000Z",
