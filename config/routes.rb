@@ -121,6 +121,7 @@ SEEK::Application.routes.draw do
       get :registration_form
       get :edit_tag      
       post :update_home_settings
+      post :delete_carousel_form
       post :restart_server
       post :restart_delayed_job
       post :update_admins

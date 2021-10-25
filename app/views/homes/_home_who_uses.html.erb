@@ -18,27 +18,31 @@
   });
 </script>
 
-<% who_uses_content = YAML.load(File.read(File.join(Rails.root, 'config/home', 'who_uses.yml'))) %>
-
 <%= panel("Who is using it?", id: 'home_who_uses', body_options: { class: '' }) do %>
   <div id="home_who_uses_carousel" class="carousel slide" data-ride="carousel">
     <!-- Indicators: removed indicators as to not to obstruct the text -->
-    <!--<ol class="carousel-indicators">
-      <% who_uses_content.each_with_index  do |item, index| %>
-        <li data-target="#home_who_uses_carousel" data-slide-to="<%=index%>" <%= 'class="active"' if index==0 %>></li>
-      <% end %>
-    </ol>-->
+    <!--<ol class="carousel-indicators">-->
+    <!--  <% Seek::Config.home_carousel_image.each_with_index  do |item, index| %>-->
+    <!--    <li data-target="#home_who_uses_carousel" data-slide-to="<%=index%>" <%= 'class="active"' if index==0 %>></li>-->
+    <!--  <% end %>-->
+    <!--</ol>-->
 
     <!-- Wrapper for slides -->
     <div class="carousel-inner" role="listbox">
-      <% who_uses_content.each_with_index  do |item, index| %>
+
+      <% Seek::Config.home_carousel_image.each_with_index do |image_index, index| -%>
         <div class="item <%= 'active' if index==0 %>" style="text-align: center;">
           <div>
-            <img src="<%= item['logo'] %>" alt="<%= item['title'] %>" class="<%=index%>" style="width:auto;height:100px;">
+            <a href="<%= Seek::Config.home_carousel_url[index] %>">
+              <img src="<%= Avatar.find(image_index).public_asset_url %>"
+                alt="<%= Seek::Config.home_carousel_title[index] %> logo"
+                class="<%=index%>"
+                style="width:auto;height:100px;">
+            </a>
           </div>
-          <h3> <%= item['title'] %> </h3>
-          <p style="font-size: larger;"> <%= item['description'] %> </p>
-          <i> <%= item['author'] %> </i>
+          <h3> <%= Seek::Config.home_carousel_title[index] %> </h3>
+          <p style="font-size: larger;"> <%= Seek::Config.home_carousel_description[index] %> </p>
+          <i> <%= Seek::Config.home_carousel_author[index] %> </i>
         </div>
       <% end %>
     </div>

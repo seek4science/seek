@@ -163,6 +163,7 @@ class AdminController < ApplicationController
     Seek::Config.home_show_my_items = string_to_boolean params[:home_show_my_items]
     Seek::Config.home_show_who_uses = string_to_boolean params[:home_show_who_uses]
     Seek::Config.home_show_integrations = string_to_boolean params[:home_show_integrations]
+    add_carousel_form
 
     begin
       Seek::FeedReader.clear_cache
@@ -494,6 +495,64 @@ class AdminController < ApplicationController
         flash[:error] = 'There was an error updating the header image logo! There could be a problem with the image file. Please try again or try another image.'
       end
     end
+  end
+
+  def add_carousel_form
+    # Only add it if ALL carousel inputs are filled
+    if (!params[:home_carousel_image].blank?&&
+        !params[:home_carousel_title].blank?&&
+        !params[:home_carousel_author].blank?&&
+        !params[:home_carousel_url].blank?&&
+        !params[:home_carousel_description].blank?)
+      file_io = params[:home_carousel_image]
+      avatar = Avatar.new(original_filename: file_io.original_filename, image_file: file_io, skip_owner_validation: true)
+      if avatar.save
+        if Seek::Config.home_carousel_image.blank?
+          # Initialise configuration arrays
+          Seek::Config.home_carousel_image = Array.new
+          Seek::Config.home_carousel_title = Array.new
+          Seek::Config.home_carousel_author = Array.new
+          Seek::Config.home_carousel_url = Array.new
+          Seek::Config.home_carousel_description = Array.new
+        end
+        # Array modification in place doesn't work on Seek::Config arrays, explicit assignement is needed
+        Seek::Config.home_carousel_image = Seek::Config.home_carousel_image << avatar.id
+        Seek::Config.home_carousel_title = Seek::Config.home_carousel_title << params[:home_carousel_title]
+        Seek::Config.home_carousel_author = Seek::Config.home_carousel_author << params[:home_carousel_author]
+        Seek::Config.home_carousel_url = Seek::Config.home_carousel_url << params[:home_carousel_url]
+        Seek::Config.home_carousel_description = Seek::Config.home_carousel_description << params[:home_carousel_description]
+      else
+        flash[:error] = 'There was an error adding an image to the carousel! There could be a problem with the image file. Please try again or try another image.'
+      end
+    else
+      flash[:error] = 'Information was missing for the carousel configuration, no changes has been made to it.'
+    end
+  end
+
+  # Removes the carousel item with the given image id
+  def delete_carousel_form
+    carousel_index = Integer(params[:carousel_index], exception: false)
+    if carousel_index && request.post?
+      image_id = Seek::Config.home_carousel_image.delete_at(carousel_index)
+      Seek::Config.home_carousel_image = array_remove_at(Seek::Config.home_carousel_image,carousel_index)
+      Seek::Config.home_carousel_title = array_remove_at(Seek::Config.home_carousel_title,carousel_index)
+      Seek::Config.home_carousel_author = array_remove_at(Seek::Config.home_carousel_author,carousel_index)
+      Seek::Config.home_carousel_url = array_remove_at(Seek::Config.home_carousel_url,carousel_index)
+      Seek::Config.home_carousel_description = array_remove_at(Seek::Config.home_carousel_description,carousel_index)
+      Avatar.find(image_id).delete
+      flash.now[:notice] = "Carousel number #{carousel_index} deleted"
+    else
+      flash.now[:error] = 'Must be a post'
+    end
+    redirect_to :home_settings_admin
+  end
+
+  ## Helper function to retrieve arrays removing a given index
+  def array_remove_at(array, index)
+    if index<0 || index>=array.length
+      return array
+    end
+    return array.slice(0,index) + array.slice(index+1,array.length)
   end
 
   # this destroys any failed Delayed::Jobs
