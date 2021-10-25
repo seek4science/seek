@@ -44,7 +44,7 @@ troublesome and is not covered here.
 
 ## Installing packages
 
-These are the packages required to run SEEK with Ubuntu 18.04 (Desktop or
+These are the packages required to run SEEK with Ubuntu 20.04 (Desktop or
 Server). For other distributions or versions please visit our [Other
 Distributions](other-distributions.html) notes.
 
