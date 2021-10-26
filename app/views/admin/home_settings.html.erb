@@ -75,28 +75,30 @@
                             :onchange => toggle_appear_javascript('home_show_who_uses_details')) %>
   <div id="home_show_who_uses_details" class="additional_settings" style="<%= show_or_hide_block Seek::Config.home_show_who_uses -%>">
     <%# For each item in the array, generate a new output %>
-    <b> Existing carousel slides</b>
-    <div class="cards">
-      <% Seek::Config.home_carousel_image.each_with_index do |image_index, index| -%>
-        <div class="card">
-          <div class="panel panel-default">
-            <div class="panel-heading">
-              <%= Seek::Config.home_carousel_title[index] %>
-              <%= link_to image('destroy', title: 'Delete'),{action: :delete_carousel_form,carousel_index: index}, data: { confirm: 'Are you sure?' }, method: :post -%>
-            </div>
-            <div class="panel-body">
-              <img src='<%= Avatar.find(image_index).public_asset_url %>' alt="<%= Seek::Config.home_carousel_title[index] %> logo">
-              <ul>
-                <li>Title: <%= Seek::Config.home_carousel_title[index] %> </li>
-                <li>Author: <%= Seek::Config.home_carousel_author[index] %> </li>
-                <li>Url: <%= Seek::Config.home_carousel_url[index] %> </li>
-                <li>Description: <%= Seek::Config.home_carousel_description[index] %> </li>
-              </ul>
+    <% if !Seek::Config.home_carousel_image.blank? %>
+      <b> Existing carousel slides</b>
+      <div class="cards">
+        <% Seek::Config.home_carousel_image.each_with_index do |image_index, index| -%>
+          <div class="card">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <%= Seek::Config.home_carousel_title[index] %>
+                <%= link_to image('destroy', title: 'Delete'),{action: :delete_carousel_form,carousel_index: index}, data: { confirm: 'Are you sure?' }, method: :post -%>
+              </div>
+              <div class="panel-body">
+                <img src='<%= Avatar.find(image_index).public_asset_url %>' alt="<%= Seek::Config.home_carousel_title[index] %> logo">
+                <ul>
+                  <li>Title: <%= Seek::Config.home_carousel_title[index] %> </li>
+                  <li>Author: <%= Seek::Config.home_carousel_author[index] %> </li>
+                  <li>Url: <%= Seek::Config.home_carousel_url[index] %> </li>
+                  <li>Description: <%= Seek::Config.home_carousel_description[index] %> </li>
+                </ul>
+              </div>
             </div>
           </div>
-        </div>
-      <% end %>
-    </div>
+        <% end %>
+      </div>
+    <% end %>
 
     <%= admin_file_setting(:home_carousel_image,
                           'Upload a header logo image file', 'The file for the header logo image. It should be a valid image file, such as JPEG or PNG.') %>
