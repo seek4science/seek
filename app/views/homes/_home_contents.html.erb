@@ -21,7 +21,9 @@
 <%# If not logged in, home_description takes entire row, otherwise, col-9 (2/3rds) %>
 <% if !logged_in_and_registered? %>
   <%= render :partial=>"home_description_box" -%>
-  <%= render :partial=>"home_features" -%>
+  <% if Seek::Config.home_show_features%>
+      <%= render :partial=>"home_features" -%>
+  <% end %>
 <% end %>
 
 <div class="row">
