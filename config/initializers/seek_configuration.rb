@@ -209,6 +209,7 @@ def load_seek_config_defaults!
   Seek::Config.default :home_show_quickstart,true
   Seek::Config.default :home_show_my_items,true
   Seek::Config.default :home_show_who_uses,true
+  Seek::Config.default :home_explore_projects,true
   Seek::Config.default :home_show_integrations,true
 
   # omniauth settings and behaviour

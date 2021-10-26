@@ -111,8 +111,13 @@
     <%= admin_text_setting(:home_carousel_description, "",
                           "Description text", "A text used as description") %>
   </div>
+
+  
+  <%= admin_checkbox_setting(:home_explore_projects, 1, Seek::Config.home_explore_projects,
+                              "Explore projects enabled", "Whether the 'latest additions' and explore projects panel are displayed.") %>
+
   <%= admin_checkbox_setting(:home_show_integrations, 1, Seek::Config.home_show_integrations,
-                              "Integrations enabled", "Whether the Integrations panel is displayed.") %>                 
+                              "Integrations enabled", "Whether the Integrations panel is displayed.") %>
 
   <%= submit_tag "Update", data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' -%> or
   <%= cancel_button admin_path -%>

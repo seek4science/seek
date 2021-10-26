@@ -37,7 +37,9 @@
     <% if !logged_in_and_registered? && Seek::Config.home_show_who_uses %>
       <%= render :partial=>"home_who_uses" -%>
     <% end %>
-    <%= render :partial=>"home_explore_projects" -%>
+    <% if Seek::Config.home_explore_projects %>
+      <%= render :partial=>"home_explore_projects" -%>
+    <% end %>
     <% if !logged_in_and_registered? && Seek::Config.home_show_integrations %>
       <%= render :partial=>"home_integrations" -%>
     <% end %>

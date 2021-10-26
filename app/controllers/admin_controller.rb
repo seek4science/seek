@@ -162,6 +162,7 @@ class AdminController < ApplicationController
     Seek::Config.home_show_quickstart = string_to_boolean params[:home_show_quickstart]
     Seek::Config.home_show_my_items = string_to_boolean params[:home_show_my_items]
     Seek::Config.home_show_who_uses = string_to_boolean params[:home_show_who_uses]
+    Seek::Config.home_explore_projects = string_to_boolean params[:home_explore_projects]
     Seek::Config.home_show_integrations = string_to_boolean params[:home_show_integrations]
     add_carousel_form
 
