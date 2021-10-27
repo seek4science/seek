@@ -508,25 +508,19 @@ class AdminController < ApplicationController
       file_io = params[:home_carousel_image]
       avatar = Avatar.new(original_filename: file_io.original_filename, image_file: file_io, skip_owner_validation: true)
       if avatar.save
-        if Seek::Config.home_carousel_image.blank?
-          # Initialise configuration arrays
-          Seek::Config.home_carousel_image = Array.new
-          Seek::Config.home_carousel_title = Array.new
-          Seek::Config.home_carousel_author = Array.new
-          Seek::Config.home_carousel_url = Array.new
-          Seek::Config.home_carousel_description = Array.new
+        if Seek::Config.home_carousel.blank?
+          Seek::Config.home_carousel = Array.new
         end
-        # Array modification in place doesn't work on Seek::Config arrays, explicit assignement is needed
-        Seek::Config.home_carousel_image = Seek::Config.home_carousel_image << avatar.id
-        Seek::Config.home_carousel_title = Seek::Config.home_carousel_title << params[:home_carousel_title]
-        Seek::Config.home_carousel_author = Seek::Config.home_carousel_author << params[:home_carousel_author]
-        Seek::Config.home_carousel_url = Seek::Config.home_carousel_url << params[:home_carousel_url]
-        Seek::Config.home_carousel_description = Seek::Config.home_carousel_description << params[:home_carousel_description]
+        # build new data to store
+        data = {:image => avatar.id, :title => params[:home_carousel_title],
+          :author => params[:home_carousel_author], :url => params[:home_carousel_url],
+          :description => params[:home_carousel_description]}
+        Seek::Config.home_carousel = Seek::Config.home_carousel << data
       else
         flash[:error] = 'There was an error adding an image to the carousel! There could be a problem with the image file. Please try again or try another image.'
       end
-    else
-      flash[:error] = 'Information was missing for the carousel configuration, no changes has been made to it.'
+    # else
+    #   flash[:error] = 'Information was missing for the carousel configuration, no changes has been made to it.'
     end
   end
 
@@ -534,12 +528,8 @@ class AdminController < ApplicationController
   def delete_carousel_form
     carousel_index = Integer(params[:carousel_index], exception: false)
     if carousel_index && request.post?
-      image_id = Seek::Config.home_carousel_image.delete_at(carousel_index)
-      Seek::Config.home_carousel_image = array_remove_at(Seek::Config.home_carousel_image,carousel_index)
-      Seek::Config.home_carousel_title = array_remove_at(Seek::Config.home_carousel_title,carousel_index)
-      Seek::Config.home_carousel_author = array_remove_at(Seek::Config.home_carousel_author,carousel_index)
-      Seek::Config.home_carousel_url = array_remove_at(Seek::Config.home_carousel_url,carousel_index)
-      Seek::Config.home_carousel_description = array_remove_at(Seek::Config.home_carousel_description,carousel_index)
+      image_id = Seek::Config.home_carousel[carousel_index][:image]
+      Seek::Config.home_carousel = array_remove_at(Seek::Config.home_carousel,carousel_index)
       Avatar.find(image_id).delete
       flash.now[:notice] = "Carousel number #{carousel_index} deleted"
     else

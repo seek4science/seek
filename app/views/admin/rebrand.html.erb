@@ -85,6 +85,9 @@
                                Below is an example.", :rows => 30) %>
   </div>
 
+  <%= admin_text_setting(:funding_link, Seek::Config.funding_link,
+                        "Funding link", "Optional external link providing funding information.",:placeholder=>"http://use-full-URLs.com") %>
+
   <h2>Information links</h2>
 
   <%= admin_checkbox_setting(:about_page_enabled, 1, Seek::Config.about_page_enabled,
@@ -106,9 +109,6 @@
 
   <%= admin_text_setting(:contact_link, Seek::Config.contact_link,
                         "Contact link", "Optional external link providing contact information.",:placeholder=>"http://use-full-URLs.com") %>
-
-  <%= admin_text_setting(:funding_link, Seek::Config.funding_link,
-                        "Funding link", "Optional external link providing funding information.",:placeholder=>"http://use-full-URLs.com") %>
 
   <%= submit_tag "Update", data: {disable_with: 'Updating...'}, :class => 'btn btn-primary' -%> or
   <%= cancel_button admin_path %>

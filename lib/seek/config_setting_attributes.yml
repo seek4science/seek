@@ -161,11 +161,7 @@ home_show_my_items:
 home_show_who_uses:
 home_explore_projects:
 home_show_integrations:
-home_carousel_image:
-home_carousel_title:
-home_carousel_author:
-home_carousel_url:
-home_carousel_description:
+home_carousel:
 permissions_popup:
   convert: :to_i
 auth_lookup_update_batch_size:

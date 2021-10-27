@@ -75,23 +75,23 @@
                             :onchange => toggle_appear_javascript('home_show_who_uses_details')) %>
   <div id="home_show_who_uses_details" class="additional_settings" style="<%= show_or_hide_block Seek::Config.home_show_who_uses -%>">
     <%# For each item in the array, generate a new output %>
-    <% if !Seek::Config.home_carousel_image.blank? %>
+    <% if !Seek::Config.home_carousel.blank? %>
       <b> Existing carousel slides</b>
       <div class="cards">
-        <% Seek::Config.home_carousel_image.each_with_index do |image_index, index| -%>
+        <% Seek::Config.home_carousel.each_with_index do |carousel_item, index| -%>
           <div class="card">
             <div class="panel panel-default">
               <div class="panel-heading">
-                <%= Seek::Config.home_carousel_title[index] %>
+                <%= carousel_item[:title] %>
                 <%= link_to image('destroy', title: 'Delete'),{action: :delete_carousel_form,carousel_index: index}, data: { confirm: 'Are you sure?' }, method: :post -%>
               </div>
               <div class="panel-body">
-                <img src='<%= Avatar.find(image_index).public_asset_url %>' alt="<%= Seek::Config.home_carousel_title[index] %> logo">
+                <img src='<%= Avatar.find(carousel_item[:image]).public_asset_url %>' alt="<%= carousel_item[:title] %> logo">
                 <ul>
-                  <li>Title: <%= Seek::Config.home_carousel_title[index] %> </li>
-                  <li>Author: <%= Seek::Config.home_carousel_author[index] %> </li>
-                  <li>Url: <%= Seek::Config.home_carousel_url[index] %> </li>
-                  <li>Description: <%= Seek::Config.home_carousel_description[index] %> </li>
+                  <li>Title: <%= carousel_item[:title] %> </li>
+                  <li>Author: <%= carousel_item[:author] %> </li>
+                  <li>Url: <%= carousel_item[:url] %> </li>
+                  <li>Description: <%= carousel_item[:description] %> </li>
                 </ul>
               </div>
             </div>
@@ -107,7 +107,7 @@
     <%= admin_text_setting(:home_carousel_author, "",
                           "Author text", "A text used as the author") %>
     <%= admin_text_setting(:home_carousel_url, "",
-                          "Url text", "A text used as url") %>
+                          "Url text", "A text used as url",:placeholder=>"http://use-full-URLs.com") %>
     <%= admin_text_setting(:home_carousel_description, "",
                           "Description text", "A text used as description") %>
   </div>
