@@ -6,7 +6,7 @@
 
 <%= index_title(WorkflowClass.model_name.human.pluralize) %>
 
-<h1>Supported Workflow Types</h1>
+<h1>Core Workflow Types</h1>
 <%= render partial: 'workflow_class_table', locals: { workflow_classes: @workflow_classes.extractable } %>
 
 <h1>User-added Workflow Types</h1>
