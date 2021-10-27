@@ -86,6 +86,14 @@ module WorkflowExtraction
       crate.main_workflow = ROCrate::Workflow.new(crate, StringIO.new(file), main_workflow_path, content_size: file.length)
       if diagram_path && git_version.file_exists?(diagram_path)
         crate.main_workflow.diagram = ROCrate::WorkflowDiagram.new(crate, StringIO.new(diagram_blob.file_contents), diagram_path)
+      else # Was the diagram generated?
+        begin
+          d = diagram
+          if d&.exists?
+            crate.main_workflow.diagram = ROCrate::WorkflowDiagram.new(crate, d.path, d.filename, { contentSize: d.size })
+          end
+        rescue WorkflowDiagram::UnsupportedFormat
+        end
       end
       if abstract_cwl_path && git_version.file_exists?(abstract_cwl_path)
         crate.main_workflow.cwl_description = ROCrate::WorkflowDescription.new(crate, StringIO.new(abstract_cwl_blob.file_contents), abstract_cwl_path)

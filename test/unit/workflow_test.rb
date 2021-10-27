@@ -478,4 +478,27 @@ class WorkflowTest < ActiveSupport::TestCase
     assert new_diagram.size < 50000
     assert_not_equal original_sha1sum, new_diagram.sha1sum
   end
+
+  test 'generates RO-Crate for workflow with auto-generated diagram' do
+    workflow = Factory(:annotationless_local_git_workflow,
+                       workflow_class: WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class))
+
+    v = workflow.git_version
+    disable_authorization_checks do
+      v.main_workflow_path = 'Concat_two_files.cwl'
+      v.save!
+    end
+
+    v = workflow.git_version
+    original_diagram = v.diagram
+    assert original_diagram
+    assert_nil v.diagram_path, 'Diagram path should not be set, it is generated.'
+
+    assert_nothing_raised do
+      crate = workflow.ro_crate
+      assert crate.main_workflow
+      assert crate.main_workflow_diagram
+      assert_equal original_diagram.size, crate.main_workflow_diagram.content_size
+    end
+  end
 end
