@@ -16,7 +16,7 @@ module Seek
                         content_type: :encodingFormat,
                         subject_of: :subjectOf,
                         part_of: :isPartOf,
-			                  previous_version_url: :isBasedOn
+			 previous_version_url: :isBasedOn	
 
         def content_type
           return unless resource.respond_to?(:content_blob) && resource.content_blob
@@ -36,18 +36,18 @@ module Seek
           others = others.collect { |name| { "@type": 'Person',"@id": "##{ROCrate::Entity.format_id(name)}", "name": name } }
           all = mini_definitions(assets_creators) + others
           return if all.empty?
+
           all
         end
 
 
-	      def previous_version_url
+        def previous_version_url
           return unless respond_to?(:previous_version) && resource.previous_version
 
           resource_url(resource.previous_version)
         end
+
       end
     end
   end
 end
-
-

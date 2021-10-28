@@ -11,6 +11,8 @@ class SampleControlledVocab < ApplicationRecord
   has_many :sample_types, through: :sample_attributes
   has_many :samples, through: :sample_types
 
+  auto_strip_attributes :ols_root_term_uri
+
   validates :title, presence: true, uniqueness: true
   validates :ols_root_term_uri, url: { allow_blank: true }
 

@@ -386,6 +386,7 @@ ActiveRecord::Schema.define(version: 2021_10_27_103152) do
     t.string "title"
     t.bigint "sample_controlled_vocab_id"
     t.text "description"
+    t.string "label"
     t.index ["custom_metadata_type_id"], name: "index_custom_metadata_attributes_on_custom_metadata_type_id"
     t.index ["sample_attribute_type_id"], name: "index_custom_metadata_attributes_on_sample_attribute_type_id"
     t.index ["sample_controlled_vocab_id"], name: "index_custom_metadata_attributes_on_sample_controlled_vocab_id"

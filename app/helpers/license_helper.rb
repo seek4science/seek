@@ -3,8 +3,6 @@ require 'seek/license'
 
 module LicenseHelper
   def license_select(name, selected = nil, opts = {})
-    puts opts[:multiple]
-    puts opts
     select_tag(name, options_for_select(license_options(opts), selected), opts)
   end
 
