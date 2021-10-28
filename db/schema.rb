@@ -1845,6 +1845,7 @@ ActiveRecord::Schema.define(version: 2021_09_29_111617) do
     t.text "other_creators"
     t.string "deleted_contributor"
     t.integer "position"
+    t.integer "sop_id"
   end
 
   create_table "study_auth_lookup",  force: :cascade do |t|
