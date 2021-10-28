@@ -127,7 +127,12 @@ module Seek
 
         if i.is_a?(Hash)
           i = i.flat_map do |id, s|
-            s.is_a?(String) ? { 'id' => id, 'source' => s } : s
+            if s.is_a?(String)
+              { 'id' => id, 'source' => s }
+            else
+              s['id'] ||= id
+              s
+            end
           end
         end
 
