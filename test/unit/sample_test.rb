@@ -255,12 +255,40 @@ class SampleTest < ActiveSupport::TestCase
     disable_authorization_checks { sample.save! }
     refute sample.get_attribute_value(:bool)
 
+    sample.update_attributes(data: { the_title: 'fish', bool: '' })
+    assert sample.valid?
+    sample.update_attributes(data: { the_title: 'fish', bool: nil })
+    assert sample.valid?
+    disable_authorization_checks { sample.save! }
+    assert_nil sample.get_attribute_value(:bool)
+
     # not valid
     sample.update_attributes(data: { the_title: 'fish', bool: 'fish' })
     refute sample.valid?
     sample.set_attribute_value(:bool, 'true')
     assert sample.valid?
     sample.set_attribute_value(:bool, 'fish')
+    refute sample.valid?
+
+
+    # with required attribute
+    sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
+    sample_type = Factory(:simple_sample_type)
+    sample_type.sample_attributes << Factory(:sample_attribute, title: 'bool', sample_attribute_type: Factory(:boolean_sample_attribute_type), required: true, is_title: false, sample_type: sample_type)
+    sample_type.save!
+    sample.sample_type = sample_type
+
+    sample.update_attributes(data: { the_title: 'fish', bool: 'true' })
+    assert sample.valid?
+    sample.update_attributes(data: { the_title: 'fish', bool: true })
+    assert sample.valid?
+    sample.update_attributes(data: { the_title: 'fish', bool: false })
+    assert sample.valid?
+    sample.update_attributes(data: { the_title: 'fish', bool: 'false' })
+    assert sample.valid?
+    sample.update_attributes(data: { the_title: 'fish', bool: nil })
+    refute sample.valid?
+    sample.update_attributes(data: { the_title: 'fish', bool: '' })
     refute sample.valid?
   end
 

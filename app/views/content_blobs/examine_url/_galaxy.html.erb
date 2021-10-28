@@ -1,0 +1,11 @@
+<div class="remote-content-preview-result">
+  <h4><%= image_tag('avatars/workflow_types/avatar-galaxy.png', class: 'github-logo') %> Galaxy Workflow</h4>
+  <strong>Instance:</strong> <%= link_to @info[:galaxy_host].to_s, @info[:galaxy_host].to_s, target: :_blank %><br/>
+  <strong>Workflow ID:</strong> <%= content_tag(:code, @info[:workflow_id]) %>
+  <%= link_to(@info[:display_url], class: 'btn btn-default btn-xs', target: :_blank) do %>
+  View <span class="glyphicon glyphicon-new-window" aria-hidden="true"></span>
+  <% end %>
+  <hr/>
+
+  <%= render partial: 'content_blobs/examine_url/file_metadata' %>
+</div>

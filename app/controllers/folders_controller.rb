@@ -23,7 +23,8 @@ class FoldersController < ApplicationController
   def destroy
     respond_to do |format|
       flash[:error]="Unable to delete this folder" if !@folder.destroy
-      format.html { redirect_to(:project_folders) }
+      format.html {  Seek::Config.project_single_page_enabled ? redirect_to(single_page_path(@project))
+         : redirect_to(:project_folders) }
     end
   end
 
@@ -110,7 +111,7 @@ class FoldersController < ApplicationController
   end
 
   def browser_enabled
-    unless Seek::Config.project_browser_enabled
+    unless Seek::Config.project_browser_enabled || Seek::Config.project_single_page_enabled
       flash[:error]="Not available"
       redirect_to @project
     end

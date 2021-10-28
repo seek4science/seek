@@ -42,6 +42,7 @@ module Seek
         validates :title, presence: true
         validates :title, length: { maximum: 255 }, unless: -> { is_a?(Publication) }
         validates :description, length: { maximum: 65_535 }, if: -> { respond_to?(:description) }
+        validates :license, license:true, allow_blank: true, if: -> { respond_to?(:license) }
 
 
         include Seek::Stats::ActivityCounts
@@ -76,6 +77,10 @@ module Seek
           }
         end
         with_contributors.to_json
+      end
+
+      def user_creatable?
+        feature_enabled?
       end
 
       def can_create?

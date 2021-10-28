@@ -25,32 +25,33 @@
               <span class="none_text">Not known</span>
           <% end -%>
         </p>
-        <%= render :partial=>"areas_of_expertise", :locals => {:person=>@person} %>
+
         <p>
           <b>ORCID:</b>
           <%= orcid_identifier(@person) -%>
         </p>
+        <% if @person.registered? %>
+          <p>
+            <b>Joined:</b>
+            <%= date_as_string(@person.user.created_at, admin_or_me) %>
+          </p>
+        <% end %>
+
       </div>
-      <% if admin_or_me %>
-          <div class="col-md-6">
-
-            <p>
-              <span class='none_text'>Only shown to you and administrators</span>
-            </p>
-
-            <% if !@person.user.nil? && @person.user.login %>
-                <p>
-                  <b>Login name:</b>
-                  <%= h @person.user.login %>
-                </p>
-            <% end %>
-            <p>
-              <b>Joined:</b>
-              <%= @person.registered? ? date_as_string(@person.user.created_at, true) : 'This person has not yet registered' -%>
-            </p>
-
-          </div>
-      <% end %>
+      <div class="col-md-6">
+        <%= render :partial=>"areas_of_expertise", :locals => {:person=>@person} %>
+        <% if admin_or_me %>
+              <% if !@person.user.nil? && @person.user.login %>
+                  <p>
+                    <span class='none_text'>Only shown to you and administrators</span>
+                  </p>
+                  <p>
+                    <b>Login name:</b>
+                    <%= h @person.user.login %>
+                  </p>
+              <% end %>
+        <% end %>
+      </div>
     </div>
 
   </div>

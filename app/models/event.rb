@@ -24,6 +24,18 @@ class Event < ApplicationRecord
   # load the configuration for the pagination
   grouped_pagination
 
+  auto_strip_attributes :url
+
+  validates_presence_of :title
+  validates :title, length: { maximum: 255 }
+  validates :description, length: { maximum: 65_535 }
+  validates_presence_of :start_date
+
+  # validates_is_url_string :url
+  validates :url, url: {allow_nil: true, allow_blank: true}
+
+  validates :country, country:true, allow_blank: true
+
   validate :validate_data_files
   def validate_data_files
     df = data_files.to_a
@@ -34,18 +46,6 @@ class Event < ApplicationRecord
   def validate_end_date
     errors.add(:end_date, 'is before start date.') unless end_date.nil? || start_date.nil? || end_date >= start_date
   end
-
-  validates_presence_of :title
-  validates :title, length: { maximum: 255 }
-
-  validates :description, length: { maximum: 65_535 }
-
-  validates_presence_of :start_date
-
-  # validates_is_url_string :url
-  validates :url, url: {allow_nil: true, allow_blank: true}
-
-  validates :country, country:true, allow_blank: true
 
   def show_contributor_avatars?
     false
@@ -59,7 +59,6 @@ class Event < ApplicationRecord
     columns_default + ['address','url','title']
   end
 
-  # defines that this is a user_creatable object type, and appears in the "New Object" gadget
   def self.user_creatable?
     Seek::Config.events_enabled
   end

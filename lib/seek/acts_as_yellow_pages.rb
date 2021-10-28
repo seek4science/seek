@@ -52,10 +52,6 @@ module Seek #:nodoc:
     end
 
     module SingletonMethods
-      # defines that this is a user_creatable object type, and appears in the "New Object" gadget
-      def user_creatable?
-        false
-      end
     end
 
     module InstanceMethods

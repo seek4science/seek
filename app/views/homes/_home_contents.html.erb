@@ -51,6 +51,22 @@
     <% end %>
     <%= render :partial=>"gadgets/announcements_gadget" if show_announcements? %>
     <%= home_news_feeds %>
+
+    <% if Seek::Config.workflows_enabled && Seek::Config.workflow_class_list_enabled %>
+      <div id="workflow-class-list">
+        <% cache do -%>
+          <%= render partial: 'gadgets/workflow_class_gadget' %>
+        <% end -%>
+      </div>
+    <% end %>
+
+    <% if Seek::Config.tagging_enabled && Seek::Config.tag_cloud_enabled %>
+        <div id="sidebar_tag_cloud">
+          <% cache 'sidebar_tag_cloud', skip_digest: true do -%>
+              <%= render :partial=>"gadgets/tag_cloud_gadget" %>
+          <% end -%>
+        </div>
+    <% end %>
   </div>
 </div>
 <br>

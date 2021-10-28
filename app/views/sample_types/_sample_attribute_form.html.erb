@@ -89,18 +89,17 @@
 
   <td>
     <% if allow_attribute_removal %>
+      <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', autocomplete: 'off' %>
       <div class="btn-group" data-toggle="buttons">
-        <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', autocomplete: 'off' %>
         <label class="btn btn-danger">
           Remove
           <%= check_box_tag "#{field_name_prefix}[_destroy]", '1', false,
                             class: 'destroy-attribute', autocomplete: 'off',id:"#{field_name_prefix}-checkbox[_destroy]" %>
         </label>
       </div>
-        <% else %>
-        <div>&nbsp;</div>
+    <% else %>
+      <div>&nbsp;</div>
     <% end %>
-
   </td>
 
 

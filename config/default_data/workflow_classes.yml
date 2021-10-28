@@ -1,24 +1,35 @@
 cwl_workflow_class:
-  id: 1
   title: Common Workflow Language
-  key: CWL
+  key: cwl
+  extractor: CWL
+  alternate_name: CWL
+  identifier: https://w3id.org/cwl/v1.0/
+  url: https://www.commonwl.org/
 
 galaxy_workflow_class:
-  id: 2
   title: Galaxy
-  key: Galaxy
+  key: galaxy
+  extractor: Galaxy
+  identifier: https://galaxyproject.org/
+  url: https://galaxyproject.org/
 
 knime_workflow_class:
-  id: 3
   title: KNIME
-  key: KNIME
+  key: knime
+  extractor: KNIME
+  identifier: https://www.knime.com/
+  url: https://www.knime.com/
 
 nextflow_class:
-  id: 5
   title: Nextflow
-  key: Nextflow
+  key: nextflow
+  extractor: Nextflow
+  identifier: https://www.nextflow.io/
+  url: https://www.nextflow.io/
 
 snakemake_class:
-  id: 6
   title: Snakemake
-  key: Snakemake
+  key: snakemake
+  extractor: Snakemake
+  identifier: https://doi.org/10.1093/bioinformatics/bts480
+  url: https://snakemake.readthedocs.io

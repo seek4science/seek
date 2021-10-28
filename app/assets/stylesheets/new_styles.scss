@@ -412,7 +412,7 @@ div.isa_graph {
 a.remove-association {
   text-decoration: none;
   vertical-align: middle;
-  color: $brand-danger;
+  color: $brand-danger !important;
   &:hover {
     text-decoration: none;
   }
@@ -1016,10 +1016,6 @@ img.github-logo {
   max-width: 100%;
 }
 
-.list_item_content .maturity-level {
-  font-size: 100%;
-}
-
 ul.list.collapsed li.hidden-item {
   display: none;
 }
@@ -1077,3 +1073,52 @@ span.disabled {
 .citation-box {
   overflow-x: auto;
 }
+
+a.orcid-link {
+  background-image: url(image-path('logos/orcid_16x16.png'));
+  background-repeat: no-repeat;
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  vertical-align: text-top;
+}
+
+#author-form {
+  .author-form-search {
+    display: inline-block;
+    .bootstrap-tagsinput {
+      width: 20em;
+    }
+  }
+
+  .assets-creator-list {
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    padding: 10px 0;
+    margin: 10px 0;
+
+    .author {
+      padding: 3px;
+      border-radius: 4px;
+      &.ui-sortable-helper {
+        background-color: $hover-highlight;
+        opacity: 0.7;
+      }
+    }
+  }
+}
+  
+.seek-description {
+  background-color: #fcfcfc;
+  border: 1px solid #e3e3e3;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+
+.markdown-body {
+  padding: 15px;
+  min-height: 20px;
+  margin-bottom: 20px;
+  font-size: inherit !important;
+}  
+

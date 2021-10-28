@@ -3,6 +3,8 @@ module FancyMultiselectHelper
     # override default values with options passed in to the method
     options.reverse_merge! default_fancy_multi_select_options(association, object, options)
 
+    return if Seek::Config.respond_to?("#{association}_enabled") && !Seek::Config.send("#{association}_enabled")
+
     options[:selected] ||= object.send(association)
 
     # - SetDefaultsWithReflection

@@ -38,4 +38,5 @@ class PublicationSerializer < PCSSerializer
   has_many :publications
   has_many :presentations
   has_many :events
+  has_many :workflows
 end

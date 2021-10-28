@@ -1,4 +1,4 @@
-require 'ro_crate_ruby'
+require 'ro_crate'
 
 module ROCrate
   class WorkflowCrate < ::ROCrate::Crate
@@ -6,7 +6,7 @@ module ROCrate
 
     validates :main_workflow, presence: true
 
-    properties(%w[mainEntity])
+    properties(%w[mainEntity mentions about])
 
     def main_workflow
       main_entity
@@ -36,8 +36,16 @@ module ROCrate
       main_workflow.cwl_description = entity
     end
 
+    def test_suites
+      ((mentions || []) | (about || [])).select { |entity| entity.has_type?('TestSuite') }
+    end
+
     def readme
       dereference('README.md')
+    end
+
+    def find_entry(path)
+      entries[path]
     end
   end
 end

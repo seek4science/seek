@@ -1,6 +1,10 @@
 require 'test_helper'
 
 class CWLExtractionTest < ActiveSupport::TestCase
+  setup do
+    @cwl = WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class)
+  end
+
   test 'extracts metadata from packed CWL' do
     wf = open_fixture_file('workflows/rp2-to-rp2path-packed.cwl')
     extractor = Seek::WorkflowExtractors::CWL.new(wf)
@@ -13,7 +17,7 @@ class CWLExtractionTest < ActiveSupport::TestCase
     assert_equal ['null', 'int'].sort, input[:type].sort
   end
 
-  test 'extracts metadata from CWL in workflow RO crate' do
+  test 'extracts metadata from CWL in workflow RO-Crate' do
     wf = open_fixture_file('workflows/rp2.crate.zip')
     extractor = Seek::WorkflowExtractors::ROCrate.new(wf)
     metadata = extractor.metadata

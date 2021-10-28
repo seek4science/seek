@@ -5,10 +5,11 @@ module Seek
       class DataFile < CreativeWork
         include ActionView::Helpers::NumberHelper
 
-        associated_items subject_of: :events
-
+        
         schema_mappings doi: :identifier,
                         distribution: :distribution
+
+        DATASET_PROFILE = 'https://bioschemas.org/profiles/Dataset/0.3-RELEASE-2019_06_14/'.freeze
 
         def doi
           "https://doi.org/#{resource.doi}" if resource.doi
@@ -16,10 +17,8 @@ module Seek
 
         def description
           description = resource.description&.truncate(4999)
-          if description.blank?
-            description = 'Description not specified'
-          end
-          description.ljust(50,'.')
+          description = 'Description not specified' if description.blank?
+          description.ljust(50, '.')
         end
 
         def distribution
@@ -47,6 +46,10 @@ module Seek
 
         def schema_type
           'Dataset'
+        end
+
+        def conformance
+          DATASET_PROFILE
         end
       end
     end

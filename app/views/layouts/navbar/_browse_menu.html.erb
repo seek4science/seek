@@ -6,64 +6,43 @@
   </a>
   <ul class="dropdown-menu" role="menu">
     <li role="presentation" class="dropdown-header visible-md">Browse</li>
-    <li role="presentation" class="dropdown-header"><%= t("menu.yellow_pages") -%></li>
-    <% if Seek::Config.programmes_enabled %>
-        <li><%= link_to t('programme').pluralize, programmes_path %></li>
-    <% end %>
-    <li><%= link_to t("project").pluralize, projects_path %></li>
-    <li><%= link_to t("institution").pluralize, institutions_path %></li>
-    <li><%= link_to t("person").pluralize, people_path %></li>
+    <%= render_menu_group(t('menu.yellow_pages'), [
+        [t('programme').pluralize, programmes_path, Seek::Config.programmes_enabled],
+        [t('project').pluralize, projects_path, true],
+        [t('institution').pluralize, institutions_path, true],
+        [t('profile').pluralize, people_path, true]
+    ]) %>
 
-    <% if Seek::Config.isa_enabled %>
-      <li role="presentation" class="dropdown-header"><%= t("menu.isa") -%></li>
-      <li><%= link_to t("investigation").pluralize, investigations_path %></li>
-      <li><%= link_to t("study").pluralize, studies_path %></li>
-      <li><%= link_to t("assays.assay").pluralize, assays_path %></li>
-    <% end %>
+    <%= render_menu_group(t('menu.isa'), [
+        [t('investigation').pluralize, investigations_path, Seek::Config.investigations_enabled],
+        [t('study').pluralize, studies_path, Seek::Config.studies_enabled],
+        [t('assay').pluralize, assays_path, Seek::Config.assays_enabled],
+    ]) %>
 
-    <li role="presentation" class="dropdown-header"><%= t("menu.assets") -%></li>
-    <li><%= link_to t("data_file").pluralize, data_files_path %></li>
-    <% if Seek::Config.models_enabled %>
-        <li><%= link_to t("model").pluralize, models_path %></li>
-    <% end %>
-    <li><%= link_to t("sop").pluralize, sops_path %></li>
-    <% if Seek::Config.workflows_enabled %>
-      <li><%= link_to t("workflow").pluralize, workflows_path %></li>
-      <% if false %>
-        <li><%= link_to t("node").pluralize, nodes_path %></li>
-      <% end %>
-    <% end %>
-    <% if Seek::Config.publications_enabled %>
-      <li><%= link_to t("publication").pluralize, publications_path %></li>
-    <% end %>
-    <% if Seek::Config.documents_enabled %>
-      <li><%= link_to t("document").pluralize, documents_path %></li>
-    <% end %>
-    <% if Seek::Config.collections_enabled %>
-      <li><%= link_to t("collection").pluralize, collections_path %></li>
-    <% end %>
+    <%= render_menu_group(t('menu.assets'), [
+        [t('data_file').pluralize, data_files_path, Seek::Config.data_files_enabled],
+        [t('model').pluralize, models_path, Seek::Config.models_enabled],
+        [t('sop').pluralize, sops_path, Seek::Config.sops_enabled],
+        [t('workflow').pluralize, workflows_path, Seek::Config.workflows_enabled],
+        [t('publication').pluralize, publications_path, Seek::Config.publications_enabled],
+        [t('document').pluralize, documents_path, Seek::Config.documents_enabled],
+        [t('collection').pluralize, collections_path, Seek::Config.collections_enabled]
+    ]) %>
 
-    <li role="presentation" class="dropdown-header"><%= t("menu.activities") -%></li>
-    <li><%= link_to t("presentation").pluralize, presentations_path %></li>
-    <% if Seek::Config.events_enabled %>
-        <li><%= link_to t("event").pluralize, events_path %></li>
-    <% end %>
-    <% if Seek::Config.samples_enabled || Seek::Config.organisms_enabled %>
-      <li role="presentation" class="dropdown-header"><%= t("menu.samples") -%></li>
-      <% if Seek::Config.samples_enabled %>
-        <li><%= link_to(t("sample_type").pluralize, sample_types_path) %></li>
-      <% end %>
-      <% if Seek::Config.organisms_enabled %>
-          <li><%= link_to t("organism").pluralize, organisms_path %></li>
-      <% end %>
-    <% end %>
+    <%= render_menu_group(t('menu.activities'), [
+      [t('presentation').pluralize, presentations_path, Seek::Config.presentations_enabled],
+      [t('event').pluralize, events_path, Seek::Config.events_enabled],
+    ]) %>
 
-    <% if Seek::Config.human_diseases_enabled %>
-      <li role="presentation" class="dropdown-header"><%= t("menu.vocabularies") -%></li>
+    <%= render_menu_group(t('menu.samples'), [
+        [t('sample').pluralize, select_sample_types_path, Seek::Config.samples_enabled],
+        [t('sample_type').pluralize, sample_types_path, Seek::Config.samples_enabled],
+        [t('strain').pluralize, strains_path,  Seek::Config.organisms_enabled],
+        [t('organism').pluralize, organisms_path,  Seek::Config.organisms_enabled],
+    ]) %>
 
-      <% if Seek::Config.human_diseases_enabled %>
-        <li><%= link_to t("human_disease").pluralize, human_diseases_path %></li>
-      <% end %>
-    <% end %>
+    <%= render_menu_group(t('menu.vocabularies'), [
+        [t('human_disease').pluralize, human_diseases_path, Seek::Config.human_diseases_enabled]
+    ]) %>
   </ul>
 </li>

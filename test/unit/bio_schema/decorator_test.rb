@@ -10,15 +10,15 @@ class DecoratorTest < ActiveSupport::TestCase
     identifier = "http://localhost:3000/data_files/#{data_file.id}"
     assert_equal identifier, decorator.identifier
     assert_equal identifier, decorator.url
-    assert_equal 'http://schema.org', decorator.context
+    assert_equal Seek::BioSchema::Serializer::SCHEMA_ORG, decorator.context
     assert_equal %w[blue green red], decorator.keywords.split(',').collect(&:strip).sort
 
     properties = decorator.attributes.collect(&:property).collect(&:to_s).sort
-    assert_equal ['@id', 'description', 'keywords', 'name', 'url'], properties
+    assert_equal ['@id', 'description', 'image', 'keywords', 'name', 'url'], properties
   end
 
   test 'CreativeWork' do
-    event = Factory(:event)
+    event = Factory(:event, policy: Factory(:public_policy))
     document = Factory(:document, events: [event], license: 'CC-BY-4.0', creators: [Factory(:person)])
     document.add_annotations('yellow, lorry', 'tag', User.first)
     disable_authorization_checks { document.save! }
@@ -36,7 +36,7 @@ class DecoratorTest < ActiveSupport::TestCase
     assert_equal [{ :@type => 'Person', :@id => "http://localhost:3000/people/#{person.id}", :name => person.title }], decorator.all_creators
 
     properties = decorator.attributes.collect(&:property).collect(&:to_s).sort
-    assert_equal ['@id', 'creator', 'dateCreated', 'dateModified', 'description', 'encodingFormat', 'isBasedOn', 'keywords', 'license', 'name', 'producer', 'subjectOf', 'url'], properties
+    assert_equal ['@id', 'creator', 'dateCreated', 'dateModified', 'description', 'encodingFormat', 'image', 'isBasedOn', 'isPartOf', 'keywords', 'license', 'name', 'producer', 'subjectOf', 'url', 'version'], properties
   end
 
   test 'Dataset pads or truncates description' do

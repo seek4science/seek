@@ -53,13 +53,19 @@
                               "Home page buttons enabled", "Display the three large buttons on the home page.") %>
 
 -->
-  <%= admin_text_setting(:tag_threshold, Seek::Config.tag_threshold,
-                          'Tag threshold', 'Tags must have a count above or equal to this value to appear in either expanded or collapsed left hand tag cloud.',
-                          :onkeypress => "javascript: return onlyNumbers(event);") %>
+  <%= admin_checkbox_setting(:tag_cloud_enabled, 1, Seek::Config.tag_cloud_enabled,
+                             "Tag cloud enabled", "Display the tag cloud on the right-hand side of the home page.") %>
 
-  <%= admin_text_setting(:max_visible_tags, Seek::Config.max_visible_tags,
-                          'Maximum visible tags', 'The maximum number of tags that will appear in the left hand tag cloud in its collapsed state.',
-                          :onkeypress => "javascript: return onlyNumbers(event);") %>
+  <%= admin_text_setting(:tag_threshold, Seek::Config.tag_threshold,
+                           'Tag threshold', 'Tags must have a count above or equal to this value to appear in either expanded or collapsed right-hand tag cloud.',
+                           :onkeypress => "javascript: return onlyNumbers(event);") %>
+
+    <%= admin_text_setting(:max_visible_tags, Seek::Config.max_visible_tags,
+                           'Maximum visible tags', 'The maximum number of tags that will appear in the right-hand tag cloud in its collapsed state.',
+                           :onkeypress => "javascript: return onlyNumbers(event);") %>
+
+  <%= admin_checkbox_setting(:workflow_class_list_enabled, 1, Seek::Config.workflow_class_list_enabled,
+                             "Workflow class list enabled", "Display the list of workflow classes on the right-hand side of the home page.") %>
 
   <h2>Panels</h2>
   <%# Allows admins to enable/disable a number of panels in the homepage %>

@@ -1,56 +1,175 @@
-<%# This partial is expecting 3 parameters to be defined: -%>
+<%# This partial is expecting 1 parameter to be defined, and 1 optional. -%>
 <%# - form - the form object -%>
-<%# - existing_creators - list of creators for the current resource (this should be collection of Person objects) -%>
-<%# - other_creators - list of non-SEEK creators for the current resource (this should be a string) -%>
+<%# - assoc_text - (optional) The displayed name of the association. Comes from I18n by default. ("creators"?) -%>
+<%# - field_name - (optional) The name of the intermediate association between the object and creators. Default e.g.: workflow[assets_creators_attributes] -%>
 
 <%
-  resource_type = form.object.class.name.underscore
-  resource_type_text = text_for_resource(form.object)
-  collapsed = existing_creators.blank? if collapsed.nil?
-  assoc_text ||= form.object.class.human_attribute_name('creators', default: t('creator').pluralize).downcase
+  resource = form.object
+  resource_type = resource.class.name.underscore
+  resource_type_text = text_for_resource(resource)
+  collapsed = (resource.assets_creators.empty? && resource.other_creators.blank?) if collapsed.nil?
+  assoc_text ||= resource.class.human_attribute_name('creators', default: t('creator').pluralize).downcase
+  field_name ||= "#{resource_type}[assets_creators_attributes]"
+  existing = resource.assets_creators.map do |c|
+    { id: c.id,
+      creator_id: c.creator_id,
+      family_name: c.family_name,
+      given_name: c.given_name,
+      affiliation: c.affiliation,
+      orcid: c.orcid }
+  end
 %>
 
-<%= folding_panel(assoc_text.capitalize, collapsed, :id=>'author_form',:body_options => {:id => 'creator_fold_content'},
-                  :help_text => "Here you attribute this #{resource_type_text} to other people.") do %>
-  <p>
-    If this <%= resource_type_text %> was created, by or together with, other members, please list their names below.
-    <br/>
-    <strong>
-      The <%= assoc_text -%> you specify will have permissions to 'view and edit summary and contents'.
-    </strong>
-  </p>
+<%= folding_panel(assoc_text.capitalize, collapsed, id: 'author-form', help_text: "Here you attribute this #{resource_type_text} to other people.") do %>
+  <div class="author-form-search">
+    <%= text_field_tag(nil, nil, placeholder: "Type to search for #{assoc_text}...", id: 'author-search-field') %>
+  </div>
+  or
+  <%= button_link_to("Add new #{assoc_text.singularize}", 'add', '#', id: 'new-author') %>
 
-  <p style="color: #666666;">
-    So far you have specified the following <%= assoc_text -%>:
-  </p>
-  <%= hidden_field_tag "#{resource_type}[creator_ids][]" %>
-  <ul id="creators_list" class="box_editing_inner">
-    <li><span class="none_text" id="creators_text">Loading...</span></li>
-  </ul>
-  <p>
-    Please type <%= assoc_text -%> into the box below - suggestions will be displayed as you type.
-  </p>
-  <p>
-    <%= objects_input('creator-typeahead', [], :typeahead => {:query_url => typeahead_people_path + '?query=%QUERY'}) -%>
-  </p>
+  <div class="row">
+    <div class="col-md-8">
+      <div id="author-list" class="assets-creator-list" data-field-name="<%= field_name -%>"></div>
+      <span id="empty-change-list" class="none_text">No <%= assoc_text -%> specified</span>
+    </div>
+    <div class="col-md-4">
 
-  <p>
-    If anyone not registered with <%= Seek::Config.application_name %> assisted creating this <%= resource_type_text %>, you can specify them below.
-  </p>
-  <p>
-    <%= text_field_tag "#{resource_type}[other_creators]", other_creators, :class => 'form-control' %>
-  </p>
+    </div>
+  </div>
 
+  <%= content_tag(:script, existing.to_json.html_safe, type: 'application/json', id: 'existing-assets-creators') %>
+  <%= modal(id: 'new-author-modal', size: 'm') do %>
+    <%= modal_header("New #{assoc_text.singularize.capitalize}") %>
+    <%= modal_body do %>
+      <div class="form-group">
+        <label class="required">Given Name</label>
+        <%= text_field_tag('_author_form[given_name]', nil, placeholder: 'Josiah', data: { field: 'given_name' }, id: 'author-given-name', class: 'form-control') -%>
+      </div>
+
+      <div class="form-group">
+        <label class="required">Family Name</label>
+        <%= text_field_tag('_author_form[family_name]', nil, placeholder: 'Carberry', data: { field: 'family_name' }, id: 'author-family-name', class: 'form-control') -%>
+      </div>
+
+      <div class="form-group">
+        <label>Affiliation</label>
+        <%= text_field_tag('_author_form[affiliation]', nil, placeholder: 'Brown University', data: { field: 'affiliation' }, id: 'author-affiliation', class: 'form-control') -%>
+      </div>
+
+      <div class="form-group">
+        <label>ORCID</label>
+        <%= text_field_tag('_author_form[orcid]', nil, placeholder: '0000-0002-1825-0097', data: { field: 'orcid' }, id: 'author-orcid', class: 'form-control') -%>
+      </div>
+    <% end %>
+    <%= modal_footer do %>
+      <%= link_to('Add another', '#', id: 'add-another-author', class: 'btn btn-default') %>
+      <%= link_to('Add & finish', '#', id: 'add-author', class: 'btn btn-success') %>
+    <% end %>
+  <% end %>
+
+  <div class="form-group">
+    <label><%= resource.class.human_attribute_name('other_creators') -%></label>
+    <%= text_field_tag "#{resource_type}[other_creators]", resource.other_creators, class: 'form-control' %>
+    <p class="help-block">A free-text field to specify additional credit for the creation of this <%= resource_type_text %>.</p>
+  </div>
 <% end %>
 
 <script type="text/javascript">
-    var resourceType = "<%= resource_type -%>";
-    // recreate internal store of attributions..
-    var creators = <%= existing_creators.map do |c|
-    {   id: c.id,
-        name: c.name,
-        email: c.email,
-        projects: c.projects.map(&:title).join(", ") }
-    end.to_json.html_safe -%>;
-    updateCreatorSettings(); // ..and update the page to make existing attributions visible
+    $j(document).ready(function () {
+        $j('#new-author').click(function () {
+            AuthorForm.openModal();
+            return false;
+        });
+
+        $j('#add-author').click(function () {
+            AuthorForm.submitModal();
+            return false;
+        });
+
+        $j('#add-another-author').click(function () {
+            AuthorForm.submitModal();
+            AuthorForm.openModal();
+            return false;
+        });
+
+        $j('#new-author-modal').keydown(function (event) {
+            if (event.keyCode === 13) {
+                AuthorForm.submitModal();
+                AuthorForm.openModal();
+                return false;
+            }
+        });
+
+        $j('#author-form').on('click', '.remove-association', AuthorForm.remove);
+
+        var creators = JSON.parse(document.getElementById('existing-assets-creators').innerText);
+        creators.forEach(function (c) { AuthorForm.add(c)})
+
+        var registeredBloodhound = new Bloodhound({
+            datumTokenizer: Bloodhound.tokenizers.obj.whitespace(['given_name', 'family_name']),
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            remote: {
+                url: '<%= registered_creators_path(format: :json, query: 'QUERY') %>',
+                wildcard: 'QUERY'
+            },
+            limit: 10
+        });
+        registeredBloodhound.initialize();
+
+        var unRegisteredBloodhound = new Bloodhound({
+            datumTokenizer: Bloodhound.tokenizers.obj.whitespace(['given_name', 'family_name']),
+            queryTokenizer: Bloodhound.tokenizers.whitespace,
+            remote: {
+                url: '<%= unregistered_creators_path(format: :json, query: 'QUERY') %>',
+                wildcard: 'QUERY'
+            },
+            limit: 10
+        });
+        unRegisteredBloodhound.initialize();
+
+        $j('#author-search-field').tagsinput({
+            itemValue: function(item) { return item },
+            typeaheadjs: [
+                {
+                    highlight: true,
+                    minLength: 1
+                },
+                [
+                    {
+                        name: "registered",
+                        displayKey: function (item) {
+                            return item.given_name + " " + item.family_name;
+                        },
+                        source: registeredBloodhound.ttAdapter(),
+                        templates: {
+                            header: 'Registered',
+                            suggestion: HandlebarsTemplates['typeahead/registered_author']
+                        }
+                    },
+                    {
+                        name: "unregistered",
+                        displayKey: function (item) {
+                            return item.given_name + " " + item.family_name;
+                        },
+                        source: unRegisteredBloodhound.ttAdapter(),
+                        templates: {
+                            header: 'Unregistered',
+                            suggestion: HandlebarsTemplates['typeahead/unregistered_author']
+                        }
+                    }
+                ]
+            ]
+        });
+
+        $j('#author-search-field').on('itemAdded', function (event) {
+            AuthorForm.add(event.item)
+            $j(this).tagsinput('removeAll'); // clear the input
+        });
+
+        // Make rows sortable
+        AuthorForm.bindSortable();
+        AuthorForm.recalculatePositions();
+        AuthorForm.toggleEmptyListText();
+        $j('#author-search-field').tagsinput('removeAll'); // clear the input
+    });
 </script>

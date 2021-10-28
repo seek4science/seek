@@ -3,7 +3,7 @@
         "id": "203",
         "type": "sops",
         "attributes": {
-            "tags": null,
+            "tags": [],
             "title": "Validation experiments",
             "description": "SOP for the determination of external metabolites (Glc, Pyr, Gly, Lac) in intact trophozoite incubations, and for the determination of intracellular metabolite concentrations.",
             "license": null,

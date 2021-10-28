@@ -1,0 +1,42 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://localhost:8000/workflows/56c50ac0-529b-0139-9132-000c29a94011/1
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (linux-gnu x86_64) ruby/2.6.6p146
+      Content-Type:
+      - application/json
+      Authorization:
+      - Bearer 0KFv5bXGD4FhEFTuqLJ8uAaJVNI0cNIgYeIeWR5XqR
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - localhost:8000
+  response:
+    status:
+      code: 404
+      message: NOT FOUND
+    headers:
+      Content-Type:
+      - application/problem+json
+      Content-Length:
+      - '226'
+      Server:
+      - Werkzeug/1.0.1 Python/3.7.9
+      Date:
+      - Mon, 22 Feb 2021 13:40:35 GMT
+    body:
+      encoding: UTF-8
+      string: '{"detail": "Workflow ''56c50ac0-529b-0139-9132-000c29a94011'' (ver.1)
+        not found", "status": 404, "title": "Not Found", "type": "about:blank", "instance":
+        "https://localhost:8000/workflows/56c50ac0-529b-0139-9132-000c29a94011/1"}'
+    http_version: 
+  recorded_at: Mon, 22 Feb 2021 13:40:35 GMT
+recorded_with: VCR 2.9.3

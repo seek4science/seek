@@ -94,7 +94,7 @@ class SampleType < ApplicationRecord
   end
 
   def self.user_creatable?
-    true
+    Sample.user_creatable?
   end
 
   def self.can_create?
