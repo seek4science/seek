@@ -37,17 +37,17 @@
         </div>
     </div>
 
-    <div id="provide-metadata-content">
-    </div>
+    <div id="provide-metadata-content"></div>
+</div>
 
-    <script type="text/javascript">
-        var selectedItem = {type:"",id:""}, pid, uid
-        $j(document).ready(function() {
-            setupFoldersTree( <%= ((TreeviewBuilder.new(@project, @folders)).build_tree_data).html_safe -%> , 'demo_tree', 'draggable_folder_item');
-            $j("#item-layout").html("<%= escape_javascript(render template: 'projects/show' ) %>");
-            $j("#item_contents").show();
-            pid = <%= @project.id %>
-            uid = <%= current_user.id if current_user %>
-        });
-        
-    </script>
+<script type="text/javascript">
+    var selectedItem = {type:"",id:""}, pid, uid
+    $j(document).ready(function() {
+        setupFoldersTree( <%= ((TreeviewBuilder.new(@project, @folders)).build_tree_data).html_safe -%> , 'demo_tree', 'draggable_folder_item');
+        $j("#item-layout").html("<%= escape_javascript(render template: 'projects/show' ) %>");
+        $j("#item_contents").show();
+        pid = <%= @project.id %>
+        uid = <%= current_user.id if current_user %>
+    });
+    
+</script>

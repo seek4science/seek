@@ -1,14 +1,13 @@
 var SampleTypes = {
-
-    recalculatePositions: function () {
-        $j('#attribute-table tr.sample-attribute .attribute-position').each(function (index, item) {
+    recalculatePositions: function (selector = "#attribute-table") {
+        $j(selector + ' tr.sample-attribute .attribute-position').each(function (index, item) {
             $j('.attribute-position-label', $j(item)).html(index + 1);
             $j('input', $j(item)).val(index + 1);
         });
     },
 
-    bindSortable: function () {
-        $j('#attribute-table tbody').sortable({
+    bindSortable: function (selector = "#attribute-table") {
+        $j(selector + ' tbody').sortable({
             items: '.sample-attribute',
             helper: SampleTypes.fixHelper,
             handle: '.attribute-handle'
@@ -17,8 +16,8 @@ var SampleTypes = {
         });
     },
 
-    unbindSortable: function () {
-        $j('#attribute-table tbody').sortable('destroy');
+    unbindSortable: function (selector = "#attribute-table") {
+        $j(selector + ' tbody').sortable('destroy');
     },
 
     fixHelper: function(e, ui) {

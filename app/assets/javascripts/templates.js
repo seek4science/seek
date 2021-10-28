@@ -1,4 +1,11 @@
-var Templates = { table: null };
+var Templates = {
+  table: null,
+  context: { description_elem: null, suffix: null }
+};
+
+Templates.clearContext = function () {
+  Templates.context = { description_elem: null, suffix: null };
+};
 
 Templates.init = function (elem) {
   const columnDefs = [
@@ -128,33 +135,49 @@ function loadFilterSelectors(data) {
 const applyTemplate = () => {
   const id = $j("#source_select").find(":selected").val();
   const data = templates.find((t) => t.template_id == id);
-  const codeMirror = $j("#template-description").nextAll(".CodeMirror")[0].CodeMirror;
+  const codeMirror = $j(Templates.context.description_elem || "#template-description").nextAll(
+    ".CodeMirror"
+  )[0].CodeMirror;
   if (data.description) codeMirror.getDoc().setValue(data.description);
+  const suffix = Templates.context.suffix || "";
+  const attribute_table = "#attribute-table" + suffix;
+  const attribute_row = "#new-attribute-row" + suffix;
+  const addAttributeRow = "#add-attribute-row" + suffix;
 
-  $j("#template_parent_id").val(data.template_id)
-  $j("#attribute-table tbody").find("tr:not(:last)").remove();
+  $j("#template_parent_id").val(data.template_id);
+  $j(`${attribute_table} tbody`).find("tr:not(:last)").remove();
   SampleTypes.unbindSortable();
   $j.each(Templates.table.rows().data(), (i, row) => {
-    var newRow = $j("#new-attribute-row tbody").clone().html();
+    var newRow = $j(`${attribute_row} tbody`).clone().html();
     var index = 0;
-    $j("#attribute-table tr.sample-attribute").each(function () {
+    $j(`${attribute_table} tr.sample-attribute`).each(function () {
       var newIndex = parseInt($j(this).data("index"));
       if (newIndex > index) {
         index = newIndex;
       }
     });
     index++;
+
     newRow = $j(newRow.replace(/replace-me/g, index));
-    $j(newRow).find("#template_attribute_required").prop("checked", row[0]);
-    $j(newRow).find("#template_attribute_title").val(row[1]);
-    $j(newRow).find("#template_attribute_description").val(row[2]);
-    $j(newRow).find("#template_attribute_type").val(row[3]);
-    $j(newRow).find("#template_attribute_cv_id").val(row[4]);
-    $j(newRow).find("#template_attribute_unit").val(row[5]);
+
+    $j(newRow).find('[data-attr="required"]').prop("checked", row[0]);
+    $j(newRow).find('[data-attr="title"]').val(row[1]);
+    $j(newRow).find('[data-attr="description"]').val(row[2]);
+    $j(newRow).find('[data-attr="type"]').val(row[3]);
+    $j(newRow).find('[data-attr="cv_id"]').val(row[4]);
+    $j(newRow).find('[data-attr="unit"]').val(row[5]);
     $j(newRow).find(".sample-type-is-title").prop("checked", row[7]);
-    $j(newRow).find("#template_attribute_iri").val(row[8]);
-    $j("#attribute-table #add-attribute-row").before(newRow);
+    $j(newRow).find('[data-attr="iri"]').val(row[8]);
+
+    // Show the CV block if cv_id is not empty
+    if(row[4]) $j(newRow).find(".controlled-vocab-block").show()
+
+    $j(`${attribute_table} ${addAttributeRow}`).before(newRow);
   });
+
+  // Sets the template_id in the form (if the object is an isa_study form sample_type)
+  const template_id_tag = $j(`#isa_study${suffix}_template_id`)
+  if(template_id_tag) $j(template_id_tag).val(id)
 
   SampleTypes.recalculatePositions();
   SampleTypes.bindSortable();
