@@ -84,7 +84,16 @@
                                       unit_id),
                    include_blank: true,
                    class: 'form-control',
-                   disabled: !allow_type_change %>
+                   disabled: !allow_type_change, data: {attr: "unit"} %>
+  </td>
+  <td>
+    <%= text_field_tag "#{field_name_prefix}[description]", description, class: 'form-control',
+                       placeholder: 'Description', data: {attr: "description"} %>
+  </td>
+
+  <td>
+    <%= text_field_tag "#{field_name_prefix}[iri]", iri, class: 'form-control',
+                       placeholder: 'IRI', data: {attr: "iri"} %>
   </td>
 
   <td>
