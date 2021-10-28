@@ -7,9 +7,6 @@ class SinglePagesController < ApplicationController
   def show
     @project = Project.find(params[:id])
     @folders = project_folders
-    @investigation = Investigation.new
-    @study = Study.new
-    @assay = Assay.new
 
     respond_to do |format|
       format.html
