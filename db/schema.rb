@@ -1603,6 +1603,13 @@ ActiveRecord::Schema.define(version: 2021_09_29_111617) do
     t.integer "template_id"
   end
 
+  create_table "sample_types_studies",  force: :cascade do |t|
+    t.bigint "sample_type_id"
+    t.bigint "study_id"
+    t.index ["sample_type_id"], name: "index_sample_types_studies_on_sample_type_id"
+    t.index ["study_id"], name: "index_sample_types_studies_on_study_id"
+  end
+
   create_table "samples", id: :integer,  force: :cascade do |t|
     t.string "title"
     t.integer "sample_type_id"
