@@ -12,6 +12,7 @@ class GitController < ApplicationController
 
   rescue_from Git::ImmutableVersionException, with: :render_immutable_error
   rescue_from Git::PathNotFoundException, with: :render_path_not_found_error
+  rescue_from Git::InvalidPathException, with: :render_invalid_path_error
 
   def browse
     respond_to do |format|
@@ -109,6 +110,13 @@ class GitController < ApplicationController
 
   def render_path_not_found_error(ex)
     flash[:error] = "Couldn't find path: #{ex.path}"
+    respond_to do |format|
+      format.html { redirect_to polymorphic_path(@parent_resource, anchor: 'files') }
+    end
+  end
+
+  def render_invalid_path_error(ex)
+    flash[:error] = "Invalid path: #{ex.path}"
     respond_to do |format|
       format.html { redirect_to polymorphic_path(@parent_resource, anchor: 'files') }
     end

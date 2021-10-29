@@ -328,4 +328,18 @@ class GitControllerTest < ActionController::TestCase
 
     assert flash[:error].include?('authorized')
   end
+
+  test 'adding file with invalid path throws exception' do
+    refute @git_version.file_exists?('/////')
+    commit = @git_version.commit
+
+    post :add_file, params: { workflow_id: @workflow.id, version: @git_version.version,
+                              file: { path: '/////',
+                                      data: fixture_file_upload('files/little_file.txt') } }
+
+    assert_redirected_to workflow_path(@workflow, anchor: 'files')
+    refute assigns(:git_version).file_exists?('/////')
+    assert_equal 'Invalid path: /////', flash[:error]
+    assert_equal commit, assigns(:git_version).commit
+  end
 end

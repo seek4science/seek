@@ -35,7 +35,6 @@ class GitVersionTest < ActiveSupport::TestCase
     workflow = Factory(:workflow)
     repo = Factory(:blank_repository, resource: workflow)
 
-
     v = disable_authorization_checks { workflow.git_versions.create!(mutable: true) }
     assert_equal 'This Workflow', v.title
     assert v.mutable?
@@ -271,5 +270,57 @@ class GitVersionTest < ActiveSupport::TestCase
     assert_equal gv.resource_attributes['title'], next_ver.resource_attributes['title']
     assert_equal gv.commit, next_ver.commit
     assert_equal gv.git_repository, next_ver.git_repository
+  end
+
+  test 'can handle unusual paths' do
+    workflow = Factory(:workflow)
+    repo = Factory(:blank_repository, resource: workflow)
+
+    v = disable_authorization_checks { workflow.git_versions.create!(mutable: true) }
+    assert_equal 'This Workflow', v.title
+    assert v.mutable?
+    assert v.commit.blank?
+    assert_empty v.blobs
+
+    assert_raise(Git::InvalidPathException) do
+      v.add_file('///', StringIO.new('blah'))
+    end
+
+    assert_raise(Git::InvalidPathException) do
+      v.add_file('something/', StringIO.new('blah'))
+    end
+
+    assert_nothing_raised do
+      v.add_file('?&&?&&?&&&?', StringIO.new('blah'))
+    end
+
+    assert_nothing_raised do
+      v.add_file('     ', StringIO.new('blah'))
+    end
+
+    assert v.reload.commit.present?
+    refute v.file_exists?('///')
+    refute v.file_exists?('something/')
+    assert v.file_exists?('?&&?&&?&&&?')
+    assert v.file_exists?('     ')
+  end
+
+  test 'valid paths are rejected when committed with invalid paths' do
+    workflow = Factory(:workflow)
+    repo = Factory(:blank_repository, resource: workflow)
+
+    v = disable_authorization_checks { workflow.git_versions.create!(mutable: true) }
+    assert_equal 'This Workflow', v.title
+    assert v.mutable?
+    assert v.commit.blank?
+    assert_empty v.blobs
+
+    assert_raise(Git::InvalidPathException) do
+      v.add_files([['valid_path', StringIO.new('blah')], ['../../../secrets', StringIO.new('blah')]])
+    end
+
+    refute v.file_exists?('valid_path'), 'valid_path should not have been committed as it was bundled with an invalid path.'
+    refute v.file_exists?('../../../secrets')
+    assert v.reload.commit.blank?
   end
 end

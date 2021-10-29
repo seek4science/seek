@@ -32,7 +32,7 @@
             var jstree = $j.jstree.reference(this);
             var node = jstree.get_node(this);
             if (node.type === 'blob') {
-                var path = '<%= polymorphic_path([resource, :git_blob], version: git_version.version, path: '__replaceme__') %>'.replace('__replaceme__', node.id)
+                var path = '<%= polymorphic_path([resource, :git_blob], version: git_version.version, path: '__replaceme__') %>'.replace('__replaceme__', encodeURIComponent(node.id))
                 $j.ajax(path, {
                     success: function (html) {
                         $j('#git-preview-modal .modal-body').html(html);

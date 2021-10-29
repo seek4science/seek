@@ -82,8 +82,7 @@ module Git
     def add_file(path, io, message: nil)
       message ||= "#{file_exists?(path) ? 'Updated' : 'Added'} #{path}"
       perform_commit(message) do |index|
-        oid = git_base.write(io.read, :blob) # Write the file into the object DB
-        index.add(path: path, oid: oid, mode: 0100644) # Add it to the index
+        write_blob(index, path, io)
       end
     end
 
@@ -91,8 +90,7 @@ module Git
       message ||= "Added/updated #{path_io_pairs.count} files"
       perform_commit(message) do |index|
         path_io_pairs.each do |path, io|
-          oid = git_base.write(io.read, :blob) # Write the file into the object DB
-          index.add(path: path, oid: oid, mode: 0100644) # Add it to the index
+          write_blob(index, path, io)
         end
       end
     end
@@ -149,6 +147,13 @@ module Git
       end
 
       self.commit
+    end
+
+    def write_blob(index, path, io)
+      oid = git_base.write(io.read, :blob) # Write the file into the object DB
+      index.add(path: path, oid: oid, mode: 0100644) # Add it to the index
+    rescue Rugged::IndexError
+      raise Git::InvalidPathException.new(path: path)
     end
   end
 end
