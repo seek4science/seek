@@ -235,6 +235,13 @@ module Git
       end
     end
 
+    def add_remote_file(path, url, fetch: true, message: nil)
+      add_file(path, StringIO.new(''), message: message).tap do
+        git_annotations.create(key: 'remote_source', path: path, value: url)
+        RemoteGitContentFetchingJob.perform_later(self, path, url) if fetch
+      end
+    end
+
     private
 
     def set_version

@@ -60,12 +60,12 @@ class GitController < ApplicationController
   end
 
   def add_file
-    path = file_params[:path]
-    path = file_params[:data].original_filename if path.blank?
-    @git_version.add_file(path, file_params[:data])
-    @git_version.save!
+    if file_params[:url].present?
+      add_remote_file
+    else
+      add_local_file
+    end
 
-    flash[:notice] = "Uploaded #{file_params[:path]}"
     redirect_to polymorphic_path(@parent_resource, anchor: 'files')
   end
 
@@ -162,7 +162,7 @@ class GitController < ApplicationController
   end
 
   def file_params
-    params.require(:file).permit(:path, :data, :new_path)
+    params.require(:file).permit(:path, :data, :new_path, :url)
   end
 
   def fetch_git_version
@@ -172,6 +172,24 @@ class GitController < ApplicationController
 
   def git_version_params
     params.require(:git_version).permit(:name, :comment)
+  end
+
+  def add_local_file
+    path = file_params[:path]
+    path = file_params[:data].original_filename if path.blank?
+    @git_version.add_file(path, file_params[:data])
+    @git_version.save!
+
+    flash[:notice] = "Uploaded #{file_params[:path]}"
+  end
+
+  def add_remote_file
+    path = file_params[:path]
+    path = file_params[:url].split('/').last if path.blank?
+    @git_version.add_remote_file(path, file_params[:url])
+    @git_version.save!
+
+    flash[:notice] = "Registered #{file_params[:path]}"
   end
 
   # # Rugged does not allow streaming blobs

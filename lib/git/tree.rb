@@ -37,7 +37,7 @@ module Git
       t = []
 
       each_tree do |entry|
-        t << Git::Tree.new(git_version, git_base.lookup(entry[:oid]), entry[:path])
+        t << Git::Tree.new(git_version, git_base.lookup(entry[:oid]), entry[:name])
       end
 
       t
@@ -47,7 +47,7 @@ module Git
       b = []
 
       each_blob do |entry|
-        b << Git::Blob.new(git_version, git_base.lookup(entry[:oid]), entry[:path])
+        b << Git::Blob.new(git_version, git_base.lookup(entry[:oid]), entry[:name])
       end
 
       b
