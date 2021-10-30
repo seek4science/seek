@@ -34,7 +34,7 @@
 
         <% Seek::Config.home_carousel.each_with_index do |carousel_item, index| -%>
           <div class="item <%= 'active' if index==0 %>" style="text-align: center;">
-            <div>
+            <div class="carousel-logo">
               <a href="<%= carousel_item[:url] %>">
                 <img src="<%= Avatar.find(carousel_item[:image]).public_asset_url %>"
                   alt="<%= carousel_item[:title] %> logo"
@@ -42,9 +42,9 @@
                   style="width:auto;height:100px;">
               </a>
             </div>
-            <h3> <%= carousel_item[:title] %> </h3>
-            <p style="font-size: larger;"> <%= carousel_item[:description] %> </p>
-            <i> <%= carousel_item[:author] %> </i>
+            <h3 class="carousel-title"> <%= carousel_item[:title] %> </h3>
+            <p class="carousel-description" style="font-size: larger;"> <%= carousel_item[:description] %> </p>
+            <i class="carousel-author"> <%= carousel_item[:author] %> </i>
           </div>
         <% end %>
       </div>

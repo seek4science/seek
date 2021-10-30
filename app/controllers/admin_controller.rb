@@ -513,12 +513,8 @@ class AdminController < ApplicationController
   end
 
   def add_carousel_form
-    # Only add it if ALL carousel inputs are filled
-    if (!params[:home_carousel_image].blank?&&
-        !params[:home_carousel_title].blank?&&
-        !params[:home_carousel_author].blank?&&
-        !params[:home_carousel_url].blank?&&
-        !params[:home_carousel_description].blank?)
+    # Only add it if at least logo and title is given carousel inputs are filled
+    if (!params[:home_carousel_image].blank? && !params[:home_carousel_title].blank?)
       file_io = params[:home_carousel_image]
       avatar = Avatar.new(original_filename: file_io.original_filename, image_file: file_io, skip_owner_validation: true)
       if avatar.save
