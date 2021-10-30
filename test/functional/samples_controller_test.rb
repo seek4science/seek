@@ -917,6 +917,106 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal 'http://www.slack.com/', sample.discussion_links.first.url
   end
 
+  test 'batch_create' do
+    person = Factory(:person)
+    creator = Factory(:person)
+    login_as(person)
+    type = Factory(:patient_sample_type)
+    assert_difference('Sample.count', 2) do
+        post :batch_create, params: {data:[
+        {ex_id: "1",data:{type: "samples", attributes:{attribute_map:{"full name": 'Fred Smith', "age": '22', "weight": '22.1' ,"postcode": 'M13 9PL'}},
+        tags: nil,relationships:{projects:{data:[{id: person.projects.first.id, type: "projects"}]},
+        sample_type:{ data:{id: type.id, type: "sample_types"}}}}},
+        {ex_id: "2", data:{type: "samples",attributes:{attribute_map:{"full name": 'David Tailor', "age": '33', "weight": '33.1' ,"postcode": 'M12 8PL'}},
+        tags: nil,relationships:{projects:{data:[{id: person.projects.first.id, type: "projects"}]},
+        sample_type:{data:{id: type.id, type: "sample_types"}}}}}]}
+    end
+
+    sample1 = Sample.all.first
+    assert_equal 'Fred Smith', sample1.title
+    assert_equal 'Fred Smith', sample1.get_attribute_value('full name')
+    assert_equal '22', sample1.get_attribute_value(:age)
+    assert_equal '22.1', sample1.get_attribute_value(:weight)
+    assert_equal 'M13 9PL', sample1.get_attribute_value(:postcode)
+
+    sample2 = Sample.limit(2)[1]
+    assert_equal 'David Tailor', sample2.title
+    assert_equal 'David Tailor', sample2.get_attribute_value('full name')
+    assert_equal '33', sample2.get_attribute_value(:age)
+    assert_equal '33.1', sample2.get_attribute_value(:weight)
+    assert_equal 'M12 8PL', sample2.get_attribute_value(:postcode)
+  end
+
+  test 'terminate batch_create if error' do
+    person = Factory(:person)
+    creator = Factory(:person)
+    login_as(person)
+    type = Factory(:patient_sample_type)
+    assert_difference('Sample.count', 0) do
+        post :batch_create, params: {data:[
+        {ex_id: "1",data:{type: "samples", attributes:{attribute_map:{"full name": 'Fred Smith', "age": '22', "weight": '22.1' ,"postcode": 'M13 9PL'}},
+        tags: nil,relationships:{projects:{data:[{id: person.projects.first.id, type: "projects"}]},
+        sample_type:{ data:{id: type.id, type: "sample_types"}}}}},
+        {ex_id: "2", data:{type: "samples",attributes:{attribute_map:{"wrong attribute": 'David Tailor', "age": '33', "weight": '33.1' ,"postcode": 'M12 8PL'}},
+        tags: nil,relationships:{projects:{data:[{id: person.projects.first.id, type: "projects"}]},
+        sample_type:{data:{id: type.id, type: "sample_types"}}}}}]}
+    end
+
+    json_response = JSON.parse(response.body)
+    assert_equal 1, json_response["errors"].length
+    assert_equal "2", json_response["errors"][0]["ex_id"].to_s
+  end
+
+
+  test 'batch_update' do
+    login_as(Factory(:person))
+    creator = Factory(:person)
+    sample1 = populated_patient_sample
+    sample2 = populated_patient_sample
+    type_id1 = sample1.sample_type.id
+    type_id2 = sample2.sample_type.id
+    assert_empty sample1.creators
+
+    assert_no_difference('Sample.count') do
+      put :batch_update, params: {data:[
+        {id: sample1.id, data:{type: "samples", attributes:{ attribute_map:{ "full name": 'Alfred Marcus', "age": '22', "weight": '22.1' }, creator_ids: [creator.id]}}},
+        {id: sample2.id, data:{type: "samples", attributes:{ attribute_map:{ "full name": 'David Tailor', "age": '33', "weight": '33.1' }, creator_ids: [creator.id]}}}]}
+      assert_equal [creator], sample1.creators
+    end
+
+    samples = Sample.limit(2)
+
+    first_updated_sample = samples[0]
+    assert_equal type_id1, first_updated_sample.sample_type.id
+    assert_equal 'Alfred Marcus', first_updated_sample.title
+    assert_equal 'Alfred Marcus', first_updated_sample.get_attribute_value('full name')
+    assert_equal '22', first_updated_sample.get_attribute_value(:age)
+    assert_nil first_updated_sample.get_attribute_value(:postcode)
+    assert_equal '22.1', first_updated_sample.get_attribute_value(:weight)
+
+    last_updated_sample = samples[1]
+    assert_equal type_id2, last_updated_sample.sample_type.id
+    assert_equal 'David Tailor', last_updated_sample.title
+    assert_equal 'David Tailor', last_updated_sample.get_attribute_value('full name')
+    assert_equal '33', last_updated_sample.get_attribute_value(:age)
+    assert_nil last_updated_sample.get_attribute_value(:postcode)
+    assert_equal '33.1', last_updated_sample.get_attribute_value(:weight)
+  end
+
+  test 'batch_delete' do
+    person = Factory(:person)
+    sample1 = Factory(:patient_sample, contributor: person)
+    sample2 = Factory(:patient_sample, contributor: person)
+    type1 = sample1.sample_type
+    type2 = sample1.sample_type
+    login_as(person.user)
+    assert sample1.can_delete?
+    assert sample2.can_delete?
+    assert_difference('Sample.count', -2) do
+      delete :batch_delete, params: { data: [ {id: sample1.id}, {id: sample2.id}] }
+    end
+  end
+
 
   private
 

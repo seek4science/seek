@@ -651,6 +651,9 @@ SEEK::Application.routes.draw do
     collection do
       get :attribute_form
       get :filter
+      post :batch_create
+      put :batch_update
+      delete :batch_delete
     end
     resources :people, :programmes, :projects, :assays, :studies, :investigations, :data_files, :publications, :samples,
               :strains, :organisms, :collections, only: [:index]
