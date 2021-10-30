@@ -19,7 +19,7 @@ class Organism < ApplicationRecord
 
   has_and_belongs_to_many :projects
   has_many :programmes, through: :projects
-
+  
   before_validation :convert_concept_uri
 
   validates_presence_of :title
@@ -44,10 +44,10 @@ class Organism < ApplicationRecord
 
   # Returns the columns to be shown on the table view for the resource
   def columns_default
-    super + ['title']
+    super
   end
   def columns_allowed
-    super + ['title']
+    columns_default + ['title']
   end
 
   def can_delete?(user = User.current_user)

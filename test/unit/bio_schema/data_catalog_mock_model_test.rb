@@ -5,9 +5,9 @@ class DataCatalogMockModelTest < ActiveSupport::TestCase
     @data_catalogue = Seek::BioSchema::DataCatalogMockModel.new
   end
 
-  test 'date created' do
+  test 'created_at' do
     ActivityLog.destroy_all
-    assert_nil @data_catalogue.date_created
+    assert_nil @data_catalogue.created_at
 
     now = 2.days.ago
     df = Factory(:data_file)
@@ -19,7 +19,7 @@ class DataCatalogMockModelTest < ActiveSupport::TestCase
       Factory :activity_log, activity_loggable: df, action: 'create', controller_name: 'data_files'
     end
 
-    assert_equal now.to_i, @data_catalogue.date_created.to_i
+    assert_equal now.to_i, @data_catalogue.created_at.to_i
   end
 
   test 'url' do
@@ -32,9 +32,10 @@ class DataCatalogMockModelTest < ActiveSupport::TestCase
     with_config_value(:dm_project_name, 'WIBBLE') do
       with_config_value(:dm_project_link, 'http://wibble.eu') do
         expected = {
-          '@type' => 'Organization',
-          'name' => 'WIBBLE',
-          'url' => 'http://wibble.eu'
+          "@type"=>"Organization",
+          "@id"=>"http://wibble.eu",
+          "name"=>"WIBBLE",
+          "url"=>"http://wibble.eu"
         }
         assert_equal expected, @data_catalogue.provider
       end

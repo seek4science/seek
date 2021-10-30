@@ -3,21 +3,34 @@
     "id": "1039986486",
     "type": "investigations",
     "attributes": {
-      "snapshots": null,
+      "snapshots": [],
       "policy":
       {
         "access":"no_access",
         "permissions":[]
       },
       "other_creators": "Max Blumenthal, Ed Snowden",
+      "position": null,
+      "creators": [{
+        "profile": "/people/1039986485",
+        "family_name": "Last",
+        "given_name": "Person16",
+        "affiliation": "An Institution: 17",
+        "orcid": null
+      }],
       "title": "A Maximal Investigation",
-      "description": "Investigation of the Human Genome"
+      "description": "Investigation of the Human Genome",
+      "discussion_links": [{
+        "id": 55,
+        "url": "http://www.slack.com/",
+        "label": "Slack"
+      }]
     },
     "relationships": {
       "creators": {
         "data": [
           {
-            "id": "1039986701",
+            "id": "1039986485",
             "type": "people"
           }
         ]
@@ -37,7 +50,7 @@
             "type": "people"
           },
           {
-            "id": "1039986701",
+            "id": "1039986485",
             "type": "people"
           }
         ]

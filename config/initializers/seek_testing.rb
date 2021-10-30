@@ -30,6 +30,8 @@ def load_seek_testing_defaults!
       Settings.defaults[:factors_studied_enabled] = true
       Settings.defaults[:experimental_conditions_enabled] = true
       Settings.defaults[:programme_user_creation_enabled] = true
+      Settings.defaults[:programmes_open_for_projects_enabled] = true
+
       Settings.defaults[:project_hierarchy_enabled] = true
       Settings.defaults[:tabs_lazy_load_enabled] = false
 
@@ -37,6 +39,7 @@ def load_seek_testing_defaults!
       Settings.defaults[:collections_enabled] = true
       Settings.defaults[:documents_enabled] = true
       Settings.defaults[:events_enabled] = true
+      Settings.defaults[:human_diseases_enabled] = true
       Settings.defaults[:isa_enabled] = true
       Settings.defaults[:models_enabled] = true
       Settings.defaults[:organisms_enabled] = true
@@ -62,7 +65,7 @@ def load_seek_testing_defaults!
       Settings.defaults[:doi_minting_enabled]=true
       Settings.defaults[:doi_prefix] = "10.5072"
       Settings.defaults[:doi_suffix] = "Sysmo.SEEK"
-      Settings.defaults[:datacite_url] = "https://test.datacite.org/mds/"
+      Settings.defaults[:datacite_url] = "https://mds.test.datacite.org/"
       Settings.defaults[:datacite_username] = 'test'
       Settings.defaults[:datacite_password] = 'test'
       Settings.defaults[:time_lock_doi_for] = 0
@@ -134,7 +137,11 @@ def load_seek_testing_defaults!
       Settings.defaults[:omniauth_github_client_id] = 'abc'
       Settings.defaults[:omniauth_github_secret] = '456'
 
-      Settings.defaults[:custom_metadata_enabled] = true
+      Settings.defaults[:ga4gh_trs_api_enabled] = true
+
+      Settings.defaults[:life_monitor_url] = 'https://localhost:8000'
+      Settings.defaults[:life_monitor_client_id] = 'xyz'
+      Settings.defaults[:life_monitor_client_secret] = 'xyzabc'
     end
 end
 

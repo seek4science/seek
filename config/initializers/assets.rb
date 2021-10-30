@@ -5,6 +5,9 @@ Rails.application.config.assets.version = '1.0'
 
 # Add additional assets to the asset load path
 # Rails.application.config.assets.paths << Emoji.images_path
+Rails.application.configure do
+  config.assets.paths += Dir["#{Rails.root}/vendor/assets/rails-assets/*/*"]
+end
 Rails.application.config.assets.compile = true
 
 # Precompile additional assets.
@@ -33,6 +36,7 @@ Rails.application.config.assets.precompile += [
     'exhibit/exhibit-api.js',
     'flot/index.js',
     'project_folders',
+    'single_page/index',
     'tablesorter/jquery-latest.js',
     'tablesorter/jquery.tablesorter.js',
     'multi_step_wizard.js',
@@ -47,6 +51,7 @@ Rails.application.config.assets.precompile += [
     "tablesorter/blue/tablesorter_blue.css",
     "yui/index.css",
     "appended/*.css",
-    "publications"
+    "publications",
+    'controlled_vocabs.js'
 ]
 

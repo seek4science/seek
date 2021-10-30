@@ -4,16 +4,14 @@ module Seek
   module WorkflowExtractors
     class CWL < Base
       DIAGRAM_PATH = '/graph/%{format}'
-      def self.ro_crate_metadata
-        {
-            "@id" => "#cwl",
-            "@type" => "ComputerLanguage",
-            "name" => "Common Workflow Language",
-            "alternateName" => "CWL",
-            "identifier" => { "@id" => "https://w3id.org/cwl/v1.0/" },
-            "url" => { "@id" => "https://www.commonwl.org/" }
-        }
-      end
+      ABSTRACT_CWL_METADATA = {
+          "@id" => "#cwl",
+          "@type" => "ComputerLanguage",
+          "name" => "Common Workflow Language",
+          "alternateName" => "CWL",
+          "identifier" => { "@id" => "https://w3id.org/cwl/v1.0/" },
+          "url" => { "@id" => "https://www.commonwl.org/" }
+      }
 
       available_diagram_formats(png: 'image/png', svg: 'image/svg+xml', default: :svg)
 

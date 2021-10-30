@@ -1,11 +1,10 @@
 {
     "data": {
         "attributes": {
-            "tags": null,
+            "tags": [],
             "title": "A study 31",
             "description": null,
-            "experimentalists": null,
-            "person_responsible_id": "1"
+            "experimentalists": null,            
         },
         "relationships": {
            "investigation": {

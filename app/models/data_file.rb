@@ -42,7 +42,7 @@ class DataFile < ApplicationRecord
       joins: [:assays]
   )
 
-  explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi']) do
+  explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi', 'data_type', 'format_type']) do
     include Seek::Data::SpreadsheetExplorerRepresentation
     acts_as_doi_mintable(proxy: :parent, type: 'Dataset', general_type: 'Dataset')
     acts_as_versioned_resource
@@ -79,10 +79,10 @@ class DataFile < ApplicationRecord
 
   # Returns the columns to be shown on the table view for the resource
   def columns_default
-    super + ['title','version']
+    super + ['creators','projects','version']
   end
   def columns_allowed
-    super + ['title','last_used_at','version','other_creators','doi','license','simulation_data','deleted_contributor']
+    columns_default + ['last_used_at','other_creators','doi','license','simulation_data']
   end
 
   def included_to_be_copied?(symbol)
@@ -100,11 +100,6 @@ class DataFile < ApplicationRecord
   end
 
   def use_mime_type_for_avatar?
-    true
-  end
-
-  # defines that this is a user_creatable object type, and appears in the "New Object" gadget
-  def self.user_creatable?
     true
   end
 
@@ -222,7 +217,7 @@ class DataFile < ApplicationRecord
   end
 
   def populate_metadata_from_template
-    if contains_extractable_spreadsheet?
+    if contains_extractable_excel?
       Seek::Templates::Extract::DataFileRightFieldExtractor.new(self).populate(self)
     else
       Set.new
@@ -231,11 +226,13 @@ class DataFile < ApplicationRecord
 
   def initialise_assay_from_template
     assay = Assay.new
-    if contains_extractable_spreadsheet?
+    if contains_extractable_excel?
       warnings = Seek::Templates::Extract::AssayRightfieldExtractor.new(self).populate(assay)
       return assay, warnings
     else
       return assay, Set.new
     end
   end
+
+  has_task :sample_extraction
 end

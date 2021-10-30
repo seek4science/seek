@@ -1,0 +1,47 @@
+<div class="author row" data-index="{{index}}" data-identifier="{{ identifier }}">
+    <div class="col-sm-5">
+        <div class="btn btn-info btn-xs author-handle">
+            <span class="glyphicon glyphicon-sort" aria-hidden="true"></span>
+            <span class="author-position-label">{{ pos }}</span>
+            <input type="hidden" name="{{field}}[{{index}}][pos]" value="{{pos}}"/>
+        </div>
+
+        {{#if creator_id}}
+            <span class="glyphicon glyphicon-user"></span>
+            <a href="/people/{{creator_id}}" target="_blank">
+              {{given_name}} {{family_name}}
+            </a>
+        {{else}}
+            {{given_name}} {{family_name}}
+        {{/if}}
+
+        {{#if orcid}}
+            <a href="{{orcid}}" target="_blank" title="ORCID" class="orcid-link"></a>
+        {{/if}}
+    </div>
+
+    <div class="col-sm-5">
+        {{#if affiliation}}
+            <em>{{affiliation}}</em>
+        {{else}}
+            <span class="none_text">No affiliation specified</span>
+        {{/if}}
+    </div>
+
+    <div class="col-sm-2 text-right">
+        <input type="hidden" name="{{field}}[{{index}}][creator_id]" value="{{creator_id}}"/>
+        <input type="hidden" name="{{field}}[{{index}}][family_name]" value="{{family_name}}"/>
+        <input type="hidden" name="{{field}}[{{index}}][given_name]" value="{{given_name}}"/>
+        <input type="hidden" name="{{field}}[{{index}}][affiliation]" value="{{affiliation}}"/>
+        <input type="hidden" name="{{field}}[{{index}}][orcid]" value="{{orcid}}"/>
+
+        <a class="remove-association clickable" title="Remove this author">
+            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+        </a>
+        {{#if id}}
+            <input type="hidden" data-role="destroy" name="{{field}}[{{index}}][_destroy]" value="0">
+            <input type="hidden" name="{{field}}[{{index}}][id]" value="{{id}}"/>
+        {{/if}}
+    </div>
+</div>
+</div>

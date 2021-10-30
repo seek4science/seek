@@ -27,8 +27,8 @@
             <span id="publication_type_info" style="display:none;"></span>
              <span id="publication_type_selection">
               <%= collection_select :publication, :publication_type_id, PublicationType.order(:title), :id, :title,
-                              {:include_blank => "Publication type"},
-                              {:class => 'form-control'} -%>
+                                    {:selected => PublicationType.Journal.id},
+                              {:class => 'form-control'}  -%>
       </span>
           </div>
         </div>
@@ -76,7 +76,7 @@
         <span id="publication_type_info" style="display:none;"></span>
         <span id="publication_type_selection">
         <%= collection_select :publication, :publication_type_id, PublicationType.order(:title), :id, :title,
-                              {:include_blank => "Publication type"},
+                              {:selected => PublicationType.Journal.id},
                               {:class => 'form-control'} -%>
       </span>
       </div>
@@ -197,7 +197,7 @@
         <p>On successful import, the 'Enter manually' tab will be opened and the form will be populated with the data from the first article from the imported file.</p>
       </div>
       <div class="col-sm-5">
-        <p>On successful import, all publications will be saved. Any changes will need to be made inidividually afterwards.</p>
+        <p>On successful import, all publications will be saved. Any changes will need to be made individually afterwards.</p>
       </div>
       <div class="col-sm-5 col-sm-offset-2">
         <%= publication_form.button 'Import first', :name => "subaction", :value => 'Import', :class => 'btn btn-primary' %>

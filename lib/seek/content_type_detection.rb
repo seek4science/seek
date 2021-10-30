@@ -22,7 +22,7 @@ module Seek
     end
 
     def is_indexable_text?(blob = self)
-      within_text_size_limit(blob) && is_text?(blob) && blob.file_exists?
+      within_text_size_limit?(blob) && is_text?(blob) && blob.file_exists?
     end
 
     def is_excel?(blob = self)
@@ -30,11 +30,17 @@ module Seek
     end
 
     def is_supported_spreadsheet_format?(blob = self)
-      is_excel?(blob)
+      is_excel?(blob) || is_csv?(blob) || is_tsv?(blob)
+    end
+    
+    # is an Excel file capable of being extacted from
+    def is_extractable_excel?(blob = self)
+      blob.file_exists? && is_excel?(blob) && within_excel_extraction_size_limit?(blob)
     end
 
+    # is any spreadsheet format, including csv and tsv, that can be extracted from
     def is_extractable_spreadsheet?(blob = self)
-      blob.file_exists? && within_spreadsheet_size_limit(blob) && is_supported_spreadsheet_format?(blob)
+      blob.file_exists? && (is_extractable_excel?(blob) || is_csv?(blob) || is_tsv?(blob))
     end
 
     def is_in_simulatable_size_limit?(blob = self)
@@ -55,6 +61,10 @@ module Seek
 
     def is_csv?(blob = self)
       mime_extensions(blob.content_type).include?('csv')
+    end
+    
+    def is_tsv?(blob = self)
+      mime_extensions(blob.content_type).include?('tsv')
     end
 
     def is_binary?(blob = self)
@@ -125,11 +135,12 @@ module Seek
 
     private
 
-    def within_text_size_limit(blob)
+    def within_text_size_limit?(blob)
       !blob.file_size.nil? && blob.file_size < max_indexible_text_size
     end
 
-    def within_spreadsheet_size_limit(blob)
+    # within the size limit that the Apache POI based Excel extractor is able to handle
+    def within_excel_extraction_size_limit?(blob = self)
       !blob.file_size.nil? && blob.file_size < max_extractable_spreadsheet_size
     end
 

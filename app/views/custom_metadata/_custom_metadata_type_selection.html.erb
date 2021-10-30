@@ -1,7 +1,6 @@
-<% return unless Seek::Config.custom_metadata_enabled %>
+<% return if CustomMetadataType.where(supported_type:resource.class.name).empty? %>
 
 <%
-
   label ||= 'Extended Metadata'
 %>
 

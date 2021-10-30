@@ -289,21 +289,32 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_no_difference('Project.count') do
       delete :destroy, params: { id: project }
     end
-    assert_not_nil flash[:error]
-  end
-
-  test 'can not destroy project if it contains people' do
-    project = projects(:four)
-    work_group = Factory(:work_group, project: project)
-    a_person = Factory(:person, group_memberships: [Factory(:group_membership, work_group: work_group)])
-    get :show, params: { id: project }
-    assert_select 'span.disabled_icon', text: /Delete #{I18n.t('project')}/, count: 1
-    assert_no_difference('Project.count') do
-      delete :destroy, params: { id: project }
-    end
     refute_nil flash[:error]
   end
 
+  test 'can destroy project if it contains people' do
+    project = Factory(:person).projects.first
+
+    assert_equal 1,project.work_groups.count
+    assert_equal 1, project.people.count
+    assert_equal 1, project.group_memberships.count
+
+    login_as(Factory(:admin))
+
+    assert project.can_delete?
+
+    assert_difference('Project.count', -1) do
+      assert_difference('GroupMembership.count', -1) do
+        assert_no_difference('Person.count') do
+          assert_difference('WorkGroup.count',-1) do
+            delete :destroy, params: { id: project }
+          end
+        end
+      end
+    end
+
+  end
+  
   def test_non_admin_should_not_manage_projects
     login_as(:aaron)
     get :manage, params: { id: Factory(:project) }
@@ -608,7 +619,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as gatekeeper.user
     get :show, params: { id: gatekeeper.projects.first }
     assert_select 'div.box_about_actor p.asset_gatekeepers' do
-      assert_select 'strong', text: 'Asset gatekeepers:', count: 1
+      assert_select 'strong', text: I18n.t('asset_gatekeeper').pluralize+':', count: 1
       assert_select 'a', count: 1
       assert_select 'a[href=?]', person_path(gatekeeper), text: gatekeeper.name, count: 1
     end
@@ -633,7 +644,8 @@ class ProjectsControllerTest < ActionController::TestCase
       assert_select 'strong', text: 'Asset housekeepers:', count: 0
       assert_select 'a[href=?]', person_path(asset_manager), text: asset_manager.name, count: 0
 
-      assert_select 'strong', text: 'Asset gatekeepers:', count: 0
+
+      assert_select 'strong', text: I18n.t('asset_gatekeeper').pluralize+':', count: 0
       assert_select 'a[href=?]', person_path(gatekeeper), text: gatekeeper.name, count: 0
 
       assert_select 'strong', text: 'SysMO-DB PALs:', count: 1
@@ -877,33 +889,29 @@ class ProjectsControllerTest < ActionController::TestCase
     person = Factory(:person)
     project = person.projects.first
     login_as(person)
-    Delayed::Job.delete_all
 
-    post :update, params: { id: project, project: { description: 'sdfkuhsdfkhsdfkhsdf' } }
-
-    assert ProjectChangedEmailJob.new(project).exists?
+    assert_enqueued_with(job: ProjectChangedEmailJob) do
+      post :update, params: { id: project, project: { description: 'sdfkuhsdfkhsdfkhsdf' } }
+    end
   end
 
   test 'no email job created when edited by an admin' do
     person = Factory(:admin)
     project = person.projects.first
     login_as(person)
-    Delayed::Job.delete_all
 
-    post :update, params: { id: project, project: { description: 'sdfkuhsdfkhsdfkhsdf' } }
-
-    refute ProjectChangedEmailJob.new(project).exists?
+    assert_no_enqueued_jobs(only: ProjectChangedEmailJob) do
+      post :update, params: { id: project, project: { description: 'sdfkuhsdfkhsdfkhsdf' } }
+    end
   end
 
   test 'no email job created when edited by an project administrator' do
     person = Factory(:project_administrator)
     project = person.projects.first
     login_as(person)
-    Delayed::Job.delete_all
-
-    post :update, params: { id: project, project: { description: 'sdfkuhsdfkhsdfkhsdf' } }
-
-    refute ProjectChangedEmailJob.new(project).exists?
+    assert_no_enqueued_jobs(only: ProjectChangedEmailJob) do
+      post :update, params: { id: project, project: { description: 'sdfkuhsdfkhsdfkhsdf' } }
+    end
   end
 
   test 'projects belonging to an institution through nested route' do
@@ -1214,9 +1222,9 @@ class ProjectsControllerTest < ActionController::TestCase
     wg = Factory(:work_group, project: project)
     group_membership = Factory(:group_membership, work_group: wg)
     person = Factory(:person, group_memberships: [group_membership])
-    former_group_membership = Factory(:group_membership, time_left_at: 10.days.ago, work_group: wg)
+    former_group_membership = Factory(:group_membership, time_left_at: 10.days.ago, work_group: wg, has_left: true)
     former_person = Factory(:person, group_memberships: [former_group_membership])
-    assert_difference("Delayed::Job.where(\"handler LIKE '%ProjectLeavingJob%'\").count", 2) do
+    assert_no_enqueued_jobs only: ProjectLeavingJob do
       assert_no_difference('GroupMembership.count') do
         post :update_members, params: { id: project, memberships_to_flag: { group_membership.id.to_s => { time_left_at: 1.day.ago },
                                     former_group_membership.id.to_s => { time_left_at: '' } } }
@@ -1227,7 +1235,8 @@ class ProjectsControllerTest < ActionController::TestCase
     end
 
     assert group_membership.reload.has_left
-    assert !former_group_membership.reload.has_left
+    refute former_group_membership.reload.has_left
+    refute former_group_membership.reload[:has_left]
   end
 
   test 'cannot flag members of other projects as leaving' do
@@ -1708,9 +1717,9 @@ class ProjectsControllerTest < ActionController::TestCase
 
     login_as(person)
 
-    get :guided_join, params:{id:project.id}
+    get :guided_join, params: { id: project.id }
     assert_response :success
-    assert_select "input[type=checkbox][name='projects[]'][checked=checked]",value:project.id
+    assert_select 'input#projects', value: project.id
   end
 
   test 'invalid guided join' do
@@ -1728,7 +1737,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = Factory(:project_administrator).projects.first
 
     # already requested
-    MessageLog.log_project_membership_request(person, project, Factory(:institution), '')
+    ProjectMembershipMessageLog.log_request(sender:person, project:project, institution:Factory(:institution))
     get :guided_join, params:{id:project.id}
     assert_redirected_to project
     assert flash[:error]
@@ -1749,19 +1758,43 @@ class ProjectsControllerTest < ActionController::TestCase
 
   test 'guided create with administered programmes' do
     person = Factory(:programme_administrator)
-    prog = Factory(:programme, title:'THE MANAGED ONE')
+    managed_prog = Factory(:programme, title:'THE MANAGED ONE')
     person_prog = person.programmes.first
     another_prog = Factory(:programme)
     login_as(person)
-    with_config_value(:managed_programme_id, prog.id) do
+    with_config_value(:managed_programme_id, managed_prog.id) do
       get :guided_create
     end
     assert_response :success
     assert_select 'input#managed_programme', count:0
     assert_select 'select#programme_id' do
       assert_select 'option',count:2
-      assert_select 'option',value:prog.id,text:prog.title
+      assert_select 'option',value:managed_prog.id,text:managed_prog.title
       assert_select 'option',value:person_prog.id,text:person_prog.title
+      assert_select 'option',value:another_prog.id,text:another_prog.title, count:0
+    end
+  end
+
+  test 'guided create with administered programmes as admin' do
+    person = Factory(:programme_administrator)
+    managed_prog = Factory(:programme, title:'THE MANAGED ONE')
+    person_prog = person.programmes.first
+    another_prog = Factory(:programme)
+    admin = Factory(:admin)
+    admin_prog = Factory(:programme)
+    admin.is_programme_administrator = true, admin_prog
+    admin.save!
+    login_as(admin)
+    with_config_value(:managed_programme_id, managed_prog.id) do
+      get :guided_create
+    end
+    assert_response :success
+    assert_select 'input#managed_programme', count:0
+    assert_select 'select#programme_id' do
+      assert_select 'option',count:2      
+      assert_select 'option',value:managed_prog.id,text:managed_prog.title
+      assert_select 'option',value:admin_prog.id,text:admin_prog.title
+      assert_select 'option',value:person_prog.id,text:person_prog.title, count:0
       assert_select 'option',value:another_prog.id,text:another_prog.title, count:0
     end
   end
@@ -1772,25 +1805,25 @@ class ProjectsControllerTest < ActionController::TestCase
     institution = Factory(:institution)
     login_as(person)
     params = {
-        projects: [project.id.to_s],
+        projects: project.id.to_s,
         institution:{
             id:institution.id
         },
         comments: 'some comments'
     }
     assert_enqueued_emails(1) do
-      assert_difference('MessageLog.count') do
+      assert_difference('ProjectMembershipMessageLog.count') do
         post :request_join, params: params
       end
     end
 
     assert_response :success
     assert flash[:notice]
-    log = MessageLog.last
-    details = JSON.parse(log.details)
-    assert_equal 'some comments', details['comments']
-    assert_equal institution.title, details['institution']['title']
-    assert_equal institution.id, details['institution']['id']
+    log = ProjectMembershipMessageLog.last
+    details = log.parsed_details
+    assert_equal 'some comments', details.comments
+    assert_equal institution.title, details.institution.title
+    assert_equal institution.id, details.institution.id
 
   end
 
@@ -1806,58 +1839,106 @@ class ProjectsControllerTest < ActionController::TestCase
         web_page:'http://google.com'
     }
     params = {
-        projects: [project.id.to_s],
+        projects: project.id.to_s,
         institution: institution_params,
         comments: 'some comments'
     }
 
     assert_enqueued_emails(1) do
-      assert_difference('MessageLog.count') do
+      assert_difference('ProjectMembershipMessageLog.count') do
         post :request_join, params: params
       end
     end
 
     assert_response :success
     assert flash[:notice]
-    log = MessageLog.last
-    details = JSON.parse(log.details)
-    assert_equal 'some comments', details['comments']
-    institution_details = details['institution']
-    assert_nil institution_details['id']
-    assert_equal 'GB', institution_details['country']
-    assert_equal 'Sheffield', institution_details['city']
-    assert_equal 'http://google.com', institution_details['web_page']
+    log = ProjectMembershipMessageLog.last
+
+    details = log.parsed_details
+    assert_equal 'some comments', details.comments
+    assert_nil details.institution.id
+    assert_equal 'GB', details.institution.country
+    assert_equal 'Sheffield', details.institution.city
+    assert_equal 'http://google.com', details.institution.web_page
+  end
+
+  test 'request join multiple projects' do
+    person = Factory(:person_not_in_project)
+    project1 = Factory(:project_administrator).projects.first #project needs to have an admin
+    project2 = Factory(:project_administrator).projects.first
+    login_as(person)
+
+    institution_params = {
+      title:'fish',
+      city:'Sheffield',
+      country:'GB',
+      web_page:'http://google.com'
+    }
+    params = {
+      projects: "#{project1.id},#{project2.id}",
+      institution: institution_params,
+      comments: 'some comments'
+    }
+
+    assert_enqueued_emails(2) do
+      assert_difference('ProjectMembershipMessageLog.count', 2) do
+        post :request_join, params: params
+      end
+    end
+
+    assert_response :success
+    assert flash[:notice]
+    log = ProjectMembershipMessageLog.last
+    details = log.parsed_details
+    assert_equal project2, log.subject
+    assert_equal 'some comments', details.comments
+    assert_nil details.institution.id
+    assert_equal 'GB', details.institution.country
+    assert_equal 'Sheffield', details.institution.city
+    assert_equal 'http://google.com', details.institution.web_page
   end
 
   test 'request create project with site managed programme' do
+    Factory(:admin)
     person = Factory(:person_not_in_project)
     programme = Factory(:programme)
+
+    prog_admin = Factory(:person)
+    prog_admin.is_programme_administrator = true, programme
+    prog_admin.save!
+    another_prog_admin = Factory(:person)
+    another_prog_admin.is_programme_administrator = true, programme
+    another_prog_admin.save!
+    programme.reload
+    assert_equal 2, programme.programme_administrators.count
+
     institution = Factory(:institution)
+    
+    refute programme.programme_administrators.select(&:is_admin?).any?
     login_as(person)
     with_config_value(:managed_programme_id, programme.id) do
       params = {
           programme_id: programme.id,
-          project: { title: 'The Project',description:'description',web_page:'web_page'},
-          institution: {id: institution.id}
+          project: { title: 'The Project', description: 'description', web_page: 'web_page'},
+          institution: { id: institution.id }
       }
-      assert_enqueued_emails(1) do
-        assert_difference('MessageLog.count') do
+      assert_enqueued_emails(2) do # programme admins, and instance admins
+        assert_difference('ProjectCreationMessageLog.count') do
           post :request_create, params: params
         end
       end
 
       assert_response :success
       assert flash[:notice]
-      log = MessageLog.last
-      details = JSON.parse(log.details)
-      assert_equal institution.title, details['institution']['title']
-      assert_equal institution.id, details['institution']['id']
-      assert_equal institution.country, details['institution']['country']
-      assert_equal programme.title, details['programme']['title']
-      assert_equal programme.id, details['programme']['id']
-      project_details = details['project']
-      assert_equal 'description', project_details['description']
-      assert_equal 'The Project', project_details['title']
+      log = ProjectCreationMessageLog.last
+      details = log.parsed_details
+      assert_equal institution.title, details.institution.title
+      assert_equal institution.id, details.institution.id
+      assert_equal institution.country, details.institution.country
+      assert_equal programme.title, details.programme.title
+      assert_equal programme.id, details.programme.id
+      assert_equal 'description', details.project.description
+      assert_equal 'The Project', details.project.title
     end
   end
 
@@ -1873,37 +1954,40 @@ class ProjectsControllerTest < ActionController::TestCase
         institution: {id: institution.id}
       }
       assert_enqueued_emails(0) do
-        assert_difference('MessageLog.count',1) do
+        assert_difference('ProjectCreationMessageLog.count',1) do
           post :request_create, params: params
         end
       end
-      log = MessageLog.last
+      log = ProjectCreationMessageLog.last
       assert_redirected_to administer_create_project_request_projects_path(message_log_id:log.id)
 
-      details = JSON.parse(log.details)
-      assert_equal institution.title, details['institution']['title']
-      assert_equal institution.id, details['institution']['id']
-      assert_equal institution.country, details['institution']['country']
-      assert_equal programme.title, details['programme']['title']
-      assert_equal programme.id, details['programme']['id']
-      project_details = details['project']
-      assert_equal 'description', project_details['description']
-      assert_equal 'The Project', project_details['title']
+      details = log.parsed_details
+      assert_equal institution.title, details.institution.title
+      assert_equal institution.id, details.institution.id
+      assert_equal institution.country, details.institution.country
+      assert_equal programme.title, details.programme.title
+      assert_equal programme.id, details.programme.id
+
+      assert_equal 'description', details.project.description
+      assert_equal 'The Project', details.project.title
     end
   end
 
   test 'request create project with new programme and institution' do
+    Factory(:admin)
     person = Factory(:person_not_in_project)
     programme = Factory(:programme)
+    assert Person.admins.count > 1
     login_as(person)
     with_config_value(:managed_programme_id, programme.id) do
       params = {
-          project: { title: 'The Project',description:'description',web_page:'web_page'},
-          institution: {title:'the inst',web_page:'the page',city:'London',country:'GB'},
-          programme: {title:'the prog'}
+          project: { title: 'The Project', description:'description', web_page:'web_page'},
+          institution: {title: 'the inst', web_page: 'the page', city: 'London', country: 'GB'},
+          programme_id: '',
+          programme: {title: 'the prog'}
       }
       assert_enqueued_emails(1) do
-        assert_difference('MessageLog.count') do
+        assert_difference('ProjectCreationMessageLog.count') do
           assert_no_difference('Institution.count') do
             assert_no_difference('Project.count') do
               assert_no_difference('Programme.count') do
@@ -1916,25 +2000,21 @@ class ProjectsControllerTest < ActionController::TestCase
 
       assert_response :success
       assert flash[:notice]
-      log = MessageLog.last
-      details = JSON.parse(log.details)
-      project_details = details['project']
-      programme_details = details['programme']
-      institution_details = details['institution']
+      log = ProjectCreationMessageLog.last
+      details = log.parsed_details
 
+      assert_equal 'GB',details.institution.country
+      assert_equal 'London',details.institution.city
+      assert_equal 'the page',details.institution.web_page
+      assert_equal 'the inst',details.institution.title
+      assert_nil details.institution.id
 
-      assert_equal 'GB',institution_details['country']
-      assert_equal 'London',institution_details['city']
-      assert_equal 'the page',institution_details['web_page']
-      assert_equal 'the inst',institution_details['title']
-      assert_nil institution_details['id']
+      assert_equal 'description', details.project.description
+      assert_equal 'The Project', details.project.title
+      assert_nil  details.project.id
 
-      assert_equal 'description', project_details['description']
-      assert_equal 'The Project', project_details['title']
-      assert_nil  project_details['id']
-
-      assert_equal 'the prog',programme_details['title']
-      assert_nil programme_details['id']
+      assert_equal 'the prog',details.programme.title
+      assert_nil details.programme.id
     end
   end
 
@@ -1948,7 +2028,7 @@ class ProjectsControllerTest < ActionController::TestCase
         institution: {title:'the inst',web_page:'the page',city:'London',country:'GB'}
       }
       assert_enqueued_emails(1) do
-        assert_difference('MessageLog.count') do
+        assert_difference('ProjectCreationMessageLog.count') do
           assert_no_difference('Institution.count') do
             assert_no_difference('Project.count') do
               post :request_create, params: params
@@ -1959,23 +2039,20 @@ class ProjectsControllerTest < ActionController::TestCase
 
       assert_response :success
       assert flash[:notice]
-      log = MessageLog.last
-      details = JSON.parse(log.details)
-      project_details = details['project']
-      institution_details = details['institution']
+      log = ProjectCreationMessageLog.last
+      details = log.parsed_details
 
+      assert_equal 'GB',details.institution.country
+      assert_equal 'London',details.institution.city
+      assert_equal 'the page',details.institution.web_page
+      assert_equal 'the inst',details.institution.title
+      assert_nil details.institution.id
 
-      assert_equal 'GB',institution_details['country']
-      assert_equal 'London',institution_details['city']
-      assert_equal 'the page',institution_details['web_page']
-      assert_equal 'the inst',institution_details['title']
-      assert_nil institution_details['id']
+      assert_equal 'description', details.project.description
+      assert_equal 'The Project', details.project.title
+      assert_nil  details.project.id
 
-      assert_equal 'description', project_details['description']
-      assert_equal 'The Project', project_details['title']
-      assert_nil  project_details['id']
-
-      assert_nil details['programme']
+      assert_nil details.programme
     end
   end
 
@@ -1984,9 +2061,23 @@ class ProjectsControllerTest < ActionController::TestCase
     project = person.projects.first
     login_as(person)
     institution = Institution.new(title:'my institution')
-    log = MessageLog.log_project_membership_request(Factory(:person),project,institution,'some comments')
+    log = ProjectMembershipMessageLog.log_request(sender:Factory(:person), project:project, institution:institution, comments: 'some comments')
     get :administer_join_request, params:{id:project.id,message_log_id:log.id}
     assert_response :success
+  end
+
+  test 'administer join request with new institution that was since created' do
+    person = Factory(:project_administrator)
+    project = person.projects.first
+    login_as(person)
+    institution = Institution.new(title:'my institution')
+    log = ProjectMembershipMessageLog.log_request(sender:Factory(:person), project:project, institution:institution, comments:'some comments')
+    created_inst = Factory(:institution,title:'my institution')
+    get :administer_join_request, params:{id:project.id,message_log_id:log.id}
+    assert_response :success
+    
+    assert_select 'input#institution_title', count: 0
+    assert_select 'input#institution_id', value: created_inst.id, count: 1
   end
 
   test 'admininster join request blocked for different admin' do
@@ -1995,7 +2086,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = person.projects.first
     login_as(another_admin)
     institution = Institution.new(title:'my institution')
-    log = MessageLog.log_project_membership_request(Factory(:person),project,institution,'some comments')
+    log = ProjectMembershipMessageLog.log_request(sender:Factory(:person), project:project, institution:institution, comments:'some comments')
     get :administer_join_request, params:{id:project.id,message_log_id:log.id}
     assert_redirected_to :root
     refute_nil flash[:error]
@@ -2007,7 +2098,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = person.projects.first
     institution = Factory(:institution)
     sender = Factory(:person)
-    log = MessageLog.log_project_membership_request(sender,project,institution,'some comments')
+    log = ProjectMembershipMessageLog.log_request(sender:sender, project:project, institution:institution, comments:'some comments')
 
     params = {
         message_log_id: log.id,
@@ -2042,7 +2133,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = person.projects.first
     institution = Factory(:institution)
     sender = Factory(:person)
-    log = MessageLog.log_project_membership_request(sender,project,institution,'some comments')
+    log = ProjectMembershipMessageLog.log_request(sender:sender, project:project, institution:institution, comments:'some comments')
 
     params = {
         message_log_id: log.id,
@@ -2074,7 +2165,7 @@ class ProjectsControllerTest < ActionController::TestCase
                                       title:'institution',
                                    country:'DE'
                                   })
-    log = MessageLog.log_project_membership_request(sender,project,institution,'some comments')
+    log = ProjectMembershipMessageLog.log_request(sender:sender, project:project, institution:institution, comments:'some comments')
 
     params = {
         message_log_id: log.id,
@@ -2116,7 +2207,7 @@ class ProjectsControllerTest < ActionController::TestCase
                                       title:'institution',
                                       country:'DE'
                                   })
-    log = MessageLog.log_project_membership_request(sender,project,institution,'some comments')
+    log = ProjectMembershipMessageLog.log_request(sender:sender, project:project, institution:institution, comments:'some comments')
 
     params = {
         message_log_id: log.id,
@@ -2148,7 +2239,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = person.projects.first
     institution = Factory(:institution)
     sender = Factory(:person)
-    log = MessageLog.log_project_membership_request(sender,project,institution,'some comments')
+    log = ProjectMembershipMessageLog.log_request(sender:sender, project:project, institution:institution, comments:'some comments')
 
     params = {
         message_log_id: log.id,
@@ -2182,9 +2273,25 @@ class ProjectsControllerTest < ActionController::TestCase
     project = Project.new(title:'new project')
     programme = Programme.new(title:'new programme')
     institution = Institution.new(title:'my institution')
-    log = MessageLog.log_project_creation_request(Factory(:person),programme, project,institution)
+    log = ProjectCreationMessageLog.log_request(sender:Factory(:person), programme:programme, project:project, institution:institution)
     get :administer_create_project_request, params:{message_log_id:log.id}
     assert_response :success
+  end
+
+  test 'administer create request project with institution already created' do
+    # when a new institution when requested, but it has then been created before the request is handled 
+    person = Factory(:admin)
+    login_as(person)
+    project = Project.new(title:'new project')
+    programme = Programme.new(title:'new programme')
+    institution = Institution.new(title:'my institution')
+    log = ProjectCreationMessageLog.log_request(sender:Factory(:person), programme:programme, project:project, institution:institution)
+    created_inst = Factory(:institution,title:'my institution')
+    get :administer_create_project_request, params:{message_log_id:log.id}
+    assert_response :success
+
+    assert_select 'input#institution_title', count: 0
+    assert_select 'input#institution_id', value: created_inst.id, count: 1
   end
 
   test 'admininister create request can be accessed by programme admin' do
@@ -2193,7 +2300,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = Project.new(title:'new project')
     programme = person.programmes.first
     institution = Institution.new(title:'my institution')
-    log = MessageLog.log_project_creation_request(Factory(:person),programme, project,institution)
+    log = ProjectCreationMessageLog.log_request(sender:Factory(:person), programme:programme, project:project, institution:institution)
     get :administer_create_project_request, params:{message_log_id:log.id}
     assert_response :success
 
@@ -2212,7 +2319,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = Project.new(title:'new project')
     programme = person.programmes.first
     institution = Institution.new(title:'my institution')
-    log = MessageLog.log_project_creation_request(Factory(:person),programme, project,institution)
+    log = ProjectCreationMessageLog.log_request(sender:Factory(:person), programme:programme, project:project, institution:institution)
     get :administer_create_project_request, params:{message_log_id:log.id}
 
     assert_redirected_to :root
@@ -2225,7 +2332,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = Project.new(title:'new project')
     programme = Programme.new(title:'new programme')
     institution = Institution.new(title:'my institution')
-    log = MessageLog.log_project_creation_request(Factory(:person),programme, project,institution)
+    log = ProjectCreationMessageLog.log_request(sender:Factory(:person), programme:programme, project:project, institution:institution)
     get :administer_create_project_request, params:{message_log_id:log.id}
     assert_response :success
   end
@@ -2236,7 +2343,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = Project.new(title:'new project')
     programme = Programme.new(title:'new programme')
     institution = Institution.new(title:'my institution')
-    log = MessageLog.log_project_creation_request(Factory(:person),programme, project,institution)
+    log = ProjectCreationMessageLog.log_request(sender:Factory(:person), programme:programme, project:project, institution:institution)
     get :administer_create_project_request, params:{message_log_id:log.id}
 
     assert_redirected_to :root
@@ -2250,7 +2357,7 @@ class ProjectsControllerTest < ActionController::TestCase
     programme = Programme.new(title:'new programme')
     institution = Institution.new({title:'institution', country:'DE'})
     requester = Factory(:person)
-    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    log = ProjectCreationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution)
     params = {
         message_log_id:log.id,
         accept_request: '1',
@@ -2273,7 +2380,9 @@ class ProjectsControllerTest < ActionController::TestCase
         assert_difference('Project.count') do
           assert_difference('Institution.count') do
             assert_difference('GroupMembership.count') do
-              post :respond_create_project_request, params:params
+              assert_difference('WorkGroup.count') do
+                post :respond_create_project_request, params:params
+              end              
             end
           end
         end
@@ -2283,6 +2392,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project = Project.last
     programme = Programme.last
     institution = Institution.last
+    requester.reload
 
     assert_redirected_to(project_path(project))
     assert_equal "Request accepted and #{log.sender.name} added to Project and notified",flash[:notice]
@@ -2297,6 +2407,10 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_includes programme.programme_administrators, requester
     assert_includes project.project_administrators, requester
 
+    assert_equal WorkGroup.last, requester.work_groups.last
+    assert_equal institution, requester.work_groups.last.institution
+    assert_equal project, requester.work_groups.last.project
+
     log.reload
     assert log.responded?
     assert_equal 'Accepted',log.response
@@ -2310,7 +2424,7 @@ class ProjectsControllerTest < ActionController::TestCase
     programme = Programme.new(title:'new programme')
     institution = Institution.new({title:'institution', country:'DE'})
     requester = Factory(:person)
-    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    log = ProjectCreationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution)
     params = {
         message_log_id:log.id,
         accept_request: '1',
@@ -2355,7 +2469,7 @@ class ProjectsControllerTest < ActionController::TestCase
     programme = Programme.new(title:'new programme')
     institution = Institution.new({title:'institution', country:'DE'})
     requester = Factory(:person)
-    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    log = ProjectCreationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution)
     params = {
         message_log_id:log.id,
         accept_request: '1',
@@ -2400,7 +2514,7 @@ class ProjectsControllerTest < ActionController::TestCase
     programme = Programme.new(title:'new programme')
     institution = Institution.new({title:'institution', country:'DE'})
     requester = Factory(:person)
-    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    log = ProjectCreationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution)
     params = {
         message_log_id:log.id,
         accept_request: '1',
@@ -2422,7 +2536,9 @@ class ProjectsControllerTest < ActionController::TestCase
         assert_no_difference('Project.count') do
           assert_no_difference('Institution.count') do
             assert_no_difference('GroupMembership.count') do
-              post :respond_create_project_request, params:params
+              assert_no_difference('WorkGroup.count') do
+                post :respond_create_project_request, params:params
+              end              
             end
           end
         end
@@ -2442,7 +2558,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
     project = Project.new(title:'new project',web_page:'my new project')
     requester = Factory(:person)
-    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    log = ProjectCreationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution)
     params = {
         message_log_id:log.id,
         accept_request: '1',
@@ -2495,7 +2611,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
     project = Project.new(title:'new project',web_page:'my new project')
     requester = person
-    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    log = ProjectCreationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution)
     assert log.sent_by_self?
     params = {
       message_log_id:log.id,
@@ -2517,7 +2633,7 @@ class ProjectsControllerTest < ActionController::TestCase
         assert_difference('Project.count') do
           assert_no_difference('Institution.count') do
             assert_difference('GroupMembership.count') do
-              assert_difference('MessageLog.count',-1) do
+              assert_difference('ProjectCreationMessageLog.count',-1) do
                 post :respond_create_project_request, params:params
               end
             end
@@ -2546,7 +2662,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
     project = Project.new(title:'new project',web_page:'my new project')
     requester = person
-    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    log = ProjectCreationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution)
     assert log.sent_by_self?
     params = {
       message_log_id:log.id,
@@ -2567,7 +2683,7 @@ class ProjectsControllerTest < ActionController::TestCase
         assert_no_difference('Project.count') do
           assert_no_difference('Institution.count') do
             assert_no_difference('GroupMembership.count') do
-              assert_difference('MessageLog.count',-1) do
+              assert_difference('ProjectCreationMessageLog.count',-1) do
                 post :respond_create_project_request, params:params
               end
             end
@@ -2588,7 +2704,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(another_admin)
     project = Project.new(title:'new project',web_page:'my new project')
     requester = Factory(:person)
-    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    log = ProjectCreationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution)
     params = {
         message_log_id:log.id,
         accept_request: '1',
@@ -2632,7 +2748,7 @@ class ProjectsControllerTest < ActionController::TestCase
     login_as(person)
     project = Project.new(title:'new project',web_page:'my new project')
     requester = Factory(:person)
-    log = MessageLog.log_project_creation_request(requester,programme,project,institution)
+    log = ProjectCreationMessageLog.log_request(sender:requester, programme:programme, project:project, institution:institution)
     params = {
         message_log_id:log.id,
         reject_details:'not very good',
@@ -2681,9 +2797,9 @@ class ProjectsControllerTest < ActionController::TestCase
     requester2 = Factory(:person)
     requester3 = Factory(:person)
 
-    log1 = MessageLog.log_project_membership_request(requester1,project1,Factory(:institution),'')
-    log2 = MessageLog.log_project_membership_request(requester2,project1,Factory(:institution),'')
-    log3 = MessageLog.log_project_membership_request(Factory(:person),project2,Factory(:institution),'')
+    log1 = ProjectMembershipMessageLog.log_request(sender:requester1, project:project1, institution:Factory(:institution))
+    log2 = ProjectMembershipMessageLog.log_request(sender:requester2, project:project1, institution:Factory(:institution))
+    log3 = ProjectMembershipMessageLog.log_request(sender:Factory(:person), project:project2, institution:Factory(:institution))
 
     logout
     get :project_join_requests
@@ -2729,12 +2845,127 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
+  test "project creation requests" do
+    admin = Factory(:admin)
+    prog_admin = Factory(:programme_administrator)
+    programme = prog_admin.programmes.first
+    person = Factory(:person)
+    institution = Factory(:institution)
+    project = Project.new(title: "new")
 
+    log_existing_programme = ProjectCreationMessageLog.log_request(sender:person, programme:programme, project:project, institution:institution)
+    log_new_programme = ProjectCreationMessageLog.log_request(sender:person, programme:Programme.new(title: "new"), project:project, institution:institution)
 
-  private
+    # no user
+    logout
+    get :project_creation_requests
+    assert_redirected_to :login
+    refute_nil flash[:error]
+
+    login_as(prog_admin)
+    get :project_creation_requests
+    assert_response :success
+
+    assert_select "h1", text: /1 pending project creation/i
+    assert_select "table#project-create-requests" do
+      assert_select "tbody tr", count: 1
+      assert_select "a[href=?]", person_path(person), text: person.title
+      assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_existing_programme.id)
+      assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_new_programme.id), count: 0
+    end
+
+    login_as(admin)
+    get :project_creation_requests
+    assert_response :success
+
+    assert_select "h1", text: /1 pending project creation/i
+    assert_select "table#project-create-requests" do
+      assert_select "tbody tr", count: 1
+      assert_select "a[href=?]", person_path(person), text: person.title
+      assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_new_programme.id)
+      assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_existing_programme.id), count: 0
+    end
+
+    with_config_value(:managed_programme_id, programme.id) do
+      get :project_creation_requests
+      assert_response :success
+
+      assert_select "h1", text: /2 pending project creation/i
+      assert_select "table#project-create-requests" do
+        assert_select "tbody tr", count: 2
+        assert_select "a[href=?]", person_path(person), text: person.title, count: 2
+        assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_new_programme.id)
+        assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_existing_programme.id)
+      end
+    end
+
+    login_as(person)
+    get :project_creation_requests
+    assert_response :success
+
+    assert_select "h1", text: /0 pending project creation/i
+    assert_select "table#project-create-requests" do
+      assert_select "tbody tr", count: 0
+      assert_select "a[href=?]", person_path(person), text: person.title, count: 0
+      assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_new_programme.id), count: 0
+      assert_select "a[href=?]", administer_create_project_request_projects_path(message_log_id: log_existing_programme.id), count: 0
+    end
+  end
+
+  test 'should create with discussion link' do
+    person = Factory(:admin)
+    login_as(person)
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('Project.count') do
+        post :create, params: { project: { title: 'test',
+                                          discussion_links_attributes: [{url: "http://www.slack.com/"}]}}
+      end
+    end
+    project = assigns(:project)
+    assert_equal 'http://www.slack.com/', project.discussion_links.first.url
+    assert_equal AssetLink::DISCUSSION, project.discussion_links.first.link_type
+  end
+
+  test 'should show discussion link' do
+    disc_link = Factory(:discussion_link)
+    project = Factory(:project)
+    project.discussion_links = [disc_link]
+    get :show, params: { id: project }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+  end
+
+  test 'should update node with discussion link' do
+    person = Factory(:admin)
+    project = Factory(:project)
+    login_as(person)
+    assert_nil project.discussion_links.first
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: project.id, project: { discussion_links_attributes:[{url: "http://www.slack.com/"}] } }
+      end
+    end
+    assert_redirected_to project_path(assigns(:project))
+    assert_equal 'http://www.slack.com/', project.discussion_links.first.url
+  end
+
+  test 'should destroy related assetlink when the discussion link is removed ' do
+    person = Factory(:admin)
+    login_as(person)
+    asset_link = Factory(:discussion_link)
+    project = Factory(:project)
+    project.discussion_links = [asset_link]
+    assert_difference('AssetLink.discussion.count', -1) do
+      put :update, params: { id: project.id, project: { discussion_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
+    end
+    assert_redirected_to project_path(project = assigns(:project))
+    assert_empty project.discussion_links
+  end
+
+    private
 
   def edit_max_object(project)
-    for i in 1..5 do
+    for i in 1..5
       Factory(:person).add_to_project_and_institution(project, Factory(:institution))
     end
     project.default_policy = Factory(:private_policy)
@@ -2743,6 +2974,7 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   def valid_project
-    { title: 'a title' }
-  end
+    { title: "a title" }
+  end  
+  
 end

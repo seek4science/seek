@@ -31,6 +31,8 @@ class Programme < ApplicationRecord
   end
   accepts_nested_attributes_for :projects
 
+  auto_strip_attributes :web_page
+
   # validations
   validates :title, uniqueness: true
   validates :title, length: { maximum: 255 }
@@ -40,6 +42,8 @@ class Programme < ApplicationRecord
 
   after_save :handle_administrator_ids, if: -> { @administrator_ids }
   before_create :activate_on_create
+
+
 
   # scopes
   scope :activated, -> { where(is_activated: true) }
@@ -100,6 +104,10 @@ class Programme < ApplicationRecord
 
   def can_activate?(user = User.current_user)
     user && user.is_admin? && !is_activated?
+  end
+
+  def allows_user_projects?
+    open_for_projects? && Seek::Config.programmes_open_for_projects_enabled
   end
 
   def self.can_create?

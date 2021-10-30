@@ -25,4 +25,28 @@ module WorkflowsHelper
                 t("maturity_level.#{level}"),
                 class: "maturity-level label #{level == :released ? 'label-success' : 'label-warning'}")
   end
+
+  def test_status_badge(status)
+    case status
+    when :all_passing
+      label_class = 'label-success'
+      label = t("test_status.#{status}")
+    when :some_passing
+      label_class = 'label-warning'
+      label = t("test_status.#{status}")
+    when :all_failing
+      label_class = 'label-danger'
+      label = t("test_status.#{status}")
+    else
+      label_class = 'label-default'
+      label = t('test_status.not_available')
+    end
+    content_tag(:span, "Tests: #{label}", class: "test-status label #{label_class}")
+  end
+
+  def run_workflow_url(workflow_version)
+    if workflow_version.workflow_class_title == 'Galaxy'
+      "#{Seek::Config.galaxy_instance_trs_import_url}&trs_id=#{workflow_version.parent.id}&trs_version=#{workflow_version.version}"
+    end
+  end
 end

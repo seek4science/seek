@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-gem 'rails', '~> 5.2.4'
+gem 'rails', '~> 5.2.4.0'
 gem 'rdoc'
 
 #database adaptors
@@ -21,8 +21,7 @@ gem 'rmagick', '2.15.2'
 gem 'rest-client', '~>2.0'
 gem 'factory_girl', '2.6.4'
 gem 'bio', '~> 1.5.1'
-gem 'sunspot_rails', '~>2.2.7'
-gem 'sunspot_solr', '~>2.2.0'
+gem 'sunspot_rails'
 gem 'progress_bar'
 gem 'savon', '1.1.0'
 gem 'dynamic_form'
@@ -54,8 +53,8 @@ gem 'will_paginate', '~> 3.1'
 gem 'yaml_db'
 gem 'rails_autolink'
 gem 'rfc-822'
-gem 'nokogiri', '>= 1.11.0.rc4'
-gem 'rdf-virtuoso', git: 'https://github.com/ruby-rdf/rdf-virtuoso', branch: 'develop'
+gem 'nokogiri', '~> 1.12.5'
+gem 'rdf-virtuoso', '>= 0.2.0'
 gem 'terrapin'
 gem 'lograge'
 gem 'psych'
@@ -77,7 +76,7 @@ gem 'jquery-ui-rails'
 gem 'recaptcha', '~> 4.1.0'
 gem 'metainspector'
 gem 'mechanize'
-gem 'mimemagic','0.3.2'
+gem 'mimemagic','~> 0.3.7'
 gem 'auto_strip_attributes'
 gem 'coffee-rails', '~> 4.2'
 gem 'bootstrap-sass', '>=3.4.1'
@@ -91,11 +90,11 @@ gem 'zenodo-client', git: 'https://github.com/seek4science/zenodo-client.git'
 gem 'unicorn-rails'
 gem 'seedbank'
 
-gem 'rspec-rails'
+gem 'rspec-rails','~> 3.6'
 
 gem 'citeproc-ruby', '~> 1.1.4'
 gem 'citeproc', '~> 1.0.4'
-gem 'csl-styles', '~> 1.0.1.7'
+gem 'csl-styles', '~> 1.0.1.11'
 gem 'bibtex-ruby', '~> 5.1.0'
 
 gem 'omniauth', '~> 1.3.1'
@@ -131,28 +130,15 @@ gem "doorkeeper", ">= 5.2.5"
 
 gem 'request_store'
 
-# javascript assets from https://rails-assets.org
 gem 'bundler', '>= 1.8.4'
 
-gem 'ro-crate-ruby', git: 'https://github.com/fbacall/ro-crate-ruby.git'
+gem 'ro-crate', '~> 0.4.9'
 
 gem 'git'
-
-gem 'redcarpet'
-
 gem 'i18n-js'
-
-source 'https://rails-assets.org' do
-  gem 'rails-assets-bootstrap-multiselect', '~> 0.9.13'
-  gem 'rails-assets-bootstrap-tagsinput', '~> 0.8.0'
-  gem 'rails-assets-typeahead.js', '~> 0.10.5'
-  gem 'rails-assets-clipboard', '~> 1.5.12'
-  gem 'rails-assets-vue', '~> 2.1.8'
-  gem 'rails-assets-eonasdan-bootstrap-datetimepicker', '~> 4.17.42'
-  gem 'rails-assets-x-editable', '~> 1.5.1'
-  gem 'rails-assets-chartjs', '~> 2.7.2'
-  gem 'rails-assets-lightbox2', '~> 2.10.0'
-end
+gem 'whenever', '~> 1.0.0', require: false
+gem 'dotenv-rails', '~> 2.7.6'
+gem 'commonmarker'
 
 group :production do
   gem 'passenger'
@@ -174,13 +160,14 @@ group :test do
   gem 'ruby-prof'
   gem 'test-prof'
   gem 'rails-perftest'
-  gem 'minitest', '5.10.3'
+  gem 'minitest', '~> 5.14'
   gem 'minitest-reporters'
   gem 'sunspot_matchers'
   gem 'database_cleaner', '~> 1.7.0'
   gem 'vcr', '~> 2.9'
   gem 'rails-controller-testing'
   gem 'simplecov'
+  gem 'whenever-test'
 end
 
 group :test, :development do

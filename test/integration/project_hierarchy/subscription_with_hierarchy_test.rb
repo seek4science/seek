@@ -3,15 +3,12 @@ require 'project_hierarchy_test_helper'
 
 class SubscriptionWithHierarchyTest < ActionDispatch::IntegrationTest
   include ProjectHierarchyTestHelper
+  include ActiveJob::TestHelper
+
   def setup
     skip_hierarchy_tests?
-    sync_delayed_jobs [ProjectSubscriptionJob, SetSubscriptionsForItemJob, RemoveSubscriptionsForItemJob]
     login_as_test_user
     initialize_hierarchical_projects
-  end
-
-  def teardown
-    desync_delayed_jobs
   end
 
   test 'add/remove_project_subscriptions_for_subscriber when adding/removing ancestors' do
@@ -28,6 +25,7 @@ class SubscriptionWithHierarchyTest < ActionDispatch::IntegrationTest
     assert !person.project_subscriptions.map(&:project).include?(@proj)
     assert person.project_subscriptions.map(&:project).include?(new_parent_proj)
   end
+
   test 'people subscribe to their projects and parent projects when their projects are assigned' do
     # when created without a project
     person = Factory(:brand_new_person)
@@ -46,33 +44,37 @@ class SubscriptionWithHierarchyTest < ActionDispatch::IntegrationTest
   end
 
   test 'subscribing to a project subscribes existing and new items in the project AND NEW items in its ancestors' do
-    # when person edits his profile to subscribe new project, only items in that direct project are subscribed
-    child_project = Factory :project, parent_id: @proj.id
-    @proj.reload
+    perform_enqueued_jobs(only: [ProjectSubscriptionJob, SetSubscriptionsForItemJob, RemoveSubscriptionsForItemJob]) do
+      # when person edits his profile to subscribe new project, only items in that direct project are subscribed
+      child_project = Factory :project, parent_id: @proj.id
+      @proj.reload
 
-    existing_subscribable = Factory :subscribable, projects: [child_project], contributor: Factory(:person,project:child_project)
-    current_person.project_subscriptions.create(project: child_project)
-    new_subscribable = Factory :subscribable, projects: [child_project], contributor: Factory(:person,project:child_project)
-    new_subscribable_proj = Factory :subscribable, projects: [@proj], contributor: Factory(:person,project:@proj)
+      existing_subscribable = Factory :subscribable, projects: [child_project], contributor: Factory(:person,project:child_project)
+      current_person.project_subscriptions.create(project: child_project)
+      new_subscribable = Factory :subscribable, projects: [child_project], contributor: Factory(:person,project:child_project)
+      new_subscribable_proj = Factory :subscribable, projects: [@proj], contributor: Factory(:person,project:@proj)
 
-    assert existing_subscribable.subscribed?
-    assert new_subscribable.subscribed?
+      assert existing_subscribable.subscribed?
+      assert new_subscribable.subscribed?
 
-    refute @subscribables_in_proj.all?(&:subscribed?)
-    assert new_subscribable_proj.subscribed?
+      refute @subscribables_in_proj.all?(&:subscribed?)
+      assert new_subscribable_proj.subscribed?
+    end
   end
 
   test 'when the project tree updates, people subscribe to items in the new parent of the projects they are subscribed to' do
-    child_project = Factory :project
-    current_person.project_subscriptions.create project: child_project
-    child_project.reload
-    assert !child_project.project_subscriptions.map(&:person).empty?
-    disable_authorization_checks do
-      child_project.parent_id = @proj.id
-      child_project.save!
+    perform_enqueued_jobs(only: [ProjectSubscriptionJob, SetSubscriptionsForItemJob, RemoveSubscriptionsForItemJob]) do
+      child_project = Factory :project
+      current_person.project_subscriptions.create project: child_project
+      child_project.reload
+      assert !child_project.project_subscriptions.map(&:person).empty?
+      disable_authorization_checks do
+        child_project.parent_id = @proj.id
+        child_project.save!
+      end
+      @subscribables_in_proj.each(&:reload)
+      assert @subscribables_in_proj.all?(&:subscribed?)
     end
-    @subscribables_in_proj.each(&:reload)
-    assert @subscribables_in_proj.all?(&:subscribed?)
   end
 
   test 'subscribe/unsubscribe a project should subscribe/unsubscribe only itself rather that its parents' do
@@ -126,28 +128,30 @@ class SubscriptionWithHierarchyTest < ActionDispatch::IntegrationTest
   end
 
   test 'clear all subscriptions when no project is assigned to person' do
-    person = new_person_with_hierarchical_projects
-    # subscribe an individual item in another project
-    person.subscriptions.build subscribable: Factory(:subscribable)
+    perform_enqueued_jobs(only: [ProjectSubscriptionJob, SetSubscriptionsForItemJob, RemoveSubscriptionsForItemJob]) do
+      person = new_person_with_hierarchical_projects
+      # subscribe an individual item in another project
+      person.subscriptions.build subscribable: Factory(:subscribable)
 
-    disable_authorization_checks do
-      # save person in order to save built project subscriptions
-      person.save!
+      disable_authorization_checks do
+        # save person in order to save built project subscriptions
+        person.save!
+      end
+
+      # @proj,@proj_child1,@proj_child2 are subscribed
+      assert_equal 3, person.project_subscriptions.count
+
+      # 3 subscriptions from project subscription for @proj + 1 individual subscription
+      assert_equal 4, person.subscriptions.count
+
+      # unassign all related projects
+      person.work_groups.destroy_all
+      disable_authorization_checks do
+        person.save
+      end
+      person.reload
+      assert_equal 0, person.project_subscriptions.count
+      assert_equal 0, person.subscriptions.count
     end
-
-    # @proj,@proj_child1,@proj_child2 are subscribed
-    assert_equal 3, person.project_subscriptions.count
-
-    # 3 subscriptions from project subscription for @proj + 1 individual subscription
-    assert_equal 4, person.subscriptions.count
-
-    # unassign all related projects
-    person.work_groups.destroy_all
-    disable_authorization_checks do
-      person.save
-    end
-    person.reload
-    assert_equal 0, person.project_subscriptions.count
-    assert_equal 0, person.subscriptions.count
   end
 end

@@ -18,7 +18,6 @@
 *= require bives
 *= require full_scroll_table
 *= require match_making
-*= require modified_exhibit
 *= require faceted_browsing
 *= require project_folders
 *= require publishing
@@ -41,5 +40,7 @@
 *= require cytoscape_isa_graph
 *= require multi-step-wizard.css.erb
 *= require lightbox2
-*= require simplemde.min
+*= require simplemde-markdown-editor-1.11.2/simplemde.min
+*= require github-markdown-css/github-markdown
+*= require single_page
 */

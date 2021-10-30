@@ -35,6 +35,7 @@ Factory.define(:max_collection, class: Collection) do |f|
   f.with_project_contributor
   f.title 'A Maximal Collection'
   f.description 'A collection of very interesting things'
+  f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
   f.policy { Factory(:downloadable_public_policy) }
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
   f.after_create do |c|
@@ -47,7 +48,7 @@ Factory.define(:max_collection, class: Collection) do |f|
         Factory(:collection_item, comment: 'Bad data', collection: c, asset: Factory(:data_file, policy: Factory(:private_policy), title: 'Readme'))
     ]
   end
-  f.other_creators 'Blogs, Joe'
+  f.other_creators 'Joe Bloggs'
 end
 
 # CollectionItem

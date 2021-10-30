@@ -80,7 +80,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'creates valid datafile with dependent external_assed that can be saved' do
-    @endpoint.project.update_attributes(default_license: 'wibble')
+    @endpoint.project.update_attributes(default_license: 'CC0-1.0')
     dataset = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')
     assert dataset
 
@@ -91,7 +91,7 @@ class SeekUtilTest < ActiveSupport::TestCase
 
     assert df.valid?
     assert df.openbis?
-    assert_equal 'wibble', df.license
+    assert_equal 'CC0-1.0', df.license
 
     assert_difference('DataFile.count') do
       assert_difference('ExternalAsset.count') do
@@ -323,17 +323,15 @@ class SeekUtilTest < ActiveSupport::TestCase
 
     assert asset.save
 
-    Delayed::Job.destroy_all
     ReindexingQueue.destroy_all
-    assert_difference('Delayed::Job.count', 1) do
+    assert_enqueued_jobs(1, only: ReindexingJob) do
       @util.sync_asset_content(asset)
     end
     assert ReindexingQueue.exists?(item: data_file)
 
     asset.reload
-    Delayed::Job.destroy_all
     ReindexingQueue.destroy_all
-    assert_no_difference('Delayed::Job.count') do
+    assert_no_enqueued_jobs(only: ReindexingJob) do
       # same content no change
       @util.sync_asset_content(asset)
     end
@@ -380,17 +378,15 @@ class SeekUtilTest < ActiveSupport::TestCase
 
     assert asset.save
 
-    Delayed::Job.destroy_all
     ReindexingQueue.destroy_all
-    assert_difference('Delayed::Job.count', 1) do
+    assert_enqueued_jobs(1, only: ReindexingJob) do
       @util.sync_external_asset(asset)
     end
     assert ReindexingQueue.exists?(item: data_file)
 
     asset.reload
-    Delayed::Job.destroy_all
     ReindexingQueue.destroy_all
-    assert_no_difference('Delayed::Job.count') do
+    assert_no_enqueued_jobs(only: ReindexingJob) do
       # same content no change
       @util.sync_external_asset(asset)
     end

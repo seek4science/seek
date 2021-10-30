@@ -206,6 +206,12 @@ module ApplicationHelper
     return "<li><div class='none_text'> None specified</div></li>".html_safe if is_nil_or_empty?(list)
   end
 
+  def render_markdown(markdown)
+    doc = CommonMarker.render_doc(markdown, :UNSAFE, [:tagfilter, :table, :strikethrough, :autolink])
+    renderer = CommonMarker::SeekHtmlRenderer.new(options: [:UNSAFE, :GITHUB_PRE_LANG], extensions: [:tagfilter, :table, :strikethrough, :autolink])
+    renderer.render(doc)
+  end
+
   def text_or_not_specified(text, options = {})
     text = text.to_s
     if text.nil? || text.chomp.empty?
@@ -218,18 +224,12 @@ module ApplicationHelper
       res = text.html_safe
       res = white_list(res)
       res = truncate_without_splitting_words(res, options[:length]) if options[:length]
-      res = simple_format(res, {}, sanitize: false).html_safe if options[:description] == true || options[:address] == true
-      if options[:description] == true && options[:markdown] == true
-        markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, tables: true)
-        # replace br with newlines to fix list render issues
-        res.gsub!(/<br\s*\/>/, "\n")
-        # remove <p> and <br> tags, Redcarpet markdown render cannot handle them
-        scrubber = Rails::Html::TargetScrubber.new
-        scrubber.tags = ['p','br']
-        res = Loofah.fragment(res).scrub!(scrubber).to_s
-        res = markdown.render(res)
+      if options[:markdown]
+        res = render_markdown(res)
+      elsif options[:description] || options[:address]
+        res = simple_format(res, {}, sanitize: false).html_safe
       end
-      res = auto_link(res, html: { rel: 'nofollow' }, sanitize: false) if options[:auto_link]
+      res = auto_link(res, html: { rel: 'nofollow' }, sanitize: false) if options[:auto_link] && !options[:markdown]
       res = mail_to(res) if options[:email]
       res = link_to(res, res, popup: true, target: :_blank) if options[:external_link]
       res = res + '&nbsp;' + flag_icon(text) if options[:flag]
@@ -437,6 +437,11 @@ module ApplicationHelper
     instance_variable_get("@#{c.singularize}")
   end
 
+  # returns the current version of the resource for the controller, e.g @display_data_file for data_files
+  def versioned_resource_for_controller(c = controller_name)
+    instance_variable_get("@display_#{c.singularize}")
+  end
+
   def cancel_button(path, html_options = {})
     html_options[:class] ||= ''
     html_options[:class] << ' btn btn-default'
@@ -473,15 +478,17 @@ module ApplicationHelper
   end
 
   def pending_project_creation_request?
-    return false unless admin_logged_in?
-    return MessageLog.pending_project_creation_requests.any?
+    return false unless logged_in_and_registered?   
+    ProjectCreationMessageLog.pending_requests.collect do |log|
+      log.can_respond_project_creation_request?(User.current_user)
+    end.any?
   end
 
   def pending_project_join_request?
     return false unless project_administrator_logged_in?
     person = User.current_user.person
     projects = person.administered_projects
-    return MessageLog.pending_project_join_requests(projects).any?
+    return ProjectMembershipMessageLog.pending_requests(projects).any?
   end
 
   #whether to show a banner encouraging you to join or create a project
@@ -498,11 +505,24 @@ module ApplicationHelper
     return Seek::Config.programmes_enabled && Programme.site_managed_programme
   end
 
+  def render_menu_group(title, options)
+    return unless options.any? { |opt_title, url, enabled| enabled }
+    html = content_tag(:li, title, role: 'presentation', class: 'dropdown-header')
+    options.each do |opt_title, url, enabled|
+      next unless enabled
+      html += content_tag(:li) do
+        link_to(opt_title, url)
+      end
+    end
+
+    html
+  end
+
   PAGE_TITLES = { 'home' => 'Home', 'projects' => I18n.t('project').pluralize, 'institutions' => I18n.t('institution').pluralize,
                   'people' => 'People', 'sessions' => 'Login', 'users' => { 'new' => 'Signup', '*' => 'Account' }, 'search' => 'Search',
-                  'assays' => I18n.t('assays.assay').pluralize.capitalize, 'sops' => I18n.t('sop').pluralize, 'models' => I18n.t('model').pluralize, 'data_files' => I18n.t('data_file').pluralize,
+                  'assays' => I18n.t('assays.assay').pluralize.capitalize, 'sops' => I18n.t('sop').pluralize, 'models' => I18n.t('model').pluralize, 'data_files' => I18n.t('data_file').pluralize, 'documents' => 'Documents',
                   'publications' => 'Publications', 'investigations' => I18n.t('investigation').pluralize, 'studies' => I18n.t('study').pluralize,
-                  'samples' => 'Samples', 'strains' => 'Strains', 'organisms' => 'Organisms', 'human_disease' => 'Human Diseases', 'biosamples' => 'Biosamples',
+                  'samples' => 'Samples', 'strains' => 'Strains', 'organisms' => 'Organisms', 'human_disease' => 'Human Diseases', 'biosamples' => 'Biosamples', 'sample_types' => 'Sample Types',
                   'presentations' => I18n.t('presentation').pluralize, 'programmes' => I18n.t('programme').pluralize, 'events' => I18n.t('event').pluralize, 'help_documents' => 'Help' }.freeze
 end
 

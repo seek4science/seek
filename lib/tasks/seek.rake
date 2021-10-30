@@ -17,7 +17,7 @@ namespace :seek do
       end
     end
     # 5 is an arbitrary number to take advantage of there being more than 1 worker dedicated to auth refresh
-    5.times { AuthLookupUpdateJob.new.queue_job(1, 5.seconds.from_now) }
+    5.times { AuthLookupUpdateJob.set(priority: 1).perform_later }
   end
 
   desc 'Rebuild all authorization lookup table for all items.'
@@ -68,7 +68,7 @@ namespace :seek do
   desc 'Creates background jobs to reindex all searchable things'
   task(reindex_all: :environment) do
     Seek::Util.searchable_types.each do |type|
-      ReindexingJob.new.add_items_to_queue type.all, 5.seconds.from_now, 2
+      ReindexingQueue.enqueue(type.all)
     end
   end
 
@@ -95,9 +95,24 @@ namespace :seek do
     puts 'Done'
   end
 
+  desc "populate the postions of assays"
+  task populate_positions: :environment do
+    Study.all.each do |s|
+      position = 1
+      s.assays.each do |a|
+        a.position = position
+        position += 1
+        disable_authorization_checks do
+          puts a.save
+        end
+      end
+    end
+  end
+
   desc "Clear encrypted settings"
   task clear_encrypted_settings: :environment do
     Settings.where(var: Seek::Config.encrypted_settings).destroy_all
     puts 'Encrypted settings cleared'
   end
+
 end

@@ -20,14 +20,14 @@ end
 Factory.define(:min_model, class: Model) do |f|
   f.with_project_contributor
   f.title 'A Minimal Model'
-  f.projects { [Factory.build(:min_project)] }
+  f.projects { [Factory(:min_project)] }
 end
 
 Factory.define(:max_model, class: Model) do |f|
   f.with_project_contributor
   f.title 'A Maximal Model'
   f.description 'Hidden Markov Model'
-  f.projects { [Factory.build(:max_project)] }
+  f.projects { [Factory(:max_project)] }
   f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
   f.assays {[Factory.build(:max_assay, policy: Factory(:public_policy))]}
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}

@@ -1,0 +1,1 @@
+<a name="listSampleAttributeTypes"></a>The **listSampleAttributeTypes** operation returns a JSON object containing a list of all the <a href="#sampleAttributeTypes">**SampleAttributeTypes**</a> to which the authenticated user has access.

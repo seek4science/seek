@@ -7,22 +7,26 @@ module Seek
       include ActionView::Helpers::SanitizeHelper
       attr_reader :resource
 
+      SCHEMA_ORG = 'https://schema.org'
+
       # initialise with a resource
       def initialize(resource)
         @resource = resource
       end
 
-      # returns the JSON-LD as a String, for the resource
-      def json_ld
-        unless supported?
-          raise UnsupportedTypeException, "Bioschema not supported for #{resource.class.name}"
-        end
-        json = {
+      def json_representation
+        repr = {
           '@context' => resource_decorator.context,
           '@type' => resource_decorator.schema_type
-        }.merge(attributes_json)
+        }
+        repr['dct:conformsTo'] = resource_decorator.conformance if resource_decorator.respond_to? 'conformance'
+        repr = repr.merge(attributes_json)
+        repr.deep_stringify_keys
+      end
 
-        JSON.pretty_generate(json)
+      # returns the JSON-LD as a String, for the resource
+      def json_ld
+        JSON.pretty_generate(json_representation)
       end
 
       # whether the resource BioSchema was initialized with is supported
@@ -44,8 +48,9 @@ module Seek
       private
 
       SUPPORTED_TYPES = [Person, Project, Event, DataFile, Organism, HumanDisease,
-                         Seek::BioSchema::DataCatalogMockModel, Sample,
-                         Document, Presentation, Workflow, Collection].freeze
+                         Seek::BioSchema::DataCatalogMockModel,
+                         Document, Presentation, Workflow, Collection,
+                         Institution, Programme, Sample, AssetsCreator].freeze
 
       def resource_decorator
         @decorator ||= ResourceDecorators::Factory.instance.get(resource)

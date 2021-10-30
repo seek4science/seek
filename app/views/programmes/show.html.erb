@@ -28,10 +28,21 @@
     <div class="well well-sm">
       <%= text_or_not_specified(@programme.funding_details, :description=>true,:auto_link=>true, :none_text=>"No funding details specified") %>
     </div>
+
+    <% if @programme.allows_user_projects? %>
+      <strong><%= "Allows #{"Users"} to create #{"Projects"}" %></strong>
+    <% end %>
   </div>
 
   <div class="col-md-3 col-sm-4">
     <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @programme } -%>
+
+    <% if @programme.is_discussable? -%>
+      <% if @programme.discussion_links.select{|link| link.url.present?}.any?  %>
+        <%= render partial: 'assets/discussion_links_box', locals: {resource: @programme } -%>
+      <% end -%>
+     <% end -%>
+
     <% if @programme.can_manage? -%>
         <%= render :partial => 'general/storage_usage_box', locals: { programme: @programme,
                                                                       url: storage_report_programme_path(@programme)} %>

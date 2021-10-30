@@ -15,10 +15,21 @@ Factory.define(:any_string_sample_attribute, parent: :sample_attribute) do |f|
   f.required true
 end
 
+Factory.define(:data_file_sample_attribute, parent: :sample_attribute) do |f|
+  f.sample_attribute_type factory: :data_file_sample_attribute_type
+  f.required true
+end
+
 Factory.define(:sample_sample_attribute, parent: :sample_attribute) do |f|
   f.sequence(:title) { |n| "sample attribute #{n}" }
   f.linked_sample_type factory: :simple_sample_type
   f.sample_attribute_type factory: :sample_sample_attribute_type
+end
+
+Factory.define(:sample_multi_sample_attribute, parent: :sample_attribute) do |f|
+  f.sequence(:title) { |n| "sample attribute #{n}" }
+  f.linked_sample_type factory: :simple_sample_type
+  f.sample_attribute_type factory: :sample_multi_sample_attribute_type
 end
 
 Factory.define(:apples_controlled_vocab_attribute, parent: :sample_attribute) do |f|

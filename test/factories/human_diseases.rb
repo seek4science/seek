@@ -9,7 +9,7 @@ end
 
 Factory.define(:max_humandisease, class: HumanDisease) do |f|
   f.title 'A Maximal Human Disease'
-  f.projects { [ Factory.build(:max_project) ] }
+  f.projects { [ Factory(:max_project) ] }
   f.concept_uri 'http://purl.bioontology.org/obo/DOID_1909'
   f.ontology_id '23'
   f.assays { [ Factory.build(:assay, policy: Factory(:public_policy)) ] }

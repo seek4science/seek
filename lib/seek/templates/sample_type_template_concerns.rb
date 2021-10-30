@@ -9,6 +9,7 @@ module Seek
         validate :validate_template_file
         has_one :content_blob, as: :asset, dependent: :destroy
         alias_method :template, :content_blob
+        has_task :template_generation
         extend ClassMethods
       end
 
@@ -25,7 +26,7 @@ module Seek
       end
 
       def queue_sample_type_update_job
-        SampleTypeUpdateJob.new(self).queue_job
+        SampleTypeUpdateJob.new(self, true).queue_job
       end
 
       def generate_template

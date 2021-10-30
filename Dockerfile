@@ -1,6 +1,6 @@
-FROM ruby:2.6-stretch
+FROM ruby:2.6-buster
 
-MAINTAINER Stuart Owen <orcid.org/0000-0003-2130-0865>, Finn Bacall
+LABEL maintainer="Stuart Owen <orcid.org/0000-0003-2130-0865>, Finn Bacall"
 
 ENV APP_DIR /seek
 ENV RAILS_ENV=production
@@ -12,7 +12,7 @@ RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends build-essential git \
 		libcurl4-gnutls-dev libmagick++-dev libpq-dev libreadline-dev \
 		libreoffice libsqlite3-dev libssl-dev libxml++2.6-dev \
-		libxslt1-dev locales default-mysql-client nginx nodejs openjdk-8-jdk \
+		libxslt1-dev locales default-mysql-client nginx nodejs openjdk-11-jdk-headless \
 		python3 python3-pip python3-setuptools python3-wheel python3-psutil python3-dev \
 		poppler-utils postgresql-client sqlite3 links telnet vim-tiny zip && \
     apt-get clean && \
@@ -59,6 +59,17 @@ RUN bundle exec rake assets:precompile && \
 
 #root access needed for next couple of steps
 USER root
+
+# Install supercronic - a cron alternative
+ENV SUPERCRONIC_URL=https://github.com/aptible/supercronic/releases/download/v0.1.12/supercronic-linux-amd64 \
+    SUPERCRONIC=supercronic-linux-amd64 \
+    SUPERCRONIC_SHA1SUM=048b95b48b708983effb2e5c935a1ef8483d9e3e
+
+RUN curl -fsSLO "$SUPERCRONIC_URL" \
+ && echo "${SUPERCRONIC_SHA1SUM}  ${SUPERCRONIC}" | sha1sum -c - \
+ && chmod +x "$SUPERCRONIC" \
+ && mv "$SUPERCRONIC" "/usr/local/bin/${SUPERCRONIC}" \
+ && ln -s "/usr/local/bin/${SUPERCRONIC}" /usr/local/bin/supercronic
 
 # NGINX config
 COPY docker/nginx.conf /etc/nginx/nginx.conf

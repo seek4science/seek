@@ -1,15 +1,13 @@
 require 'test_helper'
 
 class AdminDefinedRoleProjectTest < ActiveSupport::TestCase
-  def setup
-    Delayed::Job.delete_all
-  end
-
   test 'fire update auth table job on create' do
     person = Factory(:person)
     with_config_value :auth_lookup_enabled, true do
-      assert_difference('Delayed::Job.count', 1) do
-        AdminDefinedRoleProject.create person: person, project: person.projects.first, role_mask: 2
+      assert_enqueued_with(job: AuthLookupUpdateJob) do
+        assert_difference('AuthLookupUpdateQueue.count', 1) do
+          AdminDefinedRoleProject.create person: person, project: person.projects.first, role_mask: 2
+        end
       end
     end
   end
@@ -18,8 +16,10 @@ class AdminDefinedRoleProjectTest < ActiveSupport::TestCase
     person = Factory(:person)
     role = AdminDefinedRoleProject.create person: person, project: person.projects.first, role_mask: 2
     with_config_value :auth_lookup_enabled, true do
-      assert_difference('Delayed::Job.count', 1) do
-        role.destroy
+      assert_enqueued_with(job: AuthLookupUpdateJob) do
+        assert_difference('AuthLookupUpdateQueue.count', 1) do
+          role.destroy
+        end
       end
     end
   end

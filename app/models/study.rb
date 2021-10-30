@@ -5,9 +5,6 @@ class Study < ApplicationRecord
 
   searchable(:auto_index => false) do
     text :experimentalists
-    text :person_responsible do
-      person_responsible.try(:name)
-    end
   end if Seek::Config.solr_enabled
 
   belongs_to :investigation
@@ -22,12 +19,9 @@ class Study < ApplicationRecord
   has_many :assay_publications, through: :assays, source: :publications
   has_one :external_asset, as: :seek_entity, dependent: :destroy
 
-  belongs_to :person_responsible, :class_name => "Person"
-
   validates :investigation, presence: { message: "Investigation is blank or invalid" }, projects: true
 
   enforce_authorization_on_association :investigation, :view
-
 
   %w[data_file sop model document].each do |type|
     has_many "#{type}_versions".to_sym, -> { distinct }, through: :assays
@@ -40,10 +34,10 @@ class Study < ApplicationRecord
   
   # Returns the columns to be shown on the table view for the resource
   def columns_default
-    super + ['title']
+    super + ['creators','projects']
   end
   def columns_allowed
-    super + ['title','experimentalists','other_creators','deleted_contributor']
+    columns_default + ['other_creators']
   end
 
   def state_allows_delete? *args
@@ -69,12 +63,10 @@ class Study < ApplicationRecord
     publication_ids | assay_publication_ids
   end
 
-  def related_person_ids
-    ids = super
-    ids << person_responsible_id if person_responsible_id
-    ids.uniq
+  def positioned_assays
+    assays.order(position: :asc)
   end
-
+  
   def self.user_creatable?
     Seek::Config.studies_enabled
   end

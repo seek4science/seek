@@ -13,14 +13,7 @@ class AdminController < ApplicationController
     respond_to do |format|
       format.html
     end
-  end
-
-  def project_creation_requests
-    @requests = MessageLog.pending_project_creation_requests
-    respond_to do |format|
-      format.html
-    end
-  end
+  end  
 
   def update_admins
     admin_ids = params[:admins].split(',') || []
@@ -63,8 +56,10 @@ class AdminController < ApplicationController
     Seek::Config.set_smtp_settings('password', params[:smtp_password]) if params.key?(:smtp_password)
     Seek::Config.set_smtp_settings('enable_starttls_auto', params[:enable_starttls_auto] == '1') if params.key?(:enable_starttls_auto)
 
-    Seek::Config.support_email_address = params[:support_email_address]
-    Seek::Config.noreply_sender = params[:noreply_sender]
+    Seek::Config.support_email_address = params[:support_email_address] if params.key?(:support_email_address)
+    Seek::Config.noreply_sender = params[:noreply_sender] if params.key?(:noreply_sender)
+    Seek::Config.exception_notification_recipients = params[:exception_notification_recipients] if params.key?(:exception_notification_recipients)
+    Seek::Config.exception_notification_enabled = string_to_boolean params[:exception_notification_enabled] if params.key?(:exception_notification_enabled)
 
     Seek::Config.omniauth_enabled = string_to_boolean params[:omniauth_enabled]
     Seek::Config.omniauth_user_create = string_to_boolean params[:omniauth_user_create]
@@ -95,27 +90,31 @@ class AdminController < ApplicationController
     Seek::Config.external_help_url = params[:external_help_url]
 
     Seek::Config.cwl_viewer_url = params[:cwl_viewer_url]
+    Seek::Config.ga4gh_trs_api_enabled = string_to_boolean(params[:ga4gh_trs_api_enabled])
     # Types enabled
     Seek::Config.collections_enabled = string_to_boolean params[:collections_enabled]
+    Seek::Config.data_files_enabled = string_to_boolean params[:data_files_enabled]
     Seek::Config.documents_enabled = string_to_boolean params[:documents_enabled]
     Seek::Config.events_enabled = string_to_boolean params[:events_enabled]
     Seek::Config.isa_enabled = string_to_boolean params[:isa_enabled]
     Seek::Config.models_enabled = string_to_boolean params[:models_enabled]
     Seek::Config.organisms_enabled = string_to_boolean params[:organisms_enabled]
     Seek::Config.programmes_enabled = string_to_boolean params[:programmes_enabled]
+    Seek::Config.programmes_open_for_projects_enabled = string_to_boolean params[:programmes_open_for_projects_enabled]
+    Seek::Config.presentations_enabled = string_to_boolean params[:presentations_enabled]
     Seek::Config.publications_enabled = string_to_boolean params[:publications_enabled]
     Seek::Config.samples_enabled = string_to_boolean params[:samples_enabled]
+    Seek::Config.sops_enabled = string_to_boolean params[:sops_enabled]
     Seek::Config.workflows_enabled = string_to_boolean params[:workflows_enabled]
-
-    Seek::Config.exception_notification_recipients = params[:exception_notification_recipients]
-    Seek::Config.exception_notification_enabled = string_to_boolean params[:exception_notification_enabled]
 
     Seek::Config.google_analytics_tracker_id = params[:google_analytics_tracker_id]
     Seek::Config.google_analytics_enabled = string_to_boolean params[:google_analytics_enabled]
+    Seek::Config.google_analytics_tracking_notice = params[:google_analytics_tracking_notice]
 
     Seek::Config.piwik_analytics_enabled = string_to_boolean params[:piwik_analytics_enabled]
     Seek::Config.piwik_analytics_id_site = params[:piwik_analytics_id_site]
     Seek::Config.piwik_analytics_url = params[:piwik_analytics_url]
+    Seek::Config.piwik_analytics_tracking_notice = params[:piwik_analytics_tracking_notice]
 
     Seek::Config.doi_minting_enabled = string_to_boolean params[:doi_minting_enabled]
     Seek::Config.datacite_username = params[:datacite_username]
@@ -132,13 +131,19 @@ class AdminController < ApplicationController
 
     Seek::Config.openbis_enabled = string_to_boolean(params[:openbis_enabled])
     Seek::Config.copasi_enabled = string_to_boolean(params[:copasi_enabled])
+    Seek::Config.project_single_page_enabled = string_to_boolean(params[:project_single_page_enabled])
 
     Seek::Config.nels_enabled = string_to_boolean(params[:nels_enabled])
-    Seek::Config.nels_client_id = params[:nels_client_id].try(:strip)
-    Seek::Config.nels_client_secret = params[:nels_client_secret].try(:strip)
-    Seek::Config.nels_api_url = params[:nels_api_url].blank? ? nil : params[:nels_api_url].strip.chomp('/')
-    Seek::Config.nels_oauth_url = params[:nels_oauth_url].blank? ? nil : params[:nels_oauth_url].strip.chomp('/')
-    Seek::Config.nels_permalink_base = params[:nels_permalink_base].try(:strip)
+    Seek::Config.nels_client_id = params[:nels_client_id]&.strip
+    Seek::Config.nels_client_secret = params[:nels_client_secret]&.strip
+    Seek::Config.nels_api_url = params[:nels_api_url]&.strip&.chomp('/')
+    Seek::Config.nels_oauth_url = params[:nels_oauth_url]&.strip&.chomp('/')
+    Seek::Config.nels_permalink_base = params[:nels_permalink_base]&.strip
+
+    Seek::Config.life_monitor_enabled = string_to_boolean(params[:life_monitor_enabled])
+    Seek::Config.life_monitor_url = params[:life_monitor_url]&.strip&.chomp('/')
+    Seek::Config.life_monitor_client_id = params[:life_monitor_client_id]&.strip
+    Seek::Config.life_monitor_client_secret = params[:life_monitor_client_secret]&.strip
 
     time_lock_doi_for = params[:time_lock_doi_for]
     time_lock_is_integer = only_integer time_lock_doi_for, 'time lock doi for'
@@ -172,6 +177,8 @@ class AdminController < ApplicationController
     tag_threshold = params[:tag_threshold]
     Seek::Config.tag_threshold = tag_threshold if only_integer tag_threshold, 'tag threshold'
     Seek::Config.max_visible_tags = max_visible_tags if only_positive_integer max_visible_tags, 'maximum visible tags'
+    Seek::Config.tag_cloud_enabled = string_to_boolean params[:tag_cloud_enabled]
+    Seek::Config.workflow_class_list_enabled = string_to_boolean params[:workflow_class_list_enabled]
 
     update_redirect_to (is_entries_integer && (only_integer tag_threshold, 'tag threshold') && (only_positive_integer max_visible_tags, 'maximum visible tags')), 'home_settings'
   end
@@ -192,6 +199,7 @@ class AdminController < ApplicationController
 
     Seek::Config.dm_project_name = params[:dm_project_name]
     Seek::Config.dm_project_link = params[:dm_project_link]
+    Seek::Config.issue_tracker = params[:issue_tracker]
 
     Seek::Config.application_name = params[:application_name]
 
@@ -228,6 +236,10 @@ class AdminController < ApplicationController
 
     valid = only_positive_integer(params[:results_per_page_default], 'default items per page')
     Seek::Config.results_per_page_default = params[:results_per_page_default] if valid
+
+    valid_condensed = only_positive_integer(params[:results_per_page_default_condensed], 'default items per condensed page')
+    Seek::Config.results_per_page_default_condensed = params[:results_per_page_default_condensed] if valid_condensed
+
     Seek::Config.related_items_limit = params[:related_items_limit]
     Seek::Config.search_results_limit = params[:search_results_limit]
 
@@ -270,6 +282,8 @@ class AdminController < ApplicationController
     Seek::Config.orcid_required = string_to_boolean params[:orcid_required]
 
     Seek::Config.default_license = params[:default_license]
+    Seek::Config.recommended_data_licenses = params[:recommended_data_licenses]
+    Seek::Config.recommended_software_licenses = params[:recommended_software_licenses]
     update_flag = (pubmed_email == '' || pubmed_email_valid) && (crossref_email == '' || crossref_email_valid)
     update_redirect_to update_flag, 'settings'
   end

@@ -116,7 +116,7 @@ class AdminControllerTest < ActionController::TestCase
       assert_select '#address[value=?]', '255.255.255.255'
       assert_select '#domain[value=?]', 'email.example.com'
     end
-  end
+  end  
 
   test 'update visible tags and threshold' do
     Seek::Config.max_visible_tags = 2
@@ -181,6 +181,11 @@ class AdminControllerTest < ActionController::TestCase
 
   test 'get project content stats' do
     get :get_stats, xhr: true, params: { page: 'content_stats' }
+    assert_response :success
+  end
+
+  test 'get auth consistency stats' do
+    get :get_stats, xhr: true, params: { page: 'auth_consistency' }
     assert_response :success
   end
 
@@ -298,12 +303,10 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'clear failed jobs' do
-
     Delayed::Job.destroy_all
-    ContentBlobCleanerJob.new.queue_job
-    job = Delayed::Job.last
+    job = Delayed::Job.create!
     job.update_column(:failed_at,Time.now)
-    ContentBlobCleanerJob.new.queue_job
+    Delayed::Job.create!
     assert_equal 2,Delayed::Job.count
     assert_difference('Delayed::Job.count',-1) do
       post :clear_failed_jobs, format: 'json'
@@ -318,10 +321,9 @@ class AdminControllerTest < ActionController::TestCase
     person = Factory(:person)
 
     Delayed::Job.destroy_all
-    ContentBlobCleanerJob.new.queue_job
-    job = Delayed::Job.last
+    job = Delayed::Job.create!
     job.update_column(:failed_at,Time.now)
-    ContentBlobCleanerJob.new.queue_job
+    Delayed::Job.create!
     assert_equal 2,Delayed::Job.count
 
     assert_no_difference('Delayed::Job.count') do
@@ -342,7 +344,7 @@ class AdminControllerTest < ActionController::TestCase
     assert_nil Seek::Config.header_image_avatar_id
     settings = {project_name: 'project name', project_type: 'project type', project_description: 'project description', project_keywords: 'project,    keywords, ',
                 project_link: 'http://project-link.com',application_name: 'app name',
-                dm_project_name: 'dm project name', dm_project_link: 'http://dm-project-link.com',
+                dm_project_name: 'dm project name', dm_project_link: 'http://dm-project-link.com', issue_tracker: 'https://issues-galore.com',
                 header_image_link: 'http://header-link.com/image.jpg', header_image_title: 'header image title',
                 copyright_addendum_content: 'copyright content', imprint_description: 'imprint description',
                 terms_page: 'terms page', privacy_page: 'privacy page', about_page: 'about page',
@@ -361,6 +363,7 @@ class AdminControllerTest < ActionController::TestCase
     assert_equal 'app name', Seek::Config.application_name
     assert_equal 'dm project name', Seek::Config.dm_project_name
     assert_equal 'http://dm-project-link.com', Seek::Config.dm_project_link
+    assert_equal 'https://issues-galore.com', Seek::Config.issue_tracker
     assert_equal 'http://header-link.com/image.jpg', Seek::Config.header_image_link
     assert_equal 'header image title', Seek::Config.header_image_title
     assert_equal 'copyright content', Seek::Config.copyright_addendum_content
@@ -434,4 +437,59 @@ class AdminControllerTest < ActionController::TestCase
       end
     end
   end
+
+  test 'email settings preserved if not sent' do
+
+    Seek::Config.set_smtp_settings('address', 'smtp.address.org') 
+    Seek::Config.set_smtp_settings('port', 1)
+    Seek::Config.set_smtp_settings('domain', 'the-domain')
+    Seek::Config.set_smtp_settings('authentication', 'auth')
+    Seek::Config.set_smtp_settings('user_name', 'fred')
+    Seek::Config.set_smtp_settings('password', 'blogs') 
+    Seek::Config.set_smtp_settings('enable_starttls_auto', true)
+
+    with_config_value(:support_email_address, 'support@email.com') do
+      with_config_value(:noreply_sender, 'no-reply@sender.com') do
+        with_config_value(:exception_notification_recipients, 'errors@fred.org, errors@john.org') do
+          with_config_value(:exception_notification_enabled, true) do
+            post :update_features_enabled, params: {}
+
+            assert_equal 'smtp.address.org', Seek::Config.smtp_settings('address')
+            assert_equal 1, Seek::Config.smtp_settings('port')
+            assert_equal 'the-domain', Seek::Config.smtp_settings('domain')
+            assert_equal 'auth', Seek::Config.smtp_settings('authentication')
+            assert_equal 'fred', Seek::Config.smtp_settings('user_name')
+            assert_equal 'blogs', Seek::Config.smtp_settings('password')
+            assert_equal true, Seek::Config.smtp_settings('enable_starttls_auto')
+
+            assert_equal 'support@email.com', Seek::Config.support_email_address
+            assert_equal 'no-reply@sender.com', Seek::Config.noreply_sender
+            assert_equal 'errors@fred.org, errors@john.org', Seek::Config.exception_notification_recipients
+            assert_equal true, Seek::Config.exception_notification_enabled
+          end
+        end
+      end
+    end
+  end
+
+  test 'recommended data licenses' do
+    Seek::Config.recommended_data_licenses = []
+    new_value = ['CC-BY-4.0']
+    post :update_settings, params: {recommended_data_licenses: new_value}
+    assert_equal new_value, Seek::Config.recommended_data_licenses
+    new_value = []
+    post :update_settings, params: {recommended_data_licenses: new_value}
+    assert_equal nil, Seek::Config.recommended_data_licenses
+  end
+
+  test 'recommended software licenses' do
+    Seek::Config.recommended_software_licenses = []
+    new_value = ['BitTorrent-1.1']
+    post :update_settings, params: {recommended_software_licenses: new_value}
+    assert_equal new_value, Seek::Config.recommended_software_licenses
+    new_value = []
+    post :update_settings, params: {recommended_software_licenses: new_value}
+    assert_equal nil, Seek::Config.recommended_software_licenses
+  end
+
 end

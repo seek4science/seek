@@ -1,0 +1,4586 @@
+---
+- - ACI Materials Journal
+  - aci-materials-journal
+- - ACM SIG Proceedings ("et al." for 15+ authors)
+  - acm-sig-proceedings-long-author-list
+- - ACM SIG Proceedings ("et al." for 3+ authors)
+  - acm-sig-proceedings
+- - ACM SIGCHI Proceedings (2016)
+  - acm-sigchi-proceedings
+- - ACM SIGCHI Proceedings - Extended Abstract Format
+  - acm-sigchi-proceedings-extended-abstract-format
+- - ACM SIGGRAPH
+  - acm-siggraph
+- - 'ACME: An International Journal for Critical Geographies'
+  - acme-an-international-journal-for-critical-geographies
+- - AFTE Journal
+  - afte-journal
+- - AIB studi (Italian)
+  - aib-studi
+- - AIDS
+  - aids
+- - AIMS Press
+  - aims-press
+- - AMBIO
+  - ambio
+- - ANPET - Congresso de Pesquisa e Ensino em Transportes (Portuguese - Brazil)
+  - associacao-nacional-de-pesquisa-e-ensino-em-transportes
+- - ASAIO Journal (American Society for Artificial Internal Organs)
+  - asaio-journal
+- - ASSAY and Drug Development Technologies
+  - assay-and-drug-development-technologies
+- - Academy of Management Review
+  - academy-of-management-review
+- - Accident Analysis and Prevention
+  - accident-analysis-and-prevention
+- - Acta Amazonica
+  - acta-amazonica
+- - Acta Anaesthesiologica Scandinavica
+  - acta-anaesthesiologica-scandinavica
+- - Acta Anaesthesiologica Taiwanica
+  - acta-anaesthesiologica-taiwanica
+- - Acta Botanica Croatica
+  - acta-botanica-croatica
+- - Acta Chiropterologica
+  - acta-chiropterologica
+- - Acta Ichthyologica et Piscatoria
+  - acta-ichthyologica-et-piscatoria
+- - Acta Médica Peruana
+  - acta-medica-peruana
+- - Acta Naturae
+  - acta-naturae
+- - Acta Neurobiologiae Experimentalis
+  - acta-neurobiologiae-experimentalis
+- - Acta Neurochirurgica
+  - acta-neurochirurgica
+- - Acta Ophthalmologica
+  - acta-ophthalmologica
+- - Acta Ornithologica
+  - acta-ornithologica
+- - Acta Orthopaedica
+  - acta-orthopaedica
+- - Acta Orthopædica Belgica
+  - acta-orthopaedica-belgica
+- - Acta Paediatrica
+  - acta-paediatrica
+- - Acta Palaeontologica Polonica
+  - acta-palaeontologica-polonica
+- - Acta Pharmaceutica
+  - acta-pharmaceutica
+- - Acta Pharmaceutica Sinica B
+  - acta-pharmaceutica-sinica-b
+- - Acta Philosophica
+  - acta-philosophica
+- - Acta Physiologica
+  - acta-physiologica
+- - Acta Polytechnica
+  - acta-polytechnica
+- - Acta Psychiatrica Scandinavica
+  - acta-psychiatrica-scandinavica
+- - Acta Radiologica
+  - acta-radiologica
+- - Acta Scientiae Veterinariae
+  - acta-scientiae-veterinariae
+- - Acta Societatis Botanicorum Poloniae
+  - acta-societatis-botanicorum-poloniae
+- - Acta Universitatis Agriculturae Sueciae (Swedish University of Agricultural Sciences)
+  - acta-universitatis-agriculturae-sueciae
+- - Acta Universitatis Agriculturae et Silviculturae Mendelianae Brunensis
+  - acta-universitatis-agriculturae-et-silviculturae-mendelianae-brunensis
+- - Acta Zoologica Academiae Scientiarum Hungaricae
+  - acta-zoologica-academiae-scientiarum-hungaricae
+- - Acta chirurgiae orthopaedicae et traumatologiae Čechoslovaca
+  - acta-chirurgiae-orthopaedicae-et-traumatologiae-cechoslovaca
+- - Administrative Science Quarterly
+  - administrative-science-quarterly
+- - Advanced Engineering Materials
+  - advanced-engineering-materials
+- - Advanced Functional Materials
+  - advanced-functional-materials
+- - Advanced Healthcare Materials
+  - advanced-healthcare-materials
+- - Advanced Materials
+  - advanced-materials
+- - Advanced Optical Materials
+  - advanced-optical-materials
+- - Advances in Alzheimer's Disease
+  - advances-in-alzheimers-disease
+- - Advances in Complex Systems
+  - advances-in-complex-systems
+- - Aerosol Science and Technology
+  - aerosol-science-and-technology
+- - Aerosol and Air Quality Research
+  - aerosol-and-air-quality-research
+- - African Journal of Marine Science
+  - african-journal-of-marine-science
+- - African Online Scientific Information Systems - Harvard
+  - african-online-scientific-information-systems-harvard
+- - African Zoology
+  - african-zoology
+- - Afro-Ásia (Portuguese - Brazil)
+  - afro-asia
+- - Age and Ageing
+  - age-and-ageing
+- - Ageing &amp; Society
+  - ageing-and-society
+- - Aging
+  - aging
+- - Aging Cell
+  - aging-cell
+- - Aging and Disease
+  - aging-and-disease
+- - Agora
+  - agora
+- - Agriculturae Conspectus Scientificus
+  - agriculturae-conspectus-scientificus
+- - Aix-Marseille Université - Département d'études asiatiques (French)
+  - aix-marseille-universite-departement-d-etudes-asiatiques
+- - Al-Jami'ah - Journal of Islamic Studies
+  - al-jamiah-journal-of-islamic-studies
+- - Albert-Ludwigs-Universität Freiburg - Geschichte (German)
+  - universitat-freiburg-geschichte
+- - Alcohol and Alcoholism
+  - alcohol-and-alcoholism
+- - 'Alcoholism: Clinical and Experimental Research'
+  - alcoholism-clinical-and-experimental-research
+- - Alkoholizmus a drogové závislosti
+  - alkoholizmus-a-drogove-zavislosti
+- - Allergology International
+  - allergology-international
+- - Allergy
+  - allergy
+- - Alternatives to Animal Experimentation
+  - alternatives-to-animal-experimentation
+- - Ameghiniana
+  - ameghiniana
+- - American Anthropological Association
+  - american-anthropological-association
+- - American Association for Cancer Research
+  - american-association-for-cancer-research
+- - American Association of Petroleum Geologists
+  - american-association-of-petroleum-geologists
+- - American Chemical Society
+  - american-chemical-society
+- - American Fisheries Society
+  - american-fisheries-society
+- - American Geophysical Union
+  - american-geophysical-union
+- - American Heart Association
+  - american-heart-association
+- - American Institute of Aeronautics and Astronautics
+  - american-institute-of-aeronautics-and-astronautics
+- - American Institute of Physics
+  - american-institute-of-physics
+- - American Journal of Agricultural Economics
+  - american-journal-of-agricultural-economics
+- - American Journal of Archaeology
+  - american-journal-of-archaeology
+- - American Journal of Botany
+  - american-journal-of-botany
+- - American Journal of Climate Change
+  - american-journal-of-climate-change
+- - American Journal of Clinical Pathology
+  - american-journal-of-clinical-pathology
+- - American Journal of Enology and Viticulture
+  - american-journal-of-enology-and-viticulture
+- - American Journal of Epidemiology
+  - american-journal-of-epidemiology
+- - American Journal of Health Behavior
+  - american-journal-of-health-behavior
+- - American Journal of Hypertension
+  - american-journal-of-hypertension
+- - American Journal of Medical Genetics
+  - american-journal-of-medical-genetics
+- - American Journal of Neuroradiology
+  - american-journal-of-neuroradiology
+- - American Journal of Orthodontics &amp; Dentofacial Orthopedics
+  - american-journal-of-orthodontics-and-dentofacial-orthopedics
+- - American Journal of Plant Sciences
+  - american-journal-of-plant-sciences
+- - American Journal of Political Science
+  - american-journal-of-political-science
+- - American Journal of Respiratory and Critical Care Medicine
+  - american-journal-of-respiratory-and-critical-care-medicine
+- - American Journal of Science
+  - american-journal-of-science
+- - American Journal of Sonography
+  - american-journal-of-sonography
+- - American Journal of Surgical Pathology
+  - american-journal-of-surgical-pathology
+- - American Journal of Translational Research
+  - american-journal-of-translational-research
+- - American Marketing Association
+  - american-marketing-association
+- - American Medical Association 10th edition
+  - american-medical-association-10th-edition
+- - American Medical Association 11th edition
+  - american-medical-association
+- - American Medical Association 11th edition (no "et al.")
+  - american-medical-association-no-et-al
+- - American Medical Association 11th edition (no URL)
+  - american-medical-association-no-url
+- - American Medical Association 11th edition (sorted alphabetically)
+  - american-medical-association-alphabetical
+- - American Meteorological Society
+  - american-meteorological-society
+- - American Mineralogist
+  - american-mineralogist
+- - American Nuclear Society
+  - american-nuclear-society
+- - American Physical Society
+  - american-physics-society
+- - American Physical Society (without titles)
+  - american-physics-society-without-titles
+- - American Physical Society - et al. (if more than 3 authors)
+  - american-physical-society-et-al
+- - American Physiological Society
+  - american-physiological-society
+- - American Phytopathological Society
+  - american-phytopathological-society
+- - American Political Science Association
+  - american-political-science-association
+- - American Psychological Association 5th edition
+  - apa-5th-edition
+- - American Psychological Association 6th edition
+  - apa-6th-edition
+- - American Psychological Association 6th edition ("doi:" DOI prefix)
+  - apa-old-doi-prefix
+- - American Psychological Association 6th edition (Provost) (French - Canada)
+  - apa-fr-provost
+- - American Psychological Association 6th edition (Turkish)
+  - apa-tr
+- - American Psychological Association 6th edition (no DOIs, no issue numbers)
+  - apa-no-doi-no-issue
+- - American Psychological Association 6th edition (no ampersand)
+  - apa-6th-edition-no-ampersand
+- - American Psychological Association 7th edition
+  - apa
+- - American Psychological Association 7th edition (annotated bibliography)
+  - apa-annotated-bibliography
+- - American Psychological Association 7th edition (curriculum vitae, sorted by descending
+    date)
+  - apa-cv
+- - American Psychological Association 7th edition (no ampersand)
+  - apa-no-ampersand
+- - American Psychological Association 7th edition (numeric, brackets)
+  - apa-numeric-superscript-brackets
+- - American Psychological Association 7th edition (numeric, superscript)
+  - apa-numeric-superscript
+- - American Psychological Association 7th edition (single-spaced bibliography)
+  - apa-single-spaced
+- - American Psychological Association 7th edition (with abstract)
+  - apa-with-abstract
+- - American School of Classical Studies at Athens
+  - american-school-of-classical-studies-at-athens
+- - American Society for Microbiology
+  - american-society-for-microbiology
+- - American Society for Pharmacology and Experimental Therapeutics
+  - american-society-for-pharmacology-and-experimental-therapeutics
+- - American Society of Agricultural and Biological Engineers
+  - american-society-of-agricultural-and-biological-engineers
+- - American Society of Agronomy, Crop Science Society of America, Soil Science Society
+    of America
+  - asa-cssa-sssa
+- - American Society of Civil Engineers
+  - american-society-of-civil-engineers
+- - American Society of Mechanical Engineers
+  - american-society-of-mechanical-engineers
+- - American Sociological Association 6th edition
+  - american-sociological-association
+- - American Statistical Association
+  - american-statistical-association
+- - American Veterinary Medical Association
+  - american-veterinary-medical-association
+- - Amerindia
+  - amerindia
+- - Amphibia-Reptilia
+  - amphibia-reptilia
+- - Amsterdam University Press - Academic
+  - amsterdam-university-press-academic
+- - Anabases (French)
+  - anabases
+- - Anaesthesia
+  - anaesthesia
+- - Analytical Sciences
+  - analytical-sciences
+- - Anatomical Sciences Education
+  - anatomical-sciences-education
+- - Ancilla Iuris
+  - ancilla-iuris
+- - Andean Geology
+  - andean-geology
+- - Anesthesia and Analgesia
+  - anesthesia-and-analgesia
+- - Anesthesiology
+  - anesthesiology
+- - Angewandte Chemie International Edition
+  - angewandte-chemie
+- - Angiologia (Spanish)
+  - angiologia
+- - Anglia
+  - anglia
+- - Anglia Ruskin University - Harvard
+  - harvard-anglia-ruskin-university
+- - Animal Conservation
+  - animal-conservation
+- - Animal Migration
+  - animal-migration
+- - Animal Welfare
+  - animal-welfare
+- - Annalen des Naturhistorischen Museums in Wien
+  - annalen-des-naturhistorischen-museums-in-wien
+- - Annales de démographie historique
+  - annales-de-demographie-historique
+- - Annales. Histoire, Sciences sociales (French)
+  - annales
+- - Annals of Applied Biology
+  - annals-of-applied-biology
+- - Annals of Behavioral Medicine
+  - annals-of-behavioral-medicine
+- - Annals of Biomedical Engineering
+  - annals-of-biomedical-engineering
+- - Annals of Botany
+  - annals-of-botany
+- - Annals of Joint
+  - annals-of-joint
+- - Annals of Neurology
+  - annals-of-neurology
+- - Annals of Oncology
+  - annals-of-oncology
+- - Annals of Surgery
+  - annals-of-surgery
+- - Annals of the Association of American Geographers
+  - annals-of-the-association-of-american-geographers
+- - Annals of the New York Academy of Sciences
+  - annals-of-the-new-york-academy-of-sciences
+- - Annual Review of Astronomy and Astrophysics
+  - annual-review-of-astronomy-and-astrophysics
+- - Annual Review of Medicine
+  - annual-review-of-medicine
+- - Annual Review of Nuclear and Particle Science
+  - annual-review-of-nuclear-and-particle-science
+- - Annual Reviews (author-date)
+  - annual-reviews-author-date
+- - Annual Reviews (sorted alphabetically)
+  - annual-reviews-alphabetical
+- - Annual Reviews (sorted by order of appearance)
+  - annual-reviews
+- - Annual Reviews (sorted by order of appearance, without titles)
+  - annual-reviews-without-titles
+- - Antarctic Science
+  - antarctic-science
+- - Anthropologie et Sociétés (French)
+  - anthropologie-et-societes
+- - Anticancer Research
+  - anticancer-research
+- - Antioxidants &amp; Redox Signaling
+  - antioxidants-and-redox-signaling
+- - Antipode
+  - antipode
+- - Antiquity
+  - antiquity
+- - Antiquités africaines
+  - antiquites-africaines
+- - 'Aporia: The Nursing Journal'
+  - aporia-the-nursing-journal
+- - Applied Clay Science
+  - applied-clay-science
+- - Applied In Vitro Toxicology
+  - applied-in-vitro-toxicology
+- - Applied Spectroscopy
+  - applied-spectroscopy
+- - Applied Spectroscopy Reviews
+  - applied-spectroscopy-reviews
+- - 'Aquatic Conservation: Marine and Freshwater Ecosystems'
+  - aquatic-conservation
+- - Aquatic Invasions
+  - aquatic-invasions
+- - Aquatic Living Resources
+  - aquatic-living-resources
+- - Aquitania (French)
+  - aquitania
+- - Arachne
+  - arachne
+- - Arachnology
+  - arachnology
+- - Archaeologia Austriaca
+  - archaeologia-austriaca
+- - Archaeometry
+  - archaeometry
+- - Archaeonautica
+  - archaeonautica
+- - Archeologia Classica (Italian)
+  - archeologia-classica
+- - Archeologické rozhledy
+  - archeologicke-rozhledy
+- - Archiv für Geschichte der Philosophie
+  - archiv-fur-geschichte-der-philosophie
+- - Archiv für die civilistische Praxis (German)
+  - archiv-fur-die-civilistische-praxis
+- - Archives of Physical Medicine and Rehabilitation
+  - archives-of-physical-medicine-and-rehabilitation
+- - Archivos de Bronconeumología
+  - archivos-de-bronconeumologia
+- - Archivos de la Sociedad Española de Oftalmología (Spanish)
+  - archivos-de-la-sociedad-espanola-de-oftalmologia
+- - Archivum Latinitatis Medii Aevi (French)
+  - archivum-latinitatis-medii-aevi
+- - ArchéoSciences (French)
+  - archeosciences
+- - Archéologie médiévale (French)
+  - archeologie-medievale
+- - Archéologies et Sciences de l'Antiquité (French)
+  - archeologies-et-sciences-de-lantiquite
+- - Arctic
+  - arctic
+- - Arctic, Antarctic, and Alpine Research
+  - arctic-antarctic-and-alpine-research
+- - Arhiv za higijenu rada i toksikologiju (Archives of Industrial Hygiene and Toxicology)
+  - arhiv-za-higijenu-rada-i-toksikologiju
+- - Art History
+  - art-history
+- - Artery Research
+  - artery-research
+- - Arthritis &amp; Rheumatism
+  - arthritis-and-rheumatism
+- - Arts University Bournemouth
+  - arts-university-bournemouth
+- - Arzneimitteltherapie
+  - arzneimitteltherapie
+- - Asia &amp; the Pacific Policy Studies
+  - asia-and-the-pacific-policy-studies
+- - Asia Pacific Journal of Human Resources
+  - asia-pacific-journal-of-human-resources
+- - Asian Journal of Neurosurgery
+  - asian-journal-of-neurosurgery
+- - Asian Studies Review
+  - asian-studies-review
+- - Association de Science Régionale de Langue Française (French)
+  - association-de-science-regionale-de-langue-francaise
+- - Association for Computational Linguistics - Conference Proceedings
+  - association-for-computational-linguistics
+- - Association for Computing Machinery
+  - association-for-computing-machinery
+- - Associação Brasileira de Normas Técnicas (Portuguese - Brazil)
+  - associacao-brasileira-de-normas-tecnicas
+- - Associação Brasileira de Normas Técnicas (note, Portuguese - Brazil)
+  - associacao-brasileira-de-normas-tecnicas-note
+- - Atlande (author-date, French)
+  - atlande
+- - Atlas of Genetics and Cytogenetics in Oncology and Haematology
+  - atlas-of-genetics-and-cytogenetics-in-oncology-and-haematology
+- - Ausonius Éditions (French)
+  - ausonius-editions
+- - Austral Ecology
+  - austral-ecology
+- - Austral Entomology
+  - austral-entomology
+- - Australian Archaeology
+  - australian-archaeology
+- - Australian Critical Care
+  - australian-critical-care
+- - Australian Dental Journal
+  - australian-dental-journal
+- - Australian Guide to Legal Citation 3rd edition
+  - australian-guide-to-legal-citation-3rd-edition
+- - Australian Guide to Legal Citation 4th edition
+  - australian-guide-to-legal-citation
+- - Australian Historical Studies
+  - australian-historical-studies
+- - Australian Journal of Earth Sciences
+  - australian-journal-of-earth-sciences
+- - Australian Journal of Grape and Wine Research
+  - australian-journal-of-grape-and-wine-research
+- - Australian Veterinary Journal
+  - australian-veterinary-journal
+- - Austrian Journal of Development Studies (Journal für Entwicklungspolitik)
+  - austrian-journal-of-development-studies
+- - Austrian Legal (German - Austria)
+  - austrian-legal
+- - Avian Conservation and Ecology
+  - avian-conservation-and-ecology
+- - Avian Diseases
+  - avian-diseases
+- - Avian Pathology
+  - avian-pathology
+- - Aviation, Space, and Environmental Medicine
+  - aviation-space-and-environmental-medicine
+- - Ayer (Spanish)
+  - ayer
+- - BMJ
+  - bmj
+- - BYZANTINA SYMMEIKTA
+  - byzantina-symmeikta
+- - Babes-Bolyai University - Faculty of Orthodox Theology (no ibid., Romanian)
+  - babes-bolyai-university-faculty-of-orthodox-theology
+- - Baghdad Science Journal
+  - baghdad-science-journal
+- - Begell House - APA
+  - begell-house-apa
+- - Begell House - Chicago Manual of Style
+  - begell-house-chicago-author-date
+- - Behaviour
+  - behaviour
+- - Beilstein Journal of Organic Chemistry
+  - beilstein-journal-of-organic-chemistry
+- - Beltz - Pädagogik (German)
+  - beltz-padagogik
+- - Berghahn Books (author-date, English - UK)
+  - berghahn-books-author-date-en-gb
+- - Berlin School of Economics and Law - International Marketing Management
+  - berlin-school-of-economics-and-law-international-marketing-management
+- - BibTeX generic citation style
+  - bibtex
+- - Biblio 3W (Spanish)
+  - biblio-3w
+- - Bibliothèque d'archéologie méditerranéenne et africaine (BiAMA) (French)
+  - bibliotheque-d-archeologie-mediterraneenne-et-africaine-biama
+- - Bibliothèque universitaire de médecine - Vancouver (French)
+  - bibliotheque-universitaire-de-medecine-vancouver
+- - Biens symboliques / Symbolic Goods
+  - biens-symboliques-symbolic-goods
+- - BioMed Central
+  - biomed-central
+- - BioMed Research International
+  - biomed-research-international
+- - BioResources
+  - bioresources
+- - BioScience
+  - bioscience
+- - BioSocieties
+  - biosocieties
+- - BioTechniques
+  - biotechniques
+- - Bioarchaeology International
+  - bioarchaeology-international
+- - Bioarchaeology of the Near East
+  - bioarchaeology-of-the-near-east
+- - Biochemical Journal
+  - biochemical-journal
+- - Biochemical Society Transactions
+  - biochemical-society-transactions
+- - Biochemistry
+  - biochemistry
+- - Biochemistry and Molecular Biology Education
+  - biochemistry-and-molecular-biology-education
+- - Biochimica et Biophysica Acta
+  - biochimica-et-biophysica-acta
+- - Bioelectromagnetics
+  - bioelectromagnetics
+- - Bioinformatics
+  - bioinformatics
+- - Biologia
+  - biologia
+- - Biological Journal of the Linnean Society
+  - biological-journal-of-the-linnean-society
+- - Biological Psychiatry
+  - biological-psychiatry
+- - Biological Reviews
+  - biological-reviews
+- - Biological and Pharmaceutical Bulletin
+  - biological-and-pharmaceutical-bulletin
+- - Biology of Reproduction
+  - biology-of-reproduction
+- - Biometrics
+  - biometrics
+- - Biophysical Journal
+  - biophysical-journal
+- - Biopolymers
+  - biopolymers
+- - Biota Neotropica
+  - biota-neotropica
+- - Biotechnology and Bioengineering
+  - biotechnology-and-bioengineering
+- - Biotropica
+  - biotropica
+- - Biuletyn Polskiego Towarzystwa Językoznawczego (Polish)
+  - biuletyn-polskiego-towarzystwa-jezykoznawczego
+- - Blood
+  - blood
+- - Bluebook Inline
+  - bluebook-inline
+- - Bluebook Law Review
+  - bluebook-law-review
+- - Bluebook Law Review (2)
+  - bluebook2
+- - Body &amp; Society
+  - body-and-society
+- - Boletín de Pediatría (Spanish)
+  - boletin-de-pediatria
+- - Bollettino d'archeologia online (Italian)
+  - bollettino-d-archeologia-online
+- - Boreal Environment Research
+  - boreal-environment-research
+- - Bourgogne-Franche-Comté Nature (French)
+  - bourgogne-franche-comte-nature
+- - Bournemouth University - Harvard
+  - harvard-bournemouth-university
+- - Brachytherapy
+  - brachytherapy
+- - Brain
+  - brain
+- - Brain, Behavior and Evolution
+  - brain-behavior-and-evolution
+- - Brazilian Journal of Infectious Diseases
+  - brazilian-journal-of-infectious-diseases
+- - Brazilian Journal of Veterinary Research and Animal Science
+  - brazilian-journal-of-veterinary-research-and-animal-science
+- - Brazilian Oral Research
+  - brazilian-oral-research
+- - BrewingScience
+  - brewingscience
+- - Briefings in Bioinformatics
+  - briefings-in-bioinformatics
+- - British Journal of Anaesthesia
+  - british-journal-of-anaesthesia
+- - British Journal of Cancer
+  - british-journal-of-cancer
+- - British Journal of Dermatology
+  - british-journal-of-dermatology
+- - British Journal of Haematology
+  - british-journal-of-haematology
+- - British Journal of Industrial Relations
+  - british-journal-of-industrial-relations
+- - British Journal of Pharmacology
+  - british-journal-of-pharmacology
+- - British Journal of Political Science
+  - british-journal-of-political-science
+- - British Journal of Surgery
+  - british-journal-of-surgery
+- - Budownictwo i Architektura
+  - budownictwo-i-architektura-pl
+- - Building Structure (Chinese)
+  - building-structure
+- - Buletin Agrohorti
+  - buletin-agrohorti
+- - Bulletin de Correspondance Hellénique (French)
+  - bulletin-de-correspondance-hellenique
+- - Bulletin de la Société Entomologique de France
+  - bulletin-de-la-societe-entomologique-de-france
+- - Bulletin de la Société préhistorique française (French)
+  - bulletin-de-la-societe-prehistorique-francaise
+- - Bulletin du Centre d’études médiévales d’Auxerre (French)
+  - bulletin-du-centre-detudes-medievales-dauxerre
+- - Bulletin of Geosciences
+  - bulletin-of-geosciences
+- - Bulletin of Marine Science
+  - bulletin-of-marine-science
+- - Bulletin of the American Schools of Oriental Research
+  - bulletin-of-the-american-schools-of-oriental-research
+- - Bulletin of the Seismological Society of America
+  - bulletin-of-the-seismological-society-of-america
+- - Bursa Uludag Üniversitesi Fen Bilimleri Enstitüsü
+  - bursa-uludag-universitesi-fen-bilimleri-enstitusu
+- - Bursa Uludağ Üniversitesi - Eğitim Bilimleri Enstitüsü
+  - bursa-uludag-universitesi-egitim-bilimleri-enstitusu
+- - Bursa Uludağ Üniversitesi - Sağlık Bilimleri Enstitüsü
+  - bursa-uludag-universitesi-saglik-bilimleri-enstitusu
+- - Bursa Uludağ Üniversitesi - Sosyal Bilimler Enstitüsü
+  - bursa-uludag-universitesi-sosyal-bilimler-enstitusu
+- - Bursa Uludağ Üniversitesi - Sosyal Bilimler Enstitüsü (metinici atif)
+  - bursa-uludag-universitesi-sosyal-bilimler-enstitusu-metinici-atif
+- - 'Business Ethics: A European Review'
+  - business-ethics-a-european-review
+- - Byzantine and Modern Greek Studies
+  - byzantine-and-modern-greek-studies
+- - CHIMIA
+  - chimia
+- - CLARA Architecture/Recherche (French)
+  - clara-architecture-recherche
+- - CNS &amp; Neurological Disorders - Drug Targets
+  - cns-and-neurological-disorders-drug-targets
+- - Cahiers d'ethnomusicologie (French)
+  - cahiers-d-ethnomusicologie
+- - Cahiers du Centre Gustave-Glotz (French)
+  - cahiers-du-centre-gustave-glotz
+- - California Agriculture
+  - california-agriculture
+- - Cambridge Journal of Economics
+  - cambridge-journal-of-economics
+- - Cambridge University Press (author-date)
+  - cambridge-university-press-author-date
+- - Cambridge University Press (note)
+  - cambridge-university-press-note
+- - Cambridge University Press (numeric)
+  - cambridge-university-press-numeric
+- - Cambridge University Press - Law (note)
+  - cambridge-university-press-law-note
+- - Campus adventiste du Salève - Faculté adventiste de théologie (French)
+  - campus-adventiste-du-saleve-faculte-adventiste-de-theologie
+- - Canadian Biosystems Engineering
+  - canadian-biosystems-engineering
+- - Canadian Geotechnical Journal
+  - canadian-geotechnical-journal
+- - Canadian Guide to Uniform Legal Citation 9th edition (McGill Guide)
+  - mcgill-en
+- - Canadian Journal of Chemistry
+  - canadian-journal-of-chemistry
+- - Canadian Journal of Dietetic Practice and Research
+  - canadian-journal-of-dietetic-practice-and-research
+- - Canadian Journal of Earth Sciences
+  - canadian-journal-of-earth-sciences
+- - Canadian Journal of Economics
+  - canadian-journal-of-economics
+- - Canadian Journal of Fisheries and Aquatic Sciences
+  - canadian-journal-of-fisheries-and-aquatic-sciences
+- - Canadian Journal of Physics
+  - canadian-journal-of-physics
+- - Canadian Journal of Public Health
+  - canadian-journal-of-public-health
+- - Canadian Journal of Soil Science
+  - canadian-journal-of-soil-science
+- - Canadian Public Policy
+  - canadian-public-policy
+- - Cancer Translational Medicine
+  - cancer-translational-medicine
+- - Cape Peninsula University of Technology - Harvard
+  - harvard-cape-peninsula-university-of-technology
+- - Carcinogenesis
+  - carcinogenesis
+- - Cardiff University - Harvard
+  - harvard-cardiff-university
+- - Cardiff University - Vancouver
+  - cardiff-university-vancouver
+- - Cardiff University BIOSI and CARBS - Harvard
+  - cardiff-university-biosi-and-carbs-harvard
+- - Cardiocore (Spanish)
+  - cardiocore
+- - Cath Lab Digest
+  - cath-lab-digest
+- - Catholic Biblical Association (full note)
+  - catholic-biblical-association
+- - Cell
+  - cell
+- - Cell Research
+  - cell-research
+- - Cell Structure and Function
+  - cell-structure-and-function
+- - Cell Transplantation
+  - cell-transplantation
+- - Cell journals (numeric)
+  - cell-numeric
+- - Cell journals (numeric, superscript)
+  - cell-numeric-superscript
+- - Cellular Reprogramming
+  - cellular-reprogramming
+- - Cellular and Molecular Bioengineering
+  - cellular-and-molecular-bioengineering
+- - Cellular and Molecular Gastroenterology and Hepatology
+  - cellular-and-molecular-gastroenterology-and-hepatology
+- - Centaurus
+  - centaurus
+- - Centre de recherche sur les civilisations de l'Asie orientale (French)
+  - centre-de-recherche-sur-les-civilisations-de-l-asie-orientale
+- - Cerebral Cortex
+  - cerebral-cortex
+- - Changer d'époque (French)
+  - changer-d-epoque
+- - Chemical Biology &amp; Drug Design
+  - chemical-biology-and-drug-design
+- - Chemical Engineering Progress
+  - chemical-engineering-progress
+- - Chemical Senses
+  - chemical-senses
+- - Chemical and Pharmaceutical Bulletin
+  - chemical-and-pharmaceutical-bulletin
+- - Chemie Ingenieur Technik
+  - chemie-ingenieur-technik
+- - Chemistry Education Research and Practice
+  - chemistry-education-research-and-practice
+- - Chest
+  - chest
+- - Chicago Manual of Style 16th edition (author-date)
+  - chicago-author-date-16th-edition
+- - Chicago Manual of Style 16th edition (author-date, Basque)
+  - chicago-author-date-basque
+- - Chicago Manual of Style 16th edition (author-date, German)
+  - chicago-author-date-de
+- - Chicago Manual of Style 16th edition (figures and illustrations)
+  - chicago-figures
+- - Chicago Manual of Style 16th edition (full note)
+  - chicago-fullnote-bibliography-16th-edition
+- - Chicago Manual of Style 16th edition (note)
+  - chicago-note-bibliography-16th-edition
+- - Chicago Manual of Style 17th edition (author-date)
+  - chicago-author-date
+- - Chicago Manual of Style 17th edition (author-date), French
+  - chicago-author-date-fr
+- - Chicago Manual of Style 17th edition (full note)
+  - chicago-fullnote-bibliography
+- - Chicago Manual of Style 17th edition (full note, French)
+  - chicago-fullnote-bibliography-fr
+- - Chicago Manual of Style 17th edition (full note, short title subsequent)
+  - chicago-fullnote-bibliography-short-title-subsequent
+- - Chicago Manual of Style 17th edition (full note, with Ibid.)
+  - chicago-fullnote-bibliography-with-ibid
+- - Chicago Manual of Style 17th edition (library list)
+  - chicago-library-list
+- - Chicago Manual of Style 17th edition (note)
+  - chicago-note-bibliography
+- - Chicago Manual of Style 17th edition (note, annotated bibliography)
+  - chicago-annotated-bibliography
+- - Chicago Manual of Style 17th edition (note, with Ibid.)
+  - chicago-note-bibliography-with-ibid
+- - China Information
+  - china-information
+- - China National Standard GB/T 7714-1987 (numeric, Chinese)
+  - chinese-gb7714-1987-numeric
+- - China National Standard GB/T 7714-2005 (author-date, Chinese)
+  - chinese-gb7714-2005-author-date
+- - China National Standard GB/T 7714-2005 (numeric, Chinese)
+  - chinese-gb7714-2005-numeric
+- - China National Standard GB/T 7714-2015 (author-date, Chinese)
+  - china-national-standard-gb-t-7714-2015-author-date
+- - China National Standard GB/T 7714-2015 (note, Chinese)
+  - china-national-standard-gb-t-7714-2015-note
+- - China National Standard GB/T 7714-2015 (numeric, Chinese)
+  - china-national-standard-gb-t-7714-2015-numeric
+- - Chinese Journal of Aeronautics
+  - chinese-journal-of-aeronautics
+- - Chinese Medical Journal
+  - chinese-medical-journal
+- - Chroniques des activités archéologiques de l'Ecole française de Rome
+  - chroniques-des-activites-archeologiques-de-l-ecole-francaise-de-rome
+- - Chungara Revista de Antropología Chilena (Spanish - Chile)
+  - chungara-revista-de-antropologia-chilena
+- - Circulation
+  - circulation
+- - Circulation Journal
+  - circulation-journal
+- - Cirugia Cardiovascular (Spanish)
+  - cirugia-cardiovascular
+- - Citation Compass (Kildekompasset) - APA (note)
+  - citation-compass-apa-note
+- - Cite Them Right 10th edition - Harvard
+  - harvard-cite-them-right
+- - Cite Them Right 10th edition - Harvard (no "et al.")
+  - harvard-cite-them-right-no-et-al
+- - 'Citizen Science: Theory and Practice'
+  - citizen-science-theory-and-practice
+- - Civiltà Italiana (Italian)
+  - civilta-italiana
+- - 'Civitas: Revista de Ciências Sociais'
+  - civitas-revista-de-ciencias-sociais
+- - Cladistics
+  - cladistics
+- - Clay Minerals
+  - clay-minerals
+- - Clays and Clay Minerals
+  - clays-and-clay-minerals
+- - Climate Change Economics
+  - climate-change-economics
+- - Clinical Anatomy
+  - clinical-anatomy
+- - Clinical Dysmorphology
+  - clinical-dysmorphology
+- - Clinical Gastroenterology and Hepatology
+  - clinical-gastroenterology-and-hepatology
+- - Clinical Hemorheology and Microcirculation
+  - clinical-hemorheology-and-microcirculation
+- - Clinical Infectious Diseases
+  - clinical-infectious-diseases
+- - Clinical Journal of Sport Medicine
+  - clinical-journal-of-sport-medicine
+- - Clinical Journal of the American Society of Nephrology
+  - clinical-journal-of-the-american-society-of-nephrology
+- - Clinical Management Issues
+  - clinical-management-issues
+- - Clinical Nuclear Medicine
+  - clinical-nuclear-medicine
+- - Clinical Oral Implants Research
+  - clinical-oral-implants-research
+- - Clinical Orthopaedics and Related Research
+  - clinical-orthopaedics-and-related-research
+- - Clinical Otolaryngology
+  - clinical-otolaryngology
+- - Clinical Pharmacology &amp; Therapeutics
+  - clinical-pharmacology-and-therapeutics
+- - Clinical Physiology and Functional Imaging
+  - clinical-physiology-and-functional-imaging
+- - Clinical Radiology
+  - clinical-radiology
+- - Clinical Spine Surgery
+  - clinical-spine-surgery
+- - Clio Medica
+  - clio-medica
+- - Clínica e Investigación en Arteriosclerosis (Spanish)
+  - clinica-e-investigacion-en-arteriosclerosis
+- - Cold Spring Harbor Laboratory Press
+  - cold-spring-harbor-laboratory-press
+- - Collection de l'Ecole française de Rome (full note, French)
+  - collection-de-l-ecole-francaise-de-rome-full-note
+- - Collection de l'Ecole française de Rome (note, French)
+  - collection-de-l-ecole-francaise-de-rome-note
+- - Collection du Centre Jean-Bérard (French)
+  - collection-du-centre-jean-berard
+- - Collections électroniques de l'INHA (author-date, French)
+  - collections-electroniques-de-l-inha-author-date
+- - Collections électroniques de l'INHA (full note, French)
+  - collections-electroniques-de-l-inha-full-note
+- - College of Naturopathic Medicine
+  - college-of-naturopathic-medicine
+- - Collège Montmorency (note, French - Canada)
+  - college-montmorency
+- - Colombian Journal of Anesthesiology
+  - colombian-journal-of-anesthesiology
+- - Colorado State University - School of Biomedical Engineering
+  - colorado-state-university-school-of-biomedical-engineering
+- - Comisión Económica para América Latina y el Caribe (Spanish)
+  - comision-economica-para-america-latina-y-el-caribe
+- - Common Market Law Review
+  - common-market-law-review
+- - Communication et Langages
+  - communication-et-langages
+- - Comparative Politics
+  - comparative-politics
+- - Comparative Population Studies
+  - comparative-population-studies
+- - Computer und Recht (German)
+  - computer-und-recht
+- - Conservation &amp; Society
+  - conservation-and-society
+- - Conservation Biology
+  - conservation-biology
+- - Conservation Letters
+  - conservation-letters
+- - Conservation Physiology
+  - conservation-physiology
+- - Contemporary Accounting Research
+  - contemporary-accounting-research
+- - Continuity and Change
+  - continuity-and-change
+- - Contributions to the Archaeology of Egypt, Nubia and the Levant
+  - contributions-to-the-archaeology-of-egypt-nubia-and-the-levant
+- - Copeia
+  - copeia
+- - Copernicus Publications
+  - copernicus-publications
+- - Coral Reefs
+  - coral-reefs
+- - Cornea
+  - cornea
+- - Corrosion
+  - corrosion
+- - Council of Science Editors, Citation-Name (numeric, sorted alphabetically)
+  - council-of-science-editors-alphabetical
+- - Council of Science Editors, Citation-Sequence (numeric)
+  - council-of-science-editors
+- - Council of Science Editors, Name-Year (author-date)
+  - council-of-science-editors-author-date
+- - Coventry University - Harvard
+  - harvard-coventry-university
+- - Cranfield University (numeric)
+  - cranfield-university-numeric
+- - Cranfield University - Harvard
+  - harvard-cranfield-university
+- - Creativity and Innovation Management
+  - creativity-and-innovation-management
+- - Critical Care Medicine
+  - critical-care-medicine
+- - Critical Reviews in Plant Sciences
+  - critical-reviews-in-plant-sciences
+- - Critical Reviews in Solid State and Materials Sciences
+  - critical-reviews-in-solid-state-and-materials-sciences
+- - Crop Breeding and Applied Biotechnology
+  - crop-breeding-and-applied-biotechnology
+- - Crustaceana
+  - crustaceana
+- - Cuadernos de Filología Clásica. Estudios Griegos e Indoeuropeos (autor-año, Spanish)
+  - cuadernos-de-filologia-clasica
+- - Cultivos Tropicales (Spanish)
+  - cultivos-tropicales
+- - Cultural Studies of Science Education
+  - cultural-studies-of-science-education
+- - Culture, Medicine, and Psychiatry
+  - culture-medicine-and-psychiatry
+- - Cureus
+  - cureus
+- - Current Alzheimer Research
+  - current-alzheimer-research
+- - Current Gene Therapy
+  - current-gene-therapy
+- - Current Opinion in Endocrinology, Diabetes and Obesity
+  - current-opinion-in-endocrinology-diabetes-and-obesity
+- - Current Opinion journals
+  - current-opinion
+- - Current Pharmaceutical Design
+  - current-pharmaceutical-design
+- - Current Proteomics
+  - current-proteomics
+- - Current Protocols journals
+  - current-protocols
+- - Current Science
+  - current-science
+- - Current Topics in Medicinal Chemistry
+  - current-topics-in-medicinal-chemistry
+- - Currents in Biblical Research
+  - currents-in-biblical-research
+- - Cyberpsychology, Behavior, and Social Networking
+  - cyberpsychology-behavior-and-social-networking
+- - Cybium
+  - cybium
+- - Cytometry
+  - cytometry
+- - DIN 1505-2 (alphanumeric, German) - standard superseded by ISO-690
+  - din-1505-2-alphanumeric
+- - DIN 1505-2 (author-date, German) - standard superseded by ISO-690
+  - din-1505-2
+- - DIN 1505-2 (numeric, German) - standard superseded by ISO-690
+  - din-1505-2-numeric
+- - DIN 1505-2 (numeric, sorted alphabetically, German) - standard superseded by ISO-690
+  - din-1505-2-numeric-alphabetical
+- - DNA Research
+  - dna-research
+- - Data Science Journal
+  - data-science-journal
+- - Database
+  - database
+- - De Buck (Dutch)
+  - de-buck
+- - De Montfort University - Harvard
+  - de-montfort-university-harvard
+- - Deakin University - Harvard
+  - harvard-deakin-university
+- - Decision Sciences
+  - decision-sciences
+- - Demographic Research
+  - demographic-research
+- - Dermatology Online Journal
+  - dermatology-online-journal
+- - Deutsche Gesellschaft für Psychologie (German)
+  - deutsche-gesellschaft-fur-psychologie
+- - Deutsche Sprache (German)
+  - deutsche-sprache
+- - Deutsches Archäologisches Institut
+  - deutsches-archaologisches-institut
+- - Deutsches Ärzteblatt
+  - deutsches-arzteblatt
+- - Developing World Bioethics
+  - developing-world-bioethics
+- - Development Policy Review
+  - development-policy-review
+- - Development and Change
+  - development-and-change
+- - Developmental Neurobiology
+  - developmental-neurobiology
+- - Diabetes Technology &amp; Therapeutics
+  - diabetes-technology-and-therapeutics
+- - Diabetologia
+  - diabetologia
+- - Diagnóstico Prenatal (Spanish)
+  - diagnostico-prenatal
+- - Dialisis y Trasplante (Spanish)
+  - dialisis-y-trasplante
+- - Diatom Research
+  - diatom-research
+- - Die Bachelorarbeit (Samac et al.) (in-text, German)
+  - die-bachelorarbeit-samac-et-al-in-text
+- - Die Bachelorarbeit (Samac et al.) (note, German)
+  - die-bachelorarbeit-samac-et-al-note
+- - Digital Scholarship in the Humanities
+  - digital-scholarship-in-the-humanities
+- - Diplo
+  - diplo
+- - Disability and Rehabilitation
+  - disability-and-rehabilitation
+- - Discovery Medicine
+  - discovery-medicine
+- - Documents d'archéologie française (French)
+  - documents-d-archeologie-francaise
+- - Donau-Universität Krems - Department für E-Governance in Wirtschaft und Verwaltung
+    (German - Austria)
+  - donau-universitat-krems-department-fur-e-governance-in-wirthschaft-und-verwaltung
+- - Drug Development Research
+  - drug-development-research
+- - Drug Testing and Analysis
+  - drug-testing-and-analysis
+- - Drugs of Today
+  - drugs-of-today
+- - Dundalk Institute of Technology - Harvard
+  - harvard-dundalk-institute-of-technology
+- - Durham University Business School - Harvard
+  - harvard-durham-university-business-school
+- - E3S Web of Conferences
+  - e3s-web-of-conferences
+- - EMBO Press
+  - embo-press
+- - EMBnet.journal
+  - embnet-journal
+- - ENS de Lyon - Centre d'ingénierie documentaire (French)
+  - ens-de-lyon-centre-d-ingenierie-documentaire
+- - ENTECHO (Czech)
+  - entecho
+- - EVA Berlin Konferenz (German)
+  - eva-berlin-konferenz
+- - EXCLI Journal
+  - excli-journal
+- - Ear and Hearing
+  - ear-and-hearing
+- - Early Christianity
+  - early-christianity
+- - Early Medieval Europe
+  - early-medieval-europe
+- - Earth Surface Processes and Landforms
+  - earth-surface-processes-and-landforms
+- - Earthquake Engineering &amp; Structural Dynamics
+  - earthquake-engineering-and-structural-dynamics
+- - Earthquake Spectra
+  - earthquake-spectra
+- - Ecclesial Practices
+  - ecclesial-practices
+- - Ecological Entomology
+  - ecological-entomology
+- - Ecological Restoration
+  - ecological-restoration
+- - Ecology
+  - ecology
+- - Ecology Letters
+  - ecology-letters
+- - Ecology and Society
+  - ecology-and-society
+- - Ecology of Freshwater Fish
+  - ecology-of-freshwater-fish
+- - Econometrica
+  - econometrica
+- - Economic Commission for Latin America and the Caribbean
+  - economic-commission-for-latin-america-and-the-caribbean
+- - Economic Geology
+  - economic-geology
+- - Economía y Política (Spanish - Chile)
+  - economia-y-politica
+- - Ecosistemas (Spanish)
+  - ecosistemas
+- - Ecosystems
+  - ecosystems
+- - Edge Hill University - Harvard
+  - harvard-edge-hill-university
+- - Edward Elgar Publishing - Business and Social Sciences
+  - edward-elgar-business-and-social-sciences
+- - Egretta (German - Austria)
+  - egretta
+- - Einaudi (Italian)
+  - einaudi
+- - Eksploatacja i Niezawodność (Maintenance and Reliability) (English)
+  - eksploatacja-i-niezawodnosc
+- - El profesional de la información (Spanish)
+  - el-profesional-de-la-informacion
+- - Electrophoresis
+  - electrophoresis
+- - Elementa
+  - elementa
+- - Elsevier (numeric, with titles)
+  - elsevier-with-titles
+- - Elsevier (numeric, with titles, sorted alphabetically)
+  - elsevier-with-titles-alphabetical
+- - Elsevier (numeric, without titles)
+  - elsevier-without-titles
+- - Elsevier - Harvard (with titles)
+  - elsevier-harvard
+- - Elsevier - Harvard (without titles)
+  - elsevier-harvard-without-titles
+- - Elsevier - Harvard 2
+  - elsevier-harvard2
+- - Elsevier - Vancouver
+  - elsevier-vancouver
+- - Elsevier - Vancouver (author-date)
+  - elsevier-vancouver-author-date
+- - Emerald - Harvard
+  - emerald-harvard
+- - Emu - Austral Ornithology
+  - emu-austral-ornithology
+- - Endocrine Press
+  - endocrine-press
+- - Endoscopia (Spanish)
+  - endoscopia
+- - Enfermería Clínica (Spanish)
+  - enfermeria-clinica
+- - Enfermería Intensiva (Spanish)
+  - enfermeria-intensiva
+- - Engineering in Life Sciences
+  - engineering-in-life-sciences
+- - Engineering, Technology &amp; Applied Science Research
+  - engineering-technology-and-applied-science-research
+- - Entomologia Experimentalis et Applicata
+  - entomologia-experimentalis-et-applicata
+- - Entomological Society of America
+  - entomological-society-of-america
+- - Environment and Planning
+  - environment-and-planning
+- - Environment and Urbanization
+  - environment-and-urbanization
+- - Environmental &amp; Engineering Geoscience
+  - environmental-and-engineering-geoscience
+- - Environmental Chemistry
+  - environmental-chemistry
+- - Environmental Conservation
+  - environmental-conservation
+- - Environmental Health Perspectives
+  - environmental-health-perspectives
+- - Environmental Microbiology
+  - environmental-microbiology
+- - Environmental Values
+  - environmental-values
+- - Environnement, Risques &amp; Santé
+  - environnement-risques-et-sante
+- - Ephemerides Theologicae Lovanienses
+  - ephemerides-theologicae-lovanienses
+- - Epidemiology &amp; Infection
+  - epidemiology-and-infection
+- - Epilepsia
+  - epilepsia
+- - Equine Veterinary Education
+  - equine-veterinary-education
+- - Equine Veterinary Journal
+  - equine-veterinary-journal
+- - Ergo
+  - ergo
+- - 'Errata: Publicação sobre processos editoriais (Portuguese - Brazil)'
+  - errata
+- - Escola de Comando e Estado-Maior do Exército - ABNT (Portuguese - Brazil)
+  - associacao-brasileira-de-normas-tecnicas-eceme
+- - Escola de Comando e Estado-Maior do Exército - Instituto Meira Mattos - ABNT (Portuguese
+    - Brazil)
+  - associacao-brasileira-de-normas-tecnicas-instituto-meira-mattos
+- - Escuela Nacional de Antropología e Historia (autor-fecha) (Spanish - Mexico)
+  - escuela-nacional-de-antropologia-e-historia-author-date
+- - Escuela Nacional de Antropología e Historia (nota completa) (Spanish - Mexico)
+  - escuela-nacional-de-antropologia-e-historia-full-note
+- - Escuela Nacional de Antropología e Historia (nota corta) (Spanish - Mexico)
+  - escuela-nacional-de-antropologia-e-historia-short-note
+- - Estudios Hispánicos (Spanish)
+  - estudios-hispanicos
+- - Estudios de Cultura Maya (Spanish - Mexico)
+  - estudios-de-cultura-maya
+- - Estudios de Fonética Experimental
+  - estudios-de-fonetica-experimental
+- - Ethics (for book reviews)
+  - ethics-book-reviews
+- - Ethnobiology and Conservation
+  - ethnobiology-and-conservation
+- - Ethnologie française (French)
+  - ethnologie-francaise
+- - Ethnomusicology
+  - ethnomusicology
+- - Eurasian Journal of Medical Investigation
+  - eurasian-journal-of-medical-investigation
+- - Eurasian Journal of Medicine and Oncology
+  - eurasian-journal-of-medicine-and-oncology
+- - EuroIntervention
+  - eurointervention
+- - Europace
+  - europace
+- - European Archaeology - Harvard
+  - harvard-european-archaeology
+- - European Cells &amp; Materials
+  - european-cells-and-materials
+- - European Journal for Philosophy of Religion
+  - european-journal-for-philosophy-of-religion
+- - European Journal of Anaesthesiology
+  - european-journal-of-anaesthesiology
+- - European Journal of Clinical Microbiology &amp; Infectious Diseases
+  - european-journal-of-clinical-microbiology-and-infectious-diseases
+- - European Journal of Emergency Medicine
+  - european-journal-of-emergency-medicine
+- - European Journal of Endocrinology
+  - european-journal-of-endocrinology
+- - European Journal of Entomology
+  - european-journal-of-entomology
+- - European Journal of Human Genetics
+  - european-journal-of-human-genetics
+- - European Journal of Immunology
+  - european-journal-of-immunology
+- - European Journal of Information Systems
+  - european-journal-of-information-systems
+- - European Journal of International Law
+  - european-journal-of-international-law
+- - European Journal of Microbiology &amp; Immunology
+  - european-journal-of-microbiology-and-immunology
+- - European Journal of Neuroscience
+  - european-journal-of-neuroscience
+- - European Journal of Ophthalmology
+  - european-journal-of-ophthalmology
+- - European Journal of Paediatric Neurology
+  - european-journal-of-paediatric-neurology
+- - European Journal of Pain
+  - european-journal-of-pain
+- - European Journal of Political Research
+  - european-journal-of-political-research
+- - European Journal of Public Health
+  - european-journal-of-public-health
+- - European Journal of Soil Science
+  - european-journal-of-soil-science
+- - European Journal of Taxonomy
+  - european-journal-of-taxonomy
+- - European Journal of Theology
+  - european-journal-of-theology
+- - European Journal of Ultrasound (Ultraschall in der Medizin)
+  - european-journal-of-ultrasound
+- - European Journal of Vascular and Endovascular Surgery
+  - european-journal-of-vascular-and-endovascular-surgery
+- - European Respiratory Journal
+  - european-respiratory-journal
+- - European Retail Research
+  - european-retail-research
+- - European Society of Cardiology
+  - european-society-of-cardiology
+- - European Union - Interinstitutional Style Guide (author-date)
+  - european-union-interinstitutional-style-guide-author-date
+- - European Union - Interinstitutional Style Guide (note)
+  - european-union-interinstitutional-style-guide
+- - Evidence-Based Complementary and Alternative Medicine
+  - evidence-based-complementary-and-alternative-medicine
+- - Evolution
+  - evolution
+- - Evolution &amp; Development
+  - evolution-and-development
+- - Evolutionary Anthropology
+  - evolutionary-anthropology
+- - Evolutionary Ecology Research
+  - evolutionary-ecology-research
+- - Experimental Biomedical Research
+  - experimental-biomedical-research
+- - Experimental Dermatology
+  - experimental-dermatology
+- - Eye
+  - eye
+- - FOLD&amp;R (Fasti On Line Documents &amp; Research)
+  - fold-and-r
+- - Fachhochschule Kiel - Fachbereich Medien (German)
+  - fachhochschule-kiel-fachbereich-medien
+- - Fachhochschule Salzburg - Harvard
+  - harvard-fachhochschule-salzburg
+- - Fachhochschule Vorarlberg (author-date)
+  - fachhochschule-vorarlberg-author-date
+- - Fachhochschule Vorarlberg (note)
+  - fachhochschule-vorarlberg-note
+- - Facial Plastic Surgery Clinics of North America
+  - facial-plastic-surgery-clinics-of-north-america
+- - Facoltà Teologica dell'Italia Settentrionale - Milano (titoli di riviste non abbreviati,
+    Italian)
+  - facolta-teologica-dell-italia-settentrionale-milano
+- - Falmouth University - Harvard
+  - harvard-falmouth-university
+- - Family Business Review
+  - family-business-review
+- - Farmeconomia. Health Economics and Therapeutic Pathways
+  - farmeconomia
+- - Fatigue &amp; Fracture of Engineering Materials &amp; Structures
+  - fatigue-and-fracture-of-engineering-materials-and-structures
+- - Feminist Economics
+  - feminist-economics
+- - Feminist Theory
+  - feminist-theory
+- - Ferdinand Porsche Fernfachhochschule (German - Austria)
+  - ferdinand-porsche-fern-fachhochschule
+- - Fertility and Sterility
+  - fertility-and-sterility
+- - Finance and Society
+  - finance-and-society
+- - FinanzArchiv - Public Finance Analysis
+  - finanzarchiv
+- - Fine Focus
+  - fine-focus
+- - First Break
+  - first-break
+- - First Monday
+  - first-monday
+- - Fishery Bulletin
+  - fishery-bulletin
+- - Flavour and Fragrance Journal
+  - flavour-and-fragrance-journal
+- - Florida Entomologist
+  - florida-entomologist
+- - Folia Biologica
+  - folia-biologica
+- - Food and Agriculture Organization of the United Nations
+  - food-and-agriculture-organization-of-the-united-nations
+- - Foodborne Pathogens and Disease
+  - foodborne-pathogens-and-disease
+- - Forensic Anthropology
+  - forensic-anthropology
+- - Forensic Science Review
+  - forensic-science-review
+- - Forest Science
+  - forest-science
+- - 'Forum: Qualitative Social Research (English)'
+  - forum-qualitative-social-research
+- - 'Forum: Qualitative Sozialforschung (German)'
+  - forum-qualitative-sozialforschung
+- - France (auteurs et al., auteur-date, French)
+  - french4
+- - France (auteurs et al., numérotation, French)
+  - french2
+- - France (tous les auteurs, auteur-date, French)
+  - french3
+- - France (tous les auteurs, numérotation, French)
+  - french1
+- - Free Radical Research
+  - free-radical-research
+- - Freie Universität Berlin - Geographische Wissenschaften (German)
+  - freie-universitat-berlin-geographische-wissenschaften
+- - French Politics
+  - french-politics
+- - Freshwater Biology
+  - freshwater-biology
+- - Freshwater Crayfish
+  - freshwater-crayfish
+- - Freshwater Science
+  - freshwater-science
+- - Friedrich-Schiller-Universität Jena - Medizinische Fakultät (German)
+  - friedrich-schiller-universitat-jena-medizinische-fakultat
+- - Frontiers in Bioscience
+  - frontiers-in-bioscience
+- - Frontiers in Ecology and the Environment
+  - frontiers-in-ecology-and-the-environment
+- - Frontiers in Optics
+  - frontiers-in-optics
+- - Frontiers in Physics
+  - frontiers-in-physics
+- - Frontiers journals
+  - frontiers
+- - Frontiers medical journals
+  - frontiers-medical-journals
+- - Frontiers of Biogeography
+  - frontiers-of-biogeography
+- - Future Medicine journals
+  - future-medicine
+- - Future Science Group
+  - future-science-group
+- - G. Giappichelli Editore (Italian)
+  - g-giappichelli-editore
+- - 'G3: Genes, Genomes, Genetics'
+  - g3
+- - Gaceta Sanitaria
+  - gaceta-sanitaria
+- - Galatasaray Üniversitesi Sosyal Bilimler Enstitüsü
+  - galatasaray-universitesi-sosyal-bilimler-enstitusu
+- - Gallia (French)
+  - gallia
+- - Gallia Préhistoire (French)
+  - gallia-prehistoire
+- - Gastroenterology
+  - gastroenterology
+- - Gastrointestinal Endoscopy Clinics of North America
+  - gastrointestinal-endoscopy-clinics-of-north-america
+- - Gastrointestinal Intervention
+  - gastrointestinal-intervention
+- - Gazeta Médica
+  - gazeta-medica
+- - Geistes- und Kulturwissenschaften (Heilmann) (German)
+  - geistes-und-kulturwissenschaften-heilmann
+- - Generic Style Rules for Linguistics
+  - generic-style-rules-for-linguistics
+- - Genes to Cells
+  - genes-to-cells
+- - Genes, Brain and Behavior
+  - genes-brain-and-behavior
+- - Genetics
+  - genetics
+- - Genetics and Molecular Biology
+  - genetics-and-molecular-biology
+- - Genome Biology and Evolution
+  - genome-biology-and-evolution
+- - Genomics &amp; Informatics
+  - genomics-and-informatics
+- - 'Genèses: Sciences sociales et histoire (French)'
+  - geneses
+- - Geoarchaeology
+  - geoarchaeology
+- - Geobiology
+  - geobiology
+- - Geochemical Perspectives Letters
+  - geochemical-perspectives-letters
+- - Geochimica et Cosmochimica Acta
+  - geochimica-et-cosmochimica-acta
+- - Geochronometria
+  - geochronometria
+- - Geografia Fisica e Dinamica Quaternaria
+  - geografia-fisica-e-dinamica-quaternaria
+- - Geografie Sborník ČGS
+  - geografie-sbornik-cgs
+- - Geographische Zeitschrift
+  - geographische-zeitschrift
+- - Geological Magazine
+  - geological-magazine
+- - Geophysical Journal International
+  - geophysical-journal-international
+- - Geophysics
+  - geophysics
+- - Geopolitics
+  - geopolitics
+- - Georg-August-Universität Göttingen - Institut für Ethnologie und Ethnologische
+    Sammlung (German)
+  - georg-august-universitat-gottingen-institut-fur-ethnologie-und-ethnologische-sammlung
+- - German Council of Economic Experts
+  - german-council-of-economic-experts
+- - German Yearbook of International Law
+  - german-yearbook-of-international-law
+- - Gesellschaft fur Popularmusikforschung (German)
+  - gesellschaft-fur-popularmusikforschung
+- - Gesellschaft für Bildung und Forschung in Europa - Harvard (German)
+  - harvard-gesellschaft-fur-bildung-und-forschung-in-europa
+- - Gewerblicher Rechtsschutz und Urheberrecht (German)
+  - gewerblicher-rechtsschutz-und-urheberrecht
+- - GigaScience
+  - gigascience
+- - Global Ecology and Biogeography
+  - global-ecology-and-biogeography
+- - Glossa
+  - glossa
+- - Government and Opposition
+  - government-and-opposition
+- - Grasas y Aceites
+  - grasas-y-aceites
+- - Griffith College - Harvard
+  - griffith-college-harvard
+- - Groupe d'anthropologie et d'archéologie funéraire (French)
+  - groupe-danthropologie-et-darcheologie-funeraire
+- - Guide des citations, références et abréviations juridiques 6e édition (French)
+  - guide-des-citations-references-et-abreviations-juridiques
+- - Guide des références pour la rédaction juridique 7e édition (Guide Lluelles, French
+    - Canada)
+  - lluelles
+- - Guide des références pour la rédaction juridique 7e édition (Notes complètes)
+    (Guide Lluelles, no Ibid., French - Canada)
+  - lluelles-no-ibid
+- - Guide pour la rédaction et la présentation des thèses à l'usage des doctorants
+    (French)
+  - guide-pour-la-redaction-et-la-presentation-des-theses-a-lusage-des-doctorants
+- - Géographie et cultures (French)
+  - geographie-et-cultures
+- - Gériatrie et Psychologie Neuropsychiatrie du Vieillissement
+  - geriatrie-et-psychologie-neuropsychiatrie-du-vieillissement
+- - HAND
+  - hand
+- - HPB
+  - hpb
+- - Haematologica
+  - haematologica
+- - Haemophilia
+  - haemophilia
+- - Hainan Medical University Journal Publisher
+  - hainan-medical-university-journal-publisher
+- - Hamburg School of Food Science (diploma, German)
+  - hamburg-school-of-food-science
+- - Handbook of Clinical Neurology
+  - handbook-of-clinical-neurology
+- - Harper Adams University - Harvard
+  - harper-adams-university-harvard
+- - Haute Ecole pédagogique Fribourg (French)
+  - haute-ecole-pedagogique-fribourg
+- - Haute école de gestion de Genève - ISO-690 (English)
+  - haute-ecole-de-gestion-de-geneve-iso-690
+- - Hawaii International Conference on System Sciences Proceedings
+  - hawaii-international-conference-on-system-sciences-proceedings
+- - Health &amp; Social Care in the Community
+  - health-and-social-care-in-the-community
+- - Health Economics
+  - health-economics
+- - Health Economics, Policy and Law
+  - health-economics-policy-and-law
+- - Health Education Research
+  - health-education-research
+- - Health Policy and Planning
+  - health-policy-and-planning
+- - Health Reform Observer - Observatoire des Réformes de Santé
+  - health-reform-observer-observatoire-des-reformes-de-sante
+- - Health and Human Rights Journal
+  - health-and-human-rights-journal
+- - Heart Failure Clinics
+  - heart-failure-clinics
+- - Heart Rhythm
+  - heart-rhythm
+- - Heidelberg University - Faculty of Medicine (Universität Heidelberg - Medizinische
+    Fakultät Heidelberg)
+  - heidelberg-university-faculty-of-medicine
+- - Heiliger Dienst (German)
+  - heiliger-dienst
+- - Helsingin yliopisto - Teologinen tiedekunta (Finnish)
+  - university-of-helsinki-faculty-of-theology
+- - Helvetica Chimica Acta
+  - helvetica-chimica-acta
+- - Hematology/Oncology Clinics of North America
+  - hematology-oncology-clinics-of-north-america
+- - Henoch
+  - henoch
+- - Hepatology
+  - hepatology
+- - Heredity
+  - heredity
+- - Herpetologica
+  - herpetologica
+- - High Altitude Medicine &amp; Biology
+  - high-altitude-medicine-and-biology
+- - Hiob Ludolf Centre for Ethiopian Studies
+  - hiob-ludolf-centre-for-ethiopian-studies
+- - Hiob Ludolf Centre for Ethiopian Studies (long names)
+  - hiob-ludolf-centre-for-ethiopian-studies-long-names
+- - Hiob Ludolf Centre for Ethiopian Studies (with URL/DOI)
+  - hiob-ludolf-centre-for-ethiopian-studies-with-url-doi
+- - Hipertensión y Riesgo Vascular (Spanish)
+  - hipertension-y-riesgo-vascular
+- - Histoire &amp; Mesure (French)
+  - histoire-et-mesure
+- - Histoire@Politique. Politique, culture, société (French)
+  - histoire-at-politique
+- - Histopathology
+  - histopathology
+- - Historical Materialism
+  - historical-materialism
+- - Historical Social Research
+  - historical-social-research
+- - History Australia
+  - history-australia
+- - History and Theory
+  - history-and-theory
+- - History of the Human Sciences
+  - history-of-the-human-sciences
+- - Hochschule Bonn-Rhein-Sieg (German)
+  - hochschule-bonn-rhein-sieg
+- - Hochschule Hannover - Soziale Arbeit (German)
+  - hochschule-hannover-soziale-arbeit
+- - Hochschule München - Fakultät für Angewandte Sozialwissenschaften (German)
+  - hochschule-munchen-fakultat-fur-angewandte-sozialwissenschaften
+- - Hochschule Osnabrück - Fakultät Agrarwissenschaften und Landschaftsarchitektur
+    (German)
+  - hochschule-osnabruck-fakultat-agrarwissenschaften-und-landschaftsarchitektur
+- - Hochschule Pforzheim - Fakultät für Wirtschaft und Recht (German)
+  - hochschule-pforzheim-fakultat-fur-wirtschaft-und-recht
+- - Hochschule der Medien Stuttgart (German)
+  - stuttgart-media-university
+- - Hochschule für Soziale Arbeit FHNW (German - Switzerland)
+  - hochschule-fur-soziale-arbeit-fhnw
+- - Hochschule für Wirtschaft und Recht Berlin (German)
+  - hochschule-fur-wirtschaft-und-recht-berlin
+- - Hong Kong Journal of Radiology
+  - hong-kong-journal-of-radiology
+- - Human Brain Mapping
+  - human-brain-mapping
+- - Human Gene Therapy
+  - human-gene-therapy
+- - Human Mutation
+  - human-mutation
+- - Human Reproduction
+  - human-reproduction
+- - Human Reproduction Update
+  - human-reproduction-update
+- - Human Resource Management Journal
+  - human-resource-management-journal
+- - Human-Wildlife Interactions
+  - human-wildlife-interactions
+- - Humanistica Lovaniensia. Journal of Neo-Latin Studies
+  - humanistica-lovaniensia-journal-of-neo-latin-studies
+- - Humboldt State University - Environmental Resources Engineering
+  - humboldt-state-university-environmental-resources-engineering
+- - Hydrobiologia
+  - hydrobiologia
+- - Hydrological Processes
+  - hydrological-processes
+- - Hydrological Sciences Journal
+  - hydrological-sciences-journal
+- - Hypertension Research
+  - hypertension-research
+- - Hypotheses in the Life Sciences
+  - hypotheses-in-the-life-sciences
+- - I.B. Tauris (note)
+  - ib-tauris-note
+- - ICES Journal of Marine Science
+  - ices-journal-of-marine-science
+- - IE Comunicaciones
+  - ie-comunicaciones
+- - IEEE
+  - ieee
+- - IEEE (with URL)
+  - ieee-with-url
+- - IEEE Transactions on Medical Imaging
+  - ieee-transactions-on-medical-imaging
+- - IICA-CATIE (Spanish)
+  - iica-catie
+- - INDIANA
+  - indiana
+- - INSTAP Academic Press
+  - instap-academic-press
+- - 'INTER: Romanian Review for Theological and Religious Studies'
+  - inter-ro
+- - IOS Press (books)
+  - ios-press-books
+- - IPAG Business School - APA
+  - ipag-business-school-apa
+- - ISO-690 (author-date, Czech)
+  - iso690-author-date-cs
+- - ISO-690 (author-date, English)
+  - iso690-author-date-en
+- - ISO-690 (author-date, French)
+  - iso690-author-date-fr
+- - ISO-690 (author-date, German)
+  - iso690-author-date-de
+- - ISO-690 (author-date, Portuguese - Brazil)
+  - iso690-author-date-pt-br
+- - ISO-690 (author-date, Slovak)
+  - iso690-author-date-sk
+- - ISO-690 (author-date, Spanish)
+  - iso690-author-date-es
+- - ISO-690 (author-date, no abstract, French)
+  - iso690-author-date-fr-no-abstract
+- - ISO-690 (full note, Czech)
+  - iso690-full-note-cs
+- - ISO-690 (full note, Slovak)
+  - iso690-full-note-sk
+- - ISO-690 (full note, with Ibid., Romanian)
+  - iso690-full-note-with-ibid-ro
+- - ISO-690 (note, no abstract, French)
+  - iso690-note-fr
+- - ISO-690 (note, without bibliography, Czech)
+  - iso690-note-cs
+- - ISO-690 (numeric, English)
+  - iso690-numeric-en
+- - ISO-690 (numeric, French)
+  - iso690-numeric-fr
+- - ISO-690 (numeric, Lithuanian)
+  - iso690-numeric-lt
+- - ISO-690 (numeric, Slovak)
+  - iso690-numeric-sk
+- - ISO-690 (numeric, brackets, Czech)
+  - iso690-numeric-brackets-cs
+- - ISO-690 (numeric, parentheses, Czech)
+  - iso690-numeric-cs
+- - IUBMB Life
+  - iubmb-life
+- - Ibis
+  - ibis
+- - Időjárás - Quarterly Journal of the Hungarian Meteorological Service
+  - idojaras-quarterly-journal-of-the-hungarian-meteorological-service
+- - Igaku Toshokan (Japanese)
+  - igaku-toshokan
+- - Ilahiyat Studies (full note)
+  - ilahiyat-studies
+- - Im Gespräch - Hefte der Martin Buber-Gesellschaft (German)
+  - im-gesprach
+- - Imperial College London - Harvard
+  - harvard-imperial-college-london
+- - Imperial College London - Vancouver
+  - vancouver-imperial-college-london
+- - InVisu
+  - invisu
+- - Indian Dermatology Online Journal
+  - indian-dermatology-online-journal
+- - Indian Journal of Medical Research
+  - indian-journal-of-medical-research
+- - Indian Journal of Orthopaedics
+  - indian-journal-of-orthopaedics
+- - Indian Journal of Physics
+  - indian-journal-of-physics
+- - Indian Journal of Traditional Knowledge
+  - indian-journal-of-traditional-knowledge
+- - Indoor Air
+  - indoor-air
+- - Industrial Relations
+  - industrial-relations
+- - Infectio (Spanish)
+  - infectio
+- - Infectious Disease Clinics of North America
+  - infectious-disease-clinics-of-north-america
+- - Inflammatory Bowel Diseases
+  - inflammatory-bowel-diseases
+- - Influenza and Other Respiratory Viruses
+  - influenza-and-other-respiratory-viruses
+- - Infomin
+  - infomin
+- - Informal Logic
+  - informal-logic
+- - Ingeniería Agrícola (Spanish)
+  - ingenieria-agricola
+- - 'Institut Pertanian Bogor: Pedoman Penulisan Karya Ilmiah Edisi ke-3 (Indonesian)'
+  - institut-pertanian-bogor
+- - Institut Teknologi Bandung - Sekolah Pascasarjana
+  - institut-teknologi-bandung-sekolah-pascasarjana
+- - Institut français d'archéologie orientale (English)
+  - institut-francais-darcheologie-orientale-en
+- - Institut français d'archéologie orientale (French)
+  - institut-francais-darcheologie-orientale
+- - Institut für Praxisforschung - Harvard (Bahr &amp; Frackmann) (German)
+  - harvard-institut-fur-praxisforschung-de
+- - Institut national de la recherche scientifique - Sciences sociales (author-date,
+    French)
+  - institut-national-de-la-recherche-scientifique-sciences-sociales
+- - Institut national de recherches archéologiques préventives (French)
+  - institut-national-de-recherches-archeologiques-preventives
+- - Institut national de santé publique du Québec - NAPP (French - Canada)
+  - institut-national-de-sante-publique-du-quebec-napp
+- - Institut national de santé publique du Québec - TOPO (French - Canada)
+  - institut-national-de-sante-publique-du-quebec-topo
+- - Institute for Operations Research and the Management Sciences
+  - institute-for-operations-research-and-the-management-sciences
+- - Institute of Mathematical Statistics journals
+  - institute-of-mathematical-statistics
+- - Institute of Mathematics and its Applications
+  - institute-of-mathematics-and-its-applications
+- - Institute of Physics (numeric)
+  - institute-of-physics-numeric
+- - Institute of Physics - Harvard
+  - institute-of-physics-harvard
+- - Instituto Brasileiro de Informação em Ciência e Tecnologia - ABNT (autoria abreviada)
+  - instituto-brasileiro-de-informacao-em-ciencia-e-tecnologia-abnt-initials
+- - Instituto Brasileiro de Informação em Ciência e Tecnologia - ABNT (autoria completa)
+  - instituto-brasileiro-de-informacao-em-ciencia-e-tecnologia-abnt
+- - Instituto Superior de Teología de las Islas Canarias (Spanish)
+  - instituto-superior-de-teologia-de-las-islas-canarias
+- - Instituto de Investigaciones sobre la Universidad y la Educación - Moderno (autor-fecha,
+    Spanish)
+  - instituto-de-investigaciones-sobre-la-universidad-y-la-educacion-moderno
+- - Instituto de Pesquisa Econômica Aplicada - ABNT (Portuguese - Brazil)
+  - associacao-brasileira-de-normas-tecnicas-ipea
+- - Instituto de Pesquisas Energéticas e Nucleares (Portuguese - Brazil)
+  - instituto-de-pesquisas-energeticas-e-nucleares
+- - Instituto de Pesquisas Tecnológicas (Portuguese - Brazil)
+  - instituto-de-pesquisas-tecnologicas
+- - Integrated Science Publishing journals
+  - integrated-science-publishing-journals
+- - Integrative &amp; Comparative Biology
+  - integrative-and-comparative-biology
+- - Inter-Research Science Center
+  - inter-research-science-center
+- - Interaction Design &amp; Architecture(s)
+  - interaction-design-and-architectures
+- - Interactive CardioVascular and Thoracic Surgery
+  - interactive-cardiovascular-and-thoracic-surgery
+- - Interdisziplinäre Anthropologie (German)
+  - interdisziplinare-anthropologie
+- - Interdisziplinäre Zeitschrift für Technologie und Lernen (German)
+  - interdisziplinare-zeitschrift-fur-technologie-und-lernen
+- - International Atomic Energy Agency
+  - international-atomic-energy-agency
+- - International Biodeterioration &amp; Biodegradation
+  - international-biodeterioration-and-biodegradation
+- - International Brazilian Journal Of Urology
+  - international-brazilian-journal-of-urology
+- - International Conference on Information Systems Development
+  - international-conference-on-information-systems-development
+- - International Development Policy
+  - international-development-policy
+- - International Energy Agency - Organisation for Economic Co-operation and Development
+  - international-energy-agency-organisation-for-economic-co-operation-and-development
+- - International Islamic University Malaysia - Ahmad Ibrahim Kulliyyah of Laws
+  - international-islamic-university-malaysia-ahmad-ibrahim-kulliyyah-of-laws
+- - International Journal for Numerical Methods in Biomedical Engineering
+  - international-journal-for-numerical-methods-in-biomedical-engineering
+- - International Journal of Audiology
+  - international-journal-of-audiology
+- - International Journal of Cancer
+  - international-journal-of-cancer
+- - International Journal of Circuit Theory and Applications
+  - international-journal-of-circuit-theory-and-applications
+- - International Journal of Climatology
+  - international-journal-of-climatology
+- - International Journal of Electrochemical Science
+  - international-journal-of-electrochemical-science
+- - International Journal of Electronic Commerce
+  - international-journal-of-electronic-commerce
+- - International Journal of Epidemiology
+  - international-journal-of-epidemiology
+- - International Journal of Exercise Science
+  - international-journal-of-exercise-science
+- - International Journal of Food Science &amp; Technology
+  - international-journal-of-food-science-and-technology
+- - International Journal of Geriatric Psychiatry
+  - international-journal-of-geriatric-psychiatry
+- - International Journal of Humanoid Robotics
+  - international-journal-of-humanoid-robotics
+- - International Journal of Language &amp; Communication Disorders
+  - international-journal-of-language-and-communication-disorders
+- - International Journal of Lexicography
+  - international-journal-of-lexicography
+- - International Journal of Management Reviews
+  - international-journal-of-management-reviews
+- - International Journal of Nuclear Security
+  - international-journal-of-nuclear-security
+- - International Journal of Obstetric Anesthesia
+  - international-journal-of-obstetric-anesthesia
+- - International Journal of Occupational Medicine and Environmental Health
+  - international-journal-of-occupational-medicine-and-environmental-health
+- - International Journal of Oral and Maxillofacial Surgery
+  - international-journal-of-oral-and-maxillofacial-surgery
+- - International Journal of Osteoarchaeology
+  - international-journal-of-osteoarchaeology
+- - International Journal of Plant Sciences
+  - international-journal-of-plant-sciences
+- - International Journal of Polymer Analysis and Characterization
+  - international-journal-of-polymer-analysis-and-characterization
+- - International Journal of Polymeric Materials and Polymeric Biomaterials
+  - international-journal-of-polymeric-materials-and-polymeric-biomaterials
+- - International Journal of Population Data Science
+  - international-journal-of-population-data-science
+- - International Journal of Quantum Chemistry
+  - international-journal-of-quantum-chemistry
+- - International Journal of Radiation Oncology, Biology, Physics
+  - international-journal-of-radiation-oncology-biology-physics
+- - International Journal of Research in Exercise Physiology
+  - international-journal-of-research-in-exercise-physiology
+- - International Journal of Simulation Modelling
+  - international-journal-of-simulation-modelling
+- - International Journal of Spatial Data Infrastructures Research
+  - international-journal-of-spatial-data-infrastructures-research
+- - International Journal of Sport Medicine
+  - international-journal-of-sports-medicine
+- - International Journal of Urban and Regional Research
+  - international-journal-of-urban-and-regional-research
+- - International Journal of Wildland Fire
+  - international-journal-of-wildland-fire
+- - International Microbiology
+  - international-microbiology
+- - International Organization
+  - international-organization
+- - International Pig Veterinary Society Congress Proceedings
+  - international-pig-veterinary-society-congress-proceedings
+- - International Review of the Red Cross
+  - international-review-of-the-red-cross
+- - International Security
+  - international-security
+- - International Studies Association
+  - international-studies-association
+- - International Union of Crystallography journals
+  - international-union-of-crystallography
+- - Inventaire général du patrimoine culturel - ISO-690 (full note, French)
+  - inventaire-general-du-patrimoine-culturel-iso-690-full-note
+- - Inventaire général du patrimoine culturel - ISO-690 (full note, with Ibid., French)
+  - inventaire-general-du-patrimoine-culturel-iso-690-full-note-with-ibid
+- - Inventaire général du patrimoine culturel - ISO-690 (note, French)
+  - inventaire-general-du-patrimoine-culturel-iso-690-note
+- - Invertebrate Biology
+  - invertebrate-biology
+- - Investigative Radiology
+  - investigative-radiology
+- - Iranian Journal of Basic Medical Sciences
+  - iranian-journal-of-basic-medical-sciences
+- - Iranian Journal of Pharmaceutical Research
+  - iranian-journal-of-pharmaceutical-research
+- - Irish Historical Studies
+  - irish-historical-studies
+- - Isabella Stewart Gardner Museum
+  - isabella-stewart-gardner-museum
+- - Israel Medical Association Journal
+  - israel-medical-association-journal
+- - Italian Journal of Agronomy
+  - italian-journal-of-agronomy
+- - Italus Hortus
+  - italus-hortus
+- - Ithaque (French - Canada)
+  - ithaque
+- - Ius Ecclesiae
+  - ius-ecclesiae
+- - 'JACC: Cardiovascular Imaging'
+  - jacc-cardiovascular-imaging
+- - 'JACC: Cardiovascular Interventions'
+  - jacc-cardiovascular-interventions
+- - Jahrbuch der Österreichischen Byzantinischen Gesellschaft
+  - jahrbuch-der-osterreichischen-byzantinischen-gesellschaft
+- - Jahrbuch für evangelikale Theologie (German)
+  - jahrbuch-fur-evangelikale-theologie
+- - Japanese Journal of Applied Physics
+  - japanese-journal-of-applied-physics
+- - Javnost - The Public
+  - javnost-the-public
+- - John Benjamins Publishing Company - Iconicity in Language and Literature
+  - john-benjamins-publishing-company-iconicity-in-language-and-literature
+- - John Benjamins Publishing Company - Linguistik Aktuell/Linguistics Today
+  - john-benjamins-publishing-company-linguistik-aktuell-linguistics-today
+- - Johnson Matthey Technology Review
+  - johnson-matthey-technology-review
+- - Journal Of Magnetic Resonance Imaging
+  - journal-of-magnetic-resonance-imaging
+- - Journal and Proceedings of the Royal Society of New South Wales
+  - journal-and-proceedings-of-the-royal-society-of-new-south-wales
+- - Journal de la Société des américanistes
+  - journal-de-la-societe-des-americanistes
+- - Journal for Veterinary Medicine, Biotechnology and Biosafety
+  - journal-for-veterinary-medicine-biotechnology-and-biosafety
+- - Journal for the History of Astronomy
+  - journal-for-the-history-of-astronomy
+- - Journal für Kunstgeschichte
+  - journal-fur-kunstgeschichte
+- - Journal of AOAC International
+  - journal-of-aoac-international
+- - Journal of Acoustics
+  - journal-of-acoustics
+- - Journal of Adolescent Health
+  - journal-of-adolescent-health
+- - Journal of Advertising Research
+  - journal-of-advertising-research
+- - Journal of Aerosol Medicine and Pulmonary Drug Delivery
+  - journal-of-aerosol-medicine-and-pulmonary-drug-delivery
+- - Journal of Agricultural and Applied Economics
+  - journal-of-agricultural-and-applied-economics
+- - Journal of Agricultural and Resource Economics
+  - journal-of-agricultural-and-resource-economics
+- - Journal of Alzheimer's Disease
+  - journal-of-alzheimers-disease
+- - Journal of Analytical Toxicology
+  - journal-of-analytical-toxicology
+- - Journal of Animal Physiology and Animal Nutrition
+  - journal-of-animal-physiology-and-animal-nutrition
+- - Journal of Animal Science
+  - journal-of-animal-science
+- - Journal of Antimicrobial Chemotherapy
+  - journal-of-antimicrobial-chemotherapy
+- - Journal of Applied Animal Science
+  - journal-of-applied-animal-science
+- - Journal of Applied Clinical Medical Physics
+  - journal-of-applied-clinical-medical-physics
+- - Journal of Applied Entomology
+  - journal-of-applied-entomology
+- - Journal of Applied Pharmaceutical Research
+  - journal-of-applied-pharmaceutical-research
+- - Journal of Applied Philosophy
+  - journal-of-applied-philosophy
+- - Journal of Applied Polymer Science
+  - journal-of-applied-polymer-science
+- - Journal of Archaeological Research
+  - journal-of-archaeological-research
+- - Journal of Atrial Fibrillation
+  - journal-of-atrial-fibrillation
+- - Journal of Australian Strength &amp; Conditioning
+  - journal-of-australian-strength-and-conditioning
+- - Journal of Avian Biology
+  - journal-of-avian-biology
+- - Journal of Basic Microbiology
+  - journal-of-basic-microbiology
+- - Journal of Biological Regulators &amp; Homeostatic Agents
+  - journal-of-biological-regulators-and-homeostatic-agents
+- - Journal of Biomedical Materials Research Part A
+  - journal-of-biomedical-materials-research-part-a
+- - Journal of Biosciences
+  - journal-of-biosciences
+- - Journal of Bone and Mineral Research
+  - journal-of-bone-and-mineral-research
+- - Journal of Brachial Plexus and Peripheral Nerve Injury
+  - journal-of-brachial-plexus-and-peripheral-nerve-injury
+- - Journal of Breast Cancer
+  - journal-of-breast-cancer
+- - Journal of Burn Care &amp; Research
+  - journal-of-burn-care-and-research
+- - Journal of Business Logistics
+  - journal-of-business-logistics
+- - Journal of Cachexia, Sarcopenia and Muscle
+  - journal-of-cachexia-sarcopenia-and-muscle
+- - Journal of Cardiothoracic and Vascular Anesthesia
+  - journal-of-cardiothoracic-and-vascular-anesthesia
+- - Journal of Cellular Biochemistry
+  - journal-of-cellular-biochemistry
+- - Journal of Cellular and Molecular Medicine
+  - journal-of-cellular-and-molecular-medicine
+- - Journal of Chemistry and Chemical Engineering
+  - journal-of-chemistry-and-chemical-engineering
+- - Journal of Chemometrics
+  - journal-of-chemometrics
+- - Journal of Child and Adolescent Psychopharmacology
+  - journal-of-child-and-adolescent-psychopharmacology
+- - Journal of Clinical Neurology
+  - journal-of-clinical-neurology
+- - Journal of Clinical Neurophysiology
+  - journal-of-clinical-neurophysiology
+- - Journal of Clinical Oncology
+  - journal-of-clinical-oncology
+- - Journal of Clinical Rheumatology
+  - journal-of-clinical-rheumatology
+- - Journal of Clinical Sleep Medicine
+  - journal-of-clinical-sleep-medicine
+- - Journal of Combinatorics
+  - journal-of-combinatorics
+- - Journal of Common Market Studies
+  - journal-of-common-market-studies
+- - Journal of Comparative Pathology
+  - journal-of-comparative-pathology
+- - Journal of Computational Chemistry
+  - journal-of-computational-chemistry
+- - Journal of Computer Applications in Archaeology
+  - journal-of-computer-applications-in-archaeology
+- - Journal of Computer Information Systems
+  - journal-of-computer-information-systems
+- - Journal of Consumer Research
+  - journal-of-consumer-research
+- - Journal of Contemporary Medicine
+  - journal-of-contemporary-medicine
+- - Journal of Crohn's and Colitis
+  - journal-of-crohns-and-colitis
+- - Journal of Crohn's and Colitis Supplements
+  - journal-of-crohns-and-colitis-supplements
+- - Journal of Dairy Science
+  - journal-of-dairy-science
+- - Journal of ETA Maritime Science
+  - journal-of-eta-maritime-science
+- - Journal of Early Christian Studies
+  - journal-of-early-christian-studies
+- - Journal of Egyptian History
+  - journal-of-egyptian-history
+- - Journal of Elections, Public Opinion &amp; Parties
+  - journal-of-elections-public-opinion-and-parties
+- - Journal of Endodontics
+  - journal-of-endodontics
+- - Journal of Environmental Science and Health, Part B
+  - journal-of-environmental-science-and-health-part-b
+- - Journal of Ethnobiology
+  - journal-of-ethnobiology
+- - Journal of European Public Policy
+  - journal-of-european-public-policy
+- - Journal of Evolution and Health
+  - journal-of-evolution-and-health
+- - Journal of Evolutionary Biology
+  - journal-of-evolutionary-biology
+- - Journal of Experimental Botany
+  - journal-of-experimental-botany
+- - Journal of Field Ornithology
+  - journal-of-field-ornithology
+- - Journal of Finance
+  - journal-of-finance
+- - Journal of Fish Biology
+  - journal-of-fish-biology
+- - Journal of Food Protection
+  - journal-of-food-protection
+- - Journal of Foraminiferal Research
+  - journal-of-foraminiferal-research
+- - Journal of Forensic Sciences
+  - journal-of-forensic-sciences
+- - Journal of Frailty &amp; Aging
+  - journal-of-frailty-and-aging
+- - Journal of Geriatric Psychiatry and Neurology
+  - journal-of-geriatric-psychiatry-and-neurology
+- - Journal of Glaciology
+  - journal-of-glaciology
+- - Journal of Hearing Science
+  - journal-of-hearing-science
+- - Journal of Historical Linguistics
+  - journal-of-historical-linguistics
+- - Journal of Human Evolution
+  - journal-of-human-evolution
+- - Journal of Hypertension
+  - journal-of-hypertension
+- - Journal of Industrial Ecology
+  - journal-of-industrial-ecology
+- - Journal of Industrial and Engineering Chemistry
+  - journal-of-industrial-and-engineering-chemistry
+- - Journal of Infection
+  - journal-of-infection
+- - Journal of Infectious Diseases
+  - journal-of-infectious-diseases
+- - Journal of Information Technology
+  - journal-of-information-technology
+- - Journal of Institutional and Theoretical Economics
+  - journal-of-institutional-and-theoretical-economics
+- - Journal of Instrumentation
+  - journal-of-instrumentation
+- - Journal of Integrated OMICS
+  - journal-of-integrated-omics
+- - Journal of Interactive Marketing
+  - journal-of-interactive-marketing
+- - Journal of Internal Medicine
+  - journal-of-internal-medicine
+- - Journal of International Business Studies
+  - journal-of-international-business-studies
+- - Journal of International Economic Law
+  - journal-of-international-economic-law
+- - Journal of International Peacekeeping
+  - journal-of-international-peacekeeping
+- - Journal of International Relations and Development
+  - journal-of-international-relations-and-development
+- - Journal of Investigative Dermatology
+  - journal-of-investigative-dermatology
+- - Journal of Jewish Studies
+  - journal-of-jewish-studies
+- - Journal of Korean Neurosurgical Society
+  - journal-of-korean-neurosurgical-society
+- - Journal of Leukocyte Biology
+  - journal-of-leukocyte-biology
+- - Journal of Limnology
+  - journal-of-limnology
+- - Journal of Linguistics
+  - journal-of-linguistics
+- - Journal of Lipid Research
+  - journal-of-lipid-research
+- - Journal of Mammalogy
+  - journal-of-mammalogy
+- - Journal of Management
+  - journal-of-management
+- - Journal of Management Information Systems
+  - journal-of-management-information-systems
+- - Journal of Management Studies
+  - journal-of-management-studies
+- - Journal of Materials Research
+  - journal-of-materials-research
+- - Journal of Mechanical Science and Technology
+  - journal-of-mechanical-science-and-technology
+- - Journal of Medical Genetics
+  - journal-of-medical-genetics
+- - Journal of Medical Internet Research
+  - journal-of-medical-internet-research
+- - Journal of Minimally Invasive Gynecology
+  - journal-of-minimally-invasive-gynecology
+- - Journal of Molecular Cell Biology
+  - journal-of-molecular-cell-biology
+- - Journal of Molecular Endocrinology
+  - journal-of-molecular-endocrinology
+- - Journal of Molecular Recognition
+  - journal-of-molecular-recognition
+- - Journal of Molecular Signaling
+  - journal-of-molecular-signaling
+- - Journal of Musculoskeletal Research
+  - journal-of-musculoskeletal-research
+- - Journal of Music Technology and Education
+  - journal-of-music-technology-and-education
+- - Journal of Nanoscience and Nanotechnology
+  - journal-of-nanoscience-and-nanotechnology
+- - Journal of Natural History
+  - journal-of-natural-history
+- - Journal of Neolithic Archaeology
+  - journal-of-neolithic-archaeology
+- - Journal of Neurochemistry
+  - journal-of-neurochemistry
+- - Journal of Neuroendocrinology
+  - journal-of-neuroendocrinology
+- - Journal of Neurological Disorders
+  - journal-of-neurological-disorders
+- - Journal of Neurophysiology
+  - journal-of-neurophysiology
+- - Journal of Neuroscience and Neuroengineering
+  - journal-of-neuroscience-and-neuroengineering
+- - Journal of Neurosurgery
+  - journal-of-neurosurgery
+- - Journal of Neurotrauma
+  - journal-of-neurotrauma
+- - Journal of New Zealand Grasslands
+  - journal-of-new-zealand-grasslands
+- - Journal of Nutrition
+  - journal-of-nutrition
+- - Journal of Oral and Maxillofacial Surgery
+  - journal-of-oral-and-maxillofacial-surgery
+- - Journal of Orthopaedic Research
+  - journal-of-orthopaedic-research
+- - Journal of Orthopaedic Trauma
+  - journal-of-orthopaedic-trauma
+- - Journal of Orthopaedics, Trauma and Rehabilitation
+  - journal-of-orthopaedics-trauma-and-rehabilitation
+- - Journal of Paleontology
+  - journal-of-paleontology
+- - Journal of Peace Research
+  - journal-of-peace-research
+- - Journal of Pediatric Gastroenterology and Nutrition
+  - journal-of-pediatric-gastroenterology-and-nutrition
+- - Journal of Peptide Science
+  - journal-of-peptide-science
+- - Journal of Perinatal Medicine
+  - journal-of-perinatal-medicine
+- - Journal of Periodontal Research
+  - journal-of-periodontal-research
+- - Journal of Petrology
+  - journal-of-petrology
+- - Journal of Pharmacy and Pharmacology
+  - journal-of-pharmacy-and-pharmacology
+- - Journal of Phycology
+  - journal-of-phycology
+- - Journal of Physical Therapy Science
+  - journal-of-physical-therapy-science
+- - Journal of Plankton Research
+  - journal-of-plankton-research
+- - Journal of Plant Ecology
+  - journal-of-plant-ecology
+- - Journal of Plant Nutrition and Soil Science
+  - journal-of-plant-nutrition-and-soil-science
+- - Journal of Plant Protection Research
+  - journal-of-plant-protection-research
+- - Journal of Political Ideologies
+  - journal-of-political-ideologies
+- - Journal of Political Philosophy
+  - journal-of-political-philosophy
+- - Journal of Pollination Ecology
+  - journal-of-pollination-ecology
+- - 'Journal of Polymer Science Part A: Polymer Chemistry'
+  - journal-of-polymer-science-part-a-polymer-chemistry
+- - Journal of Porphyrins and Phthalocyanines
+  - journal-of-porphyrins-and-phthalocyanines
+- - Journal of Product Innovation Management
+  - journal-of-product-innovation-management
+- - Journal of Psychiatric and Mental Health Nursing
+  - journal-of-psychiatric-and-mental-health-nursing
+- - Journal of Psychiatry &amp; Neuroscience
+  - journal-of-psychiatry-and-neuroscience
+- - Journal of Raman Spectroscopy
+  - journal-of-raman-spectroscopy
+- - Journal of Reconstructive Microsurgery
+  - journal-of-reconstructive-microsurgery
+- - Journal of Refugee Studies
+  - journal-of-refugee-studies
+- - Journal of Retailing
+  - journal-of-retailing
+- - Journal of Rheumatology
+  - journal-of-rheumatology
+- - Journal of Roman Archaeology (A)
+  - journal-of-roman-archaeology-a
+- - Journal of Roman Archaeology (B)
+  - journal-of-roman-archaeology-b
+- - Journal of Science and Medicine in Sport
+  - journal-of-science-and-medicine-in-sport
+- - Journal of Separation Science
+  - journal-of-separation-science
+- - Journal of Shoulder and Elbow Surgery
+  - journal-of-shoulder-and-elbow-surgery
+- - Journal of Simulation
+  - journal-of-simulation
+- - Journal of Sleep Research
+  - journal-of-sleep-research
+- - Journal of Small Animal Practice
+  - journal-of-small-animal-practice
+- - Journal of Small Business Management
+  - journal-of-small-business-management
+- - Journal of Social Archaeology
+  - journal-of-social-archaeology
+- - Journal of Social Philosophy
+  - journal-of-social-philosophy
+- - Journal of Soil Science and Plant Nutrition
+  - journal-of-soil-science-and-plant-nutrition
+- - Journal of Soil and Water Conservation
+  - journal-of-soil-and-water-conservation
+- - Journal of Sport and Health Science
+  - journal-of-sport-and-health-science
+- - Journal of Sports Science &amp; Medicine
+  - journal-of-sports-science-and-medicine
+- - Journal of Strength and Conditioning Research
+  - journal-of-strength-and-conditioning-research
+- - Journal of Structural Geology
+  - journal-of-structural-geology
+- - Journal of Studies on Alcohol and Drugs
+  - journal-of-studies-on-alcohol-and-drugs
+- - Journal of Surgery and Medicine
+  - journal-of-surgery-and-medicine
+- - Journal of Systematic Palaeontology
+  - journal-of-systematic-palaeontology
+- - Journal of The Electrochemical Society
+  - journal-of-the-electrochemical-society
+- - Journal of Thermal Spray Technology
+  - journal-of-thermal-spray-technology
+- - Journal of Threatened Taxa
+  - journal-of-threatened-taxa
+- - Journal of Thrombosis and Haemostasis
+  - journal-of-thrombosis-and-haemostasis
+- - Journal of Tropical Ecology
+  - journal-of-tropical-ecology
+- - Journal of Tropical Life Science
+  - journal-of-tropical-life-science
+- - Journal of Universal Computer Science
+  - journal-of-universal-computer-science
+- - Journal of Urban Technology
+  - journal-of-urban-technology
+- - Journal of Urban and Environmental Engineering
+  - journal-of-urban-and-environmental-engineering
+- - Journal of Vegetation Science
+  - journal-of-vegetation-science
+- - Journal of Vertebrate Biology
+  - journal-of-vertebrate-biology
+- - Journal of Vertebrate Paleontology
+  - journal-of-vertebrate-paleontology
+- - Journal of Veterinary Diagnostic Investigation
+  - journal-of-veterinary-diagnostic-investigation
+- - Journal of Visualized Experiments
+  - journal-of-visualized-experiments
+- - Journal of Water Sanitation and Hygiene for Development
+  - journal-of-water-sanitation-and-hygiene-for-development
+- - Journal of Wildlife Diseases
+  - journal-of-wildlife-diseases
+- - Journal of Zoo Biology
+  - journal-of-zoo-biology
+- - Journal of Zoo and Wildlife Medicine
+  - journal-of-zoo-and-wildlife-medicine
+- - Journal of Zoology
+  - journal-of-zoology
+- - Journal of the Air &amp; Waste Management Association
+  - journal-of-the-air-and-waste-management-association
+- - Journal of the American Academy of Audiology
+  - journal-of-the-american-academy-of-audiology
+- - Journal of the American Academy of Orthopaedic Surgeons
+  - journal-of-the-american-academy-of-orthopaedic-surgeons
+- - Journal of the American Animal Hospital Association
+  - journal-of-the-american-animal-hospital-association
+- - Journal of the American Association of Laboratory Animal Science
+  - journal-of-the-american-association-of-laboratory-animal-science
+- - Journal of the American Ceramic Society
+  - journal-of-the-american-ceramic-society
+- - Journal of the American College of Cardiology
+  - journal-of-the-american-college-of-cardiology
+- - Journal of the American College of Surgeons
+  - journal-of-the-american-college-of-surgeons
+- - Journal of the American Heart Association
+  - journal-of-the-american-heart-association
+- - Journal of the American Society of Brewing Chemists
+  - journal-of-the-american-society-of-brewing-chemists
+- - Journal of the American Society of Nephrology
+  - journal-of-the-american-society-of-nephrology
+- - Journal of the American Water Resources Association
+  - journal-of-the-american-water-resources-association
+- - Journal of the Association for Information Systems
+  - journal-of-the-association-for-information-systems
+- - Journal of the Association of Environmental and Resource Economists
+  - journal-of-the-association-of-environmental-and-resource-economists
+- - Journal of the Botanical Research Institute of Texas
+  - journal-of-the-botanical-research-institute-of-texas
+- - Journal of the Brazilian Chemical Society
+  - journal-of-the-brazilian-chemical-society
+- - Journal of the European Academy of Dermatology and Venereology
+  - journal-of-the-european-academy-of-dermatology-and-venereology
+- - Journal of the History of Collections
+  - journal-of-the-history-of-collections
+- - Journal of the Indian Law Institute
+  - journal-of-the-indian-law-institute
+- - Journal of the Korean Society of Civil Engineers
+  - journal-of-the-korean-society-of-civil-engineers
+- - Journal of the Marine Biological Association of the United Kingdom
+  - journal-of-the-marine-biological-association-of-the-united-kingdom
+- - Journal of the Royal Anthropological Institute
+  - journal-of-the-royal-anthropological-institute
+- - Journal of the Royal Society of Western Australia
+  - journal-of-the-royal-society-of-western-australia
+- - Journal of the Royal Statistical Society
+  - journal-of-the-royal-statistical-society
+- - Journal of the Science of Food and Agriculture
+  - journal-of-the-science-of-food-and-agriculture
+- - Journal of the Serbian Chemical Society
+  - journal-of-the-serbian-chemical-society
+- - Journal of the South African Veterinary Association
+  - journal-of-the-south-african-veterinary-association
+- - Journal of the Warburg and Courtauld Institutes
+  - journal-of-the-warburg-and-courtauld-institutes
+- - Journal on Efficiency and Responsibility in Education and Science
+  - journal-on-efficiency-and-responsibility-in-education-and-science
+- - Journalistica (Danish)
+  - journalistica
+- - Juristische Schulung (German)
+  - juristische-schulung
+- - Juristische Zitierweise (Stüber) (German)
+  - juristische-zitierweise
+- - Juristische Zitierweise - Öffentliches Recht (German)
+  - juristische-zitierweise-offentliches-recht
+- - Juristische Zitierweise Schweizer (Ryser Büschi et al.) (German - Switzerland)
+  - juristische-zitierweise-schweizer
+- - Jurnal Ilmu dan Teknologi Hasil Ternak
+  - jurnal-ilmu-dan-teknologi-hasil-ternak
+- - Jurnal Pangan dan Agroindustri (Indonesian)
+  - jurnal-pangan-dan-agroindustri
+- - Jurnal Sains Farmasi &amp; Klinis
+  - jurnal-sains-farmasi-dan-klinis
+- - Jyväskylän yliopisto - Kemian laitos (Finnish)
+  - jyvaskylan-yliopisto-kemian-laitos
+- - KONA Powder and Particle Journal
+  - kona-powder-and-particle-journal
+- - KSCE Journal of Civil Engineering
+  - ksce-journal-of-civil-engineering
+- - KTH Royal Institute of Technology - School of Computer Science and Communication
+  - kth-royal-institute-of-technology-school-of-computer-science-and-communication
+- - KTH Royal Institute of Technology - School of Computer Science and Communication
+    (Swedish)
+  - kth-royal-institute-of-technology-school-of-computer-science-and-communication-sv
+- - Karabuk University - Graduate School of Natural and Applied Sciences
+  - karabuk-university-graduate-school-of-natural-and-applied-sciences
+- - Karger journals
+  - karger-journals
+- - Karger journals (author-date)
+  - karger-journals-author-date
+- - Karlstad Universitet - Harvard (Swedish)
+  - karlstad-universitet-harvard
+- - Karstenia
+  - karstenia
+- - Keel ja Kirjandus (Estonian)
+  - keel-ja-kirjandus
+- - Kidney Research and Clinical Practice
+  - kidney-research-and-clinical-practice
+- - Kindheit und Entwicklung
+  - kindheit-und-entwicklung
+- - King's College London - Harvard
+  - harvard-kings-college-london
+- - Knee Surgery &amp; Related Research
+  - knee-surgery-and-related-research
+- - Knee Surgery, Sports Traumatology, Arthroscopy
+  - knee-surgery-sports-traumatology-arthroscopy
+- - Knowledge &amp; Management of Aquatic Ecosystems
+  - knowledge-and-management-of-aquatic-ecosystems
+- - Kommunikation und Recht (German)
+  - kommunikation-und-recht
+- - Korean Journal of Anesthesiology
+  - korean-journal-of-anesthesiology
+- - Korean Journal of Radiology
+  - korean-journal-of-radiology
+- - Kritische Ausgabe (German)
+  - kritische-ausgabe
+- - Kunstakademie Münster (German)
+  - kunstakademie-munster
+- - Kölner Zeitschrift für Soziologie und Sozialpsychologie (German)
+  - kolner-zeitschrift-fur-soziologie-und-sozialpsychologie
+- - L'homme – Revue française d'anthropologie
+  - l-homme
+- - LCGC
+  - lcgc
+- - La Trobe University - APA 6th edition
+  - la-trobe-university-apa
+- - La Trobe University - Harvard
+  - la-trobe-university-harvard
+- - Laboratory Animal Science Professional
+  - laboratory-animal-science-professional
+- - Lancaster University - Harvard
+  - lancaster-university-harvard
+- - Land Degradation &amp; Development
+  - land-degradation-and-development
+- - Landes Bioscience Journals
+  - landes-bioscience-journals
+- - Language
+  - language
+- - Language in Society
+  - language-in-society
+- - Laser &amp; Photonics Reviews
+  - laser-and-photonics-reviews
+- - Latin American Perspectives
+  - latin-american-perspectives
+- - Latin American Research Review
+  - latin-american-research-review
+- - Lauterbornia - Internationale Zeitschrift für Faunistik und Floristik des Süßwassers
+    (German)
+  - lauterbornia
+- - Law &amp; Society Review
+  - law-and-society-review
+- - Law, Technology and Humans
+  - law-technology-and-humans
+- - Le Mouvement Social (French)
+  - le-mouvement-social
+- - Le tapuscrit (École des hautes études en sciences sociales) (author-date, French)
+  - le-tapuscrit-author-date
+- - Le tapuscrit (École des hautes études en sciences sociales) (note, French)
+  - le-tapuscrit-note
+- - Leeds Beckett University - Harvard
+  - harvard-leeds-beckett-university
+- - Leeds Metropolitan University - Harvard
+  - harvard-leeds-metropolitan-university
+- - Leiden Journal of International Law
+  - leiden-journal-of-international-law
+- - Leidraad voor juridische auteurs (Dutch)
+  - leidraad-voor-juridische-auteurs
+- - Leonardo
+  - leonardo
+- - Les Journées de la Recherche Avicole (French)
+  - les-journees-de-la-recherche-avicole
+- - Les Journées de la Recherche Porcine (French)
+  - les-journees-de-la-recherche-porcine
+- - Les nouvelles de l'archéologie (French)
+  - les-nouvelles-de-l-archeologie
+- - Lethaia
+  - lethaia
+- - Letters in Applied Microbiology
+  - letters-in-applied-microbiology
+- - Lettres et Sciences Humaines (biblio et notes, French)
+  - lettres-et-sciences-humaines-fr
+- - Leviathan (German)
+  - leviathan
+- - Lien social et Politiques (French)
+  - lien-social-et-politiques
+- - Limnetica
+  - limnetica
+- - Limnology and Oceanography
+  - limnology-and-oceanography
+- - Liver International
+  - liver-international
+- - Liverpool John Moores University - Harvard
+  - liverpool-john-moores-university-harvard
+- - London Metropolitan University - Harvard
+  - london-metropolitan-university-harvard
+- - London Review of International Law
+  - london-review-of-international-law
+- - London South Bank University (numeric)
+  - london-south-bank-university-numeric
+- - London South Bank University - Harvard
+  - harvard-london-south-bank-university
+- - Lund University School of Economics and Management
+  - lund-university-school-of-economics-and-management
+- - L’Année sociologique (French)
+  - lannee-sociologique
+- - MIS Quarterly
+  - mis-quarterly
+- - Macromolecular Reaction Engineering
+  - macromolecular-reaction-engineering
+- - Magnetic Resonance Materials in Physics, Biology and Medicine
+  - magnetic-resonance-materials-in-physics-biology-and-medicine
+- - Magnetic Resonance in Medicine
+  - magnetic-resonance-in-medicine
+- - Maison de l'Orient et de la Méditerranée (English)
+  - maison-de-l-orient-et-de-la-mediterranee-en
+- - Maison de l'Orient et de la Méditerranée (French)
+  - maison-de-l-orient-et-de-la-mediterranee
+- - Malaysian Orthopaedic Journal
+  - malaysian-orthopaedic-journal
+- - Mammal Review
+  - mammal-review
+- - Mammalia
+  - mammalia
+- - Management &amp; Avenir (French)
+  - management-et-avenir
+- - Management international
+  - management-international
+- - Manchester Business School - Harvard
+  - harvard-manchester-business-school
+- - Manchester Metropolitan University - Harvard
+  - harvard-manchester-metropolitan-university
+- - Manchester University Press monographs (author-date)
+  - manchester-university-press-author-date
+- - Manchester University Press monographs (note)
+  - manchester-university-press
+- - Manuel canadien de la référence juridique 9e édition (Guide McGill, French - Canada)
+  - mcgill-fr
+- - Marine Biology
+  - marine-biology
+- - Marine Mammal Science
+  - marine-mammal-science
+- - Marine Ornithology
+  - marine-ornithology
+- - Marine Turtle Newsletter
+  - marine-turtle-newsletter
+- - Marmara Üniversitesi - Türkiyat Araştırmaları Enstitüsü (Turkish)
+  - marmara-universitesi-turkiyat-arastirmalari-enstitusu
+- - Masarykova univerzita - Právnická fakulta
+  - masarykova-univerzita-pravnicka-fakulta
+- - Mastozoologia Neotropical
+  - mastozoologia-neotropical
+- - Materials Express
+  - materials-express
+- - Mathematical Geosciences
+  - mathematical-geosciences
+- - Mathematics and Computers in Simulation
+  - mathematics-and-computers-in-simulation
+- - McDonald Institute Monographs
+  - mcdonald-institute-monographs
+- - Media, Culture &amp; Society
+  - media-culture-and-society
+- - Mediaeval Studies
+  - mediaeval-studies
+- - Medical Dosimetry
+  - medical-dosimetry
+- - Medical History
+  - medical-history
+- - Medicina Clínica (Spanish)
+  - medicina-clinica
+- - Medicina delle Dipendenze - Italian Journal of the Addictions (Italian)
+  - medicina-delle-dipendenze-italian-journal-of-the-addictions
+- - Medicinal Research Reviews
+  - medicinal-research-reviews
+- - Medicine &amp; Science in Sports &amp; Exercise
+  - medicine-and-science-in-sports-and-exercise
+- - Medicinskiy Akademicheskiy Zhurnal
+  - medicinskiy-akademicheskiy-zhurnal
+- - Mediterranean Journal of Chemistry
+  - mediterranean-journal-of-chemistry
+- - Mediterranean Journal of Infection, Microbes and Antimicrobials
+  - mediterranean-journal-of-infection-microbes-and-antimicrobials
+- - Mediterranean Politics
+  - mediterranean-politics
+- - Melbourne Polytechnic - Harvard
+  - harvard-melbourne-polytechnic
+- - Melbourne School of Theology
+  - melbourne-school-of-theology
+- - Memórias do Instituto Oswaldo Cruz
+  - memorias-do-instituto-oswaldo-cruz
+- - Mercator-Institut für Sprachförderung und Deutsch als Zweitsprache (German)
+  - mercator-institut-fur-sprachforderung-und-deutsch-als-zweitsprache
+- - Mercatus Center
+  - mercatus-center
+- - Metallurgical and Materials Transactions
+  - metallurgical-and-materials-transactions
+- - Metallurgical and Materials Transactions A
+  - metallurgical-and-materials-transactions-a
+- - Meteoritics &amp; Planetary Science
+  - meteoritics-and-planetary-science
+- - Meteorological Applications
+  - meteorological-applications
+- - Method &amp; Theory in the Study of Religion
+  - method-and-theory-in-the-study-of-religion
+- - Methods in Ecology and Evolution
+  - methods-in-ecology-and-evolution
+- - Methods of Information in Medicine
+  - methods-of-information-in-medicine
+- - Metropol Verlag (German)
+  - metropol-verlag
+- - Microbial Cell
+  - microbial-cell
+- - Microbial Drug Resistance
+  - microbial-drug-resistance
+- - Microbiology Society
+  - microbiology-society
+- - Microscopy and Microanalysis
+  - microscopy-and-microanalysis
+- - Middle East Critique
+  - middle-east-critique
+- - Midwestern Baptist Theological Seminary
+  - midwestern-baptist-theological-seminary
+- - Mimbar Hukum
+  - mimbar-hukum
+- - Mimesis Edizioni (Italian)
+  - mimesis-edizioni
+- - Mind &amp; Language
+  - mind-and-language
+- - Mineralogical Magazine
+  - mineralogical-magazine
+- - Modern Humanities Research Association 3rd edition (author-date)
+  - modern-humanities-research-association-author-date
+- - Modern Humanities Research Association 3rd edition (note with bibliography)
+  - modern-humanities-research-association
+- - Modern Language Association 6th edition (note)
+  - modern-language-association-6th-edition-note
+- - Modern Language Association 7th edition
+  - modern-language-association-7th-edition
+- - Modern Language Association 7th edition (underline)
+  - modern-language-association-7th-edition-underline
+- - Modern Language Association 7th edition (with URL)
+  - modern-language-association-7th-edition-with-url
+- - Modern Language Association 8th edition
+  - modern-language-association
+- - Modern Pathology
+  - modern-pathology
+- - Modern Phytomorphology
+  - modern-phytomorphology
+- - Mohr Siebeck - Recht (German - Austria)
+  - mohr-siebeck-recht
+- - Molecular &amp; Cellular Proteomics
+  - molecular-and-cellular-proteomics
+- - Molecular Biology
+  - molecular-biology
+- - Molecular Biology and Evolution
+  - molecular-biology-and-evolution
+- - Molecular Biology of the Cell
+  - molecular-biology-of-the-cell
+- - Molecular Metabolism
+  - molecular-metabolism
+- - Molecular Microbiology
+  - molecular-microbiology
+- - Molecular Nutrition &amp; Food Research
+  - molecular-nutrition-and-food-research
+- - Molecular Oncology
+  - molecular-oncology
+- - Molecular Plant
+  - molecular-plant
+- - Molecular Plant Pathology
+  - molecular-plant-pathology
+- - Molecular Plant-Microbe Interactions
+  - molecular-plant-microbe-interactions
+- - Molecular Psychiatry
+  - molecular-psychiatry
+- - Molecular Psychiatry (letters to the editor)
+  - molecular-psychiatry-letters
+- - Monash University - CSIRO
+  - monash-university-csiro
+- - Monash University - Harvard
+  - monash-university-harvard
+- - Mondes en développement (French)
+  - mondes-en-developpement
+- - Moore Theological College
+  - moore-theological-college
+- - Moorlands College
+  - moorlands-college
+- - Multidisciplinary Digital Publishing Institute
+  - multidisciplinary-digital-publishing-institute
+- - Multimed (Spanish)
+  - multimed
+- - Multiple Sclerosis Journal
+  - multiple-sclerosis-journal
+- - Muscle &amp; Nerve
+  - muscle-and-nerve
+- - Music Theory Spectrum
+  - music-theory-spectrum
+- - Muséum national d'Histoire naturelle
+  - museum-national-dhistoire-naturelle
+- - Mutagenesis
+  - mutagenesis
+- - Mycologia
+  - mycologia
+- - Myrmecological News
+  - myrmecological-news
+- - Médecine Intensive Réanimation
+  - medecine-intensive-reanimation
+- - Métropolitiques (French)
+  - metropolitiques
+- - NCCR Mediality. Medienwandel - Medienwechsel - Medienwissen (German)
+  - nccr-mediality
+- - NEJM Catalyst Innovations in Care Delivery
+  - nejm-catalyst-innovations-in-care-delivery
+- - Nano Biomedicine and Engineering
+  - nano-biomedicine-and-engineering
+- - National Archives of Australia
+  - national-archives-of-australia
+- - National Institute of Health Research
+  - national-institute-of-health-research
+- - National Institute of Organisation Dynamics Australia - Harvard
+  - national-institute-of-organisation-dynamics-australia-harvard
+- - National Institute of Technology Karnataka
+  - national-institute-of-technology-karnataka
+- - National Institute of Technology, Tiruchirappalli
+  - national-institute-of-technology-tiruchirappalli
+- - National Library of Medicine (grant proposals with PMCID/PMID)
+  - national-library-of-medicine-grant-proposals
+- - National Marine Fisheries Service - National Environmental Policy Act
+  - national-marine-fisheries-service-national-environmental-policy-act
+- - National Natural Science Foundation of China (Chinese)
+  - national-natural-science-foundation-of-china
+- - National Science Foundation (grant proposals)
+  - national-science-foundation-grant-proposals
+- - National University of Singapore - Department of Geography - Harvard
+  - national-university-of-singapore-department-of-geography-harvard
+- - Nations and Nationalism
+  - nations-and-nationalism
+- - Natur und Landschaft (German)
+  - natur-und-landschaft
+- - Nature
+  - nature
+- - Nature (no "et al.")
+  - nature-no-et-al
+- - Nature (no superscript)
+  - nature-no-superscript
+- - Nature Neuroscience (brief communications)
+  - nature-neuroscience-brief-communications
+- - Nature Publishing Group - Vancouver
+  - nature-publishing-group-vancouver
+- - Natures Sciences Sociétés
+  - natures-sciences-societes
+- - Nauplius
+  - nauplius
+- - Navigation
+  - navigation
+- - NeHeT (French)
+  - nehet
+- - Necmettin Erbakan Üniversitesi Fen ve Mühendislik Bilimleri Dergisi (Turkish)
+  - necmettin-erbakan-universitesi-fen-ve-muhendislik-bilimleri-dergisi
+- - Nephrology Dialysis Transplantation
+  - nephrology-dialysis-transplantation
+- - Neue Juristische Wochenschrift (German)
+  - neue-juristische-wochenschrift
+- - Neural Plasticity
+  - neural-plasticity
+- - NeuroReport
+  - neuroreport
+- - Neuroendocrinology Letters
+  - neuroendocrinology-letters
+- - Neuroimaging Clinics of North America
+  - neuroimaging-clinics-of-north-america
+- - Neurology
+  - neurology
+- - Neurology India
+  - neurology-india
+- - Neurología (Spanish)
+  - neurologia
+- - Neurología Argentina (Spanish)
+  - neurologia-argentina
+- - Neuropsychopharmacology
+  - neuropsychopharmacology
+- - Neurorehabilitation and Neural Repair
+  - neurorehabilitation-and-neural-repair
+- - Neurosurgery Clinics of North America
+  - neurosurgery-clinics-of-north-america
+- - 'New Hart''s Rules: The Oxford Style Guide'
+  - new-harts-rules-the-oxford-style-guide
+- - New Phytologist
+  - new-phytologist
+- - New Solutions
+  - new-solutions
+- - New Testament Studies
+  - new-testament-studies
+- - New Zealand Dental Journal
+  - new-zealand-dental-journal
+- - New Zealand Journal of Forestry Science
+  - new-zealand-journal-of-forestry-science
+- - New Zealand Journal of History
+  - new-zealand-journal-of-history
+- - New Zealand Plant Protection
+  - new-zealand-plant-protection
+- - New Zealand Veterinary Journal
+  - new-zealand-veterinary-journal
+- - Newcastle University - Harvard
+  - harvard-newcastle-university
+- - Nordic Pulp &amp; Paper Research Journal
+  - nordic-pulp-and-paper-research-journal
+- - Norma Portuguesa 405 (Portuguese)
+  - norma-portuguesa-405
+- - Norois (French)
+  - norois
+- - Norsk APA-manual - APA 7th edition (author-date)
+  - norsk-apa-manual
+- - Norsk APA-manual - APA 7th edition (note)
+  - norsk-apa-manual-note
+- - North-West University - Harvard
+  - harvard-north-west-university
+- - Northeastern Naturalist
+  - northeastern-naturalist
+- - Nottingham Trent University Library - Harvard
+  - nottingham-trent-university-library-harvard
+- - Nowa Audiofonologia (Polish)
+  - nowa-audiofonologia
+- - Nuclear Receptor Signaling
+  - nuclear-receptor-signaling
+- - Nucleic Acids Research
+  - nucleic-acids-research
+- - Nucleic Acids Research - Web Server Issue
+  - nucleic-acids-research-web-server-issue
+- - Nutrition Research Reviews
+  - nutrition-research-reviews
+- - O.W. Barth Verlag (German)
+  - owbarth-verlag
+- - OSCOLA (Oxford University Standard for Citation of Legal Authorities)
+  - oscola
+- - OSCOLA (Oxford University Standard for Citation of Legal Authorities) (no Ibid.)
+  - oscola-no-ibid
+- - Obafemi Awolowo University - Faculty of Technology
+  - obafemi-awolowo-university-faculty-of-technology
+- - Obesity
+  - obesity
+- - Obstetrics &amp; Gynecology Science
+  - obstetrics-and-gynecology-science
+- - Occupational Medicine
+  - occupational-medicine
+- - Oceanography
+  - oceanography
+- - Oecologia Australis
+  - oecologia-australis
+- - Offa - Berichte und Mitteilungen zur Urgeschichte, Frühgeschichte und Mittelalterarchäologie
+  - offa
+- - Oikos
+  - oikos
+- - OncoImmunology
+  - oncoimmunology
+- - Oncotarget
+  - oncotarget
+- - Onderstepoort Journal of Veterinary Research
+  - onderstepoort-journal-of-veterinary-research
+- - Open Window - Harvard
+  - open-window
+- - Operative Dentistry
+  - operative-dentistry
+- - Ophthalmology
+  - ophthalmology
+- - Ophthalmology Retina
+  - ophthalmology-retina
+- - Optics Express
+  - optics-express
+- - Optics Letters
+  - optics-letters
+- - Optometry &amp; Vision Science
+  - optometry-and-vision-science
+- - Opuscula
+  - opuscula
+- - Oral Diseases
+  - oral-diseases
+- - Organic Geochemistry
+  - organic-geochemistry
+- - Organised Sound
+  - organised-sound
+- - Organization
+  - organization
+- - Organon
+  - organon
+- - Ornitología Neotropical
+  - ornitologia-neotropical
+- - Orthopedic Clinics of North America
+  - orthopedic-clinics-of-north-america
+- - Oryx
+  - oryx
+- - Otto-von-Guericke-Universität Magdeburg - Medizinische Fakultät (numeric)
+  - otto-von-guricke-universitat-magdeburg-medizinische-fakultat-numeric
+- - Oxford Art Journal
+  - oxford-art-journal
+- - Oxford Brookes University - Faculty of Health and Life Sciences - Harvard
+  - harvard-oxford-brookes-university-faculty-of-health-and-life-sciences
+- - Oxford Centre for Mission Studies - Harvard
+  - oxford-centre-for-mission-studies-harvard
+- - Oxford Studies in Ancient Philosophy
+  - oxford-studies-in-ancient-philosophy
+- - Oxford Studies on the Roman Economy
+  - oxford-studies-on-the-roman-economy
+- - Oxford University Press (note)
+  - oxford-university-press-note
+- - Oxford University Press HUMSOC
+  - oxford-university-press-humsoc
+- - Oxford University Press SciMed (author-date)
+  - oxford-university-press-scimed-author-date
+- - Oxford University Press SciMed (numeric)
+  - oxford-university-press-scimed-numeric
+- - Oxidation of Metals
+  - oxidation-of-metals
+- - PAIN
+  - pain
+- - PROTEOMICS
+  - proteomics
+- - Pacific Conservation Biology
+  - pacific-conservation-biology
+- - Pacific Science
+  - pacific-science
+- - Paediatric and Perinatal Epidemiology
+  - paediatric-and-perinatal-epidemiology
+- - Pakistan Journal of Agricultural Sciences
+  - pakistan-journal-of-agricultural-sciences
+- - Pakistan Veterinary Journal
+  - pakistani-veterinary-journal
+- - Palaeodiversity
+  - palaeodiversity
+- - 'Palaeontographica Abteilung B: Palaeobotany - Palaeophytology'
+  - palaeontographica-abteilung-b-palaeobotany-palaeophytology
+- - Palaeontologia Electronica
+  - palaeontologia-electronica
+- - Palaeontology
+  - palaeontology
+- - Palaeovertebrata
+  - palaeovertebrata
+- - Palaios
+  - palaios
+- - Paleobiology
+  - paleobiology
+- - Parasite
+  - parasite
+- - Parasitology
+  - parasitology
+- - Past &amp; Present
+  - past-and-present
+- - Pediatric Allergy and Immunology
+  - pediatric-allergy-and-immunology
+- - Pediatric Anesthesia
+  - pediatric-anesthesia
+- - Pediatric Blood &amp; Cancer
+  - pediatric-blood-and-cancer
+- - Pediatric Infectious Disease Journal
+  - pediatric-infectious-disease-journal
+- - Pediatric Physical Therapy
+  - pediatric-physical-therapy
+- - Pediatric Practice and Research
+  - pediatric-practice-and-research
+- - Pediatric Pulmonology
+  - pediatric-pulmonology
+- - Pediatric Research
+  - pediatric-research
+- - Pediatric Urology Case Reports
+  - pediatric-urology-case-reports
+- - PeerJ
+  - peerj
+- - Pensoft Journals
+  - pensoft-journals
+- - Periodicum Biologorum
+  - periodicum-biologorum
+- - Periodontology 2000
+  - periodontology-2000
+- - Permafrost and Periglacial Processes
+  - permafrost-and-periglacial-processes
+- - Perspectives on Sexual and Reproductive Health
+  - perspectives-on-sexual-and-reproductive-health
+- - Pesquisa Agropecuária Brasileira (Portuguese - Brazil)
+  - pesquisa-agropecuaria-brasileira
+- - Pest Management Science
+  - pest-management-science
+- - Petit Chicago (author-date, French - Canada)
+  - petit-chicago-author-date
+- - Pharmacoepidemiology and Drug Safety
+  - pharmacoepidemiology-and-drug-safety
+- - Philippika (German)
+  - philippika
+- - Philipps-Universität Marburg - Erziehungswissenschaften (note, German)
+  - philipps-universitat-marburg-note
+- - Philosophia Scientiæ
+  - philosophia-scientiae
+- - Philosophiques (French)
+  - philosophiques
+- - Philosophy &amp; Public Affairs
+  - philosophy-and-public-affairs
+- - Photochemistry and Photobiology
+  - photochemistry-and-photobiology
+- - Photosynthetica
+  - photosynthetica
+- - Phycological Research
+  - phycological-research
+- - Phyllomedusa
+  - phyllomedusa
+- - Physiologia Plantarum
+  - physiologia-plantarum
+- - Physiological and Biochemical Zoology
+  - physiological-and-biochemical-zoology
+- - Phytopathologia Mediterranea
+  - phytopathologia-mediterranea
+- - Phytotaxa
+  - phytotaxa
+- - Pisa University Press
+  - pisa-university-press
+- - Planning Practice &amp; Research
+  - planning-practice-and-research
+- - Plant &amp; Cell Physiology
+  - plant-and-cell-physiology
+- - Plant Biology
+  - plant-biology
+- - Plant Biotechnology Journal
+  - plant-biotechnology-journal
+- - Plant Genetic Resources - Characterization and Utilization
+  - plant-genetic-resources-characterization-and-utilization
+- - Plant Pathology
+  - plant-pathology
+- - Plant Physiology
+  - plant-physiology
+- - Plant, Cell &amp; Environment
+  - plant-cell-and-environment
+- - Podzemná voda (Slovak)
+  - podzemna-voda
+- - Polish Legal (Polish)
+  - polish-legal
+- - Politeknik Negeri Manado - Jurnal Pusat Penelitian dan Pengabdian Kepada Masyarakat
+    (Indonesian)
+  - politeknik-negeri-manado-jurnal-p3m
+- - Political Studies
+  - political-studies
+- - Politische Vierteljahresschrift (German)
+  - politische-vierteljahresschrift
+- - Politix (French)
+  - politix
+- - Polymer Reviews
+  - polymer-reviews
+- - Pontifical Athenaeum Regina Apostolorum
+  - pontifical-athenaeum-regina-apostolorum
+- - Pontifical Biblical Institute
+  - pontifical-biblical-institute
+- - Pontifical Gregorian University (Italian)
+  - pontifical-gregorian-university
+- - Pontificia Universidad Católica del Ecuador (Spanish) - Harvard
+  - harvard-pontificia-universidad-catolica-del-ecuador
+- - Population (French)
+  - population
+- - Population, Space and Place
+  - population-space-and-place
+- - Postępy Higieny i Medycyny Doświadczalnej (Polish)
+  - postepy-higieny-i-medycyny-doswiadczalnej
+- - Poultry Science
+  - poultry-science
+- - Pour réussir (note, French - Canada)
+  - pour-reussir-note
+- - Prehospital Emergency Care
+  - prehospital-emergency-care
+- - Preslia - The Journal of the Czech Botanical Society
+  - preslia
+- - Presses Universitaires de Rennes (French)
+  - presses-universitaires-de-rennes
+- - Presses Universitaires de Rennes - Archéologie et Culture (French)
+  - presses-universitaires-de-rennes-archeologie-et-culture
+- - Presses universitaires de Paris Nanterre (note, French)
+  - presses-universitaires-de-paris-nanterre
+- - Presses universitaires de Strasbourg (note, French)
+  - presses-universitaires-de-strasbourg-note
+- - 'Primary Care: Clinics in Office Practice'
+  - primary-care-clinics-in-office-practice
+- - ProInflow (note, Czech)
+  - proinflow
+- - Proceedings of the Joint International Grassland &amp; International Rangeland
+    Congress 2021
+  - proceedings-of-the-joint-international-grassland-and-international-rangeland-congress-2021
+- - Proceedings of the National Academy of Sciences of the United States of America
+  - pnas
+- - Proceedings of the Royal Society B
+  - proceedings-of-the-royal-society-b
+- - Processing and Application of Ceramics
+  - processing-and-application-of-ceramics
+- - Protein Engineering Design and Selection
+  - protein-engineering-design-and-selection
+- - Protein Science
+  - protein-science
+- - Právník (Czech)
+  - pravnik
+- - Préhistoires méditerranéennes
+  - prehistoires-mediterraneennes
+- - Psychiatric Clinics of North America
+  - psychiatric-clinics-of-north-america
+- - Psychiatric Services
+  - psychiatric-services
+- - Psychiatry and Clinical Neurosciences
+  - psychiatry-and-clinical-neurosciences
+- - Psychological Medicine
+  - psychological-medicine
+- - Psychosomatic Medicine
+  - psychosomatic-medicine
+- - Psychosomatics
+  - psychosomatics
+- - Public Health Nutrition
+  - public-health-nutrition
+- - Public Library of Science
+  - plos
+- - Pure and Applied Geophysics
+  - pure-and-applied-geophysics
+- - Pädagogische Hochschule Bern - Institut Vorschulstufe und Primarstufe
+  - padagogische-hochschule-bern-institut-vorschulstufe-und-primarstufe
+- - Pädagogische Hochschule Fachhochschule Nordwestschweiz (German - Switzerland)
+  - padagogische-hochschule-fachhochschule-nordwestschweiz
+- - Pädagogische Hochschule Heidelberg (German)
+  - padagogische-hochschule-heidelberg
+- - Pädagogische Hochschule Vorarlberg (German)
+  - padagogische-hochschule-vorarlberg
+- - Quaderni Materialisti (Italian)
+  - quaderni-materialisti
+- - Quaderni degli Avogadro Colloquia
+  - quaderni-degli-avogadro-colloquia
+- - Quaternaire (French)
+  - quaternaire
+- - Quaternary International
+  - quaternary-international
+- - Queen Margaret University - Harvard
+  - queen-margaret-university-harvard
+- - R&amp;D Management
+  - r-and-d-management
+- - REVER - Revista de Estudos da Religião
+  - rever-revista-de-estudos-da-religiao
+- - RMIT University - Harvard
+  - rmit-university-harvard
+- - ROSE School
+  - rose-school
+- - RTF Scan
+  - rtf-scan
+- - RadioGraphics
+  - radiographics
+- - Radiochimica Acta
+  - radiochimica-acta
+- - Radiography
+  - radiography
+- - Radiologic Clinics of North America
+  - radiologic-clinics-of-north-america
+- - Radiology
+  - radiology
+- - Radiopaedia.org
+  - radiopaedia
+- - Raffles Bulletin of Zoology
+  - raffles-bulletin-of-zoology
+- - Recent Patents on Drug Delivery &amp; Formulation
+  - recent-patents-on-drug-delivery-and-formulation
+- - Recherches en Sciences de Gestion (French)
+  - recherches-en-sciences-de-gestion
+- - Religion in the Roman Empire
+  - religion-in-the-roman-empire
+- - Renewable Agriculture and Food Systems
+  - renewable-agriculture-and-food-systems
+- - Reports of Practical Oncology and Radiotherapy
+  - reports-of-practical-oncology-and-radiotherapy
+- - Representation
+  - representation
+- - Reproduction
+  - reproduction
+- - Reproduction, Fertility and Development
+  - reproduction-fertility-and-development
+- - Research Institute for Nature and Forest (Instituut voor Natuur- en Bosonderzoek)
+  - research-institute-for-nature-and-forest
+- - Research and Education Promotion Association
+  - research-and-education-promotion-association
+- - Research on Biomedical Engineering
+  - research-on-biomedical-engineering
+- - Restoration Ecology
+  - restoration-ecology
+- - Review of International Studies
+  - review-of-international-studies
+- - Review of Political Economy
+  - review-of-political-economy
+- - Reviews of Modern Physics (with titles)
+  - reviews-of-modern-physics-with-titles
+- - Revista Argentina de Antropologia Biologica (Spanish)
+  - revista-argentina-de-antropologia-biologica
+- - Revista Brasileira de Ciência do Solo
+  - revista-brasileira-de-ciencia-do-solo
+- - Revista Bíblica (Spanish)
+  - revista-biblica
+- - Revista Chilena de Derecho y Tecnología (Spanish - Chile)
+  - revista-chilena-de-derecho-y-tecnologia
+- - Revista Ciencias Técnicas Agropecuarias (Spanish)
+  - revista-ciencias-tecnicas-agropecuarias
+- - Revista Cubana de Meteorologia
+  - revista-cubana-de-meteorologia
+- - Revista Espanola de Nutricion Humana y Dietetica (Spanish)
+  - revista-espanola-de-nutricion-humana-y-dietetica
+- - Revista FAVE - Sección Ciencias Agrarias (Spanish)
+  - revista-fave-seccion-ciencias-agrarias
+- - Revista Latinoamericana de Metalurgia y Materiales
+  - revista-latinoamericana-de-metalurgia-y-materiales
+- - Revista Latinoamericana de Recursos Naturales
+  - revista-latinoamericana-de-recursos-naturales
+- - Revista Matéria
+  - revista-materia
+- - Revista Nóesis
+  - revista-noesis
+- - Revista Peruana de Medicina Experimental y Salud Pública (Spanish)
+  - revista-peruana-de-medicina-experimental-y-salud-publica
+- - Revista Portuguesa de Arqueologia
+  - revista-portuguesa-de-arqueologia
+- - Revista Virtual de Química (Portuguese - Brazil)
+  - revista-virtual-de-quimica
+- - Revista da Sociedade Brasileira de Medicina Tropical
+  - revista-da-sociedade-brasileira-de-medicina-tropical
+- - Revista de Biología Marina y Oceanografía
+  - revista-de-biologia-marina-y-oceanografia
+- - Revista de Biología Tropical (International Journal of Tropical Biology and Conservation)
+  - revista-de-biologia-tropical
+- - Revista de Filología Española (Spanish)
+  - revista-de-filologia-espanola
+- - Revista do Instituto de Medicina Tropical de São Paulo
+  - revista-do-instituto-de-medicina-tropical-de-sao-paulo
+- - Revue Archéologique (French)
+  - revue-archeologique
+- - Revue Européenne des Migrations Internationales
+  - revue-europeenne-des-migrations-internationales
+- - Revue archéologique de l’Est (French)
+  - revue-archeologique-de-lest
+- - Revue archéologique du Centre de la France (French)
+  - revue-archeologique-du-centre-de-la-france
+- - Revue d'histoire des sciences humaines (French)
+  - revue-dhistoire-des-sciences-humaines
+- - Revue d'histoire moderne et contemporaine (French)
+  - revue-dhistoire-moderne-et-contemporaine
+- - Revue d'élevage et de médecine vétérinaire des pays tropicaux (French)
+  - revue-d-elevage-et-de-medecine-veterinaire-des-pays-tropicaux
+- - Revue de Médecine Vétérinaire (French)
+  - revue-de-medecine-veterinaire
+- - Revue de Qumrân
+  - revue-de-qumran
+- - Revue des Nouvelles Technologies de l'Information (French)
+  - revue-des-nouvelles-technologies-de-l-information
+- - Revue des Études Byzantines
+  - revue-des-etudes-byzantines
+- - Revue française d'administration publique (French)
+  - revue-francaise-d-administration-publique
+- - Revue française de gestion (French)
+  - revue-francaise-de-gestion
+- - Revue française de sociologie (French)
+  - revue-francaise-de-sociologie
+- - Rhinology
+  - rhinology
+- - Rhodora
+  - rhodora
+- - Risk Analysis
+  - risk-analysis
+- - 'Ritið: tímarit Hugvísindastofnunar (Icelandic)'
+  - ritid
+- - Rivista Italiana di Paleontologia e Stratigrafia
+  - rivista-italiana-di-paleontologia-e-stratigrafia
+- - Robert Gordon University - Harvard
+  - harvard-robert-gordon-university
+- - Romanian Humanities (Romanian)
+  - romanian-humanities
+- - Royal College of Nursing - Harvard
+  - royal-college-of-nursing-harvard
+- - Royal Society of Chemistry
+  - royal-society-of-chemistry
+- - Royal Society of Chemistry (with titles)
+  - royal-society-of-chemistry-with-titles
+- - Ruhr-Universität Bochum - Lehrstuhl für Industrial Sales and Service Engineering
+  - ruhr-universitat-bochum-lehrstuhl-fur-industrial-sales-and-service-engineering
+- - Ruhr-Universität Bochum - Medizinische Fakultät (numerisch, German)
+  - ruhr-universitat-bochum-medizinische-fakultat-numeric
+- - Russian GOST R 7.0.5-2008 (Russian)
+  - gost-r-7-0-5-2008
+- - Russian GOST R 7.0.5-2008 (numeric)
+  - gost-r-7-0-5-2008-numeric
+- - Russian GOST R 7.0.5-2008 (numeric, sorted alphabetically, Russian)
+  - gost-r-7-0-5-2008-numeric-alphabetical
+- - 'RöFo: Fortschritte auf dem Gebiet der Röntgenstrahlen und bildgebenden Verfahren'
+  - rofo
+- - SAGE - Harvard
+  - sage-harvard
+- - SAGE - Vancouver
+  - sage-vancouver
+- - SAGE - Vancouver (brackets)
+  - sage-vancouver-brackets
+- - SCIENCE CHINA Earth Sciences
+  - science-china-earth-sciences
+- - SCIENCE CHINA Life Sciences
+  - science-china-life-sciences
+- - SIST02 (Japanese)
+  - sist02
+- - SPIE BiOS
+  - spie-bios
+- - SPIE Conference Proceedings
+  - spie-proceedings
+- - SPIE journals
+  - spie-journals
+- - SPIP - Cite plugin
+  - spip-cite
+- - Sanamed
+  - sanamed
+- - Sascha Foerster - Geisteswissenschaft (German)
+  - foerster-geisteswissenschaft
+- - Scandinavian Journal of Infectious Diseases
+  - scandinavian-journal-of-infectious-diseases
+- - Scandinavian Journal of Medicine &amp; Science in Sports
+  - scandinavian-journal-of-medicine-and-science-in-sports
+- - Scandinavian Journal of Rheumatology
+  - scandinavian-journal-of-rheumatology
+- - Scandinavian Journal of Work, Environment &amp; Health
+  - scandinavian-journal-of-work-environment-and-health
+- - Scandinavian Political Studies
+  - scandinavian-political-studies
+- - Science
+  - science
+- - Science (without titles)
+  - science-without-titles
+- - Science China Chemistry
+  - science-china-chemistry
+- - Science Translational Medicine
+  - science-translational-medicine
+- - Science and Technology for the Built Environment
+  - science-and-technology-for-the-built-environment
+- - ScienceAsia
+  - scienceasia
+- - Sciences Po - Ecole doctorale (author-date, French)
+  - sciences-po-ecole-doctorale-author-date
+- - Sciences Po - École doctorale (note, French)
+  - sciences-po-ecole-doctorale-note-french
+- - Scientia Agriculturae Bohemica
+  - scientia-agriculturae-bohemica
+- - Scientia Iranica
+  - scientia-iranica
+- - Scientific Review Engineering and Environmental Sciences (Przegląd Naukowy Inżynieria
+    i Kształtowanie Środowiska)
+  - scientific-review-engineering-and-environmental-sciences
+- - Scrinium
+  - scrinium
+- - Sedimentology
+  - sedimentology
+- - Seed Science Research
+  - seed-science-research
+- - Seed Science and Technology
+  - seed-science-and-technology
+- - Seismological Research Letters
+  - seismological-research-letters
+- - Seminars in Pediatric Neurology
+  - seminars-in-pediatric-neurology
+- - Serdica Journal of Computing
+  - serdica-journal-of-computing
+- - Service Médical de l'Assurance Maladie (French)
+  - service-medical-de-l-assurance-maladie
+- - Sexual Development
+  - sexual-development
+- - Sexual Health
+  - sexual-health
+- - Sheffield Hallam University - History
+  - sheffield-hallam-university-history
+- - Shock
+  - shock
+- - Skenè. Journal of Theatre and Drama Studies
+  - skene-journal-of-theatre-and-drama-studies
+- - Small
+  - small
+- - Smithsonian Institution Scholarly Press (author-date)
+  - smithsonian-institution-scholarly-press-author-date
+- - Smithsonian Institution Scholarly Press (note)
+  - smithsonian-institution-scholarly-press-note
+- - Smithsonian Institution Scholarly Press - Botany (author-date)
+  - smithsonian-institution-scholarly-press-botany
+- - Smyrna Tıp Dergisi (Turkish)
+  - smyrna-tip-dergisi
+- - Social Cognitive and Affective Neuroscience
+  - social-cognitive-and-affective-neuroscience
+- - Sociedade Brasileira de Computação
+  - sociedade-brasileira-de-computacao
+- - Society for American Archaeology
+  - society-for-american-archaeology
+- - Society for Historical Archaeology
+  - society-for-historical-archaeology
+- - Society for Laboratory Automation and Screening
+  - society-for-laboratory-automation-and-screening
+- - Society of Automotive Engineers Technical Papers (numeric)
+  - society-of-automotive-engineers-technical-papers-numeric
+- - Society of Biblical Literature 2nd edition (author-date)
+  - society-of-biblical-literature-author-date
+- - Society of Biblical Literature 2nd edition (full note)
+  - society-of-biblical-literature-fullnote-bibliography
+- - Socio-Economic Review
+  - socio-economic-review
+- - Sociology of Health &amp; Illness
+  - sociology-of-health-and-illness
+- - Société Archéologique de Bordeaux (French)
+  - societe-archeologique-de-bordeaux
+- - Société Française d’Étude de la Céramique Antique en Gaule (French)
+  - societe-francaise-detude-de-la-ceramique-antique-en-gaule
+- - Société Nationale des Groupements Techniques Vétérinaires (French)
+  - societe-nationale-des-groupements-techniques-veterinaires
+- - Sociétés Contemporaines
+  - societes-contemporaines
+- - Soft Robotics
+  - soft-robotics
+- - Soil Biology and Biochemistry
+  - soil-biology-and-biochemistry
+- - Soil Science and Plant Nutrition
+  - soil-science-and-plant-nutrition
+- - Solent University - Harvard
+  - solent-university-harvard
+- - Solutions
+  - solutions
+- - Sorbonne Student Law Review - Revue juridique des étudiants de la Sorbonne
+  - sorbonne-student-law-review
+- - South African Actuarial Journal
+  - south-african-actuarial-journal
+- - South African Journal of Animal Science
+  - south-african-journal-of-animal-science
+- - South African Journal of Enology and Viticulture
+  - south-african-journal-of-enology-and-viticulture
+- - South African Journal of Geology
+  - south-african-journal-of-geology
+- - South African Theological Seminary
+  - south-african-theological-seminary
+- - Southeastern Geographer
+  - southeastern-geographer
+- - Southern African Journal of Critical Care
+  - southern-african-journal-of-critical-care
+- - Soziale Welt (German)
+  - soziale-welt
+- - Sozialpädagogisches Institut Berlin - Walter May (German)
+  - sozialpadagogisches-institut-berlin-walter-may
+- - Sozialwissenschaften (Heilmann) (German)
+  - sozialwissenschaften-heilmann
+- - Soziologie (German)
+  - soziologie
+- - Soziologiemagazin (German)
+  - soziologiemagazin
+- - Spandidos Publications
+  - spandidos-publications
+- - Spanish Legal (Spanish)
+  - spanish-legal
+- - Spectroscopy Letters
+  - spectroscopy-letters
+- - Speculum
+  - speculum
+- - Spine
+  - spine
+- - Springer - Basic (author-date)
+  - springer-basic-author-date
+- - Springer - Basic (author-date, no "et al.")
+  - springer-basic-author-date-no-et-al
+- - Springer - Basic (author-date, no "et al.", with issue numbers)
+  - springer-basic-author-date-no-et-al-with-issue
+- - Springer - Basic (note)
+  - springer-basic-note
+- - Springer - Basic (numeric, brackets)
+  - springer-basic-brackets
+- - Springer - Basic (numeric, brackets, no "et al.")
+  - springer-basic-brackets-no-et-al
+- - Springer - Basic (numeric, brackets, no "et al.", alphabetical)
+  - springer-basic-brackets-no-et-al-alphabetical
+- - Springer - Fachzeitschriften Medizin Psychologie (German)
+  - springer-fachzeitschriften-medizin-psychologie
+- - Springer - Humanities (author-date)
+  - springer-humanities-author-date
+- - Springer - Humanities (numeric, brackets)
+  - springer-humanities-brackets
+- - Springer - IMIS Series Migrationsgesellschaften
+  - springer-imis-series-migrationsgesellschaften
+- - Springer - Lecture Notes in Computer Science
+  - springer-lecture-notes-in-computer-science
+- - Springer - Lecture Notes in Computer Science (sorted alphabetically)
+  - springer-lecture-notes-in-computer-science-alphabetical
+- - Springer - MathPhys (author-date)
+  - springer-mathphys-author-date
+- - Springer - MathPhys (numeric, brackets)
+  - springer-mathphys-brackets
+- - Springer - Physics (author-date)
+  - springer-physics-author-date
+- - Springer - Physics (numeric, brackets)
+  - springer-physics-brackets
+- - Springer - SocPsych (author-date)
+  - springer-socpsych-author-date
+- - Springer - SocPsych (numeric, brackets)
+  - springer-socpsych-brackets
+- - Springer - Vancouver
+  - springer-vancouver
+- - Springer - Vancouver (author-date)
+  - springer-vancouver-author-date
+- - Springer - Vancouver (brackets)
+  - springer-vancouver-brackets
+- - Springer VS (author-date, German)
+  - springer-vs-author-date
+- - SpringerProtocols
+  - springerprotocols
+- - St Patrick's College
+  - st-patricks-college
+- - Staffordshire University - Harvard
+  - harvard-staffordshire-university
+- - 'Statistika: Statistics and Economy Journal'
+  - statistika-statistics-and-economy-journal
+- - Stavební obzor (Czech)
+  - stavebni-obzor
+- - Steinbeis-Hochschule - School of Management &amp; Innovation (German)
+  - steinbeis-hochschule-school-of-management-and-innovation
+- - Stellenbosch University - Harvard
+  - harvard-stellenbosch-university
+- - Stem Cells
+  - stem-cells
+- - Stem Cells and Development
+  - stem-cells-and-development
+- - Strategic Design Research Journal
+  - strategic-design-research-journal
+- - Strategic Entrepreneurship Journal
+  - strategic-entrepreneurship-journal
+- - Strategic Management Journal
+  - strategic-management-journal
+- - Stroke
+  - stroke
+- - Structural Control and Health Monitoring
+  - structural-control-and-health-monitoring
+- - Studi e materiali di storia delle religioni (Italian)
+  - studi-e-materiali-di-storia-delle-religioni
+- - Studia BAS (Polish)
+  - studia-bas
+- - Studii Teologice
+  - studii-teologice
+- - Style Manual - Australian Government (author-date)
+  - style-manual-australian-government
+- - Style Manual - Australian Government (note)
+  - style-manual-australian-government-note
+- - Sunway College Johor Bahru - Harvard
+  - sunway-college-johor-bahru
+- - Surgical Clinics of North America
+  - surgical-clinics-of-north-america
+- - Surgical Neurology International
+  - surgical-neurology-international
+- - Surgical Pathology Clinics
+  - surgical-pathology-clinics
+- - Svensk exegetisk årsbok (full note)
+  - svensk-exegetisk-arsbok
+- - Swedish Legal (Swedish)
+  - swedish-legal
+- - Swinburne University of Technology - Harvard
+  - harvard-swinburne-university-of-technology
+- - Swiss Political Science Review
+  - swiss-political-science-review
+- - Sylwan (Polish)
+  - sylwan
+- - Synthesis
+  - synthesis
+- - Systematic Biology
+  - systematic-biology
+- - Systematic and Applied Microbiology
+  - systematic-and-applied-microbiology
+- - Séminaire Saint-Sulpice - Ecole Théologie (French)
+  - seminaire-saint-sulpice-ecole-theologie
+- - Södertörns högskola - Harvard
+  - sodertorns-hogskola-harvard
+- - Södertörns högskola - Harvard (with Ibid.)
+  - sodertorns-hogskola-harvard-ibid
+- - TATuP - Zeitschrift für Technikfolgenabschätzung in Theorie und Praxis
+  - tatup-zeitschrift-fur-technikfolgenabschatzung-in-theorie-und-praxis
+- - TGM Wien Diplomarbeit (German)
+  - tgm-wien-diplom
+- - TGM Wien Diplomarbeit ÖNORM (German - Austria)
+  - tgm-wien-diplomarbeit-onorm
+- - Tagungsberichte der Historischen Kommission für ost- und westpreußische Landesforschung
+    (German)
+  - tagungsberichte-der-historischen-kommission-fur-ost-und-westpreussische-landesforschung
+- - Taxon
+  - taxon
+- - Taylor &amp; Francis - American Chemical Society
+  - taylor-and-francis-acs
+- - Taylor &amp; Francis - Chicago F
+  - taylor-and-francis-chicago-f
+- - Taylor &amp; Francis - Chicago Manual of Style (author-date)
+  - taylor-and-francis-chicago-author-date
+- - Taylor &amp; Francis - Council of Science Editors (author-date)
+  - taylor-and-francis-council-of-science-editors-author-date
+- - Taylor &amp; Francis - Harvard X
+  - taylor-and-francis-harvard-x
+- - Taylor &amp; Francis - National Library of Medicine
+  - taylor-and-francis-national-library-of-medicine
+- - Taylor &amp; Francis - Numeric Q
+  - taylor-and-francis-numeric-q
+- - Techniques&amp;Culture (French)
+  - techniques-et-culture
+- - Technische Universität Dresden - Betriebswirtschaftslehre/Logistik (author-date)
+  - technische-universitat-dresden-betriebswirtschaftslehre-logistik-author-date
+- - Technische Universität Dresden - Betriebswirtschaftslehre/Marketing (author-date)
+  - technische-universitat-dresden-betriebswirtschaftslehre-marketing
+- - Technische Universität Dresden - Betriebswirtschaftslehre/Rechnungswesen/Controlling
+    (German)
+  - technische-universitat-dresden-betriebswirtschaftslehre-rechnungswesen-controlling
+- - Technische Universität Dresden - Erziehungswissenschaften (author-date)
+  - technische-universitat-dresden-erziehungswissenschaften-author-date
+- - Technische Universität Dresden - Finanzwirtschaft und Finanzdienstleistungen (author-date)
+  - technische-universitat-dresden-finanzwirtschaft-und-finanzdienstleistungen-author-date
+- - Technische Universität Dresden - Finanzwirtschaft und Finanzdienstleistungen (note)
+  - technische-universitat-dresden-finanzwirtschaft-und-finanzdienstleistungen-note
+- - Technische Universität Dresden - Forstwissenschaft (author-date, German)
+  - technische-universitat-dresden-forstwissenschaft
+- - Technische Universität Dresden - Historische Musikwissenschaft (note, German)
+  - technische-universitat-dresden-historische-musikwissenschaft-note
+- - Technische Universität Dresden - Kunstgeschichte (note, German)
+  - technische-universitat-dresden-kunstgeschichte-note
+- - Technische Universität Dresden - Linguistik (German)
+  - technische-universitat-dresden-linguistik
+- - Technische Universität Dresden - Medienwissenschaft und Neuere Deutsche Literatur
+    (note, German)
+  - technische-universitat-dresden-medienwissenschaft-und-neuere-deutsche-literatur-note
+- - Technische Universität Dresden - Medizin
+  - technische-universitat-dresden-medizin
+- - Technische Universität Dresden - Wirtschaftswissenschaften (German)
+  - technische-universitat-dresden-wirtschaftswissenschaften
+- - Technische Universität München - Controlling (German)
+  - technische-universitat-munchen-controlling
+- - Technische Universität München - Unternehmensführung (German)
+  - technische-universitat-munchen-unternehmensfuhrung
+- - Technische Universität Wien (dissertation) (German)
+  - technische-universitat-wien
+- - Teologia Catalunya
+  - teologia-catalunya
+- - Terra Nova
+  - terra-nova
+- - Tetrahedron Letters
+  - tetrahedron-letters
+- - Textual Cultures
+  - textual-cultures
+- - Textual Practice
+  - textual-practice
+- - The Accounting Review
+  - the-accounting-review
+- - The American Journal of Bioethics
+  - the-american-journal-of-bioethics
+- - The American Journal of Cardiology
+  - the-american-journal-of-cardiology
+- - The American Journal of Gastroenterology
+  - the-american-journal-of-gastroenterology
+- - The American Journal of Geriatric Psychiatry
+  - the-american-journal-of-geriatric-psychiatry
+- - The American Journal of Human Genetics
+  - the-american-journal-of-human-genetics
+- - The American Journal of Pathology
+  - the-american-journal-of-pathology
+- - The American Journal of Psychiatry
+  - the-american-journal-of-psychiatry
+- - The American Midland Naturalist
+  - the-american-midland-naturalist
+- - The American Naturalist
+  - the-american-naturalist
+- - The Astrophysical Journal
+  - the-astrophysical-journal
+- - The Auk
+  - the-auk
+- - The Australian Journal of Agricultural and Resource Economics
+  - the-australian-journal-of-agricultural-and-resource-economics
+- - The Biological Bulletin
+  - the-biological-bulletin
+- - The Bone &amp; Joint Journal
+  - the-bone-and-joint-journal
+- - The Botanical Review
+  - the-botanical-review
+- - The British Journal for the Philosophy of Science
+  - the-british-journal-for-the-philosophy-of-science
+- - The British Journal of Cardiology
+  - the-british-journal-of-cardiology
+- - The British Journal of Criminology
+  - the-british-journal-of-criminology
+- - The British Journal of Psychiatry
+  - the-british-journal-of-psychiatry
+- - The British Journal of Sociology
+  - the-british-journal-of-sociology
+- - The Canadian Geographer (Le Géographe canadien)
+  - the-canadian-geographer
+- - The Canadian Journal of Chemical Engineering
+  - the-canadian-journal-of-chemical-engineering
+- - The Canadian Journal of Psychiatry
+  - the-canadian-journal-of-psychiatry
+- - The Cancer Journal
+  - the-cancer-journal
+- - The Chemical Society of Japan
+  - the-chemical-society-of-japan
+- - The Company of Biologists
+  - the-company-of-biologists
+- - The Design Journal
+  - the-design-journal
+- - The Economic History Review
+  - the-economic-history-review
+- - The European Research Journal
+  - the-european-research-journal
+- - The FASEB Journal
+  - the-faseb-journal
+- - The FEBS Journal
+  - the-febs-journal
+- - The Geological Society of America
+  - the-geological-society-of-america
+- - The Geological Society of London
+  - the-geological-society-of-london
+- - The Hastings Center Report
+  - the-hastings-center-report
+- - The Historical Journal
+  - the-historical-journal
+- - The Holocene
+  - the-holocene
+- - The ISME Journal
+  - the-isme-journal
+- - The Institute of Electronics, Information and Communication Engineers (電子情報通信学会)
+  - the-institute-of-electronics-information-and-communication-engineers
+- - The Institution of Engineering and Technology
+  - the-institution-of-engineering-and-technology
+- - The International Journal of Developmental Biology
+  - the-international-journal-of-developmental-biology
+- - The International Journal of Psychoanalysis
+  - the-international-journal-of-psychoanalysis
+- - The International Journal of Tuberculosis and Lung Disease
+  - the-international-journal-of-tuberculosis-and-lung-disease
+- - The Journal of Adhesive Dentistry
+  - the-journal-of-adhesive-dentistry
+- - The Journal of Agricultural Science
+  - the-journal-of-agricultural-science
+- - The Journal of Biological Chemistry
+  - journal-of-biological-chemistry
+- - The Journal of Clinical Ethics
+  - the-journal-of-clinical-ethics
+- - The Journal of Clinical Investigation
+  - the-journal-of-clinical-investigation
+- - The Journal of Comparative Law
+  - the-journal-of-comparative-law
+- - The Journal of Comparative Neurology
+  - the-journal-of-comparative-neurology
+- - The Journal of Egyptian Archaeology
+  - the-journal-of-egyptian-archaeology
+- - The Journal of Eukaryotic Microbiology
+  - the-journal-of-eukaryotic-microbiology
+- - The Journal of Foot &amp; Ankle Surgery
+  - the-journal-of-foot-and-ankle-surgery
+- - The Journal of Hand Surgery (European Volume)
+  - the-journal-of-hand-surgery-european-volume
+- - The Journal of Hand Surgery Asian-Pacific Volume
+  - the-journal-of-hand-surgery-asian-pacific-volume
+- - The Journal of Hellenic Studies
+  - the-journal-of-hellenic-studies
+- - The Journal of Immunology
+  - the-journal-of-immunology
+- - The Journal of Infection in Developing Countries
+  - the-journal-of-infection-in-developing-countries
+- - The Journal of Juristic Papyrology
+  - the-journal-of-juristic-papyrology
+- - The Journal of Modern History
+  - the-journal-of-modern-history
+- - The Journal of Molecular Diagnostics
+  - the-journal-of-molecular-diagnostics
+- - The Journal of Nervous and Mental Disease
+  - the-journal-of-nervous-and-mental-disease
+- - The Journal of Neuropsychiatry and Clinical Neurosciences
+  - the-journal-of-neuropsychiatry-and-clinical-neurosciences
+- - The Journal of Neuroscience
+  - the-journal-of-neuroscience
+- - The Journal of Nuclear Medicine
+  - the-journal-of-nuclear-medicine
+- - The Journal of Nutrition, Health &amp; Aging
+  - the-journal-of-nutrition-health-and-aging
+- - The Journal of Pain
+  - the-journal-of-pain
+- - The Journal of Parasitology
+  - the-journal-of-parasitology
+- - The Journal of Pathology
+  - the-journal-of-pathology
+- - The Journal of Peasant Studies
+  - the-journal-of-peasant-studies
+- - The Journal of Physiology
+  - the-journal-of-physiology
+- - The Journal of Pure and Applied Chemistry Research
+  - the-journal-of-pure-and-applied-chemistry-research
+- - The Journal of Roman Studies
+  - the-journal-of-roman-studies
+- - The Journal of Transport History
+  - the-journal-of-transport-history
+- - The Journal of Trauma and Acute Care Surgery
+  - the-journal-of-trauma-and-acute-care-surgery
+- - The Journal of Urology
+  - the-journal-of-urology
+- - The Journal of Value Inquiry
+  - journal-of-value-inquiry
+- - The Journal of Veterinary Medical Science
+  - the-journal-of-veterinary-medical-science
+- - The Journal of Wildlife Management
+  - the-journal-of-wildlife-management
+- - The Journal of the Acoustical Society of America
+  - the-journal-of-the-acoustical-society-of-america
+- - The Journal of the Torrey Botanical Society
+  - the-journal-of-the-torrey-botanical-society
+- - 'The Journals of Gerontology, Series A: Biological Sciences and Medical Sciences'
+  - the-journals-of-gerontology-series-a
+- - The Korean Journal of Gastroenterology
+  - the-korean-journal-of-gastroenterology
+- - The Korean Journal of Internal Medicine
+  - the-korean-journal-of-internal-medicine
+- - The Lancet
+  - the-lancet
+- - The Lichenologist
+  - the-lichenologist
+- - The National Medical Journal of India
+  - the-national-medical-journal-of-india
+- - The Neuroscientist
+  - the-neuroscientist
+- - The New England Journal of Medicine
+  - the-new-england-journal-of-medicine
+- - The Oncologist
+  - the-oncologist
+- - The Open University (numeric)
+  - the-open-university-numeric
+- - The Open University (numeric, superscript)
+  - the-open-university-numeric-superscript
+- - The Open University - A251 - Arts Course
+  - the-open-university-a251
+- - The Open University - Harvard
+  - the-open-university-harvard
+- - The Open University - M801 - Research Project and Dissertation
+  - the-open-university-m801
+- - The Open University - S390
+  - the-open-university-s390
+- - The Optical Society
+  - the-optical-society
+- - The Pan African Medical Journal
+  - the-pan-african-medical-journal
+- - The Plant Cell
+  - the-plant-cell
+- - The Plant Genome
+  - the-plant-genome
+- - The Plant Journal
+  - the-plant-journal
+- - The Review of Financial Studies
+  - the-review-of-financial-studies
+- - The Rockefeller University Press
+  - the-rockefeller-university-press
+- - The Saudi Journal for Dental Research
+  - the-saudi-journal-for-dental-research
+- - The Scandinavian Journal of Clinical &amp; Laboratory Investigation
+  - the-scandinavian-journal-of-clinical-and-laboratory-investigation
+- - The University of Melbourne - Harvard
+  - harvard-the-university-of-melbourne
+- - The University of New South Wales - Oxford
+  - oxford-the-university-of-new-south-wales
+- - The University of Northampton - Harvard
+  - harvard-the-university-of-northampton
+- - The University of Sheffield - School of East Asian Studies - Harvard
+  - harvard-the-university-of-sheffield-school-of-east-asian-studies
+- - The University of Sheffield - Town and Regional Planning - Harvard
+  - harvard-the-university-of-sheffield-town-and-regional-planning
+- - The University of Western Australia - Harvard
+  - the-university-of-western-australia-harvard
+- - The University of Winchester - Harvard
+  - the-university-of-winchester-harvard
+- - The World Journal of Biological Psychiatry
+  - the-world-journal-of-biological-psychiatry
+- - Theologie und Philosophie (German)
+  - theologie-und-philosophie
+- - Theologisches Seminar Adelshofen - Harvard (German)
+  - harvard-theologisches-seminar-adelshofen
+- - Theory, Culture &amp; Society
+  - theory-culture-and-society
+- - Theranostics
+  - theranostics
+- - Thieme-German (German)
+  - thieme-german
+- - Thomson Reuters - Legal, Tax &amp; Accounting Australia
+  - thomson-reuters-legal-tax-and-accounting-australia
+- - Thrombosis and Haemostasis
+  - thrombosis-and-haemostasis
+- - Thyroid
+  - thyroid
+- - Tijdschrift voor Geneeskunde (Dutch)
+  - tijdschrift-voor-geneeskunde
+- - Tijdschrift voor economische en sociale geografie
+  - tijdschrift-voor-economische-en-sociale-geografie
+- - Tissue Engineering
+  - tissue-engineering
+- - Toxicological Sciences
+  - toxicological-sciences
+- - Trabajos de Prehistoria (Spanish)
+  - trabajos-de-prehistoria
+- - 'Tracés: Revue de Sciences Humaines (French)'
+  - traces
+- - Traffic
+  - traffic
+- - Traffic Injury Prevention
+  - traffic-injury-prevention
+- - Transactions of the American Philological Association
+  - transactions-of-the-american-philological-association
+- - Transactions of the Materials Research Society of Japan
+  - transactions-of-the-materials-research-society-of-japan
+- - Transboundary and Emerging Diseases
+  - transboundary-and-emerging-diseases
+- - Transnational Environmental Law
+  - transnational-environmental-law
+- - Transplantation
+  - transplantation
+- - Transport
+  - transport
+- - 'Transportation Research Record: Journal of the Transportation Research Board'
+  - transportation-research-record
+- - Transposition. Musique et sciences sociales
+  - transposition
+- - Transversalités (French)
+  - transversalites
+- - Tree Physiology
+  - tree-physiology
+- - Trends in Glycoscience and Glycotechnology
+  - trends-in-glycoscience-and-glycotechnology
+- - Trends journals
+  - trends-journals
+- - Triangle (French)
+  - triangle
+- - Tropical Animal Health and Production
+  - tropical-animal-health-and-production
+- - Tsaqafah
+  - tsaqafah
+- - Turabian 8th edition (full note)
+  - turabian-fullnote-bibliography
+- - Turabian 9th edition (author-date)
+  - turabian-author-date
+- - Twentieth-Century Music
+  - twentieth-century-music
+- - TÜBİTAK (Türkiye Bilimsel ve Teknolojik Araştırma Kurumu) (Turkish)
+  - turkiye-bilimsel-ve-teknolojik-arastirma-kurumu
+- - Tábula (Spanish)
+  - tabula
+- - U Schyłku Starożytności (Polish)
+  - u-schylku-starozytnosci
+- - U.S. Geological Survey
+  - us-geological-survey
+- - UCL Institute of Education - Harvard
+  - ucl-institute-of-education-harvard
+- - UCL University College - APA
+  - ucl-university-college-apa
+- - UCL University College - Harvard (Danish)
+  - ucl-university-college-harvard
+- - UCL University College - Vancouver (English)
+  - ucl-university-college-vancouver
+- - UCLouvain - Centre Charles De Visscher pour le droit international et européen
+    (French)
+  - uclouvain-centre-charles-de-visscher-pour-le-droit-international-et-europeen
+- - USDA Forest Service - Pacific Northwest Research Station
+  - usda-forest-service-pacific-northwest-research-station
+- - Ugeskrift for Læger (Danish)
+  - ugeskrift-for-laeger
+- - Ultrasound in Medicine and Biology
+  - ultrasound-in-medicine-and-biology
+- - Uludağ Üniversitesi - Sosyal Bilimler Enstitüsü (author-date, Turkish)
+  - uludag-universitesi-sosyal-bilimler-enstitusu-author-date
+- - Uludağ Üniversitesi - Sosyal Bilimler Enstitüsü (full note, Turkish)
+  - uludag-universitesi-sosyal-bilimler-enstitusu-full-note
+- - Uludağ Üniversitesi - Sosyal Bilimler Enstitüsü (full note, with Ibid., Turkish)
+  - uludag-universitesi-sosyal-bilimler-enstitusu-full-note-with-ibid
+- - Uludağ Üniversitesi - Sosyal Bilimler Enstitüsü - İlahiyat Fakültesi (full note,
+    Turkish)
+  - uludag-universitesi-sosyal-bilimler-enstitusu-ilahiyat-fakultesi-full-note
+- - Uludağ Üniversitesi - Sosyal Bilimler Enstitüsü - İlahiyat Fakültesi (full note,
+    with Ibid., Turkish)
+  - uludag-universitesi-sosyal-bilimler-enstitusu-ilahiyat-fakultesi-full-note-with-ibid
+- - Unified Stylesheet for Linguistics (de Gruyter Literature)
+  - unified-style-sheet-for-linguistics-de-gruyter-literature
+- - Unified style sheet for linguistics
+  - unified-style-sheet-for-linguistics
+- - United Nations Conference on Trade and Development
+  - united-nations-conference-on-trade-and-development
+- - United Nations Development Programme ICCA Legal Review
+  - united-nations-development-programme-icca-legal-review
+- - United Nations Framework Convention on Climate Change
+  - united-nations-framework-convention-on-climate-change
+- - Universidad Autónoma de Ciudad Juárez - Estilo Latino Humanístico
+  - universidad-autonoma-cidudad-juarez-estilo-latino-humanistico
+- - Universidad Evangélica del Paraguay (Spanish)
+  - universidad-evangelica-del-paraguay
+- - Universidad de León (España) - Harvard
+  - universidad-de-leon-harvard
+- - Universidade Estadual Paulista - Campus de Dracena - ABNT (autoria abreviada)
+    (Portuguese - Brazil)
+  - universidade-estadual-paulista-campus-de-dracena-abnt
+- - Universidade Estadual de Alagoas - ABNT (Portuguese - Brazil)
+  - universidade-estadual-de-alagoas-abnt
+- - Universidade Federal de Juiz de Fora (Portuguese - Brazil)
+  - universidade-federal-de-juiz-de-fora
+- - Universidade Federal de Minas Gerais - Faculdade de Ciências Econômicas - ABNT
+    (autoria abreviada) (Portuguese - Brazil)
+  - associacao-brasileira-de-normas-tecnicas-ufmg-face-initials
+- - Universidade Federal de Minas Gerais - Faculdade de Ciências Econômicas - ABNT
+    (autoria completa) (Portuguese - Brazil)
+  - associacao-brasileira-de-normas-tecnicas-ufmg-face-full
+- - Universidade Federal de Pernambuco - ABNT (Portuguese - Brazil)
+  - universidade-federal-de-pernambuco-abnt
+- - Universidade Federal de Sergipe - ABNT (Portuguese - Brazil)
+  - associacao-brasileira-de-normas-tecnicas-ufs
+- - Universidade Federal de Sergipe - Departamento de Engenharia de Produção - ABNT
+    (Portuguese - Brazil)
+  - universidade-federal-de-sergipe-departamento-de-engenharia-de-producao-abnt
+- - Universidade Federal do Espírito Santo - ABNT (autoria abreviada) (Portuguese
+    - Brazil)
+  - universidade-federal-do-espirito-santo-abnt-initials
+- - Universidade Federal do Espírito Santo - ABNT (autoria completa) (Portuguese -
+    Brazil)
+  - universidade-federal-do-espirito-santo-abnt
+- - Universidade Federal do Estado do Rio de Janeiro - Educação Infantil e Políticas
+    Públicas - ABNT (Portuguese - Brazil)
+  - associacao-brasileira-de-normas-tecnicas-unirio-eipp
+- - Universidade Federal do Paraná - ABNT (Portuguese - Brazil)
+  - associacao-brasileira-de-normas-tecnicas-ufpr
+- - Universidade Federal do Rio Grande do Sul - ABNT (autoria abreviada) (Portuguese
+    - Brazil)
+  - associacao-brasileira-de-normas-tecnicas-ufrgs-initials
+- - Universidade Federal do Rio Grande do Sul - ABNT (autoria abreviada, nota, com
+    Ibid.) (Portuguese - Brazil)
+  - associacao-brasileira-de-normas-tecnicas-ufrgs-note-initials-with-ibid
+- - Universidade Federal do Rio Grande do Sul - ABNT (autoria completa) (Portuguese
+    - Brazil)
+  - associacao-brasileira-de-normas-tecnicas-ufrgs
+- - Universidade de São Paulo - Escola de Comunicações e Artes - ABNT (Portuguese
+    - Brazil)
+  - universidade-de-sao-paulo-escola-de-comunicacoes-e-artes-abnt
+- - Universidade de São Paulo - Faculdade de Medicina Veterinária e Zootecnia - ABNT
+    (Portuguese - Brazil)
+  - associacao-brasileira-de-normas-tecnicas-usp-fmvz
+- - Universidade de São Paulo - Instituto de Matemática e Estatística
+  - universidade-de-sao-paulo-instituto-de-matematica-e-estatistica
+- - Universidade do Porto - Faculdade de Engenharia - Chicago Manual of Style
+  - universidade-do-porto-faculdade-de-engenharia-chicago
+- - Universidade do Porto - Faculdade de Psicologia e de Ciências da Educação - APA
+  - universidade-do-porto-faculdade-de-psicologia-e-de-ciencias-da-educacao
+- - Universitas Gadjah Mada - Departemen Sejarah (Indonesian)
+  - universitas-gadjah-mada-departemen-sejarah
+- - Universitas Negeri Semarang - Fakultas Matematika dan Ilmu Pengetahuan Alam (Indonesian)
+  - universitas-negeri-semarang-fakultas-matematika-dan-ilmu-pengetahuan-alam
+- - Universitas Negeri Yogyakarta - Program Pascasarjana (Indonesian)
+  - universitas-negeri-yogyakarta-program-pascasarjana
+- - Universiteit Utrecht - Onderzoeksgids Geschiedenis (Dutch)
+  - universiteit-utrecht-onderzoeksgids-geschiedenis
+- - Universitetet i Oslo - Rettsvitenskap (Norwegian - Bokmål)
+  - universitetet-i-oslo-rettsvitenskap
+- - Universiti Kebangsaan Malaysia (Malay)
+  - universiti-kebangsaan-malaysia
+- - Universiti Teknologi Malaysia - Harvard
+  - harvard-universiti-teknologi-malaysia
+- - Universiti Tunku Abdul Rahman - Harvard
+  - harvard-universiti-tunku-abdul-rahman
+- - University College Dublin - School of History &amp; Archives
+  - university-college-dublin-school-of-history-and-archives
+- - University College Lillebælt - APA (Danish)
+  - university-college-lillebaelt-apa
+- - University for the Creative Arts (figures and illustrations)
+  - university-for-the-creative-arts-figures
+- - University for the Creative Arts - Harvard
+  - harvard-university-for-the-creative-arts
+- - University of Aberdeen - School of Education - Harvard
+  - university-of-aberdeen-school-of-education-harvard
+- - University of Abertay Dundee - Harvard
+  - harvard-university-of-abertay-dundee
+- - University of Aleppo - Faculty of Medicine
+  - university-of-aleppo-faculty-of-medicine
+- - University of Auckland - History
+  - university-of-auckland-history
+- - University of Bath - Harvard
+  - harvard-university-of-bath
+- - University of Birmingham - Harvard
+  - harvard-university-of-birmingham
+- - University of Bologna - Liberal Arts College (Università di Bologna - Facoltà
+    di Lettere e Filosofia) (Italian)
+  - universita-di-bologna-lettere
+- - University of Bradford - Harvard
+  - university-of-bradford-harvard
+- - University of Brighton School of Environment &amp; Technology - Harvard
+  - harvard-university-of-brighton-school-of-environment-and-technology
+- - University of Cambridge - Faculty of History
+  - university-of-cambridge-faculty-of-history
+- - University of Cape Town - Harvard
+  - harvard-university-of-cape-town
+- - University of Exeter - Geography - Harvard
+  - harvard-university-of-exeter-geography
+- - University of Gothenburg - APA (Swedish legislations)
+  - university-of-gothenburg-apa-swedish-legislations
+- - University of Greenwich - Harvard
+  - harvard-university-of-greenwich
+- - University of Kent - Harvard
+  - harvard-university-of-kent
+- - University of Leeds - Harvard
+  - harvard-university-of-leeds
+- - University of Limerick (Cite it Right) - Harvard
+  - harvard-limerick
+- - University of Lincoln - Harvard
+  - university-of-lincoln-harvard
+- - University of New England, Australia (note)
+  - university-of-new-england-australia-note
+- - University of South Africa - Harvard
+  - university-of-south-africa-harvard
+- - University of South Australia 2011 - Harvard
+  - university-of-south-australia-harvard-2011
+- - University of South Australia 2013 - Harvard
+  - university-of-south-australia-harvard-2013
+- - University of South Australia 2017 - Harvard
+  - university-of-south-australia-2017-harvard
+- - University of Technology Sydney - Harvard
+  - harvard-university-of-technology-sydney
+- - University of Westminster - Harvard
+  - harvard-university-of-westminster
+- - University of Wolverhampton - Harvard
+  - harvard-university-of-wolverhampton
+- - University of Worcester - Harvard
+  - harvard-university-of-worcester
+- - University of York - APA 6th edition
+  - university-of-york-apa
+- - University of York - Chicago Manual of Style 16th edition
+  - university-of-york-chicago
+- - University of York - Harvard
+  - university-of-york-harvard
+- - University of York - Harvard - Archaeology
+  - university-of-york-harvard-archaeology
+- - University of York - Harvard - Environment
+  - university-of-york-harvard-environment
+- - University of York - IEEE
+  - university-of-york-ieee
+- - University of York - Modern Humanities Research Association 3rd edition
+  - university-of-york-mhra
+- - University of York - Modern Language Association 8th edition
+  - university-of-york-mla
+- - University of York - OSCOLA
+  - university-of-york-oscola
+- - University of York - Vancouver
+  - university-of-york-vancouver
+- - University of Zabol (English)
+  - university-of-zabol
+- - University of Zabol (Persian)
+  - university-of-zabol-fa
+- - University of the West of England (Bristol) - Harvard
+  - harvard-university-of-the-west-of-england
+- - University of the West of Scotland - Harvard
+  - harvard-university-of-the-west-of-scotland
+- - Università Cattolica del Sacro Cuore (note, Italian)
+  - universita-cattolica-del-sacro-cuore
+- - Università Pontificia Salesiana
+  - universita-pontificia-salesiana
+- - Università Pontificia Salesiana (Italian)
+  - universita-pontificia-salesiana-it
+- - Universität Basel - Deutsche Sprachwissenschaft
+  - universitat-basel-deutsche-sprachwissenschaft
+- - Universität Basel - Iberoromanistik (Spanish)
+  - universitat-basel-iberoromanistik
+- - Universität Bern - Institut für Musikwissenschaft (note, German)
+  - universitat-bern-institut-fur-musikwissenschaft-note
+- - Universität Bern - Institut für Sozialanthropologie (German - Switzerland)
+  - universitat-bern-institut-fur-sozialanthropologie
+- - Universität Bremen - Institut für Politikwissenschaft (German)
+  - universitat-bremen-institut-fur-politikwissenschaft
+- - Universität Bremen - Lehrstuhl für innovatives Markenmanagement (German)
+  - universitat-bremen-lehrstuhl-fur-innovatives-markenmanagement
+- - Universität Heidelberg - Historisches Seminar (German)
+  - universitat-heidelberg-historisches-seminar
+- - Universität Heidelberg - Medizinische Fakultät Mannheim (numerisch, German)
+  - universitat-heidelberg-medizinische-fakultat-mannheim-numeric
+- - Universität Mainz - Geographisches Institut (German)
+  - universitat-mainz-geographisches-institut
+- - Universität Stuttgart - Planung und Partizipation (German)
+  - universitat-stuttgart-planung-und-partizipation
+- - Universität Wien - Institut für Geschichte
+  - universitat-wien-institut-fur-geschichte
+- - Universität zu Köln - Seminar für ABWL und Finanzierungslehre (German)
+  - universitat-zu-koln-seminar-fur-abwl-und-finanzierungslehre
+- - Universitätsmedizin Göttingen (German)
+  - universitatsmedizin-gottingen
+- - Université Catholique de Louvain - Histoire (French)
+  - universite-catholique-de-louvain-histoire
+- - Université Laval - Département d'information et de communication (French - Canada)
+  - universite-laval-departement-dinformation-et-de-communication
+- - Université Laval - Département des sciences historiques (French - Canada)
+  - universite-laval-departement-des-sciences-historiques
+- - Université Laval - Faculté de théologie et de sciences religieuses (French - Canada)
+  - universite-laval-faculte-de-theologie-et-de-sciences-religieuses
+- - Université Nangui Abrogoua - Sciences de la Nature - APA (French)
+  - universite-nangui-abrogoua-sciences-de-la-nature-apa
+- - Université de Bordeaux - École doctorale de droit (French)
+  - universite-de-bordeaux-ecole-doctorale-de-droit
+- - Université de Lausanne - Histoire (French)
+  - universite-de-lausanne-histoire
+- - Université de Liège - Droit (French)
+  - universite-de-liege-droit
+- - Université de Liège - Droit (classement par catégorie, French)
+  - universite-de-liege-droit-par-categorie
+- - Université de Liège - Histoire (French)
+  - universite-de-liege-histoire
+- - Université de Montréal - APA (French - Canada)
+  - universite-de-montreal-apa
+- - Université de Montréal - Faculté de musique (French - Canada)
+  - universite-de-montreal-faculte-de-musique
+- - Université de Picardie Jules Verne (Amiens) - Thèse de UFR de Médecine
+  - universite-de-picardie-jules-verne-ufr-de-medecine
+- - Université de Sherbrooke - Département de géomatique (French - Canada)
+  - universite-de-sherbrooke-departement-de-geomatique
+- - Université de Sherbrooke - Faculté d'éducation (French - Canada)
+  - universite-de-sherbrooke-faculte-d-education
+- - Université du Québec à Montréal (French - Canada)
+  - universite-du-quebec-a-montreal
+- - Université du Québec à Montréal - Département d’histoire (French - Canada)
+  - universite-du-quebec-a-montreal-departement-dhistoire
+- - Université du Québec à Montréal - Études littéraires et sémiologie (French - Canada)
+  - universite-du-quebec-a-montreal-etudes-litteraires-et-semiologie
+- - Université libre de Bruxelles - Histoire (French)
+  - universite-libre-de-bruxelles-histoire
+- - Univerza na Primorskem - Fakulteta za vede o zdravju - APA (Slovenian)
+  - univerza-na-primorskem-fakulteta-za-vede-o-zdravju-apa
+- - Uniwersytet Kardynała Stefana Wyszyńskiego w Warszawie (autor-rok, Polish)
+  - uniwersytet-kardynala-stefana-wyszynskiego-w-warszawie-autor-rok
+- - Uniwersytet Kardynała Stefana Wyszyńskiego w Warszawie (przypis, Polish)
+  - uniwersytet-kardynala-stefana-wyszynskiego-w-warszawie-przypis
+- - Uniwersytet im. Adama Mickiewicza w Poznaniu - Wydział Anglistyki (English)
+  - uniwersytet-im-adama-mickiewicza-w-poznaniu-wydzial-anglistyki
+- - Uppsala universitet - Historia
+  - uppsala-universitet-historia
+- - Uppsala universitet, Institutionen för biologisk grundutbildning
+  - uppsala-universitet-institutionen-for-biologisk-grundutbildning
+- - Urban Geography
+  - urban-geography
+- - Urban Habitats
+  - urban-habitats
+- - Urban Studies
+  - urban-studies
+- - Urbani izziv (Urban Challenge) (English)
+  - urbani-izziv-en
+- - Urbani izziv (Urban Challenge) (Slovenian)
+  - urbani-izziv
+- - Urological Science
+  - urological-science
+- - User Modeling and User-Adapted Interaction
+  - user-modeling-and-user-adapted-interaction
+- - Utah Geological Survey
+  - utah-geological-survey
+- - Vancouver
+  - vancouver
+- - Vancouver (French - Canada)
+  - vancouver-fr-ca
+- - Vancouver (author-date)
+  - vancouver-author-date
+- - Vancouver (brackets)
+  - vancouver-brackets
+- - Vancouver (brackets, no "et al.")
+  - vancouver-brackets-no-et-al
+- - Vancouver (brackets, only year in date, no issue numbers)
+  - vancouver-brackets-only-year-no-issue
+- - Vancouver (superscript)
+  - vancouver-superscript
+- - Vancouver (superscript, brackets, only year in date)
+  - vancouver-superscript-brackets-only-year
+- - Vancouver (superscript, only year in date, no issue numbers)
+  - vancouver-superscript-only-year
+- - Veterinaria Italiana
+  - veterinaria-italiana
+- - Veterinary Medicine Austria (Wiener Tierärztliche Monatsschrift)
+  - veterinary-medicine-austria
+- - Veterinary Microbiology
+  - veterinary-microbiology
+- - Veterinary Pathology
+  - veterinary-pathology
+- - Veterinary Radiology &amp; Ultrasound
+  - veterinary-radiology-and-ultrasound
+- - Veterinary Record
+  - veterinary-record
+- - Victoria University - Harvard
+  - victoria-university-harvard
+- - Vienna Legal
+  - vienna-legal
+- - Vietnam Ministry of Education and Training (English)
+  - vietnam-ministry-of-education-and-training-en
+- - Vietnam Ministry of Education and Training (Vietnamese)
+  - vietnam-ministry-of-education-and-training-vi
+- - Vigiliae Christianae
+  - vigiliae-christianae
+- - Vilnius Gediminas Technical University (Lithuanian)
+  - vilnius-gediminas-technical-university
+- - Vingtième Siècle. Revue d'histoire (French)
+  - vingtieme-siecle
+- - Vita Latina (French)
+  - vita-latina
+- - Vita Latina (auteurs anciens, French)
+  - vita-latina-auteurs-anciens
+- - Vodohospodářské technicko-ekonomické informace (Czech)
+  - vodohospodarske-technicko-ekonomicke-informace
+- - Vodohospodářské technicko-ekonomické informace (English)
+  - vodohospodarske-technicko-ekonomicke-informace-en
+- - WHO Regional Office for Europe (numeric)
+  - who-europe-numeric
+- - WHO Regional Office for Europe - Harvard
+  - who-europe-harvard
+- - Wader Study
+  - wader-study
+- - Water Alternatives
+  - water-alternatives
+- - Water Environment Research
+  - water-environment-research
+- - Water SA
+  - water-sa
+- - Water Science &amp; Technology
+  - water-science-and-technology
+- - Waterbirds
+  - waterbirds
+- - Weed Research
+  - weed-research
+- - Weed Science Society of America
+  - weed-science-society-of-america
+- - West European Politics
+  - west-european-politics
+- - Western Journal of Emergency Medicine
+  - western-journal-of-emergency-medicine
+- - Westfälische Wilhelms-Universität Münster - Medizinische Fakultät (German)
+  - westfalische-wilhelms-universitat-munster-medizinische-fakultat
+- - Wetlands
+  - wetlands
+- - Wheaton College - Ph.D. in Biblical and Theological Studies
+  - wheaton-college-phd-in-biblical-and-theological-studies
+- - Wiesbaden Business School
+  - wiesbaden-business-school
+- - Wiley-VCH books
+  - wiley-vch-books
+- - Wireless Communications and Mobile Computing
+  - wireless-communications-and-mobile-computing
+- - Wirtschaftsuniversität Wien (author-date)
+  - wirtschaftsuniversitat-wien-author-date
+- - Wirtschaftsuniversität Wien - Abteilung für Bildungswissenschaft (German - Austria)
+  - wirtschaftsuniversitat-wien-abteilung-fur-bildungswissenschaft
+- - Wirtschaftsuniversität Wien - Handel und Marketing (German - Austria)
+  - wirtschaftsuniversitat-wien-handel-und-marketing
+- - Wirtschaftsuniversität Wien - Health Care Management (German - Austria)
+  - wirtschaftsuniversitat-wien-health-care-management
+- - Wirtschaftsuniversität Wien - Institut für BWL des Außenhandels (German - Austria)
+  - wirtschaftsuniversitat-wien-institut-fur-bwl-des-aussenhandels
+- - Wirtschaftsuniversität Wien - Unternehmensrechnung und Controlling
+  - wirtschaftsuniversitat-wien-unternehmensrechnung-und-controlling
+- - Wirtschaftsuniversität Wien - Wirtschaftspädagogik (German - Austria)
+  - wirtschaftsuniversitat-wien-wirtschaftspadagogik
+- - Wissenschaftlicher Industrielogistik-Dialog (German - Austria)
+  - wissenschaftlicher-industrielogistik-dialog
+- - Wolters Kluwerbrede Schrijfwijzer (author-date, Dutch)
+  - wolters-kluwerbrede-schrijfwijzer-author-date
+- - World Applied Sciences Journal
+  - world-applied-sciences-journal
+- - World Congress on Engineering Asset Management 2010
+  - world-congress-on-engineering-asset-management
+- - World Journal of Gastroenterology
+  - world-journal-of-gastroenterology
+- - World Mycotoxin Journal
+  - world-mycotoxin-journal
+- - World Organisation for Animal Health - Scientific and Technical Review
+  - world-organisation-for-animal-health-scientific-and-technical-review
+- - World Politics
+  - world-politcs
+- - World's Poultry Science Journal
+  - worlds-poultry-science-journal
+- - Xenotransplantation
+  - xenotransplantation
+- - Yeast
+  - yeast
+- - York St John University - Harvard
+  - harvard-york-st-john-university
+- - Yozgat Bozok Üniversitesi - Fen Bilimleri Enstitüsü (Turkish)
+  - yozgat-bozok-universitesi-fen-bilimleri-enstitusu
+- - ZDfm – Zeitschrift für Diversitätsforschung und -management (German - Austria)
+  - zdfm-zeitschrift-fur-diversitatsforschung-und-management
+- - Zastosowania Komputerów w Elektrotechnice
+  - zastosowania-komputerow-w-elektrotechnice
+- - Zdravniški Vestnik (Slovenian Medical Journal)
+  - zdravniski-vestnik
+- - Zeitgeschichte (German)
+  - zeitgeschichte
+- - Zeitschrift für Allgemeinmedizin
+  - zeitschrift-fur-allgemeinmedizin
+- - Zeitschrift für Antikes Christentum (Journal of Ancient Christianity) (English)
+  - zeitschrift-fur-antikes-christentum
+- - Zeitschrift für Internationale Beziehungen (German)
+  - zeitschrift-fur-internationale-beziehungen
+- - Zeitschrift für Kunstgeschichte
+  - zeitschrift-fur-kunstgeschichte
+- - Zeitschrift für Medien- und Kulturforschung (German)
+  - zeitschrift-fur-medien-und-kulturforschung
+- - Zeitschrift für Medienwissenschaft (German)
+  - zeitschrift-fur-medienwissenschaft
+- - Zeitschrift für Ostmitteleuropa-Forschung (German)
+  - zeitschrift-fur-ostmitteleuropa-forschung
+- - Zeitschrift für Parlamentsfragen (German)
+  - zeitschrift-fur-parlamentsfragen
+- - Zeitschrift für Pädagogik (German)
+  - zeitschrift-fur-padagogik
+- - Zeitschrift für Qualitative Forschung (German)
+  - zeitschrift-fur-qualitative-forschung
+- - Zeitschrift für Religionswissenschaft (author-date)
+  - zeitschrift-fur-religionswissenschaft-author-date
+- - Zeitschrift für Religionswissenschaft (note)
+  - zeitschrift-fur-religionswissenschaft-note
+- - Zeitschrift für Soziologie (German)
+  - zeitschrift-fur-soziologie
+- - Zeitschrift für Theologie und Kirche (German)
+  - zeitschrift-fur-theologie-und-kirche
+- - Zeitschrift für Theologie und Philosophie
+  - zeitschrift-fur-theologie-und-philosophie
+- - Zeitschrift für Zahnärztliche Implantologie (German)
+  - zeitschrift-fur-zahnarztliche-implantologie
+- - Zeitschrift für deutsche Philologie (German)
+  - zeitschrift-fur-deutsche-philologie
+- - Zeitschrift für die Geschichte des Oberrheins (German)
+  - zeitschrift-fur-die-geschichte-des-oberrheins
+- - Zeitschrift für digitale Geisteswissenschaften (German)
+  - zeitschrift-fur-digitale-geisteswissenschaften
+- - Zeszyty Prawnicze BAS (Polish)
+  - zeszyty-prawnicze-bas
+- - Zilsel (French)
+  - zilsel
+- - 'ZitierGuide: Leitfaden zum fachgerechten Zitieren in rechtswissenschaftlichen
+    Arbeiten (Roger Müller) (German - Switzerland)'
+  - zitierguide-leitfaden-zum-fachgerechten-zitieren-in-rechtswissenschaftlichen-arbeiten
+- - Zoological Journal of the Linnean Society
+  - zoological-journal-of-the-linnean-society
+- - Zootaxa
+  - zootaxa
+- - Zwitscher-Maschine
+  - zwitscher-maschine
+- - animal
+  - animal
+- - b.i.t.online (note, German)
+  - bitonline
+- - cultural geographies
+  - cultural-geographies
+- - der moderne staat (German)
+  - der-moderne-staat
+- - eLife
+  - elife
+- - eNeuro
+  - eneuro
+- - eXPRESS Polymer Letters
+  - express-polymer-letters
+- - ergoscience
+  - ergoscience
+- - exercer (French)
+  - exercer
+- - historia.scribere (German)
+  - historia-scribere
+- - iForest
+  - iforest
+- - infoclio.ch (German - Switzerland)
+  - infoclio-de
+- - infoclio.ch (petites majuscules, French)
+  - infoclio-fr-smallcaps
+- - infoclio.ch (sans majuscules, French)
+  - infoclio-fr-nocaps
+- - médecine/sciences
+  - medecine-sciences
+- - natbib - plainnat (author-date)
+  - natbib-plainnat-author-date
+- - sub\urban - Zeitschrift für kritische Stadtforschung (German)
+  - suburban-zeitschrift-fur-kritische-stadtforschung
+- - ÉTS - École de technologie supérieure (French - Canada)
+  - ets-ecole-de-technologie-superieure
+- - École Pratique des Hautes Études - Sciences historiques et philologiques (French)
+  - ecole-pratique-des-hautes-etudes-sciences-historiques-et-philologiques
+- - École de technologie supérieure - APA (French - Canada)
+  - ecole-de-technologie-superieure-apa
+- - Économie et Statistique (French)
+  - economie-et-statistique
+- - Écoscience
+  - ecoscience
+- - Épidémiologie et Santé Animale
+  - epidemiologie-et-sante-animale
+- - Österreichische Zeitschrift für Politikwissenschaft (German - Austria)
+  - osterreichische-zeitschrift-fur-politikwissenschaft
+- - Česká zemědělská univerzita v Praze - Fakulta agrobiologie, potravinových a přírodních
+    zdrojů
+  - ceska-zemedelska-univerzita-v-praze-fakulta-agrobiologie-potravinovych-a-prirodnich-zdroju
+- - İSNAD Atıf Sistemi 1. Edisyon (dipnotlu)
+  - isnad
+- - İSNAD Atıf Sistemi 2. Edisyon (dipnotlu)
+  - isnad-dipnotlu
+- - İSNAD Atıf Sistemi 2. Edisyon (metiniçi)
+  - isnad-metinici
+- - İstanbul Üniversitesi Sosyal Bilimler Enstitüsü (Turkish)
+  - istanbul-universitesi-sosyal-bilimler-enstitusu
+- - İzmir Katip Çelebi Üniversitesi - Sosyal Bilimler Enstitüsü (Turkish)
+  - izmir-katip-celebi-universitesi-sosyal-bilimler-enstitusu
+- - Российский физиологический журнал им. И.М. Сеченова (Russian)
+  - rossiiskii-fiziologicheskii-zhurnal-imeni-i-m-sechenova
+- - Успехи геронтологии (Russian)
+  - uspekhi-gerontologii
+- - 東京大学法科大学院ローレビュー (The University of Tokyo Law Review) (Japanese)
+  - the-university-of-tokyo-law-review

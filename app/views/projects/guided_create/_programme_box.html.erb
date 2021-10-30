@@ -1,26 +1,30 @@
 
-  <div class="panel panel-default">
-    <div class="panel-heading"><%= t('programme') %></div>
-    <div class="panel-body">
+<%
+  help_text = t(:about_programme, programme:t(:programme), project:t(:project), projects:t(:project).pluralize)
+  if Programme.site_managed_programme
+    help_text << t(:about_managed_programme, programme:t(:programme), project:t(:project), projects:t(:project).pluralize)
+  end
+  help_text = strip_tags(help_text)
+%>
 
-      <% if Seek::ProjectFormProgrammeOptions.programme_dropdown? %>
+<%= panel(t(:programme), help_text: help_text) do %>    
 
-        <%= render partial: 'projects/guided_create/programme_dropdown' %>
+    <% if Seek::ProjectFormProgrammeOptions.programme_dropdown? %>
 
-      <% elsif Seek::ProjectFormProgrammeOptions.managed_checkbox? %>
+      <%= render partial: 'projects/guided_create/programme_dropdown' %>
 
-        <%= render partial: 'projects/guided_create/managed_programme_checkbox' %>
+    <% elsif Seek::ProjectFormProgrammeOptions.managed_checkbox? %>
 
-      <% elsif Seek::ProjectFormProgrammeOptions.managed_only? %>
-        <%= hidden_field_tag :programme_id, Programme.site_managed_programme.id %>
-        <div class="help-block">
-          Your new <%= t('project') %> will be linked to the <%= "#{Seek::Config.dm_project_name} managed #{t('programme')}" %>, <%= link_to Programme.site_managed_programme.title, Programme.site_managed_programme %>.
-        </div>
-      <% end %>
+      <%= render partial: 'projects/guided_create/managed_programme_checkbox' %>
 
-      <% if Seek::ProjectFormProgrammeOptions.creation_allowed? %>
-          <%= render partial:'projects/guided_create/programme_details' %>
-      <% end %>
-
+    <% elsif Seek::ProjectFormProgrammeOptions.managed_only? %>
+      <%= hidden_field_tag :programme_id, Programme.site_managed_programme.id %>
+      <div class="help-block">
+        Your new <%= t('project') %> will be linked to the <%= "#{Seek::Config.dm_project_name} managed #{t('programme')}" %>, <%= link_to Programme.site_managed_programme.title, Programme.site_managed_programme %>.
       </div>
-    </div>
+    <% end %>
+
+    <% if Seek::ProjectFormProgrammeOptions.creation_allowed? %>
+        <%= render partial:'projects/guided_create/programme_details' %>
+    <% end %>
+<% end %>

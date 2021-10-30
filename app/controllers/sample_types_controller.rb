@@ -138,26 +138,33 @@ class SampleTypesController < ApplicationController
   private
 
   def sample_type_params
-    attribute_map = params[:sample_type][:attribute_map]
-      if (attribute_map)
-      params[:sample_type][:sample_attributes_attributes] =[]
-      attribute_map.each do |attribute|
-        attribute[:sample_attribute_type_id] = attribute[:sample_attribute_type][:id]
-        params[:sample_type][:sample_attributes_attributes] << attribute
+    attributes = params[:sample_type][:sample_attributes]
+    if (attributes)
+      params[:sample_type][:sample_attributes_attributes] = []
+      attributes.each do |attribute|
+        if attribute[:sample_attribute_type]
+          if attribute[:sample_attribute_type][:id]
+            attribute[:sample_attribute_type_id] = attribute[:sample_attribute_type][:id].to_i
+          elsif attribute[:sample_attribute_type][:title]
+            attribute[:sample_attribute_type_id] = SampleAttributeType.where(title: attribute[:sample_attribute_type][:title]).first.id
+          end
         end
+        attribute[:unit_id] = Unit.where(symbol: attribute[:unit_symbol]).first.id unless attribute[:unit_symbol].nil?
+        params[:sample_type][:sample_attributes_attributes] << attribute
       end
+    end
 
-    if(params[:sample_type][:assay_assets_attributes])
-      params[:sample_type][:assay_ids] = params[:sample_type][:assay_assets_attributes].map{|x| x[:assay_id]}
+    if (params[:sample_type][:assay_assets_attributes])
+      params[:sample_type][:assay_ids] = params[:sample_type][:assay_assets_attributes].map { |x| x[:assay_id] }
     end
 
     params.require(:sample_type).permit(:title, :description, :tags,
                                         { project_ids: [],
                                           sample_attributes_attributes: [:id, :title, :pos, :required, :is_title,
-                                                                        :sample_attribute_type_id,
-                                                                        :sample_controlled_vocab_id,
-                                                                        :linked_sample_type_id,
-                                                                        :unit_id, :_destroy]},:assay_ids => [])
+                                                                         :sample_attribute_type_id,
+                                                                         :sample_controlled_vocab_id,
+                                                                         :linked_sample_type_id,
+                                                                         :unit_id, :_destroy] }, :assay_ids => [])
   end
 
 

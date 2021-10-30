@@ -1,3 +1,4 @@
+<% is_modal ||= false %>
 <div class='panel panel-default'>
   <div class='panel-heading'>
     Other associated items
@@ -8,20 +9,28 @@
 
     <%= render :partial => 'assets/attribution_form', :locals => {:resource_class => DataFile,
                                                                   :existing_attributions => [], collapsed: @data_file.attributions.empty?} -%>
-    <%= f.fancy_multiselect :publications, { hidden:  @data_file.publications.empty?, other_projects_checkbox: true } %>
+    <%= f.fancy_multiselect :publications, { hidden: @data_file.publications.empty?, other_projects_checkbox: true } %>
 
-    <%= fancy_multiselect @data_file, :events, { hidden: @data_file.events.empty?, other_projects_checkbox: true, sort_by: :start_date } if Seek::Config.events_enabled %>
+    <%= fancy_multiselect @data_file, :events, { hidden: @data_file.events.empty?, other_projects_checkbox: true, sort_by: :start_date } %>
 
     <div class='multi-step-buttons'>
       <%= multi_step_start_button %>
       <%= multi_step_back_button %>
-      <%= submit_tag 'Create',
-                     :id => 'data_file_submit_btn',
-                     :onclick => "javascript: previewPermissions(); return(false);",
-                     :class => 'btn btn-primary' -%>
-    </div>
 
-    <%= cancel_button(data_files_path) -%>
+      <% if is_modal %>
+        <input value="Create" type="button" id="data_file_post_btn" class="btn btn-primary" />
+      <% else %>
+        <%= submit_tag 'Create',
+                      :id => 'data_file_submit_btn',
+                      :onclick => "javascript: previewPermissions(); return(false);",
+                      :class => 'btn btn-primary' -%>
+      <% end %>
+    </div>
+    <%if(is_modal)%>
+      <a class=" btn btn-default" onClick="location.reload();">Cancel</a>
+    <%else%>
+      <%= cancel_button(data_files_path) -%>
+    <%end%>
   </div>
 </div>
 <%= wizard_footer_tips %>

@@ -6,9 +6,10 @@ class ApplicationRecord < ActiveRecord::Base
   include Seek::VersionedResource
   include Seek::ExplicitVersioning
   include Seek::Favouritable
+  include Seek::ActsAsDiscussable
   include Seek::ActsAsFleximageExtension
   include Seek::UniquelyIdentifiable
-  include Seek::YellowPages
+  include Seek::ActsAsYellowPages
   include Seek::GroupedPagination
   include Seek::Scalable
   include Seek::TitleTrimmer
@@ -23,6 +24,7 @@ class ApplicationRecord < ActiveRecord::Base
   include Seek::Permissions::AuthorizationEnforcement
   include Seek::Permissions::ActsAsAuthorized
   include Seek::RelatedItems
+  include HasTasks
 
   include Annotations::Acts::Annotatable
   include Annotations::Acts::AnnotationSource
@@ -33,12 +35,20 @@ class ApplicationRecord < ActiveRecord::Base
   end
   
   # Returns the columns to be shown on the table view for the resource
+  # This columns will always be shown
+  def columns_required
+    ['title']
+  end
+  # default columns to be shown after required columns
   def columns_default
-    ['description','created_at']
+    []
   end
+  # additional available columns to be shown as an option
   def columns_allowed
-    ['description','created_at','updated_at']
+    columns_default + ['description','created_at','updated_at']
   end
+
+  
 
   # takes and ignores arguments for use in :after_add => :update_timestamp, etc.
   def update_timestamp(*_args)
@@ -85,7 +95,7 @@ class ApplicationRecord < ActiveRecord::Base
   end
 
   def self.subscribable?
-    include? Seek::Subscribable
+    false
   end
 
   def subscribable?
@@ -98,6 +108,10 @@ class ApplicationRecord < ActiveRecord::Base
 
   def supports_doi?
     self.class.supports_doi?
+  end
+
+  def is_a_version?
+    false
   end
 
   def self.with_search_query(q)
@@ -137,4 +151,14 @@ class ApplicationRecord < ActiveRecord::Base
   has_filter query: Seek::Filtering::SearchFilter.new
   has_filter created_at: Seek::Filtering::DateFilter.new(field: :created_at,
                                                          presets: [24.hours, 1.week, 1.month, 1.year, 5.years])
+
+  def self.feature_enabled?
+    method = "#{name.underscore.pluralize}_enabled"
+    !Seek::Config.respond_to?(method) || Seek::Config.send(method)
+  end
+
+  # TODO: Decide what this should actually do, since it doesn't check user roles etc.
+  def self.user_creatable?
+    false
+  end
 end

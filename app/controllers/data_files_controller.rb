@@ -25,6 +25,7 @@ class DataFilesController < ApplicationController
 
   before_action :login_required, only: [:create, :create_content_blob, :create_metadata, :rightfield_extraction_ajax, :provide_metadata]
 
+  
   # has to come after the other filters
   include Seek::Publishing::PublishingCommon
 
@@ -265,7 +266,7 @@ class DataFilesController < ApplicationController
 
   def extraction_status
     @previous_status = params[:previous_status]
-    @job_status = SampleDataExtractionJob.get_status(@data_file)
+    @job_status = @data_file.sample_extraction_task.status
 
     respond_to do |format|
       format.html { render partial: 'data_files/sample_extraction_status', locals: { data_file: @data_file } }
@@ -313,13 +314,21 @@ class DataFilesController < ApplicationController
   # handles the uploading of the file to create a content blob, which is then associated with a new unsaved datafile
   # and stored on the session
   def create_content_blob
+    # clean up the session
+    session.delete(:uploaded_content_blob_id)
+    session.delete(:processed_datafile)
+    session.delete(:processed_assay)
+    session.delete(:processed_warnings)
+
     @data_file = setup_new_asset
     respond_to do |format|
       if handle_upload_data && @data_file.content_blob.save
         session[:uploaded_content_blob_id] = @data_file.content_blob.id
+        format.js
         format.html {}
       else
         session.delete(:uploaded_content_blob_id)
+        format.js
         format.html { render action: :new }
       end
     end
@@ -342,6 +351,7 @@ class DataFilesController < ApplicationController
         @warnings.merge(warnings)
       else
         critical_error_msg = "The file that was requested to be processed doesn't match that which had been uploaded"
+        notify_content_blob_mismatch(params[:content_blob_id], session[:uploaded_content_blob_id])
       end
     rescue Exception => e
       Seek::Errors::ExceptionForwarder.send_notification(e, data:{message: "Problem attempting to extract from RightField for content blob #{params[:content_blob_id]}"})
@@ -361,6 +371,18 @@ class DataFilesController < ApplicationController
     end
   end
 
+  def notify_content_blob_mismatch(param_id, session_id)
+    begin
+      raise 'Content blob mismatch during data file creation'
+    rescue RuntimeError => e
+      Seek::Errors::ExceptionForwarder.send_notification(e, data:{
+        message: "Parameter and Session Content Blob id don't match",
+        param_blob_id: param_id.inspect,
+        session_blob_id: session_id.inspect
+      })
+    end
+  end
+
   # Displays the form Wizard for providing the metadata for both the data file, and possibly related Assay
   # if not already provided and available, it will use those that had previously been populated through RightField extraction
   def provide_metadata
@@ -377,6 +399,7 @@ class DataFilesController < ApplicationController
     @data_file.assay_assets.build(assay_id: @assay.id) if @assay.persisted?
 
     respond_to do |format|
+      format.js
       format.html
     end
   end
@@ -403,6 +426,10 @@ class DataFilesController < ApplicationController
     # check the content blob id matches that previously uploaded and recorded on the session
     all_valid = uploaded_blob_matches = (params[:content_blob_id].to_s == session[:uploaded_content_blob_id].to_s)
 
+    unless uploaded_blob_matches
+      notify_content_blob_mismatch(params[:content_blob_id], session[:uploaded_content_blob_id])
+    end
+
     #associate the content blob with the data file
     blob = ContentBlob.find(params[:content_blob_id])
     @data_file.content_blob = blob
@@ -415,12 +442,7 @@ class DataFilesController < ApplicationController
 
     if all_valid
 
-      update_relationships(@data_file, params)
-
-      session.delete(:uploaded_content_blob_id)
-      session.delete(:processed_datafile)
-      session.delete(:processed_assay)
-      session.delete(:processed_warnings)
+      update_relationships(@data_file, params)      
 
       respond_to do |format|
         flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
@@ -499,9 +521,9 @@ class DataFilesController < ApplicationController
 
   def data_file_params
     params.require(:data_file).permit(:title, :description, :simulation_data, { project_ids: [] },
-                                      :license, :other_creators,{ event_ids: [] },
+                                      :license, *creator_related_params, { event_ids: [] },
                                       { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                      { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
+                                      { assay_assets_attributes: [:assay_id, :relationship_type_id] },
                                       { scales: [] }, { publication_ids: [] },
                                       discussion_links_attributes:[:id, :url, :label, :_destroy])
   end

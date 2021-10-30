@@ -17,17 +17,26 @@ class ProjectFolder < ApplicationRecord
   end
 
   def assets
-    project_folder_assets.collect{|pfa| pfa.asset}
+    project_folder_assets.collect(&:asset).reject{|a| a.class.name=='Collection'}
   end
 
   #assets that are authorized to be shown for the current user
   def authorized_assets
-    assets.select{|a| a.can_view?}
+    assets.select(&:can_view?)
+  end
+
+   #assets that are not associated to any assay
+  def authorized_hanging_assets
+    assets.select{ |a| a.assays.length == 0 }.select(&:can_view?)
   end
 
   #what is displayed in the tree
   def label
     "#{title} (#{authorized_assets.count})"
+  end
+
+  def count
+    authorized_hanging_assets.count
   end
 
   def self.new_items_folder project

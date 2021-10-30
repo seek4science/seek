@@ -255,12 +255,40 @@ class SampleTest < ActiveSupport::TestCase
     disable_authorization_checks { sample.save! }
     refute sample.get_attribute_value(:bool)
 
+    sample.update_attributes(data: { the_title: 'fish', bool: '' })
+    assert sample.valid?
+    sample.update_attributes(data: { the_title: 'fish', bool: nil })
+    assert sample.valid?
+    disable_authorization_checks { sample.save! }
+    assert_nil sample.get_attribute_value(:bool)
+
     # not valid
     sample.update_attributes(data: { the_title: 'fish', bool: 'fish' })
     refute sample.valid?
     sample.set_attribute_value(:bool, 'true')
     assert sample.valid?
     sample.set_attribute_value(:bool, 'fish')
+    refute sample.valid?
+
+
+    # with required attribute
+    sample = Sample.new title: 'testing', project_ids: [Factory(:project).id]
+    sample_type = Factory(:simple_sample_type)
+    sample_type.sample_attributes << Factory(:sample_attribute, title: 'bool', sample_attribute_type: Factory(:boolean_sample_attribute_type), required: true, is_title: false, sample_type: sample_type)
+    sample_type.save!
+    sample.sample_type = sample_type
+
+    sample.update_attributes(data: { the_title: 'fish', bool: 'true' })
+    assert sample.valid?
+    sample.update_attributes(data: { the_title: 'fish', bool: true })
+    assert sample.valid?
+    sample.update_attributes(data: { the_title: 'fish', bool: false })
+    assert sample.valid?
+    sample.update_attributes(data: { the_title: 'fish', bool: 'false' })
+    assert sample.valid?
+    sample.update_attributes(data: { the_title: 'fish', bool: nil })
+    refute sample.valid?
+    sample.update_attributes(data: { the_title: 'fish', bool: '' })
     refute sample.valid?
   end
 
@@ -1064,4 +1092,74 @@ class SampleTest < ActiveSupport::TestCase
     assert_equal 'B', sample.get_attribute_value('name ++##!')
     assert_equal 'C', sample.get_attribute_value('size range (bp)')
   end
+
+  test 'data file sample' do
+    project = Factory(:project)
+    sample_type = Factory(:data_file_sample_type, project_ids:[project.id])
+    sample = Sample.new(sample_type: sample_type, project_ids: [project.id])
+    df = Factory(:data_file)
+
+    sample.update_attributes(data:{'data file':df.id})
+    assert sample.valid?
+    sample.save!
+
+    sample.reload
+    expected = {id:df.id,type:'DataFile',title:df.title}.with_indifferent_access
+    assert_equal expected, sample.get_attribute_value('data file')
+
+    sample = Sample.new(sample_type: sample_type, project_ids: [project.id])
+    sample.set_attribute_value('data file',df.id)
+    assert sample.valid?
+    sample.save!
+
+    sample.reload
+    expected = {'id':df.id,type:'DataFile',title:df.title}.with_indifferent_access
+    assert_equal expected, sample.get_attribute_value('data file')
+
+  end
+
+  test 'multi linked sample validation' do
+    patient = Factory(:patient_sample)
+    patient2 = Factory(:patient_sample, sample_type:patient.sample_type )
+    multi_linked_sample_type = Factory(:multi_linked_sample_type, project_ids: [Factory(:project).id])
+    multi_linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
+    multi_linked_sample_type.save!
+
+    sample = Sample.new(sample_type: multi_linked_sample_type, project_ids: [Factory(:project).id])
+    sample.set_attribute_value(:title, 'blah')
+    sample.set_attribute_value(:patient, "")
+    refute sample.valid?
+    sample.set_attribute_value(:patient, [])
+    refute sample.valid?
+    sample.set_attribute_value(:patient, [patient.id])
+    assert sample.valid?
+    sample.set_attribute_value(:patient, [patient.id, patient2.id])
+    assert sample.valid?
+    sample.set_attribute_value(:patient, "#{patient.id}, #{patient2.id}")
+    assert sample.valid?
+    sample.save!
+    assert sample.get_attribute_value("patient").kind_of?(Array)
+    assert_equal  patient.id, sample.get_attribute_value("patient")[0]["id"]
+    assert_equal  patient2.id, sample.get_attribute_value("patient")[1]["id"]
+  end
+
+  test 'refuse multi linked sample as title' do
+    patient = Factory(:patient_sample)
+    multi_linked_sample_type = Factory(:multi_linked_sample_type, project_ids: [Factory(:project).id])
+    multi_linked_sample_type.sample_attributes.last.linked_sample_type = patient.sample_type
+    multi_linked_sample_type.sample_attributes.first.is_title = false
+    multi_linked_sample_type.sample_attributes.last.is_title = true
+    refute multi_linked_sample_type.valid?
+  end
+
+  test 'json api doesnt format attribute_map keys' do
+    sample = User.with_current_user(Factory(:user)) do
+      Factory(:max_sample)
+    end
+    json = JSON.parse(ActiveModelSerializers::SerializableResource.new(sample).adapter.to_json)
+    attribute_map = json['data']['attributes']['attribute_map']
+    assert attribute_map.key?('CAPITAL key')
+    assert_equal 'key must remain capitalised', attribute_map['CAPITAL key']
+  end
+
 end

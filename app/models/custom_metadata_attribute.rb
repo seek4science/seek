@@ -11,4 +11,8 @@ class CustomMetadataAttribute < ApplicationRecord
   def linked_sample_type
     nil
   end
+
+  def label
+    super || title&.humanize
+  end
 end

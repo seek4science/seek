@@ -32,6 +32,7 @@ module Seek
         acts_as_authorized
         acts_as_uniquely_identifiable
         acts_as_favouritable
+        acts_as_discussable
         grouped_pagination
         title_trimmer
 
@@ -41,6 +42,7 @@ module Seek
         validates :title, presence: true
         validates :title, length: { maximum: 255 }, unless: -> { is_a?(Publication) }
         validates :description, length: { maximum: 65_535 }, if: -> { respond_to?(:description) }
+        validates :license, license:true, allow_blank: true, if: -> { respond_to?(:license) }
 
 
         include Seek::Stats::ActivityCounts
@@ -77,6 +79,10 @@ module Seek
         with_contributors.to_json
       end
 
+      def user_creatable?
+        feature_enabled?
+      end
+
       def can_create?
         User.logged_in_and_member?
       end
@@ -100,8 +106,7 @@ module Seek
         versioned? &&
           is_downloadable? &&
           !(respond_to?(:extracted_samples) && extracted_samples.any?) &&
-          !(respond_to?(:openbis?) && openbis?) &&
-          !(supports_doi? && has_doi?)
+          !(respond_to?(:openbis?) && openbis?)
       end
     end
   end

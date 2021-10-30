@@ -63,7 +63,7 @@ module Seek
           clause = { "#{related_item_class.name.downcase}_id" => item_id }
           related_items_association(person).where(role_mask: role_info.role_mask).where(clause).destroy_all
         end
-        if (current_item_ids - item_ids).empty?
+        if (current_item_ids - item_ids).empty? && person.roles_mask >= role_info.role_mask
           person.update_attribute(:roles_mask, person.roles_mask - role_info.role_mask)
         end
       end

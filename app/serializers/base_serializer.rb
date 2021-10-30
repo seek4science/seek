@@ -6,6 +6,13 @@ class BaseSerializer < SimpleBaseSerializer
 
   attribute :policy, if: :show_policy?
 
+  attribute :discussion_links,  if: -> { object.is_discussable? } do
+    object.discussion_links.collect do |link|
+      {id:link.id, label: link.label, url: link.url}
+    end
+  end
+
+
   def policy
     BaseSerializer.convert_policy object.policy
   end
@@ -123,6 +130,16 @@ class BaseSerializer < SimpleBaseSerializer
       return []
     else
       return [result]
+    end
+  end
+
+  def serialize_assets_creators
+    object.assets_creators.map do |c|
+      { profile: c.creator_id ? person_path(c.creator_id) : nil,
+        family_name: c.family_name,
+        given_name: c.given_name,
+        affiliation: c.affiliation,
+        orcid: c.orcid }
     end
   end
 end

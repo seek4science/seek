@@ -3,6 +3,8 @@ class Institution < ApplicationRecord
   acts_as_yellow_pages
   title_trimmer
 
+  auto_strip_attributes :web_page
+
   validates :title, uniqueness: true
   validates :web_page, url: { allow_nil: true, allow_blank: true }
   validates :country, country: true
@@ -34,10 +36,10 @@ class Institution < ApplicationRecord
 
   # Returns the columns to be shown on the table view for the resource
   def columns_default
-    super + ['title','web_page']
+    super + ['city','country','web_page']
   end
   def columns_allowed
-    super + ['title','web_page','address','city','country']
+    columns_default + ['address']
   end
 
   # get a listing of all known institutions

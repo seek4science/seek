@@ -36,7 +36,7 @@ module SessionsHelper
     Seek::Config.omniauth_enabled && Seek::Config.omniauth_providers.any?
   end
 
-  def show_elixir_login?
+  def show_elixir_aai_login?
     Seek::Config.omniauth_elixir_aai_enabled
   end
 

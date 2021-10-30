@@ -3,7 +3,7 @@
     "id": "1039986486",
     "type": "studies",
     "attributes": {
-      "snapshots": null,
+      "snapshots": [],
       "policy":
       {
         "access":"no_access",
@@ -12,14 +12,28 @@
       "title": "A Maximal Study",
       "description": "The Study of many things",
       "experimentalists": "Wet lab people",
+      "position": null,
       "other_creators": "Marie Curie",
-      "person_responsible_id": "887473922"
+      "creators": [
+        {
+          "profile": "/people/1039986485",
+          "family_name": "Last",
+          "given_name": "Person16",
+          "affiliation": "An Institution: 17",
+          "orcid": null
+        }
+      ],
+      "discussion_links": [{
+        "id": 55,
+        "url": "http://www.slack.com/",
+        "label": "Slack"
+      }]
     },
     "relationships": {
       "creators": {
         "data": [
           {
-            "id": "1039986744",
+            "id": "1039986485",
             "type": "people"
           }
         ]
@@ -37,13 +51,9 @@
           {
             "id": "1039986548",
             "type": "people"
-          },
+          },          
           {
-            "id": "1039986744",
-            "type": "people"
-          },
-          {
-            "id": "887473922",
+            "id": "1039986485",
             "type": "people"
           }
         ]

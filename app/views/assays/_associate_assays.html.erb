@@ -42,7 +42,7 @@ return if resource.is_a?(Model) && !Seek::Config.modelling_analysis_enabled
    add_new_assay_title = ""
 
   collapsed = associated_assays.blank? if collapsed.nil?
-  assay_asset_json = associations_json_from_assay_assets(resource.assay_assets, type: resource.class.name.underscore)
+  assay_asset_json = associations_json_from_assay_assets(resource.assay_assets)
 %>
 
 <%= folding_panel(assay_class_text, collapsed, :body_options => {:id => 'associate_assay_fold_content'},
@@ -54,8 +54,9 @@ return if resource.is_a?(Model) && !Seek::Config.modelling_analysis_enabled
           The following <%= assay_class_text -%> are associated with this <%= resource_text -%>:
         </p>
 
-        <%= associations_list('assay_asset_list', 'associations/assay', assay_asset_json, empty_text: 'No assays',) %>
-        <%= hidden_field_tag "#{resource_type}[assay_assets_attributes][]" %>
+        <%= associations_list('assay_asset_list', 'associations/assay', assay_asset_json,
+                              'data-field-name' => "#{resource_type}[assay_assets_attributes]",
+                              empty_text: 'No assays') %>
         <div class="association_step">
           <hr/>
           <p style="color: #666666;">

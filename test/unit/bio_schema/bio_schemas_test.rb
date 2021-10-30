@@ -98,7 +98,7 @@ class BioSchemaTest < ActiveSupport::TestCase
     assert_equal 'http://project.com', json['url']
     member_json = json['member']
     refute_nil member_json
-    assert_equal 2, member_json.count
+    assert_equal 4, member_json.count # should have institutions and people
 
     expected = { '@type' => 'Person', '@id' => member.rdf_resource, 'name' => member.title }
     assert_equal expected, member_json[0]
@@ -120,6 +120,14 @@ class BioSchemaTest < ActiveSupport::TestCase
     assert_raise Seek::BioSchema::UnsupportedTypeException do
       Seek::BioSchema::ResourceDecorators::Factory.instance.get(unsupported_type)
     end
+  end
+
+  test 'collection json_ld' do
+    p = Factory(:max_collection)
+    json = Seek::BioSchema::Serializer.new(p).json_ld
+    json = JSON.parse(json)
+    assert_equal "http://localhost:3000/collections/#{p.id}", json['@id']
+    assert json['hasPart']
   end
 
   private

@@ -1,0 +1,8 @@
+<% if @workflow_class.errors.any? %>
+alert("<%= @workflow_class.errors.full_messages.join(', ') %>");
+<% else %>
+$j('#workflow-class-form select').append('<option value="<%= @workflow_class.id %>"><%= @workflow_class.title %></option>');
+$j('#workflow-class-form select').val(<%= @workflow_class.id %>);
+$j('#workflow-class-modal').modal('hide');
+<% end %>
+

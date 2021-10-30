@@ -129,7 +129,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert model.creators.include?(p2)
     assert_select '.list_item_title a[href=?]', model_path(model), 'ZZZZZ', 'the data file for this test should appear as a list item'
 
-    # check for avatars: uploader won't be shown if he/she is not creator
+    # check for avatars: uploader won't be shown if they are not creator
     assert_select '.list_item_avatar' do
       assert_select 'a[href=?]', person_path(p2) do
         assert_select 'img'
@@ -903,29 +903,6 @@ class ModelsControllerTest < ActionController::TestCase
     assert_select 'p.list_item_attribute', text: /, another creator/, count: 1
   end
 
-  test 'should display cytoscape button for supported models' do
-    model = Factory :xgmml_model
-    login_as(model.contributor)
-    get :show, params: { id: model.id }
-    assert_response :success
-    assert_select 'a[href=?]', visualise_model_path(model, version: model.version), text: 'Visualize'
-  end
-
-  test 'should not display cytoscape button for supported models' do
-    model = Factory :teusink_jws_model
-    login_as(model.contributor)
-    get :show, params: { id: model.id }
-    assert_response :success
-    assert_select 'a[href=?]', visualise_model_path(model, version: model.version), count: 0
-  end
-
-  test 'visualise with cytoscape' do
-    model = Factory :xgmml_model
-    login_as(model.contributor)
-    get :visualise, params: { id: model.id, version: model.version }
-    assert_response :success
-  end
-
   test 'should show sycamore button for sbml' do
     with_config_value :sycamore_enabled, true do
       model = Factory :teusink_model
@@ -972,7 +949,7 @@ class ModelsControllerTest < ActionController::TestCase
     model.save
     get :show, params: { id: model }
 
-    assert_select 'li.author-list-item', text: 'another creator', count: 1
+    assert_select '#author-box .additional-credit', text: 'another creator', count: 1
   end
 
   test 'should create new model version based on content_blobs of previous version' do
@@ -1251,7 +1228,7 @@ class ModelsControllerTest < ActionController::TestCase
     # should be a temporary sharing link
     assert_select 'div#temporary_links', count:1
 
-    assert_select 'div#author_form', count:1
+    assert_select 'div#author-form', count:1
   end
 
   test 'cannot access manage page with edit rights' do

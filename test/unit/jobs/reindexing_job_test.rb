@@ -1,40 +1,47 @@
 require 'test_helper'
 
 class ReindexingJobTest < ActiveSupport::TestCase
-  test 'exists' do
-    Delayed::Job.delete_all
-    assert !ReindexingJob.new.exists?
-    assert_difference('Delayed::Job.count', 1) do
-      Delayed::Job.enqueue ReindexingJob.new
-    end
-
-    assert ReindexingJob.new.exists?
-    job = Delayed::Job.first
-
-    assert_nil job.failed_at
-    job.failed_at = Time.now
-    job.save!
-    assert !ReindexingJob.new.exists?, 'Should ignore failed jobs'
-
-    assert_nil job.locked_at
-    job.locked_at = Time.now
-    job.failed_at = nil
-    job.save!
-    assert !ReindexingJob.new.exists?, 'Should ignore locked jobs'
-
-    Delayed::Job.delete_all
-  end
-
   test 'add item to queue' do
-    Delayed::Job.delete_all
     p = Factory :person
-    assert_difference('ReindexingQueue.count') do
-      ReindexingJob.new.add_items_to_queue p
+    ReindexingQueue.delete_all
+    assert_enqueued_jobs(1, only: ReindexingJob) do
+      assert_difference('ReindexingQueue.count') do
+        ReindexingQueue.enqueue(p)
+      end
     end
 
     models = [Factory(:model), Factory(:model)]
-    assert_difference('ReindexingQueue.count', 2) do
-      ReindexingJob.new.add_items_to_queue models
+    ReindexingQueue.delete_all
+    assert_enqueued_jobs(1, only: ReindexingJob) do
+      assert_difference('ReindexingQueue.count', 2) do
+        ReindexingQueue.enqueue(models)
+      end
     end
+
+    models = [Factory(:model), Factory(:model)]
+    ReindexingQueue.delete_all
+    assert_no_enqueued_jobs(only: ReindexingJob) do
+      assert_difference('ReindexingQueue.count', 2) do
+        ReindexingQueue.enqueue(models, queue_job: false)
+      end
+    end
+  end
+
+  test 'gather_items strips deleted (nil) items' do
+    model1 = Factory(:model)
+    model2 = Factory(:model)
+    document = Factory(:document)
+    ReindexingQueue.delete_all
+    ReindexingQueue.enqueue([model1, model2], queue_job: false)
+    ReindexingQueue.enqueue(document, queue_job: false)
+
+    disable_authorization_checks { model1.destroy! }
+
+    items = ReindexingJob.new.gather_items
+
+    assert_equal 2, items.length
+    assert_not_includes items, model1
+    assert_includes items, model2
+    assert_includes items, document
   end
 end

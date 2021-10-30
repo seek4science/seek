@@ -28,6 +28,15 @@ jobs:
         ports:
           - 33306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+      virtuoso:
+        image: tenforce/virtuoso
+        env:
+          DBA_PASSWORD: tester
+          SPARQL_UPDATE: true
+          DEFAULT_GRAPH: http://www.example.com/my-graph
+        ports:
+          - 8890:8890
+          - 1111:1111
     strategy:
       fail-fast: false
       matrix:
@@ -38,10 +47,11 @@ jobs:
           - rails test test/functional
           - rails test test/integration
           - rspec spec
-          - rake teaspoon
+          # - rake teaspoon
           - rake assets:precompile
           - rake db:setup
           - rake db:migrate
+          - rake seek:upgrade
         include:
           - database: postgres
             suite: rails test test/unit
@@ -58,7 +68,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
-          java-version: '8' # The JDK version to make available on the path.
+          java-version: '11' # The JDK version to make available on the path.
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -93,5 +103,11 @@ jobs:
           git checkout ${{ github.event.before }} -- db/schema.rb
       - name: Load test database schema
         run: bundle exec rake db:schema:load
+      - name: Seed database
+        if: matrix.suite == 'rake seek:upgrade'
+        run: bundle exec rake db:seed
+      - name: Virtuoso config
+        if: matrix.suite == 'rails test test/integration'
+        run: cp test/config/virtuoso_test_settings.yml config/virtuoso_settings.yml
       - name: Run tests
         run: bundle exec ${{ matrix.suite }}

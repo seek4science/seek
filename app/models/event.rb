@@ -24,6 +24,18 @@ class Event < ApplicationRecord
   # load the configuration for the pagination
   grouped_pagination
 
+  auto_strip_attributes :url
+
+  validates_presence_of :title
+  validates :title, length: { maximum: 255 }
+  validates :description, length: { maximum: 65_535 }
+  validates_presence_of :start_date
+
+  # validates_is_url_string :url
+  validates :url, url: {allow_nil: true, allow_blank: true}
+
+  validates :country, country:true, allow_blank: true
+
   validate :validate_data_files
   def validate_data_files
     df = data_files.to_a
@@ -35,31 +47,18 @@ class Event < ApplicationRecord
     errors.add(:end_date, 'is before start date.') unless end_date.nil? || start_date.nil? || end_date >= start_date
   end
 
-  validates_presence_of :title
-  validates :title, length: { maximum: 255 }
-
-  validates :description, length: { maximum: 65_535 }
-
-  validates_presence_of :start_date
-
-  # validates_is_url_string :url
-  validates :url, url: {allow_nil: true, allow_blank: true}
-
-  validates :country, country:true, allow_blank: true
-
   def show_contributor_avatars?
     false
   end
 
   # Returns the columns to be shown on the table view for the resource
   def columns_default
-    super + ['title','start_date','end_date','city','country']
+    super + ['city','country','start_date','end_date']
   end
   def columns_allowed
-    super + ['start_date','end_date','address','city','country','url','title','deleted_contributor']
+    columns_default + ['address','url','title']
   end
 
-  # defines that this is a user_creatable object type, and appears in the "New Object" gadget
   def self.user_creatable?
     Seek::Config.events_enabled
   end

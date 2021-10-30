@@ -16,7 +16,7 @@ class StudiesControllerTest < ActionController::TestCase
   def rest_api_test_object
     @object = Factory :study, policy: Factory(:public_policy)
   end
-
+  
   test 'should get index' do
     Factory :study, policy: Factory(:public_policy)
     get :index
@@ -456,7 +456,7 @@ class StudiesControllerTest < ActionController::TestCase
 
     get :show, params: { id: study.id }
     assert_response :success
-    assert_select 'li.author-list-item', text: 'frodo baggins'
+    assert_select '#author-box .additional-credit', text: 'frodo baggins', count: 1
   end
 
   test 'should not multiply creators after calling show' do
@@ -493,8 +493,7 @@ class StudiesControllerTest < ActionController::TestCase
     end
   end
 
-  def edit_max_object(study)
-    study.person_responsible = Factory(:max_person)
+  def edit_max_object(study)    
     add_creator_to_test_object(study)
   end
 
@@ -618,7 +617,7 @@ class StudiesControllerTest < ActionController::TestCase
     #no sharing link, not for Investigation, Study and Assay
     assert_select 'div#temporary_links', count:0
 
-    assert_select 'div#author_form', count:1
+    assert_select 'div#author-form', count:1
   end
 
   test 'cannot access manage page with edit rights' do
@@ -875,4 +874,57 @@ class StudiesControllerTest < ActionController::TestCase
 
 
   end
+
+  test 'should create with discussion link' do
+    person = Factory(:person)
+    login_as(person)
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('Study.count') do
+        post :create, params: { study: { title: 'test',
+                                         investigation_id: Factory(:investigation, contributor: person).id,
+                                         discussion_links_attributes: [{url: "http://www.slack.com/"}]},
+                                policy_attributes: valid_sharing }
+      end
+    end
+    study = assigns(:study)
+    assert_equal 'http://www.slack.com/', study.discussion_links.first.url
+    assert_equal AssetLink::DISCUSSION, study.discussion_links.first.link_type
+  end
+
+  test 'should show discussion link' do
+    disc_link = Factory(:discussion_link)
+    study = Factory(:study, contributor: User.current_user.person)
+    study.discussion_links = [disc_link]
+    get :show, params: { id: study }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Discussion Channel/, count: 1
+  end
+
+  test 'should update node with discussion link' do
+    person = Factory(:person)
+    study = Factory(:study, contributor: person)
+    login_as(person)
+    assert_nil study.discussion_links.first
+    assert_difference('AssetLink.discussion.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: study.id, study: { discussion_links_attributes:[{url: "http://www.slack.com/"}] } }
+      end
+    end
+    assert_redirected_to study_path(assigns(:study))
+    assert_equal 'http://www.slack.com/', study.discussion_links.first.url
+  end
+
+  test 'should destroy related assetlink when the discussion link is removed ' do
+    person = Factory(:person)
+    login_as(person)
+    asset_link = Factory(:discussion_link)
+    study = Factory(:study, contributor: person)
+    study.discussion_links = [asset_link]
+    assert_difference('AssetLink.discussion.count', -1) do
+      put :update, params: { id: study.id, study: { discussion_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
+    end
+    assert_redirected_to study_path(study = assigns(:study))
+    assert_empty study.discussion_links
+  end
+
 end

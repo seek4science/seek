@@ -5,7 +5,7 @@
 <%= render partial: 'assets/upload_new_version_form', locals: { resource: @workflow } -%>
 
 <div class="row">
-  <% if @display_workflow&.content_blob&.caching_job&.exists? %>
+  <% if @display_workflow&.content_blob&.remote_content_fetch_task&.pending? %>
     <div class="col-sm-12">
       <%= alert_box('info', hide_button: true) do %>
         The content of this workflow has not yet been downloaded. Please check back later.
@@ -13,15 +13,19 @@
     </div>
   <% end %>
   <div class="col-md-9 col-sm-8 box_about_actor">
-    <% if @display_workflow.maturity_level %>
-      <p>
-        <%= maturity_badge(@display_workflow.maturity_level) %>
-      </p>
-    <% end %>
+    <strong><%= WorkflowClass.model_name.human %>: </strong> <%= @display_workflow.workflow_class_title -%>
 
-    <div id="description">
-      <%= item_description(@display_workflow.description) %>
+    <div style="margin-bottom: 5px;">
+      <% if @display_workflow.maturity_level %>
+        <%= maturity_badge(@display_workflow.maturity_level) %>
+      <% end %>
+
+      <% if @display_workflow.test_status %>
+        <%= test_status_badge(@display_workflow.test_status) %>
+      <% end %>
     </div>
+
+    <%= item_description(@display_workflow.description) %>
 
     <% begin %>
       <% if @display_workflow.diagram_exists? || @display_workflow.can_render_diagram? %>

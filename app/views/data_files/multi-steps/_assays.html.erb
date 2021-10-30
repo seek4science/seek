@@ -1,3 +1,4 @@
+<% is_modal ||= false %>
 <div class='panel panel-default'>
   <div class='panel-heading'>
     Associated <%=t('assay').pluralize %>
@@ -34,7 +35,7 @@
         </div>
         <div class='form-group'>
           <label>Description</label>
-          <%= text_area_tag 'assay[description]', @assay.description, :class => 'form-control', :rows => 5 %>
+          <%= text_area_tag 'assay[description]', @assay.description, :class => 'form-control rich-text-edit', :rows => 5 %>
         </div>
         <div class='form-group'>
           <label>Study <span class='required'>*</span></label>
@@ -64,7 +65,11 @@
         </div>
       </div>
     </div>
-    <%= cancel_button(data_files_path) -%>
+     <%if(is_modal)%>
+      <a class=" btn btn-default" onClick="location.reload();">Cancel</a>
+    <%else%>
+      <%= cancel_button(data_files_path) -%>
+    <%end%>
     <div class='multi-step-buttons'>
       <%= multi_step_start_button %>
       <%= multi_step_back_button %>

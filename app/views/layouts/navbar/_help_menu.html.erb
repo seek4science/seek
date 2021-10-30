@@ -15,9 +15,17 @@
     <% if Seek::Config.about_page_enabled %>
         <li><%= link_to 'About', about_home_path -%></li>
     <% end %>
+    <li><%= link_to t("menu.api"), '/api' %></li>
     <% if logged_in_and_registered? %>
-        <li role="presentation" class="dropdown-header visible-md-block">Feedback</li>
         <li><%= link_to 'Provide feedback', feedback_home_path -%></li>
     <% end %>
+    <% if Seek::Config.issue_tracker.present? %>
+      <% if logged_in_and_registered? %>
+          <li><%= link_to t('menu.report_issue'), report_issue_home_path %></li>
+      <% else %>
+        <li><%= link_to t('menu.report_issue'), Seek::Config.issue_tracker, target: :_blank %></li>
+      <% end %>
+    <% end %>
+    
   </ul>
 </li>

@@ -16,6 +16,7 @@ module Seek
         acts_as_scalable
         acts_as_authorized
         acts_as_uniquely_identifiable
+        acts_as_discussable
         has_extended_custom_metadata
 
         title_trimmer
@@ -36,7 +37,7 @@ module Seek
         include Seek::Subscribable
         include Seek::ResearchObjects::Packaging
         include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
-        has_many :programmes, through: :projects
+        has_many :programmes, ->{ distinct }, through: :projects
 
         extend Seek::ActsAsISA::SingletonMethods
       end
@@ -47,9 +48,8 @@ module Seek
     end
 
     module SingletonMethods
-      # defines that this is a user_creatable object type, and appears in the "New Object" gadget
       def user_creatable?
-        true
+        feature_enabled?
       end
 
       def can_create?
