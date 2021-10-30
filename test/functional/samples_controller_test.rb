@@ -984,27 +984,23 @@ class SamplesControllerTest < ActionController::TestCase
       assert_equal [creator], sample1.creators
     end
 
-    first_updated_sample = Sample.all.first
+    samples = Sample.limit(2)
+
+    first_updated_sample = samples[0]
     assert_equal type_id1, first_updated_sample.sample_type.id
     assert_equal 'Alfred Marcus', first_updated_sample.title
     assert_equal 'Alfred Marcus', first_updated_sample.get_attribute_value('full name')
     assert_equal '22', first_updated_sample.get_attribute_value(:age)
     assert_nil first_updated_sample.get_attribute_value(:postcode)
     assert_equal '22.1', first_updated_sample.get_attribute_value(:weight)
-    # job should have been triggered
-    assert SampleTypeUpdateJob.new(sample1.sample_type, false).exists?
 
-
-    last_updated_sample = Sample.limit(2)[1]
-    last_updated_sample = Sample.find(last_updated_sample.id)
+    last_updated_sample = samples[1]
     assert_equal type_id2, last_updated_sample.sample_type.id
     assert_equal 'David Tailor', last_updated_sample.title
     assert_equal 'David Tailor', last_updated_sample.get_attribute_value('full name')
     assert_equal '33', last_updated_sample.get_attribute_value(:age)
     assert_nil last_updated_sample.get_attribute_value(:postcode)
     assert_equal '33.1', last_updated_sample.get_attribute_value(:weight)
-    # job should have been triggered
-    assert SampleTypeUpdateJob.new(sample2.sample_type, false).exists?
   end
 
   test 'batch_delete' do
@@ -1019,9 +1015,6 @@ class SamplesControllerTest < ActionController::TestCase
     assert_difference('Sample.count', -2) do
       delete :batch_delete, params: { data: [ {id: sample1.id}, {id: sample2.id}] }
     end
-    # job should have been triggered
-    assert SampleTypeUpdateJob.new(type1, false).exists?
-    assert SampleTypeUpdateJob.new(type2, false).exists?
   end
 
 
