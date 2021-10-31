@@ -690,6 +690,16 @@ class HomesControllerTest < ActionController::TestCase
     assert_select 'div#home_features', count: 0 
     assert_select 'div#home_who_uses', count: 0 
     assert_select 'div#home_integrations', count: 0
+
+    ### disabling tags removes tag cloud within explore project
+    with_config_value :home_explore_projects, true do
+      get :index
+      assert_select 'div#home_explore_projects_tag_cloud', count: 1
+      with_config_value :tagging_enabled, false do
+        get :index
+        assert_select 'div#home_explore_projects_tag_cloud', count: 0
+      end
+    end
   end
 
   test 'show about options' do

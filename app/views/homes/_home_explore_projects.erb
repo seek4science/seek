@@ -6,8 +6,8 @@
     <div class="col-md-6">
       <%= panel('Find content', body_options: { id: 'find_content', class: '',}) do %>
         <% if Seek::Config.tagging_enabled %>
-          <div id="sidebar_tag_cloud">
-            <% cache 'sidebar_tag_cloud', skip_digest: true do -%>
+          <div id="home_explore_projects_tag_cloud">
+            <% cache 'home_explore_projects_tag_cloud', skip_digest: true do -%>
                 <%= render :partial=>"gadgets/tag_cloud_gadget_home" %>
             <% end -%>
           </div>
