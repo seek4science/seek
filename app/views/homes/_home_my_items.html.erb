@@ -2,8 +2,8 @@
   <% current_person = current_user.person %>
   <% current_person_projects = current_person.projects %>
   <h2 class="text-center"><a href="<%=person_path(current_person)%>/items">My <%= Seek::Config.project_name %> </a> </h2>
-  <div class="row" style="display: flex;flex-wrap: wrap;">
-    <div class="col-md-6" style="border-right: 2px solid #ccc;">
+  <div class="row">
+    <div class="col-sm-6" style="border-right: 2px solid #ccc;">
       <% if Seek::Config.programmes_enabled && can_create_programmes?%>
         <% current_person_programmes = current_person.programmes %>
         <h3>My Programmes</h3>
@@ -43,7 +43,7 @@
           <% end %>
       </ul>
     </div>
-    <div class="col-md-6">
+    <div class="col-sm-6">
       <%= render :partial=>"home_my_recent" -%>
     </div>
   </div>
