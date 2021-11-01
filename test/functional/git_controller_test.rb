@@ -342,4 +342,28 @@ class GitControllerTest < ActionController::TestCase
     assert_equal 'Invalid path: /////', flash[:error]
     assert_equal commit, assigns(:git_version).commit
   end
+
+  test 'add remote file' do
+    refute @git_version.file_exists?('new-file.txt')
+
+    post :add_file, params: { workflow_id: @workflow.id, version: @git_version.version,
+                              file: { path: 'new-file.txt',
+                                      url: 'https://internets.com/files/new.txt' } }
+
+    assert_redirected_to workflow_path(@workflow, anchor: 'files')
+    assert assigns(:git_version).file_exists?('new-file.txt')
+    assert_equal '', assigns(:git_version).file_contents('new-file.txt')
+  end
+
+  test 'do not add remote file with bad URL' do
+    refute @git_version.file_exists?('new-file.txt')
+
+    post :add_file, params: { workflow_id: @workflow.id, version: @git_version.version,
+                              file: { path: 'new-file.txt',
+                                      url: '😂' } }
+
+    assert_redirected_to workflow_path(@workflow, anchor: 'files')
+    assert_equal 'URL (😂) must be a valid, accessible remote URL', flash[:error]
+    refute assigns(:git_version).file_exists?('new-file.txt')
+  end
 end
