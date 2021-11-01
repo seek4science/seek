@@ -125,7 +125,7 @@ namespace :seek do
     puts "... Setting version visibility..."
     disable_authorization_checks do
       [DataFile::Version, Document::Version, Model::Version, Node::Version, Presentation::Version, Sop::Version, Workflow::Version].each do |klass|
-        scope = klass.where(visibility: nil)
+        scope = klass.where(visibility: nil).where.not(parent:nil)
         count = scope.count
         if count == 0
           puts "  No #{klass.name} with unset visibility found, skipping"
