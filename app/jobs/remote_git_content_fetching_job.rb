@@ -1,7 +1,7 @@
 class RemoteGitContentFetchingJob < ApplicationJob
   queue_as QueueNames::REMOTE_CONTENT
 
-  retry_on Seek::DownloadHandling::BadResponseCodeException, wait: 15.seconds, attempts: 3
+  retry_on Seek::DownloadHandling::BadResponseCodeException, wait: 1.minute, attempts: 3
 
   def perform(git_version, path, url)
     handler = ContentBlob.remote_content_handler_for(url)
