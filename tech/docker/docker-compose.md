@@ -80,7 +80,7 @@ The following gives an example of a basic procedure, but we recommend you read [
 and to restore into new volumes:
         
     docker-compose down
-    docker volume rm seek-filestore # this and the next step only necessary if you want to recreate existing volumes
+    docker volume rm seek-filestore 
     docker volume rm seek-mysql-db     
     docker volume create --name=seek-filestore
     docker volume create --name=seek-mysql-db
@@ -89,7 +89,9 @@ and to restore into new volumes:
     docker run --rm --volumes-from seek-mysql -v $(pwd):/backup ubuntu bash -c "tar xfv /backup/seek-mysql-db.tar"
     docker-compose up -d        
     
-Note that the cache and solr index don't need backing up. Once up and running, if necessary the solr index can be regenerated with:
+**Note** that when rolling back a version, for example from an unsuccessful upgrade, it is particularly important to remove and recreate the *seek-filestore* and *seek-mysql-db* volumes - otherwise additional files may be left around when the backup is restored over the top.
+
+The cache and solr index don't need backing up. Once up and running, if necessary the solr index can be regenerated with:
 
     docker exec seek bundle exec rake reindex:all
         
