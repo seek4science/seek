@@ -1,15 +1,5 @@
-<% integrations_content = YAML.load(File.read(File.join(Rails.root, 'config/home', 'integrations.yml'))) %>
-
-<div class="panel panel-default" id="home_integrations" style="padding: 20px;">
+<div class="panel panel-default" id="home_integrations">
   <h2 class="text-center">Integrations</h2>
-  <div class="row seek-homepage-button-container" style="display: flex;align-items: center;">
-    <% integrations_content.each do |item| %>
-      <div class="col-sm-<%= (12/integrations_content.length).floor %> text-center">
-        <a class="image-link" target="_blank" href="<%= item['url'] %>">
-          <img src='<%= item['logo'] %>' style="width:40%" alt='<%= item['title'] %>'>
-        </a>
-      </div>
-    <% end %>
-  </div>
+  <img src='/assets/front_page/integrations.svg' alt='Integrations' style="width: 100%;padding: 20px;">
 </div>
 
