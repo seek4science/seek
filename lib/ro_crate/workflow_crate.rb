@@ -3,10 +3,10 @@ require 'ro_crate'
 module ROCrate
   class WorkflowCrate < ::ROCrate::Crate
     PROFILE = {
-      '@id': 'https://about.workflowhub.eu/Workflow-RO-Crate/',
-      '@type': 'CreativeWork',
-      'name': 'Workflow RO-Crate Profile',
-      'version': '0.2.0'
+      '@id' => 'https://about.workflowhub.eu/Workflow-RO-Crate/',
+      '@type' => 'CreativeWork',
+      'name' => 'Workflow RO-Crate Profile',
+      'version' => '0.2.0'
     }.freeze
 
     include ActiveModel::Model
