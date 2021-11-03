@@ -15,7 +15,7 @@ If you have any comments or feedback about a release, then please [Contact Us](/
 
 Release date: _3rd November 2021_
 
-A small update to fix a possible upgrade issue (see [https://github.com/seek4science/seek/issues/770](https://github.com/seek4science/seek/issues/770)
+A small update to fix a possible upgrade issue (see [https://github.com/seek4science/seek/issues/770](https://github.com/seek4science/seek/issues/770))
 
 For a full list, see [closed issues for 1.11.3](https://github.com/seek4science/seek/milestone/8?closed=1)
 
