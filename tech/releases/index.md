@@ -11,6 +11,14 @@ Please see [Getting FAIRDOM-SEEK](/get-seek.html) for details about installing S
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html)
 
+## Version 1.11.3
+
+Release date: _3rd November 2021_
+
+A small update to fix a possible upgrade issue (see [https://github.com/seek4science/seek/issues/770](https://github.com/seek4science/seek/issues/770)
+
+For a full list, see [closed issues for 1.11.3](https://github.com/seek4science/seek/milestone/8?closed=1)
+
 ## Version 1.11.2
 
 Release date: _6th October 2021_
