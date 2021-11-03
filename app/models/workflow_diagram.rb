@@ -38,7 +38,6 @@ class WorkflowDiagram
 
   def to_crate_entity(crate, type: ::ROCrate::WorkflowDiagram, properties: {})
     type.new(crate, path, filename).tap do |entity|
-      entity['url'] = url if url.present?
       entity['contentSize'] = size
       entity.properties = entity.raw_properties.merge(properties)
     end
