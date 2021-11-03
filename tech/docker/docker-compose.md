@@ -93,7 +93,7 @@ and to restore into new volumes:
 
 The cache and solr index don't need backing up. Once up and running, if necessary the solr index can be regenerated with:
 
-    docker exec seek bundle exec rake reindex:all
+    docker exec seek bundle exec rake seek:reindex_all
         
 ## Upgrading between versions    
 
