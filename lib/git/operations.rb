@@ -27,12 +27,12 @@ module Git
     end
 
     def get_blob(path)
-      return nil unless commit
+      return nil unless commit && path.present?
       tree.get_blob(path)
     end
 
     def get_tree(path)
-      return nil unless commit
+      return nil unless commit && path.present?
       tree.get_tree(path)
     end
 
