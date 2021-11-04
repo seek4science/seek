@@ -85,6 +85,13 @@
                                Below is an example.", :rows => 30) %>
   </div>
 
+  <%= admin_text_setting(:funding_link, Seek::Config.funding_link,
+                        "Funding link", "Optional external link providing funding information (shown in footer)",:placeholder=>"http://use-full-URLs.com") %>
+
+  <h2>Information links</h2>
+
+  <p> These options will be shown under "About" in the navigation bar </p>
+
   <%= admin_checkbox_setting(:about_page_enabled, 1, Seek::Config.about_page_enabled,
                              '"About" page enabled', 'Add a custom "About" page link to the Help menu where users can find out more information about this SEEK instance.',
                              :onchange => toggle_appear_javascript('about_page_details')) %>
@@ -94,6 +101,16 @@
                                nil, "Here you can specify content for your instance's \"About\" page. You can input basic html tags and formats.
                                Below is an example.", :rows => 30) %>
   </div>
+
+
+  <%= admin_text_setting(:about_link, Seek::Config.about_link,
+                        "About link", "Optional external link providing additional information.",:placeholder=>"http://use-full-URLs.com") %>
+
+  <%= admin_text_setting(:cite_link, Seek::Config.cite_link,
+                        "Cite link", "Optional external link providing instructions on how to cite you. (shown in footer as well)",:placeholder=>"http://use-full-URLs.com") %>
+
+  <%= admin_text_setting(:contact_link, Seek::Config.contact_link,
+                        "Contact link", "Optional external link providing contact information. (shown in footer as well)",:placeholder=>"http://use-full-URLs.com") %>
 
   <%= submit_tag "Update", data: {disable_with: 'Updating...'}, :class => 'btn btn-primary' -%> or
   <%= cancel_button admin_path %>

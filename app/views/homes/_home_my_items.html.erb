@@ -1,0 +1,50 @@
+<div class="panel panel-default" id="home_my_items" style="padding: 20px;height:100%;">
+  <% current_person = current_user.person %>
+  <% current_person_projects = current_person.projects %>
+  <h2 class="text-center"><a href="<%=person_path(current_person)%>/items">My <%= Seek::Config.project_name %> </a> </h2>
+  <div class="row">
+    <div class="col-sm-6" style="border-right: 2px solid #ccc;">
+      <% if Seek::Config.programmes_enabled && can_create_programmes?%>
+        <% current_person_programmes = current_person.programmes %>
+        <h3>My Programmes</h3>
+        <% if current_person_programmes.length == 0 %>
+          <p>You have not created any programmes yet</p>
+        <% end %>
+        <ul>
+          <% for programme in current_person_programmes %>
+            <li><a href="/programmes/<%=programme.id%>"><%= programme.title %> </a></li>
+          <% end %>
+        </ul>
+      <% end %>
+      <h3>My Projects</h3>
+        <% if current_person_projects.length == 0 %>
+          <p>You have not created any projects yet</p>
+        <% end %>
+        <ul>
+          <% projectCount = 0%>
+          <% for project in current_person_projects.reverse() %>
+            <% if current_person.is_project_administrator?(project) && projectCount < 5 %>
+              <% projectCount += 1%>
+              <li><a href="/projects/<%=project.id%>"><%= project.title %> </a></li>
+            <% end %>
+          <% end %>
+          <% if current_person_projects.length() > 5 %>
+            <li><a href="<%=person_path(current_person)%>/items#projects">...</a></li>
+          <% end %>
+        </ul>
+      <h3> Other projects I am a member of</h3>
+      <ul>      
+        <% projectCount = 0%>
+          <% for project in current_person_projects.reverse() %>
+            <% if !current_person.is_project_administrator?(project) && projectCount < 5 %>
+              <% projectCount += 1%>
+              <li><a href="/projects/<%=project.id%>"><%= project.title %> </a></li>
+            <% end %>
+          <% end %>
+      </ul>
+    </div>
+    <div class="col-sm-6">
+      <%= render :partial=>"home_my_recent" -%>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,64 @@
+<script>
+  $j(document).ready(function () {
+    const distance = 200;
+
+    $j('#carousel-right').click(function () {
+      document.getElementById('carousel-control').scrollBy({ 
+        left: distance, 
+        behavior: 'smooth' 
+      });
+    });
+
+    $j('#carousel-left').click(function () {
+      document.getElementById('carousel-control').scrollBy({ 
+        left: -distance, 
+        behavior: 'smooth' 
+      });
+    });
+  });
+</script>
+
+<%# Only display the carousel if there is content %>
+<% if !Seek::Config.home_carousel.blank? %>
+  <%= panel("Who is using it?", id: 'home_who_uses', body_options: { class: '' }) do %>
+    <div id="home_who_uses_carousel" class="carousel slide" data-ride="carousel">
+      <!-- Indicators: removed indicators as to not obstruct the text -->
+      <!--<ol class="carousel-indicators">-->
+      <!--  <% Seek::Config.home_carousel.each_with_index  do |carousel_item, index| %>-->
+      <!--    <li data-target="#home_who_uses_carousel" data-slide-to="<%=index%>" <%= 'class="active"' if index==0 %>></li>-->
+      <!--  <% end %>-->
+      <!--</ol>-->
+
+      <!-- Wrapper for slides -->
+      <div class="carousel-inner" role="listbox">
+
+        <% Seek::Config.home_carousel.each_with_index do |carousel_item, index| -%>
+          <div class="item <%= 'active' if index==0 %>" style="text-align: center;">
+            <div class="carousel-logo">
+              <a href="<%= carousel_item[:url] %>">
+                <img src="<%= Avatar.find(carousel_item[:image]).public_asset_url %>"
+                  alt="<%= carousel_item[:title] %> logo"
+                  class="<%=index%>"
+                  style="width:auto;height:100px;">
+              </a>
+            </div>
+            <h3 class="carousel-title"> <%= carousel_item[:title] %> </h3>
+            <p class="carousel-description" style="font-size: larger;"> <%= carousel_item[:description] %> </p>
+            <i class="carousel-author"> <%= carousel_item[:author] %> </i>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Controls -->
+      <a class="left carousel-control" href="#home_who_uses_carousel" role="button" data-slide="prev" style="background-image: none; color:black;"
+  }>
+        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </a>
+      <a class="right carousel-control" href="#home_who_uses_carousel" role="button" data-slide="next" style="background-image: none; color:black;">
+        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
+    </div>
+  <% end %>
+<% end %>

@@ -120,6 +120,12 @@ def load_seek_config_defaults!
   Settings.defaults[:about_page_enabled]= false
   Seek::Config.default :about_page, File.read(Rails.root.join('config/default_data/about_page_example'))
 
+  Seek::Config.default :about_link, ''
+  Seek::Config.default :cite_link, ''
+  Seek::Config.default :contact_link, ''
+
+  Seek::Config.default :funding_link, ''
+  
   #Terms and conditions page
   Settings.defaults[:terms_enabled]= false
   Seek::Config.default :terms_page, File.read(Rails.root.join('config/default_data/terms_and_conditions_example'))
@@ -204,6 +210,15 @@ def load_seek_config_defaults!
   Seek::Config.default :front_page_buttons_enabled, false
   Seek::Config.default :tag_cloud_enabled,true
   Seek::Config.default :workflow_class_list_enabled,false
+
+  # Home page panel settings
+  Seek::Config.default :home_show_features,true
+  Seek::Config.default :home_show_quickstart,true
+  Seek::Config.default :home_show_my_items,true
+  Seek::Config.default :home_show_who_uses,true
+  Seek::Config.default :home_explore_projects,true
+  Seek::Config.default :home_show_integrations,true
+  Seek::Config.default :home_carousel,[]
 
   # omniauth settings and behaviour
   Seek::Config.default :omniauth_enabled, false
