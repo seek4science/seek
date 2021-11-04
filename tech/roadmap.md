@@ -14,19 +14,27 @@ They are expected to be added to FAIRDOM-SEEK in roughly the order they are pres
 
 | Feature | Milestone date |
 | --- | --- |
-| Collections - grouping assets together under a topic or theme | Summer 2021 |
-| Sample and Sample Type API | Summer 2021 |
-| Project folders, to help organise files outside of the ISA structure | Summer 2021 |
-| UI for creating Custom Metadata Extensions | Summer 2021 |
-| Backend storage changes with better versioning support | Autumn 2021 |
-| Better support for GitHub | Autumn 2021 |
-| Support for Datasets containing multiple files organised into folders | Autumn 2021 |
-| API support for creating new versions | Autumn 2021 |
+| Collections - grouping assets together under a topic or theme | Autumn 2021 |
+| A new customizable front page | Autumn 2021 |
+| Improvements to defining authors and creators, and their order | Autumn 2021 |
+| Explicit ordering of items within ISA | Autumn 2021 |
+| Better and easier definition of institutions, integrating the Research Organization Registry (ROR) | Winter 2022 |
+| License improvements, using SPDX | Winter 2022 |
+| Project folders, to help organise files outside of the ISA structure | Winter 2022 |
+| UI for creating Custom Metadata Extensions | Winter 2022 |
+| Describing Observed Variables within MIAPPE | Winter 2022 |
+| Backend storage changes with better versioning support | Winter 2022 |
+| Better support for GitHub | Winter 2022 |
+| Support for Datasets containing multiple files organised into folders | Winter 2022 |
+| API support for creating new versions | Spring 2022 |
+| ISA improvements, with a single page for creating and managing them | 2022 |
+| Deposition to repositories, such as ENA | 2022 |
+| Integration with other file storage systems, e.g. Dropbox, Google Drive, Nextflow | 2022 |
 
 <br/>
 
 Please also see the [Workflow Hub Roadmap](https://about.workflowhub.eu/roadmap/), 
-which is being built upon and in conjuction with FAIRDOM-SEEK.
+which is being built on and in conjunction with FAIRDOM-SEEK.
 
 
 
@@ -42,6 +50,7 @@ You can find more details about each release in our [Change Logs](/tech/releases
 
 | Feature | SEEK version |
 | --- | --- | 
+| Sample and Sample Type API | 1.11.2 |
 | Generic Custom Metadata fields | 1.11.0  |
 | Extended Studies with extended metadata, supporting MIAPPE | 1.11.0 |
 | Ontology based metadata attributes, for samples and custom metadata | 1.11.0 |
