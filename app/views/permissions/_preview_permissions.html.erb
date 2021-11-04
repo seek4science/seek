@@ -25,7 +25,7 @@
                   <% if send_request_publish_approval %>
                       An email will be sent to the <%= t('asset_gatekeeper').downcase.pluralize %> of the <%= t('project').pluralize -%> associated with this <%= t(resource_name) -%> to ask for publishing approval. This <%= t(resource_name) -%> will not be published until one of the <%= t('asset_gatekeeper').downcase.pluralize %> has granted approval.
                   <% else %>
-                      You requested the publishing approval from the <%= t('asset_gatekeeper').downcase.pluralize %> of the <%= t('project').pluralize -%> associated with this <%= t(resource_name) -%>, and it is waiting for the decision. This <%= t(resource_name) -%> will not be published until one of the <%= t('asset_gatekeeper').downcase.pluralize %> has granted approval.
+                      You requested the publishing approval from one of the <%= t('asset_gatekeeper').downcase.pluralize %> of the <%= t('project').pluralize -%> associated with this <%= t(resource_name) -%>, and it is waiting for the decision. This <%= t(resource_name) -%> will not be published until one of the <%= t('asset_gatekeeper').downcase.pluralize %> has granted approval.
                   <% end %>
                 </div>
             <% end %>
