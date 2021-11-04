@@ -74,7 +74,7 @@ class PoliciesControllerTest < ActionController::TestCase
     ResourcePublishLog.add_log ResourcePublishLog::WAITING_FOR_APPROVAL, sop
     post :preview_permissions, params: { policy_attributes: { access_type: Policy::VISIBLE }, resource_name: 'sop', resource_id: sop.id, project_ids: gatekeeper.projects.first.id.to_s }
 
-    assert_select '#preview_permissions div.alert', text: "You requested the publishing approval from the asset gatekeepers of the #{I18n.t('project').pluralize} associated with this #{I18n.t('sop')}, and it is waiting for the decision. This #{I18n.t('sop')} will not be published until one of the asset gatekeepers has granted approval.", count: 1
+    assert_select '#preview_permissions div.alert', text: "You requested the publishing approval from one of the asset gatekeepers of the #{I18n.t('project').pluralize} associated with this #{I18n.t('sop')}, and it is waiting for the decision. This #{I18n.t('sop')} will not be published until one of the asset gatekeepers has granted approval.", count: 1
   end
 
   test 'should not show notice message when an item can be published right away' do
