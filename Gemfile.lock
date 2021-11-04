@@ -470,7 +470,7 @@ GEM
       slop (~> 3.0)
     psych (2.2.4)
     public_suffix (4.0.6)
-    puma (5.5.1)
+    puma (4.3.10)
       nio4r (~> 2.0)
     pyu-ruby-sasl (0.0.3.3)
     racc (1.5.2)
@@ -878,7 +878,7 @@ DEPENDENCIES
   pry-doc
   pry-remote
   psych
-  puma (>= 3.12.6)
+  puma (~> 4.3)
   rack-attack (~> 5.0.1)
   rails (~> 5.2.4.0)
   rails-controller-testing
