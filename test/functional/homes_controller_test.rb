@@ -307,8 +307,6 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_select 'div#recently_added ul>li>a[href=?]', investigation_snapshot_path(snapshot1.resource, snapshot1), text: /inv with snap/
-    # recently_downloaded was removed from newer landing page version
-    # assert_select 'div#recently_downloaded ul>li>a[href=?]', assay_snapshot_path(snapshot2.resource, snapshot2), text: /assay with snap/
   end
 
   test 'should show headline announcement' do
