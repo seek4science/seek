@@ -27,4 +27,37 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
     assert cwl
     assert_equal cwl, crate.main_workflow_cwl
   end
+
+  test 'include remotes in generated Workflow RO-Crate' do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/little_file.txt", 'http://internet.internet/file'
+
+    workflow = Factory(:local_git_workflow)
+
+    v = workflow.git_version
+    assert v.mutable?
+    assert_empty v.remote_sources
+
+    assert_difference('Git::Annotation.count', 2) do
+      assert_enqueued_jobs(1, only: RemoteGitContentFetchingJob) do
+        v.add_remote_file('blah.txt', 'http://internet.internet/file')
+        v.add_remote_file('blah2.txt', 'http://internet.internet/another_file', fetch: false)
+      end
+    end
+
+    RemoteGitContentFetchingJob.perform_now(v, 'blah.txt', 'http://internet.internet/file')
+
+    assert_equal 'http://internet.internet/file', v.remote_sources['blah.txt']
+    assert_equal 'http://internet.internet/another_file', v.remote_sources['blah2.txt']
+    assert_equal 11, v.get_blob('blah.txt').size
+    assert_equal 0, v.get_blob('blah2.txt').size
+
+    zip = workflow.ro_crate_zip
+
+    crate = ROCrate::WorkflowCrateReader.read_zip(zip)
+    remote1 = crate.get('http://internet.internet/file')
+    assert remote1.is_a?(::ROCrate::File)
+
+    remote1 = crate.get('http://internet.internet/another_file')
+    assert remote1.is_a?(::ROCrate::File)
+  end
 end

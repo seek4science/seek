@@ -82,9 +82,12 @@ module WorkflowExtraction
 
   def populate_ro_crate(crate)
     if is_git_versioned?
+      remotes = git_version.remote_sources
       crate.main_workflow = main_workflow_blob.to_crate_entity(crate, type: ROCrate::Workflow)
+      remotes.delete(main_workflow_blob.path)
       d = diagram_blob
       if d
+        remotes.delete(d.path)
         crate.main_workflow.diagram = d.to_crate_entity(crate, type: ROCrate::WorkflowDiagram)
       else # Was the diagram generated?
         begin
@@ -97,7 +100,11 @@ module WorkflowExtraction
       end
       c = abstract_cwl_blob
       if c
+        remotes.delete(c.path)
         crate.main_workflow.cwl_description = c.to_crate_entity(crate, type: ROCrate::WorkflowDescription)
+      end
+      remotes.each do |path, url|
+        crate.add_external_file(url)
       end
     else
       unless crate.main_workflow
