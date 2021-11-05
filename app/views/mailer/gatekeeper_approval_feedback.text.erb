@@ -1,6 +1,6 @@
 Hi <%= @requester.name -%>,
 
-    Upon your publishing requests, the <%= Seek::Config.application_name %> Gatekeeper <%= @gatekeeper.name -%>, <%= person_url(@gatekeeper) -%> approved to publish:
+    Upon your publishing requests, the <%= Seek::Config.application_name %> <%= t('asset_gatekeeper').downcase -%> <%= @gatekeeper.name -%>, <%= person_url(@gatekeeper) -%> approved to publish:
     <% @items_and_comments.each do |item_and_comment| %>
         <% item = item_and_comment[:item] %>
         <% controller=item.class.name.underscore.pluralize -%>

@@ -53,6 +53,35 @@ class SampleCUDTest < ActionDispatch::IntegrationTest
     assert_equal 44, sample.get_attribute_value("age")
   end
 
+  test 'patching a couple of attributes retains others including capitals' do
+    admin_login
+    User.current_user = @current_user
+    sample = Factory(:max_sample, contributor: @current_person, policy: Factory(:public_policy))
+    params = {
+      "data": {
+        "type": "samples",
+        "id": "#{sample.id}",
+        "attributes": {
+          "attribute_map": {
+            "full_name": "Jack Frost",
+            'CAPITAL key': 'some value',
+            "postcode": "Z50 8GG"
+          }
+        }
+      }
+    }.to_json
+    assert_no_difference('Sample.count') do
+      patch sample_path(sample.id, format: :json), params: params,headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+    end
+
+    assert_response :success
+    sample = Sample.find(sample.id)
+    assert_equal "Jack Frost", sample.get_attribute_value("full_name")
+    assert_equal "Z50 8GG", sample.get_attribute_value("postcode")
+    assert_equal 'HD', sample.get_attribute_value("address")
+    assert_equal "some value", sample.get_attribute_value("CAPITAL key")
+  end
+
   test 'set sample_type and attributes in post' do
     admin_login
     patient_sample_type = Factory(:patient_sample_type)
