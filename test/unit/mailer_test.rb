@@ -122,7 +122,7 @@ class MailerTest < ActionMailer::TestCase
     item = Factory(:data_file, projects: gatekeeper.projects, title: 'Picture', contributor:person)
     items_and_comments = [{ item: item, comment: nil }]
     requester = Factory(:person, first_name: 'Aaron', last_name: 'Spiggle')
-    @expected.subject = 'A Sysmo SEEK gatekeeper approved your publishing requests.'
+    @expected.subject = "A Sysmo SEEK #{I18n.t('asset_gatekeeper').downcase} approved your publishing requests."
 
     @expected.to = requester.email_with_name
     @expected.from = 'no-reply@sysmo-db.org'
@@ -132,6 +132,7 @@ class MailerTest < ActionMailer::TestCase
     expected_text = encode_mail(@expected)
     expected_text.gsub!('-person_id-', gatekeeper.id.to_s)
     expected_text.gsub!('-df_id-', item.id.to_s)
+    expected_text.gsub!('-asset_gatekeeper-', I18n.t('asset_gatekeeper').downcase)
 
     assert_equal expected_text, encode_mail(Mailer.gatekeeper_approval_feedback(requester, gatekeeper, items_and_comments))
   end
@@ -143,7 +144,7 @@ class MailerTest < ActionMailer::TestCase
     items_and_comments = [{ item: item, comment: 'not ready' }]
 
     requester = Factory(:person, first_name: 'Aaron', last_name: 'Spiggle')
-    @expected.subject = 'A Sysmo SEEK gatekeeper rejected your publishing requests.'
+    @expected.subject = "A Sysmo SEEK #{I18n.t('asset_gatekeeper').downcase} rejected your publishing requests."
 
     @expected.to = requester.email_with_name
     @expected.from = 'no-reply@sysmo-db.org'
@@ -154,6 +155,7 @@ class MailerTest < ActionMailer::TestCase
     expected_text = encode_mail(@expected)
     expected_text.gsub!('-person_id-', gatekeeper.id.to_s)
     expected_text.gsub!('-df_id-', item.id.to_s)
+    expected_text.gsub!('-asset_gatekeeper-', I18n.t('asset_gatekeeper').downcase)
 
     assert_equal expected_text, encode_mail(Mailer.gatekeeper_reject_feedback(requester, gatekeeper, items_and_comments))
   end
