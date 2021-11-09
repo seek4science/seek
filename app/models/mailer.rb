@@ -278,7 +278,7 @@ class Mailer < ActionMailer::Base
 
     mail(from: Seek::Config.noreply_sender,
          to: requester.email_with_name,
-         subject: "A #{Seek::Config.application_name} gatekeeper #{response} your publishing requests.",
+         subject: "A #{Seek::Config.application_name} #{I18n.t('asset_gatekeeper').downcase} #{response} your publishing requests.",
          reply_to: gatekeeper.email_with_name)
   end
 
