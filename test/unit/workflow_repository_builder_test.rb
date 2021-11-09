@@ -88,7 +88,7 @@ class WorkflowRepositoryBuilderTest < ActiveSupport::TestCase
     workflow = builder.build
     crate = workflow.ro_crate
 
-    assert_equal 17, crate.entities.count
+    assert_equal 18, crate.entities.count
     assert crate.get("ro-crate-metadata.json").is_a?(ROCrate::Metadata)
     assert crate.get("ro-crate-preview.html").is_a?(ROCrate::Preview)
     assert crate.get("./").is_a?(ROCrate::WorkflowCrate)
@@ -98,5 +98,6 @@ class WorkflowRepositoryBuilderTest < ActiveSupport::TestCase
     assert crate.get("#galaxy").is_a?(ROCrate::ContextualEntity)
     assert crate.get("#cwl").is_a?(ROCrate::ContextualEntity)
     assert 9, crate.entities.select { |e| e.type == 'FormalParameter' }.count
+    assert crate.get(ROCrate::WorkflowCrate::PROFILE['@id']).is_a?(ROCrate::ContextualEntity)
   end
 end

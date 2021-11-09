@@ -325,6 +325,15 @@ module Ga4gh
           assert_equal 'PRIMARY_DESCRIPTOR', galaxy['file_type']
           refute diagram
         end
+
+        test 'should work with snakemake' do
+          workflow = Factory(:workflow, workflow_class: Factory(:unextractable_workflow_class, key: 'snakemake', title: 'Snakemake'), policy: Factory(:public_policy))
+
+          get :files, params: { id: workflow.id, version_id: 1, type: 'SMK' }
+
+          assert_response :success
+        end
+
       end
     end
   end
