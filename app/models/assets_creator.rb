@@ -3,6 +3,10 @@ class AssetsCreator < ApplicationRecord
   belongs_to :creator, class_name: 'Person', optional: true
   alias_method :person, :creator
 
+  validates :creator_id, uniqueness: { scope: [:asset_type, :asset_id], allow_blank: true }
+  validates :orcid, uniqueness: { scope: [:asset_type, :asset_id], allow_blank: true }
+  validates :family_name, uniqueness: { scope: [:asset_type, :asset_id, :given_name, :affiliation], allow_blank: true }
+
   include Seek::Rdf::ReactToAssociatedChange
   include Seek::OrcidSupport
   include Seek::BioSchema::Support

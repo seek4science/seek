@@ -160,6 +160,7 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.12.2)
+    commonmarker (0.23.2)
     concurrent-ruby (1.1.9)
     connection_pool (2.2.3)
     countries (2.1.4)
@@ -594,7 +595,6 @@ GEM
     rdoc (6.3.1)
     recaptcha (4.1.0)
       json
-    redcarpet (3.5.1)
     regexp_parser (2.0.0)
     request-log-analyzer (1.13.4)
     request_store (1.4.1)
@@ -820,6 +820,7 @@ DEPENDENCIES
   citeproc (~> 1.0.4)
   citeproc-ruby (~> 1.1.4)
   coffee-rails (~> 4.2)
+  commonmarker
   convert_office!
   country_select
   csl-styles (~> 1.0.1.11)
@@ -891,7 +892,6 @@ DEPENDENCIES
   rdf-virtuoso (>= 0.2.0)
   rdoc
   recaptcha (~> 4.1.0)
-  redcarpet
   request-log-analyzer
   request_store
   responders

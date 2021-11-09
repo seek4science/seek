@@ -49,7 +49,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@id' => "http://localhost:3000/people/#{@person.id}",
       '@type' => 'Person',
-      'dct:conformsTo' => 'https://bioschemas.org/profiles/Person/0.2-DRAFT-2019_07_19/',
+      'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Person::PERSON_PROFILE,
       'name' => @person.name,
       'givenName' => @person.first_name,
       'familyName' => @person.last_name,
@@ -149,7 +149,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       end
       df
     end
-
+    
     df.reload
     assert_nil df.content_blob
 
@@ -176,8 +176,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'subjectOf' => [
         { '@type' => 'Event',
           '@id' => "http://localhost:3000/events/#{df.events.first.id}",
-          'name' => df.events.first.title }
-      ]
+          'name' => df.events.first.title }]
     }
 
     json = JSON.parse(df.to_schema_ld)
@@ -205,8 +204,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dct:conformsTo' => 'https://bioschemas.org/profiles/Dataset/0.3-RELEASE-2019_06_14/',
       'name' => df.title,
       'description' => df.description,
-      'keywords' => 'keyword',      
-      'version' => 1,	
+      'keywords' => 'keyword',
+      'version' => 1,      
       'creator' => [{ '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Blogs')}", 'name' => 'Blogs' }, { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Joe')}", 'name' => 'Joe' }],
       'url' => 'http://www.abc.com',
       'producer' => [{
@@ -288,7 +287,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     disable_authorization_checks { sample.save! }
 
     expected = {
-      '@context' => 'https://schema.org',
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => %w[Thing Sample],
       '@id' => "http://localhost:3000/samples/#{sample.id}",
       'dct:conformsTo' => 'https://bioschemas.org/profiles/Sample/0.2-RELEASE-2018_11_10/',
@@ -315,8 +314,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@id' => "http://localhost:3000/events/#{event.id}",
+      'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Event::EVENT_PROFILE,
       '@type' => 'Event',
-      'dct:conformsTo' => 'https://bioschemas.org/profiles/Event/0.2-DRAFT-2019_06_14/',
       'name' => 'A Maximal Event',
       'description' => 'All you ever wanted to know about headaches',
       'url' => "http://localhost:3000/events/#{event.id}",
@@ -352,7 +351,6 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateModified' => event.updated_at&.iso8601
     }
     json = JSON.parse(event.to_schema_ld)
-    expected.each { |k, v| assert_equal v, json[k] }
     assert_equal expected, json
   end
 
@@ -444,15 +442,15 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     expected_wf_prefix = workflow.title.downcase.gsub(/[^0-9a-z]/i, '_')
 
-    expected = { '@context' => 'https://schema.org',
+    expected = { '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
                  '@type' => %w[File SoftwareSourceCode ComputationalWorkflow],
                  '@id' => "http://localhost:3000/workflows/#{workflow.id}",
-                 'dct:conformsTo' => 'https://bioschemas.org/profiles/ComputationalWorkflow/1.0-RELEASE/',
+                 'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::WORKFLOW_PROFILE,
                  'description' => 'This is a test workflow for bioschema generation',
                  'name' => 'This workflow',
                  'url' => "http://localhost:3000/workflows/#{workflow.id}",
                  'keywords' => 'wibble',
-                 'license' => 'https://opensource.org/licenses/APSL-2.0',
+                 'license' => Seek::License.find('APSL-2.0')&.url,
                  'creator' =>
                     [{ '@type' => 'Person',
                        '@id' => "http://localhost:3000/people/#{@person.id}",
@@ -492,69 +490,70 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 		    'input' => [
                    { '@type' => 'FormalParameter',
                      '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.cofsfile",
-                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      'name' => '#main/input.cofsfile' },
                    { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.dmax",
                      'name' => '#main/input.dmax' },
                    { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.dmin",
                      'name' => '#main/input.dmin' },
                    { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.max-steps",
                      'name' => '#main/input.max-steps' },
                    { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.mwmax-cof",
                      'name' => '#main/input.mwmax-cof' },
                    { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.mwmax-source",
                      'name' => '#main/input.mwmax-source' },
                    { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.rulesfile",
                      'name' => '#main/input.rulesfile' },
                    { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.sinkfile",
                      'name' => '#main/input.sinkfile' },
                    { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.sourcefile",
                      'name' => '#main/input.sourcefile' },
                    { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.std_mode",
                      'name' => '#main/input.std_mode' },
                    { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.stereo_mode",
                      'name' => '#main/input.stereo_mode' },
                    { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.topx",
                      'name' => '#main/input.topx' }
                  ],
                  'output' => [
                    { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      '@id' => "\##{expected_wf_prefix}-outputs-\#main/solutionfile",
                      'name' => '#main/solutionfile' },
                    { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      '@id' => "\##{expected_wf_prefix}-outputs-\#main/sourceinsinkfile",
                      'name' => '#main/sourceinsinkfile' },
                    { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => 'https://bioschemas.org/profiles/FormalParameter/1.0-RELEASE/',
+                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
                      '@id' => "\##{expected_wf_prefix}-outputs-\#main/stdout",
                      'name' => '#main/stdout' }
                  ] }
 
     json = JSON.parse(workflow.to_schema_ld)
+    fine_json_comparison expected, json
     assert_equal expected, json
     check_version(workflow.latest_version, expected)
   end
@@ -822,7 +821,13 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     expected['@id'] += "?version=#{version.version}"
     expected['url'] += "?version=#{version.version}" if expected['url'].include?(Seek::Config.site_base_host)
     expected.delete('identifier') unless version.respond_to?(:doi) && version.doi.present?
-    expected.each { |k, v| assert_equal v, json[k] }
+    fine_json_comparison expected, json
     assert_equal expected, json
   end
+
+  def fine_json_comparison expected, json
+    expected.each { |k, v| assert_equal v, json[k], "mismatch with key #{k}" }
+    json.each { |k, v| assert_equal v, expected[k], "mismatch with key #{k}" }
+  end
+
 end

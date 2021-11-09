@@ -62,6 +62,27 @@ class EventTest < ActiveSupport::TestCase
     assert @event.save
   end
 
+  test 'validates and tests url' do
+    @event.url = nil
+    assert @event.valid?
+
+    @event.url = ''
+    assert @event.valid?
+
+    @event.url = 'fish'
+    refute @event.valid?
+
+    @event.url = 'http://google.com'
+    assert @event.valid?
+
+    @event.url = 'https://google.com'
+    assert @event.valid?
+
+    @event.url = '  http://google.com   '
+    assert @event.valid?
+    assert_equal 'http://google.com', @event.url
+  end
+
   test 'start date required' do
     @event.start_date = nil
     assert !@event.valid?
