@@ -18,7 +18,7 @@ module Ga4gh
           remote? ? uri&.to_s : nil
         end
 
-        def checksums
+        def checksum
           [] # [{ type: 'SHA-256', checksum: 'bla' }]
         end
       end
