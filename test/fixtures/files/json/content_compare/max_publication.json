@@ -16,6 +16,13 @@
           "url": "http://www.slack.com/"
         }
       ],
+      "misc_links":	[
+        {
+          "id": 67,
+          "label": "A link",
+          "url": "http://www.slack.com/"
+        }
+      ],
       "title": "A Maximal Publication",
       "license": null,
       "description": "Amazing insights into the mechanism of TF2",
