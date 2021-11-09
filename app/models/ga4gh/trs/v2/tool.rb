@@ -29,6 +29,10 @@ module Ga4gh
         def toolclass
           ToolClass::WORKFLOW
         end
+
+        def author
+          authors
+        end
       end
     end
   end

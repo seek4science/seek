@@ -58,6 +58,10 @@ module Ga4gh
 
           files
         end
+
+        def author
+          authors
+        end
       end
     end
   end
