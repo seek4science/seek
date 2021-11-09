@@ -1,0 +1,58 @@
+<div id="home_tag_cloud_home" style="padding: 20px;">
+  <h3>By tag:
+    <span style="font-size:smaller"><%= link_to "[show all]", all_anns_path -%></span></h3>
+ <% unless false -%>
+        <div class="tags_smaller">
+          <div class="hTagcloud">
+
+            <div class="popularity">
+              <%
+                 tag_cloud = TextValue.all_tags
+                 all_tags= tag_cloud.select { |tag| tag.tag_count>=Seek::Config.tag_threshold }
+                 show_tags= tag_cloud.sort { |a, b| b.tag_count<=>a.tag_count }[0...Seek::Config.max_visible_tags]
+                 hidden_tags=all_tags.size != show_tags.size
+              %>
+              <% unless all_tags.blank? -%>
+                  <% ann_cloud all_tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |tag, css_class| -%>
+                      <%
+                         hide_tag=!show_tags.include?(tag)
+                         tag_class="#{css_class}"
+                         tag_class << " merged_tag_hidden" if hide_tag
+                         style= hide_tag ? "display:none;" : ""  #has to be set as a style rather than in CSS for javascript to work
+                      %>
+                      <%= link_for_ann tag, :truncate_length=>40, :class => tag_class, :style=>"#{style}" -%>
+                  <% end -%>
+              <% end -%>
+
+              <% if hidden_tags -%>
+                  <div class="expand_collapse_tags_button">
+                    <% link_to image('expand'), '#', id: 'show-hidden-tags' %>
+                    <% link_to image('collapse'), '#', id: 'hide-hidden-tags', style: 'display: none' %>
+                  </div>
+              <% end -%>
+            </div>
+
+          </div>
+        </div>
+    <% else -%>
+        <p class="none_text">Tag cloud is disabled in development mode</p>
+    <% end -%>
+</div>
+
+<script>
+  $j('#show-hidden-tags').click(function () {
+      $j('.merged_tag_hidden').show();
+      $j('#show-hidden-tags').hide();
+      $j('#hide-hidden-tags').show();
+
+      return false;
+  });
+
+  $j('#hide-hidden-tags').click(function () {
+      $j('.merged_tag_hidden').hide();
+      $j('#show-hidden-tags').show();
+      $j('#hide-hidden-tags').hide();
+
+      return false;
+  });
+</script>

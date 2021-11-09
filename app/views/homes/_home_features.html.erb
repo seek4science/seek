@@ -1,0 +1,38 @@
+<div class="panel panel-default" id="home_features" style="border:none;">
+  <h2 class="text-center"><%= Seek::Config.project_name %>: The better way to manage your data</h2>
+  <h3 class="text-center">Free and open platform for easier research data management</h3>
+  <div class="row seek-homepage-button-container" style="padding-top:10px">
+    <div class="col-sm-3 text-center">
+      <img src='/assets/front_page/home_feature_organise.svg' style="height:125px;" alt="Organise & Structure">
+      <h3>Organise & Structure</h3>
+      <p>Organise documents and data to easily manage your research project</p>
+    </div>
+
+    <div class="col-sm-3 text-center">
+      <img src='/assets/front_page/home_feature_collaborate.svg' style="height:125px;" alt="Collaborate & Manage access">
+      <h3>Manage access</h3>
+      <p>There is a lot of flexibility and control over who can see, download or edit your items</p>
+    </div>
+
+    <div class="col-sm-3 text-center">
+      <img src='/assets/front_page/home_feature_standardise.svg' style="height:125px;" alt="Standardise research data">
+      <h3>Standardise research data</h3>
+      <p>Use available standards to describe your dataset and make it ready for publication</p>
+    </div>
+
+    <div class="col-sm-3 text-center">
+      <img src='/assets/front_page/home_feature_publish.svg' style="height:125px;" alt="Publish & Share data">
+      <h3>Publish & Share data</h3>
+      <p> Publish your data and link them to your scientific article</p>
+    </div>
+  </div>
+  <br>
+  <div class="row" style="position: relative;">
+    <div class="col-sm-6">
+      <a class="btn btn-primary btn-lg" style="position: absolute;bottom: 0;" target="_blank" href="https://seek4science.org/" role="button" aria-label="Left Align" style="white-space: normal;"> Learn more </a>        
+    </div>
+    <div class="col-sm-6 text-right">
+      <a class="btn btn-success btn-lg" style="position: absolute;bottom: 0;right: 16px;" href=<%=login_path(:return_to => params[:return_to] || request.original_fullpath) %> role="button" aria-label="Left Align" style="white-space: normal;"> Get started </a>       
+    </div>
+  </div>
+</div>

@@ -29,6 +29,11 @@
         [t('collection').pluralize, collections_path, Seek::Config.collections_enabled]
     ]) %>
 
+    <%= render_menu_group(t('menu.activities'), [
+      [t('presentation').pluralize, presentations_path, Seek::Config.presentations_enabled],
+      [t('event').pluralize, events_path, Seek::Config.events_enabled],
+    ]) %>
+
     <%= render_menu_group(t('menu.samples'), [
         [t('sample').pluralize, select_sample_types_path, Seek::Config.samples_enabled],
         [t('sample_type').pluralize, sample_types_path, Seek::Config.samples_enabled],

@@ -1,0 +1,25 @@
+<%
+  path_create_project = "/projects/guided_create"
+  path_join_project = "/projects/guided_join"
+%>
+<%= panel("Quick start", id: 'home_quick_start', body_options: { class: 'front-page-panel' }) do %>
+  <% if can_create_projects? %>
+    <div class="row" style="display: flex;align-items: center;">
+      <div class="col-sm-5 text-center">
+        <a class="btn btn-success" href="<%=path_create_project%>" role="button" aria-label="Left Align" style="white-space: normal;width:100%;"> Create project </a>
+      </div>
+      <div class="col-sm-7">
+        Create new project
+      </div>
+    </div>
+    <br>
+  <% end %>
+  <div class="row" style="display: flex;align-items: center;">
+    <div class="col-sm-5 text-center">
+      <a class="btn btn-success" href="<%=path_join_project%>" role="button" aria-label="Left Align" style="white-space: normal;width:100%;"> Join <br> project </a>       
+    </div>
+    <div class="col-sm-7">
+      Request membership of already existing project
+    </div>
+  </div>
+<% end %>

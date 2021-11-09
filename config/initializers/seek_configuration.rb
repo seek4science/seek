@@ -69,6 +69,8 @@ def load_seek_config_defaults!
   Seek::Config.default :programme_user_creation_enabled, false
   Seek::Config.default :programmes_open_for_projects_enabled, false
   Seek::Config.default :project_admin_sample_type_restriction, false #only project admins can create and edit sample types and controlled vocabs
+  Seek::Config.default :recommended_data_licenses,  ['CC-BY-4.0', 'CC0-1.0', 'CC-BY-NC-4.0', 'CC-BY-SA-4.0', 'ODC-BY-1.0']
+  Seek::Config.default :recommended_software_licenses, ['Apache-2.0','GPL-3.0','MIT','BSD-2-Clause','BSD-3-Clause','LGPL-2.1']
 
   # Types
   Seek::Config.default :documents_enabled,true
@@ -118,6 +120,12 @@ def load_seek_config_defaults!
   Settings.defaults[:about_page_enabled]= false
   Seek::Config.default :about_page, File.read(Rails.root.join('config/default_data/about_page_example'))
 
+  Seek::Config.default :about_link, ''
+  Seek::Config.default :cite_link, ''
+  Seek::Config.default :contact_link, ''
+
+  Seek::Config.default :funding_link, ''
+  
   #Terms and conditions page
   Settings.defaults[:terms_enabled]= false
   Seek::Config.default :terms_page, File.read(Rails.root.join('config/default_data/terms_and_conditions_example'))
@@ -202,6 +210,15 @@ def load_seek_config_defaults!
   Seek::Config.default :front_page_buttons_enabled, false
   Seek::Config.default :tag_cloud_enabled,true
   Seek::Config.default :workflow_class_list_enabled,false
+
+  # Home page panel settings
+  Seek::Config.default :home_show_features,true
+  Seek::Config.default :home_show_quickstart,true
+  Seek::Config.default :home_show_my_items,true
+  Seek::Config.default :home_show_who_uses,true
+  Seek::Config.default :home_explore_projects,true
+  Seek::Config.default :home_show_integrations,true
+  Seek::Config.default :home_carousel,[]
 
   # omniauth settings and behaviour
   Seek::Config.default :omniauth_enabled, false

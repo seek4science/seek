@@ -32,6 +32,6 @@ class SampleTypeSerializer < BaseSerializer
   end
 
   def get_sample_attribute_type(attribute)
-    JSON.parse(SampleAttributeTypeSerializer.new(attribute.sample_attribute_type).to_json)
+    SampleAttributeTypeSerializer.new(attribute.sample_attribute_type).to_h
   end
 end

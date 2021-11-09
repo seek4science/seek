@@ -94,5 +94,20 @@ class CustomMetadataAttributeTest < ActiveSupport::TestCase
     assert_equal 'fish pie', attribute.accessor_name
   end
 
+  test 'label defaults to humanized title' do
+    attribute = CustomMetadataAttribute.new title: 'fish_soup', sample_attribute_type: Factory(:datetime_sample_attribute_type)
+    assert_nil attribute[:label]
+    assert_equal 'Fish soup',attribute.label
+    attribute.label = "Apple pie"
+    assert_equal 'Apple pie',attribute.label
+    assert_equal 'fish_soup',attribute.title
+
+    attribute.label = nil
+    attribute.title = nil
+
+    assert_nil attribute.label
+
+  end
+
 
 end

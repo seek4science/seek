@@ -167,6 +167,15 @@ class AdminController < ApplicationController
     Seek::Config.home_description = params[:home_description]
 
     #    Seek::Config.front_page_buttons_enabled = params[:front_page_buttons_enabled]
+
+    Seek::Config.home_show_features = string_to_boolean params[:home_show_features]
+    Seek::Config.home_show_quickstart = string_to_boolean params[:home_show_quickstart]
+    Seek::Config.home_show_my_items = string_to_boolean params[:home_show_my_items]
+    Seek::Config.home_show_who_uses = string_to_boolean params[:home_show_who_uses]
+    Seek::Config.home_explore_projects = string_to_boolean params[:home_explore_projects]
+    Seek::Config.home_show_integrations = string_to_boolean params[:home_show_integrations]
+    add_carousel_form
+
     begin
       Seek::FeedReader.clear_cache
     rescue => e
@@ -216,6 +225,12 @@ class AdminController < ApplicationController
 
     Seek::Config.about_page_enabled = string_to_boolean params[:about_page_enabled]
     Seek::Config.about_page = params[:about_page]
+
+    Seek::Config.about_link = params[:about_link]
+    Seek::Config.cite_link = params[:cite_link]
+    Seek::Config.contact_link = params[:contact_link]
+
+    Seek::Config.funding_link = params[:funding_link]
 
     Seek::Config.terms_enabled = string_to_boolean params[:terms_enabled]
     Seek::Config.terms_page = params[:terms_page]
@@ -282,6 +297,8 @@ class AdminController < ApplicationController
     Seek::Config.orcid_required = string_to_boolean params[:orcid_required]
 
     Seek::Config.default_license = params[:default_license]
+    Seek::Config.recommended_data_licenses = params[:recommended_data_licenses]
+    Seek::Config.recommended_software_licenses = params[:recommended_software_licenses]
     update_flag = (pubmed_email == '' || pubmed_email_valid) && (crossref_email == '' || crossref_email_valid)
     update_redirect_to update_flag, 'settings'
   end
@@ -493,6 +510,50 @@ class AdminController < ApplicationController
         flash[:error] = 'There was an error updating the header image logo! There could be a problem with the image file. Please try again or try another image.'
       end
     end
+  end
+
+  def add_carousel_form
+    # Only add it if at least logo and title is given carousel inputs are filled
+    if (!params[:home_carousel_image].blank? && !params[:home_carousel_title].blank?)
+      file_io = params[:home_carousel_image]
+      avatar = Avatar.new(original_filename: file_io.original_filename, image_file: file_io, skip_owner_validation: true)
+      if avatar.save
+        if Seek::Config.home_carousel.blank?
+          Seek::Config.home_carousel = Array.new
+        end
+        # build new data to store
+        data = {:image => avatar.id, :title => params[:home_carousel_title],
+          :author => params[:home_carousel_author], :url => params[:home_carousel_url],
+          :description => params[:home_carousel_description]}
+        Seek::Config.home_carousel = Seek::Config.home_carousel << data
+      else
+        flash[:error] = 'There was an error adding an image to the carousel! There could be a problem with the image file. Please try again or try another image.'
+      end
+    # else
+    #   flash[:error] = 'Information was missing for the carousel configuration, no changes has been made to it.'
+    end
+  end
+
+  # Removes the carousel item with the given image id
+  def delete_carousel_form
+    carousel_index = Integer(params[:carousel_index], exception: false)
+    if carousel_index && request.post?
+      image_id = Seek::Config.home_carousel[carousel_index][:image]
+      Seek::Config.home_carousel = array_remove_at(Seek::Config.home_carousel,carousel_index)
+      Avatar.find(image_id).delete
+      flash.now[:notice] = "Carousel number #{carousel_index} deleted"
+    else
+      flash.now[:error] = 'Must be a post'
+    end
+    redirect_to :home_settings_admin
+  end
+
+  ## Helper function to retrieve arrays removing a given index
+  def array_remove_at(array, index)
+    if index<0 || index>=array.length
+      return array
+    end
+    return array.slice(0,index) + array.slice(index+1,array.length)
   end
 
   # this destroys any failed Delayed::Jobs

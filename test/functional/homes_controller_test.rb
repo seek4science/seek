@@ -307,7 +307,6 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
     assert_select 'div#recently_added ul>li>a[href=?]', investigation_snapshot_path(snapshot1.resource, snapshot1), text: /inv with snap/
-    assert_select 'div#recently_downloaded ul>li>a[href=?]', assay_snapshot_path(snapshot2.resource, snapshot2), text: /assay with snap/
   end
 
   test 'should show headline announcement' do
@@ -424,23 +423,23 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
 
-    assert_select 'div#my-recent-contributions .panel-body ul li', 4
-    assert_select 'div#my-recent-contributions .panel-body ul>li a[href=?]', data_file_path(df), text: /A new data file/
-    assert_select 'div#my-recent-contributions .panel-body ul li a[href=?]', sop_path(sop), text: /A new sop/
-    assert_select 'div#my-recent-contributions .panel-body ul li a[href=?]', assay_path(assay), text: /A new assay/
-    assert_select 'div#my-recent-contributions .panel-body ul li a[href=?]', assay_snapshot_path(assay, snapshot), text: /A new assay/
+    assert_select 'div#my-recent-contributions ul li', 4
+    assert_select 'div#my-recent-contributions ul>li a[href=?]', data_file_path(df), text: /A new data file/
+    assert_select 'div#my-recent-contributions ul li a[href=?]', sop_path(sop), text: /A new sop/
+    assert_select 'div#my-recent-contributions ul li a[href=?]', assay_path(assay), text: /A new assay/
+    assert_select 'div#my-recent-contributions ul li a[href=?]', assay_snapshot_path(assay, snapshot), text: /A new assay/
 
     sop.update_attributes(title: 'An old sop')
     Factory :activity_log, activity_loggable: sop, controller_name: 'assays', culprit: person.user, action: 'update'
 
     get :index
     assert_response :success
-    assert_select 'div#my-recent-contributions .panel-body ul li', 4
-    assert_select 'div#my-recent-contributions .panel-body ul>li a[href=?]', sop_path(sop), text: /An old sop/
-    assert_select 'div#my-recent-contributions .panel-body ul li a[href=?]', data_file_path(df), text: /A new data file/
-    assert_select 'div#my-recent-contributions .panel-body ul li a[href=?]', assay_path(assay), text: /A new assay/
-    assert_select 'div#my-recent-contributions .panel-body ul li a[href=?]', assay_snapshot_path(assay, snapshot), text: /A new assay/
-    assert_select 'div#my-recent-contributions .panel-body ul li a[href=?]', sop_path(sop), text: /A new sop/, count: 0
+    assert_select 'div#my-recent-contributions ul li', 4
+    assert_select 'div#my-recent-contributions ul>li a[href=?]', sop_path(sop), text: /An old sop/
+    assert_select 'div#my-recent-contributions ul li a[href=?]', data_file_path(df), text: /A new data file/
+    assert_select 'div#my-recent-contributions ul li a[href=?]', assay_path(assay), text: /A new assay/
+    assert_select 'div#my-recent-contributions ul li a[href=?]', assay_snapshot_path(assay, snapshot), text: /A new assay/
+    assert_select 'div#my-recent-contributions ul li a[href=?]', sop_path(sop), text: /A new sop/, count: 0
   end
 
   test 'can enabled/disable front page buttons' do
@@ -582,6 +581,155 @@ class HomesControllerTest < ActionController::TestCase
         assert_select '#workflow-class-list a[href=?]', workflow_classes_path, text: '...and 2 others'
       end
     end
+  end
+
+  test 'show carousel slides from config' do
+    
+    with_config_value :home_show_who_uses, true do
+      with_config_value :home_carousel, Array.new do
+
+        avatar = Avatar.new(original_filename: "test avatar file", image_file: File.open("#{Rails.root}/test/fixtures/files/file_picture.png", 'rb'), skip_owner_validation: true)
+        avatar.save
+        data = {:image=>avatar.id, :title=>"title 1", :author=>"", :url=>"", :description=>""}
+        Seek::Config.home_carousel = Seek::Config.home_carousel << data
+
+        image1_url = avatar.public_asset_url
+
+        avatar = Avatar.new(original_filename: "test avatar file", image_file: File.open("#{Rails.root}/test/fixtures/files/file_picture.png", 'rb'), skip_owner_validation: true)
+        avatar.save
+        data = {:image=>avatar.id, :title=>"Title 2", :author=>"Author 2", :url=>"URL2", :description=>"Desc2"}
+        Seek::Config.home_carousel = Seek::Config.home_carousel << data
+
+        get :index
+        assert_response :success
+
+        assert_select 'div#home_who_uses_carousel .carousel-inner div.item', count: 2
+        assert_select 'div#home_who_uses_carousel .carousel-inner div.item:first .carousel-title', text: 'title 1'
+        assert_select 'div#home_who_uses_carousel .carousel-inner div.item:first .carousel-logo img[src=?]', image1_url
+
+        assert_select 'div#home_who_uses_carousel .carousel-inner div.item:last .carousel-author', text: 'Author 2'
+        assert_select 'div#home_who_uses_carousel .carousel-inner div.item:last .carousel-logo a[href=?]', "URL2"
+      end
+    end
+
+    # not show carousel if disabled
+    with_config_value :home_show_who_uses, false do
+      get :index
+      assert_response :success
+      assert_select 'div#home_who_uses_carousel', count: 0
+    end
+  end
+
+  test 'toggling home panels' do
+    
+    ######## Empty home page
+    # shown if activated
+    Seek::Config.home_explore_projects = false
+
+    # shown if logged in and activated
+    Seek::Config.home_show_quickstart = false
+    Seek::Config.home_show_my_items = false
+    
+    # only shown if not logged in and activated
+    Seek::Config.home_show_features = false
+    Seek::Config.home_show_who_uses = false
+    Seek::Config.home_show_integrations = false
+    
+    logout
+    get :index
+    assert_response :success
+
+    assert_select 'div#home_explore_projects', count: 0
+    assert_select 'div#home_quick_start', count: 0
+    assert_select 'div#home_my_items', count: 0
+    assert_select 'div#home_features', count: 0
+    assert_select 'div#home_who_uses', count: 0
+    assert_select 'div#home_integrations', count: 0
+
+    ##### full homepage no user logged in
+
+    # shown if activated
+    Seek::Config.home_explore_projects = true
+
+    # shown if logged in and activated
+    Seek::Config.home_show_quickstart = true
+    Seek::Config.home_show_my_items = true
+    
+    # only shown if not logged in and activated
+    Seek::Config.home_show_features = true
+    Seek::Config.home_show_who_uses = true
+    Seek::Config.home_show_integrations = true
+
+    # Adds a slide to home_carousel so who uses is displayed
+    avatar = Avatar.new(original_filename: "test avatar file", image_file: File.open("#{Rails.root}/test/fixtures/files/file_picture.png", 'rb'), skip_owner_validation: true)
+    avatar.save
+    data = {:image=>avatar.id, :title=>"title 1", :author=>"", :url=>"", :description=>""}
+    Seek::Config.home_carousel = Seek::Config.home_carousel << data
+    
+    get :index
+    assert_response :success
+
+    assert_select 'div#home_explore_projects', count: 1
+    assert_select 'div#home_quick_start', count: 0
+    assert_select 'div#home_my_items', count: 0
+    assert_select 'div#home_features', count: 1
+    assert_select 'div#home_who_uses', count: 1
+    assert_select 'div#home_integrations', count: 1
+
+    ##### full homepage logged in
+
+    login_as(:aaron)
+    get :index
+    assert_response :success
+
+    assert_select 'div#home_explore_projects', count: 1
+    assert_select 'div#home_quick_start', count: 1
+    assert_select 'div#home_my_items', count: 1
+    assert_select 'div#home_features', count: 0 
+    assert_select 'div#home_who_uses', count: 0 
+    assert_select 'div#home_integrations', count: 0
+
+    ### disabling tags removes tag cloud within explore project
+    with_config_value :home_explore_projects, true do
+      get :index
+      assert_select 'div#home_explore_projects_tag_cloud', count: 1
+      with_config_value :tagging_enabled, false do
+        get :index
+        assert_select 'div#home_explore_projects_tag_cloud', count: 0
+      end
+    end
+  end
+
+  test 'show about options' do
+
+    # about dropdown in navbar not shown if no options are configured
+    Seek::Config.about_page_enabled = false
+    Seek::Config.about_link = ''
+    Seek::Config.cite_link = ''
+    Seek::Config.contact_link = ''
+
+    get :index
+    assert_response :success
+    assert_select 'li#navbar_about', count: 0
+
+    
+    Seek::Config.about_link = 'http://external_about.com'
+    Seek::Config.cite_link = 'http://external_cite.com'
+    Seek::Config.contact_link = 'http://external_contact.com'
+    # funding link shown in footer if set
+    Seek::Config.funding_link = 'http://external_funding.com'
+
+    get :index
+    assert_response :success
+    assert_select 'li#navbar_about', count: 1
+    assert_select 'li#navbar_about a[href=?]', 'http://external_about.com', count:1
+    assert_select 'li#navbar_about a[href=?]', 'http://external_cite.com', count:1
+    assert_select 'li#navbar_about a[href=?]', 'http://external_contact.com', count:1
+    # contact and cite links are also shown in the footer ft
+    assert_select 'div#ft a[href=?]', 'http://external_cite.com', count:1
+    assert_select 'div#ft a[href=?]', 'http://external_contact.com', count:1
+    assert_select 'div#ft a[href=?]', 'http://external_funding.com', count:1
+
   end
 
   def uri_to_guardian_feedtest

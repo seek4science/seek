@@ -156,6 +156,13 @@ news_feed_urls:
 news_number_of_entries:
   convert: :to_i
 front_page_buttons_enabled:
+home_show_features:
+home_show_quickstart:
+home_show_my_items:
+home_show_who_uses:
+home_explore_projects:
+home_show_integrations:
+home_carousel:
 permissions_popup:
   convert: :to_i
 auth_lookup_update_batch_size:
@@ -167,8 +174,14 @@ openbis_debug:
 openbis_autosync:
 openbis_check_new_arrivals:
 default_license:
+recommended_data_licenses:
+recommended_software_licenses:
 about_page_enabled:
 about_page:
+about_link:
+cite_link:
+contact_link:
+funding_link:
 terms_enabled:
 terms_page:
 privacy_enabled:

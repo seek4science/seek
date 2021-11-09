@@ -1,11 +1,11 @@
 <div class="alert alert-info">
   <p>
     <% project_names = current_user.person.projects_for_role(Seek::Roles::ASSET_GATEKEEPER).collect(&:title) %>
-    You are the Gatekeeper for the <%= t('project').downcase.pluralize(project_names.count) %>
+    You are the <%= t('asset_gatekeeper').downcase -%> for the <%= t('project').downcase.pluralize(project_names.count) %>
     : <strong><%= project_names.join(', ') %></strong>.
   </p>
   <p>
-    As the Gatekeeper, you control the final process of publishing items in
+    As the <%= t('asset_gatekeeper').downcase -%>, you control the final process of publishing items in
     your <%= t('project').downcase.pluralize(project_names.count) %>, that is:
     the owners of the items requested to make these items public, but it requires your approval.
   </p>

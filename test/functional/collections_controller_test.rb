@@ -63,6 +63,18 @@ class CollectionsControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+  test 'should show all item types without error' do
+    all_types_collection = Factory(:collection_with_all_types)
+    items = all_types_collection.collection_items
+
+    get :show, params: { id: all_types_collection }
+
+    assert_response :success
+    items.each do |item|
+      assert_select '#items-table tr a[href=?]', polymorphic_path(item.asset), "#{item.asset_type} collection item missing"
+    end
+  end
+
   test 'should not show hidden collection' do
     hidden_collection = Factory(:private_collection)
 
@@ -201,7 +213,7 @@ class CollectionsControllerTest < ActionController::TestCase
     # should be a temporary sharing link
     assert_select 'div#temporary_links', count:1
 
-    assert_select 'div#author_form', count:1
+    assert_select 'div#author-form', count:1
   end
 
   test 'cannot access manage page with edit rights' do

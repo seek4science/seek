@@ -210,7 +210,7 @@ class PresentationsControllerTest < ActionController::TestCase
   test 'should show the other creators in -uploader and creators- box' do
     presentation = Factory(:presentation, policy: Factory(:public_policy), other_creators: 'another creator')
     get :show, params: { id: presentation }
-    assert_select 'li.author-list-item', text: 'another creator', count: 1
+    assert_select '#author-box .additional-credit', text: 'another creator', count: 1
   end
 
   test 'should be able to view ms/open office ppt content' do
@@ -424,7 +424,7 @@ class PresentationsControllerTest < ActionController::TestCase
     # should be a temporary sharing link
     assert_select 'div#temporary_links', count:1
 
-    assert_select 'div#author_form', count:1
+    assert_select 'div#author-form', count:1
   end
 
   test 'cannot access manage page with edit rights' do

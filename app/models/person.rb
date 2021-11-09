@@ -422,6 +422,16 @@ class Person < ApplicationRecord
     ActivationEmailMessageLog.activation_email_logs(self)
   end
 
+  def self.with_name(name)
+    concat_clause = if Seek::Util.database_type == 'sqlite3'
+                      "LOWER(first_name || ' ' || last_name)"
+                    else
+                      "LOWER(CONCAT(first_name, ' ', last_name))"
+                    end
+
+    Person.where("#{concat_clause} LIKE :query OR LOWER(first_name) LIKE :query OR LOWER(last_name) LIKE :query",
+                 query: "#{name.downcase}%")
+  end
 
   private
 

@@ -1,7 +1,8 @@
 <% if logged_in_and_registered? %>
+    <% current_person = current_user.person %>
+    <li><%= link_to 'My ' + Seek::Config.project_name, person_path(current_person)+'/items' -%></li>
     <li class="dropdown" id="user-menu">
       <a href="#" id="user-menu-button" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-        <% current_person = current_user.person %>
         <% if current_person.avatar.nil? %>
             <%= image_tag(icon_filename_for_key("person_avatar"), :size => "18x18") %>
         <% else %>
