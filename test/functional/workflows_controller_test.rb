@@ -889,6 +889,17 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_equal g.id, assigns(:workflow).workflow_class_id
   end
 
+  test '404 response code for show and ro-crate if workflow not found' do
+    id = 999
+    assert_nil Workflow.find_by_id(id)
+
+    get :show, params: {id: id}
+    assert_response :not_found
+
+    get :ro_crate, params: {id: id}
+    assert_response :not_found
+  end
+
   def edit_max_object(workflow)
     add_tags_to_test_object(workflow)
     add_creator_to_test_object(workflow)
