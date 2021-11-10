@@ -357,22 +357,17 @@ module Ga4gh
         test 'should get descriptor containing URL for binary file on git workflow' do
           workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
           disable_authorization_checks do
-            c = workflow.git_version.add_file('binary.bin', StringIO.new(SecureRandom.random_bytes(50)))
+            c = workflow.git_version.add_file('dir/binary.bin', StringIO.new(SecureRandom.random_bytes(50)))
             workflow.git_version.update_column(:commit, c)
           end
 
-          get :descriptor, params: { id: workflow.id, version_id: 1, type: 'GALAXY', relative_path: 'binary.bin' }
+          get :descriptor, params: { id: workflow.id, version_id: 1, type: 'GALAXY', relative_path: 'dir/binary.bin' }
 
           assert_response :success
           assert_equal 'application/json; charset=utf-8', @response.headers['Content-Type']
           h = JSON.parse(@response.body)
           assert_nil h['content']
-          assert_equal ga4gh_trs_v2_tool_versions_descriptor_url(host: 'localhost', port: '3000',
-                                                                 id: workflow.id,
-                                                                 version_id: 1,
-                                                                 type: 'PLAIN_GALAXY',
-                                                                 relative_path: 'binary.bin'),
-                       h['url']
+          assert_equal "http://localhost:3000/ga4gh/trs/v2/tools/1/versions/1/PLAIN_GALAXY/descriptor/dir/binary.bin", h['url']
         end
 
         test 'should get raw descriptor for binary file on git workflow' do
