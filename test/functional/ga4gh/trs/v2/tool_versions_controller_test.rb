@@ -358,6 +358,40 @@ module Ga4gh
           assert_response :success
           assert_equal 'PNG', @response.body.force_encoding('ASCII-8BIT')[1..3]
         end
+
+        test 'should get descriptor containing URL for binary file on git workflow' do
+          workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+          disable_authorization_checks do
+            c = workflow.git_version.add_file('binary.bin', StringIO.new(SecureRandom.random_bytes(50)))
+            workflow.git_version.update_column(:commit, c)
+          end
+
+          get :descriptor, params: { id: workflow.id, version_id: 1, type: 'GALAXY', relative_path: 'binary.bin' }
+
+          assert_response :success
+          assert_equal 'application/json; charset=utf-8', @response.headers['Content-Type']
+          h = JSON.parse(@response.body)
+          assert_nil h['content']
+          assert_equal ga4gh_trs_v2_tool_versions_descriptor_url(host: 'localhost', port: '3000',
+                                                                 id: workflow.id,
+                                                                 version_id: 1,
+                                                                 type: 'PLAIN_GALAXY',
+                                                                 relative_path: 'binary.bin'),
+                       h['url']
+        end
+
+        test 'should get raw descriptor for binary file on git workflow' do
+          bytes = SecureRandom.random_bytes(20)
+          workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+          disable_authorization_checks do
+            c = workflow.git_version.add_file('binary.bin', StringIO.new(bytes))
+            workflow.git_version.update_column(:commit, c)
+          end
+
+          get :descriptor, params: { id: workflow.id, version_id: 1, type: 'PLAIN_GALAXY', relative_path: 'binary.bin' }
+          assert_response :success
+          assert_equal bytes, @response.body.force_encoding('ASCII-8BIT')
+        end
       end
     end
   end
