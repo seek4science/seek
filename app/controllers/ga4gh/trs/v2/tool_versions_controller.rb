@@ -19,8 +19,10 @@ module Ga4gh
         def descriptor
           @tool.ro_crate do |crate|
             if params[:relative_path].present?
+              path = params[:relative_path]
               entry = crate.find_entry(params[:relative_path])
             else
+              path = crate.main_workflow.id
               entry = crate.main_workflow&.source
             end
 
@@ -29,7 +31,7 @@ module Ga4gh
             if params[:type].downcase.start_with?('plain_')
               render plain: (entry.remote? ? entry.uri : entry.read)
             else
-              @file_wrapper = FileWrapper.new(entry)
+              @file_wrapper = FileWrapper.new(entry, path: path, tool_version: @tool_version)
               respond_to do |format|
                 format.json { render json: @file_wrapper, adapter: :attributes }
                 format.text { render plain: (entry.remote? ? entry.uri : entry.read) }
