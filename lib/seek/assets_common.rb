@@ -13,7 +13,8 @@ module Seek
       if found_version&.visible?
         instance_variable_set("@display_#{asset.class.name.underscore}", asset.find_version(found_version))
       else
-        error('This version is not available', 'invalid route')
+        status =  found_version.nil? ? :not_found : :forbidden
+        error('This version is not available', 'invalid route', status)
         false
       end
     end
