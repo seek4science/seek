@@ -6,10 +6,10 @@ module SamplesHelper
     attribute_form_element(attribute, resource, element_name, element_class)
   end
 
-  def controlled_vocab_form_field(attribute, element_name, value)    
-    if attribute.sample_controlled_vocab.sample_controlled_vocab_terms.count < Seek::Config.cv_dropdown_limit
+  def controlled_vocab_form_field(sample_controlled_vocab, element_name, value)
+    if sample_controlled_vocab.sample_controlled_vocab_terms.count < Seek::Config.cv_dropdown_limit
       options = options_from_collection_for_select(
-        attribute.sample_controlled_vocab.sample_controlled_vocab_terms.sort_by(&:label),
+        sample_controlled_vocab.sample_controlled_vocab_terms.sort_by(&:label),
         :label, :label,
         value
       )
@@ -18,7 +18,7 @@ module SamplesHelper
                  class: "form-control",
                  include_blank: ""
     else
-      scv_id = attribute.sample_controlled_vocab.id
+      scv_id = sample_controlled_vocab.id
       existing_objects = []
       existing_objects << Struct.new(:id, :name).new(value, value) if value
       objects_input(element_name, existing_objects,
@@ -204,7 +204,7 @@ module SamplesHelper
                                                    :title, value.try(:[], 'id'))
       select_tag(element_name, options, include_blank: !attribute.required?, class: "form-control #{element_class}")
     when Seek::Samples::BaseType::CV
-      controlled_vocab_form_field attribute, element_name, value
+      controlled_vocab_form_field attribute.sample_controlled_vocab, element_name, value
     when Seek::Samples::BaseType::SEEK_SAMPLE
       terms = attribute.linked_sample_type.samples.authorized_for('view').to_a
       options = options_from_collection_for_select(terms, :id, :title, value.try(:[], 'id'))
