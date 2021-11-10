@@ -16,7 +16,7 @@ SEEK::Application.routes.draw do
         get 'tools/:id/versions' => 'tool_versions#index'
         get 'tools/:id/versions/:version_id' => 'tool_versions#show'
         get 'tools/:id/versions/:version_id/containerfile' => 'tool_versions#containerfile'
-        get 'tools/:id/versions/:version_id/:type/descriptor(/:relative_path)' => 'tool_versions#descriptor', constraints: { relative_path: /.+/ }
+        get 'tools/:id/versions/:version_id/:type/descriptor(/:relative_path)' => 'tool_versions#descriptor', constraints: { relative_path: /.+/ }, format: false, as: :tool_versions_descriptor
         get 'tools/:id/versions/:version_id/:type/files' => 'tool_versions#files', format: false
         get 'tools/:id/versions/:version_id/:type/tests' => 'tool_versions#tests'
         get 'toolClasses' => 'general#tool_classes'

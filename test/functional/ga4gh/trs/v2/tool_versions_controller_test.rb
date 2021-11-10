@@ -260,6 +260,30 @@ module Ga4gh
           assert_response :success
         end
 
+        test 'should get descriptor containing URL for binary file' do
+          workflow = Factory(:nf_core_ro_crate_workflow, policy: Factory(:public_policy))
+
+          get :descriptor, params: { id: workflow.id, version_id: 1, type: 'NFL', relative_path: 'docs/images/nfcore-ampliseq_logo.png' }, format: :json
+
+          assert_response :success
+          assert_equal 'application/json; charset=utf-8', @response.headers['Content-Type']
+          h = JSON.parse(@response.body)
+          assert_nil h['content']
+          assert_equal ga4gh_trs_v2_tool_versions_descriptor_url(host: 'localhost', port: '3000',
+                                                                 id: workflow.id,
+                                                                 version_id: 1,
+                                                                 type: 'PLAIN_NFL',
+                                                                 relative_path: 'docs/images/nfcore-ampliseq_logo.png'),
+                       h['url']
+        end
+
+        test 'should get raw descriptor for binary file' do
+          workflow = Factory(:nf_core_ro_crate_workflow, policy: Factory(:public_policy))
+
+          get :descriptor, params: { id: workflow.id, version_id: 1, type: 'PLAIN_NFL', relative_path: 'docs/images/nfcore-ampliseq_logo.png' }
+          assert_response :success
+          assert_equal 'PNG', @response.body.force_encoding('ASCII-8BIT')[1..3]
+        end
       end
     end
   end
