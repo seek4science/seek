@@ -184,3 +184,12 @@ $j(document).ready(function () {
         });
     });
 });
+
+var Git = {
+    // Make a path URL-safe, but without encoding slashes (Apache doesn't like it).
+    encodePath: function (path) {
+        return path.split('/').map(function (component) {
+            return encodeURIComponent(component);
+        }).join('/');
+    }
+}
