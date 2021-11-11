@@ -26,7 +26,7 @@ class Workflow < ApplicationRecord
   has_many :edam_topic_values, through: :edam_topics_annotations, source: :value, source_type: 'SampleControlledVocabTerm'
 
   def edam_topics=(vals, source = User.current_user)
-    topic_values = Array(vals).map { |topic| SampleControlledVocab.edam_topics_controlled_vocab.sample_controlled_vocab_terms.find_by_label(topic) }.compact.uniq
+    topic_values = Array(vals.split(',')).map { |topic| SampleControlledVocab.edam_topics_controlled_vocab.sample_controlled_vocab_terms.find_by_label(topic) }.compact.uniq
     self.edam_topics_annotations = topic_values.map do |topic|
       self.edam_topics_annotations.build(source: source, value: topic)
     end

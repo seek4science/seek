@@ -6,7 +6,7 @@ module SamplesHelper
     attribute_form_element(attribute, resource, element_name, element_class)
   end
 
-  def controlled_vocab_form_field(sample_controlled_vocab, element_name, value)
+  def controlled_vocab_form_field(sample_controlled_vocab, element_name, values, limit=1)
     if sample_controlled_vocab.sample_controlled_vocab_terms.count < Seek::Config.cv_dropdown_limit
       options = options_from_collection_for_select(
         sample_controlled_vocab.sample_controlled_vocab_terms.sort_by(&:label),
@@ -19,12 +19,13 @@ module SamplesHelper
                  include_blank: ""
     else
       scv_id = sample_controlled_vocab.id
-      existing_objects = []
-      existing_objects << Struct.new(:id, :name).new(value, value) if value
+      existing_objects = Array(values).collect do |value|
+        Struct.new(:id, :name).new(value, value)
+      end
       objects_input(element_name, existing_objects,
                     typeahead: { query_url: typeahead_sample_controlled_vocabs_path + "?query=%QUERY&scv_id=#{scv_id}", 
                     handlebars_template: 'typeahead/controlled_vocab_term' }, 
-                    limit: 1)
+                    limit: limit)
     end
   end
 
