@@ -49,6 +49,12 @@
     </div>
 
     <div class="form-group">
+      <label>EDAM Topic</label>
+      <%= controlled_vocab_form_field(SampleControlledVocab.edam_topics_controlled_vocab, 'workflow[edam_topics]', @workflow.edam_topic_values.collect(&:label), 10 ) -%>
+      <p class="help-block">The EDAM Topic.</p>
+    </div>
+
+    <div class="form-group">
       <label>Maturity</label>
       <%= select_tag 'workflow[maturity_level]',
                      options_for_select(Workflow::MATURITY_LEVELS.values.map { |k| [t("maturity_level.#{k}"), k] }, @workflow.maturity_level),
