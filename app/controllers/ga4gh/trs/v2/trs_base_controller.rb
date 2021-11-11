@@ -7,6 +7,10 @@ module Ga4gh
         before_action :set_format
         before_action :check_trs_enabled
         after_action :set_content_type
+        rescue_from StandardError do |e|
+          Rails.logger.error("TRS Error: #{e.message} - #{e.backtrace.join($/)}")
+          trs_error(500, "An unexpected error occurred.")
+        end
 
         private
 
