@@ -22,6 +22,11 @@ class SampleControlledVocab < ApplicationRecord
 
   grouped_pagination
 
+  # TODO: will be moved and not hard-coded
+  def self.edam_topics_controlled_vocab
+    SampleControlledVocab.find_by_id(10)
+  end
+
   def labels
     sample_controlled_vocab_terms.collect(&:label)
   end
