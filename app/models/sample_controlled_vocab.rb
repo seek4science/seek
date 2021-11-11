@@ -23,12 +23,6 @@ class SampleControlledVocab < ApplicationRecord
 
   grouped_pagination
 
-  EDAM_TOPICS_KEY=:edam_topics
-
-  def self.edam_topics_controlled_vocab
-    SampleControlledVocab.find_by_key(EDAM_TOPICS_KEY)
-  end
-
   def labels
     sample_controlled_vocab_terms.collect(&:label)
   end
@@ -42,7 +36,13 @@ class SampleControlledVocab < ApplicationRecord
   end
 
   def can_edit?(user = User.current_user)
-    samples.empty? && user && (!Seek::Config.project_admin_sample_type_restriction || user.is_admin_or_project_administrator?) && Seek::Config.samples_enabled
+    !system_vocab? && samples.empty? && user && (!Seek::Config.project_admin_sample_type_restriction || user.is_admin_or_project_administrator?) && Seek::Config.samples_enabled
+  end
+
+  # a vocabulary that is built in and seeded, and that other parts are dependent upon
+  def system_vocab?
+    # currently determined by whether it has a special key, which cannot be set by user defined CV's
+    key.present? && SystemVocabs.key_known?(key)
   end
 
   def self.can_create?
@@ -62,6 +62,25 @@ class SampleControlledVocab < ApplicationRecord
       return true
     end
     return false
+  end
+
+  class SystemVocabs
+
+    KEYS = {
+      edam_topics: 'edam_topics',
+      edam_operations: 'edam_operations'
+    }
+
+    def self.key_known?(key)
+      KEYS.values.include?(key)
+    end
+
+    KEYS.each do |k, v|
+      define_singleton_method "#{k}_controlled_vocab" do
+        SampleControlledVocab.find_by_key(v)
+      end
+    end
+    
   end
   
 end
