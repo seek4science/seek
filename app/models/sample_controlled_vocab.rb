@@ -80,7 +80,7 @@ class SampleControlledVocab < ApplicationRecord
         SampleControlledVocab.find_by_key(v)
       end
     end
-    
+
   end
   
 end
