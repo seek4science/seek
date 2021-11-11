@@ -8,7 +8,8 @@ namespace :seek do
   # these are the tasks required for this version upgrade
   task upgrade_version_tasks: %i[
     environment
-    db:seed:workflow_classes
+    db:seed:010_workflow_classes
+    db:seed:011_edam_topics
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change

@@ -16,15 +16,17 @@ class SampleControlledVocab < ApplicationRecord
 
   validates :title, presence: true, uniqueness: true
   validates :ols_root_term_uri, url: { allow_blank: true }
+  validates :key, uniqueness: { allow_blank: true }
 
   accepts_nested_attributes_for :sample_controlled_vocab_terms, allow_destroy: true
   accepts_nested_attributes_for :repository_standard, :reject_if => :check_repository_standard
 
   grouped_pagination
 
-  # TODO: will be moved and not hard-coded
+  EDAM_TOPICS_KEY=:edam_topics
+
   def self.edam_topics_controlled_vocab
-    SampleControlledVocab.find_by_id(10)
+    SampleControlledVocab.find_by_key(EDAM_TOPICS_KEY)
   end
 
   def labels
