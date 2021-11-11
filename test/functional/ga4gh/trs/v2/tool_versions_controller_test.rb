@@ -367,7 +367,7 @@ module Ga4gh
           assert_equal 'application/json; charset=utf-8', @response.headers['Content-Type']
           h = JSON.parse(@response.body)
           assert_nil h['content']
-          assert_equal "http://localhost:3000/ga4gh/trs/v2/tools/1/versions/1/PLAIN_GALAXY/descriptor/dir/binary.bin", h['url']
+          assert_equal "http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1/PLAIN_GALAXY/descriptor/dir/binary.bin", h['url']
         end
 
         test 'should get raw descriptor for binary file on git workflow' do
