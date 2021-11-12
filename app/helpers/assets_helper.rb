@@ -342,4 +342,8 @@ module AssetsHelper
       link_to(item.label, browser_url, target: :_blank).html_safe
     end.join(', ').html_safe
   end
+
+  def show_edam_properties_box?(resource)
+    (resource.respond_to?(:edam_topics) && resource.edam_topics.any?) || (resource.respond_to?(:edam_operations) && resource.edam_operations.any?)
+  end
 end
