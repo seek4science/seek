@@ -1,6 +1,16 @@
 module HasEdamAnnotations
   extend ActiveSupport::Concern
 
+  included do
+    def supports_edam_annotations?
+      respond_to?(:edam_topics) && respond_to?(:edam_operations)
+    end
+
+    def edam_annotations?
+      supports_edam_annotations? && edam_topics.any? && edam_operations.any?
+    end
+  end
+
   class_methods do
     def has_edam_annotations
       include InstanceMethods
