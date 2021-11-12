@@ -135,7 +135,7 @@ module Ga4gh
           get :descriptor, params: { id: workflow.id, version_id: 1, type: 'PLAIN_GALAXY', relative_path: 'Genomics-1-PreProcessing_without_downloading_from_SRA.svg' }
 
           assert_response :success
-          assert_equal 'text/plain; charset=utf-8', @response.headers['Content-Type']
+          assert_equal "image/svg+xml; charset=utf-8", @response.headers['Content-Type']
           assert @response.body.start_with?('<?xml version="1')
         end
 
