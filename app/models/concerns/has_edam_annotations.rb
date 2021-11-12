@@ -4,6 +4,7 @@ module HasEdamAnnotations
   class_methods do
     def has_edam_annotations
       include InstanceMethods
+      include Search
       has_annotation_type :edam_topics
       has_many :edam_topic_values, through: :edam_topics_annotations, source: :value,
                                    source_type: 'SampleControlledVocabTerm'
@@ -12,12 +13,33 @@ module HasEdamAnnotations
                source_type: 'SampleControlledVocabTerm'
 
       # this is needed, because it overrides a previously 'defined' method from has_annotation_type
+      # the topics  vals can be an array or comma seperated list of either labels or IRI's
       define_method :edam_topics= do |vals|
         associate_edam_topics vals
       end
 
+      # this is needed, because it overrides a previously 'defined' method from has_annotation_type
+      # the operation vals can be an array or comma seperated list of either labels or IRI's
       define_method :edam_operations= do |vals|
         associate_edam_operations vals
+      end
+
+    end
+  end
+
+  module Search
+    def self.included(klass)
+      klass.class_eval do
+        if Seek::Config.solr_enabled
+          searchable(auto_index: false) do
+            text :edam_topics do
+              edam_topic_labels
+            end
+            text :edam_operations do
+              edam_operation_labels
+            end
+          end
+        end
       end
     end
   end
@@ -31,6 +53,16 @@ module HasEdamAnnotations
     def edam_operations_vocab
       SampleControlledVocab::SystemVocabs.edam_operations_controlled_vocab
     end
+
+    def edam_topic_labels
+      edam_topic_values.collect(&:label)
+    end
+
+    def edam_operation_labels
+      edam_operation_values.collect(&:label)
+    end
+
+    private
 
     # the topics can be an array or comma seperated list of either labels or IRI's
     def associate_edam_topics(vals)
@@ -60,5 +92,6 @@ module HasEdamAnnotations
 
       operation_values
     end
+
   end
 end
