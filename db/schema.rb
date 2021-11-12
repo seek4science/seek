@@ -1711,15 +1711,15 @@ ActiveRecord::Schema.define(version: 2021_11_11_133408) do
   create_table "sop_versions", id: :integer,  force: :cascade do |t|
     t.integer "sop_id"
     t.integer "version"
-    t.text "revision_comments", limit: 16777215
+    t.text "revision_comments"
     t.integer "contributor_id"
     t.string "title"
-    t.text "description", limit: 16777215
+    t.text "description"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
     t.string "first_letter", limit: 1
-    t.text "other_creators", limit: 16777215
+    t.text "other_creators"
     t.string "uuid"
     t.integer "policy_id"
     t.string "doi"
@@ -1733,13 +1733,13 @@ ActiveRecord::Schema.define(version: 2021_11_11_133408) do
   create_table "sops", id: :integer,  force: :cascade do |t|
     t.integer "contributor_id"
     t.string "title"
-    t.text "description", limit: 16777215
+    t.text "description"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
     t.integer "version", default: 1
     t.string "first_letter", limit: 1
-    t.text "other_creators", limit: 16777215
+    t.text "other_creators"
     t.string "uuid"
     t.integer "policy_id"
     t.string "doi"
