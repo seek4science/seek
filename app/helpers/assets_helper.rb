@@ -343,7 +343,4 @@ module AssetsHelper
     end.join(', ').html_safe
   end
 
-  def show_edam_properties_box?(resource)
-    (resource.respond_to?(:edam_topics) && resource.edam_topics.any?) || (resource.respond_to?(:edam_operations) && resource.edam_operations.any?)
-  end
 end
