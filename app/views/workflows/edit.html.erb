@@ -24,13 +24,7 @@
       <p class="help-block">If this workflow came from an external repository (i.e. GitHub), you can include its original URL here.</p>
     </div>
 
-    <% if SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab %>
-      <div class="form-group">
-        <label>EDAM Topic</label>
-        <%= controlled_vocab_form_field(SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab, 'workflow[edam_topics]', @workflow.edam_topic_values.collect(&:label), 10 ) -%>
-        <p class="help-block">The EDAM Topic.</p>
-      </div>
-    <% end %>
+    <%= render partial: 'assets/edam_form_properties', locals: { resource: @workflow } %>
 
     <div class="form-group">
       <label>Maturity</label>

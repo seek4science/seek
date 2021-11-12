@@ -13,27 +13,14 @@ class Workflow < ApplicationRecord
 
   acts_as_doi_parent(child_accessor: :versions)
 
+  has_edam_annotations
+
   validates :projects, presence: true, projects: { self: true }, unless: Proc.new {Seek::Config.is_virtualliver }
 
   #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
   has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
 
   has_and_belongs_to_many :sops
-
-  ######### TODO: block to be moved to a Concern module
-
-  has_annotation_type :edam_topics
-  has_many :edam_topic_values, through: :edam_topics_annotations, source: :value, source_type: 'SampleControlledVocabTerm'
-
-  def edam_topics=(vals, source = User.current_user)
-    topic_values = Array(vals.split(',')).map { |topic| SampleControlledVocab.edam_topics_controlled_vocab.sample_controlled_vocab_terms.find_by_label(topic) }.compact.uniq
-    self.edam_topics_annotations = topic_values.map do |topic|
-      self.edam_topics_annotations.build(source: source, value: topic)
-    end
-    edam_topics
-  end
-
-  #########
 
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi', 'test_status']) do
     after_commit :submit_to_life_monitor, on: [:create, :update]
