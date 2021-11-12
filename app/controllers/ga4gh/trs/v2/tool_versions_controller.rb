@@ -29,7 +29,9 @@ module Ga4gh
             return trs_error(404, "No descriptor found#{ " at: #{params[:relative_path]}" if params[:relative_path].present?}") unless entry
 
             if params[:type].downcase.start_with?('plain_')
-              render plain: (entry.remote? ? entry.uri : entry.read)
+              respond_to do |format|
+                format.all { render plain: (entry.remote? ? entry.uri : entry.read) }
+              end
             else
               @file_wrapper = FileWrapper.new(entry, path: path, tool_version: @tool_version)
               respond_to do |format|
