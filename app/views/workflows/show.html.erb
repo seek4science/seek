@@ -27,16 +27,6 @@
 
     <%= item_description(@display_workflow.description) %>
 
-    <% if @workflow.edam_topics.any? %>
-      <label>EDAM Topics</label>
-      <%= edam_ontology_items(@workflow.edam_topic_values) %>
-    <% end %>
-
-    <% if @workflow.edam_operations.any? %>
-      <label>EDAM Operations</label>
-      <%= edam_ontology_items(@workflow.edam_operation_values) %>
-    <% end %>
-
     <% begin %>
       <% if @display_workflow.diagram_exists? || @display_workflow.can_render_diagram? %>
         <div class="row">
