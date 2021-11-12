@@ -475,6 +475,8 @@ GEM
     rack (2.2.3)
     rack-attack (5.0.1)
       rack
+    rack-cors (1.1.1)
+      rack (>= 2.0.0)
     rack-oauth2 (1.19.0)
       activesupport
       attr_required
@@ -877,6 +879,7 @@ DEPENDENCIES
   psych
   puma (>= 3.12.6)
   rack-attack (~> 5.0.1)
+  rack-cors
   rails (~> 5.2.4.0)
   rails-controller-testing
   rails-html-sanitizer
