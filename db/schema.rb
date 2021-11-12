@@ -544,8 +544,8 @@ ActiveRecord::Schema.define(version: 2021_11_11_133408) do
   end
 
   create_table "documents", id: :integer,  force: :cascade do |t|
-    t.text "title", limit: 4294967295
-    t.text "description", limit: 4294967295
+    t.text "title"
+    t.text "description"
     t.integer "contributor_id"
     t.integer "version"
     t.string "first_letter", limit: 1
@@ -556,7 +556,7 @@ ActiveRecord::Schema.define(version: 2021_11_11_133408) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text "other_creators", limit: 4294967295
+    t.text "other_creators"
     t.string "deleted_contributor"
     t.index ["contributor_id"], name: "index_documents_on_contributor"
   end
