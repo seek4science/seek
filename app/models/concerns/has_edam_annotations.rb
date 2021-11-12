@@ -7,7 +7,8 @@ module HasEdamAnnotations
     end
 
     def edam_annotations?
-      supports_edam_annotations? && edam_topics.any? && edam_operations.any?
+      return false unless supports_edam_annotations?
+      edam_topics.any? || edam_operations.any?
     end
   end
 
