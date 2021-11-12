@@ -10,6 +10,7 @@ namespace :seek do
     environment
     db:seed:010_workflow_classes
     db:seed:011_edam_topics
+    db:seed:012_edam_operations
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
