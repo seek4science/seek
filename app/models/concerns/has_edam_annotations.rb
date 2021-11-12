@@ -10,7 +10,7 @@ module HasEdamAnnotations
                                    source_type: 'SampleControlledVocabTerm'
       has_annotation_type :edam_operations
       has_many :edam_operation_values, through: :edam_operations_annotations, source: :value,
-               source_type: 'SampleControlledVocabTerm'
+                                       source_type: 'SampleControlledVocabTerm'
 
       # this is needed, because it overrides a previously 'defined' method from has_annotation_type
       # the topics  vals can be an array or comma seperated list of either labels or IRI's
@@ -24,6 +24,16 @@ module HasEdamAnnotations
         associate_edam_operations vals
       end
 
+      # INDEX filters. Unfortunately, these won't currently consider the hierarchy
+      has_filter edam_topic: Seek::Filtering::Filter.new(
+        value_field: 'sample_controlled_vocab_terms.label',
+        joins: [:edam_topic_values]
+      )
+
+      has_filter edam_operation: Seek::Filtering::Filter.new(
+        value_field: 'sample_controlled_vocab_terms.label',
+        joins: [:edam_operation_values]
+      )
     end
   end
 
@@ -45,7 +55,6 @@ module HasEdamAnnotations
   end
 
   module InstanceMethods
-
     def edam_topics_vocab
       SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
     end
@@ -55,11 +64,11 @@ module HasEdamAnnotations
     end
 
     def edam_topic_labels
-      edam_topic_values.collect(&:label)
+      edam_topic_values.pluck(:label)
     end
 
     def edam_operation_labels
-      edam_operation_values.collect(&:label)
+      edam_operation_values.pluck(:label)
     end
 
     private
@@ -71,7 +80,7 @@ module HasEdamAnnotations
           edam_topics_vocab.sample_controlled_vocab_terms.find_by_iri(value)
       end.compact.uniq
 
-      self.edam_topics_annotations.delete_all
+      edam_topics_annotations.delete_all
       self.edam_topics_annotations = topic_values.map do |annotation|
         edam_topics_annotations.build(source: User.current_user, value: annotation)
       end
@@ -85,13 +94,12 @@ module HasEdamAnnotations
           edam_operations_vocab.sample_controlled_vocab_terms.find_by_iri(value)
       end.compact.uniq
 
-      self.edam_operations_annotations.delete_all
+      edam_operations_annotations.delete_all
       self.edam_operations_annotations = operation_values.map do |annotation|
         edam_operations_annotations.build(source: User.current_user, value: annotation)
       end
 
       operation_values
     end
-
   end
 end
