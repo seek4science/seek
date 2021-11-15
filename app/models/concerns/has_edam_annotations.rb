@@ -86,7 +86,8 @@ module HasEdamAnnotations
 
     # the topics can be an array or comma seperated list of either labels or IRI's
     def associate_edam_topics(vals)
-      topic_values = Array(vals.split(',')).map do |value|
+      topic_values = Array(vals.split(',').flatten).map do |value|
+        value = value.strip
         edam_topics_vocab.sample_controlled_vocab_terms.find_by_label(value) ||
           edam_topics_vocab.sample_controlled_vocab_terms.find_by_iri(value)
       end.compact.uniq
@@ -100,7 +101,8 @@ module HasEdamAnnotations
     end
 
     def associate_edam_operations(vals)
-      operation_values = Array(vals.split(',')).map do |value|
+      operation_values = Array(vals.split(',').flatten).map do |value|
+        value = value.strip
         edam_operations_vocab.sample_controlled_vocab_terms.find_by_label(value) ||
           edam_operations_vocab.sample_controlled_vocab_terms.find_by_iri(value)
       end.compact.uniq
