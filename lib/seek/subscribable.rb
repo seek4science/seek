@@ -56,7 +56,7 @@ module Seek
         # also build subscriptions for studies and assays associating with this investigation
         next unless self.is_a?(Investigation)
         (studies | assays).each do |item|
-          item.subscriptions.create(person: person, project_subscription_id: ps.id) unless item.subscribed?(person)
+          item.subscriptions.create(person: person, project_subscription_id: project_subscription.id) unless item.subscribed?(person)
         end
       end
     end
