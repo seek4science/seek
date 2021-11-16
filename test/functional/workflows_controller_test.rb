@@ -889,6 +889,42 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_equal g.id, assigns(:workflow).workflow_class_id
   end
 
+  test '404 response code for show and ro-crate if workflow not found' do
+    id = 999
+    assert_nil Workflow.find_by_id(id)
+
+    get :show, params: {id: id}
+    assert_response :not_found
+
+    get :ro_crate, params: {id: id}
+    assert_response :not_found
+  end
+
+  test 'json response code for missing version' do
+    user = Factory(:user)
+    workflow = Factory(:cwl_workflow, contributor: user.person)
+    login_as(user)
+
+    version = 999
+    assert_nil workflow.find_version(999)
+
+    get :show, params: {id: workflow.id, version: version}, format: :json
+    assert_response :not_found
+
+    get :ro_crate, params: {id: workflow.id, version: version}, format: :json
+    assert_response :not_found
+
+    workflow = Factory(:cwl_workflow, contributor: Factory(:person))
+    refute workflow.can_view?
+
+    get :show, params: {id: workflow.id, version: version}, format: :json
+    assert_response :forbidden
+
+    get :ro_crate, params: {id: workflow.id, version: version}, format: :json
+    assert_response :forbidden
+
+  end
+
   def edit_max_object(workflow)
     add_tags_to_test_object(workflow)
     add_creator_to_test_object(workflow)
