@@ -346,9 +346,11 @@ class GitControllerTest < ActionController::TestCase
   test 'add remote file' do
     refute @git_version.file_exists?('new-file.txt')
 
-    post :add_file, params: { workflow_id: @workflow.id, version: @git_version.version,
-                              file: { path: 'new-file.txt',
-                                      url: 'https://internets.com/files/new.txt' } }
+    assert_no_enqueued_jobs(only: RemoteGitContentFetchingJob) do
+      post :add_file, params: { workflow_id: @workflow.id, version: @git_version.version,
+                                file: { path: 'new-file.txt',
+                                        url: 'https://internets.com/files/new.txt' } }
+    end
 
     assert_redirected_to workflow_path(@workflow, anchor: 'files')
     assert assigns(:git_version).file_exists?('new-file.txt')
@@ -358,12 +360,29 @@ class GitControllerTest < ActionController::TestCase
   test 'do not add remote file with bad URL' do
     refute @git_version.file_exists?('new-file.txt')
 
-    post :add_file, params: { workflow_id: @workflow.id, version: @git_version.version,
-                              file: { path: 'new-file.txt',
-                                      url: '😂' } }
+    assert_no_enqueued_jobs(only: RemoteGitContentFetchingJob) do
+      post :add_file, params: { workflow_id: @workflow.id, version: @git_version.version,
+                                file: { path: 'new-file.txt',
+                                        url: '😂' } }
+    end
 
     assert_redirected_to workflow_path(@workflow, anchor: 'files')
     assert_equal 'URL (😂) must be a valid, accessible remote URL', flash[:error]
     refute assigns(:git_version).file_exists?('new-file.txt')
+  end
+
+  test 'add and fetch remote file' do
+    refute @git_version.file_exists?('new-file.txt')
+
+    assert_enqueued_jobs(1, only: RemoteGitContentFetchingJob) do
+      post :add_file, params: { workflow_id: @workflow.id, version: @git_version.version,
+                                file: { path: 'new-file.txt',
+                                        url: 'https://internets.com/files/new.txt',
+                                        fetch: '1' } }
+    end
+
+    assert_redirected_to workflow_path(@workflow, anchor: 'files')
+    assert assigns(:git_version).file_exists?('new-file.txt')
+    assert_equal '', assigns(:git_version).file_contents('new-file.txt')
   end
 end

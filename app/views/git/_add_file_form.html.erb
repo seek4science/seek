@@ -28,6 +28,16 @@
 
         <div data-role="seek-url-checker-result"></div>
 
+        <div style="display: none;" data-role="seek-url-checker-msg-success">
+          <div class="checkbox">
+            <label>
+              <%= check_box_tag 'file[fetch]', '1', false, autocomplete: 'off' %>
+              <strong>Fetch a copy</strong>
+            </label>
+            <p class="help-block">Fetch and store a copy of this file from the provided URL.</p>
+          </div>
+        </div>
+
         <div class="alert alert-info" role="alert" style="display: none;" data-role="seek-url-checker-msg-too-big">
           This file exceeds <%= Seek::Config.application_name %>'s remote file size limit of
           <strong><%= number_to_human_size(Seek::Config.hard_max_cachable_size) -%></strong>

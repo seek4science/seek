@@ -170,7 +170,7 @@ class GitController < ApplicationController
   end
 
   def file_params
-    params.require(:file).permit(:path, :data, :new_path, :url)
+    params.require(:file).permit(:path, :data, :new_path, :url, :fetch)
   end
 
   def fetch_git_version
@@ -194,7 +194,7 @@ class GitController < ApplicationController
   def add_remote_file
     path = file_params[:path]
     path = file_params[:url].split('/').last if path.blank?
-    @git_version.add_remote_file(path, file_params[:url])
+    @git_version.add_remote_file(path, file_params[:url], fetch: file_params[:fetch] == '1')
     @git_version.save!
 
     flash[:notice] = "Registered #{file_params[:path]}"
