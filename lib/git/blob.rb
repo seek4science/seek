@@ -2,6 +2,8 @@
 # where the blob exists in the repository.
 module Git
   class Blob
+    include Seek::ContentExtraction
+
     delegate_missing_to :@blob
     delegate :git_repository, :version, :git_base, to: :git_version
 
@@ -45,6 +47,18 @@ module Git
         entity['contentSize'] = size
         entity.properties = entity.raw_properties.merge(properties)
       end
+    end
+
+    def text_contents_for_search
+      content = []
+      unless binary?
+        text = file_contents
+        unless text.blank?
+          content = filter_text_content text
+          content = split_content(content,10,5)
+        end
+      end
+      content
     end
   end
 end

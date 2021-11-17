@@ -501,4 +501,26 @@ class WorkflowTest < ActiveSupport::TestCase
       assert_equal original_diagram.size, crate.main_workflow_diagram.content_size
     end
   end
+
+  test 'search terms for git workflows' do
+    workflow = Factory(:annotationless_local_git_workflow, workflow_class: Factory(:unextractable_workflow_class))
+
+    v = nil
+    disable_authorization_checks do
+      v = workflow.git_version
+      c = v.add_files(
+        [['main.ga', StringIO.new('{ "a_galaxy_workflow" : true, "Yes" : "yep", "OK" : "yep", "Cool" : "yep" } ')],
+         ['README.md', StringIO.new('unique_string_banana a b c d e')],
+         ['LICENSE', StringIO.new('unique_string_grapefruit f g h i j k')]])
+      v.main_workflow_path = 'main.ga'
+      v.commit = c
+      v.save!
+    end
+
+    terms = v.search_terms
+
+    assert(terms.any? { |t| t.include?('a_galaxy_workflow') })
+    assert(terms.any? { |t| t.include?('unique_string_banana') })
+    refute(terms.any? { |t| t.include?('unique_string_grapefruit') })
+  end
 end

@@ -245,6 +245,10 @@ module Git
       end
     end
 
+    def search_terms
+      []
+    end
+
     private
 
     def set_version

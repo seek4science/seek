@@ -35,6 +35,16 @@ class Workflow < ApplicationRecord
     def workflow_class
       WorkflowClass.find_by_id(workflow_class_id)
     end
+
+    def search_terms
+      terms = []
+
+      main = main_workflow_blob
+      terms += main_workflow_blob.text_contents_for_search if main
+      readme = git_version.get_blob('README.md')
+      terms += readme.text_contents_for_search if readme
+      terms
+    end
   end
 
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi', 'test_status']) do

@@ -73,6 +73,10 @@ module Git
             git_versions.where(visibility: scopes)
           end
 
+          def git_search_terms
+            git_version.search_terms[0..920000]
+          end
+
           # def state_allows_download?(*args)
           #   latest_git_version.commit.present?
           # end
