@@ -14,7 +14,7 @@ RUN apt-get update -qq && \
 		libreoffice libsqlite3-dev libssl-dev libxml++2.6-dev \
 		libxslt1-dev locales default-mysql-client nginx nodejs openjdk-8-jdk \
 		python3 python3-pip python3-setuptools python3-wheel python3-psutil python3-dev \
-		poppler-utils postgresql-client sqlite3 links telnet vim-tiny zip && \
+		poppler-utils postgresql-client shared-mime-info sqlite3 links telnet vim-tiny zip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     locale-gen en_US.UTF-8 && \
