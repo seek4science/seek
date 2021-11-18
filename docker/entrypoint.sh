@@ -12,6 +12,12 @@ start_soffice
 # Search
 start_search
 
+# Precompile assets if using RAILS_RELATIVE_URL_ROOT
+if [ ! -z $RAILS_RELATIVE_URL_ROOT ]
+then
+  bundle exec rake assets:precompile
+fi
+
 # SETUP for OpenSEEK only, to link to openBIS if necessary
 if [ ! -z $OPENBIS_USERNAME ]
 then
