@@ -94,8 +94,12 @@ module Seek
     def to_spreadsheet_xml
       begin
         spreadsheet_to_xml(File.open(filepath), Seek::Config.jvm_memory_allocation)
-      rescue SysMODB::SpreadsheetExtractionException
-        to_spreadsheet_xml if double_check_mime_type
+      rescue SysMODB::SpreadsheetExtractionException=>e
+        if double_check_mime_type
+          to_spreadsheet_xml
+        else
+          raise e
+        end
       end
     end
 
