@@ -2,6 +2,8 @@
 # where the blob exists in the repository.
 module Git
   class Tree
+    include ActiveModel::Serialization
+
     delegate_missing_to :@tree
     delegate :git_repository, :version, :git_base, to: :git_version
 
@@ -62,6 +64,14 @@ module Git
       end
 
       total
+    end
+
+    def absolute_path(entry_path)
+      if path == '/'
+        entry_path
+      else
+        "#{path}/#{entry_path}"
+      end
     end
   end
 end

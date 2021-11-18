@@ -118,7 +118,7 @@ SEEK::Application.routes.draw do
 
   concern :git do
     nested do
-      scope controller: :git, path: '/git(/*version)', constraints: { path: /.+/ }, format: false, defaults: { format: :html }  do
+      scope controller: :git, path: '/git(/*version)', constraints: { path: /[^\0]+/ }, format: false do
         get 'tree(/*path)' => 'git#tree', as: :git_tree
         get 'blob/*path' => 'git#blob', as: :git_blob
         get 'raw/*path' => 'git#raw', as: :git_raw
@@ -154,7 +154,7 @@ SEEK::Application.routes.draw do
       get :settings
       get :get_stats
       get :registration_form
-      get :edit_tag      
+      get :edit_tag
       post :update_home_settings
       post :restart_server
       post :restart_delayed_job
@@ -509,8 +509,8 @@ SEEK::Application.routes.draw do
   resources :models, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
     member do
       get :compare_versions
-      post :compare_versions      
-      post :submit_to_sycamore      
+      post :compare_versions
+      post :submit_to_sycamore
       post :execute
       get :simulate
       post :simulate

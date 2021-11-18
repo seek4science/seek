@@ -7,6 +7,7 @@ class GitController < ApplicationController
   before_action :fetch_git_version
   before_action :get_tree, only: [:tree]
   before_action :get_blob, only: [:blob, :download, :raw]
+  before_action :coerce_format
 
   user_content_actions :raw
 
@@ -23,6 +24,7 @@ class GitController < ApplicationController
 
   def tree
     respond_to do |format|
+      format.json { render json: @tree, adapter: :attributes }
       if request.xhr?
         format.html { render partial: 'tree' }
       else
@@ -37,6 +39,7 @@ class GitController < ApplicationController
 
   def blob
     respond_to do |format|
+      format.json { render json: @blob, adapter: :attributes }
       if request.xhr?
         format.html { render partial: 'blob' }
       else
@@ -63,27 +66,25 @@ class GitController < ApplicationController
   def add_file
     if file_params[:url].present?
       add_remote_file
+      operation_response("Registered #{file_params[:url]}")
     else
       add_local_file
+      operation_response("Uploaded #{file_params[:path]}")
     end
-
-    redirect_to polymorphic_path(@parent_resource, anchor: 'files')
   end
 
   def remove_file
     @git_version.remove_file(file_params[:path])
     @git_version.save!
 
-    flash[:notice] = "Removed #{file_params[:path]}"
-    redirect_to polymorphic_path(@parent_resource, anchor: 'files')
+    operation_response("Removed #{file_params[:path]}")
   end
 
   def move_file
     @git_version.move_file(file_params[:path], file_params[:new_path])
     @git_version.save!
 
-    flash[:notice] = "Moved #{file_params[:path]} to #{file_params[:new_path]}"
-    redirect_to polymorphic_path(@parent_resource, anchor: 'files')
+    operation_response("Moved #{file_params[:path]} to #{file_params[:new_path]}")
   end
 
   def freeze_preview
@@ -101,6 +102,20 @@ class GitController < ApplicationController
   end
 
   private
+
+  def operation_response(notice = nil)
+    respond_to do |format|
+      format.json { render json: { }, status: 200, adapter: :attributes }
+      format.html do
+        if request.xhr?
+          render partial: 'files', locals: { resource: @parent_resource, git_version: @git_version }
+        else
+          flash[:notice] = notice if notice
+          redirect_to polymorphic_path(@parent_resource, anchor: 'files')
+        end
+      end
+    end
+  end
 
   def render_immutable_error
     flash[:error] = @git_version.immutable_error
@@ -187,8 +202,6 @@ class GitController < ApplicationController
     path = file_params[:data].original_filename if path.blank?
     @git_version.add_file(path, file_params[:data])
     @git_version.save!
-
-    flash[:notice] = "Uploaded #{file_params[:path]}"
   end
 
   def add_remote_file
@@ -196,8 +209,17 @@ class GitController < ApplicationController
     path = file_params[:url].split('/').last if path.blank?
     @git_version.add_remote_file(path, file_params[:url], fetch: file_params[:fetch] == '1')
     @git_version.save!
+  end
 
-    flash[:notice] = "Registered #{file_params[:path]}"
+  def coerce_format
+    # I have to do this because Rails doesn't seem to be behaving as expected.
+    # In routes.rb, the git routes are scoped with "format: false", so Rails should disregard the extension
+    # (e.g. /git/1/blob/my_file.yml) when determining the response format.
+    # However this results in an UnknownFormat error when trying to load the HTML view, as Rails still seems to be
+    # looking for an e.g. application/yaml view.
+    # You can fix this by adding { defaults: { format: :html } }, but then it is not possible to request JSON,
+    # even with an explicit `Accept: application/json` header! -Finn
+    request.format = :html unless json_api_request?
   end
 
   # # Rugged does not allow streaming blobs

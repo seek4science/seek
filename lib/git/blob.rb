@@ -3,6 +3,7 @@
 module Git
   class Blob
     include Seek::ContentExtraction
+    include ActiveModel::Serialization
 
     delegate_missing_to :@blob
     delegate :git_repository, :version, :git_base, to: :git_version
