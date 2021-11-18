@@ -31,13 +31,8 @@
       <%= render :partial => "spreadsheets/annotations", :locals=>{ :annotations => @display_data_file.spreadsheet_annotations } %>
     </div>
 
-        <%
-           spreadsheet = Rails.cache.fetch(@display_data_file.content_blob.cache_key) do
-             @display_data_file.spreadsheet
-           end
-        %>
-        <%= render :partial => "spreadsheets/spreadsheet_styles", :locals => {:styles => spreadsheet.styles} %>
-        <%= render :partial => "spreadsheets/spreadsheet", :locals => {:workbook => spreadsheet }%>
+        <%= render :partial => "spreadsheets/spreadsheet_styles", :locals => {:styles => @workbook.styles} %>
+        <%= render :partial => "spreadsheets/spreadsheet", :locals => {:workbook => @workbook }%>
 
   </div>
 </div>

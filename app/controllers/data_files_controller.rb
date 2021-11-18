@@ -186,12 +186,22 @@ class DataFilesController < ApplicationController
       end
     end
     if @display_data_file.contains_extractable_spreadsheet?
-      respond_to do |format|
-        format.html
+      begin
+        @workbook = Rails.cache.fetch("spreadsheet-workbook-#{@display_data_file.content_blob.cache_key}") do
+          @display_data_file.spreadsheet
+        end
+        respond_to do |format|
+          format.html
+        end
+      rescue SysMODB::SpreadsheetExtractionException
+        respond_to do |format|
+          flash[:error] = "There was an error when processing the #{t('data_file')} to explore, perhaps it isn't a valid Excel spreadsheet"
+          format.html { redirect_to data_file_path(@data_file, version: @display_data_file.version) }
+        end
       end
     else
       respond_to do |format|
-        flash[:error] = 'Unable to view contents of this data file'
+        flash[:error] = "Unable to explore contents of this #{t('data_file')}"
         format.html { redirect_to data_file_path(@data_file, version: @display_data_file.version) }
       end
     end
