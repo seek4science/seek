@@ -2,10 +2,10 @@
 
 <%= form_tag({:action => "update_rebrand"}, :multipart => true) do %>
 
-  <%= panel('Instance', help_text: "details about the current running instance") do %>
+  <%= panel('Instance', help_text: "About this instance of FAIRDOM-SEEK that is currently running.") do %>
 
     <%= admin_text_setting(:project_name, Seek::Config.project_name,
-                           "Name", "A name for your instance, this is the text that is used in sentences. Example FAIRDOMHub") %>
+                           "Name", "A name for your instance; example FAIRDOMHub") %>
 
     <%= admin_textarea_setting(:project_description, Seek::Config.project_description,
                                "Description", "A description about the instance.") %>
@@ -14,25 +14,23 @@
                            "Keywords", "A comma separated list of keywords that describe the instance.") %>
 
     <%= admin_text_setting(:project_link, Seek::Config.project_link,
-                           "Link", "A URL that is used as a link to your website that describes the instance. Example https://fair-dom.org") %>
+                           "Link", "A URL that is used as a link to your website that describes the instance; example https://fair-dom.org/fairdomhub") %>
 
     <%= admin_text_setting(:issue_tracker, Seek::Config.issue_tracker,
                            "Issue tracker link", "A URL for an issue tracker, which users can use to report bugs or other issues. Leave blank if not required") %>
 
-    <%= admin_text_setting(:application_name, Seek::Config.application_name,
+    <%#= admin_text_setting(:application_name, Seek::Config.application_name,
                            "Application name", "The name of your application, as used in sentences, if you are extending SEEK and wish to give it a different name.") %>
 
   <% end %>
 
   <%= panel('Instance administrators',help_text: "About the team or group that administer the instance") do %>
 
-
     <%= admin_text_setting(:dm_project_name, Seek::Config.dm_project_name,
-                           "Data management #{t('project')} name", "The name of the data management #{t('project')}, if different from the #{t('project')}, as used in titles. For example, in SysMO the #{t('project')} is SysMO, but the DM #{t('project')} name is SysMO-DB.") %>
+                           "Instance administrators name", "The name of the group that administers the instance, Example FAIRDOM") %>
 
     <%= admin_text_setting(:dm_project_link, Seek::Config.dm_project_link,
-                           "Data management #{t('project')} link", "A URL that is used in links to the data management #{t('project')}.") %>
-
+                           "Instance administrators link", "The link for more details about the group that administers the instance, example https://fair-dom.org") %>
 
   <% end %>
 
