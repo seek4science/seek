@@ -15,7 +15,10 @@ start_search
 # Precompile assets if using RAILS_RELATIVE_URL_ROOT
 if [ ! -z $RAILS_RELATIVE_URL_ROOT ]
 then
-  bundle exec rake assets:precompile
+  echo "COMPILING ASSETS"
+  # using --trace prevents giving the feeling things have frozen up during startup
+  bundle exec rake assets:precompile --trace
+  bundle exec rake assets:clean --trace
 fi
 
 # SETUP for OpenSEEK only, to link to openBIS if necessary
