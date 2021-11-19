@@ -278,6 +278,13 @@ class SampleAttributeTest < ActiveSupport::TestCase
     assert valid_value?(attribute, 'surely no one has used this as a sample title')
   end
 
+  test 'attribute with description and iri factory' do
+    attribute = Factory(:string_sample_attribute_with_description_and_iri, is_title: true, sample_type: Factory(:simple_sample_type))
+    assert attribute.valid?
+    refute_nil attribute.description
+    refute_nil attribute.iri
+  end
+
   private
 
   def valid_value?(attribute, value)
