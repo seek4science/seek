@@ -124,9 +124,9 @@ SEEK::Application.routes.draw do
         get 'raw/*path' => 'git#raw', as: :git_raw
         get 'download/*path' => 'git#download', as: :git_download
         get 'browse' => 'git#browse', as: :git_browse
-        post 'add' => 'git#add_file', as: :git_add_file
-        delete 'remove' => 'git#remove_file', as: :git_remove_file
-        patch 'move' => 'git#move_file', as: :git_move_file
+        post 'blob(/*path)' =>'git#add_file', as: :git_add_file
+        delete 'blob/*path' => 'git#remove_file', as: :git_remove_file
+        patch 'blob/*path' => 'git#move_file', as: :git_move_file
         get 'freeze' => 'git#freeze_preview', as: :git_freeze_preview
         post 'freeze' => 'git#freeze', as: :git_freeze
       end

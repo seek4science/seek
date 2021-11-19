@@ -69,22 +69,22 @@ class GitController < ApplicationController
       operation_response("Registered #{file_params[:url]}")
     else
       add_local_file
-      operation_response("Uploaded #{file_params[:path]}")
+      operation_response("Uploaded #{file_params[:path] || params[:path]}")
     end
   end
 
   def remove_file
-    @git_version.remove_file(file_params[:path])
+    @git_version.remove_file(params[:path])
     @git_version.save!
 
-    operation_response("Removed #{file_params[:path]}")
+    operation_response("Removed #{params[:path]}")
   end
 
   def move_file
-    @git_version.move_file(file_params[:path], file_params[:new_path])
+    @git_version.move_file(params[:path], file_params[:new_path])
     @git_version.save!
 
-    operation_response("Moved #{file_params[:path]} to #{file_params[:new_path]}")
+    operation_response("Moved #{params[:path]} to #{file_params[:new_path]}")
   end
 
   def freeze_preview
@@ -198,14 +198,14 @@ class GitController < ApplicationController
   end
 
   def add_local_file
-    path = file_params[:path]
+    path = file_params[:path] || params[:path]
     path = file_params[:data].original_filename if path.blank?
     @git_version.add_file(path, file_params[:data])
     @git_version.save!
   end
 
   def add_remote_file
-    path = file_params[:path]
+    path = file_params[:path] || params[:path]
     path = file_params[:url].split('/').last if path.blank?
     @git_version.add_remote_file(path, file_params[:url], fetch: file_params[:fetch] == '1')
     @git_version.save!
