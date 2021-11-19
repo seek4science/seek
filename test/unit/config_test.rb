@@ -218,9 +218,7 @@ class ConfigTest < ActiveSupport::TestCase
   test 'project_name' do
     assert_equal 'Sysmo', Seek::Config.project_name
   end
-  test 'project_type' do
-    assert_equal 'Consortium', Seek::Config.project_type
-  end
+
   test 'project_link' do
     assert_equal 'http://www.sysmo.net', Seek::Config.project_link
   end

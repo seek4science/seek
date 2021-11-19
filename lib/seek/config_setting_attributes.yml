@@ -11,7 +11,6 @@ registration_disabled_description:
 activation_required_enabled:
 smtp:
   encrypt: true
-project_type:
 project_link:
 type_managers_enabled:
 type_managers:

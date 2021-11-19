@@ -99,7 +99,6 @@ def load_seek_config_defaults!
   Seek::Config.default :home_feeds_cache_timeout,30
 # Branding
   Seek::Config.default :project_name,'FAIRDOM'
-  Seek::Config.default :project_type,''
   Seek::Config.default :project_link,'http://www.fair-dom.org'
 
   Seek::Config.default :application_name,"SEEK"

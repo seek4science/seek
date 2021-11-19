@@ -342,7 +342,7 @@ class AdminControllerTest < ActionController::TestCase
 
   test 'update branding' do
     assert_nil Seek::Config.header_image_avatar_id
-    settings = {project_name: 'project name', project_type: 'project type', project_description: 'project description', project_keywords: 'project,    keywords, ',
+    settings = {project_name: 'project name', project_description: 'project description', project_keywords: 'project,    keywords, ',
                 project_link: 'http://project-link.com',application_name: 'app name',
                 dm_project_name: 'dm project name', dm_project_link: 'http://dm-project-link.com', issue_tracker: 'https://issues-galore.com',
                 header_image_link: 'http://header-link.com/image.jpg', header_image_title: 'header image title',
@@ -356,7 +356,6 @@ class AdminControllerTest < ActionController::TestCase
     assert_redirected_to admin_path
 
     assert_equal 'project name', Seek::Config.project_name
-    assert_equal 'project type', Seek::Config.project_type
     assert_equal 'project description', Seek::Config.project_description
     assert_equal 'project, keywords', Seek::Config.project_keywords
     assert_equal 'http://project-link.com', Seek::Config.project_link

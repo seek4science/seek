@@ -3,13 +3,6 @@ module Seek
   # Convention to create a new fallback is to name the method <setting_name>_fallback
   module Fallbacks
     # fallback attributes
-    def project_long_name_fallback
-      if project_type.blank?
-        project_name.to_s
-      else
-        "#{project_name} #{project_type}"
-      end
-    end
 
     def dm_project_name_fallback
       project_name
