@@ -1,6 +1,6 @@
 Hi <%= @person.name %>,
 
-This email is to inform you that several of your files have been automatically registered with <%= Seek::Config.application_name %>.
+This email is to inform you that several of your files have been automatically registered with <%= Seek::Config.project_name %>.
 You can edit and change permissions of these resources, along with the title, description and other attributes, just as if you had uploaded them manually.
 <% success_resources = @resources.select{|r| r[:response] == :success} -%>
 <% warning_resources = @resources.select{|r| r[:response] == :warning} -%>

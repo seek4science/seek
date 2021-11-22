@@ -18,7 +18,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'DataCatalog',
       'dct:conformsTo' => 'https://bioschemas.org/profiles/DataCatalog/0.3-RELEASE-2019_07_01/',
-      'name' => 'Sysmo',
+      'name' => 'Sysmo SEEK',
       'url' => 'http://fairyhub.org',
       'description' => 'a lovely project',
       'keywords' => 'a, b, c, d',

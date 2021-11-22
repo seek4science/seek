@@ -343,7 +343,7 @@ class AdminControllerTest < ActionController::TestCase
   test 'update branding' do
     assert_nil Seek::Config.header_image_avatar_id
     settings = {project_name: 'project name', project_description: 'project description', project_keywords: 'project,    keywords, ',
-                project_link: 'http://project-link.com',application_name: 'app name',
+                project_link: 'http://project-link.com',
                 dm_project_name: 'dm project name', dm_project_link: 'http://dm-project-link.com', issue_tracker: 'https://issues-galore.com',
                 header_image_link: 'http://header-link.com/image.jpg', header_image_title: 'header image title',
                 copyright_addendum_content: 'copyright content', imprint_description: 'imprint description',
@@ -359,7 +359,6 @@ class AdminControllerTest < ActionController::TestCase
     assert_equal 'project description', Seek::Config.project_description
     assert_equal 'project, keywords', Seek::Config.project_keywords
     assert_equal 'http://project-link.com', Seek::Config.project_link
-    assert_equal 'app name', Seek::Config.application_name
     assert_equal 'dm project name', Seek::Config.dm_project_name
     assert_equal 'http://dm-project-link.com', Seek::Config.dm_project_link
     assert_equal 'https://issues-galore.com', Seek::Config.issue_tracker
@@ -478,7 +477,7 @@ class AdminControllerTest < ActionController::TestCase
     assert_equal new_value, Seek::Config.recommended_data_licenses
     new_value = []
     post :update_settings, params: {recommended_data_licenses: new_value}
-    assert_equal nil, Seek::Config.recommended_data_licenses
+    assert_nil Seek::Config.recommended_data_licenses
   end
 
   test 'recommended software licenses' do
@@ -488,7 +487,7 @@ class AdminControllerTest < ActionController::TestCase
     assert_equal new_value, Seek::Config.recommended_software_licenses
     new_value = []
     post :update_settings, params: {recommended_software_licenses: new_value}
-    assert_equal nil, Seek::Config.recommended_software_licenses
+    assert_nil Seek::Config.recommended_software_licenses
   end
 
 end

@@ -216,7 +216,7 @@ class ConfigTest < ActiveSupport::TestCase
 
   # Project
   test 'project_name' do
-    assert_equal 'Sysmo', Seek::Config.project_name
+    assert_equal 'Sysmo SEEK', Seek::Config.project_name
   end
 
   test 'project_link' do
@@ -231,7 +231,7 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal 'http://www.sysmo-db.org', Seek::Config.dm_project_link
   end
   test 'application_name' do
-    assert_equal 'Sysmo SEEK', Seek::Config.application_name
+    assert_equal 'FAIRDOM-SEEK', Seek::Config.application_name
   end
 
   test 'header_image_enabled' do

@@ -3,7 +3,7 @@ def load_seek_testing_defaults!
     silence_warnings do
       Settings.defaults[:is_virtualliver] = false
       Settings.defaults[:project_hierarchy_enabled] = true
-      Settings.defaults[:project_name] = 'Sysmo'
+      Settings.defaults[:project_name] = 'Sysmo SEEK'
 
       Settings.defaults[:noreply_sender] ="no-reply@sysmo-db.org"
       Settings.defaults[:support_email_address] = 'support@seek.org'
@@ -49,7 +49,7 @@ def load_seek_testing_defaults!
       Settings.defaults[:workflows_enabled] = true
 
       Settings.defaults[:project_link] = 'http://www.sysmo.net'
-      Settings.defaults[:application_name] = 'Sysmo SEEK'
+      Settings.defaults[:application_name] = 'FAIRDOM-SEEK'
       Settings.defaults[:dm_project_name] = "SysMO-DB"
       Settings.defaults[:dm_project_link] = "http://www.sysmo-db.org"
       Settings.defaults[:header_image_enabled] = true
