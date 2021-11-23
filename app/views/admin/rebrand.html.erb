@@ -107,8 +107,11 @@
     </div>
 
 
-    <%= admin_text_setting(:about_link, Seek::Config.about_link,
-                           "About link", "Optional external link providing additional information.",:placeholder=>"http://use-full-URLs.com") %>
+    <%= admin_checkbox_setting(:about_instance_link_enabled, 1, Seek::Config.about_instance_link_enabled,
+                        "About link for the instance enabled", "Whether the About instance link, that uses the instance name and link, is enabled in the About menu") %>
+
+    <%= admin_checkbox_setting(:about_instance_admins_link_enabled, 1, Seek::Config.about_instance_admins_link_enabled,
+                               "About link for the instance administrators enabled", "Whether the About instance administrators link, that uses the instance admins name and link, is enabled in the About menu") %>
 
     <%= admin_text_setting(:cite_link, Seek::Config.cite_link,
                            "Cite link", "Optional external link providing instructions on how to cite you. (shown in footer as well)",:placeholder=>"http://use-full-URLs.com") %>

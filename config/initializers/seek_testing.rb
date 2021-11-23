@@ -57,6 +57,9 @@ def load_seek_testing_defaults!
       Settings.defaults[:header_image_link] = "http://www.sysmo-db.org"
       Settings.defaults[:bioportal_api_key]="fish"
 
+      Settings.defaults[:about_instance_link_enabled] = true
+      Settings.defaults[:about_instance_admins_link_enabled] = true
+
       Settings.defaults[:technology_type_ontology_file] = "file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
       Settings.defaults[:modelling_analysis_type_ontology_file] = "file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
       Settings.defaults[:assay_type_ontology_file] = "file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"

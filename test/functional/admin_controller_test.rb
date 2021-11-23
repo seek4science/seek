@@ -348,6 +348,7 @@ class AdminControllerTest < ActionController::TestCase
                 header_image_link: 'http://header-link.com/image.jpg', header_image_title: 'header image title',
                 copyright_addendum_content: 'copyright content', imprint_description: 'imprint description',
                 terms_page: 'terms page', privacy_page: 'privacy page', about_page: 'about page',
+                about_instance_link_enabled: 1, about_instance_admins_link_enabled: 1,
                 header_image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
 
     assert_difference('Avatar.count', 1) do
@@ -369,6 +370,8 @@ class AdminControllerTest < ActionController::TestCase
     assert_equal 'terms page', Seek::Config.terms_page
     assert_equal 'privacy page', Seek::Config.privacy_page
     assert_equal 'about page', Seek::Config.about_page
+    assert Seek::Config.about_instance_link_enabled
+    assert Seek::Config.about_instance_admins_link_enabled
     assert Seek::Config.header_image_avatar_id > 0
   end
 
