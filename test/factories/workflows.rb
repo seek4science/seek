@@ -238,3 +238,18 @@ Factory.define(:ro_crate_git_workflow, class: Workflow) do |f|
     }
   end
 end
+
+Factory.define(:nfcore_git_workflow, class: Workflow) do |f|
+  f.title 'nf-core/ampliseq'
+  f.with_project_contributor
+  f.workflow_class { WorkflowClass.find_by_key('nextflow') || Factory(:nextflow_workflow_class) }
+  f.git_version_attributes do
+    repo = Factory(:nfcore_local_rocrate_repository)
+    { git_repository_id: repo.id,
+      ref: 'refs/heads/master',
+      commit: 'fda2a6add4b4c2a9ec02b40485adbce690cf4429',
+      main_workflow_path: 'main.nf',
+      mutable: true
+    }
+  end
+end

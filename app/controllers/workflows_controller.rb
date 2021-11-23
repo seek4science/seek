@@ -290,33 +290,28 @@ class WorkflowsController < ApplicationController
   private
 
   def handle_ro_crate_post(new_version = false)
-    @workflow = Workflow.new unless new_version
-    extractor = Seek::WorkflowExtractors::ROCrate.new(params[:ro_crate])
-
-    @workflow.assign_attributes(extractor.metadata.except(:errors, :warnings))
-    @workflow.assign_attributes(workflow_params)
-    crate_upload = params[:ro_crate]
-    old_content_blob = new_version ? @workflow.content_blob : nil
-    version = new_version ? @workflow.version + 1 : 1
-    @workflow.build_content_blob(tmp_io_object: crate_upload,
-                                 original_filename: crate_upload.original_filename,
-                                 content_type: crate_upload.content_type,
-                                 asset_version: version)
-    if old_content_blob
-      old_content_blob.update_column(:asset_id, @workflow.id)
-    end
-
+    @crate_extractor = WorkflowCrateExtractor.new(ro_crate: { data: params[:ro_crate] }, params: workflow_params)
     if new_version
-      success = @workflow.save_as_new_version(params[:revision_comments])
-    else
-      create_asset(@workflow)
-      success = @workflow.save
+      if @workflow.latest_git_version.remote?
+        @workflow.errors.add(:base, 'Cannot add RO-Crate to remote workflows.')
+        render json: json_api_errors(@workflow), status: :unprocessable_entity
+        return
+      else
+        @crate_extractor.workflow = @workflow
+        @workflow.latest_git_version.lock if @workflow.latest_git_version.mutable?
+        @crate_extractor.git_version = @workflow.latest_git_version.next_version(mutable: true).tap(&:save)
+      end
     end
+    @workflow = @crate_extractor.build
 
-    if success
-      render json: @workflow, include: json_api_include_param
+    if @crate_extractor.valid?
+      if (!new_version || @workflow.git_version.save) && @workflow.save
+        render json: @workflow, include: json_api_include_param
+      else
+        render json: json_api_errors(@workflow), status: :unprocessable_entity
+      end
     else
-      render json: json_api_errors(@workflow), status: :unprocessable_entity
+      render json: json_api_errors(@crate_extractor), status: :unprocessable_entity
     end
   end
 

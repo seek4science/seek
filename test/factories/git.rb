@@ -34,6 +34,12 @@ Factory.define(:remote_workflow_ro_crate_repository, parent: :workflow_ro_crate_
   f.remote "https://somewhere.internets/repo.git"
 end
 
+Factory.define(:nfcore_local_rocrate_repository, class: Git::Repository) do |f|
+  f.after_create do |r|
+    FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'nf-core-ampliseq', '_git', '.'), File.join(r.local_path, '.git'))
+  end
+end
+
 # GitVersions
 Factory.define(:git_version, class: Git::Version) do |f|
   f.git_repository { Factory(:local_repository) }

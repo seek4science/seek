@@ -5,35 +5,38 @@ require 'seek/download_handling/http_streamer'
 class WorkflowCrateExtractor
   include ActiveModel::Model
 
-  attr_accessor :ro_crate, :workflow_class
+  attr_accessor :ro_crate, :workflow_class, :workflow, :git_version, :params
 
   validate :resolve_crate
   validate :main_workflow_present?, if: -> { @crate.present? }
 
   def build
-    @workflow = Workflow.new(workflow_class: workflow_class)
+    unless workflow
+      self.workflow = Workflow.new(workflow_class: workflow_class)
+      self.git_version = workflow.git_version
+      git_version.set_default_git_repository
+    end
 
     if valid?
-      repo = Git::Repository.create!
-      gv = @workflow.git_version
-      gv.git_repository = repo
-      gv.main_workflow_path = URI.decode_www_form_component(@crate.main_workflow.id) if @crate.main_workflow && !@crate.main_workflow.remote?
-      gv.diagram_path = URI.decode_www_form_component(@crate.main_workflow.diagram.id) if @crate.main_workflow&.diagram && !@crate.main_workflow.diagram.remote?
-      gv.abstract_cwl_path = URI.decode_www_form_component(@crate.main_workflow.cwl_description.id) if @crate.main_workflow&.cwl_description && !@crate.main_workflow.diagram.remote?
+      git_version.main_workflow_path = URI.decode_www_form_component(@crate.main_workflow.id) if @crate.main_workflow && !@crate.main_workflow.remote?
+      git_version.diagram_path = URI.decode_www_form_component(@crate.main_workflow.diagram.id) if @crate.main_workflow&.diagram && !@crate.main_workflow.diagram.remote?
+      git_version.abstract_cwl_path = URI.decode_www_form_component(@crate.main_workflow.cwl_description.id) if @crate.main_workflow&.cwl_description && !@crate.main_workflow.diagram.remote?
       files = []
       @crate.entries.each do |path, entry|
         next if entry.directory?
         files << [path, entry.source]
       end
-      gv.add_files(files)
+      git_version.add_files(files)
 
-      extractor = @workflow.extractor
-      @workflow.provide_metadata(extractor.metadata)
+      extractor = Seek::WorkflowExtractors::ROCrate.new(git_version)
+      workflow.provide_metadata(extractor.metadata)
+      workflow.assign_attributes(params) if params.present?
+      git_version.set_resource_attributes(workflow.attributes)
 
-      @workflow
+      workflow
     end
 
-    @workflow
+    workflow
   end
 
   private

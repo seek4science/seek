@@ -15,6 +15,7 @@ module Git
     before_validation :assign_contributor, on: :create
     before_save :set_commit, unless: -> { ref.blank? }
     after_create :set_git_repository_resource
+    after_create :set_resource_version
 
     accepts_nested_attributes_for :git_annotations
 
@@ -161,15 +162,18 @@ module Git
 
     # Initialize a follow-up version to this one, with the version number bumped.
     def next_version(extra_attributes = {})
-      git_version = self.dup
-      git_version.comment = nil
-      git_version.ref = nil
-      git_version.version = (version + 1)
-      git_version.name = "Version #{git_version.version}"
-      git_version.set_resource_attributes(resource.attributes)
-      git_version.assign_attributes(extra_attributes)
-      git_version.git_annotations = git_annotations.map(&:dup)
-      git_version
+      resource.git_versions.build.tap do |gv|
+        [:visibility, :git_repository_id, :ref, :commit, :root_path].each do |attr|
+          gv.send("#{attr}=", send(attr))
+        end
+        gv.comment = nil
+        gv.ref = nil
+        gv.version = (version + 1)
+        gv.name = "Version #{gv.version}"
+        gv.set_resource_attributes(resource.attributes)
+        gv.assign_attributes(extra_attributes)
+        gv.git_annotations = git_annotations.map(&:dup)
+      end
     end
 
     def to_schema_ld
@@ -222,7 +226,7 @@ module Git
       if @remote.present?
         self.git_repository ||= Git::Repository.find_or_create_by(remote: @remote)
       else
-        self.git_repository ||= (resource.local_git_repository || resource.create_local_git_repository)
+        self.git_repository ||= (resource.local_git_repository || Git::Repository.create)
         self.ref = DEFAULT_LOCAL_REF if self.ref.blank?
       end
     end
@@ -327,6 +331,10 @@ module Git
 
     def set_git_repository_resource
       git_repository.update_attribute(:resource, resource) unless git_repository.remote?
+    end
+
+    def set_resource_version
+      resource.update_attribute(:version, version)
     end
   end
 end
