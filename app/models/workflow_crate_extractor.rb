@@ -11,13 +11,11 @@ class WorkflowCrateExtractor
   validate :main_workflow_present?, if: -> { @crate.present? }
 
   def build
-    unless workflow
-      self.workflow = Workflow.new(workflow_class: workflow_class)
-      self.git_version = workflow.git_version
-      git_version.set_default_git_repository
-    end
-
+    self.workflow ||= Workflow.new(workflow_class: workflow_class)
     if valid?
+      self.git_version ||= workflow.git_version.tap do |gv|
+        gv.set_default_git_repository
+      end
       git_version.main_workflow_path = URI.decode_www_form_component(@crate.main_workflow.id) if @crate.main_workflow && !@crate.main_workflow.remote?
       git_version.diagram_path = URI.decode_www_form_component(@crate.main_workflow.diagram.id) if @crate.main_workflow&.diagram && !@crate.main_workflow.diagram.remote?
       git_version.abstract_cwl_path = URI.decode_www_form_component(@crate.main_workflow.cwl_description.id) if @crate.main_workflow&.cwl_description && !@crate.main_workflow.diagram.remote?
