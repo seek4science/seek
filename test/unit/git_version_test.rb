@@ -114,11 +114,12 @@ class GitVersionTest < ActiveSupport::TestCase
 
   test 'automatically init local git repo' do
     w = Factory(:workflow)
-    v = w.git_versions.create
-
-    assert v.git_repository
-    assert w.local_git_repository
-    assert_equal w.local_git_repository, v.git_repository
+    disable_authorization_checks do
+      v = w.git_versions.create
+      assert v.git_repository
+      assert w.local_git_repository
+      assert_equal w.local_git_repository, v.git_repository
+    end
   end
 
   test 'automatically link existing remote git repos' do

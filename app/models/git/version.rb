@@ -4,7 +4,7 @@ module Git
     SYNC_IGNORE_ATTRIBUTES = %w(id version doi visibility created_at updated_at).freeze
     cattr_accessor :git_sync_ignore_attributes
 
-    belongs_to :resource, polymorphic: true
+    belongs_to :resource, polymorphic: true, inverse_of: :git_versions
     belongs_to :contributor, class_name: 'Person'
     belongs_to :git_repository, class_name: 'Git::Repository'
     has_many :git_annotations, inverse_of: :git_version, dependent: :destroy, class_name: 'Git::Annotation', foreign_key: :git_version_id
@@ -14,8 +14,8 @@ module Git
     before_validation :set_default_visibility, on: :create
     before_validation :assign_contributor, on: :create
     before_save :set_commit, unless: -> { ref.blank? }
-    after_create :set_git_repository_resource
     after_create :set_resource_version
+    after_create :set_git_repository_resource
 
     accepts_nested_attributes_for :git_annotations
 
@@ -334,7 +334,7 @@ module Git
     end
 
     def set_resource_version
-      resource.update_attribute(:version, version)
+      resource.update_column(:version, version)
     end
   end
 end

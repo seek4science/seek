@@ -1,6 +1,6 @@
 module Git
   class Repository < ApplicationRecord
-    belongs_to :resource, polymorphic: true, optional: true
+    belongs_to :resource, polymorphic: true, optional: true, inverse_of: :local_git_repository
     has_many :git_versions, class_name: 'Git::Version', foreign_key: :git_repository_id
     after_create :initialize_repository
     after_create :setup_remote, if: -> { remote.present? }

@@ -13,8 +13,8 @@ module Git
         self.git_version_class_name = options[:git_version_class_name] || 'Git::Version'
 
         class_eval do
-          has_many :git_versions, as: :resource, dependent: :destroy, class_name: 'Git::Version'
-          has_one :local_git_repository, as: :resource, class_name: 'Git::Repository'
+          has_many :git_versions, as: :resource, dependent: :destroy, class_name: 'Git::Version', inverse_of: :resource
+          has_one :local_git_repository, as: :resource, class_name: 'Git::Repository', inverse_of: :resource
 
           attr_accessor :git_version_attributes
 
