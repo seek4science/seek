@@ -7,7 +7,7 @@ module Seek
       include Seek::BioSchema::Support
 
       def description
-        Seek::Config.project_description
+        Seek::Config.instance_description
       end
 
       def title

@@ -49,7 +49,7 @@ class DataCatalogMockModelTest < ActiveSupport::TestCase
   end
 
   test 'description' do
-    with_config_value(:project_description, 'The worlds best app') do
+    with_config_value(:instance_description, 'The worlds best app') do
       assert_equal 'The worlds best app', @data_catalogue.description
     end
   end
@@ -66,7 +66,7 @@ class DataCatalogMockModelTest < ActiveSupport::TestCase
       with_config_value(:dm_project_name, 'WIBBLE') do
         with_config_value(:dm_project_link, 'http://wibble.eu') do
           with_config_value(:project_keywords, 'a, b, c, d, e') do
-            with_config_value(:project_description, 'The worlds best app') do
+            with_config_value(:instance_description, 'The worlds best app') do
               with_config_value(:instance_name, 'bioschema supported app') do
                 json = @data_catalogue.to_schema_ld
                 JSON.parse(json)

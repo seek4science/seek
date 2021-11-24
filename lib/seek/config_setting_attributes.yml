@@ -23,7 +23,7 @@ noreply_sender:
 solr_enabled:
 application_name:
 instance_name:
-project_description:
+instance_description:
 project_keywords:
 dm_project_name:
 dm_project_link:

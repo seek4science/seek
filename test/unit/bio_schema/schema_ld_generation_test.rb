@@ -31,7 +31,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601
     }
-    with_config_value(:project_description, 'a lovely project') do
+    with_config_value(:instance_description, 'a lovely project') do
       with_config_value(:project_keywords, 'a,  b, ,,c,d') do
         with_config_value(:site_base_host, 'http://fairyhub.org') do
           json = JSON.parse(Seek::BioSchema::DataCatalogMockModel.new.to_schema_ld)

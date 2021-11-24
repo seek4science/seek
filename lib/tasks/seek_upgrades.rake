@@ -49,6 +49,7 @@ namespace :seek do
   task(rename_branding_settings: [:environment]) do
     Seek::Config.transfer_value :project_link, :instance_link
     Seek::Config.transfer_value :project_name, :instance_name
+    Seek::Config.transfer_value :project_description, :instance_description
   end
 
 end

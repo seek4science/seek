@@ -201,7 +201,7 @@ class AdminController < ApplicationController
   def update_rebrand
     Seek::Config.instance_name = params[:instance_name]
     Seek::Config.instance_link = params[:instance_link]
-    Seek::Config.project_description = params[:project_description]
+    Seek::Config.instance_description = params[:instance_description]
     Seek::Config.project_keywords = params[:project_keywords].split(',').collect(&:strip).reject(&:blank?).join(', ')
 
     Seek::Config.dm_project_name = params[:dm_project_name]
