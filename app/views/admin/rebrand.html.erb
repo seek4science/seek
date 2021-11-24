@@ -24,10 +24,10 @@
   <%= panel('Instance administrator details',help_text: "Details about the organisation or group that administers this running instance. Like the instance details, these are used in various places of the interface, emails, and markup for search engines.") do %>
 
     <%= admin_text_setting(:instance_admins_name, Seek::Config.instance_admins_name,
-                           "Instance administrator name", "The name of the organisation or group that administers the instance; Example FAIRDOM") %>
+                           "Instance administrator name", "The name of the organisation or group that administers the instance; example FAIRDOM") %>
 
     <%= admin_text_setting(:instance_admins_link, Seek::Config.instance_admins_link,
-                           "Instance administrator link", "The URL to a website that provides more details about the organisation or group that administers the instance, example https://fair-dom.org") %>
+                           "Instance administrator link", "The URL to a website that provides more details about the organisation or group that administers the instance; example https://fair-dom.org") %>
 
   <% end %>
 
