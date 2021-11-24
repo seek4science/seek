@@ -151,7 +151,7 @@ module Seek
         # Step 1 - JSON-API -> Rails format
         polymorphic_fields = POLYMORPHIC_FIELDS[@controller_name.to_sym] || []
         @parameters[@controller_name.singularize.to_sym] =
-            ActiveModelSerializers::Deserialization.jsonapi_parse(@parameters, polymorphic: polymorphic_fields)
+            ActiveModelSerializers::Deserialization.jsonapi_parse(@parameters, polymorphic: polymorphic_fields, key_transform: :unaltered)
 
         # Step 2 - Perform any conversions on parameter values
         convert_parameters
