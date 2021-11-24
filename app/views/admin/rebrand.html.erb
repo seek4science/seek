@@ -2,10 +2,10 @@
 
 <%= form_tag({:action => "update_rebrand"}, :multipart => true) do %>
 
-  <%= panel('Instance', help_text: "About this instance of FAIRDOM-SEEK that is currently running.") do %>
+  <%= panel('Instance details', help_text: "Details that describe this running instance of #{Seek::Config.application_name}. These are used in various places of the interface, emails, and markup for search engines.") do %>
 
     <%= admin_text_setting(:instance_name, Seek::Config.instance_name,
-                           "Name", "A name for your instance; example FAIRDOMHub") %>
+                           "Name", "A name for your instance; example FAIRDOMHub.") %>
 
     <%= admin_textarea_setting(:instance_description, Seek::Config.instance_description,
                                "Description", "A description about the instance.") %>
@@ -17,17 +17,17 @@
                            "Link", "A URL that is used as a link to your website that describes the instance; example https://fair-dom.org/fairdomhub") %>
 
     <%= admin_text_setting(:issue_tracker, Seek::Config.issue_tracker,
-                           "Issue tracker link", "A URL for an issue tracker, which users can use to report bugs or other issues. Leave blank if not required") %>
+                           "Issue tracker link", "A URL for an issue tracker, which users can use to report bugs or feature requests. Leave blank if not required") %>
 
   <% end %>
 
-  <%= panel('Instance administrators',help_text: "About the team or group that administer the instance") do %>
+  <%= panel('Instance administrator details',help_text: "Details about the organisation or group that administers this running instance. Like the instance details, these are used in various places of the interface, emails, and markup for search engines.") do %>
 
     <%= admin_text_setting(:instance_admins_name, Seek::Config.instance_admins_name,
-                           "Instance administrators name", "The name of the group that administers the instance, Example FAIRDOM") %>
+                           "Instance administrator name", "The name of the organisation or group that administers the instance; Example FAIRDOM") %>
 
     <%= admin_text_setting(:instance_admins_link, Seek::Config.instance_admins_link,
-                           "Instance administrators link", "The link for more details about the group that administers the instance, example https://fair-dom.org") %>
+                           "Instance administrator link", "The URL to a website that provides more details about the organisation or group that administers the instance, example https://fair-dom.org") %>
 
   <% end %>
 
@@ -108,10 +108,10 @@
 
 
     <%= admin_checkbox_setting(:about_instance_link_enabled, 1, Seek::Config.about_instance_link_enabled,
-                        "About link for the instance enabled", "Whether the About instance link, that uses the instance name and link, is enabled in the About menu") %>
+                        '"About" the instance enabled', "When enabled an item will appear in the About menu that uses the instance name and link provided above.") %>
 
     <%= admin_checkbox_setting(:about_instance_admins_link_enabled, 1, Seek::Config.about_instance_admins_link_enabled,
-                               "About link for the instance administrators enabled", "Whether the About instance administrators link, that uses the instance admins name and link, is enabled in the About menu") %>
+                               '"About" the instance administrator enabled', "When enabled an item will appear in the About menu that uses the instance administrator name and link provided above.") %>
 
     <%= admin_text_setting(:cite_link, Seek::Config.cite_link,
                            "Cite link", "Optional external link providing instructions on how to cite you. (shown in footer as well)",:placeholder=>"http://use-full-URLs.com") %>
