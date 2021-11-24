@@ -5,8 +5,8 @@ production:
     log_level: WARNING
     memory: 1G
     path: <%= ENV['SOLR_PATH'] || '/solr/seek' %>
-    read_timeout: 30
-    open_timeout: 3
+    read_timeout: 120
+    open_timeout: 12
 
 development:
   solr:
@@ -14,8 +14,6 @@ development:
     port: <%= ENV['SOLR_PORT'] || 8983 %>
     log_level: INFO
     path: <%= ENV['SOLR_PATH'] || '/solr/seek' %>
-    read_timeout: 30
-    open_timeout: 3
 
 test:
   solr:
