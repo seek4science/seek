@@ -205,7 +205,7 @@ class AdminController < ApplicationController
     Seek::Config.instance_keywords = params[:instance_keywords].split(',').collect(&:strip).reject(&:blank?).join(', ')
 
     Seek::Config.instance_admins_name = params[:instance_admins_name]
-    Seek::Config.dm_project_link = params[:dm_project_link]
+    Seek::Config.instance_admins_link = params[:instance_admins_link]
     Seek::Config.issue_tracker = params[:issue_tracker]
 
     Seek::Config.header_image_enabled = string_to_boolean params[:header_image_enabled]

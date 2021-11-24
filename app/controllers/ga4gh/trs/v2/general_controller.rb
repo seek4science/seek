@@ -15,7 +15,7 @@ module Ga4gh
               "name": Seek::Config.instance_name,
               "organization": {
                   "name": Seek::Config.instance_admins_name,
-                  "url": Seek::Config.dm_project_link
+                  "url": Seek::Config.instance_admins_link
               },
               "type": {
                   "artifact": "trs",

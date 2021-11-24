@@ -21,9 +21,9 @@ module Seek
       def provider
         {
           '@type' => 'Organization',
-          '@id' => Seek::Config.dm_project_link,
+          '@id' => Seek::Config.instance_admins_link,
           'name' => Seek::Config.instance_admins_name,
-          'url' => Seek::Config.dm_project_link
+          'url' => Seek::Config.instance_admins_link
         }
       end
 

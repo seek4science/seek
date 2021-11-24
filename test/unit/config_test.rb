@@ -223,12 +223,12 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal 'http://www.sysmo.net', Seek::Config.instance_link
   end
 
-  test 'dm_project_name' do
+  test 'instance_admins_name' do
     assert_equal 'SysMO-DB', Seek::Config.instance_admins_name
   end
 
-  test 'dm_project_link' do
-    assert_equal 'http://www.sysmo-db.org', Seek::Config.dm_project_link
+  test 'instance_admins_link' do
+    assert_equal 'http://www.sysmo-db.org', Seek::Config.instance_admins_link
   end
   test 'application_name' do
     assert_equal 'FAIRDOM-SEEK', Seek::Config.application_name

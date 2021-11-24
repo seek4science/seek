@@ -342,9 +342,9 @@ class AdminControllerTest < ActionController::TestCase
 
   test 'update branding' do
     assert_nil Seek::Config.header_image_avatar_id
-    settings = {instance_name: 'instance name', instance_description: 'instance description', instance_keywords: 'instnace,    keywords, ',
+    settings = {instance_name: 'instance name', instance_description: 'instance description', instance_keywords: 'instance,    keywords, ',
                 instance_link: 'http://project-link.com',
-                instance_admins_name: 'instance admins name', dm_project_link: 'http://dm-project-link.com', issue_tracker: 'https://issues-galore.com',
+                instance_admins_name: 'instance admins name', instance_admins_link: 'http://dm-project-link.com', issue_tracker: 'https://issues-galore.com',
                 header_image_link: 'http://header-link.com/image.jpg', header_image_title: 'header image title',
                 copyright_addendum_content: 'copyright content', imprint_description: 'imprint description',
                 terms_page: 'terms page', privacy_page: 'privacy page', about_page: 'about page',
@@ -360,8 +360,8 @@ class AdminControllerTest < ActionController::TestCase
     assert_equal 'instance description', Seek::Config.instance_description
     assert_equal 'instance, keywords', Seek::Config.instance_keywords
     assert_equal 'http://project-link.com', Seek::Config.instance_link
-    assert_equal 'dm project name', Seek::Config.instance_admins_name
-    assert_equal 'http://dm-project-link.com', Seek::Config.dm_project_link
+    assert_equal 'instance admins name', Seek::Config.instance_admins_name
+    assert_equal 'http://dm-project-link.com', Seek::Config.instance_admins_link
     assert_equal 'https://issues-galore.com', Seek::Config.issue_tracker
     assert_equal 'http://header-link.com/image.jpg', Seek::Config.header_image_link
     assert_equal 'header image title', Seek::Config.header_image_title

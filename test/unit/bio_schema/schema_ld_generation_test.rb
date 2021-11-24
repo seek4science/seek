@@ -474,9 +474,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                  'sdPublisher' =>
                    {
                      '@type' => 'Organization',
-                     '@id' => Seek::Config.dm_project_link,
+                     '@id' => Seek::Config.instance_admins_link,
                      'name' => Seek::Config.instance_admins_name,
-                     'url' => Seek::Config.dm_project_link },
+                     'url' => Seek::Config.instance_admins_link },
                  'version' => 1,
                  'programmingLanguage' => {
                    '@id'=>'#cwl',

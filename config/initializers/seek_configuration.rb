@@ -103,7 +103,7 @@ def load_seek_config_defaults!
 
   Seek::Config.default :application_name,"FAIRDOM-SEEK"
   Seek::Config.default :instance_admins_name,"FAIRDOM"
-  Seek::Config.default :dm_project_link,"http://www.fair-dom.org"
+  Seek::Config.default :instance_admins_link,"http://www.fair-dom.org"
   Seek::Config.default :header_image_enabled,true
   Seek::Config.default :header_image_title, "FAIRDOM"
   Seek::Config.default :header_image_link,"http://www.fair-dom.org"

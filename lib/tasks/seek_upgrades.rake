@@ -53,6 +53,7 @@ namespace :seek do
     Seek::Config.transfer_value :project_keywords, :instance_keywords
 
     Seek::Config.transfer_value :dm_project_name, :instance_admins_name
+    Seek::Config.transfer_value :dm_project_link, :instance_admins_link
   end
 
 end

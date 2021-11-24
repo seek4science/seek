@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_11_11_133408) do
+ActiveRecord::Schema.define(version: 2021_10_15_152343) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -544,8 +544,8 @@ ActiveRecord::Schema.define(version: 2021_11_11_133408) do
   end
 
   create_table "documents", id: :integer,  force: :cascade do |t|
-    t.text "title", limit: 4294967295
-    t.text "description", limit: 4294967295
+    t.text "title"
+    t.text "description"
     t.integer "contributor_id"
     t.integer "version"
     t.string "first_letter", limit: 1
@@ -556,7 +556,7 @@ ActiveRecord::Schema.define(version: 2021_11_11_133408) do
     t.datetime "last_used_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text "other_creators", limit: 4294967295
+    t.text "other_creators"
     t.string "deleted_contributor"
     t.index ["contributor_id"], name: "index_documents_on_contributor"
   end
@@ -1495,7 +1495,7 @@ ActiveRecord::Schema.define(version: 2021_11_11_133408) do
     t.datetime "updated_at"
   end
 
-  create_table "repository_standards", id: :integer,  force: :cascade do |t|
+  create_table "repository_standards",  force: :cascade do |t|
     t.string "title"
     t.string "url"
     t.string "group_tag"
@@ -1578,7 +1578,6 @@ ActiveRecord::Schema.define(version: 2021_11_11_133408) do
     t.boolean "required"
     t.string "short_name"
     t.integer "repository_standard_id"
-    t.string "key"
   end
 
   create_table "sample_resource_links", id: :integer,  force: :cascade do |t|
@@ -1711,15 +1710,15 @@ ActiveRecord::Schema.define(version: 2021_11_11_133408) do
   create_table "sop_versions", id: :integer,  force: :cascade do |t|
     t.integer "sop_id"
     t.integer "version"
-    t.text "revision_comments", limit: 16777215
+    t.text "revision_comments"
     t.integer "contributor_id"
     t.string "title"
-    t.text "description", limit: 16777215
+    t.text "description"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
     t.string "first_letter", limit: 1
-    t.text "other_creators", limit: 16777215
+    t.text "other_creators"
     t.string "uuid"
     t.integer "policy_id"
     t.string "doi"
@@ -1733,13 +1732,13 @@ ActiveRecord::Schema.define(version: 2021_11_11_133408) do
   create_table "sops", id: :integer,  force: :cascade do |t|
     t.integer "contributor_id"
     t.string "title"
-    t.text "description", limit: 16777215
+    t.text "description"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.datetime "last_used_at"
     t.integer "version", default: 1
     t.string "first_letter", limit: 1
-    t.text "other_creators", limit: 16777215
+    t.text "other_creators"
     t.string "uuid"
     t.integer "policy_id"
     t.string "doi"
@@ -1977,7 +1976,7 @@ ActiveRecord::Schema.define(version: 2021_11_11_133408) do
     t.index ["user_id", "can_view"], name: "index_w_auth_lookup_on_user_id_and_can_view"
   end
 
-  create_table "workflow_classes", id: :integer,  force: :cascade do |t|
+  create_table "workflow_classes",  force: :cascade do |t|
     t.string "title"
     t.text "description"
     t.string "key"

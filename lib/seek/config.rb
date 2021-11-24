@@ -8,7 +8,7 @@ module Seek
       instance_name
     end
     
-    def dm_project_link_fallback
+    def instance_admins_link_fallback
       instance_link
     end
 
@@ -17,7 +17,7 @@ module Seek
     end
 
     def header_image_link_fallback
-      dm_project_link
+      instance_admins_link
     end
 
     def header_image_title_fallback
