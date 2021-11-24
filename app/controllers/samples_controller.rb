@@ -129,45 +129,55 @@ class SamplesController < ApplicationController
   end
 
   def batch_create
-    errors = []
+    errors, results = [], []
     param_converter = Seek::Api::ParameterConverter.new("samples")
     Sample.transaction do
       params[:data].each do |par|
         params =  param_converter.convert(par)
         sample = Sample.new(sample_type_id: params[:sample][:sample_type_id], title: params[:sample][:title])
         update_sample_with_params(params, sample)
-        errors.push({ ex_id: par[:ex_id], error: sample.errors.messages }) if !sample.save
+        if sample.save
+          results.push({ ex_id: par[:ex_id], id: sample.id })
+        elsif
+          errors.push({ ex_id: par[:ex_id], error: sample.errors.messages })
+        end
+      end
+      raise ActiveRecord::Rollback if !errors.empty?
+    end
+    render json: { status: errors.empty? ? :ok : :unprocessable_entity, errors: errors, results: results }
+  end
+
+  def batch_update
+    errors = []
+    param_converter = Seek::Api::ParameterConverter.new("samples")
+    Sample.transaction do
+      params[:data].each do |par|
+        begin
+          params = param_converter.convert(par)
+          sample = Sample.find(par[:id])
+          update_sample_with_params(params, sample)
+          errors.push({ ex_id: par[:ex_id], error: sample.errors.messages }) if !sample.save
+        rescue 
+          errors.push({ ex_id: par[:ex_id], error: "Can not be updated." })
+        end
       end
       raise ActiveRecord::Rollback if !errors.empty?
     end
     render json: { status: errors.empty? ? :ok : :unprocessable_entity, errors: errors }
   end
 
-  def batch_update
-    errors = []
-    param_converter = Seek::Api::ParameterConverter.new("samples")
-    params[:data].each do |par|
-      begin
-        params = param_converter.convert(par)
-        sample = Sample.find(par[:id])
-        update_sample_with_params(params, sample)
-        errors.push(par[:id]) if !sample.save
-      rescue 
-        errors.push(par[:id]) 
-      end
-    end
-    render json: { status: errors.empty? ? :ok : :unprocessable_entity, errors: errors }
-  end
-
   def batch_delete
     errors = []
-    params[:data].each do |par|
-      begin
-        sample = Sample.find(par[:id])
-        errors.push(par[:id]) if !(sample.can_delete? && sample.destroy)
-      rescue 
-        errors.push(par[:id]) 
+    Sample.transaction do
+      params[:data].each do |par|
+        begin
+          sample = Sample.find(par[:id])
+          errors.push({ ex_id: par[:ex_id], error: "Can not be deleted." }) if !(sample.can_delete? && sample.destroy)
+        rescue 
+          errors.push({ ex_id: par[:ex_id], error: sample.errors.messages })
+        end         
       end
+      raise ActiveRecord::Rollback if !errors.empty?
     end
     render json: { status: errors.empty? ? :ok : :unprocessable_entity, errors: errors }
   end
