@@ -48,7 +48,7 @@ def load_seek_testing_defaults!
       Settings.defaults[:samples_enabled] = true
       Settings.defaults[:workflows_enabled] = true
 
-      Settings.defaults[:project_link] = 'http://www.sysmo.net'
+      Settings.defaults[:instance_link] = 'http://www.sysmo.net'
       Settings.defaults[:application_name] = 'FAIRDOM-SEEK'
       Settings.defaults[:dm_project_name] = "SysMO-DB"
       Settings.defaults[:dm_project_link] = "http://www.sysmo-db.org"

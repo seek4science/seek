@@ -11,7 +11,7 @@ registration_disabled_description:
 activation_required_enabled:
 smtp:
   encrypt: true
-project_link:
+instance_link:
 type_managers_enabled:
 type_managers:
 pubmed_api_email:

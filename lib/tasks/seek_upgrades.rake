@@ -9,6 +9,7 @@ namespace :seek do
   task upgrade_version_tasks: %i[
     environment
     db:seed:workflow_classes
+    rename_branding_settings
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -43,6 +44,10 @@ namespace :seek do
     ensure
       Seek::Config.solr_enabled = solr
     end
+  end
+
+  task(rename_branding_settings: [:environment]) do
+    Seek::Config.transfer_value :project_link, :instance_link
   end
 
 end

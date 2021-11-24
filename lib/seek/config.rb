@@ -9,7 +9,7 @@ module Seek
     end
     
     def dm_project_link_fallback
-      project_link
+      instance_link
     end
 
     def application_name_fallback
@@ -413,7 +413,7 @@ module Seek
       result
     end
 
-    # transfers a setting value from the old_name to the new_name setting value.
+    # transfers a setting value from the old_name to the new_name setting value, for use when renaming a setting.
     # Creates a new record for the new setting (if set), and cleans up and removes the old record. Ignores any defaults that are set
     def transfer_value(old_name, new_name)
       if old_value = Settings.global.get(:old_name)

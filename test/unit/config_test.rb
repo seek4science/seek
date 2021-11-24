@@ -219,8 +219,8 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal 'Sysmo SEEK', Seek::Config.project_name
   end
 
-  test 'project_link' do
-    assert_equal 'http://www.sysmo.net', Seek::Config.project_link
+  test 'instance_link' do
+    assert_equal 'http://www.sysmo.net', Seek::Config.instance_link
   end
 
   test 'dm_project_name' do
