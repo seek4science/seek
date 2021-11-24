@@ -25,6 +25,8 @@
 
 %>
 
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
 <% content_for :pagination do %>
   <%= render partial: 'general/paginate_numerical', locals: { objects: objects } if objects.respond_to?(:current_page) %>
 <% end %>
