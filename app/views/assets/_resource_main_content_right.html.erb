@@ -32,6 +32,25 @@
   <% end %>
 <% end %>
 
+<% if resource.respond_to?(:file_template) && !resource.file_template.nil? %>
+  <%= render :partial => "assets/file_template_box", :locals => { :resource => resource } -%>
+<% end %>
+
+<% suffix = 'the Data file'
+   if resource.instance_of? FileTemplate
+   suffix = 'Data files'
+   elsif resource.instance_of? Placeholder
+   suffix = 'actual Data files'
+   end
+   %>
+<% if resource.respond_to?(:format_type) %>
+  <%= render :partial => "assets/format_types_box", :locals => { :resource => resource, :versioned_resource=> versioned_resource, :suffix => suffix } -%>
+<% end %>
+
+<% if resource.respond_to?(:data_type) %>
+  <%= render :partial => "assets/data_types_box", :locals => { :resource => resource, :versioned_resource=> versioned_resource, :suffix => suffix } -%>
+<% end %>
+
 <% if resource.respond_to?(:license) %>
   <%= render :partial => "assets/license_box", :locals => { :resource => resource, :versioned_resource=> versioned_resource } -%>
 <% end %>

@@ -49,6 +49,12 @@
           <% end %>
 
           <%= render partial: 'custom_metadata/custom_metadata_attribute_values', locals: {resource: @study} %>
+        <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @study}%>
+
+        <p id="position">
+          <b><%= "Study position" %>: </b>
+          <%= @study.position %>
+        </p>
 
           <%= render partial: 'general/isa_graph', locals: { root_item: @study, options: { depth: 4 } } -%>
 

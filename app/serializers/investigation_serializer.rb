@@ -14,4 +14,6 @@ class InvestigationSerializer < SnapshottableSerializer
   attribute :creators do
     serialize_assets_creators
   end
+
+  has_one :assignee
 end

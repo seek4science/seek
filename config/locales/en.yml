@@ -35,6 +35,8 @@ en:
   publication: "Publication"
   presentation: "Presentation"
   event: "Event"
+  file_template: "File Template"
+  placeholder: "Placeholder"
   collection: "Collection"
 
   sample: "Sample"
@@ -101,6 +103,7 @@ en:
   asset_housekeeper: 'Asset housekeeper'
   asset_gatekeeper: 'Asset gatekeeper'
   project_administrator: 'Project administrator'
+  admin: 'Administrator'
   pal: 'PAL'
   programme_administrator: 'Programme administrator'
 

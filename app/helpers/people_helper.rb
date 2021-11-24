@@ -29,7 +29,7 @@ module PeopleHelper
     options.reverse_merge!(size: "#{size}x#{size}",
                            alt: role.to_s,
                            style: 'vertical-align: middle',
-                           'data-tooltip' => tooltip(role.humanize))
+                           'data-tooltip' => tooltip(t(role).humanize))
     image(role.to_s, options)
   end
 

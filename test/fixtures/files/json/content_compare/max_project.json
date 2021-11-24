@@ -149,6 +149,11 @@
             "type": "workflows"
           }
         ]
+      "file_templates" : {
+        "data" : []
+      },
+      "placeholders" : {
+        "data" : []
       }
     },
     "links": {

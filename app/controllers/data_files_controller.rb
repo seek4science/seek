@@ -139,6 +139,7 @@ class DataFilesController < ApplicationController
 
       update_annotations(params[:tag_list], @data_file)
       update_relationships(@data_file, params)
+      update_template() if params.key?(:file_template_id)
 
       if @data_file.save
         if !@data_file.parent_name.blank?
@@ -165,6 +166,7 @@ class DataFilesController < ApplicationController
     update_annotations(params[:tag_list], @data_file) if params.key?(:tag_list)
     update_sharing_policies @data_file
     update_relationships(@data_file, params)
+    update_template() if params.key?(:file_template_id)
 
     respond_to do |format|
       if @data_file.update_attributes(data_file_params)
@@ -178,6 +180,16 @@ class DataFilesController < ApplicationController
     end
   end
 
+  def update_template
+    if (params[:file_template_id].empty?)
+      @data_file.file_template_id = nil
+      ft = nil
+    else
+      @data_file.file_template_id = params[:file_template_id]
+      ft = FileTemplate.find(params[:file_template_id])
+    end
+  end
+  
   def explore
     #drop invalid explore params
     [:page_rows, :page, :sheet].each do |param|
@@ -447,12 +459,15 @@ class DataFilesController < ApplicationController
     # if creating a new assay, check it is valid and the associated study is editable
     all_valid = all_valid && !@create_new_assay || (@assay.study.try(:can_edit?) && @assay.save)
 
+    update_template() if params.key?(:file_template_id)
+
     # check the datafile can be saved, and also the content blob can be saved
     all_valid = all_valid && @data_file.save && blob.save
 
     if all_valid
 
       update_relationships(@data_file, params)      
+      
 
       respond_to do |format|
         flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
@@ -534,6 +549,9 @@ class DataFilesController < ApplicationController
                                       :license, *creator_related_params, { event_ids: [] },
                                       { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                       { assay_assets_attributes: [:assay_id, :relationship_type_id] },
+                                      :file_template_id,
+                                      :format_type,
+                                      :data_type,
                                       { scales: [] }, { publication_ids: [] },
                                       discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
