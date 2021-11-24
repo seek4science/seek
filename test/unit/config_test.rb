@@ -224,7 +224,7 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'dm_project_name' do
-    assert_equal 'SysMO-DB', Seek::Config.dm_project_name
+    assert_equal 'SysMO-DB', Seek::Config.instance_admins_name
   end
 
   test 'dm_project_link' do

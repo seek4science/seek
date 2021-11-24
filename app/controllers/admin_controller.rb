@@ -202,9 +202,9 @@ class AdminController < ApplicationController
     Seek::Config.instance_name = params[:instance_name]
     Seek::Config.instance_link = params[:instance_link]
     Seek::Config.instance_description = params[:instance_description]
-    Seek::Config.project_keywords = params[:project_keywords].split(',').collect(&:strip).reject(&:blank?).join(', ')
+    Seek::Config.instance_keywords = params[:instance_keywords].split(',').collect(&:strip).reject(&:blank?).join(', ')
 
-    Seek::Config.dm_project_name = params[:dm_project_name]
+    Seek::Config.instance_admins_name = params[:instance_admins_name]
     Seek::Config.dm_project_link = params[:dm_project_link]
     Seek::Config.issue_tracker = params[:issue_tracker]
 

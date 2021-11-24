@@ -10,7 +10,7 @@
     <%= admin_textarea_setting(:instance_description, Seek::Config.instance_description,
                                "Description", "A description about the instance.") %>
 
-    <%= admin_text_setting(:project_keywords, Seek::Config.project_keywords,
+    <%= admin_text_setting(:instance_keywords, Seek::Config.instance_keywords,
                            "Keywords", "A comma separated list of keywords that describe the instance.") %>
 
     <%= admin_text_setting(:instance_link, Seek::Config.instance_link,
@@ -23,7 +23,7 @@
 
   <%= panel('Instance administrators',help_text: "About the team or group that administer the instance") do %>
 
-    <%= admin_text_setting(:dm_project_name, Seek::Config.dm_project_name,
+    <%= admin_text_setting(:instance_admins_name, Seek::Config.instance_admins_name,
                            "Instance administrators name", "The name of the group that administers the instance, Example FAIRDOM") %>
 
     <%= admin_text_setting(:dm_project_link, Seek::Config.dm_project_link,

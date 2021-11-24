@@ -24,8 +24,8 @@ solr_enabled:
 application_name:
 instance_name:
 instance_description:
-project_keywords:
-dm_project_name:
+instance_keywords:
+instance_admins_name:
 dm_project_link:
 issue_tracker:
 header_image_link:

@@ -15,14 +15,14 @@ module Seek
       end
 
       def keywords
-        Seek::Config.project_keywords&.split(',')&.collect(&:strip)&.reject(&:blank?)&.join(', ')
+        Seek::Config.instance_keywords&.split(',')&.collect(&:strip)&.reject(&:blank?)&.join(', ')
       end
 
       def provider
         {
           '@type' => 'Organization',
           '@id' => Seek::Config.dm_project_link,
-          'name' => Seek::Config.dm_project_name,
+          'name' => Seek::Config.instance_admins_name,
           'url' => Seek::Config.dm_project_link
         }
       end

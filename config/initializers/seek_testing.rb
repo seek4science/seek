@@ -50,7 +50,7 @@ def load_seek_testing_defaults!
 
       Settings.defaults[:instance_link] = 'http://www.sysmo.net'
       Settings.defaults[:application_name] = 'FAIRDOM-SEEK'
-      Settings.defaults[:dm_project_name] = "SysMO-DB"
+      Settings.defaults[:instance_admins_name] = "SysMO-DB"
       Settings.defaults[:dm_project_link] = "http://www.sysmo-db.org"
       Settings.defaults[:header_image_enabled] = true
       Settings.defaults[:header_image_title] =  "SysMO-DB"

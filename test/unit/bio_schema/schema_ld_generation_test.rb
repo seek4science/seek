@@ -32,7 +32,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateModified' => @current_time.iso8601
     }
     with_config_value(:instance_description, 'a lovely project') do
-      with_config_value(:project_keywords, 'a,  b, ,,c,d') do
+      with_config_value(:instance_keywords, 'a,  b, ,,c,d') do
         with_config_value(:site_base_host, 'http://fairyhub.org') do
           json = JSON.parse(Seek::BioSchema::DataCatalogMockModel.new.to_schema_ld)
           assert_equal expected, json
@@ -475,7 +475,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                    {
                      '@type' => 'Organization',
                      '@id' => Seek::Config.dm_project_link,
-                     'name' => Seek::Config.dm_project_name,
+                     'name' => Seek::Config.instance_admins_name,
                      'url' => Seek::Config.dm_project_link },
                  'version' => 1,
                  'programmingLanguage' => {

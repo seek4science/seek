@@ -14,7 +14,7 @@ module Ga4gh
               "id": id,
               "name": Seek::Config.instance_name,
               "organization": {
-                  "name": Seek::Config.dm_project_name,
+                  "name": Seek::Config.instance_admins_name,
                   "url": Seek::Config.dm_project_link
               },
               "type": {

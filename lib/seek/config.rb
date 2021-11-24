@@ -4,8 +4,8 @@ module Seek
   module Fallbacks
     # fallback attributes
 
-    def dm_project_name_fallback
-      project_name
+    def instance_admins_name_fallback
+      instance_name
     end
     
     def dm_project_link_fallback
@@ -13,7 +13,7 @@ module Seek
     end
 
     def application_name_fallback
-      "#{project_name} SEEK"
+      "#{instance_name} SEEK"
     end
 
     def header_image_link_fallback
@@ -21,7 +21,7 @@ module Seek
     end
 
     def header_image_title_fallback
-      dm_project_name
+      instance_admins_name
     end
   end
 

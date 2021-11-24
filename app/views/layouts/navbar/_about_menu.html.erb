@@ -11,8 +11,8 @@
       <% if Seek::Config.about_instance_link_enabled && Seek::Config.instance_name.present? && Seek::Config.instance_link.present? %>
         <li><%= link_to "About #{Seek::Config.instance_name}", Seek::Config.instance_link, :target => '_blank' -%></li>
       <% end %>
-      <% if Seek::Config.about_instance_admins_link_enabled && Seek::Config.dm_project_name.present? && Seek::Config.dm_project_link.present? %>
-        <li><%= link_to "About #{Seek::Config.dm_project_name}", Seek::Config.dm_project_link, :target => '_blank' -%></li>
+      <% if Seek::Config.about_instance_admins_link_enabled && Seek::Config.instance_admins_name.present? && Seek::Config.dm_project_link.present? %>
+        <li><%= link_to "About #{Seek::Config.instance_admins_name}", Seek::Config.dm_project_link, :target => '_blank' -%></li>
       <% end %>
       <% if !Seek::Config.cite_link.blank? %>
         <li><%= link_to "Cite us", Seek::Config.cite_link, :target => '_blank' -%></li>

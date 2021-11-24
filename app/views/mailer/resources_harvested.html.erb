@@ -27,11 +27,11 @@ The following resources were uploaded, but are missing information:
     
 <% end -%>
 <% end -%>
-If you are having trouble accessing your files, or if you think a file has been uploaded by mistake, please contact one of the <%= Seek::Config.dm_project_name %> administrators listed below:
+If you are having trouble accessing your files, or if you think a file has been uploaded by mistake, please contact one of the <%= Seek::Config.instance_admins_name %> administrators listed below:
 <% Person.admins do |admin| -%>
     <%= "#{h admin.name}: " %><%= admin.email %>
 <% end -%>
 
 Regards,
 
-- The <%= Seek::Config.dm_project_name %> Team
+- The <%= Seek::Config.instance_admins_name %> Team

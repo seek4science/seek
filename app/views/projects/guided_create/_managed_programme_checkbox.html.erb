@@ -1,6 +1,6 @@
 <%= hidden_field_tag :programme_id, Programme.site_managed_programme.id %>
 <div class="help-block">
-  You can choose either to be linked to a <%= "#{Seek::Config.dm_project_name} managed #{t('programme')}" %>, <%= link_to Programme.site_managed_programme.title, Programme.site_managed_programme %>, or have one created for you.
+  You can choose either to be linked to a <%= "#{Seek::Config.instance_admins_name} managed #{t('programme')}" %>, <%= link_to Programme.site_managed_programme.title, Programme.site_managed_programme %>, or have one created for you.
 </div>
 <div class="help-block">
   If you have a <%= t('programme') %> created, then you will become its administrator and be able to freely create further <%= t('project').pluralize %> within
@@ -8,5 +8,5 @@
 </div>
 <label>
   <%= check_box_tag :managed_programme, '1', true %>
-  <%= "#{Seek::Config.dm_project_name} managed #{t('programme')}?" %>
+  <%= "#{Seek::Config.instance_admins_name} managed #{t('programme')}?" %>
 </label>
