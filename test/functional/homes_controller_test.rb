@@ -704,7 +704,7 @@ class HomesControllerTest < ActionController::TestCase
 
     # about dropdown in navbar not shown if no options are configured
     Seek::Config.about_page_enabled = false
-    Seek::Config.project_name = 'SEEK'
+    Seek::Config.instance_name = 'SEEK'
     Seek::Config.instance_link = 'http://seek.com'
     Seek::Config.about_instance_link_enabled=false
     Seek::Config.about_instance_admins_link_enabled=false

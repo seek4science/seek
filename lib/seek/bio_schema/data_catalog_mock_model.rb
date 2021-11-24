@@ -11,7 +11,7 @@ module Seek
       end
 
       def title
-        Seek::Config.project_name
+        Seek::Config.instance_name
       end
 
       def keywords

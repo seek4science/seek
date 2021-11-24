@@ -199,7 +199,7 @@ class AdminController < ApplicationController
   end
 
   def update_rebrand
-    Seek::Config.project_name = params[:project_name]
+    Seek::Config.instance_name = params[:instance_name]
     Seek::Config.instance_link = params[:instance_link]
     Seek::Config.project_description = params[:project_description]
     Seek::Config.project_keywords = params[:project_keywords].split(',').collect(&:strip).reject(&:blank?).join(', ')
@@ -445,7 +445,7 @@ class AdminController < ApplicationController
     when 'non_project_members'
       partial = 'user_stats_list'
       collection = Person.without_group.registered
-      title = "Users are not in a #{Seek::Config.project_name} #{t('project')}"
+      title = "Users are not in a #{Seek::Config.instance_name} #{t('project')}"
     when 'profiles_without_users'
       partial = 'user_stats_list'
       collection = Person.userless_people

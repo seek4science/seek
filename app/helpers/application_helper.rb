@@ -305,7 +305,7 @@ module ApplicationHelper
       title << t
       title
     else
-      "#{Seek::Config.project_name}"
+      "#{Seek::Config.instance_name}"
     end
   end
 

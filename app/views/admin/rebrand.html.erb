@@ -4,7 +4,7 @@
 
   <%= panel('Instance', help_text: "About this instance of FAIRDOM-SEEK that is currently running.") do %>
 
-    <%= admin_text_setting(:project_name, Seek::Config.project_name,
+    <%= admin_text_setting(:instance_name, Seek::Config.instance_name,
                            "Name", "A name for your instance; example FAIRDOMHub") %>
 
     <%= admin_textarea_setting(:project_description, Seek::Config.project_description,

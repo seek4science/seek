@@ -3,7 +3,7 @@ def load_seek_testing_defaults!
     silence_warnings do
       Settings.defaults[:is_virtualliver] = false
       Settings.defaults[:project_hierarchy_enabled] = true
-      Settings.defaults[:project_name] = 'Sysmo SEEK'
+      Settings.defaults[:instance_name] = 'Sysmo SEEK'
 
       Settings.defaults[:noreply_sender] ="no-reply@sysmo-db.org"
       Settings.defaults[:support_email_address] = 'support@seek.org'

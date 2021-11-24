@@ -6,10 +6,10 @@
     </a>
     <ul class="dropdown-menu" role="menu">
       <% if Seek::Config.about_page_enabled %>
-        <li><%= link_to "About #{Seek::Config.project_name}", about_home_path -%></li>
+        <li><%= link_to "About #{Seek::Config.instance_name}", about_home_path -%></li>
       <% end %>
-      <% if Seek::Config.about_instance_link_enabled && Seek::Config.project_name.present? && Seek::Config.instance_link.present? %>
-        <li><%= link_to "About #{Seek::Config.project_name}", Seek::Config.instance_link, :target => '_blank' -%></li>
+      <% if Seek::Config.about_instance_link_enabled && Seek::Config.instance_name.present? && Seek::Config.instance_link.present? %>
+        <li><%= link_to "About #{Seek::Config.instance_name}", Seek::Config.instance_link, :target => '_blank' -%></li>
       <% end %>
       <% if Seek::Config.about_instance_admins_link_enabled && Seek::Config.dm_project_name.present? && Seek::Config.dm_project_link.present? %>
         <li><%= link_to "About #{Seek::Config.dm_project_name}", Seek::Config.dm_project_link, :target => '_blank' -%></li>

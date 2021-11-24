@@ -216,7 +216,7 @@ class ConfigTest < ActiveSupport::TestCase
 
   # Project
   test 'project_name' do
-    assert_equal 'Sysmo SEEK', Seek::Config.project_name
+    assert_equal 'Sysmo SEEK', Seek::Config.instance_name
   end
 
   test 'instance_link' do

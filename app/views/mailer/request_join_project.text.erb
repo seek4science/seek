@@ -1,7 +1,7 @@
 
 Hi <%= @owners.collect{|o| o.name}.join(", ") -%>,
 
-The <%= Seek::Config.project_name %> user <%= "#{@requester.name} (#{person_url(@requester)})" %>, has requested membership of <%= "#{@project.title} (#{project_url(@project)})" %>.
+The <%= Seek::Config.instance_name %> user <%= "#{@requester.name} (#{person_url(@requester)})" %>, has requested membership of <%= "#{@project.title} (#{project_url(@project)})" %>.
 
 <% if @institution.id.nil? %>
   <%
