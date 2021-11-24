@@ -1,6 +1,7 @@
 var tree;
 var elementFolderIds = [];
 var displayed_folder_id = 0;
+const isa_study_element = ["source_material", "sample_collection", "study_samples", "study_table"];
 
 function setupFoldersTree(dataJson, container_id, drop_accept_class) {
   $j("#" + container_id)
@@ -137,7 +138,7 @@ function folder_clicked(folder_id, project_id) {
   $j.ajax({ url: path, cache: false, dataType: "script" });
 }
 
-function item_clicked(type, id, parent) {
+async function item_clicked(type, id, parent) {
   hideAllViews();
   updateBreadcrumb(type);
   selectedItem.id = id;
@@ -145,6 +146,12 @@ function item_clicked(type, id, parent) {
   selectedItem.parent = parent;
   if (type == "sample") {
     loadItemDetails(`/assays/${parent.id}/samples`, { view: "default" });
+  } else if (isa_study_element.includes(type)) {
+    if ($j('a[href^="#study_design"]').toArray().length == 0) {
+      await loadItemDetails(`/studies/${parent.id}`, { view: "default" });
+    }
+    $j('a[href^="#study_design"]').first().click();
+    $j(`a[href^="#${type}"]`).first().click();
   } else {
     loadItemDetails(`/${pluralize(type)}/${id}`, { view: "default" });
   }
@@ -156,7 +163,7 @@ const loadAssaySamples = (view, table_cols) =>
   loadItemDetails(`/assays/${selectedItem.parent.id}/samples`, { view, table_cols });
 
 const loadItemDetails = (url, params = {}) => {
-  $j.ajax({
+  return $j.ajax({
     url,
     data: $j.extend(params, { only_content: true, single_page: true }),
     cache: false,
@@ -169,7 +176,7 @@ const loadItemDetails = (url, params = {}) => {
       else if (e.status === 403) alert("You do not have permission to view this content!");
       else if (e.status !== 200)
         alert(`An error occurred while processing the request.\nDetails: ${e.responseText}`);
-      $j("#item-layout").html("Unavailable")
+      $j("#item-layout").html("Unavailable");
     }
   });
 };

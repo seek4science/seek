@@ -69,6 +69,10 @@ class Sample < ApplicationRecord
     linked_sample_ids | linking_sample_ids
   end
 
+  def linking_samples
+    Sample.where(id: linking_sample_ids)
+  end
+
   def referenced_resources
     sample_type.sample_attributes.select(&:seek_resource?).map do |sa|
       value = get_attribute_value(sa)

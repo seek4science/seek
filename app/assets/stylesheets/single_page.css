@@ -441,5 +441,18 @@
 
 .disabled {
     pointer-events: none;
-    opacity: 0.4;
+    opacity: 0.4 !important;
+    text-decoration: none;
+}
+
+.row-delete{
+    text-decoration: line-through;
+ }
+
+.row-error{
+    background-color: #ff0044 !important;
+}
+
+.row-success{
+    background-color: #a6ff00 !important;
 }

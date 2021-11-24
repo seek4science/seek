@@ -1,0 +1,30 @@
+<% study ||= nil %>
+<ul class="nav nav-tabs">
+    <li class="active">
+        <a data-toggle="tab" href="#source_material"><i class="glyphicon glyphicon-list-alt"></i> Source material</a>
+    </li>
+    <li>
+        <a data-toggle="tab" href="#sample_collection"><i class="glyphicon glyphicon-list-alt"></i> Protocols</a>
+    </li>
+    <li>
+        <a data-toggle="tab" href="#study_samples"><i class="glyphicon glyphicon-list-alt"></i> Samples</a>
+    </li>
+    <li>
+        <a data-toggle="tab" href="#study_table"><i class="glyphicon glyphicon-list-alt"></i> Table</a>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <div id="source_material" class="tab-pane fade active in">
+        <%= render :partial=>"isa_studies/source_material", locals: { study: study} -%>
+    </div>
+    <div id="sample_collection" class="tab-pane fade">
+        <%= render :partial=>"isa_studies/sop", locals: { study: study} -%>
+    </div>
+    <div id="study_samples" class="tab-pane fade">
+        <%= render :partial=>"isa_studies/study_samples", locals: { study: study} -%>
+    </div>
+     <div id="study_table" class="tab-pane fade">
+        <%= render :partial=>"isa_studies/study_table", locals: { study: study} -%>   
+    </div>
+</div>

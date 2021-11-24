@@ -727,6 +727,9 @@ SEEK::Application.routes.draw do
 
   ### SINGLE PAGE
   resources :single_pages do
+    member do
+      get :ontology
+    end
   end
 
   ### ISA STUDY

@@ -7,6 +7,14 @@
             <i class="glyphicon glyphicon-th-list"></i> Related items
         </a>
     </li>
+    <% if Seek::Config.project_single_page_advanced_enabled %>
+      <li>
+          <a data-toggle="tab" href="#study_design"><i class="glyphicon glyphicon-list-alt"></i> Study design</a>
+      </li>
+      <li>
+          <a data-toggle="tab" href="#flowchart"><i class="glyphicon glyphicon-list-alt"></i> Flowchart</a>
+      </li>
+    <% end %>
 </ul>
 <div class="tab-content">
     <div id="details" class="tab-pane fade in active">
@@ -26,11 +34,11 @@
               </p>
 
               <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @study}%>        
-		<p id="position">
-          		<b><%= "Study position" %>: </b>
-          		<%= @study.position %>
-        	</p>
-        	<%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @study}%>        
+              <p id="position">
+                  <b><%= "Study position" %>: </b>
+                  <%= @study.position %>
+              </p>
+        	    <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @study}%>        
               <% unless @study.experimentalists.blank? %>
                 <p>
                   <b>Experimentalists:</b>
@@ -63,5 +71,12 @@
     <div id="related-items" class="tab-pane fade">
       <%= render :partial=>"general/items_related_to", :object => @study -%>
     </div>
+
+    <% if Seek::Config.project_single_page_advanced_enabled %>
+      <div id="study_design" class="tab-pane fade">
+          <%= render :partial=>"isa_studies/study_design", locals: { study: @study} -%>
+      </div>
+      <div id="flowchart" class="tab-pane fade"></div>
+    <% end %>
     
 </div>

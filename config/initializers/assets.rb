@@ -40,6 +40,7 @@ Rails.application.config.assets.precompile += [
     'select2.min.css',
     'select2.bootstrap.min.css',
     'single_page/index',
+    'single_page/dynamic_table',
     'tablesorter/jquery-latest.js',
     'tablesorter/jquery.tablesorter.js',
     'multi_step_wizard.js',

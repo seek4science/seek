@@ -2,11 +2,12 @@ class TreeviewBuilder
     include ImagesHelper
     include ActionView::Helpers::SanitizeHelper
     def initialize(project, folders)
-    @project = project
-    @folders = folders
+        @project = project
+        @folders = folders
     end
 
     def build_tree_data
+        sp_advanced = Seek::Config.project_single_page_advanced_enabled
         inv, std, prj, asy, assay_assets = Array.new(5) {[]}
         bold = { 'style': 'font-weight:bold' }
         @project.investigations.each do |investigation|
@@ -37,7 +38,7 @@ class TreeviewBuilder
                                         _id: study.id, 
                                         a_attr: bold, 
                                         label: asy.length>0 ? 'Assays' : nil, 
-                                        children: asy, 
+                                        children: (sp_advanced ? load_isa_study_element(study) : []) + asy, 
                                         resource: study}))
                 asy = []
             end
@@ -97,6 +98,18 @@ class TreeviewBuilder
           next value unless value.class == Hash
           deep_compact(value)
         end.reject { |_k, v| v.blank? }
+    end
+
+    def load_isa_study_element (study)
+        elements = []
+        # TODO: Use the isa_order of sample_type instead
+        if (study.sop && !study.sample_types.blank?)
+            elements << create_node({text: "Source material", _type: 'source_material', _id: study.sample_types.first.id, resource: @project})
+            elements << create_node({text: "Sample collection", _type: 'sample_collection', _id: study.sop.id, resource: @project})
+            elements << create_node({text: "Study sample", _type: 'study_samples', _id: study.id, resource: @project})
+            elements << create_node({text: "Study table", _type: 'study_table', _id: study.id, resource: @project})
+        end
+        return elements
     end
 
 end
