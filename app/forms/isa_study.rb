@@ -56,10 +56,16 @@ class IsaStudy
     @study.errors.each {|e| errors[:base] << "[Study]: #{e}" } if !@study.valid?
     errors[:base] << "SOP is required" if !@study.sop_id
 
-    @source_sample_type.errors.each {|e| errors[:base] << "[Source sample type]: #{e}"} if !@source_sample_type.valid?
+    if !@source_sample_type.valid?
+      @source_sample_type.errors.full_messages.each {|e| errors[:base] << "[Source sample type]: #{e}"} 
+    end
 
-    @sample_collection_sample_type.errors.each {|e| errors[:base] << 
-      "[Sample collection sample type]: #{e}"} if !@sample_collection_sample_type.valid?
+    if !@sample_collection_sample_type.valid?
+      @sample_collection_sample_type.errors.full_messages.each do |e|
+         errors[:base] << "[Sample collection sample type]: #{e}" 
+      end
+    end
+
     if !@sample_collection_sample_type.sample_attributes.any? {|a| a.seek_sample_multi?}
       errors[:base] << "[Sample Collection sample type]: SEEK Sample Multi attribute is not provided"
     end

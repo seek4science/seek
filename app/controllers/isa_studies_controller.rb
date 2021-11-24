@@ -8,6 +8,7 @@ class IsaStudiesController < ApplicationController
     @isa_study = IsaStudy.new(isa_study_params)
     @isa_study.source.contributor = User.current_user.person
     @isa_study.sample_collection.contributor = User.current_user.person
+    @isa_study.study.sample_types = [@isa_study.source, @isa_study.sample_collection]
 
     if @isa_study.save
       redirect_to controller: "single_pages", action: "show", id: @isa_study.study.projects.first.id , notice: 'The ISA study was created successfully!'
@@ -35,14 +36,6 @@ class IsaStudiesController < ApplicationController
       { discussion_links_attributes:[:id, :url, :label, :_destroy] },
       { custom_metadata_attributes: determine_custom_metadata_keys }]
   end
-
-  # def sop_params
-  #   [:title, :description, { project_ids: [] }, :license, *creator_related_params,
-  #     { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-  #     { assay_assets_attributes: [:assay_id] }, { scales: [] },
-  #     { publication_ids: [] }, {workflow_ids: []},
-  #     discussion_links_attributes:[:id, :url, :label, :_destroy]]
-  # end
 
   def sample_type_params (params, field)
     attributes = params[field][:sample_attributes]
