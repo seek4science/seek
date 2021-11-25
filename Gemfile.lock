@@ -738,6 +738,8 @@ GEM
     temple (0.8.1)
     terrapin (0.6.0)
       climate_control (>= 0.0.3, < 1.0)
+    terser (1.1.8)
+      execjs (>= 0.3.0, < 3)
     test-prof (0.4.8)
     thor (1.1.0)
     thread_safe (0.3.6)
@@ -746,8 +748,6 @@ GEM
       thread_safe (~> 0.1)
     ucf (2.0.2)
       zip-container (~> 4.0.1)
-    uglifier (3.2.0)
-      execjs (>= 0.3.0, < 3)
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.7)
@@ -917,8 +917,8 @@ DEPENDENCIES
   teaspoon
   teaspoon-mocha
   terrapin
+  terser (~> 1.1, >= 1.1.1)
   test-prof
-  uglifier
   unicorn-rails
   uuid (~> 2.3)
   validate_url

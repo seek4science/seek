@@ -105,7 +105,7 @@ gem 'omniauth-github', '~> 1.2.0'
 
 gem 'ransack'
 
-gem 'uglifier'
+gem 'terser', '~> 1.1', '>= 1.1.1'
 
 # Rails 4 upgrade
 gem 'activerecord-session_store'
