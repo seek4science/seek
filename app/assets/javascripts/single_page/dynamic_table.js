@@ -3,12 +3,12 @@ const dtErrClass = "row-error",
   dtSuccessClass = "row-success",
   dtDeletedClass = "disabled",
   dtRowDelete = "row-delete";
-let defaultCols = [
+const defaultCols = [
   {
     width: "10px",
     className: "text-center",
     mRender: function (data, type, full) {
-      return `<td><input class='row-select' type='checkbox' onClick="handleCheck($j(this))" /></td>`;
+      return "<td><input class='row-select' type='checkbox' onClick='handleCheck($j(this))'/></td>";
     }
   }
 ];
