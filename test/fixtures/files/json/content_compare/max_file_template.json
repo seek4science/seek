@@ -9,6 +9,15 @@
         "permissions":[]
       },
       "tags": ["FileTemplate-tag1", "FileTemplate-tag2", "FileTemplate-tag3", "FileTemplate-tag4", "FileTemplate-tag5"],
+      "creators": [
+        {
+          "profile": "/people/1040002026",
+          "family_name": "Last",
+          "given_name": "Person69",
+          "affiliation": "An Institution: 81",
+          "orcid": null
+        }
+      ],
       "title": "A Maximal FileTemplate",
       "description": "The important report we did for ~important-milestone~",
       "license": null,

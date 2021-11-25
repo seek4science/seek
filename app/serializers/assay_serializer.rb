@@ -1,5 +1,6 @@
 class AssaySerializer < SnapshottableSerializer
   attributes :title, :description, :other_creators
+  attribute :position
   attribute :assay_class do
     { title: object.assay_class.title,
       key: object.assay_class.key,

@@ -121,10 +121,7 @@
             "type": "documents"
           }
         ]
-      },
-	"assignee" : {
-	    "data" : null
-	}
+      }
     },
     "links": {
       "self": "/studies/1039986486"
