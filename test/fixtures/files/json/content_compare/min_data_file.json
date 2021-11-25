@@ -81,7 +81,13 @@
       },
       "events": {
         "data": []
-      }
+      },
+	"file_template": {
+	    "data" : null
+	},
+	"placeholder": {
+	    "data" : null
+	}
     },
     "links": {
       "self": "/data_files/883654268"

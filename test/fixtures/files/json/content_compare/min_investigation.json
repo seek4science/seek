@@ -64,7 +64,10 @@
       },
       "documents": {
         "data": []
-      }
+      },
+	"assignee" : {
+	    "data" : null
+	}
     },
     "links": {
       "self": "/investigations/1039986486"

@@ -1,3 +1,15 @@
+<% unless @data_file.file_template.nil? %>
+<% unless EdamHelper::ancestry(@data_file.data_type, @data_file.file_template.data_type) -%>
+    <%= alert_box('warning') do %>
+        The data type of the data file is not compatible with that of the template
+    <% end %>
+<% end %>
+<% unless EdamHelper::ancestry(@data_file.format_type, @data_file.file_template.format_type) -%>
+    <%= alert_box('warning') do %>
+        The format of the data file is not compatible with that of the template
+    <% end %>
+<% end %>
+<% end %>
 <ul class="nav nav-tabs">
     <li class="active ">
         <a data-toggle="tab" href="#item-details"><i class="glyphicon glyphicon-list-alt"></i> Details</a>

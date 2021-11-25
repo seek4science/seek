@@ -1,0 +1,8 @@
+<%= panel("Format of #{suffix}", :body_options => {:class => 'text-center'}) do %>
+  <% text = EdamHelper::url_to_text(resource.format_type);
+     if text.nil? %>
+<li class="author-list-item"><%= resource.format_type -%></li>
+<% else %>
+<li class="author-list-item"><a href='<%= resource.format_type -%>' target='_blank'><%= text -%></a></li>
+<% end %>
+<% end %>

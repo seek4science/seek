@@ -1,0 +1,44 @@
+<% unless @placeholder.file_template.nil? %>
+<% unless EdamHelper::ancestry(@placeholder.data_type, @placeholder.file_template.data_type) -%>
+    <%= alert_box('warning') do %>
+        The data type of the placeholder is not compatible with that of the template
+    <% end %>
+<% end %>
+<% unless EdamHelper::ancestry(@placeholder.format_type, @placeholder.file_template.format_type) -%>
+    <%= alert_box('warning') do %>
+        The format of the plceholder is not compatible with that of the template
+    <% end %>
+<% end %>
+<% end %>
+
+<%= render :partial => "general/item_title",:locals => {:item => @placeholder,
+                                                        :buttons_partial => 'assets/asset_buttons'} -%>
+
+<div class="row">
+  <div class="col-md-9 col-sm-8 box_about_actor">
+    <%= item_description @placeholder.description -%>
+
+    <strong>Resolution: </strong>
+    <% if @placeholder.data_file %>
+      <%= link_to(@placeholder.data_file.title, @placeholder.data_file) %>
+      <%  else %>
+      Not specified
+      <% end %>
+    <div class="row">
+      <div class="col-md-6">
+        <%= persistent_resource_id(@placeholder) %>
+
+        <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @placeholder} %>
+
+      </div>
+    </div>
+    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @placeholder, :deep => true, :include_parents => true} %>
+  </div>
+
+  <div class="col-md-3 col-sm-4">
+    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @placeholder } %>
+  </div>
+</div>
+
+<%# get, classify and authorize all assets for this project -%>
+<%= render :partial=>"general/items_related_to",:object => @placeholder %>
