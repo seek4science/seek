@@ -426,12 +426,13 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       workflow = Factory(:cwl_packed_workflow,
                          title: 'This workflow',
                          description: 'This is a test workflow for bioschema generation',
-                         creators: [@person, creator2],
                          contributor: @person,
                          license: 'APSL-2.0')
 
-      workflow.assets_creators.create!(given_name: 'Fred', family_name: 'Bloggs')
-      workflow.assets_creators.create!(given_name: 'Steve', family_name: 'Smith', orcid: 'https://orcid.org/0000-0002-1694-233X')
+      workflow.assets_creators.create!(creator: @person, pos: 1)
+      workflow.assets_creators.create!(creator: creator2, pos: 2)
+      workflow.assets_creators.create!(given_name: 'Fred', family_name: 'Bloggs', pos: 3)
+      workflow.assets_creators.create!(given_name: 'Steve', family_name: 'Smith', orcid: 'https://orcid.org/0000-0002-1694-233X', pos: 4)
 
       workflow.internals = workflow.extractor.metadata[:internals]
 
