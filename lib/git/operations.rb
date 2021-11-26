@@ -110,7 +110,11 @@ module Git
 
       perform_commit("Moved #{oldpath} -> #{newpath}") do |index|
         existing = index[oldpath]
-        index.add(path: newpath, oid: existing[:oid], mode: 0100644)
+        begin
+          index.add(path: newpath, oid: existing[:oid], mode: 0100644)
+        rescue Rugged::IndexError
+          raise Git::InvalidPathException.new(path: newpath)
+        end
         index.remove(oldpath)
       end
 
