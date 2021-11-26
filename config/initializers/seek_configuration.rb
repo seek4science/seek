@@ -101,15 +101,17 @@ def load_seek_config_defaults!
   Seek::Config.default :instance_name,'FAIRDOM'
   Seek::Config.default :instance_link,'http://www.fair-dom.org'
 
-  Seek::Config.default :application_name,"FAIRDOM-SEEK"
   Seek::Config.default :instance_admins_name,"FAIRDOM"
   Seek::Config.default :instance_admins_link,"http://www.fair-dom.org"
+
   Seek::Config.default :header_image_enabled,true
   Seek::Config.default :header_image_title, "FAIRDOM"
   Seek::Config.default :header_image_link,"http://www.fair-dom.org"
   Seek::Config.default :copyright_addendum_enabled,false
   Seek::Config.default :copyright_addendum_content,'Additions copyright ...'
   Seek::Config.default :issue_tracker, 'https://fair-dom.org/issues'
+
+  Seek::Config.fixed :application_name,"FAIRDOM-SEEK"
 
   #Imprint
   Settings.defaults[:imprint_enabled]= false
