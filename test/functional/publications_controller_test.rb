@@ -343,9 +343,7 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'should show the publication with unspecified publication type as Not specified' do
-    publication = Factory(:publication, title: 'Publication without type')
-    publication.publication_type = nil
-    publication.save(validate: false)
+    Factory(:publication, title: 'Publication without type', publication_type: nil)
     get :show, params: { id: publication.id }
     assert_response :success
     assert_select 'p' do

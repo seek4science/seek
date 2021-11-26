@@ -31,9 +31,6 @@ class Publication < ApplicationRecord
   has_many :presentations, through: :related_relationships, source: :subject, source_type: 'Presentation'
   has_many :workflows, through: :related_relationships, source: :subject, source_type: 'Workflow'
 
-  has_many :misc_links, -> { where(AssetLink.misc_link.where_values_hash) }, class_name: 'AssetLink', as: :asset, dependent: :destroy, inverse_of: :asset
-  accepts_nested_attributes_for :misc_links, allow_destroy:true
-
   has_and_belongs_to_many :human_diseases
   has_filter :human_disease
 

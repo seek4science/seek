@@ -9,7 +9,6 @@ namespace :seek do
   task upgrade_version_tasks: %i[
     environment
     db:seed:workflow_classes
-    db:seed:010_ena_custom_metadata
     update_missing_publication_versions
   ]
 
