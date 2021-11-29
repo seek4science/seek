@@ -23,6 +23,7 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'should get index' do
+    Factory(:publication)
     get :index
     assert_response :success
     assert_not_nil assigns(:publications)
@@ -312,7 +313,7 @@ class PublicationsControllerTest < ActionController::TestCase
     ]
 
     assert_difference('Publication.count',2) do
-        post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('files/bibtex/author_match.bib'), project_ids: [projects(:one).id] } }
+      post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('files/bibtex/author_match.bib'), project_ids: [projects(:one).id] } }
     end
 
 
@@ -330,6 +331,9 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'should show old unspecified publication type' do
+    publication = Factory(:publication, title: 'Publication without type')
+    publication.publication_type = nil
+    publication.save(validate: false)
     get :index
     assert_response :success
     assert_select '.list_item_attribute' do
@@ -339,7 +343,10 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'should show the publication with unspecified publication type as Not specified' do
-    get :show, params: { id: publications(:no_publication_type) }
+    publication = Factory(:publication, title: 'Publication without type')
+    publication.publication_type = nil
+    publication.save(validate: false)
+    get :show, params: { id: publication.id }
     assert_response :success
     assert_select 'p' do
       assert_select 'strong', { text: 'Publication type:' }
@@ -362,7 +369,11 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'should show publication' do
-    get :show, params: { id: publications(:one) }
+    publication = Factory :publication, contributor: User.current_user.person
+    publication.save
+
+    get :show, params: { id: publication.id }
+    puts response.body
     assert_response :success
   end
 
@@ -482,20 +493,28 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'should filter publications by projects_id for export' do
+    p1 = Factory(:project, title: 'OneProject')
+    p2 = Factory(:project, title: 'AnotherProject')
+    list_of_publ = FactoryGirl.create_list(:publication_with_author, 6)
+    Factory( :max_publication, projects: [p1])
+    Factory( :min_publication, projects: [p1])
+    Factory( :publication, projects: [p2, p1])
     # project without publications
-    get :export, params: { query: { projects_id_in: [projects(:sysmo_project).id + 1] } }
+    get :export, params: { query: { projects_id_in: [-100] } }
 
     assert_response :success
     p = assigns(:publications)
     assert_equal 0, p.length
     # project with publications
-    get :export, params: { query: { projects_id_in: [projects(:sysmo_project).id] } }
+    get :export, params: { query: { projects_id_in: [p1.id, p2.id] } }
     assert_response :success
     p = assigns(:publications)
-    assert_equal 5, p.length
+    assert_equal 3, p.length
   end
 
   test 'should filter publications sort by published date for export' do
+    FactoryGirl.create_list(:publication_with_date, 6)
+
     # sort by published_date asc
     get :export, params: { query: { s: [{ name: :published_date, dir: :asc }] } }
     assert_response :success
@@ -512,52 +531,61 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'should filter publications by title contains for export' do
-    # sort by published_date asc
-    get :export, params: { query: { title_cont: 'workflows' } }
+    FactoryGirl.create_list(:publication, 6)
+    Factory(:min_publication)
+
+    get :export, params: { query: { title_cont: 'A Minimal Publication' } }
     assert_response :success
     p = assigns(:publications)
     assert_equal 1, p.count
   end
 
-  test 'should filter publications by authour name contains for export' do
+  test 'should filter publications by author name contains for export' do
+    FactoryGirl.create_list(:publication_with_author, 6)
+    Factory(:max_publication)
+
     # sort by published_date asc
-    get :export, params: { query: { publication_authors_last_name_cont: 'Bau' } }
+    get :export, params: { query: { publication_authors_last_name_cont: 'LastNonReg' } }
     assert_response :success
     p = assigns(:publications)
     assert_equal 1, p.count
   end
 
   test 'should get edit' do
-    get :edit, params: { id: publications(:one) }
+    pub = Factory(:publication)
+    get :edit, params: { id: pub.id }
     assert_response :success
   end
 
 
   test 'associates assay' do
-    login_as(:model_owner) # can edit assay
-    p = publications(:taverna_paper_pubmed)
-    refute_nil p.contributor
-    original_assay = assays(:assay_with_a_publication)
-    assert p.assays.include?(original_assay)
-    assert original_assay.publications.include?(p)
+    login_as(User.current_user)  # can edit assay
 
-    new_assay = assays(:metabolomics_assay)
+    publ = Factory(:publication)
+    original_assay = Factory :assay, contributor: User.current_user.person, publications: [publ]
+    publ.assays = [original_assay]
+    refute_nil publ.contributor
+
+    assert publ.assays.include?(original_assay)
+    assert original_assay.publications.include?(publ)
+
+    new_assay = Factory :assay, contributor: User.current_user.person
     assert new_assay.publications.empty?
 
-    put :update, params: { id: p, publication: { abstract: p.abstract, assay_ids: [new_assay.id.to_s] } }
+    put :update, params: { id: publ, publication: { abstract: publ.abstract, assay_ids: [new_assay.id.to_s] } }
 
-    assert_redirected_to publication_path(p)
-    p.reload
+    assert_redirected_to publication_path(publ)
+    publ.reload
     original_assay.reload
     new_assay.reload
 
-    assert_equal 1, p.assays.count
+    assert_equal 1, publ.assays.count
 
-    assert !p.assays.include?(original_assay)
-    assert !original_assay.publications.include?(p)
+    assert !publ.assays.include?(original_assay)
+    assert !original_assay.publications.include?(publ)
 
-    assert p.assays.include?(new_assay)
-    assert new_assay.publications.include?(p)
+    assert publ.assays.include?(new_assay)
+    assert new_assay.publications.include?(publ)
   end
 
   test 'associates data files' do
@@ -714,33 +742,38 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'do not associate assays unauthorized for edit' do
-    p = publications(:taverna_paper_pubmed)
-    original_assay = assays(:assay_with_a_publication)
-    assert p.assays.include?(original_assay)
-    assert original_assay.publications.include?(p)
+    publ = Factory (:publication)
+    original_assay = Factory(:assay)
+    publ.assays = [original_assay]
 
-    new_assay = assays(:metabolomics_assay)
+    assert publ.assays.include?(original_assay)
+    assert original_assay.publications.include?(publ)
+
+    new_assay = Factory(:assay)
     assert new_assay.publications.empty?
 
     # Should not add the new assay and should not remove the old one
-    put :update, params: { id: p, publication: { abstract: p.abstract, assay_ids: [new_assay.id] } }
+    put :update, params: { id: publ.id, publication: { abstract: publ.abstract, assay_ids: [new_assay.id] } }
 
-    assert_redirected_to publication_path(p)
-    p.reload
+    assert_redirected_to publication_path(publ)
+    publ.reload
     original_assay.reload
     new_assay.reload
 
-    assert_equal 1, p.assays.count
+    assert_equal 1, publ.assays.count
 
-    assert p.assays.include?(original_assay)
-    assert original_assay.publications.include?(p)
+    assert publ.assays.include?(original_assay)
+    assert original_assay.publications.include?(publ)
 
-    assert !p.assays.include?(new_assay)
-    assert !new_assay.publications.include?(p)
+    assert !publ.assays.include?(new_assay)
+    assert !new_assay.publications.include?(publ)
   end
 
   test 'should keep model and data associations after update' do
-    p = publications(:pubmed_2)
+    p = Factory(:publication_with_model_and_data_file)
+    linked_model = p.models.first
+    linked_data_file = p.data_files.first
+
     put :update, params: { id: p, publication: { abstract: p.abstract, model_ids: p.models.collect { |m| m.id.to_s },
                                        data_file_ids: p.data_files.map(&:id), assay_ids: [''] } }
 
@@ -748,8 +781,8 @@ class PublicationsControllerTest < ActionController::TestCase
     p.reload
 
     assert p.assays.empty?
-    assert p.models.include?(models(:teusink))
-    assert p.data_files.include?(data_files(:picture))
+    assert p.models.include?(linked_model)
+    assert p.data_files.include?(linked_data_file)
   end
 
   test 'should associate authors' do
@@ -793,7 +826,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should disassociate authors' do
     mock_pubmed(content_file: 'pubmed_5.txt')
-    p = publications(:one)
+    p = Factory(:publication)
     p.publication_authors << PublicationAuthor.new(publication: p, first_name: people(:quentin_person).first_name, last_name: people(:quentin_person).last_name, person: people(:quentin_person))
     p.publication_authors << PublicationAuthor.new(publication: p, first_name: people(:aaron_person).first_name, last_name: people(:aaron_person).last_name, person: people(:aaron_person))
     p.creators << people(:quentin_person)
@@ -811,12 +844,13 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'should update project' do
-    p = publications(:one)
-    assert_equal projects(:sysmo_project), p.projects.first
-    put :update, params: { id: p.id, publication: { project_ids: [projects(:one).id] } }
-    assert_redirected_to publication_path(p)
-    p.reload
-    assert_equal [projects(:one)], p.projects
+    publ = Factory(:publication)
+    project = Factory(:min_project)
+    assert_not_equal project, publ.projects.first
+    put :update, params: { id: publ.id, publication: { project_ids: [project.id] } }
+    assert_redirected_to publication_path(publ)
+    publ.reload
+    assert_equal [project], publ.projects
   end
 
   test 'should destroy publication' do
@@ -985,17 +1019,18 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'query single authors for typeahead' do
-    query = 'Bloggs'
+    FactoryGirl.create_list(:publication_with_author, 6)
+    query = 'Last'
     get :query_authors_typeahead, params: { format: :json, full_name: query }
     assert_response :success
     authors = JSON.parse(@response.body)
-    assert_equal 1, authors.length, authors
+    assert_equal 6, authors.length, authors
     assert authors[0].key?('person_id'), 'missing author person_id'
     assert authors[0].key?('first_name'), 'missing author first name'
     assert authors[0].key?('last_name'), 'missing author last name'
     assert authors[0].key?('count'), 'missing author publication count'
-    assert_equal 'J', authors[0]['first_name']
-    assert_equal 'Bloggs', authors[0]['last_name']
+    assert authors[0]['first_name'].start_with?('Author')
+    assert_equal 'Last', authors[0]['last_name']
     assert_nil authors[0]['person_id']
     assert_equal 1, authors[0]['count']
   end
@@ -1009,9 +1044,10 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'query authors for initialization' do
+    FactoryGirl.create_list(:publication_with_author, 6)
     query_authors = {
-      '0' => { full_name: 'J Bloggs' },
-      '1' => { full_name: 'J Bauers' }
+      '0' => { full_name: 'Author2 Last' }, # Existing author-> should return 1
+      '1' => { full_name: 'NewAuthor ShouldBeCreated' } # New author (i.e. not found)
     }
     get :query_authors, format: :json, as: :json, params: { authors: query_authors }
     assert_response :success
@@ -1021,8 +1057,8 @@ class PublicationsControllerTest < ActionController::TestCase
     assert authors[0].key?('first_name'), 'missing author first name'
     assert authors[0].key?('last_name'), 'missing author last name'
     assert authors[0].key?('count'), 'missing author publication count'
-    assert_equal 'J', authors[0]['first_name']
-    assert_equal 'Bloggs', authors[0]['last_name']
+    assert_equal 'Author2', authors[0]['first_name']
+    assert_equal 'Last', authors[0]['last_name']
     assert_nil authors[0]['person_id']
     assert_equal 1, authors[0]['count']
 
@@ -1030,8 +1066,8 @@ class PublicationsControllerTest < ActionController::TestCase
     assert authors[1].key?('first_name'), 'missing author first name'
     assert authors[1].key?('last_name'), 'missing author last name'
     assert authors[1].key?('count'), 'missing author publication count'
-    assert_equal 'J', authors[1]['first_name']
-    assert_equal 'Bauers', authors[1]['last_name']
+    assert_equal 'NewAuthor', authors[1]['first_name']
+    assert_equal 'ShouldBeCreated', authors[1]['last_name']
     assert_nil authors[1]['person_id']
     assert_equal 0, authors[1]['count']
   end
@@ -1050,7 +1086,7 @@ class PublicationsControllerTest < ActionController::TestCase
                                    published_date: '2017-05-23',
                                    publication_type_id: journal.id
 
-                                  }, subaction: 'Create'}
+                                  }, subaction: 'Create' }
 
 
     end
@@ -1214,7 +1250,7 @@ class PublicationsControllerTest < ActionController::TestCase
     publication = Factory(:publication, contributor:person)
     login_as(person)
 
-    get :manage, params: { id: publication}
+    get :manage, params: { id: publication }
     assert_response :success
 
     assert_select 'select#possible_publication_investigation_ids' do
@@ -1223,25 +1259,328 @@ class PublicationsControllerTest < ActionController::TestCase
 
   end
 
+
+
+  test 'can create with valid url' do
+    project = Factory(:project)
+
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://somewhere.com/piccy.png'
+    publication_attrs = Factory.attributes_for(:publication,
+                                                project_ids: [project.id],
+                                                doi: '10.1371/journal.pone.0004803',
+                                                title: 'Clickstream Data Yields High-Resolution Maps of Science',
+                                                abstract: 'Intricate maps of science have been created from citation data to visualize the structure of scientific activity. However, most scientific publications are now accessed online. Scholarly web portals record detailed log data at a scale that exceeds the number of all existing citations combined. Such log data is recorded immediately upon publication and keeps track of the sequences of user requests (clickstreams) that are issued by a variety of users across many different domains. Given these advantages of log datasets over citation data, we investigate whether they can produce high-resolution, more current maps of science.',
+                                                publication_authors: ['Johan Bollen', 'Herbert Van de Sompel', 'Aric Hagberg', 'Luis Bettencourt', 'Ryan Chute', 'Marko A. Rodriguez', 'Lyudmila Balakireva'],
+                                                journal: 'Public Library of Science (PLoS)',
+                                                published_date: Date.new(2011, 3),
+                                                publication_type_id: Factory(:journal).id
+    )
+
+    assert_difference 'Publication.count' do
+      post :create, params: { subaction: 'Create', publication: publication_attrs, content_blobs: [{ data_url: 'http://somewhere.com/piccy.png', data: nil }], sharing: valid_sharing }
+    end
+
+    assert_redirected_to manage_publication_path(assigns(:publication))
+    p = assigns(:publication)
+
+    #assert_nil p.pubmed_id
+    assert_equal publication_attrs[:doi], p.doi
+    assert_equal publication_attrs[:title], p.title
+    assert_equal publication_attrs[:abstract], p.abstract
+    assert_equal publication_attrs[:journal], p.journal
+    assert_equal publication_attrs[:published_date], p.published_date
+    assert_equal publication_attrs[:publication_authors], p.publication_authors.collect(&:full_name)
+    assert_equal publication_attrs[:project_ids], p.projects.collect(&:id)
+
+    content_blob_id = p.content_blob.id
+    assert_not_nil ContentBlob.find_by_id(content_blob_id)
+  end
+
+  test 'can create with local file' do
+    project = Factory(:project)
+
+    publication_attrs = Factory.attributes_for(:publication,
+                                                contributor: User.current_user,
+                                                project_ids: [project.id],
+                                                doi: '10.1371/journal.pone.0004803',
+                                                title: 'Clickstream Data Yields High-Resolution Maps of Science - 2',
+                                                abstract: 'Intricate maps of science have been created from citation data to visualize the structure of scientific activity. However, most scientific publications are now accessed online. Scholarly web portals record detailed log data at a scale that exceeds the number of all existing citations combined. Such log data is recorded immediately upon publication and keeps track of the sequences of user requests (clickstreams) that are issued by a variety of users across many different domains. Given these advantages of log datasets over citation data, we investigate whether they can produce high-resolution, more current maps of science.',
+                                                publication_authors: ['Johan Bollen', 'Herbert Van de Sompel', 'Aric Hagberg', 'Luis Bettencourt', 'Ryan Chute', 'Marko A. Rodriguez', 'Lyudmila Balakireva'],
+                                                journal: 'Public Library of Science (PLoS)',
+                                                published_date: Date.new(2011, 3),
+                                                publication_type_id: Factory(:journal).id)
+
+    assert_difference 'ActivityLog.count' do
+      assert_difference 'Publication.count' do
+        assert_difference 'ContentBlob.count' do
+          post :create, params: { subaction: 'Create', publication: publication_attrs, content_blobs: [{ data: file_for_upload }], sharing: valid_sharing }
+        end
+      end
+    end
+
+    assert_redirected_to manage_publication_path(assigns(:publication))
+    p = assigns(:publication)
+
+    assert_equal publication_attrs[:doi], p.doi
+    assert_equal publication_attrs[:title], p.title
+    assert_equal publication_attrs[:abstract], p.abstract
+    assert_equal publication_attrs[:journal], p.journal
+    assert_equal publication_attrs[:published_date], p.published_date
+    assert_equal publication_attrs[:publication_authors], p.publication_authors.collect(&:full_name)
+    assert_equal publication_attrs[:project_ids], p.projects.collect(&:id)
+
+    content_blob_id = p.content_blob.id
+    assert_not_nil ContentBlob.find_by_id(content_blob_id)
+  end
+
+  test 'can create publication without uploading if invalid url' do
+    project = Factory(:project)
+
+    stub_request(:head, 'http://www.blah.de/images/logo.png').to_raise(SocketError)
+
+    publication_attrs = Factory.attributes_for(:publication,
+                                       contributor: User.current_user.person,
+                                       project_ids: [project.id],
+                                       doi: '10.1371/journal.pone.0004803',
+                                       title: 'Clickstream Data Yields High-Resolution Maps of Science - 2',
+                                       abstract: 'Intricate maps of science have been created from citation data to visualize the structure of scientific activity. However, most scientific publications are now accessed online. Scholarly web portals record detailed log data at a scale that exceeds the number of all existing citations combined. Such log data is recorded immediately upon publication and keeps track of the sequences of user requests (clickstreams) that are issued by a variety of users across many different domains. Given these advantages of log datasets over citation data, we investigate whether they can produce high-resolution, more current maps of science.',
+                                       publication_authors: ['Johan Bollen', 'Herbert Van de Sompel', 'Aric Hagberg', 'Luis Bettencourt', 'Ryan Chute', 'Marko A. Rodriguez', 'Lyudmila Balakireva'],
+                                       journal: 'Public Library of Science (PLoS)',
+                                       published_date: Date.new(2011, 3),
+                                       publication_type_id: Factory(:journal).id) # .symbolize_keys(turn string key to symbol)
+
+    assert_difference 'Publication.count' do
+      assert_no_difference('ContentBlob.count') do
+        post :create, params: { subaction: 'Create', publication: publication_attrs, content_blobs: [{ data_url: 'http://www.blah.de/images/logo.png' }] }
+      end
+    end
+    assert_response :redirect
+  end
+
+  test 'cannot upload with invalid url - 2' do
+    publication = Factory :publication, contributor: User.current_user.person
+
+    login_as(publication.contributor)
+    with_config_value(:allow_publications_fulltext, true) do
+      assert_no_difference 'Publication.count' do
+        assert_no_difference('ContentBlob.count') do
+          post :upload_pdf, params: { id: publication, publication: publication, content_blobs:
+            [{ data_url: 'notanurl',
+               data: nil }], sharing: valid_sharing }
+        end
+      end
+    end
+
+    assert_response :redirect
+
+    assert_nil publication.content_blob
+
+  end
+
+  test 'can upload with valid url' do
+    publication = Factory :publication, contributor: User.current_user.person
+
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://somewhere.com/piccy.png'
+
+    login_as(publication.contributor)
+    with_config_value(:allow_publications_fulltext, true) do
+      assert_no_difference 'Publication.count' do
+        assert_difference('ContentBlob.count', +1) do
+          post :upload_pdf, params: { id: publication, publication: publication, content_blobs:
+                                                                    [{ data_url: 'http://somewhere.com/piccy.png',
+                                                                       data: nil }], sharing: valid_sharing }
+        end
+      end
+    end
+
+    assert_response :redirect
+
+    assert_not_nil publication.latest_version.content_blob
+
+    content_blob_id = publication.latest_version.content_blob.id
+
+    assert_not_nil ContentBlob.find_by_id(content_blob_id)
+  end
+
+  test 'cannot upload with invalid url' do
+    publication = Factory :publication, contributor: User.current_user.person
+
+    stub_request(:head, 'http://www.blah.de/images/logo.png').to_raise(SocketError)
+
+    login_as(publication.contributor)
+    with_config_value(:allow_publications_fulltext, true) do
+      assert_no_difference 'Publication.count' do
+        assert_no_difference('ContentBlob.count') do
+          post :upload_pdf, params: { id: publication, publication: publication, content_blobs:
+                                        [{ data_url: 'http://www.blah.de/images/logo.png',
+                                                data: nil }], sharing: valid_sharing }
+        end
+      end
+    end
+    assert_response :redirect
+    assert_nil publication.content_blob
+  end
+
+  test 'can upload with local file' do
+    publication = Factory :publication, contributor: User.current_user.person
+
+    login_as(publication.contributor)
+    with_config_value(:allow_publications_fulltext, true) do
+
+      assert_no_difference 'Publication.count' do
+        assert_difference('ContentBlob.count', +1) do
+          post :upload_pdf, params: { id: publication, publication: publication, content_blobs: [{ data: file_for_upload }],
+                                  sharing: valid_sharing }
+        end
+      end
+      assert_response :redirect
+
+      content_blob_id = publication.latest_version.content_blob.id
+      assert_not_nil ContentBlob.find_by_id(content_blob_id)
+    end
+  end
+
+  test 'can soft-delete content_blob' do
+    publication = Factory :max_publication, contributor: User.current_user.person
+
+    login_as(User.current_user.person)
+
+    with_config_value(:allow_publications_fulltext, true) do
+      assert_difference('Publication::Version.count', 1) do
+        assert_no_difference('Publication.count') do
+          assert_no_difference('ContentBlob.count') do
+            get :soft_delete_fulltext, params: {id: publication.id}
+          end
+        end
+      end
+    end
+
+    assert_response :redirect
+    # there should be a new version with empty content blob.
+
+    assert_nil(publication.latest_version.content_blob)
+  end
+
+  test 'cannot upload with anonymous user' do
+    publication = Factory :publication, policy: Factory(:public_policy, access_type: Policy::VISIBLE)
+
+    User.current_user = nil
+
+    with_config_value(:allow_publications_fulltext, true) do
+
+      assert_no_difference 'Publication.count' do
+        assert_no_difference'ContentBlob.count' do
+          post :upload_pdf, params: { id: publication, publication: publication, content_blobs: [{ data: file_for_upload }],
+                                      sharing: valid_sharing }
+        end
+      end
+      assert_response :redirect
+
+      assert_nil publication.content_blob
+    end
+  end
+
+
+  test 'should create with misc link' do
+    person = Factory(:person)
+    login_as(person)
+
+    project = Factory(:project)
+
+    publication_attrs = Factory.attributes_for(:publication,
+                                               contributor: User.current_user.person,
+                                               project_ids: [project.id],
+                                               doi: '10.1371/journal.pone.0004803',
+                                               title: 'Clickstream Data Yields High-Resolution Maps of Science - 2',
+                                               abstract: 'Intricate maps of science have been created from citation data to visualize the structure of scientific activity. However, most scientific publications are now accessed online. Scholarly web portals record detailed log data at a scale that exceeds the number of all existing citations combined. Such log data is recorded immediately upon publication and keeps track of the sequences of user requests (clickstreams) that are issued by a variety of users across many different domains. Given these advantages of log datasets over citation data, we investigate whether they can produce high-resolution, more current maps of science.',
+                                               publication_authors: ['Johan Bollen', 'Herbert Van de Sompel', 'Aric Hagberg', 'Luis Bettencourt', 'Ryan Chute', 'Marko A. Rodriguez', 'Lyudmila Balakireva'],
+                                               journal: 'Public Library of Science (PLoS)',
+                                               published_date: Date.new(2011, 3),
+                                               publication_type_id: Factory(:journal).id,
+                                               misc_links_attributes: { '0' => { url: "http://www.slack.com/",
+                                                label:'the slack about this publication' } })
+
+    assert_difference('AssetLink.misc_link.count') do
+      assert_difference('Publication.count') do
+          post :create, params: { subaction: 'Create', publication: publication_attrs }
+      end
+    end
+    publication = assigns(:publication)
+    assert_equal 'http://www.slack.com/', publication.misc_links.first.url
+    assert_equal 'the slack about this publication', publication.misc_links.first.label
+    assert_equal AssetLink::MISC_LINKS, publication.misc_links.first.link_type
+  end
+
+  test 'should show misc link' do
+    asset_link = Factory(:misc_link)
+    publication = Factory(:publication, misc_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE))
+    get :show, params: { id: publication }
+    assert_response :success
+    assert_select 'div.panel-heading', text: /Related links/, count: 1
+  end
+
+  test 'should update publication with new misc link' do
+    person = Factory(:person)
+    publication = Factory(:publication, contributor: person)
+    login_as(person)
+    assert_nil publication.misc_links.first
+    assert_difference('AssetLink.misc_link.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: publication.id, publication: { misc_links_attributes:[{ url: "http://www.slack.com/" }] }  }
+      end
+    end
+    assert_redirected_to publication_path(publication = assigns(:publication))
+    assert_equal 'http://www.slack.com/', publication.misc_links.first.url
+  end
+
+  test 'should update publication with edited misc link' do
+    person = Factory(:person)
+    publication = Factory(:publication, contributor: person, misc_links:[Factory(:misc_link)])
+    login_as(person)
+    assert_equal 1,publication.misc_links.count
+    assert_no_difference('AssetLink.misc_link.count') do
+      assert_difference('ActivityLog.count') do
+        put :update, params: { id: publication.id, publication: { misc_links_attributes:[{ id:publication.misc_links.first.id, url: "http://www.wibble.com/" }] } }
+      end
+    end
+    publication = assigns(:publication)
+    assert_redirected_to publication_path(publication)
+    assert_equal 1,publication.misc_links.count
+    assert_equal 'http://www.wibble.com/', publication.misc_links.first.url
+  end
+
+  test 'should destroy related assetlink when the misc link is removed ' do
+    person = Factory(:person)
+    login_as(person)
+    asset_link = Factory(:misc_link)
+    publication = Factory(:publication, misc_links: [asset_link], policy: Factory(:public_policy, access_type: Policy::VISIBLE), contributor: person)
+    assert_difference('AssetLink.misc_link.count', -1) do
+      put :update, params: { id: publication.id, publication: { misc_links_attributes:[{ id: asset_link.id, _destroy:'1' }] } }
+    end
+    assert_redirected_to publication_path(publication = assigns(:publication))
+    assert_empty publication.misc_links
+  end
+
+
   private
 
   def publication_for_export_tests
     Factory(:publication, title: 'A paper on blabla',
-                          abstract: 'WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD',
-                          published_date: 5.days.ago.to_s(:db),
-                          pubmed_id: 5,
-                          publication_type: Factory(:journal)
+            abstract: 'WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD',
+            published_date: 5.days.ago.to_s(:db),
+            pubmed_id: 5,
+            publication_type: Factory(:journal)
 
     )
   end
 
   def pre_print_publication_for_export_tests
     Factory(:publication, title: 'A paper on blabla',
-                          abstract: 'WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD',
-                          pubmed_id: nil,
-                          publication_authors: [Factory(:publication_author),
-                                                Factory(:publication_author)],
-                          publication_type: Factory(:journal)
-            )
+            abstract: 'WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD WORD',
+            pubmed_id: nil,
+            publication_authors: [Factory(:publication_author),
+                                  Factory(:publication_author)],
+            publication_type: Factory(:journal)
+    )
   end
 end

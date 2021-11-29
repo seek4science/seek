@@ -5,10 +5,13 @@ class PublicationsController < ApplicationController
   include Seek::AssetsCommon
   include Seek::PreviewHandling
 
+  include Seek::UploadHandling::DataUpload
+
   before_action :publications_enabled?
   before_action :find_assets, only: [:index]
-  before_action :find_and_authorize_requested_item, only: %i[show edit manage update destroy]
+  before_action :find_and_authorize_requested_item, only: %i[show edit manage update destroy download upload_fulltext upload_pdf soft_delete_fulltext]
   before_action :suggest_authors, only: [:manage]
+  before_action :find_display_asset, :only=>[:show, :download]
 
   include Seek::IsaGraphExtensions
   include PublicationsHelper
@@ -72,6 +75,11 @@ class PublicationsController < ApplicationController
   # GET /publications/1/manage
   def manage; end
 
+  # GET /publications/1/upload_fulltext
+  def upload_fulltext
+    # @publication = Publication.find(params[:id])
+    # publication is found via find_and_authorize_requested_item and return is authorized!
+  end
 
   # POST /publications
   # POST /publications.xml
@@ -104,6 +112,7 @@ class PublicationsController < ApplicationController
   # PUT /publications/1.xml
   def update
     update_annotations(params[:tag_list], @publication) if params.key?(:tag_list)
+    update_sharing_policies @publication
 
     if @publication.update_attributes(publication_params)
       respond_to do |format|
@@ -118,6 +127,45 @@ class PublicationsController < ApplicationController
         format.xml  { render xml: @publication.errors, status: :unprocessable_entity }
         format.json { render json: @publication.errors, status: :unprocessable_entity }
       end
+    end
+  end
+
+  def upload_pdf
+    blob_params = params[:content_blobs]
+    if !blob_params || blob_params.empty? || blob_params.none? { |p| check_for_data_or_url(p) }
+      redirect_to @publication
+    elsif handle_upload_data(true)
+      comments = params[:revision_comments]
+
+      respond_to do |format|
+        create_new_version comments
+        format.html { redirect_to @publication }
+      end
+    else
+      flash[:error] = flash.now[:error]
+      redirect_to @publication
+    end
+  end
+
+  def create_new_version comments
+    if @publication.save_as_new_version(comments)
+      flash[:notice]="New full text uploaded #{@publication.version}"
+    else
+      flash[:error]="Unable to save new fulltext"
+    end
+  end
+
+  def soft_delete_fulltext
+    # replace this version as a new empty version
+    if @publication.can_soft_delete_full_text?
+      # create an empty version
+      respond_to do |format|
+        create_new_version 'Soft delete'
+        format.html { redirect_to @publication }
+      end
+    else
+      flash[:error]=flash.now[:error]
+      redirect_to @publication
     end
   end
 
@@ -327,6 +375,7 @@ class PublicationsController < ApplicationController
                                         :published_date, :bibtex_file, :registered_mode, :publisher, :booktitle, { project_ids: [] }, { event_ids: [] }, { model_ids: [] },
                                         { investigation_ids: [] }, { study_ids: [] }, { assay_ids: [] }, { presentation_ids: [] },
                                         { data_file_ids: [] }, { scales: [] }, { human_disease_ids: [] }, { workflow_ids: [] },
+                                        { misc_links_attributes: [:id, :url, :label, :_destroy] },
                                         { publication_authors_attributes: [:person_id, :id, :first_name, :last_name ] }).tap do |pub_params|
       filter_association_params(pub_params, :assay_ids, Assay, :can_edit?)
       filter_association_params(pub_params, :study_ids, Study, :can_view?)
@@ -354,7 +403,7 @@ class PublicationsController < ApplicationController
     params[key]
   end
 
-  # the original way of creating a bublication by either doi or pubmedid, where all data is set server-side
+  # the original way of creating a publication by either doi or pubmedid, where all data is set server-side
   def register_publication
     get_data(@publication, @publication.pubmed_id, @publication.doi)
 
@@ -380,7 +429,7 @@ class PublicationsController < ApplicationController
   # create a publication from a form that contains all the data
   def create_publication
 
-    @publication.registered_mode = @publication.registered_mode || 3
+    @publication.registered_mode = @publication.registered_mode || Publication::REGISTRATION_MANUALLY
     assay_ids = params[:assay_ids] || []
     # create publication authors
     plain_authors = params[:publication][:publication_authors]
@@ -395,6 +444,8 @@ class PublicationsController < ApplicationController
     end
 
     if @publication.save
+      upload_blob
+
       create_or_update_associations assay_ids, 'Assay', 'edit'
       if !@publication.parent_name.blank?
         render partial: 'assets/back_to_fancy_parent', locals: { child: @publication, parent_name: @publication.parent_name }
@@ -412,6 +463,18 @@ class PublicationsController < ApplicationController
         format.xml  { render xml: @publication.errors, status: :unprocessable_entity }
         format.json { render json: @publication.errors, status: :unprocessable_entity }
       end
+    end
+  end
+
+  def upload_blob
+    blob_params = params[:content_blobs]
+    if !blob_params || blob_params.empty? || blob_params.none? { |p| check_for_data_or_url(p) }
+      nil # Empty content is allowed for full text publication.
+    elsif handle_upload_data(true)
+      comments = params[:revision_comments]
+      create_new_version comments
+    else
+      flash[:error] = flash.now[:error]
     end
   end
 
@@ -447,7 +510,7 @@ class PublicationsController < ApplicationController
         format.json { render json: @publication.errors, status: :unprocessable_entity }
       end
     else
-        @subaction = 'Create'
+      @subaction = 'Create'
         respond_to do |format|
           format.html { render action: 'new' }
           format.json { render json: @publication, status: :ok, include: [params[:include]] }

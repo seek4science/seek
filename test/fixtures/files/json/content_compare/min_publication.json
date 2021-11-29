@@ -1,37 +1,71 @@
 {
   "data": {
-    "id": "980191248",
+    "id": "980194972",
     "type": "publications",
     "attributes": {
-      "policy":
-      {
-        "access":"no_access",
-        "permissions":[]
+      "policy": {
+        "access": "view",
+        "permissions": [
+
+        ]
       },
+      "discussion_links": [
+
+      ],
+      "misc_links":	[
+
+      ],
       "title": "A Minimal Publication",
+      "license": null,
+      "description": null,
+      "latest_version": 1,
+      "tags": [
+
+      ],
+      "versions": [
+        {
+          "version": 1,
+          "revision_comments": null,
+          "url": "http://localhost:3000/publications/980194972?version=1"
+        }
+      ],
+      "version": 1,
+      "revision_comments": null,
+      "created_at": "2021-10-13T09:40:59.000Z",
+      "updated_at": "2021-10-13T09:40:59.000Z",
+      "content_blobs": [
+
+      ],
+      "creators": [
+
+      ],
+      "other_creators": null,
       "journal": null,
       "published_date": null,
-      "doi": "10.5072/abcd",
+      "doi": "10.5075/abcd",
       "pubmed_id": null,
       "abstract": null,
       "citation": null,
-      "editor":	null,
-      "booktitle":	null,
-      "publisher":	null,
-      "link_to_pub": "https://doi.org/10.5072/abcd",
+      "editor": null,
+      "booktitle": null,
+      "publisher": null,
       "url": null,
-      "publication_type":"Journal",
-      "authors": [],
-      "discussion_links" : []
+      "link_to_pub": "https://doi.org/10.5075/abcd",
+      "publication_type": "Journal",
+      "authors": [
+
+      ]
     },
     "relationships": {
       "creators": {
-        "data": []
+        "data": [
+
+        ]
       },
       "submitter": {
         "data": [
           {
-            "id": "522086294",
+            "id": "1040034824",
             "type": "people"
           }
         ]
@@ -39,7 +73,7 @@
       "people": {
         "data": [
           {
-            "id": "1039986644",
+            "id": "1040034824",
             "type": "people"
           }
         ]
@@ -47,48 +81,66 @@
       "projects": {
         "data": [
           {
-            "id": "1022250817",
+            "id": "1022304213",
             "type": "projects"
           }
         ]
       },
       "investigations": {
-        "data": []
+        "data": [
+
+        ]
       },
       "studies": {
-        "data": []
+        "data": [
+
+        ]
       },
       "assays": {
-        "data": []
+        "data": [
+
+        ]
       },
       "data_files": {
-        "data": []
+        "data": [
+
+        ]
       },
       "models": {
-        "data": []
+        "data": [
+
+        ]
       },
       "publications": {
-        "data": []
+        "data": [
+
+        ]
       },
       "presentations": {
-        "data": []
+        "data": [
+
+        ]
       },
       "events": {
-        "data": []
+        "data": [
+
+        ]
       },
       "workflows": {
-        "data": []
+        "data": [
+
+        ]
       }
     },
     "links": {
-      "self": "/publications/927855014"
+      "self": "/publications/980194972?version=1"
     },
     "meta": {
-      "created": "2017-10-06T09:53:31.000Z",
-      "modified": "2017-10-06T09:53:31.000Z",
-      "uuid": "23ac7610-8caa-0135-d381-745c89ac8d09",
-      "base_url": "http://localhost:3000",
-      "api_version": "0.3"
+      "created": "2021-10-13T09:40:59.000Z",
+      "modified": "2021-10-13T09:40:59.000Z",
+      "api_version": "0.3",
+      "uuid": "988454a0-0e37-013a-3e95-00224803bc5d",
+      "base_url": "http://localhost:3000"
     }
   },
   "jsonapi": {
