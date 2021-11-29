@@ -60,7 +60,7 @@ module Git
     end
 
     def remote
-      git_repository&.remote
+      @remote || git_repository&.remote
     end
 
     def remote?
