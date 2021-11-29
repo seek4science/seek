@@ -1,41 +1,88 @@
 {
   "data": {
-    "id": "980191145",
+    "id": "980191010",
     "type": "publications",
     "attributes": {
-      "policy":
-      {
-        "access":"no_access",
-        "permissions":[]
+      "policy": {
+        "access": "view",
+        "permissions": [
+
+        ]
       },
+      "discussion_links": [
+        {
+          "id": 67,
+          "label": "Slack",
+          "url": "http://www.slack.com/"
+        }
+      ],
+      "misc_links":	[
+        {
+          "id": 67,
+          "label": "A link",
+          "url": "http://www.slack.com/"
+        }
+      ],
       "title": "A Maximal Publication",
+      "license": null,
+      "description": "Amazing insights into the mechanism of TF2",
+      "latest_version": 1,
+      "tags": [
+
+      ],
+      "versions": [
+        {
+          "version": 1,
+          "revision_comments": null,
+          "url": "http://localhost:3000/publications/980191010?version=1"
+        }
+      ],
+      "version": 1,
+      "revision_comments": null,
+      "created_at": "2021-10-13T11:09:01.000Z",
+      "updated_at": "2021-10-13T11:09:01.000Z",
+      "content_blobs": [
+        {
+          "original_filename": "min file",
+          "url": null,
+          "md5sum": "726de0a3f94d65056b909b9736e10349",
+          "sha1sum": "fbcc0dee4b5415de4c82ef5b137d8231fec1331b",
+          "content_type": "application/pdf",
+          "link": "http://localhost:3000/publications/980191010/content_blobs/1050453563",
+          "size": 8
+        }
+      ],
+      "creators": [
+
+      ],
+      "other_creators": null,
       "journal": "Journal of Molecular Biology",
       "published_date": "2017-10-10",
       "doi": "10.5072/abcd",
       "pubmed_id": 873864488,
       "abstract": "Amazing insights into the mechanism of TF2",
       "citation": "JMB Oct 2017, 12:234-245",
-      "editor":	"Richling, S. and Baumann, M. and Heuveline, V.",
-      "booktitle":	"Proceedings of the 3rd bwHPC-Symposium: Heidelberg 2016",
-      "publisher":	"Heidelberg University Library, heiBOOKS",
+      "editor": "Richling, S. and Baumann, M. and Heuveline, V.",
+      "booktitle": "Proceedings of the 3rd bwHPC-Symposium: Heidelberg 2016",
+      "publisher": "Heidelberg University Library, heiBOOKS",
       "url": null,
       "link_to_pub": "https://www.ncbi.nlm.nih.gov/pubmed/873864488",
-      "publication_type":"Journal",
-      "authors": ["Author1 Last", "Author2 Last"],
-      "discussion_links": [{
-        "id": 55,
-        "url": "http://www.slack.com/",
-        "label": "Slack"
-      }]
+      "publication_type": "Journal",
+      "authors": [
+        "Author_non_registered LastNonReg",
+        "Author_registered LastReg"
+      ]
     },
     "relationships": {
       "creators": {
-        "data": []
+        "data": [
+
+        ]
       },
       "submitter": {
         "data": [
           {
-            "id": "522086294",
+            "id": "1039989660",
             "type": "people"
           }
         ]
@@ -43,7 +90,7 @@
       "people": {
         "data": [
           {
-            "id": "1039986644",
+            "id": "1039989660",
             "type": "people"
           }
         ]
@@ -51,7 +98,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022250817",
+            "id": "1022253888",
             "type": "projects"
           }
         ]
@@ -59,7 +106,7 @@
       "investigations": {
         "data": [
           {
-            "id": "973655056",
+            "id": "973655031",
             "type": "investigations"
           }
         ]
@@ -67,7 +114,7 @@
       "studies": {
         "data": [
           {
-            "id": "873655023",
+            "id": "1060385070",
             "type": "studies"
           }
         ]
@@ -75,7 +122,7 @@
       "assays": {
         "data": [
           {
-            "id": "4573633054",
+            "id": "1035386794",
             "type": "assays"
           }
         ]
@@ -83,7 +130,7 @@
       "data_files": {
         "data": [
           {
-            "id": "1022250817",
+            "id": "883654558",
             "type": "data_files"
           }
         ]
@@ -91,7 +138,7 @@
       "models": {
         "data": [
           {
-            "id": "1022250817",
+            "id": "1004285676",
             "type": "models"
           }
         ]
@@ -99,7 +146,7 @@
       "publications": {
         "data": [
           {
-            "id": "1022250817",
+            "id": "980191009",
             "type": "publications"
           }
         ]
@@ -107,7 +154,7 @@
       "presentations": {
         "data": [
           {
-            "id": "25",
+            "id": "65",
             "type": "presentations"
           }
         ]
@@ -115,7 +162,7 @@
       "events": {
         "data": [
           {
-            "id": "1022250817",
+            "id": "1025618674",
             "type": "events"
           }
         ]
@@ -123,21 +170,21 @@
       "workflows": {
         "data": [
           {
-            "id": "1022250817",
+            "id": "46",
             "type": "workflows"
           }
         ]
       }
     },
     "links": {
-      "self": "/publications/927855014"
+      "self": "/publications/980191010?version=1"
     },
     "meta": {
-      "created": "2017-10-06T09:53:31.000Z",
-      "modified": "2017-10-06T09:53:31.000Z",
-      "uuid": "23ac7610-8caa-0135-d381-745c89ac8d09",
-      "base_url": "http://localhost:3000",
-      "api_version": "0.3"
+      "created": "2021-10-13T11:09:01.000Z",
+      "modified": "2021-10-13T11:09:01.000Z",
+      "api_version": "0.3",
+      "uuid": "e4a7afb0-0e43-013a-c058-6045bd86ea55",
+      "base_url": "http://localhost:3000"
     }
   },
   "jsonapi": {

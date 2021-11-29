@@ -9,6 +9,7 @@ namespace :seek do
   task upgrade_version_tasks: %i[
     environment
     db:seed:workflow_classes
+    update_missing_publication_versions
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -45,4 +46,23 @@ namespace :seek do
     end
   end
 
+
+  task(update_missing_publication_versions: :environment) do
+    puts '... creating missing publications versions ...'
+    create = 0
+    disable_authorization_checks do
+      Publication.find_each do |publication|
+        # check if the publication has a version
+        # then create one if missing
+        if publication.latest_version.nil?
+          publication.save_as_new_version 'Version for legacy entries'
+          unless publication.latest_version.nil?
+            create += 1
+          end
+        end
+        # publication.save
+      end
+    end
+    puts " ... finished creating missing publications versions for #{create.to_s} publications"
+  end
 end

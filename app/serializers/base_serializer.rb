@@ -6,12 +6,17 @@ class BaseSerializer < SimpleBaseSerializer
 
   attribute :policy, if: :show_policy?
 
-  attribute :discussion_links,  if: -> { object.is_discussable? } do
+  attribute :discussion_links, if: -> { object.is_discussable? } do
     object.discussion_links.collect do |link|
-      {id:link.id, label: link.label, url: link.url}
+      { id: link.id, label: link.label, url: link.url }
     end
   end
 
+  attribute :misc_links, if: -> { object.have_misc_links? } do
+    object.misc_links.collect do |link|
+      { id: link.id, label: link.label, url: link.url }
+    end
+  end
 
   def policy
     BaseSerializer.convert_policy object.policy
@@ -23,7 +28,7 @@ class BaseSerializer < SimpleBaseSerializer
       @associated[name]
     else
       items = (object.class.name.include?('::Version') ? object.parent : object).get_related(name).authorized_for('view')
-      @associated[name] = items.empty? ? nil : items
+      @associated[name] = items.empty? ? [] : items
     end
   end
 
@@ -105,7 +110,7 @@ class BaseSerializer < SimpleBaseSerializer
 
   def BaseSerializer.convert_policy policy
     { 'access' => (PolicyHelper::access_type_key policy.access_type),
-      'permissions' => (BaseSerializer.permits policy)}
+      'permissions' => (BaseSerializer.permits policy) }
   end
 
   def BaseSerializer.permits policy
