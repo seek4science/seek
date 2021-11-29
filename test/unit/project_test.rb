@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class ProjectTest < ActiveSupport::TestCase
-  fixtures :projects, :institutions, :work_groups, :group_memberships, :people, :users, :publications, :assets, :organisms
+  fixtures :projects, :institutions, :work_groups, :group_memberships, :people, :users, :assets, :organisms
 
 
   test 'workgroups destroyed with project' do
