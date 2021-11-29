@@ -120,3 +120,29 @@ Factory.define(:ontology_sample_controlled_vocab, parent: :sample_controlled_voc
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Father',iri:'http://ontology.org/#father',parent_iri:'http://ontology.org/#parent')
   end
 end
+
+Factory.define(:edam_topics_controlled_vocab, parent: :sample_controlled_vocab) do |f|
+  f.title 'EDAM Topics'
+  f.ols_root_term_uri 'http://edamontology.org/topic_0003'
+  f.key SampleControlledVocab::SystemVocabs::KEYS[:edam_topics]
+  f.source_ontology 'edam'
+  f.after_build do |vocab|
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Topic',iri:'http://edamontology.org/topic_0003',parent_iri:'')
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Biomedical science',iri:'http://edamontology.org/topic_3344',parent_iri:'http://edamontology.org/topic_0003')
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Chemistry',iri:'http://edamontology.org/topic_3314',parent_iri:'http://edamontology.org/topic_0003')
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Sample collections',iri:'http://edamontology.org/topic_3277',parent_iri:'http://edamontology.org/topic_3344')
+  end
+end
+
+Factory.define(:edam_operations_controlled_vocab, parent: :sample_controlled_vocab) do |f|
+  f.title 'EDAM Operations'
+  f.ols_root_term_uri 'http://edamontology.org/operation_0004'
+  f.key SampleControlledVocab::SystemVocabs::KEYS[:edam_operations]
+  f.source_ontology 'edam'
+  f.after_build do |vocab|
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Operation',iri:'http://edamontology.org/operation_0004',parent_iri:'')
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Correlation',iri:'http://edamontology.org/operation_3465',parent_iri:'http://edamontology.org/operation_0004')
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Clustering',iri:'http://edamontology.org/operation_3432',parent_iri:'http://edamontology.org/operation_0004')
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Expression correlation analysis',iri:'http://edamontology.org/operation_3463',parent_iri:'http://edamontology.org/operation_3465')
+  end
+end

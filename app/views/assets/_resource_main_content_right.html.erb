@@ -38,6 +38,10 @@
 
 <%= render :partial => "assets/usage_info_box",:locals => { :resource => resource } -%>
 
+<% if resource.edam_annotations? %>
+  <%= render partial:'assets/edam_properties_box' %>
+<% end %>
+
 <% if resource.class.is_taggable? %>
     <%= render :partial=>"assets/tags_box", :no_tags_message=>"Add tags (comma separated) ..." -%>
 <% end -%>

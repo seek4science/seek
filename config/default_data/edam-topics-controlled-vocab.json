@@ -1,0 +1,1323 @@
+{
+  "title": "EDAM Topics",
+  "description": "The Topics branch of the EDAM Ontology. EDAM is a simple ontology of well established, familiar concepts that are prevalent within bioinformatics, including types of data and data identifiers, data formats, operations and topics. EDAM provides a set of terms with synonyms and definitions - organised into an intuitive hierarchy for convenient use.",
+  "ols_root_term_uri": "http://edamontology.org/topic_0003",
+  "source_ontolgy": "edam",
+  "terms": [
+    {
+      "label": "Topic",
+      "iri": "http://edamontology.org/topic_0003",
+      "parent_iri": ""
+    },
+    {
+      "label": "Biomedical science",
+      "iri": "http://edamontology.org/topic_3344",
+      "parent_iri": "http://edamontology.org/topic_0003"
+    },
+    {
+      "label": "Sample collections",
+      "iri": "http://edamontology.org/topic_3277",
+      "parent_iri": "http://edamontology.org/topic_3344"
+    },
+    {
+      "label": "Cell culture collection",
+      "iri": "http://edamontology.org/topic_3340",
+      "parent_iri": "http://edamontology.org/topic_3277"
+    },
+    {
+      "label": "Clone library",
+      "iri": "http://edamontology.org/topic_3341",
+      "parent_iri": "http://edamontology.org/topic_3277"
+    },
+    {
+      "label": "Biobank",
+      "iri": "http://edamontology.org/topic_3337",
+      "parent_iri": "http://edamontology.org/topic_3277"
+    },
+    {
+      "label": "Mouse clinic",
+      "iri": "http://edamontology.org/topic_3338",
+      "parent_iri": "http://edamontology.org/topic_3277"
+    },
+    {
+      "label": "Microbial collection",
+      "iri": "http://edamontology.org/topic_3339",
+      "parent_iri": "http://edamontology.org/topic_3277"
+    },
+    {
+      "label": "Neurobiology",
+      "iri": "http://edamontology.org/topic_3304",
+      "parent_iri": "http://edamontology.org/topic_3344"
+    },
+    {
+      "label": "Parasitology",
+      "iri": "http://edamontology.org/topic_3302",
+      "parent_iri": "http://edamontology.org/topic_3344"
+    },
+    {
+      "label": "Pharmacology",
+      "iri": "http://edamontology.org/topic_0202",
+      "parent_iri": "http://edamontology.org/topic_3344"
+    },
+    {
+      "label": "Pharmacogenomics",
+      "iri": "http://edamontology.org/topic_0208",
+      "parent_iri": "http://edamontology.org/topic_0202"
+    },
+    {
+      "label": "Nutritional science",
+      "iri": "http://edamontology.org/topic_3390",
+      "parent_iri": "http://edamontology.org/topic_3344"
+    },
+    {
+      "label": "Regenerative medicine",
+      "iri": "http://edamontology.org/topic_3395",
+      "parent_iri": "http://edamontology.org/topic_3344"
+    },
+    {
+      "label": "Laboratory animal science",
+      "iri": "http://edamontology.org/topic_3386",
+      "parent_iri": "http://edamontology.org/topic_3344"
+    },
+    {
+      "label": "Animal study",
+      "iri": "http://edamontology.org/topic_3679",
+      "parent_iri": "http://edamontology.org/topic_3386"
+    },
+    {
+      "label": "Medicines research and development",
+      "iri": "http://edamontology.org/topic_3376",
+      "parent_iri": "http://edamontology.org/topic_3344"
+    },
+    {
+      "label": "Drug discovery",
+      "iri": "http://edamontology.org/topic_3336",
+      "parent_iri": "http://edamontology.org/topic_3376"
+    },
+    {
+      "label": "Compound libraries and screening",
+      "iri": "http://edamontology.org/topic_3343",
+      "parent_iri": "http://edamontology.org/topic_3336"
+    },
+    {
+      "label": "Medicinal chemistry",
+      "iri": "http://edamontology.org/topic_0209",
+      "parent_iri": "http://edamontology.org/topic_3336"
+    },
+    {
+      "label": "Quality affairs",
+      "iri": "http://edamontology.org/topic_3393",
+      "parent_iri": "http://edamontology.org/topic_3376"
+    },
+    {
+      "label": "Regulatory affairs",
+      "iri": "http://edamontology.org/topic_3394",
+      "parent_iri": "http://edamontology.org/topic_3376"
+    },
+    {
+      "label": "Safety sciences",
+      "iri": "http://edamontology.org/topic_3377",
+      "parent_iri": "http://edamontology.org/topic_3376"
+    },
+    {
+      "label": "Toxicology",
+      "iri": "http://edamontology.org/topic_2840",
+      "parent_iri": "http://edamontology.org/topic_3377"
+    },
+    {
+      "label": "Pharmacovigilance",
+      "iri": "http://edamontology.org/topic_3378",
+      "parent_iri": "http://edamontology.org/topic_3377"
+    },
+    {
+      "label": "Preclinical and clinical studies",
+      "iri": "http://edamontology.org/topic_3379",
+      "parent_iri": "http://edamontology.org/topic_3376"
+    },
+    {
+      "label": "Drug development",
+      "iri": "http://edamontology.org/topic_3373",
+      "parent_iri": "http://edamontology.org/topic_3376"
+    },
+    {
+      "label": "Biotherapeutics",
+      "iri": "http://edamontology.org/topic_3374",
+      "parent_iri": "http://edamontology.org/topic_3376"
+    },
+    {
+      "label": "Drug metabolism",
+      "iri": "http://edamontology.org/topic_3375",
+      "parent_iri": "http://edamontology.org/topic_3376"
+    },
+    {
+      "label": "Vaccinology",
+      "iri": "http://edamontology.org/topic_3966",
+      "parent_iri": "http://edamontology.org/topic_3376"
+    },
+    {
+      "label": "Immunology",
+      "iri": "http://edamontology.org/topic_0804",
+      "parent_iri": "http://edamontology.org/topic_3344"
+    },
+    {
+      "label": "Immunoproteins and antigens",
+      "iri": "http://edamontology.org/topic_2830",
+      "parent_iri": "http://edamontology.org/topic_0804"
+    },
+    {
+      "label": "Immunoinformatics",
+      "iri": "http://edamontology.org/topic_3948",
+      "parent_iri": "http://edamontology.org/topic_0804"
+    },
+    {
+      "label": "Immunogenetics",
+      "iri": "http://edamontology.org/topic_3930",
+      "parent_iri": "http://edamontology.org/topic_0804"
+    },
+    {
+      "label": "Anatomy",
+      "iri": "http://edamontology.org/topic_3067",
+      "parent_iri": "http://edamontology.org/topic_3344"
+    },
+    {
+      "label": "Physics",
+      "iri": "http://edamontology.org/topic_3318",
+      "parent_iri": "http://edamontology.org/topic_0003"
+    },
+    {
+      "label": "Biophysics",
+      "iri": "http://edamontology.org/topic_3306",
+      "parent_iri": "http://edamontology.org/topic_3318"
+    },
+    {
+      "label": "Chemistry",
+      "iri": "http://edamontology.org/topic_3314",
+      "parent_iri": "http://edamontology.org/topic_0003"
+    },
+    {
+      "label": "Biochemistry",
+      "iri": "http://edamontology.org/topic_3292",
+      "parent_iri": "http://edamontology.org/topic_3314"
+    },
+    {
+      "label": "Computational chemistry",
+      "iri": "http://edamontology.org/topic_3332",
+      "parent_iri": "http://edamontology.org/topic_3314"
+    },
+    {
+      "label": "Analytical chemistry",
+      "iri": "http://edamontology.org/topic_3370",
+      "parent_iri": "http://edamontology.org/topic_3314"
+    },
+    {
+      "label": "Synthetic chemistry",
+      "iri": "http://edamontology.org/topic_3371",
+      "parent_iri": "http://edamontology.org/topic_3314"
+    },
+    {
+      "label": "Chemical biology",
+      "iri": "http://edamontology.org/topic_3369",
+      "parent_iri": "http://edamontology.org/topic_3371"
+    },
+    {
+      "label": "Mathematics",
+      "iri": "http://edamontology.org/topic_3315",
+      "parent_iri": "http://edamontology.org/topic_0003"
+    },
+    {
+      "label": "Pure mathematics",
+      "iri": "http://edamontology.org/topic_3570",
+      "parent_iri": "http://edamontology.org/topic_3315"
+    },
+    {
+      "label": "Applied mathematics",
+      "iri": "http://edamontology.org/topic_3569",
+      "parent_iri": "http://edamontology.org/topic_3315"
+    },
+    {
+      "label": "Statistics and probability",
+      "iri": "http://edamontology.org/topic_2269",
+      "parent_iri": "http://edamontology.org/topic_3315"
+    },
+    {
+      "label": "Computer science",
+      "iri": "http://edamontology.org/topic_3316",
+      "parent_iri": "http://edamontology.org/topic_0003"
+    },
+    {
+      "label": "Natural language processing",
+      "iri": "http://edamontology.org/topic_0218",
+      "parent_iri": "http://edamontology.org/topic_3316"
+    },
+    {
+      "label": "Software engineering",
+      "iri": "http://edamontology.org/topic_3372",
+      "parent_iri": "http://edamontology.org/topic_3316"
+    },
+    {
+      "label": "Data mining",
+      "iri": "http://edamontology.org/topic_3473",
+      "parent_iri": "http://edamontology.org/topic_3316"
+    },
+    {
+      "label": "Machine learning",
+      "iri": "http://edamontology.org/topic_3474",
+      "parent_iri": "http://edamontology.org/topic_3316"
+    },
+    {
+      "label": "Data visualisation",
+      "iri": "http://edamontology.org/topic_0092",
+      "parent_iri": "http://edamontology.org/topic_3316"
+    },
+    {
+      "label": "Computational biology",
+      "iri": "http://edamontology.org/topic_3307",
+      "parent_iri": "http://edamontology.org/topic_0003"
+    },
+    {
+      "label": "Sequence sites, features and motifs",
+      "iri": "http://edamontology.org/topic_0160",
+      "parent_iri": "http://edamontology.org/topic_3307"
+    },
+    {
+      "label": "Protein sites, features and motifs",
+      "iri": "http://edamontology.org/topic_3510",
+      "parent_iri": "http://edamontology.org/topic_0160"
+    },
+    {
+      "label": "Protein binding sites",
+      "iri": "http://edamontology.org/topic_3534",
+      "parent_iri": "http://edamontology.org/topic_3510"
+    },
+    {
+      "label": "Nucleic acid sites, features and motifs",
+      "iri": "http://edamontology.org/topic_3511",
+      "parent_iri": "http://edamontology.org/topic_0160"
+    },
+    {
+      "label": "DNA binding sites",
+      "iri": "http://edamontology.org/topic_3125",
+      "parent_iri": "http://edamontology.org/topic_3511"
+    },
+    {
+      "label": "Transcription factors and regulatory sites",
+      "iri": "http://edamontology.org/topic_0749",
+      "parent_iri": "http://edamontology.org/topic_3125"
+    },
+    {
+      "label": "Molecular genetics",
+      "iri": "http://edamontology.org/topic_3321",
+      "parent_iri": "http://edamontology.org/topic_3307"
+    },
+    {
+      "label": "Genetic variation",
+      "iri": "http://edamontology.org/topic_0199",
+      "parent_iri": "http://edamontology.org/topic_3321"
+    },
+    {
+      "label": "DNA polymorphism",
+      "iri": "http://edamontology.org/topic_2885",
+      "parent_iri": "http://edamontology.org/topic_0199"
+    },
+    {
+      "label": "DNA mutation",
+      "iri": "http://edamontology.org/topic_2533",
+      "parent_iri": "http://edamontology.org/topic_0199"
+    },
+    {
+      "label": "Structural variation",
+      "iri": "http://edamontology.org/topic_3175",
+      "parent_iri": "http://edamontology.org/topic_0199"
+    },
+    {
+      "label": "Copy number variation",
+      "iri": "http://edamontology.org/topic_3958",
+      "parent_iri": "http://edamontology.org/topic_3175"
+    },
+    {
+      "label": "Gene structure",
+      "iri": "http://edamontology.org/topic_0114",
+      "parent_iri": "http://edamontology.org/topic_3321"
+    },
+    {
+      "label": "Gene transcripts",
+      "iri": "http://edamontology.org/topic_3512",
+      "parent_iri": "http://edamontology.org/topic_0114"
+    },
+    {
+      "label": "Functional, regulatory and non-coding RNA",
+      "iri": "http://edamontology.org/topic_0659",
+      "parent_iri": "http://edamontology.org/topic_0114"
+    },
+    {
+      "label": "Mobile genetic elements",
+      "iri": "http://edamontology.org/topic_0798",
+      "parent_iri": "http://edamontology.org/topic_0114"
+    },
+    {
+      "label": "Gene expression",
+      "iri": "http://edamontology.org/topic_0203",
+      "parent_iri": "http://edamontology.org/topic_3321"
+    },
+    {
+      "label": "RNA splicing",
+      "iri": "http://edamontology.org/topic_3320",
+      "parent_iri": "http://edamontology.org/topic_0203"
+    },
+    {
+      "label": "Transcriptomics",
+      "iri": "http://edamontology.org/topic_3308",
+      "parent_iri": "http://edamontology.org/topic_0203"
+    },
+    {
+      "label": "Metatranscriptomics",
+      "iri": "http://edamontology.org/topic_3941",
+      "parent_iri": "http://edamontology.org/topic_3308"
+    },
+    {
+      "label": "Gene regulation",
+      "iri": "http://edamontology.org/topic_0204",
+      "parent_iri": "http://edamontology.org/topic_0203"
+    },
+    {
+      "label": "Gene and protein families",
+      "iri": "http://edamontology.org/topic_0623",
+      "parent_iri": "http://edamontology.org/topic_3321"
+    },
+    {
+      "label": "Cytogenetics",
+      "iri": "http://edamontology.org/topic_3959",
+      "parent_iri": "http://edamontology.org/topic_3321"
+    },
+    {
+      "label": "Function analysis",
+      "iri": "http://edamontology.org/topic_1775",
+      "parent_iri": "http://edamontology.org/topic_3307"
+    },
+    {
+      "label": "Functional genomics",
+      "iri": "http://edamontology.org/topic_0085",
+      "parent_iri": "http://edamontology.org/topic_1775"
+    },
+    {
+      "label": "Molecular interactions, pathways and networks",
+      "iri": "http://edamontology.org/topic_0602",
+      "parent_iri": "http://edamontology.org/topic_3307"
+    },
+    {
+      "label": "Protein interactions",
+      "iri": "http://edamontology.org/topic_0128",
+      "parent_iri": "http://edamontology.org/topic_0602"
+    },
+    {
+      "label": "Biomolecular simulation",
+      "iri": "http://edamontology.org/topic_3892",
+      "parent_iri": "http://edamontology.org/topic_3307"
+    },
+    {
+      "label": "Molecular dynamics",
+      "iri": "http://edamontology.org/topic_0176",
+      "parent_iri": "http://edamontology.org/topic_3892"
+    },
+    {
+      "label": "Nucleic acids",
+      "iri": "http://edamontology.org/topic_0077",
+      "parent_iri": "http://edamontology.org/topic_3307"
+    },
+    {
+      "label": "DNA",
+      "iri": "http://edamontology.org/topic_0654",
+      "parent_iri": "http://edamontology.org/topic_0077"
+    },
+    {
+      "label": "DNA packaging",
+      "iri": "http://edamontology.org/topic_3176",
+      "parent_iri": "http://edamontology.org/topic_0654"
+    },
+    {
+      "label": "DNA replication and recombination",
+      "iri": "http://edamontology.org/topic_3127",
+      "parent_iri": "http://edamontology.org/topic_0654"
+    },
+    {
+      "label": "RNA",
+      "iri": "http://edamontology.org/topic_0099",
+      "parent_iri": "http://edamontology.org/topic_0077"
+    },
+    {
+      "label": "Nucleic acid structure analysis",
+      "iri": "http://edamontology.org/topic_0097",
+      "parent_iri": "http://edamontology.org/topic_0077"
+    },
+    {
+      "label": "Proteins",
+      "iri": "http://edamontology.org/topic_0078",
+      "parent_iri": "http://edamontology.org/topic_3307"
+    },
+    {
+      "label": "Protein properties",
+      "iri": "http://edamontology.org/topic_0123",
+      "parent_iri": "http://edamontology.org/topic_0078"
+    },
+    {
+      "label": "Protein expression",
+      "iri": "http://edamontology.org/topic_0108",
+      "parent_iri": "http://edamontology.org/topic_0078"
+    },
+    {
+      "label": "Protein targeting and localisation",
+      "iri": "http://edamontology.org/topic_0140",
+      "parent_iri": "http://edamontology.org/topic_0108"
+    },
+    {
+      "label": "Protein modifications",
+      "iri": "http://edamontology.org/topic_0601",
+      "parent_iri": "http://edamontology.org/topic_0108"
+    },
+    {
+      "label": "Protein variants",
+      "iri": "http://edamontology.org/topic_3120",
+      "parent_iri": "http://edamontology.org/topic_0108"
+    },
+    {
+      "label": "Protein structure analysis",
+      "iri": "http://edamontology.org/topic_2814",
+      "parent_iri": "http://edamontology.org/topic_0078"
+    },
+    {
+      "label": "Protein structural motifs and surfaces",
+      "iri": "http://edamontology.org/topic_0166",
+      "parent_iri": "http://edamontology.org/topic_2814"
+    },
+    {
+      "label": "Protein folding, stability and design",
+      "iri": "http://edamontology.org/topic_0130",
+      "parent_iri": "http://edamontology.org/topic_2814"
+    },
+    {
+      "label": "Protein secondary structure",
+      "iri": "http://edamontology.org/topic_3542",
+      "parent_iri": "http://edamontology.org/topic_2814"
+    },
+    {
+      "label": "Protein disordered structure",
+      "iri": "http://edamontology.org/topic_3538",
+      "parent_iri": "http://edamontology.org/topic_2814"
+    },
+    {
+      "label": "Protein folds and structural domains",
+      "iri": "http://edamontology.org/topic_0736",
+      "parent_iri": "http://edamontology.org/topic_2814"
+    },
+    {
+      "label": "Enzymes",
+      "iri": "http://edamontology.org/topic_0821",
+      "parent_iri": "http://edamontology.org/topic_0078"
+    },
+    {
+      "label": "Membrane and lipoproteins",
+      "iri": "http://edamontology.org/topic_0820",
+      "parent_iri": "http://edamontology.org/topic_0078"
+    },
+    {
+      "label": "Sequence analysis",
+      "iri": "http://edamontology.org/topic_0080",
+      "parent_iri": "http://edamontology.org/topic_3307"
+    },
+    {
+      "label": "Phylogenomics",
+      "iri": "http://edamontology.org/topic_0194",
+      "parent_iri": "http://edamontology.org/topic_0080"
+    },
+    {
+      "label": "Sequence assembly",
+      "iri": "http://edamontology.org/topic_0196",
+      "parent_iri": "http://edamontology.org/topic_0080"
+    },
+    {
+      "label": "Sequence composition, complexity and repeats",
+      "iri": "http://edamontology.org/topic_0157",
+      "parent_iri": "http://edamontology.org/topic_0080"
+    },
+    {
+      "label": "Mapping",
+      "iri": "http://edamontology.org/topic_0102",
+      "parent_iri": "http://edamontology.org/topic_0080"
+    },
+    {
+      "label": "Phylogenetics",
+      "iri": "http://edamontology.org/topic_3293",
+      "parent_iri": "http://edamontology.org/topic_0080"
+    },
+    {
+      "label": "Probes and primers",
+      "iri": "http://edamontology.org/topic_0632",
+      "parent_iri": "http://edamontology.org/topic_0080"
+    },
+    {
+      "label": "Cladistics",
+      "iri": "http://edamontology.org/topic_3944",
+      "parent_iri": "http://edamontology.org/topic_0080"
+    },
+    {
+      "label": "Structure analysis",
+      "iri": "http://edamontology.org/topic_0081",
+      "parent_iri": "http://edamontology.org/topic_3307"
+    },
+    {
+      "label": "Small molecules",
+      "iri": "http://edamontology.org/topic_0154",
+      "parent_iri": "http://edamontology.org/topic_0081"
+    },
+    {
+      "label": "Lipids",
+      "iri": "http://edamontology.org/topic_0153",
+      "parent_iri": "http://edamontology.org/topic_0081"
+    },
+    {
+      "label": "Carbohydrates",
+      "iri": "http://edamontology.org/topic_0152",
+      "parent_iri": "http://edamontology.org/topic_0081"
+    },
+    {
+      "label": "Structure prediction",
+      "iri": "http://edamontology.org/topic_0082",
+      "parent_iri": "http://edamontology.org/topic_0081"
+    },
+    {
+      "label": "Molecular modelling",
+      "iri": "http://edamontology.org/topic_2275",
+      "parent_iri": "http://edamontology.org/topic_0082"
+    },
+    {
+      "label": "Phylogeny",
+      "iri": "http://edamontology.org/topic_0084",
+      "parent_iri": "http://edamontology.org/topic_3307"
+    },
+    {
+      "label": "Medicine",
+      "iri": "http://edamontology.org/topic_3303",
+      "parent_iri": "http://edamontology.org/topic_0003"
+    },
+    {
+      "label": "Translational medicine",
+      "iri": "http://edamontology.org/topic_3342",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Molecular medicine",
+      "iri": "http://edamontology.org/topic_3388",
+      "parent_iri": "http://edamontology.org/topic_3342"
+    },
+    {
+      "label": "Neurology",
+      "iri": "http://edamontology.org/topic_3334",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Cardiology",
+      "iri": "http://edamontology.org/topic_3335",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Respiratory medicine",
+      "iri": "http://edamontology.org/topic_3322",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Public health and epidemiology",
+      "iri": "http://edamontology.org/topic_3305",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Physiology",
+      "iri": "http://edamontology.org/topic_3300",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Geriatric medicine",
+      "iri": "http://edamontology.org/topic_3399",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Systems medicine",
+      "iri": "http://edamontology.org/topic_3396",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Veterinary medicine",
+      "iri": "http://edamontology.org/topic_3397",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Reproductive health",
+      "iri": "http://edamontology.org/topic_3420",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Surgery",
+      "iri": "http://edamontology.org/topic_3421",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Urology and nephrology",
+      "iri": "http://edamontology.org/topic_3422",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Complementary medicine",
+      "iri": "http://edamontology.org/topic_3423",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Opthalmology",
+      "iri": "http://edamontology.org/topic_3417",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Paediatrics",
+      "iri": "http://edamontology.org/topic_3418",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Psychiatry",
+      "iri": "http://edamontology.org/topic_3419",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Trauma medicine",
+      "iri": "http://edamontology.org/topic_3414",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Medical toxicology",
+      "iri": "http://edamontology.org/topic_3415",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Musculoskeletal medicine",
+      "iri": "http://edamontology.org/topic_3416",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Gender medicine",
+      "iri": "http://edamontology.org/topic_3410",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Gynaecology and obstetrics",
+      "iri": "http://edamontology.org/topic_3411",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Hepatic and biliary medicine",
+      "iri": "http://edamontology.org/topic_3412",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Ear, nose and throat medicine",
+      "iri": "http://edamontology.org/topic_3406",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Endocrinology and metabolism",
+      "iri": "http://edamontology.org/topic_3407",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Haematology",
+      "iri": "http://edamontology.org/topic_3408",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Gastroenterology",
+      "iri": "http://edamontology.org/topic_3409",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Anaesthesiology",
+      "iri": "http://edamontology.org/topic_3402",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Critical care medicine",
+      "iri": "http://edamontology.org/topic_3403",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Dermatology",
+      "iri": "http://edamontology.org/topic_3404",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Dentistry",
+      "iri": "http://edamontology.org/topic_3405",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Allergy, clinical immunology and immunotherapeutics",
+      "iri": "http://edamontology.org/topic_3400",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Pain medicine",
+      "iri": "http://edamontology.org/topic_3401",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Tropical medicine",
+      "iri": "http://edamontology.org/topic_3575",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Personalised medicine",
+      "iri": "http://edamontology.org/topic_3577",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Pathology",
+      "iri": "http://edamontology.org/topic_0634",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Rare diseases",
+      "iri": "http://edamontology.org/topic_3325",
+      "parent_iri": "http://edamontology.org/topic_0634"
+    },
+    {
+      "label": "Infectious disease",
+      "iri": "http://edamontology.org/topic_3324",
+      "parent_iri": "http://edamontology.org/topic_0634"
+    },
+    {
+      "label": "Oncology",
+      "iri": "http://edamontology.org/topic_2640",
+      "parent_iri": "http://edamontology.org/topic_3303"
+    },
+    {
+      "label": "Omics",
+      "iri": "http://edamontology.org/topic_3391",
+      "parent_iri": "http://edamontology.org/topic_0003"
+    },
+    {
+      "label": "Proteomics",
+      "iri": "http://edamontology.org/topic_0121",
+      "parent_iri": "http://edamontology.org/topic_3391"
+    },
+    {
+      "label": "Phenomics",
+      "iri": "http://edamontology.org/topic_3298",
+      "parent_iri": "http://edamontology.org/topic_3391"
+    },
+    {
+      "label": "Genomics",
+      "iri": "http://edamontology.org/topic_0622",
+      "parent_iri": "http://edamontology.org/topic_3391"
+    },
+    {
+      "label": "Structural genomics",
+      "iri": "http://edamontology.org/topic_0122",
+      "parent_iri": "http://edamontology.org/topic_0622"
+    },
+    {
+      "label": "Population genomics",
+      "iri": "http://edamontology.org/topic_3796",
+      "parent_iri": "http://edamontology.org/topic_0622"
+    },
+    {
+      "label": "Comparative genomics",
+      "iri": "http://edamontology.org/topic_0797",
+      "parent_iri": "http://edamontology.org/topic_0622"
+    },
+    {
+      "label": "Epistasis",
+      "iri": "http://edamontology.org/topic_3974",
+      "parent_iri": "http://edamontology.org/topic_0622"
+    },
+    {
+      "label": "Paleogenomics",
+      "iri": "http://edamontology.org/topic_3943",
+      "parent_iri": "http://edamontology.org/topic_0622"
+    },
+    {
+      "label": "Proteogenomics",
+      "iri": "http://edamontology.org/topic_3922",
+      "parent_iri": "http://edamontology.org/topic_0622"
+    },
+    {
+      "label": "Epigenomics",
+      "iri": "http://edamontology.org/topic_3173",
+      "parent_iri": "http://edamontology.org/topic_0622"
+    },
+    {
+      "label": "Metagenomics",
+      "iri": "http://edamontology.org/topic_3174",
+      "parent_iri": "http://edamontology.org/topic_0622"
+    },
+    {
+      "label": "Immunomics",
+      "iri": "http://edamontology.org/topic_3967",
+      "parent_iri": "http://edamontology.org/topic_3391"
+    },
+    {
+      "label": "Fluxomics",
+      "iri": "http://edamontology.org/topic_3955",
+      "parent_iri": "http://edamontology.org/topic_3391"
+    },
+    {
+      "label": "Molecular evolution",
+      "iri": "http://edamontology.org/topic_3945",
+      "parent_iri": "http://edamontology.org/topic_3391"
+    },
+    {
+      "label": "Metabolomics",
+      "iri": "http://edamontology.org/topic_3172",
+      "parent_iri": "http://edamontology.org/topic_3391"
+    },
+    {
+      "label": "Laboratory techniques",
+      "iri": "http://edamontology.org/topic_3361",
+      "parent_iri": "http://edamontology.org/topic_0003"
+    },
+    {
+      "label": "Imaging",
+      "iri": "http://edamontology.org/topic_3382",
+      "parent_iri": "http://edamontology.org/topic_3361"
+    },
+    {
+      "label": "X-ray diffraction",
+      "iri": "http://edamontology.org/topic_2828",
+      "parent_iri": "http://edamontology.org/topic_3382"
+    },
+    {
+      "label": "Bioimaging",
+      "iri": "http://edamontology.org/topic_3383",
+      "parent_iri": "http://edamontology.org/topic_3382"
+    },
+    {
+      "label": "Medical imaging",
+      "iri": "http://edamontology.org/topic_3384",
+      "parent_iri": "http://edamontology.org/topic_3382"
+    },
+    {
+      "label": "Light microscopy",
+      "iri": "http://edamontology.org/topic_3385",
+      "parent_iri": "http://edamontology.org/topic_3382"
+    },
+    {
+      "label": "Tomography",
+      "iri": "http://edamontology.org/topic_3452",
+      "parent_iri": "http://edamontology.org/topic_3382"
+    },
+    {
+      "label": "Neutron diffraction",
+      "iri": "http://edamontology.org/topic_3448",
+      "parent_iri": "http://edamontology.org/topic_3382"
+    },
+    {
+      "label": "MRI",
+      "iri": "http://edamontology.org/topic_3444",
+      "parent_iri": "http://edamontology.org/topic_3382"
+    },
+    {
+      "label": "NMR",
+      "iri": "http://edamontology.org/topic_0593",
+      "parent_iri": "http://edamontology.org/topic_3382"
+    },
+    {
+      "label": "Electron microscopy",
+      "iri": "http://edamontology.org/topic_0611",
+      "parent_iri": "http://edamontology.org/topic_3382"
+    },
+    {
+      "label": "Echography",
+      "iri": "http://edamontology.org/topic_3954",
+      "parent_iri": "http://edamontology.org/topic_3382"
+    },
+    {
+      "label": "RNAi experiment",
+      "iri": "http://edamontology.org/topic_3523",
+      "parent_iri": "http://edamontology.org/topic_3361"
+    },
+    {
+      "label": "Simulation experiment",
+      "iri": "http://edamontology.org/topic_3524",
+      "parent_iri": "http://edamontology.org/topic_3361"
+    },
+    {
+      "label": "Proteomics experiment",
+      "iri": "http://edamontology.org/topic_3520",
+      "parent_iri": "http://edamontology.org/topic_3361"
+    },
+    {
+      "label": "Genotyping experiment",
+      "iri": "http://edamontology.org/topic_3516",
+      "parent_iri": "http://edamontology.org/topic_3361"
+    },
+    {
+      "label": "Microarray experiment",
+      "iri": "http://edamontology.org/topic_3518",
+      "parent_iri": "http://edamontology.org/topic_3361"
+    },
+    {
+      "label": "PCR experiment",
+      "iri": "http://edamontology.org/topic_3519",
+      "parent_iri": "http://edamontology.org/topic_3361"
+    },
+    {
+      "label": "Immunoprecipitation experiment",
+      "iri": "http://edamontology.org/topic_3656",
+      "parent_iri": "http://edamontology.org/topic_3361"
+    },
+    {
+      "label": "Methylated DNA immunoprecipitation",
+      "iri": "http://edamontology.org/topic_3674",
+      "parent_iri": "http://edamontology.org/topic_3656"
+    },
+    {
+      "label": "RNA immunoprecipitation",
+      "iri": "http://edamontology.org/topic_3794",
+      "parent_iri": "http://edamontology.org/topic_3656"
+    },
+    {
+      "label": "ChIP-on-chip",
+      "iri": "http://edamontology.org/topic_3179",
+      "parent_iri": "http://edamontology.org/topic_3656"
+    },
+    {
+      "label": "ChIP-seq",
+      "iri": "http://edamontology.org/topic_3169",
+      "parent_iri": "http://edamontology.org/topic_3656"
+    },
+    {
+      "label": "Protein interaction experiment",
+      "iri": "http://edamontology.org/topic_3957",
+      "parent_iri": "http://edamontology.org/topic_3361"
+    },
+    {
+      "label": "Chromosome conformation capture",
+      "iri": "http://edamontology.org/topic_3940",
+      "parent_iri": "http://edamontology.org/topic_3361"
+    },
+    {
+      "label": "Cytometry",
+      "iri": "http://edamontology.org/topic_3934",
+      "parent_iri": "http://edamontology.org/topic_3361"
+    },
+    {
+      "label": "Sequencing",
+      "iri": "http://edamontology.org/topic_3168",
+      "parent_iri": "http://edamontology.org/topic_3361"
+    },
+    {
+      "label": "Whole genome sequencing",
+      "iri": "http://edamontology.org/topic_3673",
+      "parent_iri": "http://edamontology.org/topic_3168"
+    },
+    {
+      "label": "Exome sequencing",
+      "iri": "http://edamontology.org/topic_3676",
+      "parent_iri": "http://edamontology.org/topic_3168"
+    },
+    {
+      "label": "Genome resequencing",
+      "iri": "http://edamontology.org/operation_3923",
+      "parent_iri": "http://edamontology.org/topic_3168"
+    },
+    {
+      "label": "Metagenomic sequencing",
+      "iri": "http://edamontology.org/topic_3837",
+      "parent_iri": "http://edamontology.org/topic_3168"
+    },
+    {
+      "label": "RNA-Seq",
+      "iri": "http://edamontology.org/topic_3170",
+      "parent_iri": "http://edamontology.org/topic_3168"
+    },
+    {
+      "label": "Experimental design and studies",
+      "iri": "http://edamontology.org/topic_3678",
+      "parent_iri": "http://edamontology.org/topic_0003"
+    },
+    {
+      "label": "GWAS study",
+      "iri": "http://edamontology.org/topic_3517",
+      "parent_iri": "http://edamontology.org/topic_3678"
+    },
+    {
+      "label": "Informatics",
+      "iri": "http://edamontology.org/topic_0605",
+      "parent_iri": "http://edamontology.org/topic_0003"
+    },
+    {
+      "label": "Cheminformatics",
+      "iri": "http://edamontology.org/topic_2258",
+      "parent_iri": "http://edamontology.org/topic_0605"
+    },
+    {
+      "label": "Chemometrics",
+      "iri": "http://edamontology.org/operation_3931",
+      "parent_iri": "http://edamontology.org/topic_2258"
+    },
+    {
+      "label": "Laboratory information management",
+      "iri": "http://edamontology.org/topic_0607",
+      "parent_iri": "http://edamontology.org/topic_0605"
+    },
+    {
+      "label": "Biological databases",
+      "iri": "http://edamontology.org/topic_3071",
+      "parent_iri": "http://edamontology.org/topic_0605"
+    },
+    {
+      "label": "Data security",
+      "iri": "http://edamontology.org/topic_3263",
+      "parent_iri": "http://edamontology.org/topic_3071"
+    },
+    {
+      "label": "Data identity and mapping",
+      "iri": "http://edamontology.org/topic_3345",
+      "parent_iri": "http://edamontology.org/topic_3071"
+    },
+    {
+      "label": "Data submission, annotation and curation",
+      "iri": "http://edamontology.org/topic_0219",
+      "parent_iri": "http://edamontology.org/topic_3071"
+    },
+    {
+      "label": "Data architecture, analysis and design",
+      "iri": "http://edamontology.org/topic_3365",
+      "parent_iri": "http://edamontology.org/topic_3071"
+    },
+    {
+      "label": "Data integration and warehousing",
+      "iri": "http://edamontology.org/topic_3366",
+      "parent_iri": "http://edamontology.org/topic_3071"
+    },
+    {
+      "label": "Database management",
+      "iri": "http://edamontology.org/topic_3489",
+      "parent_iri": "http://edamontology.org/topic_3071"
+    },
+    {
+      "label": "Data governance",
+      "iri": "http://edamontology.org/topic_3571",
+      "parent_iri": "http://edamontology.org/topic_3071"
+    },
+    {
+      "label": "Data quality management",
+      "iri": "http://edamontology.org/topic_3572",
+      "parent_iri": "http://edamontology.org/topic_3071"
+    },
+    {
+      "label": "Workflows",
+      "iri": "http://edamontology.org/topic_0769",
+      "parent_iri": "http://edamontology.org/topic_3071"
+    },
+    {
+      "label": "Data acquisition",
+      "iri": "http://edamontology.org/topic_3077",
+      "parent_iri": "http://edamontology.org/topic_3071"
+    },
+    {
+      "label": "Medical informatics",
+      "iri": "http://edamontology.org/topic_3063",
+      "parent_iri": "http://edamontology.org/topic_0605"
+    },
+    {
+      "label": "Bioinformatics",
+      "iri": "http://edamontology.org/topic_0091",
+      "parent_iri": "http://edamontology.org/topic_0605"
+    },
+    {
+      "label": "Ontology and terminology",
+      "iri": "http://edamontology.org/topic_0089",
+      "parent_iri": "http://edamontology.org/topic_0605"
+    },
+    {
+      "label": "Biology",
+      "iri": "http://edamontology.org/topic_3070",
+      "parent_iri": "http://edamontology.org/topic_0003"
+    },
+    {
+      "label": "Evolutionary biology",
+      "iri": "http://edamontology.org/topic_3299",
+      "parent_iri": "http://edamontology.org/topic_3070"
+    },
+    {
+      "label": "Taxonomy",
+      "iri": "http://edamontology.org/topic_0637",
+      "parent_iri": "http://edamontology.org/topic_3299"
+    },
+    {
+      "label": "Biotechnology",
+      "iri": "http://edamontology.org/topic_3297",
+      "parent_iri": "http://edamontology.org/topic_3070"
+    },
+    {
+      "label": "Bioengineering",
+      "iri": "http://edamontology.org/topic_3398",
+      "parent_iri": "http://edamontology.org/topic_3297"
+    },
+    {
+      "label": "Biomaterials",
+      "iri": "http://edamontology.org/topic_3368",
+      "parent_iri": "http://edamontology.org/topic_3297"
+    },
+    {
+      "label": "Medical biotechnology",
+      "iri": "http://edamontology.org/topic_3576",
+      "parent_iri": "http://edamontology.org/topic_3297"
+    },
+    {
+      "label": "Metabolic engineering",
+      "iri": "http://edamontology.org/operation_3939",
+      "parent_iri": "http://edamontology.org/topic_3297"
+    },
+    {
+      "label": "Synthetic biology",
+      "iri": "http://edamontology.org/topic_3895",
+      "parent_iri": "http://edamontology.org/topic_3297"
+    },
+    {
+      "label": "Genetic engineering",
+      "iri": "http://edamontology.org/topic_3912",
+      "parent_iri": "http://edamontology.org/topic_3297"
+    },
+    {
+      "label": "Microbiology",
+      "iri": "http://edamontology.org/topic_3301",
+      "parent_iri": "http://edamontology.org/topic_3070"
+    },
+    {
+      "label": "Microbial ecology",
+      "iri": "http://edamontology.org/topic_3697",
+      "parent_iri": "http://edamontology.org/topic_3301"
+    },
+    {
+      "label": "Human biology",
+      "iri": "http://edamontology.org/topic_2815",
+      "parent_iri": "http://edamontology.org/topic_3070"
+    },
+    {
+      "label": "Marine biology",
+      "iri": "http://edamontology.org/topic_3387",
+      "parent_iri": "http://edamontology.org/topic_3070"
+    },
+    {
+      "label": "Biomarkers",
+      "iri": "http://edamontology.org/topic_3360",
+      "parent_iri": "http://edamontology.org/topic_3070"
+    },
+    {
+      "label": "Freshwater biology",
+      "iri": "http://edamontology.org/topic_3573",
+      "parent_iri": "http://edamontology.org/topic_3070"
+    },
+    {
+      "label": "Cell biology",
+      "iri": "http://edamontology.org/topic_2229",
+      "parent_iri": "http://edamontology.org/topic_3070"
+    },
+    {
+      "label": "Zoology",
+      "iri": "http://edamontology.org/topic_3500",
+      "parent_iri": "http://edamontology.org/topic_3070"
+    },
+    {
+      "label": "Systems biology",
+      "iri": "http://edamontology.org/topic_2259",
+      "parent_iri": "http://edamontology.org/topic_3070"
+    },
+    {
+      "label": "Model organisms",
+      "iri": "http://edamontology.org/topic_0621",
+      "parent_iri": "http://edamontology.org/topic_3070"
+    },
+    {
+      "label": "Ecology",
+      "iri": "http://edamontology.org/topic_0610",
+      "parent_iri": "http://edamontology.org/topic_3070"
+    },
+    {
+      "label": "Biodiversity",
+      "iri": "http://edamontology.org/topic_3050",
+      "parent_iri": "http://edamontology.org/topic_0610"
+    },
+    {
+      "label": "Environmental science",
+      "iri": "http://edamontology.org/topic_3855",
+      "parent_iri": "http://edamontology.org/topic_3070"
+    },
+    {
+      "label": "Agricultural science",
+      "iri": "http://edamontology.org/topic_3810",
+      "parent_iri": "http://edamontology.org/topic_3070"
+    },
+    {
+      "label": "Virology",
+      "iri": "http://edamontology.org/topic_0781",
+      "parent_iri": "http://edamontology.org/topic_3070"
+    },
+    {
+      "label": "Plant biology",
+      "iri": "http://edamontology.org/topic_0780",
+      "parent_iri": "http://edamontology.org/topic_3070"
+    },
+    {
+      "label": "Developmental biology",
+      "iri": "http://edamontology.org/topic_3064",
+      "parent_iri": "http://edamontology.org/topic_3070"
+    },
+    {
+      "label": "Embryology",
+      "iri": "http://edamontology.org/topic_3065",
+      "parent_iri": "http://edamontology.org/topic_3064"
+    },
+    {
+      "label": "Genetics",
+      "iri": "http://edamontology.org/topic_3053",
+      "parent_iri": "http://edamontology.org/topic_3070"
+    },
+    {
+      "label": "Epigenetics",
+      "iri": "http://edamontology.org/topic_3295",
+      "parent_iri": "http://edamontology.org/topic_3053"
+    },
+    {
+      "label": "Human genetics",
+      "iri": "http://edamontology.org/topic_3574",
+      "parent_iri": "http://edamontology.org/topic_3053"
+    },
+    {
+      "label": "Genotype and phenotype",
+      "iri": "http://edamontology.org/topic_0625",
+      "parent_iri": "http://edamontology.org/topic_3053"
+    },
+    {
+      "label": "Quantitative genetics",
+      "iri": "http://edamontology.org/topic_3055",
+      "parent_iri": "http://edamontology.org/topic_0625"
+    },
+    {
+      "label": "Population genetics",
+      "iri": "http://edamontology.org/topic_3056",
+      "parent_iri": "http://edamontology.org/topic_3053"
+    },
+    {
+      "label": "Molecular biology",
+      "iri": "http://edamontology.org/topic_3047",
+      "parent_iri": "http://edamontology.org/topic_3070"
+    },
+    {
+      "label": "Structural biology",
+      "iri": "http://edamontology.org/topic_1317",
+      "parent_iri": "http://edamontology.org/topic_3070"
+    },
+    {
+      "label": "Literature and language",
+      "iri": "http://edamontology.org/topic_3068",
+      "parent_iri": "http://edamontology.org/topic_0003"
+    }
+  ]
+}

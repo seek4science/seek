@@ -35,6 +35,27 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     end
   end
 
+  test 'validate unique key' do
+    User.with_current_user(Factory(:project_administrator).user) do
+      SampleControlledVocab.create(title: 'no key')
+      SampleControlledVocab.create(title: 'blank key',key:'')
+      vocab = SampleControlledVocab.new(title: 'test')
+      assert vocab.valid?
+      vocab.key='test'
+      assert vocab.valid?
+      vocab.save!
+      vocab = SampleControlledVocab.new(title: 'test2', key:'test')
+      refute vocab.valid?
+      vocab.key = 'test2'
+      assert vocab.valid?
+      # blanks are allowed
+      vocab.key = nil
+      assert vocab.valid?
+      vocab.key = ''
+      assert vocab.valid?
+    end
+  end
+
   test 'apples factory' do
     apples = Factory(:apples_sample_controlled_vocab)
     assert apples.title.start_with?('apples controlled vocab')

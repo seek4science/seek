@@ -1,0 +1,21 @@
+<%= panel("EDAM Properties", :body_options => { :class => 'text-center' }) do %>
+
+  <% if @workflow.edam_topics.any? %>
+    <div>
+      <strong>Topics</strong>
+    </div>
+    <div>
+      <%= edam_ontology_items(@workflow.edam_topic_values) %>
+    </div>
+  <% end %>
+
+  <% if @workflow.edam_operations.any? %>
+    <div>
+      <strong>Operations</strong>
+    </div>
+    <div>
+      <%= edam_ontology_items(@workflow.edam_operation_values) %>
+    </div>
+  <% end %>
+
+<% end %>

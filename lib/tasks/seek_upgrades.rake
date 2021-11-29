@@ -8,7 +8,9 @@ namespace :seek do
   # these are the tasks required for this version upgrade
   task upgrade_version_tasks: %i[
     environment
-    db:seed:workflow_classes
+    db:seed:010_workflow_classes
+    db:seed:011_edam_topics
+    db:seed:012_edam_operations
     update_missing_publication_versions
   ]
 
@@ -65,4 +67,5 @@ namespace :seek do
     end
     puts " ... finished creating missing publications versions for #{create.to_s} publications"
   end
+
 end

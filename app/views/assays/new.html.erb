@@ -1,46 +1,42 @@
-<% investigations = Investigation.all.select &:can_view?
-   studies=[]
-   investigations.each do |i|
-     studies << i.studies.select(&:can_view?)
-   end
-
--%>
-<% if investigations.blank? %>
+<% if Investigation.authorized_for('view').none? %>
+    <%= alert_box('info') do %>
+        <%= "No #{t('study')} and #{t('investigation')} available, you have to create a new #{t('investigation')} first before creating your #{t('study')} and #{t('assays.assay')}!" %>
+    <% end %>
     <div class="text-center">
-      <%= button_link_to("New #{t('investigation')}", 'arrow_right', new_investigation_path) -%>
+        <%= button_link_to("New #{t('investigation')}", 'arrow_right', new_investigation_path) -%>
+    </div>
+<% elsif Study.authorized_for('view').none? %>
+    <%= alert_box('info') do %>
+        <%= "No #{t('study')} available, you have to create a new #{t('study')} before creating your #{t('assays.assay')}!" %>
+    <% end %>
+    <div class="text-center">
+        <%= button_link_to("New #{t('study')}", 'arrow_right', new_study_path) -%>
     </div>
 <% else %>
-    <% if studies.flatten.blank? %>
+    <div class="contribution_title">
+        <h1><%=  @assay.is_modelling? ? "#{t('assays.modelling_analysis')} creation" : "#{t('assays.assay')} creation" -%></h1>
+    </div>
+
+    <% unless @assay.assay_class %>
         <div class="text-center">
-          <%= button_link_to("New #{t('study')}", 'arrow_right', new_study_path) -%>
+            <p>Please select the class of <%= t('assays.assay') %> you wish to create</p>
+
+            <%= link_to new_assay_path(:class=>:experimental, :assay=>@permitted_params),
+                        :class => 'select_assay_class' do %>
+                <%= image("assay_experimental_avatar") %>
+                An <%= t('assays.experimental_assay') -%>
+            <% end %>
+
+            <%= link_to new_assay_path(:class=>:modelling, :assay=>@permitted_params),
+                        :class => 'select_assay_class' do %>
+                <%= image("assay_modelling_avatar") %>
+                A <%= t('assays.modelling_analysis') -%>
+            <% end %>
         </div>
     <% else %>
-        <div class="contribution_title">
-          <h1><%=  @assay.is_modelling? ? "#{t('assays.modelling_analysis')} creation" : "#{t('assays.assay')} creation" -%></h1>
-        </div>
-
-        <% unless @assay.assay_class %>
-            <div class="text-center">
-              <p>Please select the class of <%= t('assays.assay') %> you wish to create</p>
-
-              <%= link_to new_assay_path(:class=>:experimental, :assay=>@permitted_params),
-                          :class => 'select_assay_class' do %>
-                  <%= image("assay_experimental_avatar") %>
-                  An <%= t('assays.experimental_assay') -%>
-              <% end %>
-
-              <%= link_to new_assay_path(:class=>:modelling, :assay=>@permitted_params),
-                          :class => 'select_assay_class' do %>
-                  <%= image("assay_modelling_avatar") %>
-                  A <%= t('assays.modelling_analysis') -%>
-              <% end %>
-            </div>
-        <% else %>
-            <%= suggested_type_modal_boxes %>
-      <%= form_for @assay do |f| %>
-                <%= render :partial => "form", :locals => { :f => f, :action=>:new } -%>
-            <% end -%>
-     <% end %>
-    <% end -%>
-
+        <%= suggested_type_modal_boxes %>
+        <%= form_for @assay do |f| %>
+            <%= render :partial => "form", :locals => { :f => f, :action=>:new } -%>
+        <% end -%>
+    <% end %>
 <% end %>

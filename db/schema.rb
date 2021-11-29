@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_10_15_152343) do
+ActiveRecord::Schema.define(version: 2021_11_11_133408) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -1533,7 +1533,7 @@ ActiveRecord::Schema.define(version: 2021_10_15_152343) do
     t.datetime "updated_at"
   end
 
-  create_table "repository_standards",  force: :cascade do |t|
+  create_table "repository_standards", id: :integer,  force: :cascade do |t|
     t.string "title"
     t.string "url"
     t.string "group_tag"
@@ -1616,6 +1616,7 @@ ActiveRecord::Schema.define(version: 2021_10_15_152343) do
     t.boolean "required"
     t.string "short_name"
     t.integer "repository_standard_id"
+    t.string "key"
   end
 
   create_table "sample_resource_links", id: :integer,  force: :cascade do |t|
@@ -2014,7 +2015,7 @@ ActiveRecord::Schema.define(version: 2021_10_15_152343) do
     t.index ["user_id", "can_view"], name: "index_w_auth_lookup_on_user_id_and_can_view"
   end
 
-  create_table "workflow_classes",  force: :cascade do |t|
+  create_table "workflow_classes", id: :integer,  force: :cascade do |t|
     t.string "title"
     t.text "description"
     t.string "key"

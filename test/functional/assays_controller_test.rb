@@ -205,6 +205,8 @@ class AssaysControllerTest < ActionController::TestCase
     assert_response :success
     assert_not_nil assigns(:assay)
     assert_nil assigns(:assay).study
+    assert_select 'div.alert.alert-info', text: /No Study and Investigation available/, count: 0
+    assert_select 'a.btn[href=?]', new_investigation_path, count: 0
   end
 
   test 'should show new with study when id provided' do
@@ -614,6 +616,28 @@ class AssaysControllerTest < ActionController::TestCase
     assert_select 'a', text: /An #{I18n.t('assays.experimental_assay')}/i, count: 0
     assert_select 'a[href=?]', new_assay_path(class: :modelling), count: 0
     assert_select 'a', text: /A #{I18n.t('assays.modelling_analysis')}/i, count: 0
+  end
+
+  test 'get new without investigation prompts user to create' do
+    disable_authorization_checks { Investigation.destroy_all }
+    Factory(:investigation, policy: Factory(:private_policy))
+    assert Investigation.authorized_for('view', User.current_user).none?
+
+    get :new
+    assert_response :success
+    assert_select 'div.alert.alert-info', text: /No Study and Investigation available/, count: 1
+    assert_select 'a.btn[href=?]', new_investigation_path
+  end
+
+  test 'get new without study prompts user to create' do
+    disable_authorization_checks { Study.destroy_all }
+    Factory(:study, policy: Factory(:private_policy))
+    assert Study.authorized_for('view', User.current_user).none?
+
+    get :new
+    assert_response :success
+    assert_select 'div.alert.alert-info', text: /No Study available/, count: 1
+    assert_select 'a.btn[href=?]', new_study_path
   end
 
   test 'links have nofollow in sop tabs' do

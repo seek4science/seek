@@ -318,6 +318,7 @@ class WorkflowsController < ApplicationController
                                      { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                      { assay_assets_attributes: [:assay_id] }, { scales: [] },
                                      { publication_ids: [] }, :internals, :maturity_level, :source_link_url,
+                                     :edam_topics, :edam_operations,
                                      { discussion_links_attributes: [:id, :url, :label, :_destroy] },
                                      *creator_related_params)
   end

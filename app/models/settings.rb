@@ -47,13 +47,14 @@ class Settings < ActiveRecord::Base
   end
 
   def self.to_hash(starting_with=nil)
-    vars = select(:var, :values)
+    vars = select(:var, :value, :encrypted_value, :encrypted_value_iv)
     vars = vars.where("var LIKE ?", "'#{starting_with}%'") if starting_with
 
     result = HashWithIndifferentAccess.new
     vars.each do |record|
       result[record.var] = record.value
     end
+    result
   end
 
   class << self
