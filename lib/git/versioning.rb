@@ -30,6 +30,7 @@ module Git
             if truth && new_record?
               repo = Git::Repository.create!
               @git_version_attributes = { git_repository_id: repo.id, comment: 'Initial commit' }
+              self.local_git_repository = repo
               initial_git_version.assign_attributes(@git_version_attributes)
             end
           end

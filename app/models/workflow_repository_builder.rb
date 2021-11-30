@@ -13,7 +13,7 @@ class WorkflowRepositoryBuilder
   validate :workflow_data_present
 
   def build
-    @workflow = Workflow.new(workflow_class: workflow_class)
+    @workflow = Workflow.new(workflow_class: workflow_class, is_git_versioned: true)
 
     if valid?
       gv = @workflow.git_version
@@ -41,9 +41,6 @@ class WorkflowRepositoryBuilder
         gv.abstract_cwl_path = abstract_cwl_filename
       end
 
-      repo = Git::Repository.create!
-      @workflow.local_git_repository = repo
-      gv.git_repository = repo
       gv.add_files(files)
       files.each do |path, _, url|
         gv.git_annotations.build(path: path, key: 'remote_source', value: url) if url
