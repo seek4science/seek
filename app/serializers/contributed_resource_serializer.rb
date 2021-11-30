@@ -21,7 +21,7 @@ class ContributedResourceSerializer < PCSSerializer
         data[:remote] = v.remote if v.remote?
         data[:commit] = v.commit
         data[:ref] = v.ref
-        data[:tree_url] = polymorphic_path([object, :git_tree], version: v.version)
+        data[:tree] = polymorphic_path([object, :git_tree], version: v.version)
       end
       versions_data.append(data)
     end
