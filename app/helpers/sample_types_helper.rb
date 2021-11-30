@@ -1,5 +1,5 @@
 module SampleTypesHelper
-  def sample_attribute_details(sample_type_attribute)
+  def sample_attribute_details(sample_type_attribute, show_description=true)
     type = sample_type_attribute.sample_attribute_type.title
     if sample_type_attribute.seek_sample?
       type += ' - ' + link_to(sample_type_attribute.linked_sample_type.title, sample_type_attribute.linked_sample_type)
@@ -13,8 +13,11 @@ module SampleTypesHelper
     req = sample_type_attribute.required? ? required_span : ''
     attribute_css = 'sample-attribute'
     attribute_css << ' sample-attribute-title' if sample_type_attribute.is_title?
+
+    description = show_description && sample_type_attribute.description? ? content_tag(:span, sample_type_attribute.description, class:'text-muted') : ''
+
     content_tag :span, class: attribute_css do
-      "#{h sample_type_attribute.title} (#{type}) #{unit} #{req}".html_safe
+      "#{h sample_type_attribute.title} #{description} (#{type}) #{unit} #{req}".html_safe
     end
   end
 
