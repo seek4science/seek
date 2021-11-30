@@ -51,7 +51,8 @@ class SampleTypesControllerTest < ActionController::TestCase
                                                        },
                                                        '1' => {
                                                          pos: '2', title: 'a number', required: '1',
-                                                         sample_attribute_type_id: @int_type.id, _destroy: '0'
+                                                         sample_attribute_type_id: @int_type.id, _destroy: '0',
+                                                         description: 'this is a number'
                                                        }
                                                      },
                                                      tags: 'fish,golf' } }
@@ -69,7 +70,12 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_equal 'The description!!', type.description
     assert_equal @project_ids.sort, type.project_ids.sort
     assert_equal 2, type.sample_attributes.size
+
     assert_equal 'a string', type.sample_attributes.title_attributes.first.title
+    assert_nil type.sample_attributes.first.description
+    assert_equal 'a number', type.sample_attributes.second.title
+    assert_equal 'this is a number', type.sample_attributes.second.description
+
     assert_equal [@project], type.projects
     refute type.uploaded_template?
     assert_equal %w[fish golf], type.tags.sort
