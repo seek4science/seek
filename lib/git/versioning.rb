@@ -23,7 +23,7 @@ module Git
           after_update :sync_resource_attributes
 
           def is_git_versioned?
-            git_version&.git_repository&.persisted? || !@git_version_attributes.blank?
+            git_versions.any? || !@git_version_attributes.blank?
           end
 
           def is_git_versioned=(truth)
