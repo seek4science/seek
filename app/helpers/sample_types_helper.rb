@@ -14,10 +14,10 @@ module SampleTypesHelper
     attribute_css = 'sample-attribute'
     attribute_css << ' sample-attribute-title' if sample_type_attribute.is_title?
 
-    description = show_description && sample_type_attribute.description? ? content_tag(:span, sample_type_attribute.description, class:'text-muted') : ''
+    description = show_description && sample_type_attribute.description? ? " #{content_tag(:span, sample_type_attribute.description, class:'text-muted')}" : ''
 
     content_tag :span, class: attribute_css do
-      "#{h sample_type_attribute.title} #{description} (#{type}) #{unit} #{req}".html_safe
+      "#{h sample_type_attribute.title}#{description} (#{type}) #{unit} #{req}".html_safe
     end
   end
 

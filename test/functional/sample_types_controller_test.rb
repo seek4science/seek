@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class SampleTypesControllerTest < ActionController::TestCase
+
   include RestTestCases
   include AuthenticatedTestHelper
 
@@ -18,7 +19,7 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   def rest_api_test_object
-    @object = @sample_type # Factory(:sample_type, project_ids: @project_ids)
+    @object = Factory(:max_sample_type, project_ids: @project_ids)
   end
 
   test 'should get index' do
