@@ -37,18 +37,17 @@ module Git
     end
 
     def tree
-      Git::Tree.new(self, git_base.lookup(commit).tree) if commit
+      return nil unless commit
+      Git::Tree.new(self, git_base.lookup(commit).tree)
     end
 
     def trees
       return [] unless commit
-
       tree.trees
     end
 
     def blobs
       return [] unless commit
-
       tree.blobs
     end
 
@@ -57,11 +56,22 @@ module Git
     end
 
     def total_size
+      return 0 unless commit
       tree.total_size
+    end
+
+    def empty?
+      persisted? && blobs.empty?
+    end
+
+    # In the case that the repository was created but has no commits.
+    def unborn?
+      persisted? && commit.nil?
     end
 
     # Checkout the commit into the given directory.
     def in_dir(dir)
+      return if commit.nil?
       base = git_base.base
       wd = base.workdir
       base.workdir = dir

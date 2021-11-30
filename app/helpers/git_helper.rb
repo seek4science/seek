@@ -14,14 +14,16 @@ module GitHelper
       root_id = '___repository-root'
     end
 
-    ['tree', 'blob'].each do |type|
-      tree.send("walk_#{type}s", :preorder) do |root, entry|
-        nodes << {
-          id: "#{root}#{entry[:name]}",
-          parent: root.blank? ? root_id : root.chomp('/'),
-          text: entry[:name],
-          type: type
-        }
+    unless tree.nil?
+      ['tree', 'blob'].each do |type|
+        tree.send("walk_#{type}s", :preorder) do |root, entry|
+          nodes << {
+            id: "#{root}#{entry[:name]}",
+            parent: root.blank? ? root_id : root.chomp('/'),
+            text: entry[:name],
+            type: type
+          }
+        end
       end
     end
 

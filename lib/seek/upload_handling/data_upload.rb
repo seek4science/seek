@@ -6,6 +6,7 @@ module Seek
 
       def handle_upload_data(new_version = false)
         blob_params = params[:content_blobs]
+        return false if blob_params.empty?
         allow_empty_content_blob = model_image_present? || json_api_request?
 
         unless allow_empty_content_blob || retained_content_blob_ids.present?

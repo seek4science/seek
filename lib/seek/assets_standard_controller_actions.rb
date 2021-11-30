@@ -85,7 +85,7 @@ module Seek
     def create
       item = initialize_asset
 
-      if handle_upload_data
+      if item.is_git_versioned? || handle_upload_data
         create_asset_and_respond(item)
       else
         handle_upload_data_failure

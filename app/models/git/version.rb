@@ -72,6 +72,10 @@ module Git
         errors.add(:base, 'is already frozen')
         return false
       end
+      if unborn?
+        errors.add(:base, 'has no content')
+        return false
+      end
 
       self.set_resource_attributes(resource.attributes)
       self.mutable = false
