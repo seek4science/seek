@@ -35,6 +35,7 @@ class PublicationTest < ActiveSupport::TestCase
   test 'create publication from hash' do
     publication_hash = {
         title: 'SEEK publication',
+        abstract: 'An investigation into blalblabla',
         journal: 'The testing journal',
         published_date: Date.new(2011, 12, 24),
         pubmed_id: nil,
@@ -44,6 +45,7 @@ class PublicationTest < ActiveSupport::TestCase
     assert_equal publication_hash[:title], publication.title
     assert_equal publication_hash[:journal], publication.journal
     assert_equal publication_hash[:published_date], publication.published_date
+    assert_equal publication_hash[:abstract], publication.abstract
     assert_nil publication.pubmed_id
     assert_nil publication.doi
   end
@@ -51,6 +53,7 @@ class PublicationTest < ActiveSupport::TestCase
   test 'create publication from metadata doi' do
     publication_hash = {
         title: 'SEEK publication',
+        abstract: 'An investigation into blalblabla',
         journal: 'The testing journal',
         date_published: Date.new(2011, 12, 24),
         pubmed_id: nil,
@@ -62,6 +65,7 @@ class PublicationTest < ActiveSupport::TestCase
     assert_equal publication_hash[:title], publication.title
     assert_equal publication_hash[:journal], publication.journal
     assert_equal publication_hash[:date_published], publication.published_date
+    assert_equal publication_hash[:abstract], publication.abstract
     assert_nil publication.pubmed_id
     assert_nil publication.doi
     assert_equal Publication::REGISTRATION_BY_DOI, publication.registered_mode
@@ -70,6 +74,7 @@ class PublicationTest < ActiveSupport::TestCase
   test 'create publication from metadata pubmed' do
     publication_hash = {
         'title'   => 'SEEK publication\\r', # test required? chomp
+        'abstract' => 'An investigation into blalblabla',
         'journal' => 'The testing journal',
         'pubmed' => nil,
         'doi' => nil
@@ -79,6 +84,7 @@ class PublicationTest < ActiveSupport::TestCase
     publication.extract_pubmed_metadata(bio_reference)
     assert_equal publication_hash[:title.to_s], publication.title
     assert_equal publication_hash[:journal.to_s], publication.journal
+    assert_equal publication_hash[:abstract.to_s], publication.abstract
     assert_nil publication.pubmed_id
     assert_nil publication.doi
     assert_equal Publication::REGISTRATION_BY_PUBMED, publication.registered_mode
@@ -92,6 +98,7 @@ class PublicationTest < ActiveSupport::TestCase
       title        = {BCL::SAXS},
       journal      = {Proteins},
       year         = {2015},
+      abstract     = {An investigation into blalblabla},
       volume       = {83},
       number       = {8},
       pages        = {1500--1512},
@@ -103,6 +110,7 @@ class PublicationTest < ActiveSupport::TestCase
     publication.extract_bibtex_metadata(bibtex['@article'][0])
     assert_equal 'BCL::SAXS', publication.title
     assert_equal 'Proteins', publication.journal
+    assert_equal 'An investigation into blalblabla', publication.abstract
     assert_equal Date.new(2015, 1, 1), publication.published_date
     assert_equal 5, publication.publication_authors.length
     assert_equal Publication::REGISTRATION_FROM_BIBTEX, publication.registered_mode
