@@ -83,8 +83,13 @@ module WorkflowExtraction
   def populate_ro_crate(crate)
     if is_git_versioned?
       remotes = git_version.remote_sources
-      crate.main_workflow = main_workflow_blob.to_crate_entity(crate, type: ROCrate::Workflow)
-      remotes.delete(main_workflow_blob.path)
+      m = main_workflow_blob
+      if m
+        crate.main_workflow = main_workflow_blob.to_crate_entity(crate, type: ROCrate::Workflow)
+        remotes.delete(main_workflow_blob.path)
+        crate.main_workflow.programming_language = ROCrate::ContextualEntity.new(crate, nil, workflow_class&.ro_crate_metadata || Seek::WorkflowExtractors::Base::NULL_CLASS_METADATA)
+      end
+
       d = diagram_blob
       if d
         remotes.delete(d.path)
@@ -98,11 +103,13 @@ module WorkflowExtraction
         rescue WorkflowDiagram::UnsupportedFormat
         end
       end
+
       c = abstract_cwl_blob
       if c
         remotes.delete(c.path)
         crate.main_workflow.cwl_description = c.to_crate_entity(crate, type: ROCrate::WorkflowDescription)
       end
+
       remotes.each do |path, url|
         crate.add_external_file(url)
       end
@@ -121,7 +128,6 @@ module WorkflowExtraction
       end
     end
 
-    crate.main_workflow.programming_language = ROCrate::ContextualEntity.new(crate, nil, workflow_class&.ro_crate_metadata || Seek::WorkflowExtractors::Base::NULL_CLASS_METADATA)
     authors = creators.map { |person| crate.add_person(nil, person.ro_crate_metadata) }
     others = other_creators&.split(',')&.collect(&:strip)&.compact || []
     authors += others.map.with_index { |name, i| crate.add_person("creator-#{i + 1}", name: name) }
@@ -160,7 +166,7 @@ module WorkflowExtraction
     flattened['@graph'].each do |elem|
       type = elem['@type']
       type = [type] unless type.is_a?(Array)
-      if type.include?('ComputationalWorkflow')
+      if type.include?('ComputationalWorkflow') && crate.main_workflow
         merge_fields(crate.main_workflow, elem)
       else
         entity_class = ROCrate::ContextualEntity.specialize(elem)

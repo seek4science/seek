@@ -22,6 +22,17 @@ class GitControllerTest < ActionController::TestCase
     assert_equal 'little file', assigns(:git_version).file_contents('new-file.txt')
   end
 
+  test 'add file via path param' do
+    refute @git_version.file_exists?('new-file.txt')
+
+    post :add_file, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'new-file.txt',
+                              file: { data: fixture_file_upload('files/little_file.txt') } }
+
+    assert_redirected_to workflow_path(@workflow, anchor: 'files')
+    assert assigns(:git_version).file_exists?('new-file.txt')
+    assert_equal 'little file', assigns(:git_version).file_contents('new-file.txt')
+  end
+
   test 'adding file with no paths defaults to filename' do
     refute @git_version.file_exists?('little_file.txt')
 
@@ -64,8 +75,8 @@ class GitControllerTest < ActionController::TestCase
     assert @git_version.file_exists?('diagram.png')
     refute @git_version.file_exists?('cool-pic.png')
 
-    patch :move_file, params: { workflow_id: @workflow.id, version: @git_version.version,
-                              file: { path: 'diagram.png', new_path: 'cool-pic.png' } }
+    patch :move_file, format: :html, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'diagram.png',
+                                      file: { new_path: 'cool-pic.png' } }
 
     assert_redirected_to workflow_path(@workflow, anchor: 'files')
     refute assigns(:git_version).file_exists?('diagram.png')
@@ -76,8 +87,8 @@ class GitControllerTest < ActionController::TestCase
     assert @git_version.file_exists?('diagram.png')
     refute @git_version.file_exists?('mydir/cool-pic.png')
 
-    patch :move_file, params: { workflow_id: @workflow.id, version: @git_version.version,
-                              file: { path: 'diagram.png', new_path: 'mydir/cool-pic.png' } }
+    patch :move_file, format: :html, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'diagram.png',
+                                      file: { new_path: 'mydir/cool-pic.png' } }
 
     assert_redirected_to workflow_path(@workflow, anchor: 'files')
     refute assigns(:git_version).file_exists?('diagram.png')
@@ -85,8 +96,8 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'error when moving non-existent path' do
-    patch :move_file, params: { workflow_id: @workflow.id, version: @git_version.version,
-                              file: { path: 'doesnotexist.png', new_path: 'mydir/cool-pic.png' } }
+    patch :move_file, format: :html, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'doesnotexist.png',
+                                      file: { new_path: 'mydir/cool-pic.png' } }
 
     assert flash[:error].include?("Couldn't find path: doesnotexist.png")
     refute assigns(:git_version).file_exists?('mydir/cool-pic.png')
@@ -97,8 +108,8 @@ class GitControllerTest < ActionController::TestCase
     assert @git_version.file_exists?('diagram.png')
     refute @git_version.file_exists?('cool-pic.png')
 
-    patch :move_file, params: { workflow_id: @workflow.id, version: @git_version.version,
-                                file: { path: 'diagram.png', new_path: 'cool-pic.png' } }
+    patch :move_file, format: :html, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'diagram.png',
+                                      file: {  new_path: 'cool-pic.png' } }
 
     assert_redirected_to root_path
     assert flash[:error].include?('authorized')
@@ -111,8 +122,8 @@ class GitControllerTest < ActionController::TestCase
     assert @git_version.file_exists?('diagram.png')
     refute @git_version.file_exists?('cool-pic.png')
 
-    patch :move_file, params: { workflow_id: @workflow.id, version: @git_version.version,
-                                file: { path: 'diagram.png', new_path: 'cool-pic.png' } }
+    patch :move_file, format: :html, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'diagram.png',
+                                      file: { new_path: 'cool-pic.png' } }
 
     assert_redirected_to workflow_path(@workflow, anchor: 'files')
     assert flash[:error].include?('cannot make changes')
@@ -123,8 +134,7 @@ class GitControllerTest < ActionController::TestCase
   test 'remove file' do
     assert @git_version.file_exists?('diagram.png')
 
-    patch :remove_file, params: { workflow_id: @workflow.id, version: @git_version.version,
-                                file: { path: 'diagram.png' } }
+    delete :remove_file, format: :html, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'diagram.png' }
 
     assert_redirected_to workflow_path(@workflow, anchor: 'files')
     refute assigns(:git_version).file_exists?('diagram.png')
@@ -133,8 +143,7 @@ class GitControllerTest < ActionController::TestCase
   test 'error when removing non-existent path' do
     refute @git_version.file_exists?('doesnotexist.png')
 
-    patch :remove_file, params: { workflow_id: @workflow.id, version: @git_version.version,
-                                file: { path: 'doesnotexist.png' } }
+    delete :remove_file, format: :html, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'doesnotexist.png' }
 
     assert flash[:error].include?("Couldn't find path: doesnotexist.png")
     refute assigns(:git_version).file_exists?('doesnotexist.png')
@@ -144,8 +153,7 @@ class GitControllerTest < ActionController::TestCase
     logout
     assert @git_version.file_exists?('diagram.png')
 
-    patch :remove_file, params: { workflow_id: @workflow.id, version: @git_version.version,
-                                file: { path: 'diagram.png'} }
+    delete :remove_file, format: :html, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'diagram.png' }
 
     assert_redirected_to root_path
     assert flash[:error].include?('authorized')
@@ -156,8 +164,7 @@ class GitControllerTest < ActionController::TestCase
     @git_version.update_column(:mutable, false)
     assert @git_version.file_exists?('diagram.png')
 
-    patch :remove_file, params: { workflow_id: @workflow.id, version: @git_version.version,
-                                  file: { path: 'diagram.png'} }
+    delete :remove_file, format: :html, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'diagram.png' }
 
     assert_redirected_to workflow_path(@workflow, anchor: 'files')
     assert flash[:error].include?('cannot make changes')
@@ -167,7 +174,7 @@ class GitControllerTest < ActionController::TestCase
     get :blob, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'concat_two_files.ga' }
 
     assert_response :success
-    assert_select 'a.btn[href=?]', workflow_git_remove_file_path(@workflow, version: @git_version.version, file: { path: 'concat_two_files.ga' })
+    assert_select 'a.btn[href=?]', workflow_git_remove_file_path(@workflow, version: @git_version.version, path: 'concat_two_files.ga')
   end
 
   test 'get raw text file' do
@@ -189,7 +196,7 @@ class GitControllerTest < ActionController::TestCase
     get :blob, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'diagram.png', format: 'html' } # Not sure why this is needed
 
     assert_response :success
-    assert_select 'a.btn[href=?]', workflow_git_remove_file_path(@workflow, version: @git_version.version, file: { path: 'diagram.png' })
+    assert_select 'a.btn[href=?]', workflow_git_remove_file_path(@workflow, version: @git_version.version, path: 'diagram.png')
     assert_select 'img.git-image-preview[src=?]', workflow_git_raw_path(@workflow, version: @git_version.version, path: 'diagram.png')
   end
 
@@ -220,28 +227,28 @@ class GitControllerTest < ActionController::TestCase
   end
 
   test 'non-existent download throws error' do
-    get :download, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'doesnotexist' }
+    get :download, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'doesnotexist' }, format: :html
 
     assert flash[:error].include?("Couldn't find path: doesnotexist")
   end
 
   test 'getting blob with no permissions throws error' do
     logout
-    get :blob, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'diagram.png' }
+    get :blob, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'diagram.png' }, format: :html
 
     assert flash[:error].include?('authorized')
   end
 
   test 'getting raw with no permissions throws error' do
     logout
-    get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'diagram.png' }
+    get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'diagram.png' }, format: :html
 
     assert flash[:error].include?('authorized')
   end
 
   test 'download with no permissions throws error' do
     logout
-    get :download, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'diagram.png' }
+    get :download, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'diagram.png' }, format: :html
 
     assert flash[:error].include?('authorized')
   end
@@ -265,7 +272,7 @@ class GitControllerTest < ActionController::TestCase
     assert_select 'a.btn[href=?]', workflow_git_raw_path(@workflow, version: @git_version.version, path: 'concat_two_files.ga'), count: 0
     assert_select 'a.btn[href=?]', workflow_git_download_path(@workflow, version: @git_version.version, path: 'concat_two_files.ga'), count: 0
     assert_select "a.btn[data-target='#git-move-modal']", count: 0
-    assert_select 'a.btn[href=?]', workflow_git_remove_file_path(@workflow, version: @git_version.version, file: { path: 'concat_two_files.ga' }), count: 0
+    assert_select 'a.btn[href=?]', workflow_git_remove_file_path(@workflow, version: @git_version.version, path: 'concat_two_files.ga'), count: 0
 
     # DOWNLOAD
     login_as(downloader)
@@ -276,7 +283,7 @@ class GitControllerTest < ActionController::TestCase
     assert_select 'a.btn[href=?]', workflow_git_raw_path(@workflow, version: @git_version.version, path: 'concat_two_files.ga'), count: 1
     assert_select 'a.btn[href=?]', workflow_git_download_path(@workflow, version: @git_version.version, path: 'concat_two_files.ga'), count: 1
     assert_select "a.btn[data-target='#git-move-modal']", count: 0
-    assert_select 'a.btn[href=?]', workflow_git_remove_file_path(@workflow, version: @git_version.version, file: { path: 'concat_two_files.ga' }), count: 0
+    assert_select 'a.btn[href=?]', workflow_git_remove_file_path(@workflow, version: @git_version.version, path: 'concat_two_files.ga'), count: 0
 
     # EDIT
     login_as(editor)
@@ -287,7 +294,7 @@ class GitControllerTest < ActionController::TestCase
     assert_select 'a.btn[href=?]', workflow_git_raw_path(@workflow, version: @git_version.version, path: 'concat_two_files.ga'), count: 1
     assert_select 'a.btn[href=?]', workflow_git_download_path(@workflow, version: @git_version.version, path: 'concat_two_files.ga'), count: 1
     assert_select "a.btn[data-target='#git-move-modal']", count: 1
-    assert_select 'a.btn[href=?]', workflow_git_remove_file_path(@workflow, version: @git_version.version, file: { path: 'concat_two_files.ga' }), count: 1
+    assert_select 'a.btn[href=?]', workflow_git_remove_file_path(@workflow, version: @git_version.version, path: 'concat_two_files.ga'), count: 1
 
     # MANAGE
     login_as(manager)
@@ -298,7 +305,7 @@ class GitControllerTest < ActionController::TestCase
     assert_select 'a.btn[href=?]', workflow_git_raw_path(@workflow, version: @git_version.version, path: 'concat_two_files.ga'), count: 1
     assert_select 'a.btn[href=?]', workflow_git_download_path(@workflow, version: @git_version.version, path: 'concat_two_files.ga'), count: 1
     assert_select "a.btn[data-target='#git-move-modal']", count: 1
-    assert_select 'a.btn[href=?]', workflow_git_remove_file_path(@workflow, version: @git_version.version, file: { path: 'concat_two_files.ga' }), count: 1
+    assert_select 'a.btn[href=?]', workflow_git_remove_file_path(@workflow, version: @git_version.version, path: 'concat_two_files.ga'), count: 1
   end
 
   test 'disables move and delete buttons if immutable' do
@@ -310,7 +317,7 @@ class GitControllerTest < ActionController::TestCase
     assert_select 'a.btn[href=?]', workflow_git_raw_path(@workflow, version: @git_version.version, path: 'concat_two_files.ga'), count: 1
     assert_select 'a.btn[href=?]', workflow_git_download_path(@workflow, version: @git_version.version, path: 'concat_two_files.ga'), count: 1
     assert_select "a.btn[data-target='#git-move-modal']", count: 0
-    assert_select 'a.btn[href=?]', workflow_git_remove_file_path(@workflow, version: @git_version.version, file: { path: 'concat_two_files.ga' }), count: 0
+    assert_select 'a.btn[href=?]', workflow_git_remove_file_path(@workflow, version: @git_version.version, path: 'concat_two_files.ga'), count: 0
     assert_select "a.btn.disabled", text: 'Move/rename', count: 1
     assert_select "a.btn.disabled", text: 'Delete', count: 1
   end
@@ -384,5 +391,198 @@ class GitControllerTest < ActionController::TestCase
     assert_redirected_to workflow_path(@workflow, anchor: 'files')
     assert assigns(:git_version).file_exists?('new-file.txt')
     assert_equal '', assigns(:git_version).file_contents('new-file.txt')
+  end
+
+  test 'view a blob as json' do
+    workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+    get :blob, params: { workflow_id: workflow, version: 1, path: 'concat_two_files.ga' }, format: :json
+
+    assert_response :success
+    data = JSON.parse(response.body)
+    assert_equal 'concat_two_files.ga', data['path']
+    assert_equal 4813, data['size']
+    assert_equal false, data['binary']
+  end
+
+  test 'view a binary blob as json' do
+    workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+    get :blob, params: { workflow_id: workflow, version: 1, path: 'diagram.png' }, format: :json
+
+    assert_response :success
+    data = JSON.parse(response.body)
+    assert_equal 'diagram.png', data['path']
+    assert_equal 32248, data['size']
+    assert_equal true, data['binary']
+  end
+
+  test 'view missing blob as json' do
+    workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+    get :blob, params: { workflow_id: workflow, version: 1, path: 'doesnotexist' }, format: :json
+
+    assert_response :not_found
+    data = JSON.parse(response.body)
+    assert_equal "Couldn't find path: doesnotexist", data['error']
+  end
+
+  test 'cannot view a blob as json if no permission' do
+    workflow = Factory(:local_git_workflow)
+    get :blob, params: { workflow_id: workflow, version: 1, path: 'concat_two_files.ga' }, format: :json
+
+    assert_response :forbidden
+    data = JSON.parse(response.body)
+    assert_equal 'Not authorized', data['error']
+  end
+
+  test 'view root tree as json' do
+    workflow = Factory(:ro_crate_git_workflow, policy: Factory(:public_policy))
+    get :tree, params: { workflow_id: workflow, version: 1 }, format: :json
+
+    assert_response :success
+    data = JSON.parse(response.body)
+    assert_equal '/', data['path']
+    assert_equal 5, data['tree'].length
+    assert_includes data['tree'].map { |e| e['name'] }, 'README.md'
+    assert_equal 'blob', data['tree'].detect { |n| n['name'] == 'README.md' }['type']
+    assert_equal 'tree', data['tree'].detect { |n| n['name'] == 'test' }['type']
+  end
+
+  test 'view a subtree as json' do
+    workflow = Factory(:ro_crate_git_workflow, policy: Factory(:public_policy))
+    get :tree, params: { workflow_id: workflow, version: 1, path: 'test/test1' }, format: :json
+
+    assert_response :success
+    data = JSON.parse(response.body)
+    assert_equal 'test/test1', data['path']
+    assert_equal 3, data['tree'].length
+    assert_includes data['tree'].map { |e| e['name'] }, 'input.bed'
+  end
+
+  test 'view missing tree as json' do
+    workflow = Factory(:ro_crate_git_workflow, policy: Factory(:public_policy))
+    get :tree, params: { workflow_id: workflow, version: 1, path: 'test/test47' }, format: :json
+
+    assert_response :not_found
+    data = JSON.parse(response.body)
+    assert_equal "Couldn't find path: test/test47", data['error']
+  end
+
+  test 'cannot view a tree as json if no permission' do
+    workflow = Factory(:ro_crate_git_workflow)
+    get :blob, params: { workflow_id: workflow, version: 1, path: 'test/test1' }, format: :json
+
+    assert_response :forbidden
+    data = JSON.parse(response.body)
+    assert_equal 'Not authorized', data['error']
+  end
+
+  # post 'blob(/*path)' =>'git#add_file', as: :git_add_file
+  # delete 'blob/*path' => 'git#remove_file', as: :git_remove_file
+  # patch 'blob/*path' => 'git#move_file', as: :git_move_file
+
+  test 'add a new file via API' do
+    workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+    refute workflow.git_version.file_exists?('new_file.txt')
+
+    post :add_file, params: { workflow_id: workflow, version: 1, path: 'new_file.txt', file: { content: Base64.encode64('file contents') } }, format: :json
+
+    assert_response :created
+    assert workflow.git_version.file_exists?('new_file.txt')
+  end
+
+  test 'add a new remote file via API' do
+    workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+    refute workflow.git_version.file_exists?('new_remote_file.txt')
+
+    assert_difference('Git::Annotation.count', 1) do
+      post :add_file, params: { workflow_id: workflow, version: 1, path: 'new_remote_file.txt', file: { url: 'http://example.com' } }, format: :json
+    end
+
+    assert_response :created
+    assert workflow.git_version.file_exists?('new_remote_file.txt')
+    assert_equal 'http://example.com', workflow.git_version.remote_sources['new_remote_file.txt']
+  end
+
+  test 'cannot add a new file via API if not authorized' do
+    workflow = Factory(:local_git_workflow)
+    refute workflow.git_version.file_exists?('new_file.txt')
+
+    post :add_file, params: { workflow_id: workflow, version: 1, path: 'new_file.txt', file: { content: Base64.encode64('file contents') } }, format: :json
+
+    assert_response :forbidden
+    refute workflow.git_version.file_exists?('new_file.txt')
+  end
+
+  test 'update an existing file via API' do
+    workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+    refute_equal 'file contents', workflow.git_version.file_contents('concat_two_files.ga')
+
+    post :add_file, params: { workflow_id: workflow, version: 1, path: 'concat_two_files.ga', file: { content: Base64.encode64('file contents') } }, format: :json
+
+    assert_response :created
+    assert_equal 'file contents', workflow.git_version.file_contents('concat_two_files.ga')
+  end
+
+  test 'rename a file via API' do
+    workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+    refute workflow.git_version.file_exists?('concat_2_files.ga')
+    assert_equal 'concat_two_files.ga', workflow.git_version.main_workflow_path
+
+    post :move_file, params: { workflow_id: workflow, version: 1, path: 'concat_two_files.ga', file: { new_path: 'concat_2_files.ga' } }, format: :json
+
+    assert_response :success
+    assert_equal 'concat_2_files.ga', workflow.git_version.main_workflow_path
+    assert workflow.git_version.file_exists?('concat_2_files.ga')
+  end
+
+  test 'cannot rename a file via API if not authorized' do
+    workflow = Factory(:local_git_workflow)
+    assert workflow.git_version.file_exists?('concat_two_files.ga')
+    assert_equal 'concat_two_files.ga', workflow.git_version.main_workflow_path
+
+    post :move_file, params: { workflow_id: workflow, version: 1, path: 'concat_two_files.ga', file: { new_path: 'concat_2_files.ga' } }, format: :json
+
+    assert_response :forbidden
+    assert workflow.git_version.file_exists?('concat_two_files.ga')
+    assert_equal 'concat_two_files.ga', workflow.git_version.main_workflow_path
+  end
+
+  test 'trying to rename a file via API with invalid path throws error' do
+    workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+    assert workflow.git_version.file_exists?('concat_two_files.ga')
+    assert_equal 'concat_two_files.ga', workflow.git_version.main_workflow_path
+
+    post :move_file, params: { workflow_id: workflow, version: 1, path: 'concat_two_files.ga', file: { new_path: '////////////' } }, format: :json
+
+    assert_response :unprocessable_entity
+    assert workflow.git_version.file_exists?('concat_two_files.ga')
+    assert_equal 'concat_two_files.ga', workflow.git_version.main_workflow_path
+  end
+
+  test 'remove a file via API' do
+    workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+    assert workflow.git_version.file_exists?('diagram.png')
+
+    delete :remove_file, params: { workflow_id: workflow, version: 1, path: 'diagram.png' }, format: :json
+
+    assert_response :success
+    refute workflow.git_version.file_exists?('diagram.png')
+  end
+
+  test 'cannot remove a file via API if not authorized' do
+    workflow = Factory(:local_git_workflow)
+    assert workflow.git_version.file_exists?('diagram.png')
+
+    delete :remove_file, params: { workflow_id: workflow, version: 1, path: 'diagram.png' }, format: :json
+
+    assert_response :forbidden
+    assert workflow.git_version.file_exists?('diagram.png')
+  end
+
+  test 'trying to remove a file via API with wrong path throws error' do
+    workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+
+    delete :remove_file, params: { workflow_id: workflow, version: 1, path: '../../../../home' }, format: :json
+
+    assert_response :not_found
   end
 end

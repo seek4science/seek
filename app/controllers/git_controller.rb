@@ -7,6 +7,7 @@ class GitController < ApplicationController
   before_action :fetch_git_version
   before_action :get_tree, only: [:tree]
   before_action :get_blob, only: [:blob, :download, :raw]
+  before_action :coerce_format
 
   user_content_actions :raw
 
@@ -23,6 +24,7 @@ class GitController < ApplicationController
 
   def tree
     respond_to do |format|
+      format.json { render json: @tree, adapter: :attributes }
       if request.xhr?
         format.html { render partial: 'tree' }
       else
@@ -37,6 +39,7 @@ class GitController < ApplicationController
 
   def blob
     respond_to do |format|
+      format.json { render json: @blob, adapter: :attributes }
       if request.xhr?
         format.html { render partial: 'blob' }
       else
@@ -63,27 +66,25 @@ class GitController < ApplicationController
   def add_file
     if file_params[:url].present?
       add_remote_file
+      operation_response("Registered #{file_params[:url]}", status: 201)
     else
       add_local_file
+      operation_response("Uploaded #{file_params[:path] || params[:path]}", status: 201)
     end
-
-    redirect_to polymorphic_path(@parent_resource, anchor: 'files')
   end
 
   def remove_file
-    @git_version.remove_file(file_params[:path])
+    @git_version.remove_file(params[:path])
     @git_version.save!
 
-    flash[:notice] = "Removed #{file_params[:path]}"
-    redirect_to polymorphic_path(@parent_resource, anchor: 'files')
+    operation_response("Removed #{params[:path]}")
   end
 
   def move_file
-    @git_version.move_file(file_params[:path], file_params[:new_path])
+    @git_version.move_file(params[:path], file_params[:new_path])
     @git_version.save!
 
-    flash[:notice] = "Moved #{file_params[:path]} to #{file_params[:new_path]}"
-    redirect_to polymorphic_path(@parent_resource, anchor: 'files')
+    operation_response("Moved #{params[:path]} to #{file_params[:new_path]}")
   end
 
   def freeze_preview
@@ -102,31 +103,45 @@ class GitController < ApplicationController
 
   private
 
-  def render_immutable_error
-    flash[:error] = @git_version.immutable_error
+  def operation_response(notice = nil, status: 200)
     respond_to do |format|
-      format.html { redirect_to polymorphic_path(@parent_resource, anchor: 'files') }
+      format.json { render json: { }, status: status, adapter: :attributes }
+      format.html do
+        if request.xhr?
+          render partial: 'files', locals: { resource: @parent_resource, git_version: @git_version }, status: status
+        else
+          flash[:notice] = notice if notice
+          redirect_to polymorphic_path(@parent_resource, anchor: 'files')
+        end
+      end
     end
+  end
+
+  def render_immutable_error
+    render_git_error(@git_version.immutable_error, status: 409)
   end
 
   def render_path_not_found_error(ex)
-    flash[:error] = "Couldn't find path: #{ex.path}"
-    respond_to do |format|
-      format.html { redirect_to polymorphic_path(@parent_resource, anchor: 'files') }
-    end
+    render_git_error("Couldn't find path: #{ex.path}", status: 404)
   end
 
   def render_invalid_path_error(ex)
-    flash[:error] = "Invalid path: #{ex.path}"
-    respond_to do |format|
-      format.html { redirect_to polymorphic_path(@parent_resource, anchor: 'files') }
-    end
+    render_git_error("Invalid path: #{ex.path}", status: 422)
   end
 
   def render_invalid_url_error(ex)
-    flash[:error] = ex.message
+    render_git_error(ex.message, status: 422)
+  end
+
+  def render_git_error(message, status: 400, redirect: polymorphic_path(@parent_resource, anchor: 'files'))
     respond_to do |format|
-      format.html { redirect_to polymorphic_path(@parent_resource, anchor: 'files') }
+      format.html do
+        flash[:error] = message
+        redirect_to redirect
+      end
+      format.json do
+        render json: { error: message }, status: status
+      end
     end
   end
 
@@ -156,21 +171,15 @@ class GitController < ApplicationController
   end
 
   def authorize_parent
-    unless @parent_resource.can_download?
-      flash[:error] = "Not authorized."
-      redirect_to :root
-    end
+    render_git_error('Not authorized', status: 403, redirect: :root) unless @parent_resource.can_download?
   end
 
   def authorized_to_edit
-    unless @parent_resource.can_edit?
-      flash[:error] = "Not authorized."
-      redirect_to :root
-    end
+    render_git_error('Not authorized', status: 403, redirect: :root) unless @parent_resource.can_edit?
   end
 
   def file_params
-    params.require(:file).permit(:path, :data, :new_path, :url, :fetch)
+    params.require(:file).permit(:path, :data, :content, :new_path, :url, :fetch)
   end
 
   def fetch_git_version
@@ -183,21 +192,32 @@ class GitController < ApplicationController
   end
 
   def add_local_file
-    path = file_params[:path]
-    path = file_params[:data].original_filename if path.blank?
-    @git_version.add_file(path, file_params[:data])
+    path = file_params[:path] || params[:path]
+    path = file_params[:data].original_filename if path.blank? && file_params[:data]
+    @git_version.add_file(path, file_content)
     @git_version.save!
-
-    flash[:notice] = "Uploaded #{file_params[:path]}"
   end
 
   def add_remote_file
-    path = file_params[:path]
+    path = file_params[:path] || params[:path]
     path = file_params[:url].split('/').last if path.blank?
     @git_version.add_remote_file(path, file_params[:url], fetch: file_params[:fetch] == '1')
     @git_version.save!
+  end
 
-    flash[:notice] = "Registered #{file_params[:path]}"
+  def coerce_format
+    # I have to do this because Rails doesn't seem to be behaving as expected.
+    # In routes.rb, the git routes are scoped with "format: false", so Rails should disregard the extension
+    # (e.g. /git/1/blob/my_file.yml) when determining the response format.
+    # However this results in an UnknownFormat error when trying to load the HTML view, as Rails still seems to be
+    # looking for an e.g. application/yaml view.
+    # You can fix this by adding { defaults: { format: :html } }, but then it is not possible to request JSON,
+    # even with an explicit `Accept: application/json` header! -Finn
+    request.format = :html unless json_api_request?
+  end
+
+  def file_content
+    file_params.key?(:content) ? StringIO.new(Base64.decode64(file_params[:content])) : file_params[:data]
   end
 
   # # Rugged does not allow streaming blobs

@@ -1,6 +1,4 @@
-<%= form_tag(polymorphic_path([resource, :git_move_file], version: version), method: :patch) do %>
-  <%= hidden_field_tag('file[path]', path) %>
-
+<%= form_tag(polymorphic_path([resource, :git_move_file], path: path, version: version), method: :patch) do %>
   <div class="form-group">
     <label class="required">Filename</label>
     <%= text_field_tag 'file[new_path]', path, class: 'form-control' -%>

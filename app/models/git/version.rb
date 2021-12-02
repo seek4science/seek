@@ -28,7 +28,7 @@ module Git
 
     alias_method :parent, :resource # ExplicitVersioning compatibility
 
-    attr_accessor :remote
+    attr_writer :remote
 
     delegate :tag_counts, :scales, :managers, :attributions, :creators, :assets_creators, :is_asset?,
              :authorization_supported?, :defines_own_avatar?, :use_mime_type_for_avatar?, :avatar_key,
@@ -60,6 +60,10 @@ module Git
       end
     end
 
+    def remote
+      @remote || git_repository&.remote
+    end
+
     def remote?
       git_repository&.remote.present?
     end
@@ -67,6 +71,10 @@ module Git
     def lock
       unless mutable?
         errors.add(:base, 'is already frozen')
+        return false
+      end
+      if unborn?
+        errors.add(:base, 'has no content')
         return false
       end
 

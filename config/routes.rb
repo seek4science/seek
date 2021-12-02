@@ -118,15 +118,15 @@ SEEK::Application.routes.draw do
 
   concern :git do
     nested do
-      scope controller: :git, path: '/git(/*version)', constraints: { path: /.+/ }, format: false, defaults: { format: :html }  do
+      scope controller: :git, path: '/git(/*version)', constraints: { path: /[^\0]+/ }, format: false do
         get 'tree(/*path)' => 'git#tree', as: :git_tree
         get 'blob/*path' => 'git#blob', as: :git_blob
         get 'raw/*path' => 'git#raw', as: :git_raw
         get 'download/*path' => 'git#download', as: :git_download
         get 'browse' => 'git#browse', as: :git_browse
-        post 'add' => 'git#add_file', as: :git_add_file
-        delete 'remove' => 'git#remove_file', as: :git_remove_file
-        patch 'move' => 'git#move_file', as: :git_move_file
+        post 'blob(/*path)' =>'git#add_file', as: :git_add_file
+        delete 'blob/*path' => 'git#remove_file', as: :git_remove_file
+        patch 'blob/*path' => 'git#move_file', as: :git_move_file
         get 'freeze' => 'git#freeze_preview', as: :git_freeze_preview
         post 'freeze' => 'git#freeze', as: :git_freeze
       end
@@ -154,7 +154,7 @@ SEEK::Application.routes.draw do
       get :settings
       get :get_stats
       get :registration_form
-      get :edit_tag      
+      get :edit_tag
       post :update_home_settings
       post :restart_server
       post :restart_delayed_job
@@ -509,8 +509,8 @@ SEEK::Application.routes.draw do
   resources :models, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
     member do
       get :compare_versions
-      post :compare_versions      
-      post :submit_to_sycamore      
+      post :compare_versions
+      post :submit_to_sycamore
       post :execute
       get :simulate
       post :simulate

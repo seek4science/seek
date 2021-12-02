@@ -10,7 +10,7 @@
       </h4>
 
       <div class="list-group-item-text auto-collapse">
-        <% commit_comment = version.comment || version.commit_object.message %>
+        <% commit_comment = version.comment || version.commit_object&.message %>
         <%= text_or_not_specified(commit_comment, description: true, auto_link: false, none_text: 'No revision comments', markdown: true) %>
       </div>
       <br/>
