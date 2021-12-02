@@ -1,8 +1,6 @@
 class WorkflowDiagram
   include Seek::MimeTypes
 
-  class UnsupportedFormat < RuntimeError; end
-
   attr_reader :workflow, :path
 
   def initialize(workflow, path)

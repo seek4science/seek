@@ -4,8 +4,6 @@ require 'ro_crate'
 module Seek
   module WorkflowExtractors
     class ROCrate < Base
-      available_diagram_formats(png: 'image/png', svg: 'image/svg+xml', jpg: 'image/jpeg', default: :svg)
-
       def initialize(io, main_workflow_class: nil)
         @io = io
         @main_workflow_class = main_workflow_class
@@ -23,17 +21,15 @@ module Seek
         end
       end
 
-      def generate_diagram(format = nil)
+      def generate_diagram
         open_crate do |crate|
-          format ||= default_diagram_format
-
           return crate.main_workflow_diagram&.source&.read if crate.main_workflow_diagram
 
           extractor = main_workflow_extractor(crate)
-          return extractor.generate_diagram(format) if extractor&.can_render_diagram?
+          return extractor.generate_diagram if extractor&.can_render_diagram?
 
           extractor = abstract_cwl_extractor(crate)
-          return extractor.generate_diagram(format) if extractor&.can_render_diagram?
+          return extractor.generate_diagram if extractor&.can_render_diagram?
 
           return nil
         end
@@ -112,11 +108,10 @@ module Seek
         v
       end
 
-      def default_diagram_format
+      def diagram_extension
         open_crate do |crate|
           if crate&.main_workflow&.diagram
-            ext = crate&.main_workflow&.diagram.id.split('.').last
-            return ext if self.class.diagram_formats.key?(ext)
+            return crate&.main_workflow&.diagram.id.split('.').last
           end
 
           super

@@ -4,8 +4,6 @@ require 'ro_crate'
 module Seek
   module WorkflowExtractors
     class GitRepo < Base
-      available_diagram_formats(png: 'image/png', svg: 'image/svg+xml', jpg: 'image/jpeg', default: :svg)
-
       def initialize(git_version, main_workflow_class: nil)
         @git_version = git_version
         @main_workflow_class = main_workflow_class
@@ -15,23 +13,20 @@ module Seek
         @git_version.path_for_key(:diagram).present? || main_workflow_extractor&.can_render_diagram? || abstract_cwl_extractor&.can_render_diagram?
       end
 
-      def default_diagram_format
-        diagram_path = @git_version.path_for_key(:diagram)
-        if diagram_path
-          ext = diagram_path.split('.').last
-          return ext if self.class.diagram_formats.key?(ext)
-        end
+      def diagram_extension
+        path = @git_version.path_for_key(:diagram)
+        return path.split('.').last if path
 
         super
       end
 
-      def generate_diagram(format = nil)
+      def generate_diagram
         if @git_version.path_for_key(:diagram).present?
           @git_version.file_contents(@git_version.path_for_key(:diagram))
         elsif main_workflow_extractor&.can_render_diagram?
-          main_workflow_extractor.generate_diagram(format)
+          main_workflow_extractor.generate_diagram
         elsif abstract_cwl_extractor&.can_render_diagram?
-          abstract_cwl_extractor.generate_diagram(format)
+          abstract_cwl_extractor.generate_diagram
         else
           nil
         end

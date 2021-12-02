@@ -7,22 +7,6 @@ module Seek
           "name" => "Unrecognized Workflow Type"
       }
 
-      def self.available_diagram_formats(formats)
-        formats = formats.with_indifferent_access
-        @default_diagram_format = formats.delete(:default) || formats.keys.first.to_sym
-        @diagram_formats = formats.freeze
-      end
-
-      def self.diagram_formats
-        @diagram_formats || superclass.diagram_formats
-      end
-
-      def self.default_diagram_format
-        @default_diagram_format || superclass.default_diagram_format
-      end
-
-      available_diagram_formats(png: 'image/png', svg: 'image/svg+xml', jpg: 'image/jpeg', default: :png)
-
       def initialize(io)
         @io = io.is_a?(String) ? StringIO.new(io) : io
       end
@@ -39,12 +23,12 @@ module Seek
         false
       end
 
-      def generate_diagram(format = default_diagram_format)
+      def generate_diagram
         nil
       end
 
-      def default_diagram_format
-        self.class.default_diagram_format
+      def diagram_extension
+        'svg'
       end
 
       def self.workflow_class

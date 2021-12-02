@@ -25,7 +25,7 @@ module WorkflowExtraction
     end
   end
 
-  delegate :default_diagram_format, :can_render_diagram?, :has_tests?, to: :extractor
+  delegate :can_render_diagram?, :has_tests?, to: :extractor
 
   def is_git_ro_crate?
     is_git_versioned? && git_version.ro_crate?
@@ -61,18 +61,19 @@ module WorkflowExtraction
     can_download?(nil) && workflow_class_title == 'Galaxy' && Seek::Config.galaxy_instance_trs_import_url.present?
   end
 
-  def diagram_exists?(format = default_diagram_format)
-    File.exist?(cached_diagram_path(format))
+  def diagram_exists?
+    path = Dir.glob(cached_diagram_path('*')).last
+    path && File.exist?(path)
   end
 
-  def diagram(format = default_diagram_format)
-    path = Pathname.new(cached_diagram_path(format))
-    content_type = extractor.class.diagram_formats[format]
-    raise(WorkflowDiagram::UnsupportedFormat, "Unsupported diagram format: #{format}") if content_type.nil?
+  def diagram
+    path = Dir.glob(cached_diagram_path('*')).last
 
-    unless path.exist?
-      diagram = extractor.generate_diagram(format)
+    unless path && File.exist?(path)
+      e = extractor
+      diagram = e.generate_diagram
       return nil if diagram.nil? || diagram.length <= 1
+      path = Pathname.new(cached_diagram_path(e.diagram_extension))
       path.parent.mkdir unless path.parent.exist?
       File.binwrite(path, diagram)
     end
@@ -95,12 +96,9 @@ module WorkflowExtraction
         remotes.delete(d.path)
         crate.main_workflow.diagram = d.to_crate_entity(crate, type: ROCrate::WorkflowDiagram)
       else # Was the diagram generated?
-        begin
-          d = diagram
-          if d&.exists?
-            crate.main_workflow.diagram = d.to_crate_entity(crate)
-          end
-        rescue WorkflowDiagram::UnsupportedFormat
+        d = diagram
+        if d&.exists?
+          crate.main_workflow.diagram = d.to_crate_entity(crate)
         end
       end
 
@@ -117,14 +115,11 @@ module WorkflowExtraction
       unless crate.main_workflow
         crate.main_workflow = ROCrate::Workflow.new(crate, content_blob.filepath, content_blob.original_filename, contentSize: content_blob.file_size)
       end
-      begin
-        d = diagram
-        if d&.exists?
-          wdf = crate.main_workflow_diagram || ROCrate::WorkflowDiagram.new(crate, d.path, d.filename)
-          wdf.content_size = d.size
-          crate.main_workflow.diagram = wdf
-        end
-      rescue WorkflowDiagram::UnsupportedFormat
+      d = diagram
+      if d&.exists?
+        wdf = crate.main_workflow_diagram || ROCrate::WorkflowDiagram.new(crate, d.path, d.filename)
+        wdf.content_size = d.size
+        crate.main_workflow.diagram = wdf
       end
     end
 

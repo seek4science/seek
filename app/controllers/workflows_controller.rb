@@ -20,10 +20,6 @@ class WorkflowsController < ApplicationController
   api_actions :index, :show, :create, :update, :destroy, :ro_crate
   user_content_actions :diagram
 
-  rescue_from WorkflowDiagram::UnsupportedFormat do
-    head :not_acceptable
-  end
-
   def new_git_version
     @git_repository = @workflow.latest_git_version.git_repository
     if @git_repository&.remote?
@@ -234,8 +230,7 @@ class WorkflowsController < ApplicationController
   end
 
   def diagram
-    diagram_format = params.key?(:diagram_format) ? params[:diagram_format] : @display_workflow.default_diagram_format
-    @diagram = @display_workflow.diagram(diagram_format)
+    @diagram = @display_workflow.diagram
     if @diagram
       send_file(@diagram.path,
                 filename: @diagram.filename,

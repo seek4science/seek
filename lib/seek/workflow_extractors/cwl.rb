@@ -13,8 +13,6 @@ module Seek
           "url" => { "@id" => "https://www.commonwl.org/" }
       }
 
-      available_diagram_formats(png: 'image/png', svg: 'image/svg+xml', default: :svg)
-
       def self.file_extensions
         ['cwl']
       end
@@ -23,13 +21,13 @@ module Seek
         true
       end
 
-      def generate_diagram(format = self.class.default_digram_format)
+      def generate_diagram
         begin
           f = Tempfile.new('diagram.dot')
           wf = WorkflowInternals::Structure.new(metadata[:internals])
           Seek::WorkflowExtractors::CwlDotGenerator.new(f).write_graph(wf)
           f.rewind
-          `cat #{f.path} | dot -T#{format}`
+          `cat #{f.path} | dot -Tsvg`
         rescue StandardError => e
           nil
         end
