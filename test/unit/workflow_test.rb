@@ -390,7 +390,7 @@ class WorkflowTest < ActiveSupport::TestCase
     end
 
     assert_equal 'new-diagram.png', v.diagram_path
-    refute v.diagram_exists?('png')
+    refute v.diagram_exists?
     new_diagram = v.diagram
 
     assert new_diagram.exists?
@@ -429,7 +429,7 @@ class WorkflowTest < ActiveSupport::TestCase
     end
 
     assert_equal 'new-diagram.png', v.diagram_path
-    refute v.diagram_exists?('png')
+    refute v.diagram_exists?
     new_diagram = v.diagram
 
     assert new_diagram.exists?
@@ -469,7 +469,7 @@ class WorkflowTest < ActiveSupport::TestCase
     end
 
     assert_nil v.diagram_path
-    refute v.diagram_exists?('png')
+    refute v.diagram_exists?
     assert v.can_render_diagram?
     new_diagram = v.diagram # Generates diagram
 
