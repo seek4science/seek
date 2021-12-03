@@ -106,6 +106,8 @@ module Seek
         @opened_crate = nil
 
         v
+      rescue RuntimeError
+        raise ::ROCrate::ReadException.new("Couldn't read RO-Crate metadata.")
       end
 
       def diagram_extension

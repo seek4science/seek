@@ -20,6 +20,17 @@ class WorkflowsController < ApplicationController
   api_actions :index, :show, :create, :update, :destroy, :ro_crate
   user_content_actions :diagram
 
+  rescue_from ROCrate::ReadException do |e|
+    logger.error("Error whilst attempting to read RO-Crate metadata for #{@workflow&.id}.")
+    respond_to do |format|
+      format.html do
+        flash[:error] = "Couldn't read RO-Crate metadata. Check the file is valid."
+        redirect_to workflow_path(@workflow)
+      end
+      format.json { render json: { title: 'RO-Crate Read Error', detail: e.message }, status: :internal_server_error }
+    end
+  end
+
   def new_git_version
     @git_repository = @workflow.latest_git_version.git_repository
     if @git_repository&.remote?
