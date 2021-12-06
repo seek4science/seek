@@ -21,8 +21,8 @@ class IsaStudy
 
 
   def save
-    @sample_collection_sample_type.sample_attributes.detect {|a| a.seek_sample_multi?}.linked_sample_type = @source_sample_type
     if valid?
+      @sample_collection_sample_type.sample_attributes.detect {|a| a.seek_sample_multi?}.linked_sample_type = @source_sample_type
       @study.save
       @source_sample_type.save
       @sample_collection_sample_type.save

@@ -736,6 +736,10 @@ SEEK::Application.routes.draw do
   resources :isa_studies do
   end
 
+  ### ISA ASSAY
+  resources :isa_assays do
+  end
+
   ### ASSAY AND TECHNOLOGY TYPES ###
 
   get '/assay_types/', to: 'assay_types#show', as: 'assay_types'

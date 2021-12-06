@@ -6,11 +6,21 @@ module DynamicTableHelper
     return { columns: columns, rows: rows }
   end
 
-  def dt_aggregated(study, include_assays = nil)
-    sample_types = study.sample_types
-    ## sample_types << ordered_assays_sample_types if include_assays
+  def dt_aggregated(study, include_all_assays = nil, assay = nil)
+    if assay
+      if assay.position == 0
+        sample_types = [study.sample_types.second, assay.sample_type]
+      else
+        previous_assay = Assay.where(position: assay.position - 1).first
+        sample_types = [previous_assay.sample_type, assay.sample_type]
+      end
+    else
+      sample_types = study.sample_types
+      sample_types.push(*study.assays.map {|a| a.sample_type }) if include_all_assays
+    end
     columns = dt_cumulative_cols(sample_types)
     rows = dt_cumulative_rows(sample_types, columns.length)
+    
     return { columns: columns, rows: rows }
   end
 
@@ -46,7 +56,6 @@ module DynamicTableHelper
       s.samples.each { |sa| row[sa.id] = sa.linking_samples.map{ |l| l.id } }
       @arr << row
     end
-
     @arr[0].each { |x,arr| get_full_rows(x).each { |s| samples_graph << s } }
 
     samples_graph.each do |sample_id_set|
@@ -61,7 +70,7 @@ module DynamicTableHelper
 
   def get_full_rows(x, row=[], i=0, rows=[])
     row << x
-    links = @arr[i][x];
+    links = @arr[i][x] if @arr[i]
     if (links && links.length > 0)
       links.each {|m| get_full_rows(m, row.clone, i+1, rows)}
     else 

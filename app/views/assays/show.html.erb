@@ -7,6 +7,11 @@
       <i class="glyphicon glyphicon-th-list"></i> Related items
     </a>
   </li>
+  <% if Seek::Config.project_single_page_advanced_enabled %>
+    <li>
+        <a data-toggle="tab" href="#assay_design"><i class="glyphicon glyphicon-list-alt"></i> Assay design</a>
+    </li>
+  <% end %>
 </ul>
 <div class="tab-content">
   <div id="details" class="tab-pane fade in active">
@@ -138,5 +143,11 @@
   <div id="related-items" class="tab-pane fade">
     <%= render :partial => "general/items_related_to", :object => @assay -%>
   </div>
+
+  <% if Seek::Config.project_single_page_advanced_enabled %>
+    <div id="assay_design" class="tab-pane fade">
+        <%= render :partial=>"isa_assays/assay_design", locals: { assay: @assay} -%>
+    </div>
+  <% end %>
 
 </div>
