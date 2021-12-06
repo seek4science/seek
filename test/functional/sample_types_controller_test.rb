@@ -54,7 +54,7 @@ class SampleTypesControllerTest < ActionController::TestCase
                                                          pos: '2', title: 'a number', required: '1',
                                                          sample_attribute_type_id: @int_type.id, _destroy: '0',
                                                          description: 'this is a number',
-                                                         iri: 'scheme:id'
+                                                         pid: 'scheme:id'
 
                                                        }
                                                      },
@@ -76,10 +76,10 @@ class SampleTypesControllerTest < ActionController::TestCase
 
     assert_equal 'a string', type.sample_attributes.title_attributes.first.title
     assert_nil type.sample_attributes.first.description
-    assert_nil type.sample_attributes.first.iri
+    assert_nil type.sample_attributes.first.pid
     assert_equal 'a number', type.sample_attributes.second.title
     assert_equal 'this is a number', type.sample_attributes.second.description
-    assert_equal 'scheme:id', type.sample_attributes.second.iri
+    assert_equal 'scheme:id', type.sample_attributes.second.pid
 
     assert_equal [@project], type.projects
     refute type.uploaded_template?

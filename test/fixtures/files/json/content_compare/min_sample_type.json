@@ -10,7 +10,7 @@
           "id": "504",
           "title": "full_name",
           "description": null,
-          "iri": null,
+          "pid": null,
           "sample_attribute_type": {
             "id": "777",
             "title": "Full name",

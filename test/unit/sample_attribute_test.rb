@@ -61,13 +61,13 @@ class SampleAttributeTest < ActiveSupport::TestCase
                                     sample_attribute_type: Factory(:integer_sample_attribute_type)
     refute attribute.valid?
 
-    attribute = SampleAttribute.new title: 'fish', iri:'wibble',
+    attribute = SampleAttribute.new title: 'fish', pid:'wibble',
                                     sample_attribute_type: Factory(:integer_sample_attribute_type),
                                     sample_type: Factory(:simple_sample_type)
     refute attribute.valid?
-    attribute.iri = 'http://somewhere.org#fish'
+    attribute.pid = 'http://somewhere.org#fish'
     assert attribute.valid?
-    attribute.iri = 'dc:fish'
+    attribute.pid = 'dc:fish'
     assert attribute.valid?
 
 

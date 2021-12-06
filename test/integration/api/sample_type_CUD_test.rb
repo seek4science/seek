@@ -189,7 +189,7 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
               "id": "#{attr.id}",
               "title": "the name",
               "description": "the name for the patient",
-              "iri": "patient:name"
+              "pid": "patient:name"
             }
           ]
         }
@@ -204,7 +204,7 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
 
     assert_equal 'the name',SampleAttribute.find(attr.id).title
     assert_equal 'the name for the patient',SampleAttribute.find(attr.id).description
-    assert_equal 'patient:name',SampleAttribute.find(attr.id).iri
+    assert_equal 'patient:name',SampleAttribute.find(attr.id).pid
     assert_equal 5, SampleType.find(sample_type.id).sample_attributes.count
   end
 

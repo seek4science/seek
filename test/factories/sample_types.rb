@@ -112,7 +112,7 @@ Factory.define(:max_sample_type, parent: :sample_type) do |f|
     # Not sure why i have to explicitly add the sample_type association
     type.sample_attributes << Factory.build(:sample_attribute, title: 'full_name', description: 'the persons full name', sample_attribute_type: Factory(:full_name_sample_attribute_type), required: true, is_title: true, sample_type: type)
     type.sample_attributes << Factory.build(:sample_attribute, title: 'address', sample_attribute_type: Factory(:address_sample_attribute_type), required: false, sample_type: type)
-    type.sample_attributes << Factory.build(:sample_attribute, title: 'postcode', iri: 'dc:postcode', sample_attribute_type: Factory(:postcode_sample_attribute_type), required: false, sample_type: type)
+    type.sample_attributes << Factory.build(:sample_attribute, title: 'postcode', pid: 'dc:postcode', sample_attribute_type: Factory(:postcode_sample_attribute_type), required: false, sample_type: type)
     type.sample_attributes << Factory.build(:sample_attribute, title: 'CAPITAL key', sample_attribute_type: Factory(:string_sample_attribute_type, title:'String'), required: false, sample_type: type)
   end
 end
