@@ -7,10 +7,17 @@
   resource_type = resource.class.name.underscore
   resource_type_text = text_for_resource(resource)
   help_text = "You can add a data type for this #{resource_type_text}"
+  current_data_type = "#{EdamHelper::url_to_text(resource.data_type)}"
 
 %>
 
-<%= folding_panel('Data Type', true, :body_options => {:id => 'data_type_urls'},
+<%= folding_panel("Data Type", false, :body_options => {:id => 'data_type_urls'},
+                  :help_text => help_text) do %>
+
+    <p><%= "<b>Current data type:</b> #{current_data_type}".html_safe %></p>
+    <p id="selected_data_type"></p>
+
+    <%= folding_panel("Select data type", true,
                   :help_text => help_text) do %>
 
     <p class="help-block">
@@ -21,6 +28,7 @@
 
     <div id="data_type_tree"></div>
 
+    <% end %>
 <% end %>
 
 <script type="application/javascript">
@@ -35,6 +43,8 @@
       });
       data_type_tree.on("afterSelect", function(event, classId, prefLabel, selectedNode) {
 	  document.getElementById('<%= "#{resource_type}_data_type" %>').value = classId;
+	  selected_data_type = document.getElementById('selected_data_type')
+	  selected_data_type.innerHTML = `<b>Selected data type:</b> ${prefLabel}`
       })
 	     });
 </script>

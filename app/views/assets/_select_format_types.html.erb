@@ -1,15 +1,26 @@
 <!-- format_type_form -->
 <link rel="stylesheet" type="text/css" href="https://bioportal.bioontology.org/widgets/jquery.ncbo.tree.css">
 <script src="https://bioportal.bioontology.org/widgets/jquery.ncbo.tree-2.0.2.js"></script>
-
+<script>
+  var app = require("ols-treeview");
+var instance = new app();
+instance.draw($("#term-tree"), false, "bfo", "terms", "https://purl.obolibrary.org/obo/BFO_0000182", "https://www.ebi.ac.uk/ols", {});
+</script>
 <%
 
   resource_type = resource.class.name.underscore
   resource_type_text = text_for_resource(resource)
   help_text = "You can add a format for this #{resource_type_text}"
+  current_format = "#{EdamHelper::url_to_text(resource.format_type)}"
 %>
 
-<%= folding_panel('Format', true, :body_options => {:id => 'format_type_urls'},
+<%= folding_panel("Format", false, :heading_options => {:id  => 'format_panel'}, :body_options => {:id => 'format_type_urls'},
+                  :help_text => help_text) do %>
+
+    <p><%= "<b>Current format:</b> #{current_format}".html_safe %></p>
+    <p id="selected_format"></p>
+
+    <%= folding_panel("Select format", true,
                   :help_text => help_text) do %>
 
     <p class="help-block">
@@ -19,6 +30,8 @@
     <%= text_field_tag("#{resource_type}[format_type]", "#{resource.format_type}", hidden: true) %>
 
     <div id="format_type_tree"></div>
+
+    <% end %>
 
 <% end %>
 
@@ -34,6 +47,9 @@
       });
       format_type_tree.on("afterSelect", function(event, classId, prefLabel, selectedNode) {
 	  document.getElementById('<%= "#{resource_type}_format_type" %>').value = classId;
+
+	  selected_format = document.getElementById('selected_format')
+	  selected_format.innerHTML = `<b>Selected format:</b> ${prefLabel}`
       })
 	     });
 </script>
