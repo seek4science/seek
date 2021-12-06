@@ -273,6 +273,8 @@ class AdminController < ApplicationController
     pubmed_email_valid = check_valid_email(pubmed_email, 'pubmed API email address')
     crossref_email = params[:crossref_api_email]
     crossref_email_valid = check_valid_email(crossref_email, 'crossref API email address')
+    Seek::Config.allow_publications_fulltext = string_to_boolean params[:allow_publications_fulltext]
+    Seek::Config.allow_edit_of_registered_publ = string_to_boolean params[:allow_edit_of_registered_publ]
     Seek::Config.pubmed_api_email = pubmed_email if pubmed_email == '' || pubmed_email_valid
     Seek::Config.crossref_api_email = crossref_email if crossref_email == '' || crossref_email_valid
 

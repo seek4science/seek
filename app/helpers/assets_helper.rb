@@ -336,4 +336,11 @@ module AssetsHelper
     ContactRequestMessageLog.recent_requests(current_user.try(:person), resource).first
   end
 
+  def edam_ontology_items(ontologyCVItems)
+    ontologyCVItems.collect do |item|
+      browser_url = "https://edamontology.github.io/edam-browser/#{URI.parse(item.iri).path.gsub('/','#')}"
+      link_to(item.label, browser_url, target: :_blank).html_safe
+    end.join(', ').html_safe
+  end
+
 end

@@ -1,0 +1,91 @@
+version: '3'
+services:
+  db: # Database implementation, in this case MySQL
+    image: mysql:5.7
+    container_name: seek-mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    restart: always
+    stop_grace_period: 1m30s
+    env_file:
+      - docker/db.env
+    volumes:
+      - seek-mysql-db:/var/lib/mysql
+
+  seek: # The SEEK application
+    #build: .
+
+    image: fairdom/seek:1.12-dev
+
+    container_name: seek
+    command: docker/entrypoint.sh
+    restart: always
+    environment:
+      RAILS_ENV: production
+      SOLR_PORT: 8983
+      SOLR_HOST: solr
+      NO_ENTRYPOINT_WORKERS: 1
+      RAILS_RELATIVE_URL_ROOT: '/seek'
+    env_file:
+      - docker/db.env
+    volumes:
+      - seek-filestore:/seek/filestore
+      - seek-cache:/seek/tmp/cache
+      - seek-assets:/seek/public/assets
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - solr
+    links:
+      - db
+      - solr
+
+  seek_workers: # The SEEK delayed job workers
+      #build: .
+
+      image: fairdom/seek:1.12-dev
+      container_name: seek-workers
+      command: docker/start_workers.sh
+      restart: always
+      environment:
+        RAILS_ENV: production
+        SOLR_PORT: 8983
+        SOLR_HOST: solr
+      env_file:
+        - docker/db.env
+      volumes:
+        - seek-filestore:/seek/filestore
+        - seek-cache:/seek/tmp/cache
+      depends_on:
+        - db
+        - solr
+      links:
+        - db
+        - solr
+
+  solr:
+    image: fairdom/seek-solr:8.9
+    container_name: seek-solr
+    restart: always
+    environment:
+      SOLR_JAVA_MEM: -Xms512m -Xmx1024m
+    volumes:
+      - seek-solr-data:/var/solr/
+    entrypoint:
+      - docker-entrypoint.sh
+      - solr-precreate
+      - seek
+      - /opt/solr/server/solr/configsets/seek_config      
+
+
+volumes:
+  seek-filestore:
+    external: true
+  seek-mysql-db:
+    external: true
+  seek-solr-data:
+    external: true
+  seek-cache:
+    external: true
+  seek-assets:
+    external: true

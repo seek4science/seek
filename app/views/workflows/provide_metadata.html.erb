@@ -48,6 +48,8 @@
       <p class="help-block">If this workflow came from an external repository (i.e. GitHub), you can include its original URL here.</p>
     </div>
 
+    <%= render partial: 'assets/edam_form_properties', locals: { resource: @workflow } %>
+
     <div class="form-group">
       <label>Maturity</label>
       <%= select_tag 'workflow[maturity_level]',

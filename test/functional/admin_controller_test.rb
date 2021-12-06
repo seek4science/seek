@@ -116,7 +116,7 @@ class AdminControllerTest < ActionController::TestCase
       assert_select '#address[value=?]', '255.255.255.255'
       assert_select '#domain[value=?]', 'email.example.com'
     end
-  end  
+  end
 
   test 'update visible tags and threshold' do
     Seek::Config.max_visible_tags = 2
@@ -344,7 +344,7 @@ class AdminControllerTest < ActionController::TestCase
     assert_nil Seek::Config.header_image_avatar_id
     settings = {project_name: 'project name', project_type: 'project type', project_description: 'project description', project_keywords: 'project,    keywords, ',
                 project_link: 'http://project-link.com',application_name: 'app name',
-                dm_project_name: 'dm project name', dm_project_link: 'http://dm-project-link.com', issue_tracker: 'https://issues-galore.com',
+                dm_project_name: 'dm project name', dm_project_link: 'http://dm-project-link.com',
                 header_image_link: 'http://header-link.com/image.jpg', header_image_title: 'header image title',
                 copyright_addendum_content: 'copyright content', imprint_description: 'imprint description',
                 terms_page: 'terms page', privacy_page: 'privacy page', about_page: 'about page',
@@ -363,7 +363,6 @@ class AdminControllerTest < ActionController::TestCase
     assert_equal 'app name', Seek::Config.application_name
     assert_equal 'dm project name', Seek::Config.dm_project_name
     assert_equal 'http://dm-project-link.com', Seek::Config.dm_project_link
-    assert_equal 'https://issues-galore.com', Seek::Config.issue_tracker
     assert_equal 'http://header-link.com/image.jpg', Seek::Config.header_image_link
     assert_equal 'header image title', Seek::Config.header_image_title
     assert_equal 'copyright content', Seek::Config.copyright_addendum_content
@@ -440,12 +439,12 @@ class AdminControllerTest < ActionController::TestCase
 
   test 'email settings preserved if not sent' do
 
-    Seek::Config.set_smtp_settings('address', 'smtp.address.org') 
+    Seek::Config.set_smtp_settings('address', 'smtp.address.org')
     Seek::Config.set_smtp_settings('port', 1)
     Seek::Config.set_smtp_settings('domain', 'the-domain')
     Seek::Config.set_smtp_settings('authentication', 'auth')
     Seek::Config.set_smtp_settings('user_name', 'fred')
-    Seek::Config.set_smtp_settings('password', 'blogs') 
+    Seek::Config.set_smtp_settings('password', 'blogs')
     Seek::Config.set_smtp_settings('enable_starttls_auto', true)
 
     with_config_value(:support_email_address, 'support@email.com') do
@@ -492,4 +491,14 @@ class AdminControllerTest < ActionController::TestCase
     assert_equal nil, Seek::Config.recommended_software_licenses
   end
 
+  test 'publication fulltext enabled' do
+    with_config_value(:allow_publications_fulltext, false) do
+      post :update_settings, params: { allow_publications_fulltext: '1' }
+      assert_equal true, Seek::Config.allow_publications_fulltext
+    end
+    with_config_value(:allow_publications_fulltext, true) do
+      post :update_settings, params: { allow_publications_fulltext: '0' }
+      assert_equal false, Seek::Config.allow_publications_fulltext
+    end
+  end
 end

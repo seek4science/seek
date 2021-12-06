@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_10_15_152343) do
+ActiveRecord::Schema.define(version: 2021_11_11_133408) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -1470,6 +1470,11 @@ ActiveRecord::Schema.define(version: 2021_10_15_152343) do
     t.date "end_date"
   end
 
+  create_table "projects_publication_versions", id: false,  force: :cascade do |t|
+    t.integer "project_id"
+    t.integer "version_id"
+  end
+
   create_table "projects_publications", id: false,  force: :cascade do |t|
     t.integer "project_id"
     t.integer "publication_id"
@@ -1543,6 +1548,36 @@ ActiveRecord::Schema.define(version: 2021_10_15_152343) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "publication_versions",  force: :cascade do |t|
+    t.integer "publication_id"
+    t.integer "version"
+    t.text "revision_comments"
+    t.integer "pubmed_id"
+    t.text "title"
+    t.text "abstract"
+    t.date "published_date"
+    t.string "journal"
+    t.string "first_letter", limit: 1
+    t.integer "contributor_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.datetime "last_used_at"
+    t.string "doi"
+    t.string "uuid"
+    t.integer "policy_id"
+    t.text "citation"
+    t.string "deleted_contributor"
+    t.integer "registered_mode"
+    t.text "booktitle"
+    t.string "publisher"
+    t.text "editor"
+    t.integer "publication_type_id"
+    t.text "url"
+    t.integer "visibility"
+    t.index ["contributor_id"], name: "index_publication_versions_on_contributor"
+    t.index ["publication_id"], name: "index_publication_versions_on_publication_id"
+  end
+
   create_table "publications", id: :integer,  force: :cascade do |t|
     t.integer "pubmed_id"
     t.text "title"
@@ -1565,6 +1600,9 @@ ActiveRecord::Schema.define(version: 2021_10_15_152343) do
     t.text "editor"
     t.integer "publication_type_id"
     t.text "url"
+    t.integer "version", default: 1
+    t.string "license"
+    t.text "other_creators"
     t.index ["contributor_id"], name: "index_publications_on_contributor"
   end
 
@@ -1611,7 +1649,7 @@ ActiveRecord::Schema.define(version: 2021_10_15_152343) do
     t.datetime "updated_at"
   end
 
-  create_table "repository_standards",  force: :cascade do |t|
+  create_table "repository_standards", id: :integer,  force: :cascade do |t|
     t.string "title"
     t.string "url"
     t.string "group_tag"
@@ -1694,6 +1732,7 @@ ActiveRecord::Schema.define(version: 2021_10_15_152343) do
     t.boolean "required"
     t.string "short_name"
     t.integer "repository_standard_id"
+    t.string "key"
   end
 
   create_table "sample_resource_links", id: :integer,  force: :cascade do |t|
@@ -2101,7 +2140,7 @@ ActiveRecord::Schema.define(version: 2021_10_15_152343) do
     t.index ["user_id", "can_view"], name: "index_w_auth_lookup_on_user_id_and_can_view"
   end
 
-  create_table "workflow_classes",  force: :cascade do |t|
+  create_table "workflow_classes", id: :integer,  force: :cascade do |t|
     t.string "title"
     t.text "description"
     t.string "key"

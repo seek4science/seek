@@ -77,20 +77,7 @@ class AssaysController < ApplicationController
 
     @assay.assay_class=AssayClass.for_type(@assay_class) unless @assay_class.nil?
 
-    investigations = Investigation.all.select(&:can_view?)
-    studies=[]
-    investigations.each do |i|
-      studies << i.studies.select(&:can_view?)
-    end
     respond_to do |format|
-      if investigations.blank?
-         flash.now[:notice] = "No #{t('study')} and #{t('investigation')} available, you have to create a new #{t('investigation')} first before creating your #{t('study')} and #{t('assays.assay')}!"
-      else
-        if studies.flatten.blank?
-          flash.now[:notice] = "No #{t('study')} available, you have to create a new #{t('study')} before creating your #{t('assays.assay')}!"
-        end
-      end
-
       format.html
       format.xml
     end
@@ -185,7 +172,7 @@ class AssaysController < ApplicationController
                                   { samples_attributes: [:asset_id, :direction] },
                                   { data_files_attributes: [:asset_id, :direction, :relationship_type_id] },
                                   { placeholders_attributes: [:asset_id, :direction, :relationship_type_id] },
-                                  { publication_ids: [] },				  	
+                                  { publication_ids: [] },
                                   { custom_metadata_attributes: determine_custom_metadata_keys },
 				  { discussion_links_attributes:[:id, :url, :label, :_destroy] }
                                   ).tap do |assay_params|

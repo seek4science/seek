@@ -1,3 +1,4 @@
+# Needed as normally the types are Seeded.
 Journal:
   title: Journal
   key: article

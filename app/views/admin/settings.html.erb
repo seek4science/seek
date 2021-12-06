@@ -14,6 +14,10 @@
     <%= admin_text_setting(:crossref_api_email, Seek::Config.crossref_api_email,
                            'CrossRef API email', "When adding a publication from a DOI, an email address is required to use the API. The email address needs registering at #{link_to 'http://www.crossref.org/', 'http://www.crossref.org/',:target=>:_blank}") %>
 
+    <%= admin_checkbox_setting(:allow_publications_fulltext, 1, Seek::Config.allow_publications_fulltext,
+                             "Allow uploading FullTexts", "Allow the registered users to upload Fulltext (pdf) for publications. They can also be made public. Please makes sure it is allowed first.") %>
+    <%= admin_checkbox_setting(:allow_edit_of_registered_publ, 1, Seek::Config.allow_edit_of_registered_publ,
+                             "Allow editing registered publications", "By default registered publication (from PubMed for instance) cannot be edited and should be changed at the source. If you need to curate your publication locally, you can allow the edition here.") %>
     <%= admin_text_setting(:bioportal_api_key, Seek::Config.bioportal_api_key,
                            'BioPortal API key', "Required to interact with BioPortal - for example when creating new Organisms through the NCBI Taxonomy. Please register with #{link_to 'http://bioportal.bioontology.org','http://bioportal.bioontology.org',:target=>:_blank} to get an API key.") %>
 

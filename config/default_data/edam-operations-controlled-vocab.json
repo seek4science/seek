@@ -1,0 +1,2678 @@
+{
+  "title": "EDAM Operations",
+  "description": "The Operations branch of the EDAM Ontology. EDAM is a simple ontology of well established, familiar concepts that are prevalent within bioinformatics, including types of data and data identifiers, data formats, operations and topics. EDAM provides a set of terms with synonyms and definitions - organised into an intuitive hierarchy for convenient use.",
+  "ols_root_term_uri": "http://edamontology.org/operation_0004",
+  "source_ontolgy": "edam",
+  "terms": [
+    {
+      "label": "Operation",
+      "iri": "http://edamontology.org/operation_0004",
+      "parent_iri": ""
+    },
+    {
+      "label": "Correlation",
+      "iri": "http://edamontology.org/operation_3465",
+      "parent_iri": "http://edamontology.org/operation_0004"
+    },
+    {
+      "label": "Expression correlation analysis",
+      "iri": "http://edamontology.org/operation_3463",
+      "parent_iri": "http://edamontology.org/operation_3465"
+    },
+    {
+      "label": "Sequence alignment analysis (site correlation)",
+      "iri": "http://edamontology.org/operation_0449",
+      "parent_iri": "http://edamontology.org/operation_3465"
+    },
+    {
+      "label": "Clustering",
+      "iri": "http://edamontology.org/operation_3432",
+      "parent_iri": "http://edamontology.org/operation_0004"
+    },
+    {
+      "label": "Sequence clustering",
+      "iri": "http://edamontology.org/operation_0291",
+      "parent_iri": "http://edamontology.org/operation_3432"
+    },
+    {
+      "label": "Functional clustering",
+      "iri": "http://edamontology.org/operation_3459",
+      "parent_iri": "http://edamontology.org/operation_0291"
+    },
+    {
+      "label": "Expression profile clustering",
+      "iri": "http://edamontology.org/operation_0313",
+      "parent_iri": "http://edamontology.org/operation_3432"
+    },
+    {
+      "label": "Document clustering",
+      "iri": "http://edamontology.org/operation_3279",
+      "parent_iri": "http://edamontology.org/operation_3432"
+    },
+    {
+      "label": "Structure clustering",
+      "iri": "http://edamontology.org/operation_2844",
+      "parent_iri": "http://edamontology.org/operation_3432"
+    },
+    {
+      "label": "Conversion",
+      "iri": "http://edamontology.org/operation_3434",
+      "parent_iri": "http://edamontology.org/operation_0004"
+    },
+    {
+      "label": "Sequence alignment conversion",
+      "iri": "http://edamontology.org/operation_0260",
+      "parent_iri": "http://edamontology.org/operation_3434"
+    },
+    {
+      "label": "Sequence coordinate conversion",
+      "iri": "http://edamontology.org/operation_3267",
+      "parent_iri": "http://edamontology.org/operation_3434"
+    },
+    {
+      "label": "Sequence conversion",
+      "iri": "http://edamontology.org/operation_0233",
+      "parent_iri": "http://edamontology.org/operation_3434"
+    },
+    {
+      "label": "DNA transcription",
+      "iri": "http://edamontology.org/operation_0372",
+      "parent_iri": "http://edamontology.org/operation_0233"
+    },
+    {
+      "label": "DNA translation",
+      "iri": "http://edamontology.org/operation_0371",
+      "parent_iri": "http://edamontology.org/operation_0233"
+    },
+    {
+      "label": "DNA back-translation",
+      "iri": "http://edamontology.org/operation_2510",
+      "parent_iri": "http://edamontology.org/operation_0233"
+    },
+    {
+      "label": "Calculation",
+      "iri": "http://edamontology.org/operation_3438",
+      "parent_iri": "http://edamontology.org/operation_0004"
+    },
+    {
+      "label": "Nucleic acid property calculation",
+      "iri": "http://edamontology.org/operation_0262",
+      "parent_iri": "http://edamontology.org/operation_3438"
+    },
+    {
+      "label": "Nucleic acid curvature calculation",
+      "iri": "http://edamontology.org/operation_0461",
+      "parent_iri": "http://edamontology.org/operation_0262"
+    },
+    {
+      "label": "Nucleic acid thermodynamic property calculation",
+      "iri": "http://edamontology.org/operation_0455",
+      "parent_iri": "http://edamontology.org/operation_0262"
+    },
+    {
+      "label": "Nucleic acid melting profile plotting",
+      "iri": "http://edamontology.org/operation_0456",
+      "parent_iri": "http://edamontology.org/operation_0262"
+    },
+    {
+      "label": "Nucleic acid temperature profile plotting",
+      "iri": "http://edamontology.org/operation_0460",
+      "parent_iri": "http://edamontology.org/operation_0456"
+    },
+    {
+      "label": "Nucleic acid probability profile plotting",
+      "iri": "http://edamontology.org/operation_0459",
+      "parent_iri": "http://edamontology.org/operation_0456"
+    },
+    {
+      "label": "Nucleic acid melting curve plotting",
+      "iri": "http://edamontology.org/operation_0458",
+      "parent_iri": "http://edamontology.org/operation_0456"
+    },
+    {
+      "label": "Nucleic acid stitch profile plotting",
+      "iri": "http://edamontology.org/operation_0457",
+      "parent_iri": "http://edamontology.org/operation_0456"
+    },
+    {
+      "label": "Restriction digest",
+      "iri": "http://edamontology.org/operation_0365",
+      "parent_iri": "http://edamontology.org/operation_0262"
+    },
+    {
+      "label": "Protein property calculation",
+      "iri": "http://edamontology.org/operation_0250",
+      "parent_iri": "http://edamontology.org/operation_3438"
+    },
+    {
+      "label": "Protein dipole moment calculation",
+      "iri": "http://edamontology.org/operation_0386",
+      "parent_iri": "http://edamontology.org/operation_0250"
+    },
+    {
+      "label": "Protein molecular weight calculation",
+      "iri": "http://edamontology.org/operation_0398",
+      "parent_iri": "http://edamontology.org/operation_0250"
+    },
+    {
+      "label": "Protein fragment weight comparison",
+      "iri": "http://edamontology.org/operation_2929",
+      "parent_iri": "http://edamontology.org/operation_0398"
+    },
+    {
+      "label": "Protein extinction coefficient calculation",
+      "iri": "http://edamontology.org/operation_0399",
+      "parent_iri": "http://edamontology.org/operation_0250"
+    },
+    {
+      "label": "Protein pKa calculation",
+      "iri": "http://edamontology.org/operation_0400",
+      "parent_iri": "http://edamontology.org/operation_0250"
+    },
+    {
+      "label": "Protein hydrogen exchange rate calculation",
+      "iri": "http://edamontology.org/operation_0404",
+      "parent_iri": "http://edamontology.org/operation_0400"
+    },
+    {
+      "label": "Protein isoelectric point calculation",
+      "iri": "http://edamontology.org/operation_0403",
+      "parent_iri": "http://edamontology.org/operation_0400"
+    },
+    {
+      "label": "Protein titration curve plotting",
+      "iri": "http://edamontology.org/operation_0402",
+      "parent_iri": "http://edamontology.org/operation_0400"
+    },
+    {
+      "label": "Peptide immunogenicity prediction",
+      "iri": "http://edamontology.org/operation_0252",
+      "parent_iri": "http://edamontology.org/operation_0250"
+    },
+    {
+      "label": "Residue contact prediction",
+      "iri": "http://edamontology.org/operation_0272",
+      "parent_iri": "http://edamontology.org/operation_0250"
+    },
+    {
+      "label": "Enzyme kinetics calculation",
+      "iri": "http://edamontology.org/operation_0334",
+      "parent_iri": "http://edamontology.org/operation_0250"
+    },
+    {
+      "label": "3D-1D scoring matrix generation",
+      "iri": "http://edamontology.org/operation_2239",
+      "parent_iri": "http://edamontology.org/operation_0250"
+    },
+    {
+      "label": "Protein hydropathy calculation",
+      "iri": "http://edamontology.org/operation_2574",
+      "parent_iri": "http://edamontology.org/operation_0250"
+    },
+    {
+      "label": "Protein crystallizability prediction",
+      "iri": "http://edamontology.org/operation_0410",
+      "parent_iri": "http://edamontology.org/operation_2574"
+    },
+    {
+      "label": "Protein aliphatic index calculation",
+      "iri": "http://edamontology.org/operation_0406",
+      "parent_iri": "http://edamontology.org/operation_2574"
+    },
+    {
+      "label": "Protein hydrophobic region calculation",
+      "iri": "http://edamontology.org/operation_0405",
+      "parent_iri": "http://edamontology.org/operation_2574"
+    },
+    {
+      "label": "Protein globularity prediction",
+      "iri": "http://edamontology.org/operation_0408",
+      "parent_iri": "http://edamontology.org/operation_2574"
+    },
+    {
+      "label": "Protein hydrophobic moment plotting",
+      "iri": "http://edamontology.org/operation_0407",
+      "parent_iri": "http://edamontology.org/operation_2574"
+    },
+    {
+      "label": "Protein solubility prediction",
+      "iri": "http://edamontology.org/operation_0409",
+      "parent_iri": "http://edamontology.org/operation_2574"
+    },
+    {
+      "label": "Spectrum calculation",
+      "iri": "http://edamontology.org/operation_3860",
+      "parent_iri": "http://edamontology.org/operation_0250"
+    },
+    {
+      "label": "Simulation analysis",
+      "iri": "http://edamontology.org/operation_0244",
+      "parent_iri": "http://edamontology.org/operation_0250"
+    },
+    {
+      "label": "Essential dynamics",
+      "iri": "http://edamontology.org/operation_3891",
+      "parent_iri": "http://edamontology.org/operation_0244"
+    },
+    {
+      "label": "Protein geometry calculation",
+      "iri": "http://edamontology.org/operation_0249",
+      "parent_iri": "http://edamontology.org/operation_0250"
+    },
+    {
+      "label": "Ramachandran plot calculation",
+      "iri": "http://edamontology.org/operation_0396",
+      "parent_iri": "http://edamontology.org/operation_0249"
+    },
+    {
+      "label": "Residue interaction calculation",
+      "iri": "http://edamontology.org/operation_0248",
+      "parent_iri": "http://edamontology.org/operation_0250"
+    },
+    {
+      "label": "Hydrogen bond calculation",
+      "iri": "http://edamontology.org/operation_0394",
+      "parent_iri": "http://edamontology.org/operation_0248"
+    },
+    {
+      "label": "Residue distance calculation",
+      "iri": "http://edamontology.org/operation_2950",
+      "parent_iri": "http://edamontology.org/operation_0248"
+    },
+    {
+      "label": "Protein distance matrix calculation",
+      "iri": "http://edamontology.org/operation_0391",
+      "parent_iri": "http://edamontology.org/operation_2950"
+    },
+    {
+      "label": "Contact map calculation",
+      "iri": "http://edamontology.org/operation_0392",
+      "parent_iri": "http://edamontology.org/operation_0391"
+    },
+    {
+      "label": "Residue cluster calculation",
+      "iri": "http://edamontology.org/operation_0393",
+      "parent_iri": "http://edamontology.org/operation_2950"
+    },
+    {
+      "label": "Protein-metal contact calculation",
+      "iri": "http://edamontology.org/operation_1834",
+      "parent_iri": "http://edamontology.org/operation_0248"
+    },
+    {
+      "label": "Metal-bound cysteine detection",
+      "iri": "http://edamontology.org/operation_1831",
+      "parent_iri": "http://edamontology.org/operation_0248"
+    },
+    {
+      "label": "Salt bridge calculation",
+      "iri": "http://edamontology.org/operation_1839",
+      "parent_iri": "http://edamontology.org/operation_0248"
+    },
+    {
+      "label": "Statistical calculation",
+      "iri": "http://edamontology.org/operation_2238",
+      "parent_iri": "http://edamontology.org/operation_3438"
+    },
+    {
+      "label": "Standardisation and normalisation",
+      "iri": "http://edamontology.org/operation_3435",
+      "parent_iri": "http://edamontology.org/operation_2238"
+    },
+    {
+      "label": "Regression analysis",
+      "iri": "http://edamontology.org/operation_3659",
+      "parent_iri": "http://edamontology.org/operation_2238"
+    },
+    {
+      "label": "Statistical inference",
+      "iri": "http://edamontology.org/operation_3658",
+      "parent_iri": "http://edamontology.org/operation_2238"
+    },
+    {
+      "label": "Statistical modelling",
+      "iri": "http://edamontology.org/operation_3664",
+      "parent_iri": "http://edamontology.org/operation_2238"
+    },
+    {
+      "label": "Imputation",
+      "iri": "http://edamontology.org/operation_3557",
+      "parent_iri": "http://edamontology.org/operation_2238"
+    },
+    {
+      "label": "Principal component analysis",
+      "iri": "http://edamontology.org/operation_3960",
+      "parent_iri": "http://edamontology.org/operation_2238"
+    },
+    {
+      "label": "Isotopic distributions calculation",
+      "iri": "http://edamontology.org/operation_3632",
+      "parent_iri": "http://edamontology.org/operation_3438"
+    },
+    {
+      "label": "Retention time prediction",
+      "iri": "http://edamontology.org/operation_3633",
+      "parent_iri": "http://edamontology.org/operation_3438"
+    },
+    {
+      "label": "Dimensionality reduction",
+      "iri": "http://edamontology.org/operation_3935",
+      "parent_iri": "http://edamontology.org/operation_3438"
+    },
+    {
+      "label": "Feature selection",
+      "iri": "http://edamontology.org/operation_3936",
+      "parent_iri": "http://edamontology.org/operation_3935"
+    },
+    {
+      "label": "Feature extraction",
+      "iri": "http://edamontology.org/operation_3937",
+      "parent_iri": "http://edamontology.org/operation_3935"
+    },
+    {
+      "label": "Rarefaction",
+      "iri": "http://edamontology.org/operation_3797",
+      "parent_iri": "http://edamontology.org/operation_3438"
+    },
+    {
+      "label": "Sequence composition calculation",
+      "iri": "http://edamontology.org/operation_0236",
+      "parent_iri": "http://edamontology.org/operation_3438"
+    },
+    {
+      "label": "k-mer counting",
+      "iri": "http://edamontology.org/operation_3472",
+      "parent_iri": "http://edamontology.org/operation_0236"
+    },
+    {
+      "label": "Repeat sequence organisation analysis",
+      "iri": "http://edamontology.org/operation_0380",
+      "parent_iri": "http://edamontology.org/operation_0236"
+    },
+    {
+      "label": "Nucleic acid density plotting",
+      "iri": "http://edamontology.org/operation_2284",
+      "parent_iri": "http://edamontology.org/operation_0236"
+    },
+    {
+      "label": "Sequence ambiguity calculation",
+      "iri": "http://edamontology.org/operation_0235",
+      "parent_iri": "http://edamontology.org/operation_0236"
+    },
+    {
+      "label": "Sequence complexity calculation",
+      "iri": "http://edamontology.org/operation_0234",
+      "parent_iri": "http://edamontology.org/operation_0236"
+    },
+    {
+      "label": "Generation",
+      "iri": "http://edamontology.org/operation_3429",
+      "parent_iri": "http://edamontology.org/operation_0004"
+    },
+    {
+      "label": "Probabilistic data generation",
+      "iri": "http://edamontology.org/operation_3480",
+      "parent_iri": "http://edamontology.org/operation_3429"
+    },
+    {
+      "label": "Probabilistic sequence generation",
+      "iri": "http://edamontology.org/operation_3481",
+      "parent_iri": "http://edamontology.org/operation_3480"
+    },
+    {
+      "label": "RNA structure covariance model generation",
+      "iri": "http://edamontology.org/operation_3469",
+      "parent_iri": "http://edamontology.org/operation_3429"
+    },
+    {
+      "label": "3D profile generation",
+      "iri": "http://edamontology.org/operation_0297",
+      "parent_iri": "http://edamontology.org/operation_3429"
+    },
+    {
+      "label": "Sequence profile generation",
+      "iri": "http://edamontology.org/operation_0296",
+      "parent_iri": "http://edamontology.org/operation_3429"
+    },
+    {
+      "label": "Sequence checksum generation",
+      "iri": "http://edamontology.org/operation_3348",
+      "parent_iri": "http://edamontology.org/operation_3429"
+    },
+    {
+      "label": "Bibliography generation",
+      "iri": "http://edamontology.org/operation_3349",
+      "parent_iri": "http://edamontology.org/operation_3429"
+    },
+    {
+      "label": "Codon usage table generation",
+      "iri": "http://edamontology.org/operation_0284",
+      "parent_iri": "http://edamontology.org/operation_3429"
+    },
+    {
+      "label": "Sequence distance matrix generation",
+      "iri": "http://edamontology.org/operation_0289",
+      "parent_iri": "http://edamontology.org/operation_3429"
+    },
+    {
+      "label": "Phylogenetic inference",
+      "iri": "http://edamontology.org/operation_0323",
+      "parent_iri": "http://edamontology.org/operation_3429"
+    },
+    {
+      "label": "Phylogenetic reconstruction",
+      "iri": "http://edamontology.org/operation_3478",
+      "parent_iri": "http://edamontology.org/operation_0323"
+    },
+    {
+      "label": "Phylogenetic footprinting",
+      "iri": "http://edamontology.org/operation_0327",
+      "parent_iri": "http://edamontology.org/operation_0323"
+    },
+    {
+      "label": "Species tree construction",
+      "iri": "http://edamontology.org/operation_0544",
+      "parent_iri": "http://edamontology.org/operation_0323"
+    },
+    {
+      "label": "Phylogenetic inference (data centric)",
+      "iri": "http://edamontology.org/operation_0538",
+      "parent_iri": "http://edamontology.org/operation_0323"
+    },
+    {
+      "label": "Phylogenetic inference (from continuous quantitative characters)",
+      "iri": "http://edamontology.org/operation_0541",
+      "parent_iri": "http://edamontology.org/operation_0538"
+    },
+    {
+      "label": "Phylogenetic inference (from molecular sequences)",
+      "iri": "http://edamontology.org/operation_0540",
+      "parent_iri": "http://edamontology.org/operation_0538"
+    },
+    {
+      "label": "Phylogenetic inference (from polymorphism data)",
+      "iri": "http://edamontology.org/operation_0543",
+      "parent_iri": "http://edamontology.org/operation_0538"
+    },
+    {
+      "label": "Phylogenetic inference (from gene frequencies)",
+      "iri": "http://edamontology.org/operation_0542",
+      "parent_iri": "http://edamontology.org/operation_0538"
+    },
+    {
+      "label": "Phylogenetic inference (method centric)",
+      "iri": "http://edamontology.org/operation_0539",
+      "parent_iri": "http://edamontology.org/operation_0323"
+    },
+    {
+      "label": "Phylogenetic inference (maximum likelihood and Bayesian methods)",
+      "iri": "http://edamontology.org/operation_0547",
+      "parent_iri": "http://edamontology.org/operation_0539"
+    },
+    {
+      "label": "Phylogenetic inference (minimum distance methods)",
+      "iri": "http://edamontology.org/operation_0546",
+      "parent_iri": "http://edamontology.org/operation_0539"
+    },
+    {
+      "label": "Phylogenetic inference (AI methods)",
+      "iri": "http://edamontology.org/operation_0549",
+      "parent_iri": "http://edamontology.org/operation_0539"
+    },
+    {
+      "label": "Phylogenetic inference (quartet methods)",
+      "iri": "http://edamontology.org/operation_0548",
+      "parent_iri": "http://edamontology.org/operation_0539"
+    },
+    {
+      "label": "Phylogenetic inference (parsimony methods)",
+      "iri": "http://edamontology.org/operation_0545",
+      "parent_iri": "http://edamontology.org/operation_0539"
+    },
+    {
+      "label": "Gene tree construction",
+      "iri": "http://edamontology.org/operation_0553",
+      "parent_iri": "http://edamontology.org/operation_0323"
+    },
+    {
+      "label": "Consensus tree construction",
+      "iri": "http://edamontology.org/operation_0555",
+      "parent_iri": "http://edamontology.org/operation_0323"
+    },
+    {
+      "label": "Alignment",
+      "iri": "http://edamontology.org/operation_2928",
+      "parent_iri": "http://edamontology.org/operation_3429"
+    },
+    {
+      "label": "Sequence alignment",
+      "iri": "http://edamontology.org/operation_0292",
+      "parent_iri": "http://edamontology.org/operation_2928"
+    },
+    {
+      "label": "Structure-based sequence alignment",
+      "iri": "http://edamontology.org/operation_0294",
+      "parent_iri": "http://edamontology.org/operation_0292"
+    },
+    {
+      "label": "Sequence profile alignment",
+      "iri": "http://edamontology.org/operation_0300",
+      "parent_iri": "http://edamontology.org/operation_0292"
+    },
+    {
+      "label": "Local alignment",
+      "iri": "http://edamontology.org/operation_0495",
+      "parent_iri": "http://edamontology.org/operation_0292"
+    },
+    {
+      "label": "Global alignment",
+      "iri": "http://edamontology.org/operation_0496",
+      "parent_iri": "http://edamontology.org/operation_0292"
+    },
+    {
+      "label": "Pairwise sequence alignment",
+      "iri": "http://edamontology.org/operation_0491",
+      "parent_iri": "http://edamontology.org/operation_0292"
+    },
+    {
+      "label": "Multiple sequence alignment",
+      "iri": "http://edamontology.org/operation_0492",
+      "parent_iri": "http://edamontology.org/operation_0292"
+    },
+    {
+      "label": "Tree-based sequence alignment",
+      "iri": "http://edamontology.org/operation_0499",
+      "parent_iri": "http://edamontology.org/operation_0292"
+    },
+    {
+      "label": "Genome alignment",
+      "iri": "http://edamontology.org/operation_3182",
+      "parent_iri": "http://edamontology.org/operation_0292"
+    },
+    {
+      "label": "Structure alignment",
+      "iri": "http://edamontology.org/operation_0295",
+      "parent_iri": "http://edamontology.org/operation_2928"
+    },
+    {
+      "label": "Pairwise structure alignment",
+      "iri": "http://edamontology.org/operation_0503",
+      "parent_iri": "http://edamontology.org/operation_0295"
+    },
+    {
+      "label": "Multiple structure alignment",
+      "iri": "http://edamontology.org/operation_0504",
+      "parent_iri": "http://edamontology.org/operation_0295"
+    },
+    {
+      "label": "Local structure alignment",
+      "iri": "http://edamontology.org/operation_0509",
+      "parent_iri": "http://edamontology.org/operation_0295"
+    },
+    {
+      "label": "Global structure alignment",
+      "iri": "http://edamontology.org/operation_0510",
+      "parent_iri": "http://edamontology.org/operation_0295"
+    },
+    {
+      "label": "Fold recognition",
+      "iri": "http://edamontology.org/operation_0303",
+      "parent_iri": "http://edamontology.org/operation_2928"
+    },
+    {
+      "label": "Protein threading",
+      "iri": "http://edamontology.org/operation_0302",
+      "parent_iri": "http://edamontology.org/operation_0303"
+    },
+    {
+      "label": "Heat map generation",
+      "iri": "http://edamontology.org/operation_0531",
+      "parent_iri": "http://edamontology.org/operation_3429"
+    },
+    {
+      "label": "RNA secondary structure alignment",
+      "iri": "http://edamontology.org/operation_0502",
+      "parent_iri": "http://edamontology.org/operation_3429"
+    },
+    {
+      "label": "Scaffolding",
+      "iri": "http://edamontology.org/operation_3216",
+      "parent_iri": "http://edamontology.org/operation_3429"
+    },
+    {
+      "label": "Scaffold gap completion",
+      "iri": "http://edamontology.org/operation_3217",
+      "parent_iri": "http://edamontology.org/operation_3216"
+    },
+    {
+      "label": "Sequence generation",
+      "iri": "http://edamontology.org/operation_0230",
+      "parent_iri": "http://edamontology.org/operation_3429"
+    },
+    {
+      "label": "Reverse complement",
+      "iri": "http://edamontology.org/operation_0363",
+      "parent_iri": "http://edamontology.org/operation_0230"
+    },
+    {
+      "label": "Random sequence generation",
+      "iri": "http://edamontology.org/operation_0364",
+      "parent_iri": "http://edamontology.org/operation_0230"
+    },
+    {
+      "label": "Protein sequence cleavage",
+      "iri": "http://edamontology.org/operation_0366",
+      "parent_iri": "http://edamontology.org/operation_0230"
+    },
+    {
+      "label": "de Novo sequencing",
+      "iri": "http://edamontology.org/operation_3644",
+      "parent_iri": "http://edamontology.org/operation_0230"
+    },
+    {
+      "label": "Base-calling",
+      "iri": "http://edamontology.org/operation_3185",
+      "parent_iri": "http://edamontology.org/operation_0230"
+    },
+    {
+      "label": "Classification",
+      "iri": "http://edamontology.org/operation_2990",
+      "parent_iri": "http://edamontology.org/operation_0004"
+    },
+    {
+      "label": "Single particle alignment and classification",
+      "iri": "http://edamontology.org/operation_3458",
+      "parent_iri": "http://edamontology.org/operation_2990"
+    },
+    {
+      "label": "Sequence classification",
+      "iri": "http://edamontology.org/operation_2995",
+      "parent_iri": "http://edamontology.org/operation_2990"
+    },
+    {
+      "label": "Taxonomic classification",
+      "iri": "http://edamontology.org/operation_3460",
+      "parent_iri": "http://edamontology.org/operation_2995"
+    },
+    {
+      "label": "Variant classification",
+      "iri": "http://edamontology.org/operation_3225",
+      "parent_iri": "http://edamontology.org/operation_2995"
+    },
+    {
+      "label": "Structure classification",
+      "iri": "http://edamontology.org/operation_2996",
+      "parent_iri": "http://edamontology.org/operation_2990"
+    },
+    {
+      "label": "Protein architecture recognition",
+      "iri": "http://edamontology.org/operation_2475",
+      "parent_iri": "http://edamontology.org/operation_2996"
+    },
+    {
+      "label": "Visualisation",
+      "iri": "http://edamontology.org/operation_0337",
+      "parent_iri": "http://edamontology.org/operation_0004"
+    },
+    {
+      "label": "Incident curve plotting",
+      "iri": "http://edamontology.org/operation_3503",
+      "parent_iri": "http://edamontology.org/operation_0337"
+    },
+    {
+      "label": "Scatter plot plotting",
+      "iri": "http://edamontology.org/operation_2940",
+      "parent_iri": "http://edamontology.org/operation_0337"
+    },
+    {
+      "label": "Box-Whisker plot plotting",
+      "iri": "http://edamontology.org/operation_2943",
+      "parent_iri": "http://edamontology.org/operation_0337"
+    },
+    {
+      "label": "Principal component visualisation",
+      "iri": "http://edamontology.org/operation_2939",
+      "parent_iri": "http://edamontology.org/operation_0337"
+    },
+    {
+      "label": "Mass spectrum visualisation",
+      "iri": "http://edamontology.org/operation_3694",
+      "parent_iri": "http://edamontology.org/operation_0337"
+    },
+    {
+      "label": "Multiple sample visualisation",
+      "iri": "http://edamontology.org/operation_3744",
+      "parent_iri": "http://edamontology.org/operation_0337"
+    },
+    {
+      "label": "Microscope image visualisation",
+      "iri": "http://edamontology.org/operation_3552",
+      "parent_iri": "http://edamontology.org/operation_0337"
+    },
+    {
+      "label": "Ontology visualisation",
+      "iri": "http://edamontology.org/operation_3559",
+      "parent_iri": "http://edamontology.org/operation_0337"
+    },
+    {
+      "label": "Expression data visualisation",
+      "iri": "http://edamontology.org/operation_0571",
+      "parent_iri": "http://edamontology.org/operation_0337"
+    },
+    {
+      "label": "Treemap visualisation",
+      "iri": "http://edamontology.org/operation_2942",
+      "parent_iri": "http://edamontology.org/operation_0571"
+    },
+    {
+      "label": "Clustering profile plotting",
+      "iri": "http://edamontology.org/operation_2935",
+      "parent_iri": "http://edamontology.org/operation_0571"
+    },
+    {
+      "label": "Proximity map plotting",
+      "iri": "http://edamontology.org/operation_2937",
+      "parent_iri": "http://edamontology.org/operation_0571"
+    },
+    {
+      "label": "Dendrogram visualisation",
+      "iri": "http://edamontology.org/operation_2938",
+      "parent_iri": "http://edamontology.org/operation_0571"
+    },
+    {
+      "label": "Map drawing",
+      "iri": "http://edamontology.org/operation_0573",
+      "parent_iri": "http://edamontology.org/operation_0337"
+    },
+    {
+      "label": "Operon drawing",
+      "iri": "http://edamontology.org/operation_0579",
+      "parent_iri": "http://edamontology.org/operation_0573"
+    },
+    {
+      "label": "Restriction map drawing",
+      "iri": "http://edamontology.org/operation_0575",
+      "parent_iri": "http://edamontology.org/operation_0573"
+    },
+    {
+      "label": "Plasmid map drawing",
+      "iri": "http://edamontology.org/operation_0578",
+      "parent_iri": "http://edamontology.org/operation_0573"
+    },
+    {
+      "label": "Structure visualisation",
+      "iri": "http://edamontology.org/operation_0570",
+      "parent_iri": "http://edamontology.org/operation_0337"
+    },
+    {
+      "label": "Transmembrane protein visualisation",
+      "iri": "http://edamontology.org/operation_2241",
+      "parent_iri": "http://edamontology.org/operation_0570"
+    },
+    {
+      "label": "Surface rendering",
+      "iri": "http://edamontology.org/operation_1816",
+      "parent_iri": "http://edamontology.org/operation_0570"
+    },
+    {
+      "label": "Trajectory visualization",
+      "iri": "http://edamontology.org/operation_3890",
+      "parent_iri": "http://edamontology.org/operation_0570"
+    },
+    {
+      "label": "Helical wheel drawing",
+      "iri": "http://edamontology.org/operation_2485",
+      "parent_iri": "http://edamontology.org/operation_0570"
+    },
+    {
+      "label": "Topology diagram drawing",
+      "iri": "http://edamontology.org/operation_2486",
+      "parent_iri": "http://edamontology.org/operation_0570"
+    },
+    {
+      "label": "Sequence visualisation",
+      "iri": "http://edamontology.org/operation_0564",
+      "parent_iri": "http://edamontology.org/operation_0337"
+    },
+    {
+      "label": "Base position variability plotting",
+      "iri": "http://edamontology.org/operation_0287",
+      "parent_iri": "http://edamontology.org/operation_0564"
+    },
+    {
+      "label": "Dot plot plotting",
+      "iri": "http://edamontology.org/operation_0490",
+      "parent_iri": "http://edamontology.org/operation_0564"
+    },
+    {
+      "label": "Genome visualisation",
+      "iri": "http://edamontology.org/operation_3208",
+      "parent_iri": "http://edamontology.org/operation_0564"
+    },
+    {
+      "label": "Sequence assembly visualisation",
+      "iri": "http://edamontology.org/operation_3184",
+      "parent_iri": "http://edamontology.org/operation_0564"
+    },
+    {
+      "label": "Phylogenetic tree visualisation",
+      "iri": "http://edamontology.org/operation_0567",
+      "parent_iri": "http://edamontology.org/operation_0337"
+    },
+    {
+      "label": "Sequence cluster visualisation",
+      "iri": "http://edamontology.org/operation_0566",
+      "parent_iri": "http://edamontology.org/operation_0337"
+    },
+    {
+      "label": "Network visualisation",
+      "iri": "http://edamontology.org/operation_3925",
+      "parent_iri": "http://edamontology.org/operation_0337"
+    },
+    {
+      "label": "Pathway visualisation",
+      "iri": "http://edamontology.org/operation_3926",
+      "parent_iri": "http://edamontology.org/operation_0337"
+    },
+    {
+      "label": "Chromatogram visualisation",
+      "iri": "http://edamontology.org/operation_3203",
+      "parent_iri": "http://edamontology.org/operation_0337"
+    },
+    {
+      "label": "Analysis",
+      "iri": "http://edamontology.org/operation_2945",
+      "parent_iri": "http://edamontology.org/operation_0004"
+    },
+    {
+      "label": "Image analysis",
+      "iri": "http://edamontology.org/operation_3443",
+      "parent_iri": "http://edamontology.org/operation_2945"
+    },
+    {
+      "label": "Neurite measurement",
+      "iri": "http://edamontology.org/operation_3450",
+      "parent_iri": "http://edamontology.org/operation_3443"
+    },
+    {
+      "label": "Single particle analysis",
+      "iri": "http://edamontology.org/operation_3457",
+      "parent_iri": "http://edamontology.org/operation_3443"
+    },
+    {
+      "label": "Cell migration analysis",
+      "iri": "http://edamontology.org/operation_3446",
+      "parent_iri": "http://edamontology.org/operation_3443"
+    },
+    {
+      "label": "Enrichment analysis",
+      "iri": "http://edamontology.org/operation_3501",
+      "parent_iri": "http://edamontology.org/operation_2945"
+    },
+    {
+      "label": "Chemical similarity enrichment",
+      "iri": "http://edamontology.org/operation_3502",
+      "parent_iri": "http://edamontology.org/operation_3501"
+    },
+    {
+      "label": "Gene-set enrichment analysis",
+      "iri": "http://edamontology.org/operation_2436",
+      "parent_iri": "http://edamontology.org/operation_3501"
+    },
+    {
+      "label": "Protein function prediction",
+      "iri": "http://edamontology.org/operation_1777",
+      "parent_iri": "http://edamontology.org/operation_2945"
+    },
+    {
+      "label": "Protein-nucleic acid interaction analysis",
+      "iri": "http://edamontology.org/operation_0389",
+      "parent_iri": "http://edamontology.org/operation_1777"
+    },
+    {
+      "label": "RNA-binding protein prediction",
+      "iri": "http://edamontology.org/operation_3901",
+      "parent_iri": "http://edamontology.org/operation_0389"
+    },
+    {
+      "label": "DNA-binding protein prediction",
+      "iri": "http://edamontology.org/operation_3900",
+      "parent_iri": "http://edamontology.org/operation_0389"
+    },
+    {
+      "label": "Molecular docking",
+      "iri": "http://edamontology.org/operation_0478",
+      "parent_iri": "http://edamontology.org/operation_1777"
+    },
+    {
+      "label": "Protein-ligand docking",
+      "iri": "http://edamontology.org/operation_0482",
+      "parent_iri": "http://edamontology.org/operation_0478"
+    },
+    {
+      "label": "Virtual screening",
+      "iri": "http://edamontology.org/operation_3938",
+      "parent_iri": "http://edamontology.org/operation_0482"
+    },
+    {
+      "label": "Protein-protein docking",
+      "iri": "http://edamontology.org/operation_3899",
+      "parent_iri": "http://edamontology.org/operation_0478"
+    },
+    {
+      "label": "Protein signal peptide detection",
+      "iri": "http://edamontology.org/operation_0418",
+      "parent_iri": "http://edamontology.org/operation_1777"
+    },
+    {
+      "label": "Protein function comparison",
+      "iri": "http://edamontology.org/operation_1778",
+      "parent_iri": "http://edamontology.org/operation_1777"
+    },
+    {
+      "label": "Protein-protein interaction analysis",
+      "iri": "http://edamontology.org/operation_2949",
+      "parent_iri": "http://edamontology.org/operation_1777"
+    },
+    {
+      "label": "Protein interaction network analysis",
+      "iri": "http://edamontology.org/operation_0276",
+      "parent_iri": "http://edamontology.org/operation_2949"
+    },
+    {
+      "label": "Protein interaction network prediction",
+      "iri": "http://edamontology.org/operation_3094",
+      "parent_iri": "http://edamontology.org/operation_2949"
+    },
+    {
+      "label": "Protein interaction prediction",
+      "iri": "http://edamontology.org/operation_2492",
+      "parent_iri": "http://edamontology.org/operation_2949"
+    },
+    {
+      "label": "Binding site prediction",
+      "iri": "http://edamontology.org/operation_2575",
+      "parent_iri": "http://edamontology.org/operation_1777"
+    },
+    {
+      "label": "Nucleic acids-binding site prediction",
+      "iri": "http://edamontology.org/operation_0420",
+      "parent_iri": "http://edamontology.org/operation_2575"
+    },
+    {
+      "label": "RNA binding site prediction",
+      "iri": "http://edamontology.org/operation_3902",
+      "parent_iri": "http://edamontology.org/operation_0420"
+    },
+    {
+      "label": "DNA binding site prediction",
+      "iri": "http://edamontology.org/operation_3903",
+      "parent_iri": "http://edamontology.org/operation_0420"
+    },
+    {
+      "label": "Active site prediction",
+      "iri": "http://edamontology.org/operation_3896",
+      "parent_iri": "http://edamontology.org/operation_2575"
+    },
+    {
+      "label": "Ligand-binding site prediction",
+      "iri": "http://edamontology.org/operation_3897",
+      "parent_iri": "http://edamontology.org/operation_2575"
+    },
+    {
+      "label": "Metal-binding site prediction",
+      "iri": "http://edamontology.org/operation_3898",
+      "parent_iri": "http://edamontology.org/operation_2575"
+    },
+    {
+      "label": "Protein-protein binding site prediction",
+      "iri": "http://edamontology.org/operation_2464",
+      "parent_iri": "http://edamontology.org/operation_2575"
+    },
+    {
+      "label": "Subcellular localisation prediction",
+      "iri": "http://edamontology.org/operation_2489",
+      "parent_iri": "http://edamontology.org/operation_1777"
+    },
+    {
+      "label": "Transmembrane protein analysis",
+      "iri": "http://edamontology.org/operation_0270",
+      "parent_iri": "http://edamontology.org/operation_2945"
+    },
+    {
+      "label": "Transmembrane protein prediction",
+      "iri": "http://edamontology.org/operation_0269",
+      "parent_iri": "http://edamontology.org/operation_0270"
+    },
+    {
+      "label": "Text mining",
+      "iri": "http://edamontology.org/operation_0306",
+      "parent_iri": "http://edamontology.org/operation_2945"
+    },
+    {
+      "label": "Relation extraction",
+      "iri": "http://edamontology.org/operation_3625",
+      "parent_iri": "http://edamontology.org/operation_0306"
+    },
+    {
+      "label": "Information extraction",
+      "iri": "http://edamontology.org/operation_3907",
+      "parent_iri": "http://edamontology.org/operation_0306"
+    },
+    {
+      "label": "Named-entity and concept recognition",
+      "iri": "http://edamontology.org/operation_3280",
+      "parent_iri": "http://edamontology.org/operation_3907"
+    },
+    {
+      "label": "Information retrieval",
+      "iri": "http://edamontology.org/operation_3908",
+      "parent_iri": "http://edamontology.org/operation_0306"
+    },
+    {
+      "label": "Data retrieval",
+      "iri": "http://edamontology.org/operation_2422",
+      "parent_iri": "http://edamontology.org/operation_3908"
+    },
+    {
+      "label": "Phylogenetic analysis",
+      "iri": "http://edamontology.org/operation_0324",
+      "parent_iri": "http://edamontology.org/operation_2945"
+    },
+    {
+      "label": "Phylogenetic tree editing",
+      "iri": "http://edamontology.org/operation_0326",
+      "parent_iri": "http://edamontology.org/operation_0324"
+    },
+    {
+      "label": "Phylogenetic tree comparison",
+      "iri": "http://edamontology.org/operation_0325",
+      "parent_iri": "http://edamontology.org/operation_0324"
+    },
+    {
+      "label": "Phylogenetic tree distances calculation",
+      "iri": "http://edamontology.org/operation_0557",
+      "parent_iri": "http://edamontology.org/operation_0325"
+    },
+    {
+      "label": "Phylogenetic sub/super tree construction",
+      "iri": "http://edamontology.org/operation_0556",
+      "parent_iri": "http://edamontology.org/operation_0325"
+    },
+    {
+      "label": "Phylogenetic tree reconciliation",
+      "iri": "http://edamontology.org/operation_3947",
+      "parent_iri": "http://edamontology.org/operation_0325"
+    },
+    {
+      "label": "Ancestral reconstruction",
+      "iri": "http://edamontology.org/operation_3745",
+      "parent_iri": "http://edamontology.org/operation_0324"
+    },
+    {
+      "label": "Phylogenetic tree bootstrapping",
+      "iri": "http://edamontology.org/operation_0552",
+      "parent_iri": "http://edamontology.org/operation_0324"
+    },
+    {
+      "label": "Phylogenetic tree topology analysis",
+      "iri": "http://edamontology.org/operation_0551",
+      "parent_iri": "http://edamontology.org/operation_0324"
+    },
+    {
+      "label": "Allele frequency distribution analysis",
+      "iri": "http://edamontology.org/operation_0554",
+      "parent_iri": "http://edamontology.org/operation_0324"
+    },
+    {
+      "label": "Tree dating",
+      "iri": "http://edamontology.org/operation_3942",
+      "parent_iri": "http://edamontology.org/operation_0324"
+    },
+    {
+      "label": "Sequence analysis",
+      "iri": "http://edamontology.org/operation_2403",
+      "parent_iri": "http://edamontology.org/operation_2945"
+    },
+    {
+      "label": "Antimicrobial resistance prediction",
+      "iri": "http://edamontology.org/operation_3482",
+      "parent_iri": "http://edamontology.org/operation_2403"
+    },
+    {
+      "label": "Sequence file editing",
+      "iri": "http://edamontology.org/operation_2121",
+      "parent_iri": "http://edamontology.org/operation_2403"
+    },
+    {
+      "label": "Virulence prediction",
+      "iri": "http://edamontology.org/operation_3461",
+      "parent_iri": "http://edamontology.org/operation_2403"
+    },
+    {
+      "label": "Sequence feature detection",
+      "iri": "http://edamontology.org/operation_0253",
+      "parent_iri": "http://edamontology.org/operation_2403"
+    },
+    {
+      "label": "Sequence motif recognition",
+      "iri": "http://edamontology.org/operation_0239",
+      "parent_iri": "http://edamontology.org/operation_0253"
+    },
+    {
+      "label": "Sequence motif discovery",
+      "iri": "http://edamontology.org/operation_0238",
+      "parent_iri": "http://edamontology.org/operation_0253"
+    },
+    {
+      "label": "Sequence feature comparison",
+      "iri": "http://edamontology.org/operation_0256",
+      "parent_iri": "http://edamontology.org/operation_2403"
+    },
+    {
+      "label": "Genome feature comparison",
+      "iri": "http://edamontology.org/operation_3194",
+      "parent_iri": "http://edamontology.org/operation_0256"
+    },
+    {
+      "label": "Sequence alignment analysis",
+      "iri": "http://edamontology.org/operation_0258",
+      "parent_iri": "http://edamontology.org/operation_2403"
+    },
+    {
+      "label": "Sequence alignment analysis (conservation)",
+      "iri": "http://edamontology.org/operation_0448",
+      "parent_iri": "http://edamontology.org/operation_0258"
+    },
+    {
+      "label": "Sequence alignment validation",
+      "iri": "http://edamontology.org/operation_0447",
+      "parent_iri": "http://edamontology.org/operation_0258"
+    },
+    {
+      "label": "Sequence alignment refinement",
+      "iri": "http://edamontology.org/operation_2089",
+      "parent_iri": "http://edamontology.org/operation_0258"
+    },
+    {
+      "label": "Sequence alignment comparison",
+      "iri": "http://edamontology.org/operation_0259",
+      "parent_iri": "http://edamontology.org/operation_0258"
+    },
+    {
+      "label": "Sequence database search",
+      "iri": "http://edamontology.org/operation_0338",
+      "parent_iri": "http://edamontology.org/operation_2403"
+    },
+    {
+      "label": "Sequence database search (by property)",
+      "iri": "http://edamontology.org/operation_0349",
+      "parent_iri": "http://edamontology.org/operation_0338"
+    },
+    {
+      "label": "Sequence similarity search",
+      "iri": "http://edamontology.org/operation_0346",
+      "parent_iri": "http://edamontology.org/operation_0338"
+    },
+    {
+      "label": "Sequence motif analysis",
+      "iri": "http://edamontology.org/operation_2404",
+      "parent_iri": "http://edamontology.org/operation_2403"
+    },
+    {
+      "label": "Sequence motif comparison",
+      "iri": "http://edamontology.org/operation_0240",
+      "parent_iri": "http://edamontology.org/operation_2404"
+    },
+    {
+      "label": "Nucleic acid sequence analysis",
+      "iri": "http://edamontology.org/operation_2478",
+      "parent_iri": "http://edamontology.org/operation_2403"
+    },
+    {
+      "label": "Recombination detection",
+      "iri": "http://edamontology.org/operation_0451",
+      "parent_iri": "http://edamontology.org/operation_2478"
+    },
+    {
+      "label": "Chimera detection",
+      "iri": "http://edamontology.org/operation_0450",
+      "parent_iri": "http://edamontology.org/operation_2478"
+    },
+    {
+      "label": "Nucleic acid feature detection",
+      "iri": "http://edamontology.org/operation_0415",
+      "parent_iri": "http://edamontology.org/operation_2478"
+    },
+    {
+      "label": "Repeat sequence detection",
+      "iri": "http://edamontology.org/operation_0379",
+      "parent_iri": "http://edamontology.org/operation_0415"
+    },
+    {
+      "label": "PolyA signal detection",
+      "iri": "http://edamontology.org/operation_0428",
+      "parent_iri": "http://edamontology.org/operation_0415"
+    },
+    {
+      "label": "Transposon prediction",
+      "iri": "http://edamontology.org/operation_0427",
+      "parent_iri": "http://edamontology.org/operation_0415"
+    },
+    {
+      "label": "Quadruplex formation site detection",
+      "iri": "http://edamontology.org/operation_0429",
+      "parent_iri": "http://edamontology.org/operation_0415"
+    },
+    {
+      "label": "Restriction site recognition",
+      "iri": "http://edamontology.org/operation_0431",
+      "parent_iri": "http://edamontology.org/operation_0415"
+    },
+    {
+      "label": "CpG island and isochore detection",
+      "iri": "http://edamontology.org/operation_0430",
+      "parent_iri": "http://edamontology.org/operation_0415"
+    },
+    {
+      "label": "Nucleosome position prediction",
+      "iri": "http://edamontology.org/operation_0432",
+      "parent_iri": "http://edamontology.org/operation_0415"
+    },
+    {
+      "label": "Vector sequence detection",
+      "iri": "http://edamontology.org/operation_0266",
+      "parent_iri": "http://edamontology.org/operation_0415"
+    },
+    {
+      "label": "RNA secondary structure prediction",
+      "iri": "http://edamontology.org/operation_0278",
+      "parent_iri": "http://edamontology.org/operation_0415"
+    },
+    {
+      "label": "Differential binding analysis",
+      "iri": "http://edamontology.org/operation_3677",
+      "parent_iri": "http://edamontology.org/operation_0415"
+    },
+    {
+      "label": "Peak calling",
+      "iri": "http://edamontology.org/operation_3222",
+      "parent_iri": "http://edamontology.org/operation_0415"
+    },
+    {
+      "label": "Codon usage analysis",
+      "iri": "http://edamontology.org/operation_0286",
+      "parent_iri": "http://edamontology.org/operation_2478"
+    },
+    {
+      "label": "Genetic code prediction",
+      "iri": "http://edamontology.org/operation_0489",
+      "parent_iri": "http://edamontology.org/operation_0286"
+    },
+    {
+      "label": "Codon usage table comparison",
+      "iri": "http://edamontology.org/operation_0285",
+      "parent_iri": "http://edamontology.org/operation_0286"
+    },
+    {
+      "label": "Codon usage bias calculation",
+      "iri": "http://edamontology.org/operation_2962",
+      "parent_iri": "http://edamontology.org/operation_0286"
+    },
+    {
+      "label": "Codon usage fraction calculation",
+      "iri": "http://edamontology.org/operation_2964",
+      "parent_iri": "http://edamontology.org/operation_0286"
+    },
+    {
+      "label": "DNA substitution modelling",
+      "iri": "http://edamontology.org/operation_0550",
+      "parent_iri": "http://edamontology.org/operation_0286"
+    },
+    {
+      "label": "Ecological modelling",
+      "iri": "http://edamontology.org/operation_3946",
+      "parent_iri": "http://edamontology.org/operation_0286"
+    },
+    {
+      "label": "Linkage analysis",
+      "iri": "http://edamontology.org/operation_0283",
+      "parent_iri": "http://edamontology.org/operation_2478"
+    },
+    {
+      "label": "Linkage disequilibrium calculation",
+      "iri": "http://edamontology.org/operation_0488",
+      "parent_iri": "http://edamontology.org/operation_0283"
+    },
+    {
+      "label": "Genetic mapping",
+      "iri": "http://edamontology.org/operation_0282",
+      "parent_iri": "http://edamontology.org/operation_0283"
+    },
+    {
+      "label": "Haplotype mapping",
+      "iri": "http://edamontology.org/operation_0487",
+      "parent_iri": "http://edamontology.org/operation_0282"
+    },
+    {
+      "label": "Virtual PCR",
+      "iri": "http://edamontology.org/operation_0307",
+      "parent_iri": "http://edamontology.org/operation_2478"
+    },
+    {
+      "label": "Sequence assembly",
+      "iri": "http://edamontology.org/operation_0310",
+      "parent_iri": "http://edamontology.org/operation_2478"
+    },
+    {
+      "label": "Cross-assembly",
+      "iri": "http://edamontology.org/operation_3730",
+      "parent_iri": "http://edamontology.org/operation_0310"
+    },
+    {
+      "label": "Genome assembly",
+      "iri": "http://edamontology.org/operation_0525",
+      "parent_iri": "http://edamontology.org/operation_0310"
+    },
+    {
+      "label": "De-novo assembly",
+      "iri": "http://edamontology.org/operation_0524",
+      "parent_iri": "http://edamontology.org/operation_0310"
+    },
+    {
+      "label": "EST assembly",
+      "iri": "http://edamontology.org/operation_0526",
+      "parent_iri": "http://edamontology.org/operation_0310"
+    },
+    {
+      "label": "Mapping assembly",
+      "iri": "http://edamontology.org/operation_0523",
+      "parent_iri": "http://edamontology.org/operation_0310"
+    },
+    {
+      "label": "Transcriptome assembly",
+      "iri": "http://edamontology.org/operation_3258",
+      "parent_iri": "http://edamontology.org/operation_0310"
+    },
+    {
+      "label": "Exome assembly",
+      "iri": "http://edamontology.org/operation_3229",
+      "parent_iri": "http://edamontology.org/operation_0310"
+    },
+    {
+      "label": "Localised reassembly",
+      "iri": "http://edamontology.org/operation_3183",
+      "parent_iri": "http://edamontology.org/operation_0310"
+    },
+    {
+      "label": "DNA profiling",
+      "iri": "http://edamontology.org/operation_3894",
+      "parent_iri": "http://edamontology.org/operation_2478"
+    },
+    {
+      "label": "DNA testing",
+      "iri": "http://edamontology.org/operation_3920",
+      "parent_iri": "http://edamontology.org/operation_2478"
+    },
+    {
+      "label": "Sequence read processing",
+      "iri": "http://edamontology.org/operation_3921",
+      "parent_iri": "http://edamontology.org/operation_2478"
+    },
+    {
+      "label": "RNA-Seq analysis",
+      "iri": "http://edamontology.org/operation_3680",
+      "parent_iri": "http://edamontology.org/operation_3921"
+    },
+    {
+      "label": "RNA-seq read count analysis",
+      "iri": "http://edamontology.org/operation_3563",
+      "parent_iri": "http://edamontology.org/operation_3680"
+    },
+    {
+      "label": "RNA-seq time series data analysis",
+      "iri": "http://edamontology.org/operation_3565",
+      "parent_iri": "http://edamontology.org/operation_3680"
+    },
+    {
+      "label": "Demultiplexing",
+      "iri": "http://edamontology.org/operation_3933",
+      "parent_iri": "http://edamontology.org/operation_3921"
+    },
+    {
+      "label": "Read summarisation",
+      "iri": "http://edamontology.org/operation_3793",
+      "parent_iri": "http://edamontology.org/operation_3921"
+    },
+    {
+      "label": "Read binning",
+      "iri": "http://edamontology.org/operation_3798",
+      "parent_iri": "http://edamontology.org/operation_3921"
+    },
+    {
+      "label": "Read pre-processing",
+      "iri": "http://edamontology.org/operation_3219",
+      "parent_iri": "http://edamontology.org/operation_3921"
+    },
+    {
+      "label": "Read depth analysis",
+      "iri": "http://edamontology.org/operation_3230",
+      "parent_iri": "http://edamontology.org/operation_3921"
+    },
+    {
+      "label": "Read mapping",
+      "iri": "http://edamontology.org/operation_3198",
+      "parent_iri": "http://edamontology.org/operation_3921"
+    },
+    {
+      "label": "Split read mapping",
+      "iri": "http://edamontology.org/operation_3199",
+      "parent_iri": "http://edamontology.org/operation_3198"
+    },
+    {
+      "label": "Selection detection",
+      "iri": "http://edamontology.org/operation_3950",
+      "parent_iri": "http://edamontology.org/operation_2478"
+    },
+    {
+      "label": "Genome analysis",
+      "iri": "http://edamontology.org/operation_3918",
+      "parent_iri": "http://edamontology.org/operation_2478"
+    },
+    {
+      "label": "Genome annotation",
+      "iri": "http://edamontology.org/operation_0362",
+      "parent_iri": "http://edamontology.org/operation_3918"
+    },
+    {
+      "label": "Genome indexing",
+      "iri": "http://edamontology.org/operation_3211",
+      "parent_iri": "http://edamontology.org/operation_3918"
+    },
+    {
+      "label": "Genome comparison",
+      "iri": "http://edamontology.org/operation_3209",
+      "parent_iri": "http://edamontology.org/operation_3918"
+    },
+    {
+      "label": "Whole genome methylation analysis",
+      "iri": "http://edamontology.org/operation_3206",
+      "parent_iri": "http://edamontology.org/operation_3918"
+    },
+    {
+      "label": "Nucleic acid design",
+      "iri": "http://edamontology.org/operation_3095",
+      "parent_iri": "http://edamontology.org/operation_2478"
+    },
+    {
+      "label": "RNA inverse folding",
+      "iri": "http://edamontology.org/operation_0483",
+      "parent_iri": "http://edamontology.org/operation_3095"
+    },
+    {
+      "label": "Primer and probe design",
+      "iri": "http://edamontology.org/operation_2419",
+      "parent_iri": "http://edamontology.org/operation_3095"
+    },
+    {
+      "label": "Microarray probe design",
+      "iri": "http://edamontology.org/operation_0309",
+      "parent_iri": "http://edamontology.org/operation_2419"
+    },
+    {
+      "label": "PCR primer design",
+      "iri": "http://edamontology.org/operation_0308",
+      "parent_iri": "http://edamontology.org/operation_2419"
+    },
+    {
+      "label": "DNA vaccine design",
+      "iri": "http://edamontology.org/operation_0560",
+      "parent_iri": "http://edamontology.org/operation_3095"
+    },
+    {
+      "label": "In vitro selection",
+      "iri": "http://edamontology.org/operation_3795",
+      "parent_iri": "http://edamontology.org/operation_3095"
+    },
+    {
+      "label": "Gene prediction",
+      "iri": "http://edamontology.org/operation_2454",
+      "parent_iri": "http://edamontology.org/operation_2478"
+    },
+    {
+      "label": "tRNA gene prediction",
+      "iri": "http://edamontology.org/operation_0464",
+      "parent_iri": "http://edamontology.org/operation_2454"
+    },
+    {
+      "label": "SECIS element prediction",
+      "iri": "http://edamontology.org/operation_0437",
+      "parent_iri": "http://edamontology.org/operation_2454"
+    },
+    {
+      "label": "Coding region prediction",
+      "iri": "http://edamontology.org/operation_0436",
+      "parent_iri": "http://edamontology.org/operation_2454"
+    },
+    {
+      "label": "Translation initiation site prediction",
+      "iri": "http://edamontology.org/operation_0439",
+      "parent_iri": "http://edamontology.org/operation_0436"
+    },
+    {
+      "label": "Transcriptional regulatory element prediction",
+      "iri": "http://edamontology.org/operation_0438",
+      "parent_iri": "http://edamontology.org/operation_2454"
+    },
+    {
+      "label": "Promoter prediction",
+      "iri": "http://edamontology.org/operation_0440",
+      "parent_iri": "http://edamontology.org/operation_0438"
+    },
+    {
+      "label": "Exonic splicing enhancer prediction",
+      "iri": "http://edamontology.org/operation_0446",
+      "parent_iri": "http://edamontology.org/operation_0440"
+    },
+    {
+      "label": "Transcription factor binding site prediction",
+      "iri": "http://edamontology.org/operation_0445",
+      "parent_iri": "http://edamontology.org/operation_0440"
+    },
+    {
+      "label": "cis-regulatory element prediction",
+      "iri": "http://edamontology.org/operation_0441",
+      "parent_iri": "http://edamontology.org/operation_0438"
+    },
+    {
+      "label": "S/MAR prediction",
+      "iri": "http://edamontology.org/operation_0444",
+      "parent_iri": "http://edamontology.org/operation_0438"
+    },
+    {
+      "label": "trans-regulatory element prediction",
+      "iri": "http://edamontology.org/operation_0443",
+      "parent_iri": "http://edamontology.org/operation_0438"
+    },
+    {
+      "label": "miRNA target prediction",
+      "iri": "http://edamontology.org/operation_0463",
+      "parent_iri": "http://edamontology.org/operation_0443"
+    },
+    {
+      "label": "siRNA binding specificity prediction",
+      "iri": "http://edamontology.org/operation_0465",
+      "parent_iri": "http://edamontology.org/operation_0443"
+    },
+    {
+      "label": "siRNA duplex prediction",
+      "iri": "http://edamontology.org/operation_2008",
+      "parent_iri": "http://edamontology.org/operation_0443"
+    },
+    {
+      "label": "Operon prediction",
+      "iri": "http://edamontology.org/operation_0435",
+      "parent_iri": "http://edamontology.org/operation_2454"
+    },
+    {
+      "label": "Ab-initio gene prediction",
+      "iri": "http://edamontology.org/operation_3662",
+      "parent_iri": "http://edamontology.org/operation_2454"
+    },
+    {
+      "label": "Homology-based gene prediction",
+      "iri": "http://edamontology.org/operation_3663",
+      "parent_iri": "http://edamontology.org/operation_2454"
+    },
+    {
+      "label": "Splicing analysis",
+      "iri": "http://edamontology.org/operation_2499",
+      "parent_iri": "http://edamontology.org/operation_2454"
+    },
+    {
+      "label": "Splice site prediction",
+      "iri": "http://edamontology.org/operation_0433",
+      "parent_iri": "http://edamontology.org/operation_2499"
+    },
+    {
+      "label": "Alternative splicing prediction",
+      "iri": "http://edamontology.org/operation_0264",
+      "parent_iri": "http://edamontology.org/operation_2499"
+    },
+    {
+      "label": "Sequencing quality control",
+      "iri": "http://edamontology.org/operation_3218",
+      "parent_iri": "http://edamontology.org/operation_2478"
+    },
+    {
+      "label": "Variant filtering",
+      "iri": "http://edamontology.org/operation_3675",
+      "parent_iri": "http://edamontology.org/operation_3218"
+    },
+    {
+      "label": "Sequence assembly validation",
+      "iri": "http://edamontology.org/operation_3180",
+      "parent_iri": "http://edamontology.org/operation_3218"
+    },
+    {
+      "label": "Sequence contamination filtering",
+      "iri": "http://edamontology.org/operation_3187",
+      "parent_iri": "http://edamontology.org/operation_3218"
+    },
+    {
+      "label": "DNA barcoding",
+      "iri": "http://edamontology.org/operation_3200",
+      "parent_iri": "http://edamontology.org/operation_2478"
+    },
+    {
+      "label": "Methylation analysis",
+      "iri": "http://edamontology.org/operation_3204",
+      "parent_iri": "http://edamontology.org/operation_2478"
+    },
+    {
+      "label": "Methylation calling",
+      "iri": "http://edamontology.org/operation_3919",
+      "parent_iri": "http://edamontology.org/operation_3204"
+    },
+    {
+      "label": "DMR identification",
+      "iri": "http://edamontology.org/operation_3809",
+      "parent_iri": "http://edamontology.org/operation_3204"
+    },
+    {
+      "label": "Gene methylation analysis",
+      "iri": "http://edamontology.org/operation_3207",
+      "parent_iri": "http://edamontology.org/operation_3204"
+    },
+    {
+      "label": "Bisulfite mapping",
+      "iri": "http://edamontology.org/operation_3186",
+      "parent_iri": "http://edamontology.org/operation_3204"
+    },
+    {
+      "label": "Species frequency estimation",
+      "iri": "http://edamontology.org/operation_3221",
+      "parent_iri": "http://edamontology.org/operation_2478"
+    },
+    {
+      "label": "Variant calling",
+      "iri": "http://edamontology.org/operation_3227",
+      "parent_iri": "http://edamontology.org/operation_2478"
+    },
+    {
+      "label": "Indel detection",
+      "iri": "http://edamontology.org/operation_0452",
+      "parent_iri": "http://edamontology.org/operation_3227"
+    },
+    {
+      "label": "SNP detection",
+      "iri": "http://edamontology.org/operation_0484",
+      "parent_iri": "http://edamontology.org/operation_3227"
+    },
+    {
+      "label": "Frameshift detection",
+      "iri": "http://edamontology.org/operation_0265",
+      "parent_iri": "http://edamontology.org/operation_3227"
+    },
+    {
+      "label": "Protein sequence analysis",
+      "iri": "http://edamontology.org/operation_2479",
+      "parent_iri": "http://edamontology.org/operation_2403"
+    },
+    {
+      "label": "Protein structure prediction",
+      "iri": "http://edamontology.org/operation_0474",
+      "parent_iri": "http://edamontology.org/operation_2479"
+    },
+    {
+      "label": "Protein modelling",
+      "iri": "http://edamontology.org/operation_0477",
+      "parent_iri": "http://edamontology.org/operation_0474"
+    },
+    {
+      "label": "Side chain modelling",
+      "iri": "http://edamontology.org/operation_0480",
+      "parent_iri": "http://edamontology.org/operation_0477"
+    },
+    {
+      "label": "Loop modelling",
+      "iri": "http://edamontology.org/operation_0481",
+      "parent_iri": "http://edamontology.org/operation_0477"
+    },
+    {
+      "label": "Backbone modelling",
+      "iri": "http://edamontology.org/operation_0479",
+      "parent_iri": "http://edamontology.org/operation_0477"
+    },
+    {
+      "label": "Ab initio structure prediction",
+      "iri": "http://edamontology.org/operation_0476",
+      "parent_iri": "http://edamontology.org/operation_0474"
+    },
+    {
+      "label": "Protein secondary structure prediction",
+      "iri": "http://edamontology.org/operation_0267",
+      "parent_iri": "http://edamontology.org/operation_2479"
+    },
+    {
+      "label": "Protein secondary structure prediction (turns)",
+      "iri": "http://edamontology.org/operation_0469",
+      "parent_iri": "http://edamontology.org/operation_0267"
+    },
+    {
+      "label": "Protein secondary structure prediction (helices)",
+      "iri": "http://edamontology.org/operation_0468",
+      "parent_iri": "http://edamontology.org/operation_0267"
+    },
+    {
+      "label": "Protein secondary structure prediction (coils)",
+      "iri": "http://edamontology.org/operation_0470",
+      "parent_iri": "http://edamontology.org/operation_0267"
+    },
+    {
+      "label": "Protein super-secondary structure prediction",
+      "iri": "http://edamontology.org/operation_0268",
+      "parent_iri": "http://edamontology.org/operation_0267"
+    },
+    {
+      "label": "Protein feature detection",
+      "iri": "http://edamontology.org/operation_3092",
+      "parent_iri": "http://edamontology.org/operation_2479"
+    },
+    {
+      "label": "Disulfide bond prediction",
+      "iri": "http://edamontology.org/operation_0471",
+      "parent_iri": "http://edamontology.org/operation_3092"
+    },
+    {
+      "label": "Protein cleavage site prediction",
+      "iri": "http://edamontology.org/operation_0422",
+      "parent_iri": "http://edamontology.org/operation_3092"
+    },
+    {
+      "label": "PTM site prediction",
+      "iri": "http://edamontology.org/operation_0417",
+      "parent_iri": "http://edamontology.org/operation_3092"
+    },
+    {
+      "label": "Epitope mapping",
+      "iri": "http://edamontology.org/operation_0416",
+      "parent_iri": "http://edamontology.org/operation_3092"
+    },
+    {
+      "label": "Adhesin prediction",
+      "iri": "http://edamontology.org/operation_3968",
+      "parent_iri": "http://edamontology.org/operation_3092"
+    },
+    {
+      "label": "Protein disorder prediction",
+      "iri": "http://edamontology.org/operation_3904",
+      "parent_iri": "http://edamontology.org/operation_3092"
+    },
+    {
+      "label": "Protein domain recognition",
+      "iri": "http://edamontology.org/operation_0246",
+      "parent_iri": "http://edamontology.org/operation_3092"
+    },
+    {
+      "label": "Protein peeling",
+      "iri": "http://edamontology.org/operation_0390",
+      "parent_iri": "http://edamontology.org/operation_0246"
+    },
+    {
+      "label": "Structural motif discovery",
+      "iri": "http://edamontology.org/operation_0245",
+      "parent_iri": "http://edamontology.org/operation_3092"
+    },
+    {
+      "label": "Sequence comparison",
+      "iri": "http://edamontology.org/operation_2451",
+      "parent_iri": "http://edamontology.org/operation_2403"
+    },
+    {
+      "label": "Sequence word comparison",
+      "iri": "http://edamontology.org/operation_0288",
+      "parent_iri": "http://edamontology.org/operation_2451"
+    },
+    {
+      "label": "Sequence redundancy removal",
+      "iri": "http://edamontology.org/operation_0290",
+      "parent_iri": "http://edamontology.org/operation_2451"
+    },
+    {
+      "label": "Representative sequence identification",
+      "iri": "http://edamontology.org/operation_2233",
+      "parent_iri": "http://edamontology.org/operation_2451"
+    },
+    {
+      "label": "Sequencing error detection",
+      "iri": "http://edamontology.org/operation_3195",
+      "parent_iri": "http://edamontology.org/operation_2451"
+    },
+    {
+      "label": "Sequence editing",
+      "iri": "http://edamontology.org/operation_0231",
+      "parent_iri": "http://edamontology.org/operation_2403"
+    },
+    {
+      "label": "Restriction site creation",
+      "iri": "http://edamontology.org/operation_0370",
+      "parent_iri": "http://edamontology.org/operation_0231"
+    },
+    {
+      "label": "Sequence mutation and randomisation",
+      "iri": "http://edamontology.org/operation_0367",
+      "parent_iri": "http://edamontology.org/operation_0231"
+    },
+    {
+      "label": "Sequence cutting",
+      "iri": "http://edamontology.org/operation_0369",
+      "parent_iri": "http://edamontology.org/operation_0231"
+    },
+    {
+      "label": "Primer removal",
+      "iri": "http://edamontology.org/operation_3237",
+      "parent_iri": "http://edamontology.org/operation_0369"
+    },
+    {
+      "label": "Sequence trimming",
+      "iri": "http://edamontology.org/operation_3192",
+      "parent_iri": "http://edamontology.org/operation_0369"
+    },
+    {
+      "label": "Sequence masking",
+      "iri": "http://edamontology.org/operation_0368",
+      "parent_iri": "http://edamontology.org/operation_0231"
+    },
+    {
+      "label": "Sequence merging",
+      "iri": "http://edamontology.org/operation_0232",
+      "parent_iri": "http://edamontology.org/operation_0231"
+    },
+    {
+      "label": "Repeat sequence analysis",
+      "iri": "http://edamontology.org/operation_0237",
+      "parent_iri": "http://edamontology.org/operation_2403"
+    },
+    {
+      "label": "Network analysis",
+      "iri": "http://edamontology.org/operation_3927",
+      "parent_iri": "http://edamontology.org/operation_2945"
+    },
+    {
+      "label": "Gene regulatory network analysis",
+      "iri": "http://edamontology.org/operation_1781",
+      "parent_iri": "http://edamontology.org/operation_3927"
+    },
+    {
+      "label": "Metabolic network modelling",
+      "iri": "http://edamontology.org/operation_3660",
+      "parent_iri": "http://edamontology.org/operation_3927"
+    },
+    {
+      "label": "Weighted correlation network analysis",
+      "iri": "http://edamontology.org/operation_3766",
+      "parent_iri": "http://edamontology.org/operation_3927"
+    },
+    {
+      "label": "Gene regulatory network prediction",
+      "iri": "http://edamontology.org/operation_2437",
+      "parent_iri": "http://edamontology.org/operation_3927"
+    },
+    {
+      "label": "Pathway analysis",
+      "iri": "http://edamontology.org/operation_3928",
+      "parent_iri": "http://edamontology.org/operation_2945"
+    },
+    {
+      "label": "Expression profile pathway mapping",
+      "iri": "http://edamontology.org/operation_0533",
+      "parent_iri": "http://edamontology.org/operation_3928"
+    },
+    {
+      "label": "Metabolic pathway prediction",
+      "iri": "http://edamontology.org/operation_3929",
+      "parent_iri": "http://edamontology.org/operation_3928"
+    },
+    {
+      "label": "Structure analysis",
+      "iri": "http://edamontology.org/operation_2480",
+      "parent_iri": "http://edamontology.org/operation_2945"
+    },
+    {
+      "label": "Diffraction data analysis",
+      "iri": "http://edamontology.org/operation_3445",
+      "parent_iri": "http://edamontology.org/operation_2480"
+    },
+    {
+      "label": "Diffraction data integration",
+      "iri": "http://edamontology.org/operation_3453",
+      "parent_iri": "http://edamontology.org/operation_3445"
+    },
+    {
+      "label": "Phasing",
+      "iri": "http://edamontology.org/operation_3454",
+      "parent_iri": "http://edamontology.org/operation_3445"
+    },
+    {
+      "label": "Diffraction data reduction",
+      "iri": "http://edamontology.org/operation_3447",
+      "parent_iri": "http://edamontology.org/operation_3445"
+    },
+    {
+      "label": "Molecular surface analysis",
+      "iri": "http://edamontology.org/operation_3351",
+      "parent_iri": "http://edamontology.org/operation_2480"
+    },
+    {
+      "label": "Accessible surface calculation",
+      "iri": "http://edamontology.org/operation_0384",
+      "parent_iri": "http://edamontology.org/operation_3351"
+    },
+    {
+      "label": "Molecular surface calculation",
+      "iri": "http://edamontology.org/operation_0387",
+      "parent_iri": "http://edamontology.org/operation_3351"
+    },
+    {
+      "label": "Molecular surface comparison",
+      "iri": "http://edamontology.org/operation_3666",
+      "parent_iri": "http://edamontology.org/operation_3351"
+    },
+    {
+      "label": "Molecular model refinement",
+      "iri": "http://edamontology.org/operation_0322",
+      "parent_iri": "http://edamontology.org/operation_2480"
+    },
+    {
+      "label": "Molecular replacement",
+      "iri": "http://edamontology.org/operation_3455",
+      "parent_iri": "http://edamontology.org/operation_0322"
+    },
+    {
+      "label": "Rigid body refinement",
+      "iri": "http://edamontology.org/operation_3456",
+      "parent_iri": "http://edamontology.org/operation_0322"
+    },
+    {
+      "label": "Protein structure analysis",
+      "iri": "http://edamontology.org/operation_2406",
+      "parent_iri": "http://edamontology.org/operation_2480"
+    },
+    {
+      "label": "Protein structure validation",
+      "iri": "http://edamontology.org/operation_0321",
+      "parent_iri": "http://edamontology.org/operation_2406"
+    },
+    {
+      "label": "Maximum occurence analysis",
+      "iri": "http://edamontology.org/operation_3560",
+      "parent_iri": "http://edamontology.org/operation_0321"
+    },
+    {
+      "label": "Residue bump detection",
+      "iri": "http://edamontology.org/operation_1836",
+      "parent_iri": "http://edamontology.org/operation_0321"
+    },
+    {
+      "label": "Protein geometry validation",
+      "iri": "http://edamontology.org/operation_1844",
+      "parent_iri": "http://edamontology.org/operation_0321"
+    },
+    {
+      "label": "Residue packing validation",
+      "iri": "http://edamontology.org/operation_1843",
+      "parent_iri": "http://edamontology.org/operation_0321"
+    },
+    {
+      "label": "Protein structure assignment",
+      "iri": "http://edamontology.org/operation_0320",
+      "parent_iri": "http://edamontology.org/operation_2406"
+    },
+    {
+      "label": "Protein secondary structure assignment",
+      "iri": "http://edamontology.org/operation_0319",
+      "parent_iri": "http://edamontology.org/operation_0320"
+    },
+    {
+      "label": "Protein cysteine and disulfide bond assignment",
+      "iri": "http://edamontology.org/operation_1850",
+      "parent_iri": "http://edamontology.org/operation_0320"
+    },
+    {
+      "label": "Free cysteine detection",
+      "iri": "http://edamontology.org/operation_1830",
+      "parent_iri": "http://edamontology.org/operation_1850"
+    },
+    {
+      "label": "Cysteine bridge detection",
+      "iri": "http://edamontology.org/operation_1829",
+      "parent_iri": "http://edamontology.org/operation_1850"
+    },
+    {
+      "label": "Protein secondary structure analysis",
+      "iri": "http://edamontology.org/operation_2416",
+      "parent_iri": "http://edamontology.org/operation_2406"
+    },
+    {
+      "label": "Protein secondary structure comparison",
+      "iri": "http://edamontology.org/operation_2488",
+      "parent_iri": "http://edamontology.org/operation_2416"
+    },
+    {
+      "label": "Protein folding analysis",
+      "iri": "http://edamontology.org/operation_2415",
+      "parent_iri": "http://edamontology.org/operation_2406"
+    },
+    {
+      "label": "Protein structure comparison",
+      "iri": "http://edamontology.org/operation_2487",
+      "parent_iri": "http://edamontology.org/operation_2406"
+    },
+    {
+      "label": "Protein architecture analysis",
+      "iri": "http://edamontology.org/operation_0247",
+      "parent_iri": "http://edamontology.org/operation_2406"
+    },
+    {
+      "label": "Protein architecture comparison",
+      "iri": "http://edamontology.org/operation_2474",
+      "parent_iri": "http://edamontology.org/operation_0247"
+    },
+    {
+      "label": "Nucleic acid structure analysis",
+      "iri": "http://edamontology.org/operation_2481",
+      "parent_iri": "http://edamontology.org/operation_2480"
+    },
+    {
+      "label": "Nucleic acid structure prediction",
+      "iri": "http://edamontology.org/operation_0475",
+      "parent_iri": "http://edamontology.org/operation_2481"
+    },
+    {
+      "label": "Nucleic acid folding analysis",
+      "iri": "http://edamontology.org/operation_0279",
+      "parent_iri": "http://edamontology.org/operation_0475"
+    },
+    {
+      "label": "RNA structure prediction",
+      "iri": "http://edamontology.org/operation_2441",
+      "parent_iri": "http://edamontology.org/operation_0475"
+    },
+    {
+      "label": "DNA structure prediction",
+      "iri": "http://edamontology.org/operation_2442",
+      "parent_iri": "http://edamontology.org/operation_0475"
+    },
+    {
+      "label": "RNA secondary structure analysis",
+      "iri": "http://edamontology.org/operation_2439",
+      "parent_iri": "http://edamontology.org/operation_2481"
+    },
+    {
+      "label": "Nucleic acid structure comparison",
+      "iri": "http://edamontology.org/operation_2518",
+      "parent_iri": "http://edamontology.org/operation_2481"
+    },
+    {
+      "label": "Structure comparison",
+      "iri": "http://edamontology.org/operation_2483",
+      "parent_iri": "http://edamontology.org/operation_2480"
+    },
+    {
+      "label": "Structural similarity search",
+      "iri": "http://edamontology.org/operation_0360",
+      "parent_iri": "http://edamontology.org/operation_2483"
+    },
+    {
+      "label": "Chemical redundancy removal",
+      "iri": "http://edamontology.org/operation_3564",
+      "parent_iri": "http://edamontology.org/operation_2483"
+    },
+    {
+      "label": "Molecular dynamics",
+      "iri": "http://edamontology.org/operation_2476",
+      "parent_iri": "http://edamontology.org/operation_2480"
+    },
+    {
+      "label": "Expression analysis",
+      "iri": "http://edamontology.org/operation_2495",
+      "parent_iri": "http://edamontology.org/operation_2945"
+    },
+    {
+      "label": "Expression profile comparison",
+      "iri": "http://edamontology.org/operation_0315",
+      "parent_iri": "http://edamontology.org/operation_2495"
+    },
+    {
+      "label": "Gene expression profiling",
+      "iri": "http://edamontology.org/operation_0314",
+      "parent_iri": "http://edamontology.org/operation_2495"
+    },
+    {
+      "label": "Differential protein expression profiling",
+      "iri": "http://edamontology.org/operation_3741",
+      "parent_iri": "http://edamontology.org/operation_0314"
+    },
+    {
+      "label": "Differential gene expression profiling",
+      "iri": "http://edamontology.org/operation_3223",
+      "parent_iri": "http://edamontology.org/operation_0314"
+    },
+    {
+      "label": "miRNA expression analysis",
+      "iri": "http://edamontology.org/operation_3792",
+      "parent_iri": "http://edamontology.org/operation_2495"
+    },
+    {
+      "label": "Gene expression QTL analysis",
+      "iri": "http://edamontology.org/operation_3232",
+      "parent_iri": "http://edamontology.org/operation_2495"
+    },
+    {
+      "label": "Spectral analysis",
+      "iri": "http://edamontology.org/operation_3214",
+      "parent_iri": "http://edamontology.org/operation_2945"
+    },
+    {
+      "label": "Protein quantification",
+      "iri": "http://edamontology.org/operation_3630",
+      "parent_iri": "http://edamontology.org/operation_3214"
+    },
+    {
+      "label": "Label-free quantification",
+      "iri": "http://edamontology.org/operation_3634",
+      "parent_iri": "http://edamontology.org/operation_3630"
+    },
+    {
+      "label": "Ion counting",
+      "iri": "http://edamontology.org/operation_3704",
+      "parent_iri": "http://edamontology.org/operation_3634"
+    },
+    {
+      "label": "Spectral counting",
+      "iri": "http://edamontology.org/operation_3637",
+      "parent_iri": "http://edamontology.org/operation_3634"
+    },
+    {
+      "label": "Labeled quantification",
+      "iri": "http://edamontology.org/operation_3635",
+      "parent_iri": "http://edamontology.org/operation_3630"
+    },
+    {
+      "label": "18O labeling",
+      "iri": "http://edamontology.org/operation_3640",
+      "parent_iri": "http://edamontology.org/operation_3635"
+    },
+    {
+      "label": "TMT-tag",
+      "iri": "http://edamontology.org/operation_3641",
+      "parent_iri": "http://edamontology.org/operation_3635"
+    },
+    {
+      "label": "Dimethyl",
+      "iri": "http://edamontology.org/operation_3642",
+      "parent_iri": "http://edamontology.org/operation_3635"
+    },
+    {
+      "label": "Metabolic labeling",
+      "iri": "http://edamontology.org/operation_3715",
+      "parent_iri": "http://edamontology.org/operation_3635"
+    },
+    {
+      "label": "Isotope-coded protein label",
+      "iri": "http://edamontology.org/operation_3705",
+      "parent_iri": "http://edamontology.org/operation_3635"
+    },
+    {
+      "label": "SILAC",
+      "iri": "http://edamontology.org/operation_3638",
+      "parent_iri": "http://edamontology.org/operation_3635"
+    },
+    {
+      "label": "iTRAQ",
+      "iri": "http://edamontology.org/operation_3639",
+      "parent_iri": "http://edamontology.org/operation_3635"
+    },
+    {
+      "label": "MRM/SRM",
+      "iri": "http://edamontology.org/operation_3636",
+      "parent_iri": "http://edamontology.org/operation_3630"
+    },
+    {
+      "label": "Peptide identification",
+      "iri": "http://edamontology.org/operation_3631",
+      "parent_iri": "http://edamontology.org/operation_3214"
+    },
+    {
+      "label": "Tag-based peptide identification",
+      "iri": "http://edamontology.org/operation_3643",
+      "parent_iri": "http://edamontology.org/operation_3631"
+    },
+    {
+      "label": "PTM identification",
+      "iri": "http://edamontology.org/operation_3645",
+      "parent_iri": "http://edamontology.org/operation_3631"
+    },
+    {
+      "label": "PTM localisation",
+      "iri": "http://edamontology.org/operation_3755",
+      "parent_iri": "http://edamontology.org/operation_3645"
+    },
+    {
+      "label": "Peptide database search",
+      "iri": "http://edamontology.org/operation_3646",
+      "parent_iri": "http://edamontology.org/operation_3631"
+    },
+    {
+      "label": "Target-Decoy",
+      "iri": "http://edamontology.org/operation_3649",
+      "parent_iri": "http://edamontology.org/operation_3646"
+    },
+    {
+      "label": "Blind peptide database search",
+      "iri": "http://edamontology.org/operation_3647",
+      "parent_iri": "http://edamontology.org/operation_3646"
+    },
+    {
+      "label": "Spectral library search",
+      "iri": "http://edamontology.org/operation_3801",
+      "parent_iri": "http://edamontology.org/operation_3631"
+    },
+    {
+      "label": "Mass spectra calibration",
+      "iri": "http://edamontology.org/operation_3627",
+      "parent_iri": "http://edamontology.org/operation_3214"
+    },
+    {
+      "label": "Chromatographic alignment",
+      "iri": "http://edamontology.org/operation_3628",
+      "parent_iri": "http://edamontology.org/operation_3214"
+    },
+    {
+      "label": "Deisotoping",
+      "iri": "http://edamontology.org/operation_3629",
+      "parent_iri": "http://edamontology.org/operation_3214"
+    },
+    {
+      "label": "Protein identification",
+      "iri": "http://edamontology.org/operation_3767",
+      "parent_iri": "http://edamontology.org/operation_3214"
+    },
+    {
+      "label": "Natural product identification",
+      "iri": "http://edamontology.org/operation_3803",
+      "parent_iri": "http://edamontology.org/operation_3214"
+    },
+    {
+      "label": "Peak detection",
+      "iri": "http://edamontology.org/operation_3215",
+      "parent_iri": "http://edamontology.org/operation_3214"
+    },
+    {
+      "label": "Genetic variation analysis",
+      "iri": "http://edamontology.org/operation_3197",
+      "parent_iri": "http://edamontology.org/operation_2945"
+    },
+    {
+      "label": "Variant pattern analysis",
+      "iri": "http://edamontology.org/operation_3504",
+      "parent_iri": "http://edamontology.org/operation_3197"
+    },
+    {
+      "label": "Reference identification",
+      "iri": "http://edamontology.org/operation_3703",
+      "parent_iri": "http://edamontology.org/operation_3197"
+    },
+    {
+      "label": "Collapsing methods",
+      "iri": "http://edamontology.org/operation_3791",
+      "parent_iri": "http://edamontology.org/operation_3197"
+    },
+    {
+      "label": "Variant prioritisation",
+      "iri": "http://edamontology.org/operation_3226",
+      "parent_iri": "http://edamontology.org/operation_3197"
+    },
+    {
+      "label": "Structural variation detection",
+      "iri": "http://edamontology.org/operation_3228",
+      "parent_iri": "http://edamontology.org/operation_3197"
+    },
+    {
+      "label": "Copy number variation detection",
+      "iri": "http://edamontology.org/operation_3961",
+      "parent_iri": "http://edamontology.org/operation_3228"
+    },
+    {
+      "label": "Deletion detection",
+      "iri": "http://edamontology.org/operation_3962",
+      "parent_iri": "http://edamontology.org/operation_3961"
+    },
+    {
+      "label": "Duplication detection",
+      "iri": "http://edamontology.org/operation_3963",
+      "parent_iri": "http://edamontology.org/operation_3961"
+    },
+    {
+      "label": "Complex CNV detection",
+      "iri": "http://edamontology.org/operation_3964",
+      "parent_iri": "http://edamontology.org/operation_3961"
+    },
+    {
+      "label": "Amplification detection",
+      "iri": "http://edamontology.org/operation_3965",
+      "parent_iri": "http://edamontology.org/operation_3961"
+    },
+    {
+      "label": "Copy number estimation",
+      "iri": "http://edamontology.org/operation_3233",
+      "parent_iri": "http://edamontology.org/operation_3961"
+    },
+    {
+      "label": "Genotyping",
+      "iri": "http://edamontology.org/operation_3196",
+      "parent_iri": "http://edamontology.org/operation_3197"
+    },
+    {
+      "label": "Multilocus sequence typing",
+      "iri": "http://edamontology.org/operation_3840",
+      "parent_iri": "http://edamontology.org/operation_3196"
+    },
+    {
+      "label": "Data handling",
+      "iri": "http://edamontology.org/operation_2409",
+      "parent_iri": "http://edamontology.org/operation_0004"
+    },
+    {
+      "label": "Deposition",
+      "iri": "http://edamontology.org/operation_3431",
+      "parent_iri": "http://edamontology.org/operation_2409"
+    },
+    {
+      "label": "Aggregation",
+      "iri": "http://edamontology.org/operation_3436",
+      "parent_iri": "http://edamontology.org/operation_2409"
+    },
+    {
+      "label": "Format detection",
+      "iri": "http://edamontology.org/operation_3357",
+      "parent_iri": "http://edamontology.org/operation_2409"
+    },
+    {
+      "label": "Splitting",
+      "iri": "http://edamontology.org/operation_3359",
+      "parent_iri": "http://edamontology.org/operation_2409"
+    },
+    {
+      "label": "Formatting",
+      "iri": "http://edamontology.org/operation_0335",
+      "parent_iri": "http://edamontology.org/operation_2409"
+    },
+    {
+      "label": "Filtering",
+      "iri": "http://edamontology.org/operation_3695",
+      "parent_iri": "http://edamontology.org/operation_2409"
+    },
+    {
+      "label": "Parsing",
+      "iri": "http://edamontology.org/operation_1812",
+      "parent_iri": "http://edamontology.org/operation_2409"
+    },
+    {
+      "label": "Editing",
+      "iri": "http://edamontology.org/operation_3096",
+      "parent_iri": "http://edamontology.org/operation_2409"
+    },
+    {
+      "label": "Structure editing",
+      "iri": "http://edamontology.org/operation_3080",
+      "parent_iri": "http://edamontology.org/operation_3096"
+    },
+    {
+      "label": "Sequence alignment editing",
+      "iri": "http://edamontology.org/operation_3081",
+      "parent_iri": "http://edamontology.org/operation_3096"
+    },
+    {
+      "label": "Sorting",
+      "iri": "http://edamontology.org/operation_3802",
+      "parent_iri": "http://edamontology.org/operation_2409"
+    },
+    {
+      "label": "Anonymisation",
+      "iri": "http://edamontology.org/operation_3283",
+      "parent_iri": "http://edamontology.org/operation_2409"
+    },
+    {
+      "label": "Query and retrieval",
+      "iri": "http://edamontology.org/operation_0224",
+      "parent_iri": "http://edamontology.org/operation_2409"
+    },
+    {
+      "label": "Database search",
+      "iri": "http://edamontology.org/operation_2421",
+      "parent_iri": "http://edamontology.org/operation_0224"
+    },
+    {
+      "label": "Structure database search",
+      "iri": "http://edamontology.org/operation_0339",
+      "parent_iri": "http://edamontology.org/operation_2421"
+    },
+    {
+      "label": "Literature search",
+      "iri": "http://edamontology.org/operation_0305",
+      "parent_iri": "http://edamontology.org/operation_2421"
+    },
+    {
+      "label": "Validation",
+      "iri": "http://edamontology.org/operation_2428",
+      "parent_iri": "http://edamontology.org/operation_0004"
+    },
+    {
+      "label": "Format validation",
+      "iri": "http://edamontology.org/operation_0336",
+      "parent_iri": "http://edamontology.org/operation_2428"
+    },
+    {
+      "label": "Mapping",
+      "iri": "http://edamontology.org/operation_2429",
+      "parent_iri": "http://edamontology.org/operation_0004"
+    },
+    {
+      "label": "Database comparison",
+      "iri": "http://edamontology.org/operation_3561",
+      "parent_iri": "http://edamontology.org/operation_2429"
+    },
+    {
+      "label": "DNA mapping",
+      "iri": "http://edamontology.org/operation_2520",
+      "parent_iri": "http://edamontology.org/operation_2429"
+    },
+    {
+      "label": "Physical mapping",
+      "iri": "http://edamontology.org/operation_2944",
+      "parent_iri": "http://edamontology.org/operation_2520"
+    },
+    {
+      "label": "Radiation Hybrid Mapping",
+      "iri": "http://edamontology.org/operation_0485",
+      "parent_iri": "http://edamontology.org/operation_2944"
+    },
+    {
+      "label": "Sequence tagged site (STS) mapping",
+      "iri": "http://edamontology.org/operation_2871",
+      "parent_iri": "http://edamontology.org/operation_2944"
+    },
+    {
+      "label": "Sequence tag mapping",
+      "iri": "http://edamontology.org/operation_0527",
+      "parent_iri": "http://edamontology.org/operation_2520"
+    },
+    {
+      "label": "ID mapping",
+      "iri": "http://edamontology.org/operation_3282",
+      "parent_iri": "http://edamontology.org/operation_2429"
+    },
+    {
+      "label": "Prediction and recognition",
+      "iri": "http://edamontology.org/operation_2423",
+      "parent_iri": "http://edamontology.org/operation_0004"
+    },
+    {
+      "label": "Protein quaternary structure prediction",
+      "iri": "http://edamontology.org/operation_3350",
+      "parent_iri": "http://edamontology.org/operation_2423"
+    },
+    {
+      "label": "Variant effect prediction",
+      "iri": "http://edamontology.org/operation_0331",
+      "parent_iri": "http://edamontology.org/operation_2423"
+    },
+    {
+      "label": "Comparison",
+      "iri": "http://edamontology.org/operation_2424",
+      "parent_iri": "http://edamontology.org/operation_0004"
+    },
+    {
+      "label": "Article comparison",
+      "iri": "http://edamontology.org/operation_3437",
+      "parent_iri": "http://edamontology.org/operation_2424"
+    },
+    {
+      "label": "Document similarity calculation",
+      "iri": "http://edamontology.org/operation_3278",
+      "parent_iri": "http://edamontology.org/operation_3437"
+    },
+    {
+      "label": "Ontology comparison",
+      "iri": "http://edamontology.org/operation_3352",
+      "parent_iri": "http://edamontology.org/operation_2424"
+    },
+    {
+      "label": "Protein comparison",
+      "iri": "http://edamontology.org/operation_2997",
+      "parent_iri": "http://edamontology.org/operation_2424"
+    },
+    {
+      "label": "Protein property comparison",
+      "iri": "http://edamontology.org/operation_2930",
+      "parent_iri": "http://edamontology.org/operation_2997"
+    },
+    {
+      "label": "Nucleic acid comparison",
+      "iri": "http://edamontology.org/operation_2998",
+      "parent_iri": "http://edamontology.org/operation_2424"
+    },
+    {
+      "label": "Sample comparison",
+      "iri": "http://edamontology.org/operation_3731",
+      "parent_iri": "http://edamontology.org/operation_2424"
+    },
+    {
+      "label": "Optimisation and refinement",
+      "iri": "http://edamontology.org/operation_2425",
+      "parent_iri": "http://edamontology.org/operation_0004"
+    },
+    {
+      "label": "Modelling and simulation",
+      "iri": "http://edamontology.org/operation_2426",
+      "parent_iri": "http://edamontology.org/operation_0004"
+    },
+    {
+      "label": "Simulated gene expression data generation",
+      "iri": "http://edamontology.org/operation_3566",
+      "parent_iri": "http://edamontology.org/operation_2426"
+    },
+    {
+      "label": "Forcefield parameterisation",
+      "iri": "http://edamontology.org/operation_3893",
+      "parent_iri": "http://edamontology.org/operation_2426"
+    },
+    {
+      "label": "Design",
+      "iri": "http://edamontology.org/operation_2430",
+      "parent_iri": "http://edamontology.org/operation_0004"
+    },
+    {
+      "label": "Small molecule design",
+      "iri": "http://edamontology.org/operation_4009",
+      "parent_iri": "http://edamontology.org/operation_2430"
+    },
+    {
+      "label": "Protein design",
+      "iri": "http://edamontology.org/operation_4008",
+      "parent_iri": "http://edamontology.org/operation_2430"
+    },
+    {
+      "label": "Service management",
+      "iri": "http://edamontology.org/operation_3760",
+      "parent_iri": "http://edamontology.org/operation_0004"
+    },
+    {
+      "label": "Service discovery",
+      "iri": "http://edamontology.org/operation_3761",
+      "parent_iri": "http://edamontology.org/operation_3760"
+    },
+    {
+      "label": "Service composition",
+      "iri": "http://edamontology.org/operation_3762",
+      "parent_iri": "http://edamontology.org/operation_3760"
+    },
+    {
+      "label": "Service invocation",
+      "iri": "http://edamontology.org/operation_3763",
+      "parent_iri": "http://edamontology.org/operation_3760"
+    },
+    {
+      "label": "Quantification",
+      "iri": "http://edamontology.org/operation_3799",
+      "parent_iri": "http://edamontology.org/operation_0004"
+    },
+    {
+      "label": "RNA-Seq quantification",
+      "iri": "http://edamontology.org/operation_3800",
+      "parent_iri": "http://edamontology.org/operation_3799"
+    },
+    {
+      "label": "Indexing",
+      "iri": "http://edamontology.org/operation_0227",
+      "parent_iri": "http://edamontology.org/operation_0004"
+    },
+    {
+      "label": "Annotation",
+      "iri": "http://edamontology.org/operation_0226",
+      "parent_iri": "http://edamontology.org/operation_0004"
+    },
+    {
+      "label": "Sequence annotation",
+      "iri": "http://edamontology.org/operation_0361",
+      "parent_iri": "http://edamontology.org/operation_0226"
+    },
+    {
+      "label": "Gene functional annotation",
+      "iri": "http://edamontology.org/operation_3672",
+      "parent_iri": "http://edamontology.org/operation_0361"
+    },
+    {
+      "label": "SNP annotation",
+      "iri": "http://edamontology.org/operation_3661",
+      "parent_iri": "http://edamontology.org/operation_0361"
+    },
+    {
+      "label": "Image annotation",
+      "iri": "http://edamontology.org/operation_3553",
+      "parent_iri": "http://edamontology.org/operation_0226"
+    },
+    {
+      "label": "Phylogenetic tree annotation",
+      "iri": "http://edamontology.org/operation_0558",
+      "parent_iri": "http://edamontology.org/operation_0226"
+    },
+    {
+      "label": "Text annotation",
+      "iri": "http://edamontology.org/operation_3778",
+      "parent_iri": "http://edamontology.org/operation_0226"
+    }
+  ]
+}

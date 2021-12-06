@@ -110,7 +110,7 @@ class SampleControlledVocabsController < ApplicationController
 
   def typeahead
     scv = SampleControlledVocab.find(params[:scv_id])
-    results = scv.sample_controlled_vocab_terms.where('LOWER(label) like :query OR LOWER(iri) LIKE :query',
+    results = scv.sample_controlled_vocab_terms.where('LOWER(label) like :query',
                                                       query: "%#{params[:query].downcase}%").limit(params[:limit] || 100)
     items = results.map do |term|
       { id: term.label,

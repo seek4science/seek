@@ -24,6 +24,8 @@
       <p class="help-block">If this workflow came from an external repository (i.e. GitHub), you can include its original URL here.</p>
     </div>
 
+    <%= render partial: 'assets/edam_form_properties', locals: { resource: @workflow } %>
+
     <div class="form-group">
       <label>Maturity</label>
       <%= f.select :maturity_level, Workflow::MATURITY_LEVELS.values.map { |k| [t("maturity_level.#{k}"), k] }, { include_blank: 'Not specified' }, class: 'form-control' -%>
