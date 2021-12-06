@@ -170,14 +170,23 @@ const applyTemplate = () => {
     $j(newRow).find('[data-attr="iri"]').val(row[8]);
 
     // Show the CV block if cv_id is not empty
-    if(row[4]) $j(newRow).find(".controlled-vocab-block").show()
+    if (row[4]) $j(newRow).find(".controlled-vocab-block").show();
+
+    // Show the sample-type-block block if type is SEEK sample
+    const is_seek_sample = $j(newRow)
+      .find(".sample-type-attribute-type")
+      .find(":selected")
+      .data("is-seek-sample");
+    if (is_seek_sample) $j(newRow).find(".sample-type-block").show();
+    // Select the first item by default
+    $j(newRow).find(".linked-sample-type-selection optgroup option:first").attr("selected", "selected")
 
     $j(`${attribute_table} ${addAttributeRow}`).before(newRow);
   });
 
   // Sets the template_id in the form (if the object is an isa_study form sample_type)
-  const template_id_tag = $j(`#isa_study${suffix}_template_id`)
-  if(template_id_tag) $j(template_id_tag).val(id)
+  const template_id_tag = $j(`#isa_study${suffix}_template_id`);
+  if (template_id_tag) $j(template_id_tag).val(id);
 
   SampleTypes.recalculatePositions();
   SampleTypes.bindSortable();
