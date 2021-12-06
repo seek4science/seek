@@ -31,9 +31,13 @@
 *= require organisms
 *= require human_diseases
 *= require samples
-*= require DataTables-1.10.11/dataTables.bootstrap
-*= require DataTables-1.10.11/select.bootstrap
-*= require DataTables-1.10.11/buttons.bootstrap
+*= require DataTables-1.11.3/dataTables.bootstrap
+*= require DataTables-1.11.3/select.bootstrap
+*= require DataTables-1.11.3/buttons.bootstrap
+*= require DataTables-1.11.3/autoFill.bootstrap
+*= require DataTables-1.11.3/colReorder.bootstrap
+*= require DataTables-1.11.3/fixedColumns.bootstrap
+*= require DataTables-1.11.3/fixedHeader.bootstrap
 *= require jstree
 *= require openbis
 *= require eonasdan-bootstrap-datetimepicker

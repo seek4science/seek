@@ -59,10 +59,13 @@ table.dataTable.display tbody > tr > .selected:hover, table.dataTable.order-colu
 table.dataTable.order-column.hover tbody > tr > .selected:hover {
   background-color: #007dbb;
 }
-table.dataTable td.select-checkbox {
+table.dataTable tbody td.select-checkbox,
+table.dataTable tbody th.select-checkbox {
   position: relative;
 }
-table.dataTable td.select-checkbox:before, table.dataTable td.select-checkbox:after {
+table.dataTable tbody td.select-checkbox:before, table.dataTable tbody td.select-checkbox:after,
+table.dataTable tbody th.select-checkbox:before,
+table.dataTable tbody th.select-checkbox:after {
   display: block;
   position: absolute;
   top: 1.2em;
@@ -71,19 +74,30 @@ table.dataTable td.select-checkbox:before, table.dataTable td.select-checkbox:af
   height: 12px;
   box-sizing: border-box;
 }
-table.dataTable td.select-checkbox:before {
-  content: ' ';
+table.dataTable tbody td.select-checkbox:before,
+table.dataTable tbody th.select-checkbox:before {
+  content: " ";
   margin-top: -6px;
   margin-left: -6px;
   border: 1px solid black;
   border-radius: 3px;
 }
-table.dataTable tr.selected td.select-checkbox:after {
-  content: '\2714';
-  margin-top: -11px;
-  margin-left: -4px;
+table.dataTable tr.selected td.select-checkbox:after,
+table.dataTable tr.selected th.select-checkbox:after {
+  content: "✓";
+  font-size: 20px;
+  margin-top: -19px;
+  margin-left: -6px;
   text-align: center;
   text-shadow: 1px 1px #B0BED9, -1px -1px #B0BED9, 1px -1px #B0BED9, -1px 1px #B0BED9;
+}
+table.dataTable.compact tbody td.select-checkbox:before,
+table.dataTable.compact tbody th.select-checkbox:before {
+  margin-top: -12px;
+}
+table.dataTable.compact tr.selected td.select-checkbox:after,
+table.dataTable.compact tr.selected th.select-checkbox:after {
+  margin-top: -16px;
 }
 
 div.dataTables_wrapper span.select-info,
@@ -93,7 +107,7 @@ div.dataTables_wrapper span.select-item {
 
 @media screen and (max-width: 640px) {
   div.dataTables_wrapper span.select-info,
-  div.dataTables_wrapper span.select-item {
+div.dataTables_wrapper span.select-item {
     margin-left: 0;
     display: block;
   }
