@@ -3,6 +3,7 @@
 <% id = sample_attribute ? sample_attribute.id : '' %>
 <% title = sample_attribute ? sample_attribute.title : '' %>
 <% description = sample_attribute ? sample_attribute.description : '' %>
+<% pid = sample_attribute ? sample_attribute.iri : '' %>
 <% pos = sample_attribute ? sample_attribute.pos : '' %>
 <% required = sample_attribute ? sample_attribute.required : false %>
 <% is_title = sample_attribute ? sample_attribute.is_title : false %>
@@ -33,6 +34,9 @@
 
     <%= text_area_tag "#{field_name_prefix}[description]", description, class: 'form-control',
                        placeholder: 'Description' %>
+
+    <%= text_field_tag "#{field_name_prefix}[iri]", pid, class: 'form-control',
+                      placeholder: 'Identifier' %>
   </td>
   <td class="text-center">
     <div class="checkbox-inline">
