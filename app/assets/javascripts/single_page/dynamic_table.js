@@ -50,6 +50,8 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
         scrollX: true,
         errMode: "throw",
         order: [[options.readonly ? 1 : 3, "asc"]],
+        dom: "Blftipr",
+        buttons: "main"
         // stateSave: true
       });
       this.table.rows.add(rows.map((r) => [null, ...r])).draw();
