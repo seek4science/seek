@@ -3,6 +3,7 @@
 <% new_attribute_id = 'new-attribute-row' + id_suffix %>
 <% add_attribute_row_id = 'add-attribute-row' + id_suffix %>
 <% main_field_name = id_suffix[1..-1] %>
+<% isa_element ||= "study" %>
 
 <%=  f.fields_for main_field_name, sample_type do |field| %>
 
@@ -53,7 +54,7 @@
           <% sample_type.sample_attributes.each_with_index do |sample_attribute, index| %>
               <%= render :partial => 'sample_types/sample_attribute_form', :locals => { :index => index,
                                                                            :sample_attribute => sample_attribute,
-                                                                           :sample_type=>sample_type, :prefix => "isa_study[#{main_field_name}]"} %>
+                                                                           :sample_type=>sample_type, :prefix => "isa_#{isa_element}[#{main_field_name}]"} %>
           <% end %>
 
           <% unless sample_type.uploaded_template? || !sample_type.editing_constraints.allow_new_attribute? %>
@@ -72,7 +73,7 @@
 
 <table id=<%=new_attribute_id%> style="display: none">
   <tbody>
-    <%= render :partial => 'sample_types/sample_attribute_form', :locals=> {sample_type:sample_type, prefix: "isa_study[#{main_field_name}]"} %>
+    <%= render :partial => 'sample_types/sample_attribute_form', :locals=> {sample_type:sample_type, prefix: "isa_#{isa_element}[#{main_field_name}]"} %>
   </tbody>
 </table>
 

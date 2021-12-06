@@ -15,7 +15,7 @@
     <script>
         let studyDynamicTable
         $j(document).ready(function () {
-            const dt = <%= sanitize(dt_aggregated(study).to_json) %>
+            const dt = <%= sanitize(dt_aggregated(study, true).to_json) %>
             studyDynamicTable = new $j.dynamicTable('#study-table')
             studyDynamicTable.init(dt.rows, dt.columns, { readonly: true })
             const types = studyDynamicTable.getSampleTypes()
