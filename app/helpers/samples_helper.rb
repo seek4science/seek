@@ -11,7 +11,7 @@ module SamplesHelper
       options = options_from_collection_for_select(
         sample_controlled_vocab.sample_controlled_vocab_terms.sort_by(&:label),
         :label, :label,
-        value
+        values
       )
       select_tag element_name,
                  options,                 
