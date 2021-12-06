@@ -1,19 +1,31 @@
 <% cancel_path ||= workflows_path %>
 <% new_version ||= false %>
 
-<div>
-  <ul class="nav nav-pills nav-stacked" role="tablist">
-    <li class="active" role="presentation"><a href="#new-ro-crate" aria-controls="new-ro-crate" role="tab" data-toggle="tab">Simple</a></li>
-    <li role="presentation"><a href="#git-repo" aria-controls="git-repo" role="tab" data-toggle="tab">Git Repository</a></li>
-    <li role="presentation"><a href="#existing-ro-crate" aria-controls="existing-ro-crate" role="tab" data-toggle="tab">Advanced (<em>Workflow RO-Crate</em>)</a></li>
-  </ul>
+<div class="row">
+  <div class="col-sm-3 col-md-2">
+    <ul class="nav nav-pills nav-stacked" role="tablist">
+      <li class="active" role="presentation">
+        <a href="#new-ro-crate" aria-controls="new-ro-crate" role="tab" data-toggle="tab">
+          <%= t('workflows.register.files') %>
+        </a>
+      </li>
+      <li role="presentation">
+        <a href="#git-repo" aria-controls="git-repo" role="tab" data-toggle="tab">
+          <%= t('workflows.register.git') %>
+        </a>
+      </li>
+      <li role="presentation">
+        <a href="#existing-ro-crate" aria-controls="existing-ro-crate" role="tab" data-toggle="tab">
+          <%= t('workflows.register.ro_crate') %>
+        </a>
+      </li>
+    </ul>
+  </div>
 
-  <br/>
-
-  <div class="tab-content">
-    <div id="new-ro-crate" role="tabpanel" class="tab-pane active">
-      <%= form_tag({ action: :create_from_files, anchor: 'new-ro-crate' }, multipart: true) do -%>
-        <div class="asset_form">
+  <div class="col-sm-9 col-md-10">
+    <div class="tab-content">
+      <div id="new-ro-crate" role="tabpanel" class="tab-pane active">
+        <%= form_tag({ action: :create_from_files, anchor: 'new-ro-crate' }, multipart: true) do -%>
           <%= error_messages_for :workflow -%>
           <%= error_messages_for :crate_builder, header_message: "Could not build Workflow RO-Crate" -%>
 
@@ -61,27 +73,25 @@
               <%= render partial: 'assets/upload', locals: { field_name: 'ro_crate[diagram]', param: params.dig(:ro_crate, :diagram), file_field_opts: { accept: 'image/*' } } -%>
             </div>
           <% end %>
-        </div>
 
-        <% if new_version %>
-          <div class="form-group">
-            <label>Revision comments (optional)</label>
-            <%= text_area_tag :revision_comments, nil, size: '55x4', class: 'form-control' -%>
+          <% if new_version %>
+            <div class="form-group">
+              <label>Revision comments (optional)</label>
+              <%= text_area_tag :revision_comments, nil, size: '55x4', class: 'form-control' -%>
+            </div>
+
+            <%= hidden_field_tag(:workflow_id, @workflow.id) %>
+          <% end %>
+
+          <div>
+            <%= create_button class: 'btn btn-primary'-%>
+            or <%= cancel_button(cancel_path) -%>
           </div>
+        <% end -%>
+      </div>
 
-          <%= hidden_field_tag(:workflow_id, @workflow.id) %>
-        <% end %>
-
-        <div>
-          <%= create_button class: 'btn btn-primary'-%>
-          or <%= cancel_button(cancel_path) -%>
-        </div>
-      <% end -%>
-    </div>
-
-    <div id="git-repo" role="tabpanel" class="tab-pane">
-      <%= form_tag({ action: :create_from_git, anchor: 'git-repo' }) do -%>
-        <div class="asset_form">
+      <div id="git-repo" role="tabpanel" class="tab-pane">
+        <%= form_tag({ action: :create_from_git, anchor: 'git-repo' }) do -%>
           <%= error_messages_for :workflow -%>
 
           <%= panel do %>
@@ -91,18 +101,16 @@
               <%= text_field_tag 'workflow[git_version_attributes][remote]', nil, placeholder: 'https://github.com/example/repository.git', class: 'form-control' -%>
             </div>
           <% end %>
-        </div>
 
-        <div>
-          <%= create_button class: 'btn btn-primary'-%>
-          or <%= cancel_button(cancel_path) -%>
-        </div>
-      <% end -%>
-    </div>
+          <div>
+            <%= create_button class: 'btn btn-primary'-%>
+            or <%= cancel_button(cancel_path) -%>
+          </div>
+        <% end -%>
+      </div>
 
-    <div id="existing-ro-crate" role="tabpanel" class="tab-pane">
-      <%= form_tag({ action: :create_from_ro_crate, anchor: 'existing-ro-crate' }, multipart: true) do -%>
-        <div class="asset_form">
+      <div id="existing-ro-crate" role="tabpanel" class="tab-pane">
+        <%= form_tag({ action: :create_from_ro_crate, anchor: 'existing-ro-crate' }, multipart: true) do -%>
           <%= error_messages_for :workflow -%>
           <%= error_messages_for :crate_extractor -%>
 
@@ -127,8 +135,8 @@
             <%= create_button class: 'btn btn-primary'-%>
             or <%= cancel_button(cancel_path) -%>
           </div>
-        </div>
-      <% end -%>
+        <% end -%>
+      </div>
     </div>
   </div>
 </div>

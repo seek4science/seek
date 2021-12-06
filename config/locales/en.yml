@@ -30,6 +30,10 @@ en:
     galaxy_workflow: "Galaxy workflow"
     knime_workflow: "KNIME workflow"
     ro_workflow: "Research Object workflow"
+    register:
+      files: 'Upload/Import Files'
+      git: 'Import Git Repository'
+      ro_crate: 'Upload/Import Workflow RO-Crate'
   node: "Workflow Node"
   nodes:
     node: "Workflow Node"
