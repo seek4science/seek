@@ -31,13 +31,8 @@
 
     <%= text_field_tag "#{field_name_prefix}[title]", title, class: 'form-control',
                        placeholder: 'Attribute name',disabled: !allow_name_change %>
-
-    <%= text_area_tag "#{field_name_prefix}[description]", description, class: 'form-control',
-                       placeholder: 'Description' %>
-
-    <%= text_field_tag "#{field_name_prefix}[pid]", pid, class: 'form-control',
-                      placeholder: 'Identifier' %>
   </td>
+
   <td class="text-center">
     <div class="checkbox-inline">
       <%= hidden_field_tag "#{field_name_prefix}[required]", '0' %>
@@ -86,6 +81,14 @@
                      include_blank: true,
                      class: 'form-control linked-sample-type-selection' %>
     </div>
+  </td>
+  <td>
+    <%= text_area_tag "#{field_name_prefix}[description]", description, class: 'form-control',
+                      style:'height:4em;width:20em;', placeholder: 'Description' %>
+  </td>
+  <td>
+    <%= text_field_tag "#{field_name_prefix}[pid]", pid, class: 'form-control',
+                       placeholder: 'Identifier URI' %>
   </td>
   <td>
     <%= select_tag "#{field_name_prefix}[unit_id]",
