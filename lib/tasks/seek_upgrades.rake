@@ -11,6 +11,7 @@ namespace :seek do
     db:seed:010_workflow_classes
     db:seed:011_edam_topics
     db:seed:012_edam_operations
+    rename_branding_settings
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -45,6 +46,16 @@ namespace :seek do
     ensure
       Seek::Config.solr_enabled = solr
     end
+  end
+
+  task(rename_branding_settings: [:environment]) do
+    Seek::Config.transfer_value :project_link, :instance_link
+    Seek::Config.transfer_value :project_name, :instance_name
+    Seek::Config.transfer_value :project_description, :instance_description
+    Seek::Config.transfer_value :project_keywords, :instance_keywords
+
+    Seek::Config.transfer_value :dm_project_name, :instance_admins_name
+    Seek::Config.transfer_value :dm_project_link, :instance_admins_link
   end
 
 end
