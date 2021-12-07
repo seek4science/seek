@@ -378,9 +378,12 @@ class SampleTypesControllerTest < ActionController::TestCase
 
     get :show, params: { id: linked_type.id }
 
-    assert_select 'li', text: /patient \(#{linked_attribute.sample_attribute_type.title}/i do
-      assert_select 'a[href=?]', sample_type_path(sample_type_linked_to), text: sample_type_linked_to.title
+    assert_select 'table tbody' do
+      assert_select 'td', text: /#{linked_attribute.sample_attribute_type.title}/i do
+        assert_select 'a[href=?]', sample_type_path(sample_type_linked_to), text: sample_type_linked_to.title
+      end
     end
+
   end
 
   test 'add attribute button' do
