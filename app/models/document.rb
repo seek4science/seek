@@ -12,6 +12,8 @@ class Document < ApplicationRecord
   #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
   has_one :content_blob, -> (r) { where('content_blobs.asset_version = ?', r.version) }, :as => :asset, :foreign_key => :asset_id
 
+  has_and_belongs_to_many :workflows, -> { distinct }
+
   if Seek::Config.events_enabled
     has_and_belongs_to_many :events
     before_destroy {events.clear}

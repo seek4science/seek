@@ -2,6 +2,7 @@ require 'test_helper'
 require 'minitest/mock'
 
 class WorkflowsControllerTest < ActionController::TestCase
+
   include AuthenticatedTestHelper
   include SharingFormTestHelper
   include GeneralAuthorizationTestCases
@@ -889,13 +890,14 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_equal g.id, assigns(:workflow).workflow_class_id
   end
 
-  test 'should create with presentation links' do
+  test 'should create with presentation and document links' do
     person = Factory(:person)
     presentation = Factory(:presentation, contributor: person)
+    document = Factory(:document, contributor:person)
     login_as(person)
     blob = Factory(:content_blob)
     session[:uploaded_content_blob_id] = blob.id
-    workflow =  {title: 'workflow', project_ids: [person.projects.first.id], presentation_ids:[presentation.id]}
+    workflow =  {title: 'workflow', project_ids: [person.projects.first.id], presentation_ids:[presentation.id], document_ids:[document.id]}
 
     assert_difference('Workflow.count') do
       post :create_metadata, params: {workflow: workflow, content_blob_id: blob.id.to_s, policy_attributes: { access_type: Policy::VISIBLE }}
@@ -904,21 +906,25 @@ class WorkflowsControllerTest < ActionController::TestCase
     workflow = assigns(:workflow)
 
     assert_equal [presentation], workflow.presentations
+    assert_equal [document], workflow.documents
   end
 
-  test 'should update workflow with presentation link' do
+  test 'should update workflow with presentation and document link' do
     person = Factory(:person)
     workflow = Factory(:workflow, contributor: person)
     presentation = Factory(:presentation, contributor: person)
+    document = Factory(:document, contributor:person)
     login_as(person)
     assert_empty workflow.presentations
+    assert_empty workflow.documents
 
     assert_difference('ActivityLog.count') do
-      put :update, params: { id: workflow.id, workflow: { presentation_ids: [presentation.id]} }
+      put :update, params: { id: workflow.id, workflow: { presentation_ids: [presentation.id], document_ids:[document.id]} }
     end
 
     assert_redirected_to workflow_path(workflow = assigns(:workflow))
     assert_equal [presentation], workflow.presentations
+    assert_equal [document], workflow.documents
   end
 
   test 'presentation workflows through nested routing' do
@@ -928,6 +934,21 @@ class WorkflowsControllerTest < ActionController::TestCase
     workflow2 = Factory(:workflow, policy: Factory(:public_policy), contributor:User.current_user.person)
 
     get :index, params: { presentation_id: presentation.id }
+
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', workflow_path(workflow), text: workflow.title
+      assert_select 'a[href=?]', workflow_path(workflow2), text: workflow2.title, count: 0
+    end
+  end
+
+  test 'document workflows through nested routing' do
+    assert_routing 'documents/2/workflows', controller: 'workflows', action: 'index', document_id: '2'
+    document = Factory(:document, contributor: User.current_user.person)
+    workflow = Factory(:workflow, policy: Factory(:public_policy), documents:[document], contributor:User.current_user.person)
+    workflow2 = Factory(:workflow, policy: Factory(:public_policy), contributor:User.current_user.person)
+
+    get :index, params: { document_id: document.id }
 
     assert_response :success
     assert_select 'div.list_item_title' do

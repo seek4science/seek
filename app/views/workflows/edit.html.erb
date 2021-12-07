@@ -36,7 +36,8 @@
     <%= render partial: 'assets/asset_form_bottom', locals: { f: f }-%>
     <%= render partial: 'assays/associate_assays', locals: { resource: @workflow } -%>
 
-    <%= f.fancy_multiselect :presentations, :other_projects_checkbox=>true %>
+    <%= f.fancy_multiselect :presentations, other_projects_checkbox: true %>
+    <%= f.fancy_multiselect :documents, other_projects_checkbox: true  if Seek::Config.documents_enabled %>
 
     <%= form_submit_buttons(@workflow) %>
   </div>

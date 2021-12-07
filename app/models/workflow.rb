@@ -20,6 +20,7 @@ class Workflow < ApplicationRecord
 
   has_and_belongs_to_many :sops
   has_and_belongs_to_many :presentations, -> { distinct }
+  has_and_belongs_to_many :documents, -> { distinct }
 
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi', 'test_status']) do
     after_commit :submit_to_life_monitor, on: [:create, :update]

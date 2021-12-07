@@ -317,7 +317,8 @@ class WorkflowsController < ApplicationController
                                      { project_ids: [] }, :license, :other_creators,
                                      { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                      { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
-                                     { publication_ids: [] }, { presentation_ids: [] }, :internals, :maturity_level, :source_link_url,
+                                     { publication_ids: [] }, { presentation_ids: [] }, { document_ids: [] },
+                                     :internals, :maturity_level, :source_link_url,
                                      discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 

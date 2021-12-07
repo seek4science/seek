@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_07_141429) do
+ActiveRecord::Schema.define(version: 2021_12_07_170649) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -559,6 +559,13 @@ ActiveRecord::Schema.define(version: 2021_12_07_141429) do
     t.integer "project_id"
     t.index ["document_id", "project_id"], name: "index_documents_projects_on_document_id_and_project_id"
     t.index ["project_id"], name: "index_documents_projects_on_project_id"
+  end
+
+  create_table "documents_workflows", id: false,  force: :cascade do |t|
+    t.bigint "workflow_id", null: false
+    t.bigint "document_id", null: false
+    t.index ["document_id", "workflow_id"], name: "index_documents_workflows_on_document_id_and_workflow_id"
+    t.index ["workflow_id", "document_id"], name: "index_documents_workflows_on_workflow_id_and_document_id"
   end
 
   create_table "event_auth_lookup",  force: :cascade do |t|

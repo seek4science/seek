@@ -76,7 +76,8 @@
                            existing_creators: @workflow.creators.any? ? @workflow.creators : [],
                            other_creators: @workflow.other_creators } %>
 
-      <%= f.fancy_multiselect :presentations, :other_projects_checkbox=>true %>
+      <%= f.fancy_multiselect :presentations, other_projects_checkbox: true %>
+      <%= f.fancy_multiselect :documents, other_projects_checkbox: true if Seek::Config.documents_enabled %>
 
     <% end %>
 
