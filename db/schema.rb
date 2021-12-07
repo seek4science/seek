@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_08_10_211320) do
+ActiveRecord::Schema.define(version: 2021_12_07_141429) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -1260,6 +1260,13 @@ ActiveRecord::Schema.define(version: 2021_08_10_211320) do
     t.integer "presentation_id"
     t.index ["presentation_id", "project_id"], name: "index_presentations_projects_pres_proj_id"
     t.index ["project_id"], name: "index_presentations_projects_on_project_id"
+  end
+
+  create_table "presentations_workflows", id: false,  force: :cascade do |t|
+    t.bigint "workflow_id", null: false
+    t.bigint "presentation_id", null: false
+    t.index ["presentation_id", "workflow_id"], name: "index_presentations_workflows_on_presentation_id_and_workflow_id"
+    t.index ["workflow_id", "presentation_id"], name: "index_presentations_workflows_on_workflow_id_and_presentation_id"
   end
 
   create_table "programmes", id: :integer,  force: :cascade do |t|

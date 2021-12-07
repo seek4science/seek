@@ -486,7 +486,7 @@ SEEK::Application.routes.draw do
   end
 
   resources :presentations, concerns: [:has_content_blobs, :publishable, :has_versions, :asset] do
-    resources :people, :programmes, :projects, :publications, :events, :collections, only: [:index]
+    resources :people, :programmes, :projects, :publications, :events, :collections, :workflows, only: [:index]
   end
 
   resources :models, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
@@ -532,7 +532,7 @@ SEEK::Application.routes.draw do
       get :new_version
       post :create_version_metadata
     end
-    resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :sops, :collections, only: [:index]
+    resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :sops, :collections, :presentations, only: [:index]
   end
 
   resources :workflow_classes, except: [:show]

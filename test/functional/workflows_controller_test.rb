@@ -40,7 +40,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
   test 'can create with local file' do
     workflow_attrs = Factory.attributes_for(:workflow,
-                                            contributor: User.current_user,
+                                            contributor: User.current_user.person,
                                             project_ids: [@project.id])
 
     assert_difference 'Workflow.count' do
@@ -887,6 +887,53 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     assert_equal 'Galaxy', assigns(:workflow).workflow_class_title
     assert_equal g.id, assigns(:workflow).workflow_class_id
+  end
+
+  test 'should create with presentation links' do
+    person = Factory(:person)
+    presentation = Factory(:presentation, contributor: person)
+    login_as(person)
+    blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+    workflow =  {title: 'workflow', project_ids: [person.projects.first.id], presentation_ids:[presentation.id]}
+
+    assert_difference('Workflow.count') do
+      post :create_metadata, params: {workflow: workflow, content_blob_id: blob.id.to_s, policy_attributes: { access_type: Policy::VISIBLE }}
+    end
+
+    workflow = assigns(:workflow)
+
+    assert_equal [presentation], workflow.presentations
+  end
+
+  test 'should update workflow with presentation link' do
+    person = Factory(:person)
+    workflow = Factory(:workflow, contributor: person)
+    presentation = Factory(:presentation, contributor: person)
+    login_as(person)
+    assert_empty workflow.presentations
+
+    assert_difference('ActivityLog.count') do
+      put :update, params: { id: workflow.id, workflow: { presentation_ids: [presentation.id]} }
+    end
+
+    assert_redirected_to workflow_path(workflow = assigns(:workflow))
+    assert_equal [presentation], workflow.presentations
+  end
+
+  test 'presentation workflows through nested routing' do
+    assert_routing 'presentations/2/workflows', controller: 'workflows', action: 'index', presentation_id: '2'
+    presentation = Factory(:presentation, contributor: User.current_user.person)
+    workflow = Factory(:workflow, policy: Factory(:public_policy), presentations:[presentation], contributor:User.current_user.person)
+    workflow2 = Factory(:workflow, policy: Factory(:public_policy), contributor:User.current_user.person)
+
+    get :index, params: { presentation_id: presentation.id }
+
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', workflow_path(workflow), text: workflow.title
+      assert_select 'a[href=?]', workflow_path(workflow2), text: workflow2.title, count: 0
+    end
   end
 
   def edit_max_object(workflow)

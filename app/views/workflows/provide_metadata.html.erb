@@ -75,7 +75,11 @@
                  locals: { form: f,
                            existing_creators: @workflow.creators.any? ? @workflow.creators : [],
                            other_creators: @workflow.other_creators } %>
+
+      <%= f.fancy_multiselect :presentations, :other_projects_checkbox=>true %>
+
     <% end %>
+
 
     <%= hidden_field_tag 'workflow[internals]', raw(@workflow.internals.to_json) -%>
 

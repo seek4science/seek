@@ -19,6 +19,7 @@ class Workflow < ApplicationRecord
   has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
 
   has_and_belongs_to_many :sops
+  has_and_belongs_to_many :presentations, -> { distinct }
 
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi', 'test_status']) do
     after_commit :submit_to_life_monitor, on: [:create, :update]
