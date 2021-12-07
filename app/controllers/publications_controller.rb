@@ -591,7 +591,7 @@ class PublicationsController < ApplicationController
       elsif has_non_umlaut(author.last_name)
         replaced_name = replace_to_umlaut(author.last_name)
       end
-      last_name_matches = Person.where(last_name: replaced_name)
+      last_name_matches = Person.where(last_name: replaced_name) unless replaced_name.blank?
       matches = last_name_matches
     end
 
