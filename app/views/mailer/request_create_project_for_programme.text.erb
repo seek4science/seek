@@ -3,13 +3,13 @@ Hi <%= @admins.collect{|o| o.name}.join(", ") -%>,
 
 <% if @programme %>
 
-  The <%= Seek::Config.application_name %> user <%= "#{@requester.name} (#{person_url(@requester)})" %>, has requested a new <%= t('project')  %> is created within your <%= t('programme') %>.
+  The <%= Seek::Config.instance_name %> user <%= "#{@requester.name} (#{person_url(@requester)})" %>, has requested a new <%= t('project')  %> is created within your <%= t('programme') %>.
 
   The <%= t('programme') %> is <%= "#{@programme.title} (#{programme_url(@programme)})" %>
 
 <% else %>
 
-  The <%= Seek::Config.application_name %> user <%= "#{@requester.name} (#{person_url(@requester)})" %>, has requested a new <%= t('project')  %> is created.
+  The <%= Seek::Config.instance_name %> user <%= "#{@requester.name} (#{person_url(@requester)})" %>, has requested a new <%= t('project')  %> is created.
 
 <% end %>
 
@@ -45,4 +45,4 @@ You can reply to <%= @requester.first_name.capitalize -%> by replying to this em
 
 This is an automated email.
 
-- <%= Seek::Config.dm_project_name %> Team
+- <%= Seek::Config.instance_admins_name %> Team

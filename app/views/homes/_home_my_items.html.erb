@@ -1,7 +1,7 @@
 <div class="panel panel-default" id="home_my_items" style="padding: 20px;height:100%;">
   <% current_person = current_user.person %>
   <% current_person_projects = current_person.projects %>
-  <h2 class="text-center"><a href="<%=person_path(current_person)%>/items">My <%= Seek::Config.project_name %> </a> </h2>
+  <h2 class="text-center"><a href="<%=person_path(current_person)%>/items">My <%= Seek::Config.instance_name %> </a> </h2>
   <div class="row">
     <div class="col-sm-6" style="border-right: 2px solid #ccc;">
       <% if Seek::Config.programmes_enabled && can_create_programmes?%>

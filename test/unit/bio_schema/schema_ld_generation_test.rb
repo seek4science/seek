@@ -18,7 +18,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => 'DataCatalog',
       'dct:conformsTo' => 'https://bioschemas.org/profiles/DataCatalog/0.3-RELEASE-2019_07_01/',
-      'name' => 'Sysmo',
+      'name' => 'Sysmo SEEK',
       'url' => 'http://fairyhub.org',
       'description' => 'a lovely project',
       'keywords' => 'a, b, c, d',
@@ -31,8 +31,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601
     }
-    with_config_value(:project_description, 'a lovely project') do
-      with_config_value(:project_keywords, 'a,  b, ,,c,d') do
+    with_config_value(:instance_description, 'a lovely project') do
+      with_config_value(:instance_keywords, 'a,  b, ,,c,d') do
         with_config_value(:site_base_host, 'http://fairyhub.org') do
           json = JSON.parse(Seek::BioSchema::DataCatalogMockModel.new.to_schema_ld)
           assert_equal expected, json
@@ -426,12 +426,13 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       workflow = Factory(:cwl_packed_workflow,
                          title: 'This workflow',
                          description: 'This is a test workflow for bioschema generation',
-                         creators: [@person, creator2],
                          contributor: @person,
                          license: 'APSL-2.0')
 
-      workflow.assets_creators.create!(given_name: 'Fred', family_name: 'Bloggs')
-      workflow.assets_creators.create!(given_name: 'Steve', family_name: 'Smith', orcid: 'https://orcid.org/0000-0002-1694-233X')
+      workflow.assets_creators.create!(creator: @person, pos: 1)
+      workflow.assets_creators.create!(creator: creator2, pos: 2)
+      workflow.assets_creators.create!(given_name: 'Fred', family_name: 'Bloggs', pos: 3)
+      workflow.assets_creators.create!(given_name: 'Steve', family_name: 'Smith', orcid: 'https://orcid.org/0000-0002-1694-233X', pos: 4)
 
       workflow.internals = workflow.extractor.metadata[:internals]
 
@@ -474,9 +475,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                  'sdPublisher' =>
                    {
                      '@type' => 'Organization',
-                     '@id' => Seek::Config.dm_project_link,
-                     'name' => Seek::Config.dm_project_name,
-                     'url' => Seek::Config.dm_project_link },
+                     '@id' => Seek::Config.instance_admins_link,
+                     'name' => Seek::Config.instance_admins_name,
+                     'url' => Seek::Config.instance_admins_link },
                  'version' => 1,
                  'programmingLanguage' => {
                    '@id'=>'#cwl',

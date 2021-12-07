@@ -102,7 +102,7 @@ class DataciteMetadataTest < ActiveSupport::TestCase
     assert_equal 'ORCID', resource.xpath('./xmlns:creators/xmlns:creator/xmlns:nameIdentifier/@nameIdentifierScheme').first.text
     assert_equal 'https://orcid.org', resource.xpath('./xmlns:creators/xmlns:creator/xmlns:nameIdentifier/@schemeURI').first.text
     assert_equal thing.created_at.year.to_s, resource.xpath('./xmlns:publicationYear').first.text
-    assert_equal Seek::Config.project_name, resource.xpath('./xmlns:publisher').first.text
+    assert_equal Seek::Config.instance_name, resource.xpath('./xmlns:publisher').first.text
     assert_equal 'Dataset', resource.xpath('./xmlns:resourceType').first.text
     assert_equal 'Dataset', resource.xpath('./xmlns:resourceType/@resourceTypeGeneral').first.text
   end

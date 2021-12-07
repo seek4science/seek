@@ -17,7 +17,7 @@
 -%>
 
 <%= panel("Their tags",
-          :help_text => "These are the tags that they have used to tag items in #{h(Seek::Config.application_name)}. The weight of the tag indicates how often it has been used within #{h(Seek::Config.application_name)}.") do %>
+          :help_text => "These are the tags that they have used to tag items in #{h(Seek::Config.instance_name)}. The weight of the tag indicates how often it has been used within #{h(Seek::Config.instance_name)}.") do %>
 
   <%= render :partial=>"tags/tag_cloud",:locals=>{:tags=>tags,:show_overall_count=>true,:id=>"personal_tags",:tags_smaller=>true,:no_tags_text=>"This person has not yet tagged anything."} %>
  
