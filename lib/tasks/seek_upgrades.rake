@@ -12,6 +12,8 @@ namespace :seek do
     db:seed:011_edam_topics
     db:seed:012_edam_operations
     update_missing_publication_versions
+    db:seed:013_edam_formats
+    db:seed:014_edam_data
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change

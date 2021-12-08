@@ -1649,7 +1649,7 @@ ActiveRecord::Schema.define(version: 2021_11_11_133408) do
     t.datetime "updated_at"
   end
 
-  create_table "repository_standards", id: :integer,  force: :cascade do |t|
+  create_table "repository_standards",  force: :cascade do |t|
     t.string "title"
     t.string "url"
     t.string "group_tag"
@@ -2140,7 +2140,7 @@ ActiveRecord::Schema.define(version: 2021_11_11_133408) do
     t.index ["user_id", "can_view"], name: "index_w_auth_lookup_on_user_id_and_can_view"
   end
 
-  create_table "workflow_classes", id: :integer,  force: :cascade do |t|
+  create_table "workflow_classes",  force: :cascade do |t|
     t.string "title"
     t.text "description"
     t.string "key"
