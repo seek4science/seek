@@ -78,6 +78,7 @@
 
       <%= f.fancy_multiselect :presentations, other_projects_checkbox: true %>
       <%= f.fancy_multiselect :documents, other_projects_checkbox: true if Seek::Config.documents_enabled %>
+      <%= f.fancy_multiselect :data_files, other_projects_checkbox: true %>
 
     <% end %>
 
