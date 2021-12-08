@@ -32,7 +32,7 @@
 
       <%= fancy_multiselect @presentation, :events, { other_projects_checkbox: true, sort_by: :start_date } %>
 
-      <%= f.fancy_multiselect :workflows, :other_projects_checkbox=>true if Seek::Config.workflows_enabled %>
+      <%= fancy_multiselect @presentation, :workflows, :other_projects_checkbox=>true if Seek::Config.workflows_enabled %>
 
       <%= form_submit_buttons(@presentation) %>
     </div>
