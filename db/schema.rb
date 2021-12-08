@@ -564,8 +564,8 @@ ActiveRecord::Schema.define(version: 2021_12_07_170649) do
   create_table "documents_workflows", id: false,  force: :cascade do |t|
     t.bigint "workflow_id", null: false
     t.bigint "document_id", null: false
-    t.index ["document_id", "workflow_id"], name: "index_documents_workflows_on_document_id_and_workflow_id"
-    t.index ["workflow_id", "document_id"], name: "index_documents_workflows_on_workflow_id_and_document_id"
+    t.index ["document_id", "workflow_id"], name: "index_documents_workflows_on_doc_workflow"
+    t.index ["workflow_id", "document_id"], name: "index_documents_workflows_on_workflow_doc"
   end
 
   create_table "event_auth_lookup",  force: :cascade do |t|
@@ -1272,8 +1272,8 @@ ActiveRecord::Schema.define(version: 2021_12_07_170649) do
   create_table "presentations_workflows", id: false,  force: :cascade do |t|
     t.bigint "workflow_id", null: false
     t.bigint "presentation_id", null: false
-    t.index ["presentation_id", "workflow_id"], name: "index_presentations_workflows_on_presentation_id_and_workflow_id"
-    t.index ["workflow_id", "presentation_id"], name: "index_presentations_workflows_on_workflow_id_and_presentation_id"
+    t.index ["presentation_id", "workflow_id"], name: "index_presentations_workflows_on_pres_workflow"
+    t.index ["workflow_id", "presentation_id"], name: "index_presentations_workflows_on_workflow_pres"
   end
 
   create_table "programmes", id: :integer,  force: :cascade do |t|
