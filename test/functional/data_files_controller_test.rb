@@ -893,7 +893,20 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_equal 'Data file metadata was successfully updated.', flash[:notice]
-    assert assigns(:data_file)
+    assert_redirected_to data_file_path(df)
+    assert_equal 'diff title',assigns(:data_file).title
+  end
+
+  test 'should update data file with workflow link' do
+    df = Factory(:data_file, contributor:User.current_user.person)
+    workflow = Factory(:workflow, contributor: User.current_user.person)
+    assert_empty df.workflows
+    assert_difference('ActivityLog.count') do
+      put :update, params: { id: df.id, data_file: { workflow_ids: [workflow.id] } }
+    end
+
+    assert_equal 'Data file metadata was successfully updated.', flash[:notice]
+    assert_equal [workflow], assigns(:data_file).workflows
     assert_redirected_to data_file_path(df)
   end
 
@@ -1596,6 +1609,19 @@ class DataFilesControllerTest < ActionController::TestCase
     project = df.projects.first
     df2 = Factory(:data_file, policy: Factory(:public_policy))
     get :index, params: { project_id: project.id }
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', data_file_path(df), text: df.title
+      assert_select 'a[href=?]', data_file_path(df2), text: df2.title, count: 0
+    end
+  end
+
+  test 'workflow data files through nested routing' do
+    assert_routing 'workflows/2/data_files', controller: 'data_files', action: 'index', workflow_id: '2'
+    workflow = Factory(:workflow, contributor: User.current_user.person)
+    df = Factory(:data_file, policy: Factory(:public_policy), workflows: [workflow], contributor: User.current_user.person)
+    df2 = Factory(:data_file, policy: Factory(:public_policy), contributor: User.current_user.person)
+    get :index, params: { workflow_id: workflow.id }
     assert_response :success
     assert_select 'div.list_item_title' do
       assert_select 'a[href=?]', data_file_path(df), text: df.title

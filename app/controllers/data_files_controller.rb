@@ -520,7 +520,7 @@ class DataFilesController < ApplicationController
                                       :license, :other_creators,{ event_ids: [] },
                                       { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                       { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
-                                      { scales: [] }, { publication_ids: [] },
+                                      { scales: [] }, { publication_ids: [] }, { workflow_ids: [] },
                                       discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 

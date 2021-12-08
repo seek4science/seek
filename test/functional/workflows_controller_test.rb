@@ -927,6 +927,39 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_equal [document], workflow.documents
   end
 
+  test 'should create with data file links' do
+    person = Factory(:person)
+    presentation = Factory(:presentation, contributor: person)
+    data_file = Factory(:data_file, contributor:person)
+    login_as(person)
+    blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+    workflow =  {title: 'workflow', project_ids: [person.projects.first.id], data_file_ids:[data_file.id] }
+
+    assert_difference('Workflow.count') do
+      post :create_metadata, params: {workflow: workflow, content_blob_id: blob.id.to_s, policy_attributes: { access_type: Policy::VISIBLE }}
+    end
+
+    workflow = assigns(:workflow)
+
+    assert_equal [data_file], workflow.data_files
+  end
+
+  test 'should update workflow with data file link' do
+    person = Factory(:person)
+    workflow = Factory(:workflow, contributor: person)
+    data_file = Factory(:data_file, contributor:person)
+    login_as(person)
+    assert_empty workflow.data_files
+
+    assert_difference('ActivityLog.count') do
+      put :update, params: { id: workflow.id, workflow: { data_file_ids: [data_file.id] } }
+    end
+
+    assert_redirected_to workflow_path(workflow = assigns(:workflow))
+    assert_equal [data_file], workflow.data_files
+  end
+
   test 'presentation workflows through nested routing' do
     assert_routing 'presentations/2/workflows', controller: 'workflows', action: 'index', presentation_id: '2'
     presentation = Factory(:presentation, contributor: User.current_user.person)
@@ -949,6 +982,21 @@ class WorkflowsControllerTest < ActionController::TestCase
     workflow2 = Factory(:workflow, policy: Factory(:public_policy), contributor:User.current_user.person)
 
     get :index, params: { document_id: document.id }
+
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', workflow_path(workflow), text: workflow.title
+      assert_select 'a[href=?]', workflow_path(workflow2), text: workflow2.title, count: 0
+    end
+  end
+
+  test 'data_file workflows through nested routing' do
+    assert_routing 'data_files/2/workflows', controller: 'workflows', action: 'index', data_file_id: '2'
+    data_file = Factory(:data_file, contributor: User.current_user.person)
+    workflow = Factory(:workflow, policy: Factory(:public_policy), data_files:[data_file], contributor: User.current_user.person)
+    workflow2 = Factory(:workflow, policy: Factory(:public_policy), contributor: User.current_user.person)
+
+    get :index, params: { data_file_id: data_file.id }
 
     assert_response :success
     assert_select 'div.list_item_title' do
