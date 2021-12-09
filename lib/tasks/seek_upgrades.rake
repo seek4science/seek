@@ -17,6 +17,7 @@ namespace :seek do
     fix_negative_programme_role_mask
     db:seed:007_sample_attribute_types
     db:seed:008_miappe_custom_metadata
+    db:seed:013_workflow_data_file_relationships
     delete_users_with_invalid_person
     delete_specimen_activity_logs
     update_session_store

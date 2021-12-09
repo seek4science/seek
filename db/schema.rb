@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_08_104742) do
+ActiveRecord::Schema.define(version: 2021_12_09_112856) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -1989,9 +1989,17 @@ ActiveRecord::Schema.define(version: 2021_12_08_104742) do
     t.index ["contributor_id"], name: "index_workflow_classes_on_contributor_id"
   end
 
+  create_table "workflow_data_file_relationships",  force: :cascade do |t|
+    t.string "title"
+    t.string "key"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "workflow_data_files", id: false,  force: :cascade do |t|
     t.integer "workflow_id"
     t.integer "data_file_id"
+    t.integer "workflow_data_file_relationship_id"
     t.index ["data_file_id", "workflow_id"], name: "index_data_files_workflows_on_data_file_workflow"
     t.index ["workflow_id", "data_file_id"], name: "index_data_files_workflows_on_workflow_data_file"
   end
