@@ -318,7 +318,8 @@ class WorkflowsController < ApplicationController
                                      { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                      { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
                                      { publication_ids: [] }, { presentation_ids: [] }, { document_ids: [] },
-                                     { data_file_ids: [] }, :internals, :maturity_level, :source_link_url,
+                                     { data_file_ids: [] }, { workflow_data_files_attributes:[:id, :data_file_id, :workflow_data_file_relationship_id, :_destroy] },
+                                     :internals, :maturity_level, :source_link_url,
                                      discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 

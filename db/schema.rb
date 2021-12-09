@@ -1996,7 +1996,7 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "workflow_data_files", id: false,  force: :cascade do |t|
+  create_table "workflow_data_files",  force: :cascade do |t|
     t.integer "workflow_id"
     t.integer "data_file_id"
     t.integer "workflow_data_file_relationship_id"

@@ -1,6 +1,6 @@
 class CreateWorkflowDataFiles < ActiveRecord::Migration[5.2]
   def change
-    create_table :workflow_data_files, id: false do |t|
+    create_table :workflow_data_files do |t|
       t.integer :workflow_id
       t.integer :data_file_id
 

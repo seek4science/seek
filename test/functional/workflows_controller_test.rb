@@ -949,15 +949,49 @@ class WorkflowsControllerTest < ActionController::TestCase
     person = Factory(:person)
     workflow = Factory(:workflow, contributor: person)
     data_file = Factory(:data_file, contributor:person)
+    relationship = Factory(:test_data_workflow_data_file_relationship)
     login_as(person)
     assert_empty workflow.data_files
 
     assert_difference('ActivityLog.count') do
-      put :update, params: { id: workflow.id, workflow: { data_file_ids: [data_file.id] } }
+      assert_difference('WorkflowDataFile.count') do
+        put :update, params: { id: workflow.id, workflow: {
+          workflow_data_files_attributes: [{data_file_id: data_file.id, workflow_data_file_relationship_id:relationship.id}]
+        } }
+      end
     end
 
     assert_redirected_to workflow_path(workflow = assigns(:workflow))
     assert_equal [data_file], workflow.data_files
+    assert_equal 1,workflow.workflow_data_files.count
+    assert_equal [relationship.id], workflow.workflow_data_files.pluck(:workflow_data_file_relationship_id)
+
+    # doesn't duplicate
+    assert_difference('ActivityLog.count') do
+      assert_no_difference('WorkflowDataFile.count') do
+        put :update, params: { id: workflow.id, workflow: {
+          workflow_data_files_attributes: [{data_file_id: data_file.id, workflow_data_file_relationship_id:relationship.id}]
+        } }
+      end
+    end
+    assert_redirected_to workflow_path(workflow = assigns(:workflow))
+    assert_equal [data_file], workflow.data_files
+    assert_equal 1,workflow.workflow_data_files.count
+    assert_equal [relationship.id], workflow.workflow_data_files.pluck(:workflow_data_file_relationship_id)
+
+    #removes
+    assert_difference('ActivityLog.count') do
+      assert_difference('WorkflowDataFile.count', -1) do
+        put :update, params: { id: workflow.id, workflow: {
+          title: 'needs an attribute',
+          workflow_data_files_attributes: []
+        } }
+      end
+    end
+    assert_redirected_to workflow_path(workflow = assigns(:workflow))
+    assert_equal [], workflow.data_files
+    assert_equal 0,workflow.workflow_data_files.count
+    assert_equal [], workflow.workflow_data_files.pluck(:workflow_data_file_relationship_id)
   end
 
   test 'presentation workflows through nested routing' do
