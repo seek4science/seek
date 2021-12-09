@@ -21,6 +21,7 @@ namespace :seek do
     delete_specimen_activity_logs
     update_session_store
     update_cv_sample_templates
+    seek:rebuild_workflow_internals
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
