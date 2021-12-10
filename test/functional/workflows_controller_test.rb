@@ -956,7 +956,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('WorkflowDataFile.count') do
         put :update, params: { id: workflow.id, workflow: {
-          workflow_data_files_attributes: [{data_file_id: data_file.id, workflow_data_file_relationship_id:relationship.id}]
+          workflow_data_files_attributes: ['',{data_file_id: data_file.id, workflow_data_file_relationship_id:relationship.id}]
         } }
       end
     end
@@ -970,7 +970,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_no_difference('WorkflowDataFile.count') do
         put :update, params: { id: workflow.id, workflow: {
-          workflow_data_files_attributes: [{data_file_id: data_file.id, workflow_data_file_relationship_id:relationship.id}]
+          workflow_data_files_attributes: ['',{data_file_id: data_file.id, workflow_data_file_relationship_id:relationship.id}]
         } }
       end
     end
@@ -983,8 +983,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_difference('ActivityLog.count') do
       assert_difference('WorkflowDataFile.count', -1) do
         put :update, params: { id: workflow.id, workflow: {
-          title: 'needs an attribute',
-          workflow_data_files_attributes: []
+          workflow_data_files_attributes: ['']
         } }
       end
     end
