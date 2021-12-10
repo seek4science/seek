@@ -1,0 +1,68 @@
+<%
+  return unless Seek::Config.data_files_enabled
+
+  resource_text ||= text_for_resource(resource)
+  field_name = "#{resource.class.name.underscore}[workflow_data_files_attributes]"
+
+  collapse_panel = resource.data_files.empty?
+  associated_data_files_json = associations_json_from_workflow_data_files(resource.workflow_data_files)
+
+-%>
+
+<%= folding_panel("Data Files", collapse_panel, :body_options => {:id => 'associate_data_file_fold_content'},
+                  :help_text => "Here you associate Data Files in SEEK to this #{resource_text}.") do %>
+
+  <p>The following Data Files are involved in this <%= resource_text -%>:</p>
+
+
+    <%= associations_list('data_file_to_list', 'associations/workflow_data_file', associated_data_files_json,
+                          'data-field-name' => field_name,
+                          empty_text: 'No data files') %>
+
+  <hr/>
+
+  <%= association_selector('data_file_to_list', 'Associate data', 'Associate data', size: 'md') do %>
+
+      <div class="form-group">
+        <%= label_tag "How was the data used in this #{resource_text}?" %>
+        <%= select_tag :workflow_data_file_relationship, options_for_select(WorkflowDataFileRelationship.all.collect{|r| [r.title,r.id]}),
+                       include_blank:'Not specified', class: 'form-control', 'data-role' => 'seek-association-common-field'
+        %>
+      </div>
+
+    <hr/>
+
+    <label>Select data file</label>
+    <div class="form-group" data-role="seek-association-filter-group" data-filter-url="<%= filter_data_files_path(workflow_id: resource.id) -%>">
+      <%= association_select_filter %>
+
+      <div class="checkbox">
+        <label>
+          <%= check_box_tag(:all_projects, '1', false, 'data-role' => 'seek-association-filter-field') %>
+          <strong>Show data from all <%= t('project').downcase.pluralize -%>?</strong>
+        </label>
+      </div>
+
+      <%= association_select_results(multiple:true) %>
+    </div>
+
+  <% end %>
+<% end %>
+
+
+<script>
+    $j(document).ready(function () {
+
+        $j('#modalAssociateData #workflow_data_file_relationship').change(function () {
+            $j('#modalAssociateData [data-role="seek-association-filter-group"]').data('filterGroup').filter();
+        });
+
+        // override from association.js
+        Associations.List.prototype.findDuplicate = function(association) {
+            return this.items.find(function(item) {
+                return item.data.id === association.id && item.data.workflow_data_file_relationship.value == association.workflow_data_file_relationship.value;
+            });
+        }
+    });
+</script>
+

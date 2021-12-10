@@ -21,13 +21,17 @@ module Seek
                         [Model, 'model[publication_ids][]'],
                         [Presentation, 'presentation[publication_ids][]']],
       'Document' => [[Event, 'event[document_ids][]'],
+                     [Workflow, 'workflow[document_ids][]'],
                      [Assay, 'assay[document_ids][]']],
-      'Presentation' => [[Event, 'event[presentation_ids][]']],
+      'Presentation' => [[Event, 'event[presentation_ids][]'],
+                         [Workflow, 'workflow[presentation_ids][]']],
       'Event' => [[DataFile, 'data_file[event_ids][]'],
                   [Presentation, 'presentation[event_ids][]'],
                   [Document, 'document[event_ids][]']],
       'DataFile' => [[Assay, 'assay[data_files_attributes[][asset_id]]'],
-                     [Event, 'event[data_file_ids][]']]
+                     [Event, 'event[data_file_ids][]']],
+      'Workflow' => [[Document, 'document[workflow_ids][]'],
+                     [Presentation, 'presentation[workflow_ids][]']]
     }.freeze
 
     def self.add_dropdown_for(item)

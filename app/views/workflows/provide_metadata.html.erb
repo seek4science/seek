@@ -78,7 +78,13 @@
                  locals: { form: f,
                            existing_creators: @workflow.creators.any? ? @workflow.creators : [],
                            other_creators: @workflow.other_creators } %>
+
+      <%= f.fancy_multiselect :presentations, other_projects_checkbox: true %>
+      <%= f.fancy_multiselect :documents, other_projects_checkbox: true if Seek::Config.documents_enabled %>
+      <%= render partial: 'associate_data_file', locals: {:f=>f, :resource => @workflow } if Seek::Config.data_files_enabled %>
+
     <% end %>
+
 
     <%= hidden_field_tag 'workflow[internals]', raw(@workflow.internals.to_json) -%>
 

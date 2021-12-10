@@ -27,6 +27,9 @@ class DataFile < ApplicationRecord
   has_many :studied_factors, ->(r) { where('studied_factors.data_file_version =?', r.version) }
   has_many :extracted_samples, class_name: 'Sample', foreign_key: :originating_data_file_id
 
+  has_many :workflow_data_files, dependent: :destroy
+  has_many :workflows, through: :workflow_data_files
+
   scope :with_extracted_samples, -> { joins(:extracted_samples).distinct }
 
   scope :simulation_data, -> { where(simulation_data: true) }

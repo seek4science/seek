@@ -19,6 +19,13 @@ class Workflow < ApplicationRecord
   has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
 
   has_and_belongs_to_many :sops
+  has_and_belongs_to_many :presentations
+  has_and_belongs_to_many :documents
+
+  has_many :workflow_data_files, dependent: :destroy
+  has_many :data_files, ->{ distinct }, through: :workflow_data_files
+
+  accepts_nested_attributes_for :workflow_data_files
 
   git_versioning(sync_ignore_columns: ['test_status']) do
     include WorkflowExtraction
@@ -100,6 +107,21 @@ class Workflow < ApplicationRecord
   def provide_metadata(metadata)
     @extracted_metadata = metadata
     assign_attributes(metadata)
+  end
+
+  def workflow_data_files_attributes=(attributes)
+    self.workflow_data_files.each do |link|
+      if link.workflow_data_file_relationship
+        link.mark_for_destruction unless attributes.include?({"data_file_id"=>link.data_file.id.to_s,"workflow_data_file_relationship_id"=>link.workflow_data_file_relationship.id.to_s })
+      else
+        link.mark_for_destruction unless attributes.include?({"data_file_id"=>link.data_file.id.to_s})
+      end
+    end
+    attributes.each do |attr|
+      if self.workflow_data_files.where(attr).empty?
+        self.workflow_data_files.build(attr)
+      end
+    end
   end
 
   def avatar_key

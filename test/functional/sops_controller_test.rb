@@ -560,6 +560,23 @@ class SopsControllerTest < ActionController::TestCase
     assert_nil flash[:notice]
   end
 
+  test 'the gatekeeper should have right to view the item when an item is requested to be published' do
+    gatekeeper = Factory(:asset_gatekeeper)
+    @user.person.add_to_project_and_institution(gatekeeper.projects.first, Factory(:institution))
+    post :create, params: { sop: { title: 'text sop', project_ids: gatekeeper.projects.collect(&:id) }, content_blobs: [{ data: picture_file }], policy_attributes: { access_type: Policy::NO_ACCESS } }
+    sop = assigns(:sop)
+
+    login_as(gatekeeper)
+    refute sop.can_view?
+
+    login_as(sop.contributor)
+    post :publish, params: { id: sop }
+    sop = assigns(:sop)
+
+    login_as(gatekeeper)
+    assert sop.can_view?
+  end
+
   test "should show 'None' for other contributors if no contributors" do
     get :index
     assert_response :success

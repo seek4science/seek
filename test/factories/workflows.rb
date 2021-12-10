@@ -253,3 +253,8 @@ Factory.define(:nfcore_git_workflow, class: Workflow) do |f|
     }
   end
 end
+
+Factory.define(:test_data_workflow_data_file_relationship, class: WorkflowDataFileRelationship) do |f|
+  f.title 'Test data'
+  f.key 'test'
+end

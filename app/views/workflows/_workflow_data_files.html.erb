@@ -1,0 +1,16 @@
+<%
+  return if @workflow.workflow_data_files.empty?
+%>
+<label><%= "Associated #{t('data_file').pluralize}" %></label>
+<ul>
+  <% (WorkflowDataFileRelationship.all + [nil]).each do |relationship| %>
+    <% matches = @workflow.workflow_data_files.where(workflow_data_file_relationship: relationship ) %>
+    <% matches = matches.select{|m| m.data_file.can_view?} %>
+    <% if matches.any? %>
+      <li>
+        <label><%= relationship&.title || 'No specified relationship' %>: </label>
+        <%= matches.collect(&:data_file).collect{|df| link_to(df.title, df)}.join(', ').html_safe %>
+      </li>
+    <% end %>
+  <% end %>
+</ul>
