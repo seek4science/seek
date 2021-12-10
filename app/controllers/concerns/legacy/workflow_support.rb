@@ -7,14 +7,15 @@ module Legacy
       before_action :legacy_set_workflow, only: [:create_content_blob, :create_ro_crate]
     end
 
+    # Creating a Workflow from individual files
     def create_ro_crate
       @crate_builder = Legacy::WorkflowCrateBuilder.new(legacy_ro_crate_params)
-      @crate_builder.workflow_class = @workflow.workflow_class
+      @crate_builder.workflow_class = WorkflowClass.find_by_id(params[:workflow_class_id])
       blob_params = @crate_builder.build
-      @workflow.build_content_blob(blob_params)
+      @content_blob = ContentBlob.new(blob_params)
 
       respond_to do |format|
-        if blob_params && @workflow.content_blob.save && extract_metadata
+        if blob_params && @content_blob.save && extract_metadata(@content_blob)
           format.html { render :provide_metadata }
         else
           format.html { render action: @workflow.persisted? ? :new_version : :new, status: :unprocessable_entity }
@@ -22,11 +23,21 @@ module Legacy
       end
     end
 
+    # Creating a Workflow from a user-provided RO-Crate
     def create_content_blob
+      workflow = @workflow
+      @workflow = Workflow.new(workflow_class: workflow.workflow_class)
       respond_to do |format|
-        if handle_upload_data(@workflow.persisted?) && @workflow.content_blob.save && extract_metadata
-          format.html { render :provide_metadata }
+        if handle_upload_data && @workflow.content_blob.save
+          @content_blob = @workflow.content_blob
+          @workflow = workflow
+          if extract_metadata(@content_blob)
+            format.html { render :provide_metadata }
+          else
+            format.html { render action: @workflow.persisted? ? :new_version : :new, status: :unprocessable_entity }
+          end
         else
+          @workflow = workflow
           format.html { render action: @workflow.persisted? ? :new_version : :new, status: :unprocessable_entity }
         end
       end
@@ -48,10 +59,12 @@ module Legacy
       end
     end
 
-    def extract_metadata
+    def extract_metadata(content_blob)
       begin
-        extractor = @workflow.extractor
-        retrieve_content @workflow.content_blob # Hack
+        retrieve_content content_blob # Hack
+        # Another hack to get around the fact that if we associate the content_blob with @workflow, it will automatically
+        # unlink any existing content_blob, which breaks things when creating a new version:
+        extractor = Workflow.new(content_blob: content_blob, workflow_class: @workflow.workflow_class).extractor
         @metadata = extractor.metadata
         @warnings ||= @metadata.delete(:warnings) || []
         @errors ||= @metadata.delete(:errors) || []
@@ -65,6 +78,13 @@ module Legacy
       end
 
       true
+    end
+
+    def retrieve_content(blob)
+      unless blob.file_exists?
+        blob.remote_content_fetch_task&.cancel
+        blob.retrieve
+      end
     end
   end
 end

@@ -168,12 +168,13 @@ class WorkflowsController < ApplicationController
     update_sharing_policies(@workflow)
     filter_associated_projects(@workflow)
 
-    blob = ContentBlob.where(uuid: params[:content_blob_uuid], asset_id: nil).first
-    @workflow.errors.add(:content_blob, 'was not found') unless blob
-    @workflow.content_blob = blob
+    @content_blob = ContentBlob.where(uuid: params[:content_blob_uuid], asset_id: nil).first
+    @workflow.errors.add(:content_blob, 'was not found') unless @content_blob
+    @workflow.content_blob = @content_blob
     update_annotations(params[:tag_list], @workflow) if params.key?(:tag_list)
     if params[:content_blob_uuid].present?
-      valid = blob && @workflow.save && blob.save
+      valid = @content_blob && @workflow.save && @content_blob.save
+      @content_blob.update_column(:asset_id, nil) unless valid
     elsif @workflow.git_version_attributes.present?
       valid = @workflow.save
     else
@@ -207,15 +208,16 @@ class WorkflowsController < ApplicationController
 
     if params[:content_blob_uuid].present?
       #associate the content blob with the workflow
-      blob = ContentBlob.where(uuid: params[:content_blob_uuid], asset_id: nil).first
-      @workflow.errors.add(:content_blob, 'was not found') unless blob
+      @content_blob = ContentBlob.where(uuid: params[:content_blob_uuid], asset_id: nil).first
+      @workflow.errors.add(:content_blob, 'was not found') unless @content_blob
       new_version = @workflow.version += 1
       old_content_blob = @workflow.content_blob
-      blob.asset_version = new_version
-      @workflow.content_blob = blob
+      @content_blob.asset_version = new_version
+      @workflow.content_blob = @content_blob
       # asset_id on the previous content blob gets blanked out after the above command is run, so need to do:
       old_content_blob.update_column(:asset_id, @workflow.id) if old_content_blob
-      valid = blob && @workflow.save_as_new_version(params[:revision_comments]) && blob.save
+      valid = @content_blob && @workflow.save_as_new_version(params[:revision_comments]) && @content_blob.save
+      @content_blob.update_column(:asset_id, nil) unless valid # Have to do this otherwise the content blob keeps the workflow's ID
     elsif @workflow.git_version_attributes.present?
       valid = @workflow.save_as_new_git_version
     else
@@ -326,13 +328,6 @@ class WorkflowsController < ApplicationController
       @workflow = Workflow.find(params[:workflow_id])
     else
       @workflow = Workflow.new(workflow_class_id: params[:workflow_class_id])
-    end
-  end
-
-  def retrieve_content(blob)
-    unless blob.file_exists?
-      blob.remote_content_fetch_task&.cancel
-      blob.retrieve
     end
   end
 
