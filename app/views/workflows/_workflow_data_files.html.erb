@@ -5,6 +5,7 @@
 <ul>
   <% (WorkflowDataFileRelationship.all + [nil]).each do |relationship| %>
     <% matches = @workflow.workflow_data_files.where(workflow_data_file_relationship: relationship ) %>
+    <% matches = matches.select{|m| m.data_file.can_view?} %>
     <% if matches.any? %>
       <li>
         <label><%= relationship&.title || 'No specified relationship' %>: </label>
