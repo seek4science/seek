@@ -1056,7 +1056,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     workflow =  {title: 'workflow', project_ids: [person.projects.first.id], presentation_ids:[presentation.id], document_ids:[document.id]}
 
     assert_difference('Workflow.count') do
-      post :create_metadata, params: {workflow: workflow, content_blob_id: blob.id.to_s, policy_attributes: { access_type: Policy::VISIBLE }}
+      post :create_metadata, params: {workflow: workflow, content_blob_uuid: blob.uuid.to_s, policy_attributes: { access_type: Policy::VISIBLE }}
     end
 
     workflow = assigns(:workflow)
@@ -1093,7 +1093,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     workflow =  {title: 'workflow', project_ids: [person.projects.first.id], data_file_ids:[data_file.id] }
 
     assert_difference('Workflow.count') do
-      post :create_metadata, params: {workflow: workflow, content_blob_id: blob.id.to_s, policy_attributes: { access_type: Policy::VISIBLE }}
+      post :create_metadata, params: {workflow: workflow, content_blob_uuid: blob.uuid.to_s, policy_attributes: { access_type: Policy::VISIBLE }}
     end
 
     workflow = assigns(:workflow)
