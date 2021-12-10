@@ -51,18 +51,25 @@ class InstitutionTest < ActiveSupport::TestCase
   end
 
   def test_can_be_edited_by
+    prog_admin = Factory(:programme_administrator)
     pm = Factory(:project_administrator)
     i = pm.institutions.first
     i2 = Factory(:institution)
     assert i.can_edit?(pm.user), 'This institution should be editable as this user is project administrator of a project this institution is linked to'
-    assert !i2.can_edit?(pm.user), 'This institution should be not editable as this user is project administrator but not of a project this institution is linked to'
+    assert i2.can_edit?(pm.user), 'This institution should be editable as this user is project administrator, even if not of a project this institution is linked to'
+    assert i.can_edit?(prog_admin.user), 'This institution should be editable as this user is programme administrator'
+
+    person = Factory(:person)
+    refute i.can_edit?(person), 'The institution should not be editable by a normal person'
+    i = person.institutions.first
+    refute i.can_edit?(person), 'The institution should not be editable by a normal person even if a member'
 
     i = Factory(:institution)
     u = Factory(:admin).user
     assert i.can_edit?(u), "Institution :one should be editable by this user, as he's an admin"
   end
 
-  def test_valid
+  test 'validation' do
     i = Factory(:institution)
     assert i.valid?
 
@@ -89,6 +96,11 @@ class InstitutionTest < ActiveSupport::TestCase
 
     i.web_page = 'https://google.com'
     assert i.valid?
+
+    # gets stripped before validation
+    i.web_page = '  https://google.com   '
+    assert i.valid?
+    assert_equal 'https://google.com', i.web_page
 
     i.web_page = 'http://google.com/fred'
     assert i.valid?

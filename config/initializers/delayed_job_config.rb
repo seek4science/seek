@@ -1,3 +1,8 @@
+# Try and avoid deadlocks
+Delayed::Backend::ActiveRecord.configure do |config|
+  config.reserve_sql_strategy = :default_sql
+end
+
 SEEK::Application.configure do
 
   Delayed::Worker.destroy_failed_jobs = false

@@ -138,6 +138,7 @@ namespace :seek do
         check_doi = klass.attribute_method?(:doi)
         # Go through all versions and set the "latest" versions to publicly visible
         scope.find_each do |version|
+          next if version.parent.nil?
           if version.latest_version? || check_doi && version.doi.present?
             version.update_column(:visibility, Seek::ExplicitVersioning::VISIBILITY_INV[:public])
           else
