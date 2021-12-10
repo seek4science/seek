@@ -1,17 +1,12 @@
 <%
   return unless Seek::Config.data_files_enabled
 
-  has_relationships = false
   resource_text ||= text_for_resource(resource)
   field_name = "#{resource.class.name.underscore}[workflow_data_files_attributes]"
 
-  # if params[:data_files] && params[:data_files].any?
-  #   collapse_panel = false
-  #   associated_data_files_json = associations_json_from_params(DataFile, params[:data_files])
-  # else
-    collapse_panel = resource.data_files.empty?
-    associated_data_files_json = associations_json_from_workflow_data_files(resource.workflow_data_files)
-  # end
+  collapse_panel = resource.data_files.empty?
+  associated_data_files_json = associations_json_from_workflow_data_files(resource.workflow_data_files)
+
 -%>
 
 <%= folding_panel("Data Files", collapse_panel, :body_options => {:id => 'associate_data_file_fold_content'},
@@ -48,19 +43,26 @@
         </label>
       </div>
 
-      <%= association_select_results %>
+      <%= association_select_results(multiple:true) %>
     </div>
 
   <% end %>
 <% end %>
 
-<% if has_relationships -%>
-  <script>
-      $j(document).ready(function () {
 
-          $j('#modalAssociateData #relationship_type').change(function () {
-              $j('#modalAssociateData [data-role="seek-association-filter-group"]').data('filterGroup').filter();
-          });
-      });
-  </script>
-<% end %>
+<script>
+    $j(document).ready(function () {
+
+        $j('#modalAssociateData #workflow_data_file_relationship').change(function () {
+            $j('#modalAssociateData [data-role="seek-association-filter-group"]').data('filterGroup').filter();
+        });
+
+        // override from association.js
+        Associations.List.prototype.findDuplicate = function(association) {
+            return this.items.find(function(item) {
+                return item.data.id === association.id && item.data.workflow_data_file_relationship.value == association.workflow_data_file_relationship.value;
+            });
+        }
+    });
+</script>
+
