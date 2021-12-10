@@ -109,7 +109,12 @@ namespace :seek do
     gr_count = Git::Repository.count
     Workflow.includes(:git_versions).find_each do |workflow|
       next if workflow.is_git_versioned?
-      Git::Converter.new(workflow).convert(unzip: true)
+      begin
+        Git::Converter.new(workflow).convert(unzip: true)
+      rescue StandardError => e
+        STDERR.puts "Error converting Workflow #{workflow.id}"
+        raise e
+      end
       count += 1
       print '.'
     end
