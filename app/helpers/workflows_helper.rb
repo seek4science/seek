@@ -49,4 +49,5 @@ module WorkflowsHelper
       "#{Seek::Config.galaxy_instance_trs_import_url}&trs_id=#{workflow_version.parent.id}&trs_version=#{workflow_version.version}"
     end
   end
+
 end
