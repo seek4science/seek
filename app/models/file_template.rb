@@ -14,6 +14,8 @@ class FileTemplate < ApplicationRecord
 
   acts_as_doi_parent(child_accessor: :versions)
 
+  has_edam_annotations
+
   #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
   has_one :content_blob, -> (r) { where('content_blobs.asset_version = ?', r.version) }, :as => :asset, :foreign_key => :asset_id
 
@@ -42,4 +44,16 @@ class FileTemplate < ApplicationRecord
     true
   end
 
+  def edam_datum_labels
+    edam_data_labels
+  end
+  
+  def edam_topics_vocab
+    nil
+  end
+  
+  def edam_operations_vocab
+    nil
+  end
+  
 end

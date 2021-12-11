@@ -3,12 +3,13 @@ module HasEdamAnnotations
 
   included do
     def supports_edam_annotations?
-      respond_to?(:edam_topics) && respond_to?(:edam_operations)
+      respond_to?(:edam_topics) && respond_to?(:edam_operations) &&
+        respond_to?(:edam_data) && respond_to?(:edam_formats)
     end
 
     def edam_annotations?
       return false unless supports_edam_annotations?
-      edam_topics.any? || edam_operations.any?
+      edam_topics.any? || edam_operations.any? || edam_data.any? || edam_formats.any?
     end
   end
 
@@ -16,12 +17,22 @@ module HasEdamAnnotations
     def has_edam_annotations
       include InstanceMethods
       include Search
+
       has_annotation_type :edam_topics
       has_many :edam_topic_values, through: :edam_topics_annotations, source: :value,
                                    source_type: 'SampleControlledVocabTerm'
+
       has_annotation_type :edam_operations
       has_many :edam_operation_values, through: :edam_operations_annotations, source: :value,
                                        source_type: 'SampleControlledVocabTerm'
+
+      has_annotation_type :edam_data
+      has_many :edam_data_values, through: :edam_data_annotations, source: :value,
+                                   source_type: 'SampleControlledVocabTerm'
+
+      has_annotation_type :edam_formats
+      has_many :edam_format_values, through: :edam_formats_annotations, source: :value,
+                                   source_type: 'SampleControlledVocabTerm'
 
       # this is needed, because it overrides a previously 'defined' method from has_annotation_type
       # the topics  vals can be an array or comma seperated list of either labels or IRI's
@@ -35,6 +46,18 @@ module HasEdamAnnotations
         associate_edam_operations vals
       end
 
+      # this is needed, because it overrides a previously 'defined' method from has_annotation_type
+      # the data vals can be an array or comma seperated list of either labels or IRI's
+      define_method :edam_data= do |vals|
+        associate_edam_data vals
+      end
+
+      # this is needed, because it overrides a previously 'defined' method from has_annotation_type
+      # the format vals can be an array or comma seperated list of either labels or IRI's
+      define_method :edam_formats= do |vals|
+        associate_edam_formats vals
+      end
+
       # INDEX filters. Unfortunately, these won't currently consider the hierarchy
       has_filter edam_topic: Seek::Filtering::Filter.new(
         value_field: 'sample_controlled_vocab_terms.label',
@@ -44,6 +67,16 @@ module HasEdamAnnotations
       has_filter edam_operation: Seek::Filtering::Filter.new(
         value_field: 'sample_controlled_vocab_terms.label',
         joins: [:edam_operation_values]
+      )
+
+      has_filter edam_data: Seek::Filtering::Filter.new(
+        value_field: 'sample_controlled_vocab_terms.label',
+        joins: [:edam_data_values]
+      )
+
+      has_filter edam_format: Seek::Filtering::Filter.new(
+        value_field: 'sample_controlled_vocab_terms.label',
+        joins: [:edam_format_values]
       )
     end
   end
@@ -58,6 +91,12 @@ module HasEdamAnnotations
             end
             text :edam_operations do
               edam_operation_labels
+            end
+            text :edam_data do
+              edam_data_labels
+            end
+            text :edam_formats do
+              edam_format_labels
             end
           end
         end
@@ -74,12 +113,28 @@ module HasEdamAnnotations
       SampleControlledVocab::SystemVocabs.edam_operations_controlled_vocab
     end
 
+    def edam_data_vocab
+      SampleControlledVocab::SystemVocabs.edam_data_controlled_vocab
+    end
+
+    def edam_formats_vocab
+      SampleControlledVocab::SystemVocabs.edam_formats_controlled_vocab
+    end
+
     def edam_topic_labels
       edam_topic_values.pluck(:label)
     end
 
     def edam_operation_labels
       edam_operation_values.pluck(:label)
+    end
+
+    def edam_data_labels
+      edam_data_values.pluck(:label)
+    end
+
+    def edam_format_labels
+      edam_format_values.pluck(:label)
     end
 
     private
@@ -114,5 +169,39 @@ module HasEdamAnnotations
 
       operation_values
     end
+
+    # the data can be an array or comma seperated list of either labels or IRI's
+    def associate_edam_data(vals)
+      data_values = Array(vals.split(',').flatten).map do |value|
+        value = value.strip
+        edam_data_vocab.sample_controlled_vocab_terms.find_by_label(value) ||
+          edam_data_vocab.sample_controlled_vocab_terms.find_by_iri(value)
+      end.compact.uniq
+
+      edam_data_annotations.delete_all
+      self.edam_data_annotations = data_values.map do |annotation|
+        edam_data_annotations.build(source: User.current_user, value: annotation)
+      end
+
+      data_values
+    end
+
+    # the formats can be an array or comma seperated list of either labels or IRI's
+    def associate_edam_formats(vals)
+      format_values = Array(vals.split(',').flatten).map do |value|
+        value = value.strip
+        edam_formats_vocab.sample_controlled_vocab_terms.find_by_label(value) ||
+          edam_formats_vocab.sample_controlled_vocab_terms.find_by_iri(value)
+      end.compact.uniq
+
+      edam_formats_annotations.delete_all
+      self.edam_formats_annotations = format_values.map do |annotation|
+        edam_formats_annotations.build(source: User.current_user, value: annotation)
+      end
+
+      format_values
+    end
+
+
   end
 end

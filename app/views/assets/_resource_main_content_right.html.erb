@@ -43,13 +43,6 @@
    suffix = 'actual Data files'
    end
    %>
-<% if resource.respond_to?(:format_type) %>
-  <%= render :partial => "assets/format_types_box", :locals => { :resource => resource, :versioned_resource=> versioned_resource, :suffix => suffix } -%>
-<% end %>
-
-<% if resource.respond_to?(:data_type) %>
-  <%= render :partial => "assets/data_types_box", :locals => { :resource => resource, :versioned_resource=> versioned_resource, :suffix => suffix } -%>
-<% end %>
 
 <% if resource.respond_to?(:license) %>
   <%= render :partial => "assets/license_box", :locals => { :resource => resource, :versioned_resource=> versioned_resource } -%>
@@ -58,7 +51,7 @@
 <%= render :partial => "assets/usage_info_box",:locals => { :resource => resource } -%>
 
 <% if resource.edam_annotations? %>
-  <%= render partial:'assets/edam_properties_box' %>
+  <%= render partial:'assets/edam_properties_box', :locals => { :resource => resource } %>
 <% end %>
 
 <% if resource.class.is_taggable? %>
