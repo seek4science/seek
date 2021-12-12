@@ -117,6 +117,14 @@ module HasEdamAnnotations
       SampleControlledVocab::SystemVocabs.edam_data_controlled_vocab
     end
 
+    def edam_datum_labels
+      edam_data_labels
+    end
+  
+    def edam_datum_values
+      edam_data_values
+    end
+    
     def edam_formats_vocab
       SampleControlledVocab::SystemVocabs.edam_formats_controlled_vocab
     end

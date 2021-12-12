@@ -44,10 +44,6 @@ class FileTemplate < ApplicationRecord
     true
   end
 
-  def edam_datum_labels
-    edam_data_labels
-  end
-  
   def edam_topics_vocab
     nil
   end
