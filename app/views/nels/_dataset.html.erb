@@ -16,8 +16,40 @@
             <%= hidden_field_tag('dataset_id', params[:dataset_id]) %>
             <%= hidden_field_tag('subtype_name', subtype['type']) %>
             <%= subtype['type'] %> <span class="subtle">(<%= number_to_human_size(subtype['size']) %>)</span>
+            <%# <%= button_link_to('Add metadata', 'add', add_metadata_assay_nels_path(params[:project_id],subtype['type'])) %>
+            <%= button_link_to('Add metadata', 'add', nil, { id: "add_metadata_"+ subtype['type'], class:"add_metadata"} ) %>
             <%= submit_tag('Register', class: 'btn btn-primary btn-xs pull-right') %>
         <% end %>
       </li>
   <% end %>
 </ul>
+
+<%= modal(id: 'upload-file', size: 'm', class: 'text-left') do %>
+  <%= form_tag({:action => :add_metadata}, :multipart => true) do %>
+    <%= modal_header('Add metadata') %>
+    <%= modal_body do %>
+      <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@data_file} -%>
+    <% end %>
+    <%= modal_footer do %>
+      <%= create_button id:"data_file_submit_btn",
+                          onclick:"return validateResourceFields('data_file');",
+                          class:'btn btn-primary' %>
+      <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+
+    <% end %>
+  <% end %>
+<% end %>
+
+<script>
+  $j(document).ready(function () {
+    $j('.add_metadata').on('click', function () {
+      // alert("adding metadata");
+      $j('#upload-file').modal('show');
+      // var form = $j('#upload-file form');
+      // // var collectionId = $j(this).data('collectionId');
+      // // form.attr('action', form.attr('action').replace('-collection-id-', collectionId));
+
+      return false;
+    });
+  });
+</script>

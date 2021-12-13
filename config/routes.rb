@@ -444,6 +444,9 @@ SEEK::Application.routes.draw do
         get :datasets
         get :dataset
         post :register
+        get :new_dataset
+        post :create_dataset
+        post :add_metadata
       end
     end
     resources :people, :programmes, :projects, :investigations, :samples, :studies, :models, :sops, :workflows, :nodes, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, only: [:index]

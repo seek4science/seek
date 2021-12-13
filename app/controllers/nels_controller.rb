@@ -34,6 +34,29 @@ class NelsController < ApplicationController
     end
   end
 
+  def new_dataset
+    # Populate all the necessary information for the view
+    @datasettypes = @rest_client.datasettypes
+    @projects = @rest_client.projects
+
+    puts (@projects)
+    puts (@datasettypes)
+
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  def create_dataset
+    @rest_client.create_dataset(params["project"],params["datasettype"], params["title"], params["description"])
+    render :index
+  end
+
+  def add_metadata
+    puts ("################################ add_metadata")
+    puts params.inspect
+  end
+
   def projects
     @projects = @rest_client.projects
 
