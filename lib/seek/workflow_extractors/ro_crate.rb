@@ -39,9 +39,21 @@ module Seek
         open_crate do |crate|
           # Use CWL description
           m = if crate.main_workflow_cwl
-                abstract_cwl_extractor(crate).metadata
+                begin
+                  abstract_cwl_extractor(crate).metadata
+                rescue StandardError => e
+                  Rails.logger.error('Error extracting abstract CWL:')
+                  Rails.logger.error(e)
+                  { errors: "Couldn't parse abstract CWL" }
+                end
               else
-                main_workflow_extractor(crate).metadata
+                begin
+                  main_workflow_extractor(crate).metadata
+                rescue StandardError => e
+                  Rails.logger.error('Error extracting workflow:')
+                  Rails.logger.error(e)
+                  { errors: "Couldn't parse main workflow" }
+                end
               end
           m[:workflow_class_id] ||= main_workflow_class(crate)&.id
 

@@ -1,7 +1,7 @@
 <h1>New <%= t('workflow') %></h1>
 
 <%= form_tag(@workflow.new_record? ? create_metadata_workflows_path : create_version_metadata_workflow_path(@workflow), multipart: true) do -%>
-  <%= hidden_field_tag 'content_blob_uuid', @workflow.content_blob&.uuid %>
+  <%= hidden_field_tag 'content_blob_uuid', @content_blob&.uuid %>
   <%= render partial: 'git/git_version_fields', locals: { name: 'workflow[git_version_attributes]', git_version: @workflow.git_version } if @workflow.git_version %>
 
   <%= hidden_field_tag 'revision_comments', params[:revision_comments] %>

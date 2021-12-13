@@ -393,10 +393,8 @@ class WorkflowsControllerTest < ActionController::TestCase
           workflow_class_id: cwl.id }
     end
     assert_response :success
-    assert wf = assigns(:workflow)
-    refute_nil wf.content_blob
-    assert_select '#content_blob_uuid[value=?]', wf.content_blob.uuid
-    assert_equal cwl, wf.workflow_class
+    assert_select '#content_blob_uuid[value=?]', assigns(:content_blob).uuid
+    assert_equal cwl, assigns(:workflow).workflow_class
   end
 
   test 'create content blob requires login' do
@@ -426,10 +424,8 @@ class WorkflowsControllerTest < ActionController::TestCase
       }
     end
     assert_response :success
-    assert wf = assigns(:workflow)
-    refute_nil wf.content_blob
-    assert_equal cwl, wf.workflow_class
-    assert_equal 'new-workflow.basic.crate.zip', wf.content_blob.original_filename
+    assert_equal cwl.id, assigns(:metadata)[:workflow_class_id]
+    assert_equal 'new-workflow.basic.crate.zip', assigns(:content_blob).original_filename
   end
 
   test 'extract metadata' do
@@ -443,7 +439,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'https://www.abc.com/workflow.cwl'
     cwl = Factory(:cwl_workflow_class)
     post :create_content_blob, params: { content_blobs: [{ data_url: 'https://www.abc.com/workflow.cwl' }], workflow_class_id: cwl.id }
-    assert assigns[:workflow].content_blob.reload.remote_content_fetch_task.cancelled?
+    assert assigns(:content_blob).reload.remote_content_fetch_task.cancelled?
     assert_response :success
     assert_equal 5, assigns[:metadata][:internals][:inputs].length
   end
@@ -555,8 +551,7 @@ class WorkflowsControllerTest < ActionController::TestCase
       }
     end
     assert_response :success
-    assert wf = assigns(:workflow)
-    workflow_crate = ROCrate::WorkflowCrateReader.read_zip(wf.content_blob.path)
+    workflow_crate = ROCrate::WorkflowCrateReader.read_zip(assigns(:content_blob).path)
     crate_workflow = workflow_crate.main_workflow
     assert crate_workflow
     assert_equal 'file%20with%20spaces%20in%20name.txt', crate_workflow.id
@@ -657,7 +652,7 @@ class WorkflowsControllerTest < ActionController::TestCase
       }
     end
     assert_response :success
-    workflow_crate = ROCrate::WorkflowCrateReader.read_zip(assigns(:workflow).content_blob.path)
+    workflow_crate = ROCrate::WorkflowCrateReader.read_zip(assigns(:content_blob).path)
     crate_workflow = workflow_crate.main_workflow
     crate_cwl = workflow_crate.main_workflow_cwl
     assert_not_equal crate_workflow.id, crate_cwl.id
@@ -778,8 +773,7 @@ class WorkflowsControllerTest < ActionController::TestCase
       }
     end
     assert_response :success
-    assert wf = assigns(:workflow)
-    workflow_crate = ROCrate::WorkflowCrateReader.read_zip(wf.content_blob.path)
+    workflow_crate = ROCrate::WorkflowCrateReader.read_zip(assigns(:content_blob).path)
     crate_workflow = workflow_crate.main_workflow
     assert crate_workflow
     assert_equal 'workflow.txt', crate_workflow.id
