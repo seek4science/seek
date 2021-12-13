@@ -37,7 +37,6 @@ module Nels
         perform("sbi/sample-metadata?ref=#{reference}", :get, skip_parse: true)
       end
 
-      ## TODO: Adding new function to cover the needs for the new dataset
       def datasettypes
         response = perform("sbi/datasettypes", :get)
         newHash={}
@@ -46,8 +45,8 @@ module Nels
       end
       
       def create_dataset(projectid, datasettype, name, description)
-        perform("v2/sbi/projects/"+projectid+"/datasets", :post,
-          body: {datasettypeid:datasettype,name:name,description:description})
+        perform("v2/sbi/projects/"+projectid+"/datasets/", :post,
+          body: {datasettypeid:datasettype.to_i,name:name,description:description})
       end
 
       def upload_metadata(file)
@@ -67,7 +66,14 @@ module Nels
         end
         args << opts
 
+        # TODO: debugging logs, remove
+        puts base
+        puts path
+        puts args
+
         response = base[path].send(*args)
+
+        puts response
 
         return response if opts[:skip_parse]
 
