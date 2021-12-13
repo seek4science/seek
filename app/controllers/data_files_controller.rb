@@ -551,8 +551,8 @@ class DataFilesController < ApplicationController
                                       { assay_assets_attributes: [:assay_id, :relationship_type_id] },
                                       { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
                                       :file_template_id,
-                                      :format_type,
-                                      :data_type,
+                                      :edam_formats,
+                                      :edam_data,
                                       { scales: [] }, { publication_ids: [] },
                                       discussion_links_attributes:[:id, :url, :label, :_destroy])
   end

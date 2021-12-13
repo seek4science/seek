@@ -14,15 +14,13 @@
         <%= f.text_area :description, :class=>"form-control rich-text-edit", :rows => 5 -%>
       </div>
 
-      <%= render :partial => "select_template", :locals => {:resource => (@placeholder ? @placeholder : Placeholder.new),
+      <%= render :partial => "assets/select_template", :locals => {:resource => (@placeholder ? @placeholder : Placeholder.new),
       :templates => FileTemplate.all } %>
       
-        <%= render :partial => "assets/select_format_types", :locals => {:resource => (@placeholder ? @placeholder : Placeholder.new) } -%>
-
-        <%= render :partial => "assets/select_data_types", :locals => {:resource => (@placeholder ? @placeholder : Placeholder.new) } -%>
-
 	<%= render :partial => "resolve", :locals => {:resource => (@placeholder ? @placeholder : Placeholder.new) } -%>
 	
+      <%= render partial: 'assets/edam_form_properties', :locals => { :resource => (@placeholder ? @placeholder : Placeholder.new) } -%>
+
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @placeholder } %>
 
       <%= render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f}-%>

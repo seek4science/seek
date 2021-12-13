@@ -16,6 +16,8 @@ class DataFile < ApplicationRecord
 
   acts_as_doi_parent(child_accessor: :versions)
 
+  has_edam_annotations
+
   validates :projects, presence: true, projects: { self: true }, unless: Proc.new {Seek::Config.is_virtualliver }
 
   # allow same titles, but only if these belong to different users
@@ -91,6 +93,14 @@ class DataFile < ApplicationRecord
     columns_default + ['last_used_at','other_creators','doi','license','simulation_data']
   end
 
+  def edam_topics_vocab
+    nil
+  end
+  
+  def edam_operations_vocab
+    nil
+  end
+  
   def included_to_be_copied?(symbol)
     case symbol.to_s
     when 'activity_logs', 'versions', 'attributions', 'relationships', 'inverse_relationships', 'annotations'

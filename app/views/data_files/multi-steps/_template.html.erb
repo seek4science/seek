@@ -4,12 +4,11 @@
   </div>
 
   <div class='panel-body'>
-      <%= render :partial => "select_template", :locals => {:resource => (@data_file ? @data_file : DataFile.new),
+      <%= render :partial => "assets/select_template", :locals => {:resource => (@data_file ? @data_file : DataFile.new),
       :templates => FileTemplate.all } %>
       
-        <%= render :partial => "assets/select_format_types", :locals => {:resource => (@data_file ? @data_file : DataFile.new) } -%>
+      <%= render partial: 'assets/edam_form_properties', :locals => { :resource => @data_file } -%>
 
-        <%= render :partial => "assets/select_data_types", :locals => {:resource => (@data_file ? @data_file : DataFile.new) } -%>
     <%= cancel_button(data_files_path) -%>
     <div class='multi-step-buttons'>
       <%= multi_step_forward_button %>

@@ -4,6 +4,8 @@ class Placeholder < ApplicationRecord
 
   acts_as_asset
 
+  has_edam_annotations
+
   validates :projects, presence: true, projects: { self: true }
 
   belongs_to :project
@@ -19,6 +21,14 @@ class Placeholder < ApplicationRecord
     super  + ['format_type', 'data_type', 'license','last_used_at','other_creators','deleted_contributor']  
   end
 
+  def edam_topics_vocab
+    nil
+  end
+  
+  def edam_operations_vocab
+    nil
+  end
+  
   def avatar_key
     :programme
   end
