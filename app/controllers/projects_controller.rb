@@ -476,9 +476,7 @@ class ProjectsController < ApplicationController
   end
 
   def populate_from_spreadsheet
-    ActiveRecord::Base.transaction do
     populate_from_spreadsheet_impl
-    end
     respond_with(@project) do |format|
       format.html { redirect_to project_path(@project) }
     end

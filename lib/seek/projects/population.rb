@@ -6,22 +6,32 @@ module Seek
         datafile = DataFile.find(params[:spreadsheet_id])
 
         policy = @project.default_policy
-        
-        workbook = datafile.spreadsheet
-        sheet = workbook.sheets.first
+
+        workbook = datafile&.spreadsheet
+        sheet = workbook&.sheets&.first
+        if sheet.blank?
+          flash[:error]= "Unable to find a sheet"
+          return
+        end
 
         r = sheet.rows[1]
 
-        values = r.cells.collect { |c| (c.nil? ? 'NIL' : c.value) }
-        investigation_index = values.find_index('Investigation')
-        study_index = values.find_index('Study')
-        assay_index = values.find_index('Assay')
-        description_index = values.find_index('Description')
+        values = r&.cells&.collect { |c| (c.blank? ? 'NIL' : c.value) }
+
+        if values.blank?
+          flash[:error]= "Unable to find header cells in #{datafile.title}" 
+          return
+        end
+        
+        investigation_index = values&.find_index('Investigation')
+        study_index = values&.find_index('Study')
+        assay_index = values&.find_index('Assay')
+        description_index = values&.find_index('Description')
         assignee_indices = []
         protocol_index = nil
-        values.each_with_index {
+        values&.each_with_index do
           |val,i|
-          if val.start_with?('Assign')
+          if val&.start_with?('Assign')
           then
             assignee_indices << i
           end
@@ -29,14 +39,12 @@ module Seek
           then
             protocol_index = i
           end
-        }
-
-        if investigation_index.nil? || study_index.nil? || assay_index.nil? || assignee_indices.empty?
-          flash[:notice]= 'indices missing'
         end
 
-        @project.status = 'planned'
-        @project.assignee = @project.project_administrators[0]
+        if investigation_index.blank? || study_index.blank? || assay_index.blank?
+          flash[:error]= "Investigation, Study or Assay column is missing from #{datafile.title}"
+          return
+        end
 
         investigation = nil
         study = nil
@@ -47,123 +55,114 @@ module Seek
         assay_position = 1
 
         sheet.rows.each do |r|
-          if r.nil?
+          if r.blank?
             next
           end
           if r.index == 1
             next
           end
 
-          unless r.cell(investigation_index).nil? || r.cell(investigation_index).value.empty?
+          if r.cell(investigation_index)&.value.present?
             title = r.cell(investigation_index).value.to_s.strip
-            description = 'Description withheld'
-            s_description = r.cell(description_index)&.value&.to_s&.strip
-            unless s_description.blank?
-              description = s_description
-            end
             investigation = @project.investigations.select { |i| i.title == title }.first
-            if investigation.nil?
+            if investigation.blank?
               investigation = Investigation.new(title: title, projects: [@project], policy: policy.deep_copy)
             end
-            investigation.description = description
-            assignee_emails = []
-            assignee_indices.each do |x|
-              unless r.cell(x).nil?
-                assignee_emails = assignee_emails + r.cell(x).value.split(';')
-              end
-            end
-            unless assignee_emails.empty?
-              investigation.assignee = Person.find_by(email: assignee_emails[0])
-            end
-            if investigation.assignee.nil?
-              investigation.assignee = @project.assignee
-            end
+            set_description(investigation, r, description_index)
             investigation.position = investigation_position
-            investigation.status = 'planned'
             investigation_position += 1
             study_position = 1
             assay_position = 1
             investigation.save!
           end
-          unless r.cell(study_index).nil? || r.cell(study_index).value.empty?
-            title = r.cell(study_index).value.to_s.strip
-            description = 'Description withheld'
-            s_description = r.cell(description_index)&.value&.to_s&.strip
-            unless s_description.blank?
-              description = s_description
+          
+          if r.cell(study_index)&.value.present?
+            if investigation.blank?
+              flash[:error]= "Study specified without Investigation in #{datafile.title} at row #{r.index}"
+              return
             end
+            title = r.cell(study_index).value.to_s.strip
             study = investigation.studies.select { |i| i.title == title }.first
-            if study.nil?
+            if study.blank?
               study = Study.new(title: title, investigation: investigation,
                                 policy: policy.deep_copy )
             end
-            study.description = description
-            assignee_emails = []
-            assignee_indices.each do |x|
-              unless r.cell(x).nil?
-                assignee_emails = assignee_emails + r.cell(x).value.split(';')
-              end
-            end
-            unless assignee_emails.empty?
-              study.assignee = Person.find_by(email: assignee_emails[0])
-            end
-            if study.assignee.nil?
-              study.assignee = investigation.assignee
-            end
+            set_description(study, r, description_index)
             study.position = study_position
-            study.status = 'planned'
             study_position += 1
             assay_position = 1
             study.save!
           end
-          unless r.cell(assay_index).nil? || r.cell(assay_index).value.empty?
-            title = r.cell(assay_index).value.to_s.strip
-            description = 'Description withheld'
-            s_description = r.cell(description_index)&.value&.to_s&.strip
-            unless s_description.blank?
-              description = s_description
+
+          if r.cell(assay_index)&.value.present?
+            if study.blank?
+              flash[:error]= "Assay specified without Study in #{datafile.title} at row #{r.index}"
+              return
             end
+            title = r.cell(assay_index).value.to_s.strip
             assay = study.assays.select { |i| i.title == title }.first
-            if assay.nil?
+            if assay.blank?
               assay = Assay.new(title: title, study: study,
                                 policy: policy.deep_copy )
             end
-            assay.description = description
-            assignee_emails = []
-            assignee_indices.each do |x|
-              unless r.cell(x).nil?
-                assignee_emails = assignee_emails + r.cell(x).value.split(';')
-              end
-            end
-            unless assignee_emails.empty?
-              assay.assignee = Person.find_by(email: assignee_emails[0])
-            end
-            if assay.assignee.nil?
-              assay.assignee = study.assignee
-            end
+            set_description(assay, r, description_index)
             assay.position = assay_position
-            assay.status = 'planned'
             assay_position += 1
             assay.assay_class = AssayClass.for_type('experimental')
-            known_creators = []
-            other_creators = []
-            assay.creators = known_creators
-            assay.other_creators = other_creators.join(';')
-            unless r.cell(protocol_index).nil?
-              protocol_string = r.cell(protocol_index).value.to_s.strip
-              protocol_id = protocol_string.split(/\//)[-1].to_i
-              if protocol_string.starts_with?(Seek::Config.site_base_host)
-                protocol = @project.sops.select { |p| p.id == protocol_id }.first
-                unless protocol.nil?
-                  assay.sops = [protocol]
-                end
-              end
+
+            set_assignees(assay, r, assignee_indices)
+
+            if r.cell(protocol_index)&.value.present?
+              set_protocol(assay, r, protocol_index)
             end
             assay.save!
           end
         end
         @project.save!
       end
-end
-end
+
+      def set_description(object, r, description_index)
+        description = 'Description withheld'
+        if description_index.present?
+          s_description = r.cell(description_index)&.value&.to_s&.strip
+          if s_description.present?
+            description = s_description
+          end
+        end
+        object.description = description
+      end
+      
+      def set_assignees(assay, r, assignee_indices)
+        assignees = []
+        assignee_indices.each do |x|
+          if r.cell(x)&.value.present?
+            assignees += r.cell(x).value.split(';')
+          end
+        end
+        known_creators = []
+        other_creators = []
+        assignees.each do |a|
+          creator = Person.find_by email: a
+          if creator.blank?
+            other_creators += [a]
+          else
+            known_creators += [creator]
+          end
+        end
+        assay.creators = known_creators
+        assay.other_creators = other_creators.join(';')
+      end  
+
+      def set_protocol(assay, r, protocol_index)
+        protocol_string = r.cell(protocol_index)&.value&.to_s.strip
+        protocol_id = protocol_string.split(/\//)[-1].to_i
+        if protocol_string.starts_with?(Seek::Config.site_base_host)
+          protocol = @project.sops.select { |p| p.id == protocol_id }.first
+          if protocol.present?
+            assay.sops = [protocol]
+          end
+        end
+      end
+    end
+  end
 end
