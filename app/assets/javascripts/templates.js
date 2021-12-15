@@ -177,9 +177,11 @@ const applyTemplate = () => {
       .find(".sample-type-attribute-type")
       .find(":selected")
       .data("is-seek-sample");
-    if (is_seek_sample) $j(newRow).find(".sample-type-block").show();
-    // Select the first item by default
-    $j(newRow).find(".linked-sample-type-selection optgroup option:first").attr("selected", "selected")
+    if (is_seek_sample) {
+      $j(newRow).find(".sample-type-block").show();
+      // Select the first item by default
+      $j(newRow).find(".linked-sample-type-selection optgroup option:first").attr("selected", "selected");
+    }
 
     $j(`${attribute_table} ${addAttributeRow}`).before(newRow);
   });
