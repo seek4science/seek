@@ -69,8 +69,24 @@ Factory.define(:xlsm_spreadsheet_datafile, parent: :data_file) do |f|
   f.association :content_blob, factory: :xlsm_content_blob
 end
 
-Factory.define(:csv_spreadsheet_datafile, parent: :data_file) do |f|
-  f.association :content_blob, factory: :csv_content_blob
+Factory.define(:xlsx_population_datafile, parent: :data_file) do |f|
+  f.association :content_blob, factory: :xlsx_population_content_blob
+end
+
+Factory.define(:xlsx_population_no_header_datafile, parent: :data_file) do |f|
+  f.association :content_blob, factory: :xlsx_population_no_header_content_blob
+end
+
+Factory.define(:xlsx_population_no_study_header_datafile, parent: :data_file) do |f|
+  f.association :content_blob, factory: :xlsx_population_no_study_header_content_blob
+end
+
+Factory.define(:xlsx_population_no_investigation_datafile, parent: :data_file) do |f|
+  f.association :content_blob, factory: :xlsx_population_no_investigation_content_blob
+end
+
+Factory.define(:xlsx_population_no_study_datafile, parent: :data_file) do |f|
+  f.association :content_blob, factory: :xlsx_population_no_study_content_blob
 end
 
 Factory.define(:small_test_spreadsheet_datafile, parent: :data_file) do |f|

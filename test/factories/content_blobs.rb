@@ -390,3 +390,30 @@ Factory.define(:ro_crate_with_tests, parent: :content_blob) do |f|
   f.content_type 'application/zip'
   f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/ro-crate-with-tests.crate.zip", 'rb').read }
 end
+
+Factory.define(:xlsx_population_content_blob, parent: :content_blob) do |f|
+  f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  f.original_filename 'population.xlsx'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/population.xlsx", 'rb').read }
+end
+
+Factory.define(:xlsx_population_no_header_content_blob, parent: :xlsx_population_content_blob) do |f|
+  f.original_filename 'population_no_header.xlsx'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/population_no_header.xlsx", 'rb').read }
+end
+
+Factory.define(:xlsx_population_no_study_header_content_blob, parent: :xlsx_population_content_blob) do |f|
+  f.original_filename 'population_no_study_header.xlsx'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/population_no_study_header.xlsx", 'rb').read }
+end
+
+Factory.define(:xlsx_population_no_investigation_content_blob, parent: :xlsx_population_content_blob) do |f|
+  f.original_filename 'population_no_investigation.xlsx'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/population_no_investigation.xlsx", 'rb').read }
+end
+
+Factory.define(:xlsx_population_no_study_content_blob, parent: :xlsx_population_content_blob) do |f|
+  f.original_filename 'population_no_study.xlsx'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/population_no_study.xlsx", 'rb').read }
+end
+

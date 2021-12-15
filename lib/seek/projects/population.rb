@@ -6,6 +6,10 @@ module Seek
         datafile = DataFile.find(params[:spreadsheet_id])
 
         policy = @project.default_policy
+        if policy.blank?
+          flash[:error]= "Project does not have a default policy"
+          return
+        end
 
         workbook = datafile&.spreadsheet
         sheet = workbook&.sheets&.first
@@ -16,26 +20,32 @@ module Seek
 
         r = sheet.rows[1]
 
-        values = r&.cells&.collect { |c| (c.blank? ? 'NIL' : c.value) }
-
-        if values.blank?
+        puts r.cells.size
+        
+        if r.cell(1).value.blank?
           flash[:error]= "Unable to find header cells in #{datafile.title}" 
           return
+        else
+          puts r.cell(1).value
         end
-        
-        investigation_index = values&.find_index('Investigation')
-        study_index = values&.find_index('Study')
-        assay_index = values&.find_index('Assay')
-        description_index = values&.find_index('Description')
+
+        header_cell_values = r.cells.collect { |c| (c.nil? ? 'NIL' : c.value) }
+        investigation_index = header_cell_values.find_index('Investigation')
+        puts header_cell_values[investigation_index]
+        study_index = header_cell_values.find_index('Study')
+        puts study_index
+        assay_index = header_cell_values.find_index('Assay')
+        puts assay_index
+        description_index = header_cell_values.find_index('Description')
         assignee_indices = []
         protocol_index = nil
-        values&.each_with_index do
+        header_cell_values.each_with_index do
           |val,i|
-          if val&.start_with?('Assign')
+          if val&.starts_with?('Assign')
           then
             assignee_indices << i
           end
-          if val.start_with?('Protocol')
+          if val&.starts_with?('Protocol')
           then
             protocol_index = i
           end

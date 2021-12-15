@@ -2962,6 +2962,105 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_empty project.discussion_links
   end
 
+  test 'should not populate if no policy' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.first
+    login_as(project_administrator.user)
+    df = Factory(:xlsx_population_datafile, projects: [project])
+    flash.clear
+    refute flash.key? :error
+    put :populate_from_spreadsheet, params: {id: project.id, :spreadsheet_id => df.id }
+    assert flash.key? :error
+    assert flash[:error] == "Project does not have a default policy"
+  end
+
+  test 'should populate if policy' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.first
+    login_as(project_administrator.user)
+    df = Factory(:xlsx_population_datafile, projects: [project])
+
+    project.use_default_policy = true
+    project.default_policy = Factory(:public_policy)
+    project.save!
+    refute project.default_policy.blank?
+    flash.clear
+    refute flash.key? :error
+    put :populate_from_spreadsheet, params: {id: project.id, :spreadsheet_id => df.id }
+    refute flash.key? :error
+  end
+
+  test 'should not populate if no header' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.first
+    login_as(project_administrator.user)
+    df = Factory(:xlsx_population_no_header_datafile, projects: [project])
+
+    project.use_default_policy = true
+    project.default_policy = Factory(:public_policy)
+    project.save!
+    refute project.default_policy.blank?
+    flash.clear
+    refute flash.key? :error
+    put :populate_from_spreadsheet, params: {id: project.id, :spreadsheet_id => df.id }
+    assert flash.key? :error
+    assert flash[:error].starts_with?("Unable to find header cells")
+  end
+
+  test 'should not populate if a header missing' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.first
+    login_as(project_administrator.user)
+    df = Factory(:xlsx_population_no_study_header_datafile, projects: [project])
+
+    project.use_default_policy = true
+    project.default_policy = Factory(:public_policy)
+    project.save!
+    refute project.default_policy.blank?
+    flash.clear
+    refute flash.key? :error
+    put :populate_from_spreadsheet, params: {id: project.id, :spreadsheet_id => df.id }
+    assert flash.key? :error
+    puts flash[:error]
+    assert flash[:error].starts_with?("Investigation, Study or Assay column is missing")
+  end
+
+  test 'should not populate if no investigation' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.first
+    login_as(project_administrator.user)
+    df = Factory(:xlsx_population_no_investigation_datafile, projects: [project])
+
+    project.use_default_policy = true
+    project.default_policy = Factory(:public_policy)
+    project.save!
+    refute project.default_policy.blank?
+    flash.clear
+    refute flash.key? :error
+    put :populate_from_spreadsheet, params: {id: project.id, :spreadsheet_id => df.id }
+    assert flash.key? :error
+    puts flash[:error]
+    assert flash[:error].starts_with?("Study specified without Investigation")
+  end
+
+  test 'should not populate if no study' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.first
+    login_as(project_administrator.user)
+    df = Factory(:xlsx_population_no_study_datafile, projects: [project])
+
+    project.use_default_policy = true
+    project.default_policy = Factory(:public_policy)
+    project.save!
+    refute project.default_policy.blank?
+    flash.clear
+    refute flash.key? :error
+    put :populate_from_spreadsheet, params: {id: project.id, :spreadsheet_id => df.id }
+    assert flash.key? :error
+    puts flash[:error]
+    assert flash[:error].starts_with?("Assay specified without Study")
+  end
+
     private
 
   def edit_max_object(project)
