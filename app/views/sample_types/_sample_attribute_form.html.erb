@@ -19,6 +19,7 @@
 <% allow_type_change = constraints.allow_type_change?(sample_attribute) %>
 <% allow_name_change = constraints.allow_name_change?(sample_attribute) %>
 <% seek_sample_multi = sample_attribute.try(:seek_sample_multi?) %>
+<% link_to_self = sample_attribute && sample_attribute.deferred_link_to_self %>
 <tr class="sample-attribute <%= 'success' if sample_attribute.nil? -%>" data-index="<%= index-%>">
   <th scope="row" class="attribute-position">
     <div class="btn btn-info attribute-handle">
@@ -77,7 +78,7 @@
       %>
       <%= select_tag "#{field_name_prefix}[linked_sample_type_id]",
                      grouped_options_for_select(options,
-                                        linked_sample_type_id),
+                                        link_to_self ? 'self' : linked_sample_type_id),
                      include_blank: true,
                      class: 'form-control linked-sample-type-selection' %>
     </div>
