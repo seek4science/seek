@@ -14,19 +14,19 @@ They are expected to be added to FAIRDOM-SEEK in roughly the order they are pres
 
 | Feature | Milestone date |
 | --- | --- |
-| Collections - grouping assets together under a topic or theme | Autumn 2021 |
-| A new customizable front page | Autumn 2021 |
-| Improvements to defining authors and creators, and their order | Autumn 2021 |
-| Explicit ordering of items within ISA | Autumn 2021 |
-| Better and easier definition of institutions, integrating the Research Organization Registry (ROR) | Winter 2022 |
-| License improvements, using SPDX | Winter 2022 |
-| Project folders, to help organise files outside of the ISA structure | Winter 2022 |
-| UI for creating Custom Metadata Extensions | Winter 2022 |
-| Describing Observed Variables within MIAPPE | Winter 2022 |
-| Backend storage changes with better versioning support | Winter 2022 |
-| Better support for GitHub | Winter 2022 |
-| Support for Datasets containing multiple files organised into folders | Winter 2022 |
-| API support for creating new versions | Spring 2022 |
+| Collections - grouping assets together under a topic or theme | Q1 2022 |
+| A new customizable front page | Q1 2022 |
+| Improvements to defining authors and creators, and their order | Q1 2022 |
+| Explicit ordering of items within ISA | Q1 2022 |
+| Better and easier definition of institutions, integrating the Research Organization Registry (ROR) | Q2 2022 |
+| License improvements, using SPDX | Q2 2022 |
+| Project folders, to help organise files outside of the ISA structure | Q2 2022 |
+| UI for creating Custom Metadata Extensions | Q2 2022 |
+| Describing Observed Variables within MIAPPE | Q2 2022 |
+| Backend storage changes with better versioning support | Q2 2022 |
+| Better support for GitHub | Q2 2022 |
+| Support for Datasets containing multiple files organised into folders | Q2 2022 |
+| API support for creating new versions | Q3 2022 |
 | ISA improvements, with a single page for creating and managing them | 2022 |
 | Deposition to repositories, such as ENA | 2022 |
 | Integration with other file storage systems, e.g. Dropbox, Google Drive, Nextflow | 2022 |
