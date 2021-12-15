@@ -410,4 +410,12 @@ class GitVersionTest < ActiveSupport::TestCase
     assert_empty v.blobs
     assert_empty v.remote_sources
   end
+
+  test 'empty?' do
+    workflow = Factory(:empty_git_workflow)
+    assert workflow.git_version.empty?
+
+    workflow.git_version.add_file('folder/blah.txt', StringIO.new('blah'))
+    refute workflow.git_version.empty?
+  end
 end

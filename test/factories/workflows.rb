@@ -254,6 +254,15 @@ Factory.define(:nfcore_git_workflow, class: Workflow) do |f|
   end
 end
 
+Factory.define(:empty_git_workflow, class: Workflow) do |f|
+  f.title 'Empty Workflow'
+  f.with_project_contributor
+  f.git_version_attributes do
+    repo = Factory(:blank_repository)
+    { git_repository_id: repo.id, mutable: true }
+  end
+end
+
 Factory.define(:test_data_workflow_data_file_relationship, class: WorkflowDataFileRelationship) do |f|
   f.title 'Test data'
   f.key 'test'

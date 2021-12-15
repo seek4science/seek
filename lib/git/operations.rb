@@ -61,7 +61,7 @@ module Git
     end
 
     def empty?
-      persisted? && blobs.empty?
+      persisted? && blobs.empty? && trees.empty?
     end
 
     # In the case that the repository was created but has no commits.
