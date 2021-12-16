@@ -9,7 +9,6 @@ class DocumentsController < ApplicationController
   before_action :find_and_authorize_requested_item, :except => [ :index, :new, :create,:preview, :update_annotations_ajax]
   before_action :find_display_asset, :only=>[:show, :download]
 
-  
   include Seek::Publishing::PublishingCommon
 
   include Seek::Doi::Minting
@@ -61,8 +60,8 @@ class DocumentsController < ApplicationController
     params.require(:document).permit(:title, :description, { project_ids: [] }, :license, *creator_related_params,
                                 { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                 { assay_assets_attributes: [:assay_id] }, { scales: [] },
-                                { publication_ids: [] }, { event_ids: [] },
-                                     discussion_links_attributes:[:id, :url, :label, :_destroy])
+                                { publication_ids: [] }, { event_ids: [] }, { workflow_ids: [] },
+                                discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
   alias_method :asset_params, :document_params

@@ -190,6 +190,25 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_equal [event],doc.events
   end
 
+  test 'should update and link to workflow' do
+    person = Factory(:person)
+    document = Factory(:document, contributor: person)
+    assert_empty document.workflows
+
+    login_as(person)
+
+    workflow = Factory(:workflow,contributor:person)
+
+    assert_difference('ActivityLog.count') do
+      put :update, params: { id: document.id, document: { title: 'Different title', project_ids: [person.projects.first.id],
+                                                          workflow_ids:['',workflow.id.to_s] } }
+    end
+
+    assert (doc = assigns(:document))
+    assert_redirected_to document_path(doc)
+    assert_equal [workflow],doc.workflows
+  end
+
   test 'update with no assays' do
     person = Factory(:person)
     creators = [Factory(:person), Factory(:person)]
@@ -306,12 +325,28 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_routing 'projects/2/documents', controller: 'documents', action: 'index', project_id: '2'
     person = Factory(:person)
     login_as(person)
-    assay = Factory(:assay, contributor:person)
-    document = Factory(:document,assays:[assay],contributor:person)
+    document = Factory(:document, contributor:person)
     document2 = Factory(:document,policy: Factory(:public_policy),contributor:Factory(:person))
 
 
     get :index, params: { project_id: person.projects.first.id }
+
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', document_path(document), text: document.title
+      assert_select 'a[href=?]', document_path(document2), text: document2.title, count: 0
+    end
+  end
+
+  test "workflow documents through nested routing" do
+    assert_routing 'workflows/2/documents', controller: 'documents', action: 'index', workflow_id: '2'
+    person = Factory(:person)
+    login_as(person)
+    workflow = Factory(:workflow, contributor:person)
+    document = Factory(:document,workflows:[workflow],contributor:person)
+    document2 = Factory(:document,policy: Factory(:public_policy),contributor:Factory(:person))
+
+    get :index, params: { workflow_id: workflow.id }
 
     assert_response :success
     assert_select 'div.list_item_title' do

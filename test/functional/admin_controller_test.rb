@@ -17,7 +17,7 @@ class AdminControllerTest < ActionController::TestCase
   test 'non admin cannot restart the server' do
     login_as(Factory(:user))
     post :restart_server
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
   end
 
   test 'admin can restart the server' do
@@ -33,7 +33,7 @@ class AdminControllerTest < ActionController::TestCase
   test 'non admin cannot restart the delayed job' do
     login_as(Factory(:user))
     post :restart_delayed_job
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
   end
 
   test 'admin can restart the delayed job' do
@@ -46,7 +46,7 @@ class AdminControllerTest < ActionController::TestCase
     get :registration_form
     assert !User.current_user.person.is_admin?
     assert_redirected_to root_path
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
   end
 
   test 'should show features enabled' do
@@ -74,7 +74,7 @@ class AdminControllerTest < ActionController::TestCase
     login_as(Factory(:user))
     get :index
     assert_response :redirect
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
   end
 
   test 'string to boolean' do
@@ -149,17 +149,17 @@ class AdminControllerTest < ActionController::TestCase
 
   test 'invalid email address' do
     post :update_settings, params: { pubmed_api_email: 'quentin', crossref_api_email: 'quentin@example.com' }
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
   end
 
   test 'should input integer' do
     post :update_home_settings, params: { tag_threshold: '', max_visible_tags: '20' }
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
   end
 
   test 'should input positive integer' do
     post :update_home_settings, params: { tag_threshold: '1', max_visible_tags: '0' }
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
   end
 
   test 'update admins' do
@@ -244,7 +244,7 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'update home page settings' do
-    assert_not_equal 'This is the home description', Seek::Config.home_description
+    refute_nil 'This is the home description', Seek::Config.home_description
     post :update_home_settings, params: { home_description: 'This is the home description', news_number_of_entries: '3', news_enabled: '1', news_feed_urls: 'http://fish.com, http://goats.com' }
 
     assert_equal 'This is the home description', Seek::Config.home_description
@@ -265,7 +265,7 @@ class AdminControllerTest < ActionController::TestCase
 
     post :update_features_enabled, params: { time_lock_doi_for: '' }
     assert_redirected_to features_enabled_admin_path
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
   end
 
   test 'update_redirect_to for update_home_setting' do
@@ -275,7 +275,7 @@ class AdminControllerTest < ActionController::TestCase
 
     post :update_home_settings, params: { news_number_of_entries: '', tag_threshold: '1', max_visible_tags: '20' }
     assert_redirected_to home_settings_admin_path
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
   end
 
   test 'openbis enabled' do

@@ -10,7 +10,8 @@ namespace :seek do
     environment
     db:seed:010_workflow_classes
     db:seed:011_edam_topics
-    db:seed:012_edam_operations
+    db:seed:012_edam_operations   
+    db:seed:013_workflow_data_file_relationships
     rename_branding_settings
   ]
 
@@ -57,5 +58,5 @@ namespace :seek do
     Seek::Config.transfer_value :dm_project_name, :instance_admins_name
     Seek::Config.transfer_value :dm_project_link, :instance_admins_link
   end
-
+  
 end

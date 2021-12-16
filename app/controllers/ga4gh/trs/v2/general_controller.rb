@@ -9,7 +9,7 @@ module Ga4gh
               "contactUrl": "mailto:#{Seek::Config.support_email_address}",
               #"createdAt": "2019-06-04T12:58:19Z",
               "description": "TRS API endpoint for #{Seek::Config.instance_name}",
-              "documentationUrl": "https://editor.swagger.io/?url=https://raw.githubusercontent.com/ga4gh/tool-registry-schemas/develop/openapi/ga4gh-tool-discovery.yaml",
+              "documentationUrl": "https://editor.swagger.io/?url=https://raw.githubusercontent.com/ga4gh/tool-registry-service-schemas/release/v2.0.1/openapi/openapi.yaml",
               "environment": Rails.env,
               "id": id,
               "name": Seek::Config.instance_name,

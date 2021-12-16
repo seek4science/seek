@@ -73,6 +73,7 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_response :success
     p = assigns(:publication)
     assert_equal p.publication_authors[0].suggested_person.name, person.name
+    assert_nil p.publication_authors[1].suggested_person
   end
 
 
