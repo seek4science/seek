@@ -3061,8 +3061,77 @@ class ProjectsControllerTest < ActionController::TestCase
     assert flash[:error].starts_with?("Assay specified without Study")
   end
 
-    private
+  test 'should populate correctly from xlsx' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.first
+    login_as(project_administrator.user)
+    df = Factory(:xlsx_population_datafile, projects: [project])
 
+    project.use_default_policy = true
+    project.default_policy = Factory(:public_policy)
+    project.save!
+    put :populate_from_spreadsheet, params: {id: project.id, :spreadsheet_id => df.id }
+
+    check_project(project)
+  end
+
+  test 'should populate correctly from csv' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.first
+    login_as(project_administrator.user)
+    df = Factory(:csv_population_datafile, projects: [project])
+
+    project.use_default_policy = true
+    project.default_policy = Factory(:public_policy)
+    project.save!
+    put :populate_from_spreadsheet, params: {id: project.id, :spreadsheet_id => df.id }
+
+    check_project(project)
+  end
+
+  test 'should populate correctly from tsv' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.first
+    login_as(project_administrator.user)
+    df = Factory(:tsv_population_datafile, projects: [project])
+
+    project.use_default_policy = true
+    project.default_policy = Factory(:public_policy)
+    project.save!
+    put :populate_from_spreadsheet, params: {id: project.id, :spreadsheet_id => df.id }
+
+    check_project(project)
+  end
+
+  private
+
+  def check_project(project)
+    assert project.investigations.size == 2
+    check_investigation_0(project.investigations[0])
+    check_investigation_1(project.investigations[1])
+  end
+
+  def check_investigation_0(investigation)
+    assert investigation.title == "Select host and product"
+    assert investigation.studies.size == 4
+  end
+    
+  def check_investigation_1(investigation)
+    assert investigation.title == "Design"
+    assert investigation.studies.size == 1
+    check_study_1_0(investigation.studies[0])
+  end
+    
+  def check_study_1_0(study)
+    assert study.title == "Receive input from select host and products step"
+    assert study.assays.size == 2
+    check_assay_1_0_1(study.assays[1])
+  end
+
+  def check_assay_1_0_1(assay)
+    assert assay.title == "Obtain SBML models for production hosts"
+  end
+  
   def edit_max_object(project)
     for i in 1..5
       Factory(:person).add_to_project_and_institution(project, Factory(:institution))

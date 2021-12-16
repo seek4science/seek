@@ -397,6 +397,18 @@ Factory.define(:xlsx_population_content_blob, parent: :content_blob) do |f|
   f.data { File.new("#{Rails.root}/test/fixtures/files/population.xlsx", 'rb').read }
 end
 
+Factory.define(:csv_population_content_blob, parent: :content_blob) do |f|
+  f.content_type 'text/csv'
+  f.original_filename 'population.csv'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/population.csv", 'rb').read }
+end
+
+Factory.define(:tsv_population_content_blob, parent: :content_blob) do |f|
+  f.content_type 'text/tsv'
+  f.original_filename 'population.tsv'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/population.tsv", 'rb').read }
+end
+
 Factory.define(:xlsx_population_no_header_content_blob, parent: :xlsx_population_content_blob) do |f|
   f.original_filename 'population_no_header.xlsx'
   f.data { File.new("#{Rails.root}/test/fixtures/files/population_no_header.xlsx", 'rb').read }

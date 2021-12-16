@@ -77,6 +77,14 @@ Factory.define(:xlsx_population_datafile, parent: :data_file) do |f|
   f.association :content_blob, factory: :xlsx_population_content_blob
 end
 
+Factory.define(:csv_population_datafile, parent: :data_file) do |f|
+  f.association :content_blob, factory: :csv_population_content_blob
+end
+
+Factory.define(:tsv_population_datafile, parent: :data_file) do |f|
+  f.association :content_blob, factory: :tsv_population_content_blob
+end
+
 Factory.define(:xlsx_population_no_header_datafile, parent: :data_file) do |f|
   f.association :content_blob, factory: :xlsx_population_no_header_content_blob
 end
