@@ -22,7 +22,7 @@ class Workflow < ApplicationRecord
   has_and_belongs_to_many :presentations
   has_and_belongs_to_many :documents
 
-  has_many :workflow_data_files, dependent: :destroy
+  has_many :workflow_data_files, dependent: :destroy, autosave: true
   has_many :data_files, ->{ distinct }, through: :workflow_data_files
 
   accepts_nested_attributes_for :workflow_data_files
