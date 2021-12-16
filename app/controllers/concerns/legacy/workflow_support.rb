@@ -10,7 +10,7 @@ module Legacy
     # Creating a Workflow from individual files
     def create_ro_crate
       @crate_builder = Legacy::WorkflowCrateBuilder.new(legacy_ro_crate_params)
-      @crate_builder.workflow_class = WorkflowClass.find_by_id(params[:workflow_class_id])
+      @workflow.workflow_class = @crate_builder.workflow_class = WorkflowClass.find_by_id(params[:workflow_class_id])
       blob_params = @crate_builder.build
       @content_blob = ContentBlob.new(blob_params)
 

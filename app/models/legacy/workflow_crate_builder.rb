@@ -26,7 +26,7 @@ module Legacy
           crate.main_workflow.diagram['url'] = diagram[:data_url] if diagram[:data_url].present?
         end
 
-        if abstract_cwl[:data].present?
+        if abstract_cwl && abstract_cwl[:data].present?
           crate.main_workflow.cwl_description = ROCrate::WorkflowDescription.new(crate, abstract_cwl[:data], get_unique_filename(crate, abstract_cwl))
           crate.main_workflow.cwl_description['url'] = abstract_cwl[:data_url] if abstract_cwl[:data_url].present?
         end

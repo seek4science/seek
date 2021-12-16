@@ -44,7 +44,7 @@ module Seek
                 rescue StandardError => e
                   Rails.logger.error('Error extracting abstract CWL:')
                   Rails.logger.error(e)
-                  { errors: "Couldn't parse abstract CWL" }
+                  { errors: ["Couldn't parse abstract CWL"] }
                 end
               else
                 begin
@@ -52,7 +52,7 @@ module Seek
                 rescue StandardError => e
                   Rails.logger.error('Error extracting workflow:')
                   Rails.logger.error(e)
-                  { errors: "Couldn't parse main workflow" }
+                  { errors: ["Couldn't parse main workflow"] }
                 end
               end
           m[:workflow_class_id] ||= main_workflow_class(crate)&.id
