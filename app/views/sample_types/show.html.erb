@@ -9,13 +9,11 @@
 
 <h2>Attributes</h2>
 
-<ul>
+
 <%=
-  @sample_type.sample_attributes.collect do |attribute|
-    content_tag(:li){sample_attribute_details(attribute)}
-  end.join.html_safe
+  sample_attribute_details_table(@sample_type.sample_attributes)
 %>
-</ul>
+
 
 <h2>Tags</h2>
 <%= sample_type_tags_list(@sample_type) %>

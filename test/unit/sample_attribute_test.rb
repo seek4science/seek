@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class SampleAttributeTest < ActiveSupport::TestCase
+
   test 'sample_attribute initialize' do
     attribute = SampleAttribute.new title: 'fish', sample_attribute_type: Factory(:integer_sample_attribute_type),
                                     sample_type: Factory(:simple_sample_type)
@@ -60,6 +61,16 @@ class SampleAttributeTest < ActiveSupport::TestCase
     attribute = SampleAttribute.new title: 'fish',
                                     sample_attribute_type: Factory(:integer_sample_attribute_type)
     refute attribute.valid?
+
+    attribute = SampleAttribute.new title: 'fish', pid:'wibble',
+                                    sample_attribute_type: Factory(:integer_sample_attribute_type),
+                                    sample_type: Factory(:simple_sample_type)
+    refute attribute.valid?
+    attribute.pid = 'http://somewhere.org#fish'
+    assert attribute.valid?
+    attribute.pid = 'dc:fish'
+    assert attribute.valid?
+
 
     attribute = SampleAttribute.new
     refute attribute.valid?
@@ -276,6 +287,13 @@ class SampleAttributeTest < ActiveSupport::TestCase
 
     assert valid_value?(attribute, sample.title)
     assert valid_value?(attribute, 'surely no one has used this as a sample title')
+  end
+
+  test 'attribute with description and pid factory' do
+    attribute = Factory(:string_sample_attribute_with_description_and_pid, is_title: true, sample_type: Factory(:simple_sample_type))
+    assert attribute.valid?
+    refute_nil attribute.description
+    refute_nil attribute.pid
   end
 
   private
