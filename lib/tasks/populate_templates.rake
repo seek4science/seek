@@ -30,15 +30,12 @@ namespace :seek do
             isa_measurement_type: metadata["isa_measurement_type"], 
             isa_technology_type: metadata["isa_technology_type"], 
             isa_protocol_type: metadata["isa_protocol_type"], 
-            repo_schema_id: metadata["repo_schema_id"], 
+            repo_schema_id: metadata["r epo_schema_id"], 
             organism: metadata["organism"], 
             level: metadata["level"],
-            projects:[project]})
-
-            policy = Policy.public_policy
-            policy.save
-            repo.policy_id = policy.id
-            repo.update_column(:policy_id,policy.id)
+            projects:[project],
+            policy: Policy.public_policy
+            })
   
             item["data"].each_with_index do |attribute, j|
               is_ontology = !attribute["ontology"].blank?
