@@ -1,5 +1,6 @@
 class IsaAssaysController < ApplicationController
-
+  before_action :set_up_instance_variable
+  
   def new
     @isa_assay = IsaAssay.new
   end
@@ -68,5 +69,9 @@ class IsaAssaysController < ApplicationController
                                       :sample_controlled_vocab_id,
                                       :linked_sample_type_id,
                                       :unit_id, :_destroy]},assay_ids:[]]
+  end
+
+  def set_up_instance_variable
+    @single_page = true
   end
 end
