@@ -179,6 +179,25 @@ class AssetsHelperTest < ActionView::TestCase
     end
   end
 
+  test 'add_new_item_to_options filters disabled' do
+    publication = Factory(:publication)
+    with_config_value(:data_files_enabled, true) do
+      options = []
+      add_new_item_to_options(publication) do |text, path|
+        options << text
+      end
+      assert_includes options, "Add new #{t('data_file')}"
+    end
+
+    with_config_value(:data_files_enabled, false) do
+      options = []
+      add_new_item_to_options(publication) do |text, path|
+        options << text
+      end
+      refute_includes options, "Add new #{t('data_file')}"
+    end
+  end
+
   private
 
   def update_lookup_tables
