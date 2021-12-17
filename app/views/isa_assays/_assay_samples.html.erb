@@ -26,6 +26,7 @@
             });
             const dt = <%= sanitize(dt_data(sample_type).to_json) %>
             sampleDynamicTable = new $j.dynamicTable('#assay-samples-table')
+            sampleDynamicTable.init(dt.rows, dt.columns, { assayId:  selectedItem.type =="assay" ? selectedItem.id : null })
 
              $j(".dataTables_scrollBody").css("min-height", "300px")
         });
@@ -44,10 +45,6 @@
 
         function SampleAddNewRow(){
             sampleDynamicTable.newRow()
-        }
-
-        function SampleTest() {
-            console.log(sampleDynamicTable.table.rows().data())
         }
 																														
     </script>

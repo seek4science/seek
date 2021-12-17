@@ -16,9 +16,17 @@ const ajaxCall = (url, method, params) => {
 
 function updateBreadcrumb(item) {
   $j(".bcrumb li a").removeClass("active");
-  if (!item) return;
-  let index = ["project", "investigation", "study", "assay"].indexOf(item);
-  $j(`.bcrumb li:nth-child(${index + 1}) a`).addClass("active");
+  if (item) {
+    const elements = {
+      project: ["project", "folder"],
+      investigation: ["investigation"],
+      study: ["study", "source_material", "sample_collection", "study_samples", "study_table"],
+      assay: ["assay", "sop", "data_file", "document", "sample"]
+    };
+    item = Object.keys(elements).find((e) => elements[e].includes(item.toLowerCase()));
+    let index = ["project", "investigation", "study", "assay"].indexOf(item);
+    $j(`.bcrumb li:nth-child(${index + 1}) a`).addClass("active");
+  }
 }
 
 let timer;
@@ -47,7 +55,7 @@ const batchSampleUpdateStruct = (ex_id, attribute_map, id) => ({
   }
 });
 
-const batchSampleCreateStruct = (ex_id, attribute_map, sample_type_id, pid) => ({
+const batchSampleCreateStruct = (ex_id, attribute_map, sample_type_id, pid, assay_id = null) => ({
   ex_id,
   data: {
     type: "samples",
@@ -69,7 +77,17 @@ const batchSampleCreateStruct = (ex_id, attribute_map, sample_type_id, pid) => (
           id: sample_type_id,
           type: "sample_types"
         }
-      }
+      },
+      ...(assay_id && {
+        assays: {
+          data: [
+            {
+              id: 1,
+              type: "assays"
+            }
+          ]
+        }
+      })
     }
   }
 });
@@ -104,7 +122,7 @@ async function batchCreateSample(sampleTypes) {
     let data = [];
     sampleTypes.forEach((s) => {
       s.samples.forEach((sa, k) => {
-        data.push(batchSampleCreateStruct(sa.exId, sa.data, s.sampleTypeId, s.pid));
+        data.push(batchSampleCreateStruct(sa.exId, sa.data, s.sampleTypeId, s.pid, s.assayId));
       });
     });
 

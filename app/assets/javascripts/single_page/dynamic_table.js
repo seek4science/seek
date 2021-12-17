@@ -62,6 +62,7 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
           editor($j(this), table, context);
         });
       }
+      if (options.assayId) this.assayId = options.assayId;
     },
     pasteFromClipboard: function () {
       navigator.clipboard.readText().then((text) => {
@@ -150,6 +151,7 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
         return {
           pid: pid.toString(),
           sampleTypeId: s,
+          assayId: this.assayId,
           // Returning those samples that apply the 'status'
           samples: rowsIdx.reduce((filtered, i) => {
             const item = this.table.cells(i, `${s}:name`).data().toArray();

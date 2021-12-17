@@ -199,29 +199,32 @@ class SamplesController < ApplicationController
 
   private
 
-  def sample_params(sample_type=nil, _params=nil)
-    _params ||= params
+  def sample_params(sample_type = nil, parameters = nil)
+    parameters ||= params
     sample_type_param_keys = sample_type ? sample_type.sample_attributes.map(&:title).collect(&:to_sym) : []
-    if _params[:sample][:attribute_map]
-      _params[:sample][:data] = _params[:sample].delete(:attribute_map)
+    if parameters[:sample][:attribute_map]
+      parameters[:sample][:data] = parameters[:sample].delete(:attribute_map)
     end
-    _params.require(:sample).permit(:sample_type_id, *creator_related_params, { project_ids: [] },
-                              { data: sample_type_param_keys },
+    if (parameters[:sample][:assay_assets_attributes])
+      parameters[:sample][:assay_ids] = parameters[:sample][:assay_assets_attributes].map { |x| x[:assay_id] }
+    end
+    parameters.require(:sample).permit(:sample_type_id, *creator_related_params,
+                              { project_ids: [] }, { assay_ids: [] }, { data: sample_type_param_keys },
                               { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                               discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
-  def update_sample_with_params(_params=nil, sample=nil)
+  def update_sample_with_params(parameters = nil, sample = nil)
     sample ||= @sample
-    if _params.nil?
+    if parameters.nil?
       sample.update_attributes(sample_params(sample.sample_type))
     else  
-      sample.assign_attributes(sample_params(sample.sample_type, _params))
+      sample.assign_attributes(sample_params(sample.sample_type, parameters))
     end
     update_sharing_policies sample
     update_annotations(params[:tag_list], sample)
     update_relationships(sample, params)
-    sample.save if _params.nil?
+    sample.save if parameters.nil?
   end
 
   def find_index_assets
