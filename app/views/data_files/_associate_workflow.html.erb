@@ -9,26 +9,26 @@
 
 -%>
 
-<%= folding_panel("#{t('workflow').pluralize}", collapse_panel, :body_options => {:id => 'associate_data_file_fold_content'},
+<%= folding_panel("#{t('workflow').pluralize}", collapse_panel, :body_options => { :id => 'associate_data_file_fold_content' },
                   :help_text => "Here you associate #{t('workflow').pluralize} to this #{resource_text}.") do %>
 
   <p>The following <%= t('workflow').pluralize %> are associated with this <%= resource_text -%>:</p>
 
 
-    <%= associations_list('workflow_to_list', 'associations/data_file_workflow', associated_workflows_json,
-                          'data-field-name' => field_name,
-                          empty_text: "No #{t('workflow').pluralize}") %>
+  <%= associations_list('workflow_to_list', 'associations/data_file_workflow', associated_workflows_json,
+                        'data-field-name' => field_name,
+                        empty_text: "No #{t('workflow').pluralize}") %>
 
   <hr/>
 
   <%= association_selector('workflow_to_list', "Associate #{t('workflow').pluralize}", "Associate #{t('workflow').pluralize}", size: 'md') do %>
 
-      <div class="form-group">
-        <%= label_tag "How are the #{t('workflow').pluralize} related to this #{resource_text} ?" %>
-        <%= select_tag :workflow_data_file_relationship, options_for_select(WorkflowDataFileRelationship.all.collect{|r| [r.title,r.id]}),
-                       include_blank:'Not specified', class: 'form-control', 'data-role' => 'seek-association-common-field'
-        %>
-      </div>
+    <div class="form-group">
+      <%= label_tag "How are the #{t('workflow').pluralize} related to this #{resource_text} ?" %>
+      <%= select_tag :workflow_data_file_relationship, options_for_select(WorkflowDataFileRelationship.all.collect { |r| [r.title, r.id] }),
+                     include_blank: 'Not specified', class: 'form-control', 'data-role' => 'seek-association-common-field'
+      %>
+    </div>
 
     <hr/>
 
@@ -43,7 +43,7 @@
         </label>
       </div>
 
-      <%= association_select_results(multiple:true) %>
+      <%= association_select_results(multiple: true) %>
     </div>
 
   <% end %>
@@ -59,9 +59,13 @@
         });
 
         // override from association.js
-        Associations.List.prototype.findDuplicate = function(association) {
-            return this.items.find(function(item) {
-                return item.data.id === association.id && item.data.workflow_data_file_relationship.value == association.workflow_data_file_relationship.value;
+        Associations.List.prototype.findDuplicate = function (association) {
+            return this.items.find(function (item) {
+                var relationship = ''
+                if (item.data.workflow_data_file_relationship != null) {
+                    relationship = item.data.workflow_data_file_relationship.value;
+                }
+                return item.data.id === association.id && association.workflow_data_file_relationship.value == relationship;
             });
         }
     });
