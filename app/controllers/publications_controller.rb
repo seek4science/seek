@@ -354,7 +354,7 @@ class PublicationsController < ApplicationController
     params[key]
   end
 
-  # the original way of creating a bublication by either doi or pubmedid, where all data is set server-side
+  # the original way of creating a publication by either doi or pubmedid, where all data is set server-side
   def register_publication
     get_data(@publication, @publication.pubmed_id, @publication.doi)
 
