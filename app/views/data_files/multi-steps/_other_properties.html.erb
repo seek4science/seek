@@ -13,7 +13,7 @@
 
     <%= f.fancy_multiselect :events, { hidden: @data_file.events.empty?, other_projects_checkbox: true, sort_by: :start_date } if Seek::Config.events_enabled %>
 
-    <%= f.fancy_multiselect :workflows, other_projects_checkbox: true if Seek::Config.workflows_enabled %>
+    <%= render partial: 'associate_workflow', locals: {:f=>f, :resource => @data_file } if Seek::Config.workflows_enabled %>
 
     <div class='multi-step-buttons'>
       <%= multi_step_start_button %>
