@@ -31,18 +31,28 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
         .filter((c) => c.multi_link)
         .forEach((c) => {
           c["mRender"] = function (data, type, full) {
-            const existingObjects = JSON.stringify(
-              (data || []).map(({ id, title }) => ({ id: id, name: title }))
-            );
+            const existingObjectsJSON = (data || []).map(({ id, title }) => ({ id: id, name: title }));
+            const existingObjects = JSON.stringify(existingObjectsJSON);
             const url = typeaheadUrl.replace("%LINKED%", c.linked_sample_type);
-            return objectInput.replace("%EXISTING%", existingObjects).replace("%URL%", url);
+            if (options.readonly) {
+              return existingObjectsJSON.map((e) => `<span class="badge">${e.name}</span>`).join(" ");
+            } else {
+              return objectInput.replace("%EXISTING%", existingObjects).replace("%URL%", url);
+            }
           };
           c["createdCell"] = function (td, cellData, rowData, row, col) {
             setTagsInput($j(td));
           };
         });
       columns.unshift(...defaultCols);
-      const columnDefs = [{ orderable: false, targets: options.readonly ? [0] : [0, 1, 2] }];
+      const columnDefs = [
+        { orderable: false, targets: options.readonly ? [0] : [0, 1, 2] },
+        {
+          targets: [1, 2],
+          visible: false,
+          searchable: false
+        }
+      ];
       const editor = this.editor;
       this.table = this.table.DataTable({
         columnDefs,
@@ -50,9 +60,12 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
         scrollX: true,
         errMode: "throw",
         order: [[options.readonly ? 1 : 3, "asc"]],
-        dom: "Blftipr",
+        pageLength: 25,
+        dom:
+          "<'row'<'col-sm-3'l><'col-sm-5'B><'col-sm-4'f>>" +
+          "<'row'<'col-sm-12'tr>>" +
+          "<'row'<'col-sm-5'i><'col-sm-7'p>>",
         buttons: "main"
-        // stateSave: true
       });
       this.table.rows.add(rows.map((r) => [null, ...r])).draw();
       if (!options.readonly) {
@@ -177,17 +190,11 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
         .attr("contenteditable", true)
         .focus()
         .unbind()
-        .keypress(function (e) {
-          const keyCode = e.keyCode ? e.keyCode : e.which;
-          if (keyCode == "13") {
-            table.cell(elem).data(elem.text());
-            elem.attr("contenteditable", false);
-            table.columns.adjust();
-            handleCellUpdate(table, elem);
-          }
-        })
         .blur(function () {
-          table.cell(elem).data(table.cell(elem).data());
+          table.cell(elem).data(elem.text());
+          elem.attr("contenteditable", false);
+          table.columns.adjust();
+          handleCellUpdate(table, elem);
         });
 
       const colIndex = table.cell(elem).index().column;
@@ -280,14 +287,6 @@ function handleResponse(table, sampleTypes, errorCls, successCls) {
         s.samples.forEach((sa, k) => {
           const [rowId, sampleTypeId] = sa.exId.split("-");
           table.cells(rowId, `${sampleTypeId}:name`).every(function (rowIdx, columnIdx) {
-            //* This is not used as there is always one sample type in table
-            // // Here id column index is 2 (Because reading from table.columns() that includes the select column)
-            // if (res.results && columnIdx == 2) {
-            //   // update created samples' id in the table
-            //   const id = res.results.find((r) => r.ex_id == sa.exId).id;
-            //   this.data(id);
-            // }
-
             sampleStatus(table, rowId, sampleTypeId, rowStatus.noAction);
             $j(this.node()).addClass(successCls);
           });
