@@ -80,7 +80,14 @@ module DynamicTableHelper
   end
 
   def dt_cumulative_cols(sample_types)
-    sample_types.map {|s| s.sample_attributes.map {|a| { title: a.title, name: s.id.to_s }}}.flatten
+    return sample_types.flat_map do |s|
+      s.sample_attributes.map do |a|
+        attribute = { title: a.title, name: s.id.to_s }
+        condition = a.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
+        attribute.merge!({multi_link: true, linked_sample_type: a.linked_sample_type.id }) if condition
+        attribute       
+      end
+    end
   end
 
 end
