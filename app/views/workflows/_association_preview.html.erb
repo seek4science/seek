@@ -1,0 +1,8 @@
+<%= link_to '#', :class => "list-group-item selectable",
+            'data-role' => 'seek-association-candidate',
+            'data-association-id' => association_preview.id,
+            'data-association-title' => association_preview.title do %>
+  <%= association_preview.title %>
+
+  <span class="pull-right subtle">ID: <%= association_preview.id -%></span>
+<% end %>
