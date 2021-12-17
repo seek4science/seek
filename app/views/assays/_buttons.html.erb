@@ -1,7 +1,9 @@
 <% assay_word = item.is_modelling? ? t('assays.modelling_analysis') : t('assays.assay') %>
 <%= render :partial => "subscriptions/subscribe", :locals => {:object => item} %>
 <% if logged_in_and_member? %>
-  <%= button_link_to("New #{assay_word} based on this one", 'new', new_object_based_on_existing_one_assay_path(item, :controller_name => "assays")) %>
+  <% if !displaying_single_page? %>
+    <%= button_link_to("New #{assay_word} based on this one", 'new', new_object_based_on_existing_one_assay_path(item, :controller_name => "assays")) %>
+  <% end %>
   <% if item.can_edit? %>
     <%= add_to_dropdown(item) %>
   <% end %>
