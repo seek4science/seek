@@ -131,6 +131,7 @@ function item_dropped_to_folder(item_element, dest_folder_id) {
 
 function folder_clicked(folder_id, project_id) {
   hideAllViews();
+  updateBreadcrumb("project");
   $j("#folder_contents").show();
   $j("#folder_contents").spinner("add");
   var path = "/projects/" + project_id + "/folders/" + folder_id + "/display_contents";
