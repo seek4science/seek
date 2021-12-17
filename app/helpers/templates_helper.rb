@@ -18,7 +18,7 @@ module TemplatesHelper
       { title: item.title, group: item.group, level: item.level,
         organism: item.organism, template_id: item.id,
         description: item.description, attributes: 
-        item.template_attributes.map { |attribute|
+        item.template_attributes.order(:pos).map { |attribute|
           { 
             attribute_type_id: attribute.sample_attribute_type_id,
             data_type: SampleAttributeType.find(attribute.sample_attribute_type_id)&.title,
@@ -29,7 +29,8 @@ module TemplatesHelper
             description: attribute.description,
             iri: attribute.iri,
             required: attribute.required,
-            unit_id: attribute.unit_id 
+            unit_id: attribute.unit_id,
+            pos: attribute.pos
           }
         }
       }

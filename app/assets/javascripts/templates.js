@@ -9,9 +9,9 @@ Templates.clearContext = function () {
 
 Templates.init = function (elem) {
   const columnDefs = [
-    { orderable: false, targets: [0, 7, 9] },
+    { orderable: false, targets: [0, 7, 10] },
     {
-      targets: [3, 4],
+      targets: [3, 4, 9],
       visible: false,
       searchable: false
     },
@@ -44,6 +44,7 @@ Templates.init = function (elem) {
       width: "7%"
     },
     { title: "IRI", width: "10%" },
+    { title: "pos" },
     {
       title: "Remove",
       width: "5%",
@@ -59,9 +60,9 @@ Templates.init = function (elem) {
   Templates.table = elem.DataTable({
     columnDefs,
     columns,
-    order: [[1, "asc"]],
+    order: [[9, "asc"]],
     autoWidth: false,
-    stateSave: true
+    stateSave: false
   });
 
   loadFilterSelectors(templates);
@@ -109,7 +110,8 @@ Templates.mapData = (data) =>
     item.unit_id,
     item.data_type,
     item.is_title,
-    item.iri
+    item.iri,
+    item.pos
   ]);
 
 function loadFilterSelectors(data) {
@@ -147,6 +149,8 @@ const applyTemplate = () => {
   $j("#template_parent_id").val(data.template_id);
   $j(`${attribute_table} tbody`).find("tr:not(:last)").remove();
   SampleTypes.unbindSortable();
+  // Make sure default sorted attributes are added to the table 
+  Templates.table.order([9, "asc"]).draw();
   $j.each(Templates.table.rows().data(), (i, row) => {
     var newRow = $j(`${attribute_row} tbody`).clone().html();
     var index = 0;
@@ -178,9 +182,9 @@ const applyTemplate = () => {
       .find(":selected")
       .data("is-seek-sample");
     if (is_seek_sample) {
-      $j(newRow).find(".sample-type-block").show();
-      // Select the first item by default
+      // Select the first item by default and hide the row
       $j(newRow).find(".linked-sample-type-selection optgroup option:first").attr("selected", "selected");
+      $j(newRow).hide();
     }
 
     $j(`${attribute_table} ${addAttributeRow}`).before(newRow);
