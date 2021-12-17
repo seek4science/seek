@@ -29,7 +29,7 @@ class HomesControllerTest < ActionController::TestCase
   test 'test title' do
     login_as(:quentin)
     get :index
-    assert_select 'title', text: 'The Sysmo SEEK', count: 1
+    assert_select 'title', text: 'Sysmo SEEK', count: 1
   end
 
   test 'correct response to unknown action' do
@@ -704,7 +704,10 @@ class HomesControllerTest < ActionController::TestCase
 
     # about dropdown in navbar not shown if no options are configured
     Seek::Config.about_page_enabled = false
-    Seek::Config.about_link = ''
+    Seek::Config.instance_name = 'SEEK'
+    Seek::Config.instance_link = 'http://seek.com'
+    Seek::Config.about_instance_link_enabled=false
+    Seek::Config.about_instance_admins_link_enabled=false
     Seek::Config.cite_link = ''
     Seek::Config.contact_link = ''
 
@@ -712,17 +715,17 @@ class HomesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'li#navbar_about', count: 0
 
-    
-    Seek::Config.about_link = 'http://external_about.com'
+
     Seek::Config.cite_link = 'http://external_cite.com'
     Seek::Config.contact_link = 'http://external_contact.com'
     # funding link shown in footer if set
     Seek::Config.funding_link = 'http://external_funding.com'
+    Seek::Config.about_instance_link_enabled=true
 
     get :index
     assert_response :success
     assert_select 'li#navbar_about', count: 1
-    assert_select 'li#navbar_about a[href=?]', 'http://external_about.com', count:1
+    assert_select 'li#navbar_about a[href=?]', 'http://seek.com', count:1
     assert_select 'li#navbar_about a[href=?]', 'http://external_cite.com', count:1
     assert_select 'li#navbar_about a[href=?]', 'http://external_contact.com', count:1
     # contact and cite links are also shown in the footer ft

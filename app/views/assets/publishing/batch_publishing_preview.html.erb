@@ -4,7 +4,7 @@
   <div class="alert alert-info">
     <p>
       Publishing means that you will be making the item visible, and where applicable downloadable, to other people
-      visiting the <%= Seek::Config.application_name -%>.
+      visiting the <%= Seek::Config.instance_name -%>.
     </p>
 
     <p>
@@ -21,7 +21,7 @@
 
   <%= form_tag({:action => :check_related_items},:method=>:post)  do -%>
       <% if @assets.empty? %>
-          <span class="no_unpublished_asset">All your assets are published or you have no assets in <%= Seek::Config.project_name %></span>
+          <span class="no_unpublished_asset">All your assets are published or you have no assets in <%= Seek::Config.instance_name %></span>
           <br/>
           <br/>
           <%= link_to "Back to profile", person_path(params[:id].to_i) -%>

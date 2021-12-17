@@ -272,6 +272,16 @@ class WorkflowsController < ApplicationController
     end
   end
 
+  def filter
+    scope = Workflow
+    scope = scope.joins(:projects).where(projects: { id: current_user.person.projects }) unless (params[:all_projects] == 'true')
+    @workflows = scope.where('workflows.title LIKE ?', "%#{params[:filter]}%").distinct.authorized_for('view').first(20)
+
+    respond_to do |format|
+      format.html { render partial: 'workflows/association_preview', collection: @workflows }
+    end
+  end
+
   private
 
   def handle_ro_crate_post(new_version = false)
@@ -317,6 +327,8 @@ class WorkflowsController < ApplicationController
                                      { project_ids: [] }, :license,
                                      { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                      { assay_assets_attributes: [:assay_id] }, { scales: [] },
+				                             { presentation_ids: [] }, { document_ids: [] }, { data_file_ids: [] },
+                                     { workflow_data_files_attributes:[:id, :data_file_id, :workflow_data_file_relationship_id, :_destroy] },
                                      { publication_ids: [] }, :internals, :maturity_level, :source_link_url,
                                      :edam_topics, :edam_operations,
                                      { discussion_links_attributes: [:id, :url, :label, :_destroy] },

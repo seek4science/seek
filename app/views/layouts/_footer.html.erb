@@ -12,10 +12,10 @@
         </div>
         <% cache cache_name, skip_digest: true do -%>
           <div class="ft-info">
-            <% if Seek::Config.dm_project_link != Seek::Config.project_link %>
-                <%= link_to "About #{Seek::Config.dm_project_name}", Seek::Config.dm_project_link, :target => '_blank' %> |
+            <% if (Seek::Config.instance_admins_link != Seek::Config.instance_link) && (Seek::Config.instance_admins_name != Seek::Config.instance_name) %>
+                <%= link_to "About #{Seek::Config.instance_admins_name}", Seek::Config.instance_admins_link, :target => '_blank' %> |
             <% end %>
-            <%= link_to Seek::Config.project_name, Seek::Config.project_link, :target => '_blank' %> |
+            <%= link_to "About #{Seek::Config.instance_name}", Seek::Config.instance_link, :target => '_blank' %> |
             <% if logged_in_and_registered? %>
                 <%= link_to 'Provide feedback', feedback_home_path -%> |
             <% end %>

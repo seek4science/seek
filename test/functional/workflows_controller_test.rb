@@ -2,6 +2,7 @@ require 'test_helper'
 require 'minitest/mock'
 
 class WorkflowsControllerTest < ActionController::TestCase
+
   include AuthenticatedTestHelper
   include SharingFormTestHelper
   include GeneralAuthorizationTestCases
@@ -40,7 +41,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
   test 'can create with local file' do
     workflow_attrs = Factory.attributes_for(:workflow,
-                                            contributor: User.current_user,
+                                            contributor: User.current_user.person,
                                             project_ids: [@project.id])
 
     assert_difference 'Workflow.count' do
@@ -966,6 +967,154 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_select 'div.panel div.panel-heading',text:/EDAM Properties/i, count:1
     assert_select 'div.panel div.panel-body div strong',text:/Topics/, count:1
     assert_select 'div.panel div.panel-body a[href=?]','https://edamontology.github.io/edam-browser/#topic_3314',text:/Chemistry/, count:1
+  end
+
+  test 'should create with presentation and document links' do
+    person = Factory(:person)
+    presentation = Factory(:presentation, contributor: person)
+    document = Factory(:document, contributor:person)
+    login_as(person)
+    blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+    workflow =  {title: 'workflow', project_ids: [person.projects.first.id], presentation_ids:[presentation.id], document_ids:[document.id]}
+
+    assert_difference('Workflow.count') do
+      post :create_metadata, params: {workflow: workflow, content_blob_id: blob.id.to_s, policy_attributes: { access_type: Policy::VISIBLE }}
+    end
+
+    workflow = assigns(:workflow)
+
+    assert_equal [presentation], workflow.presentations
+    assert_equal [document], workflow.documents
+  end
+
+  test 'should update workflow with presentation and document link' do
+    person = Factory(:person)
+    workflow = Factory(:workflow, contributor: person)
+    presentation = Factory(:presentation, contributor: person)
+    document = Factory(:document, contributor:person)
+    login_as(person)
+    assert_empty workflow.presentations
+    assert_empty workflow.documents
+
+    assert_difference('ActivityLog.count') do
+      put :update, params: { id: workflow.id, workflow: { presentation_ids: [presentation.id], document_ids:[document.id]} }
+    end
+
+    assert_redirected_to workflow_path(workflow = assigns(:workflow))
+    assert_equal [presentation], workflow.presentations
+    assert_equal [document], workflow.documents
+  end
+
+  test 'should create with data file links' do
+    person = Factory(:person)
+    presentation = Factory(:presentation, contributor: person)
+    data_file = Factory(:data_file, contributor:person)
+    login_as(person)
+    blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+    workflow =  {title: 'workflow', project_ids: [person.projects.first.id], data_file_ids:[data_file.id] }
+
+    assert_difference('Workflow.count') do
+      post :create_metadata, params: {workflow: workflow, content_blob_id: blob.id.to_s, policy_attributes: { access_type: Policy::VISIBLE }}
+    end
+
+    workflow = assigns(:workflow)
+
+    assert_equal [data_file], workflow.data_files
+  end
+
+  test 'should update workflow with data file link' do
+    person = Factory(:person)
+    workflow = Factory(:workflow, contributor: person)
+    data_file = Factory(:data_file, contributor:person)
+    relationship = Factory(:test_data_workflow_data_file_relationship)
+    login_as(person)
+    assert_empty workflow.data_files
+
+    assert_difference('ActivityLog.count') do
+      assert_difference('WorkflowDataFile.count') do
+        put :update, params: { id: workflow.id, workflow: {
+          workflow_data_files_attributes: ['',{data_file_id: data_file.id, workflow_data_file_relationship_id:relationship.id}]
+        } }
+      end
+    end
+
+    assert_redirected_to workflow_path(workflow = assigns(:workflow))
+    assert_equal [data_file], workflow.data_files
+    assert_equal 1,workflow.workflow_data_files.count
+    assert_equal [relationship.id], workflow.workflow_data_files.pluck(:workflow_data_file_relationship_id)
+
+    # doesn't duplicate
+    assert_difference('ActivityLog.count') do
+      assert_no_difference('WorkflowDataFile.count') do
+        put :update, params: { id: workflow.id, workflow: {
+          workflow_data_files_attributes: ['',{data_file_id: data_file.id, workflow_data_file_relationship_id:relationship.id}]
+        } }
+      end
+    end
+    assert_redirected_to workflow_path(workflow = assigns(:workflow))
+    assert_equal [data_file], workflow.data_files
+    assert_equal 1,workflow.workflow_data_files.count
+    assert_equal [relationship.id], workflow.workflow_data_files.pluck(:workflow_data_file_relationship_id)
+
+    #removes
+    assert_difference('ActivityLog.count') do
+      assert_difference('WorkflowDataFile.count', -1) do
+        put :update, params: { id: workflow.id, workflow: {
+          workflow_data_files_attributes: ['']
+        } }
+      end
+    end
+    assert_redirected_to workflow_path(workflow = assigns(:workflow))
+    assert_equal [], workflow.data_files
+    assert_equal 0,workflow.workflow_data_files.count
+    assert_equal [], workflow.workflow_data_files.pluck(:workflow_data_file_relationship_id)
+  end
+
+  test 'presentation workflows through nested routing' do
+    assert_routing 'presentations/2/workflows', controller: 'workflows', action: 'index', presentation_id: '2'
+    presentation = Factory(:presentation, contributor: User.current_user.person)
+    workflow = Factory(:workflow, policy: Factory(:public_policy), presentations:[presentation], contributor:User.current_user.person)
+    workflow2 = Factory(:workflow, policy: Factory(:public_policy), contributor:User.current_user.person)
+
+    get :index, params: { presentation_id: presentation.id }
+
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', workflow_path(workflow), text: workflow.title
+      assert_select 'a[href=?]', workflow_path(workflow2), text: workflow2.title, count: 0
+    end
+  end
+
+  test 'document workflows through nested routing' do
+    assert_routing 'documents/2/workflows', controller: 'workflows', action: 'index', document_id: '2'
+    document = Factory(:document, contributor: User.current_user.person)
+    workflow = Factory(:workflow, policy: Factory(:public_policy), documents:[document], contributor:User.current_user.person)
+    workflow2 = Factory(:workflow, policy: Factory(:public_policy), contributor:User.current_user.person)
+
+    get :index, params: { document_id: document.id }
+
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', workflow_path(workflow), text: workflow.title
+      assert_select 'a[href=?]', workflow_path(workflow2), text: workflow2.title, count: 0
+    end
+  end
+
+  test 'data_file workflows through nested routing' do
+    assert_routing 'data_files/2/workflows', controller: 'workflows', action: 'index', data_file_id: '2'
+    data_file = Factory(:data_file, contributor: User.current_user.person)
+    workflow = Factory(:workflow, policy: Factory(:public_policy), data_files:[data_file], contributor: User.current_user.person)
+    workflow2 = Factory(:workflow, policy: Factory(:public_policy), contributor: User.current_user.person)
+
+    get :index, params: { data_file_id: data_file.id }
+
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', workflow_path(workflow), text: workflow.title
+      assert_select 'a[href=?]', workflow_path(workflow2), text: workflow2.title, count: 0
+    end
   end
 
   def edit_max_object(workflow)

@@ -1,6 +1,6 @@
 Hi <%= @person.name %>,
 
-This email is to inform you that several of your files have been automatically registered with <%= Seek::Config.application_name %>.
+This email is to inform you that several of your files have been automatically registered with <%= Seek::Config.instance_name %>.
 You can edit and change permissions of these resources, along with the title, description and other attributes, just as if you had uploaded them manually.
 <% success_resources = @resources.select{|r| r[:response] == :success} -%>
 <% warning_resources = @resources.select{|r| r[:response] == :warning} -%>
@@ -27,11 +27,11 @@ The following resources were uploaded, but are missing information:
     
 <% end -%>
 <% end -%>
-If you are having trouble accessing your files, or if you think a file has been uploaded by mistake, please contact one of the <%= Seek::Config.dm_project_name %> administrators listed below:
+If you are having trouble accessing your files, or if you think a file has been uploaded by mistake, please contact one of the <%= Seek::Config.instance_admins_name %> administrators listed below:
 <% Person.admins do |admin| -%>
     <%= "#{h admin.name}: " %><%= admin.email %>
 <% end -%>
 
 Regards,
 
-- The <%= Seek::Config.dm_project_name %> Team
+- The <%= Seek::Config.instance_admins_name %> Team

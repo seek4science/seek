@@ -62,6 +62,8 @@
 
     <%= rendered_asset_view(@display_workflow) %>
 
+    <%= render partial: 'workflow_data_files' if Seek::Config.data_files_enabled %>
+
     <% if Seek::Config.isa_enabled %>
       <%= render partial: 'general/isa_graph', locals: { root_item: @workflow, deep: true, include_parents: true } %>
     <% end %>

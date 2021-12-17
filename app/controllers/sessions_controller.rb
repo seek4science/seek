@@ -167,7 +167,7 @@ class SessionsController < ApplicationController
         if Seek::Config.omniauth_user_create # Create a new user if allowed.
           create_user_from_omniauth(auth)
         else # If user creation is not allowed, too bad.
-          failed_login "The authenticated user: #{auth.info.nickname} does not have a #{Seek::Config.application_name} account."
+          failed_login "The authenticated user: #{auth.info.nickname} does not have a #{Seek::Config.instance_name} account."
         end
       end
     end

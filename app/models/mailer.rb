@@ -10,7 +10,7 @@ class Mailer < ActionMailer::Base
     reply_to = user.person.email_with_name unless @anon
     mail(from: Seek::Config.noreply_sender,
          to: admin_emails,
-         subject: "#{Seek::Config.application_name} Feedback provided - #{topic}",
+         subject: "#{Seek::Config.instance_name} Feedback provided - #{topic}",
          reply_to: reply_to)
   end
 
@@ -20,18 +20,18 @@ class Mailer < ActionMailer::Base
     @data_file = file
     mail(from: Seek::Config.noreply_sender,
          to: [uploader.person.email_with_name, receiver.email_with_name],
-         subject: "#{Seek::Config.application_name} - File Upload",
+         subject: "#{Seek::Config.instance_name} - File Upload",
          reply_to: uploader.person.email_with_name)
   end
 
   def request_publishing(owner, publisher, resources)
     @owner = owner
-    publish_notification owner, publisher, resources, "A #{Seek::Config.application_name} member requests you make some items public"
+    publish_notification owner, publisher, resources, "A #{Seek::Config.instance_name} member requests you make some items public"
   end
 
   def request_publish_approval(gatekeeper, publisher, resources)
     @gatekeeper = gatekeeper
-    publish_notification gatekeeper, publisher, resources, "A #{Seek::Config.application_name} member requested your approval to publish some items."
+    publish_notification gatekeeper, publisher, resources, "A #{Seek::Config.instance_name} member requested your approval to publish some items."
   end
 
   def gatekeeper_approval_feedback(requester, gatekeeper, items_and_comments)
@@ -50,7 +50,7 @@ class Mailer < ActionMailer::Base
     mail(from: Seek::Config.noreply_sender,
          to: @owners.collect(&:email_with_name),
          reply_to: user.person.email_with_name,
-         subject: "A #{Seek::Config.application_name} member requests to discuss with you regarding #{resource.title}")
+         subject: "A #{Seek::Config.instance_name} member requests to discuss with you regarding #{resource.title}")
   end
 
   def activation_request(user)
@@ -60,7 +60,7 @@ class Mailer < ActionMailer::Base
     @activation_code = user.activation_code
     mail(from: Seek::Config.noreply_sender,
          to: user.person.email_with_name,
-         subject: "#{Seek::Config.application_name} account activation")
+         subject: "#{Seek::Config.instance_name} account activation")
   end
 
   def forgot_password(user)
@@ -69,7 +69,7 @@ class Mailer < ActionMailer::Base
     @reset_code = user.reset_password_code
     mail(from: Seek::Config.noreply_sender,
          to: user.person.email_with_name,
-         subject: "#{Seek::Config.application_name} - Password reset")
+         subject: "#{Seek::Config.instance_name} - Password reset")
   end
 
   def welcome(user)
@@ -77,7 +77,7 @@ class Mailer < ActionMailer::Base
     @person = user.person
     mail(from: Seek::Config.noreply_sender,
          to: user.person.email_with_name,
-         subject: "Welcome to #{Seek::Config.application_name}")
+         subject: "Welcome to #{Seek::Config.instance_name}")
   end
 
   def contact_admin_new_user(user)
@@ -88,13 +88,13 @@ class Mailer < ActionMailer::Base
     mail(from: Seek::Config.noreply_sender,
          to: admin_emails,
          reply_to: user.person.email_with_name,
-         subject: "#{Seek::Config.application_name} member signed up")
+         subject: "#{Seek::Config.instance_name} member signed up")
   end
 
   def project_changed(project)
     @project = project
     recipients = admin_emails | @project.project_administrators.collect{|m| m.email_with_name}
-    subject = "The #{Seek::Config.application_name} #{t('project')} #{@project.title} information has been changed"
+    subject = "The #{Seek::Config.instance_name} #{t('project')} #{@project.title} information has been changed"
 
     mail(:from=>Seek::Config.noreply_sender,
          :to=>recipients,
@@ -116,7 +116,7 @@ class Mailer < ActionMailer::Base
     @notifiee_info = notifiee_info
     mail(from: Seek::Config.noreply_sender,
          to: notifiee_info.notifiee.email_with_name,
-         subject: "#{Seek::Config.application_name} Announcement: #{site_announcement.title}")
+         subject: "#{Seek::Config.instance_name} Announcement: #{site_announcement.title}")
   end
 
   def test_email(testing_email)
@@ -131,7 +131,7 @@ class Mailer < ActionMailer::Base
 
     mail(from: Seek::Config.noreply_sender,
          to: person.email_with_name,
-         subject: "You have been assigned to a #{Seek::Config.application_name} project")
+         subject: "You have been assigned to a #{Seek::Config.instance_name} project")
   end
 
   def programme_activation_required(programme, creator)
@@ -140,7 +140,7 @@ class Mailer < ActionMailer::Base
 
     mail(from: Seek::Config.noreply_sender,
          to: admin_emails,
-         subject: "The #{Seek::Config.application_name} #{t('programme')} #{programme.title} was created and needs activating"
+         subject: "The #{Seek::Config.instance_name} #{t('programme')} #{programme.title} was created and needs activating"
     )
   end
 
@@ -149,7 +149,7 @@ class Mailer < ActionMailer::Base
 
     mail(from: Seek::Config.noreply_sender,
          to: programme.programme_administrators.map(&:email_with_name),
-         subject: "The #{Seek::Config.application_name} #{t('programme')} #{programme.title} has been activated"
+         subject: "The #{Seek::Config.instance_name} #{t('programme')} #{programme.title} has been activated"
     )
   end
 
@@ -158,7 +158,7 @@ class Mailer < ActionMailer::Base
     @reason = reason
     mail(from: Seek::Config.noreply_sender,
          to: programme.programme_administrators.map(&:email_with_name),
-         subject: "The #{Seek::Config.application_name} #{t('programme')} #{programme.title} has been rejected"
+         subject: "The #{Seek::Config.instance_name} #{t('programme')} #{programme.title} has been rejected"
     )
   end
 
@@ -278,7 +278,7 @@ class Mailer < ActionMailer::Base
 
     mail(from: Seek::Config.noreply_sender,
          to: requester.email_with_name,
-         subject: "A #{Seek::Config.application_name} #{I18n.t('asset_gatekeeper').downcase} #{response} your publishing requests.",
+         subject: "A #{Seek::Config.instance_name} #{I18n.t('asset_gatekeeper').downcase} #{response} your publishing requests.",
          reply_to: gatekeeper.email_with_name)
   end
 

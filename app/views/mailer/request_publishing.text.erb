@@ -1,6 +1,6 @@
 Hi <%= @owner.name -%>,
 
-    The <%= Seek::Config.application_name %> user <%= @publisher.name -%>, <%= person_url(@publisher) -%>, has requested you to publish your following items in seek:
+    The <%= Seek::Config.instance_name %> user <%= @publisher.name -%>, <%= person_url(@publisher) -%>, has requested you to publish your following items in seek:
 
 <% @resources.each do |resource| %>
     <% controller=resource.class.name.underscore.pluralize -%>
@@ -17,4 +17,4 @@ Hi <%= @owner.name -%>,
 
     This is an automated email.
 
-- <%= Seek::Config.dm_project_name %> Team.
+- <%= Seek::Config.instance_admins_name %> Team.

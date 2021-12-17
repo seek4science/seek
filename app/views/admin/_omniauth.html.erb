@@ -3,7 +3,7 @@
                            onchange: toggle_appear_javascript('omniauth_settings')) %>
 <div id="omniauth_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.omniauth_enabled) -%>;">
   <%= admin_checkbox_setting(:omniauth_user_create, 1, Seek::Config.omniauth_user_create,
-                             "Omniauth user creation on login", "When a user logs in through an omniauth provider and does not exist as a #{Seek::Config.application_name} user, they will be created using the information given by the provider."                             ) %>
+                             "Omniauth user creation on login", "When a user logs in through an omniauth provider and does not exist as a #{Seek::Config.instance_name} user, they will be created using the information given by the provider."                             ) %>
   <%= admin_checkbox_setting(:omniauth_user_activate, 1, Seek::Config.omniauth_user_activate,
                              "Omniauth user activation on login", "The user created through login by omniauth is automatically activated and does not require email confirmation.") %>
 

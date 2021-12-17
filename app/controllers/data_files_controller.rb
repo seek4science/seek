@@ -25,7 +25,6 @@ class DataFilesController < ApplicationController
 
   before_action :login_required, only: [:create, :create_content_blob, :create_metadata, :rightfield_extraction_ajax, :provide_metadata]
 
-  
   # has to come after the other filters
   include Seek::Publishing::PublishingCommon
 
@@ -365,7 +364,7 @@ class DataFilesController < ApplicationController
       end
     rescue Exception => e
       Seek::Errors::ExceptionForwarder.send_notification(e, data:{message: "Problem attempting to extract from RightField for content blob #{params[:content_blob_id]}"})
-      session[:extraction_exception_message] = e.message
+      session[:extraction_exception_message] = 'Rightfield extraction error'
     end
 
     session[:processed_datafile] = @data_file
@@ -534,7 +533,8 @@ class DataFilesController < ApplicationController
                                       :license, *creator_related_params, { event_ids: [] },
                                       { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                       { assay_assets_attributes: [:assay_id, :relationship_type_id] },
-                                      { scales: [] }, { publication_ids: [] },
+                                      { scales: [] }, { publication_ids: [] }, { workflow_ids: [] },
+                                      { workflow_data_files_attributes:[:id, :workflow_id, :workflow_data_file_relationship_id, :_destroy] },
                                       discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 

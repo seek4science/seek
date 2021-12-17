@@ -10,7 +10,9 @@ namespace :seek do
     environment
     db:seed:010_workflow_classes
     db:seed:011_edam_topics
-    db:seed:012_edam_operations
+    db:seed:012_edam_operations   
+    db:seed:013_workflow_data_file_relationships
+    rename_branding_settings
     update_missing_publication_versions
   ]
 
@@ -48,6 +50,15 @@ namespace :seek do
     end
   end
 
+  task(rename_branding_settings: [:environment]) do
+    Seek::Config.transfer_value :project_link, :instance_link
+    Seek::Config.transfer_value :project_name, :instance_name
+    Seek::Config.transfer_value :project_description, :instance_description
+    Seek::Config.transfer_value :project_keywords, :instance_keywords
+
+    Seek::Config.transfer_value :dm_project_name, :instance_admins_name
+    Seek::Config.transfer_value :dm_project_link, :instance_admins_link
+  end
 
   task(update_missing_publication_versions: :environment) do
     puts '... creating missing publications versions ...'
@@ -67,5 +78,5 @@ namespace :seek do
     end
     puts " ... finished creating missing publications versions for #{create.to_s} publications"
   end
-
+  
 end

@@ -294,9 +294,6 @@ class PresentationsControllerTest < ActionController::TestCase
   test 'filter by publications using nested routes' do
     assert_routing 'publications/7/presentations', controller: 'presentations', action: 'index', publication_id: '7'
 
-    person1 = Factory(:person)
-    person2 = Factory(:person)
-
     pub1 = Factory(:publication)
     pub2 = Factory(:publication)
 
@@ -304,6 +301,23 @@ class PresentationsControllerTest < ActionController::TestCase
     pres2 = Factory(:presentation, policy: Factory(:public_policy), publications:[pub2])
 
     get :index, params: { publication_id: pub1.id }
+    assert_response :success
+
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', presentation_path(pres1), text: pres1.title
+      assert_select 'a[href=?]', presentation_path(pres2), text: pres2.title, count: 0
+    end
+  end
+
+  test 'filter by workflow using nested routes' do
+    assert_routing 'workflows/7/presentations', controller: 'presentations', action: 'index', workflow_id: '7'
+
+    workflow = Factory(:workflow, policy: Factory(:public_policy))
+
+    pres1 = Factory(:presentation, policy: Factory(:public_policy), workflows:[workflow])
+    pres2 = Factory(:presentation, policy: Factory(:public_policy))
+
+    get :index, params: { workflow_id: workflow.id }
     assert_response :success
 
     assert_select 'div.list_item_title' do
@@ -358,6 +372,21 @@ class PresentationsControllerTest < ActionController::TestCase
     get :show, params: { id: presentation }
     assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share-Alike 4.0'
     assert_equal 'CC-BY-SA-4.0', assigns(:presentation).license
+  end
+
+  test 'should update linked workflow' do
+    user = Factory(:person).user
+    login_as(user)
+    presentation = Factory :presentation, policy: Factory(:public_policy), contributor: user.person
+    workflow = Factory(:workflow, contributor: user.person)
+
+    assert_empty presentation.workflows
+
+    put :update, params: { id: presentation, presentation: { workflow_ids: [workflow.id] } }
+
+    assert_response :redirect
+
+    assert_equal [workflow], assigns(:presentation).workflows
   end
 
   test 'programme presentations through nested routing' do

@@ -137,7 +137,7 @@ module Seek
           end
           send_file filepath, filename: @content_blob.original_filename, type: @content_blob.content_type || 'application/octet-stream', disposition: disposition
         else
-          redirect_on_error @asset_version, "Unable to find a copy of the file for download, or an alternative location. Please contact an administrator of #{Seek::Config.application_name}."
+          redirect_on_error @asset_version, "Unable to find a copy of the file for download, or an alternative location. Please contact an administrator of #{Seek::Config.instance_name}."
         end
       else
         begin
