@@ -2,7 +2,7 @@
 <% valid_study = study && !study.sample_types.blank? %>
 <% sample_type = study&.sample_types&.first %>
 
-<div style="padding: 20px;">
+<div style="padding:0 20px 20px 20px;">
     <div class="row">
         <div class="col-12">
             <table class="table table-striped table-bordered display nowrap" id="source-material-table" style="width:100%;"></table>
@@ -10,12 +10,13 @@
     </div>
 </div>
 
-<input class="btn btn-default" type="button" value="New row" onClick="SourceAddNewRow()" />
-</br>
-<input class="btn btn-default" type="button" value="Paste From Clipboard" onClick="SourcePasteFromClipboard()" />
-<input class="btn btn-default" type="button" value="Delete selected" onClick="SourceSetAsDeleted()" />
-<input class="btn btn-primary" type="button" value="Save changes" onClick="SourceSave()" />
-<input class="btn btn-primary" type="button" value="*TEST*" onClick="SourceTest()" />
+<div class="btn-group">
+    <input class="btn btn-default" type="button" value="Add row" onClick="SourceAddNewRow()" />
+    <input class="btn btn-default" type="button" value="Paste From Clipboard" onClick="SourcePasteFromClipboard()" />
+    <input class="btn btn-default" type="button" value="Delete selected" onClick="SourceSetAsDeleted()" />
+    <input class="btn btn-primary" type="button" value="Save" onClick="SourceSave()" />
+</div>
+
 
 <% if valid_study %>
     <script>
@@ -27,6 +28,8 @@
             const dt = <%= sanitize(dt_data(sample_type).to_json) %>
             sourceDynamicTable = new $j.dynamicTable('#source-material-table')
             sourceDynamicTable.init(dt.rows, dt.columns)
+
+            $j(".dataTables_scrollBody").css("min-height", "300px")
         });
 
         function SourcePasteFromClipboard(){
@@ -43,43 +46,6 @@
 
         function SourceAddNewRow(){
             sourceDynamicTable.newRow()
-        }
-
-        function SourceTest() {
-            // // console.log(sourceDynamicTable.columns().data())
-            // // console.log(sourceDynamicTable.columns(0))
-            // console.log(sourceDynamicTable.table.columns("67:name").data())
-
-            // console.log(sourceDynamicTable.table.rows().data())
-            // console.log(sourceDynamicTable.table.rows().data().filter((r) => r[1] === "delete").columns("67:name"))
-
-            //  console.log(sourceDynamicTable.table.cells([1],[1,2,3]).data()) //(rows, cols)
-            // console.log(sourceDynamicTable.table.cells([1],"67:name").data())
-
-            // var indexes = sourceDynamicTable.table
-            //     .rows().indexes()
-            //     .filter( i=> 'delete' === sourceDynamicTable.table.row(i).data()[1] );
-            // console.log(sourceDynamicTable.table.cells(indexes,"67:name").data())
-
-            // console.log(sourceDynamicTable.table.settings()[0].aoColumns.map(c=>c.name).filter((value, index, self)=> value && self.indexOf(value) === index))
-
-            // console.log(sourceDynamicTable.getSamples(""))
-            // console.log(sourceDynamicTable.table.cells(1, "67:name"))
-            console.log(sourceDynamicTable.table.rows().data().toArray())
-
-            // console.log(sourceDynamicTable.table.columns("67:name"))
-           
-
-
-            // console.log(sourceDynamicTable.columns([2,3]).data()[0],table.columns([2,3]).data()[1])
-
-            // console.log(sourceDynamicTable.rows(0).data())
-
-            // console.log(sourceDynamicTable.headers());
-
-
-            // // console.log(sourceDynamicTable.columns);
-
         }
 																														
     </script>

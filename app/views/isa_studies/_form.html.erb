@@ -44,6 +44,10 @@
                                                                           select_id: '#study_investigation_id',
                                                                           parents: Investigation.authorized_for('edit') } %>
     
+    <%= folding_panel("Source sample type") do %>
+      <%= render partial: 'sample_types_form', locals: {f: f, sample_type: @isa_study.source, id_suffix: "_source_sample_type" } %>
+    <% end %>
+
     <%= folding_panel("SOP") do %>
       <p class="help-block">The following SOP is associated with this study:</p>
       <%= study_fields.collection_select(:sop, authorised_assets(Sop, current_user.person.projects, "view"),
@@ -52,15 +56,14 @@
                               {class:"form-control", id:'isa_study_sop_selector', name: "isa_study[study][sop_id]"}) %>
     <% end %>
 
+    <%= folding_panel("Sample collection sample type") do %>
+      <%= render partial: 'sample_types_form', locals: {f: f, sample_type: @isa_study.sample_collection, id_suffix: "_sample_collection_sample_type"  } %>
+    <% end %>
+
 <% end -%> 
 
-<%= folding_panel("Source sample type") do %>
-  <%= render partial: 'sample_types_form', locals: {f: f, sample_type: @isa_study.source, id_suffix: "_source_sample_type" } %>
-<% end %>
 
-<%= folding_panel("Sample collection sample type") do %>
-    <%= render partial: 'sample_types_form', locals: {f: f, sample_type: @isa_study.sample_collection, id_suffix: "_sample_collection_sample_type"  } %>
-<% end %>
+
  
 <%= f.submit "Create", :class => 'btn btn-primary'  %>
 

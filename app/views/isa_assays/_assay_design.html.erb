@@ -1,6 +1,6 @@
 <% assay ||= nil %>
 <ul class="nav nav-tabs">
-    <li>
+    <li class="active">
         <a data-toggle="tab" href="#sample_collection"><i class="glyphicon glyphicon-list-alt"></i> Protocols</a>
     </li>
     <li>
@@ -12,7 +12,7 @@
 </ul>
 
 <div class="tab-content">
-    <div id="sample_collection" class="tab-pane fade">
+    <div id="sample_collection" class="tab-pane fade active in">
         <%= render :partial=>"isa_assays/sop", locals: { assay: assay} -%>
     </div>
     <div id="assay_samples" class="tab-pane fade">

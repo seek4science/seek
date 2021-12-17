@@ -15,16 +15,18 @@
     <script>
         let studyDynamicTable
         $j(document).ready(function () {
-            const dt = <%= sanitize(dt_aggregated(study, true).to_json) %>
+            const dt = <%= sanitize(dt_aggregated(study, false).to_json) %>
             studyDynamicTable = new $j.dynamicTable('#study-table')
             studyDynamicTable.init(dt.rows, dt.columns, { readonly: true })
             const types = studyDynamicTable.getSampleTypes()
             createSampleTypeOptions(types)
+
+            $j(".dataTables_scrollBody").css("min-height", "300px")
         });	
         
         function createSampleTypeOptions(types){
             types.forEach( t => {
-                const input = `<div><input checked type="checkbox" id="checkbox-${t}" onClick="toggleSampleType(${t}, $j(this))"> <label for="checkbox-${t}">sample type ${t}</label> <div/>`
+                const input = `<div style="display:inline-block"><input style="padding:3px" checked type="checkbox" id="checkbox-${t}" onClick="toggleSampleType(${t}, $j(this))"> <label style="margin-right:10px" for="checkbox-${t}">sample type ${t}</label> <div/>`
                 $j("#options_container").append(input)
             })
         }

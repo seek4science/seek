@@ -24,7 +24,7 @@
         
         function createSampleTypeOptions(types){
             types.forEach( t => {
-                const input = `<div><input checked type="checkbox" id="checkbox-${t}" onClick="toggleSampleType(${t}, $j(this))"> <label for="checkbox-${t}">sample type ${t}</label> <div/>`
+                const input = `<div style="display:inline-block"><input style="padding:3px" checked type="checkbox" id="checkbox-${t}" onClick="toggleSampleType(${t}, $j(this))"> <label style="margin-right:10px" for="checkbox-${t}">sample type ${t}</label> <div/>`
                 $j("#options_container").append(input)
             })
         }
