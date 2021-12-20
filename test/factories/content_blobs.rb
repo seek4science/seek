@@ -397,3 +397,9 @@ Factory.define(:spaces_ro_crate, parent: :content_blob) do |f|
   f.content_type 'application/zip'
   f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/with-spaces.crate.zip", 'rb').read }
 end
+
+Factory.define(:dots_ro_crate, parent: :content_blob) do |f|
+  f.original_filename 'with-dots.crate.zip'
+  f.content_type 'application/zip'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/with-dots.crate.zip", 'rb').read }
+end

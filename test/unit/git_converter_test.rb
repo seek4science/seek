@@ -192,4 +192,30 @@ class GitConverterTest < ActiveSupport::TestCase
     assert_not_includes keys, 'version'
     assert_not_includes keys, 'doi'
   end
+
+  test 'convert provided RO-Crate that has a file with dots in the path' do
+    workflow = Factory(:dots_ro_crate_workflow)
+
+    converter = Git::Converter.new(workflow)
+
+    refute workflow.local_git_repository
+    refute workflow.latest_git_version
+
+    assert_difference('Git::Annotation.count', 1) do
+      assert_difference('Git::Repository.count', 1) do
+        assert_difference('Git::Version.count', 1) do
+          converter.convert(unzip: true)
+        end
+      end
+    end
+
+    assert workflow.local_git_repository
+    assert_equal 1, workflow.git_versions.count
+    assert workflow.latest_git_version.file_exists?('ont-artic-variation.ga')
+    assert workflow.latest_git_version.file_exists?('.dockstore.yml')
+    assert_equal 'ont-artic-variation.ga', workflow.latest_git_version.main_workflow_path
+    assert_nothing_raised do
+      workflow.ro_crate_zip
+    end
+  end
 end

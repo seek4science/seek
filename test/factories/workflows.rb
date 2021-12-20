@@ -179,6 +179,11 @@ Factory.define(:spaces_ro_crate_workflow, parent: :workflow) do |f|
   f.workflow_class { WorkflowClass.find_by_title('Jupyter Notebook') || Factory(:jupyter_workflow_class) }
 end
 
+Factory.define(:dots_ro_crate_workflow, parent: :workflow) do |f|
+  f.association :content_blob, factory: :dots_ro_crate
+  f.workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
+end
+
 Factory.define(:remote_git_workflow, class: Workflow) do |f|
   f.title 'Concat two files'
   f.with_project_contributor
