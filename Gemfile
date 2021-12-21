@@ -30,7 +30,7 @@ gem 'daemons'
 gem 'linkeddata'
 gem 'rdf'
 
-gem 'openseek-api'
+gem 'openseek-api', :path => '/Users/abecam/RubymineProjects/openseek-api-gem'
 # for fancy content escaping in openbis integration
 gem 'loofah'
 gem 'jbuilder'
