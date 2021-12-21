@@ -354,7 +354,7 @@ class PublicationsController < ApplicationController
     params[key]
   end
 
-  # the original way of creating a publication by either doi or pubmedid, where all data is set server-side
+  # the original way of creating a bublication by either doi or pubmedid, where all data is set server-side
   def register_publication
     get_data(@publication, @publication.pubmed_id, @publication.doi)
 
@@ -363,10 +363,8 @@ class PublicationsController < ApplicationController
         render partial: 'assets/back_to_fancy_parent', locals: { child: @publication, parent_name: @publication.parent_name }
       else
         respond_to do |format|
-          flash[:notice] = 'Publication was successfully created. You can edit the additional information now or later'
-
-          # newly_created Change the buttons in the manage page-> Cancel will become Skip, ...
-          format.html { redirect_to(manage_publication_url(@publication, newly_created: true)) }
+          flash[:notice] = 'Publication was successfully created.'
+          format.html { redirect_to(manage_publication_url(@publication)) }
           format.xml  { render xml: @publication, status: :created, location: @publication }
           format.json  { render json: @publication, status: :created, location: @publication, include: [params[:include]] }
         end
