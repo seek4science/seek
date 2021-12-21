@@ -42,7 +42,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     end
 
-    assert_redirected_to manage_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication), newly_created: true)
     p = assigns(:publication)
     assert_equal 0, p.assays.count
   end
@@ -57,7 +57,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     end
 
-    assert_redirected_to manage_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication), newly_created: true)
     p = assigns(:publication)
     assert_equal 1, p.assays.count
     assert p.assays.include? assay
@@ -83,7 +83,7 @@ class PublicationsControllerTest < ActionController::TestCase
       post :create, params: { publication: { doi: '10.1371/journal.pone.0004803', project_ids: [projects(:sysmo_project).id],publication_type_id: Factory(:journal).id } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
-    assert_redirected_to manage_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication), newly_created: true)
   end
 
 
@@ -94,7 +94,7 @@ class PublicationsControllerTest < ActionController::TestCase
     end
 
     assert_not_nil assigns(:publication)
-    assert_redirected_to manage_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication), newly_created: true)
 
   end
 
@@ -105,7 +105,7 @@ class PublicationsControllerTest < ActionController::TestCase
     end
 
     assert_not_nil assigns(:publication)
-    assert_redirected_to manage_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication), newly_created: true)
     assigns(:publication).destroy
 
     # formatted slightly different
@@ -114,7 +114,7 @@ class PublicationsControllerTest < ActionController::TestCase
     end
 
     assert_not_nil assigns(:publication)
-    assert_redirected_to manage_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication), newly_created: true)
     assigns(:publication).destroy
 
     # with url
@@ -123,7 +123,7 @@ class PublicationsControllerTest < ActionController::TestCase
     end
 
     assert_not_nil assigns(:publication)
-    assert_redirected_to manage_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication), newly_created: true)
     assigns(:publication).destroy
 
     # with url but no protocol
@@ -132,7 +132,7 @@ class PublicationsControllerTest < ActionController::TestCase
     end
 
     assert_not_nil assigns(:publication)
-    assert_redirected_to manage_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication), newly_created: true)
     assigns(:publication).destroy
 
     # also test with spaces around
@@ -140,7 +140,7 @@ class PublicationsControllerTest < ActionController::TestCase
       post :create, params: { publication: { doi: '  10.1371/journal.pone.0004803  ', project_ids: [projects(:sysmo_project).id],publication_type_id: Factory(:journal).id } } # 10.1371/journal.pone.0004803.g001 10.1093/nar/gkl320
     end
 
-    assert_redirected_to manage_publication_path(assigns(:publication))
+    assert_redirected_to manage_publication_path(assigns(:publication), newly_created: true)
   end
 
   test 'should create publication from details' do
@@ -1221,7 +1221,37 @@ class PublicationsControllerTest < ActionController::TestCase
     assert_select 'select#possible_publication_investigation_ids' do
       assert_select 'option[value=?]',investigation.id.to_s,count:1
     end
+  end
 
+  test 'manage from registration should go to manage as newly_created' do
+    mock_pubmed(content_file: 'pubmed_1.txt')
+    login_as(:model_owner)
+    assert_difference('Publication.count') do
+      post :create, params: { publication: { pubmed_id: 1, project_ids: [projects(:sysmo_project).id], publication_type_id: Factory(:journal).id } }
+    end
+    assert_redirected_to manage_publication_path(assigns(:publication), newly_created: true)
+  end
+
+  test 'manage from newly_created should give a delete button' do
+    publication = Factory(:publication, publication_authors: [Factory(:publication_author), Factory(:publication_author)])
+
+    login_as publication.contributor
+
+    get :manage, params: { id: publication, newly_created: true}
+    assert_response :success
+
+    assert_select "a", { count: 1, text: "Cancel and delete" }, "This page must contain a Cancel and delete button"
+  end
+
+  test 'manage from menu should not give a delete button' do
+    publication = Factory(:publication, publication_authors: [Factory(:publication_author), Factory(:publication_author)])
+
+    login_as publication.contributor
+
+    get :manage, params: { id: publication}
+    assert_response :success
+
+    assert_select "a", { count: 0, text: "Cancel and delete" }, "This page must not contain a Cancel and delete button"
   end
 
   private

@@ -48,6 +48,9 @@ class SamplesControllerTest < ActionController::TestCase
     assert_response :success
     assert assigns(:sample)
     assert_equal type, assigns(:sample).sample_type
+
+    # displays description if set
+    assert_select 'div label+p', text:/the weight of the patient/i, count:1
   end
 
   test 'create from form' do

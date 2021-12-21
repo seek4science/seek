@@ -1556,6 +1556,8 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.string "original_accessor_name"
     t.integer "sample_controlled_vocab_id"
     t.integer "linked_sample_type_id"
+    t.string "pid"
+    t.text "description"
     t.index ["sample_type_id"], name: "index_sample_attributes_on_sample_type_id"
     t.index ["unit_id"], name: "index_sample_attributes_on_unit_id"
   end
