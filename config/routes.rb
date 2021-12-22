@@ -543,7 +543,7 @@ SEEK::Application.routes.draw do
       get :provide_metadata
       get :annotate_repository
       post :create_metadata
-
+      get :filter
       post :create_content_blob # Legacy
       post :create_ro_crate # Legacy
     end

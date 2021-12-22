@@ -295,6 +295,16 @@ class WorkflowsController < ApplicationController
     end
   end
 
+  def filter
+    scope = Workflow
+    scope = scope.joins(:projects).where(projects: { id: current_user.person.projects }) unless (params[:all_projects] == 'true')
+    @workflows = scope.where('workflows.title LIKE ?', "%#{params[:filter]}%").distinct.authorized_for('view').first(20)
+
+    respond_to do |format|
+      format.html { render partial: 'workflows/association_preview', collection: @workflows }
+    end
+  end
+
   private
 
   def handle_ro_crate_post(new_version = false)
