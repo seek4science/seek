@@ -7,9 +7,14 @@ module Git
       @asset = asset
     end
 
-    def convert(unzip: false)
-      repo = asset.create_local_git_repository
-      asset.versions.each do |version|
+    def convert(unzip: false, overwrite: false)
+      if overwrite
+        disable_authorization_checks { asset.local_git_repository&.destroy! }
+        repo = asset.create_local_git_repository
+      else
+        repo = asset.local_git_repository || asset.create_local_git_repository
+      end
+      asset.versions.order(:version).each do |version|
         convert_version(repo, version, unzip: unzip)
       end
 
@@ -18,15 +23,14 @@ module Git
 
     def convert_version(repo, version, unzip: false)
       Dir.mktmpdir do |tmp_dir|
-        git_version = asset.git_versions.build(git_repository: repo,
-                                               version: version.version,
-                                               name: "Version #{version.version}",
-                                               comment: version.revision_comments,
-                                               doi: version.doi,
-                                               contributor_id: version.contributor_id,
-                                               visibility: version.visibility,
-                                               created_at: version.created_at,
-                                               updated_at: version.updated_at)
+        git_version = asset.git_versions.where(git_repository: repo, version: version.version).first_or_initialize
+        git_version.assign_attributes(name: "Version #{version.version}",
+                                      comment: version.revision_comments,
+                                      doi: version.doi,
+                                      contributor_id: version.contributor_id,
+                                      visibility: version.visibility,
+                                      created_at: version.created_at,
+                                      updated_at: version.updated_at)
         attribute_keys = asset.class.versioned_columns.map(&:name)
         attribute_keys.delete('revision_comments')
         attribute_keys.delete('contributor_id')
