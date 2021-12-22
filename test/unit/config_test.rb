@@ -586,19 +586,4 @@ class ConfigTest < ActiveSupport::TestCase
     assert_nil Settings.fetch(:new_name_2)
 
   end
-
-  test 'enabled_for_type?' do
-    with_config_value 'events_enabled', true do
-      assert Seek::Config.enabled_for_type?(Event)
-      assert Seek::Config.enabled_for_type?('Event')
-    end
-
-    with_config_value 'events_enabled', false  do
-      refute Seek::Config.enabled_for_type?(Event)
-      refute Seek::Config.enabled_for_type?('Event')
-    end
-
-    # always enabled if there isn't a configuration option
-    assert Seek::Config.enabled_for_type?(Person)
-  end
 end

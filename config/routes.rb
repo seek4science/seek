@@ -531,7 +531,6 @@ SEEK::Application.routes.draw do
       get :provide_metadata
       post :metadata_extraction_ajax
       post :create_metadata
-      get :filter
     end
     member do
       get :diagram

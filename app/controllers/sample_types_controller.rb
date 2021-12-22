@@ -161,7 +161,7 @@ class SampleTypesController < ApplicationController
     params.require(:sample_type).permit(:title, :description, :tags,
                                         { project_ids: [],
                                           sample_attributes_attributes: [:id, :title, :pos, :required, :is_title,
-                                                                         :description, :pid, :sample_attribute_type_id,
+                                                                         :sample_attribute_type_id,
                                                                          :sample_controlled_vocab_id,
                                                                          :linked_sample_type_id,
                                                                          :unit_id, :_destroy] }, :assay_ids => [])
