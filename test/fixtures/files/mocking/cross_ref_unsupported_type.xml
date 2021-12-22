@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_records>
+  <doi_record owner="10.13003" timestamp="2020-04-09 09:13:37">
+    <crossref>
+      <database>
+        <database_metadata language="en">
+          <titles>
+            <title>Public Data File</title>
+          </titles>
+          <institution>
+            <institution_name>Crossref</institution_name>
+            <institution_acronym>Crossref</institution_acronym>
+          </institution>
+        </database_metadata>
+        <dataset dataset_type="collection">
+          <contributors>
+            <organization sequence="first" contributor_role="author">Crossref</organization>
+          </contributors>
+          <titles>
+            <title>March 2020 Public Data File</title>
+          </titles>
+          <doi_data>
+            <doi>10.13003/83B2GP</doi>
+            <resource>https://academictorrents.com/download/0c6c3fbfdc13f0169b561d29354ea8b188eb9d63.torrent</resource>
+          </doi_data>
+        </dataset>
+      </database>
+    </crossref>
+  </doi_record>
+</doi_records>
