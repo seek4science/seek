@@ -78,12 +78,15 @@
     $j.ajax('<%= test_endpoint_project_openbis_endpoints_path(@project) %>', {
           data: $j('input.login-credential').serialize(),
           success: function (data) {
-            if (data.result==true) {
+
+            var arrg = JSON.parse(data);
+
+            if (arrg.success == true) {
               $j('#check-result').html('Authentication succeeded');
               fetchSpaces();
             }
             else {
-              $j('#check-result').html('Authentication failed!');
+              $j('#check-result').html('Authentication failed!<br/>Cause: '+arrg.error_message);
               $j('#submit-button').prop('disabled', true);
             }
           },

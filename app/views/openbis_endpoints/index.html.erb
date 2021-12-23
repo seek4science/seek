@@ -14,6 +14,8 @@
 
 <div class="list_items_container">
 <% @project.openbis_endpoints.each do |space| %>
-  <%= render partial:'space_list_item',locals:{space:space,project:@project} %>
+    <% unless space.nil? %>
+      <%= render partial:'space_list_item',locals:{space:space,project:@project} %>
+    <% end %>
 <% end %>
 </div>

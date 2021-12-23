@@ -154,4 +154,15 @@ module OpenbisHelper
     cleaned = cleaned.scrub!(Seek::Openbis::ObisCommentScrubber.new)
     cleaned.scrub!(:prune).to_s.html_safe
   end
+
+  def select_entity_type(entity_type, entity_type_options)
+    select_tag(entity_type, options_for_select(entity_type_options, entity_type),
+               id: 'entity_type', class: 'form-control', onchange: 'this.form.submit();').html_safe
+  end
+
+  def select_zample_type(entity_type, entity_type_options)
+    select_tag(entity_type, options_for_select(entity_type_options, entity_type),
+               id: 'zample_type', class: 'form-control', onchange: 'this.form.submit();').html_safe
+  end
+
 end

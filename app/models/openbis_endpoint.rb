@@ -39,10 +39,30 @@ class OpenbisEndpoint < ApplicationRecord
     can_edit?(user) && external_assets.empty?
   end
 
+  class AuthenticationResult
+    attr_accessor :success, :error_message, :error_content
+  end
+
   def test_authentication
-    !session_token.nil?
-  rescue Fairdom::OpenbisApi::OpenbisQueryException
-    false
+    aNewResult = AuthenticationResult.new
+
+    begin
+      aNewResult.success = !session_token.nil?
+
+      if !aNewResult.success
+        aNewResult.error_message = "An unknown problem occurred"
+        aNewResult.error_content = "The authentication failed but the connector did not issue any error."
+      end
+    rescue Fairdom::OpenbisApi::OpenbisQueryException => e
+      aNewResult.success = false
+      if (e.message["[MESSAGE]"] && e.message["[/MESSAGE]"])
+        aNewResult.error_message = e.message.split("[MESSAGE]").last.split("[/MESSAGE]").first
+      else
+        aNewResult.error_message = e.message
+      end
+      aNewResult.error_content = e.full_message
+    end
+    aNewResult
   end
 
   def available_spaces
@@ -51,7 +71,7 @@ class OpenbisEndpoint < ApplicationRecord
 
   # session token used for authentication, provided when logging in
   def session_token
-    @session_token ||= Fairdom::OpenbisApi::Authentication.new(username, password, as_endpoint).login['token']
+    @session_token ||= Fairdom::OpenbisApi::Authentication.new(username, password, as_endpoint, true).login['token']
   end
 
   def space

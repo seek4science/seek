@@ -24,11 +24,24 @@ class OpenbisExperimentsController < ApplicationController
   end
 
   def entities
-    if Seek::Openbis::ALL_TYPES == @entity_type
-      @entities = Seek::Openbis::Experiment.new(@openbis_endpoint).all
-    else
-      codes = @entity_type == Seek::Openbis::ALL_STUDIES ? @entity_types_codes : [@entity_type]
-      @entities = Seek::Openbis::Experiment.new(@openbis_endpoint).find_by_type_codes(codes)
+    begin
+      if Seek::Openbis::ALL_TYPES == @entity_type
+        @entities = Seek::Openbis::Experiment.new(@openbis_endpoint).all
+      else
+        codes = @entity_type == Seek::Openbis::ALL_STUDIES ? @entity_types_codes : [@entity_type]
+        @entities = Seek::Openbis::Experiment.new(@openbis_endpoint).find_by_type_codes(codes)
+      end
+    rescue Fairdom::OpenbisApi::OpenbisQueryException => e
+      if e.message
+        errorMessage = e.message
+        if (e.message["[MESSAGE]"] && e.message["[/MESSAGE]"])
+          errorMessage = e.message.split("[MESSAGE]").last.split("[/MESSAGE]").first
+        end
+
+        flash[:error] = "An error occured with the OpenBis connector. Detailed message: <br/>" + errorMessage
+      else
+        flash[:error] = "An error occured with the OpenBis connector"
+      end
     end
   end
 

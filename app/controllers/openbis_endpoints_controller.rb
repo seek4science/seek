@@ -70,7 +70,8 @@ class OpenbisEndpointsController < ApplicationController
     result = endpoint.test_authentication
 
     respond_to do |format|
-      format.json { render(json: { result: result }) }
+      format.html { render json: result }
+      format.json { render json: result }
     end
   end
 
