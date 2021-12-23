@@ -26,8 +26,10 @@
 
       <%= render :partial => "scales/scales_selector", :locals => {:object => @data_file} if show_scales? %>
 
-      <%= render :partial => "assets/select_template", :locals => {:resource => (@data_file ? @data_file : DataFile.new),
-      :templates => FileTemplate.all } %>
+      <% if Seek::Config.file_templates_enabled %>
+        <%= render :partial => "assets/select_template", :locals => {:resource => (@data_file ? @data_file : DataFile.new),
+        :templates => FileTemplate.all } %>
+      <% end %>
       
       <%= render partial: 'assets/edam_form_properties', :locals => { :resource => (@data_file ? @data_file : DataFile.new) } -%>
 

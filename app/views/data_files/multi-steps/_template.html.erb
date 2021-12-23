@@ -1,12 +1,18 @@
 <div class='panel panel-default'>
   <div class='panel-heading'>
-    File template, data type and format
+    <% if Seek::Config.file_templates_enabled %>
+       File template, data type and format
+    <% else %>
+       Data type and format
+    <% end %>
   </div>
 
   <div class='panel-body'>
+    <% if Seek::Config.file_templates_enabled %>
       <%= render :partial => "assets/select_template", :locals => {:resource => (@data_file ? @data_file : DataFile.new),
       :templates => FileTemplate.all } %>
       
+    <% end %>
       <%= render partial: 'assets/edam_form_properties', :locals => { :resource => @data_file } -%>
 
     <%= cancel_button(data_files_path) -%>
