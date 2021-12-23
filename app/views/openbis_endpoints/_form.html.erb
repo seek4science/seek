@@ -35,12 +35,17 @@
     </div>
 
     <div class="form-group">
-      <label>Study like types</label><span class="required">*</span>
+      <%= f.label 'Is a test OpenBis (allow to use http connection)', class: 'required' %>
+      <%= f.check_box :is_test, autocomplete: 'off', class:"checkbox" %>
+    </div>
+
+    <div class="form-group">
+      <label>Study like types (for filtering results)</label>
       <%= f.text_field :study_types, :class=>"form-control login-credential"-%>
     </div>
 
     <div class="form-group">
-      <label>Assay like types</label><span class="required">*</span>
+      <label>Assay like types (for filtering results)</label>
       <%= f.text_field :assay_types, :class=>"form-control login-credential"-%>
     </div>
 

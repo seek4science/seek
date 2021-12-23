@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_09_112856) do
+ActiveRecord::Schema.define(version: 2021_12_23_165143) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -1162,6 +1162,7 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.text "meta_config_json"
     t.datetime "last_sync"
     t.datetime "last_cache_refresh"
+    t.boolean "is_test", default: false
   end
 
   create_table "organisms", id: :integer,  force: :cascade do |t|
