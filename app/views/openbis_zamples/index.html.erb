@@ -9,10 +9,15 @@
         <%= hidden_field_tag(:seek, @seek_type) %>
         <div class="form-group"><label><%= t('project') -%>:</label> <%= @project.title %></div>
         <div class="form-group"><label>Endpoint:</label> <%= @openbis_endpoint.title %></div>
-        <div class="form-group"><label>Entities like:</label> <%= @seek_type.capitalize %></div>
-        <div class="form-group"><label>OpenBIS Type:</label>
-        <%= select_zample_type @entity_type, @entity_type_options %></div>
-        <div class="form-group"><label>Samples:</label> <%= @entities.length %></div>
+        <% if @entities.nil? %>
+          <div class="form-group"><label>Sorry, something went wrong</label></div>
+          <div class="form-group"><label>Please check the configuration of the OpenBis connection, and if OpenBis is correctly configured.</label></div>
+        <% else %>
+          <div class="form-group"><label>Entities like:</label> <%= @seek_type.capitalize %></div>
+          <div class="form-group"><label>OpenBIS Type:</label>
+          <%= select_zample_type @entity_type, @entity_type_options %></div>
+          <div class="form-group"><label>Samples:</label> <%= @entities.length %></div>
+        <% end -%>
     <% end %>
   </div>
 </div>
