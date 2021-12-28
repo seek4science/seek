@@ -64,7 +64,8 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
               refresh_period_mins: '123',
               space_perm_id: 'space-id',
               study_types: 'ST1, ST2',
-              assay_types: 'ASSAY, DEFAULT'
+              assay_types: 'ASSAY, DEFAULT',
+              is_test: false
           }, policy_attributes: policy_attributes }
     end
 

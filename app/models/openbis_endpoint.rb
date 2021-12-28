@@ -13,7 +13,8 @@ class OpenbisEndpoint < ApplicationRecord
   validates :dss_endpoint, url: { allow_nil: true, allow_blank: true }
   validates :web_endpoint, url: { allow_nil: true, allow_blank: true }
   validates :project, :as_endpoint, :dss_endpoint, :web_endpoint, :username,
-            :password, :space_perm_id, :refresh_period_mins, :policy, :is_test, presence: true
+            :password, :space_perm_id, :refresh_period_mins, :policy, presence: true
+  validates :is_test, :inclusion => { :in => [true, false] }
   # validates :refresh_period_mins, numericality: { greater_than_or_equal_to: 1 }
   validates :refresh_period_mins, numericality: { greater_than_or_equal_to: 60 }
   validates :space_perm_id, uniqueness: { scope: %i[dss_endpoint as_endpoint space_perm_id project_id],
