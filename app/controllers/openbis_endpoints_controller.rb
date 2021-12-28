@@ -77,6 +77,7 @@ class OpenbisEndpointsController < ApplicationController
 
   def fetch_spaces
     endpoint = OpenbisEndpoint.new(openbis_endpoint_params)
+
     respond_to do |format|
       format.html { render partial: 'available_spaces', locals: { endpoint: endpoint } }
     end
@@ -87,7 +88,7 @@ class OpenbisEndpointsController < ApplicationController
   def openbis_endpoint_params
     params.require(:openbis_endpoint).permit(:project_id, :web_endpoint, :as_endpoint, :dss_endpoint,
                                              :username, :password, :refresh_period_mins, :space_perm_id,
-                                             :study_types, :assay_types)
+                                             :study_types, :assay_types, :is_test)
   end
 
   ### Filters
