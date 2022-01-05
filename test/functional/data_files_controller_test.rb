@@ -896,18 +896,67 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_redirected_to data_file_path(df)
     assert_equal 'diff title',assigns(:data_file).title
   end
+  #
+  # test 'should update data file with workflow link' do
+  #   df = Factory(:data_file, contributor:User.current_user.person)
+  #   workflow = Factory(:workflow, contributor: User.current_user.person)
+  #   assert_empty df.workflows
+  #   assert_difference('ActivityLog.count') do
+  #     put :update, params: { id: df.id, data_file: { workflow_ids: [workflow.id] } }
+  #   end
+  #
+  #   assert_equal 'Data file metadata was successfully updated.', flash[:notice]
+  #   assert_equal [workflow], assigns(:data_file).workflows
+  #   assert_redirected_to data_file_path(df)
+  # end
 
-  test 'should update data file with workflow link' do
-    df = Factory(:data_file, contributor:User.current_user.person)
-    workflow = Factory(:workflow, contributor: User.current_user.person)
-    assert_empty df.workflows
+  test 'should update data_file with workflow link' do
+
+    person = Factory(:person)
+    workflow = Factory(:workflow, contributor: person)
+    data_file = Factory(:data_file, contributor:person)
+    relationship = Factory(:test_data_workflow_data_file_relationship)
+    login_as(person)
+    assert_empty data_file.workflows
+
     assert_difference('ActivityLog.count') do
-      put :update, params: { id: df.id, data_file: { workflow_ids: [workflow.id] } }
+      assert_difference('WorkflowDataFile.count') do
+        put :update, params: { id: data_file.id, data_file: {
+          workflow_data_files_attributes: ['',{workflow_id: workflow.id, workflow_data_file_relationship_id:relationship.id}]
+        } }
+      end
     end
 
-    assert_equal 'Data file metadata was successfully updated.', flash[:notice]
-    assert_equal [workflow], assigns(:data_file).workflows
-    assert_redirected_to data_file_path(df)
+    assert_redirected_to data_file_path(data_file = assigns(:data_file))
+    assert_equal [workflow], data_file.workflows
+    assert_equal 1,data_file.workflow_data_files.count
+    assert_equal [relationship.id], data_file.workflow_data_files.pluck(:workflow_data_file_relationship_id)
+
+    # doesn't duplicate
+    assert_difference('ActivityLog.count') do
+      assert_no_difference('WorkflowDataFile.count') do
+        put :update, params: { id: data_file.id, data_file: {
+          workflow_data_files_attributes: ['',{workflow_id: workflow.id, workflow_data_file_relationship_id:relationship.id}]
+        } }
+      end
+    end
+    assert_redirected_to data_file_path(data_file = assigns(:data_file))
+    assert_equal [workflow], data_file.workflows
+    assert_equal 1,data_file.workflow_data_files.count
+    assert_equal [relationship.id], data_file.workflow_data_files.pluck(:workflow_data_file_relationship_id)
+
+    #removes
+    assert_difference('ActivityLog.count') do
+      assert_difference('WorkflowDataFile.count', -1) do
+        put :update, params: { id: data_file.id, data_file: {
+          workflow_data_files_attributes: ['']
+        } }
+      end
+    end
+    assert_redirected_to data_file_path(data_file = assigns(:data_file))
+    assert_equal [], data_file.workflows
+    assert_equal 0,data_file.workflow_data_files.count
+    assert_equal [], data_file.workflow_data_files.pluck(:workflow_data_file_relationship_id)
   end
 
   test 'should destroy DataFile' do
