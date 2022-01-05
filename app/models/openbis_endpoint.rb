@@ -75,19 +75,6 @@ class OpenbisEndpoint < ApplicationRecord
     aNewResult = AuthenticationResult.new
 
     @session_token ||= Fairdom::OpenbisApi::Authentication.new(username, password, as_endpoint, is_test).login['token']
-    #
-    # begin
-    #   @session_token ||= Fairdom::OpenbisApi::Authentication.new(username, password, as_endpoint, is_test).login['token']
-    # rescue Fairdom::OpenbisApi::OpenbisQueryException => e
-    #   aNewResult.success = false
-    #   if (e.message["[MESSAGE]"] && e.message["[/MESSAGE]"])
-    #     aNewResult.error_message = e.message.split("[MESSAGE]").last.split("[/MESSAGE]").first
-    #   else
-    #     aNewResult.error_message = e.message
-    #   end
-    #   aNewResult.error_content = e.full_message
-    # end
-    # aNewResult
   end
 
   def space
