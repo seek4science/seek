@@ -5,7 +5,7 @@
   field_name = "#{resource.class.name.underscore}[workflow_data_files_attributes]"
 
   collapse_panel = resource.workflows.empty?
-  associated_workflows_json = associations_json_from_workflow_data_files2(resource.workflow_data_files)
+  associated_workflows_json = associations_json_from_data_file_to_workflows(resource.workflow_data_files)
 
 -%>
 
