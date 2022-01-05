@@ -13,6 +13,7 @@ namespace :seek do
     db:seed:012_edam_operations   
     db:seed:013_workflow_data_file_relationships
     rename_branding_settings
+    update_missing_openbis_istest
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -58,5 +59,25 @@ namespace :seek do
     Seek::Config.transfer_value :dm_project_name, :instance_admins_name
     Seek::Config.transfer_value :dm_project_link, :instance_admins_link
   end
-  
+
+  task(update_missing_openbis_istest: :environment) do
+    puts '... creating missing is_test for OpenbisEndpoint...'
+    create = 0
+    disable_authorization_checks do
+      OpenbisEndpoint.find_each do |openbis_endpoint|
+        # check if the publication has a version
+        # then create one if missing
+        if openbis_endpoint.is_test.nil?
+          openbis_endpoint.is_test = false # default -> prod, https
+          openbis_endpoint.save
+          unless openbis_endpoint.is_test.nil?
+            create += 1
+          end
+        end
+        # publication.save
+      end
+    end
+    puts " ... finished creating missing is_test for #{create.to_s} OpenbisEndpoint(s)"
+  end
+
 end
