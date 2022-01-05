@@ -1916,5 +1916,6 @@ class AssaysControllerTest < ActionController::TestCase
       get :show, params: { id: assay.id }
       assert_select 'ul#item-admin-menu li a',text: /add new document/i, count:0
     end
-
   end
+
+end

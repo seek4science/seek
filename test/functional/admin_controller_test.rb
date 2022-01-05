@@ -244,7 +244,7 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'update home page settings' do
-    assert_not_equal 'This is the home description', Seek::Config.home_description
+    refute_equal 'This is the home description', Seek::Config.home_description
     post :update_home_settings, params: { home_description: 'This is the home description', news_number_of_entries: '3', news_enabled: '1', news_feed_urls: 'http://fish.com, http://goats.com' }
 
     assert_equal 'This is the home description', Seek::Config.home_description

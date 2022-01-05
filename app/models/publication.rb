@@ -462,6 +462,8 @@ class Publication < ApplicationRecord
         @error = 'The DOI you entered appears to be malformed.'
       rescue DOI::NotFoundException
         @error = 'The DOI you entered could not be resolved.'
+      rescue DOI::RecordNotSupported
+        @error = 'The DOI resolved to an unsupported resource type.'
       rescue RuntimeError => exception
         @error = 'There was an problem contacting the DOI query service. Please try again later'
         Seek::Errors::ExceptionForwarder.send_notification(exception, data: {message: "Problem accessing crossref using DOI #{doi}"})
