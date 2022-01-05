@@ -499,14 +499,5 @@ module Seek
       true
     end
 
-    def self.enabled_for_type?(type)
-      method = type.to_s.tableize + '_enabled'
-      if respond_to?(method)
-        send(method)
-      else
-        true
-      end
-    end
-
   end
 end
