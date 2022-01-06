@@ -382,6 +382,22 @@ module Ga4gh
           assert_response :success
           assert_equal bytes, @response.body.force_encoding('ASCII-8BIT')
         end
+
+        test 'should get file list for workflow with missing main workflow' do
+          workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+          disable_authorization_checks do
+            v = workflow.git_version
+            v.remove_file('concat_two_files.ga')
+            v.save!
+          end
+
+          get :files, params: { id: workflow.reload.id, version_id: 1, type: 'GALAXY' }
+
+          assert_response :success
+          r = JSON.parse(@response.body)
+          refute r.detect { |f| f['path'] == 'concat_two_files.ga' }
+          refute r.detect { |f| f['file_type'] == 'PRIMARY_DESCRIPTOR' }
+        end
       end
     end
   end

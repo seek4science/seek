@@ -6,6 +6,10 @@
 
 <div class="row">
   <div class="col-md-9 col-sm-8 box_about_actor">
+    <% unless @display_workflow.main_workflow_blob %>
+      <%= alert_box('warning', hide_button: true) do %>This workflow does not specify a "main" workflow file.<% end %>
+    <% end %>
+
     <ul class="nav nav-tabs" role="tablist">
       <li class="active">
         <a href="#overview" aria-controls="overview" role="tab" data-toggle="tab">Overview</a>
