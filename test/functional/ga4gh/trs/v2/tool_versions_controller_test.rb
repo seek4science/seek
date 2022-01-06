@@ -391,12 +391,25 @@ module Ga4gh
             v.save!
           end
 
-          get :files, params: { id: workflow.reload.id, version_id: 1, type: 'GALAXY' }
+          get :files, params: { id: workflow.id, version_id: 1, type: 'GALAXY' }
 
           assert_response :success
           r = JSON.parse(@response.body)
           refute r.detect { |f| f['path'] == 'concat_two_files.ga' }
           refute r.detect { |f| f['file_type'] == 'PRIMARY_DESCRIPTOR' }
+        end
+
+        test 'should 404 on descriptor for workflow with missing main workflow' do
+          workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+          disable_authorization_checks do
+            v = workflow.git_version
+            v.remove_file('concat_two_files.ga')
+            v.save!
+          end
+
+          get :descriptor, params: { id: workflow.id, version_id: 1, type: 'GALAXY' }
+
+          assert_response :not_found
         end
       end
     end
