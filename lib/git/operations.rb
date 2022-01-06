@@ -108,17 +108,19 @@ module Git
     def remove_file(path, update_annotations: true)
       raise Git::PathNotFoundException.new(path: path) unless file_exists?(path)
 
-      perform_commit("Deleted #{path}") do |index|
+      c = perform_commit("Deleted #{path}") do |index|
         index.remove(path)
       end
 
       git_annotations.where(path: path).destroy_all if respond_to?(:git_annotations) && update_annotations
+
+      c
     end
 
     def move_file(oldpath, newpath, update_annotations: true)
       raise Git::PathNotFoundException.new(path: oldpath) unless file_exists?(oldpath)
 
-      perform_commit("Moved #{oldpath} -> #{newpath}") do |index|
+      c = perform_commit("Moved #{oldpath} -> #{newpath}") do |index|
         existing = index[oldpath]
         begin
           index.add(path: newpath, oid: existing[:oid], mode: 0100644)
@@ -129,6 +131,8 @@ module Git
       end
 
       git_annotations.where(path: oldpath).update_all(path: newpath) if respond_to?(:git_annotations) && update_annotations
+
+      c
     end
 
     private
