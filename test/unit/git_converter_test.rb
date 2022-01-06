@@ -300,4 +300,28 @@ class GitConverterTest < ActiveSupport::TestCase
     assert_equal workflow.contributor.email, author[:email]
     assert_in_delta workflow.latest_version.created_at.to_time, author[:time], 1.second
   end
+
+  test 'converted workflow does not retain original files from RO-Crate' do
+    workflow = Factory(:generated_galaxy_ro_crate_workflow)
+
+    converter = Git::Converter.new(workflow)
+
+    refute workflow.local_git_repository
+    refute workflow.latest_git_version
+
+    assert_difference('Git::Annotation.count', 3) do
+      assert_difference('Git::Repository.count', 1) do
+        assert_difference('Git::Version.count', 1) do
+          converter.convert(unzip: true)
+        end
+      end
+    end
+
+    assert_difference('Git::Annotation.count', -1) do
+      workflow.git_version.remove_file('Genomics-1-PreProcessing_without_downloading_from_SRA.cwl')
+    end
+
+    refute workflow.ro_crate.entries.key?('Genomics-1-PreProcessing_without_downloading_from_SRA.cwl')
+    assert workflow.ro_crate.entries.key?('Genomics-1-PreProcessing_without_downloading_from_SRA.ga')
+  end
 end

@@ -32,7 +32,7 @@ module WorkflowExtraction
   end
 
   def is_already_ro_crate?
-    content_blob && content_blob.original_filename.end_with?('.crate.zip') || is_git_ro_crate?
+    (!is_git_versioned? && content_blob.original_filename.end_with?('.crate.zip')) || is_git_ro_crate?
   end
 
   def is_basic_ro_crate?
