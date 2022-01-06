@@ -6,7 +6,7 @@
 
 <div class="row">
   <div class="col-md-9 col-sm-8 box_about_actor">
-    <% unless @display_workflow.main_workflow_blob %>
+    <% if @display_workflow.is_git_versioned? && @display_workflow.main_workflow_blob.nil? %>
       <%= alert_box('warning', hide_button: true) do %>This workflow does not specify a "main" workflow file.<% end %>
     <% end %>
 
