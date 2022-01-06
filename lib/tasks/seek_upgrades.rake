@@ -3,16 +3,16 @@
 require 'rubygems'
 require 'rake'
 
-
 namespace :seek do
   # these are the tasks required for this version upgrade
   task upgrade_version_tasks: %i[
     environment
     db:seed:010_workflow_classes
     db:seed:011_edam_topics
-    db:seed:012_edam_operations   
+    db:seed:012_edam_operations
     db:seed:013_workflow_data_file_relationships
     rename_branding_settings
+    remove_orphaned_versions
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -24,10 +24,10 @@ namespace :seek do
 
   desc('upgrades SEEK from the last released version to the latest released version')
   task(upgrade: [:environment]) do
-    puts "Starting upgrade ..."
-    puts "... trimming old session data ..."
+    puts 'Starting upgrade ...'
+    puts '... trimming old session data ...'
     Rake::Task['db:sessions:trim'].invoke
-    puts "... migrating database ..."
+    puts '... migrating database ...'
     Rake::Task['db:migrate'].invoke
     Rake::Task['tmp:clear'].invoke
 
@@ -35,12 +35,12 @@ namespace :seek do
     Seek::Config.solr_enabled = false
 
     begin
-      puts "... performing upgrade tasks ..."
+      puts '... performing upgrade tasks ...'
       Rake::Task['seek:standard_upgrade_tasks'].invoke
       Rake::Task['seek:upgrade_version_tasks'].invoke
 
       Seek::Config.solr_enabled = solr
-      puts "... queuing search reindexing jobs ..."
+      puts '... queuing search reindexing jobs ...'
       Rake::Task['seek:reindex_all'].invoke if solr
 
       puts 'Upgrade completed successfully'
@@ -58,5 +58,19 @@ namespace :seek do
     Seek::Config.transfer_value :dm_project_name, :instance_admins_name
     Seek::Config.transfer_value :dm_project_link, :instance_admins_link
   end
-  
+
+  task(remove_orphaned_versions: [:environment]) do
+    puts 'Removing orphaned versions ...'
+    count = 0
+    types = [DataFile::Version, Document::Version, Sop::Version, Model::Version, Node::Version, Presentation::Version,
+             Sop::Version, Workflow::Version]
+    disable_authorization_checks do
+      types.each do |type|
+        found = type.all.select { |v| v.parent.nil? }
+        count += found.length
+        found.each(&:destroy)
+      end
+    end
+    puts "... finished removing #{count} orphaned versions"
+  end
 end
