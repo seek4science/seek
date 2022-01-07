@@ -59,6 +59,37 @@ module Legacy
       end
     end
 
+    def legacy_handle_ro_crate_post(new_version = false)
+      @workflow = Workflow.new unless new_version
+      extractor = Seek::WorkflowExtractors::ROCrate.new(params[:ro_crate])
+
+      @workflow.assign_attributes(extractor.metadata.except(:errors, :warnings))
+      @workflow.assign_attributes(workflow_params)
+      crate_upload = params[:ro_crate]
+      old_content_blob = new_version ? @workflow.content_blob : nil
+      version = new_version ? @workflow.version + 1 : 1
+      @workflow.build_content_blob(tmp_io_object: crate_upload,
+                                   original_filename: crate_upload.original_filename,
+                                   content_type: crate_upload.content_type,
+                                   asset_version: version)
+      if old_content_blob
+        old_content_blob.update_column(:asset_id, @workflow.id)
+      end
+
+      if new_version
+        success = @workflow.save_as_new_version(params[:revision_comments])
+      else
+        create_asset(@workflow)
+        success = @workflow.save
+      end
+
+      if success
+        render json: @workflow, include: json_api_include_param
+      else
+        render json: json_api_errors(@workflow), status: :unprocessable_entity
+      end
+    end
+
     def extract_metadata(content_blob)
       begin
         retrieve_content content_blob # Hack

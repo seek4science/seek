@@ -1,0 +1,112 @@
+require 'test_helper'
+
+class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
+  setup do
+    admin = Factory.create(:admin)
+    login_as(admin.user)
+    Factory(:cwl_workflow_class) # Make sure the CWL class is present
+    Factory(:nextflow_workflow_class)
+    @project = admin.person.projects.first
+    @git_support = Seek::Config.git_support_enabled
+    Seek::Config.git_support_enabled = true
+  end
+
+  teardown do
+    Seek::Config.git_support_enabled = @git_support
+  end
+
+  test 'can post RO crate' do
+    assert_difference('Workflow.count', 1) do
+      post workflows_path, params: {
+        ro_crate: fixture_file_upload('files/workflows/ro-crate-nf-core-ampliseq.crate.zip'),
+        workflow: {
+          project_ids: [@project.id]
+        }
+      }
+
+      assert_response :success
+      assert_equal 'Nextflow', assigns(:workflow).workflow_class.title
+      assert_equal 'nf-core/ampliseq', assigns(:workflow).title
+      assert assigns(:workflow).git_version.total_size > 100
+      assert_equal 'main.nf', assigns(:workflow).ro_crate.main_workflow.id
+    end
+  end
+
+  test 'can post RO crate as new version' do
+    workflow = Factory(:local_git_workflow, policy: Factory(:public_policy), contributor: @current_person)
+
+    assert_no_difference('Workflow.count') do
+      assert_difference('Git::Version.count', 1) do
+        post create_version_workflow_path(workflow.id), params: {
+          ro_crate: fixture_file_upload('files/workflows/ro-crate-nf-core-ampliseq.crate.zip'),
+          workflow: {
+            project_ids: [@project.id]
+          },
+          revision_comments: 'new ver'
+        }
+
+        assert_response :success
+        assert_equal 2, assigns(:workflow).reload.version
+        assert_equal 'Nextflow', assigns(:workflow).workflow_class.title
+        assert_equal 'nf-core/ampliseq', assigns(:workflow).title
+        assert assigns(:workflow).git_version.total_size > 100
+        assert_equal 'main.nf', assigns(:workflow).ro_crate.main_workflow.id
+      end
+    end
+  end
+
+  test 'cannot post RO crate as new version to remote git workflows' do
+    workflow = Factory(:remote_git_workflow, policy: Factory(:public_policy), contributor: @current_person)
+
+    assert_no_difference('Workflow.count') do
+      assert_no_difference('Git::Version.count') do
+        post create_version_workflow_path(workflow.id), params: {
+          ro_crate: fixture_file_upload('files/workflows/ro-crate-nf-core-ampliseq.crate.zip'),
+          workflow: {
+            project_ids: [@project.id]
+          },
+          revision_comments: 'new ver'
+        }
+
+        assert_response :unprocessable_entity
+        assert @response.body.include?('Cannot add RO-Crate to remote workflows')
+      end
+    end
+  end
+
+  test 'cannot post RO crate with missing metadata' do
+    assert_no_difference('Workflow.count') do
+      post workflows_path, params: {
+        ro_crate: fixture_file_upload('files/workflows/workflow-4-1.crate.zip'),
+        workflow: {
+          project_ids: [@project.id]
+        }
+      }
+
+      assert_response :unprocessable_entity
+      assert @response.body.include?("can't be blank")
+    end
+  end
+
+  test 'can supplement metadata when posting RO crate' do
+    assert_difference('Workflow.count', 1) do
+      post workflows_path, params: {
+        ro_crate: fixture_file_upload('files/workflows/workflow-4-1.crate.zip'),
+        workflow: {
+          title: 'Alternative title',
+          project_ids: [@project.id]
+        }
+      }
+
+      assert_response :success
+      assert_equal 'Alternative title', assigns(:workflow).title
+    end
+  end
+
+  private
+
+  def login_as(user)
+    User.current_user = user
+    post '/session', params: { login: user.login, password: generate_user_password }
+  end
+end

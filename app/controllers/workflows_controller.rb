@@ -308,6 +308,8 @@ class WorkflowsController < ApplicationController
   private
 
   def handle_ro_crate_post(new_version = false)
+    return legacy_handle_ro_crate_post(new_version) unless Seek::Config.git_support_enabled
+
     @crate_extractor = WorkflowCrateExtractor.new(ro_crate: { data: params[:ro_crate] }, params: workflow_params)
     if new_version
       if @workflow.latest_git_version.remote?

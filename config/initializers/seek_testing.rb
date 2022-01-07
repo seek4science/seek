@@ -145,4 +145,3 @@ def load_seek_testing_defaults!
       Settings.defaults[:git_support_enabled] = true
     end
 end
-
