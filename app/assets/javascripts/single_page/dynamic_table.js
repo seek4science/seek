@@ -57,7 +57,7 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
       this.table = this.table.DataTable({
         columnDefs,
         columns,
-        scrollX: true,
+        scrollX: "100%",
         errMode: "throw",
         order: [[options.readonly ? 1 : 3, "asc"]],
         pageLength: 25,
