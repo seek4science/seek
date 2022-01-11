@@ -3,12 +3,9 @@
 class ReindexAllJob < ApplicationJob
 
   BATCH_SIZE = 250
+  queue_with_priority 3
 
-  def perform
-    Seek::Util.searchable_types.each do |type|
-      Rails.logger.info "solr_reindex for #{type.name}"
-      type.solr_reindex(batch_size: BATCH_SIZE)
-    end
+  def perform(type)
+    type.constantize.solr_reindex(batch_size: BATCH_SIZE) if type && Seek::Config.solr_enabled
   end
-
 end
