@@ -30,6 +30,10 @@
 
       <%= fancy_multiselect @document, :events, { other_projects_checkbox: true, sort_by: :start_date } %>
 
+      <% if displaying_single_page?%>
+        <input name="single_page" type="hidden" value=<%=params[:single_page]%> />
+      <% end %>
+
       <%= form_submit_buttons(@document) %>
 
     </div>

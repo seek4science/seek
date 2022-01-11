@@ -325,7 +325,7 @@ class DataFilesController < ApplicationController
       if handle_upload_data && @data_file.content_blob.save
         session[:uploaded_content_blob_id] = @data_file.content_blob.id
         format.js
-        format.html {}
+        format.html { {params: params[:single_page]} if params[:single_page] }
       else
         session.delete(:uploaded_content_blob_id)
         format.js
@@ -450,7 +450,9 @@ class DataFilesController < ApplicationController
 
         # the assay_id param can also contain the relationship type
         @data_file.assays << @assay if @create_new_assay
-        format.html { redirect_to data_file_path(@data_file) }
+        format.html { redirect_to params[:single_page] ? 
+          { controller: :single_pages, action: :show, id: params[:single_page] } 
+          : data_file_path(@data_file) }
         format.json { render json: @data_file, include: [params[:include]] }
       end
 
@@ -461,10 +463,10 @@ class DataFilesController < ApplicationController
       # - want the avoid the user fixing one set of validation only to be presented with a new set
       @assay.valid? if @create_new_assay
       @data_file.valid? if uploaded_blob_matches
-
+      param = params[:single_page] ? {single_page: params[:single_page]} : {}
       respond_to do |format|
         format.html do
-          render :provide_metadata, status: :unprocessable_entity
+          render :provide_metadata, params: param, status: :unprocessable_entity
         end
       end
     end

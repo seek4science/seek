@@ -166,7 +166,7 @@ const loadAssaySamples = (view, table_cols) =>
 const loadItemDetails = (url, params = {}) => {
   return $j.ajax({
     url,
-    data: $j.extend(params, { only_content: true, single_page: true }),
+    data: $j.extend(params, { only_content: true, single_page: pid }),
     cache: false,
     type: "get",
     success: (s) => $j("#item-layout").html(s),
@@ -215,7 +215,7 @@ $j.jstree.plugins.separate = function (options, parent) {
       if (n.data.id) $j(obj.childNodes[1]).attr("_id", n.data.id);
       if (n.state.separate) {
         var p = d.createElement("p");
-        p.innerHTML = n.state.separate.label;
+        p.innerHTML = "<span>" + n.state.separate.label + "</span>";
         p.className = "separator";
         if (n.state.separate.action) {
           var a = d.createElement("a");

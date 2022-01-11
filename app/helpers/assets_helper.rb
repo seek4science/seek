@@ -10,7 +10,7 @@ module AssetsHelper
       options[:preview_permissions] = show_form_manage_specific_attributes?
     end
     options[:button_text] ||= submit_button_text(item)
-    options[:cancel_path] = polymorphic_path(item)
+    options[:cancel_path] = params[:single_page] ? single_page_path(id: params[:single_page]) : polymorphic_path(item)
     options[:resource_name] = item.class.name.underscore
     options[:button_id] ||= "#{options[:resource_name]}_submit_btn"
 
@@ -280,9 +280,10 @@ module AssetsHelper
   def add_item_to_options(item)
     elements = []
     Seek::AddButtons.add_for_item(item).each do |type,param|
-
       text="#{t('add_new_dropdown.option')} #{t(type.name.underscore)}"
-      path = new_polymorphic_path(type,param=>item.id)
+      parameters = { param=>item.id }
+      parameters = parameters.merge({ single_page: params[:single_page] }) if displaying_single_page?
+      path = new_polymorphic_path(type,parameters)
       elements << yield(text,path)
     end
     elements

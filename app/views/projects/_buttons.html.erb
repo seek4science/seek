@@ -30,7 +30,11 @@
 <% end -%>
 
 <% if item.can_edit? -%>
-  <%= add_to_dropdown(item) %>
+  <% if displaying_single_page? %>
+    <%= button_link_to("Create #{t('investigation')}", 'new', new_investigation_path("investigation[project_ids][]": item.id, single_page: params[:id])) %>
+  <% else -%>
+    <%= add_to_dropdown(item) %> 
+  <% end -%>
 <% end -%>
 
 <%= item_actions_dropdown do %>

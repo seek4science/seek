@@ -109,7 +109,9 @@ module Seek
         unless return_to_fancy_parent(item)
           flash[:notice] = "#{t(item.class.name.underscore)} was successfully uploaded and saved."
           respond_to do |format|
-            format.html { redirect_to item }
+            format.html { redirect_to params[:single_page] ?
+              { controller: :single_pages, action: :show, id: params[:single_page] } 
+              : item }
             format.json { render json: item, include: json_api_include_param }
           end
         end
