@@ -729,6 +729,7 @@ SEEK::Application.routes.draw do
   resources :single_pages do
     member do
       get :ontology
+      get :dynamic_table_data
     end
   end
 

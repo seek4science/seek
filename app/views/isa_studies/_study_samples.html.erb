@@ -19,11 +19,26 @@
 
 <% if valid_study %>
     <script>
-        let sampleDynamicTable 
+        var sampleDynamicTable
+        let initialLoad = true;
         $j(document).ready(function () {
             const dt = <%= sanitize(dt_data(sample_type).to_json) %>
             sampleDynamicTable = new $j.dynamicTable('#study-samples-table')
-            sampleDynamicTable.init(dt.rows, dt.columns)
+            const options = {
+               ajax:{
+                    url: `/single_pages/${pid}/dynamic_table_data/`,
+                    data: function(d) { 
+                        if (initialLoad) {
+                            initialLoad = false;
+                            return;
+                        }
+                        d.sample_type_id = '<%=sample_type.id%>';
+                        d.rows_pad = "true"
+                    }
+                },
+                callback: () => studyDynamicTable.table.ajax.reload()
+            }
+            sampleDynamicTable.init(dt.rows, dt.columns, options)
 
             $j(".dataTables_scrollBody").css("min-height", "300px")
         });

@@ -31,7 +31,12 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
         .filter((c) => c.multi_link)
         .forEach((c) => {
           c["mRender"] = function (data, type, full) {
-            const existingObjectsJSON = (data || []).map(({ id, title }) => ({ id: id, name: title }));
+            const existingObjectsJSON = (data && Array.isArray(data) ? data : [data]).map(
+              ({ id, title }) => ({
+                id: id,
+                name: title
+              })
+            );
             const existingObjects = JSON.stringify(existingObjectsJSON);
             const url = typeaheadUrl.replace("%LINKED%", c.linked_sample_type);
             if (options.readonly) {
@@ -65,7 +70,8 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
           "<'row'<'col-sm-3'l><'col-sm-5'B><'col-sm-4'f>>" +
           "<'row'<'col-sm-12'tr>>" +
           "<'row'<'col-sm-5'i><'col-sm-7'p>>",
-        buttons: "main"
+        buttons: "main",
+        ajax: options.ajax
       });
       this.table.rows.add(rows.map((r) => [null, ...r])).draw();
       if (!options.readonly) {
@@ -76,6 +82,25 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
         });
       }
       if (options.assayId) this.assayId = options.assayId;
+      this.initHeader(columns);
+      this.options = options;
+    },
+    initHeader: function (columns) {
+      const requiredCols = columns.map((c, i) => c.required && i).filter((c) => c);
+      this.table
+        .columns()
+        .header()
+        .each((x, i) => {
+          if (i && requiredCols.includes(i)) {
+            $j(x).append("<span class='required-attribute'>*</span>");
+          }
+          $j(x)
+            .attr("title", columns[i].description)
+            .attr("data-toggle", "tooltip")
+            .attr("data-placement", "top")
+            .attr("data-container", "body");
+        });
+      $j('[data-toggle="tooltip"]').tooltip();
     },
     pasteFromClipboard: function () {
       navigator.clipboard.readText().then((text) => {
@@ -137,6 +162,9 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
         if (res) {
           handleResponse(this.table, newSamples, dtErrClass, dtSuccessClass)(res);
         }
+      }
+      if (this.options.callback && typeof this.options.callback === "function") {
+        this.options.callback();
       }
     },
     headers: function () {
@@ -274,14 +302,16 @@ function handleResponse(table, sampleTypes, errorCls, successCls) {
         const errorColNames = Object.keys(error.error);
         table.cells(rowId, `${sampleTypeId}:name`).every(function () {
           const idx = this.index().column;
-          const colTitle = $j(table.column(idx).header()).html();
+          const colTitle = $j(table.column(idx).header()).text().replace("*", "");
           if (errorColNames.includes(colTitle)) {
             $j(this.node()).addClass(errorCls);
             $j(this.node()).attr("title", error.error[colTitle]);
           }
         });
       });
-      alert("The operation can not be done for one or some samples.");
+      alert(
+        "The operation can not be done for one or some samples. The red cells indicate unacceptable values."
+      );
     } else if (res.status == "ok") {
       sampleTypes.forEach((s) => {
         s.samples.forEach((sa, k) => {
