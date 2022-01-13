@@ -146,7 +146,7 @@ const applyTemplate = () => {
   const attribute_row = "#new-attribute-row" + suffix;
   const addAttributeRow = "#add-attribute-row" + suffix;
 
-  $j("#template_parent_id").val(data.template_id);
+  $j(".template_parent_id").val(data.template_id);
   $j(`${attribute_table} tbody`).find("tr:not(:last)").remove();
   SampleTypes.unbindSortable();
   // Make sure default sorted attributes are added to the table 
