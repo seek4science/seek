@@ -140,6 +140,8 @@ gem 'whenever', '~> 1.0.0', require: false
 gem 'dotenv-rails', '~> 2.7.6'
 gem 'commonmarker'
 
+gem 'rack-cors', require: 'rack/cors'
+
 group :production do
   gem 'passenger'
 end

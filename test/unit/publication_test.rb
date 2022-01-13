@@ -252,6 +252,14 @@ class PublicationTest < ActiveSupport::TestCase
     end
   end
 
+  test 'unsupported type doi' do
+    mock_crossref(email: 'fred@email.com', doi: '10.1.11.1', content_file: 'cross_ref_unsupported_type.xml')
+    assert_raises DOI::RecordNotSupported do
+      query = DOI::Query.new('fred@email.com')
+      query.fetch('10.1.11.1')
+    end
+  end
+
   test 'editor should not be author' do
     mock_crossref(email: 'fred@email.com', doi: '10.1371/journal.pcbi.1002352', content_file: 'cross_ref2.xml')
     query = DOI::Query.new('fred@email.com')

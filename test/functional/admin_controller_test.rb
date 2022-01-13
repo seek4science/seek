@@ -17,7 +17,7 @@ class AdminControllerTest < ActionController::TestCase
   test 'non admin cannot restart the server' do
     login_as(Factory(:user))
     post :restart_server
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
   end
 
   test 'admin can restart the server' do
@@ -33,7 +33,7 @@ class AdminControllerTest < ActionController::TestCase
   test 'non admin cannot restart the delayed job' do
     login_as(Factory(:user))
     post :restart_delayed_job
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
   end
 
   test 'admin can restart the delayed job' do
@@ -46,7 +46,7 @@ class AdminControllerTest < ActionController::TestCase
     get :registration_form
     assert !User.current_user.person.is_admin?
     assert_redirected_to root_path
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
   end
 
   test 'should show features enabled' do
@@ -74,7 +74,7 @@ class AdminControllerTest < ActionController::TestCase
     login_as(Factory(:user))
     get :index
     assert_response :redirect
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
   end
 
   test 'string to boolean' do
@@ -149,17 +149,17 @@ class AdminControllerTest < ActionController::TestCase
 
   test 'invalid email address' do
     post :update_settings, params: { pubmed_api_email: 'quentin', crossref_api_email: 'quentin@example.com' }
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
   end
 
   test 'should input integer' do
     post :update_home_settings, params: { tag_threshold: '', max_visible_tags: '20' }
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
   end
 
   test 'should input positive integer' do
     post :update_home_settings, params: { tag_threshold: '1', max_visible_tags: '0' }
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
   end
 
   test 'update admins' do
@@ -244,7 +244,7 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'update home page settings' do
-    assert_not_equal 'This is the home description', Seek::Config.home_description
+    refute_equal 'This is the home description', Seek::Config.home_description
     post :update_home_settings, params: { home_description: 'This is the home description', news_number_of_entries: '3', news_enabled: '1', news_feed_urls: 'http://fish.com, http://goats.com' }
 
     assert_equal 'This is the home description', Seek::Config.home_description
@@ -265,7 +265,7 @@ class AdminControllerTest < ActionController::TestCase
 
     post :update_features_enabled, params: { time_lock_doi_for: '' }
     assert_redirected_to features_enabled_admin_path
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
   end
 
   test 'update_redirect_to for update_home_setting' do
@@ -275,7 +275,7 @@ class AdminControllerTest < ActionController::TestCase
 
     post :update_home_settings, params: { news_number_of_entries: '', tag_threshold: '1', max_visible_tags: '20' }
     assert_redirected_to home_settings_admin_path
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
   end
 
   test 'openbis enabled' do
@@ -342,12 +342,13 @@ class AdminControllerTest < ActionController::TestCase
 
   test 'update branding' do
     assert_nil Seek::Config.header_image_avatar_id
-    settings = {project_name: 'project name', project_type: 'project type', project_description: 'project description', project_keywords: 'project,    keywords, ',
-                project_link: 'http://project-link.com',application_name: 'app name',
-                dm_project_name: 'dm project name', dm_project_link: 'http://dm-project-link.com',
+    settings = {instance_name: 'instance name', instance_description: 'instance description', instance_keywords: 'instance,    keywords, ',
+                instance_link: 'http://project-link.com',
+                instance_admins_name: 'instance admins name', instance_admins_link: 'http://dm-project-link.com', issue_tracker: 'https://issues-galore.com',
                 header_image_link: 'http://header-link.com/image.jpg', header_image_title: 'header image title',
                 copyright_addendum_content: 'copyright content', imprint_description: 'imprint description',
                 terms_page: 'terms page', privacy_page: 'privacy page', about_page: 'about page',
+                about_instance_link_enabled: 1, about_instance_admins_link_enabled: 1,
                 header_image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
 
     assert_difference('Avatar.count', 1) do
@@ -355,14 +356,13 @@ class AdminControllerTest < ActionController::TestCase
     end
     assert_redirected_to admin_path
 
-    assert_equal 'project name', Seek::Config.project_name
-    assert_equal 'project type', Seek::Config.project_type
-    assert_equal 'project description', Seek::Config.project_description
-    assert_equal 'project, keywords', Seek::Config.project_keywords
-    assert_equal 'http://project-link.com', Seek::Config.project_link
-    assert_equal 'app name', Seek::Config.application_name
-    assert_equal 'dm project name', Seek::Config.dm_project_name
-    assert_equal 'http://dm-project-link.com', Seek::Config.dm_project_link
+    assert_equal 'instance name', Seek::Config.instance_name
+    assert_equal 'instance description', Seek::Config.instance_description
+    assert_equal 'instance, keywords', Seek::Config.instance_keywords
+    assert_equal 'http://project-link.com', Seek::Config.instance_link
+    assert_equal 'instance admins name', Seek::Config.instance_admins_name
+    assert_equal 'http://dm-project-link.com', Seek::Config.instance_admins_link
+    assert_equal 'https://issues-galore.com', Seek::Config.issue_tracker
     assert_equal 'http://header-link.com/image.jpg', Seek::Config.header_image_link
     assert_equal 'header image title', Seek::Config.header_image_title
     assert_equal 'copyright content', Seek::Config.copyright_addendum_content
@@ -370,6 +370,8 @@ class AdminControllerTest < ActionController::TestCase
     assert_equal 'terms page', Seek::Config.terms_page
     assert_equal 'privacy page', Seek::Config.privacy_page
     assert_equal 'about page', Seek::Config.about_page
+    assert Seek::Config.about_instance_link_enabled
+    assert Seek::Config.about_instance_admins_link_enabled
     assert Seek::Config.header_image_avatar_id > 0
   end
 
@@ -478,7 +480,7 @@ class AdminControllerTest < ActionController::TestCase
     assert_equal new_value, Seek::Config.recommended_data_licenses
     new_value = []
     post :update_settings, params: {recommended_data_licenses: new_value}
-    assert_equal nil, Seek::Config.recommended_data_licenses
+    assert_nil Seek::Config.recommended_data_licenses
   end
 
   test 'recommended software licenses' do
@@ -488,7 +490,7 @@ class AdminControllerTest < ActionController::TestCase
     assert_equal new_value, Seek::Config.recommended_software_licenses
     new_value = []
     post :update_settings, params: {recommended_software_licenses: new_value}
-    assert_equal nil, Seek::Config.recommended_software_licenses
+    assert_nil Seek::Config.recommended_software_licenses
   end
 
   test 'publication fulltext enabled' do
@@ -501,4 +503,5 @@ class AdminControllerTest < ActionController::TestCase
       assert_equal false, Seek::Config.allow_publications_fulltext
     end
   end
+
 end

@@ -16,7 +16,7 @@ Report displayed: <%= select_tag "displayed_publication_report",options_for_sele
 
   <p class='alert alert-info' style="width:98%;text-align:center;margin-bottom:1em;">
     These are the publications, with associated <%= t('data_file').pluralize %> and/or <%= t('model').pluralize %> that
-    are available to download by any visitor to the <%= Seek::Config.application_name %> site.
+    are available to download by any visitor to the <%= Seek::Config.instance_name %> site.
   </p>
   <%= render :partial => "projects/asset_report/linked_publication_table", :object => publications_all_public -%>
 </div>
@@ -28,7 +28,7 @@ Report displayed: <%= select_tag "displayed_publication_report",options_for_sele
   <p class='alert alert-info' style="width:98%;text-align:center;margin-bottom:1em;">
     These are the publications that have associated <%= t('data_file').pluralize %> and/or <%= t('model').pluralize %>,
     however not all the associated assets are available to download by everybody visiting
-    the <%= Seek::Config.application_name %> site. <br/>
+    the <%= Seek::Config.instance_name %> site. <br/>
     The assets that have restricted access and need sharing publicly are highlighted in Red.
   </p>
   <%= render :partial => "projects/asset_report/linked_publication_table", :object => publications_not_all_public -%>

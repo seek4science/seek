@@ -36,5 +36,11 @@
 
 <%= publication_form.fancy_multiselect :workflows, other_projects_checkbox: true %>
 
-<%= publication_form.submit  'Update',data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' %>
-or <%= cancel_button(publication_path(@publication)) %>
+<% if  params[:newly_created].nil? or params[:newly_created] == "false" %>
+  <%= publication_form.submit  'Update',data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' %>
+  or <%= cancel_button(publication_path(@publication)) %>
+<% else %>
+  <%= publication_form.submit  'Save',data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' %>
+  or <%= cancel_button(publication_path(@publication), button_text: 'Skip') %>
+  or <%= cancel_button(publication_path(@publication), button_text: 'Cancel and delete', method: :delete) -%>
+<% end %>

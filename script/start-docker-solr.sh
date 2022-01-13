@@ -18,5 +18,5 @@ then
     docker start seek-search
 else
     echo "creating and starting seek-search container"
-    docker run -d --name seek-search -p 8983:8983 fairdom/seek-solr:8.9 solr-precreate seek /opt/solr/server/solr/configsets/seek_config
+    docker run -d --name seek-search -p 8983:8983 fairdom/seek-solr:8.11 solr-precreate seek /opt/solr/server/solr/configsets/seek_config
 fi

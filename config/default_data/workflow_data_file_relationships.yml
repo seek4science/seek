@@ -1,0 +1,16 @@
+example_input_data:
+  title: 'Example input data'
+  key: 'example_in'
+
+example_output_data:
+  title: 'Example output data'
+  key: 'example_out'
+
+training_data:
+  title: 'Training data'
+  key: 'training'
+
+test_data:
+  title: 'Test data'
+  key: 'test'
+

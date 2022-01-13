@@ -1902,4 +1902,20 @@ class AssaysControllerTest < ActionController::TestCase
     assert_empty assay.discussion_links
   end
 
+  test 'add new honours enabled setting' do
+    person = Factory(:person)
+    login_as(person)
+    assay = Factory(:assay, contributor: person)
+
+    with_config_value(:documents_enabled, true) do
+      get :show, params: { id: assay.id }
+      assert_select 'ul#item-admin-menu li a',text: /add new document/i, count:1
+    end
+
+    with_config_value(:documents_enabled, false) do
+      get :show, params: { id: assay.id }
+      assert_select 'ul#item-admin-menu li a',text: /add new document/i, count:0
+    end
   end
+
+end

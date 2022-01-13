@@ -8,14 +8,14 @@ module Ga4gh
           respond_with({
               "contactUrl": "mailto:#{Seek::Config.support_email_address}",
               #"createdAt": "2019-06-04T12:58:19Z",
-              "description": "TRS API endpoint for #{Seek::Config.application_name}",
-              "documentationUrl": "https://editor.swagger.io/?url=https://raw.githubusercontent.com/ga4gh/tool-registry-schemas/develop/openapi/ga4gh-tool-discovery.yaml",
+              "description": "TRS API endpoint for #{Seek::Config.instance_name}",
+              "documentationUrl": "https://editor.swagger.io/?url=https://raw.githubusercontent.com/ga4gh/tool-registry-service-schemas/release/v2.0.1/openapi/openapi.yaml",
               "environment": Rails.env,
               "id": id,
-              "name": Seek::Config.application_name,
+              "name": Seek::Config.instance_name,
               "organization": {
-                  "name": Seek::Config.dm_project_name,
-                  "url": Seek::Config.dm_project_link
+                  "name": Seek::Config.instance_admins_name,
+                  "url": Seek::Config.instance_admins_link
               },
               "type": {
                   "artifact": "trs",

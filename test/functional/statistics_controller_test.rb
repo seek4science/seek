@@ -28,7 +28,7 @@ class StatisticsControllerTest < ActionController::TestCase
   test 'application status' do
     ApplicationStatus.delete_all
     soffice = Seek::Config.soffice_available? ? 'running' : 'not running'
-    with_config_value :application_name, 'Euro SEEK' do
+    with_config_value :instance_name, 'Euro SEEK' do
       with_config_value :solr_enabled, true do
         logout
         assert_difference('ApplicationStatus.count') do
