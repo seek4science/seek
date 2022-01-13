@@ -32,23 +32,10 @@ class WorkflowsController < ApplicationController
   end
 
   def new_git_version
-    @git_repository = @workflow.latest_git_version.git_repository
-    if @git_repository&.remote?
-      @git_repository.queue_fetch
+    @git_version = @workflow.latest_git_version.next_version(mutable: !@git_repository&.remote?)
 
-      respond_to do |format|
-        format.html
-      end
-    else
-      @git_version = @workflow.latest_git_version.next_version(mutable: true)
-      if @git_version.save
-        flash[:notice] = "New development version created."
-      else
-        flash[:error] = "Couldn't save new version: #{@git_version.errors.full_messages.join(',')}."
-      end
-      respond_to do |format|
-        format.html { redirect_to workflow_path(@workflow) }
-      end
+    respond_to do |format|
+      format.html
     end
   end
 
@@ -135,6 +122,8 @@ class WorkflowsController < ApplicationController
   def create_from_git
     wizard = GitWorkflowWizard.new(params: workflow_params)
     @workflow = wizard.run
+    @display_workflow = @workflow.git_version
+
     respond_to do |format|
       format.html { render wizard.next_step }
     end
@@ -143,6 +132,8 @@ class WorkflowsController < ApplicationController
   def create_version_from_git
     wizard = GitWorkflowWizard.new(params: workflow_params, workflow: @workflow)
     @workflow = wizard.run
+    @display_workflow = @workflow.git_version
+
     respond_to do |format|
       format.html { render wizard.next_step }
     end
@@ -352,7 +343,7 @@ class WorkflowsController < ApplicationController
                                      { data_file_ids: [] }, { workflow_data_files_attributes:[:id, :data_file_id, :workflow_data_file_relationship_id, :_destroy] },
                                      :internals, :maturity_level, :source_link_url,
                                      { discussion_links_attributes: [:id, :url, :label, :_destroy] },
-                                     { git_version_attributes: [:name, :description, :ref, :commit, :root_path,
+                                     { git_version_attributes: [:name, :comment, :ref, :commit, :root_path,
                                                                 :git_repository_id, :main_workflow_path,
                                                                 :abstract_cwl_path, :diagram_path, :remote,
                                                                 { remote_sources: {} }] }, :is_git_versioned)

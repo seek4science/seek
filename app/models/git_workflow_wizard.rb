@@ -13,19 +13,22 @@ class GitWorkflowWizard
   attr_accessor :params, :workflow
 
   def run
-    @next_step = :new
-
     if new_version?
+      @next_step = :new_git_version
       workflow_class = workflow.workflow_class
       current_version = workflow.git_version
       git_version = workflow.git_versions.build(params.delete(:git_version_attributes))
-      # Assign existing paths if they still exist in the new version
-      [:main_workflow_path, :abstract_cwl_path, :diagram_path].each do |path_attr|
-        path = current_version.send(path_attr)
-        git_version.send("#{path_attr}=", path) if git_version.send(path_attr).blank? && path && git_version.file_exists?(path)
+      unless git_version.remote? # It's a new local version, so just use next_version and finish the wizard
+        git_version = current_version.next_version(name: git_version.name, comment: git_version.comment, mutable: true)
+        git_version.save!
+        @workflow.reload
+        @next_step = :show
+        return @workflow
       end
     else
+      @next_step = :new
       self.workflow = Workflow.new
+      current_version = nil
     end
 
     workflow.assign_attributes(params)
@@ -56,6 +59,12 @@ class GitWorkflowWizard
         git_version.diagram_path ||= crate.main_workflow&.diagram&.id if crate.main_workflow&.diagram&.id
 
         workflow_class ||= WorkflowClass.match_from_metadata(crate&.main_workflow&.programming_language&.properties || {})
+      end
+    elsif current_version
+      # Assign existing paths if they still exist in the new version
+      [:main_workflow_path, :abstract_cwl_path, :diagram_path].each do |path_attr|
+        path = current_version.send(path_attr)
+        git_version.send("#{path_attr}=", path) if git_version.send(path_attr).blank? && path && git_version.file_exists?(path)
       end
     end
 

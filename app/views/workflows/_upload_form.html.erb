@@ -1,5 +1,4 @@
 <% cancel_path ||= workflows_path %>
-<% new_version ||= false %>
 
 <div class="row">
   <div class="col-sm-3 col-md-2">
@@ -74,15 +73,6 @@
             </div>
           <% end %>
 
-          <% if new_version %>
-            <div class="form-group">
-              <label>Revision comments (optional)</label>
-              <%= text_area_tag :revision_comments, nil, size: '55x4', class: 'form-control' -%>
-            </div>
-
-            <%= hidden_field_tag(:workflow_id, @workflow.id) %>
-          <% end %>
-
           <div>
             <%= create_button class: 'btn btn-primary'-%>
             or <%= cancel_button(cancel_path) -%>
@@ -120,15 +110,6 @@
               <p class="help-block">The zipped <a href="https://github.com/workflowhub-eu/about/wiki/Workflow-RO-Crate" target="_blank">Workflow RO-Crate</a>.</p>
               <%= render partial: 'assets/upload', locals: { field_name: 'ro_crate', param: params[:ro_crate], file_field_opts: { accept: '.zip' } } -%>
             </div>
-          <% end %>
-
-          <% if new_version %>
-            <div class="form-group">
-              <label>Revision comments (optional)</label>
-              <%= text_area_tag :revision_comments, nil, size: '55x4', class: 'form-control' -%>
-            </div>
-
-            <%= hidden_field_tag(:workflow_id, @workflow.id) %>
           <% end %>
 
           <div>
