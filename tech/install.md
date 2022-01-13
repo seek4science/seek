@@ -192,34 +192,10 @@ a production server, following these steps is fine to check things are
 working. However, you should also read the [Installation for
 Production](install-production.html) guide for automating these services.
 
-### Starting and Stopping the Search Service
+### Setting up and starting the Search Service
 
-For a new installation, by default search is disabled. Before running the
-service you may need to enable search in the Administration setting. The SEEK
-server needs restarting whenever search is enabled or disabled.
-
-**If search is enabled and the following service is not running, you will get
-errors when adding or updating information in SEEK.**
-
-SEEK search is based upon the [Apache Lucene
-Solr](http://lucene.apache.org/solr/) service. To start this service run:
-
-    bundle exec rake sunspot:solr:start
-
-and to stop run:
-
-    bundle exec rake sunspot:solr:stop
-
-Optionally, there is also a configuration file for configuring the port and
-host that Solr runs on - which is important if running multiple SEEK
-installations on the same machine. If you wish to override the default ports
-then copy config/sunspot.default.yml to sunspot.yml and change the settings.
-
-The following task can also be run at any time if there is need to force all
-content to be reindexed (such as after a period of running SEEK with search
-turned off).
-
-    bundle exec rake seek:reindex_all
+SEEK uses the [Apache Solr Search Engine](https://solr.apache.org/) which since SEEK v1.12 needs setting up 
+separately. It is relatively straightforward and there are instructions on how to do this in [Setting Up Solr](setting-up-solr).
 
 ### Starting and Stopping the Background Service
 
