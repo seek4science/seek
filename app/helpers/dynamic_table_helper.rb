@@ -34,7 +34,7 @@ module DynamicTableHelper
 
   def dt_cols(sample_type)
     attribs = sample_type.sample_attributes.map do |a|
-      attribute = {title: a.title, name: sample_type.id.to_s}
+      attribute = {title: a.title, name: sample_type.id.to_s, required: a.required, description: a.description}
       attribute.merge!({cv_id: a.sample_controlled_vocab_id}) if !a.sample_controlled_vocab_id.blank?
       condition = a.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
       attribute.merge!({multi_link: true, linked_sample_type: a.linked_sample_type.id }) if condition
@@ -82,7 +82,7 @@ module DynamicTableHelper
   def dt_cumulative_cols(sample_types)
     return sample_types.flat_map do |s|
       s.sample_attributes.map do |a|
-        attribute = { title: a.title, name: s.id.to_s }
+        attribute = { title: a.title, name: s.id.to_s, required: a.required, description: a.description}
         condition = a.sample_attribute_type.base_type == Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
         attribute.merge!({multi_link: true, linked_sample_type: a.linked_sample_type.id }) if condition
         attribute       

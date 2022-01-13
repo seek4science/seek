@@ -68,6 +68,7 @@ class IsaAssaysController < ApplicationController
                                       :sample_attribute_type_id, :isa_tag_id,
                                       :sample_controlled_vocab_id,
                                       :linked_sample_type_id,
+                                      :description,
                                       :unit_id, :_destroy]},assay_ids:[]]
   end
 

@@ -92,30 +92,38 @@ const batchSampleCreateStruct = (ex_id, attribute_map, sample_type_id, pid, assa
   }
 });
 
-async function setAutoComplete(e, sample_controlled_vocab_id) {
-  try {
-    const setSource = (data) => {
-      $j(e).autocomplete({
-        classes: {
-          "ui-autocomplete": "highlight"
-        },
-        source: data || [],
-        mustMatch: true
-      });
-    };
-
-    let url = "/single_pages/" + pid + "/ontology?sample_controlled_vocab_id=";
-    url += sample_controlled_vocab_id + "&query=" + $j(e).html();
-    const res = await ajaxCall(url, "GET", { dataType: "json" });
-
-    if (res.status == "ok") {
-      setSource(res.data);
-      $j(e).autocomplete("search", "a");
-    }
-  } catch (err) {
-    console.log(err);
+//** =============Autocomplete============== */
+async function setAutoComplete(e, cvId) {
+  $j(e).on("input", function () {
+    fetchTerms($j(e), cvId);
+  });
+  if ($j(e).autocomplete() && !$j($j(e).autocomplete("widget")).is(":visible")) {
+    fetchTerms($j(e), cvId);
   }
 }
+
+const setSource = (elem, data) => {
+  elem.autocomplete({
+    classes: {
+      "ui-autocomplete": "highlight"
+    },
+    source: data,
+    minLength: 0,
+    mustMatch: true
+  });
+};
+
+async function fetchTerms(elem, cvId) {
+  if (!elem.find(".loader").length) elem.append("<span class='loader'></span>");
+  let url = `/single_pages/${pid}/ontology?sample_controlled_vocab_id=${cvId}&query=${elem.text()}`;
+  const res = await ajaxCall(url, "GET", { dataType: "json" });
+  if (res.status == "ok") {
+    setSource(elem, res.data);
+    elem.focus().autocomplete("search");
+    elem.find(".loader").remove();
+  }
+}
+//** =============End Autocomplete============== */
 
 async function batchCreateSample(sampleTypes) {
   try {
@@ -167,7 +175,7 @@ async function batchUpdateSample(sampleTypes) {
     });
 
     if (data.length == 0) {
-      console.log("No samples to create");
+      console.log("No samples to update");
       return;
     }
     console.log(data);

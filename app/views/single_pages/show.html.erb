@@ -48,7 +48,7 @@
         $j("#item-layout").html("<%= escape_javascript(render template: 'projects/show' ) %>");
         $j("#item_contents").show();
         pid = <%= @project.id %>
-        uid = <%= current_user.id if current_user %>
+        uid = <%= current_user ? current_user.id : "null" %>
     });
     
 </script>

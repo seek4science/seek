@@ -1,16 +1,16 @@
 <% study ||= nil %>
 <ul class="nav nav-tabs">
     <li class="active">
-        <a data-toggle="tab" href="#source_material"><i class="glyphicon glyphicon-list-alt"></i> Source material</a>
+        <a data-toggle="tab" href="#source_material" onClick="highlightTreeviewItem('source_material')"><em class="glyphicon glyphicon-list-alt"></em> Source material</a>
     </li>
     <li>
-        <a data-toggle="tab" href="#sample_collection"><i class="glyphicon glyphicon-list-alt"></i> Protocols</a>
+        <a data-toggle="tab" href="#sample_collection" onClick="highlightTreeviewItem('sample_collection')"><em class="glyphicon glyphicon-list-alt"></em> Protocols</a>
     </li>
     <li>
-        <a data-toggle="tab" href="#study_samples"><i class="glyphicon glyphicon-list-alt"></i> Samples</a>
+        <a data-toggle="tab" href="#study_samples" onClick="highlightTreeviewItem('study_samples')"><em class="glyphicon glyphicon-list-alt"></em> Samples</a>
     </li>
     <li>
-        <a data-toggle="tab" href="#study_table"><i class="glyphicon glyphicon-list-alt"></i> Table</a>
+        <a data-toggle="tab" href="#study_table" onClick="highlightTreeviewItem('study_table')"><em class="glyphicon glyphicon-list-alt"></em> Table</a>
     </li>
 </ul>
 
@@ -28,3 +28,11 @@
         <%= render :partial=>"isa_studies/study_table", locals: { study: study} -%>   
     </div>
 </div>
+
+<script>
+    function highlightTreeviewItem(item){
+        $j(".jstree-clicked").removeClass("jstree-clicked")
+        const parent = $j(`a[_type="${selectedItem.parent.type}"][_id="${selectedItem.parent.id}"]`)
+        $j(parent).next().find(`a[_type="${item}"]`).addClass("jstree-clicked")
+    }
+</script>

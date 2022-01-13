@@ -11,9 +11,6 @@
       <li>
           <a data-toggle="tab" href="#study_design"><i class="glyphicon glyphicon-list-alt"></i> Study design</a>
       </li>
-      <li>
-          <a data-toggle="tab" href="#flowchart"><i class="glyphicon glyphicon-list-alt"></i> Flowchart</a>
-      </li>
     <% end %>
 </ul>
 <div class="tab-content">
@@ -76,7 +73,6 @@
       <div id="study_design" class="tab-pane fade">
           <%= render :partial=>"isa_studies/study_design", locals: { study: @study} -%>
       </div>
-      <div id="flowchart" class="tab-pane fade"></div>
     <% end %>
     
 </div>

@@ -149,7 +149,7 @@ async function item_clicked(type, id, parent) {
     loadItemDetails(`/assays/${parent.id}/samples`, { view: "default" });
   } else if (isa_study_element.includes(type)) {
     if ($j('a[href^="#study_design"]').toArray().length == 0) {
-      await loadItemDetails(`/studies/${parent.id}`, { view: "default" });
+      loadItemDetails(`/studies/${parent.id}`, { view: "default" });
     }
     $j('a[href^="#study_design"]').first().click();
     $j(`a[href^="#${type}"]`).first().click();
@@ -177,7 +177,9 @@ const loadItemDetails = (url, params = {}) => {
       else if (e.status === 403) alert("You do not have permission to view this content!");
       else if (e.status !== 200)
         alert(`An error occurred while processing the request.\nDetails: ${e.responseText}`);
-      $j("#item-layout").html("Unavailable");
+      $j("#item-layout").html(
+        '<div class="landing_page"><h2 class="forbidden">The content is not visible to you.</h2><p class="text-center">You may need to login to access this content.</p></div>'
+      );
     }
   });
 };

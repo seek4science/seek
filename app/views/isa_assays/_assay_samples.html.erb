@@ -28,7 +28,7 @@
             sampleDynamicTable = new $j.dynamicTable('#assay-samples-table')
             sampleDynamicTable.init(dt.rows, dt.columns, { assayId:  selectedItem.type =="assay" ? selectedItem.id : null })
 
-             $j(".dataTables_scrollBody").css("min-height", "300px")
+             $j(".dataTables_scrollBody").css("min-height", "300px").css("overflow-y", "hidden")
         });
 
         function SamplePasteFromClipboard(){
