@@ -374,7 +374,6 @@ class PublicationsControllerTest < ActionController::TestCase
     publication.save
 
     get :show, params: { id: publication.id }
-    puts response.body
     assert_response :success
   end
 
