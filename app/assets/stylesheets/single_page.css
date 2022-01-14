@@ -458,11 +458,11 @@
  }
 
 .row-error{
-    background-color: #ff0044 !important;
+    border-bottom: solid 2px #ff0044 !important;
 }
 
 .row-success{
-    background-color: #a6ff00 !important;
+    border-bottom: solid 2px #a6ff00 !important;
 }
 
 .jstree-container-ul {
