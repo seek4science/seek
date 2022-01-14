@@ -5,7 +5,7 @@ production:
     log_level: WARNING
     memory: 1G
     path: <%= ENV['SOLR_PATH'] || '/solr/seek' %>
-    read_timeout: 120
+    read_timeout: 1000
     open_timeout: 12
 
 development:

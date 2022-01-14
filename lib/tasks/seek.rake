@@ -65,8 +65,8 @@ namespace :seek do
 
   desc 'Creates background jobs to reindex all searchable things'
   task(reindex_all: :environment) do
-    Seek::Util.searchable_types.each do |type|
-      ReindexingQueue.enqueue(type.all)
+    Seek::Util.searchable_types.collect(&:to_s).each do |type|
+      ReindexAllJob.perform_later(type)
     end
   end
 
