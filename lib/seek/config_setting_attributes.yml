@@ -236,3 +236,4 @@ cv_dropdown_limit:
 tag_cloud_enabled:
 workflow_class_list_enabled:
 git_support_enabled:
+immediate_git_fetch:

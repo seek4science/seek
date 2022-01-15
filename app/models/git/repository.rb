@@ -68,7 +68,7 @@ module Git
     def queue_fetch(force = false)
       if remote.present?
         if force || last_fetch.nil? || last_fetch < FETCH_SPACING.ago
-          RemoteGitFetchJob.perform_later(self)
+          Seek::Config.immediate_git_fetch ? RemoteGitFetchJob.perform_now(self) : RemoteGitFetchJob.perform_later(self)
         end
       end
     end
