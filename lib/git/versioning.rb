@@ -62,6 +62,7 @@ module Git
             version.resource_attributes = self.attributes
             version.save
             self.git_version_attributes = nil
+            self.save
             version
           end
 
