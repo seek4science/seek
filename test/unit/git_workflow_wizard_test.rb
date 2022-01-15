@@ -17,7 +17,9 @@ class GitWorkflowWizardTest < ActiveSupport::TestCase
     assert_difference('Git::Repository.count', 1) do
       assert_difference('Task.count', 1) do
         assert_enqueued_jobs(1, only: RemoteGitFetchJob) do
-          workflow = wizard.run
+          disable_authorization_checks do
+            workflow = wizard.run
+          end
         end
       end
     end
@@ -42,8 +44,10 @@ class GitWorkflowWizardTest < ActiveSupport::TestCase
     assert_no_difference('Git::Repository.count') do
       assert_difference('Task.count', 1) do
         assert_enqueued_jobs(1, only: RemoteGitFetchJob) do
-          workflow = wizard.run
-          assert_equal repo, workflow.git_version.git_repository
+          disable_authorization_checks do
+            workflow = wizard.run
+            assert_equal repo, workflow.git_version.git_repository
+          end
         end
       end
     end
@@ -60,10 +64,11 @@ class GitWorkflowWizardTest < ActiveSupport::TestCase
         }
       }
     }
-
-    wizard = GitWorkflowWizard.new(params: params[:workflow])
-    workflow = wizard.run
-    assert_equal :select_ref, wizard.next_step
+    disable_authorization_checks do
+      wizard = GitWorkflowWizard.new(params: params[:workflow])
+      workflow = wizard.run
+      assert_equal :select_ref, wizard.next_step
+    end
   end
 
   test 'direct to select_paths if main workflow path missing and cannot be inferred from ro-crate-metadata' do
@@ -77,10 +82,11 @@ class GitWorkflowWizardTest < ActiveSupport::TestCase
         }
       }
     }
-
-    wizard = GitWorkflowWizard.new(params: params[:workflow])
-    workflow = wizard.run
-    assert_equal :select_paths, wizard.next_step
+    disable_authorization_checks do
+      wizard = GitWorkflowWizard.new(params: params[:workflow])
+      workflow = wizard.run
+      assert_equal :select_paths, wizard.next_step
+    end
   end
 
   test 'skip select_paths if main workflow path can be inferred from ro-crate-metadata.json' do
@@ -96,9 +102,11 @@ class GitWorkflowWizardTest < ActiveSupport::TestCase
     }
 
     wizard = GitWorkflowWizard.new(params: params[:workflow])
-    workflow = wizard.run
-    assert_equal 'sort-and-change-case.ga', workflow.git_version.main_workflow_path
-    assert_equal :provide_metadata, wizard.next_step
+    disable_authorization_checks do
+      workflow = wizard.run
+      assert_equal 'sort-and-change-case.ga', workflow.git_version.main_workflow_path
+      assert_equal :provide_metadata, wizard.next_step
+    end
   end
 
   test 'direct to provide_metadata if repo, ref and main workflow path are present' do
@@ -115,8 +123,10 @@ class GitWorkflowWizardTest < ActiveSupport::TestCase
     }
 
     wizard = GitWorkflowWizard.new(params: params[:workflow])
-    workflow = wizard.run
-    assert_equal :provide_metadata, wizard.next_step
+    disable_authorization_checks do
+      workflow = wizard.run
+      assert_equal :provide_metadata, wizard.next_step
+    end
   end
 
   test 'add error if no remote URL given' do
@@ -129,9 +139,11 @@ class GitWorkflowWizardTest < ActiveSupport::TestCase
     }
 
     wizard = GitWorkflowWizard.new(params: params[:workflow])
-    workflow = wizard.run
-    assert workflow.errors.added?(:base, 'Git URL was blank.')
-    assert_equal :new, wizard.next_step
+    disable_authorization_checks do
+      workflow = wizard.run
+      assert workflow.errors.added?(:base, 'Git URL was blank.')
+      assert_equal :new, wizard.next_step
+    end
   end
 
   test 'copies git annotations when creating new workflow version' do
@@ -147,26 +159,34 @@ class GitWorkflowWizardTest < ActiveSupport::TestCase
     }
 
     wizard = GitWorkflowWizard.new(params: params[:workflow], workflow: workflow)
-    workflow = wizard.run
-    assert_equal 'sort-and-change-case.ga', workflow.git_version.main_workflow_path
-    assert_equal :provide_metadata, wizard.next_step
+    disable_authorization_checks do
+      workflow = wizard.run
+      assert_equal 'sort-and-change-case.ga', workflow.git_version.main_workflow_path
+      assert_equal :provide_metadata, wizard.next_step
+    end
   end
 
   test 'does not copy git annotations when creating new workflow version if path no longer exists' do
-    workflow = Factory(:local_git_workflow)
+    workflow = Factory(:remote_git_workflow)
+    refute_nil workflow.git_version.main_workflow_path
+    refute_nil workflow.git_version.diagram_path
+
     params = {
       workflow: {
         git_version_attributes: {
           git_repository_id: workflow.git_version.git_repository_id,
           ref: 'refs/heads/master',
-          commit: 'ef558beaf17d76b99e0071f9eb0afd38567306b8' # Main workflow was deleted in this commit
+          commit: '17ee8b9088f80b9881b0b8177559739e33a71f15' # Diagram and main workflow not present in this commit
         }
       }
     }
 
     wizard = GitWorkflowWizard.new(params: params[:workflow], workflow: workflow)
-    workflow = wizard.run
-    assert_nil workflow.git_version.main_workflow_path
-    assert_equal :select_paths, wizard.next_step
+    disable_authorization_checks do
+      workflow = wizard.run
+      assert_nil workflow.git_version.main_workflow_path
+      assert_nil workflow.git_version.diagram_path
+      assert_equal :select_paths, wizard.next_step
+    end
   end
 end

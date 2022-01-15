@@ -22,7 +22,7 @@ class GitWorkflowWizard
         git_version = current_version.next_version(name: git_version.name, comment: git_version.comment, mutable: true)
         git_version.save!
         @workflow.reload
-        @next_step = :show
+        @next_step = nil
         return @workflow
       end
     else
@@ -40,8 +40,11 @@ class GitWorkflowWizard
         return workflow
       else
         git_version.set_default_git_repository
-        git_version.git_repository.queue_fetch
       end
+    end
+
+    if git_version.remote?
+      git_version.git_repository.queue_fetch
     end
 
     if git_version.ref.blank?
@@ -60,7 +63,9 @@ class GitWorkflowWizard
 
         workflow_class ||= WorkflowClass.match_from_metadata(crate&.main_workflow&.programming_language&.properties || {})
       end
-    elsif current_version
+    end
+
+    if current_version
       # Assign existing paths if they still exist in the new version
       [:main_workflow_path, :abstract_cwl_path, :diagram_path].each do |path_attr|
         path = current_version.send(path_attr)

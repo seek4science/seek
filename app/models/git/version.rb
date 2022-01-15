@@ -65,7 +65,7 @@ module Git
     end
 
     def remote?
-      git_repository&.remote.present?
+      @remote.present? || git_repository&.remote.present?
     end
 
     def lock

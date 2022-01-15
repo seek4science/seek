@@ -991,14 +991,15 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert workflow.is_git_versioned?
 
     assert_no_difference('Git::Version.count') do
-      assert_enqueued_jobs(1, only: RemoteGitFetchJob) do
-        post :new_git_version, params: { id: workflow.id }
+      assert_no_enqueued_jobs(only: RemoteGitFetchJob) do
+        get :new_git_version, params: { id: workflow.id }
       end
     end
 
     assert_response :success
-    assert_select '#repo-ref-form'
-    assert_select 'form[action=?]', create_version_from_git_workflow_path(workflow.id)
+    assert_select 'form[action=?]', create_version_from_git_workflow_path(workflow.id, anchor: 'new-local-version'),
+                  { count: 0 }, 'Should not be able to go back to a local git version from a remote one'
+    assert_select 'form[action=?]', create_version_from_git_workflow_path(workflow.id, anchor: 'new-remote-version')
   end
 
   test 'get new git version page for local git repo' do
@@ -1007,13 +1008,15 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     assert workflow.is_git_versioned?
 
-    assert_difference('Git::Version.count', 1) do
+    assert_no_difference('Git::Version.count') do
       assert_no_enqueued_jobs(only: RemoteGitFetchJob) do
-        post :new_git_version, params: { id: workflow.id }
+        get :new_git_version, params: { id: workflow.id }
       end
     end
 
-    assert_redirected_to workflow_path(workflow)
+    assert_response :success
+    assert_select 'form[action=?]', create_version_from_git_workflow_path(workflow.id, anchor: 'new-local-version')
+    assert_select 'form[action=?]', create_version_from_git_workflow_path(workflow.id, anchor: 'new-remote-version')
   end
 
   test 'should list files for git workflow' do

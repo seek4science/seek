@@ -125,7 +125,7 @@ class WorkflowsController < ApplicationController
     @display_workflow = @workflow.git_version
 
     respond_to do |format|
-      format.html { render wizard.next_step }
+      format.html { wizard.next_step.nil? ? redirect_to(@workflow) : render(wizard.next_step) }
     end
   end
 
@@ -135,7 +135,7 @@ class WorkflowsController < ApplicationController
     @display_workflow = @workflow.git_version
 
     respond_to do |format|
-      format.html { render wizard.next_step }
+      format.html { wizard.next_step.nil? ? redirect_to(@workflow) : render(wizard.next_step) }
     end
   end
 

@@ -84,7 +84,7 @@
       <% if display_asset.mutable? %>
         <li><%= image_tag_for_key('freeze', polymorphic_path([asset, :git_freeze_preview], version: display_asset.version), nil, nil, 'Freeze version') -%></li>
       <% else %>
-        <li><%= image_tag_for_key('new', polymorphic_path([:new_git_version, asset]), nil, { method: :post }, 'New version') -%></li>
+        <li><%= image_tag_for_key('new', polymorphic_path([:new_git_version, asset]), nil, { }, 'New version') -%></li>
       <% end %>
     <% elsif asset.versioned? -%>
       <li>

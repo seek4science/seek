@@ -45,7 +45,7 @@
               <%= f.hidden_field :mutable %>
             <% end %>
 
-            <%= create_button(button_text: 'Continue', class: 'btn btn-primary') %> or <%= cancel_button(@parent_resource) %>
+            <%= create_button(button_text: 'Continue', class: 'btn btn-primary') %> or <%= cancel_button(@workflow) %>
           <% end %>
         <% end %>
       <% end %>
@@ -63,7 +63,7 @@
           <% end %>
 
           <div>
-            <%= create_button(button_text: 'Continue', class: 'btn btn-primary') %> or <%= cancel_button(@parent_resource) %>
+            <%= create_button(button_text: 'Continue', class: 'btn btn-primary') %> or <%= cancel_button(@workflow) %>
           </div>
         <% end %>
       <% end %>
