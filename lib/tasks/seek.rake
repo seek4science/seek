@@ -109,8 +109,10 @@ namespace :seek do
       begin
         Git::Converter.new(workflow).convert(unzip: true)
       rescue StandardError => e
+        print 'E'
         STDERR.puts "Error converting Workflow #{workflow.id}"
-        raise e
+        STDERR.puts e.message
+        e.backtrace.each { |l| STDERR.puts(l) }
       end
       count += 1
       print '.'
