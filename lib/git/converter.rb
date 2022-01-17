@@ -73,6 +73,7 @@ module Git
               git_version.git_annotations.build(path: path, key: 'remote_source', value: url) if url
             end
           end
+          git_version.mutable = version.version == version.versions.maximum(:version)
           git_version.save!
         end
         git_version

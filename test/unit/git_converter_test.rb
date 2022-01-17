@@ -176,6 +176,7 @@ class GitConverterTest < ActiveSupport::TestCase
     assert_equal 'Dave', gv1.other_creators
     assert_equal :work_in_progress, gv1.maturity_level
     assert_equal :private, gv1.visibility
+    refute gv1.mutable?
 
     assert_equal '10.81082/dev-workflowhub.workflow.136.1', gv2.doi
     assert_equal 'CC-BY-4.0', gv2.license
@@ -184,6 +185,7 @@ class GitConverterTest < ActiveSupport::TestCase
     assert_equal 'Steve', gv2.other_creators
     assert_equal :released, gv2.maturity_level
     assert_equal :public, gv2.visibility
+    assert gv2.mutable?
 
     keys = gv2.resource_attributes.keys.map(&:to_s)
     assert_not_includes keys, 'id'
