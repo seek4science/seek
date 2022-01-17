@@ -100,9 +100,10 @@ en:
 
   asset_housekeeper: 'Asset housekeeper'
   asset_gatekeeper: 'Asset gatekeeper'
-  project_administrator: 'Project administrator'
+  project_administrator: 'Proj administrator'
   pal: 'PAL'
   programme_administrator: 'Programme administrator'
+  admin: 'Admin'
 
   contributor: 'submitter' # A person who submitted the resource to SEEK
   contribution: 'submission'
