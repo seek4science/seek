@@ -111,7 +111,7 @@ class GitController < ApplicationController
           render partial: 'files', locals: { resource: @parent_resource, git_version: @git_version }, status: status
         else
           flash[:notice] = notice if notice
-          redirect_to polymorphic_path(@parent_resource, anchor: 'files')
+          redirect_to polymorphic_path(@parent_resource, tab: 'files')
         end
       end
     end
@@ -133,7 +133,7 @@ class GitController < ApplicationController
     render_git_error(ex.message, status: 422)
   end
 
-  def render_git_error(message, status: 400, redirect: polymorphic_path(@parent_resource, anchor: 'files'))
+  def render_git_error(message, status: 400, redirect: polymorphic_path(@parent_resource, tab: 'files'))
     respond_to do |format|
       format.html do
         flash[:error] = message

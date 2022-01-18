@@ -184,6 +184,18 @@ module BootstrapHelper
     end
   end
 
+  def tab(title, tab_id, selected = false)
+    content_tag(:li, class: selected ? 'active' : '') do
+      content_tag(:a, title, data: { target: "##{tab_id}", toggle: 'tab' }, aria: { controls: tab_id }, role: 'tab')
+    end
+  end
+
+  def tab_pane(tab_id, selected = false)
+    content_tag(:div, id: tab_id, class: selected ? 'tab-pane active' : 'tab-pane') do
+      yield
+    end
+  end
+
   private
 
   def tags_input_typeahead_options(typeahead_opts)
