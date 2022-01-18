@@ -493,4 +493,20 @@ class AdminControllerTest < ActionController::TestCase
     assert_nil Seek::Config.recommended_software_licenses
   end
 
+  test 'update session store timeout' do
+    with_config_value(:session_store_timeout, 10.minutes) do
+      get :settings
+
+      assert_response :success
+      assert_select 'input#session_store_timeout',value:'10'
+
+      post :update_settings, params: {session_store_timeout:'60'}
+      assert_equal 1.hour, Seek::Config.session_store_timeout
+
+      # ignores if not a valid integer
+      post :update_settings, params: {session_store_timeout:'fish'}
+      assert_equal 1.hour, Seek::Config.session_store_timeout
+    end
+  end
+
 end
