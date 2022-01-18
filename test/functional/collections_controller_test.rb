@@ -44,6 +44,21 @@ class CollectionsControllerTest < ActionController::TestCase
     assert assigns(:collections).any?
   end
 
+  test 'should not duplicate maintainer' do
+    person = Factory(:person)
+    login_as(person.user)
+    collection = Factory(:public_collection, title: 'my collection',contributor:person, creators:[person, Factory(:person)])
+
+    get :index
+    assert_response :success
+    assert_equal 1, assigns(:collections).count
+
+    assert_select 'div.list_item' do
+      assert_select '.list_item_title', text:'my collection'
+      assert_select '.rli-person-list a[href=?]',person_path(person),count:1
+    end
+  end
+
   test "shouldn't show hidden items in index" do
     visible_collection = Factory(:public_collection)
     hidden_collection = Factory(:private_collection)
