@@ -52,9 +52,16 @@ class NelsController < ApplicationController
     render :index
   end
 
+  def get_metadata
+    file_name, file_path = @rest_client.get_metadata(params[:project_id].to_i, params[:dataset_id].to_i,params[:subtype_name])
+    send_file file_path, filename: file_name, disposition: 'attachment'
+  end
+
   def add_metadata
-    puts ("################################ add_metadata")
+    # TODO: Finish implementenation for uploading metadata
     puts params.inspect
+    puts params["content_blobs"][0]["data"].path
+    @rest_client.upload_metadata(params[:project_id].to_i, params[:dataset_id].to_i,params[:subtype_name], params["content_blobs"][0]["data"].path)
   end
 
   def projects
@@ -76,6 +83,12 @@ class NelsController < ApplicationController
   def dataset
     @dataset = @rest_client.dataset(params[:project_id].to_i, params[:dataset_id].to_i)
 
+    # Populates the "metadata" field for each subtype, indicating if there is associated metadata with it
+    @dataset['subtypes'].each_with_index do |subtype, index |
+      @dataset['subtypes'][index]['metadata'] = 
+        @rest_client.check_metadata_exists(params[:project_id].to_i, params[:dataset_id].to_i, subtype['type'])
+    end
+    
     respond_to do |format|
       format.html { render partial: 'nels/dataset' }
     end

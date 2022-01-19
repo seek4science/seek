@@ -1,5 +1,6 @@
 require 'rest-client'
 require 'uri'
+require 'tempfile'
 
 module Nels
   module Rest
@@ -43,14 +44,37 @@ module Nels
         response["data"].each { |x| newHash[x["name"]]=x["id"]}
         return newHash
       end
-      
-      def create_dataset(projectid, datasettype, name, description)
-        perform("v2/sbi/projects/"+projectid+"/datasets/", :post,
+
+      def create_dataset(project_id, datasettype, name, description)
+        perform("v2/sbi/projects/"+project_id+"/datasets/", :post,
           body: {datasettypeid:datasettype.to_i,name:name,description:description})
       end
+      
+      # Checks if there is a metadata file associated with the given dataset->subtype
+      # NeLS responds 404 if no metadata exists, and 302 if it does
+      def check_metadata_exists(project_id, dataset_id, subtype_name)
+        if perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/metadata/do", :post,
+          body: { method: 'exist'}) == 302
+          return true
+        else
+          return false
+        end
+      end
 
-      def upload_metadata(file)
+      def get_metadata(project_id, dataset_id, subtype_name)
+        response_file = perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/metadata", :get, skip_parse: true, raw_response: true)
+        # TODO: replace with determine_filename_from_disposition function
+        file_name = Mechanize::HTTP::ContentDispositionParser.parse(response_file.headers[:content_disposition]).try(:filename)
+        tmp_file = Tempfile.new()
+        File.open(tmp_file.path, 'wb'){|f| f << response_file.to_str}
+
+        return file_name, tmp_file.path
+      end
+
+      def upload_metadata(project_id, dataset_id, subtype_name, file_path)
         ## TODO: start job to send data
+        # perform("sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/metadata", :post,
+        #   body: { file: File.new(file_path)})
       end
 
       private
@@ -71,10 +95,21 @@ module Nels
         puts path
         puts args
 
-        response = base[path].send(*args)
+        # 404 and 302 exceptions have to be caught, as they are valid responses from NeLS
+        begin
+          response = base[path].send(*args)
+        rescue RestClient::ResourceNotFound => err
+          return 404
+        rescue RestClient::Found => err
+          return 302
+        # rescue RestClient::MovedPermanently, #301
+        #        RestClient::TemporaryRedirect #307
+        #   puts "Other exception"
+        #   return response
+        end
 
+        puts "response"
         puts response
-
         return response if opts[:skip_parse]
 
         JSON.parse(response) unless response.empty?

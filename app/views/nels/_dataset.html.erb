@@ -17,6 +17,11 @@
             <%= hidden_field_tag('subtype_name', subtype['type']) %>
             <%= subtype['type'] %> <span class="subtle">(<%= number_to_human_size(subtype['size']) %>)</span>
             <%= button_link_to('Add metadata', 'add', nil, { id: "add_metadata_"+ subtype['type'], class:"add_metadata"} ) %>
+            <% if subtype["metadata"] %>
+              <%= button_link_to('Download metadata', 'download', {:action => :get_metadata,
+                :project_id => params[:project_id],:dataset_id => params[:dataset_id],:subtype_name => subtype['type']},
+                method: :get) %>
+            <% end %>
             <%= submit_tag('Register', class: 'btn btn-primary btn-xs pull-right') %>
         <% end %>
       </li>

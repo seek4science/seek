@@ -445,6 +445,7 @@ SEEK::Application.routes.draw do
         get :dataset
         post :register
         get :new_dataset
+        get :get_metadata
         post :create_dataset
         post :add_metadata
       end
