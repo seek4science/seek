@@ -96,6 +96,8 @@ CVTerms = {
             var row = $j('table#new-terms tr.sample-cv-term').last();
             var inputs = $j(row).find('td input');
 
+            $j(inputs).prop('disabled',true);
+
             //inputs 0,1,2 are label, iri, and parent_iri
             $j(inputs[0]).val(term.label);
             $j(inputs[1]).val(term.iri);
@@ -192,8 +194,10 @@ CVTerms = {
             if (selected.value == "") {
                 $j('#sample_controlled_vocab_ols_root_term_uri').val('');
                 $j('#ontology-root-uri').hide();
+                $j('a#add-term').attr('disabled',false);
             } else {
                 $j('#ontology-root-uri').show();
+                $j('a#add-term').attr('disabled',true);
                 var link = $j('a#selected-ols-link');
                 link.text(selected.text);
                 link.attr('href', 'https://www.ebi.ac.uk/ols/ontologies/' + selected.value);
