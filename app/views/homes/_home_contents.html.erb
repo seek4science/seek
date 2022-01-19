@@ -5,23 +5,44 @@
 <% end %>
 
 <div class="row">
-  <div class="col-md-9">
-    <%= render :partial=>"home_description_box" -%>
 
     <% if Seek::Config.front_page_buttons_enabled %>
         <%= render :partial=>"home_buttons" -%>
     <% end %>
+</div>
 
-    <% if logged_in_and_registered? %>
-        <%= render :partial=>"user_activity" -%>
-    <% else %>
-        <%= render :partial=>"home_activity_notifications" -%>
+<%# If not logged in, home_description takes entire row, otherwise, col-9 (2/3rds) %>
+<% if !logged_in_and_registered? %>
+  <%= render :partial=>"home_description_box" -%>
+  <% if Seek::Config.home_show_features%>
+      <%= render :partial=>"home_features" -%>
+  <% end %>
+<% end %>
+
+<div class="row">
+  <div class="col-md-9">
+    <% if logged_in_and_registered?%>
+      <%= render :partial=>"home_description_box" -%>
+    <% end %>
+    <% if logged_in_and_registered? && Seek::Config.home_show_my_items%>
+      <%= render :partial=>"home_my_items" -%>
+    <% end %>
+    <% if !logged_in_and_registered? && Seek::Config.home_show_who_uses %>
+      <%= render :partial=>"home_who_uses" -%>
+    <% end %>
+    <% if Seek::Config.home_explore_projects %>
+      <%= render :partial=>"home_explore_projects" -%>
+    <% end %>
+    <% if !logged_in_and_registered? && Seek::Config.home_show_integrations %>
+      <%= render :partial=>"home_integrations" -%>
     <% end %>
   </div>
 
   <div class="col-md-3">
+    <% if logged_in_and_registered?  && Seek::Config.home_show_quickstart %>
+      <%= render :partial=>"home_quick_start" -%>
+    <% end %>
     <%= render :partial=>"gadgets/announcements_gadget" if show_announcements? %>
-
     <%= home_news_feeds %>
 
     <% if Seek::Config.workflows_enabled && Seek::Config.workflow_class_list_enabled %>
@@ -41,6 +62,7 @@
     <% end %>
   </div>
 </div>
+<br>
 
 <% if Seek::Config.human_diseases_enabled  %>
   <%= render :partial => 'human_diseases/overview_plot' %>

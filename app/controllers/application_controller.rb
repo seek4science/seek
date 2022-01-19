@@ -14,6 +14,8 @@ class ApplicationController < ActionController::Base
   # if the logged in user is currently partially registered, force the continuation of the registration process
   before_action :partially_registered?
 
+  before_action :check_displaying_single_page
+
   after_action :log_event
 
   include AuthenticatedSystem
@@ -206,12 +208,11 @@ class ApplicationController < ActionController::Base
   end
 
   #_status is mostly important for the json responses, default is 400 (Bad Request)
-  def error(notice, _message, _status=400)
+  def error(notice, message, status=400)
     flash[:error] = notice
     respond_to do |format|
       format.html { redirect_to root_url }
-      format.json { render json: { errors: [{ title: notice, detail: _message }] }, status:  _status }
-
+      format.json { render json: { errors: [{ title: notice, detail: message }] }, status:  status }
     end
   end
 
@@ -639,8 +640,10 @@ class ApplicationController < ActionController::Base
     keys
   end
 
-  def set_displaying_single_page
-    @single_page = true
+  def check_displaying_single_page
+    if params[:single_page]
+      @single_page = true
+    end
   end
 
   def displaying_single_page?

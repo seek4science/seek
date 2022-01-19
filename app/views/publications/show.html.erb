@@ -5,8 +5,21 @@
     <%= item_description @publication.abstract, :label => "Abstract", :none_text => "No abstract specified" %>
 
     <div class="row">
+      <% if Seek::Config.allow_publications_fulltext %>
+
+        <div class="col-md-6">
+
+          <%= persistent_resource_id(@publication) %>
+
+          <%= render :partial => 'assets/fileinfo', :object => @publication.content_blob -%>
+
+          <% if @publication.content_blob %>
+            <%= rendered_asset_view(@publication) %>
+          <% end %>
+        </div>
+      <% end %>
+
       <div class="col-md-6">
-        <%= persistent_resource_id(@publication) %>
         <% unless @publication.pubmed_id.nil? %>
           <p>
             <strong>PubMed ID:</strong>
@@ -123,6 +136,11 @@
   </div>
   <div class="col-md-3 col-sm-4">
     <%= render :partial => "assets/resource_main_content_right", :locals => { :resource => @publication, :authors_title=>"Submitter" } -%>
+    <p>
+      <% if @publication.misc_links.select{|link| link.url.present?}.any?  %>
+        <%= render partial: 'assets/misc_links_box', locals: {resource: @publication } -%>
+      <% end -%>
+    </p>
   </div>
 </div>
 

@@ -28,7 +28,7 @@
       To avoid being locked out of your account, please ensure you either:
       <ul>
         <li>Keep at least 1 identity</li>
-        <li>Know your <%= Seek::Config.application_name -%> password</li>
+        <li>Know your <%= Seek::Config.instance_name -%> password</li>
         <li>Have access to your registered email address: <%= link_to @user.person.email, edit_person_path(@user.person, anchor: 'person_email') -%></li>
       </ul>
     </div>

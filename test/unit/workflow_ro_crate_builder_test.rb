@@ -86,7 +86,7 @@ class WorkflowROCrateBuilderTest < ActiveSupport::TestCase
     cb_params = builder.build
     crate = ROCrate::WorkflowCrateReader.read_zip(cb_params[:tmp_io_object])
 
-    assert_equal 8, crate.entities.count
+    assert_equal 9, crate.entities.count
     assert crate.get("ro-crate-metadata.json").is_a?(ROCrate::Metadata)
     assert crate.get("ro-crate-preview.html").is_a?(ROCrate::Preview)
     assert crate.get("./").is_a?(ROCrate::WorkflowCrate)
@@ -95,5 +95,6 @@ class WorkflowROCrateBuilderTest < ActiveSupport::TestCase
     assert crate.get("rp2-to-rp2path-packed.cwl").is_a?(ROCrate::WorkflowDescription)
     assert crate.get("#galaxy").is_a?(ROCrate::ContextualEntity)
     assert crate.get("#cwl").is_a?(ROCrate::ContextualEntity)
+    assert crate.get(ROCrate::WorkflowCrate::PROFILE['@id']).is_a?(ROCrate::ContextualEntity)
   end
 end

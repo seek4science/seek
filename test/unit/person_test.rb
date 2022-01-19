@@ -658,10 +658,6 @@ class PersonTest < ActiveSupport::TestCase
     refute p.valid?
     assert_equal 1,p.errors.full_messages.count
     assert_equal "Full name can't be blank",p.errors.full_messages.first
-
-
-
-
   end
 
   def test_email_with_capitalise_valid

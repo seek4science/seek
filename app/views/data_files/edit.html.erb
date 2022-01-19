@@ -34,7 +34,9 @@
 
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @data_file} -%>
 
-      <%= fancy_multiselect @data_file, :events, { other_projects_checkbox: true, sort_by: :start_date } %>
+      <%= f.fancy_multiselect :events, { other_projects_checkbox: true, sort_by: :start_date } if Seek::Config.events_enabled %>
+
+      <%= render partial: 'associate_workflow', locals: {:f=>f, :resource => @data_file } if Seek::Config.workflows_enabled %>
 
       <%= form_submit_buttons(@data_file) %>
     </div>

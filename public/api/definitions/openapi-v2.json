@@ -1359,7 +1359,7 @@
                     "name": "asset_types",
                     "in": "path",
                     "required": true,
-                    "description": "The typs of asset being fetched, uploaded or downloaded",
+                    "description": "The types of asset being fetched, uploaded or downloaded",
                     "type": "string",
                     "default": "data_files"
                 },
@@ -7322,9 +7322,6 @@
                                 "policy": {
                                     "$ref": "#/definitions/policy"
                                 },
-                                "content_blobs": {
-                                    "$ref": "#/definitions/contentBlobSlotsList"
-                                },
                                 "other_creators": {
                                     "$ref": "#/definitions/nullableOtherCreatorsString"
                                 },
@@ -10131,6 +10128,9 @@
                                 "authors": {
                                     "$ref": "#/definitions/nonEmptyStringList"
                                 },
+                                "content_blobs": {
+                                    "$ref": "#/definitions/contentBlobsList"
+                                },
                                 "policy": {
                                     "$ref": "#/definitions/policy"
                                 }
@@ -12844,7 +12844,7 @@
             }
         },
         "contentBlobSlot": {
-            "x-oneOf": [
+            "oneOf": [
                 {
                     "$ref": "#/definitions/remoteContentBlob"
                 },

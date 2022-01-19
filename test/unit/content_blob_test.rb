@@ -942,7 +942,9 @@ class ContentBlobTest < ActiveSupport::TestCase
     blob = Factory(:image_content_blob, content_type:'application/msexcel', original_filename:'image.xls')
     assert blob.is_extractable_spreadsheet?
 
-    assert_nil blob.to_spreadsheet_xml
+    assert_raises(SysMODB::SpreadsheetExtractionException) do
+      blob.to_spreadsheet_xml
+    end
 
     blob.reload
 

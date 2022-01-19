@@ -52,10 +52,6 @@ class AssayTest < ActiveSupport::TestCase
     assert !assays(:metabolomics_assay).is_asset?
   end
 
-  test 'sort by updated_at' do
-    assert_equal Assay.all.sort_by { |a| a.updated_at.to_i * -1 }, Assay.all
-  end
-
   test 'authorization supported?' do
     assert Assay.authorization_supported?
     assert assays(:metabolomics_assay).authorization_supported?
@@ -233,7 +229,11 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'publications' do
-    assert_equal 1, assays(:assay_with_a_publication).publications.size
+    User.with_current_user Factory(:user) do
+    one_assay_with_publication = Factory :assay, publications: [Factory(:publication)]
+
+    assert_equal 1, one_assay_with_publication.publications.size
+    end
   end
 
   test 'can delete?' do
@@ -258,7 +258,8 @@ class AssayTest < ActiveSupport::TestCase
     assay = Factory(:assay, contributor: another_project_person)
     assert !assay.can_delete?(pal.user)
 
-    assert !assays(:assay_with_a_publication).can_delete?(users(:model_owner))
+    one_assay_with_publication = Factory :assay, contributor: User.current_user.person, publications: [Factory(:publication)]
+    assert !one_assay_with_publication.can_delete?(User.current_user.person)
   end
 
   test 'assets' do

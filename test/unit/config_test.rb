@@ -216,26 +216,22 @@ class ConfigTest < ActiveSupport::TestCase
 
   # Project
   test 'project_name' do
-    assert_equal 'Sysmo', Seek::Config.project_name
-  end
-  test 'project_type' do
-    assert_equal 'Consortium', Seek::Config.project_type
-  end
-  test 'project_link' do
-    assert_equal 'http://www.sysmo.net', Seek::Config.project_link
-  end
-  test 'project_long_name' do
-    assert_equal 'Sysmo Consortium', Seek::Config.project_long_name
-  end
-  test 'dm_project_name' do
-    assert_equal 'SysMO-DB', Seek::Config.dm_project_name
+    assert_equal 'Sysmo SEEK', Seek::Config.instance_name
   end
 
-  test 'dm_project_link' do
-    assert_equal 'http://www.sysmo-db.org', Seek::Config.dm_project_link
+  test 'instance_link' do
+    assert_equal 'http://www.sysmo.net', Seek::Config.instance_link
+  end
+
+  test 'instance_admins_name' do
+    assert_equal 'SysMO-DB', Seek::Config.instance_admins_name
+  end
+
+  test 'instance_admins_link' do
+    assert_equal 'http://www.sysmo-db.org', Seek::Config.instance_admins_link
   end
   test 'application_name' do
-    assert_equal 'Sysmo SEEK', Seek::Config.application_name
+    assert_equal 'FAIRDOM-SEEK', Seek::Config.application_name
   end
 
   test 'header_image_enabled' do
@@ -548,4 +544,47 @@ class ConfigTest < ActiveSupport::TestCase
       assert_equal 'ActiveSupport::HashWithIndifferentAccess', Seek::Config.smtp.class.name
     end
   end
+
+  test 'transfer_setting' do
+
+    # old name has a value hanging around
+    Seek::Config.set_value(:old_name, "The INSTANCE name")
+
+    refute_nil Settings.fetch(:old_name)
+    refute_nil Settings.global.fetch(:old_name)
+    assert_equal "The INSTANCE name",Seek::Config.get_value(:old_name)
+    assert_nil Seek::Config.get_value(:new_name)
+
+    Seek::Config.transfer_value(:old_name, :new_name)
+
+    assert_equal "The INSTANCE name",Seek::Config.get_value(:new_name)
+    assert_nil Seek::Config.get_value(:old_name)
+    assert_nil Settings.fetch(:old_name)
+    assert_nil Settings.global.fetch(:old_name)
+
+    # repeatable
+    Seek::Config.transfer_value(:old_name, :new_name)
+
+    assert_equal "The INSTANCE name",Seek::Config.get_value(:new_name)
+    assert_nil Seek::Config.get_value(:old_name)
+    assert_nil Settings.fetch(:old_name)
+    assert_nil Settings.global.fetch(:old_name)
+
+    # don't transfer default if not set
+    Seek::Config.default :old_name_2, 'The setting'
+    assert_equal "The setting",Seek::Config.get_value(:old_name_2)
+    assert_nil Settings.fetch(:old_name_2)
+    assert_nil Settings.global.fetch(:old_name_2)
+
+    Seek::Config.transfer_value(:old_name_2, :new_name_2)
+
+    assert_nil Settings.global.fetch(:old_name_2)
+    assert_nil Settings.global.fetch(:new_name_2)
+    assert_nil Seek::Config.get_value(:new_name_2)
+    assert_nil Seek::Config.get_value(:old_name_2)
+    assert_nil Settings.fetch(:old_name_2)
+    assert_nil Settings.fetch(:new_name_2)
+
+  end
+
 end

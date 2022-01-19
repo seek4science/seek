@@ -2,6 +2,8 @@
 <% index ||= 'replace-me' %>
 <% id = sample_attribute ? sample_attribute.id : '' %>
 <% title = sample_attribute ? sample_attribute.title : '' %>
+<% description = sample_attribute ? sample_attribute.description : '' %>
+<% pid = sample_attribute ? sample_attribute.pid : '' %>
 <% pos = sample_attribute ? sample_attribute.pos : '' %>
 <% required = sample_attribute ? sample_attribute.required : false %>
 <% is_title = sample_attribute ? sample_attribute.is_title : false %>
@@ -17,6 +19,7 @@
 <% allow_type_change = constraints.allow_type_change?(sample_attribute) %>
 <% allow_name_change = constraints.allow_name_change?(sample_attribute) %>
 <% seek_sample_multi = sample_attribute.try(:seek_sample_multi?) %>
+<% link_to_self = sample_attribute && sample_attribute.deferred_link_to_self %>
 <tr class="sample-attribute <%= 'success' if sample_attribute.nil? -%>" data-index="<%= index-%>">
   <th scope="row" class="attribute-position">
     <div class="btn btn-info attribute-handle">
@@ -26,9 +29,11 @@
     <%= hidden_field_tag "#{field_name_prefix}[pos]", pos, readonly: true %>
   </th>
   <td>
+
     <%= text_field_tag "#{field_name_prefix}[title]", title, class: 'form-control',
                        placeholder: 'Attribute name',disabled: !allow_name_change %>
   </td>
+
   <td class="text-center">
     <div class="checkbox-inline">
       <%= hidden_field_tag "#{field_name_prefix}[required]", '0' %>
@@ -73,10 +78,18 @@
       %>
       <%= select_tag "#{field_name_prefix}[linked_sample_type_id]",
                      grouped_options_for_select(options,
-                                        linked_sample_type_id),
+                                        link_to_self ? 'self' : linked_sample_type_id),
                      include_blank: true,
                      class: 'form-control linked-sample-type-selection' %>
     </div>
+  </td>
+  <td>
+    <%= text_area_tag "#{field_name_prefix}[description]", description, class: 'form-control',
+                      style:'height:4em;width:20em;', placeholder: 'Description' %>
+  </td>
+  <td>
+    <%= text_field_tag "#{field_name_prefix}[pid]", pid, class: 'form-control',
+                       placeholder: 'Identifier URI' %>
   </td>
   <td>
     <%= select_tag "#{field_name_prefix}[unit_id]",

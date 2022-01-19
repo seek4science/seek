@@ -1,6 +1,6 @@
 <% custom_metadata_type.custom_metadata_attributes.each do |attribute| %>
   <div class="form-group">
-    <label><%= attribute.title.humanize %></label><%= required_span if attribute.required? %>
+    <label><%= attribute.label %></label><%= required_span if attribute.required? %>
     <%= custom_metadata_form_field_for_attribute(attribute,resource) %>
     <% unless attribute.description.nil? %>
       <%= custom_metadata_attribute_description(attribute.description) %>

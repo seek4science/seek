@@ -39,3 +39,10 @@ Factory.define(:apples_controlled_vocab_attribute, parent: :sample_attribute) do
     type.sample_attribute_type = Factory(:controlled_vocab_attribute_type)
   end
 end
+
+Factory.define(:string_sample_attribute_with_description_and_pid, parent: :sample_attribute) do |f|
+  f.sample_attribute_type factory: :string_sample_attribute_type
+  f.description "sample_attribute_description"
+  f.pid "sample_attribute:pid"
+  f.required true
+end

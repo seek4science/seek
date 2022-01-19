@@ -9,6 +9,8 @@
         {
           "id": "523",
           "title": "full_name",
+          "description": "the persons full name",
+          "pid": null,
           "sample_attribute_type": {
             "id": "808",
             "title": "Full name",
@@ -25,6 +27,8 @@
         {
           "id": "526",
           "title": "address",
+          "description": null,
+          "pid": null,
           "sample_attribute_type": {
             "id": "811",
             "title": "Address",
@@ -41,6 +45,8 @@
         {
           "id": "527",
           "title": "postcode",
+          "description": null,
+          "pid": "dc:postcode",
           "sample_attribute_type": {
             "id": "812",
             "title": "Post Code",
@@ -57,6 +63,8 @@
         {
           "id": "645",
           "title": "CAPITAL key",
+          "description": null,
+          "pid": null,
           "sample_attribute_type": {
             "id": "",
             "title": "String",

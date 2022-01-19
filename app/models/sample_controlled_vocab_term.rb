@@ -5,6 +5,8 @@ class SampleControlledVocabTerm < ApplicationRecord
 
   before_validation :truncate_label
 
+  acts_as_annotation_value content_field: :iri
+
   private
 
   def truncate_label

@@ -23,7 +23,7 @@
                 <li>
                   <% if item.asset.can_view? %>
                     <%= link_to(avatar(item.asset, 60, true, nil, nil, true, 'home_asset_icon'), item.asset, class: 'file-type-icon') %>
-                    <%= link_to(item.asset.title, item.asset, 'data-tooltip' => item.asset.description, target: '_blank') %>
+                    <%= link_to(item.asset.title, item.asset, 'data-tooltip' => item.asset.respond_to?(:description) ? item.asset.description : nil, target: '_blank') %>
                   <% else %>
                     <span class="none_text"><%= t('private_asset') -%></span>
                   <% end %>

@@ -21,6 +21,8 @@ class SampleTypeSerializer < BaseSerializer
     {
       "id": attribute.id.to_s,
       "title": attribute.title,
+      "description": attribute.description,
+      "pid": attribute.pid,
       "sample_attribute_type": get_sample_attribute_type(attribute),
       "required": attribute.required,
       "pos": attribute.pos.to_s,
@@ -32,6 +34,6 @@ class SampleTypeSerializer < BaseSerializer
   end
 
   def get_sample_attribute_type(attribute)
-    JSON.parse(SampleAttributeTypeSerializer.new(attribute.sample_attribute_type).to_json)
+    SampleAttributeTypeSerializer.new(attribute.sample_attribute_type).to_h
   end
 end

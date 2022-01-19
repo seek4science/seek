@@ -19,7 +19,7 @@ class EventTest < ActiveSupport::TestCase
 
   test 'publication association' do
     assert @event.publications.empty?
-    publication = publications(:one)
+    publication = Factory(:publication)
     @event.publications << publication
     assert @event.valid?
     assert @event.save
@@ -60,6 +60,27 @@ class EventTest < ActiveSupport::TestCase
     @event.end_date = nil
     assert @event.valid?
     assert @event.save
+  end
+
+  test 'validates and tests url' do
+    @event.url = nil
+    assert @event.valid?
+
+    @event.url = ''
+    assert @event.valid?
+
+    @event.url = 'fish'
+    refute @event.valid?
+
+    @event.url = 'http://google.com'
+    assert @event.valid?
+
+    @event.url = 'https://google.com'
+    assert @event.valid?
+
+    @event.url = '  http://google.com   '
+    assert @event.valid?
+    assert_equal 'http://google.com', @event.url
   end
 
   test 'start date required' do

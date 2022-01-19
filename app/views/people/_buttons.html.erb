@@ -5,7 +5,7 @@
     <%= button_link_to "Publish your assets", "publish", batch_publishing_preview_person_path(@person), 'data-tooltip' => tooltip(tooltip_text_publishing) -%>
   <% if @person.is_in_any_gatekept_projects? %>
     <%= button_link_to "Assets awaiting approval", "waiting", waiting_approval_assets_person_path(@person),
-                       'data-tooltip' => tooltip("The assets you have requested to publish, but are awaiting Gatekeeper approval") -%>
+                       'data-tooltip' => tooltip("The assets you have requested to publish, but are awaiting the #{t('asset_gatekeeper').downcase} approval") -%>
   <% end %>
   <% if @person.is_asset_gatekeeper_of_any_project? %>
     <%= button_link_to "Assets you are Gatekeeping", "waiting", requested_approval_assets_person_path(@person),

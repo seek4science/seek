@@ -59,6 +59,8 @@ class Project < ApplicationRecord
 
   scope :without_programme, -> { where('programme_id IS NULL') }
 
+  auto_strip_attributes :web_page, :wiki_page
+
   validates :web_page, url: {allow_nil: true, allow_blank: true}
   validates :wiki_page, url: {allow_nil: true, allow_blank: true}
 
