@@ -10,11 +10,11 @@ module Seek
     end
 
     def current_users_subscription
-      subscriptions.detect { |ss| ss.person == User.current_user.person }
+      subscriptions.where(person: User.current_user.person).first
     end
 
     def subscribed?(person = User.current_user.person)
-      !subscriptions.detect { |sub| sub.person == person }.nil?
+      subscriptions.where(person: person).any?
     end
 
     def subscribed=(subscribed)
@@ -48,18 +48,15 @@ module Seek
     end
 
     def set_default_subscriptions(projects)
-      unless projects.empty?
-        Person.includes(:project_subscriptions).each do |person|
-          project_subscriptions = person.project_subscriptions
-          project_subscriptions.each do |ps|
-            next unless projects.include? ps.project
-            subscriptions.create(person: person, project_subscription_id: ps.id) if !ps.unsubscribed_types.include?(self.class.name) && !self.subscribed?(person)
-            # also build subscriptions for studies and assays associating with this investigation
-            next unless self.is_a?(Investigation)
-            (studies | assays).each do |item|
-              item.subscriptions << Subscription.create(person: person, project_subscription_id: ps.id) unless item.subscribed?(person)
-            end
-          end
+      ProjectSubscription.includes(:person).where(project_id: projects).find_each do |project_subscription|
+        person = project_subscription.person
+        unless project_subscription.unsubscribed_types.include?(self.class.name) || subscribed?(person)
+          subscriptions.create(person: person, project_subscription: project_subscription)
+        end
+        # also build subscriptions for studies and assays associating with this investigation
+        next unless self.is_a?(Investigation)
+        (studies | assays).each do |item|
+          item.subscriptions.create(person: person, project_subscription_id: project_subscription.id) unless item.subscribed?(person)
         end
       end
     end

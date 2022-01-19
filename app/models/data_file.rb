@@ -27,6 +27,9 @@ class DataFile < ApplicationRecord
   has_many :studied_factors, ->(r) { where('studied_factors.data_file_version =?', r.version) }
   has_many :extracted_samples, class_name: 'Sample', foreign_key: :originating_data_file_id
 
+  has_many :workflow_data_files, dependent: :destroy, autosave: true
+  has_many :workflows, ->{ distinct }, through: :workflow_data_files
+
   scope :with_extracted_samples, -> { joins(:extracted_samples).distinct }
 
   scope :simulation_data, -> { where(simulation_data: true) }
@@ -75,6 +78,21 @@ class DataFile < ApplicationRecord
     end
 
     def event_ids=(_events_ids); end
+  end
+
+  def workflow_data_files_attributes=(attributes)
+    self.workflow_data_files.each do |link|
+      if link.workflow_data_file_relationship
+        link.mark_for_destruction unless attributes.include?({"workflow_id"=>link.workflow.id.to_s,"workflow_data_file_relationship_id"=>link.workflow_data_file_relationship.id.to_s })
+      else
+        link.mark_for_destruction unless attributes.include?({"workflow_id"=>link.workflow.id.to_s})
+      end
+    end
+    attributes.each do |attr|
+      if self.workflow_data_files.where(attr).empty?
+        self.workflow_data_files.build(attr)
+      end
+    end
   end
 
   # Returns the columns to be shown on the table view for the resource

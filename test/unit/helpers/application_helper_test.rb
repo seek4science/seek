@@ -1,55 +1,55 @@
 require 'test_helper'
 
 class ApplicationHelperTest < ActionView::TestCase
+
   test 'persistent_resource_id' do
-    with_config_value(:application_name, 'TEST-TEST-TEST') do # the application name is no longer used, and is just SEEK ID
-      assay = Factory(:assay)
+    assay = Factory(:assay)
+    html = persistent_resource_id(assay)
+    blocks = Nokogiri::HTML::DocumentFragment.parse(html).children.first.children
+    # should be something like
+    # <p class="id">
+    #   <label>SEEK ID: </label>
+    #   <a href="http://localhost:3000/assays/1035386651">http://localhost:3000/assays/1035386651</a>
+    # </p>
+    assert_equal 'strong', blocks.first.name
+    assert_match(/SEEK ID/, blocks.first.children.first.content)
+    assert_equal 'a', blocks.last.name
+    assert_match(/http:\/\/localhost:3000\/assays\/#{assay.id}/, blocks.last['href'])
+    assert_match(/http:\/\/localhost:3000\/assays\/#{assay.id}/, blocks.last.children.first.content)
+
+    versioned_sop = Factory(:sop_version)
+    html = persistent_resource_id(versioned_sop)
+    blocks = Nokogiri::HTML::DocumentFragment.parse(html).children.first.children
+    # should be something like
+    # <p class="id">
+    #   <label>SEEK ID: </label>
+    #   <a href="http://localhost:3000/sops/1055250457?version=2">http://localhost:3000/sops/1055250457?version=2</a>
+    # </p>
+    assert_equal 'strong', blocks.first.name
+    assert_match(/SEEK ID/, blocks.first.children.first.content)
+    assert_equal 'a', blocks.last.name
+    assert_match(/http:\/\/localhost:3000\/sops\/#{versioned_sop.parent.id}\?version=#{versioned_sop.version}/, blocks.last['href'])
+    assert_match(/http:\/\/localhost:3000\/sops\/#{versioned_sop.parent.id}\?version=#{versioned_sop.version}/, blocks.last.children.first.content)
+
+    # handles sub uri
+    with_config_value(:site_base_host, 'http://seek.org/fish') do
       html = persistent_resource_id(assay)
       blocks = Nokogiri::HTML::DocumentFragment.parse(html).children.first.children
-      # should be something like
-      # <p class="id">
-      #   <label>SEEK ID: </label>
-      #   <a href="http://localhost:3000/assays/1035386651">http://localhost:3000/assays/1035386651</a>
-      # </p>
       assert_equal 'strong', blocks.first.name
       assert_match(/SEEK ID/, blocks.first.children.first.content)
       assert_equal 'a', blocks.last.name
-      assert_match(/http:\/\/localhost:3000\/assays\/#{assay.id}/, blocks.last['href'])
-      assert_match(/http:\/\/localhost:3000\/assays\/#{assay.id}/, blocks.last.children.first.content)
+      assert_match(/http:\/\/seek.org\/fish\/assays\/#{assay.id}/, blocks.last['href'])
+      assert_match(/http:\/\/seek.org\/fish\/assays\/#{assay.id}/, blocks.last.children.first.content)
 
-      versioned_sop = Factory(:sop_version)
       html = persistent_resource_id(versioned_sop)
       blocks = Nokogiri::HTML::DocumentFragment.parse(html).children.first.children
-      # should be something like
-      # <p class="id">
-      #   <label>SEEK ID: </label>
-      #   <a href="http://localhost:3000/sops/1055250457?version=2">http://localhost:3000/sops/1055250457?version=2</a>
-      # </p>
       assert_equal 'strong', blocks.first.name
       assert_match(/SEEK ID/, blocks.first.children.first.content)
       assert_equal 'a', blocks.last.name
-      assert_match(/http:\/\/localhost:3000\/sops\/#{versioned_sop.parent.id}\?version=#{versioned_sop.version}/, blocks.last['href'])
-      assert_match(/http:\/\/localhost:3000\/sops\/#{versioned_sop.parent.id}\?version=#{versioned_sop.version}/, blocks.last.children.first.content)
-
-      # handles sub uri
-      with_config_value(:site_base_host, 'http://seek.org/fish') do
-        html = persistent_resource_id(assay)
-        blocks = Nokogiri::HTML::DocumentFragment.parse(html).children.first.children
-        assert_equal 'strong', blocks.first.name
-        assert_match(/SEEK ID/, blocks.first.children.first.content)
-        assert_equal 'a', blocks.last.name
-        assert_match(/http:\/\/seek.org\/fish\/assays\/#{assay.id}/, blocks.last['href'])
-        assert_match(/http:\/\/seek.org\/fish\/assays\/#{assay.id}/, blocks.last.children.first.content)
-
-        html = persistent_resource_id(versioned_sop)
-        blocks = Nokogiri::HTML::DocumentFragment.parse(html).children.first.children
-        assert_equal 'strong', blocks.first.name
-        assert_match(/SEEK ID/, blocks.first.children.first.content)
-        assert_equal 'a', blocks.last.name
-        assert_match(/http:\/\/seek.org\/fish\/sops\/#{versioned_sop.parent.id}\?version=#{versioned_sop.version}/, blocks.last['href'])
-        assert_match(/http:\/\/seek.org\/fish\/sops\/#{versioned_sop.parent.id}\?version=#{versioned_sop.version}/, blocks.last.children.first.content)
-      end
+      assert_match(/http:\/\/seek.org\/fish\/sops\/#{versioned_sop.parent.id}\?version=#{versioned_sop.version}/, blocks.last['href'])
+      assert_match(/http:\/\/seek.org\/fish\/sops\/#{versioned_sop.parent.id}\?version=#{versioned_sop.version}/, blocks.last.children.first.content)
     end
+
   end
 
   def test_join_with_and

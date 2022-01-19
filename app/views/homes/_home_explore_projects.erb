@@ -1,0 +1,56 @@
+<div id="home_explore_projects">
+  <div class="row">
+    <div class="col-md-6" id="recently_added_col">
+      <%= render :partial=>"home_activity_notifications_projects" -%>
+    </div>
+    <div class="col-md-6">
+      <%= panel('Find content', body_options: { id: 'find_content', class: '',}) do %>
+        <% if Seek::Config.tagging_enabled %>
+          <div id="home_explore_projects_tag_cloud">
+            <% cache 'home_explore_projects_tag_cloud', skip_digest: true do -%>
+                <%= render :partial=>"gadgets/tag_cloud_gadget_home" %>
+            <% end -%>
+          </div>
+        <% end %>
+        <div class="row">
+          <% if Seek::Config.programmes_enabled %>
+            <div class="col-md-6">
+              <div style="text-align: center;">
+                <a class="btn btn-primary btn-lg" href="<%=programmes_path %>" role="button" style="white-space: normal; width: 100%;"> Browse programmes <br> <img src="assets/avatars/avatar-programme.png" class="mini-resource-list-avatar" style="height:100px"></a>
+              </div>
+              <br>
+            </div>
+            <div class="col-md-6">
+          <% else %>
+            <div class="col-md-12">
+          <% end %>
+            <div style="text-align: center;">
+              <a class="btn btn-primary btn-lg" href="<%=projects_path %>" role="button" style="white-space: normal; width: 100%;"> Browse projects <br> <img src="assets/avatars/avatar-project.png" class="mini-resource-list-avatar" style="height:100px"></a>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<script>
+  $j(document).ready(function () {
+    /**
+     * Sets the #recently_added panel to the same height as #find_content, so they are consistent
+     * in 2 column view. #recently_added_col is necessary to compute the width value with respect
+     * to the row
+     */
+    function setLatestAdditionsHeight () {
+      // Hackish way to determine if bootstrap is displaying a single column
+      var parent_col_width = ( 100 * parseFloat($j('#recently_added_col').css('width')) / parseFloat($j('#recently_added_col').parent().css('width')));
+      if (parent_col_width !=100){
+        $j('#recently_added').css({'height': $j('#find_content').outerHeight(),"max-height":"none"})
+      }else{
+        $j('#recently_added').css({'height': '',"max-height":""})
+      }
+    };
+    setLatestAdditionsHeight();
+    $j(window).resize(function() {setLatestAdditionsHeight();});
+  });
+</script>

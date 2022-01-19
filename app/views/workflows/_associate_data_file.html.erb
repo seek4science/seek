@@ -1,0 +1,72 @@
+<%
+  return unless Seek::Config.data_files_enabled
+
+  resource_text ||= text_for_resource(resource)
+  field_name = "#{resource.class.name.underscore}[workflow_data_files_attributes]"
+
+  collapse_panel = resource.data_files.empty?
+  associated_data_files_json = associations_json_from_workflow_to_data_files(resource.workflow_data_files)
+
+-%>
+
+<%= folding_panel("#{t('data_file').pluralize}", collapse_panel, :body_options => { :id => 'associate_data_file_fold_content' },
+                  :help_text => "Here you associate #{t('data_file').pluralize} in SEEK to this #{resource_text}.") do %>
+
+  <p>The following <%= t('data_file').pluralize %> are associated with this <%= resource_text -%>:</p>
+
+
+  <%= associations_list('data_file_to_list', 'associations/workflow_data_file', associated_data_files_json,
+                        'data-field-name' => field_name,
+                        empty_text: "No #{t('data_file').pluralize}") %>
+
+  <hr/>
+
+  <%= association_selector('data_file_to_list', "Associate #{t('data_file').pluralize}", "Associate #{t('data_file').pluralize}", size: 'md') do %>
+
+    <div class="form-group">
+      <%= label_tag "How are the #{t('data_file').pluralize} related to this #{resource_text}?" %>
+      <%= select_tag :workflow_data_file_relationship, options_for_select(WorkflowDataFileRelationship.all.collect { |r| [r.title, r.id] }),
+                     include_blank: 'Not specified', class: 'form-control', 'data-role' => 'seek-association-common-field'
+      %>
+    </div>
+
+    <hr/>
+
+    <label>Select <%= t('data_file').pluralize %></label>
+    <div class="form-group" data-role="seek-association-filter-group" data-filter-url="<%= filter_data_files_path(workflow_id: resource.id) -%>">
+      <%= association_select_filter %>
+
+      <div class="checkbox">
+        <label>
+          <%= check_box_tag(:all_projects, '1', false, 'data-role' => 'seek-association-filter-field') %>
+          <strong>Show <%= t('data_file').pluralize %> from all <%= t('project').downcase.pluralize -%>?</strong>
+        </label>
+      </div>
+
+      <%= association_select_results(multiple: true) %>
+    </div>
+
+  <% end %>
+<% end %>
+
+
+<script>
+    $j(document).ready(function () {
+
+        $j('#modalAssociateData #workflow_data_file_relationship').change(function () {
+            $j('#modalAssociateData [data-role="seek-association-filter-group"]').data('filterGroup').filter();
+        });
+
+        // override from association.js
+        Associations.List.prototype.findDuplicate = function (association) {
+            return this.items.find(function (item) {
+                var relationship = ''
+                if (item.data.workflow_data_file_relationship != null) {
+                    relationship = item.data.workflow_data_file_relationship.value;
+                }
+                return item.data.id === association.id && association.workflow_data_file_relationship.value == relationship;
+            });
+        }
+    });
+</script>
+

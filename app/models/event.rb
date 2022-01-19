@@ -12,6 +12,7 @@ class Event < ApplicationRecord
   include Seek::Search::CommonFields
   include Seek::Search::BackgroundReindexing
   include Seek::BioSchema::Support
+  include Seek::Collectable
 
   searchable(ignore_attribute_changes_of: [:updated_at], auto_index: false) do
     text :address, :city, :country, :url

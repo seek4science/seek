@@ -3,7 +3,7 @@ module Scrapers
     def self.bot_account
       @bot = Person.where(email: Seek::Config.noreply_sender).first
       unless @bot
-        @bot = Person.new(first_name: Seek::Config.application_name,
+        @bot = Person.new(first_name: Seek::Config.instance_name,
                           last_name: 'Bot',
                           email: Seek::Config.noreply_sender)
         disable_authorization_checks { @bot.save! }

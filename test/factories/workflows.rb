@@ -168,3 +168,8 @@ Factory.define(:monitored_workflow, parent: :workflow) do |f|
     workflow.latest_version.update_column(:monitored, true)
   end
 end
+
+Factory.define(:test_data_workflow_data_file_relationship, class: WorkflowDataFileRelationship) do |f|
+  f.title 'Test data'
+  f.key 'test'
+end

@@ -3,7 +3,7 @@ def load_seek_testing_defaults!
     silence_warnings do
       Settings.defaults[:is_virtualliver] = false
       Settings.defaults[:project_hierarchy_enabled] = true
-      Settings.defaults[:project_name] = 'Sysmo'
+      Settings.defaults[:instance_name] = 'Sysmo SEEK'
 
       Settings.defaults[:noreply_sender] ="no-reply@sysmo-db.org"
       Settings.defaults[:support_email_address] = 'support@seek.org'
@@ -27,6 +27,8 @@ def load_seek_testing_defaults!
       Settings.defaults[:magic_guest_enabled] = false
       Settings.defaults[:modelling_analysis_enabled] = true
       Settings.defaults[:show_as_external_link_enabled] = false
+      Settings.defaults[:allow_publications_fulltext] = true
+      Settings.defaults[:allow_edit_of_registered_publ] = false
       Settings.defaults[:factors_studied_enabled] = true
       Settings.defaults[:experimental_conditions_enabled] = true
       Settings.defaults[:programme_user_creation_enabled] = true
@@ -48,15 +50,17 @@ def load_seek_testing_defaults!
       Settings.defaults[:samples_enabled] = true
       Settings.defaults[:workflows_enabled] = true
 
-      Settings.defaults[:project_link] = 'http://www.sysmo.net'
-      Settings.defaults[:application_name] = 'Sysmo SEEK'
-      Settings.defaults[:dm_project_name] = "SysMO-DB"
-      Settings.defaults[:dm_project_link] = "http://www.sysmo-db.org"
-      Settings.defaults[:project_type] = 'Consortium'
+      Settings.defaults[:instance_link] = 'http://www.sysmo.net'
+      Settings.defaults[:application_name] = 'FAIRDOM-SEEK'
+      Settings.defaults[:instance_admins_name] = "SysMO-DB"
+      Settings.defaults[:instance_admins_link] = "http://www.sysmo-db.org"
       Settings.defaults[:header_image_enabled] = true
       Settings.defaults[:header_image_title] =  "SysMO-DB"
       Settings.defaults[:header_image_link] = "http://www.sysmo-db.org"
       Settings.defaults[:bioportal_api_key]="fish"
+
+      Settings.defaults[:about_instance_link_enabled] = true
+      Settings.defaults[:about_instance_admins_link_enabled] = true
 
       Settings.defaults[:technology_type_ontology_file] = "file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
       Settings.defaults[:modelling_analysis_type_ontology_file] = "file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
