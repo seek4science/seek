@@ -30,7 +30,8 @@ module TemplatesHelper
             iri: attribute.iri,
             required: attribute.required,
             unit_id: attribute.unit_id,
-            pos: attribute.pos
+            pos: attribute.pos,
+            isa_tag_id: attribute.isa_tag_id
           }
         }
       }

@@ -92,6 +92,7 @@
 
   <td>
     <div class="btn-group" data-toggle="buttons">
+      <%= hidden_field_tag "#{field_name_prefix}[isa_tag_id]",nil,  data: { attr: "isa_tag_id" }  %>
       <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', autocomplete: 'off' %>
       <label class="btn btn-danger">
         Remove

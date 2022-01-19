@@ -9,9 +9,9 @@ Templates.clearContext = function () {
 
 Templates.init = function (elem) {
   const columnDefs = [
-    { orderable: false, targets: [0, 7, 10] },
+    { orderable: false, targets: [0, 7, 11] },
     {
-      targets: [3, 4, 9],
+      targets: [3, 4, 9, 10],
       visible: false,
       searchable: false
     },
@@ -45,6 +45,7 @@ Templates.init = function (elem) {
     },
     { title: "IRI", width: "10%" },
     { title: "pos" },
+    { title: "isa_tag_id" },
     {
       title: "Remove",
       width: "5%",
@@ -111,7 +112,8 @@ Templates.mapData = (data) =>
     item.data_type,
     item.is_title,
     item.iri,
-    item.pos
+    item.pos,
+    item.isa_tag_id
   ]);
 
 function loadFilterSelectors(data) {
@@ -172,6 +174,7 @@ const applyTemplate = () => {
     $j(newRow).find('[data-attr="unit"]').val(row[5]);
     $j(newRow).find(".sample-type-is-title").prop("checked", row[7]);
     $j(newRow).find('[data-attr="iri"]').val(row[8]);
+    $j(newRow).find('[data-attr="isa_tag_id"]').val(row[10]);
 
     // Show the CV block if cv_id is not empty
     if (row[4]) $j(newRow).find(".controlled-vocab-block").show();
