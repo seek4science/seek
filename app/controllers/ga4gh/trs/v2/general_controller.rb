@@ -30,6 +30,10 @@ module Ga4gh
         def tool_classes
           respond_with([ToolClass::WORKFLOW], adapter: :attributes)
         end
+
+        def organizations
+          respond_with(Project.pluck(:title), adapter: :attributes)
+        end
       end
     end
   end
