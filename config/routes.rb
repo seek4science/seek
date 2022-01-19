@@ -21,6 +21,8 @@ SEEK::Application.routes.draw do
         get 'tools/:id/versions/:version_id/:type/tests' => 'tool_versions#tests'
         get 'toolClasses' => 'general#tool_classes'
         get 'service-info' => 'general#service_info'
+        get 'extended/workflows/:organization' => 'tools#index'
+        get 'extended/organizations' => 'general#organizations'
       end
     end
   end
