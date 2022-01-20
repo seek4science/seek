@@ -16,6 +16,7 @@ namespace :seek do
     update_missing_publication_versions
     db:seed:013_edam_formats
     db:seed:014_edam_data
+    remove_orphaned_versions
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -79,6 +80,21 @@ namespace :seek do
       end
     end
     puts " ... finished creating missing publications versions for #{create.to_s} publications"
+  end
+
+  task(remove_orphaned_versions: [:environment]) do
+    puts 'Removing orphaned versions ...'
+    count = 0
+    types = [DataFile::Version, Document::Version, Sop::Version, Model::Version, Node::Version, Presentation::Version,
+             Sop::Version, Workflow::Version]
+    disable_authorization_checks do
+      types.each do |type|
+        found = type.all.select { |v| v.parent.nil? }
+        count += found.length
+        found.each(&:destroy)
+      end
+    end
+    puts "... finished removing #{count} orphaned versions"
   end
   
 end

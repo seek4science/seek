@@ -374,7 +374,6 @@ class PublicationsControllerTest < ActionController::TestCase
     publication.save
 
     get :show, params: { id: publication.id }
-    puts response.body
     assert_response :success
   end
 
@@ -1045,9 +1044,10 @@ class PublicationsControllerTest < ActionController::TestCase
   end
 
   test 'query authors for initialization' do
-    FactoryGirl.create_list(:publication_with_author, 6)
+    FactoryGirl.create_list(:publication_with_author, 5)
+    Factory.create(:publication_with_author, publication_authors:[Factory(:publication_author, first_name:'Existing', last_name:'Author')])
     query_authors = {
-      '0' => { full_name: 'Author2 Last' }, # Existing author-> should return 1
+      '0' => { full_name: 'Existing Author' }, # Existing author-> should return 1
       '1' => { full_name: 'NewAuthor ShouldBeCreated' } # New author (i.e. not found)
     }
     get :query_authors, format: :json, as: :json, params: { authors: query_authors }
@@ -1058,8 +1058,8 @@ class PublicationsControllerTest < ActionController::TestCase
     assert authors[0].key?('first_name'), 'missing author first name'
     assert authors[0].key?('last_name'), 'missing author last name'
     assert authors[0].key?('count'), 'missing author publication count'
-    assert_equal 'Author2', authors[0]['first_name']
-    assert_equal 'Last', authors[0]['last_name']
+    assert_equal 'Existing', authors[0]['first_name']
+    assert_equal 'Author', authors[0]['last_name']
     assert_nil authors[0]['person_id']
     assert_equal 1, authors[0]['count']
 
