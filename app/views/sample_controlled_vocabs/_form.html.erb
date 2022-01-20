@@ -70,9 +70,9 @@
             <%= f.fields_for :sample_controlled_vocab_terms, term do |terms_f| %>
 
               <tr class="sample-cv-term" data-index="<%= index %>">
-                <td><%= terms_f.text_field :label, :class => 'form-control', disabled:term.ontology_based? %></td>
-                <td><%= terms_f.text_field :iri, :class => 'form-control', disabled:term.ontology_based? %></td>
-                <td><%= terms_f.text_field :parent_iri, :class => 'form-control', disabled:term.ontology_based? %></td>
+                <td><%= terms_f.text_field :label, :class => 'form-control', readonly:term.ontology_based? %></td>
+                <td><%= terms_f.text_field :iri, :class => 'form-control', readonly:term.ontology_based? %></td>
+                <td><%= terms_f.text_field :parent_iri, :class => 'form-control', readonly:term.ontology_based? %></td>
                 <td>
                   <div class="btn-group" data-toggle="buttons">
                     <%= hidden_field_tag "sample_controlled_vocab[sample_controlled_vocab_terms_attributes][#{index}][_destroy]", '0', :autocomplete => 'off' %>

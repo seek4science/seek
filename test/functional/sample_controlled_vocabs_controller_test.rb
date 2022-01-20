@@ -242,7 +242,7 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
 
     assert_select 'table#new-terms' do
       assert_select 'tr.sample-cv-term input[type=text]', count:cv.sample_controlled_vocab_terms.length * 3 do |input|
-        assert input.attr('disabled').present?
+        assert input.attr('readonly').present?
       end
     end
 
@@ -262,7 +262,7 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
 
     assert_select 'table#new-terms' do
       assert_select 'tr.sample-cv-term input[type=text]', count:cv.sample_controlled_vocab_terms.length * 3 do |input|
-        assert input.attr('disabled').nil?
+        assert input.attr('readonly').nil?
       end
     end
 
