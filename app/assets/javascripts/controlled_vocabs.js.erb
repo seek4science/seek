@@ -135,6 +135,23 @@ CVTerms = {
             }
         });
     },
+    disableAddTermButton: function(reason) {
+        $j('a#add-term').attr('disabled', true);
+        if (!$j('a#add-term').parent().is('span')) {
+            let span = $j('a#add-term').wrap('<span />').parent();
+            $j(span).attr('data-tooltip', reason);
+            bindTooltips('div#controlled-vocab-terms');
+            $j(span).click(function () {
+                alert(reason);
+            });
+        }
+    },
+    enableAddTermButton: function() {
+        let button = $j('a#add-term');
+        button.attr('disabled',false);
+        button.removeClass('disabled');
+        button.unwrap('span');
+    },
     // sets up and trigger the ajax call to fetch the terms list
     fetchTermsAJAX: function () {
         $j('div#controlled-vocab-terms').hide();
@@ -194,10 +211,10 @@ CVTerms = {
             if (selected.value == "") {
                 $j('#sample_controlled_vocab_ols_root_term_uri').val('');
                 $j('#ontology-root-uri').hide();
-                $j('a#add-term').attr('disabled',false);
+                CVTerms.enableAddTermButton();
             } else {
                 $j('#ontology-root-uri').show();
-                $j('a#add-term').attr('disabled',true);
+                CVTerms.disableAddTermButton('<%= I18n.t('controlled_vocabs.add_new_term_disabled_reason') %>');
                 var link = $j('a#selected-ols-link');
                 link.text(selected.text);
                 link.attr('href', 'https://www.ebi.ac.uk/ols/ontologies/' + selected.value);

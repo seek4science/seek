@@ -94,7 +94,11 @@
         </table>
       </div>
       <div>
-        <%= button_link_to('Add new term', 'add', '#', :id => 'add-term', disabled:@sample_controlled_vocab.ontology_based?) %>
+        <%
+          options = {id: 'add-term'}
+          options.merge!({disabled:true, disabled_reason:t('controlled_vocabs.add_new_term_disabled_reason')}) if @sample_controlled_vocab.ontology_based?
+        %>
+        <%= button_link_to('Add new term', 'add', '#', options) %>
         <%= button_link_to('Remove all terms', 'destroy', '#', :id => 'clear-terms', class:'btn btn-danger') %>
       </div>
     </div>
