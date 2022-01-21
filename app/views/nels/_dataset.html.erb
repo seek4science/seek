@@ -11,23 +11,26 @@
 <ul class="list-group">
   <% @dataset['subtypes'].each do |subtype| %>
       <li class="list-group-item">
-        <%= form_tag(register_assay_nels_path(params[:assay_id]), method: :post) do %>
+        <%= subtype['type'] %> <span class="subtle">(<%= number_to_human_size(subtype['size']) %>)</span>
+        <%= button_link_to('Add metadata', 'add', nil, { id: "add_metadata_"+params[:project_id]+"_"+params[:dataset_id]+"_"+subtype['type'], class:"add_metadata"} ) %>
+
+        <% if subtype["metadata"] %>
+          <%= button_link_to('Download metadata', 'download', {:action => :get_metadata,
+            :project_id => params[:project_id],:dataset_id => params[:dataset_id],:subtype_name => subtype['type']},
+            method: :get) %>
+        <% end %>
+
+        <%= form_tag(register_assay_nels_path(params[:assay_id]), method: :post, class: 'pull-right') do %>
             <%= hidden_field_tag('project_id', params[:project_id]) %>
             <%= hidden_field_tag('dataset_id', params[:dataset_id]) %>
             <%= hidden_field_tag('subtype_name', subtype['type']) %>
-            <%= subtype['type'] %> <span class="subtle">(<%= number_to_human_size(subtype['size']) %>)</span>
-            <%= button_link_to('Add metadata', 'add', nil, { id: "add_metadata_"+ subtype['type'], class:"add_metadata"} ) %>
-            <% if subtype["metadata"] %>
-              <%= button_link_to('Download metadata', 'download', {:action => :get_metadata,
-                :project_id => params[:project_id],:dataset_id => params[:dataset_id],:subtype_name => subtype['type']},
-                method: :get) %>
-            <% end %>
-            <%= submit_tag('Register', class: 'btn btn-primary btn-xs pull-right') %>
+            <%= submit_tag('Register', class: 'btn btn-primary btn-xs') %>
         <% end %>
       </li>
   <% end %>
 </ul>
 
+<%# TODO: Check app\assets\javascripts\validation.js as it doesn't interrupt flow if invalid%>
 <%= modal(id: 'upload-file', size: 'm', class: 'text-left') do %>
   <%= form_tag({:action => :add_metadata}, :multipart => true) do %>
     <%= modal_header('Add metadata') %>
@@ -36,7 +39,7 @@
     <% end %>
     <%= modal_footer do %>
       <%= create_button id:"data_file_submit_btn",
-                          onclick:"return validateResourceFields('data_file');",
+                          onclick:"return validateResourceFields('data_file_xlsx');",
                           class:'btn btn-primary' %>
       <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
 
@@ -47,11 +50,13 @@
 <script>
   $j(document).ready(function () {
     $j('.add_metadata').on('click', function () {
-      // alert("adding metadata");
+      // Show upload file form and populate the params as hidden fields
       $j('#upload-file').modal('show');
-      // var form = $j('#upload-file form');
-      // // var collectionId = $j(this).data('collectionId');
-      // // form.attr('action', form.attr('action').replace('-collection-id-', collectionId));
+      button_id = $j(this).attr('id')
+
+      $j('#upload-file form').append(`<input type="hidden" name="project_id" value="${button_id.split("_")[2]}" />`);
+      $j('#upload-file form').append(`<input type="hidden" name="dataset_id" value="${button_id.split("_")[3]}" />`);
+      $j('#upload-file form').append(`<input type="hidden" name="subtype_name" value="${button_id.split("_")[4]}" />`);
 
       return false;
     });

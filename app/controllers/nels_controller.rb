@@ -62,6 +62,7 @@ class NelsController < ApplicationController
     puts params.inspect
     puts params["content_blobs"][0]["data"].path
     @rest_client.upload_metadata(params[:project_id].to_i, params[:dataset_id].to_i,params[:subtype_name], params["content_blobs"][0]["data"].path)
+    redirect_to action: "index"
   end
 
   def projects

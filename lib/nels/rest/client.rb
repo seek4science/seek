@@ -72,9 +72,9 @@ module Nels
       end
 
       def upload_metadata(project_id, dataset_id, subtype_name, file_path)
-        ## TODO: start job to send data
-        # perform("sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/metadata", :post,
-        #   body: { file: File.new(file_path)})
+        perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/metadata", :post,
+          :body => IO.read(file_path),
+          :content_type => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
       end
 
       private
