@@ -1,54 +1,64 @@
-<%= render :partial => "general/item_title",:locals => {:item=>@programme, :buttons_partial => 'programmes/buttons'} %>
+<%= render partial: 'general/show_page_tab_definitions' %>
+
+<div class="tab-content">
+  <div id="details" class="tab-pane fade in active">
+
+    <%= render :partial => "general/item_title",:locals => {:item=>@programme, :buttons_partial => 'programmes/buttons'} %>
 
 
-<div class="row">
-  <div class="col-md-9 col-sm-8 box_about_actor">
+    <div class="row">
+      <div class="col-md-9 col-sm-8 box_about_actor">
 
-    <%= render :partial=>"activation_status" %>
+        <%= render :partial=>"activation_status" %>
 
-    <%=  item_description @programme.description -%>
+        <%=  item_description @programme.description -%>
 
-    <p>
-      <strong>Web page:</strong>
-      <%= text_or_not_specified(@programme.web_page,:external_link=>true) %>
-    </p>
-
-    <% if logged_in_and_registered? %>
-
-        <p class="programme_administrators">
-          <strong><%= t('programme') %> Administrators:</strong>
-          <%= programme_administrator_link_list @programme -%>
+        <p>
+          <strong>Web page:</strong>
+          <%= text_or_not_specified(@programme.web_page,:external_link=>true) %>
         </p>
 
-    <% end %>
+        <% if logged_in_and_registered? %>
 
-    <%= show_funding_codes(@programme) %>
+            <p class="programme_administrators">
+              <strong><%= t('programme') %> Administrators:</strong>
+              <%= programme_administrator_link_list @programme -%>
+            </p>
 
-    <strong>Funding details:</strong>
-    <div class="well well-sm">
-      <%= text_or_not_specified(@programme.funding_details, :description=>true,:auto_link=>true, :none_text=>"No funding details specified") %>
+        <% end %>
+
+        <%= show_funding_codes(@programme) %>
+
+        <strong>Funding details:</strong>
+        <div class="well well-sm">
+          <%= text_or_not_specified(@programme.funding_details, :description=>true,:auto_link=>true, :none_text=>"No funding details specified") %>
+        </div>
+
+        <% if @programme.allows_user_projects? %>
+          <strong><%= "Allows #{"Users"} to create #{"Projects"}" %></strong>
+        <% end %>
+      </div>
+
+      <div class="col-md-3 col-sm-4">
+        <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @programme } -%>
+
+        <% if @programme.is_discussable? -%>
+          <% if @programme.discussion_links.select{|link| link.url.present?}.any?  %>
+            <%= render partial: 'assets/discussion_links_box', locals: {resource: @programme } -%>
+          <% end -%>
+         <% end -%>
+
+        <% if @programme.can_manage? -%>
+            <%= render :partial => 'general/storage_usage_box', locals: { programme: @programme,
+                                                                          url: storage_report_programme_path(@programme)} %>
+        <% end %>
+      </div>
     </div>
-
-    <% if @programme.allows_user_projects? %>
-      <strong><%= "Allows #{"Users"} to create #{"Projects"}" %></strong>
-    <% end %>
   </div>
 
-  <div class="col-md-3 col-sm-4">
-    <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @programme } -%>
-
-    <% if @programme.is_discussable? -%>
-      <% if @programme.discussion_links.select{|link| link.url.present?}.any?  %>
-        <%= render partial: 'assets/discussion_links_box', locals: {resource: @programme } -%>
-      <% end -%>
-     <% end -%>
-
-    <% if @programme.can_manage? -%>
-        <%= render :partial => 'general/storage_usage_box', locals: { programme: @programme,
-                                                                      url: storage_report_programme_path(@programme)} %>
-    <% end %>
+  <div id="related-items" class="tab-pane fade">
+    <%# get, classify and authorize all assets for this project -%>
+    <%= render :partial=>"general/items_related_to",:object => @programme %>
   </div>
+
 </div>
-
-<%# get, classify and authorize all assets for this project -%>
-<%= render :partial=>"general/items_related_to",:object => @programme %>
