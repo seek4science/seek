@@ -1,13 +1,5 @@
-<ul class="nav nav-tabs">
-  <li class="active ">
-    <a data-toggle="tab" href="#details"><i class="glyphicon glyphicon-list-alt"></i> Details</a>
-  </li>
-  <li>
-      <a data-toggle="tab" href="#related-items">
-          <i class="glyphicon glyphicon-th-list"></i> Related items
-      </a>
-  </li>
-</ul>
+<%= render partial: 'general/show_page_tab_definitions' %>
+
 <div class="tab-content">
 
     <div id="details" class="tab-pane fade in active">
@@ -153,7 +145,6 @@
     </div>
 
     <div id="related-items" class="tab-pane fade">
-      <%# get, classify and authorize all assets for this project -%>
       <%= render :partial=>"general/items_related_to",:object => @project %>  
     </div>
 

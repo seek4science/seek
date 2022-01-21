@@ -96,6 +96,8 @@ CVTerms = {
             var row = $j('table#new-terms tr.sample-cv-term').last();
             var inputs = $j(row).find('td input');
 
+            $j(inputs).prop('readonly',true);
+
             //inputs 0,1,2 are label, iri, and parent_iri
             $j(inputs[0]).val(term.label);
             $j(inputs[1]).val(term.iri);
@@ -132,6 +134,23 @@ CVTerms = {
                 $j(this).trigger('change');
             }
         });
+    },
+    disableAddTermButton: function(reason) {
+        $j('a#add-term').attr('disabled', true);
+        if (!$j('a#add-term').parent().is('span')) {
+            let span = $j('a#add-term').wrap('<span />').parent();
+            $j(span).attr('data-tooltip', reason);
+            bindTooltips('div#controlled-vocab-terms');
+            $j(span).click(function () {
+                alert(reason);
+            });
+        }
+    },
+    enableAddTermButton: function() {
+        let button = $j('a#add-term');
+        button.attr('disabled',false);
+        button.removeClass('disabled');
+        button.unwrap('span');
     },
     // sets up and trigger the ajax call to fetch the terms list
     fetchTermsAJAX: function () {
@@ -192,8 +211,10 @@ CVTerms = {
             if (selected.value == "") {
                 $j('#sample_controlled_vocab_ols_root_term_uri').val('');
                 $j('#ontology-root-uri').hide();
+                CVTerms.enableAddTermButton();
             } else {
                 $j('#ontology-root-uri').show();
+                CVTerms.disableAddTermButton('<%= I18n.t('controlled_vocabs.add_new_term_disabled_reason') %>');
                 var link = $j('a#selected-ols-link');
                 link.text(selected.text);
                 link.attr('href', 'https://www.ebi.ac.uk/ols/ontologies/' + selected.value);

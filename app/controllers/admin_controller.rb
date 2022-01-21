@@ -273,6 +273,13 @@ class AdminController < ApplicationController
     Seek::Config.pubmed_api_email = pubmed_email if pubmed_email == '' || pubmed_email_valid
     Seek::Config.crossref_api_email = crossref_email if crossref_email == '' || crossref_email_valid
 
+    if params[:session_store_timeout]
+      mins = params[:session_store_timeout].to_i
+      if mins >= 1
+        Seek::Config.session_store_timeout = mins.minutes
+      end
+    end
+
     Seek::Config.bioportal_api_key = params[:bioportal_api_key]
     Seek::Config.sabiork_ws_base_url = params[:sabiork_ws_base_url] unless params[:sabiork_ws_base_url].nil?
     Seek::Config.recaptcha_enabled = string_to_boolean params[:recaptcha_enabled]

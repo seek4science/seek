@@ -441,12 +441,12 @@ class AdminControllerTest < ActionController::TestCase
 
   test 'email settings preserved if not sent' do
 
-    Seek::Config.set_smtp_settings('address', 'smtp.address.org')
+    Seek::Config.set_smtp_settings('address', 'smtp.address.org') 
     Seek::Config.set_smtp_settings('port', 1)
     Seek::Config.set_smtp_settings('domain', 'the-domain')
     Seek::Config.set_smtp_settings('authentication', 'auth')
     Seek::Config.set_smtp_settings('user_name', 'fred')
-    Seek::Config.set_smtp_settings('password', 'blogs')
+    Seek::Config.set_smtp_settings('password', 'blogs') 
     Seek::Config.set_smtp_settings('enable_starttls_auto', true)
 
     with_config_value(:support_email_address, 'support@email.com') do
@@ -501,6 +501,22 @@ class AdminControllerTest < ActionController::TestCase
     with_config_value(:allow_publications_fulltext, true) do
       post :update_settings, params: { allow_publications_fulltext: '0' }
       assert_equal false, Seek::Config.allow_publications_fulltext
+    end
+  end
+
+  test 'update session store timeout' do
+    with_config_value(:session_store_timeout, 10.minutes) do
+      get :settings
+
+      assert_response :success
+      assert_select 'input#session_store_timeout',value:'10'
+
+      post :update_settings, params: {session_store_timeout:'60'}
+      assert_equal 1.hour, Seek::Config.session_store_timeout
+
+      # ignores if not a valid integer
+      post :update_settings, params: {session_store_timeout:'fish'}
+      assert_equal 1.hour, Seek::Config.session_store_timeout
     end
   end
 
