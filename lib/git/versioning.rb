@@ -68,8 +68,7 @@ module Git
 
           def sync_resource_attributes
             version = latest_git_version
-            return unless version&.mutable?
-            version.sync_resource_attributes
+            version&.sync_resource_attributes
           end
 
           def build_initial_git_version

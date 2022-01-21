@@ -523,4 +523,25 @@ class WorkflowTest < ActiveSupport::TestCase
     assert(terms.any? { |t| t.include?('unique_string_banana') })
     refute(terms.any? { |t| t.include?('unique_string_grapefruit') })
   end
+
+  test 'updating workflow synchronizes metadata on git version' do
+    workflow = Factory(:annotationless_local_git_workflow, workflow_class: Factory(:unextractable_workflow_class))
+    assert workflow.git_version.mutable
+    disable_authorization_checks do
+      workflow.update_attributes!(title: 'new title')
+      assert_equal 'new title', workflow.reload.title
+      assert_equal 'new title', workflow.git_version.reload.title
+    end
+  end
+
+  test 'updating workflow synchronizes metadata on immutable git version' do
+    workflow = Factory(:annotationless_local_git_workflow, workflow_class: Factory(:unextractable_workflow_class))
+    disable_authorization_checks do
+      workflow.git_version.lock
+      refute workflow.git_version.mutable
+      workflow.update_attributes!(title: 'new title')
+      assert_equal 'new title', workflow.reload.title
+      assert_equal 'new title', workflow.git_version.reload.title
+    end
+  end
 end
