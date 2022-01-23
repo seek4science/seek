@@ -90,11 +90,6 @@ module Nels
         end
         args << opts
 
-        # TODO: debugging logs, remove
-        puts base
-        puts path
-        puts args
-
         # 404 and 302 exceptions have to be caught, as they are valid responses from NeLS
         begin
           response = base[path].send(*args)
@@ -108,8 +103,6 @@ module Nels
         #   return response
         end
 
-        puts "response"
-        puts response
         return response if opts[:skip_parse]
 
         JSON.parse(response) unless response.empty?
