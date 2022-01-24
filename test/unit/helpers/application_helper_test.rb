@@ -330,9 +330,11 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal "<p>Hello\nWorld</p>\n<blockquote>\n<p>quote</p>\n</blockquote>\n", text_or_not_specified("Hello\nWorld\n\n> quote", markdown: true).to_s
     assert_equal "<p>Hello\nWorld</p>\n<blockquote>\n<p>quote</p>\n</blockquote>\n", text_or_not_specified("Hello</div></div></div>\nWorld\n\n> quote", markdown: true).to_s
     assert_equal "<p><i>Hello</i>\n<b>World</b></p>\n<blockquote>\n<p>quote</p>\n</blockquote>\n", text_or_not_specified("<i>Hello</i></div></div></div>\n<b>World</b>\n\n> quote", markdown: true).to_s
+    assert_equal "<p>alert('hi');</p>\n<blockquote>\n<p>quote</p>\n</blockquote>\n", text_or_not_specified("<script>alert('hi');</script>\n\n> quote", markdown: true).to_s
 
     assert_equal "&gt; quote", text_or_not_specified("> quote", markdown: false).to_s
     assert_equal "Hello\nWorld\n\n&gt; quote", text_or_not_specified("Hello</div></div></div>\nWorld\n\n> quote", markdown: false).to_s
     assert_equal "<i>Hello</i>\n<b>World</b>\n\n&gt; quote", text_or_not_specified("<i>Hello</i></div></div></div>\n<b>World</b>\n\n> quote", markdown: false).to_s
+    assert_equal "alert('hi');\n\n&gt; quote", text_or_not_specified("<script>alert('hi');</script>\n\n> quote", markdown: false).to_s
   end
 end
