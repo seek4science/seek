@@ -147,7 +147,6 @@ module ApiTestHelper
   end
 
   def test_should_delete_object
-    skip "Should be fixed"
     begin
       obj = Factory(@clz.to_sym, contributor: @current_person)
     rescue NoMethodError
@@ -226,7 +225,6 @@ module ApiTestHelper
   end
 
   def test_update
-    skip "Should be fixed"
     begin
       create_patch_values
     rescue NameError
