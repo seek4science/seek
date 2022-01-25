@@ -209,7 +209,6 @@ class AdminController < ApplicationController
     Seek::Config.issue_tracker = params[:issue_tracker]
 
     Seek::Config.header_image_enabled = string_to_boolean params[:header_image_enabled]
-    Seek::Config.header_image_link = params[:header_image_link]
     Seek::Config.header_image_title = params[:header_image_title]
     header_image_file
 

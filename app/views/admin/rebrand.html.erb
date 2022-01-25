@@ -33,18 +33,15 @@
 
   <%= panel('Header image', help_text:'Customize the image at the top left of the page') do %>
     <%= admin_checkbox_setting(:header_image_enabled, 1, Seek::Config.header_image_enabled,
-                               "Header logo image enabled", "Whether a header logo image appears on the right in the header.",
+                               "Header logo image enabled", "Whether a header logo image appears on the left in the header.",
                                :onchange => toggle_appear_javascript('header_image_details')) %>
 
     <div id="header_image_details" class="additional_settings" style="<%= show_or_hide_block Seek::Config.header_image_enabled -%>">
       <%= admin_file_setting(:header_image_file,
                              'Upload a header logo image file', 'The file for the header logo image. It should be a valid image file, such as JPEG or PNG.') %>
 
-      <%= admin_text_setting(:header_image_link, Seek::Config.header_image_link,
-                             "Header image link", "A URL that is used as the link in the header image.") %>
-
       <%= admin_text_setting(:header_image_title, Seek::Config.header_image_title,
-                             "Header image title", "A title for the header image.") %>
+                             "Header image alternative title", "An alternative title for the header image, if the image for some reason cannot be displayed") %>
     </div>
   <% end %>
 
