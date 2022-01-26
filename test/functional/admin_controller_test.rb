@@ -363,7 +363,6 @@ class AdminControllerTest < ActionController::TestCase
     assert_equal 'instance admins name', Seek::Config.instance_admins_name
     assert_equal 'http://dm-project-link.com', Seek::Config.instance_admins_link
     assert_equal 'https://issues-galore.com', Seek::Config.issue_tracker
-    assert_equal 'http://header-link.com/image.jpg', Seek::Config.header_image_link
     assert_equal 'header image title', Seek::Config.header_image_title
     assert_equal 'copyright content', Seek::Config.copyright_addendum_content
     assert_equal 'imprint description', Seek::Config.imprint_description
