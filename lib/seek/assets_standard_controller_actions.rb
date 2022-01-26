@@ -33,6 +33,7 @@ module Seek
         format.xml
         format.rdf { render template: 'rdf/show' }
         format.json { render json: asset, scope: { requested_version: params[:version] }, include: json_api_include_param }
+        format.datacite_xml { render xml: asset_version.datacite_metadata.to_s } if asset_version.respond_to?(:datacite_metadata)
       end
     end
 
