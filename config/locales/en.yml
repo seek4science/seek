@@ -114,6 +114,10 @@ en:
 
   null_license: 'No license - no permission to use unless the owner grants a licence'
 
+  licenses:
+    other: 'Other'
+    recommended: 'Suggested'
+
   attributes: # Applies to attributes for any model
     other_creators: Additional credit
 
