@@ -7,7 +7,6 @@ module LicenseHelper
   end
 
   def grouped_license_select(name, selected = nil, opts = {})
-    puts name
     select_tag(name, grouped_options_for_select(grouped_license_options(opts), selected), opts)
   end
 
@@ -88,15 +87,12 @@ module LicenseHelper
 
   def sort_grouped_licenses(licenses)
     s = licenses.sort_by do |pair|
-      puts 'Sort pair' + pair[0]
       case pair[0]
       when 'recommended'
-        puts '0'
         0
 #      when 'Generic'
 #        2
       else
-        puts '3'
         3
       end
     end
