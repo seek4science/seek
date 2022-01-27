@@ -1,12 +1,10 @@
 <% truncate_length_for_boxes = 22 -%>
 <% versioned_resource ||= resource -%>
-<% creators ||= nil %>
 <% authors_title||=nil %>
 
-<% if creators || resource.respond_to?("creators") %>
+<% if resource.respond_to?("creators") %>
   <%= render partial: 'assets/resource_authors_box', locals: { resource: versioned_resource,
                                                                truncate_to: truncate_length_for_boxes,
-                                                               creators: creators,
                                                                title: authors_title } -%>
 <% end -%>
 
@@ -39,6 +37,10 @@
 <% end %>
 
 <%= render :partial => "assets/usage_info_box",:locals => { :resource => resource } -%>
+
+<% if resource.edam_annotations? %>
+  <%= render partial:'assets/edam_properties_box', :locals => { :resource => resource }  %>
+<% end %>
 
 <% if resource.class.is_taggable? %>
     <%= render :partial=>"assets/tags_box", :no_tags_message=>"Add tags (comma separated) ..." -%>

@@ -2,7 +2,7 @@ Dear <%= @person.name%>,
 <br/>
 <br/>
 <% if @frequency == 'immediately' %>
-The following resources have just been created or updated in <%= Seek::Config.application_name %>:
+The following resources have just been created or updated in <%= Seek::Config.instance_name %>:
 <% else %>
     <%
        if @frequency == 'daily'
@@ -11,7 +11,7 @@ The following resources have just been created or updated in <%= Seek::Config.ap
          frequency = @frequency.chomp('ly')
        end
     %>
-    For the <%= t('project').pluralize %> you have subscribed to receive notifications, the following resources have been created or updated in <%= Seek::Config.application_name %> during the past <%= frequency %>:
+    For the <%= t('project').pluralize %> you have subscribed to receive notifications, the following resources have been created or updated in <%= Seek::Config.instance_name %> during the past <%= frequency %>:
 <% end %>
 <br/>
 <br/>
@@ -65,7 +65,7 @@ You can change your subscription setting by editing your profile:
 
 You can unsubscribe from a particular resource by clicking on the Unsubscribe link in the subscription report above
 <br/>
-or by visiting that resource in <%= Seek::Config.application_name %>
+or by visiting that resource in <%= Seek::Config.instance_name %>
 <br/>
 <br/>
 

@@ -1,8 +1,8 @@
 <%
-
   creators_enable = true if creators_enable.nil?
   creators_enable = creators_enable && f.object.respond_to?(:creators)
-  other_creators ||= nil
+
+  assays_enable = f.object.respond_to?(:positioned_assays)
 
   sharing_enable = true if sharing_enable.nil?
   sharing_enable = sharing_enable && f.object.can_manage?
@@ -10,11 +10,10 @@
   sharing_link = true if sharing_link.nil?
   sharing_link = sharing_link && f.try(:object).try(:is_a?, (Seek::Permissions::CodeBasedAuthorization)) && !f.try(:object).try(:new_record?)
 
-  existing_creators ||= f.object.try(:creators)
-  existing_creators = [current_user.person] if existing_creators.blank? && action_name == 'new'
-
-  other_creators ||= f.object.try(:other_creators)
-
+  if creators_enable
+    existing_creators ||= f.object.try(:creators)
+    f.object.assets_creators.build(creator: current_user.person) if existing_creators.blank? && action_name == 'new'
+  end
 %>
 
 <% if sharing_enable %>
@@ -22,9 +21,7 @@
 <% end -%>
 
 <% if creators_enable %>
-  <%= render :partial => "assets/author_form", :locals => {:form => f,
-                                                           :existing_creators => existing_creators,
-                                                           :other_creators => other_creators} -%>
+  <%= render :partial => "assets/author_form", :locals => { :form => f } -%>
 <% end %>
 
 <% if sharing_link %>

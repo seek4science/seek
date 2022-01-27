@@ -20,12 +20,13 @@
       <ul class="nav navbar-nav">
         <%= render :partial => "layouts/navbar/browse_menu" %>
         <%= render :partial => "layouts/navbar/create_menu" if logged_in_and_registered? %>
-        <%= render :partial => "layouts/navbar/help_menu" if Seek::Config.documentation_enabled %>
       </ul>
 
       <%= render :partial => 'layouts/navbar/search_bar' if Seek::Config.solr_enabled %>
 
       <ul class="nav navbar-nav navbar-right">
+        <%= render :partial => "layouts/navbar/about_menu"%>
+        <%= render :partial => "layouts/navbar/help_menu" if Seek::Config.documentation_enabled %>
         <% if logged_in_and_registered? %>
             <%= render :partial => "layouts/navbar/user_menu" %>
         <% else %>

@@ -3,32 +3,25 @@ module Seek
   # Convention to create a new fallback is to name the method <setting_name>_fallback
   module Fallbacks
     # fallback attributes
-    def project_long_name_fallback
-      if project_type.blank?
-        project_name.to_s
-      else
-        "#{project_name} #{project_type}"
-      end
-    end
 
-    def dm_project_name_fallback
-      project_name
+    def instance_admins_name_fallback
+      instance_name
     end
-
-    def dm_project_link_fallback
-      project_link
+    
+    def instance_admins_link_fallback
+      instance_link
     end
 
     def application_name_fallback
-      "#{project_name} SEEK"
+      "#{instance_name} SEEK"
     end
 
     def header_image_link_fallback
-      dm_project_link
+      instance_admins_link
     end
 
     def header_image_title_fallback
-      dm_project_name
+      instance_admins_name
     end
   end
 
@@ -319,6 +312,7 @@ module Seek
           discovery: false,
           send_nonce: true,
           client_signing_alg: :RS256,
+          # The following is obtained from: https://login.elixir-czech.org/oidc/jwk
           client_jwk_signing_key: '{"keys":[{"kty":"RSA","e":"AQAB","kid":"rsa1","alg":"RS256","n":"uVHPfUHVEzpgOnDNi3e2pVsbK1hsINsTy_1mMT7sxDyP-1eQSjzYsGSUJ3GHq9LhiVndpwV8y7Enjdj0purywtwk_D8z9IIN36RJAh1yhFfbyhLPEZlCDdzxas5Dku9k0GrxQuV6i30Mid8OgRQ2q3pmsks414Afy6xugC6u3inyjLzLPrhR0oRPTGdNMXJbGw4sVTjnh5AzTgX-GrQWBHSjI7rMTcvqbbl7M8OOhE3MQ_gfVLXwmwSIoKHODC0RO-XnVhqd7Qf0teS1JiILKYLl5FS_7Uy2ClVrAYd2T6X9DIr_JlpRkwSD899pq6PR9nhKguipJE0qUXxamdY9nw"}]}',
           client_options: {
               identifier: omniauth_elixir_aai_client_id,
@@ -419,6 +413,16 @@ module Seek
       result
     end
 
+    # transfers a setting value from the old_name to the new_name setting value, for use when renaming a setting.
+    # Creates a new record for the new setting (if set), and cleans up and removes the old record. Ignores any defaults that are set
+    def transfer_value(old_name, new_name)
+      if old_value = Settings.global.get(:old_name)
+        set_value(new_name,old_value)
+        Settings.destroy(old_name)
+      end
+      Settings.defaults.delete(old_name.to_s)
+    end
+
     def setting(setting, options = {})
       options ||= {}
       setter = "#{setting}="
@@ -494,5 +498,6 @@ module Seek
     def self.schema_org_supported?
       true
     end
+
   end
 end

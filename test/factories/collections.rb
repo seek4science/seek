@@ -48,7 +48,24 @@ Factory.define(:max_collection, class: Collection) do |f|
         Factory(:collection_item, comment: 'Bad data', collection: c, asset: Factory(:data_file, policy: Factory(:private_policy), title: 'Readme'))
     ]
   end
-  f.other_creators 'Blogs, Joe'
+  f.other_creators 'Joe Bloggs'
+end
+
+Factory.define(:collection_with_all_types, parent: :public_collection) do |f|
+  f.after_create do |c|
+    c.items = [
+      Factory(:collection_item, comment: 'its a data_file', collection: c, asset: Factory(:data_file, policy: Factory(:public_policy))),
+      Factory(:collection_item, comment: 'its a sop', collection: c, asset: Factory(:sop, policy: Factory(:public_policy))),
+      Factory(:collection_item, comment: 'its a model', collection: c, asset: Factory(:model, policy: Factory(:public_policy))),
+      Factory(:collection_item, comment: 'its a document', collection: c, asset: Factory(:document, policy: Factory(:public_policy))),
+      Factory(:collection_item, comment: 'its a publication', collection: c, asset: Factory(:publication)),
+      Factory(:collection_item, comment: 'its a presentation', collection: c, asset: Factory(:presentation, policy: Factory(:public_policy))),
+      Factory(:collection_item, comment: 'its a sample', collection: c, asset: Factory(:sample, policy: Factory(:public_policy))),
+      Factory(:collection_item, comment: 'its a event', collection: c, asset: Factory(:event, policy: Factory(:public_policy))),
+      Factory(:collection_item, comment: 'its a workflow', collection: c, asset: Factory(:workflow, policy: Factory(:public_policy))),
+      Factory(:collection_item, comment: 'its a collection', collection: c, asset: Factory(:collection, policy: Factory(:public_policy)))
+    ]
+  end
 end
 
 # CollectionItem

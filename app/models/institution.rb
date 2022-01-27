@@ -3,6 +3,8 @@ class Institution < ApplicationRecord
   acts_as_yellow_pages
   title_trimmer
 
+  auto_strip_attributes :web_page
+
   validates :title, uniqueness: true
   validates :web_page, url: { allow_nil: true, allow_blank: true }
   validates :country, country: true
@@ -27,9 +29,7 @@ class Institution < ApplicationRecord
 
   # determines if this person is the member of a project for which the user passed is a project manager
   def is_managed_by?(user)
-    projects.any? do |p|
-      user.person.is_project_administrator?(p)
-    end
+    user&.person&.is_project_administrator_of_any_project? || user&.person&.is_programme_administrator_of_any_programme?
   end
 
   # Returns the columns to be shown on the table view for the resource

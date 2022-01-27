@@ -18,7 +18,9 @@ module Seek
         repr = {
           '@context' => resource_decorator.context,
           '@type' => resource_decorator.schema_type
-        }.merge(attributes_json)
+        }
+        repr['dct:conformsTo'] = resource_decorator.conformance if resource_decorator.respond_to? 'conformance'
+        repr = repr.merge(attributes_json)
         repr.deep_stringify_keys
       end
 
@@ -46,8 +48,9 @@ module Seek
       private
 
       SUPPORTED_TYPES = [Person, Project, Event, DataFile, Organism, HumanDisease,
-                         Seek::BioSchema::DataCatalogMockModel, Sample,
-                         Document, Presentation, Workflow, Collection].freeze
+                         Seek::BioSchema::DataCatalogMockModel,
+                         Document, Presentation, Workflow, Collection,
+                         Institution, Programme, Sample, AssetsCreator].freeze
 
       def resource_decorator
         @decorator ||= ResourceDecorators::Factory.instance.get(resource)

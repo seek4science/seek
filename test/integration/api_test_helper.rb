@@ -264,6 +264,7 @@ module ApiTestHelper
 
       to_ignore = (defined? ignore_non_read_or_write_attributes) ? ignore_non_read_or_write_attributes : []
       to_ignore << 'updated_at'
+      to_ignore << 'creators'
 
       # Check the changed attributes and relationships
       if @to_patch['data'].key?('attributes')
@@ -375,7 +376,7 @@ module ApiTestHelper
         deep_comparison(sub_value, sorted_result[index], "#{key}[#{index}]")
       end
     elsif source.nil?
-      assert_nil result
+      assert_nil result, "Expected #{key} to be nil but was `#{result}`"
     else
       assert_equal source, result, "Expected #{key} to be `#{source}` but was `#{result}`"
     end

@@ -27,7 +27,7 @@
   <%= show_title "Publishing complete" -%>
 
   <% unless waiting_for_publish_items.empty? -%>
-      <h2>A Gatekeeper has been notified of your wish to publish the following items:</h2>
+      <h2>The <%= t('asset_gatekeeper').downcase %> has been notified of your wish to publish the following items:</h2>
       <ul class="publishing_options" id="publish_requested">
         <% waiting_for_publish_items.each do |item| -%>
             <li class="type_and_title"><%= text_for_resource item -%>: <%= link_to item.title, item -%></li>

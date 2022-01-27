@@ -1,0 +1,12 @@
+<li class="association-list-item">
+    <input type="hidden" name="{{fieldName}}[][workflow_id]" value="{{id}}"/>
+    {{title}}
+
+    {{#if workflow_data_file_relationship.value}}
+        <input type="hidden" name="{{fieldName}}[][workflow_data_file_relationship_id]" value="{{workflow_data_file_relationship.value}}"/>
+        <small>({{workflow_data_file_relationship.text}})</small>
+    {{/if}}
+    <a class="remove-association clickable" title="Remove data">
+        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+    </a>
+</li>

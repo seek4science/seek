@@ -122,7 +122,7 @@ class MailerTest < ActionMailer::TestCase
     item = Factory(:data_file, projects: gatekeeper.projects, title: 'Picture', contributor:person)
     items_and_comments = [{ item: item, comment: nil }]
     requester = Factory(:person, first_name: 'Aaron', last_name: 'Spiggle')
-    @expected.subject = 'A Sysmo SEEK gatekeeper approved your publishing requests.'
+    @expected.subject = "A Sysmo SEEK #{I18n.t('asset_gatekeeper').downcase} approved your publishing requests."
 
     @expected.to = requester.email_with_name
     @expected.from = 'no-reply@sysmo-db.org'
@@ -132,6 +132,7 @@ class MailerTest < ActionMailer::TestCase
     expected_text = encode_mail(@expected)
     expected_text.gsub!('-person_id-', gatekeeper.id.to_s)
     expected_text.gsub!('-df_id-', item.id.to_s)
+    expected_text.gsub!('-asset_gatekeeper-', I18n.t('asset_gatekeeper').downcase)
 
     assert_equal expected_text, encode_mail(Mailer.gatekeeper_approval_feedback(requester, gatekeeper, items_and_comments))
   end
@@ -143,7 +144,7 @@ class MailerTest < ActionMailer::TestCase
     items_and_comments = [{ item: item, comment: 'not ready' }]
 
     requester = Factory(:person, first_name: 'Aaron', last_name: 'Spiggle')
-    @expected.subject = 'A Sysmo SEEK gatekeeper rejected your publishing requests.'
+    @expected.subject = "A Sysmo SEEK #{I18n.t('asset_gatekeeper').downcase} rejected your publishing requests."
 
     @expected.to = requester.email_with_name
     @expected.from = 'no-reply@sysmo-db.org'
@@ -154,6 +155,7 @@ class MailerTest < ActionMailer::TestCase
     expected_text = encode_mail(@expected)
     expected_text.gsub!('-person_id-', gatekeeper.id.to_s)
     expected_text.gsub!('-df_id-', item.id.to_s)
+    expected_text.gsub!('-asset_gatekeeper-', I18n.t('asset_gatekeeper').downcase)
 
     assert_equal expected_text, encode_mail(Mailer.gatekeeper_reject_feedback(requester, gatekeeper, items_and_comments))
   end
@@ -272,7 +274,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'test mail' do
-    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+    with_config_value(:instance_name, 'SEEK EMAIL TEST') do
       with_config_value(:site_base_host, 'http://fred.com') do
         email = Mailer.test_email('fred@email.com')
         assert_not_nil email
@@ -286,7 +288,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'test mail with https host' do
-    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+    with_config_value(:instance_name, 'SEEK EMAIL TEST') do
       with_config_value(:site_base_host, 'https://securefred.com:1337') do
         email = Mailer.test_email('fred@email.com')
         assert_not_nil email
@@ -300,7 +302,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'request join project with new institution' do
-    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+    with_config_value(:instance_name, 'SEEK EMAIL TEST') do
       with_config_value(:site_base_host, 'https://hub.com') do
         project = Factory(:project)
         institution = Institution.new({title:'My lovely institution', web_page:'http://inst.org', country:'DE'})
@@ -315,7 +317,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'request join project existing institution' do
-    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+    with_config_value(:instance_name, 'SEEK EMAIL TEST') do
       with_config_value(:site_base_host, 'https://securefred.com:1337') do
         project = Factory(:project)
         institution = Factory(:institution)
@@ -331,7 +333,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'request create project for programme' do
-    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+    with_config_value(:instance_name, 'SEEK EMAIL TEST') do
       with_config_value(:site_base_host, 'https://securefred.com:1337') do
         programme_admin = Factory(:programme_administrator)
         programme = programme_admin.programmes.first
@@ -352,7 +354,7 @@ class MailerTest < ActionMailer::TestCase
     admin = Factory(:admin)
     programme_admin = Factory(:programme_administrator)
     programme = programme_admin.programmes.first
-    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+    with_config_value(:instance_name, 'SEEK EMAIL TEST') do
       with_config_value(:site_base_host, 'https://securefred.com:1337') do        
         with_config_value(:managed_programme_id, programme.id) do
           refute_empty programme.programme_administrators
@@ -370,7 +372,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'request create project' do
-    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+    with_config_value(:instance_name, 'SEEK EMAIL TEST') do
       with_config_value(:site_base_host, 'https://securefred.com:1337') do
         project = Project.new(title:'My lovely project')
         institution = Factory(:institution)
@@ -384,7 +386,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'request create project and programme' do
-    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+    with_config_value(:instance_name, 'SEEK EMAIL TEST') do
       with_config_value(:site_base_host, 'https://securefred.com:1337') do
         institution = Institution.new({title:'My lovely institution', web_page:'http://inst.org', country:'DE'})
         project = Project.new(title:'My lovely project')

@@ -2,11 +2,30 @@ require 'ro_crate'
 
 module ROCrate
   class WorkflowCrate < ::ROCrate::Crate
+    PROFILE = {
+      '@id' => 'https://about.workflowhub.eu/Workflow-RO-Crate/',
+      '@type' => 'CreativeWork',
+      'name' => 'Workflow RO-Crate Profile',
+      'version' => '0.2.0'
+    }.freeze
+
     include ActiveModel::Model
 
     validates :main_workflow, presence: true
 
     properties(%w[mainEntity mentions about])
+
+    def initialize(*args)
+      super.tap do
+        prof = add_contextual_entity(ROCrate::ContextualEntity.new(self, nil, PROFILE))
+        conforms = metadata['conformsTo']
+        if conforms.is_a?(Array)
+          metadata['conformsTo'] << prof.reference
+        else
+          metadata['conformsTo'] = [{ '@id' => ::ROCrate::Metadata::SPEC }, prof.reference]
+        end
+      end
+    end
 
     def main_workflow
       main_entity

@@ -33,6 +33,11 @@
   <%= assay_study_selection('assay[study_id]',@assay.study) %>
 </div>
 
+<div class="form-group">
+  <%= f.label "Assay position" -%><br/>
+  <%= f.number_field :position, :rows => 5, :class=>"form-control"  -%>
+</div>
+
 
 <%= f.hidden_field :assay_class_id -%>
 
@@ -90,9 +95,9 @@
         <%= f.fancy_multiselect :models, other_projects_checkbox: true %>
     <% end -%>
 
-    <%= render :partial => "assets/associate_data_file",:locals=>{:f=>f, :resource => @assay,
-                                                                  :has_relationships => @assay.is_modelling?,
-                                                                  :has_direction => !@assay.is_modelling?} -%>
+    <%= render :partial => "assets/associate_data_file_with_assay", :locals=>{ :f=>f, :resource => @assay,
+                                                                               :has_relationships => @assay.is_modelling?,
+                                                                               :has_direction => !@assay.is_modelling?} -%>
 
     <%= f.fancy_multiselect :publications, { other_projects_checkbox: true } %>
 

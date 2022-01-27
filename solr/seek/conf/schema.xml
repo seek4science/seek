@@ -89,13 +89,14 @@
          the spellcheck. For example, the lowercase filter here means
          all spelling suggestions will be lower case (without it,
          though, you'd have duplicate suggestions for lower and proper
-         cased words). -->
+         cased words).
     <fieldType name="textSpell" class="solr.TextField" positionIncrementGap="100" omitNorms="true">
       <analyzer>
         <tokenizer class="solr.StandardTokenizerFactory"/>
         <filter class="solr.LowerCaseFilterFactory"/>
       </analyzer>
     </fieldType>
+    -->
     <!-- A specialized field for geospatial search. If indexed, this fieldType must not be multivalued. -->
     <fieldType name="location" class="solr.LatLonType" subFieldSuffix="_coordinate"/>
   </types>
@@ -254,7 +255,10 @@
     <dynamicField name="*_llm" stored="false" type="location" multiValued="true" indexed="true"/>
     <dynamicField name="*_lls" stored="true" type="location" multiValued="false" indexed="true"/>
     <dynamicField name="*_llms" stored="true" type="location" multiValued="true" indexed="true"/>
+
+    <!--
     <field name="textSpell" stored="false" type="textSpell" multiValued="true" indexed="true"/>
+    -->
 
     <!-- required by Solr 5 -->
     <field name="_version_" type="tlong" indexed="true" stored="true" multiValued="false" />
@@ -270,7 +274,8 @@
         searching.  -->
 
   <!-- Use copyField to copy the fields you want to run spell checking
-       on into one field. For example: -->
+       on into one field. For example:
   <copyField source="*_text"  dest="textSpell" />
   <copyField source="*_s"  dest="textSpell" />
+  -->
 </schema>

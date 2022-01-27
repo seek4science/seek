@@ -2,7 +2,7 @@ module Seek
   module Openbis
     # An ugly util class that contains most of the OpenBIS to SEEK logic.
     # could not think how to spread the code better, as Experiments registration may involve Sample registration
-    # and data files registration ... so all is in one bag. The contrrollers have very similar behaviour but still
+    # and data files registration ... so all is in one bag. The controllers have very similar behaviour but still
     # they are not exactly same.
     # On bright side, this logic can be tested without using the whole rails app internals
     class SeekUtil
@@ -233,7 +233,7 @@ if automatic synchronization was selected.'}
                    user = p.user
                    p
                  else
-                   raise "Cannot add new entities unsuported current_user type #{user.class}"
+                   raise "Cannot add new entities unsupported current_user type #{user.class}"
                  end
 
         raise 'Cannot add new entities with guest current_user' if user.guest?

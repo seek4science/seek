@@ -2,8 +2,12 @@
 
 <div class="row">
   <div class="col-sm-6">
-    <%= list_item_person_list [resource.contributor] | resource.creators, (resource.other_creators if resource.respond_to? 'other_creators'), 'Maintainers' %>
-    <%= list_item_attribute('# items', resource.items.count) %>
+    <%
+      # filter out creators that are also the contributor
+      maintainers = [resource.contributor] | resource.assets_creators.reject{|creator| creator.person == resource.contributor}
+    %>
+    <%= list_item_person_list maintainers, resource.other_creators, 'Maintainers' %>
+    <%= list_item_attribute('Number of items', resource.items.count) %>
     <%= list_item_doi(resource) %>
     <%= list_item_tag_list(resource) %>
   </div>

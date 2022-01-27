@@ -1301,6 +1301,36 @@ class PeopleControllerTest < ActionController::TestCase
     end
   end
 
+  test 'admin can see user login through API' do
+    login_as(Factory(:admin))
+
+    get :show, format: :json, params: { id: Factory(:user, login: 'dave1234').person }
+
+    assert_response :success
+    h = JSON.parse(response.body)
+    assert_equal 'dave1234', h['data']['attributes']['login']
+  end
+
+  test 'admin cannot see user login through API if no registered person' do
+    login_as(Factory(:admin))
+
+    get :show, format: :json, params: { id: Factory(:brand_new_person) }
+
+    assert_response :success
+    h = JSON.parse(response.body)
+    refute h['data']['attributes']['login'].present?
+  end
+
+  test 'non-admin cannot see user login through API' do
+    login_as(Factory(:person))
+
+    get :show, format: :json, params: { id: Factory(:user, login: 'dave1234').person }
+
+    assert_response :success
+    h = JSON.parse(response.body)
+    refute h['data']['attributes'].key?('login')
+  end
+
   def edit_max_object(person)
     Factory :expertise, value: 'golf', annotatable: person
     Factory :expertise, value: 'fishing', annotatable: person

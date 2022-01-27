@@ -7,28 +7,32 @@ module Seek
       include Seek::BioSchema::Support
 
       def description
-        Seek::Config.project_description
+        Seek::Config.instance_description
       end
 
       def title
-        Seek::Config.project_name
+        Seek::Config.instance_name
       end
 
       def keywords
-        Seek::Config.project_keywords&.split(',')&.collect(&:strip)&.reject(&:blank?)&.join(', ')
+        Seek::Config.instance_keywords&.split(',')&.collect(&:strip)&.reject(&:blank?)&.join(', ')
       end
 
       def provider
         {
           '@type' => 'Organization',
-          'name' => Seek::Config.dm_project_name,
-          'url' => Seek::Config.dm_project_link,
-          '@id' => Seek::Config.dm_project_link
+          '@id' => Seek::Config.instance_admins_link,
+          'name' => Seek::Config.instance_admins_name,
+          'url' => Seek::Config.instance_admins_link
         }
       end
 
       def created_at
         ActivityLog.order(:id).first.try(:created_at)
+      end
+
+      def updated_at
+        ActivityLog.order(:id).last.try(:updated_at)
       end
 
       def url

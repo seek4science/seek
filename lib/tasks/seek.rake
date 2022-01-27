@@ -13,11 +13,9 @@ namespace :seek do
     Seek::Util.authorized_types.each do |type|
       type.remove_invalid_auth_lookup_entries
       type.find_each do |item|
-        AuthLookupUpdateQueue.create(item: item, priority: 1) # Duplicates will be caught by uniqueness check
+        AuthLookupUpdateQueue.enqueue(item)
       end
     end
-    # 5 is an arbitrary number to take advantage of there being more than 1 worker dedicated to auth refresh
-    5.times { AuthLookupUpdateJob.set(priority: 1).perform_later }
   end
 
   desc 'Rebuild all authorization lookup table for all items.'
@@ -67,8 +65,8 @@ namespace :seek do
 
   desc 'Creates background jobs to reindex all searchable things'
   task(reindex_all: :environment) do
-    Seek::Util.searchable_types.each do |type|
-      ReindexingQueue.enqueue(type.all)
+    Seek::Util.searchable_types.collect(&:to_s).each do |type|
+      ReindexAllJob.perform_later(type)
     end
   end
 
@@ -95,9 +93,24 @@ namespace :seek do
     puts 'Done'
   end
 
+  desc "populate the postions of assays"
+  task populate_positions: :environment do
+    Study.all.each do |s|
+      position = 1
+      s.assays.each do |a|
+        a.position = position
+        position += 1
+        disable_authorization_checks do
+          puts a.save
+        end
+      end
+    end
+  end
+
   desc "Clear encrypted settings"
   task clear_encrypted_settings: :environment do
     Settings.where(var: Seek::Config.encrypted_settings).destroy_all
     puts 'Encrypted settings cleared'
   end
+
 end

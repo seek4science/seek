@@ -16,7 +16,7 @@ SEEK::Application.routes.draw do
         get 'tools/:id/versions' => 'tool_versions#index'
         get 'tools/:id/versions/:version_id' => 'tool_versions#show'
         get 'tools/:id/versions/:version_id/containerfile' => 'tool_versions#containerfile'
-        get 'tools/:id/versions/:version_id/:type/descriptor(/:relative_path)' => 'tool_versions#descriptor', constraints: { relative_path: /.+/ }
+        get 'tools/:id/versions/:version_id/:type/descriptor(/*relative_path)' => 'tool_versions#descriptor', constraints: { relative_path: /.+/ }, format: false, as: :tool_versions_descriptor
         get 'tools/:id/versions/:version_id/:type/files' => 'tool_versions#files', format: false
         get 'tools/:id/versions/:version_id/:type/tests' => 'tool_versions#tests'
         get 'toolClasses' => 'general#tool_classes'
@@ -36,6 +36,7 @@ SEEK::Application.routes.draw do
         get :view_content
         get :get_pdf
         get :download
+        delete :destroy
       end
     end
   end
@@ -139,6 +140,7 @@ SEEK::Application.routes.draw do
       get :registration_form
       get :edit_tag      
       post :update_home_settings
+      post :delete_carousel_form
       post :restart_server
       post :restart_delayed_job
       post :update_admins
@@ -316,6 +318,7 @@ SEEK::Application.routes.draw do
       post :update_members
       post :request_membership
       get :overview
+      get :order_investigations
       get :administer_join_request
       post :respond_join_request
       get :guided_join
@@ -395,6 +398,9 @@ SEEK::Application.routes.draw do
     resources :people, :programmes, :projects, :assays, :studies, :models, :sops, :workflows, :nodes, :data_files, :publications, :documents, only: [:index]
     member do
       get :export_isatab_json
+      get :manage
+      get :order_studies
+      patch :manage_update
     end
   end
 
@@ -426,6 +432,7 @@ SEEK::Application.routes.draw do
       get :published
       get :isa_children
       get :manage
+      get :order_assays
       patch :manage_update
     end
     resources :people, :programmes, :projects, :assays, :investigations, :models, :sops, :workflows, :nodes, :data_files, :publications, :documents, only: [:index]
@@ -482,11 +489,11 @@ SEEK::Application.routes.draw do
         post :create_from_existing
       end
     end
-    resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, only: [:index]
+    resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, :workflows, only: [:index]
   end
 
   resources :presentations, concerns: [:has_content_blobs, :publishable, :has_versions, :asset] do
-    resources :people, :programmes, :projects, :publications, :events, :collections, only: [:index]
+    resources :people, :programmes, :projects, :publications, :events, :collections, :workflows, only: [:index]
   end
 
   resources :models, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
@@ -525,6 +532,7 @@ SEEK::Application.routes.draw do
       get :provide_metadata
       post :metadata_extraction_ajax
       post :create_metadata
+      get :filter
     end
     member do
       get :diagram
@@ -532,7 +540,7 @@ SEEK::Application.routes.draw do
       get :new_version
       post :create_version_metadata
     end
-    resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :sops, :collections, only: [:index]
+    resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :sops, :collections, :presentations, :documents, :data_files, only: [:index]
   end
 
   resources :workflow_classes, except: [:show]
@@ -568,7 +576,7 @@ SEEK::Application.routes.draw do
     concerns :has_dashboard, controller: :programme_stats
   end
 
-  resources :publications, concerns: [:asset] do
+  resources :publications, concerns: [:asset, :has_content_blobs] do
     collection do
       get :query_authors
       get :query_authors_typeahead
@@ -577,9 +585,15 @@ SEEK::Application.routes.draw do
       post :update_metadata
     end
     member do
+      get :manage
+      get :download
+      get :upload_fulltext
+      get :soft_delete_fulltext
+      post :update_annotations_ajax
       post :disassociate_authors
       post :update_metadata
       post :request_contact
+      post :upload_pdf
     end
     resources :people, :programmes, :projects, :investigations, :assays, :studies, :models, :data_files, :documents, :presentations, :organisms, :events, :collections, only: [:index]
   end
@@ -646,6 +660,9 @@ SEEK::Application.routes.draw do
     collection do
       get :attribute_form
       get :filter
+      post :batch_create
+      put :batch_update
+      delete :batch_delete
     end
     resources :people, :programmes, :projects, :assays, :studies, :investigations, :data_files, :publications, :samples,
               :strains, :organisms, :collections, only: [:index]
@@ -688,7 +705,7 @@ SEEK::Application.routes.draw do
   ### DOCUMENTS
 
   resources :documents, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
-    resources :people, :programmes, :projects, :programmes, :investigations, :assays, :studies, :publications, :events, :collections, only: [:index]
+    resources :people, :programmes, :projects, :programmes, :investigations, :assays, :studies, :publications, :events, :collections, :workflows, only: [:index]
   end
 
   resources :collections, concerns: [:publishable, :has_doi, :asset] do
@@ -699,6 +716,18 @@ SEEK::Application.routes.draw do
         post :select
       end
     end
+  end
+
+  resources :creators, only: [] do
+    collection do
+      get :registered
+      get :unregistered
+    end
+  end
+
+   ### SINGLE PAGE
+
+  resources :single_pages do
   end
 
   ### ASSAY AND TECHNOLOGY TYPES ###
@@ -762,4 +791,6 @@ SEEK::Application.routes.draw do
   get '/citation/(*doi)' => 'citations#fetch', as: :citation, constraints: { doi: /.+/ }
 
   get '/home/isa_colours' => 'homes#isa_colours'
+
+  post '/previews/markdown' => 'previews#markdown'
 end

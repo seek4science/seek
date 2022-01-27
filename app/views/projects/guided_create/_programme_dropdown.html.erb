@@ -3,7 +3,7 @@
 </div>
 <% if !admin_logged_in? && Programme.site_managed_programme.present? %>
   <div class="help-block">
-    You can also choose the <%= "#{Seek::Config.dm_project_name} managed #{t('programme')}" %>, <%= link_to Programme.site_managed_programme.title, Programme.site_managed_programme %>, and if so you will need to wait for approval.
+    You can also choose the <%= "#{Seek::Config.instance_admins_name} managed #{t('programme')}" %>, <%= link_to Programme.site_managed_programme.title, Programme.site_managed_programme %>, and if so you will need to wait for approval.
   </div>
 <% end %>
 <% programmes = (Programme.all.select{|p| User.current_user.person.is_programme_administrator?(p)} + [Programme.site_managed_programme]).compact.uniq %>

@@ -3,11 +3,11 @@
 </div>
 <div id="public_assets" class="asset_report_container curved">
   <h1>Items that are fully available publicly, including to
-    non <%= Seek::Config.application_name %> members</h1>
+    non <%= Seek::Config.instance_name %> members</h1>
 
   <p class='alert alert-info' style="width:98%;text-align:center;margin-bottom:1em;">
     These are the <%= t('data_file').pluralize %>, <%= t('model').pluralize %>, <%= t('sop').pluralize %>, <%= t('presentation').pluralize %>, <%= t('investigation').pluralize %>,
-    <%= t('study').pluralize %> or <%= t('assays.assay').pluralize %> that are available to download by any visitor to the <%= Seek::Config.application_name -%>, including those without a
+    <%= t('study').pluralize %> or <%= t('assays.assay').pluralize %> that are available to download by any visitor to the <%= Seek::Config.instance_name -%>, including those without a
     registered account.
   </p>
 
@@ -23,7 +23,7 @@
 
   <p class='alert alert-info' style="width:98%;text-align:center;margin-bottom:1em;">
     These are the <%= t('data_file').pluralize %>, <%= t('model').pluralize %>, <%= t('sop').pluralize %>, <%= t('presentation').pluralize %>, <%= t('investigation').pluralize %>,
-    <%= t('study').pluralize %> or <%= t('assays.assay').pluralize %> that are not available to download by any visitor to the <%= Seek::Config.application_name -%>, but are available to download
+    <%= t('study').pluralize %> or <%= t('assays.assay').pluralize %> that are not available to download by any visitor to the <%= Seek::Config.instance_name -%>, but are available to download
     by all members with a registered account.
   </p>
   <% @types.each do |type| -%>

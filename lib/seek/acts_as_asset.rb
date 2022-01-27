@@ -23,6 +23,10 @@ module Seek
       is_asset? && is_downloadable?
     end
 
+    def have_misc_links?
+      self.class.have_misc_links?
+    end
+
     module ClassMethods
       def acts_as_asset
         attr_accessor :parent_name
@@ -42,6 +46,7 @@ module Seek
         validates :title, presence: true
         validates :title, length: { maximum: 255 }, unless: -> { is_a?(Publication) }
         validates :description, length: { maximum: 65_535 }, if: -> { respond_to?(:description) }
+        validates :license, license:true, allow_blank: true, if: -> { respond_to?(:license) }
 
 
         include Seek::Stats::ActivityCounts
@@ -60,6 +65,10 @@ module Seek
 
       def is_asset?
         include?(Seek::ActsAsAsset::InstanceMethods)
+      end
+
+      def have_misc_links?
+        include?(Seek::ActsAsHavingMiscLinks::InstanceMethods)
       end
     end
 

@@ -1,0 +1,9 @@
+
+<%# adapted _home_activity_notifications removing downloaded items for new landing page %>
+<%= panel('Latest additions', body_options: { id: 'recently_added', class: 'front-page-panel' }) do %>
+    <ul class="feed">
+      <% recently_added_item_logs_hash(1.years.ago, 8).each do |added_item_log| -%>
+          <%= display_single_log_item_hash(added_item_log, 'added') -%>
+      <% end %>
+    </ul>
+<% end %>

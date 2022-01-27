@@ -53,7 +53,7 @@ gem 'will_paginate', '~> 3.1'
 gem 'yaml_db'
 gem 'rails_autolink'
 gem 'rfc-822'
-gem 'nokogiri', '~> 1.11.4'
+gem 'nokogiri', '~> 1.12.5'
 gem 'rdf-virtuoso', '>= 0.2.0'
 gem 'terrapin'
 gem 'lograge'
@@ -83,7 +83,7 @@ gem 'bootstrap-sass', '>=3.4.1'
 gem 'sass-rails', '~> 5.0'
 gem 'sprockets-rails'
 
-gem 'ro-bundle', '~> 0.2.5'
+gem 'ro-bundle', '~> 0.3.0'
 gem 'handlebars_assets'
 gem 'zenodo-client', git: 'https://github.com/seek4science/zenodo-client.git'
 
@@ -124,7 +124,7 @@ gem 'bootsnap', '>= 1.1.0', require: false
 
 gem 'activerecord-import'
 
-gem "puma", ">= 3.12.6"
+gem "puma", "~>4.3"
 
 gem "doorkeeper", ">= 5.2.5"
 
@@ -132,13 +132,15 @@ gem 'request_store'
 
 gem 'bundler', '>= 1.8.4'
 
-gem 'ro-crate', '~> 0.4.9'
+gem 'ro-crate', '~> 0.4.14'
 
 gem 'git'
-gem 'redcarpet'
 gem 'i18n-js'
 gem 'whenever', '~> 1.0.0', require: false
 gem 'dotenv-rails', '~> 2.7.6'
+gem 'commonmarker'
+
+gem 'rack-cors', require: 'rack/cors'
 
 group :production do
   gem 'passenger'

@@ -12,6 +12,7 @@ class Event < ApplicationRecord
   include Seek::Search::CommonFields
   include Seek::Search::BackgroundReindexing
   include Seek::BioSchema::Support
+  include Seek::Collectable
 
   searchable(ignore_attribute_changes_of: [:updated_at], auto_index: false) do
     text :address, :city, :country, :url
@@ -24,6 +25,18 @@ class Event < ApplicationRecord
   # load the configuration for the pagination
   grouped_pagination
 
+  auto_strip_attributes :url
+
+  validates_presence_of :title
+  validates :title, length: { maximum: 255 }
+  validates :description, length: { maximum: 65_535 }
+  validates_presence_of :start_date
+
+  # validates_is_url_string :url
+  validates :url, url: {allow_nil: true, allow_blank: true}
+
+  validates :country, country:true, allow_blank: true
+
   validate :validate_data_files
   def validate_data_files
     df = data_files.to_a
@@ -34,18 +47,6 @@ class Event < ApplicationRecord
   def validate_end_date
     errors.add(:end_date, 'is before start date.') unless end_date.nil? || start_date.nil? || end_date >= start_date
   end
-
-  validates_presence_of :title
-  validates :title, length: { maximum: 255 }
-
-  validates :description, length: { maximum: 65_535 }
-
-  validates_presence_of :start_date
-
-  # validates_is_url_string :url
-  validates :url, url: {allow_nil: true, allow_blank: true}
-
-  validates :country, country:true, allow_blank: true
 
   def show_contributor_avatars?
     false

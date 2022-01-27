@@ -58,6 +58,8 @@ class Project < ApplicationRecord
 
   scope :without_programme, -> { where('programme_id IS NULL') }
 
+  auto_strip_attributes :web_page, :wiki_page
+
   validates :web_page, url: {allow_nil: true, allow_blank: true}
   validates :wiki_page, url: {allow_nil: true, allow_blank: true}
 
@@ -308,6 +310,10 @@ class Project < ApplicationRecord
 
   def validate_end_date
     errors.add(:end_date, 'is before start date.') unless end_date.nil? || start_date.nil? || end_date >= start_date
+  end
+
+  def positioned_investigations
+    investigations.order(position: :asc)
   end
 
   def ro_crate_metadata

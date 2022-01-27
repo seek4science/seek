@@ -18,12 +18,14 @@ class CustomMetadataTypesControllerTest < ActionController::TestCase
   end
 
   test 'show help text' do
-    cmt = Factory(:simple_investigation_custom_metadata_type_with_description)
+    cmt = Factory(:simple_investigation_custom_metadata_type_with_description_and_label)
     login_as(Factory(:person))
     get :form_fields, params:{id:cmt.id}
-    assert_select "small", "You need to enter age."
-    assert_select "small", 1
-    assert_select "p.help-block", 1
+    assert_select 'small', 'You need to enter age.'
+    assert_select 'small', 1
+    assert_select 'p.help-block', 1
+    assert_select 'label',  text:'Biological age', count:1
+    assert_select 'label',  text:'Date', count:1
   end
 
 end

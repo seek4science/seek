@@ -1,19 +1,19 @@
 <div class='show_basic'>
-  <%= show_title "A Gatekeeper will need to approve the items to be published" -%>
+  <%= show_title "One #{t('asset_gatekeeper').downcase } will need to approve the items to be published" -%>
 
   <div class="alert alert-info">
     <p>
-      One or more of the items to be published are associated with a <%= t('project') -%> that has chosen to use the protection of a Gatekeeper.
+      One or more of the items to be published are associated with a <%= t('project') -%> that has chosen to use the protection of the <%= t('asset_gatekeeper').downcase %>.
     </p>
     <p>
-      The Gatekeeper is a person that needs to approve items before they are finally published.
+      The <%= t('asset_gatekeeper').downcase %> is a person that needs to approve items before they are finally published.
     </p>
     <p>
-      The affected items, and the related Gatekeeper, are listed below. When you Submit an email will be sent to that person, and they will either approve
+      The affected items, and the related <%= t('asset_gatekeeper').downcase %>, are listed below. When you Submit an email will be sent to that person, and they will either approve
       or reject the publication. Once this has happened, you will be notified back via an email.
     </p>
   </div>
-  <h2>The following items require approval from a Gatekeeper:</h2>
+  <h2>The following items require approval from one of the <%= t('asset_gatekeeper').downcase.pluralize %>:</h2>
   <ul class="publishing_options" id="waiting_approval">
     <% @waiting_for_publish_items.each do |item| %>
         <li class="type_and_title"><%= text_for_resource item -%>
@@ -23,7 +23,7 @@
     <% end %>
   </ul>
   <% unless @items_for_immediate_publishing.empty? -%>
-  <h2>The following items will be published immediately and do not require approval from a Gatekeeper:</h2>
+  <h2>The following items will be published immediately and do not require approval from the <%= t('asset_gatekeeper').downcase %>:</h2>
       <ul class="publishing_options" id="publish_immediately">
           <% @items_for_immediate_publishing.each do |item| %>
               <li class="type_and_title">

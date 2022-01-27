@@ -560,6 +560,23 @@ class SopsControllerTest < ActionController::TestCase
     assert_nil flash[:notice]
   end
 
+  test 'the gatekeeper should have right to view the item when an item is requested to be published' do
+    gatekeeper = Factory(:asset_gatekeeper)
+    @user.person.add_to_project_and_institution(gatekeeper.projects.first, Factory(:institution))
+    post :create, params: { sop: { title: 'text sop', project_ids: gatekeeper.projects.collect(&:id) }, content_blobs: [{ data: picture_file }], policy_attributes: { access_type: Policy::NO_ACCESS } }
+    sop = assigns(:sop)
+
+    login_as(gatekeeper)
+    refute sop.can_view?
+
+    login_as(sop.contributor)
+    post :publish, params: { id: sop }
+    sop = assigns(:sop)
+
+    login_as(gatekeeper)
+    assert sop.can_view?
+  end
+
   test "should show 'None' for other contributors if no contributors" do
     get :index
     assert_response :success
@@ -1287,7 +1304,7 @@ class SopsControllerTest < ActionController::TestCase
     # should be a temporary sharing link
     assert_select 'div#temporary_links', count:1
 
-    assert_select 'div#author_form', count:1
+    assert_select 'div#author-form', count:1
 
     # this is to check the SOP is all upper case in the sharing form
     assert_select 'div.alert-info', text: /the #{I18n.t('sop')}/
@@ -1644,6 +1661,125 @@ class SopsControllerTest < ActionController::TestCase
     assert_redirected_to sop
 
     assert_equal :public, sop.find_version(2).reload.visibility, 'Should not have changed visibility - latest version'
+  end
+
+  test 'can add assets_creators via API' do
+    sop = Factory(:sop)
+    person = Factory(:person, first_name: 'Jane', last_name: 'Smith')
+    login_as(sop.contributor)
+    assert_difference('AssetsCreator.count', 2) do
+      disable_authorization_checks do
+        sop.api_assets_creators = [
+          {
+            given_name: "Joe",
+            family_name: "Bloggs",
+            affiliation: "School of Rock",
+            orcid: "https://orcid.org/0000-0002-5111-7263"
+          },
+          {
+            given_name: nil,
+            family_name: nil,
+            affiliation: nil,
+            orcid: nil,
+            creator_id: person.id
+          }
+        ]
+        assert sop.save
+      end
+    end
+  end
+
+  test 'can update assets_creators via API' do
+    person = Factory(:person, first_name: 'Jane', last_name: 'Smith')
+    person2 = Factory(:person, first_name: 'Sally', last_name: 'Smith')
+    sop = Factory(:sop)
+    ac1 = nil
+    ac2 = nil
+    ac3 = nil
+    disable_authorization_checks do
+      ac1 = sop.assets_creators.create(creator_id: person)
+      ac2 = sop.assets_creators.create(family_name: 'Smith', given_name: 'Bob')
+      ac3 = sop.assets_creators.create(family_name: 'Smith', given_name: 'Fred')
+    end
+    login_as(sop.contributor)
+    assert_difference('AssetsCreator.count', 1) do
+      disable_authorization_checks do
+        sop.api_assets_creators = [
+          {
+            given_name: "Joe",
+            family_name: "Bloggs"
+          },
+          {
+            given_name: "Bob",
+            family_name: "Smith"
+          },
+          {
+            given_name: nil,
+            family_name: nil,
+            affiliation: nil,
+            orcid: nil,
+            creator_id: person.id
+          },
+          {
+            given_name: nil,
+            family_name: nil,
+            affiliation: nil,
+            orcid: nil,
+            creator_id: person2.id
+          }
+        ]
+        assert sop.save
+        sop.reload
+        assert_equal 4, sop.assets_creators.count
+        assert_includes sop.assets_creators, ac1
+        assert_includes sop.assets_creators, ac2
+        assert ac3.destroyed?
+        names = sop.assets_creators.map(&:name)
+        assert_includes names, 'Joe Bloggs'
+        assert_includes names, 'Bob Smith'
+        assert_includes names, 'Sally Smith'
+        assert_includes names, 'Jane Smith'
+      end
+    end
+  end
+
+  test 'can adjust assets_creators positions in API without creating/deleting records' do
+    person = Factory(:person, first_name: 'Jane', last_name: 'Smith')
+    sop = Factory(:sop)
+    ac1 = nil
+    ac2 = nil
+    disable_authorization_checks do
+      ac2 = sop.assets_creators.create(pos: 1, family_name: 'Smith', given_name: 'Bob')
+      ac1 = sop.assets_creators.create(pos: 2, creator_id: person)
+    end
+    login_as(sop.contributor)
+    assert_no_difference('AssetsCreator.count') do
+      disable_authorization_checks do
+        sop.api_assets_creators = [
+          {
+            pos: 2,
+            given_name: "Bob",
+            family_name: "Smith"
+          },
+          {
+            pos: 1,
+            given_name: nil,
+            family_name: nil,
+            affiliation: nil,
+            orcid: nil,
+            creator_id: person.id
+          }
+        ]
+        assert sop.save
+        sop.reload
+        assert_equal 2, sop.assets_creators.count
+        assert_includes sop.assets_creator_ids, ac1.id
+        assert_includes sop.assets_creator_ids, ac2.id
+        names = sop.assets_creators.map(&:name)
+        assert_includes names, 'Bob Smith'
+        assert_includes names, 'Jane Smith'
+      end
+    end
   end
 
   private
