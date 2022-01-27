@@ -253,6 +253,55 @@ class Mailer < ActionMailer::Base
          subject: subject)
   end
 
+  def notify_admins_project_creation_accepted(responder, requester, project)
+    @requester = requester
+    @project = project
+    @responder = responder
+    recipients = []
+    if @project.programme
+      recipients = project.programme.programme_administrators
+      recipients |= admins if project.programme.site_managed?
+    else
+      recipients = admins
+    end
+
+    subject = "The request to create the #{t('project')}, #{@project.title}, has been APPROVED by #{@responder.name}"
+    mail(from: Seek::Config.noreply_sender,
+         to: recipients.collect(&:email_with_name),
+         reply_to: @responder.email_with_name,
+         subject: subject)
+
+  end
+
+  def notify_admins_project_join_accepted(responder, requester, project)
+    @requester = requester
+    @project = project
+    @responder = responder
+    recipients = @project.project_administrators
+
+
+    subject = "The request to join the #{t('project')}, #{@project.title}, has been ACCEPTED by #{@responder.name}"
+    mail(from: Seek::Config.noreply_sender,
+         to: recipients.collect(&:email_with_name),
+         reply_to: @responder.email_with_name,
+         subject: subject)
+  end
+
+  def notify_admins_project_join_rejected(responder, requester, project, comments)
+    @requester = requester
+    @project = project
+    @responder = responder
+    @comments = comments
+    recipients = @project.project_administrators
+
+
+    subject = "The request to join the #{t('project')}, #{@project.title}, has been REJECTED by #{@responder.name}"
+    mail(from: Seek::Config.noreply_sender,
+         to: recipients.collect(&:email_with_name),
+         reply_to: @responder.email_with_name,
+         subject: subject)
+  end
+
   private
 
   def admin_emails

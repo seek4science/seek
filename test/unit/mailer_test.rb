@@ -419,6 +419,35 @@ class MailerTest < ActionMailer::TestCase
     refute_nil email.body
   end
 
+  test 'notify_admins_project_creation_accepted' do
+    responder = Factory(:programme_administrator)
+    requester = Factory(:person)
+    project = responder.projects.first
+
+    email = Mailer.notify_admins_project_creation_accepted(responder, requester, project)
+    refute_nil email
+    refute_nil email.body
+  end
+
+  test 'notify_admins_project_join_accepted' do
+    responder = Factory(:project_administrator)
+    requester = Factory(:person)
+    project = responder.projects.first
+
+    email = Mailer.notify_admins_project_join_accepted(responder, requester, project)
+    refute_nil email
+    refute_nil email.body
+  end
+
+  test 'notify_admins_project_join_rejected' do
+    responder = Factory(:project_administrator)
+    requester = Factory(:person)
+    project = responder.projects.first
+
+    email = Mailer.notify_admins_project_join_rejected(responder, requester, project, "we don't want you here")
+    refute_nil email
+    refute_nil email.body
+  end
 
   private
 
