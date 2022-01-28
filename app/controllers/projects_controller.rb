@@ -598,7 +598,7 @@ class ProjectsController < ApplicationController
         @message_log.respond(comments)
         project_name = JSON.parse(@message_log.details)['project']['title']
         Mailer.create_project_rejected(requester,project_name,comments).deliver_later
-        Mailer.notify_admins_project_creation_rejected(current_person, requester, project_name, comments).deliver_later
+        Mailer.notify_admins_project_creation_rejected(current_person, requester, project_name, @programme&.to_json, comments).deliver_later
         flash[:notice] = "Request rejected and #{requester.name} has been notified"
       end
 

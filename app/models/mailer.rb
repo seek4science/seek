@@ -302,6 +302,29 @@ class Mailer < ActionMailer::Base
          subject: subject)
   end
 
+  def notify_admins_project_creation_rejected(responder, requester, project_name, programme_json, comments)
+    @requester = requester
+    @project_name = project_name
+    @responder = responder
+    @programme = nil
+    if programme_json
+      @programme = Programme.new(JSON.parse(programme_json))
+      @programme = Programme.find(@programme.id) if @programme.id
+    end
+    if @programme
+      recipients = @programme.programme_administrators
+      recipients |= admins if @programme.site_managed?
+    else
+      recipients = admins
+    end
+
+    subject = "The request to create the #{t('project')}, #{@project_name}, has been REJECTED by #{@responder.name}"
+    mail(from: Seek::Config.noreply_sender,
+         to: recipients.collect(&:email_with_name),
+         reply_to: @responder.email_with_name,
+         subject: subject)
+  end
+
   private
 
   def admin_emails

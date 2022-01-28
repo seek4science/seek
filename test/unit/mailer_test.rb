@@ -449,6 +449,39 @@ class MailerTest < ActionMailer::TestCase
     refute_nil email.body
   end
 
+  test 'notify_admins_project_creation_rejected existing programme' do
+    responder = Factory(:programme_administrator)
+    requester = Factory(:person)
+    project = Factory.build(:project)
+    programme = responder.programmes.first
+
+    email = Mailer.notify_admins_project_creation_rejected(responder, requester, project.title, programme.to_json, "sorry")
+    refute_nil email
+    refute_nil email.body
+  end
+
+  test 'notify_admins_project_creation_rejected nil programme' do
+    responder = Factory(:admin)
+    requester = Factory(:person)
+    project = Factory.build(:project)
+
+    email = Mailer.notify_admins_project_creation_rejected(responder, requester, project.title, nil, "sorry")
+    refute_nil email
+    refute_nil email.body
+  end
+
+  test 'notify_admins_project_creation_rejected new programme' do
+    responder = Factory(:admin)
+    requester = Factory(:person)
+    project = Factory.build(:project)
+    programme = Factory.build(:programme)
+    assert_nil programme.id
+
+    email = Mailer.notify_admins_project_creation_rejected(responder, requester, project.title, programme.to_json, "sorry")
+    refute_nil email
+    refute_nil email.body
+  end
+
   private
 
   def encode_mail(message)
