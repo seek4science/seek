@@ -177,6 +177,7 @@ class Mailer < ActionMailer::Base
 
   def request_create_project_for_programme(user, programme, project_json, institution_json, message_log)
     @admins = programme.programme_administrators
+    @admins |= admins if programme.site_managed?
     @programme = programme
     @requester = user.person
     @institution = Institution.new(JSON.parse(institution_json))
@@ -188,23 +189,6 @@ class Mailer < ActionMailer::Base
          reply_to: @requester.email_with_name,
          subject: "NEW #{t('project')} request from #{@requester.name} for your #{t('programme')}: #{@project.title}")
 
-  end
-
-  # same as request_create_project_for_programme but to notify the site admins rather instead of programme admins
-  def request_create_project_for_programme_admins(user, programme, project_json, institution_json, message_log)
-    @admins = admins
-    @programme = programme
-    @requester = user.person
-    @institution = Institution.new(JSON.parse(institution_json))
-    @project = Project.new(JSON.parse(project_json))
-    @message_log = message_log
-    
-    mail(from: Seek::Config.noreply_sender,
-         to: admin_emails,
-         reply_to: @requester.email_with_name,
-         subject: "NEW #{t('project')} request from #{@requester.name} for your #{t('programme')}: #{@project.title}",
-         template_name: :request_create_project_for_programme)
-    
   end
 
   def request_create_project_and_programme(user, programme_json, project_json, institution_json, message_log)

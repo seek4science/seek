@@ -175,7 +175,6 @@ class ProjectsController < ApplicationController
       elsif @programme.site_managed?
         log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
         Mailer.request_create_project_for_programme(current_user, @programme, @project.to_json, @institution.to_json, log).deliver_later
-        Mailer.request_create_project_for_programme_admins(current_user, @programme, @project.to_json, @institution.to_json, log).deliver_later
         flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
       else
         raise 'Invalid Programme'

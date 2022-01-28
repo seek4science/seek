@@ -1922,7 +1922,7 @@ class ProjectsControllerTest < ActionController::TestCase
           project: { title: 'The Project', description: 'description', web_page: 'web_page'},
           institution: { id: institution.id }
       }
-      assert_enqueued_emails(2) do # programme admins, and instance admins
+      assert_enqueued_emails(1) do
         assert_difference('ProjectCreationMessageLog.count') do
           post :request_create, params: params
         end

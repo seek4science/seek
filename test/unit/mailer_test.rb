@@ -350,27 +350,6 @@ class MailerTest < ActionMailer::TestCase
     end
   end
 
-  test 'request create project for programme admins' do
-    admin = Factory(:admin)
-    programme_admin = Factory(:programme_administrator)
-    programme = programme_admin.programmes.first
-    with_config_value(:instance_name, 'SEEK EMAIL TEST') do
-      with_config_value(:site_base_host, 'https://securefred.com:1337') do        
-        with_config_value(:managed_programme_id, programme.id) do
-          refute_empty programme.programme_administrators
-          project = Project.new(title:'My lovely project')
-          institution = Factory(:institution)
-          sender = Factory(:person)
-          log = ProjectCreationMessageLog.log_request(sender:sender, programme:programme, project:project, institution: institution)
-          email = Mailer.request_create_project_for_programme_admins(sender.user, programme, project.to_json, institution.to_json,log)
-          refute_nil email
-          refute_nil email.body
-          assert_equal Person.admins.collect(&:email), email.to
-        end        
-      end
-    end
-  end
-
   test 'request create project' do
     with_config_value(:instance_name, 'SEEK EMAIL TEST') do
       with_config_value(:site_base_host, 'https://securefred.com:1337') do
