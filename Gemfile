@@ -141,6 +141,8 @@ gem 'commonmarker'
 
 gem 'rack-cors', require: 'rack/cors'
 
+gem 'addressable', '~> 2.7.0'
+
 group :production do
   gem 'passenger'
 end

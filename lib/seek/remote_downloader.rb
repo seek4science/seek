@@ -55,7 +55,7 @@ module Seek
       begin
         URI.parse(url)
       rescue URI::InvalidURIError
-        url = URI.encode(url)
+        url = Addressable::URI.escape(url)
       end
 
       begin
@@ -156,7 +156,7 @@ module Seek
     def parse_and_encode_url(url)
       return URI.parse(url)
     rescue URI::InvalidURIError
-      url = URI.encode(url)
+      url = Addressable::URI.escape(url)
       return URI.parse(url)
     end
   end
