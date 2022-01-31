@@ -337,4 +337,9 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal "<i>Hello</i>\n<b>World</b>\n\n&gt; quote", text_or_not_specified("<i>Hello</i></div></div></div>\n<b>World</b>\n\n> quote", markdown: false).to_s
     assert_equal "alert('hi');\n\n&gt; quote", text_or_not_specified("<script>alert('hi');</script>\n\n> quote", markdown: false).to_s
   end
+
+  test 'markdown generation does not double encode special characters' do
+    assert_equal "<p>&amp;&amp; &quot;&quot; &lt; &gt;\n<code>&amp;&amp;</code></p>\n", text_or_not_specified("&& \"\" < >\n```&&```\n\n", markdown: true).to_s
+    assert_equal "&amp;&amp; \"\" &lt; &gt;\n```&amp;&amp;```\n\n", text_or_not_specified("&& \"\" < >\n```&&```\n\n", markdown: false).to_s
+  end
 end
