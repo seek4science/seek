@@ -22,12 +22,8 @@ class AvatarsController < ApplicationController
   # POST /people/1/avatars
   # POST /people
   def create
-    @avatar = @avatar_owner_instance.avatars.build
-    begin
-      @avatar.assign_attributes(avatar_params)
-      @avatar.original_filename = avatar_params[:image_file].original_filename
-    rescue ActionController::ParameterMissing
-    end
+    @avatar = @avatar_owner_instance.avatars.build(avatar_params)
+    @avatar.original_filename = avatar_params[:image_file].original_filename if avatar_params[:image_file]
 
     respond_to do |format|
       if @avatar.save
@@ -130,7 +126,7 @@ class AvatarsController < ApplicationController
   end
 
   def avatar_params
-    params.require(:avatar).permit(:image_file)
+    params.fetch(:avatar, {}).permit(:image_file)
   end
 
   def find_avatars
