@@ -291,6 +291,7 @@ class Mailer < ActionMailer::Base
     @project_name = project_name
     @responder = responder
     @programme = nil
+    @comments = comments
     if programme_json
       @programme = Programme.new(JSON.parse(programme_json))
       @programme = Programme.find(@programme.id) if @programme.id
