@@ -739,6 +739,7 @@ SEEK::Application.routes.draw do
     member do
       get :ontology
       get :dynamic_table_data
+      get :export_isa, action: :export_isa
     end
   end
 

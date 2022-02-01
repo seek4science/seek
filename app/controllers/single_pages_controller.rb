@@ -1,3 +1,4 @@
+require "isatab_converter"
 class SinglePagesController < ApplicationController
   include Seek::AssetsCommon
   before_action :set_up_instance_variable
@@ -59,6 +60,20 @@ class SinglePagesController < ApplicationController
       render json: { data: data }
     rescue Exception => e
       render json: {status: :unprocessable_entity, error: e.message } 
+    end
+  end
+
+  def export_isa
+    inv = Investigation.find(params[:investigation_id])
+    exporter = IsaExporter::Exporter.new(inv)
+    isa = exporter.export
+    if isa.nil?
+      respond_to do |format|
+        flash[:error] = "No data to download!"
+        format.html { redirect_to single_page_path(@project) }
+      end
+    else
+      send_data isa, filename: "isa.json", type: "application/json", deposition: "attachment"
     end
   end
 

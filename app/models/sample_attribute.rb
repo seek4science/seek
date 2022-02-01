@@ -6,6 +6,8 @@ class SampleAttribute < ApplicationRecord
 
   belongs_to :linked_sample_type, class_name: 'SampleType'
 
+  belongs_to :isa_tag
+
   validates :sample_type, presence: true
   validates :pid, format: { with: URI::regexp, allow_blank: true, allow_nil: true, message: 'not a valid URI' }
 
