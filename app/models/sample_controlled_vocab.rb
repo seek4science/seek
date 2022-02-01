@@ -53,5 +53,24 @@ class SampleControlledVocab < ApplicationRecord
   def update_sample_type_templates(_term)
     sample_types.each(&:queue_template_generation) unless new_record?
   end
+
+  class SystemVocabs
+
+    KEYS = {
+      edam_topics: 'edam_topics',
+      edam_operations: 'edam_operations'
+    }
+
+    def self.key_known?(key)
+      KEYS.values.include?(key)
+    end
+
+    KEYS.each do |k, v|
+      define_singleton_method "#{k}_controlled_vocab" do
+        SampleControlledVocab.find_by_key(v)
+      end
+    end
+
+  end
   
 end
