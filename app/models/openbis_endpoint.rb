@@ -21,8 +21,8 @@ class OpenbisEndpoint < ApplicationRecord
 
   after_destroy :clear_metadata_store
 
-  after_initialize :default_policy, autosave: true
-  after_initialize :add_meta_config, autosave: true
+  after_initialize :default_policy
+  after_initialize :add_meta_config
 
   before_save :meta_config_to_json
   before_save :clear_metadata_if_changed
