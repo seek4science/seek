@@ -199,7 +199,7 @@ module Seek
     #     unless owner.blank?
     #       current = entity.annotations_with_attribute(params[:annotation][:attribute_name])
     #       unless annotation.blank?
-    #         annotation.update_attributes!({:attribute_name => params[:annotation][:attribute_name], :value => params[:annotation][:value]})
+    #         annotation.update!({:attribute_name => params[:annotation][:attribute_name], :value => params[:annotation][:value]})
     #       else
     #         create_annotation owner
     #       end

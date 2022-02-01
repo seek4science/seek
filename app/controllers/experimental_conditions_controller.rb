@@ -91,7 +91,7 @@ class ExperimentalConditionsController < ApplicationController
       update_annotations(params[:annotation][:value], @experimental_condition, 'description') if try_block{!params[:annotation][:value].blank?}
 
 
-      if @experimental_condition.update_attributes(experimental_condition_params)
+      if @experimental_condition.update(experimental_condition_params)
         respond_to do |format|
           format.js
         end

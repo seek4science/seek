@@ -429,7 +429,7 @@ class HomesControllerTest < ActionController::TestCase
     assert_select 'div#my-recent-contributions ul li a[href=?]', assay_path(assay), text: /A new assay/
     assert_select 'div#my-recent-contributions ul li a[href=?]', assay_snapshot_path(assay, snapshot), text: /A new assay/
 
-    sop.update_attributes(title: 'An old sop')
+    sop.update(title: 'An old sop')
     Factory :activity_log, activity_loggable: sop, controller_name: 'assays', culprit: person.user, action: 'update'
 
     get :index

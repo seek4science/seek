@@ -35,7 +35,7 @@ module Seek
           flash[:notice] = "The sharing policies for your selected #{"item".pluralize(@items_for_sharing.size)} were successfully updated:<ul> "
           flash[:error] = "The sharing policies for your selected #{"item".pluralize(@items_for_sharing.size)} were not successfully updated:<ul> "
           @items_for_sharing.each do |item|
-            item.policy.update_attributes_with_bulk_sharing_policy(policy_params) if policy_params.present?
+            item.policy.update_with_bulk_sharing_policy(policy_params) if policy_params.present?
             begin
               item.save!
               notice_count +=1

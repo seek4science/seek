@@ -407,7 +407,7 @@ class ProjectsController < ApplicationController
 
     begin
       respond_to do |format|
-        if @project.update_attributes(project_params)
+        if @project.update(project_params)
           if Seek::Config.email_enabled && !@project.can_manage?(current_user)
             ProjectChangedEmailJob.new(@project).queue_job
           end
@@ -495,7 +495,7 @@ class ProjectsController < ApplicationController
 
   def update_administrative_roles
     unless params[:project].blank?
-      @project.update_attributes(project_role_params)
+      @project.update(project_role_params)
     end
   end
 
@@ -712,7 +712,7 @@ class ProjectsController < ApplicationController
       GroupMembership.where(id: params[:memberships_to_flag].keys).includes(:work_group).each do |membership|
         if membership.work_group.project_id == @project.id # Prevent modification of other projects' memberships
           left_at = params[:memberships_to_flag][membership.id.to_s][:time_left_at]
-          membership.update_attributes(time_left_at: left_at)
+          membership.update(time_left_at: left_at)
         end
         member = Person.find(membership.person_id)
         Rails.cache.delete_matched("rli_title_#{member.cache_key}_.*")

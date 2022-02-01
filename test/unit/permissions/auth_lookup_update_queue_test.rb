@@ -188,7 +188,7 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
 
     assert_no_difference('AuthLookupUpdateQueue.count') do
       disable_authorization_checks do
-        user.update_attributes(password: '123456789', password_confirmation: '123456789')
+        user.update(password: '123456789', password_confirmation: '123456789')
       end
     end
   end
@@ -198,7 +198,7 @@ class AuthLookupUpdateQueueTest < ActiveSupport::TestCase
 
     assert_no_difference('AuthLookupUpdateQueue.count') do
       disable_authorization_checks do
-        person.update_attributes(first_name: 'Dave')
+        person.update(first_name: 'Dave')
       end
     end
   end

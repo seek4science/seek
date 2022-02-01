@@ -144,7 +144,7 @@ class Policy < ApplicationRecord
     end
   end
 
-  def update_attributes_with_bulk_sharing_policy(policy_params)
+  def update_with_bulk_sharing_policy(policy_params)
 
     tap do |policy|
       if policy_params

@@ -42,7 +42,7 @@ class NodesController < ApplicationController
     update_relationships(@node,params)
 
     respond_to do |format|
-      if @node.update_attributes(node_params)
+      if @node.update(node_params)
         flash[:notice] = "#{t('node')} metadata was successfully updated."
         format.html { redirect_to node_path(@node) }
         format.json { render json: @node, include: [params[:include]] }

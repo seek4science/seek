@@ -228,7 +228,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     workflow = Factory :workflow, license: 'CC-BY-4.0', policy: Factory(:public_policy)
     workflowv = Factory :workflow_version_with_blob, workflow: workflow
 
-    workflow.update_attributes license: 'CC0-1.0'
+    workflow.update license: 'CC0-1.0'
 
     get :show, params: { id: workflow, version: 1 }
     assert_response :success
@@ -638,7 +638,7 @@ class WorkflowsControllerTest < ActionController::TestCase
                        license: 'MIT', other_creators: 'Jane Smith, John Smith', policy: Factory(:public_policy))
     disable_authorization_checks do
       workflow.save_as_new_version
-      workflow.update_attributes(title: 'V2 title', description: 'V2 description', workflow_class_id: Factory(:galaxy_workflow_class).id)
+      workflow.update(title: 'V2 title', description: 'V2 description', workflow_class_id: Factory(:galaxy_workflow_class).id)
       Factory(:generated_galaxy_ro_crate, asset: workflow, asset_version: 2)
     end
 

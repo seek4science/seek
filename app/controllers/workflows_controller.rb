@@ -58,7 +58,7 @@ class WorkflowsController < ApplicationController
     update_relationships(@workflow,params)
 
     respond_to do |format|
-      if @workflow.update_attributes(workflow_params)
+      if @workflow.update(workflow_params)
         flash[:notice] = "#{t('workflow')} metadata was successfully updated."
         format.html { redirect_to workflow_path(@workflow) }
         format.json { render json: @workflow, include: [params[:include]] }

@@ -347,7 +347,7 @@ class PresentationsControllerTest < ActionController::TestCase
     presentation = Factory :presentation, license: 'CC-BY-4.0', policy: Factory(:public_policy)
     presentationv = Factory :presentation_version_with_blob, presentation: presentation
 
-    presentation.update_attributes license: 'CC0-1.0'
+    presentation.update license: 'CC0-1.0'
 
     get :show, params: { id: presentation, version: 1 }
     assert_response :success
