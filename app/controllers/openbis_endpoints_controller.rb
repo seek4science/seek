@@ -32,7 +32,7 @@ class OpenbisEndpointsController < ApplicationController
   end
 
   def update
-    @openbis_endpoint.update_attributes(openbis_endpoint_params)
+    @openbis_endpoint.update(openbis_endpoint_params)
     save_and_respond 'The space was successfully updated.'
   end
 

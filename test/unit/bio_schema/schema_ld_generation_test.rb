@@ -714,7 +714,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       disable_authorization_checks do
         df.save!
         df.save_as_new_version
-        df.update_attributes(description: 'version 2 description', title: 'version 2 title')
+        df.update(description: 'version 2 description', title: 'version 2 title')
         Factory.create(:image_content_blob, asset: df, asset_version: 2)
         df.latest_version.update_column(:doi, '10.10.10.10/test.2')
       end

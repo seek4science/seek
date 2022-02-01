@@ -80,7 +80,7 @@ class SeekUtilTest < ActiveSupport::TestCase
   end
 
   test 'creates valid datafile with dependent external_assed that can be saved' do
-    @endpoint.project.update_attributes(default_license: 'CC0-1.0')
+    @endpoint.project.update(default_license: 'CC0-1.0')
     dataset = Seek::Openbis::Dataset.new(@endpoint, '20160210130454955-23')
     assert dataset
 

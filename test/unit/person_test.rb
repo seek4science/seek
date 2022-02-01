@@ -1121,7 +1121,7 @@ class PersonTest < ActiveSupport::TestCase
 
     with_config_value(:orcid_required, true) do
       assert_nothing_raised do
-        no_orcid.update_attributes(email: 'FISH-sOup99@email.com')
+        no_orcid.update(email: 'FISH-sOup99@email.com')
         assert no_orcid.valid?
       end
     end
@@ -1131,7 +1131,7 @@ class PersonTest < ActiveSupport::TestCase
     bad_orcid = Factory :brand_new_person, email: 'FISH-sOup1@email.com'
 
     with_config_value(:orcid_required, true) do
-      bad_orcid.update_attributes(email: 'FISH-sOup99@email.com', orcid: 'big mac')
+      bad_orcid.update(email: 'FISH-sOup99@email.com', orcid: 'big mac')
       assert !bad_orcid.valid?
       assert_not_empty bad_orcid.errors[:orcid]
     end

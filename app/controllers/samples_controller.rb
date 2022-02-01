@@ -204,7 +204,7 @@ class SamplesController < ApplicationController
   def update_sample_with_params(_params=nil, sample=nil)
     sample ||= @sample
     if _params.nil?
-      sample.update_attributes(sample_params(sample.sample_type))
+      sample.update(sample_params(sample.sample_type))
     else  
       sample.assign_attributes(sample_params(sample.sample_type, _params))
     end

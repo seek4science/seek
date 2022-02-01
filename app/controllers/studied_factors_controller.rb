@@ -92,7 +92,7 @@ class StudiedFactorsController < ApplicationController
     update_annotations(params[:annotation][:value], @studied_factor, 'description') if try_block { !params[:annotation][:value].blank? }
 
 
-    if @studied_factor.update_attributes(studied_factor_params)
+    if @studied_factor.update(studied_factor_params)
       respond_to do |format|
         format.js
       end

@@ -224,7 +224,7 @@ class NodesControllerTest < ActionController::TestCase
     node = Factory :node, license: 'CC-BY-4.0', policy: Factory(:public_policy)
     nodev = Factory :node_version_with_blob, node: node
 
-    node.update_attributes license: 'CC0-1.0'
+    node.update license: 'CC0-1.0'
 
     get :show, params: { id: node, version: 1 }
     assert_response :success

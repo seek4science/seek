@@ -98,7 +98,7 @@ class HumanDiseasesController < ApplicationController
   def update
 
     respond_to do |format|
-      if @human_disease.update_attributes(human_disease_params)
+      if @human_disease.update(human_disease_params)
         flash[:notice] = 'Human Disease was successfully updated.'
         format.html { redirect_to human_disease_path(@human_disease) }
         format.xml  { head :ok }

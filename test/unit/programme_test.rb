@@ -170,7 +170,7 @@ class ProgrammeTest < ActiveSupport::TestCase
     person = Factory(:person)
     person2 = Factory(:person)
 
-    programme.update_attributes(administrator_ids: [person.id.to_s])
+    programme.update(administrator_ids: [person.id.to_s])
     person.reload
     person2.reload
     programme.reload
@@ -179,7 +179,7 @@ class ProgrammeTest < ActiveSupport::TestCase
     refute person2.is_programme_administrator?(programme)
     assert_equal [person], programme.programme_administrators
 
-    programme.update_attributes(administrator_ids: [person2.id])
+    programme.update(administrator_ids: [person2.id])
     person.reload
     person2.reload
     programme.reload
@@ -188,7 +188,7 @@ class ProgrammeTest < ActiveSupport::TestCase
     assert person2.is_programme_administrator?(programme)
     assert_equal [person2], programme.programme_administrators
 
-    programme.update_attributes(administrator_ids: [person2.id, person.id])
+    programme.update(administrator_ids: [person2.id, person.id])
     person.reload
     person2.reload
     programme.reload

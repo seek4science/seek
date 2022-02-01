@@ -1106,7 +1106,7 @@ class ModelsControllerTest < ActionController::TestCase
     model = Factory :model, license: 'CC-BY-4.0', policy: Factory(:public_policy)
     modelv = Factory :model_version_with_blob, model: model
 
-    model.update_attributes license: 'CC0-1.0'
+    model.update license: 'CC0-1.0'
 
     get :show, params: { id: model, version: 1 }
     assert_response :success

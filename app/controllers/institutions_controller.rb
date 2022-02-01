@@ -76,7 +76,7 @@ class InstitutionsController < ApplicationController
   # PUT /institutions/1.xml
   def update
     respond_to do |format|
-      if @institution.update_attributes(institution_params)
+      if @institution.update(institution_params)
         expire_resource_list_item_content
         flash[:notice] = "#{t('institution')} was successfully updated."
         format.html { redirect_to(@institution) }

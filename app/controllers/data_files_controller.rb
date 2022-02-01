@@ -166,7 +166,7 @@ class DataFilesController < ApplicationController
     update_relationships(@data_file, params)
 
     respond_to do |format|
-      if @data_file.update_attributes(data_file_params)
+      if @data_file.update(data_file_params)
         flash[:notice] = "#{t('data_file')} metadata was successfully updated."
         format.html { redirect_to data_file_path(@data_file) }
         format.json {render json: @data_file, include: [params[:include]]}

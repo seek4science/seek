@@ -105,7 +105,7 @@ class PublicationsController < ApplicationController
   def update
     update_annotations(params[:tag_list], @publication) if params.key?(:tag_list)
 
-    if @publication.update_attributes(publication_params)
+    if @publication.update(publication_params)
       respond_to do |format|
         flash[:notice] = 'Publication was successfully updated.'
         format.html { redirect_to(@publication) }
@@ -299,7 +299,7 @@ class PublicationsController < ApplicationController
       end
     else
       @publication.publication_authors.each do |author|
-        author.update_attributes(person_id: nil) unless author.person_id.nil?
+        author.update(person_id: nil) unless author.person_id.nil?
       end
       @error = 'Please enter either a DOI or a PubMed ID for the publication.'
     end

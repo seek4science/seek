@@ -1577,8 +1577,8 @@ class DataFilesControllerTest < ActionController::TestCase
     published_data_file.reload
 
     disable_authorization_checks do
-      published_data_file.find_version(1).update_attributes!(visibility: :registered_users)
-      published_data_file.find_version(2).update_attributes!(visibility: :public)
+      published_data_file.find_version(1).update!(visibility: :registered_users)
+      published_data_file.find_version(2).update!(visibility: :public)
     end
 
     logout
@@ -2155,7 +2155,7 @@ class DataFilesControllerTest < ActionController::TestCase
     df = Factory :data_file, license: 'CC-BY-4.0', policy: Factory(:public_policy)
     dfv = Factory :data_file_version_with_blob, data_file: df
 
-    df.update_attributes license: 'CC0-1.0'
+    df.update license: 'CC0-1.0'
 
     get :show, params: { id: df, version: 1 }
     assert_response :success

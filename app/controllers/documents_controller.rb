@@ -43,7 +43,7 @@ class DocumentsController < ApplicationController
     update_relationships(@document,params)
 
     respond_to do |format|
-      if @document.update_attributes(document_params)
+      if @document.update(document_params)
         flash[:notice] = "#{t('document')} metadata was successfully updated."
         format.html { redirect_to document_path(@document) }
         format.json { render json: @document, include: [params[:include]] }
