@@ -72,8 +72,6 @@ module SEEK
 
     config.active_job.queue_adapter = :delayed_job
 
-    config.active_record.sqlite3.represent_boolean_as_integer = true
-
     # Ignore translation overrides when testing
     config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'overrides', '**', '*.{rb,yml}')] unless Rails.env.test?
     
