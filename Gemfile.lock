@@ -215,7 +215,6 @@ GEM
     dotenv-rails (2.7.6)
       dotenv (= 2.7.6)
       railties (>= 3.2)
-    dynamic_form (1.1.4)
     ebnf (2.3.0)
       amazing_print (~> 1.4)
       htmlentities (~> 4.3)
@@ -909,7 +908,6 @@ DEPENDENCIES
   doi_query_tool!
   doorkeeper (>= 5.2.5)
   dotenv-rails (~> 2.7.6)
-  dynamic_form
   equivalent-xml
   exception_notification
   factory_girl (= 2.6.4)
