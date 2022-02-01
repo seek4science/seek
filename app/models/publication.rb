@@ -57,7 +57,7 @@ class Publication < ApplicationRecord
   validate :check_uniqueness_within_project, unless: -> { Seek::Config.is_virtualliver }
 
   attr_writer :refresh_policy
-  before_save :refresh_policy, on: :update
+  before_update :refresh_policy
   after_update :update_creators_from_publication_authors
 
   accepts_nested_attributes_for :publication_authors
