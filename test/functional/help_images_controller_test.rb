@@ -53,6 +53,6 @@ class HelpImagesControllerTest < ActionController::TestCase
   private
 
   def picture_file
-    fixture_file_upload('files/file_picture.png', 'image/png')
+    Rack::Test::UploadedFile.new('files/file_picture.png', 'image/png')
   end
 end

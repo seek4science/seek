@@ -74,7 +74,7 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
 
     assert_difference('Workflow.count', 1) do
       post workflows_path, params: {
-          ro_crate: fixture_file_upload('files/workflows/ro-crate-nf-core-ampliseq.crate.zip'),
+          ro_crate: Rack::Test::UploadedFile.new('files/workflows/ro-crate-nf-core-ampliseq.crate.zip'),
           workflow: {
               project_ids: [@project.id]
           }
@@ -95,7 +95,7 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
     assert_no_difference('Workflow.count', 1) do
       assert_difference('Workflow::Version.count', 1) do
         post create_version_workflow_path(workflow.id), params: {
-            ro_crate: fixture_file_upload('files/workflows/ro-crate-nf-core-ampliseq.crate.zip'),
+            ro_crate: Rack::Test::UploadedFile.new('files/workflows/ro-crate-nf-core-ampliseq.crate.zip'),
             workflow: {
                 project_ids: [@project.id]
             },
@@ -115,7 +115,7 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
   test 'cannot post RO crate with missing metadata' do
     assert_no_difference('Workflow.count') do
       post workflows_path, params: {
-          ro_crate: fixture_file_upload('files/workflows/workflow-4-1.crate.zip'),
+          ro_crate: Rack::Test::UploadedFile.new('files/workflows/workflow-4-1.crate.zip'),
           workflow: {
               project_ids: [@project.id]
           }
@@ -129,7 +129,7 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
   test 'can supplement metadata when posting RO crate' do
     assert_difference('Workflow.count', 1) do
       post workflows_path, params: {
-          ro_crate: fixture_file_upload('files/workflows/workflow-4-1.crate.zip'),
+          ro_crate: Rack::Test::UploadedFile.new('files/workflows/workflow-4-1.crate.zip'),
           workflow: {
               title: 'Alternative title',
               project_ids: [@project.id]

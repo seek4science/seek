@@ -195,7 +195,7 @@ class UploadHandingTest < ActiveSupport::TestCase
   end
 
   test 'model image present?' do
-    file_with_content = fixture_file_upload('files/file', 'text/plain')
+    file_with_content = Rack::Test::UploadedFile.new('files/file', 'text/plain')
 
     @params = { model_image: { image_file: file_with_content }, content_blob: {}, model: { title: 'fish' } }
     assert model_image_present?
@@ -206,8 +206,8 @@ class UploadHandingTest < ActiveSupport::TestCase
   end
 
   test 'check for data if present' do
-    file_with_content = fixture_file_upload('files/file', 'text/plain')
-    empty_content = fixture_file_upload('files/empty_file', 'text/plain')
+    file_with_content = Rack::Test::UploadedFile.new('files/file', 'text/plain')
+    empty_content = Rack::Test::UploadedFile.new('files/empty_file', 'text/plain')
 
     assert check_for_empty_data_if_present(data: '', data_url: 'http://fish')
     assert check_for_empty_data_if_present(data: file_with_content, data_url: '')

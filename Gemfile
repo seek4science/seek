@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-gem 'rails', '~> 6.1.0'
+gem 'rails', '~> 6.1.4.4'
 gem 'rdoc'
 
 #database adaptors
@@ -35,7 +35,7 @@ gem 'openseek-api'
 gem 'loofah'
 gem 'jbuilder'
 gem 'jbuilder-json_api'
-gem 'active_model_serializers', '~> 0.10.2'
+gem 'active_model_serializers'
 gem 'json-schema'
 gem 'json-diff'
 gem 'rubyzip'
@@ -53,7 +53,7 @@ gem 'will_paginate', '~> 3.1'
 gem 'yaml_db'
 gem 'rails_autolink'
 gem 'rfc-822'
-gem 'nokogiri', '~> 1.12.5'
+gem 'nokogiri'
 gem 'rdf-virtuoso', '>= 0.2.0'
 gem 'terrapin'
 gem 'lograge'
@@ -80,7 +80,7 @@ gem 'mimemagic','~> 0.3.7'
 gem 'auto_strip_attributes'
 gem 'coffee-rails', '~> 4.2'
 gem 'bootstrap-sass', '>=3.4.1'
-gem 'sass-rails', '~> 5.0'
+gem 'sass-rails'
 gem 'sprockets-rails'
 
 gem 'ro-bundle', '~> 0.2.5'
@@ -141,7 +141,7 @@ gem 'commonmarker'
 
 gem 'rack-cors', require: 'rack/cors'
 
-gem 'addressable', '~> 2.7.0'
+gem 'addressable'
 
 group :production do
   gem 'passenger'

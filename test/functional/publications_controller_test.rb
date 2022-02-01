@@ -188,7 +188,7 @@ class PublicationsControllerTest < ActionController::TestCase
       ],
       published_date: Date.new(2006)
     }
-    post :create, params: { subaction: 'Import', publication: { bibtex_file: fixture_file_upload('files/publication.bibtex') } }
+    post :create, params: { subaction: 'Import', publication: { bibtex_file: Rack::Test::UploadedFile.new('files/publication.bibtex') } }
     p = assigns(:publication)
     assert_equal publication[:title], p.title
     assert_equal publication[:journal], p.journal
@@ -240,7 +240,7 @@ class PublicationsControllerTest < ActionController::TestCase
     ]
 
     assert_difference('Publication.count', 3) do
-      post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('files/publications.bibtex'), project_ids: [projects(:one).id] } }
+      post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: Rack::Test::UploadedFile.new('files/publications.bibtex'), project_ids: [projects(:one).id] } }
     end
 
     publication0 = Publication.where(title: publications[0][:title]).first
@@ -274,7 +274,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should check the correctness of bibtex files' do
     assert_difference('Publication.count', 0) do
-      post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('files/bibtex/error_bibtex.bib'), project_ids: [projects(:one).id] } }
+      post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: Rack::Test::UploadedFile.new('files/bibtex/error_bibtex.bib'), project_ids: [projects(:one).id] } }
       assert_redirected_to publications_path
       assert_includes flash[:error], 'An InProceedings needs to have a booktitle.'
       assert_includes flash[:error], 'Please check your bibtex files, each publication should contain a title or a chapter name.'
@@ -313,7 +313,7 @@ class PublicationsControllerTest < ActionController::TestCase
     ]
 
     assert_difference('Publication.count',2) do
-        post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('files/bibtex/author_match.bib'), project_ids: [projects(:one).id] } }
+        post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: Rack::Test::UploadedFile.new('files/bibtex/author_match.bib'), project_ids: [projects(:one).id] } }
     end
 
 

@@ -70,7 +70,7 @@ end
 
 Factory.define(:model_image) do |f|
   f.original_filename 'file_picture.png'
-  f.image_file fixture_file_upload("#{Rails.root}/test/fixtures/files/file_picture.png", 'image/png')
+  f.image_file Rack::Test::UploadedFile.new("#{Rails.root}/test/fixtures/files/file_picture.png", 'image/png')
   f.content_type 'image/png'
 end
 

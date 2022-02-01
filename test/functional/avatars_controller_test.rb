@@ -176,6 +176,6 @@ class AvatarsControllerTest < ActionController::TestCase
   private
 
   def avatar_payload
-    { image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
+    { image_file: Rack::Test::UploadedFile.new('files/file_picture.png', 'image/png') }
   end
 end

@@ -98,7 +98,7 @@ class ActiveSupport::TestCase
   teardown :clear_current_user
 
   def file_for_upload
-    fixture_file_upload('files/little_file_v2.txt', 'text/plain')
+    Rack::Test::UploadedFile.new('files/little_file_v2.txt', 'text/plain')
   end
 
   def check_for_soffice
