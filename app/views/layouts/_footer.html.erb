@@ -10,21 +10,18 @@
           </a>
           <span class="subtle"><%= version_text -%></span>
         </div>
+        <div id="elixir-belgium-credit">
+          <a href="https://www.elixir-belgium.org/" target="_blank" class="powered-by">
+             <%= image(:elixir_belgium_logo, width: 85, height: 85) %>
+          </a>
+        </div>
         <% cache cache_name, skip_digest: true do -%>
           <div class="ft-info">
-            <% if (Seek::Config.instance_admins_link != Seek::Config.instance_link) && (Seek::Config.instance_admins_name != Seek::Config.instance_name) %>
-                <%= link_to "About #{Seek::Config.instance_admins_name}", Seek::Config.instance_admins_link, :target => '_blank' %> |
-            <% end %>
-            <%= link_to "About #{Seek::Config.instance_name}", Seek::Config.instance_link, :target => '_blank' %> |
+
             <% if logged_in_and_registered? %>
                 <%= link_to 'Provide feedback', feedback_home_path -%> |
             <% end %>
-            <%= link_to 'Funding and Programmes', funding_home_path -%> | 
-            <% if !Seek::Config.funding_link.blank? %>
-              <a href="<%=Seek::Config.funding_link%>" target="_blank">
-                <%=Seek::Config.funding_link%>
-              </a> |
-            <% end %>
+
             <%= link_to 'Credits', Seek::Help::HelpDictionary.instance.help_link(:credits), :target => '_blank' -%>
             <% if Seek::Config.terms_enabled %>
                 | <%= link_to("Terms & Conditions", terms_home_path) %>
