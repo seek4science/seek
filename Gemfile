@@ -41,7 +41,6 @@ gem 'rubyzip'
 
 gem 'equivalent-xml'
 gem 'docsplit'
-gem 'pothoven-attachment_fu'
 gem 'exception_notification'
 gem 'fssm'
 gem 'acts-as-taggable-on'
