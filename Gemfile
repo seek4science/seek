@@ -1,13 +1,13 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-gem 'rails', '~> 6.1.4.4'
+gem 'rails', '~> 6.1.4', '>= 6.1.4.4'
 gem 'rdoc'
 
 #database adaptors
 gem 'mysql2'
 gem 'pg'
-gem 'sqlite3'
+gem 'sqlite3', '~> 1.4'
 
 gem 'feedjira', '~>1'
 gem 'google-analytics-rails'
@@ -32,7 +32,7 @@ gem 'rdf'
 gem 'openseek-api'
 # for fancy content escaping in openbis integration
 gem 'loofah'
-gem 'jbuilder'
+gem 'jbuilder', '~> 2.7'
 gem 'jbuilder-json_api'
 gem 'active_model_serializers'
 gem 'json-schema'
@@ -79,7 +79,7 @@ gem 'mimemagic','~> 0.3.7'
 gem 'auto_strip_attributes'
 gem 'coffee-rails', '~> 4.2'
 gem 'bootstrap-sass', '>=3.4.1'
-gem 'sass-rails'
+gem 'sass-rails', '>= 6'
 gem 'sprockets-rails'
 
 gem 'ro-bundle', '~> 0.2.5'
@@ -117,12 +117,11 @@ gem 'private_address_check'
 # Rails 5 upgrade
 gem 'rails-html-sanitizer'
 
-# Rails 5.2 upgrade
-gem 'bootsnap', '>= 1.1.0', require: false
+gem 'bootsnap', '>= 1.4.4', require: false
 
 gem 'activerecord-import'
 
-gem "puma", "~>4.3"
+gem "puma", "~> 5.0"
 
 gem "doorkeeper", ">= 5.2.5"
 
@@ -156,6 +155,10 @@ group :development do
   gem 'gem-licenses'
   gem "better_errors"
   gem "binding_of_caller"
+
+  gem 'web-console', '>= 4.1.0'
+  gem 'rack-mini-profiler', '~> 2.0'
+  gem 'listen', '~> 3.3'
 end
 
 group :test do
@@ -170,6 +173,8 @@ group :test do
   gem 'rails-controller-testing'
   gem 'simplecov'
   gem 'whenever-test'
+  # Easy installation and use of web drivers to run system tests with browsers
+  gem 'webdrivers'
 end
 
 group :test, :development do
