@@ -115,7 +115,7 @@ module IsaExporter
             isa_assay[:technologyPlatform] = nil
             isa_assay[:characteristicCategories] = convert_characteristic_categories(nil, assay)
             isa_assay[:materials] = { 
-                samples: assay.sample_type.samples.map { |s| find_sample_origin(s) }.flatten.uniq.map{ |s| {"@id": "#sample/#{s}"} } ,#the samples from study level that are referenced in this assay's samples,
+                samples: assay.sample_type.samples.map { |s| find_sample_origin([s]) }.flatten.uniq.map{ |s| {"@id": "#sample/#{s}"} } ,#the samples from study level that are referenced in this assay's samples,
                 otherMaterials: convert_other_materials(assay.sample_type),
             }
             isa_assay[:processSequence] = convert_process_sequence(assay.sample_type)
@@ -239,7 +239,7 @@ module IsaExporter
                 {
                     "@id": "#sample/#{s.id}",
                     name: s.get_attribute_value(with_tag_sample),
-                    derivesFrom: extract_sample_ids(s.get_attribute_value(with_type_seek_sample_multi)),
+                    derivesFrom: extract_sample_ids(s.get_attribute_value(with_type_seek_sample_multi), "source"),
                     characteristics: convert_characteristics(s, with_tag_sample_characteristic),
                     factorValues: [{
                         category: { "@id": nil },
@@ -294,9 +294,22 @@ module IsaExporter
 
         def convert_process_sequence(sample_type)
             # This method is meant to be used for both Studies and Assays
+            return [] if !sample_type.samples.any?
             with_tag_isa_parameter_value = get_values(sample_type)
-            with_tag_protocol = get_protocol(sample_type)
-            with_type_seek_sample_multi = get_sample_multi(sample_type)
+            with_tag_protocol = detect_protocol(sample_type)
+            with_type_seek_sample_multi = detect_sample_multi(sample_type)
+            type = "source"
+            if sample_type.assays.any?
+                prev_sample_type = sample_type.samples[0].linked_samples[0].sample_type
+                if detect_sample(prev_sample_type)
+                    type = "sample"
+                elsif detect_other_material(prev_sample_type)
+                    type = "otherMaterials"
+                elsif detect_data_file(prev_sample_type)
+                    type = "dataFile"
+                end
+                raise "Defected ISA process_sequence!" if !type
+            end
             sample_type.samples.map do |s|
                 {
                     "@id": "#process/#{with_tag_protocol.title}/#{s.id}", 
@@ -309,14 +322,14 @@ module IsaExporter
                     date:"",
                     previousProcess: previous_process(s),
                     nextProcess: next_process(s),
-                    inputs: extract_sample_ids(s.get_attribute_value(with_type_seek_sample_multi)),
+                    inputs: extract_sample_ids(s.get_attribute_value(with_type_seek_sample_multi), type),
                     outputs: process_sequence_output(s)
                 }
             end
         end
 
         def convert_data_files(sample_type)
-            with_tag_data_file = get_data_file(sample_type)
+            with_tag_data_file = detect_data_file(sample_type)
             return [] if !with_tag_data_file
             sample_type.samples.map do |s|
                 {
@@ -329,9 +342,9 @@ module IsaExporter
         end
 
         def convert_other_materials(sample_type)
-            with_tag_isa_other_material = get_other_material(sample_type)
+            with_tag_isa_other_material = detect_other_material(sample_type)
             return [] if !with_tag_isa_other_material
-            with_type_seek_sample_multi = get_sample_multi(sample_type)
+            with_type_seek_sample_multi = detect_sample_multi(sample_type)
             raise "Defected ISA other_materials!" if !with_type_seek_sample_multi
             sample_type.samples.map do |s|
                 {
@@ -349,7 +362,7 @@ module IsaExporter
                             unit: { "@id": nil }
                         }
                     ],
-                    derivesFrom: extract_sample_ids(s.get_attribute_value(with_type_seek_sample_multi))
+                    derivesFrom: extract_sample_ids(s.get_attribute_value(with_type_seek_sample_multi), "sample")
                 }
             end
         end
@@ -363,7 +376,11 @@ module IsaExporter
 
         private 
 
-        def get_protocol(sample_type)
+        def detect_sample(sample_type)
+            sample_type.sample_attributes.detect{ |sa| sa.isa_tag&.isa_sample? }
+        end
+
+        def detect_protocol(sample_type)
             sample_type.sample_attributes.detect{ |sa| sa.isa_tag&.isa_protocol? }
         end
 
@@ -371,29 +388,29 @@ module IsaExporter
             sample_type.sample_attributes.select{|sa| sa.isa_tag&.isa_parameter_value?}
         end
 
-        def get_data_file(sample_type)
+        def detect_data_file(sample_type)
             sample_type.sample_attributes.detect{|sa| sa.isa_tag&.isa_data_file?}
         end
 
-        def get_other_material(sample_type)
+        def detect_other_material(sample_type)
             sample_type.sample_attributes.detect{|sa| sa.isa_tag&.isa_other_material?}
         end
 
-        def get_sample_multi(sample_type)
+        def detect_sample_multi(sample_type)
             sample_type.sample_attributes.detect(&:seek_sample_multi?)
         end
 
         def next_process(sample)
             sample_type = sample.linking_samples.first&.sample_type
             return nil if !sample_type
-            protocol = get_protocol(sample_type)
-            return sample_type && protocol ? { "@id": "#process/#{get_protocol(sample_type).title}" } : nil
+            protocol = detect_protocol(sample_type)
+            return sample_type && protocol ? { "@id": "#process/#{detect_protocol(sample_type).title}" } : nil
         end
 
         def previous_process(sample)
             sample_type = sample.linked_samples.first&.sample_type
             return nil if !sample_type
-            protocol = get_protocol(sample_type)
+            protocol = detect_protocol(sample_type)
             # if there's no protocol, it means the previous sample type is source
             return sample_type && protocol ?  { "@id": "#process/#{protocol.title}" } : nil
         end
@@ -401,10 +418,10 @@ module IsaExporter
         def process_sequence_output(sample)
             prefix = "sample"
             if sample.sample_type.isa_template.level == "assay"
-                if get_other_material(sample.sample_type)
+                if detect_other_material(sample.sample_type)
                     prefix = "other_material"
                 else
-                    if get_data_file(sample.sample_type)
+                    if detect_data_file(sample.sample_type)
                         prefix = "data_file"
                     else
                         raise "Defected ISA process!"
@@ -433,8 +450,8 @@ module IsaExporter
             end
         end
 
-        def extract_sample_ids(obj)
-            Array.wrap(obj).map { |item| {"@id": "#source/#{item[:id]}"} }
+        def extract_sample_ids(obj, type)
+            Array.wrap(obj).map { |item| {"@id": "##{type}/#{item[:id]}"} }
         end
 
         def get_ontology_details(sample_attribute)
@@ -447,20 +464,14 @@ module IsaExporter
 
         # This method finds the source sample (sample_collection/samples of 2nd sample_type of the study) of a sample
         # The samples declared in the study level and being used in the stream of the current sample
-        def find_sample_origin(sample)
-            sample_list = Array.wrap(sample)
-            arr = []
+        def find_sample_origin(sample_list)
             temp = []
-            while sample_list.length > 0 do
-            sample_list.each do |s|
-                linked_samples = s.linked_samples
-                arr.push(*linked_samples) if linked_samples.length > 0
+            while sample_list.any? do
+              sample_list = sample_list.map{ |s| s.linked_samples }.flatten.uniq
+              temp << sample_list.map{ |s| s.id }
             end
-            temp = sample_list
-            sample_list = arr.uniq
-            arr = []
-            end
-            return temp.map{|s| s.id}
+            #temp[0]: source, temp[1]: sample
+            return temp[0]
         end
 
 
