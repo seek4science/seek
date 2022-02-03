@@ -1120,5 +1120,14 @@ a.orcid-link {
   min-height: 20px;
   margin-bottom: 20px;
   font-size: inherit !important;
-}  
+}
 
+#home-explore-projects a.browse-button {
+  white-space: normal;
+  width: 90%;
+  font-size: 16px;
+}
+
+#home-explore-projects a.browse-button img {
+  height: 80px;
+}
