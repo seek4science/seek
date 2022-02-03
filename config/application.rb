@@ -12,7 +12,7 @@ end
 module SEEK
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 5.0
+    config.load_defaults 5.2
 
     # Force all environments to use the same logger level
     # Configuration for the application, engines, and railties goes here.
@@ -74,6 +74,7 @@ module SEEK
 
     # Ignore translation overrides when testing
     config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'overrides', '**', '*.{rb,yml}')] unless Rails.env.test?
-    
+
+    config.active_record.belongs_to_required_by_default = false
   end
 end
