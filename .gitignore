@@ -6,6 +6,7 @@ data.sql
 reset-db.sh
 rails_best_practices_output.html
 
+db/*.sqlite
 db/*.sqlite3
 db/*.sqlite3-journal
 config/database.yml
