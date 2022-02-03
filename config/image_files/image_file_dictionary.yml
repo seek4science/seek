@@ -224,6 +224,13 @@ asset_housekeeper: 'roles/role-asset-housekeeper.png'
 admin: 'roles/role-admin.png'
 pal: 'roles/role-pal.png'
 
+# front page
+front_page_feature_organise: 'front_page/home_feature_organise.svg'
+front_page_feature_collaborate: 'front_page/home_feature_collaborate.svg'
+front_page_feature_standardise: 'front_page/home_feature_standardise.svg'
+front_page_feature_publish: 'front_page/home_feature_publish.svg'
+front_page_integrations: 'front_page/integrations.svg'
+
 #images for mime types
 #general mime type
 bmp_file: 'file_icons/small/bmp.png'

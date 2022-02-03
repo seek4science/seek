@@ -12,7 +12,7 @@
               <div style="text-align: center;">
                 <a class="btn btn-primary btn-lg browse-button" href="<%= programmes_path %>" role="button">
                   <p>Browse <%= t('programme').pluralize %></p>
-                  <%= image_tag_for_key('programme_avatar', nil, nil,nil, '') %>
+                  <%= image('programme_avatar') %>
                 </a>
               </div>
               <br>
@@ -22,7 +22,7 @@
             <div style="text-align: center;">
               <a class="btn btn-primary btn-lg browse-button" href="<%= projects_path %>" role="button">
                 <p>Browse <%= t('project').pluralize %></p>
-                <%= image_tag_for_key('project_avatar', nil, nil,nil, '') %>
+                <%= image('project_avatar') %>
               </a>
             </div>
           </div>
