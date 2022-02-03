@@ -57,4 +57,7 @@ Rails.application.configure do
   # Annotate rendered view with file names.
   # config.action_view.annotate_rendered_view_with_filenames = true
   config.assets.digest = false
+
+  # TODO: Change this to: `:random` when tests are all passing
+  config.active_support.test_order = :sorted
 end
