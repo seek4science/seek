@@ -38,7 +38,7 @@
       <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@data_file} -%>
     <% end %>
     <%= modal_footer do %>
-      <%= create_button id:"data_file_submit_btn",
+      <%= create_button id:"data_file_submit_btn", button_text:'Add',
                           onclick:"return validateResourceFields('data_file_xlsx');",
                           class:'btn btn-primary' %>
       <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>

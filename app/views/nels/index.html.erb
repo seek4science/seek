@@ -16,6 +16,38 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
 
 <script type="text/javascript">
   $j(document).ready(function () {
+
+    // Waits till the given element is loaded
+    function waitForElm(selector) {
+      return new Promise(resolve => {
+        if (document.querySelector(selector)) {
+          return resolve(document.querySelector(selector));
+        }
+
+        const observer = new MutationObserver(mutations => {
+          if (document.querySelector(selector)) {
+            resolve(document.querySelector(selector));
+            observer.disconnect();
+          }
+        });
+
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true
+        });
+      });
+    }
+
+    // Reopen the tree at previous existing location
+    if (sessionStorage.getItem("nels_tree_state")){
+      path = sessionStorage.getItem("nels_tree_state").split(',')
+      waitForElm(`#${path[0]}`).then((elm) => $j("#nels-tree").jstree("open_node", path[0]))
+      waitForElm(`#${path[1]}`).then((elm) => {
+        $j("#nels-tree").jstree("select_node", path[1]);
+        $j(`#${path[1]} a`).click()
+      });
+    }
+
     $j('#nels-tree')
         .bind('loaded.jstree', function() {})
         .jstree({
@@ -25,8 +57,10 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
             'data' : {
               'url': function (node) {
                 if (node.id === '#') {
+                  console.log ('<%= projects_assay_nels_path(params[:assay_id]) -%>')
                   return '<%= projects_assay_nels_path(params[:assay_id]) -%>';
                 } else {
+                  console.log ('<%= datasets_assay_nels_path(params[:assay_id]) -%>')
                   return '<%= datasets_assay_nels_path(params[:assay_id]) -%>';
                 }
               },
@@ -34,18 +68,22 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
                 if (node.id === '#') {
                   return { };
                 }
-
+                // Returns d, but I am not sure what for!!
+                console.log(node.data)
                 var d = { id: node.data.id };
 
                 if (node.data.project_id) {
                   d.project_id = node.data.project_id
                 }
-                return d;
+                console.log("returning d")
+                console.log(d)
+                if (d) return d;
               },
               'error': function (error) {
                 $j('#nels-dataset').hide();
                 $j('#nels-content').show();
                 $j('#nels-content').html(HandlebarsTemplates['nels/error'](error));
+                console.log(error)
                 if (error.responseJSON.url) {
                   window.location.href = error.responseJSON.url;
                 }
@@ -54,9 +92,12 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
           }
         })
       .on('activate_node.jstree', function (e, data) {
-        if (data.node.data.project_id) {
+        if (data.node.data.project_id) {// dataset selected
           $j('#nels-dataset').html('').spinner('add').show();
           $j('#nels-content').hide();
+
+          // Save current state
+          sessionStorage.setItem('nels_tree_state',`project${data.node.data.project_id},dataset${data.node.data.id}`)          
 
           $j.ajax({ url: '<%= dataset_assay_nels_path(params[:assay_id]) -%>',
             data: {
@@ -67,7 +108,7 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
               $j('#nels-dataset').html(data).spinner('remove');
             }
           });
-        } else {
+        } else {// Project selected
           $j('#nels-dataset').hide();
           $j('#nels-content').show();
           $j('#nels-content').html(HandlebarsTemplates['nels/project'](data.node.data));
