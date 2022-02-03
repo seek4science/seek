@@ -8,7 +8,5 @@ class CollectionItemSerializer < SimpleBaseSerializer
 
   attributes :comment, :order
 
-  def _links
-    { self: collection_item_path(object.collection, object) }
-  end
+  link(:self) { collection_item_path(object.collection, object) }
 end
