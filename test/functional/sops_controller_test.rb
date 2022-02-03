@@ -325,7 +325,7 @@ class SopsControllerTest < ActionController::TestCase
     # !!!description cannot be changed in new version but revision comments and file name,etc
 
     # create new version
-    post :create_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: Rack::Test::UploadedFile.new('files/little_file_v2.txt', 'text/plain') }] }
+    post :create_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: fixture_file_upload('little_file_v2.txt', 'text/plain') }] }
     assert_redirected_to sop_path(assigns(:sop))
 
     s = Sop.find(s.id)
@@ -392,7 +392,7 @@ class SopsControllerTest < ActionController::TestCase
     refute s.can_edit?
 
     assert_no_difference('Sop::Version.count') do
-      post :create_version, params: { id: s, data: Rack::Test::UploadedFile.new('files/file_picture.png'), revision_comments: 'This is a new revision' }
+      post :create_version, params: { id: s, data: fixture_file_upload('file_picture.png'), revision_comments: 'This is a new revision' }
     end
 
     assert_redirected_to sop_path(s)
@@ -1801,8 +1801,8 @@ class SopsControllerTest < ActionController::TestCase
   def picture_file(options = {})
     options.reverse_merge!({ filename: 'file_picture.png',
                              content_type: 'image/png',
-                             tempfile_fixture: 'files/file_picture.png' })
-    Rack::Test::UploadedFile.new(options[:tempfile_fixture], options[:content_type])
+                             tempfile_fixture: 'file_picture.png' })
+    fixture_file_upload(options[:tempfile_fixture], options[:content_type])
   end
 
   def valid_sop_with_url

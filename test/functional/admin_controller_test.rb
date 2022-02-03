@@ -349,7 +349,7 @@ class AdminControllerTest < ActionController::TestCase
                 copyright_addendum_content: 'copyright content', imprint_description: 'imprint description',
                 terms_page: 'terms page', privacy_page: 'privacy page', about_page: 'about page',
                 about_instance_link_enabled: 1, about_instance_admins_link_enabled: 1,
-                header_image_file: Rack::Test::UploadedFile.new('files/file_picture.png', 'image/png') }
+                header_image_file: fixture_file_upload('file_picture.png', 'image/png') }
 
     assert_difference('Avatar.count', 1) do
       post :update_rebrand, params: settings

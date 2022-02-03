@@ -390,7 +390,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     login_as(person)
     assert_difference('ContentBlob.count') do
       post :create_content_blob, params: {
-          content_blobs: [{ data: Rack::Test::UploadedFile.new('files/workflows/rp2-to-rp2path-packed.cwl', 'application/x-yaml') }],
+          content_blobs: [{ data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl', 'application/x-yaml') }],
           workflow_class_id: cwl.id }
     end
     assert_response :success
@@ -406,7 +406,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     logout
     assert_no_difference('ContentBlob.count') do
       post :create_content_blob, params: {
-          content_blobs: [{ data: Rack::Test::UploadedFile.new('files/workflows/rp2-to-rp2path-packed.cwl', 'application/x-yaml') }],
+          content_blobs: [{ data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl', 'application/x-yaml') }],
           workflow_class_id: cwl.id }
     end
     assert_response :redirect
@@ -419,9 +419,9 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_difference('ContentBlob.count') do
       post :create_ro_crate, params: {
           ro_crate: {
-              workflow: { data: Rack::Test::UploadedFile.new('files/checksums.txt') },
-                          diagram: { data: Rack::Test::UploadedFile.new('files/file_picture.png') },
-              abstract_cwl: { data: Rack::Test::UploadedFile.new('files/workflows/rp2-to-rp2path-packed.cwl') }
+              workflow: { data: fixture_file_upload('checksums.txt') },
+                          diagram: { data: fixture_file_upload('file_picture.png') },
+              abstract_cwl: { data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl') }
           },
           workflow_class_id: cwl.id
       }
@@ -576,9 +576,9 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_difference('ContentBlob.count') do
       post :create_ro_crate, params: {
           ro_crate: {
-              workflow: { data: Rack::Test::UploadedFile.new('files/file with spaces in name.txt') },
-              diagram: { data: Rack::Test::UploadedFile.new('files/file_picture.png') },
-              abstract_cwl: { data: Rack::Test::UploadedFile.new('files/workflows/rp2-to-rp2path-packed.cwl') }
+              workflow: { data: fixture_file_upload('file with spaces in name.txt') },
+              diagram: { data: fixture_file_upload('file_picture.png') },
+              abstract_cwl: { data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl') }
           },
           workflow_class_id: cwl.id
       }
@@ -678,9 +678,9 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_difference('ContentBlob.count') do
       post :create_ro_crate, params: {
           ro_crate: {
-              workflow: { data: Rack::Test::UploadedFile.new('files/workflows/rp2-to-rp2path-packed.cwl') },
-                          diagram: { data: Rack::Test::UploadedFile.new('files/file_picture.png') },
-              abstract_cwl: { data: Rack::Test::UploadedFile.new('files/workflows/rp2-to-rp2path-packed.cwl') }
+              workflow: { data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl') },
+                          diagram: { data: fixture_file_upload('file_picture.png') },
+              abstract_cwl: { data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl') }
           },
           workflow_class_id: cwl.id
       }

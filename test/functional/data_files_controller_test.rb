@@ -363,12 +363,12 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'upload_for_tool inacessible with normal login' do
-    post :upload_for_tool, params: { data_file: { title: 'Test', data: Rack::Test::UploadedFile.new('files/file_picture.png'), project_id: projects(:sysmo_project).id }, recipient_id: people(:quentin_person).id }
+    post :upload_for_tool, params: { data_file: { title: 'Test', data: fixture_file_upload('file_picture.png'), project_id: projects(:sysmo_project).id }, recipient_id: people(:quentin_person).id }
     assert_redirected_to root_url
   end
 
   test 'upload_from_email inacessible with normal login' do
-    post :upload_from_email, params: { data_file: { title: 'Test', data: Rack::Test::UploadedFile.new('files/file_picture.png'), project_id: projects(:sysmo_project).id }, recipient_ids: [people(:quentin_person).id], cc_ids: [] }
+    post :upload_from_email, params: { data_file: { title: 'Test', data: fixture_file_upload('file_picture.png'), project_id: projects(:sysmo_project).id }, recipient_ids: [people(:quentin_person).id], cc_ids: [] }
     assert_redirected_to root_url
   end
 
@@ -3607,7 +3607,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   def picture_file
-    Rack::Test::UploadedFile.new('files/file_picture.png', 'image/png')
+    fixture_file_upload('file_picture.png', 'image/png')
   end
 
   def valid_data_file

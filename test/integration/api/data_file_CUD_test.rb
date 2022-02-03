@@ -48,7 +48,7 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     assert df.can_download?(@current_user)
     assert df.can_edit?(@current_user)
 
-    put data_file_content_blob_path(df, df.content_blob), params: { file: Rack::Test::UploadedFile.new('files/txt_test.txt', 'text/plain') }, headers: { 'Accept' => 'application/json' }
+    put data_file_content_blob_path(df, df.content_blob), params: { file: fixture_file_upload('txt_test.txt', 'text/plain') }, headers: { 'Accept' => 'application/json' }
 
     assert_response :success
     blob = df.content_blob.reload

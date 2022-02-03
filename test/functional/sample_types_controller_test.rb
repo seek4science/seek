@@ -623,15 +623,15 @@ class SampleTypesControllerTest < ActionController::TestCase
   private
 
   def template_for_upload
-    Rack::Test::UploadedFile.new('files/sample-type-example.xlsx', 'application/excel')
+    fixture_file_upload('sample-type-example.xlsx', 'application/excel')
   end
 
   def bad_template_for_upload
-    Rack::Test::UploadedFile.new('files/small-test-spreadsheet.xls', 'application/excel')
+    fixture_file_upload('small-test-spreadsheet.xls', 'application/excel')
   end
 
   def missing_columns_template_for_upload
-    Rack::Test::UploadedFile.new('files/samples-data-missing-columns.xls', 'application/excel')
+    fixture_file_upload('samples-data-missing-columns.xls', 'application/excel')
   end
 
   def edit_min_object(object)
