@@ -1,9 +1,7 @@
 require 'rails_helper'
 require 'factory_girl'
-require_relative '../../../test/password_helper.rb'
-
-include ActionDispatch::TestProcess::FixtureFile
-include PasswordHelper
+require_relative '../../../test/factories_helper.rb'
+include FactoriesHelper
 
 FactoryGirl.find_definitions
 
