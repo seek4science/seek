@@ -77,7 +77,7 @@ class ExperimentalConditionTest < ActiveSupport::TestCase
       ec_array.push Factory(:experimental_condition, sop: s, start_value: i)
     end
     # create bunch of ECes which are the same based on the set (measured_item, unit, value, substances)
-    compound = Factory(:compound, name: 'glucose')
+    compound = Factory(:compound, name: 'Fructose')
     measured_item = Factory(:measured_item)
     unit = Factory(:unit)
     (0...number_of_the_same_ecs).to_a.each do
@@ -95,7 +95,7 @@ class ExperimentalConditionTest < ActiveSupport::TestCase
   test 'should create experimental condition and the association has_many compounds , through experimental_condition_links table' do
     User.with_current_user users(:aaron) do
       compound1 = Compound.new(name: 'water')
-      compound2 = Compound.new(name: 'glucose')
+      compound2 = Compound.new(name: 'Fructose')
       ec = ExperimentalCondition.new(sop: sops(:editable_sop), sop_version: 1, measured_item: measured_items(:concentration), unit: units(:gram), start_value: 1)
       ec_link1 = ExperimentalConditionLink.new(substance: compound1)
       ec_link2 = ExperimentalConditionLink.new(substance: compound2)

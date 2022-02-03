@@ -76,7 +76,7 @@ class StudiedFactorTest < ActiveSupport::TestCase
       fs_array.push Factory(:studied_factor, data_file: d, start_value: i)
     end
     # create bunch of FSes which are the same based on the set (measured_item, unit, start_value, end_value, sd, substance)
-    compound = Factory(:compound, name: 'glucose')
+    compound = Factory(:compound, name: 'Fructose')
     measured_item = Factory(:measured_item)
     unit = Factory(:unit)
     (0...number_of_the_same_fses).to_a.each do
@@ -93,7 +93,7 @@ class StudiedFactorTest < ActiveSupport::TestCase
   test 'should create the factor_studied and the association has_many compounds , through studied_factor_links table' do
     User.with_current_user users(:aaron) do
       compound1 = Compound.new(name: 'water')
-      compound2 = Compound.new(name: 'glucose')
+      compound2 = Compound.new(name: 'Fructose')
       fs = StudiedFactor.new(data_file: data_files(:editable_data_file), data_file_version: 1, measured_item: measured_items(:concentration), unit: units(:gram), start_value: 1, end_value: 10, standard_deviation: 1)
       fs_link1 = StudiedFactorLink.new(substance: compound1)
       fs_link2 = StudiedFactorLink.new(substance: compound2)

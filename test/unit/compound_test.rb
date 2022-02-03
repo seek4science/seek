@@ -51,7 +51,7 @@ class CompoundTest < ActiveSupport::TestCase
   end
 
   test 'should create the association has_many with synonyms table' do
-    compound = Compound.new(name: 'glucose')
+    compound = Compound.new(name: 'Fructose')
     synonyms1 = Synonym.new(name: 'glc', substance: compound)
     synonyms2 = Synonym.new(name: 'glk', substance: compound)
     compound.synonyms = [synonyms1, synonyms2]
@@ -62,7 +62,7 @@ class CompoundTest < ActiveSupport::TestCase
 
   test 'should create the association compound has_many studied_factors, through studied_factor_links table ' do
     User.with_current_user users(:aaron) do
-      compound = Compound.new(name: 'glucose')
+      compound = Compound.new(name: 'Fructose')
       fs1 = StudiedFactor.new(data_file: data_files(:editable_data_file), data_file_version: 1, measured_item: measured_items(:concentration), unit: units(:gram), start_value: 1, end_value: 10, standard_deviation: 1)
       fs2 = StudiedFactor.new(data_file: data_files(:editable_data_file), data_file_version: 1, measured_item: measured_items(:concentration), unit: units(:gram), start_value: 1, end_value: 10, standard_deviation: 2)
 
@@ -80,7 +80,7 @@ class CompoundTest < ActiveSupport::TestCase
 
   test 'should create the association compound has_many experimental_conditions, through experimental_condition_links table ' do
     User.with_current_user users(:aaron) do
-      compound = Compound.new(name: 'glucose')
+      compound = Compound.new(name: 'Fructose')
       ec1 = ExperimentalCondition.new(sop: sops(:editable_sop), sop_version: 1, measured_item: measured_items(:concentration), unit: units(:gram), start_value: 1)
       ec2 = ExperimentalCondition.new(sop: sops(:editable_sop), sop_version: 1, measured_item: measured_items(:concentration), unit: units(:gram), start_value: 1)
 
