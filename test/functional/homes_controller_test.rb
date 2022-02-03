@@ -639,12 +639,12 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
 
-    assert_select 'div#home_explore_projects', count: 0
-    assert_select 'div#home_quick_start', count: 0
-    assert_select 'div#home_my_items', count: 0
-    assert_select 'div#home_features', count: 0
-    assert_select 'div#home_who_uses', count: 0
-    assert_select 'div#home_integrations', count: 0
+    assert_select 'div#home-explore-projects', count: 0
+    assert_select 'div#home-quick-start', count: 0
+    assert_select 'div#home-my-items', count: 0
+    assert_select 'div#home-features', count: 0
+    assert_select 'div#home-who-uses', count: 0
+    assert_select 'div#home-integrations', count: 0
 
     ##### full homepage no user logged in
 
@@ -669,12 +669,12 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
 
-    assert_select 'div#home_explore_projects', count: 1
-    assert_select 'div#home_quick_start', count: 0
-    assert_select 'div#home_my_items', count: 0
-    assert_select 'div#home_features', count: 1
-    assert_select 'div#home_who_uses', count: 1
-    assert_select 'div#home_integrations', count: 1
+    assert_select 'div#home-explore-projects', count: 1
+    assert_select 'div#home-quick-start', count: 0
+    assert_select 'div#home-my-items', count: 0
+    assert_select 'div#home-features', count: 1
+    assert_select 'div#home-who-uses', count: 1
+    assert_select 'div#home-integrations', count: 1
 
     ##### full homepage logged in
 
@@ -682,12 +682,12 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
 
-    assert_select 'div#home_explore_projects', count: 1
-    assert_select 'div#home_quick_start', count: 1
-    assert_select 'div#home_my_items', count: 1
-    assert_select 'div#home_features', count: 0 
-    assert_select 'div#home_who_uses', count: 0 
-    assert_select 'div#home_integrations', count: 0
+    assert_select 'div#home-explore-projects', count: 1
+    assert_select 'div#home-quick-start', count: 1
+    assert_select 'div#home-my-items', count: 1
+    assert_select 'div#home-features', count: 0
+    assert_select 'div#home-who_uses', count: 0
+    assert_select 'div#home-integrations', count: 0
 
     ### disabling tags removes tag cloud within explore project
     with_config_value :home_explore_projects, true do
