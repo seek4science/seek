@@ -44,7 +44,7 @@ class SearchControllerTest < ActionController::TestCase
         end
       end
     end
-    File.write('res.html', response.body)
+
     assert_equal 3, assigns(:results)['Model'].count
     assert_equal 25, assigns(:external_results).count
     assert_select '.related-items li a', text: 'Models (3)'
