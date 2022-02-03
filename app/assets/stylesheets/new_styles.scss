@@ -332,6 +332,18 @@ img#front-page-integrations {
   padding: 20px;
 }
 
+#home-quick-start a.quick-start-button {
+  white-space: normal;
+  width:100%;
+  vertical-align: middle;
+}
+
+#home-quick-start a.quick-start-button .glyphicon {
+  font-size: 25px;
+  float: left;
+  //opacity: 0.8;
+}
+
 a.seek-homepage-button {
   display: block;
   font-size: 200%;

@@ -1,25 +1,31 @@
 <%
-  path_create_project = "/projects/guided_create"
-  path_join_project = "/projects/guided_join"
+  path_create_project = guided_create_projects_path
+  path_join_project = guided_join_projects_path
 %>
-<%= panel("Quick start", id: 'home_quick_start', body_options: { class: 'front-page-panel' }) do %>
+<%= panel("Quick start", id: 'home-quick-start', body_options: { class: 'front-page-panel' }) do %>
   <% if can_create_projects? %>
     <div class="row" style="display: flex;align-items: center;">
-      <div class="col-sm-5 text-center">
-        <a class="btn btn-success" href="<%=path_create_project%>" role="button" aria-label="Left Align" style="white-space: normal;width:100%;"> Create project </a>
+      <div class="col-md-6 text-center">
+        <a class="btn btn-primary quick-start-button" href="<%=path_create_project%>" role="button" aria-label="Left Align">
+          <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+          Create <%= t('project') %>
+        </a>
       </div>
-      <div class="col-sm-7">
-        Create new project
+      <div class="col-md-6">
+        Create a new <%= t('project') %>
       </div>
     </div>
     <br>
   <% end %>
   <div class="row" style="display: flex;align-items: center;">
-    <div class="col-sm-5 text-center">
-      <a class="btn btn-success" href="<%=path_join_project%>" role="button" aria-label="Left Align" style="white-space: normal;width:100%;"> Join <br> project </a>       
+    <div class="col-md-6 text-center">
+      <a class="btn btn-primary quick-start-button" href="<%=path_join_project%>" role="button" aria-label="Left Align">
+        <span class="glyphicon glyphicon-link" aria-hidden="true"></span>
+        Join <br> <%= t('project') %>
+      </a>
     </div>
-    <div class="col-sm-7">
-      Request membership of already existing project
+    <div class="col-md-6">
+      Request membership of an existing <%= t('project') %>
     </div>
   </div>
 <% end %>
