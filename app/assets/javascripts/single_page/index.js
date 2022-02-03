@@ -82,7 +82,7 @@ const batchSampleCreateStruct = (ex_id, attribute_map, sample_type_id, pid, assa
         assays: {
           data: [
             {
-              id: 1,
+              id: assay_id,
               type: "assays"
             }
           ]
