@@ -357,7 +357,7 @@ class SopsControllerTest < ActionController::TestCase
     al = ActivityLog.last
     assert_equal 'download', al.action
     assert_equal sop, al.activity_loggable
-    assert_equal "attachment; filename=\"ms_word_test.doc\"", @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"ms_word_test.doc\"; filename*=UTF-8''ms_word_test.doc", @response.header['Content-Disposition']
     assert_equal 'application/msword', @response.header['Content-Type']
     assert_equal '9216', @response.header['Content-Length']
   end
@@ -1005,7 +1005,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'content blob filename precedence should take user input first' do
     stub_request(:any, 'http://example.com/url_filename.txt')
-        .to_return(body: 'hi', headers: { 'Content-Disposition' => 'attachment; filename="server_filename.txt"' })
+        .to_return(body: 'hi', headers: { 'Content-Disposition' => "attachment; filename=\"server_filename.txt\"; filename*=UTF-8''server_filename.txt" })
     sop = { title: 'Test', project_ids: [@project.id] }
     blob = { data_url: 'http://example.com/url_filename.txt', original_filename: 'user_filename.txt' }
 
@@ -1020,7 +1020,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'content blob filename precedence should take server filename second' do
     stub_request(:any, 'http://example.com/url_filename.txt')
-        .to_return(body: 'hi', headers: { 'Content-Disposition' => 'attachment; filename="server_filename.txt"' })
+        .to_return(body: 'hi', headers: { 'Content-Disposition' => "attachment; filename=\"server_filename.txt\"; filename*=UTF-8''server_filename.txt" })
     sop = { title: 'Test', project_ids: [@project.id] }
     blob = { data_url: 'http://example.com/url_filename.txt' }
 

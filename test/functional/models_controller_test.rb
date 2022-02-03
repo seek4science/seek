@@ -41,7 +41,7 @@ class ModelsControllerTest < ActionController::TestCase
       get :download, params: { id: model.id }
     end
     assert_response :success
-    assert_equal "attachment; filename=\"file_with_no_extension\"", @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"file_with_no_extension\"; filename*=UTF-8''file_with_no_extension", @response.header['Content-Disposition']
     assert_equal 'application/octet-stream', @response.header['Content-Type']
     assert_equal '31', @response.header['Content-Length']
   end
@@ -52,7 +52,7 @@ class ModelsControllerTest < ActionController::TestCase
       get :download, params: { id: model.id }
     end
     assert_response :success
-    assert_equal "attachment; filename=\"this_model.zip\"", @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"this_model.zip\"; filename*=UTF-8''this_model.zip", @response.header['Content-Disposition']
     assert_equal 'application/zip', @response.header['Content-Type']
     assert_equal '3024', @response.header['Content-Length']
   end
@@ -63,7 +63,7 @@ class ModelsControllerTest < ActionController::TestCase
       get :download, params: { id: model.id }
     end
     assert_response :success
-    assert_equal "attachment; filename=\"cronwright.xml\"", @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"cronwright.xml\"; filename*=UTF-8''cronwright.xml", @response.header['Content-Disposition']
     assert_equal 'application/xml', @response.header['Content-Type']
     assert_equal '5933', @response.header['Content-Length']
   end
