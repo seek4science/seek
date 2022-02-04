@@ -3,8 +3,8 @@
       <h2><%= pluralize(object.errors.count, 'error') %> prohibited this sample from being saved</h2>
       <p>There were problems with the following fields:</p>
       <ul>
-        <% object.errors.each do |attr, msg| %>
-            <li><%= attr.to_s.humanize %> <%= msg %></li>
+        <% object.errors.each do |error| %>
+          <li><%= error.full_message.html_safe %></li>
         <% end %>
       </ul>
     </div>
