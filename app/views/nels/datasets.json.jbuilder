@@ -10,13 +10,13 @@ end
 
 @datasets.each do |dataset|
   json.array! dataset['subtypes'].split(',') do |subtype|
-    json.id "#{subtype}_#{dataset['id']}"
+    json.id "#{subtype}#{dataset['id']}"
     json.text subtype
     json.parent "dataset#{dataset['id']}"
     json.data do
-      json.id "#{subtype}_#{dataset['id']}"
+      json.id "#{subtype}#{dataset['id']}"
       json.project_id params[:id]
-      json.dataset_id "dataset#{dataset['id']}"
+      json.dataset_id dataset['id']
     end
   end
 end

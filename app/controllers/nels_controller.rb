@@ -38,10 +38,6 @@ class NelsController < ApplicationController
     # Populate all the necessary information for the view
     @datasettypes = @rest_client.datasettypes
     @projects = @rest_client.projects
-
-    puts (@projects)
-    puts (@datasettypes)
-
     respond_to do |format|
       format.html
     end
@@ -58,9 +54,13 @@ class NelsController < ApplicationController
   end
 
   def add_metadata
-    # TODO: Finish implementenation for uploading metadata
-    puts params.inspect
-    puts params["content_blobs"][0]["data"].path
+    # TODO: Finish validating metadata sample. How exactly are the sample_types retrieved?
+    # @possible_sample_types = @data_file.possible_sample_types
+    # raise error
+    # @data_file.content_blob = IO.read(file_path)
+
+    # SampleType.sample_types_matching_content_blob(IO.read(params["content_blobs"][0]["data"].path))
+
     @rest_client.upload_metadata(params[:project_id].to_i, params[:dataset_id].to_i,params[:subtype_name], params["content_blobs"][0]["data"].path)
     redirect_to action: "index"
   end
@@ -75,7 +75,6 @@ class NelsController < ApplicationController
 
   def datasets
     @datasets = @rest_client.datasets(params[:id].to_i)
-
     respond_to do |format|
       format.json
     end
@@ -92,6 +91,23 @@ class NelsController < ApplicationController
     
     respond_to do |format|
       format.html { render partial: 'nels/dataset' }
+    end
+  end
+
+  
+  def subtype
+    @dataset = @rest_client.dataset(params[:project_id].to_i, params[:dataset_id].to_i)
+
+    @subtype_id = params[:subtype_id]
+
+    # Populates the "metadata" field for each subtype, indicating if there is associated metadata with it
+    @dataset['subtypes'].each_with_index do |subtype, index |
+      @dataset['subtypes'][index]['metadata'] = 
+        @rest_client.check_metadata_exists(params[:project_id].to_i, params[:dataset_id].to_i, subtype['type'])
+    end
+    
+    respond_to do |format|
+      format.html { render partial: 'nels/subtype' }
     end
   end
 

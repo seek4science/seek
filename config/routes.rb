@@ -443,6 +443,7 @@ SEEK::Application.routes.draw do
         get :projects
         get :datasets
         get :dataset
+        get :subtype
         post :register
         get :new_dataset
         get :get_metadata
