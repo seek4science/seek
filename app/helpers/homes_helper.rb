@@ -208,27 +208,27 @@ module HomesHelper
     [
       {
         key: 'front_page_integration_elixir_aai',
-        url: nil,
+        url: 'https://elixir-europe.org/services/compute/aai',
         label: 'Login with'
       },
       {
         key: 'front_page_integration_ols',
-        url: nil,
+        url: 'https://www.ebi.ac.uk/ols/index',
         label: 'Ontologies'
       },
       {
         key: 'front_page_integration_datacite',
-        url: nil,
+        url: 'https://datacite.org/index.html',
         label: 'Assign DOIs'
       },
       {
         key: 'front_page_integration_zenodo',
-        url: nil,
+        url: 'https://zenodo.org/',
         label: 'Publish'
       },
       {
         key: 'front_page_integration_json_api',
-        url: nil,
+        url: 'https://jsonapi.org/',
         label: 'Programmatic access'
       },
       {
