@@ -400,6 +400,21 @@ a.seek-homepage-button {
   }
 }
 
+#home-integrations .col {
+  text-align: center;
+  height: 15em;
+}
+
+#home-integrations img.integration-logo {
+  max-width: 90%;
+  padding: 1em;
+  max-height: 80%;
+}
+
+#home-integrations .integration-label {
+  font-size: x-large;
+}
+
 div.isa_graph {
   background: $panel-bg;
   border-color: $panel-default-border;

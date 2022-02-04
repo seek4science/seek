@@ -233,7 +233,7 @@ module HomesHelper
       },
       {
         key: 'front_page_integration_bioschemas',
-        url: nil,
+        url: 'https://bioschemas.org',
         label: 'Markup'
       }
     ]
