@@ -203,4 +203,39 @@ module HomesHelper
       end
     end
   end
+
+  def integration_definitions
+    [
+      {
+        key: 'front_page_integration_elixir_aai',
+        url: nil,
+        label: 'Login with'
+      },
+      {
+        key: 'front_page_integration_ols',
+        url: nil,
+        label: 'Ontologies'
+      },
+      {
+        key: 'front_page_integration_datacite',
+        url: nil,
+        label: 'Assign DOIs'
+      },
+      {
+        key: 'front_page_integration_zenodo',
+        url: nil,
+        label: 'Publish'
+      },
+      {
+        key: 'front_page_integration_json_api',
+        url: nil,
+        label: 'Programmatic access'
+      },
+      {
+        key: 'front_page_integration_bioschemas',
+        url: nil,
+        label: 'Markup'
+      }
+    ]
+  end
 end

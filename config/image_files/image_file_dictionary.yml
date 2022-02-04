@@ -230,6 +230,12 @@ front_page_feature_collaborate: 'front_page/home_feature_collaborate.svg'
 front_page_feature_standardise: 'front_page/home_feature_standardise.svg'
 front_page_feature_publish: 'front_page/home_feature_publish.svg'
 front_page_integrations: 'front_page/integrations.svg'
+front_page_integration_elixir_aai: 'front_page/integrations-elixir.svg'
+front_page_integration_datacite: 'front_page/integrations-datacite.svg'
+front_page_integration_ols: 'front_page/integrations-ols.svg'
+front_page_integration_zenodo: 'front_page/integrations-zenodo.svg'
+front_page_integration_json_api: 'front_page/integrations-json-api.svg'
+front_page_integration_bioschemas: 'front_page/integrations-bioschemas.svg'
 
 #images for mime types
 #general mime type

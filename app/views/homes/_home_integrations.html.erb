@@ -1,5 +1,15 @@
 <div class="panel panel-default" id="home-integrations">
   <h2 class="text-center">Integrations</h2>
-  <%= image('front_page_integrations', alt:'Integrations',id:'front-page-integrations') %>
+
+  <% cache('front-page-integrations') do %>
+    <div class='row'>
+      <% integration_definitions.each do |integration| %>
+        <div class='col col-md-4'>
+          <%= image_tag_for_key(integration[:key],integration[:url],integration[:label],{class:'integration-logo'},nil) %>
+          <div class='integration-label'><%= integration[:label] %></div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
 </div>
 
