@@ -319,8 +319,16 @@ label.admin-checkbox {
 }
 
 div#home-features {
-  border: none;
-  border-radius: 0px;
+  padding-bottom: 1.5em;
+}
+
+div#home-my-items .panel-title {
+  text-align: center;
+}
+
+div#home-my-items #my-projects {
+  border-right: 2px solid #ccc;
+  min-height: 100%;
 }
 
 .seek-homepage-button-container {
@@ -340,12 +348,14 @@ img#front-page-integrations {
 #home-quick-start a.quick-start-button {
   white-space: normal;
   width:100%;
+  display:block;
   vertical-align: middle;
 }
 
 #home-quick-start a.quick-start-button .glyphicon {
   font-size: 25px;
   float: left;
+  padding-top: 5px;
   //opacity: 0.8;
 }
 
