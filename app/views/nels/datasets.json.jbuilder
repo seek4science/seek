@@ -17,6 +17,7 @@ end
       json.id "#{subtype}#{dataset['id']}"
       json.project_id params[:id]
       json.dataset_id dataset['id']
+      json.text subtype
     end
   end
 end

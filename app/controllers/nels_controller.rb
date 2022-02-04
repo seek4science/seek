@@ -98,7 +98,7 @@ class NelsController < ApplicationController
   def subtype
     @dataset = @rest_client.dataset(params[:project_id].to_i, params[:dataset_id].to_i)
 
-    @subtype_id = params[:subtype_id]
+    @subtype = params[:subtype]
 
     # Populates the "metadata" field for each subtype, indicating if there is associated metadata with it
     @dataset['subtypes'].each_with_index do |subtype, index |

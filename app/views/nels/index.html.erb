@@ -106,7 +106,7 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
             data: {
               project_id: data.node.data.project_id,
               dataset_id: data.node.data.dataset_id,
-              subtype_id: data.node.data.id,
+              subtype: data.node.data.text,
             },
             success: function (data) {
               $j('#nels-dataset').html(data).spinner('remove');

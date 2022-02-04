@@ -1,6 +1,7 @@
+<i>Non Working prototype, links not working!!</i>
 <h2>You are at:</h2>
 
-<%= @dataset['name'] -%>/<a href="" style="pointer-events: none;><%= @subtype_id -%></a><span id="nels_breadcrumb"></span>
+<%= @dataset['name'] -%>/<a href="" onclick="return false;"><%= @subtype -%></a><span id="nels_breadcrumb"></span>
 
 <% if @dataset['owner_name'].present? %>
     <strong>Owner:</strong> <%= @dataset['owner_name'] %><br/>
@@ -28,7 +29,7 @@ table, th, td {
   </thead>
   <tbody>
     <tr>
-      <td><a href="">Folder 1</a></td>
+      <td><a class="nels-folder" href="">Folder 1</a></td>
       <td></td>
     </tr>
     <tr>
@@ -47,10 +48,9 @@ table, th, td {
     path=''
     sessionStorage.getItem('nels_folder_state').split("/").forEach(element => {
       path=path.concat(`/${element}`);
-      pathHTML=pathHTML.concat(`/<a href="" path="${path}">${element}</a>`);
+      pathHTML=pathHTML.concat(`/<a href="" onclick="return false;" path="${path}">${element}</a>`);
     });
-    $j('#nels_breadcrumb').html(path)
+    $j('#nels_breadcrumb').html(pathHTML)
     // TODO: Add on click for each `a` element in the breadcrumb
-
   });
 </script>
