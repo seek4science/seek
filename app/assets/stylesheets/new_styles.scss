@@ -51,6 +51,12 @@ ul.feed li:first-child {
   padding-top: 0;
 }
 
+div#my-recent-contributions .feed {
+  max-height:40em;
+  overflow:hidden;
+  overflow-y:auto;
+}
+
 .file-type-icon {
   display: block;
   float: left;
