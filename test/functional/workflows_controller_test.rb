@@ -919,6 +919,28 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'cannot update path to non-existent path' do
+    workflow = Factory(:git_version).resource
+    login_as(workflow.contributor)
+
+    assert_equal 'Common Workflow Language', workflow.workflow_class.title
+    assert_equal 'Common Workflow Language', workflow.latest_git_version.workflow_class.title
+    assert_nil workflow.main_workflow_path
+    assert_nil workflow.latest_git_version.main_workflow_path
+    assert_no_difference('Git::Annotation.count') do
+      patch :update_paths, params: { id: workflow.id,
+                                     git_version: { diagram_path: 'banananananana.png',
+                                                    main_workflow_path: 'concat_two_files.ga' },
+                                     workflow: { workflow_class_id: Factory(:galaxy_workflow_class).id } }
+
+      assert_response :unprocessable_entity
+      assert assigns(:display_workflow).errors.added?(:"git_annotations.path", 'not found in repository')
+      workflow.reload
+      assert_nil workflow.main_workflow_path
+      assert_nil workflow.latest_git_version.main_workflow_path
+    end
+  end
+
   test 'can update paths and extract metadata' do
     workflow = Factory(:git_version).resource
     login_as(workflow.contributor)

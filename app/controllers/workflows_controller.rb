@@ -272,7 +272,7 @@ class WorkflowsController < ApplicationController
           format.json { render json: @workflow, include: [params[:include]] }
         end
       else
-        format.html { render action: 'edit' }
+        format.html { render action: 'edit_paths', status: :unprocessable_entity }
         format.json { render json: json_api_errors(@workflow), status: :unprocessable_entity }
       end
     end

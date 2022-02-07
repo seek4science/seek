@@ -1,4 +1,6 @@
 module GitHelper
+  NAMESPACE = 'git-tree/'
+
   def jstree_json_from_git_tree(tree, root_text: 'Root', include_root: false)
     nodes = []
     root_id = '#'
@@ -18,10 +20,11 @@ module GitHelper
       ['tree', 'blob'].each do |type|
         tree.send("walk_#{type}s", :preorder) do |root, entry|
           nodes << {
-            id: "#{root}#{entry[:name]}",
-            parent: root.blank? ? root_id : root.chomp('/'),
+            id: "#{NAMESPACE}#{root}#{entry[:name]}",
+            parent: root.blank? ? root_id : "#{NAMESPACE}#{root.chomp('/')}",
             text: entry[:name],
-            type: type
+            type: type,
+            data: { path: "#{root}#{entry[:name]}" }
           }
         end
       end
@@ -34,8 +37,9 @@ module GitHelper
     h = {}
 
     git_annotations.each do |ga|
-      h[ga.path] ||= []
-      h[ga.path] << {
+      path = "#{NAMESPACE}#{ga.path}"
+      h[path] ||= []
+      h[path] << {
           key: ga.key,
           label: t("git_annotation_label.#{ga.key}")
       }

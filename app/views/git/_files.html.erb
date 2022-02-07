@@ -36,7 +36,7 @@
             var node = jstree.get_node(this);
             var element = $j(this);
             if (node.type === 'blob') {
-                var path = '<%= polymorphic_path([resource, :git_blob], version: git_version.version, path: '__replaceme__') %>'.replace('__replaceme__', Git.encodePath(node.id))
+                var path = '<%= polymorphic_path([resource, :git_blob], version: git_version.version, path: '__replaceme__') %>'.replace('__replaceme__', Git.encodePath(node.data.path))
                 element.spinner('add');
                 $j.ajax(path, {
                     success: function (html) {
