@@ -2,12 +2,26 @@ module AssociationsHelper
 
   def associations_list(id, template_name, existing, options = {})
     empty_text = options.delete(:empty_text) || 'No items'
-    options.reverse_merge!(:id => id, 'data-role' => 'seek-associations-list', 'data-template-name' => template_name,class:'box_editing_inner')
+    options.reverse_merge!(id: id,
+                           class: 'box_editing_inner',
+                           blank_field: true,
+                           'data-role' => 'seek-associations-list',
+                           'data-template-name' => template_name)
 
     content_tag(:div, options) do
-      content_tag(:ul, '', class: 'associations-list related_asset_list') +
-        content_tag(:span, empty_text, class: 'none_text no-item-text') +
-        content_tag(:script, existing.html_safe, :type => 'application/json', 'data-role' => 'seek-existing-associations')
+      content = content_tag(:ul, '', class: 'associations-list related_asset_list') +
+          content_tag(:span, empty_text, class: 'none_text no-item-text') +
+          content_tag(:script, existing.html_safe, :type => 'application/json', 'data-role' => 'seek-existing-associations')
+      # Add an empty hidden field to allow removal of all items
+      # This ensures that the parameter is always sent, even when nothing is selected.
+      # It adds a "" as the first item in the array. So if items 1,2, and 3 are selected the
+      # value of the parameter will be ["","1","2","3"]. This is compatible with the rails
+      # association association_ids= methods, which reject 'blank' values automatically.
+      if options['data-field-name'] && options[:blank_field]
+        hidden_field_tag("#{options['data-field-name']}[]", nil, id: nil) + content
+      else
+        content
+      end
     end
   end
 
@@ -99,6 +113,8 @@ module AssociationsHelper
     end.flatten.to_json
   end
 
+
+
   def associations_json_from_params(model, association_params)
     association_params.map do |association|
       item = model.find(association[:id])
@@ -133,6 +149,26 @@ module AssociationsHelper
 
       ao.reverse_merge(extra_data)
     end.flatten.to_json
+  end
+
+  def associations_json_from_workflow_data_files(workflow_data_files)
+    workflow_data_files.map do |wfdf|
+      hash = { title: wfdf.data_file.title, id: wfdf.data_file.id}
+      if wfdf.workflow_data_file_relationship
+        hash[:workflow_data_file_relationship]= { value: wfdf.workflow_data_file_relationship.id, text: wfdf.workflow_data_file_relationship.title }
+      end
+      hash
+    end.to_json
+  end
+
+  def associations_json_from_workflow_data_files2(workflow_data_files)
+    workflow_data_files.map do |wfdf|
+      hash = { title: wfdf.workflow.title, id: wfdf.workflow.id}
+      if wfdf.workflow_data_file_relationship
+        hash[:workflow_data_file_relationship]= { value: wfdf.workflow_data_file_relationship.id, text: wfdf.workflow_data_file_relationship.title }
+      end
+      hash
+    end.to_json
   end
 
   def associations_json_from_assay_human_diseases(assay_human_diseases, extra_data = {})

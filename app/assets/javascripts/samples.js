@@ -82,7 +82,7 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
         // SEEK sample columns
         var seekSampleColumns = [];
         $j('table thead th', selector).each(function (index, column) {
-            if($j(column).data('columnType') == 'SeekSample') {
+            if(['SeekSample','SeekSampleMulti'].includes($j(column).data('columnType'))) {
                 seekSampleColumns.push(index);
             }
         });
@@ -90,14 +90,18 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
             options["columnDefs"].push({
                 "targets": seekSampleColumns,
                 "render": function (data, type, row) {
-                    if(data && data.id) {
-                        if (data.title)
-                            return '<a href="/samples/' + data.id + '">' + data.title + '</a>';
-                        else
-                            return '<span class="none_text">' + (data.id || data.title) + '</span>';
-                    } else {
-                        return '<span class="none_text">Not specified</span>';
-                    }
+                    var values = Array.isArray(data) ? data : [data];
+                    var result = $j.map(values, function(value, i) {
+                        if(value && value.id) {
+                            if (value.title)
+                                return '<a href="/samples/' + value.id + '">' + value.title + '</a>';
+                            else
+                                return '<span class="none_text">' + (value.id || value.title) + '</span>';
+                        } else {
+                            return '<span class="none_text">Not specified</span>';
+                        }
+                    })
+                    return result.join(", ")
                 }
             });
         }

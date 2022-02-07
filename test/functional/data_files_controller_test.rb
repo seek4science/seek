@@ -893,8 +893,70 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_equal 'Data file metadata was successfully updated.', flash[:notice]
-    assert assigns(:data_file)
     assert_redirected_to data_file_path(df)
+    assert_equal 'diff title',assigns(:data_file).title
+  end
+  #
+  # test 'should update data file with workflow link' do
+  #   df = Factory(:data_file, contributor:User.current_user.person)
+  #   workflow = Factory(:workflow, contributor: User.current_user.person)
+  #   assert_empty df.workflows
+  #   assert_difference('ActivityLog.count') do
+  #     put :update, params: { id: df.id, data_file: { workflow_ids: [workflow.id] } }
+  #   end
+  #
+  #   assert_equal 'Data file metadata was successfully updated.', flash[:notice]
+  #   assert_equal [workflow], assigns(:data_file).workflows
+  #   assert_redirected_to data_file_path(df)
+  # end
+
+  test 'should update data_file with workflow link' do
+
+    person = Factory(:person)
+    workflow = Factory(:workflow, contributor: person)
+    data_file = Factory(:data_file, contributor:person)
+    relationship = Factory(:test_data_workflow_data_file_relationship)
+    login_as(person)
+    assert_empty data_file.workflows
+
+    assert_difference('ActivityLog.count') do
+      assert_difference('WorkflowDataFile.count') do
+        put :update, params: { id: data_file.id, data_file: {
+          workflow_data_files_attributes: ['',{workflow_id: workflow.id, workflow_data_file_relationship_id:relationship.id}]
+        } }
+      end
+    end
+
+    assert_redirected_to data_file_path(data_file = assigns(:data_file))
+    assert_equal [workflow], data_file.workflows
+    assert_equal 1,data_file.workflow_data_files.count
+    assert_equal [relationship.id], data_file.workflow_data_files.pluck(:workflow_data_file_relationship_id)
+
+    # doesn't duplicate
+    assert_difference('ActivityLog.count') do
+      assert_no_difference('WorkflowDataFile.count') do
+        put :update, params: { id: data_file.id, data_file: {
+          workflow_data_files_attributes: ['',{workflow_id: workflow.id, workflow_data_file_relationship_id:relationship.id}]
+        } }
+      end
+    end
+    assert_redirected_to data_file_path(data_file = assigns(:data_file))
+    assert_equal [workflow], data_file.workflows
+    assert_equal 1,data_file.workflow_data_files.count
+    assert_equal [relationship.id], data_file.workflow_data_files.pluck(:workflow_data_file_relationship_id)
+
+    #removes
+    assert_difference('ActivityLog.count') do
+      assert_difference('WorkflowDataFile.count', -1) do
+        put :update, params: { id: data_file.id, data_file: {
+          workflow_data_files_attributes: ['']
+        } }
+      end
+    end
+    assert_redirected_to data_file_path(data_file = assigns(:data_file))
+    assert_equal [], data_file.workflows
+    assert_equal 0,data_file.workflow_data_files.count
+    assert_equal [], data_file.workflow_data_files.pluck(:workflow_data_file_relationship_id)
   end
 
   test 'should destroy DataFile' do
@@ -1273,6 +1335,21 @@ class DataFilesControllerTest < ActionController::TestCase
     assert flash[:error]
   end
 
+  test 'gracefully handles explore with invalid mime type' do
+    df = Factory(:csv_spreadsheet_datafile, policy: Factory(:public_policy))
+    df.content_blob.update_column(:content_type, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+    # incorrectly thinks it's excel
+    assert df.content_blob.is_excel?
+
+    # check mime type cannot be resolved, otherwise it will autofix without error
+    assert_nil df.content_blob.send(:mime_magic_content_type)
+
+    get :explore, params: { id: df, version: 1 }
+    assert_redirected_to data_file_path(df, version: 1)
+    assert flash[:error]
+  end
+
   test 'correctly displays links in spreadsheet explorer' do
     df = Factory(:data_file,
                  policy: Factory(:public_policy),
@@ -1596,6 +1673,19 @@ class DataFilesControllerTest < ActionController::TestCase
     project = df.projects.first
     df2 = Factory(:data_file, policy: Factory(:public_policy))
     get :index, params: { project_id: project.id }
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', data_file_path(df), text: df.title
+      assert_select 'a[href=?]', data_file_path(df2), text: df2.title, count: 0
+    end
+  end
+
+  test 'workflow data files through nested routing' do
+    assert_routing 'workflows/2/data_files', controller: 'data_files', action: 'index', workflow_id: '2'
+    workflow = Factory(:workflow, contributor: User.current_user.person)
+    df = Factory(:data_file, policy: Factory(:public_policy), workflows: [workflow], contributor: User.current_user.person)
+    df2 = Factory(:data_file, policy: Factory(:public_policy), contributor: User.current_user.person)
+    get :index, params: { workflow_id: workflow.id }
     assert_response :success
     assert_select 'div.list_item_title' do
       assert_select 'a[href=?]', data_file_path(df), text: df.title
@@ -3790,4 +3880,37 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_empty data_file.discussion_links
   end
 
+  test 'can fetch datacite metadata' do
+    someone = Factory(:person, first_name: 'Jane', last_name: 'Bloggs')
+    thing = Factory(:data_file, policy: Factory(:public_policy),
+                    title: 'The title',
+                    description: 'The description',
+                    creators: [someone],
+                    contributor: Factory(:person, first_name: 'Joe', last_name: 'Bloggs', orcid: 'https://orcid.org/0000-0002-1694-233X')
+    ).latest_version
+
+    get :show, params: { id: thing.parent.id, version: thing.version, format: :datacite_xml }
+
+    assert_response :success
+    parsed = Nokogiri::XML.parse(response.body)
+    assert_equal 'http://datacite.org/schema/kernel-4', parsed.namespaces['xmlns']
+    assert_equal 'http://www.w3.org/2001/XMLSchema-instance', parsed.namespaces['xmlns:xsi']
+    assert_equal 'http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4.3/metadata.xsd', parsed.xpath('//xmlns:resource/@xsi:schemaLocation').first.text
+    resource =  parsed.xpath('//xmlns:resource').first
+    assert_equal 'The title', resource.xpath('./xmlns:titles/xmlns:title').first.text
+    assert_equal 'The description', resource.xpath('./xmlns:descriptions/xmlns:description').first.text
+    assert_equal 2, resource.xpath('./xmlns:creators/xmlns:creator').length
+    joe = parsed.xpath("//xmlns:resource/xmlns:creators/xmlns:creator[xmlns:creatorName/text()='Bloggs, Joe']").first
+    jane = parsed.xpath("//xmlns:resource/xmlns:creators/xmlns:creator[xmlns:creatorName/text()='Bloggs, Jane']").first
+    assert_equal 'Bloggs, Joe', joe.xpath('./xmlns:creatorName').first.text
+    assert_equal 'https://orcid.org/0000-0002-1694-233X', joe.xpath('./xmlns:nameIdentifier').first.text
+    assert_equal 'Bloggs, Jane', jane.xpath('./xmlns:creatorName').first.text
+    assert_nil jane.xpath('./xmlns:nameIdentifier').first
+    assert_equal 'ORCID', resource.xpath('./xmlns:creators/xmlns:creator/xmlns:nameIdentifier/@nameIdentifierScheme').first.text
+    assert_equal 'https://orcid.org', resource.xpath('./xmlns:creators/xmlns:creator/xmlns:nameIdentifier/@schemeURI').first.text
+    assert_equal thing.created_at.year.to_s, resource.xpath('./xmlns:publicationYear').first.text
+    assert_equal Seek::Config.project_name, resource.xpath('./xmlns:publisher').first.text
+    assert_equal 'Dataset', resource.xpath('./xmlns:resourceType').first.text
+    assert_equal 'Dataset', resource.xpath('./xmlns:resourceType/@resourceTypeGeneral').first.text
+  end
 end

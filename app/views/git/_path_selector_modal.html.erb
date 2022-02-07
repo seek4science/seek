@@ -1,0 +1,14 @@
+<% id ||= 'git-path-select-modal' %>
+
+<%= modal(size: 'lg', id: id, class: 'git-browser-modal', 'data-role' => 'seek-git-browser-modal') do %>
+  <%= modal_header('Select path') %>
+
+  <%= modal_body do %>
+    <%= render partial: 'git/jstree', locals: { tree: tree, opts: { id: id } } %>
+  <% end -%>
+
+  <%= modal_footer do %>
+    <%= submit_tag 'Select', class: 'btn btn-primary', 'data-role' => 'seek-git-browser-modal-btn'  %>
+    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+  <% end %>
+<% end %>

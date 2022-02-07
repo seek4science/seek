@@ -1,0 +1,73 @@
+<div role="tabpanel" data-role="seek-upload-field">
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="upload-field-tab active">
+      <a data-role="seek-upload-field-tab" data-tab-target="local-file" role="tab" data-toggle="tab">Local file</a>
+    </li>
+    <li role="presentation" class="upload-field-tab">
+      <a data-role="seek-upload-field-tab" data-tab-target="remote-url" role="tab" data-toggle="tab">Remote URL</a>
+    </li>
+  </ul>
+
+  <%= form_tag(polymorphic_path([resource, :git_add_file], version: version), multipart: true) do %>
+    <div class="tab-content">
+      <div role="tabpanel" class="tab-pane active" data-role="seek-upload-field-tab-pane" data-tab-id="local-file">
+        <div class="form-group">
+          <label class="required">File</label>
+          <%= file_field_tag 'file[data]' -%>
+        </div>
+      </div>
+
+      <div role="tabpanel" class="tab-pane" data-role="seek-upload-field-tab-pane" data-tab-id="remote-url">
+        <div class="form-group">
+          <label class="required">URL</label>
+          <div class="input-group" id="remote-url" data-role="seek-url-checker" data-path="<%= examine_url_content_blobs_path -%>">
+            <%= text_field_tag "file[url]", '', class: 'form-control' -%>
+            <span class="input-group-btn"><%= button_link_to 'Test', 'test', '#' %></span>
+          </div>
+        </div>
+
+        <div data-role="seek-url-checker-result"></div>
+
+        <div style="display: none;" data-role="seek-url-checker-msg-success">
+          <div class="checkbox">
+            <label>
+              <%= check_box_tag 'file[fetch]', '1', false, autocomplete: 'off' %>
+              <strong>Fetch a copy</strong>
+            </label>
+            <p class="help-block">Fetch and store a copy of this file from the provided URL.</p>
+          </div>
+        </div>
+
+        <div class="alert alert-info" role="alert" style="display: none;" data-role="seek-url-checker-msg-too-big">
+          This file exceeds <%= Seek::Config.application_name %>'s remote file size limit of
+          <strong><%= number_to_human_size(Seek::Config.hard_max_cachable_size) -%></strong>
+          and so only a link to the file will be stored.
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="required">Filename</label>
+        <%= text_field_tag 'file[path]', '', class: 'form-control' -%>
+        <p class="help-block">Use <code>/</code> in the path to add the file into a directory.</p>
+      </div>
+
+      <%= submit_tag('Submit', class: 'btn btn-primary') %>
+    </div>
+  <% end %>
+</div>
+
+<script>
+    $j(document).ready(function () {
+        // Set file path to be selected file's filename
+        $j('#file_data').change(function () {
+            var pathField = $j('#file_path');
+            var parts = $j(this).val().split(/[\\\/]/);
+            pathField.val(parts[parts.length - 1]);
+        });
+
+        $j(document).on('urlChecked', function (event, info) {
+            var pathField = $j('#file_path');
+            pathField.val(info.file_name);
+        });
+    })
+</script>

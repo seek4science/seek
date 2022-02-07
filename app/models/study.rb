@@ -5,9 +5,6 @@ class Study < ApplicationRecord
 
   searchable(:auto_index => false) do
     text :experimentalists
-    text :person_responsible do
-      person_responsible.try(:name)
-    end
   end if Seek::Config.solr_enabled
 
   belongs_to :investigation
@@ -21,8 +18,6 @@ class Study < ApplicationRecord
   has_many :assays
   has_many :assay_publications, through: :assays, source: :publications
   has_one :external_asset, as: :seek_entity, dependent: :destroy
-
-  belongs_to :person_responsible, :class_name => "Person"
 
   validates :investigation, presence: { message: "Investigation is blank or invalid" }, projects: true
 
@@ -68,9 +63,7 @@ class Study < ApplicationRecord
     publication_ids | assay_publication_ids
   end
 
-  def related_person_ids
-    ids = super
-    ids << person_responsible_id if person_responsible_id
-    ids.uniq
+  def self.user_creatable?
+    Seek::Config.studies_enabled
   end
 end

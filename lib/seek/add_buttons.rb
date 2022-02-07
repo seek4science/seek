@@ -27,7 +27,9 @@ module Seek
                   [Presentation, 'presentation[event_ids][]'],
                   [Document, 'document[event_ids][]']],
       'DataFile' => [[Assay, 'assay[data_files_attributes[][asset_id]]'],
-                     [Event, 'event[data_file_ids][]']]
+                     [Event, 'event[data_file_ids][]']],
+      'Workflow' => [[Document, 'document[workflow_ids][]'],
+                     [Presentation, 'presentation[workflow_ids][]']]
     }.freeze
 
     def self.add_dropdown_for(item)

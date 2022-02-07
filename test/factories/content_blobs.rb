@@ -330,7 +330,7 @@ end
 Factory.define(:cwl_content_blob, parent: :content_blob) do |f|
   f.original_filename 'rp2-to-rp2path.cwl'
   f.content_type 'application/x-yaml'
-  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path.cwl", 'rb').read }
+  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/rp2/workflows/rp2-to-rp2path.cwl", 'rb').read }
 end
 
 Factory.define(:cwl_packed_content_blob, parent: :content_blob) do |f|
@@ -340,6 +340,7 @@ Factory.define(:cwl_packed_content_blob, parent: :content_blob) do |f|
 end
 
 Factory.define(:url_cwl_content_blob, parent: :content_blob) do |f|
+  f.original_filename 'rp2-to-rp2path.cwl'
   f.url 'https://www.abc.com/workflow.cwl'
   f.data nil
 end
@@ -389,4 +390,16 @@ Factory.define(:ro_crate_with_tests, parent: :content_blob) do |f|
   f.original_filename 'ro_crate_with_tests.crate.zip'
   f.content_type 'application/zip'
   f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/ro-crate-with-tests.crate.zip", 'rb').read }
+end
+
+Factory.define(:spaces_ro_crate, parent: :content_blob) do |f|
+  f.original_filename 'with-spaces.crate.zip'
+  f.content_type 'application/zip'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/with-spaces.crate.zip", 'rb').read }
+end
+
+Factory.define(:dots_ro_crate, parent: :content_blob) do |f|
+  f.original_filename 'with-dots.crate.zip'
+  f.content_type 'application/zip'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/with-dots.crate.zip", 'rb').read }
 end

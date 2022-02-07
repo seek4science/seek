@@ -942,7 +942,9 @@ class ContentBlobTest < ActiveSupport::TestCase
     blob = Factory(:image_content_blob, content_type:'application/msexcel', original_filename:'image.xls')
     assert blob.is_extractable_spreadsheet?
 
-    assert_nil blob.to_spreadsheet_xml
+    assert_raises(SysMODB::SpreadsheetExtractionException) do
+      blob.to_spreadsheet_xml
+    end
 
     blob.reload
 
@@ -995,6 +997,12 @@ class ContentBlobTest < ActiveSupport::TestCase
         content_blob.save!
         refute content_blob.remote_content_fetch_task.pending?
       end
+    end
+  end
+
+  test 'can destroy unsaved content blob without Cannot Modify Frozen Hash error' do
+    assert_nothing_raised do
+      ContentBlob.new.destroy
     end
   end
 end

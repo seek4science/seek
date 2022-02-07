@@ -15,11 +15,14 @@ namespace :seek do
     remove_old_project_join_logs
     db:seed:workflow_classes
     fix_negative_programme_role_mask
-    db:seed:sample_attribute_types
+    db:seed:007_sample_attribute_types
+    db:seed:008_miappe_custom_metadata
+    db:seed:013_workflow_data_file_relationships
     delete_users_with_invalid_person
     delete_specimen_activity_logs
     update_session_store
     update_cv_sample_templates
+    seek:rebuild_workflow_internals
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -137,6 +140,7 @@ namespace :seek do
         check_doi = klass.attribute_method?(:doi)
         # Go through all versions and set the "latest" versions to publicly visible
         scope.find_each do |version|
+          next if version.parent.nil?
           if version.latest_version? || check_doi && version.doi.present?
             version.update_column(:visibility, Seek::ExplicitVersioning::VISIBILITY_INV[:public])
           else
@@ -192,10 +196,10 @@ namespace :seek do
   end
 
   task(update_session_store: :environment) do
-    puts '... Updating session store'
+    puts '... Updating session store (this can take some time so please be patient)'
     Rake::Task['db:sessions:upgrade'].invoke
   end
-  
+
   task(update_cv_sample_templates: :environment) do
     puts '... Queue jobs for Sample templates containing controlled vocabularies'
     SampleType.all.each do |st|

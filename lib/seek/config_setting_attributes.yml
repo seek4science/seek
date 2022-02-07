@@ -166,6 +166,8 @@ openbis_debug:
 openbis_autosync:
 openbis_check_new_arrivals:
 default_license:
+recommended_data_licenses:
+recommended_software_licenses:
 about_page_enabled:
 about_page:
 terms_enabled:
@@ -188,7 +190,6 @@ results_per_page_default:
 results_per_page_default_condensed:
   convert: :to_i
 results_per_page:
-cwl_viewer_url:
 # Types enabled
 data_files_enabled:
 documents_enabled:
@@ -234,3 +235,5 @@ cv_dropdown_limit:
   convert: :to_i
 tag_cloud_enabled:
 workflow_class_list_enabled:
+git_support_enabled:
+immediate_git_fetch:

@@ -1,0 +1,195 @@
+<% environment.context_class.instance_eval { include ImagesHelper } %>
+
+$j(document).ready(function () {
+
+    $j('[data-role="seek-git-jstree-container"]').each(function () {
+        var container = $j(this);
+        var element = $j('[data-role="seek-git-jstree"]', container);
+        var json = JSON.parse($j('script[data-role="seek-git-jstree-data"]', container).html());
+        var annotationMap = {};
+        if ($j('script[data-role="seek-git-jstree-annotation-data"]', container).length) {
+          annotationMap = JSON.parse($j('script[data-role="seek-git-jstree-annotation-data"]', container).html());
+        }
+
+        var redrawAnnotations = function (nodeIds) {
+            if (annotationMap) {
+                var tree = element.jstree(true);
+                nodeIds.forEach(function (nodeId) {
+                    var node = tree.get_node(nodeId);
+                    var element = tree.get_node(nodeId, true);
+                    if (!element || !node.data) {
+                        return;
+                    }
+                    // Remove existing annotations
+                    $j('> .git-annotation', element).remove();
+                    element.addClass('git-annotated');
+                    if (node.data.annotations && node.data.annotations.length) {
+                        node.data.annotations.forEach(function(annotation) {
+                            var template = HandlebarsTemplates["git/annotation"];
+                            element.append(template(annotation));
+                        });
+                    }
+
+                    if (tree.is_closed(node) && node.data.childAnnotations && node.data.childAnnotations.length) {
+                        element.addClass('git-annotated-parent');
+                        node.data.childAnnotations.forEach(function(annotation) {
+                            var template = HandlebarsTemplates["git/annotation"];
+                            element.append(template(annotation));
+                        });
+                    }
+                })
+            }
+        }
+
+        var addAnnotations = function (node, annotations, isParent) {
+            if (!node.data) {
+                node.data = {}
+            }
+            var key = isParent ? 'childAnnotations' : 'annotations';
+            if (!node.data[key]) {
+                node.data[key] = []
+            }
+            annotations.forEach(function (annotation) {
+                if (!node.data[key].find(function (a) { a.key === annotation.key })) {
+                    node.data[key].push(annotation);
+                }
+            })
+        }
+
+        element.on('after_close.jstree', function (e, data) {
+            if (annotationMap) {
+                var nodes = $j(this).jstree(true).get_node(data.node.id).children || [];
+                redrawAnnotations(nodes.concat(data.node.id));
+            }
+        });
+
+        element.on('open_node.jstree', function (e, data) {
+            if (annotationMap) {
+                var nodes = $j(this).jstree(true).get_node(data.node.id).children || [];
+                redrawAnnotations(nodes.concat(data.node.id));
+            }
+        });
+
+        element.on('loaded.jstree', function(e, data) {
+            if (annotationMap) {
+                var annotated = [];
+                var tree = $j(this).jstree(true);
+                Object.keys(annotationMap).forEach(function(path) {
+                    var annotations = annotationMap[path];
+                    var node = tree.get_node(path);
+                    if (node) {
+                        annotated.push(path);
+                        addAnnotations(node, annotations, false);
+                        var nodeId = node.id;
+                        var i = 0;
+                        while ((nodeId = tree.get_parent(nodeId)) !== '#') {
+                            if (i++ > 100) {
+                                break;
+                            }
+                            node = tree.get_node(nodeId);
+                            if (node) {
+                                annotated.push(nodeId);
+                                addAnnotations(node, annotations, true);
+                            }
+                        }
+                    }
+                });
+
+                redrawAnnotations(annotated);
+            }
+        }).jstree({
+            'plugins': ['wholerow', 'checkbox', 'types', 'conditionalselect'],
+            'checkbox': {
+                'three_state': false
+            },
+            'types' : {
+                'root': {
+                    'icon': '<%= asset_path(icon_filename_for_key('git_repository')) %>',
+                    'a_attr': { 'class': 'git-jstree-root' }
+                },
+                'tree' : {
+                    'icon': '<%= asset_path(icon_filename_for_key('organise')) %>',
+                    'a_attr': { 'class': 'git-jstree-tree' }
+                },
+                'blob': {
+                    'icon': '<%= asset_path(icon_filename_for_key('markup')) %>',
+                    'a_attr': { 'class': 'git-jstree-blob' }
+                }
+            },
+            'conditionalselect' : function (node, event) {
+                if (element.hasClass('allow-tree-select') && node.type === 'tree') {
+                    return true;
+                }
+                if (element.hasClass('allow-blob-select') && node.type === 'blob') {
+                    return true;
+                }
+                if (element.hasClass('allow-root-select') && node.type === 'root') {
+                    return true;
+                }
+
+                return false;
+            },
+            'core': {
+                'check_callback': true,
+                'force_text': true,
+                'multiple': false,
+                'dblclick_toggle': true,
+                'data': json
+            }
+        });
+    });
+
+    $j('[data-role="seek-git-browser-modal-btn"]').click(function () {
+        var modal = $j(this).parents('.modal');
+        var input = modal.data('targetInput');
+        var jstree = $j('.jstree', modal).jstree(true);
+        input.val(jstree.get_selected());
+        input.change();
+        modal.modal('hide');
+
+        return false;
+    });
+
+    $j('[data-role="seek-git-path-input"]').each(function () {
+        var input = $j(this);
+        var modal = $j(input.data('modal'));
+        var jstreeElement = $j('.jstree', modal);
+        var selectTrees = input.data('select-trees') || false;
+        var selectBlobs = input.data('select-blobs') || false;
+        var selectRoot = input.data('select-root') || false;
+        input.click(function () {
+            jstreeElement.toggleClass('allow-tree-select', selectTrees);
+            jstreeElement.toggleClass('allow-blob-select', selectBlobs);
+            jstreeElement.toggleClass('allow-root-select', selectRoot);
+
+            jstreeElement.jstree(true).close_all();
+            jstreeElement.jstree(true).uncheck_all();
+
+            if (input.val()) {
+                jstreeElement.jstree(true).select_node(input.val());
+            }
+
+            modal.modal();
+            modal.modal('show');
+            modal.data('targetInput', input);
+
+            return false;
+        });
+
+        input.blur(function () {
+            modal.modal('hide');
+            modal.data('targetInput', null);
+
+            return true;
+        });
+    });
+});
+
+var Git = {
+    // Make a path URL-safe, but without encoding slashes (Apache doesn't like it).
+    encodePath: function (path) {
+        return path.split('/').map(function (component) {
+            return encodeURIComponent(component);
+        }).join('/');
+    }
+}

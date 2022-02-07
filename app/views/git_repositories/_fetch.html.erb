@@ -1,0 +1,26 @@
+<% job_status ||= @git_repository.remote_git_fetch_task&.status %>
+<div id="fetching-status">
+  <div class="alert alert-info" role="alert">
+    <strong>Checking out <%= @git_repository.remote %></strong><br/>
+    <span id="fetch-status"><%= job_status.to_s.humanize %></span>
+    <%= image 'spinner' %>
+    <script>
+        var interval = setInterval(function () {
+            $j.ajax('<%= status_git_repository_path(@git_repository) %>', {
+                success: function (json) {
+                    $j('#fetch-status').html(json.text)
+                    if (json.status === 'done') {
+                        window.location.reload();
+                    } else if (json.status === 'failed') {
+                        clearInterval(interval);
+                        alert("Failed :(");
+                    }
+                },
+                error: function () {
+                    clearInterval(interval);
+                    alert("Error :(");
+                }});
+        }, 2000);
+    </script>
+  </div>
+</div>

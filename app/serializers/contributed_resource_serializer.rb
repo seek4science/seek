@@ -1,5 +1,7 @@
 class ContributedResourceSerializer < PCSSerializer
-  attributes :title, :description, :license
+  attributes :title
+  attribute :license, if: -> {object.respond_to?(:license)}
+  attribute :description, if: -> {object.respond_to?(:description)}
 
   attribute :version, key: :latest_version, if: -> { object.respond_to?(:version) }
 
@@ -10,10 +12,18 @@ class ContributedResourceSerializer < PCSSerializer
   attribute :versions, if: -> { object.respond_to?(:versions) } do
     versions_data = []
     object.visible_versions.each do |v|
-      path = polymorphic_path(object, version: v.version)
-      versions_data.append(version: v.version,
-                           revision_comments: v.revision_comments.presence,
-                           url: "#{base_url}#{path}")
+      data = {
+        version: v.version,
+        revision_comments: v.revision_comments.presence,
+        url: "#{base_url}#{polymorphic_path(object, version: v.version)}"
+      }
+      if v.is_git_versioned?
+        data[:remote] = v.remote if v.remote?
+        data[:commit] = v.commit
+        data[:ref] = v.ref
+        data[:tree] = polymorphic_path([object, :git_tree], version: v.version)
+      end
+      versions_data.append(data)
     end
     versions_data
   end
@@ -77,6 +87,6 @@ class ContributedResourceSerializer < PCSSerializer
   private
 
   def version_number
-    @scope[:requested_version] || object.try(:version)
+    @scope.try(:[],:requested_version) || object.try(:version)
   end
 end

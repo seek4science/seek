@@ -27,8 +27,12 @@ module Seek
         }
       end
 
-      def date_created
+      def created_at
         ActivityLog.order(:id).first.try(:created_at)
+      end
+
+      def updated_at
+        ActivityLog.order(:id).last.try(:updated_at)
       end
 
       def url
@@ -37,6 +41,10 @@ module Seek
 
       def schema_org_supported?
         true
+      end
+
+      def is_a_version?
+        false
       end
     end
   end

@@ -1,0 +1,111 @@
+<%
+  return unless Seek::Config.data_files_enabled
+  has_direction ||= false
+  has_relationships ||= false
+  resource_text ||= text_for_resource(resource)
+
+  if params[:data_files] && params[:data_files].any?
+    collapse_panel = false
+    associated_data_files_json = associations_json_from_params(DataFile, params[:data_files])
+  elsif resource.respond_to?(:assay_assets)
+    assay_assets = resource.assay_assets.select { |aa| aa.asset_type == 'DataFile' }
+    field_name = "#{resource.class.name.underscore}[data_files_attributes]"
+    collapse_panel = assay_assets.empty?
+    associated_data_files_json = associations_json_from_assay_assets(assay_assets)
+  else
+    field_name = "data_files"
+    collapse_panel = resource.data_files.empty?
+    associated_data_files_json = associations_json_from_relationship(resource.data_files)
+  end
+-%>
+
+<%= folding_panel("Data Files", collapse_panel, :body_options => {:id => 'associate_data_file_fold_content'},
+                  :help_text => "Here you associate Data Files in SEEK to this #{resource_text}.") do %>
+
+    <p>The following Data Files are involved in this <%= resource_text -%>:</p>
+
+    <% if has_direction -%>
+        <%= associations_list_group('data_file_to_list', 'direction.value', associated_data_files_json) do %>
+            <div class="row">
+              <div class="col-md-4">
+                <h3>Incoming</h3>
+                <%= associations_list('incoming-data-file-list', 'associations/data_file', '',
+                                      empty_text: 'No incoming data',
+                                      'data-field-name' => field_name,
+                                      'data-multilist-group-value' => AssayAsset::Direction::INCOMING) %>
+              </div>
+              <div class="col-md-4">
+                <h3>Outgoing</h3>
+                <%= associations_list('outgoing-data-file-list', 'associations/data_file', '',
+                                      empty_text: 'No outgoing data',
+                                      'data-field-name' => field_name,
+                                      'data-multilist-group-value' => AssayAsset::Direction::OUTGOING) %>
+              </div>
+              <div class="col-md-4">
+                <h3>No direction</h3>
+                <%= associations_list('other-data-file-list', 'associations/data_file', '',
+                                      empty_text: 'No other data',
+                                      'data-field-name' => field_name,
+                                      'data-multilist-group-value' => AssayAsset::Direction::NODIRECTION) %>
+              </div>
+            </div>
+        <% end %>
+    <% else %>
+        <%= associations_list('data_file_to_list', 'associations/data_file', associated_data_files_json,
+                              'data-field-name' => field_name,
+                              empty_text: 'No data files') %>
+    <% end %>
+
+    <hr/>
+
+    <%= association_selector('data_file_to_list', 'Associate data', 'Associate data', size: 'md') do %>
+        <% if has_relationships -%>
+            <div class="form-group">
+              <%= label_tag "How was the data used in this #{resource_text}?" %>
+              <%= select_tag :relationship_type, options_for_select([['Not specified',0]] + RelationshipType.all.collect{|r| [r.title,r.id]}),
+                             class: 'form-control', 'data-role' => 'seek-association-common-field'
+              %>
+            </div>
+        <% end %>
+
+        <hr/>
+
+        <label>Select data file</label>
+        <div class="form-group" data-role="seek-association-filter-group" data-filter-url="<%= filter_data_files_path(assay_id: resource.id) -%>">
+          <%= association_select_filter %>
+
+          <div class="checkbox">
+            <label>
+              <%= check_box_tag(:all_projects, '1', false, 'data-role' => 'seek-association-filter-field') %>
+              <strong>Show data from all <%= t('project').downcase.pluralize -%>?</strong>
+            </label>
+          </div>
+
+          <%= check_box_tag(:simulation_data, '1', false, style: 'display: none', 'data-role' => 'seek-association-filter-field') %>
+
+          <%= association_select_results %>
+        </div>
+
+        <% if has_direction -%>
+            <hr/>
+
+            <div class="form-group">
+              <label>Select direction</label>
+              <%= select_tag(:direction, direction_options, :class => 'form-control', 'data-role' => 'seek-association-common-field') %>
+            </div>
+        <% end %>
+    <% end %>
+<% end %>
+
+<% if has_relationships -%>
+    <script>
+      $j(document).ready(function () {
+        var simulationRelationshipTypeId = '<%= RelationshipType.find_by_key(RelationshipType::SIMULATION).id -%>';
+
+        $j('#modalAssociateData #relationship_type').change(function () {
+          $j('#modalAssociateData #simulation_data').prop('checked', ($j(this).val() == simulationRelationshipTypeId));
+          $j('#modalAssociateData [data-role="seek-association-filter-group"]').data('filterGroup').filter();
+        });
+      });
+    </script>
+<% end %>

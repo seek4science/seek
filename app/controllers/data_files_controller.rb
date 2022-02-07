@@ -185,12 +185,22 @@ class DataFilesController < ApplicationController
       end
     end
     if @display_data_file.contains_extractable_spreadsheet?
-      respond_to do |format|
-        format.html
+      begin
+        @workbook = Rails.cache.fetch("spreadsheet-workbook-#{@display_data_file.content_blob.cache_key}") do
+          @display_data_file.spreadsheet
+        end
+        respond_to do |format|
+          format.html
+        end
+      rescue SysMODB::SpreadsheetExtractionException
+        respond_to do |format|
+          flash[:error] = "There was an error when processing the #{t('data_file')} to explore, perhaps it isn't a valid Excel spreadsheet"
+          format.html { redirect_to data_file_path(@data_file, version: @display_data_file.version) }
+        end
       end
     else
       respond_to do |format|
-        flash[:error] = 'Unable to view contents of this data file'
+        flash[:error] = "Unable to explore contents of this #{t('data_file')}"
         format.html { redirect_to data_file_path(@data_file, version: @display_data_file.version) }
       end
     end
@@ -352,7 +362,7 @@ class DataFilesController < ApplicationController
       end
     rescue Exception => e
       Seek::Errors::ExceptionForwarder.send_notification(e, data:{message: "Problem attempting to extract from RightField for content blob #{params[:content_blob_id]}"})
-      session[:extraction_exception_message] = e.message
+      session[:extraction_exception_message] = 'Rightfield extraction error'
     end
 
     session[:processed_datafile] = @data_file
@@ -520,7 +530,8 @@ class DataFilesController < ApplicationController
                                       :license, :other_creators,{ event_ids: [] },
                                       { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                       { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
-                                      { scales: [] }, { publication_ids: [] },
+                                      { scales: [] }, { publication_ids: [] }, { workflow_ids: [] },
+                                      { workflow_data_files_attributes:[:id, :workflow_id, :workflow_data_file_relationship_id, :_destroy] },
                                       discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 

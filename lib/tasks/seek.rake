@@ -13,11 +13,9 @@ namespace :seek do
     Seek::Util.authorized_types.each do |type|
       type.remove_invalid_auth_lookup_entries
       type.find_each do |item|
-        AuthLookupUpdateQueue.create(item: item, priority: 1) # Duplicates will be caught by uniqueness check
+        AuthLookupUpdateQueue.enqueue(item)
       end
     end
-    # 5 is an arbitrary number to take advantage of there being more than 1 worker dedicated to auth refresh
-    5.times { AuthLookupUpdateJob.set(priority: 1).perform_later }
   end
 
   desc 'Rebuild all authorization lookup table for all items.'
@@ -99,5 +97,54 @@ namespace :seek do
   task clear_encrypted_settings: :environment do
     Settings.where(var: Seek::Config.encrypted_settings).destroy_all
     puts 'Encrypted settings cleared'
+  end
+
+  desc "Convert workflows to use git backend"
+  task convert_workflows_to_git: :environment do
+    puts 'Converting Workflows to git: '
+    count = 0
+    gv_count = Git::Version.count
+    gr_count = Git::Repository.count
+    Workflow.includes(:git_versions).find_each do |workflow|
+      begin
+        Git::Converter.new(workflow).convert(unzip: true)
+      rescue StandardError => e
+        print 'E'
+        STDERR.puts "Error converting Workflow #{workflow.id}"
+        STDERR.puts e.message
+        e.backtrace.each { |l| STDERR.puts(l) }
+      end
+      count += 1
+      print '.'
+    end
+    puts
+    puts "Converted #{count} Workflows"
+    puts "Created #{Git::Repository.count - gr_count} GitRepositories"
+    puts "Created #{Git::Version.count - gv_count} GitVersions"
+  end
+
+  desc "Rebuild workflow internals"
+  task rebuild_workflow_internals: :environment do
+    puts 'Rebuilding workflow internals: '
+    count = 0
+    disable_authorization_checks do
+      Workflow.includes(:git_versions, :versions).find_each do |workflow|
+        ([workflow] + workflow.versions.to_a + workflow.git_versions.to_a).each do |wf|
+          begin
+            wf.refresh_internals
+            if wf.save(touch: false)
+              print '.'
+              count += 1
+            else
+              print 'E'
+            end
+          rescue StandardError => e
+            puts "Error for #{wf.class} #{wf.id}: #{e.class.name} (#{e.message})#{e.backtrace.join("\n")}"
+          end
+        end
+      end
+    end
+    puts
+    puts "Refreshed #{count} Workflows/versions"
   end
 end

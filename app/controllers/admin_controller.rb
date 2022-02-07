@@ -89,7 +89,6 @@ class AdminController < ApplicationController
     Seek::Config.internal_help_enabled = string_to_boolean params[:internal_help_enabled]
     Seek::Config.external_help_url = params[:external_help_url]
 
-    Seek::Config.cwl_viewer_url = params[:cwl_viewer_url]
     Seek::Config.ga4gh_trs_api_enabled = string_to_boolean(params[:ga4gh_trs_api_enabled])
     # Types enabled
     Seek::Config.collections_enabled = string_to_boolean params[:collections_enabled]
@@ -135,8 +134,8 @@ class AdminController < ApplicationController
     Seek::Config.nels_enabled = string_to_boolean(params[:nels_enabled])
     Seek::Config.nels_client_id = params[:nels_client_id]&.strip
     Seek::Config.nels_client_secret = params[:nels_client_secret]&.strip
-    Seek::Config.nels_api_url&.strip&.chomp('/')
-    Seek::Config.nels_oauth_url&.strip&.chomp('/')
+    Seek::Config.nels_api_url = params[:nels_api_url]&.strip&.chomp('/')
+    Seek::Config.nels_oauth_url = params[:nels_oauth_url]&.strip&.chomp('/')
     Seek::Config.nels_permalink_base = params[:nels_permalink_base]&.strip
 
     Seek::Config.life_monitor_enabled = string_to_boolean(params[:life_monitor_enabled])
@@ -281,6 +280,8 @@ class AdminController < ApplicationController
     Seek::Config.orcid_required = string_to_boolean params[:orcid_required]
 
     Seek::Config.default_license = params[:default_license]
+    Seek::Config.recommended_data_licenses = params[:recommended_data_licenses]
+    Seek::Config.recommended_software_licenses = params[:recommended_software_licenses]
     update_flag = (pubmed_email == '' || pubmed_email_valid) && (crossref_email == '' || crossref_email_valid)
     update_redirect_to update_flag, 'settings'
   end

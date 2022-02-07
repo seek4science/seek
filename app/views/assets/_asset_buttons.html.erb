@@ -32,9 +32,9 @@
 <% if asset.is_downloadable? -%>
   <% if can_download_asset?(asset, params[:code]) -%>
     <% if asset.is_a?(Workflow) %>
-      <% if asset.content_blob.file_exists? %>
-        <%= button_link_to('Download RO-Crate', 'ro_crate_file', ro_crate_workflow_path(asset, version: version, code: params[:code]),
-              'data-tooltip' => tooltip("The Workflow RO-Crate is a package containing the workflow definition, its metadata and supporting resources like test data")) %>
+      <% if display_asset.is_git_versioned? || asset.content_blob&.file_exists? %>
+        <%= button_link_to('Download RO Crate', 'ro_crate_file', ro_crate_workflow_path(asset, version: version, code: params[:code]),
+                           'data-tooltip' => tooltip("The Workflow RO-Crate is a package containing the workflow definition, its metadata and supporting resources like test data")) %>
         <% if asset.can_run? %>
           <%= button_link_to("Run on #{Seek::Config.galaxy_instance_name || 'Galaxy'}", 'run_galaxy', run_workflow_url(display_asset)) %>
         <% end %>
@@ -75,12 +75,18 @@
 <% end %>
 
 <% if asset.can_edit? %>
-  <%= add_to_dropdown(asset) %>
+  <%= add_new_item_to_dropdown(asset) %>
 <% end %>
 
 <%= item_actions_dropdown do %>
   <% if asset.can_edit? -%>
-    <% if asset.versioned? -%>
+    <% if asset.is_git_versioned? -%>
+      <% if display_asset.mutable? %>
+        <li><%= image_tag_for_key('freeze', polymorphic_path([asset, :git_freeze_preview], version: display_asset.version), nil, nil, 'Freeze version') -%></li>
+      <% else %>
+        <li><%= image_tag_for_key('new', polymorphic_path([:new_git_version, asset]), nil, { }, 'New version') -%></li>
+      <% end %>
+    <% elsif asset.versioned? -%>
       <li>
         <% if asset.new_version_supported? %>
           <% if asset.is_a?(Workflow) %>

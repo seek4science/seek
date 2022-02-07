@@ -5,8 +5,7 @@
         "attributes": {
             "title": "Model analysis",
             "description": null,
-            "experimentalists": null,
-            "person_responsible_id": "411"
+            "experimentalists": null,            
         },
         "relationships": {
             "creators": {

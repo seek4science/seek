@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'minitest/mock'
 
 class Ga4ghTrsApiTest < ActionDispatch::IntegrationTest
   include AuthenticatedTestHelper
@@ -84,5 +85,47 @@ class Ga4ghTrsApiTest < ActionDispatch::IntegrationTest
       crate = ROCrate::WorkflowCrateReader.read_zip(t.path, target_dir: dir)
       assert crate.main_workflow
     end
+  end
+
+  test 'should throw spec-compliant JSON error if unexpected error occurs' do
+    workflow = Factory(:generated_galaxy_ro_crate_workflow, policy: Factory(:public_policy))
+    Workflow.stub(:find_by_id, -> (_) { raise 'oh no!' }) do
+      get "/ga4gh/trs/v2/tools/#{workflow.id}/versions/1/containerfile"
+    end
+
+    assert_response :internal_server_error
+    r = JSON.parse(@response.body)
+    assert r['message'].include?('An unexpected error')
+  end
+
+  test 'should filter workflows through extended GA4GH endpoint' do
+    p1 = Factory(:project, title: 'MegaWorkflows')
+    p2 = Factory(:project, title: 'CovidSux')
+    w1 = Factory(:workflow, projects: [p1], policy: Factory(:public_policy))
+    w2 = Factory(:workflow, projects: [p2], policy: Factory(:public_policy))
+    w3 = Factory(:workflow, projects: [p1, p2], policy: Factory(:public_policy))
+
+    get '/ga4gh/trs/v2/extended/organizations'
+
+    assert_response :success
+    names = JSON.parse(@response.body)
+    assert_includes names, p1.title
+    assert_includes names, p2.title
+
+    get '/ga4gh/trs/v2/extended/workflows/CovidSux'
+
+    assert_response :success
+    ids = JSON.parse(@response.body).map { |t| t['id'] }
+    assert_equal 2, ids.length
+    assert ids.include?(w2.id.to_s)
+    assert ids.include?(w3.id.to_s)
+
+    get '/ga4gh/trs/v2/extended/workflows/MegaWorkflows'
+
+    assert_response :success
+    ids = JSON.parse(@response.body).map { |t| t['id'] }
+    assert_equal 2, ids.length
+    assert ids.include?(w1.id.to_s)
+    assert ids.include?(w3.id.to_s)
   end
 end

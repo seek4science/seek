@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'minitest/mock'
 
 class WorkflowTest < ActiveSupport::TestCase
   test 'validations' do
@@ -64,7 +65,7 @@ class WorkflowTest < ActiveSupport::TestCase
     crate = workflow.ro_crate
 
     assert crate.main_workflow
-    refute crate.main_workflow_diagram
+    assert crate.main_workflow_diagram
     refute crate.main_workflow_cwl
     assert_equal 'Common Workflow Language', crate.main_workflow.programming_language['name']
 
@@ -135,30 +136,29 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'generates RO-Crate and diagram for workflow/abstract workflow' do
-    with_config_value(:cwl_viewer_url, 'http://localhost:8080/cwl_viewer') do
-      workflow = Factory(:generated_galaxy_no_diagram_ro_crate_workflow)
-      assert workflow.should_generate_crate?
-      crate = nil
+    workflow = Factory(:generated_galaxy_no_diagram_ro_crate_workflow)
+    assert workflow.should_generate_crate?
+    crate = nil
 
-      VCR.use_cassette('workflows/cwl_viewer_galaxy_workflow_abstract_cwl_diagram') do
-        crate = workflow.ro_crate
-      end
+    crate = workflow.ro_crate
 
-      assert crate.main_workflow
-      assert crate.main_workflow_diagram
-      assert crate.main_workflow_cwl
-    end
+    assert crate.main_workflow
+    assert crate.main_workflow_diagram
+    assert crate.main_workflow_cwl
   end
 
   test 'generates RO-Crate and gracefully handles diagram error for workflow/abstract workflow' do
-    with_config_value(:cwl_viewer_url, 'http://localhost:8080/cwl_viewer') do
+    bad_generator = MiniTest::Mock.new
+    def bad_generator.write_graph(struct)
+      raise 'oh dear'
+    end
+
+    Seek::WorkflowExtractors::CwlDotGenerator.stub :new, bad_generator do
       workflow = Factory(:generated_galaxy_no_diagram_ro_crate_workflow)
       assert workflow.should_generate_crate?
       crate = nil
 
-      VCR.use_cassette('workflows/cwl_viewer_error') do
-        crate = workflow.ro_crate
-      end
+      crate = workflow.ro_crate
 
       assert crate.main_workflow
       refute crate.main_workflow_diagram
@@ -340,5 +340,208 @@ class WorkflowTest < ActiveSupport::TestCase
     assert_nil workflow.reload.test_status
     assert_equal :all_failing, v1.reload.test_status
     assert_nil v2.reload.test_status
+  end
+
+  test 'changing main workflow path refreshes internals structure' do
+    workflow = Factory(:local_git_workflow)
+    v = workflow.git_version
+
+    disable_authorization_checks do
+      v.refresh_internals
+      v.save!
+      v.add_file('1-PreProcessing.ga', open_fixture_file('workflows/1-PreProcessing.ga'))
+    end
+
+    assert_equal 'concat_two_files.ga', v.main_workflow_path
+    assert_equal 2, v.inputs.count
+    assert_equal 3, v.steps.count
+    assert_equal 1, v.outputs.count
+
+    disable_authorization_checks do
+      v.main_workflow_path = '1-PreProcessing.ga'
+      assert v.main_workflow_path_changed?
+      v.save!
+    end
+
+    assert_equal '1-PreProcessing.ga', v.main_workflow_path
+    assert_equal 1, v.inputs.length
+    assert_equal 17, v.steps.length
+    assert_equal 31, v.outputs.length
+  end
+
+  test 'changing diagram path clears the cached diagram' do
+    workflow = Factory(:local_git_workflow)
+    v = workflow.git_version
+    original_diagram = v.diagram
+    assert original_diagram
+
+    disable_authorization_checks do
+      v.add_file('new-diagram.png', open_fixture_file('file_picture.png'))
+    end
+
+    assert_equal 'diagram.png', v.diagram_path
+    assert original_diagram.exists?
+    assert_equal 32248, original_diagram.size
+
+    disable_authorization_checks do
+      v.diagram_path = 'new-diagram.png'
+      assert v.diagram_path_changed?
+      v.save!
+    end
+
+    assert_equal 'new-diagram.png', v.diagram_path
+    refute v.diagram_exists?
+    new_diagram = v.diagram
+
+    assert new_diagram.exists?
+    assert_equal 2728, new_diagram.size
+  end
+
+  test 'adding diagram path clears the cached auto-generated diagram' do
+    workflow = Factory(:annotationless_local_git_workflow,
+                       workflow_class: WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class))
+
+    v = workflow.git_version
+    disable_authorization_checks do
+      v.main_workflow_path = 'Concat_two_files.cwl'
+      v.save!
+    end
+
+    assert v.can_render_diagram?
+    original_diagram = v.diagram # Generates a diagram from the CWL
+    assert original_diagram
+
+    disable_authorization_checks do
+      v.add_file('new-diagram.png', open_fixture_file('file_picture.png'))
+    end
+
+    assert_nil v.diagram_path, 'Diagram path should not be set, it is generated.'
+    assert original_diagram.exists?
+    original_size = original_diagram.size
+    assert original_size > 100
+    assert original_size < 50000
+    original_sha1sum = original_diagram.sha1sum
+
+    disable_authorization_checks do
+      v.diagram_path = 'new-diagram.png'
+      assert v.diagram_path_changed?
+      v.save!
+    end
+
+    assert_equal 'new-diagram.png', v.diagram_path
+    refute v.diagram_exists?
+    new_diagram = v.diagram
+
+    assert new_diagram.exists?
+    assert_equal 2728, new_diagram.size
+    assert_not_equal original_sha1sum, new_diagram.sha1sum
+  end
+
+
+  test 'removing diagram path reverts to the auto-generated diagram' do
+    workflow = Factory(:annotationless_local_git_workflow,
+                       workflow_class: WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class))
+
+    v = workflow.git_version
+    disable_authorization_checks do
+      v.main_workflow_path = 'Concat_two_files.cwl'
+      v.diagram_path = 'diagram.png'
+      v.save!
+    end
+
+    v = workflow.git_version
+    original_diagram = v.diagram
+    assert original_diagram
+
+    disable_authorization_checks do
+      v.add_file('new-diagram.png', open_fixture_file('file_picture.png'))
+    end
+
+    assert_equal 'diagram.png', v.diagram_path
+    assert original_diagram.exists?
+    assert_equal 32248, original_diagram.size
+    original_sha1sum = original_diagram.sha1sum
+
+    disable_authorization_checks do
+      v.diagram_path = nil
+      assert v.diagram_path_changed?
+      v.save!
+    end
+
+    assert_nil v.diagram_path
+    refute v.diagram_exists?
+    assert v.can_render_diagram?
+    new_diagram = v.diagram # Generates diagram
+
+    assert new_diagram.exists?
+    assert new_diagram.size > 100
+    assert new_diagram.size < 50000
+    assert_not_equal original_sha1sum, new_diagram.sha1sum
+  end
+
+  test 'generates RO-Crate for workflow with auto-generated diagram' do
+    workflow = Factory(:annotationless_local_git_workflow,
+                       workflow_class: WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class))
+
+    v = workflow.git_version
+    disable_authorization_checks do
+      v.main_workflow_path = 'Concat_two_files.cwl'
+      v.save!
+    end
+
+    v = workflow.git_version
+    original_diagram = v.diagram
+    assert original_diagram
+    assert_nil v.diagram_path, 'Diagram path should not be set, it is generated.'
+
+    assert_nothing_raised do
+      crate = workflow.ro_crate
+      assert crate.main_workflow
+      assert crate.main_workflow_diagram
+      assert_equal original_diagram.size, crate.main_workflow_diagram.content_size
+    end
+  end
+
+  test 'search terms for git workflows' do
+    workflow = Factory(:annotationless_local_git_workflow, workflow_class: Factory(:unextractable_workflow_class))
+
+    v = nil
+    disable_authorization_checks do
+      v = workflow.git_version
+      c = v.add_files(
+        [['main.ga', StringIO.new('{ "a_galaxy_workflow" : true, "Yes" : "yep", "OK" : "yep", "Cool" : "yep" } ')],
+         ['README.md', StringIO.new('unique_string_banana a b c d e')],
+         ['LICENSE', StringIO.new('unique_string_grapefruit f g h i j k')]])
+      v.main_workflow_path = 'main.ga'
+      v.commit = c
+      v.save!
+    end
+
+    terms = v.search_terms
+
+    assert(terms.any? { |t| t.include?('a_galaxy_workflow') })
+    assert(terms.any? { |t| t.include?('unique_string_banana') })
+    refute(terms.any? { |t| t.include?('unique_string_grapefruit') })
+  end
+
+  test 'updating workflow synchronizes metadata on git version' do
+    workflow = Factory(:annotationless_local_git_workflow, workflow_class: Factory(:unextractable_workflow_class))
+    assert workflow.git_version.mutable
+    disable_authorization_checks do
+      workflow.update_attributes!(title: 'new title')
+      assert_equal 'new title', workflow.reload.title
+      assert_equal 'new title', workflow.git_version.reload.title
+    end
+  end
+
+  test 'updating workflow synchronizes metadata on immutable git version' do
+    workflow = Factory(:annotationless_local_git_workflow, workflow_class: Factory(:unextractable_workflow_class))
+    disable_authorization_checks do
+      workflow.git_version.lock
+      refute workflow.git_version.mutable
+      workflow.update_attributes!(title: 'new title')
+      assert_equal 'new title', workflow.reload.title
+      assert_equal 'new title', workflow.git_version.reload.title
+    end
   end
 end

@@ -68,6 +68,8 @@ def load_seek_config_defaults!
   Seek::Config.default :programme_user_creation_enabled, false
   Seek::Config.default :programmes_open_for_projects_enabled, false
   Seek::Config.default :project_admin_sample_type_restriction, false #only project admins can create and edit sample types and controlled vocabs
+  Seek::Config.default :recommended_data_licenses,  ['CC-BY-4.0', 'CC0-1.0', 'CC-BY-NC-4.0', 'CC-BY-SA-4.0', 'ODC-BY-1.0']
+  Seek::Config.default :recommended_software_licenses, ['Apache-2.0','GPL-3.0','MIT','BSD-2-Clause','BSD-3-Clause','LGPL-2.1']
 
   # Types
   Seek::Config.default :documents_enabled,true
@@ -241,6 +243,7 @@ def load_seek_config_defaults!
   Seek::Config.default :sorting, {}
 
   Seek::Config.default :life_monitor_enabled, false
+  Seek::Config.default :git_support_enabled, false
 
   load_seek_testing_defaults! if Rails.env.test?
 end

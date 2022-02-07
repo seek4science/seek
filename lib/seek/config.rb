@@ -14,7 +14,7 @@ module Seek
     def dm_project_name_fallback
       project_name
     end
-
+    
     def dm_project_link_fallback
       project_link
     end
@@ -207,10 +207,18 @@ module Seek
       append_filestore_path 'rebranding'
     end
 
-    def append_filestore_path(inner_dir)
+    def git_filestore_path
+      append_filestore_path 'git'
+    end
+
+    def git_temporary_filestore_path
+      append_filestore_path 'tmp', 'git'
+    end
+
+    def append_filestore_path(*inner_dir)
       path = filestore_path
       path = File.join(Rails.root, path) unless path.start_with? '/'
-      check_path_exists(File.join(path, inner_dir))
+      check_path_exists(File.join(path, *inner_dir))
     end
 
     def check_path_exists(path)
@@ -494,5 +502,15 @@ module Seek
     def self.schema_org_supported?
       true
     end
+
+    def self.enabled_for_type?(type)
+      method = type.to_s.tableize + '_enabled'
+      if respond_to?(method)
+        send(method)
+      else
+        true
+      end
+    end
+
   end
 end

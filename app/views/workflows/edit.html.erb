@@ -33,8 +33,14 @@
     <%= render partial: 'assets/license_selector', locals: { resource: @workflow, license_group: :software, default_license: 'Apache-2.0' } %>
     <%= render partial: 'assets/discussion_links_form', locals: { resource: @workflow} -%>
     <%= render partial: 'sharing/form' -%>
-    <%= render partial: 'assets/asset_form_bottom', locals: { show_publications: false, f: f }-%>
+    <%= render partial: 'assets/asset_form_bottom', locals: { f: f }-%>
     <%= render partial: 'assays/associate_assays', locals: { resource: @workflow } -%>
+
+    <%= hidden_field_tag 'workflow[internals]', raw(@workflow.internals.to_json) -%>
+
+    <%= f.fancy_multiselect :presentations, other_projects_checkbox: true %>
+    <%= f.fancy_multiselect :documents, other_projects_checkbox: true  if Seek::Config.documents_enabled %>
+    <%= render partial: 'associate_data_file', locals: {:f=>f, :resource => @workflow } if Seek::Config.data_files_enabled %>
 
     <%= form_submit_buttons(@workflow) %>
   </div>

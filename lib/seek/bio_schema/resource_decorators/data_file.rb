@@ -5,13 +5,19 @@ module Seek
       class DataFile < CreativeWork
         include ActionView::Helpers::NumberHelper
 
-        associated_items subject_of: :events
-
         schema_mappings doi: :identifier,
                         distribution: :distribution
 
+        DATASET_PROFILE = 'https://bioschemas.org/profiles/Dataset/0.3-RELEASE-2019_06_14/'.freeze
+
         def doi
           "https://doi.org/#{resource.doi}" if resource.doi
+        end
+
+        def description
+          description = resource.description&.truncate(4999)
+          description = 'Description not specified' if description.blank?
+          description.ljust(50, '.')
         end
 
         def distribution
@@ -21,7 +27,7 @@ module Seek
           data = {
             '@type': 'DataDownload',
             'contentSize': number_to_human_size(blob.file_size),
-            'contentUrl': polymorphic_url([resource, blob], action: :download, host: Seek::Config.site_base_host),
+            'contentUrl': resource_url([resource, blob], action: :download, host: Seek::Config.site_base_host, strip_version: true),
             'encodingFormat': blob.content_type,
             'name': blob.original_filename
           }
@@ -39,6 +45,10 @@ module Seek
 
         def schema_type
           'Dataset'
+        end
+
+        def conformance
+          DATASET_PROFILE
         end
       end
     end

@@ -128,12 +128,11 @@ module AssetsHelper
 
   def get_original_model_name(model)
     class_name = model.class.name
-    class_name = class_name.split('::')[0] if class_name.end_with?('::Version')
-    class_name
+    model.is_a_version? ? class_name.split('::')[0] : class_name
   end
 
   def download_resource_path(resource, _code = nil)
-    if resource.class.name.include?('::Version')
+    if resource.is_a_version?
       polymorphic_path(resource.parent, version: resource.version, action: :download, code: params[:code])
     else
       polymorphic_path(resource, action: :download, code: params[:code])
@@ -148,7 +147,7 @@ module AssetsHelper
   end
 
   def show_resource_path(resource)
-    if resource.class.name.include?('::Version')
+    if resource.is_a_version?
       polymorphic_path(resource.parent, version: resource.version)
     elsif resource.is_a?(Snapshot)
       polymorphic_path([resource.resource, resource])
@@ -158,7 +157,7 @@ module AssetsHelper
   end
 
   def edit_resource_path(resource)
-    if resource.class.name.include?('::Version')
+    if resource.is_a_version?
       edit_polymorphic_path(resource.parent)
     else
       edit_polymorphic_path(resource)
@@ -166,7 +165,7 @@ module AssetsHelper
   end
 
   def manage_resource_path(resource)
-    if resource.class.name.include?('::Version')
+    if resource.is_a_version?
       polymorphic_path(resource.parent, action:'manage')
     else
       polymorphic_path(resource, action:'manage')
@@ -265,11 +264,11 @@ module AssetsHelper
     image_tag_for_key('download', polymorphic_path([fileinfo.asset, fileinfo], action: :download, code: params[:code]), 'Download', { title: 'Download this file' }, '')
   end
 
-  def add_to_dropdown(item)
+  def add_new_item_to_dropdown(item)
     return unless Seek::AddButtons.add_dropdown_for(item)
     tooltip = "This option allows you to add a new item, whilst associating it with this #{text_for_resource(item)}"
     dropdown_button(t('add_new_dropdown.button'), 'attach', menu_options: {class: 'pull-right', id: 'item-admin-menu'}, tooltip:tooltip) do
-      add_item_to_options(item) do |text, path|
+      add_new_item_to_options(item) do |text, path|
         content_tag(:li) do
           image_tag_for_key('add', path, text, nil, text)
         end
@@ -277,10 +276,10 @@ module AssetsHelper
     end
   end
 
-  def add_item_to_options(item)
+  def add_new_item_to_options(item)
     elements = []
     Seek::AddButtons.add_for_item(item).each do |type,param|
-
+      next unless Seek::Config.enabled_for_type?(type)
       text="#{t('add_new_dropdown.option')} #{t(type.name.underscore)}"
       path = new_polymorphic_path(type,param=>item.id)
       elements << yield(text,path)

@@ -12,16 +12,13 @@
     <% unless resource.is_modelling? -%>
         <%= "<p class=\"list_item_attribute\"><b>Technology type</b>: #{link_to_technology_type(resource)}</p>".html_safe %>
     <% end -%>
-
-    <%= list_item_snapshot_list resource %>
-    <%= list_item_doi(resource) %>
-  </div>
-
-  <div class="col-sm-6 hidden-xs">
     <%= list_item_authorized_list [resource.investigation], t('investigation'), true, 50, true %>
 
     <%= list_item_authorized_list [resource.study], t('study'), true, 50, true %>
 
+  </div>
+
+  <div class="col-sm-6 hidden-xs">
     <% if Seek::Config.organisms_enabled %>
         <%= list_assay_organisms("Organisms", resource.assay_organisms,{:class=>"list_item_attribute"}) %>
     <% end %>
@@ -40,7 +37,9 @@
       <%= list_item_authorized_list resource.data_files, t('data_file').pluralize, true, 50, true %>
     <% end %>
 
-        </div>
+    <%= list_item_snapshot_list resource %>
+    <%= list_item_doi(resource) %>
+  </div>
 </div>
 
 <div class="hidden-xs">

@@ -1,0 +1,72 @@
+<h1>New Version</h1>
+
+<div class="row">
+  <div class="col-sm-3 col-md-2">
+    <ul class="nav nav-pills nav-stacked" role="tablist">
+      <%# Cannot go from a remote source back to a local one %>
+      <% unless @git_version.remote? %>
+        <%= content_tag(:li, role: 'presentation', class: @git_version.remote? ? '' : 'active') do %>
+          <a href="#new-local-version" aria-controls="new-local-version" role="tab" data-toggle="tab">
+            <%= t('workflows.register.files') %>
+          </a>
+        <% end %>
+      <% end %>
+      <%= content_tag(:li, role: 'presentation', class: @git_version.remote? ? 'active' : '') do %>
+        <a href="#new-remote-version" aria-controls="new-remote-version" role="tab" data-toggle="tab">
+          <%= t('workflows.register.git') %>
+        </a>
+      <% end %>
+    </ul>
+  </div>
+
+  <div class="col-sm-9 col-md-10">
+    <div class="tab-content">
+      <% unless @git_version.remote? %>
+        <%= content_tag(:div, role: 'tabpanel', id: 'new-local-version', class: @git_version.remote? ? 'tab-pane' : 'tab-pane active') do %>
+          <%= form_tag(polymorphic_path([:create_version_from_git, @workflow], anchor: 'new-local-version')) do -%>
+            <%= error_messages_for :git_version -%>
+
+            <%= fields_for('workflow[git_version_attributes]', @git_version) do |f| %>
+              <p class="help-block">Note: These fields can be changed later before finalizing the version.</p>
+
+              <div class="form-group">
+                <label>Name</label>
+                <%= f.text_field(:name, class: 'form-control') %>
+              </div>
+
+              <div class="form-group">
+                <label>Comment</label>
+                <%= f.text_area(:comment, class: 'form-control') %>
+              </div>
+
+              <%= f.hidden_field :git_repository_id %>
+              <%= f.hidden_field :ref %>
+              <%= f.hidden_field :commit %>
+              <%= f.hidden_field :mutable %>
+            <% end %>
+
+            <%= create_button(button_text: 'Continue', class: 'btn btn-primary') %> or <%= cancel_button(@workflow) %>
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <%= content_tag(:div, role: 'tabpanel', id: 'new-remote-version', class: @git_version.remote? ? 'tab-pane active' : 'tab-pane') do %>
+        <%= form_tag(polymorphic_path([:create_version_from_git, @workflow], anchor: 'new-remote-version')) do -%>
+          <%= error_messages_for :git_version -%>
+
+          <%= fields_for('workflow[git_version_attributes]', @git_version) do |f| %>
+            <div class="form-group">
+              <label class="required">URL</label>
+              <p class="help-block">URL to the git repository. Should end in ".git".</p>
+              <%= f.text_field :remote, placeholder: 'https://github.com/example/repository.git', class: 'form-control' %>
+            </div>
+          <% end %>
+
+          <div>
+            <%= create_button(button_text: 'Continue', class: 'btn btn-primary') %> or <%= cancel_button(@workflow) %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>

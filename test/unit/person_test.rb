@@ -658,10 +658,6 @@ class PersonTest < ActiveSupport::TestCase
     refute p.valid?
     assert_equal 1,p.errors.full_messages.count
     assert_equal "Full name can't be blank",p.errors.full_messages.first
-
-
-
-
   end
 
   def test_email_with_capitalise_valid
@@ -971,6 +967,62 @@ class PersonTest < ActiveSupport::TestCase
     assert_no_difference('WorkGroup.count') do
       assert_no_difference('GroupMembership.count') do
         p1.add_to_project_and_institution(proj1, inst1)
+      end
+    end
+  end
+
+  test 'add to project and institution saves new' do
+    person = Factory(:person)
+    institution = Institution.new(title:'an institution')
+    project = Project.new(title: 'a project')
+    assert institution.valid?
+    assert project.valid?
+
+    disable_authorization_checks do
+      assert_difference('Project.count') do
+        assert_difference('Institution.count') do
+          assert_difference('WorkGroup.count') do
+            assert_difference('GroupMembership.count') do
+              person.add_to_project_and_institution(project, institution)
+            end
+          end
+        end
+      end
+    end
+
+    # won't if the institution is invalid
+    institution = Institution.new(title:nil)
+    project = Project.new(title: 'another project')
+    refute institution.valid?
+    assert project.valid?
+
+    disable_authorization_checks do
+      assert_no_difference('Project.count') do
+        assert_no_difference('Institution.count') do
+          assert_no_difference('WorkGroup.count') do
+            assert_no_difference('GroupMembership.count') do
+              person.add_to_project_and_institution(project, institution)
+            end
+          end
+        end
+      end
+    end
+
+    # won't if the project is invalid
+    institution = Institution.new(title:'another inst')
+    project = Project.new(title: nil)
+    assert institution.valid?
+    refute project.valid?
+
+    disable_authorization_checks do
+      assert_no_difference('Project.count') do
+        assert_no_difference('Institution.count') do
+          assert_no_difference('WorkGroup.count') do
+            assert_no_difference('GroupMembership.count') do
+              person.add_to_project_and_institution(project, institution)
+            end
+          end
+        end
       end
     end
   end

@@ -13,24 +13,28 @@ module Seek
           "url" => { "@id" => "https://www.commonwl.org/" }
       }
 
-      available_diagram_formats(png: 'image/png', svg: 'image/svg+xml', default: :svg)
-
-      def can_render_diagram?
-        Seek::Config.cwl_viewer_url.present?
+      def self.file_extensions
+        ['cwl']
       end
 
-      def diagram(format = self.class.default_digram_format)
-        return nil unless Seek::Config.cwl_viewer_url.present?
-        content_type = self.class.diagram_formats[format]
-        url = URI.join(Seek::Config.cwl_viewer_url, DIAGRAM_PATH % { format: format }).to_s
+      def can_render_diagram?
+        true
+      end
+
+      def generate_diagram
         begin
-          RestClient.post(url, @io.read, content_type: 'text/plain', accept: content_type)
-        rescue RestClient::Exception => e
+          f = Tempfile.new('diagram.dot')
+          wf = WorkflowInternals::Structure.new(metadata[:internals])
+          Seek::WorkflowExtractors::CwlDotGenerator.new(f).write_graph(wf)
+          f.rewind
+          `cat #{f.path} | dot -Tsvg`
+        rescue StandardError => e
           nil
         end
       end
 
       def metadata
+        return @metadata if @metadata
         meta = super
         if @io.is_a?(Pathname)
           cwl_string = nil
@@ -47,7 +51,7 @@ module Seek
           path = f.path
         end
 
-        packed_cwl_string = `cwltool --quiet --pack #{path}`
+        packed_cwl_string = `cwltool --skip-schemas --quiet --enable-dev --non-strict --pack #{path}`
         if $?.success?
           cwl_string = packed_cwl_string
         else
@@ -57,13 +61,15 @@ module Seek
 
         parse_metadata(meta, cwl_string)
 
-        meta
+        @metadata = meta
       end
 
       private
 
       def parse_metadata(existing_metadata, yaml_or_json_string)
         cwl = YAML.load(yaml_or_json_string)
+        cwl = (cwl['$graph'].detect { |w| w['id'] == '#main' } || {}) if cwl.key?('$graph')
+
         if cwl.key?('label')
           existing_metadata[:title] = cwl['label']
         end
@@ -74,35 +80,95 @@ module Seek
           existing_metadata[:license] = cwl['s:license']
         end
 
-        existing_metadata[:internals] = {}
+        existing_metadata[:internals] = {
+          inputs: [],
+          outputs: [],
+          steps: [],
+          links: []
+        }
 
-        existing_metadata[:internals][:inputs] = iterate(cwl['inputs']).map do |id, input|
-          { id: id, name: input['label'], description: input['doc'], type: input['type'], default_value: input['default'] }
+        existing_metadata[:internals][:inputs] = normalise(cwl['inputs']).map do |input|
+          { id: input['id'], name: input['label'], description: input['doc'], type: normalise_type(input['type']), default_value: input['default'] }
         end
 
-        existing_metadata[:internals][:outputs] = iterate(cwl['outputs']).map do |id, output|
-          { id: id, name: output['label'], description: output['doc'], type: output['type'] }
+        existing_metadata[:internals][:outputs] = normalise(cwl['outputs']).map do |output|
+          { id: output['id'], name: output['label'], description: output['doc'], type: normalise_type(output['type']), source_ids: output['outputSource'] ? Array(output['outputSource']) : [] }
         end
 
-        existing_metadata[:internals][:steps] = iterate(cwl['steps']).map do |id, step|
-          { id: id, name: step['label'], description: step['doc'] }
+        existing_metadata[:internals][:steps] = normalise(cwl['steps']).map do |step|
+          existing_metadata[:internals][:links] += build_links(step)
+          { id: step['id'], name: step['label'], description: step['doc'], sink_ids: extract_sinks(step['out'], step['id']) }
         end
       end
 
-      # Iterate array or map-style lists of things
-      # @return [Hash{String => Hash}, Enumerable]
-      def iterate(array_or_hash)
-        return {} if array_or_hash.nil?
-        return to_enum(__method__, array_or_hash) unless block_given?
-
+      # Normalise array or map-style lists of things and return an array of hashes.
+      # @return [Array{Hash}]
+      def normalise(array_or_hash, key_field: 'id', value_field: 'type')
         if array_or_hash.is_a?(Hash)
-          array_or_hash.each do |key, item|
-            yield(key, item)
+          o = []
+          array_or_hash.each do |key, value|
+            if value.is_a?(String)
+              o << { key_field => key, value_field => value }
+            else
+              o << value.merge(key_field => key)
+            end
           end
-        else
-          array_or_hash.each do |item|
-            yield(item['id'], item)
+          return o
+        end
+
+        array_or_hash || []
+      end
+
+      def build_links(step)
+        i = step['in']
+        return [] if i.nil?
+
+        if i.is_a?(Hash)
+          i = i.flat_map do |id, s|
+            if s.is_a?(String)
+              { 'id' => id, 'source' => s }
+            else
+              s['id'] ||= id
+              s
+            end
           end
+        end
+
+        Array(i).flat_map do |s|
+          (s['source'].is_a?(Array) ? s['source'] : [s['source']]).map do |source|
+            { id: s['id'], source_id: source, sink_id: step['id'], name: s['label'], default_value: s['default'] }
+          end
+        end
+      end
+
+      def extract_sinks(obj, id)
+        obj.map do |o|
+          sink = o.is_a?(Hash) ? o['id'] : o
+          sink = "#{id}/#{sink}"unless sink.start_with?("#{id}/")
+          sink
+        end
+      end
+
+      def normalise_type(types, tabs = '')
+        types = [types] unless types.is_a?(Array)
+        types.map do |type|
+          t = type.is_a?(String) ? { 'type' => type } : type.dup
+
+          if t.key?('items')
+            t['items'] = normalise_type(t['items'], tabs + ' ')
+          end
+
+          if t.key?('fields')
+            f = []
+            if t['fields'].is_a?(Hash)
+              t['fields'].each do |name, value|
+                f << (value.is_a?(String) ? { 'type' => value } : value).merge('name' => name)
+              end
+            end
+            t['fields'] = f.map { |fi| normalise_type(fi['type'], tabs + ' ') }
+          end
+
+          t
         end
       end
     end

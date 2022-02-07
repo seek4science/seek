@@ -28,6 +28,7 @@ class Publication < ApplicationRecord
   has_many :studies, through: :related_relationships, source: :subject, source_type: 'Study'
   has_many :investigations, through: :related_relationships, source: :subject, source_type: 'Investigation'
   has_many :presentations, through: :related_relationships, source: :subject, source_type: 'Presentation'
+  has_many :workflows, through: :related_relationships, source: :subject, source_type: 'Workflow'
 
   has_and_belongs_to_many :human_diseases
   has_filter :human_disease
@@ -198,9 +199,9 @@ class Publication < ApplicationRecord
   # @param doi_record DOI::Record
   # @see https://github.com/SysMO-DB/doi_query_tool/blob/master/lib/doi_record.rb
   def extract_doi_metadata(doi_record)
-
     self.registered_mode = 2
     self.title = doi_record.title
+    self.abstract = doi_record.abstract
     self.published_date = doi_record.date_published
     self.journal = doi_record.journal
     self.doi = doi_record.doi
@@ -212,7 +213,6 @@ class Publication < ApplicationRecord
 
   # @param bibtex_record BibTeX entity from bibtex-ruby gem
   def extract_bibtex_metadata(bibtex_record)
-
     self.registered_mode = 4
     self.publication_type_id = PublicationType.get_publication_type_id(bibtex_record)
     self.title           = bibtex_record[:title].try(:to_s).gsub /{|}/, '' unless bibtex_record[:title].nil?

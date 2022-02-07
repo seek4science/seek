@@ -77,11 +77,11 @@ module ApplicationHelper
   def persistent_resource_id(resource)
     # FIXME: this contains some duplication of Seek::Rdf::RdfGeneration#rdf_resource - however not every model includes that Module at this time.
     # ... its also a bit messy handling the version
-    url = if resource.class.name.include?('::Version')
+    url = if resource.is_a_version?
             URI.join(Seek::Config.site_base_host + '/', "#{resource.parent.class.name.tableize}/", "#{resource.parent.id}?version=#{resource.version}").to_s
           else
             URI.join(Seek::Config.site_base_host + '/', "#{resource.class.name.tableize}/", resource.id.to_s).to_s
-    end
+          end
 
     content_tag :p, class: :id do
       content_tag(:strong) do
@@ -206,6 +206,12 @@ module ApplicationHelper
     return "<li><div class='none_text'> None specified</div></li>".html_safe if is_nil_or_empty?(list)
   end
 
+  def render_markdown(markdown)
+    doc = CommonMarker.render_doc(markdown, :UNSAFE, [:tagfilter, :table, :strikethrough, :autolink])
+    renderer = CommonMarker::SeekHtmlRenderer.new(options: [:UNSAFE, :GITHUB_PRE_LANG], extensions: [:tagfilter, :table, :strikethrough, :autolink])
+    renderer.render(doc)
+  end
+
   def text_or_not_specified(text, options = {})
     text = text.to_s
     if text.nil? || text.chomp.empty?
@@ -219,12 +225,11 @@ module ApplicationHelper
       res = white_list(res)
       res = truncate_without_splitting_words(res, options[:length]) if options[:length]
       if options[:markdown]
-        markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML, tables: true)
-        res = markdown.render(res)
+        res = render_markdown(res)
       elsif options[:description] || options[:address]
         res = simple_format(res, {}, sanitize: false).html_safe
       end
-      res = auto_link(res, html: { rel: 'nofollow' }, sanitize: false) if options[:auto_link]
+      res = auto_link(res, html: { rel: 'nofollow' }, sanitize: false) if options[:auto_link] && !options[:markdown]
       res = mail_to(res) if options[:email]
       res = link_to(res, res, popup: true, target: :_blank) if options[:external_link]
       res = res + '&nbsp;' + flag_icon(text) if options[:flag]
@@ -432,6 +437,11 @@ module ApplicationHelper
     instance_variable_get("@#{c.singularize}")
   end
 
+  # returns the current version of the resource for the controller, e.g @display_data_file for data_files
+  def versioned_resource_for_controller(c = controller_name)
+    instance_variable_get("@display_#{c.singularize}")
+  end
+
   def cancel_button(path, html_options = {})
     html_options[:class] ||= ''
     html_options[:class] << ' btn btn-default'
@@ -464,7 +474,7 @@ module ApplicationHelper
 
   # whether manage attributes should be shown, dont show if editing (rather than new or managing)
   def show_form_manage_specific_attributes?
-    !(action_name == 'edit' || action_name == 'update')
+    !(action_name == 'edit' || action_name == 'update' || action_name == 'update_paths') # TODO: Figure out a better check here...
   end
 
   def pending_project_creation_request?

@@ -59,7 +59,7 @@ jobs:
             suite: rails test test/unit
     steps:
       - name: Install system dependencies
-        run: sudo apt update && sudo apt install libcurl4-gnutls-dev
+        run: sudo apt update && sudo apt install libcurl4-gnutls-dev graphviz
         # build-essential git imagemagick libgmp-dev \
         #    libmagick++-dev libmysqlclient-dev libpq-dev libreadline-dev libreoffice libssl-dev \
         #    libxml++2.6-dev libxslt1-dev nodejs openjdk-8-jdk openssh-server poppler-utils zip
@@ -68,7 +68,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
-          java-version: '8' # The JDK version to make available on the path.
+          java-version: '11' # The JDK version to make available on the path.
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
