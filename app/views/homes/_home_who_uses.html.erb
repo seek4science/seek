@@ -19,7 +19,7 @@
 </script>
 
 <%# Only display the carousel if there is content %>
-<% if !Seek::Config.home_carousel.blank? %>
+<% unless Seek::Config.home_carousel.blank? %>
   <%= panel("Who is using it?", id: 'home-who-uses', body_options: { class: '' }) do %>
     <div id="home_who_uses_carousel" class="carousel slide" data-ride="carousel">
       <!-- Indicators: removed indicators as to not obstruct the text -->
@@ -38,20 +38,18 @@
               <a href="<%= carousel_item[:url] %>">
                 <img src="<%= Avatar.find(carousel_item[:image]).public_asset_url %>"
                   alt="<%= carousel_item[:title] %> logo"
-                  class="<%=index%>"
-                  style="width:auto;height:100px;">
+                  class="<%=index%>" >
               </a>
             </div>
             <h3 class="carousel-title"> <%= carousel_item[:title] %> </h3>
-            <p class="carousel-description" style="font-size: larger;"> <%= carousel_item[:description] %> </p>
-            <i class="carousel-author"> <%= carousel_item[:author] %> </i>
+            <p class="carousel-description"> <%= carousel_item[:description] %> </p>
+            <p class="carousel-author"> <%= carousel_item[:author] %> </p>
           </div>
         <% end %>
       </div>
 
       <!-- Controls -->
-      <a class="left carousel-control" href="#home_who_uses_carousel" role="button" data-slide="prev" style="background-image: none; color:black;"
-  }>
+      <a class="left carousel-control" href="#home_who_uses_carousel" role="button" data-slide="prev">
         <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
         <span class="sr-only">Previous</span>
       </a>
