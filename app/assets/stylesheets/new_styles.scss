@@ -368,11 +368,6 @@ div#home-my-items #my-projects {
   height: 125px;
 }
 
-img#front-page-integrations {
-  width: 100%;
-  padding: 20px;
-}
-
 #home-quick-start a.quick-start-button {
   white-space: normal;
   width:100%;
@@ -430,17 +425,17 @@ a.seek-homepage-button {
 
 #home-integrations .col {
   text-align: center;
-  height: 15em;
+  height: 10em;
 }
 
 #home-integrations img.integration-logo {
-  max-width: 90%;
-  padding: 1em;
-  max-height: 80%;
+  padding: 0.5em;
+  height:45%;
 }
 
 #home-integrations .integration-label {
-  font-size: x-large;
+  padding-top: 0.75em;
+  font-size: large;
 }
 
 div.isa_graph {
