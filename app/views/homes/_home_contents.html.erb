@@ -23,11 +23,11 @@
     <% if logged_in_and_registered? && Seek::Config.home_show_my_items%>
       <%= render :partial=>"home_my_items" -%>
     <% end %>
-    <% if !logged_in_and_registered? && Seek::Config.home_show_who_uses %>
-      <%= render :partial=>"home_who_uses" -%>
-    <% end %>
     <% if Seek::Config.home_explore_projects %>
       <%= render :partial=>"home_explore_projects" -%>
+    <% end %>
+    <% if !logged_in_and_registered? && Seek::Config.home_show_who_uses %>
+      <%= render :partial=>"home_who_uses" -%>
     <% end %>
     <% if !logged_in_and_registered? && Seek::Config.home_show_integrations %>
       <%= render :partial=>"home_integrations" -%>
