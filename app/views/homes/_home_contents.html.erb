@@ -19,7 +19,7 @@
 <% end %>
 
 <div class="row">
-  <div class="col-md-9">
+  <div class="col-md-9 home-main-panel">
     <% if logged_in_and_registered? && Seek::Config.home_show_my_items%>
       <%= render :partial=>"home_my_items" -%>
     <% end %>
