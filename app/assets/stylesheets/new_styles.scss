@@ -57,6 +57,28 @@ div#my-recent-contributions .feed {
   overflow-y:auto;
 }
 
+div#home_who_uses_carousel div.carousel-logo img {
+  width:auto;
+  height:14em;
+}
+
+div#home_who_uses_carousel p.carousel-description {
+  font-size: 1.15em;
+}
+
+div#home_who_uses_carousel p.carousel-author {
+  font-style: italic;
+}
+
+div#home_who_uses_carousel .carousel-control {
+  background-image: none;
+  color:black;
+}
+
+div#home_who_uses_carousel .carousel-control span {
+  opacity: 0.4;
+}
+
 .file-type-icon {
   display: block;
   float: left;
