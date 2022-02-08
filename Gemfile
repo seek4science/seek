@@ -26,7 +26,8 @@ gem 'progress_bar'
 gem 'savon', '1.1.0'
 gem 'delayed_job_active_record'
 gem 'daemons'
-gem 'linkeddata', '~> 3.0.1'
+gem 'linkeddata'
+gem 'rdf', git: 'https://github.com/ruby-rdf/rdf.git', ref: '71c0141c71da5c40809e3fd2fb38c0ca55c6f858'
 
 gem 'openseek-api'
 # for fancy content escaping in openbis integration

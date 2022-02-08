@@ -25,6 +25,14 @@ GIT
     my_responds_to_parent (1.0.0)
 
 GIT
+  remote: https://github.com/ruby-rdf/rdf.git
+  revision: 71c0141c71da5c40809e3fd2fb38c0ca55c6f858
+  ref: 71c0141c71da5c40809e3fd2fb38c0ca55c6f858
+  specs:
+    rdf (3.2.3)
+      link_header (~> 0.0, >= 0.0.8)
+
+GIT
   remote: https://github.com/seek4science/DOI-query-tool.git
   revision: 95f795d00094c5e0d4febf97dd73a5e97c9d5798
   specs:
@@ -586,8 +594,6 @@ GEM
     rb-inotify (0.10.1)
       ffi (~> 1.0)
     rchardet (1.8.0)
-    rdf (3.2.3)
-      link_header (~> 0.0, >= 0.0.8)
     rdf-aggregate-repo (3.2.0)
       rdf (~> 3.2)
     rdf-isomorphic (3.2.0)
@@ -927,7 +933,7 @@ DEPENDENCIES
   json-diff
   json-schema
   libxml-ruby (~> 2.9.0)
-  linkeddata (~> 3.0.1)
+  linkeddata
   listen (~> 3.3)
   lograge
   loofah
@@ -967,6 +973,7 @@ DEPENDENCIES
   rails_autolink
   rails_best_practices
   ransack
+  rdf!
   rdf-virtuoso (>= 0.2.0)
   rdoc
   recaptcha (~> 4.1.0)
