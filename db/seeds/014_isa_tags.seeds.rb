@@ -15,6 +15,8 @@ other_material_characteristic = IsaTag.find_or_initialize_by(title:'other_materi
 other_material_characteristic.save
 data_file = IsaTag.find_or_initialize_by(title:'data_file')
 data_file.save
+data_file_comment = IsaTag.find_or_initialize_by(title:'data_file_comment')
+data_file_comment.save
 parameter_value = IsaTag.find_or_initialize_by(title:'parameter_value')
 parameter_value.save
 

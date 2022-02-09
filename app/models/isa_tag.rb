@@ -36,6 +36,10 @@ class IsaTag < ApplicationRecord
     title == Seek::ISA::TagType::DATA_FILE
   end
 
+  def isa_data_file_comment?
+    title == Seek::ISA::TagType::DATA_FILE_COMMENT
+  end
+
   def isa_parameter_value?
     title == Seek::ISA::TagType::PARAMETER_VALUE
   end
