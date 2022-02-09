@@ -10,66 +10,60 @@ class DynamicTableHelperTest < ActionView::TestCase
     User.with_current_user(person.user) do
       inv = Factory(:investigation, projects: [project], contributor:person)
 
-      sample1 = Factory(:max_sample)
-      sample1_1 = Factory(:max_sample, sample_type: sample1.sample_type)
-      sample1_2 = Factory(:max_sample, sample_type: sample1.sample_type)
+      sample_A1 = Factory(:max_sample)
+      type_A = sample_A1.sample_type
+      sample_A2 = Factory(:max_sample, sample_type: type_A)
+      sample_A3 = Factory(:max_sample, sample_type: type_A)
 
-      type2 = Factory(:multi_linked_sample_type, project_ids: [project.id])
-      type2.sample_attributes.last.linked_sample_type = sample1.sample_type
-      type2.save!
+      type_B = Factory(:multi_linked_sample_type, project_ids: [project.id])
+      type_B.sample_attributes.last.linked_sample_type = type_A
+      type_B.save!
 
-      sample2 = Sample.new(sample_type: type2, project_ids: [project.id])
-      sample2.set_attribute_value(:title, 'sample2')
-      sample2.set_attribute_value(:patient, [sample1.id])
-      disable_authorization_checks { sample2.save! }
+      sample_B1 = Sample.new(sample_type: type_B, project_ids: [project.id])
+      sample_B1.set_attribute_value(:title, 'sample_B1')
+      sample_B1.set_attribute_value(:patient, [sample_A1.id])
+      disable_authorization_checks { sample_B1.save! }
 
-      sample2_1 = Sample.new(sample_type: type2, project_ids: [project.id])
-      sample2_1.set_attribute_value(:title, 'sample2_1')
-      sample2_1.set_attribute_value(:patient, [sample1_1.id])
-      disable_authorization_checks { sample2_1.save! }
+      sample_B2 = Sample.new(sample_type: type_B, project_ids: [project.id])
+      sample_B2.set_attribute_value(:title, 'sample_B2')
+      sample_B2.set_attribute_value(:patient, [sample_A2.id])
+      disable_authorization_checks { sample_B2.save! }
 
-      type3 = Factory(:multi_linked_sample_type, project_ids: [project.id])
-      type3.sample_attributes.last.linked_sample_type = type2
-      type3.save!
+      type_C = Factory(:multi_linked_sample_type, project_ids: [project.id])
+      type_C.sample_attributes.last.linked_sample_type = type_B
+      type_C.save!
 
-      sample3 = Sample.new(sample_type: type3, project_ids: [project.id])
-      sample3.set_attribute_value(:title, 'sample3')
-      sample3.set_attribute_value(:patient, [sample2.id])
-      disable_authorization_checks { sample3.save! }
+      sample_C1 = Sample.new(sample_type: type_C, project_ids: [project.id])
+      sample_C1.set_attribute_value(:title, 'sample_C1')
+      sample_C1.set_attribute_value(:patient, [sample_B1.id])
+      disable_authorization_checks { sample_C1.save! }
 
-      study = Factory(:study, investigation: inv, contributor:person)
-      study.sample_types = [sample1.sample_type, type2]
-      study.save!
+      study = Factory(:study, investigation: inv, contributor: person, sample_types: [type_A, type_B])
 
-      types = [sample1.sample_type, type2, type3]
-      for limit in 2..3 do
-        custom_attributes_count = limit * 2
-        dt = dt_data(types, limit)
-        assert_equal sample1.sample_type.samples.length , dt[:rows].length
+      dt = dt_aggregated(study)
+      columns_count = study.sample_types.reduce(0) {|s,n| s + n.sample_attributes.length }
 
-        columns_count = types.slice(0,limit).map{|s| s.sample_attributes}.flatten.length + custom_attributes_count
-
-        assert_equal columns_count , dt[:columns].length
-        dt[:rows].each {|r| assert_equal columns_count, r.length}
-      end
+      assert_equal type_A.samples.length , dt[:rows].length
+      assert_equal columns_count , dt[:columns].length
+      dt[:rows].each {|r| assert_equal columns_count, r.length}
 
       assert_equal false, dt[:rows][0].any? { |x| x == "" }
-      assert_equal true, dt[:rows][1].any? { |x| x == "" }
+      assert_equal false, dt[:rows][1].any? { |x| x == "" }
       assert_equal true, dt[:rows][2].any? { |x| x == "" }
 
-      dt = dt_data(types, 1)
-      puts dt[:columns].inspect
-      puts dt[:rows][0]
     end
 
     # |-------------------------------------------------------------------------|
-    # |         ST1            |          ST2           |           ST3         |
+    # |         type_A         |         type_B         |         type_C        |
     # |------------------------|------------------------|-----------------------|
-    # |  (status)(id)sample1   | (status)(id)sample2    | (status)(id)sample3   |
-    # |  (status)(id)sample1_1 | (status)(id)sample2_1  | x                     |
-    # |  (status)(id)sample1_2 | x                      | x                     |
+    # |  (status)(id)sample_A1 | (status)(id)sample_B1  | (status)(id)sample_C1 |
+    # |  (status)(id)sample_A2 | (status)(id)sample_B2  | x                     |
+    # |  (status)(id)sample_A3 | x                      | x                     |
     # |-------------------------------------------------------------------------|
 
+    # TODO test when there is(are) 1(more) assay(s)
+    # TODO test with no sample
+    
   end
 
 end

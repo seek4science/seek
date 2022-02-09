@@ -56,7 +56,7 @@ module DynamicTableHelper
       s.samples.each { |sa| row[sa.id] = sa.linking_samples.map{ |l| l.id } }
       @arr << row
     end
-    @arr[0].each { |x,arr| get_full_rows(x).each { |s| samples_graph << s } }
+    @arr[0].each { |x,arr| get_full_rows(x, sample_types.length-1).each { |s| samples_graph << s } }
 
     samples_graph.each do |sample_id_set|
       full_row = []
@@ -68,11 +68,12 @@ module DynamicTableHelper
     aggregated_rows
   end
 
-  def get_full_rows(x, row=[], i=0, rows=[])
+  #TODO 
+  def get_full_rows(x, depth, row=[], i=0, rows=[])
     row << x
     links = @arr[i][x] if @arr[i]
-    if (links && links.length > 0)
-      links.each {|m| get_full_rows(m, row.clone, i+1, rows)}
+    if (links && links.length > 0 && i < depth)
+      links.each {|m| get_full_rows(m, depth, row.clone, i+1, rows)}
     else 
       rows << row
     end
