@@ -30,9 +30,8 @@
         <div class="row">
           <% if Seek::Config.tagging_enabled %>
             <div id="home_explore_projects_tag_cloud">
-              <% cache 'home_explore_projects_tag_cloud', skip_digest: true do -%>
-                <%= render :partial => "home_tag_cloud" %>
-              <% end -%>
+              <%= render :partial => "home_tag_cloud" %>
+
             </div>
           <% end %>
         </div>

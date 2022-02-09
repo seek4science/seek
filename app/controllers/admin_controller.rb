@@ -189,6 +189,8 @@ class AdminController < ApplicationController
     Seek::Config.tag_cloud_enabled = string_to_boolean params[:tag_cloud_enabled]
     Seek::Config.workflow_class_list_enabled = string_to_boolean params[:workflow_class_list_enabled]
 
+    expire_annotation_fragments
+
     update_redirect_to (is_entries_integer && (only_integer tag_threshold, 'tag threshold') && (only_positive_integer max_visible_tags, 'maximum visible tags')), 'home_settings'
   end
 

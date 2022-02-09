@@ -3,11 +3,13 @@
 </div>
 
 <div class="show_basic">
-  <%= render partial: "tags/tag_cloud",
-             locals: {
-                 tags: TextValue.all_tags,
-                 show_overall_count: true,
-                 id: "super_tag_cloud",
-                 tags_smaller: false
-             } %>
+  <% cache('super_tag_cloud') do %>
+    <%= render partial: "tags/tag_cloud",
+               locals: {
+                   tags: TextValue.all_tags.select{|t| t.tag_count>0},
+                   show_overall_count: true,
+                   id: "super_tag_cloud",
+                   tags_smaller: false
+               } %>
+    <% end %>
 </div>
