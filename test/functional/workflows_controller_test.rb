@@ -1213,6 +1213,32 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'get workflow as json-ld' do
+    person = Factory(:max_person, description: 'a lovely person')
+    login_as(person)
+    creator2 = Factory(:person)
+    current_time = Time.now.utc
+    workflow = travel_to(current_time) do
+      workflow = Factory(:cwl_packed_workflow,
+                         title: 'This workflow',
+                         description: 'This is a test workflow for bioschema generation',
+                         creators: [person, creator2],
+                         other_creators: 'Fred Bloggs, Steve Smith',
+                         contributor: person,
+                         license: 'APSL-2.0')
+
+      workflow.internals = workflow.extractor.metadata[:internals]
+
+      workflow.add_annotations('wibble', 'tag', User.first)
+      disable_authorization_checks { workflow.save! }
+      workflow
+    end
+
+    get :show, params: { id: workflow.id, format: :jsonld }
+    json = JSON.parse(response.body)
+    assert_equal Seek::BioSchema::Serializer.new(workflow.latest_version).json_representation, json
+  end
+
   def edit_max_object(workflow)
     add_tags_to_test_object(workflow)
     add_creator_to_test_object(workflow)
