@@ -138,7 +138,6 @@ async function batchCreateSample(sampleTypes) {
       console.log("No samples to create");
       return;
     }
-    console.log(data);
     return ajaxCall("/samples/batch_create/", "POST", { data: JSON.stringify({ data }) });
   } catch (e) {
     console.log(e);
@@ -158,7 +157,6 @@ async function batchDeleteSample(sampleTypes) {
       console.log("No samples to delete.");
       return;
     }
-    console.log(data);
     return ajaxCall("/samples/batch_delete/", "DELETE", { data: JSON.stringify({ data }) });
   } catch (e) {
     console.log(e);
@@ -178,7 +176,6 @@ async function batchUpdateSample(sampleTypes) {
       console.log("No samples to update");
       return;
     }
-    console.log(data);
     return ajaxCall("/samples/batch_update/", "PUT", { data: JSON.stringify({ data }) });
   } catch (e) {
     console.log(e);
