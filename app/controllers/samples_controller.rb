@@ -133,7 +133,7 @@ class SamplesController < ApplicationController
     param_converter = Seek::Api::ParameterConverter.new("samples")
     Sample.transaction do
       params[:data].each do |par|
-        params =  param_converter.convert(par)
+        params = param_converter.convert(par)
         sample = Sample.new(sample_type_id: params[:sample][:sample_type_id], title: params[:sample][:title])
         update_sample_with_params(params, sample)
         if sample.save
@@ -199,8 +199,7 @@ class SamplesController < ApplicationController
 
   private
 
-  def sample_params(sample_type = nil, parameters = nil)
-    parameters ||= params
+  def sample_params(sample_type = nil, parameters = params)
     sample_type_param_keys = sample_type ? sample_type.sample_attributes.map(&:title).collect(&:to_sym) : []
     if parameters[:sample][:attribute_map]
       parameters[:sample][:data] = parameters[:sample].delete(:attribute_map)
@@ -214,17 +213,12 @@ class SamplesController < ApplicationController
                               discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
-  def update_sample_with_params(parameters = nil, sample = nil)
-    sample ||= @sample
-    if parameters.nil?
-      sample.update_attributes(sample_params(sample.sample_type))
-    else  
-      sample.assign_attributes(sample_params(sample.sample_type, parameters))
-    end
+  def update_sample_with_params(parameters = params, sample = @sample)
+    sample.update_attributes(sample_params(sample.sample_type, parameters))
     update_sharing_policies sample
-    update_annotations(params[:tag_list], sample)
-    update_relationships(sample, params)
-    sample.save if parameters.nil?
+    update_annotations(parameters[:tag_list], sample)
+    update_relationships(sample, parameters)
+    sample.save
   end
 
   def find_index_assets
