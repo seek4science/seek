@@ -204,11 +204,12 @@ class SamplesController < ApplicationController
     if parameters[:sample][:attribute_map]
       parameters[:sample][:data] = parameters[:sample].delete(:attribute_map)
     end
-    if (parameters[:sample][:assay_assets_attributes])
-      parameters[:sample][:assay_ids] = parameters[:sample][:assay_assets_attributes].map { |x| x[:assay_id] }
-    end
+    # if (parameters[:sample][:assay_assets_attributes])
+    #   parameters[:sample][:assay_ids] = parameters[:sample][:assay_assets_attributes].map { |x| x[:assay_id] }
+    # end
     parameters.require(:sample).permit(:sample_type_id, *creator_related_params,
-                              { project_ids: [] }, { assay_ids: [] }, { data: sample_type_param_keys },
+                              { project_ids: [] }, { data: sample_type_param_keys },
+                              { assay_assets_attributes: [:assay_id] },
                               { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                               discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
