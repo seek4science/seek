@@ -6,10 +6,13 @@ namespace :seek do
   desc "Fetch ontology terms from EBI API"
   task :populate_templates => :environment do
     begin
-      Template.delete_all
-      TemplateAttribute.delete_all
-      SampleControlledVocab.delete_all
-      SampleControlledVocabTerm.delete_all
+      if ENV['wipe'] == "yes"
+        puts "Wiping templates data....."
+        Template.delete_all
+        TemplateAttribute.delete_all
+        SampleControlledVocab.delete_all
+        SampleControlledVocabTerm.delete_all
+      end
 
       disable_authorization_checks do
         client = Ebi::OlsClient.new
