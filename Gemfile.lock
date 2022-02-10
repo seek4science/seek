@@ -38,12 +38,6 @@ GIT
     zenodo-client (0.3.0)
       rest-client (~> 2.0)
 
-PATH
-  remote: /Users/abecam/RubymineProjects/openseek-api-gem
-  specs:
-    openseek-api (0.18)
-      terrapin
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -449,6 +443,8 @@ GEM
       validate_email
       validate_url
       webfinger (>= 1.0.1)
+    openseek-api (0.17.4)
+      terrapin
     options (2.3.2)
     parallel (1.20.1)
     parser (2.7.2.0)
@@ -874,7 +870,7 @@ DEPENDENCIES
   omniauth-ldap (~> 1.0.5)
   omniauth-rails_csrf_protection (~> 0.1)
   omniauth_openid_connect
-  openseek-api!
+  openseek-api
   passenger
   pg
   pothoven-attachment_fu
