@@ -252,11 +252,11 @@ function checkSampleLink(value) {
   } else return value;
 }
 
-function sampleStatus(table, rowId, sampleTypeId, value = null) {
+function sampleStatus(table, rowId, sampleTypeId, value = "notSet") {
   const sampleStatusIndex = table
     .settings()[0]
     .aoColumns.findIndex((x) => x?.status && x.name == sampleTypeId);
-  if (value) table.row(rowId).data()[sampleStatusIndex] = value;
+  if (value !== "notSet") table.row(rowId).data()[sampleStatusIndex] = value;
   else return table.row(rowId).data()[sampleStatusIndex];
 }
 
