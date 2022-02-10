@@ -314,6 +314,8 @@ function handleResponse(table, sampleTypes, errorCls, successCls) {
           if (errorColNames.includes(colTitle)) {
             $j(this.node()).addClass(errorCls);
             $j(this.node()).attr("title", error.error[colTitle]);
+          } else if (error.error == "Can not be deleted.") {
+            $j(this.node()).addClass(errorCls);
           }
         });
       });
