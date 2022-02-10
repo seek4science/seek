@@ -126,6 +126,10 @@ class SampleType < ApplicationRecord
     Seek::Samples::SampleTypeEditingConstraints.new(self)
   end
 
+  def isa_template
+    Template.find(template_id).title if template_id
+  end
+
   private
 
   # whether the referring sample is valid and gives permission to view

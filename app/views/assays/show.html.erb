@@ -132,6 +132,11 @@
             <% end %>
         <% end %>
         <%= render partial: 'general/isa_graph', locals: { root_item: @assay, options: { depth: 4 } } %>
+
+        <% if Seek::Config.project_single_page_advanced_enabled %>
+            <%= render partial: 'isa_studies/applied_templates', locals: { resource: @assay } -%>
+        <% end %>
+
       </div>
 
       <div class="col-md-3 col-sm-4">

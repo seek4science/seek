@@ -1,0 +1,18 @@
+<% applied_templates = resource.respond_to?("sample_types") ?
+ resource.sample_types.map {|s| s.isa_template } : [resource.sample_type.isa_template]  %>
+ 
+<% if applied_templates.any? %>
+  <div>
+    <h3>Applied template<%=applied_templates.second ? "s" : "" %></h3>
+    <div>
+    <ul>
+      <% applied_templates.each do |t| %>
+        <li>
+        <%= t %>
+        </li>
+      <% end %>
+      </ul>
+    </div>
+  </div>
+<% end %>
+

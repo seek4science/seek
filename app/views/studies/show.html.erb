@@ -57,6 +57,10 @@
 
           <%= render partial: 'general/isa_graph', locals: { root_item: @study, options: { depth: 4 } } -%>
 
+          <% if Seek::Config.project_single_page_advanced_enabled %>
+              <%= render partial: 'isa_studies/applied_templates', locals: { resource: @study } -%>
+          <% end %>
+
         </div>
 
         <div class="col-md-3 col-sm-4">
