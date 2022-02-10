@@ -148,7 +148,6 @@ const applyTemplate = () => {
   const attribute_row = "#new-attribute-row" + suffix;
   const addAttributeRow = "#add-attribute-row" + suffix;
 
-  $j(".template_parent_id").val(data.template_id);
   $j(`${attribute_table} tbody`).find("tr:not(:last)").remove();
   SampleTypes.unbindSortable();
   // Make sure default sorted attributes are added to the table 
@@ -194,7 +193,7 @@ const applyTemplate = () => {
   });
 
   // Sets the template_id in the form (if the object is an isa_study form sample_type)
-  const template_id_tag = $j(`#isa_study${suffix}_template_id`);
+  const template_id_tag = $j(`#isa_study${suffix}template_parent_id`);
   if (template_id_tag) $j(template_id_tag).val(id);
 
   SampleTypes.recalculatePositions();
