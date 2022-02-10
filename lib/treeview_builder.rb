@@ -103,7 +103,7 @@ class TreeviewBuilder
     def load_isa_study_element (study)
         elements = []
         # TODO: Use the isa_order of sample_type instead
-        if (study.sop && !study.sample_types.blank?)
+        if (study.sop && study.sample_types.any?)
             elements << create_node({text: "Source material", _type: 'source_material', _id: study.sample_types.first.id, resource: study.sample_types.first})
             elements << create_node({text: "Sample collection", _type: 'sample_collection', _id: study.sop.id, resource: study.sop})
             elements << create_node({text: "Study sample", _type: 'study_samples', _id: study.id, resource: study.sample_types.first})

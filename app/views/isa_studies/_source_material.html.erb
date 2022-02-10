@@ -1,5 +1,5 @@
 <% study ||= nil %>
-<% valid_study = study && !study.sample_types.blank? %>
+<% valid_study = study && study.sample_types.any? %>
 <% sample_type = study&.sample_types&.first %>
 
 <div style="padding:0 20px 20px 20px;">
