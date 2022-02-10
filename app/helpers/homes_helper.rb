@@ -209,7 +209,7 @@ module HomesHelper
       {
         key: 'front_page_integration_elixir_aai',
         url: 'https://elixir-europe.org/services/compute/aai',
-        label: 'Login with'
+        label: 'Authentication'
       },
       {
         key: 'front_page_integration_ols',
@@ -228,7 +228,7 @@ module HomesHelper
       },
       {
         key: 'front_page_integration_json_api',
-        url: 'https://jsonapi.org/',
+        url: 'https://docs.seek4science.org/help/user-guide/api.html',
         label: 'Programmatic access'
       },
       {
