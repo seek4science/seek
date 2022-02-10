@@ -126,6 +126,62 @@ class SampleCUDTest < ActionDispatch::IntegrationTest
     assert_equal 12, sample.get_attribute_value("age")
   end
 
+  test 'batch create' do 
+    person = Factory(:person)
+    user_login(person)
+    project = Factory(:project)
+    institution = Factory(:institution)
+    person.add_to_project_and_institution(project, institution)
+    investigation = Factory(:investigation, contributor: person)
+    study = Factory(:study, contributor: person)
+    type = Factory(:patient_sample_type, contributor: person)
+    assay = Factory(:assay, contributor: person, sample_type: type)
+
+    other_person = Factory(:person)
+    user_login(other_person)
+    other_person.add_to_project_and_institution(project, institution)
+    params = {
+      "data": [
+        {
+          "ex_id": "1",
+          "data": {
+            "type": "samples",
+            "attributes": {
+              "title": "Jack Frost",
+              "attribute_map": {"full name": "Jack Frost","weight": 12.4,"age": 12}
+            },
+            "relationships": {
+              "projects": {"data":[{"type": "projects","id": "#{project.id}"}]},
+              "sample_type": {"data": {"id": "#{type.id}","type": "sample_types"}},
+              "assays":{"data": [{"type": "assays","id": "#{assay.id}"}]}
+            }
+          }
+        }
+      ]
+    }
+
+    assert_difference('Sample.count', 0) do
+      assert_difference('AssayAsset.count', 0) do
+        assert_difference('SampleType.count', 0) do
+          post "/samples/batch_create", as: :json, params: params
+          assert_response :success
+        end
+      end
+    end
+
+    assay.policy.permissions.create!(access_type: Policy::EDITING, contributor: other_person)
+
+    assert_difference('Sample.count', 1) do
+      assert_difference('AssayAsset.count', 1) do
+        assert_difference('SampleType.count', 0) do
+          post "/samples/batch_create", as: :json, params: params
+          assert_response :success
+        end
+      end
+    end
+
+  end
+
   def create_post_values
       @post_values = {
          sample_type_id: @sample_type.id,

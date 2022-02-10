@@ -33,7 +33,7 @@ class Sample < ApplicationRecord
   has_many :linking_samples, through: :reverse_sample_resource_links, source: :sample
 
   validates :title, :sample_type, presence: true
-  include ActiveModel::Validations
+
   validates_with SampleAttributeValidator
 
   before_validation :set_title_to_title_attribute_value
