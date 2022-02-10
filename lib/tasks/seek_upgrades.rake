@@ -13,6 +13,8 @@ namespace :seek do
     db:seed:013_workflow_data_file_relationships
     rename_branding_settings
     remove_orphaned_versions
+    create_seek_sample_multi
+    rename_seek_sample_attribute_types
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -73,4 +75,21 @@ namespace :seek do
     end
     puts "... finished removing #{count} orphaned versions"
   end
+
+  task(create_seek_sample_multi: [:environment]) do
+    # check it doesn't exist with the old or new name
+    if SampleAttributeType.where(title: 'SEEK Sample Multi').or(SampleAttributeType.where(title: 'Registered Sample (multiple)')).empty?
+      seek_sample_multi_type = SampleAttributeType.find_or_initialize_by(title:'Registered Sample (multiple)')
+      seek_sample_multi_type.update(base_type: Seek::Samples::BaseType::SEEK_SAMPLE_MULTI)
+    end
+  end
+
+  task(rename_seek_sample_attribute_types: [:environment]) do
+    type = SampleAttributeType.where(title: 'SEEK Sample').first
+    type&.update_column(:title, 'Registered Sample')
+
+    type = SampleAttributeType.where(title: 'SEEK Sample Multi').first
+    type&.update_column(:title, 'Registered Sample (multiple)')
+  end
+
 end
