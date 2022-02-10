@@ -440,9 +440,6 @@ a.seek-homepage-button {
 
 #home_tag_cloud_home {
   padding: 1em;
-}
-
-#home_tag_cloud_home .tags_smaller {
   font-size: x-large;
 }
 
@@ -1217,4 +1214,8 @@ a.orcid-link {
 
 #home-explore-projects a.browse-button img {
   height: 80px;
+}
+
+div#super_tag_cloud {
+  font-size: x-large;
 }

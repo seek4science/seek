@@ -7,7 +7,12 @@
 
   <div class="panel-body">
 
-    <%= render partial: 'general/build_tag_cloud' %>
+    <%= render :partial => "tags/tag_cloud",
+               :locals => { tags: tags_above_threshold,
+                            cache_key: 'tag_cloud',
+                            no_tags_text: 'There are not yet any tags defined'
+               }
+    %>
 
   </div>
 </div>
