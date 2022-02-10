@@ -376,7 +376,7 @@
           "iri": null,
           "name": "Technology type",
           "description": "",
-          "dataType": "String",
+          "dataType": "Controlled Vocabulary",
           "required": true,
           "isaTag": "other_material_characteristic",
           "ontology": null,
