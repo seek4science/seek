@@ -15,7 +15,7 @@ module DynamicTableHelper
         sample_types = [previous_assay.sample_type, assay.sample_type]
       end
     else
-      sample_types = study.sample_types
+      sample_types = study.sample_types.map(&:clone)
       sample_types.push(*study.assays.map {|a| a.sample_type }) if include_all_assays
     end
     columns = dt_cumulative_cols(sample_types)
