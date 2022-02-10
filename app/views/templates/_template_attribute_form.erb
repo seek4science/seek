@@ -76,18 +76,18 @@
     </div>
   </td>
   <td>
-    <%= select_tag "#{field_name_prefix}[unit_id]",
-                   options_for_select(Unit.order(:order).map { |u| ["#{u.symbol} #{u.title}", "#{u.id}"] },
-                   unit_id),include_blank: true, class: 'form-control', data: {attr: "unit"} %>
+    <%= text_field_tag "#{field_name_prefix}[description]", description, class: 'form-control',
+                    placeholder: 'Description', data: {attr: "description"} %>
   </td>
   <td>
-    <%= text_field_tag "#{field_name_prefix}[description]", description, class: 'form-control',
-                       placeholder: 'Description', data: {attr: "description"} %>
+    <%= text_field_tag "#{field_name_prefix}[iri]", iri, class: 'form-control',
+                    placeholder: 'IRI', data: {attr: "iri"} %>
   </td>
 
-   <td>
-    <%= text_field_tag "#{field_name_prefix}[iri]", iri, class: 'form-control',
-                       placeholder: 'IRI', data: {attr: "iri"} %>
+  <td>
+    <%= select_tag "#{field_name_prefix}[unit_id]",
+                    options_for_select(Unit.order(:order).map { |u| ["#{u.symbol} #{u.title}", "#{u.id}"] },
+                    unit_id),include_blank: true, class: 'form-control', data: {attr: "unit"} %>
   </td>
 
   <td>

@@ -39,16 +39,16 @@
         <p class="help-block">Re-arrange attributes by clicking and dragging the button on the left-hand side of each row.</p>
         <table class="table" id=<%=attribute_table_id%> >
           <thead>
-          <tr>
-            <th width="5em">Order</th>
-            <th>Name</th>
-            <th width="5em">Required?</th>
-            <th width="5em">Title?</th>
-            <th>Type</th>
-            <th>Unit</th>
-            <th>Description</th>
-            <th>IRI</th>
-          </tr>
+            <tr>
+              <th width="5em">Order</th>
+              <th>Name<%= required_span %></th>
+              <th width="5em">Required?</th>
+              <th width="5em">Title?</th>
+              <th>Type<%= required_span %></th>
+              <th>Description</th>
+              <th>IRI</th>
+              <th>Unit</th>
+            </tr>
           </thead>
           <tbody>
           <% sample_type.sample_attributes.each_with_index do |sample_attribute, index| %>
