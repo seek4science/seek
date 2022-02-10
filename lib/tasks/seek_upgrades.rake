@@ -77,19 +77,24 @@ namespace :seek do
   end
 
   task(create_seek_sample_multi: [:environment]) do
-    # check it doesn't exist with the old or new name
-    if SampleAttributeType.where(title: 'SEEK Sample Multi').or(SampleAttributeType.where(title: 'Registered Sample (multiple)')).empty?
+    if SampleAttributeType.where(base_type: Seek::Samples::BaseType::SEEK_SAMPLE_MULTI).empty?
       seek_sample_multi_type = SampleAttributeType.find_or_initialize_by(title:'Registered Sample (multiple)')
       seek_sample_multi_type.update(base_type: Seek::Samples::BaseType::SEEK_SAMPLE_MULTI)
     end
   end
 
   task(rename_seek_sample_attribute_types: [:environment]) do
-    type = SampleAttributeType.where(title: 'SEEK Sample').first
+    type = SampleAttributeType.where(base_type: Seek::Samples::BaseType::SEEK_SAMPLE).first
     type&.update_column(:title, 'Registered Sample')
 
-    type = SampleAttributeType.where(title: 'SEEK Sample Multi').first
+    type = SampleAttributeType.where(base_type: Seek::Samples::BaseType::SEEK_SAMPLE_MULTI).first
     type&.update_column(:title, 'Registered Sample (multiple)')
+
+    type = SampleAttributeType.where(base_type: Seek::Samples::BaseType::SEEK_STRAIN).first
+    type&.update_column(:title, 'Registered Strain')
+
+    type = SampleAttributeType.where(base_type: Seek::Samples::BaseType::SEEK_DATA_FILE).first
+    type&.update_column(:title, 'Registered Data file')
   end
 
 end
