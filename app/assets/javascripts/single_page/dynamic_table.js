@@ -143,11 +143,10 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
             if (data[x + 1]) {
               data[x] = rowStatus.delete;
               $j(node).addClass(dtRowDelete);
-              hasId = true;
-            }
+            } else hasId = true;
           });
           // There is only one status column in regular table
-          if (!hasId) deleteRowInx.push(idx);
+          if (hasId) deleteRowInx.push(idx);
         }
       });
       if (deleteRowInx.length) this.table.rows(deleteRowInx).remove().draw();
@@ -326,6 +325,12 @@ function handleResponse(table, sampleTypes, errorCls, successCls) {
         s.samples.forEach((sa, k) => {
           const [rowId, sampleTypeId] = sa.exId.split("-");
           table.cells(rowId, `${sampleTypeId}:name`).every(function (rowIdx, columnIdx) {
+            // Here id column index is 2 (being read from table.columns() that includes the select column)
+            if (res.results && columnIdx == 2) {
+              // update created samples' id in the table
+              const id = res.results.find((r) => r.ex_id == sa.exId).id;
+              this.data(id);
+            }
             sampleStatus(table, rowId, sampleTypeId, rowStatus.noAction);
             $j(this.node()).addClass(successCls);
           });
