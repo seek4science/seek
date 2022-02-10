@@ -34,8 +34,8 @@ class IsaAssaysControllerTest < ActionController::TestCase
     study.sample_types << source_sample_type
     study.sample_types << sample_collection_sample_type
 
-    assert_difference('Assay.count') do
-      assert_difference('SampleType.count') do
+    assert_difference('Assay.count', 1) do
+      assert_difference('SampleType.count', 1) do
         post :create, params: { isa_assay: { assay: { title: 'test', study_id: study.id, sop_ids: [Factory(:sop, policy: Factory(:public_policy)).id]} , 
                                             input_sample_type_id: sample_collection_sample_type.id,
                                             sample_type: { title: 'source', project_ids: [projects.first.id], 
