@@ -77,7 +77,7 @@ class OpenbisEndpoint < ApplicationRecord
     @session_token ||= Fairdom::OpenbisApi::Authentication.new(username, password, as_endpoint, is_test).login['token']
   end
 
-  def space
+  def do_authentication
     aNewResult = AuthenticationResult.new
 
     begin
