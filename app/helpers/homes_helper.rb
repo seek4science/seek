@@ -4,9 +4,6 @@ module HomesHelper
   include ImagesHelper
   include AvatarsHelper
 
-  DOWNLOAD_ACTIVITY_CACHE_PREFIX = 'download_activity_'.freeze
-  CREATE_ACTIVITY_CACHE_PREFIX = 'create_activity_'.freeze
-
   def home_description_text
     Seek::Config.home_description.html_safe
   end
@@ -113,34 +110,28 @@ module HomesHelper
   end
 
   def recently_downloaded_item_logs_hash(time = 1.month.ago, number_of_item = 10)
-    selected_activity_logs = Rails.cache.fetch("#{DOWNLOAD_ACTIVITY_CACHE_PREFIX}#{current_user_id}") do
-      activity_logs = ActivityLog.no_spider.where(['action = ? AND created_at > ?', 'download', time]).order('created_at DESC')
-      selected_activity_logs = []
-      activity_logs.each do |activity_log|
-        included = selected_activity_logs.index { |log| log.activity_loggable == activity_log.activity_loggable }
-        if !included && activity_log.can_render_link?
-          selected_activity_logs << activity_log
-        end
-        break if selected_activity_logs.length >= number_of_item
+    activity_logs = ActivityLog.no_spider.where(['action = ? AND created_at > ?', 'download', time]).order('created_at DESC')
+    selected_activity_logs = []
+    activity_logs.each do |activity_log|
+      included = selected_activity_logs.index { |log| log.activity_loggable == activity_log.activity_loggable }
+      if !included && activity_log.can_render_link?
+        selected_activity_logs << activity_log
       end
-      selected_activity_logs
-    end || []
+      break if selected_activity_logs.length >= number_of_item
+    end
     convert_logs_to_hash selected_activity_logs
   end
 
   def recently_added_item_logs_hash(time = 1.month.ago, number_of_item = 10)
-    selected_activity_logs = Rails.cache.fetch("#{CREATE_ACTIVITY_CACHE_PREFIX}#{current_user_id}") do
-      item_types = Seek::Util.user_creatable_types.collect(&:name) | [Project, Programme, Snapshot].collect(&:name)
-      activity_logs = ActivityLog.where(['action = ? AND created_at > ? AND activity_loggable_type in (?)', 'create', time, item_types]).order('created_at DESC')
-      selected_activity_logs = []
-      activity_logs.each do |log|
-        if log.can_render_link? && item_types.include?(log.activity_loggable_type)
-          selected_activity_logs << log
-        end
-        break if selected_activity_logs.length >= number_of_item
+    item_types = Seek::Util.user_creatable_types.collect(&:name) | [Project, Programme, Snapshot].collect(&:name)
+    activity_logs = ActivityLog.where(['action = ? AND created_at > ? AND activity_loggable_type in (?)', 'create', time, item_types]).order('created_at DESC')
+    selected_activity_logs = []
+    activity_logs.each do |log|
+      if log.can_render_link? && item_types.include?(log.activity_loggable_type)
+        selected_activity_logs << log
       end
-      selected_activity_logs
-    end || []
+      break if selected_activity_logs.length >= number_of_item
+    end
     convert_logs_to_hash selected_activity_logs
   end
 
@@ -209,7 +200,7 @@ module HomesHelper
       {
         key: 'front_page_integration_elixir_aai',
         url: 'https://elixir-europe.org/services/compute/aai',
-        label: 'Login with'
+        label: 'Authentication'
       },
       {
         key: 'front_page_integration_ols',
@@ -228,7 +219,7 @@ module HomesHelper
       },
       {
         key: 'front_page_integration_json_api',
-        url: 'https://jsonapi.org/',
+        url: 'https://docs.seek4science.org/help/user-guide/api.html',
         label: 'Programmatic access'
       },
       {

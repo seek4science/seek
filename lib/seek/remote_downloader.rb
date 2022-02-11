@@ -62,7 +62,7 @@ module Seek
         auth_params = {}
         auth_params[:http_basic_authentication] = [username, password] unless username.nil? && password.nil?
 
-        open(url, auth_params) do |f|
+        URI.open(url, auth_params) do |f|
           # FIXME: need to handle full range of 2xx success responses, in particular where the response is only partial
           if f.status[0] == '200'
             result = { content_type: f.content_type, filename: determine_filename(f) }

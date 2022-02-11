@@ -9,6 +9,7 @@
       <div class='row'>
         <% integration_definitions.each do |integration| %>
           <div class='col col-md-4 col-sm-6'>
+            <div class='integration-label'><%= integration[:label] %></div>
             <% logo_image = image(integration[:key], alt: integration[:label], class: 'integration-logo') %>
             <% if integration[:url].present? %>
               <%= link_to(integration[:url], target: :_blank) do %>
@@ -17,7 +18,6 @@
             <% else %>
               <%= logo_image %>
             <% end %>
-            <div class='integration-label'><%= integration[:label] %></div>
           </div>
         <% end %>
       </div>

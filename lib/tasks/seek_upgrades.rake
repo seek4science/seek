@@ -13,6 +13,8 @@ namespace :seek do
     db:seed:013_workflow_data_file_relationships
     rename_branding_settings
     remove_orphaned_versions
+    create_seek_sample_multi
+    rename_seek_sample_attribute_types
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -72,5 +74,62 @@ namespace :seek do
       end
     end
     puts "... finished removing #{count} orphaned versions"
+  end
+
+  task(create_seek_sample_multi: [:environment]) do
+    if SampleAttributeType.where(base_type: Seek::Samples::BaseType::SEEK_SAMPLE_MULTI).empty?
+      seek_sample_multi_type = SampleAttributeType.find_or_initialize_by(title:'Registered Sample (multiple)')
+      seek_sample_multi_type.update(base_type: Seek::Samples::BaseType::SEEK_SAMPLE_MULTI)
+    end
+  end
+
+  task(rename_seek_sample_attribute_types: [:environment]) do
+    type = SampleAttributeType.where(base_type: Seek::Samples::BaseType::SEEK_SAMPLE).first
+    type&.update_column(:title, 'Registered Sample')
+
+    type = SampleAttributeType.where(base_type: Seek::Samples::BaseType::SEEK_SAMPLE_MULTI).first
+    type&.update_column(:title, 'Registered Sample (multiple)')
+
+    type = SampleAttributeType.where(base_type: Seek::Samples::BaseType::SEEK_STRAIN).first
+    type&.update_column(:title, 'Registered Strain')
+
+    type = SampleAttributeType.where(base_type: Seek::Samples::BaseType::SEEK_DATA_FILE).first
+    type&.update_column(:title, 'Registered Data file')
+  end
+
+  task(convert_mysql_charset: [:environment]) do
+    if ActiveRecord::Base.connection.instance_values["config"][:adapter] == 'mysql2'
+      puts "Attempting MySQL database conversion"
+      # Get charset from database.yml, then find appropriate collation from mysql
+      db = ActiveRecord::Base.connection.current_database
+      charset = ActiveRecord::Base.connection.instance_values["config"][:encoding] || 'utf8mb4'
+      collation = "#{charset}_unicode_ci" # Prefer e.g. utf8_unicode_ci over utf8_general_ci
+      collation = ActiveRecord::Base.connection.execute("SHOW COLLATION WHERE Charset = '#{charset}' AND Collation = '#{collation}';").first&.first
+      unless collation
+        # Pick default collation for given charset if above collation not available
+        collation = ActiveRecord::Base.connection.execute("SHOW COLLATION WHERE Charset = '#{charset}' `Default` = 'Yes';").first&.first
+        unless collation
+          puts "Could not find collation for charset: #{charset}, aborting"
+          return
+        end
+      end
+
+      puts "Converting database: #{db} to character set: #{charset}, collation: #{collation}"
+
+      # Set database defaults
+      puts "Setting default charset and collation"
+      ActiveRecord::Base.connection.execute("ALTER DATABASE #{db} DEFAULT CHARACTER SET #{charset} DEFAULT COLLATE #{collation};")
+
+      # Set/convert each table
+      tables = ActiveRecord::Base.connection.exec_query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA='#{db}' AND TABLE_COLLATION != '#{collation}';").rows.flatten
+      puts "#{tables.count} tables to convert"
+      tables.each do |table|
+        puts "  Converting #{table}"
+        ActiveRecord::Base.connection.execute("ALTER TABLE #{table} CONVERT TO CHARACTER SET #{charset} COLLATE #{collation};")
+      end
+      puts "Done"
+    else
+      puts "Database adapter is: #{ActiveRecord::Base.connection.instance_values["config"][:adapter]}, doing nothing"
+    end
   end
 end
