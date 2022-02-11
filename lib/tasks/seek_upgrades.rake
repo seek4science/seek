@@ -99,6 +99,7 @@ namespace :seek do
 
   task(convert_mysql_charset: [:environment]) do
     if ActiveRecord::Base.connection.instance_values["config"][:adapter] == 'mysql2'
+      puts "Attempting MySQL database conversion"
       # Get charset from database.yml, then find appropriate collation from mysql
       db = ActiveRecord::Base.connection.current_database
       charset = ActiveRecord::Base.connection.instance_values["config"][:encoding] || 'utf8mb4'
