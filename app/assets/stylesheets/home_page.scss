@@ -16,10 +16,14 @@ div#home-my-items #my-projects {
 
 .seek-homepage-button-container {
   margin-bottom: 1em;
+}
+
+.seek-homepage-feature-container {
+  margin-bottom: 1em;
   margin-top: 1em;
 }
 
-.seek-homepage-button-container img.feature-icon {
+.seek-homepage-feature-container img.feature-icon {
   height: 125px;
 }
 
@@ -59,7 +63,7 @@ a.seek-homepage-button {
 }
 
 @media (min-width: $screen-sm-min) {
-  .seek-homepage-button-container {
+  .seek-homepage-feature-container {
     margin-bottom: 3em;
     margin-top: 3em;
   }
