@@ -586,4 +586,5 @@ class ConfigTest < ActiveSupport::TestCase
     assert_nil Settings.fetch(:new_name_2)
 
   end
+
 end

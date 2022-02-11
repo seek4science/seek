@@ -32,7 +32,6 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     end
   end
 
-
   test 'login required for new' do
     get :new
     assert_response :redirect
@@ -231,5 +230,45 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
       assert_redirected_to :root
       refute_nil flash[:error]
     end
+  end
+
+  test 'edit ontology based cv should have non editable terms' do
+    person = Factory(:person)
+    login_as(person)
+    cv = Factory(:ontology_sample_controlled_vocab)
+    assert cv.ontology_based?
+    get :edit, params:{id: cv.id}
+    assert_response :success
+
+    assert_select 'table#new-terms' do
+      assert_select 'tr.sample-cv-term input[type=text]', count:cv.sample_controlled_vocab_terms.length * 3 do |input|
+        assert input.attr('readonly').present?
+      end
+    end
+
+    assert_select('a#add-term') do |button|
+      assert button.attr('disabled').present?
+    end
+
+  end
+
+  test 'edit simple, non ontology cv should have editable terms' do
+    person = Factory(:person)
+    login_as(person)
+    cv = Factory(:apples_sample_controlled_vocab)
+    refute cv.ontology_based?
+    get :edit, params:{id: cv.id}
+    assert_response :success
+
+    assert_select 'table#new-terms' do
+      assert_select 'tr.sample-cv-term input[type=text]', count:cv.sample_controlled_vocab_terms.length * 3 do |input|
+        assert input.attr('readonly').nil?
+      end
+    end
+
+    assert_select('a#add-term') do |button|
+      assert button.attr('disabled').nil?
+    end
+
   end
 end

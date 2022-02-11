@@ -49,6 +49,8 @@ sabiork_ws_base_url:
 filestore_path:
 tagline_prefix:
 modelling_analysis_enabled:
+allow_publications_fulltext:
+allow_edit_of_registered_publ:
 human_diseases_enabled:
 jerm_enabled:
 email_enabled:

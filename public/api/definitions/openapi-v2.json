@@ -9106,6 +9106,9 @@
                                 },
                                 "project_positions": {
                                     "$ref": "#/definitions/projectPositionsList"
+                                },
+                                "login": {
+                                    "$ref": "#/definitions/nullableNonEmptyString"
                                 }
                             },
                             "required": [
@@ -10127,6 +10130,9 @@
                                 },
                                 "authors": {
                                     "$ref": "#/definitions/nonEmptyStringList"
+                                },
+                                "content_blobs": {
+                                    "$ref": "#/definitions/contentBlobsList"
                                 },
                                 "policy": {
                                     "$ref": "#/definitions/policy"

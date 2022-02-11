@@ -36,6 +36,7 @@ SEEK::Application.routes.draw do
         get :view_content
         get :get_pdf
         get :download
+        delete :destroy
       end
     end
   end
@@ -531,6 +532,7 @@ SEEK::Application.routes.draw do
       get :provide_metadata
       post :metadata_extraction_ajax
       post :create_metadata
+      get :filter
     end
     member do
       get :diagram
@@ -574,7 +576,7 @@ SEEK::Application.routes.draw do
     concerns :has_dashboard, controller: :programme_stats
   end
 
-  resources :publications, concerns: [:asset] do
+  resources :publications, concerns: [:asset, :has_content_blobs] do
     collection do
       get :query_authors
       get :query_authors_typeahead
@@ -583,9 +585,15 @@ SEEK::Application.routes.draw do
       post :update_metadata
     end
     member do
+      get :manage
+      get :download
+      get :upload_fulltext
+      get :soft_delete_fulltext
+      post :update_annotations_ajax
       post :disassociate_authors
       post :update_metadata
       post :request_contact
+      post :upload_pdf
     end
     resources :people, :programmes, :projects, :investigations, :assays, :studies, :models, :data_files, :documents, :presentations, :organisms, :events, :collections, only: [:index]
   end

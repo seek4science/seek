@@ -53,6 +53,7 @@ module JsonRestTestCases
   def edit_min_object(object); end
 
   def test_json_content
+    print self.class.name
     %w[min max].each do |m|
       object = get_test_object(m)
       json_file = File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'content_compare',

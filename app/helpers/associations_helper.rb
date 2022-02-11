@@ -151,9 +151,19 @@ module AssociationsHelper
     end.flatten.to_json
   end
 
-  def associations_json_from_workflow_data_files(workflow_data_files)
+  def associations_json_from_workflow_to_data_files(workflow_data_files)
     workflow_data_files.map do |wfdf|
       hash = { title: wfdf.data_file.title, id: wfdf.data_file.id}
+      if wfdf.workflow_data_file_relationship
+        hash[:workflow_data_file_relationship]= { value: wfdf.workflow_data_file_relationship.id, text: wfdf.workflow_data_file_relationship.title }
+      end
+      hash
+    end.to_json
+  end
+
+  def associations_json_from_data_file_to_workflows(workflow_data_files)
+    workflow_data_files.map do |wfdf|
+      hash = { title: wfdf.workflow.title, id: wfdf.workflow.id}
       if wfdf.workflow_data_file_relationship
         hash[:workflow_data_file_relationship]= { value: wfdf.workflow_data_file_relationship.id, text: wfdf.workflow_data_file_relationship.title }
       end
