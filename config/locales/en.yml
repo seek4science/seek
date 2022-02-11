@@ -52,6 +52,9 @@ en:
   avatar: "Avatar"
   private_asset: 'Hidden item'
 
+  samples:
+    pid_info_text: 'The identifier assigns a unique and unequivocal meaning to the attribute name.'
+
   gadget:
     new_heading: "New or upload"
     create_button: "CREATE"
