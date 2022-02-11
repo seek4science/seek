@@ -28,7 +28,12 @@ class IsaStudiesControllerTest < ActionController::TestCase
                           sample_attribute_type_id: Factory(:string_sample_attribute_type).id, _destroy: '0'
                         },
                         '1' => {
-                          pos: '2', title: 'a sample', required: '1',
+                          pos: '2', title: 'source', required: '1',
+                          sample_attribute_type_id: Factory(:string_sample_attribute_type).id,
+                          isa_tag_id: IsaTag.find_by_title(Seek::ISA::TagType::SOURCE).id, _destroy: '0'
+                        },
+                        '2' => {
+                          pos: '3', title: 'a sample', required: '1',
                           sample_attribute_type_id: Factory(:string_sample_attribute_type).id, _destroy: '0'
                         }
                       }}, 
@@ -39,7 +44,12 @@ class IsaStudiesControllerTest < ActionController::TestCase
                           sample_attribute_type_id: Factory(:string_sample_attribute_type).id, _destroy: '0'
                         },
                         '1' => {
-                          pos: '2', title: 'a sample', required: '1',
+                          pos: '2', title: 'sample', required: '1',
+                          sample_attribute_type_id: Factory(:string_sample_attribute_type).id,
+                          isa_tag_id: IsaTag.find_by_title(Seek::ISA::TagType::SAMPLE).id, _destroy: '0'
+                        },
+                        '2' => {
+                          pos: '3', title: 'a sample', required: '1',
                           sample_attribute_type_id: Factory(:sample_multi_sample_attribute_type).id,
                           linked_sample_type_id: "self", _destroy: '0'
                         }

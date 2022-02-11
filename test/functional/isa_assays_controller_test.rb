@@ -26,17 +26,15 @@ class IsaAssaysControllerTest < ActionController::TestCase
     study = Factory(:study, investigation_id: inv.id, contributor:User.current_user.person)
 
     source_sample_type = Factory(:simple_sample_type)
+
     sample_collection_sample_type = Factory(:multi_linked_sample_type, project_ids: [projects.first.id])
     sample_collection_sample_type.sample_attributes.last.linked_sample_type = source_sample_type
 
-    assay_sample_type = Factory(:multi_linked_sample_type, project_ids: [projects.first.id])
-
-    study.sample_types << source_sample_type
-    study.sample_types << sample_collection_sample_type
+    study.sample_types = [source_sample_type, sample_collection_sample_type]
 
     assert_difference('Assay.count', 1) do
       assert_difference('SampleType.count', 1) do
-        post :create, params: { isa_assay: { assay: { title: 'test', study_id: study.id, sop_ids: [Factory(:sop, policy: Factory(:public_policy)).id]} , 
+       aa = post :create, params: { isa_assay: { assay: { title: 'test', study_id: study.id, sop_ids: [Factory(:sop, policy: Factory(:public_policy)).id]} , 
                                             input_sample_type_id: sample_collection_sample_type.id,
                                             sample_type: { title: 'source', project_ids: [projects.first.id], 
                                               sample_attributes_attributes: {
@@ -45,7 +43,11 @@ class IsaAssaysControllerTest < ActionController::TestCase
                                                   sample_attribute_type_id: Factory(:string_sample_attribute_type).id, _destroy: '0'
                                                 },
                                                 '1' => {
-                                                  pos: '2', title: 'link', required: '1',
+                                                  pos: '2', title: 'protocol', required: '1', is_title: '0',
+                                                  sample_attribute_type_id: Factory(:string_sample_attribute_type).id, isa_tag_id: IsaTag.find_by_title(Seek::ISA::TagType::PROTOCOL).id, _destroy: '0'
+                                                },
+                                                '2' => {
+                                                  pos: '3', title: 'link', required: '1',
                                                   sample_attribute_type_id: Factory(:sample_multi_sample_attribute_type).id,
                                                   linked_sample_type_id: "self", _destroy: '0'
                                                 }

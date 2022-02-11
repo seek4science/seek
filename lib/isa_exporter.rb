@@ -72,6 +72,7 @@ module IsaExporter
             study.assays.each do |a|
                 # There should be only one attribute with isa_tag == protocol
                 attribute = a.sample_type.sample_attributes.detect { |sa| sa.isa_tag&.isa_protocol? }  
+                raise "Protocol ISA tag not found in assay #{a.id}" if attribute.blank?
                 sop = a.sops.first
                 protocols << convert_protocol(sop, attribute)
             end

@@ -42,15 +42,19 @@ class IsaAssay
   private
 
   def validate_objects
-    @assay.errors.each {|e| errors[:base] << "[Assay]: #{e}" } if !@assay.valid?
+    @assay.errors.each {|e| errors[:base] << "[Assay]: #{e}" } unless @assay.valid?
     errors[:base] << "SOP is required" if @assay.sop_ids.blank?
 
-    if !@sample_type.valid?
+    unless @sample_type.valid?
       @sample_type.errors.full_messages.each {|e| errors[:base] << "[Sample type]: #{e}"} 
     end
 
-    if !@sample_type.sample_attributes.any? {|a| a.seek_sample_multi?}
+    unless @sample_type.sample_attributes.any? {|a| a.seek_sample_multi?}
       errors[:base] << "[Sample type]: SEEK Sample Multi attribute is not provided"
+    end
+
+    unless @sample_type.sample_attributes.select {|a| a.isa_tag&.isa_protocol? }.one?
+      errors[:base] << "[Sample type]: An attribute with Protocol ISA tag is not provided"
     end
 
     if @input_sample_type_id.blank?

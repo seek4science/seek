@@ -53,20 +53,28 @@ class IsaStudy
   private
 
   def validate_objects
-    @study.errors.each {|e| errors[:base] << "[Study]: #{e}" } if !@study.valid?
-    errors[:base] << "SOP is required" if !@study.sop_id
+    @study.errors.each {|e| errors[:base] << "[Study]: #{e}" } unless @study.valid?
+    errors[:base] << "SOP is required" unless @study.sop_id
 
-    if !@source_sample_type.valid?
+    unless @source_sample_type.valid?
       @source_sample_type.errors.full_messages.each {|e| errors[:base] << "[Source sample type]: #{e}"} 
     end
 
-    if !@sample_collection_sample_type.valid?
+    unless @sample_collection_sample_type.valid?
       @sample_collection_sample_type.errors.full_messages.each do |e|
          errors[:base] << "[Sample collection sample type]: #{e}" 
       end
     end
 
-    if !@sample_collection_sample_type.sample_attributes.any? {|a| a.seek_sample_multi?}
+    unless @source_sample_type.sample_attributes.select {|a| a.isa_tag&.isa_source? }.one?
+      errors[:base] << "[Sample type]: An attribute with source ISA tag is not provided"
+    end
+
+    unless @sample_collection_sample_type.sample_attributes.select {|a| a.isa_tag&.isa_sample? }.one?
+      errors[:base] << "[Sample type]: An attribute with sample ISA tag is not provided"
+    end
+
+    unless @sample_collection_sample_type.sample_attributes.any? {|a| a.seek_sample_multi?}
       errors[:base] << "[Sample Collection sample type]: SEEK Sample Multi attribute is not provided"
     end
   end
