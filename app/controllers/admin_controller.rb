@@ -165,6 +165,7 @@ class AdminController < ApplicationController
     Seek::Config.news_number_of_entries = entries if is_entries_integer
 
     Seek::Config.home_description = params[:home_description]
+    Seek::Config.home_description_position = params[:home_description_position]
 
     #    Seek::Config.front_page_buttons_enabled = params[:front_page_buttons_enabled]
 

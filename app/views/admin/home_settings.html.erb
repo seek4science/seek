@@ -48,6 +48,11 @@
   <%= admin_textarea_setting(:home_description, Seek::Config.home_description,
                               "Home page description", "Sets the description text on the front page") %>
 
+  <%= admin_dropdown_setting(:home_description_position, options_for_select([['Right side', 'side'],
+                                                                             ['Top centre', 'middle']],
+                                                                            Seek::Config.home_description_position),
+                             'Home page description position',
+                             'The location of the home page description') %>
 <!--
   <%= admin_checkbox_setting(:front_page_buttons_enabled, 1, Seek::Config.front_page_buttons_enabled,
                               "Home page buttons enabled", "Display the three large buttons on the home page.") %>

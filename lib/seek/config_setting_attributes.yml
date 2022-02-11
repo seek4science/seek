@@ -247,3 +247,4 @@ cv_dropdown_limit:
   convert: :to_i
 tag_cloud_enabled:
 workflow_class_list_enabled:
+home_description_position:
