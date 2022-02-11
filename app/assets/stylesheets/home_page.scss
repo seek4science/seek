@@ -1,0 +1,113 @@
+@import 'variables';
+@import 'mixins';
+
+div#home-features {
+  padding-bottom: 1.5em;
+}
+
+div#home-my-items .panel-title {
+  text-align: center;
+}
+
+div#home-my-items #my-projects {
+  border-right: 2px solid #ccc;
+  min-height: 100%;
+}
+
+.seek-homepage-button-container {
+  margin-bottom: 1em;
+  margin-top: 1em;
+}
+
+.seek-homepage-button-container img.feature-icon {
+  height: 125px;
+}
+
+#home-quick-start a.quick-start-button {
+  white-space: normal;
+  width:100%;
+  display:block;
+  vertical-align: middle;
+}
+
+#home-quick-start a.quick-start-button .glyphicon {
+  font-size: 25px;
+  float: left;
+  padding-top: 5px;
+}
+
+a.seek-homepage-button {
+  display: block;
+  font-size: 200%;
+  background-color: #f7f7f7;
+  border-radius: 4px;
+  padding: 20px;
+  margin: 5px;
+  text-decoration: none;
+
+  &:hover {
+    background-color: #f0f0f0;
+  }
+}
+
+.seek-homepage-button img, .seek-homepage-button span.glyphicon  {
+  display: block;
+  font-size: 80px;
+  margin: auto;
+  line-height: 120px;
+  color: #666;
+}
+
+@media (min-width: $screen-sm-min) {
+  .seek-homepage-button-container {
+    margin-bottom: 3em;
+    margin-top: 3em;
+  }
+
+  a.seek-homepage-button {
+    display: block;
+    text-align: center;
+  }
+
+  .seek-homepage-button img {
+    width: 200px;
+    height: 200px;
+    display: block;
+    margin: 5px auto;
+  }
+}
+
+#home-integrations .col {
+  text-align: center;
+  height: 10em;
+}
+
+#home-integrations img.integration-logo {
+  padding: 0.5em;
+  height:45%;
+}
+
+#home-integrations .integration-label {
+  padding-bottom: 0.25em;
+  font-size: large;
+}
+
+#home_tag_cloud_home {
+  padding: 1em;
+  font-size: large;
+}
+
+.home-main-panel .panel-heading {
+  text-align: center;
+  font-size: larger;
+}
+
+#home-explore-projects a.browse-button {
+  white-space: normal;
+  width: 90%;
+  font-size: 16px;
+}
+
+#home-explore-projects a.browse-button img {
+  height: 80px;
+}
