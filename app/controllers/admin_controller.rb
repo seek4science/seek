@@ -167,8 +167,6 @@ class AdminController < ApplicationController
     Seek::Config.home_description = params[:home_description]
     Seek::Config.home_description_position = params[:home_description_position]
 
-    #    Seek::Config.front_page_buttons_enabled = params[:front_page_buttons_enabled]
-
     Seek::Config.home_show_features = string_to_boolean params[:home_show_features]
     Seek::Config.home_show_quickstart = string_to_boolean params[:home_show_quickstart]
     Seek::Config.home_show_my_items = string_to_boolean params[:home_show_my_items]
