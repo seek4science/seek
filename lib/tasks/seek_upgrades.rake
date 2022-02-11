@@ -97,4 +97,38 @@ namespace :seek do
     type&.update_column(:title, 'Registered Data file')
   end
 
+  task(convert_mysql_charset: [:environment]) do
+    if ActiveRecord::Base.connection.instance_values["config"][:adapter] == 'mysql2'
+      # Get charset from database.yml, then find appropriate collation from mysql
+      db = ActiveRecord::Base.connection.current_database
+      charset = ActiveRecord::Base.connection.instance_values["config"][:encoding] || 'utf8mb4'
+      collation = "#{charset}_unicode_ci" # Prefer e.g. utf8_unicode_ci over utf8_general_ci
+      collation = ActiveRecord::Base.connection.execute("SHOW COLLATION WHERE Charset = '#{charset}' AND Collation = '#{collation}';").first&.first
+      unless collation
+        # Pick default collation for given charset if above collation not available
+        collation = ActiveRecord::Base.connection.execute("SHOW COLLATION WHERE Charset = '#{charset}' `Default` = 'Yes';").first&.first
+        unless collation
+          puts "Could not find collation for charset: #{charset}, aborting"
+          return
+        end
+      end
+
+      puts "Converting database: #{db} to character set: #{charset}, collation: #{collation}"
+
+      # Set database defaults
+      puts "Setting default charset and collation"
+      ActiveRecord::Base.connection.execute("ALTER DATABASE #{db} DEFAULT CHARACTER SET #{charset} DEFAULT COLLATE #{collation};")
+
+      # Set/convert each table
+      tables = ActiveRecord::Base.connection.exec_query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES where TABLE_SCHEMA='#{db}' AND TABLE_COLLATION != '#{collation}';").rows.flatten
+      puts "#{tables.count} tables to convert"
+      tables.each do |table|
+        puts "  Converting #{table}"
+        ActiveRecord::Base.connection.execute("ALTER TABLE #{table} CONVERT TO CHARACTER SET #{charset} COLLATE #{collation};")
+      end
+      puts "Done"
+    else
+      puts "Database adapter is: #{ActiveRecord::Base.connection.instance_values["config"][:adapter]}, doing nothing"
+    end
+  end
 end
