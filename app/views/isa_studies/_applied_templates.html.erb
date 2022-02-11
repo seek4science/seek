@@ -1,5 +1,5 @@
 <% applied_templates = resource.respond_to?("sample_types") ?
- resource.sample_types.map {|s| s.isa_template } : [resource.sample_type.isa_template]  %>
+ resource.sample_types.map {|s| s.isa_template.title } : [resource.sample_type&.isa_template&.title]  %>
  
 <% if applied_templates.any? %>
   <div>
