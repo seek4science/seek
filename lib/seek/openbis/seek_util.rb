@@ -130,8 +130,13 @@ if automatic synchronization was selected.'}
 
       def extract_err_message(exception)
         if exception.is_a? Fairdom::OpenbisApi::OpenbisQueryException
-          return 'Cannot connect to the OpenBIS server' if exception.message && exception.message.include?('java.net.ConnectException')
-          return 'Cannot access OpenBIS: Invalid username or password' if exception.message && exception.message.include?('Invalid username or password')
+
+          errorMessage = exception.message
+          if (exception.message["[MESSAGE]"] && exception.message["[/MESSAGE]"])
+            errorMessage = exception.message.split("[MESSAGE]").last.split("[/MESSAGE]").first
+          end
+          return 'Cannot connect to the OpenBIS server. Error given:' + errorMessage if exception.message && exception.message.include?('java.net.ConnectException')
+          return 'Cannot access OpenBIS: Invalid username or password. Error given:' + errorMessage if exception.message && exception.message.include?('Invalid username or password')
         end
 
         exception.class.to_s

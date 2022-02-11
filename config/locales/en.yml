@@ -52,6 +52,8 @@ en:
   avatar: "Avatar"
   private_asset: 'Hidden item'
 
+  openbis_endpoint: "OpenBis endpoint"
+
   gadget:
     new_heading: "New or upload"
     create_button: "CREATE"
