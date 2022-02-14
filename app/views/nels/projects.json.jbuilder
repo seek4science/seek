@@ -2,6 +2,7 @@ json.array! @projects do |project|
   json.id "project#{project['id']}"
   json.text project['name']
   json.parent '#'
+  json.icon "glyphicon glyphicon-book"
   json.state do
     json.loaded false
   end
