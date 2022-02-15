@@ -20,4 +20,10 @@ module HelpHelper
       link_text: 'Help'
     }
   end
+
+  def help_icon_with_link(key, text, _delay = 200, extra_style = '')
+    #image('info', :alt => 'help', 'data-tooltip' => tooltip(text), :style => "vertical-align: middle;#{extra_style}")
+    link_to content_tag(:span,'',class:'help_icon') + "What is a "+key, Seek::Help::HelpDictionary.instance.help_link(key), :title =>text ,target: :_blank
+  end
+
 end
