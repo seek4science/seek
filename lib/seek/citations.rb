@@ -20,7 +20,7 @@ module Seek
 
     def self.csl(doi)
       Rails.cache.fetch("citation-#{doi}") do
-        resp = RestClient.get(URI.escape("https://doi.org/#{doi}"), accept: 'application/vnd.citationstyles.csl+json')
+        resp = RestClient.get("https://doi.org/#{Addressable::URI.escape(doi)}", accept: 'application/vnd.citationstyles.csl+json')
         JSON.parse(resp)
       end
     end

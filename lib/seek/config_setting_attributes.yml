@@ -155,7 +155,6 @@ news_enabled:
 news_feed_urls:
 news_number_of_entries:
   convert: :to_i
-front_page_buttons_enabled:
 home_show_features:
 home_show_quickstart:
 home_show_my_items:
@@ -249,3 +248,4 @@ cv_dropdown_limit:
   convert: :to_i
 tag_cloud_enabled:
 workflow_class_list_enabled:
+home_description_position:

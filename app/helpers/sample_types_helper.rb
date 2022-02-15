@@ -15,7 +15,7 @@ module SampleTypesHelper
   def sample_attribute_details_table(attributes)
     head = content_tag :thead do
       content_tag :tr do
-        "<th>Name</th><th>Type</th><th>Description</th><th>PID</th><th>Unit</th>".html_safe
+        "<th>Name</th><th>Type</th><th>Description</th><th>PID #{sample_attribute_pid_help_icon}</th><th>Unit</th>".html_safe
       end
     end
 
@@ -82,6 +82,10 @@ module SampleTypesHelper
     opts = Ebi::OlsClient.ontologies.map { |ontology| [ontology.dig('config', 'title'), ontology.dig('config', 'namespace')] }
 
     opts.sort_by { |o| o[0] }
+  end
+
+  def sample_attribute_pid_help_icon
+    help_icon(t('samples.pid_info_text'))
   end
 
   private

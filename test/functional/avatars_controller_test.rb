@@ -151,13 +151,26 @@ class AvatarsControllerTest < ActionController::TestCase
 
   test 'create avatar' do
     person = Factory(:person)
-
     login_as(person)
-    assert_difference("Avatar.count",1) do
-      post :create, params: { person_id:person, owner_type:'Person', owner_id:person.id, avatar:avatar_payload, return_to:'http://localhost:3000/fish' }
+
+    assert_difference('Avatar.count', 1) do
+      post :create, params: { person_id: person.id, avatar: avatar_payload, return_to: 'http://localhost:3000/fish' }
     end
+
     assert_nil flash[:error]
     assert_redirected_to 'http://localhost:3000/fish?use_unsaved_session_data=true'
+  end
+
+  test 'create avatar with missing param throws appropriate error' do
+    person = Factory(:person)
+    login_as(person)
+
+    assert_no_difference('Avatar.count') do
+      post :create, params: { person_id: person.id, avatar: {}, return_to: 'http://localhost:3000/fish' }
+    end
+
+    assert_response :unprocessable_entity
+    assigns(:avatar).errors.added?(:image_file, :required)
   end
 
   private
