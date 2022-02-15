@@ -54,6 +54,9 @@ en:
 
   openbis_endpoint: "OpenBis endpoint"
 
+  samples:
+    pid_info_text: 'The identifier assigns a unique and unequivocal meaning to the attribute name.'
+
   gadget:
     new_heading: "New or upload"
     create_button: "CREATE"
@@ -115,6 +118,10 @@ en:
   deleted_contributor_name: 'Deleted submitter'
 
   null_license: 'No license - no permission to use unless the owner grants a licence'
+
+  licenses:
+    other: 'Other'
+    recommended: 'Suggested'
 
   attributes: # Applies to attributes for any model
     other_creators: Additional credit

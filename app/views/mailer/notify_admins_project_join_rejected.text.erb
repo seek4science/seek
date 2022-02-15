@@ -1,0 +1,10 @@
+Hi,
+
+The request to join a <%= t('project') %> has been responded to and rejected by <%= @responder.name %>.
+
+The <%= t('project') %> joined is '<%= @project.title %>' ( <%= project_url(@project) %> ), and was requested by
+'<%= @requester.name %>' ( <%= person_url(@requester) %> ).
+
+It was rejected with the comment: `<%= @comments %>`.
+
+This is an automated email.
