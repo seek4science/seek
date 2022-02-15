@@ -3,8 +3,7 @@
   <% current_person_administered_projects = current_person.administered_projects %>
   <% current_person_projects_member_only = current_person.projects - current_person_administered_projects %>
   <div class="panel-heading">
-    My <%= Seek::Config.instance_name %>
-    &nbsp;<a href="<%= items_person_path(current_person) %>"><span>(My Items)</span></a>
+    My <%= Seek::Config.instance_name %>&nbsp;
   </div>
   <div class="panel-body">
     <div class="row">
