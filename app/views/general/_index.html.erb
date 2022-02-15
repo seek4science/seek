@@ -50,6 +50,8 @@
       <%= render partial: 'assets/resource_active_filters' if Seek::Config.filtering_enabled %>
     <% end %>
 
+    <%= index_and_new_help_icon klass_from_controller(controller_name) %>
+
     <% if faceted_browsing %>
       <%= render partial: 'faceted_browsing/faceted_browsing', object: items %>
     <% else %>
