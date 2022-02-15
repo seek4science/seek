@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/SysMO-DB/bioportal.git
-  revision: 0f80b4281af3f71234a425d40981b1185a3e5d0b
+  revision: 5b2f2e506a406a002413424de9b37177e4d2df0b
   specs:
     bioportal (3.0)
 
@@ -26,7 +26,7 @@ GIT
 
 GIT
   remote: https://github.com/seek4science/DOI-query-tool.git
-  revision: 95f795d00094c5e0d4febf97dd73a5e97c9d5798
+  revision: 7c2ba934885ad404d964cd371e236d3348efb63c
   specs:
     doi_query_tool (1.0.1)
       libxml-ruby (>= 2.6.0)
@@ -619,7 +619,7 @@ GEM
       json (~> 2.3.0)
       ucf (~> 2.0.2)
       uuid (~> 2.3)
-    ro-crate (0.4.14)
+    ro-crate (0.4.15)
       addressable (>= 2.7, < 2.9)
       rubyzip (~> 2.0.0)
     rsolr (2.3.0)

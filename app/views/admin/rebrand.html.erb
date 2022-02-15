@@ -94,7 +94,7 @@
 
   <%= panel('Information', help_text:'These options will be shown under "About" in the navigation bar') do %>
     <%= admin_checkbox_setting(:about_page_enabled, 1, Seek::Config.about_page_enabled,
-                               '"About" page enabled', 'Add a custom "About" page link to the Help menu where users can find out more information about this SEEK instance.',
+                               '"About" page enabled', 'Add a custom "About" page link to the About menu where users can find out more information about this SEEK instance.',
                                :onchange => toggle_appear_javascript('about_page_details')) %>
 
     <div class="additional_settings" id="about_page_details" style="<%= show_or_hide_block Seek::Config.about_page_enabled -%>">
