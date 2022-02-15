@@ -125,11 +125,11 @@ class AssetsHelperTest < ActionView::TestCase
     with_config_value(:email_enabled,true) do
       User.with_current_user(requester.user) do
         travel_to 16.hours.ago do
-          MessageLog.create(subject:presentation,sender:requester,message_type:MessageLog::CONTACT_REQUEST)
+          ContactRequestMessageLog.create(subject:presentation,sender:requester)
         end
         assert request_contact_button_enabled?(presentation)
         travel_to 1.hour.ago do
-          MessageLog.create(subject:presentation,sender:requester,message_type:MessageLog::CONTACT_REQUEST)
+          ContactRequestMessageLog.create(subject:presentation,sender:requester)
         end
         refute request_contact_button_enabled?(presentation)
       end
@@ -176,6 +176,25 @@ class AssetsHelperTest < ActionView::TestCase
       authorised = authorised_assets DataFile, @project, 'download'
       assert_equal 1, authorised.count
       assert_equal ['A'], authorised.collect(&:title)
+    end
+  end
+
+  test 'add_new_item_to_options filters disabled' do
+    publication = Factory(:publication)
+    with_config_value(:data_files_enabled, true) do
+      options = []
+      add_new_item_to_options(publication) do |text, path|
+        options << text
+      end
+      assert_includes options, "Add new #{t('data_file')}"
+    end
+
+    with_config_value(:data_files_enabled, false) do
+      options = []
+      add_new_item_to_options(publication) do |text, path|
+        options << text
+      end
+      refute_includes options, "Add new #{t('data_file')}"
     end
   end
 

@@ -1,29 +1,27 @@
-
-
 <div class="show_basic">
   <br/>
 
   <div class="alert alert-info">
     <ul style="padding-left:1em;">
       <li>
-        The <b>Gatekeeper</b> is a person in your <%=t('project').downcase -%> that needs to approve items before they are finally published.
+        The <b><%= t('asset_gatekeeper').downcase %></b> is a person in your <%=t('project').downcase -%> that needs to approve items before they are finally published.
       </li>
       <li>
         If you requested to publish an item, an email will have be sent to that person, asking them to either approve
         or reject the publication.
       </li>
       <li>
-        The following is a list of the items that you have requested to make published, but are still waiting for the approval from a Gatekeeper in your <%=t('project').downcase -%>.
+        The following is a list of the items that you have requested to make published, but are still waiting for the approval from a <%= t('asset_gatekeeper').downcase %> in your <%=t('project').downcase -%>.
       </li>
     </ul>
   </div>
 
   <br/>
   <% if @waiting_approval_assets.empty? %>
-      <span class="published">You have no items waiting for the approval from your <%=t('project').downcase -%> Gatekeeper</span>
+      <span class="published">You have no items waiting for the approval from your <%=t('project').downcase -%> <%= t('asset_gatekeeper').downcase %></span>
       <br/>
   <% else %>
-      <h2>You have requested to publish the following items, and they are awaiting approval from a Gatekeeper:</h2>
+      <h2>You have requested to publish the following items, and they are awaiting approval from one of the <%= t('asset_gatekeeper').downcase.pluralize %>:</h2>
       <% isa_order = ['Investigation', 'Study', 'Assay'] %>
       <% @waiting_approval_assets.sort_by { |a| [a.is_isa? ? -1 : 1, isa_order.index(a.class.name), a.class.name] }.each do |asset| %>
           <ul class="item_waiting_for_approval">

@@ -1,0 +1,17 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    Supported <%= WorkflowClass.model_name.human.pluralize %>
+  </div>
+
+  <div class="panel-body">
+    <ul>
+      <% WorkflowClass.extractable.all.each do |wc| %>
+        <li><%= wc.title %></li>
+      <% end %>
+    </ul>
+    <% user_added = WorkflowClass.unextractable.count %>
+    <% if user_added > 0 %>
+      <%= link_to "...and #{pluralize(user_added, 'other', 'others')}", workflow_classes_path %>
+    <% end %>
+  </div>
+</div>

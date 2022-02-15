@@ -5,6 +5,7 @@ module Seek
       class DataFile < CreativeWork
         include ActionView::Helpers::NumberHelper
 
+        
         schema_mappings doi: :identifier,
                         distribution: :distribution
 
@@ -23,12 +24,11 @@ module Seek
         def distribution
           return unless resource.content_blob
           return if resource.content_blob.show_as_external_link?
-
           blob = resource.content_blob
           data = {
             '@type': 'DataDownload',
             'contentSize': number_to_human_size(blob.file_size),
-            'contentUrl': resource_url([resource, blob], action: :download, host: Seek::Config.site_base_host),
+            'contentUrl': resource_url([resource, blob], action: :download, host: Seek::Config.site_base_host, strip_version: true),
             'encodingFormat': blob.content_type,
             'name': blob.original_filename
           }

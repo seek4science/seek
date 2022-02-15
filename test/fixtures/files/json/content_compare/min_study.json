@@ -3,7 +3,7 @@
     "id": "1039986486",
     "type": "studies",
     "attributes": {
-      "snapshots": null,
+      "snapshots": [],
       "policy":
       {
         "access":"no_access",
@@ -12,8 +12,10 @@
       "title": "A Minimal Study",
       "description": null,
       "experimentalists": null,
-      "other_creators": null,      
-      "discussion_links" : null
+      "other_creators": null,
+      "creators": [],
+      "position": null,
+      "discussion_links" : []
     },
     "relationships": {
       "creators": {

@@ -1,48 +1,59 @@
-<%= render :partial => "general/item_title", :locals => {:item=>@strain, :buttons_partial => 'strains/buttons'} %>
+<%= render partial: 'general/show_page_tab_definitions' %>
 
-<div class="row">
-  <div class="col-md-9 col-sm-8">
+<div class="tab-content">
+
+  <div id="details" class="tab-pane fade in active">
+    <%= render :partial => "general/item_title", :locals => { :item => @strain, :buttons_partial => 'strains/buttons' } %>
+
     <div class="row">
-      <div class="col-md-6">
-        <p>
-          <label>Name:</label>
-          <%= @strain.title %>
-        </p>
-        <p>
-          <label>Provider's strain ID:</label>
-          <%= text_or_not_specified(@strain.provider_id) %>
-        </p>
-        <p>
-          <label>Provider Name:</label>
-          <%= text_or_not_specified(@strain.provider_name) %>
-        </p>
-        <p>
-          <label>Synonym:</label>
-          <%= text_or_not_specified(@strain.synonym) %>
-        </p>
-        <p>
-          <label>Comment:</label>
-          <%= text_or_not_specified(@strain.comment) %>
-        </p>
-        <p>
-          <label>Genotypes</label>
-          <%= text_or_not_specified(@strain.genotype_info) %>
-        </p>
-        <p>
-          <label>Phenotypes:</label>
-          <%= text_or_not_specified(@strain.phenotype_info) %>
-        </p>
+      <div class="col-md-9 col-sm-8">
+        <div class="row">
+          <div class="col-md-6">
+            <p>
+              <label>Name:</label>
+              <%= @strain.title %>
+            </p>
+            <p>
+              <label>Provider's strain ID:</label>
+              <%= text_or_not_specified(@strain.provider_id) %>
+            </p>
+            <p>
+              <label>Provider Name:</label>
+              <%= text_or_not_specified(@strain.provider_name) %>
+            </p>
+            <p>
+              <label>Synonym:</label>
+              <%= text_or_not_specified(@strain.synonym) %>
+            </p>
+            <p>
+              <label>Comment:</label>
+              <%= text_or_not_specified(@strain.comment) %>
+            </p>
+            <p>
+              <label>Genotypes</label>
+              <%= text_or_not_specified(@strain.genotype_info) %>
+            </p>
+            <p>
+              <label>Phenotypes:</label>
+              <%= text_or_not_specified(@strain.phenotype_info) %>
+            </p>
 
-        <p id="organism">
-          <label>Organism: </label>
-          <%= strain_organism_list @strain.organism %>
-        </p>
+            <p id="organism">
+              <label>Organism: </label>
+              <%= strain_organism_list @strain.organism %>
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-4">
+        <%= render :partial => "assets/resource_main_content_right", :locals => { :resource => @strain } %>
       </div>
     </div>
-  </div>
-  <div class="col-md-3 col-sm-4">
-    <%= render :partial => "assets/resource_main_content_right", :locals => {:resource => @strain } %>
-  </div>
-</div>
 
-<%= render :partial=>"general/items_related_to", :object => @strain %>
+  </div>
+
+  <div id="related-items" class="tab-pane fade">
+    <%= render :partial => "general/items_related_to", :object => @strain %>
+  </div>
+
+</div>

@@ -1,35 +1,43 @@
-<%= dropdown_button('Add to collection', 'add', menu_options: { 'data-role' => 'add-to-collection-list' }) do %>
-  <% collections.each do |collection| %>
-    <li><%= link_to collection.title, '#', 'data-role' => 'add-to-collection-link', 'data-collection-id' => collection.id -%></li>
-  <% end %>
-<% end %>
+<% if Seek::Config.collections_enabled %>
+  <% exceptions = resource.collection_ids %>
+  <% exceptions << resource.id if resource.is_a?(Collection) # Can't add to self! %>
+  <% collections = current_user.person.related_collections.where.not(id: exceptions) %>
 
-<%= modal(id: 'add-collection-item-modal', size: 'm', class: 'text-left') do %>
-  <%= form_tag(collection_items_path('-collection-id-')) do %>
-    <%= modal_header('Add to collection') %>
-    <%= modal_body do %>
-      <div class="form-group">
-        <label>Comment</label>
-        <%= text_field_tag('collection_item[comment]', nil, placeholder: 'Comment (optional)', id: 'collection-item-comment', class: 'form-control', autocomplete: 'off') -%>
-      </div>
-      <%= hidden_field_tag('collection_item[asset_type]', resource.class.name) %>
-      <%= hidden_field_tag('collection_item[asset_id]', resource.id) %>
+  <% if collections.any? %>
+    <%= dropdown_button('Add to collection', 'add', menu_options: { 'data-role' => 'add-to-collection-list' }) do %>
+      <% collections.each do |collection| %>
+        <li><%= link_to collection.title, '#', 'data-role' => 'add-to-collection-link', 'data-collection-id' => collection.id -%></li>
+      <% end %>
     <% end %>
-    <%= modal_footer do %>
-      <%= submit_tag('Add', class: 'btn btn-primary pull-right') %>
+
+    <%= modal(id: 'add-collection-item-modal', size: 'm', class: 'text-left') do %>
+      <%= form_tag(collection_items_path('-collection-id-')) do %>
+        <%= modal_header('Add to collection') %>
+        <%= modal_body do %>
+          <div class="form-group">
+            <label>Comment</label>
+            <%= text_field_tag('collection_item[comment]', nil, placeholder: 'Comment (optional)', id: 'collection-item-comment', class: 'form-control', autocomplete: 'off') -%>
+          </div>
+          <%= hidden_field_tag('collection_item[asset_type]', resource.class.name) %>
+          <%= hidden_field_tag('collection_item[asset_id]', resource.id) %>
+        <% end %>
+        <%= modal_footer do %>
+          <%= submit_tag('Add', class: 'btn btn-primary pull-right') %>
+        <% end %>
+      <% end %>
     <% end %>
-  <% end %>
-<% end %>
 
-<script>
-    $j(document).ready(function () {
-        $j('[data-role="add-to-collection-list"]').on('click', '[data-role="add-to-collection-link"]', function () {
-            $j('#add-collection-item-modal').modal('show');
-            var form = $j('#add-collection-item-modal form');
-            var collectionId = $j(this).data('collectionId');
-            form.attr('action', form.attr('action').replace('-collection-id-', collectionId));
+    <script>
+        $j(document).ready(function () {
+            $j('[data-role="add-to-collection-list"]').on('click', '[data-role="add-to-collection-link"]', function () {
+                $j('#add-collection-item-modal').modal('show');
+                var form = $j('#add-collection-item-modal form');
+                var collectionId = $j(this).data('collectionId');
+                form.attr('action', form.attr('action').replace('-collection-id-', collectionId));
 
-            return false;
+                return false;
+            });
         });
-    });
-</script>
+    </script>
+  <% end %>
+<% end %>

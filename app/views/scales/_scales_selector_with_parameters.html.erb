@@ -3,7 +3,7 @@
   selected ||= object.scales
   intro ||= "The following #{t('scale').pluralize} are associated with this #{t('model')}:"
   button_text ||= "Associate with this #{t('model')}"
-  existing_json = associations_json_from_scales(object, selected, fieldName: obj)
+  existing_json = associations_json_from_scales(object, selected)
 %>
 
 <%= folding_panel("#{t('scale').pluralize}", false, id: 'add_scales_form',
@@ -15,7 +15,7 @@
 
   <%= hidden_field_tag "#{obj}[scales][]", "" %>
   <%= hidden_field_tag "#{obj}[scale_extra_params][]", "" %>
-  <%= associations_list('scale_list', 'associations/scale', existing_json, 'data-field-name' => obj, empty_text: 'None') %>
+  <%= associations_list('scale_list', 'associations/scale', existing_json, 'data-field-name' => obj, blank_field: false, empty_text: 'None') %>
   <div class="association_step row">
     <div class="col-sm-4">
       <%= select_tag 'possible_scale_ids',
@@ -52,6 +52,8 @@
         var param = $j('#choose_parameter_for_scale_id').val();
         var unit = $j('#choose_unit_for_scale_id').val();
         var selectedOption = $j('#possible_scale_ids option:selected');
+        if (!selectedOption.val())
+            return false;
 
         var item = { id: parseInt(selectedOption.val()),
                      title: selectedOption.text() };
@@ -60,14 +62,14 @@
             item.extraParams.stringified = JSON.stringify(item.extraParams);
         }
 
-        var existsing = list.find(function (s) { return s.id === item.id && (!param || (s.extraParams.param === param)) });
-        if (!existsing) {
+        var existing = list.find(function (s) { return s.id === item.id && (!param || (s.extraParams && (s.extraParams.param === param))) });
+        if (!existing) {
             list.add(item);
             $j('#possible_scale_ids').val('');
             $j('#choose_parameter_for_scale_id').val('');
             $j('#choose_unit_for_scale_id').val('');
         } else {
-            existsing.element.highlight('blue');
+            existing.element.highlight('blue');
         }
 
         return false;

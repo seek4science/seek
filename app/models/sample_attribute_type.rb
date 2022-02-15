@@ -85,6 +85,10 @@ class SampleAttributeType < ApplicationRecord
     base_type == Seek::Samples::BaseType::SEEK_SAMPLE
   end
 
+  def seek_sample_multi?
+    base_type == Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
+  end
+
   def seek_strain?
     base_type == Seek::Samples::BaseType::SEEK_STRAIN
   end

@@ -29,7 +29,7 @@ module PeopleHelper
     options.reverse_merge!(size: "#{size}x#{size}",
                            alt: role.to_s,
                            style: 'vertical-align: middle',
-                           'data-tooltip' => tooltip(role.humanize))
+                           'data-tooltip' => tooltip(t(role)))
     image(role.to_s, options)
   end
 
@@ -77,5 +77,9 @@ module PeopleHelper
       end
     end
     filtered_items_not_in_ISA
+  end
+
+  def orcid_link(orcid)
+    link_to('', orcid, target: :_blank, title: 'ORCID', class: 'orcid-link')
   end
 end

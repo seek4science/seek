@@ -106,7 +106,7 @@ class PeopleControllerTest < ActionController::TestCase
     with_config_value(:activation_required_enabled,true) do
       with_config_value(:email_enabled, true) do
         assert_difference('Person.count') do
-          assert_difference('MessageLog.count') do
+          assert_difference('ActivationEmailMessageLog.count') do
             assert_enqueued_emails(2) do #1 to admin, and 1 email requesting activation
               post :create, params: { person: { first_name: 'test', email: 'hghg@sdfsd.com' } }
             end
@@ -118,8 +118,8 @@ class PeopleControllerTest < ActionController::TestCase
     person = assigns(:person)
     assert_redirected_to activation_required_users_path
     refute person.user.active?
-    assert_equal 1,MessageLog.activation_email_logs(person).count
-    assert_equal person,MessageLog.activation_email_logs(person).last.subject
+    assert_equal 1,ActivationEmailMessageLog.activation_email_logs(person).count
+    assert_equal person,ActivationEmailMessageLog.activation_email_logs(person).last.subject
     assert_equal 1,person.activation_email_logs.count
   end
 
@@ -1299,6 +1299,36 @@ class PeopleControllerTest < ActionController::TestCase
         end
       end
     end
+  end
+
+  test 'admin can see user login through API' do
+    login_as(Factory(:admin))
+
+    get :show, format: :json, params: { id: Factory(:user, login: 'dave1234').person }
+
+    assert_response :success
+    h = JSON.parse(response.body)
+    assert_equal 'dave1234', h['data']['attributes']['login']
+  end
+
+  test 'admin cannot see user login through API if no registered person' do
+    login_as(Factory(:admin))
+
+    get :show, format: :json, params: { id: Factory(:brand_new_person) }
+
+    assert_response :success
+    h = JSON.parse(response.body)
+    refute h['data']['attributes']['login'].present?
+  end
+
+  test 'non-admin cannot see user login through API' do
+    login_as(Factory(:person))
+
+    get :show, format: :json, params: { id: Factory(:user, login: 'dave1234').person }
+
+    assert_response :success
+    h = JSON.parse(response.body)
+    refute h['data']['attributes'].key?('login')
   end
 
   def edit_max_object(person)

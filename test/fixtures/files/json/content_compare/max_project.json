@@ -141,6 +141,14 @@
             "type": "documents"
           }
         ]
+      },
+      "workflows": {
+        "data": [
+          {
+            "id": "980191497",
+            "type": "workflows"
+          }
+        ]
       }
     },
     "links": {

@@ -1,6 +1,9 @@
 <%
-   search_enabled = Seek::Config.solr_enabled ? 'enabled' : 'disabled'
-   delayed_job_count = delayed_job_pids.count rescue 0
-   soffice_running = Seek::Config.soffice_available?(false) ? 'running' : 'not running'
+   status = ApplicationStatus.instance
+   unless Seek::Docker.using_docker?
+      status.refresh
+   end
+   search = status.search_enabled ? "enabled" : "disabled"
+   soffice = status.soffice_running ? 'running' : 'not running'   
 %>
-<%= Seek::Config.application_name %> is running | search is <%= search_enabled %> | <%= delayed_job_count %> delayed jobs running | soffice is <%= soffice_running %>
+<%= Seek::Config.instance_name %> is running | search is <%= search %> | <%= status.running_jobs %> delayed jobs running | soffice is <%= soffice %>

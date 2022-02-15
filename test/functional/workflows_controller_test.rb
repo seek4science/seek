@@ -2,6 +2,7 @@ require 'test_helper'
 require 'minitest/mock'
 
 class WorkflowsControllerTest < ActionController::TestCase
+
   include AuthenticatedTestHelper
   include SharingFormTestHelper
   include GeneralAuthorizationTestCases
@@ -21,6 +22,9 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'index' do
+    Factory(:public_workflow, test_status: :all_passing)
+    Factory(:public_workflow, test_status: :all_failing)
+    Factory(:public_workflow, test_status: :some_passing)
     get :index
     assert_response :success
     assert_not_nil assigns(:workflows)
@@ -37,7 +41,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
   test 'can create with local file' do
     workflow_attrs = Factory.attributes_for(:workflow,
-                                            contributor: User.current_user,
+                                            contributor: User.current_user.person,
                                             project_ids: [@project.id])
 
     assert_difference 'Workflow.count' do
@@ -177,7 +181,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   test 'should show the other creators in -uploader and creators- box' do
     workflow = Factory(:workflow, policy: Factory(:public_policy), other_creators: 'another creator')
     get :show, params: { id: workflow }
-    assert_select 'li.author-list-item', text: 'another creator', count: 1
+    assert_select '#author-box .additional-credit', text: 'another creator', count: 1
   end
 
   test 'filter by people, including creators, using nested routes' do
@@ -288,7 +292,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     # should be a temporary sharing link
     assert_select 'div#temporary_links', count:1
 
-    assert_select 'div#author_form', count:1
+    assert_select 'div#author-form', count:1
   end
 
   test 'cannot access manage page with edit rights' do
@@ -408,7 +412,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_response :redirect
   end
 
-  test 'create ro crate with local content' do
+  test 'create RO-Crate with local content' do
     cwl = Factory(:cwl_workflow_class)
     person = Factory(:person)
     login_as(person)
@@ -416,7 +420,7 @@ class WorkflowsControllerTest < ActionController::TestCase
       post :create_ro_crate, params: {
           ro_crate: {
               workflow: { data: fixture_file_upload('files/checksums.txt') },
-              diagram: { data: fixture_file_upload('files/file_picture.png') },
+                          diagram: { data: fixture_file_upload('files/file_picture.png') },
               abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
           },
           workflow_class_id: cwl.id
@@ -489,7 +493,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'picks diagram from RO crate' do
+  test 'picks diagram from RO-Crate' do
     wf = Factory(:existing_galaxy_ro_crate_workflow)
     login_as(wf.contributor)
     refute wf.diagram_exists?
@@ -502,7 +506,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert wf.diagram_exists?
   end
 
-  test 'generates diagram from CWL workflow in RO crate' do
+  test 'generates diagram from CWL workflow in RO-Crate' do
     with_config_value(:cwl_viewer_url, 'http://localhost:8080/cwl_viewer') do
       wf = Factory(:just_cwl_ro_crate_workflow)
       login_as(wf.contributor)
@@ -520,7 +524,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'generates diagram from abstract CWL in RO crate' do
+  test 'generates diagram from abstract CWL in RO-Crate' do
     with_config_value(:cwl_viewer_url, 'http://localhost:8080/cwl_viewer') do
       wf = Factory(:generated_galaxy_no_diagram_ro_crate_workflow)
       login_as(wf.contributor)
@@ -553,7 +557,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'does not render diagram if not in RO crate' do
+  test 'does not render diagram if not in RO-Crate' do
     wf = Factory(:nf_core_ro_crate_workflow)
     login_as(wf.contributor)
     refute wf.diagram_exists?
@@ -581,12 +585,13 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
     assert_response :success
     assert wf = assigns(:workflow)
-    crate_workflow = wf.ro_crate.main_workflow
+    workflow_crate = ROCrate::WorkflowCrateReader.read_zip(wf.content_blob.path)
+    crate_workflow = workflow_crate.main_workflow
     assert crate_workflow
     assert_equal 'file%20with%20spaces%20in%20name.txt', crate_workflow.id
   end
 
-  test 'downloads valid generated RO crate' do
+  test 'downloads valid generated RO-Crate' do
     workflow = Factory(:generated_galaxy_ro_crate_workflow, policy: Factory(:public_policy))
 
     get :ro_crate, params: { id: workflow.id }
@@ -600,7 +605,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'downloads valid existing RO crate' do
+  test 'downloads valid existing RO-Crate' do
     workflow = Factory(:existing_galaxy_ro_crate_workflow, policy: Factory(:public_policy))
 
     get :ro_crate, params: { id: workflow.id }
@@ -614,7 +619,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'downloads valid RO crate for single workflow file' do
+  test 'downloads valid RO-Crate for single workflow file' do
     workflow = Factory(:cwl_packed_workflow, policy: Factory(:public_policy))
 
     get :ro_crate, params: { id: workflow.id }
@@ -628,7 +633,45 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
   end
 
-  test 'create ro crate even with with duplicated filenames' do
+  test 'downloads RO-Crate with metadata for correct version' do
+    workflow = Factory(:cwl_workflow, title: 'V1 title', description: 'V1 description',
+                       license: 'MIT', other_creators: 'Jane Smith, John Smith', policy: Factory(:public_policy))
+    disable_authorization_checks do
+      workflow.save_as_new_version
+      workflow.update_attributes(title: 'V2 title', description: 'V2 description', workflow_class_id: Factory(:galaxy_workflow_class).id)
+      Factory(:generated_galaxy_ro_crate, asset: workflow, asset_version: 2)
+    end
+
+    get :ro_crate, params: { id: workflow.id, version: 1 }
+
+    assert_response :success
+    assert @response.header['Content-Length'].present?
+    assert @response.header['Content-Length'].to_i > 500
+    Dir.mktmpdir do |dir|
+      crate = ROCrate::WorkflowCrateReader.read_zip(response.stream.to_path, target_dir: dir)
+      assert crate.main_workflow
+      assert_equal 'V1 title', crate.main_workflow['name']
+      assert_equal 'V1 description', crate.main_workflow['description']
+      assert_equal 'Common Workflow Language', crate.main_workflow.programming_language['name']
+      assert crate.main_workflow.source.read.include?('cwlVersion')
+    end
+
+    get :ro_crate, params: { id: workflow.id, version: 2 }
+
+    assert_response :success
+    assert @response.header['Content-Length'].present?
+    assert @response.header['Content-Length'].to_i > 500
+    Dir.mktmpdir do |dir|
+      crate = ROCrate::WorkflowCrateReader.read_zip(response.stream.to_path, target_dir: dir)
+      assert crate.main_workflow
+      assert_equal 'V2 title', crate.main_workflow['name']
+      assert_equal 'V2 description', crate.main_workflow['description']
+      assert_equal 'Galaxy', crate.main_workflow.programming_language['name']
+      assert crate.main_workflow.source.read.include?('a_galaxy_workflow')
+    end
+  end
+
+  test 'create RO-Crate even with with duplicated filenames' do
     cwl = Factory(:cwl_workflow_class)
     person = Factory(:person)
     login_as(person)
@@ -636,16 +679,16 @@ class WorkflowsControllerTest < ActionController::TestCase
       post :create_ro_crate, params: {
           ro_crate: {
               workflow: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') },
-              diagram: { data: fixture_file_upload('files/file_picture.png') },
+                          diagram: { data: fixture_file_upload('files/file_picture.png') },
               abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
           },
           workflow_class_id: cwl.id
       }
     end
     assert_response :success
-    assert wf = assigns(:workflow)
-    crate_workflow = wf.ro_crate.main_workflow
-    crate_cwl = wf.ro_crate.main_workflow_cwl
+    workflow_crate = ROCrate::WorkflowCrateReader.read_zip(assigns(:workflow).content_blob.path)
+    crate_workflow = workflow_crate.main_workflow
+    crate_cwl = workflow_crate.main_workflow_cwl
     assert_not_equal crate_workflow.id, crate_cwl.id
   end
 
@@ -745,7 +788,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_empty workflow.discussion_links
   end
 
-  test 'should be able to handle remote files when creating RO crate' do
+  test 'should be able to handle remote files when creating RO-Crate' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/file with spaces in name.txt", 'https://raw.githubusercontent.com/bob/workflow/master/workflow.txt'
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'https://raw.githubusercontent.com/bob/workflow/master/diagram.png'
     mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'https://raw.githubusercontent.com/bob/workflow/master/abstract.cwl'
@@ -757,7 +800,7 @@ class WorkflowsControllerTest < ActionController::TestCase
       post :create_ro_crate, params: {
           ro_crate: {
               workflow: { data_url: 'https://github.com/bob/workflow/blob/master/workflow.txt' },
-              diagram: { data_url: 'https://github.com/bob/workflow/blob/master/diagram.png' },
+                          diagram: { data_url: 'https://github.com/bob/workflow/blob/master/diagram.png' },
               abstract_cwl: { data_url: 'https://github.com/bob/workflow/blob/master/abstract.cwl' }
           },
           workflow_class_id: cwl.id
@@ -765,7 +808,8 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
     assert_response :success
     assert wf = assigns(:workflow)
-    crate_workflow = wf.ro_crate.main_workflow
+    workflow_crate = ROCrate::WorkflowCrateReader.read_zip(wf.content_blob.path)
+    crate_workflow = workflow_crate.main_workflow
     assert crate_workflow
     assert_equal 'workflow.txt', crate_workflow.id
   end
@@ -792,7 +836,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_equal blob, workflow.versions.last.content_blob
   end
 
-  test 'should be able to handle remote files in existing RO crate' do
+  test 'should be able to handle remote files in existing RO-Crate' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/file with spaces in name.txt", 'https://raw.githubusercontent.com/bob/workflow/master/workflow.txt'
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'https://raw.githubusercontent.com/bob/workflow/master/diagram.png'
     mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'https://raw.githubusercontent.com/bob/workflow/master/abstract.cwl'
@@ -803,6 +847,274 @@ class WorkflowsControllerTest < ActionController::TestCase
     post :metadata_extraction_ajax, params: { content_blob_id: blob.id.to_s, format: 'js', workflow_class_id: galaxy.id }
     assert_response :success
     assert_equal 12, session[:metadata][:internals][:inputs].length
+  end
+
+  test 'filter by test status' do
+    w1, w2, w3 = nil
+    disable_authorization_checks do
+      w1 = Factory(:public_workflow)
+      w1.save_as_new_version
+      w1.update_test_status(:all_failing, 1)
+      w1.update_test_status(:all_passing, 2)
+      w2 = Factory(:public_workflow)
+      w2.update_test_status(:all_failing)
+      w3 = Factory(:public_workflow)
+      w3.update_test_status(:some_passing)
+    end
+
+    get :index, params: { filter: { tests: Workflow::TEST_STATUS_INV[:all_passing] } }
+    assert_response :success
+    assert_includes assigns(:workflows), w1
+
+    get :index, params: { filter: { tests: Workflow::TEST_STATUS_INV[:all_failing] } }
+    assert_response :success
+    assert_includes assigns(:workflows), w2
+
+    get :index, params: { filter: { tests: Workflow::TEST_STATUS_INV[:some_passing] } }
+    assert_response :success
+    assert_includes assigns(:workflows), w3
+  end
+
+  test 'should update workflow class ' do
+    g = Factory(:galaxy_workflow_class)
+    user = Factory(:user)
+    workflow = Factory(:cwl_workflow, contributor: user.person)
+    login_as(user)
+    assert workflow.can_manage?
+
+    assert_equal 'Common Workflow Language', workflow.workflow_class_title
+
+    put :update, params: { id: workflow.id, workflow: { workflow_class_id: g.id } }
+
+    assert_equal 'Galaxy', assigns(:workflow).workflow_class_title
+    assert_equal g.id, assigns(:workflow).workflow_class_id
+  end
+
+  test '404 response code for show and ro-crate if workflow not found' do
+    id = 999
+    assert_nil Workflow.find_by_id(id)
+
+    get :show, params: {id: id}
+    assert_response :not_found
+
+    get :ro_crate, params: {id: id}
+    assert_response :not_found
+  end
+
+  test 'json response code for missing version' do
+    user = Factory(:user)
+    workflow = Factory(:cwl_workflow, contributor: user.person)
+    login_as(user)
+
+    version = 999
+    assert_nil workflow.find_version(999)
+
+    get :show, params: {id: workflow.id, version: version}, format: :json
+    assert_response :not_found
+
+    get :ro_crate, params: {id: workflow.id, version: version}, format: :json
+    assert_response :not_found
+
+    workflow = Factory(:cwl_workflow, contributor: Factory(:person))
+    refute workflow.can_view?
+
+    get :show, params: {id: workflow.id, version: version}, format: :json
+    assert_response :forbidden
+
+    get :ro_crate, params: {id: workflow.id, version: version}, format: :json
+    assert_response :forbidden
+
+  end
+
+  test 'should update workflow edam annotations ' do
+    Factory(:edam_topics_controlled_vocab)
+    Factory(:edam_operations_controlled_vocab)
+
+    user = Factory(:user)
+    workflow = Factory(:cwl_workflow, contributor: user.person)
+    login_as(user)
+    assert workflow.can_manage?
+
+    assert_equal 'Common Workflow Language', workflow.workflow_class_title
+
+    put :update, params: { id: workflow.id, workflow: { edam_topics: 'Chemistry, Sample collections',edam_operations:'Clustering, Expression correlation analysis' } }
+
+    assert_equal ['http://edamontology.org/topic_3314','http://edamontology.org/topic_3277'], assigns(:workflow).edam_topics
+    assert_equal ['http://edamontology.org/operation_3432','http://edamontology.org/operation_3463'], assigns(:workflow).edam_operations
+
+  end
+
+  test 'show edam annotations if set' do
+    Factory(:edam_topics_controlled_vocab)
+    Factory(:edam_operations_controlled_vocab)
+
+    user = Factory(:user)
+    workflow = Factory(:cwl_workflow, contributor: user.person)
+    login_as(user)
+
+    get :show, params: {id: workflow.id}
+    assert_response :success
+    assert_select 'div.panel div.panel-heading',text:/EDAM Properties/i, count:0
+
+    workflow.edam_topics = "Chemistry"
+    workflow.save!
+
+    assert workflow.edam_annotations?
+
+    get :show, params: {id: workflow.id}
+    assert_response :success
+
+    assert_select 'div.panel div.panel-heading',text:/EDAM Properties/i, count:1
+    assert_select 'div.panel div.panel-body div strong',text:/Topics/, count:1
+    assert_select 'div.panel div.panel-body a[href=?]','https://edamontology.github.io/edam-browser/#topic_3314',text:/Chemistry/, count:1
+  end
+
+  test 'should create with presentation and document links' do
+    person = Factory(:person)
+    presentation = Factory(:presentation, contributor: person)
+    document = Factory(:document, contributor:person)
+    login_as(person)
+    blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+    workflow =  {title: 'workflow', project_ids: [person.projects.first.id], presentation_ids:[presentation.id], document_ids:[document.id]}
+
+    assert_difference('Workflow.count') do
+      post :create_metadata, params: {workflow: workflow, content_blob_id: blob.id.to_s, policy_attributes: { access_type: Policy::VISIBLE }}
+    end
+
+    workflow = assigns(:workflow)
+
+    assert_equal [presentation], workflow.presentations
+    assert_equal [document], workflow.documents
+  end
+
+  test 'should update workflow with presentation and document link' do
+    person = Factory(:person)
+    workflow = Factory(:workflow, contributor: person)
+    presentation = Factory(:presentation, contributor: person)
+    document = Factory(:document, contributor:person)
+    login_as(person)
+    assert_empty workflow.presentations
+    assert_empty workflow.documents
+
+    assert_difference('ActivityLog.count') do
+      put :update, params: { id: workflow.id, workflow: { presentation_ids: [presentation.id], document_ids:[document.id]} }
+    end
+
+    assert_redirected_to workflow_path(workflow = assigns(:workflow))
+    assert_equal [presentation], workflow.presentations
+    assert_equal [document], workflow.documents
+  end
+
+  test 'should create with data file links' do
+    person = Factory(:person)
+    presentation = Factory(:presentation, contributor: person)
+    data_file = Factory(:data_file, contributor:person)
+    login_as(person)
+    blob = Factory(:content_blob)
+    session[:uploaded_content_blob_id] = blob.id
+    workflow =  {title: 'workflow', project_ids: [person.projects.first.id], data_file_ids:[data_file.id] }
+
+    assert_difference('Workflow.count') do
+      post :create_metadata, params: {workflow: workflow, content_blob_id: blob.id.to_s, policy_attributes: { access_type: Policy::VISIBLE }}
+    end
+
+    workflow = assigns(:workflow)
+
+    assert_equal [data_file], workflow.data_files
+  end
+
+  test 'should update workflow with data file link' do
+    person = Factory(:person)
+    workflow = Factory(:workflow, contributor: person)
+    data_file = Factory(:data_file, contributor:person)
+    relationship = Factory(:test_data_workflow_data_file_relationship)
+    login_as(person)
+    assert_empty workflow.data_files
+
+    assert_difference('ActivityLog.count') do
+      assert_difference('WorkflowDataFile.count') do
+        put :update, params: { id: workflow.id, workflow: {
+          workflow_data_files_attributes: ['',{data_file_id: data_file.id, workflow_data_file_relationship_id:relationship.id}]
+        } }
+      end
+    end
+
+    assert_redirected_to workflow_path(workflow = assigns(:workflow))
+    assert_equal [data_file], workflow.data_files
+    assert_equal 1,workflow.workflow_data_files.count
+    assert_equal [relationship.id], workflow.workflow_data_files.pluck(:workflow_data_file_relationship_id)
+
+    # doesn't duplicate
+    assert_difference('ActivityLog.count') do
+      assert_no_difference('WorkflowDataFile.count') do
+        put :update, params: { id: workflow.id, workflow: {
+          workflow_data_files_attributes: ['',{data_file_id: data_file.id, workflow_data_file_relationship_id:relationship.id}]
+        } }
+      end
+    end
+    assert_redirected_to workflow_path(workflow = assigns(:workflow))
+    assert_equal [data_file], workflow.data_files
+    assert_equal 1,workflow.workflow_data_files.count
+    assert_equal [relationship.id], workflow.workflow_data_files.pluck(:workflow_data_file_relationship_id)
+
+    #removes
+    assert_difference('ActivityLog.count') do
+      assert_difference('WorkflowDataFile.count', -1) do
+        put :update, params: { id: workflow.id, workflow: {
+          workflow_data_files_attributes: ['']
+        } }
+      end
+    end
+    assert_redirected_to workflow_path(workflow = assigns(:workflow))
+    assert_equal [], workflow.data_files
+    assert_equal 0,workflow.workflow_data_files.count
+    assert_equal [], workflow.workflow_data_files.pluck(:workflow_data_file_relationship_id)
+  end
+
+  test 'presentation workflows through nested routing' do
+    assert_routing 'presentations/2/workflows', controller: 'workflows', action: 'index', presentation_id: '2'
+    presentation = Factory(:presentation, contributor: User.current_user.person)
+    workflow = Factory(:workflow, policy: Factory(:public_policy), presentations:[presentation], contributor:User.current_user.person)
+    workflow2 = Factory(:workflow, policy: Factory(:public_policy), contributor:User.current_user.person)
+
+    get :index, params: { presentation_id: presentation.id }
+
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', workflow_path(workflow), text: workflow.title
+      assert_select 'a[href=?]', workflow_path(workflow2), text: workflow2.title, count: 0
+    end
+  end
+
+  test 'document workflows through nested routing' do
+    assert_routing 'documents/2/workflows', controller: 'workflows', action: 'index', document_id: '2'
+    document = Factory(:document, contributor: User.current_user.person)
+    workflow = Factory(:workflow, policy: Factory(:public_policy), documents:[document], contributor:User.current_user.person)
+    workflow2 = Factory(:workflow, policy: Factory(:public_policy), contributor:User.current_user.person)
+
+    get :index, params: { document_id: document.id }
+
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', workflow_path(workflow), text: workflow.title
+      assert_select 'a[href=?]', workflow_path(workflow2), text: workflow2.title, count: 0
+    end
+  end
+
+  test 'data_file workflows through nested routing' do
+    assert_routing 'data_files/2/workflows', controller: 'workflows', action: 'index', data_file_id: '2'
+    data_file = Factory(:data_file, contributor: User.current_user.person)
+    workflow = Factory(:workflow, policy: Factory(:public_policy), data_files:[data_file], contributor: User.current_user.person)
+    workflow2 = Factory(:workflow, policy: Factory(:public_policy), contributor: User.current_user.person)
+
+    get :index, params: { data_file_id: data_file.id }
+
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', workflow_path(workflow), text: workflow.title
+      assert_select 'a[href=?]', workflow_path(workflow2), text: workflow2.title, count: 0
+    end
   end
 
   def edit_max_object(workflow)

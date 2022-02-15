@@ -7,6 +7,7 @@ class SampleAttribute < ApplicationRecord
   belongs_to :linked_sample_type, class_name: 'SampleType'
 
   validates :sample_type, presence: true
+  validates :pid, format: { with: URI::regexp, allow_blank: true, allow_nil: true, message: 'not a valid URI' }
 
   before_save :store_accessor_name
   before_save :default_pos, :force_required_when_is_title

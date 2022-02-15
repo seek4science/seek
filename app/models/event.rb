@@ -12,6 +12,7 @@ class Event < ApplicationRecord
   include Seek::Search::CommonFields
   include Seek::Search::BackgroundReindexing
   include Seek::BioSchema::Support
+  include Seek::Collectable
 
   searchable(ignore_attribute_changes_of: [:updated_at], auto_index: false) do
     text :address, :city, :country, :url
@@ -59,7 +60,6 @@ class Event < ApplicationRecord
     columns_default + ['address','url','title']
   end
 
-  # defines that this is a user_creatable object type, and appears in the "New Object" gadget
   def self.user_creatable?
     Seek::Config.events_enabled
   end

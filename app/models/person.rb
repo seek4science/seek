@@ -172,7 +172,7 @@ class Person < ApplicationRecord
   end
 
   def email_uri
-    URI.escape('mailto:' + email)
+    "mailto:#{Addressable::URI.escape(email)}"
   end
 
   def mbox_sha1sum
@@ -419,9 +419,19 @@ class Person < ApplicationRecord
 
   # activation email logs associated with this person
   def activation_email_logs
-    MessageLog.activation_email_logs(self)
+    ActivationEmailMessageLog.activation_email_logs(self)
   end
 
+  def self.with_name(name)
+    concat_clause = if Seek::Util.database_type == 'sqlite3'
+                      "LOWER(first_name || ' ' || last_name)"
+                    else
+                      "LOWER(CONCAT(first_name, ' ', last_name))"
+                    end
+
+    Person.where("#{concat_clause} LIKE :query OR LOWER(first_name) LIKE :query OR LOWER(last_name) LIKE :query",
+                 query: "#{name.downcase}%")
+  end
 
   private
 

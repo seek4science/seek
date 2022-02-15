@@ -30,8 +30,10 @@ module Seek
 
         # list of comma seperated tags, it the resource supports it
         def keywords
-          tags_as_text_array.join(', ') if resource.respond_to?(:tags_as_text_array)
+          obj = resource.is_a_version? ? resource.parent : resource
+          obj.tags_as_text_array.join(', ') if obj.respond_to?(:tags_as_text_array)
         end
+        
       end
     end
   end

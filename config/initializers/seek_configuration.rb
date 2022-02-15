@@ -39,10 +39,12 @@ def load_seek_config_defaults!
   Seek::Config.default :community_news_feed_urls,''
   Seek::Config.default :community_news_number_of_entries,10
   Seek::Config.default :home_description, 'You can configure the text that goes here within the Admin pages: Site Configuration->Home page settings.'
+  Seek::Config.default :home_description_position, 'side'
   Seek::Config.default :tagline_prefix, 'Find, share and exchange <b>Data</b>, <b>Models</b> and <b>Processes</b> within the'
   Seek::Config.default :publish_button_enabled, true
   Seek::Config.default :auth_lookup_enabled,true
   Seek::Config.default :external_search_enabled, true
+  Seek::Config.default :project_single_page_enabled, false
   Seek::Config.default :project_browser_enabled,false
   Seek::Config.default :experimental_features_enabled,false
   Seek::Config.default :pdf_conversion_enabled,true
@@ -73,13 +75,16 @@ def load_seek_config_defaults!
 
   # Types
   Seek::Config.default :documents_enabled,true
+  Seek::Config.default :data_files_enabled,true
   Seek::Config.default :events_enabled,true
   Seek::Config.default :isa_enabled, true
   Seek::Config.default :models_enabled,true
   Seek::Config.default :organisms_enabled,true
   Seek::Config.default :programmes_enabled, false
+  Seek::Config.default :presentations_enabled,true
   Seek::Config.default :publications_enabled,true
   Seek::Config.default :samples_enabled, true
+  Seek::Config.default :sops_enabled, true
   Seek::Config.default :workflows_enabled, false
   Seek::Config.default :collections_enabled, false
 
@@ -94,19 +99,20 @@ def load_seek_config_defaults!
 #time in minutes that the feeds on the front page are cached for
   Seek::Config.default :home_feeds_cache_timeout,30
 # Branding
-  Seek::Config.default :project_name,'FAIRDOM'
-  Seek::Config.default :project_type,''
-  Seek::Config.default :project_link,'http://www.fair-dom.org'
+  Seek::Config.default :instance_name,'FAIRDOM'
+  Seek::Config.default :instance_link,'http://www.fair-dom.org'
 
-  Seek::Config.default :application_name,"SEEK"
-  Seek::Config.default :dm_project_name,"FAIRDOM"
-  Seek::Config.default :dm_project_link,"http://www.fair-dom.org"
+  Seek::Config.default :instance_admins_name,"FAIRDOM"
+  Seek::Config.default :instance_admins_link,"http://www.fair-dom.org"
+
   Seek::Config.default :header_image_enabled,true
   Seek::Config.default :header_image_title, "FAIRDOM"
   Seek::Config.default :header_image_link,"http://www.fair-dom.org"
   Seek::Config.default :copyright_addendum_enabled,false
   Seek::Config.default :copyright_addendum_content,'Additions copyright ...'
   Seek::Config.default :issue_tracker, 'https://fair-dom.org/issues'
+
+  Seek::Config.fixed :application_name,"FAIRDOM-SEEK"
 
   #Imprint
   Settings.defaults[:imprint_enabled]= false
@@ -116,6 +122,13 @@ def load_seek_config_defaults!
   Settings.defaults[:about_page_enabled]= false
   Seek::Config.default :about_page, File.read(Rails.root.join('config/default_data/about_page_example'))
 
+  Seek::Config.default :about_instance_link_enabled, false
+  Seek::Config.default :about_instance_admin_link_enabled, false
+  Seek::Config.default :cite_link, ''
+  Seek::Config.default :contact_link, ''
+
+  Seek::Config.default :funding_link, ''
+  
   #Terms and conditions page
   Settings.defaults[:terms_enabled]= false
   Seek::Config.default :terms_page, File.read(Rails.root.join('config/default_data/terms_and_conditions_example'))
@@ -197,8 +210,17 @@ def load_seek_config_defaults!
   Seek::Config.default :news_feed_urls,''
   Seek::Config.default :news_number_of_entries,10
   Seek::Config.default :recent_contributions_number_of_entries, 20
+  Seek::Config.default :tag_cloud_enabled,true
+  Seek::Config.default :workflow_class_list_enabled,false
 
-  Seek::Config.default :front_page_buttons_enabled, false
+  # Home page panel settings
+  Seek::Config.default :home_show_features,true
+  Seek::Config.default :home_show_quickstart,true
+  Seek::Config.default :home_show_my_items,true
+  Seek::Config.default :home_show_who_uses,true
+  Seek::Config.default :home_explore_projects,true
+  Seek::Config.default :home_show_integrations,true
+  Seek::Config.default :home_carousel,[]
 
   # omniauth settings and behaviour
   Seek::Config.default :omniauth_enabled, false
@@ -237,6 +259,8 @@ def load_seek_config_defaults!
   Seek::Config.default :results_per_page_default_condensed, 14
   Seek::Config.default :results_per_page, {}
   Seek::Config.default :sorting, {}
+
+  Seek::Config.default :life_monitor_enabled, false
 
   load_seek_testing_defaults! if Rails.env.test?
 end

@@ -16,6 +16,15 @@
       "created_at": "2020-06-03T16:10:48.000Z",
       "updated_at": "2020-06-03T16:10:51.000Z",
       "other_creators": "Joe Bloggs",
+      "creators": [
+        {
+          "profile": "/people/1039986630",
+          "family_name": "Last",
+          "given_name": "Person150",
+          "affiliation": "An Institution: 166",
+          "orcid": null
+        }
+      ],
       "discussion_links": [{
         "id": 55,
         "url": "http://www.slack.com/",
@@ -26,7 +35,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039986924",
+            "id": "1039986630",
             "type": "people"
           }
         ]
@@ -46,7 +55,7 @@
             "type": "people"
           },
           {
-            "id": "1039986924",
+            "id": "1039986630",
             "type": "people"
           }
         ]

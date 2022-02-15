@@ -11,8 +11,7 @@ registration_disabled_description:
 activation_required_enabled:
 smtp:
   encrypt: true
-project_type:
-project_link:
+instance_link:
 type_managers_enabled:
 type_managers:
 pubmed_api_email:
@@ -23,12 +22,11 @@ copyright_addendum_content:
 noreply_sender:
 solr_enabled:
 application_name:
-project_long_name:
-project_name:
-project_description:
-project_keywords:
-dm_project_name:
-dm_project_link:
+instance_name:
+instance_description:
+instance_keywords:
+instance_admins_name:
+instance_admins_link:
 issue_tracker:
 header_image_link:
 header_image_title:
@@ -67,6 +65,7 @@ project_hierarchy_enabled:
 tabs_lazy_load_enabled:
 publish_button_enabled:
 project_browser_enabled:
+project_single_page_enabled:
 experimental_features_enabled:
 pdf_conversion_enabled:
 admin_impersonation_enabled:
@@ -154,7 +153,13 @@ news_enabled:
 news_feed_urls:
 news_number_of_entries:
   convert: :to_i
-front_page_buttons_enabled:
+home_show_features:
+home_show_quickstart:
+home_show_my_items:
+home_show_who_uses:
+home_explore_projects:
+home_show_integrations:
+home_carousel:
 permissions_popup:
   convert: :to_i
 auth_lookup_update_batch_size:
@@ -170,6 +175,11 @@ recommended_data_licenses:
 recommended_software_licenses:
 about_page_enabled:
 about_page:
+about_instance_link_enabled:
+about_instance_admins_link_enabled:
+cite_link:
+contact_link:
+funding_link:
 terms_enabled:
 terms_page:
 privacy_enabled:
@@ -192,6 +202,7 @@ results_per_page_default_condensed:
 results_per_page:
 cwl_viewer_url:
 # Types enabled
+data_files_enabled:
 documents_enabled:
 events_enabled:
 isa_enabled:
@@ -199,8 +210,10 @@ models_enabled:
 organisms_enabled:
 programmes_enabled:
 managed_programme_id:
+presentations_enabled:
 publications_enabled:
 samples_enabled:
+sops_enabled:
 workflows_enabled:
 collections_enabled:
 # Omniauth
@@ -218,8 +231,19 @@ omniauth_github_enabled:
 omniauth_github_client_id:
 omniauth_github_secret:
   encrypt: true
+ga4gh_trs_api_enabled:
+custom_metadata_enabled: false
 search_results_limit:
   convert: :to_i
-# Controlled vocabs  
+life_monitor_enabled:
+life_monitor_url:
+life_monitor_client_id:
+life_monitor_client_secret:
+galaxy_instance_name:
+galaxy_instance_trs_import_url:
+# Controlled vocabs
 cv_dropdown_limit:
   convert: :to_i
+tag_cloud_enabled:
+workflow_class_list_enabled:
+home_description_position:

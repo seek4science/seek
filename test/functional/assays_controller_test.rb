@@ -205,6 +205,8 @@ class AssaysControllerTest < ActionController::TestCase
     assert_response :success
     assert_not_nil assigns(:assay)
     assert_nil assigns(:assay).study
+    assert_select 'div.alert.alert-info', text: /No Study and Investigation available/, count: 0
+    assert_select 'a.btn[href=?]', new_investigation_path, count: 0
   end
 
   test 'should show new with study when id provided' do
@@ -613,6 +615,28 @@ class AssaysControllerTest < ActionController::TestCase
     assert_select 'a', text: /An #{I18n.t('assays.experimental_assay')}/i, count: 0
     assert_select 'a[href=?]', new_assay_path(class: :modelling), count: 0
     assert_select 'a', text: /A #{I18n.t('assays.modelling_analysis')}/i, count: 0
+  end
+
+  test 'get new without investigation prompts user to create' do
+    disable_authorization_checks { Investigation.destroy_all }
+    Factory(:investigation, policy: Factory(:private_policy))
+    assert Investigation.authorized_for('view', User.current_user).none?
+
+    get :new
+    assert_response :success
+    assert_select 'div.alert.alert-info', text: /No Study and Investigation available/, count: 1
+    assert_select 'a.btn[href=?]', new_investigation_path
+  end
+
+  test 'get new without study prompts user to create' do
+    disable_authorization_checks { Study.destroy_all }
+    Factory(:study, policy: Factory(:private_policy))
+    assert Study.authorized_for('view', User.current_user).none?
+
+    get :new
+    assert_response :success
+    assert_select 'div.alert.alert-info', text: /No Study available/, count: 1
+    assert_select 'a.btn[href=?]', new_study_path
   end
 
   test 'links have nofollow in sop tabs' do
@@ -1298,8 +1322,7 @@ class AssaysControllerTest < ActionController::TestCase
 
     get :show, params: { id: assay.id }
     assert_response :success
-    assert_select 'li.author-list-item', text: 'john smith'
-    assert_select 'li.author-list-item', text: 'jane smith'
+    assert_select '#author-box .additional-credit', text: 'john smith, jane smith', count: 1
   end
 
   test 'programme assays through nested routing' do
@@ -1741,7 +1764,7 @@ class AssaysControllerTest < ActionController::TestCase
     #no sharing link, not for Investigation, Study and Assay
     assert_select 'div#temporary_links', count:0
 
-    assert_select 'div#author_form', count:1
+    assert_select 'div#author-form', count:1
   end
 
   test 'cannot access manage page with edit rights' do
@@ -1878,4 +1901,20 @@ class AssaysControllerTest < ActionController::TestCase
     assert_empty assay.discussion_links
   end
 
+  test 'add new honours enabled setting' do
+    person = Factory(:person)
+    login_as(person)
+    assay = Factory(:assay, contributor: person)
+
+    with_config_value(:documents_enabled, true) do
+      get :show, params: { id: assay.id }
+      assert_select 'ul#item-admin-menu li a',text: /add new document/i, count:1
+    end
+
+    with_config_value(:documents_enabled, false) do
+      get :show, params: { id: assay.id }
+      assert_select 'ul#item-admin-menu li a',text: /add new document/i, count:0
+    end
   end
+
+end

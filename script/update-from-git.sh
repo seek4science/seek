@@ -17,19 +17,18 @@ echo "${GREEN}bundle install${NC}"
 bundle install --deployment --without development test
 
 bundle exec rake seek:workers:stop
-bundle exec rake sunspot:solr:stop
 
 echo "${GREEN} seek:upgrade${NC}"
 bundle exec rake seek:upgrade
+
+sleep 5 # small delay to make sure SOLR has started up and ready
+bundle exec rake seek:workers:start &
+
 echo "${GREEN} precompile assets${NC}"
 bundle exec rake assets:precompile # this task will take a while
 
-bundle exec rake sunspot:solr:start
-sleep 5 # small delay to make sure SOLR has started up and ready
-bundle exec rake seek:workers:start
-
 echo "${GREEN} update crontab${NC}"
-bundle exec whenever --update-crontab
+bundle exec whenever --update-crontab &
 
 echo "${GREEN} restart server${NC}"
 touch tmp/restart.txt

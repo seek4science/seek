@@ -1,48 +1,59 @@
-<%= render :partial => "general/item_title",:locals => {:item=>@study, :buttons_partial => 'studies/buttons'} %>
+<%= render partial: 'general/show_page_tab_definitions' %>
 
-<div class="row">
-  <div class="col-md-9 col-sm-8 box_about_actor">
-    <%= item_description @study.description -%>
+<div class="tab-content">
+    <div id="details" class="tab-pane fade in active">
+      <%= render :partial => "general/item_title",:locals => {:item=>@study, :buttons_partial => 'studies/buttons'} %>
+      <div class="row">
+        <div class="col-md-9 col-sm-8 box_about_actor">
+          <%= item_description @study.description -%>
 
-    <div class="row">
-      <div class="col-md-6">
+          <div class="row">
+            <div class="col-md-6">
 
-        <%= persistent_resource_id(@study) %>
+              <%= persistent_resource_id(@study) %>
 
-        <p class="investigation">
-          <label><%= t('investigation') %>:</label>
-          <%= investigation_link(@study.investigation) %>
-        </p>
+              <p class="investigation">
+                <label><%= t('investigation') %>:</label>
+                <%= investigation_link(@study.investigation) %>
+              </p>
 
-        <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @study}%>        
+              <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @study}%>        
+		<p id="position">
+          		<b><%= "Study position" %>: </b>
+          		<%= @study.position %>
+        	</p>
+        	<%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @study}%>        
+              <% unless @study.experimentalists.blank? %>
+                <p>
+                  <b>Experimentalists:</b>
+                  <%= text_or_not_specified(@study.experimentalists) %>
+                </p>
+              <% end %>
 
-        <% unless @study.experimentalists.blank? %>
-          <p>
-            <b>Experimentalists:</b>
-            <%= text_or_not_specified(@study.experimentalists) %>
-          </p>
-        <% end %>
+            </div>
+          </div>
+          <% if @study.external_asset %>
+              <div class="row">
+                <div class="col-md-12">
+                  <%= external_asset_details(@study) %>
+                </div>
+              </div>
+          <% end %>
 
+          <%= render partial: 'custom_metadata/custom_metadata_attribute_values', locals: {resource: @study} %>
+
+          <%= render partial: 'general/isa_graph', locals: { root_item: @study, options: { depth: 4 } } -%>
+
+        </div>
+
+        <div class="col-md-3 col-sm-4">
+          <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @study } %>
+        </div>
       </div>
     </div>
-    <% if @study.external_asset %>
-        <div class="row">
-          <div class="col-md-12">
-            <%= external_asset_details(@study) %>
-          </div>
-        </div>
-    <% end %>
 
-    <%= render partial: 'custom_metadata/custom_metadata_attribute_values', locals: {resource: @study} %>
-
-    <%= render partial: 'general/isa_graph', locals: { root_item: @study, options: { depth: 4 } } %>
-
-  </div>
-
-  <div class="col-md-3 col-sm-4">
-    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @study } %>
-  </div>
+    <div id="related-items" class="tab-pane fade">
+      <%= render :partial=>"general/items_related_to", :object => @study -%>
+    </div>
+    
 </div>
-
-
-<%= render :partial=>"general/items_related_to", :object => @study %>

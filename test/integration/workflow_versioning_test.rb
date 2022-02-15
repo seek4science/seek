@@ -5,7 +5,7 @@ class WorkflowVersioningTest < ActionDispatch::IntegrationTest
   include HtmlHelper
 
   setup do
-    WorkflowClass.find_by_key('Galaxy') || Factory(:galaxy_workflow_class)
+    @galaxy = WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class)
   end
 
   test 'uploads a new version of a workflow' do
@@ -13,6 +13,9 @@ class WorkflowVersioningTest < ActionDispatch::IntegrationTest
     workflow_id = workflow.id
     person = workflow.contributor
     login_as(person.user)
+
+    assert_equal 0, workflow.inputs.count
+    assert_equal 0, workflow.versions.first.inputs.count
 
     get new_version_workflow_path(workflow.id)
 
@@ -25,6 +28,7 @@ class WorkflowVersioningTest < ActionDispatch::IntegrationTest
                            diagram: { data_url: 'http://somewhere.com/piccy.png' },
                            abstract_cwl: { data_url: 'http://workflow.com/rp2.cwl' } },
                revision_comments: 'A new version!',
+               workflow_class_id: @galaxy.id,
                workflow_id: workflow.id
     }
 
@@ -45,6 +49,9 @@ class WorkflowVersioningTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert session[:metadata][:internals].present?
 
+    meta = session[:metadata].except(:errors, :warnings).with_indifferent_access
+    meta[:internals] = meta[:internals].to_json
+
     get provide_metadata_workflows_path
 
     assert_response :success
@@ -55,12 +62,16 @@ class WorkflowVersioningTest < ActionDispatch::IntegrationTest
       assert_no_difference('Workflow.count', ) do
         assert_no_difference('ContentBlob.count', ) do
           post create_version_metadata_workflow_path(workflow_id),
-               params: session[:metadata].merge(title: 'Something something',
-                                                content_blob_id: session[:uploaded_content_blob_id])
+               params: { workflow: meta.merge(title: 'Something something'),
+                         content_blob_id: session[:uploaded_content_blob_id] }
 
           assert_redirected_to workflow_path(workflow_id)
 
           assert_equal 'A new version!', assigns(:workflow).versions.last.revision_comments
+          assert_equal 'Something something', assigns(:workflow).title
+          assert_equal 12, assigns(:workflow).inputs.count
+          assert_equal 12, assigns(:workflow).versions.last.inputs.count
+          assert_equal 0, assigns(:workflow).versions.first.inputs.count
         end
       end
     end

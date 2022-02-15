@@ -1,0 +1,28 @@
+<div class="panel panel-default" id="home-integrations">
+  <div class="panel-heading">
+    Integrations
+  </div>
+
+  <div class="panel-body">
+    <% cache('front-page-integrations') do %>
+
+      <div class='row'>
+        <% integration_definitions.each do |integration| %>
+          <div class='col col-md-4 col-sm-6'>
+            <div class='integration-label'><%= integration[:label] %></div>
+            <% logo_image = image(integration[:key], alt: integration[:label], class: 'integration-logo') %>
+            <% if integration[:url].present? %>
+              <%= link_to(integration[:url], target: :_blank) do %>
+                <%= logo_image %>
+              <% end %>
+            <% else %>
+              <%= logo_image %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+  <% end %>
+</div>
+

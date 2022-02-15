@@ -7,6 +7,8 @@ module Seek
       include ActionView::Helpers::SanitizeHelper
       attr_reader :resource
 
+      SCHEMA_ORG = 'https://schema.org'
+
       # initialise with a resource
       def initialize(resource)
         @resource = resource
@@ -48,7 +50,7 @@ module Seek
       SUPPORTED_TYPES = [Person, Project, Event, DataFile, Organism, HumanDisease,
                          Seek::BioSchema::DataCatalogMockModel,
                          Document, Presentation, Workflow, Collection,
-                         Institution, Programme, Sample].freeze
+                         Institution, Programme, Sample, AssetsCreator].freeze
 
       def resource_decorator
         @decorator ||= ResourceDecorators::Factory.instance.get(resource)

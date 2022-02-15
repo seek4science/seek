@@ -1,0 +1,13 @@
+<div class="pull-right">
+  <% if WorkflowClass.can_create? %>
+    <%= button_link_to('New Workflow Type', 'new', new_workflow_class_path) %>
+  <% end %>
+</div>
+
+<%= index_title(WorkflowClass.model_name.human.pluralize) %>
+
+<h1>Core Workflow Types</h1>
+<%= render partial: 'workflow_class_table', locals: { workflow_classes: @workflow_classes.extractable } %>
+
+<h1>User-added Workflow Types</h1>
+<%= render partial: 'workflow_class_table', locals: { workflow_classes: @workflow_classes.unextractable } %>

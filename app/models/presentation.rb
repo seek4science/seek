@@ -20,18 +20,13 @@ class Presentation < ApplicationRecord
   end
 
   has_and_belongs_to_many :events
+  has_and_belongs_to_many :workflows, -> { distinct }
 
   # get a list of Presentations with their original uploaders - for autocomplete fields
   # (authorization is done immediately to save from iterating through the collection again afterwards)
   #
   # Parameters:
   # - user - user that performs the action; this is required for authorization
-
-
-   #defines that this is a user_creatable object type, and appears in the "New Object" gadget
-  def self.user_creatable?
-    true
-  end
 
   # Returns the columns to be shown on the table view for the resource
   def columns_default

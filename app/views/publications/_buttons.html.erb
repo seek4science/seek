@@ -12,8 +12,12 @@
   <% end %>
 <% end %>
 
+<% if current_user %>
+  <%= render partial: 'assets/add_to_collection', locals: { resource: item } %>
+<% end %>
+
 <% if item.can_edit? %>
-  <%= add_to_dropdown(item) %>
+  <%= add_new_item_to_dropdown(item) %>
 <% end %>
 
 <%= item_actions_dropdown do %>

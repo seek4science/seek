@@ -190,6 +190,25 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_equal [event],doc.events
   end
 
+  test 'should update and link to workflow' do
+    person = Factory(:person)
+    document = Factory(:document, contributor: person)
+    assert_empty document.workflows
+
+    login_as(person)
+
+    workflow = Factory(:workflow,contributor:person)
+
+    assert_difference('ActivityLog.count') do
+      put :update, params: { id: document.id, document: { title: 'Different title', project_ids: [person.projects.first.id],
+                                                          workflow_ids:['',workflow.id.to_s] } }
+    end
+
+    assert (doc = assigns(:document))
+    assert_redirected_to document_path(doc)
+    assert_equal [workflow],doc.workflows
+  end
+
   test 'update with no assays' do
     person = Factory(:person)
     creators = [Factory(:person), Factory(:person)]
@@ -306,12 +325,28 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_routing 'projects/2/documents', controller: 'documents', action: 'index', project_id: '2'
     person = Factory(:person)
     login_as(person)
-    assay = Factory(:assay, contributor:person)
-    document = Factory(:document,assays:[assay],contributor:person)
+    document = Factory(:document, contributor:person)
     document2 = Factory(:document,policy: Factory(:public_policy),contributor:Factory(:person))
 
 
     get :index, params: { project_id: person.projects.first.id }
+
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', document_path(document), text: document.title
+      assert_select 'a[href=?]', document_path(document2), text: document2.title, count: 0
+    end
+  end
+
+  test "workflow documents through nested routing" do
+    assert_routing 'workflows/2/documents', controller: 'documents', action: 'index', workflow_id: '2'
+    person = Factory(:person)
+    login_as(person)
+    workflow = Factory(:workflow, contributor:person)
+    document = Factory(:document,workflows:[workflow],contributor:person)
+    document2 = Factory(:document,policy: Factory(:public_policy),contributor:Factory(:person))
+
+    get :index, params: { workflow_id: workflow.id }
 
     assert_response :success
     assert_select 'div.list_item_title' do
@@ -341,7 +376,7 @@ class DocumentsControllerTest < ActionController::TestCase
     # should be a temporary sharing link
     assert_select 'div#temporary_links', count:1
 
-    assert_select 'div#author_form', count:1
+    assert_select 'div#author-form', count:1
   end
 
   test 'cannot access manage page with edit rights' do
@@ -1066,7 +1101,6 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_redirected_to project_path(project)
   end
 
-  
   test "shouldn't return to unauthorised host" do
     person = Factory(:person)
     project = Factory(:project)
@@ -1078,6 +1112,61 @@ class DocumentsControllerTest < ActionController::TestCase
       end
     end
     assert_redirected_to documents_path
+  end
+
+  test 'shows creators in order in author box' do
+    person = Factory(:person, first_name: 'Jessica', last_name: 'Three')
+    document = Factory(:public_document)
+    disable_authorization_checks do
+      document.assets_creators.create!(given_name: 'Julia', family_name: 'Two', pos: 2, affiliation: 'University of Sheffield', orcid: 'https://orcid.org/0000-0001-8172-8981')
+      document.assets_creators.create!(creator: person, pos: 3)
+      document.assets_creators.create!(given_name: 'Jill', family_name: 'One', pos: 1)
+      document.assets_creators.create!(given_name: 'Jane', family_name: 'Four', pos: 4, affiliation: 'University of Edinburgh')
+    end
+
+    get :show, params: { id: document }
+
+    assert_select '#author-box ul' do
+      assert_select '.author-list-item:nth-child(1)', text: 'Jill One'
+
+      assert_select '.author-list-item:nth-child(2)', text: 'Julia Two'
+      assert_select '.author-list-item:nth-child(2)[title=?]', 'Julia Two, University of Sheffield'
+      assert_select '.author-list-item:nth-child(2) a.orcid-link[href=?]', 'https://orcid.org/0000-0001-8172-8981'
+
+      assert_select '.author-list-item:nth-child(3)', text: 'Jessica Three'
+      assert_select '.author-list-item:nth-child(3) a[href=?]', person_path(person)
+
+      assert_select '.author-list-item:nth-child(4)', text: 'Jane Four'
+      assert_select '.author-list-item:nth-child(4)[title=?]', 'Jane Four, University of Edinburgh'
+    end
+  end
+
+  test 'shows creators in order in resource list item' do
+    person = Factory(:person, first_name: 'Jessica', last_name: 'Three')
+    document = Factory(:public_document, other_creators: 'Joy Five')
+    disable_authorization_checks do
+      document.assets_creators.create!(given_name: 'Julia', family_name: 'Two', pos: 2, affiliation: 'University of Sheffield', orcid: 'https://orcid.org/0000-0001-8172-8981')
+      document.assets_creators.create!(creator: person, pos: 3)
+      document.assets_creators.create!(given_name: 'Jill', family_name: 'One', pos: 1)
+      document.assets_creators.create!(given_name: 'Jane', family_name: 'Four', pos: 4, affiliation: 'University of Edinburgh')
+    end
+
+    get :index
+
+    assert_select '.rli-person-list', text: 'Creators: Jill One, Julia Two, Jessica Three, Jane Four, Joy Five'
+    assert_select '.rli-person-list' do
+      assert_select ':nth-child(2)', text: 'Jill One'
+
+      assert_select ':nth-child(3)', text: 'Julia Two'
+      assert_select ':nth-child(3)[title=?]', 'Julia Two, University of Sheffield'
+      assert_select ':nth-child(3)[href=?]', 'https://orcid.org/0000-0001-8172-8981'
+
+      assert_select ':nth-child(4)', text: 'Jessica Three'
+      assert_select ':nth-child(4)[href=?]', person_path(person)
+
+      assert_select ':nth-child(5)', text: 'Jane Four'
+      assert_select ':nth-child(5)[title=?]', 'Jane Four, University of Edinburgh'
+    end
   end
 
   private

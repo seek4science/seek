@@ -71,10 +71,10 @@ class PresentationsController < ApplicationController
   private
 
   def presentation_params
-    params.require(:presentation).permit(:title, :description, :other_creators, :license, :parent_name,
+    params.require(:presentation).permit(:title, :description, *creator_related_params, :license, :parent_name,
                                          { event_ids: [] }, { project_ids: [] },
                                          { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                         { creator_ids: [] }, { publication_ids: [] },
+                                         { publication_ids: [] }, { workflow_ids: [] },
                                          discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 

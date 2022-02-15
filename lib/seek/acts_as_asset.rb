@@ -79,6 +79,10 @@ module Seek
         with_contributors.to_json
       end
 
+      def user_creatable?
+        feature_enabled?
+      end
+
       def can_create?
         User.logged_in_and_member?
       end

@@ -326,7 +326,7 @@ class PublicationsController < ApplicationController
     params.require(:publication).permit(:publication_type_id, :pubmed_id, :doi, :parent_name, :abstract, :title, :journal, :citation,:url,:editor,
                                         :published_date, :bibtex_file, :registered_mode, :publisher, :booktitle, { project_ids: [] }, { event_ids: [] }, { model_ids: [] },
                                         { investigation_ids: [] }, { study_ids: [] }, { assay_ids: [] }, { presentation_ids: [] },
-                                        { data_file_ids: [] }, { scales: [] }, { human_disease_ids: [] },
+                                        { data_file_ids: [] }, { scales: [] }, { human_disease_ids: [] }, { workflow_ids: [] },
                                         { publication_authors_attributes: [:person_id, :id, :first_name, :last_name ] }).tap do |pub_params|
       filter_association_params(pub_params, :assay_ids, Assay, :can_edit?)
       filter_association_params(pub_params, :study_ids, Study, :can_view?)
@@ -354,7 +354,7 @@ class PublicationsController < ApplicationController
     params[key]
   end
 
-  # the original way of creating a bublication by either doi or pubmedid, where all data is set server-side
+  # the original way of creating a publication by either doi or pubmedid, where all data is set server-side
   def register_publication
     get_data(@publication, @publication.pubmed_id, @publication.doi)
 
@@ -363,8 +363,10 @@ class PublicationsController < ApplicationController
         render partial: 'assets/back_to_fancy_parent', locals: { child: @publication, parent_name: @publication.parent_name }
       else
         respond_to do |format|
-          flash[:notice] = 'Publication was successfully created.'
-          format.html { redirect_to(manage_publication_url(@publication)) }
+          flash[:notice] = 'Publication was successfully created. You can edit the additional information now or later'
+
+          # newly_created Change the buttons in the manage page-> Cancel will become Skip, ...
+          format.html { redirect_to(manage_publication_url(@publication, newly_created: true)) }
           format.xml  { render xml: @publication, status: :created, location: @publication }
           format.json  { render json: @publication, status: :created, location: @publication, include: [params[:include]] }
         end

@@ -27,7 +27,7 @@
 
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop} -%>
 
-      <%= fancy_multiselect @sop, :workflows, { other_projects_checkbox: false } if Seek::Config.workflows_enabled -%>
+      <%= fancy_multiselect @sop, :workflows, { other_projects_checkbox: false } -%>
 
       <%= form_submit_buttons(@sop) %>
     </div>

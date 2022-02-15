@@ -3,7 +3,7 @@
 <p class="list_item_attribute">
   <label>Attributes: </label>
   <%=
-      resource.sample_attributes.collect{|attr| sample_attribute_details(attr)}.join(", ").html_safe
+      resource.sample_attributes.collect{|attr| list_item_sample_attribute_details(attr)}.join(", ").html_safe
   %>
 </p>
 

@@ -14,13 +14,9 @@
 
 <%= render partial: 'assets/select_tags' -%>
 
-<% if Seek::Config.human_diseases_enabled %>
-  <%= publication_form.fancy_multiselect :human_diseases, { possibilities: HumanDisease.order(:title).all, with_new_link: true, hidden: false } %>
-<% end %>
+<%= publication_form.fancy_multiselect :human_diseases, { possibilities: HumanDisease.order(:title).all, with_new_link: true, hidden: false } %>
 
-<% if Seek::Config.events_enabled -%>
-  <%= publication_form.fancy_multiselect :events, other_projects_checkbox: true, sort_by: :start_date %>
-<% end -%>
+<%= publication_form.fancy_multiselect :events, other_projects_checkbox: true, sort_by: :start_date %>
 
 <%= publication_form.fancy_multiselect :investigations, other_projects_checkbox: true %>
 
@@ -36,5 +32,13 @@
 
 <%= publication_form.fancy_multiselect :presentations, other_projects_checkbox: true %>
 
-<%= publication_form.submit  'Update',data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' %>
-or <%= cancel_button(publication_path(@publication)) %>
+<%= publication_form.fancy_multiselect :workflows, other_projects_checkbox: true %>
+
+<% if  params[:newly_created].nil? or params[:newly_created] == "false" %>
+  <%= publication_form.submit  'Update',data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' %>
+  or <%= cancel_button(publication_path(@publication)) %>
+<% else %>
+  <%= publication_form.submit  'Save',data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' %>
+  or <%= cancel_button(publication_path(@publication), button_text: 'Skip') %>
+  or <%= cancel_button(publication_path(@publication), button_text: 'Cancel and delete', method: :delete) -%>
+<% end %>

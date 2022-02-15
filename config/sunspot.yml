@@ -1,0 +1,24 @@
+production:
+  solr:
+    hostname: <%= ENV['SOLR_HOST'] || 'localhost' %>
+    port: <%= ENV['SOLR_PORT'] || 8983 %>
+    log_level: WARNING
+    memory: 1G
+    path: <%= ENV['SOLR_PATH'] || '/solr/seek' %>
+    read_timeout: 1000
+    open_timeout: 12
+
+development:
+  solr:
+    hostname: <%= ENV['SOLR_HOST'] || 'localhost' %>
+    port: <%= ENV['SOLR_PORT'] || 8983 %>
+    log_level: INFO
+    path: <%= ENV['SOLR_PATH'] || '/solr/seek' %>
+
+test:
+  solr:
+    hostname: <%= ENV['SOLR_HOST'] || 'localhost' %>
+    port: 8981
+    log_level: WARNING
+    path: /solr/test
+    

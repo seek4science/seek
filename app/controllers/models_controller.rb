@@ -150,9 +150,9 @@ class ModelsController < ApplicationController
   def model_params
     params.require(:model).permit(:imported_source, :imported_url, :title, :description, { project_ids: [] }, :license,
                                   :model_type_id, :model_format_id, :recommended_environment_id, :organism_id, { organism_ids: []}, :human_disease_id,
-                                  :other_creators,
+                                  *creator_related_params,
                                   { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                  { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
+                                  { assay_assets_attributes: [:assay_id] }, { scales: [] },
                                   { scale_extra_params: [] }, { publication_ids: [] },
                                   discussion_links_attributes:[:id, :url, :label, :_destroy])
   end

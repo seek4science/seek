@@ -95,6 +95,7 @@ class SampleControlledVocabsController < ApplicationController
 
       client = Ebi::OlsClient.new
       terms = client.all_descendants(source_ontology, root_uri)
+      terms.reject! { |t| t[:iri] == root_uri } unless params[:include_root_term] == '1'
     rescue StandardError => e
       error_msg = e.message
     end
@@ -110,7 +111,7 @@ class SampleControlledVocabsController < ApplicationController
 
   def typeahead
     scv = SampleControlledVocab.find(params[:scv_id])
-    results = scv.sample_controlled_vocab_terms.where('LOWER(label) like :query OR LOWER(iri) LIKE :query',
+    results = scv.sample_controlled_vocab_terms.where('LOWER(label) like :query',
                                                       query: "%#{params[:query].downcase}%").limit(params[:limit] || 100)
     items = results.map do |term|
       { id: term.label,

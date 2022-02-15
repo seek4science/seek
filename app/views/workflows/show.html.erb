@@ -1,74 +1,91 @@
-<%= render partial: 'general/item_title', locals: { item: @workflow,
-                                                    version: @display_workflow.version,
-                                                    buttons_partial: 'assets/asset_buttons' } -%>
+<%= render partial: 'general/show_page_tab_definitions' %>
 
-<%= render partial: 'assets/upload_new_version_form', locals: { resource: @workflow } -%>
+<div class="tab-content">
 
-<div class="row">
-  <% if @display_workflow&.content_blob&.remote_content_fetch_task&.pending? %>
-    <div class="col-sm-12">
-      <%= alert_box('info', hide_button: true) do %>
-        The content of this workflow has not yet been downloaded. Please check back later.
-      <% end %>
-    </div>
-  <% end %>
-  <div class="col-md-9 col-sm-8 box_about_actor">
-    <% if @display_workflow.maturity_level %>
-      <p>
-        <%= maturity_badge(@display_workflow.maturity_level) %>
-      </p>
-    <% end %>
+  <div id="details" class="tab-pane fade in active">
 
-    <div id="description">
-      <%= item_description(@display_workflow.description) %>
-    </div>
+    <%= render partial: 'general/item_title', locals: { item: @workflow,
+                                                        version: @display_workflow.version,
+                                                        buttons_partial: 'assets/asset_buttons' } -%>
 
-    <% begin %>
-      <% if @display_workflow.diagram_exists? || @display_workflow.can_render_diagram? %>
-        <div class="row">
-          <div class="col-md-12">
-            <div class="workflow-diagram">
-              <%= image_tag(diagram_workflow_path(@workflow, version: @display_workflow.version)) %>
-            </div>
-          </div>
-        </div>
-      <% end %>
-    <% rescue StandardError => e %>
-      <% Rails.logger.error(e.inspect) %>
-      <% Rails.logger.error(e.backtrace.inspect) %>
-      <div class="alert alert-warning">Could not render the workflow diagram.</div>
-    <% end %>
+    <%= render partial: 'assets/upload_new_version_form', locals: { resource: @workflow } -%>
 
     <div class="row">
-      <div class="col-md-6">
-        <%= persistent_resource_id(@display_workflow) %>
+      <% if @display_workflow&.content_blob&.remote_content_fetch_task&.pending? %>
+        <div class="col-sm-12">
+          <%= alert_box('info', hide_button: true) do %>
+            The content of this workflow has not yet been downloaded. Please check back later.
+          <% end %>
+        </div>
+      <% end %>
+      <div class="col-md-9 col-sm-8 box_about_actor">
+        <strong><%= WorkflowClass.model_name.human %>: </strong> <%= @display_workflow.workflow_class_title -%>
 
-        <%= render partial: 'assets/special_auth_code_display', locals: { resource: @workflow } %>
-        <%= render partial: 'assets/asset_doi', locals: { displayed_resource: @display_workflow } %>
+        <div style="margin-bottom: 5px;">
+          <% if @display_workflow.maturity_level %>
+            <%= maturity_badge(@display_workflow.maturity_level) %>
+          <% end %>
+
+          <% if @display_workflow.test_status %>
+            <%= test_status_badge(@display_workflow.test_status) %>
+          <% end %>
+        </div>
+
+        <%= item_description(@display_workflow.description) %>
+
+        <% begin %>
+          <% if @display_workflow.diagram_exists? || @display_workflow.can_render_diagram? %>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="workflow-diagram">
+                  <%= image_tag(diagram_workflow_path(@workflow, version: @display_workflow.version)) %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        <% rescue StandardError => e %>
+          <% Rails.logger.error(e.inspect) %>
+          <% Rails.logger.error(e.backtrace.inspect) %>
+          <div class="alert alert-warning">Could not render the workflow diagram.</div>
+        <% end %>
+
+        <div class="row">
+          <div class="col-md-6">
+            <%= persistent_resource_id(@display_workflow) %>
+
+            <%= render partial: 'assets/special_auth_code_display', locals: { resource: @workflow } %>
+            <%= render partial: 'assets/asset_doi', locals: { displayed_resource: @display_workflow } %>
+          </div>
+        </div>
+
+        <% unless @display_workflow.internals.empty? %>
+          <div class="row">
+            <div class="col-md-12">
+              <%= render partial: 'workflows/workflow_internals', locals: { workflow: @display_workflow } %>
+            </div>
+          </div>
+        <% end %>
+
+        <%= rendered_asset_view(@display_workflow) %>
+
+        <%= render partial: 'workflow_data_files' if Seek::Config.data_files_enabled %>
+
+        <% if Seek::Config.isa_enabled %>
+          <%= render partial: 'general/isa_graph', locals: { root_item: @workflow, deep: true, include_parents: true } %>
+        <% end %>
+      </div>
+
+      <div class="col-md-3 col-sm-4">
+        <%= render partial: 'assets/resource_main_content_right', locals: { resource: @workflow, versioned_resource: @display_workflow } %>
       </div>
     </div>
 
-    <% unless @display_workflow.internals.empty? %>
-      <div class="row">
-        <div class="col-md-12">
-          <%= render partial: 'workflows/workflow_internals', locals: { workflow: @display_workflow } %>
-        </div>
-      </div>
-    <% end %>
+    <%= render partial: 'assets/resource_version_details', locals: { displayed_resource: @display_workflow, resource: @workflow } -%>
 
-    <%= rendered_asset_view(@display_workflow) %>
-
-    <% if Seek::Config.isa_enabled %>
-      <%= render partial: 'general/isa_graph', locals: { root_item: @workflow, deep: true, include_parents: true } %>
-    <% end %>
   </div>
 
-  <div class="col-md-3 col-sm-4">
-    <%= render partial: 'assets/resource_main_content_right', locals: { resource: @workflow, versioned_resource: @display_workflow } %>
+  <div id="related-items" class="tab-pane fade">
+    <%= render :partial => "general/items_related_to", :object => @workflow %>
   </div>
+
 </div>
-
-<%= render partial: 'assets/resource_version_details', locals: { displayed_resource: @display_workflow, resource: @workflow } -%>
-
-<%# get, classify and authorize all assets for this project -%>
-<%= render partial: 'general/items_related_to', object: @workflow %>

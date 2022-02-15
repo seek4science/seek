@@ -333,9 +333,11 @@ class DataFilesController < ApplicationController
     respond_to do |format|
       if handle_upload_data && @data_file.content_blob.save
         session[:uploaded_content_blob_id] = @data_file.content_blob.id
+        format.js
         format.html {}
       else
         session.delete(:uploaded_content_blob_id)
+        format.js
         format.html { render action: :new }
       end
     end
@@ -362,7 +364,7 @@ class DataFilesController < ApplicationController
       end
     rescue Exception => e
       Seek::Errors::ExceptionForwarder.send_notification(e, data:{message: "Problem attempting to extract from RightField for content blob #{params[:content_blob_id]}"})
-      session[:extraction_exception_message] = e.message
+      session[:extraction_exception_message] = 'Rightfield extraction error'
     end
 
     session[:processed_datafile] = @data_file
@@ -406,6 +408,7 @@ class DataFilesController < ApplicationController
     @data_file.assay_assets.build(assay_id: @assay.id) if @assay.persisted?
 
     respond_to do |format|
+      format.js
       format.html
     end
   end
@@ -527,10 +530,11 @@ class DataFilesController < ApplicationController
 
   def data_file_params
     params.require(:data_file).permit(:title, :description, :simulation_data, { project_ids: [] },
-                                      :license, :other_creators,{ event_ids: [] },
+                                      :license, *creator_related_params, { event_ids: [] },
                                       { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                      { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
-                                      { scales: [] }, { publication_ids: [] },
+                                      { assay_assets_attributes: [:assay_id, :relationship_type_id] },
+                                      { scales: [] }, { publication_ids: [] }, { workflow_ids: [] },
+                                      { workflow_data_files_attributes:[:id, :workflow_id, :workflow_data_file_relationship_id, :_destroy] },
                                       discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 

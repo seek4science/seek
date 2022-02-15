@@ -3,7 +3,7 @@ def load_seek_testing_defaults!
     silence_warnings do
       Settings.defaults[:is_virtualliver] = false
       Settings.defaults[:project_hierarchy_enabled] = true
-      Settings.defaults[:project_name] = 'Sysmo'
+      Settings.defaults[:instance_name] = 'Sysmo SEEK'
 
       Settings.defaults[:noreply_sender] ="no-reply@sysmo-db.org"
       Settings.defaults[:support_email_address] = 'support@seek.org'
@@ -39,6 +39,7 @@ def load_seek_testing_defaults!
       Settings.defaults[:collections_enabled] = true
       Settings.defaults[:documents_enabled] = true
       Settings.defaults[:events_enabled] = true
+      Settings.defaults[:human_diseases_enabled] = true
       Settings.defaults[:isa_enabled] = true
       Settings.defaults[:models_enabled] = true
       Settings.defaults[:organisms_enabled] = true
@@ -47,15 +48,17 @@ def load_seek_testing_defaults!
       Settings.defaults[:samples_enabled] = true
       Settings.defaults[:workflows_enabled] = true
 
-      Settings.defaults[:project_link] = 'http://www.sysmo.net'
-      Settings.defaults[:application_name] = 'Sysmo SEEK'
-      Settings.defaults[:dm_project_name] = "SysMO-DB"
-      Settings.defaults[:dm_project_link] = "http://www.sysmo-db.org"
-      Settings.defaults[:project_type] = 'Consortium'
+      Settings.defaults[:instance_link] = 'http://www.sysmo.net'
+      Settings.defaults[:application_name] = 'FAIRDOM-SEEK'
+      Settings.defaults[:instance_admins_name] = "SysMO-DB"
+      Settings.defaults[:instance_admins_link] = "http://www.sysmo-db.org"
       Settings.defaults[:header_image_enabled] = true
       Settings.defaults[:header_image_title] =  "SysMO-DB"
       Settings.defaults[:header_image_link] = "http://www.sysmo-db.org"
       Settings.defaults[:bioportal_api_key]="fish"
+
+      Settings.defaults[:about_instance_link_enabled] = true
+      Settings.defaults[:about_instance_admins_link_enabled] = true
 
       Settings.defaults[:technology_type_ontology_file] = "file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
       Settings.defaults[:modelling_analysis_type_ontology_file] = "file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
@@ -135,6 +138,12 @@ def load_seek_testing_defaults!
       Settings.defaults[:omniauth_github_enabled] = true
       Settings.defaults[:omniauth_github_client_id] = 'abc'
       Settings.defaults[:omniauth_github_secret] = '456'
+
+      Settings.defaults[:ga4gh_trs_api_enabled] = true
+
+      Settings.defaults[:life_monitor_url] = 'https://localhost:8000'
+      Settings.defaults[:life_monitor_client_id] = 'xyz'
+      Settings.defaults[:life_monitor_client_secret] = 'xyzabc'
     end
 end
 

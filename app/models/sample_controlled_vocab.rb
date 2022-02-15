@@ -16,6 +16,7 @@ class SampleControlledVocab < ApplicationRecord
 
   validates :title, presence: true, uniqueness: true
   validates :ols_root_term_uri, url: { allow_blank: true }
+  validates :key, uniqueness: { allow_blank: true }
 
   accepts_nested_attributes_for :sample_controlled_vocab_terms, allow_destroy: true
   accepts_nested_attributes_for :repository_standard, :reject_if => :check_repository_standard
@@ -35,12 +36,23 @@ class SampleControlledVocab < ApplicationRecord
   end
 
   def can_edit?(user = User.current_user)
-    samples.empty? && user && (!Seek::Config.project_admin_sample_type_restriction || user.is_admin_or_project_administrator?) && Seek::Config.samples_enabled
+    !system_vocab? && samples.empty? && user && (!Seek::Config.project_admin_sample_type_restriction || user.is_admin_or_project_administrator?) && Seek::Config.samples_enabled
+  end
+
+  # a vocabulary that is built in and seeded, and that other parts are dependent upon
+  def system_vocab?
+    # currently determined by whether it has a special key, which cannot be set by user defined CV's
+    key.present? && SystemVocabs.key_known?(key)
   end
 
   def self.can_create?
     # criteria is the same, and likely to always be
     SampleType.can_create?
+  end
+
+  # whether the controlled vocab is linked to an ontology
+  def ontology_based?
+    source_ontology.present? && ols_root_term_uri.present?
   end
 
   private
@@ -55,6 +67,25 @@ class SampleControlledVocab < ApplicationRecord
       return true
     end
     return false
+  end
+
+  class SystemVocabs
+
+    KEYS = {
+      edam_topics: 'edam_topics',
+      edam_operations: 'edam_operations'
+    }
+
+    def self.key_known?(key)
+      KEYS.values.include?(key)
+    end
+
+    KEYS.each do |k, v|
+      define_singleton_method "#{k}_controlled_vocab" do
+        SampleControlledVocab.find_by_key(v)
+      end
+    end
+
   end
   
 end

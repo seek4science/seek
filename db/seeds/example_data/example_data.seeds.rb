@@ -215,10 +215,9 @@ Seek::Config.home_description = '<p style="text-align:center;font-size:larger;fo
 Seek::Config.solr_enabled = true
 Seek::Config.programmes_enabled = true
 Seek::Config.programme_user_creation_enabled = true
-Seek::Config.front_page_buttons_enabled = true
 Seek::Config.noreply_sender = 'no-reply@fair-dom.org'
-Seek::Config.project_name = 'SEEK SANDBOX'
-Seek::Config.application_name = 'SEEK SANDBOX'
+Seek::Config.instance_name = 'SEEK SANDBOX'
+Seek::Config.application_name = 'FAIRDOM-SEEK'
 Seek::Config.exception_notification_enabled = true
 Seek::Config.exception_notification_recipients = ['errors@fair-dom.org']
 Seek::Config.datacite_url = 'https://mds.test.datacite.org/'
