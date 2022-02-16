@@ -30,4 +30,10 @@ class Placeholder < ApplicationRecord
   def is_discussable?
     false
   end
+
+  def self.user_creatable?
+    Seek::Config.placeholders_enabled
+  end
+
 end
+
