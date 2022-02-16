@@ -37,7 +37,7 @@ en:
   event: "Event"
   collection: "Collection"
   collections:
-    info_text: "A collection can be used to group things together that don’t belong in any other kind of hierarchy eg. ISA"
+    info_text: "A collection can be used to group items together that don’t belong in any other kind of hierarchy eg. ISA"
 
   sample: "Sample"
   sample_type: "Sample type"
