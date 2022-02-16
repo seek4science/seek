@@ -23,7 +23,6 @@ module HelpHelper
 
   def index_and_new_help_icon(clz)
     key = clz.to_s.underscore.pluralize + ".info_text"
-    pp key
     if (I18n.exists?(key))
       help_icon_with_link(clz.to_s, t(key))
     end
