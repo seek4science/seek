@@ -5,8 +5,19 @@ layout: page
 
 # Collections
 
-A Collection is a curated, ordered list of SEEK assets (Data Files, SOPs, etc.). 
-They can be used to group things together that don't belong in any other kind of hierarchy eg. ISA.
+A collection is a group of SEEK items that are conceptually related to each other. Items within a collection can be ordered.
+
+SEEK items that can be part of a collection are:
+
+    Assets (except other collections)
+    Activities
+    Samples
+
+SEEK items that cannot be part of a collection are:
+
+    Yellow pages
+    Experiments
+    Other collections
 
 ## Creating a Collection
 
