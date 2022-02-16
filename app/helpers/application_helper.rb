@@ -523,7 +523,8 @@ module ApplicationHelper
   def index_and_new_help_icon(clz)
     help_text = index_and_new_explanation_messages[clz]
     unless (help_text.nil?)
-      help_icon(help_text) + help_link(clz)
+      #help_icon(help_text) + help_link(clz)
+      help_icon_with_link(clz.to_s, help_text)
     end
   end
 
