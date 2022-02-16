@@ -71,7 +71,11 @@ Templates.init = function (elem) {
   setTemplate();
 };
 
-const remove = (e) => Templates.table.row($j(e).closest("tr")).remove().draw();
+const remove = (e) =>{
+  const currentPage = Templates.table.page()
+  Templates.table.row($j(e).closest("tr")).remove().draw();
+  Templates.table.page(currentPage).draw(false);
+}
 const handleClick = (e) => (Templates.table.row($j(e).closest("tr")).data()[0] = $j(e).is(":checked"));
 
 function loadTemplates(data) {
