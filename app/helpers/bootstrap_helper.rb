@@ -131,6 +131,7 @@ module BootstrapHelper
   def objects_input(name, existing_objects = [], options = {})
     options['data-role'] = 'seek-objectsinput'
     options['data-tags-limit'] = options.delete(:limit) if options[:limit]
+    options['data-ontology'] = options.delete(:ontology) if options[:ontology]
     options.merge!(typeahead_options(options.delete(:typeahead))) if options[:typeahead]
 
     unless existing_objects.empty?
