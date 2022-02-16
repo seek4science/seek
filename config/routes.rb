@@ -18,7 +18,7 @@ SEEK::Application.routes.draw do
         get 'tools/:id/versions' => 'tool_versions#index'
         get 'tools/:id/versions/:version_id' => 'tool_versions#show'
         get 'tools/:id/versions/:version_id/containerfile' => 'tool_versions#containerfile'
-        get 'tools/:id/versions/:version_id/:type/descriptor(/:relative_path)' => 'tool_versions#descriptor', constraints: { relative_path: /.+/ }
+        get 'tools/:id/versions/:version_id/:type/descriptor(/*relative_path)' => 'tool_versions#descriptor', constraints: { relative_path: /.+/ }, format: false, as: :tool_versions_descriptor
         get 'tools/:id/versions/:version_id/:type/files' => 'tool_versions#files', format: false
         get 'tools/:id/versions/:version_id/:type/tests' => 'tool_versions#tests'
         get 'toolClasses' => 'general#tool_classes'
@@ -38,6 +38,7 @@ SEEK::Application.routes.draw do
         get :view_content
         get :get_pdf
         get :download
+        delete :destroy
       end
     end
   end
@@ -490,11 +491,11 @@ SEEK::Application.routes.draw do
         post :create_from_existing
       end
     end
-    resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, only: [:index]
+    resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, :workflows, only: [:index]
   end
 
   resources :presentations, concerns: [:has_content_blobs, :publishable, :has_versions, :asset] do
-    resources :people, :programmes, :projects, :publications, :events, :collections, only: [:index]
+    resources :people, :programmes, :projects, :publications, :events, :collections, :workflows, only: [:index]
   end
 
   resources :models, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
@@ -533,6 +534,7 @@ SEEK::Application.routes.draw do
       get :provide_metadata
       post :metadata_extraction_ajax
       post :create_metadata
+      get :filter
     end
     member do
       get :diagram
@@ -540,7 +542,7 @@ SEEK::Application.routes.draw do
       get :new_version
       post :create_version_metadata
     end
-    resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :sops, :collections, only: [:index]
+    resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :sops, :collections, :presentations, :documents, :data_files, only: [:index]
   end
 
   resources :workflow_classes, except: [:show]
@@ -576,7 +578,7 @@ SEEK::Application.routes.draw do
     concerns :has_dashboard, controller: :programme_stats
   end
 
-  resources :publications, concerns: [:asset] do
+  resources :publications, concerns: [:asset, :has_content_blobs] do
     collection do
       get :query_authors
       get :query_authors_typeahead
@@ -585,9 +587,15 @@ SEEK::Application.routes.draw do
       post :update_metadata
     end
     member do
+      get :manage
+      get :download
+      get :upload_fulltext
+      get :soft_delete_fulltext
+      post :update_annotations_ajax
       post :disassociate_authors
       post :update_metadata
       post :request_contact
+      post :upload_pdf
     end
     resources :people, :programmes, :projects, :investigations, :assays, :studies, :models, :data_files, :documents, :presentations, :organisms, :events, :collections, only: [:index]
   end
@@ -699,7 +707,7 @@ SEEK::Application.routes.draw do
   ### DOCUMENTS
 
   resources :documents, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
-    resources :people, :programmes, :projects, :programmes, :investigations, :assays, :studies, :publications, :events, :collections, only: [:index]
+    resources :people, :programmes, :projects, :programmes, :investigations, :assays, :studies, :publications, :events, :collections, :workflows, only: [:index]
   end
 
   resources :collections, concerns: [:publishable, :has_doi, :asset] do

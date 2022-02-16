@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'minitest/mock'
 
 class Ga4ghTrsApiTest < ActionDispatch::IntegrationTest
   include AuthenticatedTestHelper
@@ -84,5 +85,16 @@ class Ga4ghTrsApiTest < ActionDispatch::IntegrationTest
       crate = ROCrate::WorkflowCrateReader.read_zip(t.path, target_dir: dir)
       assert crate.main_workflow
     end
+  end
+
+  test 'should throw spec-compliant JSON error if unexpected error occurs' do
+    workflow = Factory(:generated_galaxy_ro_crate_workflow, policy: Factory(:public_policy))
+    Workflow.stub(:find_by_id, -> (_) { raise 'oh no!' }) do
+      get "/ga4gh/trs/v2/tools/#{workflow.id}/versions/1/containerfile"
+    end
+
+    assert_response :internal_server_error
+    r = JSON.parse(@response.body)
+    assert r['message'].include?('An unexpected error')
   end
 end

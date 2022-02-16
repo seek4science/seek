@@ -202,7 +202,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
 
   test 'space' do
     endpoint = Factory(:openbis_endpoint)
-    space = endpoint.space
+    space = endpoint.do_authentication.space
     refute_nil space
     assert_equal 'API-SPACE', space.perm_id
   end
@@ -262,7 +262,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
     pa = Factory(:project_administrator)
     endpoint = Factory(:openbis_endpoint, project: pa.projects.first)
     metadata_store = endpoint.metadata_store
-    key = endpoint.space.cache_key(endpoint.space_perm_id)
+    key = endpoint.do_authentication.space.cache_key(endpoint.space_perm_id)
     assert metadata_store.exist?(key)
     assert_difference('OpenbisEndpoint.count', -1) do
       User.with_current_user(pa.user) do
@@ -274,7 +274,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
 
   test 'clear metadata store' do
     endpoint = Factory(:openbis_endpoint)
-    key = endpoint.space.cache_key(endpoint.space_perm_id)
+    key = endpoint.do_authentication.space.cache_key(endpoint.space_perm_id)
     assert endpoint.metadata_store.exist?(key)
     endpoint.clear_metadata_store
     refute endpoint.metadata_store.exist?(key)
@@ -282,7 +282,7 @@ class OpenbisEndpointTest < ActiveSupport::TestCase
 
   test 'clears metadata store on details update' do
     endpoint = Factory(:openbis_endpoint)
-    key = endpoint.space.cache_key(endpoint.space_perm_id)
+    key = endpoint.do_authentication.space.cache_key(endpoint.space_perm_id)
     assert endpoint.metadata_store.exist?(key)
 
     disable_authorization_checks do

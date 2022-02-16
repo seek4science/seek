@@ -1,35 +1,45 @@
-<%= render :partial => "general/item_title",:locals=>{:item=>@institution, :buttons_partial => 'institutions/buttons'} -%>
+<%= render partial: 'general/show_page_tab_definitions' %>
 
-<div class="row">
-  <div class="col-md-9 col-sm-8 box_about_actor">
-    <p class="web_page">
-      <strong>Web page: </strong><%= text_or_not_specified(@institution.web_page, :external_link=>true) -%>
-    </p>
+<div class="tab-content">
 
-    <p class="country">
-      <strong>Country: </strong><%= country_text_or_not_specified @institution.country -%>
-    </p>
+  <div id="details" class="tab-pane fade in active">
+    <%= render :partial => "general/item_title", :locals => { :item => @institution, :buttons_partial => 'institutions/buttons' } -%>
 
-    <p class="city">
-      <strong>City: </strong><%= text_or_not_specified @institution.city %>
-    </p>
+    <div class="row">
+      <div class="col-md-9 col-sm-8 box_about_actor">
+        <p class="web_page">
+          <strong>Web page: </strong><%= text_or_not_specified(@institution.web_page, :external_link => true) -%>
+        </p>
 
-    <p class="address">
-      <strong>Address: </strong><%= text_or_not_specified @institution.address, :address=>true %>
-    </p>
+        <p class="country">
+          <strong>Country: </strong><%= country_text_or_not_specified @institution.country -%>
+        </p>
+
+        <p class="city">
+          <strong>City: </strong><%= text_or_not_specified @institution.city %>
+        </p>
+
+        <p class="address">
+          <strong>Address: </strong><%= text_or_not_specified @institution.address, :address => true %>
+        </p>
+      </div>
+
+      <div class="col-md-3 col-sm-4">
+        <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @institution } -%>
+
+        <% if @institution.is_discussable? -%>
+          <% if @institution.discussion_links.select { |link| link.url.present? }.any? %>
+            <%= render partial: 'assets/discussion_links_box', locals: { resource: @institution } -%>
+          <% end -%>
+        <% end -%>
+
+
+      </div>
+    </div>
   </div>
 
-  <div class="col-md-3 col-sm-4">
-    <%= render :partial => "layouts/contribution_section_box_avatar", :locals => { :object => @institution } -%>
-
-    <% if @institution.is_discussable? -%>
-      <% if @institution.discussion_links.select{|link| link.url.present?}.any?  %>
-        <%= render partial: 'assets/discussion_links_box', locals: {resource: @institution } -%>
-      <% end -%>
-    <% end -%>
-
-
+  <div id="related-items" class="tab-pane fade">
+    <%= render :partial => "general/items_related_to", :object => @institution %>
   </div>
+
 </div>
-
-<%= render :partial=>"general/items_related_to",:object => @institution %>

@@ -25,6 +25,7 @@ class ApplicationRecord < ActiveRecord::Base
   include Seek::Permissions::ActsAsAuthorized
   include Seek::RelatedItems
   include HasTasks
+  include HasEdamAnnotations
 
   include Annotations::Acts::Annotatable
   include Annotations::Acts::AnnotationSource

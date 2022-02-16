@@ -135,7 +135,7 @@ module Ga4gh
           get :descriptor, params: { id: workflow.id, version_id: 1, type: 'PLAIN_GALAXY', relative_path: 'Genomics-1-PreProcessing_without_downloading_from_SRA.svg' }
 
           assert_response :success
-          assert_equal 'text/plain; charset=utf-8', @response.headers['Content-Type']
+          assert_equal "image/svg+xml; charset=utf-8", @response.headers['Content-Type']
           assert @response.body.start_with?('<?xml version="1')
         end
 
@@ -250,6 +250,34 @@ module Ga4gh
           assert galaxy
           assert_equal 'PRIMARY_DESCRIPTOR', galaxy['file_type']
           refute diagram
+        end
+
+        test 'should work with snakemake' do
+          workflow = Factory(:workflow, workflow_class: Factory(:unextractable_workflow_class, key: 'snakemake', title: 'Snakemake'), policy: Factory(:public_policy))
+
+          get :files, params: { id: workflow.id, version_id: 1, type: 'SMK' }
+
+          assert_response :success
+        end
+
+        test 'should get descriptor containing URL for binary file' do
+          workflow = Factory(:nf_core_ro_crate_workflow, policy: Factory(:public_policy))
+
+          get :descriptor, params: { id: workflow.id, version_id: 1, type: 'NFL', relative_path: 'docs/images/nfcore-ampliseq_logo.png' }, format: :json
+
+          assert_response :success
+          assert_equal 'application/json; charset=utf-8', @response.headers['Content-Type']
+          h = JSON.parse(@response.body)
+          assert_nil h['content']
+          assert_equal "http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1/PLAIN_NFL/descriptor/docs/images/nfcore-ampliseq_logo.png", h['url']
+        end
+
+        test 'should get raw descriptor for binary file' do
+          workflow = Factory(:nf_core_ro_crate_workflow, policy: Factory(:public_policy))
+
+          get :descriptor, params: { id: workflow.id, version_id: 1, type: 'PLAIN_NFL', relative_path: 'docs/images/nfcore-ampliseq_logo.png' }
+          assert_response :success
+          assert_equal 'PNG', @response.body.force_encoding('ASCII-8BIT')[1..3]
         end
       end
     end

@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class SampleTypesControllerTest < ActionController::TestCase
+
   include RestTestCases
   include AuthenticatedTestHelper
 
@@ -18,7 +19,7 @@ class SampleTypesControllerTest < ActionController::TestCase
   end
 
   def rest_api_test_object
-    @object = @sample_type # Factory(:sample_type, project_ids: @project_ids)
+    @object = Factory(:max_sample_type, project_ids: @project_ids)
   end
 
   test 'should get index' do
@@ -51,7 +52,10 @@ class SampleTypesControllerTest < ActionController::TestCase
                                                        },
                                                        '1' => {
                                                          pos: '2', title: 'a number', required: '1',
-                                                         sample_attribute_type_id: @int_type.id, _destroy: '0'
+                                                         sample_attribute_type_id: @int_type.id, _destroy: '0',
+                                                         description: 'this is a number',
+                                                         pid: 'scheme:id'
+
                                                        }
                                                      },
                                                      tags: 'fish,golf' } }
@@ -69,7 +73,14 @@ class SampleTypesControllerTest < ActionController::TestCase
     assert_equal 'The description!!', type.description
     assert_equal @project_ids.sort, type.project_ids.sort
     assert_equal 2, type.sample_attributes.size
+
     assert_equal 'a string', type.sample_attributes.title_attributes.first.title
+    assert_nil type.sample_attributes.first.description
+    assert_nil type.sample_attributes.first.pid
+    assert_equal 'a number', type.sample_attributes.second.title
+    assert_equal 'this is a number', type.sample_attributes.second.description
+    assert_equal 'scheme:id', type.sample_attributes.second.pid
+
     assert_equal [@project], type.projects
     refute type.uploaded_template?
     assert_equal %w[fish golf], type.tags.sort
@@ -367,9 +378,12 @@ class SampleTypesControllerTest < ActionController::TestCase
 
     get :show, params: { id: linked_type.id }
 
-    assert_select 'li', text: /patient \(#{linked_attribute.sample_attribute_type.title}/i do
-      assert_select 'a[href=?]', sample_type_path(sample_type_linked_to), text: sample_type_linked_to.title
+    assert_select 'table tbody' do
+      assert_select 'td', text: /#{linked_attribute.sample_attribute_type.title}/i do
+        assert_select 'a[href=?]', sample_type_path(sample_type_linked_to), text: sample_type_linked_to.title
+      end
     end
+
   end
 
   test 'add attribute button' do

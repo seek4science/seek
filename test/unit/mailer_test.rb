@@ -122,7 +122,7 @@ class MailerTest < ActionMailer::TestCase
     item = Factory(:data_file, projects: gatekeeper.projects, title: 'Picture', contributor:person)
     items_and_comments = [{ item: item, comment: nil }]
     requester = Factory(:person, first_name: 'Aaron', last_name: 'Spiggle')
-    @expected.subject = 'A Sysmo SEEK gatekeeper approved your publishing requests.'
+    @expected.subject = "A Sysmo SEEK #{I18n.t('asset_gatekeeper').downcase} approved your publishing requests."
 
     @expected.to = requester.email_with_name
     @expected.from = 'no-reply@sysmo-db.org'
@@ -132,6 +132,7 @@ class MailerTest < ActionMailer::TestCase
     expected_text = encode_mail(@expected)
     expected_text.gsub!('-person_id-', gatekeeper.id.to_s)
     expected_text.gsub!('-df_id-', item.id.to_s)
+    expected_text.gsub!('-asset_gatekeeper-', I18n.t('asset_gatekeeper').downcase)
 
     assert_equal expected_text, encode_mail(Mailer.gatekeeper_approval_feedback(requester, gatekeeper, items_and_comments))
   end
@@ -143,7 +144,7 @@ class MailerTest < ActionMailer::TestCase
     items_and_comments = [{ item: item, comment: 'not ready' }]
 
     requester = Factory(:person, first_name: 'Aaron', last_name: 'Spiggle')
-    @expected.subject = 'A Sysmo SEEK gatekeeper rejected your publishing requests.'
+    @expected.subject = "A Sysmo SEEK #{I18n.t('asset_gatekeeper').downcase} rejected your publishing requests."
 
     @expected.to = requester.email_with_name
     @expected.from = 'no-reply@sysmo-db.org'
@@ -154,6 +155,7 @@ class MailerTest < ActionMailer::TestCase
     expected_text = encode_mail(@expected)
     expected_text.gsub!('-person_id-', gatekeeper.id.to_s)
     expected_text.gsub!('-df_id-', item.id.to_s)
+    expected_text.gsub!('-asset_gatekeeper-', I18n.t('asset_gatekeeper').downcase)
 
     assert_equal expected_text, encode_mail(Mailer.gatekeeper_reject_feedback(requester, gatekeeper, items_and_comments))
   end
@@ -272,7 +274,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'test mail' do
-    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+    with_config_value(:instance_name, 'SEEK EMAIL TEST') do
       with_config_value(:site_base_host, 'http://fred.com') do
         email = Mailer.test_email('fred@email.com')
         assert_not_nil email
@@ -286,7 +288,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'test mail with https host' do
-    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+    with_config_value(:instance_name, 'SEEK EMAIL TEST') do
       with_config_value(:site_base_host, 'https://securefred.com:1337') do
         email = Mailer.test_email('fred@email.com')
         assert_not_nil email
@@ -300,7 +302,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'request join project with new institution' do
-    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+    with_config_value(:instance_name, 'SEEK EMAIL TEST') do
       with_config_value(:site_base_host, 'https://hub.com') do
         project = Factory(:project)
         institution = Institution.new({title:'My lovely institution', web_page:'http://inst.org', country:'DE'})
@@ -315,7 +317,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'request join project existing institution' do
-    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+    with_config_value(:instance_name, 'SEEK EMAIL TEST') do
       with_config_value(:site_base_host, 'https://securefred.com:1337') do
         project = Factory(:project)
         institution = Factory(:institution)
@@ -331,7 +333,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'request create project for programme' do
-    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+    with_config_value(:instance_name, 'SEEK EMAIL TEST') do
       with_config_value(:site_base_host, 'https://securefred.com:1337') do
         programme_admin = Factory(:programme_administrator)
         programme = programme_admin.programmes.first
@@ -348,29 +350,8 @@ class MailerTest < ActionMailer::TestCase
     end
   end
 
-  test 'request create project for programme admins' do
-    admin = Factory(:admin)
-    programme_admin = Factory(:programme_administrator)
-    programme = programme_admin.programmes.first
-    with_config_value(:application_name, 'SEEK EMAIL TEST') do
-      with_config_value(:site_base_host, 'https://securefred.com:1337') do        
-        with_config_value(:managed_programme_id, programme.id) do
-          refute_empty programme.programme_administrators
-          project = Project.new(title:'My lovely project')
-          institution = Factory(:institution)
-          sender = Factory(:person)
-          log = ProjectCreationMessageLog.log_request(sender:sender, programme:programme, project:project, institution: institution)
-          email = Mailer.request_create_project_for_programme_admins(sender.user, programme, project.to_json, institution.to_json,log)
-          refute_nil email
-          refute_nil email.body
-          assert_equal Person.admins.collect(&:email), email.to
-        end        
-      end
-    end
-  end
-
   test 'request create project' do
-    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+    with_config_value(:instance_name, 'SEEK EMAIL TEST') do
       with_config_value(:site_base_host, 'https://securefred.com:1337') do
         project = Project.new(title:'My lovely project')
         institution = Factory(:institution)
@@ -384,7 +365,7 @@ class MailerTest < ActionMailer::TestCase
   end
 
   test 'request create project and programme' do
-    with_config_value(:application_name, 'SEEK EMAIL TEST') do
+    with_config_value(:instance_name, 'SEEK EMAIL TEST') do
       with_config_value(:site_base_host, 'https://securefred.com:1337') do
         institution = Institution.new({title:'My lovely institution', web_page:'http://inst.org', country:'DE'})
         project = Project.new(title:'My lovely project')
@@ -417,6 +398,68 @@ class MailerTest < ActionMailer::TestCase
     refute_nil email.body
   end
 
+  test 'notify_admins_project_creation_accepted' do
+    responder = Factory(:programme_administrator)
+    requester = Factory(:person)
+    project = responder.projects.first
+
+    email = Mailer.notify_admins_project_creation_accepted(responder, requester, project)
+    refute_nil email
+    refute_nil email.body
+  end
+
+  test 'notify_admins_project_join_accepted' do
+    responder = Factory(:project_administrator)
+    requester = Factory(:person)
+    project = responder.projects.first
+
+    email = Mailer.notify_admins_project_join_accepted(responder, requester, project)
+    refute_nil email
+    refute_nil email.body
+  end
+
+  test 'notify_admins_project_join_rejected' do
+    responder = Factory(:project_administrator)
+    requester = Factory(:person)
+    project = responder.projects.first
+
+    email = Mailer.notify_admins_project_join_rejected(responder, requester, project, "we don't want you here")
+    refute_nil email
+    refute_nil email.body
+  end
+
+  test 'notify_admins_project_creation_rejected existing programme' do
+    responder = Factory(:programme_administrator)
+    requester = Factory(:person)
+    project = Factory.build(:project)
+    programme = responder.programmes.first
+
+    email = Mailer.notify_admins_project_creation_rejected(responder, requester, project.title, programme.to_json, "sorry")
+    refute_nil email
+    refute_nil email.body
+  end
+
+  test 'notify_admins_project_creation_rejected nil programme' do
+    responder = Factory(:admin)
+    requester = Factory(:person)
+    project = Factory.build(:project)
+
+    email = Mailer.notify_admins_project_creation_rejected(responder, requester, project.title, nil, "sorry")
+    refute_nil email
+    refute_nil email.body
+  end
+
+  test 'notify_admins_project_creation_rejected new programme' do
+    responder = Factory(:admin)
+    requester = Factory(:person)
+    project = Factory.build(:project)
+    programme = Factory.build(:programme)
+    assert_nil programme.id
+
+    email = Mailer.notify_admins_project_creation_rejected(responder, requester, project.title, programme.to_json, "sorry")
+    refute_nil email
+    refute_nil email.body
+  end
 
   private
 

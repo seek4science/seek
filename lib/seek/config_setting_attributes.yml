@@ -11,8 +11,7 @@ registration_disabled_description:
 activation_required_enabled:
 smtp:
   encrypt: true
-project_type:
-project_link:
+instance_link:
 type_managers_enabled:
 type_managers:
 pubmed_api_email:
@@ -23,12 +22,11 @@ copyright_addendum_content:
 noreply_sender:
 solr_enabled:
 application_name:
-project_long_name:
-project_name:
-project_description:
-project_keywords:
-dm_project_name:
-dm_project_link:
+instance_name:
+instance_description:
+instance_keywords:
+instance_admins_name:
+instance_admins_link:
 issue_tracker:
 header_image_link:
 header_image_title:
@@ -51,6 +49,8 @@ sabiork_ws_base_url:
 filestore_path:
 tagline_prefix:
 modelling_analysis_enabled:
+allow_publications_fulltext:
+allow_edit_of_registered_publ:
 human_diseases_enabled:
 jerm_enabled:
 email_enabled:
@@ -155,7 +155,6 @@ news_enabled:
 news_feed_urls:
 news_number_of_entries:
   convert: :to_i
-front_page_buttons_enabled:
 home_show_features:
 home_show_quickstart:
 home_show_my_items:
@@ -178,7 +177,8 @@ recommended_data_licenses:
 recommended_software_licenses:
 about_page_enabled:
 about_page:
-about_link:
+about_instance_link_enabled:
+about_instance_admins_link_enabled:
 cite_link:
 contact_link:
 funding_link:
@@ -248,3 +248,4 @@ cv_dropdown_limit:
   convert: :to_i
 tag_cloud_enabled:
 workflow_class_list_enabled:
+home_description_position:

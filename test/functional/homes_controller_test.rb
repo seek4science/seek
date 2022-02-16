@@ -29,7 +29,7 @@ class HomesControllerTest < ActionController::TestCase
   test 'test title' do
     login_as(:quentin)
     get :index
-    assert_select 'title', text: 'The Sysmo SEEK', count: 1
+    assert_select 'title', text: 'Sysmo SEEK', count: 1
   end
 
   test 'correct response to unknown action' do
@@ -442,20 +442,6 @@ class HomesControllerTest < ActionController::TestCase
     assert_select 'div#my-recent-contributions ul li a[href=?]', sop_path(sop), text: /A new sop/, count: 0
   end
 
-  test 'can enabled/disable front page buttons' do
-    login_as Factory(:user)
-    with_config_value :front_page_buttons_enabled, true do
-      get :index
-      assert_response :success
-      assert_select 'a.seek-homepage-button', count: 3
-    end
-    with_config_value :front_page_buttons_enabled, false do
-      get :index
-      assert_response :success
-      assert_select 'a.seek-homepage-button', count: 0
-    end
-  end
-
   test 'can get imprint page' do
     with_config_value :imprint_enabled, true do
       with_config_value :imprint_description, '<h1>Hello World</h1>' do
@@ -639,12 +625,12 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
 
-    assert_select 'div#home_explore_projects', count: 0
-    assert_select 'div#home_quick_start', count: 0
-    assert_select 'div#home_my_items', count: 0
-    assert_select 'div#home_features', count: 0
-    assert_select 'div#home_who_uses', count: 0
-    assert_select 'div#home_integrations', count: 0
+    assert_select 'div#home-explore-projects', count: 0
+    assert_select 'div#home-quick-start', count: 0
+    assert_select 'div#home-my-items', count: 0
+    assert_select 'div#home-features', count: 0
+    assert_select 'div#home-who-uses', count: 0
+    assert_select 'div#home-integrations', count: 0
 
     ##### full homepage no user logged in
 
@@ -669,12 +655,12 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
 
-    assert_select 'div#home_explore_projects', count: 1
-    assert_select 'div#home_quick_start', count: 0
-    assert_select 'div#home_my_items', count: 0
-    assert_select 'div#home_features', count: 1
-    assert_select 'div#home_who_uses', count: 1
-    assert_select 'div#home_integrations', count: 1
+    assert_select 'div#home-explore-projects', count: 1
+    assert_select 'div#home-quick-start', count: 0
+    assert_select 'div#home-my-items', count: 0
+    assert_select 'div#home-features', count: 1
+    assert_select 'div#home-who-uses', count: 1
+    assert_select 'div#home-integrations', count: 1
 
     ##### full homepage logged in
 
@@ -682,12 +668,12 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
 
-    assert_select 'div#home_explore_projects', count: 1
-    assert_select 'div#home_quick_start', count: 1
-    assert_select 'div#home_my_items', count: 1
-    assert_select 'div#home_features', count: 0 
-    assert_select 'div#home_who_uses', count: 0 
-    assert_select 'div#home_integrations', count: 0
+    assert_select 'div#home-explore-projects', count: 1
+    assert_select 'div#home-quick-start', count: 1
+    assert_select 'div#home-my-items', count: 1
+    assert_select 'div#home-features', count: 0
+    assert_select 'div#home-who_uses', count: 0
+    assert_select 'div#home-integrations', count: 0
 
     ### disabling tags removes tag cloud within explore project
     with_config_value :home_explore_projects, true do
@@ -704,7 +690,10 @@ class HomesControllerTest < ActionController::TestCase
 
     # about dropdown in navbar not shown if no options are configured
     Seek::Config.about_page_enabled = false
-    Seek::Config.about_link = ''
+    Seek::Config.instance_name = 'SEEK'
+    Seek::Config.instance_link = 'http://seek.com'
+    Seek::Config.about_instance_link_enabled=false
+    Seek::Config.about_instance_admins_link_enabled=false
     Seek::Config.cite_link = ''
     Seek::Config.contact_link = ''
 
@@ -712,17 +701,17 @@ class HomesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'li#navbar_about', count: 0
 
-    
-    Seek::Config.about_link = 'http://external_about.com'
+
     Seek::Config.cite_link = 'http://external_cite.com'
     Seek::Config.contact_link = 'http://external_contact.com'
     # funding link shown in footer if set
     Seek::Config.funding_link = 'http://external_funding.com'
+    Seek::Config.about_instance_link_enabled=true
 
     get :index
     assert_response :success
     assert_select 'li#navbar_about', count: 1
-    assert_select 'li#navbar_about a[href=?]', 'http://external_about.com', count:1
+    assert_select 'li#navbar_about a[href=?]', 'http://seek.com', count:1
     assert_select 'li#navbar_about a[href=?]', 'http://external_cite.com', count:1
     assert_select 'li#navbar_about a[href=?]', 'http://external_contact.com', count:1
     # contact and cite links are also shown in the footer ft

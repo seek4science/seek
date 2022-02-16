@@ -39,6 +39,7 @@ def load_seek_config_defaults!
   Seek::Config.default :community_news_feed_urls,''
   Seek::Config.default :community_news_number_of_entries,10
   Seek::Config.default :home_description, 'You can configure the text that goes here within the Admin pages: Site Configuration->Home page settings.'
+  Seek::Config.default :home_description_position, 'side'
   Seek::Config.default :tagline_prefix, 'Find, share and exchange <b>Data</b>, <b>Models</b> and <b>Processes</b> within the'
   Seek::Config.default :publish_button_enabled, true
   Seek::Config.default :auth_lookup_enabled,true
@@ -98,19 +99,20 @@ def load_seek_config_defaults!
 #time in minutes that the feeds on the front page are cached for
   Seek::Config.default :home_feeds_cache_timeout,30
 # Branding
-  Seek::Config.default :project_name,'FAIRDOM'
-  Seek::Config.default :project_type,''
-  Seek::Config.default :project_link,'http://www.fair-dom.org'
+  Seek::Config.default :instance_name,'FAIRDOM'
+  Seek::Config.default :instance_link,'http://www.fair-dom.org'
 
-  Seek::Config.default :application_name,"SEEK"
-  Seek::Config.default :dm_project_name,"FAIRDOM"
-  Seek::Config.default :dm_project_link,"http://www.fair-dom.org"
+  Seek::Config.default :instance_admins_name,"FAIRDOM"
+  Seek::Config.default :instance_admins_link,"http://www.fair-dom.org"
+
   Seek::Config.default :header_image_enabled,true
   Seek::Config.default :header_image_title, "FAIRDOM"
   Seek::Config.default :header_image_link,"http://www.fair-dom.org"
   Seek::Config.default :copyright_addendum_enabled,false
   Seek::Config.default :copyright_addendum_content,'Additions copyright ...'
   Seek::Config.default :issue_tracker, 'https://fair-dom.org/issues'
+
+  Seek::Config.fixed :application_name,"FAIRDOM-SEEK"
 
   #Imprint
   Settings.defaults[:imprint_enabled]= false
@@ -120,7 +122,8 @@ def load_seek_config_defaults!
   Settings.defaults[:about_page_enabled]= false
   Seek::Config.default :about_page, File.read(Rails.root.join('config/default_data/about_page_example'))
 
-  Seek::Config.default :about_link, ''
+  Seek::Config.default :about_instance_link_enabled, false
+  Seek::Config.default :about_instance_admin_link_enabled, false
   Seek::Config.default :cite_link, ''
   Seek::Config.default :contact_link, ''
 
@@ -207,7 +210,6 @@ def load_seek_config_defaults!
   Seek::Config.default :news_feed_urls,''
   Seek::Config.default :news_number_of_entries,10
   Seek::Config.default :recent_contributions_number_of_entries, 20
-  Seek::Config.default :front_page_buttons_enabled, false
   Seek::Config.default :tag_cloud_enabled,true
   Seek::Config.default :workflow_class_list_enabled,false
 

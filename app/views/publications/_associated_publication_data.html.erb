@@ -12,6 +12,8 @@
 
 <%= render partial: 'scales/scales_selector', locals: { object: @publication } if show_scales?%>
 
+<%= render :partial=> "assets/misc_links_form", :locals=>{:resource => @publication} -%>
+
 <%= render partial: 'assets/select_tags' -%>
 
 <%= publication_form.fancy_multiselect :human_diseases, { possibilities: HumanDisease.order(:title).all, with_new_link: true, hidden: false } %>
@@ -34,5 +36,11 @@
 
 <%= publication_form.fancy_multiselect :workflows, other_projects_checkbox: true %>
 
-<%= publication_form.submit  'Update',data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' %>
-or <%= cancel_button(publication_path(@publication)) %>
+<% if  params[:newly_created].nil? or params[:newly_created] == "false" %>
+  <%= publication_form.submit  'Update',data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' %>
+  or <%= cancel_button(publication_path(@publication)) %>
+<% else %>
+  <%= publication_form.submit  'Save',data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' %>
+  or <%= cancel_button(publication_path(@publication), button_text: 'Skip') %>
+  or <%= cancel_button(publication_path(@publication), button_text: 'Cancel and delete', method: :delete) -%>
+<% end %>

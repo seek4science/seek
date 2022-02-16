@@ -5,10 +5,8 @@ require 'cgi'
 module Seek
   class SabiorkWebservices
     def get_compound_annotation(compound_name)
-      url = URI.encode(webservice_base_url + 'compounds?compoundName=')
-      compound_name = URI.escape(compound_name, Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
-      url.concat(compound_name)
-      doc = get_xml_doc url
+      url = "#{webservice_base_url.chomp('/')}/compounds?compoundName=#{Addressable::URI.escape(compound_name)}"
+      doc = get_xml_doc(url)
       compound_annotations = { 'synonyms' => [], 'chebi_ids' => [], 'kegg_ids' => [] }
 
       unless doc.blank? || (doc.find('//Compound/sabioID').collect.blank?)

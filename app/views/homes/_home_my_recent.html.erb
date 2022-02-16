@@ -1,6 +1,6 @@
 <div id="my-recent-contributions">
-  <h3>My recent</h3>
-  <ul class="feed" style="max-height:400px; overflow:hidden; overflow-y:auto;">
+  <h3>My recent changes</h3>
+  <ul class="feed">
     <% activity = current_user.person.recent_activity(Seek::Config.recent_contributions_number_of_entries).select {|a| a.activity_loggable} %>
     <% items = convert_logs_to_hash(activity) %>
     <% if items.length == 0 %>

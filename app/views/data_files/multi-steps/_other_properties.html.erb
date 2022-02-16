@@ -11,7 +11,9 @@
                                                                   :existing_attributions => [], collapsed: @data_file.attributions.empty?} -%>
     <%= f.fancy_multiselect :publications, { hidden: @data_file.publications.empty?, other_projects_checkbox: true } %>
 
-    <%= fancy_multiselect @data_file, :events, { hidden: @data_file.events.empty?, other_projects_checkbox: true, sort_by: :start_date } %>
+    <%= f.fancy_multiselect :events, { hidden: @data_file.events.empty?, other_projects_checkbox: true, sort_by: :start_date } if Seek::Config.events_enabled %>
+
+    <%= render partial: 'associate_workflow', locals: {:f=>f, :resource => @data_file } if Seek::Config.workflows_enabled %>
 
     <div class='multi-step-buttons'>
       <%= multi_step_start_button %>

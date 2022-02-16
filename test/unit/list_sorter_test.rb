@@ -7,7 +7,8 @@ class ListSorterTest < ActiveSupport::TestCase
     assert_equal 'updated_at DESC', Seek::ListSorter.order_for_view('NewModelThatDoesntExist', :index)
     assert_equal 'updated_at DESC', Seek::ListSorter.order_for_view('NewModelThatDoesntExist', :related)
     assert_equal 'published_date DESC', Seek::ListSorter.order_for_view('Publication', :index)
-    assert_equal 'updated_at DESC', Seek::ListSorter.order_for_view('Assay', :related)
+    assert_equal 'updated_at DESC', Seek::ListSorter.order_for_view('Document', :related)
+    assert_equal 'position', Seek::ListSorter.order_for_view('Assay', :related)
 
     assert Seek::ListSorter::RULES.frozen?
   end

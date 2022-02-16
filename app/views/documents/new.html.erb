@@ -28,7 +28,11 @@
 
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @document} -%>
 
-      <%= fancy_multiselect @document, :events, { other_projects_checkbox: true, sort_by: :start_date } %>
+      <% if Seek::Config.events_enabled %>
+        <%= fancy_multiselect @document, :events, { other_projects_checkbox: true, sort_by: :start_date } %>
+      <% end %>
+
+      <%= fancy_multiselect @document, :workflows, :other_projects_checkbox=>true if Seek::Config.workflows_enabled %>
 
       <%= form_submit_buttons(@document) %>
 

@@ -165,8 +165,7 @@ class AdminController < ApplicationController
     Seek::Config.news_number_of_entries = entries if is_entries_integer
 
     Seek::Config.home_description = params[:home_description]
-
-    #    Seek::Config.front_page_buttons_enabled = params[:front_page_buttons_enabled]
+    Seek::Config.home_description_position = params[:home_description_position]
 
     Seek::Config.home_show_features = string_to_boolean params[:home_show_features]
     Seek::Config.home_show_quickstart = string_to_boolean params[:home_show_quickstart]
@@ -189,6 +188,8 @@ class AdminController < ApplicationController
     Seek::Config.tag_cloud_enabled = string_to_boolean params[:tag_cloud_enabled]
     Seek::Config.workflow_class_list_enabled = string_to_boolean params[:workflow_class_list_enabled]
 
+    expire_annotation_fragments
+
     update_redirect_to (is_entries_integer && (only_integer tag_threshold, 'tag threshold') && (only_positive_integer max_visible_tags, 'maximum visible tags')), 'home_settings'
   end
 
@@ -199,21 +200,16 @@ class AdminController < ApplicationController
   end
 
   def update_rebrand
-    Seek::Config.project_name = params[:project_name]
-    Seek::Config.project_type = params[:project_type]
-    Seek::Config.project_link = params[:project_link]
-    Seek::Config.project_description = params[:project_description]
-    Seek::Config.project_keywords = params[:project_keywords].split(',').collect(&:strip).reject(&:blank?).join(', ')
-    Seek::Config.project_long_name = params[:project_long_name]
+    Seek::Config.instance_name = params[:instance_name]
+    Seek::Config.instance_link = params[:instance_link]
+    Seek::Config.instance_description = params[:instance_description]
+    Seek::Config.instance_keywords = params[:instance_keywords].split(',').collect(&:strip).reject(&:blank?).join(', ')
 
-    Seek::Config.dm_project_name = params[:dm_project_name]
-    Seek::Config.dm_project_link = params[:dm_project_link]
+    Seek::Config.instance_admins_name = params[:instance_admins_name]
+    Seek::Config.instance_admins_link = params[:instance_admins_link]
     Seek::Config.issue_tracker = params[:issue_tracker]
 
-    Seek::Config.application_name = params[:application_name]
-
     Seek::Config.header_image_enabled = string_to_boolean params[:header_image_enabled]
-    Seek::Config.header_image_link = params[:header_image_link]
     Seek::Config.header_image_title = params[:header_image_title]
     header_image_file
 
@@ -226,7 +222,8 @@ class AdminController < ApplicationController
     Seek::Config.about_page_enabled = string_to_boolean params[:about_page_enabled]
     Seek::Config.about_page = params[:about_page]
 
-    Seek::Config.about_link = params[:about_link]
+    Seek::Config.about_instance_link_enabled = string_to_boolean params[:about_instance_link_enabled]
+    Seek::Config.about_instance_admins_link_enabled = string_to_boolean params[:about_instance_admins_link_enabled]
     Seek::Config.cite_link = params[:cite_link]
     Seek::Config.contact_link = params[:contact_link]
 
@@ -271,8 +268,17 @@ class AdminController < ApplicationController
     pubmed_email_valid = check_valid_email(pubmed_email, 'pubmed API email address')
     crossref_email = params[:crossref_api_email]
     crossref_email_valid = check_valid_email(crossref_email, 'crossref API email address')
+    Seek::Config.allow_publications_fulltext = string_to_boolean params[:allow_publications_fulltext]
+    Seek::Config.allow_edit_of_registered_publ = string_to_boolean params[:allow_edit_of_registered_publ]
     Seek::Config.pubmed_api_email = pubmed_email if pubmed_email == '' || pubmed_email_valid
     Seek::Config.crossref_api_email = crossref_email if crossref_email == '' || crossref_email_valid
+
+    if params[:session_store_timeout]
+      mins = params[:session_store_timeout].to_i
+      if mins >= 1
+        Seek::Config.session_store_timeout = mins.minutes
+      end
+    end
 
     Seek::Config.bioportal_api_key = params[:bioportal_api_key]
     Seek::Config.sabiork_ws_base_url = params[:sabiork_ws_base_url] unless params[:sabiork_ws_base_url].nil?
@@ -448,7 +454,7 @@ class AdminController < ApplicationController
     when 'non_project_members'
       partial = 'user_stats_list'
       collection = Person.without_group.registered
-      title = "Users are not in a #{Seek::Config.project_name} #{t('project')}"
+      title = "Users are not in a #{Seek::Config.instance_name} #{t('project')}"
     when 'profiles_without_users'
       partial = 'user_stats_list'
       collection = Person.userless_people

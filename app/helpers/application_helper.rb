@@ -225,7 +225,9 @@ module ApplicationHelper
       res = white_list(res)
       res = truncate_without_splitting_words(res, options[:length]) if options[:length]
       if options[:markdown]
-        res = render_markdown(res)
+        # Convert `&gt;` etc. back to `>` so markdown blockquotes can be used.
+        # The markdown renderer will cope with rogue `>`s that are not part of quotes.
+        res = render_markdown(CGI::unescapeHTML(res))
       elsif options[:description] || options[:address]
         res = simple_format(res, {}, sanitize: false).html_safe
       end
@@ -305,7 +307,7 @@ module ApplicationHelper
       title << t
       title
     else
-      "The #{Seek::Config.application_name}"
+      "#{Seek::Config.instance_name}"
     end
   end
 
