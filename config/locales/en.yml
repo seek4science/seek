@@ -36,6 +36,8 @@ en:
   presentation: "Presentation"
   event: "Event"
   collection: "Collection"
+  collections:
+    info_text: "A collection is a group of SEEK items that are conceptually related to each other."
 
   sample: "Sample"
   sample_type: "Sample type"
