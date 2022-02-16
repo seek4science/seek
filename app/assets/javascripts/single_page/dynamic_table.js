@@ -53,7 +53,7 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
       const columnDefs = [
         { orderable: false, targets: options.readonly ? [0] : [0, 1, 2] },
         {
-          targets: [1, 2],
+          targets: options.readonly ? [] : [1, 2],
           visible: false,
           searchable: false
         }
