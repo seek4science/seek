@@ -44,6 +44,15 @@
           <label>Root term</label>
           <%= f.text_field :ols_root_term_uri, :class => 'form-control', :placeholder => 'e.g. http://www.ebi.ac.uk/efo/EFO_0000635' %>
         </div>
+
+        <div class="checkbox">
+          <label>
+            <%= check_box_tag(:include_root_term, '1', false, name: nil, autocomplete: 'off') %>
+            <strong>Include root term?</strong>
+            <p class="help-block">If checked, the selected root term will be included in the list of options. Otherwise, only children of the root term will be included.</p>
+          </label>
+        </div>
+
         <div>
           <%= submit_tag 'Fetch', id: 'fetch-ontology-terms-submit', :class => 'btn btn-primary' %>
         </div>
@@ -61,8 +70,8 @@
         <table id="new-terms" class="table" style="width:100%;">
           <thead>
           <th>Label<span class="required">*</span></th>
-          <th>IRI</th>
-          <th>Parent IRI</th>
+          <th>URI</th>
+          <th>Parent URI</th>
           <th></th>
           </thead>
           <tbody>

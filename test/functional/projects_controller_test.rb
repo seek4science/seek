@@ -1922,7 +1922,7 @@ class ProjectsControllerTest < ActionController::TestCase
           project: { title: 'The Project', description: 'description', web_page: 'web_page'},
           institution: { id: institution.id }
       }
-      assert_enqueued_emails(2) do # programme admins, and instance admins
+      assert_enqueued_emails(1) do
         assert_difference('ProjectCreationMessageLog.count') do
           post :request_create, params: params
         end
@@ -2107,7 +2107,7 @@ class ProjectsControllerTest < ActionController::TestCase
         id:project.id
     }
 
-    assert_enqueued_emails(1) do
+    assert_enqueued_emails(2) do
       assert_no_difference('Institution.count') do
         assert_difference('GroupMembership.count') do
           post :respond_join_request, params:params
@@ -2177,7 +2177,7 @@ class ProjectsControllerTest < ActionController::TestCase
         id:project.id
     }
 
-    assert_enqueued_emails(1) do
+    assert_enqueued_emails(2) do
       assert_difference('Institution.count') do
         assert_difference('GroupMembership.count') do
           post :respond_join_request, params:params
@@ -2248,7 +2248,7 @@ class ProjectsControllerTest < ActionController::TestCase
         id:project.id
     }
 
-    assert_enqueued_emails(1) do
+    assert_enqueued_emails(2) do
       assert_no_difference('Institution.count') do
         assert_no_difference('GroupMembership.count') do
           post :respond_join_request, params:params
@@ -2375,7 +2375,7 @@ class ProjectsControllerTest < ActionController::TestCase
         }
     }
 
-    assert_enqueued_emails(1) do
+    assert_enqueued_emails(2) do
       assert_difference('Programme.count') do
         assert_difference('Project.count') do
           assert_difference('Institution.count') do
@@ -2574,7 +2574,7 @@ class ProjectsControllerTest < ActionController::TestCase
         }
     }
 
-    assert_enqueued_emails(1) do
+    assert_enqueued_emails(2) do
       assert_no_difference('Programme.count') do
         assert_difference('Project.count') do
           assert_no_difference('Institution.count') do
@@ -2764,7 +2764,7 @@ class ProjectsControllerTest < ActionController::TestCase
         }
     }
 
-    assert_enqueued_emails(1) do
+    assert_enqueued_emails(2) do
       assert_no_difference('Programme.count') do
         assert_no_difference('Project.count') do
           assert_no_difference('Institution.count') do

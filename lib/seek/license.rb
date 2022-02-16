@@ -24,7 +24,7 @@ module Seek
     [Seek::License::OPENDEFINITION, Seek::License::ZENODO].each do |category|
       category[:all] = category[:all]
                        .sort_by { |l| l['title'] }
-                       .sort_by { |l| l.key?('is_generic') && l['is_generic'] ? 1 : 0 }
+                       .sort_by { |l| l.key?('is_generic') && l['is_generic'] ? 0 : 1 }
 
       category[:data] = category[:all].select do |l|
         l['domain_data'] ||

@@ -92,9 +92,8 @@ gem 'seedbank'
 
 gem 'rspec-rails','~> 3.6'
 
-gem 'citeproc-ruby', '~> 1.1.4'
-gem 'citeproc', '~> 1.0.4'
-gem 'csl-styles', '~> 1.0.1.11'
+gem 'citeproc-ruby', '~> 2.0.0'
+gem 'csl-styles', '~> 2.0.0'
 gem 'bibtex-ruby', '~> 5.1.0'
 
 gem 'omniauth', '~> 1.3.1'
@@ -141,6 +140,8 @@ gem 'dotenv-rails', '~> 2.7.6'
 gem 'commonmarker'
 
 gem 'rack-cors', require: 'rack/cors'
+
+gem 'addressable', '~> 2.7.0'
 
 group :production do
   gem 'passenger'

@@ -71,7 +71,7 @@
               <% end %>
             <% end -%>
             <th>
-              <div id="tableview-colselector" class="dropdown">
+              <div id="tableview-colselector" class="dropdown pull-right">
                   <a href="#" class="dropdown-toggle"><span class="glyphicon glyphicon-cog"></span></a>
                   <div id="sortable-colselector" class="dropdown-menu" style="padding:0px;">
                     <% for column in availableColView -%>
@@ -117,6 +117,7 @@
   /* Removing data-toggle="dropdown" from 'tableview-colselector a' we can prevent it from closing */
   $j('#tableview-colselector a').on('click', function (event) {
       $j(this).parent().toggleClass('open');
+      return false;
   });
 
   $j('#view_tabs a').click(function () {

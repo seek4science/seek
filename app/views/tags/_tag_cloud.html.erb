@@ -1,11 +1,14 @@
 <%
-   show_overall||=false
-   method= show_overall_count ? :overall_total : :count
-   no_tags_text||=""
+  cache_key ||= nil
+  show_all ||= false
+
+  unless show_all
+    tags = tags.sort { |a, b| b.tag_count<=>a.tag_count }[0...Seek::Config.max_visible_tags]
+  end
+
 %>
 
-
-<div id="<%= id -%>" <%= "class='tags_smaller'" if tags_smaller -%>>
+<% cache_if(cache_key.present?, cache_key) do %>
   <div class="hTagcloud">
     <% if !tags.blank? -%>
         <div class="popularity">
@@ -14,7 +17,7 @@
           <% end -%>
         </div>
     <% else -%>
-        <p class="none_text"><%= h(no_tags_text) -%></p>
+        <p class="none_text"><%= h(no_tags_text) || '' %></p>
     <% end -%>
   </div>
-</div>
+<% end %>

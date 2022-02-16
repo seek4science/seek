@@ -51,6 +51,34 @@ ul.feed li:first-child {
   padding-top: 0;
 }
 
+div#my-recent-contributions .feed {
+  max-height:40em;
+  overflow:hidden;
+  overflow-y:auto;
+}
+
+div#home_who_uses_carousel div.carousel-logo img {
+  width:auto;
+  height:14em;
+}
+
+div#home_who_uses_carousel p.carousel-description {
+  font-size: 1.15em;
+}
+
+div#home_who_uses_carousel p.carousel-author {
+  font-style: italic;
+}
+
+div#home_who_uses_carousel .carousel-control {
+  background-image: none;
+  color:black;
+}
+
+div#home_who_uses_carousel .carousel-control span {
+  opacity: 0.4;
+}
+
 .file-type-icon {
   display: block;
   float: left;
@@ -316,52 +344,6 @@ a.select_assay_class:hover {
 
 label.admin-checkbox {
   font-weight: bold
-}
-
-.seek-homepage-button-container {
-  margin-bottom: 1em;
-  margin-top: 1em;
-}
-
-a.seek-homepage-button {
-  display: block;
-  font-size: 200%;
-  background-color: #f7f7f7;
-  border-radius: 4px;
-  padding: 20px;
-  margin: 5px;
-  text-decoration: none;
-
-  &:hover {
-    background-color: #f0f0f0;
-  }
-}
-
-.seek-homepage-button img, .seek-homepage-button span.glyphicon  {
-  display: block;
-  font-size: 80px;
-  margin: auto;
-  line-height: 120px;
-  color: #666;
-}
-
-@media (min-width: $screen-sm-min) {
-  .seek-homepage-button-container {
-    margin-bottom: 3em;
-    margin-top: 3em;
-  }
-
-  a.seek-homepage-button {
-    display: block;
-    text-align: center;
-  }
-
-  .seek-homepage-button img {
-    width: 200px;
-    height: 200px;
-    display: block;
-    margin: 5px auto;
-  }
 }
 
 div.isa_graph {
@@ -1196,4 +1178,8 @@ ul.workflow-port-type {
   ul.workflow-port-type {
     padding-left: 2em;
   }
+}
+
+div#super_tag_cloud {
+  font-size: x-large;
 }

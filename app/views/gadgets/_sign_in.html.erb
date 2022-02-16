@@ -58,7 +58,7 @@
               </div>
 
               <div class="form-group">
-                <%= submit_tag 'Log in', class: 'btn btn-default', id: 'login_button' %>
+                <%= submit_tag 'Log in', class: 'btn btn-primary', id: 'login_button' %>
               </div>
             <% end #form %>
           <% end %>
@@ -88,8 +88,9 @@
       </div>
 
       <div class="panel-footer">
-        <%= link_to "Need an account?", main_app.signup_url %> or
-        <%= link_to "Forgotten your password?", main_app.forgot_password_url %>
+        <%= link_to "Register an account", signup_path %> or
+        <%= link_to "Forgotten your password?", forgot_password_path %>
       </div>
+
     </div>
 <% end -%>

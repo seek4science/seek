@@ -350,27 +350,6 @@ class MailerTest < ActionMailer::TestCase
     end
   end
 
-  test 'request create project for programme admins' do
-    admin = Factory(:admin)
-    programme_admin = Factory(:programme_administrator)
-    programme = programme_admin.programmes.first
-    with_config_value(:instance_name, 'SEEK EMAIL TEST') do
-      with_config_value(:site_base_host, 'https://securefred.com:1337') do        
-        with_config_value(:managed_programme_id, programme.id) do
-          refute_empty programme.programme_administrators
-          project = Project.new(title:'My lovely project')
-          institution = Factory(:institution)
-          sender = Factory(:person)
-          log = ProjectCreationMessageLog.log_request(sender:sender, programme:programme, project:project, institution: institution)
-          email = Mailer.request_create_project_for_programme_admins(sender.user, programme, project.to_json, institution.to_json,log)
-          refute_nil email
-          refute_nil email.body
-          assert_equal Person.admins.collect(&:email), email.to
-        end        
-      end
-    end
-  end
-
   test 'request create project' do
     with_config_value(:instance_name, 'SEEK EMAIL TEST') do
       with_config_value(:site_base_host, 'https://securefred.com:1337') do
@@ -419,6 +398,68 @@ class MailerTest < ActionMailer::TestCase
     refute_nil email.body
   end
 
+  test 'notify_admins_project_creation_accepted' do
+    responder = Factory(:programme_administrator)
+    requester = Factory(:person)
+    project = responder.projects.first
+
+    email = Mailer.notify_admins_project_creation_accepted(responder, requester, project)
+    refute_nil email
+    refute_nil email.body
+  end
+
+  test 'notify_admins_project_join_accepted' do
+    responder = Factory(:project_administrator)
+    requester = Factory(:person)
+    project = responder.projects.first
+
+    email = Mailer.notify_admins_project_join_accepted(responder, requester, project)
+    refute_nil email
+    refute_nil email.body
+  end
+
+  test 'notify_admins_project_join_rejected' do
+    responder = Factory(:project_administrator)
+    requester = Factory(:person)
+    project = responder.projects.first
+
+    email = Mailer.notify_admins_project_join_rejected(responder, requester, project, "we don't want you here")
+    refute_nil email
+    refute_nil email.body
+  end
+
+  test 'notify_admins_project_creation_rejected existing programme' do
+    responder = Factory(:programme_administrator)
+    requester = Factory(:person)
+    project = Factory.build(:project)
+    programme = responder.programmes.first
+
+    email = Mailer.notify_admins_project_creation_rejected(responder, requester, project.title, programme.to_json, "sorry")
+    refute_nil email
+    refute_nil email.body
+  end
+
+  test 'notify_admins_project_creation_rejected nil programme' do
+    responder = Factory(:admin)
+    requester = Factory(:person)
+    project = Factory.build(:project)
+
+    email = Mailer.notify_admins_project_creation_rejected(responder, requester, project.title, nil, "sorry")
+    refute_nil email
+    refute_nil email.body
+  end
+
+  test 'notify_admins_project_creation_rejected new programme' do
+    responder = Factory(:admin)
+    requester = Factory(:person)
+    project = Factory.build(:project)
+    programme = Factory.build(:programme)
+    assert_nil programme.id
+
+    email = Mailer.notify_admins_project_creation_rejected(responder, requester, project.title, programme.to_json, "sorry")
+    refute_nil email
+    refute_nil email.body
+  end
 
   private
 

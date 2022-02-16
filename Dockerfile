@@ -1,4 +1,4 @@
-FROM ruby:2.6-buster
+FROM ruby:2.7-buster
 
 LABEL maintainer="Stuart Owen <orcid.org/0000-0003-2130-0865>, Finn Bacall"
 

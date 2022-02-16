@@ -230,6 +230,20 @@ asset_housekeeper: 'roles/role-asset-housekeeper.png'
 admin: 'roles/role-admin.png'
 pal: 'roles/role-pal.png'
 
+# front page
+front_page_feature_organise: 'front_page/home_feature_organise.svg'
+front_page_feature_collaborate: 'front_page/home_feature_collaborate.svg'
+front_page_feature_standardise: 'front_page/home_feature_standardise.svg'
+front_page_feature_publish: 'front_page/home_feature_publish.svg'
+front_page_integrations: 'front_page/integrations.svg'
+
+front_page_integration_elixir_aai: 'front_page/integrations-elixir-aaix120.png'
+front_page_integration_datacite: 'front_page/integrations-datacite-widex120.png'
+front_page_integration_ols: 'front_page/integrations-olsx120.png'
+front_page_integration_zenodo: 'front_page/integrations-zenodo.svg'
+front_page_integration_json_api: 'front_page/integrations-json-apix120.png'
+front_page_integration_bioschemas: 'front_page/integrations-bioschemas.svg'
+
 #images for mime types
 #general mime type
 bmp_file: 'file_icons/small/bmp.png'
