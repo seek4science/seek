@@ -520,26 +520,6 @@ module ApplicationHelper
     html
   end
 
-  def index_and_new_help_icon(clz)
-    help_text = index_and_new_explanation_messages[clz]
-    unless (help_text.nil?)
-      #help_icon(help_text) + help_link(clz)
-      help_icon_with_link(clz.to_s, help_text)
-    end
-  end
-
-  def index_and_new_explanation_messages
-    { Collection => t('collections.info_text'),
-      #      Assay => "Replace",
-      #Study => "Replace",
-      #Investigation => "Replace",
-      #Strain => "Replace",
-      #Project => "Replace",
-      #Institution => "Replace",
-      #SampleType => "Replace"
-      }
-  end
-
   PAGE_TITLES = { 'home' => 'Home', 'projects' => I18n.t('project').pluralize, 'institutions' => I18n.t('institution').pluralize,
                   'people' => 'People', 'sessions' => 'Login', 'users' => { 'new' => 'Signup', '*' => 'Account' }, 'search' => 'Search',
                   'assays' => I18n.t('assays.assay').pluralize.capitalize, 'sops' => I18n.t('sop').pluralize, 'models' => I18n.t('model').pluralize, 'data_files' => I18n.t('data_file').pluralize, 'documents' => 'Documents',
