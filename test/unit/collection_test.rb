@@ -175,4 +175,22 @@ class CollectionTest < ActiveSupport::TestCase
       disable_authorization_checks { document.destroy }
     end
   end
+
+  test 'can add all valid types to a collection' do
+    collection = Factory(:collection)
+    assert_empty collection.items
+    assert_empty collection.assets
+
+    types = Seek::Util.persistent_classes.select { |c| c.name != 'Project' && c.method_defined?(:collections) }
+    types.each do |type|
+      opts = [type.name.underscore.to_sym]
+      opts << { policy: Factory(:public_policy) } if type.method_defined?(:policy)
+      asset = Factory(*opts)
+      assert_difference('CollectionItem.count', 1, "#{type.name} could not be added to collection") do
+        collection.items.create!(asset: asset)
+      end
+
+      assert_includes collection.reload.assets, asset
+    end
+  end
 end

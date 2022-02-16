@@ -336,17 +336,18 @@ class WorkflowsController < ApplicationController
 
   def workflow_params
     params.require(:workflow).permit(:title, :description, :workflow_class_id, # :metadata,
-                                     { project_ids: [] }, :license, :other_creators,
+                                     { project_ids: [] }, :license,
                                      { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                      { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
-                                     { publication_ids: [] }, { presentation_ids: [] }, { document_ids: [] },
+                                     { publication_ids: [] }, { presentation_ids: [] }, { document_ids: [] }, { data_file_ids: [] },
                                      { data_file_ids: [] }, { workflow_data_files_attributes:[:id, :data_file_id, :workflow_data_file_relationship_id, :_destroy] },
-                                     :internals, :maturity_level, :source_link_url,
+                                     :internals, :maturity_level, :source_link_url, :edam_topics, :edam_operations,
                                      { discussion_links_attributes: [:id, :url, :label, :_destroy] },
                                      { git_version_attributes: [:name, :comment, :ref, :commit, :root_path,
                                                                 :git_repository_id, :main_workflow_path,
                                                                 :abstract_cwl_path, :diagram_path, :remote,
-                                                                { remote_sources: {} }] }, :is_git_versioned)
+                                                                { remote_sources: {} }] }, :is_git_versioned,
+                                      *creator_related_params)
   end
 
   alias_method :asset_params, :workflow_params

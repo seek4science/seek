@@ -19,10 +19,6 @@ module Seek
                         created_at: :dateCreated,
                         updated_at: :dateModified
 
-        def schema_type
-          'Event'
-        end
-
         def conformance
           EVENT_PROFILE
         end

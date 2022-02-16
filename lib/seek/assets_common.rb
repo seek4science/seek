@@ -12,7 +12,8 @@ module Seek
       if found_version&.visible?
         instance_variable_set("@display_#{asset.class.name.underscore}", found_version)
       else
-        error('This version is not available', 'invalid route')
+        status =  found_version.nil? ? :not_found : :forbidden
+        error('This version is not available', 'invalid route', status)
         false
       end
     end
@@ -26,7 +27,7 @@ module Seek
       details = params[:details]
       mail = Mailer.request_contact(current_user, resource, details)
       mail.deliver_later
-      MessageLog.log_contact_request(current_user.person, resource, details)
+      ContactRequestMessageLog.log_request(sender:current_user.person, item:resource, details:details)
       @resource = resource
       respond_to do |format|
         format.js { render template: 'assets/request_contact' }

@@ -61,7 +61,18 @@ module Seek
       if items.is_a?(ActiveRecord::Relation)
         orderings = strategy_for_relation(order, items)
         # Postgres requires any columns being ORDERed to be explicitly SELECTed (only when using DISTINCT?).
-        columns = [items.arel_table[Arel.star]] + orderings.reject { |n| n.is_a?(Arel::Nodes::Ordering) }
+        columns = [items.arel_table[Arel.star]]
+        orderings.each do |ordering|
+          if ordering.is_a?(Arel::Nodes::Ordering)
+            expr = ordering.expr
+            # Don't need to SELECT columns that are already covered by "*" and MySQL will error if you try!
+            unless expr.respond_to?(:relation) && expr.relation == items.arel_table
+              columns << expr
+            end
+          else
+            columns << ordering
+          end
+        end
         items.select(columns).order(orderings)
       else
         items.sort(&strategy_for_enum(order))

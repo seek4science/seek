@@ -5,6 +5,7 @@ module Seek
       class DataFile < CreativeWork
         include ActionView::Helpers::NumberHelper
 
+        
         schema_mappings doi: :identifier,
                         distribution: :distribution
 

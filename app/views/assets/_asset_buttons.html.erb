@@ -66,12 +66,7 @@
 <% end -%>
 
 <% if current_user && asset.respond_to?(:collections) %>
-  <% exceptions = asset.collection_ids %>
-  <% exceptions << asset.id if asset.is_a?(Collection) # Can't add to self! %>
-  <% collections = current_user.person.related_collections.where.not(id: exceptions) %>
-  <% if collections.any? %>
-    <%= render partial: 'assets/add_to_collection', locals: { resource: asset, collections: collections } %>
-  <% end %>
+  <%= render partial: 'assets/add_to_collection', locals: { resource: asset } %>
 <% end %>
 
 <% if asset.can_edit? %>

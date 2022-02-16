@@ -11,7 +11,7 @@ module Ga4gh
 
           assert_response :success
           r = JSON.parse(@response.body)
-          assert_equal Seek::Config.application_name, r['name']
+          assert_equal Seek::Config.instance_name, r['name']
           assert_equal "mailto:#{Seek::Config.support_email_address}", r['contactUrl']
           assert_equal "test", r['environment']
         end

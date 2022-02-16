@@ -60,7 +60,7 @@ class RegularMaintenanceJob < ApplicationJob
         logs = user.person.activation_email_logs
         if logs.count < MAX_ACTIVATION_EMAILS && (logs.empty? || logs.last.created_at < RESEND_ACTIVATION_EMAIL_DELAY.ago)
           Mailer.activation_request(user).deliver_later
-          MessageLog.log_activation_email(user.person)
+          ActivationEmailMessageLog.log_activation_email(user.person)
         end
       else
         Rails.logger.info("User with invalid person - #{user.id}")

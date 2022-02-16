@@ -279,7 +279,7 @@ module AssetsHelper
   def add_new_item_to_options(item)
     elements = []
     Seek::AddButtons.add_for_item(item).each do |type,param|
-      next unless Seek::Config.enabled_for_type?(type)
+      next unless type.feature_enabled?
       text="#{t('add_new_dropdown.option')} #{t(type.name.underscore)}"
       path = new_polymorphic_path(type,param=>item.id)
       elements << yield(text,path)
@@ -324,7 +324,7 @@ module AssetsHelper
 
   # whether the request contact button should be showns
   def request_contact_button_enabled?(resource)
-    Seek::Config.email_enabled && logged_in_and_registered? && get_email_recipients(resource).present? && MessageLog.recent_contact_requests(User.current_user.try(:person),resource).empty?
+    Seek::Config.email_enabled && logged_in_and_registered? && get_email_recipients(resource).present? && ContactRequestMessageLog.recent_requests(User.current_user.try(:person),resource).empty?
   end
 
   # whether the request contact has been made within 12 hours
@@ -332,7 +332,14 @@ module AssetsHelper
     return nil unless logged_in_and_registered?
     return nil unless Seek::Config.email_enabled
     return nil unless get_email_recipients(resource).present?
-    MessageLog.recent_contact_requests(current_user.try(:person), resource).first
+    ContactRequestMessageLog.recent_requests(current_user.try(:person), resource).first
+  end
+
+  def edam_ontology_items(ontologyCVItems)
+    ontologyCVItems.collect do |item|
+      browser_url = "https://edamontology.github.io/edam-browser/#{URI.parse(item.iri).path.gsub('/','#')}"
+      link_to(item.label, browser_url, target: :_blank).html_safe
+    end.join(', ').html_safe
   end
 
 end

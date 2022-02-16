@@ -1,27 +1,56 @@
+<style>
+  .cards {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
+  .card {
+    flex: 0 0 250px;
+    margin: 10px;
+  } 
+  .card .panel-heading a{
+    float: right;
+  }
+  .card img {
+    max-width: 100%;
+  }
+  .card .text {
+    padding: 0 20px 20px;
+  }
+  .card .text > button {
+    background: gray;
+    border: 0;
+    color: white;
+    padding: 10px;
+    width: 100%;
+    }
+</style>
+
+
 <h1>Homepage Settings</h1>
+<%= form_tag({:action => "update_home_settings"}, :multipart => true) do -%>
 
-<%= form_tag :action=>"update_home_settings" do -%>
-    <%= admin_checkbox_setting(:show_announcements, 1, Seek::Config.show_announcements,
-                               "Announcements enabled", "Whether the announcements panel is displayed. If you don't make many announcements you may want to hide it to avoid showing old announcements") %>
+  <%= admin_checkbox_setting(:show_announcements, 1, Seek::Config.show_announcements,
+                              "Announcements enabled", "Whether the announcements panel is displayed. If you don't make many announcements you may want to hide it to avoid showing old announcements") %>
 
-    <%= admin_checkbox_setting(:news_enabled, 1, Seek::Config.news_enabled,
-                               "News enabled", "Display news in the homepage",
-                               :onchange=>toggle_appear_javascript('news_block')) %>
-    <div id="news_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.news_enabled -%>">
-      <%= admin_text_setting(:news_feed_urls, Seek::Config.news_feed_urls,
-                             'Feed URLs', "The urls of the news feeds you want for the news box. The multiple urls are separated by a comma. The format of the feeds can either be RSS or ATOM") %>
+  <%= admin_checkbox_setting(:news_enabled, 1, Seek::Config.news_enabled,
+                              "News enabled", "Display news in the homepage",
+                              :onchange=>toggle_appear_javascript('news_block')) %>
+  <div id="news_block" class="additional_settings" style="<%= show_or_hide_block Seek::Config.news_enabled -%>">
+    <%= admin_text_setting(:news_feed_urls, Seek::Config.news_feed_urls,
+                            'Feed URLs', "The urls of the news feeds you want for the news box. The multiple urls are separated by a comma. The format of the feeds can either be RSS or ATOM") %>
 
-      <%= admin_text_setting(:news_number_of_entries, Seek::Config.news_number_of_entries,
-                             'Number of news items', "Number of news items you want to display in the news box. The news will be taken by the chronological order",
-                             :onkeypress => "javascript: return onlyNumbers(event);") %>
-    </div>
+    <%= admin_text_setting(:news_number_of_entries, Seek::Config.news_number_of_entries,
+                            'Number of news items', "Number of news items you want to display in the news box. The news will be taken by the chronological order",
+                            :onkeypress => "javascript: return onlyNumbers(event);") %>
+  </div>
 
-    <%= admin_textarea_setting(:home_description, Seek::Config.home_description,
-                               "Home page description", "Sets the description text on the front page") %>
+  <%= admin_textarea_setting(:home_description, Seek::Config.home_description,
+                              "Home page description", "Sets the description text on the front page") %>
 
 <!--
-    <%= admin_checkbox_setting(:front_page_buttons_enabled, 1, Seek::Config.front_page_buttons_enabled,
-                               "Home page buttons enabled", "Display the three large buttons on the home page.") %>
+  <%= admin_checkbox_setting(:front_page_buttons_enabled, 1, Seek::Config.front_page_buttons_enabled,
+                              "Home page buttons enabled", "Display the three large buttons on the home page.") %>
 
 -->
   <%= admin_checkbox_setting(:tag_cloud_enabled, 1, Seek::Config.tag_cloud_enabled,
@@ -38,6 +67,64 @@
   <%= admin_checkbox_setting(:workflow_class_list_enabled, 1, Seek::Config.workflow_class_list_enabled,
                              "Workflow class list enabled", "Display the list of workflow classes on the right-hand side of the home page.") %>
 
-    <%= submit_tag "Update", data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' -%> or
-    <%= cancel_button admin_path -%>
+  <h2>Panels</h2>
+  <%# Allows admins to enable/disable a number of panels in the homepage %>
+  
+  <%= admin_checkbox_setting(:home_show_features, 1, Seek::Config.home_show_features,
+                              "Feature showcase enabled", "Whether the feature showcase panel is displayed.") %>
+  <%= admin_checkbox_setting(:home_show_quickstart, 1, Seek::Config.home_show_quickstart,
+                              "Quickstart enabled", "Whether the quickstart panel is displayed.") %>
+  <%= admin_checkbox_setting(:home_show_my_items, 1, Seek::Config.home_show_my_items,
+                              "My items enabled", "Whether the my items panel is displayed.") %>
+  <%= admin_checkbox_setting(:home_show_who_uses, 1, Seek::Config.home_show_who_uses,
+                              "Who uses enabled", "Whether the Who uses panel is displayed.",
+                            :onchange => toggle_appear_javascript('home_show_who_uses_details')) %>
+  <div id="home_show_who_uses_details" class="additional_settings" style="<%= show_or_hide_block Seek::Config.home_show_who_uses -%>">
+    <%# For each item in the array, generate a new output %>
+    <% if !Seek::Config.home_carousel.blank? %>
+      <b> Existing carousel slides</b>
+      <div class="cards">
+        <% Seek::Config.home_carousel.each_with_index do |carousel_item, index| -%>
+          <div class="card">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <%= carousel_item[:title] %>
+                <%= link_to image('destroy', title: 'Delete'),{action: :delete_carousel_form,carousel_index: index}, data: { confirm: 'Are you sure?' }, method: :post -%>
+              </div>
+              <div class="panel-body">
+                <img src='<%= Avatar.find(carousel_item[:image]).public_asset_url %>' alt="<%= carousel_item[:title] %> logo">
+                <ul>
+                  <li>Title: <%= carousel_item[:title] %> </li>
+                  <li>Author: <%= carousel_item[:author] %> </li>
+                  <li>Url: <%= carousel_item[:url] %> </li>
+                  <li>Description: <%= carousel_item[:description] %> </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%= admin_file_setting(:home_carousel_image,
+                          'Upload a header logo image file', 'The file for the header logo image. It should be a valid image file, such as JPEG or PNG.') %>
+    <%= admin_text_setting(:home_carousel_title, "",
+                          "Title text", "A text used as title") %>
+    <%= admin_text_setting(:home_carousel_author, "",
+                          "Author text", "A text used as the author") %>
+    <%= admin_text_setting(:home_carousel_url, "",
+                          "Url text", "A text used as url",:placeholder=>"http://use-full-URLs.com") %>
+    <%= admin_text_setting(:home_carousel_description, "",
+                          "Description text", "A text used as description") %>
+  </div>
+
+  
+  <%= admin_checkbox_setting(:home_explore_projects, 1, Seek::Config.home_explore_projects,
+                              "Explore projects enabled", "Whether the 'latest additions' and explore projects panel are displayed.") %>
+
+  <%= admin_checkbox_setting(:home_show_integrations, 1, Seek::Config.home_show_integrations,
+                              "Integrations enabled", "Whether the Integrations panel is displayed.") %>
+
+  <%= submit_tag "Update", data: { disable_with: 'Updating...' }, :class => 'btn btn-primary' -%> or
+  <%= cancel_button admin_path -%>
 <% end %>

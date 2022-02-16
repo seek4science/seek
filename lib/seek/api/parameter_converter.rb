@@ -103,7 +103,16 @@ module Seek
               WorkflowClass.where(key: value[:key]).pluck(:id).first
             end
           },
-          asset_type: proc { |value| value.classify }
+          asset_type: proc { |value| value.classify },
+
+          creators: proc { |value|
+            value.map.with_index do |attrs, i|
+              attrs[:pos] ||= (i + 1)
+              profile = attrs.delete(:profile)
+              attrs[:creator_id] = profile.split('/')&.last&.to_i if profile
+              attrs
+            end
+          }
       }
       CONVERSIONS[:default_policy] = CONVERSIONS[:policy]
       CONVERSIONS.freeze
@@ -124,7 +133,8 @@ module Seek
           assay_ids: :assay_assets_attributes,
           workflow_class: :workflow_class_id,
           discussion_links: :discussion_links_attributes,
-          repository_standard: :repository_standard_attributes
+          repository_standard: :repository_standard_attributes,
+          creators: :api_assets_creators
       }.freeze
 
       # Parameters to "elevate" out of params[bla] to the top-level.

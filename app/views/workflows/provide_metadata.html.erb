@@ -51,6 +51,8 @@
       <p class="help-block">If this workflow came from an external repository (i.e. GitHub), you can include its original URL here.</p>
     </div>
 
+    <%= render partial: 'assets/edam_form_properties', locals: { resource: @workflow } %>
+
     <div class="form-group">
       <label>Maturity</label>
       <%= select_tag 'workflow[maturity_level]',
@@ -74,17 +76,13 @@
     <% end %>
 
     <%= fields_for(@workflow) do |f| %>
-      <%= render partial: 'assets/author_form',
-                 locals: { form: f,
-                           existing_creators: @workflow.creators.any? ? @workflow.creators : [],
-                           other_creators: @workflow.other_creators } %>
+      <%= render partial: 'assets/author_form', locals: { form: f } %>
 
       <%= f.fancy_multiselect :presentations, other_projects_checkbox: true %>
       <%= f.fancy_multiselect :documents, other_projects_checkbox: true if Seek::Config.documents_enabled %>
       <%= render partial: 'associate_data_file', locals: {:f=>f, :resource => @workflow } if Seek::Config.data_files_enabled %>
 
     <% end %>
-
 
     <%= hidden_field_tag 'workflow[internals]', raw(@workflow.internals.to_json) -%>
 

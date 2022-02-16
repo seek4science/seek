@@ -146,7 +146,7 @@ class PeopleController < ApplicationController
           format.json {render json: @person, status: :created, location: @person, include: [params[:include]] }
         else
           Mailer.activation_request(current_user).deliver_later
-          MessageLog.log_activation_email(@person)
+          ActivationEmailMessageLog.log_activation_email(@person)
           flash[:notice] = 'An email has been sent to you to confirm your email address. You need to respond to this email before you can login'
           logout_user
           format.html { redirect_to controller: 'users', action: 'activation_required' }
@@ -253,15 +253,8 @@ class PeopleController < ApplicationController
 
   # For use in autocompleters
   def typeahead
-    # String concatenation varies across SQL implementations :(
-    concat_clause = if Seek::Util.database_type == 'sqlite3'
-                      "LOWER(first_name || ' ' || last_name)"
-                    else
-                      "LOWER(CONCAT(first_name, ' ', last_name))"
-                    end
+    results = Person.with_name(params[:query]).limit(params[:limit] || 10)
 
-    results = Person.where("#{concat_clause} LIKE :query OR LOWER(first_name) LIKE :query OR LOWER(last_name) LIKE :query",
-                           query: "#{params[:query].downcase}%").limit(params[:limit] || 10)
     items = results.map do |person|
       { id: person.id, name: person.name, projects: person.projects.collect(&:title).join(', '), hint: person.typeahead_hint }
     end

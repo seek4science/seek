@@ -33,6 +33,10 @@ module Seek
       assets.select(&:can_view?)
     end
 
+    def authorized_hanging_assets
+      #implements project_folder
+    end
+
     def title
       assay.title
     end

@@ -225,7 +225,9 @@ module ApplicationHelper
       res = white_list(res)
       res = truncate_without_splitting_words(res, options[:length]) if options[:length]
       if options[:markdown]
-        res = render_markdown(res)
+        # Convert `&gt;` back to `>` so markdown blockquotes can be used.
+        # The markdown renderer will cope with rogue `>`s that are not part of quotes.
+        res = render_markdown(res.gsub('&gt;', '>'))
       elsif options[:description] || options[:address]
         res = simple_format(res, {}, sanitize: false).html_safe
       end
@@ -305,7 +307,7 @@ module ApplicationHelper
       title << t
       title
     else
-      "The #{Seek::Config.application_name}"
+      "#{Seek::Config.instance_name}"
     end
   end
 
@@ -479,7 +481,7 @@ module ApplicationHelper
 
   def pending_project_creation_request?
     return false unless logged_in_and_registered?   
-    MessageLog.pending_project_creation_requests.collect do |log|
+    ProjectCreationMessageLog.pending_requests.collect do |log|
       log.can_respond_project_creation_request?(User.current_user)
     end.any?
   end
@@ -488,7 +490,7 @@ module ApplicationHelper
     return false unless project_administrator_logged_in?
     person = User.current_user.person
     projects = person.administered_projects
-    return MessageLog.pending_project_join_requests(projects).any?
+    return ProjectMembershipMessageLog.pending_requests(projects).any?
   end
 
   #whether to show a banner encouraging you to join or create a project

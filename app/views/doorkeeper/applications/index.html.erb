@@ -5,9 +5,9 @@
 <%= render partial: 'general/page_title', locals: { title: t('.title') } %>
 
 <div class="alert alert-info" role="alert">
-  Here you can register an application and generate credentials to access the <%= Seek::Config.application_name %> API
+  Here you can register an application and generate credentials to access the <%= Seek::Config.instance_name %> API
   as an <%= link_to('OAuth', 'https://oauth.net/2/', target: :_blank) %> client.<br/><br/>
-  This is useful if you are developing an application for other <%= Seek::Config.application_name %> users to interact with.
+  This is useful if you are developing an application for other <%= Seek::Config.instance_name %> users to interact with.
 </div>
 
 <table class="table table-striped">

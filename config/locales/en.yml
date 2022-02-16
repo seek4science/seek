@@ -108,6 +108,7 @@ en:
   project_administrator: 'Project administrator'
   pal: 'PAL'
   programme_administrator: 'Programme administrator'
+  admin: 'Admin'
 
   contributor: 'submitter' # A person who submitted the resource to SEEK
   contribution: 'submission'
@@ -119,6 +120,7 @@ en:
   null_license: 'No license - no permission to use unless the owner grants a licence'
 
   attributes: # Applies to attributes for any model
+    other_creators: Additional credit
     ro_crate: RO-Crate
     abstract_cwl: "Abstract CWL"
 
@@ -179,3 +181,5 @@ you can choose to have a %{project} linked to a site managed %{programme} instea
   Alternatively, if you are unable to use the %{issue_tracker_link}, or the issue is of a private nature, then you can use the %{feedback_link}.
   <p>'
 
+  controlled_vocabs:
+    add_new_term_disabled_reason: "You are unable to add new terms when linked to an Ontology"

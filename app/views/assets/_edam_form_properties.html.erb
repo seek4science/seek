@@ -1,0 +1,17 @@
+<% return unless resource.supports_edam_annotations? %>
+
+<% if resource.edam_topics_vocab %>
+  <div class="form-group">
+    <label>EDAM Topic</label>
+    <%= controlled_vocab_form_field(resource.edam_topics_vocab, "#{resource.class.model_name.singular}[edam_topics]", resource.edam_topic_labels, 10 ) -%>
+    <p class="help-block">The EDAM Topics.</p>
+  </div>
+<% end %>
+
+<% if resource.edam_operations_vocab %>
+  <div class="form-group">
+    <label>EDAM Operations</label>
+    <%= controlled_vocab_form_field(resource.edam_operations_vocab, "#{resource.class.model_name.singular}[edam_operations]", resource.edam_operation_labels, 10 ) -%>
+    <p class="help-block">The EDAM Operations.</p>
+  </div>
+<% end %>

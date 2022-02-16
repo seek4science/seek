@@ -33,6 +33,7 @@ module Seek
           obj = resource.is_a_version? ? resource.parent : resource
           obj.tags_as_text_array.join(', ') if obj.respond_to?(:tags_as_text_array)
         end
+        
       end
     end
   end

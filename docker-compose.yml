@@ -22,6 +22,7 @@ services:
     environment:
       RAILS_ENV: production
       SOLR_PORT: 8983
+      SOLR_HOST: solr
       NO_ENTRYPOINT_WORKERS: 1
     env_file:
       - docker/db.env
@@ -47,6 +48,7 @@ services:
       environment:
         RAILS_ENV: production
         SOLR_PORT: 8983
+        SOLR_HOST: solr
       env_file:
         - docker/db.env
       volumes:
@@ -60,7 +62,7 @@ services:
         - solr
 
   solr:
-    image: fairdom/seek-solr:8.9
+    image: fairdom/seek-solr:8.11
     container_name: seek-solr
     restart: always
     environment:

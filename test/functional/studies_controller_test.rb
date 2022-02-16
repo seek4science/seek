@@ -456,7 +456,7 @@ class StudiesControllerTest < ActionController::TestCase
 
     get :show, params: { id: study.id }
     assert_response :success
-    assert_select 'li.author-list-item', text: 'frodo baggins'
+    assert_select '#author-box .additional-credit', text: 'frodo baggins', count: 1
   end
 
   test 'should not multiply creators after calling show' do
@@ -617,7 +617,7 @@ class StudiesControllerTest < ActionController::TestCase
     #no sharing link, not for Investigation, Study and Assay
     assert_select 'div#temporary_links', count:0
 
-    assert_select 'div#author_form', count:1
+    assert_select 'div#author-form', count:1
   end
 
   test 'cannot access manage page with edit rights' do

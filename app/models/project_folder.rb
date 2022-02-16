@@ -25,9 +25,18 @@ class ProjectFolder < ApplicationRecord
     assets.select(&:can_view?)
   end
 
+   #assets that are not associated to any assay
+  def authorized_hanging_assets
+    assets.select{ |a| a.assays.length == 0 }.select(&:can_view?)
+  end
+
   #what is displayed in the tree
   def label
     "#{title} (#{authorized_assets.count})"
+  end
+
+  def count
+    authorized_hanging_assets.count
   end
 
   def self.new_items_folder project

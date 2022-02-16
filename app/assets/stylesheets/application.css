@@ -42,4 +42,5 @@
 *= require lightbox2
 *= require simplemde-markdown-editor-1.11.2/simplemde.min
 *= require github-markdown-css/github-markdown
+*= require single_page
 */

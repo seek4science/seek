@@ -10,6 +10,10 @@ module Seek
             creators.compact.map(&:name) if self.respond_to?(:creators)
           end
 
+          text :unregistered_creators do
+            assets_creators.unregistered.map(&:name).compact if self.respond_to?(:assets_creators)
+          end
+
           text :other_creators do
             other_creators if self.respond_to?(:other_creators)
           end

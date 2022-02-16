@@ -10,9 +10,10 @@
       "last_name": "Minimal",
       "orcid": null,
       "mbox_sha1sum": "f65adacb4f4ddc963fec0bae4626f32279242ca2",
-      "expertise": null,
-      "tools": null,
-      "project_positions": null
+      "expertise": [],
+      "tools": [],
+      "project_positions": [],
+      "login": null
     },
     "relationships": {
       "projects": {

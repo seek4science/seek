@@ -65,8 +65,8 @@ namespace :seek do
 
   desc 'Creates background jobs to reindex all searchable things'
   task(reindex_all: :environment) do
-    Seek::Util.searchable_types.each do |type|
-      ReindexingQueue.enqueue(type.all)
+    Seek::Util.searchable_types.collect(&:to_s).each do |type|
+      ReindexAllJob.perform_later(type)
     end
   end
 
@@ -91,6 +91,20 @@ namespace :seek do
   task clear_rack_attack_cache: :environment do
     Rack::Attack.cache.store.delete_matched("#{Rack::Attack.cache.prefix}:*")
     puts 'Done'
+  end
+
+  desc "populate the postions of assays"
+  task populate_positions: :environment do
+    Study.all.each do |s|
+      position = 1
+      s.assays.each do |a|
+        a.position = position
+        position += 1
+        disable_authorization_checks do
+          puts a.save
+        end
+      end
+    end
   end
 
   desc "Clear encrypted settings"

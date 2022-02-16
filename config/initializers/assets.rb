@@ -36,6 +36,7 @@ Rails.application.config.assets.precompile += [
     'exhibit/exhibit-api.js',
     'flot/index.js',
     'project_folders',
+    'single_page/index',
     'tablesorter/jquery-latest.js',
     'tablesorter/jquery.tablesorter.js',
     'multi_step_wizard.js',

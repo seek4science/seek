@@ -1,0 +1,14 @@
+<h1>Upload PDF of the full text: <%= link_to(h(@publication.title), publication_path(@publication)) -%></h1>
+<%= error_messages_for('publication', :message => nil) %>
+
+<% if Seek::Config.allow_publications_fulltext %>
+  <%if @publication.content_blob %>
+    <%= render partial: 'assets/fileinfo', object: @publication.content_blob -%>
+  <%else %>
+    <%= form_for @publication, :html => { :multipart => true }, :url => url_for( :action => :upload_pdf), method: :post do |publication_form|  %>
+        <%= render partial: 'assets/upload_box',  :locals=>{:resource=>@publication} -%>
+
+        <%= publication_form.submit 'Upload', :name => "subaction", :value => 'Upload', :class => 'btn btn-primary' %>
+    <%end %>
+  <% end %>
+<% end %>
