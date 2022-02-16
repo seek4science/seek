@@ -103,11 +103,6 @@ module Seek
           last_id = unscoped.maximum(:id)
           asset_count = unscoped.count
 
-          # trigger off a full update for that user if the count is zero and items should exist for that type
-          if lookup_count == 0 && !last_id.nil?
-            AuthLookupUpdateQueue.enqueue(User.find_by_id(user_id))
-          end
-
           (lookup_count == asset_count && (asset_count == 0 || (last_lookup_asset_id == last_id)))
         end
 
