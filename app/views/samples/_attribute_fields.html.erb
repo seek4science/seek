@@ -1,6 +1,9 @@
 <% sample_type.sample_attributes.each do |attribute| %>
     <div class="form-group">
       <label><%= sample_attribute_title_and_unit(attribute) %></label><%= required_span if attribute.required? %>
+      <% if attribute.description %>
+        <p class="help-block"><%= attribute.description %></p>
+      <% end %>
       <%= sample_form_field_for_attribute(attribute, @sample) %>
     </div>
 <% end %>

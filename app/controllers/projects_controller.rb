@@ -97,7 +97,7 @@ class ProjectsController < ApplicationController
   end
 
   def respond_join_request
-    sender = @message_log.sender
+    requester = @message_log.sender
     validation_error_msg=nil;
 
     if params[:accept_request]=='1'
@@ -115,17 +115,19 @@ class ProjectsController < ApplicationController
       end
 
       unless validation_error_msg
-        sender.add_to_project_and_institution(@project,@institution)
-        sender.save!
-        Mailer.notify_user_projects_assigned(sender,[@project]).deliver_later
-        flash[:notice]="Request accepted and #{sender.name} added to #{t('project')} and notified"
+        requester.add_to_project_and_institution(@project,@institution)
+        requester.save!
+        Mailer.notify_user_projects_assigned(requester,[@project]).deliver_later
+        Mailer.notify_admins_project_join_accepted(current_person, requester, @project).deliver_later
+        flash[:notice]="Request accepted and #{requester.name} added to #{t('project')} and notified"
         @message_log.respond('Accepted')
       end
     else
       comments = params['reject_details']
       @message_log.respond(comments)
-      Mailer.join_project_rejected(sender,@project,comments).deliver_later
-      flash[:notice]="Request rejected and #{sender.name} has been notified"
+      Mailer.join_project_rejected(requester,@project,comments).deliver_later
+      Mailer.notify_admins_project_join_rejected(current_person, requester, @project, comments).deliver_later
+      flash[:notice]="Request rejected and #{requester.name} has been notified"
     end
 
     if validation_error_msg
@@ -181,7 +183,6 @@ class ProjectsController < ApplicationController
       elsif @programme.site_managed?
         log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
         Mailer.request_create_project_for_programme(current_user, @programme, @project.to_json, @institution.to_json, log).deliver_later
-        Mailer.request_create_project_for_programme_admins(current_user, @programme, @project.to_json, @institution.to_json, log).deliver_later
         flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
       else
         raise 'Invalid Programme'
@@ -600,6 +601,7 @@ class ProjectsController < ApplicationController
           @message_log.respond('Accepted')
           flash[:notice]="Request accepted and #{requester.name} added to #{t('project')} and notified"
           Mailer.notify_user_projects_assigned(requester,[@project]).deliver_later
+          Mailer.notify_admins_project_creation_accepted(current_person, requester, @project).deliver_later
         end
 
         redirect_to(@project)
@@ -617,6 +619,7 @@ class ProjectsController < ApplicationController
         @message_log.respond(comments)
         project_name = JSON.parse(@message_log.details)['project']['title']
         Mailer.create_project_rejected(requester,project_name,comments).deliver_later
+        Mailer.notify_admins_project_creation_rejected(current_person, requester, project_name, @programme&.to_json, comments).deliver_later
         flash[:notice] = "Request rejected and #{requester.name} has been notified"
       end
 

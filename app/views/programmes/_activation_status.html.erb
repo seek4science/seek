@@ -2,7 +2,7 @@
 <% unless @programme.is_activated? %>
     <% alert_style = @programme.rejected? ? 'alert-danger' : 'alert-warning' %>
     <div class='alert <%=alert_style%>'>
-      This <%= t('programme') %> is waiting to be activated by a <%= Seek::Config.project_name %> administrator.
+      This <%= t('programme') %> is waiting to be activated by a <%= Seek::Config.instance_name %> administrator.
 
       <% if @programme.rejected? %>
           <p style="font-weight: bolder">

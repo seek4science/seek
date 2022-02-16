@@ -29,9 +29,7 @@ class Institution < ApplicationRecord
 
   # determines if this person is the member of a project for which the user passed is a project manager
   def is_managed_by?(user)
-    projects.any? do |p|
-      user.person.is_project_administrator?(p)
-    end
+    user&.person&.is_project_administrator_of_any_project? || user&.person&.is_programme_administrator_of_any_programme?
   end
 
   # Returns the columns to be shown on the table view for the resource

@@ -53,26 +53,26 @@
       <%= hidden_field_tag "#{field_name}[original_filename]", original_filename_from_params, 'data-role' => 'seek-upload-field-filename' %>
 
       <div class="alert alert-info" role="alert" style="display: none;" data-role="seek-url-checker-msg-too-big">
-        This file exceeds <%= Seek::Config.application_name %>'s remote file size limit of
+        This file exceeds <%= Seek::Config.instance_name %>'s remote file size limit of
         <strong><%= number_to_human_size(Seek::Config.hard_max_cachable_size) -%></strong>
         and so only a link to the file will be stored.
       </div>
 
       <div style="display: none;" data-role="seek-url-checker-msg-success">
         <p>
-          You can either upload this file to <%= Seek::Config.application_name %> using this URL, or you can register a link to the file.
+          You can either upload this file to <%= Seek::Config.instance_name %> using this URL, or you can register a link to the file.
         </p>
 
         <p>
           By selecting the option below, a copy of the file will be made. This is recommended, and is equivalent to uploading
           a file from your disk. It also means that should the data behind the URL become unavailable, the data is still
-          available from <%= Seek::Config.application_name %>.
+          available from <%= Seek::Config.instance_name %>.
           However, you should be sure that the copyright on the file allows you to do this.
         </p>
 
         <p>
-          If you do not select the option below <%= Seek::Config.application_name %> will store only the URL and a copy will not be stored on <%= Seek::Config.application_name %>. You should do this if the file
-          is large or you always want <%= Seek::Config.application_name %> to deliver the latest version.
+          If you do not select the option below <%= Seek::Config.instance_name %> will store only the URL and a copy will not be stored on <%= Seek::Config.instance_name %>. You should do this if the file
+          is large or you always want <%= Seek::Config.instance_name %> to deliver the latest version.
         </p>
 
         <div class="checkbox">

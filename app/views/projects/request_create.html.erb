@@ -5,7 +5,7 @@
         <% if @programme %>
           <% if @programme.id.nil? %>
             <%
-              mail_recipients = "#{Seek::Config.dm_project_name} administrators"
+              mail_recipients = "#{Seek::Config.instance_admins_name} administrators"
               to_be_created = "#{t('programme')} and #{t('project')}"
             %>
             <p>
@@ -26,7 +26,7 @@
               to_be_created = "#{t('project')}"
             %>
             <p>
-              You have requested for a <%= t('project') %> to be created within a <%= Seek::Config.dm_project_name %>
+              You have requested for a <%= t('project') %> to be created within a <%= Seek::Config.instance_admins_name %>
               managed <%= t('programme') %>.
             </p>
           <% end %>

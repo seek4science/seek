@@ -132,7 +132,7 @@ module ImagesHelper
 
   def header_logo_image
     if Seek::Config.header_image_avatar_id && avatar = Avatar.find_by_id(Seek::Config.header_image_avatar_id)
-      image_tag(avatar.public_asset_url, options={:style=>'background-color:white'})
+      image_tag(avatar.public_asset_url, options={:style=>'background-color:white', alt:Seek::Config.header_image_title })
     else
       image('header_image_default')
     end

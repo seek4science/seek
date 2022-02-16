@@ -62,7 +62,7 @@ services:
         - solr
 
   solr:
-    image: fairdom/seek-solr:8.9
+    image: fairdom/seek-solr:8.11
     container_name: seek-solr
     restart: always
     environment:

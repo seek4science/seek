@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_10_15_152343) do
+ActiveRecord::Schema.define(version: 2021_12_09_112856) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -576,6 +576,13 @@ ActiveRecord::Schema.define(version: 2021_10_15_152343) do
     t.integer "project_id"
     t.index ["document_id", "project_id"], name: "index_documents_projects_on_document_id_and_project_id"
     t.index ["project_id"], name: "index_documents_projects_on_project_id"
+  end
+
+  create_table "documents_workflows", id: false,  force: :cascade do |t|
+    t.bigint "workflow_id", null: false
+    t.bigint "document_id", null: false
+    t.index ["document_id", "workflow_id"], name: "index_documents_workflows_on_doc_workflow"
+    t.index ["workflow_id", "document_id"], name: "index_documents_workflows_on_workflow_doc"
   end
 
   create_table "event_auth_lookup",  force: :cascade do |t|
@@ -1393,6 +1400,13 @@ ActiveRecord::Schema.define(version: 2021_10_15_152343) do
     t.index ["project_id"], name: "index_presentations_projects_on_project_id"
   end
 
+  create_table "presentations_workflows", id: false,  force: :cascade do |t|
+    t.bigint "workflow_id", null: false
+    t.bigint "presentation_id", null: false
+    t.index ["presentation_id", "workflow_id"], name: "index_presentations_workflows_on_pres_workflow"
+    t.index ["workflow_id", "presentation_id"], name: "index_presentations_workflows_on_workflow_pres"
+  end
+
   create_table "programmes", id: :integer,  force: :cascade do |t|
     t.string "title"
     t.text "description"
@@ -1658,6 +1672,8 @@ ActiveRecord::Schema.define(version: 2021_10_15_152343) do
     t.string "original_accessor_name"
     t.integer "sample_controlled_vocab_id"
     t.integer "linked_sample_type_id"
+    t.string "pid"
+    t.text "description"
     t.index ["sample_type_id"], name: "index_sample_attributes_on_sample_type_id"
     t.index ["unit_id"], name: "index_sample_attributes_on_unit_id"
   end
@@ -1694,6 +1710,7 @@ ActiveRecord::Schema.define(version: 2021_10_15_152343) do
     t.boolean "required"
     t.string "short_name"
     t.integer "repository_standard_id"
+    t.string "key"
   end
 
   create_table "sample_resource_links", id: :integer,  force: :cascade do |t|
@@ -2113,6 +2130,21 @@ ActiveRecord::Schema.define(version: 2021_10_15_152343) do
     t.text "identifier"
     t.text "url"
     t.index ["contributor_id"], name: "index_workflow_classes_on_contributor_id"
+  end
+
+  create_table "workflow_data_file_relationships",  force: :cascade do |t|
+    t.string "title"
+    t.string "key"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "workflow_data_files",  force: :cascade do |t|
+    t.integer "workflow_id"
+    t.integer "data_file_id"
+    t.integer "workflow_data_file_relationship_id"
+    t.index ["data_file_id", "workflow_id"], name: "index_data_files_workflows_on_data_file_workflow"
+    t.index ["workflow_id", "data_file_id"], name: "index_data_files_workflows_on_workflow_data_file"
   end
 
   create_table "workflow_versions", id: :integer,  force: :cascade do |t|

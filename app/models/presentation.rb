@@ -20,6 +20,7 @@ class Presentation < ApplicationRecord
   end
 
   has_and_belongs_to_many :events
+  has_and_belongs_to_many :workflows, -> { distinct }
 
   # get a list of Presentations with their original uploaders - for autocomplete fields
   # (authorization is done immediately to save from iterating through the collection again afterwards)
