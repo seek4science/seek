@@ -9,11 +9,11 @@ module IsaExporter
 
         def convert_investigation
             isa_investigation = {}
-            isa_investigation[:identifier] = @investigation.id
+            isa_investigation[:identifier] = nil # @investigation.id
             isa_investigation[:title] = @investigation.title
             isa_investigation[:description] = @investigation.description
-            isa_investigation[:submissionDate] = @investigation.created_at.to_date.iso8601
-            isa_investigation[:publicReleaseDate] = @investigation.created_at.to_date.iso8601
+            isa_investigation[:submissionDate] = nil #@investigation.created_at.to_date.iso8601
+            isa_investigation[:publicReleaseDate] = nil #@investigation.created_at.to_date.iso8601
             isa_investigation[:ontologySourceReferences] = convert_ontologies
 
             publications = []
