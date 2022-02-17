@@ -268,6 +268,8 @@ GEM
     i18n-js (3.7.0)
       i18n (>= 0.6.6)
     i18n_data (0.8.0)
+    indefinite_article (0.2.4)
+      activesupport
     jbuilder (2.8.0)
       activesupport (>= 4.2.0)
       multi_json (>= 1.2)
@@ -847,6 +849,7 @@ DEPENDENCIES
   handlebars_assets
   hpricot (~> 0.8.2)
   i18n-js
+  indefinite_article
   jbuilder
   jbuilder-json_api
   jquery-rails (~> 4.2.2)

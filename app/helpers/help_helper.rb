@@ -21,15 +21,19 @@ module HelpHelper
     }
   end
 
+  def help_icon(text, _delay = 200, extra_style = '')
+    image('info', :alt => 'help', 'data-tooltip' => tooltip(text), :style => "vertical-align: middle;#{extra_style}")
+  end
+
   def index_and_new_help_icon(clz)
     key = clz.to_s.underscore.pluralize + ".info_text"
     if (I18n.exists?(key))
-      help_icon_with_link(clz.to_s, t(key))
+      help_icon_with_link(translate_resource_type(clz.to_s), t(key))
     end
   end
 
   def help_icon_with_link(key, text, _delay = 200, extra_style = '')
-    link_to content_tag(:span,'',class:'help_icon') + "What is a "+key+"?", Seek::Help::HelpDictionary.instance.help_link(key), :title =>text ,target: :_blank
+    link_to content_tag(:span,'',class:'help_icon') + "What is #{key.indefinite_article} #{key}?", Seek::Help::HelpDictionary.instance.help_link(key), "data-tooltip"=>text ,target: :_blank
   end
 
 end

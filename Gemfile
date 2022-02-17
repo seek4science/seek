@@ -29,6 +29,7 @@ gem 'delayed_job_active_record'
 gem 'daemons'
 gem 'linkeddata'
 gem 'rdf'
+gem 'indefinite_article'
 
 gem 'openseek-api'
 # for fancy content escaping in openbis integration
