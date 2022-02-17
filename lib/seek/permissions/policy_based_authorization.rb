@@ -92,7 +92,7 @@ module Seek
         def remove_invalid_auth_lookup_entries
           lookup_class.where('asset_id NOT IN (?)', pluck(:id)).delete_all
 
-          duplicates = lookup_class.select(:asset_id, :user_id).group(:asset_id, :user_id).having("count(*) > 1")
+          duplicates = lookup_class.select(:asset_id, :user_id).group(:asset_id, :user_id).having('count(*) > 1')
           duplicates.each do |dup|
             entries = lookup_class.where(asset_id:dup.asset_id, user_id:dup.user_id).to_a
             entries.shift
