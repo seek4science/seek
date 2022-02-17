@@ -172,7 +172,7 @@ class Person < ApplicationRecord
   end
 
   def email_uri
-    URI.escape('mailto:' + email)
+    "mailto:#{Addressable::URI.escape(email)}"
   end
 
   def mbox_sha1sum

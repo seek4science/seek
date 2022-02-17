@@ -1,21 +1,31 @@
+<%= render partial: 'general/show_page_tab_definitions' %>
+
+<div class="tab-content">
+
+  <div id="details" class="tab-pane fade in active">
+
+    <%= render :partial => "general/item_title", :locals => { :item => @sample_type, :buttons_partial => 'buttons' } %>
+
+    <%= item_description h(@sample_type.description) -%>
+
+    <h2>Template</h2>
+    <%= render :partial => "template" %>
+
+    <h2>Attributes</h2>
 
 
-<%= render :partial => "general/item_title", :locals => {:item => @sample_type,:buttons_partial => 'buttons'} %>
-
-<%= item_description h(@sample_type.description) -%>
-
-<h2>Template</h2>
-<%= render :partial=>"template" %>
-
-<h2>Attributes</h2>
+    <%=
+      sample_attribute_details_table(@sample_type.sample_attributes)
+    %>
 
 
-<%=
-  sample_attribute_details_table(@sample_type.sample_attributes)
-%>
+    <h2>Tags</h2>
+    <%= sample_type_tags_list(@sample_type) %>
 
+  </div>
 
-<h2>Tags</h2>
-<%= sample_type_tags_list(@sample_type) %>
+  <div id="related-items" class="tab-pane fade">
+    <%= render :partial => "general/items_related_to", :object => @sample_type %>
+  </div>
 
-<%= render :partial=>"general/items_related_to",:object => @sample_type %>
+</div>

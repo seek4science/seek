@@ -1,3 +1,8 @@
+<%= render partial: 'general/show_page_tab_definitions' %>
+
+<div class="tab-content">
+
+  <div id="details" class="tab-pane fade in active">
 <%= render :partial => "general/item_title",:locals=>{:item=>@event, :buttons_partial => 'assets/asset_buttons'} -%>
 
 <%= item_description @event.description -%>
@@ -57,4 +62,10 @@
 
 <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @event}%>
 
-<%= render :partial=>"general/items_related_to",:object => @event %>
+  </div>
+
+  <div id="related-items" class="tab-pane fade">
+    <%= render :partial => "general/items_related_to", :object => @event %>
+  </div>
+
+</div>

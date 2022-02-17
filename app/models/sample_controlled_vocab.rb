@@ -48,6 +48,11 @@ class SampleControlledVocab < ApplicationRecord
     SampleType.can_create?
   end
 
+  # whether the controlled vocab is linked to an ontology
+  def ontology_based?
+    source_ontology.present? && ols_root_term_uri.present?
+  end
+
   private
 
   def update_sample_type_templates(_term)

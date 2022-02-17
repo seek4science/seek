@@ -13,7 +13,7 @@ Factory.define(:max_person, class: Person) do |f|
   f.email "maximal_person@email.com"
   f.phone "34-167-552266"
   f.skype_name "myskypename"
-  f.association :user, factory: :activated_user
+  f.association :user, factory: :activated_user, login: 'max_person_user'
   f.group_memberships { [Factory.build(:group_membership)] }
   f.after_create do |p|
     p.contributed_assays = [Factory(:min_assay, contributor: p, policy: Factory(:public_policy))]

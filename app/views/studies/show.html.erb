@@ -1,18 +1,5 @@
-<ul class="nav nav-tabs">
-    <li class="active ">
-        <a data-toggle="tab" href="#details"><i class="glyphicon glyphicon-list-alt"></i> Details</a>
-    </li>
-    <li>
-        <a data-toggle="tab" href="#related-items">
-            <i class="glyphicon glyphicon-th-list"></i> Related items
-        </a>
-    </li>
-    <% if Seek::Config.project_single_page_advanced_enabled %>
-      <li>
-          <a data-toggle="tab" href="#study_design"><i class="glyphicon glyphicon-list-alt"></i> Study design</a>
-      </li>
-    <% end %>
-</ul>
+<%= render partial: 'general/show_page_tab_definitions', locals: { resource: @study } %>
+
 <div class="tab-content">
     <div id="details" class="tab-pane fade in active">
       <%= render :partial => "general/item_title",:locals => {:item=>@study, :buttons_partial => 'studies/buttons'} %>

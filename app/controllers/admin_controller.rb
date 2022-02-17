@@ -167,8 +167,7 @@ class AdminController < ApplicationController
     Seek::Config.news_number_of_entries = entries if is_entries_integer
 
     Seek::Config.home_description = params[:home_description]
-
-    #    Seek::Config.front_page_buttons_enabled = params[:front_page_buttons_enabled]
+    Seek::Config.home_description_position = params[:home_description_position]
 
     Seek::Config.home_show_features = string_to_boolean params[:home_show_features]
     Seek::Config.home_show_quickstart = string_to_boolean params[:home_show_quickstart]
@@ -191,6 +190,8 @@ class AdminController < ApplicationController
     Seek::Config.tag_cloud_enabled = string_to_boolean params[:tag_cloud_enabled]
     Seek::Config.workflow_class_list_enabled = string_to_boolean params[:workflow_class_list_enabled]
 
+    expire_annotation_fragments
+
     update_redirect_to (is_entries_integer && (only_integer tag_threshold, 'tag threshold') && (only_positive_integer max_visible_tags, 'maximum visible tags')), 'home_settings'
   end
 
@@ -211,7 +212,6 @@ class AdminController < ApplicationController
     Seek::Config.issue_tracker = params[:issue_tracker]
 
     Seek::Config.header_image_enabled = string_to_boolean params[:header_image_enabled]
-    Seek::Config.header_image_link = params[:header_image_link]
     Seek::Config.header_image_title = params[:header_image_title]
     header_image_file
 
@@ -274,6 +274,13 @@ class AdminController < ApplicationController
     Seek::Config.allow_edit_of_registered_publ = string_to_boolean params[:allow_edit_of_registered_publ]
     Seek::Config.pubmed_api_email = pubmed_email if pubmed_email == '' || pubmed_email_valid
     Seek::Config.crossref_api_email = crossref_email if crossref_email == '' || crossref_email_valid
+
+    if params[:session_store_timeout]
+      mins = params[:session_store_timeout].to_i
+      if mins >= 1
+        Seek::Config.session_store_timeout = mins.minutes
+      end
+    end
 
     Seek::Config.bioportal_api_key = params[:bioportal_api_key]
     Seek::Config.sabiork_ws_base_url = params[:sabiork_ws_base_url] unless params[:sabiork_ws_base_url].nil?

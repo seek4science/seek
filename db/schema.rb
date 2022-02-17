@@ -1167,6 +1167,7 @@ ActiveRecord::Schema.define(version: 2022_01_24_171916) do
     t.text "meta_config_json"
     t.datetime "last_sync"
     t.datetime "last_cache_refresh"
+    t.boolean "is_test", default: false
   end
 
   create_table "organisms", id: :integer,  force: :cascade do |t|

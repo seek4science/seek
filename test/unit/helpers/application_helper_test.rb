@@ -318,7 +318,28 @@ class ApplicationHelperTest < ActionView::TestCase
     User.with_current_user(unregistered_user) do
       refute pending_project_creation_request?
     end
-    
   end
-  
+
+  test 'markdown generation allows block quotes without compromising HTML sanitization' do
+    assert_equal "<blockquote>\n<p>quote</p>\n</blockquote>\n", text_or_not_specified("> quote", markdown: true).to_s
+    assert_equal "<blockquote>\n<p>quote</p>\n</blockquote>\n", text_or_not_specified(" > quote", markdown: true).to_s
+    assert_equal "<blockquote>\n<p>quote</p>\n</blockquote>\n", text_or_not_specified("  > quote", markdown: true).to_s
+    assert_equal "<pre><code>&gt; quote\n</code></pre>\n", text_or_not_specified("    > quote", markdown: true).to_s
+    assert_equal "<pre><code>    &gt; quote\n</code></pre>\n", text_or_not_specified("        > quote", markdown: true).to_s
+    assert_equal "<p>test&gt; quote</p>\n", text_or_not_specified("test> quote", markdown: true).to_s
+    assert_equal "<p>Hello\nWorld</p>\n<blockquote>\n<p>quote</p>\n</blockquote>\n", text_or_not_specified("Hello\nWorld\n\n> quote", markdown: true).to_s
+    assert_equal "<p>Hello\nWorld</p>\n<blockquote>\n<p>quote</p>\n</blockquote>\n", text_or_not_specified("Hello</div></div></div>\nWorld\n\n> quote", markdown: true).to_s
+    assert_equal "<p><i>Hello</i>\n<b>World</b></p>\n<blockquote>\n<p>quote</p>\n</blockquote>\n", text_or_not_specified("<i>Hello</i></div></div></div>\n<b>World</b>\n\n> quote", markdown: true).to_s
+    assert_equal "<p>alert('hi');</p>\n<blockquote>\n<p>quote</p>\n</blockquote>\n", text_or_not_specified("<script>alert('hi');</script>\n\n> quote", markdown: true).to_s
+
+    assert_equal "&gt; quote", text_or_not_specified("> quote", markdown: false).to_s
+    assert_equal "Hello\nWorld\n\n&gt; quote", text_or_not_specified("Hello</div></div></div>\nWorld\n\n> quote", markdown: false).to_s
+    assert_equal "<i>Hello</i>\n<b>World</b>\n\n&gt; quote", text_or_not_specified("<i>Hello</i></div></div></div>\n<b>World</b>\n\n> quote", markdown: false).to_s
+    assert_equal "alert('hi');\n\n&gt; quote", text_or_not_specified("<script>alert('hi');</script>\n\n> quote", markdown: false).to_s
+  end
+
+  test 'markdown generation does not double encode special characters' do
+    assert_equal "<p>&amp;&amp; &quot;&quot; &lt; &gt;\n<code>&amp;&amp;</code></p>\n", text_or_not_specified("&& \"\" < >\n```&&```\n\n", markdown: true).to_s
+    assert_equal "&amp;&amp; \"\" &lt; &gt;\n```&amp;&amp;```\n\n", text_or_not_specified("&& \"\" < >\n```&&```\n\n", markdown: false).to_s
+  end
 end

@@ -33,7 +33,7 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
   def populate_extra_attributes(hash)
     extra_attributes = {}
     if  hash['data']['attributes'].has_key? 'email'
-      extra_attributes[:mbox_sha1sum] =  Digest::SHA1.hexdigest(URI.escape('mailto:' + hash['data']['attributes']['email']))
+      extra_attributes[:mbox_sha1sum] =  Digest::SHA1.hexdigest("mailto:#{Addressable::URI.escape(hash['data']['attributes']['email'])}")
     end
 
     #by construction, expertise & tools appear together IF they appear at all
