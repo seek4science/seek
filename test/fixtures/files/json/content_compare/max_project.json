@@ -149,6 +149,7 @@
             "type": "workflows"
           }
         ]
+      },
       "file_templates" : {
         "data" : []
       },
