@@ -1,0 +1,969 @@
+{
+  "data": [
+    {
+      "metadata": {
+        "name": "sample_collection",
+        "group": "ilvo",
+        "group_order": 2,
+        "temporary_name": "2_arrayexpress_sample_collection",
+        "template_version": "1.2.0",
+        "isa_config": "studySample_default_v2015-07-02",
+        "isa_measurement_type": "Sample",
+        "isa_technology_type": null,
+        "isa_protocol_type": "sample collection",
+        "repo_schema_id": "Annotare-default.properties",
+        "organism": "any",
+        "level": "study"
+      },
+      "data": [
+        {
+          "iri": null,
+          "name": "Input",
+          "description": "Existing Samples in DataHub that represent input for this protocol.",
+          "dataType": "SEEK Sample Multi",
+          "required": true,
+          "isaTag": null
+        },
+        {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0005518",
+          "name": "sample collection",
+          "description": "A protocol that describes the procedure whereby biological samples for an experiment are sourced. Examples of this are: collection of clinical samples from patients, collection of plant materials in a forest, collection of larvae from lab-grown Drosophila flies.",
+          "dataType": "String",
+          "required": true,
+          "isaTag": "protocol",
+          "ontology": null,
+          "CVList": null
+        },
+        {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000688",
+          "name": "sampling site",
+          "description": "A site from which a sample, i.e. a statistically representative of the whole, is extracted from the whole. e.g. a liver sample.",
+          "dataType": "String",
+          "required": false,
+          "isaTag": "parameter_value"
+        },
+        {
+          "iri": null,
+          "name": "collection date",
+          "description": "YYMMDD",
+          "dataType": "String",
+          "required": false,
+          "isaTag": "parameter_value"
+        },
+        {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000635",
+          "name": "organism part",
+          "description": "The part of organism's anatomy or substance arising from an organism from which the biomaterial was derived, excludes cells. E.g. tissue, organ, system, sperm, blood or body location (arm).",
+          "dataType": "Ontology",
+          "required": true,
+          "isaTag": "sample_characteristic",
+          "ontology": {
+            "name": "efo",
+            "version": "1",
+            "description": "Experimental Factor Ontology",
+            "rootTermURI": "http://www.ebi.ac.uk/efo/EFO_0000635"
+          }
+        },
+        {
+          "iri": null,
+          "name": "material type",
+          "description": "Used as an attribute column following Source Name, Sample Name, Extract Name, or Labeled Extract Name. This column contains terms describing the type of each material, for examples: whole organism, organism part, cell, total RNA.",
+          "dataType": "Controlled Vocabulary",
+          "required": true,
+          "isaTag": "sample_characteristic",
+          "ontology": null,
+          "CVList": ["whole organism", "organism part", "RNA", "DNA", "cell"]
+        },
+        {
+          "iri": null,
+          "name": "Sample Name",
+          "description": "Name of the major output resulting from the application of the protocol.",
+          "dataType": "String",
+          "title": true,
+          "required": true,
+          "isaTag": "sample",
+          "ontology": null
+        },
+        {
+          "iri": null,
+          "name": "# samples/pool",
+          "description": "number of genotypes in composite samples or pools",
+          "dataType": "String",
+          "required": true,
+          "isaTag": "sample_characteristic",
+          "ontology": null
+        },
+        {
+          "iri": null,
+          "name": "individual",
+          "description": "genotype number or description of sample (with unique genome composition as sample) unique in combination with species and location or experiment",
+          "dataType": "String",
+          "required": true,
+          "isaTag": "sample_characteristic",
+          "ontology": null
+        },
+        {
+          "iri": null,
+          "name": "remarks",
+          "description": "",
+          "dataType": "String",
+          "required": false,
+          "isaTag": "sample_characteristic",
+          "ontology": null
+        }
+      ]
+    },
+
+    {
+      "metadata": {
+        "name": "source_plant",
+        "group": "ilvo",
+        "group_order": 1,
+        "temporary_name": "1_arrayexpress_source_plant",
+        "template_version": "1.2.0",
+        "isa_config": "studySample_default_v2015-07-02",
+        "isa_measurement_type": null,
+        "isa_technology_type": null,
+        "repo_schema_id": "Annotare-default.properties",
+        "organism": "plant",
+        "level": "study"
+      },
+      "data": [
+        {
+          "iri": null,
+          "name": "Source Name",
+          "description": "Sources are considered as the starting biological material used in a study.",
+          "dataType": "String",
+          "title": true,
+          "required": true,
+          "isaTag": "source"
+        },
+        {
+          "iri": "http://purl.obolibrary.org/obo/OBI_0100026",
+          "name": "organism",
+          "description": "A material entity that is an individual living system, such as animal, plant, bacteria or virus, that is capable of replicating or reproducing, growth and maintenance in the right environment. An organism may be unicellular or made up, like humans, of many billions of cells divided into specialized tissues and organs. E.g Drosophila melanogaster.",
+          "dataType": "Ontology",
+          "required": true,
+          "isaTag": "source_characteristic",
+          "ontology": {
+            "name": "efo",
+            "version": "1",
+            "description": "Experimental Factor Ontology",
+            "rootTermURI": "http://purl.obolibrary.org/obo/OBI_0100026"
+          }
+        },
+        {
+          "iri": "http://purl.obolibrary.org/obo/NCBITaxon_33858",
+          "name": "environmental samples",
+          "description": "",
+          "dataType": "String",
+          "required": false,
+          "isaTag": "source_characteristic"
+        },
+        {
+          "iri": null,
+          "name": "remarks",
+          "description": "",
+          "dataType": "String",
+          "required": false,
+          "isaTag": "source_characteristic"
+        },
+        {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000399",
+          "name": "developmental stage",
+          "description": "A developmental stage is spatiotemporal region encompassing some part of the life cycle of an organism, e.g. blastula stage",
+          "dataType": "Ontology",
+          "required": true,
+          "isaTag": "source_characteristic",
+          "ontology": {
+            "name": "efo",
+            "version": "1",
+            "description": "Experimental Factor Ontology",
+            "rootTermURI": "http://www.ebi.ac.uk/efo/EFO_0000399"
+          }
+        },
+        {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000246",
+          "name": "age",
+          "description": "A temporal measurement of the time period elapsed since an identifiable point in the life cycle of an organism. If a developmental stage is specified, the identifiable point would be the beginning of that stage. Otherwise the identifiable point must be specified such as planting (e.g. 3 days post planting).",
+          "dataType": "Ontology",
+          "required": true,
+          "isaTag": "source_characteristic",
+          "ontology": {
+            "name": "efo",
+            "version": "1",
+            "description": "Experimental Factor Ontology",
+            "rootTermURI": "http://www.ebi.ac.uk/efo/EFO_0000246"
+          }
+        },
+        {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000513",
+          "name": "genotype",
+          "description": "The total sum of the genetic information of an organism that is known and relevant to the experiment being performed, including chromosomal, plasmid, viral or other genetic material which has been introduced into the organism either prior to or during the experiment.",
+          "dataType": "Ontology",
+          "required": true,
+          "isaTag": "source_characteristic",
+          "ontology": {
+            "name": "efo",
+            "version": "1",
+            "description": "Experimental Factor Ontology",
+            "rootTermURI": "http://www.ebi.ac.uk/efo/EFO_0000513"
+          }
+        },
+        {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0005136",
+          "name": "cultivar",
+          "description": "A cultivated plant variety selected and given a name because it has desirable characteristics that distinguish it from otherwise similar plants of the same species.",
+          "dataType": "String",
+          "required": true,
+          "isaTag": "source_characteristic"
+        },
+        {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000510",
+          "name": "genetic modification",
+          "description": "A genetic modification of the genome of an organism which may occur naturally by spontaneous mutation, or be introduced by some experimental means. Examples of genetic modification include specification of a transgene or the gene knocked-out or details of transient transfection.",
+          "dataType": "Ontology",
+          "required": false,
+          "isaTag": "source_characteristic",
+          "ontology": {
+            "name": "efo",
+            "version": "1",
+            "description": "Experimental Factor Ontology",
+            "rootTermURI": "http://www.ebi.ac.uk/efo/EFO_0000510"
+          }
+        },
+        {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000523",
+          "name": "growth condition",
+          "description": "A role that a material entity can play which enables particular conditions used to grow organisms or parts of the organism. This includes isolated environments such as cultures and open environments such as field studies.",
+          "dataType": "Ontology",
+          "required": false,
+          "isaTag": "source_characteristic",
+          "ontology": {
+            "name": "efo",
+            "version": "1",
+            "description": "Experimental Factor Ontology",
+            "rootTermURI": "http://www.ebi.ac.uk/efo/EFO_0000523"
+          }
+        },
+        {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0000683",
+          "name": "replicate",
+          "description": "A role played by a a biological sample in the context of an experiment where the intent is that biological or technical variation is measured.",
+          "dataType": "Ontology",
+          "required": false,
+          "isaTag": "source_characteristic",
+          "ontology": {
+            "name": "efo",
+            "version": "1",
+            "description": "Experimental Factor Ontology",
+            "rootTermURI": "http://www.ebi.ac.uk/efo/EFO_0000683"
+          }
+        }
+      ]
+    },
+
+    {
+      "metadata": {
+        "name": "library construction",
+        "group": "ilvo",
+        "group_order": 4,
+        "temporary_name": "4_arrayexpress_library_construction",
+        "template_version": "1.2.0",
+        "isa_config": "genome_seq_default_v2015-07-02",
+        "isa_measurement_type": "transcription profiling",
+        "isa_technology_type": "nucleotide sequencing",
+        "isa_protocol_type": "library construction",
+        "repo_schema_id": "General experiment information 2021",
+        "organism": "any",
+        "level": "assay"
+      },
+      "data": [
+        {
+          "iri": null,
+          "name": "Input",
+          "description": "Existing Samples in DataHub that represent input for this protocol.",
+          "dataType": "SEEK Sample Multi",
+          "required": true,
+          "isaTag": null
+        },
+        {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0004184",
+          "name": "library construction",
+          "description": "A protocol that describes the processes performed and equipment used to prepare nucleic acid sequencing library.",
+          "required": true,
+          "isaTag": "protocol",
+          "ontology": null,
+          "dataType": "String",
+          "CVList": null
+        },
+        {
+          "iri": "",
+          "name": "library type",
+          "description": "type library can vary per technology and subclass: brand, kit or restriction enzyme",
+          "required": true,
+          "isaTag": "parameter_value",
+          "ontology": null,
+          "dataType": "String",
+          "CVList": null
+        },
+        {
+          "iri": null,
+          "name": "library source",
+          "description": "The LIBRARY_SOURCE specifies the type of source material that is being sequenced. (SRA 1.2 documentation)",
+          "dataType": "Controlled Vocabulary",
+          "required": true,
+          "isaTag": "parameter_value",
+          "ontology": null,
+          "CVList": [
+            "GENOMIC",
+            "GENOMIC SINGLE CELL",
+            "TRANSCRIPTOMIC",
+            "TRANSCRIPTOMIC SINGLE CELL",
+            "METAGENOMIC",
+            "METATRANSCRIPTOMIC",
+            "SYNTHETIC",
+            "VIRAL RNA",
+            "OTHER"
+          ]
+        },
+        {
+          "iri": null,
+          "name": "library strategy",
+          "description": "Sequencing technique intended for this library (SRA 1.2 documentation)",
+          "dataType": "Controlled Vocabulary",
+          "required": true,
+          "isaTag": "parameter_value",
+          "ontology": null,
+          "CVList": [
+            "WGS",
+            "WGA",
+            "WXS",
+            "RNA-Seq",
+            "ssRNA-seq",
+            "miRNA-Seq",
+            "ncRNA-Seq",
+            "FL-cDNA",
+            "EST",
+            "Hi-C",
+            "ATAC-seq",
+            "WCS",
+            "RAD-Seq",
+            "CLONE",
+            "POOLCLONE",
+            "AMPLICON",
+            "CLONEEND",
+            "FINISHING",
+            "ChIP-Seq",
+            "MNase-Seq",
+            "DNase-Hypersensitivity",
+            "Bisulfite-Seq",
+            "CTS",
+            "MRE-Seq",
+            "MeDIP-Seq",
+            "MBD-Seq",
+            "Tn-Seq",
+            "VALIDATION",
+            "FAIRE-seq",
+            "SELEX",
+            "RIP-Seq",
+            "ChIA-PET",
+            "Synthetic-Long-Read",
+            "Targeted-Capture",
+            "OTHER"
+          ]
+        },
+        {
+          "iri": null,
+          "name": "library selection",
+          "description": "Whether any method was used to select for or against, enrich, or screen the material being sequenced. (SRA 1.2 documentation)",
+          "dataType": "Controlled Vocabulary",
+          "required": true,
+          "isaTag": "parameter_value",
+          "ontology": null,
+          "CVList": [
+            "RANDOM",
+            "PCR",
+            "RANDOM PCR",
+            "RT-PCR",
+            "HMPR",
+            "MF",
+            "repeat fractionation",
+            "size fractionation",
+            "MSLL",
+            "cDNA",
+            "cDNA_randomPriming",
+            "cDNA_oligo_dT",
+            "PolyA",
+            "Oligo-dT",
+            "Inverse rRNA",
+            "Inverse rRNA selection",
+            "ChIP",
+            "ChIP-Seq",
+            "MNase",
+            "DNase",
+            "Hybrid Selection",
+            "Reduced Representation",
+            "Restriction Digest",
+            "5-methylcytidine antibody",
+            "MBD2 protein methyl-CpG binding domain",
+            "CAGE",
+            "RACE",
+            "MDA",
+            "padlock probes capture method",
+            "other",
+            "unspecified"
+          ]
+        },
+        {
+          "iri": null,
+          "name": "library layout",
+          "description": "specifies whether to expect single, paired, or other configuration of reads.",
+          "dataType": "Controlled Vocabulary",
+          "required": true,
+          "isaTag": "parameter_value",
+          "ontology": null,
+          "CVList": ["SINGLE", "PAIRED"]
+        },
+        {
+          "iri": null,
+          "name": "library strand",
+          "description": "",
+          "dataType": "Controlled Vocabulary",
+          "required": false,
+          "isaTag": "parameter_value",
+          "ontology": null,
+          "CVList": ["first strand", "second strand", "not applicable"]
+        },
+        {
+          "name": "orientation",
+          "description": "",
+          "dataType": "Controlled Vocabulary",
+          "required": false,
+          "isaTag": "parameter_value",
+          "ontology": null,
+          "CVList": ["5'-3'-3'-5'", "5'-3'-5'-3'"]
+        },
+        {
+          "name": "insert size",
+          "description": "",
+          "dataType": "String",
+          "required": false,
+          "isaTag": "parameter_value",
+          "ontology": null,
+          "CVList": null
+        },
+        {
+          "name": "primers remarks",
+          "description": "",
+          "dataType": "String",
+          "required": false,
+          "isaTag": "other_material_characteristic",
+          "ontology": null,
+          "CVList": null
+        },
+        {
+          "name": "barcode i7",
+          "description": "",
+          "dataType": "String",
+          "required": false,
+          "isaTag": "other_material_characteristic",
+          "ontology": null,
+          "CVList": null
+        },
+        {
+          "name": "barcode i5",
+          "description": "",
+          "dataType": "String",
+          "required": false,
+          "isaTag": "other_material_characteristic",
+          "ontology": null,
+          "CVList": null
+        },
+        {
+          "name": "adaptor index i7 code",
+          "description": "",
+          "dataType": "String",
+          "required": false,
+          "isaTag": "other_material_characteristic",
+          "ontology": null,
+          "CVList": null
+        },
+        {
+          "name": "adaptor index i5 code",
+          "description": "",
+          "dataType": "String",
+          "required": false,
+          "isaTag": "other_material_characteristic",
+          "ontology": null,
+          "CVList": null
+        },
+        {
+          "name": "custom internal barcode i5 code",
+          "description": "",
+          "dataType": "String",
+          "required": false,
+          "isaTag": "other_material_characteristic",
+          "ontology": null,
+          "CVList": null
+        },
+        {
+          "name": "custom internal barcode i5 sequence",
+          "description": "",
+          "dataType": "String",
+          "required": false,
+          "isaTag": "other_material_characteristic",
+          "ontology": null,
+          "CVList": null
+        },
+        {
+          "name": "custom internal barcode i7 code",
+          "description": "",
+          "dataType": "String",
+          "required": false,
+          "isaTag": "other_material_characteristic",
+          "ontology": null,
+          "CVList": null
+        },
+        {
+          "name": "custom internal barcode i7 sequence",
+          "description": "",
+          "dataType": "String",
+          "required": false,
+          "isaTag": "other_material_characteristic",
+          "ontology": null,
+          "CVList": null
+        },
+        {
+          "name": "barcoded restriction site",
+          "description": "",
+          "dataType": "String",
+          "required": false,
+          "isaTag": "other_material_characteristic",
+          "ontology": null,
+          "CVList": null
+        },
+        {
+          "name": "common restriction site",
+          "description": "",
+          "dataType": "String",
+          "required": false,
+          "isaTag": "other_material_characteristic",
+          "ontology": null,
+          "CVList": null
+        },
+        {
+          "name": "plate id",
+          "description": "plate identifier",
+          "dataType": "String",
+          "required": false,
+          "isaTag": "other_material_characteristic",
+          "ontology": null,
+          "CVList": null
+        },
+        {
+          "name": "position in the plate",
+          "description": "Well in the plate, for instance A01",
+          "dataType": "String",
+          "required": false,
+          "isaTag": "other_material_characteristic",
+          "ontology": null,
+          "CVList": null
+        },
+        {
+          "name": "library name",
+          "description": "name given to the generated library.",
+          "dataType": "String",
+          "title": true,
+          "required": true,
+          "isaTag": "other_material",
+          "ontology": null,
+          "CVList": null
+        }
+      ]
+    },
+
+    {
+      "metadata": {
+        "name": "nucleic acid extraction",
+        "group": "ilvo",
+        "group_order": 3,
+        "temporary_name": "3_arrayexpress_nucleic_acid_extraction",
+        "template_version": "1.2.0",
+        "isa_config": "genome_seq_default_v2015-07-02",
+        "isa_measurement_type": "transcription profiling",
+        "isa_technology_type": "nucleotide sequencing",
+        "isa_protocol_type": "nucleic acid extraction",
+        "repo_schema_id": "NA",
+        "organism": "any",
+        "level": "assay"
+      },
+      "data": [
+        {
+          "iri": null,
+          "name": "Input",
+          "description": "Existing Samples in DataHub that represent input for this protocol.",
+          "dataType": "SEEK Sample Multi",
+          "required": true,
+          "isaTag": null
+        },
+        {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0002944",
+          "name": "nucleic acid extraction",
+          "description": "A protocol that describes in which a material separation to recover the nucleic acid fraction of an input material is performed.",
+          "dataType": "String",
+          "required": true,
+          "isaTag": "protocol",
+          "ontology": null,
+          "CVList": null
+        },
+        {
+          "iri": null,
+          "name": "Extract Name",
+          "description": "User-defined names for each portion of extracted material.",
+          "dataType": "String",
+          "title": true,
+          "required": true,
+          "isaTag": "other_material",
+          "ontology": null,
+          "CVList": null
+        },
+        {
+          "iri": null,
+          "name": "Material type",
+          "description": "This column contains terms describing the type of each material, for examples: whole organism, organism part, cell, total RNA.",
+          "dataType": "Controlled Vocabulary",
+          "required": true,
+          "isaTag": "other_material_characteristic",
+          "ontology": null,
+          "CVList": ["whole organism", "organism part", "RNA", "DNA", "cell"]
+        }
+      ]
+    },
+
+    {
+      "metadata": {
+        "name": "nucleic acid sequencing",
+        "group": "ilvo",
+        "group_order": 5,
+        "temporary_name": "5_arrayexpress_nucleic_acid_sequencing",
+        "template_version": "1.2.0",
+        "isa_config": "genome_seq_default_v2015-07-02",
+        "isa_measurement_type": "transcription profiling",
+        "isa_technology_type": "nucleotide sequencing",
+        "isa_protocol_type": "nucleic acid sequencing",
+        "repo_schema_id": "ENA General experiment information 2021",
+        "organism": "any",
+        "level": "assay"
+      },
+      "data": [
+        {
+          "iri": null,
+          "name": "Input",
+          "description": "Existing Samples in DataHub that represent input for this protocol.",
+          "dataType": "SEEK Sample Multi",
+          "required": true,
+          "isaTag": null
+        },
+        {
+          "iri": "http://www.ebi.ac.uk/efo/EFO_0004170",
+          "name": "nucleic acid sequencing",
+          "description": "A protocol that describes the processes performed and equipment used to determine the order of nucleotide bases in a nucleic acid sample.",
+          "dataType": "String",
+          "required": true,
+          "isaTag": "protocol",
+          "ontology": null,
+          "CVList": null
+        },
+        {
+          "iri": null,
+          "name": "sequencing instrument",
+          "description": "a parameter to report the sequencing instrument model and make",
+          "dataType": "Controlled Vocabulary",
+          "required": true,
+          "isaTag": "parameter_value",
+          "ontology": null,
+          "CVList": [
+            "454 GS",
+            "454 GS 20",
+            "454 GS FLX",
+            "454 GS FLX+",
+            "454 GS FLX Titanium",
+            "454 GS Junior",
+            "HiSeq X Five",
+            "HiSeq X Ten",
+            "Illumina Genome Analyzer",
+            "Illumina Genome Analyzer II",
+            "Illumina Genome Analyzer IIx",
+            "Illumina HiScanSQ",
+            "Illumina HiSeq 1000",
+            "Illumina HiSeq 1500",
+            "Illumina HiSeq 2000",
+            "Illumina HiSeq 2500",
+            "Illumina HiSeq 3000",
+            "Illumina HiSeq 4000",
+            "Illumina iSeq 100",
+            "Illumina MiSeq",
+            "Illumina MiniSeq",
+            "Illumina NovaSeq 6000",
+            "NextSeq 500",
+            "NextSeq 550",
+            "PacBio RS",
+            "PacBio RS II",
+            "Sequel",
+            "Ion Torrent PGM",
+            "Ion Torrent Proton",
+            "Ion Torrent S5",
+            "Ion Torrent S5 XL",
+            "AB 3730xL Genetic Analyzer",
+            "AB 3730 Genetic Analyzer",
+            "AB 3500xL Genetic Analyzer",
+            "AB 3500 Genetic Analyzer",
+            "AB 3130xL Genetic Analyzer",
+            "AB 3130 Genetic Analyzer",
+            "AB 310 Genetic Analyzer",
+            "MinION",
+            "GridION",
+            "PromethION",
+            "BGISEQ-500",
+            "DNBSEQ-T7",
+            "DNBSEQ-G400",
+            "DNBSEQ-G50",
+            "DNBSEQ-G400 FAST",
+            "unspecified"
+          ]
+        },
+        {
+          "iri": null,
+          "name": "quality scorer",
+          "description": "Name and version of the quality scoring software.",
+          "dataType": "String",
+          "required": false,
+          "isaTag": "parameter_value",
+          "ontology": null,
+          "CVList": null
+        },
+        {
+          "iri": null,
+          "name": "base caller",
+          "description": "Name and version of the base or color calling software.",
+          "dataType": "String",
+          "required": false,
+          "isaTag": "parameter_value",
+          "ontology": null,
+          "CVList": null
+        },
+        {
+          "iri": null,
+          "name": "Assay Name",
+          "description": "User-defined name for an assay.",
+          "dataType": "String",
+          "required": true,
+          "isaTag": "data_file_comment",
+          "ontology": null,
+          "CVList": null
+        },
+        {
+          "iri": null,
+          "name": "Technology type",
+          "description": "",
+          "dataType": "String",
+          "required": true,
+          "isaTag": "data_file_comment",
+          "ontology": null,
+          "CVList": ["sequencing assay"]
+        },
+        {
+          "name": "technical replicate",
+          "description": "sequential number indicating the number of times that the same sample (individual) is sequenced with the same  technology (library)",
+          "dataType": "String",
+          "required": false,
+          "isaTag": "data_file_comment",
+          "ontology": null,
+          "CVList": null
+        },
+        {
+          "iri": null,
+          "name": "run and lane",
+          "description": "sequential number per run /per sequence provider /machinename /lane",
+          "dataType": "String",
+          "required": false,
+          "ontology": null,
+          "CVList": null,
+          "isaTag": "data_file_comment"
+        },
+        {
+          "iri": null,
+          "name": "B species or environment code",
+          "description": "",
+          "dataType": "String",
+          "required": false,
+          "ontology": null,
+          "CVList": null,
+          "isaTag": "data_file_comment"
+        },
+        {
+          "iri": null,
+          "name": "experiment site code",
+          "description": "",
+          "dataType": "String",
+          "required": false,
+          "ontology": null,
+          "CVList": null,
+          "isaTag": "data_file_comment"
+        },
+        {
+          "iri": null,
+          "name": "collection date code",
+          "description": "",
+          "dataType": "String",
+          "required": false,
+          "ontology": null,
+          "CVList": null,
+          "isaTag": "data_file_comment"
+        },
+        {
+          "iri": null,
+          "name": "# samples/pool code",
+          "description": "",
+          "dataType": "String",
+          "required": false,
+          "ontology": null,
+          "CVList": null,
+          "isaTag": "data_file_comment"
+        },
+        {
+          "iri": null,
+          "name": "individual code",
+          "description": "",
+          "dataType": "String",
+          "required": false,
+          "ontology": null,
+          "CVList": null,
+          "isaTag": "data_file_comment"
+        },
+        {
+          "iri": null,
+          "name": "P protocol code",
+          "description": "",
+          "dataType": "String",
+          "required": false,
+          "ontology": null,
+          "CVList": null,
+          "isaTag": "data_file_comment"
+        },
+        {
+          "iri": null,
+          "name": "technical replicate code",
+          "description": "",
+          "dataType": "String",
+          "required": false,
+          "ontology": null,
+          "CVList": null,
+          "isaTag": "data_file_comment"
+        },
+        {
+          "iri": null,
+          "name": "U flowcell lanes",
+          "description": "",
+          "dataType": "String",
+          "required": false,
+          "ontology": null,
+          "CVList": null,
+          "isaTag": "data_file_comment"
+        },
+        {
+          "iri": null,
+          "name": "unique sample code",
+          "description": "",
+          "dataType": "String",
+          "required": false,
+          "ontology": null,
+          "CVList": null,
+          "isaTag": "data_file_comment"
+        },
+        {
+          "iri": null,
+          "name": "P U protocol lane",
+          "description": "",
+          "dataType": "String",
+          "required": false,
+          "ontology": null,
+          "CVList": null,
+          "isaTag": "data_file_comment"
+        },
+        {
+          "iri": null,
+          "name": "Raw Data File",
+          "description": "or Array Data File: Name (or URI) of the raw data file generated by an assay.",
+          "dataType": "String",
+          "title": true,
+          "required": true,
+          "isaTag": "data_file",
+          "ontology": null,
+          "CVList": null
+        },
+        {
+          "iri": null,
+          "name": "md5 value PE forward",
+          "description": "The MD5 checksum of the file.",
+          "dataType": "String",
+          "required": false,
+          "ontology": null,
+          "CVList": null,
+          "isaTag": "data_file_comment"
+        },
+        {
+          "iri": null,
+          "name": "md5 value PE reverse",
+          "description": "The MD5 checksum of the file.",
+          "dataType": "String",
+          "required": false,
+          "ontology": null,
+          "CVList": null,
+          "isaTag": "data_file_comment"
+        },
+        {
+          "iri": null,
+          "name": "md5 value SE",
+          "description": "The MD5 checksum of the file.",
+          "dataType": "String",
+          "required": false,
+          "ontology": null,
+          "CVList": null,
+          "isaTag": "data_file_comment"
+        },
+        {
+          "iri": null,
+          "name": "submission date",
+          "description": "Date in which run was submitted to repository. Date of submission to repository.",
+          "dataType": "String",
+          "required": false,
+          "ontology": null,
+          "CVList": null,
+          "isaTag": "data_file_comment"
+        },
+        {
+          "iri": null,
+          "name": "status",
+          "description": "Status of submission to repository.",
+          "dataType": "String",
+          "required": false,
+          "ontology": null,
+          "CVList": ["add", "added", "modify", "modified", "cancel", "cancelled", "release", "released"],
+          "isaTag": "data_file_comment"
+        },
+        {
+          "iri": null,
+          "name": "accession",
+          "description": "repository run accession code. Provided by ENA after submission.",
+          "dataType": "String",
+          "required": false,
+          "ontology": null,
+          "CVList": null,
+          "isaTag": "data_file"
+        }
+      ]
+    }
+  ]
+}
