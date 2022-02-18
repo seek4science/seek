@@ -29,4 +29,18 @@ class SamplesHelperTest < ActionView::TestCase
     assert_equal 'none_text', tag['class']
     assert_equal 'Blah', tag.children.first.content
   end
+
+  test 'sample_attribute_display_title' do
+    # simple
+    attribute = Factory(:sample_sample_attribute, title:'The title',sample_type: Factory(:simple_sample_type))
+    assert_equal 'The title',sample_attribute_display_title(attribute)
+
+    #unit
+    attribute = Factory(:sample_sample_attribute, title:'The title',unit:Factory(:unit),sample_type: Factory(:simple_sample_type))
+    assert_equal 'The title ( g )',sample_attribute_display_title(attribute)
+
+    #pid
+    attribute = Factory(:sample_sample_attribute, title:'The title',pid:'http://pid.org/attr#title',sample_type: Factory(:simple_sample_type))
+    assert_equal "The title<small data-tooltip=\"http://pid.org/attr#title\"> [ attr#title ]</small>",sample_attribute_display_title(attribute)
+  end
 end
