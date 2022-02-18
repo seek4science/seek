@@ -8,9 +8,9 @@
   <div class="col-sm-6">
     <%= list_item_authorized_attribute t('contributor').capitalize, resource.contributor %>
 
-    <%= "<p class=\"list_item_attribute\"><b>#{assay_type_text}</b>: #{link_to_assay_type(resource)}</p>".html_safe %>
+    <%= list_item_attribute(assay_type_text, resource.assay_type_label, assay_types_path(parameters_for_type(resource, 'assay_type'))) %>
     <% unless resource.is_modelling? -%>
-        <%= "<p class=\"list_item_attribute\"><b>Technology type</b>: #{link_to_technology_type(resource)}</p>".html_safe %>
+      <%= list_item_attribute('Technology type', resource.technology_type_label, technology_types_path(parameters_for_type(resource, 'technology_type'))) %>
     <% end -%>
     <%= list_item_authorized_list [resource.investigation], t('investigation'), true, 50, true %>
 

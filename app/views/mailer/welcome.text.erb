@@ -1,6 +1,6 @@
 Hi <%= @name %>,
 
-Welcome to <%= Seek::Config.application_name %>. You have now registered and activated your account.
+Welcome to <%= Seek::Config.instance_name %>. You have now registered and activated your account.
 
 You may now update your profile at <%=  edit_person_url(@person) %>
 
@@ -17,4 +17,4 @@ If you require any assistance, please contact one of the following administrator
   <%= "#{h admin.name}: " %><%= admin.email %>
 <% end -%>
 
-- The <%= Seek::Config.dm_project_name %> Team
+- The <%= Seek::Config.instance_admins_name %> Team

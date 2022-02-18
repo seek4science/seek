@@ -185,6 +185,24 @@ module Seek
         recipient_items
       end
 
+        def grant_gatekeepers_view_permission(items)
+        items.each do |item|
+          item.asset_gatekeepers.each do |gatekeeper|
+
+            unless item.can_view?(gatekeeper)
+              begin
+
+                permission = item.policy.permissions.where(contributor: gatekeeper).first_or_initialize
+                permission.update_attributes(contributor: gatekeeper, access_type: Policy::ACCESSIBLE)
+
+              rescue Exception => e
+                Rails.logger.error("Error when granting the accessible permission to the owner #{gatekeeper.name} - #{e.message}")
+              end
+            end
+          end
+        end
+      end
+
       def notify_gatekeepers_of_approval_request(items)
         deliver_publishing_notification_emails :asset_gatekeepers, items, :request_publish_approval
       end
@@ -225,6 +243,7 @@ module Seek
         end
 
         notify_gatekeepers_of_approval_request @waiting_for_publish_items
+        grant_gatekeepers_view_permission @waiting_for_publish_items
       end
 
       def determine_state_for_log(object)

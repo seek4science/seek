@@ -31,7 +31,12 @@ class CollectionItemsController < ApplicationController
     @item = @collection.items.build(item_params)
 
     respond_to do |format|
-      if @item.save
+      if !@item.valid?
+        format.html do
+          flash[:error] = "#{@item.asset.title} cannot be added to collection"
+          redirect_to @collection
+        end
+      elsif @item.save
         format.html do
           flash[:notice] = "#{@item.asset.title} added to collection"
           redirect_to @collection

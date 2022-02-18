@@ -173,7 +173,7 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
 
   end
 
-  test 'update attribute title' do
+  test 'update attribute title and description' do
     sample_type = Factory(:patient_sample_type)
     assert_equal 5,sample_type.sample_attributes.count
 
@@ -187,7 +187,9 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
           "sample_attributes": [
             {
               "id": "#{attr.id}",
-              "title": "the name"
+              "title": "the name",
+              "description": "the name for the patient",
+              "pid": "patient:name"
             }
           ]
         }
@@ -201,6 +203,8 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
     assert_response :success
 
     assert_equal 'the name',SampleAttribute.find(attr.id).title
+    assert_equal 'the name for the patient',SampleAttribute.find(attr.id).description
+    assert_equal 'patient:name',SampleAttribute.find(attr.id).pid
     assert_equal 5, SampleType.find(sample_type.id).sample_attributes.count
   end
 
@@ -217,6 +221,7 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
         "attributes": {
           "sample_attributes": [
             title: 'a string',
+            description: 'a series of characters',
             "sample_attribute_type": {
               "id": "#{str_attribute_type.id}"
             },
@@ -239,6 +244,7 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
     refute_nil attr
     assert attr.required?
     assert_equal str_attribute_type, attr.sample_attribute_type
+    assert_equal 'a series of characters',attr.description
 
   end
 

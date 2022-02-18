@@ -7,7 +7,7 @@
       A user already exists with the email address: <code><%= @person.email %></code>
       <% if current_user.uses_omniauth? %>
         <p>
-          If you wanted to link this identity to your existing <%= Seek::Config.application_name %> account, please
+          If you wanted to link this identity to your existing <%= Seek::Config.instance_name %> account, please
           <%= render partial: 'cancel_registration' %>, then log in using that account and click the "Manage Identities"
           option in the top-right user menu, where you will be able to add an identity to your account.
           <%= link_to('For detailed guidance on how to do this, click here.',

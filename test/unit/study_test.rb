@@ -189,4 +189,19 @@ class StudyTest < ActiveSupport::TestCase
     refute item.has_jerm_contributor?
     assert item2.has_jerm_contributor?
   end
+
+  test 'assay positioning' do
+    study = Factory(:study)
+    assay2 = Factory(:assay, study: study, position: 2)
+    assay3 = Factory(:assay, study: study, position: 3)
+    assay1 = Factory(:assay, study: study, position: 1)
+    assay4 = Factory(:assay, study: study, position: 4)
+
+    assert_equal [assay1, assay2, assay3, assay4], study.positioned_assays.to_a
+
+    related_items_hash = { 'Assay' => { items: [assay4, assay1, assay2, assay3] } }
+    Seek::ListSorter.related_items(related_items_hash)
+
+    assert_equal [assay1, assay2, assay3, assay4], related_items_hash['Assay'][:items]
+  end
 end

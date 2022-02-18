@@ -3,8 +3,6 @@ require 'seek/license'
 
 module LicenseHelper
   def license_select(name, selected = nil, opts = {})
-    puts opts[:multiple]
-    puts opts
     select_tag(name, options_for_select(license_options(opts), selected), opts)
   end
 
@@ -80,7 +78,7 @@ module LicenseHelper
   def grouped_license_options(opts = {})
     grouped_licenses = sort_grouped_licenses(group_licenses(opts))
 
-    grouped_licenses.each do |_, licenses|
+    grouped_licenses.each do |g, licenses|
       licenses.map! { |value| [value['title'], value['id'], { 'data-url' => value['url'] }] }
     end
 
@@ -88,27 +86,29 @@ module LicenseHelper
   end
 
   def sort_grouped_licenses(licenses)
-    licenses.sort_by do |pair|
+    s = licenses.sort_by do |pair|
       case pair[0]
-      when 'Recommended'
+      when 'recommended'
         0
-      when 'Generic'
-        1
+#      when 'Generic'
+#        2
       else
-        2
+        3
       end
     end
+    s.each do |pair|
+      pair[0] = "#{t('licenses.' + pair[0])}"
+    end
+    s
   end
 
   def group_licenses(opts)
-    
+
     grouped = license_values(opts).group_by do |l|
       if opts[:recommended]&.include?(l['id'])
-        'Recommended'
-      elsif l.key?('is_generic') && l['is_generic']
-        'Generic'
+        'recommended'
       else
-        'Other'
+        'other'
       end
     end.to_a
   end

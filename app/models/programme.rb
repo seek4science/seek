@@ -31,6 +31,8 @@ class Programme < ApplicationRecord
   end
   accepts_nested_attributes_for :projects
 
+  auto_strip_attributes :web_page
+
   # validations
   validates :title, uniqueness: true
   validates :title, length: { maximum: 255 }

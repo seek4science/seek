@@ -19,17 +19,21 @@ module Ga4gh
         def descriptor
           @tool.ro_crate do |crate|
             if params[:relative_path].present?
+              path = params[:relative_path]
               entry = crate.find_entry(params[:relative_path])
             else
+              path = crate.main_workflow.id
               entry = crate.main_workflow&.source
             end
 
             return trs_error(404, "No descriptor found#{ " at: #{params[:relative_path]}" if params[:relative_path].present?}") unless entry
 
             if params[:type].downcase.start_with?('plain_')
-              render plain: (entry.remote? ? entry.uri : entry.read)
+              respond_to do |format|
+                format.all { render plain: (entry.remote? ? entry.uri : entry.read) }
+              end
             else
-              @file_wrapper = FileWrapper.new(entry)
+              @file_wrapper = FileWrapper.new(entry, path: path, tool_version: @tool_version)
               respond_to do |format|
                 format.json { render json: @file_wrapper, adapter: :attributes }
                 format.text { render plain: (entry.remote? ? entry.uri : entry.read) }

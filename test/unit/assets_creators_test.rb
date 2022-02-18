@@ -5,6 +5,23 @@ class AssetsCreatorsTest < ActiveSupport::TestCase
     user = Factory :user
     User.current_user = user
     @resource = Factory :sop, contributor: User.current_user.person, projects: user.person.projects
+    @person = Factory(:person)
+    @sop = Factory(:sop, assets_creators_attributes: {
+      '1' => {
+        creator_id: @person.id
+      },
+      '2' => {
+        given_name: 'Joe',
+        family_name: 'Bloggs',
+        affiliation: 'School of Rock',
+        orcid: 'https://orcid.org/0000-0002-5111-7263'
+      },
+      '3' => {
+        given_name: 'Jess',
+        family_name: 'Jenkins',
+        affiliation: 'School of Rock'
+      }
+    })
   end
 
   def teardown
@@ -75,5 +92,85 @@ class AssetsCreatorsTest < ActiveSupport::TestCase
     assert creators.include?(creator_to_stay)
     assert creators.include?(new_creator)
     assert !creators.include?(creator_to_remove)
+  end
+
+  test 'cannot add duplicate assets creators by creator_id' do
+    disable_authorization_checks do
+      assert_no_difference('AssetsCreator.count') do
+        @sop.update_attributes(assets_creators_attributes: {
+          '1233' => {
+            creator_id: @person.id
+          }
+        })
+
+        assert @sop.errors.added?('assets_creators.creator_id', :taken, value: @person.id)
+      end
+    end
+  end
+
+  test 'cannot add duplicate assets creators by orcid' do
+    disable_authorization_checks do
+      assert_no_difference('AssetsCreator.count') do
+        @sop.update_attributes(assets_creators_attributes: {
+          '4634' => {
+            given_name: 'Someone',
+            family_name: 'Else',
+            orcid: 'https://orcid.org/0000-0002-5111-7263'
+          }
+        })
+
+        assert @sop.errors.added?('assets_creators.orcid', :taken, value: 'https://orcid.org/0000-0002-5111-7263')
+      end
+    end
+  end
+
+  test 'cannot add duplicate assets creators by name in same institution' do
+    disable_authorization_checks do
+      assert_no_difference('AssetsCreator.count') do
+        @sop.update_attributes(assets_creators_attributes: {
+          '4634' => {
+            given_name: 'Jess',
+            family_name: 'Jenkins',
+            affiliation: 'School of Rock'
+          }
+        })
+
+        assert @sop.errors.added?('assets_creators.family_name', :taken, value: 'Jenkins')
+      end
+    end
+  end
+
+  test 'can add assets creators with same names in different institutions' do
+    disable_authorization_checks do
+      assert_difference('AssetsCreator.count', 1) do
+        @sop.update_attributes(assets_creators_attributes: {
+          '4634' => {
+            given_name: 'Jess',
+            family_name: 'Jenkins',
+            affiliation: 'School of Jazz'
+          }
+        })
+
+        assert @sop.valid?
+      end
+    end
+  end
+
+  test 'can add duplicate assets creators on different assets' do
+    other_sop = Factory(:sop)
+
+    disable_authorization_checks do
+      assert_difference('AssetsCreator.count', 1) do
+        other_sop.update_attributes(assets_creators_attributes: {
+          '4634' => {
+            given_name: 'Jess',
+            family_name: 'Jenkins',
+            affiliation: 'School of Rock'
+          }
+        })
+
+        assert other_sop.valid?
+      end
+    end
   end
 end

@@ -52,6 +52,7 @@ module Seek
                    inverse_of: :other_object
 
           include Seek::Creators
+          include Seek::Collectable
 
           has_many :discussion_links, -> { where(AssetLink.discussion.where_values_hash) }, class_name: 'AssetLink', as: :asset, dependent: :destroy, inverse_of: :asset
           accepts_nested_attributes_for :discussion_links, allow_destroy: true
@@ -60,14 +61,6 @@ module Seek
           has_many :publication_relationships, -> { where(predicate: Relationship::RELATED_TO_PUBLICATION) },
                    class_name: 'Relationship', as: :subject, dependent: :destroy, inverse_of: :subject
           has_many :publications, through: :publication_relationships, source: :other_object, source_type: 'Publication'
-
-          has_many :collection_items, as: :asset, dependent: :destroy
-          has_many :collections, through: :collection_items
-          has_filter collection: Seek::Filtering::Filter.new(
-              value_field: 'collections.id',
-              label_field: 'collections.title',
-              joins: [:collections]
-          )
         end
       end
     end

@@ -18,6 +18,9 @@ module Seek
       'Other' => {
           defaults: { index: :updated_at_desc, related: :updated_at_desc },
           options: [:updated_at_asc, :updated_at_desc, :created_at_asc, :created_at_desc, :title_asc, :title_desc] },
+      'Assay' => {
+          defaults: { related: :position_asc }
+      }
     }.with_indifferent_access.freeze
 
     ORDER_OPTIONS = {
@@ -33,6 +36,8 @@ module Seek
       updated_at_desc: { title: 'Last update date (Descending)', order: 'updated_at DESC' },
       created_at_asc: { title: 'Creation date (Ascending)', order: 'created_at' },
       created_at_desc: { title: 'Creation date (Descending)', order: 'created_at DESC' },
+      position_asc: { title: 'Position (Ascending)', order: 'position' },
+      position_desc: { title: 'Position (Descending)', order: 'position DESC' },
       relevance: { title: 'Relevance', order: '--relevance', proc: -> (items) {
         ids = items.solr_cache(items.last_solr_query)
         return [] if ids.empty?
@@ -80,7 +85,7 @@ module Seek
     end
 
     def self.options(type_name)
-      (RULES[type_name] || RULES['Other'])[:options]
+      RULES.dig(type_name, :options) || RULES.dig('Other', :options)
     end
 
     def self.options_for_select(type_name)
@@ -90,7 +95,7 @@ module Seek
     end
 
     def self.key_for_view(type_name, view)
-      (RULES[type_name] || RULES['Other'])[:defaults][view] || RULES['Other'][:defaults][view]
+      RULES.dig(type_name, :defaults, view) || RULES.dig('Other', :defaults, view)
     end
 
     def self.valid_key?(type, key)

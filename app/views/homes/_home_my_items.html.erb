@@ -1,0 +1,62 @@
+<div class="panel panel-default" id="home-my-items">
+  <% current_person = current_user.person %>
+  <% current_person_administered_projects = current_person.administered_projects %>
+  <% current_person_projects_member_only = current_person.projects - current_person_administered_projects %>
+  <div class="panel-heading">
+    My <%= Seek::Config.instance_name %>&nbsp;
+  </div>
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-sm-6" id='my-projects'>
+
+        <% if false && Seek::Config.programmes_enabled && current_person.is_programme_administrator_of_any_programme?%>
+          <% current_person_programmes = current_person.administered_programmes %>
+          <h3>My <%= t('programme').pluralize %></h3>
+          <ul class="feed">
+            <% current_person_programmes.first(3).each do |programme| %>
+              <li>
+                <%= avatar(programme, 30, true, nil, nil, true, 'home_asset_icon') %>
+                <%= link_to(programme.title, programme) %>
+              </li>
+            <% end %>
+            <% if current_person_programmes.length() > 3 %>
+              <li><%= link_to('More ...',person_programmes_path(current_person)) %></li>
+            <% end %>
+          </ul>
+        <% end %>
+
+        <% if current_person.is_project_administrator_of_any_project? %>
+        <h3><%= t('project').pluralize %> I administer</h3>
+          <ul class="feed">
+            <% projectCount = 0%>
+            <% current_person_administered_projects.reverse.first(5).each do |project| %>
+                <li>
+                  <%= avatar(project, 30, true, nil, nil, true, 'home_asset_icon') %>
+                  <%= link_to(project.title, project) %>
+                </li>
+            <% end %>
+            <% if current_person_administered_projects.length() > 5 %>
+              <li><%= link_to('More ...',person_projects_path(current_person)) %></li>
+            <% end %>
+          </ul>
+        <% end %>
+
+        <h3><%= 'Other ' if current_person_administered_projects.any? %><%= t('project').pluralize %> I am a member of</h3>
+        <ul class="feed">
+          <% current_person_projects_member_only.reverse.first(5).each do |project| %>
+            <li>
+              <%= avatar(project, 30, true, nil, nil, true, 'home_asset_icon') %>
+              <%= link_to(project.title, project) %>
+            </li>
+          <% end %>
+          <% if current_person_projects_member_only.length() > 5 %>
+            <li><%= link_to('More ...',person_projects_path(current_person)) %></li>
+          <% end %>
+        </ul>
+      </div>
+      <div class="col-sm-6">
+        <%= render :partial=>"home_my_recent" -%>
+      </div>
+    </div>
+  </div>
+</div>

@@ -199,9 +199,9 @@ class Publication < ApplicationRecord
   # @param doi_record DOI::Record
   # @see https://github.com/SysMO-DB/doi_query_tool/blob/master/lib/doi_record.rb
   def extract_doi_metadata(doi_record)
-
     self.registered_mode = 2
     self.title = doi_record.title
+    self.abstract = doi_record.abstract
     self.published_date = doi_record.date_published
     self.journal = doi_record.journal
     self.doi = doi_record.doi
@@ -213,7 +213,6 @@ class Publication < ApplicationRecord
 
   # @param bibtex_record BibTeX entity from bibtex-ruby gem
   def extract_bibtex_metadata(bibtex_record)
-
     self.registered_mode = 4
     self.publication_type_id = PublicationType.get_publication_type_id(bibtex_record)
     self.title           = bibtex_record[:title].try(:to_s).gsub /{|}/, '' unless bibtex_record[:title].nil?
@@ -441,8 +440,10 @@ class Publication < ApplicationRecord
         @error = 'The DOI you entered appears to be malformed.'
       rescue DOI::NotFoundException
         @error = 'The DOI you entered could not be resolved.'
+      rescue DOI::RecordNotSupported
+        @error = 'The DOI resolved to an unsupported resource type.'
       rescue RuntimeError => exception
-        @error = 'There was an problem contacting the DOI query service. Please try again later'
+        @error = 'There was a problem contacting the DOI query service. Please try again later'
         Seek::Errors::ExceptionForwarder.send_notification(exception, data: {message: "Problem accessing crossref using DOI #{doi}"})
       end
     else
