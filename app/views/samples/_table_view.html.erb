@@ -12,7 +12,7 @@
                 <th>ID</th>
                 <th>Title</th>
                 <% shown_attributes.each do |attribute| %>
-                    <th <%= 'data-title-column="true" ' if (attribute.is_title && link) -%>data-accessor-name="<%= attribute.accessor_name -%>" data-column-type="<%= attribute.sample_attribute_type.base_type-%>"><%= sample_attribute_display_title(attribute) %></th>
+                    <th <%= 'data-title-column="true" ' if (attribute.is_title && link) -%>data-accessor-name="<%= attribute.accessor_name -%>" data-column-type="<%= attribute.sample_attribute_type.base_type-%>"><%= attribute.title %></th>
                 <% end %>
               </tr>
           <% end %>

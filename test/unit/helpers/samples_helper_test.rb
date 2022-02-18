@@ -41,6 +41,6 @@ class SamplesHelperTest < ActionView::TestCase
 
     #pid
     attribute = Factory(:sample_sample_attribute, title:'The title',pid:'http://pid.org/attr#title',sample_type: Factory(:simple_sample_type))
-    assert_equal "The title<small data-tooltip=\"http://pid.org/attr#title\"> [ attr#title ]</small>",sample_attribute_display_title(attribute)
+    assert_equal "The title<small data-tooltip=\"http://pid.org/attr#title\"> [ title ]</small>",sample_attribute_display_title(attribute)
   end
 end
