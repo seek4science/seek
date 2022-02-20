@@ -42,12 +42,13 @@
 </div>
 
 <script type="text/javascript">
-    var selectedItem = {type:"",id:""}, pid, uid
+    var selectedItem = {type:"",id:""}, pid, projectAccessType, uid
     $j(document).ready(function() {
         setupFoldersTree( <%= ((TreeviewBuilder.new(@project, @folders)).build_tree_data).html_safe -%> , 'demo_tree', 'draggable_folder_item');
         $j("#item-layout").html("<%= escape_javascript(render template: 'projects/show' ) %>");
         $j("#item_contents").show();
         pid = <%= @project.id %>
+        projectAccessType = <%= @project&.default_policy&.access_type || "" %>
         uid = <%= current_user ? current_user.id : "null" %>
     });
     

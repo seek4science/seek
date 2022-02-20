@@ -22,6 +22,9 @@
       </div>
     <% end %>
 
+    <div id="investigation_collection" class="hidden">
+      <%= render :partial=>"studies/investigation_list",:locals=>{study:@isa_study.study, :investigations=>Investigation.all.select {|i|current_user.person.member_of? i.projects}} -%>
+    </div>    
 
     <div class="form-group">
       <%= study_fields.label "Study position" -%><br/>
@@ -40,7 +43,7 @@
 
     <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @isa_study.study} -%>
 
-    <%= render partial: 'projects/implicit_project_selector', locals: { action: action,
+    <%= render partial: 'projects/implicit_project_selector', locals: { action: :new,
                                                                           select_id: '#study_investigation_id',
                                                                           parents: Investigation.authorized_for('edit') } %>
     
@@ -78,9 +81,12 @@
     $j(document).ready(function () {   
       const urlSearchParams = new URLSearchParams(window.location.search);
       const params = Object.fromEntries(urlSearchParams.entries());
+      const investigation_id = params["investigation_id"]
       // Prevent setting the hidden field on redirect (query string parameters are missing)
-      if(params["investigation_id"])
-        $j("#isa_study_study_investigation_id").val(params["investigation_id"]);  
+      if(investigation_id) {
+          $j("#isa_study_study_investigation_id").val(investigation_id); 
+          $j("#study_investigation_id").val(investigation_id).change();
+      } 
 
       Templates.init($j('#template-attributes'));   
     }); 

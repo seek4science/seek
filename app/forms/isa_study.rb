@@ -46,8 +46,12 @@ class IsaStudy
     @sample_collection_sample_type
   end
 
-  def can_manage?
-    false
+  def can_manage?(user = User.current_user)
+    user && user.person == @study.contributor
+  end
+
+  def isa_object
+    @study
   end
 
   private

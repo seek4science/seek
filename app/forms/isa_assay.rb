@@ -35,8 +35,12 @@ class IsaAssay
     @sample_type
   end
 
-  def can_manage?
-    false
+  def can_manage?(user = User.current_user)
+    user && user.person == @assay.contributor
+  end
+
+  def isa_object
+    @assay
   end
 
   private

@@ -1,4 +1,5 @@
 class IsaAssaysController < ApplicationController
+  include Seek::AssetsCommon
   before_action :set_up_instance_variable
   
   def new
@@ -7,6 +8,8 @@ class IsaAssaysController < ApplicationController
 
   def create
     @isa_assay = IsaAssay.new(isa_assay_params)
+    update_sharing_policies @isa_assay.assay
+    @isa_assay.assay.contributor=current_person
     @isa_assay.sample_type.contributor = User.current_user.person
 
     if @isa_assay.save

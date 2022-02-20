@@ -1,4 +1,5 @@
 class IsaStudiesController < ApplicationController
+  include Seek::AssetsCommon
   before_action :set_up_instance_variable
 
   def new
@@ -7,6 +8,7 @@ class IsaStudiesController < ApplicationController
 
   def create
     @isa_study = IsaStudy.new(isa_study_params)
+    update_sharing_policies @isa_study.study
     @isa_study.source.contributor = User.current_user.person
     @isa_study.sample_collection.contributor = User.current_user.person
     @isa_study.study.sample_types = [@isa_study.source, @isa_study.sample_collection]

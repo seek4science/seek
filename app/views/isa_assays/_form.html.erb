@@ -71,6 +71,12 @@
  
 <%= f.submit "Create", :class => 'btn btn-primary'  %>
 
+
+<%= render partial: 'projects/implicit_project_selector', locals: { action: :new,
+                                                                    select_id: '#isa_assay_assay_study_id',
+                                                                    parents: Study.authorized_for('edit') } %>
+
+
 <script>
     const templates = <%= load_templates().to_json.html_safe %>
     const initTemplateModal = function(field_name) {
@@ -82,9 +88,10 @@
     $j(document).ready(function () {   
       const urlSearchParams = new URLSearchParams(window.location.search);
       const params = Object.fromEntries(urlSearchParams.entries());
+      const study_id = params["study_id"]
       // Prevent setting the hidden field on redirect (query string parameters are missing)
-      if(params["study_id"])
-        $j("#isa_assay_assay_study_id").val(params["study_id"]);  
+      if(study_id) 
+        $j("#isa_assay_assay_study_id").val(study_id).change(); 
 
       Templates.init($j('#template-attributes'));   
     }); 
