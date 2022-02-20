@@ -11,7 +11,7 @@ module DynamicTableHelper
       if assay.position == 0
         sample_types = [study.sample_types.second, assay.sample_type]
       else
-        previous_assay = Assay.where(position: assay.position - 1).first
+        previous_assay = study.assays.find_by_position(assay.position - 1)
         sample_types = [previous_assay.sample_type, assay.sample_type]
       end
     else
@@ -68,7 +68,6 @@ module DynamicTableHelper
     aggregated_rows
   end
 
-  #TODO 
   def get_full_rows(x, depth, row=[], i=0, rows=[])
     row << x
     links = @arr[i][x] if @arr[i]
