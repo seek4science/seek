@@ -13,20 +13,25 @@
 
 <% if valid_assay %>
     <script>
-        let assayDynamicTable
+        var assayDynamicTable
+        let initialLoad = true;
         $j(document).ready(function () {
-            const dt = <%= sanitize(dt_aggregated(assay.study, nil, assay).to_json) %>
+            const dt = <%= sanitize(dt_aggregated(assay.study, false, assay).to_json) %>
             assayDynamicTable = new $j.dynamicTable('#assay-table')
             const ajax = {
                 url: `/single_pages/${pid}/dynamic_table_data/`,
-                data: function(d) { 
+                data: function(d) {
+                    if (initialLoad) {
+                        initialLoad = false;
+                        return;
+                    }
                     d.study_id = '<%=assay.study.id%>';
                     d.include_all_assays = 'false';
                     d.assay_id = '<%=assay.id%>';
                     d.rows_pad = "true";
                 }
             }
-            assayDynamicTable.init(dt.rows, dt.columns, { readonly: true })
+            assayDynamicTable.init(dt.rows, dt.columns, { readonly: true, ajax })
             const types = assayDynamicTable.getSampleTypes()
             createSampleTypeOptions(types)
         });	

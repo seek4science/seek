@@ -25,10 +25,15 @@
                 $j.fn.dataTable.tables( {visible: true, api: true} ).columns.adjust();
             });
             const dt = <%= sanitize(dt_data(sample_type).to_json) %>
-            sampleDynamicTable = new $j.dynamicTable('#assay-samples-table')
-            sampleDynamicTable.init(dt.rows, dt.columns, { assayId:  selectedItem.type =="assay" ? selectedItem.id : null })
+            sampleDynamicTable = new $j.dynamicTable('#assay-samples-table');
+            const options = {
+                assayId:  selectedItem.type =="assay" ? selectedItem.id : null,
+                callback: () => assayDynamicTable.table.ajax.reload()
+            }
 
-             $j(".dataTables_scrollBody").css("min-height", "300px").css("overflow-y", "hidden")
+            sampleDynamicTable.init(dt.rows, dt.columns, options)
+            
+            $j(".dataTables_scrollBody").css("min-height", "300px").css("overflow-y", "hidden")
         });
 
         function SamplePasteFromClipboard(){
