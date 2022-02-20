@@ -102,7 +102,7 @@ module IsaExporter
         def convert_assay (assay)
             isa_assay = {}
             isa_assay["@id"] = "#assay/#{assay.id}"
-            isa_assay[:filename] = "a_name of the used template.txt"
+            isa_assay[:filename] = assay&.sample_type&.isa_template&.title
             isa_assay[:measurementType] = {
                 annotationValue: "",
                 termSource: "",
@@ -192,7 +192,7 @@ module IsaExporter
                 termAccession: ontology[:termAccession],
                 termSource: ontology[:termSource]
             }
-            isa_protocol[:description] = attribute.description
+            isa_protocol[:description] = sop.description
             isa_protocol[:uri] = ontology[:termAccession]
             isa_protocol[:version] = nil
             isa_protocol[:parameters] = [
@@ -402,6 +402,8 @@ module IsaExporter
         end
 
         def next_process(sample)
+            # return { "@id": nil } for studies
+            return { "@id": nil } if sample.sample_type.assays.blank?
             sample_type = sample.linking_samples.first&.sample_type
             return nil if !sample_type
             protocol = detect_protocol(sample_type)
