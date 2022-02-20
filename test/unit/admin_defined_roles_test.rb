@@ -500,6 +500,15 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
     assert_equal expected_masks, actual_masks
   end
 
+  test 'locale for roles' do
+    #it's important the role name constants map the the locale key
+    assert I18n.exists?(Seek::Roles::PAL)
+    assert I18n.exists?(Seek::Roles::PROJECT_ADMINISTRATOR)
+    assert I18n.exists?(Seek::Roles::PROGRAMME_ADMINISTRATOR)
+    assert I18n.exists?(Seek::Roles::ASSET_GATEKEEPER)
+    assert I18n.exists?(Seek::Roles::ASSET_HOUSEKEEPER)
+  end
+
   test 'factories for roles' do
     User.with_current_user Factory(:admin).user do
       admin = Factory(:admin)

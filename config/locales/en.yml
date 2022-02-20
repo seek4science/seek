@@ -54,6 +54,11 @@ en:
   avatar: "Avatar"
   private_asset: 'Hidden item'
 
+  openbis_endpoint: "OpenBis endpoint"
+
+  samples:
+    pid_info_text: 'The identifier assigns a unique and unequivocal meaning to the attribute name.'
+
   gadget:
     new_heading: "New or upload"
     create_button: "CREATE"
@@ -106,6 +111,7 @@ en:
   admin: 'Administrator'
   pal: 'PAL'
   programme_administrator: 'Programme administrator'
+  admin: 'Admin'
 
   contributor: 'submitter' # A person who submitted the resource to SEEK
   contribution: 'submission'
@@ -115,6 +121,10 @@ en:
   deleted_contributor_name: 'Deleted submitter'
 
   null_license: 'No license - no permission to use unless the owner grants a licence'
+
+  licenses:
+    other: 'Other'
+    recommended: 'Suggested'
 
   attributes: # Applies to attributes for any model
     other_creators: Additional credit
@@ -173,3 +183,5 @@ you can choose to have a %{project} linked to a site managed %{programme} instea
   Alternatively, if you are unable to use the %{issue_tracker_link}, or the issue is of a private nature, then you can use the %{feedback_link}.
   <p>'
 
+  controlled_vocabs:
+    add_new_term_disabled_reason: "You are unable to add new terms when linked to an Ontology"

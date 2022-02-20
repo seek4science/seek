@@ -26,7 +26,7 @@ module IsaTabConverter
          :name => 'jerm_ontology',
          :version => '1.0',
          :description => ''},
-        {:file => URI.encode("#{Seek::Config.site_base_host}/ontologies/ad_hoc_ontology"),
+        {:file => Addressable::URI.escape("#{Seek::Config.site_base_host}/ontologies/ad_hoc_ontology"),
          :name => 'ad_hoc_ontology',
          :version => '1.0',
          :description => ''}
@@ -331,7 +331,7 @@ module IsaTabConverter
     end
 
     isa_material_attribute = {}
-    isa_material_attribute['@id'] = URI.encode("#{Seek::Config.site_base_host}/sample_types/#{sa.sample_type.id.to_s}/#{sa.title}")
+    isa_material_attribute['@id'] = Addressable::URI.escape("#{Seek::Config.site_base_host}/sample_types/#{sa.sample_type.id.to_s}/#{sa.title}")
     isa_material_attribute['characteristicType'] = {}
     isa_material_attribute['characteristicType']["$ref"] = 'ontology_annotation_schema.json#'
     if ["Float", "Integer"].include? sa.sample_attribute_type.base_type
@@ -340,7 +340,7 @@ module IsaTabConverter
       isa_material_attribute['characteristicType']['annotationValue'] = {'type' => 'string'}
     end
     isa_material_attribute['characteristicType']['termSource'] = 'ad_hoc_ontology'
-    isa_material_attribute['characteristicType']['termAccession'] = URI.encode("#{sa.title}")
+    isa_material_attribute['characteristicType']['termAccession'] = Addressable::URI.escape(sa.title)
 
     OBJECT_MAP[sa] = isa_material_attribute
     return isa_material_attribute

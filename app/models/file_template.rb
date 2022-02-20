@@ -44,6 +44,10 @@ class FileTemplate < ApplicationRecord
     true
   end
 
+  def self.user_creatable?
+    Seek::Config.file_templates_enabled
+  end
+
   def edam_topics_vocab
     nil
   end

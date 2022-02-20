@@ -54,6 +54,8 @@
       <td><%= EdamHelper::url_to_text(resource.data_type) %></td>
     <% when "format_type" %>
       <td><%= EdamHelper::url_to_text(resource.format_type) %></td>
+    <% when "technology_type_uri"%>
+      <td><%= link_to_technology_type(resource) %></td>
     <% else  %>
       <% if resource.respond_to?(column) %>
         <td><%= text_or_not_specified(resource.send(column),length: 300, auto_link: true, none_text: "") %></td>

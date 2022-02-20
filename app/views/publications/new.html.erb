@@ -340,6 +340,17 @@ jQuery(document).ready(function() {
             suggestion: HandlebarsTemplates['typeahead/hint']
           }
         },
+          {
+              name: "typed-several",
+              displayKey: function(item){ return item.name;},
+              source: function(q, sync) {
+                  return sync([{name: q, count: 0}]);
+              },
+              templates: {
+                  header: 'Comma separated new Author',
+                  suggestion: HandlebarsTemplates['typeahead/hint']
+              }
+          },
         {
           name: "authors",
           displayKey: function(item){ return item.first_name + " " + item.last_name;},

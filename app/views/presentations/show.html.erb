@@ -1,32 +1,44 @@
-<%= render :partial => "general/item_title",:locals=>{:item=>@presentation, :version => @display_presentation.version,
-                                                      :buttons_partial => 'assets/asset_buttons'} %>
+<%= render partial: 'general/show_page_tab_definitions' %>
 
-<%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@presentation} -%>
+<div class="tab-content">
 
-<div class="row">
-  <div class="col-md-9 col-sm-8 box_about_actor">
-    <%= item_description @display_presentation.description %>
+  <div id="details" class="tab-pane fade in active">
+
+    <%= render :partial => "general/item_title", :locals => { :item => @presentation, :version => @display_presentation.version,
+                                                              :buttons_partial => 'assets/asset_buttons' } %>
+
+    <%= render :partial => "assets/upload_new_version_form", :locals => { :resource => @presentation } -%>
+
     <div class="row">
-      <div class="col-md-6">
-        <%= persistent_resource_id(@display_presentation) %>
+      <div class="col-md-9 col-sm-8 box_about_actor">
+        <%= item_description @display_presentation.description %>
+        <div class="row">
+          <div class="col-md-6">
+            <%= persistent_resource_id(@display_presentation) %>
 
-        <%= render :partial => 'assets/fileinfo',:object=>@display_presentation.content_blob -%>
+            <%= render :partial => 'assets/fileinfo', :object => @display_presentation.content_blob -%>
 
-        <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @presentation} %>
+            <%= render :partial => "assets/special_auth_code_display", :locals => { :resource => @presentation } %>
+          </div>
+        </div>
+
+        <%= rendered_asset_view(@display_presentation) %>
+
+        <%= render :partial => "general/isa_graph", :locals => { :root_item => @presentation, :deep => true, :include_parents => true } %>
+      </div>
+
+      <div class="col-md-3 col-sm-4">
+        <%= render :partial => "assets/resource_main_content_right", :locals => { :resource => @presentation, :versioned_resource => @display_presentation } %>
       </div>
     </div>
 
-    <%= rendered_asset_view(@display_presentation) %>
 
-    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @presentation, :deep => true, :include_parents => true} %>
+    <%= render :partial => "assets/resource_version_details", :locals => { :displayed_resource => @display_presentation, :resource => @presentation } -%>
+
   </div>
 
-  <div class="col-md-3 col-sm-4">
-    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @presentation, :versioned_resource=>@display_presentation } %>
+  <div id="related-items" class="tab-pane fade">
+    <%= render :partial => "general/items_related_to", :object => @presentation %>
   </div>
+
 </div>
-
-
-<%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_presentation, :resource=>@presentation} -%>
-
-<%= render :partial=>"general/items_related_to",:object => @presentation %>

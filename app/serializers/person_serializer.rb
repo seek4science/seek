@@ -27,6 +27,10 @@ class PersonSerializer < AvatarObjSerializer
     positions
   end
 
+  attribute :login, if: -> { User.current_user&.is_admin? } do
+    object&.user&.login
+  end
+
   has_many :projects
   has_many :institutions
   has_many :investigations

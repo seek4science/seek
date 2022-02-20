@@ -24,9 +24,21 @@ module Seek
       end
 
       def index
-        entity_type
-        entity_types
-        entities
+        begin
+          entity_type
+          entity_types
+          entities
+        rescue Fairdom::OpenbisApi::OpenbisQueryException => e
+          if e.message
+            errorMessage = e.message
+            if (e.message["[MESSAGE]"] && e.message["[/MESSAGE]"])
+              errorMessage = e.message.split("[MESSAGE]").last.split("[/MESSAGE]").first
+            end
+            flash[:error] = "An error occured with the OpenBis connector. Detailed message: \n" + errorMessage
+          else
+            flash[:error] = "An error occured with the OpenBis connector"
+          end
+        end
       end
 
       def edit

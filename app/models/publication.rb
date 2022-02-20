@@ -465,7 +465,7 @@ class Publication < ApplicationRecord
       rescue DOI::RecordNotSupported
         @error = 'The DOI resolved to an unsupported resource type.'
       rescue RuntimeError => exception
-        @error = 'There was an problem contacting the DOI query service. Please try again later'
+        @error = 'There was a problem contacting the DOI query service. Please try again later'
         Seek::Errors::ExceptionForwarder.send_notification(exception, data: {message: "Problem accessing crossref using DOI #{doi}"})
       end
     else

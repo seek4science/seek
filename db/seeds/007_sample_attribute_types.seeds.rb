@@ -55,13 +55,13 @@ inchi_type.update_attributes(base_type: Seek::Samples::BaseType::STRING,
 bool_type = SampleAttributeType.find_or_initialize_by(title:'Boolean')
 bool_type.update_attributes(base_type: Seek::Samples::BaseType::BOOLEAN)
 
-strain_type = SampleAttributeType.find_or_initialize_by(title:'SEEK Strain')
+strain_type = SampleAttributeType.find_or_initialize_by(title:'Registered Strain')
 strain_type.update_attributes(base_type: Seek::Samples::BaseType::SEEK_STRAIN)
 
-seek_sample_type = SampleAttributeType.find_or_initialize_by(title:'SEEK Sample')
+seek_sample_type = SampleAttributeType.find_or_initialize_by(title:'Registered Sample')
 seek_sample_type.update_attributes(base_type: Seek::Samples::BaseType::SEEK_SAMPLE)
 
-seek_sample_multi_type = SampleAttributeType.find_or_initialize_by(title:'SEEK Sample Multi')
+seek_sample_multi_type = SampleAttributeType.find_or_initialize_by(title:'Registered Sample (multiple)')
 seek_sample_multi_type.update_attributes(base_type: Seek::Samples::BaseType::SEEK_SAMPLE_MULTI)
 
 cv_type = SampleAttributeType.find_or_initialize_by(title:'Controlled Vocabulary')
@@ -76,7 +76,7 @@ doi_type.update_attributes(base_type: Seek::Samples::BaseType::STRING, regexp: '
 ncbi_type = SampleAttributeType.find_or_initialize_by(title:'NCBI ID')
 ncbi_type.update_attributes(base_type: Seek::Samples::BaseType::STRING, regexp: '[0-9]+', placeholder: '23234', resolution:'https://identifiers.org/taxonomy/\\0')
 
-data_file_type = SampleAttributeType.find_or_initialize_by(title: 'SEEK Data file')
+data_file_type = SampleAttributeType.find_or_initialize_by(title: 'Registered Data file')
 data_file_type.update_attributes(base_type: Seek::Samples::BaseType::SEEK_DATA_FILE)
 
 puts "Seeded #{SampleAttributeType.count - count} sample attribute types"

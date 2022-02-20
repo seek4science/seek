@@ -8,6 +8,7 @@ class UtilTest < ActiveSupport::TestCase
 
   test 'creatable types' do
     types = Seek::Util.user_creatable_types
+    # How to enable Placeholder?
     expected = [Collection, DataFile, Document, FileTemplate, Model, Node, Presentation, Publication, Sample, Sop, Assay, Investigation, Study, Event, SampleType, Strain, Workflow]
 
     # first as strings for more readable failed assertion message
@@ -18,6 +19,7 @@ class UtilTest < ActiveSupport::TestCase
   end
 
   test 'authorized types' do
+    # How to enable Placeholder?
     expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, Investigation, Model, Node, Presentation, Publication, Sample, Sop, Strain, Study, Workflow].map(&:name).sort
     actual = Seek::Util.authorized_types.map(&:name).sort
     assert_equal expected, actual

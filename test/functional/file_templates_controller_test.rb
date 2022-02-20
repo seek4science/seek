@@ -214,7 +214,7 @@ class FileTemplatesControllerTest < ActionController::TestCase
     # should be a temporary sharing link
     assert_select 'div#temporary_links', count:1
 
-#    assert_select 'div#author_form', count:1
+#    assert_select 'div#author-form', count:1
   end
 
   test 'cannot access manage page with edit rights' do
