@@ -947,7 +947,7 @@
           "iri": null,
           "name": "status",
           "description": "Status of submission to repository.",
-          "dataType": "String",
+          "dataType": "Controlled Vocabulary",
           "required": false,
           "ontology": null,
           "CVList": ["add", "added", "modify", "modified", "cancel", "cancelled", "release", "released"],
