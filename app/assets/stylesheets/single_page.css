@@ -285,7 +285,7 @@
     top: 50%;
     margin-top: -50px;
     left: 100%;
-    z-index: 2;
+    z-index: -1;
     transition: all ease-in-out 200ms;
 }
 
@@ -302,7 +302,7 @@
     margin-top: -50px;
     margin-left: 1px;
     left: 100%;
-    z-index: 1;
+    z-index: -1;
 }
 
 .bcrumb li:nth-child(2) a span,
@@ -315,18 +315,22 @@
 
 .bcrumb li:first-child a {
     width: 20%;
+    z-index:10
 }
 
 .bcrumb li:nth-child(2) a {
-    width: 30%;
+    width: 32%;
+    z-index:9
 }
 
 .bcrumb li:nth-child(3) a {
-    width: 22%;
+    width: 20%;
+    z-index:8
 }
 
 .bcrumb li:last-child a {
     width: 28%;
+    z-index:7
 }
 
 .bcrumb li:last-child a.active {
@@ -343,11 +347,11 @@
     cursor: default
 }
 
-/* @media only screen and (min-width: 1000px) {
+@media only screen and (min-width: 992px) {
     .bcrumb li a {
-        font-size: 10px;
+        font-size: min(1vw, 13px);
     }
-} */
+}
 
 .small_list {
     margin-bottom: 10px;
