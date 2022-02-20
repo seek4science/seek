@@ -39,3 +39,13 @@
 <!-- custom metadata experiment end -->
 
 <%= form_submit_buttons(@investigation) %>
+
+<script>
+    $j(document).ready(function () {   
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        const params = Object.fromEntries(urlSearchParams.entries());
+        const project_id = params["investigation[project_id]"]
+        if(project_id)
+          $j("#projects-selector-select").val(project_id).change();
+    }); 
+</script>
