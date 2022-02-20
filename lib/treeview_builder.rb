@@ -27,6 +27,7 @@ class TreeviewBuilder
                     end
                     asy.push(create_node({text: assay.title, 
                                         _type: 'assay', 
+                                        label: 'Assay',
                                         _id: assay.id, 
                                         a_attr: bold, 
                                         children: assay_assets, 
@@ -37,7 +38,7 @@ class TreeviewBuilder
                                         _type: 'study', 
                                         _id: study.id, 
                                         a_attr: bold, 
-                                        label: asy.length>0 ? 'Assays' : nil, 
+                                        label: 'Study', 
                                         children: (sp_advanced ? load_isa_study_element(study) : []) + asy, 
                                         resource: study}))
                 asy = []
@@ -46,7 +47,7 @@ class TreeviewBuilder
                                         _type: 'investigation', 
                                         _id: investigation.id, 
                                         a_attr: bold, 
-                                        label: 'Studies', 
+                                        label: 'Investigation', 
                                         children: std, 
                                         resource: investigation}))
             std = []
@@ -59,7 +60,7 @@ class TreeviewBuilder
                                         _type: 'project',
                                         _id: @project.id,
                                         a_attr: bold, 
-                                        label: 'Investigations',
+                                        label: 'Project',
                                         children: inv, 
                                         resource: @project}))
 
