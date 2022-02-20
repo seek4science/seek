@@ -1,3 +1,5 @@
+<% resource ||= nil %>
+<% resource_name = resource ? resource.class.name : nil %>
 <ul class="nav nav-tabs">
   <li class="active ">
     <a data-toggle="tab" href="#details"><i class="glyphicon glyphicon-list-alt"></i> Details</a>
@@ -7,4 +9,9 @@
       <i class="glyphicon glyphicon-th-list"></i> Related items
     </a>
   </li>
+   <% if Seek::Config.project_single_page_advanced_enabled && displaying_single_page? && resource %>
+      <li>
+          <a data-toggle="tab" href="#<%=resource_name&.downcase%>_design"><i class="glyphicon glyphicon-list-alt"></i> <%=resource_name&.camelize%> design</a>
+      </li>
+    <% end %>
 </ul>
