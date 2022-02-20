@@ -55,11 +55,38 @@ const batchSampleUpdateStruct = (ex_id, attribute_map, id) => ({
   }
 });
 
-const batchSampleCreateStruct = (ex_id, attribute_map, sample_type_id, pid, assay_id = null) => ({
+const accessType = (code) => {
+  switch (code) {
+    case 0:
+      return "no_access";
+    case 1:
+      return "view";
+    case 2:
+      return "download";
+  }
+};
+
+const batchSampleCreateStruct = (
+  ex_id,
+  attribute_map,
+  sample_type_id,
+  pid,
+  assay_id = null,
+  access_type = 0
+) => ({
   ex_id,
   data: {
     type: "samples",
     attributes: {
+      policy: {
+        access: accessType(access_type),
+        permissions: [
+          {
+            resource: { type: "Project", id: pid },
+            access: accessType(access_type)
+          }
+        ]
+      },
       attribute_map
     },
     tags: null,
@@ -125,12 +152,14 @@ async function fetchTerms(elem, cvId) {
 }
 //** =============End Autocomplete============== */
 
-async function batchCreateSample(sampleTypes) {
+async function batchCreateSample(sampleTypes, projectAccessType) {
   try {
     let data = [];
     sampleTypes.forEach((s) => {
       s.samples.forEach((sa, k) => {
-        data.push(batchSampleCreateStruct(sa.exId, sa.data, s.sampleTypeId, s.pid, s.assayId));
+        data.push(
+          batchSampleCreateStruct(sa.exId, sa.data, s.sampleTypeId, s.pid, s.assayId, projectAccessType)
+        );
       });
     });
 

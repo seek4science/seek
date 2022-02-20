@@ -128,8 +128,8 @@ module Seek
       asset.projects = asset.projects & user.person.projects
     end
 
-    def update_sharing_policies(item)
-      item.policy.set_attributes_with_sharing(policy_params) if policy_params.present?
+    def update_sharing_policies(item, parameters = params)
+      item.policy.set_attributes_with_sharing(policy_params(parameters)) if policy_params(parameters).present?
     end
 
     def initialize_asset

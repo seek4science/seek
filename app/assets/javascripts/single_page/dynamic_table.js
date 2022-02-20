@@ -166,7 +166,7 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
       const sampleTypeIds = this.getSampleTypes();
       for (const s of sampleTypeIds) {
         const newSamples = this.getSamples(rowStatus.new, s);
-        res = await batchCreateSample(newSamples);
+        res = await batchCreateSample(newSamples, projectAccessType);
         if (res) {
           handleResponse(this.table, newSamples, dtErrClass, dtSuccessClass)(res);
         }
