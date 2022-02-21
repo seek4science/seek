@@ -269,7 +269,7 @@
           "required": true,
           "ontology": null,
           "dataType": "String",
-          "CVList": [],
+          "CVList": null,
           "isaTag": "protocol"
         },
         {
@@ -392,7 +392,7 @@
           "iri": null,
           "name": "file type",
           "description": "The run data file model.",
-          "dataType": "String",
+          "dataType": "Controlled Vocabulary",
           "required": true,
           "ontology": null,
           "CVList": ["bam", "cram", "fastq", "oxfordnanopore_native", "pacbio_hdf5", "sff"],
@@ -643,7 +643,7 @@
           "required": true,
           "ontology": null,
           "dataType": "String",
-          "CVList": [],
+          "CVList": null,
           "isaTag": "protocol"
         },
         {
@@ -1304,7 +1304,7 @@
           "iri": null,
           "name": "status",
           "description": "Status of submission to ENA.",
-          "dataType": "String",
+          "dataType": "Controlled Vocabulary",
           "required": false,
           "ontology": null,
           "CVList": ["add", "added", "modify", "modified", "cancel", "cancelled", "release", "released"],

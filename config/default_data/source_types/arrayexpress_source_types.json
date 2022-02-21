@@ -215,7 +215,7 @@
           "required": true,
           "isaTag": "protocol",
           "ontology": null,
-          "CVList": []
+          "CVList": null
         },
         {
           "iri": null,
