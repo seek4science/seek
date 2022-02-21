@@ -13,6 +13,16 @@ const defaultCols = [
   }
 ];
 
+// const setTagsInputListeners = () => {
+//   $j(".tt-input")
+//     .on("input", function () {
+//       $j(".dataTables_scrollBody").css({ "overflow": "visible" });
+//     })
+//     .on("blur", function () {
+//       $j(".dataTables_scrollBody").css({ "overflow": "scroll" });
+//     });
+// };
+
 const objectInput =
   "<td><input data-role='seek-objectsinput' data-tags-limit='3' " +
   "data-existing-objects='%EXISTING%' data-typeahead='true' " +
@@ -84,6 +94,7 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
       if (options.assayId) this.assayId = options.assayId;
       this.initHeader(columns);
       this.options = options;
+      // setTagsInputListeners();
     },
     initHeader: function (columns) {
       const requiredCols = columns.map((c, i) => c.required && i).filter((c) => c);
@@ -129,6 +140,7 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
       indexes.forEach((x) => (arr[x] = rowStatus.new));
       sampleLinkIndexes.forEach((x) => (arr[x] = []));
       this.table.row.add(arr).draw();
+      // setTagsInputListeners();
     },
     setAsDeleted: function () {
       const indexes = getStatusIndexes(this.table.settings()[0].aoColumns);
@@ -169,7 +181,7 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
       const sampleTypeIds = this.getSampleTypes();
       for (const s of sampleTypeIds) {
         const newSamples = this.getSamples(rowStatus.new, s);
-        res = await batchCreateSample(newSamples, projectAccessType);
+        res = await batchCreateSample(newSamples, projectDefaultPolicy);
         if (res) {
           handleResponse(this.table, newSamples, dtErrClass, dtSuccessClass)(res);
         }

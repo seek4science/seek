@@ -55,7 +55,7 @@ const batchSampleUpdateStruct = (ex_id, attribute_map, id) => ({
   }
 });
 
-const accessType = (code) => {
+const getAccessType = (code) => {
   switch (code) {
     case 0:
       return "no_access";
@@ -63,7 +63,23 @@ const accessType = (code) => {
       return "view";
     case 2:
       return "download";
+    case 3:
+      return "edit";
+    case 4:
+      return "manage";
   }
+};
+
+const getAccess = (projectDefaultPolicy) => {
+  const t = projectDefaultPolicy?.access_type;
+  return t ? getAccessType(t) : 0;
+};
+
+const getPermission = (projectDefaultPolicy, pid) => {
+  const t = projectDefaultPolicy?.permissions;
+  const accessType =
+    t && t.find((x) => x.contributor_type == "Project" && x.contributor_id == pid)?.access_type;
+  return getAccessType(accessType || 0);
 };
 
 const batchSampleCreateStruct = (
@@ -71,19 +87,19 @@ const batchSampleCreateStruct = (
   attribute_map,
   sample_type_id,
   pid,
-  assay_id = null,
-  access_type = 0
+  projectDefaultPolicy,
+  assay_id = null
 ) => ({
   ex_id,
   data: {
     type: "samples",
     attributes: {
       policy: {
-        access: accessType(access_type),
+        access: getAccess(projectDefaultPolicy),
         permissions: [
           {
             resource: { type: "Project", id: pid },
-            access: accessType(access_type)
+            access: getPermission(projectDefaultPolicy, pid)
           }
         ]
       },
@@ -152,13 +168,13 @@ async function fetchTerms(elem, cvId) {
 }
 //** =============End Autocomplete============== */
 
-async function batchCreateSample(sampleTypes, projectAccessType) {
+async function batchCreateSample(sampleTypes, projectDefaultPolicy) {
   try {
     let data = [];
     sampleTypes.forEach((s) => {
       s.samples.forEach((sa, k) => {
         data.push(
-          batchSampleCreateStruct(sa.exId, sa.data, s.sampleTypeId, s.pid, s.assayId, projectAccessType)
+          batchSampleCreateStruct(sa.exId, sa.data, s.sampleTypeId, s.pid, projectDefaultPolicy, s.assayId)
         );
       });
     });
