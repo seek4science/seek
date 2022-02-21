@@ -22,6 +22,7 @@
 <% seek_sample_multi = sample_attribute.try(:seek_sample_multi?) %>
 <% link_to_self = sample_attribute && sample_attribute.deferred_link_to_self %>
 <% hide_seek_sample_multi = seek_sample_multi && displaying_single_page? %>
+<% isa_tag_id = sample_attribute&.isa_tag_id %>
 
 <tr class="sample-attribute <%= 'success' if sample_attribute.nil? -%><%='hidden' if hide_seek_sample_multi -%>" data-index="<%= index-%>">
   <th scope="row" class="attribute-position">
@@ -106,7 +107,7 @@
 
   <td>
     <% if allow_attribute_removal %>
-      <%= hidden_field_tag "#{field_name_prefix}[isa_tag_id]",nil,  data: { attr: "isa_tag_id" }  %>
+      <%= hidden_field_tag "#{field_name_prefix}[isa_tag_id]", isa_tag_id, data: { attr: "isa_tag_id" }  %>
       <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', autocomplete: 'off' %>
       <div class="btn-group" data-toggle="buttons">
         <label class="btn btn-danger">

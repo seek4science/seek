@@ -14,6 +14,7 @@
 <% field_name_prefix = "template[template_attributes_attributes][#{index}]" %> 
 <% seek_sample_multi = template_attribute.try(:seek_sample_multi?) %>
 <% is_title = template_attribute ? template_attribute.is_title : false %>
+<% isa_tag_id = template_attribute&.isa_tag_id %>
 
 
 <tr class="sample-attribute <%= 'success' if template_attribute.nil? -%>" data-index="<%= index-%>">
