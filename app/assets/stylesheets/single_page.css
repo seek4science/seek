@@ -458,7 +458,9 @@
 }
 
 .row-delete{
-    text-decoration: line-through;
+    /* text-decoration: line-through; */
+    opacity: 0.5;
+    border-bottom: solid 2px #ff9d00 !important;
  }
 
 .row-error{
@@ -496,4 +498,8 @@
 .required-attribute {
     color: rgb(134, 0, 0);
     margin-left: 5px
+}
+
+.btn {
+    outline: none !important;
 }

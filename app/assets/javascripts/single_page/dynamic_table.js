@@ -133,7 +133,8 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
     setAsDeleted: function () {
       const indexes = getStatusIndexes(this.table.settings()[0].aoColumns);
       const deleteRowInx = [];
-      this.table.rows(function (idx, data, node) {
+      const table = this.table;
+      table.rows(function (idx, data, node) {
         let hasId = false;
         // If selected
         if (data[0]) {
@@ -142,16 +143,18 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
             // Check if the sample has an ID (data[x+1]) (it's an existing sample)
             if (data[x + 1]) {
               data[x] = rowStatus.delete;
-              $j(node).addClass(dtRowDelete);
+              $j(node).find("td").addClass(dtRowDelete);
             } else hasId = true;
           });
           // There is only one status column in regular table
           if (hasId) deleteRowInx.push(idx);
         }
       });
-      if (deleteRowInx.length) this.table.rows(deleteRowInx).remove().draw();
+      if (deleteRowInx.length) table.rows(deleteRowInx).remove().draw();
     },
     save: async function () {
+      const { enableLoading, disableLoading } = this.options;
+      if (enableLoading) enableLoading();
       this.resetClasses();
       //=======================DELETE==================================
       const deletedSamples = this.getSamples(rowStatus.delete);
@@ -174,6 +177,7 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
       if (this.options.callback && typeof this.options.callback === "function") {
         this.options.callback();
       }
+      if (disableLoading) disableLoading();
     },
     headers: function () {
       return this.table

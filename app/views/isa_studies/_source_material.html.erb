@@ -11,10 +11,10 @@
 </div>
 
 <div class="btn-group">
-    <input class="btn btn-default" type="button" value="Add row" onClick="SourceAddNewRow()" />
-    <input class="btn btn-default" type="button" value="Paste From Clipboard" onClick="SourcePasteFromClipboard()" />
-    <input class="btn btn-default" type="button" value="Delete selected" onClick="SourceSetAsDeleted()" />
-    <input class="btn btn-primary" type="button" value="Save" onClick="SourceSave()" />
+    <input class="btn btn-default dt-action" type="button" value="Add row" onClick="SourceAddNewRow()" />
+    <input class="btn btn-default dt-action" type="button" value="Paste From Clipboard" onClick="SourcePasteFromClipboard()" />
+    <input class="btn btn-default dt-action" type="button" value="Delete selected" onClick="SourceSetAsDeleted()" />
+    <button class="btn btn-primary dt-action" id="btn_save_source" onClick="SourceSave()">Save</button>
 </div>
 
 
@@ -30,6 +30,7 @@
             });
             let dt = <%= sanitize(dt_data(sample_type).to_json) %>
             sourceDynamicTable = new $j.dynamicTable('#source-material-table')
+            const elem = $j("#btn_save_source")
             const options = {
                ajax:{
                     url: `/single_pages/${pid}/dynamic_table_data/`,
@@ -42,7 +43,15 @@
                         d.rows_pad = "true"
                     }
                 },
-                callback: () => studyDynamicTable.table.ajax.reload()
+                callback: () => studyDynamicTable.table.ajax.reload(),
+                enableLoading: () => {
+                    elem.append("<span class='loader' style='margin:2px 0 2px 5px'></span>")
+                    $j(".dt-action").addClass("disabled")
+                },
+                disableLoading: () => {
+                    elem.find(".loader").remove();
+                    $j(".dt-action").removeClass("disabled")
+                }
             }
             sourceDynamicTable.init(dt.rows, dt.columns, options)
             dt = []
