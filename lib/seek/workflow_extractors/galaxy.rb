@@ -6,9 +6,17 @@ module Seek
       end
 
       def metadata
-        metadata = super
         galaxy_string = @io.read
+        f = Tempfile.new('ga')
+        f.binmode
+        f.write(galaxy_string)
+        f.rewind
+        cf = Tempfile.new('cwl')
+        `gxwf-abstract-export #{f.path} #{cf.path}`
+        cf.rewind
+        metadata = Seek::WorkflowExtractors::CWL.new(cf).metadata
         galaxy = JSON.parse(galaxy_string)
+
         if galaxy.has_key?('name')
           metadata[:title] = galaxy['name']
         else
@@ -16,27 +24,26 @@ module Seek
           metadata[:warnings] << 'Unable to determine title of workflow'
         end
 
-        metadata[:license] = galaxy['license'] if galaxy['license']
+        metadata[:description] = galaxy['annotation'] if galaxy['annotation'].present?
+        metadata[:license] = galaxy['license'] if galaxy['license'].present?
 
         if galaxy['creator']
           creators = Array(galaxy['creator']).select { |c| c['class'] == 'Person' }.map { |c| c['name'] }
           metadata[:other_creators] = creators.join(', ') if creators.any?
         end
 
-        metadata[:internals] = {}
-        metadata[:internals][:inputs] = []
-        metadata[:internals][:outputs] = []
         metadata[:internals][:steps] = []
         galaxy['steps'].each do |num, step|
-          (step['inputs'] || []).each do |input|
-            metadata[:internals][:inputs] << { id: input['name'], name: input['label'] || input['name'], description: input['description'] }
+          unless ['data_input', 'data_collection_input', 'parameter_input'].include?(step['type'])
+            metadata[:internals][:steps] << { id: step['id'].to_s, name: step['label'] || step['name'], description: (step['annotation'] || '') + "\n " + (step['tool_id'] || '') }
           end
+        end
 
-          (step['outputs'] || []).each do |output|
-            metadata[:internals][:outputs] << { id: output['name'], name: output['label'] || output['name'], type: output['type'] }
+        # Copy ID to name field, if not present
+        [metadata[:internals][:inputs] || [], metadata[:internals][:outputs] || []].each do |port_type|
+          port_type.each do |port|
+            port[:name] ||= port[:id]
           end
-
-          metadata[:internals][:steps] << { id: step['id'].to_s, name: step['label'] || step['name'], description: (step['annotation'] || '') + "\n " + (step['tool_id'] || '') }
         end
 
         metadata[:tags] = galaxy['tags']
