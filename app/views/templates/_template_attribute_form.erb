@@ -7,7 +7,6 @@
 <% pos = template_attribute ? template_attribute.pos : '' %>
 <% required = template_attribute ? template_attribute.required : false %>
 <% allow_attribute_removal = !required  %>
-<% linked_sample_type_id = template_attribute ? template_attribute.linked_sample_type_id : nil %>
 <% attribute_type_id = template_attribute ? template_attribute.sample_attribute_type_id : nil %>
 <% sample_controlled_vocab_id = template_attribute ? template_attribute.sample_controlled_vocab_id : nil %>
 <% unit_id = template_attribute ? template_attribute.unit_id : nil %>
@@ -70,8 +69,7 @@
         end
       %>
       <%= select_tag "#{field_name_prefix}[linked_sample_type_id]",
-                     grouped_options_for_select(options,
-                                        linked_sample_type_id),
+                     grouped_options_for_select(options, nil),
                      include_blank: true,
                      class: 'form-control linked-sample-type-selection' %>
     </div>
@@ -93,7 +91,7 @@
 
   <td>
     <div class="btn-group" data-toggle="buttons">
-      <%= hidden_field_tag "#{field_name_prefix}[isa_tag_id]",nil,  data: { attr: "isa_tag_id" }  %>
+      <%= hidden_field_tag "#{field_name_prefix}[isa_tag_id]", isa_tag_id,  data: { attr: "isa_tag_id" }  %>
       <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', autocomplete: 'off' %>
       <label class="btn btn-danger">
         Remove
