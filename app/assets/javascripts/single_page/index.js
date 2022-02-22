@@ -70,10 +70,7 @@ const getAccessType = (code) => {
   }
 };
 
-const getAccess = (projectDefaultPolicy) => {
-  const t = projectDefaultPolicy?.access_type;
-  return getAccessType(t ? t : 0);
-};
+const getAccess = (projectDefaultPolicy) => getAccessType(projectDefaultPolicy?.access_type || 0);
 
 const getPermission = (projectDefaultPolicy, pid) => {
   const t = projectDefaultPolicy?.permissions;
