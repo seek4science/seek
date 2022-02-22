@@ -478,8 +478,8 @@ GEM
     pyu-ruby-sasl (0.0.3.3)
     racc (1.5.2)
     rack (2.2.3)
-    rack-attack (5.0.1)
-      rack
+    rack-attack (6.6.0)
+      rack (>= 1.0, < 3)
     rack-cors (1.1.1)
       rack (>= 2.0.0)
     rack-oauth2 (1.19.0)
@@ -885,7 +885,7 @@ DEPENDENCIES
   pry-remote
   psych
   puma (~> 4.3)
-  rack-attack (~> 5.0.1)
+  rack-attack (~> 6.6.0)
   rack-cors
   rails (~> 5.2.4.0)
   rails-controller-testing

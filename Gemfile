@@ -112,7 +112,7 @@ gem 'activerecord-session_store'
 gem 'rails-observers'
 gem 'responders'
 
-gem 'rack-attack', '~> 5.0.1'
+gem 'rack-attack', '~> 6.6.0'
 
 gem 'private_address_check'
 
