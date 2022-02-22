@@ -46,6 +46,15 @@ module Seek
           end
         end
 
+        # Exclude inputs from workflow outputs
+        if metadata[:internals][:outputs]
+          metadata[:internals][:outputs].reject! do |output|
+            output[:id].sub('#main/', '').start_with?('_anonymous_output_') &&
+              (output[:source_ids] || []).length == 1 &&
+              metadata[:internals][:inputs].detect { |i| i[:id] == output[:source_ids].first }
+          end
+        end
+
         metadata[:tags] = galaxy['tags']
 
         metadata

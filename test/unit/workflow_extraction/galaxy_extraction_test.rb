@@ -15,7 +15,7 @@ class GalaxyExtractionTest < ActiveSupport::TestCase
     assert_equal ['covid-19'], metadata[:tags]
     assert_equal 2, internals[:inputs].length
     assert_equal 15, internals[:steps].length
-    assert_equal 33, internals[:outputs].length
+    assert_equal 31, internals[:outputs].length
     input = internals[:inputs].detect { |i| i[:id] == 'List of Illumina accessions' }
     assert_equal 'List of Illumina accessions', input[:name]
   end
@@ -33,7 +33,7 @@ class GalaxyExtractionTest < ActiveSupport::TestCase
     assert_equal 'https://github.com/galaxyproject/SARS-CoV-2', metadata[:source_link_url]
     assert_equal 2, internals[:inputs].length
     assert_equal 15, internals[:steps].length
-    assert_equal 33, internals[:outputs].length
+    assert_equal 31, internals[:outputs].length
     input = internals[:inputs].detect { |i| i[:id] == 'List of Illumina accessions' }
     assert_equal 'List of Illumina accessions', input[:name]
   end

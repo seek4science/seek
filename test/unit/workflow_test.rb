@@ -354,7 +354,7 @@ class WorkflowTest < ActiveSupport::TestCase
 
     assert_equal 'concat_two_files.ga', v.main_workflow_path
     assert_equal 2, v.inputs.count
-    assert_equal 3, v.steps.count
+    assert_equal 1, v.steps.count
     assert_equal 1, v.outputs.count
 
     disable_authorization_checks do
@@ -364,8 +364,8 @@ class WorkflowTest < ActiveSupport::TestCase
     end
 
     assert_equal '1-PreProcessing.ga', v.main_workflow_path
-    assert_equal 1, v.inputs.length
-    assert_equal 17, v.steps.length
+    assert_equal 2, v.inputs.length
+    assert_equal 15, v.steps.length
     assert_equal 31, v.outputs.length
   end
 
