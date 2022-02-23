@@ -4,19 +4,15 @@
 
 <%= render partial: 'assets/upload_new_version_form', locals: { resource: @workflow } -%>
 
-<div class="row">
-  <div class="col-md-9 col-sm-8 box_about_actor">
-    <% if @display_workflow.is_git_versioned? && @display_workflow.main_workflow_blob.nil? %>
-      <%= alert_box('warning', hide_button: true) do %>This workflow does not specify a "main" workflow file.<% end %>
-    <% end %>
+<%= render partial: 'general/show_page_tab_definitions', locals: { versioned_resource: @display_workflow } %>
 
-    <ul class="nav nav-tabs" role="tablist">
-      <%= tab('Overview', 'overview', !params.key?(:tab) || params[:tab] == 'overview') %>
-      <%= tab('Files', 'files', params[:tab] == 'files') if @display_workflow.is_git_versioned? %>
-    </ul>
-
-    <div class="tab-content">
-      <%= tab_pane('overview', !params.key?(:tab) || params[:tab] == 'overview') do %>
+<div class="tab-content">
+  <%= tab_pane('details') do %>
+    <div class="row">
+      <div class="col-md-9 col-sm-8 box_about_actor">
+        <% if @display_workflow.is_git_versioned? && @display_workflow.main_workflow_blob.nil? %>
+          <%= alert_box('warning', hide_button: true) do %>This workflow does not specify a "main" workflow file.<% end %>
+        <% end %>
         <strong><%= WorkflowClass.model_name.human %>: </strong> <%= @display_workflow.workflow_class_title -%>
 
         <div style="margin-bottom: 5px;">
@@ -71,22 +67,23 @@
         <% if Seek::Config.isa_enabled %>
           <%= render partial: 'general/isa_graph', locals: { root_item: @workflow, deep: true, include_parents: true } %>
         <% end %>
-      <% end %>
 
-      <% if @display_workflow.is_git_versioned? %>
-        <%= tab_pane('files', params[:tab] == 'files') do %>
-          <%= render partial: 'git/files', locals: { resource: @workflow, git_version: @display_workflow } %>
-        <% end %>
-      <% end %>
+        <%= render partial: 'assets/resource_version_details', locals: { displayed_resource: @display_workflow, resource: @workflow } -%>
+      </div>
+
+      <div class="col-md-3 col-sm-4">
+        <%= render partial: 'assets/resource_main_content_right', locals: { resource: @workflow, versioned_resource: @display_workflow } %>
+      </div>
     </div>
-  </div>
+  <% end %>
 
-  <div class="col-md-3 col-sm-4">
-    <%= render partial: 'assets/resource_main_content_right', locals: { resource: @workflow, versioned_resource: @display_workflow } %>
-  </div>
+  <% if @display_workflow.is_git_versioned? %>
+    <%= tab_pane('files') do %>
+      <%= render partial: 'git/files', locals: { resource: @workflow, git_version: @display_workflow } %>
+    <% end %>
+  <% end %>
+
+  <%= tab_pane('related-items') do %>
+    <%= render partial: 'general/items_related_to', object: @workflow %>
+  <% end %>
 </div>
-
-<%= render partial: 'assets/resource_version_details', locals: { displayed_resource: @display_workflow, resource: @workflow } -%>
-
-<%# get, classify and authorize all assets for this project -%>
-<%= render partial: 'general/items_related_to', object: @workflow %>

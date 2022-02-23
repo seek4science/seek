@@ -184,13 +184,30 @@ module BootstrapHelper
     end
   end
 
-  def tab(title, tab_id, selected = false)
+  def tab(*args)
+    if block_given?
+      tab_id, selected = *args
+      title = nil
+    else
+      title, tab_id, selected = *args
+    end
+
+    selected = show_page_tab == tab_id if selected.nil?
+
     content_tag(:li, class: selected ? 'active' : '') do
-      content_tag(:a, title, data: { target: "##{tab_id}", toggle: 'tab' }, aria: { controls: tab_id }, role: 'tab')
+      if block_given?
+        content_tag(:a, data: { target: "##{tab_id}", toggle: 'tab' }, aria: { controls: tab_id }, role: 'tab') do
+          yield
+        end
+      else
+        content_tag(:a, title, data: { target: "##{tab_id}", toggle: 'tab' }, aria: { controls: tab_id }, role: 'tab')
+      end
     end
   end
 
-  def tab_pane(tab_id, selected = false)
+  def tab_pane(tab_id, selected = nil)
+    selected = show_page_tab == tab_id if selected.nil?
+
     content_tag(:div, id: tab_id, class: selected ? 'tab-pane active' : 'tab-pane') do
       yield
     end

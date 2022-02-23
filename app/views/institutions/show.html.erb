@@ -1,10 +1,9 @@
+<%= render partial: 'general/item_title', locals: { item: @institution, buttons_partial: 'institutions/buttons' } %>
+
 <%= render partial: 'general/show_page_tab_definitions' %>
 
 <div class="tab-content">
-
-  <div id="details" class="tab-pane fade in active">
-    <%= render :partial => "general/item_title", :locals => { :item => @institution, :buttons_partial => 'institutions/buttons' } -%>
-
+  <%= tab_pane('details') do %>
     <div class="row">
       <div class="col-md-9 col-sm-8 box_about_actor">
         <p class="web_page">
@@ -36,10 +35,9 @@
 
       </div>
     </div>
-  </div>
+  <% end %>
 
-  <div id="related-items" class="tab-pane fade">
-    <%= render :partial => "general/items_related_to", :object => @institution %>
-  </div>
-
+  <%= tab_pane('related-items') do %>
+    <%= render partial: 'general/items_related_to', object: @institution %>
+  <% end %>
 </div>
