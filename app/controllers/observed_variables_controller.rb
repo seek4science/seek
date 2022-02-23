@@ -1,5 +1,7 @@
 class ObservedVariablesController < ApplicationController
+
   before_action :login_required
+  before_action :observed_variables_enabled?
 
   def index
     @observed_variables = ObservedVariable.all
