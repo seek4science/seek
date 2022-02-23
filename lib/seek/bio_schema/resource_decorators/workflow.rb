@@ -27,7 +27,7 @@ module Seek
         end
 
         def schema_type
-          %w[File SoftwareSourceCode ComputationalWorkflow]
+          %w[SoftwareSourceCode ComputationalWorkflow]
         end
 
         def programming_language

@@ -29,7 +29,6 @@ class CollectionItemsController < ApplicationController
 
   def create
     @item = @collection.items.build(item_params)
-    pp @item.valid?
 
     respond_to do |format|
       if !@item.valid?
