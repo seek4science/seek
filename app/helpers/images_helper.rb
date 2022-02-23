@@ -49,10 +49,6 @@ module ImagesHelper
     image_tag(filename, options)
   end
 
-  def help_icon(text, _delay = 200, extra_style = '')
-    image('info', :alt => 'help', 'data-tooltip' => tooltip(text), :style => "vertical-align: middle;#{extra_style}")
-  end
-
   def flag_icon(country, text = country, margin_right = '0.3em')
     return '' unless country && !country.empty?
 

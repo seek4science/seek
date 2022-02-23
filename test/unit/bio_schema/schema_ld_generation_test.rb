@@ -444,7 +444,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     expected_wf_prefix = workflow.title.downcase.gsub(/[^0-9a-z]/i, '_')
 
     expected = { '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
-                 '@type' => %w[File SoftwareSourceCode ComputationalWorkflow],
+                 '@type' => %w[SoftwareSourceCode ComputationalWorkflow],
                  '@id' => "http://localhost:3000/workflows/#{workflow.id}",
                  'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::WORKFLOW_PROFILE,
                  'description' => 'This is a test workflow for bioschema generation',
