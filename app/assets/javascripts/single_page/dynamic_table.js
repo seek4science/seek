@@ -172,18 +172,18 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
       const deletedSamples = this.getSamples(rowStatus.delete);
       //* Delete action is applied to all samples in a row
       let res = await batchDeleteSample(deletedSamples);
-      if (res) handleResponse(this.table, deletedSamples, dtErrClass, dtDeletedClass)(res);
+      if (res) handleResponse(this.table, deletedSamples)(res);
       //=======================UPDATE==================================
       const updatedSamples = this.getSamples(rowStatus.update);
       res = await batchUpdateSample(updatedSamples);
-      if (res) handleResponse(this.table, updatedSamples, dtErrClass, dtSuccessClass)(res);
+      if (res) handleResponse(this.table, updatedSamples)(res);
       //=======================CREATE==================================
       const sampleTypeIds = this.getSampleTypes();
       for (const s of sampleTypeIds) {
         const newSamples = this.getSamples(rowStatus.new, s);
         res = await batchCreateSample(newSamples, projectDefaultPolicy);
         if (res) {
-          handleResponse(this.table, newSamples, dtErrClass, dtSuccessClass)(res);
+          handleResponse(this.table, newSamples)(res);
         }
       }
       if (this.options.callback && typeof this.options.callback === "function") {
@@ -318,42 +318,50 @@ function handleCellUpdate(table, cell) {
   }
 }
 
-function handleResponse(table, sampleTypes, errorCls, successCls) {
+function handleResponse(table, sampleTypes) {
   return function (res) {
-    if (res.status == "unprocessable_entity") {
-      res.errors.forEach((error) => {
-        const [rowId, sampleTypeId] = error.ex_id.split("-");
-        const errorColNames = Object.keys(error.error);
-        table.cells(rowId, `${sampleTypeId}:name`).every(function () {
-          const idx = this.index().column;
-          const colTitle = $j(table.column(idx).header()).text().replace("*", "");
-          if (errorColNames.includes(colTitle)) {
-            $j(this.node()).addClass(errorCls);
-            $j(this.node()).attr("title", error.error[colTitle]);
-          } else if (error.error == "Can not be deleted.") {
-            $j(this.node()).addClass(errorCls);
-          }
-        });
-      });
-      alert(
-        "The operation can not be done for one or some samples. The red cells indicate unacceptable values."
-      );
-    } else if (res.status == "ok") {
-      sampleTypes.forEach((s) => {
-        s.samples.forEach((sa, k) => {
-          const [rowId, sampleTypeId] = sa.exId.split("-");
-          table.cells(rowId, `${sampleTypeId}:name`).every(function (rowIdx, columnIdx) {
-            // Here id column index is 2 (being read from table.columns() that includes the select column)
-            if (res.results && columnIdx == 2) {
-              // update created samples' id in the table
-              const id = res.results.find((r) => r.ex_id == sa.exId).id;
-              this.data(id);
-            }
-            sampleStatus(table, rowId, sampleTypeId, rowStatus.noAction);
-            $j(this.node()).addClass(successCls);
-          });
-        });
-      });
-    }
+    if (res.status == "ok") handleSuccess(table, sampleTypes, res);
+    else handleFailure(table, res);
   };
 }
+
+const handleFailure = (table, res) => {
+  const errors = new Set();
+  errors.add(
+    "The operation can not be performed for one or some samples. The red cells indicate unacceptable values."
+  );
+  res.errors.forEach((error) => {
+    const [rowId, sampleTypeId] = error.ex_id.split("-");
+    const errorColNames = Object.keys(error.error);
+    if (errorColNames.includes("base")) errors.add(error.error["base"]);
+    table.cells(rowId, `${sampleTypeId}:name`).every(function () {
+      const idx = this.index().column;
+      const colTitle = $j(table.column(idx).header()).text().replace("*", "");
+      if (errorColNames.includes(colTitle)) {
+        $j(this.node()).addClass(dtErrClass);
+        $j(this.node()).attr("title", error.error[colTitle]);
+      } else if (error.error == "Can not be deleted.") {
+        $j(this.node()).addClass(dtErrClass);
+      }
+    });
+  });
+  alert([...errors].reverse().join("\n"));
+};
+
+const handleSuccess = (table, sampleTypes, res) => {
+  sampleTypes.forEach((s) => {
+    s.samples.forEach((sa, k) => {
+      const [rowId, sampleTypeId] = sa.exId.split("-");
+      table.cells(rowId, `${sampleTypeId}:name`).every(function (rowIdx, columnIdx) {
+        // Here id column index is 2 (being read from table.columns() that includes the select column)
+        if (res.results && columnIdx == 2) {
+          // update created samples' id in the table
+          const id = res.results.find((r) => r.ex_id == sa.exId).id;
+          this.data(id);
+        }
+        sampleStatus(table, rowId, sampleTypeId, rowStatus.noAction);
+        $j(this.node()).addClass(dtSuccessClass);
+      });
+    });
+  });
+};
