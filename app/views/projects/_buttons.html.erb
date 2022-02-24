@@ -1,5 +1,7 @@
-<% if !displaying_single_page? && Seek::Config.project_single_page_enabled && logged_in_and_registered? && current_user.person.member_of?(item) %>
+<% if !displaying_single_page? && Seek::Config.project_single_page_enabled %>
+  <span>
     <%= button_link_to("Single Page", 'sop', single_page_path(item.id)) -%>
+  </span>
 <% end -%>
 <% if Seek::Config.project_browser_enabled && logged_in_and_registered? && current_user.person.member_of?(item) %>
     <%= button_link_to("Organize", 'organise', project_folders_path(item.id)) -%>
