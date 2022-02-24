@@ -14,27 +14,32 @@ module TemplatesHelper
   end
 
   def load_templates
-    Template.all().order(:group, :group_order).map { |item|
+    privilege = Seek::Permissions::Translator.translate("view")
+    Template.select{|t| t.can_perform?(privilege)}.map { |item|
       { title: item.title, group: item.group, level: item.level,
         organism: item.organism, template_id: item.id,
-        description: item.description, attributes: 
-        item.template_attributes.order(:pos).map { |attribute|
-          { 
-            attribute_type_id: attribute.sample_attribute_type_id,
-            data_type: SampleAttributeType.find(attribute.sample_attribute_type_id)&.title,
-            cv_id: attribute.sample_controlled_vocab_id,
-            title: attribute.title,
-            is_title: attribute.is_title,
-            short_name: attribute.short_name,
-            description: attribute.description,
-            iri: attribute.iri,
-            required: attribute.required,
-            unit_id: attribute.unit_id,
-            pos: attribute.pos,
-            isa_tag_id: attribute.isa_tag_id
-          }
-        }
+        description: item.description,
+        attributes: item.template_attributes.order(:pos).map { |a| map_template_attributes(a) }
       }
+    }
+  end
+
+  private 
+
+  def map_template_attributes(attribute)
+    { 
+      attribute_type_id: attribute.sample_attribute_type_id,
+      data_type: SampleAttributeType.find(attribute.sample_attribute_type_id)&.title,
+      cv_id: attribute.sample_controlled_vocab_id,
+      title: attribute.title,
+      is_title: attribute.is_title,
+      short_name: attribute.short_name,
+      description: attribute.description,
+      iri: attribute.iri,
+      required: attribute.required,
+      unit_id: attribute.unit_id,
+      pos: attribute.pos,
+      isa_tag_id: attribute.isa_tag_id
     }
   end
   
