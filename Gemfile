@@ -37,8 +37,6 @@ gem 'loofah'
 gem 'jbuilder'
 gem 'jbuilder-json_api'
 gem 'active_model_serializers', '~> 0.10.2'
-gem 'json-schema'
-gem 'json-diff'
 gem 'rubyzip'
 
 gem 'equivalent-xml'
@@ -172,6 +170,8 @@ group :test do
   gem 'rails-controller-testing'
   gem 'simplecov'
   gem 'whenever-test'
+  gem 'json-schema'
+  gem 'json-diff'
 end
 
 group :test, :development do

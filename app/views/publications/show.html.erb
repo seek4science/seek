@@ -1,11 +1,9 @@
+<%= render partial: 'general/item_title', locals: { item: @publication, buttons_partial: 'publications/buttons' } %>
+
 <%= render partial: 'general/show_page_tab_definitions' %>
 
 <div class="tab-content">
-
-  <div id="details" class="tab-pane fade in active">
-
-    <%= render :partial => "general/item_title", :locals => { :item => @publication, :buttons_partial => 'publications/buttons' } %>
-
+  <%= tab_pane('details') do %>
     <div class="row">
       <div class="col-md-9 col-sm-8 box_about_actor">
         <%= item_description @publication.abstract, :label => "Abstract", :none_text => "No abstract specified" %>
@@ -149,11 +147,8 @@
         </p>
       </div>
     </div>
-
-  </div>
-
-  <div id="related-items" class="tab-pane fade">
-    <%= render :partial => "general/items_related_to", :object => @publication %>
-  </div>
-
+  <% end %>
+  <%= tab_pane('related-items') do %>
+    <%= render partial: 'general/items_related_to', object: @publication %>
+  <% end %>
 </div>

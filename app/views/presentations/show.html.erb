@@ -1,14 +1,12 @@
+<%= render partial: 'general/item_title', locals: { item: @presentation, version: @display_presentation.version,
+                                                    buttons_partial: 'assets/asset_buttons' } %>
+
+<%= render partial: 'assets/upload_new_version_form', locals: { resource: @presentation } %>
+
 <%= render partial: 'general/show_page_tab_definitions' %>
 
 <div class="tab-content">
-
-  <div id="details" class="tab-pane fade in active">
-
-    <%= render :partial => "general/item_title", :locals => { :item => @presentation, :version => @display_presentation.version,
-                                                              :buttons_partial => 'assets/asset_buttons' } %>
-
-    <%= render :partial => "assets/upload_new_version_form", :locals => { :resource => @presentation } -%>
-
+  <%= tab_pane('details') do %>
     <div class="row">
       <div class="col-md-9 col-sm-8 box_about_actor">
         <%= item_description @display_presentation.description %>
@@ -35,10 +33,8 @@
 
     <%= render :partial => "assets/resource_version_details", :locals => { :displayed_resource => @display_presentation, :resource => @presentation } -%>
 
-  </div>
-
-  <div id="related-items" class="tab-pane fade">
-    <%= render :partial => "general/items_related_to", :object => @presentation %>
-  </div>
-
+  <% end %>
+  <%= tab_pane('related-items') do %>
+    <%= render partial: 'general/items_related_to', object: @presentation %>
+  <% end %>
 </div>
