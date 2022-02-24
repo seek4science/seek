@@ -178,7 +178,7 @@ module Seek
         }
       when Project
         {
-          children: [:positioned_investigations],
+          children: %i[positioned_investigations project_assets],
           parents: [:programme]
         }
       when Investigation

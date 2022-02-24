@@ -189,6 +189,7 @@ module ISAHelper
     if node.can_view?
       entry[:text] = object.title
       entry[:icon] = asset_path(resource_avatar_path(object) || icon_filename_for_key("#{object.class.name.downcase}_avatar"))
+      entry[:li_attr][:title] = object.class.name
     else
       entry[:text] = 'Hidden item'
       entry[:a_attr] = { class: 'hidden-leaf none_text' }

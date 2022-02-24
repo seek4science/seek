@@ -88,6 +88,10 @@ def load_seek_config_defaults!
   Seek::Config.default :workflows_enabled, false
   Seek::Config.default :collections_enabled, false
 
+  #Observered variables
+  Seek::Config.default :observed_variables_enabled, false
+  Seek::Config.default :observed_variable_sets_enabled,false
+
   Seek::Config.default :doi_minting_enabled, false
   Seek::Config.default :time_lock_doi_for, 0
   Seek::Config.default :doi_prefix,''

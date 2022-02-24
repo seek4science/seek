@@ -25,7 +25,6 @@ namespace :seek do
   task standard_upgrade_tasks: %i[
     environment
     clear_filestore_tmp
-    repopulate_auth_lookup_tables
   ]
 
   desc('upgrades SEEK from the last released version to the latest released version')
