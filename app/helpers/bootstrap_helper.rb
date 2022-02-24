@@ -208,7 +208,7 @@ module BootstrapHelper
   def tab_pane(tab_id, selected = nil)
     selected = show_page_tab == tab_id if selected.nil?
 
-    content_tag(:div, id: tab_id, class: selected ? 'tab-pane active' : 'tab-pane') do
+    content_tag(:div, id: tab_id, class: selected ? 'tab-pane fade in active' : 'tab-pane fade') do
       yield
     end
   end
