@@ -135,7 +135,7 @@ const batchSampleCreateStruct = (
 //** =============Autocomplete============== */
 async function setAutoComplete(e, cvId) {
   $j(e).on("input", function () {
-    fetchTerms($j(e), cvId);
+    debounce(fetchTerms, 500)($j(e), cvId);
   });
   if ($j(e).autocomplete() && !$j($j(e).autocomplete("widget")).is(":visible")) {
     fetchTerms($j(e), cvId);
