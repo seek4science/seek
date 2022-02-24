@@ -711,6 +711,51 @@ ActiveRecord::Schema.define(version: 2021_12_23_165143) do
     t.datetime "updated_at"
   end
 
+  create_table "git_annotations", id: :integer,  force: :cascade do |t|
+    t.bigint "git_version_id"
+    t.bigint "contributor_id"
+    t.string "path"
+    t.string "key"
+    t.text "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["contributor_id"], name: "index_git_annotations_on_contributor_id"
+    t.index ["git_version_id"], name: "index_git_annotations_on_git_version_id"
+  end
+
+  create_table "git_repositories", id: :integer,  force: :cascade do |t|
+    t.string "resource_type"
+    t.bigint "resource_id"
+    t.string "uuid"
+    t.text "remote"
+    t.datetime "last_fetch"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["resource_type", "resource_id"], name: "index_git_repositories_on_resource_type_and_resource_id"
+  end
+
+  create_table "git_versions", id: :integer,  force: :cascade do |t|
+    t.string "resource_type"
+    t.bigint "resource_id"
+    t.integer "version"
+    t.string "name"
+    t.text "comment"
+    t.string "ref"
+    t.string "commit"
+    t.boolean "mutable"
+    t.text "root_path"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.text "resource_attributes"
+    t.bigint "git_repository_id"
+    t.integer "visibility"
+    t.string "doi"
+    t.bigint "contributor_id"
+    t.index ["contributor_id"], name: "index_git_versions_on_contributor_id"
+    t.index ["git_repository_id"], name: "index_git_versions_on_git_repository_id"
+    t.index ["resource_type", "resource_id"], name: "index_git_versions_on_resource_type_and_resource_id"
+  end
+
   create_table "group_memberships", id: :integer,  force: :cascade do |t|
     t.integer "person_id"
     t.integer "work_group_id"
