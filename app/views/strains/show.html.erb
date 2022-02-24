@@ -1,10 +1,9 @@
+<%= render partial: 'general/item_title',locals: { item: @strain, buttons_partial: 'strains/buttons' } %>
+
 <%= render partial: 'general/show_page_tab_definitions' %>
 
 <div class="tab-content">
-
-  <div id="details" class="tab-pane fade in active">
-    <%= render :partial => "general/item_title", :locals => { :item => @strain, :buttons_partial => 'strains/buttons' } %>
-
+  <%= tab_pane('details') do %>
     <div class="row">
       <div class="col-md-9 col-sm-8">
         <div class="row">
@@ -49,11 +48,8 @@
         <%= render :partial => "assets/resource_main_content_right", :locals => { :resource => @strain } %>
       </div>
     </div>
-
-  </div>
-
-  <div id="related-items" class="tab-pane fade">
-    <%= render :partial => "general/items_related_to", :object => @strain %>
-  </div>
-
+  <% end %>
+  <%= tab_pane('related-items') do %>
+    <%= render partial: 'general/items_related_to', object: @strain %>
+  <% end %>
 </div>
