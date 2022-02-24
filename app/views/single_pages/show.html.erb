@@ -15,7 +15,7 @@
                     <li ><a href="#"><span>Study</span></a></li>
                     <li ><a href="#"><span>Assay</span></a></li>
                     </ul>
-                    <div id="demo_tree" class="new-design"></div>
+                    <div id="single_page_tree" class="new-design"></div>
                 </div>
             </div>
         </div>
@@ -44,7 +44,7 @@
 <script type="text/javascript">
     var selectedItem = {type:"",id:""}, pid, uid, projectDefaultPolicy
     $j(document).ready(function() {
-        setupFoldersTree( <%= ((TreeviewBuilder.new(@project, @folders)).build_tree_data).html_safe -%> , 'demo_tree', 'draggable_folder_item');
+        setupFoldersTree( <%= ((TreeviewBuilder.new(@project, @folders)).build_tree_data).html_safe -%> , 'single_page_tree', 'draggable_folder_item');
         $j("#item-layout").html("<%= escape_javascript(render template: 'projects/show' ) %>");
         $j("#item_contents").show();
         pid = <%= @project.id %>
