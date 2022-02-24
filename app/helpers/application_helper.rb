@@ -528,7 +528,7 @@ module ApplicationHelper
                   'presentations' => I18n.t('presentation').pluralize, 'programmes' => I18n.t('programme').pluralize, 'events' => I18n.t('event').pluralize, 'help_documents' => 'Help' }.freeze
 
   def show_page_tab
-    return 'details' unless params.key?(:tab)
+    return 'overview' unless params.key?(:tab)
 
     params[:tab]
   end

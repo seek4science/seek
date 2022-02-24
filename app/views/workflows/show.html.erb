@@ -7,7 +7,7 @@
 <%= render partial: 'general/show_page_tab_definitions', locals: { versioned_resource: @display_workflow } %>
 
 <div class="tab-content">
-  <%= tab_pane('details') do %>
+  <%= tab_pane('overview') do %>
     <div class="row">
       <div class="col-md-9 col-sm-8 box_about_actor">
         <% if @display_workflow.is_git_versioned? && @display_workflow.main_workflow_blob.nil? %>
