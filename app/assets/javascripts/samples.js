@@ -6,7 +6,7 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
     opts = opts || {};
 
     $j('table tfoot th', selector).each( function () {
-        var title = $j(this).text();
+        var title = $j(this).data().searchTitle;
         $j(this).html('<input type="text" class="form-control" placeholder="Search '+title+'" />');
     });
 

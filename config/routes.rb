@@ -1,4 +1,6 @@
 SEEK::Application.routes.draw do
+  resources :observed_variable_sets
+  resources :observed_variables
   use_doorkeeper do
     controllers applications: 'oauth_applications'
     controllers authorized_applications: 'authorized_oauth_applications'

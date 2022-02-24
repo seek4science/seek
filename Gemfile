@@ -29,6 +29,7 @@ gem 'delayed_job_active_record'
 gem 'daemons'
 gem 'linkeddata'
 gem 'rdf'
+gem 'indefinite_article'
 
 gem 'openseek-api'
 # for fancy content escaping in openbis integration
@@ -111,7 +112,7 @@ gem 'activerecord-session_store'
 gem 'rails-observers'
 gem 'responders'
 
-gem 'rack-attack', '~> 5.0.1'
+gem 'rack-attack', '~> 6.6.0'
 
 gem 'private_address_check'
 

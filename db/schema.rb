@@ -1151,6 +1151,36 @@ ActiveRecord::Schema.define(version: 2022_01_24_171916) do
     t.index ["user_id"], name: "index_oauth_sessions_on_user_id"
   end
 
+  create_table "observed_variable_sets",  force: :cascade do |t|
+    t.string "title"
+    t.integer "contributor_id"
+    t.string "project_ids"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "observed_variables",  force: :cascade do |t|
+    t.integer "observed_variable_set_id"
+    t.string "variable_id"
+    t.string "variable_name"
+    t.string "variable_an"
+    t.string "trait"
+    t.string "trait_an"
+    t.string "trait_entity"
+    t.string "trait_entity_an"
+    t.string "trait_attribute"
+    t.string "trait_attribute_an"
+    t.string "method"
+    t.string "method_an"
+    t.text "method_description"
+    t.string "method_reference"
+    t.string "scale"
+    t.string "scale_an"
+    t.string "timescale"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "openbis_endpoints", id: :integer,  force: :cascade do |t|
     t.string "as_endpoint"
     t.string "space_perm_id"
@@ -1372,6 +1402,11 @@ ActiveRecord::Schema.define(version: 2022_01_24_171916) do
     t.boolean "use_default_policy", default: false
     t.date "start_date"
     t.date "end_date"
+  end
+
+  create_table "projects_observed_variable_sets", id: false,  force: :cascade do |t|
+    t.integer "project_id"
+    t.integer "observed_variable_set_id"
   end
 
   create_table "projects_publication_versions", id: false,  force: :cascade do |t|

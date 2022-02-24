@@ -251,3 +251,6 @@ cv_dropdown_limit:
 tag_cloud_enabled:
 workflow_class_list_enabled:
 home_description_position:
+
+observed_variables_enabled:
+observed_variable_sets_enabled:
