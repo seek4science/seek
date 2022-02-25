@@ -60,9 +60,6 @@ class DynamicTableHelperTest < ActionView::TestCase
     # |  (status)(id)sample_A2 | (status)(id)sample_B2  | x                     |
     # |  (status)(id)sample_A3 | x                      | x                     |
     # |-------------------------------------------------------------------------|
-
-    # TODO test when there is(are) 1(more) assay(s)
-    # TODO test with no sample
     
   end
 

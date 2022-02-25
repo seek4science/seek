@@ -8,15 +8,10 @@ module DynamicTableHelper
 
   def dt_aggregated(study, include_all_assays = nil, assay = nil)
     if assay
-      if assay.position == 0
-        sample_types = [study.sample_types.second, assay.sample_type]
-      else
-        previous_assay = study.assays.find_by_position(assay.position - 1)
-        sample_types = [previous_assay.sample_type, assay.sample_type]
-      end
+      sample_types = study.assays.where("position <= #{assay.position}").order(:position).map(&:sample_type)
     else
       sample_types = study.sample_types.map(&:clone)
-      sample_types.push(*study.assays.map {|a| a.sample_type }) if include_all_assays
+      sample_types.push(*study.assays.map(&:sample_type)) if include_all_assays
     end
     columns = dt_cumulative_cols(sample_types)
     rows = dt_cumulative_rows(sample_types, columns.length)
