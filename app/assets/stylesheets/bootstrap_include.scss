@@ -119,3 +119,8 @@ textarea.form-control {
   border-right: 4px solid transparent;
   border-left: 4px solid transparent;
 }
+
+/* Ensure tabs that use `data-target` instead of `href` get a pointer cursor. */
+.nav-tabs a[data-target] {
+  cursor: pointer;
+}

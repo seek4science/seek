@@ -29,6 +29,7 @@ gem 'delayed_job_active_record'
 gem 'daemons'
 gem 'linkeddata'
 gem 'rdf'
+gem 'indefinite_article'
 
 gem 'openseek-api'
 # for fancy content escaping in openbis integration
@@ -36,8 +37,6 @@ gem 'loofah'
 gem 'jbuilder'
 gem 'jbuilder-json_api'
 gem 'active_model_serializers', '~> 0.10.2'
-gem 'json-schema'
-gem 'json-diff'
 gem 'rubyzip'
 
 gem 'equivalent-xml'
@@ -111,7 +110,7 @@ gem 'activerecord-session_store'
 gem 'rails-observers'
 gem 'responders'
 
-gem 'rack-attack', '~> 5.0.1'
+gem 'rack-attack', '~> 6.6.0'
 
 gem 'private_address_check'
 
@@ -171,6 +170,8 @@ group :test do
   gem 'rails-controller-testing'
   gem 'simplecov'
   gem 'whenever-test'
+  gem 'json-schema'
+  gem 'json-diff'
 end
 
 group :test, :development do

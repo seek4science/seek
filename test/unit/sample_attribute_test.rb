@@ -296,6 +296,20 @@ class SampleAttributeTest < ActiveSupport::TestCase
     refute_nil attribute.pid
   end
 
+  test 'short pid' do
+    attribute = Factory(:string_sample_attribute_with_description_and_pid, is_title: true, pid: 'http://pid.org/attr#title', sample_type: Factory(:simple_sample_type))
+    assert_equal 'title',attribute.short_pid
+
+    attribute = Factory(:string_sample_attribute_with_description_and_pid, is_title: true, pid: 'pid:title', sample_type: Factory(:simple_sample_type))
+    assert_equal 'pid:title',attribute.short_pid
+
+    attribute = Factory(:string_sample_attribute_with_description_and_pid, is_title: true, pid: 'http://pid.org/attr/title', sample_type: Factory(:simple_sample_type))
+    assert_equal 'title',attribute.short_pid
+
+    attribute = Factory(:sample_sample_attribute, sample_type: Factory(:simple_sample_type))
+    assert_equal '', attribute.short_pid
+  end
+
   private
 
   def valid_value?(attribute, value)

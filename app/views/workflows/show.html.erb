@@ -1,15 +1,13 @@
-<%= render partial: 'general/show_page_tab_definitions' %>
+<%= render partial: 'general/item_title', locals: { item: @workflow,
+                                                    version: @display_workflow.version,
+                                                    buttons_partial: 'assets/asset_buttons' } -%>
+
+<%= render partial: 'assets/upload_new_version_form', locals: { resource: @workflow } -%>
+
+<%= render partial: 'general/show_page_tab_definitions', locals: { versioned_resource: @display_workflow } %>
 
 <div class="tab-content">
-
-  <div id="details" class="tab-pane fade in active">
-
-    <%= render partial: 'general/item_title', locals: { item: @workflow,
-                                                        version: @display_workflow.version,
-                                                        buttons_partial: 'assets/asset_buttons' } -%>
-
-    <%= render partial: 'assets/upload_new_version_form', locals: { resource: @workflow } -%>
-
+  <%= tab_pane('overview') do %>
     <div class="row">
       <% if @display_workflow&.content_blob&.remote_content_fetch_task&.pending? %>
         <div class="col-sm-12">
@@ -45,7 +43,7 @@
           <% end %>
         <% rescue StandardError => e %>
           <% Rails.logger.error(e.inspect) %>
-          <% Rails.logger.error(e.backtrace.inspect) %>
+          <% Rails.logger.error(e.backtrace.join("\n")) %>
           <div class="alert alert-warning">Could not render the workflow diagram.</div>
         <% end %>
 
@@ -79,13 +77,9 @@
         <%= render partial: 'assets/resource_main_content_right', locals: { resource: @workflow, versioned_resource: @display_workflow } %>
       </div>
     </div>
+  <% end %>
 
-    <%= render partial: 'assets/resource_version_details', locals: { displayed_resource: @display_workflow, resource: @workflow } -%>
-
-  </div>
-
-  <div id="related-items" class="tab-pane fade">
-    <%= render :partial => "general/items_related_to", :object => @workflow %>
-  </div>
-
+  <%= tab_pane('related-items') do %>
+    <%= render partial: 'general/items_related_to', object: @workflow %>
+  <% end %>
 </div>

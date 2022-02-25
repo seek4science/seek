@@ -526,6 +526,12 @@ module ApplicationHelper
                   'publications' => 'Publications', 'investigations' => I18n.t('investigation').pluralize, 'studies' => I18n.t('study').pluralize,
                   'samples' => 'Samples', 'strains' => 'Strains', 'organisms' => 'Organisms', 'human_disease' => 'Human Diseases', 'biosamples' => 'Biosamples', 'sample_types' => 'Sample Types',
                   'presentations' => I18n.t('presentation').pluralize, 'programmes' => I18n.t('programme').pluralize, 'events' => I18n.t('event').pluralize, 'help_documents' => 'Help' }.freeze
+
+  def show_page_tab
+    return 'overview' unless params.key?(:tab)
+
+    params[:tab]
+  end
 end
 
 class ApplicationFormBuilder < ActionView::Helpers::FormBuilder

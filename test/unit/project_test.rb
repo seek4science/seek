@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class ProjectTest < ActiveSupport::TestCase
-  fixtures :projects, :institutions, :work_groups, :group_memberships, :people, :users, :publications, :assets, :organisms
+  fixtures :projects, :institutions, :work_groups, :group_memberships, :people, :users, :publications, :assets, :organisms, :assays, :data_files
 
 
   test 'workgroups destroyed with project' do
@@ -905,7 +905,19 @@ class ProjectTest < ActiveSupport::TestCase
       proj.update_attribute(:funding_codes,'a,b')
       assert_equal ['a','b'],proj.funding_codes.sort
     end
-
-
   end
+
+  test 'project assets' do
+    sp = projects(:sysmo_project)
+    a = assays(:modelling_assay_with_data_and_relationship)
+    df = a.data_files.first
+    assert sp.assets.include? df
+    refute sp.project_assets.include? df
+
+    unused_df = data_files(:sysmo_data_file)
+
+    assert sp.assets.include? unused_df
+    assert sp.project_assets.include? unused_df
+  end
+  
 end

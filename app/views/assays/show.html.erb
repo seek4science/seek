@@ -1,12 +1,10 @@
+<%= render partial: 'general/item_title', locals: { item: @assay, buttons_partial: 'assays/buttons' } -%>
+
 <%= render partial: 'general/show_page_tab_definitions' %>
 
 <div class="tab-content">
-  <div id="details" class="tab-pane fade in active">
-    <%= render :partial => "general/item_title", :locals => { :item => @assay, :buttons_partial => 'assays/buttons' } -%>
-
-    <%
-      assay_type_text = @assay.is_modelling? ? "Biological problem addressed" : "#{t('assays.assay')} type"
-    %>
+  <%= tab_pane('overview') do %>
+    <% assay_type_text = @assay.is_modelling? ? "Biological problem addressed" : "#{t('assays.assay')} type" %>
 
     <div class="row">
       <div class="col-md-9 col-sm-8 box_about_actor">
@@ -125,10 +123,9 @@
         <%= render :partial => "assets/resource_main_content_right", :locals => { :resource => @assay } %>
       </div>
     </div>
-  </div>
+  <% end %>
 
-  <div id="related-items" class="tab-pane fade">
-    <%= render :partial => "general/items_related_to", :object => @assay -%>
-  </div>
-
+  <%= tab_pane('related-items') do %>
+    <%= render partial: 'general/items_related_to', object: @assay %>
+  <% end %>
 </div>
