@@ -98,7 +98,7 @@ class Project < ApplicationRecord
   end
 
   def project_assets
-    assets.select { |a| a.investigations.blank? }
+    assets.select { |a| a.investigations.empty? }
   end
   
   def institutions=(new_institutions)
