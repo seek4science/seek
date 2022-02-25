@@ -56,9 +56,8 @@ module Seek
           sleep(1)
         end
       end
-    rescue Exception => e
+    rescue RuntimeError => e
       Rails.logger.error("Problem with converting file of content_blob #{id} to pdf - #{e.class.name}:#{e.message}")
-      raise(e)
     end
 
     def extract_text_from_pdf
