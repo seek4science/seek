@@ -283,7 +283,9 @@ module AssetsHelper
       next unless type.feature_enabled?
       text="#{t('add_new_dropdown.option')} #{t(type.name.underscore)}"
       parameters = { param=>item.id }
-      parameters = parameters.merge({ single_page: params[:single_page] }) if displaying_single_page?
+      if (Seek::Config.project_single_page_enabled && params[:single_page])
+        parameters = parameters.merge({ single_page: params[:single_page] })
+      end
       path = new_polymorphic_path(type,parameters)
       elements << yield(text,path)
     end
