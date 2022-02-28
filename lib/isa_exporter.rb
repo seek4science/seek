@@ -71,10 +71,11 @@ module IsaExporter
             protocols = []
             study.assays.each do |a|
                 # There should be only one attribute with isa_tag == protocol
-                attribute = a.sample_type.sample_attributes.detect { |sa| sa.isa_tag&.isa_protocol? }  
-                raise "Protocol ISA tag not found in assay #{a.id}" if attribute.blank?
+                with_tag_protocol = a.sample_type.sample_attributes.detect { |sa| sa.isa_tag&.isa_protocol? }
+                with_tag_parameter_value = a.sample_type.sample_attributes.select { |sa| sa.isa_tag&.isa_parameter_value? }
+                raise "Protocol ISA tag not found in assay #{a.id}" if with_tag_protocol.blank?
                 sop = a.sops.first
-                protocols << convert_protocol(sop, attribute)
+                protocols << convert_protocol(sop, with_tag_protocol, with_tag_parameter_value)
             end
             isa_study[:protocols] = protocols
 
@@ -180,31 +181,33 @@ module IsaExporter
             source_ontologies.uniq.map { |s| client.fetch_ontology_reference(s) }
         end
 
-        def convert_protocol(sop, attribute)
+        def convert_protocol(sop, protocol, parameter_values)
             isa_protocol = {}
-            isa_protocol['@id'] =  "#protocol/#{sop.id}"
-            isa_protocol[:name] = sop.title
+            # generates random identifiers that point to the same resource in Seek
+            isa_protocol['@id'] =  "#protocol/#{sop.id}?#{random_string(6)}"
+            isa_protocol[:name] = protocol.title #sop.title
 
-            ontology = get_ontology_details(attribute)
+            ontology = get_ontology_details(protocol)
 
             isa_protocol[:protocolType] = {
-                annotationValue: attribute.title,
+                annotationValue: protocol.title,
                 termAccession: ontology[:termAccession],
                 termSource: ontology[:termSource]
             }
             isa_protocol[:description] = sop.description
             isa_protocol[:uri] = ontology[:termAccession]
             isa_protocol[:version] = nil
-            isa_protocol[:parameters] = [
+            isa_protocol[:parameters] = parameter_values.map do |parameter_value|
+                parameter_value_ontology = get_ontology_details(parameter_value)
                 {
-                    "@id": "#parameter/#{attribute.id}",
+                    "@id": "#parameter/#{parameter_value.id}",
                     parameterName: {
-                        annotationValue: attribute.title,
-                        termAccession: ontology[:termAccession],
-                        termSource: ontology[:termSource]
+                        annotationValue: parameter_value.title,
+                        termAccession: parameter_value_ontology[:termAccession],
+                        termSource: parameter_value_ontology[:termSource]
                     }
                 }
-            ]
+            end
             isa_protocol[:components] = [
                 {
                     componentName: "",
@@ -475,6 +478,10 @@ module IsaExporter
             end
             #temp[0]: source, temp[1]: sample
             return temp[0]
+        end
+
+        def random_string(len)
+            (0...len).map { ('a'..'z').to_a[rand(26)] }.join
         end
 
 
