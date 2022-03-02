@@ -1,3 +1,4 @@
+require 'open4'
 require 'rest-client'
 
 module Seek
@@ -27,7 +28,7 @@ module Seek
           wf = WorkflowInternals::Structure.new(metadata[:internals])
           Seek::WorkflowExtractors::CwlDotGenerator.new(f).write_graph(wf)
           f.rewind
-          `cat #{f.path} | dot -Tsvg`
+          Open4.popen4("cat #{f.path} | dot -Tsvg")
         rescue StandardError => e
           nil
         end
@@ -51,8 +52,16 @@ module Seek
           path = f.path
         end
 
-        packed_cwl_string = `cwltool --skip-schemas --quiet --enable-dev --non-strict --pack #{path}`
-        if $?.success?
+        packed_cwl_string = ''
+        status = Open4.popen4("cwltool --skip-schemas --quiet --enable-dev --non-strict --pack #{path}") do |_pid, _stdin, stdout, stderr|
+          while (line = stdout.gets) != nil
+            packed_cwl_string << line
+          end
+          stdout.close
+          stderr.close
+        end
+
+        if status.success?
           cwl_string = packed_cwl_string
         else
           cwl_string ||= @io.read
