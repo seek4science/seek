@@ -28,7 +28,15 @@ module Seek
           wf = WorkflowInternals::Structure.new(metadata[:internals])
           Seek::WorkflowExtractors::CwlDotGenerator.new(f).write_graph(wf)
           f.rewind
-          Open4.popen4("cat #{f.path} | dot -Tsvg")
+          out = ''
+          Open4.open4('dot -Tsvg') do |pid, stdin, stdout, stderr|
+            stdin.puts(f.read)
+            stdin.close
+            out = stdout.read
+            stdout.close
+            stderr.close
+          end
+          out
         rescue StandardError => e
           nil
         end
