@@ -37,7 +37,7 @@ class ExceptionForwarderTest < ActiveSupport::TestCase
   test 'send notification' do
     with_config_value(:email_enabled, true) do
       with_config_value(:exception_notification_enabled, true) do
-        #assert_enqueued_emails(1) do
+        #assert_emails(1) do
           Seek::Errors::ExceptionForwarder.send_notification(StandardError.new('test'),data:{})
         #end
       end
