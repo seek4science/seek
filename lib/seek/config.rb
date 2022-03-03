@@ -277,15 +277,7 @@ module Seek
     end
 
     def soffice_available?(cached=false)
-      @@soffice_available = nil unless cached
-      begin
-        port = ConvertOffice::ConvertOfficeConfig.options[:soffice_port]
-        soc = TCPSocket.new('localhost', port)
-        soc.close
-        true
-      rescue
-        false
-      end
+      true
     end
 
     def studies_enabled

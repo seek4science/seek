@@ -50,11 +50,8 @@ module Seek
 
         FileUtils.cp dat_filepath, copied_filepath
 
-        ConvertOffice::ConvertOfficeFormat.new.convert(copied_filepath, pdf_filepath)
-        t = Time.now
-        while !File.exist?(pdf_filepath) && (Time.now - t) < MAXIMUM_PDF_CONVERT_TIME
-          sleep(1)
-        end
+        Libreconv.convert(copied_filepath, pdf_filepath)
+
       end
     rescue RuntimeError => e
       Rails.logger.error("Problem with converting file of content_blob #{id} to pdf - #{e.class.name}:#{e.message}")

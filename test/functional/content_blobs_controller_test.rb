@@ -295,7 +295,6 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'get_pdf' do
-    check_for_soffice
     ms_word_sop = Factory(:doc_sop, policy: Factory(:all_sysmo_downloadable_policy))
     pdf_path = ms_word_sop.content_blob.filepath('pdf')
     FileUtils.rm pdf_path if File.exist?(pdf_path)
@@ -315,7 +314,6 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'get_pdf raises exception if soffice not running and conversion is needed' do
-    check_for_soffice
     ms_word_sop = Factory(:doc_sop, policy: Factory(:all_sysmo_downloadable_policy))
     pdf_path = ms_word_sop.content_blob.filepath('pdf')
     FileUtils.rm pdf_path if File.exist?(pdf_path)
@@ -358,7 +356,6 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'get_pdf of a doc file from url' do
-    check_for_soffice
     mock_remote_file "#{Rails.root}/test/fixtures/files/ms_word_test.doc",
                      'http://somewhere.com/piccy.doc',
                      'Content-Type' => 'application/pdf',
