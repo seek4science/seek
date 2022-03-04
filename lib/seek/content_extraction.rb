@@ -1,6 +1,5 @@
 module Seek
   module ContentExtraction
-    MAXIMUM_PDF_CONVERT_TIME = 3.minutes
 
     include ContentTypeDetection
     include SysMODB::SpreadsheetExtractor
@@ -50,13 +49,13 @@ module Seek
 
         FileUtils.cp dat_filepath, copied_filepath
 
-        ConvertOffice::ConvertOfficeFormat.new.convert(copied_filepath, pdf_filepath)
-        t = Time.now
-        while !File.exist?(pdf_filepath) && (Time.now - t) < MAXIMUM_PDF_CONVERT_TIME
-          sleep(1)
+        Timeout.timeout(Seek::Config.pdf_convert_timeout) do
+          Libreconv.convert(copied_filepath, pdf_filepath)
         end
+
       end
     rescue RuntimeError => e
+      Seek::Errors::ExceptionForwarder.send_notification(e, data: { content_blob: self, asset: asset })
       Rails.logger.error("Problem with converting file of content_blob #{id} to pdf - #{e.class.name}:#{e.message}")
     end
 

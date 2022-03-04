@@ -6,9 +6,6 @@
 # DB config
 check_mysql
 
-# Soffice service
-start_soffice
-
 # Search
 start_search
 

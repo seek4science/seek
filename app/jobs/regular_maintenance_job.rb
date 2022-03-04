@@ -62,16 +62,19 @@ class RegularMaintenanceJob < ApplicationJob
   # checks lookup_table_consistent? on each type for each user, and if not triggers a job to repopulate for that user
   # if not already queued
   def check_authlookup_consistency
+    found_types = []
     User.where.not(person_id: nil).to_a.push(nil).each do |user|
-      next if AuthLookupUpdateQueue.where(item: user).any?
 
       found = Seek::Util.authorized_types.find do |type|
         !type.lookup_table_consistent?(user)
       end
+
       if found.present?
-        found.remove_invalid_auth_lookup_entries
-        AuthLookupUpdateQueue.enqueue(user)
+        found_types << found unless found_types.include?(found)
+        UserAuthLookupUpdateJob.perform_later(user, found.name)
       end
+
     end
+    found_types.each(&:remove_invalid_auth_lookup_entries)
   end
 end

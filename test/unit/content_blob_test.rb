@@ -94,7 +94,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     as_not_virtualliver do
       mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://webpage.com/piccy.png', 'Content-Type' => 'image/png'
       blob = ContentBlob.create url: 'http://webpage.com/piccy.png', original_filename: nil, content_type: nil
-      assert !blob.is_webpage?
+      refute blob.is_webpage?
       assert_equal 'image/png', blob.content_type
     end
   end
@@ -102,7 +102,7 @@ class ContentBlobTest < ActiveSupport::TestCase
   test 'handles an unavailable url when checking for a webpage' do
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://webpage.com/piccy.png', { 'Content-Type' => 'image/png' }, 500
     blob = ContentBlob.create url: 'http://webpage.com/piccy.png', original_filename: nil, content_type: nil
-    assert !blob.is_webpage?
+    refute blob.is_webpage?
   end
 
   test "content type for url type with binary doesn't try read file" do
@@ -318,7 +318,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     content_blob = Factory(:content_blob, uuid: '1111')
     assert content_blob.file_exists?
     content_blob = Factory(:content_blob, uuid: '2222', data: nil)
-    assert !content_blob.file_exists?
+    refute content_blob.file_exists?
   end
 
   test 'human content type' do
@@ -377,12 +377,11 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'covert_office should doc to pdf and then docslit convert pdf to txt' do
-    check_for_soffice
     content_blob = Factory(:doc_content_blob, uuid: 'doc_1')
     assert File.exist? content_blob.filepath
     pdf_path = content_blob.filepath('pdf')
     FileUtils.rm pdf_path if File.exist? pdf_path
-    assert !File.exist?(pdf_path)
+    refute File.exist?(pdf_path)
 
     content_blob.convert_to_pdf
 
@@ -397,11 +396,10 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'convert_office should convert docx to pdf and then docsplit convert pdf to txt' do
-    check_for_soffice
     content_blob = Factory(:docx_content_blob, uuid: 'docx_1')
     assert File.exist? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exist? content_blob.filepath('pdf')
-    assert !File.exist?(content_blob.filepath('pdf'))
+    refute File.exist?(content_blob.filepath('pdf'))
 
     content_blob.convert_to_pdf
 
@@ -415,12 +413,39 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert content.include?('This is a ms word docx format')
   end
 
+  test 'convert timeout' do
+    sop = Factory(:sop, content_blob: Factory(:docx_content_blob, uuid: 'docx_1'))
+    content_blob = sop.content_blob
+    assert File.exist? content_blob.filepath
+    FileUtils.rm content_blob.filepath('pdf') if File.exist? content_blob.filepath('pdf')
+    refute File.exist?(content_blob.filepath('pdf'))
+    notification_exception = nil
+    notification_data = nil
+
+    # intercept the exception notification
+    Seek::Errors::ExceptionForwarder.define_singleton_method(:send_notification) do |*args|
+      notification_exception = args[0]
+      notification_data = args[1][:data]
+    end
+
+    with_config_value(:pdf_convert_timeout, 0.00001.seconds) do
+      Thread.report_on_exception = false
+      content_blob.convert_to_pdf
+      refute File.exist?(content_blob.filepath('pdf')), 'should have timed out before the pdf was created'
+
+      refute_nil notification_exception
+      assert_equal Timeout::Error, notification_exception.class
+      assert_equal content_blob, notification_data[:content_blob]
+      assert_equal sop, notification_data[:asset]
+    end
+
+  end
+
   test 'convert_office should convert odt to pdf and then docsplit converts pdf to txt' do
-    check_for_soffice
     content_blob = Factory(:odt_content_blob, uuid: 'odt_1')
     assert File.exist? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exist? content_blob.filepath('pdf')
-    assert !File.exist?(content_blob.filepath('pdf'))
+    refute File.exist?(content_blob.filepath('pdf'))
 
     content_blob.convert_to_pdf
 
@@ -435,11 +460,10 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'convert_office should convert ppt to pdf and then docsplit converts pdf to txt' do
-    check_for_soffice
     content_blob = Factory(:ppt_content_blob, uuid: 'ppt_1')
     assert File.exist? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exist? content_blob.filepath('pdf')
-    assert !File.exist?(content_blob.filepath('pdf'))
+    refute File.exist?(content_blob.filepath('pdf'))
 
     content_blob.convert_to_pdf
 
@@ -454,11 +478,10 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'convert_office should convert pptx to pdf and then docsplit converts pdf to txt' do
-    check_for_soffice
     content_blob = Factory(:pptx_content_blob, uuid: 'pptx_1')
     assert File.exist? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exist? content_blob.filepath('pdf')
-    assert !File.exist?(content_blob.filepath('pdf'))
+    refute File.exist?(content_blob.filepath('pdf'))
 
     content_blob.convert_to_pdf
 
@@ -473,11 +496,10 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'convert_office should convert odp to pdf and then docsplit converts pdf to txt' do
-    check_for_soffice
     content_blob = Factory(:odp_content_blob, uuid: 'odp_1')
     assert File.exist? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exist? content_blob.filepath('pdf')
-    assert !File.exist?(content_blob.filepath('pdf'))
+    refute File.exist?(content_blob.filepath('pdf'))
 
     content_blob.convert_to_pdf
 
@@ -492,11 +514,10 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'convert_office should convert rtf to pdf and then docsplit converts pdf to txt' do
-    check_for_soffice
     content_blob = Factory(:rtf_content_blob, uuid: 'rtf_1')
     assert File.exist? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exist? content_blob.filepath('pdf')
-    assert !File.exist?(content_blob.filepath('pdf'))
+    refute File.exist?(content_blob.filepath('pdf'))
 
     content_blob.convert_to_pdf
 
@@ -512,11 +533,10 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'convert_office should convert txt to pdf' do
-    check_for_soffice
     content_blob = Factory(:txt_content_blob, uuid: 'txt_1')
     assert File.exist? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exist? content_blob.filepath('pdf')
-    assert !File.exist?(content_blob.filepath('pdf'))
+    refute File.exist?(content_blob.filepath('pdf'))
 
     content_blob.convert_to_pdf
 
@@ -591,16 +611,14 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'filter_text_content' do
-    check_for_soffice
     ms_word_sop_cb = Factory(:doc_content_blob)
     content = "test \n content \f only"
     filtered_content = ms_word_sop_cb.send(:filter_text_content, content)
-    assert !filtered_content.include?('\n')
-    assert !filtered_content.include?('\f')
+    refute filtered_content.include?('\n')
+    refute filtered_content.include?('\f')
   end
 
   test 'pdf_contents_for_search for a doc file' do
-    check_for_soffice
     ms_word_sop_content_blob = Factory(:doc_content_blob)
     assert ms_word_sop_content_blob.is_pdf_convertable?
     content = ms_word_sop_content_blob.pdf_contents_for_search
@@ -608,7 +626,6 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'pdf_contents_for_search for a pdf file' do
-    check_for_soffice
     pdf_content_blob = Factory(:pdf_content_blob)
     assert pdf_content_blob.is_pdf?
     content = pdf_content_blob.pdf_contents_for_search
@@ -644,7 +661,7 @@ class ContentBlobTest < ActiveSupport::TestCase
     blob = Factory(:url_content_blob)
     blob.save
     blob.reload
-    assert !blob.file_exists?
+    refute blob.file_exists?
     assert blob.md5sum.blank?
     assert blob.sha1sum.blank?
 
@@ -663,7 +680,7 @@ class ContentBlobTest < ActiveSupport::TestCase
                                                        headers: { content_type: 'text/plain' }, status: 200)
 
     blob = Factory(:url_content_blob)
-    assert !blob.file_exists?
+    refute blob.file_exists?
     assert_nil blob.file_size
 
     blob.retrieve
@@ -681,7 +698,7 @@ class ContentBlobTest < ActiveSupport::TestCase
                                                        headers: { content_type: 'text/plain' }, status: 200)
 
     blob = Factory(:url_content_blob)
-    assert !blob.file_exists?
+    refute blob.file_exists?
     assert_equal 500, blob.file_size
 
     with_config_value(:hard_max_cachable_size, 5000) do
@@ -689,7 +706,7 @@ class ContentBlobTest < ActiveSupport::TestCase
         blob.retrieve
       end
     end
-    assert !blob.file_exists?
+    refute blob.file_exists?
   end
 
   test "won't endlessly follow redirects when downloading remote content" do
@@ -700,13 +717,13 @@ class ContentBlobTest < ActiveSupport::TestCase
     stub_request(:get, 'http://www.abc.com').to_return(headers: { location: 'http://www.abc.com' }, status: 302)
 
     blob = Factory(:url_content_blob)
-    assert !blob.file_exists?
+    refute blob.file_exists?
     assert_equal 500, blob.file_size
 
     assert_raise Seek::DownloadHandling::RedirectLimitExceededException do
       blob.retrieve
     end
-    assert !blob.file_exists?
+    refute blob.file_exists?
   end
 
   test 'raises exception on bad response code when downloading remote content' do
@@ -716,13 +733,13 @@ class ContentBlobTest < ActiveSupport::TestCase
     stub_request(:get, 'http://www.abc.com').to_return(status: 404)
 
     blob = Factory(:url_content_blob)
-    assert !blob.file_exists?
+    refute blob.file_exists?
     assert_equal 500, blob.file_size
 
     assert_raise Seek::DownloadHandling::BadResponseCodeException do
       blob.retrieve
     end
-    assert !blob.file_exists?
+    refute blob.file_exists?
   end
 
   test 'handles relative redirects when downloading remote content' do
@@ -735,7 +752,7 @@ class ContentBlobTest < ActiveSupport::TestCase
                                                            headers: { content_type: 'text/plain' }, status: 200)
 
     blob = Factory(:url_content_blob)
-    assert !blob.file_exists?
+    refute blob.file_exists?
     assert_nil blob.file_size
 
     blob.retrieve
@@ -753,7 +770,7 @@ class ContentBlobTest < ActiveSupport::TestCase
                                                            headers: { content_type: 'text/plain' }, status: 200)
 
     blob = Factory(:url_content_blob)
-    assert !blob.file_exists?
+    refute blob.file_exists?
     assert_nil blob.file_size
 
     blob.retrieve
@@ -773,7 +790,7 @@ class ContentBlobTest < ActiveSupport::TestCase
                                                            headers: { content_type: 'text/plain' }, status: 200)
 
     blob = Factory(:url_content_blob)
-    assert !blob.file_exists?
+    refute blob.file_exists?
     assert_nil blob.file_size
 
     blob.retrieve
@@ -789,13 +806,13 @@ class ContentBlobTest < ActiveSupport::TestCase
         assert PrivateAddressCheck.resolves_to_private_address?('localhost')
 
         blob = Factory(:url_content_blob, url: 'http://localhost/secrets')
-        assert !blob.file_exists?
+        refute blob.file_exists?
 
         assert_raise PrivateAddressCheck::PrivateConnectionAttemptedError do
           blob.retrieve
         end
 
-        assert !blob.file_exists?
+        refute blob.file_exists?
       end
     ensure
       WebMock.disable_net_connect!(allow_localhost: true)
@@ -911,7 +928,6 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'fix mime type after failed pdf contents for search' do
-    check_for_soffice
     blob = Factory(:image_content_blob, content_type: 'application/msword', original_filename: 'image.doc')
     assert blob.is_pdf_convertable?
 
