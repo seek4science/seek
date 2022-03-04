@@ -147,7 +147,7 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
       assert Document.lookup_table_consistent?(p2.user)
       assert Document.lookup_table_consistent?(nil)
 
-      assert_no_difference("AuthLookupUpdateQueue.count") do
+      assert_no_enqueued_jobs do
         RegularMaintenanceJob.perform_now
       end
 
@@ -159,12 +159,7 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
       #gets immmediately updated for anonymous user
       assert Document.lookup_table_consistent?(nil)
 
-      assert_difference("AuthLookupUpdateQueue.count",2) do
-        RegularMaintenanceJob.perform_now
-      end
-
-      # doesn't duplicate them
-      assert_no_difference("AuthLookupUpdateQueue.count") do
+      assert_enqueued_jobs(2) do
         RegularMaintenanceJob.perform_now
       end
 
