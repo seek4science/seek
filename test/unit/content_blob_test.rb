@@ -414,7 +414,8 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'convert timeout' do
-    content_blob = Factory(:docx_content_blob, uuid: 'docx_1')
+    sop = Factory(:sop, content_blob: Factory(:docx_content_blob, uuid: 'docx_1'))
+    content_blob = sop.content_blob
     assert File.exist? content_blob.filepath
     FileUtils.rm content_blob.filepath('pdf') if File.exist? content_blob.filepath('pdf')
     refute File.exist?(content_blob.filepath('pdf'))
@@ -435,6 +436,7 @@ class ContentBlobTest < ActiveSupport::TestCase
       refute_nil notification_exception
       assert_equal Timeout::Error, notification_exception.class
       assert_equal content_blob, notification_data[:content_blob]
+      assert_equal sop, notification_data[:asset]
     end
 
   end

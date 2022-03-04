@@ -55,7 +55,7 @@ module Seek
 
       end
     rescue RuntimeError => e
-      Seek::Errors::ExceptionForwarder.send_notification(e, data: { content_blob: self })
+      Seek::Errors::ExceptionForwarder.send_notification(e, data: { content_blob: self, asset: asset })
       Rails.logger.error("Problem with converting file of content_blob #{id} to pdf - #{e.class.name}:#{e.message}")
     end
 
