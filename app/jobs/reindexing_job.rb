@@ -1,5 +1,6 @@
 class ReindexingJob < BatchJob
   BATCHSIZE = 100
+  queue_as QueueNames::INDEXING
 
   def perform
     if Seek::Config.solr_enabled
