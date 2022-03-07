@@ -15,6 +15,12 @@
                     <li ><a href="#"><span>Study</span></a></li>
                     <li ><a href="#"><span>Assay</span></a></li>
                     </ul>
+                    <div class="treeview-toggle">
+                        Toggle: 
+                        <button class="active" onClick="toggleItem(this, 'investigation')">Investigations</button>
+                        <button class="active" onClick="toggleItem(this, 'study')">Studies</button>
+                        <button class="active" onClick="toggleItem(this, 'assay')">Assays</button>
+                    </div>
                     <div id="single_page_tree" class="new-design"></div>
                 </div>
             </div>
@@ -51,5 +57,13 @@
         projectDefaultPolicy = <%= project_policy_json(@project) %>
         uid = <%= current_user ? current_user.id : "null" %>
     });
+
+    function toggleItem(e, type){
+        let action
+        if($j(e).hasClass("active")) action = "close_node"
+        else action = "open_node"
+        $j("a[_type='" + type + "']").each((i, e) => $j("#single_page_tree").jstree(action, $j(e)))
+        $j(e).toggleClass("active")
+    }
     
 </script>

@@ -503,3 +503,27 @@
 .btn {
     outline: none !important;
 }
+
+.treeview-toggle {
+   padding: 0 10px 0 10px;
+   font-size: 12px;
+   opacity: 0.3;
+   transition: all ease-in-out 100ms;
+}
+
+.treeview-toggle:hover {
+    opacity: 1;
+    cursor: default;
+ }
+
+.treeview-toggle button{
+    border-radius: 3px;
+    border:none;
+    outline: none;
+}
+
+.treeview-toggle button.active{
+    background-color: #303e4e;
+    color:#fff
+}
+
