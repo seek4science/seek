@@ -42,6 +42,7 @@ module Seek
 
     def convert_to_pdf(dat_filepath = filepath, pdf_filepath = filepath('pdf'))
       unless File.exist?(pdf_filepath) || !Seek::Config.soffice_available?
+        Rails.logger.info("Converting blob #{id} to pdf")
         # copy dat file to original file extension in order to convert to pdf on this file
         file_extension = mime_extensions(content_type).first
         tmp_file = Tempfile.new(['', '.' + file_extension])
@@ -49,9 +50,11 @@ module Seek
 
         FileUtils.cp dat_filepath, copied_filepath
 
-        Timeout.timeout(Seek::Config.pdf_convert_timeout) do
+        #Timeout.timeout(Seek::Config.pdf_convert_timeout) do
           Libreconv.convert(copied_filepath, pdf_filepath)
-        end
+        #end
+
+        Rails.logger.info("Finished converting blob #{id} to pdf")
 
       end
     rescue RuntimeError => e
@@ -60,20 +63,21 @@ module Seek
     end
 
     def extract_text_from_pdf
-      return "" unless is_pdf? || is_pdf_convertable?
       pdf_filepath = filepath('pdf')
       txt_filepath = filepath('txt')
 
-      if File.exist?(pdf_filepath)
-        begin
-          Docsplit.extract_text(pdf_filepath, output: converted_storage_directory) unless File.exist?(txt_filepath)
-          File.read(txt_filepath)
-        rescue Docsplit::ExtractionFailed => e
-          extract_text_from_pdf if double_check_mime_type
-          Rails.logger.error("Problem with extracting text from pdf #{id} #{e}")
-          ""
-        end
+      return '' unless is_pdf? || is_pdf_convertable?
+      return '' unless File.exist?(pdf_filepath)
+
+      begin
+        Docsplit.extract_text(pdf_filepath, output: converted_storage_directory) unless File.exist?(txt_filepath)
+        File.read(txt_filepath)
+      rescue Docsplit::ExtractionFailed => e
+        extract_text_from_pdf if double_check_mime_type
+        Rails.logger.error("Problem with extracting text from pdf #{id} #{e}")
+        ''
       end
+
     end
 
     def to_csv(sheet = 1, trim = false)
