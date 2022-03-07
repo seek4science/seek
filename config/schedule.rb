@@ -58,6 +58,6 @@ end
 # not safe to automatically add in a non containerised environment
 if Seek::Docker.using_docker?
   every 10.minutes do
-    command "sh ./script/kill-long-running-soffice.sh"
+    command "sh /seek/script/kill-long-running-soffice.sh"
   end
 end
