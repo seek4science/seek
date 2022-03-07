@@ -26,4 +26,8 @@ class ReindexingJob < BatchJob
   def follow_on_job?
     ReindexingQueue.any?
   end
+
+  def timelimit
+    1.hour
+  end
 end
