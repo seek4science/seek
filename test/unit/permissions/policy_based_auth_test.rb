@@ -257,6 +257,11 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
       doc.update_lookup_table(user)
       assert_empty Document.items_missing_from_authlookup(user)
 
+      # check for anonymous user
+      assert_empty Document.items_missing_from_authlookup(nil)
+      Document.lookup_class.where(user_id:0).last.delete
+      assert_equal [doc],Document.items_missing_from_authlookup(nil)
+
     end
   end
 
