@@ -50,9 +50,9 @@ module Seek
 
         FileUtils.cp dat_filepath, copied_filepath
 
-        Timeout.timeout(Seek::Config.pdf_convert_timeout) do
+        #Timeout.timeout(Seek::Config.pdf_convert_timeout) do
           Libreconv.convert(copied_filepath, pdf_filepath)
-        end
+        #end
 
         Rails.logger.info("Finished converting blob #{id} to pdf")
 
