@@ -116,7 +116,8 @@ module Seek
 
         # returns items that have entries missing from the authlookup for this user
         def items_missing_from_authlookup(user)
-          ids = pluck(:id) - lookup_class.where(user_id:user&.id).pluck(:asset_id)
+          user_id = user&.id || 0
+          ids = pluck(:id) - lookup_class.where(user_id:user_id).pluck(:asset_id)
           ids.collect{|id| find(id)}
         end
 
