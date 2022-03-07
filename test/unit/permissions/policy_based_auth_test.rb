@@ -244,6 +244,22 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
     end
   end
 
+  test 'items_missing_from_authlookup' do
+    with_config_value :auth_lookup_enabled, true do
+      user = Factory(:user)
+      user2 = Factory(:user)
+      doc = Factory(:document)
+      doc.update_lookup_table(user2)
+
+      assert_equal [doc],Document.items_missing_from_authlookup(user)
+      assert_empty Document.items_missing_from_authlookup(user2)
+
+      doc.update_lookup_table(user)
+      assert_empty Document.items_missing_from_authlookup(user)
+
+    end
+  end
+
   test 'people flagged as having left a project cannot see project-shared items' do
     person = Factory(:former_project_person)
     project = person.projects.first
