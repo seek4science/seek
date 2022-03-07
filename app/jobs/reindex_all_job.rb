@@ -8,4 +8,9 @@ class ReindexAllJob < ApplicationJob
   def perform(type)
     type.constantize.solr_reindex(batch_size: BATCH_SIZE) if type && Seek::Config.solr_enabled
   end
+
+  def timelimit
+    2.hours
+  end
+
 end
