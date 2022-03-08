@@ -296,7 +296,7 @@ class Mailer < ActionMailer::Base
       @programme = Programme.new(JSON.parse(programme_json))
       @programme = Programme.find(@programme.id) if @programme.id
     end
-    if @programme
+    if @programme&.id
       recipients = @programme.programme_administrators
       recipients |= admins if @programme.site_managed?
     else

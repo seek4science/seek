@@ -106,6 +106,8 @@ class Person < ApplicationRecord
 
   if Seek::Config.solr_enabled
     searchable(auto_index: false) do
+      text :expertise
+      text :tools
       text :project_positions
       text :disciplines do
         disciplines.map(&:title)

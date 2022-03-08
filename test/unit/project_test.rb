@@ -1,7 +1,8 @@
 require 'test_helper'
 
 class ProjectTest < ActiveSupport::TestCase
-  fixtures :all
+  fixtures :projects, :institutions, :work_groups, :group_memberships, :people, :users, :assets, :organisms
+
 
   test 'workgroups destroyed with project' do
     project = Factory(:person).projects.first
@@ -923,4 +924,5 @@ class ProjectTest < ActiveSupport::TestCase
     assert sp.assets.include? unused_df
     assert sp.project_assets.include? unused_df
   end
+  
 end

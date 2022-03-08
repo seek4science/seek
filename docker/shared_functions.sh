@@ -51,11 +51,6 @@ function enable_search {
     fi
 }
 
-function start_soffice {
-    echo "STARTING SOFFICE"
-    soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard &
-}
-
 function start_search {
     if [ ! -z $SOLR_PORT ]
     then
