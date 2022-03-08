@@ -913,11 +913,6 @@ class ProjectTest < ActiveSupport::TestCase
   end
 
   test 'project assets' do
-    sp = projects(:sysmo_project)
-    a = assays(:modelling_assay_with_data_and_relationship)
-    df = a.data_files.first
-    assert sp.assets.include? df
-    refute sp.project_assets.include? df
 
     disable_authorization_checks do
       assay = Factory(:assay)
