@@ -1443,6 +1443,11 @@ ActiveRecord::Schema.define(version: 2022_03_08_102056) do
     t.date "end_date"
   end
 
+  create_table "projects_observed_variable_sets", id: false,  force: :cascade do |t|
+    t.integer "project_id"
+    t.integer "observed_variable_set_id"
+  end
+
   create_table "projects_publication_versions", id: false,  force: :cascade do |t|
     t.integer "project_id"
     t.integer "version_id"
