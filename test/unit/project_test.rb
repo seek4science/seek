@@ -913,16 +913,24 @@ class ProjectTest < ActiveSupport::TestCase
   end
 
   test 'project assets' do
-    sp = projects(:sysmo_project)
-    a = assays(:modelling_assay_with_data_and_relationship)
-    df = a.data_files.first
-    assert sp.assets.include? df
-    refute sp.project_assets.include? df
+    disable_authorization_checks do
+      assay = Factory(:assay)
+      project = assay.projects.first
+      df = Factory(:data_file, projects:[project])
+      assay.data_files << df
+      assay.save!
 
-    unused_df = data_files(:sysmo_data_file)
+      assert project.assets.include? df
+      refute project.project_assets.include? df
 
-    assert sp.assets.include? unused_df
-    assert sp.project_assets.include? unused_df
+      unused_df = Factory(:data_file, projects:[project])
+      assert unused_df.investigations.empty?
+
+      project.reload
+
+      assert project.assets.include? unused_df
+      assert project.project_assets.include? unused_df
+    end
   end
   
 end
