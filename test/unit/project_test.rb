@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class ProjectTest < ActiveSupport::TestCase
-  fixtures :projects, :institutions, :work_groups, :group_memberships, :people, :users, :assets, :organisms, :assays, :data_files
+  fixtures :projects, :institutions, :work_groups, :group_memberships, :people, :users, :assets, :organisms
 
 
   test 'workgroups destroyed with project' do
@@ -919,10 +919,25 @@ class ProjectTest < ActiveSupport::TestCase
     assert sp.assets.include? df
     refute sp.project_assets.include? df
 
-    unused_df = data_files(:sysmo_data_file)
+    disable_authorization_checks do
+      assay = Factory(:assay)
+      project = assay.projects.first
+      df = Factory(:data_file, projects:[project])
+      assay.data_files << df
+      assay.save!
 
-    assert sp.assets.include? unused_df
-    assert sp.project_assets.include? unused_df
+      assert project.assets.include? df
+      refute project.project_assets.include? df
+
+      unused_df = Factory(:data_file, projects:[project])
+      assert unused_df.investigations.empty?
+
+      project.reload
+
+      assert project.assets.include? unused_df
+      assert project.project_assets.include? unused_df
+    end
+
   end
   
 end

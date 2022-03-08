@@ -101,12 +101,6 @@ class ActiveSupport::TestCase
     fixture_file_upload('files/little_file_v2.txt', 'text/plain')
   end
 
-  def check_for_soffice
-    unless Seek::Config.soffice_available?(true)
-      skip("soffice is not available on port #{ConvertOffice::ConvertOfficeConfig.options[:soffice_port]}, skipping test")
-    end
-  end
-
   def skip_rest_schema_check?
     false
   end

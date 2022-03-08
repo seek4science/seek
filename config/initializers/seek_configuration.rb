@@ -48,6 +48,7 @@ def load_seek_config_defaults!
   Seek::Config.default :project_browser_enabled,false
   Seek::Config.default :experimental_features_enabled,false
   Seek::Config.default :pdf_conversion_enabled,true
+  Seek::Config.default :pdf_convert_timeout, 3.minutes
   Seek::Config.default :delete_asset_version_enabled, false
   Seek::Config.default :filestore_path,"filestore"
   Seek::Config.default :modelling_analysis_enabled,true

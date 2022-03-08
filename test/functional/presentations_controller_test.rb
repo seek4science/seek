@@ -214,39 +214,21 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'should be able to view ms/open office ppt content' do
-    Seek::Config.stub(:soffice_available?, true) do
-      ms_ppt_presentation = Factory(:ppt_presentation, policy: Factory(:all_sysmo_downloadable_policy))
-      assert ms_ppt_presentation.content_blob.is_content_viewable?
-      get :show, params: { id: ms_ppt_presentation.id }
-      assert_response :success
-      assert_select 'a', text: /View content/, count: 1
-      assert_select 'a.disabled', text: /View content/, count: 0
 
-      openoffice_ppt_presentation = Factory(:odp_presentation, policy: Factory(:all_sysmo_downloadable_policy))
-      assert openoffice_ppt_presentation.content_blob.is_content_viewable?
-      get :show, params: { id: openoffice_ppt_presentation.id }
-      assert_response :success
-      assert_select 'a', text: /View content/, count: 1
-      assert_select 'a.disabled', text: /View content/, count: 0
-    end
-  end
+    ms_ppt_presentation = Factory(:ppt_presentation, policy: Factory(:all_sysmo_downloadable_policy))
+    assert ms_ppt_presentation.content_blob.is_content_viewable?
+    get :show, params: { id: ms_ppt_presentation.id }
+    assert_response :success
+    assert_select 'a', text: /View content/, count: 1
+    assert_select 'a.disabled', text: /View content/, count: 0
 
-  test 'view content disabled for ms/open office ppt content if soffice not available and conversion required' do
-    Seek::Config.stub(:soffice_available?, false) do
-      ms_ppt_presentation = Factory(:ppt_presentation, policy: Factory(:all_sysmo_downloadable_policy))
-      assert ms_ppt_presentation.content_blob.file_exists?
-      refute ms_ppt_presentation.content_blob.file_exists?('pdf')
-      get :show, params: { id: ms_ppt_presentation.id }
-      assert_response :success
-      assert_select 'a.disabled', text: /View content/, count: 1
+    openoffice_ppt_presentation = Factory(:odp_presentation, policy: Factory(:all_sysmo_downloadable_policy))
+    assert openoffice_ppt_presentation.content_blob.is_content_viewable?
+    get :show, params: { id: openoffice_ppt_presentation.id }
+    assert_response :success
+    assert_select 'a', text: /View content/, count: 1
+    assert_select 'a.disabled', text: /View content/, count: 0
 
-      openoffice_ppt_presentation = Factory(:odp_presentation, policy: Factory(:all_sysmo_downloadable_policy))
-      assert openoffice_ppt_presentation.content_blob.file_exists?
-      refute openoffice_ppt_presentation.content_blob.file_exists?('pdf')
-      get :show, params: { id: openoffice_ppt_presentation.id }
-      assert_response :success
-      assert_select 'a.disabled', text: /View content/, count: 1
-    end
   end
 
   test 'should display the file icon according to version' do

@@ -1,5 +1,5 @@
 <%
-  cache_key ||= nil
+
   show_all ||= false
 
   unless show_all
@@ -8,16 +8,15 @@
 
 %>
 
-<% cache_if(cache_key.present?, cache_key) do %>
-  <div class="hTagcloud">
-    <% if !tags.blank? -%>
-        <div class="popularity">
-          <% ann_cloud tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |ann, css_class| -%>
-              <%= link_for_ann ann, :truncate_length=>40, :class => css_class -%>
-          <% end -%>
-        </div>
-    <% else -%>
-        <p class="none_text"><%= h(no_tags_text) || '' %></p>
-    <% end -%>
-  </div>
-<% end %>
+<div class="hTagcloud">
+  <% if !tags.blank? -%>
+      <div class="popularity">
+        <% ann_cloud tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |ann, css_class| -%>
+            <%= link_for_ann ann, :truncate_length=>40, :class => css_class -%>
+        <% end -%>
+      </div>
+  <% else -%>
+      <p class="none_text"><%= h(no_tags_text) || '' %></p>
+  <% end -%>
+</div>
+
