@@ -413,34 +413,6 @@ class ContentBlobTest < ActiveSupport::TestCase
     assert content.include?('This is a ms word docx format')
   end
 
-  # test 'convert timeout' do
-  #   sop = Factory(:sop, content_blob: Factory(:docx_content_blob, uuid: 'docx_1'))
-  #   content_blob = sop.content_blob
-  #   assert File.exist? content_blob.filepath
-  #   FileUtils.rm content_blob.filepath('pdf') if File.exist? content_blob.filepath('pdf')
-  #   refute File.exist?(content_blob.filepath('pdf'))
-  #   notification_exception = nil
-  #   notification_data = nil
-  #
-  #   # intercept the exception notification
-  #   Seek::Errors::ExceptionForwarder.define_singleton_method(:send_notification) do |*args|
-  #     notification_exception = args[0]
-  #     notification_data = args[1][:data]
-  #   end
-  #
-  #   with_config_value(:pdf_convert_timeout, 0.00001.seconds) do
-  #     Thread.report_on_exception = false
-  #     content_blob.convert_to_pdf
-  #     refute File.exist?(content_blob.filepath('pdf')), 'should have timed out before the pdf was created'
-  #
-  #     refute_nil notification_exception
-  #     assert_equal Timeout::Error, notification_exception.class
-  #     assert_equal content_blob, notification_data[:content_blob]
-  #     assert_equal sop, notification_data[:asset]
-  #   end
-  #
-  # end
-
   test 'convert_office should convert odt to pdf and then docsplit converts pdf to txt' do
     content_blob = Factory(:odt_content_blob, uuid: 'odt_1')
     assert File.exist? content_blob.filepath

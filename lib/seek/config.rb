@@ -276,10 +276,6 @@ module Seek
       end
     end
 
-    def soffice_available?(cached=false)
-      true
-    end
-
     def studies_enabled
       isa_enabled
     end
