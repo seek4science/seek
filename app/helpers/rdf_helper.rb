@@ -17,7 +17,7 @@ module RdfHelper
         data={}
         data[:message] = 'Error embedding Schema JSON-LD into page HEAD'
         data[:item] = resource.inspect
-        Seek::Errors::ExceptionForwarder.send_notification(exception, data)
+        Seek::Errors::ExceptionForwarder.send_notification(exception, data:data)
         ''
       end
     end
