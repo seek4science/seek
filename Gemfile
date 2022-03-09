@@ -130,7 +130,7 @@ gem 'request_store'
 
 gem 'bundler', '>= 1.8.4'
 
-gem 'ro-crate', '~> 0.4.14'
+gem 'ro-crate', '~> 0.4.16'
 
 gem 'rugged'
 gem 'i18n-js'
@@ -140,7 +140,7 @@ gem 'commonmarker'
 
 gem 'rack-cors', require: 'rack/cors'
 
-gem 'addressable', '~> 2.7.0'
+gem 'addressable', '~> 2.8.0'
 
 group :production do
   gem 'passenger'
