@@ -41,7 +41,7 @@ module Seek
     end
 
     def convert_to_pdf(dat_filepath = filepath, pdf_filepath = filepath('pdf'))
-      unless File.exist?(pdf_filepath) || !Seek::Config.soffice_available?
+      unless File.exist?(pdf_filepath)
         Rails.logger.info("Converting blob #{id} to pdf")
         # copy dat file to original file extension in order to convert to pdf on this file
         file_extension = mime_extensions(content_type).first
@@ -50,9 +50,7 @@ module Seek
 
         FileUtils.cp dat_filepath, copied_filepath
 
-        #Timeout.timeout(Seek::Config.pdf_convert_timeout) do
-          Libreconv.convert(copied_filepath, pdf_filepath)
-        #end
+        Libreconv.convert(copied_filepath, pdf_filepath)
 
         Rails.logger.info("Finished converting blob #{id} to pdf")
 

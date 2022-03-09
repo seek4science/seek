@@ -433,6 +433,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       workflow.assets_creators.create!(creator: creator2, pos: 2)
       workflow.assets_creators.create!(given_name: 'Fred', family_name: 'Bloggs', pos: 3)
       workflow.assets_creators.create!(given_name: 'Steve', family_name: 'Smith', orcid: 'https://orcid.org/0000-0002-1694-233X', pos: 4)
+      workflow.assets_creators.create!(given_name: 'Bob', family_name: 'Colon:', pos: 4)
 
       workflow.internals = workflow.extractor.metadata[:internals]
 
@@ -464,7 +465,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                        'name' => 'Fred Bloggs' },
                      { '@type' => 'Person',
                        '@id' => "https://orcid.org/0000-0002-1694-233X",
-                       'name' => 'Steve Smith' }],
+                       'name' => 'Steve Smith' },
+                     { '@type' => 'Person',
+                       '@id' => "#Bob%20Colon:",
+                       'name' => 'Bob Colon:' }],
                  'producer' =>
                     [{ '@type' => %w[Project Organization],
                        '@id' => "http://localhost:3000/projects/#{@project.id}",

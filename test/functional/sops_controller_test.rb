@@ -623,24 +623,22 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should be able to view ms/open office word content' do
-    Seek::Config.stub(:soffice_available?, true) do
-      ms_word_sop = Factory(:doc_sop, policy: Factory(:all_sysmo_downloadable_policy))
-      content_blob = ms_word_sop.content_blob
-      pdf_filepath = content_blob.filepath('pdf')
-      FileUtils.rm pdf_filepath if File.exist?(pdf_filepath)
-      assert content_blob.is_content_viewable?
-      get :show, params: { id: ms_word_sop.id }
-      assert_response :success
-      assert_select 'a', text: /View content/, count: 1
-      assert_select 'a.disabled', text: /View content/, count: 0
+    ms_word_sop = Factory(:doc_sop, policy: Factory(:all_sysmo_downloadable_policy))
+    content_blob = ms_word_sop.content_blob
+    pdf_filepath = content_blob.filepath('pdf')
+    FileUtils.rm pdf_filepath if File.exist?(pdf_filepath)
+    assert content_blob.is_content_viewable?
+    get :show, params: { id: ms_word_sop.id }
+    assert_response :success
+    assert_select 'a', text: /View content/, count: 1
+    assert_select 'a.disabled', text: /View content/, count: 0
 
-      openoffice_word_sop = Factory(:odt_sop, policy: Factory(:all_sysmo_downloadable_policy))
-      assert openoffice_word_sop.content_blob.is_content_viewable?
-      get :show, params: { id: openoffice_word_sop.id }
-      assert_response :success
-      assert_select 'a', text: /View content/, count: 1
-      assert_select 'a.disabled', text: /View content/, count: 0
-    end
+    openoffice_word_sop = Factory(:odt_sop, policy: Factory(:all_sysmo_downloadable_policy))
+    assert openoffice_word_sop.content_blob.is_content_viewable?
+    get :show, params: { id: openoffice_word_sop.id }
+    assert_response :success
+    assert_select 'a', text: /View content/, count: 1
+    assert_select 'a.disabled', text: /View content/, count: 0
   end
 
   test 'should disappear view content button for the document needing pdf conversion, when pdf_conversion_enabled is false' do
