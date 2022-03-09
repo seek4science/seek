@@ -82,7 +82,7 @@ gem 'bootstrap-sass', '>=3.4.1'
 gem 'sass-rails', '~> 5.0'
 gem 'sprockets-rails'
 
-gem 'ro-bundle', '~> 0.2.5'
+gem 'ro-bundle', '~> 0.3.0'
 gem 'handlebars_assets'
 gem 'zenodo-client', git: 'https://github.com/seek4science/zenodo-client.git'
 
@@ -130,7 +130,7 @@ gem 'request_store'
 
 gem 'bundler', '>= 1.8.4'
 
-gem 'ro-crate', '~> 0.4.14'
+gem 'ro-crate', '~> 0.4.16'
 
 gem 'git'
 gem 'i18n-js'
@@ -140,7 +140,7 @@ gem 'commonmarker'
 
 gem 'rack-cors', require: 'rack/cors'
 
-gem 'addressable', '~> 2.7.0'
+gem 'addressable', '~> 2.8.0'
 
 group :production do
   gem 'passenger'
