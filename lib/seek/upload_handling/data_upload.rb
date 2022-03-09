@@ -11,7 +11,7 @@ module Seek
         unless allow_empty_content_blob || retained_content_blob_ids.present?
           if !blob_params || blob_params.empty? || blob_params.none? { |p| check_for_data_or_url(p) }
 
-            flash.now[:error] ||= 'DataUpload Please select a file to upload or provide a URL to the data.'
+            flash.now[:error] ||= 'Please select a file to upload or provide a URL to the data.'
             return false
           end
         end

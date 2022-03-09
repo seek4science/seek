@@ -47,7 +47,7 @@ class PlaceholdersController < ApplicationController
     update_sharing_policies @placeholder
     update_relationships(@placeholder,params)
     update_template() if params.key?(:file_template_id)
-    resolve() # if params.key?(:data_file_id)
+    resolve() if params.key?(:data_file_id)
 
     respond_to do |format|
 
@@ -75,21 +75,15 @@ class PlaceholdersController < ApplicationController
   def resolve
     if params.key?(:data_file_id)
       df = DataFile.find(params[:data_file_id])
-    else
-      df = DataFile.find(10)
-    end
       @placeholder.data_file = df
-      puts('Resolving to ' + df.id.to_s)
-      puts('There are ' + @placeholder.assays.length.to_s + ' assays')
       @placeholder.assays.each do |a|
-        puts
-        puts(a.title);
         assay_asset = a.assay_assets.detect { |aa| aa.asset == @placeholder }
         direction = assay_asset.direction
         a.associate(df, direction: direction)
         a.save!
       end
       @placeholder.save!
+    end
   end
   
   def filter

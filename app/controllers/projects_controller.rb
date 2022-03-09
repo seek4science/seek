@@ -750,7 +750,6 @@ class ProjectsController < ApplicationController
   end
 
   def has_spreadsheets
-    @project = Project.find(params[:id])
     return !@project.spreadsheets.empty?
   end
 

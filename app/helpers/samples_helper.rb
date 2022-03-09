@@ -13,7 +13,6 @@ module SamplesHelper
         :label, :label,
         values
       )
-      flash.alert = values[0]
       select_tag element_name,
                  options,                 
                  class: "form-control",
