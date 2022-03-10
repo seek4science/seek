@@ -340,7 +340,6 @@ class StudiesController < ApplicationController
   end
 
   private
-
   def study_params
     params.require(:study).permit(:title, :description, :experimentalists, :investigation_id,
                                   *creator_related_params, :position, { scales: [] }, { publication_ids: [] },

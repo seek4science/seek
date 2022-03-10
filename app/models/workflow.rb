@@ -183,4 +183,12 @@ class Workflow < ApplicationRecord
         end
       }
   )
+
+  def edam_data_vocab
+    nil
+  end
+
+  def edam_formats_vocab
+    nil
+  end
 end

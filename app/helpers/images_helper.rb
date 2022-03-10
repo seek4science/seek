@@ -6,7 +6,6 @@ module ImagesHelper
 
   def image_tag_for_key(key, url = nil, alt = nil, html_options = {}, label = key.humanize, remote = false, size = nil)
     label = 'Delete' if label == 'Destroy'
-
     return nil unless (filename = icon_filename_for_key(key.downcase))
 
     image_options = alt ? { alt: alt } : { alt: key.humanize }

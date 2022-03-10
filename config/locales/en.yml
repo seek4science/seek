@@ -40,6 +40,8 @@ en:
   publication: "Publication"
   presentation: "Presentation"
   event: "Event"
+  file_template: "File Template"
+  placeholder: "Placeholder"
   collection: "Collection"
   collections:
     info_text: "A collection is a group of items that are conceptually related to each other."

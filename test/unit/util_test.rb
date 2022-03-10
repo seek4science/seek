@@ -8,7 +8,8 @@ class UtilTest < ActiveSupport::TestCase
 
   test 'creatable types' do
     types = Seek::Util.user_creatable_types
-    expected = [Collection, DataFile, Document, Model, Node, Presentation, Publication, Sample, Sop, Assay, Investigation, Study, Event, SampleType, Strain, Workflow]
+    # How to enable Placeholder?
+    expected = [Collection, DataFile, Document, FileTemplate, Model, Node, Presentation, Publication, Sample, Sop, Assay, Investigation, Study, Event, SampleType, Strain, Workflow]
 
     # first as strings for more readable failed assertion message
     assert_equal expected.map(&:to_s).sort, types.map(&:to_s).sort
@@ -18,7 +19,8 @@ class UtilTest < ActiveSupport::TestCase
   end
 
   test 'authorized types' do
-    expected = [Assay, Collection, DataFile, Document, Event, Investigation, Model, Node, Presentation, Publication, Sample, Sop, Strain, Study, Workflow].map(&:name).sort
+    # How to enable Placeholder?
+    expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, Investigation, Model, Node, Presentation, Publication, Sample, Sop, Strain, Study, Workflow].map(&:name).sort
     actual = Seek::Util.authorized_types.map(&:name).sort
     assert_equal expected, actual
   end
@@ -31,7 +33,7 @@ class UtilTest < ActiveSupport::TestCase
 
   test 'searchable types' do
     types = Seek::Util.searchable_types
-    expected = [Assay, Collection, DataFile, Document, Event, HumanDisease, Institution, Investigation, Model, Node, Organism, Person, Presentation, Programme, Project, Publication, Sample, SampleType, Sop, Strain, Study, Workflow]
+    expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, HumanDisease, Institution, Investigation, Model, Node, Organism, Person, Presentation, Programme, Project, Publication, Sample, SampleType, Sop, Strain, Study, Workflow]
 
     # first as strings for more readable failed assertion message
     assert_equal expected.map(&:to_s).sort, types.map(&:to_s).sort
@@ -68,7 +70,7 @@ class UtilTest < ActiveSupport::TestCase
   test 'doiable asset types' do
     types = Seek::Util.doiable_asset_types
 
-    expected = [DataFile, Document, Model, Sop, Investigation, Study, Assay, Node, Workflow]
+    expected = [DataFile, Document, FileTemplate, Model, Sop, Investigation, Study, Assay, Node, Workflow]
 
     # first as strings for more readable failed assertion message
     assert_equal expected.map(&:to_s).sort, types.map(&:to_s).sort

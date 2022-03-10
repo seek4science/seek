@@ -308,7 +308,7 @@ SEEK::Application.routes.draw do
       post :batch_change_permssion_for_selected_items
       post :batch_sharing_permission_changed
     end
-    resources :projects, :programmes, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :nodes, :data_files, :presentations, :publications, :documents, :events, :samples, :specimens, :strains, :collections, only: [:index]
+    resources :projects, :programmes, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :nodes, :data_files, :presentations, :publications, :documents, :events, :samples, :specimens, :strains, :file_templates, :placeholders, :collections, only: [:index]
     resources :avatars do
       member do
         post :select
@@ -333,6 +333,8 @@ SEEK::Application.routes.draw do
     end
     member do
       get :asset_report
+      get :populate
+      post :populate_from_spreadsheet
       get :admin_members
       get :admin_member_roles
       get :storage_report
@@ -345,7 +347,7 @@ SEEK::Application.routes.draw do
       get :guided_join
     end
     resources :programmes, :people, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :nodes, :data_files, :presentations,
-              :publications, :events, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :collections, only: [:index]
+              :publications, :events, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :file_templates, :placeholders, :collections, only: [:index]
 
     resources :openbis_endpoints do
       collection do
@@ -468,7 +470,7 @@ SEEK::Application.routes.draw do
         post :register
       end
     end
-    resources :people, :programmes, :projects, :investigations, :samples, :studies, :models, :sops, :workflows, :nodes, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, only: [:index]
+    resources :people, :programmes, :projects, :investigations, :samples, :studies, :models, :sops, :workflows, :nodes, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, :placeholders, only: [:index]
   end
 
   # to be removed as STI does not work in too many places
@@ -575,6 +577,32 @@ SEEK::Application.routes.draw do
 
   resources :nodes, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, only: [:index]
+  end
+
+  resources :file_templates, concerns: [:has_content_blobs, :has_versions, :has_doi, :publishable, :asset] do
+    collection do
+      get :filter
+      get :provide_metadata
+      post :create_content_blob
+      post :create_metadata
+    end
+    member do
+      get :explore
+    end
+    resources :people, :programmes, :projects, :collections, only: [:index]
+  end
+
+  resources :placeholders, concerns: [:asset] do
+    collection do
+      get :filter
+      get :provide_metadata
+      post :create_metadata
+    end
+    member do
+      get :explore
+      get :data_file
+    end
+    resources :people, :programmes, :projects, :collections, only: [:index]
   end
 
   resources :content_blobs, except: [:show, :index, :update, :create, :destroy] do

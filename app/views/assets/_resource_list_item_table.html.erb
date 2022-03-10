@@ -50,6 +50,10 @@
       <td><%= table_item_person_list resource.creators %></td>
     <% when "assay_type_uri"%>
       <td><%= link_to_assay_type(resource) %></td>
+    <% when "data_type" %>
+      <td><%= EdamHelper::url_to_text(resource.data_type) %></td>
+    <% when "format_type" %>
+      <td><%= EdamHelper::url_to_text(resource.format_type) %></td>
     <% when "technology_type_uri"%>
       <td><%= link_to_technology_type(resource) %></td>
     <% else  %>

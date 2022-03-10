@@ -217,6 +217,8 @@ samples_enabled:
 sops_enabled:
 workflows_enabled:
 collections_enabled:
+file_templates_enabled:
+placeholders_enabled:
 # Omniauth
 omniauth_enabled:
 omniauth_user_create:

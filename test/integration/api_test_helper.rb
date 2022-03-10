@@ -103,7 +103,10 @@ module ApiTestHelper
     end
 
     ['min','max'].each do |m|
+<<<<<<< HEAD
       puts m if debug
+=======
+>>>>>>> origin/master-ibisba
       if defined? @post_values
         to_post = load_template("post_#{m}_#{@clz}.json.erb", @post_values)
       else
@@ -251,7 +254,8 @@ module ApiTestHelper
       validate_json_against_fragment @to_patch.to_json, "#/definitions/#{@clz.camelize(:lower)}Patch"
 
       assert_no_difference("#{@clz.classify}.count") do
-        patch member_url(obj), params: @to_patch.to_json, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+        j = @to_patch.to_json
+        patch member_url(obj), params: j, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
         assert_response :success
       end
 

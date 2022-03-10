@@ -16,6 +16,8 @@ class DataFile < ApplicationRecord
 
   acts_as_doi_parent(child_accessor: :versions)
 
+  has_edam_annotations
+
   validates :projects, presence: true, projects: { self: true }, unless: Proc.new {Seek::Config.is_virtualliver }
 
   # allow same titles, but only if these belong to different users
@@ -24,6 +26,7 @@ class DataFile < ApplicationRecord
   has_one :content_blob, ->(r) { where('content_blobs.asset_version =?', r.version) }, as: :asset, foreign_key: :asset_id
   has_one :external_asset, as: :seek_entity, dependent: :destroy
 
+  belongs_to :file_template
   has_many :studied_factors, ->(r) { where('studied_factors.data_file_version =?', r.version) }
   has_many :extracted_samples, class_name: 'Sample', foreign_key: :originating_data_file_id
 
@@ -45,7 +48,8 @@ class DataFile < ApplicationRecord
       joins: [:assays]
   )
 
-  explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi', 'data_type', 'format_type']) do
+  explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi', 'data_type', 'format_type', 'file_template_id']) do
+
     include Seek::Data::SpreadsheetExplorerRepresentation
     acts_as_doi_mintable(proxy: :parent, type: 'Dataset', general_type: 'Dataset')
     acts_as_versioned_resource
@@ -80,6 +84,10 @@ class DataFile < ApplicationRecord
     def event_ids=(_events_ids); end
   end
 
+  def placeholder
+    Placeholder.find_by data_file: self
+  end
+  
   def workflow_data_files_attributes=(attributes)
     self.workflow_data_files.each do |link|
       if link.workflow_data_file_relationship
@@ -97,12 +105,20 @@ class DataFile < ApplicationRecord
 
   # Returns the columns to be shown on the table view for the resource
   def columns_default
-    super + ['creators','projects','version']
+    super + ['creators','projects','version', 'format_type', 'data_type']
   end
   def columns_allowed
     columns_default + ['last_used_at','other_creators','doi','license','simulation_data']
   end
 
+  def edam_topics_vocab
+    nil
+  end
+  
+  def edam_operations_vocab
+    nil
+  end
+  
   def included_to_be_copied?(symbol)
     case symbol.to_s
     when 'activity_logs', 'versions', 'attributions', 'relationships', 'inverse_relationships', 'annotations'

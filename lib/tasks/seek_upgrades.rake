@@ -15,6 +15,8 @@ namespace :seek do
     rename_branding_settings
     update_missing_openbis_istest
     update_missing_publication_versions
+    db:seed:013_edam_formats
+    db:seed:014_edam_data
     remove_orphaned_versions
     create_seek_sample_multi
     rename_seek_sample_attribute_types
