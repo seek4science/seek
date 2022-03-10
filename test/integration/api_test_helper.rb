@@ -103,10 +103,6 @@ module ApiTestHelper
     end
 
     ['min','max'].each do |m|
-<<<<<<< HEAD
-      puts m if debug
-=======
->>>>>>> origin/master-ibisba
       if defined? @post_values
         to_post = load_template("post_#{m}_#{@clz}.json.erb", @post_values)
       else
