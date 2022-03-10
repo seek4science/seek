@@ -1,18 +1,3 @@
-<!--
-    <% unless @placeholder.file_template.nil? %>
-    <% unless EdamHelper::ancestry(@placeholder.data_type, @placeholder.file_template.data_type) -%>
-    <%= alert_box('warning') do %>
-    The data type of the placeholder is not compatible with that of the template
-    <% end %>
-    <% end %>
-    <% unless EdamHelper::ancestry(@placeholder.format_type, @placeholder.file_template.format_type) -%>
-    <%= alert_box('warning') do %>
-    The format of the plceholder is not compatible with that of the template
-    <% end %>
-    <% end %>
-    <% end %>
--->
-
 <ul class="nav nav-tabs">
   <li class="active ">
     <a data-toggle="tab" href="#details"><i class="glyphicon glyphicon-list-alt"></i> Details</a>

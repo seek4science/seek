@@ -28,7 +28,7 @@
 
       <% if Seek::Config.file_templates_enabled %>
         <%= render :partial => "assets/select_template", :locals => {:resource => (@data_file ? @data_file : DataFile.new),
-        :templates => FileTemplate.all } %>
+	:templates => authorised_assets(FileTemplate, nil, 'edit') } %>
       <% end %>
       
       <%= render partial: 'assets/edam_form_properties', :locals => { :resource => (@data_file ? @data_file : DataFile.new) } -%>

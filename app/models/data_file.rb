@@ -33,6 +33,7 @@ class DataFile < ApplicationRecord
   has_many :workflow_data_files, dependent: :destroy, autosave: true
   has_many :workflows, ->{ distinct }, through: :workflow_data_files
 
+  has_one :placeholder
   scope :with_extracted_samples, -> { joins(:extracted_samples).distinct }
 
   scope :simulation_data, -> { where(simulation_data: true) }
@@ -84,10 +85,6 @@ class DataFile < ApplicationRecord
     def event_ids=(_events_ids); end
   end
 
-  def placeholder
-    Placeholder.find_by data_file: self
-  end
-  
   def workflow_data_files_attributes=(attributes)
     self.workflow_data_files.each do |link|
       if link.workflow_data_file_relationship
