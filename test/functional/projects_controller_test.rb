@@ -3021,7 +3021,6 @@ class ProjectsControllerTest < ActionController::TestCase
     refute flash.key? :error
     put :populate_from_spreadsheet, params: {id: project.id, :spreadsheet_id => df.id }
     assert flash.key? :error
-    puts flash[:error]
     assert flash[:error].starts_with?("Investigation, Study or Assay column is missing")
   end
 
@@ -3039,7 +3038,6 @@ class ProjectsControllerTest < ActionController::TestCase
     refute flash.key? :error
     put :populate_from_spreadsheet, params: {id: project.id, :spreadsheet_id => df.id }
     assert flash.key? :error
-    puts flash[:error]
     assert flash[:error].starts_with?("Study specified without Investigation")
   end
 
@@ -3057,7 +3055,6 @@ class ProjectsControllerTest < ActionController::TestCase
     refute flash.key? :error
     put :populate_from_spreadsheet, params: {id: project.id, :spreadsheet_id => df.id }
     assert flash.key? :error
-    puts flash[:error]
     assert flash[:error].starts_with?("Assay specified without Study")
   end
 
