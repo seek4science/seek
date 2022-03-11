@@ -433,7 +433,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       workflow.assets_creators.create!(creator: creator2, pos: 2)
       workflow.assets_creators.create!(given_name: 'Fred', family_name: 'Bloggs', pos: 3)
       workflow.assets_creators.create!(given_name: 'Steve', family_name: 'Smith', orcid: 'https://orcid.org/0000-0002-1694-233X', pos: 4)
-      workflow.assets_creators.create!(given_name: 'Bob', family_name: 'Colon:', pos: 4)
+      workflow.assets_creators.create!(given_name: 'Bob', family_name: 'Colon:', pos: 5)
 
       workflow.internals = workflow.extractor.metadata[:internals]
 
