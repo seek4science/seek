@@ -75,7 +75,7 @@ class PlaceholdersController < ApplicationController
   def resolve
     if params.key?(:data_file_id)
       df = DataFile.find(params[:data_file_id])
-      if df.authorized_for(:edit)
+      if df.can_edit?
         @placeholder.data_file = df
         @placeholder.assays.each do |a|
           assay_asset = a.assay_assets.detect { |aa| aa.asset == @placeholder }
