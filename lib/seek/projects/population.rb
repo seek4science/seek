@@ -20,22 +20,15 @@ module Seek
 
         r = sheet.rows[1]
 
-        puts r.cells.size
-        
         if r.cell(1).value.blank?
           flash[:error]= "Unable to find header cells in #{datafile.title}" 
           return
-        else
-          puts r.cell(1).value
         end
 
         header_cell_values = r.cells.collect { |c| (c.nil? ? 'NIL' : c.value) }
         investigation_index = header_cell_values.find_index('Investigation')
-        puts header_cell_values[investigation_index]
         study_index = header_cell_values.find_index('Study')
-        puts study_index
         assay_index = header_cell_values.find_index('Assay')
-        puts assay_index
         description_index = header_cell_values.find_index('Description')
         assignee_indices = []
         protocol_index = nil

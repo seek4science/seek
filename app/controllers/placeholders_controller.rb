@@ -75,14 +75,16 @@ class PlaceholdersController < ApplicationController
   def resolve
     if params.key?(:data_file_id)
       df = DataFile.find(params[:data_file_id])
-      @placeholder.data_file = df
-      @placeholder.assays.each do |a|
-        assay_asset = a.assay_assets.detect { |aa| aa.asset == @placeholder }
-        direction = assay_asset.direction
-        a.associate(df, direction: direction)
-        a.save!
+      if df.authorized_for(:edit)
+        @placeholder.data_file = df
+        @placeholder.assays.each do |a|
+          assay_asset = a.assay_assets.detect { |aa| aa.asset == @placeholder }
+          direction = assay_asset.direction
+          a.associate(df, direction: direction)
+          a.save!
+        end
+        @placeholder.save!
       end
-      @placeholder.save!
     end
   end
   
