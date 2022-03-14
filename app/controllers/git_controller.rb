@@ -92,7 +92,7 @@ class GitController < ApplicationController
   end
 
   def freeze
-    if @git_version.update_attributes(git_version_params) && @git_version.lock
+    if @git_version.update(git_version_params) && @git_version.lock
       flash[:notice] = "#{@git_version.name} was frozen"
     else
       flash[:error] = "Could not freeze #{@git_version.name} - #{@git_version.errors.full_messages.join(', ')}"

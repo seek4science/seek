@@ -109,7 +109,7 @@ class FileTemplateTest < ActiveSupport::TestCase
       person.add_to_project_and_institution(Factory(:project),person.institutions.first)
       projects = person.projects
       assert_equal 2,projects.count
-      file_template.update_attributes(project_ids: projects.map(&:id))
+      file_template.update(project_ids: projects.map(&:id))
       file_template.save!
       file_template.reload
       assert_equal projects.sort, file_template.projects.sort

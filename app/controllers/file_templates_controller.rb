@@ -50,7 +50,7 @@ class FileTemplatesController < ApplicationController
 
     respond_to do |format|
 
-      if @file_template.update_attributes(file_template_params)
+      if @file_template.update(file_template_params)
         flash[:notice] = "#{t('file_template')} metadata was successfully updated."
         format.html { redirect_to file_template_path(@file_template) }
         format.json { render json: @file_template, include: [params[:include]] }

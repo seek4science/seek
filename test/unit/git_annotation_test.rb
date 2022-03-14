@@ -14,7 +14,7 @@ class GitAnnotationTest < ActiveSupport::TestCase
     assert_nil workflow.main_workflow_path
 
     assert_difference('Git::Annotation.count', 1) do
-      disable_authorization_checks { workflow.update_attributes!(workflow_class_id: @galaxy_class.id) }
+      disable_authorization_checks { workflow.update!(workflow_class_id: @galaxy_class.id) }
       wgv.reload
       wgv.main_workflow_path = 'concat_two_files.ga'
       disable_authorization_checks { assert wgv.save }
@@ -58,7 +58,7 @@ class GitAnnotationTest < ActiveSupport::TestCase
     assert_nil workflow.main_workflow_path
 
     assert_difference('Git::Annotation.count', 1) do
-      disable_authorization_checks { workflow.update_attributes!(workflow_class_id: @galaxy_class.id) }
+      disable_authorization_checks { workflow.update!(workflow_class_id: @galaxy_class.id) }
       wgv.reload
       wgv.main_workflow_path = 'concat_two_files.ga'
       assert wgv.save
@@ -76,7 +76,7 @@ class GitAnnotationTest < ActiveSupport::TestCase
     workflow = Factory(:git_version).resource
     wgv = workflow.git_version
     assert_difference('Git::Annotation.count', 1) do
-      disable_authorization_checks { workflow.update_attributes!(workflow_class_id: @galaxy_class.id) }
+      disable_authorization_checks { workflow.update!(workflow_class_id: @galaxy_class.id) }
       wgv.reload
       wgv.main_workflow_path = 'concat_two_files.ga'
       assert wgv.save
@@ -93,7 +93,7 @@ class GitAnnotationTest < ActiveSupport::TestCase
     workflow = Factory(:git_version).resource
     wgv = workflow.git_version
     assert_difference('Git::Annotation.count', 1) do
-      disable_authorization_checks { workflow.update_attributes!(workflow_class_id: @galaxy_class.id) }
+      disable_authorization_checks { workflow.update!(workflow_class_id: @galaxy_class.id) }
       wgv.reload
       wgv.main_workflow_path = 'concat_two_files.ga'
       assert wgv.save
@@ -109,7 +109,7 @@ class GitAnnotationTest < ActiveSupport::TestCase
     workflow = Factory(:git_version).resource
     wgv = workflow.git_version
     assert_difference('Git::Annotation.count', 1) do
-      disable_authorization_checks { workflow.update_attributes!(workflow_class_id: @galaxy_class.id) }
+      disable_authorization_checks { workflow.update!(workflow_class_id: @galaxy_class.id) }
       wgv.reload
       wgv.main_workflow_path = 'concat_two_files.ga'
       assert wgv.save
@@ -126,7 +126,7 @@ class GitAnnotationTest < ActiveSupport::TestCase
     workflow = Factory(:git_version).resource
     wgv = workflow.git_version
     assert_difference('Git::Annotation.count', 1) do
-      disable_authorization_checks { workflow.update_attributes!(workflow_class_id: @galaxy_class.id) }
+      disable_authorization_checks { workflow.update!(workflow_class_id: @galaxy_class.id) }
       wgv.reload
       wgv.main_workflow_path = 'concat_two_files.ga'
       assert wgv.save
@@ -145,7 +145,7 @@ class GitAnnotationTest < ActiveSupport::TestCase
     workflow = Factory(:git_version).resource
     wgv = workflow.git_version
     assert_difference('Git::Annotation.count', 1) do
-      disable_authorization_checks { workflow.update_attributes!(workflow_class_id: @galaxy_class.id) }
+      disable_authorization_checks { workflow.update!(workflow_class_id: @galaxy_class.id) }
       wgv.reload
       wgv.main_workflow_path = 'concat_two_files.ga'
       assert wgv.save
@@ -169,7 +169,7 @@ class GitAnnotationTest < ActiveSupport::TestCase
     assert_nil workflow.main_workflow_path
 
     assert_difference('Git::Annotation.count', 2) do
-      disable_authorization_checks { workflow.update_attributes!(workflow_class_id: @galaxy_class.id) }
+      disable_authorization_checks { workflow.update!(workflow_class_id: @galaxy_class.id) }
       wgv.reload
       wgv.main_workflow_path = 'concat_two_files.ga'
       wgv.remote_sources = { 'concat_two_files.ga' => 'https://workflows.example.com/concat_two_files.ga' }

@@ -49,7 +49,7 @@ class ObservedVariablesController < ApplicationController
 
   def update
     @observed_variable = ObservedVariable.find(params[:id])
-    @observed_variable.update_attributes(observed_variable_params)
+    @observed_variable.update(observed_variable_params)
     if @observed_variable.save
       respond_to do |format|
         format.html { redirect_to @observed_variable}
