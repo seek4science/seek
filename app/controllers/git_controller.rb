@@ -24,7 +24,7 @@ class GitController < ApplicationController
 
   def tree
     respond_to do |format|
-      format.json { render json: @tree, adapter: :attributes }
+      format.json { render json: @tree, adapter: :attributes, root: '' }
       if request.xhr?
         format.html { render partial: 'tree' }
       else
@@ -39,7 +39,7 @@ class GitController < ApplicationController
 
   def blob
     respond_to do |format|
-      format.json { render json: @blob, adapter: :attributes }
+      format.json { render json: @blob, adapter: :attributes, root: '' }
       if request.xhr?
         format.html { render partial: 'blob' }
       else
@@ -105,7 +105,7 @@ class GitController < ApplicationController
 
   def operation_response(notice = nil, status: 200)
     respond_to do |format|
-      format.json { render json: { }, status: status, adapter: :attributes }
+      format.json { render json: { }, status: status, adapter: :attributes, root: '' }
       format.html do
         if request.xhr?
           render partial: 'files', locals: { resource: @parent_resource, git_version: @git_version }, status: status
