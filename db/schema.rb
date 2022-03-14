@@ -25,7 +25,7 @@ ActiveRecord::Schema.define(version: 2022_03_08_102056) do
     t.datetime "updated_at"
     t.string "http_referer"
     t.text "user_agent"
-    t.text "data", limit: 16777215
+    t.text "data"
     t.string "controller_name"
     t.index ["action"], name: "act_logs_action_index"
     t.index ["activity_loggable_type", "activity_loggable_id"], name: "act_logs_act_loggable_index"
@@ -723,9 +723,9 @@ ActiveRecord::Schema.define(version: 2022_03_08_102056) do
     t.string "license"
     t.datetime "last_used_at"
     t.text "other_creators"
+    t.integer "visibility"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer "visibility"
     t.index ["contributor_id"], name: "index_ft_versions_on_contributor"
     t.index ["file_template_id"], name: "index_ft_versions_on_ft_id"
     t.index ["policy_id"], name: "index_file_template_versions_on_policy_id"
@@ -735,7 +735,7 @@ ActiveRecord::Schema.define(version: 2022_03_08_102056) do
     t.bigint "version_id"
     t.bigint "project_id"
     t.index ["project_id"], name: "index_ft_versions_projects_on_project_id"
-    t.index ["version_id", "project_id"], name: "index_ft_versions_projects_on_v_id_and_p_id"
+    t.index ["version_id", "project_id"], name: "index_ft_versions_projects_on_version_id_and_project_id"
     t.index ["version_id"], name: "index_ft_versions_projects_on_version_id"
   end
 
@@ -783,7 +783,7 @@ ActiveRecord::Schema.define(version: 2022_03_08_102056) do
     t.datetime "updated_at"
   end
 
-  create_table "git_annotations", id: :integer,  force: :cascade do |t|
+  create_table "git_annotations",  force: :cascade do |t|
     t.bigint "git_version_id"
     t.bigint "contributor_id"
     t.string "path"
@@ -795,7 +795,7 @@ ActiveRecord::Schema.define(version: 2022_03_08_102056) do
     t.index ["git_version_id"], name: "index_git_annotations_on_git_version_id"
   end
 
-  create_table "git_repositories", id: :integer,  force: :cascade do |t|
+  create_table "git_repositories",  force: :cascade do |t|
     t.string "resource_type"
     t.bigint "resource_id"
     t.string "uuid"
@@ -806,7 +806,7 @@ ActiveRecord::Schema.define(version: 2022_03_08_102056) do
     t.index ["resource_type", "resource_id"], name: "index_git_repositories_on_resource_type_and_resource_id"
   end
 
-  create_table "git_versions", id: :integer,  force: :cascade do |t|
+  create_table "git_versions",  force: :cascade do |t|
     t.string "resource_type"
     t.bigint "resource_id"
     t.integer "version"
@@ -1743,7 +1743,7 @@ ActiveRecord::Schema.define(version: 2022_03_08_102056) do
     t.datetime "updated_at"
   end
 
-  create_table "repository_standards", id: :integer,  force: :cascade do |t|
+  create_table "repository_standards",  force: :cascade do |t|
     t.string "title"
     t.string "url"
     t.string "group_tag"
@@ -2206,15 +2206,6 @@ ActiveRecord::Schema.define(version: 2022_03_08_102056) do
     t.string "uuid"
   end
 
-  create_table "webhook_endpoints",  force: :cascade do |t|
-    t.string "target_url", null: false
-    t.string "events", null: false
-    t.integer "person_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["events"], name: "index_webhook_endpoints_on_events"
-  end
-
   create_table "work_groups", id: :integer,  force: :cascade do |t|
     t.string "name"
     t.integer "institution_id"
@@ -2236,7 +2227,7 @@ ActiveRecord::Schema.define(version: 2022_03_08_102056) do
     t.index ["user_id", "can_view"], name: "index_w_auth_lookup_on_user_id_and_can_view"
   end
 
-  create_table "workflow_classes", id: :integer,  force: :cascade do |t|
+  create_table "workflow_classes",  force: :cascade do |t|
     t.string "title"
     t.text "description"
     t.string "key"
