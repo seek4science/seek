@@ -18,7 +18,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
   test 'can post RO crate' do
     assert_difference('Workflow.count', 1) do
       post workflows_path, params: {
-        ro_crate: fixture_file_upload('files/workflows/ro-crate-nf-core-ampliseq.crate.zip'),
+        ro_crate: fixture_file_upload('workflows/ro-crate-nf-core-ampliseq.crate.zip'),
         workflow: {
           project_ids: [@project.id]
         }
@@ -38,7 +38,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
     assert_no_difference('Workflow.count') do
       assert_difference('Git::Version.count', 1) do
         post create_version_workflow_path(workflow.id), params: {
-          ro_crate: fixture_file_upload('files/workflows/ro-crate-nf-core-ampliseq.crate.zip'),
+          ro_crate: fixture_file_upload('workflows/ro-crate-nf-core-ampliseq.crate.zip'),
           workflow: {
             project_ids: [@project.id]
           },
@@ -61,7 +61,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
     assert_no_difference('Workflow.count') do
       assert_no_difference('Git::Version.count') do
         post create_version_workflow_path(workflow.id), params: {
-          ro_crate: fixture_file_upload('files/workflows/ro-crate-nf-core-ampliseq.crate.zip'),
+          ro_crate: fixture_file_upload('workflows/ro-crate-nf-core-ampliseq.crate.zip'),
           workflow: {
             project_ids: [@project.id]
           },
@@ -77,7 +77,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
   test 'cannot post RO crate with missing metadata' do
     assert_no_difference('Workflow.count') do
       post workflows_path, params: {
-        ro_crate: fixture_file_upload('files/workflows/workflow-4-1.crate.zip'),
+        ro_crate: fixture_file_upload('workflows/workflow-4-1.crate.zip'),
         workflow: {
           project_ids: [@project.id]
         }
@@ -91,7 +91,7 @@ class GitWorkflowRoCrateApiTest < ActionDispatch::IntegrationTest
   test 'can supplement metadata when posting RO crate' do
     assert_difference('Workflow.count', 1) do
       post workflows_path, params: {
-        ro_crate: fixture_file_upload('files/workflows/workflow-4-1.crate.zip'),
+        ro_crate: fixture_file_upload('workflows/workflow-4-1.crate.zip'),
         workflow: {
           title: 'Alternative title',
           project_ids: [@project.id]

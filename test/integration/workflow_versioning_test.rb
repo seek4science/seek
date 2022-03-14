@@ -81,7 +81,7 @@ class WorkflowVersioningTest < ActionDispatch::IntegrationTest
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://somewhere.com/piccy.png'
     mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'http://workflow.com/rp2.cwl'
 
-    params = { ro_crate: { workflow: { data: fixture_file_upload('files/workflows/1-PreProcessing.ga', 'text/plain') },
+    params = { ro_crate: { workflow: { data: fixture_file_upload('workflows/1-PreProcessing.ga', 'text/plain') },
                            diagram: { data_url: 'http://somewhere.com/piccy.png' },
                            abstract_cwl: { data_url: 'http://workflow.com/rp2.cwl' } },
                revision_comments: 'A new version!',
@@ -160,7 +160,7 @@ class WorkflowVersioningTest < ActionDispatch::IntegrationTest
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://somewhere.com/piccy.png'
     mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'http://workflow.com/rp2.cwl'
 
-    params = { ro_crate: { workflow: { data: fixture_file_upload('files/workflows/1-PreProcessing.ga', 'text/plain') } },
+    params = { ro_crate: { workflow: { data: fixture_file_upload('workflows/1-PreProcessing.ga', 'text/plain') } },
                revision_comments: 'A galaxy version!',
                workflow_class_id: @galaxy.id,
                workflow_id: workflow.id

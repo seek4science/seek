@@ -430,7 +430,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
   test 'extract metadata' do
     cwl = Factory(:cwl_workflow_class)
-    post :create_content_blob, params: { content_blobs: [{ data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl', 'text/plain') }], workflow_class_id: cwl.id }
+    post :create_content_blob, params: { content_blobs: [{ data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl', 'text/plain') }], workflow_class_id: cwl.id }
     assert_response :success
     assert_equal 5, assigns[:metadata][:internals][:inputs].length
   end
@@ -807,7 +807,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'https://raw.githubusercontent.com/bob/workflow/master/abstract.cwl'
 
     galaxy = Factory(:galaxy_workflow_class)
-    post :create_content_blob, params: { content_blobs: [{ data: fixture_file_upload('files/workflows/all_remote.crate.zip', 'application/zip') }], workflow_class_id: galaxy.id }
+    post :create_content_blob, params: { content_blobs: [{ data: fixture_file_upload('workflows/all_remote.crate.zip', 'application/zip') }], workflow_class_id: galaxy.id }
     assert_response :success
     assert_equal 5, assigns[:metadata][:internals][:inputs].length
   end
@@ -856,7 +856,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   test 'RO-Crate with no main workflow throws error' do
     assert_no_difference('Git::Repository.count') do
       post :create_from_ro_crate, params: {
-        ro_crate: { data: fixture_file_upload('files/workflows/no-main-workflow.crate.zip', 'application/zip') }
+        ro_crate: { data: fixture_file_upload('workflows/no-main-workflow.crate.zip', 'application/zip') }
       }
     end
 
