@@ -587,7 +587,6 @@ GEM
     rb-fsevent (0.11.0)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
-    rchardet (1.8.0)
     rdf-aggregate-repo (3.2.0)
       rdf (~> 3.2)
     rdf-isomorphic (3.2.0)
