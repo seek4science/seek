@@ -15,7 +15,7 @@ class ContributedResourceSerializer < PCSSerializer
       data = {
         version: v.version,
         revision_comments: v.revision_comments.presence,
-        url: "#{base_url}#{polymorphic_path(object, version: v.version)}"
+        url: polymorphic_url(object, version: v.version, host: Seek::Config.site_base_host)
       }
       if v.is_git_versioned?
         data[:remote] = v.remote if v.remote?
