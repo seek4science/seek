@@ -174,9 +174,11 @@ class GitVersionTest < ActiveSupport::TestCase
     workflow = Factory(:workflow, git_version_attributes: { git_repository_id: remote.id })
 
     v = disable_authorization_checks { workflow.git_versions.create!(remote: remote.remote, ref: 'refs/remotes/origin/main') }
-    assert_equal 'b6312caabe582d156dd351fab98ce78356c4b74c', v.commit
+    assert_equal '94ae9926a824ebe809a9e9103cbdb1d5c5f98608', v.commit
     v = disable_authorization_checks { workflow.git_versions.create!(remote: remote.remote, ref: 'refs/tags/v0.01') }
     assert_equal '3f2c23e92da3ccbc89d7893b4af6039e66bdaaaf', v.commit
+    v = disable_authorization_checks { workflow.git_versions.create!(remote: remote.remote, ref: 'refs/tags/v0.02') }
+    assert_equal '94ae9926a824ebe809a9e9103cbdb1d5c5f98608', v.commit
   end
 
   test 'remove file' do

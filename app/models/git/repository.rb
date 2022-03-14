@@ -58,7 +58,9 @@ module Git
 
     # Return the commit SHA for the given ref.
     def resolve_ref(ref)
-      git_base.ref(ref)&.target&.oid
+      t = git_base.ref(ref)&.target
+      t = t.target if t.is_a?(Rugged::Tag::Annotation)
+      t&.oid
     end
 
     def remote?
