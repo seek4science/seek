@@ -4,7 +4,7 @@ class SimpleBaseSerializer < ActiveModel::Serializer
   end
 
   def base_url
-    root_url(host:Seek::Config.site_base_host)
+    Seek::Config.site_base_host
   end
 
   # remove link to object/associated --> "#{self_link}/#{format_name(attribute_name)}"
