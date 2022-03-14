@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_03_08_102056) do
+ActiveRecord::Schema.define(version: 2022_03_14_113556) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -735,7 +735,7 @@ ActiveRecord::Schema.define(version: 2022_03_08_102056) do
     t.bigint "version_id"
     t.bigint "project_id"
     t.index ["project_id"], name: "index_ft_versions_projects_on_project_id"
-    t.index ["version_id", "project_id"], name: "index_ft_versions_projects_on_version_id_and_project_id"
+    t.index ["version_id", "project_id"], name: "index_ft_versions_projects_on_v_id_and_p_id"
     t.index ["version_id"], name: "index_ft_versions_projects_on_version_id"
   end
 
