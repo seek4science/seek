@@ -1,12 +1,12 @@
 Factory.define(:blank_repository, class: Git::Repository) do |f|
   f.after_create do |r|
-    FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'blank-repository', '_git'), File.join(r.local_path, '.git'))
+    FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'blank-repository', '_git', '.'), File.join(r.local_path, '.git'))
   end
 end
 
 Factory.define(:unlinked_local_repository, class: Git::Repository) do |f|
   f.after_create do |r|
-    FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'local-fixture-workflow', '_git'), File.join(r.local_path, '.git'))
+    FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'local-fixture-workflow', '_git', '.'), File.join(r.local_path, '.git'))
   end
 end
 
@@ -20,13 +20,13 @@ end
 
 Factory.define(:remote_repository, parent: :unfetched_remote_repository) do |f|
   f.after_create do |r|
-    FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'fixture-workflow', '_git'), File.join(r.local_path, '.git'))
+    FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'fixture-workflow', '_git', '.'), File.join(r.local_path, '.git'))
   end
 end
 
 Factory.define(:workflow_ro_crate_repository, class: Git::Repository) do |f|
   f.after_create do |r|
-    FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'galaxy-sort-change-case', '_git'), File.join(r.local_path, '.git'))
+    FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'galaxy-sort-change-case', '_git', '.'), File.join(r.local_path, '.git'))
   end
 end
 
@@ -36,7 +36,7 @@ end
 
 Factory.define(:nfcore_local_rocrate_repository, class: Git::Repository) do |f|
   f.after_create do |r|
-    FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'nf-core-ampliseq', '_git'), File.join(r.local_path, '.git'))
+    FileUtils.cp_r(File.join(Rails.root, 'test', 'fixtures', 'git', 'nf-core-ampliseq', '_git', '.'), File.join(r.local_path, '.git'))
   end
 end
 
