@@ -27,6 +27,8 @@ def load_seek_testing_defaults!
       Settings.defaults[:magic_guest_enabled] = false
       Settings.defaults[:modelling_analysis_enabled] = true
       Settings.defaults[:show_as_external_link_enabled] = false
+      Settings.defaults[:allow_publications_fulltext] = true
+      Settings.defaults[:allow_edit_of_registered_publ] = false
       Settings.defaults[:factors_studied_enabled] = true
       Settings.defaults[:experimental_conditions_enabled] = true
       Settings.defaults[:programme_user_creation_enabled] = true
@@ -144,6 +146,6 @@ def load_seek_testing_defaults!
       Settings.defaults[:life_monitor_url] = 'https://localhost:8000'
       Settings.defaults[:life_monitor_client_id] = 'xyz'
       Settings.defaults[:life_monitor_client_secret] = 'xyzabc'
+      Settings.defaults[:git_support_enabled] = true
     end
 end
-

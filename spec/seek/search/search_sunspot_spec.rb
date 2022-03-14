@@ -131,13 +131,11 @@ describe Person do
   it { should have_searchable_field(:title) }
   it { should have_searchable_field(:description) }
   it { should have_searchable_field(:searchable_tags) }
-  #it { should have_searchable_field(:contributor) }
+  it { should have_searchable_field(:expertise) }
+  it { should have_searchable_field(:tools) }
   it { should have_searchable_field(:projects) }
 
-#  it { should have_searchable_field(:email) }
-#  it { should have_searchable_field(:skype_name) }
-#  it { should have_searchable_field(:web_page) }
-#  it { should have_searchable_field(:orcid) }
+
   #this goes through institutions
   it { should have_searchable_field(:locations) }
   it { should have_searchable_field(:project_positions) }

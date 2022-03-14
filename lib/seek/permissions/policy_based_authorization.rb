@@ -88,9 +88,17 @@ module Seek
           instance_method("state_allows_#{action}?").owner != Seek::Permissions::StateBasedPermissions
         end
 
-        # deletes entries where the ID doesn't match that of an existing ID
+        # deletes entries where the ID doesn't match that of an existing ID, or where ther are duplicates
         def remove_invalid_auth_lookup_entries
           lookup_class.where('asset_id NOT IN (?)', pluck(:id)).delete_all
+
+          duplicates = lookup_class.select(:asset_id, :user_id).group(:asset_id, :user_id).having('count(*) > 1')
+          duplicates.each do |dup|
+            entries = lookup_class.where(asset_id:dup.asset_id, user_id:dup.user_id).to_a
+            entries.shift
+            entries.each(&:delete)
+          end
+
         end
 
         # determines whether the lookup table records are consistent with the number of asset items in the database and the last id of the item added
@@ -103,12 +111,14 @@ module Seek
           last_id = unscoped.maximum(:id)
           asset_count = unscoped.count
 
-          # trigger off a full update for that user if the count is zero and items should exist for that type
-          if lookup_count == 0 && !last_id.nil?
-            AuthLookupUpdateQueue.enqueue(User.find_by_id(user_id))
-          end
-
           (lookup_count == asset_count && (asset_count == 0 || (last_lookup_asset_id == last_id)))
+        end
+
+        # returns items that have entries missing from the authlookup for this user
+        def items_missing_from_authlookup(user)
+          user_id = user&.id || 0
+          ids = pluck(:id) - lookup_class.where(user_id:user_id).pluck(:asset_id)
+          ids.collect{|id| find(id)}
         end
 
         # the name of the lookup table, holding authorisation lookup information, for this given authorised type

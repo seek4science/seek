@@ -36,7 +36,7 @@ module CommonSweepers
   end
 
   def expire_annotation_fragments(name = nil)
-    expire_fragment('sidebar_tag_cloud')
+    expire_fragment('tag_cloud')
     expire_fragment('super_tag_cloud')
     if name.nil?
       expire_fragment(/suggestion_for.*/)

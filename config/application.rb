@@ -77,5 +77,9 @@ module SEEK
 
     config.active_record.belongs_to_required_by_default = false
     config.action_mailer.delivery_job = 'ActionMailer::MailDeliveryJob' # Can remove after updating defaults
+
+    # pass forward the relative url root, if set. Needed for generating correct non-relative URL's. See https://github.com/rails/rails/issues/40237
+    routes.default_url_options[:relative_url_root] = config.relative_url_root
+
   end
 end

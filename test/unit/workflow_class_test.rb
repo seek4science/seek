@@ -156,5 +156,11 @@ class WorkflowClassTest < ActiveSupport::TestCase
         "alternateName" => "blalbalbla ignore me")
 
     assert_nil match
+
+    # Match on string URL
+    match = WorkflowClass.match_from_metadata("url" => "https://www.commonwl.org/",
+                                              "@type" => "ComputerLanguage")
+
+    assert_equal cwl, match
   end
 end

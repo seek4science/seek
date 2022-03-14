@@ -656,7 +656,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select 'a.disabled', text: 'Explore', count: 0
     end
   end
-  
+
   test 'show explore button for csv file' do
     df = Factory(:csv_spreadsheet_datafile)
     login_as(df.contributor.user)
@@ -668,7 +668,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
-  
+
   test 'not show explore button if spreadsheet not supported' do
     df = Factory(:non_spreadsheet_datafile)
     login_as(df.contributor.user)
@@ -3021,7 +3021,7 @@ class DataFilesControllerTest < ActionController::TestCase
     al = ActivityLog.last
     assert_equal 'create', al.action
     assert_equal df, al.activity_loggable
-    assert_equal person.user, al.culprit    
+    assert_equal person.user, al.culprit
 
   end
 
@@ -3880,4 +3880,38 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_empty data_file.discussion_links
   end
 
+  test 'can fetch datacite metadata' do
+    someone = Factory(:person, first_name: 'Jane', last_name: 'Bloggs')
+    thing = Factory(:data_file, policy: Factory(:public_policy),
+                    title: 'The title',
+                    description: 'The description',
+                    creators: [someone],
+                    contributor: Factory(:person, first_name: 'Joe', last_name: 'Bloggs', orcid: 'https://orcid.org/0000-0002-1694-233X')
+    ).latest_version
+    thing.assets_creators.create!(given_name: 'Phil', family_name: 'Collins', orcid: 'https://orcid.org/0000-0002-1694-233X')
+
+    get :show, params: { id: thing.parent.id, version: thing.version, format: :datacite_xml }
+
+    assert_response :success
+    parsed = Nokogiri::XML.parse(response.body)
+    assert_equal 'http://datacite.org/schema/kernel-4', parsed.namespaces['xmlns']
+    assert_equal 'http://www.w3.org/2001/XMLSchema-instance', parsed.namespaces['xmlns:xsi']
+    assert_equal 'http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4.3/metadata.xsd', parsed.xpath('//xmlns:resource/@xsi:schemaLocation').first.text
+    resource =  parsed.xpath('//xmlns:resource').first
+    assert_equal 'The title', resource.xpath('./xmlns:titles/xmlns:title').first.text
+    assert_equal 'The description', resource.xpath('./xmlns:descriptions/xmlns:description').first.text
+    assert_equal 2, resource.xpath('./xmlns:creators/xmlns:creator').length
+    phil = parsed.xpath("//xmlns:resource/xmlns:creators/xmlns:creator[xmlns:creatorName/text()='Collins, Phil']").first
+    jane = parsed.xpath("//xmlns:resource/xmlns:creators/xmlns:creator[xmlns:creatorName/text()='Bloggs, Jane']").first
+    assert_equal 'Collins, Phil', phil.xpath('./xmlns:creatorName').first.text
+    assert_equal 'https://orcid.org/0000-0002-1694-233X', phil.xpath('./xmlns:nameIdentifier').first.text
+    assert_equal 'Bloggs, Jane', jane.xpath('./xmlns:creatorName').first.text
+    assert_nil jane.xpath('./xmlns:nameIdentifier').first
+    assert_equal 'ORCID', resource.xpath('./xmlns:creators/xmlns:creator/xmlns:nameIdentifier/@nameIdentifierScheme').first.text
+    assert_equal 'https://orcid.org', resource.xpath('./xmlns:creators/xmlns:creator/xmlns:nameIdentifier/@schemeURI').first.text
+    assert_equal thing.created_at.year.to_s, resource.xpath('./xmlns:publicationYear').first.text
+    assert_equal Seek::Config.instance_name, resource.xpath('./xmlns:publisher').first.text
+    assert_equal 'Dataset', resource.xpath('./xmlns:resourceType').first.text
+    assert_equal 'Dataset', resource.xpath('./xmlns:resourceType/@resourceTypeGeneral').first.text
+  end
 end

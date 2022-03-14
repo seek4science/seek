@@ -1,0 +1,14 @@
+<%= fields_for(name, git_version) do |f| %>
+  <%= f.hidden_field :name %>
+  <%= f.hidden_field :comment %>
+  <%= f.hidden_field :root_path %>
+  <%= f.hidden_field :git_repository_id %>
+  <%= f.hidden_field :ref %>
+  <%= f.hidden_field :commit %>
+  <%= f.hidden_field :main_workflow_path %>
+  <%= f.hidden_field :diagram_path %>
+  <%= f.hidden_field :abstract_cwl_path %>
+  <% git_version.remote_sources.each do |path, url| %>
+    <%= hidden_field_tag "#{f.object_name}[remote_sources][#{path}]", url %>
+  <% end %>
+<% end %>

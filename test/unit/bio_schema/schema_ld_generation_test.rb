@@ -433,6 +433,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       workflow.assets_creators.create!(creator: creator2, pos: 2)
       workflow.assets_creators.create!(given_name: 'Fred', family_name: 'Bloggs', pos: 3)
       workflow.assets_creators.create!(given_name: 'Steve', family_name: 'Smith', orcid: 'https://orcid.org/0000-0002-1694-233X', pos: 4)
+      workflow.assets_creators.create!(given_name: 'Bob', family_name: 'Colon:', pos: 5)
 
       workflow.internals = workflow.extractor.metadata[:internals]
 
@@ -444,7 +445,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     expected_wf_prefix = workflow.title.downcase.gsub(/[^0-9a-z]/i, '_')
 
     expected = { '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
-                 '@type' => %w[File SoftwareSourceCode ComputationalWorkflow],
+                 '@type' => %w[SoftwareSourceCode ComputationalWorkflow],
                  '@id' => "http://localhost:3000/workflows/#{workflow.id}",
                  'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::WORKFLOW_PROFILE,
                  'description' => 'This is a test workflow for bioschema generation',
@@ -464,7 +465,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                        'name' => 'Fred Bloggs' },
                      { '@type' => 'Person',
                        '@id' => "https://orcid.org/0000-0002-1694-233X",
-                       'name' => 'Steve Smith' }],
+                       'name' => 'Steve Smith' },
+                     { '@type' => 'Person',
+                       '@id' => "#Bob%20Colon:",
+                       'name' => 'Bob Colon:' }],
                  'producer' =>
                     [{ '@type' => %w[Project Organization],
                        '@id' => "http://localhost:3000/projects/#{@project.id}",
@@ -490,67 +494,39 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                    'isPartOf' => [],
 		    'input' => [
                    { '@type' => 'FormalParameter',
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.cofsfile",
+                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/max-steps",
                      'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     'name' => '#main/input.cofsfile' },
+                     'name' => '#main/max-steps' },
                    { '@type' => 'FormalParameter',
                      'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.dmax",
-                     'name' => '#main/input.dmax' },
+                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/reverse",
+                     'name' => '#main/reverse' },
                    { '@type' => 'FormalParameter',
                      'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.dmin",
-                     'name' => '#main/input.dmin' },
+                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/rulesfile",
+                     'name' => '#main/rulesfile' },
                    { '@type' => 'FormalParameter',
                      'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.max-steps",
-                     'name' => '#main/input.max-steps' },
+                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/sinkfile",
+                     'name' => '#main/sinkfile' },
                    { '@type' => 'FormalParameter',
                      'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.mwmax-cof",
-                     'name' => '#main/input.mwmax-cof' },
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.mwmax-source",
-                     'name' => '#main/input.mwmax-source' },
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.rulesfile",
-                     'name' => '#main/input.rulesfile' },
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.sinkfile",
-                     'name' => '#main/input.sinkfile' },
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.sourcefile",
-                     'name' => '#main/input.sourcefile' },
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.std_mode",
-                     'name' => '#main/input.std_mode' },
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.stereo_mode",
-                     'name' => '#main/input.stereo_mode' },
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.topx",
-                     'name' => '#main/input.topx' }
+                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/sourcefile",
+                     'name' => '#main/sourcefile' }
                  ],
                  'output' => [
                    { '@type' => 'FormalParameter',
                      'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-outputs-\#main/solutionfile",
-                     'name' => '#main/solutionfile' },
+                     '@id' => "\##{expected_wf_prefix}-outputs-\#main/compounds",
+                     'name' => '#main/compounds' },
                    { '@type' => 'FormalParameter',
                      'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-outputs-\#main/sourceinsinkfile",
-                     'name' => '#main/sourceinsinkfile' },
+                     '@id' => "\##{expected_wf_prefix}-outputs-\#main/reactions",
+                     'name' => '#main/reactions' },
                    { '@type' => 'FormalParameter',
                      'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-outputs-\#main/stdout",
-                     'name' => '#main/stdout' }
+                     '@id' => "\##{expected_wf_prefix}-outputs-\#main/sinks",
+                     'name' => '#main/sinks' }
                  ] }
 
     json = JSON.parse(workflow.to_schema_ld)

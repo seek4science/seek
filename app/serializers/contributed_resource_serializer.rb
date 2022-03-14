@@ -12,10 +12,18 @@ class ContributedResourceSerializer < PCSSerializer
   attribute :versions, if: -> { object.respond_to?(:versions) } do
     versions_data = []
     object.visible_versions.each do |v|
-      path = polymorphic_path(object, version: v.version)
-      versions_data.append(version: v.version,
-                           revision_comments: v.revision_comments.presence,
-                           url: "#{base_url}#{path}")
+      data = {
+        version: v.version,
+        revision_comments: v.revision_comments.presence,
+        url: "#{base_url}#{polymorphic_path(object, version: v.version)}"
+      }
+      if v.is_git_versioned?
+        data[:remote] = v.remote if v.remote?
+        data[:commit] = v.commit
+        data[:ref] = v.ref
+        data[:tree] = polymorphic_path([object, :git_tree], version: v.version)
+      end
+      versions_data.append(data)
     end
     versions_data
   end
@@ -35,18 +43,22 @@ class ContributedResourceSerializer < PCSSerializer
     get_version.updated_at
   end
 
+  def get_correct_blob_content(requested_version)
+    blobs = if requested_version.respond_to?(:content_blobs)
+              requested_version.content_blobs
+            elsif requested_version.respond_to?(:content_blob)
+              [requested_version.content_blob].compact
+            else
+              []
+            end
+
+    blobs.map { |cb| convert_content_blob_to_json(cb) }
+  end
+
   attribute :content_blobs, if: -> { object.respond_to?(:content_blobs) || object.respond_to?(:content_blob) } do
     requested_version = get_version
 
-    if requested_version.respond_to?(:content_blobs)
-      blobs = requested_version.content_blobs
-    elsif requested_version.respond_to?(:content_blob)
-      blobs = [requested_version.content_blob].compact
-    else
-      blobs = []
-    end
-
-    blobs.map { |cb| convert_content_blob_to_json(cb) }
+    get_correct_blob_content(requested_version)
   end
 
   attribute :creators, if: -> { object.respond_to?(:assets_creators) } do

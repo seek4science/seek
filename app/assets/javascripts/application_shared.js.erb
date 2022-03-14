@@ -346,4 +346,24 @@ $j(document).ready(function () {
             }
         });
     });
+
+    // Show a summary with link to expand large sections of text
+    $j('.auto-collapse').each(function () {
+        if (this.scrollHeight > this.clientHeight) {
+            var div = $j(this);
+            var btn = $j('<a class="auto-collapse-btn">(Expand)</a>');
+            btn.click(function () {
+                if ($j(this)[0].innerHTML === '(Expand)') {
+                    div.addClass('open');
+                    $j(this).html('(Collapse)');
+                } else {
+                    div.removeClass('open');
+                    $j(this).html('(Expand)');
+                }
+
+                return false;
+            });
+            div.after(btn);
+        }
+    });
 });

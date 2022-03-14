@@ -14,6 +14,7 @@ class OpenbisEndpoint < ApplicationRecord
   validates :web_endpoint, url: { allow_nil: true, allow_blank: true }
   validates :project, :as_endpoint, :dss_endpoint, :web_endpoint, :username,
             :password, :space_perm_id, :refresh_period_mins, :policy, presence: true
+  validates :is_test, :inclusion => { :in => [true, false] }
   # validates :refresh_period_mins, numericality: { greater_than_or_equal_to: 1 }
   validates :refresh_period_mins, numericality: { greater_than_or_equal_to: 60 }
   validates :space_perm_id, uniqueness: { scope: %i[dss_endpoint as_endpoint space_perm_id project_id],
@@ -39,10 +40,30 @@ class OpenbisEndpoint < ApplicationRecord
     can_edit?(user) && external_assets.empty?
   end
 
+  class AuthenticationResult
+    attr_accessor :success, :error_message, :error_content, :space
+  end
+
   def test_authentication
-    !session_token.nil?
-  rescue Fairdom::OpenbisApi::OpenbisQueryException
-    false
+    aNewResult = AuthenticationResult.new
+
+    begin
+      aNewResult.success = !session_token.nil?
+
+      if !aNewResult.success
+        aNewResult.error_message = "An unknown problem occurred"
+        aNewResult.error_content = "The authentication failed but the connector did not issue any error."
+      end
+    rescue Fairdom::OpenbisApi::OpenbisQueryException => e
+      aNewResult.success = false
+      if (e.message["[MESSAGE]"] && e.message["[/MESSAGE]"])
+        aNewResult.error_message = e.message.split("[MESSAGE]").last.split("[/MESSAGE]").first
+      else
+        aNewResult.error_message = e.message
+      end
+      aNewResult.error_content = e.full_message
+    end
+    aNewResult
   end
 
   def available_spaces
@@ -51,11 +72,28 @@ class OpenbisEndpoint < ApplicationRecord
 
   # session token used for authentication, provided when logging in
   def session_token
-    @session_token ||= Fairdom::OpenbisApi::Authentication.new(username, password, as_endpoint).login['token']
+    aNewResult = AuthenticationResult.new
+
+    @session_token ||= Fairdom::OpenbisApi::Authentication.new(username, password, as_endpoint, is_test).login['token']
   end
 
-  def space
-    @space ||= Seek::Openbis::Space.new(self, space_perm_id)
+  def do_authentication
+    aNewResult = AuthenticationResult.new
+
+    begin
+      @space ||= Seek::Openbis::Space.new(self, space_perm_id)
+      aNewResult.space = @space
+      aNewResult.success = true
+    rescue Fairdom::OpenbisApi::OpenbisQueryException => e
+      aNewResult.success = false
+      if (e.message["[MESSAGE]"] && e.message["[/MESSAGE]"])
+        aNewResult.error_message = e.message.split("[MESSAGE]").last.split("[/MESSAGE]").first
+      else
+        aNewResult.error_message = e.message
+      end
+      aNewResult.error_content = e.full_message
+    end
+    aNewResult
   end
 
   def title
@@ -63,10 +101,11 @@ class OpenbisEndpoint < ApplicationRecord
   end
 
   def refresh_metadata
-    if test_authentication
+    test_result = test_authentication
+    if test_result.success
       Rails.logger.info("REFRESHING METADATA FOR Openbis Space #{id} passed authentication")
     else
-      Rails.logger.info("Authentication test for Openbis Space #{id} failed when refreshing METADATA")
+      Rails.logger.info("Authentication test for Openbis Space #{id} failed, when forcing refreshing METADATA, error: "+test_result.error_message)
     end
 
     # as content stays in external_asset we can still clean the cache and mark items for refresh
@@ -85,10 +124,11 @@ class OpenbisEndpoint < ApplicationRecord
   end
 
   def force_refresh_metadata
-    if test_authentication
+    test_result = test_authentication
+    if test_result.success
       Rails.logger.info("FORCING REFRESHING METADATA FOR Openbis Space #{id} passed authentication")
     else
-      Rails.logger.info("Authentication test for Openbis Space #{id} failed, when forcing refreshing METADATA")
+      Rails.logger.info("Authentication test for Openbis Space #{id} failed, when forcing refreshing METADATA, error: "+test_result.error_message)
     end
 
     # as content stays in external_asset we can still clean the cache and mark items for refresh

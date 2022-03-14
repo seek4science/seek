@@ -17,7 +17,7 @@ class WorkflowSerializer < ContributedResourceSerializer
 
   attribute :internals
 
-  link(:diagram, if: -> { get_version.content_blob.file_exists? && (get_version.diagram_exists? rescue false) }) do
+  link(:diagram, if: -> { get_version.diagram_exists? } do
     diagram_workflow_path(object, version: get_version.version)
   end
 end

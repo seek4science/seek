@@ -565,16 +565,17 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test 'should not delete assay with publication' do
-    login_as(:model_owner)
-    a = assays(:assay_with_a_publication)
+    login_as(Factory(:user))
+    one_assay_with_publication = Factory :assay, contributor: User.current_user.person, publications: [Factory(:publication)]
+
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('Assay.count') do
-        delete :destroy, params: { id: a }
+        delete :destroy, params: { id: one_assay_with_publication.id }
       end
     end
 
     assert flash[:error]
-    assert_redirected_to a
+    assert_redirected_to one_assay_with_publication
   end
 
   test 'should not delete assay with sops' do

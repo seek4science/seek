@@ -1,5 +1,6 @@
 class ReindexingJob < BatchJob
   BATCHSIZE = 100
+  queue_as QueueNames::INDEXING
 
   def perform
     if Seek::Config.solr_enabled
@@ -25,5 +26,9 @@ class ReindexingJob < BatchJob
 
   def follow_on_job?
     ReindexingQueue.any?
+  end
+
+  def timelimit
+    1.hour
   end
 end

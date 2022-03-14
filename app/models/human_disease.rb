@@ -148,6 +148,6 @@ class HumanDisease < ApplicationRecord
   private
 
   def get_json(url)
-    JSON.parse(open(url, "Authorization" => "apikey token=#{Seek::Config.bioportal_api_key}").read)
+    JSON.parse(URI.open(url, "Authorization" => "apikey token=#{Seek::Config.bioportal_api_key}").read)
   end
 end

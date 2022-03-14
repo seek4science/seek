@@ -1,7 +1,10 @@
 <h1>New <%= t('workflow') %></h1>
 
 <%= form_tag(@workflow.new_record? ? create_metadata_workflows_path : create_version_metadata_workflow_path(@workflow), multipart: true) do -%>
-  <%= hidden_field_tag 'content_blob_id', session[:uploaded_content_blob_id] %>
+  <%= hidden_field_tag 'content_blob_uuid', @content_blob&.uuid %>
+  <%= render partial: 'git/git_version_fields', locals: { name: 'workflow[git_version_attributes]', git_version: @workflow.git_version } if @workflow.git_version %>
+
+  <%= hidden_field_tag 'revision_comments', params[:revision_comments] %>
 
   <div class="asset_form">
     <% if @errors && @errors.any? %>
@@ -34,12 +37,12 @@
 
     <div class="form-group">
       <label class="required">Title</label>
-      <%= text_field_tag 'workflow[title]', @workflow.title, class: "form-control", readonly: session[:metadata][:title].present? -%>
+      <%= text_field_tag 'workflow[title]', @workflow.title, class: "form-control" -%>
     </div>
 
     <div class="form-group">
       <label>Description</label>
-      <%= text_area_tag 'workflow[description]', @workflow.description, class: "form-control rich-text-edit", readonly: session[:metadata][:description].present? -%>
+      <%= text_area_tag 'workflow[description]', @workflow.description, class: "form-control rich-text-edit" -%>
     </div>
 
     <div class="form-group">

@@ -68,7 +68,7 @@ class PublicationTest < ActiveSupport::TestCase
     assert_equal publication_hash[:abstract], publication.abstract
     assert_nil publication.pubmed_id
     assert_nil publication.doi
-    assert_equal 2, publication.registered_mode
+    assert_equal Publication::REGISTRATION_BY_DOI, publication.registered_mode
   end
 
   test 'create publication from metadata pubmed' do
@@ -87,7 +87,7 @@ class PublicationTest < ActiveSupport::TestCase
     assert_equal publication_hash[:abstract.to_s], publication.abstract
     assert_nil publication.pubmed_id
     assert_nil publication.doi
-    assert_equal 1, publication.registered_mode
+    assert_equal Publication::REGISTRATION_BY_PUBMED, publication.registered_mode
   end
 
   test 'create publication from metadata bibtex' do
@@ -113,7 +113,7 @@ class PublicationTest < ActiveSupport::TestCase
     assert_equal 'An investigation into blalblabla', publication.abstract
     assert_equal Date.new(2015, 1, 1), publication.published_date
     assert_equal 5, publication.publication_authors.length
-    assert_equal 4, publication.registered_mode
+    assert_equal Publication::REGISTRATION_FROM_BIBTEX, publication.registered_mode
   end
 
   test 'event association' do
@@ -156,17 +156,9 @@ class PublicationTest < ActiveSupport::TestCase
     publication.associate(assay)
     publication.associate(data_file)
     publication.associate(model)
-    publication.save!
-
-    assert_equal [assay], publication.assays
-    assert_equal [data_file], publication.data_files
-    assert_equal [model], publication.models
-
-    publication.associate(assay)
-    publication.associate(data_file)
-    publication.associate(model)
-    publication.save!
-
+    User.with_current_user publication.contributor do
+      publication.save!
+    end
     assert_equal [assay], publication.assays
     assert_equal [data_file], publication.data_files
     assert_equal [model], publication.models
@@ -184,14 +176,16 @@ class PublicationTest < ActiveSupport::TestCase
     publication.associate(model2)
     publication.associate(assay1)
     publication.associate(assay2)
-    publication.save!
+    User.with_current_user publication.contributor do
+      publication.save!
+    end
 
     assert_equal [organism1, organism2].sort, publication.related_organisms.sort
   end
 
   test 'assay association' do
-    publication = publications(:pubmed_2)
-    assay = assays(:modelling_assay_with_data_and_relationship)
+    publication = Factory(:publication)
+    assay = Factory (:assay)
 
     assert_not_includes publication.assays, assay
 
@@ -277,16 +271,31 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test 'model and datafile association' do
-    publication = publications(:pubmed_2)
-    assert publication.models.include?(models(:teusink))
-    assert publication.data_files.include?(data_files(:picture))
+    publication = Factory(:publication)
+
+    model = Factory(:model)
+    datafile = Factory(:data_file)
+
+    assert_not_includes publication.models, model
+    assert_not_includes publication.data_files, datafile
+
+    assert_difference('Relationship.count', 2) do
+      User.with_current_user(model.contributor.user) { publication.associate(model) }
+      User.with_current_user(datafile.contributor.user) { publication.associate(datafile) }
+    end
+
+    assert_includes publication.models, model
+    assert_includes publication.data_files, datafile
   end
 
   test 'test uuid generated' do
-    x = publications(:one)
-    assert_nil x.attributes['uuid']
-    x.save
-    assert_not_nil x.attributes['uuid']
+    publ = Factory( :publication )
+    publ.uuid = nil
+    assert_nil publ.attributes['uuid']
+    #publ.save(validate: false)
+
+    publ.save
+    assert_not_nil publ.attributes['uuid']
   end
 
   test 'title trimmed' do
@@ -358,11 +367,11 @@ class PublicationTest < ActiveSupport::TestCase
   end
 
   test "uuid doesn't change" do
-    x = publications(:one)
-    x.save
-    uuid = x.attributes['uuid']
-    x.save
-    assert_equal x.uuid, uuid
+    publ = Factory ( :publication )
+    publ.save
+    uuid = publ.attributes['uuid']
+    publ.save
+    assert_equal publ.uuid, uuid
   end
 
   test 'project_not_required' do

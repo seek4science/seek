@@ -6,7 +6,6 @@ module ImagesHelper
 
   def image_tag_for_key(key, url = nil, alt = nil, html_options = {}, label = key.humanize, remote = false, size = nil)
     label = 'Delete' if label == 'Destroy'
-
     return nil unless (filename = icon_filename_for_key(key.downcase))
 
     image_options = alt ? { alt: alt } : { alt: key.humanize }
@@ -47,10 +46,6 @@ module ImagesHelper
     filename = icon_filename_for_key(key)
     raise "Image not found for key: #{key}" if filename.nil? && !Rails.env.production?
     image_tag(filename, options)
-  end
-
-  def help_icon(text, _delay = 200, extra_style = '')
-    image('info', :alt => 'help', 'data-tooltip' => tooltip(text), :style => "vertical-align: middle;#{extra_style}")
   end
 
   def flag_icon(country, text = country, margin_right = '0.3em')

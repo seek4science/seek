@@ -53,7 +53,6 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test 'content blob search terms' do
-    check_for_soffice
     m = Factory :teusink_model
     m.content_blobs << Factory.create(:doc_content_blob, original_filename: 'word.doc', asset: m, asset_version: m.version)
     m.reload
@@ -132,10 +131,6 @@ class ModelTest < ActiveSupport::TestCase
       assert_equal assay_asset.assay, assay
     end
 
-  end
-
-  test 'sort by updated_at' do
-    assert_equal Model.all.sort_by { |m| m.updated_at.to_i * -1 }, Model.all
   end
 
   test 'validation' do

@@ -1,4 +1,6 @@
 SEEK::Application.routes.draw do
+  resources :observed_variable_sets
+  resources :observed_variables
   use_doorkeeper do
     controllers applications: 'oauth_applications'
     controllers authorized_applications: 'authorized_oauth_applications'
@@ -21,6 +23,8 @@ SEEK::Application.routes.draw do
         get 'tools/:id/versions/:version_id/:type/tests' => 'tool_versions#tests'
         get 'toolClasses' => 'general#tool_classes'
         get 'service-info' => 'general#service_info'
+        get 'extended/workflows/:organization' => 'tools#index'
+        get 'extended/organizations' => 'general#organizations'
       end
     end
   end
@@ -36,6 +40,7 @@ SEEK::Application.routes.draw do
         get :view_content
         get :get_pdf
         get :download
+        delete :destroy
       end
     end
   end
@@ -116,6 +121,23 @@ SEEK::Application.routes.draw do
     end
   end
 
+  concern :git do
+    nested do
+      scope controller: :git, path: '/git(/*version)', constraints: { path: /[^\0]+/ }, format: false do
+        get 'tree(/*path)' => 'git#tree', as: :git_tree
+        get 'blob/*path' => 'git#blob', as: :git_blob
+        get 'raw/*path' => 'git#raw', as: :git_raw
+        get 'download/*path' => 'git#download', as: :git_download
+        get 'browse' => 'git#browse', as: :git_browse
+        post 'blob(/*path)' =>'git#add_file', as: :git_add_file
+        delete 'blob/*path' => 'git#remove_file', as: :git_remove_file
+        patch 'blob/*path' => 'git#move_file', as: :git_move_file
+        get 'freeze' => 'git#freeze_preview', as: :git_freeze_preview
+        post 'freeze' => 'git#freeze', as: :git_freeze
+      end
+    end
+  end
+
   resources :scales do
     collection do
       post :search
@@ -137,7 +159,7 @@ SEEK::Application.routes.draw do
       get :settings
       get :get_stats
       get :registration_form
-      get :edit_tag      
+      get :edit_tag
       post :update_home_settings
       post :delete_carousel_form
       post :restart_server
@@ -286,7 +308,7 @@ SEEK::Application.routes.draw do
       post :batch_change_permssion_for_selected_items
       post :batch_sharing_permission_changed
     end
-    resources :projects, :programmes, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :nodes, :data_files, :presentations, :publications, :documents, :events, :samples, :specimens, :strains, :collections, only: [:index]
+    resources :projects, :programmes, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :nodes, :data_files, :presentations, :publications, :documents, :events, :samples, :specimens, :strains, :file_templates, :placeholders, :collections, only: [:index]
     resources :avatars do
       member do
         post :select
@@ -311,6 +333,8 @@ SEEK::Application.routes.draw do
     end
     member do
       get :asset_report
+      get :populate
+      post :populate_from_spreadsheet
       get :admin_members
       get :admin_member_roles
       get :storage_report
@@ -323,7 +347,7 @@ SEEK::Application.routes.draw do
       get :guided_join
     end
     resources :programmes, :people, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :nodes, :data_files, :presentations,
-              :publications, :events, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :collections, only: [:index]
+              :publications, :events, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :file_templates, :placeholders, :collections, only: [:index]
 
     resources :openbis_endpoints do
       collection do
@@ -446,7 +470,7 @@ SEEK::Application.routes.draw do
         post :register
       end
     end
-    resources :people, :programmes, :projects, :investigations, :samples, :studies, :models, :sops, :workflows, :nodes, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, only: [:index]
+    resources :people, :programmes, :projects, :investigations, :samples, :studies, :models, :sops, :workflows, :nodes, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, :placeholders, only: [:index]
   end
 
   # to be removed as STI does not work in too many places
@@ -498,8 +522,8 @@ SEEK::Application.routes.draw do
   resources :models, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
     member do
       get :compare_versions
-      post :compare_versions      
-      post :submit_to_sycamore      
+      post :compare_versions
+      post :submit_to_sycamore
       post :execute
       get :simulate
       post :simulate
@@ -524,20 +548,27 @@ SEEK::Application.routes.draw do
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :workflows, :collections, only: [:index]
   end
 
-  resources :workflows, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
+  resources :workflows, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset, :git] do
     collection do
-      post :create_content_blob
-      post :create_ro_crate
+      post :create_from_ro_crate
+      post :create_from_files
+      post :create_from_git
       get :provide_metadata
-      post :metadata_extraction_ajax
+      get :annotate_repository
       post :create_metadata
       get :filter
+      post :create_content_blob # Legacy
+      post :create_ro_crate # Legacy
     end
     member do
       get :diagram
       get :ro_crate
       get :new_version
+      get :new_git_version
       post :create_version_metadata
+      post :create_version_from_git
+      get :edit_paths
+      patch :update_paths
     end
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :sops, :collections, :presentations, :documents, :data_files, only: [:index]
   end
@@ -546,6 +577,32 @@ SEEK::Application.routes.draw do
 
   resources :nodes, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, only: [:index]
+  end
+
+  resources :file_templates, concerns: [:has_content_blobs, :has_versions, :has_doi, :publishable, :asset] do
+    collection do
+      get :filter
+      get :provide_metadata
+      post :create_content_blob
+      post :create_metadata
+    end
+    member do
+      get :explore
+    end
+    resources :people, :programmes, :projects, :collections, only: [:index]
+  end
+
+  resources :placeholders, concerns: [:asset] do
+    collection do
+      get :filter
+      get :provide_metadata
+      post :create_metadata
+    end
+    member do
+      get :explore
+      get :data_file
+    end
+    resources :people, :programmes, :projects, :collections, only: [:index]
   end
 
   resources :content_blobs, except: [:show, :index, :update, :create, :destroy] do
@@ -575,7 +632,7 @@ SEEK::Application.routes.draw do
     concerns :has_dashboard, controller: :programme_stats
   end
 
-  resources :publications, concerns: [:asset] do
+  resources :publications, concerns: [:asset, :has_content_blobs] do
     collection do
       get :query_authors
       get :query_authors_typeahead
@@ -584,9 +641,15 @@ SEEK::Application.routes.draw do
       post :update_metadata
     end
     member do
+      get :manage
+      get :download
+      get :upload_fulltext
+      get :soft_delete_fulltext
+      post :update_annotations_ajax
       post :disassociate_authors
       post :update_metadata
       post :request_contact
+      post :upload_pdf
     end
     resources :people, :programmes, :projects, :investigations, :assays, :studies, :models, :data_files, :documents, :presentations, :organisms, :events, :collections, only: [:index]
   end
@@ -708,6 +771,13 @@ SEEK::Application.routes.draw do
       member do
         post :select
       end
+    end
+  end
+
+  resources :git_repositories, only: [] do
+    member do
+      get :status
+      get :refs
     end
   end
 

@@ -14,15 +14,12 @@
     <% end %>
   <% end %>
 <% end %>
+<%= render partial: 'general/item_title', locals: { item: @organism } %>
 
 <%= render partial: 'general/show_page_tab_definitions' %>
 
 <div class="tab-content">
-
-  <div id="details" class="tab-pane fade in active">
-
-    <%= render :partial => "general/item_title", :locals => { :item => @organism } %>
-
+  <%= tab_pane('overview') do %>
     <div class="show_basic">
 
       <% if @organism.concept -%>
@@ -50,10 +47,9 @@
         <%= render :partial => "strain_information_row", :collection => @organism.strains.without_default.select(&:can_view?) -%>
       </table>
     </div>
-  </div>
+  <% end %>
 
-  <div id="related-items" class="tab-pane fade">
-    <%= render :partial => "general/items_related_to", :object => @organism %>
-  </div>
-
+  <%= tab_pane('related-items') do %>
+    <%= render partial: 'general/items_related_to', object: @organism %>
+  <% end %>
 </div>

@@ -1,41 +1,38 @@
+<%= render partial: 'general/item_title', locals: { item: @sop, version: @display_sop.version,
+                                                    buttons_partial: 'assets/asset_buttons' } %>
+
+<%= render partial: 'assets/upload_new_version_form', locals: { resource: @sop } %>
+
 <%= render partial: 'general/show_page_tab_definitions' %>
 
 <div class="tab-content">
-    <div id="details" class="tab-pane fade in active">
-      <%= render :partial => "general/item_title",:locals => {:item => @sop, :version => @display_sop.version,
-                                                              :buttons_partial => 'assets/asset_buttons'} -%>
+  <%= tab_pane('overview') do %>
+    <div class="row">
+      <div class="col-md-9 col-sm-8 box_about_actor">
+        <%= item_description @display_sop.description -%>
 
-      <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@sop} -%>
+        <div class="row">
+          <div class="col-md-6">
+            <%= persistent_resource_id(@display_sop) %>
 
-      <div class="row">
-        <div class="col-md-9 col-sm-8 box_about_actor">
-          <%= item_description @display_sop.description -%>
+            <%= render :partial => 'assets/fileinfo',:object=>@display_sop.content_blob -%>
 
-          <div class="row">
-            <div class="col-md-6">
-              <%= persistent_resource_id(@display_sop) %>
+            <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @sop} %>
 
-              <%= render :partial => 'assets/fileinfo',:object=>@display_sop.content_blob -%>
-
-              <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @sop} %>
-
-              <%= render :partial => "assets/asset_doi", :locals => {:displayed_resource=>@display_sop} %>
-            </div>
+            <%= render :partial => "assets/asset_doi", :locals => {:displayed_resource=>@display_sop} %>
           </div>
-          <%= render :partial=>"general/isa_graph", :locals => {:root_item => @sop, :deep => true, :include_parents => true} %>
         </div>
-
-        <div class="col-md-3 col-sm-4">
-          <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @sop, :versioned_resource=>@display_sop } %>
-        </div>
+        <%= render :partial=>"general/isa_graph", :locals => {:root_item => @sop, :deep => true, :include_parents => true} %>
       </div>
 
-      <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_sop, :resource=>@sop} %>
+      <div class="col-md-3 col-sm-4">
+        <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @sop, :versioned_resource=>@display_sop } %>
+      </div>
     </div>
 
-    <div id="related-items" class="tab-pane fade">
-      <%= render :partial=>"general/items_related_to",:object => @sop -%>
-    </div>
-
+    <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_sop, :resource=>@sop} %>
+  <% end %>
+  <%= tab_pane('related-items') do %>
+    <%= render partial: 'general/items_related_to', object: @sop %>
+  <% end %>
 </div>
-

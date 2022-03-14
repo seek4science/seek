@@ -1,0 +1,9 @@
+<%= link_to '[new]',new_observed_variable_path %>
+<ul>
+<% @observed_variables.each do |variable| %>
+  <li>
+    <%= link_to(variable.variable_id,variable) %>
+    <%= link_to('[edit]',edit_observed_variable_path(variable)) %>
+  </li>
+<% end %>
+</ul>

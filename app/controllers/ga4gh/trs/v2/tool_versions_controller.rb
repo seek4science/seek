@@ -22,7 +22,7 @@ module Ga4gh
               path = params[:relative_path]
               entry = crate.find_entry(params[:relative_path])
             else
-              path = crate.main_workflow.id
+              path = crate.main_workflow&.id
               entry = crate.main_workflow&.source
             end
 

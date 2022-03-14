@@ -109,6 +109,9 @@
           }
         ]
       },
+      "placeholders": {
+        "data": []
+      },
       "models": {
         "data": [
           {

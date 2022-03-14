@@ -1,0 +1,40 @@
+<!-- format_type_form -->
+<link rel="stylesheet" type="text/css" href="https://bioportal.bioontology.org/widgets/jquery.ncbo.tree.css">
+<script src="https://bioportal.bioontology.org/widgets/jquery.ncbo.tree-2.0.2.js"></script>
+
+<%
+
+  resource_type = resource.class.name.underscore
+  resource_type_text = text_for_resource(resource)
+  help_text = "You can add a format type for this #{resource_type_text}"
+
+%>
+
+<%= folding_panel('Format Type', false, :body_options => {:id => 'format_type_urls'},
+                  :help_text => help_text) do %>
+
+    <p class="help-block">
+      Specify a format type for this <%= resource_type_text %>.
+    </p>
+
+    <%= text_field_tag("#{resource_type}[format_type]", "#{resource.format_type}", hidden: true) %>
+
+    <div id="format_type_tree"></div>
+
+<% end %>
+
+<script type="application/javascript">
+
+  $j(document).ready(function(){
+      console.log('<%= resource.format_type %>');
+      var format_type_tree = $j("#format_type_tree").NCBOTree({
+	  apikey: "58de558b-45df-4e96-8bfe-4d63af070bd0",
+	  ontology: "EDAM",
+	  startingClass: "<%= resource.format_type %>",
+          startingRoot: "http://edamontology.org/format_1915"
+      });
+      format_type_tree.on("afterSelect", function(event, classId, prefLabel, selectedNode) {
+	  document.getElementById("placeholder_format_type").value = classId;
+      })
+	     });
+</script>

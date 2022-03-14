@@ -1,7 +1,8 @@
 <%
 hide_title ||= 0
 version ||= params[:version]
-avatar = favouritable_icon(version ? item.find_version(version) : item, 120)
+display_item = item.find_version(version) if version
+avatar = favouritable_icon(version ? display_item : item, 120)
 title_prefix||=""
 title_postfix||=""
 title ||= item.title || ""
@@ -22,13 +23,13 @@ col_width = buttons_partial.nil? && !content_for?(:buttons) ? 12 : 6
           <% if visible_versions.length > 1 %>
               <div class="version">
                 <a class="dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
-                  Version <%= version -%> <span class="caret"></span>
+                  <%= display_item.name -%> <%= item.describe_version(display_item.version) -%><span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu" role="menu">
                   <% visible_versions.reverse.each do |v| %>
                       <li>
                         <%= link_to({:version => v.version}, :method => request.request_method) do -%>
-                            Version <%= v.version %> <%= item.describe_version(v.version) -%><br/>
+                            <%= v.name %> <%= item.describe_version(v.version) -%><br/>
                         <% end %>
                       </li>
                   <% end %>

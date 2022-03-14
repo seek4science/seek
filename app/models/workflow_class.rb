@@ -43,7 +43,8 @@ class WorkflowClass < ApplicationRecord
   def self.match_from_metadata(metadata)
     match = nil
 
-    iden = metadata.dig('identifier', '@id')
+    iden = metadata.dig('identifier')
+    iden = iden['@id'] unless iden.nil? || iden.is_a?(String)
     match = where(identifier: iden).first if iden.present?
     return match if match
 
@@ -56,10 +57,11 @@ class WorkflowClass < ApplicationRecord
       return match if match
     end
 
-    match = where(key: metadata['@id'].sub('#', '')).first
+    match = where(key: metadata['@id']&.sub('#', '')).first
     return match if match
 
-    u = metadata.dig('url', '@id')
+    u = metadata.dig('url')
+    u = u['@id'] unless u.nil? || u.is_a?(String)
     match = where(url: u).first if u.present?
     return match if match
 

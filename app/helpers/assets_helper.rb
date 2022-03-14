@@ -128,12 +128,11 @@ module AssetsHelper
 
   def get_original_model_name(model)
     class_name = model.class.name
-    class_name = class_name.split('::')[0] if class_name.end_with?('::Version')
-    class_name
+    model.is_a_version? ? class_name.split('::')[0] : class_name
   end
 
   def download_resource_path(resource, _code = nil)
-    if resource.class.name.include?('::Version')
+    if resource.is_a_version?
       polymorphic_path(resource.parent, version: resource.version, action: :download, code: params[:code])
     else
       polymorphic_path(resource, action: :download, code: params[:code])
@@ -148,7 +147,7 @@ module AssetsHelper
   end
 
   def show_resource_path(resource)
-    if resource.class.name.include?('::Version')
+    if resource.is_a_version?
       polymorphic_path(resource.parent, version: resource.version)
     elsif resource.is_a?(Snapshot)
       polymorphic_path([resource.resource, resource])
@@ -158,7 +157,7 @@ module AssetsHelper
   end
 
   def edit_resource_path(resource)
-    if resource.class.name.include?('::Version')
+    if resource.is_a_version?
       edit_polymorphic_path(resource.parent)
     else
       edit_polymorphic_path(resource)
@@ -166,7 +165,7 @@ module AssetsHelper
   end
 
   def manage_resource_path(resource)
-    if resource.class.name.include?('::Version')
+    if resource.is_a_version?
       polymorphic_path(resource.parent, action:'manage')
     else
       polymorphic_path(resource, action:'manage')
@@ -291,11 +290,7 @@ module AssetsHelper
   # whether the viewable content is available, or converted to pdf, or capable to be converted to pdf
   def view_content_available?(content_blob)
     return true if content_blob.is_text? || content_blob.is_pdf? || content_blob.is_cwl? || content_blob.is_image?
-    if content_blob.is_pdf_viewable?
-      content_blob.file_exists?('pdf') || Seek::Config.soffice_available?
-    else
-      false
-    end
+    content_blob.is_pdf_viewable?
   end
 
   def source_link_button(source_link)

@@ -9,7 +9,7 @@ ENV RAILS_ENV=production
 ENV LANG="en_US.UTF-8" LANGUAGE="en_US:UTF-8" LC_ALL="C.UTF-8"
 
 RUN apt-get update -qq && \
-    apt-get install -y --no-install-recommends build-essential git \
+    apt-get install -y --no-install-recommends build-essential cmake graphviz git \
 		libcurl4-gnutls-dev libmagick++-dev libpq-dev libreadline-dev \
 		libreoffice libsqlite3-dev libssl-dev libxml++2.6-dev \
 		libxslt1-dev locales default-mysql-client nginx nodejs openjdk-11-jdk-headless \

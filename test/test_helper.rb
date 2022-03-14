@@ -100,12 +100,6 @@ class ActiveSupport::TestCase
     fixture_file_upload('little_file_v2.txt', 'text/plain')
   end
 
-  def check_for_soffice
-    unless Seek::Config.soffice_available?(true)
-      skip("soffice is not available on port #{ConvertOffice::ConvertOfficeConfig.options[:soffice_port]}, skipping test")
-    end
-  end
-
   def skip_rest_schema_check?
     false
   end
@@ -272,3 +266,8 @@ VCR.configure do |config|
 end
 
 WebMock.disable_net_connect!(allow_localhost: true) # Need to comment this line out when running VCRs for the first time
+
+# Clear testing filestore before test run (but check its under tmp for safety)
+if File.expand_path(Seek::Config.filestore_path).start_with?(File.expand_path(File.join(Rails.root, 'tmp')))
+  FileUtils.rm_r(Seek::Config.filestore_path)
+end

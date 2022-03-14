@@ -61,6 +61,7 @@ Factory.define(:openbis_endpoint) do |f|
   f.sequence(:web_endpoint) { |nr| "https://openbis-api.fair-dom.org/openbis#{nr}" }
   f.username 'apiuser'
   f.password 'apiuser'
+  f.is_test false
   # f.sequence(:space_perm_id) { |nr| "API-SPACE#{nr}" }
   f.sequence(:space_perm_id) { |_nr| 'API-SPACE' }
   f.association :project, factory: :project

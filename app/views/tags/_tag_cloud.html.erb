@@ -1,20 +1,22 @@
 <%
-   show_overall||=false
-   method= show_overall_count ? :overall_total : :count
-   no_tags_text||=""
+
+  show_all ||= false
+
+  unless show_all
+    tags = tags.sort { |a, b| b.tag_count<=>a.tag_count }[0...Seek::Config.max_visible_tags]
+  end
+
 %>
 
-
-<div id="<%= id -%>" <%= "class='tags_smaller'" if tags_smaller -%>>
-  <div class="hTagcloud">
-    <% if !tags.blank? -%>
-        <div class="popularity">
-          <% ann_cloud tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |ann, css_class| -%>
-              <%= link_for_ann ann, :truncate_length=>40, :class => css_class -%>
-          <% end -%>
-        </div>
-    <% else -%>
-        <p class="none_text"><%= h(no_tags_text) -%></p>
-    <% end -%>
-  </div>
+<div class="hTagcloud">
+  <% if !tags.blank? -%>
+      <div class="popularity">
+        <% ann_cloud tags, %w(popular v-popular vv-popular vvv-popular vvvv-popular) do |ann, css_class| -%>
+            <%= link_for_ann ann, :truncate_length=>40, :class => css_class -%>
+        <% end -%>
+      </div>
+  <% else -%>
+      <p class="none_text"><%= h(no_tags_text) || '' %></p>
+  <% end -%>
 </div>
+

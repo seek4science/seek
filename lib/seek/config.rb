@@ -99,7 +99,7 @@ module Seek
         SEEK::Application.config.middleware.use ExceptionNotification::Rack,
                                                 email: {
                                                   sender_address: [noreply_sender],
-                                                  email_prefix: "[ #{application_name} ERROR ] ",
+                                                  email_prefix: "[ #{instance_name} ERROR ] ",
                                                   exception_recipients: exception_notification_recipients.nil? ? [] : exception_notification_recipients.split(/[, ]/)
                                                 }
       else
@@ -200,10 +200,18 @@ module Seek
       append_filestore_path 'rebranding'
     end
 
-    def append_filestore_path(inner_dir)
+    def git_filestore_path
+      append_filestore_path 'git'
+    end
+
+    def git_temporary_filestore_path
+      append_filestore_path 'tmp', 'git'
+    end
+
+    def append_filestore_path(*inner_dir)
       path = filestore_path
       path = File.join(Rails.root, path) unless path.start_with? '/'
-      check_path_exists(File.join(path, inner_dir))
+      check_path_exists(File.join(path, *inner_dir))
     end
 
     def check_path_exists(path)
@@ -273,18 +281,6 @@ module Seek
     def write_secret_key_base
       File.open(secret_key_base_path, 'w') do |f|
         f << SecureRandom.hex(64)
-      end
-    end
-
-    def soffice_available?(cached=false)
-      @@soffice_available = nil unless cached
-      begin
-        port = ConvertOffice::ConvertOfficeConfig.options[:soffice_port]
-        soc = TCPSocket.new('localhost', port)
-        soc.close
-        true
-      rescue
-        false
       end
     end
 

@@ -1,10 +1,17 @@
+<% versioned_resource ||= nil %>
+
 <ul class="nav nav-tabs">
-  <li class="active ">
-    <a data-toggle="tab" href="#details"><i class="glyphicon glyphicon-list-alt"></i> Details</a>
-  </li>
-  <li>
-    <a data-toggle="tab" href="#related-items">
-      <i class="glyphicon glyphicon-th-list"></i> Related items
-    </a>
-  </li>
+  <%= tab('overview') do %>
+    <span class="glyphicon glyphicon-list-alt"></span> Overview
+  <% end %>
+
+  <% if versioned_resource&.is_git_versioned? %>
+    <%= tab('files') do %>
+      <span class="glyphicon glyphicon-folder-close"></span> Files
+    <% end %>
+  <% end %>
+
+  <%= tab('related-items') do %>
+    <span class="glyphicon glyphicon-th-list"></span> Related items
+  <% end %>
 </ul>

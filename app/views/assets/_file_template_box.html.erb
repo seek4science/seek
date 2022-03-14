@@ -1,0 +1,4 @@
+<%= panel("File template", :body_options => {:class => 'text-center'}) do %>
+  <% text = resource.file_template.title -%>
+<li class="author-list-item"><%= link_to(text, resource.file_template) %></li>
+<% end %>

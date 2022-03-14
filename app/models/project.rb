@@ -20,6 +20,8 @@ class Project < ApplicationRecord
   has_and_belongs_to_many :samples
   has_and_belongs_to_many :sample_types
   has_and_belongs_to_many :documents
+  has_and_belongs_to_many :file_templates
+  has_and_belongs_to_many :placeholders
   has_and_belongs_to_many :collections
 
   has_many :work_groups, dependent: :destroy, inverse_of: :project
@@ -42,6 +44,9 @@ class Project < ApplicationRecord
 
   has_annotation_type :funding_code
 
+  enum status: [:planned, :running, :completed, :cancelled, :failed]
+  belongs_to :assignee, class_name: 'Person'
+  
   belongs_to :programme
   has_filter programme: Seek::Filtering::Filter.new(
       value_field: 'programmes.id',
@@ -96,6 +101,14 @@ class Project < ApplicationRecord
   def assets
     data_files | sops | models | publications | presentations | documents | workflows | nodes | collections
   end
+
+  def project_assets
+    assets.select { |a| a.investigations.empty? }
+  end
+
+  def spreadsheets
+    data_files.select { |d| d.contains_extractable_spreadsheet?}
+  end	  
 
   def institutions=(new_institutions)
     new_institutions = Array(new_institutions).map do |i|

@@ -65,7 +65,7 @@ class Person < ApplicationRecord
   has_many :assets_creators, dependent: :destroy, foreign_key: 'creator_id'
 
   RELATED_RESOURCE_TYPES = %w[DataFile Sop Model Document Publication Presentation
-                              Sample Event Investigation Study Assay Strain Workflow Node Collection].freeze
+                              Sample Event Investigation Study Assay Strain Workflow Node Collection FileTemplate Placeholder].freeze
 
   RELATED_RESOURCE_TYPES.each do |type|
     plural = type.tableize
@@ -106,6 +106,8 @@ class Person < ApplicationRecord
 
   if Seek::Config.solr_enabled
     searchable(auto_index: false) do
+      text :expertise
+      text :tools
       text :project_positions
       text :disciplines do
         disciplines.map(&:title)

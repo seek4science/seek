@@ -5189,23 +5189,7 @@
                     "minItems": 1,
                     "uniqueItems": true,
                     "items": {
-                        "properties": {
-                            "version": {
-                                "type": "number"
-                            },
-                            "revision_comments": {
-                                "$ref": "#/definitions/nullableNonEmptyString"
-                            },
-                            "url": {
-                                "$ref": "#/definitions/uriString"
-                            }
-                        },
-                        "required": [
-                            "version",
-                            "revision_comments",
-                            "url"
-                        ],
-                        "additionalProperties": false
+                        "$ref": "#/definitions/version"
                     }
                 },
                 "version": {
@@ -5268,23 +5252,7 @@
                     "minItems": 1,
                     "uniqueItems": true,
                     "items": {
-                        "properties": {
-                            "version": {
-                                "type": "number"
-                            },
-                            "revision_comments": {
-                                "$ref": "#/definitions/nullableNonEmptyString"
-                            },
-                            "url": {
-                                "$ref": "#/definitions/uriString"
-                            }
-                        },
-                        "required": [
-                            "version",
-                            "revision_comments",
-                            "url"
-                        ],
-                        "additionalProperties": false
+                        "$ref": "#/definitions/version"
                     }
                 },
                 "version": {
@@ -10131,6 +10099,9 @@
                                 "authors": {
                                     "$ref": "#/definitions/nonEmptyStringList"
                                 },
+                                "content_blobs": {
+                                    "$ref": "#/definitions/contentBlobsList"
+                                },
                                 "policy": {
                                     "$ref": "#/definitions/policy"
                                 }
@@ -10767,23 +10738,14 @@
                                     "minItems": 1,
                                     "uniqueItems": true,
                                     "items": {
-                                        "properties": {
-                                            "version": {
-                                                "type": "number"
+                                        "oneOf": [
+                                            {
+                                                "$ref": "#/definitions/version"
                                             },
-                                            "revision_comments": {
-                                                "$ref": "#/definitions/nullableNonEmptyString"
-                                            },
-                                            "url": {
-                                                "$ref": "#/definitions/uriString"
+                                            {
+                                                "$ref": "#/definitions/gitVersion"
                                             }
-                                        },
-                                        "required": [
-                                            "version",
-                                            "revision_comments",
-                                            "url"
-                                        ],
-                                        "additionalProperties": false
+                                        ]
                                     }
                                 },
                                 "version": {
@@ -13000,6 +12962,61 @@
             "required": [
                 "data",
                 "jsonapi"
+            ],
+            "additionalProperties": false
+        },
+        "version": {
+            "type": "object",
+            "properties": {
+                "version": {
+                    "type": "number"
+                },
+                "revision_comments": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "url": {
+                    "$ref": "#/definitions/uriString"
+                }
+            },
+            "required": [
+                "version",
+                "revision_comments",
+                "url"
+            ],
+            "additionalProperties": false
+        },
+        "gitVersion": {
+            "type": "object",
+            "properties": {
+                "version": {
+                    "type": "number"
+                },
+                "revision_comments": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "url": {
+                    "$ref": "#/definitions/uriString"
+                },
+                "commit": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "ref": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "tree": {
+                    "$ref": "#/definitions/uriString"
+                },
+                "remote": {
+                    "$ref": "#/definitions/uriString"
+                }
+            },
+            "required": [
+                "version",
+                "revision_comments",
+                "url",
+                "commit",
+                "ref",
+                "tree"
             ],
             "additionalProperties": false
         },

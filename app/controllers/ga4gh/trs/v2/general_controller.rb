@@ -30,6 +30,10 @@ module Ga4gh
         def tool_classes
           respond_with([ToolClass::WORKFLOW], adapter: :attributes, root: nil) # I have no idea why this needs to be nil instead of '' - Finn
         end
+
+        def organizations
+          respond_with(Project.pluck(:title), adapter: :attributes)
+        end
       end
     end
   end

@@ -89,9 +89,10 @@ class AdminController < ApplicationController
     Seek::Config.internal_help_enabled = string_to_boolean params[:internal_help_enabled]
     Seek::Config.external_help_url = params[:external_help_url]
 
-    Seek::Config.cwl_viewer_url = params[:cwl_viewer_url]
     Seek::Config.ga4gh_trs_api_enabled = string_to_boolean(params[:ga4gh_trs_api_enabled])
     # Types enabled
+    Seek::Config.file_templates_enabled = string_to_boolean params[:file_templates_enabled]
+    Seek::Config.placeholders_enabled = string_to_boolean params[:placeholders_enabled]
     Seek::Config.collections_enabled = string_to_boolean params[:collections_enabled]
     Seek::Config.data_files_enabled = string_to_boolean params[:data_files_enabled]
     Seek::Config.documents_enabled = string_to_boolean params[:documents_enabled]
@@ -165,8 +166,7 @@ class AdminController < ApplicationController
     Seek::Config.news_number_of_entries = entries if is_entries_integer
 
     Seek::Config.home_description = params[:home_description]
-
-    #    Seek::Config.front_page_buttons_enabled = params[:front_page_buttons_enabled]
+    Seek::Config.home_description_position = params[:home_description_position]
 
     Seek::Config.home_show_features = string_to_boolean params[:home_show_features]
     Seek::Config.home_show_quickstart = string_to_boolean params[:home_show_quickstart]
@@ -188,6 +188,8 @@ class AdminController < ApplicationController
     Seek::Config.max_visible_tags = max_visible_tags if only_positive_integer max_visible_tags, 'maximum visible tags'
     Seek::Config.tag_cloud_enabled = string_to_boolean params[:tag_cloud_enabled]
     Seek::Config.workflow_class_list_enabled = string_to_boolean params[:workflow_class_list_enabled]
+
+    expire_annotation_fragments
 
     update_redirect_to (is_entries_integer && (only_integer tag_threshold, 'tag threshold') && (only_positive_integer max_visible_tags, 'maximum visible tags')), 'home_settings'
   end
@@ -240,7 +242,7 @@ class AdminController < ApplicationController
 
   def update_pagination
     %w[people projects projects programmes institutions investigations
-        studies assays data_files models sops publications presentations events documents].each do |type|
+        studies assays data_files models sops publications presentations events documents file_templates placeholders].each do |type|
       Seek::Config.set_sorting_for(type, params[:sorting][type])
       Seek::Config.set_results_per_page_for(type, params[:results_per_page][type])
     end
@@ -267,6 +269,8 @@ class AdminController < ApplicationController
     pubmed_email_valid = check_valid_email(pubmed_email, 'pubmed API email address')
     crossref_email = params[:crossref_api_email]
     crossref_email_valid = check_valid_email(crossref_email, 'crossref API email address')
+    Seek::Config.allow_publications_fulltext = string_to_boolean params[:allow_publications_fulltext]
+    Seek::Config.allow_edit_of_registered_publ = string_to_boolean params[:allow_edit_of_registered_publ]
     Seek::Config.pubmed_api_email = pubmed_email if pubmed_email == '' || pubmed_email_valid
     Seek::Config.crossref_api_email = crossref_email if crossref_email == '' || crossref_email_valid
 

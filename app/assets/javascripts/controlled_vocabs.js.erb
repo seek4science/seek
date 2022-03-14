@@ -160,15 +160,13 @@ CVTerms = {
         $j('input#submit-button').prop('disabled', true);
         $j('input#fetch-ontology-terms-submit').prop('disabled', true);
 
-        var ontology_id = $j('select#sample_controlled_vocab_source_ontology').val();
-        var root_uri = $j('#sample_controlled_vocab_ols_root_term_uri').val();
-
         $j.ajax({
             url: '<%= fetch_ols_terms_sample_controlled_vocabs_path %>',
             dataType: "json",
             data: {
-                source_ontology_id: ontology_id,
-                root_uri: root_uri
+                source_ontology_id: $j('select#sample_controlled_vocab_source_ontology').val(),
+                root_uri: $j('#sample_controlled_vocab_ols_root_term_uri').val(),
+                include_root_term: $j('#include_root_term:checked').val()
             },
             success: function (resp) {
                 CVTerms.clearAllTerms();

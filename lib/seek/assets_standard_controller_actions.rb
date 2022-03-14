@@ -33,6 +33,8 @@ module Seek
         format.xml
         format.rdf { render template: 'rdf/show' }
         format.json { render json: asset, scope: { requested_version: params[:version] }, include: json_api_include_param }
+        format.datacite_xml { render xml: asset_version.datacite_metadata.to_s } if asset_version.respond_to?(:datacite_metadata)
+        format.jsonld { render json: Seek::BioSchema::Serializer.new(asset_version).json_representation, adapter: :attributes } if asset_version.respond_to?(:to_schema_ld)
       end
     end
 
@@ -85,7 +87,7 @@ module Seek
     def create
       item = initialize_asset
 
-      if handle_upload_data
+      if item.is_git_versioned? || handle_upload_data
         create_asset_and_respond(item)
       else
         handle_upload_data_failure

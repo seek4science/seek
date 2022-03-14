@@ -3,6 +3,9 @@ class Study < ApplicationRecord
   include Seek::Rdf::RdfGeneration
   include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
 
+  enum status: [:planned, :running, :completed, :cancelled, :failed]
+  belongs_to :assignee, class_name: 'Person'
+  
   searchable(:auto_index => false) do
     text :experimentalists
   end if Seek::Config.solr_enabled
@@ -61,6 +64,11 @@ class Study < ApplicationRecord
 
   def related_publication_ids
     publication_ids | assay_publication_ids
+  end
+
+  def related_person_ids
+    ids = super
+    ids.uniq
   end
 
   def positioned_assays

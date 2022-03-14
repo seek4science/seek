@@ -13,13 +13,11 @@ class GalaxyExtractionTest < ActiveSupport::TestCase
 
     assert_equal '1 - read pre-processing', metadata[:title]
     assert_equal ['covid-19'], metadata[:tags]
-    assert_equal 1, internals[:inputs].length
-    assert_equal 17, internals[:steps].length
+    assert_equal 2, internals[:inputs].length
+    assert_equal 15, internals[:steps].length
     assert_equal 31, internals[:outputs].length
-    input = internals[:inputs].detect { |i| i[:id] == 'bed_file' }
-    assert_equal 'bed_file', input[:name]
-    assert_equal 'runtime parameter for tool Filter SAM or BAM, output SAM or BAM', input[:description]
-
+    input = internals[:inputs].detect { |i| i[:id] == 'List of Illumina accessions' }
+    assert_equal 'List of Illumina accessions', input[:name]
   end
 
   test 'extracts metadata from Galaxy workflow RO-Crate' do
@@ -33,11 +31,10 @@ class GalaxyExtractionTest < ActiveSupport::TestCase
     assert_equal '# Preprocessing of raw SARS-CoV-2 reads', metadata[:description].split("\n").first, 'Should have parsed description from README.md'
     assert_equal ['covid-19'], metadata[:tags]
     assert_equal 'https://github.com/galaxyproject/SARS-CoV-2', metadata[:source_link_url]
-    assert_equal 1, internals[:inputs].length
-    assert_equal 17, internals[:steps].length
+    assert_equal 2, internals[:inputs].length
+    assert_equal 15, internals[:steps].length
     assert_equal 31, internals[:outputs].length
-    input = internals[:inputs].detect { |i| i[:id] == 'bed_file' }
-    assert_equal 'bed_file', input[:name]
-    assert_equal 'runtime parameter for tool Filter SAM or BAM, output SAM or BAM', input[:description]
+    input = internals[:inputs].detect { |i| i[:id] == 'List of Illumina accessions' }
+    assert_equal 'List of Illumina accessions', input[:name]
   end
 end

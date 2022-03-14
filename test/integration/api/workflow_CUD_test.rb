@@ -34,7 +34,7 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
     original_md5 = wf.content_blob.md5sum
     put workflow_content_blob_path(wf, wf.content_blob),
         headers: { 'Accept' => 'application/json',
-                   'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'workflows', 'rp2-to-rp2path.cwl')) }
+                   'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'workflows', 'rp2', 'workflows', 'rp2-to-rp2path.cwl')) }
 
     assert_response :success
     blob = wf.content_blob.reload
@@ -44,7 +44,7 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
   end
 
   test 'can create workflow with remote content' do
-    stub_request(:get, 'http://mockedlocation.com/workflow.cwl').to_return(body: File.new("#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path.cwl"),
+    stub_request(:get, 'http://mockedlocation.com/workflow.cwl').to_return(body: File.new("#{Rails.root}/test/fixtures/files/workflows/rp2/workflows/rp2-to-rp2path.cwl"),
                                                                            status: 200, headers: { content_type: 'text/plain; charset=UTF-8' })
     stub_request(:head, 'http://mockedlocation.com/workflow.cwl').to_return(status: 200, headers: { content_type: 'text/plain; charset=UTF-8' })
 
@@ -67,77 +67,5 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
 
     hash_comparison(@to_post['data']['relationships'], h['data']['relationships'])
     hash_comparison(populate_extra_relationships(@to_post), h['data']['relationships'])
-  end
-
-  test 'can post RO crate' do
-    Factory(:nextflow_workflow_class)
-
-    assert_difference('Workflow.count', 1) do
-      post workflows_path, params: {
-          ro_crate: fixture_file_upload('workflows/ro-crate-nf-core-ampliseq.crate.zip'),
-          workflow: {
-              project_ids: [@project.id]
-          }
-      }
-
-      assert_response :success
-      assert_equal 'Nextflow', assigns(:workflow).workflow_class.title
-      assert_equal 'nf-core/ampliseq', assigns(:workflow).title
-      assert assigns(:workflow).content_blob.file_size > 100
-      assert_equal 'main.nf', assigns(:workflow).ro_crate.main_workflow.id
-    end
-  end
-
-  test 'can post RO crate as new version' do
-    Factory(:nextflow_workflow_class)
-    workflow = Factory(:workflow, policy: Factory(:public_policy), contributor: @current_person)
-
-    assert_no_difference('Workflow.count', 1) do
-      assert_difference('Workflow::Version.count', 1) do
-        post create_version_workflow_path(workflow.id), params: {
-            ro_crate: fixture_file_upload('workflows/ro-crate-nf-core-ampliseq.crate.zip'),
-            workflow: {
-                project_ids: [@project.id]
-            },
-            revision_comments: 'new ver'
-        }
-
-        assert_response :success
-        assert_equal 2, assigns(:workflow).version
-        assert_equal 'Nextflow', assigns(:workflow).workflow_class.title
-        assert_equal 'nf-core/ampliseq', assigns(:workflow).title
-        assert assigns(:workflow).content_blob.file_size > 100
-        assert_equal 'main.nf', assigns(:workflow).ro_crate.main_workflow.id
-      end
-    end
-  end
-
-  test 'cannot post RO crate with missing metadata' do
-    assert_no_difference('Workflow.count') do
-      post workflows_path, params: {
-          ro_crate: fixture_file_upload('workflows/workflow-4-1.crate.zip'),
-          workflow: {
-              project_ids: [@project.id]
-          }
-      }
-
-      assert_response :unprocessable_entity
-      assert @response.body.include?("can't be blank")
-    end
-  end
-
-  test 'can supplement metadata when posting RO crate' do
-    assert_difference('Workflow.count', 1) do
-      post workflows_path, params: {
-          ro_crate: fixture_file_upload('workflows/workflow-4-1.crate.zip'),
-          workflow: {
-              title: 'Alternative title',
-              project_ids: [@project.id]
-          }
-      }
-
-      assert_response :success
-      assert_equal 'Alternative title', assigns(:workflow).title
-    end
   end
 end

@@ -62,8 +62,7 @@ Factory.define(:collection_with_all_types, parent: :public_collection) do |f|
       Factory(:collection_item, comment: 'its a presentation', collection: c, asset: Factory(:presentation, policy: Factory(:public_policy))),
       Factory(:collection_item, comment: 'its a sample', collection: c, asset: Factory(:sample, policy: Factory(:public_policy))),
       Factory(:collection_item, comment: 'its a event', collection: c, asset: Factory(:event, policy: Factory(:public_policy))),
-      Factory(:collection_item, comment: 'its a workflow', collection: c, asset: Factory(:workflow, policy: Factory(:public_policy))),
-      Factory(:collection_item, comment: 'its a collection', collection: c, asset: Factory(:collection, policy: Factory(:public_policy)))
+      Factory(:collection_item, comment: 'its a workflow', collection: c, asset: Factory(:workflow, policy: Factory(:public_policy)))
     ]
   end
 end

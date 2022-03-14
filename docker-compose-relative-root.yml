@@ -51,6 +51,7 @@ services:
         RAILS_ENV: production
         SOLR_PORT: 8983
         SOLR_HOST: solr
+        RAILS_RELATIVE_URL_ROOT: '/seek'
       env_file:
         - docker/db.env
       volumes:

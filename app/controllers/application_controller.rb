@@ -33,6 +33,7 @@ class ApplicationController < ActionController::Base
   before_action :check_doorkeeper_scopes, if: :doorkeeper_token
   before_action :check_json_id_type, only: [:create, :update], if: :json_api_request?
   before_action :convert_json_params, only: [:update, :destroy, :create, :create_version], if: :json_api_request?
+  before_action :secure_user_content
 
   before_action :rdf_enabled? #only allows through rdf calls to supported types
 
@@ -137,6 +138,10 @@ class ApplicationController < ActionController::Base
 
   def self.api_actions(*actions)
     @api_actions ||= (superclass.respond_to?(:api_actions) ? superclass.api_actions.dup : []) + actions.map(&:to_sym)
+  end
+
+  def self.user_content_actions(*actions)
+    @user_content_actions ||= (superclass.respond_to?(:user_content_actions) ? superclass.user_content_actions.dup : []) + actions.map(&:to_sym)
   end
 
   private
@@ -638,6 +643,13 @@ class ApplicationController < ActionController::Base
       end
     end
     keys
+  end
+
+  # Stop hosted user content from running scripts etc.
+  def secure_user_content
+    if self.class.user_content_actions.include?(action_name.to_sym)
+      response.set_header('Content-Security-Policy', "default-src 'self'")
+    end
   end
 
   def check_displaying_single_page

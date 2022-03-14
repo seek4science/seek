@@ -77,11 +77,11 @@ module ApplicationHelper
   def persistent_resource_id(resource)
     # FIXME: this contains some duplication of Seek::Rdf::RdfGeneration#rdf_resource - however not every model includes that Module at this time.
     # ... its also a bit messy handling the version
-    url = if resource.class.name.include?('::Version')
+    url = if resource.is_a_version?
             URI.join(Seek::Config.site_base_host + '/', "#{resource.parent.class.name.tableize}/", "#{resource.parent.id}?version=#{resource.version}").to_s
           else
             URI.join(Seek::Config.site_base_host + '/', "#{resource.class.name.tableize}/", resource.id.to_s).to_s
-    end
+          end
 
     content_tag :p, class: :id do
       content_tag(:strong) do
@@ -476,7 +476,7 @@ module ApplicationHelper
 
   # whether manage attributes should be shown, dont show if editing (rather than new or managing)
   def show_form_manage_specific_attributes?
-    !(action_name == 'edit' || action_name == 'update')
+    !(action_name == 'edit' || action_name == 'update' || action_name == 'update_paths') # TODO: Figure out a better check here...
   end
 
   def pending_project_creation_request?
@@ -526,6 +526,12 @@ module ApplicationHelper
                   'publications' => 'Publications', 'investigations' => I18n.t('investigation').pluralize, 'studies' => I18n.t('study').pluralize,
                   'samples' => 'Samples', 'strains' => 'Strains', 'organisms' => 'Organisms', 'human_disease' => 'Human Diseases', 'biosamples' => 'Biosamples', 'sample_types' => 'Sample Types',
                   'presentations' => I18n.t('presentation').pluralize, 'programmes' => I18n.t('programme').pluralize, 'events' => I18n.t('event').pluralize, 'help_documents' => 'Help' }.freeze
+
+  def show_page_tab
+    return 'overview' unless params.key?(:tab)
+
+    params[:tab]
+  end
 end
 
 class ApplicationFormBuilder < ActionView::Helpers::FormBuilder

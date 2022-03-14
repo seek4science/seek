@@ -1,15 +1,8 @@
 GIT
   remote: https://github.com/SysMO-DB/bioportal.git
-  revision: 0f80b4281af3f71234a425d40981b1185a3e5d0b
+  revision: 5b2f2e506a406a002413424de9b37177e4d2df0b
   specs:
     bioportal (3.0)
-
-GIT
-  remote: https://github.com/SysMO-DB/convert_office.git
-  revision: 753f2567dbd625bc89071e1150404efbb562e130
-  ref: 753f2567dbd625bc89071e1150404efbb562e130
-  specs:
-    convert_office (0.9.1)
 
 GIT
   remote: https://github.com/SysMO-DB/fleximage.git
@@ -34,7 +27,7 @@ GIT
 
 GIT
   remote: https://github.com/seek4science/DOI-query-tool.git
-  revision: 95f795d00094c5e0d4febf97dd73a5e97c9d5798
+  revision: 7c2ba934885ad404d964cd371e236d3348efb63c
   specs:
     doi_query_tool (1.0.1)
       libxml-ruby (>= 2.6.0)
@@ -128,7 +121,7 @@ GEM
       activerecord (>= 4.2)
     acts_as_tree (2.9.1)
       activerecord (>= 3.0.0)
-    addressable (2.7.0)
+    addressable (2.8.0)
       public_suffix (>= 2.0.2, < 5.0)
     aes_key_wrap (1.1.0)
     akami (1.2.2)
@@ -278,8 +271,6 @@ GEM
     ffi (1.15.5)
     fssm (0.2.10)
     gem-licenses (0.2.2)
-    git (1.10.2)
-      rchardet (~> 1.8)
     globalid (1.0.0)
       activesupport (>= 5.0)
     google-analytics-rails (1.1.1)
@@ -312,6 +303,8 @@ GEM
       i18n (>= 0.6.6)
     i18n_data (0.15.0)
       simple_po_parser (~> 1.1)
+    indefinite_article (0.2.4)
+      activesupport
     jbuilder (2.11.5)
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
@@ -352,6 +345,7 @@ GEM
       rdf-xsd (>= 2.2, < 4.0)
       sparql (>= 2.2, < 4.0)
       sxp (~> 1.0)
+    libreconv (0.9.5)
     libxml-ruby (2.9.0)
     link_header (0.0.8)
     linkeddata (3.0.1)
@@ -493,7 +487,7 @@ GEM
       validate_email
       validate_url
       webfinger (>= 1.0.1)
-    openseek-api (0.17.4)
+    openseek-api (0.18)
       terrapin
     options (2.3.2)
     parallel (1.21.0)
@@ -526,8 +520,8 @@ GEM
     pyu-ruby-sasl (0.0.3.3)
     racc (1.6.0)
     rack (2.2.3)
-    rack-attack (5.0.1)
-      rack
+    rack-attack (6.6.0)
+      rack (>= 1.0, < 3)
     rack-cors (1.1.1)
       rack (>= 2.0.0)
     rack-mini-profiler (2.3.3)
@@ -674,12 +668,12 @@ GEM
     rexml (3.2.5)
     rfc-822 (0.4.1)
     rmagick (2.15.2)
-    ro-bundle (0.2.5)
-      addressable (~> 2.7.0)
-      json (>= 2.3.0)
+    ro-bundle (0.3.0)
+      addressable (~> 2.8.0)
+      json (~> 2.3.0)
       ucf (~> 2.0.2)
       uuid (~> 2.3)
-    ro-crate (0.4.14)
+    ro-crate (0.4.16)
       addressable (>= 2.7, < 2.9)
       rubyzip (~> 2.0.0)
     rsolr (2.4.0)
@@ -718,6 +712,7 @@ GEM
     ruby2_keywords (0.0.5)
     rubyntlm (0.3.4)
     rubyzip (2.0.0)
+    rugged (1.1.0)
     sample-template-generator (0.6.0)
       rdoc (~> 6.0)
       terrapin (~> 0.6)
@@ -904,7 +899,6 @@ DEPENDENCIES
   citeproc-ruby (~> 2.0.0)
   coffee-rails (~> 4.2)
   commonmarker
-  convert_office!
   country_select
   csl-styles (~> 2.0.0)
   daemons
@@ -921,17 +915,18 @@ DEPENDENCIES
   fleximage!
   fssm
   gem-licenses
-  git
   google-analytics-rails
   handlebars_assets
   hpricot (~> 0.8.2)
   i18n-js
+  indefinite_article
   jbuilder (~> 2.7)
   jbuilder-json_api
   jquery-rails (~> 4.2.2)
   jquery-ui-rails
   json-diff
   json-schema
+  libreconv
   libxml-ruby (~> 2.9.0)
   linkeddata
   listen (~> 3.3)
@@ -962,7 +957,7 @@ DEPENDENCIES
   pry-remote
   psych
   puma (~> 5.0)
-  rack-attack (~> 5.0.1)
+  rack-attack (~> 6.6.0)
   rack-cors
   rack-mini-profiler (~> 2.0)
   rails (~> 6.1.4, >= 6.1.4.4)
@@ -983,12 +978,13 @@ DEPENDENCIES
   rest-client (~> 2.0)
   rfc-822
   rmagick (= 2.15.2)
-  ro-bundle (~> 0.2.5)
-  ro-crate (~> 0.4.14)
+  ro-bundle (~> 0.3.0)
+  ro-crate (~> 0.4.16)
   rspec-rails (~> 5.1)
   rubocop
   ruby-prof
   rubyzip
+  rugged
   sample-template-generator (~> 0.5)
   sass-rails (>= 6)
   savon (= 1.1.0)

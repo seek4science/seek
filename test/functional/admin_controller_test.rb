@@ -116,7 +116,7 @@ class AdminControllerTest < ActionController::TestCase
       assert_select '#address[value=?]', '255.255.255.255'
       assert_select '#domain[value=?]', 'email.example.com'
     end
-  end  
+  end
 
   test 'update visible tags and threshold' do
     Seek::Config.max_visible_tags = 2
@@ -490,6 +490,17 @@ class AdminControllerTest < ActionController::TestCase
     new_value = []
     post :update_settings, params: {recommended_software_licenses: new_value}
     assert_nil Seek::Config.recommended_software_licenses
+  end
+
+  test 'publication fulltext enabled' do
+    with_config_value(:allow_publications_fulltext, false) do
+      post :update_settings, params: { allow_publications_fulltext: '1' }
+      assert_equal true, Seek::Config.allow_publications_fulltext
+    end
+    with_config_value(:allow_publications_fulltext, true) do
+      post :update_settings, params: { allow_publications_fulltext: '0' }
+      assert_equal false, Seek::Config.allow_publications_fulltext
+    end
   end
 
   test 'update session store timeout' do

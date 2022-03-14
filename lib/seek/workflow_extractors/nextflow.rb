@@ -1,6 +1,10 @@
 module Seek
   module WorkflowExtractors
     class Nextflow < Base
+      def self.file_extensions
+        ['nf']
+      end
+
       def metadata
         metadata = super
 
