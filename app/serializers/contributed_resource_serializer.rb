@@ -12,10 +12,10 @@ class ContributedResourceSerializer < PCSSerializer
   attribute :versions, if: -> { object.respond_to?(:versions) } do
     versions_data = []
     object.visible_versions.each do |v|
-      path = polymorphic_path(object, version: v.version)
+      url = polymorphic_path(object, version: v.version, host: Seek::Config.site_base_host)
       versions_data.append(version: v.version,
                            revision_comments: v.revision_comments.presence,
-                           url: "#{base_url}#{path}")
+                           url: url)
     end
     versions_data
   end
