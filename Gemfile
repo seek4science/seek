@@ -36,8 +36,6 @@ gem 'loofah'
 gem 'jbuilder', '~> 2.7'
 gem 'jbuilder-json_api'
 gem 'active_model_serializers'
-gem 'json-schema'
-gem 'json-diff'
 gem 'rubyzip'
 
 gem 'equivalent-xml'
