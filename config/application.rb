@@ -39,10 +39,6 @@ module SEEK
     config.active_record.observers = :annotation_reindexer,
         :assay_reindexer,
         :assay_asset_reindexer,
-        :mapping_reindexer,
-        :mapping_link_reindexer,
-        :compound_reindexer,
-        :synonym_reindexer,
         :person_reindexer,
         :programme_reindexer,
         :assets_creator_reindexer
