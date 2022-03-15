@@ -95,7 +95,6 @@ class CompoundsControllerTest < ActionController::TestCase
   end
 
   test 'should delete compound, its synonyms, linked FSes and ECs' do
-    # create compounds, synonyms, mappings, mapping_link, studied_factor, studied_factor_link, experimental_condition, experimental_condition_link
     compound = Factory(:compound)
     synonym = Factory(:synonym, name: 'Glucose', substance: compound)
     mapping = Factory(:mapping)
