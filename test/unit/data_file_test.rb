@@ -208,53 +208,6 @@ class DataFileTest < ActiveSupport::TestCase
     end
   end
 
-  test 'fs_search_fields' do
-    user = Factory :user
-    User.with_current_user user do
-      df = Factory :data_file, contributor: user.person
-      sf1 = Factory :studied_factor_link, substance: Factory(:compound, name: 'sugar')
-      sf2 = Factory :studied_factor_link, substance: Factory(:compound, name: 'iron')
-      comp = sf2.substance
-      Factory :synonym, name: 'metal', substance: comp
-      Factory :mapping_link, substance: comp, mapping: Factory(:mapping, chebi_id: '12345', kegg_id: '789', sabiork_id: 111)
-      studied_factor = Factory :studied_factor, studied_factor_links: [sf1, sf2], data_file: df
-      assert df.fs_search_fields.include?('sugar')
-      assert df.fs_search_fields.include?('metal')
-      assert df.fs_search_fields.include?('iron')
-      assert df.fs_search_fields.include?('concentration')
-      assert df.fs_search_fields.include?('CHEBI:12345')
-      assert df.fs_search_fields.include?('12345')
-      assert df.fs_search_fields.include?('111')
-      assert df.fs_search_fields.include?('789')
-      assert_equal 8, df.fs_search_fields.count
-    end
-  end
-
-  test 'fs_search_fields_with_synonym_substance' do
-    user = Factory :user
-    User.with_current_user user do
-      df = Factory :data_file, contributor: user.person
-      suger = Factory(:compound, name: 'sugar')
-      iron = Factory(:compound, name: 'iron')
-      metal = Factory :synonym, name: 'metal', substance: iron
-      Factory :mapping_link, substance: iron, mapping: Factory(:mapping, chebi_id: '12345', kegg_id: '789', sabiork_id: 111)
-
-      sf1 = Factory :studied_factor_link, substance: suger
-      sf2 = Factory :studied_factor_link, substance: metal
-
-      Factory :studied_factor, studied_factor_links: [sf1, sf2], data_file: df
-      assert df.fs_search_fields.include?('sugar')
-      assert df.fs_search_fields.include?('metal')
-      assert df.fs_search_fields.include?('iron')
-      assert df.fs_search_fields.include?('concentration')
-      assert df.fs_search_fields.include?('CHEBI:12345')
-      assert df.fs_search_fields.include?('12345')
-      assert df.fs_search_fields.include?('111')
-      assert df.fs_search_fields.include?('789')
-      assert_equal 8, df.fs_search_fields.count
-    end
-  end
-
   test 'cache_remote_content' do
     user = Factory :user
     User.with_current_user(user) do

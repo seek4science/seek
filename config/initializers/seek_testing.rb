@@ -29,8 +29,6 @@ def load_seek_testing_defaults!
       Settings.defaults[:show_as_external_link_enabled] = false
       Settings.defaults[:allow_publications_fulltext] = true
       Settings.defaults[:allow_edit_of_registered_publ] = false
-      Settings.defaults[:factors_studied_enabled] = true
-      Settings.defaults[:experimental_conditions_enabled] = true
       Settings.defaults[:programme_user_creation_enabled] = true
       Settings.defaults[:programmes_open_for_projects_enabled] = true
 

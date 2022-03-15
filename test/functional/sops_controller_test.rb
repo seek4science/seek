@@ -403,48 +403,6 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal current_version, s.version
   end
 
-  def test_should_duplicate_conditions_for_new_version
-    s = Factory :sop, contributor: User.current_user.person
-    condition1 = ExperimentalCondition.create(unit_id: units(:gram).id, measured_item_id: measured_items(:weight).id,
-                                              start_value: 1, sop_id: s.id, sop_version: s.version)
-    condition1.save!
-    s.reload
-    assert_equal 1, s.experimental_conditions.count
-    assert_difference('Sop::Version.count', 1) do
-      assert_difference('ExperimentalCondition.count', 1) do
-        post :create_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' } # v2
-      end
-    end
-
-    assert_equal 1, s.find_version(1).experimental_conditions.count
-    assert_equal 1, s.find_version(2).experimental_conditions.count
-    assert_not_equal s.find_version(1).experimental_conditions, s.find_version(2).experimental_conditions
-  end
-
-  def test_adding_new_conditions_to_different_versions
-    s = Factory(:sop, contributor:User.current_user.person)
-    assert s.can_edit?
-    condition1 = ExperimentalCondition.create(unit_id: units(:gram).id, measured_item: measured_items(:weight),
-                                              start_value: 1, sop_id: s.id, sop_version: s.version)
-    assert_difference('Sop::Version.count', 1) do
-      assert_difference('ExperimentalCondition.count', 1) do
-        post :create_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' } # v2
-      end
-    end
-
-    s.find_version(2).experimental_conditions.each(&:destroy)
-    assert_equal condition1, s.find_version(1).experimental_conditions.first
-    assert_equal 0, s.find_version(2).experimental_conditions.count
-
-    condition2 = ExperimentalCondition.create(unit_id: units(:gram).id, measured_item: measured_items(:weight),
-                                              start_value: 2, sop_id: s.id, sop_version: 2)
-
-    assert_not_equal 0, s.find_version(2).experimental_conditions.count
-    assert_equal condition2, s.find_version(2).experimental_conditions.first
-    assert_not_equal condition2, s.find_version(1).experimental_conditions.first
-    assert_equal condition1, s.find_version(1).experimental_conditions.first
-  end
-
   def test_should_add_nofollow_to_links_in_show_page
     get :show, params: { id: sops(:sop_with_links_in_description) }
     assert_select 'div#description' do

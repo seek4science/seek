@@ -45,12 +45,6 @@ ActiveRecord::FixtureSet.create_fixtures(File.join(Rails.root, "config/default_d
 
 puts "Seeded recommended model environments"
 
-ActiveRecord::FixtureSet.create_fixtures(File.join(Rails.root, "config/default_data"), "measured_items")
-
-puts "Seeded measured items"
-
-
-
 ActiveRecord::FixtureSet.create_fixtures(File.join(Rails.root, "config/default_data"), "project_positions")
 
 puts "Seeded project positions"

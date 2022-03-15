@@ -40,31 +40,6 @@ module Seek
         }
       end
 
-      # this is the class fragment according to the measured item title
-      def self.measured_item_entity_fragment(title)
-        defined_measures_item_types[title]
-      end
-
-      # FIXME: I think I would prefer these as actual attributes on the MeasureItem object, making it easier to configure new ones in the future
-      # predefined mappings between the measured item name and their class
-      def self.defined_measures_item_types
-        {
-          'acidity/PH' => :pH,
-          'gas flow rate' => :Gas_flow,
-          'dry biomass concentration' => :Dry_biomass,
-          'dilution rate' => nil, # problem with: 'Growth_rate/Dilution_rate,
-          'temperature' => :Temperature,
-          'pressure' => :Pressure,
-          'specific concentration' => :Specific_concentration,
-          'concentration' => :Concentration,
-          'buffer' => :Buffer,
-          'time' => :Time_series,
-          'growth medium' => :Growth_medium_composition,
-          'stiring rate' => nil, # missing from ontology
-          'optical density 600 nm' => :Optical_density_600,
-          'glucose pulse' => nil, # missing from ontology
-        }
-      end
     end
   end
 end
