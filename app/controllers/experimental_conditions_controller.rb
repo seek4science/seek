@@ -11,7 +11,6 @@ class ExperimentalConditionsController < ApplicationController
   def index
     respond_to do |format|
       format.html
-      format.xml {render :xml=>@sop.experimental_conditions}
     end
   end
 

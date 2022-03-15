@@ -16,11 +16,9 @@ class InstitutionsController < ApplicationController
   api_actions :index, :show, :create, :update, :destroy
 
   # GET /institutions/1
-  # GET /institutions/1.xml
   def show
     respond_to do |format|
       format.html # show.html.erb
-      format.xml
       # format.json { render layout: false, json: JSON.parse(JbuilderTemplate.new(view_context).api_format!(@institution).target!) }
       #format.json { render json: @institution } #normal json
       format.json {render json: @institution, include: [params[:include]]}
@@ -28,12 +26,10 @@ class InstitutionsController < ApplicationController
   end
 
   # GET /institutions/new
-  # GET /institutions/new.xml
   def new
     @institution = Institution.new
     respond_to do |format|
       format.html # new.html.erb
-      format.xml  { render xml: @institution }
     end
   end
 
@@ -55,36 +51,30 @@ class InstitutionsController < ApplicationController
   end
 
   # POST /institutions
-  # POST /institutions.xml
   def create
     @institution = Institution.new(institution_params)
     respond_to do |format|
       if @institution.save
         flash[:notice] = "#{t('institution')} was successfully created."
         format.html { redirect_to(@institution) }
-        format.xml  { render xml: @institution, status: :created, location: @institution }
         format.json {render json: @institution, status: :created, location: @institution, include: [params[:include]]}
       else
         format.html { render action: 'new' }
-        format.xml  { render xml: @institution.errors, status: :unprocessable_entity }
         format.json { render json: json_api_errors(@institution), status: :unprocessable_entity }
       end
     end
   end
 
   # PUT /institutions/1
-  # PUT /institutions/1.xml
   def update
     respond_to do |format|
       if @institution.update_attributes(institution_params)
         expire_resource_list_item_content
         flash[:notice] = "#{t('institution')} was successfully updated."
         format.html { redirect_to(@institution) }
-        format.xml  { head :ok }
         format.json {render json: @institution, include: [params[:include]]}
       else
         format.html { render action: 'edit' }
-        format.xml  { render xml: @institution.errors, status: :unprocessable_entity }
         format.json { render json: json_api_errors(@institution), status: :unprocessable_entity }
       end
     end

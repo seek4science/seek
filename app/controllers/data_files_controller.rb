@@ -14,7 +14,6 @@ class DataFilesController < ApplicationController
   before_action :find_and_authorize_requested_item, except: [:index, :new, :upload_for_tool, :upload_from_email, :create, :create_content_blob,
                                                              :preview, :update_annotations_ajax, :rightfield_extraction_ajax, :provide_metadata]
   before_action :find_display_asset, only: [:show, :explore, :download]
-  before_action :xml_login_only, only: [:upload_for_tool, :upload_from_email]
   before_action :get_sample_type, only: :extract_samples
   before_action :check_already_extracted, only: :extract_samples
   before_action :forbid_new_version_if_samples, :only => :create_version
@@ -495,13 +494,6 @@ class DataFilesController < ApplicationController
   end
 
   protected
-
-  def xml_login_only
-    unless session[:xml_login]
-      flash[:error] = 'Only available when logged in via xml'
-      redirect_to root_url
-    end
-  end
 
   def get_sample_type
     if params[:sample_type_id] || @data_file.possible_sample_types.count == 1

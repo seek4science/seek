@@ -22,7 +22,6 @@ class OrganismsController < ApplicationController
   def show
     respond_to do |format|
       format.html
-      format.xml
       format.rdf { render :template=>'rdf/show'}
       format.json {render json: @organism, include: [params[:include]]}
     end
@@ -64,11 +63,9 @@ class OrganismsController < ApplicationController
       if @organism.save
         flash[:notice] = 'Organism was successfully created.'
         format.html { redirect_to organism_path(@organism) }
-        format.xml  { head :ok }
         format.json {render json: @organism, status: :created, location: @organism, include: [params[:include]]}
       else
         format.html { render :action => "new" }
-        format.xml  { render :xml => @organism.errors, :status => :unprocessable_entity }
         format.json  { render json: @organism.errors, status: :unprocessable_entity }
       end
     end
@@ -80,11 +77,9 @@ class OrganismsController < ApplicationController
       if @organism.update_attributes(organism_params)
         flash[:notice] = 'Organism was successfully updated.'
         format.html { redirect_to organism_path(@organism) }
-        format.xml  { head :ok }
         format.json {render json: @organism, include: [params[:include]]}
       else
         format.html { render :action => "edit" }
-        format.xml  { render :xml => @organism.errors, :status => :unprocessable_entity }
         format.json  { render json: @organism.errors, status: :unprocessable_entity }
       end
     end
@@ -93,7 +88,6 @@ class OrganismsController < ApplicationController
   def edit
     respond_to do |format|
       format.html
-      format.xml {render :xml=>@organism}
     end
   end
 

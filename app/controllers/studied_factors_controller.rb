@@ -12,7 +12,6 @@ class StudiedFactorsController < ApplicationController
   def index
     respond_to do |format|
       format.html
-      format.xml { render xml: @data_file.studied_factors }
     end
   end
 

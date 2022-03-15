@@ -35,7 +35,6 @@ class PresentationsController < ApplicationController
   end
 
  # PUT /presentations/1
-  # PUT /presentations/1.xml
   def update
     @presentation.update_attributes(presentation_params)
     update_annotations(params[:tag_list], @presentation) if params.key?(:tag_list)

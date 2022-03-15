@@ -55,17 +55,6 @@ class ApplicationController < ActionController::Base
     redirect_to register_people_path if current_user && !current_user.registration_complete?
   end
 
-  def strip_root_for_xml_requests
-    # intended to use as a before filter on requests that lack a single root model.
-    # XML requests are required to have a single root node. This assumes the root node
-    # will be named xml. Turns a params hash like.. {:xml => {:param_one => "val", :param_two => "val2"}}
-    # into {:param_one => "val", :param_two => "val2"}
-
-    # This should probably be used with prepend_before_action, since some filters might need this to happen so they can check params.
-    # see sessions controller for an example usage
-    params[:xml].each { |k, v| params[k] = v } if request.format.xml? && params[:xml]
-  end
-
   def set_no_layout
     self.class.layout nil
   end
@@ -229,7 +218,6 @@ class ApplicationController < ActionController::Base
       respond_to do |format|
         flash[:error] = "The #{name.humanize} does not exist!"
         format.rdf { render plain: 'Not found', status: :not_found }
-        format.xml { render xml: '<error>404 Not found</error>', status: :not_found }
         format.json { render json: { errors: [{ title: 'Not found',
                                                 detail: "Couldn't find #{name.camelize} with 'id'=[#{params[:id]}]" }] },
                              status: :not_found }
@@ -268,7 +256,6 @@ class ApplicationController < ActionController::Base
           end
         end
         format.rdf { render plain: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
-        format.xml { render plain: "<error>You may not #{privilege} #{name}:#{params[:id]}</error>", status: :forbidden }
         format.json { render json: { errors: [{ title: 'Forbidden',
                                                 details: "You may not #{privilege} #{name}:#{params[:id]}" }] },
                              status: :forbidden }
@@ -297,7 +284,6 @@ class ApplicationController < ActionController::Base
       end
 
       format.rdf { render plain: 'Not found', status: :not_found }
-      format.xml { render xml: '<error>404 Not found</error>', status: :not_found }
       format.json { render json: { errors: [{ title: 'Not found', detail: e.message }] }, status: :not_found }
     end
     false
