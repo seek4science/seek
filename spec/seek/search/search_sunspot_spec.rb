@@ -39,7 +39,6 @@ describe Sop do
 
   it { should have_searchable_field(:assay_type_titles) }
   it { should have_searchable_field(:technology_type_titles) }
-  it { should have_searchable_field(:exp_conditions_search_fields) }
 end
 
 describe Model do
