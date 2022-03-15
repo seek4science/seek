@@ -362,64 +362,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert assigns(:data_file).simulation_data?
   end
 
-  test 'upload_for_tool inacessible with normal login' do
-    post :upload_for_tool, params: { data_file: { title: 'Test', data: fixture_file_upload('files/file_picture.png'), project_id: projects(:sysmo_project).id }, recipient_id: people(:quentin_person).id }
-    assert_redirected_to root_url
-  end
-
-  test 'upload_from_email inacessible with normal login' do
-    post :upload_from_email, params: { data_file: { title: 'Test', data: fixture_file_upload('files/file_picture.png'), project_id: projects(:sysmo_project).id }, recipient_ids: [people(:quentin_person).id], cc_ids: [] }
-    assert_redirected_to root_url
-  end
-
-  test 'should create data file for upload tool' do
-    assert_difference('DataFile.count') do
-      assert_difference('ContentBlob.count') do
-        session[:xml_login] = true
-        post :upload_for_tool, params: { data_file: { title: 'Test', project_id: projects(:sysmo_project).id }, content_blobs: [{ data: picture_file }], recipient_id: people(:quentin_person).id }
-      end
-    end
-
-    assert_response :success
-    df = assigns(:data_file)
-    df.reload
-    assert_equal users(:datafile_owner).person, df.contributor
-
-    assert !df.content_blob.data_io_object.read.nil?
-    assert df.content_blob.url.blank?
-    assert df.policy
-    assert df.policy.permissions
-    assert_equal df.policy.permissions.first.contributor, people(:quentin_person)
-    assert df.creators
-    assert_equal df.creators.first, users(:datafile_owner).person
-  end
-
-  test 'should create data file from email tool' do
-    old_admin_impersonation = Seek::Config.admin_impersonation_enabled
-    Seek::Config.admin_impersonation_enabled = true
-    login_as Factory(:admin).user
-    assert_difference('DataFile.count') do
-      assert_difference('ContentBlob.count') do
-        session[:xml_login] = true
-        post :upload_from_email, params: { data_file: { title: 'Test', project_ids: [projects(:sysmo_project).id] }, content_blobs: [{ data: picture_file }], recipient_ids: [people(:quentin_person).id], sender_id: users(:datafile_owner).person_id }
-      end
-    end
-
-    assert_response :success
-    df = assigns(:data_file)
-    df.reload
-    assert_equal users(:datafile_owner).person, df.contributor
-
-    assert !df.content_blob.data_io_object.read.nil?
-    assert df.content_blob.url.blank?
-    assert df.policy
-    assert df.policy.permissions
-    assert_equal df.policy.permissions.first.contributor, people(:quentin_person)
-    assert df.creators
-    assert_equal df.creators.first, users(:datafile_owner).person
-    Seek::Config.admin_impersonation_enabled = old_admin_impersonation
-  end
-
   test 'missing sharing should default' do
     with_config_value 'default_all_visitors_access_type', Policy::NO_ACCESS do
       data_file, blob = valid_data_file

@@ -18,17 +18,6 @@ class AssaysControllerTest < ActionController::TestCase
     @object = Factory(:experimental_assay, policy: Factory(:public_policy))
   end
 
-  test "shouldn't show unauthorized assays" do
-    login_as Factory(:user)
-    hidden = Factory(:experimental_assay, policy: Factory(:private_policy)) # ensure at least one hidden assay exists
-    get :index, params: { page: 'all', format: 'xml' }
-    assert_response :success
-    assert_equal assigns(:assays).sort_by(&:id),
-                 assigns(:assays).authorized_for('view', users(:aaron)).sort_by(&:id),
-                 "#{t('assays.assay').downcase.pluralize} haven't been authorized"
-    assert !assigns(:assays).include?(hidden)
-  end
-
   def test_title
     get :index
     assert_select 'title', text: I18n.t('assays.assay').pluralize, count: 1
