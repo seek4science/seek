@@ -27,7 +27,6 @@ class DataFile < ApplicationRecord
   has_one :external_asset, as: :seek_entity, dependent: :destroy
 
   belongs_to :file_template
-  has_many :studied_factors, ->(r) { where('studied_factors.data_file_version =?', r.version) }
   has_many :extracted_samples, class_name: 'Sample', foreign_key: :originating_data_file_id
 
   has_many :workflow_data_files, dependent: :destroy, autosave: true
@@ -58,9 +57,6 @@ class DataFile < ApplicationRecord
 
     has_one :content_blob, ->(r) { where('content_blobs.asset_version =? AND content_blobs.asset_type =?', r.version, r.parent.class.name) },
             primary_key: :data_file_id, foreign_key: :asset_id
-
-    has_many :studied_factors, ->(r) { where('studied_factors.data_file_version = ?', r.version) },
-             primary_key: 'data_file_id', foreign_key: 'data_file_id'
 
     def relationship_type(assay)
       parent.relationship_type(assay)

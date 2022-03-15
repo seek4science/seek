@@ -53,8 +53,6 @@ def load_seek_config_defaults!
   Seek::Config.default :modelling_analysis_enabled,true
   Seek::Config.default :human_diseases_enabled, false
   Seek::Config.default :guide_box_enabled,true
-  Seek::Config.default :factors_studied_enabled,false
-  Seek::Config.default :experimental_conditions_enabled,false
   Seek::Config.default :tagging_enabled, true
   Seek::Config.default :authorization_checks_enabled, true
   Seek::Config.default :documentation_enabled,true

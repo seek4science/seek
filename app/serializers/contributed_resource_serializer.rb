@@ -15,7 +15,7 @@ class ContributedResourceSerializer < PCSSerializer
       data = {
         version: v.version,
         revision_comments: v.revision_comments.presence,
-        url: "#{base_url}#{polymorphic_path(object, version: v.version)}"
+        url: polymorphic_url(object, version: v.version, host: Seek::Config.site_base_host)
       }
       if v.is_git_versioned?
         data[:remote] = v.remote if v.remote?
@@ -68,14 +68,13 @@ class ContributedResourceSerializer < PCSSerializer
   attribute :other_creators
 
   def convert_content_blob_to_json(cb)
-    path = polymorphic_path([cb.asset, cb])
     {
       original_filename: cb.original_filename,
       url: cb.url,
       md5sum: cb.md5sum,
       sha1sum: cb.sha1sum,
       content_type: cb.content_type,
-      link: "#{base_url}#{path}",
+      link: polymorphic_url([cb.asset, cb], host: Seek::Config.site_base_host),
       size: cb.file_size
     }
   end

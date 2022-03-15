@@ -100,26 +100,14 @@ class CompoundsControllerTest < ActionController::TestCase
     synonym = Factory(:synonym, name: 'Glucose', substance: compound)
     mapping = Factory(:mapping)
     mapping_link = Factory(:mapping_link, substance: compound, mapping: mapping)
-    studied_factor = Factory(:studied_factor)
-    studied_factor_link = Factory(:studied_factor_link, substance: compound, studied_factor: studied_factor)
-    experimental_condition = Factory(:experimental_condition)
-    experimental_condition_link = Factory(:experimental_condition_link, substance: synonym, experimental_condition: experimental_condition)
     assert_not_nil Compound.find_by_id compound.id
     assert_not_nil Synonym.find_by_id synonym.id
     assert_not_nil Mapping.find_by_id mapping.id
-    assert_not_nil StudiedFactor.find_by_id studied_factor.id
-    assert_not_nil ExperimentalCondition.find_by_id experimental_condition.id
     assert_not_nil MappingLink.find_by_id mapping_link.id
-    assert_not_nil StudiedFactorLink.find_by_id studied_factor_link.id
-    assert_not_nil ExperimentalConditionLink.find_by_id experimental_condition_link.id
 
     delete :destroy, params: { id: compound.id }
 
     assert_nil Synonym.find_by_id synonym.id
-    assert_nil StudiedFactor.find_by_id studied_factor.id
-    assert_nil ExperimentalCondition.find_by_id experimental_condition.id
     assert_nil MappingLink.find_by_id mapping_link.id
-    assert_nil StudiedFactorLink.find_by_id studied_factor_link.id
-    assert_nil ExperimentalConditionLink.find_by_id experimental_condition_link.id
   end
 end

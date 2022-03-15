@@ -6,11 +6,8 @@ units.each do |unit|
   comment=unit['comment']
   order=unit['order']
   title=unit['title']
-  factors_studied=unit['factors_studied']
-  factors_studied=true if factors_studied.nil?
   unit = Unit.find_or_initialize_by(symbol:symbol)
   unit.update(comment:comment,order:order,title:title,factors_studied:factors_studied)
-
 end
 
 puts "Seeded units"

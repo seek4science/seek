@@ -996,31 +996,6 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
-  test 'adding_new_conditions_to_different_versions' do
-    d = Factory(:data_file, contributor: User.current_user.person)
-    assert d.can_edit?
-    sf = StudiedFactor.create(unit_id: units(:gram).id, measured_item: measured_items(:weight),
-                              start_value: 1, end_value: 2, data_file_id: d.id, data_file_version: d.version)
-
-    assert_difference('DataFile::Version.count', 1) do
-      assert_difference('StudiedFactor.count', 1) do
-        post :create_version, params: { id: d, data_file: { title: nil }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' } # v2
-      end
-    end
-
-    d.find_version(2).studied_factors.each(&:destroy)
-    assert_equal sf, d.find_version(1).studied_factors.first
-    assert_equal 0, d.find_version(2).studied_factors.count
-
-    sf2 = StudiedFactor.create(unit_id: units(:gram).id, measured_item: measured_items(:weight),
-                               start_value: 2, end_value: 3, data_file_id: d.id, data_file_version: 2)
-
-    assert_not_equal 0, d.find_version(2).studied_factors.count
-    assert_equal sf2, d.find_version(2).studied_factors.first
-    assert_not_equal sf2, d.find_version(1).studied_factors.first
-    assert_equal sf, d.find_version(1).studied_factors.first
-  end
-
   def test_should_add_nofollow_to_links_in_show_page
     assert_difference('ActivityLog.count') do
       get :show, params: { id: data_files(:data_file_with_links_in_description) }

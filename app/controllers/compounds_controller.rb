@@ -86,17 +86,10 @@ class CompoundsController < ApplicationController
    end
 
   def destroy
-    #destroy the factor_studied, experimental_condition and their links
-    @compound.studied_factors.each{|sf| sf.destroy}
-    @compound.experimental_conditions.each{|ec| ec.destroy}
     #destroy the mapping_links
-    @compound.mapping_links.each{|ml| ml.destroy}
+    @compound.mapping_links.destroy_all
     #destroy the synonyms and their links
-    @compound.synonyms.each do |s|
-      s.studied_factors.each{|sf| sf.destroy}
-      s.experimental_conditions.each{|ec| ec.destroy}
-      s.destroy
-    end
+    @compound.synonyms.destroy_all
 
     if @compound.destroy
       render js: "$j('#compound_row_#{@compound.id}').fadeOut(); $j('#edit_compound_#{@compound.id}').fadeOut();"
