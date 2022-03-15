@@ -54,7 +54,7 @@ class HumanDisease < ApplicationRecord
 
   validate do |human_disease|
     unless human_disease.bioportal_concept.nil? || human_disease.bioportal_concept.valid?
-      organism.bioportal_concept.errors.each do |error|
+      human_disease.bioportal_concept.errors.each do |error|
         errors.add(error.attribute, error.message)
       end
     end
