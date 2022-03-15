@@ -282,7 +282,6 @@ class AdminController < ApplicationController
     end
 
     Seek::Config.bioportal_api_key = params[:bioportal_api_key]
-    Seek::Config.sabiork_ws_base_url = params[:sabiork_ws_base_url] unless params[:sabiork_ws_base_url].nil?
     Seek::Config.recaptcha_enabled = string_to_boolean params[:recaptcha_enabled]
     Seek::Config.recaptcha_private_key = params[:recaptcha_private_key]
     Seek::Config.recaptcha_public_key = params[:recaptcha_public_key]

@@ -240,11 +240,6 @@ SEEK::Application.routes.draw do
   resources :subscriptions
   resources :saved_searches
   resources :uuids
-  resources :compounds do
-    collection do
-      post :search_in_sabiork
-    end
-  end
 
   # resources :project_folders
 

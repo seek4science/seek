@@ -86,30 +86,6 @@ Factory.define(:sop_version_with_blob, parent: :sop_version) do |f|
   end
 end
 
-# Compound
-Factory.define(:compound) do |f|
-  f.sequence(:name) { |n| "glucose #{n}" }
-end
-
-# Synonym
-Factory.define :synonym do |f|
-  f.name 'coffee'
-  f.association :substance, factory: :compound
-end
-
-# MappingLink
-Factory.define :mapping_link do |f|
-  f.association :substance, factory: :compound
-  f.association :mapping, factory: :mapping
-end
-
-# Mapping
-Factory.define :mapping do |f|
-  f.chebi_id '12345'
-  f.kegg_id '6789'
-  f.sabiork_id '4'
-end
-
 Factory.define(:api_pdf_sop, parent: :sop) do |f|
   f.association :content_blob, factory: :blank_pdf_content_blob
 end
