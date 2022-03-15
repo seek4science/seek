@@ -32,7 +32,7 @@
 
     <td id="delete_<%= compound.id -%>" class="destroy_compound">
        <%
-          confirm_string.concat("Are you sure you want to remove this compound#{compound.synonyms.blank? ? ', ' : ', synonyms'}#{(confirm_string.blank?) ? '' : ', links'}.This cannot be undone.")
+          confirm_string = "Are you sure you want to remove this compound#{compound.synonyms.blank? ? ', ' : ', synonyms'}#{(confirm_string.blank?) ? '' : ', links'}.This cannot be undone."
        %>
        <%= link_to image("destroy",:alt=>"Delete",:title=>"Delete this compound"),
          { :action => "destroy", :id => compound.id}, data: { confirm:  "#{confirm_string}" },

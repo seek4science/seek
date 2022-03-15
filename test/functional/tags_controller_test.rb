@@ -18,26 +18,6 @@ class TagsControllerTest < ActionController::TestCase
     assert_redirected_to all_anns_path
   end
 
-  test 'doesnt try and show cellranges and descriptions' do
-    p = Factory :person
-    df = Factory :data_file, policy: Factory(:public_policy)
-    exp = Factory :expertise, value: 'exp', source: p.user, annotatable: p
-    Factory :tool, value: exp.value, source: p.user, annotatable: p
-    Factory :tag, value: exp.value, source: p.user, annotatable: df
-    cell_range = cell_ranges(:cell_range_1)
-    Factory :annotation, value: exp.value, source: p.user, annotatable: cell_range
-    sf = Factory :studied_factor
-    Factory :annotation, attribute_name: 'description', value: exp.value, source: p.user, annotatable: sf
-
-    get :show, params: { id: exp.value }
-
-    assert_response :success
-
-    assert_select 'div.list_items_container' do
-      assert_select 'a[href=?]', person_path(p), text: p.name, count: 1
-      assert_select 'a[href=?]', data_file_path(df), text: df.title, count: 1
-    end
-  end
 
   test 'show for sample_type_tag' do
     st = Factory(:simple_sample_type, contributor: User.current_user.person, tags: 'fish, peas')
