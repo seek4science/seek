@@ -1,7 +1,5 @@
 /* ...
-*= require yui-grids
 *= require bootstrap_include
-*= require gadgets
 *= require acts_as_taggable_stylesheet
 *= require styles
 *= require favourites
@@ -17,13 +15,11 @@
 *= require asset_report
 *= require bives
 *= require full_scroll_table
-*= require match_making
 *= require faceted_browsing
 *= require project_folders
 *= require publishing
 *= require sharing_peremission_change
 *= require settings
-*= require new_styles
 *= require jquery-ui
 *= require bootstrap-typeahead
 *= require bootstrap-tagsinput
