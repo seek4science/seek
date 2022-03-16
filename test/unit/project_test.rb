@@ -597,13 +597,6 @@ class ProjectTest < ActiveSupport::TestCase
     refute project.can_delete?(user)
 
     project = Factory(:project)
-    Factory(:node, projects:[project])
-    project.work_groups.clear
-    project.reload
-    refute_empty project.nodes
-    refute project.can_delete?(user)
-
-    project = Factory(:project)
     Factory(:sample, projects:[project])
     project.work_groups.clear
     project.reload

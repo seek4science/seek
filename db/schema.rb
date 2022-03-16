@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_03_15_142103) do
+ActiveRecord::Schema.define(version: 2022_03_16_094857) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -1114,68 +1114,6 @@ ActiveRecord::Schema.define(version: 2022_03_15_142103) do
     t.string "position"
     t.datetime "created_at"
     t.datetime "updated_at"
-  end
-
-  create_table "node_auth_lookup",  force: :cascade do |t|
-    t.integer "user_id"
-    t.integer "asset_id"
-    t.boolean "can_view", default: false
-    t.boolean "can_manage", default: false
-    t.boolean "can_edit", default: false
-    t.boolean "can_download", default: false
-    t.boolean "can_delete", default: false
-    t.index ["user_id", "asset_id", "can_view"], name: "index_n_auth_lookup_on_user_id_and_asset_id_and_can_view"
-    t.index ["user_id", "can_view"], name: "index_n_auth_lookup_on_user_id_and_can_view"
-  end
-
-  create_table "node_versions", id: :integer,  force: :cascade do |t|
-    t.integer "node_id"
-    t.integer "version"
-    t.text "revision_comments"
-    t.integer "contributor_id"
-    t.string "title"
-    t.text "description"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.datetime "last_used_at"
-    t.string "first_letter", limit: 1
-    t.text "other_creators"
-    t.string "uuid"
-    t.integer "policy_id"
-    t.string "doi"
-    t.string "license"
-    t.string "deleted_contributor"
-    t.integer "visibility"
-    t.index ["contributor_id"], name: "index_node_versions_on_contributor"
-    t.index ["node_id"], name: "index_node_versions_on_node_id"
-  end
-
-  create_table "node_versions_projects", id: false,  force: :cascade do |t|
-    t.integer "project_id"
-    t.integer "version_id"
-  end
-
-  create_table "nodes", id: :integer,  force: :cascade do |t|
-    t.integer "contributor_id"
-    t.string "title"
-    t.text "description"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.datetime "last_used_at"
-    t.integer "version", default: 1
-    t.string "first_letter", limit: 1
-    t.text "other_creators"
-    t.string "uuid"
-    t.integer "policy_id"
-    t.string "doi"
-    t.string "license"
-    t.string "deleted_contributor"
-    t.index ["contributor_id"], name: "index_nodes_on_contributor"
-  end
-
-  create_table "nodes_projects", id: false,  force: :cascade do |t|
-    t.integer "project_id"
-    t.integer "node_id"
   end
 
   create_table "notifiee_infos", id: :integer,  force: :cascade do |t|
