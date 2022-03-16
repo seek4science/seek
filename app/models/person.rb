@@ -136,6 +136,11 @@ class Person < ApplicationRecord
   def person
     self
   end
+
+  def projects
+    # updating work groups doesn't change group memberships until you save. And vice versa.
+    work_groups.collect(&:project).uniq | group_memberships.collect { |gm| gm.work_group.project }
+  end
     
   # Returns the columns to be shown on the table view for the resource
   def columns_default
