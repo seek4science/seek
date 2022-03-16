@@ -313,7 +313,6 @@ SEEK::Application.routes.draw do
   resources :projects do
     collection do
       get :request_institutions
-      get :manage
       post :items_for_result
       get :guided_join
       get :guided_create

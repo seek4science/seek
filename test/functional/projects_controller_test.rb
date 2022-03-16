@@ -265,11 +265,6 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_redirected_to projects_path
   end
 
-  def test_admin_can_manage
-    get :manage, params: { id: Factory(:project) }
-    assert_response :success
-  end
-
   def test_non_admin_should_not_destroy_project
     login_as(:aaron)
     project = projects(:four)
@@ -303,12 +298,6 @@ class ProjectsControllerTest < ActionController::TestCase
       end
     end
 
-  end
-  
-  def test_non_admin_should_not_manage_projects
-    login_as(:aaron)
-    get :manage, params: { id: Factory(:project) }
-    assert_not_nil flash[:error]
   end
 
   test 'asset report with stuff in it can be accessed' do
