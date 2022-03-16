@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_03_14_113556) do
+ActiveRecord::Schema.define(version: 2022_03_15_142103) do
 
   create_table "activity_logs", id: :integer,  force: :cascade do |t|
     t.string "action"
@@ -2184,7 +2184,6 @@ ActiveRecord::Schema.define(version: 2022_03_14_113556) do
     t.datetime "updated_at"
     t.string "symbol"
     t.string "comment"
-    t.boolean "factors_studied", default: true
     t.integer "order"
   end
 
