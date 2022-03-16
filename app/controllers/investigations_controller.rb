@@ -100,7 +100,7 @@ class InvestigationsController < ApplicationController
 
   def update
     @investigation=Investigation.find(params[:id])
-    if params[:investigation][:ordered_study_ids]
+    if params[:investigation]&.[](:ordered_study_ids)
       a1 = params[:investigation][:ordered_study_ids]
       a1.permit!
       pos = 0
