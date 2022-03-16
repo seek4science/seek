@@ -474,6 +474,4 @@ class Person < ApplicationRecord
       end
     end
   end
-
-  include Seek::ProjectHierarchies::PersonExtension if Seek::Config.project_hierarchy_enabled
 end

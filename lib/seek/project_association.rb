@@ -2,7 +2,6 @@ module Seek
   module ProjectAssociation
     def self.included(klass)
       klass.class_eval do
-        include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
 
         @project_join_table ||= [table_name, 'projects'].sort.join('_')
         has_and_belongs_to_many :projects, join_table: @project_join_table,

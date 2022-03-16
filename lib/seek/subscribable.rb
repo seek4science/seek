@@ -75,7 +75,6 @@ module Seek
     end
 
     def set_subscription_job
-      projects = (Seek::Config.project_hierarchy_enabled) ? projects_and_descendants : self.projects
       SetSubscriptionsForItemJob.new(self, projects.to_a).queue_job
     end
 

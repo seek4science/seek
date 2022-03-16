@@ -25,12 +25,6 @@ class ConfigTest < ActiveSupport::TestCase
     assert_includes attributes, :events_enabled
   end
 
-  test 'project_hierarchy_enabled' do
-    with_config_value 'project_hierarchy_enabled', true do
-      assert Seek::Config.project_hierarchy_enabled
-    end
-  end
-
   test 'recaptcha setup?' do
     with_config_value :recaptcha_enabled, true do
       with_config_value :recaptcha_public_key, 'sdfsdf' do

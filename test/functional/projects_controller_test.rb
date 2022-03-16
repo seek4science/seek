@@ -60,16 +60,6 @@ class ProjectsControllerTest < ActionController::TestCase
     end
   end
 
-  def test_should_create_project_with_hierarchy
-    parent = Factory(:project, title: 'Test Parent')
-    assert_difference('Project.count') do
-      post :create, params: { project: { title: 'test', parent_id: parent.id } }
-    end
-
-    assert_redirected_to project_path(assigns(:project))
-    assert_includes assigns(:project).ancestors, parent
-  end
-
   test 'create project with default license' do
     person = Factory(:programme_administrator)
     login_as(person)
