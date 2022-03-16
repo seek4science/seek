@@ -481,8 +481,6 @@ SEEK::Application.routes.draw do
   resources :data_files, concerns: [:has_content_blobs, :has_versions, :has_doi, :publishable, :asset] do
     collection do
       get :filter
-      post :upload_for_tool
-      post :upload_from_email
       get :provide_metadata
       post :create_content_blob
       post :rightfield_extraction_ajax

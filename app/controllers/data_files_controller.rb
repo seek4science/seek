@@ -11,7 +11,7 @@ class DataFilesController < ApplicationController
   include Seek::AssetsCommon
 
   before_action :find_assets, only: [:index]
-  before_action :find_and_authorize_requested_item, except: [:index, :new, :upload_for_tool, :upload_from_email, :create, :create_content_blob,
+  before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :create_content_blob,
                                                              :preview, :update_annotations_ajax, :rightfield_extraction_ajax, :provide_metadata]
   before_action :find_display_asset, only: [:show, :explore, :download]
   before_action :get_sample_type, only: :extract_samples
@@ -76,49 +76,6 @@ class DataFilesController < ApplicationController
     else
       flash[:error] = flash.now[:error]
       redirect_to @data_file
-    end
-  end
-
-  def upload_for_tool
-    params[:data_file][:project_ids] = [params[:data_file].delete(:project_id)] if params[:data_file][:project_id]
-    @data_file = DataFile.new(data_file_params)
-
-    if handle_upload_data
-      @data_file.policy = Policy.new_for_upload_tool(@data_file, params[:recipient_id])
-
-      if @data_file.save
-        @data_file.creators = [current_person]
-        # send email to the file uploader and receiver
-        Mailer.file_uploaded(current_user, Person.find(params[:recipient_id]), @data_file).deliver_later
-
-        flash.now[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
-        render plain: flash.now[:notice]
-      else
-        errors = (@data_file.errors.map { |e| e.join(' ') }.join("\n"))
-        render plain: errors, status: 500
-      end
-    end
-  end
-
-  def upload_from_email
-    if current_user.is_admin? && Seek::Config.admin_impersonation_enabled
-      User.with_current_user Person.find(params[:sender_id]).user do
-        @data_file = DataFile.new(data_file_params)
-        if handle_upload_data
-          @data_file.policy = Policy.new_from_email(@data_file, params[:recipient_ids], params[:cc_ids])
-
-          if @data_file.save
-            @data_file.creators = [User.current_user.person]
-            flash.now[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
-            render plain: flash.now[:notice]
-          else
-            errors = (@data_file.errors.map { |e| e.join(' ') }.join("\n"))
-            render plain: errors, status: 500
-          end
-        end
-      end
-    else
-      render plain: 'This user is not permitted to act on behalf of other users', status: :forbidden
     end
   end
 
