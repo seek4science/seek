@@ -557,10 +557,6 @@ SEEK::Application.routes.draw do
 
   resources :workflow_classes, except: [:show]
 
-  resources concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
-    resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, only: [:index]
-  end
-
   resources :file_templates, concerns: [:has_content_blobs, :has_versions, :has_doi, :publishable, :asset] do
     collection do
       get :filter
