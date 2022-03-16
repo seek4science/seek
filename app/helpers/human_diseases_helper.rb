@@ -44,8 +44,6 @@ module HumanDiseasesHelper
 
   # Get a hash of appropriate related resources for the given resource. Also returns a hash of hidden resources
   def get_transitive_related_resources(resource, limit = nil)
-    return resource_hash_lazy_transitive_load(resource) if Seek::Config.tabs_lazy_load_enabled
-
     items_hash = {}
     resource.class.related_type_methods.each_key do |type|
       next if type == 'Organism' && !resource.is_a?(Sample)
@@ -57,18 +55,6 @@ module HumanDiseasesHelper
     end
 
     related_items_hash(items_hash, limit)
-  end
-
-  def resource_hash_lazy_transitive_load(resource, limit = nil)
-    resource_hash = {}
-    all_related_items_hash = get_transitive_related_resources(resource)
-    all_related_items_hash.each_key do |resource_type|
-      all_related_items_hash[resource_type][:items] = all_related_items_hash[resource_type][:items].uniq.compact
-      unless all_related_items_hash[resource_type][:items].empty?
-        resource_hash[resource_type] = all_related_items_hash[resource_type][:items]
-      end
-    end
-    resource_hash
   end
 
   def get_human_diseases_plot_data()

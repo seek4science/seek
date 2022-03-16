@@ -97,7 +97,6 @@ SEEK::Application.routes.draw do
     collection do
       get :typeahead
       get :preview
-      post :items_for_result # Faceted browsing
     end
     member do
       post :request_contact
@@ -111,7 +110,6 @@ SEEK::Application.routes.draw do
     collection do
       get :typeahead
       get :preview
-      post :items_for_result # Faceted browsing
     end
     member do
       post :update_annotations_ajax
@@ -287,7 +285,6 @@ SEEK::Application.routes.draw do
       get :is_this_you
       get :get_work_group
       post :userless_project_selected_ajax
-      post :items_for_result
       post :bulk_destroy
     end
     member do
@@ -314,7 +311,6 @@ SEEK::Application.routes.draw do
     collection do
       get :request_institutions
       get :manage
-      post :items_for_result
       get :guided_join
       get :guided_create
       post :request_join
@@ -398,7 +394,6 @@ SEEK::Application.routes.draw do
     collection do
       get :request_all
       get :request_all_sharing_form
-      post :items_for_result
       get  :typeahead
     end
     resources :people, :programmes, :projects, :specimens, only: [:index]
@@ -429,7 +424,6 @@ SEEK::Application.routes.draw do
       post :batch_create
       post :create_content_blob
       post :investigation_selected_ajax
-      post :items_for_result
     end
     resources :snapshots, :only => [:show, :new, :create, :destroy] do
       member do
@@ -595,7 +589,6 @@ SEEK::Application.routes.draw do
       end
     end
     collection do
-      post :items_for_result
       get :awaiting_activation
     end
     member do
@@ -781,7 +774,6 @@ SEEK::Application.routes.draw do
   get '/search/' => 'search#index', as: :search
   get '/search/save' => 'search#save', as: :save_search
   get '/search/delete' => 'search#delete', as: :delete_search
-  post '/search/items_for_result' => 'search#items_for_result'
   get 'svg/:id.:format' => 'svg#show', as: :svg
   get '/tags/latest' => 'tags#latest', as: :latest_tags
   get '/tags/query' => 'tags#query', as: :query_tags

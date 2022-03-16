@@ -4,7 +4,6 @@ class PeopleController < ApplicationController
   include Seek::Publishing::PublishingCommon
   include Seek::Sharing::SharingCommon
   include Seek::Publishing::GatekeeperPublish
-  include Seek::FacetedBrowsing
   include Seek::DestroyHandling
   include Seek::AdminBulkAction
   include RelatedItemsHelper

@@ -228,10 +228,6 @@ module Seek
       value
     end
 
-    def facet_enable_for_page(controller)
-      facet_enable_for_pages.with_indifferent_access[controller.to_s]
-    end
-
     def sorting_for(controller)
       hash = sorting.with_indifferent_access
       hash[controller.to_s]&.to_sym
