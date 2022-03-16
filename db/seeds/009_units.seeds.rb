@@ -7,7 +7,7 @@ units.each do |unit|
   order=unit['order']
   title=unit['title']
   unit = Unit.find_or_initialize_by(symbol:symbol)
-  unit.update(comment:comment,order:order,title:title,factors_studied:factors_studied)
+  unit.update(comment:comment,order:order,title:title)
 end
 
 puts "Seeded units"
