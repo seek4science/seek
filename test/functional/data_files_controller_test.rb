@@ -647,7 +647,7 @@ class DataFilesControllerTest < ActionController::TestCase
     al = ActivityLog.last
     assert_equal 'download', al.action
     assert_equal df, al.activity_loggable
-    assert_equal 'attachment; filename="rightfield.xls"', @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"rightfield.xls\"; filename*=UTF-8''rightfield.xls", @response.header['Content-Disposition']
     assert_equal 'application/vnd.ms-excel', @response.header['Content-Type']
     assert_equal '9216', @response.header['Content-Length']
   end
@@ -657,7 +657,7 @@ class DataFilesControllerTest < ActionController::TestCase
       get :download, params: { id: Factory(:small_test_spreadsheet_datafile, policy: Factory(:public_policy), contributor: User.current_user.person).id }
     end
     assert_response :success
-    assert_equal 'attachment; filename="small-test-spreadsheet.xls"', @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"small-test-spreadsheet.xls\"; filename*=UTF-8''small-test-spreadsheet.xls", @response.header['Content-Disposition']
     assert_equal 'application/vnd.ms-excel', @response.header['Content-Type']
     assert_equal '7168', @response.header['Content-Length']
   end
@@ -1494,8 +1494,8 @@ class DataFilesControllerTest < ActionController::TestCase
     published_data_file.reload
 
     disable_authorization_checks do
-      published_data_file.find_version(1).update_attributes!(visibility: :registered_users)
-      published_data_file.find_version(2).update_attributes!(visibility: :public)
+      published_data_file.find_version(1).update!(visibility: :registered_users)
+      published_data_file.find_version(2).update!(visibility: :public)
     end
 
     logout
@@ -2072,7 +2072,7 @@ class DataFilesControllerTest < ActionController::TestCase
     df = Factory :data_file, license: 'CC-BY-4.0', policy: Factory(:public_policy)
     dfv = Factory :data_file_version_with_blob, data_file: df
 
-    df.update_attributes license: 'CC0-1.0'
+    df.update license: 'CC0-1.0'
 
     get :show, params: { id: df, version: 1 }
     assert_response :success
@@ -3524,7 +3524,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   def picture_file
-    fixture_file_upload('files/file_picture.png', 'image/png')
+    fixture_file_upload('file_picture.png', 'image/png')
   end
 
   def valid_data_file

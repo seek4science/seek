@@ -227,7 +227,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     workflow = Factory :workflow, license: 'CC-BY-4.0', policy: Factory(:public_policy)
     workflowv = Factory :workflow_version_with_blob, workflow: workflow
 
-    workflow.update_attributes license: 'CC0-1.0'
+    workflow.update license: 'CC0-1.0'
 
     get :show, params: { id: workflow, version: 1 }
     assert_response :success
@@ -389,7 +389,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     login_as(person)
     assert_difference('ContentBlob.count') do
       post :create_content_blob, params: {
-          content_blobs: [{ data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl', 'application/x-yaml') }],
+          content_blobs: [{ data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl', 'application/x-yaml') }],
           workflow_class_id: cwl.id }
     end
     assert_response :success
@@ -403,7 +403,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     logout
     assert_no_difference('ContentBlob.count') do
       post :create_content_blob, params: {
-          content_blobs: [{ data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl', 'application/x-yaml') }],
+          content_blobs: [{ data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl', 'application/x-yaml') }],
           workflow_class_id: cwl.id }
     end
     assert_response :redirect
@@ -416,9 +416,9 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_difference('ContentBlob.count') do
       post :create_ro_crate, params: {
           ro_crate: {
-              workflow: { data: fixture_file_upload('files/checksums.txt') },
-                          diagram: { data: fixture_file_upload('files/file_picture.png') },
-              abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
+              workflow: { data: fixture_file_upload('checksums.txt') },
+                          diagram: { data: fixture_file_upload('file_picture.png') },
+              abstract_cwl: { data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl') }
           },
           workflow_class_id: cwl.id
       }
@@ -430,7 +430,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
   test 'extract metadata' do
     cwl = Factory(:cwl_workflow_class)
-    post :create_content_blob, params: { content_blobs: [{ data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl', 'text/plain') }], workflow_class_id: cwl.id }
+    post :create_content_blob, params: { content_blobs: [{ data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl', 'text/plain') }], workflow_class_id: cwl.id }
     assert_response :success
     assert_equal 5, assigns[:metadata][:internals][:inputs].length
   end
@@ -543,9 +543,9 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_difference('ContentBlob.count') do
       post :create_ro_crate, params: {
           ro_crate: {
-              workflow: { data: fixture_file_upload('files/file with spaces in name.txt') },
-              diagram: { data: fixture_file_upload('files/file_picture.png') },
-              abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
+              workflow: { data: fixture_file_upload('file with spaces in name.txt') },
+              diagram: { data: fixture_file_upload('file_picture.png') },
+              abstract_cwl: { data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl') }
           },
           workflow_class_id: cwl.id
       }
@@ -604,7 +604,7 @@ class WorkflowsControllerTest < ActionController::TestCase
                        license: 'MIT', other_creators: 'Jane Smith, John Smith', policy: Factory(:public_policy))
     disable_authorization_checks do
       workflow.save_as_new_version
-      workflow.update_attributes(title: 'V2 title', description: 'V2 description', workflow_class_id: Factory(:galaxy_workflow_class).id)
+      workflow.update(title: 'V2 title', description: 'V2 description', workflow_class_id: Factory(:galaxy_workflow_class).id)
       Factory(:generated_galaxy_ro_crate, asset: workflow, asset_version: 2)
     end
 
@@ -644,9 +644,9 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_difference('ContentBlob.count') do
       post :create_ro_crate, params: {
           ro_crate: {
-              workflow: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') },
-                          diagram: { data: fixture_file_upload('files/file_picture.png') },
-              abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
+              workflow: { data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl') },
+                          diagram: { data: fixture_file_upload('file_picture.png') },
+              abstract_cwl: { data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl') }
           },
           workflow_class_id: cwl.id
       }
@@ -807,7 +807,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'https://raw.githubusercontent.com/bob/workflow/master/abstract.cwl'
 
     galaxy = Factory(:galaxy_workflow_class)
-    post :create_content_blob, params: { content_blobs: [{ data: fixture_file_upload('files/workflows/all_remote.crate.zip', 'application/zip') }], workflow_class_id: galaxy.id }
+    post :create_content_blob, params: { content_blobs: [{ data: fixture_file_upload('workflows/all_remote.crate.zip', 'application/zip') }], workflow_class_id: galaxy.id }
     assert_response :success
     assert_equal 5, assigns[:metadata][:internals][:inputs].length
   end
@@ -856,7 +856,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   test 'RO-Crate with no main workflow throws error' do
     assert_no_difference('Git::Repository.count') do
       post :create_from_ro_crate, params: {
-        ro_crate: { data: fixture_file_upload('files/workflows/no-main-workflow.crate.zip', 'application/zip') }
+        ro_crate: { data: fixture_file_upload('workflows/no-main-workflow.crate.zip', 'application/zip') }
       }
     end
 

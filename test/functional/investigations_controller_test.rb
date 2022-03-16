@@ -32,7 +32,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     inv = Factory :investigation, contributor: User.current_user.person
     get :show, params: { id: inv, format: 'ro' }
     assert_response :success
-    assert_equal "attachment; filename=\"investigation-#{inv.id}.ro.zip\"", @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"investigation-#{inv.id}.ro.zip\"; filename*=UTF-8''investigation-#{inv.id}.ro.zip", @response.header['Content-Disposition']
     assert_equal 'application/vnd.wf4ever.robundle+zip', @response.header['Content-Type']
     assert @response.header['Content-Length'].to_i > 10
   end

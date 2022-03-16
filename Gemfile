@@ -1,13 +1,13 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-gem 'rails', '~> 5.2.4.0'
+gem 'rails', '~> 6.1.4', '>= 6.1.4.4'
 gem 'rdoc'
 
 #database adaptors
 gem 'mysql2'
 gem 'pg'
-gem 'sqlite3'
+gem 'sqlite3', '~> 1.4'
 
 gem 'feedjira', '~>1'
 gem 'google-analytics-rails'
@@ -24,19 +24,17 @@ gem 'bio', '~> 1.5.1'
 gem 'sunspot_rails'
 gem 'progress_bar'
 gem 'savon', '1.1.0'
-gem 'dynamic_form'
 gem 'delayed_job_active_record'
 gem 'daemons'
-gem 'linkeddata'
-gem 'rdf'
+gem 'linkeddata', '~> 3.2.0'
 gem 'indefinite_article'
 
 gem 'openseek-api'
 # for fancy content escaping in openbis integration
 gem 'loofah'
-gem 'jbuilder'
+gem 'jbuilder', '~> 2.7'
 gem 'jbuilder-json_api'
-gem 'active_model_serializers', '~> 0.10.2'
+gem 'active_model_serializers', '~> 0.10.13'
 gem 'rubyzip'
 
 gem 'equivalent-xml'
@@ -79,7 +77,7 @@ gem 'mimemagic','~> 0.3.7'
 gem 'auto_strip_attributes'
 gem 'coffee-rails', '~> 4.2'
 gem 'bootstrap-sass', '>=3.4.1'
-gem 'sass-rails', '~> 5.0'
+gem 'sass-rails', '>= 6'
 gem 'sprockets-rails'
 
 gem 'ro-bundle', '~> 0.3.0'
@@ -89,7 +87,7 @@ gem 'zenodo-client', git: 'https://github.com/seek4science/zenodo-client.git'
 gem 'unicorn-rails'
 gem 'seedbank'
 
-gem 'rspec-rails','~> 3.6'
+gem 'rspec-rails','~> 5.1'
 
 gem 'citeproc-ruby', '~> 2.0.0'
 gem 'csl-styles', '~> 2.0.0'
@@ -117,12 +115,11 @@ gem 'private_address_check'
 # Rails 5 upgrade
 gem 'rails-html-sanitizer'
 
-# Rails 5.2 upgrade
-gem 'bootsnap', '>= 1.1.0', require: false
+gem 'bootsnap', '>= 1.4.4', require: false
 
 gem 'activerecord-import'
 
-gem "puma", "~>4.3"
+gem "puma", "~> 5.0"
 
 gem "doorkeeper", ">= 5.2.5"
 
@@ -140,7 +137,7 @@ gem 'commonmarker'
 
 gem 'rack-cors', require: 'rack/cors'
 
-gem 'addressable', '~> 2.8.0'
+gem 'addressable'
 
 group :production do
   gem 'passenger'
@@ -156,6 +153,10 @@ group :development do
   gem 'gem-licenses'
   gem "better_errors"
   gem "binding_of_caller"
+
+  gem 'web-console', '>= 4.1.0'
+  gem 'rack-mini-profiler', '~> 2.0'
+  gem 'listen', '~> 3.3'
 end
 
 group :test do
@@ -172,6 +173,8 @@ group :test do
   gem 'whenever-test'
   gem 'json-schema'
   gem 'json-diff'
+  # Easy installation and use of web drivers to run system tests with browsers
+  gem 'webdrivers'
 end
 
 group :test, :development do

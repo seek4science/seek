@@ -3,7 +3,7 @@
 <%= folding_panel("Images (<span id='images_count'>#{@help_document.images.size}</span>)".html_safe, collapsed, id: 'help-image-box') do %>
   <div class="help_upload_box">
     <% if @error_text.present? %>
-      <div id="errorExplanation">
+      <div id="error_explanation">
         <h5>The following errors prevented your image being uploaded</h5>
         <ul>
           <% @error_text.each do |e| %>

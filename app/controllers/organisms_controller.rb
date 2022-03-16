@@ -74,7 +74,7 @@ class OrganismsController < ApplicationController
   def update
 
     respond_to do |format|
-      if @organism.update_attributes(organism_params)
+      if @organism.update(organism_params)
         flash[:notice] = 'Organism was successfully updated.'
         format.html { redirect_to organism_path(@organism) }
         format.json {render json: @organism, include: [params[:include]]}

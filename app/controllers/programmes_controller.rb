@@ -48,7 +48,7 @@ class ProgrammesController < ApplicationController
 
   def update
     respond_to do |format|
-      if @programme.update_attributes(programme_params)
+      if @programme.update(programme_params)
         flash[:notice] = "The #{t('programme').capitalize} was successfully updated"
         format.html { redirect_to(@programme) }
         format.json { render json: @programme, include: [params[:include]] }

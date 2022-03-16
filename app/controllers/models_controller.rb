@@ -98,7 +98,7 @@ class ModelsController < ApplicationController
     update_sharing_policies @model
     update_relationships(@model, params)
     respond_to do |format|
-      if @model.update_attributes(model_params)
+      if @model.update(model_params)
         flash[:notice] = "#{t('model')} metadata was successfully updated."
         format.html { redirect_to model_path(@model) }
         format.json {render json: @model, include: [params[:include]]}

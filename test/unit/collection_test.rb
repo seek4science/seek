@@ -69,7 +69,7 @@ class CollectionTest < ActiveSupport::TestCase
       person.add_to_project_and_institution(Factory(:project), person.institutions.first)
       projects = person.projects
       assert_equal 2,projects.count
-      collection.update_attributes(project_ids: projects.map(&:id))
+      collection.update(project_ids: projects.map(&:id))
       collection.save!
       collection.reload
       assert_equal projects.sort, collection.projects.sort

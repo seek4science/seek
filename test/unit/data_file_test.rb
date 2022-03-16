@@ -190,7 +190,7 @@ class DataFileTest < ActiveSupport::TestCase
     df = Factory :data_file, title: unupdated_title
     User.current_user = nil
 
-    assert !df.update_attributes(title: 'Updated Title')
+    assert !df.update(title: 'Updated Title')
     assert_equal unupdated_title, df.reload.title
   end
 

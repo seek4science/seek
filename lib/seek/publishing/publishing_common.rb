@@ -193,7 +193,7 @@ module Seek
               begin
 
                 permission = item.policy.permissions.where(contributor: gatekeeper).first_or_initialize
-                permission.update_attributes(contributor: gatekeeper, access_type: Policy::ACCESSIBLE)
+                permission.update(contributor: gatekeeper, access_type: Policy::ACCESSIBLE)
 
               rescue Exception => e
                 Rails.logger.error("Error when granting the accessible permission to the owner #{gatekeeper.name} - #{e.message}")

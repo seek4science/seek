@@ -528,7 +528,7 @@ class WorkflowTest < ActiveSupport::TestCase
     workflow = Factory(:annotationless_local_git_workflow, workflow_class: Factory(:unextractable_workflow_class))
     assert workflow.git_version.mutable
     disable_authorization_checks do
-      workflow.update_attributes!(title: 'new title')
+      workflow.update!(title: 'new title')
       assert_equal 'new title', workflow.reload.title
       assert_equal 'new title', workflow.git_version.reload.title
     end
@@ -539,7 +539,7 @@ class WorkflowTest < ActiveSupport::TestCase
     disable_authorization_checks do
       workflow.git_version.lock
       refute workflow.git_version.mutable
-      workflow.update_attributes!(title: 'new title')
+      workflow.update!(title: 'new title')
       assert_equal 'new title', workflow.reload.title
       assert_equal 'new title', workflow.git_version.reload.title
     end

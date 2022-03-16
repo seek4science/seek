@@ -15,7 +15,7 @@ class GitControllerTest < ActionController::TestCase
 
     post :add_file, params: { workflow_id: @workflow.id, version: @git_version.version,
                               file: { path: 'new-file.txt',
-                                      data: fixture_file_upload('files/little_file.txt') } }
+                                      data: fixture_file_upload('little_file.txt') } }
 
     assert_redirected_to workflow_path(@workflow, tab: 'files')
     assert assigns(:git_version).file_exists?('new-file.txt')
@@ -26,7 +26,7 @@ class GitControllerTest < ActionController::TestCase
     refute @git_version.file_exists?('new-file.txt')
 
     post :add_file, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'new-file.txt',
-                              file: { data: fixture_file_upload('files/little_file.txt') } }
+                              file: { data: fixture_file_upload('little_file.txt') } }
 
     assert_redirected_to workflow_path(@workflow, tab: 'files')
     assert assigns(:git_version).file_exists?('new-file.txt')
@@ -38,7 +38,7 @@ class GitControllerTest < ActionController::TestCase
 
     post :add_file, params: { workflow_id: @workflow.id, version: @git_version.version,
                               file: { path: '',
-                                      data: fixture_file_upload('files/little_file.txt') } }
+                                      data: fixture_file_upload('little_file.txt') } }
 
     assert_redirected_to workflow_path(@workflow, tab: 'files')
     assert assigns(:git_version).file_exists?('little_file.txt')
@@ -51,7 +51,7 @@ class GitControllerTest < ActionController::TestCase
 
     post :add_file, params: { workflow_id: @workflow.id, version: @git_version.version,
                               file: { path: 'new-file.txt',
-                                      data: fixture_file_upload('files/little_file.txt') } }
+                                      data: fixture_file_upload('little_file.txt') } }
 
     assert_redirected_to root_path
     assert flash[:error].include?('authorized')
@@ -64,7 +64,7 @@ class GitControllerTest < ActionController::TestCase
 
     post :add_file, params: { workflow_id: @workflow.id, version: @git_version.version,
                               file: { path: 'new-file.txt',
-                                      data: fixture_file_upload('files/little_file.txt') } }
+                                      data: fixture_file_upload('little_file.txt') } }
 
     assert_redirected_to workflow_path(@workflow, tab: 'files')
     assert flash[:error].include?('cannot make changes')
@@ -342,7 +342,7 @@ class GitControllerTest < ActionController::TestCase
 
     post :add_file, params: { workflow_id: @workflow.id, version: @git_version.version,
                               file: { path: '/////',
-                                      data: fixture_file_upload('files/little_file.txt') } }
+                                      data: fixture_file_upload('little_file.txt') } }
 
     assert_redirected_to workflow_path(@workflow, tab: 'files')
     refute assigns(:git_version).file_exists?('/////')

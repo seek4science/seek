@@ -50,7 +50,7 @@ class PlaceholdersController < ApplicationController
 
     respond_to do |format|
 
-      if @placeholder.update_attributes(placeholder_params)
+      if @placeholder.update(placeholder_params)
         flash[:notice] = "#{t('placeholder')} metadata was successfully updated."
         format.html { redirect_to placeholder_path(@placeholder) }
         format.json { render json: @placeholder, include: [params[:include]] }

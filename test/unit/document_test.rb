@@ -171,7 +171,7 @@ class DocumentTest < ActiveSupport::TestCase
       person.add_to_project_and_institution(Factory(:project),person.institutions.first)
       projects = person.projects
       assert_equal 2,projects.count
-      document.update_attributes(project_ids: projects.map(&:id))
+      document.update(project_ids: projects.map(&:id))
       document.save!
       document.reload
       assert_equal projects.sort, document.projects.sort

@@ -501,7 +501,7 @@ class ContentBlobTest < ActiveSupport::TestCase
 
     content = File.open(content_blob.filepath('txt'), 'rb').read
 
-    assert content.mb_chars.normalize.include?('This is a rtf format')
+    assert content.mb_chars.unicode_normalize(:nfd).include?('This is a rtf format')
   end
 
   test 'convert_office should convert txt to pdf' do

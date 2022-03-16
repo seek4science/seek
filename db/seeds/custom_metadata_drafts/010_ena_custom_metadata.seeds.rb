@@ -3,25 +3,25 @@ puts 'Seeded ENA Metadata'
 # Initialisation of aliases for common sample attributes types, for easier use.
 
 int_type = SampleAttributeType.find_or_initialize_by(title: 'Integer')
-int_type.update_attributes(base_type: Seek::Samples::BaseType::INTEGER, placeholder: '1')
+int_type.update(base_type: Seek::Samples::BaseType::INTEGER, placeholder: '1')
 
 bool_type = SampleAttributeType.find_or_initialize_by(title: 'Boolean')
-bool_type.update_attributes(base_type: Seek::Samples::BaseType::BOOLEAN)
+bool_type.update(base_type: Seek::Samples::BaseType::BOOLEAN)
 
 float_type = SampleAttributeType.find_or_initialize_by(title: 'Real number')
-float_type.update_attributes(base_type: Seek::Samples::BaseType::FLOAT, placeholder: '0.5')
+float_type.update(base_type: Seek::Samples::BaseType::FLOAT, placeholder: '0.5')
 
 date_type = SampleAttributeType.find_or_initialize_by(title: 'Date')
-date_type.update_attributes(base_type: Seek::Samples::BaseType::DATE, placeholder: 'January 1, 2015')
+date_type.update(base_type: Seek::Samples::BaseType::DATE, placeholder: 'January 1, 2015')
 
 string_type = SampleAttributeType.find_or_initialize_by(title: 'String')
-string_type.update_attributes(base_type: Seek::Samples::BaseType::STRING)
+string_type.update(base_type: Seek::Samples::BaseType::STRING)
 
 cv_type = SampleAttributeType.find_or_initialize_by(title: 'Controlled Vocabulary')
-cv_type.update_attributes(base_type: Seek::Samples::BaseType::CV)
+cv_type.update(base_type: Seek::Samples::BaseType::CV)
 
 text_type = SampleAttributeType.find_or_initialize_by(title: 'Text')
-text_type.update_attributes(base_type: Seek::Samples::BaseType::TEXT, placeholder: '1')
+text_type.update(base_type: Seek::Samples::BaseType::TEXT, placeholder: '1')
 
 # helper to create sample controlled vocab
 def create_sample_controlled_vocab_terms_attributes(array)

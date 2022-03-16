@@ -83,7 +83,7 @@ class SiteAnnouncementsController < ApplicationController
     @site_announcement = SiteAnnouncement.find(params[:id])
 
     respond_to do |format|
-      if @site_announcement.update_attributes(site_announcement_params)
+      if @site_announcement.update(site_announcement_params)
         flash[:notice] = 'Announcement was successfully updated.'
         format.html { redirect_to(@site_announcement) }
       else

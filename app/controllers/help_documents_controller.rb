@@ -52,7 +52,7 @@ class HelpDocumentsController < ApplicationController
       @help_document.title = params[:help_document][:title]
     end   
     respond_to do |format|
-      if !@preview && @help_document.update_attributes(help_document_params)
+      if !@preview && @help_document.update(help_document_params)
         format.html { redirect_to(@help_document) }
       elsif @preview
         format.html { render :action => "edit" }

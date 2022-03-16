@@ -113,7 +113,7 @@ class InvestigationsController < ApplicationController
         format.html { redirect_to(@investigation) }
       end
     else
-      @investigation.update_attributes(investigation_params)
+      @investigation.update(investigation_params)
       update_sharing_policies @investigation
       update_relationships(@investigation, params)
 

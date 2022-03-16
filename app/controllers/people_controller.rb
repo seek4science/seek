@@ -165,7 +165,7 @@ class PeopleController < ApplicationController
     end
 
     respond_to do |format|
-      if @person.update_attributes(person_params) && set_group_membership_project_position_ids(@person, params)
+      if @person.update(person_params) && set_group_membership_project_position_ids(@person, params)
         flash[:notice] = 'Person was successfully updated.'
         format.html { redirect_to(@person) }
         format.json {render json: @person, include: [params[:include]]}

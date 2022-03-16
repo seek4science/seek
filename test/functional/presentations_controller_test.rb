@@ -186,7 +186,7 @@ class PresentationsControllerTest < ActionController::TestCase
     al = ActivityLog.last
     assert_equal 'download', al.action
     assert_equal pres, al.activity_loggable
-    assert_equal 'attachment; filename="ppt_presentation.ppt"', @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"ppt_presentation.ppt\"; filename*=UTF-8''ppt_presentation.ppt", @response.header['Content-Disposition']
     assert_equal 'application/vnd.ms-powerpoint', @response.header['Content-Type']
     assert_equal '82432', @response.header['Content-Length']
   end
@@ -329,7 +329,7 @@ class PresentationsControllerTest < ActionController::TestCase
     presentation = Factory :presentation, license: 'CC-BY-4.0', policy: Factory(:public_policy)
     presentationv = Factory :presentation_version_with_blob, presentation: presentation
 
-    presentation.update_attributes license: 'CC0-1.0'
+    presentation.update license: 'CC0-1.0'
 
     get :show, params: { id: presentation, version: 1 }
     assert_response :success

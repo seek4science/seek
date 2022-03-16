@@ -51,10 +51,10 @@ private
   # be set to nil after cell_range= is called.
   def valid_cell_range
     if start_row.nil? || start_column.nil? || end_row.nil? || end_column.nil?
-      errors[:base] << "Invalid cell range entered. Must be in the format of <b>A1</b> or <b>A1:B1</b>"
+      errors.add(:base, "Invalid cell range entered. Must be in the format of <b>A1</b> or <b>A1:B1</b>")
       return false
     elsif  !worksheet.nil? && (start_row < 1 || start_column < 1 || end_row > worksheet.last_row || end_column > worksheet.last_column)
-      errors[:base] << "One or more cells between <b>#{to_alpha(start_column)}#{start_row}</b> and <b>#{to_alpha(end_column)}#{end_row}</b> are outside the worksheets range. Please select cells between <b>A1</b> and <b>#{to_alpha(worksheet.last_column)}#{worksheet.last_row}</b>"
+      errors.add(:base, "One or more cells between <b>#{to_alpha(start_column)}#{start_row}</b> and <b>#{to_alpha(end_column)}#{end_row}</b> are outside the worksheets range. Please select cells between <b>A1</b> and <b>#{to_alpha(worksheet.last_column)}#{worksheet.last_row}</b>")
       return false
     else
       return true

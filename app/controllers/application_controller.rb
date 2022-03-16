@@ -536,8 +536,8 @@ class ApplicationController < ActionController::Base
 
   def json_api_errors(object)
     hash = { errors: [] }
-    hash[:errors] = object.errors.map do |attribute, message|
-      segments = attribute.to_s.split('.')
+    hash[:errors] = object.errors.map do |error|
+      segments = error.attribute.to_s.split('.')
       attr = segments.first
       if !['content_blobs', 'policy'].include?(attr) && object.class.reflect_on_association(attr)
         base = '/data/relationships'
@@ -547,7 +547,7 @@ class ApplicationController < ActionController::Base
 
       {
           source: { pointer: "#{base}/#{attr}" },
-          detail: "#{segments[1..-1].join(' ') + ' ' if segments.length > 1}#{message}"
+          detail: "#{segments[1..-1].join(' ') + ' ' if segments.length > 1}#{error.message}"
       }
     end
 

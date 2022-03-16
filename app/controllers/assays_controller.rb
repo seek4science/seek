@@ -121,7 +121,7 @@ class AssaysController < ApplicationController
     update_relationships(@assay, params)
 
     respond_to do |format|
-      if @assay.update_attributes(assay_params)
+      if @assay.update(assay_params)
         flash[:notice] = "#{t('assays.assay')} was successfully updated."
         format.html { redirect_to(@assay) }
         format.json {render json: @assay, include: [params[:include]]}

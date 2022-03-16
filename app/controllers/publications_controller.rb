@@ -108,7 +108,7 @@ class PublicationsController < ApplicationController
     update_annotations(params[:tag_list], @publication) if params.key?(:tag_list)
     update_sharing_policies @publication
 
-    if @publication.update_attributes(publication_params)
+    if @publication.update(publication_params)
       respond_to do |format|
         flash[:notice] = 'Publication was successfully updated.'
         format.html { redirect_to(@publication) }
@@ -335,7 +335,7 @@ class PublicationsController < ApplicationController
       end
     else
       @publication.publication_authors.each do |author|
-        author.update_attributes(person_id: nil) unless author.person_id.nil?
+        author.update(person_id: nil) unless author.person_id.nil?
       end
       @error = 'Please enter either a DOI or a PubMed ID for the publication.'
     end
@@ -648,7 +648,7 @@ class PublicationsController < ApplicationController
         text.gsub!(/[#{s[0..-2]}]/, s[-1..-1])
       end
 
-      codepoints = text.mb_chars.normalize(:d).split(//u)
+      codepoints = text.mb_chars.unicode_normalize(:nfd).split(//u)
       ascii = codepoints.map(&:to_s).reject { |e| e.length > 1 }.join
 
       last_name_matches = Person.where(last_name: ascii)

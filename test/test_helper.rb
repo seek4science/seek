@@ -1,8 +1,7 @@
 require 'simplecov'
 SimpleCov.start 'rails'
 ENV['RAILS_ENV'] ||= 'test'
-
-require File.expand_path(File.dirname(__FILE__) + '/../config/environment')
+require_relative '../config/environment'
 require 'rails/test_help'
 
 require 'rest_test_cases'
@@ -98,7 +97,7 @@ class ActiveSupport::TestCase
   teardown :clear_current_user
 
   def file_for_upload
-    fixture_file_upload('files/little_file_v2.txt', 'text/plain')
+    fixture_file_upload('little_file_v2.txt', 'text/plain')
   end
 
   def skip_rest_schema_check?

@@ -146,11 +146,11 @@ class GitConverterTest < ActiveSupport::TestCase
     v1 = workflow.latest_version
     v2 = nil
     disable_authorization_checks do
-      v1.update_attributes(visibility: :private)
+      v1.update(visibility: :private)
       Factory(:cwl_content_blob, asset: workflow, asset_version: 2)
       workflow.save_as_new_version
       v2 = workflow.latest_version
-      v2.update_attributes(doi: '10.81082/dev-workflowhub.workflow.136.1',
+      v2.update(doi: '10.81082/dev-workflowhub.workflow.136.1',
                            license: 'CC-BY-4.0',
                            title: 'Second Title',
                            description: 'abcxyz',

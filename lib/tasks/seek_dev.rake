@@ -106,7 +106,7 @@ namespace :seek_dev do
       project.save!
       institution.projects << project
       institution.save!
-      p.update_attributes('work_group_ids' => [project.work_groups.first.id.to_s])
+      p.update('work_group_ids' => [project.work_groups.first.id.to_s])
     end
   end
 

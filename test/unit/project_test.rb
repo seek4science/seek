@@ -302,19 +302,19 @@ class ProjectTest < ActiveSupport::TestCase
     refute_includes project.project_administrators, person
     refute_includes project.project_administrators, another_person
 
-    project.update_attributes(project_administrator_ids: [person.id.to_s])
+    project.update(project_administrator_ids: [person.id.to_s])
 
     assert_includes project.project_administrators, person
     refute_includes project.project_administrators, another_person
 
-    project.update_attributes(project_administrator_ids: [another_person.id.to_s])
+    project.update(project_administrator_ids: [another_person.id.to_s])
 
     refute_includes project.project_administrators, person
     assert_includes project.project_administrators, another_person
 
     # cannot change to a person from another project
     person_in_other_project = Factory(:person)
-    project.update_attributes(project_administrator_ids: [person_in_other_project.id.to_s])
+    project.update(project_administrator_ids: [person_in_other_project.id.to_s])
 
     refute_includes project.project_administrators, person
     refute_includes project.project_administrators, another_person
@@ -334,24 +334,24 @@ class ProjectTest < ActiveSupport::TestCase
     refute_includes project.asset_gatekeepers, person
     refute_includes project.asset_gatekeepers, another_person
 
-    project.update_attributes(asset_gatekeeper_ids: [person.id.to_s])
+    project.update(asset_gatekeeper_ids: [person.id.to_s])
 
     assert_includes project.asset_gatekeepers, person
     refute_includes project.asset_gatekeepers, another_person
 
-    project.update_attributes(asset_gatekeeper_ids: [another_person.id.to_s])
+    project.update(asset_gatekeeper_ids: [another_person.id.to_s])
 
     refute_includes project.asset_gatekeepers, person
     assert_includes project.asset_gatekeepers, another_person
 
     # 2 at once
-    project.update_attributes(asset_gatekeeper_ids: [person.id.to_s, another_person.id.to_s])
+    project.update(asset_gatekeeper_ids: [person.id.to_s, another_person.id.to_s])
     assert_includes project.asset_gatekeepers, person
     assert_includes project.asset_gatekeepers, another_person
 
     # cannot change to a person from another project
     person_in_other_project = Factory(:person)
-    project.update_attributes(asset_gatekeeper_ids: [person_in_other_project.id.to_s])
+    project.update(asset_gatekeeper_ids: [person_in_other_project.id.to_s])
 
     refute_includes project.asset_gatekeepers, person
     refute_includes project.asset_gatekeepers, another_person
@@ -371,19 +371,19 @@ class ProjectTest < ActiveSupport::TestCase
     refute_includes project.pals, person
     refute_includes project.pals, another_person
 
-    project.update_attributes(pal_ids: [person.id.to_s])
+    project.update(pal_ids: [person.id.to_s])
 
     assert_includes project.pals, person
     refute_includes project.pals, another_person
 
-    project.update_attributes(pal_ids: [another_person.id.to_s])
+    project.update(pal_ids: [another_person.id.to_s])
 
     refute_includes project.pals, person
     assert_includes project.pals, another_person
 
     # cannot change to a person from another project
     person_in_other_project = Factory(:person)
-    project.update_attributes(pal_ids: [person_in_other_project.id.to_s])
+    project.update(pal_ids: [person_in_other_project.id.to_s])
 
     refute_includes project.pals, person
     refute_includes project.pals, another_person
@@ -403,24 +403,24 @@ class ProjectTest < ActiveSupport::TestCase
     refute_includes project.asset_housekeepers, person
     refute_includes project.asset_housekeepers, another_person
 
-    project.update_attributes(asset_housekeeper_ids: [person.id.to_s])
+    project.update(asset_housekeeper_ids: [person.id.to_s])
 
     assert_includes project.asset_housekeepers, person
     refute_includes project.asset_housekeepers, another_person
 
-    project.update_attributes(asset_housekeeper_ids: [another_person.id.to_s])
+    project.update(asset_housekeeper_ids: [another_person.id.to_s])
 
     refute_includes project.asset_housekeepers, person
     assert_includes project.asset_housekeepers, another_person
 
     # 2 at once
-    project.update_attributes(asset_housekeeper_ids: [person.id.to_s, another_person.id.to_s])
+    project.update(asset_housekeeper_ids: [person.id.to_s, another_person.id.to_s])
     assert_includes project.asset_housekeepers, person
     assert_includes project.asset_housekeepers, another_person
 
     # cannot change to a person from another project
     person_in_other_project = Factory(:person)
-    project.update_attributes(asset_housekeeper_ids: [person_in_other_project.id.to_s])
+    project.update(asset_housekeeper_ids: [person_in_other_project.id.to_s])
 
     refute_includes project.asset_housekeepers, person
     refute_includes project.asset_housekeepers, another_person
@@ -768,7 +768,7 @@ class ProjectTest < ActiveSupport::TestCase
       pal_ids: [person.id],
       asset_housekeeper_ids: [person.id]
     }
-    project.update_attributes(attr)
+    project.update(attr)
 
     assert_includes project.project_administrators, person
     assert_includes project.asset_gatekeepers, person
@@ -807,7 +807,7 @@ class ProjectTest < ActiveSupport::TestCase
     assert project_administrator.user.person.is_project_administrator?(project)
     assert project.can_manage?(project_administrator.user)
 
-    project_administrator.group_memberships.first.update_attributes(time_left_at: 1.day.ago)
+    project_administrator.group_memberships.first.update(time_left_at: 1.day.ago)
     project_administrator = project_administrator.reload
 
     assert_not_includes project_administrator.roles, 'project_administrator'
@@ -834,7 +834,7 @@ class ProjectTest < ActiveSupport::TestCase
     assert_nil project.nels_enabled
 
     assert_difference('Settings.count') do
-      project.update_attributes(nels_enabled: true)
+      project.update(nels_enabled: true)
     end
 
     assert project.nels_enabled
