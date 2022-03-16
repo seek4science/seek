@@ -12,7 +12,6 @@ class Project < ApplicationRecord
   has_and_belongs_to_many :models
   has_and_belongs_to_many :sops
   has_and_belongs_to_many :workflows
-  has_and_belongs_to_many :nodes
   has_and_belongs_to_many :publications
   has_and_belongs_to_many :events
   has_and_belongs_to_many :presentations
@@ -99,7 +98,7 @@ class Project < ApplicationRecord
   has_many :dependent_permissions, class_name: 'Permission', as: :contributor, dependent: :destroy
 
   def assets
-    data_files | sops | models | publications | presentations | documents | workflows | nodes | collections
+    data_files | sops | models | publications | presentations | documents | workflows | collections
   end
 
   def project_assets
