@@ -47,7 +47,7 @@ class CustomMetadataTest < ActiveSupport::TestCase
     cm = simple_test_object
     date = Time.now.to_s
     refute cm.valid?
-    cm.update_attributes(data: { name: 'Fred', age: 25, date: date })
+    cm.update(data: { name: 'Fred', age: 25, date: date })
     assert cm.valid?
     assert_equal 'Fred', cm.get_attribute_value('name')
     assert_equal 25, cm.get_attribute_value('age')
@@ -64,7 +64,7 @@ class CustomMetadataTest < ActiveSupport::TestCase
     date = Time.now.to_s
     refute cm.valid?
     exception = assert_raises Seek::JSONMetadata::Data::InvalidKeyException do
-      cm.update_attributes(data: { name: 'Fred', wrong_age: 25, wrong_date: date })
+      cm.update(data: { name: 'Fred', wrong_age: 25, wrong_date: date })
     end
 
     assert_match /culprits -/, exception.message
@@ -73,7 +73,7 @@ class CustomMetadataTest < ActiveSupport::TestCase
     cm = CustomMetadata.new(custom_metadata_type: Factory.build(:study_custom_metadata_type_with_spaces), item: Factory(:study))
 
     exception = assert_raises Seek::JSONMetadata::Data::InvalidKeyException do
-      cm.update_attributes(data: {
+      cm.update(data: {
                              'wrong full name' => 'Stuart Little',
                              'full address' => 'On earth'
                            })
@@ -86,7 +86,7 @@ class CustomMetadataTest < ActiveSupport::TestCase
   test 'mass assign attributes with spaces' do
     cm = CustomMetadata.new(custom_metadata_type: Factory.build(:study_custom_metadata_type_with_spaces), item: Factory(:study))
 
-    cm.update_attributes(data: {
+    cm.update(data: {
                            'full name' => 'Stuart Little',
                            'full address' => 'On earth'
                          })
@@ -98,7 +98,7 @@ class CustomMetadataTest < ActiveSupport::TestCase
   test 'mass assign attributes with symbols' do
     cm = CustomMetadata.new(custom_metadata_type: Factory.build(:study_custom_metadata_type_with_symbols), item: Factory(:study))
 
-    cm.update_attributes(data: {
+    cm.update(data: {
                            '+name' => '+name',
                            '-name' => '-name',
                            '&name' => '&name',

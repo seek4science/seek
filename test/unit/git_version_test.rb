@@ -400,9 +400,9 @@ class GitVersionTest < ActiveSupport::TestCase
     assert_empty v.blobs
     assert_empty v.remote_sources
 
-    assert_raise(URI::InvalidURIError) do
-      assert_difference('Git::Annotation.count', 0) do
-        assert_enqueued_jobs(0, only: RemoteGitContentFetchingJob) do
+    assert_difference('Git::Annotation.count', 0) do
+      assert_enqueued_jobs(0, only: RemoteGitContentFetchingJob) do
+        assert_raise(URI::InvalidURIError) do
           v.add_remote_file('blah.txt', '/mypc/files/something.txt')
         end
       end

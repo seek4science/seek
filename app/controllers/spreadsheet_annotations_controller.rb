@@ -41,7 +41,7 @@ class SpreadsheetAnnotationsController < ApplicationController
 
 
   def update
-    if @annotation.errors.empty? && @annotation.update_attributes(:value => params[:annotation_content])
+    if @annotation.errors.empty? && @annotation.update(:value => params[:annotation_content])
       respond_to do |format|
         format.html { render :partial => "spreadsheets/annotations", :locals=>{ :annotations => @content_blob.spreadsheet_annotations} }
       end

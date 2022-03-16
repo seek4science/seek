@@ -194,7 +194,7 @@ module Seek
         return false if attributes.nil? || attributes.empty?
         return false unless (ver = find_version(version_number_to_update))
 
-        rtn = ver.update_attributes(attributes)
+        rtn = ver.update(attributes)
 
         if rtn
           # if the latest version has been updated then update the main table as well

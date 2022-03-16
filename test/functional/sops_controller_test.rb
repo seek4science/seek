@@ -325,7 +325,7 @@ class SopsControllerTest < ActionController::TestCase
     # !!!description cannot be changed in new version but revision comments and file name,etc
 
     # create new version
-    post :create_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: fixture_file_upload('files/little_file_v2.txt', 'text/plain') }] }
+    post :create_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: fixture_file_upload('little_file_v2.txt', 'text/plain') }] }
     assert_redirected_to sop_path(assigns(:sop))
 
     s = Sop.find(s.id)
@@ -357,7 +357,7 @@ class SopsControllerTest < ActionController::TestCase
     al = ActivityLog.last
     assert_equal 'download', al.action
     assert_equal sop, al.activity_loggable
-    assert_equal "attachment; filename=\"ms_word_test.doc\"", @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"ms_word_test.doc\"; filename*=UTF-8''ms_word_test.doc", @response.header['Content-Disposition']
     assert_equal 'application/msword', @response.header['Content-Type']
     assert_equal '9216', @response.header['Content-Length']
   end
@@ -392,7 +392,7 @@ class SopsControllerTest < ActionController::TestCase
     refute s.can_edit?
 
     assert_no_difference('Sop::Version.count') do
-      post :create_version, params: { id: s, data: fixture_file_upload('files/file_picture.png'), revision_comments: 'This is a new revision' }
+      post :create_version, params: { id: s, data: fixture_file_upload('file_picture.png'), revision_comments: 'This is a new revision' }
     end
 
     assert_redirected_to sop_path(s)
@@ -829,7 +829,7 @@ class SopsControllerTest < ActionController::TestCase
     sop = Factory :sop, license: 'CC-BY-4.0', policy: Factory(:public_policy)
     sopv = Factory :sop_version_with_blob, sop: sop
 
-    sop.update_attributes license: 'CC0-1.0'
+    sop.update license: 'CC0-1.0'
 
     get :show, params: { id: sop, version: 1 }
     assert_response :success
@@ -961,7 +961,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'content blob filename precedence should take user input first' do
     stub_request(:any, 'http://example.com/url_filename.txt')
-        .to_return(body: 'hi', headers: { 'Content-Disposition' => 'attachment; filename="server_filename.txt"' })
+        .to_return(body: 'hi', headers: { 'Content-Disposition' => "attachment; filename=\"server_filename.txt\"; filename*=UTF-8''server_filename.txt" })
     sop = { title: 'Test', project_ids: [@project.id] }
     blob = { data_url: 'http://example.com/url_filename.txt', original_filename: 'user_filename.txt' }
 
@@ -976,7 +976,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'content blob filename precedence should take server filename second' do
     stub_request(:any, 'http://example.com/url_filename.txt')
-        .to_return(body: 'hi', headers: { 'Content-Disposition' => 'attachment; filename="server_filename.txt"' })
+        .to_return(body: 'hi', headers: { 'Content-Disposition' => "attachment; filename=\"server_filename.txt\"; filename*=UTF-8''server_filename.txt" })
     sop = { title: 'Test', project_ids: [@project.id] }
     blob = { data_url: 'http://example.com/url_filename.txt' }
 
@@ -1757,7 +1757,7 @@ class SopsControllerTest < ActionController::TestCase
   def picture_file(options = {})
     options.reverse_merge!({ filename: 'file_picture.png',
                              content_type: 'image/png',
-                             tempfile_fixture: 'files/file_picture.png' })
+                             tempfile_fixture: 'file_picture.png' })
     fixture_file_upload(options[:tempfile_fixture], options[:content_type])
   end
 

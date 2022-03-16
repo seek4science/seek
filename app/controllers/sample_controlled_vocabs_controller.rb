@@ -53,7 +53,7 @@ class SampleControlledVocabsController < ApplicationController
   end
 
   def update
-    @sample_controlled_vocab.update_attributes(cv_params)
+    @sample_controlled_vocab.update(cv_params)
     respond_to do |format|
       if @sample_controlled_vocab.save
         format.html do

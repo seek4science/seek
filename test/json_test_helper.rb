@@ -80,7 +80,7 @@ module JsonTestHelper
 
   def perform_jsonapi_checks
     assert_response :success
-    assert_equal 'application/vnd.api+json', @response.content_type
+    assert_equal 'application/vnd.api+json', @response.media_type
     assert JSON::Validator.validate(JSONAPI_SCHEMA_FILE_PATH, @response.body), 'Response did not validate against JSON-API schema'
   end
 

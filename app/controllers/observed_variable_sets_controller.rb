@@ -46,7 +46,7 @@ class ObservedVariableSetsController < ApplicationController
 
   def update
     @observed_variable_set = ObservedVariableSet.find(params[:id])
-    @observed_variable_set.update_attributes(observed_variable_set_params)
+    @observed_variable_set.update(observed_variable_set_params)
     if @observed_variable_set.save
       respond_to do |format|
         format.html { redirect_to @observed_variable_set}

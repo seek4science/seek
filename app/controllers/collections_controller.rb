@@ -31,7 +31,7 @@ class CollectionsController < ApplicationController
     update_relationships(@collection, params)
 
     respond_to do |format|
-      if @collection.update_attributes(collection_params)
+      if @collection.update(collection_params)
         flash[:notice] = "#{t('collection')} metadata was successfully updated."
         format.html { redirect_to collection_path(@collection) }
         format.json { render json: @collection, include: json_api_include_param }

@@ -79,7 +79,8 @@ class ContributedResourceSerializer < PCSSerializer
     }
   end
 
-  def self_link
+  link(:self) do
+    version_number = @scope.try(:[],:requested_version) || object.try(:version)
     if version_number
       polymorphic_path(object, version: version_number)
     else

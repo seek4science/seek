@@ -164,7 +164,7 @@ class SopTest < ActiveSupport::TestCase
       another_project = Factory(:project)
       @person.add_to_project_and_institution(another_project,@person.institutions.first)
       projects = [@project, another_project]
-      sop.update_attributes(project_ids: projects.map(&:id))
+      sop.update(project_ids: projects.map(&:id))
       sop.save!
       sop.reload
       assert_equal projects.sort, sop.projects.sort

@@ -112,7 +112,7 @@ class DocumentsControllerTest < ActionController::TestCase
       assert_no_difference('Document.count') do
         assert_difference('Document::Version.count') do
           assert_difference('ContentBlob.count') do
-            post :create_version, params: { id: document.id, content_blobs: [{ data: fixture_file_upload('files/little_file.txt') }], revision_comments: 'new version!' }
+            post :create_version, params: { id: document.id, content_blobs: [{ data: fixture_file_upload('little_file.txt') }], revision_comments: 'new version!' }
           end
         end
       end
@@ -1176,6 +1176,6 @@ class DocumentsControllerTest < ActionController::TestCase
   end
 
   def valid_content_blob
-    { data: fixture_file_upload('files/a_pdf_file.pdf'), data_url: '' }
+    { data: fixture_file_upload('a_pdf_file.pdf'), data_url: '' }
   end
 end

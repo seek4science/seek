@@ -88,13 +88,7 @@ class BaseSerializer < SimpleBaseSerializer
     associated('Organism')
   end
 
-  def self_link
-    polymorphic_path(object)
-  end
-
-  def _links
-    { self: self_link }
-  end
+  link(:self) { polymorphic_path(object) }
 
   # avoid dash-erizing attribute names
   def format_name(attribute_name)

@@ -17,11 +17,7 @@ class WorkflowSerializer < ContributedResourceSerializer
 
   attribute :internals
 
-  def _links
-    if get_version.diagram_exists?
-      super.merge(diagram: diagram_workflow_path(object, version: get_version.version))
-    else
-      super
-    end
+  link(:diagram, if: -> { get_version.diagram_exists? }) do
+    diagram_workflow_path(object, version: get_version.version)
   end
 end

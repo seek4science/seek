@@ -124,7 +124,7 @@ class DatasetTest < ActiveSupport::TestCase
   # Test for original Stuart's code, I left to in case it has to be compared with new one
   #   test 'create datafile' do
   #     User.current_user = Factory(:person).user
-  #     @openbis_endpoint.project.update_attributes(default_license: 'wibble')
+  #     @openbis_endpoint.project.update(default_license: 'wibble')
   #
   #     dataset = Seek::Openbis::Dataset.new(@openbis_endpoint, '20160210130454955-23')
   #     datafile = dataset.create_seek_datafile

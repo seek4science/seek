@@ -66,7 +66,7 @@ module Seek
     def manage_update
       item = determine_asset_from_controller
       raise 'shouldnt get this far without manage rights' unless item.can_manage?
-      item.update_attributes(params_for_controller)
+      item.update(params_for_controller)
       update_sharing_policies item
       respond_to do |format|
         if item.save
@@ -151,7 +151,7 @@ module Seek
       item = class_for_controller_name.find(params[:id])
       version = item.versions.find_by(version: params[:version])
 
-      if version&.update_attributes(edit_version_params(version))
+      if version&.update(edit_version_params(version))
         flash[:notice] = "Version #{params[:version]} was successfully updated."
       else
         flash[:error] = "Unable to update version #{params[:version]}. Please try again."

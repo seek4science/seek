@@ -99,7 +99,7 @@ class Settings < ActiveRecord::Base
         raise Settings::DecryptionError, "Unable to decrypt setting '#{var}'. Was the key (filestore/attr_encrypted/key) changed?"
       end
     elsif self[:value].present?
-      YAML::load(self[:value])
+      YAML::unsafe_load(self[:value])
     else
       nil
     end
