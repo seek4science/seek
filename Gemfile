@@ -119,7 +119,7 @@ gem 'bootsnap', '>= 1.4.4', require: false
 
 gem 'activerecord-import'
 
-gem "puma", "~> 5.0"
+gem "puma", "~> 5.6"
 
 gem "doorkeeper", ">= 5.2.5"
 
