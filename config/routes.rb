@@ -238,14 +238,8 @@ SEEK::Application.routes.draw do
   resources :avatars
   resources :attachments
   resources :subscriptions
-  resources :measured_items
   resources :saved_searches
   resources :uuids
-  resources :compounds do
-    collection do
-      post :search_in_sabiork
-    end
-  end
 
   # resources :project_folders
 
@@ -507,11 +501,6 @@ SEEK::Application.routes.draw do
       post :retrieve_nels_sample_metadata
       get :retrieve_nels_sample_metadata
     end
-    resources :studied_factors do
-      collection do
-        post :create_from_existing
-      end
-    end
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, :workflows, only: [:index]
   end
 
@@ -540,11 +529,6 @@ SEEK::Application.routes.draw do
   end
 
   resources :sops, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
-    resources :experimental_conditions do
-      collection do
-        post :create_from_existing
-      end
-    end
     resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :workflows, :collections, only: [:index]
   end
 

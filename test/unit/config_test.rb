@@ -387,10 +387,6 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal 'A new description', Seek::Config.registration_disabled_description
   end
 
-  test 'sabiork_ws_base_url' do
-    assert_equal 'http://sabiork.h-its.org/sabioRestWebServices/', Seek::Config.sabiork_ws_base_url
-  end
-
   test 'publish_button_enabled' do
     assert Seek::Config.publish_button_enabled
   end

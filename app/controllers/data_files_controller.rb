@@ -66,13 +66,6 @@ class DataFilesController < ApplicationController
 
       respond_to do |format|
         if @data_file.save_as_new_version(comments)
-          # Duplicate studied factors
-          factors = @data_file.find_version(@data_file.version - 1).studied_factors
-          factors.each do |f|
-            new_f = f.dup
-            new_f.data_file_version = @data_file.version
-            new_f.save
-          end
           flash[:notice] = "New version uploaded - now on version #{@data_file.version}"
         else
           flash[:error] = 'Unable to save newflash[:error] version'

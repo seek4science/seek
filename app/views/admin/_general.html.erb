@@ -36,7 +36,6 @@
         <% if Seek::Config.project_hierarchy_enabled %>
             <li><%= link_to "Manage #{t('project').pluralize.downcase}", manage_projects_path %></li>
         <% end %>
-        <!-- <li><%= link_to 'Manage compounds', compounds_path %></li> -->
         <li><%= link_to "Manage #{WorkflowClass.model_name.human.pluralize}", workflow_classes_path %></li>
       </ul>
       <ul>

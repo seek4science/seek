@@ -17,7 +17,6 @@ def load_seek_config_defaults!
   Seek::Config.default :jws_online_root,"https://jws2.sysmo-db.org/"
   Seek::Config.default :internal_help_enabled, false
   Seek::Config.default :external_help_url,"https://docs.seek4science.org/help"
-  Seek::Config.default :sabiork_ws_base_url, "http://sabiork.h-its.org/sabioRestWebServices/"
   Seek::Config.default :exception_notification_enabled,false
   Seek::Config.default :exception_notification_recipients,""
   Seek::Config.default :hide_details_enabled,false
@@ -53,8 +52,6 @@ def load_seek_config_defaults!
   Seek::Config.default :modelling_analysis_enabled,true
   Seek::Config.default :human_diseases_enabled, false
   Seek::Config.default :guide_box_enabled,true
-  Seek::Config.default :factors_studied_enabled,false
-  Seek::Config.default :experimental_conditions_enabled,false
   Seek::Config.default :tagging_enabled, true
   Seek::Config.default :authorization_checks_enabled, true
   Seek::Config.default :documentation_enabled,true
