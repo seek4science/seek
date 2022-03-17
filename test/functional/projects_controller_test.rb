@@ -2962,6 +2962,47 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_empty project.discussion_links
   end
 
+  test 'project needs more than one investigation for ordering' do
+    person = Factory(:admin)
+    login_as(person)
+    project = Factory(:project)
+    get :show, params: { id: project.id }
+    
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_investigations_project_path(project), count: 0
+
+    project.investigations += [Factory(:investigation)]
+    get :show, params: { id: project.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_investigations_project_path(project), count: 0
+
+    project.investigations += [Factory(:investigation)]
+    get :show, params: { id: project.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_investigations_project_path(project), count: 1
+  end
+
+  test 'ordering only by editor' do
+    person = Factory(:admin)
+    login_as(person)
+    project = Factory(:project)
+    project.investigations += [Factory(:investigation)]
+    project.investigations += [Factory(:investigation)]
+    get :show, params: { id: project.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_investigations_project_path(project), count: 1
+
+    login_as(:aaron)
+    get :show, params: { id: project.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_investigations_project_path(project), count: 0
+  end
+  
     private
 
   def edit_max_object(project)
