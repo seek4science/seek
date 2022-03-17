@@ -4,7 +4,6 @@ class PeopleController < ApplicationController
   include Seek::Publishing::PublishingCommon
   include Seek::Sharing::SharingCommon
   include Seek::Publishing::GatekeeperPublish
-  include Seek::FacetedBrowsing
   include Seek::DestroyHandling
   include Seek::AdminBulkAction
   include RelatedItemsHelper
@@ -28,12 +27,10 @@ class PeopleController < ApplicationController
   api_actions :index, :show, :create, :update, :destroy, :current
 
   # GET /people/1
-  # GET /people/1.xml
   def show
     respond_to do |format|
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }
-      format.xml
       format.json {render json: @person, include: [params[:include]]}
     end
   end
@@ -57,12 +54,10 @@ class PeopleController < ApplicationController
   end
 
   # GET /people/new
-  # GET /people/new.xml
   def new
     @person = Person.new
     respond_to do |format|
       format.html { render action: 'new' }
-      format.xml  { render xml: @person }
     end
   end
 
@@ -113,7 +108,6 @@ class PeopleController < ApplicationController
   end
 
   # POST /people
-  # POST /people.xml
   def create
     @person = Person.new(person_params)
 
@@ -142,7 +136,6 @@ class PeopleController < ApplicationController
             end
 
           end
-          format.xml { render xml: @person, status: :created, location: @person }
           format.json {render json: @person, status: :created, location: @person, include: [params[:include]] }
         else
           Mailer.activation_request(current_user).deliver_later
@@ -154,14 +147,12 @@ class PeopleController < ApplicationController
         end
       else
         format.html { render redirect_action }
-        format.xml { render xml: @person.errors, status: :unprocessable_entity }
         format.json { render json: json_api_errors(@person), status: :unprocessable_entity }
       end
     end
   end
 
   # PUT /people/1
-  # PUT /people/1.xml
   def update
     @person.disciplines.clear if params[:discipline_ids].nil? #????
 
@@ -176,11 +167,9 @@ class PeopleController < ApplicationController
       if @person.update(person_params) && set_group_membership_project_position_ids(@person, params)
         flash[:notice] = 'Person was successfully updated.'
         format.html { redirect_to(@person) }
-        format.xml  { head :ok }
         format.json {render json: @person, include: [params[:include]]}
       else
         format.html { render action: 'edit' }
-        format.xml  { render xml: @person.errors, status: :unprocessable_entity }
         format.json { render json: json_api_errors(@person), status: :unprocessable_entity }
       end
     end
@@ -216,7 +205,6 @@ class PeopleController < ApplicationController
   end
 
   # DELETE /people/1
-  # DELETE /people/1.xml
   def destroy
     @person.destroy
 
@@ -228,7 +216,6 @@ class PeopleController < ApplicationController
         format.html { redirect_to(people_url) }
         format.json {render json: {status: :ok}, status: :ok}
       end
-      format.xml { head :ok }
     end
   end
 

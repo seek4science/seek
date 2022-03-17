@@ -30,14 +30,11 @@ class ContentBlobsControllerTest < ActionController::TestCase
     perform_jsonapi_checks
   end
 
-  test 'html and xml not acceptable' do
+  test 'html and rdf not acceptable' do
     sop = Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
     blob = sop.content_blob
 
     get :show, params: { id: blob.id, sop_id: sop.id }
-    assert_response :not_acceptable
-
-    get :show, params: { id: blob.id, sop_id: sop.id, format: 'xml' }
     assert_response :not_acceptable
 
     get :show, params: { id: blob.id, sop_id: sop.id, format: 'rdf' }

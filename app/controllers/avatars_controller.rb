@@ -55,10 +55,6 @@ class AvatarsController < ApplicationController
       format.html do
         send_file(@avatar.full_cache_path(size), :type => "image/#{avatar_format}", :disposition => 'inline')
       end
-      format.xml do
-        @cache_file=@avatar.full_cache_path(size)
-        @type="image/#{avatar_format}"
-      end
     end
 
   end

@@ -24,7 +24,6 @@ class PlaceholdersController < ApplicationController
     @placeholder.just_used
     respond_to do |format|
         format.html
-        format.xml
         format.rdf { render template: 'rdf/show' }
         format.json { render json: @placeholder, include: json_api_include_param }
       end

@@ -108,7 +108,7 @@ namespace :seek do
   task(remove_orphaned_versions: [:environment]) do
     puts 'Removing orphaned versions ...'
     count = 0
-    types = [DataFile::Version, Document::Version, Sop::Version, Model::Version, Node::Version, Presentation::Version,
+    types = [DataFile::Version, Document::Version, Sop::Version, Model::Version, Presentation::Version,
              Sop::Version, Workflow::Version]
     disable_authorization_checks do
       types.each do |type|

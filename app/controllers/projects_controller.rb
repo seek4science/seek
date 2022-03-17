@@ -271,18 +271,15 @@ class ProjectsController < ApplicationController
 
   
   # GET /projects/1
-  # GET /projects/1.xml
   def show
     respond_to do |format|
       format.html { render(params[:only_content] ? { layout: false } : {})} # show.html.erb
       format.rdf { render template: 'rdf/show' }
-      format.xml
       format.json { render json: @project, include: [params[:include]] }
     end
   end
 
   # GET /projects/new
-  # GET /projects/new.xml
   def new
     @project = Project.new
 
@@ -345,7 +342,6 @@ class ProjectsController < ApplicationController
   end
 
   # POST /projects
-  # POST /projects.xml
   def create
     @project = Project.new
     @project.assign_attributes(project_params)
@@ -392,7 +388,6 @@ class ProjectsController < ApplicationController
   end
 
   # PUT /projects/1   , polymorphic: [:organism]
-  # PUT /projects/1.xml
   def update
     if params[:project][:ordered_investigation_ids]
       a1 = params[:project][:ordered_investigation_ids]
@@ -424,12 +419,10 @@ class ProjectsController < ApplicationController
           @project.reload
           flash[:notice] = "#{t('project')} was successfully updated."
           format.html { redirect_to(@project) }
-          format.xml  { head :ok }
           format.json { render json: @project, include: [params[:include]] }
         #            format.json {render json: @project, adapter: :json, status: 200 }
         else
           format.html { render action: 'edit' }
-          format.xml  { render xml: @project.errors, status: :unprocessable_entity }
           format.json { render json: json_api_errors(@project), status: :unprocessable_entity }
         end
       end

@@ -97,7 +97,6 @@ SEEK::Application.routes.draw do
     collection do
       get :typeahead
       get :preview
-      post :items_for_result # Faceted browsing
     end
     member do
       post :request_contact
@@ -111,7 +110,6 @@ SEEK::Application.routes.draw do
     collection do
       get :typeahead
       get :preview
-      post :items_for_result # Faceted browsing
     end
     member do
       post :update_annotations_ajax
@@ -287,7 +285,6 @@ SEEK::Application.routes.draw do
       get :is_this_you
       get :get_work_group
       post :userless_project_selected_ajax
-      post :items_for_result
       post :bulk_destroy
     end
     member do
@@ -302,7 +299,7 @@ SEEK::Application.routes.draw do
       post :batch_change_permssion_for_selected_items
       post :batch_sharing_permission_changed
     end
-    resources :projects, :programmes, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :nodes, :data_files, :presentations, :publications, :documents, :events, :samples, :specimens, :strains, :file_templates, :placeholders, :collections, only: [:index]
+    resources :projects, :programmes, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :data_files, :presentations, :publications, :documents, :events, :samples, :specimens, :strains, :file_templates, :placeholders, :collections, only: [:index]
     resources :avatars do
       member do
         post :select
@@ -313,7 +310,6 @@ SEEK::Application.routes.draw do
   resources :projects do
     collection do
       get :request_institutions
-      post :items_for_result
       get :guided_join
       get :guided_create
       post :request_join
@@ -339,7 +335,7 @@ SEEK::Application.routes.draw do
       post :respond_join_request
       get :guided_join
     end
-    resources :programmes, :people, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :nodes, :data_files, :presentations,
+    resources :programmes, :people, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :data_files, :presentations,
               :publications, :events, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :file_templates, :placeholders, :collections, only: [:index]
 
     resources :openbis_endpoints do
@@ -397,7 +393,6 @@ SEEK::Application.routes.draw do
     collection do
       get :request_all
       get :request_all_sharing_form
-      post :items_for_result
       get  :typeahead
     end
     resources :people, :programmes, :projects, :specimens, only: [:index]
@@ -411,7 +406,7 @@ SEEK::Application.routes.draw do
   ### ISA ###
 
   resources :investigations, concerns: [:publishable, :has_snapshots, :isa] do
-    resources :people, :programmes, :projects, :assays, :studies, :models, :sops, :workflows, :nodes, :data_files, :publications, :documents, only: [:index]
+    resources :people, :programmes, :projects, :assays, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, only: [:index]
     member do
       get :export_isatab_json
       get :manage
@@ -428,7 +423,6 @@ SEEK::Application.routes.draw do
       post :batch_create
       post :create_content_blob
       post :investigation_selected_ajax
-      post :items_for_result
     end
     resources :snapshots, :only => [:show, :new, :create, :destroy] do
       member do
@@ -451,7 +445,7 @@ SEEK::Application.routes.draw do
       get :order_assays
       patch :manage_update
     end
-    resources :people, :programmes, :projects, :assays, :investigations, :models, :sops, :workflows, :nodes, :data_files, :publications, :documents, only: [:index]
+    resources :people, :programmes, :projects, :assays, :investigations, :models, :sops, :workflows, :data_files, :publications, :documents, only: [:index]
   end
 
   resources :assays, concerns: [:publishable, :has_snapshots, :isa] do
@@ -463,7 +457,7 @@ SEEK::Application.routes.draw do
         post :register
       end
     end
-    resources :people, :programmes, :projects, :investigations, :samples, :studies, :models, :sops, :workflows, :nodes, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, :placeholders, only: [:index]
+    resources :people, :programmes, :projects, :investigations, :samples, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, :placeholders, only: [:index]
   end
 
   # to be removed as STI does not work in too many places
@@ -480,8 +474,6 @@ SEEK::Application.routes.draw do
   resources :data_files, concerns: [:has_content_blobs, :has_versions, :has_doi, :publishable, :asset] do
     collection do
       get :filter
-      post :upload_for_tool
-      post :upload_from_email
       get :provide_metadata
       post :create_content_blob
       post :rightfield_extraction_ajax
@@ -558,10 +550,6 @@ SEEK::Application.routes.draw do
 
   resources :workflow_classes, except: [:show]
 
-  resources :nodes, concerns: [:has_content_blobs, :publishable, :has_doi, :has_versions, :asset] do
-    resources :people, :programmes, :projects, :investigations, :assays, :samples, :studies, :publications, :events, :collections, only: [:index]
-  end
-
   resources :file_templates, concerns: [:has_content_blobs, :has_versions, :has_doi, :publishable, :asset] do
     collection do
       get :filter
@@ -600,7 +588,6 @@ SEEK::Application.routes.draw do
       end
     end
     collection do
-      post :items_for_result
       get :awaiting_activation
     end
     member do
@@ -611,7 +598,7 @@ SEEK::Application.routes.draw do
       get :storage_report
     end
     resources :people, :projects, :institutions, :investigations, :studies, :assays, :samples,
-              :data_files, :models, :sops, :workflows, :nodes, :presentations, :documents, :events, :publications, :organisms, :human_diseases, :collections, only: [:index]
+              :data_files, :models, :sops, :workflows, :presentations, :documents, :events, :publications, :organisms, :human_diseases, :collections, only: [:index]
     concerns :has_dashboard, controller: :programme_stats
   end
 
@@ -786,7 +773,6 @@ SEEK::Application.routes.draw do
   get '/search/' => 'search#index', as: :search
   get '/search/save' => 'search#save', as: :save_search
   get '/search/delete' => 'search#delete', as: :delete_search
-  post '/search/items_for_result' => 'search#items_for_result'
   get 'svg/:id.:format' => 'svg#show', as: :svg
   get '/tags/latest' => 'tags#latest', as: :latest_tags
   get '/tags/query' => 'tags#query', as: :query_tags

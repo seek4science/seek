@@ -79,14 +79,12 @@ class AssaysController < ApplicationController
 
     respond_to do |format|
       format.html
-      format.xml
     end
   end
 
   def edit
     respond_to do |format|
       format.html
-      format.xml
     end
   end
 
@@ -156,7 +154,6 @@ class AssaysController < ApplicationController
   def show
     respond_to do |format|
       format.html { render(params[:only_content] ? { layout: false } : {})}
-      format.xml
       format.rdf { render :template=>'rdf/show'}
       format.json {render json: @assay, include: [params[:include]]}
 

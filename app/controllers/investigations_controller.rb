@@ -47,7 +47,6 @@ class InvestigationsController < ApplicationController
 
     respond_to do |format|
       format.html { render(params[:only_content] ? { layout: false } : {})}
-      format.xml
       format.rdf { render :template=>'rdf/show' }
       format.json {render json: @investigation}
 

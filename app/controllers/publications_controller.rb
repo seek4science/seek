@@ -38,11 +38,9 @@ class PublicationsController < ApplicationController
   end
 
   # GET /publications/1
-  # GET /publications/1.xml
   def show
     respond_to do |format|
       format.html # show.html.erb
-      format.xml
       format.rdf { render template: 'rdf/show' }
       format.json {render json: @publication, include: [params[:include]]}
       format.any( *Publication::EXPORT_TYPES.keys ) do
@@ -59,13 +57,11 @@ class PublicationsController < ApplicationController
   end
 
   # GET /publications/new
-  # GET /publications/new.xml
   def new
     @publication = Publication.new
     @publication.parent_name = params[:parent_name]
     respond_to do |format|
       format.html # new.html.erb
-      format.xml
     end
   end
 
@@ -82,7 +78,6 @@ class PublicationsController < ApplicationController
   end
 
   # POST /publications
-  # POST /publications.xml
   def create
     @subaction = params[:subaction] || 'Register'
 
@@ -109,7 +104,6 @@ class PublicationsController < ApplicationController
   end
 
   # PUT /publications/1
-  # PUT /publications/1.xml
   def update
     update_annotations(params[:tag_list], @publication) if params.key?(:tag_list)
     update_sharing_policies @publication
@@ -118,13 +112,11 @@ class PublicationsController < ApplicationController
       respond_to do |format|
         flash[:notice] = 'Publication was successfully updated.'
         format.html { redirect_to(@publication) }
-        format.xml  { head :ok }
         format.json { render json: @publication, status: :ok, include: [params[:include]]}
       end
     else
       respond_to do |format|
         format.html { render action: 'edit' }
-        format.xml  { render xml: @publication.errors, status: :unprocessable_entity }
         format.json { render json: @publication.errors, status: :unprocessable_entity }
       end
     end
@@ -236,7 +228,6 @@ class PublicationsController < ApplicationController
       error = 'require query parameter authors'
       respond_to do |format|
         format.json { render json: { error: error }, status: 422 }
-        format.xml  { render xml: { error: error }, status: 422 }
       end
 
       return
@@ -279,7 +270,6 @@ class PublicationsController < ApplicationController
 
     respond_to do |format|
       format.json { render json: authors.to_json }
-      format.xml  { render xml: authors }
     end
   end
 
@@ -289,7 +279,6 @@ class PublicationsController < ApplicationController
       error = 'require query parameter full_name'
       respond_to do |format|
         format.json { render json: { error: error }, status: 422 }
-        format.xml  { render xml: { error: error }, status: 422 }
       end
 
       return
@@ -315,7 +304,6 @@ class PublicationsController < ApplicationController
 
     respond_to do |format|
       format.json { render json: authors.to_json }
-      format.xml  { render xml: authors }
     end
   end
 
@@ -355,7 +343,6 @@ class PublicationsController < ApplicationController
 
     respond_to do |format|
       format.html {redirect_to(manage_publication_url(@publication))}
-      format.xml {head :ok}
     end
   end
 
@@ -416,14 +403,12 @@ class PublicationsController < ApplicationController
 
           # newly_created Change the buttons in the manage page-> Cancel will become Skip, ...
           format.html { redirect_to(manage_publication_url(@publication, newly_created: true)) }
-          format.xml  { render xml: @publication, status: :created, location: @publication }
           format.json  { render json: @publication, status: :created, location: @publication, include: [params[:include]] }
         end
       end
     else # Publication save not successful
       respond_to do |format|
         format.html { render action: 'new' }
-        format.xml  { render xml: @publication.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -455,14 +440,12 @@ class PublicationsController < ApplicationController
         respond_to do |format|
           flash[:notice] = 'Publication was successfully created.'
           format.html { redirect_to(manage_publication_url(@publication)) }
-          format.xml  { render xml: @publication, status: :created, location: @publication }
           format.json { render json: @publication, status: :created, location: @publication, include: [params[:include]] }
         end
       end
     else # Publication save not successful
       respond_to do |format|
         format.html { render action: 'new' }
-        format.xml  { render xml: @publication.errors, status: :unprocessable_entity }
         format.json { render json: @publication.errors, status: :unprocessable_entity }
       end
     end
@@ -508,7 +491,6 @@ class PublicationsController < ApplicationController
     if @publication.errors.any?
       respond_to do |format|
         format.html { render action: 'new' }
-        format.xml  { render xml: @publication.errors, status: :unprocessable_entity }
         format.json { render json: @publication.errors, status: :unprocessable_entity }
       end
     else
@@ -586,13 +568,11 @@ class PublicationsController < ApplicationController
       @subaction = 'Import'
       respond_to do |format|
         format.html { render action: 'new' }
-        format.xml  { render xml: @publication.errors, status: :unprocessable_entity }
         format.json  { render json: @publication.errors, status: :unprocessable_entity }
       end
     else
       respond_to do |format|
         format.html { redirect_to(action: :index) }
-        format.xml  { render xml: publications, status: :created, location: @publication }
         format.json  { render json: publications, status: :created, location: @publication }
       end
     end

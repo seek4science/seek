@@ -30,8 +30,6 @@ def load_seek_testing_defaults!
       Settings.defaults[:programme_user_creation_enabled] = true
       Settings.defaults[:programmes_open_for_projects_enabled] = true
 
-      Settings.defaults[:tabs_lazy_load_enabled] = false
-
       # Types
       Settings.defaults[:collections_enabled] = true
       Settings.defaults[:documents_enabled] = true
@@ -72,10 +70,6 @@ def load_seek_testing_defaults!
       Seek::Config.fixed :css_prepended,''
       Seek::Config.fixed :css_appended,''
       Seek::Config.fixed :main_layout,'application'
-
-      Settings.defaults[:faceted_browsing_enabled] = false
-      Settings.defaults[:facet_enable_for_pages] = {:people => true, :projects => false, :institutions => false, :programmes => false, :investigations => false,:studies => false, :assays => true, :data_files => true, :models => true,:sops => true, :publications => true,:events => false, :strains => false, :presentations => false}
-      Settings.defaults[:faceted_search_enabled] =  false
 
       Settings.defaults[:recaptcha_enabled] = true
 

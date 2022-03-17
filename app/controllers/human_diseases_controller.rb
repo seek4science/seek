@@ -19,7 +19,6 @@ class HumanDiseasesController < ApplicationController
   def show
     respond_to do |format|
       format.html
-      format.xml
       format.rdf { render :template=>'rdf/show'}
       format.json {render json: @human_disease}
     end
@@ -34,7 +33,6 @@ class HumanDiseasesController < ApplicationController
       super
     else
       respond_to do |format|
-        format.xml
         format.json {
           render json: HumanDisease.includes(:parents).where('human_disease_parents': { parent_id: nil }).map { |r|
             node = r.to_node
@@ -85,11 +83,9 @@ class HumanDiseasesController < ApplicationController
       if @human_disease.save
         flash[:notice] = 'Human Disease was successfully created.'
         format.html { redirect_to human_disease_path(@human_disease) }
-        format.xml  { head :ok }
         format.json {render json: @human_disease, status: :created, location: @human_disease}
       else
         format.html { render :action => "new" }
-        format.xml  { render :xml => @human_disease.errors, :status => :unprocessable_entity }
         format.json  { render json: @human_disease.errors, status: :unprocessable_entity }
       end
     end
@@ -101,11 +97,9 @@ class HumanDiseasesController < ApplicationController
       if @human_disease.update(human_disease_params)
         flash[:notice] = 'Human Disease was successfully updated.'
         format.html { redirect_to human_disease_path(@human_disease) }
-        format.xml  { head :ok }
         format.json {render json: @human_disease}
       else
         format.html { render :action => "edit" }
-        format.xml  { render :xml => @human_disease.errors, :status => :unprocessable_entity }
         format.json  { render json: @human_disease.errors, status: :unprocessable_entity }
       end
     end
@@ -114,7 +108,6 @@ class HumanDiseasesController < ApplicationController
   def edit
     respond_to do |format|
       format.html
-      format.xml {render :xml=>@human_disease}
     end
   end
 
