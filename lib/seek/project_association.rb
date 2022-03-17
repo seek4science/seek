@@ -12,10 +12,7 @@ module Seek
 
         after_save -> { @project_additions = [] }
 
-        validates :projects, presence: true, unless: proc { |object|
-          Seek::Config.is_virtualliver ||
-            object.is_a?(Strain)
-        }
+        validates :projects, presence: true, unless: proc { |object| object.is_a?(Strain) }
 
         def project_additions
           @project_additions ||= []

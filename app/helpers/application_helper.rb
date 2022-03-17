@@ -100,11 +100,7 @@ module ApplicationHelper
 
   def authorized_list(all_items, attribute, sort = true, max_length = 75, count_hidden_items = false)
     items = all_items.select(&:can_view?)
-    title_only_items = if Seek::Config.is_virtualliver
-                         (all_items - items).select(&:title_is_public?)
-                       else
-                         []
-                       end
+    title_only_items = []
 
     if count_hidden_items
       original_size = all_items.size

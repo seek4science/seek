@@ -154,11 +154,11 @@ class ModelsControllerTest < ActionController::TestCase
 
   test 'correct title and text for associating a modelling analysis for new' do
     login_as(Factory(:user))
-    as_not_virtualliver do
-      get :new
-      assert_response :success
-      assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
-    end
+
+    get :new
+    assert_response :success
+    assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
+
     assert_select 'div.panel-heading', text: /#{I18n.t('assays.modelling_analysis').pluralize}/
     assert_select 'div#associate_assay_fold_content p', text: /The following #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('model')}:/
   end
@@ -166,11 +166,11 @@ class ModelsControllerTest < ActionController::TestCase
   test 'correct title and text for associating a modelling analysis for edit' do
     model = Factory :model
     login_as(model.contributor.user)
-    as_not_virtualliver do
-      get :edit, params: { id: model.id }
-      assert_response :success
-      assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
-    end
+
+    get :edit, params: { id: model.id }
+    assert_response :success
+    assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
+
     assert_select 'div.panel-heading', text: /#{I18n.t('assays.modelling_analysis').pluralize}/
     assert_select 'div#associate_assay_fold_content p', text: /The following #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('model')}:/
   end

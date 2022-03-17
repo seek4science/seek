@@ -795,16 +795,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
     # Associate a non-seek author to a seek person
     login_as p.contributor
-    as_virtualliver do
-      assert_difference('PublicationAuthor.count', 0) do
-        assert_difference('AssetsCreator.count', 2) do
-          put :update, params: { id: p.id, publication: {
-              abstract: p.abstract,
-              publication_authors_attributes: { '0' => { id: p.publication_authors[0].id, person_id: seek_author1.id },
-                                                '1' => { id: p.publication_authors[1].id, person_id: seek_author2.id } } } }
-        end
-      end
-    end
+
     assert_redirected_to publication_path(p)
     p.reload
   end
@@ -892,17 +883,6 @@ class PublicationsControllerTest < ActionController::TestCase
     seek_author1 = Factory(:person, first_name: 'Stuart', last_name: 'Owen')
     seek_author2 = Factory(:person, first_name: 'Carole', last_name: 'Goble')
 
-    # Associate a non-seek author to a seek person
-    as_virtualliver do
-      assert_difference('publication.non_seek_authors.count', -2) do
-        assert_difference('AssetsCreator.count', 2) do
-          put :update, params: { id: publication.id, publication: {
-              abstract: publication.abstract,
-              publication_authors_attributes: { '0' => { id: publication.non_seek_authors[12].id, person_id: seek_author1.id },
-                                                '1' => { id: publication.non_seek_authors[15].id, person_id: seek_author2.id } } } }
-        end
-      end
-    end
 
     publication.reload
     authors = publication.publication_authors.map { |pa| pa.first_name + ' ' + pa.last_name }

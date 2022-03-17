@@ -146,8 +146,6 @@ def load_seek_config_defaults!
   #the maximum size, in Mb, for a text file that can be indexed for search (too high and the indexing will timeout)
   Seek::Config.default :max_indexable_text_size,100
 
-  Seek::Config.default :is_virtualliver, false
-
   Seek::Config.default :related_items_limit,5
   Seek::Config.default :search_results_limit,5
 

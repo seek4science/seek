@@ -13,12 +13,6 @@ class ConfigTest < ActiveSupport::TestCase
     assert Seek::Config.solr_enabled
   end
 
-  test 'is_virtualliver' do
-    with_config_value 'is_virtualliver', true do
-      assert Seek::Config.is_virtualliver
-    end
-  end
-
   test 'read setting attributes' do
     attributes = Seek::Config.read_setting_attributes
     refute attributes.empty?

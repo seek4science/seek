@@ -15,76 +15,7 @@
 %>
 
 <h3>Content statistics</h3>
-<%if Seek::Config.is_virtualliver %>
-   
-    For authorised assets the numbers are split as <em><b>total</b></em> (<em>publicly visible</em>/<em>publicly accessible</em>)
-    <div>
-      <table id="content_stats_table" class="tablesorter">
-        <thead>
-        <tr>
-          <th><%= t('project') %></th>
-          <th>People *</th>
-          <% authorised_types.each do |type| %>
-              <th><%= resource_tab_item_name(type.name) -%></th>
-          <% end %>
 
-          <th>Publications</th>
-        </tr>
-        </thead>
-        <tbody>
-        <% stats.each do |stat| %>
-            <tr>
-
-              <td><%= link_to stat.project.name, stat.project -%></td>
-              <% registered_people = stat.registered_people.count %>
-              <td><%= stat.people.count -%></td>
-              <% authorised_types.each do |type| %>
-                  <% if stat.project.children.empty? %>
-                      <% type_sym = type.name.underscore.pluralize.to_sym
-                         pub_vis = stat.send("publicly_visible_#{type_sym}")
-                         pub_acc = stat.send("publicly_accessible_#{type_sym}")
-                         total = stat.send(type_sym).count
-                         total_publicly_visible[type_sym] |= pub_vis
-                         total_publicly_accessible[type_sym] |= pub_acc
-                         display_total_pub_accessible_count = non_downloadable.include?(type) ? na_tag : pub_acc.count
-
-                      -%>
-                      <td><b><%= "#{total}" -%></b><%= " (#{pub_vis.count}/#{display_total_pub_accessible_count})".html_safe -%></td>
-                     <% else %>
-                      <td></td>
-                  <% end -%>
-
-              <% end -%>
-
-              <td><%= stat.publications.count if stat.project.children.empty? -%> </td>
-            </tr>
-        <% end %>
-        </tbody>
-        <tfoot>
-        <tr style="background-color: #DEF">
-          <td><b>Overall</b></td>
-          <td><b><%= Person.count -%></b></td>
-          <% authorised_types.each do |type| %>
-              <% type_sym = type.name.underscore.pluralize.to_sym
-                 total=type.count
-                 total_pub_vis = total_publicly_visible[type_sym].count
-                 total_pub_acc = total_publicly_accessible[type_sym].count
-                 display_total_pub_accessible_count = non_downloadable.include?(type) ? na_tag : total_pub_acc
-
-              %>
-              <td><b><%= "#{total}" -%></b>   <%= " (#{total_pub_vis}/ #{display_total_pub_accessible_count})".html_safe -%></td>
-          <% end -%>
-
-          <td><b><%= Publication.count -%></b></td>
-        </tr>
-        </tfoot>
-
-      </table>
-    </div>
-    <hr/>
-    <em>* Note that this is the overall number of people, and registered users. This may not necessarily by the sum of the values above due to people being in multiple <%= t('project').pluralize %></em>
-
-<% else %>
 For authorised assets the numbers are split as <em>total</em> / <em>visible</em> / <em>accessible</em> / <em>publicly visible</em> / <em>publicly accessible</em>
 <table id="content_stats_table" class="tablesorter"> 
   <thead>
@@ -146,7 +77,6 @@ For authorised assets the numbers are split as <em>total</em> / <em>visible</em>
 </table>
 <hr/>
 <em>* Note that this is the overall number of people, and registered users. This may not necessarily by the sum of the values above due to people being in multiple <%= t('project').pluralize %>.</em>
-<% end %>
 
 <script type="text/javascript">
   $j("#content_stats_table").tablesorter({

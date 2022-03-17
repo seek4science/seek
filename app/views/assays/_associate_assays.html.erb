@@ -9,7 +9,6 @@ return if resource.is_a?(Model) && !Seek::Config.modelling_analysis_enabled
    show_relationships = resource.is_a?(DataFile)
    resource_text ||= text_for_resource(resource)
    authorized_action = "edit"
-   authorized_action = "view" if Seek::Config.is_virtualliver
 
    all_assays = authorised_assays(nil,authorized_action)
 

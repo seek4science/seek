@@ -18,7 +18,7 @@ class Model < ApplicationRecord
 
   acts_as_asset
 
-  validates :projects, presence: true, projects: { self: true }, unless: Proc.new {Seek::Config.is_virtualliver }
+  validates :projects, presence: true, projects: { self: true }
 
   acts_as_doi_parent(child_accessor: :versions)
 

@@ -308,8 +308,8 @@ class Person < ApplicationRecord
     user && user == User.current_user
   end
 
-  def can_view?(user = User.current_user)
-    !user.nil? || !Seek::Config.is_virtualliver
+  def can_view?(_user = User.current_user)
+    true
   end
 
   # can be edited by:
