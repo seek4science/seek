@@ -21,7 +21,7 @@ class AdminDefinedRoleProject < ApplicationRecord
   end
 
   def person_must_be_in_project
-    unless person.projects.include?(project)
+    unless person && project && person.projects.include?(project)
       errors.add(:project, "The person must be a member of the project")
     end
   end
