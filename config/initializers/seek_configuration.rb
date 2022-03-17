@@ -152,12 +152,6 @@ def load_seek_config_defaults!
   Seek::Config.default :related_items_limit,5
   Seek::Config.default :search_results_limit,5
 
-# Faceted Browsing and Faceted Search
-  Seek::Config.default :faceted_browsing_enabled, false
-  Seek::Config.default :facet_enable_for_pages, {:people => true, :projects => true, :institutions => true, :programmes => true, :investigations => true,:studies => true, :assays => true, :data_files => true, :models => true,:sops => true, :publications => true,:events => true, :strains => true, :presentations => true}
-  Seek::Config.default :faceted_search_enabled, false
-  Seek::Config.default :is_one_facet_instance, true
-
 # Others
   Seek::Config.default :type_managers_enabled,true
   Seek::Config.default :type_managers,'admins'

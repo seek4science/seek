@@ -63,7 +63,6 @@ scales:
 delete_asset_version_enabled:
 recaptcha_enabled:
 project_hierarchy_enabled:
-tabs_lazy_load_enabled:
 publish_button_enabled:
 project_browser_enabled:
 project_single_page_enabled:
@@ -85,9 +84,6 @@ modelling_analysis_type_base_uri:
 header_tagline_text_enabled:
 related_items_limit:
   convert: :to_i
-faceted_browsing_enabled:
-facet_enable_for_pages:
-faceted_search_enabled:
 css_appended:
 css_prepended:
 javascript_appended:

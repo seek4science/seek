@@ -1,7 +1,5 @@
 module Seek
   module IndexPager
-    include Seek::FacetedBrowsing
-
     def index
       respond_to do |format|
         format.html
