@@ -23,8 +23,7 @@
                 "Transcriptomics",
                 "Web services",
                 "Workflows"
-            ],
-            "project_positions": null
+            ]
         },
         "relationships": {
             "projects": {

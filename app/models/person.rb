@@ -39,14 +39,6 @@ class Person < ApplicationRecord
   has_many :current_work_groups, class_name: 'WorkGroup', through: :current_group_memberships,
                                  source: :work_group
 
-  has_many :group_memberships_project_positions, -> { distinct }, through: :group_memberships
-  has_many :project_positions, -> { distinct }, through: :group_memberships_project_positions
-  has_filter project_position: Seek::Filtering::Filter.new(
-      value_field: 'project_positions.id',
-      label_field: 'project_positions.name',
-      joins: [:project_positions]
-  )
-
   has_many :projects, -> { distinct }, through: :work_groups
   has_many :current_projects,  -> { distinct }, through: :current_work_groups, source: :project
   has_many :former_projects,  -> { distinct }, through: :former_work_groups, source: :project
@@ -108,7 +100,6 @@ class Person < ApplicationRecord
     searchable(auto_index: false) do
       text :expertise
       text :tools
-      text :project_positions
       text :disciplines do
         disciplines.map(&:title)
       end
@@ -281,10 +272,6 @@ class Person < ApplicationRecord
     first_letter = strip_first_letter(name) if no_last_name
     # first_letter = "Other" unless ("A".."Z").to_a.include?(first_letter)
     self.first_letter = first_letter
-  end
-
-  def project_positions_of_project(projects_or_project)
-    project_positions.joins(group_memberships: :work_group).where(work_groups: { project_id: projects_or_project }).distinct.to_a
   end
 
   # all items, assets, ISA and samples that are linked to this person as a creator

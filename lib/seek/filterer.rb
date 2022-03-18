@@ -4,7 +4,7 @@ module Seek
     AVAILABLE_FILTERS = {
         Publication: [:query, :programme, :project, :published_year, :publication_type, :author, :organism, :human_disease, :tag],
         Event: [:query, :created_at, :country],
-        Person: [:query, :programme, :project, :institution, :location, :project_position, :expertise, :tool]
+        Person: [:query, :programme, :project, :institution, :location, :expertise, :tool]
     }.freeze
 
     # Misc mappings/transformations that might be used in multiple filters.

@@ -687,14 +687,6 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 'B', p.disciplines[1].title
   end
 
-  def test_positions_association
-    position = Factory(:project_position)
-    p = Factory :person
-    p.group_memberships.first.project_positions << position
-    assert_equal 1, p.project_positions.size
-    assert p.project_positions.include?(position)
-  end
-
   def test_update_first_letter
     p = Factory(:brand_new_person, first_name: 'Fred', last_name: 'Monkhouse', email: 'blahblah@email.com')
     assert p.valid?, 'The new person should be valid'
