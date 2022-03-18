@@ -731,7 +731,6 @@ class ProjectTest < ActiveSupport::TestCase
       web_page: 'http://webpage.com',
       organism_ids: [organism.id],
       institution_ids: [institution.id],
-      parent_id: [other_project.id],
       description: 'Project description',
       project_administrator_ids: [person.id],
       asset_gatekeeper_ids: [person.id],
