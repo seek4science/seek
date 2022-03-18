@@ -45,13 +45,6 @@ module ProjectsHelper
     html.html_safe
   end
 
-  def mailing_list_links(project)
-    people = project.people.sort_by(&:last_name).select(&:can_view?)
-    people.map do |p|
-      link_to(h(p.name), p) + ' (' + p.email + ')'
-    end
-  end
-
   # whether you have permission to create a project without being approved
   def can_create_projects?
     Project.can_create?
