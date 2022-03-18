@@ -26,7 +26,7 @@ class Project < ApplicationRecord
   has_many :work_groups, dependent: :destroy, inverse_of: :project
   has_many :institutions, through: :work_groups, inverse_of: :projects
   has_many :group_memberships, through: :work_groups, inverse_of: :project
-  has_many :people, -> { distinct }, through: :group_memberships, inverse_of: :project
+  has_many :people, -> { distinct }, through: :group_memberships, inverse_of: :projects
 
   has_many :former_group_memberships, -> { where('time_left_at IS NOT NULL AND time_left_at <= ?', Time.now) },
            through: :work_groups, source: :group_memberships
