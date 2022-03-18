@@ -687,6 +687,17 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 'B', p.disciplines[1].title
   end
 
+  test 'project through association' do
+    # test that you can correctly access the associated projects through .projects without being saved first
+    p = Factory.build(:person_not_in_project)
+    project = Factory(:project)
+    p.group_memberships.build(project: project, institution: Factory.build(:institution))
+    p.group_memberships.build(project: project, institution: Factory.build(:institution))
+    p.work_groups.build(project: project, institution: Factory.build(:institution))
+    p.work_groups.build(project: project, institution: Factory.build(:institution))
+    assert_equal [project], p.projects
+  end
+
   def test_update_first_letter
     p = Factory(:brand_new_person, first_name: 'Fred', last_name: 'Monkhouse', email: 'blahblah@email.com')
     assert p.valid?, 'The new person should be valid'

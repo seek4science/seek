@@ -543,18 +543,16 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should set the policy to projects_policy if the item is requested to be published, when creating new sop' do
-    as_not_virtualliver do
-      gatekeeper = Factory(:asset_gatekeeper)
-      @user.person.add_to_project_and_institution(gatekeeper.projects.first, Factory(:institution))
-      post :create, params: { sop: { title: 'test', project_ids: gatekeeper.projects.collect(&:id) }, content_blobs: [{ data: picture_file }], policy_attributes: { access_type: Policy::VISIBLE } }
-      sop = assigns(:sop)
-      assert_redirected_to (sop)
-      policy = sop.policy
-      assert_equal Policy::NO_ACCESS, policy.access_type
-      assert_equal 1, policy.permissions.count
-      assert_equal gatekeeper.projects.first, policy.permissions.first.contributor
-      assert_equal Policy::ACCESSIBLE, policy.permissions.first.access_type
-    end
+    gatekeeper = Factory(:asset_gatekeeper)
+    @user.person.add_to_project_and_institution(gatekeeper.projects.first, Factory(:institution))
+    post :create, params: { sop: { title: 'test', project_ids: gatekeeper.projects.collect(&:id) }, content_blobs: [{ data: picture_file }], policy_attributes: { access_type: Policy::VISIBLE } }
+    sop = assigns(:sop)
+    assert_redirected_to (sop)
+    policy = sop.policy
+    assert_equal Policy::NO_ACCESS, policy.access_type
+    assert_equal 1, policy.permissions.count
+    assert_equal gatekeeper.projects.first, policy.permissions.first.contributor
+    assert_equal Policy::ACCESSIBLE, policy.permissions.first.access_type
   end
 
   test 'should not change the policy if the item is requested to be published, when managing sop' do

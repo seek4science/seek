@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_03_16_094857) do
+ActiveRecord::Schema.define(version: 2022_03_17_160412) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string "action"
@@ -1435,11 +1435,6 @@ ActiveRecord::Schema.define(version: 2022_03_16_094857) do
     t.boolean "open_for_projects", default: false
   end
 
-  create_table "project_descendants", id: false, force: :cascade do |t|
-    t.integer "ancestor_id"
-    t.integer "descendant_id"
-  end
-
   create_table "project_folder_assets", force: :cascade do |t|
     t.integer "asset_id"
     t.string "asset_type"
@@ -1489,8 +1484,6 @@ ActiveRecord::Schema.define(version: 2022_03_16_094857) do
     t.datetime "last_jerm_run"
     t.string "uuid"
     t.integer "programme_id"
-    t.integer "ancestor_id"
-    t.integer "parent_id"
     t.string "default_license", default: "CC-BY-4.0"
     t.boolean "use_default_policy", default: false
     t.date "start_date"

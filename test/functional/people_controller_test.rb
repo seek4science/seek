@@ -173,15 +173,6 @@ class PeopleControllerTest < ActionController::TestCase
     assert_response :success
   end
 
-  test 'virtual liver hides access to index people page for logged out user' do
-    with_config_value 'is_virtualliver', true do
-      Factory :person, first_name: 'Invisible', last_name: ''
-      logout
-      get :index
-      assert_select 'a', text: /Invisible/, count: 0
-    end
-  end
-
   def test_should_get_edit
     get :edit, params: { id: people(:quentin_person) }
     assert_response :success
@@ -620,15 +611,6 @@ class PeopleControllerTest < ActionController::TestCase
     get :show, params: { id: a_person }
     assert_response :success
     assert_select 'div.panel-heading', text: 'Subscriptions', count: 0
-  end
-
-  test 'virtual liver blocks access to profile page whilst logged out' do
-    a_person = Factory(:person)
-    logout
-    as_virtualliver do
-      get :show, params: { id: a_person }
-      assert_response :forbidden
-    end
   end
 
   test 'should update pagination when changing the relevant settings' do

@@ -26,8 +26,7 @@ class Project < ApplicationRecord
   has_many :work_groups, dependent: :destroy, inverse_of: :project
   has_many :institutions, through: :work_groups, inverse_of: :projects
   has_many :group_memberships, through: :work_groups, inverse_of: :project
-  # OVERRIDDEN in Seek::ProjectHierarchy if Seek::Config.project_hierarchy_enabled
-  has_many :people, -> { distinct }, through: :group_memberships
+  has_many :people, -> { distinct }, through: :group_memberships, inverse_of: :projects
 
   has_many :former_group_memberships, -> { where('time_left_at IS NOT NULL AND time_left_at <= ?', Time.now) },
            through: :work_groups, source: :group_memberships
@@ -325,9 +324,4 @@ class Project < ApplicationRecord
     end
   end
 
-  # should put below at the bottom in order to override methods for hierarchies,
-  # Try to find a better way for overriding methods regardless where to include the module
-  if Seek::Config.project_hierarchy_enabled
-    include Seek::ProjectHierarchies::ProjectExtension
-  end
 end

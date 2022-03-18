@@ -38,8 +38,9 @@ class Person < ApplicationRecord
            class_name: 'GroupMembership', dependent: :destroy
   has_many :current_work_groups, class_name: 'WorkGroup', through: :current_group_memberships,
                                  source: :work_group
+  
 
-  has_many :projects, -> { distinct }, through: :work_groups
+  has_many :projects, -> { distinct }, through: :group_memberships, inverse_of: :people
   has_many :current_projects,  -> { distinct }, through: :current_work_groups, source: :project
   has_many :former_projects,  -> { distinct }, through: :former_work_groups, source: :project
 
@@ -127,7 +128,12 @@ class Person < ApplicationRecord
   def person
     self
   end
-    
+
+  def projects
+    # you can't access these through .projects nested associations until they have been saved
+    work_groups.collect(&:project).uniq | group_memberships.collect { |gm| gm.work_group.project }
+  end
+
   # Returns the columns to be shown on the table view for the resource
   def columns_default
     super + ['first_name','last_name']
@@ -288,10 +294,6 @@ class Person < ApplicationRecord
 
   def me?
     user && user == User.current_user
-  end
-
-  def can_view?(user = User.current_user)
-    !user.nil? || !Seek::Config.is_virtualliver
   end
 
   # can be edited by:
@@ -461,6 +463,4 @@ class Person < ApplicationRecord
       end
     end
   end
-
-  include Seek::ProjectHierarchies::PersonExtension if Seek::Config.project_hierarchy_enabled
 end

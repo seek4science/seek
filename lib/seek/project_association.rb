@@ -2,7 +2,6 @@ module Seek
   module ProjectAssociation
     def self.included(klass)
       klass.class_eval do
-        include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
 
         @project_join_table ||= [table_name, 'projects'].sort.join('_')
         has_and_belongs_to_many :projects, join_table: @project_join_table,
@@ -13,10 +12,7 @@ module Seek
 
         after_save -> { @project_additions = [] }
 
-        validates :projects, presence: true, unless: proc { |object|
-          Seek::Config.is_virtualliver ||
-            object.is_a?(Strain)
-        }
+        validates :projects, presence: true, unless: proc { |object| object.is_a?(Strain) }
 
         def project_additions
           @project_additions ||= []

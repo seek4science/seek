@@ -57,46 +57,38 @@ class ContentBlobTest < ActiveSupport::TestCase
   end
 
   test 'detects it is a webpage' do
-    as_not_virtualliver do
-      mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html", 'http://webpage.com', 'Content-Type' => 'text/html'
-      blob = ContentBlob.create url: 'http://webpage.com', original_filename: nil, content_type: nil, external_link: true
-      assert blob.is_webpage?
-      assert_equal 'text/html', blob.content_type
-    end
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html", 'http://webpage.com', 'Content-Type' => 'text/html'
+    blob = ContentBlob.create url: 'http://webpage.com', original_filename: nil, content_type: nil, external_link: true
+    assert blob.is_webpage?
+    assert_equal 'text/html', blob.content_type
   end
 
   test 'detectes webpage if content-type includes charset info' do
-    as_not_virtualliver do
-      mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html", 'http://webpage.com', 'Content-Type' => 'text/html; charset=ascii'
-      blob = ContentBlob.create url: 'http://webpage.com', original_filename: nil, content_type: nil, external_link: true
-      assert blob.is_webpage?
-      assert_equal 'text/html', blob.content_type
-    end
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html", 'http://webpage.com', 'Content-Type' => 'text/html; charset=ascii'
+    blob = ContentBlob.create url: 'http://webpage.com', original_filename: nil, content_type: nil, external_link: true
+    assert blob.is_webpage?
+    assert_equal 'text/html', blob.content_type
   end
 
   test 'only overrides url content-type if not already known' do
-    as_not_virtualliver do
-      mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html", 'http://webpage.com', 'Content-Type' => 'text/html'
-      mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://webpage.com/piccy.png', 'Content-Type' => 'image/png'
+    mock_remote_file "#{Rails.root}/test/fixtures/files/html_file.html", 'http://webpage.com', 'Content-Type' => 'text/html'
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://webpage.com/piccy.png', 'Content-Type' => 'image/png'
 
-      blob = ContentBlob.create url: 'http://webpage.com', original_filename: nil, content_type: nil, external_link: true
-      assert_equal 'text/html', blob.content_type
+    blob = ContentBlob.create url: 'http://webpage.com', original_filename: nil, content_type: nil, external_link: true
+    assert_equal 'text/html', blob.content_type
 
-      blob = ContentBlob.create url: 'http://webpage.com/piccy.png', original_filename: nil, content_type: nil
-      assert_equal 'image/png', blob.content_type
+    blob = ContentBlob.create url: 'http://webpage.com/piccy.png', original_filename: nil, content_type: nil
+    assert_equal 'image/png', blob.content_type
 
-      blob = ContentBlob.create url: 'http://webpage.com/piccy.png', original_filename: nil, content_type: 'application/pdf'
-      assert_equal 'application/pdf', blob.content_type
-    end
+    blob = ContentBlob.create url: 'http://webpage.com/piccy.png', original_filename: nil, content_type: 'application/pdf'
+    assert_equal 'application/pdf', blob.content_type
   end
 
   test "detects it isn't a webpage" do
-    as_not_virtualliver do
-      mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://webpage.com/piccy.png', 'Content-Type' => 'image/png'
-      blob = ContentBlob.create url: 'http://webpage.com/piccy.png', original_filename: nil, content_type: nil
-      refute blob.is_webpage?
-      assert_equal 'image/png', blob.content_type
-    end
+    mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://webpage.com/piccy.png', 'Content-Type' => 'image/png'
+    blob = ContentBlob.create url: 'http://webpage.com/piccy.png', original_filename: nil, content_type: nil
+    refute blob.is_webpage?
+    assert_equal 'image/png', blob.content_type
   end
 
   test 'handles an unavailable url when checking for a webpage' do

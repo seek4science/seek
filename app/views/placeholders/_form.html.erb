@@ -14,6 +14,6 @@
 
 <%= render :partial => "select_data_types", :locals => {:resource => (@placeholder ? @placeholder : Placeholder.new) } -%>
 
-<%= render :partial => 'projects/project_selector', :locals => {:resource => @placeholder,:allow_nil=>false} if show_form_manage_specific_attributes? -%>
+<%= render :partial => 'projects/project_selector', :locals => {:resource => @placeholder } if show_form_manage_specific_attributes? -%>
 
 <%= form_submit_buttons(@placeholder) %>

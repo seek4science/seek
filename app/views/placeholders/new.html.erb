@@ -19,7 +19,7 @@
       <%= render :partial => "assets/select_template", :locals => {:resource => @placeholder,
       :templates => FileTemplate.all } %>
       
-      <%= render :partial => "projects/project_selector", :locals => { :resource => @placeholder, :allow_nil => Seek::Config.is_virtualliver } %>
+      <%= render :partial => "projects/project_selector", :locals => { :resource => @placeholder } %>
 
       <%= render partial: 'assets/edam_form_properties', :locals => { :resource => @placeholder } -%>
 

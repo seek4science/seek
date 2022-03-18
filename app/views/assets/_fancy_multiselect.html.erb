@@ -46,7 +46,7 @@
             <%= render partial: 'assets/swappable_selects',
                        locals: { select_options: select_options,
                                  alternative_select_options: unscoped_select_options,
-                                 is_checked: Seek::Config.is_virtualliver,
+                                 is_checked: false,
                                  options: possibilities_options,
                                  check_box_text: "Associate #{association_text.pluralize} from other #{('project').pluralize}?"
                        } %>

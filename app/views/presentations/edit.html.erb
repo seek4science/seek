@@ -16,7 +16,7 @@
 
       <%# only the owner should get to see this option (ability to reload defaults remain in 'edit' action, but project selector is disabled) -%>
       <% if @presentation.can_manage? -%>
-          <%= render :partial => "projects/project_selector", :locals => { :resource => @presentation, :allow_nil => Seek::Config.is_virtualliver } -%>
+          <%= render :partial => "projects/project_selector", :locals => { :resource => @presentation } -%>
       <% end -%>
 
       <% if show_scales? %>
