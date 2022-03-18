@@ -47,7 +47,7 @@ class Person < ApplicationRecord
       joins: [:project_positions]
   )
 
-  has_many :projects, -> { distinct }, through: :work_groups
+  has_many :projects, -> { distinct }, through: :group_memberships, inverse_of: :people
   has_many :current_projects,  -> { distinct }, through: :current_work_groups, source: :project
   has_many :former_projects,  -> { distinct }, through: :former_work_groups, source: :project
 
@@ -138,10 +138,10 @@ class Person < ApplicationRecord
   end
 
   def projects
-    # updating work groups doesn't change group memberships until you save. And vice versa.
+    # you can't access these through .projects nested associations until they have been saved
     work_groups.collect(&:project).uniq | group_memberships.collect { |gm| gm.work_group.project }
   end
-    
+
   # Returns the columns to be shown on the table view for the resource
   def columns_default
     super + ['first_name','last_name']
