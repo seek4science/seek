@@ -86,9 +86,24 @@ function loadTemplates(data) {
     return obj;
   }, {});
 
-  $j.each(Object.keys(categorizedData), (i, key) => {
+ 
+  const ordered = Object.keys(categorizedData).sort().reduce(
+    (obj, key) => { 
+      obj[key] = categorizedData[key]; 
+      obj[key].sort((a,b)=>{
+        if ( a.title < b.title )return -1;
+        else if ( a.title > b.title )return 1;
+        else return 0;
+      })
+      return obj;
+    }, 
+    {}
+  );
+
+  $j.each(Object.keys(ordered), (i, key) => {
     const elem = $j(`<optgroup label=${key}></optgroup>`);
-    $j.each(categorizedData[key], (j, sub_item) => {
+    
+    $j.each(ordered[key], (j, sub_item) => {
       elem.append(
         $j(`<option>${sub_item.title}</option>`).attr("value", sub_item.template_id).text(key.title)
       );
