@@ -18,7 +18,7 @@ class DataFile < ApplicationRecord
 
   has_edam_annotations
 
-  validates :projects, presence: true, projects: { self: true }, unless: Proc.new {Seek::Config.is_virtualliver }
+  validates :projects, presence: true, projects: { self: true }
 
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."

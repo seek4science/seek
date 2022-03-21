@@ -140,11 +140,6 @@ class ModelTest < ActiveSupport::TestCase
     asset = Model.new projects: [projects(:sysmo_project)], policy: Factory(:private_policy)
     assert !asset.valid?
 
-    # VL only: allow no projects
-    as_virtualliver do
-      asset = Model.new title: 'fred', policy: Factory(:private_policy)
-      assert asset.valid?
-    end
   end
 
   test 'is asset?' do

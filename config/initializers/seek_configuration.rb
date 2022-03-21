@@ -62,7 +62,6 @@ def load_seek_config_defaults!
   Seek::Config.default :technology_type_base_uri,"http://jermontology.org/ontology/JERMOntology#Technology_type"
   Seek::Config.default :modelling_analysis_type_base_uri,"http://jermontology.org/ontology/JERMOntology#Model_analysis_type"
   Seek::Config.default :profile_select_by_default,true
-  Seek::Config.default :project_hierarchy_enabled, false
   Seek::Config.default :show_announcements, true
   Seek::Config.default :programme_user_creation_enabled, false
   Seek::Config.default :programmes_open_for_projects_enabled, false
@@ -146,8 +145,6 @@ def load_seek_config_defaults!
 
   #the maximum size, in Mb, for a text file that can be indexed for search (too high and the indexing will timeout)
   Seek::Config.default :max_indexable_text_size,100
-
-  Seek::Config.default :is_virtualliver, false
 
   Seek::Config.default :related_items_limit,5
   Seek::Config.default :search_results_limit,5

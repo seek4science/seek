@@ -49,15 +49,6 @@ class SopTest < ActiveSupport::TestCase
     assert !asset.valid?
   end
 
-  test 'virtual liver allows blank projects' do
-    # VL only:allow no projects
-    as_virtualliver do
-      asset = Sop.new title: 'fred', policy: Factory(:private_policy)
-      assert asset.save!
-    end
-  end
-
-
   test 'assay association' do
     sop = sops(:sop_with_fully_public_policy)
     assay = assays(:modelling_assay_with_data_and_relationship)

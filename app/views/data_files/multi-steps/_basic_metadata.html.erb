@@ -20,7 +20,7 @@
         Model simulation data
       </label>
     </div>
-    <%= render :partial => 'projects/project_selector', locals: {resource: @data_file, allow_nil: Seek::Config.is_virtualliver} -%>
+    <%= render :partial => 'projects/project_selector', locals: {resource: @data_file } -%>
     <%= render :partial => 'assets/select_tags', locals: {collapsed: true} if DataFile.is_taggable? %>
     <%if(is_modal)%>
       <a class=" btn btn-default" onClick="location.reload();">Cancel</a>

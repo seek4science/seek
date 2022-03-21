@@ -13,22 +13,10 @@ class ConfigTest < ActiveSupport::TestCase
     assert Seek::Config.solr_enabled
   end
 
-  test 'is_virtualliver' do
-    with_config_value 'is_virtualliver', true do
-      assert Seek::Config.is_virtualliver
-    end
-  end
-
   test 'read setting attributes' do
     attributes = Seek::Config.read_setting_attributes
     refute attributes.empty?
     assert_includes attributes, :events_enabled
-  end
-
-  test 'project_hierarchy_enabled' do
-    with_config_value 'project_hierarchy_enabled', true do
-      assert Seek::Config.project_hierarchy_enabled
-    end
   end
 
   test 'recaptcha setup?' do

@@ -11,7 +11,7 @@ class ProjectSubscriptionJob < ApplicationJob
     end
   end
 
-  # all direct assets in the project, but related_#{asset_type} includes also assets from descendants
+  # all direct assets in the project
   def all_in_project(project)
     # assay and study dont have project association table
     project.studies | project.assays | assets_with_association_table(project)

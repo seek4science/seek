@@ -1,8 +1,6 @@
 #Default values required for the automated unit, functional and integration testing to behave as expected.
 def load_seek_testing_defaults!
     silence_warnings do
-      Settings.defaults[:is_virtualliver] = false
-      Settings.defaults[:project_hierarchy_enabled] = true
       Settings.defaults[:instance_name] = 'Sysmo SEEK'
 
       Settings.defaults[:noreply_sender] ="no-reply@sysmo-db.org"
@@ -31,8 +29,6 @@ def load_seek_testing_defaults!
       Settings.defaults[:allow_edit_of_registered_publ] = false
       Settings.defaults[:programme_user_creation_enabled] = true
       Settings.defaults[:programmes_open_for_projects_enabled] = true
-
-      Settings.defaults[:project_hierarchy_enabled] = true
 
       # Types
       Settings.defaults[:collections_enabled] = true

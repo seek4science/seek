@@ -23,16 +23,6 @@ class ProjectCUDTest < ActionDispatch::IntegrationTest
     @patch_values = {id: p.id, person_id: pr.id}
   end
 
-  def test_should_create_project_with_hierarchy
-    parent = Factory(:project, title: 'Test Parent')
-    @to_post['data']['attributes']['title'] = 'test project hierarchy'
-    @to_post['data']['attributes']['parent_id'] = parent.id
-    assert_difference('Project.count') do
-      post "/projects.json", params: @to_post
-    end
-    assert_includes assigns(:project).ancestors, parent
-  end
-
   def test_normal_user_cannot_create_project
     user_login(Factory(:person))
     assert_no_difference('Project.count') do

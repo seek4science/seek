@@ -42,19 +42,6 @@ end
 FactoryGirl.find_definitions # It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
 
 Kernel.class_eval do
-  def as_virtualliver
-    vl = Seek::Config.is_virtualliver
-    Seek::Config.is_virtualliver = true
-    yield
-    Seek::Config.is_virtualliver = vl
-  end
-
-  def as_not_virtualliver
-    vl = Seek::Config.is_virtualliver
-    Seek::Config.is_virtualliver = false
-    yield
-    Seek::Config.is_virtualliver = vl
-  end
 
   def with_auth_lookup_enabled
     val = Seek::Config.auth_lookup_enabled

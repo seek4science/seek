@@ -44,7 +44,6 @@ project_news_feed_urls:
 community_news_enabled:
 community_news_feed_urls:
 blacklisted_feeds:
-is_virtualliver:
 filestore_path:
 tagline_prefix:
 modelling_analysis_enabled:
@@ -62,7 +61,6 @@ seek_video_link:
 scales:
 delete_asset_version_enabled:
 recaptcha_enabled:
-project_hierarchy_enabled:
 publish_button_enabled:
 project_browser_enabled:
 project_single_page_enabled:

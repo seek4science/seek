@@ -1,7 +1,6 @@
 class Study < ApplicationRecord
 
   include Seek::Rdf::RdfGeneration
-  include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
 
   enum status: [:planned, :running, :completed, :cancelled, :failed]
   belongs_to :assignee, class_name: 'Person'
