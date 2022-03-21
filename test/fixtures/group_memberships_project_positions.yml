@@ -1,8 +1,0 @@
-group_for_model_owner_member:
-  group_membership_id: <%= ActiveRecord::FixtureSet.identify(:group_for_model_owner) %>
-
-group_for_model_owner_postdoc:
-  group_membership_id: <%= ActiveRecord::FixtureSet.identify(:group_for_model_owner) %>
-  
-pal_association:
-  group_membership_id: <%= ActiveRecord::FixtureSet.identify(:group_for_pal) %>
