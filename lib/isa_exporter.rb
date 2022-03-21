@@ -15,6 +15,7 @@ module IsaExporter
             isa_investigation[:submissionDate] = nil #@investigation.created_at.to_date.iso8601
             isa_investigation[:publicReleaseDate] = nil #@investigation.created_at.to_date.iso8601
             isa_investigation[:ontologySourceReferences] = convert_ontologies
+            isa_investigation[:filename] = "#{@investigation.title}.txt"
 
             publications = []
             @investigation.publications.each do |p|
@@ -41,12 +42,13 @@ module IsaExporter
     
         def convert_study (study)
             isa_study = {}
-            isa_study[:identifier] = study.id
+            isa_study[:identifier] = nil #study.id
             isa_study[:title] = study.title
             isa_study[:description] = study.description
-            isa_study[:submissionDate] = study.created_at.to_date.iso8601
-            isa_study[:publicReleaseDate] = study.created_at.to_date.iso8601
-            isa_study[:filename] = nil
+            isa_study[:submissionDate] = nil #study.created_at.to_date.iso8601
+            isa_study[:publicReleaseDate] = nil # study.created_at.to_date.iso8601
+            isa_study[:filename] = "#{study.title}.txt"
+            isa_study[:comments] = nil
         
             publications = []
             study.publications.each do |p|
@@ -103,7 +105,7 @@ module IsaExporter
         def convert_assay (assay)
             isa_assay = {}
             isa_assay["@id"] = "#assay/#{assay.id}"
-            isa_assay[:filename] = assay&.sample_type&.isa_template&.title
+            isa_assay[:filename] = "a_assays.txt" # assay&.sample_type&.isa_template&.title
             isa_assay[:measurementType] = {
                 annotationValue: "",
                 termSource: "",
