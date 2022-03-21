@@ -295,6 +295,10 @@ class Person < ApplicationRecord
     user && user == User.current_user
   end
 
+  def can_view?(user = User.current_user)
+    true
+  end
+
   # can be edited by:
   # (admin or project managers of this person) and (this person does not have a user or not the other admin)
   # themself
