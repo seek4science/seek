@@ -89,6 +89,7 @@
       const urlSearchParams = new URLSearchParams(window.location.search);
       const params = Object.fromEntries(urlSearchParams.entries());
       const study_id = params["study_id"]
+      $j("option:enabled", "#isa_assay_input_sample_type_id").prop('selected', true);
       // Prevent setting the hidden field on redirect (query string parameters are missing)
       if(study_id) 
         $j("#isa_assay_assay_study_id").val(study_id).change(); 
