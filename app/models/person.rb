@@ -120,7 +120,6 @@ class Person < ApplicationRecord
   after_commit :queue_update_auth_table
 
   has_many :dependent_permissions, class_name: 'Permission', as: :contributor, dependent: :destroy
-  before_destroy :reassign_contribution_permissions
   after_destroy :updated_contributed_items_contributor_after_destroy
   after_destroy :update_publication_authors_after_destroy
 
@@ -350,36 +349,6 @@ class Person < ApplicationRecord
   def remove_permissions
     permissions = Permission.where(['contributor_type =? and contributor_id=?', 'Person', id])
     permissions.each(&:destroy)
-  end
-
-  def reassign_contribution_permissions
-    # retrieve the items that this person is contributor (owner for assay), and that also has policy authorization
-    person_related_items = contributed_items.select{|item| item.respond_to?(:policy)}
-
-    # check if anyone has manage right on the related_items
-    # if not or if only the contributor then assign the manage right to pis||pals
-    person_related_items.each do |item|
-      people_can_manage_item = item.people_can_manage
-      next unless people_can_manage_item.blank? || (people_can_manage_item == [[id, name.to_s, Policy::MANAGING]])
-      # find the projects which this person and item belong to
-      projects_in_common = projects & item.projects
-      pis = projects_in_common.collect(&:pis).flatten.uniq
-      pis.reject! { |pi| pi.id == id }
-      policy = item.policy
-      if pis.blank?
-        pals = projects_in_common.collect(&:pals).flatten.uniq
-        pals.reject! { |pal| pal.id == id }
-        pals.each do |pal|
-          policy.permissions.build(contributor: pal, access_type: Policy::MANAGING)
-          policy.save
-        end
-      else
-        pis.each do |pi|
-          policy.permissions.build(contributor: pi, access_type: Policy::MANAGING)
-          policy.save
-        end
-      end
-    end
   end
 
   # a utitlity method to simply add a person to a project and institution
