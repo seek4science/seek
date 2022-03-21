@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_03_17_160412) do
+ActiveRecord::Schema.define(version: 2022_03_21_103107) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string "action"
@@ -840,11 +840,6 @@ ActiveRecord::Schema.define(version: 2022_03_17_160412) do
     t.index ["work_group_id"], name: "index_group_memberships_on_work_group_id"
   end
 
-  create_table "group_memberships_project_positions", force: :cascade do |t|
-    t.integer "group_membership_id"
-    t.integer "project_position_id"
-  end
-
   create_table "help_attachments", force: :cascade do |t|
     t.integer "help_document_id"
     t.string "title"
@@ -1453,12 +1448,6 @@ ActiveRecord::Schema.define(version: 2022_03_17_160412) do
     t.datetime "updated_at"
     t.boolean "incoming", default: false
     t.boolean "deletable", default: true
-  end
-
-  create_table "project_positions", force: :cascade do |t|
-    t.string "name"
-    t.datetime "created_at"
-    t.datetime "updated_at"
   end
 
   create_table "project_subscriptions", force: :cascade do |t|
