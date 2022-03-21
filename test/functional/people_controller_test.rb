@@ -24,7 +24,7 @@ class PeopleControllerTest < ActionController::TestCase
   def test_should_get_index
     get :index
     assert_response :success
-    assert_not_nil assigns(:people)
+    refute_nil assigns(:people)
   end
 
   def test_should_get_new
@@ -96,7 +96,7 @@ class PeopleControllerTest < ActionController::TestCase
 
     assert_redirected_to person_path(assigns(:person))
     assert_equal 'T', assigns(:person).first_letter
-    assert_not_nil Person.find(assigns(:person).id).notifiee_info
+    refute_nil Person.find(assigns(:person).id).notifiee_info
   end
 
   test 'activation required after create' do
@@ -164,7 +164,7 @@ class PeopleControllerTest < ActionController::TestCase
   def test_created_person_should_receive_notifications
     post :create, params: { person: { first_name: 'test', email: 'hghg@sdfsd.com' } }
     p = assigns(:person)
-    assert_not_nil p.notifiee_info
+    refute_nil p.notifiee_info
     assert p.notifiee_info.receive_notifications?
   end
 
@@ -270,7 +270,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(:aaron)
     quentin = people(:quentin_person)
     put :update, params: { id: people(:quentin_person), person: { email: 'kkkkk@kkkkk.com' } }
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
     quentin.reload
     assert_equal 'quentin@email.com', quentin.email
   end
@@ -441,12 +441,12 @@ class PeopleControllerTest < ActionController::TestCase
     get :edit, params: { id: a_person }
 
     assert_response :redirect
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
 
     put :update, params: { id: a_person, person: { first_name: 'blabla' } }
 
     assert_response :redirect
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
     a_person.reload
     assert_not_equal 'blabla', a_person.first_name
   end
@@ -462,19 +462,19 @@ class PeopleControllerTest < ActionController::TestCase
     get :edit, params: { id: admin }
 
     assert_response :redirect
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
 
     put :update, params: { id: admin, person: { first_name: 'blablba' } }
 
     assert_response :redirect
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
 
     refute_equal 'blablba', assigns(:person).first_name
   end
 
   test 'admin can edit other admin' do
     admin = Factory(:admin)
-    assert_not_nil admin.user
+    refute_nil admin.user
     assert_not_equal User.current_user, admin.user
 
     get :show, params: { id: admin }
