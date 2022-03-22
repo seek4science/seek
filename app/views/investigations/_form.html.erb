@@ -14,7 +14,7 @@
 
 <%= render partial: 'custom_metadata/custom_metadata_type_selection', locals:{f:f, resource:@investigation} %>
 
-<%= render :partial => 'projects/project_selector', :locals => {:resource => @investigation,:allow_nil=>false} if show_form_manage_specific_attributes? && !displaying_single_page? -%>
+<%= render :partial => 'projects/project_selector', :locals => {:resource => @investigation } if show_form_manage_specific_attributes? && !displaying_single_page? -%>
 
 <div class="form-group">
   <%= f.label "Investigation position" -%><br/>

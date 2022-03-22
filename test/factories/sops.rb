@@ -86,69 +86,6 @@ Factory.define(:sop_version_with_blob, parent: :sop_version) do |f|
   end
 end
 
-# ExperimentalCondition
-Factory.define(:experimental_condition) do |f|
-  f.start_value 1
-  f.sop_version 1
-  f.association :measured_item, factory: :measured_item
-  f.association :unit, factory: :unit
-  f.association :sop, factory: :sop
-  f.experimental_condition_links { [ExperimentalConditionLink.new(substance: Factory(:compound))] }
-end
-
-# ExperimentalConditionLink
-Factory.define(:experimental_condition_link) do |f|
-  f.association :substance, factory: :compound
-  f.association :experimental_condition
-end
-
-# StudiedFactor
-Factory.define(:studied_factor) do |f|
-  f.start_value 1
-  f.end_value 10
-  f.standard_deviation 2
-  f.data_file_version 1
-  f.association :measured_item, factory: :measured_item
-  f.association :unit, factory: :unit
-  f.studied_factor_links { [StudiedFactorLink.new(substance: Factory(:compound))] }
-  f.association :data_file, factory: :data_file
-end
-
-# StudiedFactorLink
-Factory.define(:studied_factor_link) do |f|
-  f.association :substance, factory: :compound
-  f.association :studied_factor
-end
-
-# MeasuredItem
-Factory.define(:measured_item) do |f|
-  f.title 'concentration'
-end
-
-# Compound
-Factory.define(:compound) do |f|
-  f.sequence(:name) { |n| "glucose #{n}" }
-end
-
-# Synonym
-Factory.define :synonym do |f|
-  f.name 'coffee'
-  f.association :substance, factory: :compound
-end
-
-# MappingLink
-Factory.define :mapping_link do |f|
-  f.association :substance, factory: :compound
-  f.association :mapping, factory: :mapping
-end
-
-# Mapping
-Factory.define :mapping do |f|
-  f.chebi_id '12345'
-  f.kegg_id '6789'
-  f.sabiork_id '4'
-end
-
 Factory.define(:api_pdf_sop, parent: :sop) do |f|
   f.association :content_blob, factory: :blank_pdf_content_blob
 end

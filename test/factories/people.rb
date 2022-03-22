@@ -72,8 +72,6 @@ end
 Factory.define(:pal, parent: :person) do |f|
   f.roles_mask 2
   f.after_build do |pal|
-    Factory(:pal_position) if ProjectPosition.pal_position.nil?
-    pal.group_memberships.first.project_positions << ProjectPosition.pal_position
     Factory(:admin_defined_role_project, project: pal.projects.first, person: pal, role_mask: 2)
     pal.roles_mask = 2
   end

@@ -6,7 +6,7 @@
   </div>
   <%= form_tag(spreadsheet_annotations_path, method: :post, class: 'spreadsheet-annotation-ctrl',
                id: "new_annotation_form", remote: true) do  %>
-    <%= hidden_field_tag :annotation_content_blob_id, @display_data_file.content_blob.id %>
+    <%= hidden_field_tag :annotation_content_blob_id, resource.content_blob.id %>
     <%= hidden_field_tag :annotation_sheet_id, "0" %>
     
     <p>

@@ -38,6 +38,8 @@ class ProjectSerializer < AvatarObjSerializer
   has_many :studies
   has_many :assays
   has_many :data_files
+  has_many :file_templates
+  has_many :placeholders
   has_many :models
   has_many :sops
   has_many :publications

@@ -81,6 +81,9 @@
       "data_files": {
         "data": []
       },
+      "placeholders": {
+        "data": []
+      },
       "models": {
         "data": []
       },

@@ -1,4 +1,4 @@
-class PublicationSerializer < PCSSerializer
+class PublicationSerializer < ContributedResourceSerializer
   include PublicationsHelper
   attributes :title, #:publication_authors,
              :journal, :published_date,
@@ -26,6 +26,14 @@ class PublicationSerializer < PCSSerializer
     else
       object.publication_author_names
       end
+  end
+
+  attribute :content_blobs do
+    if Seek::Config.allow_publications_fulltext
+      requested_version = object # always the latest (current) version for full text pdf
+
+      get_correct_blob_content(requested_version)
+    end
   end
 
   has_many :people

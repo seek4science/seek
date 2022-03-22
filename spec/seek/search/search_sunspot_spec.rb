@@ -1,9 +1,7 @@
 require 'rails_helper'
 require 'factory_girl'
-require_relative '../../../test/password_helper.rb'
-
-include ActionDispatch::TestProcess::FixtureFile
-include PasswordHelper
+require_relative '../../../test/factories_helper.rb'
+include FactoriesHelper
 
 FactoryGirl.find_definitions
 
@@ -39,7 +37,6 @@ describe Sop do
 
   it { should have_searchable_field(:assay_type_titles) }
   it { should have_searchable_field(:technology_type_titles) }
-  it { should have_searchable_field(:exp_conditions_search_fields) }
 end
 
 describe Model do
@@ -140,7 +137,6 @@ describe Person do
 
   #this goes through institutions
   it { should have_searchable_field(:locations) }
-  it { should have_searchable_field(:project_positions) }
   it { should have_searchable_field(:disciplines) }
   #all the assets contributed by the person
 #  it { should have_searchable_field(:contributed_assets) }

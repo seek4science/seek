@@ -12,7 +12,6 @@ class Project < ApplicationRecord
   has_and_belongs_to_many :models
   has_and_belongs_to_many :sops
   has_and_belongs_to_many :workflows
-  has_and_belongs_to_many :nodes
   has_and_belongs_to_many :publications
   has_and_belongs_to_many :events
   has_and_belongs_to_many :presentations
@@ -20,13 +19,14 @@ class Project < ApplicationRecord
   has_and_belongs_to_many :samples
   has_and_belongs_to_many :sample_types
   has_and_belongs_to_many :documents
+  has_and_belongs_to_many :file_templates
+  has_and_belongs_to_many :placeholders
   has_and_belongs_to_many :collections
 
   has_many :work_groups, dependent: :destroy, inverse_of: :project
   has_many :institutions, through: :work_groups, inverse_of: :projects
   has_many :group_memberships, through: :work_groups, inverse_of: :project
-  # OVERRIDDEN in Seek::ProjectHierarchy if Seek::Config.project_hierarchy_enabled
-  has_many :people, -> { distinct }, through: :group_memberships
+  has_many :people, -> { distinct }, through: :group_memberships, inverse_of: :projects
 
   has_many :former_group_memberships, -> { where('time_left_at IS NOT NULL AND time_left_at <= ?', Time.now) },
            through: :work_groups, source: :group_memberships
@@ -42,6 +42,9 @@ class Project < ApplicationRecord
 
   has_annotation_type :funding_code
 
+  enum status: [:planned, :running, :completed, :cancelled, :failed]
+  belongs_to :assignee, class_name: 'Person'
+  
   belongs_to :programme
   has_filter programme: Seek::Filtering::Filter.new(
       value_field: 'programmes.id',
@@ -94,13 +97,17 @@ class Project < ApplicationRecord
   has_many :dependent_permissions, class_name: 'Permission', as: :contributor, dependent: :destroy
 
   def assets
-    data_files | sops | models | publications | presentations | documents | workflows | nodes | collections
+    data_files | sops | models | publications | presentations | documents | workflows | collections
   end
 
   def project_assets
     assets.select { |a| a.investigations.empty? }
   end
-  
+
+  def spreadsheets
+    data_files.select { |d| d.contains_extractable_spreadsheet?}
+  end	  
+
   def institutions=(new_institutions)
     new_institutions = Array(new_institutions).map do |i|
       i.is_a?(Institution) ? i : Institution.find(i)
@@ -111,12 +118,6 @@ class Project < ApplicationRecord
     new_institutions.each do |i|
       institutions << i unless institutions.include?(i)
     end
-  end
-
-  # this is project role
-  def pis
-    pi_role = ProjectPosition.find_by_name('PI')
-    people.select { |p| p.project_positions_of_project(self).include?(pi_role) }
   end
 
   # this is seek role
@@ -222,13 +223,6 @@ class Project < ApplicationRecord
     end
   end
 
-  def person_roles(person)
-    # Get intersection of all project memberships + person's memberships to find project membership
-    project_memberships = work_groups.collect(&:group_memberships).flatten
-    person_project_membership = person.group_memberships & project_memberships
-    person_project_membership.project_positions
-  end
-
   def can_edit?(user = User.current_user)
     return false unless user
     return true if new_record? && self.class.can_create?
@@ -330,9 +324,4 @@ class Project < ApplicationRecord
     end
   end
 
-  # should put below at the bottom in order to override methods for hierarchies,
-  # Try to find a better way for overriding methods regardless where to include the module
-  if Seek::Config.project_hierarchy_enabled
-    include Seek::ProjectHierarchies::ProjectExtension
-  end
 end

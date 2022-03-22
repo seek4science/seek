@@ -494,67 +494,39 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                    'isPartOf' => [],
 		    'input' => [
                    { '@type' => 'FormalParameter',
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.cofsfile",
+                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/max-steps",
                      'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     'name' => '#main/input.cofsfile' },
+                     'name' => '#main/max-steps' },
                    { '@type' => 'FormalParameter',
                      'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.dmax",
-                     'name' => '#main/input.dmax' },
+                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/reverse",
+                     'name' => '#main/reverse' },
                    { '@type' => 'FormalParameter',
                      'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.dmin",
-                     'name' => '#main/input.dmin' },
+                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/rulesfile",
+                     'name' => '#main/rulesfile' },
                    { '@type' => 'FormalParameter',
                      'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.max-steps",
-                     'name' => '#main/input.max-steps' },
+                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/sinkfile",
+                     'name' => '#main/sinkfile' },
                    { '@type' => 'FormalParameter',
                      'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.mwmax-cof",
-                     'name' => '#main/input.mwmax-cof' },
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.mwmax-source",
-                     'name' => '#main/input.mwmax-source' },
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.rulesfile",
-                     'name' => '#main/input.rulesfile' },
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.sinkfile",
-                     'name' => '#main/input.sinkfile' },
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.sourcefile",
-                     'name' => '#main/input.sourcefile' },
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.std_mode",
-                     'name' => '#main/input.std_mode' },
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.stereo_mode",
-                     'name' => '#main/input.stereo_mode' },
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.topx",
-                     'name' => '#main/input.topx' }
+                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/sourcefile",
+                     'name' => '#main/sourcefile' }
                  ],
                  'output' => [
                    { '@type' => 'FormalParameter',
                      'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-outputs-\#main/solutionfile",
-                     'name' => '#main/solutionfile' },
+                     '@id' => "\##{expected_wf_prefix}-outputs-\#main/compounds",
+                     'name' => '#main/compounds' },
                    { '@type' => 'FormalParameter',
                      'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-outputs-\#main/sourceinsinkfile",
-                     'name' => '#main/sourceinsinkfile' },
+                     '@id' => "\##{expected_wf_prefix}-outputs-\#main/reactions",
+                     'name' => '#main/reactions' },
                    { '@type' => 'FormalParameter',
                      'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-outputs-\#main/stdout",
-                     'name' => '#main/stdout' }
+                     '@id' => "\##{expected_wf_prefix}-outputs-\#main/sinks",
+                     'name' => '#main/sinks' }
                  ] }
 
     json = JSON.parse(workflow.to_schema_ld)
@@ -718,7 +690,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       disable_authorization_checks do
         df.save!
         df.save_as_new_version
-        df.update_attributes(description: 'version 2 description', title: 'version 2 title')
+        df.update(description: 'version 2 description', title: 'version 2 title')
         Factory.create(:image_content_blob, asset: df, asset_version: 2)
         df.latest_version.update_column(:doi, '10.10.10.10/test.2')
       end

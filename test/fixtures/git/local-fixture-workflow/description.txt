@@ -1,0 +1,27 @@
+# Basic galaxy workflow with abstract CWL
+# Branches: master
+# Commits:
+# commit 96aee188b2f9c145860f21dc182608fec5084a8a (HEAD -> master)
+# Author: Finn Bacall <finn.bacall@manchester.ac.uk>
+# Date:   Mon Oct 11 14:11:10 2021 +0100
+#
+#     Revert "Accidentally deleted workflow"
+#
+#     This reverts commit ef558beaf17d76b99e0071f9eb0afd38567306b8.
+#
+# commit ef558beaf17d76b99e0071f9eb0afd38567306b8
+# Author: Finn Bacall <finn.bacall@manchester.ac.uk>
+# Date:   Mon Oct 11 14:11:01 2021 +0100
+#
+#     Accidentally deleted workflow
+#
+# commit 8eaac19a9e8bf17c787310422ad77d0dab1bfb33
+# Author: Finn Bacall <finn.bacall@manchester.ac.uk.example.com>
+# Date:   Wed Apr 7 13:02:46 2021 +0100
+#
+#     Added/updated 3 files
+#
+# Files on branch "main":
+Concat_two_files.cwl
+concat_two_files.ga
+diagram.png

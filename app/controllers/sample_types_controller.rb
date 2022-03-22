@@ -80,7 +80,7 @@ class SampleTypesController < ApplicationController
   # PUT /sample_types/1.json
   def update
 
-    @sample_type.update_attributes(sample_type_params)
+    @sample_type.update(sample_type_params)
     @sample_type.resolve_inconsistencies
     respond_to do |format|
       if @sample_type.save

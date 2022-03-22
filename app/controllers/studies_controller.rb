@@ -40,7 +40,6 @@ class StudiesController < ApplicationController
     @study = Study.find(params[:id])
     respond_to do |format|
       format.html
-      format.xml
     end
   end
 
@@ -89,7 +88,6 @@ class StudiesController < ApplicationController
 
     respond_to do |format|
       format.html { render(params[:only_content] ? { layout: false } : {})}
-      format.xml
       format.rdf { render template: 'rdf/show' }
       format.json {render json: @study, include: [params[:include]]}
     end
@@ -340,7 +338,6 @@ class StudiesController < ApplicationController
   end
 
   private
-
   def study_params
     params.require(:study).permit(:title, :description, :experimentalists, :investigation_id,
                                   *creator_related_params, :position, { scales: [] }, { publication_ids: [] },

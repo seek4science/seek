@@ -1,8 +1,7 @@
 require 'simplecov'
 SimpleCov.start 'rails'
 ENV['RAILS_ENV'] ||= 'test'
-
-require File.expand_path(File.dirname(__FILE__) + '/../config/environment')
+require_relative '../config/environment'
 require 'rails/test_help'
 
 require 'rest_test_cases'
@@ -43,19 +42,6 @@ end
 FactoryGirl.find_definitions # It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
 
 Kernel.class_eval do
-  def as_virtualliver
-    vl = Seek::Config.is_virtualliver
-    Seek::Config.is_virtualliver = true
-    yield
-    Seek::Config.is_virtualliver = vl
-  end
-
-  def as_not_virtualliver
-    vl = Seek::Config.is_virtualliver
-    Seek::Config.is_virtualliver = false
-    yield
-    Seek::Config.is_virtualliver = vl
-  end
 
   def with_auth_lookup_enabled
     val = Seek::Config.auth_lookup_enabled
@@ -98,7 +84,7 @@ class ActiveSupport::TestCase
   teardown :clear_current_user
 
   def file_for_upload
-    fixture_file_upload('files/little_file_v2.txt', 'text/plain')
+    fixture_file_upload('little_file_v2.txt', 'text/plain')
   end
 
   def skip_rest_schema_check?
@@ -267,3 +253,8 @@ VCR.configure do |config|
 end
 
 WebMock.disable_net_connect!(allow_localhost: true) # Need to comment this line out when running VCRs for the first time
+
+# Clear testing filestore before test run (but check its under tmp for safety)
+if File.expand_path(Seek::Config.filestore_path).start_with?(File.expand_path(File.join(Rails.root, 'tmp')))
+  FileUtils.rm_r(Seek::Config.filestore_path)
+end

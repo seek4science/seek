@@ -1,0 +1,8 @@
+<ul class="pending-files">
+  <% @tree.each_tree do |entry| %>
+    <li><%= icon_link_to(entry[:name], 'organise', polymorphic_path([@parent_resource, :git_tree], version: @git_version.version, path: [params[:path], entry[:name]].compact)) %></li>
+  <% end %>
+  <% @tree.each_blob do |entry| %>
+    <li><%= icon_link_to(entry[:name], 'markup', polymorphic_path([@parent_resource, :git_blob], version: @git_version.version, path: [params[:path], entry[:name]].compact)) %></li>
+  <% end %>
+</ul>

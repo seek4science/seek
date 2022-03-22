@@ -39,8 +39,6 @@
       </div>
     </div>
 
-    <%= render :partial=>"data_files/studied_factors" if Seek::Config.factors_studied_enabled %>
-
     <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_data_file, :resource=>@data_file} %>
   <% end %>
 

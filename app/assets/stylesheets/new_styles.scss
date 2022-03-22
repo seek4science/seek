@@ -267,10 +267,6 @@ h1 div.version a.dropdown-toggle {
   margin-bottom: 1em;
 }
 
-.factors-studied li {
-  list-style: none;
-}
-
 #description p:last-child, .list_item_desc p:last-child, #home_description p:last-child {
   margin-bottom: 0;
 }
@@ -1052,6 +1048,36 @@ span.disabled {
   max-height: 20em;
 }
 
+.jstree {
+  i.jstree-checkbox {
+    display: none;
+  }
+  &.allow-root-select .git-jstree-root > i.jstree-checkbox {
+    display: inherit;
+  }
+  &.allow-tree-select .git-jstree-tree > i.jstree-checkbox {
+    display: inherit;
+  }
+  &.allow-blob-select .git-jstree-blob > i.jstree-checkbox {
+    display: inherit;
+  }
+  &.allow-blob-preview .jstree-leaf:hover .git-jstree-blob {
+    text-decoration: underline;
+  }
+}
+
+.git-browser-modal .modal-body {
+  max-height: calc(100vh - 190px);
+  overflow-y: auto;
+}
+
+input.git-path {
+  padding-left: 32px;
+  background-image: url(asset-path("famfamfam_silk/folder_magnify.png"));
+  background-repeat: no-repeat;
+  background-position: 8px 8px;
+}
+
 .citation-box {
   overflow-x: auto;
 }
@@ -1089,7 +1115,7 @@ a.orcid-link {
     }
   }
 }
-  
+
 .seek-description {
   background-color: #fcfcfc;
   border: 1px solid #e3e3e3;
@@ -1102,6 +1128,52 @@ a.orcid-link {
   min-height: 20px;
   margin-bottom: 20px;
   font-size: inherit !important;
+}
+
+.auto-collapse {
+  max-height: 10em;
+  overflow: hidden;
+}
+
+.auto-collapse.open {
+  max-height: 9999em;
+}
+
+.auto-collapse-btn {
+  cursor: pointer;
+}
+
+.git-annotated > a {
+  font-weight: bold;
+}
+
+.git-annotated-parent > .git-annotation {
+  opacity: 0.3;
+}
+
+.git-annotation {
+  position: relative;
+  margin-right: 2px;
+  background-color: $label-default-bg;
+  &[data-annotation-key="main_workflow"] { background-color: $label-primary-bg; }
+}
+
+.git-image-preview {
+  max-width: 100%;
+}
+
+ul.workflow-port-type {
+  padding-left: 0;
+  li {
+    list-style-type: none;
+  }
+  li + li:before {
+    content: 'or';
+    color: #ccc;
+  }
+  ul.workflow-port-type {
+    padding-left: 2em;
+  }
 }
 
 div#super_tag_cloud {

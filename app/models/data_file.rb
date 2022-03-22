@@ -16,7 +16,9 @@ class DataFile < ApplicationRecord
 
   acts_as_doi_parent(child_accessor: :versions)
 
-  validates :projects, presence: true, projects: { self: true }, unless: Proc.new {Seek::Config.is_virtualliver }
+  has_edam_annotations
+
+  validates :projects, presence: true, projects: { self: true }
 
   # allow same titles, but only if these belong to different users
   # validates_uniqueness_of :title, :scope => [ :contributor_id, :contributor_type ], :message => "error - you already have a Data file with such title."
@@ -24,12 +26,13 @@ class DataFile < ApplicationRecord
   has_one :content_blob, ->(r) { where('content_blobs.asset_version =?', r.version) }, as: :asset, foreign_key: :asset_id
   has_one :external_asset, as: :seek_entity, dependent: :destroy
 
-  has_many :studied_factors, ->(r) { where('studied_factors.data_file_version =?', r.version) }
+  belongs_to :file_template
   has_many :extracted_samples, class_name: 'Sample', foreign_key: :originating_data_file_id
 
   has_many :workflow_data_files, dependent: :destroy, autosave: true
   has_many :workflows, ->{ distinct }, through: :workflow_data_files
 
+  has_one :placeholder
   scope :with_extracted_samples, -> { joins(:extracted_samples).distinct }
 
   scope :simulation_data, -> { where(simulation_data: true) }
@@ -45,7 +48,8 @@ class DataFile < ApplicationRecord
       joins: [:assays]
   )
 
-  explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi', 'data_type', 'format_type']) do
+  explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi', 'data_type', 'format_type', 'file_template_id']) do
+
     include Seek::Data::SpreadsheetExplorerRepresentation
     acts_as_doi_mintable(proxy: :parent, type: 'Dataset', general_type: 'Dataset')
     acts_as_versioned_resource
@@ -53,9 +57,6 @@ class DataFile < ApplicationRecord
 
     has_one :content_blob, ->(r) { where('content_blobs.asset_version =? AND content_blobs.asset_type =?', r.version, r.parent.class.name) },
             primary_key: :data_file_id, foreign_key: :asset_id
-
-    has_many :studied_factors, ->(r) { where('studied_factors.data_file_version = ?', r.version) },
-             primary_key: 'data_file_id', foreign_key: 'data_file_id'
 
     def relationship_type(assay)
       parent.relationship_type(assay)
@@ -97,12 +98,20 @@ class DataFile < ApplicationRecord
 
   # Returns the columns to be shown on the table view for the resource
   def columns_default
-    super + ['creators','projects','version']
+    super + ['creators','projects','version', 'format_type', 'data_type']
   end
   def columns_allowed
     columns_default + ['last_used_at','other_creators','doi','license','simulation_data']
   end
 
+  def edam_topics_vocab
+    nil
+  end
+  
+  def edam_operations_vocab
+    nil
+  end
+  
   def included_to_be_copied?(symbol)
     case symbol.to_s
     when 'activity_logs', 'versions', 'attributions', 'relationships', 'inverse_relationships', 'annotations'

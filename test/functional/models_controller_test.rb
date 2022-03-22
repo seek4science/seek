@@ -41,7 +41,7 @@ class ModelsControllerTest < ActionController::TestCase
       get :download, params: { id: model.id }
     end
     assert_response :success
-    assert_equal "attachment; filename=\"file_with_no_extension\"", @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"file_with_no_extension\"; filename*=UTF-8''file_with_no_extension", @response.header['Content-Disposition']
     assert_equal 'application/octet-stream', @response.header['Content-Type']
     assert_equal '31', @response.header['Content-Length']
   end
@@ -52,7 +52,7 @@ class ModelsControllerTest < ActionController::TestCase
       get :download, params: { id: model.id }
     end
     assert_response :success
-    assert_equal "attachment; filename=\"this_model.zip\"", @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"this_model.zip\"; filename*=UTF-8''this_model.zip", @response.header['Content-Disposition']
     assert_equal 'application/zip', @response.header['Content-Type']
     assert_equal '3024', @response.header['Content-Length']
   end
@@ -63,7 +63,7 @@ class ModelsControllerTest < ActionController::TestCase
       get :download, params: { id: model.id }
     end
     assert_response :success
-    assert_equal "attachment; filename=\"cronwright.xml\"", @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"cronwright.xml\"; filename*=UTF-8''cronwright.xml", @response.header['Content-Disposition']
     assert_equal 'application/xml', @response.header['Content-Type']
     assert_equal '5933', @response.header['Content-Length']
   end
@@ -154,11 +154,11 @@ class ModelsControllerTest < ActionController::TestCase
 
   test 'correct title and text for associating a modelling analysis for new' do
     login_as(Factory(:user))
-    as_not_virtualliver do
-      get :new
-      assert_response :success
-      assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
-    end
+
+    get :new
+    assert_response :success
+    assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
+
     assert_select 'div.panel-heading', text: /#{I18n.t('assays.modelling_analysis').pluralize}/
     assert_select 'div#associate_assay_fold_content p', text: /The following #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('model')}:/
   end
@@ -166,11 +166,11 @@ class ModelsControllerTest < ActionController::TestCase
   test 'correct title and text for associating a modelling analysis for edit' do
     model = Factory :model
     login_as(model.contributor.user)
-    as_not_virtualliver do
-      get :edit, params: { id: model.id }
-      assert_response :success
-      assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
-    end
+
+    get :edit, params: { id: model.id }
+    assert_response :success
+    assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('model')}./
+
     assert_select 'div.panel-heading', text: /#{I18n.t('assays.modelling_analysis').pluralize}/
     assert_select 'div#associate_assay_fold_content p', text: /The following #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('model')}:/
   end
@@ -362,7 +362,7 @@ class ModelsControllerTest < ActionController::TestCase
     login_as(:model_owner)
     assert_difference('Model.count') do
       assert_difference('ModelImage.count') do
-        post :create, params: { model: valid_model, content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing, model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') } }
+        post :create, params: { model: valid_model, content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing, model_image: { image_file: fixture_file_upload('file_picture.png', 'image/png') } }
 
         assert_redirected_to model_path(assigns(:model))
       end
@@ -377,7 +377,7 @@ class ModelsControllerTest < ActionController::TestCase
     login_as(:model_owner)
     assert_difference('Model.count') do
       assert_difference('ModelImage.count') do
-        post :create, params: { model: valid_model, content_blobs: [{ data: ''}], policy_attributes: valid_sharing, model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') } }
+        post :create, params: { model: valid_model, content_blobs: [{ data: ''}], policy_attributes: valid_sharing, model_image: { image_file: fixture_file_upload('file_picture.png', 'image/png') } }
 
         assert_redirected_to model_path(assigns(:model))
       end
@@ -400,9 +400,9 @@ class ModelsControllerTest < ActionController::TestCase
     assert_difference('Model::Version.count', 1) do
       assert_difference('ModelImage.count') do
         post :create_version, params: { id: m, model: { title: m.title },
-                                     content_blobs: [{ data: fixture_file_upload('files/little_file.txt') }],
+                                     content_blobs: [{ data: fixture_file_upload('little_file.txt') }],
                                      revision_comments: 'This is a new revision',
-                                     model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') } }
+                                     model_image: { image_file: fixture_file_upload('file_picture.png', 'image/png') } }
 
         assert_redirected_to model_path(assigns(:model))
       end
@@ -431,7 +431,7 @@ class ModelsControllerTest < ActionController::TestCase
     model_details[:imported_url] = 'http://biomodels/model.xml'
 
     assert_difference('Model.count') do
-      post :create, params: { model: model_details, content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing, model_image: { image_file: fixture_file_upload('files/file_picture.png', 'image/png') } }
+      post :create, params: { model: model_details, content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing, model_image: { image_file: fixture_file_upload('file_picture.png', 'image/png') } }
     end
     model = assigns(:model)
     assert_redirected_to model_path(model)
@@ -625,7 +625,7 @@ class ModelsControllerTest < ActionController::TestCase
 
     # create new version
     assert_difference('Model::Version.count', 1) do
-      post :create_version, params: { id: m, content_blobs: [{ data: fixture_file_upload('files/little_file.txt') }] }
+      post :create_version, params: { id: m, content_blobs: [{ data: fixture_file_upload('little_file.txt') }] }
     end
     assert_redirected_to model_path(assigns(:model))
     m = Model.find(m.id)
@@ -655,7 +655,7 @@ class ModelsControllerTest < ActionController::TestCase
     assert_equal 'cronwright.xml',m.versions[0].content_blobs.first.original_filename
 
     assert_difference('Model::Version.count', 1) do
-      post :create_version, params: { id: m, model: { title: m.title}, content_blobs: [{ data: fixture_file_upload('files/little_file.txt') }], revision_comments: 'This is a new revision' }
+      post :create_version, params: { id: m, model: { title: m.title}, content_blobs: [{ data: fixture_file_upload('little_file.txt') }], revision_comments: 'This is a new revision' }
     end
 
     # check previous version isn't affected
@@ -1106,7 +1106,7 @@ class ModelsControllerTest < ActionController::TestCase
     model = Factory :model, license: 'CC-BY-4.0', policy: Factory(:public_policy)
     modelv = Factory :model_version_with_blob, model: model
 
-    model.update_attributes license: 'CC0-1.0'
+    model.update license: 'CC0-1.0'
 
     get :show, params: { id: model, version: 1 }
     assert_response :success

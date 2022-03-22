@@ -1,0 +1,15 @@
+<h2>
+  <%= @observed_variable_set.title %>
+</h2>
+
+<%= "#{@observed_variable_set.observed_variables.count} #{'variable'.pluralize(@observed_variable_set.observed_variables.count)}" %>
+<%= link_to('[add]',new_observed_variable_path(observed_variable_set_id: @observed_variable_set.id)) %>
+<ul>
+  <% @observed_variable_set.observed_variables.each do |variable| %>
+  <li>
+    <%= link_to(variable.variable_id, variable) %>
+    <%= link_to('[edit]',edit_observed_variable_path(variable)) %>
+  </li>
+
+  <% end %>
+</ul>

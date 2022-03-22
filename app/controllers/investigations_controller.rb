@@ -47,7 +47,6 @@ class InvestigationsController < ApplicationController
 
     respond_to do |format|
       format.html { render(params[:only_content] ? { layout: false } : {})}
-      format.xml
       format.rdf { render :template=>'rdf/show' }
       format.json {render json: @investigation}
 
@@ -114,7 +113,7 @@ class InvestigationsController < ApplicationController
         format.html { redirect_to(@investigation) }
       end
     else
-      @investigation.update_attributes(investigation_params)
+      @investigation.update(investigation_params)
       update_sharing_policies @investigation
       update_relationships(@investigation, params)
 

@@ -320,7 +320,7 @@ module ApiHelper
   end
 
   def ignore_associated_types_xml
-    [Workflow, Node]
+    [Workflow]
   end
 
   def generic_list_xml(builder, list, tag, attr = {})

@@ -1,7 +1,3 @@
 <div id="home">
-  <% if Seek::Config.is_virtualliver %>
-      <%= render :partial => "vln_home_contents" -%>
-  <% else %>
-      <%= render :partial => "home_contents" -%>
-  <% end %>
+  <%= render partial: "home_contents" -%>
 </div>

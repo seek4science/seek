@@ -1,10 +1,14 @@
 require 'seek/custom_exception'
+require 'zip'
+require 'securerandom'
+require 'json'
 
 class ProjectsController < ApplicationController
   include Seek::IndexPager
   include CommonSweepers
   include Seek::DestroyHandling
   include ApiHelper
+  include Seek::Projects::Population
 
   before_action :login_required, only: [:guided_join, :guided_create, :request_join, :request_create,
                                         :administer_join_request, :respond_join_request,
@@ -12,14 +16,18 @@ class ProjectsController < ApplicationController
                                         :project_join_requests, :project_creation_requests, :typeahead]
 
   before_action :find_requested_item, only: %i[show admin edit update destroy asset_report admin_members
+                                               populate populate_from_spreadsheet
                                                admin_member_roles update_members storage_report
                                                overview administer_join_request respond_join_request]
+
+  before_action :has_spreadsheets, only: %i[:populate populate_from_spreadsheet]
+
   before_action :find_assets, only: [:index]
   before_action :auth_to_create, only: %i[new create,:administer_create_project_request, :respond_create_project_request]
-  before_action :is_user_admin_auth, only: %i[manage destroy]
+  before_action :is_user_admin_auth, only: %i[destroy]
   before_action :editable_by_user, only: %i[edit update]
   before_action :check_investigations_are_for_this_project, only: %i[update]
-  before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles update_members storage_report administer_join_request respond_join_request]
+  before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles update_members storage_report administer_join_request respond_join_request populate populate_from_spreadsheet]
 
   before_action :member_of_this_project, only: [:asset_report], unless: :admin_logged_in?
 
@@ -261,19 +269,17 @@ class ProjectsController < ApplicationController
     end
   end
 
+  
   # GET /projects/1
-  # GET /projects/1.xml
   def show
     respond_to do |format|
       format.html { render(params[:only_content] ? { layout: false } : {})} # show.html.erb
       format.rdf { render template: 'rdf/show' }
-      format.xml
       format.json { render json: @project, include: [params[:include]] }
     end
   end
 
   # GET /projects/new
-  # GET /projects/new.xml
   def new
     @project = Project.new
 
@@ -336,7 +342,6 @@ class ProjectsController < ApplicationController
   end
 
   # POST /projects
-  # POST /projects.xml
   def create
     @project = Project.new
     @project.assign_attributes(project_params)
@@ -383,7 +388,6 @@ class ProjectsController < ApplicationController
   end
 
   # PUT /projects/1   , polymorphic: [:organism]
-  # PUT /projects/1.xml
   def update
     if params[:project][:ordered_investigation_ids]
       a1 = params[:project][:ordered_investigation_ids]
@@ -407,7 +411,7 @@ class ProjectsController < ApplicationController
 
     begin
       respond_to do |format|
-        if @project.update_attributes(project_params)
+        if @project.update(project_params)
           if Seek::Config.email_enabled && !@project.can_manage?(current_user)
             ProjectChangedEmailJob.new(@project).queue_job
           end
@@ -415,23 +419,13 @@ class ProjectsController < ApplicationController
           @project.reload
           flash[:notice] = "#{t('project')} was successfully updated."
           format.html { redirect_to(@project) }
-          format.xml  { head :ok }
           format.json { render json: @project, include: [params[:include]] }
         #            format.json {render json: @project, adapter: :json, status: 200 }
         else
           format.html { render action: 'edit' }
-          format.xml  { render xml: @project.errors, status: :unprocessable_entity }
           format.json { render json: json_api_errors(@project), status: :unprocessable_entity }
         end
       end
-    end
-  end
-
-  def manage
-    @projects = Project.all
-    respond_to do |format|
-      format.html
-      format.xml { render xml: @projects }
     end
   end
 
@@ -463,6 +457,17 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def populate
+    respond_with(@project)
+  end
+
+  def populate_from_spreadsheet
+    populate_from_spreadsheet_impl
+    respond_with(@project) do |format|
+      format.html { redirect_to project_path(@project) }
+    end
+  end
+  
   def admin_members
     respond_with(@project)
   end
@@ -495,7 +500,7 @@ class ProjectsController < ApplicationController
 
   def update_administrative_roles
     unless params[:project].blank?
-      @project.update_attributes(project_role_params)
+      @project.update(project_role_params)
     end
   end
 
@@ -639,8 +644,9 @@ class ProjectsController < ApplicationController
 
   def project_params
     permitted_params = [:title, :web_page, :wiki_page, :description, { organism_ids: [] }, :parent_id, :start_date,
-                        :end_date, :funding_codes, { human_disease_ids: [] },
-                        discussion_links_attributes:[:id, :url, :label, :_destroy] ]
+                        :end_date,
+                        :funding_codes, { human_disease_ids: [] },
+                        discussion_links_attributes:[:id, :url, :label, :_destroy]]
 
     if User.admin_logged_in?
       permitted_params += [:site_root_uri, :site_username, :site_password, :nels_enabled]
@@ -712,7 +718,7 @@ class ProjectsController < ApplicationController
       GroupMembership.where(id: params[:memberships_to_flag].keys).includes(:work_group).each do |membership|
         if membership.work_group.project_id == @project.id # Prevent modification of other projects' memberships
           left_at = params[:memberships_to_flag][membership.id.to_s][:time_left_at]
-          membership.update_attributes(time_left_at: left_at)
+          membership.update(time_left_at: left_at)
         end
         member = Person.find(membership.person_id)
         Rails.cache.delete_matched("rli_title_#{member.cache_key}_.*")
@@ -726,6 +732,10 @@ class ProjectsController < ApplicationController
       error('Insufficient privileges', 'is invalid (insufficient_privileges)', :forbidden)
       return false
     end
+  end
+
+  def has_spreadsheets
+    return !@project.spreadsheets.empty?
   end
 
   def member_of_this_project

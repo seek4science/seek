@@ -24,14 +24,6 @@ class SopsController < ApplicationController
 
       respond_to do |format|
         if @sop.save_as_new_version(comments)
-
-          #Duplicate experimental conditions
-          conditions = @sop.find_version(@sop.version - 1).experimental_conditions
-          conditions.each do |con|
-            new_con = con.dup
-            new_con.sop_version = @sop.version
-            new_con.save
-          end
           flash[:notice]="New version uploaded - now on version #{@sop.version}"
         else
           flash[:error]="Unable to save new version"
@@ -52,7 +44,7 @@ class SopsController < ApplicationController
     update_relationships(@sop,params)
 
     respond_to do |format|
-      if @sop.update_attributes(sop_params)
+      if @sop.update(sop_params)
         flash[:notice] = "#{t('sop')} metadata was successfully updated."
         format.html { redirect_to sop_path(@sop) }
         format.json { render json: @sop, include: [params[:include]] }

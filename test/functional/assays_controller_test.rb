@@ -18,17 +18,6 @@ class AssaysControllerTest < ActionController::TestCase
     @object = Factory(:experimental_assay, policy: Factory(:public_policy))
   end
 
-  test "shouldn't show unauthorized assays" do
-    login_as Factory(:user)
-    hidden = Factory(:experimental_assay, policy: Factory(:private_policy)) # ensure at least one hidden assay exists
-    get :index, params: { page: 'all', format: 'xml' }
-    assert_response :success
-    assert_equal assigns(:assays).sort_by(&:id),
-                 assigns(:assays).authorized_for('view', users(:aaron)).sort_by(&:id),
-                 "#{t('assays.assay').downcase.pluralize} haven't been authorized"
-    assert !assigns(:assays).include?(hidden)
-  end
-
   def test_title
     get :index
     assert_select 'title', text: I18n.t('assays.assay').pluralize, count: 1
@@ -565,16 +554,17 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test 'should not delete assay with publication' do
-    login_as(:model_owner)
-    a = assays(:assay_with_a_publication)
+    login_as(Factory(:user))
+    one_assay_with_publication = Factory :assay, contributor: User.current_user.person, publications: [Factory(:publication)]
+
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('Assay.count') do
-        delete :destroy, params: { id: a }
+        delete :destroy, params: { id: one_assay_with_publication.id }
       end
     end
 
     assert flash[:error]
-    assert_redirected_to a
+    assert_redirected_to one_assay_with_publication
   end
 
   test 'should not delete assay with sops' do
@@ -1252,40 +1242,6 @@ class AssaysControllerTest < ActionController::TestCase
     assert_select 'div.list_item_title' do
       assert_select 'a[href=?]', assay_path(assay1), text: assay1.title
       assert_select 'a[href=?]', assay_path(assay2), text: assay2.title, count: 0
-    end
-  end
-
-  test 'faceted browsing config for Assay' do
-    Factory(:assay, policy: Factory(:public_policy))
-    with_config_value :faceted_browsing_enabled, true do
-      get :index, params: { user_enable_facet: 'true' }
-      assert_select "div[data-ex-facet-class='TextSearch']", count: 1
-      assert_select "div[data-ex-role='facet'][data-ex-expression='.organism']", count: 1
-      assert_select "div[data-ex-role='facet'][data-ex-expression='.assay_type'][data-ex-facet-class='Exhibit.HierarchicalFacet']", count: 1
-      assert_select "div[data-ex-role='facet'][data-ex-expression='.technology_type'][data-ex-facet-class='Exhibit.HierarchicalFacet']", count: 1
-      assert_select "div[data-ex-role='facet'][data-ex-expression='.project']", count: 1
-      assert_select "div[data-ex-role='facet'][data-ex-expression='.for_test']", count: 0
-    end
-  end
-
-  test 'content config for Assay' do
-    with_config_value :faceted_browsing_enabled, true do
-      get :index, params: { user_enable_facet: 'true' }
-      assert_select "div[data-ex-role='exhibit-view'][data-ex-label='Tiles'][data-ex-paginate='true']", count: 1
-    end
-  end
-
-  test 'show only authorized items for faceted browsing' do
-    with_config_value :faceted_browsing_enabled, true do
-      assay1 = Factory(:assay, policy: Factory(:public_policy))
-      assay2 = Factory(:assay, policy: Factory(:private_policy))
-      assert assay1.can_view?
-      assert !assay2.can_view?
-      @request.env['HTTP_REFERER'] = '/assays/items_for_result'
-      post :items_for_result, xhr: true, params: { items: "Assay_#{assay1.id},Assay_#{assay2.id}" }
-      items_for_result = ActiveSupport::JSON.decode(@response.body)['items_for_result']
-      assert items_for_result.include?(assay1.title)
-      assert !items_for_result.include?(assay2.title)
     end
   end
 

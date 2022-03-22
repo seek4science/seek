@@ -48,14 +48,12 @@ class ProgrammesController < ApplicationController
 
   def update
     respond_to do |format|
-      if @programme.update_attributes(programme_params)
+      if @programme.update(programme_params)
         flash[:notice] = "The #{t('programme').capitalize} was successfully updated"
         format.html { redirect_to(@programme) }
-        format.xml { head :ok }
         format.json { render json: @programme, include: [params[:include]] }
       else
         format.html { render action: 'edit' }
-        format.xml { render xml: @programme.errors, status: :unprocessable_entity }
         format.json { render json: json_api_errors(@programme), status: :unprocessable_entity }
       end
     end

@@ -33,10 +33,6 @@
         <li><%= link_to 'Manage assay types', suggested_assay_types_path %></li>
         <li><%= link_to 'Manage technology types', suggested_technology_types_path %></li>
         <li><%= link_to 'Manage tags', tags_admin_path %></li>
-        <% if Seek::Config.project_hierarchy_enabled %>
-            <li><%= link_to "Manage #{t('project').pluralize.downcase}", manage_projects_path %></li>
-        <% end %>
-        <!-- <li><%= link_to 'Manage compounds', compounds_path %></li> -->
         <li><%= link_to "Manage #{WorkflowClass.model_name.human.pluralize}", workflow_classes_path %></li>
       </ul>
       <ul>

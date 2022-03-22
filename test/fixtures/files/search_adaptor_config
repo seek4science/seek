@@ -3,4 +3,4 @@ adaptor_class_name: Seek::BiomodelsSearch::SearchBiomodelsAdaptor
 search_type: models
 enabled: false
 legal: "Please retain original author attributes"
-partial_path: "lib/seek/biomodels_search/_biomodels_resource_list_item.html.erb"
+partial_path: "search/partials/biomodels_resource_list_item"

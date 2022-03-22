@@ -3,12 +3,5 @@ class SkeletonSerializer < ActiveModel::Serializer
 
   attribute :title
 
-  def self_link
-    polymorphic_path(object)
-  end
-
-  def _links
-    { self: self_link }
-  end
-
+  link(:self) { polymorphic_path(object) }
 end

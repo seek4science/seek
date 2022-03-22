@@ -113,11 +113,8 @@ class StrainTest < ActiveSupport::TestCase
     assert !strain.valid?
 
     strain = Strain.new title: 'strain', organism: organisms(:yeast)
-    unless Seek::Config.is_virtualliver
-      assert !strain.valid?
-    else
-      assert strain.valid?
-    end
+
+    refute strain.valid?
 
     strain = Strain.new organism: organisms(:yeast), projects: [projects(:sysmo_project)]
     assert !strain.valid?

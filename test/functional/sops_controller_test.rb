@@ -325,7 +325,7 @@ class SopsControllerTest < ActionController::TestCase
     # !!!description cannot be changed in new version but revision comments and file name,etc
 
     # create new version
-    post :create_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: fixture_file_upload('files/little_file_v2.txt', 'text/plain') }] }
+    post :create_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: fixture_file_upload('little_file_v2.txt', 'text/plain') }] }
     assert_redirected_to sop_path(assigns(:sop))
 
     s = Sop.find(s.id)
@@ -357,7 +357,7 @@ class SopsControllerTest < ActionController::TestCase
     al = ActivityLog.last
     assert_equal 'download', al.action
     assert_equal sop, al.activity_loggable
-    assert_equal "attachment; filename=\"ms_word_test.doc\"", @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"ms_word_test.doc\"; filename*=UTF-8''ms_word_test.doc", @response.header['Content-Disposition']
     assert_equal 'application/msword', @response.header['Content-Type']
     assert_equal '9216', @response.header['Content-Length']
   end
@@ -392,7 +392,7 @@ class SopsControllerTest < ActionController::TestCase
     refute s.can_edit?
 
     assert_no_difference('Sop::Version.count') do
-      post :create_version, params: { id: s, data: fixture_file_upload('files/file_picture.png'), revision_comments: 'This is a new revision' }
+      post :create_version, params: { id: s, data: fixture_file_upload('file_picture.png'), revision_comments: 'This is a new revision' }
     end
 
     assert_redirected_to sop_path(s)
@@ -401,48 +401,6 @@ class SopsControllerTest < ActionController::TestCase
     s = Sop.find(s.id)
     assert_equal current_version_count, s.versions.size
     assert_equal current_version, s.version
-  end
-
-  def test_should_duplicate_conditions_for_new_version
-    s = Factory :sop, contributor: User.current_user.person
-    condition1 = ExperimentalCondition.create(unit_id: units(:gram).id, measured_item_id: measured_items(:weight).id,
-                                              start_value: 1, sop_id: s.id, sop_version: s.version)
-    condition1.save!
-    s.reload
-    assert_equal 1, s.experimental_conditions.count
-    assert_difference('Sop::Version.count', 1) do
-      assert_difference('ExperimentalCondition.count', 1) do
-        post :create_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' } # v2
-      end
-    end
-
-    assert_equal 1, s.find_version(1).experimental_conditions.count
-    assert_equal 1, s.find_version(2).experimental_conditions.count
-    assert_not_equal s.find_version(1).experimental_conditions, s.find_version(2).experimental_conditions
-  end
-
-  def test_adding_new_conditions_to_different_versions
-    s = Factory(:sop, contributor:User.current_user.person)
-    assert s.can_edit?
-    condition1 = ExperimentalCondition.create(unit_id: units(:gram).id, measured_item: measured_items(:weight),
-                                              start_value: 1, sop_id: s.id, sop_version: s.version)
-    assert_difference('Sop::Version.count', 1) do
-      assert_difference('ExperimentalCondition.count', 1) do
-        post :create_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' } # v2
-      end
-    end
-
-    s.find_version(2).experimental_conditions.each(&:destroy)
-    assert_equal condition1, s.find_version(1).experimental_conditions.first
-    assert_equal 0, s.find_version(2).experimental_conditions.count
-
-    condition2 = ExperimentalCondition.create(unit_id: units(:gram).id, measured_item: measured_items(:weight),
-                                              start_value: 2, sop_id: s.id, sop_version: 2)
-
-    assert_not_equal 0, s.find_version(2).experimental_conditions.count
-    assert_equal condition2, s.find_version(2).experimental_conditions.first
-    assert_not_equal condition2, s.find_version(1).experimental_conditions.first
-    assert_equal condition1, s.find_version(1).experimental_conditions.first
   end
 
   def test_should_add_nofollow_to_links_in_show_page
@@ -585,18 +543,16 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should set the policy to projects_policy if the item is requested to be published, when creating new sop' do
-    as_not_virtualliver do
-      gatekeeper = Factory(:asset_gatekeeper)
-      @user.person.add_to_project_and_institution(gatekeeper.projects.first, Factory(:institution))
-      post :create, params: { sop: { title: 'test', project_ids: gatekeeper.projects.collect(&:id) }, content_blobs: [{ data: picture_file }], policy_attributes: { access_type: Policy::VISIBLE } }
-      sop = assigns(:sop)
-      assert_redirected_to (sop)
-      policy = sop.policy
-      assert_equal Policy::NO_ACCESS, policy.access_type
-      assert_equal 1, policy.permissions.count
-      assert_equal gatekeeper.projects.first, policy.permissions.first.contributor
-      assert_equal Policy::ACCESSIBLE, policy.permissions.first.access_type
-    end
+    gatekeeper = Factory(:asset_gatekeeper)
+    @user.person.add_to_project_and_institution(gatekeeper.projects.first, Factory(:institution))
+    post :create, params: { sop: { title: 'test', project_ids: gatekeeper.projects.collect(&:id) }, content_blobs: [{ data: picture_file }], policy_attributes: { access_type: Policy::VISIBLE } }
+    sop = assigns(:sop)
+    assert_redirected_to (sop)
+    policy = sop.policy
+    assert_equal Policy::NO_ACCESS, policy.access_type
+    assert_equal 1, policy.permissions.count
+    assert_equal gatekeeper.projects.first, policy.permissions.first.contributor
+    assert_equal Policy::ACCESSIBLE, policy.permissions.first.access_type
   end
 
   test 'should not change the policy if the item is requested to be published, when managing sop' do
@@ -871,7 +827,7 @@ class SopsControllerTest < ActionController::TestCase
     sop = Factory :sop, license: 'CC-BY-4.0', policy: Factory(:public_policy)
     sopv = Factory :sop_version_with_blob, sop: sop
 
-    sop.update_attributes license: 'CC0-1.0'
+    sop.update license: 'CC0-1.0'
 
     get :show, params: { id: sop, version: 1 }
     assert_response :success
@@ -1003,7 +959,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'content blob filename precedence should take user input first' do
     stub_request(:any, 'http://example.com/url_filename.txt')
-        .to_return(body: 'hi', headers: { 'Content-Disposition' => 'attachment; filename="server_filename.txt"' })
+        .to_return(body: 'hi', headers: { 'Content-Disposition' => "attachment; filename=\"server_filename.txt\"; filename*=UTF-8''server_filename.txt" })
     sop = { title: 'Test', project_ids: [@project.id] }
     blob = { data_url: 'http://example.com/url_filename.txt', original_filename: 'user_filename.txt' }
 
@@ -1018,7 +974,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'content blob filename precedence should take server filename second' do
     stub_request(:any, 'http://example.com/url_filename.txt')
-        .to_return(body: 'hi', headers: { 'Content-Disposition' => 'attachment; filename="server_filename.txt"' })
+        .to_return(body: 'hi', headers: { 'Content-Disposition' => "attachment; filename=\"server_filename.txt\"; filename*=UTF-8''server_filename.txt" })
     sop = { title: 'Test', project_ids: [@project.id] }
     blob = { data_url: 'http://example.com/url_filename.txt' }
 
@@ -1799,7 +1755,7 @@ class SopsControllerTest < ActionController::TestCase
   def picture_file(options = {})
     options.reverse_merge!({ filename: 'file_picture.png',
                              content_type: 'image/png',
-                             tempfile_fixture: 'files/file_picture.png' })
+                             tempfile_fixture: 'file_picture.png' })
     fixture_file_upload(options[:tempfile_fixture], options[:content_type])
   end
 

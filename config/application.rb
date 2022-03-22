@@ -11,26 +11,26 @@ end
 
 module SEEK
   class Application < Rails::Application
-    config.eager_load_paths << Rails.root.join('lib')
+    # Initialize configuration defaults for originally generated Rails version.
+    config.load_defaults 5.2
 
     # Force all environments to use the same logger level
+    # Configuration for the application, engines, and railties goes here.
     # (by default production uses :info, the others :debug)
+    #
     # config.log_level = :info
+    # These settings can be overridden in specific environments using the files
     #begin
+    # in config/environments, which are processed later.
     #  RAILS_DEFAULT_LOGGER = Logger.new("#{Rails.root}/log/#{Rails.env}.log")
+    #
     #rescue StandardError
-    #  RAILS_DEFAULT_LOGGER = Logger.new(STDERR)
-    #  RAILS_DEFAULT_LOGGER.level = Logger::WARN
-    #  RAILS_DEFAULT_LOGGER.warn(
-    #      "Rails Error: Unable to access log file. Please ensure that log/#{RAILS_ENV}.log exists and is chmod 0666. " +
-    #          "The log level has been raised to WARN and the output directed to STDERR until the problem is fixed."
-    #  )
-    #end
-
     # Make Time.zone default to the specified zone, and make Active Record store time values
     # in the database in UTC, and return them converted to the specified local zone.
     # Run "rake -D time" for a list of tasks for finding time zone names. Uncomment to use default local time.
     config.time_zone = 'UTC'
+
+    config.eager_load_paths << Rails.root.join('lib')
 
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password,"rack.request.form_vars"]
@@ -39,13 +39,6 @@ module SEEK
     config.active_record.observers = :annotation_reindexer,
         :assay_reindexer,
         :assay_asset_reindexer,
-        :measured_item_reindexer,
-        :studied_factor_reindexer,
-        :experimental_condition_reindexer,
-        :mapping_reindexer,
-        :mapping_link_reindexer,
-        :compound_reindexer,
-        :synonym_reindexer,
         :person_reindexer,
         :programme_reindexer,
         :assets_creator_reindexer
@@ -72,13 +65,14 @@ module SEEK
 
     config.active_job.queue_adapter = :delayed_job
 
-    config.active_record.sqlite3.represent_boolean_as_integer = true
-
     # Ignore translation overrides when testing
     config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'overrides', '**', '*.{rb,yml}')] unless Rails.env.test?
 
+    config.active_record.belongs_to_required_by_default = false
+    config.action_mailer.delivery_job = 'ActionMailer::MailDeliveryJob' # Can remove after updating defaults
+
     # pass forward the relative url root, if set. Needed for generating correct non-relative URL's. See https://github.com/rails/rails/issues/40237
     routes.default_url_options[:relative_url_root] = config.relative_url_root
-    
+
   end
 end

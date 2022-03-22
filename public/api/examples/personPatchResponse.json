@@ -18,13 +18,6 @@
                 "CeriusII",
                 "Gromacs",
                 "Python"
-            ],
-            "project_positions": [
-                {
-                    "project_id": "676",
-                    "position_id": "1",
-                    "position_name": "A Role"
-                }
             ]
         },
         "relationships": {

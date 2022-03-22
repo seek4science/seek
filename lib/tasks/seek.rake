@@ -113,4 +113,52 @@ namespace :seek do
     puts 'Encrypted settings cleared'
   end
 
+  desc "Convert workflows to use git backend"
+  task convert_workflows_to_git: :environment do
+    puts 'Converting Workflows to git: '
+    count = 0
+    gv_count = Git::Version.count
+    gr_count = Git::Repository.count
+    Workflow.includes(:git_versions).find_each do |workflow|
+      begin
+        Git::Converter.new(workflow).convert(unzip: true)
+      rescue StandardError => e
+        print 'E'
+        STDERR.puts "Error converting Workflow #{workflow.id}"
+        STDERR.puts e.message
+        e.backtrace.each { |l| STDERR.puts(l) }
+      end
+      count += 1
+      print '.'
+    end
+    puts
+    puts "Converted #{count} Workflows"
+    puts "Created #{Git::Repository.count - gr_count} GitRepositories"
+    puts "Created #{Git::Version.count - gv_count} GitVersions"
+  end
+
+  desc "Rebuild workflow internals"
+  task rebuild_workflow_internals: :environment do
+    puts 'Rebuilding workflow internals: '
+    count = 0
+    disable_authorization_checks do
+      Workflow.includes(:git_versions, :versions).find_each do |workflow|
+        ([workflow] + workflow.versions.to_a + workflow.git_versions.to_a).each do |wf|
+          begin
+            wf.refresh_internals
+            if wf.save(touch: false)
+              print '.'
+              count += 1
+            else
+              print 'E'
+            end
+          rescue StandardError => e
+            puts "Error for #{wf.class} #{wf.id}: #{e.class.name} (#{e.message})#{e.backtrace.join("\n")}"
+          end
+        end
+      end
+    end
+    puts
+    puts "Refreshed #{count} Workflows/versions"
+  end
 end

@@ -60,8 +60,9 @@ class AdminDefinedRoleProjectTest < ActiveSupport::TestCase
     person = Factory(:person)
     project = Factory(:project)
     role = AdminDefinedRoleProject.create person: person, project: project, role_mask: 2
-    assert !role.valid?
+    refute role.valid?
     role.project = person.projects.first
+    assert role.valid?
     role.save!
   end
 end

@@ -53,6 +53,10 @@ module Seek
 
         # create the dynamic versioned model
         const_set(versioned_class_name, Class.new(ApplicationRecord)).class_eval do
+          def name
+            "Version #{version}"
+          end
+
           def self.reloadable?
             false
           end
@@ -75,6 +79,10 @@ module Seek
 
           def is_a_version?
             true
+          end
+
+          def is_git_versioned?
+            false
           end
 
           def visibility= key
@@ -108,6 +116,10 @@ module Seek
             self.visibility ||= self.class.default_visibility
           end
 
+          def cache_key_fragment
+            "#{parent.class.name.underscore}-#{parent.id}-#{version}"
+          end
+
           def to_schema_ld
             Seek::BioSchema::Serializer.new(self).json_ld
           end
@@ -136,6 +148,7 @@ module Seek
     module ActMethods
       def self.included(base) # :nodoc:
         base.extend ClassMethods
+        base.include Git::VersioningCompatibility
       end
 
       # Finds a specific version of this model.
@@ -181,7 +194,7 @@ module Seek
         return false if attributes.nil? || attributes.empty?
         return false unless (ver = find_version(version_number_to_update))
 
-        rtn = ver.update_attributes(attributes)
+        rtn = ver.update(attributes)
 
         if rtn
           # if the latest version has been updated then update the main table as well

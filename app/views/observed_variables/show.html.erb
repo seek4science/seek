@@ -1,0 +1,88 @@
+<h2>
+  <%= @observed_variable.variable_id %>
+</h2>
+
+<p>
+  <strong>Set</strong>
+  <%= link_to(@observed_variable.observed_variable_set&.title || 'None', @observed_variable.observed_variable_set) %>
+</p>
+
+<p>
+  <strong>Variable ID</strong>
+  <%= @observed_variable.variable_id %>
+</p>
+
+<p>
+  <strong>Variable name</strong>
+  <%= @observed_variable.variable_name %>
+</p>
+
+<p>
+  <strong>Variable accession number</strong>
+  <%= @observed_variable.variable_an %>
+</p>
+
+<p>
+  <strong>Trait</strong>
+  <%= @observed_variable.trait %>
+</p>
+
+<p>
+  <strong>Trait accession number</strong>
+  <%= @observed_variable.trait_an %>
+</p>
+
+<p>
+  <strong>Trait entity</strong>
+  <%= @observed_variable.trait_entity %>
+</p>
+
+<p>
+  <strong>Trait entity accession number</strong>
+  <%= @observed_variable.trait_entity_an %>
+</p>
+
+<p>
+  <strong>Trait attribute</strong>
+  <%= @observed_variable.trait_attribute %>
+</p>
+
+<p>
+  <strong>Trait attribute accession number</strong>
+  <%= @observed_variable.trait_attribute_an %>
+</p>
+
+<p>
+  <strong>Method</strong>
+  <%= @observed_variable.method %>
+</p>
+
+<p>
+  <strong>Method accession number</strong>
+  <%= @observed_variable.method_an %>
+</p>
+
+<p>
+  <strong>Method description</strong>
+  <%= @observed_variable.method_description %>
+</p>
+
+<p>
+  <strong>Method reference</strong>
+  <%= @observed_variable.method_reference %>
+</p>
+
+<p>
+  <strong>Scale</strong>
+  <%= @observed_variable.scale %>
+</p>
+
+<p>
+  <strong>Scale accession number</strong>
+  <%= @observed_variable.scale_an %>
+</p>
+
+<p>
+  <strong>Time scale</strong>
+  <%= @observed_variable.timescale %>
+</p>

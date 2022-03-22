@@ -28,13 +28,13 @@ class PersonTest < ActiveSupport::TestCase
     assert_not_equal person.projects, project_administrator2.projects
 
     assert person.can_edit?(person.user)
-    assert !person.can_edit?(project_administrator.user), 'should not be editable by the project administrator of the same project, as user is registered'
+    refute person.can_edit?(project_administrator.user), 'should not be editable by the project administrator of the same project, as user is registered'
     assert person.can_edit?(admin.user)
-    assert !person.can_edit?(another_person.user)
-    assert !person.can_edit?(project_administrator2.user), 'should be not editable by the project administrator of another project'
+    refute person.can_edit?(another_person.user)
+    refute person.can_edit?(project_administrator2.user), 'should be not editable by the project administrator of another project'
 
     assert person.can_edit?(person), 'You can also ask by passing in a person'
-    assert !person.can_edit?(project_administrator), 'You can also ask by passing in a person'
+    refute person.can_edit?(project_administrator), 'You can also ask by passing in a person'
   end
 
   test 'userless profile can be edited by' do
@@ -49,8 +49,8 @@ class PersonTest < ActiveSupport::TestCase
 
     assert profile.can_edit?(project_administrator.user), 'should be editable by the project administrator of the same project, as user is not registered'
     assert profile.can_edit?(admin.user)
-    assert !profile.can_edit?(another_person.user)
-    assert !profile.can_edit?(project_administrator2.user), 'should be not editable by the project administrator of another project'
+    refute profile.can_edit?(another_person.user)
+    refute profile.can_edit?(project_administrator2.user), 'should be not editable by the project administrator of another project'
 
     assert profile.can_edit?(project_administrator), 'You can also ask by passing in a person'
   end
@@ -89,10 +89,10 @@ class PersonTest < ActiveSupport::TestCase
     assert person_in_same_project.can_manage?(project_administrator.user), 'project administrator should be able to administer someone from same project'
     assert person_in_different_project.can_manage?(project_administrator.user), 'project administrator should be able to administer someone from another project'
 
-    assert !project_administrator.can_manage?(person_in_same_project.user), 'a normal person cannot administer someone else'
-    assert !project_administrator.can_manage?(project_administrator.user), 'project administrator should not administer himself'
-    assert !person_in_same_project.can_manage?(person_in_same_project.user), 'person should not administer themself'
-    assert !person_in_same_project.can_manage?(nil)
+    refute project_administrator.can_manage?(person_in_same_project.user), 'a normal person cannot administer someone else'
+    refute project_administrator.can_manage?(project_administrator.user), 'project administrator should not administer himself'
+    refute person_in_same_project.can_manage?(person_in_same_project.user), 'person should not administer themself'
+    refute person_in_same_project.can_manage?(nil)
 
     assert project_administrator.can_manage?(admin), 'you can also ask by passing a person'
     assert person_in_same_project.can_manage?(project_administrator), 'you can also ask by passing a person'
@@ -106,9 +106,9 @@ class PersonTest < ActiveSupport::TestCase
     admin = Factory(:admin)
     project_administrator = Factory(:project_administrator, group_memberships: [Factory(:group_membership, work_group: admin.group_memberships.first.work_group)])
 
-    assert !(admin.projects & project_administrator.projects).empty?
+    refute (admin.projects & project_administrator.projects).empty?
 
-    assert !admin.can_edit?(project_administrator)
+    refute admin.can_edit?(project_administrator)
   end
 
   # checks the updated_at doesn't get artificially changed between created and reloading
@@ -200,11 +200,11 @@ class PersonTest < ActiveSupport::TestCase
     p.orcid = nil
     assert p.valid?
     p.orcid = 'sdff-1111-1111-1111'
-    assert !p.valid?
+    refute p.valid?
     p.orcid = '1111111111111111'
-    assert !p.valid?
+    refute p.valid?
     p.orcid = '0000-0002-1694-2339'
-    assert !p.valid?, "checksum doesn't match"
+    refute p.valid?, "checksum doesn't match"
     p.orcid = '0000-0002-1694-233X'
     assert p.valid?
     p.orcid = 'http://orcid.org/0000-0002-1694-233X'
@@ -273,12 +273,12 @@ class PersonTest < ActiveSupport::TestCase
 
     person.is_admin = false
     disable_authorization_checks { person.save! }
-    assert !person.only_first_admin_person?
+    refute person.only_first_admin_person?
     person.is_admin = true
     disable_authorization_checks { person.save! }
     assert person.only_first_admin_person?
     Factory :person
-    assert !person.only_first_admin_person?
+    refute person.only_first_admin_person?
   end
 
   def test_active_ordered_by_updated_at_and_avatar_not_null
@@ -310,17 +310,17 @@ class PersonTest < ActiveSupport::TestCase
   end
 
   def test_is_asset
-    assert !Person.is_asset?
-    assert !people(:quentin_person).is_asset?
-    assert !people(:quentin_person).is_downloadable_asset?
+    refute Person.is_asset?
+    refute people(:quentin_person).is_asset?
+    refute people(:quentin_person).is_downloadable_asset?
   end
 
   def test_member_of
     p = Factory :person
     proj = Factory :project
-    assert !p.projects.empty?
+    refute p.projects.empty?
     assert p.member_of?(p.projects.first)
-    assert !p.member_of?(proj)
+    refute p.member_of?(proj)
   end
 
   def test_avatar_key
@@ -332,7 +332,7 @@ class PersonTest < ActiveSupport::TestCase
   def test_first_person_is_admin
     assert Person.count > 0 # should already be people from fixtures
     p = Factory(:brand_new_person, first_name: 'XXX', email: 'xxx@email.com')
-    assert !p.is_admin?, 'Should not automatically be admin, since people already exist'
+    refute p.is_admin?, 'Should not automatically be admin, since people already exist'
 
     Person.delete_all
 
@@ -349,7 +349,7 @@ class PersonTest < ActiveSupport::TestCase
     assert Person.count > 0
     assert Project.count > 0
     p = Factory(:brand_new_person, first_name: 'XXX', email: 'xxx@email.com')
-    assert !p.is_admin?, 'Should not automatically be admin, since people already exist'
+    refute p.is_admin?, 'Should not automatically be admin, since people already exist'
     assert_empty p.projects
     assert_empty p.institutions
 
@@ -370,15 +370,15 @@ class PersonTest < ActiveSupport::TestCase
   def test_registered
     registered = Person.registered
     registered.each do |p|
-      assert_not_nil p.user
+      refute_nil p.user
     end
     assert registered.include?(people(:quentin_person))
-    assert !registered.include?(people(:person_without_user))
+    refute registered.include?(people(:person_without_user))
   end
 
   def test_duplicates
     dups = Person.duplicates
-    assert !dups.empty?
+    refute dups.empty?
     assert dups.include?(people(:duplicate_1))
     assert dups.include?(people(:duplicate_2))
   end
@@ -387,9 +387,9 @@ class PersonTest < ActiveSupport::TestCase
     no_group = Factory(:brand_new_person)
     in_group = Factory(:person)
     assert no_group.projects.empty?
-    assert !in_group.projects.empty?
+    refute in_group.projects.empty?
     all = Person.without_group
-    assert !all.include?(in_group)
+    refute all.include?(in_group)
     assert all.include?(no_group)
   end
 
@@ -397,10 +397,10 @@ class PersonTest < ActiveSupport::TestCase
     no_group = Factory(:brand_new_person)
     in_group = Factory(:person)
     assert no_group.projects.empty?
-    assert !in_group.projects.empty?
+    refute in_group.projects.empty?
     all = Person.with_group
     assert all.include?(in_group)
-    assert !all.include?(no_group)
+    refute all.include?(no_group)
   end
 
   def test_expertise
@@ -548,7 +548,7 @@ class PersonTest < ActiveSupport::TestCase
 
     assert_equal 3, person.institutions.count
     assert person.institutions.include?(institution)
-    assert !person.institutions.include?(institution2)
+    refute person.institutions.include?(institution2)
   end
 
   def test_projects
@@ -558,12 +558,12 @@ class PersonTest < ActiveSupport::TestCase
 
   test 'not registered' do
     peeps = Person.not_registered
-    assert_not_nil peeps
-    assert !peeps.empty?, 'There should be some userless people'
+    refute_nil peeps
+    refute peeps.empty?, 'There should be some userless people'
     assert_nil(peeps.find { |p| !p.user.nil? }, 'There should be no people with a non nil user')
 
     p = people(:three)
-    assert_not_nil(peeps.find { |person| p.id == person.id }, 'Person :three should be userless and therefore in the list')
+    refute_nil(peeps.find { |person| p.id == person.id }, 'Person :three should be userless and therefore in the list')
 
     p = people(:quentin_person)
     assert_nil(peeps.find { |person| p.id == person.id }, 'Person :one should have a user and not be in the list')
@@ -615,13 +615,13 @@ class PersonTest < ActiveSupport::TestCase
     p = people(:quentin_person)
     assert p.valid?
     p.email = nil
-    assert !p.valid?
+    refute p.valid?
 
     p.email = 'sdf'
-    assert !p.valid?
+    refute p.valid?
 
     p.email = 'sdf@'
-    assert !p.valid?
+    refute p.valid?
 
     p.email = 'sdaf@sdf.com'
     assert p.valid?
@@ -633,7 +633,7 @@ class PersonTest < ActiveSupport::TestCase
     assert p.valid?
 
     p.web_page = 'sdfsdf'
-    assert !p.valid?
+    refute p.valid?
 
     p.web_page = 'http://google.com'
     assert p.valid?
@@ -672,9 +672,9 @@ class PersonTest < ActiveSupport::TestCase
   def test_email_unique
     p = people(:quentin_person)
     newP = Person.new(first_name: 'Fred', email: p.email)
-    assert !newP.valid?, 'Should not be valid as email is not unique'
+    refute newP.valid?, 'Should not be valid as email is not unique'
     newP.email = p.email.capitalize
-    assert !newP.valid?, 'Should not be valid as email is not case sensitive'
+    refute newP.valid?, 'Should not be valid as email is not case sensitive'
     newP.email = 'zxczxc@zxczxczxc.com'
     assert newP.valid?
   end
@@ -687,12 +687,15 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 'B', p.disciplines[1].title
   end
 
-  def test_positions_association
-    position = Factory(:project_position)
-    p = Factory :person
-    p.group_memberships.first.project_positions << position
-    assert_equal 1, p.project_positions.size
-    assert p.project_positions.include?(position)
+  test 'project through association' do
+    # test that you can correctly access the associated projects through .projects without being saved first
+    p = Factory.build(:person_not_in_project)
+    project = Factory(:project)
+    p.group_memberships.build(project: project, institution: Factory.build(:institution))
+    p.group_memberships.build(project: project, institution: Factory.build(:institution))
+    p.work_groups.build(project: project, institution: Factory.build(:institution))
+    p.work_groups.build(project: project, institution: Factory.build(:institution))
+    assert_equal [project], p.projects
   end
 
   def test_update_first_letter
@@ -722,13 +725,13 @@ class PersonTest < ActiveSupport::TestCase
       disable_authorization_checks { p.save! }
     end
     p = Person.find(p.id)
-    assert_not_nil p.notifiee_info
+    refute_nil p.notifiee_info
     assert p.receive_notifications?
   end
 
   def test_dependent_notifiee_info_is_destroyed_with_person
     p = Factory(:brand_new_person, first_name: 'Zebedee', last_name: '', email: 'zz@email.com')
-    assert_not_nil p.notifiee_info
+    refute_nil p.notifiee_info
     assert_difference('NotifieeInfo.count', -1) do
       disable_authorization_checks { p.destroy }
     end
@@ -764,7 +767,7 @@ class PersonTest < ActiveSupport::TestCase
     p = people(:modeller_person)
     assert_nil p.attributes['uuid']
     p.save
-    assert_not_nil p.attributes['uuid']
+    refute_nil p.attributes['uuid']
   end
 
   test "uuid doesn't change" do
@@ -1104,13 +1107,13 @@ class PersonTest < ActiveSupport::TestCase
       end
       assert_raises ActiveRecord::RecordInvalid do
         no_orcid = Factory :brand_new_person, email: 'FISH-sOup2@email.com'
-        assert !no_orcid.valid?
+        refute no_orcid.valid?
         assert_not_empty no_orcid.errors[:orcid]
       end
       assert_raises ActiveRecord::RecordInvalid do
         bad_orcid = Factory :brand_new_person, email: 'FISH-sOup3@email.com',
                                                orcid: 'banana'
-        assert !bad_orcid.valid?
+        refute bad_orcid.valid?
         assert_not_empty bad_orcid.errors[:orcid]
       end
     end
@@ -1121,7 +1124,7 @@ class PersonTest < ActiveSupport::TestCase
 
     with_config_value(:orcid_required, true) do
       assert_nothing_raised do
-        no_orcid.update_attributes(email: 'FISH-sOup99@email.com')
+        no_orcid.update(email: 'FISH-sOup99@email.com')
         assert no_orcid.valid?
       end
     end
@@ -1131,15 +1134,15 @@ class PersonTest < ActiveSupport::TestCase
     bad_orcid = Factory :brand_new_person, email: 'FISH-sOup1@email.com'
 
     with_config_value(:orcid_required, true) do
-      bad_orcid.update_attributes(email: 'FISH-sOup99@email.com', orcid: 'big mac')
-      assert !bad_orcid.valid?
+      bad_orcid.update(email: 'FISH-sOup99@email.com', orcid: 'big mac')
+      refute bad_orcid.valid?
       assert_not_empty bad_orcid.errors[:orcid]
     end
 
     with_config_value(:orcid_required, false) do
       assert_raises ActiveRecord::RecordInvalid do
         another_bad_orcid = Factory :brand_new_person, email: 'FISH-sOup1@email.com', orcid: 'こんにちは'
-        assert !another_bad_orcid.valid?
+        refute another_bad_orcid.valid?
         assert_not_empty bad_orcid.errors[:orcid]
       end
     end
@@ -1189,7 +1192,7 @@ class PersonTest < ActiveSupport::TestCase
     gm = person.group_memberships.first
     gm.time_left_at = 1.day.from_now
     gm.save
-    assert !gm.has_left
+    refute gm.has_left
     person.reload
 
     assert_not_includes person.former_projects, project

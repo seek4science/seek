@@ -1,6 +1,4 @@
 class SearchController < ApplicationController
-  include Seek::FacetedBrowsing
-
   class InvalidSearchException < RuntimeError; end
 
   api_actions :index
@@ -39,8 +37,6 @@ class SearchController < ApplicationController
     else
       flash.now[:notice]="#{matches} #{matches==1 ? 'item' : 'items'} matched '<b>#{@search_query}</b>' within their title or content.".html_safe
     end
-
-    view_context.ie_support_faceted_browsing? if Seek::Config.faceted_search_enabled
 
     respond_to do |format|
       format.html

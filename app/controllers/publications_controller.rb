@@ -5,10 +5,13 @@ class PublicationsController < ApplicationController
   include Seek::AssetsCommon
   include Seek::PreviewHandling
 
+  include Seek::UploadHandling::DataUpload
+
   before_action :publications_enabled?
   before_action :find_assets, only: [:index]
-  before_action :find_and_authorize_requested_item, only: %i[show edit manage update destroy]
+  before_action :find_and_authorize_requested_item, only: %i[show edit manage update destroy download upload_fulltext upload_pdf soft_delete_fulltext]
   before_action :suggest_authors, only: [:manage]
+  before_action :find_display_asset, :only=>[:show, :download]
 
   include Seek::IsaGraphExtensions
   include PublicationsHelper
@@ -35,11 +38,9 @@ class PublicationsController < ApplicationController
   end
 
   # GET /publications/1
-  # GET /publications/1.xml
   def show
     respond_to do |format|
       format.html # show.html.erb
-      format.xml
       format.rdf { render template: 'rdf/show' }
       format.json {render json: @publication, include: [params[:include]]}
       format.any( *Publication::EXPORT_TYPES.keys ) do
@@ -56,13 +57,11 @@ class PublicationsController < ApplicationController
   end
 
   # GET /publications/new
-  # GET /publications/new.xml
   def new
     @publication = Publication.new
     @publication.parent_name = params[:parent_name]
     respond_to do |format|
       format.html # new.html.erb
-      format.xml
     end
   end
 
@@ -72,9 +71,13 @@ class PublicationsController < ApplicationController
   # GET /publications/1/manage
   def manage; end
 
+  # GET /publications/1/upload_fulltext
+  def upload_fulltext
+    # @publication = Publication.find(params[:id])
+    # publication is found via find_and_authorize_requested_item and return is authorized!
+  end
 
   # POST /publications
-  # POST /publications.xml
   def create
     @subaction = params[:subaction] || 'Register'
 
@@ -101,23 +104,60 @@ class PublicationsController < ApplicationController
   end
 
   # PUT /publications/1
-  # PUT /publications/1.xml
   def update
     update_annotations(params[:tag_list], @publication) if params.key?(:tag_list)
+    update_sharing_policies @publication
 
-    if @publication.update_attributes(publication_params)
+    if @publication.update(publication_params)
       respond_to do |format|
         flash[:notice] = 'Publication was successfully updated.'
         format.html { redirect_to(@publication) }
-        format.xml  { head :ok }
         format.json { render json: @publication, status: :ok, include: [params[:include]]}
       end
     else
       respond_to do |format|
         format.html { render action: 'edit' }
-        format.xml  { render xml: @publication.errors, status: :unprocessable_entity }
         format.json { render json: @publication.errors, status: :unprocessable_entity }
       end
+    end
+  end
+
+  def upload_pdf
+    blob_params = params[:content_blobs]
+    if !blob_params || blob_params.empty? || blob_params.none? { |p| check_for_data_or_url(p) }
+      redirect_to @publication
+    elsif handle_upload_data(true)
+      comments = params[:revision_comments]
+
+      respond_to do |format|
+        create_new_version comments
+        format.html { redirect_to @publication }
+      end
+    else
+      flash[:error] = flash.now[:error]
+      redirect_to @publication
+    end
+  end
+
+  def create_new_version comments
+    if @publication.save_as_new_version(comments)
+      flash[:notice]="New full text uploaded #{@publication.version}"
+    else
+      flash[:error]="Unable to save new fulltext"
+    end
+  end
+
+  def soft_delete_fulltext
+    # replace this version as a new empty version
+    if @publication.can_soft_delete_full_text?
+      # create an empty version
+      respond_to do |format|
+        create_new_version 'Soft delete'
+        format.html { redirect_to @publication }
+      end
+    else
+      flash[:error]=flash.now[:error]
+      redirect_to @publication
     end
   end
 
@@ -188,7 +228,6 @@ class PublicationsController < ApplicationController
       error = 'require query parameter authors'
       respond_to do |format|
         format.json { render json: { error: error }, status: 422 }
-        format.xml  { render xml: { error: error }, status: 422 }
       end
 
       return
@@ -231,7 +270,6 @@ class PublicationsController < ApplicationController
 
     respond_to do |format|
       format.json { render json: authors.to_json }
-      format.xml  { render xml: authors }
     end
   end
 
@@ -241,7 +279,6 @@ class PublicationsController < ApplicationController
       error = 'require query parameter full_name'
       respond_to do |format|
         format.json { render json: { error: error }, status: 422 }
-        format.xml  { render xml: { error: error }, status: 422 }
       end
 
       return
@@ -267,7 +304,6 @@ class PublicationsController < ApplicationController
 
     respond_to do |format|
       format.json { render json: authors.to_json }
-      format.xml  { render xml: authors }
     end
   end
 
@@ -299,7 +335,7 @@ class PublicationsController < ApplicationController
       end
     else
       @publication.publication_authors.each do |author|
-        author.update_attributes(person_id: nil) unless author.person_id.nil?
+        author.update(person_id: nil) unless author.person_id.nil?
       end
       @error = 'Please enter either a DOI or a PubMed ID for the publication.'
     end
@@ -307,7 +343,6 @@ class PublicationsController < ApplicationController
 
     respond_to do |format|
       format.html {redirect_to(manage_publication_url(@publication))}
-      format.xml {head :ok}
     end
   end
 
@@ -327,6 +362,7 @@ class PublicationsController < ApplicationController
                                         :published_date, :bibtex_file, :registered_mode, :publisher, :booktitle, { project_ids: [] }, { event_ids: [] }, { model_ids: [] },
                                         { investigation_ids: [] }, { study_ids: [] }, { assay_ids: [] }, { presentation_ids: [] },
                                         { data_file_ids: [] }, { scales: [] }, { human_disease_ids: [] }, { workflow_ids: [] },
+                                        { misc_links_attributes: [:id, :url, :label, :_destroy] },
                                         { publication_authors_attributes: [:person_id, :id, :first_name, :last_name ] }).tap do |pub_params|
       filter_association_params(pub_params, :assay_ids, Assay, :can_edit?)
       filter_association_params(pub_params, :study_ids, Study, :can_view?)
@@ -367,14 +403,12 @@ class PublicationsController < ApplicationController
 
           # newly_created Change the buttons in the manage page-> Cancel will become Skip, ...
           format.html { redirect_to(manage_publication_url(@publication, newly_created: true)) }
-          format.xml  { render xml: @publication, status: :created, location: @publication }
           format.json  { render json: @publication, status: :created, location: @publication, include: [params[:include]] }
         end
       end
     else # Publication save not successful
       respond_to do |format|
         format.html { render action: 'new' }
-        format.xml  { render xml: @publication.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -382,7 +416,7 @@ class PublicationsController < ApplicationController
   # create a publication from a form that contains all the data
   def create_publication
 
-    @publication.registered_mode = @publication.registered_mode || 3
+    @publication.registered_mode = @publication.registered_mode || Publication::REGISTRATION_MANUALLY
     assay_ids = params[:assay_ids] || []
     # create publication authors
     plain_authors = params[:publication][:publication_authors]
@@ -397,6 +431,8 @@ class PublicationsController < ApplicationController
     end
 
     if @publication.save
+      upload_blob
+
       create_or_update_associations assay_ids, 'Assay', 'edit'
       if !@publication.parent_name.blank?
         render partial: 'assets/back_to_fancy_parent', locals: { child: @publication, parent_name: @publication.parent_name }
@@ -404,16 +440,26 @@ class PublicationsController < ApplicationController
         respond_to do |format|
           flash[:notice] = 'Publication was successfully created.'
           format.html { redirect_to(manage_publication_url(@publication)) }
-          format.xml  { render xml: @publication, status: :created, location: @publication }
           format.json { render json: @publication, status: :created, location: @publication, include: [params[:include]] }
         end
       end
     else # Publication save not successful
       respond_to do |format|
         format.html { render action: 'new' }
-        format.xml  { render xml: @publication.errors, status: :unprocessable_entity }
         format.json { render json: @publication.errors, status: :unprocessable_entity }
       end
+    end
+  end
+
+  def upload_blob
+    blob_params = params[:content_blobs]
+    if !blob_params || blob_params.empty? || blob_params.none? { |p| check_for_data_or_url(p) }
+      nil # Empty content is allowed for full text publication.
+    elsif handle_upload_data(true)
+      comments = params[:revision_comments]
+      create_new_version comments
+    else
+      flash[:error] = flash.now[:error]
     end
   end
 
@@ -445,11 +491,10 @@ class PublicationsController < ApplicationController
     if @publication.errors.any?
       respond_to do |format|
         format.html { render action: 'new' }
-        format.xml  { render xml: @publication.errors, status: :unprocessable_entity }
         format.json { render json: @publication.errors, status: :unprocessable_entity }
       end
     else
-        @subaction = 'Create'
+      @subaction = 'Create'
         respond_to do |format|
           format.html { render action: 'new' }
           format.json { render json: @publication, status: :ok, include: [params[:include]] }
@@ -523,13 +568,11 @@ class PublicationsController < ApplicationController
       @subaction = 'Import'
       respond_to do |format|
         format.html { render action: 'new' }
-        format.xml  { render xml: @publication.errors, status: :unprocessable_entity }
         format.json  { render json: @publication.errors, status: :unprocessable_entity }
       end
     else
       respond_to do |format|
         format.html { redirect_to(action: :index) }
-        format.xml  { render xml: publications, status: :created, location: @publication }
         format.json  { render json: publications, status: :created, location: @publication }
       end
     end
@@ -605,7 +648,7 @@ class PublicationsController < ApplicationController
         text.gsub!(/[#{s[0..-2]}]/, s[-1..-1])
       end
 
-      codepoints = text.mb_chars.normalize(:d).split(//u)
+      codepoints = text.mb_chars.unicode_normalize(:nfd).split(//u)
       ascii = codepoints.map(&:to_s).reject { |e| e.length > 1 }.join
 
       last_name_matches = Person.where(last_name: ascii)

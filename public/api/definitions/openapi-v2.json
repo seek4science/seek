@@ -4821,20 +4821,6 @@
                 "$ref": "#/definitions/nonEmptyString"
             }
         },
-        "projectPosition": {
-            "type": "object",
-            "properties": {
-                "project_id": {
-                    "type": "string"
-                },
-                "position_id": {
-                    "type": "string"
-                },
-                "project_name": {
-                    "type": "string"
-                }
-            }
-        },
         "assetsCreator": {
             "type": "object",
             "properties": {
@@ -4867,12 +4853,6 @@
             "minItems": 0,
             "items": {
                 "$ref": "#/definitions/assetsCreator"
-            }
-        },
-        "projectPositionsList": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/projectPosition"
             }
         },
         "snapshotSkeleton": {
@@ -5189,23 +5169,7 @@
                     "minItems": 1,
                     "uniqueItems": true,
                     "items": {
-                        "properties": {
-                            "version": {
-                                "type": "number"
-                            },
-                            "revision_comments": {
-                                "$ref": "#/definitions/nullableNonEmptyString"
-                            },
-                            "url": {
-                                "$ref": "#/definitions/uriString"
-                            }
-                        },
-                        "required": [
-                            "version",
-                            "revision_comments",
-                            "url"
-                        ],
-                        "additionalProperties": false
+                        "$ref": "#/definitions/version"
                     }
                 },
                 "version": {
@@ -5268,23 +5232,7 @@
                     "minItems": 1,
                     "uniqueItems": true,
                     "items": {
-                        "properties": {
-                            "version": {
-                                "type": "number"
-                            },
-                            "revision_comments": {
-                                "$ref": "#/definitions/nullableNonEmptyString"
-                            },
-                            "url": {
-                                "$ref": "#/definitions/uriString"
-                            }
-                        },
-                        "required": [
-                            "version",
-                            "revision_comments",
-                            "url"
-                        ],
-                        "additionalProperties": false
+                        "$ref": "#/definitions/version"
                     }
                 },
                 "version": {
@@ -9104,9 +9052,6 @@
                                 "skype_name": {
                                     "$ref": "#/definitions/nullableNonEmptyString"
                                 },
-                                "project_positions": {
-                                    "$ref": "#/definitions/projectPositionsList"
-                                },
                                 "login": {
                                     "$ref": "#/definitions/nullableNonEmptyString"
                                 }
@@ -9247,9 +9192,6 @@
                                 "skype_name": {
                                     "$ref": "#/definitions/nullableNonEmptyString"
                                 },
-                                "project_positions": {
-                                    "$ref": "#/definitions/projectPositionsList"
-                                }
                             },
                             "additionalProperties": false
                         }
@@ -10131,6 +10073,9 @@
                                 "authors": {
                                     "$ref": "#/definitions/nonEmptyStringList"
                                 },
+                                "content_blobs": {
+                                    "$ref": "#/definitions/contentBlobsList"
+                                },
                                 "policy": {
                                     "$ref": "#/definitions/policy"
                                 }
@@ -10767,23 +10712,14 @@
                                     "minItems": 1,
                                     "uniqueItems": true,
                                     "items": {
-                                        "properties": {
-                                            "version": {
-                                                "type": "number"
+                                        "oneOf": [
+                                            {
+                                                "$ref": "#/definitions/version"
                                             },
-                                            "revision_comments": {
-                                                "$ref": "#/definitions/nullableNonEmptyString"
-                                            },
-                                            "url": {
-                                                "$ref": "#/definitions/uriString"
+                                            {
+                                                "$ref": "#/definitions/gitVersion"
                                             }
-                                        },
-                                        "required": [
-                                            "version",
-                                            "revision_comments",
-                                            "url"
-                                        ],
-                                        "additionalProperties": false
+                                        ]
                                     }
                                 },
                                 "version": {
@@ -13000,6 +12936,61 @@
             "required": [
                 "data",
                 "jsonapi"
+            ],
+            "additionalProperties": false
+        },
+        "version": {
+            "type": "object",
+            "properties": {
+                "version": {
+                    "type": "number"
+                },
+                "revision_comments": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "url": {
+                    "$ref": "#/definitions/uriString"
+                }
+            },
+            "required": [
+                "version",
+                "revision_comments",
+                "url"
+            ],
+            "additionalProperties": false
+        },
+        "gitVersion": {
+            "type": "object",
+            "properties": {
+                "version": {
+                    "type": "number"
+                },
+                "revision_comments": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "url": {
+                    "$ref": "#/definitions/uriString"
+                },
+                "commit": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "ref": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "tree": {
+                    "$ref": "#/definitions/uriString"
+                },
+                "remote": {
+                    "$ref": "#/definitions/uriString"
+                }
+            },
+            "required": [
+                "version",
+                "revision_comments",
+                "url",
+                "commit",
+                "ref",
+                "tree"
             ],
             "additionalProperties": false
         },

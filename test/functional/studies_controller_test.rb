@@ -493,7 +493,7 @@ class StudiesControllerTest < ActionController::TestCase
     end
   end
 
-  def edit_max_object(study)    
+  def edit_max_object(study)
     add_creator_to_test_object(study)
   end
 

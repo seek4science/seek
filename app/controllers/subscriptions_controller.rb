@@ -21,7 +21,6 @@ class SubscriptionsController < ApplicationController
     respond_to do |format|
       flash[:notice] = "You unsubscribed from this #{subscribable.class.name.humanize}"
       format.html { redirect_to(subscribable) }
-      format.xml  { head :ok }
     end
   end
 

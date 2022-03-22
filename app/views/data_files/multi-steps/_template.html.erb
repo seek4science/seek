@@ -1,0 +1,27 @@
+<div class='panel panel-default'>
+  <div class='panel-heading'>
+    <% if Seek::Config.file_templates_enabled %>
+       File template, data type and format
+    <% else %>
+       Data type and format
+    <% end %>
+  </div>
+
+  <div class='panel-body'>
+    <% if Seek::Config.file_templates_enabled %>
+      <%= render :partial => "assets/select_template", :locals => {:resource => (@data_file ? @data_file : DataFile.new),
+      :templates => authorised_assets(FileTemplate, nil, 'edit') } %>
+      
+    <% end %>
+      <%= render partial: 'assets/edam_form_properties', :locals => { :resource => @data_file } -%>
+
+    <%= cancel_button(data_files_path) -%>
+    <div class='multi-step-buttons'>
+      <%= multi_step_forward_button %>
+
+      <%= multi_step_end_button %>
+    </div>
+  </div>
+</div>
+<%= wizard_footer_tips %>
+

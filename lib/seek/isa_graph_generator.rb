@@ -194,7 +194,7 @@ module Seek
         }
       when Assay
         {
-          children: %i[data_files models sops publications documents],
+          children: %i[data_files models sops publications documents placeholders],
           parents: [:study],
           # related: [:publications],
           aggregated_children: { samples: :samples }

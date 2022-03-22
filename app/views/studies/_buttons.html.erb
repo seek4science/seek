@@ -11,7 +11,9 @@
 <%= item_actions_dropdown do %>
   <% if item.can_edit? %>
     <li><%= image_tag_for_key('edit', edit_study_path(item), "Edit #{t('study')}", nil, "Edit #{t('study')}") -%></li>
+    <% if item.assays.size > 1 %>
     <li><%= image_tag_for_key('order', order_assays_study_path(item), "Order #{t('assay').pluralize}", nil, "Order #{t('assay').pluralize}") -%></li>
+    <% end %>
   <% end %>
 
   <% if item.can_manage? -%>

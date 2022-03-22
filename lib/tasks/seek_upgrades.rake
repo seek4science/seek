@@ -3,18 +3,24 @@
 require 'rubygems'
 require 'rake'
 
+
 namespace :seek do
   # these are the tasks required for this version upgrade
   task upgrade_version_tasks: %i[
     environment
     db:seed:010_workflow_classes
     db:seed:011_edam_topics
-    db:seed:012_edam_operations
+    db:seed:012_edam_operations   
     db:seed:013_workflow_data_file_relationships
     rename_branding_settings
+    update_missing_openbis_istest
+    update_missing_publication_versions
+    db:seed:013_edam_formats
+    db:seed:014_edam_data
     remove_orphaned_versions
     create_seek_sample_multi
     rename_seek_sample_attribute_types
+    seek:rebuild_workflow_internals
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -25,10 +31,10 @@ namespace :seek do
 
   desc('upgrades SEEK from the last released version to the latest released version')
   task(upgrade: [:environment]) do
-    puts 'Starting upgrade ...'
-    puts '... trimming old session data ...'
+    puts "Starting upgrade ..."
+    puts "... trimming old session data ..."
     Rake::Task['db:sessions:trim'].invoke
-    puts '... migrating database ...'
+    puts "... migrating database ..."
     Rake::Task['db:migrate'].invoke
     Rake::Task['tmp:clear'].invoke
 
@@ -36,12 +42,12 @@ namespace :seek do
     Seek::Config.solr_enabled = false
 
     begin
-      puts '... performing upgrade tasks ...'
+      puts "... performing upgrade tasks ..."
       Rake::Task['seek:standard_upgrade_tasks'].invoke
       Rake::Task['seek:upgrade_version_tasks'].invoke
 
       Seek::Config.solr_enabled = solr
-      puts '... queuing search reindexing jobs ...'
+      puts "... queuing search reindexing jobs ..."
       Rake::Task['seek:reindex_all'].invoke if solr
 
       puts 'Upgrade completed successfully'
@@ -60,10 +66,49 @@ namespace :seek do
     Seek::Config.transfer_value :dm_project_link, :instance_admins_link
   end
 
+ task(update_missing_openbis_istest: :environment) do
+    puts '... creating missing is_test for OpenbisEndpoint...'
+    create = 0
+    disable_authorization_checks do
+      OpenbisEndpoint.find_each do |openbis_endpoint|
+        # check if the publication has a version
+        # then create one if missing
+        if openbis_endpoint.is_test.nil?
+          openbis_endpoint.is_test = false # default -> prod, https
+          openbis_endpoint.save
+          unless openbis_endpoint.is_test.nil?
+            create += 1
+          end
+        end
+        # publication.save
+      end
+    end
+    puts " ... finished creating missing is_test for #{create.to_s} OpenbisEndpoint(s)"
+  end
+
+  task(update_missing_publication_versions: :environment) do
+    puts '... creating missing publications versions ...'
+    create = 0
+    disable_authorization_checks do
+      Publication.find_each do |publication|
+        # check if the publication has a version
+        # then create one if missing
+        if publication.latest_version.nil?
+          publication.save_as_new_version 'Version for legacy entries'
+          unless publication.latest_version.nil?
+            create += 1
+          end
+        end
+        # publication.save
+      end
+    end
+    puts " ... finished creating missing publications versions for #{create.to_s} publications"
+  end
+
   task(remove_orphaned_versions: [:environment]) do
     puts 'Removing orphaned versions ...'
     count = 0
-    types = [DataFile::Version, Document::Version, Sop::Version, Model::Version, Node::Version, Presentation::Version,
+    types = [DataFile::Version, Document::Version, Sop::Version, Model::Version, Presentation::Version,
              Sop::Version, Workflow::Version]
     disable_authorization_checks do
       types.each do |type|

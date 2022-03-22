@@ -2,6 +2,7 @@ require 'libxml'
 
 class Publication < ApplicationRecord
   include Seek::Rdf::RdfGeneration
+  include Seek::ActsAsHavingMiscLinks
   include PublicationsHelper
 
   alias_attribute :description, :abstract
@@ -36,8 +37,18 @@ class Publication < ApplicationRecord
   acts_as_asset
   validates :title, length: { maximum: 65_535 }
 
+  acts_as_having_misc_links
+
   has_many :publication_authors, dependent: :destroy, autosave: true
   has_many :people, through: :publication_authors
+
+  has_one :content_blob, ->(r) { where('content_blobs.asset_version =?', r.version) }, as: :asset, foreign_key: :asset_id
+
+  explicit_versioning(:version_column => "version", sync_ignore_columns: ['license','other_creators']) do
+    acts_as_versioned_resource
+    has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND content_blobs.asset_type =?', r.version, r.parent.class.name) },
+            :primary_key => :publication_id,:foreign_key => :asset_id
+  end
 
   belongs_to :publication_type
 
@@ -49,18 +60,19 @@ class Publication < ApplicationRecord
   validates :pubmed_id, numericality: { greater_than: 0, message: 'is invalid' }, allow_blank: true
   validates :publication_type_id, presence: true, on: :create
 
-  # validation differences between OpenSEEK and the VLN SEEK
-  validates_uniqueness_of :pubmed_id, allow_nil: true, allow_blank: true, if: -> { Seek::Config.is_virtualliver }
-  validates_uniqueness_of :doi, allow_nil: true, allow_blank: true, if: -> { Seek::Config.is_virtualliver }
-  validates_uniqueness_of :title, if: -> { Seek::Config.is_virtualliver }
-
-  validate :check_uniqueness_within_project, unless: -> { Seek::Config.is_virtualliver }
+  validate :check_uniqueness_within_project
 
   attr_writer :refresh_policy
-  before_save :refresh_policy, on: :update
+  before_update :refresh_policy
   after_update :update_creators_from_publication_authors
 
   accepts_nested_attributes_for :publication_authors
+
+  # Types of registration
+  REGISTRATION_BY_PUBMED = 1
+  REGISTRATION_BY_DOI    = 2
+  REGISTRATION_MANUALLY = 3
+  REGISTRATION_FROM_BIBTEX = 4
 
   # http://bioruby.org/rdoc/Bio/Reference.html#method-i-format
   # key for the file-extension and format used in the route
@@ -117,6 +129,7 @@ class Publication < ApplicationRecord
   def columns_default
     super + ['published_date','journal']
   end
+
   def columns_allowed
     columns_default + ['abstract','last_used_at','doi','citation','booktitle','publisher','editor','url']
   end
@@ -140,7 +153,7 @@ class Publication < ApplicationRecord
   end
 
   def default_policy
-    Policy.new(name: 'publication_policy', access_type: Policy::VISIBLE).tap do |policy|
+    Policy.new(name: 'publication_policy', access_type: Policy::ACCESSIBLE).tap do |policy|
       populate_policy_from_authors(policy)
     end
   end
@@ -154,6 +167,10 @@ class Publication < ApplicationRecord
   end
 
   def contributor_credited?
+    false
+  end
+
+  def is_in_isa_publishable?
     false
   end
 
@@ -182,7 +199,7 @@ class Publication < ApplicationRecord
   # @param reference Bio::Reference
   # @see https://github.com/bioruby/bioruby/blob/master/lib/bio/reference.rb
   def extract_pubmed_metadata(reference)
-    self.registered_mode = 1
+    self.registered_mode = Publication::REGISTRATION_BY_PUBMED
     self.title = reference.title.chomp # remove full stop
     self.abstract = reference.abstract
     self.journal = reference.journal
@@ -199,7 +216,7 @@ class Publication < ApplicationRecord
   # @param doi_record DOI::Record
   # @see https://github.com/SysMO-DB/doi_query_tool/blob/master/lib/doi_record.rb
   def extract_doi_metadata(doi_record)
-    self.registered_mode = 2
+    self.registered_mode = Publication::REGISTRATION_BY_DOI
     self.title = doi_record.title
     self.abstract = doi_record.abstract
     self.published_date = doi_record.date_published
@@ -213,7 +230,7 @@ class Publication < ApplicationRecord
 
   # @param bibtex_record BibTeX entity from bibtex-ruby gem
   def extract_bibtex_metadata(bibtex_record)
-    self.registered_mode = 4
+    self.registered_mode = Publication::REGISTRATION_FROM_BIBTEX
     self.publication_type_id = PublicationType.get_publication_type_id(bibtex_record)
     self.title           = bibtex_record[:title].try(:to_s).gsub /{|}/, '' unless bibtex_record[:title].nil?
     self.title           = bibtex_record[:chapter].try(:to_s).gsub /{|}/, '' if (self.title.nil? && !bibtex_record[:chapter].nil?)
@@ -538,6 +555,12 @@ class Publication < ApplicationRecord
     self
   end
 
+  def can_soft_delete_full_text?(user = User.current_user)
+    return false if user.nil? || user.person.nil? || !Seek::Config.allow_publications_fulltext
+    return true if user.is_admin?
+    contributor == can_edit(user) || projects.detect { |project| project.can_manage?(user) }.present?
+  end
+
   private
 
   def populate_policy_from_authors(pol)
@@ -569,7 +592,10 @@ class Publication < ApplicationRecord
       # TODO: Bio::Reference supports a 'url' option. Should this be the URL on seek, or the URL of the 'View Publication' button, or neither?
       Bio::Reference.new({ title: title, journal: journal, abstract: abstract,
                            authors: publication_authors.map { |e| e.person ? [e.person.last_name, e.person.first_name].join(', ') : [e.last_name, e.first_name].join(', ') },
-                           year: published_date.try(:year) }.with_indifferent_access)
+                           year: published_date.try(:year),
+                           url: url,
+                           doi: doi
+                           }.with_indifferent_access)
     end
   end
 

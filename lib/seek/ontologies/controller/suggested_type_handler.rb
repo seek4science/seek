@@ -59,7 +59,7 @@ module Seek
 
         def update
           @suggested_type = instance_variable_get("@#{controller_name.singularize}")
-          @suggested_type.update_attributes(type_params)
+          @suggested_type.update(type_params)
           saved = @suggested_type.save
           respond_to do |format|
             if saved
