@@ -1,6 +1,6 @@
 @import 'variables';
 
-.jstree {
+.jstree[data-role='seek-git-jstree'] {
   i.jstree-checkbox {
     display: none;
   }
