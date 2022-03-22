@@ -28,8 +28,6 @@ class ApplicationController < ActionController::Base
 
   before_action :project_membership_required, only: [:create, :new]
 
-  before_action :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
-
   before_action :check_doorkeeper_scopes, if: :doorkeeper_token
   before_action :check_json_id_type, only: [:create, :update], if: :json_api_request?
   before_action :convert_json_params, only: [:update, :destroy, :create, :create_version], if: :json_api_request?
@@ -139,13 +137,6 @@ class ApplicationController < ActionController::Base
   def determine_asset_from_controller
     name = controller_name.singularize
     instance_variable_get("@#{name}")
-  end
-
-  def restrict_guest_user
-    if current_user && current_user.guest?
-      flash[:error] = 'You cannot perform this action as a Guest User. Please sign in or register for an account first.'
-      redirect_back fallback_location: main_app.root_path
-    end
   end
 
   def project_membership_required
