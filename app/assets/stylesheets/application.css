@@ -6,15 +6,12 @@
 *= require fast_auto_complete
 *= require autocompleter_advanced
 *= require site_announcements
-*= require tabnav
-*= require easytabs
 *= require projects
 *= require jquery.bxslider
 *= require images
 *= require landing_page
 *= require asset_report
 *= require bives
-*= require full_scroll_table
 *= require project_folders
 *= require publishing
 *= require sharing_peremission_change
