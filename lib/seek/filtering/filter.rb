@@ -25,7 +25,7 @@ module Seek
         collection = collection.select(*select_fields)
         collection = apply_joins(collection)
 
-        #strip out any default ordering, that may not be included in the GROUP BY clause
+        #strip out any default ordering, that may include fields not included in the GROUP BY clause
         collection = collection.reorder('')
 
         results = collection.group(group_fields).having(count_exp.gt(0)).pluck(*select_fields)
