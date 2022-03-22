@@ -89,3 +89,11 @@ ul.item_for_decision {
   border-radius: 5px;
   display: inline-block;
 }
+
+ul.decided_item {
+  padding-left: 1em;
+}
+
+ul.decided_item li.type_and_title {
+  font-weight: bolder;
+}
