@@ -18,3 +18,42 @@ ul.publishing_options li.secondary {
     color: limegreen;
 }
 
+span.published {
+    color: green;
+}
+
+span.approve {
+    color: limegreen;
+    font-weight: bolder;
+}
+
+span.reject {
+    color: red;
+    font-weight: bolder;
+}
+
+span.decide_later {
+    font-weight: bolder;
+}
+
+
+ul.item_waiting_for_approval {
+    padding-left: 1em;
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+
+ul.item_waiting_for_approval li.type_and_title {
+    font-weight: bolder;
+}
+
+
+img.icon_visibility {
+    margin-left: 2em;
+}
+
+ul.item_for_decision {
+    padding-left: 1em;
+    margin-top: 2em;
+    margin-bottom: 2em;
+}

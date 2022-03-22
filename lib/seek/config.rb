@@ -491,5 +491,9 @@ module Seek
       true
     end
 
+    def self.header_image_enabled
+      # code here
+    end
+
   end
 end
