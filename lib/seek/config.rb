@@ -490,10 +490,5 @@ module Seek
     def self.schema_org_supported?
       true
     end
-
-    def self.header_image_enabled
-      # code here
-    end
-
   end
 end
