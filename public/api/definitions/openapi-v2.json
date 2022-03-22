@@ -4821,20 +4821,6 @@
                 "$ref": "#/definitions/nonEmptyString"
             }
         },
-        "projectPosition": {
-            "type": "object",
-            "properties": {
-                "project_id": {
-                    "type": "string"
-                },
-                "position_id": {
-                    "type": "string"
-                },
-                "project_name": {
-                    "type": "string"
-                }
-            }
-        },
         "assetsCreator": {
             "type": "object",
             "properties": {
@@ -4867,12 +4853,6 @@
             "minItems": 0,
             "items": {
                 "$ref": "#/definitions/assetsCreator"
-            }
-        },
-        "projectPositionsList": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/projectPosition"
             }
         },
         "snapshotSkeleton": {
@@ -9072,9 +9052,6 @@
                                 "skype_name": {
                                     "$ref": "#/definitions/nullableNonEmptyString"
                                 },
-                                "project_positions": {
-                                    "$ref": "#/definitions/projectPositionsList"
-                                },
                                 "login": {
                                     "$ref": "#/definitions/nullableNonEmptyString"
                                 }
@@ -9215,9 +9192,6 @@
                                 "skype_name": {
                                     "$ref": "#/definitions/nullableNonEmptyString"
                                 },
-                                "project_positions": {
-                                    "$ref": "#/definitions/projectPositionsList"
-                                }
                             },
                             "additionalProperties": false
                         }

@@ -137,7 +137,6 @@ describe Person do
 
   #this goes through institutions
   it { should have_searchable_field(:locations) }
-  it { should have_searchable_field(:project_positions) }
   it { should have_searchable_field(:disciplines) }
   #all the assets contributed by the person
 #  it { should have_searchable_field(:contributed_assets) }

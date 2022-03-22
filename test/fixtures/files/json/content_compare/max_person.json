@@ -17,9 +17,6 @@
       "tools": [
         "fishing rod"
       ],
-      "project_positions":[
-        {"project_id":1022251312,"position_id":782188582,"position_name":"PI"}
-      ],
       "login": "max_person_user"
     },
     "relationships": {

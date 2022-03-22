@@ -120,12 +120,6 @@ class Project < ApplicationRecord
     end
   end
 
-  # this is project role
-  def pis
-    pi_role = ProjectPosition.find_by_name('PI')
-    people.select { |p| p.project_positions_of_project(self).include?(pi_role) }
-  end
-
   # this is seek role
   def asset_housekeepers
     people_with_the_role(Seek::Roles::ASSET_HOUSEKEEPER)
@@ -227,13 +221,6 @@ class Project < ApplicationRecord
       end
 
     end
-  end
-
-  def person_roles(person)
-    # Get intersection of all project memberships + person's memberships to find project membership
-    project_memberships = work_groups.collect(&:group_memberships).flatten
-    person_project_membership = person.group_memberships & project_memberships
-    person_project_membership.project_positions
   end
 
   def can_edit?(user = User.current_user)
