@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_03_17_160412) do
+ActiveRecord::Schema.define(version: 2022_03_22_104351) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string "action"
@@ -181,7 +181,6 @@ ActiveRecord::Schema.define(version: 2022_03_17_160412) do
     t.integer "assay_class_id"
     t.string "uuid"
     t.integer "policy_id"
-    t.integer "institution_id"
     t.string "assay_type_uri"
     t.string "technology_type_uri"
     t.integer "suggested_assay_type_id"

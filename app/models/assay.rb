@@ -26,9 +26,7 @@ class Assay < ApplicationRecord
   acts_as_isa
   acts_as_snapshottable
 
-  belongs_to :institution
   belongs_to :sample_type 
-
 
   belongs_to :assay_class
   has_many :assay_organisms, dependent: :destroy, inverse_of: :assay
