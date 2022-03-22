@@ -1,0 +1,25 @@
+@import 'variables';
+
+a.remove-association {
+  text-decoration: none;
+  vertical-align: middle;
+  color: $brand-danger !important;
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.association-candidate-list {
+  border: 1px solid $list-group-border;
+  max-height: 200px;
+  overflow-y: scroll;
+
+  .list-group-item {
+    border-radius: 0;
+  }
+}
+
+[data-role="seek-associations-list"] ul {
+  max-height: 250px;
+  overflow-y: auto;
+}
