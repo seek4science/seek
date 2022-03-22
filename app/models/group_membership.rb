@@ -4,9 +4,6 @@ class GroupMembership < ApplicationRecord
   has_one :project, through: :work_group, inverse_of: :group_memberships
   has_one :institution, through: :work_group, inverse_of: :group_memberships
 
-  has_many :group_memberships_project_positions, :dependent => :destroy
-  has_many :project_positions, :through => :group_memberships_project_positions
-
   before_save :unset_has_left
   after_save :remember_previous_person
   after_update { remove_admin_defined_role_projects if has_left }

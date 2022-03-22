@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class PeopleControllerTest < ActionController::TestCase
-  fixtures :people, :users, :projects, :work_groups, :group_memberships, :project_positions, :institutions
+  fixtures :people, :users, :projects, :work_groups, :group_memberships, :institutions
 
   include AuthenticatedTestHelper
   include RestTestCases
@@ -24,7 +24,7 @@ class PeopleControllerTest < ActionController::TestCase
   def test_should_get_index
     get :index
     assert_response :success
-    assert_not_nil assigns(:people)
+    refute_nil assigns(:people)
   end
 
   def test_should_get_new
@@ -96,7 +96,7 @@ class PeopleControllerTest < ActionController::TestCase
 
     assert_redirected_to person_path(assigns(:person))
     assert_equal 'T', assigns(:person).first_letter
-    assert_not_nil Person.find(assigns(:person).id).notifiee_info
+    refute_nil Person.find(assigns(:person).id).notifiee_info
   end
 
   test 'activation required after create' do
@@ -164,7 +164,7 @@ class PeopleControllerTest < ActionController::TestCase
   def test_created_person_should_receive_notifications
     post :create, params: { person: { first_name: 'test', email: 'hghg@sdfsd.com' } }
     p = assigns(:person)
-    assert_not_nil p.notifiee_info
+    refute_nil p.notifiee_info
     assert p.notifiee_info.receive_notifications?
   end
 
@@ -270,7 +270,7 @@ class PeopleControllerTest < ActionController::TestCase
     login_as(:aaron)
     quentin = people(:quentin_person)
     put :update, params: { id: people(:quentin_person), person: { email: 'kkkkk@kkkkk.com' } }
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
     quentin.reload
     assert_equal 'quentin@email.com', quentin.email
   end
@@ -294,16 +294,6 @@ class PeopleControllerTest < ActionController::TestCase
     project = projects(:sysmo_project)
     get :index, params: { filter: { project: project.id } }
     assert_response :success
-  end
-
-  test 'finding by role' do
-    p1 = Factory(:pal)
-    p2 = Factory(:person)
-    get :index, params: { filter: { project_position: ProjectPosition.pal_position.id } }
-    assert_response :success
-    assert assigns(:people)
-    assert assigns(:people).include?(p1)
-    refute assigns(:people).include?(p2)
   end
 
   test 'admin can manage person' do
@@ -339,68 +329,6 @@ class PeopleControllerTest < ActionController::TestCase
 
     permissions = Permission.where(contributor_type: 'Person', contributor_id: person.try(:id))
     assert_equal 0, permissions.count
-  end
-
-  test 'should set the manage right on pi before deleting the person' do
-    login_as(:quentin)
-
-    project = Factory(:project)
-    work_group = Factory(:work_group, project: project)
-    person = Factory(:person_in_project, group_memberships: [Factory(:group_membership, work_group: work_group)])
-    user = Factory(:user, person: person)
-    # create a datafile that this person is the contributor
-    data_file = Factory(:data_file, contributor: user.person, project_ids: [project.id])
-    # create pi
-    position = ProjectPosition.find_by_name('PI')
-    pi = Factory(:person_in_project, group_memberships: [Factory(:group_membership, work_group: work_group)])
-    pi.group_memberships.first.project_positions << position
-    pi.save
-    assert_equal pi, project.pis.first
-
-    assert_difference('Person.count', -1) do
-      delete :destroy, params: { id: person }
-    end
-
-    permissions_on_person = Permission.where(contributor_type: 'Person', contributor_id: person.try(:id))
-    assert_equal 0, permissions_on_person.count
-
-    permissions = data_file.policy.permissions
-
-    assert_equal 1, permissions.count
-    assert_equal pi.id, permissions.first.contributor_id
-    assert_equal Policy::MANAGING, permissions.first.access_type
-  end
-
-  test 'should set the manage right on pal (if no pi) before deleting the person' do
-    login_as(:quentin)
-
-    project = Factory(:project)
-    work_group = Factory(:work_group, project: project)
-    person = Factory(:person_in_project, group_memberships: [Factory(:group_membership, work_group: work_group)])
-    user = Factory(:user, person: person)
-    # create a datafile that this person is the contributor and with the same project
-    data_file = Factory(:data_file, contributor: user.person, project_ids: [project.id])
-    # create pal
-    position = ProjectPosition.find_by_name('Sysmo-DB Pal')
-    pal = Factory(:person_in_project, group_memberships: [Factory(:group_membership, work_group: work_group)])
-    pal.group_memberships.first.project_positions << position
-    pal.is_pal = true, project
-    pal.save
-    assert_equal pal, project.pals.first
-    assert_equal 0, project.pis.count
-
-    assert_difference('Person.count', -1) do
-      delete :destroy, params: { id: person }
-    end
-
-    permissions_on_person = Permission.where(contributor_type: 'Person', contributor_id: person.try(:id))
-    assert_equal 0, permissions_on_person.count
-
-    permissions = data_file.policy.permissions
-
-    assert_equal 1, permissions.count
-    assert_equal pal.id, permissions.first.contributor_id
-    assert_equal Policy::MANAGING, permissions.first.access_type
   end
 
   test 'should have asset housekeeper role on person show page' do
@@ -513,12 +441,12 @@ class PeopleControllerTest < ActionController::TestCase
     get :edit, params: { id: a_person }
 
     assert_response :redirect
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
 
     put :update, params: { id: a_person, person: { first_name: 'blabla' } }
 
     assert_response :redirect
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
     a_person.reload
     assert_not_equal 'blabla', a_person.first_name
   end
@@ -534,19 +462,19 @@ class PeopleControllerTest < ActionController::TestCase
     get :edit, params: { id: admin }
 
     assert_response :redirect
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
 
     put :update, params: { id: admin, person: { first_name: 'blablba' } }
 
     assert_response :redirect
-    assert_not_nil flash[:error]
+    refute_nil flash[:error]
 
     refute_equal 'blablba', assigns(:person).first_name
   end
 
   test 'admin can edit other admin' do
     admin = Factory(:admin)
-    assert_not_nil admin.user
+    refute_nil admin.user
     assert_not_equal User.current_user, admin.user
 
     get :show, params: { id: admin }
@@ -1167,14 +1095,6 @@ class PeopleControllerTest < ActionController::TestCase
     assert_redirected_to people_path
   end
 
-  test 'should show project position on person show page' do
-    pos = Factory(:project_position, name: 'Barista')
-    project_administrator = Factory(:project_administrator)
-    project_administrator.group_memberships.last.project_positions = [pos]
-    get :show, params: { id: project_administrator }
-    assert_select '#project-positions label', text: /#{pos.name}/, count: 1
-  end
-
   test 'current should show current person' do
     get :current, format: :json
 
@@ -1318,8 +1238,6 @@ class PeopleControllerTest < ActionController::TestCase
     Factory :expertise, value: 'fishing', annotatable: person
     Factory :tool, value: 'fishing rod', annotatable: person
     Factory(:event, contributor: person, policy: Factory(:public_policy))
-    position = ProjectPosition.find_by_name('PI')
-    person.group_memberships.first.project_positions << position
     #person.save
     add_avatar_to_test_object(person)
   end

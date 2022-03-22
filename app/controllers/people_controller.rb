@@ -164,7 +164,7 @@ class PeopleController < ApplicationController
     end
 
     respond_to do |format|
-      if @person.update(person_params) && set_group_membership_project_position_ids(@person, params)
+      if @person.update(person_params)
         flash[:notice] = 'Person was successfully updated.'
         format.html { redirect_to(@person) }
         format.json {render json: @person, include: [params[:include]]}
@@ -172,35 +172,6 @@ class PeopleController < ApplicationController
         format.html { render action: 'edit' }
         format.json { render json: json_api_errors(@person), status: :unprocessable_entity }
       end
-    end
-  end
-
-  def set_group_membership_from_api_params(person,params)
-    person.group_memberships.each do |gr|
-      #gr.project_positions.clear ???
-      params[:person][:project_positions].each do |pos|
-        if (gr.project.id.to_s == pos[:project_id].to_s)
-          r = ProjectPosition.find(pos[:position_id])
-          gr.project_positions << r
-        end
-      end
-    end
-  end
-
-  def set_group_membership_project_position_ids(person, params)
-    if params[:person][:project_positions].nil?
-      prefix = 'group_membership_role_ids_'
-      person.group_memberships.each do |gr|
-        key = prefix + gr.id.to_s
-        gr.project_positions.clear
-        next unless params[key.to_sym]
-        params[key.to_sym].each do |r|
-          r = ProjectPosition.find(r)
-          gr.project_positions << r
-        end
-      end
-    else
-      set_group_membership_from_api_params(person, params)
     end
   end
 
