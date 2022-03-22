@@ -289,7 +289,7 @@ class OrganismsControllerTest < ActionController::TestCase
     get :show, params: { id: organism }
     assert_response :success
     assert_select 'table.strain_list' do
-      assert_select 'tr', count: 2 do
+      assert_select 'tr', count: 3 do
         assert_select 'td > a[href=?]', strain_path(strain_a), text: strain_a.title
         assert_select 'td > a[href=?]', strain_path(strain_b), text: strain_b.title
         assert_select 'td > a[href=?]', strain_path(parent_strain), text: parent_strain.title
