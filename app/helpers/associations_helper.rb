@@ -9,7 +9,7 @@ module AssociationsHelper
                            'data-template-name' => template_name)
 
     content_tag(:div, options) do
-      content = content_tag(:ul, '', class: 'associations-list related_asset_list') +
+      content = content_tag(:ul, '', class: 'associations-list') +
           content_tag(:span, empty_text, class: 'none_text no-item-text') +
           content_tag(:script, existing.html_safe, :type => 'application/json', 'data-role' => 'seek-existing-associations')
       # Add an empty hidden field to allow removal of all items

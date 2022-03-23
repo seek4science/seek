@@ -25,7 +25,7 @@
 *= require jstree
 *= require openbis
 *= require eonasdan-bootstrap-datetimepicker
-*= require cytoscape_isa_graph
+*= require isa_graph
 *= require multi-step-wizard
 *= require lightbox2
 *= require simplemde-markdown-editor-1.11.2/simplemde.min

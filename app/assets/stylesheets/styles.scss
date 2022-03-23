@@ -136,17 +136,6 @@ a.asset img.avatar {
   min-height: 3em;
 }
 
-ul.related_asset_list {
-  padding-left: 5px;
-  margin-bottom: 0;
-}
-
-ul.related_asset_list li, li.association-list-item {
-  white-space: normal;
-  list-style-type: none;
-  list-style-position: inside;
-}
-
 div.error_div h2 {
   font-size: inherit;
   font-weight: bold;
@@ -159,10 +148,6 @@ img.visibility_icon {
 
 div.asset_form {
   padding-right: 1em;
-}
-
-div.sharing_summary {
-  text-align: center;
 }
 
 p.import_details {
@@ -191,10 +176,6 @@ p#logging_started {
 #usage_count {
   margin-bottom: 0.5em;
   text-align: center;
-}
-
-.none_text {
-  font-style: italic;
 }
 
 ul.model_scales_list {
@@ -408,6 +389,10 @@ div.renderer {
 
 .subtle {
   font-size: 80%;
+}
+
+.none_text {
+  font-style: italic;
 }
 
 .none_text, .subtle, .pale_text {
