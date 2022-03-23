@@ -72,21 +72,21 @@ end
 Factory.define(:pal, parent: :person) do |f|
   f.roles_mask 2
   f.after_build do |pal|
-    Factory(:admin_defined_role_project, project: pal.projects.first, person: pal, role_mask: 2)
+    Factory(:admin_defined_role_project, project: pal.group_memberships.first.project, person: pal, role_mask: 2)
     pal.roles_mask = 2
   end
 end
 
 Factory.define(:asset_housekeeper, parent: :person) do |f|
   f.after_build do |am|
-    Factory(:admin_defined_role_project, project: am.projects.first, person: am, role_mask: 8)
+    Factory(:admin_defined_role_project, project: am.group_memberships.first.project, person: am, role_mask: 8)
     am.roles_mask = 8
   end
 end
 
 Factory.define(:project_administrator, parent: :person) do |f|
   f.after_build do |pm|
-    Factory(:admin_defined_role_project, project: pm.projects.first, person: pm, role_mask: 4)
+    Factory(:admin_defined_role_project, project: pm.group_memberships.first.project, person: pm, role_mask: 4)
     pm.roles_mask = 4
   end
 end
@@ -101,7 +101,7 @@ end
 
 Factory.define(:programme_administrator, parent: :project_administrator) do |f|
   f.after_build do |pm|
-    programme = Factory(:programme, projects: [pm.projects.first])
+    programme = Factory(:programme, projects: [pm.group_memberships.first.project])
     Factory(:admin_defined_role_programme, programme: programme, person: pm, role_mask: 32)
     pm.roles_mask = 32
   end
@@ -109,7 +109,7 @@ end
 
 Factory.define(:asset_gatekeeper, parent: :person) do |f|
   f.after_build do |gk|
-    Factory(:admin_defined_role_project, project: gk.projects.first, person: gk, role_mask: 16)
+    Factory(:admin_defined_role_project, project: gk.group_memberships.first.project, person: gk, role_mask: 16)
     gk.roles_mask = 16
   end
 end

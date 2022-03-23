@@ -2,12 +2,11 @@ class AdminDefinedRoleProject < ApplicationRecord
   belongs_to :project
   belongs_to :person
 
-  validates :project,:person, presence:true
-  validates :role_mask,numericality: {greater_than:0,less_than_or_equal_to:16}
+  validates :project, :person, presence: true
+  validates :role_mask, numericality: { greater_than: 0, less_than_or_equal_to: 16 }
   validate :person_must_be_in_project
 
-
-  after_commit :queue_update_auth_table, :if=>:persisted?
+  after_commit :queue_update_auth_table, if: :persisted?
   before_destroy :queue_update_auth_table
 
   def roles
@@ -21,9 +20,9 @@ class AdminDefinedRoleProject < ApplicationRecord
   end
 
   def person_must_be_in_project
-    unless person && project && person.projects.include?(project)
-      errors.add(:project, "The person must be a member of the project")
+    # need to go via group_memberships to get projects to handle unsaved records
+    unless person && project && person.group_memberships.collect(&:project).include?(project)
+      errors.add(:project, 'The person must be a member of the project')
     end
   end
-
 end

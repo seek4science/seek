@@ -128,11 +128,6 @@ class Person < ApplicationRecord
     self
   end
 
-  def projects
-    # you can't access these through .projects nested associations until they have been saved
-    work_groups.collect(&:project).uniq | group_memberships.collect { |gm| gm.work_group.project }
-  end
-
   # Returns the columns to be shown on the table view for the resource
   def columns_default
     super + ['first_name','last_name']
@@ -351,14 +346,13 @@ class Person < ApplicationRecord
     permissions.each(&:destroy)
   end
 
-  # a utitlity method to simply add a person to a project and institution
+  # a utility method to simply add a person to a project and institution
   # will automatically handle the WorkGroup and GroupMembership, and avoid creating duplicates
   def add_to_project_and_institution(project, institution)
     group = WorkGroup.where(project_id: project.id, institution_id: institution.id).first
     group ||= WorkGroup.new project: project, institution: institution
 
-
-    membership = GroupMembership.where(person_id: id, work_group_id: group.id).first
+    membership = GroupMembership.where(person: self, work_group: group).first
     membership ||= GroupMembership.new person: self, work_group: group
 
     group_memberships << membership
@@ -374,7 +368,7 @@ class Person < ApplicationRecord
 
   # projects this person is project admin of
   def administered_projects
-    projects.select{|proj| person.is_project_administrator?(proj)}
+    projects.to_a.select{|project| person.is_project_administrator?(project)}
   end
 
   # activation email logs associated with this person
