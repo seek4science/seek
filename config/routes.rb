@@ -508,14 +508,7 @@ SEEK::Application.routes.draw do
       get :simulate
       post :simulate
     end
-    resources :model_images do
-      collection do
-        post :new
-      end
-      member do
-        post :select
-      end
-    end
+    resources :model_images, only: [:show]
     resources :people, :programmes, :projects, :investigations, :assays, :studies, :publications, :events, :collections, only: [:index]
   end
 
