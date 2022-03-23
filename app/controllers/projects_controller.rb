@@ -394,7 +394,7 @@ class ProjectsController < ApplicationController
   # PUT /projects/1   , polymorphic: [:organism]
   # PUT /projects/1.xml
   def update
-    if params[:project][:ordered_investigation_ids]
+    if params[:project]&.[](:ordered_investigation_ids)
       a1 = params[:project][:ordered_investigation_ids]
       a1.permit!
       pos = 0
