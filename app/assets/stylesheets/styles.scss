@@ -122,28 +122,12 @@ div.ontology_nav {
   padding-left: 3em;
 }
 
-img.badge {
-  width: 55px;
-  height: 20px;
-  padding-top: 3px;
-}
-
 a.asset img.avatar {
   padding :5px;
   border:1px solid #ccc;
   background-color: #fff;
   min-width :3em;
   min-height: 3em;
-}
-
-div.error_div h2 {
-  font-size: inherit;
-  font-weight: bold;
-  margin: 0;
-}
-
-img.visibility_icon {
-  margin: 0 0.5em;
 }
 
 div.asset_form {
@@ -182,41 +166,17 @@ ul.model_scales_list {
   margin-left:1em;
 }
 
-.sectionIcons {
-  margin: 1em 0 0 0;
-  font-size: smaller;
-  text-align: center;
-}
+#bioportal_visualise_container {
+  height: 70em;
+  margin-top: 1em;
 
-.sectionIcons * {
-  vertical-align: middle;
-}
-
-.sectionIcons li {
-  display: inline-block;
-  margin-left: 4px;
-  padding-top: 0.75em;
-}
-
-.sectionIcons li * {
-  vertical-align: middle;
-
-}
-
-.sectionIcons li a * {
-  vertical-align: middle;
-}
-
-.sectionIcons li a,
-.sectionIcons li span.disabled_icon {
-  padding: 0.5em;
-  *padding: 0.2em 0.5em;
-  text-decoration: none;
-  @include rounded-box-shadow($seek-button-colour);
-}
-
-.sectionIcons li a:hover {
-  @include box(darken($seek-button-colour, 10%));
+  iframe#bioportal_visualisation {
+    padding:0.5em;
+    border: solid 1px #bbb;
+    width: 100%;
+    height: 80%;
+    overflow: visible;
+  }
 }
 
 .with_shadow {
@@ -234,7 +194,6 @@ ul.model_scales_list {
   border-top-left-radius: 4px;
   -moz-border-radius-topleft: 4px;
   -moz-border-radius-topright: 4px;
-
 }
 
 .curved_bottom {
@@ -254,10 +213,6 @@ ul.model_scales_list {
   border: 1px solid #aaa;
   padding: 3px;
   background-color: #FFFFFF;
-}
-
-.framed_nospace {
-  border: 1px solid #aaa;
 }
 
 div.data_model_relationship {
@@ -339,16 +294,16 @@ img.mint-doi {
 
 .avatar-gallery {
   overflow: auto;
-}
 
-.avatar-gallery div.avatar {
-  float: left;
-  padding: 10px;
-  border: 1px solid #ccc;
-  box-shadow: 2px 2px 2px #999;
-  margin: 10px;
-  width: 200px;
-  text-align: center;
+  div.avatar {
+    float: left;
+    padding: 10px;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 2px #999;
+    margin: 10px;
+    width: 200px;
+    text-align: center;
+  }
 }
 
 .related-items .nav {
@@ -408,8 +363,8 @@ span.truncated-name {
 }
 
 .contribution-header {
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
 }
 
 .contribution-header a.favouritable {
@@ -713,8 +668,8 @@ div.discussion-link {
 }
 
 .typeahead-new-item {
-  color:darkblue;
-  font-style: bold;
+  color: darkblue;
+  font-weight: bold;
 }
 
 span.disabled {
