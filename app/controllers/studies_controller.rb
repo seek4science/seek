@@ -52,7 +52,7 @@ class StudiesController < ApplicationController
 
   def update
     @study = Study.find(params[:id])
-    if params[:study][:ordered_assay_ids]
+    if params[:study]&.[](:ordered_assay_ids)
       a1 = params[:study][:ordered_assay_ids]
       a1.permit!
       pos = 0
