@@ -167,9 +167,6 @@ def load_seek_config_defaults!
   # Admin setting to allow user impersonation, useful for debugging
   Seek::Config.default :admin_impersonation_enabled, false
 
-  #magic guest is a special user required by BioVel, where a logged out user adopts a special guest user, but still appears to be logged out
-  Seek::Config.default :magic_guest_enabled,false
-
   Seek::Config.default :recaptcha_enabled, false
 
   #MERGENOTE - remove this from config and replace with alternative partial
