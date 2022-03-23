@@ -267,13 +267,6 @@ class HumanDiseasesControllerTest < ActionController::TestCase
     refute_nil flash[:error]
   end
 
-  test 'visualise available when logged out' do
-    logout
-    d = Factory(:human_disease, bioportal_concept: Factory(:human_disease_bioportal_concept))
-    get :visualise, params: { id: d }
-    assert_response :success
-  end
-
   test 'cannot delete associated human disease' do
     login_as(:quentin)
     d = human_diseases(:melanoma)

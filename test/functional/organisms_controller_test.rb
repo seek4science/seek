@@ -263,13 +263,6 @@ class OrganismsControllerTest < ActionController::TestCase
     refute_nil flash[:error]
   end
 
-  test 'visualise available when logged out' do
-    logout
-    o = Factory(:organism, bioportal_concept: Factory(:bioportal_concept))
-    get :visualise, params: { id: o }
-    assert_response :success
-  end
-
   test 'cannot delete associated organism' do
     login_as(:quentin)
     o = organisms(:yeast)

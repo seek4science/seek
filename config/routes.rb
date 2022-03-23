@@ -642,9 +642,6 @@ SEEK::Application.routes.draw do
       post :search_ajax
     end
     resources :projects, :programmes, :assays, :studies, :models, :strains, :specimens, :samples, :publications, only: [:index]
-    member do
-      get :visualise
-    end
   end
 
   resources :human_diseases do
@@ -653,7 +650,6 @@ SEEK::Application.routes.draw do
     end
     resources :projects, :programmes, :assays, :studies, :models, :publications, only: [:index]
     member do
-      get :visualise
       get :tree
     end
   end
