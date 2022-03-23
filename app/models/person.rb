@@ -368,7 +368,7 @@ class Person < ApplicationRecord
 
   # projects this person is project admin of
   def administered_projects
-    projects.to_a.select{|project| person.is_project_administrator?(project)}
+    projects.select{|project| person.is_project_administrator?(project)}
   end
 
   # activation email logs associated with this person

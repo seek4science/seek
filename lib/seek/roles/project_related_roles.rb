@@ -157,7 +157,7 @@ module Seek
         # any for projects that have been removed, and resolving the mask
         def resolve_admin_defined_role_projects
           admin_defined_role_projects.each do |role|
-            role.destroy unless projects.include?(role.project)
+            role.destroy unless group_memberships.collect(&:project).include?(role.project)
           end
           new_mask = roles_mask
           roles_to_check = roles & ProjectRelatedRoles.role_names

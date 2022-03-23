@@ -1369,8 +1369,6 @@ class PersonTest < ActiveSupport::TestCase
 
     project2 = Factory(:project)
     person.add_to_project_and_institution(project2,Factory(:institution))
-    person.save!
-    person.reload
     person.is_project_administrator = true, project2
     assert person.is_project_administrator?(project2)
     project3 = Factory(:project)
