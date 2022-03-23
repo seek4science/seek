@@ -23,10 +23,11 @@ module Seek
 
     private
 
-    PROJECT_ATTRIBUTES = %w[id title description web_page programme_id].freeze
-    PROGRAMME_ATTRIBUTES = %w[id title description].freeze
-    INSTITUTION_ATTRIBUTES = %w[id title city country web_page].freeze
-    COMBINED_ATTRIBUTES = PROJECT_ATTRIBUTES | PROGRAMME_ATTRIBUTES | INSTITUTION_ATTRIBUTES
+    REQUIRED_ATTRIBUTES = {
+      Project => %w[id title description web_page programme_id],
+      Institution => %w[id title city country web_page],
+      Programme => %w[id title description]
+    }.freeze
 
     # parses the JSON, and creates an instance of each item if it is defined in the JSON
     def parse_details
@@ -44,7 +45,7 @@ module Seek
     # either returns a new record, or an instance from the database if the id is present
     def find_instance_from_json(json, instance_class)
       key = instance_class.table_name.singularize
-      details = json[key]&.slice(*COMBINED_ATTRIBUTES)
+      details = json[key]&.slice(*REQUIRED_ATTRIBUTES[instance_class])
       obj = nil
       if details
         obj = instance_class.new(details)
@@ -56,9 +57,9 @@ module Seek
     module ClassMethods
       def details_json(programme: nil, project: nil, institution: nil, comments: nil)
         details = {}
-        details[:institution] = institution.attributes.slice(*INSTITUTION_ATTRIBUTES) if institution
-        details[:project] = project.attributes.slice(*PROJECT_ATTRIBUTES) if project
-        details[:programme] = programme&.attributes.slice(*PROGRAMME_ATTRIBUTES) if programme
+        details[:institution] = institution.attributes.slice(*REQUIRED_ATTRIBUTES[Institution]) if institution
+        details[:project] = project.attributes.slice(*REQUIRED_ATTRIBUTES[Project]) if project
+        details[:programme] = programme.attributes.slice(*REQUIRED_ATTRIBUTES[Programme]) if programme
         details[:comments] = comments if comments
 
         details.to_json
