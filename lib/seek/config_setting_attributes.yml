@@ -72,7 +72,6 @@ guide_box_enabled:
 documentation_enabled:
 tagging_enabled:
 authorization_checks_enabled:
-magic_guest_enabled:
 assay_type_ontology_file:
 technology_type_ontology_file:
 modelling_analysis_type_ontology_file:

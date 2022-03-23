@@ -22,7 +22,6 @@ def load_seek_testing_defaults!
       Settings.defaults[:filestore_path] = "tmp/testing-filestore"
       Settings.defaults[:tagging_enabled] = true
       Settings.defaults[:authorization_checks_enabled] = true
-      Settings.defaults[:magic_guest_enabled] = false
       Settings.defaults[:modelling_analysis_enabled] = true
       Settings.defaults[:show_as_external_link_enabled] = false
       Settings.defaults[:allow_publications_fulltext] = true
