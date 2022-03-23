@@ -32,7 +32,7 @@ module Seek
       end
 
       def filter_allowed_related_item_ids(item_ids, person)
-        item_ids & person.group_memberships.collect(&:project).collect(&:id)
+        item_ids & person.work_groups.collect(&:project_id)
       end
 
       ####################################################################
