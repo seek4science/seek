@@ -927,4 +927,57 @@ class StudiesControllerTest < ActionController::TestCase
     assert_empty study.discussion_links
   end
 
+  test 'study needs more than one assay for ordering' do
+    person = Factory(:admin)
+    login_as(person)
+    study = Factory(:study,
+                            policy: Factory(:public_policy),
+                            contributor: person)
+    get :show, params: { id: study.id }
+    
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_assays_study_path(study), count: 0
+
+    study.assays += [Factory(:assay,
+                                      policy: Factory(:public_policy),
+                                      contributor: person)]
+    get :show, params: { id: study.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_assays_study_path(study), count: 0
+
+    study.assays +=  [Factory(:assay,
+                                      policy: Factory(:public_policy),
+                                      contributor: person)]
+    get :show, params: { id: study.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_assays_study_path(study), count: 1
+  end
+
+  test 'ordering only by editor' do
+    person = Factory(:admin)
+    login_as(person)
+    study = Factory(:study,
+                            policy: Factory(:all_sysmo_viewable_policy),
+                            contributor: person)
+    study.assays += [Factory(:assay,
+                                      policy: Factory(:public_policy),
+                                      contributor: person)]
+    study.assays += [Factory(:assay,
+                                      policy: Factory(:public_policy),
+                                      contributor: person)]
+    get :show, params: { id: study.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_assays_study_path(study), count: 1
+
+    login_as(:aaron)
+    get :show, params: { id: study.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_assays_study_path(study), count: 0
+  end
+ 
 end

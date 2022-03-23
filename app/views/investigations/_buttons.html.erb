@@ -11,7 +11,9 @@
 <%= item_actions_dropdown do %>
     <% if item.can_edit? %>
       <li><%= image_tag_for_key('edit', edit_investigation_path(item), "Edit #{t('investigation')}", nil, "Edit #{t('investigation')}") -%></li>
-      <li><%= image_tag_for_key('order', order_studies_investigation_path(item), "Order #{t('study').pluralize}", nil, "Order #{t('study').pluralize}") -%></li>
+      <% if item.studies.size > 1 %>
+        <li><%= image_tag_for_key('order', order_studies_investigation_path(item), "Order #{t('study').pluralize}", nil, "Order #{t('study').pluralize}") -%></li>
+      <% end %>
     <% end %>
 
     <% if item.can_manage? -%>

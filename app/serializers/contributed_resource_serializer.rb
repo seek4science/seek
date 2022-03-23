@@ -12,10 +12,10 @@ class ContributedResourceSerializer < PCSSerializer
   attribute :versions, if: -> { object.respond_to?(:versions) } do
     versions_data = []
     object.visible_versions.each do |v|
-      path = polymorphic_path(object, version: v.version)
+      url = polymorphic_url(object, version: v.version, host: Seek::Config.site_base_host)
       versions_data.append(version: v.version,
                            revision_comments: v.revision_comments.presence,
-                           url: "#{base_url}#{path}")
+                           url: url)
     end
     versions_data
   end
@@ -56,14 +56,13 @@ class ContributedResourceSerializer < PCSSerializer
   attribute :other_creators
 
   def convert_content_blob_to_json(cb)
-    path = polymorphic_path([cb.asset, cb])
     {
       original_filename: cb.original_filename,
       url: cb.url,
       md5sum: cb.md5sum,
       sha1sum: cb.sha1sum,
       content_type: cb.content_type,
-      link: "#{base_url}#{path}",
+      link: polymorphic_url([cb.asset, cb], host: Seek::Config.site_base_host),
       size: cb.file_size
     }
   end

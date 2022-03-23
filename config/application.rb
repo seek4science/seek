@@ -76,6 +76,9 @@ module SEEK
 
     # Ignore translation overrides when testing
     config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'overrides', '**', '*.{rb,yml}')] unless Rails.env.test?
+
+    # pass forward the relative url root, if set. Needed for generating correct non-relative URL's. See https://github.com/rails/rails/issues/40237
+    routes.default_url_options[:relative_url_root] = config.relative_url_root
     
   end
 end

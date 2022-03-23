@@ -718,4 +718,57 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_empty investigation.discussion_links
   end
 
+ test 'investigation needs more than one study for ordering' do
+    person = Factory(:admin)
+    login_as(person)
+    investigation = Factory(:investigation,
+                            policy: Factory(:public_policy),
+                            contributor: person)
+    get :show, params: { id: investigation.id }
+    
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_studies_investigation_path(investigation), count: 0
+
+    investigation.studies += [Factory(:study,
+                                      policy: Factory(:public_policy),
+                                      contributor: person)]
+    get :show, params: { id: investigation.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_studies_investigation_path(investigation), count: 0
+
+    investigation.studies +=  [Factory(:study,
+                                      policy: Factory(:public_policy),
+                                      contributor: person)]
+    get :show, params: { id: investigation.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_studies_investigation_path(investigation), count: 1
+  end
+
+  test 'ordering only by editor' do
+    person = Factory(:admin)
+    login_as(person)
+    investigation = Factory(:investigation,
+                            policy: Factory(:all_sysmo_viewable_policy),
+                            contributor: person)
+    investigation.studies += [Factory(:study,
+                                      policy: Factory(:public_policy),
+                                      contributor: person)]
+    investigation.studies += [Factory(:study,
+                                      policy: Factory(:public_policy),
+                                      contributor: person)]
+    get :show, params: { id: investigation.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_studies_investigation_path(investigation), count: 1
+
+    login_as(:aaron)
+    get :show, params: { id: investigation.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_studies_investigation_path(investigation), count: 0
+  end
+ 
 end
