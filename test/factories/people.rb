@@ -34,7 +34,11 @@ Factory.define(:brand_new_person, class: Person) do |f|
 end
 
 Factory.define(:person_in_project, parent: :brand_new_person) do |f|
-  f.group_memberships { [Factory.build(:group_membership)] }
+  f.ignore do
+    project { Factory(:project) }
+    institution { Factory(:institution) }
+  end
+  f.group_memberships { [Factory.build(:group_membership, work_group: Factory(:work_group, project: project, institution: institution))] }
   f.after_create do |p|
     p.reload
   end
@@ -57,11 +61,6 @@ Factory.define(:person_in_multiple_projects, parent: :brand_new_person) do |f|
 end
 
 Factory.define(:person, parent: :person_in_project) do |f|
-  f.ignore do
-    project { Factory(:project) }
-    institution { Factory(:institution) }
-  end
-  f.group_memberships { [Factory.build(:group_membership, work_group: Factory(:work_group, project: project, institution: institution))] }
   f.association :user, factory: :activated_user
 end
 
