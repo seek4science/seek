@@ -20,7 +20,6 @@ describe DataFile do
   it { should have_searchable_field(:assay_type_titles) }
   it { should have_searchable_field(:technology_type_titles) }
   it { should have_searchable_field(:spreadsheet_annotation_search_fields) }
-  it { should have_searchable_field(:fs_search_fields) }
  #it { should have_searchable_field(:spreadsheet_contents_for_search) }
 end
 
@@ -114,7 +113,7 @@ describe Study do
   it { should have_searchable_field(:contributor) }
   it { should have_searchable_field(:projects) }
 
-  it { should have_searchable_field(:experimentalists) }  
+  it { should have_searchable_field(:experimentalists) }
 end
 
 describe Investigation do
