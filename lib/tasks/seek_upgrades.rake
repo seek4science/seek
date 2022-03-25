@@ -139,22 +139,22 @@ namespace :seek do
 
     unless PublicationType.find_by(title:"Masters Thesis").nil?
       PublicationType.find_by(key:"mastersthesis").update_attributes(title:"Master's Thesis")
-      puts PublicationType.find_by(key:"mastersthesis").title
+      puts 'Changing Masters Thesis to '+PublicationType.find_by(key:"mastersthesis").title
     end
 
     unless PublicationType.find_by(title:"Bachelors Thesis").nil?
       PublicationType.find_by(key:"bachelorsthesis").update_attributes(title:"Bachelor's Thesis")
-      puts PublicationType.find_by(key:"bachelorsthesis").title
+      puts 'Changing Bachelors Thesis to '+PublicationType.find_by(key:"bachelorsthesis").title
     end
 
     unless PublicationType.find_by(title:"Phd Thesis").nil?
       PublicationType.find_by(key:"phdthesis").update_attributes(title:"Doctoral Thesis")
-      puts PublicationType.find_by(key:"phdthesis").title
+      puts 'Changing Phd Thesis to '+PublicationType.find_by(key:"phdthesis").title
     end
 
     if PublicationType.find_by(key:"diplomthesis").nil?
       PublicationType.find_or_initialize_by(key: "diplomthesis").update_attributes(title:"Diplom Thesis", key: "diplomthesis")
-      puts PublicationType.find_by(key:"diplomthesis").title
+      puts 'Add new type '+PublicationType.find_by(key:"diplomthesis").title
     end
 
   end
