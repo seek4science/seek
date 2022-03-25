@@ -15,6 +15,7 @@ namespace :seek do
     remove_orphaned_versions
     create_seek_sample_multi
     rename_seek_sample_attribute_types
+    update_thesis_related_publication_types
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -131,4 +132,31 @@ namespace :seek do
       puts "Database adapter is: #{ActiveRecord::Base.connection.instance_values["config"][:adapter]}, doing nothing"
     end
   end
+
+
+  task(update_thesis_related_publication_types: [:environment]) do
+    puts 'Updating publication types ...'
+
+    unless PublicationType.find_by(title:"Masters Thesis").nil?
+      PublicationType.find_by(key:"mastersthesis").update_attributes(title:"Master's Thesis")
+      puts PublicationType.find_by(key:"mastersthesis").title
+    end
+
+    unless PublicationType.find_by(title:"Bachelors Thesis").nil?
+      PublicationType.find_by(key:"bachelorsthesis").update_attributes(title:"Bachelor's Thesis")
+      puts PublicationType.find_by(key:"bachelorsthesis").title
+    end
+
+    unless PublicationType.find_by(title:"Phd Thesis").nil?
+      PublicationType.find_by(key:"phdthesis").update_attributes(title:"Doctoral Thesis")
+      puts PublicationType.find_by(key:"phdthesis").title
+    end
+
+    if PublicationType.find_by(key:"diplomthesis").nil?
+      PublicationType.find_or_initialize_by(key: "diplomthesis").update_attributes(title:"Diplom Thesis", key: "diplomthesis")
+      puts PublicationType.find_by(key:"diplomthesis").title
+    end
+
+  end
+
 end
