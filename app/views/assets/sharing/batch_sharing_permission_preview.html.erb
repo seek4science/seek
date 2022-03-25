@@ -5,8 +5,9 @@
   all_investigations_hash = SharingPermissionsHelper::ALL_INVESTIGATIONS_HASH
   all_investigations_hash[:children] = []
 
-  #remove the public items which don't need change sharing permissions
-  all_related_items_hash = get_related_resources(current_user.person).except!('Project', 'Institution','Publication')
+  #include items which can change sharing permissions, the 'publication' is intendedly excluded.
+  all_related_items_hash = get_related_resources(current_user.person).slice(*Seek::Util.authorized_types.map(&:name)).except!('Publication')
+
   items_not_in_isa = filter_items_not_in_ISA(all_related_items_hash)
 
   @policy_params = params[:policy_attributes]
