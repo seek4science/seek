@@ -291,19 +291,6 @@ namespace :seek_dev do
     output.close
   end
 
-  task update_thesis_related_publication_types: :environment do
-    PublicationType.find_by(key:"mastersthesis").update_attributes(title:"Master's Thesis") unless PublicationType.find_by(key:"mastersthesis").nil?
-    PublicationType.find_by(key:"bachelorsthesis").update_attributes(title:"Bachelor's Thesis") unless PublicationType.find_by(key:"bachelorsthesis").nil?
-    PublicationType.find_by(key:"phdthesis").update_attributes(title:"Doctoral Thesis") unless PublicationType.find_by(key:"phdthesis").nil?
-    PublicationType.find_or_initialize_by(key: "diplomthesis").update_attributes(title:"Diplom Thesis", key: "diplomthesis")
-    pp "the updated publication types are:"
-    pp PublicationType.find_by(key:"mastersthesis").title
-    pp PublicationType.find_by(key:"bachelorsthesis").title
-    pp PublicationType.find_by(key:"phdthesis").title
-    pp PublicationType.find_by(key:"diplomthesis").title
-
-  end
-
   task find_publications_without_publication_types: :environment do
     base_url = Seek::Config.site_base_host
     File.delete("./log/publications_without_publication_types.log") if File.exist?("./log/publications_without_publication_types.log")
