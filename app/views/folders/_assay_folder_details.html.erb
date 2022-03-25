@@ -1,5 +1,5 @@
-<div class="yui-gf">
-  <div class="yui-u first">
+<div class="row">
+  <div class="col-sm-6">
     <p>
       <b>Title: </b><%= link_to(h(@folder.title), @folder.assay) -%>
     </p>
@@ -7,7 +7,7 @@
       <b>Description: </b><%= h(@folder.description) -%>
     </p>
   </div>
-  <div class="yui-u">
+  <div class="col-sm-6">
     <p>
       <b>Associated with the study:</b> <%= link_to(h(@folder.assay.study.title), @folder.assay.study) -%>
     </p>

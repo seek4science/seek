@@ -6,7 +6,7 @@
 
 <%= form_tag(update_metadata_publications_path, { remote: true, id: 'refetch_metadata_publication' }) do %>
 
-  <div id="publication_error" class="error_div alert alert-danger" style="display:none"></div>
+  <div id="publication_error" class="alert alert-danger" style="display:none"></div>
 
 
     <%= panel("Currrent Metadata", :id => 'update_publication_medadata', :help_text=> help_text) do %>

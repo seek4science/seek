@@ -8,15 +8,6 @@
 
     <div class="row">
       <div class="col-md-9 col-sm-8 box_about_actor">
-        <% if @assay.study.nil? -%>
-          <div class="warning">
-            <%= image("warning") %><b style="color:red">WARNING</b>
-            <br/>
-            <br/>
-            An <%= t('assays.assay') %> may be edited by anybody, regardless of <%= t('project') %> membership, until it
-            has been associated with a <%= t('study') %>
-          </div>
-        <% end -%>
         <%= item_description @assay.description -%>
 
         <div class="row">

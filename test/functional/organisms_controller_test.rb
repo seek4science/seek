@@ -263,13 +263,6 @@ class OrganismsControllerTest < ActionController::TestCase
     refute_nil flash[:error]
   end
 
-  test 'visualise available when logged out' do
-    logout
-    o = Factory(:organism, bioportal_concept: Factory(:bioportal_concept))
-    get :visualise, params: { id: o }
-    assert_response :success
-  end
-
   test 'cannot delete associated organism' do
     login_as(:quentin)
     o = organisms(:yeast)
@@ -289,7 +282,7 @@ class OrganismsControllerTest < ActionController::TestCase
     get :show, params: { id: organism }
     assert_response :success
     assert_select 'table.strain_list' do
-      assert_select 'tr', count: 2 do
+      assert_select 'tr', count: 3 do
         assert_select 'td > a[href=?]', strain_path(strain_a), text: strain_a.title
         assert_select 'td > a[href=?]', strain_path(strain_b), text: strain_b.title
         assert_select 'td > a[href=?]', strain_path(parent_strain), text: parent_strain.title

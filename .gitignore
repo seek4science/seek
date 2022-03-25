@@ -35,6 +35,7 @@ tmp/model_images/*
 tmp/restart.txt
 tmp/rubycritic/*
 tmp/profile-*
+tmp/miniprofiler/*
 tmp/test_content_blobs/*
 tmp/rubycritic/*
 tmp/rdf/

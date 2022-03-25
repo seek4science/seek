@@ -1,32 +1,26 @@
 <%= javascript_include_tag "project_folders" %>
 
 <%
-    default_folder = initial_folder(@project)
-    help_icon = image_tag(icon_filename_for_key("help"), :alt=>"help", 'data-tooltip' => tooltip("Click to toggle information on how to use the #{t('project')} asset browser"))
-    help_button = link_to help_icon, '#', onclick: "$j('#folders_help').slideToggle(); return false;"
+  default_folder = initial_folder(@project)
+  help_icon = image_tag(icon_filename_for_key("help"), :alt=>"help", 'data-tooltip' => tooltip("Click to toggle information on how to use the #{t('project')} asset browser"))
+  help_button = link_to help_icon, '#', onclick: "$j('#folders_help').slideToggle(); return false;"
 %>
 
 <%= render :partial => "general/page_title",:locals=>{:title=>"#{t('project')} item browser for the #{t('project')} '#{link_to @project.title,@project}'&nbsp;#{help_button}".html_safe} -%>
-<%=  -%>
 
+<%= render :partial => "folders_help" -%>
 
-
-<div class="show_basic">
-  <%= render :partial => "folders_help" -%>
-  <div class="row">
-
-    <div id="folder_column" class="col-md-4">
-      <div id="folders">
-        <%= render :partial => "folder_tree" -%>
-      </div>
-    </div>
-    <div class="col-md-8">
-      <div id="folder_contents">
-        <%= render :partial => "contents", :locals => {:folder => default_folder} if default_folder -%>
-      </div>
+<div class="row">
+  <div id="folder_column" class="col-md-4">
+    <div id="folders">
+      <%= render :partial => "folder_tree" -%>
     </div>
   </div>
-
+  <div class="col-md-8">
+    <div id="folder_contents">
+      <%= render :partial => "contents", :locals => {:folder => default_folder} if default_folder -%>
+    </div>
+  </div>
 </div>
 
 <div>

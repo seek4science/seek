@@ -490,6 +490,5 @@ module Seek
     def self.schema_org_supported?
       true
     end
-
   end
 end
