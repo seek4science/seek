@@ -292,8 +292,7 @@ namespace :seek_dev do
   end
 
   task find_publications_without_publication_types: :environment do
-     base_url = "https://fairdomhub.org/"
-     #base_url = "https://0.0.0.0:3002/"
+    base_url = Seek::Config.site_base_host
     File.delete("./log/publications_without_publication_types.log") if File.exist?("./log/publications_without_publication_types.log")
     output = File.open( "./log/publications_without_publication_types.log","w" )
      pj_has_pubs = Project.all.select { |p| p.publications.size > 0 }
