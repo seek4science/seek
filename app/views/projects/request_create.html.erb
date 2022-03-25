@@ -5,7 +5,7 @@
         <% if @programme %>
           <% if @programme.id.nil? %>
             <%
-              mail_recipients = "#{Seek::Config.instance_admins_name} administrators"
+              mail_recipients = "#{Seek::Config.instance_name} administrators"
               to_be_created = "#{t('programme')} and #{t('project')}"
             %>
             <p>

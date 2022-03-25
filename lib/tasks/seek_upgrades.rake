@@ -21,6 +21,7 @@ namespace :seek do
     create_seek_sample_multi
     rename_seek_sample_attribute_types
     seek:rebuild_workflow_internals
+    update_thesis_related_publication_types
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -31,10 +32,10 @@ namespace :seek do
 
   desc('upgrades SEEK from the last released version to the latest released version')
   task(upgrade: [:environment]) do
-    puts "Starting upgrade ..."
-    puts "... trimming old session data ..."
+    puts 'Starting upgrade ...'
+    puts '... trimming old session data ...'
     Rake::Task['db:sessions:trim'].invoke
-    puts "... migrating database ..."
+    puts '... migrating database ...'
     Rake::Task['db:migrate'].invoke
     Rake::Task['tmp:clear'].invoke
 
@@ -42,12 +43,12 @@ namespace :seek do
     Seek::Config.solr_enabled = false
 
     begin
-      puts "... performing upgrade tasks ..."
+      puts '... performing upgrade tasks ...'
       Rake::Task['seek:standard_upgrade_tasks'].invoke
       Rake::Task['seek:upgrade_version_tasks'].invoke
 
       Seek::Config.solr_enabled = solr
-      puts "... queuing search reindexing jobs ..."
+      puts '... queuing search reindexing jobs ...'
       Rake::Task['seek:reindex_all'].invoke if solr
 
       puts 'Upgrade completed successfully'
@@ -176,4 +177,31 @@ namespace :seek do
       puts "Database adapter is: #{ActiveRecord::Base.connection.instance_values["config"][:adapter]}, doing nothing"
     end
   end
+
+
+  task(update_thesis_related_publication_types: [:environment]) do
+    puts 'Updating publication types ...'
+
+    unless PublicationType.find_by(title:"Masters Thesis").nil?
+      PublicationType.find_by(key:"mastersthesis").update(title:"Master's Thesis")
+      puts 'Changing Masters Thesis to '+PublicationType.find_by(key:"mastersthesis").title
+    end
+
+    unless PublicationType.find_by(title:"Bachelors Thesis").nil?
+      PublicationType.find_by(key:"bachelorsthesis").update(title:"Bachelor's Thesis")
+      puts 'Changing Bachelors Thesis to '+PublicationType.find_by(key:"bachelorsthesis").title
+    end
+
+    unless PublicationType.find_by(title:"Phd Thesis").nil?
+      PublicationType.find_by(key:"phdthesis").update(title:"Doctoral Thesis")
+      puts 'Changing Phd Thesis to '+PublicationType.find_by(key:"phdthesis").title
+    end
+
+    if PublicationType.find_by(key:"diplomthesis").nil?
+      PublicationType.find_or_initialize_by(key: "diplomthesis").update(title:"Diplom Thesis", key: "diplomthesis")
+      puts 'Add new type '+PublicationType.find_by(key:"diplomthesis").title
+    end
+
+  end
+
 end
