@@ -226,12 +226,13 @@ module IsaExporter
 
         def convert_materials_sources(sample_type)
             with_tag_source = sample_type.sample_attributes.detect { |sa| sa.isa_tag&.isa_source? }
-            with_tag_source_characteristic = sample_type.sample_attributes.select { |sa| sa.isa_tag&.isa_source_characteristic? }
-            sources = sample_type.samples.map do |s|
+          #   with_tag_source_characteristic = sample_type.sample_attributes.select { |sa| sa.isa_tag&.isa_source_characteristic? }
+		attributes = sample_type.sample_attributes.select{ |sa| sa.isa_tag&.isa_source_characteristic? || sa.isa_tag&.isa_sample_characteristic? }  
+		sources = sample_type.samples.map do |s|
                 {
                     "@id": "#source/#{s.id}",
                     name: s.get_attribute_value(with_tag_source),
-                    characteristics: convert_characteristics(s, with_tag_source_characteristic)   
+                    characteristics: convert_characteristics(s, attributes)   
                 }
             end
             sources
