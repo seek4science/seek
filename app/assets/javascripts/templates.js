@@ -91,8 +91,8 @@ function loadTemplates(data) {
     (obj, key) => { 
       obj[key] = categorizedData[key]; 
       obj[key].sort((a,b)=>{
-        if ( a.title < b.title )return -1;
-        else if ( a.title > b.title )return 1;
+        if ( a.group_order < b.group_order )return -1;
+        else if ( a.group_order > b.group_order )return 1;
         else return 0;
       })
       return obj;

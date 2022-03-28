@@ -18,7 +18,7 @@ module TemplatesHelper
     Template.select{|t| t.can_perform?(privilege)}.map { |item|
       { title: item.title, group: item.group, level: item.level,
         organism: item.organism, template_id: item.id,
-        description: item.description,
+        description: item.description, group_order: item.group_order, 
         attributes: item.template_attributes.order(:pos).map { |a| map_template_attributes(a) }
       }
     }
