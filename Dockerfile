@@ -27,8 +27,6 @@ USER www-data
 
 WORKDIR $APP_DIR
 
-
-
 # Bundle install throw errors if Gemfile has been modified since Gemfile.lock
 COPY Gemfile* ./
 RUN bundle config --local frozen 1 && \
@@ -70,9 +68,6 @@ RUN curl -fsSLO "$SUPERCRONIC_URL" \
  && chmod +x "$SUPERCRONIC" \
  && mv "$SUPERCRONIC" "/usr/local/bin/${SUPERCRONIC}" \
  && ln -s "/usr/local/bin/${SUPERCRONIC}" /usr/local/bin/supercronic
-
-# NGINX config
-COPY docker/nginx.conf /etc/nginx/nginx.conf
 
 # Cleanup
 RUN rm -rf /tmp/* /var/tmp/*
