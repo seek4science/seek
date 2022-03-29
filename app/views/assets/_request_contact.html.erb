@@ -11,7 +11,7 @@
       <%= modal_header('Request Contact') %>
       <%= modal_body do %>
         <div id="request_contact_form">
-          <%= form_tag_with_callbacks(polymorphic_url(resource, action: :request_contact),
+          <%= form_tag_with_callbacks(polymorphic_path(resource, action: :request_contact),
                                       { id: 'request_contact',
                                         before: "$j('#requesting_contact_status').fadeIn(); $j('#request_contact_form').hide();",
                                         remote: true }) do -%>
