@@ -79,7 +79,7 @@
         var project_id = <%=@project.id%>
         <%
             fld = ProjectFolder.where(:project_id=>@project.id, :title=>"Unsorted items").first
-            folder_id = fld.id unless fld.nil?
+            folder_id = fld.nil? ? '' : fld.id
             path = move_asset_to_project_folder_path('-project_id-', folder_id)
         %>
     
