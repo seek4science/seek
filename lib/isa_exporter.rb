@@ -64,7 +64,7 @@ module IsaExporter
             isa_study[:studyDesignDescriptors] = []
             isa_study[:characteristicCategories] = convert_characteristic_categories(study)
             isa_study[:materials] = { 
-                sources: convert_materials_sources(study.sample_types), 
+                sources: convert_materials_sources(study.sample_types.first), 
                 samples: convert_materials_samples(study.sample_types.second)
             }
 
@@ -224,16 +224,15 @@ module IsaExporter
             return isa_protocol
         end
 
-        def convert_materials_sources(sample_types)
-            with_tag_source = sample_types.first.sample_attributes.detect { |sa| sa.isa_tag&.isa_source? }
-          #   with_tag_source_characteristic = sample_type.sample_attributes.select { |sa| sa.isa_tag&.isa_source_characteristic? }
-		attributes = sample_types.map{ |s| s.sample_attributes }.flatten
-		attributes = attributes.select{ |sa| sa.isa_tag&.isa_source_characteristic? || sa.isa_tag&.isa_sample_characteristic? }  
-		sources = sample_types.first.samples.map do |s|
+        def convert_materials_sources(sample_type)
+          with_tag_source = sample_type.sample_attributes.detect { |sa| sa.isa_tag&.isa_source? }
+          with_tag_source_characteristic = sample_type.sample_attributes.select { |sa| sa.isa_tag&.isa_source_characteristic? }
+		# attributes = sample_type.sample_attributes.select{ |sa| sa.isa_tag&.isa_source_characteristic? }  
+		sources = sample_type.samples.map do |s|
                 {
                     "@id": "#source/#{s.id}",
                     name: s.get_attribute_value(with_tag_source),
-                    characteristics: convert_characteristics(s, attributes)   
+                    characteristics: convert_characteristics(s, with_tag_source_characteristic)   
                 }
             end
             sources
@@ -263,10 +262,10 @@ module IsaExporter
             samples
         end
         
-        def convert_characteristics(sample, with_tag_source_characteristic)
-            with_tag_source_characteristic.map do |c|
+        def convert_characteristics(sample, attributes)
+		attributes.map do |c|
                 ontology = get_ontology_details(c)
-                return {
+               {
                     category: { "@id": "#characteristic_category/#{c.title}" },
                     value: {
                         annotationValue: sample.get_attribute_value(c),
