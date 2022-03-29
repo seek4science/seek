@@ -299,6 +299,21 @@ module IsaExporter
             end
         end
 
+	   def convert_characteristic(attributes)
+			attributes.map do |s|
+				ontology = get_ontology_details(s)
+				{
+					category: { "@id": "#characteristic_category/#{s.id}" },
+					value: {
+						annotationValue: s.title,
+						termSource: ontology[:termSource],
+						termAccession: ontology[:termAccession]
+					},
+					unit: { "@id": nil }
+				}
+			end
+	   end
+
         def convert_process_sequence(sample_type)
             # This method is meant to be used for both Studies and Assays
             return [] if !sample_type.samples.any?
@@ -353,22 +368,13 @@ module IsaExporter
             return [] if !with_tag_isa_other_material
             with_type_seek_sample_multi = detect_sample_multi(sample_type)
             raise "Defected ISA other_materials!" if !with_type_seek_sample_multi
+		  with_tag_isa_other_material_characteristics = sample_type.sample_attributes.select{ |sa| sa.isa_tag&.isa_other_material_characteristic? }
             sample_type.samples.map do |s|
                 {
                     "@id": "#material/#{s.id}", 
                     name: s.get_attribute_value(with_tag_isa_other_material),
                     type: with_tag_isa_other_material.title,
-                    characteristics: [
-                        {
-                            category: { "@id": nil },
-                            value: {
-                                annotationValue: nil,
-                                termSource: nil,
-                                termAccession: nil
-                            },
-                            unit: { "@id": nil }
-                        }
-                    ],
+                    characteristics: convert_characteristic(with_tag_isa_other_material_characteristics),
                     derivesFrom: extract_sample_ids(s.get_attribute_value(with_type_seek_sample_multi), "sample")
                 }
             end
