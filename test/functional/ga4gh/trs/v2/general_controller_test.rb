@@ -18,17 +18,15 @@ module Ga4gh
         end
 
         test 'should generate id based on application base url' do
-          url_root = Rails.application.config.relative_url_root
           with_config_value(:site_base_host, 'http://test.host') do
-            Rails.application.config.relative_url_root = '/seek/123'
-            get :service_info
+            with_relative_root('/seek/123') do
+              get :service_info
 
-            assert_response :success
-            r = JSON.parse(@response.body)
-            assert_equal "host.test.seek.123", r['id']
+              assert_response :success
+              r = JSON.parse(@response.body)
+              assert_equal "host.test.seek.123", r['id']
+            end
           end
-        ensure
-          Rails.application.config.relative_url_root = url_root
         end
 
         test 'should get tool classes' do
