@@ -7,7 +7,7 @@ function initialise_rich_text_editors(selector) {
             },
             spellChecker: false,
             previewRender: function(plainText, preview) {
-                $j.post('<%= Rails.application.routes.url_helpers.previews_markdown_path %>', { content: plainText })
+                $j.post('<%= Seek::Util.routes.previews_markdown_path %>', { content: plainText })
                     .done(function (html) { preview.innerHTML = html; })
                     .fail(function () { preview.innerHTML = 'An error occurred whilst generating the preview.'; });
 

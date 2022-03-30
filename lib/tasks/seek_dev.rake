@@ -328,7 +328,7 @@ namespace :seek_dev do
   end
 
   task report_missing_related_items_routes: :environment do
-    routes = Rails.application.routes.url_helpers
+    routes = Seek::Util.routes
     Seek::RelatedItems::RELATABLE_TYPES.each do |type|
       klass = type.constantize
       methods = klass.related_type_methods

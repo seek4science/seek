@@ -76,8 +76,8 @@ var Sharing = {
     }
   },
 
-  requestInstitutionsUrl: '<%= Rails.application.routes.url_helpers.request_institutions_projects_path %>',
-  requestAllInstitutionsUrl: '<%= Rails.application.routes.url_helpers.request_all_sharing_form_institutions_path %>',
+  requestInstitutionsUrl: '<%= Seek::Util.routes.request_institutions_projects_path %>',
+  requestAllInstitutionsUrl: '<%= Seek::Util.routes.request_all_sharing_form_institutions_path %>',
 
   accessTypes: {
     noAccess: <%= Policy::NO_ACCESS %>,

@@ -1,5 +1,5 @@
 var OpenBis = {
-    showDatasetFilesPath: "<%= Rails.application.routes.url_helpers.show_dataset_files_openbis_endpoint_openbis_dataset_path('-endpoint_id-', '-dataset_id-') %>",
+    showDatasetFilesPath: "<%= Seek::Util.routes.show_dataset_files_openbis_endpoint_openbis_dataset_path('-endpoint_id-', '-dataset_id-') %>",
     showBrowseWaitingMessage: function () {
         $j('#openbis-datasets #contents').html($j('#waiting-for-items').clone().show());
     },

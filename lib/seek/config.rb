@@ -29,7 +29,7 @@ module Seek
   # Convention for creating a new propagator is to add a method named <setting_name>_propagate
   module Propagators
     def site_base_host_propagate
-      ActionMailer::Base.default_url_options = site_url_options
+      Rails.application.default_url_options = site_url_options
     end
 
     def smtp_propagate
