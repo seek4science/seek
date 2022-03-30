@@ -311,23 +311,23 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'site_base_url' do
-    url_root = Rails.application.config.relative_url_root
-    with_config_value(:site_base_host, 'https://secure.website:443') do
-      Rails.application.config.relative_url_root = nil
-      assert_equal 'https://secure.website:443/', Seek::Config.site_base_url.to_s
+    with_relative_root(nil) do
+      with_config_value(:site_base_host, 'https://secure.website:443') do
+        assert_equal 'https://secure.website:443/', Seek::Config.site_base_url.to_s
+      end
     end
 
     with_config_value(:site_base_host, 'http://somewhere.overtherainbow') do
-      Rails.application.config.relative_url_root = '/seek'
-      assert_equal 'http://somewhere.overtherainbow/seek/', Seek::Config.site_base_url.to_s
+      with_relative_root('/seek') do
+        assert_equal 'http://somewhere.overtherainbow/seek/', Seek::Config.site_base_url.to_s
+      end
     end
 
     with_config_value(:site_base_host, 'http://localhost') do
-      Rails.application.config.relative_url_root = '/seeks/seek1'
-      assert_equal 'http://localhost/seeks/seek1/', Seek::Config.site_base_url.to_s
+      with_relative_root('/seeks/seek1') do
+        assert_equal 'http://localhost/seeks/seek1/', Seek::Config.site_base_url.to_s
+      end
     end
-  ensure
-    Rails.application.config.relative_url_root = url_root
   end
 
   test 'copyright_addendum_enabled' do
@@ -606,26 +606,25 @@ class ConfigTest < ActiveSupport::TestCase
   end
 
   test 'elixir AAI config' do
-    url_root = Rails.application.config.relative_url_root
     with_config_value(:site_base_host, 'https://secure.website:3001') do
       with_config_value(:omniauth_elixir_aai_client_id, 'abc') do
         with_config_value(:omniauth_elixir_aai_secret, '123') do
-          Rails.application.config.relative_url_root = nil
-          config = Seek::Config.omniauth_elixir_aai_config
-          assert_equal 'abc', config[:client_options][:identifier]
-          assert_equal '123', config[:client_options][:secret]
-          assert_equal '/identities/auth/elixir_aai/callback', config[:callback_path]
-          assert_equal 'https://secure.website:3001/identities/auth/elixir_aai/callback', config[:client_options][:redirect_uri]
+          with_relative_root(nil) do
+            config = Seek::Config.omniauth_elixir_aai_config
+            assert_equal 'abc', config[:client_options][:identifier]
+            assert_equal '123', config[:client_options][:secret]
+            assert_equal '/identities/auth/elixir_aai/callback', config[:callback_path]
+            assert_equal 'https://secure.website:3001/identities/auth/elixir_aai/callback', config[:client_options][:redirect_uri]
+          end
         end
       end
     end
     with_config_value(:site_base_host, 'http://localhost') do
-      Rails.application.config.relative_url_root = '/seeks/seek1'
-      config = Seek::Config.omniauth_elixir_aai_config
-      assert_equal '/seeks/seek1/identities/auth/elixir_aai/callback', config[:callback_path]
-      assert_equal 'http://localhost/seeks/seek1/identities/auth/elixir_aai/callback', config[:client_options][:redirect_uri]
+      with_relative_root('/seeks/seek1') do
+        config = Seek::Config.omniauth_elixir_aai_config
+        assert_equal '/seeks/seek1/identities/auth/elixir_aai/callback', config[:callback_path]
+        assert_equal 'http://localhost/seeks/seek1/identities/auth/elixir_aai/callback', config[:client_options][:redirect_uri]
+      end
     end
-  ensure
-    Rails.application.config.relative_url_root = url_root
   end
 end
