@@ -25,7 +25,7 @@ module Ga4gh
 
             assert_response :success
             r = JSON.parse(@response.body)
-            assert_equal "test.host.seek.123", r['id']
+            assert_equal "host.test.seek.123", r['id']
           end
         ensure
           Rails.application.config.relative_url_root = url_root
