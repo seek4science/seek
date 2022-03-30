@@ -12,9 +12,9 @@ services:
       - seek-mysql-db:/var/lib/mysql
 
   seek: # The SEEK application
-    build: .
+    #build: .
 
-    #image: fairdom/seek:1.12-dev
+    image: fairdom/seek:1.12-dev
 
     container_name: seek
     command: docker/entrypoint.sh
@@ -24,7 +24,6 @@ services:
       SOLR_PORT: 8983
       SOLR_HOST: solr
       NO_ENTRYPOINT_WORKERS: 1
-      RAILS_RELATIVE_URL_ROOT: /finn
     env_file:
       - docker/db.env
     volumes:
@@ -40,9 +39,9 @@ services:
       - solr
 
   seek_workers: # The SEEK delayed job workers
-      build: .
+      #build: .
 
-      #image: fairdom/seek:1.12-dev
+      image: fairdom/seek:1.12-dev
       container_name: seek-workers
       command: docker/start_workers.sh
       restart: always
@@ -50,7 +49,6 @@ services:
         RAILS_ENV: production
         SOLR_PORT: 8983
         SOLR_HOST: solr
-        RAILS_RELATIVE_URL_ROOT: /finn
       env_file:
         - docker/db.env
       volumes:
