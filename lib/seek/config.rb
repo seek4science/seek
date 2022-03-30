@@ -264,6 +264,14 @@ module Seek
       URI(Seek::Config.site_base_host).scheme
     end
 
+    # Includes trailing slash so it can be used to safely append subpaths, e.g.
+    # `Seek::Config.site_base_url.join('data_files')`
+    def site_base_url
+      uri = Addressable::URI.parse(Seek::Config.site_base_host)
+      uri.path = (Rails.application.config.relative_url_root || '').chomp('/') + '/'
+      uri
+    end
+
     def write_attr_encrypted_key
       File.open(attr_encrypted_key_path, 'wb') do |f|
         f << SecureRandom.random_bytes(32)
@@ -289,10 +297,11 @@ module Seek
     end
 
     def omniauth_elixir_aai_config
-      callback_path = '/identities/auth/elixir_aai/callback'
+      # Cannot use url helpers here because routes are not loaded at this point :( -Finn
+      callback_path = 'identities/auth/elixir_aai/callback'
 
       {
-          callback_path: callback_path,
+          callback_path: "#{Rails.application.config.relative_url_root}/#{callback_path}",
           name: :elixir_aai,
           scope: [:openid, :email],
           response_type: 'code',
@@ -305,7 +314,7 @@ module Seek
           client_options: {
               identifier: omniauth_elixir_aai_client_id,
               secret: omniauth_elixir_aai_secret,
-              redirect_uri: "#{site_base_host.chomp('/')}#{callback_path}",
+              redirect_uri: URI.join(site_base_url, callback_path).to_s,
               scheme: 'https',
               host: 'login.elixir-czech.org',
               port: 443,
