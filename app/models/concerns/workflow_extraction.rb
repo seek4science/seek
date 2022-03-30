@@ -167,13 +167,9 @@ module WorkflowExtraction
   end
 
   def ro_crate_url(action = nil)
-    url = Seek::Config.site_base_host.chomp('/')
-    wf = is_a_version? ? parent : self
-    url += "/#{wf.class.name.tableize}/#{wf.id}"
-    url += "/#{action}" if action
-    url += "?version=#{version}"
-
-    url
+    resource = is_a_version? ? parent : self
+    resource = [action.to_sym, resource] if action
+    Rails.application.routes.url_helpers.polymorphic_url(resource, version: version, host: Seek::Config.site_base_host)
   end
 
   def internals

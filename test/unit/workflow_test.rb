@@ -74,8 +74,9 @@ class WorkflowTest < ActiveSupport::TestCase
     # assert_includes authors, 'John Smith'
     # assert_includes authors, 'Jane Smith'
     # assert crate.author.detect { |a| a['identifier'] == URI.join(Seek::Config.site_base_host, "people/#{creator.id}").to_s }
-
-    assert_equal URI.join(Seek::Config.site_base_host, "projects/#{workflow.projects.first.id}").to_s, crate.main_workflow['producer']['@id']
+    assert_equal Rails.application.routes.url_helpers.project_url(workflow.projects.first.id,
+                                                                  host: Seek::Config.site_base_host),
+                 crate.main_workflow['producer']['@id']
   end
 
   test 'generates fresh RO-Crate for workflow/diagram/abstract workflow' do

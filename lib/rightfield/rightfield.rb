@@ -14,7 +14,7 @@ module RightField
   end
 
   def rdf_resource_uri(datafile)
-    URI.join(Seek::Config.site_base_host, "/data_files/#{datafile.id}").to_s
+    Rails.application.routes.url_helpers.data_file_url(datafile, host: Seek::Config.site_base_host)
   end
 
   def generate_rightfield_csv(datafile)
