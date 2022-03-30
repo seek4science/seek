@@ -21,7 +21,7 @@ module Seek
 
           include Seek::Doi::ActsAsDoiMintable::InstanceMethods
 
-          include Rails.application.routes.url_helpers # For URL generation
+          include Seek::Util.routes # For URL generation
         end
       end
 

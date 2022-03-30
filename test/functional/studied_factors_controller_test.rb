@@ -17,7 +17,7 @@ class StudiedFactorsControllerTest < ActionController::TestCase
 
   # required for the rdf tests
   def expected_rdf_resource_uri(object)
-    data_file_studied_factor_url(object.data_file, object, host: 'localhost', port: '3000')
+    data_file_studied_factor_url(object.data_file, object)
   end
 
   test 'should return 406 when requesting RDF' do

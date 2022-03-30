@@ -1,6 +1,6 @@
 # noinspection ALL
 class IsaTabConverter
-  include Rails.application.routes.url_helpers
+  include Seek::Util.routes
 
   JERM_ONTOLOGY_URL = 'http://jermontology.org/ontology/JERMOntology'
 
@@ -201,7 +201,7 @@ class IsaTabConverter
       process = {}
       # name is not mapped
       #
-      process['@id'] = assay_url(assay, host: Seek::Config.site_base_host)
+      process['@id'] = assay_url(assay)
       process[:executesProtocol] = {}
       process[:executesProtocol]['@id'] = OBJECT_MAP[sop]['@id']
       process[:parameterValues] = []
@@ -295,7 +295,7 @@ class IsaTabConverter
     end
 
     isa_sample = {}
-    isa_sample['@id'] = sample_url(sample, host: Seek::Config.site_base_host)
+    isa_sample['@id'] = sample_url(sample)
     isa_sample[:name] = sample.title
     isa_sample[:characteristics] = []
     sample.sample_type.sample_attributes.each do |attribute|
@@ -356,7 +356,7 @@ class IsaTabConverter
 
     isa_protocol = {}
 
-    isa_protocol['@id'] = sop_url(sop, host: Seek::Config.site_base_host)
+    isa_protocol['@id'] = sop_url(sop)
 
     # comments are not mapped
 
@@ -393,7 +393,7 @@ class IsaTabConverter
     if data_file.content_blob.url
       isa_data_file['@id'] = data_file.content_blob.url
     else
-      isa_data_file['@id'] = data_file_url(data_file, host: Seek::Config.site_base_host)
+      isa_data_file['@id'] = data_file_url(data_file)
     end
 
     # comments are not mapped

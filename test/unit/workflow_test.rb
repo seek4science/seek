@@ -74,8 +74,7 @@ class WorkflowTest < ActiveSupport::TestCase
     # assert_includes authors, 'John Smith'
     # assert_includes authors, 'Jane Smith'
     # assert crate.author.detect { |a| a['identifier'] == URI.join(Seek::Config.site_base_host, "people/#{creator.id}").to_s }
-    assert_equal Rails.application.routes.url_helpers.project_url(workflow.projects.first.id,
-                                                                  host: Seek::Config.site_base_host),
+    assert_equal Seek::Util.routes.project_url(workflow.projects.first.id),
                  crate.main_workflow['producer']['@id']
   end
 

@@ -12,7 +12,7 @@ class ContributedResourceSerializer < PCSSerializer
   attribute :versions, if: -> { object.respond_to?(:versions) } do
     versions_data = []
     object.visible_versions.each do |v|
-      url = polymorphic_url(object, version: v.version, host: Seek::Config.site_base_host)
+      url = polymorphic_url(object, version: v.version)
       versions_data.append(version: v.version,
                            revision_comments: v.revision_comments.presence,
                            url: url)
@@ -62,7 +62,7 @@ class ContributedResourceSerializer < PCSSerializer
       md5sum: cb.md5sum,
       sha1sum: cb.sha1sum,
       content_type: cb.content_type,
-      link: polymorphic_url([cb.asset, cb], host: Seek::Config.site_base_host),
+      link: polymorphic_url([cb.asset, cb]),
       size: cb.file_size
     }
   end

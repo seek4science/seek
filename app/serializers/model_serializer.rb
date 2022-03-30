@@ -14,11 +14,11 @@ class ModelSerializer < ContributedResourceSerializer
   attribute :model_image_link do
      if version_number
        unless object.find_version(version_number).model_image.nil?
-        polymorphic_url([object, object.find_version(version_number).model_image], host: Seek::Config.site_base_host)
+        polymorphic_url([object, object.find_version(version_number).model_image])
        end
      else
        unless object.model_image.nil?
-        polymorphic_url([object, object.model_image], host: Seek::Config.site_base_host)
+        polymorphic_url([object, object.model_image])
        end
      end
   end
