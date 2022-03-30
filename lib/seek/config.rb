@@ -314,7 +314,7 @@ module Seek
           client_options: {
               identifier: omniauth_elixir_aai_client_id,
               secret: omniauth_elixir_aai_secret,
-              redirect_uri: URI.join(site_base_url, callback_path).to_s,
+              redirect_uri: site_base_url.join(callback_path).to_s,
               scheme: 'https',
               host: 'login.elixir-czech.org',
               port: 443,

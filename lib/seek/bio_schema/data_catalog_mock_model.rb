@@ -36,7 +36,7 @@ module Seek
       end
 
       def url
-        Seek::Config.site_base_host
+        Rails.application.routes.url_helpers.root_url(host: Seek::Config.site_base_host).chomp('/')
       end
 
       def schema_org_supported?
