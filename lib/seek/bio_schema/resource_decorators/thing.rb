@@ -24,7 +24,7 @@ module Seek
           return unless resource.respond_to?(:avatar)
           return if resource.avatar.blank?
 
-          polymorphic_url([resource, resource.avatar], size: 250, host: Seek::Config.site_base_host)
+          polymorphic_url([resource, resource.avatar], size: 250, **Seek::Config.site_url_options)
         end
 
         # list of comma seperated tags, it the resource supports it

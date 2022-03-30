@@ -53,7 +53,7 @@ module Seek
 
         def resource_url(resource, opts = {})
           strip_version = opts.delete(:strip_version)
-          opts[:host] ||= Seek::Config.site_base_host
+          opts.reverse_merge!(Seek::Config.site_url_options)
           resource = Array(resource).map do |r|
             if r.is_a_version?
               opts[:version] = r.version unless strip_version

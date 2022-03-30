@@ -29,10 +29,7 @@ module Seek
   # Convention for creating a new propagator is to add a method named <setting_name>_propagate
   module Propagators
     def site_base_host_propagate
-      script_name = (SEEK::Application.config.relative_url_root || '/')
-      ActionMailer::Base.default_url_options = { host: host_with_port,
-                                                 protocol: host_scheme,
-                                                 script_name: script_name }
+      ActionMailer::Base.default_url_options = site_url_options
     end
 
     def smtp_propagate
@@ -270,6 +267,16 @@ module Seek
       uri = Addressable::URI.parse(Seek::Config.site_base_host)
       uri.path = (Rails.application.config.relative_url_root || '').chomp('/') + '/'
       uri
+    end
+
+    def site_url_options
+      u = URI.parse(site_base_host)
+      {
+        host: u.host,
+        port: u.port,
+        protocol: u.scheme,
+        script_name: (SEEK::Application.config.relative_url_root || '/')
+      }
     end
 
     def write_attr_encrypted_key

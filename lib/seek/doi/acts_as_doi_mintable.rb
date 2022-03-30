@@ -122,9 +122,7 @@ module Seek
         end
 
         def doi_target_url
-          polymorphic_url(self,
-                          host: Seek::Config.host_with_port,
-                          protocol: Seek::Config.host_scheme)
+          polymorphic_url(self, **Seek::Config.site_url_options)
         end
 
         def doi_resource_type

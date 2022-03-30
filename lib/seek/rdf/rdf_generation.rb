@@ -57,8 +57,7 @@ module Seek
       end
 
       def rdf_resource
-        url = Rails.application.routes.url_helpers.polymorphic_url(self,
-                                                                   host: Seek::Config.site_base_host)
+        url = Rails.application.routes.url_helpers.polymorphic_url(self, **Seek::Config.site_url_options)
         RDF::Resource.new(url)
       end
 
