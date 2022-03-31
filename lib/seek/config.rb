@@ -165,10 +165,6 @@ module Seek
       end
     end
 
-    def filestore_path
-      Rails.env.test? ? 'tmp/testing-filestore' : 'filestore'
-    end
-
     def rdf_filestore_path
       append_filestore_path 'rdf'
     end
