@@ -1,6 +1,7 @@
 require_relative 'boot'
 
 require 'rails/all'
+require_relative '../lib/rack/settings_cache'
 
 if defined?(Bundler)
   # If you precompile assets before deploying to production, use this line
@@ -47,6 +48,7 @@ module SEEK
                           include: %w(text/html application/xml application/json text/css application/javascript)
     config.middleware.use Rack::Attack
     config.middleware.use I18n::JS::Middleware
+    config.middleware.use Rack::SettingsCache
 
     config.exceptions_app = self.routes
 
