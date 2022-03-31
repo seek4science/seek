@@ -44,6 +44,7 @@ project_news_feed_urls:
 community_news_enabled:
 community_news_feed_urls:
 blacklisted_feeds:
+filestore_path:
 tagline_prefix:
 modelling_analysis_enabled:
 allow_publications_fulltext:
