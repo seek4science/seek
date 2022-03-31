@@ -155,6 +155,6 @@ class Settings < ActiveRecord::Base
   end
 
   def clear_cache
-    Seek::Config.clear_cache if self.target.nil?
+    Seek::Config.clear_cache if target_id.nil? && target_type.nil?
   end
 end
