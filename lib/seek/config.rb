@@ -165,6 +165,10 @@ module Seek
       end
     end
 
+    def filestore_path
+      'filestore'
+    end
+
     def rdf_filestore_path
       append_filestore_path 'rdf'
     end
