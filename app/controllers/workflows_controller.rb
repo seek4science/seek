@@ -338,7 +338,7 @@ class WorkflowsController < ApplicationController
     params.require(:workflow).permit(:title, :description, :workflow_class_id, # :metadata,
                                      { project_ids: [] }, :license,
                                      { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                     { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
+                                     { creator_ids: [] }, { assay_assets_attributes: [:assay_id] },
                                      { publication_ids: [] }, { presentation_ids: [] }, { document_ids: [] }, { data_file_ids: [] },
                                      { data_file_ids: [] }, { workflow_data_files_attributes:[:id, :data_file_id, :workflow_data_file_relationship_id, :_destroy] },
                                      :internals, :maturity_level, :source_link_url, :edam_topics, :edam_operations,

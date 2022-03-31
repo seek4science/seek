@@ -15,10 +15,6 @@
         <%= f.text_area :description, :class=>"form-control rich-text-edit", :rows => 5 -%>
       </div>
 
-      <% if show_scales? %>
-          <%= render :partial => "scales/scales_selector",:locals=>{:object=>@sop} %>
-      <% end %>
-
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @sop } %>
 
       <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @sop} -%>

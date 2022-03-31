@@ -63,14 +63,6 @@ module Seek
       cache('searchable_types') { filter_disabled(user_creatable_types | extras).sort_by(&:name) }
     end
 
-    def self.scalable_types
-      cache('scalable_types') do
-        persistent_classes.select do |c|
-          c.included_modules.include?(Seek::Scalable::InstanceMethods)
-        end.sort_by(&:name)
-      end
-    end
-
     def self.rdf_capable_types
       cache('rdf_capable_types') do
         Seek::Rdf::JERMVocab.defined_types.keys

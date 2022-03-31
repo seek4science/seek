@@ -494,7 +494,7 @@ class DataFilesController < ApplicationController
                                       :file_template_id,
                                       :edam_formats,
                                       :edam_data,
-                                      { scales: [] }, { publication_ids: [] }, { workflow_ids: [] },
+                                      { publication_ids: [] }, { workflow_ids: [] },
                                       { workflow_data_files_attributes:[:id, :workflow_id, :workflow_data_file_relationship_id, :_destroy] },
                                       discussion_links_attributes:[:id, :url, :label, :_destroy])
   end

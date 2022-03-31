@@ -60,7 +60,7 @@ class SopsController < ApplicationController
   def sop_params
     params.require(:sop).permit(:title, :description, { project_ids: [] }, :license, *creator_related_params,
                                 { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                { assay_assets_attributes: [:assay_id] }, { scales: [] },
+                                { assay_assets_attributes: [:assay_id] },
                                 { publication_ids: [] }, {workflow_ids: []},
                                 discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
