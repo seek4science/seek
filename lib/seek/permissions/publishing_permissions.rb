@@ -42,10 +42,13 @@ module Seek
             policy.access_type = Policy::ACCESSIBLE
             policy.sharing_scope = Policy::EVERYONE # anything but ALL_USERS
             policy.save
-            # FIXME: may need to add comment
+
             resource_publish_logs.create(publish_state: ResourcePublishLog::PUBLISHED,
                                          user: User.current_user,
                                          comment: comment)
+
+            resource_publish_logs.find_or_initialize_by(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, resource_id: self.id, user_id: self.contributor.id)
+                                 .update(publish_state:ResourcePublishLog::PUBLISHED, comment:comment)
             touch
           end
         else
@@ -57,6 +60,9 @@ module Seek
         resource_publish_logs.create(publish_state: ResourcePublishLog::REJECTED,
                                      user: User.current_user,
                                      comment: comment)
+
+        resource_publish_logs.find_or_initialize_by(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, resource_id: self.id, user_id: self.contributor.id)
+                             .update(publish_state:ResourcePublishLog::REJECTED, comment:comment)
       end
 
       def is_published?
