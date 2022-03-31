@@ -392,11 +392,12 @@ module Seek
 
     if use_db
       def get_value(setting, conversion = nil)
-        result = Settings.global.fetch(setting)
-        if result
-          val = result.value
+        val = Settings.defaults[setting.to_s]
+        if Thread.current[:use_settings_cache]
+          val = settings_cache[setting] if settings_cache.key?(setting)
         else
-          val = Settings.defaults[setting.to_s]
+          result = Settings.global.fetch(setting)
+          val = result.value if result
         end
         val = val.send(conversion) if conversion && val
         val
@@ -509,6 +510,30 @@ module Seek
 
     def self.schema_org_supported?
       true
+    end
+
+    def self.enable_cache!
+      Thread.current[:use_settings_cache] = true
+    end
+
+    def self.disable_cache!
+      Thread.current[:use_settings_cache] = nil
+    end
+
+    def self.settings_cache
+      RequestStore.fetch(:config_cache) do
+        Rails.cache.fetch(cache_key, expires_in: 1.week) do
+          Settings.global.to_hash
+        end
+      end
+    end
+
+    def self.clear_cache
+      Rails.cache.delete(cache_key)
+    end
+
+    def self.cache_key
+      'seek_config'
     end
   end
 end
