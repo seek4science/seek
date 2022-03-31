@@ -166,7 +166,7 @@ module Seek
     end
 
     def filestore_path
-      'filestore'
+      Rails.env.test? ? 'tmp/testing-filestore' : 'filestore'
     end
 
     def rdf_filestore_path
@@ -394,11 +394,11 @@ module Seek
       def get_value(setting, conversion = nil)
         val = Settings.defaults[setting.to_s]
         if Thread.current[:use_settings_cache]
-          val = settings_cache[setting] if settings_cache.key?(setting)
+          result = settings_cache[setting]
         else
           result = Settings.global.fetch(setting)
-          val = result.value if result
         end
+        val = result.value if result
         val = val.send(conversion) if conversion && val
         val
       end
@@ -523,7 +523,9 @@ module Seek
     def self.settings_cache
       RequestStore.fetch(:config_cache) do
         Rails.cache.fetch(cache_key, expires_in: 1.week) do
-          Settings.global.to_hash
+          hash = {}
+          Settings.global.to_a.each { |s| hash[s.var] = s }
+          hash
         end
       end
     end
