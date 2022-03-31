@@ -519,9 +519,15 @@ module Seek
     def self.settings_cache
       RequestStore.fetch(:config_cache) do
         Rails.cache.fetch(cache_key, expires_in: 1.week) do
-          hash = {}
-          Settings.global.to_a.each { |s| hash[s.var] = s }
-          hash
+          cache_setting = Thread.current[:use_settings_cache]
+          begin
+            hash = {}
+            disable_cache! # Disable cache whilst loading settings to prevent infinite loop via `attr_encrypted_key_path`
+            Settings.global.to_a.each { |s| hash[s.var] = s }
+            hash
+          ensure
+            Thread.current[:use_settings_cache] = cache_setting
+          end
         end
       end
     end
