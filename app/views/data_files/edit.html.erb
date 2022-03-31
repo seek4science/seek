@@ -24,8 +24,6 @@
 
       </div>
 
-      <%= render :partial => "scales/scales_selector", :locals => {:object => @data_file} if show_scales? %>
-
       <% if Seek::Config.file_templates_enabled %>
         <%= render :partial => "assets/select_template", :locals => {:resource => (@data_file ? @data_file : DataFile.new),
 	:templates => authorised_assets(FileTemplate, nil, 'edit') } %>

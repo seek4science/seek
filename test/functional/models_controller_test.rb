@@ -236,60 +236,6 @@ class ModelsControllerTest < ActionController::TestCase
     assert_includes new_assay.models, m
   end
 
-  test 'association of scales' do
-    scale1 = Factory :scale, pos: 1
-    scale2 = Factory :scale, pos: 2
-    model_params = valid_model
-
-    assert_difference('Model.count') do
-      post :create, params: { model: model_params.merge(scales: [scale1.id.to_s, scale2.id.to_s]), content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing }
-    end
-    m = assigns(:model)
-    assert_not_nil m
-    assert_equal [scale1, scale2], m.scales
-    scale3 = Factory(:scale)
-
-    put :update, params: { id: m.id, model: { title: m.title, scales: [scale3.id.to_s] } }
-    m = assigns(:model)
-    assert_equal [scale3], m.scales
-  end
-
-  test 'association of scales with params' do
-    scale1 = Factory :scale, pos: 1
-    scale2 = Factory :scale, pos: 2
-    model_params = valid_model
-    scale_ids_and_params = ["{\"scale_id\":\"#{scale1.id}\",\"param\":\"fish\",\"unit\":\"meter\"}",
-                            "{\"scale_id\":\"#{scale2.id}\",\"param\":\"carrot\",\"unit\":\"cm\"}",
-                            "{\"scale_id\":\"#{scale1.id}\",\"param\":\"soup\",\"unit\":\"minute\"}"]
-
-    model_and_scale_params = model_params.merge(
-                   scale_extra_params: scale_ids_and_params,
-                   scales: [scale1.id.to_s, scale2.id.to_s]
-    )
-
-    assert_difference('Model.count') do
-      post :create, params: { model: model_and_scale_params, content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing }
-    end
-    m = assigns(:model)
-    assert_not_nil m
-    assert_equal [scale1, scale2], m.scales
-
-    info = m.fetch_additional_scale_info(scale1.id)
-    assert_equal 2, info.count
-    info.sort! { |a, b| a['param'] <=> b['param'] }
-
-    assert_equal 'fish', info[0]['param']
-    assert_equal 'meter', info[0]['unit']
-    assert_equal 'soup', info[1]['param']
-    assert_equal 'minute', info[1]['unit']
-
-    info = m.fetch_additional_scale_info(scale2.id)
-    assert_equal 1, info.count
-    info = info.first
-    assert_equal 'carrot', info['param']
-    assert_equal 'cm', info['unit']
-  end
-
   test 'should create model' do
     login_as(:model_owner)
     assay = assays(:modelling_assay)

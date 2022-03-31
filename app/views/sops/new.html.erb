@@ -20,8 +20,6 @@
 
       <%= render :partial => "projects/project_selector", :locals => { :resource => @sop } %>
 
-      <%= render :partial => "scales/scales_selector",:locals=>{:object=>@sop} if show_scales?%>
-
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @sop } %>
 
       <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @sop} -%>
