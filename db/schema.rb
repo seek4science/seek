@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_03_22_104351) do
+ActiveRecord::Schema.define(version: 2022_04_01_102846) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string "action"
@@ -1682,6 +1682,26 @@ ActiveRecord::Schema.define(version: 2022_03_22_104351) do
     t.index ["publish_state"], name: "index_resource_publish_logs_on_publish_state"
     t.index ["resource_type", "resource_id"], name: "index_resource_publish_logs_on_resource_type_and_resource_id"
     t.index ["user_id"], name: "index_resource_publish_logs_on_user_id"
+  end
+
+  create_table "role_types", force: :cascade do |t|
+    t.string "title"
+    t.string "key"
+    t.string "scope"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "roles", force: :cascade do |t|
+    t.integer "person_id"
+    t.integer "role_type_id"
+    t.string "scope_type"
+    t.integer "scope_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["person_id"], name: "index_roles_on_person_id"
+    t.index ["role_type_id"], name: "index_roles_on_role_type_id"
+    t.index ["scope_type", "scope_id"], name: "index_roles_on_scope"
   end
 
   create_table "sample_attribute_types", force: :cascade do |t|

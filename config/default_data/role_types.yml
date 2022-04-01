@@ -1,0 +1,28 @@
+# System roles
+admin:
+  title: <%= I18n.t('admin') %>
+  key: admin
+
+# Project roles
+asset_housekeeper:
+  title: <%= I18n.t('asset_housekeeper') %>
+  key: asset_housekeeper
+  scope: Project
+asset_gatekeeper:
+  title: <%= I18n.t('asset_gatekeeper') %>
+  key: asset_gatekeeper
+  scope: Project
+project_administrator:
+  title: <%= I18n.t('project_administrator') %>
+  key: project_administrator
+  scope: Project
+pal:
+  title: <%= I18n.t('pal') %>
+  key: pal
+  scope: Project
+
+# Programme roles
+programme_administrator:
+  title: <%= I18n.t('programme_administrator') %>
+  key: programme_administrator
+  scope: Programme
