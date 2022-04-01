@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-gem 'rails', '~> 6.1.4', '>= 6.1.4.4'
+gem 'rails', '~> 6.1.4', '>= 6.1.4.7'
 gem 'rdoc'
 
 #database adaptors
