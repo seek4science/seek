@@ -1,13 +1,16 @@
 class Role < ApplicationRecord
-  belongs_to :person, required: false
-  belongs_to :role_type, required: false
+  belongs_to :person, required: true
+  belongs_to :role_type, required: true
   belongs_to :scope, polymorphic: true, optional: true
 
   validates :person_id, uniqueness: { scope: [:role_type_id, :scope_id, :scope_type] }
   validate :role_type_matches_scope, if: -> { role_type.present? }
   validate :scope_allows_person, if: -> { scope.present? }
 
+  delegate :key, to: :role_type
+
   after_commit :queue_update_auth_table
+  enforce_authorization_on_association :person, :manage
 
   def self.with_role_key(key)
     joins(:role_type).where(role_types: { key: key })

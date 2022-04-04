@@ -1374,11 +1374,10 @@ class PersonTest < ActiveSupport::TestCase
     project3 = Factory(:project)
     person.add_to_project_and_institution(project3,Factory(:institution))
 
-    person.save!
+    disable_authorization_checks { person.save! }
     person.reload
 
     assert_equal [project, project2, project3], person.projects.sort_by(&:id)
     assert_equal [project,project2], person.administered_projects.sort_by(&:id)
   end
-
 end

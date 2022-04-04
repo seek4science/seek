@@ -18,18 +18,6 @@ module Seek
         end
       end
 
-      def items_for_person_and_role(person, role_name)
-        if person.roles.include?(role_name)
-          mask = mask_for_role(role_name)
-          join_association = related_item_join_class.name.underscore.pluralize
-          related_item_class.joins(join_association.to_sym).where(
-            "#{join_association}.person_id" => person.id).where("#{join_association}.role_mask" => mask).readonly(false)
-        else
-          # can't just return an empty array, as scopes may be added or the query extended
-          related_item_class.where('1=2')
-        end
-      end
-
       def add_roles(person, role_info)
         return if role_info.items.empty?
 

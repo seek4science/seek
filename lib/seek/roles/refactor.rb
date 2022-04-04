@@ -24,6 +24,7 @@ module Seek
         has_many :roles, dependent: :destroy
         has_many :role_types, through: :roles
         after_commit :clear_role_cache
+        enforce_required_access_for_owner :roles, :manage
 
         include StandAloneRoles::PersonInstanceMethods
         extend StandAloneRoles::PersonClassMethods

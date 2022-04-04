@@ -124,12 +124,14 @@ module Seek
         end
 
         def projects_for_role(role)
-          fail UnknownRoleException.new("Unrecognised project role name #{role}") unless Seek::Roles::ProjectRelatedRoles.role_names.include?(role)
-          Seek::Roles::ProjectRelatedRoles.instance.projects_for_person_with_role(self, role)
+          role_type = RoleType.find_by_key(role)
+          fail UnknownRoleException.new("Unrecognised project role name #{role}") unless role_type
+          Project.joins(roles: [:person, :role_type]).where(people: { id: self.id },
+                                                            roles: { role_type_id: role_type.id })
         end
 
         def roles_for_project(project)
-          Seek::Roles::ProjectRelatedRoles.instance.roles_for_person_and_item(self, project)
+          scoped_roles(project)
         end
 
         # determines if this person is the member of a project for which the user passed is a project manager,
@@ -151,24 +153,8 @@ module Seek
         # called as callback after save, to make sure the role project records are aligned with the current projects, deleting
         # any for projects that have been removed, and resolving the mask
         def resolve_admin_defined_role_projects
-          admin_defined_role_projects.each do |role|
-            role.destroy unless group_memberships.collect(&:project).include?(role.project)
-          end
-          new_mask = roles_mask
-          roles_to_check = roles & ProjectRelatedRoles.role_names
-          roles_to_check.collect { |name| Seek::Roles::Roles.instance.mask_for_role(name) }.each do |mask|
-            if AdminDefinedRoleProject.where(role_mask: mask, person_id: id).empty?
-              new_mask -= mask
-            end
-          end
-          update_column :roles_mask, new_mask
-        end
-
-        def project_roles
-          map = admin_defined_role_projects.includes(:project).group_by(&:project)
-          map.each do |project, project_roles|
-            map[project] = project_roles.map { |project_role| project_role.roles }.flatten
-          end
+          projects = group_memberships.collect(&:project)
+          roles.where(scope_type: 'Project').where.not(scope_id: projects).destroy_all
         end
 
         def roles_for_projects
