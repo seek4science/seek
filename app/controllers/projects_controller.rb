@@ -7,7 +7,6 @@ class ProjectsController < ApplicationController
   include Seek::IndexPager
   include CommonSweepers
   include Seek::DestroyHandling
-  include ApiHelper
   include Seek::Projects::Population
 
   before_action :login_required, only: [:guided_join, :guided_create, :request_join, :request_create,

@@ -1,5 +1,4 @@
 class BaseSerializer < SimpleBaseSerializer
-  include ApiHelper
   include PolicyHelper
   include RelatedItemsHelper
   include Seek::Util.routes
@@ -121,6 +120,18 @@ class BaseSerializer < SimpleBaseSerializer
     current_user = User.current_user
     can_manage = object.can_manage?(current_user)
     return respond_to_policy && respond_to_manage && can_manage
+  end
+
+  def determine_submitter(object)
+    # FIXME: needs to be the creators for assets
+    return object.owner if object.respond_to?('owner')
+    result = object.contributor if object.respond_to?('contributor') && !object.is_a?(Permission)
+    if result
+      return result if result.instance_of?(Person)
+      return result.person if result.instance_of?(User)
+    end
+
+    nil
   end
 
   def submitter
