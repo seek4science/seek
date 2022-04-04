@@ -33,7 +33,7 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   def test_first_registered_person_is_admin_and_default_project
-    Person.destroy_all
+    Person.delete_all
     Project.delete_all
 
     project = Factory(:work_group).project
@@ -420,15 +420,6 @@ class PeopleControllerTest < ActionController::TestCase
     end
     assert_redirected_to :root
     refute_nil flash[:error]
-  end
-
-  test 'cannot update person roles mask' do
-    login_as(Factory(:admin))
-    person = Factory(:person)
-    put :update, params: { id: person, person: { first_name: 'blabla', roles_mask: mask_for_admin } }
-    assert_redirected_to person_path(assigns(:person))
-    refute assigns(:person).is_admin?
-    assert_equal 'blabla', assigns(:person).first_name
   end
 
   test 'not allow project administrator to edit people outside their projects' do
@@ -1240,14 +1231,6 @@ class PeopleControllerTest < ActionController::TestCase
     Factory(:event, contributor: person, policy: Factory(:public_policy))
     #person.save
     add_avatar_to_test_object(person)
-  end
-
-  def mask_for_admin
-    Seek::Roles::Roles.instance.mask_for_role('admin')
-  end
-
-  def mask_for_pal
-    Seek::Roles::Roles.instance.mask_for_role('pal')
   end
 
   def role_image(role)

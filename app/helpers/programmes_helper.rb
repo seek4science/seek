@@ -10,7 +10,7 @@ module ProgrammesHelper
   end
 
   def programme_administrators_input_box(programme)
-    administrators = programme.programme_administrators
+    administrators = programme.programme_administrators.to_a
     box = ''
     unless User.admin_logged_in?
       administrators.delete(User.current_user.person)

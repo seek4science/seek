@@ -160,7 +160,6 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert person.is_programme_administrator?(prog)
     assert person.is_programme_administrator_of_any_programme?
     assert person.has_role?('programme_administrator')
-    assert person.roles_mask & Seek::Roles::Roles.instance.mask_for_role('programme_administrator')
   end
 
   test 'admin sets themself as programme administrator at creation' do
@@ -179,7 +178,6 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert admin.is_programme_administrator?(prog)
     assert admin.is_programme_administrator_of_any_programme?
     assert admin.has_role?('programme_administrator')
-    assert admin.roles_mask & Seek::Roles::Roles.instance.mask_for_role('programme_administrator')
   end
 
   test 'programme administrator can add new administrators, but not remove themself' do
@@ -212,7 +210,6 @@ class ProgrammesControllerTest < ActionController::TestCase
 
     assert p1.is_programme_administrator_of_any_programme?
     assert p1.has_role?('programme_administrator')
-    assert p1.roles_mask & Seek::Roles::Roles.instance.mask_for_role('programme_administrator')
   end
 
   test 'admin can add new administrators, and not remove themself' do

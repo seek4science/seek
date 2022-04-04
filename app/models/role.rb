@@ -13,8 +13,7 @@ class Role < ApplicationRecord
   enforce_authorization_on_association :person, :manage
 
   def self.with_role_key(key)
-    role_type = RoleType.find_by_key(key)
-    raise Seek::Roles::UnknownRoleException, "Unknown role '#{key}'" unless role_type
+    role_type = RoleType.find_by_key!(key)
     where(role_type_id: role_type)
   end
 

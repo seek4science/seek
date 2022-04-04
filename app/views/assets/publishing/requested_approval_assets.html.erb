@@ -1,6 +1,6 @@
 <div class="alert alert-info">
   <p>
-    <% project_names = current_user.person.projects_for_role(Seek::Roles::ASSET_GATEKEEPER).collect(&:title) %>
+    <% project_names = current_user.person.projects_for_role(:asset_gatekeeper).collect(&:title) %>
     You are the <%= t('asset_gatekeeper').downcase -%> for the <%= t('project').downcase.pluralize(project_names.count) %>
     : <strong><%= project_names.join(', ') %></strong>.
   </p>

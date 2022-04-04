@@ -24,6 +24,12 @@ class RoleType
     data[key.to_sym]
   end
 
+  def self.find_by_key!(key)
+    role = find_by_key(key)
+    raise Seek::Roles::UnknownRoleException, "Unknown role '#{key}'" unless role
+    role
+  end
+
   def self.find_by_id(id)
     by_id[id.to_i]
   end

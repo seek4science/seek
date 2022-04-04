@@ -1,13 +1,6 @@
 module Seek
   module Roles
-    ADMIN = 'admin'
-    PAL = 'pal'
-    PROJECT_ADMINISTRATOR = 'project_administrator'
-    ASSET_HOUSEKEEPER = 'asset_housekeeper'
-    ASSET_GATEKEEPER = 'asset_gatekeeper'
-    PROGRAMME_ADMINISTRATOR = 'programme_administrator'
-    class UnknownRoleException < Exception; end
-    module Refactor
+    module Target
       extend ActiveSupport::Concern
 
       included do
@@ -21,7 +14,7 @@ module Seek
 
       class_methods do
         def with_role(key)
-          role_type = RoleType.find_by_key(key)
+          role_type = RoleType.find_by_key!(key)
           joins(:roles).where(roles: { role_type_id: role_type.id }).distinct
         end
       end
@@ -35,7 +28,7 @@ module Seek
       end
 
       def has_role?(key)
-        role_type = RoleType.find_by_key(key)
+        role_type = RoleType.find_by_key!(key)
         has_cached_role?(key, :any) || roles.where(role_type_id: role_type.id).any?
       end
 
@@ -82,7 +75,7 @@ module Seek
       end
 
       # called as callback after save, to make sure the role project records are aligned with the current projects, deleting
-      # any for projects that have been removed, and resolving the mask
+      # any for projects that have been removed
       def remove_dangling_project_roles
         projects = current_group_memberships.collect(&:project)
         roles.where(scope_type: 'Project').where.not(scope_id: projects).destroy_all

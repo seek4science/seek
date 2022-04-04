@@ -51,13 +51,6 @@ class Project < ApplicationRecord
       joins: [:programme]
   )
 
-  # for handling the assignment for roles
-  attr_accessor :project_administrator_ids, :asset_gatekeeper_ids, :pal_ids, :asset_housekeeper_ids
-  after_save :handle_project_administrator_ids, if: -> { @project_administrator_ids }
-  after_save :handle_asset_gatekeeper_ids, if: -> { @asset_gatekeeper_ids }
-  after_save :handle_pal_ids, if: -> { @pal_ids }
-  after_save :handle_asset_housekeeper_ids, if: -> { @asset_housekeeper_ids }
-
   scope :without_programme, -> { where('programme_id IS NULL') }
 
   auto_strip_attributes :web_page, :wiki_page
@@ -119,26 +112,18 @@ class Project < ApplicationRecord
     end
   end
 
-  # this is seek role
-  def asset_housekeepers
-    people_with_role(Seek::Roles::ASSET_HOUSEKEEPER)
-  end
+  has_many :pal_roles, -> { where(role_type_id: RoleType.find_by_key!(:pal)) }, as: :scope, class_name: 'Role'
+  has_many :pals, through: :pal_roles, class_name: 'Person', source: :person
 
-  # this is seek role
-  def project_administrators
-    people_with_role(Seek::Roles::PROJECT_ADMINISTRATOR)
-  end
+  has_many :project_administrator_roles, -> { where(role_type_id: RoleType.find_by_key!(:project_administrator)) }, as: :scope, class_name: 'Role'
+  has_many :project_administrators, through: :project_administrator_roles, class_name: 'Person', source: :person
 
-  # this is seek role
-  def asset_gatekeepers
-    people_with_role(Seek::Roles::ASSET_GATEKEEPER)
-  end
+  has_many :asset_housekeeper_roles, -> { where(role_type_id: RoleType.find_by_key!(:asset_housekeeper)) }, as: :scope, class_name: 'Role'
+  has_many :asset_housekeepers, through: :asset_housekeeper_roles, class_name: 'Person', source: :person
 
-  def pals
-    people_with_role(Seek::Roles::PAL)
-  end
-    
-  # Returns the columns to be shown on the table view for the resource
+  has_many :asset_gatekeeper_roles, -> { where(role_type_id: RoleType.find_by_key!(:asset_gatekeeper)) }, as: :scope, class_name: 'Role'
+  has_many :asset_gatekeepers, through: :asset_gatekeeper_roles, class_name: 'Person', source: :person
+
   def columns_default
     super + ['web_page']
   end
@@ -238,44 +223,6 @@ class Project < ApplicationRecord
     User.admin_logged_in? ||
       User.activated_programme_administrator_logged_in? ||
         (user && Programme.any? { |p| p.allows_user_projects? })
-  end
-
-  # set the administrators, assigned from the params to :project_administrator_ids
-  def handle_project_administrator_ids
-    handle_admin_role_ids Seek::Roles::PROJECT_ADMINISTRATOR
-  end
-
-  # set the gatekeepers, assigned from the params to :asset_gatekeeper_ids
-  def handle_asset_gatekeeper_ids
-    handle_admin_role_ids Seek::Roles::ASSET_GATEKEEPER
-  end
-
-  # set the pals, assigned from the params to :pal_ids
-  def handle_pal_ids
-    handle_admin_role_ids Seek::Roles::PAL
-  end
-
-  # set the asset housekeepers, assigned from the params to :asset_housekeeper_ids
-  def handle_asset_housekeeper_ids
-    handle_admin_role_ids Seek::Roles::ASSET_HOUSEKEEPER
-  end
-
-  # general method for assigning the people with roles, according to the role passed in.
-  # e.g. for a role of :gatekeeper, gatekeeper_ids attribute is used to set the people for that role
-  def handle_admin_role_ids(role)
-    current_members = send(role.to_s.pluralize)
-    new_members = Person.find(send("#{role}_ids"))
-
-    to_add = new_members - current_members
-    to_remove = current_members - new_members
-    to_add.each do |person|
-      person.send("is_#{role}=", [true, self])
-      disable_authorization_checks { person.save! }
-    end
-    to_remove.each do |person|
-      person.send("is_#{role}=", [false, self])
-      disable_authorization_checks { person.save! }
-    end
   end
 
   def total_asset_size

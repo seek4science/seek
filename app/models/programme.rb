@@ -29,6 +29,8 @@ class Programme < ApplicationRecord
   %i[data_files documents models sops presentations events publications samples workflows].each do |type|
     has_many type, -> { distinct }, through: :projects
   end
+  has_many :programme_administrator_roles, -> { where(role_type_id: RoleType.find_by_key!(:programme_administrator)) }, as: :scope, class_name: 'Role'
+  has_many :programme_administrators, through: :programme_administrator_roles, class_name: 'Person', source: :person
   accepts_nested_attributes_for :projects
 
   auto_strip_attributes :web_page
@@ -42,8 +44,6 @@ class Programme < ApplicationRecord
 
   after_save :handle_administrator_ids, if: -> { @administrator_ids }
   before_create :activate_on_create
-
-
 
   # scopes
   scope :activated, -> { where(is_activated: true) }
@@ -115,16 +115,8 @@ class Programme < ApplicationRecord
     User.admin_logged_in? || (User.logged_in_and_registered? && Seek::Config.programme_user_creation_enabled)
   end
 
-  def programme_administrators
-    people_with_role(Seek::Roles::PROGRAMME_ADMINISTRATOR)
-  end
-
   def total_asset_size
     projects.to_a.sum(&:total_asset_size)
-  end
-
-  def applicable_roles
-    [Seek::Roles::PROGRAMME_ADMINISTRATOR]
   end
 
   private

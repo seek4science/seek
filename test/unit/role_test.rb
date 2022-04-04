@@ -101,7 +101,6 @@ class RoleTest < ActiveSupport::TestCase
     refute person.is_pal?(project)
     refute person.is_admin?
 
-    # roles mask isn;t affected if roving a role somebody doesn't belong to
     person = Factory(:programme_administrator)
     project = person.projects.first
     person.is_pal = true, project
@@ -111,7 +110,7 @@ class RoleTest < ActiveSupport::TestCase
     refute person.is_asset_gatekeeper?(project)
     refute person.is_admin?
 
-    person.remove_role(Seek::Roles::ASSET_GATEKEEPER, items: [])
+    person.remove_role(:asset_gatekeeper, items: [])
 
     assert person.is_programme_administrator?(person.programmes.first)
     assert person.is_pal?(project)
@@ -483,11 +482,11 @@ class RoleTest < ActiveSupport::TestCase
 
   test 'locale for roles' do
     #it's important the role name constants map the the locale key
-    assert I18n.exists?(Seek::Roles::PAL)
-    assert I18n.exists?(Seek::Roles::PROJECT_ADMINISTRATOR)
-    assert I18n.exists?(Seek::Roles::PROGRAMME_ADMINISTRATOR)
-    assert I18n.exists?(Seek::Roles::ASSET_GATEKEEPER)
-    assert I18n.exists?(Seek::Roles::ASSET_HOUSEKEEPER)
+    assert I18n.exists?(:pal)
+    assert I18n.exists?(:project_administrator)
+    assert I18n.exists?(:programme_administrator)
+    assert I18n.exists?(:asset_gatekeeper)
+    assert I18n.exists?(:asset_housekeeper)
   end
 
   test 'factories for roles' do
@@ -682,15 +681,6 @@ class RoleTest < ActiveSupport::TestCase
     # also for admin
     person = Factory(:admin)
     assert_kind_of ActiveRecord::Relation, person.administered_programmes
-  end
-
-  test "nil roles mask doesn't indicate administrator" do
-    p = Factory(:person)
-    refute p.is_admin?
-    disable_authorization_checks { p.save! }
-    p.reload
-    refute p.is_admin?
-    refute_includes(Person.admins, p)
   end
 
   test 'fire update auth table job when project role created' do
