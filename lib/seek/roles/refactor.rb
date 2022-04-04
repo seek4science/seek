@@ -12,7 +12,6 @@ module Seek
 
       included do
         has_many :roles, dependent: :destroy
-        has_many :role_types, through: :roles
         after_save :remove_dangling_project_roles
         after_commit :clear_role_cache
         enforce_required_access_for_owner :roles, :manage

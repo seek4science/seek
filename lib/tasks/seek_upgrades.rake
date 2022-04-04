@@ -22,7 +22,6 @@ namespace :seek do
     rename_seek_sample_attribute_types
 
     update_thesis_related_publication_types
-    db:seed:015_role_types
     convert_roles
   ]
 
