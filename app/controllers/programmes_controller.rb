@@ -1,7 +1,6 @@
 class ProgrammesController < ApplicationController
   include Seek::IndexPager
   include Seek::DestroyHandling
-  include ApiHelper
 
   before_action :programmes_enabled?
   before_action :login_required, except: [:show, :index]
