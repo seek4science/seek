@@ -368,24 +368,29 @@ module IsaExporter
 
         def convert_other_materials(sample_types)
 		  all_attributes = sample_types.map{ |s| s.sample_attributes }.flatten
-		  st = sample_types.detect { |s| s.sample_attributes.detect{|sa| sa.isa_tag&.isa_other_material?} }
+		  isa_other_material_sample_types = sample_types.select { |s| s.sample_attributes.detect{|sa| sa.isa_tag&.isa_other_material?} }
 
-            with_tag_isa_other_material = st.sample_attributes.detect{|sa| sa.isa_tag&.isa_other_material?}
-            return [] if !with_tag_isa_other_material
+		  other_materials = []
+		  isa_other_material_sample_types.each do |st|
+			with_tag_isa_other_material = st.sample_attributes.detect{|sa| sa.isa_tag&.isa_other_material?}
+			return [] if !with_tag_isa_other_material
+			with_type_seek_sample_multi =  st.sample_attributes.detect(&:seek_sample_multi?)
+			raise "Defected ISA other_materials!" if !with_type_seek_sample_multi
 
-            with_type_seek_sample_multi =  st.sample_attributes.detect(&:seek_sample_multi?)
-            raise "Defected ISA other_materials!" if !with_type_seek_sample_multi
-
-		  with_tag_isa_other_material_characteristics = st.sample_attributes.select{ |sa| sa.isa_tag&.isa_other_material_characteristic? }
-            st.samples.map do |s|
-                {
-                    "@id": "#material/#{s.id}", 
-                    name: s.get_attribute_value(with_tag_isa_other_material),
-                    type: with_tag_isa_other_material.title,
-                    characteristics: convert_characteristic(with_tag_isa_other_material_characteristics),
-                    derivesFrom: extract_sample_ids(s.get_attribute_value(with_type_seek_sample_multi), "sample")
-                }
-            end
+			# attributes = isa_other_material_sample_types.map {|s| s.sample_attributes}.flatten
+			# samples = isa_other_material_sample_types.map {|s| s.samples}.flatten
+			with_tag_isa_other_material_characteristics = st.sample_attributes.select{ |sa| sa.isa_tag&.isa_other_material_characteristic? }
+			other_materials << st.samples.map do |s|
+			    {
+				   "@id": "#material/#{s.id}", 
+				   name: s.get_attribute_value(with_tag_isa_other_material),
+				   type: with_tag_isa_other_material.title,
+				   characteristics: convert_characteristic(with_tag_isa_other_material_characteristics),
+				   derivesFrom: extract_sample_ids(s.get_attribute_value(with_type_seek_sample_multi), "sample")
+			    }
+			end
+		  end
+		  other_materials 
         end
     
         def export
