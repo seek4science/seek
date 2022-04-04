@@ -72,10 +72,18 @@ module Seek
 
       def assign_role(key, scope = nil)
         return if check_for_role(key, scope)
-        cache_role(key, scope)
         role_type = RoleType.find_by_key(key)
         raise InvalidRoleTypeException unless role_type
-        scoped_roles(scope).build(role_type: role_type)
+        role = scoped_roles(scope).build(role_type: role_type)
+        cache_role(key, scope) if role.valid?
+        role
+      end
+
+      def unassign_role(key, scope = nil)
+        role_type = RoleType.find_by_key(key)
+        raise InvalidRoleTypeException unless role_type
+        uncache_role(key, scope)
+        scoped_roles(scope).where(role_type_id: role_type.id).destroy_all
       end
 
       def add_roles(role_infos)
@@ -91,10 +99,10 @@ module Seek
       def remove_roles(role_infos)
         Array(role_infos).each do |role_info|
           if role_info.items.empty?
-            scoped_roles(nil).where(role_type_id: role_info.role_type).destroy_all
+            unassign_role(role_info.role_name)
           else
             role_info.items.each do |item|
-              scoped_roles(item).where(role_type_id: role_info.role_type).destroy_all
+              unassign_role(role_info.role_name, item)
             end
           end
         end
@@ -108,13 +116,21 @@ module Seek
       private
 
       def role_cache
-        @_role_cache ||= { any: Set.new }
+        @_role_cache ||= { any: {} }
       end
 
       def cache_role(key, scope)
         role_cache[scope] ||= Set.new
         role_cache[scope].add(key)
-        role_cache[:any].add(key)
+        role_cache[:any][key] = (role_cache[:any][key] || 0) + 1
+      end
+
+      def uncache_role(key, scope)
+        role_cache[scope].delete(key) if role_cache[scope]
+        if role_cache[:any][key]
+          role_cache[:any][key] -= 1
+          role_cache[:any].delete(key) if role_cache[:any][key]
+        end
       end
 
       def has_cached_role?(key, scope)
