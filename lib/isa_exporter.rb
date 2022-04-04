@@ -81,11 +81,7 @@ module IsaExporter
             end
             isa_study[:protocols] = protocols
 
-            assays = []
-            study.assays.each do |a|
-                assays << convert_assay(a)
-            end
-            isa_study[:assays] = assays
+            isa_study[:assays] = [convert_assays(study.assays)]
 
             isa_study[:factors] = []
             isa_study[:unitCategories] = []
@@ -102,9 +98,13 @@ module IsaExporter
             return isa_annotation
         end
     
-        def convert_assay (assay)
+        def convert_assays (assays)
+		  all_sample_types = assays.map {|a| a.sample_type}
+		  all_samples = all_sample_types.map {|s| s.samples}.flatten
+		  first_assay = assays.detect{|s| s.position==0}
+
             isa_assay = {}
-            isa_assay["@id"] = "#assay/#{assay.id}"
+            isa_assay["@id"] = "#assay/#{assays.pluck(:id).join("_")}"
             isa_assay[:filename] = "a_assays.txt" # assay&.sample_type&.isa_template&.title
             isa_assay[:measurementType] = {
                 annotationValue: nil,
@@ -117,13 +117,14 @@ module IsaExporter
                 termAccession: nil
             }
             isa_assay[:technologyPlatform] = nil
-            isa_assay[:characteristicCategories] = convert_characteristic_categories(nil, assay)
+            isa_assay[:characteristicCategories] = convert_characteristic_categories(nil, assays)
             isa_assay[:materials] = { 
-                samples: assay.sample_type.samples.map { |s| find_sample_origin([s]) }.flatten.uniq.map{ |s| {"@id": "#sample/#{s}"} } ,#the samples from study level that are referenced in this assay's samples,
-                otherMaterials: convert_other_materials(assay.sample_type),
+			# Here, the first assay's samples will be enough
+                samples: first_assay.samples.map { |s| find_sample_origin([s]) }.flatten.uniq.map{ |s| {"@id": "#sample/#{s}"} } ,#the samples from study level that are referenced in this assay's samples,
+                otherMaterials: convert_other_materials(all_sample_types),
             }
-            isa_assay[:processSequence] = convert_process_sequence(assay.sample_type)
-            isa_assay[:dataFiles] = convert_data_files(assay.sample_type)
+            isa_assay[:processSequence] = all_sample_types.map {|sa| convert_process_sequence(sa)}.flatten 
+            isa_assay[:dataFiles] = convert_data_files(all_sample_types)
             isa_assay[:unitCategories] = [{
                 "@id": nil,
                 annotationValue: nil,
@@ -277,13 +278,13 @@ module IsaExporter
             end
         end
 
-        def convert_characteristic_categories(study = nil, assay = nil)
+        def convert_characteristic_categories(study = nil, assays = nil)
             attributes = []
             if study
                 attributes = study.sample_types.map{ |s| s.sample_attributes }.flatten
                 attributes = attributes.select{ |sa| sa.isa_tag&.isa_source_characteristic? || sa.isa_tag&.isa_sample_characteristic? }
-            elsif assay
-                attributes = assay.sample_type.sample_attributes
+            elsif assays
+                attributes = assays.map{ |a| a.sample_type.sample_attributes }.flatten
                 attributes = attributes.select{ |sa| sa.isa_tag&.isa_other_material_characteristic? }
             end
             attributes.map do |s|
@@ -350,10 +351,12 @@ module IsaExporter
             end
         end
 
-        def convert_data_files(sample_type)
-            with_tag_data_file = detect_data_file(sample_type)
+        def convert_data_files(sample_types)
+		  st = sample_types.detect {|s|  detect_data_file(s) }
+		  return [] if !st
+            with_tag_data_file = detect_data_file(st)
             return [] if !with_tag_data_file
-            sample_type.samples.map do |s|
+            st.samples.map do |s|
                 {
                     "@id": "#data/#{s.id}",
                     name: s.get_attribute_value(with_tag_data_file),
@@ -363,13 +366,18 @@ module IsaExporter
             end
         end
 
-        def convert_other_materials(sample_type)
-            with_tag_isa_other_material = detect_other_material(sample_type)
+        def convert_other_materials(sample_types)
+		  all_attributes = sample_types.map{ |s| s.sample_attributes }.flatten
+		  st = sample_types.detect { |s| s.sample_attributes.detect{|sa| sa.isa_tag&.isa_other_material?} }
+
+            with_tag_isa_other_material = st.sample_attributes.detect{|sa| sa.isa_tag&.isa_other_material?}
             return [] if !with_tag_isa_other_material
-            with_type_seek_sample_multi = detect_sample_multi(sample_type)
+
+            with_type_seek_sample_multi =  st.sample_attributes.detect(&:seek_sample_multi?)
             raise "Defected ISA other_materials!" if !with_type_seek_sample_multi
-		  with_tag_isa_other_material_characteristics = sample_type.sample_attributes.select{ |sa| sa.isa_tag&.isa_other_material_characteristic? }
-            sample_type.samples.map do |s|
+
+		  with_tag_isa_other_material_characteristics = st.sample_attributes.select{ |sa| sa.isa_tag&.isa_other_material_characteristic? }
+            st.samples.map do |s|
                 {
                     "@id": "#material/#{s.id}", 
                     name: s.get_attribute_value(with_tag_isa_other_material),
