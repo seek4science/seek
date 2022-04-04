@@ -177,6 +177,7 @@ class AdminControllerTest < ActionController::TestCase
     assert !quentin.is_admin?
     assert aaron.is_admin?
     assert aaron.is_admin?
+    assert User.current_user.person.is_admin?
   end
 
   test 'get project content stats' do
