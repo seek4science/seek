@@ -93,7 +93,7 @@ Factory.define(:programme_administrator_not_in_project, parent: :person_not_in_p
   end
 end
 
-Factory.define(:programme_administrator, parent: :project_administrator) do |f|
+Factory.define(:programme_administrator, parent: :person) do |f|
   f.after_create do |p|
     programme = Factory(:programme, projects: [p.group_memberships.first.project])
     p.assign_role(:programme_administrator, programme).save!
