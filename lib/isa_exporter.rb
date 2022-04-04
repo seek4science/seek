@@ -107,14 +107,14 @@ module IsaExporter
             isa_assay["@id"] = "#assay/#{assay.id}"
             isa_assay[:filename] = "a_assays.txt" # assay&.sample_type&.isa_template&.title
             isa_assay[:measurementType] = {
-                annotationValue: "",
-                termSource: "",
-                termAccession: ""
+                annotationValue: nil,
+                termSource: nil,
+                termAccession: nil
             }
             isa_assay[:technologyType] = {
-                annotationValue: "",
-                termSource: "",
-                termAccession: ""
+                annotationValue: nil,
+                termSource: nil,
+                termAccession: nil
             }
             isa_assay[:technologyPlatform] = nil
             isa_assay[:characteristicCategories] = convert_characteristic_categories(nil, assay)
@@ -144,9 +144,9 @@ module IsaExporter
             isa_person[:address] = nil
             isa_person[:affiliation] = nil
             roles = {}
-            roles[:termAccession] = ""
-            roles[:termSource] = ""
-            roles[:annotationValue] = ""
+            roles[:termAccession] = nil
+            roles[:termSource] = nil
+            roles[:annotationValue] = nil
             isa_person[:roles] = [roles]
             isa_person[:comments] = [{
                 "@id": nil ,
@@ -161,9 +161,9 @@ module IsaExporter
             isa_publication[:pubMedID] = publication.pubmed_id
             isa_publication[:doi] = publication.doi
             status = {}
-            status[:termAccession] = ""
-            status[:termSource] = ""
-            status[:annotationValue] = ""
+            status[:termAccession] = nil
+            status[:termSource] = nil
+            status[:annotationValue] = nil
             isa_publication[:status] = status
             isa_publication[:title] = publication.title
             isa_publication[:author_list] = publication.authors.map { |a| a.full_name }.join(', ')
@@ -212,11 +212,11 @@ module IsaExporter
             end
             isa_protocol[:components] = [
                 {
-                    componentName: "",
+                    componentName: nil,
                     componentType: {
-                        annotationValue: "",
-                        termSource: "",
-                        termAccession: ""
+                        annotationValue: nil,
+                        termSource: nil,
+                        termAccession: nil
                     }
                 }
             ]
@@ -340,8 +340,8 @@ module IsaExporter
                         "@id": "#protocol/#{with_tag_protocol.id}"
                     },
                     parameterValues: convert_parameter_values(s, with_tag_isa_parameter_value),
-                    performer:"",
-                    date:"",
+                    performer: nil,
+                    date: nil,
                     previousProcess: previous_process(s),
                     nextProcess: next_process(s),
                     inputs: extract_sample_ids(s.get_attribute_value(with_type_seek_sample_multi), type),
