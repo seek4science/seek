@@ -231,26 +231,34 @@ namespace :seek do
       end
     end
 
-    Person.find_each do |person|
-      system_roles.each do |mask, data|
-        if person.roles_mask & mask == mask
-          Role.create!(role_type: data[:role_type], person_id: person.id, scope: nil)
+    disable_authorization_checks do
+      Person.find_each do |person|
+        system_roles.each do |mask, data|
+          if person.roles_mask & mask == mask
+            Role.where(role_type_id: data[:role_type].id, person_id: person.id, scope: nil).first_or_create!
+          end
         end
       end
-    end
 
-    AdminDefinedRoleProject.find_each do |role|
-      project_roles.each do |mask, data|
-        if role.role_mask & mask == mask
-          Role.create!(role_type: data[:role_type], person_id: role.person_id, scope: role.project)
+      class AdminDefinedRoleProject < ActiveRecord::Base; end
+
+      AdminDefinedRoleProject.find_each do |role|
+        project_roles.each do |mask, data|
+          if role.role_mask & mask == mask
+            Role.where(role_type_id: data[:role_type].id, person_id: role.person_id,
+                       scope_type: 'Project', scope_id: role.project_id).first_or_create!
+          end
         end
       end
-    end
 
-    AdminDefinedRoleProgramme.find_each do |role|
-      programme_roles.each do |mask, data|
-        if role.role_mask & mask == mask
-          Role.create!(role_type: data[:role_type], person_id: role.person_id, scope: role.programme)
+      class AdminDefinedRoleProgramme < ActiveRecord::Base; end
+
+      AdminDefinedRoleProgramme.find_each do |role|
+        programme_roles.each do |mask, data|
+          if role.role_mask & mask == mask
+            Role.where(role_type_id: data[:role_type].id, person_id: role.person_id,
+                       scope_type: 'Programme', scope_id: role.programme_id).first_or_create!
+          end
         end
       end
     end

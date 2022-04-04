@@ -21,7 +21,6 @@ class Programme < ApplicationRecord
   has_many :group_memberships, through: :work_groups
   has_many :people, -> { distinct }, through: :group_memberships
   has_many :institutions, -> { distinct }, through: :work_groups
-  has_many :admin_defined_role_programmes, dependent: :destroy
   has_many :dependent_permissions, class_name: 'Permission', as: :contributor, dependent: :destroy
   has_many :organisms, -> { distinct }, through: :projects
   has_many :investigations, -> { distinct }, through: :projects
@@ -122,6 +121,10 @@ class Programme < ApplicationRecord
 
   def total_asset_size
     projects.to_a.sum(&:total_asset_size)
+  end
+
+  def applicable_roles
+    [Seek::Roles::PROGRAMME_ADMINISTRATOR]
   end
 
   private

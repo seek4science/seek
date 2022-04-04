@@ -298,7 +298,7 @@ class Person < ApplicationRecord
     return false unless user
     return true if new_record? && self.class.can_create?
     user = user.user if user.is_a?(Person)
-    (user == self.user) || user.is_admin? || (is_project_administered_by?(user) && self.user.nil?)
+    (user == self.user) || user.is_admin? || (is_project_administered_by?(user.person) && self.user.nil?)
   end
 
   # admin can administer other people, project manager can administer other people except other admins and themself

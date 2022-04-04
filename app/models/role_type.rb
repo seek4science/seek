@@ -1,16 +1,51 @@
-class RoleType < ApplicationRecord
-  has_many :roles
-  has_many :people, through: :roles
+class RoleType
+  attr_accessor :id, :key, :scope
 
-  def self.system
-    where(scope: nil)
+  def initialize(id:, key:, scope: nil)
+    @id = id
+    @key = key
+    @scope = scope
   end
 
-  def self.programme
-    where(scope: 'Programme')
+  DATA = {
+    admin: RoleType.new(id: 1, key: 'admin'),
+    pal: RoleType.new(id: 2, key: 'pal', scope: 'Project'),
+    project_administrator: RoleType.new(id: 4, key: 'project_administrator', scope: 'Project'),
+    asset_housekeeper: RoleType.new(id: 8, key: 'asset_housekeeper', scope: 'Project'),
+    asset_gatekeeper: RoleType.new(id: 16, key: 'asset_gatekeeper', scope: 'Project'),
+    programme_administrator: RoleType.new(id: 32, key: 'programme_administrator', scope: 'Programme')
+  }.freeze
+
+  def title
+    I18n.t(key)
   end
 
-  def self.project
-    where(scope: 'Project')
+  def self.find_by_key(key)
+    data[key.to_sym]
+  end
+
+  def self.find_by_id(id)
+    by_id[id.to_i]
+  end
+
+  def self.data
+    return @data if @data
+    load_data
+    @data
+  end
+
+  def self.load_data
+    @data = {}
+    @data_by_id = {}
+    DATA.each do |k, rt|
+      @data[k.to_sym] = rt
+      @data_by_id[rt.id.to_i] = rt
+    end
+  end
+
+  def self.by_id
+    return @data_by_id if @data_by_id
+    load_data
+    @data_by_id
   end
 end

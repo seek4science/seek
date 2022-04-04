@@ -42,16 +42,6 @@ module PeopleHelper
     end
   end
 
-  def admin_defined_project_roles_hash
-    roles = Seek::Roles::ProjectRelatedRoles.role_names.map do |role|
-      [role, t(role)]
-    end
-    roles = Hash[roles]
-
-    roles.delete('pal') unless admin_logged_in?
-    roles
-  end
-
   # Return whether or not to hide contact details from this user
   # Current decided by Seek::Config.hide_details_enabled or
   # is hidden if the current person doesn't share the same programme as the person being viewed

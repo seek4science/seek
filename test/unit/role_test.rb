@@ -1,8 +1,6 @@
 require 'test_helper'
 
 class RoleTest < ActiveSupport::TestCase
-  fixtures :role_types
-
   def setup
     User.current_user = Factory(:admin).user
   end
@@ -46,7 +44,7 @@ class RoleTest < ActiveSupport::TestCase
     refute person.is_project_administrator_of_any_project?, 'should no longer be a project administrator at all'
   end
 
-  test 'remove_roles' do
+  test 'remove_role' do
     person = Factory(:programme_administrator)
     project = person.projects.first
     person.is_asset_gatekeeper = true, project
@@ -62,7 +60,7 @@ class RoleTest < ActiveSupport::TestCase
     assert person.is_pal?(project)
     assert person.is_admin?
 
-    person.remove_roles([Seek::Roles::RoleInfo.new(role_name: 'project_administrator', items: [project])])
+    person.remove_role('project_administrator', items: [project])
 
     assert person.is_programme_administrator?(person.programmes.first)
     refute person.is_project_administrator?(project)
@@ -70,7 +68,7 @@ class RoleTest < ActiveSupport::TestCase
     assert person.is_pal?(project)
     assert person.is_admin?
 
-    person.remove_roles([Seek::Roles::RoleInfo.new(role_name: 'asset_gatekeeper', items: [project])])
+    person.remove_role('asset_gatekeeper', items: [project])
 
     assert person.is_programme_administrator?(person.programmes.first)
     refute person.is_project_administrator?(project)
@@ -78,7 +76,7 @@ class RoleTest < ActiveSupport::TestCase
     assert person.is_pal?(project)
     assert person.is_admin?
 
-    person.remove_roles([Seek::Roles::RoleInfo.new(role_name: 'pal', items: [project])])
+    person.remove_role('pal', items: [project])
 
     assert person.is_programme_administrator?(person.programmes.first)
     refute person.is_project_administrator?(project)
@@ -86,7 +84,7 @@ class RoleTest < ActiveSupport::TestCase
     refute person.is_pal?(project)
     assert person.is_admin?
 
-    person.remove_roles([Seek::Roles::RoleInfo.new(role_name: 'programme_administrator', items: person.programmes)])
+    person.remove_role('programme_administrator', items: person.programmes)
 
     refute person.is_programme_administrator_of_any_programme?
     refute person.is_programme_administrator?(person.programmes.first)
@@ -95,7 +93,7 @@ class RoleTest < ActiveSupport::TestCase
     refute person.is_pal?(project)
     assert person.is_admin?
 
-    person.remove_roles([Seek::Roles::RoleInfo.new(role_name: 'admin')])
+    person.remove_role('admin')
 
     refute person.is_programme_administrator?(person.programmes.first)
     refute person.is_project_administrator?(project)
@@ -113,14 +111,14 @@ class RoleTest < ActiveSupport::TestCase
     refute person.is_asset_gatekeeper?(project)
     refute person.is_admin?
 
-    person.remove_roles([Seek::Roles::RoleInfo.new(role_name: Seek::Roles::ASSET_GATEKEEPER, items: [])])
+    person.remove_role(Seek::Roles::ASSET_GATEKEEPER, items: [])
 
     assert person.is_programme_administrator?(person.programmes.first)
     assert person.is_pal?(project)
     refute person.is_asset_gatekeeper?(project)
     refute person.is_admin?
 
-    person.remove_roles([Seek::Roles::RoleInfo.new(role_name: 'admin', items: [])])
+    person.remove_role('admin', items: [])
 
     assert person.is_programme_administrator?(person.programmes.first)
     assert person.is_pal?(project)
@@ -141,7 +139,7 @@ class RoleTest < ActiveSupport::TestCase
     assert person.is_programme_administrator?(programme2)
 
     assert_difference('Role.count', -1) do
-      person.remove_roles([Seek::Roles::RoleInfo.new(role_name: 'programme_administrator', items: programme1)])
+      person.remove_role('programme_administrator', items: programme1)
     end
 
     assert person.is_programme_administrator_of_any_programme?
@@ -149,14 +147,14 @@ class RoleTest < ActiveSupport::TestCase
     assert person.is_programme_administrator?(programme2)
 
     assert_difference('Role.count', -1) do
-      person.remove_roles([Seek::Roles::RoleInfo.new(role_name: 'programme_administrator', items: programme2)])
+      person.remove_role('programme_administrator', items: programme2)
     end
 
     refute person.is_programme_administrator_of_any_programme?
     refute person.is_programme_administrator?(programme1)
     refute person.is_programme_administrator?(programme2)
     assert_no_difference('Role.count') do
-      person.remove_roles([Seek::Roles::RoleInfo.new(role_name: 'programme_administrator', items: programme2)])
+      person.remove_role('programme_administrator', items: programme2)
     end
 
     refute person.is_programme_administrator_of_any_programme?
@@ -257,7 +255,8 @@ class RoleTest < ActiveSupport::TestCase
       project = person.projects.first
       assert_equal ['admin'], person.role_names
       assert person.can_manage?
-      person.add_roles [Seek::Roles::RoleInfo.new(role_name: 'admin'), Seek::Roles::RoleInfo.new(role_name: 'pal', items: project)]
+      person.add_role('admin')
+      person.add_role('pal', items: project)
       person.save!
       person.reload
       assert_equal ['pal'].sort, person.scoped_roles(project).sort.map(&:key)
@@ -482,17 +481,6 @@ class RoleTest < ActiveSupport::TestCase
     assert gatekeeper.is_asset_gatekeeper_of?(sop)
   end
 
-  test 'order of roles' do
-    assert_equal %w(admin pal project_administrator asset_housekeeper asset_gatekeeper programme_administrator), Seek::Roles::Roles.role_names, 'The order of the roles is critical as it determines the mask that is used.'
-  end
-
-  test 'mask for role' do
-    roles = %w(admin pal project_administrator asset_housekeeper asset_gatekeeper programme_administrator)
-    expected_masks = [1,2,4,8,16,32]
-    actual_masks = roles.collect{|role| Seek::Roles::Roles.instance.mask_for_role(role)}
-    assert_equal expected_masks, actual_masks
-  end
-
   test 'locale for roles' do
     #it's important the role name constants map the the locale key
     assert I18n.exists?(Seek::Roles::PAL)
@@ -675,25 +663,6 @@ class RoleTest < ActiveSupport::TestCase
     assert person.is_programme_administrator?(other_programme)
   end
 
-  test 'role info' do
-    proj = Factory(:project)
-    info = Seek::Roles::RoleInfo.new(role_name: 'project_administrator', items: [proj])
-    assert_equal 'project_administrator', info.role_name
-    assert_equal [proj], info.items
-
-    info = Seek::Roles::RoleInfo.new(role_name: 'project_administrator', items: proj)
-    assert_equal 'project_administrator', info.role_name
-    assert_equal [proj], info.items
-
-    info = Seek::Roles::RoleInfo.new(role_name: 'project_administrator')
-    assert_equal 'project_administrator', info.role_name
-    assert_equal [], info.items
-
-    assert_raise(Seek::Roles::UnknownRoleException) do
-      Seek::Roles::RoleInfo.new(role_name: 'frog')
-    end
-  end
-
   test 'items_for_person_and_role' do
     person = Factory(:programme_administrator)
     programmes = person.programmes
@@ -729,7 +698,7 @@ class RoleTest < ActiveSupport::TestCase
     with_config_value :auth_lookup_enabled, true do
       assert_enqueued_with(job: AuthLookupUpdateJob) do
         assert_difference('AuthLookupUpdateQueue.count', 1) do
-          Role.create!(person: person, scope: person.projects.first, role_type: role_types(:project_administrator))
+          Role.create!(person: person, scope: person.projects.first, role_type: RoleType.find_by_key(:project_administrator))
         end
       end
     end
@@ -737,7 +706,7 @@ class RoleTest < ActiveSupport::TestCase
 
   test 'fire update auth table job when project role destroyed' do
     person = Factory(:person)
-    role = Role.create!(person: person, scope: person.projects.first, role_type: role_types(:project_administrator))
+    role = Role.create!(person: person, scope: person.projects.first, role_type: RoleType.find_by_key(:project_administrator))
     with_config_value :auth_lookup_enabled, true do
       assert_enqueued_with(job: AuthLookupUpdateJob) do
         assert_difference('AuthLookupUpdateQueue.count', 1) do
@@ -749,7 +718,7 @@ class RoleTest < ActiveSupport::TestCase
 
   test 'validate person must exist when creating project role' do
     person = Factory(:person)
-    role = Role.new(scope: person.projects.first, role_type: role_types(:project_administrator))
+    role = Role.new(scope: person.projects.first, role_type: RoleType.find_by_key(:project_administrator))
     refute role.valid?
     role.person = person
     assert role.valid?
@@ -757,7 +726,7 @@ class RoleTest < ActiveSupport::TestCase
 
   test 'validate project must exist when creating project role' do
     person = Factory(:person)
-    role = Role.new(person: person, role_type: role_types(:project_administrator))
+    role = Role.new(person: person, role_type: RoleType.find_by_key(:project_administrator))
     refute role.valid?
     role.scope = person.projects.first
     assert role.valid?
@@ -766,7 +735,7 @@ class RoleTest < ActiveSupport::TestCase
   test 'validate project must belong to person when creating project role' do
     person = Factory(:person)
     project = Factory(:project)
-    role = Role.new(person: person, scope: project, role_type: role_types(:project_administrator))
+    role = Role.new(person: person, scope: project, role_type: RoleType.find_by_key(:project_administrator))
     refute role.valid?
     role.scope = person.projects.first
     assert role.valid?
@@ -779,7 +748,7 @@ class RoleTest < ActiveSupport::TestCase
     with_config_value :auth_lookup_enabled, true do
       assert_enqueued_with(job: AuthLookupUpdateJob) do
         assert_difference('AuthLookupUpdateQueue.count', 1) do
-          Role.create!(person: person, scope: programme, role_type: role_types(:programme_administrator))
+          Role.create!(person: person, scope: programme, role_type: RoleType.find_by_key(:programme_administrator))
         end
       end
     end
@@ -788,7 +757,7 @@ class RoleTest < ActiveSupport::TestCase
   test 'fire update auth table job when programme role destroyed' do
     person = Factory(:person)
     programme = Factory(:programme, projects: person.projects)
-    role = Role.create!(person: person, scope: programme, role_type: role_types(:programme_administrator))
+    role = Role.create!(person: person, scope: programme, role_type: RoleType.find_by_key(:programme_administrator))
     with_config_value :auth_lookup_enabled, true do
       assert_enqueued_with(job: AuthLookupUpdateJob) do
         assert_difference('AuthLookupUpdateQueue.count', 1) do
@@ -801,7 +770,7 @@ class RoleTest < ActiveSupport::TestCase
   test 'validate person must exist when creating programme role' do
     person = Factory(:person)
     programme = Factory(:programme, projects: person.projects)
-    role = Role.new(scope: programme, role_type: role_types(:programme_administrator))
+    role = Role.new(scope: programme, role_type: RoleType.find_by_key(:programme_administrator))
     refute role.valid?
     role.person = person
     assert role.valid?
@@ -810,9 +779,10 @@ class RoleTest < ActiveSupport::TestCase
   test 'validate programme must exist when creating programme role' do
     person = Factory(:person)
     programme = Factory(:programme, projects: person.projects)
-    role = Role.new(person: person, role_type: role_types(:programme_administrator))
+    role = Role.new(person: person, role_type: RoleType.find_by_key(:programme_administrator))
     refute role.valid?
     role.scope = programme
+    role.valid?
     assert role.valid?
   end
 end

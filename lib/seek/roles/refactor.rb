@@ -1,47 +1,34 @@
 module Seek
   module Roles
+    ADMIN = 'admin'
+    PAL = 'pal'
+    PROJECT_ADMINISTRATOR = 'project_administrator'
+    ASSET_HOUSEKEEPER = 'asset_housekeeper'
+    ASSET_GATEKEEPER = 'asset_gatekeeper'
+    PROGRAMME_ADMINISTRATOR = 'programme_administrator'
+    class UnknownRoleException < Exception; end
     module Refactor
-      class InvalidRoleTypeException < Exception; end
-      class RoleInfo
-        attr_reader :role_name, :role_type, :role_mask, :items
-
-        def initialize(args)
-          @role_name = args[:role_name]
-          args[:items] ||= []
-          @items = Array(args[:items])
-          @role_type = RoleType.find_by_key(@role_name)
-          @role_mask
-
-          fail Seek::Roles::UnknownRoleException.new("Unknown role '#{@role_name.inspect}'") unless @role_type
-
-          @role_mask = Seek::Roles::Roles.instance.mask_for_role(@role_name)
-        end
-      end
-
       extend ActiveSupport::Concern
 
       included do
         has_many :roles, dependent: :destroy
         has_many :role_types, through: :roles
+        after_save :remove_dangling_project_roles
         after_commit :clear_role_cache
         enforce_required_access_for_owner :roles, :manage
 
-        include StandAloneRoles::PersonInstanceMethods
-        extend StandAloneRoles::PersonClassMethods
-        include ProjectRelatedRoles::PersonInstanceMethods
-        extend ProjectRelatedRoles::PersonClassMethods
-        include ProgrammeRelatedRoles::PersonInstanceMethods
-        extend ProgrammeRelatedRoles::PersonClassMethods
+        include Seek::Roles::Accessors
       end
 
       class_methods do
         def with_role(key)
-          joins(roles: :role_type).where(role_types: { key: key })
+          role_type = RoleType.find_by_key(key)
+          joins(:roles).where(roles: { role_type_id: role_type.id }).distinct
         end
       end
 
       def role_names
-        role_types.pluck(:key).uniq
+        roles.map(&:key).uniq
       end
 
       def scoped_roles(scope)
@@ -49,7 +36,8 @@ module Seek
       end
 
       def has_role?(key)
-        has_cached_role?(key, :any) || role_types.where(key: key).exists?
+        role_type = RoleType.find_by_key(key)
+        has_cached_role?(key, :any) || roles.where(role_type_id: role_type.id).any?
       end
 
       def check_for_role(key, scope)
@@ -60,58 +48,45 @@ module Seek
         is_admin? || is_project_administrator_of_any_project?
       end
 
-      def assign_or_remove_roles(rolename, flag_and_items)
+      def assign_or_remove_roles(key, flag_and_items)
         flag_and_items = Array(flag_and_items)
         flag = flag_and_items[0]
         items = flag_and_items[1]
         if flag
-          add_roles(Seek::Roles::RoleInfo.new(role_name: rolename, items: items))
+          add_role(key, items: items)
         else
-          remove_roles(Seek::Roles::RoleInfo.new(role_name: rolename, items: items))
+          remove_role(key, items: items)
         end
       end
 
       def assign_role(key, scope = nil)
         return if check_for_role(key, scope)
-        role_type = RoleType.find_by_key(key)
-        raise InvalidRoleTypeException unless role_type
-        role = scoped_roles(scope).build(role_type: role_type)
+        role = scoped_roles(scope).with_role_key(key).build
         cache_role(key, scope) if role.valid?
         role
       end
 
       def unassign_role(key, scope = nil)
-        role_type = RoleType.find_by_key(key)
-        raise InvalidRoleTypeException unless role_type
+        scoped_roles(scope).with_role_key(key).destroy_all
         uncache_role(key, scope)
-        scoped_roles(scope).where(role_type_id: role_type.id).destroy_all
       end
 
-      def add_roles(role_infos)
-        Array(role_infos).each do |role_info|
-          if role_info.items.empty?
-            assign_role(role_info.role_name)&.save
-          else
-            role_info.items.each { |item| assign_role(role_info.role_name, item)&.save }
-          end
-        end
+      def add_role(key, items: nil)
+        # Can't use Array(items) here because it turns `nil` into `[]` instead of `[nil]`
+        items = [items] unless items.respond_to?(:each)
+        items.map { |item| assign_role(key, item)&.save }
       end
 
-      def remove_roles(role_infos)
-        Array(role_infos).each do |role_info|
-          if role_info.items.empty?
-            unassign_role(role_info.role_name)
-          else
-            role_info.items.each do |item|
-              unassign_role(role_info.role_name, item)
-            end
-          end
-        end
+      def remove_role(key, items: nil)
+        items = [items] unless items.respond_to?(:each)
+        items.map { |item| unassign_role(key, item) }
       end
 
-      def check_role_for_item(_person, _role_name, item)
-        fail InvalidCheckException.new("This role should not be checked against an item - #{item.inspect}") unless item.nil?
-        true
+      # called as callback after save, to make sure the role project records are aligned with the current projects, deleting
+      # any for projects that have been removed, and resolving the mask
+      def remove_dangling_project_roles
+        projects = current_group_memberships.collect(&:project)
+        roles.where(scope_type: 'Project').where.not(scope_id: projects).destroy_all
       end
 
       private
