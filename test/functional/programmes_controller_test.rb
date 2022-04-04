@@ -79,7 +79,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute programme.can_delete?
 
     assert_no_difference('Programme.count') do
-      assert_no_difference('AdminDefinedRoleProgramme.count') do
+      assert_no_difference('Role.count') do
         delete :destroy, params: { id: programme.id }
       end
     end
@@ -92,7 +92,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert programme.can_delete?
 
     assert_difference('Programme.count', -1) do
-      assert_difference('AdminDefinedRoleProgramme.count',-1) do
+      assert_difference('Role.count',-1) do
         delete :destroy, params: { id: programme.id }
       end
     end
@@ -150,7 +150,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     person = Factory(:person)
     refute person.is_programme_administrator_of_any_programme?
     assert_difference('Programme.count', 1) do
-      assert_difference('AdminDefinedRoleProgramme.count', 1) do
+      assert_difference('Role.count', 1) do
         post :create, params: { programme: { administrator_ids: "#{person.id}", title: 'programme xxxyxxx2' } }
       end
     end
@@ -168,7 +168,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     login_as(admin)
     refute admin.is_programme_administrator_of_any_programme?
     assert_difference('Programme.count', 1) do
-      assert_difference('AdminDefinedRoleProgramme.count', 1) do
+      assert_difference('Role.count', 1) do
         post :create, params: { programme: { administrator_ids: "#{admin.id}", title: 'programme xxxyxxx1' } }
       end
     end

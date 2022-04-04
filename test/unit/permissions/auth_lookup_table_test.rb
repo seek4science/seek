@@ -1,6 +1,8 @@
 require 'test_helper'
 
 class AuthLookupTableTest < ActiveSupport::TestCase
+  fixtures :roles, :role_types
+
   def setup
     @val = Seek::Config.auth_lookup_enabled
     Seek::Config.auth_lookup_enabled = true

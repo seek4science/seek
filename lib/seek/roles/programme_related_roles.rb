@@ -34,7 +34,7 @@ module Seek
 
       module PersonClassMethods
         def programme_administrators
-          Seek::Roles::Roles.instance.people_with_role(Seek::Roles::PROGRAMME_ADMINISTRATOR)
+          with_role(Seek::Roles::PROGRAMME_ADMINISTRATOR)
         end
       end
 
@@ -63,8 +63,10 @@ module Seek
         end
 
         def programmes_for_role(role)
-          fail UnknownRoleException.new("Unrecognised programme role name #{role}") unless Seek::Roles::ProgrammeRelatedRoles.role_names.include?(role)
-          Seek::Roles::ProgrammeRelatedRoles.instance.programmes_for_person_with_role(self, role)
+          role_type = RoleType.find_by_key(role)
+          fail UnknownRoleException.new("Unrecognised programme role name #{role}") unless role_type
+          Programme.joins(roles: [:person, :role_type]).where(people: { id: self.id },
+                                                              roles: { role_type_id: role_type.id })
         end
 
         def administered_programmes

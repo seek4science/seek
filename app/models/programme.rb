@@ -1,5 +1,6 @@
 class Programme < ApplicationRecord
   include Seek::Annotatable
+  include Seek::Roles::Scope
 
   attr_accessor :administrator_ids
 
@@ -116,7 +117,7 @@ class Programme < ApplicationRecord
   end
 
   def programme_administrators
-    Seek::Roles::ProgrammeRelatedRoles.instance.people_with_programme_and_role(self, Seek::Roles::PROGRAMME_ADMINISTRATOR)
+    people_with_role(Seek::Roles::PROGRAMME_ADMINISTRATOR)
   end
 
   def total_asset_size

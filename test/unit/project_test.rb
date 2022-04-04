@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class ProjectTest < ActiveSupport::TestCase
-  fixtures :projects, :institutions, :work_groups, :group_memberships, :people, :users, :assets, :organisms
+  fixtures :projects, :institutions, :work_groups, :group_memberships, :people, :users, :assets, :organisms, :role_types
 
 
   test 'workgroups destroyed with project' do
@@ -302,23 +302,24 @@ class ProjectTest < ActiveSupport::TestCase
     refute_includes project.project_administrators, person
     refute_includes project.project_administrators, another_person
 
-    project.update(project_administrator_ids: [person.id.to_s])
+    assert project.update(project_administrator_ids: [person.id.to_s])
 
     assert_includes project.project_administrators, person
     refute_includes project.project_administrators, another_person
 
-    project.update(project_administrator_ids: [another_person.id.to_s])
+    assert project.update(project_administrator_ids: [another_person.id.to_s])
 
     refute_includes project.project_administrators, person
     assert_includes project.project_administrators, another_person
 
     # cannot change to a person from another project
     person_in_other_project = Factory(:person)
-    project.update(project_administrator_ids: [person_in_other_project.id.to_s])
-
-    refute_includes project.project_administrators, person
-    refute_includes project.project_administrators, another_person
+    refute project.update(project_administrator_ids: [person_in_other_project.id.to_s])
     refute_includes project.project_administrators, person_in_other_project
+
+    # Update should fail when adding bad roles, so previous people should remain
+    refute_includes project.project_administrators, person
+    assert_includes project.project_administrators, another_person
   end
 
   test 'update with attributes for gatekeeper ids' do
@@ -334,28 +335,29 @@ class ProjectTest < ActiveSupport::TestCase
     refute_includes project.asset_gatekeepers, person
     refute_includes project.asset_gatekeepers, another_person
 
-    project.update(asset_gatekeeper_ids: [person.id.to_s])
+    assert project.update(asset_gatekeeper_ids: [person.id.to_s])
 
     assert_includes project.asset_gatekeepers, person
     refute_includes project.asset_gatekeepers, another_person
 
-    project.update(asset_gatekeeper_ids: [another_person.id.to_s])
+    assert project.update(asset_gatekeeper_ids: [another_person.id.to_s])
 
     refute_includes project.asset_gatekeepers, person
     assert_includes project.asset_gatekeepers, another_person
 
     # 2 at once
-    project.update(asset_gatekeeper_ids: [person.id.to_s, another_person.id.to_s])
+    assert project.update(asset_gatekeeper_ids: [person.id.to_s, another_person.id.to_s])
     assert_includes project.asset_gatekeepers, person
     assert_includes project.asset_gatekeepers, another_person
 
     # cannot change to a person from another project
     person_in_other_project = Factory(:person)
-    project.update(asset_gatekeeper_ids: [person_in_other_project.id.to_s])
-
-    refute_includes project.asset_gatekeepers, person
-    refute_includes project.asset_gatekeepers, another_person
+    refute project.update(asset_gatekeeper_ids: [person_in_other_project.id.to_s])
     refute_includes project.asset_gatekeepers, person_in_other_project
+
+    # Update should fail when adding bad roles, so previous people should remain
+    assert_includes project.asset_gatekeepers, person
+    assert_includes project.asset_gatekeepers, another_person
   end
 
   test 'update with attributes for pal ids' do
@@ -371,23 +373,24 @@ class ProjectTest < ActiveSupport::TestCase
     refute_includes project.pals, person
     refute_includes project.pals, another_person
 
-    project.update(pal_ids: [person.id.to_s])
+    assert project.update(pal_ids: [person.id.to_s])
 
     assert_includes project.pals, person
     refute_includes project.pals, another_person
 
-    project.update(pal_ids: [another_person.id.to_s])
+    assert project.update(pal_ids: [another_person.id.to_s])
 
     refute_includes project.pals, person
     assert_includes project.pals, another_person
 
     # cannot change to a person from another project
     person_in_other_project = Factory(:person)
-    project.update(pal_ids: [person_in_other_project.id.to_s])
-
-    refute_includes project.pals, person
-    refute_includes project.pals, another_person
+    refute project.update(pal_ids: [person_in_other_project.id.to_s])
     refute_includes project.pals, person_in_other_project
+
+    # Update should fail when adding bad roles, so previous people should remain
+    refute_includes project.pals, person
+    assert_includes project.pals, another_person
   end
 
   test 'update with attributes for asset housekeeper ids' do
@@ -403,28 +406,29 @@ class ProjectTest < ActiveSupport::TestCase
     refute_includes project.asset_housekeepers, person
     refute_includes project.asset_housekeepers, another_person
 
-    project.update(asset_housekeeper_ids: [person.id.to_s])
+    assert project.update(asset_housekeeper_ids: [person.id.to_s])
 
     assert_includes project.asset_housekeepers, person
     refute_includes project.asset_housekeepers, another_person
 
-    project.update(asset_housekeeper_ids: [another_person.id.to_s])
+    assert project.update(asset_housekeeper_ids: [another_person.id.to_s])
 
     refute_includes project.asset_housekeepers, person
     assert_includes project.asset_housekeepers, another_person
 
     # 2 at once
-    project.update(asset_housekeeper_ids: [person.id.to_s, another_person.id.to_s])
+    assert project.update(asset_housekeeper_ids: [person.id.to_s, another_person.id.to_s])
     assert_includes project.asset_housekeepers, person
     assert_includes project.asset_housekeepers, another_person
 
     # cannot change to a person from another project
     person_in_other_project = Factory(:person)
-    project.update(asset_housekeeper_ids: [person_in_other_project.id.to_s])
-
-    refute_includes project.asset_housekeepers, person
-    refute_includes project.asset_housekeepers, another_person
+    refute project.update(asset_housekeeper_ids: [person_in_other_project.id.to_s])
     refute_includes project.asset_housekeepers, person_in_other_project
+
+    # Update should fail when adding bad roles, so previous people should remain
+    assert_includes project.asset_housekeepers, person
+    assert_includes project.asset_housekeepers, another_person
   end
 
   def test_update_first_letter
@@ -731,11 +735,7 @@ class ProjectTest < ActiveSupport::TestCase
       web_page: 'http://webpage.com',
       organism_ids: [organism.id],
       institution_ids: [institution.id],
-      description: 'Project description',
-      project_administrator_ids: [person.id],
-      asset_gatekeeper_ids: [person.id],
-      pal_ids: [person.id],
-      asset_housekeeper_ids: [person.id]
+      description: 'Project description'
     }
 
     project = Project.create(attr)
@@ -772,7 +772,7 @@ class ProjectTest < ActiveSupport::TestCase
     project_administrator = Factory(:project_administrator).reload
     project = project_administrator.projects.first
 
-    assert_includes project_administrator.roles, 'project_administrator'
+    assert_includes project_administrator.role_names, 'project_administrator'
     assert_includes project.project_administrators, project_administrator
     assert project_administrator.is_project_administrator?(project)
     assert project_administrator.user.is_project_administrator?(project)
@@ -782,7 +782,7 @@ class ProjectTest < ActiveSupport::TestCase
     project_administrator.group_memberships.destroy_all
     project_administrator = project_administrator.reload
 
-    assert_not_includes project_administrator.roles, 'project_administrator'
+    assert_not_includes project_administrator.role_names, 'project_administrator'
     assert_not_includes project.project_administrators, project_administrator
     assert !project_administrator.is_project_administrator?(project)
     assert !project.can_manage?(project_administrator.user)
@@ -792,7 +792,7 @@ class ProjectTest < ActiveSupport::TestCase
     project_administrator = Factory(:project_administrator).reload
     project = project_administrator.projects.first
 
-    assert_includes project_administrator.roles, 'project_administrator'
+    assert_includes project_administrator.role_names, 'project_administrator'
     assert_includes project.project_administrators, project_administrator
     assert project_administrator.is_project_administrator?(project)
     assert project_administrator.user.is_project_administrator?(project)
@@ -802,7 +802,7 @@ class ProjectTest < ActiveSupport::TestCase
     project_administrator.group_memberships.first.update(time_left_at: 1.day.ago)
     project_administrator = project_administrator.reload
 
-    assert_not_includes project_administrator.roles, 'project_administrator'
+    assert_not_includes project_administrator.role_names, 'project_administrator'
     assert_not_includes project.project_administrators, project_administrator
     assert !project_administrator.is_project_administrator?(project)
     assert !project.can_manage?(project_administrator.user)

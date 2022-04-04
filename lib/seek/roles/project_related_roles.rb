@@ -13,11 +13,6 @@ module Seek
         items_for_person_and_role(person, role)
       end
 
-      def people_with_project_and_role(project, role)
-        mask = mask_for_role(role)
-        AdminDefinedRoleProject.where(role_mask: mask, project_id: project.id).collect(&:person)
-      end
-
       # Methods specific to ProjectRelatedResources required by RelatedResources superclass
       def related_item_class
         Project
@@ -39,19 +34,19 @@ module Seek
 
       module PersonClassMethods
         def pals
-          Seek::Roles::Roles.instance.people_with_role(Seek::Roles::PAL)
+          with_role(Seek::Roles::PAL)
         end
 
         def project_administrators
-          Seek::Roles::Roles.instance.people_with_role(Seek::Roles::PROJECT_ADMINISTRATOR)
+          with_role(Seek::Roles::PROJECT_ADMINISTRATOR)
         end
 
         def asset_gatekeepers
-          Seek::Roles::Roles.instance.people_with_role(Seek::Roles::ASSET_GATEKEEPER)
+          with_role(Seek::Roles::ASSET_GATEKEEPER)
         end
 
         def asset_housekeepers
-          Seek::Roles::Roles.instance.people_with_role(Seek::Roles::ASSET_HOUSEKEEPER)
+          with_role(Seek::Roles::ASSET_HOUSEKEEPER)
         end
       end
 
@@ -177,13 +172,8 @@ module Seek
         end
 
         def roles_for_projects
-          {}.tap do |map|
-            admin_defined_role_projects.includes(:project).each do |project_role|
-              project_role.roles.each do |role|
-                map[role] ||= []
-                map[role] << project_role.project
-              end
-            end
+          roles.includes(:role_type).where(scope_type: 'Project').group_by { |r| r.role_type.key }.transform_values do |v|
+            v.map(&:scope)
           end
         end
       end

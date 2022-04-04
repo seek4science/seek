@@ -39,7 +39,7 @@ module Seek
 
       module PersonClassMethods
         def admins
-          Seek::Roles::Roles.instance.people_with_role(Seek::Roles::ADMIN)
+          with_role(Seek::Roles::ADMIN)
         end
       end
     end

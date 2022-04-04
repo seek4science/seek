@@ -3,7 +3,8 @@ class Person < ApplicationRecord
   acts_as_annotation_source
 
   include Seek::Annotatable
-  include Seek::Roles::AdminDefinedRoles
+  #include Seek::Roles::AdminDefinedRoles
+  include Seek::Roles::Refactor
 
   auto_strip_attributes :email, :first_name, :last_name, :web_page
 
@@ -263,7 +264,7 @@ class Person < ApplicationRecord
 
   # returns true this is an admin person, and they are the only one defined - indicating they are person creating during setting up SEEK
   def only_first_admin_person?
-    Person.count == 1 && [self] == Person.all && Person.first.is_admin?
+    Person.count == 1 && Person.first == self && is_admin?
   end
 
   def update_first_letter

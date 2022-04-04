@@ -186,29 +186,29 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
 
   test 'roles' do
     person = Factory(:admin)
-    assert_equal ['admin'], person.roles
+    assert_equal ['admin'], person.role_names
 
     person = Factory(:asset_gatekeeper)
-    assert_equal ['asset_gatekeeper'], person.roles
+    assert_equal ['asset_gatekeeper'], person.role_names
     person = Factory(:asset_housekeeper)
-    assert_equal ['asset_housekeeper'], person.roles
+    assert_equal ['asset_housekeeper'], person.role_names
     person = Factory(:project_administrator)
-    assert_equal ['project_administrator'], person.roles
+    assert_equal ['project_administrator'], person.role_names
     person = Factory(:pal)
-    assert_equal ['pal'], person.roles
+    assert_equal ['pal'], person.role_names
 
     project = person.projects.first
     person.is_asset_gatekeeper = true, project
-    assert_equal %w(asset_gatekeeper pal), person.roles.sort
+    assert_equal %w(asset_gatekeeper pal), person.role_names.sort
 
     person.is_admin = true
-    assert_equal %w(admin asset_gatekeeper pal), person.roles.sort
+    assert_equal %w(admin asset_gatekeeper pal), person.role_names.sort
 
     person.is_asset_housekeeper = true, project
-    assert_equal %w(admin asset_gatekeeper asset_housekeeper pal), person.roles.sort
+    assert_equal %w(admin asset_gatekeeper asset_housekeeper pal), person.role_names.sort
 
     person.is_project_administrator = true, project
-    assert_equal %w(admin asset_gatekeeper asset_housekeeper pal project_administrator), person.roles.sort
+    assert_equal %w(admin asset_gatekeeper asset_housekeeper pal project_administrator), person.role_names.sort
   end
 
   test "setting empty array doesn't set role" do
@@ -216,15 +216,15 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
       person = Factory(:person)
       person.is_project_administrator = true, []
       refute person.is_project_administrator_of_any_project?
-      refute_includes person.roles, 'project_administrator'
+      refute_includes person.role_names, 'project_administrator'
 
       person.is_pal = true, []
       refute person.is_pal_of_any_project?
-      refute_includes person.roles, 'pal'
+      refute_includes person.role_names, 'pal'
 
       person.is_programme_administrator = true, []
       refute person.is_programme_administrator_of_any_programme?
-      refute_includes person.roles, 'programme_administrator'
+      refute_includes person.role_names, 'programme_administrator'
     end
   end
 
@@ -262,7 +262,7 @@ class AdminDefinedRolesTest < ActiveSupport::TestCase
       person = Factory(:admin)
       assert_equal 1, person.projects.count
       project = person.projects.first
-      assert_equal ['admin'], person.roles
+      assert_equal ['admin'], person.role_names
       assert person.can_manage?
       person.add_roles [Seek::Roles::RoleInfo.new(role_name: 'admin'), Seek::Roles::RoleInfo.new(role_name: 'pal', items: project)]
       person.save!

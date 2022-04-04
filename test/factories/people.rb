@@ -69,47 +69,40 @@ Factory.define(:admin, parent: :person) do |f|
 end
 
 Factory.define(:pal, parent: :person) do |f|
-  f.roles_mask 2
-  f.after_build do |pal|
-    Factory(:admin_defined_role_project, project: pal.group_memberships.first.project, person: pal, role_mask: 2)
-    pal.roles_mask = 2
+  f.after_create do |p|
+    p.assign_role(:pal, p.group_memberships.first.project).save!
   end
 end
 
 Factory.define(:asset_housekeeper, parent: :person) do |f|
-  f.after_build do |am|
-    Factory(:admin_defined_role_project, project: am.group_memberships.first.project, person: am, role_mask: 8)
-    am.roles_mask = 8
+  f.after_create do |p|
+    p.assign_role(:asset_housekeeper, p.group_memberships.first.project).save!
   end
 end
 
 Factory.define(:project_administrator, parent: :person) do |f|
-  f.after_build do |pm|
-    Factory(:admin_defined_role_project, project: pm.group_memberships.first.project, person: pm, role_mask: 4)
-    pm.roles_mask = 4
+  f.after_create do |p|
+    p.assign_role(:project_administrator, p.group_memberships.first.project).save!
   end
 end
 
 Factory.define(:programme_administrator_not_in_project, parent: :person_not_in_project) do |f|
-  f.after_build do |pm|
+  f.after_create do |p|
     programme = Factory(:programme)
-    Factory(:admin_defined_role_programme, programme: programme, person: pm, role_mask: 32)
-    pm.roles_mask = 32
+    p.assign_role(:programme_administrator, programme).save!
   end
 end
 
 Factory.define(:programme_administrator, parent: :project_administrator) do |f|
-  f.after_build do |pm|
-    programme = Factory(:programme, projects: [pm.group_memberships.first.project])
-    Factory(:admin_defined_role_programme, programme: programme, person: pm, role_mask: 32)
-    pm.roles_mask = 32
+  f.after_create do |p|
+    programme = Factory(:programme, projects: [p.group_memberships.first.project])
+    p.assign_role(:programme_administrator, programme).save!
   end
 end
 
 Factory.define(:asset_gatekeeper, parent: :person) do |f|
-  f.after_build do |gk|
-    Factory(:admin_defined_role_project, project: gk.group_memberships.first.project, person: gk, role_mask: 16)
-    gk.roles_mask = 16
+  f.after_create do |p|
+    p.assign_role(:asset_gatekeeper, p.group_memberships.first.project).save!
   end
 end
 

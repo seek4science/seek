@@ -19,7 +19,7 @@ module PeopleHelper
 
   def seek_role_icons(person, size = 32)
     icons = ''
-    person.roles.each do |role|
+    person.role_names.each do |role|
       icons << seek_role_icon(role, size)
     end
     icons.html_safe

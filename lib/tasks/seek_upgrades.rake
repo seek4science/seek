@@ -20,8 +20,10 @@ namespace :seek do
     remove_orphaned_versions
     create_seek_sample_multi
     rename_seek_sample_attribute_types
-    seek:rebuild_workflow_internals
+
     update_thesis_related_publication_types
+    db:seed:015_role_types
+    convert_roles
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -67,7 +69,7 @@ namespace :seek do
     Seek::Config.transfer_value :dm_project_link, :instance_admins_link
   end
 
- task(update_missing_openbis_istest: :environment) do
+  task(update_missing_openbis_istest: :environment) do
     puts '... creating missing is_test for OpenbisEndpoint...'
     create = 0
     disable_authorization_checks do
@@ -201,7 +203,56 @@ namespace :seek do
       PublicationType.find_or_initialize_by(key: "diplomthesis").update(title:"Diplom Thesis", key: "diplomthesis")
       puts 'Add new type '+PublicationType.find_by(key:"diplomthesis").title
     end
-
   end
 
+  task(convert_roles: [:environment]) do
+    puts 'Converting roles...'
+    system_roles = {
+      1 => { key: 'admin' }
+    }
+
+    project_roles = {
+      2 => { key: 'pal'},
+      4 => { key: 'project_administrator'},
+      8 => { key: 'asset_housekeeper'},
+      16 => { key: 'asset_gatekeeper' }
+    }
+
+    programme_roles = {
+      32 => { key: 'programme_administrator' }
+    }
+
+    # Load role types for each key
+    [system_roles, project_roles, programme_roles].each do |set|
+      set.each do |k, v|
+        role_type = RoleType.find_by_key(v[:key])
+        raise "Couldn't find #{key} RoleType!" unless role_type
+        set[k] = v.merge(role_type: role_type)
+      end
+    end
+
+    Person.find_each do |person|
+      system_roles.each do |mask, data|
+        if person.roles_mask & mask == mask
+          Role.create!(role_type: data[:role_type], person_id: person.id, scope: nil)
+        end
+      end
+    end
+
+    AdminDefinedRoleProject.find_each do |role|
+      project_roles.each do |mask, data|
+        if role.role_mask & mask == mask
+          Role.create!(role_type: data[:role_type], person_id: role.person_id, scope: role.project)
+        end
+      end
+    end
+
+    AdminDefinedRoleProgramme.find_each do |role|
+      programme_roles.each do |mask, data|
+        if role.role_mask & mask == mask
+          Role.create!(role_type: data[:role_type], person_id: role.person_id, scope: role.programme)
+        end
+      end
+    end
+  end
 end

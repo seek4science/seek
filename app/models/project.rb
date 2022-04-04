@@ -1,6 +1,7 @@
 class Project < ApplicationRecord
   include Seek::Annotatable
   include HasSettings
+  include Seek::Roles::Scope
 
   acts_as_yellow_pages
   title_trimmer
@@ -122,21 +123,21 @@ class Project < ApplicationRecord
 
   # this is seek role
   def asset_housekeepers
-    people_with_the_role(Seek::Roles::ASSET_HOUSEKEEPER)
+    people_with_role(Seek::Roles::ASSET_HOUSEKEEPER)
   end
 
   # this is seek role
   def project_administrators
-    people_with_the_role(Seek::Roles::PROJECT_ADMINISTRATOR)
+    people_with_role(Seek::Roles::PROJECT_ADMINISTRATOR)
   end
 
   # this is seek role
   def asset_gatekeepers
-    people_with_the_role(Seek::Roles::ASSET_GATEKEEPER)
+    people_with_role(Seek::Roles::ASSET_GATEKEEPER)
   end
 
   def pals
-    people_with_the_role(Seek::Roles::PAL)
+    people_with_role(Seek::Roles::PAL)
   end
     
   # Returns the columns to be shown on the table view for the resource
@@ -145,11 +146,6 @@ class Project < ApplicationRecord
   end
   def columns_allowed
     columns_default + ['wiki_page','start_date','end_date']
-  end
-
-  # returns people belong to the admin defined seek 'role' for this project
-  def people_with_the_role(role)
-    Seek::Roles::ProjectRelatedRoles.instance.people_with_project_and_role(self, role)
   end
 
   def locations

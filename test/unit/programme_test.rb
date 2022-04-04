@@ -281,7 +281,7 @@ class ProgrammeTest < ActiveSupport::TestCase
     assert pa.has_role?('programme_administrator')
 
     assert_difference('Programme.count', -1) do
-      assert_difference('AdminDefinedRoleProgramme.count', -1) do
+      assert_difference('Role.count', -1) do
         prog.destroy
       end
     end
@@ -307,7 +307,7 @@ class ProgrammeTest < ActiveSupport::TestCase
     assert pa.has_role?('programme_administrator')
 
     assert_difference('Programme.count', -1) do
-      assert_difference('AdminDefinedRoleProgramme.count', -1) do
+      assert_difference('Role.count', -1) do
         prog.destroy
       end
     end
