@@ -27,6 +27,17 @@ class ResourcePublishLog < ApplicationRecord
     requested_approval_assets.reject!(&:is_published?)
     requested_approval_assets.select! { |asset| gatekeeper.is_asset_gatekeeper_of? asset }
     requested_approval_assets.uniq
+
+    isa_order = %w[Investigation Study Assay]
+
+    isa_assets = requested_approval_assets.select { |a| a.is_isa? }
+    non_isa_assets = requested_approval_assets - isa_assets
+
+    # seperate isa and non-isa items and sort them by different standards
+    isa = isa_assets.sort_by { |a| [a.is_isa? ? -1 : 1, isa_order.index(a.class.name), a.class.name] }
+    non_isa = non_isa_assets.sort_by{ |a| a.resource_publish_logs.last.created_at}.reverse!
+
+    isa+non_isa
   end
 
   def self.waiting_approval_assets_for(user)
