@@ -213,7 +213,7 @@ class SinglePublishingTest < ActionController::TestCase
     params[:publish][df.class.name] ||= {}
     params[:publish][df.class.name][df.id.to_s] = '1'
 
-    assert_difference('ResourcePublishLog.count', 1) do
+    assert_difference('ResourcePublishLog.count', 2) do
       post :publish, params: params.merge(id: df.id)
     end
 

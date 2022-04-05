@@ -115,7 +115,7 @@ class BatchPublishingTest < ActionController::TestCase
       params[:publish][asset.class.name][asset.id.to_s] = '1'
     end
 
-    assert_difference('ResourcePublishLog.count', total_assets.count) do
+    assert_difference('ResourcePublishLog.count', publish_immediately_assets.count+gatekeeper_required_assets.count*2) do
       assert_enqueued_emails gatekeeper_required_assets.count do
         post :publish, params: params.merge(id: User.current_user.person.id)
       end

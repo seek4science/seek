@@ -278,7 +278,7 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
     User.with_current_user person.user do
       assert df.resource_publish_logs.empty?
       assert df.publish!
-      assert_equal 1, df.resource_publish_logs.count
+      assert_equal 2, df.resource_publish_logs.count
       log = df.resource_publish_logs.first
       assert_equal ResourcePublishLog::PUBLISHED, log.publish_state
     end
