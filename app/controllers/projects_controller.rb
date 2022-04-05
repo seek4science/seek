@@ -352,9 +352,11 @@ class ProjectsController < ApplicationController
         if params[:default_member] && params[:default_member][:add_to_project] && params[:default_member][:add_to_project] == '1'
           institution = Institution.find(params[:default_member][:institution_id])
           person = current_person
-          person.add_to_project_and_institution(@project, institution)
-          person.is_project_administrator = true, @project
-          disable_authorization_checks { person.save }
+          disable_authorization_checks do
+            person.add_to_project_and_institution(@project, institution)
+            person.is_project_administrator = true, @project
+            person.save!
+          end
         end
         members = params[:project][:members]
         if members.nil?
@@ -368,7 +370,6 @@ class ProjectsController < ApplicationController
             person.save!
           end
         }
-        update_administrative_roles
         flash[:notice] = "#{t('project')} was successfully created."
         format.html { redirect_to(@project) }
         # format.json {render json: @project, adapter: :json, status: 200 }
@@ -630,14 +631,16 @@ class ProjectsController < ApplicationController
   def project_role_params
     permitted_roles = [:project_administrator_ids, :asset_gatekeeper_ids, :asset_housekeeper_ids, :pal_ids]
     permitted_roles.each do |k|
-      if params[:project][permitted_roles].present?
-        params[:project][k] = params[:project][k].split(',')
+      if params[:project][k].present?
+        if params[:project][k].is_a?(String)
+          params[:project][k] = params[:project][k].split(',')
+        end
       else
         params[:project][k] = []
       end
     end
 
-    params.require(:project).permit(*permitted_roles.map { |r| { r => [] }})
+    params.require(:project).permit(*permitted_roles.map { |r| { r => [] }}).tap { |x| pp x}
   end
 
   def project_params

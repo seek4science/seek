@@ -32,7 +32,7 @@ class Role < ApplicationRecord
   private
 
   def role_type_matches_scope
-    if scope&.class&.name != role_type.scope
+    if scope_type != role_type.scope
       errors.add(:role_type, "is not a valid #{scope_title} role")
     end
   end

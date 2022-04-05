@@ -19,7 +19,7 @@ module Seek
       end
 
       def role_names
-        roles.map(&:key).uniq
+        roles.select(:role_type_id).distinct.map(&:key)
       end
 
       def scoped_roles(scope)

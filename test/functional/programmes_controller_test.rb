@@ -151,7 +151,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute person.is_programme_administrator_of_any_programme?
     assert_difference('Programme.count', 1) do
       assert_difference('Role.count', 1) do
-        post :create, params: { programme: { administrator_ids: "#{person.id}", title: 'programme xxxyxxx2' } }
+        post :create, params: { programme: { programme_administrator_ids: "#{person.id}", title: 'programme xxxyxxx2' } }
       end
     end
 
@@ -168,7 +168,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute admin.is_programme_administrator_of_any_programme?
     assert_difference('Programme.count', 1) do
       assert_difference('Role.count', 1) do
-        post :create, params: { programme: { administrator_ids: "#{admin.id}", title: 'programme xxxyxxx1' } }
+        post :create, params: { programme: { programme_administrator_ids: "#{admin.id}", title: 'programme xxxyxxx1' } }
       end
     end
 
@@ -194,7 +194,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute p3.is_programme_administrator?(prog)
 
     ids = [p1.id, p2.id].join(',')
-    put :update, params: { id: prog, programme: { administrator_ids: ids } }
+    put :update, params: { id: prog, programme: { programme_administrator_ids: ids } }
 
     assert_redirected_to prog
 
@@ -228,7 +228,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute p3.is_programme_administrator?(prog)
 
     ids = [p1.id, p2.id].join(',')
-    put :update, params: { id: prog, programme: { administrator_ids: ids } }
+    put :update, params: { id: prog, programme: { programme_administrator_ids: ids } }
 
     assert_redirected_to prog
 
@@ -765,7 +765,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_difference('AssetLink.discussion.count') do
       assert_difference('Programme.count') do
         post :create, params: { programme: { title: 'test',
-                                             administrator_ids: [person.id],
+                                             programme_administrator_ids: [person.id],
                                          discussion_links_attributes: [{url: "http://www.slack.com/"}]}}
       end
     end
@@ -785,9 +785,9 @@ class ProgrammesControllerTest < ActionController::TestCase
 
   test 'should update node with discussion link' do
     person = Factory(:admin)
-    programme = Factory(:programme)
-    programme.administrator_ids = [person.id]
     login_as(person)
+    programme = Factory(:programme)
+    programme.programme_administrator_ids = [person.id]
     assert_nil programme.discussion_links.first
     assert_difference('AssetLink.discussion.count') do
       # assert_difference('ActivityLog.count') do
@@ -803,7 +803,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     login_as(person)
     asset_link = Factory(:discussion_link)
     programme = Factory(:programme)
-    programme.administrator_ids = [person.id]
+    programme.programme_administrator_ids = [person.id]
     programme.discussion_links = [asset_link]
     assert_difference('AssetLink.discussion.count', -1) do
       put :update, params: { id: programme.id, programme: { discussion_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
@@ -816,7 +816,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     person = Factory(:admin)
     login_as(person)
     programme = Factory(:programme)
-    programme.administrator_ids = [person.id]
+    programme.programme_administrator_ids = [person.id]
     programme.save!
     with_config_value :programmes_open_for_projects_enabled, false do
       get :new
