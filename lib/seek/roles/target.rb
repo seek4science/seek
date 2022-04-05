@@ -30,11 +30,11 @@ module Seek
       end
 
       def has_role?(key)
-        roles.where(role_type_id: RoleType.find_by_key!(key)).any?
+        roles.with_role_key(key).any?
       end
 
       def has_role_in?(key, scope)
-        scoped_roles(scope).with_role_key(key).exists?
+        scoped_roles(scope).with_role_key(key).any?
       end
 
       def assign_or_remove_roles(key, flag_and_items)
@@ -42,31 +42,23 @@ module Seek
         flag = flag_and_items[0]
         items = flag_and_items[1]
         if flag
-          add_role(key, items: items)
+          assign_role(key, items)
         else
-          remove_role(key, items: items)
+          unassign_role(key, items)
         end
       end
 
-      def assign_role(key, scope = nil)
-        return if has_role_in?(key, scope)
-        role = scoped_roles(scope).with_role_key(key).build
-        role
-      end
-
-      def unassign_role(key, scope = nil)
-        scoped_roles(scope).with_role_key(key).destroy_all
-      end
-
-      def add_role(key, items: nil)
+      def assign_role(key, scopes = nil)
         # Can't use Array(items) here because it turns `nil` into `[]` instead of `[nil]`
-        items = [items] unless items.respond_to?(:each)
-        items.map { |item| assign_role(key, item)&.save }
+        scopes = [scopes] unless scopes.respond_to?(:each)
+        scopes.map do |scope|
+          next if has_role_in?(key, scope)
+          scoped_roles(scope).with_role_key(key).build&.save
+        end
       end
 
-      def remove_role(key, items: nil)
-        items = [items] unless items.respond_to?(:each)
-        items.map { |item| unassign_role(key, item) }
+      def unassign_role(key, scopes = nil)
+        scoped_roles(scopes).with_role_key(key).destroy_all
       end
 
       # called as callback after save, to make sure the role project records are aligned with the current projects, deleting

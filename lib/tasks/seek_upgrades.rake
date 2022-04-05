@@ -20,6 +20,7 @@ namespace :seek do
     remove_orphaned_versions
     create_seek_sample_multi
     rename_seek_sample_attribute_types
+    seek:rebuild_workflow_internals
 
     update_thesis_related_publication_types
     convert_roles
@@ -179,7 +180,6 @@ namespace :seek do
     end
   end
 
-
   task(update_thesis_related_publication_types: [:environment]) do
     puts 'Updating publication types ...'
 
@@ -206,33 +206,12 @@ namespace :seek do
 
   task(convert_roles: [:environment]) do
     puts 'Converting roles...'
-    system_roles = {
-      1 => { key: 'admin' }
-    }
-
-    project_roles = {
-      2 => { key: 'pal'},
-      4 => { key: 'project_administrator'},
-      8 => { key: 'asset_housekeeper'},
-      16 => { key: 'asset_gatekeeper' }
-    }
-
-    programme_roles = {
-      32 => { key: 'programme_administrator' }
-    }
-
-    # Load role types for each key
-    [system_roles, project_roles, programme_roles].each do |set|
-      set.each do |k, v|
-        set[k] = v.merge(role_type: RoleType.find_by_key!(v[:key]))
-      end
-    end
-
     disable_authorization_checks do
       Person.find_each do |person|
-        system_roles.each do |mask, data|
+        RoleType.for_system.each do |rt|
+          mask = rt.id
           if person.roles_mask & mask == mask
-            Role.where(role_type_id: data[:role_type].id, person_id: person.id, scope: nil).first_or_create!
+            Role.where(role_type_id: rt.id, person_id: person.id, scope: nil).first_or_create!
           end
         end
       end
@@ -240,9 +219,10 @@ namespace :seek do
       class AdminDefinedRoleProject < ActiveRecord::Base; end
 
       AdminDefinedRoleProject.find_each do |role|
-        project_roles.each do |mask, data|
+        RoleType.for_projects.each do |rt|
+          mask = rt.id
           if role.role_mask & mask == mask
-            Role.where(role_type_id: data[:role_type].id, person_id: role.person_id,
+            Role.where(role_type_id: rt.id, person_id: role.person_id,
                        scope_type: 'Project', scope_id: role.project_id).first_or_create!
           end
         end
@@ -251,9 +231,10 @@ namespace :seek do
       class AdminDefinedRoleProgramme < ActiveRecord::Base; end
 
       AdminDefinedRoleProgramme.find_each do |role|
-        programme_roles.each do |mask, data|
+        RoleType.for_programmes.each do |rt|
+          mask = rt.id
           if role.role_mask & mask == mask
-            Role.where(role_type_id: data[:role_type].id, person_id: role.person_id,
+            Role.where(role_type_id: rt.id, person_id: role.person_id,
                        scope_type: 'Programme', scope_id: role.programme_id).first_or_create!
           end
         end

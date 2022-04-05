@@ -44,7 +44,7 @@ class RoleTest < ActiveSupport::TestCase
     refute person.is_project_administrator_of_any_project?, 'should no longer be a project administrator at all'
   end
 
-  test 'remove_role' do
+  test 'unassign_role' do
     person = Factory(:programme_administrator)
     project = person.projects.first
     person.is_asset_gatekeeper = true, project
@@ -60,7 +60,7 @@ class RoleTest < ActiveSupport::TestCase
     assert person.is_pal?(project)
     assert person.is_admin?
 
-    person.remove_role('project_administrator', items: [project])
+    person.unassign_role('project_administrator', project)
 
     assert person.is_programme_administrator?(person.programmes.first)
     refute person.is_project_administrator?(project)
@@ -68,7 +68,7 @@ class RoleTest < ActiveSupport::TestCase
     assert person.is_pal?(project)
     assert person.is_admin?
 
-    person.remove_role('asset_gatekeeper', items: [project])
+    person.unassign_role('asset_gatekeeper', [project])
 
     assert person.is_programme_administrator?(person.programmes.first)
     refute person.is_project_administrator?(project)
@@ -76,7 +76,7 @@ class RoleTest < ActiveSupport::TestCase
     assert person.is_pal?(project)
     assert person.is_admin?
 
-    person.remove_role('pal', items: [project])
+    person.unassign_role('pal', [project])
 
     assert person.is_programme_administrator?(person.programmes.first)
     refute person.is_project_administrator?(project)
@@ -84,7 +84,7 @@ class RoleTest < ActiveSupport::TestCase
     refute person.is_pal?(project)
     assert person.is_admin?
 
-    person.remove_role('programme_administrator', items: person.programmes)
+    person.unassign_role('programme_administrator', person.programmes)
 
     refute person.is_programme_administrator_of_any_programme?
     refute person.is_programme_administrator?(person.programmes.first)
@@ -93,7 +93,7 @@ class RoleTest < ActiveSupport::TestCase
     refute person.is_pal?(project)
     assert person.is_admin?
 
-    person.remove_role('admin')
+    person.unassign_role('admin')
 
     refute person.is_programme_administrator?(person.programmes.first)
     refute person.is_project_administrator?(project)
@@ -110,14 +110,14 @@ class RoleTest < ActiveSupport::TestCase
     refute person.is_asset_gatekeeper?(project)
     refute person.is_admin?
 
-    person.remove_role(:asset_gatekeeper, items: [])
+    person.unassign_role(:asset_gatekeeper, [])
 
     assert person.is_programme_administrator?(person.programmes.first)
     assert person.is_pal?(project)
     refute person.is_asset_gatekeeper?(project)
     refute person.is_admin?
 
-    person.remove_role('admin', items: [])
+    person.unassign_role('admin', [])
 
     assert person.is_programme_administrator?(person.programmes.first)
     assert person.is_pal?(project)
@@ -138,7 +138,7 @@ class RoleTest < ActiveSupport::TestCase
     assert person.is_programme_administrator?(programme2)
 
     assert_difference('Role.count', -1) do
-      person.remove_role('programme_administrator', items: programme1)
+      person.unassign_role('programme_administrator', programme1)
     end
 
     assert person.is_programme_administrator_of_any_programme?
@@ -146,14 +146,14 @@ class RoleTest < ActiveSupport::TestCase
     assert person.is_programme_administrator?(programme2)
 
     assert_difference('Role.count', -1) do
-      person.remove_role('programme_administrator', items: programme2)
+      person.unassign_role('programme_administrator', programme2)
     end
 
     refute person.is_programme_administrator_of_any_programme?
     refute person.is_programme_administrator?(programme1)
     refute person.is_programme_administrator?(programme2)
     assert_no_difference('Role.count') do
-      person.remove_role('programme_administrator', items: programme2)
+      person.unassign_role('programme_administrator', programme2)
     end
 
     refute person.is_programme_administrator_of_any_programme?
@@ -254,8 +254,8 @@ class RoleTest < ActiveSupport::TestCase
       project = person.projects.first
       assert_equal ['admin'], person.role_names
       assert person.can_manage?
-      person.add_role('admin')
-      person.add_role('pal', items: project)
+      person.assign_role('admin')
+      person.assign_role('pal', project)
       person.save!
       person.reload
       assert_equal ['pal'].sort, person.scoped_roles(project).sort.map(&:key)

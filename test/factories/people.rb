@@ -70,39 +70,39 @@ end
 
 Factory.define(:pal, parent: :person) do |f|
   f.after_create do |p|
-    p.assign_role(:pal, p.group_memberships.first.project).save!
+    p.is_pal = true, p.group_memberships.first.project
   end
 end
 
 Factory.define(:asset_housekeeper, parent: :person) do |f|
   f.after_create do |p|
-    p.assign_role(:asset_housekeeper, p.group_memberships.first.project).save!
+    p.is_asset_housekeeper = true, p.group_memberships.first.project
   end
 end
 
 Factory.define(:project_administrator, parent: :person) do |f|
   f.after_create do |p|
-    p.assign_role(:project_administrator, p.group_memberships.first.project).save!
+    p.is_project_administrator = true, p.group_memberships.first.project
   end
 end
 
 Factory.define(:programme_administrator_not_in_project, parent: :person_not_in_project) do |f|
   f.after_create do |p|
     programme = Factory(:programme)
-    p.assign_role(:programme_administrator, programme).save!
+    p.is_programme_administrator = true, programme
   end
 end
 
 Factory.define(:programme_administrator, parent: :person) do |f|
   f.after_create do |p|
     programme = Factory(:programme, projects: [p.group_memberships.first.project])
-    p.assign_role(:programme_administrator, programme).save!
+    p.is_programme_administrator = true, programme
   end
 end
 
 Factory.define(:asset_gatekeeper, parent: :person) do |f|
   f.after_create do |p|
-    p.assign_role(:asset_gatekeeper, p.group_memberships.first.project).save!
+    p.is_asset_gatekeeper = true, p.group_memberships.first.project
   end
 end
 
