@@ -20,6 +20,10 @@ class RoleType
     I18n.t(key)
   end
 
+  def self.all
+    data.values
+  end
+
   def self.for_system
     data.select { |k, v| v.scope.nil? }.values
   end
@@ -52,6 +56,12 @@ class RoleType
     @data
   end
 
+  def self.by_id
+    return @data_by_id if @data_by_id
+    load_data
+    @data_by_id
+  end
+
   def self.load_data
     @data = {}
     @data_by_id = {}
@@ -59,11 +69,5 @@ class RoleType
       @data[k.to_sym] = rt
       @data_by_id[rt.id.to_i] = rt
     end
-  end
-
-  def self.by_id
-    return @data_by_id if @data_by_id
-    load_data
-    @data_by_id
   end
 end

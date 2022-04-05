@@ -927,4 +927,35 @@ class RoleTest < ActiveSupport::TestCase
       assert person.roles.last.errors.added?(:base, 'You are not authorized to grant roles in this Programme')
     end
   end
+
+  test 'role type count' do
+    assert RoleType.all.count > 0
+    assert RoleType.for_system.count > 0
+    assert RoleType.for_projects.count > 0
+    assert RoleType.for_programmes.count > 0
+  end
+
+  test 'fetching role types' do
+    assert RoleType.find_by_key('admin')
+    assert RoleType.find_by_key(:admin)
+    assert_nil RoleType.find_by_key('badmin')
+    assert RoleType.find_by_key!('admin')
+    assert RoleType.find_by_key!(:admin)
+    assert_raises(Seek::Roles::UnknownRoleException) do
+      assert_nil RoleType.find_by_key!('hello')
+    end
+
+    assert_equal 'admin', RoleType.find_by_id(1).key
+    assert_equal 'pal', RoleType.find_by_id(2).key
+    assert_equal 'project_administrator', RoleType.find_by_id(4).key
+    assert_equal 'asset_housekeeper', RoleType.find_by_id(8).key
+    assert_equal 'asset_gatekeeper', RoleType.find_by_id(16).key
+    assert_equal 'programme_administrator', RoleType.find_by_id(32).key
+    assert_nil RoleType.find_by_id(3)
+  end
+
+  test 'role type title' do
+    assert_equal 'Project administrator', RoleType.find_by_key('project_administrator').title
+    assert_equal 'Asset gatekeeper', RoleType.find_by_key('asset_gatekeeper').title
+  end
 end

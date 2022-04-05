@@ -12,8 +12,7 @@ module Seek
 
       class_methods do
         def with_role(key)
-          role_type = RoleType.find_by_key!(key)
-          joins(:roles).where(roles: { role_type_id: role_type.id }).distinct
+          joins(:roles).where(roles: { role_type_id: RoleType.find_by_key!(key) }).distinct
         end
       end
 
@@ -21,16 +20,20 @@ module Seek
         roles.select(:role_type_id).distinct.map(&:key)
       end
 
+      # Scope can be a single object or array/collection of objects (of the same type).
+      # Can also be nil to fetch system roles.
       def scoped_roles(scope)
-        roles.where(scope_id: scope&.id, scope_type: scope&.class&.name)
+        scope_type = nil
+        scope_type = scope.model_name.to_str if scope.respond_to?(:model_name)
+        scope_type = scope.first.model_name.to_str if scope.respond_to?(:first)
+        roles.where(scope_id: scope, scope_type: scope_type)
       end
 
       def has_role?(key)
-        role_type = RoleType.find_by_key!(key)
-        roles.where(role_type_id: role_type.id).any?
+        roles.where(role_type_id: RoleType.find_by_key!(key)).any?
       end
 
-      def check_for_role(key, scope)
+      def has_role_in?(key, scope)
         scoped_roles(scope).with_role_key(key).exists?
       end
 
@@ -46,7 +49,7 @@ module Seek
       end
 
       def assign_role(key, scope = nil)
-        return if check_for_role(key, scope)
+        return if has_role_in?(key, scope)
         role = scoped_roles(scope).with_role_key(key).build
         role
       end

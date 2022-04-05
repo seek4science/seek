@@ -224,9 +224,7 @@ namespace :seek do
     # Load role types for each key
     [system_roles, project_roles, programme_roles].each do |set|
       set.each do |k, v|
-        role_type = RoleType.find_by_key(v[:key])
-        raise "Couldn't find #{key} RoleType!" unless role_type
-        set[k] = v.merge(role_type: role_type)
+        set[k] = v.merge(role_type: RoleType.find_by_key!(v[:key]))
       end
     end
 

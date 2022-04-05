@@ -116,8 +116,6 @@ class ProgrammesController < ApplicationController
     end
   end
 
-
-
   private
 
   #whether the item needs or can be activated, which affects steps around activation of rejection
@@ -131,7 +129,7 @@ class ProgrammesController < ApplicationController
   #is the item inactive, and if so can the current person view it
   def inactive_view_allowed?
     return true if @programme.is_activated? || User.admin_logged_in?
-    result=(User.logged_in_and_registered? && current_person.check_for_role(:programme_administrator, @programme))
+    result=(User.logged_in_and_registered? && current_person.is_programme_administrator?(@programme))
     unless result
       error("This #{t('programme').downcase} is not activated and cannot be viewed", "cannot view (not activated)", :forbidden)
     end

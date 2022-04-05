@@ -13,8 +13,7 @@ class Role < ApplicationRecord
   after_commit :queue_update_auth_table
 
   def self.with_role_key(key)
-    role_type = RoleType.find_by_key!(key)
-    where(role_type_id: role_type)
+    where(role_type_id: RoleType.find_by_key!(key))
   end
 
   def role_type
