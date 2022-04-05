@@ -1,5 +1,7 @@
+<% environment.context_class.instance_eval { include Seek::Util.routes } %>
+
 var OpenBis = {
-    showDatasetFilesPath: "<%= Seek::Util.routes.show_dataset_files_openbis_endpoint_openbis_dataset_path('-endpoint_id-', '-dataset_id-') %>",
+    showDatasetFilesPath: "<%= show_dataset_files_openbis_endpoint_openbis_dataset_path('-endpoint_id-', '-dataset_id-') %>",
     showBrowseWaitingMessage: function () {
         $j('#openbis-datasets #contents').html($j('#waiting-for-items').clone().show());
     },
