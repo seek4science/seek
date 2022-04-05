@@ -312,11 +312,13 @@ class RoleTest < ActiveSupport::TestCase
     project = person.projects.first
     assert_equal [], person.scoped_roles(project).map(&:key)
     User.with_current_user person.user do
-      person.is_asset_housekeeper = true, project
-      person.is_pal = true, project
       assert person.can_edit?
-      refute person.save
-      refute person.errors.empty?
+      assert_no_difference('Role.count') do
+        person.is_asset_housekeeper = true, project
+        person.is_pal = true, project
+      end
+      refute person.valid?
+      refute person.roles.all? { |r| r.errors.empty? }
       person.reload
       assert_equal [], person.scoped_roles(project).map(&:key)
     end
@@ -774,5 +776,155 @@ class RoleTest < ActiveSupport::TestCase
     role.scope = programme
     role.valid?
     assert role.valid?
+  end
+
+  test 'admins can grant admin roles' do
+    person = Factory(:person)
+    role_granter = Factory(:admin)
+    User.with_current_user(role_granter.user) do
+      assert_difference('Role.count', 1) do
+        person.is_admin = true
+      end
+    end
+  end
+
+  test 'non-admins cannot grant admin roles' do
+    person = Factory(:person)
+    role_granter = Factory(:person)
+    User.with_current_user(role_granter.user) do
+      assert_no_difference('Role.count') do
+        person.is_admin = true
+      end
+      assert person.roles.last.errors.added?(:base, 'You are not authorized to grant system roles')
+    end
+  end
+
+  test 'project admins can grant project roles' do
+    person = Factory(:person)
+    role_granter = Factory(:project_administrator, project: person.projects.first)
+    User.with_current_user(role_granter.user) do
+      assert_difference('Role.count', 1) do
+        person.is_project_administrator = true, role_granter.projects.first
+      end
+    end
+  end
+
+  test 'project admins cannot grant project roles to people not in the project' do
+    person = Factory(:person)
+    role_granter = Factory(:project_administrator)
+    User.with_current_user(role_granter.user) do
+      assert_no_difference('Role.count') do
+        person.is_project_administrator = true, role_granter.projects.first
+      end
+      assert person.roles.last.errors.added?(:person, 'does not belong to this Project')
+    end
+  end
+
+  test 'system admins cannot grant project roles to people not in the project' do
+    person = Factory(:person)
+    role_granter = Factory(:admin)
+    User.with_current_user(role_granter.user) do
+      assert_no_difference('Role.count') do
+        person.is_project_administrator = true, role_granter.projects.first
+      end
+      assert person.roles.last.errors.added?(:person, 'does not belong to this Project')
+    end
+  end
+
+  test 'project admins cannot grant non-project roles' do
+    person = Factory(:person)
+    role_granter = Factory(:project_administrator, project: person.projects.first)
+    User.with_current_user(role_granter.user) do
+      assert_no_difference('Role.count') do
+        person.is_admin = true
+      end
+      assert person.roles.last.errors.added?(:base, 'You are not authorized to grant system roles')
+    end
+  end
+
+  test 'non-project admins cannot grant project roles' do
+    person = Factory(:person)
+    role_granter = Factory(:person, project: person.projects.first)
+    User.with_current_user(role_granter.user) do
+      assert_no_difference('Role.count') do
+        person.is_project_administrator = true, role_granter.projects.first
+      end
+      assert person.roles.last.errors.added?(:base, 'You are not authorized to grant roles in this Project')
+    end
+  end
+
+  test 'project admins cannot grant project roles to projects they are not a member of' do
+    person = Factory(:person)
+    role_granter = Factory(:project_administrator, project: person.projects.first)
+    User.with_current_user(role_granter.user) do
+      assert_no_difference('Role.count') do
+        person.is_project_administrator = true, Factory(:project)
+      end
+      assert person.roles.last.errors.added?(:base, 'You are not authorized to grant roles in this Project')
+    end
+  end
+
+  test 'programme admins can grant programme roles' do
+    programme = Factory(:programme)
+    project = Factory(:project, programme: programme)
+    person = Factory(:person, project: project)
+    role_granter = Factory(:programme_administrator, project: project)
+    User.with_current_user(role_granter.user) do
+      assert_difference('Role.count', 1) do
+        person.is_programme_administrator = true, role_granter.programmes.first
+      end
+    end
+  end
+
+  test 'programme admins CAN grant programme roles to people not in the programme' do
+    programme = Factory(:programme)
+    project = Factory(:project, programme: programme)
+    person = Factory(:person)
+    role_granter = Factory(:programme_administrator, project: project)
+    refute_includes programme.people, person
+    User.with_current_user(role_granter.user) do
+      assert_difference('Role.count', 1) do
+        person.is_programme_administrator = true, role_granter.programmes.first
+      end
+    end
+  end
+
+  test 'programme admins cannot grant non-programme roles' do
+    programme = Factory(:programme)
+    project = Factory(:project, programme: programme)
+    person = Factory(:person, project: project)
+    role_granter = Factory(:programme_administrator, project: project)
+    User.with_current_user(role_granter.user) do
+      assert_no_difference('Role.count') do
+        person.is_admin = true
+      end
+      assert person.roles.last.errors.added?(:base, 'You are not authorized to grant system roles')
+    end
+  end
+
+  test 'non-programme admins cannot grant programme roles' do
+    programme = Factory(:programme)
+    project = Factory(:project, programme: programme)
+    person = Factory(:person, project: project)
+    role_granter = Factory(:person, project: project)
+    User.with_current_user(role_granter.user) do
+      assert_no_difference('Role.count') do
+        person.is_programme_administrator = true, role_granter.programmes.first
+      end
+      assert person.roles.last.errors.added?(:base, 'You are not authorized to grant roles in this Programme')
+    end
+  end
+
+  test 'programme admins cannot grant programme roles to programmes they are not a member of' do
+    programme = Factory(:programme)
+    project = Factory(:project, programme: programme)
+    person = Factory(:person, project: project)
+    role_granter = Factory(:programme_administrator, project: project)
+    User.with_current_user(role_granter.user) do
+      assert_no_difference('Role.count') do
+        person.is_programme_administrator = true, Factory(:programme)
+      end
+      assert person.roles.last.errors.added?(:base, 'You are not authorized to grant roles in this Programme')
+    end
   end
 end

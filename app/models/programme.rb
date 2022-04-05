@@ -2,8 +2,6 @@ class Programme < ApplicationRecord
   include Seek::Annotatable
   include Seek::Roles::Scope
 
-  attr_accessor :administrator_ids
-
   if Seek::Config.solr_enabled
     searchable(auto_index: false) do
       text :funding_details
@@ -42,7 +40,6 @@ class Programme < ApplicationRecord
 
   validates :web_page, url: { allow_nil: true, allow_blank: true }
 
-  after_save :handle_administrator_ids, if: -> { @administrator_ids }
   before_create :activate_on_create
 
   # scopes
@@ -120,21 +117,6 @@ class Programme < ApplicationRecord
   end
 
   private
-
-  # set the administrators, assigned from the params to :adminstrator_ids
-  def handle_administrator_ids
-    new_administrators = Person.find(administrator_ids)
-    to_add = new_administrators - programme_administrators
-    to_remove = programme_administrators - new_administrators
-    to_add.each do |person|
-      person.is_programme_administrator = true, self
-      disable_authorization_checks { person.save! }
-    end
-    to_remove.each do |person|
-      person.is_programme_administrator = false, self
-      disable_authorization_checks { person.save! }
-    end
-  end
 
   # callback, activates if current user is an admin or nil, otherwise it needs activating
   def activate_on_create

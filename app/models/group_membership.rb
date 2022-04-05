@@ -58,8 +58,7 @@ class GroupMembership < ApplicationRecord
     wg = WorkGroup.find_by_id(work_group_id)
     return unless wg
     project = Project.find_by_id(wg.project_id)
-    person = Person.find_by_id(person_id)
-    person.remove_dangling_project_roles if project && person
+    person.remove_dangling_project_roles if project && person.persisted?
   end
 
   def destroy_empty_work_group

@@ -20,6 +20,18 @@ class RoleType
     I18n.t(key)
   end
 
+  def self.for_system
+    data.select { |k, v| v.scope.nil? }.values
+  end
+
+  def self.for_projects
+    data.select { |k, v| v.scope == 'Project' }.values
+  end
+
+  def self.for_programmes
+    data.select { |k, v| v.scope == 'Programme' }.values
+  end
+
   def self.find_by_key(key)
     data[key.to_sym]
   end

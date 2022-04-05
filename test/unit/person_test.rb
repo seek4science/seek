@@ -271,8 +271,8 @@ class PersonTest < ActiveSupport::TestCase
     person = Factory :admin
     assert person.only_first_admin_person?
 
-    person.is_admin = false
     disable_authorization_checks { person.save! }
+    person.is_admin = false
     refute person.only_first_admin_person?
     person.is_admin = true
     disable_authorization_checks { person.save! }
@@ -1369,7 +1369,7 @@ class PersonTest < ActiveSupport::TestCase
 
     project2 = Factory(:project)
     person.add_to_project_and_institution(project2,Factory(:institution))
-    person.is_project_administrator = true, project2
+    disable_authorization_checks { person.is_project_administrator = true, project2 }
     assert person.is_project_administrator?(project2)
     project3 = Factory(:project)
     person.add_to_project_and_institution(project3,Factory(:institution))

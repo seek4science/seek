@@ -11,7 +11,8 @@ class Person < ApplicationRecord
 
   acts_as_yellow_pages
 
-  before_save :first_person_admin_and_add_to_default_project
+  before_save :first_person_add_to_default_project
+  after_save :first_person_admin
 
   acts_as_notifiee
 
@@ -390,12 +391,21 @@ class Person < ApplicationRecord
   private
 
   # a before_save trigger, that checks if the person is the first one created, and if so defines it as admin
-  def first_person_admin_and_add_to_default_project
+  def first_person_add_to_default_project
     if Person.count.zero?
-      self.is_admin = true
-      project = Project.first
-      if project && project.institutions.any?
-        add_to_project_and_institution(project, project.institutions.first)
+      disable_authorization_checks do
+        project = Project.first
+        if project && project.institutions.any?
+          add_to_project_and_institution(project, project.institutions.first)
+        end
+      end
+    end
+  end
+
+  def first_person_admin
+    if Person.count == 1 && Person.first == self && !is_admin?
+      disable_authorization_checks do
+        self.is_admin = true
       end
     end
   end

@@ -3,7 +3,7 @@ module Seek
     module Scope
       extend ActiveSupport::Concern
       included do
-        has_many :roles, as: :scope, dependent: :destroy
+        has_many :roles, as: :scope, dependent: :destroy, inverse_of: :scope
         has_many :people_with_roles, through: :roles, source: :person, class_name: 'Person'
       end
 

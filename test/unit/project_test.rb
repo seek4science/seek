@@ -290,145 +290,145 @@ class ProjectTest < ActiveSupport::TestCase
   end
 
   test 'update with attributes for project_administrator_ids ids' do
-    person = Factory(:person)
-    another_person = Factory(:person)
+    disable_authorization_checks do
+      person = Factory(:person)
+      another_person = Factory(:person)
 
-    project = person.projects.first
-    refute_nil project
+      project = person.projects.first
+      refute_nil project
 
-    another_person.add_to_project_and_institution(project, Factory(:institution))
-    another_person.save!
+      another_person.add_to_project_and_institution(project, Factory(:institution))
+      another_person.save!
 
-    refute_includes project.project_administrators, person
-    refute_includes project.project_administrators, another_person
+      refute_includes project.project_administrators, person
+      refute_includes project.project_administrators, another_person
 
-    assert project.update(project_administrator_ids: [person.id.to_s])
+      assert project.update(project_administrator_ids: [person.id.to_s])
 
-    assert_includes project.project_administrators, person
-    refute_includes project.project_administrators, another_person
+      assert_includes project.project_administrators, person
+      refute_includes project.project_administrators, another_person
 
-    assert project.update(project_administrator_ids: [another_person.id.to_s])
+      assert project.update(project_administrator_ids: [another_person.id.to_s])
 
-    refute_includes project.project_administrators, person
-    assert_includes project.project_administrators, another_person
+      refute_includes project.project_administrators, person
+      assert_includes project.project_administrators, another_person
 
-    # cannot change to a person from another project
-    person_in_other_project = Factory(:person)
-    refute project.update(project_administrator_ids: [person_in_other_project.id.to_s])
-    refute_includes project.project_administrators, person_in_other_project
-
-    # Update should fail when adding bad roles, so previous people should remain
-    refute_includes project.project_administrators, person
-    assert_includes project.project_administrators, another_person
+      # cannot change to a person from another project
+      person_in_other_project = Factory(:person)
+      assert_raise(ActiveRecord::RecordInvalid) do
+        project.update(project_administrator_ids: [person_in_other_project.id.to_s])
+      end
+      refute_includes project.project_administrators, person_in_other_project
+    end
   end
 
   test 'update with attributes for gatekeeper ids' do
-    person = Factory(:person)
-    another_person = Factory(:person)
+    disable_authorization_checks do
+      person = Factory(:person)
+      another_person = Factory(:person)
 
-    project = person.projects.first
-    refute_nil project
+      project = person.projects.first
+      refute_nil project
 
-    another_person.add_to_project_and_institution(project, Factory(:institution))
-    another_person.save!
+      another_person.add_to_project_and_institution(project, Factory(:institution))
+      another_person.save!
 
-    refute_includes project.asset_gatekeepers, person
-    refute_includes project.asset_gatekeepers, another_person
+      refute_includes project.asset_gatekeepers, person
+      refute_includes project.asset_gatekeepers, another_person
 
-    assert project.update(asset_gatekeeper_ids: [person.id.to_s])
+      assert project.update(asset_gatekeeper_ids: [person.id.to_s])
 
-    assert_includes project.asset_gatekeepers, person
-    refute_includes project.asset_gatekeepers, another_person
+      assert_includes project.asset_gatekeepers, person
+      refute_includes project.asset_gatekeepers, another_person
 
-    assert project.update(asset_gatekeeper_ids: [another_person.id.to_s])
+      assert project.update(asset_gatekeeper_ids: [another_person.id.to_s])
 
-    refute_includes project.asset_gatekeepers, person
-    assert_includes project.asset_gatekeepers, another_person
+      refute_includes project.asset_gatekeepers, person
+      assert_includes project.asset_gatekeepers, another_person
 
-    # 2 at once
-    assert project.update(asset_gatekeeper_ids: [person.id.to_s, another_person.id.to_s])
-    assert_includes project.asset_gatekeepers, person
-    assert_includes project.asset_gatekeepers, another_person
+      # 2 at once
+      assert project.update(asset_gatekeeper_ids: [person.id.to_s, another_person.id.to_s])
+      assert_includes project.asset_gatekeepers, person
+      assert_includes project.asset_gatekeepers, another_person
 
-    # cannot change to a person from another project
-    person_in_other_project = Factory(:person)
-    refute project.update(asset_gatekeeper_ids: [person_in_other_project.id.to_s])
-    refute_includes project.asset_gatekeepers, person_in_other_project
-
-    # Update should fail when adding bad roles, so previous people should remain
-    assert_includes project.asset_gatekeepers, person
-    assert_includes project.asset_gatekeepers, another_person
+      # cannot change to a person from another project
+      person_in_other_project = Factory(:person)
+      assert_raise(ActiveRecord::RecordInvalid) do
+        project.update(asset_gatekeeper_ids: [person_in_other_project.id.to_s])
+      end
+      refute_includes project.asset_gatekeepers, person_in_other_project
+    end
   end
 
   test 'update with attributes for pal ids' do
-    person = Factory(:person)
-    another_person = Factory(:person)
+    disable_authorization_checks do
+      person = Factory(:person)
+      another_person = Factory(:person)
 
-    project = person.projects.first
-    refute_nil project
+      project = person.projects.first
+      refute_nil project
 
-    another_person.add_to_project_and_institution(project, Factory(:institution))
-    another_person.save!
+      another_person.add_to_project_and_institution(project, Factory(:institution))
+      another_person.save!
 
-    refute_includes project.pals, person
-    refute_includes project.pals, another_person
+      refute_includes project.pals, person
+      refute_includes project.pals, another_person
 
-    assert project.update(pal_ids: [person.id.to_s])
+      assert project.update(pal_ids: [person.id.to_s])
 
-    assert_includes project.pals, person
-    refute_includes project.pals, another_person
+      assert_includes project.pals, person
+      refute_includes project.pals, another_person
 
-    assert project.update(pal_ids: [another_person.id.to_s])
+      assert project.update(pal_ids: [another_person.id.to_s])
 
-    refute_includes project.pals, person
-    assert_includes project.pals, another_person
+      refute_includes project.pals, person
+      assert_includes project.pals, another_person
 
-    # cannot change to a person from another project
-    person_in_other_project = Factory(:person)
-    refute project.update(pal_ids: [person_in_other_project.id.to_s])
-    refute_includes project.pals, person_in_other_project
-
-    # Update should fail when adding bad roles, so previous people should remain
-    refute_includes project.pals, person
-    assert_includes project.pals, another_person
+      # cannot change to a person from another project
+      person_in_other_project = Factory(:person)
+      assert_raise(ActiveRecord::RecordInvalid) do
+        project.update(pal_ids: [person_in_other_project.id.to_s])
+      end
+      refute_includes project.pals, person_in_other_project
+    end
   end
 
   test 'update with attributes for asset housekeeper ids' do
-    person = Factory(:person)
-    another_person = Factory(:person)
+    disable_authorization_checks do
+      person = Factory(:person)
+      another_person = Factory(:person)
 
-    project = person.projects.first
-    refute_nil project
+      project = person.projects.first
+      refute_nil project
 
-    another_person.add_to_project_and_institution(project, Factory(:institution))
-    another_person.save!
+      another_person.add_to_project_and_institution(project, Factory(:institution))
+      another_person.save!
 
-    refute_includes project.asset_housekeepers, person
-    refute_includes project.asset_housekeepers, another_person
+      refute_includes project.asset_housekeepers, person
+      refute_includes project.asset_housekeepers, another_person
 
-    assert project.update(asset_housekeeper_ids: [person.id.to_s])
+      assert project.update(asset_housekeeper_ids: [person.id.to_s])
 
-    assert_includes project.asset_housekeepers, person
-    refute_includes project.asset_housekeepers, another_person
+      assert_includes project.asset_housekeepers, person
+      refute_includes project.asset_housekeepers, another_person
 
-    assert project.update(asset_housekeeper_ids: [another_person.id.to_s])
+      assert project.update(asset_housekeeper_ids: [another_person.id.to_s])
 
-    refute_includes project.asset_housekeepers, person
-    assert_includes project.asset_housekeepers, another_person
+      refute_includes project.asset_housekeepers, person
+      assert_includes project.asset_housekeepers, another_person
 
-    # 2 at once
-    assert project.update(asset_housekeeper_ids: [person.id.to_s, another_person.id.to_s])
-    assert_includes project.asset_housekeepers, person
-    assert_includes project.asset_housekeepers, another_person
+      # 2 at once
+      assert project.update(asset_housekeeper_ids: [person.id.to_s, another_person.id.to_s])
+      assert_includes project.asset_housekeepers, person
+      assert_includes project.asset_housekeepers, another_person
 
-    # cannot change to a person from another project
-    person_in_other_project = Factory(:person)
-    refute project.update(asset_housekeeper_ids: [person_in_other_project.id.to_s])
-    refute_includes project.asset_housekeepers, person_in_other_project
-
-    # Update should fail when adding bad roles, so previous people should remain
-    assert_includes project.asset_housekeepers, person
-    assert_includes project.asset_housekeepers, another_person
+      # cannot change to a person from another project
+      person_in_other_project = Factory(:person)
+      assert_raise(ActiveRecord::RecordInvalid) do
+        project.update(asset_housekeeper_ids: [person_in_other_project.id.to_s])
+      end
+      refute_includes project.asset_housekeepers, person_in_other_project
+    end
   end
 
   def test_update_first_letter
@@ -760,7 +760,7 @@ class ProjectTest < ActiveSupport::TestCase
       pal_ids: [person.id],
       asset_housekeeper_ids: [person.id]
     }
-    project.update(attr)
+    disable_authorization_checks { project.update(attr) }
 
     assert_includes project.project_administrators, person
     assert_includes project.asset_gatekeepers, person

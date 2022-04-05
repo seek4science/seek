@@ -4,10 +4,9 @@ module Seek
       extend ActiveSupport::Concern
 
       included do
-        has_many :roles, dependent: :destroy
+        has_many :roles, dependent: :destroy, inverse_of: :person
         after_save :remove_dangling_project_roles
         after_commit :clear_role_cache
-        enforce_required_access_for_owner :roles, :manage
 
         include Seek::Roles::Accessors
       end
@@ -34,10 +33,6 @@ module Seek
 
       def check_for_role(key, scope)
         has_cached_role?(key, scope) || scoped_roles(scope).with_role_key(key).exists?
-      end
-
-      def is_admin_or_project_administrator?
-        is_admin? || is_project_administrator_of_any_project?
       end
 
       def assign_or_remove_roles(key, flag_and_items)
@@ -77,8 +72,14 @@ module Seek
       # called as callback after save, to make sure the role project records are aligned with the current projects, deleting
       # any for projects that have been removed
       def remove_dangling_project_roles
-        projects = current_group_memberships.collect(&:project)
-        roles.where(scope_type: 'Project').where.not(scope_id: projects).destroy_all
+        roles.where(scope_type: 'Project').where.not(scope_id: current_project_ids).each do |role|
+          unassign_role(role.key, role.scope)
+        end
+      end
+
+      def reload(*args)
+        clear_role_cache
+        super
       end
 
       private
@@ -88,12 +89,14 @@ module Seek
       end
 
       def cache_role(key, scope)
+        key = key.to_sym
         role_cache[scope] ||= Set.new
         role_cache[scope].add(key)
         role_cache[:any][key] = (role_cache[:any][key] || 0) + 1
       end
 
       def uncache_role(key, scope)
+        key = key.to_sym
         role_cache[scope].delete(key) if role_cache[scope]
         if role_cache[:any][key]
           role_cache[:any][key] -= 1
@@ -102,7 +105,7 @@ module Seek
       end
 
       def has_cached_role?(key, scope)
-        role_cache[scope] && role_cache[scope].include?(key)
+        role_cache[scope] && role_cache[scope].include?(key.to_sym)
       end
 
       def clear_role_cache

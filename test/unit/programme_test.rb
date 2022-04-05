@@ -166,36 +166,38 @@ class ProgrammeTest < ActiveSupport::TestCase
   end
 
   test 'assign adminstrator ids' do
-    programme = Factory(:programme)
-    person = Factory(:person)
-    person2 = Factory(:person)
+    disable_authorization_checks do
+      programme = Factory(:programme)
+      person = Factory(:person)
+      person2 = Factory(:person)
 
-    programme.update(administrator_ids: [person.id.to_s])
-    person.reload
-    person2.reload
-    programme.reload
+      programme.update(programme_administrator_ids: [person.id.to_s])
+      person.reload
+      person2.reload
+      programme.reload
 
-    assert person.is_programme_administrator?(programme)
-    refute person2.is_programme_administrator?(programme)
-    assert_equal [person], programme.programme_administrators
+      assert person.is_programme_administrator?(programme)
+      refute person2.is_programme_administrator?(programme)
+      assert_equal [person], programme.programme_administrators
 
-    programme.update(administrator_ids: [person2.id])
-    person.reload
-    person2.reload
-    programme.reload
+      programme.update(programme_administrator_ids: [person2.id])
+      person.reload
+      person2.reload
+      programme.reload
 
-    refute person.is_programme_administrator?(programme)
-    assert person2.is_programme_administrator?(programme)
-    assert_equal [person2], programme.programme_administrators
+      refute person.is_programme_administrator?(programme)
+      assert person2.is_programme_administrator?(programme)
+      assert_equal [person2], programme.programme_administrators
 
-    programme.update(administrator_ids: [person2.id, person.id])
-    person.reload
-    person2.reload
-    programme.reload
+      programme.update(programme_administrator_ids: [person2.id, person.id])
+      person.reload
+      person2.reload
+      programme.reload
 
-    assert person.is_programme_administrator?(programme)
-    assert person2.is_programme_administrator?(programme)
-    assert_equal [person2, person].sort, programme.programme_administrators.sort
+      assert person.is_programme_administrator?(programme)
+      assert person2.is_programme_administrator?(programme)
+      assert_equal [person2, person].sort, programme.programme_administrators.sort
+    end
   end
 
   test 'can create' do

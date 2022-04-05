@@ -1,16 +1,16 @@
 class Role < ApplicationRecord
-  belongs_to :person, required: true
-  belongs_to :scope, polymorphic: true, optional: true
+  belongs_to :person, required: true, inverse_of: :roles
+  belongs_to :scope, polymorphic: true, optional: true, inverse_of: :roles
 
   validates :person_id, uniqueness: { scope: [:role_type_id, :scope_id, :scope_type] }
   validates :role_type, presence: true
+  validate :authorized_to_grant_role
   validate :role_type_matches_scope, if: -> { role_type.present? }
   validate :scope_allows_person, if: -> { scope.present? }
 
   delegate :key, to: :role_type
 
   after_commit :queue_update_auth_table
-  enforce_authorization_on_association :person, :manage
 
   def self.with_role_key(key)
     role_type = RoleType.find_by_key!(key)
@@ -33,13 +33,22 @@ class Role < ApplicationRecord
 
   def role_type_matches_scope
     if scope&.class&.name != role_type.scope
-      errors.add(:role_type, "is not a valid #{scope_title} role.")
+      errors.add(:role_type, "is not a valid #{scope_title} role")
+    end
+  end
+
+  def authorized_to_grant_role
+    return unless authorization_checks_enabled
+    if scope
+      errors.add(:base, "You are not authorized to grant roles in this #{scope_title}") unless scope.can_manage?
+    else
+      errors.add(:base, "You are not authorized to grant #{scope_title.downcase} roles") unless User.admin_logged_in?
     end
   end
 
   def scope_allows_person
     if scope.is_a?(Project) && !scope.people.include?(person)
-      errors.add(:person, "does not belong to this #{scope_title}.")
+      errors.add(:person, "does not belong to this #{scope_title}")
     end
   end
 

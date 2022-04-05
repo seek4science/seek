@@ -31,8 +31,7 @@ class ProgrammesController < ApplicationController
         # current person becomes the programme administrator, unless they are logged in
         # also activation email is sent
         unless User.admin_logged_in?
-          current_person.is_programme_administrator = true, @programme
-          disable_authorization_checks { current_person.save! }
+          disable_authorization_checks { current_person.is_programme_administrator = true, @programme }
           if Seek::Config.email_enabled
             Mailer.programme_activation_required(@programme,current_person).deliver_later
           end
@@ -60,7 +59,7 @@ class ProgrammesController < ApplicationController
   end
 
   def handle_administrators
-    params[:programme][:administrator_ids] = params[:programme][:administrator_ids].split(',')
+    params[:programme][:programme_administrator_ids] = params[:programme][:programme_administrator_ids].split(',')
     prevent_removal_of_self_as_programme_administrator
   end
 
@@ -69,7 +68,7 @@ class ProgrammesController < ApplicationController
     return if User.admin_logged_in?
     return unless @programme
     if current_person.is_programme_administrator?(@programme)
-      params[:programme][:administrator_ids] << current_person.id.to_s
+      params[:programme][:programme_administrator_ids] << current_person.id.to_s
     end
   end
 
@@ -150,10 +149,10 @@ class ProgrammesController < ApplicationController
   end
 
   def programme_params
-    handle_administrators if params[:programme][:administrator_ids] && !(params[:programme][:administrator_ids].is_a? Array)
+    handle_administrators if params[:programme][:programme_administrator_ids] && !(params[:programme][:programme_administrator_ids].is_a? Array)
 
     params.require(:programme).permit(:avatar_id, :description, :first_letter, :title, :uuid, :web_page,
-                                      { project_ids: [] }, :funding_details, { administrator_ids: [] },
+                                      { project_ids: [] }, :funding_details, { programme_administrator_ids: [] },
                                       :activation_rejection_reason, :funding_codes,
                                       :open_for_projects,
                                       discussion_links_attributes:[:id, :url, :label, :_destroy])

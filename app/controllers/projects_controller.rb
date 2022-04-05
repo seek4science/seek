@@ -628,18 +628,16 @@ class ProjectsController < ApplicationController
   private
 
   def project_role_params
-    params[:project].keys.each do |k|
-      unless params[:project][k].nil?
+    permitted_roles = [:project_administrator_ids, :asset_gatekeeper_ids, :asset_housekeeper_ids, :pal_ids]
+    permitted_roles.each do |k|
+      if params[:project][permitted_roles].present?
         params[:project][k] = params[:project][k].split(',')
       else
         params[:project][k] = []
       end
     end
 
-    params.require(:project).permit({ project_administrator_ids: [] },
-                                    { asset_gatekeeper_ids: [] },
-                                    { asset_housekeeper_ids: [] },
-                                    pal_ids: [])
+    params.require(:project).permit(*permitted_roles.map { |r| { r => [] }})
   end
 
   def project_params
@@ -654,8 +652,7 @@ class ProjectsController < ApplicationController
 
     if @project.new_record? || @project.can_manage?(current_user)
       permitted_params += [:use_default_policy, :default_policy, :default_license,
-                           { members: [:person_id, :institution_id] }, { project_administrator_ids: [] },
-                           { asset_gatekeeper_ids: [] }, { asset_housekeeper_ids: [] }, { pal_ids: [] }]
+                           { members: [:person_id, :institution_id] }]
     end
 
     if params[:project][:programme_id].present?
