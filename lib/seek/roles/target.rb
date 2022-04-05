@@ -25,7 +25,7 @@ module Seek
       def scoped_roles(scope)
         scope_type = nil
         scope_type = scope.model_name.to_str if scope.respond_to?(:model_name)
-        scope_type = scope.first.model_name.to_str if scope.respond_to?(:first)
+        scope_type = scope.first.model_name.to_str if scope.respond_to?(:first) && scope.first.respond_to?(:model_name)
         roles.where(scope_id: scope, scope_type: scope_type)
       end
 
