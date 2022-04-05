@@ -408,7 +408,7 @@ module Seek
     # transfers a setting value from the old_name to the new_name setting value, for use when renaming a setting.
     # Creates a new record for the new setting (if set), and cleans up and removes the old record. Ignores any defaults that are set
     def transfer_value(old_name, new_name)
-      if old_value = Settings.global.get(:old_name)
+      if old_value = Settings.global.get(old_name)
         set_value(new_name,old_value)
         Settings.destroy(old_name)
       end
