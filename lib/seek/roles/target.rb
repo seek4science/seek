@@ -6,7 +6,6 @@ module Seek
       included do
         has_many :roles, dependent: :destroy, inverse_of: :person
         after_save :remove_dangling_project_roles
-        after_commit :clear_role_cache
 
         include Seek::Roles::Accessors
       end
@@ -28,11 +27,11 @@ module Seek
 
       def has_role?(key)
         role_type = RoleType.find_by_key!(key)
-        has_cached_role?(key, :any) || roles.where(role_type_id: role_type.id).any?
+        roles.where(role_type_id: role_type.id).any?
       end
 
       def check_for_role(key, scope)
-        has_cached_role?(key, scope) || scoped_roles(scope).with_role_key(key).exists?
+        scoped_roles(scope).with_role_key(key).exists?
       end
 
       def assign_or_remove_roles(key, flag_and_items)
@@ -49,13 +48,11 @@ module Seek
       def assign_role(key, scope = nil)
         return if check_for_role(key, scope)
         role = scoped_roles(scope).with_role_key(key).build
-        cache_role(key, scope) if role.valid?
         role
       end
 
       def unassign_role(key, scope = nil)
         scoped_roles(scope).with_role_key(key).destroy_all
-        uncache_role(key, scope)
       end
 
       def add_role(key, items: nil)
@@ -75,41 +72,6 @@ module Seek
         roles.where(scope_type: 'Project').where.not(scope_id: current_project_ids).each do |role|
           unassign_role(role.key, role.scope)
         end
-      end
-
-      def reload(*args)
-        clear_role_cache
-        super
-      end
-
-      private
-
-      def role_cache
-        @_role_cache ||= { any: {} }
-      end
-
-      def cache_role(key, scope)
-        key = key.to_sym
-        role_cache[scope] ||= Set.new
-        role_cache[scope].add(key)
-        role_cache[:any][key] = (role_cache[:any][key] || 0) + 1
-      end
-
-      def uncache_role(key, scope)
-        key = key.to_sym
-        role_cache[scope].delete(key) if role_cache[scope]
-        if role_cache[:any][key]
-          role_cache[:any][key] -= 1
-          role_cache[:any].delete(key) if role_cache[:any][key]
-        end
-      end
-
-      def has_cached_role?(key, scope)
-        role_cache[scope] && role_cache[scope].include?(key.to_sym)
-      end
-
-      def clear_role_cache
-        @_role_cache = nil
       end
     end
   end
