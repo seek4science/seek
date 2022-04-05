@@ -17,7 +17,7 @@ class WorkflowsController < ApplicationController
   include RoCrateHandling
   include Legacy::WorkflowSupport
 
-  api_actions :index, :show, :create, :update, :destroy, :ro_crate
+  api_actions :index, :show, :create, :update, :destroy, :ro_crate, :create_version
   user_content_actions :diagram
 
   rescue_from ROCrate::ReadException do |e|
