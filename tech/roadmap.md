@@ -29,7 +29,7 @@ They are expected to be added to FAIRDOM-SEEK in roughly the order they are pres
 | API support for creating new versions | Q3 2022 |
 | ISA improvements, with a single page for creating and managing them | 2022 |
 | Deposition to repositories, such as ENA | 2022 |
-| Integration with other file storage systems, e.g. Dropbox, Google Drive, Nextflow | 2022 |
+| Integration with other file storage systems, e.g. Dropbox, Google Drive, Nextcloud | 2022 |
 
 <br/>
 
