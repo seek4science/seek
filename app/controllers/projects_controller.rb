@@ -640,7 +640,7 @@ class ProjectsController < ApplicationController
       end
     end
 
-    params.require(:project).permit(*permitted_roles.map { |r| { r => [] }}).tap { |x| pp x}
+    params.require(:project).permit(*permitted_roles.map { |r| { r => [] }})
   end
 
   def project_params
