@@ -125,12 +125,7 @@ class BaseSerializer < SimpleBaseSerializer
   def determine_submitter(object)
     return object.owner if object.respond_to?('owner')
     result = object.contributor if object.respond_to?('contributor') && !object.is_a?(Permission)
-    if result
-      return result if result.instance_of?(Person)
-      return result.person if result.instance_of?(User)
-    end
-
-    nil
+    return result
   end
 
   def submitter
