@@ -86,7 +86,7 @@ class GatekeeperPublishTest < ActionController::TestCase
       assert_select 'a[href=?]', person_path(user.person), count: 3
     end
 
-    assert_select '.btn-group', count: 3 do
+    assert_select '.radio-inline', count: 9 do
       [df, model, sop].each do |asset|
         assert_select 'input[type=radio][name=?][value=?]', "gatekeeper_decide[#{asset.class.name}][#{asset.id}][decision]", '1'
         assert_select 'input[type=radio][name=?][value=?]', "gatekeeper_decide[#{asset.class.name}][#{asset.id}][decision]", '0'
