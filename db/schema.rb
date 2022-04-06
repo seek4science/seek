@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_04_04_164010) do
+ActiveRecord::Schema.define(version: 2022_04_06_093324) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string "action"
@@ -1691,6 +1691,7 @@ ActiveRecord::Schema.define(version: 2022_04_04_164010) do
     t.integer "scope_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["person_id", "role_type_id"], name: "index_roles_on_person_id_and_role_type_id"
     t.index ["person_id"], name: "index_roles_on_person_id"
     t.index ["role_type_id"], name: "index_roles_on_role_type_id"
     t.index ["scope_type", "scope_id"], name: "index_roles_on_scope"
