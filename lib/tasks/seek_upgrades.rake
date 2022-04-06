@@ -22,6 +22,7 @@ namespace :seek do
     rename_seek_sample_attribute_types
     seek:rebuild_workflow_internals
     update_thesis_related_publication_types
+    remove_scale_annotations
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -67,7 +68,7 @@ namespace :seek do
     Seek::Config.transfer_value :dm_project_link, :instance_admins_link
   end
 
- task(update_missing_openbis_istest: :environment) do
+  task(update_missing_openbis_istest: :environment) do
     puts '... creating missing is_test for OpenbisEndpoint...'
     create = 0
     disable_authorization_checks do
@@ -201,7 +202,12 @@ namespace :seek do
       PublicationType.find_or_initialize_by(key: "diplomthesis").update(title:"Diplom Thesis", key: "diplomthesis")
       puts 'Add new type '+PublicationType.find_by(key:"diplomthesis").title
     end
-
   end
 
+  task(remove_scale_annotations: [:environment]) do
+    a = Annotation.joins(:annotation_attribute).where(annotation_attribute: { name: ['additional_scale_info', 'scale'] })
+    count = a.count
+    a.destroy_all
+    puts "Removed #{count} scale-related annotations" if count > 0
+  end
 end
