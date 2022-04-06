@@ -123,7 +123,6 @@ class BaseSerializer < SimpleBaseSerializer
   end
 
   def determine_submitter(object)
-    # FIXME: needs to be the creators for assets
     return object.owner if object.respond_to?('owner')
     result = object.contributor if object.respond_to?('contributor') && !object.is_a?(Permission)
     if result
