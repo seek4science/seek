@@ -35,13 +35,13 @@
   </div>
 
   <%= admin_checkbox_setting(:omniauth_elixir_aai_enabled, 1, Seek::Config.omniauth_elixir_aai_enabled,
-                             "ELIXIR AAI authentication", "Enables use of ELIXIR AAI for authentication.",
+                             "#{t('login.elixir_aai')} authentication", "Enables use of #{t('login.elixir_aai')} for authentication.",
                              onchange: toggle_appear_javascript('omniauth_elixir_aai_settings')) %>
   <div id="omniauth_elixir_aai_settings" class="additional_settings" style="<%= show_or_hide_block(Seek::Config.omniauth_elixir_aai_enabled) -%>;">
     <%= admin_text_setting(:omniauth_elixir_aai_client_id, Seek::Config.omniauth_elixir_aai_client_id,
-                           'ELIXIR AAI Client ID', 'The client ID provided by ELIXIR AAI for your installation.') %>
+                           "#{t('login.elixir_aai')} Client ID", "The client ID provided by #{t('login.elixir_aai')} for your installation.") %>
     <%= admin_password_setting(:omniauth_elixir_aai_secret, Seek::Config.omniauth_elixir_aai_secret,
-                               'ELIXIR AAI Secret', 'The secret key provided by ELIXIR AAI for your installation.') %>
+                               "#{t('login.elixir_aai')} Secret", "The secret key provided by #{t('login.elixir_aai')} for your installation.") %>
   </div>
 
   <%= admin_checkbox_setting(:omniauth_github_enabled, 1, Seek::Config.omniauth_github_enabled,

@@ -110,7 +110,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
     assert_nil session[:user_id]
   end
 
-  test 'should authenticate existing ELIXIR AAI user if LDAP disabled' do
+  test 'should authenticate existing LS AAI user if LDAP disabled' do
     OmniAuth.config.mock_auth[:elixir_aai] = @elixir_aai_mock_auth
     OmniAuth.config.mock_auth[:ldap] = @ldap_mock_auth
     existing_user = Factory(:user, login: 'bob')
@@ -201,7 +201,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test 'should create and activate new ELIXIR AAI user' do
+  test 'should create and activate new LS AAI user' do
     OmniAuth.config.mock_auth[:elixir_aai] = @elixir_aai_mock_auth
 
     assert_difference('User.count', 1) do
@@ -261,7 +261,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test 'should authenticate ELIXIR AAI user and redirect to path stored in state' do
+  test 'should authenticate LS AAI user and redirect to path stored in state' do
     OmniAuth.config.mock_auth[:elixir_aai] = @elixir_aai_mock_auth
     existing_user = Factory(:user, login: 'bob')
     existing_user.identities.create!(uid: 'new_elixir_aai_user', provider: 'elixir_aai')
@@ -339,7 +339,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test 'ELIXIR AAI auth failure should redirect to login page and show error' do
+  test 'LS AAI auth failure should redirect to login page and show error' do
     OmniAuth.config.mock_auth[:elixir_aai] = :invalid_credentials
     OmniAuth.config.on_failure = Proc.new { |env| OmniAuth::FailureEndpoint.new(env).redirect_to_failure }
 
@@ -350,7 +350,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
         assert_redirected_to(omniauth_failure_path(strategy: 'elixir_aai', message: 'invalid_credentials'))
         follow_redirect!
 
-        assert_equal "ELIXIR AAI authentication failure (Invalid username/password?)", flash[:error]
+        assert_equal "LS AAI authentication failure (Invalid username/password?)", flash[:error]
         assert_select '#elixir_aai_login.active'
         assert_select '#ldap_login.active', count: 0
         assert_select '#password_login.active', count: 0
