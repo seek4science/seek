@@ -5,7 +5,7 @@ en:
   seek_id: "SEEK ID"
 
   login:
-    elixir_aai: 'ELIXIR AAI'
+    elixir_aai: 'LS AAI'
     ldap: 'LDAP'
     github: 'GitHub'
 
