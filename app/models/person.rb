@@ -3,7 +3,7 @@ class Person < ApplicationRecord
   acts_as_annotation_source
 
   include Seek::Annotatable
-  include Seek::Roles::AdminDefinedRoles
+  include Seek::Roles::Target
 
   auto_strip_attributes :email, :first_name, :last_name, :web_page
 
@@ -11,7 +11,8 @@ class Person < ApplicationRecord
 
   acts_as_yellow_pages
 
-  before_save :first_person_admin_and_add_to_default_project
+  before_save :first_person_add_to_default_project
+  after_save :first_person_admin
 
   acts_as_notifiee
 
@@ -263,7 +264,7 @@ class Person < ApplicationRecord
 
   # returns true this is an admin person, and they are the only one defined - indicating they are person creating during setting up SEEK
   def only_first_admin_person?
-    Person.count == 1 && [self] == Person.all && Person.first.is_admin?
+    Person.count == 1 && Person.first == self && is_admin?
   end
 
   def update_first_letter
@@ -297,7 +298,7 @@ class Person < ApplicationRecord
     return false unless user
     return true if new_record? && self.class.can_create?
     user = user.user if user.is_a?(Person)
-    (user == self.user) || user.is_admin? || (is_project_administered_by?(user) && self.user.nil?)
+    (user == self.user) || user.is_admin? || (is_project_administered_by?(user.person) && self.user.nil?)
   end
 
   # admin can administer other people, project manager can administer other people except other admins and themself
@@ -390,12 +391,21 @@ class Person < ApplicationRecord
   private
 
   # a before_save trigger, that checks if the person is the first one created, and if so defines it as admin
-  def first_person_admin_and_add_to_default_project
+  def first_person_add_to_default_project
     if Person.count.zero?
-      self.is_admin = true
-      project = Project.first
-      if project && project.institutions.any?
-        add_to_project_and_institution(project, project.institutions.first)
+      disable_authorization_checks do
+        project = Project.first
+        if project && project.institutions.any?
+          add_to_project_and_institution(project, project.institutions.first)
+        end
+      end
+    end
+  end
+
+  def first_person_admin
+    if Person.count == 1 && Person.first == self && !is_admin?
+      disable_authorization_checks do
+        self.is_admin = true
       end
     end
   end

@@ -115,6 +115,10 @@ en:
   programme_administrator: 'Programme administrator'
   admin: 'Admin'
 
+  roles:
+    scopes:
+      system: 'System'
+
   contributor: 'submitter' # A person who submitted the resource to SEEK
   contribution: 'submission'
   creator: 'creator' # A person who was involved with the creation of the resource  
