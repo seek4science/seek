@@ -42,23 +42,7 @@ td.primary_selected_cell {
   background: #69F;
 }
 
-td.text_annotation_type {
-    background-image: url("<%= asset_path('famfamfam_silk/tag_blue.png') %>");
-    background-repeat:no-repeat;
-    background-position: center;
-}
 
-td.plot_data_type {
-    background-image: url("<%= asset_path('famfamfam_silk/chart_line.png') %>");
-    background-repeat:no-repeat;
-}
-
-td.annotated_cell {
-  border: 1px dotted #4477FF;
-  background-image: url("<%= asset_path('famfamfam_silk/tag_blue.png') %>");
-  background-repeat:no-repeat;
-  background-position: right;
-}
 
 
 a.sheet_tab {
@@ -103,82 +87,7 @@ div.sheet_container
   overflow:  hidden;
 }
 
-div.annotation
-{
-  border: 1px solid #CCC;
-  background-color: #FFF;
-  padding: 0.5em;
-  position: relative;
-  display:none;
-  width:20em;
-  z-index: 10;
-  margin-bottom: 0.5em;
-  display: none;
-}
 
-div.annotation_content
-{
-  background-color: #FFF;
-  margin-bottom: 0.5em
-}
-
-div.annotation_content img
-{
-  vertical-align: middle;
-  margin-right: 0.5em;
-}
-
-div.annotation_avatar
-{
-  width: 3em;
-  float: left;
-}
-
-div.annotation_text
-{
-  width: 17em;
-  float: right;  
-}
-
-div.annotation_footer
-{
-  text-align: right;  
-  color: #999; 
-}
-
-div.annotation_footer img
-{
-  vertical-align: middle;
-}
-
-
-
-div.annotation textarea
-{
-  background-color: #FFD;
-  border: 1px dashed #F99;
-  width: 16em;
-  height: 8em;
-}
-
-div#annotation_controls
-{
-  text-align: center;
-  margin: 0.5em; 
-  border-top: 1px dashed #AAA; 
-  padding: 0.5em;
-}
-
-div#annotation_container
-{
-  position: absolute;
-  z-index: 20;
-}
-
-div.annotation_plot_data {
-    min-width: 650px;
-    min-height: 450px;
-}
 
 span.cell_coverage, span.sheet_location
 {
@@ -194,38 +103,6 @@ div.spreadsheet_popup
   background-color: #FFFFFF;
   position: absolute;
   z-index: 20;
-}
-
-
-div#annotation_form
-{
-}
-
-div#annotation_overview
-{
-}
-
-div#annotation_overview table td
-{
-  text-align: left;
-}
-
-div#annotation_overview table tr.source_header
-{
-  background-color: #ddd;
-  color: #000000;
-}
-
-div#annotation_overview table tr.annotation_stub
-{
-  cursor: pointer;
-  color: #000099;
-}
-
-div#annotation_overview table tr.annotation_stub:hover
-{
-  background-color: #ffd;
-  color: #FF0000;
 }
 
 div.spreadsheet_controls
@@ -288,16 +165,6 @@ div.spreadsheet_errors h1
 div.spreadsheet_errors ul li
 {
   list-style: disc inside none;
-}
-
-#annotation_drag
-{
-  background-color: #DDD;
-  margin: 2px 0;
-  border: 1px solid #555;
-  text-align: right;
-  padding: 1px;
-  z-index: 10;
 }
 
 td.layout_segment
