@@ -67,7 +67,7 @@
             <% if show_elixir_aai_login? %>
               <%= content_tag(:div, id: 'elixir_aai_login', role: 'tabpanel', class: strategy == 'elixir_aai' ? 'tab-pane active' : 'tab-pane') do %>
                 <div class='text-center'>
-                  <%= link_to image('elixir_aai_login'), omniauth_authorize_path(:elixir_aai, state: "return_to:#{original_path}"), method: :post %>
+                  <%= link_to image('ls_aai_login'), omniauth_authorize_path(:elixir_aai, state: "return_to:#{original_path}"), method: :post %>
                 </div>
               <% end %>
             <% end %>

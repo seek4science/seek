@@ -140,6 +140,11 @@ module Seek
       end
     end
 
+    # Use this to avoid needlessly regenerating the url helper module each time a route needs to be accessed
+    def self.routes
+      @_routes ||= Rails.application.routes.url_helpers
+    end
+
     private
 
     def self.cache(name, &block)

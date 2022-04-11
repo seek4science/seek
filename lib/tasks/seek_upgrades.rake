@@ -10,7 +10,7 @@ namespace :seek do
     environment
     db:seed:010_workflow_classes
     db:seed:011_edam_topics
-    db:seed:012_edam_operations   
+    db:seed:012_edam_operations
     db:seed:013_workflow_data_file_relationships
     rename_branding_settings
     update_missing_openbis_istest
@@ -23,6 +23,7 @@ namespace :seek do
     seek:rebuild_workflow_internals
     update_thesis_related_publication_types
     remove_scale_annotations
+    strip_site_base_host_path
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -179,7 +180,6 @@ namespace :seek do
     end
   end
 
-
   task(update_thesis_related_publication_types: [:environment]) do
     puts 'Updating publication types ...'
 
@@ -201,6 +201,14 @@ namespace :seek do
     if PublicationType.find_by(key:"diplomthesis").nil?
       PublicationType.find_or_initialize_by(key: "diplomthesis").update(title:"Diplom Thesis", key: "diplomthesis")
       puts 'Add new type '+PublicationType.find_by(key:"diplomthesis").title
+    end
+  end
+
+  task(strip_site_base_host_path: [:environment]) do
+    if Seek::Config.site_base_host
+      u = URI.parse(Seek::Config.site_base_host)
+      u.path = ''
+      Seek::Config.site_base_host = u.to_s
     end
   end
 
