@@ -16,6 +16,7 @@ module IsaExporter
             isa_investigation[:publicReleaseDate] = nil #@investigation.created_at.to_date.iso8601
             isa_investigation[:ontologySourceReferences] = convert_ontologies
             isa_investigation[:filename] = "#{@investigation.title}.txt"
+		  isa_investigation[:comments] = [{ name: "ISAjson export time", value: Time.now.utc.iso8601 }]
 
             publications = []
             @investigation.publications.each do |p|
@@ -48,7 +49,10 @@ module IsaExporter
             isa_study[:submissionDate] = nil #study.created_at.to_date.iso8601
             isa_study[:publicReleaseDate] = nil # study.created_at.to_date.iso8601
             isa_study[:filename] = "#{study.title}.txt"
-            isa_study[:comments] = nil
+            isa_study[:comments] = [
+			  { name: "SEEK ID", value: "studies/#{study.id}" },
+			  { name: "SEEK creation date", value: study.created_at.to_date.iso8601 }
+			]
         
             publications = []
             study.publications.each do |p|
@@ -295,20 +299,6 @@ module IsaExporter
             end
         end
 
-	   def convert_characteristic(attributes)
-			attributes.map do |s|
-				ontology = get_ontology_details(s, s.title, false)
-				{
-					category: { "@id": "#characteristic_category/#{s.id}" },
-					value: {
-						annotationValue: s.title,
-						termSource: ontology[:termSource],
-						termAccession: ontology[:termAccession]
-					},
-					unit: nil
-				}
-			end
-	   end
 
         def convert_process_sequence(sample_type, sop)
             # This method is meant to be used for both Studies and Assays
@@ -381,7 +371,7 @@ module IsaExporter
 				   "@id": "#material/#{with_tag_isa_other_material.id}", 
 				   name: s.get_attribute_value(with_tag_isa_other_material),
 				   type: with_tag_isa_other_material.title,
-				   characteristics: convert_characteristic(with_tag_isa_other_material_characteristics),
+				   characteristics: convert_characteristics(s, with_tag_isa_other_material_characteristics),
 				   derivesFrom: extract_sample_ids(s.get_attribute_value(with_type_seek_sample_multi), "sample")
 			    }
 			end
