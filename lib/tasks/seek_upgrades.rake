@@ -226,7 +226,7 @@ namespace :seek do
       Person.find_each do |person|
         RoleType.for_system.each do |rt|
           mask = rt.id
-          if person.roles_mask & mask == mask
+          if (person.roles_mask & mask) != 0
             Role.where(role_type_id: rt.id, person_id: person.id, scope: nil).first_or_create!
           end
         end
@@ -237,7 +237,7 @@ namespace :seek do
       AdminDefinedRoleProject.find_each do |role|
         RoleType.for_projects.each do |rt|
           mask = rt.id
-          if role.role_mask & mask == mask
+          if (role.role_mask & mask) != 0
             Role.where(role_type_id: rt.id, person_id: role.person_id,
                        scope_type: 'Project', scope_id: role.project_id).first_or_create!
           end
@@ -249,7 +249,7 @@ namespace :seek do
       AdminDefinedRoleProgramme.find_each do |role|
         RoleType.for_programmes.each do |rt|
           mask = rt.id
-          if role.role_mask & mask == mask
+          if (role.role_mask & mask) != 0
             Role.where(role_type_id: rt.id, person_id: role.person_id,
                        scope_type: 'Programme', scope_id: role.programme_id).first_or_create!
           end
