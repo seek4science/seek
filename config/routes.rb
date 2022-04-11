@@ -621,8 +621,6 @@ SEEK::Application.routes.draw do
     end
   end
 
-  resources :spreadsheet_annotations, only: [:create, :destroy, :update]
-
   resources :strains, concerns: [:asset] do
     collection do
       get :existing_strains_for_assay_organism
