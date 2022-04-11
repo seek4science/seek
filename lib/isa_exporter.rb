@@ -184,7 +184,7 @@ module IsaExporter
             isa_protocol['@id'] =  "#protocol/#{sop.id}_#{assay.id}"
             isa_protocol[:name] = protocol.title #sop.title
 
-            ontology = get_ontology_details(protocol)
+            ontology = get_ontology_details(protocol, protocol.title, false)
 
             isa_protocol[:protocolType] = {
                 annotationValue: protocol.title,
@@ -195,7 +195,7 @@ module IsaExporter
             isa_protocol[:uri] = ontology[:termAccession]
             isa_protocol[:version] = nil
             isa_protocol[:parameters] = parameter_values.map do |parameter_value|
-                parameter_value_ontology = get_ontology_details(parameter_value)
+                parameter_value_ontology = get_ontology_details(parameter_value,  parameter_value.title, false)
                 {
                     "@id": "#parameter/#{parameter_value.id}",
                     parameterName: {
@@ -259,11 +259,12 @@ module IsaExporter
         
         def convert_characteristics(sample, attributes)
 		attributes.map do |c|
-                ontology = get_ontology_details(c)
+			value = sample.get_attribute_value(c)
+                ontology = get_ontology_details(c, value, true)
                {
                     category: { "@id": "#characteristic_category/#{c.title}" },
                     value: {
-                        annotationValue: sample.get_attribute_value(c),
+                        annotationValue: value,
                         termSource: ontology[:termSource],
                         termAccession: ontology[:termAccession]
                     },
@@ -282,7 +283,7 @@ module IsaExporter
                 attributes = attributes.select{ |sa| sa.isa_tag&.isa_other_material_characteristic? }
             end
             attributes.map do |s|
-                ontology = get_ontology_details(s)
+                ontology = get_ontology_details(s, s.title, false)
                 {
                     "@id": "#characteristic_category/#{s.id}",
                     characteristicType: {
@@ -296,7 +297,7 @@ module IsaExporter
 
 	   def convert_characteristic(attributes)
 			attributes.map do |s|
-				ontology = get_ontology_details(s)
+				ontology = get_ontology_details(s, s.title, false)
 				{
 					category: { "@id": "#characteristic_category/#{s.id}" },
 					value: {
@@ -377,7 +378,7 @@ module IsaExporter
 			with_tag_isa_other_material_characteristics = st.sample_attributes.select{ |sa| sa.isa_tag&.isa_other_material_characteristic? }
 			other_materials << st.samples.map do |s|
 			    {
-				   "@id": "#material/#{s.id}", 
+				   "@id": "#material/#{with_tag_isa_other_material.id}", 
 				   name: s.get_attribute_value(with_tag_isa_other_material),
 				   type: with_tag_isa_other_material.title,
 				   characteristics: convert_characteristic(with_tag_isa_other_material_characteristics),
@@ -456,13 +457,14 @@ module IsaExporter
 
         def convert_parameter_values(sample, with_tag_isa_parameter_value)
             with_tag_isa_parameter_value.map do |p|
-                ontology = get_ontology_details(p)
+			 value = sample.get_attribute_value(p)
+			 ontology = get_ontology_details(p, value, true)
                 {
                     category: {
                         "@id": "#parameter/#{p.id}"
                     },
                     value: {
-                        annotationValue: sample.get_attribute_value(p),
+                        annotationValue: value,
                         termSource: ontology[:termSource],
                         termAccession: ontology[:termAccession]
                     },
@@ -475,10 +477,18 @@ module IsaExporter
             Array.wrap(obj).map { |item| {"@id": "##{type}/#{item[:id]}"} }
         end
 
-        def get_ontology_details(sample_attribute)
+        def get_ontology_details(sample_attribute, label, vocab_term)
             is_ontology = sample_attribute.sample_attribute_type.ontology?
+		  iri = ""
+		  if is_ontology
+			if vocab_term
+				iri = sample_attribute.sample_controlled_vocab.sample_controlled_vocab_terms.find_by_label(label)&.iri
+			else
+				iri = sample_attribute.sample_controlled_vocab.ols_root_term_uri
+			end
+		  end
             return {
-                termAccession: is_ontology ? sample_attribute.sample_controlled_vocab.ols_root_term_uri : nil,
+                termAccession: is_ontology ? iri : nil,
                 termSource: is_ontology ? sample_attribute.sample_controlled_vocab.source_ontology : nil
             }
         end
