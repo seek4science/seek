@@ -86,9 +86,12 @@ class WorkflowRepositoryBuilderTest < ActiveSupport::TestCase
     builder = WorkflowRepositoryBuilder.new(params)
     builder.workflow_class = @galaxy
     workflow = builder.build
+    workflow.title = "Test"
+    workflow.projects = [Factory(:project)]
+    disable_authorization_checks { workflow.save }
     crate = workflow.ro_crate
 
-    assert_equal 18, crate.entities.count
+    assert_equal 20, crate.entities.count # TODO: Change me to 19 when #960 resolved
     assert crate.get("ro-crate-metadata.json").is_a?(ROCrate::Metadata)
     assert crate.get("ro-crate-preview.html").is_a?(ROCrate::Preview)
     assert crate.get("./").is_a?(ROCrate::WorkflowCrate)

@@ -50,7 +50,7 @@ module Git
           def save_git_version_on_create
             return if @git_version_attributes.blank?
             version = build_initial_git_version
-            version.resource_attributes = self.attributes
+            version.set_resource_attributes(self.attributes)
             version.save
             self.git_version_attributes = nil
             version
@@ -59,7 +59,7 @@ module Git
           def save_as_new_git_version(extra_git_version_attributes = {})
             extra_git_version_attributes.reverse_merge!(@git_version_attributes || {})
             version = self.git_versions.build(extra_git_version_attributes)
-            version.resource_attributes = self.attributes
+            version.set_resource_attributes(self.attributes)
             version.save
             self.git_version_attributes = nil
             self.save
@@ -72,7 +72,11 @@ module Git
           end
 
           def build_initial_git_version
-            self.git_versions.first_or_initialize(@git_version_attributes)
+            return self.git_versions.first if self.git_versions.first
+
+            self.git_versions.build(@git_version_attributes).tap do |gv|
+              gv.set_resource_attributes(self.attributes)
+            end
           end
 
           def initial_git_version
