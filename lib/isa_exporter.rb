@@ -366,7 +366,7 @@ module IsaExporter
 			# attributes = isa_other_material_sample_types.map {|s| s.sample_attributes}.flatten
 			# samples = isa_other_material_sample_types.map {|s| s.samples}.flatten
 			with_tag_isa_other_material_characteristics = st.sample_attributes.select{ |sa| sa.isa_tag&.isa_other_material_characteristic? }
-			other_materials << st.samples.map do |s|
+			other_materials += st.samples.map do |s|
 			    {
 				   "@id": "#material/#{with_tag_isa_other_material.id}", 
 				   name: s.get_attribute_value(with_tag_isa_other_material),
@@ -374,7 +374,7 @@ module IsaExporter
 				   characteristics: convert_characteristics(s, with_tag_isa_other_material_characteristics),
 				   derivesFrom: extract_sample_ids(s.get_attribute_value(with_type_seek_sample_multi), "sample")
 			    }
-			end
+			end.flatten
 		  end
 		  other_materials 
         end
