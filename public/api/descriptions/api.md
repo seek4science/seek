@@ -2,7 +2,7 @@
 
 The API is defined in the [OpenAPI specification](https://swagger.io/specification) currently in [version 2](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md)
 
-Example IPython notebooks showing use of the API are available on [GitHub](https://github.com/seek4science/seekAPIexamples)
+Example IPython notebooks showing use of the API are available on [GitHub](https://github.com/FAIRdom/api-workshop)
 
 ## Policy
 <a name="Policy"></a>
