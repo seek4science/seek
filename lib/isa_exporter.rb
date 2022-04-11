@@ -125,12 +125,7 @@ module IsaExporter
             }
             isa_assay[:processSequence] = all_sample_types.map {|sa| convert_process_sequence(sa)}.flatten 
             isa_assay[:dataFiles] = convert_data_files(all_sample_types)
-            isa_assay[:unitCategories] = [{
-                "@id": nil,
-                annotationValue: nil,
-                termSource: nil,
-                termAccession: nil
-            }]
+            isa_assay[:unitCategories] = []
             return isa_assay
         end
     
@@ -256,7 +251,7 @@ module IsaExporter
                             termSource: nil,
                             termAccession: nil
                         },
-                        unit: { "@id": nil }
+                        unit: nil
                     }]
                 }
             end
@@ -273,7 +268,7 @@ module IsaExporter
                         termSource: ontology[:termSource],
                         termAccession: ontology[:termAccession]
                     },
-                    unit: { "@id": nil }
+                    unit: nil
                 }
             end
         end
@@ -310,7 +305,7 @@ module IsaExporter
 						termSource: ontology[:termSource],
 						termAccession: ontology[:termAccession]
 					},
-					unit: { "@id": nil }
+					unit: nil
 				}
 			end
 	   end
@@ -471,9 +466,7 @@ module IsaExporter
                         termSource: ontology[:termSource],
                         termAccession: ontology[:termAccession]
                     },
-                    unit: {
-                        "@id": "#unit/?"
-                    }
+                    unit: nil
                 }
             end
         end
