@@ -68,18 +68,17 @@ module IsaExporter
                 samples: convert_materials_samples(study.sample_types.second)
             }
 
-            isa_study[:processSequence] = convert_process_sequence(study.sample_types.second)
-
             protocols = []
             study.assays.each do |a|
                 # There should be only one attribute with isa_tag == protocol
                 with_tag_protocol = a.sample_type.sample_attributes.detect { |sa| sa.isa_tag&.isa_protocol? }
                 with_tag_parameter_value = a.sample_type.sample_attributes.select { |sa| sa.isa_tag&.isa_parameter_value? }
                 raise "Protocol ISA tag not found in assay #{a.id}" if with_tag_protocol.blank?
-                sop = a.sops.first
-                protocols << convert_protocol(sop, with_tag_protocol, with_tag_parameter_value)
+                protocols << convert_protocol(a, with_tag_protocol, with_tag_parameter_value)
             end
             isa_study[:protocols] = protocols
+
+		  isa_study[:processSequence] = convert_process_sequence(study.sample_types.second, study.sop)
 
             isa_study[:assays] = [convert_assays(study.assays)]
 
@@ -123,7 +122,7 @@ module IsaExporter
                 samples: first_assay.samples.map { |s| find_sample_origin([s]) }.flatten.uniq.map{ |s| {"@id": "#sample/#{s}"} } ,#the samples from study level that are referenced in this assay's samples,
                 otherMaterials: convert_other_materials(all_sample_types),
             }
-            isa_assay[:processSequence] = all_sample_types.map {|sa| convert_process_sequence(sa)}.flatten 
+            isa_assay[:processSequence] = assays.map {|a| convert_process_sequence(a.sample_type, a.sops.first)}.flatten 
             isa_assay[:dataFiles] = convert_data_files(all_sample_types)
             isa_assay[:unitCategories] = []
             return isa_assay
@@ -179,10 +178,10 @@ module IsaExporter
             source_ontologies.uniq.map { |s| client.fetch_ontology_reference(s) }
         end
 
-        def convert_protocol(sop, protocol, parameter_values)
+        def convert_protocol(assay, protocol, parameter_values)
             isa_protocol = {}
-            # generates random identifiers that point to the same resource in Seek
-            isa_protocol['@id'] =  "#protocol/#{sop.id}?#{random_string(6)}"
+		  sop = assay.sops.first
+            isa_protocol['@id'] =  "#protocol/#{sop.id}_#{assay.id}"
             isa_protocol[:name] = protocol.title #sop.title
 
             ontology = get_ontology_details(protocol)
@@ -310,7 +309,7 @@ module IsaExporter
 			end
 	   end
 
-        def convert_process_sequence(sample_type)
+        def convert_process_sequence(sample_type, sop)
             # This method is meant to be used for both Studies and Assays
             return [] if !sample_type.samples.any?
             with_tag_isa_parameter_value = get_values(sample_type)
@@ -328,12 +327,13 @@ module IsaExporter
                 end
                 raise "Defected ISA process_sequence!" if !type
             end
+		  # Convention : The sample_types of studies don't have assay
             sample_type.samples.map do |s|
                 {
                     "@id": "#process/#{with_tag_protocol.title}/#{s.id}", 
                     name: nil,
                     executesProtocol: {
-                        "@id": "#protocol/#{with_tag_protocol.id}"
+                        "@id":  "#protocol/#{sop.id}" + (s.assays.any? ? "_#{s.assays.first.id}" : "")
                     },
                     parameterValues: convert_parameter_values(s, with_tag_isa_parameter_value),
                     performer: nil,
