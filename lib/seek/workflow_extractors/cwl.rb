@@ -141,12 +141,14 @@ module Seek
         return [] if i.nil?
 
         if i.is_a?(Hash)
-          i = i.flat_map do |id, s|
-            if s.is_a?(String)
-              { 'id' => id, 'source' => s }
-            else
-              s['id'] ||= id
-              s
+          i = i.flat_map do |id, source|
+            (source.is_a?(Array) ? source : [source]).map do |s|
+              if s.is_a?(String)
+                { 'id' => id, 'source' => s }
+              else
+                s['id'] ||= id
+                s
+              end
             end
           end
         end

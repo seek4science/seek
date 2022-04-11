@@ -15,7 +15,7 @@ class ContributedResourceSerializer < PCSSerializer
       data = {
         version: v.version,
         revision_comments: v.revision_comments.presence,
-        url: polymorphic_url(object, version: v.version, host: Seek::Config.site_base_host)
+        url: polymorphic_url(object, version: v.version)
       }
       if v.is_git_versioned?
         data[:remote] = v.remote if v.remote?
@@ -74,7 +74,7 @@ class ContributedResourceSerializer < PCSSerializer
       md5sum: cb.md5sum,
       sha1sum: cb.sha1sum,
       content_type: cb.content_type,
-      link: polymorphic_url([cb.asset, cb], host: Seek::Config.site_base_host),
+      link: polymorphic_url([cb.asset, cb]),
       size: cb.file_size
     }
   end

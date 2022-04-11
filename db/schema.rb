@@ -1807,24 +1807,6 @@ ActiveRecord::Schema.define(version: 2022_04_06_093324) do
     t.boolean "include_external_search", default: false
   end
 
-  create_table "scales", force: :cascade do |t|
-    t.string "title"
-    t.string "key"
-    t.integer "pos", default: 1
-    t.string "image_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "scalings", force: :cascade do |t|
-    t.integer "scale_id"
-    t.integer "scalable_id"
-    t.integer "person_id"
-    t.string "scalable_type"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "sessions", force: :cascade do |t|
     t.string "session_id", null: false
     t.text "data", limit: 16777215

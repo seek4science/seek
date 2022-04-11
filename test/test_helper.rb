@@ -74,6 +74,15 @@ Kernel.class_eval do
     yield
     Seek::Config.send("#{config}=", oldval)
   end
+
+  def with_relative_root(root)
+    oldval = Rails.application.config.relative_url_root
+    Rails.application.config.relative_url_root = root
+    Rails.application.default_url_options = Seek::Config.site_url_options
+    yield
+    Rails.application.config.relative_url_root = oldval
+    Rails.application.default_url_options = Seek::Config.site_url_options
+  end
 end
 
 class ActiveSupport::TestCase

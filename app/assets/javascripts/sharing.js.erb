@@ -1,4 +1,5 @@
 <% environment.context_class.instance_eval { include ImagesHelper } %>
+<% environment.context_class.instance_eval { include Seek::Util.routes } %>
 
 var Sharing = {
   // Get current resource's project IDs, either directly from the project selector dropdown,
@@ -76,8 +77,8 @@ var Sharing = {
     }
   },
 
-  requestInstitutionsUrl: '<%= Rails.application.routes.url_helpers.request_institutions_projects_path %>',
-  requestAllInstitutionsUrl: '<%= Rails.application.routes.url_helpers.request_all_sharing_form_institutions_path %>',
+  requestInstitutionsUrl: '<%= request_institutions_projects_path %>',
+  requestAllInstitutionsUrl: '<%= request_all_sharing_form_institutions_path %>',
 
   accessTypes: {
     noAccess: <%= Policy::NO_ACCESS %>,

@@ -9,6 +9,9 @@ check_mysql
 # Search
 start_search
 
+# Set nginx config
+SEEK_LOCATION="${RAILS_RELATIVE_URL_ROOT:-/}" envsubst '${SEEK_LOCATION} ${RAILS_RELATIVE_URL_ROOT}' < docker/nginx.conf.template > nginx.conf
+
 # Precompile assets if using RAILS_RELATIVE_URL_ROOT
 if [ ! -z $RAILS_RELATIVE_URL_ROOT ]
 then
@@ -46,4 +49,4 @@ done
 tail -f log/production.log &
 
 echo "STARTING NGINX"
-nginx -g 'daemon off;'
+nginx -c /seek/nginx.conf -g 'daemon off;'

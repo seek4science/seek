@@ -20,9 +20,6 @@ class InvestigationsController < ApplicationController
 
   include Seek::IsaGraphExtensions
 
-  require "isatab_converter"
-  include IsaTabConverter
-
   api_actions :index, :show, :create, :update, :destroy
 
   def new_object_based_on_existing_one
@@ -38,7 +35,7 @@ class InvestigationsController < ApplicationController
   end
 
   def export_isatab_json
-    the_hash = convert_investigation Investigation.find(params[:id])
+    the_hash = IsaTabConverter.convert_investigation(Investigation.find(params[:id]))
     send_data JSON.pretty_generate(the_hash) , filename: 'isatab.json'
   end
 
@@ -136,7 +133,7 @@ class InvestigationsController < ApplicationController
 
   def investigation_params
     params.require(:investigation).permit(:title, :description, { project_ids: [] }, *creator_related_params,
-                                          :position, { scales: [] }, { publication_ids: [] },
+                                          :position, { publication_ids: [] },
                                           { discussion_links_attributes:[:id, :url, :label, :_destroy] },
                                           { custom_metadata_attributes: determine_custom_metadata_keys })
   end

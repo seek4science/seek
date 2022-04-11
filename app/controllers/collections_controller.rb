@@ -45,7 +45,7 @@ class CollectionsController < ApplicationController
   def collection_params
     params.require(:collection).permit(:title, :description, { project_ids: [] }, :license, *creator_related_params,
                                        { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                        { scales: [] }, { publication_ids: [] },
+                                       { publication_ids: [] },
                                        { items_attributes: [:id, :asset_type, :asset_id, :order, :comment, :_destroy]})
   end
 

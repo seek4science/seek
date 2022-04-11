@@ -1,5 +1,7 @@
-var OpenBis = {
+<% environment.context_class.instance_eval { include Seek::Util.routes } %>
 
+var OpenBis = {
+    showDatasetFilesPath: "<%= show_dataset_files_openbis_endpoint_openbis_dataset_path('-endpoint_id-', '-dataset_id-') %>",
     showBrowseWaitingMessage: function () {
         $j('#openbis-datasets #contents').html($j('#waiting-for-items').clone().show());
     },
@@ -11,11 +13,7 @@ var OpenBis = {
     showFiles: function () {
         var permId = $j(this).data('perm-id');
         var endpointId = $j(this).data('endpoint-id');
-        //var dataFileId = $j(this).data('datafile-id');
-        //var projectId = $j(this).data('project-id');
-        //var path = '/projects/' + projectId + '/openbis_endpoints/show_dataset_files';
-
-        var path = "/openbis_endpoints/"+endpointId+"/openbis_datasets/"+permId+"/show_dataset_files";
+        var path = OpenBis.showDatasetFilesPath.replace('-endpoint_id-', endpointId).replace('-dataset_id-', permId);
 
         $j.ajax(path, {
                 //data: {id: endpointId, data_file_id: dataFileId, perm_id: permId},
@@ -33,6 +31,7 @@ var OpenBis = {
         );
     },
 
+    // Unused?
     refreshMetadataStore: function () {
         if (confirm('Are you sure you wish to refresh the metadata?')) {
             var endpointId = $j(this).data('endpoint-id');
@@ -55,6 +54,7 @@ var OpenBis = {
         }
     },
 
+    // Unused?
     fetchItemsForBrowseSpace: function (spaceId, projectId) {
         var path = '/projects/' + projectId + '/openbis_endpoints/show_items';
         $j.ajax(path, {
@@ -72,7 +72,7 @@ var OpenBis = {
         );
     },
 
-
+    // Unused?
     browseEndpointChanged: function () {
         var selected = $j('#select-endpoints option:selected');
         var endpointId = selected.val();

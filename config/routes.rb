@@ -136,12 +136,6 @@ SEEK::Application.routes.draw do
     end
   end
 
-  resources :scales do
-    collection do
-      post :search
-    end
-  end
-
   ### GENERAL PAGES ###
 
   root to: 'homes#index'
@@ -751,6 +745,8 @@ SEEK::Application.routes.draw do
 
   resources :single_pages do
   end
+
+  resources :culture_growth_types, only: [:show]
 
   ### ASSAY AND TECHNOLOGY TYPES ###
 
