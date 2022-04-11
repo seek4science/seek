@@ -18,17 +18,17 @@
             <% end %>
             <% if show_elixir_aai_login? %>
               <%= content_tag(:li, role: 'presentation', class: strategy == 'elixir_aai' ? 'active' : nil) do %>
-                <a href="#elixir_aai_login" aria-controls="elixir_aai_login" role="tab" data-toggle="tab"><%= t('login.elixir_aai') %> login</a>
+                <a href="#elixir_aai_login" aria-controls="elixir_aai_login" role="tab" data-toggle="tab"><%= t('login.elixir_aai') %></a>
               <% end %>
             <% end %>
             <% if show_ldap_login? %>
               <%= content_tag(:li, role: 'presentation', class: strategy == 'ldap' ? 'active' : nil) do %>
-                <a href="#ldap_login" aria-controls="ldap_login" role="tab" data-toggle="tab"><%= t('login.ldap') %> login</a>
+                <a href="#ldap_login" aria-controls="ldap_login" role="tab" data-toggle="tab"><%= t('login.ldap') %></a>
               <% end %>
             <% end %>
             <% if show_github_login? %>
               <%= content_tag(:li, role: 'presentation', class: strategy == 'github' ? 'active' : nil) do %>
-                <a href="#github_login" aria-controls="github_login" role="tab" data-toggle="tab"><%= t('login.github') %> login</a>
+                <a href="#github_login" aria-controls="github_login" role="tab" data-toggle="tab"><%= t('login.github') %></a>
               <% end %>
             <% end %>
           </ul>

@@ -350,7 +350,7 @@ class OmniauthTest < ActionDispatch::IntegrationTest
         assert_redirected_to(omniauth_failure_path(strategy: 'elixir_aai', message: 'invalid_credentials'))
         follow_redirect!
 
-        assert_equal "LS AAI authentication failure (Invalid username/password?)", flash[:error]
+        assert_equal "LS Login authentication failure (Invalid username/password?)", flash[:error]
         assert_select '#elixir_aai_login.active'
         assert_select '#ldap_login.active', count: 0
         assert_select '#password_login.active', count: 0
