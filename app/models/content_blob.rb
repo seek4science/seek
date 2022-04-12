@@ -75,10 +75,6 @@ class ContentBlob < ApplicationRecord
     end
   end
 
-  def spreadsheet_annotations
-    worksheets.map { |worksheet| worksheet.cell_ranges.map(&:annotations) }.flatten
-  end
-
   # allows you to run something on a temporary copy of the blob file, which is deleted once finished
   # e.g. blob.with_temporary_copy{|copy_path| <some stuff with the copy>}
   def with_temporary_copy
