@@ -32,8 +32,9 @@ class ApplicationController < ActionController::Base
   before_action :check_json_id_type, only: [:create, :update], if: :json_api_request?
   before_action :convert_json_params, only: [:update, :destroy, :create, :create_version], if: :json_api_request?
   before_action :secure_user_content
-
   before_action :rdf_enabled? #only allows through rdf calls to supported types
+
+  include FairSignposting
 
   helper :all
 
@@ -121,7 +122,17 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  helper_method :controller_model
+  # returns the instance for the resource for the controller, e.g @data_file for data_files
+  def resource_for_controller(c = controller_name)
+    instance_variable_get("@#{c.singularize}")
+  end
+
+  # returns the current version of the resource for the controller, e.g @display_data_file for data_files
+  def versioned_resource_for_controller(c = controller_name)
+    instance_variable_get("@display_#{c.singularize}")
+  end
+
+  helper_method :controller_model, :resource_for_controller, :versioned_resource_for_controller
 
   def self.api_actions(*actions)
     @api_actions ||= (superclass.respond_to?(:api_actions) ? superclass.api_actions.dup : []) + actions.map(&:to_sym)
@@ -132,12 +143,6 @@ class ApplicationController < ActionController::Base
   end
 
   private
-
-  # returns the model asset assigned to the standard object for that controller, e.g. @model for models_controller
-  def determine_asset_from_controller
-    name = controller_name.singularize
-    instance_variable_get("@#{name}")
-  end
 
   def project_membership_required
     unless User.logged_in_and_member? || admin_logged_in?

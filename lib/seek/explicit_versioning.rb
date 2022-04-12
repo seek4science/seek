@@ -51,6 +51,7 @@ module Seek
           after_update :sync_latest_version
         end
 
+        parent_class = self
         # create the dynamic versioned model
         const_set(versioned_class_name, Class.new(ApplicationRecord)).class_eval do
           def name
@@ -120,8 +121,10 @@ module Seek
             "#{parent.class.name.underscore}-#{parent.id}-#{version}"
           end
 
-          def to_schema_ld
-            Seek::BioSchema::Serializer.new(self).json_ld
+          if parent_class.method_defined?(:to_schema_ld)
+            def to_schema_ld
+              Seek::BioSchema::Serializer.new(self).json_ld
+            end
           end
 
           def schema_org_supported?
