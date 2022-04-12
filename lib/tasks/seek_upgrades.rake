@@ -24,6 +24,7 @@ namespace :seek do
     update_thesis_related_publication_types
     remove_scale_annotations
     strip_site_base_host_path
+    convert_roles
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -217,5 +218,43 @@ namespace :seek do
     count = a.count
     a.destroy_all
     puts "Removed #{count} scale-related annotations" if count > 0
+  end
+
+  task(convert_roles: [:environment]) do
+    puts 'Converting roles...'
+    disable_authorization_checks do
+      Person.find_each do |person|
+        RoleType.for_system.each do |rt|
+          mask = rt.id
+          if (person.roles_mask & mask) != 0
+            Role.where(role_type_id: rt.id, person_id: person.id, scope: nil).first_or_create!
+          end
+        end
+      end
+
+      class AdminDefinedRoleProject < ActiveRecord::Base; end
+
+      AdminDefinedRoleProject.find_each do |role|
+        RoleType.for_projects.each do |rt|
+          mask = rt.id
+          if (role.role_mask & mask) != 0
+            Role.where(role_type_id: rt.id, person_id: role.person_id,
+                       scope_type: 'Project', scope_id: role.project_id).first_or_create!
+          end
+        end
+      end
+
+      class AdminDefinedRoleProgramme < ActiveRecord::Base; end
+
+      AdminDefinedRoleProgramme.find_each do |role|
+        RoleType.for_programmes.each do |rt|
+          mask = rt.id
+          if (role.role_mask & mask) != 0
+            Role.where(role_type_id: rt.id, person_id: role.person_id,
+                       scope_type: 'Programme', scope_id: role.programme_id).first_or_create!
+          end
+        end
+      end
+    end
   end
 end

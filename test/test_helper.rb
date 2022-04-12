@@ -103,7 +103,7 @@ class ActiveSupport::TestCase
   # always create initial person, as this will always be an admin. Avoid some confusion in the tests where a person
   # is unexpectedly an admin
   def create_initial_person
-    Factory(:admin, first_name: 'default admin')
+    disable_authorization_checks { Factory(:admin, first_name: 'default admin') }
   end
 
   # At least one sample attribute type is needed for building sample types from spreadsheets
