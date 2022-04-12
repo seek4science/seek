@@ -4,17 +4,30 @@
 <div id="spreadsheet-explorer">
   <div id="spreadsheet_errors"></div>
 
-  <input size="10" id="selection_data">
-  <input size="60" id="cell_info" readonly="readonly">
+  <div id="cell-info" class="panel panel-default">
+    <div class="panel-heading">Selected Cell</div>
+    <div class="panel-body">
+      <div>
+        <strong>Cell:</strong>
+        <span id="selected_cell"/>
+      </div>
+
+      <div>
+        <strong>Value:</strong>
+        <span id="cell_value"/>
+      </div>
+    </div>
+  </div>
+
 
   <div class="spreadsheet_viewer" id="spreadsheet_outer_frame">
-        <%
-           spreadsheet = Rails.cache.fetch(resource.content_blob.cache_key) do
-             resource.spreadsheet
-           end
-        %>
-        <%= render :partial => "spreadsheets/spreadsheet_styles", :locals => {:styles => spreadsheet.styles} %>
-        <%= render :partial => "spreadsheets/spreadsheet", :locals => {:workbook => spreadsheet }%>
+    <%
+      spreadsheet = Rails.cache.fetch(resource.content_blob.cache_key) do
+        resource.spreadsheet
+      end
+    %>
+    <%= render :partial => "spreadsheets/spreadsheet_styles", :locals => { :styles => spreadsheet.styles } %>
+    <%= render :partial => "spreadsheets/spreadsheet", :locals => { :workbook => spreadsheet } %>
 
   </div>
 </div>
