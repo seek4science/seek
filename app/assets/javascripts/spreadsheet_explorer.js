@@ -463,27 +463,6 @@ function activateSheet(sheet, sheetTab, fileIndex) {
     return false;
 }
 
-function copy_cells()
-{
-
-    var cells = $j('td.selected_cell');
-    var columns = $j('.col_heading.selected_heading').length;
-    var text = "";
-
-    for(var i = 0; i < cells.length; i += columns)
-    {
-        for(var j = 0; j < columns; j += 1)
-        {
-            text += (cells.eq(i + j).html() + "\t");
-        }
-        text += "\n";
-    }
-
-    $j("textarea#export_data").val(text);
-    $j("div.spreadsheet_popup").hide();
-    $j("div#export_form").show();
-}
-
 function changeRowsPerPage(){
     var current_href = window.location.href;
     if (current_href.endsWith('#'))

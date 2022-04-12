@@ -7,15 +7,7 @@
   <input size="10" id="selection_data">
   <input size="60" id="cell_info" readonly="readonly">
 
-  <div class="spreadsheet_controls">
-    <%= link_to image('spreadsheet_export') + " Export Data", "#", :onclick =>"copy_cells(); return false;",
-          :title => "Export selected cells into an external application", :class => "spreadsheet_button requires_selection" %>
-  </div>
-  
   <div class="spreadsheet_viewer" id="spreadsheet_outer_frame">
-    <%= render :partial => "spreadsheets/export", :locals => {:resource => resource } %>
-
-
         <%
            spreadsheet = Rails.cache.fetch(resource.content_blob.cache_key) do
              resource.spreadsheet
