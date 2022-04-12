@@ -1,14 +1,10 @@
 module FairSignposting
   extend ActiveSupport::Concern
 
-  included do
-    after_action :fair_signposting, only: [:show], if: -> { Seek::Config.fair_signposting_enabled }
-  end
-
   def fair_signposting
     parent_asset = resource_for_controller
     display_asset = versioned_resource_for_controller || parent_asset
-    return unless display_asset
+    return unless display_asset&.is_a?(ApplicationRecord)
 
     url_opts = display_asset.respond_to?(:version) ? { version: display_asset.version } : {}
 
