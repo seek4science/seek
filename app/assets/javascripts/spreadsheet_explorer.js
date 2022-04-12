@@ -364,9 +364,6 @@ function select_cells(startCol, startRow, endCol, endRow, sheetNumber) {
         selection += (":" + num2alpha(maxCol).toString() + maxRow.toString());
 
     $j('#selected_cell').text(selection);
-
-    //Show selection-dependent controls
-    $j('.requires_selection').show();
 }
 
 /* search_matched_spreadsheets_content.html.erb calls with a third argument - fileIndex = item_id
