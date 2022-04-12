@@ -372,7 +372,7 @@ module IsaExporter
 				   name: s.get_attribute_value(with_tag_isa_other_material),
 				   type: with_tag_isa_other_material.title,
 				   characteristics: convert_characteristics(s, with_tag_isa_other_material_characteristics),
-				   derivesFrom: extract_sample_ids(s.get_attribute_value(with_type_seek_sample_multi), "sample")
+				   derivesFrom: extract_sample_ids(s.get_attribute_value(with_type_seek_sample_multi), "other_material")
 			    }
 			end.flatten
 		  end
