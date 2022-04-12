@@ -16,7 +16,12 @@ module IsaExporter
             isa_investigation[:publicReleaseDate] = nil #@investigation.created_at.to_date.iso8601
             isa_investigation[:ontologySourceReferences] = convert_ontologies
             isa_investigation[:filename] = "#{@investigation.title}.txt"
-		  isa_investigation[:comments] = [{ name: "ISAjson export time", value: Time.now.utc.iso8601 }]
+		  isa_investigation[:comments] = [
+			  { name: "ISAjson export time", value: Time.now.utc.iso8601 },
+			  { name: "SEEK Project name", value: @investigation.projects.first.title },
+			  { name: "SEEK Project ID", value: "#{Seek::Config.site_base_host}/single_pages/#{@investigation.projects.first.id}" },
+			  { name: "SEEK Investigation ID", value: @investigation.id }
+		  ]
 
             publications = []
             @investigation.publications.each do |p|
