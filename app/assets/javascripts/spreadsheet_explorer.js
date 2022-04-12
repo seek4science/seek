@@ -49,12 +49,12 @@ $j(document).ready(function ($j) {
                     //Update the cell info box to contain either the value of the cell or the formula
                     // also make hovering over the info box display all the text.
                     if ($j(this).attr("title")) {
-                        $j('#cell_info').val($j(this).attr("title"));
-                        $j('#cell_info').attr("title", $j(this).attr("title"));
+                        $j('#cell_value').text($j(this).attr("title"));
+                        $j('#cell_value').attr("title", $j(this).attr("title"));
                     }
                     else {
-                        $j('#cell_info').val($j(this).html());
-                        $j('#cell_info').attr("title", $j(this).html());
+                        $j('#cell_value').text($j(this).html());
+                        $j('#cell_value').attr("title", $j(this).html());
                     }
                     isMouseDown = true;
                     startRow = parseInt($j(this).attr("row"));
@@ -158,7 +158,7 @@ $j(document).ready(function ($j) {
     ;
 
     //Select cells that are typed in
-    $j('input#selection_data')
+    $j('input#selected_cell')
         .keyup(function(e) {
             if(e.keyCode == 13) {
                 var active_sheet = $j("div.active_sheet");
@@ -220,7 +220,6 @@ $j(document).ready(function ($j) {
             }
         })
     ;
-    adjust_container_dimensions();
 
 });
 
@@ -235,24 +234,6 @@ function max_container_width() {
         max_width += parseInt($j(this)[0].style.width);
     });
     return max_width;
-}
-
-function adjust_container_dimensions() {
-    var selector = $j("div.spreadsheet_container");
-    var max_width = max_container_width();
-    var spreadsheet_container_width = selector.width();
-    if (spreadsheet_container_width>=max_width) {
-        selector.width(max_width);
-        spreadsheet_container_width = max_width;
-    }
-    else {
-        selector.width("95%");
-        spreadsheet_container_width = selector.width();
-    }
-    //var sheet_container_width = spreadsheet_container_width - 2;
-    //var sheet_width = spreadsheet_container_width -45;
-    //$j(".sheet_container").width(sheet_container_width);
-    //$j(".sheet").width(sheet_width);
 }
 
 //Convert a numeric column index to an alphabetic one
@@ -382,7 +363,7 @@ function select_cells(startCol, startRow, endCol, endRow, sheetNumber) {
     if(maxRow != minRow || maxCol != minCol)
         selection += (":" + num2alpha(maxCol).toString() + maxRow.toString());
 
-    $j('#selection_data').val(selection);
+    $j('#selected_cell').text(selection);
 
     //Show selection-dependent controls
     $j('.requires_selection').show();
