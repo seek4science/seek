@@ -8,8 +8,8 @@ class ApplicationController < ActionController::Base
   include Seek::Errors::ControllerErrorHandling
   include Seek::EnabledFeaturesFilter
   include Recaptcha::Verify
-
   include CommonSweepers
+  include ResourceHelper
 
   # if the logged in user is currently partially registered, force the continuation of the registration process
   before_action :partially_registered?
@@ -122,17 +122,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  # returns the instance for the resource for the controller, e.g @data_file for data_files
-  def resource_for_controller(c = controller_name)
-    instance_variable_get("@#{c.singularize}")
-  end
-
-  # returns the current version of the resource for the controller, e.g @display_data_file for data_files
-  def versioned_resource_for_controller(c = controller_name)
-    instance_variable_get("@display_#{c.singularize}")
-  end
-
-  helper_method :controller_model, :resource_for_controller, :versioned_resource_for_controller
+  helper_method :controller_model
 
   def self.api_actions(*actions)
     @api_actions ||= (superclass.respond_to?(:api_actions) ? superclass.api_actions.dup : []) + actions.map(&:to_sym)
@@ -149,7 +139,7 @@ class ApplicationController < ActionController::Base
       flash[:error] = "Only members of #{t('project').downcase.pluralize} can create content."
       respond_to do |format|
         format.html do
-          object = determine_asset_from_controller
+          object = resource_for_controller
           if !object.nil? && object.try(:can_view?)
             redirect_to object
           else
