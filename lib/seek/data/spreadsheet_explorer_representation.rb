@@ -20,10 +20,6 @@ module Seek
         content_blob.is_extractable_excel?
       end
 
-      def spreadsheet_annotations
-        content_blob.worksheets.collect { |w| w.cell_ranges.collect(&:annotations) }.flatten
-      end
-
       # Return the data file's spreadsheet
       # If it doesn't exist yet, it gets created
       def spreadsheet
@@ -241,12 +237,11 @@ module Seek
       end
 
       class Workbook
-        attr_accessor :sheets, :styles, :annotations
+        attr_accessor :sheets, :styles
 
         def initialize
           @sheets = []
           @styles = {}
-          @annotations = []
         end
 
         def [](x)
