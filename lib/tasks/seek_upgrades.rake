@@ -23,6 +23,7 @@ namespace :seek do
     seek:rebuild_workflow_internals
     update_thesis_related_publication_types
     remove_scale_annotations
+    remove_spreadsheet_annotations
     strip_site_base_host_path
     convert_roles
   ]
@@ -217,7 +218,16 @@ namespace :seek do
     a = Annotation.joins(:annotation_attribute).where(annotation_attribute: { name: ['additional_scale_info', 'scale'] })
     count = a.count
     a.destroy_all
-    puts "Removed #{count} scale-related annotations" if count > 0
+    puts "Removed #{count} scale related annotations" if count > 0
+  end
+
+  task(remove_spreadsheet_annotations: [:environment]) do
+    annotations = Annotation.where(annotatable_type: 'CellRange')
+    count = annotations.count
+    AnnotationAttribute.joins(:annotations).where(annotations: { annotatable_type: 'CellRange' }).destroy_all
+    TextValue.joins(:annotations).where(annotations: { annotatable_type: 'CellRange' }).destroy_all
+    annotations.destroy_all
+    puts "Removed #{count} spreadsheet related annotations" if count > 0
   end
 
   task(convert_roles: [:environment]) do
