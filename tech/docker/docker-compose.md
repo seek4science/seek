@@ -134,3 +134,15 @@ Start with a clean Docker Compose setup described above. Running the script, pas
 
     wget https://github.com/seek4science/seek/raw/seek-{{ site.current_docker_tag }}/script/import-docker-data.sh
     sh ./import-docker-data.sh /tmp/seek-migration/
+    
+## Using a Sub-URI
+
+If you wish to run SEEK under a sub-URI (e.g. https://yourdomain.com/my-seek/) you can specify this by adding a line to [docker/db.env](https://raw.githubusercontent.com/seek4science/seek/seek-{{ site.current_docker_tag }}/docker/db.env):
+```
+RAILS_RELATIVE_URL_ROOT=/my-seek
+```
+
+Please note if adding/changing/removing the `RAILS_RELATIVE_URL_ROOT` on an existing container, you will have to recompile assets and clear the cache:
+
+    docker exec seek bundle exec rake assets:precompile
+    docker exec seek bundle exec rake tmp:clear
