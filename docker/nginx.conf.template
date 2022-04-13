@@ -65,16 +65,17 @@ http {
         server {
                 listen 3000;
                 client_max_body_size 50G;
-                location ${SEEK_SUB_URI}/assets/ {
+
+                location ~ ^${SEEK_LOCATION}(/.*|$) {
+                        alias /seek/public;
+                        try_files $1 $1/index.html $1.html @app;
+                }
+                location ^~ ${SEEK_SUB_URI}/assets/ {
                         gzip_static on;
                         expires max;
                         add_header Cache-Control public;
                         alias /seek/public/assets/;
                         break;
-                }
-                location ${SEEK_LOCATION} {
-                    alias /seek/public;
-                    try_files $uri $uri/index.html $uri.html @app;
                 }
                 location @app {
                         proxy_pass http://127.0.0.1:2000;
