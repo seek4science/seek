@@ -24,5 +24,5 @@ attribute types registered with the system can be found using the <a href="#oper
 When creating or updating and wishing to specify the **sample_attribute_type**, either it's **id** or unique **title** can be used.
 
 When updating a SampleType, a **sample_attribute** can be updated by specifying it's **id**. Without the **id**, a new attribute will be added.
-Any **sample_attribute** not described in the payload will be left alone and unchanged. To remove an attribute, specify it's
+Any **sample_attribute** not described in the payload will be left alone and unchanged. To remove an attribute, specify its
 **id** and also set **_destroy** to be true.
