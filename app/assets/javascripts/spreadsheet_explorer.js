@@ -495,7 +495,3 @@ function displayRowsPerPage(){
         $j('#rows_per_page').show();
     }
 }
-
-$j(document).ready(function () {
-
-});
