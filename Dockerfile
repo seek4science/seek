@@ -69,8 +69,8 @@ RUN curl -fsSLO "$SUPERCRONIC_URL" \
  && mv "$SUPERCRONIC" "/usr/local/bin/${SUPERCRONIC}" \
  && ln -s "/usr/local/bin/${SUPERCRONIC}" /usr/local/bin/supercronic
 
-# Cleanup
-RUN rm -rf /tmp/* /var/tmp/*
+# Cleanup and remove default nginx index page
+RUN rm -rf /tmp/* /var/tmp/* /usr/share/nginx/html/index.html
 
 USER www-data
 
