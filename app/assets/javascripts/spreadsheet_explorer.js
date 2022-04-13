@@ -1,9 +1,5 @@
 
 
-$j(window)
-    .resize(function(e) {
-        adjust_container_dimensions();
-    });
 
 $j(document).ready(function ($j) {
 
@@ -181,9 +177,6 @@ $j(document).ready(function ($j) {
                 } else {
                     var obj_id = activate_sheet_from_resizable(this);
                     $j("table." + obj_id + ".active_sheet col:eq(" + ($j(this).index() - 1) + ")").width($j(this).width());
-                }
-                if ($j("div.spreadsheet_container").width()>max_container_width()) {
-                    adjust_container_dimensions();
                 }
             }
         })
@@ -435,9 +428,6 @@ function activateSheet(sheet, sheetTab, fileIndex) {
         endRow = 0,
         endCol = 0;
 
-    //FIXME: for some reason, calling this twice solves a problem where the column and column header widths are mis-aligned
-    adjust_container_dimensions();
-    adjust_container_dimensions();
     return false;
 }
 
