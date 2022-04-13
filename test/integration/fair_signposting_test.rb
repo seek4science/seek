@@ -11,9 +11,10 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     links = parse_link_header
-    assert_equal 3, links.size
+    assert_equal 4, links.size
     assert_link(links, data_file_url(df, version: 1), rel: 'describedby', type: :datacite_xml)
     assert_link(links, data_file_url(df, version: 1), rel: 'describedby', type: :jsonld)
+    assert_link(links, data_file_url(df, version: 1), rel: 'describedby', type: :rdf)
     assert_link(links, download_data_file_url(df, version: 1), rel: 'item', type: :pdf)
   end
 
@@ -27,9 +28,10 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     links = parse_link_header
-    assert_equal 4, links.size
+    assert_equal 5, links.size
     assert_link(links, data_file_url(df, version: 2), rel: 'describedby', type: :datacite_xml)
     assert_link(links, data_file_url(df, version: 2), rel: 'describedby', type: :jsonld)
+    assert_link(links, data_file_url(df, version: 2), rel: 'describedby', type: :rdf)
     assert_link(links, 'https://doi.org/10.5075/abcd', rel: 'cite-as')
     assert_link(links, download_data_file_url(df, version: 2), rel: 'item', type: :png)
   end
@@ -56,8 +58,9 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     links = parse_link_header
-    assert_equal 1, links.size
+    assert_equal 2, links.size
     assert_link(links, 'https://doi.org/10.5075/abcd', rel: 'cite-as')
+    assert_link(links, publication_url(pub, version: 1), rel: 'describedby', type: :rdf)
   end
 
   test 'fair signposting for model' do
@@ -69,8 +72,9 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     links = parse_link_header
-    assert_equal 2, links.size
+    assert_equal 3, links.size
     assert_link(links, model_url(mod, version: 1), rel: 'describedby', type: :datacite_xml)
+    assert_link(links, model_url(mod, version: 1), rel: 'describedby', type: :rdf)
     assert_link(links, download_model_url(mod, version: 1), rel: 'item', type: :zip)
   end
 
@@ -82,8 +86,9 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     links = parse_link_header
-    assert_equal 2, links.size
+    assert_equal 3, links.size
     assert_link(links, sop_url(sop, version: 1), rel: 'describedby', type: :datacite_xml)
+    assert_link(links, sop_url(sop, version: 1), rel: 'describedby', type: :rdf)
     assert_link(links, download_sop_url(sop, version: 1), rel: 'item', type: :pdf)
   end
 
@@ -94,6 +99,19 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
 
     get assay_path(a)
 
+    links = parse_link_header
+    assert_response :success
+    assert_equal 1, links.size
+    assert_link(links, assay_url(a), rel: 'describedby', type: :rdf)
+  end
+
+  test 'fair signposting for home' do
+    doi_citation_mock
+    p = Factory(:presentation)
+    login_as(p.contributor.user)
+
+    get root_path(p)
+
     assert_response :success
     assert_nil response.headers['Link'], 'Should not have any signposting links'
   end
@@ -101,7 +119,7 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
   private
 
   def assert_link(links, url, props = {})
-    assert links.any? { |u, p| u == url && props.all? { |k, v| p[k] == props[k] } }, "Expected links to contain: #{url} and #{props}"
+    assert links.any? { |u, p| u == url && props.all? { |k, v| p[k] == props[k] } }, "Expected links to contain: #{url} and #{props.inspect}"
   end
 
   def parse_link_header
