@@ -153,17 +153,6 @@ $j(document).ready(function ($j) {
         })
     ;
 
-    //Select cells that are typed in
-    $j('input#selected_cell')
-        .keyup(function(e) {
-            if(e.keyCode == 13) {
-                var active_sheet = $j("div.active_sheet");
-                var active_sheet_number = active_sheet.id.split('_')[1];
-                select_range($j(this).val(), active_sheet_number);
-            }
-        })
-    ;
-
     //Resizable column/row headings
     //also makes them clickable to select all cells in that row/column
     $j( "div.col_heading" )
