@@ -65,7 +65,7 @@ http {
         server {
                 listen 3000;
                 client_max_body_size 50G;
-                location ${RAILS_RELATIVE_URL_ROOT}/assets/ {
+                location ${SEEK_SUB_URI}/assets/ {
                         gzip_static on;
                         expires max;
                         add_header Cache-Control public;
