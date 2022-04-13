@@ -37,9 +37,3 @@ Factory.define :worksheet do |f|
   f.last_row 10
   f.last_column 10
 end
-
-# CellRange
-Factory.define :cell_range do |f|
-  f.cell_range 'A1:B3'
-  f.association :worksheet
-end
