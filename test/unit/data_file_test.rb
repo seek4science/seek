@@ -285,21 +285,6 @@ class DataFileTest < ActiveSupport::TestCase
     assert_equal 'application/vnd.ms-excel', blob.content_type
   end
 
-  test 'spreadsheet annotation search fields' do
-    df = Factory(:data_file)
-    cr = Factory(:cell_range, worksheet: Factory(:worksheet, content_blob: df.content_blob))
-
-    Annotation.create(source: Factory(:user),
-                      annotatable: cr,
-                      attribute_name: 'annotation',
-                      value: 'fish')
-
-    df.reload
-    refute_empty df.content_blob.worksheets
-    fields = df.spreadsheet_annotation_search_fields
-    assert_equal ['fish'], fields
-  end
-
   test 'openbis?' do
     mock_openbis_calls
     User.with_current_user(Factory(:user)) do

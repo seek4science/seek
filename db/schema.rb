@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_04_06_093324) do
+ActiveRecord::Schema.define(version: 2022_04_13_092221) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string "action"
@@ -263,17 +263,6 @@ ActiveRecord::Schema.define(version: 2022_04_06_093324) do
     t.text "cached_concept_yaml"
     t.integer "conceptable_id"
     t.string "conceptable_type"
-  end
-
-  create_table "cell_ranges", force: :cascade do |t|
-    t.integer "cell_range_id"
-    t.integer "worksheet_id"
-    t.integer "start_row"
-    t.integer "start_column"
-    t.integer "end_row"
-    t.integer "end_column"
-    t.datetime "created_at"
-    t.datetime "updated_at"
   end
 
   create_table "collection_auth_lookup", force: :cascade do |t|
