@@ -19,7 +19,7 @@ Rails.application.config.assets.precompile += [
     'pdfjs/debugger',
     'pdfjs/l10n',
     'pdfjs/pdf',
-    'pdfjs/viewer',
+    'pdfjs/viewer.js',
     "pdfjs/viewer.css",
     "cytoscape_web/index",
     'projects',

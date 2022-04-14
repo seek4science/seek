@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class PeopleControllerTest < ActionController::TestCase
-  fixtures :people, :users, :projects, :work_groups, :group_memberships, :institutions
+  fixtures :people, :users, :projects, :work_groups, :group_memberships, :institutions, :roles
 
   include AuthenticatedTestHelper
   include RestTestCases
@@ -33,7 +33,7 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   def test_first_registered_person_is_admin_and_default_project
-    Person.destroy_all
+    Person.delete_all
     Project.delete_all
 
     project = Factory(:work_group).project
@@ -334,7 +334,7 @@ class PeopleControllerTest < ActionController::TestCase
   test 'should have asset housekeeper role on person show page' do
     asset_housekeeper = Factory(:asset_housekeeper)
     get :show, params: { id: asset_housekeeper }
-    assert_select '#project-roles h3 img[src*=?]', role_image(:asset_housekeeper), count: 1
+    assert_select '#person-roles h3 img[src*=?]', role_image(:asset_housekeeper), count: 1
   end
 
   test 'should have asset housekeeper icon on people index page' do
@@ -351,7 +351,7 @@ class PeopleControllerTest < ActionController::TestCase
   test 'should have project administrator role on person show page' do
     project_administrator = Factory(:project_administrator)
     get :show, params: { id: project_administrator }
-    assert_select '#project-roles h3 img[src*=?]', role_image(:project_administrator), count: 1
+    assert_select '#person-roles h3 img[src*=?]', role_image(:project_administrator), count: 1
   end
 
   test 'should have project administrator icon on people index page' do
@@ -420,15 +420,6 @@ class PeopleControllerTest < ActionController::TestCase
     end
     assert_redirected_to :root
     refute_nil flash[:error]
-  end
-
-  test 'cannot update person roles mask' do
-    login_as(Factory(:admin))
-    person = Factory(:person)
-    put :update, params: { id: person, person: { first_name: 'blabla', roles_mask: mask_for_admin } }
-    assert_redirected_to person_path(assigns(:person))
-    refute assigns(:person).is_admin?
-    assert_equal 'blabla', assigns(:person).first_name
   end
 
   test 'not allow project administrator to edit people outside their projects' do
@@ -526,7 +517,37 @@ class PeopleControllerTest < ActionController::TestCase
   test 'should have gatekeeper role on person show page' do
     gatekeeper = Factory(:asset_gatekeeper)
     get :show, params: { id: gatekeeper }
-    assert_select '#project-roles h3 img[src*=?]', role_image(:asset_gatekeeper), count: 1
+    assert_select '#person-roles h3 img[src*=?]', role_image(:asset_gatekeeper), count: 1
+  end
+
+  test 'should show all roles on person show page' do
+    programme = Factory(:programme)
+    project = Factory(:project)
+    person = Factory(:person, project: project)
+
+    assert_difference('Role.count', RoleType.all.count) do
+      disable_authorization_checks do
+        RoleType.for_system.each do |rt|
+          person.assign_role(rt.key)
+        end
+        RoleType.for_projects.each do |rt|
+          person.assign_role(rt.key, project)
+        end
+        RoleType.for_programmes.each do |rt|
+          person.assign_role(rt.key, programme)
+        end
+        person.save
+      end
+    end
+
+    get :show, params: { id: person }
+
+    assert_select '#person-roles h3', count: RoleType.all.count
+    RoleType.all.each do |rt|
+      assert_select '#person-roles h3 img[src*=?]', role_image(rt.key), { count: 1 }, "Missing image for #{rt.key}"
+    end
+    assert_select '#person-roles a[href=?]', project_path(project), count: RoleType.for_projects.count
+    assert_select '#person-roles a[href=?]', programme_path(programme), count: RoleType.for_programmes.count
   end
 
   test 'should have gatekeeper icon on people index page' do
@@ -1240,14 +1261,6 @@ class PeopleControllerTest < ActionController::TestCase
     Factory(:event, contributor: person, policy: Factory(:public_policy))
     #person.save
     add_avatar_to_test_object(person)
-  end
-
-  def mask_for_admin
-    Seek::Roles::Roles.instance.mask_for_role('admin')
-  end
-
-  def mask_for_pal
-    Seek::Roles::Roles.instance.mask_for_role('pal')
   end
 
   def role_image(role)

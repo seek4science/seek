@@ -12,7 +12,7 @@
   <%= render :partial => 'admin/omniauth' %>
 
   <%= admin_checkbox_setting(:pdf_conversion_enabled, 1, Seek::Config.pdf_conversion_enabled,
-                             "PDF conversion enabled", "Whether PDF conversion is enabled. It allows converting some document types to PDF format. If enabled, you need to ensure OpenOffice is running") %>
+                             "PDF conversion enabled", "Whether PDF conversion is enabled. It allows converting some document types to PDF format. If enabled, you need to ensure LibreOffice is installed") %>
 
   <%= admin_checkbox_setting(:fair_signposting_enabled, 1, Seek::Config.fair_signposting_enabled,
                              "FAIR Signposting Enabled", "Whether #{link_to('FAIR Signposting', 'https://signposting.org/FAIR/', target: :_blank)} headers are added to resource landing pages.") %>
