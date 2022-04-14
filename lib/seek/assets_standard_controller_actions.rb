@@ -20,7 +20,7 @@ module Seek
     end
 
     def show
-      asset = determine_asset_from_controller
+      asset = resource_for_controller
       # store timestamp of the previous last usage
       @last_used_before_now = asset.last_used_at
 
@@ -64,7 +64,7 @@ module Seek
 
     # handles update for manage properties, the action for the manage form
     def manage_update
-      item = determine_asset_from_controller
+      item = resource_for_controller
       raise 'shouldnt get this far without manage rights' unless item.can_manage?
       item.update(params_for_controller)
       update_sharing_policies item
