@@ -78,12 +78,18 @@ module IsaExporter
             }
 
             protocols = []
+
+		  with_tag_protocol_study = study.sample_types.second.sample_attributes.detect { |sa| sa.isa_tag&.isa_protocol? }
+		  with_tag_parameter_value_study = study.sample_types.second.sample_attributes.select { |sa| sa.isa_tag&.isa_parameter_value? }
+		  raise "Protocol ISA tag not found in study #{study.id}" if with_tag_protocol_study.blank?
+		  protocols << convert_protocol(study.sop, study.id, with_tag_protocol_study, with_tag_parameter_value_study)
+
             study.assays.each do |a|
                 # There should be only one attribute with isa_tag == protocol
                 with_tag_protocol = a.sample_type.sample_attributes.detect { |sa| sa.isa_tag&.isa_protocol? }
                 with_tag_parameter_value = a.sample_type.sample_attributes.select { |sa| sa.isa_tag&.isa_parameter_value? }
                 raise "Protocol ISA tag not found in assay #{a.id}" if with_tag_protocol.blank?
-                protocols << convert_protocol(a, with_tag_protocol, with_tag_parameter_value)
+                protocols << convert_protocol(a.sops.first, a.id, with_tag_protocol, with_tag_parameter_value)
             end
             isa_study[:protocols] = protocols
 
@@ -187,10 +193,10 @@ module IsaExporter
             source_ontologies.uniq.map { |s| client.fetch_ontology_reference(s) }
         end
 
-        def convert_protocol(assay, protocol, parameter_values)
+        def convert_protocol(sop, id, protocol, parameter_values)
             isa_protocol = {}
-		  sop = assay.sops.first
-            isa_protocol['@id'] =  "#protocol/#{sop.id}_#{assay.id}"
+		#   sop = assay.sops.first
+            isa_protocol['@id'] =  "#protocol/#{sop.id}_#{id}"
             isa_protocol[:name] = protocol.title #sop.title
 
             ontology = get_ontology_details(protocol, protocol.title, false)
