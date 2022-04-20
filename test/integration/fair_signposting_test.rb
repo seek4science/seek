@@ -44,10 +44,11 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     links = parse_link_header
-    assert_equal 3, links.size
+    assert_equal 4, links.size
     assert_link(links, workflow_url(wf, version: 1), rel: 'describedby', type: :datacite_xml)
     assert_link(links, workflow_url(wf, version: 1), rel: 'describedby', type: :jsonld)
     assert_link(links, ro_crate_workflow_url(wf, version: 1), rel: 'item', type: :zip)
+    assert_link(links, 'https://w3id.org/ro/crate', rel: 'profile', anchor: ro_crate_workflow_url(wf, version: 1))
   end
 
   test 'fair signposting for publication' do
