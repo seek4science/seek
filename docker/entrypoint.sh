@@ -9,8 +9,15 @@ check_mysql
 # Search
 start_search
 
-# Precompile assets if using RAILS_RELATIVE_URL_ROOT
-if [ ! -z $RAILS_RELATIVE_URL_ROOT ]
+# Set nginx config
+export SEEK_LOCATION="${RAILS_RELATIVE_URL_ROOT:-/}"
+export SEEK_SUB_URI="${SEEK_LOCATION%/}"
+echo "SEEK_LOCATION: '$SEEK_LOCATION'"
+echo "SEEK_SUB_URI: '$SEEK_SUB_URI'"
+envsubst '${SEEK_LOCATION} ${SEEK_SUB_URI}' < docker/nginx.conf.template > nginx.conf
+
+# Precompile assets if using sub URI
+if [ ! -z $SEEK_SUB_URI ]
 then
   echo "COMPILING ASSETS"
   # using --trace prevents giving the feeling things have frozen up during startup
@@ -46,4 +53,4 @@ done
 tail -f log/puma.out log/puma.err log/production.log &
 
 echo "STARTING NGINX"
-nginx -g 'daemon off;'
+nginx -c /seek/nginx.conf -g 'daemon off;'

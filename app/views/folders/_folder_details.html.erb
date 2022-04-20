@@ -79,10 +79,11 @@
         var project_id = <%=@project.id%>
         <%
             fld = ProjectFolder.where(:project_id=>@project.id, :title=>"Unsorted items").first
-            folder_id = fld.id unless fld.nil?
+            folder_id = fld.nil? ? '' : fld.id
+            path = move_asset_to_project_folder_path('-project_id-', folder_id)
         %>
     
-        var path = "/projects/" + project_id + "/folders/" + <%= folder_id%> + "/move_asset_to";
+        var path = '<%= path %>'.replace('-project_id-', project_id);
         const data = {
             asset_id,
             asset_type: "DataFile",
@@ -122,7 +123,7 @@
             data.append("utf8", "✓");
             $j.ajax({
                 type: "POST",
-                url: "/data_files/create_content_blob",
+                url: '<%= create_content_blob_data_files_path -%>',
                 data,
                 cache: false,
                 contentType: false,
