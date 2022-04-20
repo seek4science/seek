@@ -356,7 +356,7 @@ class GitControllerTest < ActionController::TestCase
     assert_no_enqueued_jobs(only: RemoteGitContentFetchingJob) do
       post :add_file, params: { workflow_id: @workflow.id, version: @git_version.version,
                                 file: { path: 'new-file.txt',
-                                        url: 'https://internets.com/files/new.txt' } }
+                                        url: 'https://example.com/files/new.txt' } }
     end
 
     assert_redirected_to workflow_path(@workflow, tab: 'files')
@@ -384,13 +384,47 @@ class GitControllerTest < ActionController::TestCase
     assert_enqueued_jobs(1, only: RemoteGitContentFetchingJob) do
       post :add_file, params: { workflow_id: @workflow.id, version: @git_version.version,
                                 file: { path: 'new-file.txt',
-                                        url: 'https://internets.com/files/new.txt',
+                                        url: 'https://example.com/files/new.txt',
                                         fetch: '1' } }
     end
 
     assert_redirected_to workflow_path(@workflow, tab: 'files')
     assert assigns(:git_version).file_exists?('new-file.txt')
     assert_equal '', assigns(:git_version).file_contents('new-file.txt')
+  end
+
+  test 'replace existing remote file' do
+    refute @git_version.file_exists?('file.txt')
+
+    assert_enqueued_jobs(1, only: RemoteGitContentFetchingJob) do
+      assert_difference('Git::Annotation.count', 1) do
+        post :add_file, params: { workflow_id: @workflow.id, version: @git_version.version,
+                                  file: { path: 'file.txt',
+                                          url: 'https://example.com/files/old.txt',
+                                          fetch: '1' } }
+      end
+    end
+
+    assert_redirected_to workflow_path(@workflow, tab: 'files')
+    assert assigns(:git_version).file_exists?('file.txt')
+    assert_equal '', assigns(:git_version).file_contents('file.txt')
+    assert_equal 'https://example.com/files/old.txt', assigns(:git_version).remote_sources['file.txt']
+
+    assert_enqueued_jobs(1, only: RemoteGitContentFetchingJob) do
+      assert_no_difference('Git::Annotation.count') do
+        post :add_file, params: { workflow_id: @workflow.id, version: @git_version.version,
+                                  file: { path: 'file.txt',
+                                          url: 'https://example.com/files/new.txt',
+                                          fetch: '1' } }
+      end
+    end
+
+    assert_redirected_to workflow_path(@workflow, tab: 'files')
+    assert assigns(:git_version).file_exists?('file.txt')
+    assert_equal '', assigns(:git_version).file_contents('file.txt')
+    assert_equal 'https://example.com/files/new.txt', assigns(:git_version).remote_sources['file.txt']
+
+    assert_equal 1, assigns(:git_version).git_annotations.count
   end
 
   test 'view a blob as json' do
