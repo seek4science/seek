@@ -8,8 +8,8 @@ class ApplicationController < ActionController::Base
   include Seek::Errors::ControllerErrorHandling
   include Seek::EnabledFeaturesFilter
   include Recaptcha::Verify
-
   include CommonSweepers
+  include ResourceHelper
 
   # if the logged in user is currently partially registered, force the continuation of the registration process
   before_action :partially_registered?
@@ -32,8 +32,9 @@ class ApplicationController < ActionController::Base
   before_action :check_json_id_type, only: [:create, :update], if: :json_api_request?
   before_action :convert_json_params, only: [:update, :destroy, :create, :create_version], if: :json_api_request?
   before_action :secure_user_content
-
   before_action :rdf_enabled? #only allows through rdf calls to supported types
+
+  include FairSignposting
 
   helper :all
 
@@ -133,18 +134,12 @@ class ApplicationController < ActionController::Base
 
   private
 
-  # returns the model asset assigned to the standard object for that controller, e.g. @model for models_controller
-  def determine_asset_from_controller
-    name = controller_name.singularize
-    instance_variable_get("@#{name}")
-  end
-
   def project_membership_required
     unless User.logged_in_and_member? || admin_logged_in?
       flash[:error] = "Only members of #{t('project').downcase.pluralize} can create content."
       respond_to do |format|
         format.html do
-          object = determine_asset_from_controller
+          object = resource_for_controller
           if !object.nil? && object.try(:can_view?)
             redirect_to object
           else
