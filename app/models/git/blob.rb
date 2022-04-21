@@ -53,6 +53,8 @@ module Git
     end
 
     def ==(other)
+      return super unless other.is_a?(Git::Blob)
+
       git_version == other.git_version &&
         path == other.path &&
         oid == other.oid
