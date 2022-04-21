@@ -112,6 +112,10 @@
           </div>
 
           <%= submit_tag('Accept', class: 'btn btn-success',id:'submit-button') %>
+          <span style="display:none">
+            <%= check_box_tag 'delete_request','1',false %>
+          </span>
+          <%= submit_tag('Delete', class: 'btn btn-danger',id:'delete-button') %>
 
         <% end %>
 
@@ -158,6 +162,16 @@
           submitButtonStatus();
           rejectDetailsStatus();
         <% end %>
+
+        $j('input#delete-button').on('click', function() {
+            if (confirm("Are you sure. This will permanently delete the request, and the requester won't be notified")) {
+                $j('input#accept_request').prop( "checked", false );
+                $j('input#delete_request').prop( "checked", true );
+            }
+            else {
+                return false;
+            }
+        });
     });
 
 </script>

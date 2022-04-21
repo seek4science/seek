@@ -589,7 +589,7 @@ class ProjectsController < ApplicationController
       end
 
     else
-      if @message_log.sent_by_self?
+      if @message_log.sent_by_self? || params['delete_request'] == '1'
         @message_log.destroy
         flash[:notice]="#{t('project')} creation cancelled"
       else
@@ -767,7 +767,7 @@ class ProjectsController < ApplicationController
     error_msg ||= "message log not found" unless @message_log
     error_msg ||= ("incorrect type of message log" unless @message_log.project_creation_request?)
     error_msg ||= ("message has already been responded to" if @message_log.responded?)
-    
+
     if error_msg
       error(error_msg, error_msg)
       return false
@@ -785,7 +785,7 @@ class ProjectsController < ApplicationController
     if @institution.new_record?
       # override with existing institution if already exists with same title, it could have been created since the request was made
       @institution = Institution.find_by(title: @institution.title) if Institution.find_by(title: @institution.title)
-    end 
+    end
   end
 
   # check programme permissions for responding to a MessageLog
