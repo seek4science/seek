@@ -24,12 +24,28 @@ module Git
       git_version.remote_sources[path]
     end
 
-    def file_contents(&block)
-      if block_given?
-        block.call(StringIO.new(content)) # Rugged does not support streaming blobs :(
+    def file_contents(fetch_remote: false, &block)
+      if fetch_remote && remote? && !fetched?
+        if block_given?
+          block.call(remote_content)
+        else
+          remote_content.read
+        end
       else
-        content
+        if block_given?
+          block.call(StringIO.new(content)) # Rugged does not support streaming blobs :(
+        else
+          content
+        end
       end
+    end
+
+    def remote?
+      url.present?
+    end
+
+    def fetched?
+      !empty?
     end
 
     def empty?
@@ -60,6 +76,15 @@ module Git
         end
       end
       content
+    end
+
+    def remote_content
+      return unless remote?
+      handler = ContentBlob.remote_content_handler_for(url)
+      return unless handler
+      io = handler.fetch
+      io.rewind
+      io
     end
   end
 end

@@ -19,7 +19,7 @@ class RemoteGitContentFetchingJobTest < ActiveSupport::TestCase
     assert_equal 'http://somewhere.com/text.txt', gv.remote_sources['remote-file.txt']
     assert_equal '', gv.file_contents('remote-file.txt')
 
-    RemoteGitContentFetchingJob.perform_now(gv, 'remote-file.txt', 'http://somewhere.com/text.txt')
+    RemoteGitContentFetchingJob.perform_now(gv, 'remote-file.txt')
 
     assert_not_equal old_commit, gv.reload.commit
     assert_equal 'little file', gv.file_contents('remote-file.txt')
@@ -41,7 +41,7 @@ class RemoteGitContentFetchingJobTest < ActiveSupport::TestCase
     assert_equal 'http://somewhere.com/text.txt', gv.remote_sources['remote-file.txt']
     assert_equal '', gv.file_contents('remote-file.txt')
 
-    RemoteGitContentFetchingJob.perform_now(gv, 'remote-file.txt', 'http://somewhere.com/text.txt')
+    RemoteGitContentFetchingJob.perform_now(gv, 'remote-file.txt')
 
     assert_equal old_commit, gv.reload.commit
     assert_equal '', gv.file_contents('remote-file.txt')

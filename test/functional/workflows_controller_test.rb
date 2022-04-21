@@ -960,6 +960,36 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_equal 'Concat two files', assigns(:workflow).title
   end
 
+  test 'can update paths and extract metadata for remote, unfetched workflow' do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'https://www.abc.com/workflow.cwl'
+    cwl = Factory(:cwl_workflow_class)
+
+    workflow = Factory(:git_version).resource
+    gv = workflow.git_version
+    login_as(workflow.contributor)
+
+
+    assert_difference('Git::Annotation.count', 1) do
+      assert_no_enqueued_jobs(only: RemoteGitContentFetchingJob) do
+        gv.add_remote_file('new-main-workflow.cwl', 'https://www.abc.com/workflow.cwl', fetch: false)
+        gv.save!
+      end
+    end
+
+    assert_equal 0, workflow.structure.inputs.count
+
+    assert_difference('Git::Annotation.count', 1) do
+      patch :update_paths, params: { id: workflow.id,
+                                     git_version: { main_workflow_path: 'new-main-workflow.cwl' },
+                                     workflow: { workflow_class_id: cwl.id },
+                                     extract_metadata: '1' }
+
+      assert_response :success
+    end
+
+    assert_equal 5, assigns(:workflow).structure.inputs.count
+  end
+
   test 'new version form for git-versioned workflow redirect to new_git_version' do
     with_config_value(:git_support_enabled, false) do
       workflow = Factory(:git_version).resource

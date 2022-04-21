@@ -261,8 +261,13 @@ module Git
 
       add_file(path, StringIO.new(''), message: message).tap do
         self.remote_sources = remote_sources.merge(path => url)
-        RemoteGitContentFetchingJob.perform_later(self, path, url) if fetch
+        RemoteGitContentFetchingJob.perform_later(self, path) if fetch
       end
+    end
+
+    def fetch_remote_file(path)
+      io = get_blob(path)&.remote_content
+      add_file(path, io, message: "Fetched #{path} from URL") if io
     end
 
     def search_terms
