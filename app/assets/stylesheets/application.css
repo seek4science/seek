@@ -37,4 +37,5 @@
 *= require dashboard
 *= require git
 *= require associations
+*= require admin
 */
