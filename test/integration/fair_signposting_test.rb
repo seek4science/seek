@@ -47,7 +47,7 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
     assert_equal 3, links.size
     assert_link(links, workflow_url(wf, version: 1), rel: 'describedby', type: :datacite_xml)
     assert_link(links, workflow_url(wf, version: 1), rel: 'describedby', type: :jsonld)
-    assert_link(links, ro_crate_workflow_url(wf, version: 1), rel: 'item', type: :zip)
+    assert_link(links, ro_crate_workflow_url(wf, version: 1), rel: 'item', type: :zip, profile: 'https://w3id.org/ro/crate')
   end
 
   test 'fair signposting for publication' do
@@ -130,11 +130,12 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
         if url
           props = {}
           segments[1..-1].each do |seg|
-            k, v = seg.split('=').map(&:strip)
-            str = v.match(/"(.+)"/)
-            v = str[1] if str
-            v = Mime::Type.lookup(v).to_sym if k == 'type'
-            props[k.to_sym] = v
+            matches = seg.match(/([^=]+)\s*=\s*"([^"]+)"/)
+            if matches
+              k, v = matches[1], matches[2]
+              v = Mime::Type.lookup(v).to_sym if k == 'type'
+              props[k.to_sym] = v
+            end
           end
           [url[1], props]
         end

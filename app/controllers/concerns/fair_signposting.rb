@@ -1,5 +1,7 @@
 module FairSignposting
   extend ActiveSupport::Concern
+  # registered in https://www.iana.org/assignments/profile-uris/profile-uris.xhtml
+  RO_CRATE_PROFILE='https://w3id.org/ro/crate'
 
   def fair_signposting
     parent_asset = resource_for_controller
@@ -18,7 +20,7 @@ module FairSignposting
 
     # item
     if display_asset.respond_to?(:ro_crate)
-      links << [polymorphic_url([:ro_crate, parent_asset], **url_opts), { rel: :item, type: :zip }]
+      links << [polymorphic_url([:ro_crate, parent_asset], **url_opts), { rel: :item, type: :zip, profile: RO_CRATE_PROFILE}]
     elsif display_asset.respond_to?(:content_blobs) && display_asset.content_blobs.any?
       links << [polymorphic_url([:download, parent_asset], **url_opts), { rel: :item, type: :zip }]
     elsif display_asset.respond_to?(:content_blob) && display_asset.content_blob
