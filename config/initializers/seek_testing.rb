@@ -135,5 +135,6 @@ def load_seek_testing_defaults!
       Settings.defaults[:life_monitor_client_id] = 'xyz'
       Settings.defaults[:life_monitor_client_secret] = 'xyzabc'
       Settings.defaults[:git_support_enabled] = true
+      Settings.defaults[:fair_signposting_enabled] = true
     end
 end

@@ -1,32 +1,5 @@
-function annotation_source(id, type, name, url) {
-    this.id = id;
-    this.type = type;
-    this.name = name;
-    this.url = url;
-    this.annotations = [];
-}
 
-function annotation(id, type, sheet_number, cell_range, content, date_created) {
-    this.id = id;
-    this.type = type;
-    this.sheetNumber = sheet_number;
-    this.cellRange = cell_range;
-    this.content = content;
-    this.dateCreated = date_created;
 
-    var cell_coords = explodeCellRange(cell_range);
-    this.startCol = cell_coords[0];
-    this.startRow = cell_coords[1];
-    this.endCol = cell_coords[2];
-    this.endRow = cell_coords[3];
-}
-
-var $j = jQuery.noConflict(); //To prevent conflicts with prototype
-
-$j(window)
-    .resize(function(e) {
-        adjust_container_dimensions();
-    });
 
 $j(document).ready(function ($j) {
 
@@ -72,12 +45,12 @@ $j(document).ready(function ($j) {
                     //Update the cell info box to contain either the value of the cell or the formula
                     // also make hovering over the info box display all the text.
                     if ($j(this).attr("title")) {
-                        $j('#cell_info').val($j(this).attr("title"));
-                        $j('#cell_info').attr("title", $j(this).attr("title"));
+                        $j('#cell_value').text($j(this).attr("title"));
+                        $j('#cell_value').attr("title", $j(this).attr("title"));
                     }
                     else {
-                        $j('#cell_info').val($j(this).html());
-                        $j('#cell_info').attr("title", $j(this).html());
+                        $j('#cell_value').text($j(this).html());
+                        $j('#cell_value').attr("title", $j(this).html());
                     }
                     isMouseDown = true;
                     startRow = parseInt($j(this).attr("row"));
@@ -176,20 +149,6 @@ $j(document).ready(function ($j) {
                     scrolling = false;
                     $j('div.active_sheet').stop();
                 }
-                //Hide annotations
-                $j('#annotation_container').hide();
-                $j('div.annotation').hide();
-            }
-        })
-    ;
-
-    //Select cells that are typed in
-    $j('input#selection_data')
-        .keyup(function(e) {
-            if(e.keyCode == 13) {
-                var active_sheet = $j("div.active_sheet");
-                var active_sheet_number = active_sheet.id.split('_')[1];
-                select_range($j(this).val(), active_sheet_number);
             }
         })
     ;
@@ -207,9 +166,6 @@ $j(document).ready(function ($j) {
                 } else {
                     var obj_id = activate_sheet_from_resizable(this);
                     $j("table." + obj_id + ".active_sheet col:eq(" + ($j(this).index() - 1) + ")").width($j(this).width());
-                }
-                if ($j("div.spreadsheet_container").width()>max_container_width()) {
-                    adjust_container_dimensions();
                 }
             }
         })
@@ -246,7 +202,6 @@ $j(document).ready(function ($j) {
             }
         })
     ;
-    adjust_container_dimensions();
 
 });
 
@@ -261,24 +216,6 @@ function max_container_width() {
         max_width += parseInt($j(this)[0].style.width);
     });
     return max_width;
-}
-
-function adjust_container_dimensions() {
-    var selector = $j("div.spreadsheet_container");
-    var max_width = max_container_width();
-    var spreadsheet_container_width = selector.width();
-    if (spreadsheet_container_width>=max_width) {
-        selector.width(max_width);
-        spreadsheet_container_width = max_width;
-    }
-    else {
-        selector.width("95%");
-        spreadsheet_container_width = selector.width();
-    }
-    //var sheet_container_width = spreadsheet_container_width - 2;
-    //var sheet_width = spreadsheet_container_width -45;
-    //$j(".sheet_container").width(sheet_container_width);
-    //$j(".sheet").width(sheet_width);
 }
 
 //Convert a numeric column index to an alphabetic one
@@ -327,121 +264,6 @@ function explodeCellRange(range) {
 }
 
 
-//Process annotations
-// Links them to their respective sheet/cell/cellranges
-// Is called after every AJAX call to rebind the set of annotations that may have
-// changed, and to re-enhance DOM elements that have been reloaded
-function bindAnnotations(annotation_sources) {
-    var annotationIndexTable = $j("div#annotation_overview table");
-    for(var s = 0; s < annotation_sources.length; s++)
-    {
-        var source = annotation_sources[s];
-
-        //Add a new section in the annotation index for the source
-        var stub_heading = $j("<tr></tr>").addClass("source_header").append($j("<td></td>").attr({colspan : 3})
-            .append($j("<a>Annotations from " + source.name + "</a>").attr({href : source.url})))
-            .appendTo(annotationIndexTable);
-
-        for(var a = 0; a < source.annotations.length; a++)
-        {
-            var ann = source.annotations[a];
-
-            //Add a new "stub" in the index
-            annotationIndexTable.append(createAnnotationStub(ann));
-
-            //bind annotations to respective table cells
-            if (ann.type!="plot_data") {
-                bindAnnotation(ann);
-            }
-        }
-    }
-    //Text displayed in annotation index if no annotations present
-    if(annotation_sources < 1)
-    {
-        annotationIndexTable.append($j("<tr></tr>").append($j("<td colspan=\"3\">No annotations found</td>")));
-    }
-    //Make the annotations draggable
-    $j('#annotation_container').draggable({handle: '#annotation_drag', zIndex: 100000000000000});
-}
-
-//Small annotation summary that jumps to said annotation when clicked
-function createAnnotationStub(ann)
-{
-    var type_class;
-    var content;
-
-    if (ann.type=="plot_data") {
-        type_class="plot_data_type";
-        content = "Graph data";
-    }
-    else {
-        type_class="text_annotation_type";
-        content = ann.content.substring(0,40);
-    }
-    var stub = $j("<tr></tr>").addClass("annotation_stub")
-        .append($j("<td>&nbsp;</td>").addClass(type_class))
-        .append($j("<td>Sheet"+(ann.sheetNumber+1)+"."+ann.cellRange+"</td>"))
-        .append($j("<td>"+content+"</td>"))
-        .append($j("<td>"+ann.dateCreated+"</td>"))
-        .click( function (){
-            goToSheetPage(ann);
-        });
-
-    return stub;
-}
-
-function goToSheetPage(annotation){
-    var paginateForSheet = $j('#paginate_sheet_' + (annotation.sheetNumber+1))[0];
-    if (paginateForSheet != null) {
-        //calculate the page
-        var page = Math.floor(annotation.startRow/perPage) + 1;
-        var links = paginateForSheet.getElementsByTagName('a');
-        var link;
-        for (var i=0; i<links.length; i++){
-            if (links[i].text == page.toString()){
-                link = links[i];
-            }
-        }
-        if (link != null){
-            link.href = link.href.concat('&annotation_id=' + annotation.id);
-            window.location = link.href;
-        }else{
-            jumpToAnnotation(annotation.id, annotation.sheetNumber+1, annotation.cellRange);
-            $j('#annotation_overview').hide();
-        }
-
-    }else{
-        jumpToAnnotation(annotation.id, annotation.sheetNumber+1, annotation.cellRange);
-        $j('#annotation_overview').hide();
-    }
-}
-
-function bindAnnotation(ann) {
-    var current_page = currentPage(ann.sheetNumber+1);
-    var relative_rows = relativeRows(ann.startRow, ann.endRow, ann.sheetNumber+1);
-    var relativeMinRow = relative_rows[0];
-    var relativeMaxRow = relative_rows[1];
-    var startPage =  parseInt(ann.startRow/perPage) + 1;
-    if (ann.startRow % perPage == 0)
-        startPage -=1;
-    var endPage = parseInt(ann.endRow/perPage) + 1;
-    if (ann.endRow % perPage == 0)
-        endPage -=1;
-
-    //if no pagination, or the annotation belongs to the cell of current page, then bind it to the page
-    var annotation_of_current_page = current_page >= startPage && current_page <= endPage;
-
-    if ((current_page == null) || annotation_of_current_page){
-        $j("table.sheet:eq("+ann.sheetNumber+") tr").slice((relativeMinRow-1),relativeMaxRow).each(function() {
-
-            $j(this).children("td.cell").slice(ann.startCol-1,ann.endCol).addClass("annotated_cell")
-                .click(function () {show_annotation(ann.id,
-                    $j(this).position().left + $j(this).outerWidth(),
-                    $j(this).position().top);}
-            );
-        });
-    }
-}
 
 //to identify the current page for a specific sheet
 function currentPage(sheetNumber){
@@ -454,43 +276,6 @@ function currentPage(sheetNumber){
         return null;
     }
 
-}
-
-function toggle_annotation_form(annotation_id) {
-    var elem = 'div#annotation_' + annotation_id;
-
-    $j(elem + ' div.annotation_text').toggle();
-    $j(elem + ' div.annotation_edit_text').toggle();
-    $j(elem + ' #annotation_controls').toggle();
-}
-//To display the annotations
-function show_annotation(id,x,y) {
-    var annotation_container = $j("#annotation_container");
-    var annotation = $j("#annotation_" + id);
-    var plot_element_id = "annotation_plot_data_"+id;
-    annotation_container.css('left',x+20);
-    annotation_container.css('top',y-20);
-    annotation_container.show();
-    annotation.show();
-    if ($j("#"+plot_element_id).length>0) {
-        plot_cells(plot_element_id,'650','450');
-    }
-
-}
-
-
-function jumpToAnnotation(id, sheet, range) {
-    //Go to the right sheet
-    activateSheet(sheet);
-
-    //Select the cell range
-    select_range(range, sheet);
-
-    //Show annotation in middle of sheet
-    var cells = $j('.selected_cell');
-    show_annotation(id,
-        cells.position().left + cells.outerWidth(),
-        cells.position().top);
 }
 
 function select_range(range, sheetNumber) {
@@ -513,17 +298,6 @@ function select_range(range, sheetNumber) {
 
     $j('div.active_sheet').scrollTop(row.position().top + $j('div.active_sheet').scrollTop() - 500);
     $j('div.active_sheet').scrollLeft(cell.position().left + $j('div.active_sheet').scrollLeft() - 500);
-}
-
-function deselect_cells() {
-    //Deselect any cells and headings
-    $j(".selected_cell").removeClass("selected_cell");
-    $j(".selected_heading").removeClass("selected_heading");
-    //Clear selection box
-    $j('#selection_data').val("");
-    $j('#cell_info').val("");
-    //Hide selection-dependent buttons
-    $j('.requires_selection').hide();
 }
 
 
@@ -571,13 +345,7 @@ function select_cells(startCol, startRow, endCol, endRow, sheetNumber) {
     if(maxRow != minRow || maxCol != minCol)
         selection += (":" + num2alpha(maxCol).toString() + maxRow.toString());
 
-    $j('#selection_data').val(selection);
-
-    //Update cell coverage in annotation form
-    $j('input.annotation_cell_coverage_class').attr("value",selection);
-
-    //Show selection-dependent controls
-    $j('.requires_selection').show();
+    $j('#selected_cell').text(selection);
 }
 
 /* search_matched_spreadsheets_content.html.erb calls with a third argument - fileIndex = item_id
@@ -604,9 +372,6 @@ function activateSheet(sheet, sheetTab, fileIndex) {
 
 
     //Clean up
-    //Hide annotations
-    $j('div.annotation').hide();
-    $j('#annotation_container').hide();
 
     //Deselect previous tab
     $j('a.selected_tab').removeClass('selected_tab');
@@ -645,11 +410,6 @@ function activateSheet(sheet, sheetTab, fileIndex) {
     //Set table active
     activeSheet.children("table.sheet").addClass('active_sheet');
 
-    //deselect_cells();
-
-    //Record current sheet in annotation form
-    $j('input#annotation_sheet_id').attr("value", sheetIndex -1);
-
     //Reset variables
     isMouseDown = false,
         startRow = 0,
@@ -657,31 +417,7 @@ function activateSheet(sheet, sheetTab, fileIndex) {
         endRow = 0,
         endCol = 0;
 
-    //FIXME: for some reason, calling this twice solves a problem where the column and column header widths are mis-aligned
-    adjust_container_dimensions();
-    adjust_container_dimensions();
     return false;
-}
-
-function copy_cells()
-{
-
-    var cells = $j('td.selected_cell');
-    var columns = $j('.col_heading.selected_heading').length;
-    var text = "";
-
-    for(var i = 0; i < cells.length; i += columns)
-    {
-        for(var j = 0; j < columns; j += 1)
-        {
-            text += (cells.eq(i + j).html() + "\t");
-        }
-        text += "\n";
-    }
-
-    $j("textarea#export_data").val(text);
-    $j("div.spreadsheet_popup").hide();
-    $j("div#export_form").show();
 }
 
 function changeRowsPerPage(){
@@ -759,30 +495,3 @@ function displayRowsPerPage(){
         $j('#rows_per_page').show();
     }
 }
-
-$j(document).ready(function () {
-    $j('#new_annotation_form').on('ajax:beforeSend', function () {
-        $j('#create_annotation_button')[0].disabled = true;
-    }).on('ajax:complete', function () {
-        $j('#annotation_form').hide();
-        $j('#create_annotation_button')[0].disabled = false;
-    });
-
-    $j('#plot_panel_form').on('ajax:beforeSend', function () {
-        $j('#store_plot_button')[0].disabled = true;
-    }).on('ajax:complete', function () {
-        $j('#plot_panel').hide();
-        $j('#store_plot_button')[0].disabled = false;
-    });
-
-    // Handle updating annotations/displaying of errors when annotations are created/updated/destroyed
-    $j('#spreadsheet-explorer').on('ajax:success', '.spreadsheet-annotation-ctrl', function (_, data) {
-        $j('#annotations').html(data);
-    }).on('ajax:error', '.spreadsheet-annotation-ctrl', function (_, xhr) {
-        $j('#spreadsheet_errors').html(xhr.responseText);
-    }).on('ajax:beforeSend', '.spreadsheet-annotation-ctrl', function () {
-        $j(this).parent().find('.loading-spinner').show();
-    }).on('ajax:complete', '.spreadsheet-annotation-ctrl', function () {
-        $j(this).parent().find('.loading-spinner').hide();
-    });
-});

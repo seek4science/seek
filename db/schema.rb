@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_03_22_104351) do
+ActiveRecord::Schema.define(version: 2022_04_13_092221) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string "action"
@@ -263,17 +263,6 @@ ActiveRecord::Schema.define(version: 2022_03_22_104351) do
     t.text "cached_concept_yaml"
     t.integer "conceptable_id"
     t.string "conceptable_type"
-  end
-
-  create_table "cell_ranges", force: :cascade do |t|
-    t.integer "cell_range_id"
-    t.integer "worksheet_id"
-    t.integer "start_row"
-    t.integer "start_column"
-    t.integer "end_row"
-    t.integer "end_column"
-    t.datetime "created_at"
-    t.datetime "updated_at"
   end
 
   create_table "collection_auth_lookup", force: :cascade do |t|
@@ -1684,6 +1673,19 @@ ActiveRecord::Schema.define(version: 2022_03_22_104351) do
     t.index ["user_id"], name: "index_resource_publish_logs_on_user_id"
   end
 
+  create_table "roles", force: :cascade do |t|
+    t.integer "person_id"
+    t.integer "role_type_id"
+    t.string "scope_type"
+    t.integer "scope_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["person_id", "role_type_id"], name: "index_roles_on_person_id_and_role_type_id"
+    t.index ["person_id"], name: "index_roles_on_person_id"
+    t.index ["role_type_id"], name: "index_roles_on_role_type_id"
+    t.index ["scope_type", "scope_id"], name: "index_roles_on_scope"
+  end
+
   create_table "sample_attribute_types", force: :cascade do |t|
     t.string "title"
     t.string "base_type"
@@ -1792,24 +1794,6 @@ ActiveRecord::Schema.define(version: 2022_03_22_104351) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean "include_external_search", default: false
-  end
-
-  create_table "scales", force: :cascade do |t|
-    t.string "title"
-    t.string "key"
-    t.integer "pos", default: 1
-    t.string "image_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "scalings", force: :cascade do |t|
-    t.integer "scale_id"
-    t.integer "scalable_id"
-    t.integer "person_id"
-    t.string "scalable_type"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
   end
 
   create_table "sessions", force: :cascade do |t|

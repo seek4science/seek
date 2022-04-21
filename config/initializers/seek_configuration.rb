@@ -161,9 +161,6 @@ def load_seek_config_defaults!
   Seek::Config.default :session_store_timeout, 1.hour
   Seek::Config.default :cv_dropdown_limit, 100
 
-  #MERGENOTE - why are these here? they should be in the database under the Scale model. Maybe an old relic
-  Seek::Config.default :scales,["organism","liver","liverLobule","intercellular","cell"]
-
   # Admin setting to allow user impersonation, useful for debugging
   Seek::Config.default :admin_impersonation_enabled, false
 

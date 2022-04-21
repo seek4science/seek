@@ -19,8 +19,7 @@ describe DataFile do
 
   it { should have_searchable_field(:assay_type_titles) }
   it { should have_searchable_field(:technology_type_titles) }
-  it { should have_searchable_field(:spreadsheet_annotation_search_fields) }
- #it { should have_searchable_field(:spreadsheet_contents_for_search) }
+
 end
 
 describe Sop do

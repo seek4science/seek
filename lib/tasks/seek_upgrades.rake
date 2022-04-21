@@ -10,7 +10,7 @@ namespace :seek do
     environment
     db:seed:010_workflow_classes
     db:seed:011_edam_topics
-    db:seed:012_edam_operations   
+    db:seed:012_edam_operations
     db:seed:013_workflow_data_file_relationships
     rename_branding_settings
     update_missing_openbis_istest
@@ -22,6 +22,10 @@ namespace :seek do
     rename_seek_sample_attribute_types
     seek:rebuild_workflow_internals
     update_thesis_related_publication_types
+    remove_scale_annotations
+    remove_spreadsheet_annotations
+    strip_site_base_host_path
+    convert_roles
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -67,7 +71,7 @@ namespace :seek do
     Seek::Config.transfer_value :dm_project_link, :instance_admins_link
   end
 
- task(update_missing_openbis_istest: :environment) do
+  task(update_missing_openbis_istest: :environment) do
     puts '... creating missing is_test for OpenbisEndpoint...'
     create = 0
     disable_authorization_checks do
@@ -178,7 +182,6 @@ namespace :seek do
     end
   end
 
-
   task(update_thesis_related_publication_types: [:environment]) do
     puts 'Updating publication types ...'
 
@@ -201,7 +204,67 @@ namespace :seek do
       PublicationType.find_or_initialize_by(key: "diplomthesis").update(title:"Diplom Thesis", key: "diplomthesis")
       puts 'Add new type '+PublicationType.find_by(key:"diplomthesis").title
     end
-
   end
 
+  task(strip_site_base_host_path: [:environment]) do
+    if Seek::Config.site_base_host
+      u = URI.parse(Seek::Config.site_base_host)
+      u.path = ''
+      Seek::Config.site_base_host = u.to_s
+    end
+  end
+
+  task(remove_scale_annotations: [:environment]) do
+    a = Annotation.joins(:annotation_attribute).where(annotation_attribute: { name: ['additional_scale_info', 'scale'] })
+    count = a.count
+    a.destroy_all
+    puts "Removed #{count} scale related annotations" if count > 0
+  end
+
+  task(remove_spreadsheet_annotations: [:environment]) do
+    annotations = Annotation.where(annotatable_type: 'CellRange')
+    count = annotations.count
+    AnnotationAttribute.joins(:annotations).where(annotations: { annotatable_type: 'CellRange' }).destroy_all
+    TextValue.joins(:annotations).where(annotations: { annotatable_type: 'CellRange' }).destroy_all
+    annotations.destroy_all
+    puts "Removed #{count} spreadsheet related annotations" if count > 0
+  end
+
+  task(convert_roles: [:environment]) do
+    puts 'Converting roles...'
+    disable_authorization_checks do
+      Person.find_each do |person|
+        RoleType.for_system.each do |rt|
+          mask = rt.id
+          if (person.roles_mask & mask) != 0
+            Role.where(role_type_id: rt.id, person_id: person.id, scope: nil).first_or_create!
+          end
+        end
+      end
+
+      class AdminDefinedRoleProject < ActiveRecord::Base; end
+
+      AdminDefinedRoleProject.find_each do |role|
+        RoleType.for_projects.each do |rt|
+          mask = rt.id
+          if (role.role_mask & mask) != 0
+            Role.where(role_type_id: rt.id, person_id: role.person_id,
+                       scope_type: 'Project', scope_id: role.project_id).first_or_create!
+          end
+        end
+      end
+
+      class AdminDefinedRoleProgramme < ActiveRecord::Base; end
+
+      AdminDefinedRoleProgramme.find_each do |role|
+        RoleType.for_programmes.each do |rt|
+          mask = rt.id
+          if (role.role_mask & mask) != 0
+            Role.where(role_type_id: rt.id, person_id: role.person_id,
+                       scope_type: 'Programme', scope_id: role.programme_id).first_or_create!
+          end
+        end
+      end
+    end
+  end
 end

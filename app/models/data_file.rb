@@ -5,13 +5,6 @@ class DataFile < ApplicationRecord
   include Seek::Rdf::RdfGeneration
   include Seek::BioSchema::Support
 
-  # searchable must come before acts_as_asset call
-  if Seek::Config.solr_enabled
-    searchable(auto_index: false) do
-      text :spreadsheet_annotation_search_fields
-    end
-  end
-
   acts_as_asset
 
   acts_as_doi_parent(child_accessor: :versions)
@@ -128,19 +121,6 @@ class DataFile < ApplicationRecord
 
   def use_mime_type_for_avatar?
     true
-  end
-
-  # the annotation string values to be included in search indexing
-  def spreadsheet_annotation_search_fields
-    annotations = []
-    if content_blob
-      content_blob.worksheets.each do |ws|
-        ws.cell_ranges.each do |cell_range|
-          annotations |= cell_range.annotations.collect { |a| a.value.text }
-        end
-      end
-    end
-    annotations
   end
 
   # FIXME: bad name, its not whether it IS a template, but whether it originates from a template

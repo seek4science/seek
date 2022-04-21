@@ -74,6 +74,15 @@ Kernel.class_eval do
     yield
     Seek::Config.send("#{config}=", oldval)
   end
+
+  def with_relative_root(root)
+    oldval = Rails.application.config.relative_url_root
+    Rails.application.config.relative_url_root = root
+    Rails.application.default_url_options = Seek::Config.site_url_options
+    yield
+    Rails.application.config.relative_url_root = oldval
+    Rails.application.default_url_options = Seek::Config.site_url_options
+  end
 end
 
 class ActiveSupport::TestCase
@@ -94,7 +103,7 @@ class ActiveSupport::TestCase
   # always create initial person, as this will always be an admin. Avoid some confusion in the tests where a person
   # is unexpectedly an admin
   def create_initial_person
-    Factory(:admin, first_name: 'default admin')
+    disable_authorization_checks { Factory(:admin, first_name: 'default admin') }
   end
 
   # At least one sample attribute type is needed for building sample types from spreadsheets

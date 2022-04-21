@@ -12,7 +12,7 @@
       <li><%= link_to t("menu.jerm_templates"), help_documents_path + '/templates' -%></li>
       <li><%= link_to t("menu.isa_best_practice"), help_documents_path + '/isa-best-practice' -%></li>
     <% end %>
-    <li><%= link_to t("menu.api"), '/api' %></li>
+    <li><%= link_to t("menu.api"), asset_path('api', skip_pipeline: true) %></li>
     <% if logged_in_and_registered? %>
         <li><%= link_to 'Provide feedback', feedback_home_path -%></li>
     <% end %>

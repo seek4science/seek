@@ -134,7 +134,8 @@ module Seek
           workflow_class: :workflow_class_id,
           discussion_links: :discussion_links_attributes,
           repository_standard: :repository_standard_attributes,
-          creators: :api_assets_creators
+          creators: :api_assets_creators,
+          administrator_ids: :programme_administrator_ids
       }.freeze
 
       # Parameters to "elevate" out of params[bla] to the top-level.

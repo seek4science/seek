@@ -351,9 +351,11 @@ class ProjectsController < ApplicationController
         if params[:default_member] && params[:default_member][:add_to_project] && params[:default_member][:add_to_project] == '1'
           institution = Institution.find(params[:default_member][:institution_id])
           person = current_person
-          person.add_to_project_and_institution(@project, institution)
-          person.is_project_administrator = true, @project
-          disable_authorization_checks { person.save }
+          disable_authorization_checks do
+            person.add_to_project_and_institution(@project, institution)
+            person.is_project_administrator = true, @project
+            person.save!
+          end
         end
         members = params[:project][:members]
         if members.nil?
@@ -367,7 +369,6 @@ class ProjectsController < ApplicationController
             person.save!
           end
         }
-        update_administrative_roles
         flash[:notice] = "#{t('project')} was successfully created."
         format.html { redirect_to(@project) }
         # format.json {render json: @project, adapter: :json, status: 200 }
@@ -627,18 +628,18 @@ class ProjectsController < ApplicationController
   private
 
   def project_role_params
-    params[:project].keys.each do |k|
-      unless params[:project][k].nil?
-        params[:project][k] = params[:project][k].split(',')
+    permitted_roles = [:project_administrator_ids, :asset_gatekeeper_ids, :asset_housekeeper_ids, :pal_ids]
+    permitted_roles.each do |k|
+      if params[:project][k].present?
+        if params[:project][k].is_a?(String)
+          params[:project][k] = params[:project][k].split(',')
+        end
       else
         params[:project][k] = []
       end
     end
 
-    params.require(:project).permit({ project_administrator_ids: [] },
-                                    { asset_gatekeeper_ids: [] },
-                                    { asset_housekeeper_ids: [] },
-                                    pal_ids: [])
+    params.require(:project).permit(*permitted_roles.map { |r| { r => [] }})
   end
 
   def project_params
@@ -653,8 +654,7 @@ class ProjectsController < ApplicationController
 
     if @project.new_record? || @project.can_manage?(current_user)
       permitted_params += [:use_default_policy, :default_policy, :default_license,
-                           { members: [:person_id, :institution_id] }, { project_administrator_ids: [] },
-                           { asset_gatekeeper_ids: [] }, { asset_housekeeper_ids: [] }, { pal_ids: [] }]
+                           { members: [:person_id, :institution_id] }]
     end
 
     if params[:project][:programme_id].present?

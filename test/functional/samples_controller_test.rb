@@ -1020,6 +1020,14 @@ class SamplesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'JS request does not raise CORS error' do
+    sample = Factory(:sample)
+    login_as(sample.contributor)
+
+    assert_raises(ActionController::UnknownFormat) do
+      get :show, params: { id: sample.id, format: :js }
+    end
+  end
 
   private
 

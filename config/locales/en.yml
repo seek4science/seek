@@ -5,7 +5,7 @@ en:
   seek_id: "SEEK ID"
 
   login:
-    elixir_aai: 'ELIXIR AAI'
+    elixir_aai: 'LS Login'
     ldap: 'LDAP'
     github: 'GitHub'
 
@@ -114,6 +114,10 @@ en:
   pal: 'PAL'
   programme_administrator: 'Programme administrator'
   admin: 'Admin'
+
+  roles:
+    scopes:
+      system: 'System'
 
   contributor: 'submitter' # A person who submitted the resource to SEEK
   contribution: 'submission'

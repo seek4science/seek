@@ -1288,7 +1288,12 @@ class ProjectsControllerTest < ActionController::TestCase
 
     ids = "#{person.id},#{person2.id}"
 
-    post :update_members, params: { id: project, project: { project_administrator_ids: ids, asset_gatekeeper_ids: ids, asset_housekeeper_ids: ids, pal_ids: ids } }
+    assert_difference('Role.count', 4 * 2) do
+      post :update_members, params: { id: project, project: { project_administrator_ids: ids,
+                                                              asset_gatekeeper_ids: ids,
+                                                              asset_housekeeper_ids: ids,
+                                                              pal_ids: ids } }
+    end
 
     assert_redirected_to project_path(project)
     assert_nil flash[:error]
@@ -1343,8 +1348,10 @@ class ProjectsControllerTest < ActionController::TestCase
     person = Factory(:programme_administrator_not_in_project)
     institution = Factory(:institution)
     login_as(person)
-    assert_difference('Project.count') do
-      post :create, params: { project: { title: 'test2' }, default_member: { add_to_project: '1', institution_id: institution.id } }
+    assert_difference('Role.count', 1) do
+      assert_difference('Project.count') do
+        post :create, params: { project: { title: 'test2' }, default_member: { add_to_project: '1', institution_id: institution.id } }
+      end
     end
 
     assert project = assigns(:project)

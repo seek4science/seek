@@ -136,12 +136,6 @@ SEEK::Application.routes.draw do
     end
   end
 
-  resources :scales do
-    collection do
-      post :search
-    end
-  end
-
   ### GENERAL PAGES ###
 
   root to: 'homes#index'
@@ -627,8 +621,6 @@ SEEK::Application.routes.draw do
     end
   end
 
-  resources :spreadsheet_annotations, only: [:create, :destroy, :update]
-
   resources :strains, concerns: [:asset] do
     collection do
       get :existing_strains_for_assay_organism
@@ -751,6 +743,8 @@ SEEK::Application.routes.draw do
 
   resources :single_pages do
   end
+
+  resources :culture_growth_types, only: [:show]
 
   ### ASSAY AND TECHNOLOGY TYPES ###
 

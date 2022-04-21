@@ -1,0 +1,22 @@
+<% roles_map = person.role_scopes_by_type %>
+<%= modal(id: 'person-roles', size: 'lg', class: 'text-left') do %>
+  <%= modal_header("Roles") %>
+  <%= modal_body do %>
+    <% if roles_map.keys.any? %>
+      <% roles_map.each do |role_type, scopes| %>
+        <h3>
+          <%= seek_role_icon(role_type.key, 32, 'data-tooltip' => nil) -%>
+          <%= role_type.title %>
+        </h3>
+
+        <% if scopes.any? %>
+          <ul>
+            <% scopes.each do |scope| %>
+              <li><%= link_to(scope.title, scope) %></li>
+            <% end %>
+          </ul>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

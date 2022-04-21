@@ -194,8 +194,8 @@ module HomesHelper
   def integration_definitions
     [
       {
-        key: 'front_page_integration_elixir_aai',
-        url: 'https://elixir-europe.org/services/compute/aai',
+        key: 'front_page_integration_ls_aai',
+        url: 'https://lifescience-ri.eu/ls-login.html',
         label: 'Authentication'
       },
       {
