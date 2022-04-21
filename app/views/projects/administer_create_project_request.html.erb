@@ -115,7 +115,7 @@
           <span style="display:none">
             <%= check_box_tag 'delete_request','1',false %>
           </span>
-          <%= submit_tag('Delete without response', class: 'btn btn-danger',id:'delete-button') %>
+          <%= submit_tag('Delete without response', class: 'btn btn-danger',id:'delete-button', style:'display:none;') %>
 
         <% end %>
 
@@ -133,10 +133,12 @@
         if ($j('input#accept_request').is(':checked')) {
             $j('#submit-button').val('Accept');
             $j('#submit-button').addClass('btn-success').removeClass('btn-danger');
+            $j('#delete-button').hide();
         }
         else {
             $j('#submit-button').val('Reject');
             $j('#submit-button').addClass('btn-danger').removeClass('btn-success');
+            $j('#delete-button').show();
         }
     }
 
