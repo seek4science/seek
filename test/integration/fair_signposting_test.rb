@@ -130,11 +130,12 @@ class FairSignpostingTest < ActionDispatch::IntegrationTest
         if url
           props = {}
           segments[1..-1].each do |seg|
-            k, v = seg.split('=').map(&:strip)
-            str = v.match(/"(.+)"/)
-            v = str[1] if str
-            v = Mime::Type.lookup(v).to_sym if k == 'type'
-            props[k.to_sym] = v
+            matches = seg.match(/([^=]+)\s*=\s*"([^"]+)"/)
+            if matches
+              k, v = matches[1], matches[2]
+              v = Mime::Type.lookup(v).to_sym if k == 'type'
+              props[k.to_sym] = v
+            end
           end
           [url[1], props]
         end
