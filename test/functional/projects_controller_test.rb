@@ -3079,6 +3079,20 @@ class ProjectsControllerTest < ActionController::TestCase
     check_project(project)
   end
 
+  test 'should populate just isa' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.first
+    login_as(project_administrator.user)
+    df = Factory(:xlsx_population_just_isa_datafile, projects: [project])
+
+    project.use_default_policy = true
+    project.default_policy = Factory(:public_policy)
+    project.save!
+    put :populate_from_spreadsheet, params: {id: project.id, :spreadsheet_id => df.id }
+
+    check_project(project)
+  end
+
   test 'project needs more than one investigation for ordering' do
     person = Factory(:admin)
     login_as(person)

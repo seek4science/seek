@@ -430,6 +430,11 @@ Factory.define(:xlsx_population_no_study_content_blob, parent: :xlsx_population_
   f.data { File.new("#{Rails.root}/test/fixtures/files/population_no_study.xlsx", 'rb').read }
 end
 
+Factory.define(:xlsx_population_just_isa, parent: :xlsx_population_content_blob) do |f|
+  f.original_filename 'population_just_isa.xlsx'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/population_just_isa.xlsx", 'rb').read }
+end
+
 Factory.define(:spaces_ro_crate, parent: :content_blob) do |f|
   f.original_filename 'with-spaces.crate.zip'
   f.content_type 'application/zip'

@@ -101,6 +101,10 @@ Factory.define(:xlsx_population_no_study_datafile, parent: :data_file) do |f|
   f.association :content_blob, factory: :xlsx_population_no_study_content_blob
 end
 
+Factory.define(:xlsx_population_just_isa_datafile, parent: :data_file) do |f|
+  f.association :content_blob, factory: :xlsx_population_just_isa
+end
+
 Factory.define(:small_test_spreadsheet_datafile, parent: :data_file) do |f|
   f.association :content_blob, factory: :small_test_spreadsheet_content_blob
 end
