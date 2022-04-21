@@ -115,11 +115,16 @@ class ProjectsController < ApplicationController
         @message_log.respond('Accepted')
       end
     else
-      comments = params['reject_details']
-      @message_log.respond(comments)
-      Mailer.join_project_rejected(requester,@project,comments).deliver_later
-      Mailer.notify_admins_project_join_rejected(current_person, requester, @project, comments).deliver_later
-      flash[:notice]="Request rejected and #{requester.name} has been notified"
+      if params[:delete_request] == '1'
+        @message_log.destroy
+        flash[:notice]="#{t('project')} join request deleted"
+      else
+        comments = params[:reject_details]
+        @message_log.respond(comments)
+        Mailer.join_project_rejected(requester,@project,comments).deliver_later
+        Mailer.notify_admins_project_join_rejected(current_person, requester, @project, comments).deliver_later
+        flash[:notice]="Request rejected and #{requester.name} has been notified"
+      end
     end
 
     if validation_error_msg

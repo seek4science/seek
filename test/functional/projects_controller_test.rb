@@ -2166,6 +2166,7 @@ class ProjectsControllerTest < ActionController::TestCase
                                    country:'DE'
                                   })
     log = ProjectMembershipMessageLog.log_request(sender:sender, project:project, institution:institution, comments:'some comments')
+    login_as(person)
 
     params = {
         message_log_id: log.id,
@@ -2208,6 +2209,7 @@ class ProjectsControllerTest < ActionController::TestCase
                                       country:'DE'
                                   })
     log = ProjectMembershipMessageLog.log_request(sender:sender, project:project, institution:institution, comments:'some comments')
+    login_as(person)
 
     params = {
         message_log_id: log.id,
@@ -2240,11 +2242,12 @@ class ProjectsControllerTest < ActionController::TestCase
     institution = Factory(:institution)
     sender = Factory(:person)
     log = ProjectMembershipMessageLog.log_request(sender:sender, project:project, institution:institution, comments:'some comments')
+    login_as(person)
 
     params = {
         message_log_id: log.id,
         reject_details: 'bad request',
-        institution:{id:institution.id},
+        institution: { id:institution.id },
         id:project.id
     }
 
@@ -2265,6 +2268,70 @@ class ProjectsControllerTest < ActionController::TestCase
     log.reload
     assert log.responded?
     assert_equal 'bad request',log.response
+  end
+
+  test 'respond join request deleted' do
+    person = Factory(:project_administrator)
+    project = person.projects.first
+    institution = Factory(:institution)
+    sender = Factory(:person)
+    log = ProjectMembershipMessageLog.log_request(sender: sender, project: project, institution: institution, comments: 'some comments')
+    login_as(person)
+
+    params = {
+      message_log_id: log.id,
+      institution: { id: institution.id },
+      id: project.id,
+      delete_request: '1'
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Institution.count') do
+        assert_no_difference('GroupMembership.count') do
+          assert_difference('ProjectMembershipMessageLog.count', -1) do
+            post :respond_join_request, params:params
+          end
+        end
+      end
+    end
+
+    assert_redirected_to(project_path(project))
+    refute_nil flash[:notice]
+    project.reload
+    refute_includes project.people, sender
+    refute_includes project.institutions, institution
+  end
+
+  test 'respond join request cannot delete without rights' do
+    person = Factory(:person)
+    project = Factory(:project)
+    institution = Factory(:institution)
+    sender = Factory(:person)
+    log = ProjectMembershipMessageLog.log_request(sender: sender, project: project, institution: institution, comments: 'some comments')
+    login_as(person)
+
+    params = {
+      message_log_id: log.id,
+      institution: {id: institution.id },
+      id: project.id,
+      delete_request: '1'
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Institution.count') do
+        assert_no_difference('GroupMembership.count') do
+          assert_no_difference('ProjectMembershipMessageLog.count') do
+            post :respond_join_request, params:params
+          end
+        end
+      end
+    end
+
+    assert_redirected_to :root
+    refute_nil flash[:error]
+    project.reload
+    refute_includes project.people, sender
+    refute_includes project.institutions, institution
   end
 
   test 'administer create request project with new programme and institution' do
