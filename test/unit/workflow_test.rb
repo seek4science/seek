@@ -341,4 +341,26 @@ class WorkflowTest < ActiveSupport::TestCase
     assert_equal :all_failing, v1.reload.test_status
     assert_nil v2.reload.test_status
   end
+
+  test 'tags and edam in json' do
+    Factory(:edam_topics_controlled_vocab)
+    Factory(:edam_operations_controlled_vocab)
+
+    user = Factory(:user)
+    workflow = Factory(:cwl_workflow, contributor: user.person)
+
+    User.with_current_user(user) do
+      workflow.edam_topics = "Chemistry"
+      workflow.edam_operations = "Clustering"
+      workflow.tags = "red, green, blue"
+      workflow.save!
+    end
+
+    json = WorkflowSerializer.new(workflow).as_json
+
+    assert_equal ['blue','green','red'], json[:tags]
+
+    #TODO: Will be extendend to cover EDAM annotations
+
+  end
 end
