@@ -26,11 +26,9 @@ class ProgrammesController < ApplicationController
     respond_to do |format|
       if @programme.save
         flash[:notice] = "The #{t('programme').capitalize} was successfully created."
-
         # current person becomes the programme administrator, unless they are logged in
         # also activation email is sent
         unless User.admin_logged_in?
-          disable_authorization_checks { current_person.is_programme_administrator = true, @programme }
           if Seek::Config.email_enabled
             Mailer.programme_activation_required(@programme,current_person).deliver_later
           end
@@ -147,6 +145,10 @@ class ProgrammesController < ApplicationController
 
   def programme_params
     handle_administrators if params[:programme][:programme_administrator_ids] && !(params[:programme][:programme_administrator_ids].is_a? Array)
+    if action_name == 'create' && !User.admin_logged_in?
+      params[:programme][:programme_administrator_ids] ||= []
+      params[:programme][:programme_administrator_ids] << current_person.id.to_s
+    end
 
     params.require(:programme).permit(:avatar_id, :description, :first_letter, :title, :uuid, :web_page,
                                       { project_ids: [] }, :funding_details, { programme_administrator_ids: [] },

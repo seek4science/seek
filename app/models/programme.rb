@@ -27,7 +27,7 @@ class Programme < ApplicationRecord
   %i[data_files documents models sops presentations events publications samples workflows].each do |type|
     has_many type, -> { distinct }, through: :projects
   end
-  has_many :programme_administrator_roles, -> { where(role_type_id: RoleType.find_by_key!(:programme_administrator)) }, as: :scope, class_name: 'Role'
+  has_many :programme_administrator_roles, -> { where(role_type_id: RoleType.find_by_key!(:programme_administrator)) }, as: :scope, class_name: 'Role', inverse_of: :scope
   has_many :programme_administrators, through: :programme_administrator_roles, class_name: 'Person', source: :person
   accepts_nested_attributes_for :projects
 

@@ -144,22 +144,28 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_equal 'ggggg', prog.description
   end
 
-  test 'set programme administrator at creation' do
-    admin = Factory(:admin)
-    login_as(admin)
+  test 'set programme administrators at creation' do
+    creator = Factory(:person)
+    login_as(creator)
     person = Factory(:person)
+    person2 = Factory(:person)
     refute person.is_programme_administrator_of_any_programme?
-    assert_difference('Programme.count', 1) do
-      assert_difference('Role.count', 1) do
-        post :create, params: { programme: { programme_administrator_ids: "#{person.id}", title: 'programme xxxyxxx2' } }
+    assert_difference('Role.count', 3) do # Should include creator
+      assert_difference('Programme.count', 1) do
+        post :create, params: { programme: { programme_administrator_ids: "#{person.id},#{person2.id}", title: 'programme xxxyxxx2' } }
       end
     end
 
     assert prog = assigns(:programme)
-    person.reload
+    assert creator.is_programme_administrator?(prog)
+    assert creator.is_programme_administrator_of_any_programme?
+    assert creator.has_role?('programme_administrator')
     assert person.is_programme_administrator?(prog)
     assert person.is_programme_administrator_of_any_programme?
     assert person.has_role?('programme_administrator')
+    assert person2.is_programme_administrator?(prog)
+    assert person2.is_programme_administrator_of_any_programme?
+    assert person2.has_role?('programme_administrator')
   end
 
   test 'admin sets themself as programme administrator at creation' do

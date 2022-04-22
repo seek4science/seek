@@ -22,10 +22,10 @@ module Seek
       def is_asset_housekeeper_of_any_project?; has_role?(:asset_housekeeper); end
       def is_asset_gatekeeper_of_any_project?; has_role?(:asset_gatekeeper); end
 
-      def is_pal?(project); has_role_in?(:pal, project); end
-      def is_project_administrator?(project); has_role_in?(:project_administrator, project); end
-      def is_asset_housekeeper?(project); has_role_in?(:asset_housekeeper, project); end
-      def is_asset_gatekeeper?(project); has_role_in?(:asset_gatekeeper, project); end
+      def is_pal?(project); project.pals.include?(self); end
+      def is_project_administrator?(project); project&.project_administrators&.include?(self); end
+      def is_asset_housekeeper?(project); project&.asset_housekeepers&.include?(self); end
+      def is_asset_gatekeeper?(project); project&.asset_gatekeepers&.include?(self); end
 
       def is_pal_of?(asset); has_role_in?(:pal, asset.projects); end
       def is_project_administrator_of?(asset); has_role_in?(:project_administrator, asset.projects); end
@@ -39,7 +39,7 @@ module Seek
 
       # Programme roles
       def is_programme_administrator_of_any_programme?; has_role?(:programme_administrator); end
-      def is_programme_administrator?(programme); has_role_in?(:programme_administrator, programme); end
+      def is_programme_administrator?(programme); programme&.programme_administrators&.include?(self); end
       def is_programme_administrator=(args); assign_or_remove_roles(:programme_administrator, args); end
 
       # Misc methods
