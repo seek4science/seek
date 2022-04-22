@@ -34,6 +34,11 @@ module Seek
       end
 
       def has_role_in?(key, scope)
+        # This is to allow unsaved records (and thus unsaved roles) to be picked up
+        # otherwise permission errors can occur when creating a resource + associated roles at the same time
+        if scope && scope.is_a?(ApplicationRecord)
+          return scope.send(key.to_s.pluralize).include?(self)
+        end
         scoped_roles(scope).with_role_key(key).any?
       end
 

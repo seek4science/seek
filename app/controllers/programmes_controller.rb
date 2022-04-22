@@ -149,6 +149,7 @@ class ProgrammesController < ApplicationController
       params[:programme][:programme_administrator_ids] ||= []
       params[:programme][:programme_administrator_ids] << current_person.id.to_s
     end
+    params[:programme][:programme_administrator_ids].uniq! if params[:programme][:programme_administrator_ids]
 
     params.require(:programme).permit(:avatar_id, :description, :first_letter, :title, :uuid, :web_page,
                                       { project_ids: [] }, :funding_details, { programme_administrator_ids: [] },
