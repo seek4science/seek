@@ -9,13 +9,10 @@ class ProgrammeCUDTest < ActionDispatch::IntegrationTest
 
   def setup
     admin_login
-    #min object needed for all tests related to post except 'test_create' which will load min and max subsequently
-    p = Factory(:programme)
-    @to_post = load_template("post_min_#{singular_name}.json.erb", {title: "post programme"})
   end
 
   def post_values
-      {title: "Post programme", admin_id: @current_person.id}
+    {title: "Post programme", admin_id: current_person.id}
   end
 
   def patch_values
@@ -27,8 +24,9 @@ class ProgrammeCUDTest < ActionDispatch::IntegrationTest
   def test_user_can_create_programme
     a_person = Factory(:person)
     user_login(a_person)
+    json = post_json
     assert_difference('Programme.count') do
-      post "/programmes.json", params: @to_post
+      post "/programmes.json", params: json
       assert_response :success
     end
   end
@@ -40,11 +38,12 @@ class ProgrammeCUDTest < ActionDispatch::IntegrationTest
     prog = Factory(:programme)
     person.is_programme_administrator = true, prog
     disable_authorization_checks { person.save! }
-    @to_post["data"]["id"] = "#{prog.id}"
-    @to_post["data"]['attributes']['title'] = "Updated programme"
+    json = post_json
+    json["data"]["id"] = "#{prog.id}"
+    json["data"]['attributes']['title'] = "Updated programme"
     #change_funding_codes_before_CU("min")
 
-    patch "/programmes/#{prog.id}.json", params: @to_post
+    patch "/programmes/#{prog.id}.json", params: json
     assert_response :success
   end
 

@@ -7,32 +7,36 @@ class EventCUDTest < ActionDispatch::IntegrationTest
     Event
   end
 
+  def patch_values
+    event = Factory(:event, policy: Factory(:public_policy), contributor: current_person)
+    { id: event.id }
+  end
+
+  def populate_extra_attributes(request_hash = {})
+    h = super
+    country = request_hash.dig('data', 'attributes', 'country')
+    if country && country.length == 2
+      h[:country] = CountryCodes.country(country)
+    end
+    h
+  end
+
   def setup
     admin_login
     @project = @current_user.person.projects.first
-    @publication = Factory(:publication, contributor: @current_person)
-    @presentation = Factory(:presentation, contributor: @current_person)
-    @data_file = Factory(:data_file, contributor: @current_person)
+    @publication = Factory(:publication, contributor: current_person)
+    @presentation = Factory(:presentation, contributor: current_person)
+    @data_file = Factory(:data_file, contributor: current_person)
     @creator = Factory(:person)
-
-    template_file = File.join(ApiTestHelper.template_dir, 'post_max_event.json.erb')
-    template = ERB.new(File.read(template_file))
-    @to_post = JSON.parse(template.result(binding))
-
-    event = Factory(:event, policy: Factory(:public_policy), contributor: @current_person)
-    @to_patch = load_template("patch_min_#{singular_name}.json.erb", {id: event.id})
   end
 
   test 'returns sensible error objects' do
     skip 'Errors are a WIP'
-    template_file = File.join(ApiTestHelper.template_dir, 'post_bad_event.json.erb')
-    template = ERB.new(File.read(template_file))
-    @to_post = JSON.parse(template.result(binding))
+    to_post = load_template('post_bad_event.json.erb')
 
     assert_no_difference("#{singular_name.classify}.count") do
-      post "/#{plural_name}.json", params: @to_post
-      # assert_response :unprocessable_entity
-      # validate_json_against_fragment response.body, '#/definitions/errors'
+      post "/#{plural_name}.json", params: to_post
+      #assert_response :unprocessable_entity
     end
 
     h = JSON.parse(response.body)

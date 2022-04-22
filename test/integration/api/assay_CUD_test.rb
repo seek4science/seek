@@ -9,38 +9,32 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
 
   def setup
     admin_login
-    
-    @study = Factory(:study, contributor: @current_person)
+
+    @study = Factory(:study, contributor: current_person)
     @study.title = 'Fred'
 
     # Populate the assay classes
     Factory(:modelling_assay_class)
     Factory(:experimental_assay_class)
-    @assay = Factory(:experimental_assay, contributor: @current_person, policy: Factory(:public_policy))
-    hash = {study_id: @study.id, r: ApiTestHelper.method(:render_erb)}
-    @to_post = load_template("post_min_#{singular_name}.json.erb", hash)
+    @assay = Factory(:experimental_assay, contributor: current_person, policy: Factory(:public_policy))
   end
 
   def post_values
-      {study_id: @study.id,
-                      creator_ids: [@current_user.person.id],
-                      project_id: Factory(:project).id,
-                      r: ApiTestHelper.method(:render_erb) }
+    {
+      study_id: @study.id,
+      creator_ids: [@current_user.person.id],
+      project_id: Factory(:project).id
+    }
   end
 
   def patch_values
     @study = @assay.study
-    {id: @assay.id,
-                     study_id: @study.id,
-                     project_id: Factory(:project).id,
-                     creator_ids: [@current_user.person.id],
-                     r: ApiTestHelper.method(:render_erb) }
-  end
-
-  def populate_extra_relationships(hash = nil)
-    extra_relationships = super
-    extra_relationships[:investigation] = { data: { id: @study.investigation.id.to_s, type: 'investigations' } }
-    extra_relationships
+    {
+      id: @assay.id,
+      study_id: @study.id,
+      project_id: Factory(:project).id,
+      creator_ids: [@current_user.person.id]
+    }
   end
 
   test 'should not delete assay when not project member' do

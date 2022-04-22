@@ -9,12 +9,10 @@ class ProjectCUDTest < ActionDispatch::IntegrationTest
 
   def setup
     admin_login
-    #min object needed for all tests related to post except 'test_create' which will load min and max subsequently
-    @to_post = load_template("post_min_#{singular_name}.json.erb", {title: "Post Project" })
   end
 
   def post_values
-      {title: "Post Project"}
+    {title: "Post Project"}
   end
 
   def patch_values
@@ -25,8 +23,9 @@ class ProjectCUDTest < ActionDispatch::IntegrationTest
 
   def test_normal_user_cannot_create_project
     user_login(Factory(:person))
+    json = post_json
     assert_no_difference('Project.count') do
-      post "/projects.json", params: @to_post
+      post "/projects.json", params: json
     end
   end
 

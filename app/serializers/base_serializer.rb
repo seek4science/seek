@@ -7,13 +7,13 @@ class BaseSerializer < SimpleBaseSerializer
 
   attribute :discussion_links, if: -> { object.is_discussable? } do
     object.discussion_links.collect do |link|
-      { id: link.id, label: link.label, url: link.url }
+      { id: link.id.to_s, label: link.label, url: link.url }
     end
   end
 
   attribute :misc_links, if: -> { object.have_misc_links? } do
     object.misc_links.collect do |link|
-      { id: link.id, label: link.label, url: link.url }
+      { id: link.id.to_s, label: link.label, url: link.url }
     end
   end
 

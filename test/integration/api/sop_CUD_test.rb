@@ -7,24 +7,22 @@ class SopCUDTest < ActionDispatch::IntegrationTest
     Sop
   end
 
+  def patch_values
+    sop = Factory(:sop, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
+    { id: sop.id }
+  end
+
   def setup
     admin_login
     @project = @current_user.person.projects.first
-    investigation = Factory(:investigation, projects: [@project], contributor: @current_person)
-    study = Factory(:study, investigation: investigation, contributor: @current_person)
-    @assay = Factory(:assay, study: study, contributor: @current_person)
+    investigation = Factory(:investigation, projects: [@project], contributor: current_person)
+    study = Factory(:study, investigation: investigation, contributor: current_person)
+    @assay = Factory(:assay, study: study, contributor: current_person)
     @creator = Factory(:person)
-
-    template_file = File.join(ApiTestHelper.template_dir, 'post_max_sop.json.erb')
-    template = ERB.new(File.read(template_file))
-    @to_post = JSON.parse(template.result(binding))
-
-    sop = Factory(:sop, policy: Factory(:public_policy), contributor: @current_person, creators: [@creator])
-    @to_patch = load_template("patch_min_#{singular_name}.json.erb", {id: sop.id})
   end
 
   test 'can add content to API-created sop' do
-    sop = Factory(:api_pdf_sop, contributor: @current_person)
+    sop = Factory(:api_pdf_sop, contributor: current_person)
 
     assert sop.content_blob.no_content?
     assert sop.can_download?(@current_user)
@@ -52,7 +50,7 @@ class SopCUDTest < ActionDispatch::IntegrationTest
     ]
     policy.reload
     assert_equal Permission::PRECEDENCE.sort, permissions.map(&:contributor_type).sort, 'Should be one of each permission type'
-    sop = Factory(:sop, contributor: @current_person, policy: policy)
+    sop = Factory(:sop, contributor: current_person, policy: policy)
     original_policy = sop.reload.policy
     original_permissions = original_policy.permissions.to_a
 

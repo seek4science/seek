@@ -7,34 +7,32 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
     Model
   end
 
+  def patch_values
+    { id: @model.id }
+  end
+
   def setup
     admin_login
     @project = @current_user.person.projects.first
     @organism = Factory(:organism)
     @project.organisms << @organism
-    investigation = Factory(:investigation, projects: [@project], contributor: @current_person)
-    study = Factory(:study, investigation: investigation, contributor: @current_person)
-    @assay = Factory(:assay, study: study, contributor: @current_person)
+    investigation = Factory(:investigation, projects: [@project], contributor: current_person)
+    study = Factory(:study, investigation: investigation, contributor: current_person)
+    @assay = Factory(:assay, study: study, contributor: current_person)
     @creator = Factory(:person)
     @publication = Factory(:publication, projects: [@project])
     @event = Factory(:event, projects: [@project], policy: Factory(:public_policy))
     ModelType.where(title: 'Linear equations').first_or_create
     ModelFormat.where(title: 'SBML').first_or_create
     RecommendedModelEnvironment.where(title: 'JWS Online').first_or_create
-
-    template_file = File.join(ApiTestHelper.template_dir, 'post_max_model.json.erb')
-    template = ERB.new(File.read(template_file))
-    @to_post = JSON.parse(template.result(binding))
-
-    model = Factory(:model, policy: Factory(:public_policy),
-                    contributor: @current_person, creators: [@creator],
+    @model = Factory(:model, policy: Factory(:public_policy),
+                    contributor: current_person, creators: [@creator],
                     discussion_links:[Factory(:discussion_link)])
-    @discussion_link = model.discussion_links.first
-    @to_patch = load_template("patch_min_#{singular_name}.json.erb", {id: model.id})
+    @discussion_link = @model.discussion_links.first
   end
 
   test 'can add content to API-created model' do
-    model = Factory(:api_model, contributor: @current_person)
+    model = Factory(:api_model, contributor: current_person)
 
     assert model.content_blobs.all?(&:no_content?)
     assert model.can_download?(@current_user)
@@ -82,7 +80,7 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
   end
 
   test 'cannot add content to API-created model that already has content' do
-    model = Factory(:model, contributor: @current_person)
+    model = Factory(:model, contributor: current_person)
 
     pdf_blob = model.content_blobs.first
 
@@ -108,13 +106,11 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
                                                                            status: 200, headers: { content_type: 'application/xml; charset=UTF-8' })
     stub_request(:head, 'http://mockedlocation.com/model.xml').to_return(status: 200, headers: { content_type: 'application/xml; charset=UTF-8' })
 
-    template_file = File.join(ApiTestHelper.template_dir, 'post_remote_model.json.erb')
-    template = ERB.new(File.read(template_file))
-    @to_post = JSON.parse(template.result(binding))
-    validate_json_against_fragment @to_post.to_json, "#/definitions/#{singular_name.camelize(:lower)}Post"
+    to_post = load_template('post_remote_model.json.erb')
+    validate_json_against_fragment to_post.to_json, "#/definitions/#{singular_name.camelize(:lower)}Post"
 
     assert_difference("#{singular_name.classify}.count") do
-      post "/#{plural_name}.json", params: @to_post
+      post "/#{plural_name}.json", params: to_post
       assert_response :success
     end
 
@@ -122,21 +118,19 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
 
     h = JSON.parse(response.body)
 
-    hash_comparison(@to_post['data']['attributes'], h['data']['attributes'])
-    hash_comparison(populate_extra_attributes(@to_post), h['data']['attributes'])
+    hash_comparison(to_post['data']['attributes'], h['data']['attributes'])
+    hash_comparison(populate_extra_attributes(to_post), h['data']['attributes'])
 
-    hash_comparison(@to_post['data']['relationships'], h['data']['relationships'])
-    hash_comparison(populate_extra_relationships(@to_post), h['data']['relationships'])
+    hash_comparison(to_post['data']['relationships'], h['data']['relationships'])
+    hash_comparison(populate_extra_relationships(to_post), h['data']['relationships'])
   end
 
   test 'returns sensible error objects' do
     skip 'Errors are a WIP'
-    template_file = File.join(ApiTestHelper.template_dir, 'post_bad_model.json.erb')
-    template = ERB.new(File.read(template_file))
-    @to_post = JSON.parse(template.result(binding))
+    to_post = load_template('post_bad_model.json.erb')
 
     assert_no_difference("#{singular_name.classify}.count") do
-      post "/#{plural_name}.json", params: @to_post
+      post "/#{plural_name}.json", params: to_post
       assert_response :unprocessable_entity
       validate_json_against_fragment response.body, '#/definitions/errors'
     end

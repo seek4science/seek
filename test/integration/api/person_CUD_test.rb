@@ -9,10 +9,6 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
 
   def setup
     admin_login
-    
-    #min object needed for all tests related to post except 'test_create' which will load min and max subsequently
-    p = Factory(:person)
-    @to_post = load_template("post_min_#{singular_name}.json.erb", {first_name: "Post", last_name: p.last_name, email: p.email})
   end
 
   def post_values
@@ -28,7 +24,7 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
   # title cannot be POSTed or PATCHed
   # email and expertise/tool_list are not as are in the readAPI
   def ignore_non_read_or_write_attributes
-    ['title', 'email', 'expertise_list', 'tool_list', 'mbox_sha1sum', 'skype_name', 'phone', 'web_page']
+    super | ['title', 'email', 'expertise_list', 'tool_list', 'mbox_sha1sum', 'skype_name', 'phone', 'web_page']
   end
 
   def populate_extra_attributes(hash)
@@ -47,17 +43,19 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
 
   def test_normal_user_cannot_create_person
     user_login(Factory(:person))
+    json = post_json
     assert_no_difference('Person.count') do
-      post "/people.json", params: @to_post
+      post "/people.json", params: json
     end
   end
 
   def test_admin_can_update_others
     other_person = Factory(:person)
     ['min', 'max'].each do |m|
-      @to_post["data"]["id"] = "#{other_person.id}"
-      @to_post["data"]["attributes"]["email"] = "updateTest@email.com"
-       patch "/people/#{other_person.id}.json", params: @to_post
+      j = post_json
+      j["data"]["id"] = "#{other_person.id}"
+      j["data"]["attributes"]["email"] = "updateTest@email.com"
+       patch "/people/#{other_person.id}.json", params: j
        assert_response :success
     end
   end

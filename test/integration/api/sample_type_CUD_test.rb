@@ -8,16 +8,15 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
   end
 
   def resource
-    Factory(:simple_sample_type, project_ids: [@project.id], contributor:@current_person)
+    Factory(:simple_sample_type, project_ids: [@project.id], contributor:current_person)
   end
 
   def setup
     admin_login
     @project = @current_user.person.projects.first
-    @sample_type = Factory(:simple_sample_type, project_ids: [@project.id], contributor:@current_person)
+    @sample_type = Factory(:simple_sample_type, project_ids: [@project.id], contributor:current_person)
     @sample_type_attribute = @sample_type.sample_attributes.first
-    @to_post = load_template("post_min_#{singular_name}.json.erb", {project_id: @project.id, sample_attribute_type_title: @sample_type_attribute.sample_attribute_type.title})
-    @assay = Factory(:assay, contributor:@current_person)
+    @assay = Factory(:assay, contributor:current_person)
   end
 
   test 'create using attribute_type name' do
@@ -44,7 +43,7 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
           "projects": {
             "data": [
               {
-                "id": "#{@current_person.projects.first.id}",
+                "id": "#{current_person.projects.first.id}",
                 "type": "projects"
               }
             ]
@@ -91,7 +90,7 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
           "projects": {
             "data": [
               {
-                "id": "#{@current_person.projects.first.id}",
+                "id": "#{current_person.projects.first.id}",
                 "type": "projects"
               }
             ]
@@ -224,9 +223,10 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
   def post_values
     {
         sample_attribute_type_title: @sample_type_attribute.sample_attribute_type.title,
-        creator_id: @current_person.id,
+        creator_id: current_person.id,
         project_id: @project.id,
-        assay_id: @assay.id}
+        assay_id: @assay.id
+    }
   end
 
   def patch_values
@@ -240,6 +240,4 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
         assay_id: @assay.id
     }
   end
-
 end
-

@@ -9,10 +9,6 @@ class InstitutionCUDTest < ActionDispatch::IntegrationTest
 
   def setup
     admin_login
-    
-    #min object needed for all tests related to post except 'test_create' which will load min and max subsequently
-    inst = Factory(:institution)
-    @to_post = load_template("post_min_#{singular_name}.json.erb", {title: "Post "+inst.title, country: inst.country})
   end
 
   def post_values
@@ -25,7 +21,7 @@ class InstitutionCUDTest < ActionDispatch::IntegrationTest
   end
 
   def ignore_non_read_or_write_attributes
-    ['country_code']
+    super | ['country_code']
   end
 
   def populate_extra_attributes(hash)
@@ -38,8 +34,9 @@ class InstitutionCUDTest < ActionDispatch::IntegrationTest
 
   def test_normal_user_cannot_create_institution
     user_login(Factory(:person))
+    json = post_json
     assert_no_difference('Institution.count') do
-      post "/institutions.json", params: @to_post
+      post "/institutions.json", params: json
     end
   end
 

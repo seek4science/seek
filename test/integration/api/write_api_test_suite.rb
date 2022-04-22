@@ -1,4 +1,5 @@
 module WriteApiTestSuite
+  DEBUG = false # || true
   extend ActiveSupport::Testing::Declarative # Allows `test 'bla' do` definitions
   include ApiTestHelper
 
@@ -7,61 +8,59 @@ module WriteApiTestSuite
   end
 
   def resource
-    Factory(singular_name.to_sym, contributor: @current_person)
+    if model.method_defined?(:contributor=)
+      Factory(singular_name.to_sym, contributor: current_person)
+    else
+      Factory(singular_name.to_sym)
+    end
+  end
+
+  def post_json
+    template = "post_max_#{singular_name}.json.erb"
+    load_template(template, post_values)
   end
 
   def post_values
-    nil
+    {}
   end
 
   def patch_values
-    nil
+    {}
+  end
+
+  def ignore_non_read_or_write_attributes
+    ['updated_at', 'creators']
   end
 
   ['min','max'].each do |m|
     test "can create #{m} resource" do
-      debug = false # || true # Uncomment to enable
-
-      if post_values
-        to_post = load_template("post_#{m}_#{singular_name}.json.erb", post_values)
-      else
-        template_file = File.join(ApiTestHelper.template_dir, "post_#{m}_#{singular_name}.json.erb")
-        template = ERB.new(File.read(template_file))
-        to_post = JSON.parse(template.result(binding))
-      end
-      puts "create, to_post #{m}", to_post if debug
-
-      if to_post.blank?
-        skip
-      end
+      expected = to_post = load_template("post_#{m}_#{singular_name}.json.erb", post_values)
 
       validate_json_against_fragment to_post.to_json, "#/definitions/#{singular_name.camelize(:lower)}Post"
 
       # debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
       assert_difference("#{singular_name.classify}.count") do
         post collection_url, params: to_post.to_json, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
-        if debug
-          puts "==== Response ===="
-          puts response.body
-          puts "=================="
-        end
         assert_response :success
       end
 
       validate_json_against_fragment response.body, "#/definitions/#{singular_name.camelize(:lower)}Response"
 
-      # content check
-      h = JSON.parse(response.body)
-      to_ignore = (defined? ignore_non_read_or_write_attributes) ? ignore_non_read_or_write_attributes : []
+      actual = JSON.parse(response.body)
 
-      hash_comparison(to_post['data']['attributes'].except(*to_ignore), h['data']['attributes'])
+      expected['data']['attributes'] ||= {}
+      expected['data']['attributes'].except!(*ignore_non_read_or_write_attributes)
+      expected['data']['attributes'].merge!(populate_extra_attributes(to_post))
+      expected['data']['relationships'] ||= {}
+      expected['data']['relationships'].merge!(populate_extra_relationships(to_post))
 
-      if to_post['data'].has_key?('relationships')
-        hash_comparison(to_post['data']['relationships'], h['data']['relationships'])
+      if DEBUG
+        puts "Expected:\n #{expected.inspect}\n"
+        puts "Actual:\n #{actual.inspect}"
       end
 
-      hash_comparison(populate_extra_attributes(to_post), h['data']['attributes'])
-      hash_comparison(populate_extra_relationships(to_post), h['data']['relationships'])
+      hash_comparison(expected['data']['attributes'], actual['data']['attributes'])
+      hash_comparison(expected['data']['relationships'], actual['data']['relationships'])
     end
   end
 
@@ -86,9 +85,9 @@ module WriteApiTestSuite
   test 'unauthorized user cannot update resource' do
     obj = object_with_private_policy
     user_login(Factory(:person))
-    @to_post["data"]["id"] = "#{obj.id}"
-    @to_post["data"]["attributes"]["title"] = "updated by an unauthorized"
-    patch member_url(obj), params: @to_post
+    post_json["data"]["id"] = "#{obj.id}"
+    post_json["data"]["attributes"]["title"] = "updated by an unauthorized"
+    patch member_url(obj), params: post_json
     assert_response :forbidden
     validate_json_against_fragment response.body, '#/definitions/errors'
   end
@@ -104,7 +103,7 @@ module WriteApiTestSuite
   end
 
   test 'creating resource with an ID should throw error' do
-    post_clone = JSON.parse(JSON.generate(@to_post))
+    post_clone = JSON.parse(JSON.generate(post_json))
     post_clone['data']['id'] = '100000000'
 
     assert_no_difference("#{singular_name.classify.constantize}.count") do
@@ -116,7 +115,7 @@ module WriteApiTestSuite
   end
 
   test 'creating resource with the wrong type should throw error' do
-    post_clone = JSON.parse(JSON.generate(@to_post))
+    post_clone = JSON.parse(JSON.generate(post_json))
     post_clone['data']['type'] = 'wrong'
 
     assert_no_difference("#{singular_name.classify.constantize}.count") do
@@ -128,7 +127,7 @@ module WriteApiTestSuite
   end
 
   test 'creating resource with a missing type should throw error' do
-    post_clone = JSON.parse(JSON.generate(@to_post))
+    post_clone = JSON.parse(JSON.generate(post_json))
     post_clone['data'].delete('type')
 
     assert_no_difference("#{singular_name.classify.constantize}.count") do
@@ -141,61 +140,41 @@ module WriteApiTestSuite
 
   ['min', 'max'].each do |m|
     test "can update #{m} resource" do
-      if patch_values
-        @to_patch = load_template("patch_#{m}_#{singular_name}.json.erb", patch_values)
-      end
-
-      if @to_patch.blank?
-        skip
-      end
+      to_patch = load_template("patch_#{m}_#{singular_name}.json.erb", patch_values)
 
       #fetch original object
-      obj_id = @to_patch['data']['id']
+      obj_id = to_patch['data']['id']
       obj = singular_name.classify.constantize.find(obj_id)
+
       get member_url(obj)
       assert_response :success
-      #puts "after get: ", response.body
-      original = JSON.parse(response.body)
+      expected = JSON.parse(response.body)
 
-      validate_json_against_fragment @to_patch.to_json, "#/definitions/#{singular_name.camelize(:lower)}Patch"
+      validate_json_against_fragment to_patch.to_json, "#/definitions/#{singular_name.camelize(:lower)}Patch"
 
       assert_no_difference("#{singular_name.classify}.count") do
-        j = @to_patch.to_json
+        j = to_patch.to_json
         patch member_url(obj), params: j, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
         assert_response :success
       end
 
       validate_json_against_fragment response.body, "#/definitions/#{singular_name.camelize(:lower)}Response"
 
-      h = JSON.parse(response.body)
+      actual = JSON.parse(response.body)
 
-      #check the post-processed attributes and relationships
-      hash_comparison(populate_extra_attributes(@to_patch), h['data']['attributes'])
-      hash_comparison(populate_extra_relationships(@to_patch), h['data']['relationships'])
+      expected['data']['attributes'].merge!(to_patch['data']['attributes'] || {})
+      expected['data']['attributes'].except!(*ignore_non_read_or_write_attributes)
+      expected['data']['attributes'].merge!(populate_extra_attributes(to_patch))
+      expected['data']['relationships'].merge!(to_patch['data']['relationships'] || {})
+      expected['data']['relationships'].merge!(populate_extra_relationships(to_patch))
 
-      to_ignore = (defined? ignore_non_read_or_write_attributes) ? ignore_non_read_or_write_attributes : []
-      to_ignore << 'updated_at'
-      to_ignore << 'creators'
-
-      # Check the changed attributes and relationships
-      if @to_patch['data'].key?('attributes')
-        hash_comparison(@to_patch['data']['attributes'].except(*to_ignore), h['data']['attributes'])
+      if DEBUG
+        puts "Expected:\n #{expected.inspect}\n"
+        puts "Actual:\n #{actual.inspect}"
       end
 
-      if @to_patch['data'].key?('relationships')
-        hash_comparison(@to_patch['data']['relationships'], h['data']['relationships'])
-      end
-
-      # Check the original, unchanged attributes and relationships
-      if original['data'].key?('attributes') && @to_patch['data'].key?('attributes')
-        original_attributes = original['data']['attributes'].except(*(to_ignore + @to_patch['data']['attributes'].keys))
-        hash_comparison(original_attributes, h['data']['attributes'])
-      end
-
-      if original['data'].key?('relationships') && @to_patch['data'].key?('relationships')
-        original_relationships = original['data']['relationships'].except(*@to_patch['data']['relationships'].keys)
-        hash_comparison(original_relationships, h['data']['relationships'])
-      end
+      hash_comparison(expected['data']['attributes'], actual['data']['attributes'])
+      hash_comparison(expected['data']['relationships'], actual['data']['relationships'])
     end
   end
 
@@ -214,7 +193,7 @@ module WriteApiTestSuite
 
   test 'updating resource with the wrong type should throw error' do
     obj = resource
-    to_patch = load_patch_template({})
+    to_patch = load_patch_template
     to_patch['data']['type'] = 'wrong'
 
     assert_no_difference ("#{singular_name.classify.constantize}.count") do
@@ -227,7 +206,7 @@ module WriteApiTestSuite
 
   test 'updating resource with a missing type should throw error' do
     obj = resource
-    to_patch = load_patch_template({})
+    to_patch = load_patch_template
     to_patch['data'].delete('type')
 
     assert_no_difference ("#{singular_name.classify.constantize}.count") do

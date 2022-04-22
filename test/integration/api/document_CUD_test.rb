@@ -7,24 +7,22 @@ class DocumentCUDTest < ActionDispatch::IntegrationTest
     Document
   end
 
+  def patch_values
+    document = Factory(:document, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
+    { id: document.id }
+  end
+
   def setup
     admin_login
     @project = @current_user.person.projects.first
-    investigation = Factory(:investigation, projects: [@project], contributor: @current_person)
-    study = Factory(:study, investigation: investigation, contributor: @current_person)
-    @assay = Factory(:assay, study: study, contributor: @current_person)
+    investigation = Factory(:investigation, projects: [@project], contributor: current_person)
+    study = Factory(:study, investigation: investigation, contributor: current_person)
+    @assay = Factory(:assay, study: study, contributor: current_person)
     @creator = Factory(:person)
-
-    template_file = File.join(ApiTestHelper.template_dir, 'post_max_document.json.erb')
-    template = ERB.new(File.read(template_file))
-    @to_post = JSON.parse(template.result(binding))
-
-    document = Factory(:document, policy: Factory(:public_policy), contributor: @current_person, creators: [@creator])
-    @to_patch = load_template("patch_min_#{singular_name}.json.erb", {id: document.id})
   end
 
   test 'can add content to API-created document' do
-    doc = Factory(:api_pdf_document, contributor: @current_person)
+    doc = Factory(:api_pdf_document, contributor: current_person)
 
     assert doc.content_blob.no_content?
     assert doc.can_download?(@current_user)
@@ -56,7 +54,7 @@ class DocumentCUDTest < ActionDispatch::IntegrationTest
   end
 
   test 'cannot add content to API-created document that already has content' do
-    doc = Factory(:document, contributor: @current_person)
+    doc = Factory(:document, contributor: current_person)
 
     refute doc.content_blob.no_content?
     assert doc.can_download?(@current_user)
@@ -76,13 +74,11 @@ class DocumentCUDTest < ActionDispatch::IntegrationTest
                                                                            status: 200, headers: { content_type: 'text/plain; charset=UTF-8' })
     stub_request(:head, 'http://mockedlocation.com/txt_test.txt').to_return(status: 200, headers: { content_type: 'text/plain; charset=UTF-8' })
 
-    template_file = File.join(ApiTestHelper.template_dir, 'post_remote_document.json.erb')
-    template = ERB.new(File.read(template_file))
-    @to_post = JSON.parse(template.result(binding))
-    validate_json_against_fragment @to_post.to_json, "#/definitions/#{singular_name.camelize(:lower)}Post"
+    to_post = load_template('post_remote_document.json.erb')
+    validate_json_against_fragment to_post.to_json, "#/definitions/#{singular_name.camelize(:lower)}Post"
 
     assert_difference("#{singular_name.classify}.count") do
-      post "/#{plural_name}.json", params: @to_post
+      post "/#{plural_name}.json", params: to_post
       assert_response :success
     end
 
@@ -90,22 +86,20 @@ class DocumentCUDTest < ActionDispatch::IntegrationTest
 
     h = JSON.parse(response.body)
 
-    hash_comparison(@to_post['data']['attributes'], h['data']['attributes'])
-    hash_comparison(populate_extra_attributes(@to_post), h['data']['attributes'])
+    hash_comparison(to_post['data']['attributes'], h['data']['attributes'])
+    hash_comparison(populate_extra_attributes(to_post), h['data']['attributes'])
 
-    hash_comparison(@to_post['data']['relationships'], h['data']['relationships'])
-    hash_comparison(populate_extra_relationships(@to_post), h['data']['relationships'])
+    hash_comparison(to_post['data']['relationships'], h['data']['relationships'])
+    hash_comparison(populate_extra_relationships(to_post), h['data']['relationships'])
   end
 
 
   test 'returns sensible error objects' do
     skip 'Errors are a WIP'
-    template_file = File.join(ApiTestHelper.template_dir, 'post_bad_document.json.erb')
-    template = ERB.new(File.read(template_file))
-    @to_post = JSON.parse(template.result(binding))
+    to_post = load_template('post_bad_document.json.erb')
 
     assert_no_difference("#{singular_name.classify}.count") do
-      post "/#{plural_name}.json", params: @to_post
+      post "/#{plural_name}.json", params: to_post
       #assert_response :unprocessable_entity
     end
 

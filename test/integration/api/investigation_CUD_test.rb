@@ -9,7 +9,7 @@ class InvestigationCUDTest < ActionDispatch::IntegrationTest
 
   def setup
     admin_login
-    
+
     @min_project = Factory(:min_project)
     @min_project.title = 'Fred'
 
@@ -17,27 +17,25 @@ class InvestigationCUDTest < ActionDispatch::IntegrationTest
     @max_project.title = 'Bert'
 
     institution = Factory(:institution)
-    @current_person.add_to_project_and_institution(@min_project, institution)
-    @current_person.add_to_project_and_institution(@max_project, institution)
+    current_person.add_to_project_and_institution(@min_project, institution)
+    current_person.add_to_project_and_institution(@max_project, institution)
 
-    @inv = Factory(:investigation, contributor: @current_person, policy: Factory(:public_policy))
-
-    hash = {project_ids: [@min_project.id, @max_project.id],
-            r: ApiTestHelper.method(:render_erb) }
-    @to_post = load_template("post_min_#{singular_name}.json.erb", hash)
-  end
+    @inv = Factory(:investigation, contributor: current_person, policy: Factory(:public_policy))
+   end
 
   def post_values
-      {project_ids:  [@min_project.id, @max_project.id],
-                         creator_ids: [@current_user.person.id],
-                         r: ApiTestHelper.method(:render_erb) }
+    {
+      project_ids:  [@min_project.id, @max_project.id],
+      creator_ids: [@current_user.person.id]
+    }
   end
 
   def patch_values
-    {id: @inv.id,
-                     project_ids:  [@min_project.id, @max_project.id],
-                     creator_ids: [@current_user.person.id],
-                     r: ApiTestHelper.method(:render_erb) }
+    {
+      id: @inv.id,
+      project_ids:  [@min_project.id, @max_project.id],
+      creator_ids: [@current_user.person.id]
+    }
   end
 
   test 'should not delete investigation with studies' do

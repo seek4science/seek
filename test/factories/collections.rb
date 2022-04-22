@@ -1,7 +1,7 @@
 # Collection
 Factory.define(:collection) do |f|
   f.title 'An empty collection'
-  f.association :contributor, factory: :person
+  f.with_project_contributor
 
   f.after_build do |collection|
     collection.projects = [collection.contributor.projects.first] if collection.projects.empty?

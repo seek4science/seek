@@ -1,6 +1,10 @@
 module ApiTestHelper
   include AuthenticatedTestHelper
 
+  def current_person
+    @current_user&.person
+  end
+
   def plural_name
     model.model_name.plural
   end
@@ -20,16 +24,23 @@ module ApiTestHelper
     existing = request_hash.dig('data', 'id') # Is it an existing resource, or something being created?
     add_contributor = model.method_defined?(:contributor) && !existing
     if add_contributor
-      extra_relationships[:submitter] = { data: [{ id: @current_person.id.to_s, type: 'people' }] }
+      extra_relationships[:submitter] = { data: [{ id: current_person.id.to_s, type: 'people' }] }
     end
-    if model.method_defined?(:creators)
-      people = (request_hash.dig('data', 'relationships', 'creators', 'data') || []).map(&:symbolize_keys)
-      people << { id: @current_person.id.to_s, type: 'people' } if add_contributor
-      if people.any?
-        extra_relationships[:people] ||= {}
-        extra_relationships[:people][:data] ||= []
-        extra_relationships[:people][:data] += people
-        extra_relationships[:people][:data] = extra_relationships[:people][:data].uniq { |d| d[:id] }
+
+    # Add implicit study/investigation relationships
+    unless model == SampleType # SampleTypes do not have studies and investigations for some reason
+      assay_ids = (request_hash.dig('data', 'relationships', 'assays', 'data') || []).map { |h| h['id'] }
+      study_ids = (request_hash.dig('data', 'relationships', 'studies', 'data') || []).map { |h| h['id'] }
+      assays = Assay.includes(:study).where(id: assay_ids).to_a
+      studies = Study.includes(:investigation).where(id: study_ids).to_a
+      if assays.any?
+        extra_relationships[:studies] ||= {}
+        extra_relationships[:studies][:data] = (studies | assays.map(&:study)).map { |s| { id: s.id.to_s, type: 'studies' } }
+      end
+
+      if assays.any? || studies.any?
+        extra_relationships[:investigations] ||= {}
+        extra_relationships[:investigations][:data] = (studies.map(&:investigation) | assays.map(&:investigation)).map { |i| { id: i.id.to_s, type: 'investigations' } }
       end
     end
 
@@ -43,48 +54,34 @@ module ApiTestHelper
 
   def admin_login
     admin = Factory.create(:admin)
-    @current_person = admin
     @current_user = admin.user
     # log in
     post '/session', params: { login: @current_user.login, password: generate_user_password }
   end
 
   def user_login(person)
-    @current_person = person
     @current_user = person.user
     post '/session', params: { login: person.user.login, password: ('0' * User::MIN_PASSWORD_LENGTH) }
   end
 
   def self.template_dir
-    File.join(Rails.root, 'test', 'fixtures',
-              'files', 'json', 'templates')
+    File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'templates')
   end
 
-  def self.render_erb (path, locals)
-    content = File.read(File.join(ApiTestHelper.template_dir, path))
-    template = ERB.new(content)
-    h = locals
-    h[:r] = method(:render_erb)
-    namespace = OpenStruct.new(h)
-    template.result(namespace.instance_eval {binding})
-  end
-
-  def load_template(erb_file, hash)
+  def load_template(erb_file, hash = nil)
+    hash ||= {}
     template_file = File.join(ApiTestHelper.template_dir, erb_file)
     template = ERB.new(File.read(template_file))
-    namespace = OpenStruct.new(hash)
-    #puts template.result(namespace.instance_eval { binding })
-    json_obj = JSON.parse(template.result(namespace.instance_eval { binding }))
-    return json_obj
+    hash[:r] = -> (*args) { load_template(*args).to_json }
+    b = binding
+    hash.each do |k, v|
+      b.local_variable_set(k, v)
+    end
+    JSON.parse(template.result(b))
   end
 
-  def load_patch_template(hash)
-    patch_file = File.join(Rails.root, 'test', 'fixtures',
-                                     'files', 'json', 'templates', "patch_min_#{singular_name}.json.erb")
-    the_patch = ERB.new(File.read(patch_file))
-    namespace = OpenStruct.new(hash)
-    to_patch = JSON.parse(the_patch.result(namespace.instance_eval { binding }))
-    return to_patch
+  def load_patch_template(hash = {})
+    load_template("patch_min_#{singular_name}.json.erb", (patch_values || {}).merge(hash))
   end
 
   def validate_json_against_fragment(json, fragment)
@@ -113,36 +110,35 @@ module ApiTestHelper
   end
 
   ##
-  # Compare `result` Hash against `source`.
-  def hash_comparison(source, result)
-    source.each do |key, value|
-      # puts "#{key}: #{value} <==> #{result[key]}"
-      deep_comparison(value, result[key], key)
+  # Compare `actual` Hash against `expected`.
+  def hash_comparison(expected, actual)
+    expected.each do |key, value|
+      deep_comparison(value, actual[key], key)
     end
   end
 
   ##
-  # Compares `result` against `source`. If `source` is a Hash, compare each each key/value pair with that in `result`. If `source` is an Array, compare each value.
+  # Compares `result` against `expected`. If `expected` is a Hash, compare each each key/value pair with that in `result`. If `expected` is an Array, compare each value.
   # `key` is used to generate meaningful failure messages if the assertion fails.
-  def deep_comparison(source, result, key)
-    if source.is_a?(Hash)
-      assert result.is_a?(Hash), "#{key} was not a Hash, it was a #{result.class.name}"
-      source.each do |sub_key, sub_value|
-        actual = result.try(:[], sub_key)
-        deep_comparison(sub_value, actual, "#{key}[#{sub_key}]")
+  def deep_comparison(expected, actual, key)
+    if expected.is_a?(Hash)
+      assert actual.is_a?(Hash), "#{key} was not a Hash, it was a #{actual.class.name}"
+      expected.each do |expected_key, expected_value|
+        actual_value = actual.try(:[], expected_key)
+        deep_comparison(expected_value, actual_value, "#{key}[#{expected_key}]")
       end
-    elsif source.is_a?(Array)
-      assert result.is_a?(Array), "#{key} was not an Array"
-      assert_equal source.length, result.length, "#{key} length of #{result.length} was not equal to #{source.length}"
-      sorted_result = result.sort_by { |e| e.is_a?(Hash) ? e['id'] : e }
-      sorted_source = source.sort_by { |e| e.is_a?(Hash) ? e['id'] : e }
-      sorted_source.each_with_index do |sub_value, index|
-        deep_comparison(sub_value, sorted_result[index], "#{key}[#{index}]")
+    elsif expected.is_a?(Array)
+      assert actual.is_a?(Array), "#{key} was not an Array, it was a #{actual.class.name}"
+      assert_equal expected.length, actual.length, "#{key} length of #{actual.length} was not equal to #{expected.length}"
+      sorted_actual = actual.sort_by { |e| e.is_a?(Hash) ? e['id'] || 'ZZZZ' : e }
+      sorted_expected = expected.sort_by { |e| e.is_a?(Hash) ? e['id'] || 'ZZZZ' : e }
+      sorted_expected.each_with_index do |sub_value, index|
+        deep_comparison(sub_value, sorted_actual[index], "#{key}[#{index}]")
       end
-    elsif source.nil?
-      assert_nil result, "Expected #{key} to be nil but was `#{result}`"
+    elsif expected.nil?
+      assert_nil actual, "Expected #{key} to be nil but was `#{actual}`"
     else
-      assert_equal source, result, "Expected #{key} to be `#{source}` but was `#{result}`"
+      assert_equal expected, actual, "Expected #{key} to be `#{expected}` but was `#{actual}`"
     end
   end
 

@@ -9,30 +9,29 @@ class StudyCUDTest < ActionDispatch::IntegrationTest
 
   def setup
     admin_login
-    
-    @investigation = Factory(:investigation, contributor: @current_person, projects: [@current_person.projects.first])
+
+    @investigation = Factory(:investigation, contributor: current_person, projects: [current_person.projects.first])
     @investigation.title = 'Fred'
 
-    @study = Factory(:study, policy: Factory(:public_policy), contributor: @current_person)
-    hash = {investigation_id: @investigation.id,
-            r: ApiTestHelper.method(:render_erb) }
-    @to_post = load_template("post_min_#{singular_name}.json.erb", hash)
+    @study = Factory(:study, policy: Factory(:public_policy), contributor: current_person)
   end
 
   def post_values
-    {investigation_id: @investigation.id,
-                    person_id: @current_user.person.id,
-                    creator_ids: [@current_user.person.id],
-                    r: ApiTestHelper.method(:render_erb) }
+    {
+      investigation_id: @investigation.id,
+      person_id: @current_user.person.id,
+      creator_ids: [@current_user.person.id]
+    }
   end
 
   def patch_values
-    {id: @study.id,
-                     investigation_id: @study.investigation.id,
-                     person_id: @current_user.person.id,
-                     project_id: @study.projects.first.id,
-                     creator_ids: [@current_user.person.id],
-                     r: ApiTestHelper.method(:render_erb) }
+    {
+      id: @study.id,
+      investigation_id: @study.investigation.id,
+      person_id: @current_user.person.id,
+      project_id: @study.projects.first.id,
+      creator_ids: [@current_user.person.id]
+    }
   end
 
   test 'should not delete a study with assays' do
@@ -67,8 +66,8 @@ class StudyCUDTest < ActionDispatch::IntegrationTest
     study = Factory(:study,
                     contributor: person,
                     policy: Factory(:policy,
-                        access_type: Policy::NO_ACCESS,
-                        permissions: [Factory(:permission, contributor: proj, access_type: Policy::MANAGING)]))
+                                    access_type: Policy::NO_ACCESS,
+                                    permissions: [Factory(:permission, contributor: proj, access_type: Policy::MANAGING)]))
 
     assert_difference('Study.count', -1) do
       delete "/#{plural_name}/#{study.id}.json"

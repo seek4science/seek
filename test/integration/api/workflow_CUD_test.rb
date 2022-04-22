@@ -7,26 +7,24 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
     Workflow
   end
 
+  def patch_values
+    workflow = Factory(:workflow, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
+    { id: workflow.id }
+  end
+
   def setup
     admin_login
     Factory(:cwl_workflow_class) # Make sure the CWL class is present
     @project = @current_user.person.projects.first
-    investigation = Factory(:investigation, projects: [@project], contributor: @current_person)
-    study = Factory(:study, investigation: investigation, contributor: @current_person)
-    @assay = Factory(:assay, study: study, contributor: @current_person)
+    investigation = Factory(:investigation, projects: [@project], contributor: current_person)
+    study = Factory(:study, investigation: investigation, contributor: current_person)
+    @assay = Factory(:assay, study: study, contributor: current_person)
     @creator = Factory(:person)
     @publication = Factory(:publication, projects: [@project])
-
-    template_file = File.join(ApiTestHelper.template_dir, 'post_max_workflow.json.erb')
-    template = ERB.new(File.read(template_file))
-    @to_post = JSON.parse(template.result(binding))
-
-    workflow = Factory(:workflow, policy: Factory(:public_policy), contributor: @current_person, creators: [@creator])
-    @to_patch = load_template("patch_min_#{singular_name}.json.erb", { id: workflow.id })
   end
 
   test 'can add content to API-created workflow' do
-    wf = Factory(:api_cwl_workflow, contributor: @current_person)
+    wf = Factory(:api_cwl_workflow, contributor: current_person)
 
     assert wf.content_blob.no_content?
     assert wf.can_download?(@current_user)
@@ -49,13 +47,11 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
                                                                            status: 200, headers: { content_type: 'text/plain; charset=UTF-8' })
     stub_request(:head, 'http://mockedlocation.com/workflow.cwl').to_return(status: 200, headers: { content_type: 'text/plain; charset=UTF-8' })
 
-    template_file = File.join(ApiTestHelper.template_dir, 'post_remote_workflow.json.erb')
-    template = ERB.new(File.read(template_file))
-    @to_post = JSON.parse(template.result(binding))
-    validate_json_against_fragment @to_post.to_json, "#/definitions/#{singular_name.camelize(:lower)}Post"
+    to_post = load_template('post_remote_workflow.json.erb')
+    validate_json_against_fragment to_post.to_json, "#/definitions/#{singular_name.camelize(:lower)}Post"
 
     assert_difference("#{singular_name.classify}.count") do
-      post "/#{plural_name}.json", params: @to_post
+      post "/#{plural_name}.json", params: to_post
       assert_response :success
     end
 
@@ -63,10 +59,10 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
 
     h = JSON.parse(response.body)
 
-    hash_comparison(@to_post['data']['attributes'], h['data']['attributes'])
-    hash_comparison(populate_extra_attributes(@to_post), h['data']['attributes'])
+    hash_comparison(to_post['data']['attributes'], h['data']['attributes'])
+    hash_comparison(populate_extra_attributes(to_post), h['data']['attributes'])
 
-    hash_comparison(@to_post['data']['relationships'], h['data']['relationships'])
-    hash_comparison(populate_extra_relationships(@to_post), h['data']['relationships'])
+    hash_comparison(to_post['data']['relationships'], h['data']['relationships'])
+    hash_comparison(populate_extra_relationships(to_post), h['data']['relationships'])
   end
 end

@@ -7,23 +7,21 @@ class PresentationCUDTest < ActionDispatch::IntegrationTest
     Presentation
   end
 
+  def patch_values
+    presentation = Factory(:presentation, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
+    { id: presentation.id }
+  end
+
   def setup
     admin_login
     @project = @current_user.person.projects.first
     @creator = Factory(:person)
     @publication = Factory(:publication, projects: [@project])
     @event = Factory(:event, projects: [@project], policy: Factory(:public_policy))
-
-    template_file = File.join(ApiTestHelper.template_dir, 'post_max_presentation.json.erb')
-    template = ERB.new(File.read(template_file))
-    @to_post = JSON.parse(template.result(binding))
-
-    presentation = Factory(:presentation, policy: Factory(:public_policy), contributor: @current_person, creators: [@creator])
-    @to_patch = load_template("patch_min_#{singular_name}.json.erb", {id: presentation.id})
   end
 
   test 'can add content to API-created presentation' do
-    pres = Factory(:api_pdf_presentation, contributor: @current_person)
+    pres = Factory(:api_pdf_presentation, contributor: current_person)
 
     assert pres.content_blob.no_content?
     assert pres.can_download?(@current_user)
@@ -56,7 +54,7 @@ class PresentationCUDTest < ActionDispatch::IntegrationTest
   end
 
   test 'cannot add content to API-created presentation that already has content' do
-    pres = Factory(:presentation, contributor: @current_person)
+    pres = Factory(:presentation, contributor: current_person)
 
     refute pres.content_blob.no_content?
     assert pres.can_download?(@current_user)
@@ -77,13 +75,11 @@ class PresentationCUDTest < ActionDispatch::IntegrationTest
                                                                            status: 200, headers: { content_type: 'text/plain; charset=UTF-8' })
     stub_request(:head, 'http://mockedlocation.com/txt_test.txt').to_return(status: 200, headers: { content_type: 'text/plain; charset=UTF-8' })
 
-    template_file = File.join(ApiTestHelper.template_dir, 'post_remote_presentation.json.erb')
-    template = ERB.new(File.read(template_file))
-    @to_post = JSON.parse(template.result(binding))
-    validate_json_against_fragment @to_post.to_json, "#/definitions/#{singular_name.camelize(:lower)}Post"
+    to_post = load_template('post_remote_presentation.json.erb')
+    validate_json_against_fragment to_post.to_json, "#/definitions/#{singular_name.camelize(:lower)}Post"
 
     assert_difference("#{singular_name.classify}.count") do
-      post "/#{plural_name}.json", params: @to_post
+      post "/#{plural_name}.json", params: to_post
       assert_response :success
     end
 
@@ -91,21 +87,19 @@ class PresentationCUDTest < ActionDispatch::IntegrationTest
 
     h = JSON.parse(response.body)
 
-    hash_comparison(@to_post['data']['attributes'], h['data']['attributes'])
-    hash_comparison(populate_extra_attributes(@to_post), h['data']['attributes'])
+    hash_comparison(to_post['data']['attributes'], h['data']['attributes'])
+    hash_comparison(populate_extra_attributes(to_post), h['data']['attributes'])
 
-    hash_comparison(@to_post['data']['relationships'], h['data']['relationships'])
-    hash_comparison(populate_extra_relationships(@to_post), h['data']['relationships'])
+    hash_comparison(to_post['data']['relationships'], h['data']['relationships'])
+    hash_comparison(populate_extra_relationships(to_post), h['data']['relationships'])
   end
 
   test 'returns sensible error objects' do
     skip 'Errors are a WIP'
-    template_file = File.join(ApiTestHelper.template_dir, 'post_bad_presentation.json.erb')
-    template = ERB.new(File.read(template_file))
-    @to_post = JSON.parse(template.result(binding))
+    to_post = load_template('post_bad_presentation.json.erb')
 
     assert_no_difference("#{singular_name.classify}.count") do
-      post "/#{plural_name}.json", params: @to_post
+      post "/#{plural_name}.json", params: to_post
       # assert_response :unprocessable_entity
       # validate_json_against_fragment response.body, '#/definitions/errors'
     end

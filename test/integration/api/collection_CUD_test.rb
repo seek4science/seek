@@ -7,29 +7,25 @@ class CollectionCUDTest < ActionDispatch::IntegrationTest
     Collection
   end
 
+  def patch_values
+    collection = Factory(:collection, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
+    { id: collection.id }
+  end
+
   def setup
     admin_login
     @project = @current_user.person.projects.first
-    @document1 = Factory(:public_document, contributor: @current_person)
-    @document2 = Factory(:public_document, contributor: @current_person)
+    @document1 = Factory(:public_document, contributor: current_person)
+    @document2 = Factory(:public_document, contributor: current_person)
     @creator = Factory(:person)
-
-    template_file = File.join(ApiTestHelper.template_dir, 'post_max_collection.json.erb')
-    template = ERB.new(File.read(template_file))
-    @to_post = JSON.parse(template.result(binding))
-
-    collection = Factory(:collection, policy: Factory(:public_policy), contributor: @current_person, creators: [@creator])
-    @to_patch = load_template("patch_min_#{singular_name}.json.erb", {id: collection.id})
   end
 
   test 'returns sensible error objects' do
     skip 'Errors are a WIP'
-    template_file = File.join(ApiTestHelper.template_dir, 'post_bad_collection.json.erb')
-    template = ERB.new(File.read(template_file))
-    @to_post = JSON.parse(template.result(binding))
+    to_post = load_template('post_bad_collection.json.erb')
 
     assert_no_difference("#{singular_name.classify}.count") do
-      post "/#{plural_name}.json", params: @to_post
+      post "/#{plural_name}.json", params: to_post
       #assert_response :unprocessable_entity
     end
 
