@@ -1,13 +1,14 @@
 require 'test_helper'
-require 'integration/api_test_helper'
 
 class CollectionItemCUDTest < ActionDispatch::IntegrationTest
-  include ApiTestHelper
+  include WriteApiTestSuite
+
+  def model
+    CollectionItem
+  end
 
   def setup
     admin_login
-    @clz = 'collection_item'
-    @plural_clz = @clz.pluralize
     @project = @current_user.person.projects.first
     @collection = Factory(:collection, contributor: @current_person)
     @document = Factory(:public_document, contributor: @current_person)
@@ -18,7 +19,7 @@ class CollectionItemCUDTest < ActionDispatch::IntegrationTest
     @to_post = JSON.parse(template.result(binding))
 
     collection_item = Factory(:collection_item, contributor: @current_person)
-    @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: collection_item.id})
+    @to_patch = load_template("patch_min_#{singular_name}.json.erb", {id: collection_item.id})
   end
 
   private

@@ -1,13 +1,14 @@
 require 'test_helper'
-require 'integration/api_test_helper'
 
 class SopCUDTest < ActionDispatch::IntegrationTest
-  include ApiTestHelper
+  include WriteApiTestSuite
+
+  def model
+    Sop
+  end
 
   def setup
     admin_login
-    @clz = 'sop'
-    @plural_clz = @clz.pluralize
     @project = @current_user.person.projects.first
     investigation = Factory(:investigation, projects: [@project], contributor: @current_person)
     study = Factory(:study, investigation: investigation, contributor: @current_person)
@@ -19,7 +20,7 @@ class SopCUDTest < ActionDispatch::IntegrationTest
     @to_post = JSON.parse(template.result(binding))
 
     sop = Factory(:sop, policy: Factory(:public_policy), contributor: @current_person, creators: [@creator])
-    @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: sop.id})
+    @to_patch = load_template("patch_min_#{singular_name}.json.erb", {id: sop.id})
   end
 
   test 'can add content to API-created sop' do

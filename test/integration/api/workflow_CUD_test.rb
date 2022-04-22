@@ -1,14 +1,15 @@
 require 'test_helper'
-require 'integration/api_test_helper'
 
 class WorkflowCUDTest < ActionDispatch::IntegrationTest
-  include ApiTestHelper
+  include WriteApiTestSuite
+
+  def model
+    Workflow
+  end
 
   def setup
     admin_login
-    @clz = 'workflow'
     Factory(:cwl_workflow_class) # Make sure the CWL class is present
-    @plural_clz = @clz.pluralize
     @project = @current_user.person.projects.first
     investigation = Factory(:investigation, projects: [@project], contributor: @current_person)
     study = Factory(:study, investigation: investigation, contributor: @current_person)
@@ -21,7 +22,7 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
     @to_post = JSON.parse(template.result(binding))
 
     workflow = Factory(:workflow, policy: Factory(:public_policy), contributor: @current_person, creators: [@creator])
-    @to_patch = load_template("patch_min_#{@clz}.json.erb", { id: workflow.id })
+    @to_patch = load_template("patch_min_#{singular_name}.json.erb", { id: workflow.id })
   end
 
   test 'can add content to API-created workflow' do
@@ -51,14 +52,14 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
     template_file = File.join(ApiTestHelper.template_dir, 'post_remote_workflow.json.erb')
     template = ERB.new(File.read(template_file))
     @to_post = JSON.parse(template.result(binding))
-    validate_json_against_fragment @to_post.to_json, "#/definitions/#{@clz.camelize(:lower)}Post"
+    validate_json_against_fragment @to_post.to_json, "#/definitions/#{singular_name.camelize(:lower)}Post"
 
-    assert_difference("#{@clz.classify}.count") do
-      post "/#{@plural_clz}.json", params: @to_post
+    assert_difference("#{singular_name.classify}.count") do
+      post "/#{plural_name}.json", params: @to_post
       assert_response :success
     end
 
-    validate_json_against_fragment response.body, "#/definitions/#{@clz.camelize(:lower)}Response"
+    validate_json_against_fragment response.body, "#/definitions/#{singular_name.camelize(:lower)}Response"
 
     h = JSON.parse(response.body)
 

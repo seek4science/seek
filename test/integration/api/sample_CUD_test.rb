@@ -1,14 +1,15 @@
 require 'test_helper'
-require 'integration/api_test_helper'
 
 class SampleCUDTest < ActionDispatch::IntegrationTest
-  include ApiTestHelper
+  include WriteApiTestSuite
+
+  def model
+    Sample
+  end
 
   def setup
     admin_login
-    @clz = "sample"
-    @plural_clz = @clz.pluralize
-
+    
     @sample = Factory(:sample, contributor: @current_person, policy: Factory(:public_policy))
 
     @min_project = Factory(:min_project)
@@ -22,7 +23,7 @@ class SampleCUDTest < ActionDispatch::IntegrationTest
     @sample_type.save!
 
     #min object needed for all tests related to post except 'test_create' which will load min and max subsequently
-    @to_post = load_template("post_min_#{@clz}.json.erb", {project_id: @min_project.id, sample_type_id: @sample_type.id})
+    @to_post = load_template("post_min_#{singular_name}.json.erb", {project_id: @min_project.id, sample_type_id: @sample_type.id})
   end
 
   test 'patching a couple of attributes retains others' do
@@ -126,15 +127,15 @@ class SampleCUDTest < ActionDispatch::IntegrationTest
     assert_equal 12, sample.get_attribute_value("age")
   end
 
-  def create_post_values
-      @post_values = {
+  def post_values
+      {
          sample_type_id: @sample_type.id,
          creator_id: @current_person.id, 
          project_id: @min_project.id}
   end
 
-  def create_patch_values
-    @patch_values = {
+  def patch_values
+    {
       id: @sample.id,
       sample_type_id: @sample_type.id,
       project_id: @min_project.id,

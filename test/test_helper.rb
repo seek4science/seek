@@ -22,6 +22,8 @@ require 'minitest'
 require 'ostruct'
 require 'pry'
 require 'json_test_helper'
+require 'api_test_helper'
+require 'integration/api/write_api_test_suite'
 
 Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new(fast_fail: true,
                                                                    color: true,

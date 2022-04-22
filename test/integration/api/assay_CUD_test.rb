@@ -1,14 +1,15 @@
 require 'test_helper'
-require 'integration/api_test_helper'
 
 class AssayCUDTest < ActionDispatch::IntegrationTest
-  include ApiTestHelper
+  include WriteApiTestSuite
+
+  def model
+    Assay
+  end
 
   def setup
     admin_login
-    @clz = 'assay'
-    @plural_clz = @clz.pluralize
-
+    
     @study = Factory(:study, contributor: @current_person)
     @study.title = 'Fred'
 
@@ -17,19 +18,19 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
     Factory(:experimental_assay_class)
     @assay = Factory(:experimental_assay, contributor: @current_person, policy: Factory(:public_policy))
     hash = {study_id: @study.id, r: ApiTestHelper.method(:render_erb)}
-    @to_post = load_template("post_min_#{@clz}.json.erb", hash)
+    @to_post = load_template("post_min_#{singular_name}.json.erb", hash)
   end
 
-  def create_post_values
-      @post_values = {study_id: @study.id,
+  def post_values
+      {study_id: @study.id,
                       creator_ids: [@current_user.person.id],
                       project_id: Factory(:project).id,
                       r: ApiTestHelper.method(:render_erb) }
   end
 
-  def create_patch_values
+  def patch_values
     @study = @assay.study
-    @patch_values = {id: @assay.id,
+    {id: @assay.id,
                      study_id: @study.id,
                      project_id: Factory(:project).id,
                      creator_ids: [@current_user.person.id],
@@ -48,7 +49,7 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
     user_login(person)
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('Assay.count') do
-        delete "/#{@plural_clz}/#{a.id}.json"
+        delete "/#{plural_name}/#{a.id}.json"
         assert_response :forbidden
         validate_json_against_fragment response.body, '#/definitions/errors'
       end
@@ -66,7 +67,7 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
                                     permissions: [Factory(:permission, contributor: proj, access_type: Policy::MANAGING)]))
 
     assert_difference('Assay.count', -1) do
-      delete "/#{@plural_clz}/#{assay.id}.json"
+      delete "/#{plural_name}/#{assay.id}.json"
       assert_response :success
     end
   end
@@ -81,7 +82,7 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
 
     assert_difference('Subscription.count', -2) do
       assert_difference('Assay.count', -1) do
-        delete "/#{@plural_clz}/#{assay.id}.json"
+        delete "/#{plural_name}/#{assay.id}.json"
         assert_response :success
       end
     end

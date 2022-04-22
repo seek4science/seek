@@ -1,14 +1,15 @@
 require 'test_helper'
-require 'integration/api_test_helper'
 
 class InvestigationCUDTest < ActionDispatch::IntegrationTest
-  include ApiTestHelper
+  include WriteApiTestSuite
+
+  def model
+    Investigation
+  end
 
   def setup
     admin_login
-    @clz = 'investigation'
-    @plural_clz = @clz.pluralize
-
+    
     @min_project = Factory(:min_project)
     @min_project.title = 'Fred'
 
@@ -23,17 +24,17 @@ class InvestigationCUDTest < ActionDispatch::IntegrationTest
 
     hash = {project_ids: [@min_project.id, @max_project.id],
             r: ApiTestHelper.method(:render_erb) }
-    @to_post = load_template("post_min_#{@clz}.json.erb", hash)
+    @to_post = load_template("post_min_#{singular_name}.json.erb", hash)
   end
 
-  def create_post_values
-      @post_values = {project_ids:  [@min_project.id, @max_project.id],
+  def post_values
+      {project_ids:  [@min_project.id, @max_project.id],
                          creator_ids: [@current_user.person.id],
                          r: ApiTestHelper.method(:render_erb) }
   end
 
-  def create_patch_values
-    @patch_values = {id: @inv.id,
+  def patch_values
+    {id: @inv.id,
                      project_ids:  [@min_project.id, @max_project.id],
                      creator_ids: [@current_user.person.id],
                      r: ApiTestHelper.method(:render_erb) }
@@ -42,7 +43,7 @@ class InvestigationCUDTest < ActionDispatch::IntegrationTest
   test 'should not delete investigation with studies' do
     inv = Factory(:max_investigation)
     assert_no_difference('Investigation.count') do
-      delete "/#{@plural_clz}/#{inv.id}.json"
+      delete "/#{plural_name}/#{inv.id}.json"
       assert_response :forbidden
       validate_json_against_fragment response.body, '#/definitions/errors'
     end
@@ -58,7 +59,7 @@ class InvestigationCUDTest < ActionDispatch::IntegrationTest
 
     assert_difference('Subscription.count', -2) do
       assert_difference('Investigation.count', -1) do
-        delete "/#{@plural_clz}/#{inv.id}.json"
+        delete "/#{plural_name}/#{inv.id}.json"
       end
     end
   end

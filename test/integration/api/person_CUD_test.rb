@@ -1,27 +1,28 @@
 require 'test_helper'
-require 'integration/api_test_helper'
 
 class PersonCUDTest < ActionDispatch::IntegrationTest
-  include ApiTestHelper
+  include WriteApiTestSuite
+
+  def model
+    Person
+  end
 
   def setup
     admin_login
-    @clz = "person"
-    @plural_clz = @clz.pluralize
-
+    
     #min object needed for all tests related to post except 'test_create' which will load min and max subsequently
     p = Factory(:person)
-    @to_post = load_template("post_min_#{@clz}.json.erb", {first_name: "Post", last_name: p.last_name, email: p.email})
+    @to_post = load_template("post_min_#{singular_name}.json.erb", {first_name: "Post", last_name: p.last_name, email: p.email})
   end
 
-  def create_post_values
+  def post_values
       p = Factory(:person)
-      @post_values = {first_name: "Post", last_name: p.last_name, email: "Post"+p.email}
+      {first_name: "Post", last_name: p.last_name, email: "Post"+p.email}
   end
 
-  def create_patch_values
+  def patch_values
     p = Factory(:person)
-    @patch_values = {id: p.id, project_id: p.group_memberships.first.project.id}
+    {id: p.id, project_id: p.group_memberships.first.project.id}
   end
 
   # title cannot be POSTed or PATCHed

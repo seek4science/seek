@@ -1,27 +1,27 @@
 require 'test_helper'
-require 'integration/api_test_helper'
 
 class InstitutionCUDTest < ActionDispatch::IntegrationTest
-  include ApiTestHelper
+  include WriteApiTestSuite
+
+  def model
+    Institution
+  end
 
   def setup
     admin_login
-    @clz = "institution"
-    @plural_clz = @clz.pluralize
-
+    
     #min object needed for all tests related to post except 'test_create' which will load min and max subsequently
     inst = Factory(:institution)
-    @to_post = load_template("post_min_#{@clz}.json.erb", {title: "Post "+inst.title, country: inst.country})
+    @to_post = load_template("post_min_#{singular_name}.json.erb", {title: "Post "+inst.title, country: inst.country})
   end
 
-  def create_post_values
-      i = Factory(:institution)
-      @post_values = {title: "Post "+i.title, country: 'United Kingdom'}
+  def post_values
+    { title: "Post Institition #{Institution.maximum(:id) + 1}", country: 'United Kingdom' }
   end
 
-  def create_patch_values
+  def patch_values
     i = Factory(:institution)
-    @patch_values = {id: i.id, country:'DE'}
+    {id: i.id, country:'DE'}
   end
 
   def ignore_non_read_or_write_attributes

@@ -13,8 +13,7 @@ class ApiExamplesTest < ActiveSupport::TestCase
 
   def validate_json_against_fragment (item, json, fragment)
     if File.readable?(definitions_path)
-      errors = JSON::Validator.fully_validate_json(definitions_path,
-                                                   json,
+      errors = JSON::Validator.fully_validate_json(definitions_path, json,
                                                    {:fragment => fragment})
       unless errors.empty?
         msg = 'item: '

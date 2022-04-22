@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'integration/api_test_helper'
 
 class DataFileContentBlobTest < ActionDispatch::IntegrationTest
   def setup

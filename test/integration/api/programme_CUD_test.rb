@@ -1,26 +1,26 @@
 require 'test_helper'
-require 'integration/api_test_helper'
 
 class ProgrammeCUDTest < ActionDispatch::IntegrationTest
-  include ApiTestHelper
+  include WriteApiTestSuite
+
+  def model
+    Programme
+  end
 
   def setup
     admin_login
-    @clz = "programme"
-    @plural_clz = @clz.pluralize
-
     #min object needed for all tests related to post except 'test_create' which will load min and max subsequently
     p = Factory(:programme)
-    @to_post = load_template("post_min_#{@clz}.json.erb", {title: "post programme"})
+    @to_post = load_template("post_min_#{singular_name}.json.erb", {title: "post programme"})
   end
 
-  def create_post_values
-      @post_values = {title: "Post programme", admin_id: @current_person.id}
+  def post_values
+      {title: "Post programme", admin_id: @current_person.id}
   end
 
-  def create_patch_values
+  def patch_values
     p = Factory(:programme)
-    @patch_values = {id: p.id}
+    {id: p.id}
   end
 
   #normal user without admin rights

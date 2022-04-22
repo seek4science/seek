@@ -1,13 +1,14 @@
 require 'test_helper'
-require 'integration/api_test_helper'
 
 class CollectionCUDTest < ActionDispatch::IntegrationTest
-  include ApiTestHelper
+  include WriteApiTestSuite
+
+  def model
+    Collection
+  end
 
   def setup
     admin_login
-    @clz = 'collection'
-    @plural_clz = @clz.pluralize
     @project = @current_user.person.projects.first
     @document1 = Factory(:public_document, contributor: @current_person)
     @document2 = Factory(:public_document, contributor: @current_person)
@@ -18,7 +19,7 @@ class CollectionCUDTest < ActionDispatch::IntegrationTest
     @to_post = JSON.parse(template.result(binding))
 
     collection = Factory(:collection, policy: Factory(:public_policy), contributor: @current_person, creators: [@creator])
-    @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: collection.id})
+    @to_patch = load_template("patch_min_#{singular_name}.json.erb", {id: collection.id})
   end
 
   test 'returns sensible error objects' do
@@ -27,8 +28,8 @@ class CollectionCUDTest < ActionDispatch::IntegrationTest
     template = ERB.new(File.read(template_file))
     @to_post = JSON.parse(template.result(binding))
 
-    assert_no_difference("#{@clz.classify}.count") do
-      post "/#{@plural_clz}.json", params: @to_post
+    assert_no_difference("#{singular_name.classify}.count") do
+      post "/#{plural_name}.json", params: @to_post
       #assert_response :unprocessable_entity
     end
 

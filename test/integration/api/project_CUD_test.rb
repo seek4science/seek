@@ -1,26 +1,26 @@
 require 'test_helper'
-require 'integration/api_test_helper'
 
 class ProjectCUDTest < ActionDispatch::IntegrationTest
-  include ApiTestHelper
+  include WriteApiTestSuite
+
+  def model
+    Project
+  end
 
   def setup
     admin_login
-    @clz = "project"
-    @plural_clz = @clz.pluralize
-
     #min object needed for all tests related to post except 'test_create' which will load min and max subsequently
-    @to_post = load_template("post_min_#{@clz}.json.erb", {title: "Post Project" })
+    @to_post = load_template("post_min_#{singular_name}.json.erb", {title: "Post Project" })
   end
 
-  def create_post_values
-      @post_values = {title: "Post Project"}
+  def post_values
+      {title: "Post Project"}
   end
 
-  def create_patch_values
+  def patch_values
     p = Factory(:project)
     pr = Factory(:person)
-    @patch_values = {id: p.id, person_id: pr.id}
+    {id: p.id, person_id: pr.id}
   end
 
   def test_normal_user_cannot_create_project

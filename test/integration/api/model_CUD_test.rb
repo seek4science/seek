@@ -1,13 +1,14 @@
 require 'test_helper'
-require 'integration/api_test_helper'
 
 class ModelCUDTest < ActionDispatch::IntegrationTest
-  include ApiTestHelper
+  include WriteApiTestSuite
+
+  def model
+    Model
+  end
 
   def setup
     admin_login
-    @clz = 'model'
-    @plural_clz = @clz.pluralize
     @project = @current_user.person.projects.first
     @organism = Factory(:organism)
     @project.organisms << @organism
@@ -29,7 +30,7 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
                     contributor: @current_person, creators: [@creator],
                     discussion_links:[Factory(:discussion_link)])
     @discussion_link = model.discussion_links.first
-    @to_patch = load_template("patch_min_#{@clz}.json.erb", {id: model.id})
+    @to_patch = load_template("patch_min_#{singular_name}.json.erb", {id: model.id})
   end
 
   test 'can add content to API-created model' do
@@ -110,14 +111,14 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
     template_file = File.join(ApiTestHelper.template_dir, 'post_remote_model.json.erb')
     template = ERB.new(File.read(template_file))
     @to_post = JSON.parse(template.result(binding))
-    validate_json_against_fragment @to_post.to_json, "#/definitions/#{@clz.camelize(:lower)}Post"
+    validate_json_against_fragment @to_post.to_json, "#/definitions/#{singular_name.camelize(:lower)}Post"
 
-    assert_difference("#{@clz.classify}.count") do
-      post "/#{@plural_clz}.json", params: @to_post
+    assert_difference("#{singular_name.classify}.count") do
+      post "/#{plural_name}.json", params: @to_post
       assert_response :success
     end
 
-    validate_json_against_fragment response.body, "#/definitions/#{@clz.camelize(:lower)}Response"
+    validate_json_against_fragment response.body, "#/definitions/#{singular_name.camelize(:lower)}Response"
 
     h = JSON.parse(response.body)
 
@@ -134,8 +135,8 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
     template = ERB.new(File.read(template_file))
     @to_post = JSON.parse(template.result(binding))
 
-    assert_no_difference("#{@clz.classify}.count") do
-      post "/#{@plural_clz}.json", params: @to_post
+    assert_no_difference("#{singular_name.classify}.count") do
+      post "/#{plural_name}.json", params: @to_post
       assert_response :unprocessable_entity
       validate_json_against_fragment response.body, '#/definitions/errors'
     end
