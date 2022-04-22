@@ -44,7 +44,7 @@ class FileTemplatesController < ApplicationController
   end
 
   def update
-
+    update_annotations(params[:tag_list], @file_template) if params.key?(:tag_list)
     update_sharing_policies @file_template
     update_relationships(@file_template,params)
 
