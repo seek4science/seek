@@ -6177,6 +6177,28 @@
         "tagsType": {
             "$ref": "#/definitions/nonEmptyStringList"
         },
+        "ontologyTermsList": {
+            "type": "array",
+            "minItems": 0,
+            "uniqueItems": true,
+            "items": {
+                "$ref": "#/definitions/ontologyTerm"
+            }
+        },
+        "ontologyTerm": {
+            "type": "object",
+            "properties": {
+                "label": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "identifier": {
+                    "$ref": "#/definitions/uriString"
+                }
+            },
+            "required": [
+                "identifier"
+            ]
+        },
         "anySkeleton": {
             "properties": {
                 "id": {
@@ -10731,6 +10753,12 @@
                                 "tags": {
                                     "$ref": "#/definitions/tagsType"
                                 },
+                                "edam_topics": {
+                                    "$ref": "#/definitions/ontologyTermsList"
+                                },
+                                "edam_operations": {
+                                    "$ref": "#/definitions/ontologyTermsList"
+                                },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
                                 },
@@ -10945,6 +10973,12 @@
                                 "tags": {
                                     "$ref": "#/definitions/tagsType"
                                 },
+                                "edam_topics": {
+                                    "$ref": "#/definitions/ontologyTermsList"
+                                },
+                                "edam_operations": {
+                                    "$ref": "#/definitions/ontologyTermsList"
+                                },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
                                 },
@@ -11042,6 +11076,12 @@
                             "properties": {
                                 "tags": {
                                     "$ref": "#/definitions/tagsType"
+                                },
+                                "edam_topics": {
+                                    "$ref": "#/definitions/ontologyTermsList"
+                                },
+                                "edam_operations": {
+                                    "$ref": "#/definitions/ontologyTermsList"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"

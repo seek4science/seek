@@ -8,6 +8,22 @@
                 "key": "CWL"
             },
             "tags": ["tag1", "tag2"],
+            "edam_operations": [
+                {
+                    "label": "Clustering",
+                    "identifier": "http://edamontology.org/operation_3432"
+                },
+                {
+                    "label": "Expression correlation analysis",
+                    "identifier": "http://edamontology.org/operation_3463"
+                }
+            ],
+            "edam_topics": [
+                {
+                    "label": "Chemistry",
+                    "identifier": "http://edamontology.org/topic_3314"
+                }
+            ],
             "license": "CC-BY-4.0",
             "other_creators": "John Smith, Jane Smith",
             "content_blobs": [
