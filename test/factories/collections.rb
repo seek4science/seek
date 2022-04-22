@@ -2,17 +2,12 @@
 Factory.define(:collection) do |f|
   f.title 'An empty collection'
   f.with_project_contributor
-
-  f.after_build do |collection|
-    collection.projects = [collection.contributor.projects.first] if collection.projects.empty?
-  end
 end
 
 Factory.define(:populated_collection, parent: :collection) do |f|
   f.title 'A collection'
 
   f.after_build do |collection|
-    collection.projects = [collection.contributor.projects.first] if collection.projects.empty?
     collection.items.build(asset: Factory(:public_document))
   end
 end
