@@ -44,7 +44,7 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
       end
     end
 
-    RemoteGitContentFetchingJob.perform_now(v, 'blah.txt', 'http://internet.internet/file')
+    RemoteGitContentFetchingJob.perform_now(v, 'blah.txt')
 
     assert_equal 'http://internet.internet/file', v.remote_sources['blah.txt']
     assert_equal 'http://internet.internet/another_file', v.remote_sources['blah2.txt']

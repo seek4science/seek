@@ -363,6 +363,14 @@ class GitVersionTest < ActiveSupport::TestCase
     assert v.file_exists?('blah.txt')
     assert_equal '', v.file_contents('blah.txt')
     assert_not_empty v.blobs
+    refute v.get_blob('blah.txt').fetched?
+
+    # Fetch
+    mock_remote_file "#{Rails.root}/test/fixtures/files/little_file.txt", 'http://internet.internet/file'
+    v.fetch_remote_file('blah.txt')
+    assert_equal 'http://internet.internet/file', v.remote_sources['blah.txt']
+    assert_equal 'little file', v.file_contents('blah.txt')
+    assert v.get_blob('blah.txt').fetched?
   end
 
   test 'add remote file without fetch job' do
@@ -419,5 +427,35 @@ class GitVersionTest < ActiveSupport::TestCase
 
     workflow.git_version.add_file('folder/blah.txt', StringIO.new('blah'))
     refute workflow.git_version.empty?
+  end
+
+  test 'get blob' do
+    gv = Factory(:ro_crate_git_workflow).git_version
+
+    blob = gv.get_blob('sort-and-change-case.ga')
+    assert blob
+    assert_equal 3862, blob.size
+
+    nested_blob = gv.get_blob('test/test1/sort-and-change-case-test.yml')
+    assert nested_blob
+    assert_equal 150, nested_blob.size
+
+    assert_nil gv.get_blob('banana')
+  end
+
+  test 'get tree' do
+    gv = Factory(:ro_crate_git_workflow).git_version
+
+    root = gv.tree
+    assert_equal '/', root.path
+    assert_equal 18846, root.total_size
+
+    tree = gv.get_tree('test')
+    assert_equal 288, tree.total_size
+
+    nested_tree = gv.get_tree('test/test1')
+    assert_equal 288, nested_tree.total_size
+
+    assert_nil gv.get_tree('banana')
   end
 end

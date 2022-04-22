@@ -8,8 +8,8 @@ module Git
       git_repository.git_base
     end
 
-    def file_contents(path, &block)
-      get_blob(path)&.file_contents(&block)
+    def file_contents(path, fetch_remote: false, &block)
+      get_blob(path)&.file_contents(fetch_remote: fetch_remote, &block)
     end
 
     def object(path)
