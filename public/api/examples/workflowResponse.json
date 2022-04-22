@@ -20,6 +20,8 @@
             "license": "CC-BY-4.0",
             "latest_version": 1,
             "tags": [],
+            "edam_operations": [],
+            "edam_topics": [],
             "versions": [
                 {
                     "version": 1,

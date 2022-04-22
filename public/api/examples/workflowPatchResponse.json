@@ -24,6 +24,22 @@
                 "tag2",
                 "tag3"
             ],
+            "edam_operations": [
+                {
+                    "label": "Clustering",
+                    "identifier": "http://edamontology.org/operation_3432"
+                },
+                {
+                    "label": "Expression correlation analysis",
+                    "identifier": "http://edamontology.org/operation_3463"
+                }
+            ],
+            "edam_topics": [
+                {
+                    "label": "Chemistry",
+                    "identifier": "http://edamontology.org/topic_3314"
+                }
+            ],
             "versions": [
                 {
                     "version": 1,
