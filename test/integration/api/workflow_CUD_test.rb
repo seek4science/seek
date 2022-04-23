@@ -7,10 +7,6 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
     Workflow
   end
 
-  def resource
-    Factory(:workflow, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
-  end
-
   def setup
     admin_login
     Factory(:cwl_workflow_class) # Make sure the CWL class is present
@@ -20,6 +16,7 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
     @assay = Factory(:assay, study: study, contributor: current_person)
     @creator = Factory(:person)
     @publication = Factory(:publication, projects: [@project])
+    @workflow = Factory(:workflow, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
   end
 
   test 'can add content to API-created workflow' do

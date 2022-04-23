@@ -7,10 +7,6 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
     Model
   end
 
-  def resource
-    @model
-  end
-
   def setup
     admin_login
     @project = @current_user.person.projects.first
@@ -26,8 +22,8 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
     ModelFormat.where(title: 'SBML').first_or_create
     RecommendedModelEnvironment.where(title: 'JWS Online').first_or_create
     @model = Factory(:model, policy: Factory(:public_policy),
-                    contributor: current_person, creators: [@creator],
-                    discussion_links:[Factory(:discussion_link)])
+                     contributor: current_person, creators: [@creator],
+                     discussion_links: [Factory(:discussion_link)])
     @discussion_link = @model.discussion_links.first
   end
 
@@ -103,7 +99,7 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
                                                                            status: 200, headers: { content_type: 'text/plain; charset=UTF-8' })
     stub_request(:head, 'http://mockedlocation.com/txt_test.txt').to_return(status: 200, headers: { content_type: 'text/plain; charset=UTF-8' })
     stub_request(:get, 'http://mockedlocation.com/model.xml').to_return(body: File.new("#{Rails.root}/test/fixtures/files/BIOMD0000000064.xml"),
-                                                                           status: 200, headers: { content_type: 'application/xml; charset=UTF-8' })
+                                                                        status: 200, headers: { content_type: 'application/xml; charset=UTF-8' })
     stub_request(:head, 'http://mockedlocation.com/model.xml').to_return(status: 200, headers: { content_type: 'application/xml; charset=UTF-8' })
 
     template = load_template('post_remote_model.json.erb')

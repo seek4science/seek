@@ -7,15 +7,11 @@ class FileTemplateCUDTest < ActionDispatch::IntegrationTest
     FileTemplate
   end
 
-  def resource
-    Factory(:file_template, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
-  end
-
   def setup
     admin_login
     @project = @current_user.person.projects.first
-    investigation = Factory(:investigation, projects: [@project], contributor: current_person)
     @creator = Factory(:person)
+    @file_template = Factory(:file_template, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
   end
 
   test 'can add content to API-created file template' do
@@ -73,7 +69,6 @@ class FileTemplateCUDTest < ActionDispatch::IntegrationTest
     template = load_template('post_remote_file_template.json.erb')
     api_post_test(template)
   end
-
 
   test 'returns sensible error objects' do
     skip 'Errors are a WIP'

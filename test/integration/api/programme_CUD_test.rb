@@ -9,63 +9,62 @@ class ProgrammeCUDTest < ActionDispatch::IntegrationTest
 
   def setup
     admin_login
-  end
-
-  def post_values
-    {title: "Post programme", admin_id: current_person.id}
+    @programme_administrator = Factory(:person)
+    @project = Factory(:project)
+    @programme = Factory(:programme)
   end
 
   #normal user without admin rights
-  def test_user_can_create_programme
+  test 'user can create programme' do
     a_person = Factory(:person)
     user_login(a_person)
-    json = post_json
+    body = api_post_body
     assert_difference('Programme.count') do
-      post "/programmes.json", params: json
+      post "/programmes.json", params: body, as: :json
       assert_response :success
     end
   end
 
   #programme_admin role access
-  def test_programme_admin_can_update
+  test 'programme admin can update' do
     person = Factory(:person)
     user_login(person)
     prog = Factory(:programme)
     person.is_programme_administrator = true, prog
     disable_authorization_checks { person.save! }
-    json = post_json
-    json["data"]["id"] = "#{prog.id}"
-    json["data"]['attributes']['title'] = "Updated programme"
+    body = api_post_body
+    body["data"]["id"] = "#{prog.id}"
+    body["data"]['attributes']['title'] = "Updated programme"
     #change_funding_codes_before_CU("min")
 
-    patch "/programmes/#{prog.id}.json", params: json
+    patch "/programmes/#{prog.id}.json", params: body, as: :json
     assert_response :success
   end
 
-   def test_programme_admin_can_delete_when_no_projects
-     person = Factory(:person)
-     user_login(person)
-     prog = Factory(:programme)
-     person.is_programme_administrator = true, prog
-     disable_authorization_checks { person.save! }
+  test 'programme admin can delete when no projects' do
+    person = Factory(:person)
+    user_login(person)
+    prog = Factory(:programme)
+    person.is_programme_administrator = true, prog
+    disable_authorization_checks { person.save! }
 
-     #programme has projects ==> cannot delete
-     assert_no_difference('Programme.count', -1) do
-       delete "/programmes/#{prog.id}.json"
-       assert_response :forbidden
-       validate_json response.body, '#/definitions/errors'
-     end
+    #programme has projects ==> cannot delete
+    assert_no_difference('Programme.count', -1) do
+      delete "/programmes/#{prog.id}.json"
+      assert_response :forbidden
+      validate_json response.body, '#/definitions/errors'
+    end
 
-     #no projects ==> can delete
-     prog.projects = []
-     prog.save!
-     assert_difference('Programme.count', -1) do
-       delete "/programmes/#{prog.id}.json"
-       assert_response :success
-     end
+    #no projects ==> can delete
+    prog.projects = []
+    prog.save!
+    assert_difference('Programme.count', -1) do
+      delete "/programmes/#{prog.id}.json"
+      assert_response :success
+    end
 
-     get "/programmes/#{prog.id}.json"
-     assert_response :not_found
-     validate_json response.body, '#/definitions/errors'
-   end
+    get "/programmes/#{prog.id}.json"
+    assert_response :not_found
+    validate_json response.body, '#/definitions/errors'
+  end
 end

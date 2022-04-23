@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "<%=id%>",
+    "id": "<%= id %>",
     "type": "projects",
     "attributes": {
       "avatar": null,
@@ -14,21 +14,21 @@
         "permissions": [
           {
             "resource": {
-              "id" : "<%= Factory(:person).id %>",
+              "id": "<%= @person.id %>",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id" : "<%= Factory(:project).id %>",
+              "id": "<%= @project.id %>",
               "type": "projects"
             },
             "access": "download"
           },
           {
             "resource": {
-              "id" : "<%= Factory(:institution).id %>",
+              "id": "<%= @institution.id %>",
               "type": "institutions"
             },
             "access": "view"
@@ -40,7 +40,7 @@
       "programmes": {
         "data": [
           {
-            "id": "<%= Factory(:programme).id %>",
+            "id": "<%= @programme.id %>",
             "type": "programmes"
           }
         ]
@@ -48,7 +48,7 @@
       "organisms": {
         "data": [
           {
-            "id": "<%= Factory(:organism).id %>",
+            "id": "<%= @organism.id %>",
             "type": "organisms"
           }
         ]

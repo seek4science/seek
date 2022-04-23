@@ -17,12 +17,11 @@ module ApiTestHelper
 
   def api_post_test(template)
     expected = template
-    json = template.to_json
-    validate_json json, "#/definitions/#{singular_name.camelize(:lower)}Post"
+    validate_json template.to_json, "#/definitions/#{singular_name.camelize(:lower)}Post"
 
     # debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
     assert_difference("#{singular_name.classify}.count") do
-      post collection_url, params: json, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+      post collection_url, params: template, as: :json
       assert_response :success
     end
 
@@ -31,7 +30,7 @@ module ApiTestHelper
     actual = JSON.parse(response.body)
 
     expected['data']['attributes'] ||= {}
-    expected['data']['attributes'].except!(*ignore_non_read_or_write_attributes)
+    expected['data']['attributes'].except!(*ignored_attributes)
     expected['data']['attributes'].merge!(populate_extra_attributes(template))
     expected['data']['relationships'] ||= {}
     expected['data']['relationships'].merge!(populate_extra_relationships(template))
@@ -50,11 +49,10 @@ module ApiTestHelper
     assert_response :success
     expected = JSON.parse(response.body)
 
-    json = template.to_json
-    validate_json json, "#/definitions/#{singular_name.camelize(:lower)}Patch"
+    validate_json template.to_json, "#/definitions/#{singular_name.camelize(:lower)}Patch"
 
     assert_no_difference("#{singular_name.classify}.count") do
-      patch member_url(resource), params: json, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+      patch member_url(resource), params: template, as: :json
       assert_response :success
     end
 
@@ -63,7 +61,7 @@ module ApiTestHelper
     actual = JSON.parse(response.body)
 
     expected['data']['attributes'].merge!(template['data']['attributes'] || {})
-    expected['data']['attributes'].except!(*ignore_non_read_or_write_attributes)
+    expected['data']['attributes'].except!(*ignored_attributes)
     expected['data']['attributes'].merge!(populate_extra_attributes(template))
     expected['data']['relationships'].merge!(template['data']['relationships'] || {})
     expected['data']['relationships'].merge!(populate_extra_relationships(template))
@@ -127,12 +125,15 @@ module ApiTestHelper
     post '/session', params: { login: person.user.login, password: ('0' * User::MIN_PASSWORD_LENGTH) }
   end
 
+  def id
+    resource.id
+  end
+
   def load_template(erb_file, hash = nil)
-    hash ||= {}
     template_file = File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'templates', erb_file)
     template = ERB.new(File.read(template_file))
-    hash[:r] = -> (*args) { load_template(*args).to_json }
     b = binding
+    hash ||= {}
     hash.each do |k, v|
       b.local_variable_set(k, v)
     end
@@ -157,8 +158,8 @@ module ApiTestHelper
     polymorphic_url(model, format: :json)
   end
 
-  def member_url(obj)
-    polymorphic_url(obj, format: :json)
+  def member_url(res)
+    polymorphic_url(res, format: :json)
   end
 
   ##
@@ -194,10 +195,10 @@ module ApiTestHelper
     end
   end
 
-  def object_with_private_policy
-    obj = resource
-    obj.update_column(:policy_id, Factory(:private_policy).id) if obj.respond_to?(:policy)
-    obj
+  def private_resource
+    res = resource
+    res.update_column(:policy_id, Factory(:private_policy).id) if res.respond_to?(:policy)
+    res
   end
 
   ##

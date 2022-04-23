@@ -7,10 +7,6 @@ class EventCUDTest < ActionDispatch::IntegrationTest
     Event
   end
 
-  def resource
-    Factory(:event, policy: Factory(:public_policy), contributor: current_person)
-  end
-
   def populate_extra_attributes(request_hash = {})
     h = super
     country = request_hash.dig('data', 'attributes', 'country')
@@ -27,6 +23,7 @@ class EventCUDTest < ActionDispatch::IntegrationTest
     @presentation = Factory(:presentation, contributor: current_person)
     @data_file = Factory(:data_file, contributor: current_person)
     @creator = Factory(:person)
+    @event = Factory(:event, policy: Factory(:public_policy), contributor: current_person)
   end
 
   test 'returns sensible error objects' do

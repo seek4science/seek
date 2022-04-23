@@ -2,12 +2,17 @@
   "data": {
     "type": "investigations",
     "attributes": {
-      "policy":
-      {
-        "access":"no_access",
-        "permissions":[]
+      "policy": {
+        "access": "no_access",
+        "permissions": []
       },
-      "tags": ["Investigation-tag1", "Investigation-tag2", "Investigation-tag3", "Investigation-tag4", "Investigation-tag5"],
+      "tags": [
+        "Investigation-tag1",
+        "Investigation-tag2",
+        "Investigation-tag3",
+        "Investigation-tag4",
+        "Investigation-tag5"
+      ],
       "title": "A Maximal Investigation",
       "description": "Investigation of the Human Genome"
     },
@@ -31,7 +36,7 @@
       "projects": {
         "data": [
           {
-            "id": "<%=project_id%>",
+            "id": "<%= @project.id %>",
             "type": "projects"
           }
         ]

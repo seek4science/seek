@@ -10,31 +10,12 @@ class InvestigationCUDTest < ActionDispatch::IntegrationTest
   def setup
     admin_login
 
-    @min_project = Factory(:min_project)
-    @min_project.title = 'Fred'
-
-    @max_project = Factory(:max_project)
-    @max_project.title = 'Bert'
+    @projects = [Factory(:min_project, title: 'Fred'), Factory(:max_project, title: 'Bert')]
 
     institution = Factory(:institution)
-    current_person.add_to_project_and_institution(@min_project, institution)
-    current_person.add_to_project_and_institution(@max_project, institution)
+    @projects.each { |p| current_person.add_to_project_and_institution(p, institution) }
 
-    @inv = Factory(:investigation, contributor: current_person, policy: Factory(:public_policy))
-   end
-
-  def post_values
-    {
-      project_ids:  [@min_project.id, @max_project.id],
-      creator_ids: [@current_user.person.id]
-    }
-  end
-
-  def patch_values
-    {
-      project_ids:  [@min_project.id, @max_project.id],
-      creator_ids: [@current_user.person.id]
-    }
+    @investigation = Factory(:investigation, contributor: current_person, policy: Factory(:public_policy))
   end
 
   test 'should not delete investigation with studies' do

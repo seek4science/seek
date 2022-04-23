@@ -1,10 +1,10 @@
 {
   "data": {
     "type": "samples",
-    "id": "<%=id%>",
+    "id": "<%= id %>",
     "attributes": {
       "attribute_map": {
-        "the_title": "<%=the_title%>"
+        "the_title": "changed title"
       },
       "tags": []
     },
@@ -12,7 +12,7 @@
       "projects": {
         "data": [
           {
-            "id": "<%= project_id %>",
+            "id": "<%= @project.id %>",
             "type": "projects"
           }
         ]

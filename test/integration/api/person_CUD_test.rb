@@ -9,55 +9,47 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
 
   def setup
     admin_login
+    @person = Factory(:person)
   end
 
-  def post_values
-      p = Factory(:person)
-      {first_name: "Post", last_name: p.last_name, email: "Post"+p.email}
-  end
-
-  def patch_values
-    p = Factory(:person)
-    {id: p.id, project_id: p.group_memberships.first.project.id}
-  end
-
-  # title cannot be POSTed or PATCHed
-  # email and expertise/tool_list are not as are in the readAPI
-  def ignore_non_read_or_write_attributes
-    super | ['title', 'email', 'expertise_list', 'tool_list', 'mbox_sha1sum', 'skype_name', 'phone', 'web_page']
+  def ignored_attributes
+    super | ['email', 'skype_name', 'phone', 'web_page']
   end
 
   def populate_extra_attributes(hash)
     extra_attributes = {}
-    if  hash['data']['attributes'].has_key? 'email'
-      extra_attributes[:mbox_sha1sum] =  Digest::SHA1.hexdigest("mailto:#{Addressable::URI.escape(hash['data']['attributes']['email'])}")
+    if hash['data']['attributes'].key?('email')
+      extra_attributes[:mbox_sha1sum] = Digest::SHA1.hexdigest("mailto:#{Addressable::URI.escape(hash['data']['attributes']['email'])}")
     end
 
     #by construction, expertise & tools appear together IF they appear at all
-    if hash['data']['attributes'].has_key? 'expertise_list'
+    if hash['data']['attributes'].key?('expertise_list')
       extra_attributes[:expertise] = hash['data']['attributes']['expertise_list'].split(', ')
-      extra_attributes[:tools] =  hash['data']['attributes']['tool_list'].split(', ')
+      extra_attributes[:tools] = hash['data']['attributes']['tool_list'].split(', ')
     end
+
+    if hash['data']['attributes'].key?('first_name') || hash['data']['attributes'].key?('last_name')
+      extra_attributes[:title] = [hash['data']['attributes']['first_name'],
+                                  hash['data']['attributes']['last_name']].join(' ').strip
+    end
+
     extra_attributes.with_indifferent_access
   end
 
-  def test_normal_user_cannot_create_person
+  test 'normal user cannot create person' do
     user_login(Factory(:person))
-    json = post_json
+    body = api_post_body
     assert_no_difference('Person.count') do
-      post "/people.json", params: json
+      post "/people.json", params: body, as: :json
     end
   end
 
-  def test_admin_can_update_others
+  test 'admin can update others' do
     other_person = Factory(:person)
-    ['min', 'max'].each do |m|
-      j = post_json
-      j["data"]["id"] = "#{other_person.id}"
-      j["data"]["attributes"]["email"] = "updateTest@email.com"
-       patch "/people/#{other_person.id}.json", params: j
-       assert_response :success
-    end
+    body = api_post_body
+    body["data"]["id"] = "#{other_person.id}"
+    body["data"]["attributes"]["email"] = "updateTest@email.com"
+    patch "/people/#{other_person.id}.json", params: body, as: :json
+    assert_response :success
   end
-
 end

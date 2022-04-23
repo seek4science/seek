@@ -7,10 +7,6 @@ class SopCUDTest < ActionDispatch::IntegrationTest
     Sop
   end
 
-  def resource
-    Factory(:sop, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
-  end
-
   def setup
     admin_login
     @project = @current_user.person.projects.first
@@ -18,6 +14,7 @@ class SopCUDTest < ActionDispatch::IntegrationTest
     study = Factory(:study, investigation: investigation, contributor: current_person)
     @assay = Factory(:assay, study: study, contributor: current_person)
     @creator = Factory(:person)
+    @sop = Factory(:sop, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
   end
 
   test 'can add content to API-created sop' do
@@ -40,12 +37,12 @@ class SopCUDTest < ActionDispatch::IntegrationTest
   test 'preserves policy on update' do
     policy = Factory(:private_policy)
     permissions = [
-        Factory(:permission, policy: policy, contributor: Factory(:person), access_type: Policy::MANAGING),
-        Factory(:permission, policy: policy, contributor: Factory(:project), access_type: Policy::ACCESSIBLE),
-        Factory(:permission, policy: policy, contributor: Factory(:programme), access_type: Policy::VISIBLE),
-        Factory(:permission, policy: policy, contributor: Factory(:institution), access_type: Policy::VISIBLE),
-        Factory(:permission, policy: policy, contributor: Factory(:work_group), access_type: Policy::EDITING),
-        Factory(:permission, policy: policy, contributor: Factory(:favourite_group), access_type: Policy::MANAGING)
+      Factory(:permission, policy: policy, contributor: Factory(:person), access_type: Policy::MANAGING),
+      Factory(:permission, policy: policy, contributor: Factory(:project), access_type: Policy::ACCESSIBLE),
+      Factory(:permission, policy: policy, contributor: Factory(:programme), access_type: Policy::VISIBLE),
+      Factory(:permission, policy: policy, contributor: Factory(:institution), access_type: Policy::VISIBLE),
+      Factory(:permission, policy: policy, contributor: Factory(:work_group), access_type: Policy::EDITING),
+      Factory(:permission, policy: policy, contributor: Factory(:favourite_group), access_type: Policy::MANAGING)
     ]
     policy.reload
     assert_equal Permission::PRECEDENCE.sort, permissions.map(&:contributor_type).sort, 'Should be one of each permission type'
@@ -61,23 +58,23 @@ class SopCUDTest < ActionDispatch::IntegrationTest
     validate_json parsed_policy.to_json, "#/definitions/policy"
 
     to_patch = {
-        data: {
-            type: "sops",
-            id: "#{sop.id}",
-            attributes: {
-                policy: parsed_policy
-            }
+      data: {
+        type: "sops",
+        id: "#{sop.id}",
+        attributes: {
+          policy: parsed_policy
         }
+      }
     }
 
-    patch sop_path(sop, format: :json), params: to_patch.to_json, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+    patch sop_path(sop, format: :json), params: to_patch, as: :json
     assert_response :success
 
     updated_policy = JSON.parse(@response.body)['data']['attributes']['policy']
 
     assert_equal parsed_policy, updated_policy
     assert_equal original_policy, sop.reload.policy
-    compare = proc { |p| "#{p.contributor_type}:#{p.contributor_id} - #{p.access_type}"}
+    compare = proc { |p| "#{p.contributor_type}:#{p.contributor_id} - #{p.access_type}" }
     assert_equal original_permissions.map(&compare).sort, sop.reload.policy.permissions.to_a.map(&compare).sort
   end
 end

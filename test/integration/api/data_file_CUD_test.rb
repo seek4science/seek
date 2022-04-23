@@ -7,10 +7,6 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     DataFile
   end
 
-  def resource
-    Factory(:data_file, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
-  end
-
   def setup
     admin_login
     @project = @current_user.person.projects.first
@@ -20,6 +16,7 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     @creator = Factory(:person)
     @publication = Factory(:publication, projects: [@project])
     @event = Factory(:event, projects: [@project], policy: Factory(:public_policy))
+    @data_file = Factory(:data_file, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
   end
 
   test 'can add content to API-created data file' do
@@ -135,7 +132,7 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     h = JSON.parse(response.body)
     errors = h["errors"]
 
-    assert_equal [{"source"=>{"pointer"=>"/data/attributes/policy"},
-                   "detail"=>"access_type is too permissive"}],errors
+    assert_equal [{ "source" => { "pointer" => "/data/attributes/policy" },
+                    "detail" => "access_type is too permissive" }], errors
   end
 end

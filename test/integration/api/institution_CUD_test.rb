@@ -9,18 +9,7 @@ class InstitutionCUDTest < ActionDispatch::IntegrationTest
 
   def setup
     admin_login
-  end
-
-  def post_values
-    { title: "Post Institition #{Institution.maximum(:id) + 1}", country: 'United Kingdom' }
-  end
-
-  def patch_values
-    { country:'DE'}
-  end
-
-  def ignore_non_read_or_write_attributes
-    super | ['country_code']
+    @institution = Factory(:institution)
   end
 
   def populate_extra_attributes(hash)
@@ -31,12 +20,11 @@ class InstitutionCUDTest < ActionDispatch::IntegrationTest
     extra_attributes.with_indifferent_access
   end
 
-  def test_normal_user_cannot_create_institution
+  test 'normal user cannot create institution' do
     user_login(Factory(:person))
-    json = post_json
+    body = api_post_body
     assert_no_difference('Institution.count') do
-      post "/institutions.json", params: json
+      post collection_url, params: body, as: :json
     end
   end
-
 end

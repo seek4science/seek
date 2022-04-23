@@ -1,19 +1,21 @@
 {
   "data": {
-    "id": "<%=id%>",
+    "id": "<%= id %>",
     "type": "programmes",
     "attributes": {
       "title": "Changed title",
       "description": "A very exciting programme patched!",
       "web_page": "http://www.synbiochem.co.uk",
       "funding_details": "Someone ELSE is funding this for me",
-      "funding_codes": ["AVH"]
+      "funding_codes": [
+        "AVH"
+      ]
     },
     "relationships": {
       "projects": {
         "data": [
           {
-            "id": "<%= Factory(:project).id %>",
+            "id": "<%= @project.id %>",
             "type": "projects"
           }
         ]
@@ -21,7 +23,7 @@
       "administrators": {
         "data": [
           {
-            "id": "<%= Factory(:person).id %>",
+            "id": "<%= @programme_administrator.id %>",
             "type": "people"
           }
         ]

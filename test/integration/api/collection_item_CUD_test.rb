@@ -7,16 +7,13 @@ class CollectionItemCUDTest < ActionDispatch::IntegrationTest
     CollectionItem
   end
 
-  def resource
-    Factory(:collection_item, collection: @collection)
-  end
-
   def setup
     admin_login
     @project = @current_user.person.projects.first
     @collection = Factory(:collection, contributor: current_person)
     @document = Factory(:public_document, contributor: current_person)
     @sop = Factory(:sop, contributor: current_person, policy: Factory(:publicly_viewable_policy))
+    @collection_item = Factory(:collection_item, collection: @collection)
   end
 
   private

@@ -18,7 +18,7 @@ class DataFileContentBlobTest < ActionDispatch::IntegrationTest
         'Authorization' => "Token #{@token}"
       }
 
-      post data_files_path, params: df_params.to_json, headers: headers.merge({ 'Content-Type' => 'application/vnd.api+json' })
+      post data_files_path, params: df_params, as: :json, headers: headers
 
       assert_response :success
       df = assigns(:data_file)

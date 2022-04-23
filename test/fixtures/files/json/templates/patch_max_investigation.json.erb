@@ -1,58 +1,38 @@
 {
   "data": {
     "type": "investigations",
-    "id": "<%=id%>",
+    "id": "<%= id %>",
     "attributes": {
       "title": "A Maximal Investigation",
       "policy": {
         "access": "download",
-        "permissions": [
-          <% unless project_ids.nil? %>
-          <% project_ids.each_with_index do |project_id, i| %>
-          {
-            "resource" : {
-              "id" : "<%= project_id %>",
-              "type" : "projects"
-            },
-            "access" : "manage"
-          }<%= ',' unless i == project_ids.length - 1 %>
-          <% end %>
-          <% end %>
-        ]
+        "permissions":
+        <%= @projects.map { |p| { resource: { type: 'projects', id: p.id.to_s }, access: 'manage' } }.to_json %>
       },
       "description": "This is a more complex investigation",
       "other_creators": "Max Blumenthal, Ed Snowden"
     },
     "relationships": {
-      <% unless project_ids.nil? %>
       "projects": {
-        "data": [
-          <% projects = Array.new %>
-          <% for project_id in project_ids do %>
-          <% projects.push r.call("_related.json.erb",{:type => "projects",:id => project_id}) %>
-          <% end %>
-          <%= projects.join(',') %>
-        ]
-      }
-      <% end %>
-      ,
-      "publications":{
+        "data":
+        <%= @projects.map { |p| { type: 'projects', id: p.id.to_s } }.to_json %>
+      },
+      "publications": {
         "data": [
           {
             "id": "<%= Factory(:publication).id %>",
             "type": "publications"
           }
         ]
-      }
-      <% unless creator_ids.nil? %>
-    ,"creators": {
+      },
+      "creators": {
         "data": [
-          <% for creator_id in creator_ids do %>
-          <%= r.call("_related.json.erb",{:type => "people",:id => creator_id}) %>
-          <% end %>
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
         ]
       }
-      <% end %>
     }
   }
 }

@@ -7,16 +7,13 @@ class CollectionCUDTest < ActionDispatch::IntegrationTest
     Collection
   end
 
-  def resource
-    Factory(:collection, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
-  end
-
   def setup
     admin_login
     @project = @current_user.person.projects.first
     @document1 = Factory(:public_document, contributor: current_person)
     @document2 = Factory(:public_document, contributor: current_person)
     @creator = Factory(:person)
+    @collection = Factory(:collection, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
   end
 
   test 'returns sensible error objects' do

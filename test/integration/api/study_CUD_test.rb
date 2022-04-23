@@ -10,27 +10,11 @@ class StudyCUDTest < ActionDispatch::IntegrationTest
   def setup
     admin_login
 
-    @investigation = Factory(:investigation, contributor: current_person, projects: [current_person.projects.first])
-    @investigation.title = 'Fred'
+    @investigation = Factory(:investigation, title: 'Fred', contributor: current_person, projects: [current_person.projects.first])
+    @project = @investigation.projects.first
+    @publication = Factory(:publication)
 
     @study = Factory(:study, policy: Factory(:public_policy), contributor: current_person)
-  end
-
-  def post_values
-    {
-      investigation_id: @investigation.id,
-      person_id: @current_user.person.id,
-      creator_ids: [@current_user.person.id]
-    }
-  end
-
-  def patch_values
-    {
-      investigation_id: @study.investigation.id,
-      person_id: @current_user.person.id,
-      project_id: @study.projects.first.id,
-      creator_ids: [@current_user.person.id]
-    }
   end
 
   test 'should not delete a study with assays' do
@@ -72,6 +56,5 @@ class StudyCUDTest < ActionDispatch::IntegrationTest
       delete "/#{plural_name}/#{study.id}.json"
       assert_response :success
     end
-
   end
 end

@@ -7,10 +7,6 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
     Assay
   end
 
-  def resource
-    @assay
-  end
-
   def setup
     admin_login
 
@@ -21,23 +17,13 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
     Factory(:modelling_assay_class)
     Factory(:experimental_assay_class)
     @assay = Factory(:experimental_assay, contributor: current_person, policy: Factory(:public_policy))
-  end
-
-  def post_values
-    {
-      study_id: @study.id,
-      creator_ids: [@current_user.person.id],
-      project_id: Factory(:project).id
-    }
-  end
-
-  def patch_values
     @study = @assay.study
-    {
-      study_id: @study.id,
-      project_id: Factory(:project).id,
-      creator_ids: [@current_user.person.id]
-    }
+    @project = @assay.projects.first
+    @publication = Factory(:publication)
+    @organism = Factory(:organism)
+    @sop = Factory(:sop, policy: Factory(:public_policy))
+    @data_file = Factory(:data_file, policy: Factory(:public_policy))
+    @document = Factory(:document, policy: Factory(:public_policy))
   end
 
   test 'should not delete assay when not project member' do
@@ -84,5 +70,4 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
       end
     end
   end
-
 end

@@ -19,51 +19,52 @@
         "permissions": [
           {
             "resource": {
-              "id" : "<%= project_id %>",
+              "id": "<%= @project.id %>",
               "type": "projects"
             },
             "access": "manage"
           }
         ]
       },
-      "tags": ["alan"]
+      "tags": [
+        "alan"
+      ]
     },
     "relationships": {
       "study": {
-        "data":
-        {
-          "id": "<%=study_id%>",
+        "data": {
+          "id": "<%= @study.id %>",
           "type": "studies"
         }
       },
-      "publications":{
+      "publications": {
         "data": [
           {
-            "id": "<%= Factory(:publication).id %>",
+            "id": "<%= @publication.id %>",
             "type": "publications"
           }
         ]
       },
-      "organisms":{
+      "organisms": {
         "data": [
           {
-            "id": "<%= Factory(:organism).id %>",
+            "id": "<%= @organism.id %>",
             "type": "organisms"
           }
         ]
       },
-      "sops":{
+      "sops": {
         "data": [
           {
-            "id": "<%= Factory(:sop, policy: Factory(:public_policy)).id %>",
+            "id": "<%= @sop.id %>",
             "type": "sops"
           }
         ]
       },
-      "data_files":{
+      "data_files": {
         "data": [
           {
-            "id": "<%= Factory(:data_file, policy: Factory(:public_policy)).id %>",
+            "id": "<%= @data_file.id %>",
             "type": "data_files"
           }
         ]
@@ -71,20 +72,19 @@
       "documents": {
         "data": [
           {
-            "id": "<%= Factory(:document, policy: Factory(:public_policy)).id %>",
+            "id": "<%= @document.id %>",
             "type": "documents"
           }
         ]
-      }
-      <% unless creator_ids.nil? %>
-    ,"creators": {
+      },
+      "creators": {
         "data": [
-          <% for creator_id in creator_ids do %>
-          <%= r.call("_related.json.erb",{:type => "people",:id => creator_id}) %>
-          <% end %>
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
         ]
       }
-      <% end %>
     }
   }
 }

@@ -9,21 +9,19 @@ class ProjectCUDTest < ActionDispatch::IntegrationTest
 
   def setup
     admin_login
+
+    @person = Factory(:person)
+    @project = Factory(:project)
+    @institution = Factory(:institution)
+    @programme = Factory(:programme)
+    @organism = Factory(:organism)
   end
 
-  def post_values
-    { title: "Post Project" }
-  end
-
-  def patch_values
-    { person_id: Factory(:person).id }
-  end
-
-  def test_normal_user_cannot_create_project
+  test 'normal user cannot create project' do
     user_login(Factory(:person))
-    json = post_json
+    body = api_post_body
     assert_no_difference('Project.count') do
-      post "/projects.json", params: json
+      post "/projects.json", params: body, as: :json
     end
   end
 
@@ -43,12 +41,12 @@ class ProjectCUDTest < ActionDispatch::IntegrationTest
     project_json = JSON.parse(@response.body)
 
     project_json['data']['attributes']['members'] = [
-        { person_id: "#{new_person.id}", institution_id: "#{new_institution.id}" },
-        { person_id: "#{new_person2.id}", institution_id: "#{new_institution.id}" },
-        { person_id: "#{new_person3.id}", institution_id: "#{new_institution.id}" }
+      { person_id: "#{new_person.id}", institution_id: "#{new_institution.id}" },
+      { person_id: "#{new_person2.id}", institution_id: "#{new_institution.id}" },
+      { person_id: "#{new_person3.id}", institution_id: "#{new_institution.id}" }
     ]
 
-    patch project_path(project, format: :json), params: project_json.to_json, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+    patch project_path(project, format: :json), params: project_json, as: :json
     assert_response :success
 
     people = project.reload.people.to_a
@@ -70,18 +68,18 @@ class ProjectCUDTest < ActionDispatch::IntegrationTest
     assert_empty project.people
 
     to_patch = {
-        data: {
-            type: "projects",
-            id: "#{project.id}",
-            attributes: {
-                members: [{ person_id: "#{new_person.id}", institution_id: "#{new_institution.id}" },
-                          { person_id: "#{new_person2.id}", institution_id: "#{new_institution.id}" },
-                          { person_id: "#{new_person3.id}", institution_id: "#{new_institution.id}" }]
-            }
+      data: {
+        type: "projects",
+        id: "#{project.id}",
+        attributes: {
+          members: [{ person_id: "#{new_person.id}", institution_id: "#{new_institution.id}" },
+                    { person_id: "#{new_person2.id}", institution_id: "#{new_institution.id}" },
+                    { person_id: "#{new_person3.id}", institution_id: "#{new_institution.id}" }]
         }
+      }
     }
 
-    patch project_path(project, format: :json), params: to_patch.to_json, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+    patch project_path(project, format: :json), params: to_patch, as: :json
     assert_response :success
 
     people = project.reload.people.to_a
@@ -92,7 +90,7 @@ class ProjectCUDTest < ActionDispatch::IntegrationTest
   end
 
   # TO DO: revisit after doing relationships linkage
-  # def test_should_not_create_project_with_programme_if_not_programme_admin
+  # test 'should not create project with programme if not programme admin' do
   #   person = Factory(:person)
   #   user_login(person)
   #   prog = Factory(:programme)

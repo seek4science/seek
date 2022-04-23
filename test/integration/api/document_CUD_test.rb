@@ -7,10 +7,6 @@ class DocumentCUDTest < ActionDispatch::IntegrationTest
     Document
   end
 
-  def resource
-    Factory(:document, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
-  end
-
   def setup
     admin_login
     @project = @current_user.person.projects.first
@@ -18,6 +14,7 @@ class DocumentCUDTest < ActionDispatch::IntegrationTest
     study = Factory(:study, investigation: investigation, contributor: current_person)
     @assay = Factory(:assay, study: study, contributor: current_person)
     @creator = Factory(:person)
+    @document = Factory(:document, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
   end
 
   test 'can add content to API-created document' do
@@ -76,7 +73,6 @@ class DocumentCUDTest < ActionDispatch::IntegrationTest
     template = load_template('post_remote_document.json.erb')
     api_post_test(template)
   end
-
 
   test 'returns sensible error objects' do
     skip 'Errors are a WIP'

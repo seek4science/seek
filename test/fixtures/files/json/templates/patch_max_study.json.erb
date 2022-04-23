@@ -1,7 +1,7 @@
 {
   "data": {
     "type": "studies",
-    "id": "<%=id%>",
+    "id": "<%= id %>",
     "attributes": {
       "title": "A Maximal Study",
       "description": "The Study of many things",
@@ -12,7 +12,7 @@
         "permissions": [
           {
             "resource": {
-              "id" : "<%= project_id %>",
+              "id": "<%= @project.id %>",
               "type": "projects"
             },
             "access": "view"
@@ -22,29 +22,27 @@
     },
     "relationships": {
       "investigation": {
-        "data":
-        {
-          "id": "<%=investigation_id%>",
+        "data": {
+          "id": "<%= @investigation.id %>",
           "type": "investigations"
         }
       },
-      "publications":{
+      "publications": {
         "data": [
           {
-            "id": "<%= Factory(:publication).id %>",
+            "id": "<%= @publication.id %>",
             "type": "publications"
           }
         ]
-      }
-      <% unless creator_ids.nil? %>
-    ,"creators": {
+      },
+      "creators": {
         "data": [
-          <% for creator_id in creator_ids do %>
-          <%= r.call("_related.json.erb",{:type => "people",:id => creator_id}) %>
-          <% end %>
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
         ]
       }
-      <% end %>
     }
   }
 }

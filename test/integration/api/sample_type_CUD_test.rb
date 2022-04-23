@@ -7,16 +7,13 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
     SampleType
   end
 
-  def resource
-    @sample_type
-  end
-
   def setup
     admin_login
     @project = @current_user.person.projects.first
     @sample_type = Factory(:simple_sample_type, project_ids: [@project.id], contributor: current_person)
-    @sample_type_attribute = @sample_type.sample_attributes.first
-    @assay = Factory(:assay, contributor:current_person)
+    @sample_attribute = @sample_type.sample_attributes.first
+    @sample_attribute_type = @sample_attribute.sample_attribute_type
+    @assay = Factory(:assay, contributor: current_person)
   end
 
   test 'create using attribute_type name' do
@@ -53,14 +50,14 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
     }
     assert_difference('SampleType.count') do
       assert_difference('SampleAttribute.count') do
-        post sample_types_path(format: :json), params: params.to_json, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+        post sample_types_path(format: :json), params: params, as: :json
       end
     end
     assert_response :success
 
     sample_type = SampleType.last
     assert_equal 'In vivo biometrics', sample_type.title
-    assert_equal 1,sample_type.sample_attributes.count
+    assert_equal 1, sample_type.sample_attributes.count
     assert_equal "Fish ID", sample_type.sample_attributes.first.title
     assert_equal attribute_type, sample_type.sample_attributes.first.sample_attribute_type
 
@@ -100,14 +97,14 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
     }
     assert_difference('SampleType.count') do
       assert_difference('SampleAttribute.count') do
-        post sample_types_path(format: :json), params: params.to_json, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+        post sample_types_path(format: :json), params: params, as: :json
       end
     end
     assert_response :success
 
     sample_type = SampleType.last
     assert_equal 'In vivo biometrics', sample_type.title
-    assert_equal 1,sample_type.sample_attributes.count
+    assert_equal 1, sample_type.sample_attributes.count
     assert_equal "Fish ID", sample_type.sample_attributes.first.title
     assert_equal attribute_type, sample_type.sample_attributes.first.sample_attribute_type
 
@@ -115,7 +112,7 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
 
   test 'update attribute title and description' do
     sample_type = Factory(:patient_sample_type)
-    assert_equal 5,sample_type.sample_attributes.count
+    assert_equal 5, sample_type.sample_attributes.count
 
     attr = sample_type.sample_attributes.where(title: 'full name').first
 
@@ -137,20 +134,20 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
     }
 
     assert_no_difference('SampleAttribute.count') do
-      patch sample_type_path(sample_type.id, format: :json), params: params.to_json, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+      patch sample_type_path(sample_type.id, format: :json), params: params, as: :json
     end
 
     assert_response :success
 
-    assert_equal 'the name',SampleAttribute.find(attr.id).title
-    assert_equal 'the name for the patient',SampleAttribute.find(attr.id).description
-    assert_equal 'patient:name',SampleAttribute.find(attr.id).pid
+    assert_equal 'the name', SampleAttribute.find(attr.id).title
+    assert_equal 'the name for the patient', SampleAttribute.find(attr.id).description
+    assert_equal 'patient:name', SampleAttribute.find(attr.id).pid
     assert_equal 5, SampleType.find(sample_type.id).sample_attributes.count
   end
 
   test 'add an attribute' do
     sample_type = Factory(:patient_sample_type)
-    assert_equal 5,sample_type.sample_attributes.count
+    assert_equal 5, sample_type.sample_attributes.count
 
     str_attribute_type = Factory(:string_sample_attribute_type)
 
@@ -172,25 +169,25 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
     }
 
     assert_difference('SampleAttribute.count') do
-      patch sample_type_path(sample_type.id, format: :json), params: params.to_json, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+      patch sample_type_path(sample_type.id, format: :json), params: params, as: :json
     end
 
     assert_response :success
 
     sample_type = SampleType.find(sample_type.id)
-    attr = sample_type.sample_attributes.where(title:'a string').first
+    attr = sample_type.sample_attributes.where(title: 'a string').first
     assert_equal 6, sample_type.sample_attributes.count
 
     refute_nil attr
     assert attr.required?
     assert_equal str_attribute_type, attr.sample_attribute_type
-    assert_equal 'a series of characters',attr.description
+    assert_equal 'a series of characters', attr.description
 
   end
 
   test 'remove an attribute' do
     sample_type = Factory(:patient_sample_type)
-    assert_equal 5,sample_type.sample_attributes.count
+    assert_equal 5, sample_type.sample_attributes.count
 
     attr = sample_type.sample_attributes.where(title: 'age').first
 
@@ -210,33 +207,13 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
     }
 
     assert_difference('SampleAttribute.count', -1) do
-      patch sample_type_path(sample_type.id, format: :json), params: params.to_json, headers: { 'CONTENT_TYPE' => 'application/vnd.api+json' }
+      patch sample_type_path(sample_type.id, format: :json), params: params, as: :json
     end
 
     assert_response :success
 
     sample_type = SampleType.find(sample_type.id)
-    assert_empty sample_type.sample_attributes.where(title:'age')
+    assert_empty sample_type.sample_attributes.where(title: 'age')
     assert_equal 4, sample_type.sample_attributes.count
-  end
-
-  def post_values
-    {
-        sample_attribute_type_title: @sample_type_attribute.sample_attribute_type.title,
-        creator_id: current_person.id,
-        project_id: @project.id,
-        assay_id: @assay.id
-    }
-  end
-
-  def patch_values
-    {
-        title: "This is a new title.",
-        attribute_title: "This is a new attribute title",
-        project_id: @project.id,
-        sample_attribute_type_title: @sample_type_attribute.sample_attribute_type.title,
-        sample_attribute_id: @sample_type_attribute.id,
-        assay_id: @assay.id
-    }
   end
 end

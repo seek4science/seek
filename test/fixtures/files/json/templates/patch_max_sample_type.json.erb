@@ -1,15 +1,15 @@
 {
   "data": {
     "type": "sample_types",
-    "id": "<%= id%>",
+    "id": "<%= id %>",
     "attributes": {
-      "title": "<%= title%>",
+      "title": "This is a new title.",
       "sample_attributes": [
         {
-          "id":"<%= sample_attribute_id %>",
-          "title": "<%= attribute_title %>",
+          "id": "<%= @sample_attribute.id %>",
+          "title": "This is a new attribute title",
           "sample_attribute_type": {
-            "title":"<%= sample_attribute_type_title %>"
+            "title": "<%= @sample_attribute_type.title %>"
           }
         }
       ],
@@ -19,7 +19,7 @@
       "projects": {
         "data": [
           {
-            "id": "<%= project_id %>",
+            "id": "<%= @project.id %>",
             "type": "projects"
           }
         ]
@@ -27,7 +27,7 @@
       "assays": {
         "data": [
           {
-            "id": "<%= assay_id %>",
+            "id": "<%= @assay.id %>",
             "type": "assays"
           }
         ]

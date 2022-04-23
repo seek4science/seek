@@ -7,16 +7,13 @@ class PresentationCUDTest < ActionDispatch::IntegrationTest
     Presentation
   end
 
-  def resource
-    Factory(:presentation, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
-  end
-
   def setup
     admin_login
     @project = @current_user.person.projects.first
     @creator = Factory(:person)
     @publication = Factory(:publication, projects: [@project])
     @event = Factory(:event, projects: [@project], policy: Factory(:public_policy))
+    @presentation = Factory(:presentation, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
   end
 
   test 'can add content to API-created presentation' do
@@ -102,4 +99,3 @@ class PresentationCUDTest < ActionDispatch::IntegrationTest
     refute fetch_errors(errors, '/data/attributes/potato').any?
   end
 end
-
