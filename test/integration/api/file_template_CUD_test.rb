@@ -7,9 +7,8 @@ class FileTemplateCUDTest < ActionDispatch::IntegrationTest
     FileTemplate
   end
 
-  def patch_values
-    file_template = Factory(:file_template, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
-    { id: file_template.id }
+  def resource
+    Factory(:file_template, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
   end
 
   def setup
@@ -71,23 +70,8 @@ class FileTemplateCUDTest < ActionDispatch::IntegrationTest
     stub_request(:get, 'http://mockedlocation.com/txt_test.txt').to_return(body: File.new("#{Rails.root}/test/fixtures/files/txt_test.txt"),
                                                                            status: 200, headers: { content_type: 'text/plain; charset=UTF-8' })
     stub_request(:head, 'http://mockedlocation.com/txt_test.txt').to_return(status: 200, headers: { content_type: 'text/plain; charset=UTF-8' })
-    to_post = load_template('post_remote_file_template.json.erb')
-    validate_json_against_fragment to_post.to_json, "#/definitions/#{singular_name.camelize(:lower)}Post"
-
-    assert_difference("#{singular_name.classify}.count") do
-      post "/#{plural_name}.json", params: to_post
-      assert_response :success
-    end
-
-    validate_json_against_fragment response.body, "#/definitions/#{singular_name.camelize(:lower)}Response"
-
-    h = JSON.parse(response.body)
-
-    hash_comparison(to_post['data']['attributes'], h['data']['attributes'])
-    hash_comparison(populate_extra_attributes(to_post), h['data']['attributes'])
-
-    hash_comparison(to_post['data']['relationships'], h['data']['relationships'])
-    hash_comparison(populate_extra_relationships(to_post), h['data']['relationships'])
+    template = load_template('post_remote_file_template.json.erb')
+    api_post_test(template)
   end
 
 

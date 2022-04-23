@@ -4,8 +4,6 @@ ENV['RAILS_ENV'] ||= 'test'
 require_relative '../config/environment'
 require 'rails/test_help'
 
-require 'rest_test_cases'
-require 'rdf_test_cases'
 require 'sharing_form_test_helper'
 require 'general_authorization_test_cases'
 require 'ruby-prof'
@@ -21,9 +19,11 @@ require 'minitest/reporters'
 require 'minitest'
 require 'ostruct'
 require 'pry'
-require 'json_test_helper'
 require 'api_test_helper'
 require 'integration/api/write_api_test_suite'
+require 'json_test_helper'
+require 'rest_test_cases'
+require 'rdf_test_cases'
 
 Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new(fast_fail: true,
                                                                    color: true,

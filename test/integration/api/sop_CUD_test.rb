@@ -7,9 +7,8 @@ class SopCUDTest < ActionDispatch::IntegrationTest
     Sop
   end
 
-  def patch_values
-    sop = Factory(:sop, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
-    { id: sop.id }
+  def resource
+    Factory(:sop, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
   end
 
   def setup
@@ -59,7 +58,7 @@ class SopCUDTest < ActionDispatch::IntegrationTest
 
     parsed_policy = JSON.parse(@response.body)['data']['attributes']['policy']
 
-    validate_json_against_fragment parsed_policy.to_json, "#/definitions/policy"
+    validate_json parsed_policy.to_json, "#/definitions/policy"
 
     to_patch = {
         data: {

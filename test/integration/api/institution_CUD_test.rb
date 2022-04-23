@@ -16,8 +16,7 @@ class InstitutionCUDTest < ActionDispatch::IntegrationTest
   end
 
   def patch_values
-    i = Factory(:institution)
-    {id: i.id, country:'DE'}
+    { country:'DE'}
   end
 
   def ignore_non_read_or_write_attributes

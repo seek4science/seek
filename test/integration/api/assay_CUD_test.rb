@@ -7,6 +7,10 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
     Assay
   end
 
+  def resource
+    @assay
+  end
+
   def setup
     admin_login
 
@@ -30,7 +34,6 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
   def patch_values
     @study = @assay.study
     {
-      id: @assay.id,
       study_id: @study.id,
       project_id: Factory(:project).id,
       creator_ids: [@current_user.person.id]
@@ -45,7 +48,7 @@ class AssayCUDTest < ActionDispatch::IntegrationTest
       assert_no_difference('Assay.count') do
         delete "/#{plural_name}/#{a.id}.json"
         assert_response :forbidden
-        validate_json_against_fragment response.body, '#/definitions/errors'
+        validate_json response.body, '#/definitions/errors'
       end
     end
   end

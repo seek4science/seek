@@ -7,9 +7,8 @@ class PresentationCUDTest < ActionDispatch::IntegrationTest
     Presentation
   end
 
-  def patch_values
-    presentation = Factory(:presentation, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
-    { id: presentation.id }
+  def resource
+    Factory(:presentation, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
   end
 
   def setup
@@ -47,7 +46,7 @@ class PresentationCUDTest < ActionDispatch::IntegrationTest
     put presentation_content_blob_path(pres, pres.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')) }
 
     assert_response :forbidden
-    validate_json_against_fragment response.body, '#/definitions/errors'
+    validate_json response.body, '#/definitions/errors'
     blob = pres.content_blob.reload
     assert_nil blob.md5sum
     assert blob.no_content?
@@ -64,7 +63,7 @@ class PresentationCUDTest < ActionDispatch::IntegrationTest
     put presentation_content_blob_path(pres, pres.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'another_pdf_file.pdf')) }
 
     assert_response :bad_request
-    validate_json_against_fragment response.body, '#/definitions/errors'
+    validate_json response.body, '#/definitions/errors'
     blob = pres.content_blob.reload
     assert_equal original_md5, blob.md5sum
     assert blob.file_size > 0
@@ -75,23 +74,8 @@ class PresentationCUDTest < ActionDispatch::IntegrationTest
                                                                            status: 200, headers: { content_type: 'text/plain; charset=UTF-8' })
     stub_request(:head, 'http://mockedlocation.com/txt_test.txt').to_return(status: 200, headers: { content_type: 'text/plain; charset=UTF-8' })
 
-    to_post = load_template('post_remote_presentation.json.erb')
-    validate_json_against_fragment to_post.to_json, "#/definitions/#{singular_name.camelize(:lower)}Post"
-
-    assert_difference("#{singular_name.classify}.count") do
-      post "/#{plural_name}.json", params: to_post
-      assert_response :success
-    end
-
-    validate_json_against_fragment response.body, "#/definitions/#{singular_name.camelize(:lower)}Response"
-
-    h = JSON.parse(response.body)
-
-    hash_comparison(to_post['data']['attributes'], h['data']['attributes'])
-    hash_comparison(populate_extra_attributes(to_post), h['data']['attributes'])
-
-    hash_comparison(to_post['data']['relationships'], h['data']['relationships'])
-    hash_comparison(populate_extra_relationships(to_post), h['data']['relationships'])
+    template = load_template('post_remote_presentation.json.erb')
+    api_post_test(template)
   end
 
   test 'returns sensible error objects' do
@@ -101,7 +85,7 @@ class PresentationCUDTest < ActionDispatch::IntegrationTest
     assert_no_difference("#{singular_name.classify}.count") do
       post "/#{plural_name}.json", params: to_post
       # assert_response :unprocessable_entity
-      # validate_json_against_fragment response.body, '#/definitions/errors'
+      # validate_json response.body, '#/definitions/errors'
     end
 
     h = JSON.parse(response.body)

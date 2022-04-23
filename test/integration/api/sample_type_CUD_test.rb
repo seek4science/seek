@@ -8,13 +8,13 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
   end
 
   def resource
-    Factory(:simple_sample_type, project_ids: [@project.id], contributor:current_person)
+    @sample_type
   end
 
   def setup
     admin_login
     @project = @current_user.person.projects.first
-    @sample_type = Factory(:simple_sample_type, project_ids: [@project.id], contributor:current_person)
+    @sample_type = Factory(:simple_sample_type, project_ids: [@project.id], contributor: current_person)
     @sample_type_attribute = @sample_type.sample_attributes.first
     @assay = Factory(:assay, contributor:current_person)
   end
@@ -231,7 +231,6 @@ class SampleTypeCUDTest < ActionDispatch::IntegrationTest
 
   def patch_values
     {
-        id: @sample_type.id,
         title: "This is a new title.",
         attribute_title: "This is a new attribute title",
         project_id: @project.id,

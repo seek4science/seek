@@ -12,13 +12,11 @@ class ProjectCUDTest < ActionDispatch::IntegrationTest
   end
 
   def post_values
-    {title: "Post Project"}
+    { title: "Post Project" }
   end
 
   def patch_values
-    p = Factory(:project)
-    pr = Factory(:person)
-    {id: p.id, person_id: pr.id}
+    { person_id: Factory(:person).id }
   end
 
   def test_normal_user_cannot_create_project

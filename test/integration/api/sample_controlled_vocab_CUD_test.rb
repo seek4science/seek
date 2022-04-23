@@ -7,6 +7,18 @@ class SampleControlledVocabCUDTest < ActionDispatch::IntegrationTest
     SampleControlledVocab
   end
 
+  def resource
+    @sample_controlled_vocab
+  end
+
+  def post_values
+    { title: @sample_controlled_vocab.title }
+  end
+
+  def patch_values
+    { term_id: @sample_controlled_vocab_term.id }
+  end
+
   def setup
     admin_login
     login_as(Factory(:project_administrator))
@@ -22,18 +34,4 @@ class SampleControlledVocabCUDTest < ActionDispatch::IntegrationTest
     @sample_controlled_vocab.sample_controlled_vocab_terms <<  @sample_controlled_vocab_term
     @sample_controlled_vocab.save!
   end
-
-  def post_values
-    {
-      title: @sample_controlled_vocab.title,
-    }
-  end
-
-  def patch_values
-    {
-      id: @sample_controlled_vocab.id,
-      term_id: @sample_controlled_vocab_term.id
-    }
-  end
-
 end

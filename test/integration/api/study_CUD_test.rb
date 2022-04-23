@@ -26,7 +26,6 @@ class StudyCUDTest < ActionDispatch::IntegrationTest
 
   def patch_values
     {
-      id: @study.id,
       investigation_id: @study.investigation.id,
       person_id: @current_user.person.id,
       project_id: @study.projects.first.id,
@@ -39,7 +38,7 @@ class StudyCUDTest < ActionDispatch::IntegrationTest
     assert_no_difference('Study.count') do
       delete "/#{plural_name}/#{study.id}.json"
       assert_response :forbidden
-      validate_json_against_fragment response.body, '#/definitions/errors'
+      validate_json response.body, '#/definitions/errors'
     end
   end
 

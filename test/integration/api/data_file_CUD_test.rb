@@ -7,9 +7,8 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     DataFile
   end
 
-  def patch_values
-    data_file = Factory(:data_file, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
-    { id: data_file.id }
+  def resource
+    Factory(:data_file, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
   end
 
   def setup
@@ -65,7 +64,7 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     put data_file_content_blob_path(df, df.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')) }
 
     assert_response :forbidden
-    validate_json_against_fragment response.body, '#/definitions/errors'
+    validate_json response.body, '#/definitions/errors'
     blob = df.content_blob.reload
     assert_nil blob.md5sum
     assert blob.no_content?
@@ -82,7 +81,7 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     put data_file_content_blob_path(df, df.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'another_pdf_file.pdf')) }
 
     assert_response :bad_request
-    validate_json_against_fragment response.body, '#/definitions/errors'
+    validate_json response.body, '#/definitions/errors'
     blob = df.content_blob.reload
     assert_equal original_md5, blob.md5sum
     assert blob.file_size > 0
@@ -93,25 +92,8 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
                                                                            status: 200, headers: { content_type: 'text/plain; charset=UTF-8' })
     stub_request(:head, 'http://mockedlocation.com/txt_test.txt').to_return(status: 200, headers: { content_type: 'text/plain; charset=UTF-8' })
 
-    template_file = File.join(ApiTestHelper.template_dir, 'post_remote_data_file.json.erb')
-    template = ERB.new(File.read(template_file))
-    to_post = JSON.parse(template.result(binding))
-    validate_json_against_fragment to_post.to_json, "#/definitions/#{singular_name.camelize(:lower)}Post"
-
-    assert_difference("#{singular_name.classify}.count") do
-      post "/#{plural_name}.json", params: to_post
-      assert_response :success
-    end
-
-    validate_json_against_fragment response.body, "#/definitions/#{singular_name.camelize(:lower)}Response"
-
-    h = JSON.parse(response.body)
-
-    hash_comparison(to_post['data']['attributes'], h['data']['attributes'])
-    hash_comparison(populate_extra_attributes(to_post), h['data']['attributes'])
-
-    hash_comparison(to_post['data']['relationships'], h['data']['relationships'])
-    hash_comparison(populate_extra_relationships(to_post), h['data']['relationships'])
+    template = load_template('post_remote_data_file.json.erb')
+    api_post_test(template)
   end
 
   test 'returns sensible error objects' do
@@ -121,7 +103,7 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     assert_no_difference("#{singular_name.classify}.count") do
       post "/#{plural_name}.json", params: to_post
       assert_response :unprocessable_entity
-      validate_json_against_fragment response.body, '#/definitions/errors'
+      validate_json response.body, '#/definitions/errors'
     end
 
     h = JSON.parse(response.body)
@@ -138,9 +120,7 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
   end
 
   test 'cannot add overly permissive policy to data file' do
-    template_file = File.join(ApiTestHelper.template_dir, 'post_max_data_file.json.erb')
-    template = ERB.new(File.read(template_file))
-    to_post = JSON.parse(template.result(binding))
+    to_post = load_template('post_max_data_file.json.erb')
     to_post['data']['attributes']['policy']['access'] = 'edit'
 
     with_config_value(:max_all_visitors_access_type, Policy::VISIBLE) do
@@ -148,7 +128,7 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
         post "/#{plural_name}.json", params: to_post
         assert_response :unprocessable_entity
 
-        validate_json_against_fragment response.body, '#/definitions/errors'
+        validate_json response.body, '#/definitions/errors'
       end
     end
 

@@ -32,7 +32,6 @@ class InvestigationCUDTest < ActionDispatch::IntegrationTest
 
   def patch_values
     {
-      id: @inv.id,
       project_ids:  [@min_project.id, @max_project.id],
       creator_ids: [@current_user.person.id]
     }
@@ -43,7 +42,7 @@ class InvestigationCUDTest < ActionDispatch::IntegrationTest
     assert_no_difference('Investigation.count') do
       delete "/#{plural_name}/#{inv.id}.json"
       assert_response :forbidden
-      validate_json_against_fragment response.body, '#/definitions/errors'
+      validate_json response.body, '#/definitions/errors'
     end
   end
 

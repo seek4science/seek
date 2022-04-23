@@ -7,6 +7,10 @@ class SampleCUDTest < ActionDispatch::IntegrationTest
     Sample
   end
 
+  def resource
+    @sample
+  end
+
   def setup
     admin_login
 
@@ -134,7 +138,6 @@ class SampleCUDTest < ActionDispatch::IntegrationTest
 
   def patch_values
     {
-      id: @sample.id,
       sample_type_id: @sample_type.id,
       project_id: @min_project.id,
       creator_ids: [current_person.id],

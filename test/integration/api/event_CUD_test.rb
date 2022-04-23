@@ -7,9 +7,8 @@ class EventCUDTest < ActionDispatch::IntegrationTest
     Event
   end
 
-  def patch_values
-    event = Factory(:event, policy: Factory(:public_policy), contributor: current_person)
-    { id: event.id }
+  def resource
+    Factory(:event, policy: Factory(:public_policy), contributor: current_person)
   end
 
   def populate_extra_attributes(request_hash = {})

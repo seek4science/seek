@@ -5,39 +5,8 @@ require 'json-schema'
 require 'json-diff'
 
 module JsonTestHelper
+  include ApiTestHelper
   JSONAPI_SCHEMA_FILE_PATH = File.join(Rails.root, 'public', 'api', 'jsonapi-schema-v1')
-
-  def definitions_path
-    File.join(Rails.root, 'public', 'api', 'definitions', 'definitions.json')
-  end
-
-  def validate_json(path)
-    if File.readable?(path)
-      errors = JSON::Validator.fully_validate_json(path, @response.body)
-      unless errors.empty?
-        msg = ''
-        errors.each do |e|
-          msg += e + "\n"
-        end
-        raise Minitest::Assertion, msg
-      end
-    end
-  end
-
-  def validate_json_against_fragment(fragment)
-    if File.readable?(definitions_path)
-      errors = JSON::Validator.fully_validate_json(definitions_path,
-                                                   @response.body,
-                                                   fragment: fragment)
-      unless errors.empty?
-        msg = ''
-        errors.each do |e|
-          msg += e + "\n"
-        end
-        raise Minitest::Assertion, msg
-      end
-    end
-  end
 
   def check_content_diff(json1, json2)
     plural_obj = @controller.controller_name.pluralize

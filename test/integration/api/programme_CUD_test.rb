@@ -15,11 +15,6 @@ class ProgrammeCUDTest < ActionDispatch::IntegrationTest
     {title: "Post programme", admin_id: current_person.id}
   end
 
-  def patch_values
-    p = Factory(:programme)
-    {id: p.id}
-  end
-
   #normal user without admin rights
   def test_user_can_create_programme
     a_person = Factory(:person)
@@ -58,7 +53,7 @@ class ProgrammeCUDTest < ActionDispatch::IntegrationTest
      assert_no_difference('Programme.count', -1) do
        delete "/programmes/#{prog.id}.json"
        assert_response :forbidden
-       validate_json_against_fragment response.body, '#/definitions/errors'
+       validate_json response.body, '#/definitions/errors'
      end
 
      #no projects ==> can delete
@@ -71,6 +66,6 @@ class ProgrammeCUDTest < ActionDispatch::IntegrationTest
 
      get "/programmes/#{prog.id}.json"
      assert_response :not_found
-     validate_json_against_fragment response.body, '#/definitions/errors'
+     validate_json response.body, '#/definitions/errors'
    end
 end

@@ -11,11 +11,6 @@ class CollectionItemCUDTest < ActionDispatch::IntegrationTest
     Factory(:collection_item, collection: @collection)
   end
 
-  def patch_values
-    collection_item = Factory(:collection_item, collection: @collection)
-    { id: collection_item.id }
-  end
-
   def setup
     admin_login
     @project = @current_user.person.projects.first

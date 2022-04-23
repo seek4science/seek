@@ -19,7 +19,7 @@ module JsonRestTestCases
       assert_response :not_implemented
     else
       perform_jsonapi_checks
-      validate_json_against_fragment fragment
+      validate_json(@response.body, fragment)
     end
     # rescue ActionController::UrlGenerationError
     #   skip("unable to test read JSON for #{clz}")
@@ -34,7 +34,7 @@ module JsonRestTestCases
       assert_response :not_implemented
     else
       perform_jsonapi_checks
-      validate_json_against_fragment fragment
+      validate_json(@response.body, fragment)
     end
     # rescue ActionController::UrlGenerationError
     #   skip("unable to test index JSON for #{clz}")

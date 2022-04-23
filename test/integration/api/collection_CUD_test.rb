@@ -7,9 +7,8 @@ class CollectionCUDTest < ActionDispatch::IntegrationTest
     Collection
   end
 
-  def patch_values
-    collection = Factory(:collection, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
-    { id: collection.id }
+  def resource
+    Factory(:collection, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
   end
 
   def setup

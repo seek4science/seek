@@ -1,6 +1,8 @@
 require 'test_helper'
 
 class DataFileContentBlobTest < ActionDispatch::IntegrationTest
+  include ApiTestHelper
+
   def setup
     @person = Factory(:person)
     @project = @person.projects.first
@@ -10,15 +12,13 @@ class DataFileContentBlobTest < ActionDispatch::IntegrationTest
 
   test 'can add create and add content to data file through API' do
     with_config_value(:auth_lookup_enabled, true) do
-      template_file = File.join(ApiTestHelper.template_dir, 'post_min_data_file.json.erb')
-      template = ERB.new(File.read(template_file))
-      df_params = template.result(binding)
+      df_params = load_template('post_min_data_file.json.erb')
       headers = {
         'Accept' => 'application/vnd.api+json',
         'Authorization' => "Token #{@token}"
       }
 
-      post data_files_path, params: df_params, headers: headers.merge({ 'Content-Type' => 'application/vnd.api+json' })
+      post data_files_path, params: df_params.to_json, headers: headers.merge({ 'Content-Type' => 'application/vnd.api+json' })
 
       assert_response :success
       df = assigns(:data_file)
