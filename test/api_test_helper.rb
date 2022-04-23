@@ -77,12 +77,28 @@ module ApiTestHelper
 
   # Override me!
   def populate_extra_attributes(request_hash = {})
-    {}.with_indifferent_access
+    extra_attributes = HashWithIndifferentAccess.new
+    creators = request_hash.dig('data', 'relationships', 'creators', 'data') || []
+    if creators.any?
+      extra_attributes[:creators] = creators.map do |c|
+        p = Person.includes(:institutions).find_by_id(c['id'])
+        if p
+          {
+            profile: "/people/#{p.id}",
+            family_name: p.last_name,
+            given_name: p.first_name,
+            affiliation: p.institutions.map(&:title).join(', '),
+            orcid: p.orcid
+          }
+        end
+      end.compact
+    end
+    extra_attributes
   end
 
   # Add relationships that weren't in the original POST/PATCH request, but are in the response (such as submitter)
   def populate_extra_relationships(request_hash = {})
-    extra_relationships = {}
+    extra_relationships = HashWithIndifferentAccess.new
     existing = request_hash.dig('data', 'id') # Is it an existing resource, or something being created?
     add_contributor = model.method_defined?(:contributor) && !existing
     if add_contributor
@@ -106,7 +122,7 @@ module ApiTestHelper
       end
     end
 
-    extra_relationships.with_indifferent_access
+    extra_relationships
   end
 
   def definitions_path

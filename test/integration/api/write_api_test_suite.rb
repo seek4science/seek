@@ -15,7 +15,7 @@ module WriteApiTestSuite
   end
 
   def ignored_attributes
-    ['updated_at', 'creators']
+    ['updated_at']
   end
 
   ['min', 'max'].each do |m|
