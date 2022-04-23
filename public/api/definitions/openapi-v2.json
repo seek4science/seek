@@ -1,3 +1,5 @@
+
+
 {
     "swagger": "2.0",
     "info": {
@@ -9191,7 +9193,7 @@
                                 },
                                 "skype_name": {
                                     "$ref": "#/definitions/nullableNonEmptyString"
-                                },
+                                }
                             },
                             "additionalProperties": false
                         }
