@@ -5198,6 +5198,91 @@
                             },
                             "url": {
                                 "$ref": "#/definitions/uriString"
+                            },
+                            "doi": {
+                                "$ref": "#/definitions/nullableNonEmptyString"
+                            }
+                        },
+                        "required": [
+                            "version",
+                            "revision_comments",
+                            "url"
+                        ],
+                        "additionalProperties": false
+                    }
+                },
+                "version": {
+                    "type": "number"
+                },
+                "revision_comments": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "doi": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "created_at": {
+                    "$ref": "#/definitions/dateTimeString"
+                },
+                "updated_at": {
+                    "$ref": "#/definitions/dateTimeString"
+                },
+                "content_blobs": {
+                    "$ref": "#/definitions/contentBlobsList"
+                },
+                "policy": {
+                    "$ref": "#/definitions/policy"
+                },
+                "other_creators": {
+                    "$ref": "#/definitions/nullableOtherCreatorsString"
+                },
+                "creators": {
+                    "$ref": "#/definitions/assetsCreatorsList"
+                }
+            },
+            "required": [
+                "title",
+                "license",
+                "latest_version",
+                "versions",
+                "version",
+                "created_at",
+                "updated_at",
+                "content_blobs"
+            ],
+            "additionalProperties": false
+        },
+        "presentationAttributes": {
+            "type": "object",
+            "properties": {
+                "tags": {
+                    "$ref": "#/definitions/tagsType"
+                },
+                "title": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "description": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "license": {
+                    "$ref": "#/definitions/nullableLicense"
+                },
+                "latest_version": {
+                    "type": "number"
+                },
+                "versions": {
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                        "properties": {
+                            "version": {
+                                "type": "number"
+                            },
+                            "revision_comments": {
+                                "$ref": "#/definitions/nullableNonEmptyString"
+                            },
+                            "url": {
+                                "$ref": "#/definitions/uriString"
                             }
                         },
                         "required": [
@@ -5277,6 +5362,9 @@
                             },
                             "url": {
                                 "$ref": "#/definitions/uriString"
+                            },
+                            "doi": {
+                                "$ref": "#/definitions/nullableNonEmptyString"
                             }
                         },
                         "required": [
@@ -5291,6 +5379,9 @@
                     "type": "number"
                 },
                 "revision_comments": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "doi": {
                     "$ref": "#/definitions/nullableNonEmptyString"
                 },
                 "created_at": {
@@ -9369,7 +9460,7 @@
                             "$ref": "#/definitions/presentationType"
                         },
                         "attributes": {
-                            "$ref": "#/definitions/contributedTypeAttributes"
+                            "$ref": "#/definitions/presentationAttributes"
                         },
                         "relationships": {
                             "type": "object",
@@ -10804,6 +10895,9 @@
                                             },
                                             "url": {
                                                 "$ref": "#/definitions/uriString"
+                                            },
+                                            "doi": {
+                                                "$ref": "#/definitions/nullableNonEmptyString"
                                             }
                                         },
                                         "required": [
@@ -10818,6 +10912,9 @@
                                     "type": "number"
                                 },
                                 "revision_comments": {
+                                    "$ref": "#/definitions/nullableNonEmptyString"
+                                },
+                                "doi": {
                                     "$ref": "#/definitions/nullableNonEmptyString"
                                 },
                                 "created_at": {
