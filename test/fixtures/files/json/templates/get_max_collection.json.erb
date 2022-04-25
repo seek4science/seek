@@ -80,7 +80,7 @@
         ]
       },
       "items": {
-        "data": <%= res.collection_items.map { |c| { id: c.id.to_s, type: 'collection_items' } }.to_json %>
+        "data": <%= res.items.map { |c| { id: c.id.to_s, type: 'collection_items' } }.to_json %>
       }
     },
     "links": {
@@ -96,41 +96,42 @@
     }
   },
   "included": [
-  <% res.collection_items.each do |c| %>
+  <% res.items.each_with_index do |c, i| %>
     {
-      "id": "<%= res.c.id %>",
+      "id": "<%= c.id %>",
       "type": "collection_items",
       "attributes": {
-        "comment": "<% comment %>",
-        "order": <% order %>
+        "comment": "<%= c.comment %>",
+        "order": <%= c.order %>
       },
       "relationships": {
         "collection": {
           "data": {
-            "id": "<% id %>",
+            "id": "<%= res.id %>",
             "type": "collections"
           }
-        },
+
+        }<% unless c.asset.private? %>,
         "asset": {
           "data": {
-            "id": "<% c.asset_id %>",
-            "type": "<% c.asset_type.underscore.pluralize %>"
+            "id": "<%= c.asset_id %>",
+            "type": "<%= c.asset_type.underscore.pluralize %>"
           },
           "meta": {
-            "title": "<% c.asset.title %>"
+            "title": "<%= c.asset.title %>"
           }
         }
+        <% end %>
       },
       "links": {
-        "self": "/collections/<% id %>/items/<% c.id %>"
+        "self": "/collections/<%= res.id %>/items/<%= c.id %>"
       },
       "meta": {
-        "created": "<% c.created_at.as_json %>",
-        "modified": "<% c.updated_at.as_json %>",
+        "created": "<%= c.created_at.as_json %>",
+        "modified": "<%= c.updated_at.as_json %>",
         "api_version": "0.3"
       }
-    }
-  <%= ',' unless last %>
+    }<%= ',' unless i == res.items.length - 1%>
   <% end %>
   ],
   "jsonapi": {
