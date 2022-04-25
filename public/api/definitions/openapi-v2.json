@@ -5330,6 +5330,39 @@
             ],
             "additionalProperties": false
         },
+        "collectionAttributes": {
+            "type": "object",
+            "properties": {
+                "tags": {
+                    "$ref": "#/definitions/tagsType"
+                },
+                "title": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "description": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "license": {
+                    "$ref": "#/definitions/nullableLicense"
+                },
+                "policy": {
+                    "$ref": "#/definitions/policy"
+                },
+                "other_creators": {
+                    "$ref": "#/definitions/nullableOtherCreatorsString"
+                },
+                "creators": {
+                    "$ref": "#/definitions/assetsCreatorsList"
+                }
+            },
+            "required": [
+                "title",
+                "license",
+                "created_at",
+                "updated_at"
+            ],
+            "additionalProperties": false
+        },
         "modelAttributes": {
             "type": "object",
             "properties": {
@@ -11348,7 +11381,7 @@
                             "$ref": "#/definitions/collectionType"
                         },
                         "attributes": {
-                            "$ref": "#/definitions/contributedTypeAttributes"
+                            "$ref": "#/definitions/collectionAttributes"
                         },
                         "relationships": {
                             "type": "object",
