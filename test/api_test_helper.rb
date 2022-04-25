@@ -15,6 +15,23 @@ module ApiTestHelper
     model.model_name.singular
   end
 
+  def api_get_test(template, res)
+    get member_url(res), as: :json
+    assert_response :success
+
+    validate_json response.body, "#/definitions/#{singular_name.camelize(:lower)}Response"
+
+    expected = template
+    actual = JSON.parse(response.body)
+
+    if DEBUG
+      puts "Expected:\n #{expected.inspect}\n"
+      puts "Actual:\n #{actual.inspect}"
+    end
+
+    hash_comparison(expected, actual)
+  end
+
   def api_post_test(template)
     expected = template
     validate_json template.to_json, "#/definitions/#{singular_name.camelize(:lower)}Post"
@@ -145,6 +162,13 @@ module ApiTestHelper
     resource.id
   end
 
+  def load_get_template(erb_file, res) # `res` parameter is used via binding, despite appearing unused.
+    template_file = File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'templates', erb_file)
+    template = ERB.new(File.read(template_file))
+    b = binding
+    JSON.parse(template.result(b))
+  end
+
   def load_template(erb_file, hash = nil)
     template_file = File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'templates', erb_file)
     template = ERB.new(File.read(template_file))
@@ -175,7 +199,11 @@ module ApiTestHelper
   end
 
   def member_url(res)
-    polymorphic_url(res, format: :json)
+    if res.is_a?(Numeric)
+      "#{polymorphic_url(model)}/#{res}.json"
+    else
+      polymorphic_url(res, format: :json)
+    end
   end
 
   ##

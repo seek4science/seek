@@ -42,8 +42,11 @@ Factory.define(:max_collection, class: Collection) do |f|
         Factory(:collection_item, comment: 'Data 2', collection: c, asset: Factory(:data_file, policy: Factory(:public_policy), title: 'Data 2')),
         Factory(:collection_item, comment: 'Bad data', collection: c, asset: Factory(:data_file, policy: Factory(:private_policy), title: 'Readme'))
     ]
+    c.annotate_with(['Collection-tag1', 'Collection-tag2', 'Collection-tag3', 'Collection-tag4', 'Collection-tag5'], 'tag', c.contributor)
+    c.save!
   end
   f.other_creators 'Joe Bloggs'
+  f.assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
 end
 
 Factory.define(:collection_with_all_types, parent: :public_collection) do |f|

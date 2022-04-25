@@ -24,4 +24,5 @@ Factory.define(:max_study, parent: :min_study) do |f|
   f.after_build do |s|
     s.assays = [Factory(:max_assay, contributor: s.contributor, policy: Factory(:public_policy))]
   end
+  f.assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
 end

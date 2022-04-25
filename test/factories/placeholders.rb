@@ -25,4 +25,5 @@ Factory.define(:max_placeholder, class: Placeholder) do |f|
   f.policy { Factory(:downloadable_public_policy) }
   f.assays {[Factory.build(:max_assay, policy: Factory(:public_policy))]}
   f.other_creators 'Blogs, Joe'
+  f.assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
 end

@@ -38,8 +38,11 @@ Factory.define(:max_sop, class: Sop) do |f|
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
   f.after_create do |sop|
     sop.content_blob = Factory.create(:min_content_blob, content_type: 'application/pdf', asset: sop, asset_version: sop.version)
+    sop.annotate_with(['Sop-tag1', 'Sop-tag2', 'Sop-tag3', 'Sop-tag4', 'Sop-tag5'], 'tag', sop.contributor)
+    sop.save!
   end
   f.other_creators 'Blogs, Joe'
+  f.assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
 end
 
 Factory.define(:doc_sop, parent: :sop) do |f|

@@ -46,8 +46,11 @@ Factory.define(:max_file_template, class: FileTemplate) do |f|
   f.assays {[Factory.build(:max_assay, policy: Factory(:public_policy))]}
   f.after_create do |ft|
     ft.content_blob = Factory.create(:min_content_blob, content_type: 'application/pdf', asset: ft, asset_version: ft.version)
+    ft.annotate_with(['FileTemplate-tag1', 'FileTemplate-tag2', 'FileTemplate-tag3', 'FileTemplate-tag4', 'FileTemplate-tag5'], 'tag', ft.contributor)
+    ft.save!
   end
   f.other_creators 'Blogs, Joe'
+  f.assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
 end
 
 # Factory::Version

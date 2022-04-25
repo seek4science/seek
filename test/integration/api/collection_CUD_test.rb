@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class CollectionCUDTest < ActionDispatch::IntegrationTest
+  include ReadApiTestSuite
   include WriteApiTestSuite
 
   def model

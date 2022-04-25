@@ -1,0 +1,131 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "sample_types",
+    "attributes": {
+      "title": "A Maximal SampleType",
+      "description": "A very new research",
+      "sample_attributes": [
+        {
+          "id": "<%= res.sample_attributes[0].id %>",
+          "title": "full_name",
+          "description": "the persons full name",
+          "pid": null,
+          "sample_attribute_type": {
+            "id": <%= res.sample_attributes[0].sample_attribute_type_id %>,
+            "title": "Full name",
+            "base_type": "String",
+            "regexp": "[A-Z][a-z]+[ ][A-Z][a-z]+"
+          },
+          "required": true,
+          "pos": "1",
+          "unit": null,
+          "is_title": true,
+          "sample_controlled_vocab_id": null,
+          "linked_sample_type_id": null
+        },
+        {
+          "id": "<%= res.sample_attributes[1].id %>",
+          "title": "address",
+          "description": null,
+          "pid": null,
+          "sample_attribute_type": {
+            "id": <%= res.sample_attributes[1].sample_attribute_type_id %>,
+            "title": "Address",
+            "base_type": "Text",
+            "regexp": ".*"
+          },
+          "required": false,
+          "pos": "2",
+          "unit": null,
+          "is_title": false,
+          "sample_controlled_vocab_id": null,
+          "linked_sample_type_id": null
+        },
+        {
+          "id": "<%= res.sample_attributes[2].id %>",
+          "title": "postcode",
+          "description": null,
+          "pid": "dc:postcode",
+          "sample_attribute_type": {
+            "id": <%= res.sample_attributes[2].sample_attribute_type_id %>,
+            "title": "Post Code",
+            "base_type": "String",
+            "regexp": "^([A-PR-UWYZ0-9][A-HK-Y0-9][AEHMNPRTVXY0-9]?[ABEHMNPRVWXY0-9]? {1,2}[0-9][ABD-HJLN-UW-Z]{2}|GIR 0AA)$"
+          },
+          "required": false,
+          "pos": "3",
+          "unit": null,
+          "is_title": false,
+          "sample_controlled_vocab_id": null,
+          "linked_sample_type_id": null
+        },
+        {
+          "id": "<%= res.sample_attributes[3].id %>",
+          "title": "CAPITAL key",
+          "description": null,
+          "pid": null,
+          "sample_attribute_type": {
+            "id": <%= res.sample_attributes[3].sample_attribute_type_id %>,
+            "title": "String",
+            "base_type": "String",
+            "regexp": ".*"
+          },
+          "required": false,
+          "pos": "4",
+          "unit": null,
+          "is_title": false,
+          "sample_controlled_vocab_id": null,
+          "linked_sample_type_id": null
+        }
+      ],
+      "tags": [
+        "tag1",
+        "tag2"
+      ]
+    },
+    "relationships": {
+      "projects": {
+        "data": [
+          {
+            "id": "<%= res.projects.first.id %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "samples": {
+        "data":
+        <%= res.samples.map { |s| { id: s.id.to_s, type: 'samples' } }.to_json %>
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "<%= res.assays.first.id %>",
+            "type": "assays"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/sample_types/<%= res.id %>"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "api_version": "0.3",
+      "uuid": "<%= res.uuid %>",
+      "base_url": "http://localhost:3000"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "organisms",
+    "attributes": {
+      "title": "A Minimal Organism",
+      "concept_uri": null,
+      "ontology_id": null
+    },
+    "relationships": {
+      "projects": {
+        "data": []
+      },
+      "assays": {
+        "data": []
+      },
+      "models": {
+        "data": []
+      }
+    },
+    "links": {
+      "self": "/organisms/<%= res.id %>"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "uuid": "<%= res.uuid %>",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.3"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

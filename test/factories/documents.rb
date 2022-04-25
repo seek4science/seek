@@ -47,8 +47,11 @@ Factory.define(:max_document, class: Document) do |f|
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
   f.after_create do |document|
     document.content_blob = Factory.create(:min_content_blob, content_type: 'application/pdf', asset: document, asset_version: document.version)
+    document.annotate_with(['Document-tag1', 'Document-tag2', 'Document-tag3', 'Document-tag4', 'Document-tag5'], 'tag', document.contributor)
+    document.save!
   end
   f.other_creators 'Blogs, Joe'
+  f.assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
 end
 
 Factory.define(:api_pdf_document, parent: :document) do |f|

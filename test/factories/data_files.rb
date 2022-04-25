@@ -40,8 +40,11 @@ Factory.define(:max_data_file, class: DataFile) do |f|
     if data_file.content_blob.blank?
       data_file.content_blob = Factory.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
     end
+    data_file.annotate_with(['DataFile-tag1', 'DataFile-tag2', 'DataFile-tag3', 'DataFile-tag4', 'DataFile-tag5'], 'tag', data_file.contributor)
+    data_file.save!
   end
   f.other_creators 'Blogs, Joe'
+  f.assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
 end
 
 Factory.define(:rightfield_datafile, parent: :data_file) do |f|

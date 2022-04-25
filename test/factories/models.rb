@@ -32,14 +32,19 @@ Factory.define(:max_model, class: Model) do |f|
   f.assays {[Factory.build(:max_assay, policy: Factory(:public_policy))]}
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
   f.organism {Factory.create(:min_organism)}
+  f.model_type { ModelType.find_or_initialize_by(title: 'Ordinary differential equations (ODE)') }
+  f.recommended_environment { RecommendedModelEnvironment.find_or_initialize_by(title: 'JWS Online') }
   f.after_create do |model|
     model.content_blobs = [Factory.create(:cronwright_model_content_blob,
                                           asset: model, asset_version: model.version),
                            Factory.create(:rightfield_content_blob,
                                           asset: model,
                                           asset_version: model.version)] if model.content_blobs.blank?
+    model.annotate_with(['Model-tag1', 'Model-tag2', 'Model-tag3', 'Model-tag4', 'Model-tag5'], 'tag', model.contributor)
+    model.save!
   end
   f.other_creators 'Blogs, Joe'
+  f.assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
 end
 
 Factory.define(:model_2_files, parent: :model) do |f|

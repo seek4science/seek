@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class CollectionItemCUDTest < ActionDispatch::IntegrationTest
+  include ReadApiTestSuite
   include WriteApiTestSuite
 
   def model
@@ -22,7 +23,14 @@ class CollectionItemCUDTest < ActionDispatch::IntegrationTest
     "/collections/#{@collection.id}/items.json"
   end
 
-  def member_url(obj)
-    "/collections/#{obj.collection_id}/items/#{obj.id}.json"
+  def member_url(res)
+    if res.is_a?(Numeric)
+      id = res
+      collection_id = @collection.id
+    else
+      id = res.id
+      collection_id = res.collection_id
+    end
+    "/collections/#{collection_id}/items/#{id}.json"
   end
 end

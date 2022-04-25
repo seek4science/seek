@@ -15,6 +15,7 @@ Factory.define(:max_person, class: Person) do |f|
   f.skype_name "myskypename"
   f.association :user, factory: :activated_user, login: 'max_person_user'
   f.group_memberships { [Factory.build(:group_membership)] }
+  f.avatar
   f.after_create do |p|
     p.contributed_assays = [Factory(:min_assay, contributor: p, policy: Factory(:public_policy))]
     p.created_sops = [Factory(:sop, contributor: p, policy: Factory(:public_policy))]
@@ -23,6 +24,10 @@ Factory.define(:max_person, class: Person) do |f|
     p.created_data_files = [Factory(:data_file, contributor: p, policy: Factory(:public_policy))]
     p.created_publications = [Factory(:publication, contributor: p)]
     p.created_documents = [Factory(:public_document, contributor: p)]
+    p.created_events = [Factory(:event, contributor: p, policy: Factory(:public_policy))]
+    p.annotate_with(['golf', 'fishing'], 'expertise', p)
+    p.annotate_with(['fishing rod'], 'tool', p)
+    p.save!
     p.reload
   end
 end

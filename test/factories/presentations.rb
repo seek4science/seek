@@ -36,8 +36,11 @@ Factory.define(:max_presentation, class: Presentation) do |f|
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
   f.after_create do |presentation|
     presentation.content_blob = Factory.create(:min_content_blob, original_filename: 'test.pdf', content_type: 'application/pdf', asset: presentation, asset_version: presentation.version)
+    presentation.annotate_with(['Presentation-tag1', 'Presentation-tag2', 'Presentation-tag3', 'Presentation-tag4', 'Presentation-tag5'], 'tag', presentation.contributor)
+    presentation.save!
   end
   f.other_creators 'Blogs, Joe'
+  f.assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
 end
 
 Factory.define(:ppt_presentation, parent: :presentation) do |f|

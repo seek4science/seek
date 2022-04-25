@@ -78,10 +78,12 @@ Factory.define(:max_assay, class: Assay) do |f|
                    Factory(:assay_asset, asset: Factory(:model, policy: Factory(:public_policy))),
                    Factory(:assay_asset, asset: Factory(:document, policy: Factory(:public_policy)))]}
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
+  f.organisms { [Factory(:organism)] }
   f.after_build do |a|
     a.study ||= Factory(:study, contributor: a.contributor, policy: Factory(:public_policy),
                         investigation: Factory(:investigation, contributor: a.contributor, policy: Factory(:public_policy)))
   end
+  f.assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
 end
 
 # AssayAsset
