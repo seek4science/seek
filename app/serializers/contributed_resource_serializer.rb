@@ -13,9 +13,11 @@ class ContributedResourceSerializer < PCSSerializer
     versions_data = []
     object.visible_versions.each do |v|
       url = polymorphic_url(object, version: v.version)
-      versions_data.append(version: v.version,
-                           revision_comments: v.revision_comments.presence,
-                           url: url)
+      data = {version: v.version,
+              revision_comments: v.revision_comments.presence,
+              url: url}
+      data[:doi]=v.doi if v.respond_to?(:doi)
+      versions_data.append(data)
     end
     versions_data
   end
@@ -33,6 +35,10 @@ class ContributedResourceSerializer < PCSSerializer
   end
   attribute :updated_at do
     get_version.updated_at
+  end
+
+  attribute :doi, if: -> { object.supports_doi? } do
+    get_version.doi
   end
 
   attribute :content_blobs, if: -> { object.respond_to?(:content_blobs) || object.respond_to?(:content_blob) } do
