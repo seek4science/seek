@@ -1,12 +1,8 @@
 require 'test_helper'
 
-class InstitutionCUDTest < ActionDispatch::IntegrationTest
+class InstitutionApiTest < ActionDispatch::IntegrationTest
   include ReadApiTestSuite
   include WriteApiTestSuite
-
-  def model
-    Institution
-  end
 
   def setup
     admin_login
@@ -23,7 +19,7 @@ class InstitutionCUDTest < ActionDispatch::IntegrationTest
 
   test 'normal user cannot create institution' do
     user_login(Factory(:person))
-    body = api_post_body
+    body = api_max_post_body
     assert_no_difference('Institution.count') do
       post collection_url, params: body, as: :json
     end

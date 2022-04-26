@@ -1,12 +1,8 @@
 require 'test_helper'
 
-class FileTemplateCUDTest < ActionDispatch::IntegrationTest
+class FileTemplateApiTest < ActionDispatch::IntegrationTest
   include ReadApiTestSuite
   include WriteApiTestSuite
-
-  def model
-    FileTemplate
-  end
 
   def setup
     admin_login
@@ -75,7 +71,7 @@ class FileTemplateCUDTest < ActionDispatch::IntegrationTest
     skip 'Errors are a WIP'
     to_post = load_template('post_bad_file_template.json.erb')
 
-    assert_no_difference("#{singular_name.classify}.count") do
+    assert_no_difference(-> { model.count }) do
       post "/#{plural_name}.json", params: to_post
       #assert_response :unprocessable_entity
     end

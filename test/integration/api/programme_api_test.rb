@@ -1,12 +1,8 @@
 require 'test_helper'
 
-class ProgrammeCUDTest < ActionDispatch::IntegrationTest
+class ProgrammeApiTest < ActionDispatch::IntegrationTest
   include ReadApiTestSuite
   include WriteApiTestSuite
-
-  def model
-    Programme
-  end
 
   def setup
     admin_login
@@ -19,7 +15,7 @@ class ProgrammeCUDTest < ActionDispatch::IntegrationTest
   test 'user can create programme' do
     a_person = Factory(:person)
     user_login(a_person)
-    body = api_post_body
+    body = api_max_post_body
     assert_difference('Programme.count') do
       post "/programmes.json", params: body, as: :json
       assert_response :success
@@ -33,7 +29,7 @@ class ProgrammeCUDTest < ActionDispatch::IntegrationTest
     prog = Factory(:programme)
     person.is_programme_administrator = true, prog
     disable_authorization_checks { person.save! }
-    body = api_post_body
+    body = api_max_post_body
     body["data"]["id"] = "#{prog.id}"
     body["data"]['attributes']['title'] = "Updated programme"
     #change_funding_codes_before_CU("min")

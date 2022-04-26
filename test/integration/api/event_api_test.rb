@@ -1,12 +1,8 @@
 require 'test_helper'
 
-class EventCUDTest < ActionDispatch::IntegrationTest
+class EventApiTest < ActionDispatch::IntegrationTest
   include ReadApiTestSuite
   include WriteApiTestSuite
-
-  def model
-    Event
-  end
 
   def populate_extra_attributes(request_hash = {})
     h = super
@@ -31,7 +27,7 @@ class EventCUDTest < ActionDispatch::IntegrationTest
     skip 'Errors are a WIP'
     to_post = load_template('post_bad_event.json.erb')
 
-    assert_no_difference("#{singular_name.classify}.count") do
+    assert_no_difference(-> { model.count }) do
       post "/#{plural_name}.json", params: to_post
       #assert_response :unprocessable_entity
     end

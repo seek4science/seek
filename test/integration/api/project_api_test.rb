@@ -1,12 +1,8 @@
 require 'test_helper'
 
-class ProjectCUDTest < ActionDispatch::IntegrationTest
+class ProjectApiTest < ActionDispatch::IntegrationTest
   include ReadApiTestSuite
   include WriteApiTestSuite
-
-  def model
-    Project
-  end
 
   def setup
     admin_login
@@ -20,7 +16,7 @@ class ProjectCUDTest < ActionDispatch::IntegrationTest
 
   test 'normal user cannot create project' do
     user_login(Factory(:person))
-    body = api_post_body
+    body = api_max_post_body
     assert_no_difference('Project.count') do
       post "/projects.json", params: body, as: :json
     end

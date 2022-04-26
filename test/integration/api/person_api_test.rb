@@ -1,12 +1,8 @@
 require 'test_helper'
 
-class PersonCUDTest < ActionDispatch::IntegrationTest
+class PersonApiTest < ActionDispatch::IntegrationTest
   include ReadApiTestSuite
   include WriteApiTestSuite
-
-  def model
-    Person
-  end
 
   def setup
     admin_login
@@ -39,7 +35,7 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
 
   test 'normal user cannot create person' do
     user_login(Factory(:person))
-    body = api_post_body
+    body = api_max_post_body
     assert_no_difference('Person.count') do
       post "/people.json", params: body, as: :json
     end
@@ -47,7 +43,7 @@ class PersonCUDTest < ActionDispatch::IntegrationTest
 
   test 'admin can update others' do
     other_person = Factory(:person)
-    body = api_post_body
+    body = api_max_post_body
     body["data"]["id"] = "#{other_person.id}"
     body["data"]["attributes"]["email"] = "updateTest@email.com"
     patch "/people/#{other_person.id}.json", params: body, as: :json

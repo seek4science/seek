@@ -2,14 +2,6 @@ module WriteApiTestSuite
   extend ActiveSupport::Testing::Declarative # Allows `test 'bla' do` definitions
   include ApiTestHelper
 
-  def model
-    raise NotImplementedError
-  end
-
-  def api_post_body
-    load_template("post_max_#{singular_name}.json.erb")
-  end
-
   def ignored_attributes
     ['updated_at']
   end
@@ -35,11 +27,13 @@ module WriteApiTestSuite
       res.save!
     end
 
-    assert_difference ("#{singular_name.classify.constantize}.count"), -1 do
+    assert_difference(-> { model.count }, -1) do
       delete member_url(res)
       assert_response :success
     end
+
     get member_url(res)
+
     assert_response :not_found
     validate_json response.body, '#/definitions/errors'
   end
@@ -47,10 +41,12 @@ module WriteApiTestSuite
   test 'unauthorized user cannot update resource' do
     res = private_resource
     user_login(Factory(:person))
-    body = api_post_body
+    body = api_max_post_body
     body["data"]["id"] = id.to_s
     body["data"]["attributes"]["title"] = "updated by an unauthorized"
+
     patch member_url(res), params: body, as: :json
+
     assert_response :forbidden
     validate_json response.body, '#/definitions/errors'
   end
@@ -58,19 +54,21 @@ module WriteApiTestSuite
   test 'unauthorized user cannot delete resource' do
     res = private_resource
     user_login(Factory(:person))
-    assert_no_difference("#{singular_name.classify.constantize}.count") do
+    assert_no_difference(-> { model.count }) do
       delete member_url(res)
+
       assert_response :forbidden
       validate_json response.body, '#/definitions/errors'
     end
   end
 
   test 'creating resource with an ID should throw error' do
-    body = api_post_body
+    body = api_max_post_body
     body['data']['id'] = '100000000'
 
-    assert_no_difference("#{singular_name.classify.constantize}.count") do
+    assert_no_difference(-> { model.count }) do
       post collection_url, params: body, as: :json
+
       assert_response :unprocessable_entity
       validate_json response.body, '#/definitions/errors'
       assert_match 'A POST request is not allowed to specify an id', response.body
@@ -78,10 +76,10 @@ module WriteApiTestSuite
   end
 
   test 'creating resource with the wrong type should throw error' do
-    body = api_post_body
+    body = api_max_post_body
     body['data']['type'] = 'wrong'
 
-    assert_no_difference("#{singular_name.classify.constantize}.count") do
+    assert_no_difference(-> { model.count }) do
       post collection_url, params: body, as: :json
       assert_response :unprocessable_entity
       validate_json response.body, '#/definitions/errors'
@@ -90,10 +88,10 @@ module WriteApiTestSuite
   end
 
   test 'creating resource with a missing type should throw error' do
-    body = api_post_body
+    body = api_max_post_body
     body['data'].delete('type')
 
-    assert_no_difference("#{singular_name.classify.constantize}.count") do
+    assert_no_difference(-> { model.count }) do
       post collection_url, params: body, as: :json
       assert_response :unprocessable_entity
       validate_json response.body, '#/definitions/errors'
@@ -104,7 +102,7 @@ module WriteApiTestSuite
   test 'updating resource with the wrong ID should throw error' do
     body = load_template("patch_min_#{singular_name}.json.erb", id: '100000000')
 
-    assert_no_difference("#{singular_name.classify.constantize}.count") do
+    assert_no_difference(-> { model.count }) do
       put member_url(resource), params: body, as: :json
       assert_response :unprocessable_entity
       validate_json response.body, '#/definitions/errors'
@@ -116,7 +114,7 @@ module WriteApiTestSuite
     body = load_template("patch_min_#{singular_name}.json.erb")
     body['data']['type'] = 'wrong'
 
-    assert_no_difference("#{singular_name.classify.constantize}.count") do
+    assert_no_difference(-> { model.count }) do
       put member_url(resource), params: body, as: :json
       assert_response :unprocessable_entity
       validate_json response.body, '#/definitions/errors'
@@ -128,7 +126,7 @@ module WriteApiTestSuite
     body = load_template("patch_min_#{singular_name}.json.erb")
     body['data'].delete('type')
 
-    assert_no_difference("#{singular_name.classify.constantize}.count") do
+    assert_no_difference(-> { model.count }) do
       put member_url(resource), params: body, as: :json
       assert_response :unprocessable_entity
       validate_json response.body, '#/definitions/errors'

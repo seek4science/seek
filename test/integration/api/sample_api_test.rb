@@ -1,12 +1,8 @@
 require 'test_helper'
 
-class SampleCUDTest < ActionDispatch::IntegrationTest
+class SampleApiTest < ActionDispatch::IntegrationTest
   include ReadApiTestSuite
   include WriteApiTestSuite
-
-  def model
-    Sample
-  end
 
   def populate_extra_attributes(hash)
     extra_attributes = {}

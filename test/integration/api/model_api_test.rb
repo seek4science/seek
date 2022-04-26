@@ -1,12 +1,8 @@
 require 'test_helper'
 
-class ModelCUDTest < ActionDispatch::IntegrationTest
+class ModelApiTest < ActionDispatch::IntegrationTest
   include ReadApiTestSuite
   include WriteApiTestSuite
-
-  def model
-    Model
-  end
 
   def setup
     admin_login
@@ -111,7 +107,7 @@ class ModelCUDTest < ActionDispatch::IntegrationTest
     skip 'Errors are a WIP'
     to_post = load_template('post_bad_model.json.erb')
 
-    assert_no_difference("#{singular_name.classify}.count") do
+    assert_no_difference(-> { model.count }) do
       post "/#{plural_name}.json", params: to_post
       assert_response :unprocessable_entity
       validate_json response.body, '#/definitions/errors'

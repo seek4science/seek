@@ -3,8 +3,18 @@ module ApiTestHelper
 
   include AuthenticatedTestHelper
 
+  def model
+    @_model ||= self.class.name.split('ApiTest').first.constantize
+  end
+
   def resource
     instance_variable_get("@#{model.model_name.singular}")
+  end
+
+  def private_resource
+    res = resource
+    res.update_column(:policy_id, Factory(:private_policy).id) if res.respond_to?(:policy)
+    res
   end
 
   def current_person
@@ -41,7 +51,7 @@ module ApiTestHelper
     validate_json template.to_json, "#/definitions/#{singular_name.camelize(:lower)}Post"
 
     # debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
-    assert_difference("#{singular_name.classify}.count") do
+    assert_difference(-> { model.count }, 1) do
       post collection_url, params: template, as: :json
       assert_response :success
     end
@@ -72,7 +82,7 @@ module ApiTestHelper
 
     validate_json template.to_json, "#/definitions/#{singular_name.camelize(:lower)}Patch"
 
-    assert_no_difference("#{singular_name.classify}.count") do
+    assert_no_difference(-> { model.count }) do
       patch member_url(resource), params: template, as: :json
       assert_response :success
     end
@@ -196,6 +206,10 @@ module ApiTestHelper
     end
   end
 
+  def api_max_post_body
+    load_template("post_max_#{singular_name}.json.erb")
+  end
+
   private
 
   def collection_url
@@ -241,12 +255,6 @@ module ApiTestHelper
     else
       assert_equal expected, actual, "Expected #{key} to be `#{expected}` but was `#{actual}`"
     end
-  end
-
-  def private_resource
-    res = resource
-    res.update_column(:policy_id, Factory(:private_policy).id) if res.respond_to?(:policy)
-    res
   end
 
   ##

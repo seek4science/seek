@@ -1,12 +1,8 @@
 require 'test_helper'
 
-class AssayCUDTest < ActionDispatch::IntegrationTest
+class AssayApiTest < ActionDispatch::IntegrationTest
   include ReadApiTestSuite
   include WriteApiTestSuite
-
-  def model
-    Assay
-  end
 
   def setup
     admin_login

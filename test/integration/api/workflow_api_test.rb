@@ -1,12 +1,8 @@
 require 'test_helper'
 
-class WorkflowCUDTest < ActionDispatch::IntegrationTest
+class WorkflowApiTest < ActionDispatch::IntegrationTest
   include ReadApiTestSuite
   include WriteApiTestSuite
-
-  def model
-    Workflow
-  end
 
   def setup
     admin_login

@@ -1,12 +1,8 @@
 require 'test_helper'
 
-class SampleControlledVocabCUDTest < ActionDispatch::IntegrationTest
+class SampleControlledVocabApiTest < ActionDispatch::IntegrationTest
   # include ReadApiTestSuite
   include WriteApiTestSuite
-
-  def model
-    SampleControlledVocab
-  end
 
   def setup
     admin_login

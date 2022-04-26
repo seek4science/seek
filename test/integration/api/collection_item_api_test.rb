@@ -1,12 +1,8 @@
 require 'test_helper'
 
-class CollectionItemCUDTest < ActionDispatch::IntegrationTest
+class CollectionItemApiTest < ActionDispatch::IntegrationTest
   include ReadApiTestSuite
   include WriteApiTestSuite
-
-  def model
-    CollectionItem
-  end
 
   def setup
     admin_login

@@ -1,12 +1,8 @@
 require 'test_helper'
 
-class StudyCUDTest < ActionDispatch::IntegrationTest
+class StudyApiTest < ActionDispatch::IntegrationTest
   include ReadApiTestSuite
   include WriteApiTestSuite
-
-  def model
-    Study
-  end
 
   def setup
     admin_login

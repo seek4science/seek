@@ -1,12 +1,8 @@
 require 'test_helper'
 
-class DataFileCUDTest < ActionDispatch::IntegrationTest
+class DataFileApiTest < ActionDispatch::IntegrationTest
   include ReadApiTestSuite
   include WriteApiTestSuite
-
-  def model
-    DataFile
-  end
 
   def setup
     admin_login
@@ -98,7 +94,7 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     skip 'Errors are a WIP'
     to_post = load_template('post_bad_data_file.json.erb')
 
-    assert_no_difference("#{singular_name.classify}.count") do
+    assert_no_difference(-> { model.count }) do
       post "/#{plural_name}.json", params: to_post
       assert_response :unprocessable_entity
       validate_json response.body, '#/definitions/errors'
@@ -122,7 +118,7 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     to_post['data']['attributes']['policy']['access'] = 'edit'
 
     with_config_value(:max_all_visitors_access_type, Policy::VISIBLE) do
-      assert_no_difference("#{singular_name.classify}.count") do
+      assert_no_difference(-> { model.count }) do
         post "/#{plural_name}.json", params: to_post
         assert_response :unprocessable_entity
 

@@ -3,10 +3,6 @@ require 'test_helper'
 class ContentBlobApiTest < ActionDispatch::IntegrationTest
   include ReadApiTestSuite
 
-  def model
-    ContentBlob
-  end
-
   def private_resource
     @p ||= Factory(:min_content_blob, asset: Factory(:private_document))
   end

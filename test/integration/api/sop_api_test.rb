@@ -1,12 +1,8 @@
 require 'test_helper'
 
-class SopCUDTest < ActionDispatch::IntegrationTest
+class SopApiTest < ActionDispatch::IntegrationTest
   include ReadApiTestSuite
   include WriteApiTestSuite
-
-  def model
-    Sop
-  end
 
   def setup
     admin_login
