@@ -99,7 +99,12 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'keywords' => 'keyword',
       'version' => 1,
       'url' => "http://localhost:3000/data_files/#{df.id}",
-      'creator' => [{
+      'creator' => [
+        { '@type' => 'Person',
+          '@id' => "http://localhost:3000/people/#{df.assets_creators.first.creator_id}",
+          'name' => 'Some One'
+        },
+        {
                       '@type' => 'Person',
                       '@id' => "##{ROCrate::Entity.format_id('Blogs')}",
                       'name' => 'Blogs'
@@ -163,7 +168,14 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'keywords' => 'keyword',
       'version' => 1,
       'url' => "http://localhost:3000/data_files/#{df.id}",
-      'creator' => [{ '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Blogs')}", 'name' => 'Blogs' }, { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Joe')}", 'name' => 'Joe' }],
+      'creator' => [
+        { '@type' => 'Person',
+          '@id' => "http://localhost:3000/people/#{df.assets_creators.first.creator_id}",
+          'name' => 'Some One'
+        },
+        { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Blogs')}", 'name' => 'Blogs' },
+        { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Joe')}", 'name' => 'Joe' }
+      ],
       'producer' => [{
         '@type' => %w[Project Organization],
         '@id' => "http://localhost:3000/projects/#{@project.id}",
@@ -206,7 +218,13 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'description' => df.description,
       'keywords' => 'keyword',
       'version' => 1,      
-      'creator' => [{ '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Blogs')}", 'name' => 'Blogs' }, { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Joe')}", 'name' => 'Joe' }],
+      'creator' => [
+        { '@type' => 'Person',
+          '@id' => "http://localhost:3000/people/#{df.assets_creators.first.creator_id}",
+          'name' => 'Some One'
+        },
+        { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Blogs')}", 'name' => 'Blogs' },
+        { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Joe')}", 'name' => 'Joe' }],
       'url' => 'http://www.abc.com',
       'producer' => [{
         '@type' => %w[Project Organization],
@@ -254,6 +272,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     @project.description = 'a lovely project'
     disable_authorization_checks { @project.save! }
     institution = @project.institutions.first
+    event = @project.events.first
     expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => %w[Project Organization],
@@ -273,7 +292,11 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
           'name' => institution.title }
       ],
       'funder' => [],
-      'event' => []
+      'event' => [
+        { '@type' => 'Event',
+          '@id' => "http://localhost:3000/events/#{event.id}",
+          'name' => event.title }
+      ]
     }
     json = JSON.parse(@project.to_schema_ld)
     assert_equal expected, json
@@ -563,8 +586,12 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
                  'description' => 'A collection of very interesting things',
                  'name' => 'A Maximal Collection',
                  'url' => "http://localhost:3000/collections/#{collection.id}",
-                 'keywords' => '',
+                 'keywords' => 'Collection-tag1, Collection-tag2, Collection-tag3, Collection-tag4, Collection-tag5',
                  'creator' => [
+                   { '@type' => 'Person',
+                     '@id' => "http://localhost:3000/people/#{collection.assets_creators.first.creator_id}",
+                     'name' => 'Some One'
+                   },
                    { '@type' => 'Person',
                      '@id' => '#Joe%20Bloggs',
                      'name' => 'Joe Bloggs' }
@@ -711,6 +738,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'url' => "http://localhost:3000/data_files/#{df.id}?version=1",
       'creator' => [
         { '@type' => 'Person',
+          '@id' => "http://localhost:3000/people/#{df.assets_creators.first.creator_id}",
+          'name' => 'Some One'
+        },
+        { '@type' => 'Person',
           '@id' => "##{ROCrate::Entity.format_id('Blogs')}",
           'name' => 'Blogs' },
         { '@type' => 'Person',
@@ -752,6 +783,10 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'keywords' => 'keyword',
       'url' => "http://localhost:3000/data_files/#{df.id}?version=2",
       'creator' => [
+        { '@type' => 'Person',
+          '@id' => "http://localhost:3000/people/#{df.assets_creators.first.creator_id}",
+          'name' => 'Some One'
+        },
         { '@type' => 'Person',
           '@id' => "##{ROCrate::Entity.format_id('Blogs')}",
           'name' => 'Blogs' },
