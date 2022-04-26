@@ -11034,6 +11034,12 @@
                                 },
                                 "sops": {
                                     "$ref": "#/definitions/sopReferencesList"
+                                },
+                                "presentations": {
+                                    "$ref": "#/definitions/presentationReferencesList"
+                                },
+                                "data_files": {
+                                    "$ref": "#/definitions/dataFileReferencesList"
                                 }
                             },
                             "required": [
@@ -11165,6 +11171,12 @@
                                 },
                                 "sops": {
                                     "$ref": "#/definitions/sopReferencesList"
+                                },
+                                "presentations": {
+                                    "$ref": "#/definitions/presentationReferencesList"
+                                },
+                                "data_files": {
+                                    "$ref": "#/definitions/dataFileReferencesList"
                                 }
                             },
                             "required": [
@@ -11262,6 +11274,12 @@
                                 },
                                 "sops": {
                                     "$ref": "#/definitions/sopReferencesList"
+                                },
+                                "presentations": {
+                                    "$ref": "#/definitions/presentationReferencesList"
+                                },
+                                "data_files": {
+                                    "$ref": "#/definitions/dataFileReferencesList"
                                 }
                             },
                             "additionalProperties": false

@@ -118,6 +118,12 @@
             },
             "sops": {
                 "data": []
+            },
+            "presentations": {
+                "data": []
+            },
+            "data_files": {
+                "data": []
             }
         },
         "links": {
