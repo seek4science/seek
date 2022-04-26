@@ -7,8 +7,8 @@ class ProgrammesControllerTest < ActionController::TestCase
   include RdfTestCases
 
   def rdf_test_object
-    Factory(:programme)
     login_as(Factory(:admin))
+    Factory(:programme)
   end
 
   # for now just admins can create programmes, later we will change this

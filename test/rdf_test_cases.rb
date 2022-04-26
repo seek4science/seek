@@ -37,7 +37,7 @@ module RdfTestCases
   end
 
   test 'response code for not available rdf' do
-    get :show, params: { id: model.maximum(:id) + 100, format: 'rdf' }
+    get :show, params: { id: (model.maximum(:id) || 0) + 100, format: 'rdf' }
     assert_response :not_found
   end
 
