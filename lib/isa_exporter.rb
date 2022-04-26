@@ -379,10 +379,11 @@ module IsaExporter
 			with_tag_isa_other_material_characteristics = st.sample_attributes.select{ |sa| sa.isa_tag&.isa_other_material_characteristic? }
 			other_materials += st.samples.map do |s|
 			    {
-				   "@id": "#material/#{with_tag_isa_other_material.id}", 
+				   "@id": "#other_material/#{s.id}", 
 				   name: s.get_attribute_value(with_tag_isa_other_material),
 				   type: with_tag_isa_other_material.title,
 				   characteristics: convert_characteristics(s, with_tag_isa_other_material_characteristics),
+					# DrivesFrom should consist the 'with_tag_isa_other_material' of the connected sample??
 				   derivesFrom: extract_sample_ids(s.get_attribute_value(with_type_seek_sample_multi), "other_material")
 			    }
 			end.flatten
@@ -496,15 +497,21 @@ module IsaExporter
 
         # This method finds the source sample (sample_collection/samples of 2nd sample_type of the study) of a sample
         # The samples declared in the study level and being used in the stream of the current sample
-        def find_sample_origin(sample_list)
-            temp = []
-            while sample_list.any? do
-              sample_list = sample_list.map{ |s| s.linked_samples }.flatten.uniq
-              temp << sample_list.map{ |s| s.id }
-            end
-            #temp[0]: source, temp[1]: sample
-            return temp[0]
-        end
+			def find_sample_origin(sample_list)
+				parent_samples = []
+				while sample_list.any? do
+					temp = []
+					sample_list.each do |sample|
+						if sample.linking_samples.any?
+							temp += sample.linking_samples 
+						else
+							parent_samples << sample
+						end
+					end
+					sample_list = temp
+				end
+				parent_samples.map{ |s| s.id }.uniq
+			end
 
         def random_string(len)
             (0...len).map { ('a'..'z').to_a[rand(26)] }.join
