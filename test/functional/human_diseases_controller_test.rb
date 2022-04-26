@@ -4,7 +4,7 @@ class HumanDiseasesControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  # include RestTestCases
+  include RestTestCases
 
   def setup
     login_as(:aaron)
@@ -18,6 +18,10 @@ class HumanDiseasesControllerTest < ActionController::TestCase
 
   def rest_api_test_object
     @object = Factory(:human_disease, bioportal_concept: Factory(:human_disease_bioportal_concept))
+  end
+
+  def test_index_json
+    skip 'HumanDisease does not implement standard JSON index'
   end
 
   test 'new human disease route' do

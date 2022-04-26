@@ -32,7 +32,7 @@
       "modified": "2020-05-04T12:59:42.000Z",
       "uuid": "60dd04ec-2d4a-48a3-ab27-cbebf4adca89",
       "base_url": "http://localhost:3000",
-      "api_version": "0.2"
+      "api_version": "0.3"
     }
   },
   "jsonapi": {

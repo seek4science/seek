@@ -3,19 +3,34 @@
     "id": "<%= res.id %>",
     "type": "human_diseases",
     "attributes": {
-      "title": "A Minimal Human Disease",
-      "concept_uri": null,
-      "ontology_id": null
+      "title": "A Maximal Human Disease",
+      "concept_uri": "http://purl.bioontology.org/obo/DOID_1909",
+      "ontology_id": "23"
     },
     "relationships": {
       "projects": {
-        "data": []
+        "data": [
+          {
+            "id": "<%= res.projects.first.id %>",
+            "type": "projects"
+          }
+        ]
       },
       "assays": {
-        "data": []
+        "data": [
+          {
+            "id": "<%= res.assays.first.id %>",
+            "type": "assays"
+          }
+        ]
       },
       "models": {
-        "data": []
+        "data": [
+          {
+            "id": "<%= res.models.first.id %>",
+            "type": "models"
+          }
+        ]
       },
       "parents": {
         "data": []
@@ -32,7 +47,7 @@
       "modified": "<%= res.updated_at.as_json %>",
       "uuid": "<%= res.uuid %>",
       "base_url": "http://localhost:3000",
-      "api_version": "0.2"
+      "api_version": "0.3"
     }
   },
   "jsonapi": {

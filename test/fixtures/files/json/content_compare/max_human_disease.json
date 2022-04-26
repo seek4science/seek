@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "<%= res.id %>",
+    "id": "8233983738",
     "type": "human_diseases",
     "attributes": {
       "title": "A Maximal Human Disease",
@@ -11,7 +11,7 @@
       "projects": {
         "data": [
           {
-            "id": "<%= res.projects.first.id %>",
+            "id": "1022251427",
             "type": "projects"
           }
         ]
@@ -19,7 +19,7 @@
       "assays": {
         "data": [
           {
-            "id": "<%= res.assays.first.id %>",
+            "id": "1022251427",
             "type": "assays"
           }
         ]
@@ -27,27 +27,27 @@
       "models": {
         "data": [
           {
-            "id": "<%= res.models.first.id %>",
+            "id": "1022251427",
             "type": "models"
           }
         ]
       },
       "parents": {
-        "data": []
+        "data": [ ]
       },
       "children": {
-        "data": []
+        "data": [ ]
       }
     },
     "links": {
-      "self": "/human_diseases/<%= res.id %>"
+      "self": "/human_diseases/8233983738"
     },
     "meta": {
-      "created": "<%= res.created_at.as_json %>",
-      "modified": "<%= res.updated_at.as_json %>",
-      "uuid": "<%= res.uuid %>",
+      "created": "2020-05-04T12:59:42.000Z",
+      "modified": "2020-05-04T12:59:42.000Z",
+      "uuid": "60dd04ec-2d4a-48a3-ab27-cbebf4adca89",
       "base_url": "http://localhost:3000",
-      "api_version": "0.2"
+      "api_version": "0.3"
     }
   },
   "jsonapi": {
