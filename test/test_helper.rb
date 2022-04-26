@@ -22,8 +22,6 @@ require 'pry'
 require 'api_test_helper'
 require 'integration/api/read_api_test_suite'
 require 'integration/api/write_api_test_suite'
-require 'json_test_helper'
-require 'rest_test_cases'
 require 'rdf_test_cases'
 
 Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new(fast_fail: true,
@@ -123,28 +121,13 @@ class ActiveSupport::TestCase
     User.current_user = nil
   end
 
-  def add_avatar_to_test_object(obj)
-    disable_authorization_checks do
-      obj.avatar = Factory(:avatar, owner: obj)
-      obj.save!
-    end
+  def perform_jsonapi_checks
+    assert_response :success
+    assert_equal 'application/vnd.api+json', @response.media_type
+    assert JSON::Validator.validate(File.join(Rails.root, 'public', 'api', 'jsonapi-schema-v1'),
+                                    @response.body), 'Response did not validate against JSON-API schema'
   end
 
-  def add_tags_to_test_object(obj)
-    name = obj.class.to_s
-    #for i in 1..5 do
-    [1,2,3,4,5].each do |i|
-      tag = Factory :tag, value: "#{name}-tag#{i}", source: User.current_user, annotatable: obj
-      obj.reload
-    end
-  end
-
-  def add_creator_to_test_object(obj)
-    disable_authorization_checks do
-      obj.creators = [Factory(:person)]
-      obj.save!
-    end
-  end
   # Transactional fixtures accelerate your tests by wrapping each test method
   # in a transaction that's rolled back on completion.  This ensures that the
   # test database remains unchanged so your fixtures don't have to be reloaded

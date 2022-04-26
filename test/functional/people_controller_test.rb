@@ -4,16 +4,11 @@ class PeopleControllerTest < ActionController::TestCase
   fixtures :people, :users, :projects, :work_groups, :group_memberships, :institutions, :roles
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include ApplicationHelper
   include RdfTestCases
 
   def setup
     login_as(:quentin)
-  end
-
-  def rest_api_test_object
-    @object = Factory(:person, orcid: 'http://orcid.org/0000-0003-2130-0865')
   end
 
   def test_title
@@ -1252,15 +1247,6 @@ class PeopleControllerTest < ActionController::TestCase
     assert_response :success
     h = JSON.parse(response.body)
     refute h['data']['attributes'].key?('login')
-  end
-
-  def edit_max_object(person)
-    Factory :expertise, value: 'golf', annotatable: person
-    Factory :expertise, value: 'fishing', annotatable: person
-    Factory :tool, value: 'fishing rod', annotatable: person
-    Factory(:event, contributor: person, policy: Factory(:public_policy))
-    #person.save
-    add_avatar_to_test_object(person)
   end
 
   def role_image(role)

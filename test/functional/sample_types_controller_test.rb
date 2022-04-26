@@ -2,7 +2,6 @@ require 'test_helper'
 
 class SampleTypesControllerTest < ActionController::TestCase
 
-  include RestTestCases
   include AuthenticatedTestHelper
 
   setup do
@@ -16,10 +15,6 @@ class SampleTypesControllerTest < ActionController::TestCase
     @string_type = Factory(:string_sample_attribute_type)
     @int_type = Factory(:integer_sample_attribute_type)
     @controlled_vocab_type = Factory(:controlled_vocab_attribute_type)
-  end
-
-  def rest_api_test_object
-    @object = Factory(:max_sample_type, project_ids: @project_ids)
   end
 
   test 'should get index' do
@@ -632,17 +627,5 @@ class SampleTypesControllerTest < ActionController::TestCase
 
   def missing_columns_template_for_upload
     fixture_file_upload('samples-data-missing-columns.xls', 'application/excel')
-  end
-
-  def edit_min_object(object)
-    s1 = Factory(:min_sample, policy: Factory(:public_policy))
-    object.samples << s1
-  end
-
-  def edit_max_object(object)
-    s1 = Factory(:max_sample, policy: Factory(:public_policy))
-    s2 = Factory(:max_sample, policy: Factory(:public_policy))
-    object.samples << s1
-    object.samples << s2
   end
 end

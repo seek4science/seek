@@ -4,17 +4,12 @@ class PublicationsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
   include MockHelper
 
   def setup
     login_as(Factory(:admin))
-  end
-
-  def rest_api_test_object
-    @object = Factory(:publication, published_date: Date.new(2013, 1, 1), publication_type: Factory(:journal))
   end
 
   def test_title
@@ -1090,22 +1085,6 @@ class PublicationsControllerTest < ActionController::TestCase
 
     assert_equal '10.5072/abcd', assigns(:publication).doi
     assert_equal journal.id, assigns(:publication).publication_type.id
-  end
-
-  def edit_max_object(pub)
-    assay = Factory(:assay, policy: Factory(:public_policy))
-    study = Factory(:study, policy: Factory(:public_policy))
-    inv = Factory(:investigation, policy: Factory(:public_policy))
-    df = Factory(:data_file, policy: Factory(:public_policy))
-    model = Factory(:model, policy: Factory(:public_policy))
-    pr = Factory(:presentation, policy: Factory(:public_policy))
-
-    pub.associate(assay)
-    pub.associate(study)
-    pub.associate(inv)
-    pub.associate(df)
-    pub.associate(model)
-    pub.associate(pr)
   end
 
   test 'should give authors permissions' do

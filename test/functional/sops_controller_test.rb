@@ -5,7 +5,6 @@ class SopsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
   include HtmlHelper
@@ -15,10 +14,6 @@ class SopsControllerTest < ActionController::TestCase
     @user = users(:quentin)
     @project = @user.person.projects.first
     login_as(@user)
-  end
-
-  def rest_api_test_object
-    @object = sops(:downloadable_sop)
   end
 
   test 'creators do not show in list item' do
@@ -900,11 +895,6 @@ class SopsControllerTest < ActionController::TestCase
     get :show, params: { id: sop }
     assert_response :success
     assert_select '#citation', text: /Bacall, F/, count:1
-  end
-
-  def edit_max_object(sop)
-    add_tags_to_test_object(sop)
-    add_creator_to_test_object(sop)
   end
 
   test 'shows how to get doi for private sop' do

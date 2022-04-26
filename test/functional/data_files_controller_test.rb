@@ -8,7 +8,6 @@ class DataFilesControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include RdfTestCases
   include SharingFormTestHelper
   include GeneralAuthorizationTestCases
@@ -18,14 +17,14 @@ class DataFilesControllerTest < ActionController::TestCase
   def setup
     login_as(:datafile_owner)
   end
-
-  def rest_api_test_object
-    # by TZ for some reason depending on tets order user was no longer logged
-    login_as(:datafile_owner) unless User.current_user
-    @object = data_files(:picture)
-    @object.annotate_with 'tag1'
-    @object
-  end
+  #
+  # def rest_api_test_object
+  #   # by TZ for some reason depending on tets order user was no longer logged
+  #   login_as(:datafile_owner) unless User.current_user
+  #   @object = data_files(:picture)
+  #   @object.annotate_with 'tag1'
+  #   @object
+  # end
 
   def test_title
     get :index
@@ -41,7 +40,9 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'json link includes version' do
     df = Factory(:data_file, policy: Factory(:public_policy))
-    test_show_json(df)
+
+    get :show, params: { id: df, format: :json }
+
     json = JSON.parse(response.body)
     refute_nil json['data']
     refute_nil json['data']['links']
@@ -3442,11 +3443,6 @@ class DataFilesControllerTest < ActionController::TestCase
     refute_includes df.assay_assets.collect(&:assay),assay1
     refute_includes df.assay_assets.collect(&:assay),assay2
     refute_includes df.assay_assets.collect(&:assay),assay3
-  end
-
-  def edit_max_object(df)
-    add_tags_to_test_object(df)
-    add_creator_to_test_object(df)
   end
 
   private

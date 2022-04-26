@@ -4,17 +4,12 @@ class InvestigationsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
   include GeneralAuthorizationTestCases
 
   def setup
     login_as(:quentin)
-  end
-
-  def rest_api_test_object
-    @object = Factory(:investigation, policy: Factory(:public_policy))
   end
 
   def test_title
@@ -659,11 +654,6 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert inv=assigns(:investigation)
     refute inv.valid?
 
-  end
-
-  def edit_max_object(investigation)
-    investigation.creators = [Factory(:person)]
-    disable_authorization_checks { investigation.save! }
   end
 
   test 'should create with discussion link' do

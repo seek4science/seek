@@ -5,17 +5,12 @@ class ModelsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
   include GeneralAuthorizationTestCases
 
   def setup
     login_as(:model_owner)
-  end
-
-  def rest_api_test_object
-    @object = Factory :model_2_files, contributor: User.current_user.person, policy: Factory(:private_policy), organism: Factory(:organism)
   end
 
   test 'should get index' do
@@ -1353,13 +1348,6 @@ class ModelsControllerTest < ActionController::TestCase
   def valid_model_with_url
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png'
     [{ title: 'Test', project_ids: [projects(:sysmo_project).id] }, { data_url: 'http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png', original_filename: 'sysmo-db-logo-grad2.png', make_local_copy: '0' }]
-  end
-
-  def edit_max_object(model)
-    add_tags_to_test_object(model)
-    model[:model_type_id] = (model_types(:ODE)).id
-    model[:recommended_environment_id] = recommended_model_environments(:jws).id
-    add_creator_to_test_object(model)
   end
 
   def doi_citation_mock

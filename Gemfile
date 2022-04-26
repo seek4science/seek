@@ -172,7 +172,6 @@ group :test do
   gem 'simplecov'
   gem 'whenever-test'
   gem 'json-schema'
-  gem 'json-diff'
   # Easy installation and use of web drivers to run system tests with browsers
   gem 'webdrivers'
 end

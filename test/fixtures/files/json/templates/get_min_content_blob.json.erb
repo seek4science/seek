@@ -13,19 +13,19 @@
     "relationships": {
       "asset": {
         "data": {
-          "id": "1055250739",
+          "id": "<%= res.asset_id %>",
           "type": "sops"
         }
       }
     },
     "links": {
-      "self": "/sops/1055250739/content_blobs/<%= res.id %>"
+      "self": "/sops/<%= res.asset_id %>/content_blobs/<%= res.id %>"
     },
     "meta": {
       "created": "<%= res.created_at.as_json %>",
       "modified": "<%= res.updated_at.as_json %>",
       "api_version": "0.3",
-      "uuid": "18dd0e40-2542-0136-c088-0800279c491a",
+      "uuid": "<%= res.uuid %>",
       "base_url": "http://localhost:3000"
     }
   },

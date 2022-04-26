@@ -3,14 +3,9 @@ require 'test_helper'
 class SamplesControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include SharingFormTestHelper
   include HtmlHelper
   include GeneralAuthorizationTestCases
-
-  def rest_api_test_object
-    @object = Factory(:sample, policy: Factory(:public_policy))
-  end
 
   test 'should return 406 when requesting RDF' do
     login_as(Factory(:user))

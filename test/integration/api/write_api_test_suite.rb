@@ -6,10 +6,6 @@ module WriteApiTestSuite
     raise NotImplementedError
   end
 
-  def resource
-    instance_variable_get("@#{model.model_name.singular}")
-  end
-
   def api_post_body
     load_template("post_max_#{singular_name}.json.erb")
   end

@@ -5,7 +5,6 @@ class CollectionItemsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
 
   test 'should create collection item' do
     collection = Factory(:collection)
@@ -47,17 +46,5 @@ class CollectionItemsControllerTest < ActionController::TestCase
     assert_response :success
     res = JSON.parse(response.body)
     assert_nil res['data']['relationships']['asset']
-  end
-
-  def rest_api_test_object
-    @object ||= Factory(:collection_item)
-  end
-
-  def rest_index_url_options(collection = rest_api_test_object.collection)
-    { collection_id: collection.id }
-  end
-
-  def rest_show_url_options(collection_item = rest_api_test_object)
-    { collection_id: collection_item.collection_id }
   end
 end

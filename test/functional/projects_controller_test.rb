@@ -4,7 +4,6 @@ require 'libxml'
 class ProjectsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include RdfTestCases
   include ActionView::Helpers::NumberHelper
   include SharingFormTestHelper
@@ -13,10 +12,6 @@ class ProjectsControllerTest < ActionController::TestCase
 
   def setup
     login_as(Factory(:admin))
-  end
-
-  def rest_api_test_object
-    @object = projects(:sysmo_project)
   end
 
   def test_title
@@ -3169,18 +3164,8 @@ class ProjectsControllerTest < ActionController::TestCase
   def check_assay_1_0_1(assay)
     assert assay.title == "Obtain SBML models for production hosts"
   end
-  
-  def edit_max_object(project)
-    for i in 1..5
-      Factory(:person).add_to_project_and_institution(project, Factory(:institution))
-    end
-    project.default_policy = Factory(:private_policy)
-    project.programme_id = (Factory(:programme)).id
-    add_avatar_to_test_object(project)
-  end
 
   def valid_project
     { title: "a title" }
   end  
-  
 end

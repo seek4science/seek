@@ -1347,9 +1347,4 @@ class WorkflowsControllerTest < ActionController::TestCase
     json = JSON.parse(response.body)
     assert_equal Seek::BioSchema::Serializer.new(workflow.latest_version).json_representation, json
   end
-
-  def edit_max_object(workflow)
-    add_tags_to_test_object(workflow)
-    add_creator_to_test_object(workflow)
-  end
 end

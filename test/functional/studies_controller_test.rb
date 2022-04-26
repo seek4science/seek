@@ -4,17 +4,12 @@ class StudiesControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
   include GeneralAuthorizationTestCases
 
   def setup
     login_as Factory(:admin).user
-  end
-
-  def rest_api_test_object
-    @object = Factory :study, policy: Factory(:public_policy)
   end
   
   test 'should get index' do
@@ -491,10 +486,6 @@ class StudiesControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', study_path(study), text: study.title
       assert_select 'a[href=?]', study_path(study2), text: study2.title, count: 0
     end
-  end
-
-  def edit_max_object(study)
-    add_creator_to_test_object(study)
   end
 
   test 'can delete a study with subscriptions' do

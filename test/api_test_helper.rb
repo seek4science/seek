@@ -3,6 +3,10 @@ module ApiTestHelper
 
   include AuthenticatedTestHelper
 
+  def resource
+    instance_variable_get("@#{model.model_name.singular}")
+  end
+
   def current_person
     @current_user&.person
   end

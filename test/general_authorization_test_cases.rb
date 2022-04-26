@@ -11,10 +11,8 @@ module GeneralAuthorizationTestCases
     get :show, params: { id: item.id }
     assert_response :forbidden
 
-    unless RestTestCases::SKIPPED_JSON.include?(item.class.name)
-      get :show, params: { id: item.id, format: 'json' }
-      assert_response :forbidden
-    end
+    get :show, params: { id: item.id, format: 'json' }
+    assert_response :forbidden
   end
 
   def test_private_item_not_accessible_by_another_user
@@ -28,10 +26,8 @@ module GeneralAuthorizationTestCases
     get :show, params: { id: item.id }
     assert_response :forbidden
 
-    unless RestTestCases::SKIPPED_JSON.include?(item.class.name)
-      get :show, params: { id: item.id, format: 'json' }
-      assert_response :forbidden
-    end
+    get :show, params: { id: item.id, format: 'json' }
+    assert_response :forbidden
   end
 
   def test_private_item_accessible_by_owner
@@ -47,10 +43,8 @@ module GeneralAuthorizationTestCases
     assert_response :success
     assert_nil flash[:error]
 
-    unless RestTestCases::SKIPPED_JSON.include?(item.class.name)
-      get :show, params: { id: item.id, format: 'json' }
-      assert_response :success
-    end
+    get :show, params: { id: item.id, format: 'json' }
+    assert_response :success
   end
 
   def check_manage_edit_menu_for_type(type)

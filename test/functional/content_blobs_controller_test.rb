@@ -6,19 +6,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
 
   def setup
     login_as(:quentin)
-  end
-
-  # Is this still needed?
-  def rest_api_test_object
-    Factory(:pdf_sop, policy: Factory(:downloadable_public_policy)).content_blob
-  end
-
-  def rest_show_url_options(object = rest_api_test_object)
-    { sop_id: object.asset_id }
   end
 
   test 'should resolve to json' do
@@ -59,10 +49,6 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :get_pdf, params: { sop_id: sop2.id, id: sop2.content_blob.id }
     assert_redirected_to sop2
     assert_not_nil flash[:error]
-  end
-
-  def test_index_json
-    # nothing to do, no indexes for content blobs
   end
 
   test 'examine url to file' do

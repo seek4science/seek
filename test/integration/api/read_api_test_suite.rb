@@ -2,8 +2,8 @@ module ReadApiTestSuite
   extend ActiveSupport::Testing::Declarative # Allows `test 'bla' do` definitions
   include ApiTestHelper
 
-  def model
-    raise NotImplementedError
+  def skip_index_test?
+    false
   end
 
   ['min', 'max'].each do |m|
@@ -16,14 +16,28 @@ module ReadApiTestSuite
     end
   end
 
-  test 'unauthorized user cannot get resource' do
-    res = private_resource
-    if res.respond_to?(:policy)
-      user_login(Factory(:person))
-      get member_url(res), as: :json
-      assert_response :forbidden
-      validate_json response.body, '#/definitions/errors'
+  test 'can get index' do
+    skip if skip_index_test?
+    Factory.create("min_#{singular_name}".to_sym)
+    Factory.create("max_#{singular_name}".to_sym)
+    get collection_url, as: :json
+
+    if model == Sample
+      assert_response :not_implemented
+    else
+      perform_jsonapi_checks
+      validate_json response.body, "#/definitions/#{plural_name.camelize(:lower)}Response"
     end
+  end
+
+  test 'unauthorized user cannot get resource' do
+    skip unless model.respond_to?(:authorization_supported?) && model.authorization_supported?
+    res = private_resource
+
+    user_login(Factory(:person))
+    get member_url(res), as: :json
+    assert_response :forbidden
+    validate_json response.body, '#/definitions/errors'
   end
 
   test 'getting resource with non-existent ID should throw error' do
