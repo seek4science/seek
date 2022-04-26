@@ -34,6 +34,7 @@ Factory.define(:min_publication, class: Publication) do |f|
 end
 
 Factory.define(:max_publication, class: Publication) do |f|
+  f.with_project_contributor
   f.title 'A Maximal Publication'
   f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
   f.misc_links { [Factory.build(:misc_link, label:'A link')] }
