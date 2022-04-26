@@ -317,7 +317,6 @@ GEM
       railties (>= 3.2.16)
     json (2.3.1)
     json-canonicalization (0.3.0)
-    json-diff (0.4.1)
     json-jwt (1.13.0)
       activesupport (>= 4.2)
       aes_key_wrap
@@ -939,7 +938,6 @@ DEPENDENCIES
   jbuilder-json_api
   jquery-rails (~> 4.2.2)
   jquery-ui-rails
-  json-diff
   json-schema
   libreconv
   libxml-ruby (~> 2.9.0)
