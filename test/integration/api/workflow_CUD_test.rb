@@ -17,6 +17,8 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
     @assay = Factory(:assay, study: study, contributor: @current_person)
     @creator = Factory(:person)
     @publication = Factory(:publication, projects: [@project])
+    @presentation = Factory(:presentation, projects: [@project], contributor: @current_person)
+    @data_file = Factory(:data_file, projects: [@project], contributor: @current_person)
 
     template_file = File.join(ApiTestHelper.template_dir, 'post_max_workflow.json.erb')
     template = ERB.new(File.read(template_file))
@@ -24,6 +26,10 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
 
     workflow = Factory(:workflow, policy: Factory(:public_policy), contributor: @current_person, creators: [@creator])
     @to_patch = load_template("patch_min_#{@clz}.json.erb", { id: workflow.id })
+  end
+
+  def test_create
+    super
   end
 
   test 'can add content to API-created workflow' do
