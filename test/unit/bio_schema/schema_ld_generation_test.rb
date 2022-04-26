@@ -556,7 +556,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'human_disease' do
     human_disease = travel_to(@current_time) do
-      human_disease = Factory(:max_humandisease)
+      human_disease = Factory(:max_human_disease)
       disable_authorization_checks { human_disease.save! }
       human_disease
     end
