@@ -11,8 +11,9 @@ Factory.define(:max_organism, class: Organism) do |f|
   f.title 'A Maximal Organism'
   f.concept_uri 'http://purl.bioontology.org/ontology/NCBITAXON/9606'
   f.ontology_id "23"
-  f.assays {[Factory.build(:assay, policy: Factory(:public_policy))]}
+  f.assays { [Factory(:public_assay)] }
   f.models {[Factory.build(:model, policy: Factory(:public_policy))]}
+  f.projects {[Factory.build(:project)]}
 end
 
 # AssayOrganism

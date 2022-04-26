@@ -7,6 +7,11 @@ Factory.define(:study) do |f|
   end
 end
 
+Factory.define(:public_study, parent: :study) do |f|
+  f.policy { Factory(:public_policy) }
+  f.investigation { Factory(:public_investigation) }
+end
+
 Factory.define(:study_with_assay, parent: :study) do |f|
   f.assays { [Factory(:assay)] }
 end

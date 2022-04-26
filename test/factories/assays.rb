@@ -57,6 +57,11 @@ end
 
 Factory.define(:assay, parent: :modelling_assay) {}
 
+Factory.define(:public_assay, parent: :modelling_assay) do |f|
+  f.policy { Factory(:public_policy) }
+  f.study { Factory(:public_study) }
+end
+
 Factory.define(:min_assay, class: Assay) do |f|
   f.title "A Minimal Assay"
   f.association :assay_class, factory: :experimental_assay_class

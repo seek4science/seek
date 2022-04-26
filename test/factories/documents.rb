@@ -43,7 +43,7 @@ Factory.define(:max_document, class: Document) do |f|
   f.description 'The important report we did for ~important-milestone~'
   f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
   f.policy { Factory(:downloadable_public_policy) }
-  f.assays {[Factory.build(:assay, policy: Factory(:public_policy))]}
+  f.assays { [Factory(:public_assay)] }
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
   f.after_create do |document|
     document.content_blob = Factory.create(:min_content_blob, content_type: 'application/pdf', asset: document, asset_version: document.version)

@@ -4,6 +4,10 @@ Factory.define(:investigation, class: Investigation) do |f|
   f.sequence(:title) { |n| "Investigation#{n}" }
 end
 
+Factory.define(:public_investigation, parent: :investigation) do |f|
+  f.policy { Factory(:public_policy) }
+end
+
 Factory.define(:investigation_with_study_and_assay, parent: :investigation) do |f|
   f.studies { [Factory(:study_with_assay)] }
 end
