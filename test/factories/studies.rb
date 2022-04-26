@@ -7,6 +7,10 @@ Factory.define(:study) do |f|
   end
 end
 
+Factory.define(:study_with_assay, parent: :study) do |f|
+  f.assays { [Factory(:assay)] }
+end
+
 Factory.define(:min_study, class: Study) do |f|
   f.title "A Minimal Study"
   f.association :contributor, factory: :person

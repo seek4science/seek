@@ -4,6 +4,10 @@ Factory.define(:investigation, class: Investigation) do |f|
   f.sequence(:title) { |n| "Investigation#{n}" }
 end
 
+Factory.define(:investigation_with_study_and_assay, parent: :investigation) do |f|
+  f.studies { [Factory(:study_with_assay)] }
+end
+
 Factory.define(:min_investigation, class: Investigation) do |f|
   f.with_project_contributor
   f.title "A Minimal Investigation"

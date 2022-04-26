@@ -43,7 +43,7 @@ Factory.define(:max_file_template, class: FileTemplate) do |f|
   f.description 'The important report we did for ~important-milestone~'
   f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
   f.policy { Factory(:downloadable_public_policy) }
-  f.assays {[Factory.build(:max_assay, policy: Factory(:public_policy))]}
+  f.assays {[Factory.build(:assay, policy: Factory(:public_policy))]}
   f.after_create do |ft|
     ft.content_blob = Factory.create(:min_content_blob, content_type: 'application/pdf', asset: ft, asset_version: ft.version)
     ft.annotate_with(['FileTemplate-tag1', 'FileTemplate-tag2', 'FileTemplate-tag3', 'FileTemplate-tag4', 'FileTemplate-tag5'], 'tag', ft.contributor)

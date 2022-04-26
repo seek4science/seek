@@ -49,7 +49,6 @@ Factory.define(:max_publication, class: Publication) do |f|
   f.booktitle 'Proceedings of the 3rd bwHPC-Symposium: Heidelberg 2016'
   f.publisher 'Heidelberg University Library, heiBOOKS'
   f.publication_type_id  Factory(:journal).id
-  f.projects { [Factory(:max_project)] }
   f.events {[Factory.build(:event, policy: Factory(:public_policy))]}
   f.workflows {[Factory.build(:workflow, policy: Factory(:public_policy))]}
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}

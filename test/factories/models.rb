@@ -27,9 +27,8 @@ Factory.define(:max_model, class: Model) do |f|
   f.with_project_contributor
   f.title 'A Maximal Model'
   f.description 'Hidden Markov Model'
-  f.projects { [Factory(:max_project)] }
   f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
-  f.assays {[Factory.build(:max_assay, policy: Factory(:public_policy))]}
+  f.assays {[Factory.build(:assay, policy: Factory(:public_policy))]}
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
   f.organism {Factory.create(:min_organism)}
   f.model_type { ModelType.find_or_initialize_by(title: 'Ordinary differential equations (ODE)') }
