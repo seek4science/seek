@@ -92,7 +92,7 @@ class ContributedResourceSerializer < PCSSerializer
   end
 
   def edam_annotations(property)
-    terms = object.annotations_with_attribute(property, true).collect(&:value)
+    terms = object.annotations_with_attribute(property, true).collect(&:value).sort_by(&:label)
     terms.collect do |term|
       {
         label: term.label,
