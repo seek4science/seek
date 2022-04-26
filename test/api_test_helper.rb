@@ -177,14 +177,14 @@ module ApiTestHelper
   end
 
   def load_get_template(erb_file, res) # `res` parameter is used via binding, despite appearing unused.
-    template_file = File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'templates', erb_file)
+    template_file = File.join(Rails.root, 'test', 'fixtures', 'json', 'responses', erb_file)
     template = ERB.new(File.read(template_file))
     b = binding
     JSON.parse(template.result(b))
   end
 
   def load_template(erb_file, hash = nil)
-    template_file = File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'templates', erb_file)
+    template_file = File.join(Rails.root, 'test', 'fixtures', 'json', 'requests', erb_file)
     template = ERB.new(File.read(template_file))
     b = binding
     hash ||= {}

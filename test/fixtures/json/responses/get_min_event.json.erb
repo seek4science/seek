@@ -1,0 +1,60 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "events",
+    "attributes": {
+      "policy": {
+        "access": "no_access",
+        "permissions": []
+      },
+      "title": "A Minimal Event",
+      "description": null,
+      "url": null,
+      "address": null,
+      "city": null,
+      "country": null,
+      "start_date": "2017-01-01T00:01:00.000Z",
+      "end_date": null
+    },
+    "relationships": {
+      "submitter": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= res.project_ids.first %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "data_files": {
+        "data": []
+      },
+      "publications": {
+        "data": []
+      },
+      "presentations": {
+        "data": []
+      }
+    },
+    "links": {
+      "self": "/events/<%= res.id %>"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "uuid": "<%= res.uuid %>",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.3"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

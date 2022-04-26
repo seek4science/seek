@@ -1,0 +1,75 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "events",
+    "attributes": {
+      "policy": {
+        "access": "no_access",
+        "permissions": []
+      },
+      "title": "A Maximal Event",
+      "description": "All you ever wanted to know about headaches",
+      "url": "http://www.headache-center.org",
+      "address": "Sofienstr 2",
+      "city": "Heidelberg",
+      "country": "Germany",
+      "start_date": "2017-01-01T00:20:00.000Z",
+      "end_date": "2017-01-01T00:22:00.000Z"
+    },
+    "relationships": {
+      "submitter": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= res.project_ids.first %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "data_files": {
+        "data": [
+          {
+            "id": "<%= res.data_file_ids.first %>",
+            "type": "data_files"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "<%= res.publication_ids.first %>",
+            "type": "publications"
+          }
+        ]
+      },
+      "presentations": {
+        "data": [
+          {
+            "id": "<%= res.presentation_ids.first %>",
+            "type": "presentations"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/events/<%= res.id %>"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "uuid": "<%= res.uuid %>",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.3"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

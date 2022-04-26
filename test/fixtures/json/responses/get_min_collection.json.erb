@@ -1,0 +1,69 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "collections",
+    "attributes": {
+      "title": "A Minimal Collection",
+      "description": null,
+      "license": null,
+      "tags": [],
+      "created_at": "<%= res.created_at.as_json %>",
+      "updated_at": "<%= res.updated_at.as_json %>",
+      "other_creators": null,
+      "creators": [],
+      "discussion_links": []
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= res.project_ids.first %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+        ]
+      },
+      "items": {
+        "data": [
+        ]
+      }
+    },
+    "links": {
+      "self": "/collections/<%= res.id %>",
+      "items": "/collections/<%= res.id %>/items"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "api_version": "0.3",
+      "uuid": "<%= res.uuid %>",
+      "base_url": "http://localhost:3000"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}
