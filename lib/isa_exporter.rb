@@ -430,7 +430,7 @@ module IsaExporter
             sample_type = sample.linking_samples.first&.sample_type
             return nil if !sample_type
             protocol = detect_protocol(sample_type)
-            return sample_type && protocol ? { "@id": "#process/#{detect_protocol(sample_type).title}" } : nil
+            return sample_type && protocol ? { "@id": "#process/#{detect_protocol(sample_type).title}/#{sample.id}" } : nil
         end
 
         def previous_process(sample)
@@ -438,7 +438,7 @@ module IsaExporter
             return nil if !sample_type
             protocol = detect_protocol(sample_type)
             # if there's no protocol, it means the previous sample type is source
-            return sample_type && protocol ?  { "@id": "#process/#{protocol.title}" } : nil
+            return sample_type && protocol ?  { "@id": "#process/#{protocol.title}/#{sample.id}" } : nil
         end
 
         def process_sequence_output(sample)
