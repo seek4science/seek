@@ -30,10 +30,6 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
     @to_patch = load_template("patch_min_#{@clz}.json.erb", { id: workflow.id })
   end
 
-  def test_create
-    super
-  end
-
   test 'can add content to API-created workflow' do
     wf = Factory(:api_cwl_workflow, contributor: @current_person)
 
