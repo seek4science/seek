@@ -20,6 +20,7 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
     @presentation = Factory(:presentation, projects: [@project], contributor: @current_person)
     @data_file = Factory(:data_file, projects: [@project], contributor: @current_person)
     @document = Factory(:document, projects: [@project], contributor: @current_person)
+    @sop = Factory(:sop, projects: [@project], contributor: @current_person)
 
     template_file = File.join(ApiTestHelper.template_dir, 'post_max_workflow.json.erb')
     template = ERB.new(File.read(template_file))
