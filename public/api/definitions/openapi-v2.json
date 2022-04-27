@@ -7968,6 +7968,9 @@
                                 },
                                 "publications": {
                                     "$ref": "#/definitions/publicationReferencesList"
+                                },
+                                "workflows": {
+                                    "$ref": "#/definitions/workflowReferencesList"
                                 }
                             },
                             "required": [
@@ -8063,6 +8066,9 @@
                                 },
                                 "assays": {
                                     "$ref": "#/definitions/assayReferencesList"
+                                },
+                                "workflows": {
+                                    "$ref": "#/definitions/workflowReferencesList"
                                 }
                             },
                             "required": [
@@ -8137,6 +8143,9 @@
                                 },
                                 "assays": {
                                     "$ref": "#/definitions/assayReferencesList"
+                                },
+                                "workflows": {
+                                    "$ref": "#/definitions/workflowReferencesList"
                                 }
                             },
                             "additionalProperties": false
@@ -9524,6 +9533,9 @@
                                 },
                                 "events": {
                                     "$ref": "#/definitions/eventReferencesList"
+                                },
+                                "workflows": {
+                                    "$ref": "#/definitions/workflowReferencesList"
                                 }
                             },
                             "required": [
@@ -9623,6 +9635,9 @@
                                 },
                                 "events": {
                                     "$ref": "#/definitions/eventReferencesList"
+                                },
+                                "workflows": {
+                                    "$ref": "#/definitions/workflowReferencesList"
                                 }
                             },
                             "required": [
@@ -9700,6 +9715,9 @@
                                 },
                                 "events": {
                                     "$ref": "#/definitions/eventReferencesList"
+                                },
+                                "workflows": {
+                                    "$ref": "#/definitions/workflowReferencesList"
                                 }
                             },
                             "additionalProperties": false

@@ -82,6 +82,9 @@
             },
             "events": {
                 "data": []
+            },
+            "workflows": {
+                "data": []
             }
         },
         "links": {

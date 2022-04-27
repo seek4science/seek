@@ -12,6 +12,7 @@ class DocumentCUDTest < ActionDispatch::IntegrationTest
     investigation = Factory(:investigation, projects: [@project], contributor: @current_person)
     study = Factory(:study, investigation: investigation, contributor: @current_person)
     @assay = Factory(:assay, study: study, contributor: @current_person)
+    @workflow = Factory(:workflow, projects: [@project], contributor: @current_person)
     @creator = Factory(:person)
 
     template_file = File.join(ApiTestHelper.template_dir, 'post_max_document.json.erb')
