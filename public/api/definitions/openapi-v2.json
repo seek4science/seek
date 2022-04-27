@@ -7739,7 +7739,8 @@
                                 "studies",
                                 "assays",
                                 "publications",
-                                "events"
+                                "events",
+                                "workflows"
                             ],
                             "additionalProperties": false
                         },
@@ -7990,7 +7991,8 @@
                                 "investigations",
                                 "studies",
                                 "assays",
-                                "publications"
+                                "publications",
+                                "workflows"
                             ],
                             "additionalProperties": false
                         },
@@ -9556,7 +9558,8 @@
                                 "studies",
                                 "assays",
                                 "publications",
-                                "events"
+                                "events",
+                                "workflows"
                             ],
                             "additionalProperties": false
                         },
@@ -10366,7 +10369,8 @@
                                 "models",
                                 "publications",
                                 "presentations",
-                                "events"
+                                "events",
+                                "workflows"
                             ],
                             "additionalProperties": false
                         },
@@ -11081,7 +11085,10 @@
                                 "studies",
                                 "assays",
                                 "publications",
-                                "sops"
+                                "sops",
+                                "presentations",
+                                "data_files",
+                                "documents"
                             ],
                             "additionalProperties": false
                         },
