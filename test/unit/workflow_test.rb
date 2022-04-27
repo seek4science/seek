@@ -343,8 +343,8 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'tags and edam in json api' do
-    Factory(:edam_topics_controlled_vocab)
-    Factory(:edam_operations_controlled_vocab)
+    Factory(:edam_topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
+    Factory(:edam_operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_operations_controlled_vocab
 
     user = Factory(:user)
 

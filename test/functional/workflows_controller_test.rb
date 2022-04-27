@@ -927,8 +927,8 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should update workflow edam annotations ' do
-    Factory(:edam_topics_controlled_vocab)
-    Factory(:edam_operations_controlled_vocab)
+    Factory(:edam_topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
+    Factory(:edam_operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_operations_controlled_vocab
 
     user = Factory(:user)
     workflow = Factory(:cwl_workflow, contributor: user.person)
@@ -945,8 +945,8 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'show edam annotations if set' do
-    Factory(:edam_topics_controlled_vocab)
-    Factory(:edam_operations_controlled_vocab)
+    Factory(:edam_topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
+    Factory(:edam_operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_operations_controlled_vocab
 
     user = Factory(:user)
     workflow = Factory(:cwl_workflow, contributor: user.person)
