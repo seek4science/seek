@@ -10442,6 +10442,9 @@
                                 },
                                 "publications": {
                                     "$ref": "#/definitions/publicationReferencesList"
+                                },
+                                "workflows": {
+                                    "$ref": "#/definitions/workflowReferencesList"
                                 }
                             },
                             "required": [
@@ -10452,7 +10455,8 @@
                                 "investigations",
                                 "studies",
                                 "assays",
-                                "publications"
+                                "publications",
+                                "workflows"
                             ],
                             "additionalProperties": false
                         },
@@ -10537,6 +10541,9 @@
                                 },
                                 "assays": {
                                     "$ref": "#/definitions/assayReferencesList"
+                                },
+                                "workflows": {
+                                    "$ref": "#/definitions/workflowReferencesList"
                                 }
                             },
                             "required": [
@@ -10611,6 +10618,9 @@
                                 },
                                 "assays": {
                                     "$ref": "#/definitions/assayReferencesList"
+                                },
+                                "workflows": {
+                                    "$ref": "#/definitions/workflowReferencesList"
                                 }
                             },
                             "additionalProperties": false
