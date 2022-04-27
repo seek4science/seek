@@ -172,6 +172,9 @@
             },
             "data_files": {
                 "data": []
+            },
+            "documents": {
+                "data": []
             }
         },
         "links": {

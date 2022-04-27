@@ -24,6 +24,7 @@ class WorkflowSerializer < ContributedResourceSerializer
   has_many :sops
   has_many :presentations
   has_many :data_files
+  has_many :documents
 
   attribute :internals
 
