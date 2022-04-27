@@ -114,19 +114,40 @@
                 "data": []
             },
             "publications": {
-                "data": []
+                "data": [
+                    {
+                        "id": "22",
+                        "type": "publications"
+                    }
+                ]
             },
             "sops": {
-                "data": []
+                "data": [
+                    {
+                        "id": "73",
+                        "type": "sops"
+                    }
+                ]
             },
             "presentations": {
-                "data": []
+                "data": [
+                    {
+                        "id": "19",
+                        "type": "presentations"
+                    }
+                ]
             },
             "data_files": {
-                "data": []
+                "data": [{
+                    "id": "95",
+                    "type": "data_files"
+                }]
             },
             "documents": {
-                "data": []
+                "data": [{
+                    "id": "12",
+                    "type": "documents"
+                }]
             }
         },
         "links": {

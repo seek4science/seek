@@ -112,6 +112,14 @@
             },
             "publications": {
                 "data": []
+            },
+            "workflows": {
+                "data": [
+                    {
+                        "id": "12",
+                        "type": "workflows"
+                    }
+                ]
             }
         },
         "links": {

@@ -114,7 +114,12 @@
                 "data": []
             },
             "workflows": {
-                "data": []
+                "data": [
+                    {
+                        "id": "12",
+                        "type": "workflows"
+                    }
+                ]
             }
         },
         "links": {
