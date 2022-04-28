@@ -11,6 +11,7 @@ class InvestigationApiTest < ActionDispatch::IntegrationTest
 
     institution = Factory(:institution)
     @projects.each { |p| current_person.add_to_project_and_institution(p, institution) }
+    @publication = Factory(:publication)
 
     @investigation = Factory(:investigation, contributor: current_person, policy: Factory(:public_policy))
   end
