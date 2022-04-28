@@ -28,8 +28,6 @@ class Workflow < ApplicationRecord
   has_many :data_files, ->{ distinct }, through: :workflow_data_files
 
   accepts_nested_attributes_for :workflow_data_files
-  # a little bit of ducktyping due to differences in interlinking but only one way to transform parameters. relates to https://github.com/seek4science/seek/projects/14
-  alias data_files_attributes= workflow_data_files_attributes=
 
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi', 'test_status']) do
     after_commit :submit_to_life_monitor, on: [:create, :update]
