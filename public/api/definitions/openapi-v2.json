@@ -9350,7 +9350,7 @@
                             "$ref": "#/definitions/presentationType"
                         },
                         "attributes": {
-                            "$ref": "#/definitions/presentationAttributes"
+                            "$ref": "#/definitions/contributedTypeAttributes"
                         },
                         "relationships": {
                             "type": "object",
