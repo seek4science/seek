@@ -1772,7 +1772,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'input#managed_programme', count:0
     assert_select 'select#programme_id' do
-      assert_select 'option',count:2      
+      assert_select 'option',count:2
       assert_select 'option',value:managed_prog.id,text:managed_prog.title
       assert_select 'option',value:admin_prog.id,text:admin_prog.title
       assert_select 'option',value:person_prog.id,text:person_prog.title, count:0
@@ -1894,7 +1894,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal 2, programme.programme_administrators.count
 
     institution = Factory(:institution)
-    
+
     refute programme.programme_administrators.select(&:is_admin?).any?
     login_as(person)
     with_config_value(:managed_programme_id, programme.id) do
@@ -2056,7 +2056,7 @@ class ProjectsControllerTest < ActionController::TestCase
     created_inst = Factory(:institution,title:'my institution')
     get :administer_join_request, params:{id:project.id,message_log_id:log.id}
     assert_response :success
-    
+
     assert_select 'input#institution_title', count: 0
     assert_select 'input#institution_id', value: created_inst.id, count: 1
   end
@@ -2147,6 +2147,7 @@ class ProjectsControllerTest < ActionController::TestCase
                                    country:'DE'
                                   })
     log = ProjectMembershipMessageLog.log_request(sender:sender, project:project, institution:institution, comments:'some comments')
+    login_as(person)
 
     params = {
         message_log_id: log.id,
@@ -2189,6 +2190,7 @@ class ProjectsControllerTest < ActionController::TestCase
                                       country:'DE'
                                   })
     log = ProjectMembershipMessageLog.log_request(sender:sender, project:project, institution:institution, comments:'some comments')
+    login_as(person)
 
     params = {
         message_log_id: log.id,
@@ -2221,11 +2223,12 @@ class ProjectsControllerTest < ActionController::TestCase
     institution = Factory(:institution)
     sender = Factory(:person)
     log = ProjectMembershipMessageLog.log_request(sender:sender, project:project, institution:institution, comments:'some comments')
+    login_as(person)
 
     params = {
         message_log_id: log.id,
         reject_details: 'bad request',
-        institution:{id:institution.id},
+        institution: { id:institution.id },
         id:project.id
     }
 
@@ -2248,6 +2251,70 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal 'bad request',log.response
   end
 
+  test 'respond join request deleted' do
+    person = Factory(:project_administrator)
+    project = person.projects.first
+    institution = Factory(:institution)
+    sender = Factory(:person)
+    log = ProjectMembershipMessageLog.log_request(sender: sender, project: project, institution: institution, comments: 'some comments')
+    login_as(person)
+
+    params = {
+      message_log_id: log.id,
+      institution: { id: institution.id },
+      id: project.id,
+      delete_request: '1'
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Institution.count') do
+        assert_no_difference('GroupMembership.count') do
+          assert_difference('ProjectMembershipMessageLog.count', -1) do
+            post :respond_join_request, params:params
+          end
+        end
+      end
+    end
+
+    assert_redirected_to(project_path(project))
+    refute_nil flash[:notice]
+    project.reload
+    refute_includes project.people, sender
+    refute_includes project.institutions, institution
+  end
+
+  test 'respond join request cannot delete without rights' do
+    person = Factory(:person)
+    project = Factory(:project)
+    institution = Factory(:institution)
+    sender = Factory(:person)
+    log = ProjectMembershipMessageLog.log_request(sender: sender, project: project, institution: institution, comments: 'some comments')
+    login_as(person)
+
+    params = {
+      message_log_id: log.id,
+      institution: {id: institution.id },
+      id: project.id,
+      delete_request: '1'
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Institution.count') do
+        assert_no_difference('GroupMembership.count') do
+          assert_no_difference('ProjectMembershipMessageLog.count') do
+            post :respond_join_request, params:params
+          end
+        end
+      end
+    end
+
+    assert_redirected_to :root
+    refute_nil flash[:error]
+    project.reload
+    refute_includes project.people, sender
+    refute_includes project.institutions, institution
+  end
+
   test 'administer create request project with new programme and institution' do
     person = Factory(:admin)
     login_as(person)
@@ -2260,7 +2327,7 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   test 'administer create request project with institution already created' do
-    # when a new institution when requested, but it has then been created before the request is handled 
+    # when a new institution when requested, but it has then been created before the request is handled
     person = Factory(:admin)
     login_as(person)
     project = Project.new(title:'new project')
@@ -2363,7 +2430,7 @@ class ProjectsControllerTest < ActionController::TestCase
             assert_difference('GroupMembership.count') do
               assert_difference('WorkGroup.count') do
                 post :respond_create_project_request, params:params
-              end              
+              end
             end
           end
         end
@@ -2519,7 +2586,7 @@ class ProjectsControllerTest < ActionController::TestCase
             assert_no_difference('GroupMembership.count') do
               assert_no_difference('WorkGroup.count') do
                 post :respond_create_project_request, params:params
-              end              
+              end
             end
           end
         end
@@ -2675,6 +2742,91 @@ class ProjectsControllerTest < ActionController::TestCase
 
     assert_redirected_to :root
     assert_equal "Project creation cancelled",flash[:notice]
+  end
+
+  test 'respond create project request - delete' do
+    person = Factory(:programme_administrator)
+    programme = person.programmes.first
+    institution = Factory(:institution)
+    login_as(person)
+    project = Project.new(title: 'new project', web_page: 'my new project')
+    requester = Factory(:person)
+    log = ProjectCreationMessageLog.log_request(sender: requester, programme: programme, project: project, institution: institution)
+    refute log.sent_by_self?
+    params = {
+      message_log_id:log.id,
+      project:{
+        title:'new project',
+        web_page:'http://proj.org'
+      },
+      programme:{
+        id:programme.id
+      },
+      institution:{
+        id:institution.id
+      },
+      delete_request: '1'
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('GroupMembership.count') do
+              assert_difference('ProjectCreationMessageLog.count',-1) do
+                post :respond_create_project_request, params:params
+              end
+            end
+          end
+        end
+      end
+    end
+
+    assert_redirected_to :root
+    assert_equal "Project creation cancelled",flash[:notice]
+  end
+
+  test 'respond create project request - cannot delete without rights' do
+    person = Factory(:person)
+    programme = Factory(:programme)
+    institution = Factory(:institution)
+    login_as(person)
+    project = Project.new(title: 'new project', web_page: 'my new project')
+    requester = Factory(:person)
+    log = ProjectCreationMessageLog.log_request(sender: requester, programme: programme, project: project, institution: institution)
+    refute log.sent_by_self?
+    refute programme.can_manage?
+    params = {
+      message_log_id:log.id,
+      project:{
+        title:'new project',
+        web_page:'http://proj.org'
+      },
+      programme:{
+        id:programme.id
+      },
+      institution:{
+        id:institution.id
+      },
+      delete_request: '1'
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('GroupMembership.count') do
+              assert_no_difference('ProjectCreationMessageLog.count') do
+                post :respond_create_project_request, params:params
+              end
+            end
+          end
+        end
+      end
+    end
+
+    assert_redirected_to :root
+    refute_nil flash[:error]
   end
 
   test 'respond create project request - existing programme need prog admin rights' do
@@ -3148,13 +3300,13 @@ class ProjectsControllerTest < ActionController::TestCase
     assert investigation.title == "Select host and product"
     assert investigation.studies.size == 4
   end
-    
+
   def check_investigation_1(investigation)
     assert investigation.title == "Design"
     assert investigation.studies.size == 1
     check_study_1_0(investigation.studies[0])
   end
-    
+
   def check_study_1_0(study)
     assert study.title == "Receive input from select host and products step"
     assert study.assays.size == 2
@@ -3167,5 +3319,5 @@ class ProjectsControllerTest < ActionController::TestCase
 
   def valid_project
     { title: "a title" }
-  end  
+  end
 end

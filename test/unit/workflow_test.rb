@@ -544,4 +544,22 @@ class WorkflowTest < ActiveSupport::TestCase
       assert_equal 'new title', workflow.git_version.reload.title
     end
   end
+
+  test 'tags and edam in json api' do
+    Factory(:edam_topics_controlled_vocab)
+    Factory(:edam_operations_controlled_vocab)
+
+    user = Factory(:user)
+
+    workflow = User.with_current_user(user) do
+      Factory(:max_workflow, contributor: user.person)
+    end
+
+    json = WorkflowSerializer.new(workflow).as_json
+
+    assert_equal ['blue','green','red'], json[:tags]
+
+    assert_equal [{label:'Clustering', identifier: 'http://edamontology.org/operation_3432'}], json[:edam_operations]
+    assert_equal [{label:'Chemistry', identifier: 'http://edamontology.org/topic_3314'}], json[:edam_topics]
+  end
 end
