@@ -349,16 +349,19 @@ module IsaExporter
         end
 
         def convert_data_files(sample_types)
-		  st = sample_types.detect {|s|  detect_data_file(s) }
-		  return [] if !st
+			st = sample_types.detect { |s| detect_data_file(s) }
+			return [] unless st
+
             with_tag_data_file = detect_data_file(st)
-            return [] if !with_tag_data_file
+			with_tag_data_file_comment = select_data_file_comment(st)
+			return [] unless with_tag_data_file
+
             st.samples.map do |s|
                 {
-                    "@id": "#data/#{s.id}",
+					'@id': "#data/#{s.id}",
                     name: s.get_attribute_value(with_tag_data_file),
                     type: with_tag_data_file.title,
-                    comments: []
+					comments: with_tag_data_file_comment.map { |d| { name: d.title, value: s.get_attribute_value(d) } }
                 }
             end
         end
@@ -413,7 +416,8 @@ module IsaExporter
         end
 
         def detect_data_file(sample_type)
-            sample_type.sample_attributes.detect{|sa| sa.isa_tag&.isa_data_file?}
+		def select_data_file_comment(sample_type)
+			sample_type.sample_attributes.select { |sa| sa.isa_tag&.isa_data_file_comment? }
         end
 
         def detect_other_material(sample_type)
