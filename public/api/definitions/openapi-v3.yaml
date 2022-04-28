@@ -4054,6 +4054,24 @@ components:
       minItems: 0
       items:
         $ref: "#/components/schemas/assetsCreator"
+    assetLink:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        label:
+          $ref: "#/components/schemas/nonEmptyString"
+        url:
+          $ref: "#/components/schemas/uriString"
+      required:
+        - id
+        - label
+        - url
+    assetLinkList:
+      type: array
+      minItems: 0
+      items:
+        $ref: "#/components/schemas/assetLink"
     snapshotSkeleton:
       type: object
       properties:
@@ -4134,7 +4152,25 @@ components:
         - version
       additionalProperties: false
     indexLinks:
-      $ref: "#/components/schemas/linksType"
+      type: object
+      properties:
+        self:
+          $ref: "#/components/schemas/uriString"
+        first:
+          $ref: "#/components/schemas/nullableUriString"
+        prev:
+          $ref: "#/components/schemas/nullableUriString"
+        next:
+          $ref: "#/components/schemas/nullableUriString"
+        last:
+          $ref: "#/components/schemas/nullableUriString"
+      required:
+        - self
+        - first
+        - prev
+        - next
+        - last
+      additionalProperties: false
     linksType:
       type: object
       properties:
@@ -4292,6 +4328,8 @@ components:
           $ref: "#/components/schemas/nullableOtherCreatorsString"
         creators:
           $ref: "#/components/schemas/assetsCreatorsList"
+        discussion_links:
+          $ref: "#/components/schemas/assetLinkList"
       required:
         - title
         - license
@@ -4319,6 +4357,8 @@ components:
           $ref: "#/components/schemas/nullableOtherCreatorsString"
         creators:
           $ref: "#/components/schemas/assetsCreatorsList"
+        discussion_links:
+          $ref: "#/components/schemas/assetLinkList"
       required:
         - title
         - license
@@ -4368,6 +4408,8 @@ components:
           $ref: "#/components/schemas/nullableOtherCreatorsString"
         creators:
           $ref: "#/components/schemas/assetsCreatorsList"
+        discussion_links:
+          $ref: "#/components/schemas/assetLinkList"
       required:
         - title
         - license
@@ -4437,6 +4479,8 @@ components:
           required:
             - label
             - uri
+        discussion_links:
+          $ref: "#/components/schemas/assetLinkList"
       required:
         - title
         - description
@@ -4656,6 +4700,8 @@ components:
           $ref: "#/components/schemas/nullableNonEmptyString"
         funding_codes:
           $ref: "#/components/schemas/tagsType"
+        discussion_links:
+          $ref: "#/components/schemas/assetLinkList"
       required:
         - avatar
         - title
@@ -5514,6 +5560,8 @@ components:
                   additionalProperties: false
                 policy:
                   $ref: "#/components/schemas/policy"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkList"
               required:
                 - title
                 - assay_class
@@ -6445,6 +6493,8 @@ components:
                   $ref: "#/components/schemas/nullableNonEmptyString"
                 web_page:
                   $ref: "#/components/schemas/nullableUriString"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkList"
               required:
                 - title
                 - country
@@ -6574,6 +6624,8 @@ components:
                   $ref: "#/components/schemas/assetsCreatorsList"
                 policy:
                   $ref: "#/components/schemas/policy"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkList"
               required:
                 - title
               additionalProperties: false
@@ -7495,6 +7547,8 @@ components:
                   $ref: "#/components/schemas/policy"
                 default_license:
                   $ref: "#/components/schemas/nullableLicense"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkList"
               required:
                 - title
                 - description
@@ -7953,6 +8007,8 @@ components:
                   $ref: "#/components/schemas/assetsCreatorsList"
                 policy:
                   $ref: "#/components/schemas/policy"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkList"
               required:
                 - title
               additionalProperties: false
@@ -8186,6 +8242,8 @@ components:
                       type: array
                       items:
                         $ref: "#/components/schemas/workflowOutput"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkList"
               required:
                 - title
                 - workflow_class
