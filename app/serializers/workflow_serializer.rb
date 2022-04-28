@@ -7,6 +7,14 @@ class WorkflowSerializer < ContributedResourceSerializer
     }
   end
 
+  attribute :edam_operations do
+    edam_annotations('edam_operations')
+  end
+  attribute :edam_topics do
+    edam_annotations('edam_topics')
+  end
+
+
   has_many :people
   has_many :projects
   has_many :investigations
