@@ -35,7 +35,7 @@ module WriteApiTestSuite
     get member_url(res)
 
     assert_response :not_found
-    validate_json response.body, '#/definitions/errors'
+    validate_json response.body, '#/components/schemas/errors'
   end
 
   test 'unauthorized user cannot update resource' do
@@ -48,7 +48,7 @@ module WriteApiTestSuite
     patch member_url(res), params: body, as: :json
 
     assert_response :forbidden
-    validate_json response.body, '#/definitions/errors'
+    validate_json response.body, '#/components/schemas/errors'
   end
 
   test 'unauthorized user cannot delete resource' do
@@ -58,7 +58,7 @@ module WriteApiTestSuite
       delete member_url(res)
 
       assert_response :forbidden
-      validate_json response.body, '#/definitions/errors'
+      validate_json response.body, '#/components/schemas/errors'
     end
   end
 
@@ -70,7 +70,7 @@ module WriteApiTestSuite
       post collection_url, params: body, as: :json
 
       assert_response :unprocessable_entity
-      validate_json response.body, '#/definitions/errors'
+      validate_json response.body, '#/components/schemas/errors'
       assert_match 'A POST request is not allowed to specify an id', response.body
     end
   end
@@ -82,7 +82,7 @@ module WriteApiTestSuite
     assert_no_difference(-> { model.count }) do
       post collection_url, params: body, as: :json
       assert_response :unprocessable_entity
-      validate_json response.body, '#/definitions/errors'
+      validate_json response.body, '#/components/schemas/errors'
       assert_match "The specified data:type does not match the URL's object (#{body['data']['type']} vs. #{plural_name})", response.body
     end
   end
@@ -94,7 +94,7 @@ module WriteApiTestSuite
     assert_no_difference(-> { model.count }) do
       post collection_url, params: body, as: :json
       assert_response :unprocessable_entity
-      validate_json response.body, '#/definitions/errors'
+      validate_json response.body, '#/components/schemas/errors'
       assert_match "A POST/PUT request must specify a data:type", response.body
     end
   end
@@ -105,7 +105,7 @@ module WriteApiTestSuite
     assert_no_difference(-> { model.count }) do
       put member_url(resource), params: body, as: :json
       assert_response :unprocessable_entity
-      validate_json response.body, '#/definitions/errors'
+      validate_json response.body, '#/components/schemas/errors'
       assert_match "id specified by the PUT request does not match object-id in the JSON input", response.body
     end
   end
@@ -117,7 +117,7 @@ module WriteApiTestSuite
     assert_no_difference(-> { model.count }) do
       put member_url(resource), params: body, as: :json
       assert_response :unprocessable_entity
-      validate_json response.body, '#/definitions/errors'
+      validate_json response.body, '#/components/schemas/errors'
       assert_match "The specified data:type does not match the URL's object (#{body['data']['type']} vs. #{plural_name})", response.body
     end
   end
@@ -129,7 +129,7 @@ module WriteApiTestSuite
     assert_no_difference(-> { model.count }) do
       put member_url(resource), params: body, as: :json
       assert_response :unprocessable_entity
-      validate_json response.body, '#/definitions/errors'
+      validate_json response.body, '#/components/schemas/errors'
       assert_match "A POST/PUT request must specify a data:type", response.body
     end
   end

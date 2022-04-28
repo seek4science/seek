@@ -49,7 +49,7 @@ module ReadApiTestSuite
       assert_response :not_implemented
     else
       perform_jsonapi_checks
-      validate_json response.body, "#/definitions/#{plural_name.camelize(:lower)}Response"
+      validate_json response.body, "#/components/schemas/#{plural_name.camelize(:lower)}Response"
     end
   end
 
@@ -60,12 +60,12 @@ module ReadApiTestSuite
     user_login(Factory(:person))
     get member_url(res), as: :json
     assert_response :forbidden
-    validate_json response.body, '#/definitions/errors'
+    validate_json response.body, '#/components/schemas/errors'
   end
 
   test 'getting resource with non-existent ID should throw error' do
     get member_url(MissingItem.new(model)), as: :json
     assert_response :not_found
-    validate_json response.body, '#/definitions/errors'
+    validate_json response.body, '#/components/schemas/errors'
   end
 end

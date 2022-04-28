@@ -52,7 +52,7 @@ class SopApiTest < ActionDispatch::IntegrationTest
 
     parsed_policy = JSON.parse(@response.body)['data']['attributes']['policy']
 
-    validate_json parsed_policy.to_json, "#/definitions/policy"
+    validate_json parsed_policy.to_json, "#/components/schemas/policy"
 
     to_patch = {
       data: {

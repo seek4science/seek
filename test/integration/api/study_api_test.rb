@@ -19,7 +19,7 @@ class StudyApiTest < ActionDispatch::IntegrationTest
     assert_no_difference('Study.count') do
       delete "/#{plural_name}/#{study.id}.json"
       assert_response :forbidden
-      validate_json response.body, '#/definitions/errors'
+      validate_json response.body, '#/components/schemas/errors'
     end
   end
 

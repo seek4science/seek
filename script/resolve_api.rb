@@ -1,9 +1,10 @@
 require 'open-uri'
 require 'json'
+require 'yaml'
 
 ROOT = File.join(File.dirname(__FILE__), '../public/api/definitions')
-INPUT = 'openapi-v2.json'
-OUTPUT = 'openapi-v2-resolved.json'
+INPUT = 'openapi-v3.yaml'
+OUTPUT = 'openapi-v3-resolved'
 ALLOW_INTERNAL_REFS = true # If true, don't replace internal references i.e. "#/definitions/something"
 
 # Resolves and replaces $refs
@@ -47,19 +48,22 @@ def dig(hash, path)
 end
 
 # Store block at key, and also parse if it is JSON and store resulting object
-def cache(key, as_json = false)
-  @cache ||= { json: {}, raw: {} }
+def cache(key, as_yaml = false)
+  @cache ||= { yaml: {}, raw: {} }
   if block_given?
     @cache[:raw][key] = yield
-    @cache[:json][key] = JSON.parse(@cache[:raw][key]) if as_json
+    @cache[:yaml][key] = YAML.load(@cache[:raw][key]) if as_yaml
   end
 
-  @cache[as_json ? :json : :raw][key]
+  @cache[as_yaml ? :yaml : :raw][key]
 end
 
 
 puts "Working..."
 d = dereference({ "$ref" => "#{INPUT}\#/" })
 out = File.join(ROOT, OUTPUT)
-File.write(out, JSON.pretty_generate(d))
-puts "Done - Written to: #{out}"
+File.write("#{out}.yaml", d.to_yaml)
+File.write("#{out}.json", JSON.pretty_generate(d))
+puts "Done - Written to:"
+puts "\t #{out}.yaml"
+puts "\t #{out}.json"
