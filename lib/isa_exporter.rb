@@ -527,9 +527,9 @@ module IsaExporter
 			elsif detect_sample(prev_sample_type)
 				'sample'
 			elsif detect_other_material(prev_sample_type)
-				'otherMaterials'
+				'other_material'
 			elsif detect_data_file(prev_sample_type)
-				'dataFile'
+				'data_file'
 			end
 		end
 	end
