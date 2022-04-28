@@ -1,4 +1,4 @@
-openapi: 3.0.0
+openapi: 3.1.0
 info:
   version: "0.3"
   title: JSON API to FAIRDOM SEEK
@@ -4017,15 +4017,15 @@ components:
       type: string
       minLength: 1
     nullableNonEmptyString:
-      nullable: true
-      allOf:
+      anyOf:
+        - type: 'null'
         - $ref: "#/components/schemas/nonEmptyString"
     otherCreatorsString:
       type: string
       minLength: 1
     nullableOtherCreatorsString:
-      nullable: true
-      allOf:
+      anyOf:
+        - type: 'null'
         - $ref: "#/components/schemas/otherCreatorsString"
     nonEmptyStringList:
       type: array
@@ -4074,52 +4074,52 @@ components:
       minLength: 1
       format: uri
     nullableUriString:
-      allOf:
+      anyOf:
+        - type: 'null'
         - $ref: "#/components/schemas/uriString"
-      nullable: true
     nullableInteger:
-      allOf:
+      anyOf:
+        - type: 'null'
         - type: integer
-      nullable: true
     license:
       type: string
       minLength: 1
     nullableLicense:
-      allOf:
+      anyOf:
+        - type: 'null'
         - $ref: "#/components/schemas/license"
-      nullable: true
     md5sumString:
       type: string
       minLength: 32
       maxLength: 32
       pattern: "[0-9a-f]{32}"
     nullableMd5sumString:
-      allOf:
+      anyOf:
+        - type: 'null'
         - $ref: "#/components/schemas/md5sumString"
-      nullable: true
     sha1sumString:
       type: string
       minLength: 5
       maxLength: 40
       pattern: "[0-9a-f]{5,40}"
     nullableSha1sumString:
-      allOf:
+      anyOf:
+        - type: 'null'
         - $ref: "#/components/schemas/sha1sumString"
-      nullable: true
     countryString:
       type: string
     nullableCountryString:
-      allOf:
+      anyOf:
+        - type: 'null'
         - $ref: "#/components/schemas/countryString"
-      nullable: true
     countryCodeString:
       minLength: 2
       maxLength: 2
       type: string
     nullableCountryCodeString:
-      allOf:
+      anyOf:
+        - type: 'null'
         - $ref: "#/components/schemas/countryCodeString"
-      nullable: true
     versionNumber:
       type: string
       minLength: 1
