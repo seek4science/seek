@@ -20,17 +20,11 @@ class ContentBlobApiTest < ActionDispatch::IntegrationTest
   private
 
   def collection_url
-    "/sops/#{@sop.id}/content_blobs.json"
+    polymorphic_url([@sop, :content_blobs], format: :json)
   end
 
   def member_url(res)
-    if res.is_a?(Numeric)
-      id = res
-      asset = @sop
-    else
-      id = res.id
-      asset = res.asset
-    end
-    "/#{asset.model_name.collection}/#{asset.id}/content_blobs/#{id}.json"
+    asset = res.is_a?(ContentBlob) ? res.asset : @sop
+    polymorphic_url([asset, res], format: :json)
   end
 end

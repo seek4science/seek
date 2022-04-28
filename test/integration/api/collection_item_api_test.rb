@@ -16,17 +16,11 @@ class CollectionItemApiTest < ActionDispatch::IntegrationTest
   private
 
   def collection_url
-    "/collections/#{@collection.id}/items.json"
+    polymorphic_url([@collection, :items], format: :json)
   end
 
   def member_url(res)
-    if res.is_a?(Numeric)
-      id = res
-      collection_id = @collection.id
-    else
-      id = res.id
-      collection_id = res.collection_id
-    end
-    "/collections/#{collection_id}/items/#{id}.json"
+    collection = res.is_a?(CollectionItem) ? res.collection : @collection
+    polymorphic_url(res, collection_id: collection.id, format: :json)
   end
 end

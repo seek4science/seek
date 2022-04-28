@@ -217,11 +217,7 @@ module ApiTestHelper
   end
 
   def member_url(res)
-    if res.is_a?(Numeric)
-      "#{polymorphic_url(model)}/#{res}.json"
-    else
-      polymorphic_url(res, format: :json)
-    end
+    polymorphic_url(res, format: :json)
   end
 
   ##

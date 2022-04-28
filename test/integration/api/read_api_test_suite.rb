@@ -1,4 +1,27 @@
 module ReadApiTestSuite
+  # Class that can be used with polymorphic_url to generate an URL to an item with a non-existent ID
+  class MissingItem
+    def initialize(klass)
+      @klass = klass
+    end
+
+    def model_name
+      @klass.model_name
+    end
+
+    def to_model
+      self
+    end
+
+    def persisted?
+      true
+    end
+
+    def to_param
+      (@klass.maximum(:id) || 0) + 100
+    end
+  end
+
   extend ActiveSupport::Testing::Declarative # Allows `test 'bla' do` definitions
   include ApiTestHelper
 
@@ -41,7 +64,7 @@ module ReadApiTestSuite
   end
 
   test 'getting resource with non-existent ID should throw error' do
-    get member_url(model.maximum(:id) + 100000), as: :json
+    get member_url(MissingItem.new(model)), as: :json
     assert_response :not_found
     validate_json response.body, '#/definitions/errors'
   end
