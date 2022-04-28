@@ -98,7 +98,7 @@ module Seek
           },
 
           data_file_ids: proc { |value|
-            value.map { |i| { data_file_id: i }.with_indifferent_access }
+            value.map { |i| { asset_id: i }.with_indifferent_access }
           },
 
           assay_ids: proc { |value|

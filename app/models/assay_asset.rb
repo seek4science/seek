@@ -1,9 +1,5 @@
 class AssayAsset < ApplicationRecord
   belongs_to :asset, polymorphic: true, inverse_of: :assay_assets
-
-  # a little bit of ducktyping due to differences in interlinking but only one way to transform parameters. relates to https://github.com/seek4science/seek/projects/14
-  alias_attribute :data_file_id, :asset_id
-
   belongs_to :assay, inverse_of: :assay_assets, touch: true
 
   belongs_to :relationship_type
