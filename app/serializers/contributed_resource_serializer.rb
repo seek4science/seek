@@ -55,19 +55,6 @@ class ContributedResourceSerializer < PCSSerializer
             else
               []
             end
-  end
-
-  attribute :content_blobs, if: -> { object.respond_to?(:content_blobs) || object.respond_to?(:content_blob) } do
-    requested_version = get_version
-
-    if requested_version.respond_to?(:content_blobs)
-      blobs = requested_version.content_blobs
-    elsif requested_version.respond_to?(:content_blob)
-      blobs = [requested_version.content_blob].compact
-    else
-      blobs = []
-    end
-
     blobs.map { |cb| convert_content_blob_to_json(cb) }
   end
 
