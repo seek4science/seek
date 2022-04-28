@@ -10,11 +10,13 @@ class InstitutionApiTest < ActionDispatch::IntegrationTest
   end
 
   def populate_extra_attributes(hash)
-    extra_attributes = {}
+    extra_attributes = super
+
     if hash['data']['attributes'].has_key? 'country'
       extra_attributes[:country_code] = CountryCodes.code(hash['data']['attributes']['country'])
     end
-    extra_attributes.with_indifferent_access
+
+    extra_attributes
   end
 
   test 'normal user cannot create institution' do

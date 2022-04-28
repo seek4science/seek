@@ -97,6 +97,8 @@ module ApiTestHelper
     expected['data']['relationships'].merge!(template['data']['relationships'] || {})
     expected['data']['relationships'].merge!(populate_extra_relationships(template))
 
+    expected['data']['attributes'].delete(expected['data']['attributes'].keys.shuffle.first) if rand > 0.5
+
     if DEBUG
       puts "Expected:\n #{expected.inspect}\n"
       puts "Actual:\n #{actual.inspect}"
@@ -106,9 +108,10 @@ module ApiTestHelper
     hash_comparison(expected['data']['relationships'], actual['data']['relationships'])
   end
 
-  # Override me!
-  def populate_extra_attributes(request_hash = {})
+  # Add attributes that weren't in the original POST/PATCH request, but are in the response
+  def populate_extra_attributes(request_hash)
     extra_attributes = HashWithIndifferentAccess.new
+
     creators = request_hash.dig('data', 'relationships', 'creators', 'data') || []
     if creators.any?
       extra_attributes[:creators] = creators.map do |c|
@@ -124,12 +127,14 @@ module ApiTestHelper
         end
       end.compact
     end
+
     extra_attributes
   end
 
   # Add relationships that weren't in the original POST/PATCH request, but are in the response (such as submitter)
-  def populate_extra_relationships(request_hash = {})
+  def populate_extra_relationships(request_hash)
     extra_relationships = HashWithIndifferentAccess.new
+
     existing = request_hash.dig('data', 'id') # Is it an existing resource, or something being created?
     add_contributor = model.method_defined?(:contributor) && !existing
     if add_contributor
@@ -167,7 +172,7 @@ module ApiTestHelper
     post '/session', params: { login: @current_user.login, password: generate_user_password }
   end
 
-  def user_login(person)
+  def user_login(person = Factory(:person))
     @current_user = person.user
     post '/session', params: { login: person.user.login, password: ('0' * User::MIN_PASSWORD_LENGTH) }
   end

@@ -5,7 +5,7 @@ class WorkflowApiTest < ActionDispatch::IntegrationTest
   include WriteApiTestSuite
 
   def setup
-    admin_login
+    user_login
     Factory(:cwl_workflow_class) # Make sure the CWL class is present
     @project = @current_user.person.projects.first
     investigation = Factory(:investigation, projects: [@project], contributor: current_person)

@@ -23,8 +23,6 @@ class ProjectApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'adds members to project by PATCHing entire project' do
-    admin_login
-
     project = Factory(:project)
     new_institution = Factory(:institution)
     new_person = Factory(:person)
@@ -54,8 +52,6 @@ class ProjectApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'adds members to project' do
-    admin_login
-
     project = Factory(:project)
     new_institution = Factory(:institution)
     new_person = Factory(:person)

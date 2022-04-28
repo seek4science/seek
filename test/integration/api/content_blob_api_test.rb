@@ -12,7 +12,7 @@ class ContentBlobApiTest < ActionDispatch::IntegrationTest
   end
 
   def setup
-    admin_login
+    user_login
     @content_blob = Factory(:min_content_blob)
     @sop = @content_blob.asset
   end

@@ -5,7 +5,7 @@ class PresentationApiTest < ActionDispatch::IntegrationTest
   include WriteApiTestSuite
 
   def setup
-    admin_login
+    user_login
     @project = @current_user.person.projects.first
     @creator = Factory(:person)
     @publication = Factory(:publication, projects: [@project])

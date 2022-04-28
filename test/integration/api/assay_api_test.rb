@@ -5,7 +5,7 @@ class AssayApiTest < ActionDispatch::IntegrationTest
   include WriteApiTestSuite
 
   def setup
-    admin_login
+    user_login
 
     @study = Factory(:study, contributor: current_person)
     @study.title = 'Fred'

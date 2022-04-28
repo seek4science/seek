@@ -5,7 +5,7 @@ class SampleTypeApiTest < ActionDispatch::IntegrationTest
   include WriteApiTestSuite
 
   def setup
-    admin_login
+    user_login(Factory(:project_administrator))
     @project = @current_user.person.projects.first
     @sample_type = Factory(:simple_sample_type, project_ids: [@project.id], contributor: current_person)
     @sample_attribute = @sample_type.sample_attributes.first
@@ -108,7 +108,7 @@ class SampleTypeApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'update attribute title and description' do
-    sample_type = Factory(:patient_sample_type)
+    sample_type = Factory(:patient_sample_type, contributor: current_person)
     assert_equal 5, sample_type.sample_attributes.count
 
     attr = sample_type.sample_attributes.where(title: 'full name').first
@@ -143,7 +143,7 @@ class SampleTypeApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'add an attribute' do
-    sample_type = Factory(:patient_sample_type)
+    sample_type = Factory(:patient_sample_type, contributor: current_person)
     assert_equal 5, sample_type.sample_attributes.count
 
     str_attribute_type = Factory(:string_sample_attribute_type)
@@ -183,7 +183,7 @@ class SampleTypeApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'remove an attribute' do
-    sample_type = Factory(:patient_sample_type)
+    sample_type = Factory(:patient_sample_type, contributor: current_person)
     assert_equal 5, sample_type.sample_attributes.count
 
     attr = sample_type.sample_attributes.where(title: 'age').first

@@ -5,7 +5,7 @@ class CollectionApiTest < ActionDispatch::IntegrationTest
   include WriteApiTestSuite
 
   def setup
-    admin_login
+    user_login
     @project = @current_user.person.projects.first
     @document1 = Factory(:public_document, contributor: current_person)
     @document2 = Factory(:public_document, contributor: current_person)

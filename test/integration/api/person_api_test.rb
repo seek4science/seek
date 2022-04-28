@@ -14,7 +14,8 @@ class PersonApiTest < ActionDispatch::IntegrationTest
   end
 
   def populate_extra_attributes(hash)
-    extra_attributes = {}
+    extra_attributes = super
+
     if hash['data']['attributes'].key?('email')
       extra_attributes[:mbox_sha1sum] = Digest::SHA1.hexdigest("mailto:#{Addressable::URI.escape(hash['data']['attributes']['email'])}")
     end
@@ -30,7 +31,7 @@ class PersonApiTest < ActionDispatch::IntegrationTest
                                   hash['data']['attributes']['last_name']].join(' ').strip
     end
 
-    extra_attributes.with_indifferent_access
+    extra_attributes
   end
 
   test 'normal user cannot create person' do

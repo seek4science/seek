@@ -5,14 +5,16 @@ class SampleApiTest < ActionDispatch::IntegrationTest
   include WriteApiTestSuite
 
   def populate_extra_attributes(hash)
-    extra_attributes = {}
+    extra_attributes = super
+
     title = hash.dig('data', 'attributes', 'attribute_map', 'the_title')
     extra_attributes[:title] = title if title
-    extra_attributes.with_indifferent_access
+
+    extra_attributes
   end
 
   def setup
-    admin_login
+    user_login
 
     @sample = Factory(:sample, contributor: current_person, policy: Factory(:public_policy))
 
@@ -28,7 +30,7 @@ class SampleApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'patching a couple of attributes retains others' do
-    admin_login
+    user_login
     sample = Factory(:patient_sample, contributor: current_person, policy: Factory(:public_policy))
     params = {
       "data": {
@@ -56,7 +58,7 @@ class SampleApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'patching a couple of attributes retains others including capitals' do
-    admin_login
+    user_login
     User.current_user = @current_user
     sample = Factory(:max_sample, contributor: current_person, policy: Factory(:public_policy))
     params = {
@@ -85,7 +87,7 @@ class SampleApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'set sample_type and attributes in post' do
-    admin_login
+    user_login
     patient_sample_type = Factory(:patient_sample_type)
     params = {
       "data": {

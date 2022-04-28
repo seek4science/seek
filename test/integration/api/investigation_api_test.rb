@@ -5,7 +5,7 @@ class InvestigationApiTest < ActionDispatch::IntegrationTest
   include WriteApiTestSuite
 
   def setup
-    admin_login
+    user_login
 
     @projects = [Factory(:min_project, title: 'Fred'), Factory(:max_project, title: 'Bert')]
 

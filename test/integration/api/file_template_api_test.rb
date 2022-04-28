@@ -5,7 +5,7 @@ class FileTemplateApiTest < ActionDispatch::IntegrationTest
   include WriteApiTestSuite
 
   def setup
-    admin_login
+    user_login
     @project = @current_user.person.projects.first
     @creator = Factory(:person)
     @file_template = Factory(:file_template, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])

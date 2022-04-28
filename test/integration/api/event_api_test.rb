@@ -4,9 +4,9 @@ class EventApiTest < ActionDispatch::IntegrationTest
   include ReadApiTestSuite
   include WriteApiTestSuite
 
-  def populate_extra_attributes(request_hash = {})
+  def populate_extra_attributes(hash)
     h = super
-    country = request_hash.dig('data', 'attributes', 'country')
+    country = hash.dig('data', 'attributes', 'country')
     if country && country.length == 2
       h[:country] = CountryCodes.country(country)
     end
@@ -14,7 +14,7 @@ class EventApiTest < ActionDispatch::IntegrationTest
   end
 
   def setup
-    admin_login
+    user_login
     @project = @current_user.person.projects.first
     @publication = Factory(:publication, contributor: current_person)
     @presentation = Factory(:presentation, contributor: current_person)

@@ -5,7 +5,7 @@ class ModelApiTest < ActionDispatch::IntegrationTest
   include WriteApiTestSuite
 
   def setup
-    admin_login
+    user_login
     @project = @current_user.person.projects.first
     @organism = Factory(:organism)
     @project.organisms << @organism

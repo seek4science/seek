@@ -4,7 +4,7 @@ class HumanDiseaseApiTest < ActionDispatch::IntegrationTest
   include ReadApiTestSuite
 
   def setup
-    admin_login
+    user_login
     @human_disease = Factory(:human_disease)
   end
 

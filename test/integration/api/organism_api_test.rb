@@ -4,7 +4,7 @@ class OrganismApiTest < ActionDispatch::IntegrationTest
   include ReadApiTestSuite
 
   def setup
-    admin_login
+    user_login
     @organism = Factory(:organism)
   end
 end

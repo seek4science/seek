@@ -5,7 +5,7 @@ class DocumentApiTest < ActionDispatch::IntegrationTest
   include WriteApiTestSuite
 
   def setup
-    admin_login
+    user_login
     @project = @current_user.person.projects.first
     investigation = Factory(:investigation, projects: [@project], contributor: current_person)
     study = Factory(:study, investigation: investigation, contributor: current_person)
