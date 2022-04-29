@@ -262,7 +262,7 @@ module IsaExporter
 				ontology = get_ontology_details(c, value, true)
 				{
 					category: {
-						'@id': "#characteristic_category/#{c.title}"
+						'@id': "#characteristic_category/#{c.title}_#{c.id}"
 					},
 					value: {
 						annotationValue: value,
@@ -287,7 +287,7 @@ module IsaExporter
 			attributes.map do |s|
 				ontology = get_ontology_details(s, s.title, false)
 				{
-					'@id': "#characteristic_category/#{s.title}",
+					'@id': "#characteristic_category/#{s.title}_#{s.id}",
 					characteristicType: {
 						annotationValue: s.title,
 						termAccession: ontology[:termAccession],
