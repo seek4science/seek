@@ -1,137 +1,180 @@
 {
-    "data": {
-        "id": "23",
-        "type": "workflows",
-        "attributes": {
-            "policy": {
-                "access": "download",
-                "permissions": [
-                    {
-                        "resource": {
-                            "id": "12",
-                            "type": "projects"
-                        },
-                        "access": "edit"
-                    }
-                ]
+  "data": {
+    "id": "2",
+    "type": "workflows",
+    "attributes": {
+      "policy": {
+        "access": "download",
+        "permissions": [
+          {
+            "resource": {
+              "id": "2",
+              "type": "projects"
             },
-            "title": "An Example Workflow",
-            "description": "This is the description",
-            "license": "CC-BY-4.0",
-            "latest_version": 1,
-            "tags": [
-                "tag1",
-                "tag2"
-            ],
-            "edam_operations": [
-                {
-                    "label": "Clustering",
-                    "identifier": "http://edamontology.org/operation_3432"
-                },
-                {
-                    "label": "Expression correlation analysis",
-                    "identifier": "http://edamontology.org/operation_3463"
-                }
-            ],
-            "edam_topics": [
-                {
-                    "label": "Chemistry",
-                    "identifier": "http://edamontology.org/topic_3314"
-                }
-            ],
-            "versions": [
-                {
-                    "version": 1,
-                    "revision_comments": null,
-                    "url": "http://localhost:3000/workflows/23?version=1",
-                    "doi": null
-                }
-            ],
-            "version": 1,
-            "revision_comments": null,
-            "doi": null,
-            "created_at": "2020-01-31T14:07:10.000Z",
-            "updated_at": "2020-01-31T14:07:10.000Z",
-            "content_blobs": [
-                {
-                    "original_filename": "workflow.cwl",
-                    "url": null,
-                    "md5sum": null,
-                    "sha1sum": null,
-                    "content_type": "application/x-yaml",
-                    "link": "http://localhost:3000/workflows/23/content_blobs/1466",
-                    "size": null
-                }
-            ],
-            "other_creators": "John Smith, Jane Smith",
-            "workflow_class": {
-                "title": "Common Workflow Language",
-                "key": "CWL",
-                "description": null
-            },
-            "internals": null
-        },
-        "relationships": {
-            "creators": {
-                "data": [
-                    {
-                        "id": "321",
-                        "type": "people"
-                    }
-                ]
-            },
-            "submitter": {
-                "data": [
-                    {
-                        "id": "321",
-                        "type": "people"
-                    }
-                ]
-            },
-            "people": {
-                "data": [
-                    {
-                        "id": "321",
-                        "type": "people"
-                    }
-                ]
-            },
-            "projects": {
-                "data": [
-                    {
-                        "id": "12",
-                        "type": "projects"
-                    }
-                ]
-            },
-            "investigations": {
-                "data": []
-            },
-            "studies": {
-                "data": []
-            },
-            "assays": {
-                "data": []
-            },
-            "publications": {
-                "data": []
-            },
-            "sops": {
-                "data": []
-            }
-        },
-        "links": {
-            "self": "/workflows/23?version=1"
-        },
-        "meta": {
-            "created": "2020-01-31T14:07:09.000Z",
-            "modified": "2020-01-31T14:07:10.000Z",
-            "api_version": "0.2",
-            "uuid": "e5180ff0-2660-0138-94a4-74939ff51fe0",
-            "base_url": "http://localhost:3000"
+            "access": "edit"
+          }
+        ]
+      },
+      "discussion_links": [
+
+      ],
+      "title": "A Maximal Workflow",
+      "license": "CC-BY-4.0",
+      "description": "This is the description",
+      "latest_version": 1,
+      "tags": [
+        "tag1",
+        "tag2"
+      ],
+      "versions": [
+        {
+          "version": 1,
+          "revision_comments": null,
+          "url": "http://localhost:3000/workflows/2?version=1",
+          "doi": null
         }
+      ],
+      "version": 1,
+      "revision_comments": null,
+      "created_at": "2022-04-29T14:13:07.077Z",
+      "updated_at": "2022-04-29T14:13:07.077Z",
+      "doi": null,
+      "content_blobs": [
+        {
+          "original_filename": "rp2-to-rp2path.cwl",
+          "url": null,
+          "md5sum": null,
+          "sha1sum": null,
+          "content_type": "application/x-yaml",
+          "link": "http://localhost:3000/workflows/2/content_blobs/2",
+          "size": null
+        }
+      ],
+      "creators": [
+        {
+          "profile": "/people/3",
+          "family_name": "Last",
+          "given_name": "Person491",
+          "affiliation": "An Institution: 608",
+          "orcid": null
+        }
+      ],
+      "other_creators": "John Smith, Jane Smith",
+      "workflow_class": {
+        "title": "Common Workflow Language",
+        "key": "cwl",
+        "description": "Common Workflow Language"
+      },
+      "edam_operations": [
+        {
+          "label": "Clustering",
+          "identifier": "http://edamontology.org/operation_3432"
+        },
+        {
+          "label": "Expression correlation analysis",
+          "identifier": "http://edamontology.org/operation_3463"
+        }
+      ],
+      "edam_topics": [
+        {
+          "label": "Biomedical science",
+          "identifier": "http://edamontology.org/topic_3344"
+        },
+        {
+          "label": "Chemistry",
+          "identifier": "http://edamontology.org/topic_3314"
+        }
+      ],
+      "internals": {
+      }
     },
-    "jsonapi": {
-        "version": "1.0"
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "3",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "2",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "2",
+            "type": "people"
+          },
+          {
+            "id": "3",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "2",
+            "type": "projects"
+          }
+        ]
+      },
+      "investigations": {
+        "data": [
+          {
+            "id": "1",
+            "type": "investigations"
+          }
+        ]
+      },
+      "studies": {
+        "data": [
+          {
+            "id": "1",
+            "type": "studies"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "1",
+            "type": "assays"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "1",
+            "type": "publications"
+          }
+        ]
+      },
+      "sops": {
+        "data": [
+
+        ]
+      }
+    },
+    "links": {
+      "self": "/workflows/2?version=1"
+    },
+    "meta": {
+      "created": "2022-04-29T14:13:07.049Z",
+      "modified": "2022-04-29T14:13:07.077Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "6a5603c0-a9f4-013a-b385-000c29a94011"
     }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
 }

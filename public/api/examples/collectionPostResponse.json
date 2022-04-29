@@ -1,84 +1,104 @@
 {
-    "data": {
-        "id": "1121",
-        "type": "collections",
-        "attributes": {
-            "title": "A Collection",
-            "description": "A collection of things!",
-            "license": null,
-            "tags": [
-                "Collection-tag1",
-                "Collection-tag2",
-                "Collection-tag3",
-                "Collection-tag4",
-                "Collection-tag5"
-            ],
-            "created_at": "2020-05-28T13:03:28.000Z",
-            "updated_at": "2020-05-28T13:03:32.000Z",
-            "other_creators": "Blogs, Joe"
-        },
-        "relationships": {
-            "creators": {
-                "data": [
-                    {
-                        "id": "1039989767",
-                        "type": "people"
-                    }
-                ]
+  "data": {
+    "id": "2",
+    "type": "collections",
+    "attributes": {
+      "policy": {
+        "access": "view",
+        "permissions": [
+          {
+            "resource": {
+              "id": "2",
+              "type": "projects"
             },
-            "submitter": {
-                "data": [
-                    {
-                        "id": "1039989760",
-                        "type": "people"
-                    }
-                ]
-            },
-            "people": {
-                "data": [
-                    {
-                        "id": "1039989760",
-                        "type": "people"
-                    },
-                    {
-                        "id": "1039989767",
-                        "type": "people"
-                    }
-                ]
-            },
-            "projects": {
-                "data": [
-                    {
-                        "id": "1022253998",
-                        "type": "projects"
-                    }
-                ]
-            },
-            "publications": {
-                "data": [
-                    {
-                        "id": "980191013",
-                        "type": "publications"
-                    }
-                ]
-            },
-            "items": {
-                "data": [ ]
-            }
-        },
-        "links": {
-            "self": "/collections/1121",
-            "items": "/collections/1121/items"
-        },
-        "meta": {
-            "created": "2020-05-28T13:03:28.000Z",
-            "modified": "2020-05-28T13:03:32.000Z",
-            "api_version": "0.3",
-            "uuid": "8bfca980-8311-0138-b378-0800278a9619",
-            "base_url": "http://localhost:3000"
+            "access": "edit"
+          }
+        ]
+      },
+      "discussion_links": [
+
+      ],
+      "title": "A Maximal Collection",
+      "license": "CC-BY-4.0",
+      "description": "This is the description",
+      "tags": [
+        "tag1",
+        "tag2"
+      ],
+      "created_at": "2022-04-29T14:13:25.663Z",
+      "updated_at": "2022-04-29T14:13:25.647Z",
+      "creators": [
+        {
+          "profile": "/people/3",
+          "family_name": "Last",
+          "given_name": "Person678",
+          "affiliation": "An Institution: 829",
+          "orcid": null
         }
+      ],
+      "other_creators": "John Smith, Jane Smith"
     },
-    "jsonapi": {
-        "version": "1.0"
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "3",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "2",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "2",
+            "type": "people"
+          },
+          {
+            "id": "3",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "2",
+            "type": "projects"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+
+        ]
+      },
+      "items": {
+        "data": [
+
+        ]
+      }
+    },
+    "links": {
+      "self": "/collections/2",
+      "items": "/collections/2/items"
+    },
+    "meta": {
+      "created": "2022-04-29T14:13:25.663Z",
+      "modified": "2022-04-29T14:13:25.647Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "756f3b30-a9f4-013a-b385-000c29a94011"
     }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
 }

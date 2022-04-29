@@ -1,41 +1,28 @@
 {
-    "data": [
-        {
-            "id": "1",
-            "type": "studies",
-            "attributes": {
-                "title": "Creating template for metabolomics data"
-            },
-            "links": {
-                "self": "/studies/1"
-            }
-        },
-        {
-            "id": "2",
-            "type": "studies",
-            "attributes": {
-                "title": "Biphase Batch Fermentation(2009/02/04)"
-            },
-            "links": {
-                "self": "/studies/2"
-            }
-        },
-        {
-            "id": "3",
-            "type": "studies",
-            "attributes": {
-                "title": "Investigation of different pH values for metabolic shift"
-            },
-            "links": {
-                "self": "/studies/3"
-            }
-        }
-    ],
-    "jsonapi": {
-        "version": "1.0"
-    },
-    "meta": {
-        "base_url": "https://fairdomhub.org",
-        "api_version": "0.1"
+  "data": [
+    {
+      "id": "7",
+      "type": "studies",
+      "attributes": {
+        "title": "Study69"
+      },
+      "links": {
+        "self": "/studies/7"
+      }
     }
+  ],
+  "jsonapi": {
+    "version": "1.0"
+  },
+  "links": {
+    "self": "/studies?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "first": "/studies?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "prev": null,
+    "next": null,
+    "last": "/studies?page%5Bnumber%5D=1&page%5Bsize%5D=1000000"
+  },
+  "meta": {
+    "base_url": "http://localhost:3000",
+    "api_version": "0.3"
+  }
 }

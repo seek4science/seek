@@ -1,110 +1,203 @@
 {
-    "data": {
-        "id": "1926",
-        "type": "projects",
-        "attributes": {
-            "avatar": null,
-            "title": "Post Project Max",
-            "description": "A Taverna project",
-            "web_page": "http://www.taverna.org.uk",
-            "wiki_page": "http://www.mygrid.org.uk",
-            "default_license": "Other (Open)",
-            "default_policy": {
-                "access": "no_access",
-                "permissions": [
-                    {
-                        "resource": {
-                            "id": "1273",
-                            "type": "people"
-                        },
-                        "access": "manage"
-                    },
-                    {
-                        "resource": {
-                            "id": "1924",
-                            "type": "projects"
-                        },
-                        "access": "download"
-                    },
-                    {
-                        "resource": {
-                            "id": "1297",
-                            "type": "institutions"
-                        },
-                        "access": "view"
-                    }
-                ]
-            }
-        },
-        "relationships": {
-            "organisms": {
-                "data": [
-                    {
-                        "id": "5",
-                        "type": "organisms"
-                    }
-                ]
-            },
-            "people": {
-                "data": []
-            },
-            "institutions": {
-                "data": []
-            },
-            "programmes": {
-                "data": [
-                    {
-                        "id": "27",
-                        "type": "programmes"
-                    }
-                ]
-            },
-            "investigations": {
-                "data": []
-            },
-            "studies": {
-                "data": []
-            },
-            "assays": {
-                "data": []
-            },
-            "data_files": {
-                "data": []
-            },
-            "models": {
-                "data": []
-            },
-            "sops": {
-                "data": []
-            },
-            "publications": {
-                "data": []
-            },
-            "presentations": {
-                "data": []
-            },
-            "events": {
-                "data": []
-            },
-            "documents": {
-                "data": []
-            },
-            "workflows": {
-                "data": []
-            }
-        },
-        "links": {
-            "self": "/projects/1926"
-        },
-        "meta": {
-            "created": "2018-04-27T14:41:00.267Z",
-            "modified": "2018-04-27T14:41:00.267Z",
-            "api_version": "0.1",
-            "uuid": "ed4723e0-2c56-0136-ec2f-08002734982f",
-            "base_url": "http://localhost:3000"
+  "data": {
+    "id": "36",
+    "type": "projects",
+    "attributes": {
+      "discussion_links": [
+        {
+          "id": "4",
+          "label": "Slack",
+          "url": "http://www.slack.com/"
         }
+      ],
+      "avatar": "/projects/36/avatars/1",
+      "title": "A Maximal Project",
+      "description": "A Taverna project",
+      "web_page": "http://www.taverna.org.uk",
+      "wiki_page": "http://www.mygrid.org.uk",
+      "default_license": "Other (Open)",
+      "start_date": "2010-01-01",
+      "end_date": "2014-06-21",
+      "default_policy": {
+        "access": "no_access",
+        "permissions": [
+
+        ]
+      },
+      "members": [
+        {
+          "person_id": "31",
+          "institution_id": "32"
+        }
+      ],
+      "use_default_policy": true
     },
-    "jsonapi": {
-        "version": "1.0"
+    "relationships": {
+      "project_administrators": {
+        "data": [
+
+        ]
+      },
+      "pals": {
+        "data": [
+
+        ]
+      },
+      "asset_housekeepers": {
+        "data": [
+
+        ]
+      },
+      "asset_gatekeepers": {
+        "data": [
+
+        ]
+      },
+      "organisms": {
+        "data": [
+
+        ]
+      },
+      "human_diseases": {
+        "data": [
+
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "31",
+            "type": "people"
+          }
+        ]
+      },
+      "institutions": {
+        "data": [
+          {
+            "id": "32",
+            "type": "institutions"
+          }
+        ]
+      },
+      "programmes": {
+        "data": [
+          {
+            "id": "2",
+            "type": "programmes"
+          }
+        ]
+      },
+      "investigations": {
+        "data": [
+          {
+            "id": "7",
+            "type": "investigations"
+          }
+        ]
+      },
+      "studies": {
+        "data": [
+          {
+            "id": "6",
+            "type": "studies"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "5",
+            "type": "assays"
+          }
+        ]
+      },
+      "data_files": {
+        "data": [
+          {
+            "id": "2",
+            "type": "data_files"
+          }
+        ]
+      },
+      "file_templates": {
+        "data": [
+
+        ]
+      },
+      "placeholders": {
+        "data": [
+
+        ]
+      },
+      "models": {
+        "data": [
+          {
+            "id": "7",
+            "type": "models"
+          }
+        ]
+      },
+      "sops": {
+        "data": [
+          {
+            "id": "2",
+            "type": "sops"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "2",
+            "type": "publications"
+          }
+        ]
+      },
+      "presentations": {
+        "data": [
+          {
+            "id": "1",
+            "type": "presentations"
+          }
+        ]
+      },
+      "events": {
+        "data": [
+          {
+            "id": "1",
+            "type": "events"
+          }
+        ]
+      },
+      "documents": {
+        "data": [
+          {
+            "id": "2",
+            "type": "documents"
+          }
+        ]
+      },
+      "workflows": {
+        "data": [
+          {
+            "id": "1",
+            "type": "workflows"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/projects/36"
+    },
+    "meta": {
+      "created": "2022-04-29T14:12:25.616Z",
+      "modified": "2022-04-29T14:12:25.708Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "51a4c770-a9f4-013a-b385-000c29a94011"
     }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
 }

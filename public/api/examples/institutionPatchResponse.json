@@ -1,36 +1,43 @@
 {
-    "data": {
-        "id": "1094",
-        "type": "institutions",
-        "attributes": {
-            "avatar": null,
-            "title": "Patched institution",
-            "country": "Germany",
-            "country_code": "de",
-            "city": "Heidelberg",
-            "address": "NoName street 23",
-            "web_page": "http://my.Institution.com"
-        },
-        "relationships": {
-            "people": {
-                "data": []
-            },
-            "projects": {
-                "data": []
-            }
-        },
-        "links": {
-            "self": "/institutions/1094"
-        },
-        "meta": {
-            "created": "2018-04-27T14:38:21.000Z",
-            "modified": "2018-04-27T14:38:23.245Z",
-            "api_version": "0.1",
-            "uuid": "8e95da20-2c56-0136-ec2f-08002734982f",
-            "base_url": "http://localhost:3000"
-        }
+  "data": {
+    "id": "3",
+    "type": "institutions",
+    "attributes": {
+      "discussion_links": [
+
+      ],
+      "avatar": null,
+      "title": "Patched institution",
+      "country": "Germany",
+      "country_code": "DE",
+      "city": "Heidelberg",
+      "address": "NoName street 23",
+      "web_page": "http://my.institution.com"
     },
-    "jsonapi": {
-        "version": "1.0"
+    "relationships": {
+      "people": {
+        "data": [
+
+        ]
+      },
+      "projects": {
+        "data": [
+
+        ]
+      }
+    },
+    "links": {
+      "self": "/institutions/3"
+    },
+    "meta": {
+      "created": "2022-04-29T14:12:33.240Z",
+      "modified": "2022-04-29T14:12:33.253Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "56311830-a9f4-013a-b385-000c29a94011"
     }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
 }

@@ -1,41 +1,19 @@
 {
-    "data": [
-        {
-            "id": "1",
-            "type": "assays",
-            "attributes": {
-                "title": "Standard-based Excel template for metabolomics data"
-            },
-            "links": {
-                "self": "/assays/1"
-            }
-        },
-        {
-            "id": "2",
-            "type": "assays",
-            "attributes": {
-                "title": "Gene expression(Transcriptome)"
-            },
-            "links": {
-                "self": "/assays/2"
-            }
-        },
-        {
-            "id": "3",
-            "type": "assays",
-            "attributes": {
-                "title": "metabolome-LCMS"
-            },
-            "links": {
-                "self": "/assays/3"
-            }
-        }
-    ],
-    "jsonapi": {
-        "version": "1.0"
-    },
-    "meta": {
-        "base_url": "https://fairdomhub.org",
-        "api_version": "0.1"
-    }
+  "data": [
+
+  ],
+  "jsonapi": {
+    "version": "1.0"
+  },
+  "links": {
+    "self": "/assays?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "first": "/assays?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "prev": null,
+    "next": null,
+    "last": "/assays?page%5Bnumber%5D=1&page%5Bsize%5D=1000000"
+  },
+  "meta": {
+    "base_url": "http://localhost:3000",
+    "api_version": "0.3"
+  }
 }

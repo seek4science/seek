@@ -1,41 +1,48 @@
 {
-    "data": [
-        {
-            "id": "1",
-            "type": "institutions",
-            "attributes": {
-                "title": "Institute of Physiology Academy of Sciences"
-            },
-            "links": {
-                "self": "/institutions/1"
-            }
-        },
-        {
-            "id": "2",
-            "type": "institutions",
-            "attributes": {
-                "title": "Autonomous University of Barcelona"
-            },
-            "links": {
-                "self": "/institutions/2"
-            }
-        },
-        {
-            "id": "3",
-            "type": "institutions",
-            "attributes": {
-                "title": "CSIC Granada"
-            },
-            "links": {
-                "self": "/institutions/3"
-            }
-        }
-    ],
-    "jsonapi": {
-        "version": "1.0"
+  "data": [
+    {
+      "id": "6",
+      "type": "institutions",
+      "attributes": {
+        "title": "A Maximal Institution"
+      },
+      "links": {
+        "self": "/institutions/6"
+      }
     },
-    "meta": {
-        "base_url": "https://fairdomhub.org",
-        "api_version": "0.1"
+    {
+      "id": "4",
+      "type": "institutions",
+      "attributes": {
+        "title": "A Minimal Institution"
+      },
+      "links": {
+        "self": "/institutions/4"
+      }
+    },
+    {
+      "id": "5",
+      "type": "institutions",
+      "attributes": {
+        "title": "An Institution: 196"
+      },
+      "links": {
+        "self": "/institutions/5"
+      }
     }
+  ],
+  "jsonapi": {
+    "version": "1.0"
+  },
+  "links": {
+    "self": "/institutions?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "first": "/institutions?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "prev": null,
+    "next": null,
+    "last": "/institutions?page%5Bnumber%5D=1&page%5Bsize%5D=1000000"
+  },
+  "meta": {
+    "base_url": "http://localhost:3000",
+    "api_version": "0.3"
+  }
 }

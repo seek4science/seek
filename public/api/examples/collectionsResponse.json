@@ -1,44 +1,38 @@
 {
-    "data": [
-        {
-            "id": "1121",
-            "type": "collections",
-            "attributes": {
-                "title": "A Collection"
-            },
-            "links": {
-                "self": "/collections/1121"
-            }
-        },
-        {
-            "id": "2",
-            "type": "collections",
-            "attributes": {
-                "title": "Bob's favourite things"
-            },
-            "links": {
-                "self": "/collections/2"
-            }
-        },
-        {
-            "id": "1",
-            "type": "collections",
-            "attributes": {
-                "title": "Cool workflows"
-            },
-            "links": {
-                "self": "/collections/1"
-            }
-        }
-    ],
-    "jsonapi": {
-        "version": "1.0"
+  "data": [
+    {
+      "id": "3",
+      "type": "collections",
+      "attributes": {
+        "title": "A Maximal Collection"
+      },
+      "links": {
+        "self": "/collections/3"
+      }
     },
-    "links": {
-        "self": "/collections"
-    },
-    "meta": {
-        "base_url": "http://localhost:3000",
-        "api_version": "0.3"
+    {
+      "id": "2",
+      "type": "collections",
+      "attributes": {
+        "title": "A Minimal Collection"
+      },
+      "links": {
+        "self": "/collections/2"
+      }
     }
+  ],
+  "jsonapi": {
+    "version": "1.0"
+  },
+  "links": {
+    "self": "/collections?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "first": "/collections?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "prev": null,
+    "next": null,
+    "last": "/collections?page%5Bnumber%5D=1&page%5Bsize%5D=1000000"
+  },
+  "meta": {
+    "base_url": "http://localhost:3000",
+    "api_version": "0.3"
+  }
 }
