@@ -170,7 +170,7 @@ class AssaysController < ApplicationController
                                   :license, *creator_related_params, :position, { document_ids: []},
                                   { scales: [] }, { sop_ids: [] }, { model_ids: [] },
                                   { samples_attributes: [:asset_id, :direction] },
-                                  { data_files_attributes: [:data_file_id, :asset_id, :direction, :relationship_type_id] },
+                                  { data_files_attributes: [:asset_id, :direction, :relationship_type_id] },
                                   { publication_ids: [] },
                                   { custom_metadata_attributes: determine_custom_metadata_keys },
 				  { discussion_links_attributes:[:id, :url, :label, :_destroy] }
