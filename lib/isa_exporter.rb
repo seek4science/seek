@@ -501,8 +501,8 @@ module IsaExporter
 			while sample_list.any?
 				temp = []
 				sample_list.each do |sample|
-					if sample.linking_samples.any?
-						temp += sample.linking_samples
+					if sample.linked_samples.any?
+						temp += sample.linked_samples
 					else
 						parent_samples << sample
 					end
