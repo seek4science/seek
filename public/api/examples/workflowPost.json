@@ -87,16 +87,20 @@
                 ]
             },
             "data_files": {
-                "data": [{
-                    "id": "95",
-                    "type": "data_files"
-                }]
+                "data": [
+                    {
+                        "id": "95",
+                        "type": "data_files"
+                    }
+                ]
             },
             "documents": {
-                "data": [{
-                    "id": "12",
-                    "type": "documents"
-                }]
+                "data": [
+                    {
+                        "id": "12",
+                        "type": "documents"
+                    }
+                ]
             }
         }
     }
