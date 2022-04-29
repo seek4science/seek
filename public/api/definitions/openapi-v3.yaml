@@ -4013,6 +4013,18 @@ components:
       type: string
       minLength: 1
       format: date-time
+    nullableDateTimeString:
+      anyOf:
+        - type: 'null'
+        - $ref: "#/components/schemas/dateTimeString"
+    dateString:
+      type: string
+      minLength: 1
+      format: date
+    nullableDateString:
+      anyOf:
+        - type: 'null'
+        - $ref: "#/components/schemas/dateString"
     nonEmptyString:
       type: string
       minLength: 1
@@ -4060,11 +4072,21 @@ components:
         id:
           $ref: "#/components/schemas/nonEmptyString"
         label:
-          $ref: "#/components/schemas/nonEmptyString"
+          $ref: "#/components/schemas/nullableNonEmptyString"
         url:
           $ref: "#/components/schemas/uriString"
       required:
         - id
+        - label
+        - url
+    assetLinkCreate:
+      type: object
+      properties:
+        label:
+          $ref: "#/components/schemas/nullableNonEmptyString"
+        url:
+          $ref: "#/components/schemas/uriString"
+      required:
         - label
         - url
     assetLinkList:
@@ -4072,6 +4094,18 @@ components:
       minItems: 0
       items:
         $ref: "#/components/schemas/assetLink"
+    assetLinkPostList:
+      type: array
+      minItems: 0
+      items:
+        $ref: "#/components/schemas/assetLinkCreate"
+    assetLinkPatchList:
+      type: array
+      minItems: 0
+      items:
+        anyOf:
+          - $ref: "#/components/schemas/assetLink"
+          - $ref: "#/components/schemas/assetLinkCreate"
     snapshotSkeleton:
       type: object
       properties:
@@ -4166,11 +4200,17 @@ components:
           $ref: "#/components/schemas/nullableUriString"
       required:
         - self
-        - first
-        - prev
-        - next
-        - last
       additionalProperties: false
+    collectionLinks:
+      type: object
+      properties:
+        self:
+          $ref: "#/components/schemas/uriString"
+        items:
+          $ref: "#/components/schemas/uriString"
+      required:
+        - self
+        - items
     linksType:
       type: object
       properties:
@@ -4190,26 +4230,6 @@ components:
         - self
         - download
       additionalProperties: false
-    metaType:
-      type: object
-      properties:
-        created:
-          $ref: "#/components/schemas/dateTimeString"
-        modified:
-          $ref: "#/components/schemas/dateTimeString"
-        uuid:
-          $ref: "#/components/schemas/nonEmptyString"
-        base_url:
-          $ref: "#/components/schemas/uriString"
-        api_version:
-          $ref: "#/components/schemas/nonEmptyString"
-      required:
-        - created
-        - modified
-        - uuid
-        - base_url
-        - api_version
-      additionalProperties: false
     baseMetaType:
       type: object
       properties:
@@ -4218,6 +4238,43 @@ components:
         api_version:
           $ref: "#/components/schemas/nonEmptyString"
       required:
+        - base_url
+        - api_version
+      additionalProperties: false
+    metaType:
+      type: object
+      properties:
+        base_url:
+          $ref: "#/components/schemas/uriString"
+        api_version:
+          $ref: "#/components/schemas/nonEmptyString"
+        created:
+          $ref: "#/components/schemas/dateTimeString"
+        modified:
+          $ref: "#/components/schemas/dateTimeString"
+        uuid:
+          $ref: "#/components/schemas/nonEmptyString"
+      required:
+        - created
+        - modified
+        - uuid
+        - base_url
+        - api_version
+      additionalProperties: false
+    collectionItemMetaType:
+      type: object
+      properties:
+        base_url:
+          $ref: "#/components/schemas/uriString"
+        api_version:
+          $ref: "#/components/schemas/nonEmptyString"
+        created:
+          $ref: "#/components/schemas/dateTimeString"
+        modified:
+          $ref: "#/components/schemas/dateTimeString"
+      required:
+        - created
+        - modified
         - base_url
         - api_version
       additionalProperties: false
@@ -4349,6 +4406,10 @@ components:
           $ref: "#/components/schemas/nonEmptyString"
         description:
           $ref: "#/components/schemas/nullableNonEmptyString"
+        created_at:
+          $ref: "#/components/schemas/dateTimeString"
+        updated_at:
+          $ref: "#/components/schemas/dateTimeString"
         license:
           $ref: "#/components/schemas/nullableLicense"
         policy:
@@ -4410,6 +4471,8 @@ components:
           $ref: "#/components/schemas/assetsCreatorsList"
         discussion_links:
           $ref: "#/components/schemas/assetLinkList"
+        model_image_link:
+          $ref: "#/components/schemas/nullableUriString"
       required:
         - title
         - license
@@ -4475,7 +4538,7 @@ components:
             label:
               $ref: "#/components/schemas/nonEmptyString"
             uri:
-              $ref: "#/components/schemas/uriString"
+              $ref: "#/components/schemas/nullableUriString"
           required:
             - label
             - uri
@@ -4523,7 +4586,7 @@ components:
       type: object
       properties:
         data:
-          $ref: "#/components/schemas/collectionReferences"
+          $ref: "#/components/schemas/collectionItemReferences"
       required:
         - data
       additionalProperties: false
@@ -4784,6 +4847,10 @@ components:
           $ref: "#/components/schemas/nonEmptyString"
         title:
           $ref: "#/components/schemas/nonEmptyString"
+        description:
+          $ref: "#/components/schemas/nullableNonEmptyString"
+        pid:
+          $ref: "#/components/schemas/nullableNonEmptyString"
         sample_attribute_type:
           type: object
           properties:
@@ -4825,6 +4892,10 @@ components:
           $ref: "#/components/schemas/nonEmptyString"
         title:
           $ref: "#/components/schemas/nonEmptyString"
+        description:
+          $ref: "#/components/schemas/nullableNonEmptyString"
+        pid:
+          $ref: "#/components/schemas/nullableNonEmptyString"
         sample_attribute_type:
           type: object
           properties:
@@ -4866,6 +4937,10 @@ components:
           $ref: "#/components/schemas/nonEmptyString"
         title:
           $ref: "#/components/schemas/nonEmptyString"
+        description:
+          $ref: "#/components/schemas/nullableNonEmptyString"
+        pid:
+          $ref: "#/components/schemas/nullableNonEmptyString"
         sample_attribute_type:
           type: object
           properties:
@@ -5156,7 +5231,7 @@ components:
         id:
           $ref: "#/components/schemas/nonEmptyString"
         type:
-          $ref: "#/components/schemas/collectionType"
+          $ref: "#/components/schemas/collectionItemType"
         attributes:
           type: object
           properties:
@@ -5181,7 +5256,7 @@ components:
         links:
           $ref: "#/components/schemas/linksType"
         meta:
-          $ref: "#/components/schemas/metaType"
+          $ref: "#/components/schemas/collectionItemMetaType"
       required:
         - id
         - type
@@ -5458,6 +5533,14 @@ components:
         - id
         - type
       additionalProperties: false
+    sampleTypeSingletonReference:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/sampleTypeReference"
+      required:
+        - data
+      additionalProperties: false
     sampleTypeReferences:
       type: array
       minItems: 0
@@ -5554,7 +5637,7 @@ components:
                     label:
                       $ref: "#/components/schemas/nullableNonEmptyString"
                     uri:
-                      $ref: "#/components/schemas/uriString"
+                      $ref: "#/components/schemas/nullableUriString"
                   required:
                     - uri
                   additionalProperties: false
@@ -5562,6 +5645,8 @@ components:
                   $ref: "#/components/schemas/policy"
                 discussion_links:
                   $ref: "#/components/schemas/assetLinkList"
+                position:
+                  $ref: "#/components/schemas/nullableInteger"
               required:
                 - title
                 - assay_class
@@ -5595,6 +5680,10 @@ components:
                   $ref: "#/components/schemas/sopReferencesList"
                 publications:
                   $ref: "#/components/schemas/publicationReferencesList"
+                placeholders:
+                  $ref: "#/components/schemas/placeholderReferencesList"
+                human_diseases:
+                  $ref: "#/components/schemas/humanDiseaseReferencesList"
               required:
                 - creators
                 - submitter
@@ -5608,6 +5697,8 @@ components:
                 - models
                 - sops
                 - publications
+                - placeholders
+                - human_diseases
               additionalProperties: false
             links:
               $ref: "#/components/schemas/linksType"
@@ -5674,11 +5765,12 @@ components:
                   additionalProperties: false
                 policy:
                   $ref: "#/components/schemas/policy"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPostList"
               required:
                 - title
                 - assay_class
                 - assay_type
-                - technology_type
               additionalProperties: false
             relationships:
               type: object
@@ -5761,6 +5853,8 @@ components:
                   additionalProperties: false
                 policy:
                   $ref: "#/components/schemas/policy"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPatchList"
               additionalProperties: false
             relationships:
               type: object
@@ -5816,9 +5910,10 @@ components:
                   $ref: "#/components/schemas/nullableOtherCreatorsString"
                 creators:
                   $ref: "#/components/schemas/assetsCreatorsList"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPostList"
               required:
                 - title
-                - content_blobs
               additionalProperties: false
             relationships:
               type: object
@@ -5867,6 +5962,8 @@ components:
                   $ref: "#/components/schemas/nullableOtherCreatorsString"
                 creators:
                   $ref: "#/components/schemas/assetsCreatorsList"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPatchList"
               additionalProperties: false
             relationships:
               type: object
@@ -5927,7 +6024,7 @@ components:
             id:
               $ref: "#/components/schemas/nonEmptyString"
             type:
-              $ref: "#/components/schemas/collectionType"
+              $ref: "#/components/schemas/collectionItemType"
             attributes:
               type: object
               properties:
@@ -5986,6 +6083,10 @@ components:
                   $ref: "#/components/schemas/publicationReferencesList"
                 events:
                   $ref: "#/components/schemas/eventReferencesList"
+                file_template:
+                  $ref: "#/components/schemas/fileTemplateSingletonReference"
+                placeholder:
+                  $ref: "#/components/schemas/placeholderSingletonReference"
               required:
                 - creators
                 - submitter
@@ -5996,6 +6097,8 @@ components:
                 - assays
                 - publications
                 - events
+                - file_template
+                - placeholder
               additionalProperties: false
             links:
               $ref: "#/components/schemas/linksType"
@@ -6042,6 +6145,8 @@ components:
                   $ref: "#/components/schemas/nullableOtherCreatorsString"
                 creators:
                   $ref: "#/components/schemas/assetsCreatorsList"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPostList"
               required:
                 - title
                 - content_blobs
@@ -6099,6 +6204,8 @@ components:
                   $ref: "#/components/schemas/nullableOtherCreatorsString"
                 creators:
                   $ref: "#/components/schemas/assetsCreatorsList"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPatchList"
               additionalProperties: false
             relationships:
               type: object
@@ -6209,6 +6316,8 @@ components:
                   $ref: "#/components/schemas/nullableOtherCreatorsString"
                 creators:
                   $ref: "#/components/schemas/assetsCreatorsList"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPostList"
               required:
                 - title
                 - content_blobs
@@ -6262,6 +6371,8 @@ components:
                   $ref: "#/components/schemas/nullableOtherCreatorsString"
                 creators:
                   $ref: "#/components/schemas/assetsCreatorsList"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPatchList"
               additionalProperties: false
             relationships:
               type: object
@@ -6310,7 +6421,7 @@ components:
                 start_date:
                   $ref: "#/components/schemas/dateTimeString"
                 end_date:
-                  $ref: "#/components/schemas/dateTimeString"
+                  $ref: "#/components/schemas/nullableDateTimeString"
                 policy:
                   $ref: "#/components/schemas/policy"
               required:
@@ -6382,7 +6493,7 @@ components:
                 start_date:
                   $ref: "#/components/schemas/dateTimeString"
                 end_date:
-                  $ref: "#/components/schemas/dateTimeString"
+                  $ref: "#/components/schemas/nullableDateTimeString"
                 policy:
                   $ref: "#/components/schemas/policy"
               required:
@@ -6554,6 +6665,8 @@ components:
                   $ref: "#/components/schemas/nullableNonEmptyString"
                 web_page:
                   $ref: "#/components/schemas/nullableUriString"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPostList"
               required:
                 - title
               additionalProperties: false
@@ -6590,6 +6703,8 @@ components:
                   $ref: "#/components/schemas/nullableNonEmptyString"
                 web_page:
                   $ref: "#/components/schemas/nullableUriString"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPatchList"
               additionalProperties: false
           required:
             - id
@@ -6626,6 +6741,8 @@ components:
                   $ref: "#/components/schemas/policy"
                 discussion_links:
                   $ref: "#/components/schemas/assetLinkList"
+                position:
+                  $ref: "#/components/schemas/nullableInteger"
               required:
                 - title
               additionalProperties: false
@@ -6708,6 +6825,8 @@ components:
                   $ref: "#/components/schemas/assetsCreatorsList"
                 policy:
                   $ref: "#/components/schemas/policy"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPatchList"
               additionalProperties: false
             relationships:
               type: object
@@ -6749,6 +6868,8 @@ components:
                   $ref: "#/components/schemas/assetsCreatorsList"
                 policy:
                   $ref: "#/components/schemas/policy"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPostList"
               required:
                 - title
               additionalProperties: false
@@ -6805,6 +6926,8 @@ components:
                   $ref: "#/components/schemas/assayReferencesList"
                 publications:
                   $ref: "#/components/schemas/publicationReferencesList"
+                organisms:
+                  $ref: "#/components/schemas/organismReferencesList"
               required:
                 - creators
                 - submitter
@@ -6814,6 +6937,7 @@ components:
                 - studies
                 - assays
                 - publications
+                - organisms
               additionalProperties: false
             links:
               $ref: "#/components/schemas/linksType"
@@ -6866,6 +6990,8 @@ components:
                   $ref: "#/components/schemas/nullableNonEmptyString"
                 environment:
                   $ref: "#/components/schemas/nullableNonEmptyString"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPostList"
               required:
                 - title
                 - content_blobs
@@ -6881,6 +7007,8 @@ components:
                   $ref: "#/components/schemas/assayReferencesList"
                 publications:
                   $ref: "#/components/schemas/publicationReferencesList"
+                organisms:
+                  $ref: "#/components/schemas/organismReferencesList"
               required:
                 - projects
               additionalProperties: false
@@ -6927,6 +7055,8 @@ components:
                   $ref: "#/components/schemas/nullableNonEmptyString"
                 environment:
                   $ref: "#/components/schemas/nullableNonEmptyString"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPatchList"
               additionalProperties: false
             relationships:
               type: object
@@ -6939,6 +7069,8 @@ components:
                   $ref: "#/components/schemas/assayReferencesList"
                 publications:
                   $ref: "#/components/schemas/publicationReferencesList"
+                organisms:
+                  $ref: "#/components/schemas/organismReferencesList"
               additionalProperties: false
           required:
             - id
@@ -6965,9 +7097,9 @@ components:
                 title:
                   $ref: "#/components/schemas/nonEmptyString"
                 concept_uri:
-                  $ref: "#/components/schemas/uriString"
+                  $ref: "#/components/schemas/nullableUriString"
                 ontology_id:
-                  $ref: "#/components/schemas/nonEmptyString"
+                  $ref: "#/components/schemas/nullableNonEmptyString"
               required:
                 - title
                 - concept_uri
@@ -7285,6 +7417,8 @@ components:
                   $ref: "#/components/schemas/nullableOtherCreatorsString"
                 creators:
                   $ref: "#/components/schemas/assetsCreatorsList"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPostList"
               required:
                 - title
                 - content_blobs
@@ -7340,6 +7474,8 @@ components:
                   $ref: "#/components/schemas/nullableOtherCreatorsString"
                 creators:
                   $ref: "#/components/schemas/assetsCreatorsList"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPatchList"
               additionalProperties: false
             relationships:
               type: object
@@ -7459,6 +7595,8 @@ components:
                   $ref: "#/components/schemas/nullableNonEmptyString"
                 funding_codes:
                   $ref: "#/components/schemas/tagsType"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPostList"
               required:
                 - title
               additionalProperties: false
@@ -7502,6 +7640,8 @@ components:
                   $ref: "#/components/schemas/nullableNonEmptyString"
                 funding_codes:
                   $ref: "#/components/schemas/tagsType"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPatchList"
               additionalProperties: false
             relationships:
               type: object
@@ -7549,6 +7689,14 @@ components:
                   $ref: "#/components/schemas/nullableLicense"
                 discussion_links:
                   $ref: "#/components/schemas/assetLinkList"
+                start_date:
+                  $ref: "#/components/schemas/nullableDateString"
+                end_date:
+                  $ref: "#/components/schemas/nullableDateString"
+                members:
+                  $ref: "#/components/schemas/projectMembersList"
+                use_default_policy:
+                  type: boolean
               required:
                 - title
                 - description
@@ -7588,6 +7736,20 @@ components:
                   $ref: "#/components/schemas/programmeReferencesList"
                 workflows:
                   $ref: "#/components/schemas/workflowReferencesList"
+                file_templates:
+                  $ref: "#/components/schemas/fileTemplateReferencesList"
+                placeholders:
+                  $ref: "#/components/schemas/placeholderReferencesList"
+                human_diseases:
+                  $ref: "#/components/schemas/humanDiseaseReferencesList"
+                project_administrators:
+                  $ref: "#/components/schemas/peopleReferenceList"
+                pals:
+                  $ref: "#/components/schemas/peopleReferenceList"
+                asset_housekeepers:
+                  $ref: "#/components/schemas/peopleReferenceList"
+                asset_gatekeepers:
+                  $ref: "#/components/schemas/peopleReferenceList"
               required:
                 - organisms
                 - people
@@ -7603,6 +7765,13 @@ components:
                 - presentations
                 - events
                 - programmes
+                - file_templates
+                - placeholders
+                - human_diseases
+                - project_administrators
+                - pals
+                - asset_housekeepers
+                - asset_gatekeepers
               additionalProperties: false
             links:
               $ref: "#/components/schemas/linksType"
@@ -7649,6 +7818,8 @@ components:
                   $ref: "#/components/schemas/policy"
                 default_license:
                   $ref: "#/components/schemas/nullableLicense"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPatchList"
               additionalProperties: false
             relationships:
               type: object
@@ -7692,6 +7863,8 @@ components:
                   $ref: "#/components/schemas/policy"
                 default_license:
                   $ref: "#/components/schemas/nullableLicense"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPostList"
               required:
                 - title
               additionalProperties: false
@@ -7907,6 +8080,8 @@ components:
                   $ref: "#/components/schemas/nullableOtherCreatorsString"
                 creators:
                   $ref: "#/components/schemas/assetsCreatorsList"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPostList"
               required:
                 - title
                 - content_blobs
@@ -7960,6 +8135,8 @@ components:
                   $ref: "#/components/schemas/nullableOtherCreatorsString"
                 creators:
                   $ref: "#/components/schemas/assetsCreatorsList"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPatchList"
               additionalProperties: false
             relationships:
               type: object
@@ -8009,6 +8186,8 @@ components:
                   $ref: "#/components/schemas/policy"
                 discussion_links:
                   $ref: "#/components/schemas/assetLinkList"
+                position:
+                  $ref: "#/components/schemas/nullableInteger"
               required:
                 - title
               additionalProperties: false
@@ -8091,6 +8270,8 @@ components:
                   $ref: "#/components/schemas/assetsCreatorsList"
                 policy:
                   $ref: "#/components/schemas/policy"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPostList"
               required:
                 - title
               additionalProperties: false
@@ -8141,6 +8322,8 @@ components:
                   $ref: "#/components/schemas/assetsCreatorsList"
                 policy:
                   $ref: "#/components/schemas/policy"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPatchList"
               additionalProperties: false
             relationships:
               type: object
@@ -8351,6 +8534,8 @@ components:
                   $ref: "#/components/schemas/nullableOtherCreatorsString"
                 creators:
                   $ref: "#/components/schemas/assetsCreatorsList"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPostList"
               required:
                 - title
                 - content_blobs
@@ -8419,6 +8604,8 @@ components:
                   $ref: "#/components/schemas/nullableOtherCreatorsString"
                 creators:
                   $ref: "#/components/schemas/assetsCreatorsList"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPatchList"
               additionalProperties: false
             relationships:
               type: object
@@ -8539,7 +8726,7 @@ components:
                 - items
               additionalProperties: false
             links:
-              $ref: "#/components/schemas/linksType"
+              $ref: "#/components/schemas/collectionLinks"
             meta:
               $ref: "#/components/schemas/metaType"
           required:
@@ -8560,7 +8747,6 @@ components:
           $ref: "#/components/schemas/JsonApiVersion"
       required:
         - data
-        - included
         - jsonapi
       additionalProperties: false
     collectionItemSkeleton:
@@ -8912,6 +9098,8 @@ components:
           $ref: "#/components/schemas/JsonApiVersion"
         meta:
           $ref: "#/components/schemas/baseMetaType"
+        links:
+          $ref: "#/components/schemas/indexLinks"
       required:
         - data
         - jsonapi
@@ -9246,6 +9434,10 @@ components:
                   $ref: "#/components/schemas/sampleAttributeMap"
                 policy:
                   $ref: "#/components/schemas/policy"
+                creators:
+                  $ref: "#/components/schemas/assetsCreatorsList"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkList"
               required:
                 - title
                 - attribute_map
@@ -9270,7 +9462,7 @@ components:
                 assays:
                   $ref: "#/components/schemas/assayReferencesList"
                 sample_type:
-                  $ref: "#/components/schemas/sampleTypeReferences"
+                  $ref: "#/components/schemas/sampleTypeSingletonReference"
               required:
                 - submitter
                 - projects
@@ -9317,6 +9509,8 @@ components:
                   $ref: "#/components/schemas/sampleAttributeMap"
                 policy:
                   $ref: "#/components/schemas/policy"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPostList"
               required:
                 - attribute_map
               additionalProperties: false
@@ -9334,14 +9528,15 @@ components:
                 assays:
                   $ref: "#/components/schemas/assayReferencesList"
                 sample_type:
-                  $ref: "#/components/schemas/sampleTypeReferences"
+                  $ref: "#/components/schemas/sampleTypeSingletonReference"
               required:
                 - projects
                 - sample_type
               additionalProperties: false
           required:
-            - id
             - type
+            - attributes
+            - relationships
           additionalProperties: false
       required:
         - data
@@ -9359,7 +9554,7 @@ components:
             id:
               $ref: "#/components/schemas/nonEmptyString"
             type:
-              $ref: "#/components/schemas/sampleTypeType"
+              $ref: "#/components/schemas/sampleType"
             attributes:
               type: object
               properties:
@@ -9371,6 +9566,8 @@ components:
                   $ref: "#/components/schemas/sampleAttributeMap"
                 policy:
                   $ref: "#/components/schemas/policy"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkPatchList"
               additionalProperties: false
             relationships:
               type: object
@@ -9386,7 +9583,7 @@ components:
                 assays:
                   $ref: "#/components/schemas/assayReferencesList"
                 sample_type:
-                  $ref: "#/components/schemas/sampleTypeReference"
+                  $ref: "#/components/schemas/sampleTypeSingletonReference"
               additionalProperties: false
           required:
             - type
@@ -9475,10 +9672,13 @@ components:
                   $ref: "#/components/schemas/projectReferencesList"
                 assays:
                   $ref: "#/components/schemas/assayReferencesList"
+                samples:
+                  $ref: "#/components/schemas/sampleReferencesList"
               required:
                 - submitter
                 - projects
                 - assays
+                - samples
               additionalProperties: false
             links:
               $ref: "#/components/schemas/linksType"
@@ -9526,6 +9726,8 @@ components:
               properties:
                 projects:
                   $ref: "#/components/schemas/projectReferencesList"
+                assays:
+                  $ref: "#/components/schemas/assayReferencesList"
               required:
                 - projects
               additionalProperties: false
@@ -9564,6 +9766,8 @@ components:
               properties:
                 projects:
                   $ref: "#/components/schemas/projectReferencesList"
+                assays:
+                  $ref: "#/components/schemas/assayReferencesList"
               additionalProperties: false
           required:
             - type
@@ -9836,3 +10040,159 @@ components:
           $ref: "#/components/schemas/nullableNonEmptyString"
         type:
           $ref: "#/components/schemas/nullableNonEmptyString"
+    fileTemplateType:
+      type: string
+      minLength: 1
+      enum:
+        - file_templates
+    fileTemplateReference:
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/fileTemplateType"
+      required:
+        - id
+        - type
+      additionalProperties: false
+    fileTemplateReferences:
+      type: array
+      minItems: 0
+      uniqueItems: true
+      items:
+        $ref: "#/components/schemas/fileTemplateReference"
+    fileTemplateSingletonReference:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/fileTemplateReference"
+      required:
+        - data
+      additionalProperties: false
+    fileTemplateReferencesList:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/fileTemplateReferences"
+      required:
+        - data
+      additionalProperties: false
+    placeholderType:
+      type: string
+      minLength: 1
+      enum:
+        - placeholders
+    placeholderReference:
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/placeholderType"
+      required:
+        - id
+        - type
+      additionalProperties: false
+    placeholderReferences:
+      type: array
+      minItems: 0
+      uniqueItems: true
+      items:
+        $ref: "#/components/schemas/placeholderReference"
+    placeholderSingletonReference:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/placeholderReference"
+      required:
+        - data
+      additionalProperties: false
+    placeholderReferencesList:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/placeholderReferences"
+      required:
+        - data
+      additionalProperties: false
+    humanDiseaseType:
+      type: string
+      minLength: 1
+      enum:
+        - humanDiseases
+    humanDiseaseReference:
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/humanDiseaseType"
+      required:
+        - id
+        - type
+      additionalProperties: false
+    humanDiseaseReferences:
+      type: array
+      minItems: 0
+      uniqueItems: true
+      items:
+        $ref: "#/components/schemas/humanDiseaseReference"
+    humanDiseaseSingletonReference:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/humanDiseaseReference"
+      required:
+        - data
+      additionalProperties: false
+    humanDiseaseReferencesList:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/humanDiseaseReferences"
+      required:
+        - data
+      additionalProperties: false
+    sampleReference:
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/sampleType"
+      required:
+        - id
+        - type
+      additionalProperties: false
+    sampleReferences:
+      type: array
+      minItems: 0
+      uniqueItems: true
+      items:
+        $ref: "#/components/schemas/sampleReference"
+    sampleSingletonReference:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/sampleReference"
+      required:
+        - data
+      additionalProperties: false
+    sampleReferencesList:
+      type: object
+      properties:
+        data:
+          $ref: "#/components/schemas/sampleReferences"
+      required:
+        - data
+      additionalProperties: false
+    projectMembersList:
+      type: array
+      items:
+        type: object
+        properties:
+          person_id:
+            $ref: "#/components/schemas/nonEmptyString"
+          institution_id:
+            $ref: "#/components/schemas/nonEmptyString"
+        required:
+          - person_id
+          - institution_id
+        additionalProperties: false

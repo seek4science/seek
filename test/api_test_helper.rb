@@ -205,8 +205,12 @@ module ApiTestHelper
       opts[:fragment] = fragment if fragment
       errors = JSON::Validator.fully_validate_json(definitions_path, json, opts)
       raise Minitest::Assertion, errors.join("\n") unless errors.empty?
-    rescue JSON::Schema::SchemaError
-      warn "#{fragment} is missing from API spec, skipping validation"
+    rescue JSON::Schema::SchemaError => e
+      if e.message.start_with?("Invalid fragment resolution for :fragment option")
+        warn "#{fragment} is missing from API spec, skipping validation"
+      else
+        raise e
+      end
     end
   end
 
