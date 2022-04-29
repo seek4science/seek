@@ -218,6 +218,14 @@ module ApiTestHelper
     load_template("post_max_#{singular_name}.json.erb")
   end
 
+  def write_examples?
+    ENV['SEEK_WRITE_EXAMPLES']
+  end
+
+  def write_examples(json, path)
+    File.write(File.join(Rails.root, 'public', 'api', 'examples', path), json)
+  end
+
   private
 
   def collection_url

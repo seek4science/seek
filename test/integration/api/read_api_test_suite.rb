@@ -68,4 +68,31 @@ module ReadApiTestSuite
     assert_response :not_found
     validate_json response.body, '#/components/schemas/errors'
   end
+
+  test 'write show example' do
+    skip unless write_examples?
+
+    res = Factory.create("max_#{singular_name}".to_sym)
+    user_login(res.contributor) if res.respond_to?(:contributor)
+    get member_url(res), as: :json
+    assert_response :success
+
+    write_examples(JSON.pretty_generate(JSON.parse(response.body)), "#{singular_name.camelize(:lower)}Response.json")
+  end
+
+  test 'write index example' do
+    skip unless write_examples? && !skip_index_test?
+
+    model.delete_all unless model == Person
+    Factory.create("min_#{singular_name}".to_sym)
+    Factory.create("max_#{singular_name}".to_sym)
+
+    get collection_url, as: :json
+
+    if response.code.to_i == 200
+      write_examples(JSON.pretty_generate(JSON.parse(response.body)), "#{plural_name.camelize(:lower)}Response.json")
+    else
+      warn "Response code was #{response.code} for #{plural_name} index, ignoring"
+    end
+  end
 end

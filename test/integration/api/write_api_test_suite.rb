@@ -133,4 +133,26 @@ module WriteApiTestSuite
       assert_match "A POST/PUT request must specify a data:type", response.body
     end
   end
+
+  test 'write create example' do
+    skip unless write_examples?
+
+    template = load_template("post_max_#{singular_name}.json.erb")
+    post collection_url, params: template, as: :json
+    assert_response :success
+
+    write_examples(JSON.pretty_generate(template), "#{singular_name.camelize(:lower)}Post.json")
+    write_examples(JSON.pretty_generate(JSON.parse(response.body)), "#{singular_name.camelize(:lower)}PostResponse.json")
+  end
+
+  test 'write update example' do
+    skip unless write_examples?
+
+    template = load_template("patch_max_#{singular_name}.json.erb")
+    patch member_url(resource), params: template, as: :json
+    assert_response :success
+
+    write_examples(JSON.pretty_generate(template), "#{singular_name.camelize(:lower)}Patch.json")
+    write_examples(JSON.pretty_generate(JSON.parse(response.body)), "#{singular_name.camelize(:lower)}PatchResponse.json")
+  end
 end
