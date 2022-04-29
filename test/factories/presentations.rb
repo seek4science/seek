@@ -88,3 +88,7 @@ Factory.define(:presentation_with_specified_project, class: Presentation) do |f|
   f.with_project_contributor
   f.title 'Pres With Specified Project'
 end
+
+Factory.define(:public_presentation, parent: :presentation) do |f|
+  f.policy { Factory(:downloadable_public_policy) }
+end

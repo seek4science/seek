@@ -7903,7 +7903,7 @@ components:
                 journal:
                   $ref: "#/components/schemas/nullableNonEmptyString"
                 published_date:
-                  $ref: "#/components/schemas/nonEmptyString"
+                  $ref: "#/components/schemas/nullableNonEmptyString"
                 doi:
                   $ref: "#/components/schemas/nullableUriString"
                 pubmed_id:
@@ -7927,9 +7927,35 @@ components:
                 authors:
                   $ref: "#/components/schemas/nonEmptyStringList"
                 content_blobs:
-                  $ref: "#/components/schemas/contentBlobsList"
+                  $ref: "#/components/schemas/optionalContentBlobsList"
                 policy:
                   $ref: "#/components/schemas/policy"
+                discussion_links:
+                  $ref: "#/components/schemas/assetLinkList"
+                misc_links:
+                  $ref: "#/components/schemas/assetLinkList"
+                tags:
+                  $ref: "#/components/schemas/tagsType"
+                latest_version:
+                  type: number
+                versions:
+                  type: array
+                  minItems: 1
+                  uniqueItems: true
+                  items:
+                    $ref: "#/components/schemas/version"
+                version:
+                  type: number
+                revision_comments:
+                  $ref: "#/components/schemas/nullableNonEmptyString"
+                created_at:
+                  $ref: "#/components/schemas/dateTimeString"
+                updated_at:
+                  $ref: "#/components/schemas/dateTimeString"
+                other_creators:
+                  $ref: "#/components/schemas/nullableOtherCreatorsString"
+                creators:
+                  $ref: "#/components/schemas/assetsCreatorsList"
               required:
                 - title
                 - journal
@@ -7964,6 +7990,10 @@ components:
                   $ref: "#/components/schemas/eventReferencesList"
                 workflows:
                   $ref: "#/components/schemas/workflowReferencesList"
+                creators:
+                  $ref: "#/components/schemas/peopleReferenceList"
+                submitter:
+                  $ref: "#/components/schemas/peopleReferenceList"
               required:
                 - people
                 - projects
@@ -7975,6 +8005,9 @@ components:
                 - publications
                 - presentations
                 - events
+                - workflows
+                - creators
+                - submitter
               additionalProperties: false
             links:
               $ref: "#/components/schemas/linksType"
@@ -9848,6 +9881,11 @@ components:
     contentBlobsList:
       type: array
       minItems: 1
+      items:
+        $ref: "#/components/schemas/contentBlob"
+    optionalContentBlobsList:
+      type: array
+      minItems: 0
       items:
         $ref: "#/components/schemas/contentBlob"
     contentBlobSlotsList:
