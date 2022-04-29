@@ -10,12 +10,6 @@ class PresentationsControllerTest < ActionController::TestCase
     login_as Factory(:user)
     @project = User.current_user.person.projects.first
   end
-  #
-  # def rest_api_test_object
-  #   @object = Factory :presentation, contributor: User.current_user.person
-  #   @object.annotate_with 'tag1'
-  #   @object
-  # end
 
   test 'index' do
     get :index

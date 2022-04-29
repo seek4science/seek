@@ -17,14 +17,6 @@ class DataFilesControllerTest < ActionController::TestCase
   def setup
     login_as(:datafile_owner)
   end
-  #
-  # def rest_api_test_object
-  #   # by TZ for some reason depending on tets order user was no longer logged
-  #   login_as(:datafile_owner) unless User.current_user
-  #   @object = data_files(:picture)
-  #   @object.annotate_with 'tag1'
-  #   @object
-  # end
 
   def test_title
     get :index
