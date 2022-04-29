@@ -26,7 +26,7 @@ class ProjectsHelperTest < ActionView::TestCase
       end
     end
 
-    # no scenario will work without email enabled
+    # updated to work without email enabled
     with_config_value(:email_enabled,false) do
       User.with_current_user(project_administrator) do
         refute request_join_project_button_enabled?(project_with_admins)  #already a member
@@ -34,7 +34,7 @@ class ProjectsHelperTest < ActionView::TestCase
       end
 
       User.with_current_user(another_person) do
-        refute request_join_project_button_enabled?(project_with_admins)
+        assert request_join_project_button_enabled?(project_with_admins)
         refute request_join_project_button_enabled?(project_no_admins)
       end
 

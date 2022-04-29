@@ -41,10 +41,11 @@
 
 </div>
 
-
-<p class="text-center">
-  <strong>
-  An email has been sent to the <%= t('project_administrator').pluralize %> and you will receive an email when added
-  to the <%= t('project') %>, or an email about why your request was declined.
-  </strong>
-</p>
+<% if Seek::Config.email_enabled %>
+  <p class="text-center">
+    <strong>
+    An email has been sent to the <%= t('project_administrator').pluralize %> and you will receive an email when added
+    to the <%= t('project') %>, or an email about why your request was declined.
+    </strong>
+  </p>
+<% end %>
