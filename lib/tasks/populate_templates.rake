@@ -39,6 +39,13 @@ namespace :seek do
             projects:[project],
             policy: Policy.public_policy
             })
+
+						if (repo.id.blank?)
+							puts "An error occured creating a template with the followign details: ", repo.errors.full_messages
+							puts "==================="
+							puts repo.inspect
+							return
+						end
   
             item["data"].each_with_index do |attribute, j|
               is_ontology = !attribute["ontology"].blank?
