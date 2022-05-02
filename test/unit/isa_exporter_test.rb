@@ -49,9 +49,10 @@ class IsaExporterTest < ActionController::TestCase
 		child_3.set_attribute_value(:title, 'CHILD 3')
 		child_3.save!
 
-		assert_equal [parent.id], controller.send(:find_sample_origin, [child_1])
-		assert_equal [parent.id], controller.send(:find_sample_origin, [child_2])
-		assert_equal [parent.id], controller.send(:find_sample_origin, [child_3])
+		assert_equal [parent.id], controller.send(:find_sample_origin, [child_1], 0)
+		assert_equal [parent.id], controller.send(:find_sample_origin, [child_2], 0)
+		assert_equal [parent.id], controller.send(:find_sample_origin, [child_3], 0)
+		assert_equal [child_1.id], controller.send(:find_sample_origin, [child_3], 1) # 0: source, 1: sample
 
 		# Create another parent for child 1
 		parent_2 =
@@ -68,6 +69,21 @@ class IsaExporterTest < ActionController::TestCase
 		end
 
 		child_3.reload
-		assert_equal [parent.id, parent_2.id], controller.send(:find_sample_origin, [child_3])
+		assert_equal [parent.id, parent_2.id], controller.send(:find_sample_origin, [child_3], 0)
+		assert_equal [child_1.id], controller.send(:find_sample_origin, [child_3], 1)
+
+		# Create another parent for child 2
+		child_2_another_parent = Sample.new(sample_type: type_2, project_ids: [project.id])
+		child_2_another_parent.set_attribute_value(:patient, [parent.id])
+		child_2_another_parent.set_attribute_value(:title, 'CHILD 2 ANOTHER PARENT')
+		child_2_another_parent.save!
+
+		disable_authorization_checks do
+			child_2.set_attribute_value(:patient, [child_1.id, child_2_another_parent.id])
+			child_2.save!
+		end
+
+		child_3.reload
+		assert_equal [child_1.id, child_2_another_parent.id], controller.send(:find_sample_origin, [child_3], 1)
 	end
 end
