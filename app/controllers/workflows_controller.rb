@@ -19,6 +19,7 @@ class WorkflowsController < ApplicationController
 
   include Seek::IsaGraphExtensions
   include RoCrateHandling
+  include Legacy::WorkflowSupport
 
   api_actions :index, :show, :create, :update, :destroy, :ro_crate
 

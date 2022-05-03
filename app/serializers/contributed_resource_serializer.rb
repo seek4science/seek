@@ -6,7 +6,7 @@ class ContributedResourceSerializer < PCSSerializer
   attribute :version, key: :latest_version, if: -> { object.respond_to?(:version) }
 
   attribute :tags do
-    serialize_annotations(object)
+    serialize_annotations(object, context ='tag')
   end
 
   attribute :versions, if: -> { object.respond_to?(:versions) } do
