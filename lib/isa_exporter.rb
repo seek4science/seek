@@ -533,7 +533,7 @@ module IsaExporter
 		end
 
 		def normalize_id(str)
-			str.parameterize('_')
+			str.tr!(' ', '_')
 		end
 	end
 end
