@@ -7,6 +7,5 @@
     <strong>Created:</strong> <%= time %> <span class="subtle">(<%= time_ago_in_words(time) %> ago)</span><br/>
 <% end %>
 <br/>
-<%= button_link_to('Create NeLS dataset', 'add', new_dataset_assay_nels_path(@assay.id)) %>
 
 <%= button_link_to('Create NeLS dataset', 'add', new_dataset_assay_nels_path(:project_id => @project['id'], :project_name => @project['name'])) %>
