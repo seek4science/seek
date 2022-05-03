@@ -33,7 +33,7 @@ module ApiTestHelper
     get member_url(res), as: :json
     assert_response :success
 
-    validate_json response.body, "#/components/schemas/#{singular_name.camelize(:lower)}Response"
+    validate_json response.body, "#/components/responses/#{singular_name.camelize(:lower)}Response"
 
     expected = template
     actual = JSON.parse(response.body)
@@ -56,7 +56,7 @@ module ApiTestHelper
       assert_response :success
     end
 
-    validate_json response.body, "#/components/schemas/#{singular_name.camelize(:lower)}Response"
+    validate_json response.body, "#/components/responses/#{singular_name.camelize(:lower)}Response"
 
     actual = JSON.parse(response.body)
 
@@ -87,7 +87,7 @@ module ApiTestHelper
       assert_response :success
     end
 
-    validate_json response.body, "#/components/schemas/#{singular_name.camelize(:lower)}Response"
+    validate_json response.body, "#/components/responses/#{singular_name.camelize(:lower)}Response"
 
     actual = JSON.parse(response.body)
 

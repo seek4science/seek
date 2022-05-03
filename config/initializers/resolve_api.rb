@@ -32,7 +32,7 @@ end
 
 def resolve(uri, pointer)
   type = :raw
-  type = :yaml unless pointer.nil?
+  type = :yaml if uri.end_with?('.yml') || uri.end_with?('.yaml') || !pointer.nil?
   type = :json if uri.end_with?('.json')
   doc = cache(uri, type) do
     if uri.start_with?('http')

@@ -3,7 +3,7 @@ sampleTypeSampleAttributesResponse:
   minItems: 1
   uniqueItems: true
   items:
-    $ref: "#/components/schemas/sampleTypeSampleAttributeResponse"
+    $ref: "#/components/responses/sampleTypeSampleAttributeResponse"
 sampleTypeSampleAttributeResponse:
   type: object
   properties:
@@ -1794,7 +1794,7 @@ sampleTypeResponse:
             description:
               $ref: "#/components/schemas/nullableNonEmptyString"
             sample_attributes:
-              $ref: "#/components/schemas/sampleTypeSampleAttributesResponse"
+              $ref: "#/components/responses/sampleTypeSampleAttributesResponse"
             tags:
               $ref: "#/components/schemas/tagsType"
           required:
@@ -1933,76 +1933,6 @@ contentBlobResponse:
     - data
     - jsonapi
   additionalProperties: false
-projectMembersList:
-  type: array
-  items:
-    type: object
-    properties:
-      person_id:
-        $ref: "#/components/schemas/nonEmptyString"
-      institution_id:
-        $ref: "#/components/schemas/nonEmptyString"
-    required:
-      - person_id
-      - institution_id
-    additionalProperties: false
-workflowType:
-  type: string
-  minLength: 1
-  enum:
-    - workflows
-workflowReferencesList:
-  type: object
-  properties:
-    data:
-      $ref: "#/components/schemas/workflowReferences"
-  required:
-    - data
-  additionalProperties: false
-workflowReferences:
-  type: array
-  minItems: 0
-  uniqueItems: true
-  items:
-    $ref: "#/components/schemas/workflowReference"
-workflowReference:
-  properties:
-    id:
-      $ref: "#/components/schemas/nonEmptyString"
-    type:
-      $ref: "#/components/schemas/workflowType"
-  required:
-    - id
-    - type
-  additionalProperties: false
-workflowSkeleton:
-  properties:
-    id:
-      $ref: "#/components/schemas/nonEmptyString"
-    type:
-      $ref: "#/components/schemas/workflowType"
-    attributes:
-      type: object
-      properties:
-        title:
-          $ref: "#/components/schemas/nonEmptyString"
-      required:
-        - title
-      additionalProperties: false
-    links:
-      $ref: "#/components/schemas/linksType"
-  required:
-    - id
-    - type
-    - attributes
-    - links
-  additionalProperties: false
-workflowSkeletons:
-  type: array
-  minItems: 0
-  uniqueItems: true
-  items:
-  $ref: "#/components/schemas/workflowSkeleton"
 workflowResponse:
   type: object
   properties:

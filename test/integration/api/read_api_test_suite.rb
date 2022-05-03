@@ -49,7 +49,7 @@ module ReadApiTestSuite
       assert_response :not_implemented
     else
       perform_jsonapi_checks
-      validate_json response.body, "#/components/schemas/#{plural_name.camelize(:lower)}Response"
+      validate_json response.body, "#/components/responses/#{plural_name.camelize(:lower)}Response"
     end
   end
 
