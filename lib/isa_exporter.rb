@@ -262,7 +262,7 @@ module IsaExporter
 				ontology = get_ontology_details(c, value, true)
 				{
 					category: {
-						'@id': "#characteristic_category/#{c.title}_#{c.id}"
+						'@id': normalize_id("#characteristic_category/#{c.title}_#{c.id}")
 					},
 					value: {
 						annotationValue: value,
@@ -287,7 +287,7 @@ module IsaExporter
 			attributes.map do |s|
 				ontology = get_ontology_details(s, s.title, false)
 				{
-					'@id': "#characteristic_category/#{s.title}_#{s.id}",
+					'@id': normalize_id("#characteristic_category/#{s.title}_#{s.id}"),
 					characteristicType: {
 						annotationValue: s.title,
 						termAccession: ontology[:termAccession],
@@ -310,7 +310,7 @@ module IsaExporter
 			# Convention : The sample_types of studies don't have assay
 			sample_type.samples.map do |s|
 				{
-					'@id': "#process/#{with_tag_protocol.title}/#{s.id}",
+					'@id': normalize_id("#process/#{with_tag_protocol.title}/#{s.id}"),
 					name: nil,
 					executesProtocol: {
 						'@id': "#protocol/#{sop.id}" + (s.assays.any? ? "_#{s.assays.first.id}" : '')
@@ -428,7 +428,11 @@ module IsaExporter
 			return nil unless sample_type
 
 			protocol = detect_protocol(sample_type)
-			sample_type && protocol ? { '@id': "#process/#{detect_protocol(sample_type).title}/#{sample.id}" } : nil
+			if sample_type && protocol
+				{ '@id': normalize_id("#process/#{detect_protocol(sample_type).title}/#{sample.id}") }
+			else
+				nil
+			end
 		end
 
 		def previous_process(sample)
@@ -438,7 +442,7 @@ module IsaExporter
 			protocol = detect_protocol(sample_type)
 
 			# if there's no protocol, it means the previous sample type is source
-			sample_type && protocol ? { '@id': "#process/#{protocol.title}/#{sample.id}" } : nil
+			sample_type && protocol ? { '@id': normalize_id("#process/#{protocol.title}/#{sample.id}") } : nil
 		end
 
 		def process_sequence_output(sample)
@@ -526,6 +530,10 @@ module IsaExporter
 			elsif detect_data_file(prev_sample_type)
 				'data_file'
 			end
+		end
+
+		def normalize_id(str)
+			str.parameterize('_')
 		end
 	end
 end
