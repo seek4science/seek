@@ -51,8 +51,8 @@ module IsaExporter
 			isa_study[:publicReleaseDate] = nil # study.created_at.to_date.iso8601
 			isa_study[:filename] = "#{study.title}.txt"
 			isa_study[:comments] = [
-				{ name: 'SEEK ID', value: "studies/#{study.id}" },
-				{ name: 'SEEK creation date', value: study.created_at.to_date.iso8601 }
+				{ name: 'SEEK Study ID', value: study.id },
+				{ name: 'SEEK creation date', value: study.created_at.utc.iso8601 }
 			]
 
 			publications = []
