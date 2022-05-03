@@ -108,8 +108,6 @@ jobs:
         run: bundle exec rake db:seed
       - name: Virtuoso config
         if: matrix.suite == 'rails test test/integration'
-        run: cp test/config/virtuoso_test_settings.yml config/virtuoso_settings.yml && ruby script/resolve_api.rb
-      - name: Resolve API spec
-        run: ruby script/resolve_api.rb
+        run: cp test/config/virtuoso_test_settings.yml config/virtuoso_settings.yml
       - name: Run tests
         run: bundle exec ${{ matrix.suite }}
