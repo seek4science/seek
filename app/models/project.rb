@@ -240,6 +240,11 @@ class Project < ApplicationRecord
     user.is_admin? || user.is_project_administrator?(self) || user.is_programme_administrator?(programme)
   end
 
+  def can_order?(user = User.current_user)
+    user && can_edit?(user) &&
+      !investigations.find { |i| !i.can_edit?(user) }
+  end
+
   def can_delete?(user = User.current_user)
     user && can_manage?(user) &&
         investigations.empty? && studies.empty? && assays.empty? && assets.empty? &&

@@ -67,6 +67,11 @@ class Study < ApplicationRecord
     assays.order(position: :asc)
   end
   
+  def can_order?(user = User.current_user)
+    user && can_edit?(user) &&
+      !assays.find { |a| !a.can_edit?(user) }
+  end
+
   def self.user_creatable?
     Seek::Config.studies_enabled
   end
