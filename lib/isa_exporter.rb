@@ -111,7 +111,7 @@ module IsaExporter
 			all_sample_types = assays.map { |a| a.sample_type }
 			all_samples = all_sample_types.map { |s| s.samples }.flatten
 			first_assay = assays.detect { |s| s.position == 0 }
-			
+
 			isa_assay = {}
 			isa_assay['@id'] = "#assay/#{assays.pluck(:id).join('_')}"
 			isa_assay[:filename] = 'a_assays.txt' # assay&.sample_type&.isa_template&.title
@@ -122,7 +122,7 @@ module IsaExporter
 			isa_assay[:materials] = {
 				# Here, the first assay's samples will be enough
 				samples:
-					first_assay.samples.map { |s| find_sample_origin([s], 1) }.map { |s| { '@id': "#sample/#{s}" } }, # the samples from study level that are referenced in this assay's samples,
+					first_assay.samples.map { |s| find_sample_origin([s], 1) }.flatten.uniq.map { |s| { '@id': "#sample/#{s}" } }, # the samples from study level that are referenced in this assay's samples,
 				otherMaterials: convert_other_materials(all_sample_types)
 			}
 			isa_assay[:processSequence] = assays.map { |a| convert_process_sequence(a.sample_type, a.sops.first) }.flatten
@@ -500,15 +500,11 @@ module IsaExporter
 			sample_array = []
 			while sample_list.any?
 				temp = []
-				sample_list.each do |sample|
-					if sample.linked_samples.any?
-						temp += sample.linked_samples
-					end
-				end
-				sample_array << temp.map{|s| s.id }.uniq if !temp.blank?
+				sample_list.each { |sample| temp += sample.linked_samples if sample.linked_samples.any? }
+				sample_array << temp.map { |s| s.id }.uniq if !temp.blank?
 				sample_list = temp
 			end
-			sample_array[sample_array.length() - level - 1]
+			sample_array[sample_array.length - level - 1]
 		end
 
 		def random_string(len)
