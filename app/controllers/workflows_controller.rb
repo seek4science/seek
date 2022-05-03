@@ -1,5 +1,7 @@
 class WorkflowsController < ApplicationController
+  
   include Seek::IndexPager
+
   include Seek::AssetsCommon
 
   before_action :workflows_enabled?
@@ -12,13 +14,13 @@ class WorkflowsController < ApplicationController
   before_action :find_or_initialize_workflow, only: [:create_from_files, :create_from_ro_crate]
 
   include Seek::Publishing::PublishingCommon
+
   include Seek::Doi::Minting
+
   include Seek::IsaGraphExtensions
   include RoCrateHandling
-  include Legacy::WorkflowSupport
 
   api_actions :index, :show, :create, :update, :destroy, :ro_crate
-  user_content_actions :diagram
 
   rescue_from ROCrate::ReadException do |e|
     logger.error("Error whilst attempting to read RO-Crate metadata for #{@workflow&.id}.")
@@ -340,7 +342,7 @@ class WorkflowsController < ApplicationController
                                      { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                      { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
                                      { publication_ids: [] }, { presentation_ids: [] }, { document_ids: [] }, { data_file_ids: [] },
-                                     { data_file_ids: [] }, { workflow_data_files_attributes:[:id, :data_file_id, :workflow_data_file_relationship_id, :_destroy] },
+                                     { workflow_data_files_attributes:[:id, :data_file_id, :workflow_data_file_relationship_id, :_destroy] },
                                      :internals, :maturity_level, :source_link_url, :edam_topics, :edam_operations,
                                      { discussion_links_attributes: [:id, :url, :label, :_destroy] },
                                      { git_version_attributes: [:name, :comment, :ref, :commit, :root_path,
@@ -364,5 +366,9 @@ class WorkflowsController < ApplicationController
 
   def git_version_path_params
     params.require(:git_version).permit(:main_workflow_path, :abstract_cwl_path, :diagram_path)
+  end
+
+  def param_converter_options
+    { skip: [:data_file_ids] }
   end
 end

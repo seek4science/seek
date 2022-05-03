@@ -371,7 +371,7 @@ GEM
       nokogiri (~> 1)
       rake
     mini_mime (1.1.1)
-    mini_portile2 (2.6.1)
+    mini_portile2 (2.8.0)
     minitest (5.14.4)
     minitest-reporters (1.1.14)
       ansi
@@ -393,8 +393,8 @@ GEM
     net-ldap (0.16.0)
     netrc (0.11.0)
     nio4r (2.5.8)
-    nokogiri (1.12.5)
-      mini_portile2 (~> 2.6.1)
+    nokogiri (1.13.4)
+      mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
     nokogumbo (1.5.0)
       nokogiri
@@ -468,7 +468,7 @@ GEM
     puma (4.3.11)
       nio4r (~> 2.0)
     pyu-ruby-sasl (0.0.3.3)
-    racc (1.5.2)
+    racc (1.6.0)
     rack (2.2.3)
     rack-attack (6.6.0)
       rack (>= 1.0, < 3)
@@ -859,7 +859,7 @@ DEPENDENCIES
   minitest-reporters
   my_responds_to_parent!
   mysql2
-  nokogiri (~> 1.12.5)
+  nokogiri (~> 1.13.4)
   omniauth (~> 1.3.1)
   omniauth-github (~> 1.2.0)
   omniauth-ldap (~> 1.0.5)

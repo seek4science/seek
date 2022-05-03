@@ -23,6 +23,7 @@ class ContributedResourceSerializer < PCSSerializer
         data[:ref] = v.ref
         data[:tree] = polymorphic_path([object, :git_tree], version: v.version)
       end
+      data[:doi]=v.doi if v.respond_to?(:doi) 
       versions_data.append(data)
     end
     versions_data
@@ -41,6 +42,10 @@ class ContributedResourceSerializer < PCSSerializer
   end
   attribute :updated_at do
     get_version.updated_at
+  end
+
+  attribute :doi, if: -> { object.supports_doi? } do
+    get_version.doi
   end
 
   def get_correct_blob_content(requested_version)
@@ -74,7 +79,7 @@ class ContributedResourceSerializer < PCSSerializer
       md5sum: cb.md5sum,
       sha1sum: cb.sha1sum,
       content_type: cb.content_type,
-      link: polymorphic_url([cb.asset, cb], host: Seek::Config.site_base_host),
+      link: polymorphic_url([cb.asset, cb]),
       size: cb.file_size
     }
   end
@@ -95,5 +100,15 @@ class ContributedResourceSerializer < PCSSerializer
 
   def version_number
     @scope.try(:[],:requested_version) || object.try(:version)
+  end
+
+  def edam_annotations(property)
+    terms = object.annotations_with_attribute(property, true).collect(&:value).sort_by(&:label)
+    terms.collect do |term|
+      {
+        label: term.label,
+        identifier: term.iri
+      }
+    end
   end
 end

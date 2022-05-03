@@ -317,4 +317,17 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
       assert_equal '404 Not Found', res.dig('errors', 0, 'details')
     end
   end
+
+  test 'can access typeahead with samples disabled' do
+    person = Factory(:person)
+    login_as(person)
+    scv = Factory(:edam_topics_controlled_vocab)
+    with_config_value(:samples_enabled, false) do
+      get :typeahead, params: { format: :json, query: 'sam', scv_id:scv.id }
+      assert_response :success
+      res = JSON.parse(response.body)
+      assert_equal 1, res.length
+      assert_equal 'Sample collections', res.first['name']
+    end
+  end
 end

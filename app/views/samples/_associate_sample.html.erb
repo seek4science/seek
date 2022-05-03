@@ -107,6 +107,7 @@
 <script>
   var wizard;
   $j(document).ready(function () {
+    var samplesTablePath = '<%= samples_table_data_file_path('-data_file_id-') %>';
     // Reset the "Add individual samples" modal after it is closed
     $j('#modalAddIndividualSamples').on('hidden.bs.modal', function () {
       $j('[data-role="seek-association-filter-group"]', $j(this)).data('filterGroup').reset();
@@ -180,7 +181,7 @@
     $j('#samples-select-data-file').on('click', '.selectable[data-role="seek-association-candidate"]', function () {
       var candidate = $j(this);
       candidate.spinner('add');
-      $j.ajax('/data_files/'+$j(this).data('associationId')+'/samples_table', {
+      $j.ajax(samplesTablePath.replace('-data_file_id-', $j(this).data('associationId')), {
             success: function (data) {
               $j('#data-file-samples-table').html(data);
               initSamplesTable();

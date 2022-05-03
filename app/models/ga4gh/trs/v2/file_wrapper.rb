@@ -4,7 +4,7 @@ module Ga4gh
       # Decorator for a ROCrate::File to make it appear as a GA4GH TRS File Wrapper.
       class FileWrapper
         include ActiveModel::Serialization
-        include Rails.application.routes.url_helpers
+        include Seek::Util.routes
         attr_writer :url
 
         delegate_missing_to :@entry
@@ -25,8 +25,7 @@ module Ga4gh
                 @url = ga4gh_trs_v2_tool_versions_descriptor_url(id: @tool_version.parent.id,
                                                                  version_id: @tool_version.version,
                                                                  type: "PLAIN_#{@tool_version.descriptor_type.first.upcase}",
-                                                                 relative_path: @path,
-                                                                 host: Seek::Config.host_with_port)
+                                                                 relative_path: @path)
               end
               nil
             end

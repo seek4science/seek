@@ -5,4 +5,5 @@ class SopSerializer < ContributedResourceSerializer
   has_many :studies
   has_many :assays
   has_many :publications
-  end
+  has_many :workflows
+end

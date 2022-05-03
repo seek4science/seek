@@ -3,6 +3,14 @@ class ApplicationJob < ActiveJob::Base
   queue_as QueueNames::DEFAULT
   queue_with_priority  2
 
+  rescue_from(Exception) do |exception|
+    unless exception.is_a?(ActiveJob::DeserializationError) &&
+           exception.cause.is_a?(ActiveRecord::RecordNotFound)
+      raise exception if Rails.env.test?
+      report_exception(exception)
+    end
+  end
+
   # time limit for the whole job to run, after which a timeout exception will be raised
   def timelimit
     15.minutes
@@ -38,11 +46,6 @@ class ApplicationJob < ActiveJob::Base
     if job.follow_on_job?
       job.queue_job(default_priority, follow_on_delay)
     end
-  end
-
-  rescue_from(Exception) do |exception|
-    raise exception if Rails.env.test?
-    report_exception(exception)
   end
 
   # adds the job to the Delayed Job queue. Will not create it if it already exists and allow_duplicate is false,

@@ -23,15 +23,33 @@
                 "tag1",
                 "tag2"
             ],
+            "edam_operations": [
+                {
+                    "label": "Clustering",
+                    "identifier": "http://edamontology.org/operation_3432"
+                },
+                {
+                    "label": "Expression correlation analysis",
+                    "identifier": "http://edamontology.org/operation_3463"
+                }
+            ],
+            "edam_topics": [
+                {
+                    "label": "Chemistry",
+                    "identifier": "http://edamontology.org/topic_3314"
+                }
+            ],
             "versions": [
                 {
                     "version": 1,
                     "revision_comments": null,
-                    "url": "http://localhost:3000/workflows/23?version=1"
+                    "url": "http://localhost:3000/workflows/23?version=1",
+                    "doi": null
                 }
             ],
             "version": 1,
             "revision_comments": null,
+            "doi": null,
             "created_at": "2020-01-31T14:07:10.000Z",
             "updated_at": "2020-01-31T14:07:10.000Z",
             "content_blobs": [
@@ -96,10 +114,44 @@
                 "data": []
             },
             "publications": {
-                "data": []
+                "data": [
+                    {
+                        "id": "22",
+                        "type": "publications"
+                    }
+                ]
             },
             "sops": {
-                "data": []
+                "data": [
+                    {
+                        "id": "73",
+                        "type": "sops"
+                    }
+                ]
+            },
+            "presentations": {
+                "data": [
+                    {
+                        "id": "19",
+                        "type": "presentations"
+                    }
+                ]
+            },
+            "data_files": {
+                "data": [
+                    {
+                        "id": "95",
+                        "type": "data_files"
+                    }
+                ]
+            },
+            "documents": {
+                "data": [
+                    {
+                        "id": "12",
+                        "type": "documents"
+                    }
+                ]
             }
         },
         "links": {
