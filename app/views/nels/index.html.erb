@@ -72,22 +72,17 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
                 if (node.id === '#') {
                   return { };
                 }
-                // Returns d, but I am not sure what for!!
-                console.log(node.data)
                 var d = { id: node.data.id };
 
                 if (node.data.project_id) {
                   d.project_id = node.data.project_id
                 }
-                console.log("returning d")
-                console.log(d)
                 if (d) return d;
               },
               'error': function (error) {
                 $j('#nels-dataset').hide();
                 $j('#nels-content').show();
                 $j('#nels-content').html(HandlebarsTemplates['nels/error'](error));
-                console.log(error)
                 if (error.responseJSON.url) {
                   window.location.href = error.responseJSON.url;
                 }
@@ -131,7 +126,15 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
         } else {// Project selected
           $j('#nels-dataset').hide();
           $j('#nels-content').show();
-          $j('#nels-content').html(HandlebarsTemplates['nels/project'](data.node.data));
+          $j.ajax({ url: '<%= project_assay_nels_path(params[:assay_id]) -%>',
+            data: {
+              project: data.node.data,
+            },
+            success: function (data) {
+              $j('#nels-content').html(data).spinner('remove');
+            }
+          });
+
         }
     }).on('load_node.jstree', function (e, data) {
       if (data.node.id === '#') { // The root node - list of projects

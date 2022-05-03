@@ -441,6 +441,7 @@ SEEK::Application.routes.draw do
     resources :nels, only: [:index] do
       collection do
         get :projects
+        get :project
         get :datasets
         get :dataset
         get :subtype

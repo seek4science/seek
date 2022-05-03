@@ -37,7 +37,20 @@ class NelsController < ApplicationController
   def new_dataset
     # Populate all the necessary information for the view
     @datasettypes = @rest_client.datasettypes
-    @projects = @rest_client.projects
+    
+    @projects = []
+    # If project information is already defined
+    if (params.has_key?(:project_id) && params.has_key?(:project_name))
+      @projects = [
+        {
+          "id" => params[:project_id],
+          "name"=> params[:project_name]
+        }
+      ]
+    else
+      @projects = @rest_client.projects
+    end
+    @assay = Assay.find(params[:assay_id])
     respond_to do |format|
       format.html
     end
@@ -70,6 +83,13 @@ class NelsController < ApplicationController
 
     respond_to do |format|
       format.json
+    end
+  end
+
+  def project
+    @project = params[:project]
+    respond_to do |format|
+      format.html { render partial: 'nels/project' }
     end
   end
 

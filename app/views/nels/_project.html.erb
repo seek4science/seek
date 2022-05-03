@@ -1,0 +1,12 @@
+<h2><%= @project['name'] -%> </h2>
+<p><%= @project['description'] %></p>
+<% if @project['contact_person'].present? %>
+    <strong>Contact person:</strong> <%= @project['contact_person'] %><br/>
+<% end %>
+<% if (time = Time.parse(@project['created_at']) rescue nil).present? %>
+    <strong>Created:</strong> <%= time %> <span class="subtle">(<%= time_ago_in_words(time) %> ago)</span><br/>
+<% end %>
+<br/>
+<%= button_link_to('Create NeLS dataset', 'add', new_dataset_assay_nels_path(@assay.id)) %>
+
+<%= button_link_to('Create NeLS dataset', 'add', new_dataset_assay_nels_path(:project_id => @project['id'], :project_name => @project['name'])) %>

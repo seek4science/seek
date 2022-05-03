@@ -1,5 +1,9 @@
 <%# TODO: add dictionary entry for title %>
-<h1>New <%= @assay.title %> NeLS dataset</h1>
+<h1>New <%= @assay.title %> NeLS dataset
+<% if (@projects.length==1) %>
+  for project <%=@projects[0]['name'] %>
+<% end %>
+</h1>
 
 <%# <%= form_for[@assay, :nels, @dataset_assay_nels](@dataset_assay_nels, :multipart => true) do |f| %>
 <%# <%= form_for(@assay, :multipart => true) do |f| %>
@@ -8,7 +12,7 @@
 
    <div class="form-group">
     <label>Project <span class="required">*</span></label>
-    <%= select_tag :project, options_for_select(@projects.collect{ |p| [p['name'], p['id']]}), class: 'form-control' %>
+    <%= select_tag :project, options_for_select(@projects.collect{ |p| [p['name'], p['id']]}), class: 'form-control', disabled: @projects.length==1 %>
   </div>
    
   <div class="form-group">
