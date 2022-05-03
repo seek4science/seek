@@ -31,7 +31,10 @@ def dereference(obj)
 end
 
 def resolve(uri, pointer)
-  doc = cache(uri, !pointer.nil?) do
+  type = :raw
+  type = :yaml unless pointer.nil?
+  type = :json if uri.end_with?('.json')
+  doc = cache(uri, type) do
     if uri.start_with?('http')
       open(uri).read
     else
@@ -48,15 +51,16 @@ def dig(hash, path)
   keys.length > 0 ? hash.dig(*keys) : hash
 end
 
-# Store block at key, and also parse if it is JSON and store resulting object
-def cache(key, as_yaml = false)
-  @cache ||= { yaml: {}, raw: {} }
+# Store block at key, and also parse if it is JSON/YAML and store resulting object
+def cache(key, type = :raw)
+  @cache ||= { json: {}, raw: {}, yaml: {} }
   if block_given?
     @cache[:raw][key] = yield
-    @cache[:yaml][key] = YAML.load(@cache[:raw][key]) if as_yaml
+    @cache[:json][key] = JSON.parse(@cache[:raw][key]) if type == :json
+    @cache[:yaml][key] = YAML.unsafe_load(@cache[:raw][key]) if type == :yaml
   end
 
-  @cache[as_yaml ? :yaml : :raw][key]
+  @cache[type][key]
 end
 
 

@@ -10,7 +10,7 @@ info:
     url: http://groups.google.com/group/seek4science
     email: support@fair-dom.org
   description:
-      ref: ../descriptions/api.md
+    $ref: ../descriptions/api.md
   x-logo:
     url: api/definitions/seek.png
     backgroundColor: "#FFFFFF"
@@ -23,95 +23,95 @@ security:
 tags:
   - name: list
     description:
-        ref: ../descriptions/list.md
+      $ref: ../descriptions/list.md
     x-traitTag: true
   - name: create
     description:
-        ref: ../descriptions/create.md
+      $ref: ../descriptions/create.md
     x-traitTag: true
   - name: read
     description:
-        ref: ../descriptions/read.md
+      $ref: ../descriptions/read.md
     x-traitTag: true
   - name: update
     description:
-        ref: ../descriptions/update.md
+      $ref: ../descriptions/update.md
     x-traitTag: true
   - name: delete
     description:
-        ref: ../descriptions/delete.md
+      $ref: ../descriptions/delete.md
     x-traitTag: true
   - name: upload
     description:
-        ref: ../descriptions/upload.md
+      $ref: ../descriptions/upload.md
     x-traitTag: true
   - name: download
     description:
-        ref: ../descriptions/download.md
+      $ref: ../descriptions/download.md
     x-traitTag: true
   - name: search
     description:
-        ref: ../descriptions/search.md
+      $ref: ../descriptions/search.md
   - name: institutions
     description:
-        ref: ../descriptions/institutions.md
+      $ref: ../descriptions/institutions.md
   - name: people
     description:
-        ref: ../descriptions/people.md
+      $ref: ../descriptions/people.md
   - name: programmes
     description:
-        ref: ../descriptions/programmes.md
+      $ref: ../descriptions/programmes.md
   - name: projects
     description:
-        ref: ../descriptions/projects.md
+      $ref: ../descriptions/projects.md
   - name: investigations
     description:
-        ref: ../descriptions/investigations.md
+      $ref: ../descriptions/investigations.md
   - name: studies
     description:
-        ref: ../descriptions/studies.md
+      $ref: ../descriptions/studies.md
   - name: assays
     description:
-        ref: ../descriptions/assays.md
+      $ref: ../descriptions/assays.md
   - name: collections
     description:
-        ref: ../descriptions/collections.md
+      $ref: ../descriptions/collections.md
   - name: contentBlobs
     description:
-        ref: ../descriptions/contentBlobs.md
+      $ref: ../descriptions/contentBlobs.md
   - name: dataFiles
     description:
-        ref: ../descriptions/dataFiles.md
+      $ref: ../descriptions/dataFiles.md
   - name: documents
     description:
-        ref: ../descriptions/documents.md
+      $ref: ../descriptions/documents.md
   - name: models
     description:
-        ref: ../descriptions/models.md
+      $ref: ../descriptions/models.md
   - name: publications
     description:
-        ref: ../descriptions/publications.md
+      $ref: ../descriptions/publications.md
   - name: sops
     description:
-        ref: ../descriptions/sops.md
+      $ref: ../descriptions/sops.md
   - name: events
     description:
-        ref: ../descriptions/events.md
+      $ref: ../descriptions/events.md
   - name: presentations
     description:
-        ref: ../descriptions/presentations.md
+      $ref: ../descriptions/presentations.md
   - name: organisms
     description:
-        ref: ../descriptions/organisms.md
+      $ref: ../descriptions/organisms.md
   - name: sampleTypes
     description:
-        ref: ../descriptions/sampleTypes.md
+      $ref: ../descriptions/sampleTypes.md
   - name: samples
     description:
-        ref: ../descriptions/samples.md
+      $ref: ../descriptions/samples.md
   - name: workflows
     description:
-        ref: ../descriptions/workflows.md
+      $ref: ../descriptions/workflows.md
 x-tagGroups:
   - name: operation types
     tags:
@@ -242,7 +242,7 @@ paths:
     get:
       operationId: search
       description:
-          ref: ../descriptions/searchOperation.md
+        $ref: ../descriptions/searchOperation.md
       tags:
         - search
       responses:
@@ -255,12 +255,12 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/searchResponse.json
+                    $ref: ../examples/searchResponse.json
   /assays:
     get:
       operationId: listAssays
       description:
-          ref: ../descriptions/listAssays.md
+        $ref: ../descriptions/listAssays.md
       tags:
         - list
         - assays
@@ -274,7 +274,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/assaysResponse.json
+                    $ref: ../examples/assaysResponse.json
         "501":
           description: Not implemented
     post:
@@ -285,7 +285,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/createAssay.md
+        $ref: ../descriptions/createAssay.md
       tags:
         - create
         - assays
@@ -305,7 +305,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/assayPostResponse.json
+                    $ref: ../examples/assayPostResponse.json
         "400":
           description: Bad request
           content:
@@ -340,7 +340,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/updateAssay.md
+        $ref: ../descriptions/updateAssay.md
       tags:
         - update
         - assays
@@ -360,7 +360,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/assayPatchResponse.json
+                    $ref: ../examples/assayPatchResponse.json
         "403":
           description: Forbidden
           content:
@@ -382,7 +382,7 @@ paths:
     get:
       operationId: readAssay
       description:
-          ref: ../descriptions/readAssay.md
+        $ref: ../descriptions/readAssay.md
       tags:
         - read
         - assays
@@ -396,7 +396,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/assayResponse.json
+                    $ref: ../examples/assayResponse.json
         "403":
           description: Forbidden
           content:
@@ -417,7 +417,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/deleteAssay.md
+        $ref: ../descriptions/deleteAssay.md
       tags:
         - delete
         - assays
@@ -444,7 +444,7 @@ paths:
     get:
       operationId: listCollections
       description:
-          ref: ../descriptions/listCollections.md
+        $ref: ../descriptions/listCollections.md
       tags:
         - list
         - collections
@@ -458,7 +458,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/collectionsResponse.json
+                    $ref: ../examples/collectionsResponse.json
         "501":
           description: Not implemented
     post:
@@ -469,7 +469,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/createCollection.md
+        $ref: ../descriptions/createCollection.md
       tags:
         - create
         - collections
@@ -489,7 +489,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/collectionPostResponse.json
+                    $ref: ../examples/collectionPostResponse.json
         "400":
           description: Bad request
           content:
@@ -520,7 +520,7 @@ paths:
     get:
       operationId: readCollection
       description:
-          ref: ../descriptions/readCollection.md
+        $ref: ../descriptions/readCollection.md
       tags:
         - read
         - collections
@@ -534,7 +534,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/collectionResponse.json
+                    $ref: ../examples/collectionResponse.json
         "403":
           description: Forbidden
           content:
@@ -555,7 +555,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/updateCollection.md
+        $ref: ../descriptions/updateCollection.md
       tags:
         - update
         - collections
@@ -575,7 +575,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/collectionPatchResponse.json
+                    $ref: ../examples/collectionPatchResponse.json
         "403":
           description: Forbidden
           content:
@@ -602,7 +602,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/deleteCollection.md
+        $ref: ../descriptions/deleteCollection.md
       tags:
         - delete
         - collections
@@ -637,7 +637,7 @@ paths:
     get:
       operationId: listCollectionItems
       description:
-          ref: ../descriptions/listCollectionItems.md
+        $ref: ../descriptions/listCollectionItems.md
       tags:
         - list
         - collections
@@ -651,7 +651,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/collectionItemsResponse.json
+                    $ref: ../examples/collectionItemsResponse.json
         "501":
           description: Not implemented
     post:
@@ -662,7 +662,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/createCollectionItem.md
+        $ref: ../descriptions/createCollectionItem.md
       tags:
         - create
         - collections
@@ -682,7 +682,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/collectionItemPostResponse.json
+                    $ref: ../examples/collectionItemPostResponse.json
         "400":
           description: Bad request
           content:
@@ -720,7 +720,7 @@ paths:
     get:
       operationId: readCollectionItem
       description:
-          ref: ../descriptions/readCollectionItem.md
+        $ref: ../descriptions/readCollectionItem.md
       tags:
         - read
         - collections
@@ -734,7 +734,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/collectionItemResponse.json
+                    $ref: ../examples/collectionItemResponse.json
         "403":
           description: Forbidden
           content:
@@ -755,7 +755,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/updateCollectionItem.md
+        $ref: ../descriptions/updateCollectionItem.md
       tags:
         - update
         - collections
@@ -775,7 +775,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/collectionItemPatchResponse.json
+                    $ref: ../examples/collectionItemPatchResponse.json
         "403":
           description: Forbidden
           content:
@@ -802,7 +802,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/deleteCollectionItem.md
+        $ref: ../descriptions/deleteCollectionItem.md
       tags:
         - delete
         - collections
@@ -829,7 +829,7 @@ paths:
     get:
       operationId: listDataFiles
       description:
-          ref: ../descriptions/listDataFiles.md
+        $ref: ../descriptions/listDataFiles.md
       tags:
         - list
         - dataFiles
@@ -843,7 +843,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/dataFilesResponse.json
+                    $ref: ../examples/dataFilesResponse.json
         "501":
           description: Not implemented
     post:
@@ -854,7 +854,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/createDataFile.md
+        $ref: ../descriptions/createDataFile.md
       tags:
         - create
         - dataFiles
@@ -874,7 +874,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/dataFilePostResponse.json
+                    $ref: ../examples/dataFilePostResponse.json
         "400":
           description: Bad request
           content:
@@ -905,7 +905,7 @@ paths:
     get:
       operationId: readDataFile
       description:
-          ref: ../descriptions/readDataFile.md
+        $ref: ../descriptions/readDataFile.md
       parameters:
         - name: version
           in: query
@@ -927,7 +927,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/dataFileResponse.json
+                    $ref: ../examples/dataFileResponse.json
         "403":
           description: Forbidden
           content:
@@ -948,7 +948,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/updateDataFile.md
+        $ref: ../descriptions/updateDataFile.md
       tags:
         - update
         - dataFiles
@@ -968,7 +968,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/dataFilePatchResponse.json
+                    $ref: ../examples/dataFilePatchResponse.json
         "403":
           description: Forbidden
           content:
@@ -995,7 +995,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/deleteDataFile.md
+        $ref: ../descriptions/deleteDataFile.md
       tags:
         - delete
         - dataFiles
@@ -1049,7 +1049,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/uploadAssetContent.md
+        $ref: ../descriptions/uploadAssetContent.md
       tags:
         - upload
         - contentBlobs
@@ -1066,7 +1066,7 @@ paths:
     get:
       operationId: readContentBlob
       description:
-          ref: ../descriptions/readContentBlob.md
+        $ref: ../descriptions/readContentBlob.md
       tags:
         - read
         - contentBlobs
@@ -1124,7 +1124,7 @@ paths:
     get:
       operationId: downloadAssetContent
       description:
-          ref: ../descriptions/downloadAssetContent.md
+        $ref: ../descriptions/downloadAssetContent.md
       tags:
         - download
         - contentBlobs
@@ -1147,7 +1147,7 @@ paths:
     get:
       operationId: listDocuments
       description:
-          ref: ../descriptions/listDocuments.md
+        $ref: ../descriptions/listDocuments.md
       tags:
         - list
         - documents
@@ -1161,7 +1161,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/documentsResponse.json
+                    $ref: ../examples/documentsResponse.json
         "501":
           description: Not implemented
     post:
@@ -1172,7 +1172,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/createDocument.md
+        $ref: ../descriptions/createDocument.md
       tags:
         - create
         - documents
@@ -1192,7 +1192,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/documentPostResponse.json
+                    $ref: ../examples/documentPostResponse.json
         "400":
           description: Bad request
           content:
@@ -1223,7 +1223,7 @@ paths:
     get:
       operationId: readDocument
       description:
-          ref: ../descriptions/readDocument.md
+        $ref: ../descriptions/readDocument.md
       tags:
         - read
         - documents
@@ -1237,7 +1237,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/documentResponse.json
+                    $ref: ../examples/documentResponse.json
         "403":
           description: Forbidden
           content:
@@ -1258,7 +1258,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/updateDocument.md
+        $ref: ../descriptions/updateDocument.md
       tags:
         - update
         - documents
@@ -1278,7 +1278,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/documentPatchResponse.json
+                    $ref: ../examples/documentPatchResponse.json
         "403":
           description: Forbidden
           content:
@@ -1305,7 +1305,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/deleteDocument.md
+        $ref: ../descriptions/deleteDocument.md
       tags:
         - delete
         - documents
@@ -1332,7 +1332,7 @@ paths:
     get:
       operationId: listEvents
       description:
-          ref: ../descriptions/listEvents.md
+        $ref: ../descriptions/listEvents.md
       tags:
         - list
         - events
@@ -1346,7 +1346,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/eventsResponse.json
+                    $ref: ../examples/eventsResponse.json
         "501":
           description: Not implemented
     post:
@@ -1357,7 +1357,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/createEvent.md
+        $ref: ../descriptions/createEvent.md
       tags:
         - create
         - events
@@ -1377,7 +1377,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/eventPostResponse.json
+                    $ref: ../examples/eventPostResponse.json
         "400":
           description: Bad request
           content:
@@ -1408,7 +1408,7 @@ paths:
     get:
       operationId: readEvent
       description:
-          ref: ../descriptions/readEvent.md
+        $ref: ../descriptions/readEvent.md
       tags:
         - read
         - events
@@ -1422,7 +1422,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/eventResponse.json
+                    $ref: ../examples/eventResponse.json
         "403":
           description: Forbidden
           content:
@@ -1443,7 +1443,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/updateEvent.md
+        $ref: ../descriptions/updateEvent.md
       tags:
         - update
         - events
@@ -1463,7 +1463,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/eventPatchResponse.json
+                    $ref: ../examples/eventPatchResponse.json
         "403":
           description: Forbidden
           content:
@@ -1490,7 +1490,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/deleteEvent.md
+        $ref: ../descriptions/deleteEvent.md
       tags:
         - delete
         - events
@@ -1517,7 +1517,7 @@ paths:
     get:
       operationId: listInstitutions
       description:
-          ref: ../descriptions/listInstitutions.md
+        $ref: ../descriptions/listInstitutions.md
       tags:
         - list
         - institutions
@@ -1531,7 +1531,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/institutionsResponse.json
+                    $ref: ../examples/institutionsResponse.json
         "501":
           description: Not implemented
     post:
@@ -1542,7 +1542,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/createInstitution.md
+        $ref: ../descriptions/createInstitution.md
       tags:
         - create
         - institutions
@@ -1562,7 +1562,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/institutionPostResponse.json
+                    $ref: ../examples/institutionPostResponse.json
         "400":
           description: Bad request
           content:
@@ -1593,7 +1593,7 @@ paths:
     get:
       operationId: readInstitution
       description:
-          ref: ../descriptions/readInstitution.md
+        $ref: ../descriptions/readInstitution.md
       tags:
         - read
         - institutions
@@ -1607,7 +1607,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/institutionResponse.json
+                    $ref: ../examples/institutionResponse.json
         "403":
           description: Forbidden
           content:
@@ -1628,7 +1628,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/updateInstitution.md
+        $ref: ../descriptions/updateInstitution.md
       requestBody:
         content:
           application/json:
@@ -1648,7 +1648,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/institutionPatchResponse.json
+                    $ref: ../examples/institutionPatchResponse.json
         "403":
           description: Forbidden
           content:
@@ -1675,7 +1675,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/deleteInstitution.md
+        $ref: ../descriptions/deleteInstitution.md
       tags:
         - delete
         - institutions
@@ -1702,7 +1702,7 @@ paths:
     get:
       operationId: listInvestigations
       description:
-          ref: ../descriptions/listInvestigations.md
+        $ref: ../descriptions/listInvestigations.md
       tags:
         - list
         - investigations
@@ -1716,7 +1716,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/investigationsResponse.json
+                    $ref: ../examples/investigationsResponse.json
         "501":
           description: Not implemented
     post:
@@ -1727,7 +1727,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/createInvestigation.md
+        $ref: ../descriptions/createInvestigation.md
       tags:
         - create
         - investigations
@@ -1747,7 +1747,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/investigationPostResponse.json
+                    $ref: ../examples/investigationPostResponse.json
         "400":
           description: Bad request
           content:
@@ -1778,7 +1778,7 @@ paths:
     get:
       operationId: readInvestigation
       description:
-          ref: ../descriptions/readInvestigation.md
+        $ref: ../descriptions/readInvestigation.md
       tags:
         - read
         - investigations
@@ -1792,7 +1792,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/investigationResponse.json
+                    $ref: ../examples/investigationResponse.json
         "403":
           description: Forbidden
           content:
@@ -1813,7 +1813,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/updateInvestigation.md
+        $ref: ../descriptions/updateInvestigation.md
       requestBody:
         content:
           application/json:
@@ -1833,7 +1833,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/investigationPatchResponse.json
+                    $ref: ../examples/investigationPatchResponse.json
         "403":
           description: Forbidden
           content:
@@ -1860,7 +1860,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/deleteInvestigation.md
+        $ref: ../descriptions/deleteInvestigation.md
       tags:
         - delete
         - investigations
@@ -1887,7 +1887,7 @@ paths:
     get:
       operationId: listModels
       description:
-          ref: ../descriptions/listModels.md
+        $ref: ../descriptions/listModels.md
       tags:
         - list
         - models
@@ -1901,7 +1901,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/modelsResponse.json
+                    $ref: ../examples/modelsResponse.json
         "501":
           description: Not implemented
     post:
@@ -1912,7 +1912,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/createModel.md
+        $ref: ../descriptions/createModel.md
       tags:
         - create
         - models
@@ -1932,7 +1932,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/modelPostResponse.json
+                    $ref: ../examples/modelPostResponse.json
         "400":
           description: Bad request
           content:
@@ -1963,7 +1963,7 @@ paths:
     get:
       operationId: readModel
       description:
-          ref: ../descriptions/readModel.md
+        $ref: ../descriptions/readModel.md
       parameters:
         - name: version
           in: query
@@ -1985,7 +1985,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/modelResponse.json
+                    $ref: ../examples/modelResponse.json
         "403":
           description: Forbidden
           content:
@@ -2006,7 +2006,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/updateModel.md
+        $ref: ../descriptions/updateModel.md
       tags:
         - update
         - models
@@ -2026,7 +2026,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/modelPatchResponse.json
+                    $ref: ../examples/modelPatchResponse.json
         "403":
           description: Forbidden
           content:
@@ -2053,7 +2053,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/deleteModel.md
+        $ref: ../descriptions/deleteModel.md
       tags:
         - delete
         - models
@@ -2080,7 +2080,7 @@ paths:
     get:
       operationId: listOrganisms
       description:
-          ref: ../descriptions/listOrganisms.md
+        $ref: ../descriptions/listOrganisms.md
       tags:
         - list
         - organisms
@@ -2094,7 +2094,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/organismsResponse.json
+                    $ref: ../examples/organismsResponse.json
         "501":
           description: Not implemented
   "/organisms/{id}":
@@ -2109,7 +2109,7 @@ paths:
     get:
       operationId: readOrganism
       description:
-          ref: ../descriptions/readOrganism.md
+        $ref: ../descriptions/readOrganism.md
       tags:
         - read
         - organisms
@@ -2123,7 +2123,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/organismResponse.json
+                    $ref: ../examples/organismResponse.json
         "403":
           description: Forbidden
           content:
@@ -2140,7 +2140,7 @@ paths:
     get:
       operationId: listPeople
       description:
-          ref: ../descriptions/listPeople.md
+        $ref: ../descriptions/listPeople.md
       tags:
         - list
         - people
@@ -2154,7 +2154,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/peopleResponse.json
+                    $ref: ../examples/peopleResponse.json
         "501":
           description: Not implemented
     post:
@@ -2165,7 +2165,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/createPerson.md
+        $ref: ../descriptions/createPerson.md
       tags:
         - create
         - people
@@ -2185,7 +2185,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/personPostResponse.json
+                    $ref: ../examples/personPostResponse.json
         "400":
           description: Bad request
           content:
@@ -2208,7 +2208,7 @@ paths:
     get:
       operationId: currentPerson
       description:
-          ref: ../descriptions/currentPerson.md
+        $ref: ../descriptions/currentPerson.md
       tags:
         - read
         - people
@@ -2222,7 +2222,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/personResponse.json
+                    $ref: ../examples/personResponse.json
         "403":
           description: Forbidden
           content:
@@ -2247,7 +2247,7 @@ paths:
     get:
       operationId: readPerson
       description:
-          ref: ../descriptions/readPerson.md
+        $ref: ../descriptions/readPerson.md
       tags:
         - read
         - people
@@ -2261,7 +2261,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/personResponse.json
+                    $ref: ../examples/personResponse.json
         "403":
           description: Forbidden
           content:
@@ -2282,7 +2282,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/updatePerson.md
+        $ref: ../descriptions/updatePerson.md
       requestBody:
         content:
           application/json:
@@ -2302,7 +2302,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/personPatchResponse.json
+                    $ref: ../examples/personPatchResponse.json
         "403":
           description: Forbidden
           content:
@@ -2329,7 +2329,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/deletePerson.md
+        $ref: ../descriptions/deletePerson.md
       tags:
         - delete
         - people
@@ -2356,7 +2356,7 @@ paths:
     get:
       operationId: listPresentations
       description:
-          ref: ../descriptions/listPresentations.md
+        $ref: ../descriptions/listPresentations.md
       tags:
         - list
         - presentations
@@ -2370,7 +2370,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/presentationsResponse.json
+                    $ref: ../examples/presentationsResponse.json
         "501":
           description: Not implemented
     post:
@@ -2381,7 +2381,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/createPresentation.md
+        $ref: ../descriptions/createPresentation.md
       tags:
         - create
         - presentations
@@ -2401,7 +2401,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/presentationPostResponse.json
+                    $ref: ../examples/presentationPostResponse.json
         "400":
           description: Bad request
           content:
@@ -2432,7 +2432,7 @@ paths:
     get:
       operationId: readPresentation
       description:
-          ref: ../descriptions/readPresentation.md
+        $ref: ../descriptions/readPresentation.md
       parameters:
         - name: version
           in: query
@@ -2454,7 +2454,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/presentationResponse.json
+                    $ref: ../examples/presentationResponse.json
         "403":
           description: Forbidden
           content:
@@ -2475,7 +2475,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/updatePresentation.md
+        $ref: ../descriptions/updatePresentation.md
       tags:
         - update
         - presentations
@@ -2495,7 +2495,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/presentationPatchResponse.json
+                    $ref: ../examples/presentationPatchResponse.json
         "403":
           description: Forbidden
           content:
@@ -2522,7 +2522,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/deletePresentation.md
+        $ref: ../descriptions/deletePresentation.md
       tags:
         - delete
         - presentations
@@ -2549,7 +2549,7 @@ paths:
     get:
       operationId: listProgrammes
       description:
-          ref: ../descriptions/listProgrammes.md
+        $ref: ../descriptions/listProgrammes.md
       tags:
         - list
         - programmes
@@ -2563,7 +2563,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/programmesResponse.json
+                    $ref: ../examples/programmesResponse.json
         "501":
           description: Not implemented
     post:
@@ -2574,7 +2574,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/createProgramme.md
+        $ref: ../descriptions/createProgramme.md
       tags:
         - create
         - programmes
@@ -2594,7 +2594,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/programmePostResponse.json
+                    $ref: ../examples/programmePostResponse.json
         "400":
           description: Bad request
           content:
@@ -2625,7 +2625,7 @@ paths:
     get:
       operationId: readProgramme
       description:
-          ref: ../descriptions/readProgramme.md
+        $ref: ../descriptions/readProgramme.md
       tags:
         - read
         - programmes
@@ -2639,7 +2639,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/programmeResponse.json
+                    $ref: ../examples/programmeResponse.json
         "403":
           description: Forbidden
           content:
@@ -2660,7 +2660,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/updateProgramme.md
+        $ref: ../descriptions/updateProgramme.md
       requestBody:
         content:
           application/json:
@@ -2680,7 +2680,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/programmePatchResponse.json
+                    $ref: ../examples/programmePatchResponse.json
         "403":
           description: Forbidden
           content:
@@ -2707,7 +2707,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/deleteProgramme.md
+        $ref: ../descriptions/deleteProgramme.md
       tags:
         - delete
         - programmes
@@ -2734,7 +2734,7 @@ paths:
     get:
       operationId: listProjects
       description:
-          ref: ../descriptions/listProjects.md
+        $ref: ../descriptions/listProjects.md
       tags:
         - list
         - projects
@@ -2748,7 +2748,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/projectsResponse.json
+                    $ref: ../examples/projectsResponse.json
         "501":
           description: Not implemented
     post:
@@ -2759,7 +2759,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/createProject.md
+        $ref: ../descriptions/createProject.md
       tags:
         - create
         - projects
@@ -2779,7 +2779,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/projectPostResponse.json
+                    $ref: ../examples/projectPostResponse.json
         "400":
           description: Bad request
           content:
@@ -2810,7 +2810,7 @@ paths:
     get:
       operationId: readProject
       description:
-          ref: ../descriptions/readProject.md
+        $ref: ../descriptions/readProject.md
       tags:
         - read
         - projects
@@ -2824,7 +2824,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/projectResponse.json
+                    $ref: ../examples/projectResponse.json
         "403":
           description: Forbidden
           content:
@@ -2845,7 +2845,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/updateProject.md
+        $ref: ../descriptions/updateProject.md
       requestBody:
         content:
           application/json:
@@ -2865,7 +2865,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/projectPatchResponse.json
+                    $ref: ../examples/projectPatchResponse.json
         "403":
           description: Forbidden
           content:
@@ -2892,7 +2892,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/deleteProject.md
+        $ref: ../descriptions/deleteProject.md
       tags:
         - delete
         - projects
@@ -2919,7 +2919,7 @@ paths:
     get:
       operationId: listPublications
       description:
-          ref: ../descriptions/listPublications.md
+        $ref: ../descriptions/listPublications.md
       tags:
         - list
         - publications
@@ -2933,7 +2933,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/publicationsResponse.json
+                    $ref: ../examples/publicationsResponse.json
         "501":
           description: Not implemented
   "/publications/{id}":
@@ -2948,7 +2948,7 @@ paths:
     get:
       operationId: readPublication
       description:
-          ref: ../descriptions/readPublication.md
+        $ref: ../descriptions/readPublication.md
       tags:
         - read
         - publications
@@ -2962,7 +2962,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/publicationResponse.json
+                    $ref: ../examples/publicationResponse.json
         "403":
           description: Forbidden
           content:
@@ -2984,7 +2984,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/createSample.md
+        $ref: ../descriptions/createSample.md
       tags:
         - create
         - samples
@@ -3004,7 +3004,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/samplePostResponse.json
+                    $ref: ../examples/samplePostResponse.json
         "400":
           description: Bad request
           content:
@@ -3034,7 +3034,7 @@ paths:
     get:
       operationId: readSample
       description:
-          ref: ../descriptions/readSample.md
+        $ref: ../descriptions/readSample.md
       tags:
         - read
         - samples
@@ -3048,7 +3048,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/sampleResponse.json
+                    $ref: ../examples/sampleResponse.json
         "403":
           description: Forbidden
           content:
@@ -3069,7 +3069,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/updateSample.md
+        $ref: ../descriptions/updateSample.md
       tags:
         - update
         - samples
@@ -3089,7 +3089,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/samplePatchResponse.json
+                    $ref: ../examples/samplePatchResponse.json
         "403":
           description: Forbidden
           content:
@@ -3116,7 +3116,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/deleteSample.md
+        $ref: ../descriptions/deleteSample.md
       tags:
         - delete
         - samples
@@ -3143,7 +3143,7 @@ paths:
     get:
       operationId: listSampleAttributeTypes
       description:
-          ref: ../descriptions/listSampleAttributeTypes.md
+        $ref: ../descriptions/listSampleAttributeTypes.md
       tags:
         - list
         - sampleAttributeTypes
@@ -3157,14 +3157,14 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/sampleAttributeTypesResponse.json
+                    $ref: ../examples/sampleAttributeTypesResponse.json
         "501":
           description: Not implemented
   /sample_types:
     get:
       operationId: listSampleTypes
       description:
-          ref: ../descriptions/listSampleTypes.md
+        $ref: ../descriptions/listSampleTypes.md
       tags:
         - list
         - sampleTypes
@@ -3178,7 +3178,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/sampleTypesResponse.json
+                    $ref: ../examples/sampleTypesResponse.json
         "501":
           description: Not implemented
     post:
@@ -3189,7 +3189,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/createSampleType.md
+        $ref: ../descriptions/createSampleType.md
       tags:
         - create
         - sampleTypes
@@ -3209,7 +3209,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/sampleTypePostResponse.json
+                    $ref: ../examples/sampleTypePostResponse.json
         "400":
           description: Bad request
           content:
@@ -3239,7 +3239,7 @@ paths:
     get:
       operationId: readSampleType
       description:
-          ref: ../descriptions/readSampleType.md
+        $ref: ../descriptions/readSampleType.md
       tags:
         - read
         - sampleTypes
@@ -3253,7 +3253,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/sampleTypeResponse.json
+                    $ref: ../examples/sampleTypeResponse.json
         "403":
           description: Forbidden
           content:
@@ -3274,7 +3274,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/updateSampleType.md
+        $ref: ../descriptions/updateSampleType.md
       tags:
         - update
         - sampleTypes
@@ -3294,7 +3294,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/sampleTypePatchResponse.json
+                    $ref: ../examples/sampleTypePatchResponse.json
         "403":
           description: Forbidden
           content:
@@ -3321,7 +3321,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/deleteSampleType.md
+        $ref: ../descriptions/deleteSampleType.md
       tags:
         - delete
         - sampleTypes
@@ -3348,7 +3348,7 @@ paths:
     get:
       operationId: listSops
       description:
-          ref: ../descriptions/listSops.md
+        $ref: ../descriptions/listSops.md
       tags:
         - list
         - sops
@@ -3362,7 +3362,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/sopsResponse.json
+                    $ref: ../examples/sopsResponse.json
         "501":
           description: Not implemented
     post:
@@ -3373,7 +3373,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/createSop.md
+        $ref: ../descriptions/createSop.md
       tags:
         - create
         - sops
@@ -3393,7 +3393,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/sopPostResponse.json
+                    $ref: ../examples/sopPostResponse.json
         "400":
           description: Bad request
           content:
@@ -3424,7 +3424,7 @@ paths:
     get:
       operationId: readSop
       description:
-          ref: ../descriptions/readSop.md
+        $ref: ../descriptions/readSop.md
       parameters:
         - name: version
           in: query
@@ -3446,7 +3446,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/sopResponse.json
+                    $ref: ../examples/sopResponse.json
         "403":
           description: Forbidden
           content:
@@ -3467,7 +3467,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/updateSop.md
+        $ref: ../descriptions/updateSop.md
       tags:
         - update
         - sops
@@ -3487,7 +3487,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/sopPatchResponse.json
+                    $ref: ../examples/sopPatchResponse.json
         "403":
           description: Forbidden
           content:
@@ -3514,7 +3514,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/deleteSop.md
+        $ref: ../descriptions/deleteSop.md
       tags:
         - delete
         - sops
@@ -3541,7 +3541,7 @@ paths:
     get:
       operationId: listStudies
       description:
-          ref: ../descriptions/listStudies.md
+        $ref: ../descriptions/listStudies.md
       tags:
         - list
         - studies
@@ -3555,7 +3555,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/studiesResponse.json
+                    $ref: ../examples/studiesResponse.json
         "501":
           description: Not implemented
     post:
@@ -3566,7 +3566,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/createStudy.md
+        $ref: ../descriptions/createStudy.md
       tags:
         - create
         - studies
@@ -3586,7 +3586,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/studyPostResponse.json
+                    $ref: ../examples/studyPostResponse.json
         "400":
           description: Bad request
           content:
@@ -3617,7 +3617,7 @@ paths:
     get:
       operationId: readStudy
       description:
-          ref: ../descriptions/readStudy.md
+        $ref: ../descriptions/readStudy.md
       tags:
         - read
         - studies
@@ -3631,7 +3631,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/studyResponse.json
+                    $ref: ../examples/studyResponse.json
         "403":
           description: Forbidden
           content:
@@ -3652,7 +3652,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/updateStudy.md
+        $ref: ../descriptions/updateStudy.md
       tags:
         - update
         - studies
@@ -3672,7 +3672,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/studyPatchResponse.json
+                    $ref: ../examples/studyPatchResponse.json
         "403":
           description: Forbidden
           content:
@@ -3699,7 +3699,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/deleteStudy.md
+        $ref: ../descriptions/deleteStudy.md
       tags:
         - delete
         - studies
@@ -3726,7 +3726,7 @@ paths:
     get:
       operationId: listWorkflows
       description:
-          ref: ../descriptions/listWorkflows.md
+        $ref: ../descriptions/listWorkflows.md
       tags:
         - list
         - workflows
@@ -3740,7 +3740,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/workflowsResponse.json
+                    $ref: ../examples/workflowsResponse.json
         "501":
           description: Not implemented
     post:
@@ -3751,7 +3751,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/createWorkflow.md
+        $ref: ../descriptions/createWorkflow.md
       tags:
         - create
         - workflows
@@ -3771,7 +3771,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/workflowPostResponse.json
+                    $ref: ../examples/workflowPostResponse.json
         "400":
           description: Bad request
           content:
@@ -3802,7 +3802,7 @@ paths:
     get:
       operationId: readWorkflow
       description:
-          ref: ../descriptions/readWorkflow.md
+        $ref: ../descriptions/readWorkflow.md
       tags:
         - read
         - workflows
@@ -3816,7 +3816,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/workflowResponse.json
+                    $ref: ../examples/workflowResponse.json
         "403":
           description: Forbidden
           content:
@@ -3837,7 +3837,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/updateWorkflow.md
+        $ref: ../descriptions/updateWorkflow.md
       tags:
         - update
         - workflows
@@ -3857,7 +3857,7 @@ paths:
               examples:
                 response:
                   value:
-                      ref: ../examples/workflowPatchResponse.json
+                    $ref: ../examples/workflowPatchResponse.json
         "403":
           description: Forbidden
           content:
@@ -3884,7 +3884,7 @@ paths:
         - apiToken: []
         - basicAuth: []
       description:
-          ref: ../descriptions/deleteWorkflow.md
+        $ref: ../descriptions/deleteWorkflow.md
       tags:
         - delete
         - workflows
@@ -3914,7 +3914,7 @@ components:
     OAuth2:
       type: oauth2
       description:
-          ref: ../descriptions/authOAuth2.md
+        $ref: ../descriptions/authOAuth2.md
       flows:
         authorizationCode:
           authorizationUrl: /oauth/authorize
@@ -3927,11 +3927,11 @@ components:
       in: header
       name: Authorization
       description:
-          ref: ../descriptions/authToken.md
+        $ref: ../descriptions/authToken.md
     basicAuth:
       type: http
       description:
-          ref: ../descriptions/authBasic.md
+        $ref: ../descriptions/authBasic.md
       scheme: basic
   schemas:
     error:
@@ -5803,7 +5803,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/assayPost.json
+        $ref: ../examples/assayPost.json
     assayPatch:
       type: object
       properties:
@@ -5884,7 +5884,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/assayPatch.json
+        $ref: ../examples/assayPatch.json
     collectionPost:
       type: object
       properties:
@@ -5934,7 +5934,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/collectionPost.json
+        $ref: ../examples/collectionPost.json
     collectionPatch:
       type: object
       properties:
@@ -5981,7 +5981,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/collectionPatch.json
+        $ref: ../examples/collectionPatch.json
     collectionItemPost:
       type: object
       properties:
@@ -6014,7 +6014,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/collectionItemPost.json
+        $ref: ../examples/collectionItemPost.json
     collectionItemPatch:
       type: object
       properties:
@@ -6049,7 +6049,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/collectionItemPatch.json
+        $ref: ../examples/collectionItemPatch.json
     dataFileResponse:
       type: object
       properties:
@@ -6176,7 +6176,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/dataFilePost.json
+        $ref: ../examples/dataFilePost.json
     dataFilePatch:
       type: object
       properties:
@@ -6229,7 +6229,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/dataFilePatch.json
+        $ref: ../examples/dataFilePatch.json
     documentResponse:
       type: object
       properties:
@@ -6343,7 +6343,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/documentPost.json
+        $ref: ../examples/documentPost.json
     documentPatch:
       type: object
       properties:
@@ -6392,7 +6392,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/documentPatch.json
+        $ref: ../examples/documentPatch.json
     eventResponse:
       type: object
       properties:
@@ -6523,7 +6523,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/eventPost.json
+        $ref: ../examples/eventPost.json
     eventPatch:
       type: object
       properties:
@@ -6576,7 +6576,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/eventPatch.json
+        $ref: ../examples/eventPatch.json
     institutionResponse:
       type: object
       properties:
@@ -6677,7 +6677,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/institutionPost.json
+        $ref: ../examples/institutionPost.json
     institutionPatch:
       type: object
       properties:
@@ -6713,7 +6713,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/institutionPatch.json
+        $ref: ../examples/institutionPatch.json
     investigationResponse:
       type: object
       properties:
@@ -6846,7 +6846,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/investigationPatch.json
+        $ref: ../examples/investigationPatch.json
     investigationPost:
       type: object
       properties:
@@ -6894,7 +6894,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/investigationPost.json
+        $ref: ../examples/investigationPost.json
     modelResponse:
       type: object
       properties:
@@ -7021,7 +7021,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/modelPost.json
+        $ref: ../examples/modelPost.json
     modelPatch:
       type: object
       properties:
@@ -7080,7 +7080,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/modelPatch.json
+        $ref: ../examples/modelPatch.json
     organismResponse:
       type: object
       properties:
@@ -7283,7 +7283,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/personPatch.json
+        $ref: ../examples/personPatch.json
     personPost:
       type: object
       properties:
@@ -7327,7 +7327,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/personPost.json
+        $ref: ../examples/personPost.json
     presentationResponse:
       type: object
       properties:
@@ -7446,7 +7446,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/presentationPost.json
+        $ref: ../examples/presentationPost.json
     presentationPatch:
       type: object
       properties:
@@ -7497,7 +7497,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/presentationPatch.json
+        $ref: ../examples/presentationPatch.json
     programmeResponse:
       type: object
       properties:
@@ -7616,7 +7616,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/programmePost.json
+        $ref: ../examples/programmePost.json
     programmePatch:
       type: object
       properties:
@@ -7659,7 +7659,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/programmePatch.json
+        $ref: ../examples/programmePatch.json
     projectResponse:
       type: object
       properties:
@@ -7837,7 +7837,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/projectPatch.json
+        $ref: ../examples/projectPatch.json
     projectPost:
       type: object
       properties:
@@ -7884,7 +7884,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/projectPost.json
+        $ref: ../examples/projectPost.json
     publicationResponse:
       type: object
       properties:
@@ -8140,7 +8140,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/sopPost.json
+        $ref: ../examples/sopPost.json
     sopPatch:
       type: object
       properties:
@@ -8189,7 +8189,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/sopPatch.json
+        $ref: ../examples/sopPatch.json
     studyResponse:
       type: object
       properties:
@@ -8329,7 +8329,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/studyPost.json
+        $ref: ../examples/studyPost.json
     studyPatch:
       type: object
       properties:
@@ -8376,7 +8376,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/studyPatch.json
+        $ref: ../examples/studyPatch.json
     workflowResponse:
       type: object
       properties:
@@ -8598,7 +8598,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/workflowPost.json
+        $ref: ../examples/workflowPost.json
     workflowPatch:
       type: object
       properties:
@@ -8662,7 +8662,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/workflowPatch.json
+        $ref: ../examples/workflowPatch.json
     assaysResponse:
       type: object
       properties:
@@ -9575,7 +9575,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/samplePost.json
+        $ref: ../examples/samplePost.json
     samplePostResponse:
       $ref: "#/components/schemas/sampleResponse"
     samplePatch:
@@ -9626,7 +9626,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/samplePatch.json
+        $ref: ../examples/samplePatch.json
     sampleTypeSkeleton:
       properties:
         id:
@@ -9810,7 +9810,7 @@ components:
         - data
       additionalProperties: false
       example:
-          ref: ../examples/sampleTypePatch.json
+        $ref: ../examples/sampleTypePatch.json
     studySkeleton:
       properties:
         id:
