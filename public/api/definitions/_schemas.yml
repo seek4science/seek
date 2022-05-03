@@ -1,0 +1,4143 @@
+error:
+  type: object
+  properties:
+    id:
+      type: string
+    status:
+      type: string
+    code:
+      type: string
+    title:
+      type: string
+    detail:
+      type: string
+    source:
+      type: object
+      properties:
+        pointer:
+          type: string
+errors_array:
+  type: array
+  minItems: 0
+  items:
+    $ref: "#/components/schemas/error"
+errors:
+  type: object
+  properties:
+    errors:
+      $ref: "#/components/schemas/errors_array"
+ok:
+  type: object
+  properties:
+    status:
+      $ref: "#/components/schemas/nonEmptyString"
+  required:
+    - status
+  additionalProperties: false
+  example:
+    status: ok
+not_implemented:
+  type: object
+  properties:
+    errors:
+      $ref: "#/components/schemas/errors_array"
+unprocessable_entity:
+  type: object
+  properties:
+    errors:
+      $ref: "#/components/schemas/errors_array"
+  example:
+    errors:
+      - detail: id specified by the PUT request does not match object-id in the
+          JSON input
+bad_request:
+  type: object
+  properties:
+    errors:
+      $ref: "#/components/schemas/errors_array"
+  example:
+    errors:
+      - title: You do not have permission
+        detail: No permission
+forbidden:
+  type: object
+  properties:
+    errors:
+      $ref: "#/components/schemas/errors_array"
+not_found:
+  type: object
+  properties:
+    errors:
+      $ref: "#/components/schemas/errors_array"
+  example:
+    errors:
+      - title: Not found
+        detail: Couldn't find Institution with 'id'=[70]
+dateTimeString:
+  type: string
+  minLength: 1
+  format: date-time
+nullableDateTimeString:
+  anyOf:
+    - type: 'null'
+    - $ref: "#/components/schemas/dateTimeString"
+dateString:
+  type: string
+  minLength: 1
+  format: date
+nullableDateString:
+  anyOf:
+    - type: 'null'
+    - $ref: "#/components/schemas/dateString"
+nonEmptyString:
+  type: string
+  minLength: 1
+nullableNonEmptyString:
+  anyOf:
+    - type: 'null'
+    - $ref: "#/components/schemas/nonEmptyString"
+otherCreatorsString:
+  type: string
+  minLength: 1
+nullableOtherCreatorsString:
+  anyOf:
+    - type: 'null'
+    - $ref: "#/components/schemas/otherCreatorsString"
+nonEmptyStringList:
+  type: array
+  items:
+    $ref: "#/components/schemas/nonEmptyString"
+assetsCreator:
+  type: object
+  properties:
+    pos:
+      type: integer
+    profile:
+      $ref: "#/components/schemas/uriString"
+    given_name:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    family_name:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    orcid:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    affiliation:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+  required:
+    - given_name
+    - family_name
+assetsCreatorsList:
+  type: array
+  minItems: 0
+  items:
+    $ref: "#/components/schemas/assetsCreator"
+assetLink:
+  type: object
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    label:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    url:
+      $ref: "#/components/schemas/uriString"
+  required:
+    - id
+    - label
+    - url
+assetLinkCreate:
+  type: object
+  properties:
+    label:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    url:
+      $ref: "#/components/schemas/uriString"
+  required:
+    - label
+    - url
+assetLinkList:
+  type: array
+  minItems: 0
+  items:
+    $ref: "#/components/schemas/assetLink"
+assetLinkPostList:
+  type: array
+  minItems: 0
+  items:
+    $ref: "#/components/schemas/assetLinkCreate"
+assetLinkPatchList:
+  type: array
+  minItems: 0
+  items:
+    anyOf:
+      - $ref: "#/components/schemas/assetLink"
+      - $ref: "#/components/schemas/assetLinkCreate"
+snapshotSkeleton:
+  type: object
+  properties:
+    snapshot:
+      type: integer
+      minimum: 1
+    url:
+      $ref: "#/components/schemas/uriString"
+  required:
+    - snapshot
+    - url
+snapshotsList:
+  type: array
+  items:
+    $ref: "#/components/schemas/snapshotSkeleton"
+uriString:
+  type: string
+  minLength: 1
+  format: uri
+nullableUriString:
+  anyOf:
+    - type: 'null'
+    - $ref: "#/components/schemas/uriString"
+nullableInteger:
+  anyOf:
+    - type: 'null'
+    - type: integer
+license:
+  type: string
+  minLength: 1
+nullableLicense:
+  anyOf:
+    - type: 'null'
+    - $ref: "#/components/schemas/license"
+md5sumString:
+  type: string
+  minLength: 32
+  maxLength: 32
+  pattern: "[0-9a-f]{32}"
+nullableMd5sumString:
+  anyOf:
+    - type: 'null'
+    - $ref: "#/components/schemas/md5sumString"
+sha1sumString:
+  type: string
+  minLength: 5
+  maxLength: 40
+  pattern: "[0-9a-f]{5,40}"
+nullableSha1sumString:
+  anyOf:
+    - type: 'null'
+    - $ref: "#/components/schemas/sha1sumString"
+countryString:
+  type: string
+nullableCountryString:
+  anyOf:
+    - type: 'null'
+    - $ref: "#/components/schemas/countryString"
+countryCodeString:
+  minLength: 2
+  maxLength: 2
+  type: string
+nullableCountryCodeString:
+  anyOf:
+    - type: 'null'
+    - $ref: "#/components/schemas/countryCodeString"
+versionNumber:
+  type: string
+  minLength: 1
+  enum:
+    - "1.0"
+JsonApiVersion:
+  type: object
+  properties:
+    version:
+      $ref: "#/components/schemas/versionNumber"
+  required:
+    - version
+  additionalProperties: false
+indexLinks:
+  type: object
+  properties:
+    self:
+      $ref: "#/components/schemas/uriString"
+    first:
+      $ref: "#/components/schemas/nullableUriString"
+    prev:
+      $ref: "#/components/schemas/nullableUriString"
+    next:
+      $ref: "#/components/schemas/nullableUriString"
+    last:
+      $ref: "#/components/schemas/nullableUriString"
+  required:
+    - self
+  additionalProperties: false
+collectionLinks:
+  type: object
+  properties:
+    self:
+      $ref: "#/components/schemas/uriString"
+    items:
+      $ref: "#/components/schemas/uriString"
+  required:
+    - self
+    - items
+linksType:
+  type: object
+  properties:
+    self:
+      $ref: "#/components/schemas/uriString"
+  required:
+    - self
+  additionalProperties: false
+downloadableLinksType:
+  type: object
+  properties:
+    self:
+      $ref: "#/components/schemas/uriString"
+    download:
+      $ref: "#/components/schemas/uriString"
+  required:
+    - self
+    - download
+  additionalProperties: false
+baseMetaType:
+  type: object
+  properties:
+    base_url:
+      $ref: "#/components/schemas/uriString"
+    api_version:
+      $ref: "#/components/schemas/nonEmptyString"
+  required:
+    - base_url
+    - api_version
+  additionalProperties: false
+metaType:
+  type: object
+  properties:
+    base_url:
+      $ref: "#/components/schemas/uriString"
+    api_version:
+      $ref: "#/components/schemas/nonEmptyString"
+    created:
+      $ref: "#/components/schemas/dateTimeString"
+    modified:
+      $ref: "#/components/schemas/dateTimeString"
+    uuid:
+      $ref: "#/components/schemas/nonEmptyString"
+  required:
+    - created
+    - modified
+    - uuid
+    - base_url
+    - api_version
+  additionalProperties: false
+collectionItemMetaType:
+  type: object
+  properties:
+    base_url:
+      $ref: "#/components/schemas/uriString"
+    api_version:
+      $ref: "#/components/schemas/nonEmptyString"
+    created:
+      $ref: "#/components/schemas/dateTimeString"
+    modified:
+      $ref: "#/components/schemas/dateTimeString"
+  required:
+    - created
+    - modified
+    - base_url
+    - api_version
+  additionalProperties: false
+policy:
+  type: object
+  properties:
+    access:
+      $ref: "#/components/schemas/accessType"
+    permissions:
+      type: array
+      minItems: 0
+      uniqueItems: true
+      items:
+        properties:
+          resource:
+            $ref: "#/components/schemas/permissionResource"
+          access:
+            $ref: "#/components/schemas/accessType"
+        required:
+          - resource
+          - access
+        additionalProperties: false
+  required:
+    - access
+    - permissions
+  additionalProperties: false
+accessType:
+  type: string
+  minLength: 1
+  enum:
+    - manage
+    - edit
+    - download
+    - view
+    - no_access
+anyType:
+  type: string
+  minLength: 1
+  enum:
+    - assays
+    - content_blobs
+    - data_files
+    - documents
+    - events
+    - institutions
+    - models
+    - organisms
+    - people
+    - presentations
+    - programmes
+    - projects
+    - publications
+    - sample_types
+    - sops
+    - studies
+    - workflows
+permissionResource:
+  properties:
+    type:
+      $ref: "#/components/schemas/permissionResourceType"
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+  additionalProperties: false
+permissionResourceType:
+  type: string
+  minLength: 1
+  enum:
+    - people
+    - favourite_groups
+    - work_groups
+    - projects
+    - programmes
+    - institutions
+contributedTypeAttributes:
+  type: object
+  properties:
+    tags:
+      $ref: "#/components/schemas/tagsType"
+    title:
+      $ref: "#/components/schemas/nonEmptyString"
+    description:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    license:
+      $ref: "#/components/schemas/nullableLicense"
+    latest_version:
+      type: number
+    versions:
+      type: array
+      minItems: 1
+      uniqueItems: true
+      items:
+        $ref: "#/components/schemas/version"
+    version:
+      type: number
+    revision_comments:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    doi:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    created_at:
+      $ref: "#/components/schemas/dateTimeString"
+    updated_at:
+      $ref: "#/components/schemas/dateTimeString"
+    content_blobs:
+      $ref: "#/components/schemas/contentBlobsList"
+    policy:
+      $ref: "#/components/schemas/policy"
+    other_creators:
+      $ref: "#/components/schemas/nullableOtherCreatorsString"
+    creators:
+      $ref: "#/components/schemas/assetsCreatorsList"
+    discussion_links:
+      $ref: "#/components/schemas/assetLinkList"
+  required:
+    - title
+    - license
+    - latest_version
+    - versions
+    - version
+    - created_at
+    - updated_at
+    - content_blobs
+  additionalProperties: false
+collectionAttributes:
+  type: object
+  properties:
+    tags:
+      $ref: "#/components/schemas/tagsType"
+    title:
+      $ref: "#/components/schemas/nonEmptyString"
+    description:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    created_at:
+      $ref: "#/components/schemas/dateTimeString"
+    updated_at:
+      $ref: "#/components/schemas/dateTimeString"
+    license:
+      $ref: "#/components/schemas/nullableLicense"
+    policy:
+      $ref: "#/components/schemas/policy"
+    other_creators:
+      $ref: "#/components/schemas/nullableOtherCreatorsString"
+    creators:
+      $ref: "#/components/schemas/assetsCreatorsList"
+    discussion_links:
+      $ref: "#/components/schemas/assetLinkList"
+  required:
+    - title
+    - license
+    - created_at
+    - updated_at
+  additionalProperties: false
+modelAttributes:
+  type: object
+  properties:
+    tags:
+      $ref: "#/components/schemas/tagsType"
+    title:
+      $ref: "#/components/schemas/nonEmptyString"
+    description:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    license:
+      $ref: "#/components/schemas/nullableLicense"
+    latest_version:
+      type: number
+    versions:
+      type: array
+      minItems: 1
+      uniqueItems: true
+      items:
+        $ref: "#/components/schemas/version"
+    version:
+      type: number
+    revision_comments:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    doi:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    created_at:
+      $ref: "#/components/schemas/dateTimeString"
+    updated_at:
+      $ref: "#/components/schemas/dateTimeString"
+    content_blobs:
+      $ref: "#/components/schemas/contentBlobsList"
+    model_type:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    model_format:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    environment:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    policy:
+      $ref: "#/components/schemas/policy"
+    other_creators:
+      $ref: "#/components/schemas/nullableOtherCreatorsString"
+    creators:
+      $ref: "#/components/schemas/assetsCreatorsList"
+    discussion_links:
+      $ref: "#/components/schemas/assetLinkList"
+    model_image_link:
+      $ref: "#/components/schemas/nullableUriString"
+  required:
+    - title
+    - license
+    - latest_version
+    - versions
+    - version
+    - created_at
+    - updated_at
+    - content_blobs
+    - model_type
+    - model_format
+    - environment
+  additionalProperties: false
+assayType:
+  type: string
+  minLength: 1
+  enum:
+    - assays
+assayReferencesList:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/assayReferences"
+  required:
+    - data
+  additionalProperties: false
+assayAttributes:
+  type: object
+  properties:
+    tags:
+      $ref: "#/components/schemas/tagsType"
+    title:
+      $ref: "#/components/schemas/nonEmptyString"
+    description:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    assay_class:
+      type: object
+      properties:
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+        key:
+          $ref: "#/components/schemas/nonEmptyString"
+        description:
+          type: string
+      required:
+        - title
+        - key
+      additionalProperties: false
+    assay_type:
+      type: object
+      properties:
+        label:
+          $ref: "#/components/schemas/nonEmptyString"
+        uri:
+          $ref: "#/components/schemas/uriString"
+      required:
+        - label
+        - uri
+      additionalProperties: false
+    technology_type:
+      type: object
+      properties:
+        label:
+          $ref: "#/components/schemas/nonEmptyString"
+        uri:
+          $ref: "#/components/schemas/nullableUriString"
+      required:
+        - label
+        - uri
+    discussion_links:
+      $ref: "#/components/schemas/assetLinkList"
+  required:
+    - title
+    - description
+    - assay_class
+    - assay_type
+    - technology_type
+  additionalProperties: false
+contentBlobType:
+  type: string
+  minLength: 1
+  enum:
+    - content_blobs
+collectionType:
+  type: string
+  minLength: 1
+  enum:
+    - collections
+collectionItemType:
+  type: string
+  minLength: 1
+  enum:
+    - collection_items
+collectionReferencesList:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/collectionReferences"
+  required:
+    - data
+  additionalProperties: false
+collectionSingletonReference:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/collectionReference"
+  required:
+    - data
+  additionalProperties: false
+collectionItemReferencesList:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/collectionItemReferences"
+  required:
+    - data
+  additionalProperties: false
+dataFileType:
+  type: string
+  minLength: 1
+  enum:
+    - data_files
+dataFileReferencesList:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/dataFileReferences"
+  required:
+    - data
+  additionalProperties: false
+documentType:
+  type: string
+  minLength: 1
+  enum:
+    - documents
+documentReferencesList:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/documentReferences"
+  required:
+    - data
+  additionalProperties: false
+eventType:
+  type: string
+  minLength: 1
+  enum:
+    - events
+eventReferencesList:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/eventReferences"
+  required:
+    - data
+  additionalProperties: false
+investigationType:
+  type: string
+  minLength: 1
+  enum:
+    - investigations
+investigationReferencesList:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/investigationReferences"
+  required:
+    - data
+  additionalProperties: false
+investigationSingletonReference:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/investigationReference"
+  required:
+    - data
+  additionalProperties: false
+institutionType:
+  type: string
+  minLength: 1
+  enum:
+    - institutions
+institutionReferencesList:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/institutionReferences"
+  required:
+    - data
+  additionalProperties: false
+modelType:
+  type: string
+  minLength: 1
+  enum:
+    - models
+modelReferencesList:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/modelReferences"
+  required:
+    - data
+  additionalProperties: false
+organismType:
+  type: string
+  minLength: 1
+  enum:
+    - organisms
+organismReference:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/organismType"
+  required:
+    - id
+    - type
+  additionalProperties: false
+organismReferencesList:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/organismReferences"
+  required:
+    - data
+  additionalProperties: false
+peopleType:
+  type: string
+  minLength: 1
+  enum:
+    - people
+peopleReference:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/peopleType"
+  required:
+    - id
+    - type
+  additionalProperties: false
+peopleReferenceList:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/peopleReferences"
+  required:
+    - data
+  additionalProperties: false
+presentationType:
+  type: string
+  minLength: 1
+  enum:
+    - presentations
+presentationReferencesList:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/presentationReferences"
+  required:
+    - data
+  additionalProperties: false
+programmeType:
+  type: string
+  minLength: 1
+  enum:
+    - programmes
+programmeReferencesList:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/programmeReferences"
+  required:
+    - data
+  additionalProperties: false
+programmeDataType:
+  type: object
+  properties:
+    avatar:
+      $ref: "#/components/schemas/nullableUriString"
+    title:
+      $ref: "#/components/schemas/nonEmptyString"
+    description:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    web_page:
+      $ref: "#/components/schemas/nullableUriString"
+    funding_details:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    funding_codes:
+      $ref: "#/components/schemas/tagsType"
+    discussion_links:
+      $ref: "#/components/schemas/assetLinkList"
+  required:
+    - avatar
+    - title
+    - description
+    - web_page
+    - funding_details
+    - funding_codes
+  additionalProperties: false
+projectType:
+  type: string
+  minLength: 1
+  enum:
+    - projects
+projectReferencesList:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/projectReferences"
+  required:
+    - data
+  additionalProperties: false
+publicationType:
+  type: string
+  minLength: 1
+  enum:
+    - publications
+publicationReferencesList:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/publicationReferences"
+  required:
+    - data
+  additionalProperties: false
+sampleTypeType:
+  type: string
+  minLength: 1
+  enum:
+    - sample_types
+sampleType:
+  type: string
+  minLength: 1
+  enum:
+    - samples
+sampleAttributeBaseType:
+  type: string
+  minLength: 1
+  enum:
+    - Integer
+    - Float
+    - String
+    - DateTime
+    - Date
+    - Text
+    - Boolean
+    - SeekStrain
+    - SeekSample
+    - CV
+    - SeekDataFile
+sampleTypeReference:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/sampleTypeType"
+  required:
+    - id
+    - type
+  additionalProperties: false
+sampleTypeSampleAttributesPatch:
+  type: array
+  minItems: 1
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/sampleTypeSampleAttributePatch"
+sampleTypeSampleAttributePatch:
+  type: object
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    title:
+      $ref: "#/components/schemas/nonEmptyString"
+    description:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    pid:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    sample_attribute_type:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+      oneOf:
+        - required:
+            - id
+        - required:
+            - title
+    required:
+      type: boolean
+    pos:
+      $ref: "#/components/schemas/nullableInteger"
+    unit:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    is_title:
+      type: boolean
+    sample_controlled_vocab_id:
+      $ref: "#/components/schemas/nullableInteger"
+    linked_sample_type_id:
+      $ref: "#/components/schemas/nullableInteger"
+    _destroy:
+      type: boolean
+  required: []
+  additionalProperties: false
+sampleTypeSampleAttributesPost:
+  type: array
+  minItems: 1
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/sampleTypeSampleAttributePost"
+sampleTypeSampleAttributePost:
+  type: object
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    title:
+      $ref: "#/components/schemas/nonEmptyString"
+    description:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    pid:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    sample_attribute_type:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+      oneOf:
+        - required:
+            - id
+        - required:
+            - title
+    required:
+      type: boolean
+    pos:
+      $ref: "#/components/schemas/nullableInteger"
+    unit:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    is_title:
+      type: boolean
+    sample_controlled_vocab_id:
+      $ref: "#/components/schemas/nullableInteger"
+    linked_sample_type_id:
+      $ref: "#/components/schemas/nullableInteger"
+  required:
+    - title
+    - sample_attribute_type
+  additionalProperties: false
+sopType:
+  type: string
+  minLength: 1
+  enum:
+    - sops
+sopReferencesList:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/sopReferences"
+  required:
+    - data
+  additionalProperties: false
+studyType:
+  type: string
+  minLength: 1
+  enum:
+    - studies
+studyReference:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/studyType"
+  required:
+    - id
+    - type
+  additionalProperties: false
+studyReferencesList:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/studyReferences"
+  required:
+    - data
+  additionalProperties: false
+studySingletonReference:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/studyReference"
+  required:
+    - data
+  additionalProperties: false
+tagsType:
+  $ref: "#/components/schemas/nonEmptyStringList"
+ontologyTermsList:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/ontologyTerm"
+ontologyTerm:
+  type: object
+  properties:
+    label:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    identifier:
+      $ref: "#/components/schemas/uriString"
+  required:
+    - identifier
+anySkeleton:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/anyType"
+    attributes:
+      type: object
+      properties:
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+      required:
+        - title
+      additionalProperties: false
+    links:
+      $ref: "#/components/schemas/linksType"
+  required:
+    - id
+    - type
+    - attributes
+    - links
+  additionalProperties: false
+anySkeletons:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/anySkeleton"
+anyReference:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/anyType"
+  required:
+    - id
+    - type
+  additionalProperties: false
+anySingletonReference:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/anyReference"
+  required:
+    - data
+  additionalProperties: false
+assayReference:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/assayType"
+  required:
+    - id
+    - type
+  additionalProperties: false
+assayReferences:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/assayReference"
+assaySkeleton:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/assayType"
+    attributes:
+      type: object
+      properties:
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+      required:
+        - title
+      additionalProperties: false
+    links:
+      $ref: "#/components/schemas/linksType"
+  required:
+    - id
+    - type
+    - attributes
+    - links
+  additionalProperties: false
+assaySkeletons:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/assaySkeleton"
+collectionReferences:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/collectionReference"
+collectionReference:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/collectionType"
+  required:
+    - id
+    - type
+  additionalProperties: false
+collectionItemReferences:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/collectionItemReference"
+collectionItemReference:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/collectionItemType"
+  required:
+    - id
+    - type
+  additionalProperties: false
+collectionItem:
+  type: object
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/collectionItemType"
+    attributes:
+      type: object
+      properties:
+        comment:
+          $ref: "#/components/schemas/nullableNonEmptyString"
+        order:
+          $ref: "#/components/schemas/nullableInteger"
+      required:
+        - comment
+        - order
+      additionalProperties: false
+    relationships:
+      type: object
+      properties:
+        asset:
+          $ref: "#/components/schemas/assetSingletonReferenceWithTitle"
+        collection:
+          $ref: "#/components/schemas/collectionSingletonReference"
+      required:
+        - collection
+      additionalProperties: false
+    links:
+      $ref: "#/components/schemas/linksType"
+    meta:
+      $ref: "#/components/schemas/collectionItemMetaType"
+  required:
+    - id
+    - type
+    - attributes
+    - relationships
+    - links
+    - meta
+  additionalProperties: false
+assetType:
+  type: string
+  minLength: 1
+  enum:
+    - collections
+    - data_files
+    - documents
+    - models
+    - publications
+    - sops
+    - workflows
+assetReferences:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/assetReference"
+assetReference:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/assetType"
+  required:
+    - id
+    - type
+  additionalProperties: false
+assetReferencesList:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/assetReferences"
+  required:
+    - data
+  additionalProperties: false
+assetSingletonReference:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/assetReference"
+  required:
+    - data
+  additionalProperties: false
+assetSingletonReferenceWithTitle:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/assetReference"
+    meta:
+      type: object
+      properties:
+        title:
+          $ref: "#/components/schemas/nullableNonEmptyString"
+  required:
+    - data
+    - meta
+  additionalProperties: false
+dataFileReferences:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/dataFileReference"
+dataFileReference:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/dataFileType"
+  required:
+    - id
+    - type
+  additionalProperties: false
+dataFileSkeleton:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/dataFileType"
+    attributes:
+      type: object
+      properties:
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+      required:
+        - title
+      additionalProperties: false
+    links:
+      $ref: "#/components/schemas/linksType"
+  required:
+    - id
+    - type
+    - attributes
+    - links
+  additionalProperties: false
+dataFileSkeletons:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/dataFileSkeleton"
+documentReferences:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/documentReference"
+documentReference:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/documentType"
+  required:
+    - id
+    - type
+  additionalProperties: false
+eventReferences:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/eventReference"
+eventReference:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/eventType"
+  required:
+    - id
+    - type
+  additionalProperties: false
+investigationReferences:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/investigationReference"
+investigationReference:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/investigationType"
+  required:
+    - id
+    - type
+  additionalProperties: false
+institutionReferences:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/institutionReference"
+institutionReference:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/institutionType"
+  required:
+    - id
+    - type
+  additionalProperties: false
+modelReferences:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/modelReference"
+modelReference:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/modelType"
+  required:
+    - id
+    - type
+  additionalProperties: false
+organismReferences:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/organismReference"
+peopleReferences:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/peopleReference"
+presentationReferences:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/presentationReference"
+presentationReference:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/presentationType"
+  required:
+    - id
+    - type
+  additionalProperties: false
+programmeReferences:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/programmeReference"
+programmeReference:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/programmeType"
+  required:
+    - id
+    - type
+  additionalProperties: false
+projectReferences:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/projectReference"
+projectReference:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/projectType"
+  required:
+    - id
+    - type
+  additionalProperties: false
+publicationReferences:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/publicationReference"
+publicationReference:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/publicationType"
+  required:
+    - id
+    - type
+  additionalProperties: false
+sampleTypeSingletonReference:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/sampleTypeReference"
+  required:
+    - data
+  additionalProperties: false
+sampleTypeReferences:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/sampleTypeReference"
+sopReferences:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/sopReference"
+sopReference:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/sopType"
+  required:
+    - id
+    - type
+  additionalProperties: false
+studyReferences:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/studyReference"
+assayPost:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/assayType"
+        attributes:
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tagsType"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            assay_class:
+              type: object
+              properties:
+                key:
+                  $ref: "#/components/schemas/nonEmptyString"
+              required:
+                - key
+              additionalProperties: false
+            assay_type:
+              type: object
+              properties:
+                uri:
+                  $ref: "#/components/schemas/uriString"
+              required:
+                - uri
+              additionalProperties: false
+            technology_type:
+              type: object
+              properties:
+                uri:
+                  $ref: "#/components/schemas/uriString"
+              required:
+                - uri
+              additionalProperties: false
+            policy:
+              $ref: "#/components/schemas/policy"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPostList"
+          required:
+            - title
+            - assay_class
+            - assay_type
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            study:
+              $ref: "#/components/schemas/studySingletonReference"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+            data_files:
+              $ref: "#/components/schemas/dataFileReferencesList"
+            documents:
+              $ref: "#/components/schemas/documentReferencesList"
+            models:
+              $ref: "#/components/schemas/modelReferencesList"
+            sops:
+              $ref: "#/components/schemas/sopReferencesList"
+            organisms:
+              $ref: "#/components/schemas/organismReferencesList"
+          required:
+            - study
+          additionalProperties: false
+      required:
+        - type
+        - attributes
+        - relationships
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/assayPost.json
+assayPatch:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/assayType"
+        attributes:
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tagsType"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            assay_class:
+              type: object
+              properties:
+                key:
+                  $ref: "#/components/schemas/nonEmptyString"
+              required:
+                - key
+              additionalProperties: false
+            assay_type:
+              type: object
+              properties:
+                uri:
+                  $ref: "#/components/schemas/uriString"
+              required:
+                - uri
+              additionalProperties: false
+            technology_type:
+              type: object
+              properties:
+                uri:
+                  $ref: "#/components/schemas/uriString"
+              required:
+                - uri
+              additionalProperties: false
+            policy:
+              $ref: "#/components/schemas/policy"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPatchList"
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            study:
+              $ref: "#/components/schemas/studySingletonReference"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+            data_files:
+              $ref: "#/components/schemas/dataFileReferencesList"
+            documents:
+              $ref: "#/components/schemas/documentReferencesList"
+            models:
+              $ref: "#/components/schemas/modelReferencesList"
+            sops:
+              $ref: "#/components/schemas/sopReferencesList"
+            organisms:
+              $ref: "#/components/schemas/organismReferencesList"
+          additionalProperties: false
+      required:
+        - id
+        - type
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/assayPatch.json
+collectionPost:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/collectionType"
+        attributes:
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tagsType"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            license:
+              $ref: "#/components/schemas/nullableLicense"
+            policy:
+              $ref: "#/components/schemas/policy"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPostList"
+          required:
+            - title
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+          required:
+            - projects
+          additionalProperties: false
+      required:
+        - type
+        - attributes
+        - relationships
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/collectionPost.json
+collectionPatch:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/collectionType"
+        attributes:
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tagsType"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            license:
+              $ref: "#/components/schemas/nullableLicense"
+            policy:
+              $ref: "#/components/schemas/policy"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPatchList"
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+          additionalProperties: false
+      required:
+        - id
+        - type
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/collectionPatch.json
+collectionItemPost:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/collectionItemType"
+        attributes:
+          type: object
+          properties:
+            comment:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            order:
+              $ref: "#/components/schemas/nullableInteger"
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            asset:
+              $ref: "#/components/schemas/assetSingletonReference"
+          required:
+            - asset
+          additionalProperties: false
+      required:
+        - type
+        - relationships
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/collectionItemPost.json
+collectionItemPatch:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/collectionItemType"
+        attributes:
+          type: object
+          properties:
+            comment:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            order:
+              $ref: "#/components/schemas/nullableInteger"
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            asset:
+              $ref: "#/components/schemas/assetSingletonReference"
+          required:
+            - asset
+          additionalProperties: false
+      required:
+        - id
+        - type
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/collectionItemPatch.json
+dataFilePost:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/dataFileType"
+        attributes:
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tagsType"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            license:
+              $ref: "#/components/schemas/nullableLicense"
+            policy:
+              $ref: "#/components/schemas/policy"
+            content_blobs:
+              $ref: "#/components/schemas/contentBlobSlotsList"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPostList"
+          required:
+            - title
+            - content_blobs
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+            events:
+              $ref: "#/components/schemas/eventReferencesList"
+          required:
+            - projects
+          additionalProperties: false
+      required:
+        - type
+        - attributes
+        - relationships
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/dataFilePost.json
+dataFilePatch:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/dataFileType"
+        attributes:
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tagsType"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            license:
+              $ref: "#/components/schemas/nullableLicense"
+            policy:
+              $ref: "#/components/schemas/policy"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPatchList"
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+            events:
+              $ref: "#/components/schemas/eventReferencesList"
+          additionalProperties: false
+      required:
+        - id
+        - type
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/dataFilePatch.json
+documentPost:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/documentType"
+        attributes:
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tagsType"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            license:
+              $ref: "#/components/schemas/nullableLicense"
+            policy:
+              $ref: "#/components/schemas/policy"
+            content_blobs:
+              $ref: "#/components/schemas/contentBlobSlotsList"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPostList"
+          required:
+            - title
+            - content_blobs
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+          required:
+            - projects
+          additionalProperties: false
+      required:
+        - type
+        - attributes
+        - relationships
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/documentPost.json
+documentPatch:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/documentType"
+        attributes:
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tagsType"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            license:
+              $ref: "#/components/schemas/nullableLicense"
+            policy:
+              $ref: "#/components/schemas/policy"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPatchList"
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+          additionalProperties: false
+      required:
+        - id
+        - type
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/documentPatch.json
+eventPost:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/eventType"
+        attributes:
+          type: object
+          properties:
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            url:
+              $ref: "#/components/schemas/nullableUriString"
+            address:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            city:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            country:
+              $ref: "#/components/schemas/nullableCountryString"
+            start_date:
+              $ref: "#/components/schemas/dateTimeString"
+            end_date:
+              $ref: "#/components/schemas/nullableDateTimeString"
+            policy:
+              $ref: "#/components/schemas/policy"
+          required:
+            - title
+            - start_date
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            data_files:
+              $ref: "#/components/schemas/dataFileReferencesList"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+            presentations:
+              $ref: "#/components/schemas/presentationReferencesList"
+          required:
+            - projects
+          additionalProperties: false
+      required:
+        - type
+        - attributes
+        - relationships
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/eventPost.json
+eventPatch:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/eventType"
+        attributes:
+          type: object
+          properties:
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            url:
+              $ref: "#/components/schemas/nullableUriString"
+            address:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            city:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            country:
+              $ref: "#/components/schemas/nullableCountryString"
+            start_date:
+              $ref: "#/components/schemas/dateTimeString"
+            end_date:
+              $ref: "#/components/schemas/dateTimeString"
+            policy:
+              $ref: "#/components/schemas/policy"
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            data_files:
+              $ref: "#/components/schemas/dataFileReferencesList"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+            presentations:
+              $ref: "#/components/schemas/presentationReferencesList"
+          additionalProperties: false
+      required:
+        - id
+        - type
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/eventPatch.json
+institutionPost:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/institutionType"
+        attributes:
+          type: object
+          properties:
+            avatar:
+              $ref: "#/components/schemas/nullableUriString"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            country:
+              $ref: "#/components/schemas/nullableCountryString"
+            city:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            address:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            web_page:
+              $ref: "#/components/schemas/nullableUriString"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPostList"
+          required:
+            - title
+          additionalProperties: false
+      required:
+        - type
+        - attributes
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/institutionPost.json
+institutionPatch:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/institutionType"
+        attributes:
+          type: object
+          properties:
+            avatar:
+              $ref: "#/components/schemas/nullableUriString"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            country:
+              $ref: "#/components/schemas/nullableCountryString"
+            city:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            address:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            web_page:
+              $ref: "#/components/schemas/nullableUriString"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPatchList"
+          additionalProperties: false
+      required:
+        - id
+        - type
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/institutionPatch.json
+investigationPatch:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/investigationType"
+        attributes:
+          type: object
+          properties:
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            policy:
+              $ref: "#/components/schemas/policy"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPatchList"
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+          additionalProperties: false
+      required:
+        - id
+        - type
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/investigationPatch.json
+investigationPost:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/investigationType"
+        attributes:
+          type: object
+          properties:
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            policy:
+              $ref: "#/components/schemas/policy"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPostList"
+          required:
+            - title
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+          required:
+            - projects
+          additionalProperties: false
+      required:
+        - type
+        - attributes
+        - relationships
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/investigationPost.json
+modelPost:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/modelType"
+        attributes:
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tagsType"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            license:
+              $ref: "#/components/schemas/nullableLicense"
+            policy:
+              $ref: "#/components/schemas/policy"
+            content_blobs:
+              $ref: "#/components/schemas/contentBlobSlotsList"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            model_type:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            model_format:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            environment:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPostList"
+          required:
+            - title
+            - content_blobs
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+            organisms:
+              $ref: "#/components/schemas/organismReferencesList"
+          required:
+            - projects
+          additionalProperties: false
+      required:
+        - type
+        - attributes
+        - relationships
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/modelPost.json
+modelPatch:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/modelType"
+        attributes:
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tagsType"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            license:
+              $ref: "#/components/schemas/nullableLicense"
+            policy:
+              $ref: "#/components/schemas/policy"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            model_type:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            model_format:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            environment:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPatchList"
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+            organisms:
+              $ref: "#/components/schemas/organismReferencesList"
+          additionalProperties: false
+      required:
+        - id
+        - type
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/modelPatch.json
+personPatch:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/peopleType"
+        attributes:
+          type: object
+          properties:
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            first_name:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            last_name:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            email:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            web_page:
+              $ref: "#/components/schemas/nullableUriString"
+            orcid:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            expertise:
+              $ref: "#/components/schemas/nonEmptyStringList"
+            tools:
+              $ref: "#/components/schemas/nonEmptyStringList"
+            phone:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            skype_name:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+          additionalProperties: false
+      required:
+        - id
+        - type
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/personPatch.json
+personPost:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/peopleType"
+        attributes:
+          type: object
+          properties:
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            first_name:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            last_name:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            email:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            web_page:
+              $ref: "#/components/schemas/nullableUriString"
+            orcid:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            expertise:
+              $ref: "#/components/schemas/nonEmptyStringList"
+            tools:
+              $ref: "#/components/schemas/nonEmptyStringList"
+            phone:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            skype_name:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+          required:
+            - first_name
+            - last_name
+          additionalProperties: false
+      required:
+        - type
+        - attributes
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/personPost.json
+presentationPost:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/presentationType"
+        attributes:
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tagsType"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            license:
+              $ref: "#/components/schemas/nullableLicense"
+            policy:
+              $ref: "#/components/schemas/policy"
+            content_blobs:
+              $ref: "#/components/schemas/contentBlobSlotsList"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPostList"
+          required:
+            - title
+            - content_blobs
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+            events:
+              $ref: "#/components/schemas/eventReferencesList"
+          required:
+            - projects
+          additionalProperties: false
+      required:
+        - type
+        - attributes
+        - relationships
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/presentationPost.json
+presentationPatch:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/presentationType"
+        attributes:
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tagsType"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            license:
+              $ref: "#/components/schemas/nullableLicense"
+            policy:
+              $ref: "#/components/schemas/policy"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPatchList"
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+            events:
+              $ref: "#/components/schemas/eventReferencesList"
+          additionalProperties: false
+      required:
+        - id
+        - type
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/presentationPatch.json
+programmePost:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/programmeType"
+        attributes:
+          type: object
+          properties:
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            web_page:
+              $ref: "#/components/schemas/nullableUriString"
+            funding_details:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            funding_codes:
+              $ref: "#/components/schemas/tagsType"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPostList"
+          required:
+            - title
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            administrators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+          additionalProperties: false
+      required:
+        - type
+        - attributes
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/programmePost.json
+programmePatch:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/programmeType"
+        attributes:
+          type: object
+          properties:
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            web_page:
+              $ref: "#/components/schemas/nullableUriString"
+            funding_details:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            funding_codes:
+              $ref: "#/components/schemas/tagsType"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPatchList"
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            administrators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+          additionalProperties: false
+      required:
+        - id
+        - type
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/programmePatch.json
+projectPatch:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/projectType"
+        attributes:
+          type: object
+          properties:
+            avatar:
+              $ref: "#/components/schemas/nullableUriString"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            web_page:
+              $ref: "#/components/schemas/nullableUriString"
+            wiki_page:
+              $ref: "#/components/schemas/nullableUriString"
+            default_policy:
+              $ref: "#/components/schemas/policy"
+            default_license:
+              $ref: "#/components/schemas/nullableLicense"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPatchList"
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            programmes:
+              $ref: "#/components/schemas/programmeReferencesList"
+            organisms:
+              $ref: "#/components/schemas/organismReferencesList"
+          additionalProperties: false
+      required:
+        - id
+        - type
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/projectPatch.json
+projectPost:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/projectType"
+        attributes:
+          type: object
+          properties:
+            avatar:
+              $ref: "#/components/schemas/nullableUriString"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            web_page:
+              $ref: "#/components/schemas/nullableUriString"
+            wiki_page:
+              $ref: "#/components/schemas/nullableUriString"
+            default_policy:
+              $ref: "#/components/schemas/policy"
+            default_license:
+              $ref: "#/components/schemas/nullableLicense"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPostList"
+          required:
+            - title
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            programmes:
+              $ref: "#/components/schemas/programmeReferencesList"
+            organisms:
+              $ref: "#/components/schemas/organismReferencesList"
+          additionalProperties: false
+      required:
+        - type
+        - attributes
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/projectPost.json
+sopPost:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/sopType"
+        attributes:
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tagsType"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            license:
+              $ref: "#/components/schemas/nullableLicense"
+            policy:
+              $ref: "#/components/schemas/policy"
+            content_blobs:
+              $ref: "#/components/schemas/contentBlobSlotsList"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPostList"
+          required:
+            - title
+            - content_blobs
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+          required:
+            - projects
+          additionalProperties: false
+      required:
+        - type
+        - attributes
+        - relationships
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/sopPost.json
+sopPatch:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/sopType"
+        attributes:
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tagsType"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            license:
+              $ref: "#/components/schemas/nullableLicense"
+            policy:
+              $ref: "#/components/schemas/policy"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPatchList"
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+          additionalProperties: false
+      required:
+        - id
+        - type
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/sopPatch.json
+studyPost:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/studyType"
+        attributes:
+          type: object
+          properties:
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            experimentalists:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            policy:
+              $ref: "#/components/schemas/policy"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPostList"
+          required:
+            - title
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            investigation:
+              $ref: "#/components/schemas/investigationSingletonReference"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+          required:
+            - investigation
+          additionalProperties: false
+      required:
+        - type
+        - attributes
+        - relationships
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/studyPost.json
+studyPatch:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/studyType"
+        attributes:
+          type: object
+          properties:
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            experimentalists:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            policy:
+              $ref: "#/components/schemas/policy"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPatchList"
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            investigation:
+              $ref: "#/components/schemas/investigationSingletonReference"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+          additionalProperties: false
+      required:
+        - id
+        - type
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/studyPatch.json
+collectionSkeleton:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/collectionType"
+    attributes:
+      type: object
+      properties:
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+      required:
+        - title
+      additionalProperties: false
+    links:
+      $ref: "#/components/schemas/linksType"
+  required:
+    - id
+    - type
+    - attributes
+    - links
+  additionalProperties: false
+collectionSkeletons:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/collectionSkeleton"
+collectionItemSkeleton:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/collectionItemType"
+    attributes:
+      type: object
+      properties:
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+      required:
+        - title
+      additionalProperties: false
+    links:
+      $ref: "#/components/schemas/linksType"
+  required:
+    - id
+    - type
+    - attributes
+    - links
+  additionalProperties: false
+collectionItemSkeletons:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/collectionItemSkeleton"
+documentSkeleton:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/documentType"
+    attributes:
+      type: object
+      properties:
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+      required:
+        - title
+      additionalProperties: false
+    links:
+      $ref: "#/components/schemas/linksType"
+  required:
+    - id
+    - type
+    - attributes
+    - links
+  additionalProperties: false
+documentSkeletons:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/documentSkeleton"
+eventSkeleton:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/eventType"
+    attributes:
+      type: object
+      properties:
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+      required:
+        - title
+      additionalProperties: false
+    links:
+      $ref: "#/components/schemas/linksType"
+  required:
+    - id
+    - type
+    - attributes
+    - links
+  additionalProperties: false
+eventSkeletons:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/eventSkeleton"
+institutionSkeleton:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/institutionType"
+    attributes:
+      type: object
+      properties:
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+      required:
+        - title
+      additionalProperties: false
+    links:
+      $ref: "#/components/schemas/linksType"
+  required:
+    - id
+    - type
+    - attributes
+    - links
+  additionalProperties: false
+institutionSkeletons:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/institutionSkeleton"
+investigationSkeleton:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/investigationType"
+    attributes:
+      type: object
+      properties:
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+      required:
+        - title
+      additionalProperties: false
+    links:
+      $ref: "#/components/schemas/linksType"
+  required:
+    - id
+    - type
+    - attributes
+    - links
+  additionalProperties: false
+investigationSkeletons:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/investigationSkeleton"
+modelSkeleton:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/modelType"
+    attributes:
+      type: object
+      properties:
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+      required:
+        - title
+      additionalProperties: false
+    links:
+      $ref: "#/components/schemas/linksType"
+  required:
+    - id
+    - type
+    - attributes
+    - links
+  additionalProperties: false
+modelSkeletons:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/modelSkeleton"
+organismSkeleton:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/organismType"
+    attributes:
+      type: object
+      properties:
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+      required:
+        - title
+      additionalProperties: false
+    links:
+      $ref: "#/components/schemas/linksType"
+  required:
+    - id
+    - type
+    - attributes
+    - links
+  additionalProperties: false
+organismSkeletons:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/organismSkeleton"
+personSkeleton:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/peopleType"
+    attributes:
+      type: object
+      properties:
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+      required:
+        - title
+      additionalProperties: false
+    links:
+      $ref: "#/components/schemas/linksType"
+  required:
+    - id
+    - type
+    - attributes
+    - links
+  additionalProperties: false
+peopleSkeletons:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/personSkeleton"
+presentationSkeleton:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/presentationType"
+    attributes:
+      type: object
+      properties:
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+      required:
+        - title
+      additionalProperties: false
+    links:
+      $ref: "#/components/schemas/linksType"
+  required:
+    - id
+    - type
+    - attributes
+    - links
+  additionalProperties: false
+presentationSkeletons:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/presentationSkeleton"
+programmeSkeleton:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/programmeType"
+    attributes:
+      type: object
+      properties:
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+      required:
+        - title
+      additionalProperties: false
+    links:
+      $ref: "#/components/schemas/linksType"
+  required:
+    - id
+    - type
+    - attributes
+    - links
+  additionalProperties: false
+programmeSkeletons:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/programmeSkeleton"
+projectSkeleton:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/projectType"
+    attributes:
+      type: object
+      properties:
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+      required:
+        - title
+      additionalProperties: false
+    links:
+      $ref: "#/components/schemas/linksType"
+  required:
+    - id
+    - type
+    - attributes
+    - links
+  additionalProperties: false
+projectSkeletons:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/projectSkeleton"
+publicationSkeleton:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/publicationType"
+    attributes:
+      type: object
+      properties:
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+      required:
+        - title
+      additionalProperties: false
+    links:
+      $ref: "#/components/schemas/linksType"
+  required:
+    - id
+    - type
+    - attributes
+    - links
+  additionalProperties: false
+publicationSkeletons:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/publicationSkeleton"
+sopSkeleton:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/sopType"
+    attributes:
+      type: object
+      properties:
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+      required:
+        - title
+      additionalProperties: false
+    links:
+      $ref: "#/components/schemas/linksType"
+  required:
+    - id
+    - type
+    - attributes
+    - links
+  additionalProperties: false
+sopSkeletons:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/sopSkeleton"
+sampleSkeletons:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/sampleSkeleton"
+sampleSkeleton:
+  type: object
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/sampleType"
+    attributes:
+      type: object
+      properties:
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+      required:
+        - title
+      additionalProperties: false
+    links:
+      $ref: "#/components/schemas/linksType"
+sampleAttributeMap:
+  type: object
+  additionalProperties:
+    type: string
+sampleAttributeTypeType:
+  type: string
+  minLength: 1
+  enum:
+    - sample_attribute_types
+sampleAttributeType:
+  type: object
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/sampleAttributeTypeType"
+    attributes:
+      type: object
+      properties:
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+        base_type:
+          $ref: "#/components/schemas/sampleAttributeBaseType"
+        regexp:
+          $ref: "#/components/schemas/nonEmptyString"
+      required:
+        - title
+        - base_type
+        - regexp
+      additionalProperties: false
+    links:
+      $ref: "#/components/schemas/indexLinks"
+  required:
+    - id
+    - type
+    - attributes
+    - links
+sampleAttributeTypes:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/sampleAttributeType"
+samplePost:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/sampleType"
+        attributes:
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tagsType"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            attribute_map:
+              $ref: "#/components/schemas/sampleAttributeMap"
+            policy:
+              $ref: "#/components/schemas/policy"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPostList"
+          required:
+            - attribute_map
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            people:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            data_files:
+              $ref: "#/components/schemas/dataFileReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+            sample_type:
+              $ref: "#/components/schemas/sampleTypeSingletonReference"
+          required:
+            - projects
+            - sample_type
+          additionalProperties: false
+      required:
+        - type
+        - attributes
+        - relationships
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/samplePost.json
+samplePatch:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/sampleType"
+        attributes:
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tagsType"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            attribute_map:
+              $ref: "#/components/schemas/sampleAttributeMap"
+            policy:
+              $ref: "#/components/schemas/policy"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPatchList"
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            people:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            data_files:
+              $ref: "#/components/schemas/dataFileReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+            sample_type:
+              $ref: "#/components/schemas/sampleTypeSingletonReference"
+          additionalProperties: false
+      required:
+        - type
+        - id
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/samplePatch.json
+sampleTypeSkeleton:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/sampleTypeType"
+    attributes:
+      type: object
+      properties:
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+      required:
+        - title
+      additionalProperties: false
+    links:
+      $ref: "#/components/schemas/linksType"
+  required:
+    - id
+    - type
+    - attributes
+    - links
+  additionalProperties: false
+sampleTypeSkeletons:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/sampleTypeSkeleton"
+sampleTypePost:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/sampleTypeType"
+        attributes:
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tagsType"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            sample_attributes:
+              $ref: "#/components/schemas/sampleTypeSampleAttributesPost"
+          required:
+            - title
+            - sample_attributes
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+          required:
+            - projects
+          additionalProperties: false
+      required:
+        - type
+        - attributes
+        - relationships
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+sampleTypePatch:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/sampleTypeType"
+        attributes:
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tagsType"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            sample_attributes:
+              $ref: "#/components/schemas/sampleTypeSampleAttributesPatch"
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+          additionalProperties: false
+      required:
+        - type
+        - id
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/sampleTypePatch.json
+studySkeleton:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/studyType"
+    attributes:
+      type: object
+      properties:
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+      required:
+        - title
+      additionalProperties: false
+    links:
+      $ref: "#/components/schemas/linksType"
+  required:
+    - id
+    - type
+    - attributes
+    - links
+  additionalProperties: false
+studySkeletons:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/studySkeleton"
+contentBlobsList:
+  type: array
+  minItems: 1
+  items:
+    $ref: "#/components/schemas/contentBlob"
+optionalContentBlobsList:
+  type: array
+  minItems: 0
+  items:
+    $ref: "#/components/schemas/contentBlob"
+contentBlobSlotsList:
+  type: array
+  minItems: 1
+  items:
+    $ref: "#/components/schemas/contentBlobSlot"
+contentBlobSlot:
+  oneOf:
+    - $ref: "#/components/schemas/remoteContentBlob"
+    - $ref: "#/components/schemas/contentBlobPlaceholder"
+remoteContentBlob:
+  properties:
+    url:
+      $ref: "#/components/schemas/nullableUriString"
+    original_filename:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    content_type:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+  required:
+    - url
+  additionalProperties: false
+contentBlobPlaceholder:
+  properties:
+    original_filename:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    content_type:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+  required:
+    - original_filename
+    - content_type
+  additionalProperties: false
+contentBlob:
+  properties:
+    original_filename:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    url:
+      $ref: "#/components/schemas/nullableUriString"
+    md5sum:
+      $ref: "#/components/schemas/nullableMd5sumString"
+    sha1sum:
+      $ref: "#/components/schemas/nullableSha1sumString"
+    content_type:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    link:
+      $ref: "#/components/schemas/uriString"
+    size:
+      $ref: "#/components/schemas/nullableInteger"
+  required:
+    - original_filename
+    - url
+    - md5sum
+    - sha1sum
+    - content_type
+    - link
+    - size
+  additionalProperties: false
+version:
+  type: object
+  properties:
+    version:
+      type: number
+    revision_comments:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    url:
+      $ref: "#/components/schemas/uriString"
+    doi:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+  required:
+    - version
+    - revision_comments
+    - url
+  additionalProperties: false
+gitVersion:
+  type: object
+  properties:
+    version:
+      type: number
+    revision_comments:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    url:
+      $ref: "#/components/schemas/uriString"
+    commit:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    ref:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    tree:
+      $ref: "#/components/schemas/uriString"
+    remote:
+      $ref: "#/components/schemas/uriString"
+    doi:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+  required:
+    - version
+    - revision_comments
+    - url
+    - commit
+    - ref
+    - tree
+  additionalProperties: false
+workflowInput:
+  type: object
+  properties:
+    id:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    name:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    description:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    type:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    default_value:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+workflowStep:
+  type: object
+  properties:
+    id:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    name:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    description:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+workflowOutput:
+  type: object
+  properties:
+    id:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    name:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    description:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    type:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+fileTemplateType:
+  type: string
+  minLength: 1
+  enum:
+    - file_templates
+fileTemplateReference:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/fileTemplateType"
+  required:
+    - id
+    - type
+  additionalProperties: false
+fileTemplateReferences:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/fileTemplateReference"
+fileTemplateSingletonReference:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/fileTemplateReference"
+  required:
+    - data
+  additionalProperties: false
+fileTemplateReferencesList:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/fileTemplateReferences"
+  required:
+    - data
+  additionalProperties: false
+placeholderType:
+  type: string
+  minLength: 1
+  enum:
+    - placeholders
+placeholderReference:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/placeholderType"
+  required:
+    - id
+    - type
+  additionalProperties: false
+placeholderReferences:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/placeholderReference"
+placeholderSingletonReference:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/placeholderReference"
+  required:
+    - data
+  additionalProperties: false
+placeholderReferencesList:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/placeholderReferences"
+  required:
+    - data
+  additionalProperties: false
+humanDiseaseType:
+  type: string
+  minLength: 1
+  enum:
+    - humanDiseases
+humanDiseaseReference:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/humanDiseaseType"
+  required:
+    - id
+    - type
+  additionalProperties: false
+humanDiseaseReferences:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/humanDiseaseReference"
+humanDiseaseSingletonReference:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/humanDiseaseReference"
+  required:
+    - data
+  additionalProperties: false
+humanDiseaseReferencesList:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/humanDiseaseReferences"
+  required:
+    - data
+  additionalProperties: false
+sampleReference:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/sampleType"
+  required:
+    - id
+    - type
+  additionalProperties: false
+sampleReferences:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/sampleReference"
+sampleSingletonReference:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/sampleReference"
+  required:
+    - data
+  additionalProperties: false
+sampleReferencesList:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/sampleReferences"
+  required:
+    - data
+  additionalProperties: false
+workflowPost:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/workflowType"
+        attributes:
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tagsType"
+            edam_topics:
+              $ref: "#/components/schemas/ontologyTermsList"
+            edam_operations:
+              $ref: "#/components/schemas/ontologyTermsList"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            workflow_class:
+              type: object
+              properties:
+                key:
+                  $ref: "#/components/schemas/nonEmptyString"
+              required:
+                - key
+            license:
+              $ref: "#/components/schemas/nullableLicense"
+            policy:
+              $ref: "#/components/schemas/policy"
+            content_blobs:
+              $ref: "#/components/schemas/contentBlobSlotsList"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPostList"
+          required:
+            - title
+            - content_blobs
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+            sops:
+              $ref: "#/components/schemas/sopReferencesList"
+          required:
+            - projects
+          additionalProperties: false
+      required:
+        - type
+        - attributes
+        - relationships
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/workflowPost.json
+workflowPatch:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/workflowType"
+        attributes:
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tagsType"
+            edam_topics:
+              $ref: "#/components/schemas/ontologyTermsList"
+            edam_operations:
+              $ref: "#/components/schemas/ontologyTermsList"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            workflow_class:
+              type: object
+              properties:
+                key:
+                  $ref: "#/components/schemas/nonEmptyString"
+              required:
+                - key
+            license:
+              $ref: "#/components/schemas/nullableLicense"
+            policy:
+              $ref: "#/components/schemas/policy"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPatchList"
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+            sops:
+              $ref: "#/components/schemas/sopReferencesList"
+          additionalProperties: false
+      required:
+        - id
+        - type
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/workflowPatch.json

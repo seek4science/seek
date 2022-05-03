@@ -3,7 +3,7 @@ require 'json'
 require 'yaml'
 
 ROOT = File.join(Rails.root, 'public', 'api', 'definitions')
-INPUT = 'openapi-v3.yaml'
+INPUT = 'openapi-v3.yml'
 OUTPUT = 'openapi-v3-resolved'
 ALLOW_INTERNAL_REFS = true # If true, don't replace internal references i.e. "#/definitions/something"
 VERBOSE = false
@@ -70,5 +70,5 @@ out = File.join(ROOT, OUTPUT)
 File.write("#{out}.yaml", d.to_yaml)
 File.write("#{out}.json", JSON.pretty_generate(d))
 puts "Done - Written to:" if VERBOSE
-puts "\t #{out}.yaml" if VERBOSE
+puts "\t #{out}.yml" if VERBOSE
 puts "\t #{out}.json" if VERBOSE

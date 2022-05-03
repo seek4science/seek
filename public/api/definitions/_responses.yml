@@ -1,0 +1,2157 @@
+sampleTypeSampleAttributesResponse:
+  type: array
+  minItems: 1
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/sampleTypeSampleAttributeResponse"
+sampleTypeSampleAttributeResponse:
+  type: object
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    title:
+      $ref: "#/components/schemas/nonEmptyString"
+    description:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    pid:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    sample_attribute_type:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+        base_type:
+          $ref: "#/components/schemas/sampleAttributeBaseType"
+        regexp:
+          $ref: "#/components/schemas/nonEmptyString"
+      required: [ ]
+    required:
+      type: boolean
+    pos:
+      $ref: "#/components/schemas/nullableInteger"
+    unit:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    is_title:
+      type: boolean
+    sample_controlled_vocab_id:
+      $ref: "#/components/schemas/nullableInteger"
+    linked_sample_type_id:
+      $ref: "#/components/schemas/nullableInteger"
+  required:
+    - title
+    - sample_attribute_type
+  additionalProperties: false
+collectionsResponse:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/collectionSkeletons"
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+    meta:
+      $ref: "#/components/schemas/baseMetaType"
+    links:
+      $ref: "#/components/schemas/indexLinks"
+  required:
+    - data
+    - jsonapi
+    - meta
+  additionalProperties: false
+collectionItemResponse:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/collectionItem"
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+  required:
+    - data
+    - jsonapi
+  additionalProperties: false
+searchResponse:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/anySkeletons"
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+    meta:
+      $ref: "#/components/schemas/baseMetaType"
+  required:
+    - data
+    - jsonapi
+    - meta
+  additionalProperties: false
+assayResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/assayType"
+        attributes:
+          type: object
+          properties:
+            snapshots:
+              $ref: "#/components/schemas/snapshotsList"
+            tags:
+              $ref: "#/components/schemas/tagsType"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            assay_class:
+              type: object
+              properties:
+                title:
+                  $ref: "#/components/schemas/nonEmptyString"
+                key:
+                  $ref: "#/components/schemas/nonEmptyString"
+                description:
+                  $ref: "#/components/schemas/nullableNonEmptyString"
+              required:
+                - title
+                - key
+              additionalProperties: false
+            assay_type:
+              type: object
+              properties:
+                label:
+                  $ref: "#/components/schemas/nullableNonEmptyString"
+                uri:
+                  $ref: "#/components/schemas/uriString"
+              required:
+                - uri
+              additionalProperties: false
+            technology_type:
+              type: object
+              properties:
+                label:
+                  $ref: "#/components/schemas/nullableNonEmptyString"
+                uri:
+                  $ref: "#/components/schemas/nullableUriString"
+              required:
+                - uri
+              additionalProperties: false
+            policy:
+              $ref: "#/components/schemas/policy"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkList"
+            position:
+              $ref: "#/components/schemas/nullableInteger"
+          required:
+            - title
+            - assay_class
+            - assay_type
+            - technology_type
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            submitter:
+              $ref: "#/components/schemas/peopleReferenceList"
+            organisms:
+              $ref: "#/components/schemas/organismReferencesList"
+            people:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            investigation:
+              $ref: "#/components/schemas/investigationSingletonReference"
+            study:
+              $ref: "#/components/schemas/studySingletonReference"
+            data_files:
+              $ref: "#/components/schemas/dataFileReferencesList"
+            documents:
+              $ref: "#/components/schemas/documentReferencesList"
+            models:
+              $ref: "#/components/schemas/modelReferencesList"
+            sops:
+              $ref: "#/components/schemas/sopReferencesList"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+            placeholders:
+              $ref: "#/components/schemas/placeholderReferencesList"
+            human_diseases:
+              $ref: "#/components/schemas/humanDiseaseReferencesList"
+          required:
+            - creators
+            - submitter
+            - organisms
+            - people
+            - projects
+            - investigation
+            - study
+            - data_files
+            - documents
+            - models
+            - sops
+            - publications
+            - placeholders
+            - human_diseases
+          additionalProperties: false
+        links:
+          $ref: "#/components/schemas/linksType"
+        meta:
+          $ref: "#/components/schemas/metaType"
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+        - links
+        - meta
+      additionalProperties: false
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+  required:
+    - data
+    - jsonapi
+  additionalProperties: false
+dataFileResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/dataFileType"
+        attributes:
+          $ref: "#/components/schemas/contributedTypeAttributes"
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            submitter:
+              $ref: "#/components/schemas/peopleReferenceList"
+            people:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            investigations:
+              $ref: "#/components/schemas/investigationReferencesList"
+            studies:
+              $ref: "#/components/schemas/studyReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+            events:
+              $ref: "#/components/schemas/eventReferencesList"
+            file_template:
+              $ref: "#/components/schemas/fileTemplateSingletonReference"
+            placeholder:
+              $ref: "#/components/schemas/placeholderSingletonReference"
+          required:
+            - creators
+            - submitter
+            - people
+            - projects
+            - investigations
+            - studies
+            - assays
+            - publications
+            - events
+            - file_template
+            - placeholder
+          additionalProperties: false
+        links:
+          $ref: "#/components/schemas/linksType"
+        meta:
+          $ref: "#/components/schemas/metaType"
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+        - links
+        - meta
+      additionalProperties: false
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+  required:
+    - data
+    - jsonapi
+  additionalProperties: false
+documentResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/documentType"
+        attributes:
+          $ref: "#/components/schemas/contributedTypeAttributes"
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            submitter:
+              $ref: "#/components/schemas/peopleReferenceList"
+            people:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            investigations:
+              $ref: "#/components/schemas/investigationReferencesList"
+            studies:
+              $ref: "#/components/schemas/studyReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+          required:
+            - creators
+            - submitter
+            - people
+            - projects
+            - investigations
+            - studies
+            - assays
+            - publications
+          additionalProperties: false
+        links:
+          $ref: "#/components/schemas/linksType"
+        meta:
+          $ref: "#/components/schemas/metaType"
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+        - links
+        - meta
+      additionalProperties: false
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+  required:
+    - data
+    - jsonapi
+  additionalProperties: false
+eventResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/eventType"
+        attributes:
+          type: object
+          properties:
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            url:
+              $ref: "#/components/schemas/nullableUriString"
+            address:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            city:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            country:
+              $ref: "#/components/schemas/nullableCountryString"
+            start_date:
+              $ref: "#/components/schemas/dateTimeString"
+            end_date:
+              $ref: "#/components/schemas/nullableDateTimeString"
+            policy:
+              $ref: "#/components/schemas/policy"
+          required:
+            - title
+            - description
+            - start_date
+            - end_date
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            submitter:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            data_files:
+              $ref: "#/components/schemas/dataFileReferencesList"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+            presentations:
+              $ref: "#/components/schemas/presentationReferencesList"
+          required:
+            - projects
+            - data_files
+            - publications
+            - presentations
+          additionalProperties: false
+        links:
+          $ref: "#/components/schemas/linksType"
+        meta:
+          $ref: "#/components/schemas/metaType"
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+        - links
+        - meta
+      additionalProperties: false
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+  required:
+    - data
+    - jsonapi
+  additionalProperties: false
+institutionResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/institutionType"
+        attributes:
+          type: object
+          properties:
+            avatar:
+              $ref: "#/components/schemas/nullableUriString"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            country:
+              $ref: "#/components/schemas/nullableCountryString"
+            country_code:
+              $ref: "#/components/schemas/nullableCountryCodeString"
+            city:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            address:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            web_page:
+              $ref: "#/components/schemas/nullableUriString"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkList"
+          required:
+            - title
+            - country
+            - city
+            - address
+            - web_page
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            people:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+          required:
+            - people
+            - projects
+          additionalProperties: false
+        links:
+          $ref: "#/components/schemas/linksType"
+        meta:
+          $ref: "#/components/schemas/metaType"
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+        - links
+        - meta
+      additionalProperties: false
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+  required:
+    - data
+    - jsonapi
+  additionalProperties: false
+investigationResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/investigationType"
+        attributes:
+          type: object
+          properties:
+            snapshots:
+              $ref: "#/components/schemas/snapshotsList"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            policy:
+              $ref: "#/components/schemas/policy"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkList"
+            position:
+              $ref: "#/components/schemas/nullableInteger"
+          required:
+            - title
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            submitter:
+              $ref: "#/components/schemas/peopleReferenceList"
+            people:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            studies:
+              $ref: "#/components/schemas/studyReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+            data_files:
+              $ref: "#/components/schemas/dataFileReferencesList"
+            documents:
+              $ref: "#/components/schemas/documentReferencesList"
+            models:
+              $ref: "#/components/schemas/modelReferencesList"
+            sops:
+              $ref: "#/components/schemas/sopReferencesList"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+          required:
+            - creators
+            - submitter
+            - people
+            - projects
+            - studies
+            - assays
+            - data_files
+            - documents
+            - models
+            - sops
+            - publications
+          additionalProperties: false
+        links:
+          $ref: "#/components/schemas/linksType"
+        meta:
+          $ref: "#/components/schemas/metaType"
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+        - links
+        - meta
+      additionalProperties: false
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+  required:
+    - data
+    - jsonapi
+  additionalProperties: false
+modelResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/modelType"
+        attributes:
+          $ref: "#/components/schemas/modelAttributes"
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            submitter:
+              $ref: "#/components/schemas/peopleReferenceList"
+            people:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            investigations:
+              $ref: "#/components/schemas/investigationReferencesList"
+            studies:
+              $ref: "#/components/schemas/studyReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+            organisms:
+              $ref: "#/components/schemas/organismReferencesList"
+          required:
+            - creators
+            - submitter
+            - people
+            - projects
+            - investigations
+            - studies
+            - assays
+            - publications
+            - organisms
+          additionalProperties: false
+        links:
+          $ref: "#/components/schemas/linksType"
+        meta:
+          $ref: "#/components/schemas/metaType"
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+        - links
+        - meta
+      additionalProperties: false
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+  required:
+    - data
+    - jsonapi
+  additionalProperties: false
+organismResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/organismType"
+        attributes:
+          type: object
+          properties:
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            concept_uri:
+              $ref: "#/components/schemas/nullableUriString"
+            ontology_id:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+          required:
+            - title
+            - concept_uri
+            - ontology_id
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+            models:
+              $ref: "#/components/schemas/modelReferencesList"
+          required:
+            - projects
+            - assays
+            - models
+          additionalProperties: false
+        links:
+          $ref: "#/components/schemas/linksType"
+        meta:
+          $ref: "#/components/schemas/metaType"
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+        - links
+        - meta
+      additionalProperties: false
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+  required:
+    - data
+    - jsonapi
+  additionalProperties: false
+personResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/peopleType"
+        attributes:
+          type: object
+          properties:
+            avatar:
+              $ref: "#/components/schemas/nullableUriString"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            first_name:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            last_name:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            web_page:
+              $ref: "#/components/schemas/nullableUriString"
+            orcid:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            mbox_sha1sum:
+              $ref: "#/components/schemas/nullableSha1sumString"
+            expertise:
+              $ref: "#/components/schemas/nonEmptyStringList"
+            tools:
+              $ref: "#/components/schemas/nonEmptyStringList"
+            phone:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            skype_name:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            login:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+          required:
+            - title
+            - first_name
+            - last_name
+            - mbox_sha1sum
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            institutions:
+              $ref: "#/components/schemas/institutionReferencesList"
+            investigations:
+              $ref: "#/components/schemas/investigationReferencesList"
+            studies:
+              $ref: "#/components/schemas/studyReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+            data_files:
+              $ref: "#/components/schemas/dataFileReferencesList"
+            documents:
+              $ref: "#/components/schemas/documentReferencesList"
+            models:
+              $ref: "#/components/schemas/modelReferencesList"
+            sops:
+              $ref: "#/components/schemas/sopReferencesList"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+            presentations:
+              $ref: "#/components/schemas/presentationReferencesList"
+            events:
+              $ref: "#/components/schemas/eventReferencesList"
+          required:
+            - projects
+            - institutions
+            - investigations
+            - studies
+            - assays
+            - data_files
+            - documents
+            - models
+            - sops
+            - publications
+            - presentations
+            - events
+          additionalProperties: false
+        links:
+          $ref: "#/components/schemas/linksType"
+        meta:
+          $ref: "#/components/schemas/metaType"
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+        - links
+        - meta
+      additionalProperties: false
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+  required:
+    - data
+    - jsonapi
+  additionalProperties: false
+presentationResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/presentationType"
+        attributes:
+          $ref: "#/components/schemas/contributedTypeAttributes"
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            submitter:
+              $ref: "#/components/schemas/peopleReferenceList"
+            people:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            investigations:
+              $ref: "#/components/schemas/investigationReferencesList"
+            studies:
+              $ref: "#/components/schemas/studyReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+            events:
+              $ref: "#/components/schemas/eventReferencesList"
+          required:
+            - creators
+            - submitter
+            - people
+            - projects
+            - investigations
+            - studies
+            - assays
+            - publications
+            - events
+          additionalProperties: false
+        links:
+          $ref: "#/components/schemas/linksType"
+        meta:
+          $ref: "#/components/schemas/metaType"
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+        - links
+        - meta
+      additionalProperties: false
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+  required:
+    - data
+    - jsonapi
+  additionalProperties: false
+programmeResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/programmeType"
+        attributes:
+          $ref: "#/components/schemas/programmeDataType"
+        relationships:
+          type: object
+          properties:
+            administrators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            people:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            institutions:
+              $ref: "#/components/schemas/institutionReferencesList"
+            investigations:
+              $ref: "#/components/schemas/investigationReferencesList"
+            studies:
+              $ref: "#/components/schemas/studyReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+            data_files:
+              $ref: "#/components/schemas/dataFileReferencesList"
+            documents:
+              $ref: "#/components/schemas/documentReferencesList"
+            models:
+              $ref: "#/components/schemas/modelReferencesList"
+            sops:
+              $ref: "#/components/schemas/sopReferencesList"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+            presentations:
+              $ref: "#/components/schemas/presentationReferencesList"
+            events:
+              $ref: "#/components/schemas/eventReferencesList"
+          required:
+            - people
+            - projects
+            - institutions
+            - investigations
+            - studies
+            - assays
+            - data_files
+            - documents
+            - models
+            - sops
+            - publications
+            - presentations
+            - events
+          additionalProperties: false
+        links:
+          $ref: "#/components/schemas/linksType"
+        meta:
+          $ref: "#/components/schemas/metaType"
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+        - links
+        - meta
+      additionalProperties: false
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+  required:
+    - data
+    - jsonapi
+  additionalProperties: false
+projectResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/projectType"
+        attributes:
+          type: object
+          properties:
+            avatar:
+              $ref: "#/components/schemas/nullableUriString"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            web_page:
+              $ref: "#/components/schemas/nullableUriString"
+            wiki_page:
+              $ref: "#/components/schemas/nullableUriString"
+            default_policy:
+              $ref: "#/components/schemas/policy"
+            default_license:
+              $ref: "#/components/schemas/nullableLicense"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkList"
+            start_date:
+              $ref: "#/components/schemas/nullableDateString"
+            end_date:
+              $ref: "#/components/schemas/nullableDateString"
+            members:
+              $ref: "#/components/schemas/projectMembersList"
+            use_default_policy:
+              type: boolean
+          required:
+            - title
+            - description
+            - web_page
+            - wiki_page
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            organisms:
+              $ref: "#/components/schemas/organismReferencesList"
+            people:
+              $ref: "#/components/schemas/peopleReferenceList"
+            institutions:
+              $ref: "#/components/schemas/institutionReferencesList"
+            investigations:
+              $ref: "#/components/schemas/investigationReferencesList"
+            studies:
+              $ref: "#/components/schemas/studyReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+            data_files:
+              $ref: "#/components/schemas/dataFileReferencesList"
+            documents:
+              $ref: "#/components/schemas/documentReferencesList"
+            models:
+              $ref: "#/components/schemas/modelReferencesList"
+            sops:
+              $ref: "#/components/schemas/sopReferencesList"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+            presentations:
+              $ref: "#/components/schemas/presentationReferencesList"
+            events:
+              $ref: "#/components/schemas/eventReferencesList"
+            programmes:
+              $ref: "#/components/schemas/programmeReferencesList"
+            workflows:
+              $ref: "#/components/schemas/workflowReferencesList"
+            file_templates:
+              $ref: "#/components/schemas/fileTemplateReferencesList"
+            placeholders:
+              $ref: "#/components/schemas/placeholderReferencesList"
+            human_diseases:
+              $ref: "#/components/schemas/humanDiseaseReferencesList"
+            project_administrators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            pals:
+              $ref: "#/components/schemas/peopleReferenceList"
+            asset_housekeepers:
+              $ref: "#/components/schemas/peopleReferenceList"
+            asset_gatekeepers:
+              $ref: "#/components/schemas/peopleReferenceList"
+          required:
+            - organisms
+            - people
+            - institutions
+            - investigations
+            - studies
+            - assays
+            - data_files
+            - documents
+            - models
+            - sops
+            - publications
+            - presentations
+            - events
+            - programmes
+            - file_templates
+            - placeholders
+            - human_diseases
+            - project_administrators
+            - pals
+            - asset_housekeepers
+            - asset_gatekeepers
+          additionalProperties: false
+        links:
+          $ref: "#/components/schemas/linksType"
+        meta:
+          $ref: "#/components/schemas/metaType"
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+        - links
+        - meta
+      additionalProperties: false
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+  required:
+    - data
+    - jsonapi
+  additionalProperties: false
+publicationResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/publicationType"
+        attributes:
+          type: object
+          properties:
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            journal:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            published_date:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            doi:
+              $ref: "#/components/schemas/nullableUriString"
+            pubmed_id:
+              $ref: "#/components/schemas/nullableInteger"
+            abstract:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            citation:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            editor:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            booktitle:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            publisher:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            url:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            link_to_pub:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            publication_type:
+              $ref: "#/components/schemas/nonEmptyString"
+            authors:
+              $ref: "#/components/schemas/nonEmptyStringList"
+            content_blobs:
+              $ref: "#/components/schemas/optionalContentBlobsList"
+            policy:
+              $ref: "#/components/schemas/policy"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkList"
+            misc_links:
+              $ref: "#/components/schemas/assetLinkList"
+            tags:
+              $ref: "#/components/schemas/tagsType"
+            latest_version:
+              type: number
+            versions:
+              type: array
+              minItems: 1
+              uniqueItems: true
+              items:
+                $ref: "#/components/schemas/version"
+            version:
+              type: number
+            revision_comments:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            created_at:
+              $ref: "#/components/schemas/dateTimeString"
+            updated_at:
+              $ref: "#/components/schemas/dateTimeString"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+          required:
+            - title
+            - journal
+            - published_date
+            - pubmed_id
+            - citation
+            - publication_type
+            - link_to_pub
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            people:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            investigations:
+              $ref: "#/components/schemas/investigationReferencesList"
+            studies:
+              $ref: "#/components/schemas/studyReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+            data_files:
+              $ref: "#/components/schemas/dataFileReferencesList"
+            models:
+              $ref: "#/components/schemas/modelReferencesList"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+            presentations:
+              $ref: "#/components/schemas/presentationReferencesList"
+            events:
+              $ref: "#/components/schemas/eventReferencesList"
+            workflows:
+              $ref: "#/components/schemas/workflowReferencesList"
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            submitter:
+              $ref: "#/components/schemas/peopleReferenceList"
+          required:
+            - people
+            - projects
+            - investigations
+            - studies
+            - assays
+            - data_files
+            - models
+            - publications
+            - presentations
+            - events
+            - workflows
+            - creators
+            - submitter
+          additionalProperties: false
+        links:
+          $ref: "#/components/schemas/linksType"
+        meta:
+          $ref: "#/components/schemas/metaType"
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+        - links
+        - meta
+      additionalProperties: false
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+  required:
+    - data
+    - jsonapi
+  additionalProperties: false
+sopResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/sopType"
+        attributes:
+          $ref: "#/components/schemas/contributedTypeAttributes"
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            submitter:
+              $ref: "#/components/schemas/peopleReferenceList"
+            people:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            investigations:
+              $ref: "#/components/schemas/investigationReferencesList"
+            studies:
+              $ref: "#/components/schemas/studyReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+          required:
+            - creators
+            - submitter
+            - people
+            - projects
+            - investigations
+            - studies
+            - assays
+            - publications
+          additionalProperties: false
+        links:
+          $ref: "#/components/schemas/linksType"
+        meta:
+          $ref: "#/components/schemas/metaType"
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+        - links
+        - meta
+      additionalProperties: false
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+  required:
+    - data
+    - jsonapi
+  additionalProperties: false
+studyResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/studyType"
+        attributes:
+          type: object
+          properties:
+            snapshots:
+              $ref: "#/components/schemas/snapshotsList"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            experimentalists:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            policy:
+              $ref: "#/components/schemas/policy"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkList"
+            position:
+              $ref: "#/components/schemas/nullableInteger"
+          required:
+            - title
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            submitter:
+              $ref: "#/components/schemas/peopleReferenceList"
+            people:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            investigation:
+              $ref: "#/components/schemas/investigationSingletonReference"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+            data_files:
+              $ref: "#/components/schemas/dataFileReferencesList"
+            documents:
+              $ref: "#/components/schemas/documentReferencesList"
+            models:
+              $ref: "#/components/schemas/modelReferencesList"
+            sops:
+              $ref: "#/components/schemas/sopReferencesList"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+          required:
+            - creators
+            - submitter
+            - people
+            - projects
+            - investigation
+            - assays
+            - data_files
+            - documents
+            - models
+            - sops
+            - publications
+          additionalProperties: false
+        links:
+          $ref: "#/components/schemas/linksType"
+        meta:
+          $ref: "#/components/schemas/metaType"
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+        - links
+        - meta
+      additionalProperties: false
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+  required:
+    - data
+    - jsonapi
+  additionalProperties: false
+assaysResponse:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/assaySkeletons"
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+    meta:
+      $ref: "#/components/schemas/baseMetaType"
+    links:
+      $ref: "#/components/schemas/indexLinks"
+  required:
+    - data
+    - jsonapi
+    - meta
+  additionalProperties: false
+dataFilesResponse:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/dataFileSkeletons"
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+    meta:
+      $ref: "#/components/schemas/baseMetaType"
+    links:
+      $ref: "#/components/schemas/indexLinks"
+  required:
+    - data
+    - jsonapi
+    - meta
+  additionalProperties: false
+collectionResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/collectionType"
+        attributes:
+          $ref: "#/components/schemas/collectionAttributes"
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            submitter:
+              $ref: "#/components/schemas/peopleReferenceList"
+            people:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+            items:
+              $ref: "#/components/schemas/collectionItemReferencesList"
+          required:
+            - creators
+            - submitter
+            - people
+            - projects
+            - publications
+            - items
+          additionalProperties: false
+        links:
+          $ref: "#/components/schemas/collectionLinks"
+        meta:
+          $ref: "#/components/schemas/metaType"
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+        - links
+        - meta
+      additionalProperties: false
+    included:
+      type: array
+      minItems: 0
+      uniqueItems: true
+      items:
+        $ref: "#/components/schemas/collectionItem"
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+  required:
+    - data
+    - jsonapi
+  additionalProperties: false
+collectionItemsResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      minItems: 0
+      uniqueItems: true
+      items:
+        $ref: "#/components/schemas/collectionItem"
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+    meta:
+      $ref: "#/components/schemas/baseMetaType"
+    links:
+      $ref: "#/components/schemas/indexLinks"
+  required:
+    - data
+    - jsonapi
+    - meta
+  additionalProperties: false
+documentsResponse:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/documentSkeletons"
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+    meta:
+      $ref: "#/components/schemas/baseMetaType"
+    links:
+      $ref: "#/components/schemas/indexLinks"
+  required:
+    - data
+    - jsonapi
+    - meta
+  additionalProperties: false
+eventsResponse:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/eventSkeletons"
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+    meta:
+      $ref: "#/components/schemas/baseMetaType"
+    links:
+      $ref: "#/components/schemas/indexLinks"
+  required:
+    - data
+    - jsonapi
+    - meta
+  additionalProperties: false
+institutionsResponse:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/institutionSkeletons"
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+    meta:
+      $ref: "#/components/schemas/baseMetaType"
+    links:
+      $ref: "#/components/schemas/indexLinks"
+  required:
+    - data
+    - jsonapi
+    - meta
+  additionalProperties: false
+investigationsResponse:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/investigationSkeletons"
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+    meta:
+      $ref: "#/components/schemas/baseMetaType"
+    links:
+      $ref: "#/components/schemas/indexLinks"
+  required:
+    - data
+    - jsonapi
+    - meta
+  additionalProperties: false
+modelsResponse:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/modelSkeletons"
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+    meta:
+      $ref: "#/components/schemas/baseMetaType"
+    links:
+      $ref: "#/components/schemas/indexLinks"
+  required:
+    - data
+    - jsonapi
+    - meta
+  additionalProperties: false
+organismsResponse:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/organismSkeletons"
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+    meta:
+      $ref: "#/components/schemas/baseMetaType"
+    links:
+      $ref: "#/components/schemas/indexLinks"
+  required:
+    - data
+    - jsonapi
+    - meta
+  additionalProperties: false
+peopleResponse:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/peopleSkeletons"
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+    meta:
+      $ref: "#/components/schemas/baseMetaType"
+    links:
+      $ref: "#/components/schemas/indexLinks"
+  required:
+    - data
+    - jsonapi
+    - meta
+  additionalProperties: false
+presentationsResponse:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/presentationSkeletons"
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+    meta:
+      $ref: "#/components/schemas/baseMetaType"
+    links:
+      $ref: "#/components/schemas/indexLinks"
+  required:
+    - data
+    - jsonapi
+    - meta
+  additionalProperties: false
+programmesResponse:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/programmeSkeletons"
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+    meta:
+      $ref: "#/components/schemas/baseMetaType"
+    links:
+      $ref: "#/components/schemas/indexLinks"
+  required:
+    - data
+    - jsonapi
+    - meta
+  additionalProperties: false
+projectsResponse:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/projectSkeletons"
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+    meta:
+      $ref: "#/components/schemas/baseMetaType"
+    links:
+      $ref: "#/components/schemas/indexLinks"
+  required:
+    - data
+    - jsonapi
+    - meta
+  additionalProperties: false
+publicationsResponse:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/publicationSkeletons"
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+    meta:
+      $ref: "#/components/schemas/baseMetaType"
+    links:
+      $ref: "#/components/schemas/indexLinks"
+  required:
+    - data
+    - jsonapi
+    - meta
+  additionalProperties: false
+sopsResponse:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/sopSkeletons"
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+    meta:
+      $ref: "#/components/schemas/baseMetaType"
+    links:
+      $ref: "#/components/schemas/indexLinks"
+  required:
+    - data
+    - jsonapi
+    - meta
+  additionalProperties: false
+sampleAttributeTypesResponse:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/sampleAttributeTypes"
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+    meta:
+      $ref: "#/components/schemas/baseMetaType"
+    links:
+      $ref: "#/components/schemas/indexLinks"
+  required:
+    - data
+    - jsonapi
+    - meta
+  additionalProperties: false
+sampleResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/sampleType"
+        attributes:
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tagsType"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            created_at:
+              $ref: "#/components/schemas/dateTimeString"
+            updated_at:
+              $ref: "#/components/schemas/dateTimeString"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            attribute_map:
+              $ref: "#/components/schemas/sampleAttributeMap"
+            policy:
+              $ref: "#/components/schemas/policy"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkList"
+          required:
+            - title
+            - attribute_map
+            - tags
+            - other_creators
+            - created_at
+            - updated_at
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            submitter:
+              $ref: "#/components/schemas/peopleReferenceList"
+            people:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            data_files:
+              $ref: "#/components/schemas/dataFileReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+            sample_type:
+              $ref: "#/components/schemas/sampleTypeSingletonReference"
+          required:
+            - submitter
+            - projects
+            - people
+            - creators
+            - assays
+            - data_files
+            - sample_type
+          additionalProperties: false
+        links:
+          $ref: "#/components/schemas/linksType"
+        meta:
+          $ref: "#/components/schemas/metaType"
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+        - links
+        - meta
+      additionalProperties: false
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+  required:
+    - data
+    - jsonapi
+  additionalProperties: false
+samplePostResponse:
+  $ref: "#/components/schemas/sampleResponse"
+sampleTypesResponse:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/sampleTypeSkeletons"
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+    meta:
+      $ref: "#/components/schemas/baseMetaType"
+    links:
+      $ref: "#/components/schemas/indexLinks"
+  required:
+    - data
+    - jsonapi
+    - meta
+    - links
+  additionalProperties: false
+sampleTypeResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/sampleTypeType"
+        attributes:
+          type: object
+          properties:
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            sample_attributes:
+              $ref: "#/components/schemas/sampleTypeSampleAttributesResponse"
+            tags:
+              $ref: "#/components/schemas/tagsType"
+          required:
+            - title
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            submitter:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+            samples:
+              $ref: "#/components/schemas/sampleReferencesList"
+          required:
+            - submitter
+            - projects
+            - assays
+            - samples
+          additionalProperties: false
+        links:
+          $ref: "#/components/schemas/linksType"
+        meta:
+          $ref: "#/components/schemas/metaType"
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+        - links
+        - meta
+      additionalProperties: false
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+  required:
+    - data
+    - jsonapi
+  additionalProperties: false
+studiesResponse:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/studySkeletons"
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+    meta:
+      $ref: "#/components/schemas/baseMetaType"
+    links:
+      $ref: "#/components/schemas/indexLinks"
+  required:
+    - data
+    - jsonapi
+    - meta
+  additionalProperties: false
+workflowsResponse:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/workflowSkeletons"
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+    meta:
+      $ref: "#/components/schemas/baseMetaType"
+    links:
+      $ref: "#/components/schemas/indexLinks"
+  required:
+    - data
+    - jsonapi
+    - meta
+  additionalProperties: false
+ErrorResponse:
+  required:
+    - message
+  additionalProperties: false
+  properties:
+    message:
+      type: string
+contentBlobResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/contentBlobType"
+        attributes:
+          type: object
+          properties:
+            original_filename:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            url:
+              $ref: "#/components/schemas/nullableUriString"
+            md5sum:
+              $ref: "#/components/schemas/nullableMd5sumString"
+            sha1sum:
+              $ref: "#/components/schemas/nullableSha1sumString"
+            content_type:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            size:
+              $ref: "#/components/schemas/nullableInteger"
+          required:
+            - original_filename
+            - url
+            - md5sum
+            - sha1sum
+            - content_type
+            - size
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            asset:
+              $ref: "#/components/schemas/anySingletonReference"
+          required:
+            - asset
+          additionalProperties: false
+        links:
+          $ref: "#/components/schemas/downloadableLinksType"
+        meta:
+          $ref: "#/components/schemas/metaType"
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+        - links
+        - meta
+      additionalProperties: false
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+  required:
+    - data
+    - jsonapi
+  additionalProperties: false
+projectMembersList:
+  type: array
+  items:
+    type: object
+    properties:
+      person_id:
+        $ref: "#/components/schemas/nonEmptyString"
+      institution_id:
+        $ref: "#/components/schemas/nonEmptyString"
+    required:
+      - person_id
+      - institution_id
+    additionalProperties: false
+workflowType:
+  type: string
+  minLength: 1
+  enum:
+    - workflows
+workflowReferencesList:
+  type: object
+  properties:
+    data:
+      $ref: "#/components/schemas/workflowReferences"
+  required:
+    - data
+  additionalProperties: false
+workflowReferences:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+    $ref: "#/components/schemas/workflowReference"
+workflowReference:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/workflowType"
+  required:
+    - id
+    - type
+  additionalProperties: false
+workflowSkeleton:
+  properties:
+    id:
+      $ref: "#/components/schemas/nonEmptyString"
+    type:
+      $ref: "#/components/schemas/workflowType"
+    attributes:
+      type: object
+      properties:
+        title:
+          $ref: "#/components/schemas/nonEmptyString"
+      required:
+        - title
+      additionalProperties: false
+    links:
+      $ref: "#/components/schemas/linksType"
+  required:
+    - id
+    - type
+    - attributes
+    - links
+  additionalProperties: false
+workflowSkeletons:
+  type: array
+  minItems: 0
+  uniqueItems: true
+  items:
+  $ref: "#/components/schemas/workflowSkeleton"
+workflowResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/workflowType"
+        attributes:
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tagsType"
+            edam_topics:
+              $ref: "#/components/schemas/ontologyTermsList"
+            edam_operations:
+              $ref: "#/components/schemas/ontologyTermsList"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            workflow_class:
+              type: object
+              properties:
+                title:
+                  $ref: "#/components/schemas/nonEmptyString"
+                key:
+                  $ref: "#/components/schemas/nullableNonEmptyString"
+                description:
+                  $ref: "#/components/schemas/nullableNonEmptyString"
+              required:
+                - title
+                - key
+              additionalProperties: false
+            license:
+              $ref: "#/components/schemas/nullableLicense"
+            latest_version:
+              type: number
+            versions:
+              type: array
+              minItems: 1
+              uniqueItems: true
+              items:
+                oneOf:
+                  - $ref: "#/components/schemas/version"
+                  - $ref: "#/components/schemas/gitVersion"
+            version:
+              type: number
+            revision_comments:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            doi:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            created_at:
+              $ref: "#/components/schemas/dateTimeString"
+            updated_at:
+              $ref: "#/components/schemas/dateTimeString"
+            content_blobs:
+              $ref: "#/components/schemas/contentBlobsList"
+            policy:
+              $ref: "#/components/schemas/policy"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            internals:
+              type: object
+              properties:
+                inputs:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/workflowInput"
+                steps:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/workflowStep"
+                outputs:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/workflowOutput"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkList"
+          required:
+            - title
+            - workflow_class
+            - license
+            - latest_version
+            - versions
+            - version
+            - created_at
+            - updated_at
+            - content_blobs
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/peopleReferenceList"
+            submitter:
+              $ref: "#/components/schemas/peopleReferenceList"
+            people:
+              $ref: "#/components/schemas/peopleReferenceList"
+            projects:
+              $ref: "#/components/schemas/projectReferencesList"
+            investigations:
+              $ref: "#/components/schemas/investigationReferencesList"
+            studies:
+              $ref: "#/components/schemas/studyReferencesList"
+            assays:
+              $ref: "#/components/schemas/assayReferencesList"
+            publications:
+              $ref: "#/components/schemas/publicationReferencesList"
+            sops:
+              $ref: "#/components/schemas/sopReferencesList"
+          required:
+            - creators
+            - submitter
+            - people
+            - projects
+            - investigations
+            - studies
+            - assays
+            - publications
+            - sops
+          additionalProperties: false
+        links:
+          type: object
+          properties:
+            self:
+              $ref: "#/components/schemas/uriString"
+            diagram:
+              $ref: "#/components/schemas/uriString"
+          required:
+            - self
+          additionalProperties: false
+        meta:
+          $ref: "#/components/schemas/metaType"
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+        - links
+        - meta
+      additionalProperties: false
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+  required:
+    - data
+    - jsonapi
+  additionalProperties: false
