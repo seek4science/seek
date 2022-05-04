@@ -1,3 +1,24 @@
+indexResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      minItems: 0
+      uniqueItems: true
+      items:
+        $ref: "#/components/schemas/anySkeleton"
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+    meta:
+      $ref: "#/components/schemas/baseMetaType"
+    links:
+      $ref: "#/components/schemas/indexLinks"
+  required:
+    - data
+    - jsonapi
+    - meta
+    - links
+  additionalProperties: false
 sampleTypeSampleAttributesResponse:
   type: array
   minItems: 1
@@ -43,22 +64,6 @@ sampleTypeSampleAttributeResponse:
     - title
     - sample_attribute_type
   additionalProperties: false
-collectionsResponse:
-  type: object
-  properties:
-    data:
-      $ref: "#/components/schemas/collectionSkeletons"
-    jsonapi:
-      $ref: "#/components/schemas/JsonApiVersion"
-    meta:
-      $ref: "#/components/schemas/baseMetaType"
-    links:
-      $ref: "#/components/schemas/indexLinks"
-  required:
-    - data
-    - jsonapi
-    - meta
-  additionalProperties: false
 collectionItemResponse:
   type: object
   properties:
@@ -70,11 +75,35 @@ collectionItemResponse:
     - data
     - jsonapi
   additionalProperties: false
+collectionItemsResponse:
+  type: object
+  properties:
+    data:
+      type: array
+      minItems: 0
+      uniqueItems: true
+      items:
+        $ref: "#/components/schemas/collectionItem"
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+    meta:
+      $ref: "#/components/schemas/baseMetaType"
+    links:
+      $ref: "#/components/schemas/indexLinks"
+  required:
+    - data
+    - jsonapi
+    - meta
+  additionalProperties: false
 searchResponse:
   type: object
   properties:
     data:
-      $ref: "#/components/schemas/anySkeletons"
+      type: array
+      minItems: 0
+      uniqueItems: true
+      items:
+        $ref: "#/components/schemas/anySkeleton"
     jsonapi:
       $ref: "#/components/schemas/JsonApiVersion"
     meta:
@@ -158,33 +187,33 @@ assayResponse:
           type: object
           properties:
             creators:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             submitter:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             organisms:
-              $ref: "#/components/schemas/organismReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             people:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             projects:
-              $ref: "#/components/schemas/projectReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             investigation:
-              $ref: "#/components/schemas/investigationSingletonReference"
+              $ref: "#/components/schemas/singleReference"
             study:
-              $ref: "#/components/schemas/studySingletonReference"
+              $ref: "#/components/schemas/singleReference"
             data_files:
-              $ref: "#/components/schemas/dataFileReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             documents:
-              $ref: "#/components/schemas/documentReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             models:
-              $ref: "#/components/schemas/modelReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             sops:
-              $ref: "#/components/schemas/sopReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             publications:
-              $ref: "#/components/schemas/publicationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             placeholders:
-              $ref: "#/components/schemas/placeholderReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             human_diseases:
-              $ref: "#/components/schemas/humanDiseaseReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - creators
             - submitter
@@ -235,27 +264,27 @@ dataFileResponse:
           type: object
           properties:
             creators:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             submitter:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             people:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             projects:
-              $ref: "#/components/schemas/projectReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             investigations:
-              $ref: "#/components/schemas/investigationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             studies:
-              $ref: "#/components/schemas/studyReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             assays:
-              $ref: "#/components/schemas/assayReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             publications:
-              $ref: "#/components/schemas/publicationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             events:
-              $ref: "#/components/schemas/eventReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             file_template:
-              $ref: "#/components/schemas/fileTemplateSingletonReference"
+              $ref: "#/components/schemas/singleReference"
             placeholder:
-              $ref: "#/components/schemas/placeholderSingletonReference"
+              $ref: "#/components/schemas/singleReference"
           required:
             - creators
             - submitter
@@ -303,21 +332,21 @@ documentResponse:
           type: object
           properties:
             creators:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             submitter:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             people:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             projects:
-              $ref: "#/components/schemas/projectReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             investigations:
-              $ref: "#/components/schemas/investigationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             studies:
-              $ref: "#/components/schemas/studyReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             assays:
-              $ref: "#/components/schemas/assayReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             publications:
-              $ref: "#/components/schemas/publicationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - creators
             - submitter
@@ -387,15 +416,15 @@ eventResponse:
           type: object
           properties:
             submitter:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             projects:
-              $ref: "#/components/schemas/projectReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             data_files:
-              $ref: "#/components/schemas/dataFileReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             publications:
-              $ref: "#/components/schemas/publicationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             presentations:
-              $ref: "#/components/schemas/presentationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - projects
             - data_files
@@ -460,9 +489,9 @@ institutionResponse:
           type: object
           properties:
             people:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             projects:
-              $ref: "#/components/schemas/projectReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - people
             - projects
@@ -521,27 +550,27 @@ investigationResponse:
           type: object
           properties:
             creators:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             submitter:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             people:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             projects:
-              $ref: "#/components/schemas/projectReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             studies:
-              $ref: "#/components/schemas/studyReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             assays:
-              $ref: "#/components/schemas/assayReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             data_files:
-              $ref: "#/components/schemas/dataFileReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             documents:
-              $ref: "#/components/schemas/documentReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             models:
-              $ref: "#/components/schemas/modelReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             sops:
-              $ref: "#/components/schemas/sopReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             publications:
-              $ref: "#/components/schemas/publicationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - creators
             - submitter
@@ -589,23 +618,23 @@ modelResponse:
           type: object
           properties:
             creators:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             submitter:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             people:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             projects:
-              $ref: "#/components/schemas/projectReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             investigations:
-              $ref: "#/components/schemas/investigationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             studies:
-              $ref: "#/components/schemas/studyReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             assays:
-              $ref: "#/components/schemas/assayReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             publications:
-              $ref: "#/components/schemas/publicationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             organisms:
-              $ref: "#/components/schemas/organismReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - creators
             - submitter
@@ -663,11 +692,11 @@ organismResponse:
           type: object
           properties:
             projects:
-              $ref: "#/components/schemas/projectReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             assays:
-              $ref: "#/components/schemas/assayReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             models:
-              $ref: "#/components/schemas/modelReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - projects
             - assays
@@ -740,29 +769,29 @@ personResponse:
           type: object
           properties:
             projects:
-              $ref: "#/components/schemas/projectReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             institutions:
-              $ref: "#/components/schemas/institutionReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             investigations:
-              $ref: "#/components/schemas/investigationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             studies:
-              $ref: "#/components/schemas/studyReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             assays:
-              $ref: "#/components/schemas/assayReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             data_files:
-              $ref: "#/components/schemas/dataFileReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             documents:
-              $ref: "#/components/schemas/documentReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             models:
-              $ref: "#/components/schemas/modelReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             sops:
-              $ref: "#/components/schemas/sopReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             publications:
-              $ref: "#/components/schemas/publicationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             presentations:
-              $ref: "#/components/schemas/presentationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             events:
-              $ref: "#/components/schemas/eventReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - projects
             - institutions
@@ -811,23 +840,23 @@ presentationResponse:
           type: object
           properties:
             creators:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             submitter:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             people:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             projects:
-              $ref: "#/components/schemas/projectReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             investigations:
-              $ref: "#/components/schemas/investigationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             studies:
-              $ref: "#/components/schemas/studyReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             assays:
-              $ref: "#/components/schemas/assayReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             publications:
-              $ref: "#/components/schemas/publicationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             events:
-              $ref: "#/components/schemas/eventReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - creators
             - submitter
@@ -873,33 +902,33 @@ programmeResponse:
           type: object
           properties:
             administrators:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             people:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             projects:
-              $ref: "#/components/schemas/projectReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             institutions:
-              $ref: "#/components/schemas/institutionReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             investigations:
-              $ref: "#/components/schemas/investigationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             studies:
-              $ref: "#/components/schemas/studyReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             assays:
-              $ref: "#/components/schemas/assayReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             data_files:
-              $ref: "#/components/schemas/dataFileReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             documents:
-              $ref: "#/components/schemas/documentReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             models:
-              $ref: "#/components/schemas/modelReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             sops:
-              $ref: "#/components/schemas/sopReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             publications:
-              $ref: "#/components/schemas/publicationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             presentations:
-              $ref: "#/components/schemas/presentationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             events:
-              $ref: "#/components/schemas/eventReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - people
             - projects
@@ -980,49 +1009,49 @@ projectResponse:
           type: object
           properties:
             organisms:
-              $ref: "#/components/schemas/organismReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             people:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             institutions:
-              $ref: "#/components/schemas/institutionReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             investigations:
-              $ref: "#/components/schemas/investigationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             studies:
-              $ref: "#/components/schemas/studyReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             assays:
-              $ref: "#/components/schemas/assayReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             data_files:
-              $ref: "#/components/schemas/dataFileReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             documents:
-              $ref: "#/components/schemas/documentReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             models:
-              $ref: "#/components/schemas/modelReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             sops:
-              $ref: "#/components/schemas/sopReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             publications:
-              $ref: "#/components/schemas/publicationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             presentations:
-              $ref: "#/components/schemas/presentationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             events:
-              $ref: "#/components/schemas/eventReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             programmes:
-              $ref: "#/components/schemas/programmeReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             workflows:
-              $ref: "#/components/schemas/workflowReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             file_templates:
-              $ref: "#/components/schemas/fileTemplateReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             placeholders:
-              $ref: "#/components/schemas/placeholderReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             human_diseases:
-              $ref: "#/components/schemas/humanDiseaseReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             project_administrators:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             pals:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             asset_housekeepers:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             asset_gatekeepers:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - organisms
             - people
@@ -1148,31 +1177,31 @@ publicationResponse:
           type: object
           properties:
             people:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             projects:
-              $ref: "#/components/schemas/projectReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             investigations:
-              $ref: "#/components/schemas/investigationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             studies:
-              $ref: "#/components/schemas/studyReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             assays:
-              $ref: "#/components/schemas/assayReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             data_files:
-              $ref: "#/components/schemas/dataFileReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             models:
-              $ref: "#/components/schemas/modelReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             publications:
-              $ref: "#/components/schemas/publicationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             presentations:
-              $ref: "#/components/schemas/presentationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             events:
-              $ref: "#/components/schemas/eventReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             workflows:
-              $ref: "#/components/schemas/workflowReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             creators:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             submitter:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - people
             - projects
@@ -1222,21 +1251,21 @@ sopResponse:
           type: object
           properties:
             creators:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             submitter:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             people:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             projects:
-              $ref: "#/components/schemas/projectReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             investigations:
-              $ref: "#/components/schemas/investigationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             studies:
-              $ref: "#/components/schemas/studyReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             assays:
-              $ref: "#/components/schemas/assayReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             publications:
-              $ref: "#/components/schemas/publicationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - creators
             - submitter
@@ -1303,27 +1332,27 @@ studyResponse:
           type: object
           properties:
             creators:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             submitter:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             people:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             projects:
-              $ref: "#/components/schemas/projectReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             investigation:
-              $ref: "#/components/schemas/investigationSingletonReference"
+              $ref: "#/components/schemas/singleReference"
             assays:
-              $ref: "#/components/schemas/assayReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             data_files:
-              $ref: "#/components/schemas/dataFileReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             documents:
-              $ref: "#/components/schemas/documentReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             models:
-              $ref: "#/components/schemas/modelReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             sops:
-              $ref: "#/components/schemas/sopReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             publications:
-              $ref: "#/components/schemas/publicationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - creators
             - submitter
@@ -1355,38 +1384,6 @@ studyResponse:
     - data
     - jsonapi
   additionalProperties: false
-assaysResponse:
-  type: object
-  properties:
-    data:
-      $ref: "#/components/schemas/assaySkeletons"
-    jsonapi:
-      $ref: "#/components/schemas/JsonApiVersion"
-    meta:
-      $ref: "#/components/schemas/baseMetaType"
-    links:
-      $ref: "#/components/schemas/indexLinks"
-  required:
-    - data
-    - jsonapi
-    - meta
-  additionalProperties: false
-dataFilesResponse:
-  type: object
-  properties:
-    data:
-      $ref: "#/components/schemas/dataFileSkeletons"
-    jsonapi:
-      $ref: "#/components/schemas/JsonApiVersion"
-    meta:
-      $ref: "#/components/schemas/baseMetaType"
-    links:
-      $ref: "#/components/schemas/indexLinks"
-  required:
-    - data
-    - jsonapi
-    - meta
-  additionalProperties: false
 collectionResponse:
   type: object
   properties:
@@ -1403,17 +1400,17 @@ collectionResponse:
           type: object
           properties:
             creators:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             submitter:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             people:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             projects:
-              $ref: "#/components/schemas/projectReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             publications:
-              $ref: "#/components/schemas/publicationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             items:
-              $ref: "#/components/schemas/collectionItemReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - creators
             - submitter
@@ -1445,234 +1442,6 @@ collectionResponse:
   required:
     - data
     - jsonapi
-  additionalProperties: false
-collectionItemsResponse:
-  type: object
-  properties:
-    data:
-      type: array
-      minItems: 0
-      uniqueItems: true
-      items:
-        $ref: "#/components/schemas/collectionItem"
-    jsonapi:
-      $ref: "#/components/schemas/JsonApiVersion"
-    meta:
-      $ref: "#/components/schemas/baseMetaType"
-    links:
-      $ref: "#/components/schemas/indexLinks"
-  required:
-    - data
-    - jsonapi
-    - meta
-  additionalProperties: false
-documentsResponse:
-  type: object
-  properties:
-    data:
-      $ref: "#/components/schemas/documentSkeletons"
-    jsonapi:
-      $ref: "#/components/schemas/JsonApiVersion"
-    meta:
-      $ref: "#/components/schemas/baseMetaType"
-    links:
-      $ref: "#/components/schemas/indexLinks"
-  required:
-    - data
-    - jsonapi
-    - meta
-  additionalProperties: false
-eventsResponse:
-  type: object
-  properties:
-    data:
-      $ref: "#/components/schemas/eventSkeletons"
-    jsonapi:
-      $ref: "#/components/schemas/JsonApiVersion"
-    meta:
-      $ref: "#/components/schemas/baseMetaType"
-    links:
-      $ref: "#/components/schemas/indexLinks"
-  required:
-    - data
-    - jsonapi
-    - meta
-  additionalProperties: false
-institutionsResponse:
-  type: object
-  properties:
-    data:
-      $ref: "#/components/schemas/institutionSkeletons"
-    jsonapi:
-      $ref: "#/components/schemas/JsonApiVersion"
-    meta:
-      $ref: "#/components/schemas/baseMetaType"
-    links:
-      $ref: "#/components/schemas/indexLinks"
-  required:
-    - data
-    - jsonapi
-    - meta
-  additionalProperties: false
-investigationsResponse:
-  type: object
-  properties:
-    data:
-      $ref: "#/components/schemas/investigationSkeletons"
-    jsonapi:
-      $ref: "#/components/schemas/JsonApiVersion"
-    meta:
-      $ref: "#/components/schemas/baseMetaType"
-    links:
-      $ref: "#/components/schemas/indexLinks"
-  required:
-    - data
-    - jsonapi
-    - meta
-  additionalProperties: false
-modelsResponse:
-  type: object
-  properties:
-    data:
-      $ref: "#/components/schemas/modelSkeletons"
-    jsonapi:
-      $ref: "#/components/schemas/JsonApiVersion"
-    meta:
-      $ref: "#/components/schemas/baseMetaType"
-    links:
-      $ref: "#/components/schemas/indexLinks"
-  required:
-    - data
-    - jsonapi
-    - meta
-  additionalProperties: false
-organismsResponse:
-  type: object
-  properties:
-    data:
-      $ref: "#/components/schemas/organismSkeletons"
-    jsonapi:
-      $ref: "#/components/schemas/JsonApiVersion"
-    meta:
-      $ref: "#/components/schemas/baseMetaType"
-    links:
-      $ref: "#/components/schemas/indexLinks"
-  required:
-    - data
-    - jsonapi
-    - meta
-  additionalProperties: false
-peopleResponse:
-  type: object
-  properties:
-    data:
-      $ref: "#/components/schemas/peopleSkeletons"
-    jsonapi:
-      $ref: "#/components/schemas/JsonApiVersion"
-    meta:
-      $ref: "#/components/schemas/baseMetaType"
-    links:
-      $ref: "#/components/schemas/indexLinks"
-  required:
-    - data
-    - jsonapi
-    - meta
-  additionalProperties: false
-presentationsResponse:
-  type: object
-  properties:
-    data:
-      $ref: "#/components/schemas/presentationSkeletons"
-    jsonapi:
-      $ref: "#/components/schemas/JsonApiVersion"
-    meta:
-      $ref: "#/components/schemas/baseMetaType"
-    links:
-      $ref: "#/components/schemas/indexLinks"
-  required:
-    - data
-    - jsonapi
-    - meta
-  additionalProperties: false
-programmesResponse:
-  type: object
-  properties:
-    data:
-      $ref: "#/components/schemas/programmeSkeletons"
-    jsonapi:
-      $ref: "#/components/schemas/JsonApiVersion"
-    meta:
-      $ref: "#/components/schemas/baseMetaType"
-    links:
-      $ref: "#/components/schemas/indexLinks"
-  required:
-    - data
-    - jsonapi
-    - meta
-  additionalProperties: false
-projectsResponse:
-  type: object
-  properties:
-    data:
-      $ref: "#/components/schemas/projectSkeletons"
-    jsonapi:
-      $ref: "#/components/schemas/JsonApiVersion"
-    meta:
-      $ref: "#/components/schemas/baseMetaType"
-    links:
-      $ref: "#/components/schemas/indexLinks"
-  required:
-    - data
-    - jsonapi
-    - meta
-  additionalProperties: false
-publicationsResponse:
-  type: object
-  properties:
-    data:
-      $ref: "#/components/schemas/publicationSkeletons"
-    jsonapi:
-      $ref: "#/components/schemas/JsonApiVersion"
-    meta:
-      $ref: "#/components/schemas/baseMetaType"
-    links:
-      $ref: "#/components/schemas/indexLinks"
-  required:
-    - data
-    - jsonapi
-    - meta
-  additionalProperties: false
-sopsResponse:
-  type: object
-  properties:
-    data:
-      $ref: "#/components/schemas/sopSkeletons"
-    jsonapi:
-      $ref: "#/components/schemas/JsonApiVersion"
-    meta:
-      $ref: "#/components/schemas/baseMetaType"
-    links:
-      $ref: "#/components/schemas/indexLinks"
-  required:
-    - data
-    - jsonapi
-    - meta
-  additionalProperties: false
-sampleAttributeTypesResponse:
-  type: object
-  properties:
-    data:
-      $ref: "#/components/schemas/sampleAttributeTypes"
-    jsonapi:
-      $ref: "#/components/schemas/JsonApiVersion"
-    meta:
-      $ref: "#/components/schemas/baseMetaType"
-    links:
-      $ref: "#/components/schemas/indexLinks"
-  required:
-    - data
-    - jsonapi
-    - meta
   additionalProperties: false
 sampleResponse:
   type: object
@@ -1717,19 +1486,19 @@ sampleResponse:
           type: object
           properties:
             creators:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             submitter:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             people:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             projects:
-              $ref: "#/components/schemas/projectReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             data_files:
-              $ref: "#/components/schemas/dataFileReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             assays:
-              $ref: "#/components/schemas/assayReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             sample_type:
-              $ref: "#/components/schemas/sampleTypeSingletonReference"
+              $ref: "#/components/schemas/singleReference"
           required:
             - submitter
             - projects
@@ -1756,25 +1525,6 @@ sampleResponse:
   required:
     - data
     - jsonapi
-  additionalProperties: false
-samplePostResponse:
-  $ref: "#/components/schemas/sampleResponse"
-sampleTypesResponse:
-  type: object
-  properties:
-    data:
-      $ref: "#/components/schemas/sampleTypeSkeletons"
-    jsonapi:
-      $ref: "#/components/schemas/JsonApiVersion"
-    meta:
-      $ref: "#/components/schemas/baseMetaType"
-    links:
-      $ref: "#/components/schemas/indexLinks"
-  required:
-    - data
-    - jsonapi
-    - meta
-    - links
   additionalProperties: false
 sampleTypeResponse:
   type: object
@@ -1804,13 +1554,13 @@ sampleTypeResponse:
           type: object
           properties:
             submitter:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             projects:
-              $ref: "#/components/schemas/projectReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             assays:
-              $ref: "#/components/schemas/assayReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             samples:
-              $ref: "#/components/schemas/sampleReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - submitter
             - projects
@@ -1835,45 +1585,6 @@ sampleTypeResponse:
     - data
     - jsonapi
   additionalProperties: false
-studiesResponse:
-  type: object
-  properties:
-    data:
-      $ref: "#/components/schemas/studySkeletons"
-    jsonapi:
-      $ref: "#/components/schemas/JsonApiVersion"
-    meta:
-      $ref: "#/components/schemas/baseMetaType"
-    links:
-      $ref: "#/components/schemas/indexLinks"
-  required:
-    - data
-    - jsonapi
-    - meta
-  additionalProperties: false
-workflowsResponse:
-  type: object
-  properties:
-    data:
-      $ref: "#/components/schemas/workflowSkeletons"
-    jsonapi:
-      $ref: "#/components/schemas/JsonApiVersion"
-    meta:
-      $ref: "#/components/schemas/baseMetaType"
-    links:
-      $ref: "#/components/schemas/indexLinks"
-  required:
-    - data
-    - jsonapi
-    - meta
-  additionalProperties: false
-ErrorResponse:
-  required:
-    - message
-  additionalProperties: false
-  properties:
-    message:
-      type: string
 contentBlobResponse:
   type: object
   properties:
@@ -1911,7 +1622,7 @@ contentBlobResponse:
           type: object
           properties:
             asset:
-              $ref: "#/components/schemas/anySingletonReference"
+              $ref: "#/components/schemas/singleReference"
           required:
             - asset
           additionalProperties: false
@@ -2031,23 +1742,23 @@ workflowResponse:
           type: object
           properties:
             creators:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             submitter:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             people:
-              $ref: "#/components/schemas/peopleReferenceList"
+              $ref: "#/components/schemas/multipleReferences"
             projects:
-              $ref: "#/components/schemas/projectReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             investigations:
-              $ref: "#/components/schemas/investigationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             studies:
-              $ref: "#/components/schemas/studyReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             assays:
-              $ref: "#/components/schemas/assayReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             publications:
-              $ref: "#/components/schemas/publicationReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
             sops:
-              $ref: "#/components/schemas/sopReferencesList"
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - creators
             - submitter
@@ -2085,3 +1796,50 @@ workflowResponse:
     - data
     - jsonapi
   additionalProperties: false
+okResponse:
+  type: object
+  properties:
+    status:
+      $ref: "#/components/schemas/nonEmptyString"
+  required:
+    - status
+  additionalProperties: false
+  example:
+    status: ok
+notImplementedResponse:
+  type: object
+  properties:
+    errors:
+      $ref: "#/components/schemas/errorsArray"
+unprocessableEntityResponse:
+  type: object
+  properties:
+    errors:
+      $ref: "#/components/schemas/errorsArray"
+  example:
+    errors:
+      - detail: id specified by the PUT request does not match object-id in the
+          JSON input
+badRequestResponse:
+  type: object
+  properties:
+    errors:
+      $ref: "#/components/schemas/errorsArray"
+  example:
+    errors:
+      - title: You do not have permission
+        detail: No permission
+forbiddenResponse:
+  type: object
+  properties:
+    errors:
+      $ref: "#/components/schemas/errorsArray"
+notFoundResponse:
+  type: object
+  properties:
+    errors:
+      $ref: "#/components/schemas/errorsArray"
+  example:
+    errors:
+      - title: Not found
+        detail: Couldn't find Institution with 'id'=[70]

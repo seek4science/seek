@@ -58,7 +58,7 @@ class DataFileApiTest < ActionDispatch::IntegrationTest
     put data_file_content_blob_path(df, df.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')) }
 
     assert_response :forbidden
-    validate_json response.body, '#/components/schemas/errors'
+    validate_json response.body, '#/components/responses/forbiddenResponse'
     blob = df.content_blob.reload
     assert_nil blob.md5sum
     assert blob.no_content?
@@ -75,7 +75,7 @@ class DataFileApiTest < ActionDispatch::IntegrationTest
     put data_file_content_blob_path(df, df.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'another_pdf_file.pdf')) }
 
     assert_response :bad_request
-    validate_json response.body, '#/components/schemas/errors'
+    validate_json response.body, '#/components/responses/badRequestResponse'
     blob = df.content_blob.reload
     assert_equal original_md5, blob.md5sum
     assert blob.file_size > 0
@@ -97,7 +97,7 @@ class DataFileApiTest < ActionDispatch::IntegrationTest
     assert_no_difference(-> { model.count }) do
       post "/#{plural_name}.json", params: to_post
       assert_response :unprocessable_entity
-      validate_json response.body, '#/components/schemas/errors'
+      validate_json response.body, '#/components/responses/unprocessableEntityResponse'
     end
 
     h = JSON.parse(response.body)
@@ -121,8 +121,7 @@ class DataFileApiTest < ActionDispatch::IntegrationTest
       assert_no_difference(-> { model.count }) do
         post "/#{plural_name}.json", params: to_post
         assert_response :unprocessable_entity
-
-        validate_json response.body, '#/components/schemas/errors'
+        validate_json response.body, '#/components/responses/unprocessableEntityResponse'
       end
     end
 
