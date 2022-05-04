@@ -21,7 +21,7 @@ security:
   - apiToken: []
   - basicAuth: []
 servers:
-  - url: https://fairdomhub.org/
+  - url: https://fairdomhub.org
 tags:
   - name: list
     description:
@@ -158,54 +158,6 @@ x-tagGroups:
       - sampleTypes
       - samples
       - sampleAttributeTypes
-x-types:
-  ListTypeT:
-    "501":
-      description: Not implemented
-  CreateTypeT:
-    "400":
-      description: Bad request
-      schema:
-        $ref: "#/components/schemas/bad_request"
-    "403":
-      description: Forbidden
-      schema:
-        $ref: "#/components/schemas/forbidden"
-    "422":
-      description: Unprocessable entity
-      schema:
-        $ref: "#/components/schemas/unprocessable_entity"
-  ReadTypeT:
-    "403":
-      description: Forbidden
-      schema:
-        $ref: "#/components/schemas/forbidden"
-    "404":
-      description: Not found
-      schema:
-        $ref: "#/components/schemas/not_found"
-  UpdateTypeT:
-    "403":
-      description: Forbidden
-      schema:
-        $ref: "#/components/schemas/forbidden"
-    "404":
-      description: Not found
-      schema:
-        $ref: "#/components/schemas/not_found"
-    "422":
-      description: Unprocessable entity
-      schema:
-        $ref: "#/components/schemas/unprocessable_entity"
-  DeleteTypeT:
-    "403":
-      description: Forbidden
-      schema:
-        $ref: "#/components/schemas/forbidden"
-    "404":
-      description: Not found
-      schema:
-        $ref: "#/components/schemas/not_found"
 components:
   securitySchemes:
     OAuth2:
@@ -233,4 +185,4 @@ components:
   schemas:
     $ref: _schemas.yml
 paths:
-  $ref: _paths.yml
+  $ref: _paths2.yml
