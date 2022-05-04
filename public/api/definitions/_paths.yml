@@ -34,6 +34,7 @@
       example: data_files
   get:
     operationId: search
+    summary: Search SEEK for a given query
     description:
       $ref: ../descriptions/searchOperation.md
     tags:
@@ -52,6 +53,7 @@
 /assays:
   get:
     operationId: listAssays
+    summary: List assays
     description:
       $ref: ../descriptions/listAssays.md
     tags:
@@ -72,6 +74,7 @@
         description: Not implemented
   post:
     operationId: createAssay
+    summary: Create a new assay
     security:
       - OAuth2:
           - write
@@ -127,6 +130,7 @@
         type: integer
   patch:
     operationId: updateAssay
+    summary: Update an assay
     security:
       - OAuth2:
           - write
@@ -174,6 +178,7 @@
               $ref: "#/components/schemas/unprocessableEntityResponse"
   get:
     operationId: readAssay
+    summary: Fetch an assay
     description:
       $ref: ../descriptions/readAssay.md
     tags:
@@ -204,6 +209,7 @@
               $ref: "#/components/schemas/notFoundResponse"
   delete:
     operationId: deleteAssay
+    summary: Delete an assay
     security:
       - OAuth2:
           - write
@@ -236,6 +242,7 @@
 /collections:
   get:
     operationId: listCollections
+    summary: List collections
     description:
       $ref: ../descriptions/listCollections.md
     tags:
@@ -256,6 +263,7 @@
         description: Not implemented
   post:
     operationId: createCollection
+    summary: Create a new collection
     security:
       - OAuth2:
           - write
@@ -312,6 +320,7 @@
       example: 1152
   get:
     operationId: readCollection
+    summary: Fetch a collection
     description:
       $ref: ../descriptions/readCollection.md
     tags:
@@ -342,6 +351,7 @@
               $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateCollection
+    summary: Update a collection
     security:
       - OAuth2:
           - write
@@ -389,6 +399,7 @@
               $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteCollection
+    summary: Delete a collection
     security:
       - OAuth2:
           - write
@@ -429,6 +440,7 @@
       example: 123
   get:
     operationId: listCollectionItems
+    summary: List translation items in a collection
     description:
       $ref: ../descriptions/listCollectionItems.md
     tags:
@@ -449,6 +461,7 @@
         description: Not implemented
   post:
     operationId: createCollectionItem
+    summary: Add a new item to a collection
     security:
       - OAuth2:
           - write
@@ -512,6 +525,7 @@
       example: 1152
   get:
     operationId: readCollectionItem
+    summary: Fetch an item from a collection
     description:
       $ref: ../descriptions/readCollectionItem.md
     tags:
@@ -542,6 +556,7 @@
               $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateCollectionItem
+    summary: Update an item in a collection
     security:
       - OAuth2:
           - write
@@ -589,6 +604,7 @@
               $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteCollectionItem
+    summary: Remove an item from a collection
     security:
       - OAuth2:
           - write
@@ -621,6 +637,7 @@
 /data_files:
   get:
     operationId: listDataFiles
+    summary: List data files
     description:
       $ref: ../descriptions/listDataFiles.md
     tags:
@@ -641,6 +658,7 @@
         description: Not implemented
   post:
     operationId: createDataFile
+    summary: Create a new data file
     security:
       - OAuth2:
           - write
@@ -697,6 +715,7 @@
       example: 1152
   get:
     operationId: readDataFile
+    summary: Fetch a data file
     description:
       $ref: ../descriptions/readDataFile.md
     parameters:
@@ -735,6 +754,7 @@
               $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateDataFile
+    summary: Update a data file
     security:
       - OAuth2:
           - write
@@ -782,6 +802,7 @@
               $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteDataFile
+    summary: Delete a data file
     security:
       - OAuth2:
           - write
@@ -836,6 +857,7 @@
       example: 1831
   put:
     operationId: uploadAssetContent
+    summary: Upload content to an existing content blob placeholder
     security:
       - OAuth2:
           - write
@@ -858,6 +880,7 @@
         description: Success
   get:
     operationId: readContentBlob
+    summary: Fetch information on a content blob
     description:
       $ref: ../descriptions/readContentBlob.md
     tags:
@@ -916,6 +939,7 @@
       example: 1831
   get:
     operationId: downloadAssetContent
+    summary: Download content
     description:
       $ref: ../descriptions/downloadAssetContent.md
     tags:
@@ -939,6 +963,7 @@
 /documents:
   get:
     operationId: listDocuments
+    summary: List documents
     description:
       $ref: ../descriptions/listDocuments.md
     tags:
@@ -959,6 +984,7 @@
         description: Not implemented
   post:
     operationId: createDocument
+    summary: Create a new document
     security:
       - OAuth2:
           - write
@@ -1015,6 +1041,7 @@
       example: 1152
   get:
     operationId: readDocument
+    summary: Fetch a document
     description:
       $ref: ../descriptions/readDocument.md
     tags:
@@ -1045,6 +1072,7 @@
               $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateDocument
+    summary: Update a document
     security:
       - OAuth2:
           - write
@@ -1092,6 +1120,7 @@
               $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteDocument
+    summary: Delete a document
     security:
       - OAuth2:
           - write
@@ -1124,6 +1153,7 @@
 /events:
   get:
     operationId: listEvents
+    summary: List events
     description:
       $ref: ../descriptions/listEvents.md
     tags:
@@ -1144,6 +1174,7 @@
         description: Not implemented
   post:
     operationId: createEvent
+    summary: Create a new event
     security:
       - OAuth2:
           - write
@@ -1200,6 +1231,7 @@
       example: 75
   get:
     operationId: readEvent
+    summary: Fetch an event
     description:
       $ref: ../descriptions/readEvent.md
     tags:
@@ -1230,6 +1262,7 @@
               $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateEvent
+    summary: Update an event
     security:
       - OAuth2:
           - write
@@ -1277,6 +1310,7 @@
               $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteEvent
+    summary: Delete an event
     security:
       - OAuth2:
           - write
@@ -1309,6 +1343,7 @@
 /institutions:
   get:
     operationId: listInstitutions
+    summary: List institutions
     description:
       $ref: ../descriptions/listInstitutions.md
     tags:
@@ -1329,6 +1364,7 @@
         description: Not implemented
   post:
     operationId: createInstitution
+    summary: Create a new institution
     security:
       - OAuth2:
           - write
@@ -1385,6 +1421,7 @@
       example: 142
   get:
     operationId: readInstitution
+    summary: Fetch an institution
     description:
       $ref: ../descriptions/readInstitution.md
     tags:
@@ -1415,6 +1452,7 @@
               $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateInstitution
+    summary: Update an institution
     security:
       - OAuth2:
           - write
@@ -1462,6 +1500,7 @@
               $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteInstitution
+    summary: Delete an institution
     security:
       - OAuth2:
           - write
@@ -1494,6 +1533,7 @@
 /investigations:
   get:
     operationId: listInvestigations
+    summary: List investigations
     description:
       $ref: ../descriptions/listInvestigations.md
     tags:
@@ -1514,6 +1554,7 @@
         description: Not implemented
   post:
     operationId: createInvestigation
+    summary: Create a new investigation
     security:
       - OAuth2:
           - write
@@ -1570,6 +1611,7 @@
       example: 56
   get:
     operationId: readInvestigation
+    summary: Fetch an investigation
     description:
       $ref: ../descriptions/readInvestigation.md
     tags:
@@ -1600,6 +1642,7 @@
               $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateInvestigation
+    summary: Update an investigation
     security:
       - OAuth2:
           - write
@@ -1647,6 +1690,7 @@
               $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteInvestigation
+    summary: Delete an investigation
     security:
       - OAuth2:
           - write
@@ -1679,6 +1723,7 @@
 /models:
   get:
     operationId: listModels
+    summary: List models
     description:
       $ref: ../descriptions/listModels.md
     tags:
@@ -1699,6 +1744,7 @@
         description: Not implemented
   post:
     operationId: createModel
+    summary: Create a new model
     security:
       - OAuth2:
           - write
@@ -1755,6 +1801,7 @@
       example: 139
   get:
     operationId: readModel
+    summary: Fetch a model
     description:
       $ref: ../descriptions/readModel.md
     parameters:
@@ -1793,6 +1840,7 @@
               $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateModel
+    summary: Update a model
     security:
       - OAuth2:
           - write
@@ -1840,6 +1888,7 @@
               $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteModel
+    summary: Delete a model
     security:
       - OAuth2:
           - write
@@ -1872,6 +1921,7 @@
 /organisms:
   get:
     operationId: listOrganisms
+    summary: List organisms
     description:
       $ref: ../descriptions/listOrganisms.md
     tags:
@@ -1901,6 +1951,7 @@
       example: 1933753696
   get:
     operationId: readOrganism
+    summary: Fetch an organism
     description:
       $ref: ../descriptions/readOrganism.md
     tags:
@@ -1932,6 +1983,7 @@
 /people:
   get:
     operationId: listPeople
+    summary: List people
     description:
       $ref: ../descriptions/listPeople.md
     tags:
@@ -1952,6 +2004,7 @@
         description: Not implemented
   post:
     operationId: createPerson
+    summary: Create a new person
     security:
       - OAuth2:
           - write
@@ -2000,6 +2053,7 @@
 /people/current:
   get:
     operationId: currentPerson
+    summary: Fetch the currently authenticated user
     description:
       $ref: ../descriptions/currentPerson.md
     tags:
@@ -2039,6 +2093,7 @@
       example: 433
   get:
     operationId: readPerson
+    summary: Fetch a person
     description:
       $ref: ../descriptions/readPerson.md
     tags:
@@ -2069,6 +2124,7 @@
               $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updatePerson
+    summary: Update a person
     security:
       - OAuth2:
           - write
@@ -2116,6 +2172,7 @@
               $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deletePerson
+    summary: Delete a person
     security:
       - OAuth2:
           - write
@@ -2148,6 +2205,7 @@
 /presentations:
   get:
     operationId: listPresentations
+    summary: List presentations
     description:
       $ref: ../descriptions/listPresentations.md
     tags:
@@ -2168,6 +2226,7 @@
         description: Not implemented
   post:
     operationId: createPresentation
+    summary: Create a new presentation
     security:
       - OAuth2:
           - write
@@ -2224,6 +2283,7 @@
       example: 253
   get:
     operationId: readPresentation
+    summary: Fetch a presentation
     description:
       $ref: ../descriptions/readPresentation.md
     parameters:
@@ -2262,6 +2322,7 @@
               $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updatePresentation
+    summary: Update a presentation
     security:
       - OAuth2:
           - write
@@ -2309,6 +2370,7 @@
               $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deletePresentation
+    summary: Delete a presentation
     security:
       - OAuth2:
           - write
@@ -2341,6 +2403,7 @@
 /programmes:
   get:
     operationId: listProgrammes
+    summary: List programmes
     description:
       $ref: ../descriptions/listProgrammes.md
     tags:
@@ -2361,6 +2424,7 @@
         description: Not implemented
   post:
     operationId: createProgramme
+    summary: Create a new programme
     security:
       - OAuth2:
           - write
@@ -2417,6 +2481,7 @@
       example: 3
   get:
     operationId: readProgramme
+    summary: Fetch a programme
     description:
       $ref: ../descriptions/readProgramme.md
     tags:
@@ -2447,6 +2512,7 @@
               $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateProgramme
+    summary: Update a programme
     security:
       - OAuth2:
           - write
@@ -2494,6 +2560,7 @@
               $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteProgramme
+    summary: Delete a programme
     security:
       - OAuth2:
           - write
@@ -2526,6 +2593,7 @@
 /projects:
   get:
     operationId: listProjects
+    summary: List projects
     description:
       $ref: ../descriptions/listProjects.md
     tags:
@@ -2546,6 +2614,7 @@
         description: Not implemented
   post:
     operationId: createProject
+    summary: Create a new project
     security:
       - OAuth2:
           - write
@@ -2602,6 +2671,7 @@
       example: 17
   get:
     operationId: readProject
+    summary: Fetch a project
     description:
       $ref: ../descriptions/readProject.md
     tags:
@@ -2632,6 +2702,7 @@
               $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateProject
+    summary: Update a project
     security:
       - OAuth2:
           - write
@@ -2679,6 +2750,7 @@
               $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteProject
+    summary: Delete a project
     security:
       - OAuth2:
           - write
@@ -2711,6 +2783,7 @@
 /publications:
   get:
     operationId: listPublications
+    summary: List publications
     description:
       $ref: ../descriptions/listPublications.md
     tags:
@@ -2740,6 +2813,7 @@
       example: 240
   get:
     operationId: readPublication
+    summary: Fetch a publication
     description:
       $ref: ../descriptions/readPublication.md
     tags:
@@ -2771,6 +2845,7 @@
 /samples:
   post:
     operationId: createSample
+    summary: Create a new sample
     security:
       - OAuth2:
           - write
@@ -2816,7 +2891,7 @@
           application/json:
             schema:
               $ref: "#/components/schemas/unprocessableEntityResponse"
-"/samples/{:id}":
+"/samples/{id}":
   parameters:
     - name: id
       in: path
@@ -2826,6 +2901,7 @@
         type: integer
   get:
     operationId: readSample
+    summary: Fetch a sample
     description:
       $ref: ../descriptions/readSample.md
     tags:
@@ -2856,6 +2932,7 @@
               $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateSample
+    summary: Update a sample
     security:
       - OAuth2:
           - write
@@ -2903,6 +2980,7 @@
               $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteSample
+    summary: Delete a sample
     security:
       - OAuth2:
           - write
@@ -2935,6 +3013,7 @@
 /sample_attribute_types:
   get:
     operationId: listSampleAttributeTypes
+    summary: List possible sample attribute types
     description:
       $ref: ../descriptions/listSampleAttributeTypes.md
     tags:
@@ -2956,6 +3035,7 @@
 /sample_types:
   get:
     operationId: listSampleTypes
+    summary: List sample types
     description:
       $ref: ../descriptions/listSampleTypes.md
     tags:
@@ -2976,6 +3056,7 @@
         description: Not implemented
   post:
     operationId: createSampleType
+    summary: Create a new sample type
     security:
       - OAuth2:
           - write
@@ -3031,6 +3112,7 @@
         type: integer
   get:
     operationId: readSampleType
+    summary: Fetch a sample type
     description:
       $ref: ../descriptions/readSampleType.md
     tags:
@@ -3061,6 +3143,7 @@
               $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateSampleType
+    summary: Update a sample type
     security:
       - OAuth2:
           - write
@@ -3108,6 +3191,7 @@
               $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteSampleType
+    summary: Delete a sample type
     security:
       - OAuth2:
           - write
@@ -3140,6 +3224,7 @@
 /sops:
   get:
     operationId: listSops
+    summary: List sops
     description:
       $ref: ../descriptions/listSops.md
     tags:
@@ -3160,6 +3245,7 @@
         description: Not implemented
   post:
     operationId: createSop
+    summary: Create a new sop
     security:
       - OAuth2:
           - write
@@ -3216,6 +3302,7 @@
       example: 203
   get:
     operationId: readSop
+    summary: Fetch a sop
     description:
       $ref: ../descriptions/readSop.md
     parameters:
@@ -3254,6 +3341,7 @@
               $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateSop
+    summary: Update a sop
     security:
       - OAuth2:
           - write
@@ -3301,6 +3389,7 @@
               $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteSop
+    summary: Delete a sop
     security:
       - OAuth2:
           - write
@@ -3333,6 +3422,7 @@
 /studies:
   get:
     operationId: listStudies
+    summary: List studies
     description:
       $ref: ../descriptions/listStudies.md
     tags:
@@ -3353,6 +3443,7 @@
         description: Not implemented
   post:
     operationId: createStudy
+    summary: Create a new study
     security:
       - OAuth2:
           - write
@@ -3409,6 +3500,7 @@
       example: 138
   get:
     operationId: readStudy
+    summary: Fetch a study
     description:
       $ref: ../descriptions/readStudy.md
     tags:
@@ -3439,6 +3531,7 @@
               $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateStudy
+    summary: Update a study
     security:
       - OAuth2:
           - write
@@ -3486,6 +3579,7 @@
               $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteStudy
+    summary: Delete a study
     security:
       - OAuth2:
           - write
@@ -3518,6 +3612,7 @@
 /workflows:
   get:
     operationId: listWorkflows
+    summary: List workflows
     description:
       $ref: ../descriptions/listWorkflows.md
     tags:
@@ -3538,6 +3633,7 @@
         description: Not implemented
   post:
     operationId: createWorkflow
+    summary: Create a new workflow
     security:
       - OAuth2:
           - write
@@ -3594,6 +3690,7 @@
       example: 138
   get:
     operationId: readWorkflow
+    summary: Fetch a workflow
     description:
       $ref: ../descriptions/readWorkflow.md
     tags:
@@ -3624,6 +3721,7 @@
               $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateWorkflow
+    summary: Update a workflow
     security:
       - OAuth2:
           - write
@@ -3671,6 +3769,7 @@
               $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteWorkflow
+    summary: Delete a workflow
     security:
       - OAuth2:
           - write
