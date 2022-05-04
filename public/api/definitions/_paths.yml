@@ -737,12 +737,20 @@
             schema:
               $ref: "#/components/schemas/contentBlobResponse"
       "403":
-        $ref: "#/components/responses/forbidden"
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/forbiddenResponse"
           text/csv:
             schema:
               $ref: "#/components/schemas/forbiddenResponse"
       "404":
-        $ref: "#/components/responses/notFound"
+        description: Not found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/notFoundResponse"
           text/csv:
             schema:
               $ref: "#/components/schemas/notFoundResponse"

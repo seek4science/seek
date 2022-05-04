@@ -216,4 +216,4 @@ components:
           schema:
             $ref: "#/components/schemas/notImplementedResponse"
 paths:
-  $ref: _paths2.yml
+  $ref: _paths.yml
