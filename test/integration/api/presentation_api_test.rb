@@ -11,6 +11,7 @@ class PresentationApiTest < ActionDispatch::IntegrationTest
     @publication = Factory(:publication, projects: [@project])
     @event = Factory(:event, projects: [@project], policy: Factory(:public_policy))
     @presentation = Factory(:presentation, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
+    @workflow = Factory(:workflow, projects: [@project], policy: Factory(:public_policy))
   end
 
   test 'can add content to API-created presentation' do

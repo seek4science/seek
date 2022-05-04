@@ -12,6 +12,7 @@ class SopApiTest < ActionDispatch::IntegrationTest
     @assay = Factory(:assay, study: study, contributor: current_person)
     @creator = Factory(:person)
     @sop = Factory(:sop, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
+    @workflow = Factory(:workflow, projects: [@project], contributor: current_person)
   end
 
   test 'can add content to API-created sop' do

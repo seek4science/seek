@@ -61,6 +61,46 @@
                         "type": "projects"
                     }
                 ]
+            },
+            "publications": {
+                "data": [
+                    {
+                        "id": "22",
+                        "type": "publications"
+                    }
+                ]
+            },
+            "sops": {
+                "data": [
+                    {
+                        "id": "73",
+                        "type": "sops"
+                    }
+                ]
+            },
+            "presentations": {
+                "data": [
+                    {
+                        "id": "19",
+                        "type": "presentations"
+                    }
+                ]
+            },
+            "data_files": {
+                "data": [
+                    {
+                        "id": "95",
+                        "type": "data_files"
+                    }
+                ]
+            },
+            "documents": {
+                "data": [
+                    {
+                        "id": "12",
+                        "type": "documents"
+                    }
+                ]
             }
         }
     }

@@ -166,6 +166,15 @@
             },
             "sops": {
                 "data": []
+            },
+            "presentations": {
+                "data": []
+            },
+            "data_files": {
+                "data": []
+            },
+            "documents": {
+                "data": []
             }
         },
         "links": {

@@ -125,6 +125,14 @@
                         "type": "events"
                     }
                 ]
+            },
+            "workflows": {
+                "data": [
+                    {
+                        "id": "12",
+                        "type": "workflows"
+                    }
+                ]
             }
         },
         "links": {
