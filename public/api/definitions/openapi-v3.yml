@@ -184,5 +184,36 @@ components:
       scheme: basic
   schemas:
     $ref: _schemas.yml
+  responses:
+    badRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/badRequestResponse"
+    forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/forbiddenResponse"
+    notFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/notFoundResponse"
+    unprocessableEntity:
+      description: Unprocessable entity
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/unprocessableEntityResponse"
+    notImplemented:
+      description: Not implemented
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/notImplementedResponse"
 paths:
   $ref: _paths2.yml
