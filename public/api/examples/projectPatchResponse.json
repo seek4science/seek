@@ -47,24 +47,16 @@
     },
     "relationships": {
       "project_administrators": {
-        "data": [
-
-        ]
+        "data": []
       },
       "pals": {
-        "data": [
-
-        ]
+        "data": []
       },
       "asset_housekeepers": {
-        "data": [
-
-        ]
+        "data": []
       },
       "asset_gatekeepers": {
-        "data": [
-
-        ]
+        "data": []
       },
       "organisms": {
         "data": [
@@ -75,19 +67,13 @@
         ]
       },
       "human_diseases": {
-        "data": [
-
-        ]
+        "data": []
       },
       "people": {
-        "data": [
-
-        ]
+        "data": []
       },
       "institutions": {
-        "data": [
-
-        ]
+        "data": []
       },
       "programmes": {
         "data": [
@@ -98,69 +84,43 @@
         ]
       },
       "investigations": {
-        "data": [
-
-        ]
+        "data": []
       },
       "studies": {
-        "data": [
-
-        ]
+        "data": []
       },
       "assays": {
-        "data": [
-
-        ]
+        "data": []
       },
       "data_files": {
-        "data": [
-
-        ]
+        "data": []
       },
       "file_templates": {
-        "data": [
-
-        ]
+        "data": []
       },
       "placeholders": {
-        "data": [
-
-        ]
+        "data": []
       },
       "models": {
-        "data": [
-
-        ]
+        "data": []
       },
       "sops": {
-        "data": [
-
-        ]
+        "data": []
       },
       "publications": {
-        "data": [
-
-        ]
+        "data": []
       },
       "presentations": {
-        "data": [
-
-        ]
+        "data": []
       },
       "events": {
-        "data": [
-
-        ]
+        "data": []
       },
       "documents": {
-        "data": [
-
-        ]
+        "data": []
       },
       "workflows": {
-        "data": [
-
-        ]
+        "data": []
       }
     },
     "links": {

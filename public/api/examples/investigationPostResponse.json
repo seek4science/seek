@@ -80,29 +80,19 @@
         ]
       },
       "studies": {
-        "data": [
-
-        ]
+        "data": []
       },
       "assays": {
-        "data": [
-
-        ]
+        "data": []
       },
       "data_files": {
-        "data": [
-
-        ]
+        "data": []
       },
       "models": {
-        "data": [
-
-        ]
+        "data": []
       },
       "sops": {
-        "data": [
-
-        ]
+        "data": []
       },
       "publications": {
         "data": [
@@ -113,9 +103,7 @@
         ]
       },
       "documents": {
-        "data": [
-
-        ]
+        "data": []
       }
     },
     "links": {

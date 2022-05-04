@@ -5,9 +5,7 @@
     "attributes": {
       "policy": {
         "access": "download",
-        "permissions": [
-
-        ]
+        "permissions": []
       },
       "discussion_links": [
         {

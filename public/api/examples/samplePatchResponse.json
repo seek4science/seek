@@ -5,9 +5,7 @@
     "attributes": {
       "policy": {
         "access": "manage",
-        "permissions": [
-
-        ]
+        "permissions": []
       },
       "discussion_links": [
 
@@ -28,9 +26,7 @@
     },
     "relationships": {
       "creators": {
-        "data": [
-
-        ]
+        "data": []
       },
       "submitter": {
         "data": [
@@ -55,14 +51,10 @@
         ]
       },
       "data_files": {
-        "data": [
-
-        ]
+        "data": []
       },
       "assays": {
-        "data": [
-
-        ]
+        "data": []
       },
       "people": {
         "data": [

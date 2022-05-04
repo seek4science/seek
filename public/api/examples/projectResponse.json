@@ -20,9 +20,7 @@
       "end_date": "2014-06-21",
       "default_policy": {
         "access": "no_access",
-        "permissions": [
-
-        ]
+        "permissions": []
       },
       "members": [
         {
@@ -34,34 +32,22 @@
     },
     "relationships": {
       "project_administrators": {
-        "data": [
-
-        ]
+        "data": []
       },
       "pals": {
-        "data": [
-
-        ]
+        "data": []
       },
       "asset_housekeepers": {
-        "data": [
-
-        ]
+        "data": []
       },
       "asset_gatekeepers": {
-        "data": [
-
-        ]
+        "data": []
       },
       "organisms": {
-        "data": [
-
-        ]
+        "data": []
       },
       "human_diseases": {
-        "data": [
-
-        ]
+        "data": []
       },
       "people": {
         "data": [
@@ -120,14 +106,10 @@
         ]
       },
       "file_templates": {
-        "data": [
-
-        ]
+        "data": []
       },
       "placeholders": {
-        "data": [
-
-        ]
+        "data": []
       },
       "models": {
         "data": [

@@ -77,9 +77,7 @@
         ]
       },
       "human_diseases": {
-        "data": [
-
-        ]
+        "data": []
       },
       "people": {
         "data": [
@@ -118,9 +116,7 @@
         ]
       },
       "models": {
-        "data": [
-
-        ]
+        "data": []
       },
       "sops": {
         "data": [
@@ -139,9 +135,7 @@
         ]
       },
       "placeholders": {
-        "data": [
-
-        ]
+        "data": []
       },
       "documents": {
         "data": [

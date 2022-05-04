@@ -5,9 +5,7 @@
     "attributes": {
       "policy": {
         "access": "no_access",
-        "permissions": [
-
-        ]
+        "permissions": []
       },
       "title": "A Maximal Event",
       "description": "All you ever wanted to know about headaches",

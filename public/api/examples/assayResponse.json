@@ -5,9 +5,7 @@
     "attributes": {
       "policy": {
         "access": "no_access",
-        "permissions": [
-
-        ]
+        "permissions": []
       },
       "discussion_links": [
         {
@@ -75,9 +73,7 @@
         ]
       },
       "human_diseases": {
-        "data": [
-
-        ]
+        "data": []
       },
       "people": {
         "data": [
@@ -144,9 +140,7 @@
         ]
       },
       "placeholders": {
-        "data": [
-
-        ]
+        "data": []
       },
       "documents": {
         "data": [
