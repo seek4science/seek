@@ -77,11 +77,53 @@ module Nels
           :content_type => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
       end
 
+      def delete_metadata(project_id, dataset_id, subtype_name, file_path)
+        perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/metadata", :delete);
+      end
+
+      def sbi_storage_list_demo()
+        puts "sbi_storage_list_demo function"
+
+        # It currently returns  {"elements"=>[{"name"=>"analysis_test", "size"=>0, "path"=>"Storebioinfo/SEEK-2021/454_test_tutorial/Analysis/analysis_test", "project_id"=>1125801, "dataset_id"=>1125209, "refid"=>"d648392f-5183-4e81-9e77-88bd23de511d", "description"=>"", "islocked"=>false, "membership_type"=>1, "isFolder"=>true}]}
+        perform("/user/sbi-storage/do", :post,
+          body: {
+            "method":"list",
+            "payload":{
+              "path":"Storebioinfo/SEEK-2021/454_test_tutorial/Analysis/analysis_test",
+              "project_id":1125801,
+              "dataset_id":1125209
+            }
+          });
+      end
+      # IMPORTANT! The file_path uses project,dataset names instead of ids, and there cannot be a trailing backslash (/)
+      def sbi_storage_list(project_id, dataset_id, file_path)
+        puts "sbi_storage_list function"
+
+        if file_path[-1]=="/"
+          file_path = file_path[0...-1]
+        end
+        puts project_id
+        puts dataset_id
+        
+        puts file_path
+        perform("/user/sbi-storage/do", :post,
+          body: {
+            "method": "list",
+            "payload":{
+              "path": file_path,
+              "project_id": project_id,
+              "dataset_id": dataset_id
+            }
+          })['elements'];
+      end
+
       private
 
       def perform(path, method, opts = {})
         opts[:content_type] ||= :json
         opts[:Authorization] = "Bearer #{@access_token}"
+        puts ("DEBUG MODE PRINT ACCESS TOKEN")
+        puts "Bearer #{@access_token}"
         body = opts.delete(:body)
         args = [method]
         if body

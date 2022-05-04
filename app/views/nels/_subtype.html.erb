@@ -1,4 +1,5 @@
 <i>Non Working prototype, links not working!!</i>
+<p><%= @file_list -%></p>
 <h2>You are at:</h2>
 
 <%= @dataset['name'] -%>/<a href="" onclick="return false;"><%= @subtype -%></a><span id="nels_breadcrumb"></span>
@@ -28,14 +29,20 @@ table, th, td {
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <td><a class="nels-folder" href="">Folder 1</a></td>
-      <td></td>
-    </tr>
-    <tr>
-      <td>File 1</td>
-      <td>3Mb</td>
-    </tr>
+    <% @file_list.each do |file_item| %>
+      <tr>
+        <td>
+          <% if file_item["isFolder"] == true %>
+            <p class="nels-folder" style="cursor: pointer;" path=<%= file_item["path"]%>>
+              <%= file_item["name"]%>
+            </p>
+          <% else %>
+            <%= file_item["name"]%>
+          <% end %>
+        </td>
+        <td><%= file_item["size"]%></td>
+      </tr>
+    <% end %>
   </tbody>
 </table>
 
@@ -51,6 +58,25 @@ table, th, td {
       pathHTML=pathHTML.concat(`/<a href="" onclick="return false;" path="${path}">${element}</a>`);
     });
     $j('#nels_breadcrumb').html(pathHTML)
-    // TODO: Add on click for each `a` element in the breadcrumb
+    // TODO: Add on click for each element in the breadcrumb
+
+    function updateFolderList(path){
+      $j('#nels-dataset').html('').spinner('add').show();
+      $j.ajax({ url: '<%= subtype_assay_nels_path(params[:assay_id]) -%>',
+        data: {
+          project_id: '<%= @project_id -%>',
+          dataset_id: '<%= @dataset['id'] -%>',
+          subtype: '<%= @subtype -%>',
+          path: path,
+        },
+        success: function (data) {
+          $j('#nels-dataset').html(data).spinner('remove');
+        }
+      });
+    }
+
+    $j('.nels-folder').click(function() {
+      updateFolderList($j(this).attr('path'));
+    });
   });
 </script>

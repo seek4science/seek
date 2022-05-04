@@ -1,6 +1,7 @@
 <h1>NeLS Browser</h1>
 
 Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
+<%= @rest_client.sbi_storage_list_demo %>
 
 <%= button_link_to('Create NeLS dataset', 'add', new_dataset_assay_nels_path(@assay.id)) %>
 
@@ -95,13 +96,21 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
           $j('#nels-dataset').html('').spinner('add').show();
           $j('#nels-content').hide();
 
+          // For NeLS file browser, project and dataset names are needed
+          // Find project parent node, which for subtype will always be the second position
+          project_name = $j('#nels-tree').jstree().get_node(data.node.parents[1]).text
+
           // Save current state
-          sessionStorage.setItem('nels_tree_state',`project${data.node.data.project_id},dataset${data.node.data.dataset_id},${data.node.data.id}`)
+          sessionStorage.setItem('nels_tree_state',`project${data.node.data.project_id},dataset${data.node.data.dataset_id},${data.node.data.id}`);
+
+          folder_path = `Storebioinfo/${project_name}/${data.node.data.dataset_name}/${data.node.data.text}/`;
+
           $j.ajax({ url: '<%= subtype_assay_nels_path(params[:assay_id]) -%>',
             data: {
               project_id: data.node.data.project_id,
               dataset_id: data.node.data.dataset_id,
               subtype: data.node.data.text,
+              path: folder_path,
             },
             success: function (data) {
               $j('#nels-dataset').html(data).spinner('remove');

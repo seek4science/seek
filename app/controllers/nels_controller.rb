@@ -116,15 +116,12 @@ class NelsController < ApplicationController
 
   
   def subtype
-    @dataset = @rest_client.dataset(params[:project_id].to_i, params[:dataset_id].to_i)
+    @project_id = params[:project_id].to_i
+    @dataset = @rest_client.dataset(@project_id, params[:dataset_id].to_i)
 
     @subtype = params[:subtype]
 
-    # Populates the "metadata" field for each subtype, indicating if there is associated metadata with it
-    @dataset['subtypes'].each_with_index do |subtype, index |
-      @dataset['subtypes'][index]['metadata'] = 
-        @rest_client.check_metadata_exists(params[:project_id].to_i, params[:dataset_id].to_i, subtype['type'])
-    end
+    @file_list = @rest_client.sbi_storage_list(params[:project_id].to_i, params[:dataset_id].to_i, params[:path])
     
     respond_to do |format|
       format.html { render partial: 'nels/subtype' }
