@@ -31,7 +31,7 @@ class AssayApiTest < ActionDispatch::IntegrationTest
       assert_no_difference('Assay.count') do
         delete "/#{plural_name}/#{a.id}.json"
         assert_response :forbidden
-        validate_json response.body, '#/components/responses/forbiddenResponse'
+        validate_json response.body, '#/components/schemas/forbiddenResponse'
       end
     end
   end

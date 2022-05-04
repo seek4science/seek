@@ -49,7 +49,7 @@ class ProgrammeApiTest < ActionDispatch::IntegrationTest
     assert_no_difference('Programme.count', -1) do
       delete "/programmes/#{prog.id}.json"
       assert_response :forbidden
-      validate_json response.body, '#/components/responses/forbiddenResponse'
+      validate_json response.body, '#/components/schemas/forbiddenResponse'
     end
 
     #no projects ==> can delete
@@ -62,6 +62,6 @@ class ProgrammeApiTest < ActionDispatch::IntegrationTest
 
     get "/programmes/#{prog.id}.json"
     assert_response :not_found
-    validate_json response.body, '#/components/responses/notFoundResponse'
+    validate_json response.body, '#/components/schemas/notFoundResponse'
   end
 end

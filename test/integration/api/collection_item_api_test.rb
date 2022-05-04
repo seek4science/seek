@@ -14,7 +14,7 @@ class CollectionItemApiTest < ActionDispatch::IntegrationTest
   end
 
   def index_response_fragment
-    "#/components/responses/collectionItemsResponse"
+    "#/components/schemas/collectionItemsResponse"
   end
 
   private

@@ -232,7 +232,5 @@ components:
       scheme: basic
   schemas:
     $ref: _schemas.yml
-  responses:
-    $ref: _responses.yml
 paths:
   $ref: _paths.yml

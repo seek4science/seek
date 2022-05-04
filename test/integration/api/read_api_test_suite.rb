@@ -30,7 +30,7 @@ module ReadApiTestSuite
   end
 
   def index_response_fragment
-    "#/components/responses/indexResponse"
+    "#/components/schemas/indexResponse"
   end
 
   ['min', 'max'].each do |m|
@@ -64,13 +64,13 @@ module ReadApiTestSuite
     user_login(Factory(:person))
     get member_url(res), as: :json
     assert_response :forbidden
-    validate_json response.body, '#/components/responses/forbiddenResponse'
+    validate_json response.body, '#/components/schemas/forbiddenResponse'
   end
 
   test 'getting resource with non-existent ID should throw error' do
     get member_url(MissingItem.new(model)), as: :json
     assert_response :not_found
-    validate_json response.body, '#/components/responses/notFoundResponse'
+    validate_json response.body, '#/components/schemas/notFoundResponse'
   end
 
   test 'write show example' do

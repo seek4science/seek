@@ -7,7 +7,7 @@
         The text to search for
       schema:
         type: string
-        default: lactate inhibition
+      example: lactate inhibition
     - name: search_type
       in: query
       required: false
@@ -31,7 +31,7 @@
           - sops
           - studies
           - workflows
-        default: data_files
+      example: data_files
   get:
     operationId: search
     description:
@@ -44,7 +44,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/searchResponse"
+              $ref: "#/components/schemas/searchResponse"
             examples:
               response:
                 value:
@@ -63,7 +63,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/indexResponse"
+              $ref: "#/components/schemas/indexResponse"
             examples:
               response:
                 value:
@@ -94,7 +94,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/assayResponse"
+              $ref: "#/components/schemas/assayResponse"
             examples:
               response:
                 value:
@@ -104,19 +104,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/badRequestResponse"
+              $ref: "#/components/schemas/badRequestResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
 "/assays/{id}":
   parameters:
     - name: id
@@ -149,7 +149,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/assayResponse"
+              $ref: "#/components/schemas/assayResponse"
             examples:
               response:
                 value:
@@ -159,19 +159,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
   get:
     operationId: readAssay
     description:
@@ -185,7 +185,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/assayResponse"
+              $ref: "#/components/schemas/assayResponse"
             examples:
               response:
                 value:
@@ -195,13 +195,13 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
   delete:
     operationId: deleteAssay
     security:
@@ -220,19 +220,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/okResponse"
+              $ref: "#/components/schemas/okResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
 /collections:
   get:
     operationId: listCollections
@@ -247,7 +247,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/indexResponse"
+              $ref: "#/components/schemas/indexResponse"
             examples:
               response:
                 value:
@@ -278,7 +278,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/collectionResponse"
+              $ref: "#/components/schemas/collectionResponse"
             examples:
               response:
                 value:
@@ -288,19 +288,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/badRequestResponse"
+              $ref: "#/components/schemas/badRequestResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
 "/collections/{id}":
   parameters:
     - name: id
@@ -309,7 +309,7 @@
       description: The collection to fetch
       schema:
         type: integer
-        default: 1152
+      example: 1152
   get:
     operationId: readCollection
     description:
@@ -323,7 +323,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/collectionResponse"
+              $ref: "#/components/schemas/collectionResponse"
             examples:
               response:
                 value:
@@ -333,13 +333,13 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateCollection
     security:
@@ -364,7 +364,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/collectionResponse"
+              $ref: "#/components/schemas/collectionResponse"
             examples:
               response:
                 value:
@@ -374,19 +374,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteCollection
     security:
@@ -405,19 +405,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/okResponse"
+              $ref: "#/components/schemas/okResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
 "/collections/{collection_id}/items":
   parameters:
     - name: collection_id
@@ -426,7 +426,7 @@
       description: The ID of the collection
       schema:
         type: integer
-        default: 123
+      example: 123
   get:
     operationId: listCollectionItems
     description:
@@ -440,7 +440,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/collectionItemsResponse"
+              $ref: "#/components/schemas/collectionItemsResponse"
             examples:
               response:
                 value:
@@ -471,7 +471,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/collectionItemResponse"
+              $ref: "#/components/schemas/collectionItemResponse"
             examples:
               response:
                 value:
@@ -481,19 +481,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/badRequestResponse"
+              $ref: "#/components/schemas/badRequestResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
 "/collections/{collection_id}/items/{id}":
   parameters:
     - name: collection_id
@@ -502,14 +502,14 @@
       description: The ID of the collection
       schema:
         type: integer
-        default: 123
+      example: 123
     - name: id
       in: path
       required: true
       description: The ID of the item in the collection
       schema:
         type: integer
-        default: 1152
+      example: 1152
   get:
     operationId: readCollectionItem
     description:
@@ -523,7 +523,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/collectionItemResponse"
+              $ref: "#/components/schemas/collectionItemResponse"
             examples:
               response:
                 value:
@@ -533,13 +533,13 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateCollectionItem
     security:
@@ -564,7 +564,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/collectionItemResponse"
+              $ref: "#/components/schemas/collectionItemResponse"
             examples:
               response:
                 value:
@@ -574,19 +574,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteCollectionItem
     security:
@@ -605,19 +605,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/okResponse"
+              $ref: "#/components/schemas/okResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
 /data_files:
   get:
     operationId: listDataFiles
@@ -632,7 +632,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/indexResponse"
+              $ref: "#/components/schemas/indexResponse"
             examples:
               response:
                 value:
@@ -663,7 +663,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/dataFileResponse"
+              $ref: "#/components/schemas/dataFileResponse"
             examples:
               response:
                 value:
@@ -673,19 +673,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/badRequestResponse"
+              $ref: "#/components/schemas/badRequestResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
 "/data_files/{id}":
   parameters:
     - name: id
@@ -694,7 +694,7 @@
       description: The data file to fetch
       schema:
         type: integer
-        default: 1152
+      example: 1152
   get:
     operationId: readDataFile
     description:
@@ -706,7 +706,7 @@
         description: The version of the data file to get
         schema:
           type: integer
-          default: 2
+        example: 2
     tags:
       - read
       - dataFiles
@@ -716,7 +716,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/dataFileResponse"
+              $ref: "#/components/schemas/dataFileResponse"
             examples:
               response:
                 value:
@@ -726,13 +726,13 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateDataFile
     security:
@@ -757,7 +757,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/dataFileResponse"
+              $ref: "#/components/schemas/dataFileResponse"
             examples:
               response:
                 value:
@@ -767,19 +767,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteDataFile
     security:
@@ -798,19 +798,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/okResponse"
+              $ref: "#/components/schemas/okResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
 "/{asset_types}/{id}/content_blobs/{blob_id}":
   parameters:
     - name: asset_types
@@ -819,21 +819,21 @@
       description: The types of asset being fetched, uploaded or downloaded
       schema:
         type: string
-        default: data_files
+      example: data_files
     - name: id
       in: path
       required: true
       description: The asset content to fetch, upload or download
       schema:
         type: integer
-        default: 1152
+      example: 1152
     - name: blob_id
       in: path
       required: true
       description: The asset identifier to fetch, upload or download
       schema:
         type: integer
-        default: 1831
+      example: 1831
   put:
     operationId: uploadAssetContent
     security:
@@ -869,28 +869,28 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/contentBlobResponse"
+              $ref: "#/components/schemas/contentBlobResponse"
           text/csv:
             schema:
-              $ref: "#/components/responses/contentBlobResponse"
+              $ref: "#/components/schemas/contentBlobResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
           text/csv:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
           text/csv:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
 "/{asset_types}/{id}/content_blobs/{blob_id}/download":
   parameters:
     - name: asset_types
@@ -899,21 +899,21 @@
       description: The typs of asset being downloaded
       schema:
         type: string
-        default: data_files
+      example: data_files
     - name: id
       in: path
       required: true
       description: The asset to fetch
       schema:
         type: integer
-        default: 1152
+      example: 1152
     - name: blob_id
       in: path
       required: true
       description: The blob to download
       schema:
         type: integer
-        default: 1831
+      example: 1831
   get:
     operationId: downloadAssetContent
     description:
@@ -929,13 +929,13 @@
         content:
           "*/*":
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           "*/*":
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
 /documents:
   get:
     operationId: listDocuments
@@ -950,7 +950,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/indexResponse"
+              $ref: "#/components/schemas/indexResponse"
             examples:
               response:
                 value:
@@ -981,7 +981,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/documentResponse"
+              $ref: "#/components/schemas/documentResponse"
             examples:
               response:
                 value:
@@ -991,19 +991,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/badRequestResponse"
+              $ref: "#/components/schemas/badRequestResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
 "/documents/{id}":
   parameters:
     - name: id
@@ -1012,7 +1012,7 @@
       description: The document to fetch
       schema:
         type: integer
-        default: 1152
+      example: 1152
   get:
     operationId: readDocument
     description:
@@ -1026,7 +1026,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/documentResponse"
+              $ref: "#/components/schemas/documentResponse"
             examples:
               response:
                 value:
@@ -1036,13 +1036,13 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateDocument
     security:
@@ -1067,7 +1067,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/documentResponse"
+              $ref: "#/components/schemas/documentResponse"
             examples:
               response:
                 value:
@@ -1077,19 +1077,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteDocument
     security:
@@ -1108,19 +1108,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/okResponse"
+              $ref: "#/components/schemas/okResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
 /events:
   get:
     operationId: listEvents
@@ -1135,7 +1135,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/indexResponse"
+              $ref: "#/components/schemas/indexResponse"
             examples:
               response:
                 value:
@@ -1166,7 +1166,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/eventResponse"
+              $ref: "#/components/schemas/eventResponse"
             examples:
               response:
                 value:
@@ -1176,19 +1176,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/badRequestResponse"
+              $ref: "#/components/schemas/badRequestResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
 "/events/{id}":
   parameters:
     - name: id
@@ -1197,7 +1197,7 @@
       description: The event to fetch
       schema:
         type: integer
-        default: 75
+      example: 75
   get:
     operationId: readEvent
     description:
@@ -1211,7 +1211,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/eventResponse"
+              $ref: "#/components/schemas/eventResponse"
             examples:
               response:
                 value:
@@ -1221,13 +1221,13 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateEvent
     security:
@@ -1252,7 +1252,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/eventResponse"
+              $ref: "#/components/schemas/eventResponse"
             examples:
               response:
                 value:
@@ -1262,19 +1262,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteEvent
     security:
@@ -1293,19 +1293,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/okResponse"
+              $ref: "#/components/schemas/okResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
 /institutions:
   get:
     operationId: listInstitutions
@@ -1320,7 +1320,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/indexResponse"
+              $ref: "#/components/schemas/indexResponse"
             examples:
               response:
                 value:
@@ -1351,7 +1351,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/institutionResponse"
+              $ref: "#/components/schemas/institutionResponse"
             examples:
               response:
                 value:
@@ -1361,19 +1361,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/badRequestResponse"
+              $ref: "#/components/schemas/badRequestResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
 "/institutions/{id}":
   parameters:
     - name: id
@@ -1382,7 +1382,7 @@
       description: The institution to fetch, patch or delete
       schema:
         type: integer
-        default: 142
+      example: 142
   get:
     operationId: readInstitution
     description:
@@ -1396,7 +1396,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/institutionResponse"
+              $ref: "#/components/schemas/institutionResponse"
             examples:
               response:
                 value:
@@ -1406,13 +1406,13 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateInstitution
     security:
@@ -1437,7 +1437,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/institutionResponse"
+              $ref: "#/components/schemas/institutionResponse"
             examples:
               response:
                 value:
@@ -1447,19 +1447,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteInstitution
     security:
@@ -1478,19 +1478,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/okResponse"
+              $ref: "#/components/schemas/okResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
 /investigations:
   get:
     operationId: listInvestigations
@@ -1505,7 +1505,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/indexResponse"
+              $ref: "#/components/schemas/indexResponse"
             examples:
               response:
                 value:
@@ -1536,7 +1536,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/investigationResponse"
+              $ref: "#/components/schemas/investigationResponse"
             examples:
               response:
                 value:
@@ -1546,19 +1546,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/badRequestResponse"
+              $ref: "#/components/schemas/badRequestResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
 "/investigations/{id}":
   parameters:
     - name: id
@@ -1567,7 +1567,7 @@
       description: The investigation to fetch, patch or delete
       schema:
         type: integer
-        default: 56
+      example: 56
   get:
     operationId: readInvestigation
     description:
@@ -1581,7 +1581,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/investigationResponse"
+              $ref: "#/components/schemas/investigationResponse"
             examples:
               response:
                 value:
@@ -1591,13 +1591,13 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateInvestigation
     security:
@@ -1622,7 +1622,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/investigationResponse"
+              $ref: "#/components/schemas/investigationResponse"
             examples:
               response:
                 value:
@@ -1632,19 +1632,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteInvestigation
     security:
@@ -1663,19 +1663,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/okResponse"
+              $ref: "#/components/schemas/okResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
 /models:
   get:
     operationId: listModels
@@ -1690,7 +1690,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/indexResponse"
+              $ref: "#/components/schemas/indexResponse"
             examples:
               response:
                 value:
@@ -1721,7 +1721,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/modelResponse"
+              $ref: "#/components/schemas/modelResponse"
             examples:
               response:
                 value:
@@ -1731,19 +1731,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/badRequestResponse"
+              $ref: "#/components/schemas/badRequestResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
 "/models/{id}":
   parameters:
     - name: id
@@ -1752,7 +1752,7 @@
       description: The model to fetch, patch or delete
       schema:
         type: integer
-        default: 139
+      example: 139
   get:
     operationId: readModel
     description:
@@ -1764,7 +1764,7 @@
         description: The version of the model to get
         schema:
           type: integer
-          default: 2
+        example: 2
     tags:
       - read
       - models
@@ -1774,7 +1774,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/modelResponse"
+              $ref: "#/components/schemas/modelResponse"
             examples:
               response:
                 value:
@@ -1784,13 +1784,13 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateModel
     security:
@@ -1815,7 +1815,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/modelResponse"
+              $ref: "#/components/schemas/modelResponse"
             examples:
               response:
                 value:
@@ -1825,19 +1825,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteModel
     security:
@@ -1856,19 +1856,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/okResponse"
+              $ref: "#/components/schemas/okResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
 /organisms:
   get:
     operationId: listOrganisms
@@ -1883,7 +1883,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/indexResponse"
+              $ref: "#/components/schemas/indexResponse"
             examples:
               response:
                 value:
@@ -1898,7 +1898,7 @@
       description: The organism to fetch, patch or delete
       schema:
         type: integer
-        default: 1933753696
+      example: 1933753696
   get:
     operationId: readOrganism
     description:
@@ -1912,7 +1912,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/organismResponse"
+              $ref: "#/components/schemas/organismResponse"
             examples:
               response:
                 value:
@@ -1922,13 +1922,13 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
 /people:
   get:
     operationId: listPeople
@@ -1943,7 +1943,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/indexResponse"
+              $ref: "#/components/schemas/indexResponse"
             examples:
               response:
                 value:
@@ -1974,7 +1974,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/personResponse"
+              $ref: "#/components/schemas/personResponse"
             examples:
               response:
                 value:
@@ -1984,19 +1984,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/badRequestResponse"
+              $ref: "#/components/schemas/badRequestResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
 /people/current:
   get:
     operationId: currentPerson
@@ -2011,7 +2011,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/personResponse"
+              $ref: "#/components/schemas/personResponse"
             examples:
               response:
                 value:
@@ -2021,13 +2021,13 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
 "/people/{id}":
   parameters:
     - name: id
@@ -2036,7 +2036,7 @@
       description: The person to fetch, patch or delete
       schema:
         type: integer
-        default: 433
+      example: 433
   get:
     operationId: readPerson
     description:
@@ -2050,7 +2050,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/personResponse"
+              $ref: "#/components/schemas/personResponse"
             examples:
               response:
                 value:
@@ -2060,13 +2060,13 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updatePerson
     security:
@@ -2091,7 +2091,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/personResponse"
+              $ref: "#/components/schemas/personResponse"
             examples:
               response:
                 value:
@@ -2101,19 +2101,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deletePerson
     security:
@@ -2132,19 +2132,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/okResponse"
+              $ref: "#/components/schemas/okResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
 /presentations:
   get:
     operationId: listPresentations
@@ -2159,7 +2159,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/indexResponse"
+              $ref: "#/components/schemas/indexResponse"
             examples:
               response:
                 value:
@@ -2190,7 +2190,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/presentationResponse"
+              $ref: "#/components/schemas/presentationResponse"
             examples:
               response:
                 value:
@@ -2200,19 +2200,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/badRequestResponse"
+              $ref: "#/components/schemas/badRequestResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
 "/presentations/{id}":
   parameters:
     - name: id
@@ -2221,7 +2221,7 @@
       description: The presentation to fetch, patch or delete
       schema:
         type: integer
-        default: 253
+      example: 253
   get:
     operationId: readPresentation
     description:
@@ -2233,7 +2233,7 @@
         description: The version of the presentation to get
         schema:
           type: integer
-          default: 1
+        example: 1
     tags:
       - read
       - presentations
@@ -2243,7 +2243,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/presentationResponse"
+              $ref: "#/components/schemas/presentationResponse"
             examples:
               response:
                 value:
@@ -2253,13 +2253,13 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updatePresentation
     security:
@@ -2284,7 +2284,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/presentationResponse"
+              $ref: "#/components/schemas/presentationResponse"
             examples:
               response:
                 value:
@@ -2294,19 +2294,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deletePresentation
     security:
@@ -2325,19 +2325,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/okResponse"
+              $ref: "#/components/schemas/okResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
 /programmes:
   get:
     operationId: listProgrammes
@@ -2352,7 +2352,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/indexResponse"
+              $ref: "#/components/schemas/indexResponse"
             examples:
               response:
                 value:
@@ -2383,7 +2383,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/programmeResponse"
+              $ref: "#/components/schemas/programmeResponse"
             examples:
               response:
                 value:
@@ -2393,19 +2393,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/badRequestResponse"
+              $ref: "#/components/schemas/badRequestResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
 "/programmes/{id}":
   parameters:
     - name: id
@@ -2414,7 +2414,7 @@
       description: The programme to fetch, patch or delete
       schema:
         type: integer
-        default: 3
+      example: 3
   get:
     operationId: readProgramme
     description:
@@ -2428,7 +2428,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/programmeResponse"
+              $ref: "#/components/schemas/programmeResponse"
             examples:
               response:
                 value:
@@ -2438,13 +2438,13 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateProgramme
     security:
@@ -2469,7 +2469,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/programmeResponse"
+              $ref: "#/components/schemas/programmeResponse"
             examples:
               response:
                 value:
@@ -2479,19 +2479,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteProgramme
     security:
@@ -2510,19 +2510,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/okResponse"
+              $ref: "#/components/schemas/okResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
 /projects:
   get:
     operationId: listProjects
@@ -2537,7 +2537,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/indexResponse"
+              $ref: "#/components/schemas/indexResponse"
             examples:
               response:
                 value:
@@ -2568,7 +2568,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/projectResponse"
+              $ref: "#/components/schemas/projectResponse"
             examples:
               response:
                 value:
@@ -2578,19 +2578,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/badRequestResponse"
+              $ref: "#/components/schemas/badRequestResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
 "/projects/{id}":
   parameters:
     - name: id
@@ -2599,7 +2599,7 @@
       description: The project to fetch, patch or delete
       schema:
         type: integer
-        default: 17
+      example: 17
   get:
     operationId: readProject
     description:
@@ -2613,7 +2613,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/projectResponse"
+              $ref: "#/components/schemas/projectResponse"
             examples:
               response:
                 value:
@@ -2623,13 +2623,13 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateProject
     security:
@@ -2654,7 +2654,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/projectResponse"
+              $ref: "#/components/schemas/projectResponse"
             examples:
               response:
                 value:
@@ -2664,19 +2664,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteProject
     security:
@@ -2695,19 +2695,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/okResponse"
+              $ref: "#/components/schemas/okResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
 /publications:
   get:
     operationId: listPublications
@@ -2722,7 +2722,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/indexResponse"
+              $ref: "#/components/schemas/indexResponse"
             examples:
               response:
                 value:
@@ -2737,7 +2737,7 @@
       description: The publication to fetch, patch or delete
       schema:
         type: integer
-        default: 240
+      example: 240
   get:
     operationId: readPublication
     description:
@@ -2751,7 +2751,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/publicationResponse"
+              $ref: "#/components/schemas/publicationResponse"
             examples:
               response:
                 value:
@@ -2761,13 +2761,13 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
 /samples:
   post:
     operationId: createSample
@@ -2793,7 +2793,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/sampleResponse"
+              $ref: "#/components/schemas/sampleResponse"
             examples:
               response:
                 value:
@@ -2803,19 +2803,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/badRequestResponse"
+              $ref: "#/components/schemas/badRequestResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
 "/samples/{:id}":
   parameters:
     - name: id
@@ -2837,7 +2837,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/sampleResponse"
+              $ref: "#/components/schemas/sampleResponse"
             examples:
               response:
                 value:
@@ -2847,13 +2847,13 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateSample
     security:
@@ -2878,7 +2878,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/sampleResponse"
+              $ref: "#/components/schemas/sampleResponse"
             examples:
               response:
                 value:
@@ -2888,19 +2888,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteSample
     security:
@@ -2919,19 +2919,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/okResponse"
+              $ref: "#/components/schemas/okResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
 /sample_attribute_types:
   get:
     operationId: listSampleAttributeTypes
@@ -2946,7 +2946,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/indexResponse"
+              $ref: "#/components/schemas/indexResponse"
             examples:
               response:
                 value:
@@ -2967,7 +2967,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/indexResponse"
+              $ref: "#/components/schemas/indexResponse"
             examples:
               response:
                 value:
@@ -2998,7 +2998,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/sampleTypeResponse"
+              $ref: "#/components/schemas/sampleTypeResponse"
             examples:
               response:
                 value:
@@ -3008,19 +3008,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/badRequestResponse"
+              $ref: "#/components/schemas/badRequestResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
 "/sample_types/{id}":
   parameters:
     - name: id
@@ -3042,7 +3042,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/sampleTypeResponse"
+              $ref: "#/components/schemas/sampleTypeResponse"
             examples:
               response:
                 value:
@@ -3052,13 +3052,13 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateSampleType
     security:
@@ -3083,7 +3083,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/sampleTypeResponse"
+              $ref: "#/components/schemas/sampleTypeResponse"
             examples:
               response:
                 value:
@@ -3093,19 +3093,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteSampleType
     security:
@@ -3124,19 +3124,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/okResponse"
+              $ref: "#/components/schemas/okResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
 /sops:
   get:
     operationId: listSops
@@ -3151,7 +3151,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/indexResponse"
+              $ref: "#/components/schemas/indexResponse"
             examples:
               response:
                 value:
@@ -3182,7 +3182,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/sopResponse"
+              $ref: "#/components/schemas/sopResponse"
             examples:
               response:
                 value:
@@ -3192,19 +3192,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/badRequestResponse"
+              $ref: "#/components/schemas/badRequestResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
 "/sops/{id}":
   parameters:
     - name: id
@@ -3213,7 +3213,7 @@
       description: The SOP to fetch, patch or delete
       schema:
         type: integer
-        default: 203
+      example: 203
   get:
     operationId: readSop
     description:
@@ -3225,7 +3225,7 @@
         description: The version of the sop to get
         schema:
           type: integer
-          default: 1
+        example: 1
     tags:
       - read
       - sops
@@ -3235,7 +3235,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/sopResponse"
+              $ref: "#/components/schemas/sopResponse"
             examples:
               response:
                 value:
@@ -3245,13 +3245,13 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateSop
     security:
@@ -3276,7 +3276,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/sopResponse"
+              $ref: "#/components/schemas/sopResponse"
             examples:
               response:
                 value:
@@ -3286,19 +3286,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteSop
     security:
@@ -3317,19 +3317,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/okResponse"
+              $ref: "#/components/schemas/okResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
 /studies:
   get:
     operationId: listStudies
@@ -3344,7 +3344,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/indexResponse"
+              $ref: "#/components/schemas/indexResponse"
             examples:
               response:
                 value:
@@ -3375,7 +3375,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/studyResponse"
+              $ref: "#/components/schemas/studyResponse"
             examples:
               response:
                 value:
@@ -3385,19 +3385,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/badRequestResponse"
+              $ref: "#/components/schemas/badRequestResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
 "/studies/{id}":
   parameters:
     - name: id
@@ -3406,7 +3406,7 @@
       description: The study to fetch, patch or delete
       schema:
         type: integer
-        default: 138
+      example: 138
   get:
     operationId: readStudy
     description:
@@ -3420,7 +3420,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/studyResponse"
+              $ref: "#/components/schemas/studyResponse"
             examples:
               response:
                 value:
@@ -3430,13 +3430,13 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateStudy
     security:
@@ -3461,7 +3461,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/studyResponse"
+              $ref: "#/components/schemas/studyResponse"
             examples:
               response:
                 value:
@@ -3471,19 +3471,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteStudy
     security:
@@ -3502,19 +3502,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/okResponse"
+              $ref: "#/components/schemas/okResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
 /workflows:
   get:
     operationId: listWorkflows
@@ -3529,7 +3529,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/indexResponse"
+              $ref: "#/components/schemas/indexResponse"
             examples:
               response:
                 value:
@@ -3560,7 +3560,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/workflowResponse"
+              $ref: "#/components/schemas/workflowResponse"
             examples:
               response:
                 value:
@@ -3570,19 +3570,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/badRequestResponse"
+              $ref: "#/components/schemas/badRequestResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
 "/workflows/{id}":
   parameters:
     - name: id
@@ -3591,7 +3591,7 @@
       description: The workflow to fetch, patch or delete
       schema:
         type: integer
-        default: 138
+      example: 138
   get:
     operationId: readWorkflow
     description:
@@ -3605,7 +3605,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/workflowResponse"
+              $ref: "#/components/schemas/workflowResponse"
             examples:
               response:
                 value:
@@ -3615,13 +3615,13 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
   patch:
     operationId: updateWorkflow
     security:
@@ -3646,7 +3646,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/workflowResponse"
+              $ref: "#/components/schemas/workflowResponse"
             examples:
               response:
                 value:
@@ -3656,19 +3656,19 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
       "422":
         description: Unprocessable entity
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/unprocessableEntityResponse"
+              $ref: "#/components/schemas/unprocessableEntityResponse"
   delete:
     operationId: deleteWorkflow
     security:
@@ -3687,16 +3687,16 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/okResponse"
+              $ref: "#/components/schemas/okResponse"
       "403":
         description: Forbidden
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/forbiddenResponse"
+              $ref: "#/components/schemas/forbiddenResponse"
       "404":
         description: Not found
         content:
           application/json:
             schema:
-              $ref: "#/components/responses/notFoundResponse"
+              $ref: "#/components/schemas/notFoundResponse"
