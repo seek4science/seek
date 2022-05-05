@@ -11,6 +11,28 @@ Please see [Getting FAIRDOM-SEEK](/get-seek.html) for details about installing S
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html)
 
+## Version 1.12.0
+
+Release date: _6th May 2022_
+
+This version includes:
+
+* Collections
+* New customizable from landing page
+* Sample attributes - description and PID
+* Improvements to defining describing Asset creators
+* Explicit ordering of Investigations, Studies and Assays
+* Ability to link a Sample to multiple other samples
+* EDAM annotations for workflows
+* Simpler branding settings
+* Prevent editing of controlled vocabulary terms that have come from an ontology
+* Moved related items into a tab
+* Fixes and improvements to installing and running under a sub-uri
+* Batch registration of Samples through the API
+* Updated to use latest version of Apache SOLR, allowing 
+
+For a full list, see [closed issues for 1.12.0](https://github.com/seek4science/seek/milestone/6?closed=1)
+
 ## Version 1.11.3
 
 Release date: _3rd November 2021_
