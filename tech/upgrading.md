@@ -81,7 +81,12 @@ from your previous installation and continue with the upgrade steps. The
 database configuration file you would need to copy is _config/database.yml_,
 and the filestore is simply _filestore/_
 
-If you have a modified _config/sunspot.yml_ you will also need to copy that across.
+### Upgrading Ruby
+
+You are recommended to upgrade to Ruby 2.7. If you are using [RVM](https://rvm.io/) (according to the [Installation Guide](install.html) )you should be prompted to install during the standard installation steps that follow.
+If you are not prompted you can install with the command:
+
+    rvm install $(cat .ruby-version)
 
 ### Doing the upgrade
 
@@ -105,14 +110,19 @@ SEEK requires some cron jobs for periodic background jobs to run. To update thes
 
 ### Setting up Apache Solr
 
-The [Apache Solr Search Engine](https://solr.apache.org/) need to be set up separately. 
+The [Apache Solr Search Engine](https://solr.apache.org/) now needs to be set up separately. 
 It is relatively straightforward and there are instructions on how to do this in [Setting Up Solr](setting-up-solr).
 
 
 ### Restarting background job services
 
     bundle exec rake sunspot:solr:start
-    bundle exec rake tmp:clear  
+    bundle exec rake tmp:clear 
+
+## Stopping soffice
+
+From version 1.12.0 it is no longer necessary to run soffice as a service. If you had previously set up the _/etc/init.d/soffice_ service, 
+you now stop and remove this (the soffice executable from LibreOffice is still required though). 
 
            
 ---

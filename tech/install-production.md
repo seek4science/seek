@@ -169,17 +169,3 @@ start it up with:
 
     sudo /etc/init.d/delayed_job-seek start
 
-### The LibreOffice Soffice service
-
-Create the file /etc/init.d/soffice and copy the contents of
-[scripts/soffice](scripts/soffice) into it.
-
-The run:
-
-    sudo chmod +x /etc/init.d/soffice
-    sudo update-rc.d soffice defaults
-
-start it up with:
-
-    sudo /etc/init.d/soffice start
-

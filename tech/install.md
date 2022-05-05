@@ -26,10 +26,10 @@ would be beneficial if it is new to you. Documentation and resources
 describing Ruby on Rails can be found at http://rubyonrails.org/documentation
 .
 
-SEEK is built upon the 5.2 version of Rails, and requires Ruby 2.6.
+SEEK is built upon the 5.2 version of Rails, and requires Ruby 2.7.
 
 We recommend that you run SEEK on a Linux system. This guide is based on an
-[Ubuntu (18.04 LTS)](http://releases.ubuntu.com/18.04/) system. However, running on other Linux distributions the
+[Ubuntu (20.04 LTS)](http://releases.ubuntu.com/20.04/) system. However, running on other Linux distributions the
 main difference is the name of the required packages that have to be installed
 for that distribution, other than that the steps will be the same. If you want
 to install on different distribution or version please visit [Other
@@ -64,14 +64,14 @@ The remaining packages are:
 
     sudo apt install build-essential git imagemagick libcurl4-gnutls-dev libgmp-dev \
         libmagick++-dev libmysqlclient-dev libpq-dev libreadline-dev libreoffice libssl-dev \
-        libxml++2.6-dev libxslt1-dev nodejs openjdk-8-jdk openssh-server poppler-utils zip
+        libxml++2.6-dev libxslt1-dev nodejs openjdk-11-jdk openssh-server poppler-utils zip
 
 Installing these packages now will make installing Ruby easier later on:
 
     sudo apt install autoconf automake bison curl gawk libffi-dev libgdbm-dev \
         libncurses5-dev libsqlite3-dev libyaml-dev sqlite3
         
-SEEK's Solr implementation currently requires Java 8, so you may need to switch the system's default Java runtime:
+SEEK's Solr implementation currently requires Java 11, so you may need to switch the system's default Java runtime:
 
     sudo update-alternatives --config java
     
@@ -213,19 +213,6 @@ and to stop run:
 you can also restart with
 
     bundle exec rake seek:workers:restart
-
-### Starting and Stopping the SOFFICE service
-
-SEEK uses the soffice service provided by
-[LibreOffice](https://www.libreoffice.org/) to convert various document
-formats to PDF and Text - to allow them to be viewed in a web browser, and to
-make them indexable to the search. To start soffice run:
-
-    soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard > /dev/null 2>&1 &
-
-and to stop it run:
-
-    killall -15 soffice
 
 ## Starting SEEK
 
