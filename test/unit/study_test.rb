@@ -205,20 +205,4 @@ class StudyTest < ActiveSupport::TestCase
     assert_equal [assay1, assay2, assay3, assay4], related_items_hash['Assay'][:items]
   end
 
-  test 'can only be ordered by editor' do
-    person = Factory(:person)
-    project = person.projects.first
-    refute_nil project
-    investigation = Factory(:investigation, projects: [project], contributor: person)
-    study = Factory(:study, investigation: investigation, contributor: person)
-    another_person = Factory(:person)
-
-    assert study.can_edit?(person.user)
-    refute study.can_edit?(another_person.user)
-
-    assert study.can_order?(person.user)
-    refute study.can_order?(another_person.user)
-  end
-  
-  
 end

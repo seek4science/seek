@@ -105,8 +105,6 @@ module ImagesHelper
      explanation = "You cannot edit this #{item_name}"
    elsif subitems.size < 2
      explanation = "The #{item_name} must contain two or more #{subitem_name.pluralize}"
-   elsif !model_item.can_order?(user)
-     explanation = "You must be able to edit all #{subitem_name.pluralize}"
    end
 
    if !explanation.empty?

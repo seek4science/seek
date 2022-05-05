@@ -221,18 +221,4 @@ class InvestigationTest < ActiveSupport::TestCase
     assert_equal ['James','25'].sort, item.custom_metadata_attribute_values_for_search.sort
   end
 
-  test 'can only be ordered by editor' do
-    person = Factory(:person)
-    project = person.projects.first
-    refute_nil project
-    investigation = Factory(:investigation, projects: [project], contributor: person)
-    another_person = Factory(:person)
-
-    assert investigation.can_edit?(person.user)
-    refute investigation.can_edit?(another_person.user)
-
-    assert investigation.can_order?(person.user)
-    refute investigation.can_order?(another_person.user)
-  end
-  
 end
