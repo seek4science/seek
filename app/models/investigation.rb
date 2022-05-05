@@ -48,11 +48,6 @@ class Investigation < ApplicationRecord
     studies.order(position: :asc)
   end
   
-  def can_order?(user = User.current_user)
-    user && can_edit?(user) &&
-      !studies.find { |s| !s.can_edit?(user) }
-  end
-
   def self.user_creatable?
     Seek::Config.investigations_enabled
   end

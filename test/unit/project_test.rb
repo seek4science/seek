@@ -247,40 +247,6 @@ class ProjectTest < ActiveSupport::TestCase
     end
   end
 
-  test 'can only be ordered by editor' do
-    person = Factory(:person)
-    project = person.projects.first
-    refute_nil project
-    another_person = Factory(:person)
-
-    assert project.can_edit?(person.user)
-    refute project.can_edit?(another_person.user)
-
-    assert project.can_order?(person.user)
-    refute project.can_order?(another_person.user)
-  end
-
-  test 'can only be ordered by investigations editor' do
-    skip 'Cannot work out policy setting'
-    person = Factory(:person)
-    project = person.projects.first
-    refute_nil project
-    another_person = Factory(:person)
-
-    assert project.can_order?(person.user)
-    refute project.can_order?(another_person.user)
-
-    i1 = Factory :investigation, projects: [project], contributor:person
-    assert i1.can_edit?(person.user)
-    assert project.can_order?(person.user)
-
-    i2 = Factory :investigation, projects: [project], contributor: another_person, policy: Factory(:editing_public_policy)
-    puts i2.policy
-    assert i1.can_edit?(another_person)
-    refute project.can_order?(person.user)
-    refute project.can_order?(another_person.user)
-  end
-
   test 'can be administered by' do
     admin = Factory(:admin)
     project_administrator = Factory(:project_administrator)
