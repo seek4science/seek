@@ -6,16 +6,18 @@ class ContributedResourceSerializer < PCSSerializer
   attribute :version, key: :latest_version, if: -> { object.respond_to?(:version) }
 
   attribute :tags do
-    serialize_annotations(object)
+    serialize_annotations(object, context ='tag')
   end
 
   attribute :versions, if: -> { object.respond_to?(:versions) } do
     versions_data = []
     object.visible_versions.each do |v|
       url = polymorphic_url(object, version: v.version)
-      versions_data.append(version: v.version,
-                           revision_comments: v.revision_comments.presence,
-                           url: url)
+      data = {version: v.version,
+              revision_comments: v.revision_comments.presence,
+              url: url}
+      data[:doi]=v.doi if v.respond_to?(:doi)
+      versions_data.append(data)
     end
     versions_data
   end
@@ -33,6 +35,10 @@ class ContributedResourceSerializer < PCSSerializer
   end
   attribute :updated_at do
     get_version.updated_at
+  end
+
+  attribute :doi, if: -> { object.supports_doi? } do
+    get_version.doi
   end
 
   attribute :content_blobs, if: -> { object.respond_to?(:content_blobs) || object.respond_to?(:content_blob) } do
@@ -83,5 +89,15 @@ class ContributedResourceSerializer < PCSSerializer
 
   def version_number
     @scope.try(:[],:requested_version) || object.try(:version)
+  end
+
+  def edam_annotations(property)
+    terms = object.annotations_with_attribute(property, true).collect(&:value).sort_by(&:label)
+    terms.collect do |term|
+      {
+        label: term.label,
+        identifier: term.iri
+      }
+    end
   end
 end

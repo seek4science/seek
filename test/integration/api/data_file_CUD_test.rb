@@ -15,6 +15,7 @@ class DataFileCUDTest < ActionDispatch::IntegrationTest
     @creator = Factory(:person)
     @publication = Factory(:publication, projects: [@project])
     @event = Factory(:event, projects: [@project], policy: Factory(:public_policy))
+    @workflow = Factory(:workflow, projects: [@project], policy: Factory(:public_policy))
 
     template_file = File.join(ApiTestHelper.template_dir, 'post_max_data_file.json.erb')
     template = ERB.new(File.read(template_file))

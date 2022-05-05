@@ -8,6 +8,8 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
     admin_login
     @clz = 'workflow'
     Factory(:cwl_workflow_class) # Make sure the CWL class is present
+    Factory(:edam_topics_controlled_vocab)
+    Factory(:edam_operations_controlled_vocab)
     @plural_clz = @clz.pluralize
     @project = @current_user.person.projects.first
     investigation = Factory(:investigation, projects: [@project], contributor: @current_person)
@@ -15,6 +17,10 @@ class WorkflowCUDTest < ActionDispatch::IntegrationTest
     @assay = Factory(:assay, study: study, contributor: @current_person)
     @creator = Factory(:person)
     @publication = Factory(:publication, projects: [@project])
+    @presentation = Factory(:presentation, projects: [@project], contributor: @current_person)
+    @data_file = Factory(:data_file, projects: [@project], contributor: @current_person)
+    @document = Factory(:document, projects: [@project], contributor: @current_person)
+    @sop = Factory(:sop, projects: [@project], contributor: @current_person)
 
     template_file = File.join(ApiTestHelper.template_dir, 'post_max_workflow.json.erb')
     template = ERB.new(File.read(template_file))

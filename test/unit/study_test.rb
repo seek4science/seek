@@ -204,4 +204,5 @@ class StudyTest < ActiveSupport::TestCase
 
     assert_equal [assay1, assay2, assay3, assay4], related_items_hash['Assay'][:items]
   end
+
 end

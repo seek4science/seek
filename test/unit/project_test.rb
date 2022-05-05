@@ -208,6 +208,8 @@ class ProjectTest < ActiveSupport::TestCase
     assert project.publications.include?(publications(:taverna_paper_pubmed))
   end
 
+
+
   def test_can_be_edited_by
     u = Factory(:project_administrator).user
     p = u.person.projects.first

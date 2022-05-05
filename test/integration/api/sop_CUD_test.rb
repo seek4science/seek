@@ -13,6 +13,7 @@ class SopCUDTest < ActionDispatch::IntegrationTest
     study = Factory(:study, investigation: investigation, contributor: @current_person)
     @assay = Factory(:assay, study: study, contributor: @current_person)
     @creator = Factory(:person)
+    @workflow = Factory(:workflow, projects: [@project], contributor: @current_person)
 
     template_file = File.join(ApiTestHelper.template_dir, 'post_max_sop.json.erb')
     template = ERB.new(File.read(template_file))

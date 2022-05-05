@@ -927,8 +927,8 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'should update workflow edam annotations ' do
-    Factory(:edam_topics_controlled_vocab)
-    Factory(:edam_operations_controlled_vocab)
+    Factory(:edam_topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
+    Factory(:edam_operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_operations_controlled_vocab
 
     user = Factory(:user)
     workflow = Factory(:cwl_workflow, contributor: user.person)
@@ -945,8 +945,8 @@ class WorkflowsControllerTest < ActionController::TestCase
   end
 
   test 'show edam annotations if set' do
-    Factory(:edam_topics_controlled_vocab)
-    Factory(:edam_operations_controlled_vocab)
+    Factory(:edam_topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
+    Factory(:edam_operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_operations_controlled_vocab
 
     user = Factory(:user)
     workflow = Factory(:cwl_workflow, contributor: user.person)
@@ -1013,7 +1013,11 @@ class WorkflowsControllerTest < ActionController::TestCase
     login_as(person)
     blob = Factory(:content_blob)
     session[:uploaded_content_blob_id] = blob.id
-    workflow =  {title: 'workflow', project_ids: [person.projects.first.id], data_file_ids:[data_file.id] }
+    workflow = {
+      title: 'workflow',
+      project_ids: [person.projects.first.id],
+      workflow_data_files_attributes: ['',{data_file_id: data_file.id}]
+    }
 
     assert_difference('Workflow.count') do
       post :create_metadata, params: {workflow: workflow, content_blob_id: blob.id.to_s, policy_attributes: { access_type: Policy::VISIBLE }}

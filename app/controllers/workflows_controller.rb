@@ -327,7 +327,7 @@ class WorkflowsController < ApplicationController
                                      { project_ids: [] }, :license,
                                      { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                      { assay_assets_attributes: [:assay_id] }, { scales: [] },
-				                             { presentation_ids: [] }, { document_ids: [] }, { data_file_ids: [] },
+				                             { presentation_ids: [] }, { document_ids: [] }, { sop_ids: [] },{ data_file_ids: []},
                                      { workflow_data_files_attributes:[:id, :data_file_id, :workflow_data_file_relationship_id, :_destroy] },
                                      { publication_ids: [] }, :internals, :maturity_level, :source_link_url,
                                      :edam_topics, :edam_operations,
@@ -341,5 +341,9 @@ class WorkflowsController < ApplicationController
     params.require(:ro_crate).permit({ workflow: [:data, :data_url, :make_local_copy] },
                                      { abstract_cwl: [:data, :data_url, :make_local_copy] },
                                      { diagram: [:data, :data_url, :make_local_copy] })
+  end
+
+  def param_converter_options
+    { skip: [:data_file_ids] }
   end
 end
