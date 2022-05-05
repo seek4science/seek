@@ -99,6 +99,7 @@ module ImagesHelper
   end
 
  def order_icon(model_item, user, full_url, subitems, subitem_name)
+   subitem_name = "#{t(subitem_name).capitalize.pluralize}"
    item_name = text_for_resource model_item
    explanation = ""
    if !model_item.can_edit?(user)
