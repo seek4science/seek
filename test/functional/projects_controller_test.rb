@@ -3262,13 +3262,13 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_select 'a[href=?]',
                   order_investigations_project_path(project), count: 0
 
-    project.investigations += [Factory(:investigation)]
+    project.investigations += [Factory(:investigation, contributor:person)]
     get :show, params: { id: project.id }
     assert_response :success
     assert_select 'a[href=?]',
                   order_investigations_project_path(project), count: 0
 
-    project.investigations += [Factory(:investigation)]
+    project.investigations += [Factory(:investigation, contributor:person)]
     get :show, params: { id: project.id }
     assert_response :success
     assert_select 'a[href=?]',
@@ -3279,13 +3279,20 @@ class ProjectsControllerTest < ActionController::TestCase
     person = Factory(:admin)
     login_as(person)
     project = Factory(:project)
-    project.investigations += [Factory(:investigation)]
-    project.investigations += [Factory(:investigation)]
+    project.investigations += [Factory(:investigation, contributor:person)]
+    project.investigations += [Factory(:investigation, contributor:person)]
     get :show, params: { id: project.id }
     assert_response :success
     assert_select 'a[href=?]',
                   order_investigations_project_path(project), count: 1
 
+    # Can order if the project is editable, even if some investigations are not editable
+    project.investigations += [Factory(:investigation)]
+    get :show, params: { id: project.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_investigations_project_path(project), count: 1
+    
     login_as(:aaron)
     get :show, params: { id: project.id }
     assert_response :success

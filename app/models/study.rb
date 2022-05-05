@@ -77,5 +77,6 @@ class Study < ApplicationRecord
   
   def self.user_creatable?
     Seek::Config.studies_enabled
+
   end
 end

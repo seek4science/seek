@@ -411,10 +411,12 @@ class ProjectsController < ApplicationController
       a1.permit!
       pos = 0
       a1.each_pair do |key, value |
-        investigation = Investigation.find (value)
-        investigation.position = pos
-        pos += 1
-        investigation.save!
+        disable_authorization_checks {
+          investigation = Investigation.find (value)
+          investigation.position = pos
+          pos += 1
+          investigation.save!
+        }
       end
       respond_to do |format|
         format.html { redirect_to(@project) }

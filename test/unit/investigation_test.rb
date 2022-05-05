@@ -220,4 +220,5 @@ class InvestigationTest < ActiveSupport::TestCase
     )
     assert_equal ['James','25'].sort, item.custom_metadata_attribute_values_for_search.sort
   end
+
 end
