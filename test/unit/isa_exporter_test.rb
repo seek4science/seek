@@ -2,14 +2,8 @@ require 'test_helper'
 
 class IsaExporterTest < ActionController::TestCase
 	test 'find sample origin' do
-		# user = Factory :user
-		# User.current_user = user
-
 		controller = IsaExporter::Exporter.new Factory(:investigation)
-
 		project = Factory(:project)
-
-		# user.person.add_to_project_and_institution(project, project.institutions.first)
 
 		type_1 = Factory(:simple_sample_type, project_ids: [project.id])
 		type_2 = Factory(:multi_linked_sample_type, project_ids: [project.id])

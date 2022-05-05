@@ -1,0 +1,19 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "title" : "ISA protocol parameter schema",
+    "description" : "JSON-schema representing a parameter for a protocol (category declared in the investigation file) in the ISA model",
+    "type" : "object",
+    "properties" : {
+        "@id": { "type": "string", "format": "uri" },
+        "parameterName": {
+            "$ref": "ontology_annotation_schema.json#"
+        },
+        "comments" : {
+            "type": "array",
+            "items": {
+                 "$ref": "comment_schema.json#"
+            }
+        }
+    },
+    "additionalProperties": false
+}

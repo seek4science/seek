@@ -1,0 +1,76 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "title": "ISA process or protocol application schema, corresponds to 'Protocol REF' columns in the study and assay files",
+    "description": "JSON-schema representing a protocol application in the ISA model",
+    "type": "object",
+    "properties": {
+        "@id": { "type": "string", "format": "uri" },
+        "name": {
+            "type": "string"
+        },
+        "executesProtocol": {
+                "$ref": "protocol_schema.json#"
+        },
+        "parameterValues": {
+            "type": "array",
+            "items": {
+                  "$ref" : "process_parameter_value_schema.json#"
+            }
+        },
+        "performer": {
+             "type": "string"
+        },
+        "date": {
+             "type": "string",
+              "format": "date-time"
+        },
+        "previousProcess" : {
+             "$ref" : "process_schema.json#"
+        },
+        "nextProcess": {
+             "$ref" : "process_schema.json#"
+        },
+        "inputs" : {
+            "type": "array",
+            "items": {
+                 "anyOf": [
+                   {
+                     "$ref": "source_schema.json#"
+                   },
+                   {
+                     "$ref": "sample_schema.json#"
+                   },
+                   {
+                     "$ref": "data_schema.json#"
+                   },
+                   {
+                     "$ref": "material_schema.json#"
+                   }
+                 ]
+            }
+        },
+        "outputs" : {
+            "type": "array",
+            "items": {
+                 "anyOf": [
+                        {
+                            "$ref": "sample_schema.json#"
+                        },
+                        {
+                            "$ref": "data_schema.json#"
+                        },
+                        {
+                        "$ref": "material_schema.json#"
+                        }
+                    ]
+            }
+        },
+        "comments" : {
+            "type": "array",
+            "items": {
+                 "$ref": "comment_schema.json#"
+            }
+        }
+    },
+    "additionalProperties": false
+}
