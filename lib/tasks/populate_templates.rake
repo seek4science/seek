@@ -23,7 +23,7 @@ namespace :seek do
 					data_hash['data'].each do |item|
 						metadata = item['metadata']
 						repo =
-							Template.find_or_create_by(
+							Template.create(
 								{
 									title: metadata['name'],
 									group: metadata['group'],
@@ -45,7 +45,7 @@ namespace :seek do
 						if (repo.id.blank?)
 							puts 'An error occured creating a template with the followign details: ', repo.errors.full_messages
 							puts '==================='
-							p repo
+							puts repo.inspect
 							return
 						end
 
