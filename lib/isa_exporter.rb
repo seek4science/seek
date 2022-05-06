@@ -492,7 +492,7 @@ module IsaExporter
 					end
 			end
 			term_accession = is_ontology ? iri : ''
-			termSource = term_accession ? sample_attribute.sample_controlled_vocab.source_ontology : ''
+			termSource = term_accession.present? ? sample_attribute.sample_controlled_vocab.source_ontology : ''
 			{ termAccession: term_accession, termSource: termSource }
 		end
 
