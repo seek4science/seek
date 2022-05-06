@@ -1,0 +1,48 @@
+{
+  "data": {
+    "type": "studies",
+    "id": "<%= id %>",
+    "attributes": {
+      "title": "A Maximal Study",
+      "description": "The Study of many things",
+      "experimentalists": "Wet lab people",
+      "other_creators": "Marie Curie",
+      "policy": {
+        "access": "download",
+        "permissions": [
+          {
+            "resource": {
+              "id": "<%= @project.id %>",
+              "type": "projects"
+            },
+            "access": "view"
+          }
+        ]
+      }
+    },
+    "relationships": {
+      "investigation": {
+        "data": {
+          "id": "<%= @investigation.id %>",
+          "type": "investigations"
+        }
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "<%= @publication.id %>",
+            "type": "publications"
+          }
+        ]
+      },
+      "creators": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
-<%= render :partial => "general/item_title", :locals => {:item => @model, :version => @display_model.version,
-                                                         :buttons_partial => 'models/buttons'} -%>
+<%= render partial: 'general/item_title', locals: { item: @model, version: @display_model.version,
+                                                    buttons_partial: 'models/buttons' } %>
 
 <% model_image_form = capture do %>
   <hr/>
@@ -11,78 +11,88 @@
     </div>
     <% if previous_version_image_file = @model.latest_version.model_image.try(:original_filename) -%>
       <p>
-        The image file of previous version <span style="font-weight: bold;"><%= previous_version_image_file %></span>
+        The image file of previous version
+        <span style="font-weight: bold;"><%= previous_version_image_file %></span>
         will be used if you dont specify the image file
         <%= hidden_field_tag 'previous_version_image', previous_version_image_file %>
       </p>
     <% end -%>
   </div>
 <% end -%>
-<%= render(partial: 'assets/upload_new_version_form', locals: { resource: @model, extra_content: model_image_form })%>
+<%= render(partial: 'assets/upload_new_version_form', locals: { resource: @model, extra_content: model_image_form }) %>
 
-<div class="row">
-  <div class="col-md-9 col-sm-8 box_about_actor">
-    <%= item_description @display_model.description -%>
+<%= render partial: 'general/show_page_tab_definitions' %>
 
+<div class="tab-content">
+  <%= tab_pane('overview') do %>
     <div class="row">
-      <div class="col-md-6">
-        <%= persistent_resource_id(@display_model) %>
+      <div class="col-md-9 col-sm-8 box_about_actor">
+        <%= item_description @display_model.description -%>
 
-        <%= render :partial=>"assets/multiple_fileinfo", :object=>@display_model -%>
+        <div class="row">
+          <div class="col-md-6">
+            <%= persistent_resource_id(@display_model) %>
 
-        <p>
-          <b>Organism:</b>
-          <% if @display_model.organism -%>
-              <%= organism_link_to @display_model.organism -%>
-          <% else -%>
-              <span class="none_text">Not specified</span>
-          <% end -%>
-        </p>
+            <%= render :partial => "assets/multiple_fileinfo", :object => @display_model -%>
 
-        <% if Seek::Config.human_diseases_enabled %>
-          <p>
-            <b>Human Disease:</b>
-            <% if @display_model.human_disease -%>
-                <%= human_disease_link_to @display_model.human_disease -%>
-            <% else -%>
+            <p>
+              <b>Organism:</b>
+              <% if @display_model.organism -%>
+                <%= organism_link_to @display_model.organism -%>
+              <% else -%>
                 <span class="none_text">Not specified</span>
-            <% end -%>
-          </p>
-        <% end %>
+              <% end -%>
+            </p>
 
-        <div id="format_info">
-          <p id="model_type">
-            <b><%= t('model') %> type:</b>
-            <%= model_type_text @display_model.model_type %>
-          </p>
-          <p id="model_format">
-            <b><%= t('model') %> format:</b>
-            <%= model_format_text @display_model.model_format %>
-          </p>
-          <p id="execution_environment">
-            <b>Execution or visualisation environment:</b>
-            <%= model_environment_text @display_model %>
-          </p>
+            <% if Seek::Config.human_diseases_enabled %>
+              <p>
+                <b>Human Disease:</b>
+                <% if @display_model.human_disease -%>
+                  <%= human_disease_link_to @display_model.human_disease -%>
+                <% else -%>
+                  <span class="none_text">Not specified</span>
+                <% end -%>
+              </p>
+            <% end %>
+
+            <div id="format_info">
+              <p id="model_type">
+                <b><%= t('model') %> type:</b>
+                <%= model_type_text @display_model.model_type %>
+              </p>
+              <p id="model_format">
+                <b><%= t('model') %> format:</b>
+                <%= model_format_text @display_model.model_format %>
+              </p>
+              <p id="execution_environment">
+                <b>Execution or visualisation environment:</b>
+                <%= model_environment_text @display_model %>
+              </p>
+            </div>
+
+            <%= render :partial => "assets/special_auth_code_display", :locals => { :resource => @model } %>
+
+            <%= render :partial => "assets/asset_doi", :locals => { :displayed_resource => @display_model } %>
+
+          </div>
         </div>
 
-        <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @model} %>
+        <%= render :partial => "model_visualisation" -%>
 
-        <%= render :partial => "assets/asset_doi", :locals => {:displayed_resource=>@display_model} %>
+        <%= render :partial => "import_details", :object => @display_model %>
 
+        <%= render :partial => "general/isa_graph", :locals => { :root_item => @model, :deep => true, :include_parents => true } %>
+      </div>
+      <div class="col-md-3 col-sm-4">
+        <%= render :partial => "assets/resource_main_content_right", :locals => { :resource => @model, :versioned_resource => @display_model } %>
       </div>
     </div>
 
-    <%= render :partial=>"model_visualisation" -%>
+    <%= render :partial => "assets/resource_version_details", :locals => { :displayed_resource => @display_model, :resource => @model } -%>
 
-    <%= render :partial=>"import_details", :object=>@display_model %>
+  <% end %>
 
-    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @model, :deep => true, :include_parents => true} %>
-  </div>
-  <div class="col-md-3 col-sm-4">
-    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @model,:versioned_resource=>@display_model } %>
-  </div>
+  <%= tab_pane('related-items') do %>
+    <%= render partial: 'general/items_related_to', object: @model %>
+  <% end %>
 </div>
-
-<%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_model, :resource=>@model} -%>
-
-<%= render :partial => "general/items_related_to", :object => @model %>

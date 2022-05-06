@@ -4,44 +4,41 @@
     <% end %>
 <% end %>
 
-<div class="row">
-
-    <% if Seek::Config.front_page_buttons_enabled %>
-        <%= render :partial=>"home_buttons" -%>
-    <% end %>
-</div>
-
-<%# If not logged in, home_description takes entire row, otherwise, col-9 (2/3rds) %>
 <% if !logged_in_and_registered? %>
-  <%= render :partial=>"home_description_box" -%>
   <% if Seek::Config.home_show_features%>
       <%= render :partial=>"home_features" -%>
   <% end %>
 <% end %>
 
 <div class="row">
-  <div class="col-md-9">
-    <% if logged_in_and_registered?%>
-      <%= render :partial=>"home_description_box" -%>
+  <div class="col-md-9 home-main-panel">
+    <% if Seek::Config.home_description_position == 'middle' && home_description_text.present? %>
+      <%= render partial: 'gadgets/home_description_gadget' %>
     <% end %>
     <% if logged_in_and_registered? && Seek::Config.home_show_my_items%>
       <%= render :partial=>"home_my_items" -%>
     <% end %>
-    <% if !logged_in_and_registered? && Seek::Config.home_show_who_uses %>
-      <%= render :partial=>"home_who_uses" -%>
-    <% end %>
     <% if Seek::Config.home_explore_projects %>
       <%= render :partial=>"home_explore_projects" -%>
+    <% end %>
+    <% if !logged_in_and_registered? && Seek::Config.home_show_who_uses %>
+      <%= render :partial=>"home_who_uses" -%>
     <% end %>
     <% if !logged_in_and_registered? && Seek::Config.home_show_integrations %>
       <%= render :partial=>"home_integrations" -%>
     <% end %>
   </div>
 
+  <!-- right sidebar -->
   <div class="col-md-3">
     <% if logged_in_and_registered?  && Seek::Config.home_show_quickstart %>
       <%= render :partial=>"home_quick_start" -%>
     <% end %>
+
+    <% if Seek::Config.home_description_position == 'side' && home_description_text.present? %>
+      <%= render partial: 'gadgets/home_description_gadget' %>
+    <% end %>
+
     <%= render :partial=>"gadgets/announcements_gadget" if show_announcements? %>
     <%= home_news_feeds %>
 
@@ -54,11 +51,9 @@
     <% end %>
 
     <% if Seek::Config.tagging_enabled && Seek::Config.tag_cloud_enabled %>
-        <div id="sidebar_tag_cloud">
-          <% cache 'sidebar_tag_cloud', skip_digest: true do -%>
-              <%= render :partial=>"gadgets/tag_cloud_gadget" %>
-          <% end -%>
-        </div>
+      <div id="sidebar_tag_cloud">
+          <%= render :partial => "gadgets/tag_cloud_gadget" %>
+      </div>
     <% end %>
   </div>
 </div>

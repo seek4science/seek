@@ -44,8 +44,6 @@ project_news_feed_urls:
 community_news_enabled:
 community_news_feed_urls:
 blacklisted_feeds:
-is_virtualliver:
-sabiork_ws_base_url:
 filestore_path:
 tagline_prefix:
 modelling_analysis_enabled:
@@ -63,8 +61,6 @@ seek_video_link:
 scales:
 delete_asset_version_enabled:
 recaptcha_enabled:
-project_hierarchy_enabled:
-tabs_lazy_load_enabled:
 publish_button_enabled:
 project_browser_enabled:
 project_single_page_enabled:
@@ -74,12 +70,9 @@ pdf_conversion_enabled:
 admin_impersonation_enabled:
 auth_lookup_enabled:
 guide_box_enabled:
-factors_studied_enabled:
-experimental_conditions_enabled:
 documentation_enabled:
 tagging_enabled:
 authorization_checks_enabled:
-magic_guest_enabled:
 assay_type_ontology_file:
 technology_type_ontology_file:
 modelling_analysis_type_ontology_file:
@@ -89,9 +82,6 @@ modelling_analysis_type_base_uri:
 header_tagline_text_enabled:
 related_items_limit:
   convert: :to_i
-faceted_browsing_enabled:
-facet_enable_for_pages:
-faceted_search_enabled:
 css_appended:
 css_prepended:
 javascript_appended:
@@ -156,7 +146,6 @@ news_enabled:
 news_feed_urls:
 news_number_of_entries:
   convert: :to_i
-front_page_buttons_enabled:
 home_show_features:
 home_show_quickstart:
 home_show_my_items:
@@ -204,7 +193,6 @@ results_per_page_default:
 results_per_page_default_condensed:
   convert: :to_i
 results_per_page:
-cwl_viewer_url:
 # Types enabled
 data_files_enabled:
 documents_enabled:
@@ -220,6 +208,8 @@ samples_enabled:
 sops_enabled:
 workflows_enabled:
 collections_enabled:
+file_templates_enabled:
+placeholders_enabled:
 # Omniauth
 omniauth_enabled:
 omniauth_user_create:
@@ -250,3 +240,9 @@ cv_dropdown_limit:
   convert: :to_i
 tag_cloud_enabled:
 workflow_class_list_enabled:
+git_support_enabled:
+immediate_git_fetch:
+home_description_position:
+observed_variables_enabled:
+observed_variable_sets_enabled:
+fair_signposting_enabled:

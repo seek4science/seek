@@ -1,0 +1,10 @@
+Hi,
+
+The request to create a <%= t('project') %> has been responded to and rejected by <%= @responder.name %>.
+
+The <%= t('project') %> requested was  '<%= @project_name %>', and was originally requested by
+'<%= @requester.name %>' ( <%= person_url(@requester) %> ).
+
+It was rejected with the comment: `<%= @comments %>`.
+
+This is an automated email.

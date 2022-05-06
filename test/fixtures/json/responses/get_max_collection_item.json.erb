@@ -1,0 +1,38 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "collection_items",
+    "attributes": {
+      "comment": "A document",
+      "order": 1
+    },
+    "relationships": {
+      "collection": {
+        "data": {
+          "id": "<%= res.collection_id %>",
+          "type": "collections"
+        }
+      },
+      "asset": {
+        "data": {
+          "id": "<%= res.asset_id %>",
+          "type": "documents"
+        },
+        "meta": {
+          "title": "This Document"
+        }
+      }
+    },
+    "links": {
+      "self": "/collections/<%= res.collection_id %>/items/<%= res.id %>"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "api_version": "0.3"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

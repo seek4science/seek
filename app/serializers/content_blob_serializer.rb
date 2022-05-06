@@ -7,17 +7,6 @@ class ContentBlobSerializer < BaseSerializer
 
   has_one :asset, polymorphic: true
 
-  def self_link
-    polymorphic_path([object.asset, object])
-  end
-
-  def download_link
-    "#{self_link}/download"
-  end
-
-  def _links
-    { self: self_link, download: download_link }
-  end
-
-
+  link(:self) { polymorphic_path([object.asset, object]) }
+  link(:download) { polymorphic_path([:download, object.asset, object]) }
 end

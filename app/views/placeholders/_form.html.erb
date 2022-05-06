@@ -1,0 +1,19 @@
+<%= f.error_messages -%>
+
+<div class="form-group">
+  <label class="required">Title</label>
+  <%= f.text_field :title, :class=>"form-control" -%>
+</div>
+
+<div class="form-group">
+  <%= f.label :description -%>
+  <%= f.text_area :description, :rows => 5, :class=>"form-control rich-text-edit" -%>
+</div>
+
+<%= render :partial => "select_format_types", :locals => {:resource => (@placeholder ? @placeholder : Placeholder.new) } -%>
+
+<%= render :partial => "select_data_types", :locals => {:resource => (@placeholder ? @placeholder : Placeholder.new) } -%>
+
+<%= render :partial => 'projects/project_selector', :locals => {:resource => @placeholder } if show_form_manage_specific_attributes? -%>
+
+<%= form_submit_buttons(@placeholder) %>

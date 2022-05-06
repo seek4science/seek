@@ -1,0 +1,69 @@
+{
+  "data": {
+    "type": "sops",
+    "attributes": {
+      "title": "A Maximal SOP",
+      "description": "This is the description",
+      "tags": [
+        "tag1",
+        "tag2"
+      ],
+      "license": "CC-BY-4.0",
+      "other_creators": "John Smith, Jane Smith",
+      "content_blobs": [
+        {
+          "original_filename": "a_pdf_file.pdf",
+          "content_type": "application/pdf"
+        }
+      ],
+      "policy": {
+        "access": "download",
+        "permissions": [
+          {
+            "resource": {
+              "id": "<%= @project.id %>",
+              "type": "projects"
+            },
+            "access": "edit"
+          }
+        ]
+      },
+      "creators": [
+        {
+          "given_name": "Joe",
+          "family_name": "Bloggs",
+          "affiliation": "School of Rock",
+          "orcid": "https://orcid.org/0000-0002-5111-7263"
+        },
+        {
+          "given_name": null,
+          "family_name": null,
+          "affiliation": null,
+          "orcid": null,
+          "profile": "/people/<%= @creator.id %>"
+        }
+      ]
+    },
+    "relationships": {
+      "creators": {
+        "data": []
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= @project.id %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "<%= @assay.id %>",
+            "type": "assays"
+          }
+        ]
+      }
+    }
+  }
+}

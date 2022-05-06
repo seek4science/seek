@@ -10,7 +10,7 @@
         complete:()=>{
             $j.ajax({
                 type: "GET",
-                url: "/data_files/provide_metadata",
+                url: '<%= provide_metadata_data_files_path -%>',
                 cache: false,
                 contentType: false,
                 processData: false,

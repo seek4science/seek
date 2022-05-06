@@ -107,35 +107,31 @@ class PoliciesControllerTest < ActionController::TestCase
   end
 
   test 'when updating an item, can not publish the item if associate to it the project which has gatekeeper' do
-    as_not_virtualliver do
-      gatekeeper = Factory(:asset_gatekeeper)
-      a_person = Factory(:person)
-      item = Factory(:sop, policy: Factory(:policy))
-      Factory(:permission, contributor: a_person, access_type: Policy::MANAGING, policy: item.policy)
-      item.reload
+    gatekeeper = Factory(:asset_gatekeeper)
+    a_person = Factory(:person)
+    item = Factory(:sop, policy: Factory(:policy))
+    Factory(:permission, contributor: a_person, access_type: Policy::MANAGING, policy: item.policy)
+    item.reload
 
-      login_as(a_person.user)
-      assert item.can_manage?
+    login_as(a_person.user)
+    assert item.can_manage?
 
-      updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(item, gatekeeper.projects.first)
-      assert !updated_can_publish_immediately
-    end
+    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(item, gatekeeper.projects.first)
+    assert !updated_can_publish_immediately
   end
 
   test 'when updating an item, can publish the item if dissociate to it the project which has gatekeeper' do
-    as_not_virtualliver do
-      gatekeeper = Factory(:asset_gatekeeper)
-      a_person = Factory(:person)
-      item = Factory(:sop, policy: Factory(:policy), project_ids: gatekeeper.projects.collect(&:id))
-      Factory(:permission, contributor: a_person, access_type: Policy::MANAGING, policy: item.policy)
-      item.reload
+    gatekeeper = Factory(:asset_gatekeeper)
+    a_person = Factory(:person)
+    item = Factory(:sop, policy: Factory(:policy), project_ids: gatekeeper.projects.collect(&:id))
+    Factory(:permission, contributor: a_person, access_type: Policy::MANAGING, policy: item.policy)
+    item.reload
 
-      login_as(a_person.user)
-      assert item.can_manage?
+    login_as(a_person.user)
+    assert item.can_manage?
 
-      updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(item, Factory(:project))
-      assert updated_can_publish_immediately
-    end
+    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(item, Factory(:project))
+    assert updated_can_publish_immediately
   end
 
   test 'can publish assay without study' do
@@ -150,23 +146,21 @@ class PoliciesControllerTest < ActionController::TestCase
   end
 
   test 'can not publish assay having project with gatekeeper' do
-    as_not_virtualliver do
-      gatekeeper = Factory(:asset_gatekeeper)
-      refute_empty gatekeeper.projects
-      a_person = Factory(:person, project: gatekeeper.projects.first)
-      inv = Factory(:investigation, contributor: gatekeeper)
-      study = Factory(:study, investigation: inv, contributor: gatekeeper)
-      assay = Assay.new
-      assay.study = study
+    gatekeeper = Factory(:asset_gatekeeper)
+    refute_empty gatekeeper.projects
+    a_person = Factory(:person, project: gatekeeper.projects.first)
+    inv = Factory(:investigation, contributor: gatekeeper)
+    study = Factory(:study, investigation: inv, contributor: gatekeeper)
+    assay = Assay.new
+    assay.study = study
 
-      assert_equal assay.projects, gatekeeper.projects
-      login_as(a_person.user)
-      assert assay.can_manage?
+    assert_equal assay.projects, gatekeeper.projects
+    login_as(a_person.user)
+    assert assay.can_manage?
 
-      # FIXME: can't test controller this way properly as it doesn't setup the @request and session properly
-      updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(assay, assay.study.projects)
-      refute updated_can_publish_immediately
-    end
+    # FIXME: can't test controller this way properly as it doesn't setup the @request and session properly
+    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(assay, assay.study.projects)
+    refute updated_can_publish_immediately
   end
 
   test 'always can publish for the published item' do

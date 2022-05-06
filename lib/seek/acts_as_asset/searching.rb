@@ -29,6 +29,10 @@ module Seek
           text :technology_type_titles do
             technology_type_titles if self.respond_to?(:technology_type_titles)
           end
+
+          text :git_content do
+            git_search_terms if is_git_versioned?
+          end
         end if Seek::Config.solr_enabled
       end
     end

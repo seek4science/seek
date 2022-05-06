@@ -1,0 +1,16 @@
+<%
+  return unless resource.supports_edam_annotations?
+  with_edam= "edam_#{subtree}"
+  vocab = resource.method("#{with_edam}_vocab").call
+  return unless vocab
+  return unless resource.method("#{with_edam}").call.any?
+  values = resource.method("#{with_edam.singularize()}_values").call
+  %>
+
+
+<div>
+  <strong><%= "#{subtree.capitalize}" %></strong>
+</div>
+<div>
+  <%= edam_ontology_items(values) %>
+</div>

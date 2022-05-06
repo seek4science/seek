@@ -20,9 +20,6 @@ class InvestigationsController < ApplicationController
 
   include Seek::IsaGraphExtensions
 
-  require "isatab_converter"
-  include IsaTabConverter
-
   api_actions :index, :show, :create, :update, :destroy
 
   def new_object_based_on_existing_one
@@ -38,7 +35,7 @@ class InvestigationsController < ApplicationController
   end
 
   def export_isatab_json
-    the_hash = convert_investigation Investigation.find(params[:id])
+    the_hash = IsaTabConverter.convert_investigation(Investigation.find(params[:id]))
     send_data JSON.pretty_generate(the_hash) , filename: 'isatab.json'
   end
 
@@ -47,7 +44,6 @@ class InvestigationsController < ApplicationController
 
     respond_to do |format|
       format.html { render(params[:only_content] ? { layout: false } : {})}
-      format.xml
       format.rdf { render :template=>'rdf/show' }
       format.json {render json: @investigation}
 
@@ -100,7 +96,7 @@ class InvestigationsController < ApplicationController
 
   def update
     @investigation=Investigation.find(params[:id])
-    if params[:investigation][:ordered_study_ids]
+    if params[:investigation]&.[](:ordered_study_ids)
       a1 = params[:investigation][:ordered_study_ids]
       a1.permit!
       pos = 0
@@ -114,7 +110,7 @@ class InvestigationsController < ApplicationController
         format.html { redirect_to(@investigation) }
       end
     else
-      @investigation.update_attributes(investigation_params)
+      @investigation.update(investigation_params)
       update_sharing_policies @investigation
       update_relationships(@investigation, params)
 
@@ -137,7 +133,7 @@ class InvestigationsController < ApplicationController
 
   def investigation_params
     params.require(:investigation).permit(:title, :description, { project_ids: [] }, *creator_related_params,
-                                          :position, { scales: [] }, { publication_ids: [] },
+                                          :position, { publication_ids: [] },
                                           { discussion_links_attributes:[:id, :url, :label, :_destroy] },
                                           { custom_metadata_attributes: determine_custom_metadata_keys })
   end

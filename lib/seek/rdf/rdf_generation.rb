@@ -57,8 +57,8 @@ module Seek
       end
 
       def rdf_resource
-        uri = URI.join(Seek::Config.site_base_host + '/', "#{self.class.name.tableize}/", id.to_s).to_s
-        RDF::Resource.new(uri)
+        url = Seek::Util.routes.polymorphic_url(self)
+        RDF::Resource.new(url)
       end
 
       # extra steps that cannot be easily handled by the csv template
@@ -126,7 +126,7 @@ module Seek
                      data_file_masters sop_masters model_masters
                      assets
                      assays studies investigations
-                     institutions creators owners owner contributors contributor projects events presentations compounds organisms strains]
+                     institutions creators owners owner contributors contributor projects events presentations organisms strains]
         methods.each do |method|
           next unless respond_to?(method)
           deps = Array(send(method))

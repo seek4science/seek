@@ -3,7 +3,7 @@
 <%= folding_panel("Attachments (<span id='attachments_count'>#{@help_document.attachments.size}</span>)".html_safe, collapsed, id: 'help-attachment-box') do %>
   <div class="help_upload_box">
     <% if @error_text.present? %>
-      <div id="errorExplanation">
+      <div id="error_explanation">
         <h5>The following errors prevented your attachment being uploaded</h5>
         <ul>
           <% @error_text.each do |e| %>

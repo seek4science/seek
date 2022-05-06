@@ -1,7 +1,8 @@
-
 module RdfTestCases
-  def test_get_rdf
-    object = rest_api_test_object
+  extend ActiveSupport::Testing::Declarative # Allows `test 'bla' do` definitions
+
+  test 'get rdf' do
+    object = rdf_test_object
 
     # this strange bit of code forces the model to be reloaded from the database after being created by FactoryGirl.
     # this is to (possibly) avoid a variation in the updated_at timestamps. It means the comparison is always against what
@@ -27,33 +28,44 @@ module RdfTestCases
     end
   end
 
+  test 'response code for not accessible rdf' do
+    if model.respond_to?(:authorization_supported?) && model.authorization_supported?
+      logout
+      get :show, params: { id: private_rdf_test_object, format: 'rdf' }
+      assert_response :forbidden
+    end
+  end
+
+  test 'response code for not available rdf' do
+    get :show, params: { id: (model.maximum(:id) || 0) + 100, format: 'rdf' }
+    assert_response :not_found
+  end
+
+  private
+
+  def model
+    model_name.constantize
+  end
+
+  def model_name
+    self.class.name.split('Controller').first.singularize
+  end
+
+  def rdf_test_object
+    object = Factory(model_name.underscore)
+    login_as(object.contributor) if object.respond_to?(:contributor)
+    object
+  end
+
+  def private_rdf_test_object
+    Factory(model_name.underscore, policy: Factory(:private_policy))
+  end
+
   def invoke_rdf_get(object)
     get :show, params: { id: object, format: 'rdf' }
   end
 
   def expected_rdf_resource_uri(object)
-    eval("#{object.class.name.underscore}_url(object,:host=>'localhost',:port=>'3000')")
-  end
-
-  def test_response_code_for_not_accessible_rdf
-    clz = @controller.controller_model
-    if clz.respond_to?(:authorization_supported?) && clz.authorization_supported?
-      itemname = @controller.controller_name.singularize.underscore
-      item = Factory itemname.to_sym, policy: Factory(:private_policy)
-
-      logout
-      get :show, params: { id: item.id, format: 'rdf' }
-      assert_response :forbidden
-    end
-  end
-
-  def test_response_code_for_not_available_rdf
-    clz = @controller.controller_model
-    id = 9999
-    id += 1 until clz.find_by_id(id).nil?
-
-    logout
-    get :show, params: { id: id, format: 'rdf' }
-    assert_response :not_found
+    Seek::Util.routes.polymorphic_url(object)
   end
 end

@@ -3,9 +3,6 @@
     border-bottom: 1px solid #ccc;
 
 }
-
-
-
 .openbis-card-heading span {
     padding-left:1em;
 }
@@ -48,4 +45,14 @@ table.spaced td {
 
 form#openbis-space-form select#openbis_endpoint_refresh_period_mins {
     max-width: 5em;
+}
+
+div.simple-formating h1, div.simple-formating h2, div.simple-formating h3, div.simple-formating h4, div.simple-formating h5,
+div.simple-formating h6, div.simple-formating li, div.simple-formating p {
+    font-size: 100%;
+}
+
+div.simple-formating h1, div.simple-formating h2, div.simple-formating h3, div.simple-formating h4, div.simple-formating h5,
+div.simple-formating h6 {
+    font-weight: bold;
 }

@@ -24,7 +24,7 @@ module WorkGroupsHelper
     options = []
     last_project = nil
     # if current_user is project manager and not admin, load work_groups of projects he is in
-    work_groups = if project_administrator_logged_in? && !admin_logged_in? && !Seek::Config.is_virtualliver
+    work_groups = if project_administrator_logged_in? && !admin_logged_in?
                     current_user.person.projects.collect(&:work_groups).flatten.uniq
                   else
                     WorkGroup.includes(:project, :institution)

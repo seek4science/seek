@@ -97,18 +97,13 @@ class HomesControllerTest < ActionController::TestCase
   test 'SOP menu item should be capitalized' do
     login_as(:quentin)
 
-    as_virtualliver do
-      get :index
-      assert_select '#browse-menu li>a[href=?]', '/sops', text: 'SOPs', count: 1
-    end
-    as_not_virtualliver do
-      get :index
-      assert_select '#browse-menu' do
-        assert_select 'li' do
-          assert_select 'a[href=?]', sops_path, text: 'SOPs'
-        end
+    get :index
+    assert_select '#browse-menu' do
+      assert_select 'li' do
+        assert_select 'a[href=?]', sops_path, text: 'SOPs'
       end
     end
+
   end
 
   test 'SOP upload option should be capitalized' do
@@ -188,20 +183,6 @@ class HomesControllerTest < ActionController::TestCase
     assert_recognizes({ controller: 'homes', action: 'index' }, '/index')
   end
 
-  test 'ids of scales list should be the same as scales defined in Seek::Config.scales' do
-    as_virtualliver do
-      get :index
-      assert_response :success
-      scales = ['all']
-      scales += Scale.all.map(&:key)
-      assert_select 'div#options ul>li', scales.length do
-        scales.each do |scale|
-          assert_select '[id=?]', scale
-        end
-      end
-    end
-  end
-
   test 'project default icon shown in recent contributions' do
     project = Factory(:project)
 
@@ -215,37 +196,6 @@ class HomesControllerTest < ActionController::TestCase
     assert_select '#recently_added ul.feed' do
       assert_select 'a.file-type-icon[href=?]', project_path(project) do
         assert_select 'img.home_asset_icon[src=?]', "/assets/#{Seek::ImageFileDictionary.instance.image_filename_for_key('project_avatar')}"
-      end
-    end
-  end
-
-  test 'scales slider on home page' do
-    as_virtualliver do
-      Seek::Config.solr_enabled = true
-      get :index
-
-      assert_response :success
-      # vln home
-      assert_select 'div#wrapper' do
-        # slider
-        assert_select 'ul#scale_list'
-        assert_select 'div#slider'
-        # scale images
-        assert_select 'div#zoom img', count: 6
-      end
-
-      # default scale is organism
-      assert_select 'div#scaled_items' do
-        assert_select 'div#organism_results'
-      end
-
-      # default scale for search filtering is Organism
-      assert_select 'div#search_box' do
-        assert_select 'select#scale option' do
-          assert_select '[value=?]', 'all' do
-            assert_select '[selected=?]', 'selected'
-          end
-        end
       end
     end
   end
@@ -429,7 +379,7 @@ class HomesControllerTest < ActionController::TestCase
     assert_select 'div#my-recent-contributions ul li a[href=?]', assay_path(assay), text: /A new assay/
     assert_select 'div#my-recent-contributions ul li a[href=?]', assay_snapshot_path(assay, snapshot), text: /A new assay/
 
-    sop.update_attributes(title: 'An old sop')
+    sop.update(title: 'An old sop')
     Factory :activity_log, activity_loggable: sop, controller_name: 'assays', culprit: person.user, action: 'update'
 
     get :index
@@ -440,20 +390,6 @@ class HomesControllerTest < ActionController::TestCase
     assert_select 'div#my-recent-contributions ul li a[href=?]', assay_path(assay), text: /A new assay/
     assert_select 'div#my-recent-contributions ul li a[href=?]', assay_snapshot_path(assay, snapshot), text: /A new assay/
     assert_select 'div#my-recent-contributions ul li a[href=?]', sop_path(sop), text: /A new sop/, count: 0
-  end
-
-  test 'can enabled/disable front page buttons' do
-    login_as Factory(:user)
-    with_config_value :front_page_buttons_enabled, true do
-      get :index
-      assert_response :success
-      assert_select 'a.seek-homepage-button', count: 3
-    end
-    with_config_value :front_page_buttons_enabled, false do
-      get :index
-      assert_response :success
-      assert_select 'a.seek-homepage-button', count: 0
-    end
   end
 
   test 'can get imprint page' do
@@ -639,12 +575,12 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
 
-    assert_select 'div#home_explore_projects', count: 0
-    assert_select 'div#home_quick_start', count: 0
-    assert_select 'div#home_my_items', count: 0
-    assert_select 'div#home_features', count: 0
-    assert_select 'div#home_who_uses', count: 0
-    assert_select 'div#home_integrations', count: 0
+    assert_select 'div#home-explore-projects', count: 0
+    assert_select 'div#home-quick-start', count: 0
+    assert_select 'div#home-my-items', count: 0
+    assert_select 'div#home-features', count: 0
+    assert_select 'div#home-who-uses', count: 0
+    assert_select 'div#home-integrations', count: 0
 
     ##### full homepage no user logged in
 
@@ -669,12 +605,12 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
 
-    assert_select 'div#home_explore_projects', count: 1
-    assert_select 'div#home_quick_start', count: 0
-    assert_select 'div#home_my_items', count: 0
-    assert_select 'div#home_features', count: 1
-    assert_select 'div#home_who_uses', count: 1
-    assert_select 'div#home_integrations', count: 1
+    assert_select 'div#home-explore-projects', count: 1
+    assert_select 'div#home-quick-start', count: 0
+    assert_select 'div#home-my-items', count: 0
+    assert_select 'div#home-features', count: 1
+    assert_select 'div#home-who-uses', count: 1
+    assert_select 'div#home-integrations', count: 1
 
     ##### full homepage logged in
 
@@ -682,12 +618,12 @@ class HomesControllerTest < ActionController::TestCase
     get :index
     assert_response :success
 
-    assert_select 'div#home_explore_projects', count: 1
-    assert_select 'div#home_quick_start', count: 1
-    assert_select 'div#home_my_items', count: 1
-    assert_select 'div#home_features', count: 0 
-    assert_select 'div#home_who_uses', count: 0 
-    assert_select 'div#home_integrations', count: 0
+    assert_select 'div#home-explore-projects', count: 1
+    assert_select 'div#home-quick-start', count: 1
+    assert_select 'div#home-my-items', count: 1
+    assert_select 'div#home-features', count: 0
+    assert_select 'div#home-who_uses', count: 0
+    assert_select 'div#home-integrations', count: 0
 
     ### disabling tags removes tag cloud within explore project
     with_config_value :home_explore_projects, true do

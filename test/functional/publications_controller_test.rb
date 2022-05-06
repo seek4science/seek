@@ -4,17 +4,12 @@ class PublicationsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
   include MockHelper
 
   def setup
     login_as(Factory(:admin))
-  end
-
-  def rest_api_test_object
-    @object = Factory(:publication, published_date: Date.new(2013, 1, 1), publication_type: Factory(:journal))
   end
 
   def test_title
@@ -189,7 +184,7 @@ class PublicationsControllerTest < ActionController::TestCase
       ],
       published_date: Date.new(2006)
     }
-    post :create, params: { subaction: 'Import', publication: { bibtex_file: fixture_file_upload('files/publication.bibtex') } }
+    post :create, params: { subaction: 'Import', publication: { bibtex_file: fixture_file_upload('publication.bibtex') } }
     p = assigns(:publication)
     assert_equal publication[:title], p.title
     assert_equal publication[:journal], p.journal
@@ -241,7 +236,7 @@ class PublicationsControllerTest < ActionController::TestCase
     ]
 
     assert_difference('Publication.count', 3) do
-      post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('files/publications.bibtex'), project_ids: [projects(:one).id] } }
+      post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('publications.bibtex'), project_ids: [projects(:one).id] } }
     end
 
     publication0 = Publication.where(title: publications[0][:title]).first
@@ -275,7 +270,7 @@ class PublicationsControllerTest < ActionController::TestCase
 
   test 'should check the correctness of bibtex files' do
     assert_difference('Publication.count', 0) do
-      post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('files/bibtex/error_bibtex.bib'), project_ids: [projects(:one).id] } }
+      post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('bibtex/error_bibtex.bib'), project_ids: [projects(:one).id] } }
       assert_redirected_to publications_path
       assert_includes flash[:error], 'An InProceedings needs to have a booktitle.'
       assert_includes flash[:error], 'Please check your bibtex files, each publication should contain a title or a chapter name.'
@@ -314,7 +309,7 @@ class PublicationsControllerTest < ActionController::TestCase
     ]
 
     assert_difference('Publication.count',2) do
-      post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('files/bibtex/author_match.bib'), project_ids: [projects(:one).id] } }
+      post :create, params: { subaction: 'ImportMultiple', publication: { bibtex_file: fixture_file_upload('bibtex/author_match.bib'), project_ids: [projects(:one).id] } }
     end
 
 
@@ -795,16 +790,15 @@ class PublicationsControllerTest < ActionController::TestCase
 
     # Associate a non-seek author to a seek person
     login_as p.contributor
-    as_virtualliver do
-      assert_difference('PublicationAuthor.count', 0) do
-        assert_difference('AssetsCreator.count', 2) do
-          put :update, params: { id: p.id, publication: {
-              abstract: p.abstract,
-              publication_authors_attributes: { '0' => { id: p.publication_authors[0].id, person_id: seek_author1.id },
-                                                '1' => { id: p.publication_authors[1].id, person_id: seek_author2.id } } } }
-        end
+    assert_difference('PublicationAuthor.count', 0) do
+      assert_difference('AssetsCreator.count', 2) do
+        put :update, params: { id: p.id, publication: {
+          abstract: p.abstract,
+          publication_authors_attributes: { '0' => { id: p.publication_authors[0].id, person_id: seek_author1.id },
+                                            '1' => { id: p.publication_authors[1].id, person_id: seek_author2.id } } } }
       end
     end
+
     assert_redirected_to publication_path(p)
     p.reload
   end
@@ -892,15 +886,12 @@ class PublicationsControllerTest < ActionController::TestCase
     seek_author1 = Factory(:person, first_name: 'Stuart', last_name: 'Owen')
     seek_author2 = Factory(:person, first_name: 'Carole', last_name: 'Goble')
 
-    # Associate a non-seek author to a seek person
-    as_virtualliver do
-      assert_difference('publication.non_seek_authors.count', -2) do
-        assert_difference('AssetsCreator.count', 2) do
-          put :update, params: { id: publication.id, publication: {
-              abstract: publication.abstract,
-              publication_authors_attributes: { '0' => { id: publication.non_seek_authors[12].id, person_id: seek_author1.id },
-                                                '1' => { id: publication.non_seek_authors[15].id, person_id: seek_author2.id } } } }
-        end
+    assert_difference('publication.non_seek_authors.count', -2) do
+      assert_difference('AssetsCreator.count', 2) do
+        put :update, params: { id: publication.id, publication: {
+          abstract: publication.abstract,
+          publication_authors_attributes: { '0' => { id: publication.non_seek_authors[12].id, person_id: seek_author1.id },
+                                            '1' => { id: publication.non_seek_authors[15].id, person_id: seek_author2.id } } } }
       end
     end
 
@@ -1094,22 +1085,6 @@ class PublicationsControllerTest < ActionController::TestCase
 
     assert_equal '10.5072/abcd', assigns(:publication).doi
     assert_equal journal.id, assigns(:publication).publication_type.id
-  end
-
-  def edit_max_object(pub)
-    assay = Factory(:assay, policy: Factory(:public_policy))
-    study = Factory(:study, policy: Factory(:public_policy))
-    inv = Factory(:investigation, policy: Factory(:public_policy))
-    df = Factory(:data_file, policy: Factory(:public_policy))
-    model = Factory(:model, policy: Factory(:public_policy))
-    pr = Factory(:presentation, policy: Factory(:public_policy))
-
-    pub.associate(assay)
-    pub.associate(study)
-    pub.associate(inv)
-    pub.associate(df)
-    pub.associate(model)
-    pub.associate(pr)
   end
 
   test 'should give authors permissions' do

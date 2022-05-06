@@ -197,15 +197,15 @@ module Seek
       end
 
       def application_server_query_instance
-        Fairdom::OpenbisApi::ApplicationServerQuery.new(openbis_endpoint.as_endpoint, openbis_endpoint.session_token)
+        Fairdom::OpenbisApi::ApplicationServerQuery.new(openbis_endpoint.as_endpoint, openbis_endpoint.session_token, openbis_endpoint.is_test)
       end
 
       def datastore_server_query_instance
-        Fairdom::OpenbisApi::DataStoreQuery.new(openbis_endpoint.dss_endpoint, openbis_endpoint.session_token)
+        Fairdom::OpenbisApi::DataStoreQuery.new(openbis_endpoint.dss_endpoint, openbis_endpoint.session_token, openbis_endpoint.is_test)
       end
 
       def datastore_server_download_instance
-        Fairdom::OpenbisApi::DataStoreDownload.new(openbis_endpoint.dss_endpoint, openbis_endpoint.session_token)
+        Fairdom::OpenbisApi::DataStoreDownload.new(openbis_endpoint.dss_endpoint, openbis_endpoint.session_token, openbis_endpoint.is_test)
       end
 
       def dataset_ids

@@ -12,7 +12,6 @@ class SavedSearchesController < ApplicationController
             :search_type => saved_search.search_type,
             :include_external_search=>include_external_search,
             :saved_search => true)}
-        format.xml  { head :ok }
       else
         flash[:error]="Couldn't find the requested search."
         format.html { redirect_back fallback_location: root_path }

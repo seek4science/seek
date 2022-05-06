@@ -32,6 +32,18 @@
   <% end %>
 <% end %>
 
+<% if Seek::Config.file_templates_enabled && resource.respond_to?(:file_template) && !resource.file_template.nil? %>
+  <%= render :partial => "assets/file_template_box", :locals => { :resource => resource } -%>
+<% end %>
+
+<% suffix = 'the Data file'
+   if resource.instance_of? FileTemplate
+   suffix = 'Data files'
+   elsif resource.instance_of? Placeholder
+   suffix = 'actual Data files'
+   end
+   %>
+
 <% if resource.respond_to?(:license) %>
   <%= render :partial => "assets/license_box", :locals => { :resource => resource, :versioned_resource=> versioned_resource } -%>
 <% end %>
@@ -39,7 +51,7 @@
 <%= render :partial => "assets/usage_info_box",:locals => { :resource => resource } -%>
 
 <% if resource.edam_annotations? %>
-  <%= render partial:'assets/edam_properties_box', :locals => { :resource => resource }  %>
+  <%= render partial:'assets/edam_properties_box', :locals => { :resource => resource } -%>
 <% end %>
 
 <% if resource.class.is_taggable? %>
@@ -55,6 +67,3 @@
 <% if resource.respond_to?(:collections) && resource.collections.any? -%>
     <%= render partial: 'assets/resource_collections_box', locals: { resource: resource } -%>
 <% end -%>
-
-<%= render :partial => "assets/resource_scales_box", :locals => { :resource => resource} if resource.respond_to?(:scales) && show_scales?-%>
-

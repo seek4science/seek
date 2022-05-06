@@ -2,7 +2,6 @@ class UsersController < ApplicationController
   before_action :is_current_user_auth, only: %i[edit update]
   before_action :is_user_admin_auth, only: %i[impersonate resend_activation_email destroy activate_other]
 
-  skip_before_action :restrict_guest_user
   skip_before_action :project_membership_required
 
   skip_before_action :partially_registered?, only: %i[update cancel_registration]
@@ -147,7 +146,6 @@ class UsersController < ApplicationController
     @user.destroy if @user && !@user.person
     respond_to do |format|
       format.html { redirect_back(fallback_location: root_path) }
-      format.xml { head :ok }
     end
   end
 

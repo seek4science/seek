@@ -1,7 +1,6 @@
 class Programme < ApplicationRecord
   include Seek::Annotatable
-
-  attr_accessor :administrator_ids
+  include Seek::Roles::Scope
 
   if Seek::Config.solr_enabled
     searchable(auto_index: false) do
@@ -18,17 +17,18 @@ class Programme < ApplicationRecord
   has_many :projects, dependent: :nullify
   has_many :work_groups, through: :projects
   has_many :group_memberships, through: :work_groups
-  has_many :people, -> { order('last_name ASC').distinct }, through: :group_memberships
+  has_many :people, -> { distinct }, through: :group_memberships
   has_many :institutions, -> { distinct }, through: :work_groups
-  has_many :admin_defined_role_programmes, dependent: :destroy
   has_many :dependent_permissions, class_name: 'Permission', as: :contributor, dependent: :destroy
   has_many :organisms, -> { distinct }, through: :projects
   has_many :investigations, -> { distinct }, through: :projects
   has_many :studies, -> { distinct }, through: :investigations
   has_many :assays, -> { distinct }, through: :studies
-  %i[data_files documents models sops presentations events publications samples workflows nodes].each do |type|
+  %i[data_files documents models sops presentations events publications samples workflows].each do |type|
     has_many type, -> { distinct }, through: :projects
   end
+  has_many :programme_administrator_roles, -> { where(role_type_id: RoleType.find_by_key!(:programme_administrator)) }, as: :scope, class_name: 'Role', inverse_of: :scope
+  has_many :programme_administrators, through: :programme_administrator_roles, class_name: 'Person', source: :person
   accepts_nested_attributes_for :projects
 
   auto_strip_attributes :web_page
@@ -40,10 +40,7 @@ class Programme < ApplicationRecord
 
   validates :web_page, url: { allow_nil: true, allow_blank: true }
 
-  after_save :handle_administrator_ids, if: -> { @administrator_ids }
   before_create :activate_on_create
-
-
 
   # scopes
   scope :activated, -> { where(is_activated: true) }
@@ -115,30 +112,11 @@ class Programme < ApplicationRecord
     User.admin_logged_in? || (User.logged_in_and_registered? && Seek::Config.programme_user_creation_enabled)
   end
 
-  def programme_administrators
-    Seek::Roles::ProgrammeRelatedRoles.instance.people_with_programme_and_role(self, Seek::Roles::PROGRAMME_ADMINISTRATOR)
-  end
-
   def total_asset_size
     projects.to_a.sum(&:total_asset_size)
   end
 
   private
-
-  # set the administrators, assigned from the params to :adminstrator_ids
-  def handle_administrator_ids
-    new_administrators = Person.find(administrator_ids)
-    to_add = new_administrators - programme_administrators
-    to_remove = programme_administrators - new_administrators
-    to_add.each do |person|
-      person.is_programme_administrator = true, self
-      disable_authorization_checks { person.save! }
-    end
-    to_remove.each do |person|
-      person.is_programme_administrator = false, self
-      disable_authorization_checks { person.save! }
-    end
-  end
 
   # callback, activates if current user is an admin or nil, otherwise it needs activating
   def activate_on_create

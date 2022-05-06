@@ -3,10 +3,7 @@
 <%= form_tag :action=>"update_settings" do -%>
     <h2>General settings</h2>
     <%= admin_text_setting(:site_base_host, Seek::Config.site_base_host,
-                           'Site base URL', 'This base URL for this SEEK installation. This is required cases where the host cannot be determined from the request - particularly within the REST API and Subscription email notifications.') %>
-
-    <%= admin_text_setting(:sabiork_ws_base_url, Seek::Config.sabiork_ws_base_url,
-                           'SabioRK WS base URL', 'This base URL for sabiork webservices REST API') %>
+                           'Site base Hostname', 'The base hostname for the SEEK installation. It should only be set to the host, but not include any additional paths if running under a sub uri. This is required cases where the host cannot be determined from the request.') %>
 
     <%= admin_text_setting(:pubmed_api_email, Seek::Config.pubmed_api_email,
                            'Pubmed API email', 'When adding a publication from PubMed, an email address is required to use the API. No registration is required.') %>
@@ -27,6 +24,8 @@
     <%= admin_checkbox_setting(:allow_private_address_access, 1, Seek::Config.allow_private_address_access,
                                "Allow private network address access", "Allow SEEK to access URLs that resolve to private network addresses, e.g. 127.0.0.1, 192.168.1.1, localhost, fd00::2") %>
 
+    <%= admin_text_setting(:session_store_timeout, Seek::Config.session_store_timeout.to_i / 60,
+                           'Session store timeout', 'The length of time, in MINUTES, that the server session store is active until it expires. (Requires a restart after changing)') %>
     <%= admin_checkbox_setting(:cache_remote_files, 1, Seek::Config.cache_remote_files,
                                "Cache remote files", "If this setting is enabled, SEEK will attempt to download remote content from the provided URL and store the content in the filestore.",
                                :onchange=>toggle_appear_javascript('cache_remote_block')) %>

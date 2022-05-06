@@ -1,0 +1,37 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "institutions",
+    "attributes": {
+      "avatar": null,
+      "title": "A Minimal Institution",
+      "country": "Germany",
+      "country_code": "DE",
+      "city": null,
+      "address": null,
+      "web_page": null,
+      "discussion_links": []
+    },
+    "relationships": {
+      "people": {
+        "data": []
+      },
+      "projects": {
+        "data": []
+      }
+    },
+    "links": {
+      "self": "/institutions/<%= res.id %>"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "uuid": "<%= res.uuid %>",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.3"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

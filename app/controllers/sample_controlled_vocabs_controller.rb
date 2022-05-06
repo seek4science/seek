@@ -4,7 +4,7 @@ class SampleControlledVocabsController < ApplicationController
   include Seek::IndexPager
   include Seek::AssetsCommon
 
-  before_action :samples_enabled?
+  before_action :samples_enabled?, except: :typeahead
   before_action :login_required, except: %i[show index]
   before_action :is_user_admin_auth, only: %i[destroy update]
   before_action :find_and_authorize_requested_item, except: %i[index new create]
@@ -53,7 +53,7 @@ class SampleControlledVocabsController < ApplicationController
   end
 
   def update
-    @sample_controlled_vocab.update_attributes(cv_params)
+    @sample_controlled_vocab.update(cv_params)
     respond_to do |format|
       if @sample_controlled_vocab.save
         format.html do
@@ -95,6 +95,7 @@ class SampleControlledVocabsController < ApplicationController
 
       client = Ebi::OlsClient.new
       terms = client.all_descendants(source_ontology, root_uri)
+      terms.reject! { |t| t[:iri] == root_uri } unless params[:include_root_term] == '1'
     rescue StandardError => e
       error_msg = e.message
     end

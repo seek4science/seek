@@ -17,7 +17,6 @@ def load_seek_config_defaults!
   Seek::Config.default :jws_online_root,"https://jws2.sysmo-db.org/"
   Seek::Config.default :internal_help_enabled, false
   Seek::Config.default :external_help_url,"https://docs.seek4science.org/help"
-  Seek::Config.default :sabiork_ws_base_url, "http://sabiork.h-its.org/sabioRestWebServices/"
   Seek::Config.default :exception_notification_enabled,false
   Seek::Config.default :exception_notification_recipients,""
   Seek::Config.default :hide_details_enabled,false
@@ -39,6 +38,7 @@ def load_seek_config_defaults!
   Seek::Config.default :community_news_feed_urls,''
   Seek::Config.default :community_news_number_of_entries,10
   Seek::Config.default :home_description, 'You can configure the text that goes here within the Admin pages: Site Configuration->Home page settings.'
+  Seek::Config.default :home_description_position, 'side'
   Seek::Config.default :tagline_prefix, 'Find, share and exchange <b>Data</b>, <b>Models</b> and <b>Processes</b> within the'
   Seek::Config.default :publish_button_enabled, true
   Seek::Config.default :auth_lookup_enabled,true
@@ -53,8 +53,6 @@ def load_seek_config_defaults!
   Seek::Config.default :modelling_analysis_enabled,true
   Seek::Config.default :human_diseases_enabled, false
   Seek::Config.default :guide_box_enabled,true
-  Seek::Config.default :factors_studied_enabled,false
-  Seek::Config.default :experimental_conditions_enabled,false
   Seek::Config.default :tagging_enabled, true
   Seek::Config.default :authorization_checks_enabled, true
   Seek::Config.default :documentation_enabled,true
@@ -65,7 +63,6 @@ def load_seek_config_defaults!
   Seek::Config.default :technology_type_base_uri,"http://jermontology.org/ontology/JERMOntology#Technology_type"
   Seek::Config.default :modelling_analysis_type_base_uri,"http://jermontology.org/ontology/JERMOntology#Model_analysis_type"
   Seek::Config.default :profile_select_by_default,true
-  Seek::Config.default :project_hierarchy_enabled, false
   Seek::Config.default :show_announcements, true
   Seek::Config.default :programme_user_creation_enabled, false
   Seek::Config.default :programmes_open_for_projects_enabled, false
@@ -86,7 +83,13 @@ def load_seek_config_defaults!
   Seek::Config.default :samples_enabled, true
   Seek::Config.default :sops_enabled, true
   Seek::Config.default :workflows_enabled, false
-  Seek::Config.default :collections_enabled, false
+  Seek::Config.default :collections_enabled, true
+  Seek::Config.default :file_templates_enabled, true
+  Seek::Config.default :placeholders_enabled, false
+
+  #Observered variables
+  Seek::Config.default :observed_variables_enabled, false
+  Seek::Config.default :observed_variable_sets_enabled,false
 
   Seek::Config.default :doi_minting_enabled, false
   Seek::Config.default :time_lock_doi_for, 0
@@ -144,16 +147,8 @@ def load_seek_config_defaults!
   #the maximum size, in Mb, for a text file that can be indexed for search (too high and the indexing will timeout)
   Seek::Config.default :max_indexable_text_size,100
 
-  Seek::Config.default :is_virtualliver, false
-
   Seek::Config.default :related_items_limit,5
   Seek::Config.default :search_results_limit,5
-
-# Faceted Browsing and Faceted Search
-  Seek::Config.default :faceted_browsing_enabled, false
-  Seek::Config.default :facet_enable_for_pages, {:people => true, :projects => true, :institutions => true, :programmes => true, :investigations => true,:studies => true, :assays => true, :data_files => true, :models => true,:sops => true, :publications => true,:events => true, :strains => true, :presentations => true}
-  Seek::Config.default :faceted_search_enabled, false
-  Seek::Config.default :is_one_facet_instance, true
 
 # Others
   Seek::Config.default :type_managers_enabled,true
@@ -167,14 +162,8 @@ def load_seek_config_defaults!
   Seek::Config.default :session_store_timeout, 1.hour
   Seek::Config.default :cv_dropdown_limit, 100
 
-  #MERGENOTE - why are these here? they should be in the database under the Scale model. Maybe an old relic
-  Seek::Config.default :scales,["organism","liver","liverLobule","intercellular","cell"]
-
   # Admin setting to allow user impersonation, useful for debugging
   Seek::Config.default :admin_impersonation_enabled, false
-
-  #magic guest is a special user required by BioVel, where a logged out user adopts a special guest user, but still appears to be logged out
-  Seek::Config.default :magic_guest_enabled,false
 
   Seek::Config.default :recaptcha_enabled, false
 
@@ -210,7 +199,6 @@ def load_seek_config_defaults!
   Seek::Config.default :news_feed_urls,''
   Seek::Config.default :news_number_of_entries,10
   Seek::Config.default :recent_contributions_number_of_entries, 20
-  Seek::Config.default :front_page_buttons_enabled, false
   Seek::Config.default :tag_cloud_enabled,true
   Seek::Config.default :workflow_class_list_enabled,false
 
@@ -262,6 +250,7 @@ def load_seek_config_defaults!
   Seek::Config.default :sorting, {}
 
   Seek::Config.default :life_monitor_enabled, false
+  Seek::Config.default :git_support_enabled, false
 
   load_seek_testing_defaults! if Rails.env.test?
 end

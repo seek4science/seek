@@ -69,7 +69,7 @@ class CollectionTest < ActiveSupport::TestCase
       person.add_to_project_and_institution(Factory(:project), person.institutions.first)
       projects = person.projects
       assert_equal 2,projects.count
-      collection.update_attributes(project_ids: projects.map(&:id))
+      collection.update(project_ids: projects.map(&:id))
       collection.save!
       collection.reload
       assert_equal projects.sort, collection.projects.sort
@@ -181,7 +181,7 @@ class CollectionTest < ActiveSupport::TestCase
     assert_empty collection.items
     assert_empty collection.assets
 
-    types = Seek::Util.persistent_classes.select { |c| c.name != 'Project' && c.method_defined?(:collections) }
+    types = Seek::Util.persistent_classes.select { |c| c.name != 'Project' && c.name != 'Collection' && c.method_defined?(:collections) }
     types.each do |type|
       opts = [type.name.underscore.to_sym]
       opts << { policy: Factory(:public_policy) } if type.method_defined?(:policy)

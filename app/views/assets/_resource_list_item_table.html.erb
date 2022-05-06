@@ -12,15 +12,6 @@
    avatar_content = avatar_partial.blank? ? nil : render(:partial=> avatar_partial,:locals=>{:resource => resource})
 
    access_based_css_class = "list_item"
-   if Seek::Config.is_virtualliver
-     access_based_css_class += if resource.respond_to?(:private?) && resource.private?
-                                               " private_list_item"
-                                             elsif resource.respond_to?(:public?) && resource.public?
-                                               " public_list_item"
-                                             else
-                                               ""
-                                             end
-   end
 
    content_grid_size = 9
    content_grid_size += 1 if avatar_content.blank?
@@ -50,6 +41,8 @@
       <td><%= table_item_person_list resource.creators %></td>
     <% when "assay_type_uri"%>
       <td><%= link_to_assay_type(resource) %></td>
+    <% when "technology_type_uri"%>
+      <td><%= link_to_technology_type(resource) %></td>
     <% else  %>
       <% if resource.respond_to?(column) %>
         <td><%= text_or_not_specified(resource.send(column),length: 300, auto_link: true, none_text: "") %></td>

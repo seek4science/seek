@@ -5,25 +5,10 @@ class CollectionsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include SharingFormTestHelper
   include MockHelper
   include HtmlHelper
   include GeneralAuthorizationTestCases
-
-  def test_json_content
-    login_as(Factory(:user))
-    super
-  end
-
-  def rest_api_test_object
-    @object = Factory(:public_collection)
-  end
-
-  def edit_max_object(collection)
-    add_tags_to_test_object(collection)
-    add_creator_to_test_object(collection)
-  end
 
   test 'should return 406 when requesting RDF' do
     login_as(Factory(:user))
@@ -42,6 +27,21 @@ class CollectionsControllerTest < ActionController::TestCase
 
     assert_response :success
     assert assigns(:collections).any?
+  end
+
+  test 'should not duplicate maintainer' do
+    person = Factory(:person)
+    login_as(person.user)
+    collection = Factory(:public_collection, title: 'my collection',contributor:person, creators:[person, Factory(:person)])
+
+    get :index
+    assert_response :success
+    assert_equal 1, assigns(:collections).count
+
+    assert_select 'div.list_item' do
+      assert_select '.list_item_title', text:'my collection'
+      assert_select '.rli-person-list a[href=?]',person_path(person),count:1
+    end
   end
 
   test "shouldn't show hidden items in index" do

@@ -38,6 +38,11 @@ module TagsHelper
     end.join('').html_safe
   end
 
+  # defined tags with a count above or equal to the configured threshold
+  def tags_above_threshold
+    TextValue.all_tags.select { |tag| tag.tag_count >= Seek::Config.tag_threshold }
+  end
+
   # determines whether the tag cloud should be immediately updated, dependent on the number of tags. A large number of tags can make rebuilding it
   # an expensive process on the next page reload. The limit is based upon the number of visible tags set in the configuration
   def immediately_clear_tag_cloud?

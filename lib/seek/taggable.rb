@@ -24,7 +24,7 @@ module Seek
     end
 
     def tags_as_text_array
-      annotations.include_values.with_attribute_name('tag').map(&:value_content)
+      annotations.order(:id).include_values.with_attribute_name('tag').map(&:value_content)
     end
   end
 end

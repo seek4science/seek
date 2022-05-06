@@ -1,18 +1,30 @@
 <% cancel_path ||= workflows_path %>
-<% new_version ||= false %>
 
-<div>
-  <ul class="nav nav-pills nav-stacked" role="tablist">
-    <li class="active" role="presentation"><a href="#new-ro-crate" aria-controls="new-ro-crate" role="tab" data-toggle="tab">Simple</a></li>
-    <li role="presentation"><a href="#existing-ro-crate" aria-controls="existing-ro-crate" role="tab" data-toggle="tab">Advanced (<em>Workflow RO-Crate</em>)</a></li>
-  </ul>
+<div class="row">
+  <div class="col-sm-3 col-md-2">
+    <ul class="nav nav-pills nav-stacked" role="tablist">
+      <li class="active" role="presentation">
+        <a href="#new-ro-crate" aria-controls="new-ro-crate" role="tab" data-toggle="tab">
+          <%= t('workflows.register.files') %>
+        </a>
+      </li>
+      <li role="presentation">
+        <a href="#git-repo" aria-controls="git-repo" role="tab" data-toggle="tab">
+          <%= t('workflows.register.git') %>
+        </a>
+      </li>
+      <li role="presentation">
+        <a href="#existing-ro-crate" aria-controls="existing-ro-crate" role="tab" data-toggle="tab">
+          <%= t('workflows.register.ro_crate') %>
+        </a>
+      </li>
+    </ul>
+  </div>
 
-  <br/>
-
-  <div class="tab-content">
-    <div id="new-ro-crate" role="tabpanel" class="tab-pane active">
-      <%= form_tag({ action: :create_ro_crate, anchor: 'new-ro-crate' }, multipart: true) do -%>
-        <div class="asset_form">
+  <div class="col-sm-9 col-md-10">
+    <div class="tab-content">
+      <div id="new-ro-crate" role="tabpanel" class="tab-pane active">
+        <%= form_tag({ action: :create_from_files, anchor: 'new-ro-crate' }, multipart: true) do -%>
           <%= error_messages_for :workflow -%>
           <%= error_messages_for :crate_builder, header_message: "Could not build Workflow RO-Crate" -%>
 
@@ -20,13 +32,29 @@
             <div class="form-group">
               <label class="required">Workflow</label>
               <p class="help-block">The main executable workflow.</p>
-              <%= render partial: 'assets/upload', locals: { field_name: 'ro_crate[workflow]', param: params.dig(:ro_crate, :workflow) } -%>
+              <%= render partial: 'assets/upload', locals: { field_name: 'ro_crate[main_workflow]', param: params.dig(:ro_crate, :main_workflow) } -%>
             </div>
 
             <div class="form-group">
               <%= render partial: 'workflows/workflow_class_form', locals: { selected: @workflow.workflow_class_id } %>
               <p class="help-block">The type of the above workflow.</p>
             </div>
+
+            <script>
+                // Auto-select workflow class based on file extension.
+                $j(document).ready(function () {
+                    $j('#ro_crate_main_workflow_data').change(function () {
+                        var parts = $j(this).val().split('.');
+                        var ext = parts[parts.length - 1];
+                        $j('#workflow_class_id option').each(function () {
+                            var o = $j(this);
+                            if (o.data('fileExtensions') && o.data('fileExtensions').includes(ext)) {
+                                $j('#workflow_class_id').val(o.val());
+                            }
+                        });
+                    });
+                });
+            </script>
           <% end %>
 
           <%= panel do %>
@@ -44,52 +72,52 @@
               <%= render partial: 'assets/upload', locals: { field_name: 'ro_crate[diagram]', param: params.dig(:ro_crate, :diagram), file_field_opts: { accept: 'image/*' } } -%>
             </div>
           <% end %>
-        </div>
 
-        <% if new_version %>
-          <div class="form-group">
-            <label>Revision comments (optional)</label>
-            <%= text_area_tag :revision_comments, nil, size: '55x4', class: 'form-control' -%>
+          <div>
+            <%= create_button class: 'btn btn-primary'-%>
+            or <%= cancel_button(cancel_path) -%>
           </div>
+        <% end -%>
+      </div>
 
-          <%= hidden_field_tag(:workflow_id, @workflow.id) %>
-        <% end %>
-
-        <div>
-          <%= create_button class: 'btn btn-primary'-%>
-          or <%= cancel_button(cancel_path) -%>
-        </div>
-      <% end -%>
-    </div>
-
-    <div id="existing-ro-crate" role="tabpanel" class="tab-pane">
-      <%= form_tag({ action: :create_content_blob, anchor: 'existing-ro-crate' }, multipart: true) do -%>
-        <div class="asset_form">
+      <div id="git-repo" role="tabpanel" class="tab-pane">
+        <%= form_tag({ action: :create_from_git, anchor: 'git-repo' }) do -%>
           <%= error_messages_for :workflow -%>
 
           <%= panel do %>
             <div class="form-group">
-              <label class="required">Workflow RO-Crate</label>
-              <p class="help-block">The zipped <a href="https://github.com/workflowhub-eu/about/wiki/Workflow-RO-Crate" target="_blank">Workflow RO-Crate</a>.</p>
-              <%= render partial: 'assets/upload', locals: { file_field_opts: { accept: '.zip' } } -%>
+              <label class="required">URL</label>
+              <p class="help-block">URL to the git repository. Should end in ".git".</p>
+              <%= text_field_tag 'workflow[git_version_attributes][remote]', nil, placeholder: 'https://github.com/example/repository.git', class: 'form-control' -%>
             </div>
-          <% end %>
-
-          <% if new_version %>
-            <div class="form-group">
-              <label>Revision comments (optional)</label>
-              <%= text_area_tag :revision_comments, nil, size: '55x4', class: 'form-control' -%>
-            </div>
-
-            <%= hidden_field_tag(:workflow_id, @workflow.id) %>
           <% end %>
 
           <div>
             <%= create_button class: 'btn btn-primary'-%>
             or <%= cancel_button(cancel_path) -%>
           </div>
-        </div>
-      <% end -%>
+        <% end -%>
+      </div>
+
+      <div id="existing-ro-crate" role="tabpanel" class="tab-pane">
+        <%= form_tag({ action: :create_from_ro_crate, anchor: 'existing-ro-crate' }, multipart: true) do -%>
+          <%= error_messages_for :workflow -%>
+          <%= error_messages_for :crate_extractor -%>
+
+          <%= panel do %>
+            <div class="form-group">
+              <label class="required">Workflow RO-Crate</label>
+              <p class="help-block">The zipped <a href="https://github.com/workflowhub-eu/about/wiki/Workflow-RO-Crate" target="_blank">Workflow RO-Crate</a>.</p>
+              <%= render partial: 'assets/upload', locals: { field_name: 'ro_crate', param: params[:ro_crate], file_field_opts: { accept: '.zip' } } -%>
+            </div>
+          <% end %>
+
+          <div>
+            <%= create_button class: 'btn btn-primary'-%>
+            or <%= cancel_button(cancel_path) -%>
+          </div>
+        <% end -%>
+      </div>
     </div>
   </div>
 </div>

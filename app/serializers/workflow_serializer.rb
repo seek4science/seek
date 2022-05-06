@@ -7,6 +7,14 @@ class WorkflowSerializer < ContributedResourceSerializer
     }
   end
 
+  attribute :edam_operations do
+    edam_annotations('edam_operations')
+  end
+  attribute :edam_topics do
+    edam_annotations('edam_topics')
+  end
+
+
   has_many :people
   has_many :projects
   has_many :investigations
@@ -17,11 +25,7 @@ class WorkflowSerializer < ContributedResourceSerializer
 
   attribute :internals
 
-  def _links
-    if get_version.content_blob.file_exists? && (get_version.diagram_exists? rescue false)
-      super.merge(diagram: diagram_workflow_path(object, version: get_version.version))
-    else
-      super
-    end
+  link(:diagram, if: -> { get_version.diagram_exists? }) do
+    diagram_workflow_path(object, version: get_version.version)
   end
 end

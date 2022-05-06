@@ -3,7 +3,7 @@ module AuthenticatedSystem
   # Returns true or false if the user is logged in.
   # Preloads @current_user with the user model if they're logged in.
   def logged_in?
-    current_user && !current_user.guest?
+    current_user
   end
 
   # Accesses the current user from the session.
@@ -12,7 +12,7 @@ module AuthenticatedSystem
     if defined? @current_user
       @current_user
     else
-      self.current_user = (user_from_session || user_from_doorkeeper  || user_from_basic_auth || user_from_cookie || user_from_api_token || User.guest)
+      self.current_user = (user_from_session || user_from_doorkeeper  || user_from_basic_auth || user_from_cookie || user_from_api_token)
     end
   end
 

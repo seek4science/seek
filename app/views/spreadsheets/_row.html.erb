@@ -22,8 +22,6 @@
  %>
  <% per_page = params[:page_rows].try(:to_i) || default_per_page %>
 
- <%= render :partial => "spreadsheets/export" %>
-
  <div  class="spreadsheet_container <%= object_id %>" onselectstart="return false;" >
 
    <% sheet_array.each_with_index do |sheet_row_array, sheet_index| %>

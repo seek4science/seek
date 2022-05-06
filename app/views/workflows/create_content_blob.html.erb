@@ -31,7 +31,7 @@
               $j('#error-message').html(jqXHR.responseText);
             },
             success: function () {
-              window.location='<%= provide_metadata_workflows_path(workflow_class_id: @workflow.workflow_class_id) %>'
+              window.location='<%= provide_metadata_workflows_path(legacy: true, workflow_class_id: @workflow.workflow_class_id) %>'
             }
         });
     })

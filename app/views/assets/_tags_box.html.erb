@@ -8,7 +8,9 @@
    existing_tags = owner_item_tags.map(&:text).uniq
 %>
 <%= panel(title, :id => "tags_box", :help_text => "Tagging an item helps describe it and other people find it. You can contribute by applying your own tags to this item. The weight of a tag indicates how often it has been used.") do %>
-  <%= render :partial=>"tags/tag_cloud", :locals=>{:tags=>all_item_tags, :show_overall_count=>true, :id=>"tag_cloud", :tags_smaller=>true, :no_tags_text=>"This item has not yet been tagged."} %>
+  <div id='tag_cloud' class='tags_smaller'>
+    <%= render :partial=>"tags/tag_cloud", :locals=>{:tags=>all_item_tags, :no_tags_text=>"This item has not yet been tagged."} %>
+  </div>
   <% if current_user %>
     <hr/>
     <div class="text-center">

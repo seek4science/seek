@@ -1,21 +1,12 @@
 <%= panel("EDAM Properties", :body_options => { :class => 'text-center' }) do %>
 
-  <% if resource.edam_topics.any? %>
-    <div>
-      <strong>Topics</strong>
-    </div>
-    <div>
-      <%= edam_ontology_items(resource.edam_topic_values) %>
-    </div>
-  <% end %>
+  <%= render :partial => "assets/edam_property_box", :locals => {:resource => resource, :subtree => "topics"} -%>
 
-  <% if resource.edam_operations.any? %>
-    <div>
-      <strong>Operations</strong>
-    </div>
-    <div>
-      <%= edam_ontology_items(resource.edam_operation_values) %>
-    </div>
-  <% end %>
+  <%= render :partial => "assets/edam_property_box", :locals => {:resource => resource, :subtree => "operations"} -%>
+
+  <%= render :partial => "assets/edam_property_box", :locals => {:resource => resource, :subtree => "data"} -%>
+
+  <%= render :partial => "assets/edam_property_box", :locals => {:resource => resource, :subtree => "formats"} -%>
+
 
 <% end %>

@@ -1,4 +1,4 @@
-FROM ruby:2.6-buster
+FROM ruby:2.7-buster
 
 LABEL maintainer="Stuart Owen <orcid.org/0000-0003-2130-0865>, Finn Bacall"
 
@@ -9,7 +9,7 @@ ENV RAILS_ENV=production
 ENV LANG="en_US.UTF-8" LANGUAGE="en_US:UTF-8" LC_ALL="C.UTF-8"
 
 RUN apt-get update -qq && \
-    apt-get install -y --no-install-recommends build-essential git \
+    apt-get install -y --no-install-recommends build-essential cmake gettext graphviz git \
 		libcurl4-gnutls-dev libmagick++-dev libpq-dev libreadline-dev \
 		libreoffice libsqlite3-dev libssl-dev libxml++2.6-dev \
 		libxslt1-dev locales default-mysql-client nginx nodejs openjdk-11-jdk-headless \
@@ -26,8 +26,6 @@ RUN chown -R www-data $APP_DIR /var/www
 USER www-data
 
 WORKDIR $APP_DIR
-
-
 
 # Bundle install throw errors if Gemfile has been modified since Gemfile.lock
 COPY Gemfile* ./
@@ -71,11 +69,8 @@ RUN curl -fsSLO "$SUPERCRONIC_URL" \
  && mv "$SUPERCRONIC" "/usr/local/bin/${SUPERCRONIC}" \
  && ln -s "/usr/local/bin/${SUPERCRONIC}" /usr/local/bin/supercronic
 
-# NGINX config
-COPY docker/nginx.conf /etc/nginx/nginx.conf
-
-# Cleanup
-RUN rm -rf /tmp/* /var/tmp/*
+# Cleanup and remove default nginx index page
+RUN rm -rf /tmp/* /var/tmp/* /usr/share/nginx/html/index.html
 
 USER www-data
 

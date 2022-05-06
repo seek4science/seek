@@ -22,9 +22,8 @@ class AvatarsController < ApplicationController
   # POST /people/1/avatars
   # POST /people
   def create
-    # the creation of the new Avatar instance needs to have only one parameter - therefore, the rest should be set separately
     @avatar = @avatar_owner_instance.avatars.build(avatar_params)
-    @avatar.original_filename = (params[:avatar][:image_file]).original_filename
+    @avatar.original_filename = avatar_params[:image_file].original_filename if avatar_params[:image_file]
 
     respond_to do |format|
       if @avatar.save
@@ -33,7 +32,7 @@ class AvatarsController < ApplicationController
         # so multiple redirect options are possible -> now return link is passed as a parameter
         format.html { redirect_to(params[:return_to] + "?use_unsaved_session_data=true") }
       else
-        format.html { render action: 'new' }
+        format.html { render action: 'new', status: :unprocessable_entity }
       end
     end
   end
@@ -55,10 +54,6 @@ class AvatarsController < ApplicationController
     respond_to do |format|
       format.html do
         send_file(@avatar.full_cache_path(size), :type => "image/#{avatar_format}", :disposition => 'inline')
-      end
-      format.xml do
-        @cache_file=@avatar.full_cache_path(size)
-        @type="image/#{avatar_format}"
       end
     end
 
@@ -127,7 +122,7 @@ class AvatarsController < ApplicationController
   end
 
   def avatar_params
-    params.require(:avatar).permit(:image_file)
+    params.fetch(:avatar, {}).permit(:image_file)
   end
 
   def find_avatars

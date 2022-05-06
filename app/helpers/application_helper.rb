@@ -77,11 +77,11 @@ module ApplicationHelper
   def persistent_resource_id(resource)
     # FIXME: this contains some duplication of Seek::Rdf::RdfGeneration#rdf_resource - however not every model includes that Module at this time.
     # ... its also a bit messy handling the version
-    url = if resource.class.name.include?('::Version')
-            URI.join(Seek::Config.site_base_host + '/', "#{resource.parent.class.name.tableize}/", "#{resource.parent.id}?version=#{resource.version}").to_s
+    url = if resource.is_a_version?
+            polymorphic_url(resource.parent, version: resource.version, **Seek::Config.site_url_options)
           else
-            URI.join(Seek::Config.site_base_host + '/', "#{resource.class.name.tableize}/", resource.id.to_s).to_s
-    end
+            polymorphic_url(resource, **Seek::Config.site_url_options)
+          end
 
     content_tag :p, class: :id do
       content_tag(:strong) do
@@ -100,11 +100,7 @@ module ApplicationHelper
 
   def authorized_list(all_items, attribute, sort = true, max_length = 75, count_hidden_items = false)
     items = all_items.select(&:can_view?)
-    title_only_items = if Seek::Config.is_virtualliver
-                         (all_items - items).select(&:title_is_public?)
-                       else
-                         []
-                       end
+    title_only_items = []
 
     if count_hidden_items
       original_size = all_items.size
@@ -225,7 +221,9 @@ module ApplicationHelper
       res = white_list(res)
       res = truncate_without_splitting_words(res, options[:length]) if options[:length]
       if options[:markdown]
-        res = render_markdown(res)
+        # Convert `&gt;` etc. back to `>` so markdown blockquotes can be used.
+        # The markdown renderer will cope with rogue `>`s that are not part of quotes.
+        res = render_markdown(CGI::unescapeHTML(res))
       elsif options[:description] || options[:address]
         res = simple_format(res, {}, sanitize: false).html_safe
       end
@@ -432,16 +430,6 @@ module ApplicationHelper
     c.singularize.camelize.constantize
   end
 
-  # returns the instance for the resource for the controller, e.g @data_file for data_files
-  def resource_for_controller(c = controller_name)
-    instance_variable_get("@#{c.singularize}")
-  end
-
-  # returns the current version of the resource for the controller, e.g @display_data_file for data_files
-  def versioned_resource_for_controller(c = controller_name)
-    instance_variable_get("@display_#{c.singularize}")
-  end
-
   def cancel_button(path, html_options = {})
     html_options[:class] ||= ''
     html_options[:class] << ' btn btn-default'
@@ -474,7 +462,7 @@ module ApplicationHelper
 
   # whether manage attributes should be shown, dont show if editing (rather than new or managing)
   def show_form_manage_specific_attributes?
-    !(action_name == 'edit' || action_name == 'update')
+    !(action_name == 'edit' || action_name == 'update' || action_name == 'update_paths') # TODO: Figure out a better check here...
   end
 
   def pending_project_creation_request?
@@ -524,6 +512,12 @@ module ApplicationHelper
                   'publications' => 'Publications', 'investigations' => I18n.t('investigation').pluralize, 'studies' => I18n.t('study').pluralize,
                   'samples' => 'Samples', 'strains' => 'Strains', 'organisms' => 'Organisms', 'human_disease' => 'Human Diseases', 'biosamples' => 'Biosamples', 'sample_types' => 'Sample Types','templates' => 'Templates',
                   'presentations' => I18n.t('presentation').pluralize, 'programmes' => I18n.t('programme').pluralize, 'events' => I18n.t('event').pluralize, 'help_documents' => 'Help' }.freeze
+
+  def show_page_tab
+    return 'overview' unless params.key?(:tab)
+
+    params[:tab]
+  end
 end
 
 class ApplicationFormBuilder < ActionView::Helpers::FormBuilder

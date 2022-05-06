@@ -15,7 +15,7 @@ class Workflow < ApplicationRecord
 
   has_edam_annotations
 
-  validates :projects, presence: true, projects: { self: true }, unless: Proc.new {Seek::Config.is_virtualliver }
+  validates :projects, presence: true, projects: { self: true }
 
   #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
   has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
@@ -28,6 +28,33 @@ class Workflow < ApplicationRecord
   has_many :data_files, ->{ distinct }, through: :workflow_data_files
 
   accepts_nested_attributes_for :workflow_data_files
+
+  git_versioning(sync_ignore_columns: ['test_status']) do
+    include WorkflowExtraction
+
+    acts_as_doi_mintable(proxy: :parent, general_type: 'Workflow')
+
+    before_save :refresh_internals, if: -> { main_workflow_path_changed? && !main_workflow_blob.empty? }
+    after_save :clear_cached_diagram, if: -> { diagram_path_changed? }
+
+    def maturity_level
+      Workflow::MATURITY_LEVELS[super]
+    end
+
+    def workflow_class
+      WorkflowClass.find_by_id(workflow_class_id)
+    end
+
+    def search_terms
+      terms = []
+
+      main = main_workflow_blob
+      terms += main_workflow_blob.text_contents_for_search if main
+      readme = git_version.get_blob('README.md')
+      terms += readme.text_contents_for_search if readme
+      terms
+    end
+  end
 
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi', 'test_status']) do
     after_commit :submit_to_life_monitor, on: [:create, :update]
@@ -76,6 +103,12 @@ class Workflow < ApplicationRecord
     def sync_test_status
       parent.update_column(:test_status, Workflow::TEST_STATUS_INV[test_status]) if latest_version?
     end
+  end
+
+  attr_reader :extracted_metadata
+  def provide_metadata(metadata)
+    @extracted_metadata = metadata
+    assign_attributes(metadata)
   end
 
   def workflow_data_files_attributes=(attributes)
@@ -150,4 +183,12 @@ class Workflow < ApplicationRecord
         end
       }
   )
+
+  def edam_data_vocab
+    nil
+  end
+
+  def edam_formats_vocab
+    nil
+  end
 end
