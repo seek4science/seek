@@ -9,10 +9,12 @@ sample_characteristic:
 protocol:
   title: protocol
 otherMaterial:
-  title: otherMaterial
+  title: other_material
 otherMaterial_characteristic:
-  title: otherMaterial_characteristic
+  title: other_material_characteristic
 dataFile:
-  title: dataFile
+  title: data_file
+dataFileComment:
+  title: data_file_comment
 parameter_value:
   title: parameter_value
