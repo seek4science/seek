@@ -150,23 +150,10 @@ We would strongly recommend using [Lets Encrypt](https://letsencrypt.org/) for f
 
 ### Setting up the services
 
-The following steps show how to setup sunspot:solr search, delayed_job and
+The following steps show how to setup delayed_job and
 soffice to run as a service, and automatically start and shutdown when you
-restart the server.
+restart the server. Apache Solr should already be setup from following the [Setting up Solr](setting-up-solr) instructions.
 
-#### Search Service
-
-Create the file /etc/init.d/solr-seek and copy the contents of
-[scripts/solr-seek](scripts/solr-seek) into it.
-
-Then run
-
-    sudo chmod +x /etc/init.d/solr-seek
-    sudo update-rc.d solr-seek defaults
-
-start it up with:
-
-    sudo /etc/init.d/solr-seek start
 
 #### Delayed Job Background Service
 
@@ -181,18 +168,4 @@ The run:
 start it up with:
 
     sudo /etc/init.d/delayed_job-seek start
-
-### The LibreOffice Soffice service
-
-Create the file /etc/init.d/soffice and copy the contents of
-[scripts/soffice](scripts/soffice) into it.
-
-The run:
-
-    sudo chmod +x /etc/init.d/soffice
-    sudo update-rc.d soffice defaults
-
-start it up with:
-
-    sudo /etc/init.d/soffice start
 

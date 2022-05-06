@@ -41,14 +41,9 @@ When upgrading between patch versions, it should only be necessary to run
     bundle install
     bundle exec rake seek:upgrade 
 
-## Steps to upgrade from 1.10.x to 1.11.x
+## Steps to upgrade from 1.11.x to 1.12.x
 
-### Upgrading Ruby
-
-You will need to upgrade Ruby to Ruby 2.6.6. If you are using [RVM](https://rvm.io/) (according to the [Installation Guide](install.html) )you should be prompted to install during the standard installation steps that follow.
-If you are not prompted you can install with the command:
-
-    rvm install ruby-2.6.6
+**Note** the requirement to setup Apache Solr, which is no longer bundled together with FAIRDOM-SEEK.
 
 ### Set RAILS_ENV
               
@@ -68,17 +63,17 @@ If you have an existing installation linked to our GitHub, you can fetch the
 files with:
 
     git pull
-    git checkout v1.11.3
+    git checkout v1.12.0
 
 ### Updating using the tarball
 
 You can download the file from
-<https://github.com/seek4science/seek/archive/v1.11.3.tar.gz> You can
+<https://github.com/seek4science/seek/archive/v1.12.0.tar.gz> You can
 unpack this file using:
 
-    tar zxvf seek-1.11.3.tar.gz
+    tar zxvf seek-1.12.0.tar.gz
     mv seek seek-previous
-    mv seek-1.11.3 seek
+    mv seek-1.12.0 seek
     cd seek/
 
 and then copy across your existing filestore and database configuration file
@@ -86,7 +81,12 @@ from your previous installation and continue with the upgrade steps. The
 database configuration file you would need to copy is _config/database.yml_,
 and the filestore is simply _filestore/_
 
-If you have a modified _config/sunspot.yml_ you will also need to copy that across.
+### Upgrading Ruby
+
+You are recommended to upgrade to Ruby 2.7. If you are using [RVM](https://rvm.io/) (according to the [Installation Guide](install.html) )you should be prompted to install during the standard installation steps that follow.
+If you are not prompted you can install with the command:
+
+    rvm install $(cat .ruby-version)
 
 ### Doing the upgrade
 
@@ -102,18 +102,27 @@ content.
     bundle exec rake seek:upgrade
     bundle exec rake assets:precompile # this task will take a while       
 
-### Setup Cron Services
+### Update Cron Services
 
-This version includes an update to ActiveJob and requires some cron jobs for periodic background jobs to run. To set these up run:
+SEEK requires some cron jobs for periodic background jobs to run. To update these run:
 
     bundle exec whenever --update-crontab
 
-### Restarting services
+### Setting up Apache Solr
+
+The [Apache Solr Search Engine](https://solr.apache.org/) now needs to be set up separately. 
+It is relatively straightforward and there are instructions on how to do this in [Setting Up Solr](setting-up-solr).
+
+
+### Restarting background job services
 
     bundle exec rake sunspot:solr:start
-    bundle exec rake seek:workers:start                
-    
-    bundle exec rake tmp:clear  
+    bundle exec rake tmp:clear 
+
+## Stopping soffice
+
+From version 1.12.0 it is no longer necessary to run soffice as a service. If you had previously set up the _/etc/init.d/soffice_ service, 
+you now stop and remove this (the soffice executable from LibreOffice is still required though). 
 
            
 ---

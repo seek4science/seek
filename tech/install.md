@@ -26,10 +26,10 @@ would be beneficial if it is new to you. Documentation and resources
 describing Ruby on Rails can be found at http://rubyonrails.org/documentation
 .
 
-SEEK is built upon the 5.2 version of Rails, and requires Ruby 2.6.
+SEEK is built upon the 5.2 version of Rails, and requires Ruby 2.7.
 
 We recommend that you run SEEK on a Linux system. This guide is based on an
-[Ubuntu (18.04 LTS)](http://releases.ubuntu.com/18.04/) system. However, running on other Linux distributions the
+[Ubuntu (20.04 LTS)](http://releases.ubuntu.com/20.04/) system. However, running on other Linux distributions the
 main difference is the name of the required packages that have to be installed
 for that distribution, other than that the steps will be the same. If you want
 to install on different distribution or version please visit [Other
@@ -64,14 +64,14 @@ The remaining packages are:
 
     sudo apt install build-essential git imagemagick libcurl4-gnutls-dev libgmp-dev \
         libmagick++-dev libmysqlclient-dev libpq-dev libreadline-dev libreoffice libssl-dev \
-        libxml++2.6-dev libxslt1-dev nodejs openjdk-8-jdk openssh-server poppler-utils zip
+        libxml++2.6-dev libxslt1-dev nodejs openjdk-11-jdk openssh-server poppler-utils zip
 
 Installing these packages now will make installing Ruby easier later on:
 
     sudo apt install autoconf automake bison curl gawk libffi-dev libgdbm-dev \
         libncurses5-dev libsqlite3-dev libyaml-dev sqlite3
         
-SEEK's Solr implementation currently requires Java 8, so you may need to switch the system's default Java runtime:
+SEEK's Solr implementation currently requires Java 11, so you may need to switch the system's default Java runtime:
 
     sudo update-alternatives --config java
     
@@ -192,34 +192,10 @@ a production server, following these steps is fine to check things are
 working. However, you should also read the [Installation for
 Production](install-production.html) guide for automating these services.
 
-### Starting and Stopping the Search Service
+### Setting up and starting the Search Service
 
-For a new installation, by default search is disabled. Before running the
-service you may need to enable search in the Administration setting. The SEEK
-server needs restarting whenever search is enabled or disabled.
-
-**If search is enabled and the following service is not running, you will get
-errors when adding or updating information in SEEK.**
-
-SEEK search is based upon the [Apache Lucene
-Solr](http://lucene.apache.org/solr/) service. To start this service run:
-
-    bundle exec rake sunspot:solr:start
-
-and to stop run:
-
-    bundle exec rake sunspot:solr:stop
-
-Optionally, there is also a configuration file for configuring the port and
-host that Solr runs on - which is important if running multiple SEEK
-installations on the same machine. If you wish to override the default ports
-then copy config/sunspot.default.yml to sunspot.yml and change the settings.
-
-The following task can also be run at any time if there is need to force all
-content to be reindexed (such as after a period of running SEEK with search
-turned off).
-
-    bundle exec rake seek:reindex_all
+SEEK uses the [Apache Solr Search Engine](https://solr.apache.org/) which since SEEK v1.12 needs setting up 
+separately. It is relatively straightforward and there are instructions on how to do this in [Setting Up Solr](setting-up-solr).
 
 ### Starting and Stopping the Background Service
 
@@ -237,19 +213,6 @@ and to stop run:
 you can also restart with
 
     bundle exec rake seek:workers:restart
-
-### Starting and Stopping the SOFFICE service
-
-SEEK uses the soffice service provided by
-[LibreOffice](https://www.libreoffice.org/) to convert various document
-formats to PDF and Text - to allow them to be viewed in a web browser, and to
-make them indexable to the search. To start soffice run:
-
-    soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard > /dev/null 2>&1 &
-
-and to stop it run:
-
-    killall -15 soffice
 
 ## Starting SEEK
 
