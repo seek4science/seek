@@ -38,7 +38,7 @@ This version includes:
 * **Moved related items into a tab** - the list of related items associated with the item shown have now been moved into a separate tab, rather than needing to
   scroll to the bottom of the page. There are also plans to move other information, such as versions and files, into
   additional tabs.
-* **Fixes and improvements running under a relative URL** - for those running SEEK under a relative URL (
+* **Fixes and improvements running to under a relative URL** - for those running SEEK under a relative URL (
   e.g. https://mysite.com/fairdom-seek/), some issues were found with incorrect links. These problems have now been
   fixed, for both Docker and Bare-metal installations, and the testing process improved.
 * **Batch registration of Samples through the API** - it is now possible to register Samples in batches through the API,
@@ -47,7 +47,7 @@ This version includes:
   being maintained and updated. This locked SEEK to an older version of Java. Solr has now been separated, that can be
   installed separately using the latest version, along with an updated configurations. A new updated Docker image is
   also now available.
-* **Workflow API enhancements** updates the GA4GH TRS API, allowing one click execution of Galaxy workflows, and support for registering an RO-Crate through the API.
+* **Workflow API enhancements** updates to support the GA4GH TRS API, allowing one click execution of Galaxy workflows, and support for registering an RO-Crate through the API.
 * **Extending the items a workflow can be linked to** - ability to link a workflow to Datafiles (as test, example and training data),
   Documents, SOPs, and Presentations as well as Publications.
 * **User defined workflow types** - users can now add to the selection of workflow types, if they can't find the one
