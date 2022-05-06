@@ -24,8 +24,9 @@ This version includes:
 * **Sample attributes enhancements** - attributes can be provided a description, which provides more details when
   entering or viewing a sample. They can also be given a persistent identifier, to provide a semantic definition of the
   attributes meaning.
-* **Improvements to defining describing Asset creators** - there is now an easier UI for definition item creators, as
-  well as being able to describe unregistered creators with more information.
+* **Improvements to how creators can be credited** - there is now an improved UI for crediting the creators, or authors,
+  of assets. Extra information, such their as ORCID and affiliation, can now be added for each creator, even if they are
+  not registered in SEEK. The exact order of how creators appear can also be specified.
 * **Explicit ordering of Investigations, Studies and Assays** - each can be provided with an explicit order within the
   other, rather than the order they are added. They can re-ordered at any time.
 * **Ability to link a Sample to multiple other samples** - previously, a sample could only be linked to a single other
@@ -42,8 +43,8 @@ This version includes:
   fixed, for both Docker and Bare-metal installations, and the testing process improved.
 * **Batch registration of Samples through the API** - it is now possible to register Samples in batches through the API,
   rather than one by one, to reduce the number of necessary calls and performance.
-* **Updated to use latest version of Apache SOLR** - the Apache SOLR that was being bundled with SEEK, was no longer
-  being maintained and updated. This locked SEEK to an older version of Java. SOLR has now been separated, that can be
+* **Updated to use latest version of Apache Solr** - the Apache Solr that was being bundled with SEEK, was no longer
+  being maintained and updated. This locked SEEK to an older version of Java. Solr has now been separated, that can be
   installed separately using the latest version, along with an updated configurations. A new updated Docker image is
   also now available.
 * **Workflow API enhancements** updates the GA4GH TRS API, allowing one click execution of Galaxy workflows, and support for registering an RO-Crate through the API.
