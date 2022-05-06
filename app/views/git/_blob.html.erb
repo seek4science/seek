@@ -46,6 +46,10 @@
 <% else %>
   <% if @blob.binary? %>
     <span class="subtle">Binary content not displayed</span>
+  <% elsif @blob.path.end_with?('.ipynb') %>
+    <div class="notebook-container">
+      <%= content_tag(:iframe, '', src: polymorphic_path([@parent_resource, :git_raw], display: 'notebook', version: @git_version.version, path: @blob.path)) -%>
+    </div>
   <% else %>
     <%= content_tag :pre, @blob.content %>
   <% end %>

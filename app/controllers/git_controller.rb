@@ -6,7 +6,7 @@ class GitController < ApplicationController
   before_action :authorized_to_edit, only: [:add_file, :remove_file, :move_file, :freeze]
   before_action :fetch_git_version
   before_action :get_tree, only: [:tree]
-  before_action :get_blob, only: [:blob, :download, :raw]
+  before_action :get_blob, only: [:blob, :download, :raw, :notebook]
   before_action :coerce_format
 
   user_content_actions :raw
@@ -51,6 +51,9 @@ class GitController < ApplicationController
   def raw
     if @blob.binary?
       send_data(@blob.content, filename: path_param.split('/').last, disposition: 'inline')
+    elsif params[:display] == 'notebook'
+      response.delete_header('Content-Security-Policy')
+      render body: @blob.notebook.html_safe, content_type: 'text/html'
     else
       # Set Content-Type if it's an image to allow use in img tags
       ext = path_param.split('/').last&.split('.')&.last&.downcase
