@@ -491,7 +491,7 @@ module IsaExporter
 						sample_attribute.sample_controlled_vocab.ols_root_term_uri
 					end
 			end
-			term_accession = is_ontology ? iri : ''
+			term_accession = iri || ''
 			termSource = term_accession.present? ? sample_attribute.sample_controlled_vocab.source_ontology : ''
 			{ termAccession: term_accession, termSource: termSource }
 		end
