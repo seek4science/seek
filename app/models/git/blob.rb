@@ -88,5 +88,19 @@ module Git
       io.rewind
       io
     end
+
+    def cache_key
+      "#{git_repository.id}-#{oid}"
+    end
+
+    def notebook
+      Rails.cache.fetch("notebook-#{cache_key}") do
+        f = Tempfile.new('ipynb')
+        f.binmode
+        f.write(file_contents)
+        f.rewind
+        `jupyter nbconvert --to html #{f.path} --stdout`
+      end
+    end
   end
 end
