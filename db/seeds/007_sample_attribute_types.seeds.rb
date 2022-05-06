@@ -80,7 +80,7 @@ data_file_type = SampleAttributeType.find_or_initialize_by(title: 'Registered Da
 data_file_type.update(base_type: Seek::Samples::BaseType::SEEK_DATA_FILE)
 
 ontology_type = SampleAttributeType.find_or_initialize_by(title:'Ontology')
-ontology_type.update_attributes(base_type: Seek::Samples::BaseType::CV)
+ontology_type.update(base_type: Seek::Samples::BaseType::CV)
 
 puts "Seeded #{SampleAttributeType.count - count} sample attribute types"
 
