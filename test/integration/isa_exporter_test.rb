@@ -7,6 +7,15 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
 	include SharingFormTestHelper
 
 	def setup
+		before_all
+	end
+
+	@@before_all_run = false
+
+	def before_all
+		return if @@before_all_run
+		@@before_all_run = true
+
 		@project = Factory(:project)
 		User.current_user = Factory(:user, login: 'test')
 		post '/session', params: { login: 'test', password: generate_user_password }
@@ -17,20 +26,209 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
 		with_config_value(:project_single_page_enabled, true) do
 			get "/single_pages/#{@project.id}/export_isa?investigation_id=#{@investigation.id}"
 		end
-		@response = response.body
+		@@response = response
 	end
 
-	test 'exported ISA-JSON should be encoded using UTF-8' do
-		assert_equal @response.encoding.name, 'UTF-8'
+	# 30 rules of ISA: https://isa-specs.readthedocs.io/en/latest/isajson.html#content-rules
+
+	# 1
+	test 'Files SHOULD be encoded using UTF-8' do
+		assert_equal @@response.body.encoding.name, 'UTF-8'
 	end
 
-	test 'exported ISA-JSON content must be well-formed JSON' do
-		assert valid_json?(@response)
+	# 2
+	test 'ISA-JSON content MUST be well-formed JSON' do
+		assert valid_json?(@@response.body)
 	end
 
-	test 'exported ISA-JSON content must validate against the ISA-JSON schemas' do
-		investigation = JSON.parse(@response)['investigation']
+	# 3
+	test 'ISA-JSON content MUST validate against the ISA-JSON schemas' do
+		investigation = JSON.parse(@@response.body)['investigation']
 		valid_isa_json?(JSON.generate(investigation))
+	end
+
+	# 4
+	test 'ISA-JSON files SHOULD be suffixed with a .json extension' do
+		assert @@response['Content-Disposition'].include? '.json'
+	end
+
+	# 5
+	test 'Dates SHOULD be supplied in the ISO8601 format “YYYY-MM-DD”' do
+		# gather all date key-value pairs
+		values = []
+		json = JSON.parse(@@response.body)
+		investigation = json['investigation']
+		studies = investigation['studies']
+		values << nested_hash_value(investigation, 'submissionDate')
+		values << nested_hash_value(investigation, 'publicReleaseDate')
+		studies.each do |s|
+			values << nested_hash_value(s, 'submissionDate')
+			values << nested_hash_value(s, 'publicReleaseDate')
+			s['processSequence'].each { |p| values << nested_hash_value(p, 'date') }
+			s['assays'].each { |a| a['processSequence'].each { |p| values << nested_hash_value(p, 'date') } }
+		end
+		values.each { |v| assert v == '' || valid_date?(v) }
+	end
+
+	# 8
+	test 'Characteristic Categories declared should be referenced by at least one Characteristic' do
+		characteristics, categories = [], []
+		json = JSON.parse(@@response.body)
+		studies = json['investigation']['studies']
+		studies.each do |s|
+			categories += s['characteristicCategories']
+			sources = s['materials']['sources']
+			samples = s['materials']['samples']
+			sources.each { |m| characteristics += m['characteristics'] }
+			samples.each { |m| characteristics += m['characteristics'] }
+			s['assays'].each do |a|
+				a['materials']['otherMaterials'].each { |o| characteristics += o['characteristics'] }
+				categories += a['characteristicCategories']
+			end
+		end
+		characteristics = characteristics.map { |c| c['category']['@id'] }
+		categories = categories.map { |c| c['@id'] }
+
+		categories.each { |c| assert characteristics.include?(c) }
+
+		# 9 'Characteristics must reference a Characteristic Category declaration'
+		characteristics.each { |c| assert categories.include?(c) }
+	end
+
+	# 10
+	test 'Unit Categories declared should be referenced by at least one Unit' do
+		# Not implemented
+	end
+
+	# 11
+	test 'Units must reference a Unit Category declaration.' do
+		# Not implemented
+	end
+
+	# 12
+	test 'All Sources and Samples must be declared in the Study-level materials section' do
+		json = JSON.parse(@@response.body)
+		studies = json['investigation']['studies']
+		sources, samples = [], []
+		studies.map do |s|
+			sources += s['materials']['sources'].map { |so| so['@id'] }
+			samples += s['materials']['samples'].map { |sa| sa['@id'] }
+		end
+		materials = sources + samples
+
+		all_sources_and_samples = @@source.samples.map { |s| "#source/#{s.id}" }
+		all_sources_and_samples += @@sample_collection.samples.map { |s| "#sample/#{s.id}" }
+
+		all_sources_and_samples.each { |s| assert materials.include?(s) }
+	end
+
+	# 13
+	test 'All other materials and DataFiles must be declared in the Assay-level material and data sections respectively' do
+		json = JSON.parse(@@response.body)
+		studies = json['investigation']['studies']
+		other_materials = []
+		studies.map do |s|
+			s['assays'].map do |a|
+				other_materials += a['materials']['otherMaterials'].map { |so| so['@id'] }
+				other_materials += a['dataFiles'].map { |so| so['@id'] }
+			end
+		end
+
+		# Collect all samples with tag=data_file and tag=other_material
+		assay_level_types = [@@assay_sample_type]
+		m =
+			assay_level_types
+				.select { |s| s.sample_attributes.detect { |sa| sa.isa_tag&.isa_other_material? } }
+				.map { |s| s.samples.map { |sample| "#other_material/#{sample.id}" } }
+		d =
+			assay_level_types
+				.select { |s| s.sample_attributes.detect { |sa| sa.isa_tag&.isa_data_file? } }
+				.map { |s| s.samples.map { |sample| "#other_material/#{sample.id}" } }
+		(m + d).flatten.each { |s| assert other_materials.include?(s) }
+	end
+
+	# 14
+	test 'Each Process in a Process Sequence MUST link with other Processes forwards or backwards, unless it is a starting or terminating Process' do
+	end
+
+	# 15
+	test 'Protocols declared SHOULD be referenced by at least one Protocol REF' do
+	end
+
+	# 16
+	test 'Protocol REFs MUST reference a Protocol declaration' do
+	end
+
+	# 17
+	test 'Study Factors declared SHOULD be referenced by at least one Factor Value' do
+	end
+
+	# 18
+	test 'Factor Values MUST reference a Study Factor declared in the Study-level factors section' do
+	end
+
+	# 19
+	test 'Protocols SHOULD have a name' do
+	end
+
+	# 20
+	test 'Protocol Parameters SHOULD have a name' do
+	end
+
+	# 21
+	test 'Study Factors SHOULD have a name' do
+	end
+
+	# 22
+	test 'Sources and Samples declared SHOULD be referenced by at least one Process at the Study-level' do
+	end
+
+	# 23
+	test 'Samples, other materials, and DataFiles declared SHOULD be used in at least one Process at the Assay-level.' do
+	end
+
+	# 24
+	test 'Study and Assay filenames SHOULD be present' do
+	end
+
+	# 25
+	test 'Ontology Source References declared SHOULD be referenced by at least one Ontology Annotation' do
+	end
+
+	# 26
+	test 'Ontology Annotations MUST reference a Ontology Source Reference declaration' do
+	end
+
+	# 27
+	test 'Ontology Source References MUST contain a Term Source Name' do
+	end
+
+	# 28
+	test 'Ontology Annotations with a term and/or accession MUST provide a Term Source REF pointing to a declared Ontology Source Reference' do
+		all_ontologies = []
+		ontology_source_reference = []
+	end
+
+	# 29
+	test 'Publication metadata SHOULD match that of publication record in PubMed corresponding to the provided PubMed ID.' do
+	end
+
+	# 30
+	test 'Comments MUST have a name' do
+		all_comments = []
+		all_comments.each { |c| assert c.key?('name') }
+	end
+end
+
+private
+
+def nested_hash_value(obj, key)
+	if obj.respond_to?(:key?) && obj.key?(key)
+		obj[key]
+	elsif obj.respond_to?(:each)
+		r = nil
+		obj.find { |*a| r = nested_hash_value(a.last, key) }
+		r
 	end
 end
 
@@ -44,7 +242,6 @@ def valid_json?(json)
 end
 
 def valid_isa_json?(json)
-	p json
 	definitions_path =
 		File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'isa_schemas', 'investigation_schema.json')
 	if File.readable?(definitions_path)
@@ -55,6 +252,14 @@ def valid_isa_json?(json)
 			raise Minitest::Assertion, msg
 		end
 	end
+end
+
+def valid_date?(date)
+	# '2016-09-18T17:34:02.666Z'
+	Date.iso8601(date.to_s)
+	return true
+rescue ArgumentError
+	false
 end
 
 def create_basic_isa_project
@@ -217,109 +422,113 @@ def create_basic_isa_project
 
 	# Create ISA Assay
 
-	sample_type =
+	assay_sample_type =
 		SampleType.new title: 'ISA Assay 1',
 		               project_ids: [@project.id],
 		               isa_template: Template.find_by_title('ISA Assay 1'),
 		               contributor: @current_user.person
-	sample_type.sample_attributes <<
+	assay_sample_type.sample_attributes <<
 		Factory(
 			:sample_attribute,
 			title: 'Input',
 			required: true,
-			sample_type: sample_type,
+			sample_type: assay_sample_type,
 			linked_sample_type_id: sample_collection.id,
 			sample_attribute_type: Factory(:sample_multi_sample_attribute_type)
 		)
-	sample_type.sample_attributes <<
+	assay_sample_type.sample_attributes <<
 		Factory(
 			:sample_attribute,
 			title: 'Protocol Assay 1',
 			required: true,
-			sample_type: sample_type,
+			sample_type: assay_sample_type,
 			isa_tag_id: IsaTag.find_by_title('protocol')&.id,
 			sample_attribute_type: Factory(:string_sample_attribute_type)
 		)
-	sample_type.sample_attributes <<
+	assay_sample_type.sample_attributes <<
 		Factory(
 			:sample_attribute,
 			title: 'Assay 1 parameter value 1',
 			required: true,
-			sample_type: sample_type,
+			sample_type: assay_sample_type,
 			isa_tag_id: IsaTag.find_by_title('parameter_value')&.id,
 			sample_attribute_type: Factory(:string_sample_attribute_type)
 		)
-	sample_type.sample_attributes <<
+	assay_sample_type.sample_attributes <<
 		Factory(
 			:sample_attribute,
 			title: 'Assay 1 parameter value 2',
 			required: false,
-			sample_type: sample_type,
+			sample_type: assay_sample_type,
 			isa_tag_id: IsaTag.find_by_title('parameter_value')&.id,
 			sample_attribute_type: Factory(:controlled_vocab_attribute_type),
 			sample_controlled_vocab_id: Factory(:apples_sample_controlled_vocab).id
 		)
 
-	sample_type.sample_attributes <<
+	assay_sample_type.sample_attributes <<
 		Factory(
 			:sample_attribute,
 			title: 'Assay 1 parameter value 3',
 			required: false,
-			sample_type: sample_type,
+			sample_type: assay_sample_type,
 			isa_tag_id: IsaTag.find_by_title('parameter_value')&.id,
 			sample_attribute_type: Factory(:controlled_vocab_attribute_type),
 			sample_controlled_vocab_id: Factory(:ontology_sample_controlled_vocab).id
 		)
-	sample_type.sample_attributes <<
+	assay_sample_type.sample_attributes <<
 		Factory(
 			:sample_attribute,
-			title: 'other material 1',
+			title: 'Extract Name',
 			is_title: true,
 			required: true,
-			sample_type: sample_type,
+			sample_type: assay_sample_type,
 			isa_tag_id: IsaTag.find_by_title('other_material')&.id,
 			sample_attribute_type: Factory(:string_sample_attribute_type)
 		)
-	sample_type.sample_attributes <<
+	assay_sample_type.sample_attributes <<
 		Factory(
 			:sample_attribute,
 			title: 'other material characteristic 1',
 			required: true,
-			sample_type: sample_type,
+			sample_type: assay_sample_type,
 			isa_tag_id: IsaTag.find_by_title('other_material_characteristic')&.id,
 			sample_attribute_type: Factory(:string_sample_attribute_type)
 		)
-	sample_type.sample_attributes <<
+	assay_sample_type.sample_attributes <<
 		Factory(
 			:sample_attribute,
 			title: 'other material characteristic 2',
 			required: false,
-			sample_type: sample_type,
+			sample_type: assay_sample_type,
 			isa_tag_id: IsaTag.find_by_title('other_material_characteristic')&.id,
 			sample_attribute_type: Factory(:controlled_vocab_attribute_type),
 			sample_controlled_vocab_id: Factory(:apples_sample_controlled_vocab).id
 		)
-	sample_type.sample_attributes <<
+	assay_sample_type.sample_attributes <<
 		Factory(
 			:sample_attribute,
 			title: 'other material characteristic 3',
 			required: false,
-			sample_type: sample_type,
+			sample_type: assay_sample_type,
 			isa_tag_id: IsaTag.find_by_title('other_material_characteristic')&.id,
 			sample_attribute_type: Factory(:controlled_vocab_attribute_type),
 			sample_controlled_vocab_id: Factory(:ontology_sample_controlled_vocab).id
 		)
-	sample_type.save!
+	assay_sample_type.save!
 
 	assay =
 		Factory(
 			:assay,
 			study: study,
-			sample_type: sample_type,
+			sample_type: assay_sample_type,
 			sop_ids: [Factory(:sop, policy: Factory(:public_policy)).id],
 			contributor: @current_user.person,
 			position: 0
 		)
+
+	@@source = source
+	@@sample_collection = sample_collection
+	@@assay_sample_type = assay_sample_type
 
 	# Create samples
 	sample_1 =
@@ -349,13 +558,13 @@ def create_basic_isa_project
 	sample_3 =
 		Factory :sample,
 		        title: 'sample_2',
-		        sample_type: sample_type,
+		        sample_type: assay_sample_type,
 		        project_ids: [@project.id],
 		        data: {
 				Input: [sample_2.id],
 				'Protocol Assay 1': 'Protocol Assay 1',
 				'Assay 1 parameter value 1': 'Assay 1 parameter value 1',
-				'other material 1': 'other material 1',
+				'Extract Name': 'Extract Name',
 				'other material characteristic 1': 'other material characteristic 1'
 		        }
 end

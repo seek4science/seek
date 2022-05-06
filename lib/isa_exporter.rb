@@ -8,11 +8,11 @@ module IsaExporter
 
 		def convert_investigation
 			isa_investigation = {}
-			isa_investigation[:identifier] = nil # @investigation.id
+			isa_investigation[:identifier] = '' # @investigation.id
 			isa_investigation[:title] = @investigation.title
-			isa_investigation[:description] = @investigation.description
-			isa_investigation[:submissionDate] = nil # @investigation.created_at.to_date.iso8601
-			isa_investigation[:publicReleaseDate] = nil # @investigation.created_at.to_date.iso8601
+			isa_investigation[:description] = @investigation.description || ''
+			isa_investigation[:submissionDate] = '' # @investigation.created_at.to_date.iso8601
+			isa_investigation[:publicReleaseDate] = '' # @investigation.created_at.to_date.iso8601
 			isa_investigation[:ontologySourceReferences] = convert_ontologies
 			isa_investigation[:filename] = "#{@investigation.title}.txt"
 			isa_investigation[:comments] = [
@@ -22,7 +22,7 @@ module IsaExporter
 					name: 'SEEK Project ID',
 					value: "#{Seek::Config.site_base_host}/single_pages/#{@investigation.projects.first.id}"
 				},
-				{ name: 'SEEK Investigation ID', value: @investigation.id }
+				{ name: 'SEEK Investigation ID', value: "#{@investigation.id}" }
 			]
 
 			publications = []
@@ -44,14 +44,14 @@ module IsaExporter
 
 		def convert_study(study)
 			isa_study = {}
-			isa_study[:identifier] = nil # study.id
+			isa_study[:identifier] = '' # study.id
 			isa_study[:title] = study.title
-			isa_study[:description] = study.description
-			isa_study[:submissionDate] = nil # study.created_at.to_date.iso8601
-			isa_study[:publicReleaseDate] = nil # study.created_at.to_date.iso8601
+			isa_study[:description] = study.description || ''
+			isa_study[:submissionDate] = '' # study.created_at.to_date.iso8601
+			isa_study[:publicReleaseDate] = '' # study.created_at.to_date.iso8601
 			isa_study[:filename] = "#{study.title}.txt"
 			isa_study[:comments] = [
-				{ name: 'SEEK Study ID', value: study.id },
+				{ name: 'SEEK Study ID', value: "#{study.id}" },
 				{ name: 'SEEK creation date', value: study.created_at.utc.iso8601 }
 			]
 
@@ -115,9 +115,9 @@ module IsaExporter
 			isa_assay = {}
 			isa_assay['@id'] = "#assay/#{assays.pluck(:id).join('_')}"
 			isa_assay[:filename] = 'a_assays.txt' # assay&.sample_type&.isa_template&.title
-			isa_assay[:measurementType] = { annotationValue: nil, termSource: nil, termAccession: nil }
-			isa_assay[:technologyType] = { annotationValue: nil, termSource: nil, termAccession: nil }
-			isa_assay[:technologyPlatform] = nil
+			isa_assay[:measurementType] = { annotationValue: '', termSource: '', termAccession: '' }
+			isa_assay[:technologyType] = { annotationValue: '', termSource: '', termAccession: '' }
+			isa_assay[:technologyPlatform] = ''
 			isa_assay[:characteristicCategories] = convert_characteristic_categories(nil, assays)
 			isa_assay[:materials] = {
 				# Here, the first assay's samples will be enough
@@ -137,16 +137,16 @@ module IsaExporter
 			isa_person[:firstName] = person.first_name
 			isa_person[:midInitials] = ''
 			isa_person[:email] = person.email
-			isa_person[:phone] = person.phone
-			isa_person[:fax] = nil
-			isa_person[:address] = nil
-			isa_person[:affiliation] = nil
+			isa_person[:phone] = person.phone || ''
+			isa_person[:fax] = ''
+			isa_person[:address] = ''
+			isa_person[:affiliation] = ''
 			roles = {}
-			roles[:termAccession] = nil
-			roles[:termSource] = nil
-			roles[:annotationValue] = nil
+			roles[:termAccession] = ''
+			roles[:termSource] = ''
+			roles[:annotationValue] = ''
 			isa_person[:roles] = [roles]
-			isa_person[:comments] = [{ '@id': nil, value: nil, name: nil }]
+			isa_person[:comments] = [{ '@id': '', value: '', name: '' }]
 			isa_person
 		end
 
@@ -155,9 +155,9 @@ module IsaExporter
 			isa_publication[:pubMedID] = publication.pubmed_id
 			isa_publication[:doi] = publication.doi
 			status = {}
-			status[:termAccession] = nil
-			status[:termSource] = nil
-			status[:annotationValue] = nil
+			status[:termAccession] = ''
+			status[:termSource] = ''
+			status[:annotationValue] = ''
 			isa_publication[:status] = status
 			isa_publication[:title] = publication.title
 			isa_publication[:author_list] = publication.authors.map { |a| a.full_name }.join(', ')
@@ -191,9 +191,9 @@ module IsaExporter
 				termAccession: ontology[:termAccession],
 				termSource: ontology[:termSource]
 			}
-			isa_protocol[:description] = sop.description
+			isa_protocol[:description] = sop.description || ''
 			isa_protocol[:uri] = ontology[:termAccession]
-			isa_protocol[:version] = nil
+			isa_protocol[:version] = ''
 			isa_protocol[:parameters] =
 				parameter_values.map do |parameter_value|
 					parameter_value_ontology = get_ontology_details(parameter_value, parameter_value.title, false)
@@ -207,7 +207,7 @@ module IsaExporter
 					}
 				end
 			isa_protocol[:components] = [
-				{ componentName: nil, componentType: { annotationValue: nil, termSource: nil, termAccession: nil } }
+				{ componentName: '', componentType: { annotationValue: '', termSource: '', termAccession: '' } }
 			]
 
 			isa_protocol
@@ -242,14 +242,14 @@ module IsaExporter
 					factorValues: [
 						{
 							category: {
-								'@id': nil
+								'@id': ''
 							},
 							value: {
-								annotationValue: nil,
-								termSource: nil,
-								termAccession: nil
+								annotationValue: '',
+								termSource: '',
+								termAccession: ''
 							},
-							unit: nil
+							unit: get_unit
 						}
 					]
 				}
@@ -258,7 +258,7 @@ module IsaExporter
 
 		def convert_characteristics(sample, attributes)
 			attributes.map do |c|
-				value = sample.get_attribute_value(c)
+				value = sample.get_attribute_value(c) || ''
 				ontology = get_ontology_details(c, value, true)
 				{
 					category: {
@@ -269,7 +269,7 @@ module IsaExporter
 						termSource: ontology[:termSource],
 						termAccession: ontology[:termAccession]
 					},
-					unit: nil
+					unit: get_unit
 				}
 			end
 		end
@@ -311,13 +311,13 @@ module IsaExporter
 			sample_type.samples.map do |s|
 				{
 					'@id': normalize_id("#process/#{with_tag_protocol.title}/#{s.id}"),
-					name: nil,
+					name: '',
 					executesProtocol: {
 						'@id': "#protocol/#{sop.id}" + (s.assays.any? ? "_#{s.assays.first.id}" : '')
 					},
 					parameterValues: convert_parameter_values(s, with_tag_isa_parameter_value),
-					performer: nil,
-					date: nil,
+					performer: '',
+					date: '',
 					previousProcess: previous_process(s),
 					nextProcess: next_process(s),
 					inputs: extract_sample_ids(s.get_attribute_value(with_type_seek_sample_multi), type),
@@ -339,7 +339,7 @@ module IsaExporter
 					'@id': "#data/#{s.id}",
 					name: s.get_attribute_value(with_tag_data_file),
 					type: with_tag_data_file.title,
-					comments: with_tag_data_file_comment.map { |d| { name: d.title, value: s.get_attribute_value(d) } }
+					comments: with_tag_data_file_comment.map { |d| { name: d.title, value: "#{s.get_attribute_value(d)}" } }
 				}
 			end
 		end
@@ -362,7 +362,6 @@ module IsaExporter
 
 				type = get_derived_from_type(st)
 				raise 'Defective ISA process_sequence!' unless type
-
 				other_materials +=
 					st
 						.samples
@@ -421,28 +420,27 @@ module IsaExporter
 		end
 
 		def next_process(sample)
-			# return { "@id": nil } for studies
-			return { '@id': nil } if sample.sample_type.assays.blank?
+			# return { "@id": "" } for studies
+			return { '@id': '' } if sample.sample_type.assays.blank?
 
 			sample_type = sample.linking_samples.first&.sample_type
-			return nil unless sample_type
-
-			protocol = detect_protocol(sample_type)
-			if sample_type && protocol
-				{ '@id': normalize_id("#process/#{detect_protocol(sample_type).title}/#{sample.id}") }
-			else
-				nil
+			if sample_type
+				protocol = detect_protocol(sample_type)
+				return { '@id': normalize_id("#process/#{detect_protocol(sample_type).title}/#{sample.id}") } if protocol
 			end
+			return {}
 		end
 
 		def previous_process(sample)
 			sample_type = sample.linked_samples.first&.sample_type
-			return nil unless sample_type
-
-			protocol = detect_protocol(sample_type)
-
-			# if there's no protocol, it means the previous sample type is source
-			sample_type && protocol ? { '@id': normalize_id("#process/#{protocol.title}/#{sample.id}") } : nil
+			if (sample_type)
+				protocol = detect_protocol(sample_type)
+				if (protocol)
+					# if there's no protocol, it means the previous sample type is source
+					return { '@id': normalize_id("#process/#{protocol.title}/#{sample.id}") }
+				end
+			end
+			return {}
 		end
 
 		def process_sequence_output(sample)
@@ -456,12 +454,12 @@ module IsaExporter
 					raise 'Defective ISA process!'
 				end
 			end
-			{ '@id': "##{prefix}/#{sample.id}" }
+			[{ '@id': "##{prefix}/#{sample.id}" }]
 		end
 
 		def convert_parameter_values(sample, with_tag_isa_parameter_value)
 			with_tag_isa_parameter_value.map do |p|
-				value = sample.get_attribute_value(p)
+				value = sample.get_attribute_value(p) || ''
 				ontology = get_ontology_details(p, value, true)
 				{
 					category: {
@@ -472,7 +470,7 @@ module IsaExporter
 						termSource: ontology[:termSource],
 						termAccession: ontology[:termAccession]
 					},
-					unit: nil
+					unit: get_unit
 				}
 			end
 		end
@@ -493,8 +491,8 @@ module IsaExporter
 					end
 			end
 			{
-				termAccession: is_ontology ? iri : nil,
-				termSource: is_ontology ? sample_attribute.sample_controlled_vocab.source_ontology : nil
+				termAccession: is_ontology ? iri : '',
+				termSource: is_ontology ? sample_attribute.sample_controlled_vocab.source_ontology : ''
 			}
 		end
 
@@ -534,6 +532,10 @@ module IsaExporter
 
 		def normalize_id(str)
 			str.tr!(' ', '_')
+		end
+
+		def get_unit
+			{ termSource: '', termAccession: '', comments: [] }
 		end
 	end
 end
