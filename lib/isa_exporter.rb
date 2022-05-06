@@ -88,7 +88,7 @@ module IsaExporter
 			end
 			isa_study[:protocols] = protocols
 
-			isa_study[:processSequence] = convert_process_sequence(study.sample_types.second, study.sop)
+			isa_study[:processSequence] = convert_process_sequence(study.sample_types.second, study.sop, study.id)
 
 			isa_study[:assays] = [convert_assays(study.assays)]
 
@@ -125,7 +125,8 @@ module IsaExporter
 					first_assay.samples.map { |s| find_sample_origin([s], 1) }.flatten.uniq.map { |s| { '@id': "#sample/#{s}" } }, # the samples from study level that are referenced in this assay's samples,
 				otherMaterials: convert_other_materials(all_sample_types)
 			}
-			isa_assay[:processSequence] = assays.map { |a| convert_process_sequence(a.sample_type, a.sops.first) }.flatten
+			isa_assay[:processSequence] =
+				assays.map { |a| convert_process_sequence(a.sample_type, a.sops.first, a.id) }.flatten
 			isa_assay[:dataFiles] = convert_data_files(all_sample_types)
 			isa_assay[:unitCategories] = []
 			isa_assay
@@ -297,7 +298,7 @@ module IsaExporter
 			end
 		end
 
-		def convert_process_sequence(sample_type, sop)
+		def convert_process_sequence(sample_type, sop, id)
 			# This method is meant to be used for both Studies and Assays
 			return [] unless sample_type.samples.any?
 
@@ -313,7 +314,7 @@ module IsaExporter
 					'@id': normalize_id("#process/#{with_tag_protocol.title}/#{s.id}"),
 					name: '',
 					executesProtocol: {
-						'@id': "#protocol/#{sop.id}" + (s.assays.any? ? "_#{s.assays.first.id}" : '')
+						'@id': "#protocol/#{sop.id}_#{id}"
 					},
 					parameterValues: convert_parameter_values(s, with_tag_isa_parameter_value),
 					performer: '',
@@ -420,8 +421,8 @@ module IsaExporter
 		end
 
 		def next_process(sample)
-			# return { "@id": "" } for studies
-			return { '@id': '' } if sample.sample_type.assays.blank?
+			# return {} for studies
+			return {} if sample.sample_type.assays.blank?
 
 			sample_type = sample.linking_samples.first&.sample_type
 			if sample_type

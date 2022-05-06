@@ -109,12 +109,8 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
 	test 'All Sources and Samples must be declared in the Study-level materials section' do
 		json = JSON.parse(@@response.body)
 		studies = json['investigation']['studies']
-		sources, samples = [], []
-		studies.map do |s|
-			sources += s['materials']['sources'].map { |so| so['@id'] }
-			samples += s['materials']['samples'].map { |sa| sa['@id'] }
-		end
-		materials = sources + samples
+		materials = studies.map { |s| s['materials']['sources'] + s['materials']['samples'] }
+		materials = materials.flatten.map { |so| so['@id'] }
 
 		all_sources_and_samples = @@source.samples.map { |s| "#source/#{s.id}" }
 		all_sources_and_samples += @@sample_collection.samples.map { |s| "#sample/#{s.id}" }
@@ -127,8 +123,8 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
 		json = JSON.parse(@@response.body)
 		studies = json['investigation']['studies']
 		other_materials = []
-		studies.map do |s|
-			s['assays'].map do |a|
+		studies.each do |s|
+			s['assays'].each do |a|
 				other_materials += a['materials']['otherMaterials'].map { |so| so['@id'] }
 				other_materials += a['dataFiles'].map { |so| so['@id'] }
 			end
@@ -149,46 +145,102 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
 
 	# 14
 	test 'Each Process in a Process Sequence MUST link with other Processes forwards or backwards, unless it is a starting or terminating Process' do
+		# study > processSequence > previousProcess/nextProcess is always empty, since there is one process always
+		# assay > processSequence >
+		json = JSON.parse(@@response.body)
+		studies = json['investigation']['studies']
+		studies.each do |s|
+			assays_count = s['assays'].length
+			s['assays'].each_with_index do |a, i|
+				a['processSequence'].each { |p| assert p['previousProcess'].present? }
+
+				a['processSequence'].each do |p|
+					assert (i == assays_count - 1) ? p['nextProcess'].blank? : p['nextProcess'].present?
+				end
+			end
+		end
 	end
 
 	# 15
 	test 'Protocols declared SHOULD be referenced by at least one Protocol REF' do
+		# Protocol REF is appeared in study > processSequence and study > assya > processSequence
+		json = JSON.parse(@@response.body)
+		studies = json['investigation']['studies']
+		protocols, protocol_refs = [], []
+		studies.each do |s|
+			protocols =
+				s['protocols'].map do |pr|
+					# 19 'Protocols SHOULD have a name'
+					assert pr['name'].present?
+
+					# 20 'Protocol Parameters SHOULD have a name'
+					pr['parameters'].each { |pp| assert pp['parameterName'].present? }
+					return pr['@id']
+				end
+			protocol_refs = s['processSequence'].map { |p| p['executesProtocol']['@id'] }
+			s['assays'].each { |a| protocol_refs += a['processSequence'].map { |p| p['executesProtocol']['@id'] } }
 	end
 
-	# 16
-	test 'Protocol REFs MUST reference a Protocol declaration' do
+		protocols.each { |p| assert protocol_refs.include?(p) }
+
+		# 16 'Protocol REFs MUST reference a Protocol declaration'
+		protocol_refs.each { |p| assert protocols.include?(p) }
 	end
 
 	# 17
 	test 'Study Factors declared SHOULD be referenced by at least one Factor Value' do
+		# Not implemented
 	end
 
 	# 18
 	test 'Factor Values MUST reference a Study Factor declared in the Study-level factors section' do
-	end
-
-	# 19
-	test 'Protocols SHOULD have a name' do
-	end
-
-	# 20
-	test 'Protocol Parameters SHOULD have a name' do
+		# Not implemented
 	end
 
 	# 21
 	test 'Study Factors SHOULD have a name' do
+		# Not implemented
 	end
 
 	# 22
 	test 'Sources and Samples declared SHOULD be referenced by at least one Process at the Study-level' do
+		# sources and samples should be referenced in study > processSequence > inputs/outputs
+		json = JSON.parse(@@response.body)
+		studies = json['investigation']['studies']
+		materials, processes = [], []
+		studies.each do |s|
+			materials += s['materials']['sources'] + s['materials']['samples']
+			processes += s['processSequence'].map { |p| p['inputs'] + p['outputs'] }
+		end
+		materials = materials.map { |so| so['@id'] }
+		processes = processes.flatten.map { |p| p['@id'] }
+		materials.each { |p| assert processes.include?(p) }
 	end
 
 	# 23
 	test 'Samples, other materials, and DataFiles declared SHOULD be used in at least one Process at the Assay-level.' do
+		json = JSON.parse(@@response.body)
+		studies = json['investigation']['studies']
+		studies.each do |s|
+			s['assays'].each do |a|
+				other_materials = a['materials']['samples'] + a['materials']['otherMaterials'] + a['dataFiles']
+				other_materials = other_materials.map { |m| m['@id'] }
+				processes = a['processSequence'].map { |p| p['inputs'] + p['outputs'] }
+				processes = processes.flatten.map { |p| p['@id'] }
+
+				other_materials.each { |p| assert processes.include?(p) }
+			end
+		end
 	end
 
 	# 24
 	test 'Study and Assay filenames SHOULD be present' do
+		json = JSON.parse(@@response.body)
+		studies = json['investigation']['studies']
+		studies.each do |s|
+			assert s['filename'].present?
+			s['assays'].each { |a| assert a['filename'].present? }
+		end
 	end
 
 	# 25
