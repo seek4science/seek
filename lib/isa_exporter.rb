@@ -491,10 +491,9 @@ module IsaExporter
 						sample_attribute.sample_controlled_vocab.ols_root_term_uri
 					end
 			end
-			{
-				termAccession: is_ontology ? iri : '',
-				termSource: is_ontology ? sample_attribute.sample_controlled_vocab.source_ontology : ''
-			}
+			term_accession = is_ontology ? iri : ''
+			termSource = term_accession ? sample_attribute.sample_controlled_vocab.source_ontology : ''
+			{ termAccession: term_accession, termSource: termSource }
 		end
 
 		# This method finds the source sample (sample_collection/samples of 2nd sample_type of the study) of a sample
