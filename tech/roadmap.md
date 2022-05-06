@@ -18,6 +18,7 @@ They are expected to be added to FAIRDOM-SEEK in roughly the order they are pres
 | Project folders, to help organise files outside of the ISA structure | Q3 2022 |
 | UI for creating Custom Metadata Extensions | Q3 2022 |
 | Describing Observed Variables within MIAPPE | Q3 2022 |
+| Enhancements to Sample support | Q4 2022 |
 | Backend storage changes with better versioning support | Q4 2022 |
 | Better support for GitHub | Q4 2022 |
 | Support for Datasets containing multiple files organised into folders | Q4 2022 |
