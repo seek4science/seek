@@ -20,7 +20,7 @@
           "iri": null,
           "name": "Input",
           "description": "Existing Samples in DataHub that represent input for this protocol.",
-          "dataType": "SEEK Sample Multi",
+          "dataType": "Registered Sample (multiple)",
           "required": true,
           "isaTag": null
         },
@@ -177,7 +177,7 @@
           "dataType": "String",
           "title": true,
           "required": true,
-          "isaTag": "otherMaterial",
+          "isaTag": "other_material",
           "ontology": null,
           "CVList": null
         }
@@ -203,7 +203,7 @@
           "iri": null,
           "name": "Input",
           "description": "Existing Samples in DataHub that represent input for this protocol.",
-          "dataType": "SEEK Sample Multi",
+          "dataType": "Registered Sample (multiple)",
           "required": true,
           "isaTag": null
         },
@@ -215,7 +215,7 @@
           "required": true,
           "isaTag": "protocol",
           "ontology": null,
-          "CVList": []
+          "CVList": null
         },
         {
           "iri": null,
@@ -234,7 +234,7 @@
           "dataType": "String",
           "title": true,
           "required": true,
-          "isaTag": "otherMaterial",
+          "isaTag": "other_material",
           "ontology": null,
           "CVList": null
         },
@@ -244,7 +244,7 @@
           "description": "This column contains terms describing the type of each material, for examples: whole organism, organism part, cell, total RNA.",
           "dataType": "Controlled Vocabulary",
           "required": true,
-          "isaTag": "otherMaterial_characteristic",
+          "isaTag": "other_material_characteristic",
           "ontology": null,
           "CVList": ["whole organism", "organism part", "RNA", "DNA", "cell"]
         }
@@ -270,7 +270,7 @@
           "iri": null,
           "name": "Input",
           "description": "Existing Samples in DataHub that represent input for this protocol.",
-          "dataType": "SEEK Sample Multi",
+          "dataType": "Registered Sample (multiple)",
           "required": true,
           "isaTag": null
         },
@@ -368,7 +368,7 @@
           "description": "User-defined name for an assay.",
           "dataType": "String",
           "required": true,
-          "isaTag": "otherMaterial",
+          "isaTag": "other_material",
           "ontology": null,
           "CVList": null
         },
@@ -376,9 +376,9 @@
           "iri": null,
           "name": "Technology type",
           "description": "",
-          "dataType": "String",
+          "dataType": "Controlled Vocabulary",
           "required": true,
-          "isaTag": "otherMaterial_characteristic",
+          "isaTag": "other_material_characteristic",
           "ontology": null,
           "CVList": ["sequencing assay"]
         },
@@ -389,7 +389,7 @@
           "dataType": "String",
           "title": true,
           "required": true,
-          "isaTag": "dataFile",
+          "isaTag": "data_file",
           "ontology": null,
           "CVList": null
         }
@@ -415,7 +415,7 @@
           "iri": null,
           "name": "Input",
           "description": "Existing Samples in DataHub that represent input for this protocol.",
-          "dataType": "SEEK Sample Multi",
+          "dataType": "Registered Sample (multiple)",
           "required": true,
           "isaTag": null
         },
