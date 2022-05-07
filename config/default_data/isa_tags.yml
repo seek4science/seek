@@ -1,0 +1,20 @@
+source:
+  title: source
+source_characteristic:
+  title: source_characteristic
+sample:
+  title: sample
+sample_characteristic:
+  title: sample_characteristic
+protocol:
+  title: protocol
+otherMaterial:
+  title: other_material
+otherMaterial_characteristic:
+  title: other_material_characteristic
+dataFile:
+  title: data_file
+dataFileComment:
+  title: data_file_comment
+parameter_value:
+  title: parameter_value

@@ -1,0 +1,17 @@
+
+
+<%= render :partial => "general/item_title", :locals => {:item => @template,:buttons_partial => 'buttons'} %>
+<%= item_description h(@template.description) -%>
+
+
+<h2>Attributes</h2>
+
+<ul>
+<%=
+  @template.template_attributes.collect do |attribute|
+    content_tag(:li){template_attribute_details(attribute)}
+  end.join.html_safe
+%>
+</ul>
+
+<%= render :partial=>"general/items_related_to",:object => @template %>
