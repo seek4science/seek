@@ -175,7 +175,7 @@ module IsaExporter
 					source_ontologies << atr.sample_controlled_vocab.source_ontology if atr.sample_attribute_type.ontology?
 				end
 			end
-			source_ontologies.uniq.map { |s| client.fetch_ontology_reference(s) }
+			source_ontologies.uniq.map { |s| { name: s, file: '', version: '', description: '' } }
 		end
 
 		def convert_protocol(sop, id, protocol, parameter_values)

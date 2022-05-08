@@ -179,7 +179,7 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
 				end
 			protocol_refs = s['processSequence'].map { |p| p['executesProtocol']['@id'] }
 			s['assays'].each { |a| protocol_refs += a['processSequence'].map { |p| p['executesProtocol']['@id'] } }
-	end
+		end
 
 		protocols.each { |p| assert protocol_refs.include?(p) }
 
@@ -245,31 +245,58 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
 
 	# 25
 	test 'Ontology Source References declared SHOULD be referenced by at least one Ontology Annotation' do
-	end
+		json = JSON.parse(@@response.body)
+		studies = json['investigation']['studies']
+		ontology_refs = json['investigation']['ontologySourceReferences']
 
-	# 26
-	test 'Ontology Annotations MUST reference a Ontology Source Reference declaration' do
-	end
+		ontologies = []
+		ontologies += json['investigation']['people'].map { |p| p['roles'] }
+		studies.each do |s|
+			ontologies += s['people'].map { |p| p['roles'] }
+			ontologies += s['characteristicCategories'].map { |c| c['characteristicType'] }
+			ontologies += s['materials']['sources'].map { |s| s['characteristics'].map { |c| c['value'] } }
+			ontologies += s['materials']['samples'].map { |s| s['characteristics'].map { |c| c['value'] } }
+			ontologies += s['protocols'].map { |p| p['protocolType'] }
+			ontologies += s['protocols'].map { |p| p['parameters'].map { |pa| pa['parameterName'] } }
+			ontologies += s['protocols'].map { |p| p['components'].map { |c| c['componentType'] } }
+			ontologies += s['processSequence'].map { |p| p['parameterValues'].map { |c| c['value'] } }
 
-	# 27
-	test 'Ontology Source References MUST contain a Term Source Name' do
+			s['assays'].each do |a|
+				ontologies << a['measurementType']
+				ontologies << a['technologyType']
+				ontologies += a['characteristicCategories'].map { |c| c['characteristicType'] }
+				ontologies += a['materials']['otherMaterials'].map { |o| o['characteristics'].map { |c| c['value'] } }
+			end
+		end
+
+		ontologies = ontologies.flatten.map { |o| o['termSource'] }.uniq.reject { |c| c.empty? }
+
+		# 27 'Ontology Source References MUST contain a Term Source Name'
+		ontology_refs.each { |ref| assert ref['name'].present? }
+
+		ontology_refs = ontology_refs.map { |o| o['name'] }.uniq
+
+		ontology_refs.each { |p| assert ontologies.include?(p) }
+
+		# 26 'Ontology Annotations MUST reference a Ontology Source Reference declaration'
+		ontologies.each { |p| assert ontology_refs.include?(p) }
 	end
 
 	# 28
 	test 'Ontology Annotations with a term and/or accession MUST provide a Term Source REF pointing to a declared Ontology Source Reference' do
-		all_ontologies = []
-		ontology_source_reference = []
+		# Conflict
 	end
 
 	# 29
 	test 'Publication metadata SHOULD match that of publication record in PubMed corresponding to the provided PubMed ID.' do
+		# Not implemented
 	end
 
-	# 30
-	test 'Comments MUST have a name' do
-		all_comments = []
-		all_comments.each { |c| assert c.key?('name') }
-	end
+	# # 30
+	# test 'Comments MUST have a name' do
+	# 	all_comments = []
+	# 	all_comments.each { |c| assert c.key?('name') }
+	# end
 end
 
 private
@@ -315,6 +342,14 @@ rescue ArgumentError
 end
 
 def create_basic_isa_project
+	# Create ontologies
+	ontologies = create_ontologies
+
+	controlled_vocab_attribute_type = Factory(:controlled_vocab_attribute_type)
+	ontology_attribute_type = Factory(:controlled_vocab_attribute_type, title: 'Ontology')
+	sample_multi_sample_attribute_type = Factory(:sample_multi_sample_attribute_type)
+	string_sample_attribute_type = Factory(:string_sample_attribute_type)
+
 	# Create ISA Study
 	source =
 		SampleType.new title: 'ISA Source',
@@ -329,7 +364,7 @@ def create_basic_isa_project
 			required: true,
 			sample_type: source,
 			isa_tag_id: IsaTag.find_by_title('source')&.id,
-			sample_attribute_type: Factory(:string_sample_attribute_type)
+			sample_attribute_type: string_sample_attribute_type
 		)
 	source.sample_attributes <<
 		Factory(
@@ -338,7 +373,7 @@ def create_basic_isa_project
 			required: true,
 			sample_type: source,
 			isa_tag_id: IsaTag.find_by_title('source_characteristic')&.id,
-			sample_attribute_type: Factory(:string_sample_attribute_type)
+			sample_attribute_type: string_sample_attribute_type
 		)
 	source_characteristic_2_CV = Factory(:apples_sample_controlled_vocab)
 	source.sample_attributes <<
@@ -348,7 +383,7 @@ def create_basic_isa_project
 			required: true,
 			sample_type: source,
 			isa_tag_id: IsaTag.find_by_title('source_characteristic')&.id,
-			sample_attribute_type: Factory(:controlled_vocab_attribute_type),
+			sample_attribute_type: controlled_vocab_attribute_type,
 			sample_controlled_vocab_id: source_characteristic_2_CV.id
 		)
 	source.sample_attributes <<
@@ -358,8 +393,8 @@ def create_basic_isa_project
 			required: false,
 			sample_type: source,
 			isa_tag_id: IsaTag.find_by_title('source_characteristic')&.id,
-			sample_attribute_type: Factory(:controlled_vocab_attribute_type),
-			sample_controlled_vocab_id: Factory(:ontology_sample_controlled_vocab).id
+			sample_attribute_type: ontology_attribute_type,
+			sample_controlled_vocab_id: ontologies[0].id
 		)
 	source.save!
 
@@ -375,7 +410,7 @@ def create_basic_isa_project
 			required: true,
 			sample_type: sample_collection,
 			linked_sample_type_id: source.id,
-			sample_attribute_type: Factory(:sample_multi_sample_attribute_type)
+			sample_attribute_type: sample_multi_sample_attribute_type
 		)
 	sample_collection.sample_attributes <<
 		Factory(
@@ -384,7 +419,7 @@ def create_basic_isa_project
 			required: true,
 			sample_type: sample_collection,
 			isa_tag_id: IsaTag.find_by_title('protocol')&.id,
-			sample_attribute_type: Factory(:string_sample_attribute_type)
+			sample_attribute_type: string_sample_attribute_type
 		)
 	sample_collection.sample_attributes <<
 		Factory(
@@ -393,7 +428,7 @@ def create_basic_isa_project
 			required: true,
 			sample_type: sample_collection,
 			isa_tag_id: IsaTag.find_by_title('parameter_value')&.id,
-			sample_attribute_type: Factory(:string_sample_attribute_type)
+			sample_attribute_type: string_sample_attribute_type
 		)
 
 	sample_collection.sample_attributes <<
@@ -403,7 +438,7 @@ def create_basic_isa_project
 			required: false,
 			sample_type: sample_collection,
 			isa_tag_id: IsaTag.find_by_title('parameter_value')&.id,
-			sample_attribute_type: Factory(:controlled_vocab_attribute_type),
+			sample_attribute_type: controlled_vocab_attribute_type,
 			sample_controlled_vocab_id: Factory(:apples_sample_controlled_vocab).id
 		)
 
@@ -414,8 +449,8 @@ def create_basic_isa_project
 			required: false,
 			sample_type: sample_collection,
 			isa_tag_id: IsaTag.find_by_title('parameter_value')&.id,
-			sample_attribute_type: Factory(:controlled_vocab_attribute_type),
-			sample_controlled_vocab_id: Factory(:ontology_sample_controlled_vocab).id
+			sample_attribute_type: ontology_attribute_type,
+			sample_controlled_vocab_id: ontologies[0].id
 		)
 
 	sample_collection.sample_attributes <<
@@ -426,7 +461,7 @@ def create_basic_isa_project
 			is_title: true,
 			sample_type: sample_collection,
 			isa_tag_id: IsaTag.find_by_title('sample')&.id,
-			sample_attribute_type: Factory(:string_sample_attribute_type)
+			sample_attribute_type: string_sample_attribute_type
 		)
 
 	sample_collection.sample_attributes <<
@@ -436,7 +471,7 @@ def create_basic_isa_project
 			required: true,
 			sample_type: sample_collection,
 			isa_tag_id: IsaTag.find_by_title('sample_characteristic')&.id,
-			sample_attribute_type: Factory(:string_sample_attribute_type)
+			sample_attribute_type: string_sample_attribute_type
 		)
 
 	sample_collection.sample_attributes <<
@@ -446,7 +481,7 @@ def create_basic_isa_project
 			required: false,
 			sample_type: sample_collection,
 			isa_tag_id: IsaTag.find_by_title('sample_characteristic')&.id,
-			sample_attribute_type: Factory(:controlled_vocab_attribute_type),
+			sample_attribute_type: controlled_vocab_attribute_type,
 			sample_controlled_vocab_id: Factory(:apples_sample_controlled_vocab).id
 		)
 
@@ -457,8 +492,8 @@ def create_basic_isa_project
 			required: false,
 			sample_type: sample_collection,
 			isa_tag_id: IsaTag.find_by_title('sample_characteristic')&.id,
-			sample_attribute_type: Factory(:controlled_vocab_attribute_type),
-			sample_controlled_vocab_id: Factory(:ontology_sample_controlled_vocab).id
+			sample_attribute_type: ontology_attribute_type,
+			sample_controlled_vocab_id: ontologies[1].id
 		)
 
 	sample_collection.save!
@@ -486,7 +521,7 @@ def create_basic_isa_project
 			required: true,
 			sample_type: assay_sample_type,
 			linked_sample_type_id: sample_collection.id,
-			sample_attribute_type: Factory(:sample_multi_sample_attribute_type)
+			sample_attribute_type: sample_multi_sample_attribute_type
 		)
 	assay_sample_type.sample_attributes <<
 		Factory(
@@ -495,7 +530,7 @@ def create_basic_isa_project
 			required: true,
 			sample_type: assay_sample_type,
 			isa_tag_id: IsaTag.find_by_title('protocol')&.id,
-			sample_attribute_type: Factory(:string_sample_attribute_type)
+			sample_attribute_type: string_sample_attribute_type
 		)
 	assay_sample_type.sample_attributes <<
 		Factory(
@@ -504,7 +539,7 @@ def create_basic_isa_project
 			required: true,
 			sample_type: assay_sample_type,
 			isa_tag_id: IsaTag.find_by_title('parameter_value')&.id,
-			sample_attribute_type: Factory(:string_sample_attribute_type)
+			sample_attribute_type: string_sample_attribute_type
 		)
 	assay_sample_type.sample_attributes <<
 		Factory(
@@ -513,7 +548,7 @@ def create_basic_isa_project
 			required: false,
 			sample_type: assay_sample_type,
 			isa_tag_id: IsaTag.find_by_title('parameter_value')&.id,
-			sample_attribute_type: Factory(:controlled_vocab_attribute_type),
+			sample_attribute_type: controlled_vocab_attribute_type,
 			sample_controlled_vocab_id: Factory(:apples_sample_controlled_vocab).id
 		)
 
@@ -524,8 +559,8 @@ def create_basic_isa_project
 			required: false,
 			sample_type: assay_sample_type,
 			isa_tag_id: IsaTag.find_by_title('parameter_value')&.id,
-			sample_attribute_type: Factory(:controlled_vocab_attribute_type),
-			sample_controlled_vocab_id: Factory(:ontology_sample_controlled_vocab).id
+			sample_attribute_type: controlled_vocab_attribute_type,
+			sample_controlled_vocab_id: ontologies[0].id
 		)
 	assay_sample_type.sample_attributes <<
 		Factory(
@@ -535,7 +570,7 @@ def create_basic_isa_project
 			required: true,
 			sample_type: assay_sample_type,
 			isa_tag_id: IsaTag.find_by_title('other_material')&.id,
-			sample_attribute_type: Factory(:string_sample_attribute_type)
+			sample_attribute_type: string_sample_attribute_type
 		)
 	assay_sample_type.sample_attributes <<
 		Factory(
@@ -544,7 +579,7 @@ def create_basic_isa_project
 			required: true,
 			sample_type: assay_sample_type,
 			isa_tag_id: IsaTag.find_by_title('other_material_characteristic')&.id,
-			sample_attribute_type: Factory(:string_sample_attribute_type)
+			sample_attribute_type: string_sample_attribute_type
 		)
 	assay_sample_type.sample_attributes <<
 		Factory(
@@ -553,7 +588,7 @@ def create_basic_isa_project
 			required: false,
 			sample_type: assay_sample_type,
 			isa_tag_id: IsaTag.find_by_title('other_material_characteristic')&.id,
-			sample_attribute_type: Factory(:controlled_vocab_attribute_type),
+			sample_attribute_type: controlled_vocab_attribute_type,
 			sample_controlled_vocab_id: Factory(:apples_sample_controlled_vocab).id
 		)
 	assay_sample_type.sample_attributes <<
@@ -563,8 +598,8 @@ def create_basic_isa_project
 			required: false,
 			sample_type: assay_sample_type,
 			isa_tag_id: IsaTag.find_by_title('other_material_characteristic')&.id,
-			sample_attribute_type: Factory(:controlled_vocab_attribute_type),
-			sample_controlled_vocab_id: Factory(:ontology_sample_controlled_vocab).id
+			sample_attribute_type: controlled_vocab_attribute_type,
+			sample_controlled_vocab_id: ontologies[1].id
 		)
 	assay_sample_type.save!
 
@@ -619,4 +654,34 @@ def create_basic_isa_project
 				'Extract Name': 'Extract Name',
 				'other material characteristic 1': 'other material characteristic 1'
 		        }
+end
+
+def create_ontologies
+	ontology1 =
+		SampleControlledVocab.new(
+			{ title: 'organism part', source_ontology: 'efo', ols_root_term_uri: 'http://www.ebi.ac.uk/efo/EFO_0000635' }
+		)
+	ontology1.sample_controlled_vocab_terms << SampleControlledVocabTerm.new({ label: 'anatomical entity' })
+	ontology1.sample_controlled_vocab_terms << SampleControlledVocabTerm.new({ label: 'retroperitoneal space' })
+	ontology1.sample_controlled_vocab_terms << SampleControlledVocabTerm.new({ label: 'abdominal cavity' })
+
+	ontology2 =
+		SampleControlledVocab.new(
+			{
+				title: 'sample material processing',
+				source_ontology: 'OBI',
+				ols_root_term_uri: 'http://purl.obolibrary.org/obo/OBI_0000094'
+			}
+		)
+	ontology2.sample_controlled_vocab_terms << SampleControlledVocabTerm.new({ label: 'dissection' })
+	ontology2.sample_controlled_vocab_terms << SampleControlledVocabTerm.new({ label: 'enzymatic cleavage' })
+	ontology2.sample_controlled_vocab_terms << SampleControlledVocabTerm.new({ label: 'non specific enzymatic cleavage' })
+	ontology2.sample_controlled_vocab_terms << SampleControlledVocabTerm.new({ label: 'protease cleavage' })
+	ontology2.sample_controlled_vocab_terms <<
+		SampleControlledVocabTerm.new({ label: 'DNA restriction enzyme digestion' })
+
+	ontology1.save!
+	ontology2.save!
+
+	[ontology1, ontology2]
 end
