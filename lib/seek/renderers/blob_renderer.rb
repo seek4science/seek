@@ -1,16 +1,19 @@
 module Seek
   module Renderers
     class BlobRenderer
-      attr_reader :content_blob
+      include ActionView::Helpers
 
-      def initialize(content_blob)
-        @content_blob = content_blob
+      attr_reader :blob
+      delegate :read, :url, :path, :size, :content_path, to: :blob
+
+      def initialize(git_blob_or_blob)
+        @blob = git_blob_or_blob
       end
 
       def render
         render_content
       rescue Exception => exception
-        handle_render_exception(content_blob, exception)
+        handle_render_exception(blob, exception)
         ''
       end
 
@@ -20,11 +23,11 @@ module Seek
 
       private
 
-      def handle_render_exception(content_blob, exception)
+      def handle_render_exception(blob, exception)
         Seek::Errors::ExceptionForwarder.send_notification(exception,
                                                            data:{ message: 'rendering error',
                                                                   renderer: self,
-                                                                  item: content_blob.inspect })
+                                                                  item: blob.inspect })
       end
     end
   end

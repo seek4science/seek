@@ -24,6 +24,10 @@ module Git
       git_version.remote_sources[path]
     end
 
+    def read
+      file_contents
+    end
+
     def file_contents(fetch_remote: false, &block)
       if fetch_remote && remote? && !fetched?
         if block_given?
@@ -101,6 +105,20 @@ module Git
         f.rewind
         `jupyter nbconvert --to html #{f.path} --stdout`
       end
+    end
+
+    def content_path(opts = {})
+      opts.reverse_merge!(version: @git_version.version, path: path)
+      Seek::Util.routes.polymorphic_path([@git_version.resource, :git_raw], opts)
+    end
+
+    def is_text?
+      !binary?
+    end
+
+    def is_image?
+      ext = path.split('/').last&.split('.')&.last&.downcase
+      Seek::ContentTypeDetection::IMAGE_VIEWABLE_FORMAT.include?(ext)
     end
   end
 end

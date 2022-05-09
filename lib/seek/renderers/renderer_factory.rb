@@ -3,22 +3,22 @@ module Seek
     class RendererFactory
       include Singleton
 
-      def renderer(content_blob)
-        detect_renderer(content_blob) || Seek::Renderers::BlankRenderer.new
+      def renderer(blob, fallback: Seek::Renderers::BlankRenderer)
+        detect_renderer(blob) || fallback.new
       end
 
       private
 
-      def detect_renderer(content_blob)
+      def detect_renderer(blob)
         type = renderer_instances.detect do |type|
-          type.new(content_blob).can_render?
+          type.new(blob).can_render?
         end
-        type.new(content_blob) if type
+        type.new(blob) if type
       end
 
       def renderer_instances
         # Seek::Renderers::Renderer.descendants
-        [Seek::Renderers::SlideshareRenderer, Seek::Renderers::YoutubeRenderer]
+        [SlideshareRenderer, YoutubeRenderer, MarkdownRenderer, NotebookRenderer, ImageRenderer, TextRenderer]
       end
     end
   end
