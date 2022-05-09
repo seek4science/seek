@@ -1,8 +1,20 @@
 <i>Non Working prototype, links not working!!</i>
-<p><%= @file_list -%></p>
+<p><% @file_list -%></p>
 <h2>You are at:</h2>
 
-<%= @dataset['name'] -%>/<a href="" onclick="return false;"><%= @subtype -%></a><span id="nels_breadcrumb"></span>
+<%# Use @path to create a series of folder links as breadcrumb %>
+<%# Remove the first "Storebioinfo/" item and only make elements beyond project clickable%>
+<% full_path="Storebioinfo"%>
+<p>
+  <% @path.split('/')[1..].each_with_index do |path_item, index | %>
+    <% full_path += "/"+ path_item %>
+    /<span <% if index>1 %> class="nels-folder" style="cursor: pointer;color:blue;"<% end %> path=<%= full_path%>>
+      <%= path_item %>
+    </span>
+  <% end %>
+</p>
+
+
 
 <% if @dataset['owner_name'].present? %>
     <strong>Owner:</strong> <%= @dataset['owner_name'] %><br/>
@@ -20,6 +32,7 @@ table, th, td {
 </style>
 
 <%= button_link_to('New Folder', 'add', nil, { id: "", class:"add_metadata"}) %>
+<%= button_link_to('Upload', 'arrow_up', nil, { id: "", class:"add_metadata"}) %>
 
 <table class="table table-hover table-bordered">
   <thead>
@@ -32,13 +45,12 @@ table, th, td {
     <% @file_list.each do |file_item| %>
       <tr>
         <td>
-          <% if file_item["isFolder"] == true %>
-            <p class="nels-folder" style="cursor: pointer;" path=<%= file_item["path"]%>>
-              <%= file_item["name"]%>
-            </p>
-          <% else %>
+          <span
+            class="<%= file_item["isFolder"] ? "nels-folder" : "glyphicon glyphicon-download nels-file" %>"
+            style="cursor: pointer;" path=<%= file_item["path"]%>
+          >
             <%= file_item["name"]%>
-          <% end %>
+          </span>
         </td>
         <td><%= file_item["size"]%></td>
       </tr>
@@ -77,6 +89,9 @@ table, th, td {
 
     $j('.nels-folder').click(function() {
       updateFolderList($j(this).attr('path'));
+    });
+    $j('.nels-file').click(function() {
+      alert(`trigger download for ${$j(this).attr('path')}`);
     });
   });
 </script>

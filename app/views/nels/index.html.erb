@@ -1,7 +1,6 @@
 <h1>NeLS Browser</h1>
 
 Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
-<%= @rest_client.sbi_storage_list_demo %>
 
 <%= button_link_to('Create NeLS dataset', 'add', new_dataset_assay_nels_path(@assay.id)) %>
 

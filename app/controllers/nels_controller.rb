@@ -118,7 +118,7 @@ class NelsController < ApplicationController
   def subtype
     @project_id = params[:project_id].to_i
     @dataset = @rest_client.dataset(@project_id, params[:dataset_id].to_i)
-
+    @path = params[:path]
     @subtype = params[:subtype]
 
     @file_list = @rest_client.sbi_storage_list(params[:project_id].to_i, params[:dataset_id].to_i, params[:path])
