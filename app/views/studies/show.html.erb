@@ -1,6 +1,6 @@
 <%= render partial: 'general/item_title', locals: { item: @study, buttons_partial: 'studies/buttons' } -%>
 
-<%= render partial: 'general/show_page_tab_definitions' %>
+<%= render partial: 'general/show_page_tab_definitions', locals: { resource: @study } %>
 
 <div class="tab-content">
   <%= tab_pane('overview') do %>
@@ -43,13 +43,11 @@
 
         <%= render partial: 'custom_metadata/custom_metadata_attribute_values', locals: {resource: @study} %>
 
-          <%= render partial: 'general/isa_graph', locals: { root_item: @study, options: { depth: 4 } } -%>
+        <%= render partial: 'general/isa_graph', locals: { root_item: @study, options: { depth: 4 } } -%>
 
-          <% if Seek::Config.project_single_page_advanced_enabled %>
-              <%= render partial: 'isa_studies/applied_templates', locals: { resource: @study } -%>
-          <% end %>
-
-        </div>
+				<% if Seek::Config.project_single_page_advanced_enabled %>
+						<%= render partial: 'isa_studies/applied_templates', locals: { resource: @study } -%>
+				<% end %>
 
       </div>
 
@@ -57,15 +55,16 @@
         <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @study } %>
       </div>
     </div>
-
-    <% if Seek::Config.project_single_page_advanced_enabled %>
-      <div id="study_design" class="tab-pane fade">
-          <%= render :partial=>"isa_studies/study_design", locals: { study: @study} -%>
-      </div>
-    <% end %>
-    
   <% end %>
+	
   <%= tab_pane('related-items') do %>
     <%= render partial: 'general/items_related_to', object: @study %>
   <% end %>
+
+	<% if Seek::Config.project_single_page_advanced_enabled && displaying_single_page?%>
+		<%= tab_pane('study_design') do %>
+			<%= render :partial=>"isa_studies/study_design", locals: { study: @study} -%>
+		<% end %>
+	<% end %>
+
 </div>

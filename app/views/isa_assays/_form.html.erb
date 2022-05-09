@@ -19,13 +19,6 @@
   <%= render partial: 'custom_metadata/custom_metadata_type_selection', locals:{f:assay_fields, resource:@isa_assay.assay} %>
   <%= render partial: 'custom_metadata/custom_metadata_attribute_input', locals:{f:assay_fields,resource:@isa_assay.assay} %>
 
-  <% if Seek::Config.is_virtualliver -%>
-    <div class="form-group">
-      <%= assay_fields.label t('institution') %>
-      <%= collection_select(:assay, :institution_id, Institution.all, :id, :title, {:include_blank =>"Please Select ..."},{:class=>"form-control"}) %>
-    </div>
-  <% end -%>
-
   <div class="form-group hidden"  >
     <label class="required"><%= t('study') -%></label>
     <%= assay_study_selection('isa_assay[assay][study_id]',@isa_assay.assay.study) %>

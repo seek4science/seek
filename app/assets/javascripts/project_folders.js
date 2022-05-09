@@ -149,11 +149,11 @@ async function item_clicked(type, id, parent) {
   if (type == "sample") {
     loadItemDetails(`/assays/${parent.id}/samples`, { view: "default" });
   } else if (isa_study_element.includes(type)) {
-    if ($j('a[href^="#study_design"]').toArray().length == 0) {
+    if ($j('a[data-target^="#study_design"]').toArray().length == 0) {
       loadItemDetails(`/studies/${parent.id}`, { view: "default" });
     }
-    $j('a[href^="#study_design"]').first().click();
-    $j(`a[href^="#${type}"]`).first().click();
+    $j('a[data-target^="#study_design"]').first().click();
+    $j(`a[data-target^="#${type}"]`).first().click();
   } else {
     loadItemDetails(`/${pluralize(type)}/${id}`, { view: "default" });
   }
