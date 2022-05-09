@@ -1,0 +1,13 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+ontology_1:
+  title: organism part
+  source_ontology: efo
+  ols_root_term_uri: http://www.ebi.ac.uk/efo/EFO_0000635
+
+ontology_2:
+  title: sample material processing
+  source_ontology: OBI
+  ols_root_term_uri: http://purl.obolibrary.org/obo/OBI_0000094
+
+custom_cv:
+  title: custom sample controlled vocab

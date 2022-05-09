@@ -1,0 +1,44 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+ontology_term_1:
+  label: anatomical entity
+  sample_controlled_vocab_id: <%= ActiveRecord::FixtureSet.identify(:ontology_1) %> 
+
+ontology_term_2:
+  label: retroperitoneal space
+  sample_controlled_vocab_id: <%= ActiveRecord::FixtureSet.identify(:ontology_1) %> 
+
+ontology_term_3:
+  label: abdominal cavity
+  sample_controlled_vocab_id: <%= ActiveRecord::FixtureSet.identify(:ontology_1) %> 
+    
+ontology_term_4:
+  label: dissection
+  sample_controlled_vocab_id: <%= ActiveRecord::FixtureSet.identify(:ontology_2) %> 
+
+ontology_term_5:
+  label: enzymatic cleavage
+  sample_controlled_vocab_id: <%= ActiveRecord::FixtureSet.identify(:ontology_2) %> 
+
+ontology_term_6:
+  label: non specific enzymatic cleavage
+  sample_controlled_vocab_id: <%= ActiveRecord::FixtureSet.identify(:ontology_2) %> 
+
+ontology_term_7:
+  label: protease cleavage
+  sample_controlled_vocab_id: <%= ActiveRecord::FixtureSet.identify(:ontology_2) %> 
+
+ontology_term_8:
+  label: DNA restriction enzyme digestion
+  sample_controlled_vocab_id: <%= ActiveRecord::FixtureSet.identify(:ontology_2) %> 
+
+custom_cv_term_1:
+  label: custom_cv term 1
+  sample_controlled_vocab_id: <%= ActiveRecord::FixtureSet.identify(:custom_cv) %> 
+
+custom_cv_term_2:
+  label: custom_cv term 2
+  sample_controlled_vocab_id: <%= ActiveRecord::FixtureSet.identify(:custom_cv) %> 
+
+custom_cv_term_3:
+  label: custom_cv term 3
+  sample_controlled_vocab_id: <%= ActiveRecord::FixtureSet.identify(:custom_cv) %> 
