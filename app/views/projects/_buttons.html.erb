@@ -43,6 +43,7 @@
   <% if item.can_edit? -%>
     <% if item.can_manage? -%>
       <li><%= image_tag_for_key('manage', edit_project_path(item), "Manage #{t('project')}", nil, "Manage #{t('project')}") -%></li>
+      <li><%= image_tag_for_key('graph_nodes', populate_project_path(item), "Populate", nil, "Populate #{t('project')}") -%></li>
       <li><%= image_tag_for_key "group_edit", admin_members_project_path(item), "Administer", nil, "Administer #{t('project')} members" -%></li>
       <li><%= image_tag_for_key "group_edit", admin_member_roles_project_path(item), "Administer", nil, "Administer #{t('project')} members roles" -%></li>
       <% if OpenbisEndpoint.can_create? %>
@@ -51,7 +52,9 @@
     <% else %>
       <li><%= image_tag_for_key('edit', edit_project_path(item), "Edit #{t('project')} Details", nil, "Edit #{t('project')} Details") -%></li>
     <% end -%>
-      <li><%= image_tag_for_key('order', order_investigations_project_path(item), "Order #{t('investigation').pluralize}", nil, "Order #{t('investigation').pluralize}") -%></li>
+    <% if item.investigations.size > 1 %>
+	<li><%= image_tag_for_key('order', order_investigations_project_path(item), "Order #{t('investigation').pluralize}", nil, "Order #{t('investigation').pluralize}") -%></li>
+    <% end %>
     <% if admin_logged_in? || item.can_manage? -%>
       <%= delete_icon(item,current_user,"Any members will also be removed from the #{t('project')}, are you sure?") %>
     <% end -%>

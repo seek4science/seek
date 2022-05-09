@@ -33,7 +33,7 @@ class Strain < ApplicationRecord
   delegate :ncbi_uri, :to=>:organism
 
   validates_presence_of :title, :organism
-  validates_presence_of :projects, :unless => Proc.new{|strain| strain.is_dummy? || Seek::Config.is_virtualliver}
+  validates_presence_of :projects, :unless => Proc.new{|strain| strain.is_dummy?}
 
   alias_attribute :description, :comment
 

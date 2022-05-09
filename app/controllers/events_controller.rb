@@ -17,7 +17,6 @@ class EventsController < ApplicationController
   def show
     respond_to do |format|
       format.html # show.html.erb
-      format.xml
       format.json {render json: @event, include: [params[:include]]}
     end
   end

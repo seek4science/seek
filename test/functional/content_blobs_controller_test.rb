@@ -6,19 +6,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
 
   def setup
     login_as(:quentin)
-  end
-
-  # Is this still needed?
-  def rest_api_test_object
-    Factory(:pdf_sop, policy: Factory(:downloadable_public_policy)).content_blob
-  end
-
-  def rest_show_url_options(object = rest_api_test_object)
-    { sop_id: object.asset_id }
   end
 
   test 'should resolve to json' do
@@ -30,14 +20,11 @@ class ContentBlobsControllerTest < ActionController::TestCase
     perform_jsonapi_checks
   end
 
-  test 'html and xml not acceptable' do
+  test 'html and rdf not acceptable' do
     sop = Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
     blob = sop.content_blob
 
     get :show, params: { id: blob.id, sop_id: sop.id }
-    assert_response :not_acceptable
-
-    get :show, params: { id: blob.id, sop_id: sop.id, format: 'xml' }
     assert_response :not_acceptable
 
     get :show, params: { id: blob.id, sop_id: sop.id, format: 'rdf' }
@@ -64,10 +51,6 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
-  def test_index_json
-    # nothing to do, no indexes for content blobs
-  end
-
   test 'examine url to file' do
     # test successful request to file
     stub_request(:head, 'http://mockedlocation.com/a-piccy.png').to_return(status: 200, headers: { 'Content-Type' => 'image/png' })
@@ -91,7 +74,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'examine url to github' do
     stub_request(:any, 'https://github.com/bob/workflows/blob/master/dir/the_workflow.cwl').to_return(status: 200)
     stub_request(:any, 'https://raw.githubusercontent.com/bob/workflows/master/dir/the_workflow.cwl').to_return(
-        body: File.new("#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path.cwl"),
+        body: File.new("#{Rails.root}/test/fixtures/files/workflows/rp2/workflows/rp2-to-rp2path.cwl"),
         status: 200,
         headers: { 'Content-Length' => 1118,
                    'Content-Type' => 'text/plain' })
@@ -116,7 +99,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
         status: 200,
         headers: { 'Content-Length' => 40296,
                    'Content-Type' => 'text/plain',
-                   'Content-Disposition' => 'attachment; filename="1-PreProcessing.ga"'})
+                   'Content-Disposition' => "attachment; filename=\"1-PreProcessing.ga\"; filename*=UTF-8''1-PreProcessing.ga"})
 
     suite = -> (url) {
       get :examine_url, xhr: true, params: { data_url: url }
@@ -289,13 +272,12 @@ class ContentBlobsControllerTest < ActionController::TestCase
       get :download, params: { model_id: model.id, id: model.content_blobs.first.id }
     end
     assert_response :success
-    assert_equal 'attachment; filename="file_with_no_extension"', @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"file_with_no_extension\"; filename*=UTF-8''file_with_no_extension", @response.header['Content-Disposition']
     assert_equal 'application/octet-stream', @response.header['Content-Type']
     assert_equal '31', @response.header['Content-Length']
   end
 
   test 'get_pdf' do
-    check_for_soffice
     ms_word_sop = Factory(:doc_sop, policy: Factory(:all_sysmo_downloadable_policy))
     pdf_path = ms_word_sop.content_blob.filepath('pdf')
     FileUtils.rm pdf_path if File.exist?(pdf_path)
@@ -305,28 +287,13 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :get_pdf, params: { sop_id: ms_word_sop.id, id: ms_word_sop.content_blob.id }
     assert_response :success
 
-    assert_equal 'attachment; filename="ms_word_test.pdf"', @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"ms_word_test.pdf\"; filename*=UTF-8''ms_word_test.pdf", @response.header['Content-Disposition']
     assert_equal 'application/pdf', @response.header['Content-Type']
 
     assert_includes 8000..9300, @response.header['Content-Length'].to_i, 'the content length should fall within the rage 8000-9300 bytes'
 
     assert File.exist?(ms_word_sop.content_blob.filepath)
     assert File.exist?(pdf_path)
-  end
-
-  test 'get_pdf raises exception if soffice not running and conversion is needed' do
-    check_for_soffice
-    ms_word_sop = Factory(:doc_sop, policy: Factory(:all_sysmo_downloadable_policy))
-    pdf_path = ms_word_sop.content_blob.filepath('pdf')
-    FileUtils.rm pdf_path if File.exist?(pdf_path)
-    assert !File.exist?(pdf_path)
-    assert ms_word_sop.can_download?
-
-    Seek::Config.stub(:soffice_available?, false) do
-      assert_raises(RuntimeError) do
-        get :get_pdf, params: { sop_id: ms_word_sop.id, id: ms_word_sop.content_blob.id }
-      end
-    end
   end
 
   test 'get_pdf from url' do
@@ -349,7 +316,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
     assert_response :success
 
-    assert_equal 'attachment; filename="a_pdf_file.pdf"', @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"a_pdf_file.pdf\"; filename*=UTF-8''a_pdf_file.pdf", @response.header['Content-Disposition']
     assert_equal 'application/pdf', @response.header['Content-Type']
     assert_equal '8827', @response.header['Content-Length']
 
@@ -358,7 +325,6 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'get_pdf of a doc file from url' do
-    check_for_soffice
     mock_remote_file "#{Rails.root}/test/fixtures/files/ms_word_test.doc",
                      'http://somewhere.com/piccy.doc',
                      'Content-Type' => 'application/pdf',
@@ -373,7 +339,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
       get :get_pdf, params: { sop_id: doc_sop.id, id: doc_sop.content_blob.id }
     end
     assert_response :success
-    assert_equal 'attachment; filename="ms_word_test.pdf"', @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"ms_word_test.pdf\"; filename*=UTF-8''ms_word_test.pdf", @response.header['Content-Disposition']
     assert_equal 'application/pdf', @response.header['Content-Type']
     assert_includes 8000..9300, @response.header['Content-Length'].to_i, 'the content length should fall within the rage 8000-9300 bytes'
 
@@ -454,12 +420,12 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :view_content, params: { data_file_id: df.id, id: df.content_blob.id }
     assert_response :success
     assert @response.body.include?('1,2,3,4,5')
-    assert_equal 'text/plain', @response.content_type
+    assert_equal 'text/plain', @response.media_type
 
     df = Factory(:data_file, content_blob: Factory(:doc_content_blob), policy: Factory(:all_sysmo_downloadable_policy))
     get :view_content, params: { data_file_id: df.id, id: df.content_blob.id }
     assert_response :success
-    assert_equal 'text/html', @response.content_type
+    assert_equal 'text/html', @response.media_type
   end
 
   test 'can fetch csv content blob as csv' do
@@ -467,7 +433,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'csv' }
     assert_response :success
 
-    assert @response.content_type, 'text/csv'
+    assert @response.media_type, 'text/csv'
 
     csv = @response.body
     assert csv.include?(%(1,2,3,4,5))
@@ -479,7 +445,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'csv' }
     assert_response :success
 
-    assert @response.content_type, 'text/csv'
+    assert @response.media_type, 'text/csv'
 
     csv = @response.body
     assert csv.include?(%(,"some stuff"))
@@ -491,7 +457,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'csv' }
     assert_response :not_acceptable
 
-    assert @response.content_type, 'text/csv'
+    assert @response.media_type, 'text/csv'
 
     csv = @response.body
     assert csv.include?(%(Unable to view))
@@ -503,7 +469,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'csv' }
     assert_response :not_found
 
-    assert @response.content_type, 'text/csv'
+    assert @response.media_type, 'text/csv'
 
     csv = @response.body
     assert csv.include?(%(No content))
@@ -553,7 +519,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
       get :download, params: { data_file_id: df, id: df.content_blob }
     end
     assert_response :success
-    assert_equal 'attachment; filename="small-test-spreadsheet.xls"', @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"small-test-spreadsheet.xls\"; filename*=UTF-8''small-test-spreadsheet.xls", @response.header['Content-Disposition']
     assert_equal 'application/vnd.ms-excel', @response.header['Content-Type']
     assert_equal '7168', @response.header['Content-Length']
   end
@@ -666,7 +632,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
       get :download, params: { model_id: model.id, id: first_content_blob.id }
     end
     assert_response :success
-    assert_equal "attachment; filename=\"#{first_content_blob.original_filename}\"", @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"#{first_content_blob.original_filename}\"; filename*=UTF-8''#{first_content_blob.original_filename}", @response.header['Content-Disposition']
     assert_equal first_content_blob.content_type, @response.header['Content-Type']
     assert_equal first_content_blob.file_size.to_s, @response.header['Content-Length']
   end
@@ -701,7 +667,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     end
 
     assert_response :success
-    assert_equal "attachment; filename=\"#{sample_type.template.original_filename}\"", @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"#{sample_type.template.original_filename}\"; filename*=UTF-8''#{sample_type.template.original_filename}", @response.header['Content-Disposition']
 
     assert_equal sample_type, ActivityLog.last.activity_loggable
     assert_equal 'download',ActivityLog.last.action

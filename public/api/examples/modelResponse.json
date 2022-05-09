@@ -12,16 +12,19 @@
                 {
                     "version": 1,
                     "revision_comments": null,
-                    "url": "https://fairdomhub.org/models/139?version=1"
+                    "url": "https://fairdomhub.org/models/139?version=1",
+                    "doi": null
                 },
                 {
                     "version": 2,
                     "revision_comments": null,
-                    "url": "https://fairdomhub.org/models/139?version=2"
+                    "url": "https://fairdomhub.org/models/139?version=2",
+                    "doi": null
                 }
             ],
             "version": 2,
             "revision_comments": null,
+            "doi": null,
             "created_at": "2015-02-04T11:19:45.000Z",
             "updated_at": "2015-09-08T11:29:40.000Z",
             "content_blobs": [

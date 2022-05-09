@@ -8,12 +8,14 @@ require 'rake'
 class RegularMaintenanceJob < ApplicationJob
   RUN_PERIOD = 4.hours.freeze
   BLOB_GRACE_PERIOD = 8.hours.freeze
+  REPO_GRACE_PERIOD = 8.hours.freeze
   USER_GRACE_PERIOD = 1.week.freeze
   MAX_ACTIVATION_EMAILS = 3
   RESEND_ACTIVATION_EMAIL_DELAY = 4.hours.freeze
 
   def perform
     clean_content_blobs
+    clean_git_repositories
     resend_activation_emails
     remove_unregistered_users
     trim_session
@@ -28,6 +30,14 @@ class RegularMaintenanceJob < ApplicationJob
       Rails.logger.info("Cleaning up content blob #{blob.id}")
       blob.reload
       blob.destroy if blob.asset.nil?
+    end
+  end
+
+  # Remove GitRepositories that were never used
+  def clean_git_repositories
+    Git::Repository.redundant.where('git_repositories.created_at < ?', REPO_GRACE_PERIOD.ago).select do |repo|
+      Rails.logger.info("Cleaning up Git::Repository #{repo.id}")
+      repo.destroy
     end
   end
 
@@ -62,16 +72,23 @@ class RegularMaintenanceJob < ApplicationJob
   # checks lookup_table_consistent? on each type for each user, and if not triggers a job to repopulate for that user
   # if not already queued
   def check_authlookup_consistency
+    found_types = [].to_set
+    items_for_queue = [].to_set
     User.where.not(person_id: nil).to_a.push(nil).each do |user|
-      next if AuthLookupUpdateQueue.where(item: user).any?
 
+      # will only deal with 1 type per user per run
       found = Seek::Util.authorized_types.find do |type|
         !type.lookup_table_consistent?(user)
       end
-      if found.present?
-        found.remove_invalid_auth_lookup_entries
-        AuthLookupUpdateQueue.enqueue(user)
-      end
+
+      next unless found.present?
+
+      found_types << found
+      missing = found.items_missing_from_authlookup(user)
+      items_for_queue.merge(missing)
     end
+
+    found_types.each(&:remove_invalid_auth_lookup_entries)
+    AuthLookupUpdateQueue.enqueue(items_for_queue.to_a) unless items_for_queue.empty?
   end
 end

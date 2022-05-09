@@ -4,16 +4,13 @@ class GroupMembership < ApplicationRecord
   has_one :project, through: :work_group, inverse_of: :group_memberships
   has_one :institution, through: :work_group, inverse_of: :group_memberships
 
-  has_many :group_memberships_project_positions, :dependent => :destroy
-  has_many :project_positions, :through => :group_memberships_project_positions
-
   before_save :unset_has_left
   after_save :remember_previous_person
-  after_update { remove_admin_defined_role_projects if has_left }
+  after_update { remove_former_project_roles if has_left }
   after_commit :queue_update_auth_table
 
   after_destroy do
-    remove_admin_defined_role_projects
+    remove_former_project_roles
     destroy_empty_work_group
   end
 
@@ -57,15 +54,11 @@ class GroupMembership < ApplicationRecord
 
   private
 
-  def remove_admin_defined_role_projects
-    project = Project.find_by_id(WorkGroup.find(work_group_id).project_id)
-    person = Person.find_by_id(person_id)
-    if project && person
-      Seek::Roles::ProjectRelatedRoles.role_names.each do |role_name|
-        person.send("is_#{role_name}=", [false, project])
-      end
-      disable_authorization_checks { person.save }
-    end
+  def remove_former_project_roles
+    wg = WorkGroup.find_by_id(work_group_id)
+    return unless wg
+    project = Project.find_by_id(wg.project_id)
+    person.remove_dangling_project_roles if project && person.persisted?
   end
 
   def destroy_empty_work_group

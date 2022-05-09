@@ -58,7 +58,6 @@ class SamplesController < ApplicationController
   def show
     @sample = Sample.find(params[:id])
     respond_to do |format|
-      format.js
       format.html
       format.json {render json: @sample, include: [params[:include]]}
     end

@@ -106,7 +106,7 @@ namespace :seek_dev do
       project.save!
       institution.projects << project
       institution.save!
-      p.update_attributes('work_group_ids' => [project.work_groups.first.id.to_s])
+      p.update('work_group_ids' => [project.work_groups.first.id.to_s])
     end
   end
 
@@ -292,8 +292,7 @@ namespace :seek_dev do
   end
 
   task find_publications_without_publication_types: :environment do
-     base_url = "https://fairdomhub.org/"
-     #base_url = "https://0.0.0.0:3002/"
+    base_url = Seek::Config.site_base_url.to_s
     File.delete("./log/publications_without_publication_types.log") if File.exist?("./log/publications_without_publication_types.log")
     output = File.open( "./log/publications_without_publication_types.log","w" )
      pj_has_pubs = Project.all.select { |p| p.publications.size > 0 }
@@ -329,11 +328,12 @@ namespace :seek_dev do
   end
 
   task report_missing_related_items_routes: :environment do
+    routes = Seek::Util.routes
     Seek::RelatedItems::RELATABLE_TYPES.each do |type|
       klass = type.constantize
       methods = klass.related_type_methods
       methods.each_key do |assoc|
-        x = Rails.application.routes.url_helpers.send("#{type.underscore}_#{assoc.pluralize.underscore}_path", 1) rescue nil
+        x = routes.send("#{type.underscore}_#{assoc.pluralize.underscore}_path", 1) rescue nil
         puts "Missing! #{type.underscore}_#{assoc.pluralize.underscore}_path" if x.nil?
       end
     end

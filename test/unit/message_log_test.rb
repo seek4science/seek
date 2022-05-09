@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class MessageLogTest < ActiveSupport::TestCase
+
   test 'create' do
     log = valid_log
     log.save!
@@ -326,6 +327,44 @@ class MessageLogTest < ActiveSupport::TestCase
     assert log.can_respond_project_creation_request?(admin)
     refute log.can_respond_project_creation_request?(prog_admin)
     refute log.can_respond_project_creation_request?(person)
+  end
+
+  test 'handles legacy serialized fields' do
+    sender = Factory(:person)
+    project = Factory(:project)
+    programme = Factory(:programme)
+    institution = Factory(:institution)
+
+    details = {
+      institution: {id: institution.id, title: institution.title, country: institution.country, legacy_field:'old'},
+      project: {id:nil, title:project.title, ancestor_id:4},
+      programme: {id:programme.id, title:programme, legacy_field:'old'}
+    }
+    log = ProjectCreationMessageLog.create(subject: sender, sender: sender, details: details.to_json)
+    parsed_details = log.parsed_details
+    assert_equal institution, parsed_details.institution
+    assert_equal programme, parsed_details.programme
+    assert_equal project.title, parsed_details.project.title
+    assert_nil parsed_details.project.id
+
+  end
+
+  test 'only writes needed fields to details' do
+    sender = Factory(:person)
+    programme = Factory(:programme)
+    project = Project.new(title:'new project', description: 'blah', web_page: 'https://webpage.com', programme: programme)
+    institution = Factory(:institution)
+
+    log = ProjectCreationMessageLog.log_request(sender: sender, programme: programme,
+                                          project: project, institution: institution)
+
+    actual = JSON.parse(log.details)
+    expected = {
+      institution: {id: institution.id, title: institution.title, city: institution.city, web_page: institution.web_page, country: institution.country},
+      project: {id:nil, title:'new project', description: 'blah', web_page: 'https://webpage.com', programme_id:programme.id},
+      programme: {id:programme.id, title:programme.title, description: programme.description}
+    }.with_indifferent_access
+    assert_equal expected, actual
   end
 
   private

@@ -28,8 +28,6 @@
   <input name="single_page" type="hidden" value=<%=params[:single_page]%> />
 <% end %>
 
-<%= render :partial => "scales/scales_selector",:locals=>{:object=>@investigation} if show_scales?  %>
-
 <%= render partial: 'assets/manage_specific_attributes', locals:{f:f, :object => object} if show_form_manage_specific_attributes? %>
 
 <%= f.fancy_multiselect :publications, { other_projects_checkbox: true } %>

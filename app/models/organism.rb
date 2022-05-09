@@ -28,8 +28,8 @@ class Organism < ApplicationRecord
 
   validate do |organism|
     unless organism.bioportal_concept.nil? || organism.bioportal_concept.valid?
-      organism.bioportal_concept.errors.each do |attr, msg|
-        errors.add(attr, msg)
+      organism.bioportal_concept.errors.each do |error|
+        errors.add(error.attribute, error.message)
       end
     end
   end

@@ -4821,20 +4821,6 @@
                 "$ref": "#/definitions/nonEmptyString"
             }
         },
-        "projectPosition": {
-            "type": "object",
-            "properties": {
-                "project_id": {
-                    "type": "string"
-                },
-                "position_id": {
-                    "type": "string"
-                },
-                "project_name": {
-                    "type": "string"
-                }
-            }
-        },
         "assetsCreator": {
             "type": "object",
             "properties": {
@@ -4867,12 +4853,6 @@
             "minItems": 0,
             "items": {
                 "$ref": "#/definitions/assetsCreator"
-            }
-        },
-        "projectPositionsList": {
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/projectPosition"
             }
         },
         "snapshotSkeleton": {
@@ -5189,29 +5169,16 @@
                     "minItems": 1,
                     "uniqueItems": true,
                     "items": {
-                        "properties": {
-                            "version": {
-                                "type": "number"
-                            },
-                            "revision_comments": {
-                                "$ref": "#/definitions/nullableNonEmptyString"
-                            },
-                            "url": {
-                                "$ref": "#/definitions/uriString"
-                            }
-                        },
-                        "required": [
-                            "version",
-                            "revision_comments",
-                            "url"
-                        ],
-                        "additionalProperties": false
+                        "$ref": "#/definitions/version"
                     }
                 },
                 "version": {
                     "type": "number"
                 },
                 "revision_comments": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "doi": {
                     "$ref": "#/definitions/nullableNonEmptyString"
                 },
                 "created_at": {
@@ -5245,6 +5212,39 @@
             ],
             "additionalProperties": false
         },
+        "collectionAttributes": {
+            "type": "object",
+            "properties": {
+                "tags": {
+                    "$ref": "#/definitions/tagsType"
+                },
+                "title": {
+                    "$ref": "#/definitions/nonEmptyString"
+                },
+                "description": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "license": {
+                    "$ref": "#/definitions/nullableLicense"
+                },
+                "policy": {
+                    "$ref": "#/definitions/policy"
+                },
+                "other_creators": {
+                    "$ref": "#/definitions/nullableOtherCreatorsString"
+                },
+                "creators": {
+                    "$ref": "#/definitions/assetsCreatorsList"
+                }
+            },
+            "required": [
+                "title",
+                "license",
+                "created_at",
+                "updated_at"
+            ],
+            "additionalProperties": false
+        },
         "modelAttributes": {
             "type": "object",
             "properties": {
@@ -5268,29 +5268,16 @@
                     "minItems": 1,
                     "uniqueItems": true,
                     "items": {
-                        "properties": {
-                            "version": {
-                                "type": "number"
-                            },
-                            "revision_comments": {
-                                "$ref": "#/definitions/nullableNonEmptyString"
-                            },
-                            "url": {
-                                "$ref": "#/definitions/uriString"
-                            }
-                        },
-                        "required": [
-                            "version",
-                            "revision_comments",
-                            "url"
-                        ],
-                        "additionalProperties": false
+                        "$ref": "#/definitions/version"
                     }
                 },
                 "version": {
                     "type": "number"
                 },
                 "revision_comments": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "doi": {
                     "$ref": "#/definitions/nullableNonEmptyString"
                 },
                 "created_at": {
@@ -6176,6 +6163,28 @@
         },
         "tagsType": {
             "$ref": "#/definitions/nonEmptyStringList"
+        },
+        "ontologyTermsList": {
+            "type": "array",
+            "minItems": 0,
+            "uniqueItems": true,
+            "items": {
+                "$ref": "#/definitions/ontologyTerm"
+            }
+        },
+        "ontologyTerm": {
+            "type": "object",
+            "properties": {
+                "label": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "identifier": {
+                    "$ref": "#/definitions/uriString"
+                }
+            },
+            "required": [
+                "identifier"
+            ]
         },
         "anySkeleton": {
             "properties": {
@@ -9104,9 +9113,6 @@
                                 "skype_name": {
                                     "$ref": "#/definitions/nullableNonEmptyString"
                                 },
-                                "project_positions": {
-                                    "$ref": "#/definitions/projectPositionsList"
-                                },
                                 "login": {
                                     "$ref": "#/definitions/nullableNonEmptyString"
                                 }
@@ -9246,9 +9252,6 @@
                                 },
                                 "skype_name": {
                                     "$ref": "#/definitions/nullableNonEmptyString"
-                                },
-                                "project_positions": {
-                                    "$ref": "#/definitions/projectPositionsList"
                                 }
                             },
                             "additionalProperties": false
@@ -9347,7 +9350,7 @@
                             "$ref": "#/definitions/presentationType"
                         },
                         "attributes": {
-                            "$ref": "#/definitions/contributedTypeAttributes"
+                            "$ref": "#/definitions/presentationAttributes"
                         },
                         "relationships": {
                             "type": "object",
@@ -10734,6 +10737,12 @@
                                 "tags": {
                                     "$ref": "#/definitions/tagsType"
                                 },
+                                "edam_topics": {
+                                    "$ref": "#/definitions/ontologyTermsList"
+                                },
+                                "edam_operations": {
+                                    "$ref": "#/definitions/ontologyTermsList"
+                                },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
                                 },
@@ -10770,29 +10779,23 @@
                                     "minItems": 1,
                                     "uniqueItems": true,
                                     "items": {
-                                        "properties": {
-                                            "version": {
-                                                "type": "number"
+                                        "oneOf": [
+                                            {
+                                                "$ref": "#/definitions/version"
                                             },
-                                            "revision_comments": {
-                                                "$ref": "#/definitions/nullableNonEmptyString"
-                                            },
-                                            "url": {
-                                                "$ref": "#/definitions/uriString"
+                                            {
+                                                "$ref": "#/definitions/gitVersion"
                                             }
-                                        },
-                                        "required": [
-                                            "version",
-                                            "revision_comments",
-                                            "url"
-                                        ],
-                                        "additionalProperties": false
+                                        ]
                                     }
                                 },
                                 "version": {
                                     "type": "number"
                                 },
                                 "revision_comments": {
+                                    "$ref": "#/definitions/nullableNonEmptyString"
+                                },
+                                "doi": {
                                     "$ref": "#/definitions/nullableNonEmptyString"
                                 },
                                 "created_at": {
@@ -10948,6 +10951,12 @@
                                 "tags": {
                                     "$ref": "#/definitions/tagsType"
                                 },
+                                "edam_topics": {
+                                    "$ref": "#/definitions/ontologyTermsList"
+                                },
+                                "edam_operations": {
+                                    "$ref": "#/definitions/ontologyTermsList"
+                                },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
                                 },
@@ -11045,6 +11054,12 @@
                             "properties": {
                                 "tags": {
                                     "$ref": "#/definitions/tagsType"
+                                },
+                                "edam_topics": {
+                                    "$ref": "#/definitions/ontologyTermsList"
+                                },
+                                "edam_operations": {
+                                    "$ref": "#/definitions/ontologyTermsList"
                                 },
                                 "title": {
                                     "$ref": "#/definitions/nonEmptyString"
@@ -11214,7 +11229,7 @@
                             "$ref": "#/definitions/collectionType"
                         },
                         "attributes": {
-                            "$ref": "#/definitions/contributedTypeAttributes"
+                            "$ref": "#/definitions/collectionAttributes"
                         },
                         "relationships": {
                             "type": "object",
@@ -13003,6 +13018,67 @@
             "required": [
                 "data",
                 "jsonapi"
+            ],
+            "additionalProperties": false
+        },
+        "version": {
+            "type": "object",
+            "properties": {
+                "version": {
+                    "type": "number"
+                },
+                "revision_comments": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "url": {
+                    "$ref": "#/definitions/uriString"
+                },
+                "doi": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                }
+            },
+            "required": [
+                "version",
+                "revision_comments",
+                "url"
+            ],
+            "additionalProperties": false
+        },
+        "gitVersion": {
+            "type": "object",
+            "properties": {
+                "version": {
+                    "type": "number"
+                },
+                "revision_comments": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "url": {
+                    "$ref": "#/definitions/uriString"
+                },
+                "commit": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "ref": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                },
+                "tree": {
+                    "$ref": "#/definitions/uriString"
+                },
+                "remote": {
+                    "$ref": "#/definitions/uriString"
+                },
+                "doi": {
+                    "$ref": "#/definitions/nullableNonEmptyString"
+                }
+            },
+            "required": [
+                "version",
+                "revision_comments",
+                "url",
+                "commit",
+                "ref",
+                "tree"
             ],
             "additionalProperties": false
         },

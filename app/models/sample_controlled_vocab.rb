@@ -10,6 +10,7 @@ class SampleControlledVocab < ApplicationRecord
 
   has_many :sample_types, through: :sample_attributes
   has_many :samples, through: :sample_types
+  belongs_to :repository_standard, inverse_of: :sample_controlled_vocabs
 
   auto_strip_attributes :ols_root_term_uri
 
@@ -18,6 +19,7 @@ class SampleControlledVocab < ApplicationRecord
   validates :key, uniqueness: { allow_blank: true }
 
   accepts_nested_attributes_for :sample_controlled_vocab_terms, allow_destroy: true
+  accepts_nested_attributes_for :repository_standard, :reject_if => :check_repository_standard
 
   grouped_pagination
 
@@ -63,7 +65,9 @@ class SampleControlledVocab < ApplicationRecord
 
     KEYS = {
       edam_topics: 'edam_topics',
-      edam_operations: 'edam_operations'
+      edam_operations: 'edam_operations',
+      edam_formats: 'edam_formats',
+      edam_data: 'edam_data'
     }
 
     def self.key_known?(key)

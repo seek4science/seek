@@ -41,7 +41,6 @@ class StudiesController < ApplicationController
     @study = Study.find(params[:id])
     respond_to do |format|
       format.html
-      format.xml
     end
   end
 
@@ -54,7 +53,7 @@ class StudiesController < ApplicationController
 
   def update
     @study = Study.find(params[:id])
-    if params[:study][:ordered_assay_ids]
+    if params[:study]&.[](:ordered_assay_ids)
       a1 = params[:study][:ordered_assay_ids]
       a1.permit!
       pos = 0
@@ -90,7 +89,6 @@ class StudiesController < ApplicationController
 
     respond_to do |format|
       format.html { render(params[:only_content] ? { layout: false } : {})}
-      format.xml
       format.rdf { render template: 'rdf/show' }
       format.json {render json: @study, include: [params[:include]]}
     end
@@ -341,10 +339,9 @@ class StudiesController < ApplicationController
   end
 
   private
-
   def study_params
     params.require(:study).permit(:title, :description, :experimentalists, :investigation_id,
-                                  *creator_related_params, :position, { scales: [] }, { publication_ids: [] },
+                                  *creator_related_params, :position, { publication_ids: [] },
                                   { discussion_links_attributes:[:id, :url, :label, :_destroy] },
                                   { custom_metadata_attributes: determine_custom_metadata_keys })
   end

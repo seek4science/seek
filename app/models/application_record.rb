@@ -5,13 +5,13 @@ class ApplicationRecord < ActiveRecord::Base
   include Seek::AnnotatableExtensions
   include Seek::VersionedResource
   include Seek::ExplicitVersioning
+  include Git::Versioning
   include Seek::Favouritable
   include Seek::ActsAsDiscussable
   include Seek::ActsAsFleximageExtension
   include Seek::UniquelyIdentifiable
   include Seek::ActsAsYellowPages
   include Seek::GroupedPagination
-  include Seek::Scalable
   include Seek::TitleTrimmer
   include Seek::ActsAsAsset
   include Seek::ActsAsISA
@@ -152,6 +152,20 @@ class ApplicationRecord < ActiveRecord::Base
   has_filter query: Seek::Filtering::SearchFilter.new
   has_filter created_at: Seek::Filtering::DateFilter.new(field: :created_at,
                                                          presets: [24.hours, 1.week, 1.month, 1.year, 5.years])
+
+  def is_a_version?
+    false
+  end
+
+  def is_git_versioned?
+    false
+  end
+
+  def cache_key_fragment
+    base = "#{self.class.name.underscore}-#{id}"
+    base << "-#{version}" if versioned?
+    base
+  end
 
   def self.feature_enabled?
     method = "#{name.underscore.pluralize}_enabled"

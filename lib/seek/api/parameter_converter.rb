@@ -66,6 +66,13 @@ module Seek
             end
           },
 
+          edam_operations: proc {|value|
+            value.collect{|v| v[:identifier]}.join(', ')
+          },
+          edam_topics: proc {|value|
+            value.collect{|v| v[:identifier]}.join(', ')
+          },
+
           funding_codes: proc { |value|
             if value
               value.join(', ')
@@ -134,7 +141,8 @@ module Seek
           workflow_class: :workflow_class_id,
           discussion_links: :discussion_links_attributes,
           template: :template_attributes,
-          creators: :api_assets_creators
+          creators: :api_assets_creators,
+          administrator_ids: :programme_administrator_ids
       }.freeze
 
       # Parameters to "elevate" out of params[bla] to the top-level.

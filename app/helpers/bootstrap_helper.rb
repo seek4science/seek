@@ -174,13 +174,42 @@ module BootstrapHelper
   def modal_body(options = {})
     opts = merge_options({ class: 'modal-body' }, options)
     content_tag(:div, opts) do
-      yield
+      yield if block_given?
     end
   end
 
   def modal_footer(options = {})
     opts = merge_options({ class: 'modal-footer' }, options)
     content_tag(:div, opts) do
+      yield if block_given?
+    end
+  end
+
+  def tab(*args)
+    if block_given?
+      tab_id, selected = *args
+      title = nil
+    else
+      title, tab_id, selected = *args
+    end
+
+    selected = show_page_tab == tab_id if selected.nil?
+
+    content_tag(:li, class: selected ? 'active' : '') do
+      if block_given?
+        content_tag(:a, data: { target: "##{tab_id}", toggle: 'tab' }, aria: { controls: tab_id }, role: 'tab') do
+          yield
+        end
+      else
+        content_tag(:a, title, data: { target: "##{tab_id}", toggle: 'tab' }, aria: { controls: tab_id }, role: 'tab')
+      end
+    end
+  end
+
+  def tab_pane(tab_id, selected = nil)
+    selected = show_page_tab == tab_id if selected.nil?
+
+    content_tag(:div, id: tab_id, class: selected ? 'tab-pane fade in active' : 'tab-pane fade') do
       yield
     end
   end

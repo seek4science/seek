@@ -114,6 +114,13 @@ module Seek
           (lookup_count == asset_count && (asset_count == 0 || (last_lookup_asset_id == last_id)))
         end
 
+        # returns items that have entries missing from the authlookup for this user
+        def items_missing_from_authlookup(user)
+          user_id = user&.id || 0
+          ids = pluck(:id) - lookup_class.where(user_id:user_id).pluck(:asset_id)
+          ids.collect{|id| find(id)}
+        end
+
         # the name of the lookup table, holding authorisation lookup information, for this given authorised type
         def lookup_table_name
           "#{table_name.singularize}_auth_lookup" # Changed to handle namespaced models e.g. TavernaPlayer::Run

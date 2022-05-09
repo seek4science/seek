@@ -6,4 +6,6 @@ class DataFileSerializer < ContributedResourceSerializer
   has_many :assays
   has_many :publications
   has_many :events
+  has_one :placeholder
+  has_one :file_template
 end

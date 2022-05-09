@@ -46,12 +46,12 @@ module Seek
       end
 
       def fetch_label_for(uri)
-        result = ontology.query(subject: uri, predicate: RDF::RDFS.label).first
+        result = ontology.query({subject: uri, predicate: RDF::RDFS.label}).first
         result.nil? ? result : result.object.to_s
       end
 
       def fetch_description_for(uri)
-        result = ontology.query(subject: uri, predicate: RDF::Vocab::DC11.description).first
+        result = ontology.query({subject: uri, predicate: RDF::Vocab::DC11.description}).first
         result.nil? ? result : result.object.to_s
       end
 
@@ -86,7 +86,7 @@ module Seek
       end
 
       def subclasses_for(uri)
-        ontology.query(predicate: RDF::RDFS.subClassOf, object: uri).collect do |solution|
+        ontology.query({predicate: RDF::RDFS.subClassOf, object: uri}).collect do |solution|
           uri = solution.subject
           subclasses = subclasses_for(uri)
           o = build_ontology_class uri, nil, nil, subclasses

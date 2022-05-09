@@ -29,10 +29,7 @@ module Seek
   # Convention for creating a new propagator is to add a method named <setting_name>_propagate
   module Propagators
     def site_base_host_propagate
-      script_name = (SEEK::Application.config.relative_url_root || '/')
-      ActionMailer::Base.default_url_options = { host: host_with_port,
-                                                 protocol: host_scheme,
-                                                 script_name: script_name }
+      Rails.application.default_url_options = site_url_options
     end
 
     def smtp_propagate
@@ -99,7 +96,7 @@ module Seek
         SEEK::Application.config.middleware.use ExceptionNotification::Rack,
                                                 email: {
                                                   sender_address: [noreply_sender],
-                                                  email_prefix: "[ #{application_name} ERROR ] ",
+                                                  email_prefix: "[ #{instance_name} ERROR ] ",
                                                   exception_recipients: exception_notification_recipients.nil? ? [] : exception_notification_recipients.split(/[, ]/)
                                                 }
       else
@@ -200,10 +197,18 @@ module Seek
       append_filestore_path 'rebranding'
     end
 
-    def append_filestore_path(inner_dir)
+    def git_filestore_path
+      append_filestore_path 'git'
+    end
+
+    def git_temporary_filestore_path
+      append_filestore_path 'tmp', 'git'
+    end
+
+    def append_filestore_path(*inner_dir)
       path = filestore_path
       path = File.join(Rails.root, path) unless path.start_with? '/'
-      check_path_exists(File.join(path, inner_dir))
+      check_path_exists(File.join(path, *inner_dir))
     end
 
     def check_path_exists(path)
@@ -218,10 +223,6 @@ module Seek
     def set_smtp_settings(field, value)
       merge! :smtp, field => (value.blank? ? nil : value)
       value
-    end
-
-    def facet_enable_for_page(controller)
-      facet_enable_for_pages.with_indifferent_access[controller.to_s]
     end
 
     def sorting_for(controller)
@@ -264,6 +265,24 @@ module Seek
       URI(Seek::Config.site_base_host).scheme
     end
 
+    # Includes trailing slash so it can be used to safely append subpaths, e.g.
+    # `Seek::Config.site_base_url.join('data_files')`
+    def site_base_url
+      uri = Addressable::URI.parse(Seek::Config.site_base_host)
+      uri.path = (Rails.application.config.relative_url_root || '').chomp('/') + '/'
+      uri
+    end
+
+    def site_url_options
+      u = URI.parse(site_base_host)
+      {
+        host: u.host,
+        port: u.port,
+        protocol: u.scheme,
+        script_name: (SEEK::Application.config.relative_url_root || '/')
+      }
+    end
+
     def write_attr_encrypted_key
       File.open(attr_encrypted_key_path, 'wb') do |f|
         f << SecureRandom.random_bytes(32)
@@ -273,18 +292,6 @@ module Seek
     def write_secret_key_base
       File.open(secret_key_base_path, 'w') do |f|
         f << SecureRandom.hex(64)
-      end
-    end
-
-    def soffice_available?(cached=false)
-      @@soffice_available = nil unless cached
-      begin
-        port = ConvertOffice::ConvertOfficeConfig.options[:soffice_port]
-        soc = TCPSocket.new('localhost', port)
-        soc.close
-        true
-      rescue
-        false
       end
     end
 
@@ -301,10 +308,11 @@ module Seek
     end
 
     def omniauth_elixir_aai_config
-      callback_path = '/identities/auth/elixir_aai/callback'
+      # Cannot use url helpers here because routes are not loaded at this point :( -Finn
+      callback_path = 'identities/auth/elixir_aai/callback'
 
       {
-          callback_path: callback_path,
+          callback_path: "#{Rails.application.config.relative_url_root}/#{callback_path}",
           name: :elixir_aai,
           scope: [:openid, :email],
           response_type: 'code',
@@ -317,7 +325,7 @@ module Seek
           client_options: {
               identifier: omniauth_elixir_aai_client_id,
               secret: omniauth_elixir_aai_secret,
-              redirect_uri: "#{site_base_host.chomp('/')}#{callback_path}",
+              redirect_uri: site_base_url.join(callback_path).to_s,
               scheme: 'https',
               host: 'login.elixir-czech.org',
               port: 443,
@@ -380,12 +388,13 @@ module Seek
 
     if use_db
       def get_value(setting, conversion = nil)
-        result = Settings.global.fetch(setting)
-        if result
-          val = result.value
+        val = Settings.defaults[setting.to_s]
+        if Thread.current[:use_settings_cache]
+          result = settings_cache[setting]
         else
-          val = Settings.defaults[setting.to_s]
+          result = Settings.global.fetch(setting)
         end
+        val = result.value if result
         val = val.send(conversion) if conversion && val
         val
       end
@@ -416,7 +425,7 @@ module Seek
     # transfers a setting value from the old_name to the new_name setting value, for use when renaming a setting.
     # Creates a new record for the new setting (if set), and cleans up and removes the old record. Ignores any defaults that are set
     def transfer_value(old_name, new_name)
-      if old_value = Settings.global.get(:old_name)
+      if old_value = Settings.global.get(old_name)
         set_value(new_name,old_value)
         Settings.destroy(old_name)
       end
@@ -499,5 +508,36 @@ module Seek
       true
     end
 
+    def self.enable_cache!
+      Thread.current[:use_settings_cache] = true
+    end
+
+    def self.disable_cache!
+      Thread.current[:use_settings_cache] = nil
+    end
+
+    def self.settings_cache
+      RequestStore.fetch(:config_cache) do
+        Rails.cache.fetch(cache_key, expires_in: 1.week) do
+          cache_setting = Thread.current[:use_settings_cache]
+          begin
+            hash = {}
+            disable_cache! # Disable cache whilst loading settings to prevent infinite loop via `attr_encrypted_key_path`
+            Settings.global.to_a.each { |s| hash[s.var] = s }
+            hash
+          ensure
+            Thread.current[:use_settings_cache] = cache_setting
+          end
+        end
+      end
+    end
+
+    def self.clear_cache
+      Rails.cache.delete(cache_key)
+    end
+
+    def self.cache_key
+      'seek_config'
+    end
   end
 end

@@ -4,7 +4,6 @@ class AssaysControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
   include GeneralAuthorizationTestCases
@@ -12,21 +11,6 @@ class AssaysControllerTest < ActionController::TestCase
 
   def setup
     login_as(:quentin)
-  end
-
-  def rest_api_test_object
-    @object = Factory(:experimental_assay, policy: Factory(:public_policy))
-  end
-
-  test "shouldn't show unauthorized assays" do
-    login_as Factory(:user)
-    hidden = Factory(:experimental_assay, policy: Factory(:private_policy)) # ensure at least one hidden assay exists
-    get :index, params: { page: 'all', format: 'xml' }
-    assert_response :success
-    assert_equal assigns(:assays).sort_by(&:id),
-                 assigns(:assays).authorized_for('view', users(:aaron)).sort_by(&:id),
-                 "#{t('assays.assay').downcase.pluralize} haven't been authorized"
-    assert !assigns(:assays).include?(hidden)
   end
 
   def test_title
@@ -1256,40 +1240,6 @@ class AssaysControllerTest < ActionController::TestCase
     end
   end
 
-  test 'faceted browsing config for Assay' do
-    Factory(:assay, policy: Factory(:public_policy))
-    with_config_value :faceted_browsing_enabled, true do
-      get :index, params: { user_enable_facet: 'true' }
-      assert_select "div[data-ex-facet-class='TextSearch']", count: 1
-      assert_select "div[data-ex-role='facet'][data-ex-expression='.organism']", count: 1
-      assert_select "div[data-ex-role='facet'][data-ex-expression='.assay_type'][data-ex-facet-class='Exhibit.HierarchicalFacet']", count: 1
-      assert_select "div[data-ex-role='facet'][data-ex-expression='.technology_type'][data-ex-facet-class='Exhibit.HierarchicalFacet']", count: 1
-      assert_select "div[data-ex-role='facet'][data-ex-expression='.project']", count: 1
-      assert_select "div[data-ex-role='facet'][data-ex-expression='.for_test']", count: 0
-    end
-  end
-
-  test 'content config for Assay' do
-    with_config_value :faceted_browsing_enabled, true do
-      get :index, params: { user_enable_facet: 'true' }
-      assert_select "div[data-ex-role='exhibit-view'][data-ex-label='Tiles'][data-ex-paginate='true']", count: 1
-    end
-  end
-
-  test 'show only authorized items for faceted browsing' do
-    with_config_value :faceted_browsing_enabled, true do
-      assay1 = Factory(:assay, policy: Factory(:public_policy))
-      assay2 = Factory(:assay, policy: Factory(:private_policy))
-      assert assay1.can_view?
-      assert !assay2.can_view?
-      @request.env['HTTP_REFERER'] = '/assays/items_for_result'
-      post :items_for_result, xhr: true, params: { items: "Assay_#{assay1.id},Assay_#{assay2.id}" }
-      items_for_result = ActiveSupport::JSON.decode(@response.body)['items_for_result']
-      assert items_for_result.include?(assay1.title)
-      assert !items_for_result.include?(assay2.title)
-    end
-  end
-
   test 'should add creators' do
     assay = Factory(:assay, policy: Factory(:public_policy))
     creator = Factory(:person)
@@ -1430,14 +1380,6 @@ class AssaysControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'a[href=?]', edit_assay_path, count: 1 # Can manage
     assert_select 'a[href=?]', assay_nels_path(assay_id: assay.id), count: 0 # But not browse NeLS
-  end
-
-  def edit_max_object(assay)
-    add_tags_to_test_object(assay)
-    add_creator_to_test_object(assay)
-
-    org = Factory(:organism)
-    assay.associate_organism(org)
   end
 
   test 'can delete an assay with subscriptions' do

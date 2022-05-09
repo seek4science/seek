@@ -13,7 +13,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   end
 
   test 'doiable assets' do
-    assert_equal %w(data_file document model node sop workflow), DOIABLE_ASSETS
+    assert_equal %w(data_file document file_template model sop workflow), DOIABLE_ASSETS
   end
 
   test 'mint a DOI button' do
@@ -269,6 +269,39 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
 
     assert flash[:error].include?('not possible')
     assert_not_equal 'test 123', asset.reload.title
+  end
+
+  test 'mint doi for git-versioned workflow' do
+    mock_datacite_request
+
+    workflow = Factory(:remote_git_workflow, policy: Factory(:public_policy))
+    assert_nil workflow.latest_git_version.doi
+    refute workflow.latest_git_version.mutable?
+    assert workflow.latest_git_version.can_mint_doi?
+
+    post "/workflows/#{workflow.id}/mint_doi"
+    assert_redirected_to polymorphic_path(workflow, version: workflow.version)
+    assert_not_nil flash[:notice]
+
+    assert AssetDoiLog.was_doi_minted_for?(workflow.class.name, workflow.id, workflow.version)
+    assert_equal "10.5072/Sysmo.SEEK.workflow.#{workflow.id}.1", workflow.latest_git_version.doi
+  end
+
+  test 'cannot mint doi for git-versioned workflow if it is still mutable' do
+    mock_datacite_request
+
+    workflow = Factory(:remote_git_workflow, policy: Factory(:public_policy))
+    workflow.latest_git_version.update_column(:mutable, true)
+    assert_nil workflow.latest_git_version.doi
+    assert workflow.latest_git_version.mutable?
+    refute workflow.latest_git_version.can_mint_doi?
+
+    post "/workflows/#{workflow.id}/mint_doi"
+
+    assert flash[:error].include?('not possible')
+
+    refute AssetDoiLog.was_doi_minted_for?(workflow.class.name, workflow.id, workflow.version)
+    assert_nil workflow.latest_git_version.doi
   end
 
   private

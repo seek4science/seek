@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class SchemaLdGenerationTest < ActiveSupport::TestCase
-
   def setup
     @person = Factory(:max_person, description: 'a lovely person')
     @project = @person.projects.first
@@ -31,6 +30,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601
     }
+
     with_config_value(:instance_description, 'a lovely project') do
       with_config_value(:instance_keywords, 'a,  b, ,,c,d') do
         with_config_value(:site_base_host, 'http://fairyhub.org') do
@@ -57,18 +57,12 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'description' => 'a lovely person',
       'image' => "http://localhost:3000/people/#{@person.id}/avatars/#{@person.avatar.id}?size=250",
       'memberOf' => [
-        {
-          '@type' => %w[Project Organization],
-          '@id' => "http://localhost:3000/projects/#{@project.id}",
-          'name' => @project.title
-        }
+        { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{@project.id}",
+          'name' => @project.title }
       ],
       'worksFor' => [
-        {
-          '@type' => 'ResearchOrganization',
-          '@id' => "http://localhost:3000/institutions/#{institution.id}",
-          'name' => institution.title
-        }
+        { '@type' => 'ResearchOrganization', '@id' => "http://localhost:3000/institutions/#{institution.id}",
+          'name' => institution.title }
       ],
       'orcid' => 'https://orcid.org/0000-0001-9842-9718'
     }
@@ -99,28 +93,22 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'keywords' => 'keyword',
       'version' => 1,
       'url' => "http://localhost:3000/data_files/#{df.id}",
-      'creator' => [{
-                      '@type' => 'Person',
-                      '@id' => "##{ROCrate::Entity.format_id('Blogs')}",
-                      'name' => 'Blogs'
-                    },
-                    {
-                      '@type' => 'Person',
-                      '@id' => "##{ROCrate::Entity.format_id('Joe')}",
-                      'name' => 'Joe'
-                    }],
-      'producer' => [{
-        '@type' => %w[Project Organization],
-        '@id' => "http://localhost:3000/projects/#{@project.id}",
-        'name' => @project.title
-      }],
+      'creator' => [
+        { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{df.assets_creators.first.creator_id}",
+          'name' => 'Some One' },
+        { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Blogs')}", 'name' => 'Blogs' },
+        { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Joe')}", 'name' => 'Joe' }
+      ],
+      'producer' => [
+        { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{@project.id}",
+          'name' => @project.title }
+      ],
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'application/pdf',
       'identifier' => 'https://doi.org/10.10.10.10/test.1',
       'subjectOf' => [
-        { '@type' => 'Event',
-          '@id' => "http://localhost:3000/events/#{df.events.first.id}",
+        { '@type' => 'Event', '@id' => "http://localhost:3000/events/#{df.events.first.id}",
           'name' => df.events.first.title }
       ],
       'isPartOf' => [],
@@ -149,7 +137,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       end
       df
     end
-    
+
     df.reload
     assert_nil df.content_blob
 
@@ -163,20 +151,24 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'keywords' => 'keyword',
       'version' => 1,
       'url' => "http://localhost:3000/data_files/#{df.id}",
-      'creator' => [{ '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Blogs')}", 'name' => 'Blogs' }, { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Joe')}", 'name' => 'Joe' }],
-      'producer' => [{
-        '@type' => %w[Project Organization],
-        '@id' => "http://localhost:3000/projects/#{@project.id}",
-        'name' => @project.title
-      }],
+      'creator' => [
+        { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{df.assets_creators.first.creator_id}",
+          'name' => 'Some One' },
+        { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Blogs')}", 'name' => 'Blogs' },
+        { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Joe')}", 'name' => 'Joe' }
+      ],
+      'producer' => [
+        { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{@project.id}",
+          'name' => @project.title }
+      ],
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
       'identifier' => 'https://doi.org/10.10.10.10/test.1',
       'isPartOf' => [],
       'subjectOf' => [
-        { '@type' => 'Event',
-          '@id' => "http://localhost:3000/events/#{df.events.first.id}",
-          'name' => df.events.first.title }]
+        { '@type' => 'Event', '@id' => "http://localhost:3000/events/#{df.events.first.id}",
+          'name' => df.events.first.title }
+      ]
     }
 
     json = JSON.parse(df.to_schema_ld)
@@ -205,22 +197,25 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'name' => df.title,
       'description' => df.description,
       'keywords' => 'keyword',
-      'version' => 1,      
-      'creator' => [{ '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Blogs')}", 'name' => 'Blogs' }, { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Joe')}", 'name' => 'Joe' }],
+      'version' => 1,
+      'creator' => [
+        { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{df.assets_creators.first.creator_id}",
+          'name' => 'Some One' },
+        { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Blogs')}", 'name' => 'Blogs' },
+        { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Joe')}", 'name' => 'Joe' }
+      ],
       'url' => 'http://www.abc.com',
-      'producer' => [{
-        '@type' => %w[Project Organization],
-        '@id' => "http://localhost:3000/projects/#{@project.id}",
-        'name' => @project.title
-      }],
+      'producer' => [
+        { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{@project.id}",
+          'name' => @project.title }
+      ],
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'text/html',
       'identifier' => 'https://doi.org/10.10.10.10/test.1',
       'isPartOf' => [],
       'subjectOf' => [
-        { '@type' => 'Event',
-          '@id' => "http://localhost:3000/events/#{df.events.first.id}",
+        { '@type' => 'Event', '@id' => "http://localhost:3000/events/#{df.events.first.id}",
           'name' => df.events.first.title }
       ]
     }
@@ -254,6 +249,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     @project.description = 'a lovely project'
     disable_authorization_checks { @project.save! }
     institution = @project.institutions.first
+    event = @project.events.first
     expected = {
       '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
       '@type' => %w[Project Organization],
@@ -265,16 +261,16 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'image' => "http://localhost:3000/projects/#{@project.id}/avatars/#{@project.avatar.id}?size=250",
       'url' => @project.web_page,
       'member' => [
-        { '@type' => 'Person',
-          '@id' => "http://localhost:3000/people/#{@person.id}",
-          'name' => @person.name },
-        { '@type' => 'ResearchOrganization',
-          '@id' => "http://localhost:3000/institutions/#{institution.id}",
+        { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{@person.id}", 'name' => @person.name },
+        { '@type' => 'ResearchOrganization', '@id' => "http://localhost:3000/institutions/#{institution.id}",
           'name' => institution.title }
       ],
       'funder' => [],
-      'event' => []
+      'event' => [
+        { '@type' => 'Event', '@id' => "http://localhost:3000/events/#{event.id}", 'name' => event.title }
+      ]
     }
+
     json = JSON.parse(@project.to_schema_ld)
     assert_equal expected, json
   end
@@ -303,6 +299,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
         { '@type' => 'PropertyValue', 'name' => 'postcode', 'value' => 'M13 4PP' }
       ]
     }
+
     json = JSON.parse(sample.to_schema_ld)
     assert_equal expected, json
   end
@@ -319,37 +316,27 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'name' => 'A Maximal Event',
       'description' => 'All you ever wanted to know about headaches',
       'url' => "http://localhost:3000/events/#{event.id}",
-      'contact' => [{
-        '@type' => 'Person',
-        '@id' => "http://localhost:3000/people/#{@person.id}",
-        'name' => 'Maximilian Maxi-Mum'
-      }],
+      'contact' => [
+        { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{@person.id}", 'name' => 'Maximilian Maxi-Mum' }
+      ],
       'startDate' => '2017-01-01T00:20:00Z',
       'endDate' => '2017-01-01T00:22:00Z',
       'eventType' => [],
       'location' => 'Sofienstr 2, Heidelberg, Germany',
       'hostInstitution' => [
-        {
-          '@type' => %w[Project Organization],
-          '@id' => "http://localhost:3000/projects/#{event.projects.first.id}",
-          'name' => event.projects.first.title
-        }
+        { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{event.projects.first.id}",
+          'name' => event.projects.first.title }
       ],
       'about' => [
-        {
-          '@type' => 'Dataset',
-          '@id' => "http://localhost:3000/data_files/#{data_file.id}",
-          'name' => data_file.title
-        },
-        {
-          '@type' => 'PresentationDigitalDocument',
-          '@id' => "http://localhost:3000/presentations/#{presentation.id}",
-          'name' => presentation.title
-        }
+        { '@type' => 'Dataset', '@id' => "http://localhost:3000/data_files/#{data_file.id}",
+          'name' => data_file.title },
+        { '@type' => 'PresentationDigitalDocument', '@id' => "http://localhost:3000/presentations/#{presentation.id}",
+          'name' => presentation.title }
       ],
       'dateCreated' => event.created_at&.iso8601,
       'dateModified' => event.updated_at&.iso8601
     }
+
     json = JSON.parse(event.to_schema_ld)
     assert_equal expected, json
   end
@@ -375,8 +362,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'application/pdf',
       'producer' => [
-        { '@type' => %w[Project Organization],
-          '@id' => "http://localhost:3000/projects/#{document.projects.first.id}", 'name' => document.projects.first.title }
+        { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{document.projects.first.id}",
+          'name' => document.projects.first.title }
       ],
       'isPartOf' => [],
       'subjectOf' => []
@@ -432,7 +419,9 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       workflow.assets_creators.create!(creator: @person, pos: 1)
       workflow.assets_creators.create!(creator: creator2, pos: 2)
       workflow.assets_creators.create!(given_name: 'Fred', family_name: 'Bloggs', pos: 3)
-      workflow.assets_creators.create!(given_name: 'Steve', family_name: 'Smith', orcid: 'https://orcid.org/0000-0002-1694-233X', pos: 4)
+      workflow.assets_creators.create!(given_name: 'Steve', family_name: 'Smith',
+                                       orcid: 'https://orcid.org/0000-0002-1694-233X', pos: 4)
+      workflow.assets_creators.create!(given_name: 'Bob', family_name: 'Colon:', pos: 5)
 
       workflow.internals = workflow.extractor.metadata[:internals]
 
@@ -443,115 +432,63 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
     expected_wf_prefix = workflow.title.downcase.gsub(/[^0-9a-z]/i, '_')
 
-    expected = { '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
-                 '@type' => %w[SoftwareSourceCode ComputationalWorkflow],
-                 '@id' => "http://localhost:3000/workflows/#{workflow.id}",
-                 'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::WORKFLOW_PROFILE,
-                 'description' => 'This is a test workflow for bioschema generation',
-                 'name' => 'This workflow',
-                 'url' => "http://localhost:3000/workflows/#{workflow.id}",
-                 'keywords' => 'wibble',
-                 'license' => Seek::License.find('APSL-2.0')&.url,
-                 'creator' =>
-                    [{ '@type' => 'Person',
-                       '@id' => "http://localhost:3000/people/#{@person.id}",
-                       'name' => @person.name },
-                     { '@type' => 'Person',
-                       '@id' => "http://localhost:3000/people/#{creator2.id}",
-                       'name' => creator2.name },
-                     { '@type' => 'Person',
-                       '@id' => "##{ROCrate::Entity.format_id('Fred Bloggs')}",
-                       'name' => 'Fred Bloggs' },
-                     { '@type' => 'Person',
-                       '@id' => "https://orcid.org/0000-0002-1694-233X",
-                       'name' => 'Steve Smith' }],
-                 'producer' =>
-                    [{ '@type' => %w[Project Organization],
-                       '@id' => "http://localhost:3000/projects/#{@project.id}",
-                       'name' => @project.title }],
-                 'dateCreated' => @current_time.iso8601,
-                 'dateModified' => @current_time.iso8601,
-                 'encodingFormat' => 'application/x-yaml',
-                 'sdPublisher' =>
-                   {
-                     '@type' => 'Organization',
-                     '@id' => Seek::Config.instance_admins_link,
-                     'name' => Seek::Config.instance_admins_name,
-                     'url' => Seek::Config.instance_admins_link },
-                 'version' => 1,
-                 'programmingLanguage' => {
-                   '@id'=>'#cwl',
-                   '@type'=>'ComputerLanguage',
-                   'name'=>'Common Workflow Language',
-                   'alternateName'=>'CWL',
-                   'identifier'=> {
-                     '@id'=>'https://w3id.org/cwl/v1.0/'},
-                   'url'=>{'@id'=>'https://www.commonwl.org/'}},
-                   'isPartOf' => [],
-		    'input' => [
-                   { '@type' => 'FormalParameter',
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.cofsfile",
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     'name' => '#main/input.cofsfile' },
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.dmax",
-                     'name' => '#main/input.dmax' },
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.dmin",
-                     'name' => '#main/input.dmin' },
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.max-steps",
-                     'name' => '#main/input.max-steps' },
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.mwmax-cof",
-                     'name' => '#main/input.mwmax-cof' },
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.mwmax-source",
-                     'name' => '#main/input.mwmax-source' },
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.rulesfile",
-                     'name' => '#main/input.rulesfile' },
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.sinkfile",
-                     'name' => '#main/input.sinkfile' },
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.sourcefile",
-                     'name' => '#main/input.sourcefile' },
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.std_mode",
-                     'name' => '#main/input.std_mode' },
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.stereo_mode",
-                     'name' => '#main/input.stereo_mode' },
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-inputs-\#main/input.topx",
-                     'name' => '#main/input.topx' }
-                 ],
-                 'output' => [
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-outputs-\#main/solutionfile",
-                     'name' => '#main/solutionfile' },
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-outputs-\#main/sourceinsinkfile",
-                     'name' => '#main/sourceinsinkfile' },
-                   { '@type' => 'FormalParameter',
-                     'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
-                     '@id' => "\##{expected_wf_prefix}-outputs-\#main/stdout",
-                     'name' => '#main/stdout' }
-                 ] }
+    expected = {
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@type' => %w[SoftwareSourceCode ComputationalWorkflow],
+      '@id' => "http://localhost:3000/workflows/#{workflow.id}",
+      'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::WORKFLOW_PROFILE,
+      'description' => 'This is a test workflow for bioschema generation',
+      'name' => 'This workflow',
+      'url' => "http://localhost:3000/workflows/#{workflow.id}",
+      'keywords' => 'wibble',
+      'license' => Seek::License.find('APSL-2.0')&.url,
+      'creator' => [
+        { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{@person.id}", 'name' => @person.name },
+        { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{creator2.id}", 'name' => creator2.name },
+        { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Fred Bloggs')}", 'name' => 'Fred Bloggs' },
+        { '@type' => 'Person', '@id' => 'https://orcid.org/0000-0002-1694-233X', 'name' => 'Steve Smith' },
+        { '@type' => 'Person', '@id' => '#Bob%20Colon:', 'name' => 'Bob Colon:' }
+      ],
+      'producer' => [
+        { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{@project.id}",
+          'name' => @project.title }
+      ],
+      'dateCreated' => @current_time.iso8601,
+      'dateModified' => @current_time.iso8601,
+      'encodingFormat' => 'application/x-yaml',
+      'sdPublisher' => {
+        '@type' => 'Organization',
+        '@id' => Seek::Config.instance_admins_link,
+        'name' => Seek::Config.instance_admins_name,
+        'url' => Seek::Config.instance_admins_link
+      },
+      'version' => 1,
+      'programmingLanguage' => {
+        '@id' => '#cwl',
+        '@type' => 'ComputerLanguage',
+        'name' => 'Common Workflow Language',
+        'alternateName' => 'CWL',
+        'identifier' => { '@id' => 'https://w3id.org/cwl/v1.0/' },
+        'url' => { '@id' => 'https://www.commonwl.org/' }
+      },
+      'isPartOf' => [],
+      'input' => %w[#main/max-steps #main/reverse #main/rulesfile #main/sinkfile #main/sourcefile].map do |i|
+        {
+          '@type' => 'FormalParameter',
+          '@id' => "\##{expected_wf_prefix}-inputs-#{i}",
+          'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
+          'name' => i
+        }
+      end,
+      'output' => %w[#main/compounds #main/reactions #main/sinks].map do |o|
+        {
+          '@type' => 'FormalParameter',
+          '@id' => "\##{expected_wf_prefix}-outputs-#{o}",
+          'dct:conformsTo' => Seek::BioSchema::ResourceDecorators::Workflow::FORMALPARAMETER_PROFILE,
+          'name' => o
+        }
+      end
+    }
 
     json = JSON.parse(workflow.to_schema_ld)
     fine_json_comparison expected, json
@@ -580,38 +517,38 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     df1 = sel_assets[1]
     df2 = sel_assets[2]
 
-    expected = { '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
-                 '@type' => 'Collection',
-                 'dct:conformsTo' => 'https://schema.org/Collection',
-                 '@id' => "http://localhost:3000/collections/#{collection.id}",
-                 'description' => 'A collection of very interesting things',
-                 'name' => 'A Maximal Collection',
-                 'url' => "http://localhost:3000/collections/#{collection.id}",
-                 'keywords' => '',
-                 'creator' => [
-                   { '@type' => 'Person',
-                     '@id' => '#Joe%20Bloggs',
-                     'name' => 'Joe Bloggs' }
-                 ],
-                 'producer' => [
-                   { '@type' => %w[Project Organization],
-                     '@id' => "http://localhost:3000/projects/#{project.id}",
-                     'name' => project.title.to_s }
-                 ],
-                 'dateCreated' => @current_time.iso8601,
-                 'dateModified' => @current_time.iso8601,
-                 'isPartOf' => [],
-                 'hasPart' => [
-                   { '@type' => 'DigitalDocument',
-                     '@id' => "http://localhost:3000/documents/#{doc1.id}",
-                     'name' => doc1.title.to_s },
-                   { '@type' => 'Dataset',
-                     '@id' => "http://localhost:3000/data_files/#{df1.id}",
-                     'name' => df1.title.to_s },
-                   { '@type' => 'Dataset',
-                     '@id' => "http://localhost:3000/data_files/#{df2.id}",
-                     'name' => df2.title.to_s }
-                 ] }
+    expected = {
+      '@context' => Seek::BioSchema::Serializer::SCHEMA_ORG,
+      '@type' => 'Collection',
+      'dct:conformsTo' => 'https://schema.org/Collection',
+      '@id' => "http://localhost:3000/collections/#{collection.id}",
+      'description' => 'A collection of very interesting things',
+      'name' => 'A Maximal Collection',
+      'url' => "http://localhost:3000/collections/#{collection.id}",
+      'keywords' => 'Collection-tag1, Collection-tag2, Collection-tag3, Collection-tag4, Collection-tag5',
+      'creator' => [
+        { '@type' => 'Person',
+          '@id' => "http://localhost:3000/people/#{collection.assets_creators.first.creator_id}",
+          'name' => 'Some One' },
+        { '@type' => 'Person',
+          '@id' => '#Joe%20Bloggs',
+          'name' => 'Joe Bloggs' }
+      ],
+      'producer' => [
+        { '@type' => %w[Project Organization],
+          '@id' => "http://localhost:3000/projects/#{project.id}",
+          'name' => project.title.to_s }
+      ],
+      'dateCreated' => @current_time.iso8601,
+      'dateModified' => @current_time.iso8601,
+      'isPartOf' => [],
+      'hasPart' => [
+        { '@type' => 'DigitalDocument', '@id' => "http://localhost:3000/documents/#{doc1.id}",
+          'name' => doc1.title.to_s },
+        { '@type' => 'Dataset', '@id' => "http://localhost:3000/data_files/#{df1.id}", 'name' => df1.title.to_s },
+        { '@type' => 'Dataset', '@id' => "http://localhost:3000/data_files/#{df2.id}", 'name' => df2.title.to_s }
+      ]
+    }
 
     json = JSON.parse(collection.to_schema_ld)
     assert_equal expected, json
@@ -619,7 +556,7 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'human_disease' do
     human_disease = travel_to(@current_time) do
-      human_disease = Factory(:max_humandisease)
+      human_disease = Factory(:max_human_disease)
       disable_authorization_checks { human_disease.save! }
       human_disease
     end
@@ -709,12 +646,13 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
 
   test 'version of dataset' do
     df = travel_to(@current_time) do
-      df = Factory(:max_data_file, description: 'version 1 description', title: 'version 1 title', contributor: @person, projects: [@project], policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
+      df = Factory(:max_data_file, description: 'version 1 description', title: 'version 1 title',
+                                   contributor: @person, projects: [@project], policy: Factory(:public_policy), doi: '10.10.10.10/test.1')
       df.add_annotations('keyword', 'tag', User.first)
       disable_authorization_checks do
         df.save!
         df.save_as_new_version
-        df.update_attributes(description: 'version 2 description', title: 'version 2 title')
+        df.update(description: 'version 2 description', title: 'version 2 title')
         Factory.create(:image_content_blob, asset: df, asset_version: 2)
         df.latest_version.update_column(:doi, '10.10.10.10/test.2')
       end
@@ -730,31 +668,27 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@id' => "http://localhost:3000/data_files/#{df.id}?version=1",
       'dct:conformsTo' => 'https://bioschemas.org/profiles/Dataset/0.3-RELEASE-2019_06_14/',
       'name' => 'version 1 title',
-      'description' => 'version 1 description'.ljust(50,'.'),
+      'description' => 'version 1 description'.ljust(50, '.'),
       'keywords' => 'keyword',
       'url' => "http://localhost:3000/data_files/#{df.id}?version=1",
       'creator' => [
-        { '@type' => 'Person',
-          '@id' => "##{ROCrate::Entity.format_id('Blogs')}",
-          'name' => 'Blogs' },
-        { '@type' => 'Person',
-          '@id' => "##{ROCrate::Entity.format_id('Joe')}",
-          'name' => 'Joe' }
+        { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{df.assets_creators.first.creator_id}",
+          'name' => 'Some One' },
+        { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Blogs')}", 'name' => 'Blogs' },
+        { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Joe')}", 'name' => 'Joe' }
       ],
-      'producer' => [{
-                       '@type' => %w[Project Organization],
-                       '@id' => "http://localhost:3000/projects/#{@project.id}",
-                       'name' => @project.title
-                     }],
+      'producer' => [
+        { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{@project.id}",
+          'name' => @project.title }
+      ],
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'application/pdf',
       'version' => 1,
       'isPartOf' => [],
-      #'identifier' => 'https://doi.org/10.10.10.10/test.1', # Should not have a DOI, since it was defined on the parent resource
+      # 'identifier' => 'https://doi.org/10.10.10.10/test.1', # Should not have a DOI, since it was defined on the parent resource
       'subjectOf' => [
-        { '@type' => 'Event',
-          '@id' => "http://localhost:3000/events/#{df.events.first.id}",
+        { '@type' => 'Event', '@id' => "http://localhost:3000/events/#{df.events.first.id}",
           'name' => df.events.first.title }
       ],
       'distribution' => {
@@ -772,32 +706,28 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
       '@id' => "http://localhost:3000/data_files/#{df.id}?version=2",
       'dct:conformsTo' => 'https://bioschemas.org/profiles/Dataset/0.3-RELEASE-2019_06_14/',
       'name' => 'version 2 title',
-      'description' => 'version 2 description'.ljust(50,'.'),
+      'description' => 'version 2 description'.ljust(50, '.'),
       'keywords' => 'keyword',
       'url' => "http://localhost:3000/data_files/#{df.id}?version=2",
       'creator' => [
-        { '@type' => 'Person',
-          '@id' => "##{ROCrate::Entity.format_id('Blogs')}",
-          'name' => 'Blogs' },
-        { '@type' => 'Person',
-          '@id' => "##{ROCrate::Entity.format_id('Joe')}",
-          'name' => 'Joe' }
+        { '@type' => 'Person', '@id' => "http://localhost:3000/people/#{df.assets_creators.first.creator_id}",
+          'name' => 'Some One' },
+        { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Blogs')}", 'name' => 'Blogs' },
+        { '@type' => 'Person', '@id' => "##{ROCrate::Entity.format_id('Joe')}", 'name' => 'Joe' }
       ],
-      'producer' => [{
-                       '@type' => %w[Project Organization],
-                       '@id' => "http://localhost:3000/projects/#{@project.id}",
-                       'name' => @project.title
-                     }],
+      'producer' => [
+        { '@type' => %w[Project Organization], '@id' => "http://localhost:3000/projects/#{@project.id}",
+          'name' => @project.title }
+      ],
       'dateCreated' => @current_time.iso8601,
       'dateModified' => @current_time.iso8601,
       'encodingFormat' => 'image/png',
       'version' => 2,
       'isPartOf' => [],
-      'identifier' => 'https://doi.org/10.10.10.10/test.2',  # This DOI was added to the version itself
+      'identifier' => 'https://doi.org/10.10.10.10/test.2', # This DOI was added to the version itself
       'isBasedOn' => "http://localhost:3000/data_files/#{df.id}?version=1",
       'subjectOf' => [
-        { '@type' => 'Event',
-          '@id' => "http://localhost:3000/events/#{df.events.first.id}",
+        { '@type' => 'Event', '@id' => "http://localhost:3000/events/#{df.events.first.id}",
           'name' => df.events.first.title }
       ],
       'distribution' => {
@@ -826,9 +756,8 @@ class SchemaLdGenerationTest < ActiveSupport::TestCase
     assert_equal expected, json
   end
 
-  def fine_json_comparison expected, json
+  def fine_json_comparison(expected, json)
     expected.each { |k, v| assert_equal v, json[k], "mismatch with key #{k}" }
     json.each { |k, v| assert_equal v, expected[k], "mismatch with key #{k}" }
   end
-
 end

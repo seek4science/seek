@@ -12,8 +12,10 @@
   <%= render :partial => 'admin/omniauth' %>
 
   <%= admin_checkbox_setting(:pdf_conversion_enabled, 1, Seek::Config.pdf_conversion_enabled,
-                             "Pdf conversion enabled", "Whether pdf conversion is enabled. It allows converting some document types to pdf format. If enabled, you need to ensure open office is running") %>
+                             "PDF conversion enabled", "Whether PDF conversion is enabled. It allows converting some document types to PDF format. If enabled, you need to ensure LibreOffice is installed") %>
 
+  <%= admin_checkbox_setting(:fair_signposting_enabled, 1, Seek::Config.fair_signposting_enabled,
+                             "FAIR Signposting Enabled", "Whether #{link_to('FAIR Signposting', 'https://signposting.org/FAIR/', target: :_blank)} headers are added to resource landing pages.") %>
   <h2>SEEK features</h2>
   <%#= admin_checkbox_setting(:delete_asset_version_enabled, 1, Seek::Config.delete_asset_version_enabled,
                                "Delete asset version enabled", "Whether delete of one version of the versioned asset is enabled. It allows to delete previous (older) versions without deleting the complete asset") %>
@@ -26,7 +28,11 @@
                            'Help URL', "This is the URL for the external help e.g #{Seek::Config.default_external_help_url}.") %>
   </div>
 
+
   <h3>Resource Types</h3>
+  <%= admin_checkbox_setting(:file_templates_enabled, 1, Seek::Config.file_templates_enabled,
+                             "File templates enabled", "Whether file templates can be created and referenced.") %>
+
   <%= admin_checkbox_setting(:collections_enabled, 1, Seek::Config.collections_enabled,
                              "Collections enabled", "Whether the users can create collections of assets in SEEK.") %>
 
@@ -83,10 +89,6 @@
                              'Workflows enabled', 'Whether the Workflow framework is enabled.',
                              onchange: toggle_appear_javascript('workflow_cwl_Settings')) %>
   <div id="workflow_cwl_Settings" class="additional_settings" style="<%= show_or_hide_block Seek::Config.workflows_enabled -%>">
-    <%= admin_text_setting(:cwl_viewer_url, Seek::Config.cwl_viewer_url,
-                           'CWL Viewer URL',
-                           "The URL of a #{link_to('CWL Viewer', 'https://github.com/common-workflow-language/cwlviewer', target: :_blank)} instance to generate diagrams for CWL workflows.") %>
-
     <%= admin_checkbox_setting(:ga4gh_trs_api_enabled, 1, Seek::Config.ga4gh_trs_api_enabled,
                                "GA4GH TRS API enabled", "Enable GA4GH Tool Registry Service API endpoints for accessing workflows.") %>
   </div>

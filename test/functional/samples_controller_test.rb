@@ -3,14 +3,9 @@ require 'test_helper'
 class SamplesControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include SharingFormTestHelper
   include HtmlHelper
   include GeneralAuthorizationTestCases
-
-  def rest_api_test_object
-    @object = Factory(:sample, policy: Factory(:public_policy))
-  end
 
   test 'should return 406 when requesting RDF' do
     login_as(Factory(:user))
@@ -1027,6 +1022,14 @@ class SamplesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'JS request does not raise CORS error' do
+    sample = Factory(:sample)
+    login_as(sample.contributor)
+
+    assert_raises(ActionController::UnknownFormat) do
+      get :show, params: { id: sample.id, format: :js }
+    end
+  end
 
   private
 

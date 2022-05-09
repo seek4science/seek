@@ -63,7 +63,6 @@ class ContentBlobsController < ApplicationController
     respond_to do |format|
       format.json { render json: @content_blob, include: [params[:include]] }
       format.html { render plain: 'Format not supported', status: :not_acceptable }
-      format.xml { render plain: 'Format not supported', status: :not_acceptable }
       format.csv { csv_data }
     end
   end
@@ -114,12 +113,8 @@ class ContentBlobsController < ApplicationController
     else
       pdf_filepath = @content_blob.filepath('pdf')
       unless File.exist?(pdf_filepath)
-        if Seek::Config.soffice_available?
-          @content_blob.convert_to_pdf(filepath, pdf_filepath)
-          raise "Couldn't find converted PDF file." unless File.exist?(pdf_filepath) # If conversion didn't work somehow?
-        else
-          raise 'Cannot convert PDF - soffice not running'
-        end
+        @content_blob.convert_to_pdf(filepath, pdf_filepath)
+        raise "Couldn't find converted PDF file." unless File.exist?(pdf_filepath) # If conversion didn't work somehow?
       end
 
       pdf_filename = File.basename(@content_blob.original_filename, File.extname(@content_blob.original_filename)) + '.pdf'

@@ -1,17 +1,24 @@
-<% resource ||= nil %>
-<% resource_name = resource ? resource.class.name : nil %>
+<% versioned_resource ||= nil %>
+<% resource_name = versioned_resource ? versioned_resource.class.name : nil %>
+
 <ul class="nav nav-tabs">
-  <li class="active ">
-    <a data-toggle="tab" href="#details"><i class="glyphicon glyphicon-list-alt"></i> Details</a>
-  </li>
-  <li>
-    <a data-toggle="tab" href="#related-items">
-      <i class="glyphicon glyphicon-th-list"></i> Related items
-    </a>
-  </li>
-   <% if Seek::Config.project_single_page_advanced_enabled && displaying_single_page? && resource %>
-      <li>
-          <a data-toggle="tab" href="#<%=resource_name&.downcase%>_design"><i class="glyphicon glyphicon-list-alt"></i> <%=resource_name&.camelize%> design</a>
-      </li>
+  <%= tab('overview') do %>
+    <span class="glyphicon glyphicon-list-alt"></span> Overview
+  <% end %>
+
+  <% if versioned_resource&.is_git_versioned? %>
+    <%= tab('files') do %>
+      <span class="glyphicon glyphicon-folder-close"></span> Files
     <% end %>
+  <% end %>
+
+  <%= tab('related-items') do %>
+    <span class="glyphicon glyphicon-th-list"></span> Related items
+  <% end %>
+
+	<% if Seek::Config.project_single_page_advanced_enabled && displaying_single_page? && resource %>
+		<%= tab("#" + resource_name&.downcase + "_design") do %>
+			<span class="glyphicon glyphicon-th-list"></span> <%=resource_name&.camelize%> design
+		<% end %>
+  <% end %>
 </ul>

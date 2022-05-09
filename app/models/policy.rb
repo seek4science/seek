@@ -12,7 +12,7 @@ class Policy < ApplicationRecord
     begin
       Kernel.Float(raw_value)
     rescue ArgumentError, TypeError
-      record.errors[:base] << 'Sharing policy is invalid' unless value.is_a? Integer
+      record.errors.add(:base, 'Sharing policy is invalid') unless value.is_a? Integer
     end
   end
 
@@ -144,7 +144,7 @@ class Policy < ApplicationRecord
     end
   end
 
-  def update_attributes_with_bulk_sharing_policy(policy_params)
+  def update_with_bulk_sharing_policy(policy_params)
 
     tap do |policy|
       if policy_params

@@ -194,7 +194,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
   # TZ adding is handled by datasets_controller
   #   test 'add dataset' do
   #     disable_authorization_checks do
-  #       @project.update_attributes(default_license: 'wibble')
+  #       @project.update(default_license: 'wibble')
   #     end
   #     endpoint = Factory(:openbis_endpoint, project: @project,
   # policy: Factory(:private_policy, permissions: [Factory(:permission, contributor: @project)]))

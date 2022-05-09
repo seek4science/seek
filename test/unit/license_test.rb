@@ -64,9 +64,7 @@ class LicenseTest < ActiveSupport::TestCase
     sop.license = 'CCZZ'
     refute sop.valid?
     assert_equal 1,sop.errors.count
-    error = sop.errors.first
-    assert_equal :license, error[0]
-    assert_equal "isn't a valid license ID",error[1]
+    assert sop.errors.added?(:license, "isn't a valid license ID")
 
     #allow blank
     sop.license=nil

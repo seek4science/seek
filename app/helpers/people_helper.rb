@@ -19,7 +19,7 @@ module PeopleHelper
 
   def seek_role_icons(person, size = 32)
     icons = ''
-    person.roles.each do |role|
+    person.role_names.each do |role|
       icons << seek_role_icon(role, size)
     end
     icons.html_safe
@@ -29,7 +29,7 @@ module PeopleHelper
     options.reverse_merge!(size: "#{size}x#{size}",
                            alt: role.to_s,
                            style: 'vertical-align: middle',
-                           'data-tooltip' => tooltip(t(role)))
+                           'data-tooltip' => tooltip(t(role).humanize))
     image(role.to_s, options)
   end
 
@@ -40,16 +40,6 @@ module PeopleHelper
       logo = image(:orcid_id)
       link_to(logo + ' ' + person.orcid_display_format, person.orcid_uri, target: '_blank').html_safe
     end
-  end
-
-  def admin_defined_project_roles_hash
-    roles = Seek::Roles::ProjectRelatedRoles.role_names.map do |role|
-      [role, t(role)]
-    end
-    roles = Hash[roles]
-
-    roles.delete('pal') unless admin_logged_in?
-    roles
   end
 
   # Return whether or not to hide contact details from this user

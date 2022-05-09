@@ -27,7 +27,7 @@ module Seek #:nodoc:
         include Seek::VersionedResource::InstanceMethods
         include Seek::Permissions::SpecialContributors
 
-        delegate :tag_counts, :scales, :managers, :attributions, :creators, :assets_creators, :is_asset?,
+        delegate :tag_counts, :managers, :attributions, :creators, :assets_creators, :is_asset?,
                  :authorization_supported?, :defines_own_avatar?, :use_mime_type_for_avatar?, :avatar_key,
                  :show_contributor_avatars?, :can_see_hidden_item?, :related_people, to: :parent
       end
@@ -99,9 +99,7 @@ module Seek #:nodoc:
 
       # For acts_as_doi_mintable...
       def doi_target_url
-        polymorphic_url(parent, version: version,
-                                host: Seek::Config.host_with_port,
-                                protocol: Seek::Config.host_scheme)
+        polymorphic_url(parent, version: version, **Seek::Config.site_url_options)
       end
     end
   end

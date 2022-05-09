@@ -1,6 +1,5 @@
 require 'rest-client'
 require 'json'
-require 'git'
 require 'ro_crate'
 require 'pathname'
 
@@ -34,16 +33,9 @@ module Scrapers
         puts "Cloning #{@organization} repos"
         repositories = clone_repositories(repo_list)
 
-        puts "Building RO-Crates"
-        crates = repositories.map do |git|
-          build_workflow_ro_crate(git)
-        end
+        puts "Creating resources"
+        resources = create_resources(repositories)
 
-        puts "Building SEEK resources"
-        resources = resources(crates)
-
-        puts "Registering SEEK resources"
-        resources = register(resources)
         successes, failures = resources.partition(&:persisted?)
 
         if successes.any?
@@ -52,7 +44,7 @@ module Scrapers
         end
 
         if failures.any?
-          puts "Not registered:"
+          puts "Not registered#{@debug ? ' (DEBUG MODE)' : ''}:"
           failures.each do |w|
             puts " * #{w.title}"
             w.errors.full_messages.each { |e| puts "     #{e}" }
@@ -65,96 +57,56 @@ module Scrapers
 
     private
 
-    # Instantiate SEEK resources (E.g. workflows) for each of the given RO-Crates.
-    def resources(crate_paths)
-      crate_paths.map do |crate_path|
-        workflow = Workflow.new
+    # If the resource has already been registered, find it.
+    def existing_resource(repo)
+      @project.workflows.joins(:source_link).where(asset_links: { url: repo.remote.chomp('.git') }).first
+    end
 
-        workflow.build_content_blob(
-            tmp_io_object: File.open(crate_path),
-            original_filename: Pathname.new(crate_path).basename,
-            content_type: 'application/zip',
-            make_local_copy: true,
-            file_size: File.size(crate_path)
-        )
-        workflow.assign_attributes(Seek::WorkflowExtractors::ROCrate.new(File.open(crate_path)).metadata.except(:errors, :warnings))
-        workflow.contributor = @contributor
-        workflow.projects = Array(@project)
-        workflow.policy = Policy.projects_policy(workflow.projects)
-        workflow.policy.access_type = Policy::ACCESSIBLE
+    def create_resources(repositories)
+      repositories.map do |repo|
+        puts "  Considering #{repo.remote.chomp('.git')}..."
+        latest_tag = `cd #{repo.git_base.path}/.. && git describe --tags --abbrev=0 remotes/origin/#{@main_branch}`.chomp
+        wiz = GitWorkflowWizard.new(params: {
+          git_version_attributes: {
+            git_repository_id: repo.id,
+            ref: "refs/tags/#{latest_tag}",
+            name: latest_tag,
+            comment: "Updated to #{latest_tag}"
+          }
+        })
+        workflow = existing_resource(repo)
+        new_version = false
+        if workflow
+          new_version = true
+          wiz.workflow = workflow
+          unless workflow.git_versions.none? { |gv| gv.name == latest_tag }
+            puts "    Version #{latest_tag} already registered, doing nothing"
+            next
+          end
+          puts "    New version detected! (#{latest_tag}), creating new version"
+        else
+          puts "    Creating new workflow"
+        end
+
+        workflow = wiz.run
+        if wiz.next_step == :provide_metadata
+          workflow.contributor = @contributor
+          workflow.projects = Array(@project)
+          workflow.policy = Policy.projects_policy(workflow.projects)
+          workflow.policy.access_type = Policy::ACCESSIBLE
+          workflow.source_link_url = repo.remote.chomp('.git')
+          unless @debug
+            if new_version
+              workflow.git_version.resource_attributes = workflow.attributes
+              workflow.git_version.save
+            end
+            workflow.git_versions.reset
+            workflow.save
+          end
+        end
 
         workflow
-      end
-    end
-
-    # If the resource has already been registered, find it.
-    def existing_resource(resource)
-      @project.workflows.joins(:source_link).where(asset_links: { url: resource.source_link_url }).first
-    end
-
-    # Decide whether a new version of `existing_resource` should be created using the metadata from `resource`.
-    def should_create_new_version?(resource, existing_resource)
-      resource.ro_crate['softwareVersion'] != existing_resource.ro_crate['softwareVersion']
-    end
-
-    # Register (save) the given SEEK resources. If a resource was already registered, either skip it or create a new
-    # version, depending on some given criteria.
-    def register(resources)
-      registered = []
-      resources.each do |resource|
-        puts " Considering: #{resource.title}"
-        existing = existing_resource(resource)
-        if existing
-          version = resource.ro_crate['softwareVersion']
-          existing_version = existing.ro_crate['softwareVersion']
-          if should_create_new_version?(existing, resource)
-            puts "  New version detected! (#{version} vs. #{existing_version}), creating new version"
-            unless @debug
-              old_content_blob = existing.content_blob
-              new_content_blob = resource.content_blob
-              new_content_blob.asset_version = (existing.version + 1)
-              existing.assign_attributes(resource.extractor.metadata.except(:warnings, :errors))
-              existing.content_blob = new_content_blob
-              # asset_id on the previous content blob gets blanked out after the above command is run, so need to do:
-              old_content_blob.update_column(:asset_id, existing.id)
-              existing.save_as_new_version("Updated to #{version}")
-              new_content_blob.save!
-              registered << existing.latest_version
-            end
-          else
-            puts "  Version #{existing_version} already registered, doing nothing"
-          end
-        else
-          puts "  Registering new resource"
-          if @debug
-            resource.valid?
-          else
-            resource.save
-          end
-
-          registered << resource
-        end
-      end
-
-      registered
-    end
-
-    # Build an RO-Crate Zip file from the given ruby-git Git repository, and return the path to it.
-    def build_workflow_ro_crate(git)
-      crate = read_crate(git)
-      crate['softwareVersion'] ||= git.describe(nil, tags: true, abbrev: 0)
-      crate['isBasedOn'] ||= git.remote('origin').url
-      crate['sdDatePublished'] ||= Time.now
-      crate.preview.template ||= WorkflowExtraction::PREVIEW_TEMPLATE
-      p = File.join(crate_path, "#{[@organization, Pathname.new(git.dir.path).basename].join('-').gsub('/', '-')}.crate.zip")
-      f = File.new(p, 'w')
-      puts "  Written to: #{p}"
-      ROCrate::Writer.new(crate).write_zip(f)
-      File.expand_path(p)
-    end
-
-    def read_crate(git)
-      ROCrate::WorkflowCrateReader.read_directory(git.dir.path)
+      end.compact
     end
 
     # Get all the repositories in the given org from the GitHub API.
@@ -164,37 +116,15 @@ module Scrapers
 
     # Clone the given repositories (from above call), or make sure already-cloned repos are fetched.
     def clone_repositories(repo_list)
-      repo_list.map do |repo_info|
-        repo = repo_info['full_name']
-        full_dest_path = File.expand_path(File.join(git_path, repo))
-        if !File.exist?(full_dest_path)
-          puts "  Cloning: #{repo}"
-          git = Git.clone("https://github.com/#{repo}", repo, path: git_path)
-        else
-          puts "  Not cloning, directory exists: #{full_dest_path}"
-          git = Git.open(full_dest_path)
-        end
-        puts "  Fetching latest..."
-        git.fetch
-        git.checkout(@main_branch)
-        git.pull('origin', @main_branch)
-        tag = git.describe(nil, tags: true, abbrev: 0)
-        puts "  Checking out #{tag}"
-        git.checkout(tag)
-        git
-      end
+      repos = repo_list.map { |repo| Git::Repository.find_or_create_by(remote: repo['clone_url']) }
+
+      repos.each(&:fetch)
+
+      repos
     end
 
     def github
       RestClient::Resource.new('https://api.github.com', {})
-    end
-
-    def git_path
-      ::File.join(GIT_DESTINATION, @organization).tap { |x| FileUtils.mkdir_p(x) }
-    end
-
-    def crate_path
-      ::File.join(CRATE_DESTINATION, @organization).tap { |x| FileUtils.mkdir_p(x) }
     end
 
     def cache_path

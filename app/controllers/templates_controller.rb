@@ -45,7 +45,7 @@ class TemplatesController < ApplicationController
     end
 
     def update
-      @template.update_attributes(template_params)
+      @template.update(template_params)
       @template.resolve_inconsistencies
       respond_to do |format|
         if @template.save

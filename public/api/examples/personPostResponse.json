@@ -18,8 +18,7 @@
                 "CeriusII",
                 "Gromacs",
                 "Python"
-            ],
-            "project_positions": null
+            ]
         },
         "relationships": {
             "projects": {

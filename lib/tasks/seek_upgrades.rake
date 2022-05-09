@@ -10,14 +10,22 @@ namespace :seek do
     environment
     db:seed:010_workflow_classes
     db:seed:011_edam_topics
-    db:seed:012_edam_operations   
+    db:seed:012_edam_operations
     db:seed:013_workflow_data_file_relationships
     rename_branding_settings
     update_missing_openbis_istest
     update_missing_publication_versions
+    db:seed:013_edam_formats
+    db:seed:014_edam_data
     remove_orphaned_versions
     create_seek_sample_multi
     rename_seek_sample_attribute_types
+    seek:rebuild_workflow_internals
+    update_thesis_related_publication_types
+    remove_scale_annotations
+    remove_spreadsheet_annotations
+    strip_site_base_host_path
+    convert_roles
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -28,10 +36,10 @@ namespace :seek do
 
   desc('upgrades SEEK from the last released version to the latest released version')
   task(upgrade: [:environment]) do
-    puts "Starting upgrade ..."
-    puts "... trimming old session data ..."
+    puts 'Starting upgrade ...'
+    puts '... trimming old session data ...'
     Rake::Task['db:sessions:trim'].invoke
-    puts "... migrating database ..."
+    puts '... migrating database ...'
     Rake::Task['db:migrate'].invoke
     Rake::Task['tmp:clear'].invoke
 
@@ -39,12 +47,12 @@ namespace :seek do
     Seek::Config.solr_enabled = false
 
     begin
-      puts "... performing upgrade tasks ..."
+      puts '... performing upgrade tasks ...'
       Rake::Task['seek:standard_upgrade_tasks'].invoke
       Rake::Task['seek:upgrade_version_tasks'].invoke
 
       Seek::Config.solr_enabled = solr
-      puts "... queuing search reindexing jobs ..."
+      puts '... queuing search reindexing jobs ...'
       Rake::Task['seek:reindex_all'].invoke if solr
 
       puts 'Upgrade completed successfully'
@@ -63,7 +71,7 @@ namespace :seek do
     Seek::Config.transfer_value :dm_project_link, :instance_admins_link
   end
 
- task(update_missing_openbis_istest: :environment) do
+  task(update_missing_openbis_istest: :environment) do
     puts '... creating missing is_test for OpenbisEndpoint...'
     create = 0
     disable_authorization_checks do
@@ -105,7 +113,7 @@ namespace :seek do
   task(remove_orphaned_versions: [:environment]) do
     puts 'Removing orphaned versions ...'
     count = 0
-    types = [DataFile::Version, Document::Version, Sop::Version, Model::Version, Node::Version, Presentation::Version,
+    types = [DataFile::Version, Document::Version, Sop::Version, Model::Version, Presentation::Version,
              Sop::Version, Workflow::Version]
     disable_authorization_checks do
       types.each do |type|
@@ -171,6 +179,92 @@ namespace :seek do
       puts "Done"
     else
       puts "Database adapter is: #{ActiveRecord::Base.connection.instance_values["config"][:adapter]}, doing nothing"
+    end
+  end
+
+  task(update_thesis_related_publication_types: [:environment]) do
+    puts 'Updating publication types ...'
+
+    unless PublicationType.find_by(title:"Masters Thesis").nil?
+      PublicationType.find_by(key:"mastersthesis").update(title:"Master's Thesis")
+      puts 'Changing Masters Thesis to '+PublicationType.find_by(key:"mastersthesis").title
+    end
+
+    unless PublicationType.find_by(title:"Bachelors Thesis").nil?
+      PublicationType.find_by(key:"bachelorsthesis").update(title:"Bachelor's Thesis")
+      puts 'Changing Bachelors Thesis to '+PublicationType.find_by(key:"bachelorsthesis").title
+    end
+
+    unless PublicationType.find_by(title:"Phd Thesis").nil?
+      PublicationType.find_by(key:"phdthesis").update(title:"Doctoral Thesis")
+      puts 'Changing Phd Thesis to '+PublicationType.find_by(key:"phdthesis").title
+    end
+
+    if PublicationType.find_by(key:"diplomthesis").nil?
+      PublicationType.find_or_initialize_by(key: "diplomthesis").update(title:"Diplom Thesis", key: "diplomthesis")
+      puts 'Add new type '+PublicationType.find_by(key:"diplomthesis").title
+    end
+  end
+
+  task(strip_site_base_host_path: [:environment]) do
+    if Seek::Config.site_base_host
+      u = URI.parse(Seek::Config.site_base_host)
+      u.path = ''
+      Seek::Config.site_base_host = u.to_s
+    end
+  end
+
+  task(remove_scale_annotations: [:environment]) do
+    a = Annotation.joins(:annotation_attribute).where(annotation_attribute: { name: ['additional_scale_info', 'scale'] })
+    count = a.count
+    a.destroy_all
+    puts "Removed #{count} scale related annotations" if count > 0
+  end
+
+  task(remove_spreadsheet_annotations: [:environment]) do
+    annotations = Annotation.where(annotatable_type: 'CellRange')
+    count = annotations.count
+    AnnotationAttribute.joins(:annotations).where(annotations: { annotatable_type: 'CellRange' }).destroy_all
+    TextValue.joins(:annotations).where(annotations: { annotatable_type: 'CellRange' }).destroy_all
+    annotations.destroy_all
+    puts "Removed #{count} spreadsheet related annotations" if count > 0
+  end
+
+  task(convert_roles: [:environment]) do
+    puts 'Converting roles...'
+    disable_authorization_checks do
+      Person.find_each do |person|
+        RoleType.for_system.each do |rt|
+          mask = rt.id
+          if (person.roles_mask & mask) != 0
+            Role.where(role_type_id: rt.id, person_id: person.id, scope: nil).first_or_create!
+          end
+        end
+      end
+
+      class AdminDefinedRoleProject < ActiveRecord::Base; end
+
+      AdminDefinedRoleProject.find_each do |role|
+        RoleType.for_projects.each do |rt|
+          mask = rt.id
+          if (role.role_mask & mask) != 0
+            Role.where(role_type_id: rt.id, person_id: role.person_id,
+                       scope_type: 'Project', scope_id: role.project_id).first_or_create!
+          end
+        end
+      end
+
+      class AdminDefinedRoleProgramme < ActiveRecord::Base; end
+
+      AdminDefinedRoleProgramme.find_each do |role|
+        RoleType.for_programmes.each do |rt|
+          mask = rt.id
+          if (role.role_mask & mask) != 0
+            Role.where(role_type_id: rt.id, person_id: role.person_id,
+                       scope_type: 'Programme', scope_id: role.programme_id).first_or_create!
+          end
+        end
+      end
     end
   end
 end

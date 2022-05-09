@@ -4,7 +4,7 @@ classes.each do |key, data|
   # DB-agnostic way to match key in a case-insensitive way
   workflow_class = WorkflowClass.where(WorkflowClass.arel_table[:key].matches(data['key'])).first_or_initialize
 
-  disable_authorization_checks { workflow_class.update_attributes!(data) }
+  disable_authorization_checks { workflow_class.update!(data) }
 end
 
 puts "Seeded workflow classes"

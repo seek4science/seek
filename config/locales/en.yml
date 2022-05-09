@@ -5,7 +5,7 @@ en:
   seek_id: "SEEK ID"
 
   login:
-    elixir_aai: 'ELIXIR AAI'
+    elixir_aai: 'LS Login'
     ldap: 'LDAP'
     github: 'GitHub'
 
@@ -27,18 +27,22 @@ en:
   model: "Model"
   sop: "SOP"
   workflow: "Workflow"
+  workflow_class: "Workflow Type"
   workflows:
     workflow: "Workflow"
     cwl_workflow: "CWL workflow"
     galaxy_workflow: "Galaxy workflow"
     knime_workflow: "KNIME workflow"
     ro_workflow: "Research Object workflow"
-  node: "Workflow Node"
-  nodes:
-    node: "Workflow Node"
+    register:
+      files: 'Upload/Import Files'
+      git: 'Import Git Repository'
+      ro_crate: 'Upload/Import Workflow RO-Crate'
   publication: "Publication"
   presentation: "Presentation"
   event: "Event"
+  file_template: "File Template"
+  placeholder: "Placeholder"
   collection: "Collection"
   collections:
     info_text: "A collection is a group of items that are conceptually related to each other."
@@ -55,7 +59,6 @@ en:
   project: "Project"
   institution: "Institution"
   programme: "Programme"
-  profile: "Profile"
   avatar: "Avatar"
   private_asset: 'Hidden item'
 
@@ -117,6 +120,10 @@ en:
   programme_administrator: 'Programme administrator'
   admin: 'Admin'
 
+  roles:
+    scopes:
+      system: 'System'
+
   contributor: 'submitter' # A person who submitted the resource to SEEK
   contribution: 'submission'
   creator: 'creator' # A person who was involved with the creation of the resource  
@@ -132,8 +139,17 @@ en:
 
   attributes: # Applies to attributes for any model
     other_creators: Additional credit
+    ro_crate: RO-Crate
+    abstract_cwl: "Abstract CWL"
 
   activerecord:
+    errors:
+      template:
+        header:
+          one: "1 error prohibited this %{model} from being saved"
+          other: "%{count} errors prohibited this %{model} from being saved"
+        # The variable :count is also available
+        body: "There were problems with the following fields:"
     models:
       workflow_class: Workflow Type
     attributes:
@@ -143,11 +159,6 @@ en:
         creators: 'Maintainers'
       workflow_class:
         url: URL
-
-  activemodel:
-    attributes:
-      workflow_crate_builder:
-        abstract_cwl: "Abstract CWL"
 
   oauth_session: 'OAuth Session'
   identity: 'Identity'
@@ -160,6 +171,14 @@ en:
     some_passing: 'Some failures'
     all_failing: 'All failing'
     not_available: 'Not available'
+  git_annotation_label:
+    main_workflow: 'Main Workflow'
+    abstract_cwl: 'Abstract CWL'
+    diagram: 'Diagram'
+    remote_source: 'Remote'
+  git:
+    modify_immutable_remote_error: 'You cannot make changes to an imported repository.'
+    modify_immutable_error: 'You cannot make changes to a frozen version.'
 
   about_project: "You need to be a member of a <strong>%{project}</strong> before you can register content.
     A %{project} can contain one or more people, and gives some additional background details, and credit, about the content being registered. It can be used to describe and promote

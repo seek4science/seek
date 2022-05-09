@@ -12,7 +12,6 @@
 //= require attribution
 //= require creators
 //= require validation
-//= require studied_factor
 //= require parseuri
 //= require tabber-minimized
 //= require detect_browser
@@ -73,3 +72,4 @@
 //= require rich_text_edit
 //= require admin
 //= require templates
+//= require git

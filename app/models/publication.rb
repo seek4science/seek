@@ -48,7 +48,13 @@ class Publication < ApplicationRecord
     acts_as_versioned_resource
     has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND content_blobs.asset_type =?', r.version, r.parent.class.name) },
             :primary_key => :publication_id,:foreign_key => :asset_id
-  end
+
+    def doi_uri
+      "https://doi.org/#{doi}" if doi
+    end
+
+    alias_method :doi_identifier, :doi_uri
+end
 
   belongs_to :publication_type
 
@@ -60,15 +66,10 @@ class Publication < ApplicationRecord
   validates :pubmed_id, numericality: { greater_than: 0, message: 'is invalid' }, allow_blank: true
   validates :publication_type_id, presence: true, on: :create
 
-  # validation differences between OpenSEEK and the VLN SEEK
-  validates_uniqueness_of :pubmed_id, allow_nil: true, allow_blank: true, if: -> { Seek::Config.is_virtualliver }
-  validates_uniqueness_of :doi, allow_nil: true, allow_blank: true, if: -> { Seek::Config.is_virtualliver }
-  validates_uniqueness_of :title, if: -> { Seek::Config.is_virtualliver }
-
-  validate :check_uniqueness_within_project, unless: -> { Seek::Config.is_virtualliver }
+  validate :check_uniqueness_within_project
 
   attr_writer :refresh_policy
-  before_save :refresh_policy, on: :update
+  before_update :refresh_policy
   after_update :update_creators_from_publication_authors
 
   accepts_nested_attributes_for :publication_authors
@@ -146,6 +147,7 @@ class Publication < ApplicationRecord
   def doi_uri
     "https://doi.org/#{doi}" if doi
   end
+  alias_method :doi_identifier, :doi_uri
 
   # Automatically extract the actual DOI if the user put in the full URL
   def doi=(doi)

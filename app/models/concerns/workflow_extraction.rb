@@ -14,80 +14,127 @@ module WorkflowExtraction
   end
 
   def extractor
-    if is_already_ro_crate?
+    if is_git_ro_crate?
+      Seek::WorkflowExtractors::ROCrate.new(git_version, main_workflow_class: workflow_class)
+    elsif is_already_ro_crate?
       Seek::WorkflowExtractors::ROCrate.new(content_blob, main_workflow_class: workflow_class)
+    elsif is_git_versioned?
+      Seek::WorkflowExtractors::GitRepo.new(git_version, main_workflow_class: workflow_class)
     else
       extractor_class.new(content_blob)
     end
   end
 
-  def default_diagram_format
-    Rails.cache.fetch("#{cache_key_with_version}/default_diagram_format", expires_in: 3.days) do
-      extractor.default_diagram_format
-    end
-  end
+  delegate :can_render_diagram?, :has_tests?, to: :extractor
 
-  def has_tests?
-    extractor.has_tests?
-  end
-
-  def can_render_diagram?
-    extractor.can_render_diagram?
-  end
-
-  def can_run?
-    can_download?(nil) && workflow_class_title == 'Galaxy' && Seek::Config.galaxy_instance_trs_import_url.present?
-  end
-
-  def diagram_exists?(format = default_diagram_format)
-    path = diagram_path(format)
-    File.exist?(path)
-  end
-
-  def diagram(format = default_diagram_format)
-    path = diagram_path(format)
-    content_type = extractor_class.diagram_formats[format]
-    raise(WorkflowDiagram::UnsupportedFormat, "Unsupported diagram format: #{format}") if content_type.nil?
-
-    unless File.exist?(path)
-      diagram = extractor.diagram(format)
-      return nil if diagram.nil? || diagram.length <= 1
-      File.binwrite(path, diagram)
-    end
-
-    workflow = is_a_version? ? self.parent : self
-    WorkflowDiagram.new(workflow, version, path, format, content_type)
+  def is_git_ro_crate?
+    is_git_versioned? && git_version.ro_crate?
   end
 
   def is_already_ro_crate?
-    content_blob.original_filename.end_with?('.crate.zip')
+    (!is_git_versioned? && content_blob.original_filename.end_with?('.crate.zip')) || is_git_ro_crate?
   end
 
   def is_basic_ro_crate?
-    content_blob.original_filename.end_with?('.basic.crate.zip')
+    content_blob && content_blob.original_filename.end_with?('.basic.crate.zip')
   end
 
   def should_generate_crate?
     is_basic_ro_crate? || !is_already_ro_crate?
   end
 
-  def populate_ro_crate(crate)
-    c = content_blob
-    wf = crate.main_workflow || ROCrate::Workflow.new(crate, c.filepath, c.original_filename)
-    wf.content_size = c.file_size
-    crate.main_workflow = wf
-#    crate.main_workflow.programming_language = ROCrate::ContextualEntity.new(crate, nil, extractor_class.ro_crate_metadata)
+  def internals
+    JSON.parse(metadata || '{}').with_indifferent_access
+  end
 
-    begin
+  def internals=(meta)
+    self.metadata = meta.is_a?(String) ? meta : meta.to_json
+  end
+
+  def structure
+    WorkflowInternals::Structure.new(internals)
+  end
+
+  delegate :inputs, :outputs, :steps, to: :structure
+
+  def can_run?
+    can_download?(nil) && workflow_class_title == 'Galaxy' && Seek::Config.galaxy_instance_trs_import_url.present?
+  end
+
+  def diagram_exists?
+    path = Dir.glob(cached_diagram_path('*')).last
+    path && File.exist?(path)
+  end
+
+  def diagram
+    path = Dir.glob(cached_diagram_path('*')).last
+
+    unless path && File.exist?(path)
+      e = extractor
+      diagram = e.generate_diagram
+      return nil if diagram.nil? || diagram.length <= 1
+      path = Pathname.new(cached_diagram_path(e.diagram_extension))
+      path.parent.mkdir unless path.parent.exist?
+      File.binwrite(path, diagram)
+    end
+
+    WorkflowDiagram.new(self, path.to_s)
+  end
+
+  def populate_ro_crate(crate)
+    if is_git_versioned?
+      remotes = git_version.remote_sources
+      m = main_workflow_blob
+      if m
+        crate.main_workflow = main_workflow_blob.to_crate_entity(crate, type: ROCrate::Workflow)
+        remotes.delete(main_workflow_blob.path)
+        crate.main_workflow.programming_language = ROCrate::ContextualEntity.new(crate, nil, workflow_class&.ro_crate_metadata || Seek::WorkflowExtractors::Base::NULL_CLASS_METADATA)
+      end
+
+      d = diagram_blob
+      if d
+        remotes.delete(d.path)
+        diagram_entity = d.to_crate_entity(crate, type: ROCrate::WorkflowDiagram)
+        crate.add_data_entity(diagram_entity)
+        crate.main_workflow.diagram = diagram_entity if crate.main_workflow
+      else # Was the diagram generated?
+        d = diagram
+        if d&.exists?
+          diagram_entity = d.to_crate_entity(crate)
+          crate.add_data_entity(diagram_entity)
+          crate.main_workflow.diagram = diagram_entity if crate.main_workflow
+        end
+      end
+
+      c = abstract_cwl_blob
+      if c
+        remotes.delete(c.path)
+        cwl_entity = c.to_crate_entity(crate, type: ROCrate::WorkflowDescription)
+        crate.add_data_entity(cwl_entity)
+        crate.main_workflow.cwl_description = cwl_entity if crate.main_workflow
+      end
+
+      remotes.each do |path, url|
+        crate.add_external_file(url)
+      end
+    else
+      unless crate.main_workflow
+        crate.main_workflow = ROCrate::Workflow.new(crate, content_blob.filepath, content_blob.original_filename, contentSize: content_blob.file_size)
+      end
       d = diagram
       if d&.exists?
         wdf = crate.main_workflow_diagram || ROCrate::WorkflowDiagram.new(crate, d.path, d.filename)
         wdf.content_size = d.size
         crate.main_workflow.diagram = wdf
       end
-    rescue WorkflowDiagram::UnsupportedFormat
     end
 
+    authors = creators.map { |person| crate.add_person(nil, person.ro_crate_metadata) }
+    others = other_creators&.split(',')&.collect(&:strip)&.compact || []
+    authors += others.map.with_index { |name, i| crate.add_person("creator-#{i + 1}", name: name) }
+    crate.author = authors
+    crate['provider'] = projects.map { |project| crate.add_organization(nil, project.ro_crate_metadata).reference }
+    crate.license = license
     crate.identifier = ro_crate_identifier
     crate.url = ro_crate_url('ro_crate')
 
@@ -97,8 +144,8 @@ module WorkflowExtraction
     crate['sdDatePublished'] = Time.now unless crate['sdDatePublished']
     crate['creativeWorkStatus'] = I18n.t("maturity_level.#{maturity_level}") if maturity_level
 
-    # brute force deletion as I cannot track down where it comes from
-    crate.contextual_entities.delete_if { |c| c['@id'] == '#ro-crate-preview.html' }
+    crate.preview.template = WorkflowExtraction::PREVIEW_TEMPLATE
+
     crate
   end
 
@@ -120,28 +167,37 @@ module WorkflowExtraction
     flattened['@graph'].each do |elem|
       type = elem['@type']
       type = [type] unless type.is_a?(Array)
-      if type.include?('ComputationalWorkflow')
+      if type.include?('ComputationalWorkflow') && crate.main_workflow
         merge_fields(crate.main_workflow, elem)
       else
         entity_class = ROCrate::ContextualEntity.specialize(elem)
-        entity = entity_class.new(crate, elem['@id'], elem)
+        elem['@id'] = URI.decode_www_form_component(elem['@id'])
+        entity = entity_class.new(crate, nil, elem)
         crate.add_contextual_entity(entity)
       end
     end
   end
-  
+
   def merge_fields(crate_workflow, bioschemas_workflow)
     bioschemas_workflow.each do |key, value|
       crate_workflow[key] = value unless crate_workflow[key]
     end
   end
-  
+
   def ro_crate
     inner = proc do |crate|
       populate_ro_crate(crate) if should_generate_crate?
 
       if block_given?
-        yield crate
+        # TODO: Find a way to do this in populate_ro_crate (Without tmpdir disappearing when it comes to writing)
+        if should_generate_crate? && is_git_versioned?
+          git_version.in_temp_dir do |tmpdir|
+            crate.add_all(tmpdir, false, include_hidden: true)
+            yield crate
+          end
+        else
+          yield crate
+        end
       else
         return crate
       end
@@ -167,48 +223,74 @@ module WorkflowExtraction
   end
 
   def ro_crate_url(action = nil)
-    url = Seek::Config.site_base_host.chomp('/')
-    wf = is_a_version? ? parent : self
-    url += "/#{wf.class.name.tableize}/#{wf.id}"
-    url += "/#{action}" if action
-    url += "?version=#{version}"
-
-    url
+    resource = is_a_version? ? parent : self
+    resource = [action.to_sym, resource] if action
+    Seek::Util.routes.polymorphic_url(resource, version: version)
   end
 
-  def internals
-    JSON.parse(metadata || '{}').with_indifferent_access
-  end
+  [:main_workflow, :diagram, :abstract_cwl].each do |type|
+    s_type = type.to_s
 
-  def internals=(meta)
-    self.metadata = meta.is_a?(String) ? meta : meta.to_json
-  end
-
-  def inputs
-    (internals[:inputs] || []).map do |i|
-      WorkflowInput.new(self, **i.symbolize_keys)
+    define_method("#{s_type}_annotation") do
+      git_version.find_git_annotation(s_type)
     end
+
+    define_method("#{s_type}_path") do
+      git_version.send("#{s_type}_annotation")&.path
+    end
+
+    define_method("#{s_type}_path_changed?") do
+      instance_variable_get(:"@#{s_type}_path_changed") || false
+    end
+
+    define_method("#{type}_path=") do |path|
+      exist = git_version.send("#{type}_annotation")
+      instance_variable_set(:"@#{s_type}_path_changed", !exist || (exist.path != path))
+
+      if path.blank?
+        if exist
+          exist.destroy
+        end
+
+        return
+      end
+
+      if exist
+        exist.update_attribute(:path, path)
+      else
+        git_version.git_annotations.build(key: s_type, path: path)
+      end
+    end
+
+    define_method("#{s_type}_blob") do
+      git_version.get_blob(git_version.send("#{s_type}_path"))
+    end
+
   end
 
-  def outputs
-    (internals[:outputs] || []).map do |o|
-      WorkflowOutput.new(self, **o.symbolize_keys)
-    end
-  end
-
-  def steps
-    (internals[:steps] || []).map do |s|
-      WorkflowStep.new(self, **s.symbolize_keys)
-    end
+  def refresh_internals
+    self.internals = extractor.metadata[:internals] || {}
   end
 
   private
 
-  def diagram_path(format)
-    content_blob.filepath("diagram.#{format}") # generates a path like "<uuid>.diagram.png"
+  def ro_crate_path
+    if is_git_versioned?
+      File.join(Seek::Config.converted_filestore_path, "git_version_#{git_version.id}.crate.zip")
+    else
+      content_blob.filepath('crate.zip')
+    end
   end
 
-  def ro_crate_path
-    content_blob.filepath('crate.zip')
+  def cached_diagram_path(format)
+    if is_git_versioned?
+      File.join(Seek::Config.converted_filestore_path, "git_version_#{git_version.id}_diagram.#{format}")
+    else
+      content_blob.filepath("diagram.#{format}")
+    end
+  end
+
+  def clear_cached_diagram
+    FileUtils.rm(Dir.glob(cached_diagram_path('*')))
   end
 end

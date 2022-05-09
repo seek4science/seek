@@ -33,10 +33,6 @@
 
 <%= render partial: 'custom_metadata/custom_metadata_attribute_input', locals:{f:f,resource:@study} %>
 
-<% if show_scales? %>
-    <%= render :partial => "scales/scales_selector",:locals=>{:object=>@study} %>
-<% end %>
-
 <%= render partial: 'assets/manage_specific_attributes', locals:{f:f} if show_form_manage_specific_attributes? %>
 
 <%= f.fancy_multiselect :publications, { other_projects_checkbox: true } %>

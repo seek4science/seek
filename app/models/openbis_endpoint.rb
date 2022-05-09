@@ -2,7 +2,7 @@
 class OpenbisEndpoint < ApplicationRecord
   belongs_to :project
   belongs_to :policy, autosave: true
-  attr_encrypted :password, key: :password_key
+  attr_encrypted :password, key: proc { Seek::Config.attr_encrypted_key }
 
   has_many :external_assets, as: :seek_service # , dependent: :destroy
   has_many :registered_studies, through: :external_assets, source: :seek_entity, source_type: 'Study'
@@ -22,8 +22,8 @@ class OpenbisEndpoint < ApplicationRecord
 
   after_destroy :clear_metadata_store
 
-  after_initialize :default_policy, autosave: true
-  after_initialize :add_meta_config, autosave: true
+  after_initialize :default_policy
+  after_initialize :add_meta_config
 
   before_save :meta_config_to_json
   before_save :clear_metadata_if_changed

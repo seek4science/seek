@@ -80,7 +80,7 @@ class SampleTypesController < ApplicationController
   # PUT /sample_types/1.json
   def update
 
-    @sample_type.update_attributes(sample_type_params)
+    @sample_type.update(sample_type_params)
     @sample_type.resolve_inconsistencies
     respond_to do |format|
       if @sample_type.save
@@ -161,10 +161,10 @@ class SampleTypesController < ApplicationController
     params.require(:sample_type).permit(:title, :description, :tags, :template_id,
                                         { project_ids: [],
                                           sample_attributes_attributes: [:id, :title, :pos, :required, :is_title,
-                                                                        :sample_attribute_type_id, :description, :pid,
-                                                                        :sample_controlled_vocab_id, :isa_tag_id,
-                                                                        :linked_sample_type_id,
-                                                                        :unit_id, :_destroy]},:assay_ids => [])
+                                                                         :description, :pid, :sample_attribute_type_id,
+                                                                         :sample_controlled_vocab_id, :isa_tag_id,
+                                                                         :linked_sample_type_id,
+                                                                         :unit_id, :_destroy] }, :assay_ids => [])
   end
 
 
