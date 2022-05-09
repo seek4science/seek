@@ -112,13 +112,26 @@ module Git
       Seek::Util.routes.polymorphic_path([@git_version.resource, :git_raw], opts)
     end
 
-    def is_text?
-      !binary?
+    def file_extension
+      path.split('/').last&.split('.')&.last&.downcase
     end
 
-    def is_image?
-      ext = path.split('/').last&.split('.')&.last&.downcase
-      Seek::ContentTypeDetection::IMAGE_VIEWABLE_FORMAT.include?(ext)
+    def content_type_file_extensions
+      [file_extension]
+    end
+
+    def content_type
+      @content_type ||= content_types.first
+    end
+
+    def content_types
+      mime_types_for_extension(file_extension)
+    end
+
+    alias_method :file_size, :size
+
+    def is_text?
+      !binary?
     end
   end
 end

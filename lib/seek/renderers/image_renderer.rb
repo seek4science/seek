@@ -6,7 +6,8 @@ module Seek
       end
 
       def render_content
-        link_to(image_tag(content_path, class: 'git-image-preview'), content_path, title: 'Click for full')
+        path = blob.content_path
+        link_to(image_tag(path, class: 'git-image-preview'), path, title: 'Click for full')
       end
     end
   end

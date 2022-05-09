@@ -48,23 +48,23 @@ module Seek
     end
 
     def is_xlsx?(blob = self)
-      mime_extensions(blob.content_type).include?('xlsx')
+      blob.content_type_file_extensions.include?('xlsx')
     end
 
     def is_xls?(blob = self)
-      mime_extensions(blob.content_type).include?('xls')
+      blob.content_type_file_extensions.include?('xls')
     end
 
     def is_xlsm?(blob = self)
-      mime_extensions(blob.content_type).include?('xlsm')
+      blob.content_type_file_extensions.include?('xlsm')
     end
 
     def is_csv?(blob = self)
-      mime_extensions(blob.content_type).include?('csv')
+      blob.content_type_file_extensions.include?('csv')
     end
     
     def is_tsv?(blob = self)
-      mime_extensions(blob.content_type).include?('tsv')
+      blob.content_type_file_extensions.include?('tsv')
     end
 
     def is_binary?(blob = self)
@@ -96,19 +96,27 @@ module Seek
     end
 
     def is_pdf_convertable?(blob = self)
-      !(PDF_CONVERTABLE_FORMAT & mime_extensions(blob.content_type)).empty? && Seek::Config.pdf_conversion_enabled
+      (PDF_CONVERTABLE_FORMAT & blob.content_type_file_extensions).any? && Seek::Config.pdf_conversion_enabled
     end
 
     def is_image_viewable?(blob = self)
-      !(IMAGE_VIEWABLE_FORMAT & mime_extensions(blob.content_type)).empty?
+      (IMAGE_VIEWABLE_FORMAT & blob.content_type_file_extensions).any?
     end
 
     def is_pdf_viewable?(blob = self)
-      !(PDF_VIEWABLE_FORMAT & mime_extensions(blob.content_type)).empty?
+      (PDF_VIEWABLE_FORMAT & blob.content_type_file_extensions).any?
     end
 
     def is_pdf?(blob = self)
-      mime_extensions(blob.content_type).include?('pdf')
+      blob.content_type_file_extensions.include?('pdf')
+    end
+
+    def is_markdown?(blob = self)
+      blob.content_type_file_extensions.include?('md')
+    end
+
+    def is_jupyter_notebook?(blob = self)
+      blob.content_type_file_extensions.include?('ipynb')
     end
 
     def unknown_file_type?(blob = self)
