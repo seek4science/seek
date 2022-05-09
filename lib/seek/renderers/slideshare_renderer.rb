@@ -6,7 +6,7 @@ module Seek
       end
 
       def render_content
-        api_url = "http://www.slideshare.net/api/oembed/2?url=#{url}&format=json"
+        api_url = "http://www.slideshare.net/api/oembed/2?url=#{blob.url}&format=json"
         json = JSON.parse(RestClient.get(api_url))
         json['html']
       end

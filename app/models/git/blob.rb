@@ -128,7 +128,9 @@ module Git
       mime_types_for_extension(file_extension)
     end
 
-    alias_method :file_size, :size
+    def file_size
+      size
+    end
 
     def is_text?
       !binary?
