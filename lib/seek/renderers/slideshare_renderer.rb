@@ -2,7 +2,7 @@ module Seek
   module Renderers
     class SlideshareRenderer < BlobRenderer
       def can_render?
-        url && is_slideshare_url?(url)
+        blob.url && is_slideshare_url?(blob.url)
       end
 
       def render_content

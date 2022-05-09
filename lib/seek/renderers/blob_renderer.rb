@@ -4,7 +4,6 @@ module Seek
       include ActionView::Helpers
 
       attr_reader :blob
-      delegate :read, :url, :path, :size, :content_path, to: :blob
 
       def initialize(git_blob_or_blob)
         @blob = git_blob_or_blob

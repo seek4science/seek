@@ -87,7 +87,7 @@ class ContentBlob < ApplicationRecord
   end
 
   def file_extension
-    original_filename && original_filename.split('.').last
+    original_filename&.split('.')&.last&.downcase
   end
 
   def make_temp_copy
@@ -245,6 +245,10 @@ class ContentBlob < ApplicationRecord
   def content_path(opts = {})
     opts.reverse_merge!(action: 'download', disposition: 'inline')
     Seek::Util.routes.polymorphic_path([asset, content_blob])
+  end
+
+  def content_type_file_extensions
+    mime_extensions(content_type)
   end
 
   private
