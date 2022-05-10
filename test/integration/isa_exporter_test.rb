@@ -293,19 +293,31 @@ rescue ArgumentError
 end
 
 def create_basic_isa_project
-	# sample_collection.save!
-	source = SampleType.find_by_title('ISA Source')
-	sample_collection = SampleType.find_by_title('ISA sample collection')
-	assay_sample_type = SampleType.find_by_title('ISA Assay 1')
+	person = Factory(:person, project: @project)
 
-	disable_authorization_checks do
-		source.projects = [@project]
-		source.save!
-		sample_collection.projects = [@project]
-		sample_collection.save!
-		assay_sample_type.projects = [@project]
-		assay_sample_type.save!
-	end
+	source =
+		Factory(
+			:isa_source_sample_type,
+			contributor: person,
+			project_ids: [@project.id],
+			isa_template: Template.find_by_title('ISA Source')
+		)
+	sample_collection =
+		Factory(
+			:isa_sample_collection_sample_type,
+			contributor: person,
+			project_ids: [@project.id],
+			isa_template: Template.find_by_title('ISA sample collection'),
+			linked_sample_type_id: source
+		)
+	assay_sample_type =
+		Factory(
+			:isa_assay_sample_type,
+			contributor: person,
+			project_ids: [@project.id],
+			isa_template: Template.find_by_title('ISA Assay 1'),
+			linked_sample_type_id: sample_collection
+		)
 
 	study =
 		Factory(
@@ -313,7 +325,6 @@ def create_basic_isa_project
 			investigation: @investigation,
 			sample_types: [source, sample_collection],
 			sop: Factory(:sop, policy: Factory(:public_policy))
-			# contributor: @current_user.person
 		)
 
 	assay =
