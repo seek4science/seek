@@ -13,6 +13,8 @@ isa_source_template:
   repo_schema_id: null
   organism: any
   level: study
+  projects: [moses_project]
+  policy: fully_public_policy
 
 isa_sample_collection_template:
   title: ISA sample collection
@@ -27,6 +29,8 @@ isa_sample_collection_template:
   repo_schema_id: null
   organism: any
   level: study
+  projects: [moses_project]
+  policy: fully_public_policy
 
 isa_assay_1_template:
   title: ISA Assay 1
@@ -41,4 +45,6 @@ isa_assay_1_template:
   repo_schema_id: null
   organism: any
   level: assay
+  projects: [moses_project]
+  policy: fully_public_policy
 
