@@ -7,7 +7,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
   include SharingFormTestHelper
 
   def setup
-    login_as Factory(:admin).user
+    login_as Factory :user
   end
 
   test 'should get new' do
