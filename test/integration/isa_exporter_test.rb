@@ -308,7 +308,7 @@ def create_basic_isa_project
 			contributor: person,
 			project_ids: [@project.id],
 			isa_template: Template.find_by_title('ISA sample collection'),
-			linked_sample_type_id: source
+			linked_sample_type: source
 		)
 	assay_sample_type =
 		Factory(
@@ -316,7 +316,7 @@ def create_basic_isa_project
 			contributor: person,
 			project_ids: [@project.id],
 			isa_template: Template.find_by_title('ISA Assay 1'),
-			linked_sample_type_id: sample_collection
+			linked_sample_type: sample_collection
 		)
 
 	study =

@@ -140,11 +140,11 @@ end
 
 Factory.define(:isa_sample_collection_sample_type, parent: :sample_type) do |f|
 	f.ignore do
-    linked_sample_type_id nil
+    linked_sample_type nil
   end
 	f.sequence(:title) { |n| "ISA sample collection #{n}" }
   f.after_build do |type, eval|
-    type.sample_attributes << Factory.build(:sample_attribute, title: 'Input', sample_attribute_type: Factory(:sample_multi_sample_attribute_type), linked_sample_type: eval.linked_sample_type_id, required: true, sample_type: type)
+    type.sample_attributes << Factory.build(:sample_attribute, title: 'Input', sample_attribute_type: Factory(:sample_multi_sample_attribute_type), linked_sample_type: eval.linked_sample_type, required: true, sample_type: type)
 		type.sample_attributes << Factory.build(:sample_attribute, title: 'sample collection', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, isa_tag_id: IsaTag.find_by_title("protocol").id, sample_type: type)
 		type.sample_attributes << Factory.build(:sample_attribute, title: 'sample collection parameter value 1', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, isa_tag_id: IsaTag.find_by_title("parameter_value").id, sample_type: type)
 		type.sample_attributes << Factory.build(:sample_attribute, title: 'sample collection parameter value 2', sample_attribute_type: Factory(:controlled_vocab_attribute_type), isa_tag_id: IsaTag.find_by_title("parameter_value").id, sample_controlled_vocab: Factory(:apples_sample_controlled_vocab), sample_type: type)
@@ -158,11 +158,11 @@ end
 
 Factory.define(:isa_assay_sample_type, parent: :sample_type) do |f|
 	f.ignore do
-    linked_sample_type_id nil
+    linked_sample_type nil
   end
   f.sequence(:title) { |n| "ISA Assay #{n}" }
   f.after_build do |type, eval|
-    type.sample_attributes << Factory.build(:sample_attribute, title: 'Input', sample_attribute_type: Factory(:sample_multi_sample_attribute_type), linked_sample_type: eval.linked_sample_type_id, required: true, sample_type: type)
+    type.sample_attributes << Factory.build(:sample_attribute, title: 'Input', sample_attribute_type: Factory(:sample_multi_sample_attribute_type), linked_sample_type: eval.linked_sample_type, required: true, sample_type: type)
 		type.sample_attributes << Factory.build(:sample_attribute, title: 'Protocol Assay 1', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, isa_tag_id: IsaTag.find_by_title("protocol").id, sample_type: type)
 		type.sample_attributes << Factory.build(:sample_attribute, title: 'Assay 1 parameter value 1', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, isa_tag_id: IsaTag.find_by_title("parameter_value").id, sample_type: type)
 		type.sample_attributes << Factory.build(:sample_attribute, title: 'Assay 1 parameter value 2', sample_attribute_type: Factory(:controlled_vocab_attribute_type), isa_tag_id: IsaTag.find_by_title("parameter_value").id, sample_controlled_vocab: Factory(:apples_sample_controlled_vocab), sample_type: type)
