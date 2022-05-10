@@ -5,6 +5,7 @@ class ContentBlobsController < ApplicationController
 
   skip_before_action :check_json_id_type, only: [:update]
 
+  include RawDisplay
   include Seek::AssetsCommon
   include Seek::UploadHandling::ExamineUrl
 
@@ -26,11 +27,15 @@ class ContentBlobsController < ApplicationController
   end
 
   def view_content
-    if @content_blob.is_text? || @content_blob.is_cwl?
-      view_text_content
+    if can_display?
+      render_display(@content_blob)
     else
-      @pdf_url = pdf_url
-      view_pdf_content
+      if @content_blob.is_text? || @content_blob.is_cwl?
+        view_text_content
+      else
+        @pdf_url = pdf_url
+        view_pdf_content
+      end
     end
   end
 

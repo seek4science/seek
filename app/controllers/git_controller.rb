@@ -1,4 +1,5 @@
 class GitController < ApplicationController
+  include RawDisplay
   include Seek::MimeTypes
 
   before_action :fetch_parent
@@ -51,9 +52,8 @@ class GitController < ApplicationController
   def raw
     if @blob.binary?
       send_data(@blob.content, filename: path_param.split('/').last, disposition: 'inline')
-    elsif params[:display] == 'notebook'
-      response.delete_header('Content-Security-Policy')
-      render body: @blob.notebook.html_safe, content_type: 'text/html'
+    elsif can_display?
+      render_display(@blob)
     else
       # Set Content-Type if it's an image to allow use in img tags
       ext = path_param.split('/').last&.split('.')&.last&.downcase

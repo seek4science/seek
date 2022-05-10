@@ -25,10 +25,14 @@ module Git
     end
 
     def read
+      file_contents(as_text: true)
+    end
+
+    def binread
       file_contents
     end
 
-    def file_contents(fetch_remote: false, &block)
+    def file_contents(as_text: false, fetch_remote: false, &block)
       if fetch_remote && remote? && !fetched?
         if block_given?
           block.call(remote_content)
@@ -37,9 +41,9 @@ module Git
         end
       else
         if block_given?
-          block.call(StringIO.new(content)) # Rugged does not support streaming blobs :(
+          block.call(StringIO.new(as_text ? text : content)) # Rugged does not support streaming blobs :(
         else
-          content
+          as_text ? text : content
         end
       end
     end

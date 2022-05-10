@@ -6,9 +6,23 @@ module Seek
       end
 
       def render_content
+        "<div class=\"blob-display-container\">\n" +
+          "<iframe src=\"#{blob.content_path(display: 'markdown')}\"></iframe>" +
+        "</div>"
+      end
+
+      def render_iframe_contents
         doc = CommonMarker.render_doc(blob.read, :UNSAFE, [:tagfilter, :table, :strikethrough, :autolink])
         renderer = CommonMarker::SeekHtmlRenderer.new(options: [:UNSAFE, :GITHUB_PRE_LANG], extensions: [:tagfilter, :table, :strikethrough, :autolink])
-        renderer.render(doc)
+        "<div class=\"markdown-body\">#{renderer.render(doc)}</div>"
+      end
+
+      def iframe_layout
+        'blob'
+      end
+
+      def iframe_csp
+        "default-src 'self'"
       end
     end
   end
