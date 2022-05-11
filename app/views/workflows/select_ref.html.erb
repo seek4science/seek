@@ -5,5 +5,11 @@
   <%= render partial: 'git_repositories/ref_form', locals: { name: "workflow[git_version_attributes][ref]",
                                                              git_repository:  @workflow.git_version.git_repository } %>
 
+  <hr/>
+
+  <span id="git-create-button" style="display: none">
+    <%= create_button class: 'btn btn-primary', id: 'git-create-button' %>
+    or
+  </span>
   <%= cancel_button(@workflow.persisted? ? workflow_path(@workflow) : new_workflow_path) %>
 <% end %>
