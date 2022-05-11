@@ -61,4 +61,5 @@
 //= require sortable.min
 //= require rich_text_edit
 //= require admin
+//= require templates
 //= require git

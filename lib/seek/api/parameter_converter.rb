@@ -140,7 +140,7 @@ module Seek
           assay_ids: :assay_assets_attributes,
           workflow_class: :workflow_class_id,
           discussion_links: :discussion_links_attributes,
-          repository_standard: :repository_standard_attributes,
+          template: :template_attributes,
           creators: :api_assets_creators,
           administrator_ids: :programme_administrator_ids
       }.freeze
