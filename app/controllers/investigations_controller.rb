@@ -101,10 +101,12 @@ class InvestigationsController < ApplicationController
       a1.permit!
       pos = 0
       a1.each_pair do |key, value |
-        study = Study.find (value)
-        study.position = pos
-        pos += 1
-        study.save!
+        disable_authorization_checks {
+          study = Study.find (value)
+          study.position = pos
+          pos += 1
+          study.save!
+        }
       end
       respond_to do |format|
         format.html { redirect_to(@investigation) }
