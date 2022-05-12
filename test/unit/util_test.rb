@@ -20,7 +20,7 @@ class UtilTest < ActiveSupport::TestCase
 
   test 'authorized types' do
     # How to enable Placeholder?
-    expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, Investigation, Model, Presentation, Publication, Sample, Sop, Strain, Study, Workflow].map(&:name).sort
+    expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, Investigation, Model, Presentation, Publication, Sample, Sop, Strain, Study, Workflow, Template].map(&:name).sort
     actual = Seek::Util.authorized_types.map(&:name).sort
     assert_equal expected, actual
   end

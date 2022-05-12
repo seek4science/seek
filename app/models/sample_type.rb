@@ -32,6 +32,7 @@ class SampleType < ApplicationRecord
   has_many :linked_sample_attributes, class_name: 'SampleAttribute', foreign_key: 'linked_sample_type_id'
 
   belongs_to :contributor, class_name: 'Person'
+  belongs_to :template
 
   has_many :assays
 
@@ -79,7 +80,7 @@ class SampleType < ApplicationRecord
     super + ['uploaded_template']
   end
   def columns_allowed
-    columns_default + []
+    columns_default + ['description','created_at','projects','contributor']
   end
 
   # fixes inconsistencies following form submission that could cause validation errors
