@@ -20,6 +20,21 @@ module Seek
         fail 'needs to be implemented'
       end
 
+      def render_standalone
+        render_template('content_blobs/view_content_frame',
+                    { renderer: self },
+                    layout: layout)
+      end
+
+      def layout
+        'blob'
+      end
+
+      # Content-Security-Policy for the rendered view
+      def content_security_policy
+        ApplicationController::USER_CONTENT_CSP
+      end
+
       private
 
       def handle_render_exception(blob, exception)
@@ -27,6 +42,14 @@ module Seek
                                                            data:{ message: 'rendering error',
                                                                   renderer: self,
                                                                   item: blob.inspect })
+      end
+
+      def render_template(template_path, variables = {}, layout: 'application')
+        ApplicationController.renderer.render(
+          template: template_path,
+          assigns: variables,
+          layout: layout
+        )
       end
     end
   end
