@@ -287,12 +287,6 @@ module AssetsHelper
     elements
   end
 
-  # whether the viewable content is available, or converted to pdf, or capable to be converted to pdf
-  def view_content_available?(content_blob)
-    return true if content_blob.is_text? || content_blob.is_pdf? || content_blob.is_cwl? || content_blob.is_image?
-    content_blob.is_pdf_viewable?
-  end
-
   def source_link_button(source_link)
     url = source_link.url
     uri = URI.parse(url)

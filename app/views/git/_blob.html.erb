@@ -44,5 +44,5 @@
 <% if renderer.is_a?(Seek::Renderers::BlankRenderer) %>
   <span class="subtle">Binary content not displayed</span>
 <% else %>
-  <%= renderer.render_content.html_safe %>
+  <%= renderer.render.html_safe %>
 <% end %>

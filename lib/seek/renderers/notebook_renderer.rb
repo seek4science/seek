@@ -1,17 +1,15 @@
 module Seek
   module Renderers
-    class NotebookRenderer < BlobRenderer
+    class NotebookRenderer < IframeRenderer
       def can_render?
         blob.is_jupyter_notebook?
       end
 
-      def render_content
-        "<div class=\"blob-display-container\">\n" +
-          "<iframe src=\"#{blob.content_path(display: 'notebook')}\">Loading...</iframe>" +
-        "</div>"
+      def display_format
+        'notebook'
       end
 
-      def render_iframe_contents
+      def render_standalone
         Rails.cache.fetch("notebook-#{blob.cache_key}") do
           f = Tempfile.new('ipynb')
           f.binmode
@@ -23,11 +21,11 @@ module Seek
         end
       end
 
-      def iframe_layout
+      def layout
         false
       end
 
-      def iframe_csp
+      def content_security_policy
         "default-src 'self'; img-src * data:; style-src 'unsafe-inline';"
       end
     end

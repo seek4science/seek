@@ -3,8 +3,8 @@ module Seek
     class RendererFactory
       include Singleton
 
-      def renderer(blob, fallback: Seek::Renderers::BlankRenderer)
-        detect_renderer(blob) || fallback.new
+      def renderer(blob)
+        detect_renderer(blob)
       end
 
       private
@@ -16,9 +16,9 @@ module Seek
         type.new(blob) if type
       end
 
+      # Ordered list of Renderer classes. More generic renderers appear last.
       def renderer_instances
-        # Seek::Renderers::Renderer.descendants
-        [SlideshareRenderer, YoutubeRenderer, MarkdownRenderer, NotebookRenderer, ImageRenderer, TextRenderer]
+        [SlideshareRenderer, YoutubeRenderer, MarkdownRenderer, NotebookRenderer, PdfRenderer, ImageRenderer, TextRenderer, BlankRenderer]
       end
     end
   end
