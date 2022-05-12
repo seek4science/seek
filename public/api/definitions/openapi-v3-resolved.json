@@ -2632,6 +2632,9 @@
                   },
                   "events": {
                     "$ref": "#/components/schemas/multipleReferences"
+                  },
+                  "workflows": {
+                    "$ref": "#/components/schemas/multipleReferences"
                   }
                 },
                 "required": [
@@ -2795,6 +2798,9 @@
                   },
                   "events": {
                     "$ref": "#/components/schemas/multipleReferences"
+                  },
+                  "workflows": {
+                    "$ref": "#/components/schemas/multipleReferences"
                   }
                 },
                 "additionalProperties": false
@@ -2948,6 +2954,9 @@
                   },
                   "assays": {
                     "$ref": "#/components/schemas/multipleReferences"
+                  },
+                  "workflows": {
+                    "$ref": "#/components/schemas/multipleReferences"
                   }
                 },
                 "required": [
@@ -3088,6 +3097,9 @@
                     "$ref": "#/components/schemas/multipleReferences"
                   },
                   "assays": {
+                    "$ref": "#/components/schemas/multipleReferences"
+                  },
+                  "workflows": {
                     "$ref": "#/components/schemas/multipleReferences"
                   }
                 },
@@ -4410,6 +4422,9 @@
                   },
                   "events": {
                     "$ref": "#/components/schemas/multipleReferences"
+                  },
+                  "workflows": {
+                    "$ref": "#/components/schemas/multipleReferences"
                   }
                 },
                 "required": [
@@ -4561,6 +4576,9 @@
                     "$ref": "#/components/schemas/multipleReferences"
                   },
                   "events": {
+                    "$ref": "#/components/schemas/multipleReferences"
+                  },
+                  "workflows": {
                     "$ref": "#/components/schemas/multipleReferences"
                   }
                 },
@@ -6181,6 +6199,15 @@
                   },
                   "sops": {
                     "$ref": "#/components/schemas/multipleReferences"
+                  },
+                  "presentations": {
+                    "$ref": "#/components/schemas/multipleReferences"
+                  },
+                  "data_files": {
+                    "$ref": "#/components/schemas/multipleReferences"
+                  },
+                  "documents": {
+                    "$ref": "#/components/schemas/multipleReferences"
                   }
                 },
                 "required": [
@@ -6399,6 +6426,15 @@
                     "$ref": "#/components/schemas/multipleReferences"
                   },
                   "sops": {
+                    "$ref": "#/components/schemas/multipleReferences"
+                  },
+                  "presentations": {
+                    "$ref": "#/components/schemas/multipleReferences"
+                  },
+                  "data_files": {
+                    "$ref": "#/components/schemas/multipleReferences"
+                  },
+                  "documents": {
                     "$ref": "#/components/schemas/multipleReferences"
                   }
                 },
@@ -7092,6 +7128,9 @@
                   },
                   "placeholder": {
                     "$ref": "#/components/schemas/singleReference"
+                  },
+                  "workflows": {
+                    "$ref": "#/components/schemas/multipleReferences"
                   }
                 },
                 "required": [
@@ -7105,7 +7144,8 @@
                   "publications",
                   "events",
                   "file_template",
-                  "placeholder"
+                  "placeholder",
+                  "workflows"
                 ],
                 "additionalProperties": false
               },
@@ -7177,6 +7217,9 @@
                   },
                   "publications": {
                     "$ref": "#/components/schemas/multipleReferences"
+                  },
+                  "workflows": {
+                    "$ref": "#/components/schemas/multipleReferences"
                   }
                 },
                 "required": [
@@ -7187,7 +7230,8 @@
                   "investigations",
                   "studies",
                   "assays",
-                  "publications"
+                  "publications",
+                  "workflows"
                 ],
                 "additionalProperties": false
               },
@@ -7894,6 +7938,9 @@
                   },
                   "events": {
                     "$ref": "#/components/schemas/multipleReferences"
+                  },
+                  "workflows": {
+                    "$ref": "#/components/schemas/multipleReferences"
                   }
                 },
                 "required": [
@@ -7905,7 +7952,8 @@
                   "studies",
                   "assays",
                   "publications",
-                  "events"
+                  "events",
+                  "workflows"
                 ],
                 "additionalProperties": false
               },
@@ -9091,6 +9139,15 @@
                   },
                   "sops": {
                     "$ref": "#/components/schemas/multipleReferences"
+                  },
+                  "presentations": {
+                    "$ref": "#/components/schemas/multipleReferences"
+                  },
+                  "data_files": {
+                    "$ref": "#/components/schemas/multipleReferences"
+                  },
+                  "documents": {
+                    "$ref": "#/components/schemas/multipleReferences"
                   }
                 },
                 "required": [
@@ -9102,7 +9159,10 @@
                   "studies",
                   "assays",
                   "publications",
-                  "sops"
+                  "sops",
+                  "presentations",
+                  "data_files",
+                  "documents"
                 ],
                 "additionalProperties": false
               },

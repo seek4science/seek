@@ -1430,6 +1430,8 @@ dataFilePost:
               $ref: "#/components/schemas/multipleReferences"
             events:
               $ref: "#/components/schemas/multipleReferences"
+            workflows:
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - projects
           additionalProperties: false
@@ -1486,6 +1488,8 @@ dataFilePatch:
               $ref: "#/components/schemas/multipleReferences"
             events:
               $ref: "#/components/schemas/multipleReferences"
+            workflows:
+              $ref: "#/components/schemas/multipleReferences"
           additionalProperties: false
       required:
         - id
@@ -1538,6 +1542,8 @@ documentPost:
               $ref: "#/components/schemas/multipleReferences"
             assays:
               $ref: "#/components/schemas/multipleReferences"
+            workflows:
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - projects
           additionalProperties: false
@@ -1589,6 +1595,8 @@ documentPatch:
             projects:
               $ref: "#/components/schemas/multipleReferences"
             assays:
+              $ref: "#/components/schemas/multipleReferences"
+            workflows:
               $ref: "#/components/schemas/multipleReferences"
           additionalProperties: false
       required:
@@ -2130,6 +2138,8 @@ presentationPost:
               $ref: "#/components/schemas/multipleReferences"
             events:
               $ref: "#/components/schemas/multipleReferences"
+            workflows:
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - projects
           additionalProperties: false
@@ -2183,6 +2193,8 @@ presentationPatch:
             publications:
               $ref: "#/components/schemas/multipleReferences"
             events:
+              $ref: "#/components/schemas/multipleReferences"
+            workflows:
               $ref: "#/components/schemas/multipleReferences"
           additionalProperties: false
       required:
@@ -2900,6 +2912,12 @@ workflowPost:
               $ref: "#/components/schemas/multipleReferences"
             sops:
               $ref: "#/components/schemas/multipleReferences"
+            presentations:
+              $ref: "#/components/schemas/multipleReferences"
+            data_files:
+              $ref: "#/components/schemas/multipleReferences"
+            documents:
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - projects
           additionalProperties: false
@@ -2966,6 +2984,12 @@ workflowPatch:
             publications:
               $ref: "#/components/schemas/multipleReferences"
             sops:
+              $ref: "#/components/schemas/multipleReferences"
+            presentations:
+              $ref: "#/components/schemas/multipleReferences"
+            data_files:
+              $ref: "#/components/schemas/multipleReferences"
+            documents:
               $ref: "#/components/schemas/multipleReferences"
           additionalProperties: false
       required:
@@ -3373,6 +3397,8 @@ dataFileResponse:
               $ref: "#/components/schemas/singleReference"
             placeholder:
               $ref: "#/components/schemas/singleReference"
+            workflows:
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - creators
             - submitter
@@ -3385,6 +3411,7 @@ dataFileResponse:
             - events
             - file_template
             - placeholder
+            - workflows
           additionalProperties: false
         links:
           $ref: "#/components/schemas/links"
@@ -3435,6 +3462,8 @@ documentResponse:
               $ref: "#/components/schemas/multipleReferences"
             publications:
               $ref: "#/components/schemas/multipleReferences"
+            workflows:
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - creators
             - submitter
@@ -3444,6 +3473,7 @@ documentResponse:
             - studies
             - assays
             - publications
+            - workflows
           additionalProperties: false
         links:
           $ref: "#/components/schemas/links"
@@ -3945,6 +3975,8 @@ presentationResponse:
               $ref: "#/components/schemas/multipleReferences"
             events:
               $ref: "#/components/schemas/multipleReferences"
+            workflows:
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - creators
             - submitter
@@ -3955,6 +3987,7 @@ presentationResponse:
             - assays
             - publications
             - events
+            - workflows
           additionalProperties: false
         links:
           $ref: "#/components/schemas/links"
@@ -4792,6 +4825,12 @@ workflowResponse:
               $ref: "#/components/schemas/multipleReferences"
             sops:
               $ref: "#/components/schemas/multipleReferences"
+            presentations:
+              $ref: "#/components/schemas/multipleReferences"
+            data_files:
+              $ref: "#/components/schemas/multipleReferences"
+            documents:
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - creators
             - submitter
@@ -4802,6 +4841,9 @@ workflowResponse:
             - assays
             - publications
             - sops
+            - presentations
+            - data_files
+            - documents
           additionalProperties: false
         links:
           type: object
