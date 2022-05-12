@@ -1,0 +1,36 @@
+{
+  "data": {
+    "id": "264",
+    "type": "content_blobs",
+    "attributes": {
+      "original_filename": "min file",
+      "url": "http://example.com/remote.txt",
+      "md5sum": "726de0a3f94d65056b909b9736e10349",
+      "sha1sum": "fbcc0dee4b5415de4c82ef5b137d8231fec1331b",
+      "content_type": "text/plain",
+      "size": 8
+    },
+    "relationships": {
+      "asset": {
+        "data": {
+          "id": "39",
+          "type": "sops"
+        }
+      }
+    },
+    "links": {
+      "self": "/sops/39/content_blobs/264",
+      "download": "/sops/39/content_blobs/264/download"
+    },
+    "meta": {
+      "created": "2022-05-12T14:14:48.000Z",
+      "modified": "2022-05-12T14:14:48.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "cdd87170-b42b-013a-0f20-0a81884ed284"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}
