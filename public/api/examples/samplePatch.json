@@ -1,7 +1,7 @@
 {
   "data": {
     "type": "samples",
-    "id": "1",
+    "id": "8",
     "attributes": {
       "attribute_map": {
         "the_title": "changed title"
@@ -14,7 +14,7 @@
       "projects": {
         "data": [
           {
-            "id": "4",
+            "id": "452",
             "type": "projects"
           }
         ]

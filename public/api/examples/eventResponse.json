@@ -1,11 +1,13 @@
 {
   "data": {
-    "id": "2",
+    "id": "15",
     "type": "events",
     "attributes": {
       "policy": {
         "access": "no_access",
-        "permissions": []
+        "permissions": [
+
+        ]
       },
       "title": "A Maximal Event",
       "description": "All you ever wanted to know about headaches",
@@ -20,7 +22,7 @@
       "submitter": {
         "data": [
           {
-            "id": "7",
+            "id": "423",
             "type": "people"
           }
         ]
@@ -28,7 +30,7 @@
       "projects": {
         "data": [
           {
-            "id": "9",
+            "id": "483",
             "type": "projects"
           }
         ]
@@ -36,7 +38,7 @@
       "data_files": {
         "data": [
           {
-            "id": "2",
+            "id": "29",
             "type": "data_files"
           }
         ]
@@ -44,7 +46,7 @@
       "publications": {
         "data": [
           {
-            "id": "2",
+            "id": "35",
             "type": "publications"
           }
         ]
@@ -52,21 +54,21 @@
       "presentations": {
         "data": [
           {
-            "id": "2",
+            "id": "13",
             "type": "presentations"
           }
         ]
       }
     },
     "links": {
-      "self": "/events/2"
+      "self": "/events/15"
     },
     "meta": {
-      "created": "2022-04-29T14:12:52.992Z",
-      "modified": "2022-04-29T14:12:52.992Z",
+      "created": "2022-05-12T14:14:25.000Z",
+      "modified": "2022-05-12T14:14:25.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "61f65880-a9f4-013a-b385-000c29a94011"
+      "uuid": "c0799e00-b42b-013a-0f20-0a81884ed284"
     }
   },
   "jsonapi": {

@@ -1,11 +1,13 @@
 {
   "data": {
-    "id": "1",
+    "id": "8",
     "type": "samples",
     "attributes": {
       "policy": {
         "access": "manage",
-        "permissions": []
+        "permissions": [
+
+        ]
       },
       "discussion_links": [
 
@@ -14,8 +16,8 @@
       "tags": [
 
       ],
-      "created_at": "2022-04-29T14:13:03.316Z",
-      "updated_at": "2022-04-29T14:13:03.431Z",
+      "created_at": "2022-05-12T14:14:22.000Z",
+      "updated_at": "2022-05-12T14:14:22.000Z",
       "creators": [
 
       ],
@@ -26,54 +28,60 @@
     },
     "relationships": {
       "creators": {
-        "data": []
+        "data": [
+
+        ]
       },
       "submitter": {
         "data": [
           {
-            "id": "2",
+            "id": "397",
             "type": "people"
           }
         ]
       },
       "sample_type": {
         "data": {
-          "id": "1",
+          "id": "13",
           "type": "sample_types"
         }
       },
       "projects": {
         "data": [
           {
-            "id": "4",
+            "id": "452",
             "type": "projects"
           }
         ]
       },
       "data_files": {
-        "data": []
+        "data": [
+
+        ]
       },
       "assays": {
-        "data": []
+        "data": [
+
+        ]
       },
       "people": {
         "data": [
           {
-            "id": "2",
+            "id": "397",
             "type": "people"
           }
         ]
       }
     },
     "links": {
-      "self": "/samples/1"
+      "self": "/samples/8"
     },
     "meta": {
-      "created": "2022-04-29T14:13:03.316Z",
-      "modified": "2022-04-29T14:13:03.431Z",
+      "created": "2022-05-12T14:14:22.000Z",
+      "modified": "2022-05-12T14:14:22.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "681de680-a9f4-013a-b385-000c29a94011"
+      "uuid": "be8b9e60-b42b-013a-0f20-0a81884ed284"
     }
   },
   "jsonapi": {

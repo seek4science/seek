@@ -1,13 +1,13 @@
 {
   "data": {
-    "id": "4",
+    "id": "849",
     "type": "institutions",
     "attributes": {
       "discussion_links": [
 
       ],
       "avatar": null,
-      "title": "Post Institution 4 Max",
+      "title": "Post Institution 849 Max",
       "country": "United Kingdom",
       "country_code": "GB",
       "city": "Manchester",
@@ -16,21 +16,25 @@
     },
     "relationships": {
       "people": {
-        "data": []
+        "data": [
+
+        ]
       },
       "projects": {
-        "data": []
+        "data": [
+
+        ]
       }
     },
     "links": {
-      "self": "/institutions/4"
+      "self": "/institutions/849"
     },
     "meta": {
-      "created": "2022-04-29T14:12:32.704Z",
-      "modified": "2022-04-29T14:12:32.704Z",
+      "created": "2022-05-12T14:15:18.000Z",
+      "modified": "2022-05-12T14:15:18.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "55df1410-a9f4-013a-b385-000c29a94011"
+      "uuid": "e038aee0-b42b-013a-0f20-0a81884ed284"
     }
   },
   "jsonapi": {

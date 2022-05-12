@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "2",
+    "id": "14",
     "type": "programmes",
     "attributes": {
       "discussion_links": [
@@ -20,69 +20,93 @@
       "administrators": {
         "data": [
           {
-            "id": "2",
+            "id": "748",
             "type": "people"
           },
           {
-            "id": "3",
+            "id": "749",
             "type": "people"
           }
         ]
       },
       "people": {
-        "data": []
+        "data": [
+
+        ]
       },
       "projects": {
         "data": [
           {
-            "id": "4",
+            "id": "809",
             "type": "projects"
           }
         ]
       },
       "institutions": {
-        "data": []
+        "data": [
+
+        ]
       },
       "investigations": {
-        "data": []
+        "data": [
+
+        ]
       },
       "studies": {
-        "data": []
+        "data": [
+
+        ]
       },
       "assays": {
-        "data": []
+        "data": [
+
+        ]
       },
       "data_files": {
-        "data": []
+        "data": [
+
+        ]
       },
       "models": {
-        "data": []
+        "data": [
+
+        ]
       },
       "sops": {
-        "data": []
+        "data": [
+
+        ]
       },
       "publications": {
-        "data": []
+        "data": [
+
+        ]
       },
       "presentations": {
-        "data": []
+        "data": [
+
+        ]
       },
       "events": {
-        "data": []
+        "data": [
+
+        ]
       },
       "documents": {
-        "data": []
+        "data": [
+
+        ]
       }
     },
     "links": {
-      "self": "/programmes/2"
+      "self": "/programmes/14"
     },
     "meta": {
-      "created": "2022-04-29T14:13:19.599Z",
-      "modified": "2022-04-29T14:13:19.599Z",
+      "created": "2022-05-12T14:15:07.000Z",
+      "modified": "2022-05-12T14:15:07.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "71d20150-a9f4-013a-b385-000c29a94011"
+      "uuid": "d975c550-b42b-013a-0f20-0a81884ed284"
     }
   },
   "jsonapi": {

@@ -1,22 +1,24 @@
 {
   "data": {
-    "id": "3",
+    "id": "77",
     "type": "publications",
     "attributes": {
       "policy": {
         "access": "download",
-        "permissions": []
+        "permissions": [
+
+        ]
       },
       "discussion_links": [
         {
-          "id": "1",
+          "id": "79",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
       ],
       "misc_links": [
         {
-          "id": "2",
+          "id": "80",
           "label": "A link",
           "url": "http://www.slack.com/"
         }
@@ -30,14 +32,14 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/publications/3?version=1",
+          "url": "http://localhost:3000/publications/77?version=1",
           "doi": "10.5072/abcd"
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2022-04-29T14:12:30.030Z",
-      "updated_at": "2022-04-29T14:12:30.030Z",
+      "created_at": "2022-05-12T14:15:23.000Z",
+      "updated_at": "2022-05-12T14:15:23.000Z",
       "doi": "10.5072/abcd",
       "content_blobs": [
         {
@@ -46,7 +48,7 @@
           "md5sum": "726de0a3f94d65056b909b9736e10349",
           "sha1sum": "fbcc0dee4b5415de4c82ef5b137d8231fec1331b",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/publications/3/content_blobs/4",
+          "link": "http://localhost:3000/publications/77/content_blobs/376",
           "size": 8
         }
       ],
@@ -72,12 +74,14 @@
     },
     "relationships": {
       "creators": {
-        "data": []
+        "data": [
+
+        ]
       },
       "submitter": {
         "data": [
           {
-            "id": "20",
+            "id": "886",
             "type": "people"
           }
         ]
@@ -85,7 +89,7 @@
       "people": {
         "data": [
           {
-            "id": "20",
+            "id": "886",
             "type": "people"
           }
         ]
@@ -93,7 +97,7 @@
       "projects": {
         "data": [
           {
-            "id": "22",
+            "id": "963",
             "type": "projects"
           }
         ]
@@ -101,7 +105,7 @@
       "investigations": {
         "data": [
           {
-            "id": "3",
+            "id": "177",
             "type": "investigations"
           }
         ]
@@ -109,7 +113,7 @@
       "studies": {
         "data": [
           {
-            "id": "2",
+            "id": "154",
             "type": "studies"
           }
         ]
@@ -117,7 +121,7 @@
       "assays": {
         "data": [
           {
-            "id": "1",
+            "id": "129",
             "type": "assays"
           }
         ]
@@ -125,7 +129,7 @@
       "data_files": {
         "data": [
           {
-            "id": "1",
+            "id": "54",
             "type": "data_files"
           }
         ]
@@ -133,7 +137,7 @@
       "models": {
         "data": [
           {
-            "id": "4",
+            "id": "149",
             "type": "models"
           }
         ]
@@ -141,7 +145,7 @@
       "publications": {
         "data": [
           {
-            "id": "2",
+            "id": "76",
             "type": "publications"
           }
         ]
@@ -149,7 +153,7 @@
       "presentations": {
         "data": [
           {
-            "id": "1",
+            "id": "28",
             "type": "presentations"
           }
         ]
@@ -157,7 +161,7 @@
       "events": {
         "data": [
           {
-            "id": "1",
+            "id": "38",
             "type": "events"
           }
         ]
@@ -165,21 +169,21 @@
       "workflows": {
         "data": [
           {
-            "id": "1",
+            "id": "36",
             "type": "workflows"
           }
         ]
       }
     },
     "links": {
-      "self": "/publications/3?version=1"
+      "self": "/publications/77?version=1"
     },
     "meta": {
-      "created": "2022-04-29T14:12:29.930Z",
-      "modified": "2022-04-29T14:12:29.930Z",
+      "created": "2022-05-12T14:15:23.000Z",
+      "modified": "2022-05-12T14:15:23.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "54365b40-a9f4-013a-b385-000c29a94011"
+      "uuid": "e3085ca0-b42b-013a-0f20-0a81884ed284"
     }
   },
   "jsonapi": {

@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "3",
+    "id": "716",
     "type": "people",
     "attributes": {
       "avatar": null,
@@ -19,13 +19,13 @@
         "Gromacs",
         "Python"
       ],
-      "login": "user581"
+      "login": "user712"
     },
     "relationships": {
       "projects": {
         "data": [
           {
-            "id": "3",
+            "id": "773",
             "type": "projects"
           }
         ]
@@ -33,51 +33,71 @@
       "institutions": {
         "data": [
           {
-            "id": "3",
+            "id": "726",
             "type": "institutions"
           }
         ]
       },
       "investigations": {
-        "data": []
+        "data": [
+
+        ]
       },
       "studies": {
-        "data": []
+        "data": [
+
+        ]
       },
       "assays": {
-        "data": []
+        "data": [
+
+        ]
       },
       "data_files": {
-        "data": []
+        "data": [
+
+        ]
       },
       "models": {
-        "data": []
+        "data": [
+
+        ]
       },
       "sops": {
-        "data": []
+        "data": [
+
+        ]
       },
       "publications": {
-        "data": []
+        "data": [
+
+        ]
       },
       "presentations": {
-        "data": []
+        "data": [
+
+        ]
       },
       "events": {
-        "data": []
+        "data": [
+
+        ]
       },
       "documents": {
-        "data": []
+        "data": [
+
+        ]
       }
     },
     "links": {
-      "self": "/people/3"
+      "self": "/people/716"
     },
     "meta": {
-      "created": "2022-04-29T14:13:06.233Z",
-      "modified": "2022-04-29T14:13:06.274Z",
+      "created": "2022-05-12T14:15:03.000Z",
+      "modified": "2022-05-12T14:15:03.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "69db62a0-a9f4-013a-b385-000c29a94011"
+      "uuid": "d71b7e10-b42b-013a-0f20-0a81884ed284"
     }
   },
   "jsonapi": {

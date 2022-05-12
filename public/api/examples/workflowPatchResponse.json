@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "1",
+    "id": "44",
     "type": "workflows",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "2",
+              "id": "996",
               "type": "projects"
             },
             "access": "edit"
@@ -31,14 +31,14 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/workflows/1?version=1",
+          "url": "http://localhost:3000/workflows/44?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2022-04-29T14:13:09.346Z",
-      "updated_at": "2022-04-29T14:13:09.438Z",
+      "created_at": "2022-05-12T14:15:29.000Z",
+      "updated_at": "2022-05-12T14:15:29.000Z",
       "doi": null,
       "content_blobs": [
         {
@@ -47,16 +47,16 @@
           "md5sum": "ef2ea32522098acc937199f6c2b64f41",
           "sha1sum": "a5133ccdb0376324d039431e4eff4f7d21a751cd",
           "content_type": "application/x-yaml",
-          "link": "http://localhost:3000/workflows/1/content_blobs/1",
+          "link": "http://localhost:3000/workflows/44/content_blobs/404",
           "size": 732
         }
       ],
       "creators": [
         {
-          "profile": "/people/3",
+          "profile": "/people/918",
           "family_name": "Last",
-          "given_name": "Person515",
-          "affiliation": "An Institution: 637",
+          "given_name": "Person770",
+          "affiliation": "An Institution: 932",
           "orcid": null
         }
       ],
@@ -93,7 +93,7 @@
       "creators": {
         "data": [
           {
-            "id": "3",
+            "id": "918",
             "type": "people"
           }
         ]
@@ -101,7 +101,7 @@
       "submitter": {
         "data": [
           {
-            "id": "2",
+            "id": "917",
             "type": "people"
           }
         ]
@@ -109,11 +109,11 @@
       "people": {
         "data": [
           {
-            "id": "2",
+            "id": "917",
             "type": "people"
           },
           {
-            "id": "3",
+            "id": "918",
             "type": "people"
           }
         ]
@@ -121,7 +121,7 @@
       "projects": {
         "data": [
           {
-            "id": "2",
+            "id": "996",
             "type": "projects"
           }
         ]
@@ -129,7 +129,7 @@
       "investigations": {
         "data": [
           {
-            "id": "1",
+            "id": "183",
             "type": "investigations"
           }
         ]
@@ -137,7 +137,7 @@
       "studies": {
         "data": [
           {
-            "id": "1",
+            "id": "160",
             "type": "studies"
           }
         ]
@@ -145,7 +145,7 @@
       "assays": {
         "data": [
           {
-            "id": "1",
+            "id": "135",
             "type": "assays"
           }
         ]
@@ -153,24 +153,53 @@
       "publications": {
         "data": [
           {
-            "id": "1",
+            "id": "83",
             "type": "publications"
           }
         ]
       },
       "sops": {
-        "data": []
+        "data": [
+          {
+            "id": "53",
+            "type": "sops"
+          }
+        ]
+      },
+      "presentations": {
+        "data": [
+          {
+            "id": "32",
+            "type": "presentations"
+          }
+        ]
+      },
+      "data_files": {
+        "data": [
+          {
+            "id": "58",
+            "type": "data_files"
+          }
+        ]
+      },
+      "documents": {
+        "data": [
+          {
+            "id": "67",
+            "type": "documents"
+          }
+        ]
       }
     },
     "links": {
-      "self": "/workflows/1?version=1"
+      "self": "/workflows/44?version=1"
     },
     "meta": {
-      "created": "2022-04-29T14:13:09.337Z",
-      "modified": "2022-04-29T14:13:09.416Z",
+      "created": "2022-05-12T14:15:29.000Z",
+      "modified": "2022-05-12T14:15:29.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "6bb4b070-a9f4-013a-b385-000c29a94011"
+      "uuid": "e67c40b0-b42b-013a-0f20-0a81884ed284"
     }
   },
   "jsonapi": {

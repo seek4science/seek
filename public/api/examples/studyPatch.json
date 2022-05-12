@@ -1,7 +1,7 @@
 {
   "data": {
     "type": "studies",
-    "id": "1",
+    "id": "114",
     "attributes": {
       "title": "A Maximal Study",
       "description": "The Study of many things",
@@ -12,7 +12,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "2",
+              "id": "649",
               "type": "projects"
             },
             "access": "view"
@@ -23,14 +23,14 @@
     "relationships": {
       "investigation": {
         "data": {
-          "id": "1",
+          "id": "132",
           "type": "investigations"
         }
       },
       "publications": {
         "data": [
           {
-            "id": "1",
+            "id": "56",
             "type": "publications"
           }
         ]
@@ -38,7 +38,7 @@
       "creators": {
         "data": [
           {
-            "id": "2",
+            "id": "593",
             "type": "people"
           }
         ]

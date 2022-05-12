@@ -1,18 +1,18 @@
 {
   "data": {
-    "id": "1",
+    "id": "23",
     "type": "sample_types",
     "attributes": {
       "title": "This is a new title.",
       "description": null,
       "sample_attributes": [
         {
-          "id": "1",
+          "id": "39",
           "title": "This is a new attribute title",
           "description": null,
           "pid": null,
           "sample_attribute_type": {
-            "id": "1",
+            "id": "38",
             "title": "String attribute type 16",
             "base_type": "String",
             "regexp": ".*"
@@ -33,18 +33,20 @@
       "projects": {
         "data": [
           {
-            "id": "2",
+            "id": "908",
             "type": "projects"
           }
         ]
       },
       "samples": {
-        "data": []
+        "data": [
+
+        ]
       },
       "submitter": {
         "data": [
           {
-            "id": "2",
+            "id": "835",
             "type": "people"
           }
         ]
@@ -52,21 +54,21 @@
       "assays": {
         "data": [
           {
-            "id": "1",
+            "id": "127",
             "type": "assays"
           }
         ]
       }
     },
     "links": {
-      "self": "/sample_types/1"
+      "self": "/sample_types/23"
     },
     "meta": {
-      "created": "2022-04-29T14:13:14.066Z",
-      "modified": "2022-04-29T14:13:14.172Z",
+      "created": "2022-05-12T14:15:18.000Z",
+      "modified": "2022-05-12T14:15:18.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "6e869800-a9f4-013a-b385-000c29a94011"
+      "uuid": "dffe7bf0-b42b-013a-0f20-0a81884ed284"
     }
   },
   "jsonapi": {

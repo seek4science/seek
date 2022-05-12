@@ -47,16 +47,24 @@
     },
     "relationships": {
       "project_administrators": {
-        "data": []
+        "data": [
+
+        ]
       },
       "pals": {
-        "data": []
+        "data": [
+
+        ]
       },
       "asset_housekeepers": {
-        "data": []
+        "data": [
+
+        ]
       },
       "asset_gatekeepers": {
-        "data": []
+        "data": [
+
+        ]
       },
       "organisms": {
         "data": [
@@ -67,13 +75,19 @@
         ]
       },
       "human_diseases": {
-        "data": []
+        "data": [
+
+        ]
       },
       "people": {
-        "data": []
+        "data": [
+
+        ]
       },
       "institutions": {
-        "data": []
+        "data": [
+
+        ]
       },
       "programmes": {
         "data": [
@@ -84,54 +98,80 @@
         ]
       },
       "investigations": {
-        "data": []
+        "data": [
+
+        ]
       },
       "studies": {
-        "data": []
+        "data": [
+
+        ]
       },
       "assays": {
-        "data": []
+        "data": [
+
+        ]
       },
       "data_files": {
-        "data": []
+        "data": [
+
+        ]
       },
       "file_templates": {
-        "data": []
+        "data": [
+
+        ]
       },
       "placeholders": {
-        "data": []
+        "data": [
+
+        ]
       },
       "models": {
-        "data": []
+        "data": [
+
+        ]
       },
       "sops": {
-        "data": []
+        "data": [
+
+        ]
       },
       "publications": {
-        "data": []
+        "data": [
+
+        ]
       },
       "presentations": {
-        "data": []
+        "data": [
+
+        ]
       },
       "events": {
-        "data": []
+        "data": [
+
+        ]
       },
       "documents": {
-        "data": []
+        "data": [
+
+        ]
       },
       "workflows": {
-        "data": []
+        "data": [
+
+        ]
       }
     },
     "links": {
       "self": "/projects/6"
     },
     "meta": {
-      "created": "2022-04-29T14:12:20.248Z",
-      "modified": "2022-04-29T14:12:20.248Z",
+      "created": "2022-05-12T14:13:27.000Z",
+      "modified": "2022-05-12T14:13:27.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "4e71b900-a9f4-013a-b385-000c29a94011"
+      "uuid": "9e21c0a0-b42b-013a-0f20-0a81884ed284"
     }
   },
   "jsonapi": {

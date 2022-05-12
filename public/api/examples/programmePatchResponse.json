@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "1",
+    "id": "22",
     "type": "programmes",
     "attributes": {
       "discussion_links": [
@@ -19,65 +19,89 @@
       "administrators": {
         "data": [
           {
-            "id": "3",
+            "id": "818",
             "type": "people"
           }
         ]
       },
       "people": {
-        "data": []
+        "data": [
+
+        ]
       },
       "projects": {
         "data": [
           {
-            "id": "4",
+            "id": "890",
             "type": "projects"
           }
         ]
       },
       "institutions": {
-        "data": []
+        "data": [
+
+        ]
       },
       "investigations": {
-        "data": []
+        "data": [
+
+        ]
       },
       "studies": {
-        "data": []
+        "data": [
+
+        ]
       },
       "assays": {
-        "data": []
+        "data": [
+
+        ]
       },
       "data_files": {
-        "data": []
+        "data": [
+
+        ]
       },
       "models": {
-        "data": []
+        "data": [
+
+        ]
       },
       "sops": {
-        "data": []
+        "data": [
+
+        ]
       },
       "publications": {
-        "data": []
+        "data": [
+
+        ]
       },
       "presentations": {
-        "data": []
+        "data": [
+
+        ]
       },
       "events": {
-        "data": []
+        "data": [
+
+        ]
       },
       "documents": {
-        "data": []
+        "data": [
+
+        ]
       }
     },
     "links": {
-      "self": "/programmes/1"
+      "self": "/programmes/22"
     },
     "meta": {
-      "created": "2022-04-29T14:13:25.346Z",
-      "modified": "2022-04-29T14:13:25.381Z",
+      "created": "2022-05-12T14:15:16.000Z",
+      "modified": "2022-05-12T14:15:16.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "753fd040-a9f4-013a-b385-000c29a94011"
+      "uuid": "dec2e450-b42b-013a-0f20-0a81884ed284"
     }
   },
   "jsonapi": {

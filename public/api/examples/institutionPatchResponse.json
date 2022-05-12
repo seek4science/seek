@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "3",
+    "id": "863",
     "type": "institutions",
     "attributes": {
       "discussion_links": [
@@ -16,21 +16,25 @@
     },
     "relationships": {
       "people": {
-        "data": []
+        "data": [
+
+        ]
       },
       "projects": {
-        "data": []
+        "data": [
+
+        ]
       }
     },
     "links": {
-      "self": "/institutions/3"
+      "self": "/institutions/863"
     },
     "meta": {
-      "created": "2022-04-29T14:12:33.240Z",
-      "modified": "2022-04-29T14:12:33.253Z",
+      "created": "2022-05-12T14:15:19.000Z",
+      "modified": "2022-05-12T14:15:19.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "56311830-a9f4-013a-b385-000c29a94011"
+      "uuid": "e0b43d80-b42b-013a-0f20-0a81884ed284"
     }
   },
   "jsonapi": {

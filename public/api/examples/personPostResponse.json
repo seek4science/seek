@@ -1,15 +1,15 @@
 {
   "data": {
-    "id": "4",
+    "id": "702",
     "type": "people",
     "attributes": {
       "avatar": null,
-      "title": "Post Person4",
+      "title": "Post Person702",
       "description": "A person with all possible details",
       "first_name": "Post",
-      "last_name": "Person4",
+      "last_name": "Person702",
       "orcid": "https://orcid.org/0000-0001-9842-9718",
-      "mbox_sha1sum": "75696c3e44d8203f403ca22854de4a0c4feb388b",
+      "mbox_sha1sum": "b25ef1be931f15db5247361babfb132adf08ced7",
       "expertise": [
         "modeling",
         "programming"
@@ -23,51 +23,75 @@
     },
     "relationships": {
       "projects": {
-        "data": []
+        "data": [
+
+        ]
       },
       "institutions": {
-        "data": []
+        "data": [
+
+        ]
       },
       "investigations": {
-        "data": []
+        "data": [
+
+        ]
       },
       "studies": {
-        "data": []
+        "data": [
+
+        ]
       },
       "assays": {
-        "data": []
+        "data": [
+
+        ]
       },
       "data_files": {
-        "data": []
+        "data": [
+
+        ]
       },
       "models": {
-        "data": []
+        "data": [
+
+        ]
       },
       "sops": {
-        "data": []
+        "data": [
+
+        ]
       },
       "publications": {
-        "data": []
+        "data": [
+
+        ]
       },
       "presentations": {
-        "data": []
+        "data": [
+
+        ]
       },
       "events": {
-        "data": []
+        "data": [
+
+        ]
       },
       "documents": {
-        "data": []
+        "data": [
+
+        ]
       }
     },
     "links": {
-      "self": "/people/4"
+      "self": "/people/702"
     },
     "meta": {
-      "created": "2022-04-29T14:13:03.643Z",
-      "modified": "2022-04-29T14:13:03.643Z",
+      "created": "2022-05-12T14:15:00.000Z",
+      "modified": "2022-05-12T14:15:00.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "684f7080-a9f4-013a-b385-000c29a94011"
+      "uuid": "d5815c50-b42b-013a-0f20-0a81884ed284"
     }
   },
   "jsonapi": {

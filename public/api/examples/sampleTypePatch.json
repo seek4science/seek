@@ -1,12 +1,12 @@
 {
   "data": {
     "type": "sample_types",
-    "id": "1",
+    "id": "23",
     "attributes": {
       "title": "This is a new title.",
       "sample_attributes": [
         {
-          "id": "1",
+          "id": "39",
           "title": "This is a new attribute title",
           "sample_attribute_type": {
             "title": "String attribute type 16"
@@ -21,7 +21,7 @@
       "projects": {
         "data": [
           {
-            "id": "2",
+            "id": "908",
             "type": "projects"
           }
         ]
@@ -29,7 +29,7 @@
       "assays": {
         "data": [
           {
-            "id": "1",
+            "id": "127",
             "type": "assays"
           }
         ]

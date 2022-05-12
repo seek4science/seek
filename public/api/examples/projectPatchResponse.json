@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "4",
+    "id": "83",
     "type": "projects",
     "attributes": {
       "discussion_links": [
@@ -19,21 +19,21 @@
         "permissions": [
           {
             "resource": {
-              "id": "3",
+              "id": "68",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "4",
+              "id": "83",
               "type": "projects"
             },
             "access": "download"
           },
           {
             "resource": {
-              "id": "4",
+              "id": "72",
               "type": "institutions"
             },
             "access": "view"
@@ -47,91 +47,131 @@
     },
     "relationships": {
       "project_administrators": {
-        "data": []
+        "data": [
+
+        ]
       },
       "pals": {
-        "data": []
+        "data": [
+
+        ]
       },
       "asset_housekeepers": {
-        "data": []
+        "data": [
+
+        ]
       },
       "asset_gatekeepers": {
-        "data": []
+        "data": [
+
+        ]
       },
       "organisms": {
         "data": [
           {
-            "id": "1",
+            "id": "6",
             "type": "organisms"
           }
         ]
       },
       "human_diseases": {
-        "data": []
+        "data": [
+
+        ]
       },
       "people": {
-        "data": []
+        "data": [
+
+        ]
       },
       "institutions": {
-        "data": []
+        "data": [
+
+        ]
       },
       "programmes": {
         "data": [
           {
-            "id": "1",
+            "id": "6",
             "type": "programmes"
           }
         ]
       },
       "investigations": {
-        "data": []
+        "data": [
+
+        ]
       },
       "studies": {
-        "data": []
+        "data": [
+
+        ]
       },
       "assays": {
-        "data": []
+        "data": [
+
+        ]
       },
       "data_files": {
-        "data": []
+        "data": [
+
+        ]
       },
       "file_templates": {
-        "data": []
+        "data": [
+
+        ]
       },
       "placeholders": {
-        "data": []
+        "data": [
+
+        ]
       },
       "models": {
-        "data": []
+        "data": [
+
+        ]
       },
       "sops": {
-        "data": []
+        "data": [
+
+        ]
       },
       "publications": {
-        "data": []
+        "data": [
+
+        ]
       },
       "presentations": {
-        "data": []
+        "data": [
+
+        ]
       },
       "events": {
-        "data": []
+        "data": [
+
+        ]
       },
       "documents": {
-        "data": []
+        "data": [
+
+        ]
       },
       "workflows": {
-        "data": []
+        "data": [
+
+        ]
       }
     },
     "links": {
-      "self": "/projects/4"
+      "self": "/projects/83"
     },
     "meta": {
-      "created": "2022-04-29T14:12:25.905Z",
-      "modified": "2022-04-29T14:12:25.962Z",
+      "created": "2022-05-12T14:13:37.000Z",
+      "modified": "2022-05-12T14:13:37.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "51d1df20-a9f4-013a-b385-000c29a94011"
+      "uuid": "a3b98be0-b42b-013a-0f20-0a81884ed284"
     }
   },
   "jsonapi": {
