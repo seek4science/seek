@@ -1,108 +1,170 @@
 {
-    "data": {
-        "id": "71",
-        "type": "models",
-        "attributes": {
-            "policy": {
-                "access": "manage",
-                "permissions": []
+  "data": {
+    "id": "2",
+    "type": "models",
+    "attributes": {
+      "policy": {
+        "access": "no_access",
+        "permissions": [
+          {
+            "resource": {
+              "id": "2",
+              "type": "projects"
             },
-            "title": "A Model 64",
-            "description": "A simulation of a thing",
-            "license": null,
-            "latest_version": 1,
-            "tags": [],
-            "versions": [
-                {
-                    "version": 1,
-                    "revision_comments": null,
-                    "url": "http://localhost:3000/models/71?version=1",
-                    "doi": null
-                }
-            ],
-            "version": 1,
-            "revision_comments": null,
-            "doi": null,
-            "created_at": "2018-04-27T14:38:03.000Z",
-            "updated_at": "2018-04-27T14:38:06.000Z",
-            "content_blobs": [
-                {
-                    "original_filename": "cronwright.xml",
-                    "url": null,
-                    "md5sum": "6b9283ed4ca52a081398b715aaeb8113",
-                    "sha1sum": "454e4b6067f577b680bb8538772b12ebcdb6c4a4",
-                    "content_type": "text/xml",
-                    "link": "http://localhost:3000/models/71/content_blobs/242",
-                    "size": 5933
-                }
-            ],
-            "other_creators": null,
-            "model_type": null,
-            "model_format": "SBML",
-            "environment": null
+            "access": "edit"
+          }
+        ]
+      },
+      "discussion_links": [
+        {
+          "id": "1",
+          "label": "Yahoo",
+          "url": "http://yahoo.com"
         },
-        "relationships": {
-            "creators": {
-                "data": [
-                    {
-                        "id": "1036",
-                        "type": "people"
-                    }
-                ]
-            },
-            "submitter": {
-                "data": [
-                    {
-                        "id": "1035",
-                        "type": "people"
-                    }
-                ]
-            },
-            "people": {
-                "data": [
-                    {
-                        "id": "1035",
-                        "type": "people"
-                    },
-                    {
-                        "id": "1036",
-                        "type": "people"
-                    }
-                ]
-            },
-            "projects": {
-                "data": [
-                    {
-                        "id": "1607",
-                        "type": "projects"
-                    }
-                ]
-            },
-            "investigations": {
-                "data": []
-            },
-            "studies": {
-                "data": []
-            },
-            "assays": {
-                "data": []
-            },
-            "publications": {
-                "data": []
-            }
-        },
-        "links": {
-            "self": "/models/71?version=1"
-        },
-        "meta": {
-            "created": "2018-04-27T14:38:03.000Z",
-            "modified": "2018-04-27T14:38:04.000Z",
-            "api_version": "0.1",
-            "uuid": "83ed6ca0-2c56-0136-ec2f-08002734982f",
-            "base_url": "http://localhost:3000"
+        {
+          "id": "2",
+          "label": "fish",
+          "url": "https://fish.com"
         }
+      ],
+      "title": "A Maximally Patched Model",
+      "license": "CC-BY-4.0",
+      "description": "A simulation of a thing",
+      "latest_version": 1,
+      "tags": [
+        "tag1",
+        "tag2",
+        "tag3"
+      ],
+      "versions": [
+        {
+          "version": 1,
+          "revision_comments": null,
+          "url": "http://localhost:3000/models/2?version=1",
+          "doi": null
+        }
+      ],
+      "version": 1,
+      "revision_comments": null,
+      "created_at": "2022-04-29T14:13:12.672Z",
+      "updated_at": "2022-04-29T14:13:12.742Z",
+      "doi": null,
+      "content_blobs": [
+        {
+          "original_filename": "cronwright.xml",
+          "url": null,
+          "md5sum": "6b9283ed4ca52a081398b715aaeb8113",
+          "sha1sum": "454e4b6067f577b680bb8538772b12ebcdb6c4a4",
+          "content_type": "application/xml",
+          "link": "http://localhost:3000/models/2/content_blobs/2",
+          "size": 5933
+        }
+      ],
+      "creators": [
+        {
+          "profile": "/people/3",
+          "family_name": "Last",
+          "given_name": "Person548",
+          "affiliation": "An Institution: 676",
+          "orcid": null
+        }
+      ],
+      "other_creators": "John Smith, Jane Smith",
+      "model_type": "Linear equations",
+      "model_format": "SBML",
+      "environment": "JWS Online",
+      "model_image_link": null
     },
-    "jsonapi": {
-        "version": "1.0"
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "3",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "2",
+            "type": "people"
+          }
+        ]
+      },
+      "organisms": {
+        "data": [
+          {
+            "id": "1",
+            "type": "organisms"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "2",
+            "type": "people"
+          },
+          {
+            "id": "3",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "2",
+            "type": "projects"
+          }
+        ]
+      },
+      "investigations": {
+        "data": [
+          {
+            "id": "1",
+            "type": "investigations"
+          }
+        ]
+      },
+      "studies": {
+        "data": [
+          {
+            "id": "1",
+            "type": "studies"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "1",
+            "type": "assays"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "1",
+            "type": "publications"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/models/2?version=1"
+    },
+    "meta": {
+      "created": "2022-04-29T14:13:12.663Z",
+      "modified": "2022-04-29T14:13:12.727Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "6db03010-a9f4-013a-b385-000c29a94011"
     }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
 }

@@ -1,10 +1,12 @@
 require 'open-uri'
 require 'json'
+require 'yaml'
 
-ROOT = File.join(File.dirname(__FILE__), '../public/api/definitions')
-INPUT = 'openapi-v2.json'
-OUTPUT = 'openapi-v2-resolved.json'
+ROOT = File.join(Rails.root, 'public', 'api', 'definitions')
+INPUT = 'openapi-v3.yml'
+OUTPUT = 'openapi-v3-resolved'
 ALLOW_INTERNAL_REFS = true # If true, don't replace internal references i.e. "#/definitions/something"
+VERBOSE = false
 
 # Resolves and replaces $refs
 def dereference(obj)
@@ -29,7 +31,10 @@ def dereference(obj)
 end
 
 def resolve(uri, pointer)
-  doc = cache(uri, !pointer.nil?) do
+  type = :raw
+  type = :yaml if uri.end_with?('.yml') || uri.end_with?('.yaml') || !pointer.nil?
+  type = :json if uri.end_with?('.json')
+  doc = cache(uri, type) do
     if uri.start_with?('http')
       open(uri).read
     else
@@ -46,20 +51,24 @@ def dig(hash, path)
   keys.length > 0 ? hash.dig(*keys) : hash
 end
 
-# Store block at key, and also parse if it is JSON and store resulting object
-def cache(key, as_json = false)
-  @cache ||= { json: {}, raw: {} }
+# Store block at key, and also parse if it is JSON/YAML and store resulting object
+def cache(key, type = :raw)
+  @cache ||= { json: {}, raw: {}, yaml: {} }
   if block_given?
     @cache[:raw][key] = yield
-    @cache[:json][key] = JSON.parse(@cache[:raw][key]) if as_json
+    @cache[:json][key] = JSON.parse(@cache[:raw][key]) if type == :json
+    @cache[:yaml][key] = YAML.unsafe_load(@cache[:raw][key]) if type == :yaml
   end
 
-  @cache[as_json ? :json : :raw][key]
+  @cache[type][key]
 end
 
 
-puts "Working..."
+puts "Resolving API spec..." if VERBOSE
 d = dereference({ "$ref" => "#{INPUT}\#/" })
 out = File.join(ROOT, OUTPUT)
-File.write(out, JSON.pretty_generate(d))
-puts "Done - Written to: #{out}"
+File.write("#{out}.yaml", d.to_yaml)
+File.write("#{out}.json", JSON.pretty_generate(d))
+puts "Done - Written to:" if VERBOSE
+puts "\t #{out}.yml" if VERBOSE
+puts "\t #{out}.json" if VERBOSE

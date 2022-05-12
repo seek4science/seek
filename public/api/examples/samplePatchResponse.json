@@ -1,76 +1,79 @@
 {
   "data": {
-    "id": "292",
+    "id": "1",
     "type": "samples",
     "attributes": {
-      "discussion_links": [],
-      "title": "Fred Bloggs",
-      "tags": [],
-      "created_at": "2021-08-31T13:38:39.000Z",
-      "updated_at": "2021-09-09T13:38:39.000Z",
+      "policy": {
+        "access": "manage",
+        "permissions": []
+      },
+      "discussion_links": [
+
+      ],
+      "title": "changed title",
+      "tags": [
+
+      ],
+      "created_at": "2022-04-29T14:13:03.316Z",
+      "updated_at": "2022-04-29T14:13:03.431Z",
+      "creators": [
+
+      ],
       "other_creators": null,
       "attribute_map": {
-        "full_name": "John Doe",
-        "address": "5 School Lane",
-        "postcode": "M13 9PL"
+        "the_title": "changed title"
       }
     },
     "relationships": {
       "creators": {
-        "data": [
-
-        ]
+        "data": []
       },
       "submitter": {
         "data": [
           {
-            "id": "1056",
+            "id": "2",
             "type": "people"
           }
         ]
       },
       "sample_type": {
         "data": {
-          "id": "354",
+          "id": "1",
           "type": "sample_types"
         }
       },
       "projects": {
         "data": [
           {
-            "id": "5",
+            "id": "4",
             "type": "projects"
           }
         ]
       },
       "data_files": {
-        "data": [
-
-        ]
+        "data": []
       },
       "assays": {
-        "data": [
-
-        ]
+        "data": []
       },
       "people": {
         "data": [
           {
-            "id": "1056",
+            "id": "2",
             "type": "people"
           }
         ]
       }
     },
     "links": {
-      "self": "/samples/292"
+      "self": "/samples/1"
     },
     "meta": {
-      "created": "2021-08-31T13:38:39.000Z",
-      "modified": "2021-09-09T13:38:39.000Z",
+      "created": "2022-04-29T14:13:03.316Z",
+      "modified": "2022-04-29T14:13:03.431Z",
       "api_version": "0.3",
-      "uuid": "ac934970-ec8e-0139-2586-000c29095f88",
-      "base_url": "http://localhost:3000"
+      "base_url": "http://localhost:3000",
+      "uuid": "681de680-a9f4-013a-b385-000c29a94011"
     }
   },
   "jsonapi": {

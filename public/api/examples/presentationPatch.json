@@ -1,9 +1,63 @@
 {
-    "data": {
-        "type": "presentations",
-        "id": "47",
-        "attributes": {
-            "description": "A report about the thing that happened"
-        }
+  "data": {
+    "type": "presentations",
+    "id": "1",
+    "attributes": {
+      "title": "A Maximally Patched Presentation",
+      "description": "Presenting the research about the thing",
+      "tags": [
+        "tag1",
+        "tag2",
+        "tag3"
+      ],
+      "license": "CC-BY-4.0",
+      "other_creators": "John Smith, Jane Smith",
+      "policy": {
+        "access": "no_access",
+        "permissions": [
+          {
+            "resource": {
+              "id": "2",
+              "type": "projects"
+            },
+            "access": "edit"
+          }
+        ]
+      }
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "3",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "2",
+            "type": "projects"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "1",
+            "type": "publications"
+          }
+        ]
+      },
+      "events": {
+        "data": [
+          {
+            "id": "1",
+            "type": "events"
+          }
+        ]
+      }
     }
+  }
 }

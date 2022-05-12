@@ -11,7 +11,7 @@ class ApiExamplesTest < ActiveSupport::TestCase
     Dir.foreach(examples_path) do |item|
       next if item == '.' or item == '..'
       example = YAML.load_file(examples_path + '/' + item)
-      fragment = '#/definitions/' + item.chomp('.json')
+      fragment = '#/components/schemas/' + item.chomp('.json')
       fragment = fragment.sub('PostResponse', 'Response')
       fragment = fragment.sub('PatchResponse', 'Response')
       define_method("test_#{item.sub('.', '_')}") do

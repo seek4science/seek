@@ -1,48 +1,75 @@
 {
-    "data": {
-        "id": "75",
-        "type": "events",
-        "attributes": {
-            "title": "CropClock Kick-off Meeting, November 2014",
-            "description": "The kickoff meeting of CropClock team took place in November 12, 2014 at the Max Plank Institute (MPIPZ, http://www.mpipz.mpg.de/en), Kologne, Germany. The goal for this meeting was for the members of the various teams to get acquainted with each other\u2019s expertise and to discuss the following items: 1) Logistics about the project start,  2) Data that need to be shared,  3) Matlab code that needs to shared among the teams. \r\nThe initial plan of action for data sharing was also laid out.",
-            "url": "http://www.mpipz.mpg.de/en",
-            "address": null,
-            "city": "Kologne",
-            "country": "Germany",
-            "start_date": "2014-11-12T00:00:00.000Z",
-            "end_date": "2014-11-12T00:00:00.000Z"
-        },
-        "relationships": {
-            "projects": {
-                "data": [
-                    {
-                        "id": "26",
-                        "type": "projects"
-                    }
-                ]
-            },
-            "data_files": {
-                "data": []
-            },
-            "publications": {
-                "data": []
-            },
-            "presentations": {
-                "data": []
-            }
-        },
-        "links": {
-            "self": "/events/75"
-        },
-        "meta": {
-            "created": "2017-04-24T09:49:00.000Z",
-            "modified": "2017-04-26T07:43:42.000Z",
-            "api_version": "0.1",
-            "uuid": "2adac480-0b01-0135-8501-549f350973c0",
-            "base_url": "https://fairdomhub.org"
-        }
+  "data": {
+    "id": "2",
+    "type": "events",
+    "attributes": {
+      "policy": {
+        "access": "no_access",
+        "permissions": []
+      },
+      "title": "A Maximal Event",
+      "description": "All you ever wanted to know about headaches",
+      "url": "http://www.headache-center.org",
+      "address": "Sofienstr 2",
+      "city": "Heidelberg",
+      "country": "Germany",
+      "start_date": "2017-01-01T00:20:00.000Z",
+      "end_date": "2017-01-01T00:22:00.000Z"
     },
-    "jsonapi": {
-        "version": "1.0"
+    "relationships": {
+      "submitter": {
+        "data": [
+          {
+            "id": "7",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "9",
+            "type": "projects"
+          }
+        ]
+      },
+      "data_files": {
+        "data": [
+          {
+            "id": "2",
+            "type": "data_files"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "2",
+            "type": "publications"
+          }
+        ]
+      },
+      "presentations": {
+        "data": [
+          {
+            "id": "2",
+            "type": "presentations"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/events/2"
+    },
+    "meta": {
+      "created": "2022-04-29T14:12:52.992Z",
+      "modified": "2022-04-29T14:12:52.992Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "61f65880-a9f4-013a-b385-000c29a94011"
     }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
 }

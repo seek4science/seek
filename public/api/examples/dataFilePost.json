@@ -38,46 +38,51 @@
                     }
                 ]
             },
-            "projects": {
-                "data": [
-                    {
-                        "id": "2058",
-                        "type": "projects"
-                    }
-                ]
-            },
-            "assays": {
-                "data": [
-                    {
-                        "id": "186",
-                        "type": "assays"
-                    }
-                ]
-            },
-            "publications": {
-                "data": [
-                    {
-                        "id": "87",
-                        "type": "publications"
-                    }
-                ]
-            },
-            "events": {
-                "data": [
-                    {
-                        "id": "70",
-                        "type": "events"
-                    }
-                ]
-            },
-            "workflows": {
-                "data": [
-                    {
-                        "id": "12",
-                        "type": "workflows"
-                    }
-                ]
-            }
-        }
+            "access": "edit"
+          }
+        ]
+      }
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "3",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "2",
+            "type": "projects"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "1",
+            "type": "assays"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "1",
+            "type": "publications"
+          }
+        ]
+      },
+      "events": {
+        "data": [
+          {
+            "id": "1",
+            "type": "events"
+          }
+        ]
+      }
     }
 }

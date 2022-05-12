@@ -1,41 +1,78 @@
 {
-    "data": [
-        {
-            "id": "364",
-            "type": "people",
-            "attributes": {
-                "title": "Hadas Leonov"
-            },
-            "links": {
-                "self": "/people/364"
-            }
-        },
-        {
-            "id": "321",
-            "type": "people",
-            "attributes": {
-                "title": "Finn Bacall"
-            },
-            "links": {
-                "self": "/people/321"
-            }
-        },
-        {
-            "id": "134",
-            "type": "people",
-            "attributes": {
-                "title": "Stuart Owen"
-            },
-            "links": {
-                "self": "/people/134"
-            }
-        }
-    ],
-    "jsonapi": {
-        "version": "1.0"
+  "data": [
+    {
+      "id": "1",
+      "type": "people",
+      "attributes": {
+        "title": "default admin Last"
+      },
+      "links": {
+        "self": "/people/1"
+      }
     },
-    "meta": {
-        "base_url": "https://testing.sysmo-db.org",
-        "api_version": "0.1"
+    {
+      "id": "2",
+      "type": "people",
+      "attributes": {
+        "title": "Person478 Last"
+      },
+      "links": {
+        "self": "/people/2"
+      }
+    },
+    {
+      "id": "3",
+      "type": "people",
+      "attributes": {
+        "title": "Person479 Last"
+      },
+      "links": {
+        "self": "/people/3"
+      }
+    },
+    {
+      "id": "5",
+      "type": "people",
+      "attributes": {
+        "title": "Person480 Last"
+      },
+      "links": {
+        "self": "/people/5"
+      }
+    },
+    {
+      "id": "6",
+      "type": "people",
+      "attributes": {
+        "title": "Maximilian Maxi-Mum"
+      },
+      "links": {
+        "self": "/people/6"
+      }
+    },
+    {
+      "id": "4",
+      "type": "people",
+      "attributes": {
+        "title": "Minimal"
+      },
+      "links": {
+        "self": "/people/4"
+      }
     }
+  ],
+  "jsonapi": {
+    "version": "1.0"
+  },
+  "links": {
+    "self": "/people?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "first": "/people?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "prev": null,
+    "next": null,
+    "last": "/people?page%5Bnumber%5D=1&page%5Bsize%5D=1000000"
+  },
+  "meta": {
+    "base_url": "http://localhost:3000",
+    "api_version": "0.3"
+  }
 }
