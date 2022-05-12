@@ -65,10 +65,20 @@ end
 
 
 puts "Resolving API spec..." if VERBOSE
-d = dereference({ "$ref" => "#{INPUT}\#/" })
-out = File.join(ROOT, OUTPUT)
-File.write("#{out}.yaml", d.to_yaml)
-File.write("#{out}.json", JSON.pretty_generate(d))
+
+begin
+  d = dereference({ "$ref" => "#{INPUT}\#/" })
+  out = File.join(ROOT, OUTPUT)
+  File.write("#{out}.yaml", d.to_yaml)
+  File.write("#{out}.json", JSON.pretty_generate(d))
+rescue StandardError=>exception
+  puts "Error resolving api"
+  Rails.logger.error "Error resolving api"
+  Rails.logger.error exception.message
+  Rails.logger.error exception.backtrace
+end
+
+
 puts "Done - Written to:" if VERBOSE
 puts "\t #{out}.yml" if VERBOSE
 puts "\t #{out}.json" if VERBOSE
