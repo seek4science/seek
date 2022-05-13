@@ -8,6 +8,10 @@ module Seek
         "</div>"
       end
 
+      def iframe_src
+        blob.content_path(display: display_format)
+      end
+
       def display_format
         raise NotImplementedError
       end
