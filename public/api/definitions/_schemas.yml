@@ -839,6 +839,7 @@ anyType:
     - projects
     - publications
     - sample_types
+    - sample_attribute_types
     - sops
     - studies
     - workflows
