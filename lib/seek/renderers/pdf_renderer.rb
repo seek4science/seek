@@ -9,7 +9,7 @@ module Seek
       def render_standalone
         render_template('content_blobs/view_pdf_content',
                         { content_blob: blob,
-                          pdf_url: blob.content_path },
+                          pdf_url: blob.content_path(format: 'pdf', intent: :inline_view) },
                         layout: layout)
       end
 

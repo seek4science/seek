@@ -1,6 +1,13 @@
 require 'test_helper'
 
 class RenderersTest < ActiveSupport::TestCase
+  include HtmlHelper
+  include Rails::Dom::Testing::Assertions
+
+  setup do
+    @asset = Factory(:sop)
+  end
+
   test 'factory' do
     cb = Factory(:content_blob)
     cb.url = 'http://bbc.co.uk'
@@ -13,7 +20,7 @@ class RenderersTest < ActiveSupport::TestCase
   end
 
   test 'blank renderer' do
-    assert_equal '', Seek::Renderers::BlankRenderer.new.render
+    assert_equal '', Seek::Renderers::BlankRenderer.new(nil).render
   end
 
   test 'slideshare_renderer' do
@@ -127,5 +134,49 @@ class RenderersTest < ActiveSupport::TestCase
 
     renderer = Seek::Renderers::YoutubeRenderer.new(nil)
     assert_equal '', renderer.render
+  end
+
+  test 'pdf renderer' do
+    blob = Factory(:pdf_content_blob, asset: @asset)
+    renderer = Seek::Renderers::PdfRenderer.new(blob)
+    assert renderer.can_render?
+    @html = Nokogiri::HTML.parse(renderer.render)
+    assert_select 'iframe'
+  end
+
+  test 'markdown renderer' do
+    blob = Factory(:markdown_content_blob, asset: @asset)
+    renderer = Seek::Renderers::MarkdownRenderer.new(blob)
+    assert renderer.can_render?
+    @html = Nokogiri::HTML.parse(renderer.render)
+    assert_select 'iframe'
+  end
+
+  test 'jupyter notebook renderer' do
+    blob = Factory(:jupyter_notebook_content_blob, asset: @asset)
+    renderer = Seek::Renderers::NotebookRenderer.new(blob)
+    assert renderer.can_render?
+    @html = Nokogiri::HTML.parse(renderer.render)
+    assert_select 'iframe'
+  end
+
+  test 'text renderer' do
+    blob = Factory(:txt_content_blob, asset: @asset)
+    renderer = Seek::Renderers::TextRenderer.new(blob)
+    assert renderer.can_render?
+    @html = Nokogiri::HTML.parse(renderer.render)
+    assert_select 'pre'
+  end
+
+  test 'image renderer' do
+    blob = Factory(:image_content_blob, asset: @asset)
+    renderer = Seek::Renderers::ImageRenderer.new(blob)
+    assert renderer.can_render?
+    @html = Nokogiri::HTML.parse(renderer.render)
+    assert_select 'img.git-image-preview'
+  end
+
+  def document_root_element
+    @html
   end
 end

@@ -27,15 +27,11 @@ class ContentBlobsController < ApplicationController
   end
 
   def view_content
-    if can_display?
-      render_display(@content_blob)
+    if @content_blob.is_text? || @content_blob.is_cwl?
+      view_text_content
     else
-      if @content_blob.is_text? || @content_blob.is_cwl?
-        view_text_content
-      else
-        @pdf_url = pdf_url
-        view_pdf_content
-      end
+      @pdf_url = pdf_url
+      view_pdf_content
     end
   end
 
@@ -92,13 +88,17 @@ class ContentBlobsController < ApplicationController
         format.html { handle_openbis_download(@asset, params[:perm_id]) }
       end
     else
-      disposition = params[:disposition] || 'attachment'
-      image_size = params[:image_size]
+      if can_display?
+        render_display(@content_blob)
+      else
+        disposition = params[:disposition] || 'attachment'
+        image_size = params[:image_size]
 
-      respond_to do |format|
-        format.html { handle_download(disposition, image_size) }
-        format.pdf { get_pdf }
-        format.json { handle_download(disposition, image_size) }
+        respond_to do |format|
+          format.html { handle_download(disposition, image_size) }
+          format.pdf { get_pdf }
+          format.json { handle_download(disposition, image_size) }
+        end
       end
     end
   end
