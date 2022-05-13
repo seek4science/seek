@@ -13,6 +13,14 @@ module Seek
     IMAGE_VIEWABLE_FORMAT = %w(gif jpeg png jpg bmp svg)
     TEXT_MIME_TYPES = %w(text/plain text/csv text/x-comma-separated-values text/tab-separated-values application/sbml+xml application/xml text/xml application/json text/x-python application/matlab)
 
+    def self.viewable_formats
+      supported_file_formats = ['pdf']
+      supported_file_formats += Seek::ContentTypeDetection::PDF_VIEWABLE_FORMAT if (Seek::Config.pdf_conversion_enabled)
+      supported_file_formats += Seek::ContentTypeDetection::IMAGE_VIEWABLE_FORMAT
+      supported_file_formats += ['md', 'ipynb']
+      supported_file_formats
+    end
+
     def is_text?(blob = self)
       TEXT_MIME_TYPES.include?(blob.content_type)
     end
@@ -32,7 +40,7 @@ module Seek
     def is_supported_spreadsheet_format?(blob = self)
       is_excel?(blob) || is_csv?(blob) || is_tsv?(blob)
     end
-    
+
     # is an Excel file capable of being extacted from
     def is_extractable_excel?(blob = self)
       blob.file_exists? && is_excel?(blob) && within_excel_extraction_size_limit?(blob)
@@ -62,7 +70,7 @@ module Seek
     def is_csv?(blob = self)
       blob.content_type_file_extensions.include?('csv')
     end
-    
+
     def is_tsv?(blob = self)
       blob.content_type_file_extensions.include?('tsv')
     end
@@ -124,9 +132,7 @@ module Seek
     end
 
     def is_viewable_format?(blob = self)
-      is_text?(blob) || is_image_viewable?(blob) ||
-          is_pdf?(blob) ||
-          (is_pdf_viewable?(blob) && Seek::Config.pdf_conversion_enabled)
+      !Seek::Renderers::RendererFactory.instance.renderer(blob).is_a?(Seek::Renderers::BlankRenderer)
     end
 
     def is_content_viewable?(blob = self)
