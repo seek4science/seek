@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "863",
+    "id": "18",
     "type": "institutions",
     "attributes": {
       "discussion_links": [
@@ -27,14 +27,14 @@
       }
     },
     "links": {
-      "self": "/institutions/863"
+      "self": "/institutions/18"
     },
     "meta": {
-      "created": "2022-05-12T14:15:19.000Z",
-      "modified": "2022-05-12T14:15:19.000Z",
+      "created": "2022-05-13T14:37:21.000Z",
+      "modified": "2022-05-13T14:37:21.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "e0b43d80-b42b-013a-0f20-0a81884ed284"
+      "uuid": "1f1d2160-b4f8-013a-0f2b-0a81884ed284"
     }
   },
   "jsonapi": {

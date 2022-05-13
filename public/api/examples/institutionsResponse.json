@@ -1,33 +1,33 @@
 {
   "data": [
     {
-      "id": "855",
+      "id": "10",
       "type": "institutions",
       "attributes": {
         "title": "A Maximal Institution"
       },
       "links": {
-        "self": "/institutions/855"
+        "self": "/institutions/10"
       }
     },
     {
-      "id": "853",
+      "id": "8",
       "type": "institutions",
       "attributes": {
         "title": "A Minimal Institution"
       },
       "links": {
-        "self": "/institutions/853"
+        "self": "/institutions/8"
       }
     },
     {
-      "id": "854",
+      "id": "9",
       "type": "institutions",
       "attributes": {
-        "title": "An Institution: 852"
+        "title": "An Institution: 7"
       },
       "links": {
-        "self": "/institutions/854"
+        "self": "/institutions/9"
       }
     }
   ],

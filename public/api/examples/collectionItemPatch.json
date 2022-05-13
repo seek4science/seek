@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "20",
+    "id": "8",
     "type": "collection_items",
     "attributes": {
       "comment": "A fine addition to the collection indeed!!!",
@@ -9,7 +9,7 @@
     "relationships": {
       "asset": {
         "data": {
-          "id": "45",
+          "id": "43",
           "type": "sops"
         }
       }

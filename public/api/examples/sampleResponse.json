@@ -16,8 +16,8 @@
       "tags": [
 
       ],
-      "created_at": "2022-05-12T14:14:21.000Z",
-      "updated_at": "2022-05-12T14:14:21.000Z",
+      "created_at": "2022-05-13T14:39:18.000Z",
+      "updated_at": "2022-05-13T14:39:18.000Z",
       "creators": [
 
       ],
@@ -38,7 +38,7 @@
       "submitter": {
         "data": [
           {
-            "id": "395",
+            "id": "653",
             "type": "people"
           }
         ]
@@ -52,7 +52,7 @@
       "projects": {
         "data": [
           {
-            "id": "448",
+            "id": "705",
             "type": "projects"
           }
         ]
@@ -70,7 +70,7 @@
       "people": {
         "data": [
           {
-            "id": "395",
+            "id": "653",
             "type": "people"
           }
         ]
@@ -80,11 +80,11 @@
       "self": "/samples/7"
     },
     "meta": {
-      "created": "2022-05-12T14:14:21.000Z",
-      "modified": "2022-05-12T14:14:21.000Z",
+      "created": "2022-05-13T14:39:18.000Z",
+      "modified": "2022-05-13T14:39:18.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "be5c9f80-b42b-013a-0f20-0a81884ed284"
+      "uuid": "64856470-b4f8-013a-0f2b-0a81884ed284"
     }
   },
   "jsonapi": {

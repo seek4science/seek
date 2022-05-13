@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "721",
+              "id": "818",
               "type": "projects"
             },
             "access": "edit"
@@ -36,26 +36,26 @@
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2022-05-12T14:14:56.000Z",
-      "updated_at": "2022-05-12T14:14:56.000Z",
+      "created_at": "2022-05-13T14:39:35.000Z",
+      "updated_at": "2022-05-13T14:39:35.000Z",
       "doi": null,
       "content_blobs": [
         {
-          "original_filename": "file-42",
+          "original_filename": "file-51",
           "url": null,
-          "md5sum": "ee72eb8e745c06cc559bd95e115e5616",
-          "sha1sum": "5eb266f51e1deec0dfc66113e1491d0b725e7623",
+          "md5sum": "3fc19fe4c6a4dfd1f91742a14f58df17",
+          "sha1sum": "4564f3ce9fe3567cc9419aae732da5a589dcc203",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/file_templates/8/content_blobs/293",
-          "size": 9
+          "link": "http://localhost:3000/file_templates/8/content_blobs/332",
+          "size": 10
         }
       ],
       "creators": [
         {
-          "profile": "/people/667",
+          "profile": "/people/750",
           "family_name": "Last",
-          "given_name": "Person565",
-          "affiliation": "An Institution: 679",
+          "given_name": "Person628",
+          "affiliation": "An Institution: 764",
           "orcid": null
         }
       ],
@@ -67,7 +67,7 @@
       "creators": {
         "data": [
           {
-            "id": "667",
+            "id": "750",
             "type": "people"
           }
         ]
@@ -75,7 +75,7 @@
       "submitter": {
         "data": [
           {
-            "id": "666",
+            "id": "749",
             "type": "people"
           }
         ]
@@ -83,11 +83,11 @@
       "people": {
         "data": [
           {
-            "id": "666",
+            "id": "749",
             "type": "people"
           },
           {
-            "id": "667",
+            "id": "750",
             "type": "people"
           }
         ]
@@ -95,7 +95,7 @@
       "projects": {
         "data": [
           {
-            "id": "721",
+            "id": "818",
             "type": "projects"
           }
         ]
@@ -115,11 +115,11 @@
       "self": "/file_templates/8?version=1"
     },
     "meta": {
-      "created": "2022-05-12T14:14:56.000Z",
-      "modified": "2022-05-12T14:14:56.000Z",
+      "created": "2022-05-13T14:39:35.000Z",
+      "modified": "2022-05-13T14:39:35.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "d2b3b7d0-b42b-013a-0f20-0a81884ed284"
+      "uuid": "6ebe4180-b4f8-013a-0f2b-0a81884ed284"
     }
   },
   "jsonapi": {

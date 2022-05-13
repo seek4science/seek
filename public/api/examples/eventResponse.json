@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "15",
+    "id": "21",
     "type": "events",
     "attributes": {
       "policy": {
@@ -22,7 +22,7 @@
       "submitter": {
         "data": [
           {
-            "id": "423",
+            "id": "526",
             "type": "people"
           }
         ]
@@ -30,7 +30,7 @@
       "projects": {
         "data": [
           {
-            "id": "483",
+            "id": "577",
             "type": "projects"
           }
         ]
@@ -38,7 +38,7 @@
       "data_files": {
         "data": [
           {
-            "id": "29",
+            "id": "35",
             "type": "data_files"
           }
         ]
@@ -46,7 +46,7 @@
       "publications": {
         "data": [
           {
-            "id": "35",
+            "id": "58",
             "type": "publications"
           }
         ]
@@ -54,21 +54,21 @@
       "presentations": {
         "data": [
           {
-            "id": "13",
+            "id": "19",
             "type": "presentations"
           }
         ]
       }
     },
     "links": {
-      "self": "/events/15"
+      "self": "/events/21"
     },
     "meta": {
-      "created": "2022-05-12T14:14:25.000Z",
-      "modified": "2022-05-12T14:14:25.000Z",
+      "created": "2022-05-13T14:38:55.000Z",
+      "modified": "2022-05-13T14:38:55.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "c0799e00-b42b-013a-0f20-0a81884ed284"
+      "uuid": "56e91280-b4f8-013a-0f2b-0a81884ed284"
     }
   },
   "jsonapi": {

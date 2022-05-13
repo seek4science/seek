@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "41",
+    "id": "57",
     "type": "assays",
     "attributes": {
       "policy": {
@@ -11,7 +11,7 @@
       },
       "discussion_links": [
         {
-          "id": "20",
+          "id": "32",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
@@ -41,7 +41,7 @@
       ],
       "creators": [
         {
-          "profile": "/people/206",
+          "profile": "/people/318",
           "family_name": "One",
           "given_name": "Some",
           "affiliation": "University of Somewhere",
@@ -53,7 +53,7 @@
       "creators": {
         "data": [
           {
-            "id": "206",
+            "id": "318",
             "type": "people"
           }
         ]
@@ -61,7 +61,7 @@
       "submitter": {
         "data": [
           {
-            "id": "195",
+            "id": "307",
             "type": "people"
           }
         ]
@@ -69,7 +69,7 @@
       "organisms": {
         "data": [
           {
-            "id": "13",
+            "id": "20",
             "type": "organisms"
           }
         ]
@@ -82,11 +82,11 @@
       "people": {
         "data": [
           {
-            "id": "195",
+            "id": "307",
             "type": "people"
           },
           {
-            "id": "206",
+            "id": "318",
             "type": "people"
           }
         ]
@@ -94,27 +94,27 @@
       "projects": {
         "data": [
           {
-            "id": "221",
+            "id": "329",
             "type": "projects"
           }
         ]
       },
       "investigation": {
         "data": {
-          "id": "51",
+          "id": "78",
           "type": "investigations"
         }
       },
       "study": {
         "data": {
-          "id": "47",
+          "id": "71",
           "type": "studies"
         }
       },
       "data_files": {
         "data": [
           {
-            "id": "13",
+            "id": "17",
             "type": "data_files"
           }
         ]
@@ -122,7 +122,7 @@
       "models": {
         "data": [
           {
-            "id": "37",
+            "id": "63",
             "type": "models"
           }
         ]
@@ -130,7 +130,7 @@
       "sops": {
         "data": [
           {
-            "id": "21",
+            "id": "23",
             "type": "sops"
           }
         ]
@@ -138,7 +138,7 @@
       "publications": {
         "data": [
           {
-            "id": "15",
+            "id": "36",
             "type": "publications"
           }
         ]
@@ -151,21 +151,21 @@
       "documents": {
         "data": [
           {
-            "id": "13",
+            "id": "15",
             "type": "documents"
           }
         ]
       }
     },
     "links": {
-      "self": "/assays/41"
+      "self": "/assays/57"
     },
     "meta": {
-      "created": "2022-05-12T14:13:56.000Z",
-      "modified": "2022-05-12T14:13:56.000Z",
+      "created": "2022-05-13T14:38:17.000Z",
+      "modified": "2022-05-13T14:38:17.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "af63c0b0-b42b-013a-0f20-0a81884ed284"
+      "uuid": "40a7c9b0-b4f8-013a-0f2b-0a81884ed284"
     }
   },
   "jsonapi": {

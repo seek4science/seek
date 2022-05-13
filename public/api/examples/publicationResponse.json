@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "77",
+    "id": "19",
     "type": "publications",
     "attributes": {
       "policy": {
@@ -11,14 +11,14 @@
       },
       "discussion_links": [
         {
-          "id": "79",
+          "id": "19",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
       ],
       "misc_links": [
         {
-          "id": "80",
+          "id": "20",
           "label": "A link",
           "url": "http://www.slack.com/"
         }
@@ -32,14 +32,14 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/publications/77?version=1",
+          "url": "http://localhost:3000/publications/19?version=1",
           "doi": "10.5072/abcd"
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2022-05-12T14:15:23.000Z",
-      "updated_at": "2022-05-12T14:15:23.000Z",
+      "created_at": "2022-05-13T14:37:53.000Z",
+      "updated_at": "2022-05-13T14:37:53.000Z",
       "doi": "10.5072/abcd",
       "content_blobs": [
         {
@@ -48,7 +48,7 @@
           "md5sum": "726de0a3f94d65056b909b9736e10349",
           "sha1sum": "fbcc0dee4b5415de4c82ef5b137d8231fec1331b",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/publications/77/content_blobs/376",
+          "link": "http://localhost:3000/publications/19/content_blobs/70",
           "size": 8
         }
       ],
@@ -81,7 +81,7 @@
       "submitter": {
         "data": [
           {
-            "id": "886",
+            "id": "193",
             "type": "people"
           }
         ]
@@ -89,7 +89,7 @@
       "people": {
         "data": [
           {
-            "id": "886",
+            "id": "193",
             "type": "people"
           }
         ]
@@ -97,7 +97,7 @@
       "projects": {
         "data": [
           {
-            "id": "963",
+            "id": "211",
             "type": "projects"
           }
         ]
@@ -105,7 +105,7 @@
       "investigations": {
         "data": [
           {
-            "id": "177",
+            "id": "49",
             "type": "investigations"
           }
         ]
@@ -113,7 +113,7 @@
       "studies": {
         "data": [
           {
-            "id": "154",
+            "id": "42",
             "type": "studies"
           }
         ]
@@ -121,7 +121,7 @@
       "assays": {
         "data": [
           {
-            "id": "129",
+            "id": "30",
             "type": "assays"
           }
         ]
@@ -129,7 +129,7 @@
       "data_files": {
         "data": [
           {
-            "id": "54",
+            "id": "8",
             "type": "data_files"
           }
         ]
@@ -137,7 +137,7 @@
       "models": {
         "data": [
           {
-            "id": "149",
+            "id": "38",
             "type": "models"
           }
         ]
@@ -145,7 +145,7 @@
       "publications": {
         "data": [
           {
-            "id": "76",
+            "id": "18",
             "type": "publications"
           }
         ]
@@ -153,7 +153,7 @@
       "presentations": {
         "data": [
           {
-            "id": "28",
+            "id": "4",
             "type": "presentations"
           }
         ]
@@ -161,7 +161,7 @@
       "events": {
         "data": [
           {
-            "id": "38",
+            "id": "4",
             "type": "events"
           }
         ]
@@ -169,21 +169,21 @@
       "workflows": {
         "data": [
           {
-            "id": "36",
+            "id": "10",
             "type": "workflows"
           }
         ]
       }
     },
     "links": {
-      "self": "/publications/77?version=1"
+      "self": "/publications/19?version=1"
     },
     "meta": {
-      "created": "2022-05-12T14:15:23.000Z",
-      "modified": "2022-05-12T14:15:23.000Z",
+      "created": "2022-05-13T14:37:53.000Z",
+      "modified": "2022-05-13T14:37:53.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "e3085ca0-b42b-013a-0f20-0a81884ed284"
+      "uuid": "32489780-b4f8-013a-0f2b-0a81884ed284"
     }
   },
   "jsonapi": {

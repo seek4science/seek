@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "38",
+    "id": "44",
     "type": "data_files",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "524",
+              "id": "636",
               "type": "projects"
             },
             "access": "edit"
@@ -31,14 +31,14 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/data_files/38?version=1",
+          "url": "http://localhost:3000/data_files/44?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2022-05-12T14:14:31.000Z",
-      "updated_at": "2022-05-12T14:14:31.000Z",
+      "created_at": "2022-05-13T14:39:06.000Z",
+      "updated_at": "2022-05-13T14:39:06.000Z",
       "doi": null,
       "content_blobs": [
         {
@@ -47,16 +47,16 @@
           "md5sum": "565ae8a7a743c3bfd9f15c69647f5b8b",
           "sha1sum": "b9d2148740050b7f37975edd0fb97faa508ff767",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/data_files/38/content_blobs/203",
+          "link": "http://localhost:3000/data_files/44/content_blobs/275",
           "size": 8827
         }
       ],
       "creators": [
         {
-          "profile": "/people/468",
+          "profile": "/people/589",
           "family_name": "Last",
-          "given_name": "Person400",
-          "affiliation": "An Institution: 480",
+          "given_name": "Person495",
+          "affiliation": "An Institution: 595",
           "orcid": null
         }
       ],
@@ -66,7 +66,7 @@
       "creators": {
         "data": [
           {
-            "id": "468",
+            "id": "589",
             "type": "people"
           }
         ]
@@ -74,7 +74,7 @@
       "submitter": {
         "data": [
           {
-            "id": "467",
+            "id": "588",
             "type": "people"
           }
         ]
@@ -82,11 +82,11 @@
       "people": {
         "data": [
           {
-            "id": "467",
+            "id": "588",
             "type": "people"
           },
           {
-            "id": "468",
+            "id": "589",
             "type": "people"
           }
         ]
@@ -94,7 +94,7 @@
       "projects": {
         "data": [
           {
-            "id": "524",
+            "id": "636",
             "type": "projects"
           }
         ]
@@ -102,7 +102,7 @@
       "investigations": {
         "data": [
           {
-            "id": "110",
+            "id": "136",
             "type": "investigations"
           }
         ]
@@ -110,7 +110,7 @@
       "studies": {
         "data": [
           {
-            "id": "94",
+            "id": "117",
             "type": "studies"
           }
         ]
@@ -118,7 +118,7 @@
       "assays": {
         "data": [
           {
-            "id": "81",
+            "id": "96",
             "type": "assays"
           }
         ]
@@ -126,7 +126,7 @@
       "publications": {
         "data": [
           {
-            "id": "42",
+            "id": "65",
             "type": "publications"
           }
         ]
@@ -134,7 +134,7 @@
       "events": {
         "data": [
           {
-            "id": "22",
+            "id": "28",
             "type": "events"
           }
         ]
@@ -142,7 +142,7 @@
       "workflows": {
         "data": [
           {
-            "id": "20",
+            "id": "28",
             "type": "workflows"
           }
         ]
@@ -155,14 +155,14 @@
       }
     },
     "links": {
-      "self": "/data_files/38?version=1"
+      "self": "/data_files/44?version=1"
     },
     "meta": {
-      "created": "2022-05-12T14:14:31.000Z",
-      "modified": "2022-05-12T14:14:31.000Z",
+      "created": "2022-05-13T14:39:06.000Z",
+      "modified": "2022-05-13T14:39:06.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "c3f75540-b42b-013a-0f20-0a81884ed284"
+      "uuid": "5d7b3390-b4f8-013a-0f2b-0a81884ed284"
     }
   },
   "jsonapi": {

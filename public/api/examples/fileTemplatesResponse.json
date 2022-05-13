@@ -1,16 +1,6 @@
 {
   "data": [
     {
-      "id": "4",
-      "type": "file_templates",
-      "attributes": {
-        "title": "A Minimal FileTemplate"
-      },
-      "links": {
-        "self": "/file_templates/4"
-      }
-    },
-    {
       "id": "5",
       "type": "file_templates",
       "attributes": {
@@ -18,6 +8,16 @@
       },
       "links": {
         "self": "/file_templates/5"
+      }
+    },
+    {
+      "id": "4",
+      "type": "file_templates",
+      "attributes": {
+        "title": "A Minimal FileTemplate"
+      },
+      "links": {
+        "self": "/file_templates/4"
       }
     }
   ],

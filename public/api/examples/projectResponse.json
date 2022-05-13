@@ -1,16 +1,16 @@
 {
   "data": {
-    "id": "79",
+    "id": "789",
     "type": "projects",
     "attributes": {
       "discussion_links": [
         {
-          "id": "8",
+          "id": "66",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
       ],
-      "avatar": "/projects/79/avatars/2",
+      "avatar": "/projects/789/avatars/10",
       "title": "A Maximal Project",
       "description": "A Taverna project",
       "web_page": "http://www.taverna.org.uk",
@@ -26,8 +26,8 @@
       },
       "members": [
         {
-          "person_id": "65",
-          "institution_id": "68"
+          "person_id": "722",
+          "institution_id": "739"
         }
       ],
       "use_default_policy": true
@@ -66,7 +66,7 @@
       "people": {
         "data": [
           {
-            "id": "65",
+            "id": "722",
             "type": "people"
           }
         ]
@@ -74,7 +74,7 @@
       "institutions": {
         "data": [
           {
-            "id": "68",
+            "id": "739",
             "type": "institutions"
           }
         ]
@@ -82,7 +82,7 @@
       "programmes": {
         "data": [
           {
-            "id": "5",
+            "id": "11",
             "type": "programmes"
           }
         ]
@@ -90,7 +90,7 @@
       "investigations": {
         "data": [
           {
-            "id": "14",
+            "id": "159",
             "type": "investigations"
           }
         ]
@@ -98,7 +98,7 @@
       "studies": {
         "data": [
           {
-            "id": "12",
+            "id": "138",
             "type": "studies"
           }
         ]
@@ -106,7 +106,7 @@
       "assays": {
         "data": [
           {
-            "id": "10",
+            "id": "115",
             "type": "assays"
           }
         ]
@@ -114,7 +114,7 @@
       "data_files": {
         "data": [
           {
-            "id": "4",
+            "id": "48",
             "type": "data_files"
           }
         ]
@@ -132,7 +132,7 @@
       "models": {
         "data": [
           {
-            "id": "14",
+            "id": "127",
             "type": "models"
           }
         ]
@@ -140,7 +140,7 @@
       "sops": {
         "data": [
           {
-            "id": "4",
+            "id": "47",
             "type": "sops"
           }
         ]
@@ -148,7 +148,7 @@
       "publications": {
         "data": [
           {
-            "id": "4",
+            "id": "71",
             "type": "publications"
           }
         ]
@@ -156,7 +156,7 @@
       "presentations": {
         "data": [
           {
-            "id": "2",
+            "id": "22",
             "type": "presentations"
           }
         ]
@@ -164,7 +164,7 @@
       "events": {
         "data": [
           {
-            "id": "2",
+            "id": "30",
             "type": "events"
           }
         ]
@@ -172,7 +172,7 @@
       "documents": {
         "data": [
           {
-            "id": "4",
+            "id": "51",
             "type": "documents"
           }
         ]
@@ -180,21 +180,21 @@
       "workflows": {
         "data": [
           {
-            "id": "2",
+            "id": "36",
             "type": "workflows"
           }
         ]
       }
     },
     "links": {
-      "self": "/projects/79"
+      "self": "/projects/789"
     },
     "meta": {
-      "created": "2022-05-12T14:13:36.000Z",
-      "modified": "2022-05-12T14:13:36.000Z",
+      "created": "2022-05-13T14:39:30.000Z",
+      "modified": "2022-05-13T14:39:30.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "a37a2df0-b42b-013a-0f20-0a81884ed284"
+      "uuid": "6c11c260-b4f8-013a-0f2b-0a81884ed284"
     }
   },
   "jsonapi": {
