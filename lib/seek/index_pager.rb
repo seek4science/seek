@@ -3,7 +3,6 @@ module Seek
     def index
       respond_to do |format|
         format.html
-        format.xml
         format.json do
           render json: instance_variable_get("@#{controller_name}"),
                  each_serializer: SkeletonSerializer,
