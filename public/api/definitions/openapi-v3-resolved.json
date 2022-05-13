@@ -5665,6 +5665,9 @@
                   },
                   "assays": {
                     "$ref": "#/components/schemas/multipleReferences"
+                  },
+                  "workflows": {
+                    "$ref": "#/components/schemas/multipleReferences"
                   }
                 },
                 "required": [
@@ -5805,6 +5808,9 @@
                     "$ref": "#/components/schemas/multipleReferences"
                   },
                   "assays": {
+                    "$ref": "#/components/schemas/multipleReferences"
+                  },
+                  "workflows": {
                     "$ref": "#/components/schemas/multipleReferences"
                   }
                 },
@@ -8805,6 +8811,9 @@
                   },
                   "publications": {
                     "$ref": "#/components/schemas/multipleReferences"
+                  },
+                  "workflows": {
+                    "$ref": "#/components/schemas/multipleReferences"
                   }
                 },
                 "required": [
@@ -8815,7 +8824,8 @@
                   "investigations",
                   "studies",
                   "assays",
-                  "publications"
+                  "publications",
+                  "workflows"
                 ],
                 "additionalProperties": false
               },

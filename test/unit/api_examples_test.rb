@@ -9,7 +9,7 @@ class ApiExamplesTest < ActiveSupport::TestCase
 
   examples_path = File.join(Rails.root, 'public', 'api', 'examples')
     Dir.foreach(examples_path) do |item|
-      next if item == '.' or item == '..'
+      next if item == '.' || item == '..' || item.end_with?('.orig')
       example = YAML.load_file(examples_path + '/' + item)
       fragment = '#/components/schemas/' + item.chomp('.json')
       fragment = fragment.sub('PostResponse', 'Response')

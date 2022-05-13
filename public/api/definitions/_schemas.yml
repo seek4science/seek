@@ -2696,6 +2696,8 @@ sopPost:
               $ref: "#/components/schemas/multipleReferences"
             assays:
               $ref: "#/components/schemas/multipleReferences"
+            workflows:
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - projects
           additionalProperties: false
@@ -2747,6 +2749,8 @@ sopPatch:
             projects:
               $ref: "#/components/schemas/multipleReferences"
             assays:
+              $ref: "#/components/schemas/multipleReferences"
+            workflows:
               $ref: "#/components/schemas/multipleReferences"
           additionalProperties: false
       required:
@@ -4592,6 +4596,8 @@ sopResponse:
               $ref: "#/components/schemas/multipleReferences"
             publications:
               $ref: "#/components/schemas/multipleReferences"
+            workflows:
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - creators
             - submitter
@@ -4601,6 +4607,7 @@ sopResponse:
             - studies
             - assays
             - publications
+            - workflows
           additionalProperties: false
         links:
           $ref: "#/components/schemas/links"
