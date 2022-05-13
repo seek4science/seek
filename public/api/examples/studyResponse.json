@@ -1,129 +1,143 @@
 {
-    "data": {
-        "id": "138",
-        "type": "studies",
-        "attributes": {
-            "title": "Model analysis",
-            "description": null,
-            "experimentalists": null,            
-        },
-        "relationships": {
-            "creators": {
-                "data": []
-            },
-            "submitter": {
-                "data": [
-                    {
-                        "id": "411",
-                        "type": "people"
-                    }
-                ]
-            },
-            "people": {
-                "data": [
-                    {
-                        "id": "411",
-                        "type": "people"
-                    }
-                ]
-            },
-            "projects": {
-                "data": [
-                    {
-                        "id": "17",
-                        "type": "projects"
-                    }
-                ]
-            },
-            "investigation": {
-                "data": {
-                    "id": "56",
-                    "type": "investigations"
-                }
-            },
-            "assays": {
-                "data": [
-                    {
-                        "id": "294",
-                        "type": "assays"
-                    },
-                    {
-                        "id": "295",
-                        "type": "assays"
-                    },
-                    {
-                        "id": "296",
-                        "type": "assays"
-                    }
-                ]
-            },
-            "data_files": {
-                "data": [
-                    {
-                        "id": "1213",
-                        "type": "data_files"
-                    },
-                    {
-                        "id": "1214",
-                        "type": "data_files"
-                    }
-                ]
-            },
-            "models": {
-                "data": [
-                    {
-                        "id": "144",
-                        "type": "models"
-                    },
-                    {
-                        "id": "175",
-                        "type": "models"
-                    },
-                    {
-                        "id": "176",
-                        "type": "models"
-                    },
-                    {
-                        "id": "177",
-                        "type": "models"
-                    },
-                    {
-                        "id": "179",
-                        "type": "models"
-                    }
-                ]
-            },
-            "sops": {
-                "data": []
-            },
-            "publications": {
-                "data": [
-                    {
-                        "id": "240",
-                        "type": "publications"
-                    },
-                    {
-                        "id": "268",
-                        "type": "publications"
-                    }
-                ]
-            },
-            "documents": {
-                "data": []
-            }
-        },
-        "links": {
-            "self": "/studies/138"
-        },
-        "meta": {
-            "created": "2015-07-01T08:14:11.000Z",
-            "modified": "2015-07-01T08:14:11.000Z",
-            "api_version": "0.1",
-            "uuid": "29af988a-9b3b-4ce3-a42d-1bebf0c4cbe1",
-            "base_url": "https://fairdomhub.org"
+  "data": {
+    "id": "113",
+    "type": "studies",
+    "attributes": {
+      "policy": {
+        "access": "no_access",
+        "permissions": [
+
+        ]
+      },
+      "discussion_links": [
+        {
+          "id": "52",
+          "label": "Slack",
+          "url": "http://www.slack.com/"
         }
+      ],
+      "snapshots": [
+
+      ],
+      "title": "A Maximal Study",
+      "description": "The Study of many things",
+      "experimentalists": "Wet lab people",
+      "other_creators": "Marie Curie",
+      "position": null,
+      "creators": [
+        {
+          "profile": "/people/579",
+          "family_name": "One",
+          "given_name": "Some",
+          "affiliation": "University of Somewhere",
+          "orcid": null
+        }
+      ]
     },
-    "jsonapi": {
-        "version": "1.0"
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "579",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "577",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "577",
+            "type": "people"
+          },
+          {
+            "id": "579",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "632",
+            "type": "projects"
+          }
+        ]
+      },
+      "investigation": {
+        "data": {
+          "id": "126",
+          "type": "investigations"
+        }
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "93",
+            "type": "assays"
+          }
+        ]
+      },
+      "data_files": {
+        "data": [
+          {
+            "id": "46",
+            "type": "data_files"
+          }
+        ]
+      },
+      "models": {
+        "data": [
+          {
+            "id": "96",
+            "type": "models"
+          }
+        ]
+      },
+      "sops": {
+        "data": [
+          {
+            "id": "36",
+            "type": "sops"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "55",
+            "type": "publications"
+          }
+        ]
+      },
+      "documents": {
+        "data": [
+          {
+            "id": "38",
+            "type": "documents"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/studies/113"
+    },
+    "meta": {
+      "created": "2022-05-12T14:14:46.000Z",
+      "modified": "2022-05-12T14:14:46.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "cd269e30-b42b-013a-0f20-0a81884ed284"
     }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
 }

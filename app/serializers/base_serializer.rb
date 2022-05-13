@@ -97,7 +97,6 @@ class BaseSerializer < SimpleBaseSerializer
   def _meta
     meta = super
     meta[:uuid] = object.uuid if object.respond_to?('uuid')
-    meta[:base_url] = base_url
     meta
   end
 

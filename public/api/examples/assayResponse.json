@@ -1,95 +1,174 @@
 {
-    "data": {
-        "id": "267",
-        "type": "assays",
-        "attributes": {
-            "title": "Culturing and synchronisation of P. falciparum",
-            "description": null,
-            "assay_class": {
-                "title": "Experimental Assay",
-                "key": "EXP",
-                "description": null
-            },
-            "assay_type": {
-                "label": "Experimental Assay Type",
-                "uri": "http://jermontology.org/ontology/JERMOntology#Experimental_assay_type"
-            },
-            "technology_type": {
-                "label": "Technology Type",
-                "uri": "http://jermontology.org/ontology/JERMOntology#Technology_type"
-            }
-        },
-        "relationships": {
-            "creators": {
-                "data": []
-            },
-            "submitter": {
-                "data": [
-                    {
-                        "id": "411",
-                        "type": "people"
-                    }
-                ]
-            },
-            "organisms": {
-                "data": []
-            },
-            "people": {
-                "data": [
-                    {
-                        "id": "411",
-                        "type": "people"
-                    }
-                ]
-            },
-            "projects": {
-                "data": [
-                    {
-                        "id": "17",
-                        "type": "projects"
-                    }
-                ]
-            },
-            "investigation": {
-                "data": {
-                    "id": "56",
-                    "type": "investigations"
-                }
-            },
-            "study": {
-                "data": {
-                    "id": "118",
-                    "type": "studies"
-                }
-            },
-            "data_files": {
-                "data": []
-            },
-            "models": {
-                "data": []
-            },
-            "sops": {
-                "data": []
-            },
-            "publications": {
-                "data": []
-            },
-            "documents": {
-                "data": []
-            }
-        },
-        "links": {
-            "self": "/assays/267"
-        },
-        "meta": {
-            "created": "2014-08-15T13:01:52.000Z",
-            "modified": "2017-11-08T14:21:08.000Z",
-            "api_version": "0.1",
-            "uuid": "510b329d-1628-4e19-9ecb-4efd8966baa6",
-            "base_url": "https://fairdomhub.org"
+  "data": {
+    "id": "41",
+    "type": "assays",
+    "attributes": {
+      "policy": {
+        "access": "no_access",
+        "permissions": [
+
+        ]
+      },
+      "discussion_links": [
+        {
+          "id": "20",
+          "label": "Slack",
+          "url": "http://www.slack.com/"
         }
+      ],
+      "snapshots": [
+
+      ],
+      "title": "A Maximal Modelling Assay",
+      "description": "A Western Blot Assay",
+      "other_creators": "Anonymous creator",
+      "position": null,
+      "assay_class": {
+        "title": "Modelling analysis",
+        "key": "MODEL",
+        "description": null
+      },
+      "assay_type": {
+        "label": "Model analysis type",
+        "uri": "http://jermontology.org/ontology/JERMOntology#Model_analysis_type"
+      },
+      "technology_type": {
+        "label": null,
+        "uri": null
+      },
+      "tags": [
+
+      ],
+      "creators": [
+        {
+          "profile": "/people/206",
+          "family_name": "One",
+          "given_name": "Some",
+          "affiliation": "University of Somewhere",
+          "orcid": null
+        }
+      ]
     },
-    "jsonapi": {
-        "version": "1.0"
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "206",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "195",
+            "type": "people"
+          }
+        ]
+      },
+      "organisms": {
+        "data": [
+          {
+            "id": "13",
+            "type": "organisms"
+          }
+        ]
+      },
+      "human_diseases": {
+        "data": [
+
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "195",
+            "type": "people"
+          },
+          {
+            "id": "206",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "221",
+            "type": "projects"
+          }
+        ]
+      },
+      "investigation": {
+        "data": {
+          "id": "51",
+          "type": "investigations"
+        }
+      },
+      "study": {
+        "data": {
+          "id": "47",
+          "type": "studies"
+        }
+      },
+      "data_files": {
+        "data": [
+          {
+            "id": "13",
+            "type": "data_files"
+          }
+        ]
+      },
+      "models": {
+        "data": [
+          {
+            "id": "37",
+            "type": "models"
+          }
+        ]
+      },
+      "sops": {
+        "data": [
+          {
+            "id": "21",
+            "type": "sops"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "15",
+            "type": "publications"
+          }
+        ]
+      },
+      "placeholders": {
+        "data": [
+
+        ]
+      },
+      "documents": {
+        "data": [
+          {
+            "id": "13",
+            "type": "documents"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/assays/41"
+    },
+    "meta": {
+      "created": "2022-05-12T14:13:56.000Z",
+      "modified": "2022-05-12T14:13:56.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "af63c0b0-b42b-013a-0f20-0a81884ed284"
     }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
 }

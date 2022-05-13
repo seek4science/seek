@@ -57,10 +57,12 @@ class StudiesController < ApplicationController
       a1.permit!
       pos = 0
       a1.each_pair do |key, value |
-        assay = Assay.find (value)
-        assay.position = pos
-        pos += 1
-        assay.save!
+        disable_authorization_checks {
+          assay = Assay.find (value)
+          assay.position = pos
+          pos += 1
+          assay.save!
+        }
       end
       respond_to do |format|
          format.html { redirect_to(@study) }

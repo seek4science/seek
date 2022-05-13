@@ -33,7 +33,7 @@ module ApiTestHelper
     get member_url(res), as: :json
     assert_response :success
 
-    validate_json response.body, "#/definitions/#{singular_name.camelize(:lower)}Response"
+    validate_json response.body, "#/components/schemas/#{singular_name.camelize(:lower)}Response"
 
     expected = template
     actual = JSON.parse(response.body)
@@ -48,7 +48,7 @@ module ApiTestHelper
 
   def api_post_test(template)
     expected = template
-    validate_json template.to_json, "#/definitions/#{singular_name.camelize(:lower)}Post"
+    validate_json template.to_json, "#/components/schemas/#{singular_name.camelize(:lower)}Post"
 
     # debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
     assert_difference(-> { model.count }, 1) do
@@ -56,7 +56,7 @@ module ApiTestHelper
       assert_response :success
     end
 
-    validate_json response.body, "#/definitions/#{singular_name.camelize(:lower)}Response"
+    validate_json response.body, "#/components/schemas/#{singular_name.camelize(:lower)}Response"
 
     actual = JSON.parse(response.body)
 
@@ -80,14 +80,14 @@ module ApiTestHelper
     assert_response :success
     expected = JSON.parse(response.body)
 
-    validate_json template.to_json, "#/definitions/#{singular_name.camelize(:lower)}Patch"
+    validate_json template.to_json, "#/components/schemas/#{singular_name.camelize(:lower)}Patch"
 
     assert_no_difference(-> { model.count }) do
       patch member_url(resource), params: template, as: :json
       assert_response :success
     end
 
-    validate_json response.body, "#/definitions/#{singular_name.camelize(:lower)}Response"
+    validate_json response.body, "#/components/schemas/#{singular_name.camelize(:lower)}Response"
 
     actual = JSON.parse(response.body)
 
@@ -162,7 +162,7 @@ module ApiTestHelper
   end
 
   def definitions_path
-    File.join(Rails.root, 'public', 'api', 'definitions', 'openapi-v2-resolved.json')
+    File.join(Rails.root, 'public', 'api', 'definitions', 'openapi-v3-resolved.json')
   end
 
   def admin_login
@@ -200,19 +200,30 @@ module ApiTestHelper
   end
 
   def validate_json(json, fragment = nil)
-    return # These are all broken :(
     begin
       opts = {}
       opts[:fragment] = fragment if fragment
       errors = JSON::Validator.fully_validate_json(definitions_path, json, opts)
       raise Minitest::Assertion, errors.join("\n") unless errors.empty?
-    rescue JSON::Schema::SchemaError
-      warn "#{fragment} is missing from API spec, skipping validation"
+    rescue JSON::Schema::SchemaError => e
+      if e.message.start_with?("Invalid fragment resolution for :fragment option")
+        warn "#{fragment} is missing from API spec, skipping validation"
+      else
+        raise e
+      end
     end
   end
 
   def api_max_post_body
     load_template("post_max_#{singular_name}.json.erb")
+  end
+
+  def write_examples?
+    ENV['SEEK_WRITE_EXAMPLES']
+  end
+
+  def write_examples(json, path)
+    File.write(File.join(Rails.root, 'public', 'api', 'examples', path), json)
   end
 
   private

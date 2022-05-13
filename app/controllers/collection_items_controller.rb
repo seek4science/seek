@@ -1,4 +1,6 @@
 class CollectionItemsController < ApplicationController
+  include Seek::IndexPager
+
   before_action :collections_enabled?
   before_action :find_and_authorize_collection
   before_action :find_collection_item, except: [:index, :create]
@@ -12,7 +14,7 @@ class CollectionItemsController < ApplicationController
       format.json do
         render json: @items, include: [params[:include]],
                each_serializer: CollectionItemSerializer,
-               links: { self: collection_items_path(@collection) },
+               links: json_api_links,
                meta: {
                    base_url: Seek::Config.site_base_host,
                    api_version: ActiveModel::Serializer.config.api_version

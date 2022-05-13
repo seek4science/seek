@@ -1,123 +1,157 @@
 {
-    "data": {
-        "id": "203",
-        "type": "sops",
-        "attributes": {
-            "tags": [],
-            "title": "Validation experiments",
-            "description": "SOP for the determination of external metabolites (Glc, Pyr, Gly, Lac) in intact trophozoite incubations, and for the determination of intracellular metabolite concentrations.",
-            "license": null,
-            "latest_version": 1,
-            "versions": [
-                {
-                    "version": 1,
-                    "revision_comments": null,
-                    "url": "https://fairdomhub.org/sops/203?version=1",
-                    "doi": null
-                }
-            ],
-            "version": 1,
-            "revision_comments": null,
-            "doi": null,
-            "created_at": "2014-08-15T13:00:40.000Z",
-            "updated_at": "2015-04-17T10:27:22.000Z",
-            "content_blobs": [
-                {
-                    "original_filename": "Validation SOP.docx",
-                    "url": null,
-                    "md5sum": "80afdbcc9064a4f96eb2e8cbec138d70",
-                    "sha1sum": "b46118506c779972df036e0f7233b9cd3995bf50",
-                    "content_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                    "link": "https://fairdomhub.org/sops/203/content_blobs/1806",
-                    "size": 154968
-                }
-            ]
-        },
-        "relationships": {
-            "creators": {
-                "data": [
-                    {
-                        "id": "411",
-                        "type": "people"
-                    },
-                    {
-                        "id": "49",
-                        "type": "people"
-                    }
-                ]
-            },
-            "submitter": {
-                "data": [
-                    {
-                        "id": "411",
-                        "type": "people"
-                    }
-                ]
-            },
-            "people": {
-                "data": [
-                    {
-                        "id": "49",
-                        "type": "people"
-                    },
-                    {
-                        "id": "411",
-                        "type": "people"
-                    }
-                ]
-            },
-            "projects": {
-                "data": [
-                    {
-                        "id": "17",
-                        "type": "projects"
-                    }
-                ]
-            },
-            "investigations": {
-                "data": [
-                    {
-                        "id": "56",
-                        "type": "investigations"
-                    }
-                ]
-            },
-            "studies": {
-                "data": [
-                    {
-                        "id": "119",
-                        "type": "studies"
-                    }
-                ]
-            },
-            "assays": {
-                "data": [
-                    {
-                        "id": "260",
-                        "type": "assays"
-                    },
-                    {
-                        "id": "266",
-                        "type": "assays"
-                    }
-                ]
-            },
-            "publications": {
-                "data": []
-            }
-        },
-        "links": {
-            "self": "/sops/203?version=1"
-        },
-        "meta": {
-            "created": "2014-08-15T13:00:40.000Z",
-            "modified": "2015-04-17T10:27:22.000Z",
-            "api_version": "0.1",
-            "uuid": "90825ba2-b548-49e0-9215-a8c3ba19ee4b",
-            "base_url": "https://fairdomhub.org"
+  "data": {
+    "id": "15",
+    "type": "sops",
+    "attributes": {
+      "policy": {
+        "access": "no_access",
+        "permissions": [
+
+        ]
+      },
+      "discussion_links": [
+        {
+          "id": "18",
+          "label": "Slack",
+          "url": "http://www.slack.com/"
         }
+      ],
+      "title": "A Maximal Sop",
+      "license": null,
+      "description": "How to run a simulation in GROMACS",
+      "latest_version": 1,
+      "tags": [
+        "Sop-tag1",
+        "Sop-tag2",
+        "Sop-tag3",
+        "Sop-tag4",
+        "Sop-tag5"
+      ],
+      "versions": [
+        {
+          "version": 1,
+          "revision_comments": null,
+          "url": "http://localhost:3000/sops/15?version=1",
+          "doi": null
+        }
+      ],
+      "version": 1,
+      "revision_comments": null,
+      "created_at": "2022-05-12T14:13:49.000Z",
+      "updated_at": "2022-05-12T14:13:49.000Z",
+      "doi": null,
+      "content_blobs": [
+        {
+          "original_filename": "min file",
+          "url": null,
+          "md5sum": "726de0a3f94d65056b909b9736e10349",
+          "sha1sum": "fbcc0dee4b5415de4c82ef5b137d8231fec1331b",
+          "content_type": "application/pdf",
+          "link": "http://localhost:3000/sops/15/content_blobs/74",
+          "size": 8
+        }
+      ],
+      "creators": [
+        {
+          "profile": "/people/151",
+          "family_name": "One",
+          "given_name": "Some",
+          "affiliation": "University of Somewhere",
+          "orcid": null
+        }
+      ],
+      "other_creators": "Blogs, Joe"
     },
-    "jsonapi": {
-        "version": "1.0"
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "151",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "152",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "151",
+            "type": "people"
+          },
+          {
+            "id": "152",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "166",
+            "type": "projects"
+          }
+        ]
+      },
+      "investigations": {
+        "data": [
+          {
+            "id": "33",
+            "type": "investigations"
+          }
+        ]
+      },
+      "studies": {
+        "data": [
+          {
+            "id": "29",
+            "type": "studies"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "25",
+            "type": "assays"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "10",
+            "type": "publications"
+          }
+        ]
+      },
+      "workflows": {
+        "data": [
+          {
+            "id": "9",
+            "type": "workflows"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/sops/15?version=1"
+    },
+    "meta": {
+      "created": "2022-05-12T14:13:49.000Z",
+      "modified": "2022-05-12T14:13:49.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "aab79c90-b42b-013a-0f20-0a81884ed284"
     }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
 }

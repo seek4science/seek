@@ -1,9 +1,85 @@
 {
-    "data": {
-        "type": "models",
-        "id": "71",
-        "attributes": {
-            "description": "A simulation of a thing"
+  "data": {
+    "type": "models",
+    "id": "113",
+    "attributes": {
+      "title": "A Maximally Patched Model",
+      "description": "A simulation of a thing",
+      "tags": [
+        "tag1",
+        "tag2",
+        "tag3"
+      ],
+      "license": "CC-BY-4.0",
+      "other_creators": "John Smith, Jane Smith",
+      "policy": {
+        "access": "no_access",
+        "permissions": [
+          {
+            "resource": {
+              "id": "694",
+              "type": "projects"
+            },
+            "access": "edit"
+          }
+        ]
+      },
+      "model_type": "Linear equations",
+      "model_format": "SBML",
+      "environment": "JWS Online",
+      "discussion_links": [
+        {
+          "id": "59",
+          "url": "http://yahoo.com",
+          "label": "Yahoo"
+        },
+        {
+          "label": "fish",
+          "url": "https://fish.com"
         }
+      ]
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "639",
+            "type": "people"
+          }
+        ]
+      },
+      "organisms": {
+        "data": [
+          {
+            "id": "28",
+            "type": "organisms"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "694",
+            "type": "projects"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "99",
+            "type": "assays"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "62",
+            "type": "publications"
+          }
+        ]
+      }
     }
+  }
 }

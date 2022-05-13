@@ -12,6 +12,7 @@ class SopApiTest < ActionDispatch::IntegrationTest
     @assay = Factory(:assay, study: study, contributor: current_person)
     @creator = Factory(:person)
     @sop = Factory(:sop, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
+    @workflow = Factory(:workflow, projects: [@project], contributor: current_person)
   end
 
   test 'can add content to API-created sop' do
@@ -52,7 +53,7 @@ class SopApiTest < ActionDispatch::IntegrationTest
 
     parsed_policy = JSON.parse(@response.body)['data']['attributes']['policy']
 
-    validate_json parsed_policy.to_json, "#/definitions/policy"
+    validate_json parsed_policy.to_json, "#/components/schemas/policy"
 
     to_patch = {
       data: {

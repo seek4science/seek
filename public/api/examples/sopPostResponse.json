@@ -1,131 +1,153 @@
 {
-    "data": {
-        "id": "39",
-        "type": "sops",
-        "attributes": {
-            "policy": {
-                "access": "download",
-                "permissions": [
-                    {
-                        "resource": {
-                            "id": "1973",
-                            "type": "projects"
-                        },
-                        "access": "edit"
-                    }
-                ]
+  "data": {
+    "id": "6",
+    "type": "sops",
+    "attributes": {
+      "policy": {
+        "access": "download",
+        "permissions": [
+          {
+            "resource": {
+              "id": "86",
+              "type": "projects"
             },
-            "title": "A Maximal SOP",
-            "description": "This is the description",
-            "license": "CC-BY-4.0",
-            "latest_version": 1,
-            "tags": [
-                "tag1",
-                "tag2"
-            ],
-            "versions": [
-                {
-                    "version": 1,
-                    "revision_comments": null,
-                    "url": "http://localhost:3000/sops/39?version=1",
-                    "doi": null
-                }
-            ],
-            "version": 1,
-            "revision_comments": null,
-            "doi": null,
-            "created_at": "2018-04-27T14:41:44.000Z",
-            "updated_at": "2018-04-27T14:41:44.000Z",
-            "content_blobs": [
-                {
-                    "original_filename": "a_pdf_file.pdf",
-                    "url": null,
-                    "md5sum": null,
-                    "sha1sum": null,
-                    "content_type": "application/pdf",
-                    "link": "http://localhost:3000/sops/39/content_blobs/286",
-                    "size": null
-                }
-            ],
-            "other_creators": "John Smith, Jane Smith"
-        },
-        "relationships": {
-            "creators": {
-                "data": [
-                    {
-                        "id": "1308",
-                        "type": "people"
-                    }
-                ]
-            },
-            "submitter": {
-                "data": [
-                    {
-                        "id": "1307",
-                        "type": "people"
-                    }
-                ]
-            },
-            "people": {
-                "data": [
-                    {
-                        "id": "1307",
-                        "type": "people"
-                    },
-                    {
-                        "id": "1308",
-                        "type": "people"
-                    }
-                ]
-            },
-            "projects": {
-                "data": [
-                    {
-                        "id": "1973",
-                        "type": "projects"
-                    }
-                ]
-            },
-            "investigations": {
-                "data": [
-                    {
-                        "id": "283",
-                        "type": "investigations"
-                    }
-                ]
-            },
-            "studies": {
-                "data": [
-                    {
-                        "id": "235",
-                        "type": "studies"
-                    }
-                ]
-            },
-            "assays": {
-                "data": [
-                    {
-                        "id": "171",
-                        "type": "assays"
-                    }
-                ]
-            },
-            "publications": {
-                "data": []
-            }
-        },
-        "links": {
-            "self": "/sops/39?version=1"
-        },
-        "meta": {
-            "created": "2018-04-27T14:41:43.969Z",
-            "modified": "2018-04-27T14:41:44.691Z",
-            "api_version": "0.1",
-            "uuid": "074effb0-2c57-0136-ec2f-08002734982f",
-            "base_url": "http://localhost:3000"
+            "access": "edit"
+          }
+        ]
+      },
+      "discussion_links": [
+
+      ],
+      "title": "A Maximal SOP",
+      "license": "CC-BY-4.0",
+      "description": "This is the description",
+      "latest_version": 1,
+      "tags": [
+        "tag1",
+        "tag2"
+      ],
+      "versions": [
+        {
+          "version": 1,
+          "revision_comments": null,
+          "url": "http://localhost:3000/sops/6?version=1",
+          "doi": null
         }
+      ],
+      "version": 1,
+      "revision_comments": null,
+      "created_at": "2022-05-12T14:13:38.000Z",
+      "updated_at": "2022-05-12T14:13:38.000Z",
+      "doi": null,
+      "content_blobs": [
+        {
+          "original_filename": "a_pdf_file.pdf",
+          "url": null,
+          "md5sum": null,
+          "sha1sum": null,
+          "content_type": "application/pdf",
+          "link": "http://localhost:3000/sops/6/content_blobs/33",
+          "size": null
+        }
+      ],
+      "creators": [
+        {
+          "profile": "/people/71",
+          "family_name": "Last",
+          "given_name": "Person60",
+          "affiliation": "An Institution: 75",
+          "orcid": null
+        }
+      ],
+      "other_creators": "John Smith, Jane Smith"
     },
-    "jsonapi": {
-        "version": "1.0"
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "71",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "70",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "70",
+            "type": "people"
+          },
+          {
+            "id": "71",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "86",
+            "type": "projects"
+          }
+        ]
+      },
+      "investigations": {
+        "data": [
+          {
+            "id": "15",
+            "type": "investigations"
+          }
+        ]
+      },
+      "studies": {
+        "data": [
+          {
+            "id": "13",
+            "type": "studies"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "11",
+            "type": "assays"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+
+        ]
+      },
+      "workflows": {
+        "data": [
+          {
+            "id": "3",
+            "type": "workflows"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/sops/6?version=1"
+    },
+    "meta": {
+      "created": "2022-05-12T14:13:37.000Z",
+      "modified": "2022-05-12T14:13:38.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "a42587f0-b42b-013a-0f20-0a81884ed284"
     }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
 }

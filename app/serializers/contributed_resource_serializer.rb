@@ -1,7 +1,7 @@
 class ContributedResourceSerializer < PCSSerializer
   attributes :title
-  attribute :license, if: -> {object.respond_to?(:license)}
-  attribute :description, if: -> {object.respond_to?(:description)}
+  attribute :license, if: -> { object.respond_to?(:license) && !object.is_a?(Publication) }
+  attribute :description, if: -> { object.respond_to?(:description) && !object.is_a?(Publication) }
 
   attribute :version, key: :latest_version, if: -> { object.respond_to?(:version) }
 
