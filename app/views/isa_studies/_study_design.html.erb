@@ -32,7 +32,9 @@
 <script>
     function highlightTreeviewItem(item){
         $j(".jstree-clicked").removeClass("jstree-clicked")
-        const parent = $j(`a[_type="${selectedItem.parent.type}"][_id="${selectedItem.parent.id}"]`)
-        $j(parent).next().find(`a[_type="${item}"]`).addClass("jstree-clicked")
+				const type = selectedItem.type == "study" ? "study" : selectedItem.parent.type
+				const id = selectedItem.type == "study" ? selectedItem.id : selectedItem.parent.id
+				const parent = $j(`a[_type="${type}"][_id="${id}"]`)
+				$j(parent).next().find(`a[_type="${item}"]`).addClass("jstree-clicked")
     }
 </script>
