@@ -7,8 +7,8 @@
     <div>
     <ul>
       <% applied_templates.each do |t| %>
-        <li>
-		  <a target="_blank" href="\templates\<%= t&.id %>"><%= t&.title %></a>
+        <li> 
+					<%= link_to t.title, "#{templates_path}/#{t.id}", { target: "_blank" }  %>
         </li>
       <% end %>
       </ul>

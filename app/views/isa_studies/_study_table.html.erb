@@ -19,7 +19,7 @@
             const dt = <%= sanitize(dt_aggregated(study, false).to_json) %>
             studyDynamicTable = new $j.dynamicTable('#study-table')
             const ajax = {
-                url: `/single_pages/${pid}/dynamic_table_data/`,
+                url: '<%= Seek::Util.routes.single_pages_path %>' + `/${pid}/dynamic_table_data/`,
                 data: function(d) { 
                     if (initialLoad) {
                         initialLoad = false;
@@ -27,7 +27,7 @@
                     }
                     d.study_id = '<%=study.id%>';
                     d.include_all_assays = 'false';
-                     d.rows_pad = "true";
+                    d.rows_pad = "true";
                 }
             }
             studyDynamicTable.init(dt.rows, dt.columns, { readonly: true, ajax })
