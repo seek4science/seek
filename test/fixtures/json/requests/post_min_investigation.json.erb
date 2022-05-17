@@ -1,0 +1,14 @@
+{
+  "data": {
+    "type": "investigations",
+    "attributes": {
+      "title": "A Minimal Investigation"
+    },
+    "relationships": {
+      "projects": {
+        "data":
+        <%= @projects.map { |p| { type: 'projects', id: p.id.to_s } }.to_json %>
+      }
+    }
+  }
+}

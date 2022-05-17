@@ -1,47 +1,47 @@
 {
-    "data": {
-        "type": "studies",
-        "attributes": {
-            "title": "A Maximal Study",
-            "description": "The Study of many things",
-            "experimentalists": "Wet lab people",            
-            "other_creators": "Marie Curie",
-            "policy": {
-                "access": "download",
-                "permissions": [
-                    {
-                        "resource": {
-                            "id": "1672",
-                            "type": "projects"
-                        },
-                        "access": "view"
-                    }
-                ]
-            }
-        },
-        "relationships": {
-            "investigation": {
-                "data": {
-                    "id": "243",
-                    "type": "investigations"
-                }
+  "data": {
+    "type": "studies",
+    "attributes": {
+      "title": "A Maximal Study",
+      "description": "The Study of many things",
+      "experimentalists": "Wet lab people",
+      "other_creators": "Marie Curie",
+      "policy": {
+        "access": "download",
+        "permissions": [
+          {
+            "resource": {
+              "id": "26",
+              "type": "projects"
             },
-            "publications": {
-                "data": [
-                    {
-                        "id": "64",
-                        "type": "publications"
-                    }
-                ]
-            },
-            "creators": {
-                "data": [
-                    {
-                        "id": "1092",
-                        "type": "people"
-                    }
-                ]
-            }
+            "access": "view"
+          }
+        ]
+      }
+    },
+    "relationships": {
+      "investigation": {
+        "data": {
+          "id": "3",
+          "type": "investigations"
         }
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "1",
+            "type": "publications"
+          }
+        ]
+      },
+      "creators": {
+        "data": [
+          {
+            "id": "24",
+            "type": "people"
+          }
+        ]
+      }
     }
+  }
 }

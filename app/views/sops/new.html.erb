@@ -18,9 +18,7 @@
         <%= text_area_tag 'sop[description]', sop_description_value, :class=>"form-control rich-text-edit" -%>
       </div>
 
-      <%= render :partial => "projects/project_selector", :locals => { :resource => @sop, :allow_nil => Seek::Config.is_virtualliver } %>
-
-      <%= render :partial => "scales/scales_selector",:locals=>{:object=>@sop} if show_scales?%>
+      <%= render :partial => "projects/project_selector", :locals => { :resource => @sop } %>
 
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @sop } %>
 

@@ -8,7 +8,6 @@ class DataFilesControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include RdfTestCases
   include SharingFormTestHelper
   include GeneralAuthorizationTestCases
@@ -17,14 +16,6 @@ class DataFilesControllerTest < ActionController::TestCase
 
   def setup
     login_as(:datafile_owner)
-  end
-
-  def rest_api_test_object
-    # by TZ for some reason depending on tets order user was no longer logged
-    login_as(:datafile_owner) unless User.current_user
-    @object = data_files(:picture)
-    @object.annotate_with 'tag1'
-    @object
   end
 
   def test_title
@@ -41,7 +32,9 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'json link includes version' do
     df = Factory(:data_file, policy: Factory(:public_policy))
-    test_show_json(df)
+
+    get :show, params: { id: df, format: :json }
+
     json = JSON.parse(response.body)
     refute_nil json['data']
     refute_nil json['data']['links']
@@ -75,11 +68,11 @@ class DataFilesControllerTest < ActionController::TestCase
 
   test 'correct title and text for associating an assay for new' do
     login_as(Factory(:user))
-    as_not_virtualliver do
-      register_content_blob
-      assert_response :success
-      assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
-    end
+
+    register_content_blob
+    assert_response :success
+    assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
+
 
     assert_select 'div.panel-heading', text: /#{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize}/
     assert_select 'div#associate_assay_fold_content p', text: /The following #{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('data_file')}:/
@@ -88,11 +81,10 @@ class DataFilesControllerTest < ActionController::TestCase
   test 'correct title and text for associating an assay for edit' do
     df = Factory :data_file
     login_as(df.contributor.user)
-    as_not_virtualliver do
-      get :edit, params: { id: df.id }
-      assert_response :success
-      assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
-    end
+
+    get :edit, params: { id: df.id }
+    assert_response :success
+    assert_select 'div.association_step p', text: /You may select an existing editable #{I18n.t('assays.experimental_assay')} or #{I18n.t('assays.modelling_analysis')} to associate with this #{I18n.t('data_file')}./
 
     assert_select 'div.panel-heading', text: /#{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize}/
     assert_select 'div#associate_assay_fold_content p', text: /The following #{I18n.t('assays.experimental_assay').pluralize} and #{I18n.t('assays.modelling_analysis').pluralize} are associated with this #{I18n.t('data_file')}:/
@@ -362,64 +354,6 @@ class DataFilesControllerTest < ActionController::TestCase
     assert assigns(:data_file).simulation_data?
   end
 
-  test 'upload_for_tool inacessible with normal login' do
-    post :upload_for_tool, params: { data_file: { title: 'Test', data: fixture_file_upload('files/file_picture.png'), project_id: projects(:sysmo_project).id }, recipient_id: people(:quentin_person).id }
-    assert_redirected_to root_url
-  end
-
-  test 'upload_from_email inacessible with normal login' do
-    post :upload_from_email, params: { data_file: { title: 'Test', data: fixture_file_upload('files/file_picture.png'), project_id: projects(:sysmo_project).id }, recipient_ids: [people(:quentin_person).id], cc_ids: [] }
-    assert_redirected_to root_url
-  end
-
-  test 'should create data file for upload tool' do
-    assert_difference('DataFile.count') do
-      assert_difference('ContentBlob.count') do
-        session[:xml_login] = true
-        post :upload_for_tool, params: { data_file: { title: 'Test', project_id: projects(:sysmo_project).id }, content_blobs: [{ data: picture_file }], recipient_id: people(:quentin_person).id }
-      end
-    end
-
-    assert_response :success
-    df = assigns(:data_file)
-    df.reload
-    assert_equal users(:datafile_owner).person, df.contributor
-
-    assert !df.content_blob.data_io_object.read.nil?
-    assert df.content_blob.url.blank?
-    assert df.policy
-    assert df.policy.permissions
-    assert_equal df.policy.permissions.first.contributor, people(:quentin_person)
-    assert df.creators
-    assert_equal df.creators.first, users(:datafile_owner).person
-  end
-
-  test 'should create data file from email tool' do
-    old_admin_impersonation = Seek::Config.admin_impersonation_enabled
-    Seek::Config.admin_impersonation_enabled = true
-    login_as Factory(:admin).user
-    assert_difference('DataFile.count') do
-      assert_difference('ContentBlob.count') do
-        session[:xml_login] = true
-        post :upload_from_email, params: { data_file: { title: 'Test', project_ids: [projects(:sysmo_project).id] }, content_blobs: [{ data: picture_file }], recipient_ids: [people(:quentin_person).id], sender_id: users(:datafile_owner).person_id }
-      end
-    end
-
-    assert_response :success
-    df = assigns(:data_file)
-    df.reload
-    assert_equal users(:datafile_owner).person, df.contributor
-
-    assert !df.content_blob.data_io_object.read.nil?
-    assert df.content_blob.url.blank?
-    assert df.policy
-    assert df.policy.permissions
-    assert_equal df.policy.permissions.first.contributor, people(:quentin_person)
-    assert df.creators
-    assert_equal df.creators.first, users(:datafile_owner).person
-    Seek::Config.admin_impersonation_enabled = old_admin_impersonation
-  end
-
   test 'missing sharing should default' do
     with_config_value 'default_all_visitors_access_type', Policy::NO_ACCESS do
       data_file, blob = valid_data_file
@@ -656,7 +590,7 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_select 'a.disabled', text: 'Explore', count: 0
     end
   end
-  
+
   test 'show explore button for csv file' do
     df = Factory(:csv_spreadsheet_datafile)
     login_as(df.contributor.user)
@@ -668,7 +602,7 @@ class DataFilesControllerTest < ActionController::TestCase
     end
   end
 
-  
+
   test 'not show explore button if spreadsheet not supported' do
     df = Factory(:non_spreadsheet_datafile)
     login_as(df.contributor.user)
@@ -705,7 +639,7 @@ class DataFilesControllerTest < ActionController::TestCase
     al = ActivityLog.last
     assert_equal 'download', al.action
     assert_equal df, al.activity_loggable
-    assert_equal 'attachment; filename="rightfield.xls"', @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"rightfield.xls\"; filename*=UTF-8''rightfield.xls", @response.header['Content-Disposition']
     assert_equal 'application/vnd.ms-excel', @response.header['Content-Type']
     assert_equal '9216', @response.header['Content-Length']
   end
@@ -715,7 +649,7 @@ class DataFilesControllerTest < ActionController::TestCase
       get :download, params: { id: Factory(:small_test_spreadsheet_datafile, policy: Factory(:public_policy), contributor: User.current_user.person).id }
     end
     assert_response :success
-    assert_equal 'attachment; filename="small-test-spreadsheet.xls"', @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"small-test-spreadsheet.xls\"; filename*=UTF-8''small-test-spreadsheet.xls", @response.header['Content-Disposition']
     assert_equal 'application/vnd.ms-excel', @response.header['Content-Type']
     assert_equal '7168', @response.header['Content-Length']
   end
@@ -893,8 +827,70 @@ class DataFilesControllerTest < ActionController::TestCase
     end
 
     assert_equal 'Data file metadata was successfully updated.', flash[:notice]
-    assert assigns(:data_file)
     assert_redirected_to data_file_path(df)
+    assert_equal 'diff title',assigns(:data_file).title
+  end
+  #
+  # test 'should update data file with workflow link' do
+  #   df = Factory(:data_file, contributor:User.current_user.person)
+  #   workflow = Factory(:workflow, contributor: User.current_user.person)
+  #   assert_empty df.workflows
+  #   assert_difference('ActivityLog.count') do
+  #     put :update, params: { id: df.id, data_file: { workflow_ids: [workflow.id] } }
+  #   end
+  #
+  #   assert_equal 'Data file metadata was successfully updated.', flash[:notice]
+  #   assert_equal [workflow], assigns(:data_file).workflows
+  #   assert_redirected_to data_file_path(df)
+  # end
+
+  test 'should update data_file with workflow link' do
+
+    person = Factory(:person)
+    workflow = Factory(:workflow, contributor: person)
+    data_file = Factory(:data_file, contributor:person)
+    relationship = Factory(:test_data_workflow_data_file_relationship)
+    login_as(person)
+    assert_empty data_file.workflows
+
+    assert_difference('ActivityLog.count') do
+      assert_difference('WorkflowDataFile.count') do
+        put :update, params: { id: data_file.id, data_file: {
+          workflow_data_files_attributes: ['',{workflow_id: workflow.id, workflow_data_file_relationship_id:relationship.id}]
+        } }
+      end
+    end
+
+    assert_redirected_to data_file_path(data_file = assigns(:data_file))
+    assert_equal [workflow], data_file.workflows
+    assert_equal 1,data_file.workflow_data_files.count
+    assert_equal [relationship.id], data_file.workflow_data_files.pluck(:workflow_data_file_relationship_id)
+
+    # doesn't duplicate
+    assert_difference('ActivityLog.count') do
+      assert_no_difference('WorkflowDataFile.count') do
+        put :update, params: { id: data_file.id, data_file: {
+          workflow_data_files_attributes: ['',{workflow_id: workflow.id, workflow_data_file_relationship_id:relationship.id}]
+        } }
+      end
+    end
+    assert_redirected_to data_file_path(data_file = assigns(:data_file))
+    assert_equal [workflow], data_file.workflows
+    assert_equal 1,data_file.workflow_data_files.count
+    assert_equal [relationship.id], data_file.workflow_data_files.pluck(:workflow_data_file_relationship_id)
+
+    #removes
+    assert_difference('ActivityLog.count') do
+      assert_difference('WorkflowDataFile.count', -1) do
+        put :update, params: { id: data_file.id, data_file: {
+          workflow_data_files_attributes: ['']
+        } }
+      end
+    end
+    assert_redirected_to data_file_path(data_file = assigns(:data_file))
+    assert_equal [], data_file.workflows
+    assert_equal 0,data_file.workflow_data_files.count
+    assert_equal [], data_file.workflow_data_files.pluck(:workflow_data_file_relationship_id)
   end
 
   test 'should destroy DataFile' do
@@ -932,31 +928,6 @@ class DataFilesControllerTest < ActionController::TestCase
       assert_equal 2, df.version
       assert_redirected_to data_file_path(df)
     end
-  end
-
-  test 'adding_new_conditions_to_different_versions' do
-    d = Factory(:data_file, contributor: User.current_user.person)
-    assert d.can_edit?
-    sf = StudiedFactor.create(unit_id: units(:gram).id, measured_item: measured_items(:weight),
-                              start_value: 1, end_value: 2, data_file_id: d.id, data_file_version: d.version)
-
-    assert_difference('DataFile::Version.count', 1) do
-      assert_difference('StudiedFactor.count', 1) do
-        post :create_version, params: { id: d, data_file: { title: nil }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' } # v2
-      end
-    end
-
-    d.find_version(2).studied_factors.each(&:destroy)
-    assert_equal sf, d.find_version(1).studied_factors.first
-    assert_equal 0, d.find_version(2).studied_factors.count
-
-    sf2 = StudiedFactor.create(unit_id: units(:gram).id, measured_item: measured_items(:weight),
-                               start_value: 2, end_value: 3, data_file_id: d.id, data_file_version: 2)
-
-    assert_not_equal 0, d.find_version(2).studied_factors.count
-    assert_equal sf2, d.find_version(2).studied_factors.first
-    assert_not_equal sf2, d.find_version(1).studied_factors.first
-    assert_equal sf, d.find_version(1).studied_factors.first
   end
 
   def test_should_add_nofollow_to_links_in_show_page
@@ -1273,6 +1244,21 @@ class DataFilesControllerTest < ActionController::TestCase
     assert flash[:error]
   end
 
+  test 'gracefully handles explore with invalid mime type' do
+    df = Factory(:csv_spreadsheet_datafile, policy: Factory(:public_policy))
+    df.content_blob.update_column(:content_type, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+    # incorrectly thinks it's excel
+    assert df.content_blob.is_excel?
+
+    # check mime type cannot be resolved, otherwise it will autofix without error
+    assert_nil df.content_blob.send(:mime_magic_content_type)
+
+    get :explore, params: { id: df, version: 1 }
+    assert_redirected_to data_file_path(df, version: 1)
+    assert flash[:error]
+  end
+
   test 'correctly displays links in spreadsheet explorer' do
     df = Factory(:data_file,
                  policy: Factory(:public_policy),
@@ -1500,8 +1486,8 @@ class DataFilesControllerTest < ActionController::TestCase
     published_data_file.reload
 
     disable_authorization_checks do
-      published_data_file.find_version(1).update_attributes!(visibility: :registered_users)
-      published_data_file.find_version(2).update_attributes!(visibility: :public)
+      published_data_file.find_version(1).update!(visibility: :registered_users)
+      published_data_file.find_version(2).update!(visibility: :public)
     end
 
     logout
@@ -1596,6 +1582,19 @@ class DataFilesControllerTest < ActionController::TestCase
     project = df.projects.first
     df2 = Factory(:data_file, policy: Factory(:public_policy))
     get :index, params: { project_id: project.id }
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', data_file_path(df), text: df.title
+      assert_select 'a[href=?]', data_file_path(df2), text: df2.title, count: 0
+    end
+  end
+
+  test 'workflow data files through nested routing' do
+    assert_routing 'workflows/2/data_files', controller: 'data_files', action: 'index', workflow_id: '2'
+    workflow = Factory(:workflow, contributor: User.current_user.person)
+    df = Factory(:data_file, policy: Factory(:public_policy), workflows: [workflow], contributor: User.current_user.person)
+    df2 = Factory(:data_file, policy: Factory(:public_policy), contributor: User.current_user.person)
+    get :index, params: { workflow_id: workflow.id }
     assert_response :success
     assert_select 'div.list_item_title' do
       assert_select 'a[href=?]', data_file_path(df), text: df.title
@@ -2065,7 +2064,7 @@ class DataFilesControllerTest < ActionController::TestCase
     df = Factory :data_file, license: 'CC-BY-4.0', policy: Factory(:public_policy)
     dfv = Factory :data_file_version_with_blob, data_file: df
 
-    df.update_attributes license: 'CC0-1.0'
+    df.update license: 'CC0-1.0'
 
     get :show, params: { id: df, version: 1 }
     assert_response :success
@@ -2931,7 +2930,7 @@ class DataFilesControllerTest < ActionController::TestCase
     al = ActivityLog.last
     assert_equal 'create', al.action
     assert_equal df, al.activity_loggable
-    assert_equal person.user, al.culprit    
+    assert_equal person.user, al.culprit
 
   end
 
@@ -3438,11 +3437,6 @@ class DataFilesControllerTest < ActionController::TestCase
     refute_includes df.assay_assets.collect(&:assay),assay3
   end
 
-  def edit_max_object(df)
-    add_tags_to_test_object(df)
-    add_creator_to_test_object(df)
-  end
-
   private
 
   def data_file_with_extracted_samples(contributor = User.current_user.person)
@@ -3517,7 +3511,7 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   def picture_file
-    fixture_file_upload('files/file_picture.png', 'image/png')
+    fixture_file_upload('file_picture.png', 'image/png')
   end
 
   def valid_data_file
@@ -3790,4 +3784,38 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_empty data_file.discussion_links
   end
 
+  test 'can fetch datacite metadata' do
+    someone = Factory(:person, first_name: 'Jane', last_name: 'Bloggs')
+    thing = Factory(:data_file, policy: Factory(:public_policy),
+                    title: 'The title',
+                    description: 'The description',
+                    creators: [someone],
+                    contributor: Factory(:person, first_name: 'Joe', last_name: 'Bloggs', orcid: 'https://orcid.org/0000-0002-1694-233X')
+    ).latest_version
+    thing.assets_creators.create!(given_name: 'Phil', family_name: 'Collins', orcid: 'https://orcid.org/0000-0002-1694-233X')
+
+    get :show, params: { id: thing.parent.id, version: thing.version, format: :datacite_xml }
+
+    assert_response :success
+    parsed = Nokogiri::XML.parse(response.body)
+    assert_equal 'http://datacite.org/schema/kernel-4', parsed.namespaces['xmlns']
+    assert_equal 'http://www.w3.org/2001/XMLSchema-instance', parsed.namespaces['xmlns:xsi']
+    assert_equal 'http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4.3/metadata.xsd', parsed.xpath('//xmlns:resource/@xsi:schemaLocation').first.text
+    resource =  parsed.xpath('//xmlns:resource').first
+    assert_equal 'The title', resource.xpath('./xmlns:titles/xmlns:title').first.text
+    assert_equal 'The description', resource.xpath('./xmlns:descriptions/xmlns:description').first.text
+    assert_equal 2, resource.xpath('./xmlns:creators/xmlns:creator').length
+    phil = parsed.xpath("//xmlns:resource/xmlns:creators/xmlns:creator[xmlns:creatorName/text()='Collins, Phil']").first
+    jane = parsed.xpath("//xmlns:resource/xmlns:creators/xmlns:creator[xmlns:creatorName/text()='Bloggs, Jane']").first
+    assert_equal 'Collins, Phil', phil.xpath('./xmlns:creatorName').first.text
+    assert_equal 'https://orcid.org/0000-0002-1694-233X', phil.xpath('./xmlns:nameIdentifier').first.text
+    assert_equal 'Bloggs, Jane', jane.xpath('./xmlns:creatorName').first.text
+    assert_nil jane.xpath('./xmlns:nameIdentifier').first
+    assert_equal 'ORCID', resource.xpath('./xmlns:creators/xmlns:creator/xmlns:nameIdentifier/@nameIdentifierScheme').first.text
+    assert_equal 'https://orcid.org', resource.xpath('./xmlns:creators/xmlns:creator/xmlns:nameIdentifier/@schemeURI').first.text
+    assert_equal thing.created_at.year.to_s, resource.xpath('./xmlns:publicationYear').first.text
+    assert_equal Seek::Config.instance_name, resource.xpath('./xmlns:publisher').first.text
+    assert_equal 'Dataset', resource.xpath('./xmlns:resourceType').first.text
+    assert_equal 'Dataset', resource.xpath('./xmlns:resourceType/@resourceTypeGeneral').first.text
+  end
 end

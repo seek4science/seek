@@ -21,9 +21,11 @@ class SampleTypeSerializer < BaseSerializer
     {
       "id": attribute.id.to_s,
       "title": attribute.title,
+      "description": attribute.description,
+      "pid": attribute.pid,
       "sample_attribute_type": get_sample_attribute_type(attribute),
       "required": attribute.required,
-      "pos": attribute.pos.to_s,
+      "pos": attribute.pos,
       "unit": attribute.unit.nil? ? nil : attribute.unit.symbol,
       "is_title": attribute.is_title,
       "sample_controlled_vocab_id": attribute.sample_controlled_vocab_id.nil? ? nil : attribute.sample_controlled_vocab_id.to_s,

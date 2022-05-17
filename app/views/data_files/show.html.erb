@@ -1,59 +1,48 @@
-<ul class="nav nav-tabs">
-    <li class="active ">
-        <a data-toggle="tab" href="#item-details"><i class="glyphicon glyphicon-list-alt"></i> Details</a>
-    </li>
-    <li>
-        <a data-toggle="tab" href="#item-related-items">
-            <i class="glyphicon glyphicon-th-list"></i> Related items
-        </a>
-    </li>
-</ul>
+<%= render partial: 'general/item_title', locals: { item: @data_file, version: @display_data_file.version,
+                                                    buttons_partial: 'assets/asset_buttons' } %>
+
+<%= render partial: 'assets/upload_new_version_form', locals: { resource: @data_file } %>
+
+<%= render partial: 'general/show_page_tab_definitions' %>
+
 <div class="tab-content">
-    <div id="item-details" class="tab-pane fade in active">
-      <%= render :partial => "general/item_title",:locals => {:item=>@data_file, :version => @display_data_file.version,
-                                                              :buttons_partial => 'assets/asset_buttons'} -%>
+  <%= tab_pane('overview') do %>
+    <div class="row">
+      <div class="col-md-9 col-sm-8 box_about_actor">
+        <%= render :partial => "data_files/sample_extraction_status", :locals => {:data_file => @data_file} %>
 
-      <%= render :partial=>"assets/upload_new_version_form", :locals=>{:resource=>@data_file} -%>
+        <%= item_description @display_data_file.description -%>
 
-      <div class="row">
-        <div class="col-md-9 col-sm-8 box_about_actor">
-          <%= render :partial => "data_files/sample_extraction_status", :locals => {:data_file => @data_file} %>
-
-          <%= item_description @display_data_file.description -%>
-
-          <div class="row">
-            <div class="col-md-12">
-              <%= persistent_resource_id(@display_data_file) %>
-              <% if @data_file.can_download? %>
-                  <% if @data_file.openbis? %>
-                      <%= openbis_datafile_dataset(@data_file) %>
-                  <% elsif @display_data_file.content_blob.present? %>
-                      <%= render partial:'assets/fileinfo', object: @display_data_file.content_blob %>
-                  <% end %>
+        <div class="row">
+          <div class="col-md-12">
+            <%= persistent_resource_id(@display_data_file) %>
+            <% if @data_file.can_download? %>
+              <% if @data_file.openbis? %>
+                <%= openbis_datafile_dataset(@data_file) %>
+              <% elsif @display_data_file.content_blob.present? %>
+                <%= render partial:'assets/fileinfo', object: @display_data_file.content_blob %>
               <% end %>
+            <% end %>
 
-              <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @data_file} %>
+            <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @data_file} %>
 
-              <%= render :partial => "assets/asset_doi", :locals => {:displayed_resource=>@display_data_file} %>
+            <%= render :partial => "assets/asset_doi", :locals => {:displayed_resource=>@display_data_file} %>
 
-              <%= render partial: 'nels/data_sheet', locals: { displayed_resource: @display_data_file } if @data_file.nels? %>
-            </div>
+            <%= render partial: 'nels/data_sheet', locals: { displayed_resource: @display_data_file } if @data_file.nels? %>
           </div>
-          <%= render :partial=>"general/isa_graph", :locals => {:root_item => @data_file, :deep => true, :include_parents => true} %>
         </div>
-
-        <div class="col-md-3 col-sm-4">
-        <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @data_file, :versioned_resource=>@display_data_file } %>
-        </div>
+        <%= render :partial=>"general/isa_graph", :locals => {:root_item => @data_file, :deep => true, :include_parents => true} %>
       </div>
 
-      <%= render :partial=>"data_files/studied_factors" if Seek::Config.factors_studied_enabled %>
-
-      <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_data_file, :resource=>@data_file} %>
+      <div class="col-md-3 col-sm-4">
+        <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @data_file, :versioned_resource=>@display_data_file } %>
+      </div>
     </div>
 
-    <div id="item-related-items" class="tab-pane fade">
-      <%= render :partial=>"general/items_related_to",:object => @data_file -%>
-    </div>
-    
+    <%= render :partial=>"assets/resource_version_details", :locals=>{:displayed_resource=>@display_data_file, :resource=>@data_file} %>
+  <% end %>
+
+  <%= tab_pane('related-items') do %>
+    <%= render partial: 'general/items_related_to', object: @data_file %>
+  <% end %>
 </div>

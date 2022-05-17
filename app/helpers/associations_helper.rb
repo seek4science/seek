@@ -9,7 +9,7 @@ module AssociationsHelper
                            'data-template-name' => template_name)
 
     content_tag(:div, options) do
-      content = content_tag(:ul, '', class: 'associations-list related_asset_list') +
+      content = content_tag(:ul, '', class: 'associations-list') +
           content_tag(:span, empty_text, class: 'none_text no-item-text') +
           content_tag(:script, existing.html_safe, :type => 'application/json', 'data-role' => 'seek-existing-associations')
       # Add an empty hidden field to allow removal of all items
@@ -99,20 +99,6 @@ module AssociationsHelper
     end.to_json
   end
 
-  def associations_json_from_scales(object, scales, extra_data = {})
-    scales.map do |scale|
-      scale_params = object.fetch_additional_scale_info(scale.id)
-      if scale_params.any?
-        scale_params.map do |info|
-          { id: scale.id, title: scale.title,
-            extraParams: info.merge(stringified: info.to_json.to_s) }.reverse_merge(extra_data)
-        end
-      else
-        { id: scale.id, title: scale.title }.reverse_merge(extra_data)
-      end
-    end.flatten.to_json
-  end
-
   def associations_json_from_params(model, association_params)
     association_params.map do |association|
       item = model.find(association[:id])
@@ -147,6 +133,26 @@ module AssociationsHelper
 
       ao.reverse_merge(extra_data)
     end.flatten.to_json
+  end
+
+  def associations_json_from_workflow_to_data_files(workflow_data_files)
+    workflow_data_files.map do |wfdf|
+      hash = { title: wfdf.data_file.title, id: wfdf.data_file.id}
+      if wfdf.workflow_data_file_relationship
+        hash[:workflow_data_file_relationship]= { value: wfdf.workflow_data_file_relationship.id, text: wfdf.workflow_data_file_relationship.title }
+      end
+      hash
+    end.to_json
+  end
+
+  def associations_json_from_data_file_to_workflows(workflow_data_files)
+    workflow_data_files.map do |wfdf|
+      hash = { title: wfdf.workflow.title, id: wfdf.workflow.id}
+      if wfdf.workflow_data_file_relationship
+        hash[:workflow_data_file_relationship]= { value: wfdf.workflow_data_file_relationship.id, text: wfdf.workflow_data_file_relationship.title }
+      end
+      hash
+    end.to_json
   end
 
   def associations_json_from_assay_human_diseases(assay_human_diseases, extra_data = {})

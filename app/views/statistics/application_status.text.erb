@@ -4,6 +4,5 @@
       status.refresh
    end
    search = status.search_enabled ? "enabled" : "disabled"
-   soffice = status.soffice_running ? 'running' : 'not running'   
 %>
-<%= Seek::Config.application_name %> is running | search is <%= search %> | <%= status.running_jobs %> delayed jobs running | soffice is <%= soffice %>
+<%= Seek::Config.instance_name %> is running | search is <%= search %> | <%= status.running_jobs %> delayed jobs running

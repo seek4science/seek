@@ -77,29 +77,14 @@ class AssaysController < ApplicationController
 
     @assay.assay_class=AssayClass.for_type(@assay_class) unless @assay_class.nil?
 
-    investigations = Investigation.all.select(&:can_view?)
-    studies=[]
-    investigations.each do |i|
-      studies << i.studies.select(&:can_view?)
-    end
     respond_to do |format|
-      if investigations.blank?
-         flash.now[:notice] = "No #{t('study')} and #{t('investigation')} available, you have to create a new #{t('investigation')} first before creating your #{t('study')} and #{t('assays.assay')}!"
-      else
-        if studies.flatten.blank?
-          flash.now[:notice] = "No #{t('study')} available, you have to create a new #{t('study')} before creating your #{t('assays.assay')}!"
-        end
-      end
-
       format.html
-      format.xml
     end
   end
 
   def edit
     respond_to do |format|
       format.html
-      format.xml
     end
   end
 
@@ -136,7 +121,7 @@ class AssaysController < ApplicationController
     update_relationships(@assay, params)
 
     respond_to do |format|
-      if @assay.update_attributes(assay_params)
+      if @assay.update(assay_params)
         flash[:notice] = "#{t('assays.assay')} was successfully updated."
         format.html { redirect_to(@assay) }
         format.json {render json: @assay, include: [params[:include]]}
@@ -169,7 +154,6 @@ class AssaysController < ApplicationController
   def show
     respond_to do |format|
       format.html { render(params[:only_content] ? { layout: false } : {})}
-      format.xml
       format.rdf { render :template=>'rdf/show'}
       format.json {render json: @assay, include: [params[:include]]}
 
@@ -181,10 +165,11 @@ class AssaysController < ApplicationController
   def assay_params
     params.require(:assay).permit(:title, :description, :study_id, :assay_class_id, :assay_type_uri, :technology_type_uri,
                                   :license, *creator_related_params, :position, { document_ids: []},
-                                  { scales: [] }, { sop_ids: [] }, { model_ids: [] },
+                                  { sop_ids: [] }, { model_ids: [] },
                                   { samples_attributes: [:asset_id, :direction] },
                                   { data_files_attributes: [:asset_id, :direction, :relationship_type_id] },
-                                  { publication_ids: [] },				  	
+                                  { placeholders_attributes: [:asset_id, :direction, :relationship_type_id] },
+                                  { publication_ids: [] },
                                   { custom_metadata_attributes: determine_custom_metadata_keys },
 				  { discussion_links_attributes:[:id, :url, :label, :_destroy] }
                                   ).tap do |assay_params|

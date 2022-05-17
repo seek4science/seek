@@ -6,7 +6,7 @@ require 'terrapin'
 # longer db agnostic - see https://github.com/rails/rails/issues/26209
 Rake::Task['db:schema:dump'].enhance do
   begin
-    cmd = Terrapin::CommandLine.new("sed 's/\options.*,//' db/schema.rb > db/schema2.rb " \
+    cmd = Terrapin::CommandLine.new("sed 's/\options:.*,//' db/schema.rb > db/schema2.rb " \
       '&& mv db/schema2.rb db/schema.rb')
     cmd.run
   rescue StandardError => e

@@ -2,8 +2,6 @@ require 'test_helper'
 require 'minitest/mock'
 
 class SearchControllerTest < ActionController::TestCase
-  include JsonTestHelper
-
   test 'can render search results' do
     docs = FactoryGirl.create_list(:public_document, 3)
 

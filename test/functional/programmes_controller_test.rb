@@ -2,18 +2,13 @@ require 'test_helper'
 
 class ProgrammesControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
-  include RestTestCases
   include ActionView::Helpers::NumberHelper
 
   include RdfTestCases
 
-  def rest_api_test_object
-    Factory(:programme)
-  end
-
-  def test_json_content
+  def rdf_test_object
     login_as(Factory(:admin))
-    super
+    Factory(:programme)
   end
 
   # for now just admins can create programmes, later we will change this
@@ -79,7 +74,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute programme.can_delete?
 
     assert_no_difference('Programme.count') do
-      assert_no_difference('AdminDefinedRoleProgramme.count') do
+      assert_no_difference('Role.count') do
         delete :destroy, params: { id: programme.id }
       end
     end
@@ -92,7 +87,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert programme.can_delete?
 
     assert_difference('Programme.count', -1) do
-      assert_difference('AdminDefinedRoleProgramme.count',-1) do
+      assert_difference('Role.count',-1) do
         delete :destroy, params: { id: programme.id }
       end
     end
@@ -144,23 +139,28 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_equal 'ggggg', prog.description
   end
 
-  test 'set programme administrator at creation' do
-    admin = Factory(:admin)
-    login_as(admin)
+  test 'set programme administrators at creation' do
+    creator = Factory(:person)
+    login_as(creator)
     person = Factory(:person)
+    person2 = Factory(:person)
     refute person.is_programme_administrator_of_any_programme?
-    assert_difference('Programme.count', 1) do
-      assert_difference('AdminDefinedRoleProgramme.count', 1) do
-        post :create, params: { programme: { administrator_ids: "#{person.id}", title: 'programme xxxyxxx2' } }
+    assert_difference('Role.count', 3) do # Should include creator
+      assert_difference('Programme.count', 1) do
+        post :create, params: { programme: { programme_administrator_ids: "#{person.id},#{person2.id}", title: 'programme xxxyxxx2' } }
       end
     end
 
     assert prog = assigns(:programme)
-    person.reload
+    assert creator.is_programme_administrator?(prog)
+    assert creator.is_programme_administrator_of_any_programme?
+    assert creator.has_role?('programme_administrator')
     assert person.is_programme_administrator?(prog)
     assert person.is_programme_administrator_of_any_programme?
     assert person.has_role?('programme_administrator')
-    assert person.roles_mask & Seek::Roles::Roles.instance.mask_for_role('programme_administrator')
+    assert person2.is_programme_administrator?(prog)
+    assert person2.is_programme_administrator_of_any_programme?
+    assert person2.has_role?('programme_administrator')
   end
 
   test 'admin sets themself as programme administrator at creation' do
@@ -168,8 +168,8 @@ class ProgrammesControllerTest < ActionController::TestCase
     login_as(admin)
     refute admin.is_programme_administrator_of_any_programme?
     assert_difference('Programme.count', 1) do
-      assert_difference('AdminDefinedRoleProgramme.count', 1) do
-        post :create, params: { programme: { administrator_ids: "#{admin.id}", title: 'programme xxxyxxx1' } }
+      assert_difference('Role.count', 1) do
+        post :create, params: { programme: { programme_administrator_ids: "#{admin.id}", title: 'programme xxxyxxx1' } }
       end
     end
 
@@ -179,7 +179,6 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert admin.is_programme_administrator?(prog)
     assert admin.is_programme_administrator_of_any_programme?
     assert admin.has_role?('programme_administrator')
-    assert admin.roles_mask & Seek::Roles::Roles.instance.mask_for_role('programme_administrator')
   end
 
   test 'programme administrator can add new administrators, but not remove themself' do
@@ -196,7 +195,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute p3.is_programme_administrator?(prog)
 
     ids = [p1.id, p2.id].join(',')
-    put :update, params: { id: prog, programme: { administrator_ids: ids } }
+    put :update, params: { id: prog, programme: { programme_administrator_ids: ids } }
 
     assert_redirected_to prog
 
@@ -212,7 +211,6 @@ class ProgrammesControllerTest < ActionController::TestCase
 
     assert p1.is_programme_administrator_of_any_programme?
     assert p1.has_role?('programme_administrator')
-    assert p1.roles_mask & Seek::Roles::Roles.instance.mask_for_role('programme_administrator')
   end
 
   test 'admin can add new administrators, and not remove themself' do
@@ -231,7 +229,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     refute p3.is_programme_administrator?(prog)
 
     ids = [p1.id, p2.id].join(',')
-    put :update, params: { id: prog, programme: { administrator_ids: ids } }
+    put :update, params: { id: prog, programme: { programme_administrator_ids: ids } }
 
     assert_redirected_to prog
 
@@ -750,25 +748,13 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_equal 0, assigns(:programme).funding_codes.length
   end
 
-  def edit_max_object(programme)
-    for i in 1..5 do
-      Factory(:person).add_to_project_and_institution(programme.projects.first, Factory(:institution))
-    end
-    Factory :funding_code, value: 'DFG', annotatable: programme
-    add_avatar_to_test_object(programme)
-    person = Factory(:person)
-    login_as(person)
-    person.is_programme_administrator = true, programme
-    disable_authorization_checks { person.save! }
-  end
-
   test 'should create with discussion link' do
     person = Factory(:admin)
     login_as(person)
     assert_difference('AssetLink.discussion.count') do
       assert_difference('Programme.count') do
         post :create, params: { programme: { title: 'test',
-                                             administrator_ids: [person.id],
+                                             programme_administrator_ids: [person.id],
                                          discussion_links_attributes: [{url: "http://www.slack.com/"}]}}
       end
     end
@@ -788,9 +774,9 @@ class ProgrammesControllerTest < ActionController::TestCase
 
   test 'should update node with discussion link' do
     person = Factory(:admin)
-    programme = Factory(:programme)
-    programme.administrator_ids = [person.id]
     login_as(person)
+    programme = Factory(:programme)
+    programme.programme_administrator_ids = [person.id]
     assert_nil programme.discussion_links.first
     assert_difference('AssetLink.discussion.count') do
       # assert_difference('ActivityLog.count') do
@@ -806,7 +792,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     login_as(person)
     asset_link = Factory(:discussion_link)
     programme = Factory(:programme)
-    programme.administrator_ids = [person.id]
+    programme.programme_administrator_ids = [person.id]
     programme.discussion_links = [asset_link]
     assert_difference('AssetLink.discussion.count', -1) do
       put :update, params: { id: programme.id, programme: { discussion_links_attributes:[{id:asset_link.id, _destroy:'1'}] } }
@@ -819,7 +805,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     person = Factory(:admin)
     login_as(person)
     programme = Factory(:programme)
-    programme.administrator_ids = [person.id]
+    programme.programme_administrator_ids = [person.id]
     programme.save!
     with_config_value :programmes_open_for_projects_enabled, false do
       get :new

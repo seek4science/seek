@@ -7,6 +7,7 @@ class SampleAttribute < ApplicationRecord
   belongs_to :linked_sample_type, class_name: 'SampleType'
 
   validates :sample_type, presence: true
+  validates :pid, format: { with: URI::regexp, allow_blank: true, allow_nil: true, message: 'not a valid URI' }
 
   before_save :store_accessor_name
   before_save :default_pos, :force_required_when_is_title
@@ -43,6 +44,11 @@ class SampleAttribute < ApplicationRecord
   # provides the hash that defines the column definition for template generation
   def template_column_definition
     { title.to_s => controlled_vocab_labels }
+  end
+
+  def short_pid
+    return '' unless pid.present?
+    URI.parse(pid).fragment || pid.gsub(/.*\//,'') || pid
   end
 
   private

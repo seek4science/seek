@@ -51,11 +51,18 @@ class InstitutionTest < ActiveSupport::TestCase
   end
 
   def test_can_be_edited_by
+    prog_admin = Factory(:programme_administrator)
     pm = Factory(:project_administrator)
     i = pm.institutions.first
     i2 = Factory(:institution)
     assert i.can_edit?(pm.user), 'This institution should be editable as this user is project administrator of a project this institution is linked to'
-    assert !i2.can_edit?(pm.user), 'This institution should be not editable as this user is project administrator but not of a project this institution is linked to'
+    assert i2.can_edit?(pm.user), 'This institution should be editable as this user is project administrator, even if not of a project this institution is linked to'
+    assert i.can_edit?(prog_admin.user), 'This institution should be editable as this user is programme administrator'
+
+    person = Factory(:person)
+    refute i.can_edit?(person), 'The institution should not be editable by a normal person'
+    i = person.institutions.first
+    refute i.can_edit?(person), 'The institution should not be editable by a normal person even if a member'
 
     i = Factory(:institution)
     u = Factory(:admin).user

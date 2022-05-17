@@ -11,8 +11,7 @@ registration_disabled_description:
 activation_required_enabled:
 smtp:
   encrypt: true
-project_type:
-project_link:
+instance_link:
 type_managers_enabled:
 type_managers:
 pubmed_api_email:
@@ -23,12 +22,11 @@ copyright_addendum_content:
 noreply_sender:
 solr_enabled:
 application_name:
-project_long_name:
-project_name:
-project_description:
-project_keywords:
-dm_project_name:
-dm_project_link:
+instance_name:
+instance_description:
+instance_keywords:
+instance_admins_name:
+instance_admins_link:
 issue_tracker:
 header_image_link:
 header_image_title:
@@ -46,11 +44,11 @@ project_news_feed_urls:
 community_news_enabled:
 community_news_feed_urls:
 blacklisted_feeds:
-is_virtualliver:
-sabiork_ws_base_url:
 filestore_path:
 tagline_prefix:
 modelling_analysis_enabled:
+allow_publications_fulltext:
+allow_edit_of_registered_publ:
 human_diseases_enabled:
 jerm_enabled:
 email_enabled:
@@ -63,22 +61,18 @@ seek_video_link:
 scales:
 delete_asset_version_enabled:
 recaptcha_enabled:
-project_hierarchy_enabled:
-tabs_lazy_load_enabled:
 publish_button_enabled:
 project_browser_enabled:
 project_single_page_enabled:
+sample_type_template_enabled:
 experimental_features_enabled:
 pdf_conversion_enabled:
 admin_impersonation_enabled:
 auth_lookup_enabled:
 guide_box_enabled:
-factors_studied_enabled:
-experimental_conditions_enabled:
 documentation_enabled:
 tagging_enabled:
 authorization_checks_enabled:
-magic_guest_enabled:
 assay_type_ontology_file:
 technology_type_ontology_file:
 modelling_analysis_type_ontology_file:
@@ -88,9 +82,6 @@ modelling_analysis_type_base_uri:
 header_tagline_text_enabled:
 related_items_limit:
   convert: :to_i
-faceted_browsing_enabled:
-facet_enable_for_pages:
-faceted_search_enabled:
 css_appended:
 css_prepended:
 javascript_appended:
@@ -155,7 +146,6 @@ news_enabled:
 news_feed_urls:
 news_number_of_entries:
   convert: :to_i
-front_page_buttons_enabled:
 home_show_features:
 home_show_quickstart:
 home_show_my_items:
@@ -178,7 +168,8 @@ recommended_data_licenses:
 recommended_software_licenses:
 about_page_enabled:
 about_page:
-about_link:
+about_instance_link_enabled:
+about_instance_admins_link_enabled:
 cite_link:
 contact_link:
 funding_link:
@@ -202,7 +193,6 @@ results_per_page_default:
 results_per_page_default_condensed:
   convert: :to_i
 results_per_page:
-cwl_viewer_url:
 # Types enabled
 data_files_enabled:
 documents_enabled:
@@ -218,6 +208,8 @@ samples_enabled:
 sops_enabled:
 workflows_enabled:
 collections_enabled:
+file_templates_enabled:
+placeholders_enabled:
 # Omniauth
 omniauth_enabled:
 omniauth_user_create:
@@ -248,3 +240,9 @@ cv_dropdown_limit:
   convert: :to_i
 tag_cloud_enabled:
 workflow_class_list_enabled:
+git_support_enabled:
+immediate_git_fetch:
+home_description_position:
+observed_variables_enabled:
+observed_variable_sets_enabled:
+fair_signposting_enabled:

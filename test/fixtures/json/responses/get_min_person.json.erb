@@ -1,0 +1,69 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "people",
+    "attributes": {
+      "avatar": null,
+      "title": "Minimal",
+      "description": null,
+      "first_name": null,
+      "last_name": "Minimal",
+      "orcid": null,
+      "mbox_sha1sum": "a25ef457915f516f1fc155ce0ed39efe33c284c1",
+      "expertise": [],
+      "tools": [],
+      "login": null
+    },
+    "relationships": {
+      "projects": {
+        "data": []
+      },
+      "institutions": {
+        "data": []
+      },
+      "investigations": {
+        "data": []
+      },
+      "studies": {
+        "data": []
+      },
+      "assays": {
+        "data": []
+      },
+      "data_files": {
+        "data": []
+      },
+      "models": {
+        "data": []
+      },
+      "sops": {
+        "data": []
+      },
+      "publications": {
+        "data": []
+      },
+      "presentations": {
+        "data": []
+      },
+      "events": {
+        "data": []
+      },
+      "documents": {
+        "data": []
+      }
+    },
+    "links": {
+      "self": "/people/<%= res.id %>"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "uuid": "<%= res.uuid %>",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.3"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

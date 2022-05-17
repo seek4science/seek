@@ -4,10 +4,10 @@ class CustomMetadataValidator < ActiveModel::Validator
     record.custom_metadata_attributes.each do |attribute|
       val = record.get_attribute_value(attribute)
       if attribute.test_blank?(val)
-        record.errors[attribute.title] << 'is required' if attribute.required?
+        record.errors.add(attribute.title, 'is required') if attribute.required?
       else
         unless attribute.validate_value?(val)
-          record.errors[attribute.title] << "is not a valid #{attribute.sample_attribute_type.title}"
+          record.errors.add(attribute.title, "is not a valid #{attribute.sample_attribute_type.title}")
         end
       end
     end

@@ -1,60 +1,69 @@
-<%= render :partial => "general/item_title",:locals=>{:item=>@event, :buttons_partial => 'assets/asset_buttons'} -%>
+<%= render partial: 'general/item_title', locals: { item: @event, buttons_partial: 'assets/asset_buttons' } %>
 
-<%= item_description @event.description -%>
+<%= render partial: 'general/show_page_tab_definitions' %>
 
-<div class="row">
-  <div class="col-sm-6">
-    <%= persistent_resource_id(@event) %>
+<div class="tab-content">
+  <%= tab_pane('overview') do %>
+    <%= item_description @event.description -%>
 
-    <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @event} %>
+    <div class="row">
+      <div class="col-sm-6">
+        <%= persistent_resource_id(@event) %>
 
-    <% unless @event.contributor.nil? then %>
+        <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @event} %>
+
+        <% unless @event.contributor.nil? then %>
+          <p>
+            <label>Created by:</label>
+            <%= link_to @event.contributor.name, @event.contributor -%>
+          </p>
+        <% end %>
         <p>
-          <label>Created by:</label>
-          <%= link_to @event.contributor.name, @event.contributor -%>
+          <label>Start Time:</label>
+          <% if @event.start_date.nil? %>
+            <%= text_or_not_specified nil %>
+          <% else %>
+            <%= date_as_string(@event.start_date, !(@event.start_date.hour == 0 and @event.start_date.min == 0 and @event.start_date.sec == 0)) %>
+          <% end %>
         </p>
-    <% end %>
-    <p>
-      <label>Start Time:</label>
-      <% if @event.start_date.nil? %>
-          <%= text_or_not_specified nil %>
-      <% else %>
-          <%= date_as_string(@event.start_date, !(@event.start_date.hour == 0 and @event.start_date.min == 0 and @event.start_date.sec == 0)) %>
-      <% end %>
-    </p>
-    <p>
-      <label>End Time:</label>
-      <% if @event.end_date.nil? %>
-          <%= text_or_not_specified nil %>
-      <% else %>
-          <%= date_as_string(@event.end_date,!(@event.end_date.hour == 0 and @event.end_date.min == 0 and @event.end_date.sec == 0)) -%>
-      <% end %>
-    </p>
-  </div>
-  <div class="col-sm-6">
-    <p class="web_page">
-      <label><%= t('event') %> Website:</label>
-      <%= text_or_not_specified(@event.url, :external_link=>true) -%>
-    </p>
+        <p>
+          <label>End Time:</label>
+          <% if @event.end_date.nil? %>
+            <%= text_or_not_specified nil %>
+          <% else %>
+            <%= date_as_string(@event.end_date,!(@event.end_date.hour == 0 and @event.end_date.min == 0 and @event.end_date.sec == 0)) -%>
+          <% end %>
+        </p>
+      </div>
+      <div class="col-sm-6">
+        <p class="web_page">
+          <label><%= t('event') %> Website:</label>
+          <%= text_or_not_specified(@event.url, :external_link=>true) -%>
+        </p>
 
-    <p class="address">
-      <label>Address:</label>
-      <%= text_or_not_specified @event.address, :address=>true %>
-    </p>
+        <p class="address">
+          <label>Address:</label>
+          <%= text_or_not_specified @event.address, :address=>true %>
+        </p>
 
-    <p class="city">
-      <label>City:</label>
-      <%= text_or_not_specified @event.city %>
-    </p>
+        <p class="city">
+          <label>City:</label>
+          <%= text_or_not_specified @event.city %>
+        </p>
 
-    <p class="country">
-      <label>Country:</label>
-      <%= country_text_or_not_specified @event.country -%>
-    </p>
-  </div>
+        <p class="country">
+          <label>Country:</label>
+          <%= country_text_or_not_specified @event.country -%>
+        </p>
+      </div>
+    </div>
+    <%= render :partial=>"general/isa_graph", :locals => {:root_item => @event, :deep => true, :include_parents => true} %>
+
+    <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @event}%>
+
+  <% end %>
+
+  <%= tab_pane('related-items') do %>
+    <%= render partial: 'general/items_related_to', object: @event %>
+  <% end %>
 </div>
-<%= render :partial=>"general/isa_graph", :locals => {:root_item => @event, :deep => true, :include_parents => true} %>
-
-<%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @event}%>
-
-<%= render :partial=>"general/items_related_to",:object => @event %>

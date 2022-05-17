@@ -1,61 +1,19 @@
 {
-    "data": [
-        {
-            "id": "1",
-            "type": "sample_types",
-            "attributes": {
-                "title": "SysMO Biosample"
-            },
-            "links": {
-                "self": "/sample_types/1"
-            }
-        },
-        {
-            "id": "2",
-            "type": "sample_types",
-            "attributes": {
-                "title": "YEAST_chemostat_steady_state_culture"
-            },
-            "links": {
-                "self": "/sample_types/2"
-            }
-        },
-        {
-            "id": "3",
-            "type": "sample_types",
-            "attributes": {
-                "title": "chemostat_yeast_anaerobic"
-            },
-            "links": {
-                "self": "/sample_types/3"
-            }
-        },
-        {
-            "id": "4",
-            "type": "sample_types",
-            "attributes": {
-                "title": "test for SysMetEx1"
-            },
-            "links": {
-                "self": "/sample_types/4"
-            }
-        },
-        {
-            "id": "8",
-            "type": "sample_types",
-            "attributes": {
-                "title": "SysMetEx_Cell_Culture"
-            },
-            "links": {
-                "self": "/sample_types/8"
-            }
-        }
-    ],
-    "jsonapi": {
-        "version": "1.0"
-    },
-    "meta": {
-        "base_url": "https://fairdomhub.org",
-        "api_version": "0.3"
-    }
+  "data": [
+
+  ],
+  "jsonapi": {
+    "version": "1.0"
+  },
+  "links": {
+    "self": "/sample_types?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "first": "/sample_types?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "prev": null,
+    "next": null,
+    "last": "/sample_types?page%5Bnumber%5D=1&page%5Bsize%5D=1000000"
+  },
+  "meta": {
+    "base_url": "http://localhost:3000",
+    "api_version": "0.3"
+  }
 }

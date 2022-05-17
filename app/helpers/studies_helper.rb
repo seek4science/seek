@@ -9,11 +9,6 @@ module StudiesHelper
     (image_tag + "<p style='margin: 0; text-align: center;'>#{project_link}</p>").html_safe
   end
 
-  def sorted_measured_items
-    items = MeasuredItem.all
-    items.sort_by(&:title)
-  end
-
   def study_link(study)
     if study.nil?
       "<span class='none_text'>Not associated with a Study</span>".html_safe
@@ -29,6 +24,6 @@ module StudiesHelper
   end
 
   def show_batch_miappe_button?
-    CustomMetadataType.where(supported_type: 'Study', title: 'MIAPPE metadata').any?
+    CustomMetadataType.where(supported_type: 'Study', title: 'MIAPPE metadata v1.1').any?
   end
 end

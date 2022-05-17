@@ -26,9 +26,6 @@
 
       <%= render :partial => "human_diseases/select_human_disease",:locals=>{:model_class=>Model} -%>
 
-      <%= render :partial => "scales/scales_selector_with_parameters",:locals=>{:object=>@model} if show_scales?%>
-
-
       <%= render :partial=>"assets/asset_form_bottom", :locals=> { :f => f } -%>
 
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @model} -%>

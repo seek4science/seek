@@ -1,44 +1,45 @@
 {
-    "data": {
-        "type": "collections",
-        "attributes": {
-            "title": "A Collection",
-            "description": "A collection of things!",
-            "license": null,
-            "tags": [
-                "Collection-tag1",
-                "Collection-tag2",
-                "Collection-tag3",
-                "Collection-tag4",
-                "Collection-tag5"
-            ],
-            "other_creators": "Blogs, Joe"
-        },
-        "relationships": {
-            "creators": {
-                "data": [
-                    {
-                        "id": "1039989767",
-                        "type": "people"
-                    }
-                ]
+  "data": {
+    "type": "collections",
+    "attributes": {
+      "title": "A Maximal Collection",
+      "description": "This is the description",
+      "tags": [
+        "tag1",
+        "tag2"
+      ],
+      "license": "CC-BY-4.0",
+      "other_creators": "John Smith, Jane Smith",
+      "policy": {
+        "access": "view",
+        "permissions": [
+          {
+            "resource": {
+              "id": "963",
+              "type": "projects"
             },
-            "projects": {
-                "data": [
-                    {
-                        "id": "1022253998",
-                        "type": "projects"
-                    }
-                ]
-            },
-            "publications": {
-                "data": [
-                    {
-                        "id": "980191013",
-                        "type": "publications"
-                    }
-                ]
-            }
-        }
+            "access": "edit"
+          }
+        ]
+      }
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "887",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "963",
+            "type": "projects"
+          }
+        ]
+      }
     }
+  }
 }

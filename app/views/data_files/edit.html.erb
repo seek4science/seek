@@ -24,7 +24,12 @@
 
       </div>
 
-      <%= render :partial => "scales/scales_selector", :locals => {:object => @data_file} if show_scales? %>
+      <% if Seek::Config.file_templates_enabled %>
+        <%= render :partial => "assets/select_template", :locals => {:resource => (@data_file ? @data_file : DataFile.new),
+	:templates => authorised_assets(FileTemplate, nil, 'edit') } %>
+      <% end %>
+      
+      <%= render partial: 'assets/edam_form_properties', :locals => { :resource => (@data_file ? @data_file : DataFile.new) } -%>
 
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @data_file } %>
 
@@ -34,7 +39,9 @@
 
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @data_file} -%>
 
-      <%= fancy_multiselect @data_file, :events, { other_projects_checkbox: true, sort_by: :start_date } %>
+      <%= f.fancy_multiselect :events, { other_projects_checkbox: true, sort_by: :start_date } if Seek::Config.events_enabled %>
+
+      <%= render partial: 'associate_workflow', locals: {:f=>f, :resource => @data_file } if Seek::Config.workflows_enabled %>
 
       <%= form_submit_buttons(@data_file) %>
     </div>

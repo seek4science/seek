@@ -9,7 +9,7 @@ module Seek
       def initialize(endpoint)
         @endpoint = endpoint
         options = { expires_in: endpoint.refresh_period_mins.minutes }
-        @cache = ActiveSupport::Cache::FileStore.new(filestore_path, options)
+        @cache = ActiveSupport::Cache::FileStore.new(filestore_path, **options)
       end
 
       # clears all stored metadata for this endpoint

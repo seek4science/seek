@@ -10,7 +10,7 @@ class Presentation < ApplicationRecord
 
   has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
 
-  validates :projects, presence: true, projects: { self: true }, unless: Proc.new {Seek::Config.is_virtualliver }
+  validates :projects, presence: true, projects: { self: true }
 
   explicit_versioning(:version_column => "version") do
     acts_as_versioned_resource
@@ -20,6 +20,7 @@ class Presentation < ApplicationRecord
   end
 
   has_and_belongs_to_many :events
+  has_and_belongs_to_many :workflows, -> { distinct }
 
   # get a list of Presentations with their original uploaders - for autocomplete fields
   # (authorization is done immediately to save from iterating through the collection again afterwards)

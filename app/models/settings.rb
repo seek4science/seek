@@ -29,6 +29,7 @@ class Settings < ActiveRecord::Base
 
   attr_encrypted :value, key: proc { Seek::Config.attr_encrypted_key }, marshal: true, marshaler: Marshal
   before_save :ensure_no_plaintext, if: :encrypt?
+  after_commit :clear_cache, on: %i[create update destroy]
 
   # Support old plugin
   if defined?(SettingsDefaults::DEFAULTS)
@@ -47,13 +48,14 @@ class Settings < ActiveRecord::Base
   end
 
   def self.to_hash(starting_with=nil)
-    vars = select(:var, :values)
+    vars = select(:var, :value, :encrypted_value, :encrypted_value_iv)
     vars = vars.where("var LIKE ?", "'#{starting_with}%'") if starting_with
 
     result = HashWithIndifferentAccess.new
-    vars.each do |record|
+    vars.to_a.each do |record|
       result[record.var] = record.value
     end
+    result
   end
 
   class << self
@@ -98,7 +100,7 @@ class Settings < ActiveRecord::Base
         raise Settings::DecryptionError, "Unable to decrypt setting '#{var}'. Was the key (filestore/attr_encrypted/key) changed?"
       end
     elsif self[:value].present?
-      YAML::load(self[:value])
+      YAML::unsafe_load(self[:value])
     else
       nil
     end
@@ -150,5 +152,9 @@ class Settings < ActiveRecord::Base
 
   def ensure_no_plaintext
     self[:value] = nil if will_save_change_to_encrypted_value?
+  end
+
+  def clear_cache
+    Seek::Config.clear_cache if target_id.nil? && target_type.nil?
   end
 end

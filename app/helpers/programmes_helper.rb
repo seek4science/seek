@@ -10,7 +10,7 @@ module ProgrammesHelper
   end
 
   def programme_administrators_input_box(programme)
-    administrators = programme.programme_administrators
+    administrators = programme.programme_administrators.to_a
     box = ''
     unless User.admin_logged_in?
       administrators.delete(User.current_user.person)
@@ -20,7 +20,7 @@ module ProgrammesHelper
          This is to protect against a #{t('programme')} having no administrators"
       end
     end
-    box << objects_input('programme[administrator_ids]', administrators, typeahead: { values: Person.all.map { |p| { id: p.id, name: p.name, hint: p.typeahead_hint } } })
+    box << objects_input('programme[programme_administrator_ids]', administrators, typeahead: { values: Person.all.map { |p| { id: p.id, name: p.name, hint: p.typeahead_hint } } })
     box.html_safe
   end
 

@@ -12,7 +12,7 @@ module Zenodo
 
         hash = client.get_token(params[:code])
         oauth_session = current_user.oauth_sessions.where(provider: 'Zenodo').first_or_initialize
-        oauth_session.update_attributes(
+        oauth_session.update(
             access_token: hash['access_token'],
             expires_in: hash['expires_in'],
             refresh_token: hash['refresh_token']

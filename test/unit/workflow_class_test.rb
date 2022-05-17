@@ -43,7 +43,7 @@ class WorkflowClassTest < ActiveSupport::TestCase
   test 'assigns unique keys' do
     c1 = WorkflowClass.create!(title: 'Custom Type')
     c2 = WorkflowClass.create!(title: 'Custom  Type')
-    c3 = WorkflowClass.create!(title: 'Custom type')
+    c3 = WorkflowClass.create!(title: 'Custom   type')
 
     assert c1.key.present?
     assert c2.key.present?
@@ -156,5 +156,11 @@ class WorkflowClassTest < ActiveSupport::TestCase
         "alternateName" => "blalbalbla ignore me")
 
     assert_nil match
+
+    # Match on string URL
+    match = WorkflowClass.match_from_metadata("url" => "https://www.commonwl.org/",
+                                              "@type" => "ComputerLanguage")
+
+    assert_equal cwl, match
   end
 end

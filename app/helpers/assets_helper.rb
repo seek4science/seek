@@ -128,12 +128,11 @@ module AssetsHelper
 
   def get_original_model_name(model)
     class_name = model.class.name
-    class_name = class_name.split('::')[0] if class_name.end_with?('::Version')
-    class_name
+    model.is_a_version? ? class_name.split('::')[0] : class_name
   end
 
   def download_resource_path(resource, _code = nil)
-    if resource.class.name.include?('::Version')
+    if resource.is_a_version?
       polymorphic_path(resource.parent, version: resource.version, action: :download, code: params[:code])
     else
       polymorphic_path(resource, action: :download, code: params[:code])
@@ -148,7 +147,7 @@ module AssetsHelper
   end
 
   def show_resource_path(resource)
-    if resource.class.name.include?('::Version')
+    if resource.is_a_version?
       polymorphic_path(resource.parent, version: resource.version)
     elsif resource.is_a?(Snapshot)
       polymorphic_path([resource.resource, resource])
@@ -158,7 +157,7 @@ module AssetsHelper
   end
 
   def edit_resource_path(resource)
-    if resource.class.name.include?('::Version')
+    if resource.is_a_version?
       edit_polymorphic_path(resource.parent)
     else
       edit_polymorphic_path(resource)
@@ -166,7 +165,7 @@ module AssetsHelper
   end
 
   def manage_resource_path(resource)
-    if resource.class.name.include?('::Version')
+    if resource.is_a_version?
       polymorphic_path(resource.parent, action:'manage')
     else
       polymorphic_path(resource, action:'manage')
@@ -175,12 +174,12 @@ module AssetsHelper
 
   # provides a list of assets, according to the class, that are authorized according the 'action' which defaults to view
   # if projects is provided, only authorizes the assets for that project
-  # assets are sorted by title except if they are projects and scales (because of hierarchies)
+  # assets are sorted by title except if they are projects (because of hierarchies)
   def authorised_assets(asset_class, projects = nil, action = 'view')
     assets = asset_class
     assets = assets.filter_by_projects(projects) if projects
     assets = assets.authorized_for(action, User.current_user).to_a
-    assets = assets.sort_by(&:title) if !assets.blank? && !%w[Project Scale].include?(assets.first.class.name)
+    assets = assets.sort_by(&:title) if !assets.blank? && !%w[Project].include?(assets.first.class.name)
     assets
   end
 
@@ -265,11 +264,11 @@ module AssetsHelper
     image_tag_for_key('download', polymorphic_path([fileinfo.asset, fileinfo], action: :download, code: params[:code]), 'Download', { title: 'Download this file' }, '')
   end
 
-  def add_to_dropdown(item)
+  def add_new_item_to_dropdown(item)
     return unless Seek::AddButtons.add_dropdown_for(item)
     tooltip = "This option allows you to add a new item, whilst associating it with this #{text_for_resource(item)}"
     dropdown_button(t('add_new_dropdown.button'), 'attach', menu_options: {class: 'pull-right', id: 'item-admin-menu'}, tooltip:tooltip) do
-      add_item_to_options(item) do |text, path|
+      add_new_item_to_options(item) do |text, path|
         content_tag(:li) do
           image_tag_for_key('add', path, text, nil, text)
         end
@@ -277,10 +276,10 @@ module AssetsHelper
     end
   end
 
-  def add_item_to_options(item)
+  def add_new_item_to_options(item)
     elements = []
     Seek::AddButtons.add_for_item(item).each do |type,param|
-
+      next unless type.feature_enabled?
       text="#{t('add_new_dropdown.option')} #{t(type.name.underscore)}"
       path = new_polymorphic_path(type,param=>item.id)
       elements << yield(text,path)
@@ -291,11 +290,7 @@ module AssetsHelper
   # whether the viewable content is available, or converted to pdf, or capable to be converted to pdf
   def view_content_available?(content_blob)
     return true if content_blob.is_text? || content_blob.is_pdf? || content_blob.is_cwl? || content_blob.is_image?
-    if content_blob.is_pdf_viewable?
-      content_blob.file_exists?('pdf') || Seek::Config.soffice_available?
-    else
-      false
-    end
+    content_blob.is_pdf_viewable?
   end
 
   def source_link_button(source_link)
@@ -334,6 +329,13 @@ module AssetsHelper
     return nil unless Seek::Config.email_enabled
     return nil unless get_email_recipients(resource).present?
     ContactRequestMessageLog.recent_requests(current_user.try(:person), resource).first
+  end
+
+  def edam_ontology_items(ontologyCVItems)
+    ontologyCVItems.collect do |item|
+      browser_url = "https://edamontology.github.io/edam-browser/#{URI.parse(item.iri).path.gsub('/','#')}"
+      link_to(item.label, browser_url, target: :_blank).html_safe
+    end.join(', ').html_safe
   end
 
 end

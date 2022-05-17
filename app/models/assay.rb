@@ -3,8 +3,10 @@ class Assay < ApplicationRecord
   include Seek::Rdf::RdfGeneration
   include Seek::Ontologies::AssayOntologyTypes
   include Seek::Taggable
-  include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
 
+  enum status: [:planned, :running, :completed, :cancelled, :failed]
+  belongs_to :assignee, class_name: 'Person'
+  
   # needs to before acts_as_isa - otherwise auto_index=>false is overridden by Seek::Search::CommonFields
   if Seek::Config.solr_enabled
     searchable(auto_index: false) do
@@ -24,9 +26,7 @@ class Assay < ApplicationRecord
   acts_as_isa
   acts_as_snapshottable
 
-  belongs_to :institution
   belongs_to :sample_type 
-
 
   belongs_to :assay_class
   has_many :assay_organisms, dependent: :destroy, inverse_of: :assay
@@ -42,6 +42,7 @@ class Assay < ApplicationRecord
   has_many :assay_assets, dependent: :destroy, inverse_of: :assay, autosave: true
 
   has_many :data_files, through: :assay_assets, source: :asset, source_type: 'DataFile', inverse_of: :assays
+  has_many :placeholders, through: :assay_assets, source: :asset, source_type: 'Placeholder', inverse_of: :assays
   has_many :sops, through: :assay_assets, source: :asset, source_type: 'Sop', inverse_of: :assays
   has_many :models, through: :assay_assets, source: :asset, source_type: 'Model', inverse_of: :assays
   has_many :samples, through: :assay_assets, source: :asset, source_type: 'Sample', inverse_of: :assays
@@ -134,7 +135,7 @@ class Assay < ApplicationRecord
 
   # Associations where there is additional metadata on the association, i.e. `direction`
   def self.complex_associated_asset_types
-    [:data_files, :samples]
+    [:data_files, :samples, :placeholders]
   end
 
   def assets
@@ -235,6 +236,10 @@ class Assay < ApplicationRecord
 
   def data_files_attributes= attributes
     set_assay_assets_for('DataFile', attributes)
+  end
+
+  def placeholders_attributes= attributes
+    set_assay_assets_for('Placeholder', attributes)
   end
 
   def self.filter_by_projects(projects)

@@ -57,6 +57,11 @@ end
 
 Factory.define(:assay, parent: :modelling_assay) {}
 
+Factory.define(:public_assay, parent: :modelling_assay) do |f|
+  f.policy { Factory(:public_policy) }
+  f.study { Factory(:public_study) }
+end
+
 Factory.define(:min_assay, class: Assay) do |f|
   f.title "A Minimal Assay"
   f.association :assay_class, factory: :experimental_assay_class
@@ -71,6 +76,7 @@ Factory.define(:max_assay, class: Assay) do |f|
   f.description "A Western Blot Assay"
   f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
   f.other_creators "Anonymous creator"
+  f.technology_type_uri 'http://jermontology.org/ontology/JERMOntology#Technology_type'
   f.association :assay_class, factory: :modelling_assay_class
   f.association :contributor,  factory: :person
   f.assay_assets {[Factory(:assay_asset, asset: Factory(:data_file, policy: Factory(:public_policy))),
@@ -78,10 +84,12 @@ Factory.define(:max_assay, class: Assay) do |f|
                    Factory(:assay_asset, asset: Factory(:model, policy: Factory(:public_policy))),
                    Factory(:assay_asset, asset: Factory(:document, policy: Factory(:public_policy)))]}
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
+  f.organisms { [Factory(:organism)] }
   f.after_build do |a|
     a.study ||= Factory(:study, contributor: a.contributor, policy: Factory(:public_policy),
                         investigation: Factory(:investigation, contributor: a.contributor, policy: Factory(:public_policy)))
   end
+  f.assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
 end
 
 # AssayAsset

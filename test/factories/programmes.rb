@@ -21,5 +21,10 @@ Factory.define(:max_programme, class: Programme) do |f|
   f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
   f.web_page "http://www.synbiochem.co.uk"
   f.funding_details "Someone is funding this for me"
-  f.projects { [Factory.build(:max_project)] }
+  f.projects { [Factory(:max_project)] }
+  f.programme_administrators { [Factory(:person)] }
+  f.after_create do |p|
+    p.annotate_with(['DFG'], 'funding_code', p.programme_administrators.first)
+    p.save!
+  end
 end

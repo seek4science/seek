@@ -1,7 +1,9 @@
 # module mixed in with functional tests to test some general authorization scenerios common to all assets
 
 module GeneralAuthorizationTestCases
-  def test_private_item_not_accessible_publicly
+  extend ActiveSupport::Testing::Declarative
+
+  test 'private item not accessible publicly' do
     itemname = @controller.controller_name.singularize.underscore
 
     item = Factory itemname.to_sym, policy: Factory(:private_policy)
@@ -11,13 +13,13 @@ module GeneralAuthorizationTestCases
     get :show, params: { id: item.id }
     assert_response :forbidden
 
-    unless RestTestCases::SKIPPED_JSON.include?(item.class.name)
+    if @controller.class.api_actions.include?(:show)
       get :show, params: { id: item.id, format: 'json' }
       assert_response :forbidden
     end
   end
 
-  def test_private_item_not_accessible_by_another_user
+  test 'private item not accessible by another user' do
     itemname = @controller.controller_name.singularize.underscore
     another_user = Factory :user
 
@@ -28,13 +30,13 @@ module GeneralAuthorizationTestCases
     get :show, params: { id: item.id }
     assert_response :forbidden
 
-    unless RestTestCases::SKIPPED_JSON.include?(item.class.name)
+    if @controller.class.api_actions.include?(:show)
       get :show, params: { id: item.id, format: 'json' }
       assert_response :forbidden
     end
   end
 
-  def test_private_item_accessible_by_owner
+  test 'private item accessible by owner' do
     itemname = @controller.controller_name.singularize.underscore
 
     item = Factory itemname.to_sym, policy: Factory(:private_policy)
@@ -47,7 +49,7 @@ module GeneralAuthorizationTestCases
     assert_response :success
     assert_nil flash[:error]
 
-    unless RestTestCases::SKIPPED_JSON.include?(item.class.name)
+    if @controller.class.api_actions.include?(:show)
       get :show, params: { id: item.id, format: 'json' }
       assert_response :success
     end

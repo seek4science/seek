@@ -4,18 +4,11 @@ require 'minitest/mock'
 class PresentationsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include SharingFormTestHelper
-  include RestTestCases
   include GeneralAuthorizationTestCases
 
   def setup
     login_as Factory(:user)
     @project = User.current_user.person.projects.first
-  end
-
-  def rest_api_test_object
-    @object = Factory :presentation, contributor: User.current_user.person
-    @object.annotate_with 'tag1'
-    @object
   end
 
   test 'index' do
@@ -186,7 +179,7 @@ class PresentationsControllerTest < ActionController::TestCase
     al = ActivityLog.last
     assert_equal 'download', al.action
     assert_equal pres, al.activity_loggable
-    assert_equal 'attachment; filename="ppt_presentation.ppt"', @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"ppt_presentation.ppt\"; filename*=UTF-8''ppt_presentation.ppt", @response.header['Content-Disposition']
     assert_equal 'application/vnd.ms-powerpoint', @response.header['Content-Type']
     assert_equal '82432', @response.header['Content-Length']
   end
@@ -214,39 +207,21 @@ class PresentationsControllerTest < ActionController::TestCase
   end
 
   test 'should be able to view ms/open office ppt content' do
-    Seek::Config.stub(:soffice_available?, true) do
-      ms_ppt_presentation = Factory(:ppt_presentation, policy: Factory(:all_sysmo_downloadable_policy))
-      assert ms_ppt_presentation.content_blob.is_content_viewable?
-      get :show, params: { id: ms_ppt_presentation.id }
-      assert_response :success
-      assert_select 'a', text: /View content/, count: 1
-      assert_select 'a.disabled', text: /View content/, count: 0
 
-      openoffice_ppt_presentation = Factory(:odp_presentation, policy: Factory(:all_sysmo_downloadable_policy))
-      assert openoffice_ppt_presentation.content_blob.is_content_viewable?
-      get :show, params: { id: openoffice_ppt_presentation.id }
-      assert_response :success
-      assert_select 'a', text: /View content/, count: 1
-      assert_select 'a.disabled', text: /View content/, count: 0
-    end
-  end
+    ms_ppt_presentation = Factory(:ppt_presentation, policy: Factory(:all_sysmo_downloadable_policy))
+    assert ms_ppt_presentation.content_blob.is_content_viewable?
+    get :show, params: { id: ms_ppt_presentation.id }
+    assert_response :success
+    assert_select 'a', text: /View content/, count: 1
+    assert_select 'a.disabled', text: /View content/, count: 0
 
-  test 'view content disabled for ms/open office ppt content if soffice not available and conversion required' do
-    Seek::Config.stub(:soffice_available?, false) do
-      ms_ppt_presentation = Factory(:ppt_presentation, policy: Factory(:all_sysmo_downloadable_policy))
-      assert ms_ppt_presentation.content_blob.file_exists?
-      refute ms_ppt_presentation.content_blob.file_exists?('pdf')
-      get :show, params: { id: ms_ppt_presentation.id }
-      assert_response :success
-      assert_select 'a.disabled', text: /View content/, count: 1
+    openoffice_ppt_presentation = Factory(:odp_presentation, policy: Factory(:all_sysmo_downloadable_policy))
+    assert openoffice_ppt_presentation.content_blob.is_content_viewable?
+    get :show, params: { id: openoffice_ppt_presentation.id }
+    assert_response :success
+    assert_select 'a', text: /View content/, count: 1
+    assert_select 'a.disabled', text: /View content/, count: 0
 
-      openoffice_ppt_presentation = Factory(:odp_presentation, policy: Factory(:all_sysmo_downloadable_policy))
-      assert openoffice_ppt_presentation.content_blob.file_exists?
-      refute openoffice_ppt_presentation.content_blob.file_exists?('pdf')
-      get :show, params: { id: openoffice_ppt_presentation.id }
-      assert_response :success
-      assert_select 'a.disabled', text: /View content/, count: 1
-    end
   end
 
   test 'should display the file icon according to version' do
@@ -294,9 +269,6 @@ class PresentationsControllerTest < ActionController::TestCase
   test 'filter by publications using nested routes' do
     assert_routing 'publications/7/presentations', controller: 'presentations', action: 'index', publication_id: '7'
 
-    person1 = Factory(:person)
-    person2 = Factory(:person)
-
     pub1 = Factory(:publication)
     pub2 = Factory(:publication)
 
@@ -304,6 +276,23 @@ class PresentationsControllerTest < ActionController::TestCase
     pres2 = Factory(:presentation, policy: Factory(:public_policy), publications:[pub2])
 
     get :index, params: { publication_id: pub1.id }
+    assert_response :success
+
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', presentation_path(pres1), text: pres1.title
+      assert_select 'a[href=?]', presentation_path(pres2), text: pres2.title, count: 0
+    end
+  end
+
+  test 'filter by workflow using nested routes' do
+    assert_routing 'workflows/7/presentations', controller: 'presentations', action: 'index', workflow_id: '7'
+
+    workflow = Factory(:workflow, policy: Factory(:public_policy))
+
+    pres1 = Factory(:presentation, policy: Factory(:public_policy), workflows:[workflow])
+    pres2 = Factory(:presentation, policy: Factory(:public_policy))
+
+    get :index, params: { workflow_id: workflow.id }
     assert_response :success
 
     assert_select 'div.list_item_title' do
@@ -333,7 +322,7 @@ class PresentationsControllerTest < ActionController::TestCase
     presentation = Factory :presentation, license: 'CC-BY-4.0', policy: Factory(:public_policy)
     presentationv = Factory :presentation_version_with_blob, presentation: presentation
 
-    presentation.update_attributes license: 'CC0-1.0'
+    presentation.update license: 'CC0-1.0'
 
     get :show, params: { id: presentation, version: 1 }
     assert_response :success
@@ -358,6 +347,21 @@ class PresentationsControllerTest < ActionController::TestCase
     get :show, params: { id: presentation }
     assert_select '.panel .panel-body a', text: 'Creative Commons Attribution Share-Alike 4.0'
     assert_equal 'CC-BY-SA-4.0', assigns(:presentation).license
+  end
+
+  test 'should update linked workflow' do
+    user = Factory(:person).user
+    login_as(user)
+    presentation = Factory :presentation, policy: Factory(:public_policy), contributor: user.person
+    workflow = Factory(:workflow, contributor: user.person)
+
+    assert_empty presentation.workflows
+
+    put :update, params: { id: presentation, presentation: { workflow_ids: [workflow.id] } }
+
+    assert_response :redirect
+
+    assert_equal [workflow], assigns(:presentation).workflows
   end
 
   test 'programme presentations through nested routing' do
@@ -581,10 +585,5 @@ class PresentationsControllerTest < ActionController::TestCase
     end
     assert_redirected_to presentation_path(presentation = assigns(:presentation ))
     assert_empty presentation.discussion_links
-  end
-
-  def edit_max_object(presentation)
-    add_tags_to_test_object(presentation)
-    add_creator_to_test_object(presentation)
   end
 end

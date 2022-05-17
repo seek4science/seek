@@ -1,0 +1,255 @@
+@import 'variables';
+@import 'mixins';
+
+/* List item styles */
+.list_items_container {
+  margin-left:auto;
+  margin-right:auto;
+  clear: both;
+  padding-top: 5px;
+
+  /* condensed list collapse icons */
+  a{
+    cursor: pointer;
+  }
+  a[aria-expanded='true'] .glyphicon-option-horizontal {
+    display: none;
+  }
+  a[aria-expanded='false'] .glyphicon-option-vertical {
+    display: none;
+  }
+}
+
+.list_item_actions .btn {
+  width: 9em;
+}
+
+.list_item_content {
+  font-size: 85%;
+}
+
+.list_item_title {
+  display: inline;
+}
+
+.list_item_desc {
+  margin-bottom: 1em;
+}
+
+div.hidden_list_item {
+  margin-top: 6px;
+  padding: 1em;
+  color: #999;
+  @include rounded-box-shadow(#F5F5F5);
+}
+
+div.list_item_attribute ul, div.list_item_attribute ol {
+  margin-left: 5px;
+  padding-left: 5px;
+}
+
+p.list_item_attribute {
+  line-height: 1;
+  margin: 5px 0;
+}
+
+div.list_item_attribute p, div.list_item_attribute h1, div.list_item_attribute h2, div.list_item_attribute h3,
+div.list_item_attribute h4, div.list_item_attribute li {
+  font-size: 85%;
+  line-height: 1;
+  margin: 5px 0;
+}
+
+div.list_item_avatar img {
+  margin-top: 0.3em;
+}
+
+.list_item {
+  .rli-head {
+    display: flex;
+  }
+
+  .list_item_title {
+    flex-grow: 1;
+    flex-shrink: 0;
+
+    img {
+      max-height: 34px;
+    }
+  }
+
+  .rli-project-list {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 1;
+    flex-grow: 0;
+    margin-left: 3em;
+  }
+}
+
+img.visibility_icon {
+  margin: 0 0.5em;
+}
+
+/* End of list item styles */
+
+div.index-container {
+  display: flex;
+}
+
+div.index-content {
+  flex-grow: 1;
+  min-width: 0; /* This seems to prevent content overflowing parent. Not sure why... */
+}
+
+div.index-filters {
+  width: 240px;
+  margin-right: 20px;
+  flex-shrink: 0;
+}
+
+.filter-category {
+  .filter-category-title {
+    background: #eee;
+    padding: 5px;
+    border-bottom: 1px solid $pagination-border;
+  }
+  border-top: 1px solid $pagination-border;
+  border-left: 1px solid $pagination-border;
+  border-right: 1px solid $pagination-border;
+  &:last-child {
+    border-bottom: 1px solid $pagination-border;
+  }
+
+  .filter-option {
+    display: flex;
+    padding: 5px;
+    .filter-option-label {
+      flex-grow: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .filter-option-count {
+      flex-shrink: 0;
+    }
+  }
+
+  &.collapsed {
+    .filter-option-hidden {
+      display: none;
+    }
+  }
+}
+
+.filter-option {
+  display: flex;
+  padding: 5px;
+
+  .filter-option-label {
+    display: inline-block;
+  }
+
+  .filter-option-count {
+    color: #999;
+    display: inline-block;
+  }
+
+  &:hover {
+    text-decoration: none;
+    color: $pagination-hover-color;
+    background-color: #fafafa;
+  }
+
+  &.filter-option-active {
+    color: $pagination-active-color;
+    background-color: $pagination-active-bg;
+    .filter-option-count {
+      display: none;
+    }
+
+    &:after {
+      content: "×";
+      float: right;
+      margin-left: 5px;
+      font-weight: bold;
+    }
+
+    &:hover {
+      background-color: lighten($pagination-active-bg, 10%);
+      color: $pagination-active-color;
+    }
+  }
+}
+
+.active-filters {
+  .filter-option {
+    display: inline-block;
+    padding: 0 5px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+  }
+}
+
+.expand-filter-category-link {
+  display: block;
+  color: #999;
+  background: #f9f9f9;
+  padding: 2px 5px;
+  &:hover, &:active, &:visited {
+    text-decoration: none;
+    color: #999;
+  }
+  &:hover {
+    background: #eee;
+  }
+}
+
+.filter-option-field-group {
+  display: flex;
+  line-height: 24px;
+
+  .filter-option-field {
+    flex-grow: 1;
+    min-width: 5em;
+    padding: 5px;
+    border-style: solid;
+    border-width: 0 0 0 1px;
+    border-color: #ccc;
+    &:first-child {
+      border-width: 0;
+    }
+  }
+  .filter-option-field-button {
+    flex-shrink: 1;
+    color: inherit;
+    border-left: 1px solid #ccc;
+    padding: 5px 10px;
+    display: block;
+  }
+  .filter-option-field-clear {
+    flex-shrink: 1;
+    color: #999;
+    text-decoration: none;
+    font-size: 26px;
+    padding: 5px;
+    font-weight: bold;
+  }
+}
+
+.filter-option-dropdown {
+  border: none;
+  background: transparent;
+  width: 100%;
+  border-radius: 0;
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 14px;
+  color: #555555;
+}
+
+.pagination-container {
+  text-align: center;
+  clear: both;
+}

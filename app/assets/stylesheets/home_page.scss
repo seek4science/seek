@@ -1,0 +1,189 @@
+@import 'variables';
+@import 'mixins';
+
+div#home-features {
+  padding-bottom: 1.5em;
+}
+
+div#home-my-items .panel-title {
+  text-align: center;
+}
+
+div#home-my-items #my-projects {
+  border-right: 2px solid #ccc;
+  min-height: 100%;
+}
+
+.seek-homepage-button-container {
+  margin-bottom: 1em;
+  margin-top: 1em;
+}
+
+.seek-homepage-button-container img.feature-icon {
+  height: 125px;
+}
+
+#home-quick-start a.quick-start-button {
+  white-space: normal;
+  width:100%;
+  display:block;
+  vertical-align: middle;
+}
+
+#home-quick-start a.quick-start-button .glyphicon {
+  font-size: 25px;
+  float: left;
+  padding-top: 5px;
+}
+
+a.seek-homepage-button {
+  display: block;
+  font-size: 200%;
+  background-color: #f7f7f7;
+  border-radius: 4px;
+  padding: 20px;
+  margin: 5px;
+  text-decoration: none;
+
+  &:hover {
+    background-color: #f0f0f0;
+  }
+}
+
+.seek-homepage-button img, .seek-homepage-button span.glyphicon  {
+  display: block;
+  font-size: 80px;
+  margin: auto;
+  line-height: 120px;
+  color: #666;
+}
+
+@media (min-width: $screen-sm-min) {
+  .seek-homepage-button-container {
+    margin-bottom: 3em;
+    margin-top: 3em;
+  }
+
+  a.seek-homepage-button {
+    display: block;
+    text-align: center;
+  }
+
+  .seek-homepage-button img {
+    width: 200px;
+    height: 200px;
+    display: block;
+    margin: 5px auto;
+  }
+}
+
+#home-integrations .col {
+  text-align: center;
+  height: 10em;
+}
+
+#home-integrations img.integration-logo {
+  padding: 0.5em;
+  height:45%;
+}
+
+#home-integrations .integration-label {
+  padding-bottom: 0.25em;
+  font-size: large;
+}
+
+#home_tag_cloud_home {
+  padding: 1em;
+  font-size: large;
+}
+
+.home-main-panel .panel-heading {
+  text-align: center;
+  font-size: larger;
+}
+
+#home-explore-projects a.browse-button {
+  white-space: normal;
+  width: 90%;
+  font-size: 16px;
+}
+
+#home-explore-projects a.browse-button img {
+  height: 80px;
+}
+
+.carousel {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+
+.carousel .card {
+  flex: 0 0 auto;
+}
+
+#carousel-left{
+  position: absolute;
+  top: 45%;
+  font-size:50px;
+  left: 0;
+}
+#carousel-right{
+  position: absolute;
+  right: 0;
+  top: 45%;
+  font-size:50px;
+}
+
+a.image-link img{
+  width: 100%;
+}
+
+.front-page-panel {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+ul.feed {
+  padding: 0;
+  margin: 0;
+}
+
+ul.feed li {
+  list-style: none;
+  border-top: 1px solid #ccc;
+  padding: 0.5em 0;
+}
+
+ul.feed li:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+div#my-recent-contributions .feed {
+  max-height:40em;
+  overflow:hidden;
+  overflow-y:auto;
+}
+
+div#home_who_uses_carousel div.carousel-logo img {
+  width:auto;
+  height:14em;
+}
+
+div#home_who_uses_carousel p.carousel-description {
+  font-size: 1.15em;
+}
+
+div#home_who_uses_carousel p.carousel-author {
+  font-style: italic;
+}
+
+div#home_who_uses_carousel .carousel-control {
+  background-image: none;
+  color:black;
+}
+
+div#home_who_uses_carousel .carousel-control span {
+  opacity: 0.4;
+}

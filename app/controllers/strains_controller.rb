@@ -23,7 +23,6 @@ class StrainsController < ApplicationController
   def edit
     respond_to do |format|
       format.html # new.html.erb
-      format.xml
     end
   end
 
@@ -37,7 +36,6 @@ class StrainsController < ApplicationController
       respond_to do |format|
         flash[:notice] = 'Strain was successfully created.'
         format.html { redirect_to(@strain) }
-        format.xml { render xml: @strain, status: :created, location: @strain }
         format.json {render json: @strain, status: :created, location: @strain, include: [params[:include]]}
 
       end
@@ -45,7 +43,6 @@ class StrainsController < ApplicationController
     else
       respond_to do |format|
         format.html { render action: 'new' }
-        format.xml { render xml: @strain.errors, status: :unprocessable_entity }
         format.json  { render json: @strain.errors, status: :unprocessable_entity }
 
       end
@@ -54,9 +51,7 @@ class StrainsController < ApplicationController
 
   def index
     respond_to do |format|
-      format.rdf {super}
-      format.xml {super}
-      format.html {super}
+      format.html
       format.json {render json: :not_implemented, status: :not_implemented }
     end
   end
@@ -64,7 +59,6 @@ class StrainsController < ApplicationController
   def show
     respond_to do |format|
       format.rdf { render template: 'rdf/show' }
-      format.xml
       format.html
       # format.json {render json: @strain}
       format.json {render json: :not_implemented, status: :not_implemented }
@@ -82,21 +76,19 @@ class StrainsController < ApplicationController
       respond_to do |format|
         flash[:notice] = 'Strain was successfully updated.'
         format.html { redirect_to(@strain) }
-        format.xml { render xml: @strain, status: :created, location: @strain }
         format.json {render json: @strain, include: [params[:include]]}
       end
 
     else
       respond_to do |format|
         format.html { render action: 'edit' }
-        format.xml { render xml: @strain.errors, status: :unprocessable_entity }
         format.json  { render json: @strain.errors, status: :unprocessable_entity }
       end
     end
   end
 
   def existing_strains_for_assay_organism
-    if current_user && !Seek::Config.is_virtualliver
+    if current_user
       # restrict strains to those of that persons project
       projects = current_person.projects
       @strains = @strains.select { |s| !(s.projects & projects).empty? }

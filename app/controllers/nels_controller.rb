@@ -16,7 +16,7 @@ class NelsController < ApplicationController
     hash = @oauth_client.get_token(params[:code])
 
     oauth_session = current_user.oauth_sessions.where(provider: 'NeLS').first_or_initialize
-    oauth_session.update_attributes(access_token: hash['access_token'], expires_in: 2.hours)
+    oauth_session.update(access_token: hash['access_token'], expires_in: 2.hours)
     if (match = params[:state].match(/assay_id:(\d+)/))
       params[:assay_id] = match[1].to_i
       redirect_to assay_nels_path(params[:assay_id])

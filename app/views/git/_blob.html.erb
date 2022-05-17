@@ -1,0 +1,52 @@
+<%= modal(size: 'md', id: 'git-move-modal', class: 'git-browser-modal') do %>
+  <%= modal_header('Move/rename') %>
+
+  <%= modal_body do %>
+    <%= render partial: 'move_file_form', locals: { resource: @parent_resource, path: @blob.path, version: @git_version.version } %>
+  <% end -%>
+<% end %>
+
+<div>
+  <div class="pull-right">
+    <%= button_link_to('Download', 'download', polymorphic_path([@parent_resource, :git_download], version: @git_version.version, path: @blob.path)) %>
+    <%= button_link_to('Raw', 'markup', polymorphic_path([@parent_resource, :git_raw], version: @git_version.version, path: @blob.path)) %>
+    <% if @git_version.can_edit? %>
+      <% if @git_version.mutable? %>
+        <%= button_link_to('Move/rename', 'move', '#', { 'data-toggle' => 'modal', 'data-target' => '#git-move-modal' }) %>
+        <%= button_link_to('Delete', 'destroy',
+                           polymorphic_path([@parent_resource, :git_remove_file], version: @git_version.version, path: @blob.path),
+                           method: :delete,
+                           data: { confirm: "Are you sure you wish to delete this file?" }) %>
+      <% else %>
+        <%= button_link_to('Move/rename', 'move', nil, disabled_reason: @git_version.immutable_error) %>
+        <%= button_link_to('Delete', 'destroy', nil, disabled_reason: @git_version.immutable_error) %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <strong>Path: </strong> <%= @blob.path -%><br/>
+  <strong>Size: </strong> <%= number_to_human_size @blob.size -%><br/>
+  <div class="hidden">
+    <strong>SHA: </strong> <code><%= @blob.oid %></code><br/>
+  </div>
+  <% url = @blob.url %>
+  <% if url %>
+    <strong>Source: </strong> <%= link_to url, url, target: :_blank %><br/>
+  <% end %>
+  <% @blob.annotations.each do |a| %>
+    <span class="git-annotation label" data-annotation-key="<%= a.key -%>"><%= t("git_annotation_label.#{a.key}") %></span>
+  <% end %>
+</div>
+
+<hr/>
+
+<% if is_image_path?(@blob.path) %>
+  <% raw_path = polymorphic_path([@parent_resource, :git_raw], version: @git_version.version, path: @blob.path) %>
+  <%= link_to image_tag(raw_path, class: 'git-image-preview'), raw_path, title: 'Click for full' %>
+<% else %>
+  <% if @blob.binary? %>
+    <span class="subtle">Binary content not displayed</span>
+  <% else %>
+    <%= content_tag :pre, @blob.content %>
+  <% end %>
+<% end %>

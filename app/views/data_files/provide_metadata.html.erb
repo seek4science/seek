@@ -37,6 +37,11 @@
 
                 <%= content_tag(:div, id: "step-#{step += 1}", class: 'multi-step-block') do %>
                   <span class='multi-step-progress-indicator'></span>
+                  <%= render partial: 'data_files/multi-steps/template',locals:{f: f} %>
+                <% end %>
+
+                <%= content_tag(:div, id: "step-#{step += 1}", class: 'multi-step-block') do %>
+                  <span class='multi-step-progress-indicator'></span>
                   <%= render partial: 'data_files/multi-steps/license_and_permissions',locals:{f: f} %>
                 <% end %>
 
@@ -66,6 +71,7 @@
     //these are to prevent the entire modal being closed, when these inner modals from the permission table are closed
     $j('#add-project-permission-modal').on('click', '[data-dismiss="modal"]', function(e) { e.stopPropagation(); });
     $j('#add-person-permission-modal').on('click', '[data-dismiss="modal"]', function(e) { e.stopPropagation(); });
+    $j('#modalAssociateWorkflows').on('click', '[data-dismiss="modal"]', function(e) { e.stopPropagation(); });
 
   });
 </script>

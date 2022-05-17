@@ -25,7 +25,7 @@ module Seek
       end
 
       def label_not_defined_in_ontology
-        errors[:base] << "#{humanize_term_type} type with label #{label} is already defined in ontology!" if label_exists_in_ontology?
+        errors.add(:base, "#{humanize_term_type} type with label #{label} is already defined in ontology!") if label_exists_in_ontology?
       end
 
       def label_exists_in_ontology?
@@ -143,13 +143,13 @@ module Seek
 
       def parent_cannot_be_self
         if parent == self
-          errors[:base] << "#{humanize_term_type} type cannot define itself as a parent!"
+          errors.add(:base, "#{humanize_term_type} type cannot define itself as a parent!")
         end
       end
 
       def parent_cannot_be_child
         if all_children.include?(parent)
-          errors[:base] << "#{humanize_term_type} type cannot define a child as a parent!"
+          errors.add(:base, "#{humanize_term_type} type cannot define a child as a parent!")
         end
       end
 

@@ -1,8 +1,6 @@
-<div class="contribution_title">
-  <h1><%=  @assay.is_modelling? ? "#{t('assays.modelling_analysis')} editing" : "#{t('assays.experimental_assay')} editing" -%></h1>
-</div>
+<h1><%=  @assay.is_modelling? ? "Editing #{t('assays.modelling_analysis')}" : "Editing #{t('assays.experimental_assay')}" -%></h1>
 
-<div class="show_basic">
+<div class="asset_form">
   <%= suggested_type_modal_boxes %>
   <%= form_for @assay do |f| %>
     <%= render :partial => "form", :locals => { :f => f, :action=>:edit } -%>

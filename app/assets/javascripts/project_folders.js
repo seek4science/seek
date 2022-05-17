@@ -39,7 +39,8 @@ function setupFoldersTree(dataJson, container_id, drop_accept_class) {
 function remove_item_from_assay(item_element) {
   var project_id = item_element.data("project-id");
   var origin_folder_id = item_element.data("origin-folder-id");
-  var path = "/projects/" + project_id + "/folders/" + origin_folder_id + "/remove_asset";
+  // TODO: Use proper routes for things like this:
+  var path = URL_ROOT + "/projects/" + project_id + "/folders/" + origin_folder_id + "/remove_asset";
 
   $j.ajax({
     url: path,
@@ -105,7 +106,7 @@ function item_dropped_to_folder(item_element, dest_folder_id) {
     var folder_element_id = "folder_" + dest_folder_id;
     var project_id = item_element.data("project-id");
     var origin_folder_id = item_element.data("origin-folder-id");
-    var path = "/projects/" + project_id + "/folders/" + origin_folder_id + "/move_asset_to";
+    var path = URL_ROOT + "/projects/" + project_id + "/folders/" + origin_folder_id + "/move_asset_to";
 
     $j.ajax({
       url: path,
@@ -132,7 +133,7 @@ function folder_clicked(folder_id, project_id) {
   hideAllViews();
   $j("#folder_contents").show();
   $j("#folder_contents").spinner("add");
-  var path = "/projects/" + project_id + "/folders/" + folder_id + "/display_contents";
+  var path = URL_ROOT + "/projects/" + project_id + "/folders/" + folder_id + "/display_contents";
   displayed_folder_id = folder_id;
   $j.ajax({ url: path, cache: false, dataType: "script" });
 }
@@ -156,7 +157,8 @@ const loadAssaySamples = (view, table_cols) =>
   loadItemDetails(`/assays/${selectedItem.parent.id}/samples`, { view, table_cols });
 
 const loadItemDetails = (url, params = {}) => {
-  $j.ajax({
+    url = URL_ROOT + url;
+    $j.ajax({
     url,
     data: $j.extend(params, { only_content: true, single_page: true }),
     cache: false,

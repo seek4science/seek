@@ -135,7 +135,7 @@ module Ga4gh
           get :descriptor, params: { id: workflow.id, version_id: 1, type: 'PLAIN_GALAXY', relative_path: 'Genomics-1-PreProcessing_without_downloading_from_SRA.svg' }
 
           assert_response :success
-          assert_equal 'text/plain; charset=utf-8', @response.headers['Content-Type']
+          assert_equal "text/plain; charset=utf-8", @response.headers['Content-Type']
           assert @response.body.start_with?('<?xml version="1')
         end
 
@@ -244,12 +244,172 @@ module Ga4gh
 
           assert_response :success
           r = JSON.parse(@response.body)
-          assert_equal 4, r.length
+          assert_equal 5, r.length
           galaxy = r.detect { |f| f['path'] == 'Genomics-1-PreProcessing_without_downloading_from_SRA.ga' }
-          diagram = r.detect { |f| f['path'] == 'Genomics-1-PreProcessing_without_downloading_from_SRA.svg' }
+          orig_diagram = r.detect { |f| f['path'] == 'Genomics-1-PreProcessing_without_downloading_from_SRA.svg' }
+          generated_diagram = r.detect { |f| f['path'] == "workflow-#{workflow.id}-2-diagram.svg" }
+          assert galaxy
+          assert_equal 'PRIMARY_DESCRIPTOR', galaxy['file_type']
+          refute orig_diagram
+          assert generated_diagram
+          assert_equal 'OTHER', generated_diagram['file_type']
+        end
+
+        # Git
+        test 'should list tool version files for correct descriptor on git workflow' do
+          workflow = Factory(:remote_git_workflow, policy: Factory(:public_policy))
+
+          get :files, params: { id: workflow.id, version_id: 1, type: 'GALAXY' }
+
+          assert_response :success
+          r = JSON.parse(@response.body)
+          assert_equal 6, r.length
+          galaxy = r.detect { |f| f['path'] == 'concat_two_files.ga' }
+          diagram = r.detect { |f| f['path'] == 'diagram.png' }
+          assert galaxy
+          assert_equal 'PRIMARY_DESCRIPTOR', galaxy['file_type']
+          assert diagram
+          assert_equal 'OTHER', diagram['file_type']
+        end
+
+        test 'should get main workflow as primary descriptor on git workflow' do
+          workflow = Factory(:remote_git_workflow, policy: Factory(:public_policy))
+
+          get :descriptor, params: { id: workflow.id, version_id: 1, type: 'GALAXY' }
+
+          assert_response :success
+          assert @response.body.include?('a_galaxy_workflow')
+        end
+
+        test 'should get descriptor file via relative path on git workflow' do
+          workflow = Factory(:remote_git_workflow, policy: Factory(:public_policy))
+
+          get :descriptor, params: { id: workflow.id, version_id: 1, type: 'GALAXY', relative_path: 'concat_two_files.ga' }
+
+          assert_response :success
+          assert_equal 'application/json; charset=utf-8', @response.headers['Content-Type']
+          assert @response.body.include?('a_galaxy_workflow')
+        end
+
+        test 'should list tool version files for correct version on git workflow' do
+          workflow = Factory(:remote_git_workflow, policy: Factory(:public_policy))
+          disable_authorization_checks do
+            s = workflow.save_as_new_git_version(
+              ref: 'refs/tags/v0.01',
+              git_repository_id: workflow.git_version.git_repository_id,
+              main_workflow_path: 'concat_two_files.ga'
+            )
+            assert s
+          end
+
+          get :files, params: { id: workflow.id, version_id: 1, type: 'GALAXY' }
+
+          assert_response :success
+          r = JSON.parse(@response.body)
+          assert_equal 6, r.length
+          galaxy = r.detect { |f| f['path'] == 'concat_two_files.ga' }
+          diagram = r.detect { |f| f['path'] == 'diagram.png' }
+          assert galaxy
+          assert_equal 'PRIMARY_DESCRIPTOR', galaxy['file_type']
+          assert diagram
+          assert_equal 'OTHER', diagram['file_type']
+
+          get :files, params: { id: workflow.id, version_id: 2, type: 'GALAXY' }
+
+          assert_response :success
+          r = JSON.parse(@response.body)
+          assert_equal 4, r.length
+          galaxy = r.detect { |f| f['path'] == 'concat_two_files.ga' }
+          diagram = r.detect { |f| f['path'] == 'diagram.png' }
           assert galaxy
           assert_equal 'PRIMARY_DESCRIPTOR', galaxy['file_type']
           refute diagram
+        end
+
+        test 'should work with snakemake' do
+          workflow = Factory(:workflow, workflow_class: Factory(:unextractable_workflow_class, key: 'snakemake', title: 'Snakemake'), policy: Factory(:public_policy))
+
+          get :files, params: { id: workflow.id, version_id: 1, type: 'SMK' }
+
+          assert_response :success
+        end
+
+        test 'should get descriptor containing URL for binary file' do
+          workflow = Factory(:nf_core_ro_crate_workflow, policy: Factory(:public_policy))
+
+          get :descriptor, params: { id: workflow.id, version_id: 1, type: 'NFL', relative_path: 'docs/images/nfcore-ampliseq_logo.png' }, format: :json
+
+          assert_response :success
+          assert_equal 'application/json; charset=utf-8', @response.headers['Content-Type']
+          h = JSON.parse(@response.body)
+          assert_nil h['content']
+          assert_equal "http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1/PLAIN_NFL/descriptor/docs/images/nfcore-ampliseq_logo.png", h['url']
+        end
+
+        test 'should get raw descriptor for binary file' do
+          workflow = Factory(:nf_core_ro_crate_workflow, policy: Factory(:public_policy))
+
+          get :descriptor, params: { id: workflow.id, version_id: 1, type: 'PLAIN_NFL', relative_path: 'docs/images/nfcore-ampliseq_logo.png' }
+          assert_response :success
+          assert_equal 'PNG', @response.body.force_encoding('ASCII-8BIT')[1..3]
+        end
+
+        test 'should get descriptor containing URL for binary file on git workflow' do
+          workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+          disable_authorization_checks do
+            c = workflow.git_version.add_file('dir/binary.bin', StringIO.new(SecureRandom.random_bytes(50)))
+            workflow.git_version.update_column(:commit, c)
+          end
+
+          get :descriptor, params: { id: workflow.id, version_id: 1, type: 'GALAXY', relative_path: 'dir/binary.bin' }
+
+          assert_response :success
+          assert_equal 'application/json; charset=utf-8', @response.headers['Content-Type']
+          h = JSON.parse(@response.body)
+          assert_nil h['content']
+          assert_equal "http://localhost:3000/ga4gh/trs/v2/tools/#{workflow.id}/versions/1/PLAIN_GALAXY/descriptor/dir/binary.bin", h['url']
+        end
+
+        test 'should get raw descriptor for binary file on git workflow' do
+          bytes = SecureRandom.random_bytes(20)
+          workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+          disable_authorization_checks do
+            c = workflow.git_version.add_file('binary.bin', StringIO.new(bytes))
+            workflow.git_version.update_column(:commit, c)
+          end
+
+          get :descriptor, params: { id: workflow.id, version_id: 1, type: 'PLAIN_GALAXY', relative_path: 'binary.bin' }
+          assert_response :success
+          assert_equal bytes, @response.body.force_encoding('ASCII-8BIT')
+        end
+
+        test 'should get file list for workflow with missing main workflow' do
+          workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+          disable_authorization_checks do
+            v = workflow.git_version
+            v.remove_file('concat_two_files.ga')
+            v.save!
+          end
+
+          get :files, params: { id: workflow.id, version_id: 1, type: 'GALAXY' }
+
+          assert_response :success
+          r = JSON.parse(@response.body)
+          refute r.detect { |f| f['path'] == 'concat_two_files.ga' }
+          refute r.detect { |f| f['file_type'] == 'PRIMARY_DESCRIPTOR' }
+        end
+
+        test 'should 404 on descriptor for workflow with missing main workflow' do
+          workflow = Factory(:local_git_workflow, policy: Factory(:public_policy))
+          disable_authorization_checks do
+            v = workflow.git_version
+            v.remove_file('concat_two_files.ga')
+            v.save!
+          end
+
+          get :descriptor, params: { id: workflow.id, version_id: 1, type: 'GALAXY' }
+
+          assert_response :not_found
         end
       end
     end

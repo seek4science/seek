@@ -35,9 +35,8 @@ class PresentationsController < ApplicationController
   end
 
  # PUT /presentations/1
-  # PUT /presentations/1.xml
   def update
-    @presentation.update_attributes(presentation_params)
+    @presentation.update(presentation_params)
     update_annotations(params[:tag_list], @presentation) if params.key?(:tag_list)
     update_sharing_policies @presentation
     update_relationships(@presentation,params)
@@ -74,7 +73,8 @@ class PresentationsController < ApplicationController
     params.require(:presentation).permit(:title, :description, *creator_related_params, :license, :parent_name,
                                          { event_ids: [] }, { project_ids: [] },
                                          { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                         { publication_ids: [] }, discussion_links_attributes:[:id, :url, :label, :_destroy])
+                                         { publication_ids: [] }, { workflow_ids: [] },
+                                         discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
   alias_method :asset_params, :presentation_params

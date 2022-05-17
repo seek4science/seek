@@ -13,8 +13,9 @@ Factory.define(:max_person, class: Person) do |f|
   f.email "maximal_person@email.com"
   f.phone "34-167-552266"
   f.skype_name "myskypename"
-  f.association :user, factory: :activated_user
+  f.association :user, factory: :activated_user, login: 'max_person_user'
   f.group_memberships { [Factory.build(:group_membership)] }
+  f.avatar
   f.after_create do |p|
     p.contributed_assays = [Factory(:min_assay, contributor: p, policy: Factory(:public_policy))]
     p.created_sops = [Factory(:sop, contributor: p, policy: Factory(:public_policy))]
@@ -23,6 +24,10 @@ Factory.define(:max_person, class: Person) do |f|
     p.created_data_files = [Factory(:data_file, contributor: p, policy: Factory(:public_policy))]
     p.created_publications = [Factory(:publication, contributor: p)]
     p.created_documents = [Factory(:public_document, contributor: p)]
+    p.created_events = [Factory(:event, contributor: p, policy: Factory(:public_policy))]
+    p.annotate_with(['golf', 'fishing'], 'expertise', p)
+    p.annotate_with(['fishing rod'], 'tool', p)
+    p.save!
     p.reload
   end
 end
@@ -34,7 +39,11 @@ Factory.define(:brand_new_person, class: Person) do |f|
 end
 
 Factory.define(:person_in_project, parent: :brand_new_person) do |f|
-  f.group_memberships { [Factory.build(:group_membership)] }
+  f.ignore do
+    project { Factory(:project) }
+    institution { Factory(:institution) }
+  end
+  f.group_memberships { [Factory.build(:group_membership, work_group: Factory(:work_group, project: project, institution: institution))] }
   f.after_create do |p|
     p.reload
   end
@@ -57,11 +66,6 @@ Factory.define(:person_in_multiple_projects, parent: :brand_new_person) do |f|
 end
 
 Factory.define(:person, parent: :person_in_project) do |f|
-  f.ignore do
-    project { Factory(:project) }
-    institution { Factory(:institution) }
-  end
-  f.group_memberships { [Factory.build(:group_membership, work_group: Factory(:work_group, project: project, institution: institution))] }
   f.association :user, factory: :activated_user
 end
 
@@ -70,49 +74,40 @@ Factory.define(:admin, parent: :person) do |f|
 end
 
 Factory.define(:pal, parent: :person) do |f|
-  f.roles_mask 2
-  f.after_build do |pal|
-    Factory(:pal_position) if ProjectPosition.pal_position.nil?
-    pal.group_memberships.first.project_positions << ProjectPosition.pal_position
-    Factory(:admin_defined_role_project, project: pal.projects.first, person: pal, role_mask: 2)
-    pal.roles_mask = 2
+  f.after_create do |p|
+    p.is_pal = true, p.group_memberships.first.project
   end
 end
 
 Factory.define(:asset_housekeeper, parent: :person) do |f|
-  f.after_build do |am|
-    Factory(:admin_defined_role_project, project: am.projects.first, person: am, role_mask: 8)
-    am.roles_mask = 8
+  f.after_create do |p|
+    p.is_asset_housekeeper = true, p.group_memberships.first.project
   end
 end
 
 Factory.define(:project_administrator, parent: :person) do |f|
-  f.after_build do |pm|
-    Factory(:admin_defined_role_project, project: pm.projects.first, person: pm, role_mask: 4)
-    pm.roles_mask = 4
+  f.after_create do |p|
+    p.is_project_administrator = true, p.group_memberships.first.project
   end
 end
 
 Factory.define(:programme_administrator_not_in_project, parent: :person_not_in_project) do |f|
-  f.after_build do |pm|
+  f.after_create do |p|
     programme = Factory(:programme)
-    Factory(:admin_defined_role_programme, programme: programme, person: pm, role_mask: 32)
-    pm.roles_mask = 32
+    p.is_programme_administrator = true, programme
   end
 end
 
-Factory.define(:programme_administrator, parent: :project_administrator) do |f|
-  f.after_build do |pm|
-    programme = Factory(:programme, projects: [pm.projects.first])
-    Factory(:admin_defined_role_programme, programme: programme, person: pm, role_mask: 32)
-    pm.roles_mask = 32
+Factory.define(:programme_administrator, parent: :person) do |f|
+  f.after_create do |p|
+    programme = Factory(:programme, projects: [p.group_memberships.first.project])
+    p.is_programme_administrator = true, programme
   end
 end
 
 Factory.define(:asset_gatekeeper, parent: :person) do |f|
-  f.after_build do |gk|
-    Factory(:admin_defined_role_project, project: gk.projects.first, person: gk, role_mask: 16)
-    gk.roles_mask = 16
+  f.after_create do |p|
+    p.is_asset_gatekeeper = true, p.group_memberships.first.project
   end
 end
 

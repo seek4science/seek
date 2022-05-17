@@ -1,291 +1,105 @@
 {
-    "data": {
-        "id": "1121",
-        "type": "collections",
-        "attributes": {
-            "title": "A Maximal Collection",
-            "description": "A collection of very interesting things",
-            "license": null,
-            "tags": [
-                "Collection-tag1",
-                "Collection-tag2",
-                "Collection-tag3",
-                "Collection-tag4",
-                "Collection-tag5"
-            ],
-            "created_at": "2020-05-28T13:03:28.000Z",
-            "updated_at": "2020-05-28T13:03:32.000Z",
-            "other_creators": "Blogs, Joe"
-        },
-        "relationships": {
-            "creators": {
-                "data": [
-                    {
-                        "id": "1039989767",
-                        "type": "people"
-                    }
-                ]
+  "data": {
+    "id": "15",
+    "type": "collections",
+    "attributes": {
+      "policy": {
+        "access": "no_access",
+        "permissions": [
+          {
+            "resource": {
+              "id": "997",
+              "type": "projects"
             },
-            "submitter": {
-                "data": [
-                    {
-                        "id": "1039989760",
-                        "type": "people"
-                    }
-                ]
-            },
-            "people": {
-                "data": [
-                    {
-                        "id": "1039989760",
-                        "type": "people"
-                    },
-                    {
-                        "id": "1039989767",
-                        "type": "people"
-                    }
-                ]
-            },
-            "projects": {
-                "data": [
-                    {
-                        "id": "1022253998",
-                        "type": "projects"
-                    }
-                ]
-            },
-            "publications": {
-                "data": [
-                    {
-                        "id": "980191013",
-                        "type": "publications"
-                    }
-                ]
-            },
-            "items": {
-                "data": [
-                    {
-                        "id": "559",
-                        "type": "collection_items"
-                    },
-                    {
-                        "id": "560",
-                        "type": "collection_items"
-                    },
-                    {
-                        "id": "561",
-                        "type": "collection_items"
-                    },
-                    {
-                        "id": "562",
-                        "type": "collection_items"
-                    },
-                    {
-                        "id": "563",
-                        "type": "collection_items"
-                    },
-                    {
-                        "id": "564",
-                        "type": "collection_items"
-                    }
-                ]
-            }
-        },
-        "links": {
-            "self": "/collections/1121",
-            "items": "/collections/1121/items"
-        },
-        "meta": {
-            "created": "2020-05-28T13:03:28.000Z",
-            "modified": "2020-05-28T13:03:32.000Z",
-            "api_version": "0.3",
-            "uuid": "8bfca980-8311-0138-b378-0800278a9619",
-            "base_url": "http://localhost:3000"
+            "access": "edit"
+          }
+        ]
+      },
+      "discussion_links": [
+
+      ],
+      "title": "A Maximally Patched Collection",
+      "license": "CC-BY-4.0",
+      "description": "A collection of very interesting things",
+      "tags": [
+        "tag1",
+        "tag2",
+        "tag3"
+      ],
+      "created_at": "2022-05-13T14:40:03.000Z",
+      "updated_at": "2022-05-13T14:40:03.000Z",
+      "creators": [
+        {
+          "profile": "/people/919",
+          "family_name": "Last",
+          "given_name": "Person771",
+          "affiliation": "An Institution: 933",
+          "orcid": null
         }
+      ],
+      "other_creators": "John Smith, Jane Smith"
     },
-    "included": [
-        {
-            "id": "559",
-            "type": "collection_items",
-            "attributes": {
-                "comment": "Readme!",
-                "order": 1
-            },
-            "relationships": {
-                "collection": {
-                    "data": {
-                        "id": "1121",
-                        "type": "collections"
-                    }
-                },
-                "asset": {
-                    "data": {
-                        "id": "1196",
-                        "type": "documents"
-                    }
-                }
-            },
-            "links": {
-                "self": "/collections/1121/items/559"
-            },
-            "meta": {
-                "created": "2020-05-28T13:03:28.000Z",
-                "modified": "2020-05-28T13:03:28.000Z",
-                "api_version": "0.3"
-            }
-        },
-        {
-            "id": "560",
-            "type": "collection_items",
-            "attributes": {
-                "comment": "Secret info",
-                "order": 2
-            },
-            "relationships": {
-                "collection": {
-                    "data": {
-                        "id": "1121",
-                        "type": "collections"
-                    }
-                },
-                "asset": {
-                    "data": {
-                        "id": "1197",
-                        "type": "documents"
-                    }
-                }
-            },
-            "links": {
-                "self": "/collections/1121/items/560"
-            },
-            "meta": {
-                "created": "2020-05-28T13:03:29.000Z",
-                "modified": "2020-05-28T13:03:29.000Z",
-                "api_version": "0.3"
-            }
-        },
-        {
-            "id": "561",
-            "type": "collection_items",
-            "attributes": {
-                "comment": "The protocol",
-                "order": 3
-            },
-            "relationships": {
-                "collection": {
-                    "data": {
-                        "id": "1121",
-                        "type": "collections"
-                    }
-                },
-                "asset": {
-                    "data": {
-                        "id": "1055250677",
-                        "type": "sops"
-                    }
-                }
-            },
-            "links": {
-                "self": "/collections/1121/items/561"
-            },
-            "meta": {
-                "created": "2020-05-28T13:03:29.000Z",
-                "modified": "2020-05-28T13:03:29.000Z",
-                "api_version": "0.3"
-            }
-        },
-        {
-            "id": "562",
-            "type": "collection_items",
-            "attributes": {
-                "comment": "Data 1",
-                "order": 4
-            },
-            "relationships": {
-                "collection": {
-                    "data": {
-                        "id": "1121",
-                        "type": "collections"
-                    }
-                },
-                "asset": {
-                    "data": {
-                        "id": "883654352",
-                        "type": "data_files"
-                    }
-                }
-            },
-            "links": {
-                "self": "/collections/1121/items/562"
-            },
-            "meta": {
-                "created": "2020-05-28T13:03:30.000Z",
-                "modified": "2020-05-28T13:03:30.000Z",
-                "api_version": "0.3"
-            }
-        },
-        {
-            "id": "563",
-            "type": "collection_items",
-            "attributes": {
-                "comment": "Data 2",
-                "order": 5
-            },
-            "relationships": {
-                "collection": {
-                    "data": {
-                        "id": "1121",
-                        "type": "collections"
-                    }
-                },
-                "asset": {
-                    "data": {
-                        "id": "883654353",
-                        "type": "data_files"
-                    }
-                }
-            },
-            "links": {
-                "self": "/collections/1121/items/563"
-            },
-            "meta": {
-                "created": "2020-05-28T13:03:31.000Z",
-                "modified": "2020-05-28T13:03:31.000Z",
-                "api_version": "0.3"
-            }
-        },
-        {
-            "id": "564",
-            "type": "collection_items",
-            "attributes": {
-                "comment": "Bad data",
-                "order": 6
-            },
-            "relationships": {
-                "collection": {
-                    "data": {
-                        "id": "1121",
-                        "type": "collections"
-                    }
-                },
-                "asset": {
-                    "data": {
-                        "id": "883654354",
-                        "type": "data_files"
-                    }
-                }
-            },
-            "links": {
-                "self": "/collections/1121/items/564"
-            },
-            "meta": {
-                "created": "2020-05-28T13:03:31.000Z",
-                "modified": "2020-05-28T13:03:31.000Z",
-                "api_version": "0.3"
-            }
-        }
-    ],
-    "jsonapi": {
-        "version": "1.0"
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "919",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "918",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "918",
+            "type": "people"
+          },
+          {
+            "id": "919",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "997",
+            "type": "projects"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+
+        ]
+      },
+      "items": {
+        "data": [
+
+        ]
+      }
+    },
+    "links": {
+      "self": "/collections/15",
+      "items": "/collections/15/items"
+    },
+    "meta": {
+      "created": "2022-05-13T14:40:03.000Z",
+      "modified": "2022-05-13T14:40:03.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "7f77d930-b4f8-013a-0f2b-0a81884ed284"
     }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
 }

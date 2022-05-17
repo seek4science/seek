@@ -12,7 +12,6 @@
 //= require attribution
 //= require creators
 //= require validation
-//= require studied_factor
 //= require parseuri
 //= require tabber-minimized
 //= require detect_browser
@@ -59,5 +58,8 @@
 //= require i18n/translations
 //= require_tree ./templates
 //= require simplemde-markdown-editor-1.11.2/simplemde.min
+//= require sortable.min
 //= require rich_text_edit
 //= require admin
+//= require templates
+//= require git

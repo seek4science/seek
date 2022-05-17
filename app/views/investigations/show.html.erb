@@ -1,42 +1,33 @@
-<ul class="nav nav-tabs">
-    <li class="active ">
-        <a data-toggle="tab" href="#details"><i class="glyphicon glyphicon-list-alt"></i> Details</a>
-    </li>
-    <li>
-        <a data-toggle="tab" href="#related-items">
-            <i class="glyphicon glyphicon-th-list"></i> Related items
-        </a>
-    </li>
-</ul>
+<%= render partial: 'general/item_title', locals: { item: @investigation, buttons_partial: 'investigations/buttons' } %>
+
+<%= render partial: 'general/show_page_tab_definitions' %>
+
 <div class="tab-content">
-    <div id="details" class="tab-pane fade in active">
-      <%= render :partial => "general/item_title",:locals=>{:item=>@investigation, :buttons_partial => 'investigations/buttons'} %>
+  <%= tab_pane('overview') do %>
+    <div class="row">
+      <div class="col-md-9 col-sm-8 box_about_actor">
+        <%= item_description @investigation.description -%>
 
-      <div class="row">
-        <div class="col-md-9 col-sm-8 box_about_actor">
-          <%= item_description @investigation.description -%>
-
-          <div class="row">
-            <div class="col-md-6">
-              <%= persistent_resource_id(@investigation) %>
-              <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @investigation}  %>
-            </div>
+        <div class="row">
+          <div class="col-md-6">
+            <%= persistent_resource_id(@investigation) %>
+            <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @investigation}  %>
           </div>
-	  <p id="position">
-      		<b><%= "Investigation position" %>: </b>
-      		<%= @investigation.position %>
-    	  </p>	
-          <%= render partial: 'custom_metadata/custom_metadata_attribute_values', locals: {resource: @investigation} %>
-          <%= render partial: 'general/isa_graph', locals: { root_item: @investigation, options: { depth: 4 } } -%>
         </div>
-        <div class="col-md-3 col-sm-4">
-          <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @investigation } %>
-        </div>
+        <p id="position">
+          <b><%= "Investigation position" %>: </b>
+          <%= @investigation.position %>
+        </p>
+        <%= render partial: 'custom_metadata/custom_metadata_attribute_values', locals: {resource: @investigation} %>
+        <%= render partial: 'general/isa_graph', locals: { root_item: @investigation, options: { depth: 4 } } -%>
+      </div>
+      <div class="col-md-3 col-sm-4">
+        <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @investigation } %>
       </div>
     </div>
+  <% end %>
 
-    <div id="related-items" class="tab-pane fade">
-      <%= render :partial=>"general/items_related_to",:object => @investigation -%>
-    </div>
-    
+  <%= tab_pane('related-items') do %>
+    <%= render partial: 'general/items_related_to', object: @investigation %>
+  <% end %>
 </div>

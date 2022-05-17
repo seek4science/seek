@@ -20,7 +20,7 @@ module Seek
     end
 
     def show
-      asset = determine_asset_from_controller
+      asset = resource_for_controller
       # store timestamp of the previous last usage
       @last_used_before_now = asset.last_used_at
 
@@ -33,6 +33,8 @@ module Seek
         format.xml
         format.rdf { render template: 'rdf/show' }
         format.json { render json: asset, scope: { requested_version: params[:version] }, include: json_api_include_param }
+        format.datacite_xml { render xml: asset_version.datacite_metadata.to_s } if asset_version.respond_to?(:datacite_metadata)
+        format.jsonld { render json: Seek::BioSchema::Serializer.new(asset_version).json_representation, adapter: :attributes } if asset_version.respond_to?(:to_schema_ld)
       end
     end
 
@@ -62,9 +64,9 @@ module Seek
 
     # handles update for manage properties, the action for the manage form
     def manage_update
-      item = determine_asset_from_controller
+      item = resource_for_controller
       raise 'shouldnt get this far without manage rights' unless item.can_manage?
-      item.update_attributes(params_for_controller)
+      item.update(params_for_controller)
       update_sharing_policies item
       respond_to do |format|
         if item.save
@@ -85,7 +87,7 @@ module Seek
     def create
       item = initialize_asset
 
-      if handle_upload_data
+      if item.is_git_versioned? || handle_upload_data
         create_asset_and_respond(item)
       else
         handle_upload_data_failure
@@ -149,7 +151,7 @@ module Seek
       item = class_for_controller_name.find(params[:id])
       version = item.versions.find_by(version: params[:version])
 
-      if version&.update_attributes(edit_version_params(version))
+      if version&.update(edit_version_params(version))
         flash[:notice] = "Version #{params[:version]} was successfully updated."
       else
         flash[:error] = "Unable to update version #{params[:version]}. Please try again."

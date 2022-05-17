@@ -66,6 +66,13 @@ module Seek
             end
           },
 
+          edam_operations: proc {|value|
+            value.collect{|v| v[:identifier]}.join(', ')
+          },
+          edam_topics: proc {|value|
+            value.collect{|v| v[:identifier]}.join(', ')
+          },
+
           funding_codes: proc { |value|
             if value
               value.join(', ')
@@ -91,7 +98,7 @@ module Seek
           },
 
           data_file_ids: proc { |value|
-            value.map { |i| { 'asset_id' => i }.with_indifferent_access }
+            value.map { |i| { asset_id: i }.with_indifferent_access }
           },
 
           assay_ids: proc { |value|
@@ -133,8 +140,9 @@ module Seek
           assay_ids: :assay_assets_attributes,
           workflow_class: :workflow_class_id,
           discussion_links: :discussion_links_attributes,
-          repository_standard: :repository_standard_attributes,
-          creators: :api_assets_creators
+          template: :template_attributes,
+          creators: :api_assets_creators,
+          administrator_ids: :programme_administrator_ids
       }.freeze
 
       # Parameters to "elevate" out of params[bla] to the top-level.

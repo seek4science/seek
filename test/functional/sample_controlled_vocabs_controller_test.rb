@@ -32,7 +32,6 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
     end
   end
 
-
   test 'login required for new' do
     get :new
     assert_response :redirect
@@ -230,6 +229,105 @@ class SampleControlledVocabsControllerTest < ActionController::TestCase
       get :new
       assert_redirected_to :root
       refute_nil flash[:error]
+    end
+  end
+
+  test 'edit ontology based cv should have non editable terms' do
+    person = Factory(:person)
+    login_as(person)
+    cv = Factory(:ontology_sample_controlled_vocab)
+    assert cv.ontology_based?
+    get :edit, params:{id: cv.id}
+    assert_response :success
+
+    assert_select 'table#new-terms' do
+      assert_select 'tr.sample-cv-term input[type=text]', count:cv.sample_controlled_vocab_terms.length * 3 do |input|
+        assert input.attr('readonly').present?
+      end
+    end
+
+    assert_select('a#add-term') do |button|
+      assert button.attr('disabled').present?
+    end
+
+  end
+
+  test 'edit simple, non ontology cv should have editable terms' do
+    person = Factory(:person)
+    login_as(person)
+    cv = Factory(:apples_sample_controlled_vocab)
+    refute cv.ontology_based?
+    get :edit, params:{id: cv.id}
+    assert_response :success
+
+    assert_select 'table#new-terms' do
+      assert_select 'tr.sample-cv-term input[type=text]', count:cv.sample_controlled_vocab_terms.length * 3 do |input|
+        assert input.attr('readonly').nil?
+      end
+    end
+
+    assert_select('a#add-term') do |button|
+      assert button.attr('disabled').nil?
+    end
+  end
+
+  test 'fetch ols terms with root term included' do
+    person = Factory(:person)
+    login_as(person)
+    VCR.use_cassette('ols/fetch_obo_cell_projection') do
+      get :fetch_ols_terms, params: { source_ontology_id: 'ro',
+                                      root_uri: 'http://purl.obolibrary.org/obo/GO_0042995',
+                                      include_root_term: '1' }, format: :json
+
+      assert_response :success
+      res = JSON.parse(response.body)
+      assert_equal 4, res.length
+      iris = res.map { |term| term['iri'] }
+      assert_includes iris, 'http://purl.obolibrary.org/obo/GO_0043005'
+      assert_includes iris, 'http://purl.obolibrary.org/obo/GO_0042995'
+    end
+  end
+
+  test 'fetch ols terms without root term included' do
+    person = Factory(:person)
+    login_as(person)
+    VCR.use_cassette('ols/fetch_obo_cell_projection') do
+      get :fetch_ols_terms, params: { source_ontology_id: 'ro',
+                                      root_uri: 'http://purl.obolibrary.org/obo/GO_0042995' }, format: :json
+
+      assert_response :success
+      res = JSON.parse(response.body)
+      assert_equal 3, res.length
+      iris = res.map { |term| term['iri'] }
+      refute_includes iris, 'http://purl.obolibrary.org/obo/GO_0042995'
+      assert_includes iris, 'http://purl.obolibrary.org/obo/GO_0043005'
+    end
+  end
+
+  test 'fetch ols terms with wrong URI' do
+    person = Factory(:person)
+    login_as(person)
+    VCR.use_cassette('ols/fetch_obo_bad_term') do
+      get :fetch_ols_terms, params: { source_ontology_id: 'ro',
+                                      root_uri: 'http://purl.obolibrary.org/obo/banana',
+                                      include_root_term: '1' }, format: :json
+
+      assert_response :unprocessable_entity
+      res = JSON.parse(response.body)
+      assert_equal '404 Not Found', res.dig('errors', 0, 'details')
+    end
+  end
+
+  test 'can access typeahead with samples disabled' do
+    person = Factory(:person)
+    login_as(person)
+    scv = Factory(:edam_topics_controlled_vocab)
+    with_config_value(:samples_enabled, false) do
+      get :typeahead, params: { format: :json, query: 'sam', scv_id:scv.id }
+      assert_response :success
+      res = JSON.parse(response.body)
+      assert_equal 1, res.length
+      assert_equal 'Sample collections', res.first['name']
     end
   end
 end

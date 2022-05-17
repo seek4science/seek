@@ -1,14 +1,7 @@
 class SkeletonSerializer < ActiveModel::Serializer
-  include Rails.application.routes.url_helpers
+  include Seek::Util.routes
 
   attribute :title
 
-  def self_link
-    polymorphic_path(object)
-  end
-
-  def _links
-    { self: self_link }
-  end
-
+  link(:self) { polymorphic_path(object) }
 end

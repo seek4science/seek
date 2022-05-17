@@ -8,30 +8,34 @@ module Ga4gh
         include ::RoCrateHandling
 
         def show
-          respond_with(@tool_version, adapter: :attributes)
+          respond_with(@tool_version, adapter: :attributes, root: '')
         end
 
         def index
           @tool_versions = @tool.versions
-          respond_with(@tool_versions, adapter: :attributes)
+          respond_with(@tool_versions, adapter: :attributes, root: '')
         end
 
         def descriptor
           @tool.ro_crate do |crate|
             if params[:relative_path].present?
+              path = params[:relative_path]
               entry = crate.find_entry(params[:relative_path])
             else
+              path = crate.main_workflow&.id
               entry = crate.main_workflow&.source
             end
 
             return trs_error(404, "No descriptor found#{ " at: #{params[:relative_path]}" if params[:relative_path].present?}") unless entry
 
             if params[:type].downcase.start_with?('plain_')
-              render plain: (entry.remote? ? entry.uri : entry.read)
-            else
-              @file_wrapper = FileWrapper.new(entry)
               respond_to do |format|
-                format.json { render json: @file_wrapper, adapter: :attributes }
+                format.all { render plain: (entry.remote? ? entry.uri : entry.read) }
+              end
+            else
+              @file_wrapper = FileWrapper.new(entry, path: path, tool_version: @tool_version)
+              respond_to do |format|
+                format.json { render json: @file_wrapper, adapter: :attributes, root: '' }
                 format.text { render plain: (entry.remote? ? entry.uri : entry.read) }
               end
             end
@@ -44,7 +48,7 @@ module Ga4gh
               FileWrapper.new(entry) if path.match?(/\Atests?\/.*\.json/)
             end.compact
 
-            respond_with(file_wrappers, adapter: :attributes)
+            respond_with(file_wrappers, adapter: :attributes, root: nil)
           end
         end
 
@@ -62,7 +66,7 @@ module Ga4gh
             return trs_error(404, "No container file ('./Dockerfile') found for this tool version") unless entry
             @file_wrapper = FileWrapper.new(entry)
             respond_to do |format|
-              format.json { render json: [@file_wrapper], adapter: :attributes }
+              format.json { render json: [@file_wrapper], adapter: :attributes, root: '' }
               format.text { render plain: (entry.remote? ? entry.uri : entry.read) } # What to do if multiple container files? Maybe concat them all..
             end
           end

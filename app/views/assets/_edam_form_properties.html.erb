@@ -1,0 +1,10 @@
+<% return unless resource.supports_edam_annotations? %>
+
+<%= render :partial => "assets/edam_form_property", :locals => {:resource => resource, :subtree => "topics"} -%>
+
+<%= render :partial => "assets/edam_form_property", :locals => {:resource => resource, :subtree => "operations"} -%>
+
+<%= render :partial => "assets/edam_form_property", :locals => {:resource => resource, :subtree => "data"} -%>
+
+<%= render :partial => "assets/edam_form_property", :locals => {:resource => resource, :subtree => "formats"} -%>
+

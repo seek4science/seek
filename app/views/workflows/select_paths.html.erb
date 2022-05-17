@@ -1,0 +1,45 @@
+<h1>New <%= t('workflow') %><%= ' Version' if @workflow.persisted? %></h1>
+
+<%= form_tag(polymorphic_path(@workflow.persisted? ? [:create_version_from_git, @workflow] : [:create_from_git, :workflows])) do %>
+  <%= fields_for('workflow[git_version_attributes]', @workflow.git_version) do |f| %>
+    <% if false %>
+      <h2>Version Metadata</h2>
+
+      <% if @workflow.git_version.git_repository.remote? %>
+        <div class="form-group">
+          <label>Git Info</label>
+          <p class="form-control-static">
+            <%= @workflow.git_version.git_repository.remote %><br/>
+            <% unless @workflow.git_version.ref.blank? %>
+              <code><%= git_target_icon(@workflow.git_version.ref) %><%= @workflow.git_version.ref.split('/').last %></code> @
+            <% end %>
+            <code><%= @workflow.git_version.commit&.first(7) %></code>
+          </p>
+        </div>
+      <% end %>
+
+      <div class="form-group">
+        <label>Version Name</label>
+        <%= f.text_field(:name, class: 'form-control') %>
+        <p class="help-block">A name for this version of the workflow.</p>
+      </div>
+
+      <div class="form-group">
+        <label>Version Description</label>
+        <%= f.text_area(:comment, class: 'form-control') %>
+        <p class="help-block">An optional description for this specific version of the workflow.</p>
+      </div>
+    <% end %>
+
+    <%= f.hidden_field :name %>
+    <%= f.hidden_field :comment %>
+    <%= f.hidden_field :git_repository_id %>
+    <%= f.hidden_field :ref %>
+    <%= f.hidden_field :commit %>
+  <% end %>
+
+  <h2>Files</h2>
+  <%= render partial: 'workflows/select_paths', locals: { workflow: @workflow, git_version: @workflow.git_version } %>
+
+  <%= submit_tag('Continue', class: 'btn btn-primary') %>
+<% end %>

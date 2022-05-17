@@ -23,11 +23,15 @@ module Ga4gh
         end
 
         def versions
-          super.map { |v| ToolVersion.new(self, v) }
+          all_versions.map { |v| ToolVersion.new(self, v) }
         end
 
         def toolclass
           ToolClass::WORKFLOW
+        end
+
+        def author
+          authors
         end
       end
     end

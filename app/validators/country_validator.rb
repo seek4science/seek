@@ -6,7 +6,7 @@ class CountryValidator < ActiveModel::EachValidator
       if (CountryCodes.country(value))
         record.country = value
       else
-        record.errors[attribute] << (options[:message] || "isn't a valid country or code")
+        record.errors.add(attribute, options[:message] || "isn't a valid country or code")
       end
   end
 

@@ -1,10 +1,13 @@
 require 'seek/custom_exception'
+require 'zip'
+require 'securerandom'
+require 'json'
 
 class ProjectsController < ApplicationController
   include Seek::IndexPager
   include CommonSweepers
   include Seek::DestroyHandling
-  include ApiHelper
+  include Seek::Projects::Population
 
   before_action :login_required, only: [:guided_join, :guided_create, :request_join, :request_create,
                                         :administer_join_request, :respond_join_request,
@@ -12,14 +15,18 @@ class ProjectsController < ApplicationController
                                         :project_join_requests, :project_creation_requests, :typeahead]
 
   before_action :find_requested_item, only: %i[show admin edit update destroy asset_report admin_members
+                                               populate populate_from_spreadsheet
                                                admin_member_roles update_members storage_report
                                                overview administer_join_request respond_join_request]
+
+  before_action :has_spreadsheets, only: %i[:populate populate_from_spreadsheet]
+
   before_action :find_assets, only: [:index]
   before_action :auth_to_create, only: %i[new create,:administer_create_project_request, :respond_create_project_request]
-  before_action :is_user_admin_auth, only: %i[manage destroy]
+  before_action :is_user_admin_auth, only: %i[destroy]
   before_action :editable_by_user, only: %i[edit update]
   before_action :check_investigations_are_for_this_project, only: %i[update]
-  before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles update_members storage_report administer_join_request respond_join_request]
+  before_action :administerable_by_user, only: %i[admin admin_members admin_member_roles update_members storage_report administer_join_request respond_join_request populate populate_from_spreadsheet]
 
   before_action :member_of_this_project, only: [:asset_report], unless: :admin_logged_in?
 
@@ -89,7 +96,7 @@ class ProjectsController < ApplicationController
   end
 
   def respond_join_request
-    sender = @message_log.sender
+    requester = @message_log.sender
     validation_error_msg=nil;
 
     if params[:accept_request]=='1'
@@ -107,17 +114,31 @@ class ProjectsController < ApplicationController
       end
 
       unless validation_error_msg
-        sender.add_to_project_and_institution(@project,@institution)
-        sender.save!
-        Mailer.notify_user_projects_assigned(sender,[@project]).deliver_later
-        flash[:notice]="Request accepted and #{sender.name} added to #{t('project')} and notified"
+        requester.add_to_project_and_institution(@project,@institution)
+        requester.save!
+        if Seek::Config.email_enabled
+          Mailer.notify_user_projects_assigned(requester,[@project]).deliver_later
+          Mailer.notify_admins_project_join_accepted(current_person, requester, @project).deliver_later
+        end
+        flash[:notice] = "Request accepted and #{requester.name} added to #{t('project')}"
+        flash[:notice] += " and notified" if Seek::Config.email_enabled
         @message_log.respond('Accepted')
       end
     else
-      comments = params['reject_details']
-      @message_log.respond(comments)
-      Mailer.join_project_rejected(sender,@project,comments).deliver_later
-      flash[:notice]="Request rejected and #{sender.name} has been notified"
+      if params[:delete_request] == '1'
+        @message_log.destroy
+        flash[:notice]="#{t('project')} join request deleted"
+      else
+        comments = params[:reject_details]
+        @message_log.respond(comments)
+        if Seek::Config.email_enabled
+          Mailer.join_project_rejected(requester,@project,comments).deliver_later
+          Mailer.notify_admins_project_join_rejected(current_person, requester, @project, comments).deliver_later
+          flash[:notice]="Request rejected and #{requester.name} has been notified"
+        else
+          flash[:notice]="Request rejected"
+        end
+      end
     end
 
     if validation_error_msg
@@ -132,7 +153,6 @@ class ProjectsController < ApplicationController
   def request_join
     @projects = params[:projects].split(',').collect{|id| Project.find(id)}
     raise 'no projects defined' if @projects.empty?
-    raise 'email is disabled' unless Seek::Config.email_enabled
     @institution = Institution.find_by_id(params[:institution][:id])
     if @institution.nil?
       inst_params = params.require(:institution).permit([:id, :title, :web_page, :city, :country])
@@ -143,10 +163,9 @@ class ProjectsController < ApplicationController
     @projects.each do |project|
       if project.allow_request_membership? # protects against malicious spamming
         log = ProjectMembershipMessageLog.log_request(sender:current_user.person, project:project, institution:@institution, comments:@comments)
-        Mailer.request_join_project(current_user, project, @institution.to_json, @comments, log).deliver_later
+        Mailer.request_join_project(current_user, project, @institution.to_json, @comments, log).deliver_later if Seek::Config.email_enabled
       end
     end
-
     flash.now[:notice]="Thank you, your request to join has been sent"
     respond_to do |format|
       format.html
@@ -172,8 +191,9 @@ class ProjectsController < ApplicationController
         log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
       elsif @programme.site_managed?
         log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
-        Mailer.request_create_project_for_programme(current_user, @programme, @project.to_json, @institution.to_json, log).deliver_later
-        Mailer.request_create_project_for_programme_admins(current_user, @programme, @project.to_json, @institution.to_json, log).deliver_later
+        if Seek::Config.email_enabled
+          Mailer.request_create_project_for_programme(current_user, @programme, @project.to_json, @institution.to_json, log).deliver_later
+        end
         flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
       else
         raise 'Invalid Programme'
@@ -183,7 +203,7 @@ class ProjectsController < ApplicationController
       prog_params = params.require(:programme).permit([:title])
       @programme = Programme.new(prog_params)
       log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
-      unless User.admin_logged_in?
+      if  Seek::Config.email_enabled && !User.admin_logged_in?
         Mailer.request_create_project_and_programme(current_user, @programme.to_json, @project.to_json, @institution.to_json, log).deliver_later
       end
       flash.now[:notice] = "Thank you, your request for a new #{t('programme')} and #{t('project')} has been sent"
@@ -191,7 +211,7 @@ class ProjectsController < ApplicationController
     elsif !Seek::ProjectFormProgrammeOptions.show_programme_box?
       @programme=nil
       log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
-      unless User.admin_logged_in?
+      if Seek::Config.email_enabled && !User.admin_logged_in?
         Mailer.request_create_project(current_user, @project.to_json, @institution.to_json, log).deliver_later
       end
       flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
@@ -260,19 +280,17 @@ class ProjectsController < ApplicationController
     end
   end
 
+  
   # GET /projects/1
-  # GET /projects/1.xml
   def show
     respond_to do |format|
       format.html { render(params[:only_content] ? { layout: false } : {})} # show.html.erb
       format.rdf { render template: 'rdf/show' }
-      format.xml
       format.json { render json: @project, include: [params[:include]] }
     end
   end
 
   # GET /projects/new
-  # GET /projects/new.xml
   def new
     @project = Project.new
 
@@ -335,7 +353,6 @@ class ProjectsController < ApplicationController
   end
 
   # POST /projects
-  # POST /projects.xml
   def create
     @project = Project.new
     @project.assign_attributes(project_params)
@@ -346,9 +363,11 @@ class ProjectsController < ApplicationController
         if params[:default_member] && params[:default_member][:add_to_project] && params[:default_member][:add_to_project] == '1'
           institution = Institution.find(params[:default_member][:institution_id])
           person = current_person
-          person.add_to_project_and_institution(@project, institution)
-          person.is_project_administrator = true, @project
-          disable_authorization_checks { person.save }
+          disable_authorization_checks do
+            person.add_to_project_and_institution(@project, institution)
+            person.is_project_administrator = true, @project
+            person.save!
+          end
         end
         members = params[:project][:members]
         if members.nil?
@@ -362,7 +381,6 @@ class ProjectsController < ApplicationController
             person.save!
           end
         }
-        update_administrative_roles
         flash[:notice] = "#{t('project')} was successfully created."
         format.html { redirect_to(@project) }
         # format.json {render json: @project, adapter: :json, status: 200 }
@@ -382,17 +400,18 @@ class ProjectsController < ApplicationController
   end
 
   # PUT /projects/1   , polymorphic: [:organism]
-  # PUT /projects/1.xml
   def update
-    if params[:project][:ordered_investigation_ids]
+    if params[:project]&.[](:ordered_investigation_ids)
       a1 = params[:project][:ordered_investigation_ids]
       a1.permit!
       pos = 0
       a1.each_pair do |key, value |
-        investigation = Investigation.find (value)
-        investigation.position = pos
-        pos += 1
-        investigation.save!
+        disable_authorization_checks {
+          investigation = Investigation.find (value)
+          investigation.position = pos
+          pos += 1
+          investigation.save!
+        }
       end
       respond_to do |format|
         format.html { redirect_to(@project) }
@@ -406,7 +425,7 @@ class ProjectsController < ApplicationController
 
     begin
       respond_to do |format|
-        if @project.update_attributes(project_params)
+        if @project.update(project_params)
           if Seek::Config.email_enabled && !@project.can_manage?(current_user)
             ProjectChangedEmailJob.new(@project).queue_job
           end
@@ -414,23 +433,13 @@ class ProjectsController < ApplicationController
           @project.reload
           flash[:notice] = "#{t('project')} was successfully updated."
           format.html { redirect_to(@project) }
-          format.xml  { head :ok }
           format.json { render json: @project, include: [params[:include]] }
         #            format.json {render json: @project, adapter: :json, status: 200 }
         else
           format.html { render action: 'edit' }
-          format.xml  { render xml: @project.errors, status: :unprocessable_entity }
           format.json { render json: json_api_errors(@project), status: :unprocessable_entity }
         end
       end
-    end
-  end
-
-  def manage
-    @projects = Project.all
-    respond_to do |format|
-      format.html
-      format.xml { render xml: @projects }
     end
   end
 
@@ -462,6 +471,17 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def populate
+    respond_with(@project)
+  end
+
+  def populate_from_spreadsheet
+    populate_from_spreadsheet_impl
+    respond_with(@project) do |format|
+      format.html { redirect_to project_path(@project) }
+    end
+  end
+  
   def admin_members
     respond_with(@project)
   end
@@ -494,7 +514,7 @@ class ProjectsController < ApplicationController
 
   def update_administrative_roles
     unless params[:project].blank?
-      @project.update_attributes(project_role_params)
+      @project.update(project_role_params)
     end
   end
 
@@ -576,8 +596,13 @@ class ProjectsController < ApplicationController
           flash[:notice]="#{t('project')} created"
         else
           @message_log.respond('Accepted')
-          flash[:notice]="Request accepted and #{requester.name} added to #{t('project')} and notified"
-          Mailer.notify_user_projects_assigned(requester,[@project]).deliver_later
+          if Seek::Config.email_enabled
+            flash[:notice]="Request accepted and #{requester.name} added to #{t('project')} and notified"
+            Mailer.notify_user_projects_assigned(requester,[@project]).deliver_later
+            Mailer.notify_admins_project_creation_accepted(current_person, requester, @project).deliver_later
+          else
+            flash[:notice]="Request accepted and #{requester.name} added to #{t('project')}"
+          end
         end
 
         redirect_to(@project)
@@ -587,15 +612,21 @@ class ProjectsController < ApplicationController
       end
 
     else
-      if @message_log.sent_by_self?
+      if @message_log.sent_by_self? || params['delete_request'] == '1'
         @message_log.destroy
         flash[:notice]="#{t('project')} creation cancelled"
       else
         comments = params['reject_details']
         @message_log.respond(comments)
         project_name = JSON.parse(@message_log.details)['project']['title']
-        Mailer.create_project_rejected(requester,project_name,comments).deliver_later
-        flash[:notice] = "Request rejected and #{requester.name} has been notified"
+        if Seek::Config.email_enabled
+          Mailer.create_project_rejected(requester,project_name,comments).deliver_later
+          Mailer.notify_admins_project_creation_rejected(current_person, requester, project_name, @programme&.to_json, comments).deliver_later
+          flash[:notice] = "Request rejected and #{requester.name} has been notified"
+        else
+          flash[:notice] = "Request rejected"
+        end
+
       end
 
       redirect_to :root
@@ -620,24 +651,25 @@ class ProjectsController < ApplicationController
   private
 
   def project_role_params
-    params[:project].keys.each do |k|
-      unless params[:project][k].nil?
-        params[:project][k] = params[:project][k].split(',')
+    permitted_roles = [:project_administrator_ids, :asset_gatekeeper_ids, :asset_housekeeper_ids, :pal_ids]
+    permitted_roles.each do |k|
+      if params[:project][k].present?
+        if params[:project][k].is_a?(String)
+          params[:project][k] = params[:project][k].split(',')
+        end
       else
         params[:project][k] = []
       end
     end
 
-    params.require(:project).permit({ project_administrator_ids: [] },
-                                    { asset_gatekeeper_ids: [] },
-                                    { asset_housekeeper_ids: [] },
-                                    pal_ids: [])
+    params.require(:project).permit(*permitted_roles.map { |r| { r => [] }})
   end
 
   def project_params
     permitted_params = [:title, :web_page, :wiki_page, :description, { organism_ids: [] }, :parent_id, :start_date,
-                        :end_date, :funding_codes, { human_disease_ids: [] },
-                        discussion_links_attributes:[:id, :url, :label, :_destroy] ]
+                        :end_date,
+                        :funding_codes, { human_disease_ids: [] },
+                        discussion_links_attributes:[:id, :url, :label, :_destroy]]
 
     if User.admin_logged_in?
       permitted_params += [:site_root_uri, :site_username, :site_password, :nels_enabled]
@@ -645,8 +677,7 @@ class ProjectsController < ApplicationController
 
     if @project.new_record? || @project.can_manage?(current_user)
       permitted_params += [:use_default_policy, :default_policy, :default_license,
-                           { members: [:person_id, :institution_id] }, { project_administrator_ids: [] },
-                           { asset_gatekeeper_ids: [] }, { asset_housekeeper_ids: [] }, { pal_ids: [] }]
+                           { members: [:person_id, :institution_id] }]
     end
 
     if params[:project][:programme_id].present?
@@ -709,7 +740,7 @@ class ProjectsController < ApplicationController
       GroupMembership.where(id: params[:memberships_to_flag].keys).includes(:work_group).each do |membership|
         if membership.work_group.project_id == @project.id # Prevent modification of other projects' memberships
           left_at = params[:memberships_to_flag][membership.id.to_s][:time_left_at]
-          membership.update_attributes(time_left_at: left_at)
+          membership.update(time_left_at: left_at)
         end
         member = Person.find(membership.person_id)
         Rails.cache.delete_matched("rli_title_#{member.cache_key}_.*")
@@ -723,6 +754,10 @@ class ProjectsController < ApplicationController
       error('Insufficient privileges', 'is invalid (insufficient_privileges)', :forbidden)
       return false
     end
+  end
+
+  def has_spreadsheets
+    return !@project.spreadsheets.empty?
   end
 
   def member_of_this_project
@@ -764,7 +799,7 @@ class ProjectsController < ApplicationController
     error_msg ||= "message log not found" unless @message_log
     error_msg ||= ("incorrect type of message log" unless @message_log.project_creation_request?)
     error_msg ||= ("message has already been responded to" if @message_log.responded?)
-    
+
     if error_msg
       error(error_msg, error_msg)
       return false
@@ -782,7 +817,7 @@ class ProjectsController < ApplicationController
     if @institution.new_record?
       # override with existing institution if already exists with same title, it could have been created since the request was made
       @institution = Institution.find_by(title: @institution.title) if Institution.find_by(title: @institution.title)
-    end 
+    end
   end
 
   # check programme permissions for responding to a MessageLog

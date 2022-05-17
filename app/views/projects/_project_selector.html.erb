@@ -5,7 +5,7 @@
 
 <%
   allow_nil ||= false
-  allow_all ||= Seek::Config.is_virtualliver
+  allow_all ||= false
   resource ||= nil
 
   selected_projects = resource ? resource.projects : []
@@ -45,7 +45,7 @@
         association association_ids= methods, which reject 'blank' values automatically.%>
       <%= hidden_field_tag field_name, '' %>
       <div class="box_editing_inner">
-        <ul class="related_asset_list">
+        <ul class="associations-list">
           <span v-if="selected.length == 0" class="none_text">None</span>
           <li class="association-list-item" v-for="(project, index) in selected">
             <span :title="project.title">{{ project.title }}</span>
