@@ -33,18 +33,6 @@ class SinglePagesController < ApplicationController
     project_folders
   end
 
-  def ontology
-    begin
-      labels = (SampleControlledVocab.find(params[:sample_controlled_vocab_id])
-      &.sample_controlled_vocab_terms || [])
-      .where("LOWER(label) like :query", query: "%#{params[:query].downcase}%")
-      .select("label").limit(params[:limit] || 100)
-      render json: { status: :ok, data: labels }
-    rescue Exception => e
-      render json: {status: :unprocessable_entity, error: e.message } 
-    end
-  end
-
   def dynamic_table_data
     begin
       data = []
