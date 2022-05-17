@@ -66,20 +66,6 @@ module Ebi
       @ontology_keys ||= ontologies.map { |ontology| ontology.dig('config', 'namespace') }.sort.compact
     end
 
-    def fetch_ontology_reference(ontology_id)
-      Rails.cache.fetch("ebi_ontology_terms_#{ontology_id}") do
-        url = "https://www.ebi.ac.uk/ols/api/ontologies/#{ontology_id}"
-        json = JSON.parse(RestClient.get(url, accept: :json))
-        return { 
-          name: ontology_id,
-          file: json.dig("config", "id"),
-          version: json.dig("config", "version"),
-          description: json.dig("config", "title")
-        }
-      end
-    end
-
-
     private
 
     def double_url_encode(id)
