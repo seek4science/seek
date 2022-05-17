@@ -1,3 +1,5 @@
+<% environment.context_class.instance_eval { include Seek::Util.routes } %>
+
 const rowStatus = { new: "new", delete: "delete", update: "update", empty: "empty", noAction: "" };
 const dtErrClass = "row-error",
   dtSuccessClass = "row-success",
@@ -13,21 +15,11 @@ const defaultCols = [
   }
 ];
 
-// const setTagsInputListeners = () => {
-//   $j(".tt-input")
-//     .on("input", function () {
-//       $j(".dataTables_scrollBody").css({ "overflow": "visible" });
-//     })
-//     .on("blur", function () {
-//       $j(".dataTables_scrollBody").css({ "overflow": "scroll" });
-//     });
-// };
-
 const objectInput =
   "<td><input data-role='seek-objectsinput' data-tags-limit='3' " +
   "data-existing-objects='%EXISTING%' data-typeahead='true' " +
   "data-typeahead-query-url=%URL% /></td>";
-const typeaheadUrl = "/samples/typeahead?query=%QUERY&linked_sample_type_id=%LINKED%";
+const typeaheadUrl = '<%= typeahead_samples_path %>' + "?query=%QUERY&linked_sample_type_id=%LINKED%";
 
 const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).data()[0] = e.is(":checked"));
 
@@ -94,7 +86,6 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
       if (options.assayId) this.assayId = options.assayId;
       this.initHeader(columns);
       this.options = options;
-      // setTagsInputListeners();
     },
     initHeader: function (columns) {
       const requiredCols = columns.map((c, i) => c.required && i).filter((c) => c);
@@ -140,7 +131,6 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
       indexes.forEach((x) => (arr[x] = rowStatus.new));
       sampleLinkIndexes.forEach((x) => (arr[x] = []));
       this.table.row.add(arr).draw();
-      // setTagsInputListeners();
     },
     setAsDeleted: function () {
       const indexes = getStatusIndexes(this.table.settings()[0].aoColumns);
