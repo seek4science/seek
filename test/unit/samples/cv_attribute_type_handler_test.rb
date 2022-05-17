@@ -25,8 +25,8 @@ class CVAttributeTypeHandlerTest < ActiveSupport::TestCase
     end
   end
 
-  test 'bypass validation for ontology terms' do
-    ontology_vocab = Factory(:ontology_sample_controlled_vocab)
+  test 'bypass validation for controlled vocabs set as custom input' do
+    ontology_vocab = Factory(:ontology_sample_controlled_vocab, custom_input: true)
     handler = Seek::Samples::AttributeTypeHandlers::CVAttributeTypeHandler.new(controlled_vocab: ontology_vocab)
     assert handler.validate_value?('Parent')
     assert handler.validate_value?('custom value')

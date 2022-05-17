@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_04_13_092221) do
+ActiveRecord::Schema.define(version: 2022_05_17_085632) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string "action"
@@ -1754,6 +1754,7 @@ ActiveRecord::Schema.define(version: 2022_04_13_092221) do
     t.string "short_name"
     t.integer "template_id"
     t.string "key"
+    t.boolean "custom_input", default: false
   end
 
   create_table "sample_resource_links", force: :cascade do |t|
