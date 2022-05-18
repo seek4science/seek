@@ -3,6 +3,7 @@ module RawDisplay
 
   RAW_DISPLAY_FORMATS = %w(notebook markdown pdf)
 
+  # A method for rendering a given Git/Content Blob in an HTML "Viewer"
   def render_display(blob)
     if params[:display]
       renderer = Seek::Renderers.const_get("#{params[:display].classify}Renderer").new(blob)
@@ -13,7 +14,7 @@ module RawDisplay
     render html: renderer.render_standalone.html_safe, content_type: 'text/html', layout: renderer.layout
   end
 
-  def can_display?
+  def render_display?
     RAW_DISPLAY_FORMATS.include?(params[:display])
   end
 end

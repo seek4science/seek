@@ -16,10 +16,16 @@ module Seek
         ''
       end
 
+      # Render an HTML string that can be embedded in an existing view
+      def render_content
+        fail 'needs to be implemented'
+      end
+
       def can_render?
         fail 'needs to be implemented'
       end
 
+      # Render an entire HTML page
       def render_standalone
         render_template('content_blobs/view_content_frame',
                     { renderer: self },

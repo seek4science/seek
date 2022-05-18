@@ -88,7 +88,7 @@ class ContentBlobsController < ApplicationController
         format.html { handle_openbis_download(@asset, params[:perm_id]) }
       end
     else
-      if can_display?
+      if render_display?
         render_display(@content_blob)
       else
         disposition = params[:disposition] || 'attachment'
