@@ -239,7 +239,12 @@ module Seek
         notify_owner_of_publishing_request @notified_items
 
         @waiting_for_publish_items.each do |item|
-          ResourcePublishLog.add_log ResourcePublishLog::WAITING_FOR_APPROVAL, item
+          if item.is_rejected?
+            item.resource_publish_logs.where('user_id != ?',current_user.id).destroy_all
+            item.resource_publish_logs.first.update(publish_state:ResourcePublishLog::WAITING_FOR_APPROVAL)
+          else
+            ResourcePublishLog.add_log ResourcePublishLog::WAITING_FOR_APPROVAL, item
+          end
         end
 
         notify_gatekeepers_of_approval_request @waiting_for_publish_items

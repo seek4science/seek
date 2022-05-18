@@ -26,11 +26,11 @@ module Seek
       def state_allows_publish?(user = User.current_user)
         if new_record?
           return true unless gatekeeper_required?
-          !is_waiting_approval?(user) && !is_rejected?
+          !is_waiting_approval?(user)
         else
           return false if is_published?
           return true unless gatekeeper_required?
-          !is_waiting_approval?(user) && !is_rejected?
+          !is_waiting_approval?(user)
         end
       end
 
@@ -47,8 +47,10 @@ module Seek
                                          user: User.current_user,
                                          comment: comment)
 
-            resource_publish_logs.find_or_initialize_by(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, resource_id: self.id, user_id: self.contributor.id)
+            unless contributor.is_asset_gatekeeper_of?(self)
+              resource_publish_logs.find_or_initialize_by(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user_id: contributor.id)
                                  .update(publish_state:ResourcePublishLog::PUBLISHED, comment:comment)
+            end
             touch
           end
         else
@@ -61,7 +63,7 @@ module Seek
                                      user: User.current_user,
                                      comment: comment)
 
-        resource_publish_logs.find_or_initialize_by(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, resource_id: self.id, user_id: self.contributor.id)
+        resource_publish_logs.find_or_initialize_by(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user_id: contributor.id)
                              .update(publish_state:ResourcePublishLog::REJECTED, comment:comment)
       end
 
