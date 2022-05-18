@@ -52,7 +52,7 @@ class GitController < ApplicationController
   def raw
     if @blob.binary?
       send_data(@blob.content, filename: path_param.split('/').last, disposition: 'inline')
-    elsif can_display?
+    elsif render_display?
       render_display(@blob)
     else
       # Set Content-Type if it's an image to allow use in img tags
