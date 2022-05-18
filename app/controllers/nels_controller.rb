@@ -29,6 +29,7 @@ class NelsController < ApplicationController
   end
 
   def index
+    @register_mode = params[:register_mode]
     respond_to do |format|
       format.html
     end
@@ -78,6 +79,12 @@ class NelsController < ApplicationController
     redirect_to action: "index"
   end
 
+  def upload_file
+    # @rest_client.upload_file(params[:project_id].to_i, params[:dataset_id].to_i,params[:subtype_name], params["content_blobs"][0]["data"].path)
+    redirect_to action: "index"
+  end
+
+  
   def projects
     @projects = @rest_client.projects
 
@@ -102,6 +109,7 @@ class NelsController < ApplicationController
 
   def dataset
     @dataset = @rest_client.dataset(params[:project_id].to_i, params[:dataset_id].to_i)
+        @register_mode = params[:register_mode]
 
     # Populates the "metadata" field for each subtype, indicating if there is associated metadata with it
     @dataset['subtypes'].each_with_index do |subtype, index |

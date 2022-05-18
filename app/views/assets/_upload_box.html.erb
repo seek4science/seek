@@ -1,5 +1,6 @@
 <%
   resource ||= nil
+  action_text ||= nil
   title ||= 'Content'
   id ||= 'upload-panel'
   asset_name ||= text_for_resource(asset_field_prefix)
@@ -8,8 +9,13 @@
 <%= panel(title, id: id) do %>
   <div>
     <p>
-      You can register a <%= asset_name -%> by either directly uploading a file,
-      or registering a URL to a remote file or web page.
+      <% if action_text.nil? %>
+        You can register a <%= asset_name -%> by either directly uploading a file,
+        or registering a URL to a remote file or web page.
+      <% else %>
+        You can <%= action_text -%> by either directly selecting a file,
+        or registering a URL to a remote file or web page.
+      <% end %>
     </p>
   </div>
 

@@ -122,7 +122,7 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
           // Save current state
           sessionStorage.setItem('nels_tree_state',`project${data.node.data.project_id},dataset${data.node.data.id}`)          
 
-          $j.ajax({ url: '<%= dataset_assay_nels_path(params[:assay_id]) -%>',
+          $j.ajax({ url: '<%= dataset_assay_nels_path(params[:assay_id], :register_mode => @register_mode) -%>',
             data: {
               project_id: data.node.data.project_id,
               dataset_id: data.node.data.id,

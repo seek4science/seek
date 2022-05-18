@@ -24,7 +24,7 @@
             <%= hidden_field_tag('project_id', params[:project_id]) %>
             <%= hidden_field_tag('dataset_id', params[:dataset_id]) %>
             <%= hidden_field_tag('subtype_name', subtype['type']) %>
-            <%= submit_tag('Register', class: 'btn btn-primary btn-xs') %>
+            <%= submit_tag('Register', class: 'btn btn-primary btn-xs') if @register_mode.to_s.downcase == "true"%>
         <% end %>
       </li>
   <% end %>
@@ -35,14 +35,13 @@
   <%= form_tag({:action => :add_metadata}, :multipart => true) do %>
     <%= modal_header('Add metadata') %>
     <%= modal_body do %>
-      <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@data_file} -%>
+      <%= render :partial=>"assets/upload_box",:locals=>{:resource=>@data_file, :action_text=>"upload"} -%>
     <% end %>
     <%= modal_footer do %>
       <%= create_button id:"data_file_submit_btn", button_text:'Add',
                           onclick:"return validateResourceFields('data_file_xlsx');",
                           class:'btn btn-primary' %>
       <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-
     <% end %>
   <% end %>
 <% end %>
