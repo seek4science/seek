@@ -30,7 +30,16 @@ module Seek
         else
           return false if is_published?
           return true unless gatekeeper_required?
-          !is_waiting_approval?(user)
+          return true if user.person.is_asset_gatekeeper_of?(self)
+          return false if is_waiting_approval?(user)
+           if is_rejected?
+             if is_updated_since_be_rejected?
+               return true
+             else
+               return false
+             end
+           end
+          return true
         end
       end
 
@@ -48,7 +57,7 @@ module Seek
                                          comment: comment)
 
             unless contributor.is_asset_gatekeeper_of?(self)
-              resource_publish_logs.find_or_initialize_by(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user_id: contributor.id)
+              resource_publish_logs.find_or_initialize_by(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user: contributor.user )
                                  .update(publish_state:ResourcePublishLog::PUBLISHED, comment:comment)
             end
             touch
@@ -63,7 +72,7 @@ module Seek
                                      user: User.current_user,
                                      comment: comment)
 
-        resource_publish_logs.find_or_initialize_by(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user_id: contributor.id)
+        resource_publish_logs.find_or_initialize_by(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user: contributor.user)
                              .update(publish_state:ResourcePublishLog::REJECTED, comment:comment)
       end
 
@@ -85,6 +94,10 @@ module Seek
         else
           resource_publish_logs.where(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL).where('created_at > ?', time).any?
         end
+      end
+
+      def is_updated_since_be_rejected?
+        self.resource_publish_logs.where(publish_state: ResourcePublishLog::REJECTED).where('updated_at < ?',self.updated_at).any?
       end
 
       def gatekeeper_required?

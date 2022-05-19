@@ -14,6 +14,20 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
     assert !df.is_rejected?
   end
 
+  test 'is_updated_since_be_rejected?' do
+    person = Factory(:person,project:Factory(:asset_gatekeeper).projects.first)
+    df = Factory(:data_file, contributor: person, projects:person.projects )
+    assert !df.is_rejected?
+
+    ResourcePublishLog.add_log(ResourcePublishLog::REJECTED, df)
+    assert df.is_rejected?
+    refute df.can_publish?
+
+    df.updated_at = Time.now+3.seconds
+    df.save
+    assert df.is_updated_since_be_rejected?
+  end
+
   test 'is_waiting_approval?' do
     User.with_current_user Factory(:user) do
       df = Factory(:data_file)
@@ -132,18 +146,21 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
     end
   end
 
-  test 'not publishable when item was rejected' do
+  test 'not publishable when item was rejected and but publishable again when item was updated' do
     person = Factory(:person,project:Factory(:asset_gatekeeper).projects.first)
+    df = Factory(:data_file, contributor: person, projects:person.projects )
     User.with_current_user person.user do
-      df = Factory(:data_file, contributor: person, projects:person.projects )
       df.resource_publish_logs.create(publish_state: ResourcePublishLog::REJECTED)
       assert df.can_manage?, 'This item must be manageable for the test to be meaningful'
       refute df.is_published?, 'This item must be not published for the test to be meaningful'
       assert df.gatekeeper_required?, 'This item must require gatekeeper for the test to succeed'
       refute df.is_waiting_approval?(User.current_user), 'This item must be waiting for approval for the test to be meaningful'
       assert df.is_rejected?, 'This item must not be rejected for the test to succeed'
-
-      assert df.can_publish?, 'This item should not be publishable'
+      refute df.can_publish?, 'This item should not be publishable'
+      sleep(3)
+      df.update! title: 'new title'
+      assert df.is_updated_since_be_rejected?
+      assert df.can_publish?, 'This item should be publishable after update'
     end
   end
 

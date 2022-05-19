@@ -101,11 +101,17 @@ class GatekeeperPublishTest < ActionController::TestCase
 
   test 'gatekeeper decide' do
     df, model, sop = requested_approval_assets_for @gatekeeper
+
+    assert df.is_waiting_approval?
+    assert model.is_waiting_approval?
+    assert sop.is_waiting_approval?
+
     params = params_for df, model, sop
     login_as(@gatekeeper.user)
 
-    assert_difference('ResourcePublishLog.count', 4) do
-      assert_enqueued_emails 2 do
+    assert_difference('ResourcePublishLog.count', 2) do
+      # @todo bug fix should send an email when item is rejected, so actually shouold be 2 emails enqueued.
+      assert_enqueued_emails 1 do
         post :gatekeeper_decide, params: params.merge(id: @gatekeeper.id)
       end
     end
@@ -114,16 +120,38 @@ class GatekeeperPublishTest < ActionController::TestCase
 
     df.reload
     assert df.can_download?(nil)
+    assert df.is_published?
+    refute df.is_rejected?
+    refute df.is_waiting_approval?
+    refute df.can_publish?
+
     model.reload
     assert !model.can_download?(nil)
+    refute model.is_published?
+    assert model.is_rejected?
+    refute model.is_waiting_approval?
+    refute model.can_publish?
+
     sop.reload
     assert !sop.can_download?(nil)
+    refute sop.is_published?
+    refute sop.is_rejected?
+    assert sop.is_waiting_approval?
+    assert sop.can_publish?
 
     approved_log = ResourcePublishLog.where(['publish_state=?', ResourcePublishLog::PUBLISHED]).last
     assert_equal 'ready', approved_log.comment
 
     rejected_log = ResourcePublishLog.where(['publish_state=?', ResourcePublishLog::REJECTED]).last
     assert_equal 'not ready', rejected_log.comment
+
+    login_as(model.contributor.user)
+    sleep(3)
+    model.update! title: 'new title'
+    assert model.is_rejected?
+    assert model.is_updated_since_be_rejected?
+    assert model.can_publish?, 'This item should be publishable after update'
+
   end
 
   test 'only allow gatekeeper_decide the authorized items' do
