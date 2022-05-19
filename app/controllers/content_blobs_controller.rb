@@ -27,23 +27,9 @@ class ContentBlobsController < ApplicationController
   end
 
   def view_content
-    if @content_blob.is_text? || @content_blob.is_cwl?
-      view_text_content
-    else
-      @pdf_url = pdf_url
-      view_pdf_content
-    end
-  end
-
-  def view_text_content
-    render plain: File.read(@content_blob.filepath, encoding: 'iso-8859-1'), layout: false, content_type: 'text/plain'
-  end
-
-  def view_pdf_content
-    @pdf_url = pdf_url
-    respond_to do |format|
-      format.html { render 'view_pdf_content', layout: false }
-    end
+    opts = {}
+    opts[:code] = params[:code] if params[:code]
+    render_display(@content_blob, opts)
   end
 
   def csv_data

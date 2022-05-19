@@ -686,6 +686,72 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_response :redirect
   end
 
+  test 'should view content for pdf blob' do
+    sop = Factory(:public_sop)
+    blob = Factory(:pdf_content_blob, asset: sop)
+
+    get :view_content, params: { sop_id: sop.id, id: blob.id }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_nil @response.header['Content-Security-Policy']
+    assert_select 'iframe', count: 0
+    assert_select '#outerContainer'
+  end
+
+  test 'should view content for markdown blob' do
+    sop = Factory(:public_sop)
+    blob = Factory(:markdown_content_blob, asset: sop)
+
+    get :view_content, params: { sop_id: sop.id, id: blob.id }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert_select 'iframe', count: 0
+    assert_select '#navbar', count: 0
+    assert_select '.markdown-body h1', text: 'FAIRDOM-SEEK'
+  end
+
+  test 'should view content for jupyter blob renderer' do
+    sop = Factory(:public_sop)
+    blob = Factory(:jupyter_notebook_content_blob, asset: sop)
+
+    get :view_content, params: { sop_id: sop.id, id: blob.id }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_equal "default-src 'self'; img-src * data:; style-src 'unsafe-inline';", @response.header['Content-Security-Policy']
+    assert_select 'iframe', count: 0
+    assert_select '#navbar', count: 0
+    assert_select 'body.jp-Notebook'
+    assert_select 'div.jp-MarkdownOutput p', text: 'Import the libraries so that they can be used within the notebook'
+  end
+
+  test 'should view content for text blob' do
+    sop = Factory(:public_sop)
+    blob = Factory(:txt_content_blob, asset: sop)
+
+    get :view_content, params: { sop_id: sop.id, id: blob.id }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/plain')
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert_equal "This is a txt format\n", response.body
+  end
+
+  test 'should view content for image blob' do
+    sop = Factory(:public_sop)
+    blob = Factory(:image_content_blob, asset: sop)
+
+    get :view_content, params: { sop_id: sop.id, id: blob.id }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert_select 'img.git-image-preview[src=?]', download_sop_content_blob_path(sop, blob, disposition: 'inline')
+  end
+
   private
 
   def mock_http
