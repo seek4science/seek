@@ -17,7 +17,7 @@ module Seek
           f.rewind
           require_path = asset_path('assets/require.min.js', skip_pipeline: true)
           mathjax_path = asset_path('assets/mathjax.js', skip_pipeline: true)
-          `jupyter nbconvert --to html #{f.path} --template lab --stdout --HTMLExporter.mathjax_url=#{mathjax_path} --HTMLExporter.require_js_url=#{require_path}`
+          `python3.7 \`which jupyter\` nbconvert --log-level WARN --to html #{f.path} --template lab --stdout --HTMLExporter.mathjax_url=#{mathjax_path} --HTMLExporter.require_js_url=#{require_path}`
         end
       end
 
