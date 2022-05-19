@@ -443,24 +443,24 @@ SEEK::Application.routes.draw do
   end
 
   resources :assays, concerns: [:publishable, :has_snapshots, :isa] do
-    resources :nels, only: [:index] do
-      collection do
-        get :projects
-        get :project
-        get :datasets
-        get :dataset
-        get :subtype
-        post :register
-        get :new_dataset
-        get :get_metadata
-        post :create_dataset
-        post :add_metadata
-        post :upload_file
-      end
-    end
     resources :people, :programmes, :projects, :investigations, :samples, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, :placeholders, only: [:index]
   end
 
+  resources :nels do
+    collection do
+      get :projects
+      get :project
+      get :datasets
+      get :dataset
+      get :subtype
+      post :register
+      get :new_dataset
+      get :get_metadata
+      post :create_dataset
+      post :add_metadata
+      post :upload_file
+    end
+  end
   # to be removed as STI does not work in too many places
   # resources :openbis_assays, controller: 'assays', type: 'OpenbisAssay'
 

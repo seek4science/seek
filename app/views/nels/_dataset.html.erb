@@ -20,7 +20,7 @@
             method: :get) %>
         <% end %>
 
-        <%= form_tag(register_assay_nels_path(params[:assay_id]), method: :post, class: 'pull-right') do %>
+        <%= form_tag(register_nels_path(:assay_id=>params[:assay_id]), method: :post, class: 'pull-right') do %>
             <%= hidden_field_tag('project_id', params[:project_id]) %>
             <%= hidden_field_tag('dataset_id', params[:dataset_id]) %>
             <%= hidden_field_tag('subtype_name', subtype['type']) %>

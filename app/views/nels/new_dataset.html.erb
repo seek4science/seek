@@ -1,12 +1,11 @@
 <%# TODO: add dictionary entry for title %>
-<h1>New <%= @assay.title %> NeLS dataset
+<h1>New NeLS dataset
 <% if (@projects.length==1) %>
   for project <%=@projects[0]['name'] %>
 <% end %>
 </h1>
 
-<%# <%= form_for[@assay, :nels, @dataset_assay_nels](@dataset_assay_nels, :multipart => true) do |f| %>
-<%# <%= form_for(@assay, :multipart => true) do |f| %>
+
 <%= form_tag({:action => :create_dataset}, :multipart => true) do -%> 
   <%# <%= render :partial => "dataset_form", :locals => { :f => f, :project => nil } -%>
 
@@ -35,6 +34,6 @@
 
   <%= submit_tag "Create dataset", data: {disable_with: 'Creating...'}, :class => 'btn btn-primary' -%>
   or
-  <%= cancel_button(assay_nels_path(@assay.id)) %>
+  <%= cancel_button(nels_path(:assay_id=>4)) %>
 
 <% end %>

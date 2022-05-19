@@ -89,7 +89,7 @@ table, th, td {
 
     function updateFolderList(path){
       $j('#nels-dataset').html('').spinner('add').show();
-      $j.ajax({ url: '<%= subtype_assay_nels_path(params[:assay_id]) -%>',
+      $j.ajax({ url: '<%= subtype_nels_path(:assay_id=>params[:assay_id]) -%>',
         data: {
           project_id: '<%= @project_id -%>',
           dataset_id: '<%= @dataset['id'] -%>',

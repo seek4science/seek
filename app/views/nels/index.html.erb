@@ -2,7 +2,7 @@
 
 Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
 
-<%= button_link_to('Create NeLS dataset', 'add', new_dataset_assay_nels_path(@assay.id)) %>
+<%= button_link_to('Create NeLS dataset', 'add', new_dataset_nels_path()) %>
 
 <div class="row">
   <div class="col-sm-3">
@@ -61,11 +61,11 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
             'data' : {
               'url': function (node) {
                 if (node.id === '#') {
-                  console.log ('<%= projects_assay_nels_path(params[:assay_id]) -%>')
-                  return '<%= projects_assay_nels_path(params[:assay_id]) -%>';
+                  console.log ('<%= projects_nels_path(:assay_id=>params[:assay_id]) -%>')
+                  return '<%= projects_nels_path(:assay_id=>params[:assay_id]) -%>';
                 } else {
-                  console.log ('<%= datasets_assay_nels_path(params[:assay_id]) -%>')
-                  return '<%= datasets_assay_nels_path(params[:assay_id]) -%>';
+                  console.log ('<%= datasets_nels_path(:assay_id=>params[:assay_id]) -%>')
+                  return '<%= datasets_nels_path(:assay_id=>params[:assay_id]) -%>';
                 }
               },
               'data': function (node) {
@@ -104,7 +104,7 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
 
           folder_path = `Storebioinfo/${project_name}/${data.node.data.dataset_name}/${data.node.data.text}/`;
 
-          $j.ajax({ url: '<%= subtype_assay_nels_path(params[:assay_id]) -%>',
+          $j.ajax({ url: '<%= subtype_nels_path(:assay_id=>params[:assay_id]) -%>',
             data: {
               project_id: data.node.data.project_id,
               dataset_id: data.node.data.dataset_id,
@@ -122,7 +122,7 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
           // Save current state
           sessionStorage.setItem('nels_tree_state',`project${data.node.data.project_id},dataset${data.node.data.id}`)          
 
-          $j.ajax({ url: '<%= dataset_assay_nels_path(params[:assay_id], :register_mode => @register_mode) -%>',
+          $j.ajax({ url: '<%= dataset_nels_path(:assay_id=>params[:assay_id], :register_mode => @register_mode) -%>',
             data: {
               project_id: data.node.data.project_id,
               dataset_id: data.node.data.id,
@@ -134,7 +134,7 @@ Logged in as <%= @rest_client.user_info['name'] %><br/><br/>
         } else {// Project selected
           $j('#nels-dataset').hide();
           $j('#nels-content').show();
-          $j.ajax({ url: '<%= project_assay_nels_path(params[:assay_id]) -%>',
+          $j.ajax({ url: '<%= project_nels_path(:assay_id=>params[:assay_id]) -%>',
             data: {
               project: data.node.data,
             },
