@@ -5,8 +5,9 @@ module Seek
 
       attr_reader :blob
 
-      def initialize(git_blob_or_blob)
+      def initialize(git_blob_or_blob, url_options: {})
         @blob = git_blob_or_blob
+        @url_options = url_options
       end
 
       def render
@@ -34,6 +35,10 @@ module Seek
 
       def layout
         'blob'
+      end
+
+      def format
+        :html
       end
 
       # Content-Security-Policy for the rendered view

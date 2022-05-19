@@ -9,6 +9,7 @@ module Git
     delegate :git_repository, :version, :git_base, to: :git_version
 
     attr_reader :git_version, :path
+    alias_method :original_filename, :path
 
     def initialize(git_version, blob, path)
       @git_version = git_version

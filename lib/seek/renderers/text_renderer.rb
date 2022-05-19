@@ -8,6 +8,14 @@ module Seek
       def render_content
         "<pre>#{blob.read}</pre>"
       end
+
+      def render_standalone
+        blob.read
+      end
+
+      def format
+        :plain
+      end
     end
   end
 end

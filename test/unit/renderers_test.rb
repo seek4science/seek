@@ -6,6 +6,7 @@ class RenderersTest < ActiveSupport::TestCase
 
   setup do
     @asset = Factory(:sop)
+    @git = Factory(:git_version)
   end
 
   test 'factory' do
@@ -17,6 +18,15 @@ class RenderersTest < ActiveSupport::TestCase
     cb.url = 'http://www.slideshare.net/mygrid/if-we-build-it-will-they-come-13652794'
     render = Seek::Renderers::RendererFactory.instance.renderer(cb)
     assert_equal Seek::Renderers::SlideshareRenderer, render.class
+
+    factory = Seek::Renderers::RendererFactory.instance
+    assert_equal Seek::Renderers::PdfRenderer, factory.renderer(Factory(:pdf_content_blob)).class
+    assert_equal Seek::Renderers::PdfRenderer, factory.renderer(Factory(:docx_content_blob)).class
+    assert_equal Seek::Renderers::MarkdownRenderer, factory.renderer(Factory(:markdown_content_blob)).class
+    assert_equal Seek::Renderers::NotebookRenderer, factory.renderer(Factory(:jupyter_notebook_content_blob)).class
+    assert_equal Seek::Renderers::TextRenderer, factory.renderer(Factory(:txt_content_blob)).class
+    assert_equal Seek::Renderers::ImageRenderer, factory.renderer(Factory(:image_content_blob)).class
+    assert_equal Seek::Renderers::BlankRenderer, factory.renderer(Factory(:binary_content_blob)).class
   end
 
   test 'blank renderer' do
@@ -66,11 +76,15 @@ class RenderersTest < ActiveSupport::TestCase
 
     renderer = Seek::Renderers::SlideshareRenderer.new(cb)
     assert renderer.can_render?
+    @html = Nokogiri::HTML.parse(renderer.render)
+    assert_select 'iframe'
 
-    html = renderer.render
-    refute_nil html
-    assert html =~ /iframe/
-    assert html =~ /iframe/
+    @git.add_remote_file('slide.html', 'http://www.slideshare.net/mygrid/if-we-build-it-will-they-come-13652794')
+    gb = @git.get_blob('slide.html')
+    renderer = Seek::Renderers::SlideshareRenderer.new(gb)
+    assert renderer.can_render?
+    @html = Nokogiri::HTML.parse(renderer.render)
+    assert_select 'iframe'
 
     renderer = Seek::Renderers::SlideshareRenderer.new(nil)
     assert_equal '', renderer.render
@@ -128,9 +142,16 @@ class RenderersTest < ActiveSupport::TestCase
                    Seek::Renderers::YoutubeRenderer.new(cb).render
     end
 
-    html = renderer.render
-    refute_nil html
-    assert html =~ /iframe/
+    @html = Nokogiri::HTML.parse(renderer.render)
+    assert_select 'iframe'
+
+    @git.add_remote_file('video.html', 'https://youtu.be/1234abcd')
+    gb = @git.get_blob('video.html')
+    renderer = Seek::Renderers::YoutubeRenderer.new(gb)
+    assert renderer.can_render?
+    @html = Nokogiri::HTML.parse(renderer.render)
+    assert_select 'iframe'
+
 
     renderer = Seek::Renderers::YoutubeRenderer.new(nil)
     assert_equal '', renderer.render
@@ -142,6 +163,39 @@ class RenderersTest < ActiveSupport::TestCase
     assert renderer.can_render?
     @html = Nokogiri::HTML.parse(renderer.render)
     assert_select 'iframe'
+
+    @html = Nokogiri::HTML.parse(renderer.render_standalone)
+    assert_select 'iframe', count: 0
+    assert_select '#outerContainer'
+
+    @git.add_file('file.pdf', File.open(blob.filepath))
+    git_blob = @git.get_blob('file.pdf')
+    renderer = Seek::Renderers::PdfRenderer.new(git_blob)
+    assert renderer.can_render?
+    @html = Nokogiri::HTML.parse(renderer.render)
+    assert_select 'iframe'
+
+    @html = Nokogiri::HTML.parse(renderer.render_standalone)
+    assert_select 'iframe', count: 0
+    assert_select '#outerContainer'
+
+    with_config_value(:pdf_conversion_enabled, true) do
+      blob = Factory(:docx_content_blob, asset: @asset)
+      renderer = Seek::Renderers::PdfRenderer.new(blob)
+      assert renderer.can_render?
+    end
+
+    with_config_value(:pdf_conversion_enabled, false) do
+      blob = Factory(:docx_content_blob, asset: @asset)
+      renderer = Seek::Renderers::PdfRenderer.new(blob)
+      refute renderer.can_render?
+    end
+
+    with_config_value(:pdf_conversion_enabled, true) do
+      blob = Factory(:image_content_blob, asset: @asset)
+      renderer = Seek::Renderers::PdfRenderer.new(blob)
+      refute renderer.can_render?
+    end
   end
 
   test 'markdown renderer' do
@@ -150,6 +204,27 @@ class RenderersTest < ActiveSupport::TestCase
     assert renderer.can_render?
     @html = Nokogiri::HTML.parse(renderer.render)
     assert_select 'iframe'
+
+    @html = Nokogiri::HTML.parse(renderer.render_standalone)
+    assert_select 'iframe', count: 0
+    assert_select '#navbar', count: 0
+    assert_select '.markdown-body h1', text: 'FAIRDOM-SEEK'
+
+    @git.add_file('readme.md', File.open(blob.filepath))
+    git_blob = @git.get_blob('readme.md')
+    renderer = Seek::Renderers::MarkdownRenderer.new(git_blob)
+    assert renderer.can_render?
+    @html = Nokogiri::HTML.parse(renderer.render)
+    assert_select 'iframe'
+
+    @html = Nokogiri::HTML.parse(renderer.render_standalone)
+    assert_select 'iframe', count: 0
+    assert_select '#navbar', count: 0
+    assert_select '.markdown-body h1', text: 'FAIRDOM-SEEK'
+
+    blob = Factory(:txt_content_blob, asset: @asset)
+    renderer = Seek::Renderers::MarkdownRenderer.new(blob)
+    refute renderer.can_render?
   end
 
   test 'jupyter notebook renderer' do
@@ -158,6 +233,29 @@ class RenderersTest < ActiveSupport::TestCase
     assert renderer.can_render?
     @html = Nokogiri::HTML.parse(renderer.render)
     assert_select 'iframe'
+
+    @html = Nokogiri::HTML.parse(renderer.render_standalone)
+    assert_select 'iframe', count: 0
+    assert_select '#navbar', count: 0
+    assert_select 'body.jp-Notebook'
+    assert_select 'div.jp-MarkdownOutput p', text: 'Import the libraries so that they can be used within the notebook'
+
+    @git.add_file(blob.original_filename, File.open(blob.filepath))
+    git_blob = @git.get_blob(blob.original_filename)
+    renderer = Seek::Renderers::NotebookRenderer.new(git_blob)
+    assert renderer.can_render?
+    @html = Nokogiri::HTML.parse(renderer.render)
+    assert_select 'iframe'
+
+    @html = Nokogiri::HTML.parse(renderer.render_standalone)
+    assert_select 'iframe', count: 0
+    assert_select '#navbar', count: 0
+    assert_select 'body.jp-Notebook'
+    assert_select 'div.jp-MarkdownOutput p', text: 'Import the libraries so that they can be used within the notebook'
+
+    blob = Factory(:txt_content_blob, asset: @asset)
+    renderer = Seek::Renderers::NotebookRenderer.new(blob)
+    refute renderer.can_render?
   end
 
   test 'text renderer' do
@@ -165,7 +263,29 @@ class RenderersTest < ActiveSupport::TestCase
     renderer = Seek::Renderers::TextRenderer.new(blob)
     assert renderer.can_render?
     @html = Nokogiri::HTML.parse(renderer.render)
+    assert_select 'pre', text: /This is a txt format/
+
+    blob.rewind
+    assert_equal "This is a txt format\n", renderer.render_standalone
+
+    @git.add_file('test.txt', File.open(blob.filepath))
+    git_blob = @git.get_blob('test.txt')
+    renderer = Seek::Renderers::TextRenderer.new(git_blob)
+    assert renderer.can_render?
+    @html = Nokogiri::HTML.parse(renderer.render)
+    assert_select 'pre', text: /This is a txt format/
+
+    assert_equal "This is a txt format\n", renderer.render_standalone
+
+    blob = Factory(:csv_content_blob, asset: @asset)
+    renderer = Seek::Renderers::TextRenderer.new(blob)
+    assert renderer.can_render?
+    @html = Nokogiri::HTML.parse(renderer.render)
     assert_select 'pre'
+
+    blob = Factory(:image_content_blob, asset: @asset)
+    renderer = Seek::Renderers::TextRenderer.new(blob)
+    refute renderer.can_render?
   end
 
   test 'image renderer' do
@@ -174,6 +294,26 @@ class RenderersTest < ActiveSupport::TestCase
     assert renderer.can_render?
     @html = Nokogiri::HTML.parse(renderer.render)
     assert_select 'img.git-image-preview'
+
+    @html = Nokogiri::HTML.parse(renderer.render_standalone)
+    assert_select 'iframe', count: 0
+    assert_select '#navbar', count: 0
+    assert_select 'img.git-image-preview'
+
+    @git.add_file('test.png', File.open(blob.filepath))
+    git_blob = @git.get_blob('test.png')
+    renderer = Seek::Renderers::ImageRenderer.new(git_blob)
+    assert renderer.can_render?
+    @html = Nokogiri::HTML.parse(renderer.render)
+    assert_select 'img.git-image-preview'
+
+    @html = Nokogiri::HTML.parse(renderer.render_standalone)
+    assert_select 'iframe', count: 0
+    assert_select '#navbar', count: 0
+    assert_select 'img.git-image-preview'
+    blob = Factory(:txt_content_blob, asset: @asset)
+    renderer = Seek::Renderers::ImageRenderer.new(blob)
+    refute renderer.can_render?
   end
 
   def document_root_element
