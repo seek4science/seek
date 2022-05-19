@@ -33,7 +33,7 @@
             const elem = $j("#btn_save_source")
             const options = {
                ajax:{
-                    url: '<%= Seek::Util.routes.single_pages_path %>' + `/${pid}/dynamic_table_data/`,
+									  url: dynamicTableDataPath.replace("ID_HOLDER", pid),
                     data: function(d) { 
                         if (initialLoad) {
                             initialLoad = false;

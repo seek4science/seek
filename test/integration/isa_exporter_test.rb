@@ -24,7 +24,7 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
 		@investigation = Factory(:investigation, projects: [@project], contributor: @current_user.person)
 		create_basic_isa_project
 		with_config_value(:project_single_page_enabled, true) do
-			get "/single_pages/#{@project.id}/export_isa?investigation_id=#{@investigation.id}"
+			get export_isa_single_page_path(@project.id, investigation_id: @investigation.id)
 		end
 		@@response = response
 		@@json = JSON.parse(@@response.body)
@@ -128,10 +128,9 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
 		studies.each do |s|
 			assays_count = s['assays'].length
 			s['assays'].each_with_index do |a, i|
-				a['processSequence'].each { |p| assert p['previousProcess'].present? }
-
 				a['processSequence'].each do |p|
-					assert (i == assays_count - 1) ? p['nextProcess'].blank? : p['nextProcess'].present?
+					assert p['previousProcess'].present?
+					assert i == assays_count - 1 ? p['nextProcess'].blank? : p['nextProcess'].present?
 				end
 			end
 		end
@@ -221,7 +220,7 @@ class IsaExporterTest < ActionDispatch::IntegrationTest
 		ontology_refs = investigation['ontologySourceReferences']
 
 		ontologies = nested_hash_value(investigation, 'termSource')
-		ontologies = ontologies.uniq.reject { |c| c.empty? }
+		ontologies = ontologies.uniq.reject(&:empty?)
 
 		# 27 'Ontology Source References MUST contain a Term Source Name'
 		ontology_refs.each { |ref| assert ref['name'].present? }
@@ -255,7 +254,7 @@ private
 def nested_hash_value(obj, key, ans = [])
 	if obj.respond_to?(:keys)
 		ans << obj[key] if obj.key?(key)
-		obj.keys.each { |k| nested_hash_value(obj[k], key, ans) }
+		obj.each_key { |k| nested_hash_value(obj[k], key, ans) }
 	elsif obj.respond_to?(:each)
 		obj.each { |o| nested_hash_value(o, key, ans) }
 	end
@@ -266,8 +265,8 @@ def valid_json?(json)
 	begin
 		JSON.parse(json)
 		return true
-	rescue Exception => e
-		return false
+	rescue JSON::ParserError
+		false
 	end
 end
 
@@ -276,11 +275,7 @@ def valid_isa_json?(json)
 		File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'isa_schemas', 'investigation_schema.json')
 	if File.readable?(definitions_path)
 		errors = JSON::Validator.fully_validate_json(definitions_path, json)
-		unless errors.empty?
-			msg = ''
-			errors.each { |e| msg += e + "\n" }
-			raise Minitest::Assertion, msg
-		end
+		raise Minitest::Assertion, errors.join("\n") unless errors.empty?
 	end
 end
 
@@ -327,15 +322,14 @@ def create_basic_isa_project
 			sop: Factory(:sop, policy: Factory(:public_policy))
 		)
 
-	assay =
-		Factory(
-			:assay,
-			study: study,
-			sample_type: assay_sample_type,
-			sop_ids: [Factory(:sop, policy: Factory(:public_policy)).id],
-			contributor: @current_user.person,
-			position: 0
-		)
+	Factory(
+		:assay,
+		study: study,
+		sample_type: assay_sample_type,
+		sop_ids: [Factory(:sop, policy: Factory(:public_policy)).id],
+		contributor: @current_user.person,
+		position: 0
+	)
 
 	@@source = source
 	@@sample_collection = sample_collection
@@ -373,16 +367,15 @@ def create_basic_isa_project
 				'sample characteristic 1': 'sample characteristic 1'
 		        }
 
-	sample_3 =
-		Factory :sample,
-		        title: 'sample_2',
-		        sample_type: assay_sample_type,
-		        project_ids: [@project.id],
-		        data: {
-				Input: [sample_2.id],
-				'Protocol Assay 1': 'Protocol Assay 1',
-				'Assay 1 parameter value 1': 'Assay 1 parameter value 1',
-				'Extract Name': 'Extract Name',
-				'other material characteristic 1': 'other material characteristic 1'
-		        }
+	Factory :sample,
+	        title: 'sample_2',
+	        sample_type: assay_sample_type,
+	        project_ids: [@project.id],
+	        data: {
+			Input: [sample_2.id],
+			'Protocol Assay 1': 'Protocol Assay 1',
+			'Assay 1 parameter value 1': 'Assay 1 parameter value 1',
+			'Extract Name': 'Extract Name',
+			'other material characteristic 1': 'other material characteristic 1'
+	        }
 end

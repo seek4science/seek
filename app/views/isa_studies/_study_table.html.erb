@@ -19,7 +19,7 @@
             const dt = <%= sanitize(dt_aggregated(study, false).to_json) %>
             studyDynamicTable = new $j.dynamicTable('#study-table')
             const ajax = {
-                url: '<%= Seek::Util.routes.single_pages_path %>' + `/${pid}/dynamic_table_data/`,
+                url: dynamicTableDataPath.replace("ID_HOLDER", pid),
                 data: function(d) { 
                     if (initialLoad) {
                         initialLoad = false;

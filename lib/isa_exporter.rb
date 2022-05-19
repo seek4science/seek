@@ -20,9 +20,10 @@ module IsaExporter
 				{ name: 'SEEK Project name', value: @investigation.projects.first.title },
 				{
 					name: 'SEEK Project ID',
-					value: "#{Seek::Config.site_base_host}/single_pages/#{@investigation.projects.first.id}"
+					value:
+						File.join(Seek::Config.site_base_host, Seek::Util.routes.single_page_path(@investigation.projects.first))
 				},
-				{ name: 'SEEK Investigation ID', value: "#{@investigation.id}" }
+				{ name: 'SEEK Investigation ID', value: @investigation.id.to_s }
 			]
 
 			publications = []
@@ -51,7 +52,7 @@ module IsaExporter
 			isa_study[:publicReleaseDate] = '' # study.created_at.to_date.iso8601
 			isa_study[:filename] = "#{study.title}.txt"
 			isa_study[:comments] = [
-				{ name: 'SEEK Study ID', value: "#{study.id}" },
+				{ name: 'SEEK Study ID', value: study.id.to_s },
 				{ name: 'SEEK creation date', value: study.created_at.utc.iso8601 }
 			]
 
@@ -108,9 +109,8 @@ module IsaExporter
 		end
 
 		def convert_assays(assays)
-			all_sample_types = assays.map { |a| a.sample_type }
-			all_samples = all_sample_types.map { |s| s.samples }.flatten
-			first_assay = assays.detect { |s| s.position == 0 }
+			all_sample_types = assays.map(&:sample_type)
+			first_assay = assays.detect { |s| s.position.zero? }
 
 			isa_assay = {}
 			isa_assay['@id'] = "#assay/#{assays.pluck(:id).join('_')}"
@@ -161,15 +161,14 @@ module IsaExporter
 			status[:annotationValue] = ''
 			isa_publication[:status] = status
 			isa_publication[:title] = publication.title
-			isa_publication[:author_list] = publication.authors.map { |a| a.full_name }.join(', ')
+			isa_publication[:author_list] = publication.authors.map(&:full_name).join(', ')
 
 			publication
 		end
 
 		def convert_ontologies
-			client = Ebi::OlsClient.new
 			source_ontologies = []
-			sample_types = @investigation.studies.map { |s| s.sample_types } + @investigation.assays.map { |a| a.sample_type }
+			sample_types = @investigation.studies.map(&:sample_types) + @investigation.assays.map(&:sample_type)
 			sample_types.flatten.each do |sa|
 				sa.sample_attributes.each do |atr|
 					source_ontologies << atr.sample_controlled_vocab.source_ontology if atr.sample_attribute_type.ontology?
@@ -278,7 +277,7 @@ module IsaExporter
 		def convert_characteristic_categories(study = nil, assays = nil)
 			attributes = []
 			if study
-				attributes = study.sample_types.map { |s| s.sample_attributes }.flatten
+				attributes = study.sample_types.map(&:sample_attributes).flatten
 				attributes =
 					attributes.select { |sa| sa.isa_tag&.isa_source_characteristic? || sa.isa_tag&.isa_sample_characteristic? }
 			elsif assays
@@ -340,13 +339,12 @@ module IsaExporter
 					'@id': "#data/#{s.id}",
 					name: s.get_attribute_value(with_tag_data_file),
 					type: with_tag_data_file.title,
-					comments: with_tag_data_file_comment.map { |d| { name: d.title, value: "#{s.get_attribute_value(d)}" } }
+					comments: with_tag_data_file_comment.map { |d| { name: d.title, value: s.get_attribute_value(d).to_s } }
 				}
 			end
 		end
 
 		def convert_other_materials(sample_types)
-			all_attributes = sample_types.map { |s| s.sample_attributes }.flatten
 			isa_other_material_sample_types =
 				sample_types.select { |s| s.sample_attributes.detect { |sa| sa.isa_tag&.isa_other_material? } }
 
@@ -363,6 +361,7 @@ module IsaExporter
 
 				type = get_derived_from_type(st)
 				raise 'Defective ISA process_sequence!' unless type
+
 				other_materials +=
 					st
 						.samples

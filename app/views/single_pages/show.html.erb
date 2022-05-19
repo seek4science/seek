@@ -49,7 +49,9 @@
 
 <script type="text/javascript">
     var selectedItem = {type:"",id:""}, pid, uid, projectDefaultPolicy
-    $j(document).ready(function() {
+		var dynamicTableDataPath = '<%= Seek::Util.routes.dynamic_table_data_single_page_path("ID_HOLDER") %>'
+		
+		$j(document).ready(function() {
         setupFoldersTree( <%= ((TreeviewBuilder.new(@project, @folders)).build_tree_data).html_safe -%> , 'single_page_tree', 'draggable_folder_item');
         $j("#item-layout").html("<%= escape_javascript(render template: 'projects/show' ) %>");
         $j("#item_contents").show();
