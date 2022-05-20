@@ -5,8 +5,8 @@
     default_folder = initial_folder(@project)
 %>
 <div class="single-page-folder">
-    <div class="row">
-        <div class="col-md-4" style="padding:0 5px 0 0">
+    <div id="widget" class="row">
+        <div id="left-pane" class="col-md-3" style="padding:0 5px 0 0">
             <div id="folder_column">
                 <div id="folders">
                     <ul class="bcrumb">
@@ -26,7 +26,7 @@
             </div>
         </div>
 
-        <div class="col-md-8" style="padding:0">
+        <div id="right-pane" class="col-md-9" style="padding:0">
             <div id="container" style="position:relative" class="tv">
                 <div id="loader"></div>
                 <div id="folder_contents" class="row" style="display:none">
@@ -51,6 +51,8 @@
     var selectedItem = {type:"",id:""}, pid, uid, projectDefaultPolicy, dynamicTableDataPath
 		
 		$j(document).ready(function() {
+			  $j("#content .container-fluid").removeClass("container-fluid").addClass("container-fluid-single-page")
+
         setupFoldersTree( <%= ((TreeviewBuilder.new(@project, @folders)).build_tree_data).html_safe -%> , 'single_page_tree', 'draggable_folder_item');
         $j("#item-layout").html("<%= escape_javascript(render template: 'projects/show' ) %>");
         $j("#item_contents").show();
@@ -58,6 +60,9 @@
         projectDefaultPolicy = <%= project_policy_json(@project) %>
         uid = <%= current_user ? current_user.id : "null" %>
 				dynamicTableDataPath = '<%= Seek::Util.routes.dynamic_table_data_single_page_path(@project.id) %>'
+
+				setSplitters();
+				updateContainerHeight();
     });
 
     function toggleItem(e, type){
@@ -67,5 +72,19 @@
         $j("a[_type='" + type + "']").each((i, e) => $j("#single_page_tree").jstree(action, $j(e)))
         $j(e).toggleClass("active")
     }
+
+		function setSplitters() {
+			const splitter = $j('#widget').width('').height(768).split({
+				orientation: 'vertical',
+				limit: { leftUpper: 380, rightBottom: 1000 },
+				position: '25%'
+			});
+		}
+
+		function updateContainerHeight() {
+			const height = $j("#right-pane #container").height()
+			$j("#widget").height(height)
+			$j("#right-pane").height(height)
+		}
     
 </script>
