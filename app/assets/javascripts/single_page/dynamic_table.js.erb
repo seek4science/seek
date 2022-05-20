@@ -109,10 +109,20 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
         const colsCount = this.table.columns().data().length;
         const splitter = text.includes("\r\n") ? "\r\n" : "\n";
         const delimeter = "\t";
+				const _defaultCols = defaultCols.map((c) => c.defaultValue || "")
+
+				const cols = this.table.settings()[0].aoColumns;
+				const sampleLinkIndexes = getSampleLinkingIndexes(cols).sort((a, b) => b - a)
+
         const rows = text.split(splitter).map((r) => {
+					// Preserve row status and id
           let splitted = [rowStatus.new, ""].concat(r.split(delimeter));
           const missingColsCount = colsCount - defaultCols.length - splitted.length;
-          splitted = defaultCols.map((c) => c.defaultValue || "").concat(splitted);
+          splitted = _defaultCols.concat(splitted);
+
+					// Preserve empty placeholder for columns of type of 'Registered Sample (multiple)'
+					sampleLinkIndexes.forEach((x) => (splitted.splice(x, 0, [])));
+
           return missingColsCount < 0
             ? splitted.slice(0, colsCount)
             : splitted.concat(Array(missingColsCount).fill(""));
