@@ -48,7 +48,7 @@ class CWLExtractionTest < ActiveSupport::TestCase
   end
 
   test 'generates diagram' do
-    wf = open_fixture_file('workflows/workflow_RNAseq_kallisto.cwl')
+    wf = open_fixture_file('workflows/with_quotes.cwl')
     extractor = Seek::WorkflowExtractors::CWL.new(wf)
     diagram = extractor.generate_diagram
     assert diagram.length > 100
