@@ -110,7 +110,7 @@ class GatekeeperPublishTest < ActionController::TestCase
     login_as(@gatekeeper.user)
 
     assert_difference('ResourcePublishLog.count', 2) do
-      assert_enqueued_emails 1 do
+      assert_enqueued_emails 2 do
         post :gatekeeper_decide, params: params.merge(id: @gatekeeper.id)
       end
     end

@@ -113,7 +113,7 @@ module Seek
       end
 
       def publish_requesters
-        user_requesters = resource_publish_logs.includes(:user).where(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL).map(&:user)
+        user_requesters = resource_publish_logs.select{|log| !log.user.person.is_asset_gatekeeper_of?(self)}.map(&:user)
 
         user_requesters.uniq.compact.collect(&:person).compact
       end
