@@ -81,7 +81,7 @@ module SampleTypesHelper
   def ebi_ontology_choices
     opts = Ebi::OlsClient.ontologies.map { |ontology| [ontology.dig('config', 'title'), ontology.dig('config', 'namespace')] }
 
-    opts.sort_by { |o| o[0] }
+    opts.sort_by { |o| o[0] || '' }
   end
 
   def sample_attribute_pid_help_icon

@@ -61,6 +61,13 @@ module Ebi
       @ontologies = ontology_list.dig('_embedded', 'ontologies')
     end
 
+    # processes the JSON to return [ [title, namespace], ... ] filtering any without a title
+    def self.ontology_choices
+      opts = ontologies.map { |ontology| [ontology.dig('config', 'title'), ontology.dig('config', 'namespace')] }
+
+      opts.sort_by { |o| o[0] || '' }.delete_if{|o| o[0].blank? }
+    end
+
     def self.ontology_keys
       @ontology_keys ||= ontologies.map { |ontology| ontology.dig('config', 'namespace') }.sort.compact
     end
