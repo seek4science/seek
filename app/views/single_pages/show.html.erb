@@ -48,8 +48,7 @@
 </div>
 
 <script type="text/javascript">
-    var selectedItem = {type:"",id:""}, pid, uid, projectDefaultPolicy
-		var dynamicTableDataPath = '<%= Seek::Util.routes.dynamic_table_data_single_page_path("ID_HOLDER") %>'
+    var selectedItem = {type:"",id:""}, pid, uid, projectDefaultPolicy, dynamicTableDataPath
 		
 		$j(document).ready(function() {
         setupFoldersTree( <%= ((TreeviewBuilder.new(@project, @folders)).build_tree_data).html_safe -%> , 'single_page_tree', 'draggable_folder_item');
@@ -58,6 +57,7 @@
         pid = <%= @project.id %>
         projectDefaultPolicy = <%= project_policy_json(@project) %>
         uid = <%= current_user ? current_user.id : "null" %>
+				dynamicTableDataPath = '<%= Seek::Util.routes.dynamic_table_data_single_page_path(@project.id) %>'
     });
 
     function toggleItem(e, type){

@@ -19,7 +19,7 @@
             const dt = <%= sanitize(dt_aggregated(study, false).to_json) %>
             studyDynamicTable = new $j.dynamicTable('#study-table')
             const ajax = {
-                url: dynamicTableDataPath.replace("ID_HOLDER", pid),
+                url: dynamicTableDataPath,
                 data: function(d) { 
                     if (initialLoad) {
                         initialLoad = false;
