@@ -191,7 +191,7 @@ const applyTemplate = () => {
     $j(newRow).find('[data-attr="cv_id"]').val(row[4]);
     $j(newRow).find('[data-attr="unit"]').val(row[5]);
     $j(newRow).find(".sample-type-is-title").prop("checked", row[7]);
-    $j(newRow).find('[data-attr="iri"]').val(row[8]);
+    $j(newRow).find('[data-attr="pid"]').val(row[8]);
     $j(newRow).find('[data-attr="isa_tag_id"]').val(row[10]);
 
     // Show the CV block if cv_id is not empty
