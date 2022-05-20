@@ -1,7 +1,7 @@
 module RawDisplay
   extend ActiveSupport::Concern
 
-  RAW_DISPLAY_FORMATS = %w(notebook markdown pdf)
+  RAW_DISPLAY_FORMATS = %w(notebook markdown pdf text image)
 
   # A method for rendering a given Git/Content Blob in an HTML "Viewer"
   def render_display(blob, url_options: {})

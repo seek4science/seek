@@ -50,10 +50,10 @@ class GitController < ApplicationController
   end
 
   def raw
-    if @blob.binary?
-      send_data(@blob.content, filename: path_param.split('/').last, disposition: 'inline')
-    elsif render_display?
+    if render_display?
       render_display(@blob)
+    elsif @blob.binary?
+      send_data(@blob.content, filename: path_param.split('/').last, disposition: 'inline')
     else
       # Set Content-Type if it's an image to allow use in img tags
       ext = path_param.split('/').last&.split('.')&.last&.downcase
@@ -144,6 +144,9 @@ class GitController < ApplicationController
       end
       format.json do
         render json: { error: message }, status: status
+      end
+      format.all do
+        head status
       end
     end
   end

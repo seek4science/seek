@@ -383,7 +383,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
     assert_response :success
 
-    download_path = download_sop_content_blob_path(sop, sop.content_blob.id, format: :pdf, intent: :inline_view)
+    download_path = download_sop_content_blob_path(sop, sop.content_blob.id, format: :pdf, disposition: :inline, intent: :inline_view)
     assert @response.body.include?("DEFAULT_URL = '#{download_path}'")
 
     al = ActivityLog.last
@@ -750,6 +750,27 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert @response.header['Content-Type'].start_with?('text/html')
     assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
     assert_select 'img.git-image-preview[src=?]', download_sop_content_blob_path(sop, blob, disposition: 'inline')
+  end
+
+  test 'should view content for jupyter blob as text if requested' do
+    sop = Factory(:public_sop)
+    blob = Factory(:jupyter_notebook_content_blob, asset: sop)
+
+    get :view_content, params: { sop_id: sop.id, id: blob.id, display: 'text' }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/plain')
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert response.body[0..20].include?('"nbformat": 4')
+  end
+
+  test 'should through 406 if trying to view content for pdf blob as text' do
+    sop = Factory(:public_sop)
+    blob = Factory(:pdf_content_blob, asset: sop)
+
+    assert_raises(ActionController::UnknownFormat) do
+      get :view_content, params: { sop_id: sop.id, id: blob.id, display: 'text' }
+    end
   end
 
   private
