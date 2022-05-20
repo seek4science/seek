@@ -619,4 +619,79 @@ class GitControllerTest < ActionController::TestCase
 
     assert_response :not_found
   end
+
+  test 'should display blob as pdf' do
+    @git_version.add_file('file.pdf', Factory(:pdf_content_blob))
+    disable_authorization_checks { @git_version.save! }
+
+    get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'file.pdf', display: 'pdf' }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_nil @response.header['Content-Security-Policy']
+    assert_select 'iframe', count: 0
+    assert_select '#outerContainer'
+  end
+
+  test 'should display blob as markdown' do
+    @git_version.add_file('file.md', Factory(:markdown_content_blob))
+    disable_authorization_checks { @git_version.save! }
+
+    get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'file.md', display: 'markdown' }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert_select 'iframe', count: 0
+    assert_select '#navbar', count: 0
+    assert_select '.markdown-body h1', text: 'FAIRDOM-SEEK'
+  end
+
+  test 'should display blob as jupyter' do
+    @git_version.add_file('file.ipynb', Factory(:jupyter_notebook_content_blob))
+    disable_authorization_checks { @git_version.save! }
+
+    get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'file.ipynb', display: 'notebook' }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_equal "default-src 'self'; img-src * data:; style-src 'unsafe-inline';", @response.header['Content-Security-Policy']
+    assert_select 'iframe', count: 0
+    assert_select '#navbar', count: 0
+    assert_select 'body.jp-Notebook'
+    assert_select 'div.jp-MarkdownOutput p', text: 'Import the libraries so that they can be used within the notebook'
+  end
+
+  test 'should display blob as text' do
+    @git_version.add_file('file.txt', Factory(:txt_content_blob))
+    disable_authorization_checks { @git_version.save! }
+
+    get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'file.txt', display: 'text' }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/plain')
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert_equal "This is a txt format\n", response.body
+  end
+
+  test 'should display blob as image' do
+    @git_version.add_file('file.png', Factory(:image_content_blob))
+    disable_authorization_checks { @git_version.save! }
+
+    get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'file.png', display: 'image' }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert_select 'img.git-image-preview[src=?]', workflow_git_raw_path(@git_version.resource, version: @git_version.version, path: 'file.png')
+  end
+
+  test 'should throw 406 trying to display image as text' do
+    @git_version.add_file('file.png', Factory(:image_content_blob))
+    disable_authorization_checks { @git_version.save! }
+
+    assert_raises(ActionController::UnknownFormat) do
+      get :raw, params: { workflow_id: @workflow.id, version: @git_version.version, path: 'file.png', display: 'text' }
+    end
+  end
 end

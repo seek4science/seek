@@ -1,6 +1,6 @@
 class ContentBlobsController < ApplicationController
-  before_action :find_and_authorize_associated_asset, only: %i[get_pdf view_content view_pdf_content download show update]
-  before_action :find_and_authorize_content_blob, only: %i[get_pdf view_content view_pdf_content download show update]
+  before_action :find_and_authorize_associated_asset, only: %i[get_pdf view_content download show update]
+  before_action :find_and_authorize_content_blob, only: %i[get_pdf view_content download show update]
   before_action :set_asset_version, only: %i[get_pdf download]
 
   skip_before_action :check_json_id_type, only: [:update]
@@ -29,7 +29,7 @@ class ContentBlobsController < ApplicationController
   def view_content
     opts = {}
     opts[:code] = params[:code] if params[:code]
-    render_display(@content_blob, opts)
+    render_display(@content_blob, url_options: opts)
   end
 
   def csv_data
