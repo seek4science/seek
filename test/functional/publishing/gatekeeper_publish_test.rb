@@ -110,7 +110,6 @@ class GatekeeperPublishTest < ActionController::TestCase
     login_as(@gatekeeper.user)
 
     assert_difference('ResourcePublishLog.count', 2) do
-      # @todo bug fix should send an email when item is rejected, so actually shouold be 2 emails enqueued.
       assert_enqueued_emails 1 do
         post :gatekeeper_decide, params: params.merge(id: @gatekeeper.id)
       end

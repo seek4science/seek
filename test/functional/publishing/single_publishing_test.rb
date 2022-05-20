@@ -223,8 +223,8 @@ class SinglePublishingTest < ActionController::TestCase
 
     df.reload
     assert df.is_published?, 'The data file should be published after doing single_publish'
-    refute df.is_waiting_approval? 'The data file should not be waiting for approval after doing single_publish'
-    refute df.is_rejected? 'The data file should not be be rejected after doing single_publish'
+    refute df.is_waiting_approval?(User.current_user), 'The data file should not be waiting for approval after doing single_publish'
+    refute df.is_rejected?, 'The data file should not be be rejected after doing single_publish'
 
   end
 
