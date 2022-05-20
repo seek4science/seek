@@ -285,7 +285,8 @@ module IsaExporter
 				attributes = attributes.select { |sa| sa.isa_tag&.isa_other_material_characteristic? }
 			end
 			attributes.map do |s|
-				ontology = get_ontology_details(s, s.title, false)
+				# Check if the sample_attribute title is an ontology term
+				ontology = s.pid.present? ? get_ontology_details(s, s.title, false) : { termAccession: '', termSource: '' }
 				{
 					'@id': normalize_id("#characteristic_category/#{s.title}_#{s.id}"),
 					characteristicType: {
