@@ -196,7 +196,12 @@ module IsaExporter
 			isa_protocol[:version] = ''
 			isa_protocol[:parameters] =
 				parameter_values.map do |parameter_value|
-					parameter_value_ontology = get_ontology_details(parameter_value, parameter_value.title, false)
+					parameter_value_ontology =
+						if parameter_value.pid.present?
+							get_ontology_details(parameter_value, parameter_value.title, false)
+						else
+							{ termAccession: '', termSource: '' }
+						end
 					{
 						'@id': "#parameter/#{parameter_value.id}",
 						parameterName: {
