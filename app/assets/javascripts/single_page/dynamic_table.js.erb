@@ -112,7 +112,9 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
 				const _defaultCols = defaultCols.map((c) => c.defaultValue || "")
 
 				const cols = this.table.settings()[0].aoColumns;
-				const sampleLinkIndexes = getSampleLinkingIndexes(cols).sort((a, b) => b - a)
+				const sampleLinks = getSampleLinking(cols)
+				const sampleLinkIndexes = sampleLinks.map(x => x.idx).sort((a, b) => b - a)
+				const sampleLinksTitles = sampleLinks.map(x => x.title)
 
         const rows = text.split(splitter).map((r) => {
 					// Preserve row status and id
@@ -128,6 +130,10 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
             : splitted.concat(Array(missingColsCount).fill(""));
         });
         this.table.rows.add(rows).draw();
+
+				if (sampleLinksTitles.length)
+					alert("No value is pasted for the following column(s): \n" + 
+						sampleLinksTitles.map(x=>`"${x}"`).join(', ') + "\nYou need to manually input them.");
       });
     },
     newRow: function () {
@@ -137,7 +143,7 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
         .concat(Array(colsCount - defaultCols.length).fill(""));
       const cols = this.table.settings()[0].aoColumns;
       const indexes = getStatusIndexes(cols);
-      const sampleLinkIndexes = getSampleLinkingIndexes(cols);
+      const sampleLinkIndexes = getSampleLinking(cols).map( x => x.idx)
       indexes.forEach((x) => (arr[x] = rowStatus.new));
       sampleLinkIndexes.forEach((x) => (arr[x] = []));
       this.table.row.add(arr).draw();
@@ -280,8 +286,8 @@ function getStatusIndexes(arr) {
   return arr.filter((x) => x?.status).map((x) => x.idx);
 }
 
-function getSampleLinkingIndexes(arr) {
-  return arr.filter((x) => x.linked_sample_type).map((x) => x.idx);
+function getSampleLinking(arr) {
+  return arr.filter((x) => x.linked_sample_type).map(({ idx, title }) => ({ idx, title }));
 }
 
 function setTagsInput(item) {
