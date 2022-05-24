@@ -7,8 +7,8 @@
   <% end %>
 <% end %>
 <% if show_nels_button?(item) %>
-  <%= button_link_to('Explore NeLS data', 'git_repository_search', nels_path(:register_mode => false)) %>
-  <%= button_link_to('Add data from NeLS', 'add', nels_path(:assay_id=>item.id, :register_mode => true)) %>
+  <%= button_link_to('Explore NeLS data', 'git_repository_search', nels_path()) %>
+  <%= button_link_to('Add data from NeLS', 'add', nels_path(:assay_id=>item.id)) %>
 <% end -%>
 
 <%= item_actions_dropdown do %>

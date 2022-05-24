@@ -4,7 +4,7 @@ class NelsController < ApplicationController
   before_action :check_user_logged_in, only: :callback
   before_action :check_code_present, only: :callback
   before_action :project_membership_required, except: :callback
-  before_action :find_and_authorize_assay, except: :callback
+  before_action :authorize, except: :callback
   before_action :oauth_client
   before_action :nels_oauth_session, except: :callback
   before_action :rest_client, except: :callback
@@ -23,8 +23,9 @@ class NelsController < ApplicationController
     elsif (match = params[:state].match(/data_file_id:(\d+)/))
       redirect_to retrieve_nels_sample_metadata_data_file_path(match[1].to_i)
     else
-      flash[:error] = "Bad redirect - Missing assay or data file ID from state parameter."
-      redirect_to root_path
+      # flash[:error] = "Bad redirect - Missing assay or data file ID from state parameter."
+      # redirect_to root_path
+      redirect_to nels_path()
     end
   end
 
@@ -153,6 +154,14 @@ class NelsController < ApplicationController
   end
 
   private
+  
+  def authorize
+    if (params[:assay_id])
+      find_and_authorize_assay()
+    elsif (current_user.person.projects.any?(&:nels_enabled))
+      return true
+    end
+  end
 
   def find_and_authorize_assay
     @assay = Assay.find(params[:assay_id])
