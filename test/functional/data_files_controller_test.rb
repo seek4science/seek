@@ -2343,7 +2343,13 @@ class DataFilesControllerTest < ActionController::TestCase
     sample_type.save!
 
     assert_difference('Sample.count', 3) do
-      post :extract_samples, params: { id: data_file.id, confirm: 'true' }
+      assert_difference('ReindexingQueue.count', 3) do
+        assert_difference('AuthLookupUpdateQueue.count', 3) do
+          with_config_value(:auth_lookup_enabled,true) do # needed to test added to queue
+            post :extract_samples, params: { id: data_file.id, confirm: 'true' }
+          end
+        end
+      end
     end
 
     assert_redirected_to data_file_path(data_file)
