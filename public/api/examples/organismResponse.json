@@ -1,66 +1,50 @@
 {
-    "data": {
-        "id": "1933753696",
-        "type": "organisms",
-        "attributes": {
-            "title": "Plasmodium falciparum",
-            "concept_uri": "http://purl.bioontology.org/ontology/NCBITAXON/5833",
-            "ontology_id": "NCBITAXON"
-        },
-        "relationships": {
-            "projects": {
-                "data": [
-                    {
-                        "id": "17",
-                        "type": "projects"
-                    }
-                ]
-            },
-            "assays": {
-                "data": [
-                    {
-                        "id": "294",
-                        "type": "assays"
-                    },
-                    {
-                        "id": "295",
-                        "type": "assays"
-                    },
-                    {
-                        "id": "296",
-                        "type": "assays"
-                    }
-                ]
-            },
-            "models": {
-                "data": [
-                    {
-                        "id": "175",
-                        "type": "models"
-                    },
-                    {
-                        "id": "176",
-                        "type": "models"
-                    },
-                    {
-                        "id": "177",
-                        "type": "models"
-                    }
-                ]
-            }
-        },
-        "links": {
-            "self": "/organisms/1933753696"
-        },
-        "meta": {
-            "created": "2015-03-03T09:52:07.000Z",
-            "modified": "2015-03-03T09:52:07.000Z",
-            "api_version": "0.1",
-            "uuid": "335d74e0-a6be-0135-6773-549f350973c0",
-            "base_url": "https://fairdomhub.org"
-        }
+  "data": {
+    "id": "5",
+    "type": "organisms",
+    "attributes": {
+      "title": "A Maximal Organism",
+      "concept_uri": "http://purl.bioontology.org/ontology/NCBITAXON/9606",
+      "ontology_id": "23"
     },
-    "jsonapi": {
-        "version": "1.0"
+    "relationships": {
+      "projects": {
+        "data": [
+          {
+            "id": "24",
+            "type": "projects"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "2",
+            "type": "assays"
+          }
+        ]
+      },
+      "models": {
+        "data": [
+          {
+            "id": "4",
+            "type": "models"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/organisms/5"
+    },
+    "meta": {
+      "created": "2022-05-13T14:37:23.000Z",
+      "modified": "2022-05-13T14:37:23.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "20404a20-b4f8-013a-0f2b-0a81884ed284"
     }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
 }

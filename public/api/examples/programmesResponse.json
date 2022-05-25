@@ -1,41 +1,48 @@
 {
-    "data": [
-        {
-            "id": "1",
-            "type": "programmes",
-            "attributes": {
-                "title": "SysMO"
-            },
-            "links": {
-                "self": "/programmes/1"
-            }
-        },
-        {
-            "id": "2",
-            "type": "programmes",
-            "attributes": {
-                "title": "e:Bio"
-            },
-            "links": {
-                "self": "/programmes/2"
-            }
-        },
-        {
-            "id": "3",
-            "type": "programmes",
-            "attributes": {
-                "title": "SARCHI: Mechanistic modelling of health and epidemiology"
-            },
-            "links": {
-                "self": "/programmes/3"
-            }
-        }
-    ],
-    "jsonapi": {
-        "version": "1.0"
+  "data": [
+    {
+      "id": "18",
+      "type": "programmes",
+      "attributes": {
+        "title": "A Maximal Programme"
+      },
+      "links": {
+        "self": "/programmes/18"
+      }
     },
-    "meta": {
-        "base_url": "https://fairdomhub.org",
-        "api_version": "0.1"
+    {
+      "id": "17",
+      "type": "programmes",
+      "attributes": {
+        "title": "A Programme: 15"
+      },
+      "links": {
+        "self": "/programmes/17"
+      }
+    },
+    {
+      "id": "16",
+      "type": "programmes",
+      "attributes": {
+        "title": "A Minimal Programme"
+      },
+      "links": {
+        "self": "/programmes/16"
+      }
     }
+  ],
+  "jsonapi": {
+    "version": "1.0"
+  },
+  "links": {
+    "self": "/programmes?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "first": "/programmes?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "prev": null,
+    "next": null,
+    "last": "/programmes?page%5Bnumber%5D=1&page%5Bsize%5D=1000000"
+  },
+  "meta": {
+    "base_url": "http://localhost:3000",
+    "api_version": "0.3"
+  }
 }

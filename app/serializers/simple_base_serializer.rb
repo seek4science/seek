@@ -25,6 +25,7 @@ class SimpleBaseSerializer < ActiveModel::Serializer
       {}
            end
     meta[:api_version] = ActiveModel::Serializer.config.api_version
+    meta[:base_url] = base_url
     meta
   end
 

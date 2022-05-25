@@ -1,44 +1,19 @@
 {
-    "data": [
-        {
-            "id": "23",
-            "type": "workflows",
-            "attributes": {
-                "title": "An Example Workflow"
-            },
-            "links": {
-                "self": "/workflows/23"
-            }
-        },
-        {
-            "id": "20",
-            "type": "workflows",
-            "attributes": {
-                "title": "Functional analysis of sequences that match the 16S SSU"
-            },
-            "links": {
-                "self": "/workflows/20"
-            }
-        },
-        {
-            "id": "21",
-            "type": "workflows",
-            "attributes": {
-                "title": "A CWL Worfklow"
-            },
-            "links": {
-                "self": "/workflows/21"
-            }
-        }
-    ],
-    "jsonapi": {
-        "version": "1.0"
-    },
-    "links": {
-        "self": "/workflows"
-    },
-    "meta": {
-        "base_url": "http://localhost:3000",
-        "api_version": "0.2"
-    }
+  "data": [
+
+  ],
+  "jsonapi": {
+    "version": "1.0"
+  },
+  "links": {
+    "self": "/workflows?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "first": "/workflows?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "prev": null,
+    "next": null,
+    "last": "/workflows?page%5Bnumber%5D=1&page%5Bsize%5D=1000000"
+  },
+  "meta": {
+    "base_url": "http://localhost:3000",
+    "api_version": "0.3"
+  }
 }

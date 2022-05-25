@@ -78,12 +78,6 @@ module SampleTypesHelper
     tags.uniq.sort_by(&:tag_count).reverse
   end
 
-  def ebi_ontology_choices
-    opts = Ebi::OlsClient.ontologies.map { |ontology| [ontology.dig('config', 'title'), ontology.dig('config', 'namespace')] }
-
-    opts.sort_by { |o| o[0] }
-  end
-
   def sample_attribute_pid_help_icon
     help_icon(t('samples.pid_info_text'))
   end

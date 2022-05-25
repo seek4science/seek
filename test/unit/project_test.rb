@@ -213,6 +213,8 @@ class ProjectTest < ActiveSupport::TestCase
     assert project.publications.include?(threePubl)
   end
 
+
+
   def test_can_be_edited_by
     u = Factory(:project_administrator).user
     p = u.person.projects.first

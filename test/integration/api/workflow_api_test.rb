@@ -15,6 +15,10 @@ class WorkflowApiTest < ActionDispatch::IntegrationTest
     @assay = Factory(:assay, study: study, contributor: current_person)
     @creator = Factory(:person)
     @publication = Factory(:publication, projects: [@project])
+    @presentation = Factory(:presentation, projects: [@project], contributor: current_person)
+    @data_file = Factory(:data_file, projects: [@project], contributor: current_person)
+    @document = Factory(:document, projects: [@project], contributor: current_person)
+    @sop = Factory(:sop, projects: [@project], contributor: current_person)
     @workflow = Factory(:workflow, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
   end
 

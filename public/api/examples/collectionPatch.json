@@ -1,9 +1,47 @@
 {
-    "data": {
-        "type": "collections",
-        "id": "1121",
-        "attributes": {
-            "description": "A collection of very interesting things"
-        }
+  "data": {
+    "type": "collections",
+    "id": "15",
+    "attributes": {
+      "title": "A Maximally Patched Collection",
+      "description": "A collection of very interesting things",
+      "tags": [
+        "tag1",
+        "tag2",
+        "tag3"
+      ],
+      "license": "CC-BY-4.0",
+      "other_creators": "John Smith, Jane Smith",
+      "policy": {
+        "access": "no_access",
+        "permissions": [
+          {
+            "resource": {
+              "id": "997",
+              "type": "projects"
+            },
+            "access": "edit"
+          }
+        ]
+      }
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "919",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "997",
+            "type": "projects"
+          }
+        ]
+      }
     }
+  }
 }

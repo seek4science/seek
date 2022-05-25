@@ -1,59 +1,59 @@
 {
-    "data": {
-        "type": "investigations",
-        "attributes": {
-            "title": "A Maximal Investigation",
-            "policy": {
-                "access": "download",
-                "permissions": [
-                    {
-                        "resource": {
-                            "id": "809",
-                            "type": "projects"
-                        },
-                        "access": "manage"
-                    },
-                    {
-                        "resource": {
-                            "id": "859",
-                            "type": "projects"
-                        },
-                        "access": "manage"
-                    }
-                ]
+  "data": {
+    "type": "investigations",
+    "attributes": {
+      "title": "A Maximal Investigation",
+      "policy": {
+        "access": "download",
+        "permissions": [
+          {
+            "resource": {
+              "type": "projects",
+              "id": "376"
             },
-            "description": "This is a more complex investigation",
-            "other_creators": "Max Blumenthal, Ed Snowden"
-        },
-        "relationships": {
-            "projects": {
-                "data": [
-                    {
-                        "id": "809",
-                        "type": "projects"
-                    },
-                    {
-                        "id": "859",
-                        "type": "projects"
-                    }
-                ]
+            "access": "manage"
+          },
+          {
+            "resource": {
+              "type": "projects",
+              "id": "407"
             },
-            "publications": {
-                "data": [
-                    {
-                        "id": "23",
-                        "type": "publications"
-                    }
-                ]
-            },
-            "creators": {
-                "data": [
-                    {
-                        "id": "555",
-                        "type": "people"
-                    }
-                ]
-            }
-        }
+            "access": "manage"
+          }
+        ]
+      },
+      "description": "This is a more complex investigation",
+      "other_creators": "Max Blumenthal, Ed Snowden"
+    },
+    "relationships": {
+      "projects": {
+        "data": [
+          {
+            "type": "projects",
+            "id": "376"
+          },
+          {
+            "type": "projects",
+            "id": "407"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "42",
+            "type": "publications"
+          }
+        ]
+      },
+      "creators": {
+        "data": [
+          {
+            "id": "351",
+            "type": "people"
+          }
+        ]
+      }
     }
+  }
 }

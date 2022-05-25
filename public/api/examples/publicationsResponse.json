@@ -1,61 +1,48 @@
 {
-    "data": [
-        {
-            "id": "1",
-            "type": "publications",
-            "attributes": {
-                "title": "Quantitative proteomic analysis of Sulfolobus solfataricus membrane proteins"
-            },
-            "links": {
-                "self": "/publications/1"
-            }
-        },
-        {
-            "id": "2",
-            "type": "publications",
-            "attributes": {
-                "title": "Genome-scale reconstruction and analysis of the Pseudomonas putida KT2440 metabolic network facilitates applications in biotechnology"
-            },
-            "links": {
-                "self": "/publications/2"
-            }
-        },
-        {
-            "id": "4",
-            "type": "publications",
-            "attributes": {
-                "title": "Functional analysis of new transporters involved in stress tolerance inPseudomonas putidaDOT-T1E"
-            },
-            "links": {
-                "self": "/publications/4"
-            }
-        },
-        {
-            "id": "5",
-            "type": "publications",
-            "attributes": {
-                "title": "Identification and characterization of the PhhR regulon inPseudomonas putida"
-            },
-            "links": {
-                "self": "/publications/5"
-            }
-        },
-        {
-            "id": "7",
-            "type": "publications",
-            "attributes": {
-                "title": "Metabolic modeling and analysis of the metabolic switch in Streptomyces coelicolor"
-            },
-            "links": {
-                "self": "/publications/7"
-            }
-        }
-    ],
-    "jsonapi": {
-        "version": "1.0"
+  "data": [
+    {
+      "id": "16",
+      "type": "publications",
+      "attributes": {
+        "title": "A Maximal Publication"
+      },
+      "links": {
+        "self": "/publications/16"
+      }
     },
-    "meta": {
-        "base_url": "https://fairdomhub.org",
-        "api_version": "0.1"
+    {
+      "id": "14",
+      "type": "publications",
+      "attributes": {
+        "title": "A Minimal Publication"
+      },
+      "links": {
+        "self": "/publications/14"
+      }
+    },
+    {
+      "id": "15",
+      "type": "publications",
+      "attributes": {
+        "title": "A Publication 14"
+      },
+      "links": {
+        "self": "/publications/15"
+      }
     }
+  ],
+  "jsonapi": {
+    "version": "1.0"
+  },
+  "links": {
+    "self": "/publications?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "first": "/publications?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "prev": null,
+    "next": null,
+    "last": "/publications?page%5Bnumber%5D=1&page%5Bsize%5D=1000000"
+  },
+  "meta": {
+    "base_url": "http://localhost:3000",
+    "api_version": "0.3"
+  }
 }

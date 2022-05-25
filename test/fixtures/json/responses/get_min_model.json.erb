@@ -25,7 +25,17 @@
       "doi": null,
       "created_at": "<%= res.find_version(1).created_at.as_json %>",
       "updated_at": "<%= res.find_version(1).updated_at.as_json %>",
-      "content_blobs": [],
+      "content_blobs": [
+        {
+          "original_filename": "non_sbml_xml.xml",
+          "url": null,
+          "md5sum": "df4563d2da7b78123689663056fc6de8",
+          "sha1sum": "7f057ee8db8826b98fd84c3047a4d0a3470dcbec",
+          "content_type": "application/xml",
+          "link": "http://localhost:3000/models/<%= res.id %>/content_blobs/<%= res.content_blob_ids.first %>",
+          "size": 53
+        }
+      ],
       "model_type": null,
       "model_format": null,
       "environment": null,

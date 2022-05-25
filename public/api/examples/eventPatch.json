@@ -1,9 +1,62 @@
 {
-    "data": {
-        "type": "events",
-        "id": "14",
-        "attributes": {
-            "description": "A thing that will happen"
-        }
+  "data": {
+    "type": "events",
+    "id": "22",
+    "attributes": {
+      "title": "A Maximally Patched Event",
+      "description": "A thing happening",
+      "policy": {
+        "access": "no_access",
+        "permissions": [
+          {
+            "resource": {
+              "id": "579",
+              "type": "projects"
+            },
+            "access": "edit"
+          }
+        ]
+      },
+      "url": "http://www.example.com/events/123",
+      "address": "Sofienstr 2",
+      "city": "Heidelberg",
+      "country": "DE",
+      "start_date": "2017-01-01T00:20:00.000Z",
+      "end_date": "2017-01-01T00:22:00.000Z"
+    },
+    "relationships": {
+      "projects": {
+        "data": [
+          {
+            "id": "579",
+            "type": "projects"
+          }
+        ]
+      },
+      "data_files": {
+        "data": [
+          {
+            "id": "36",
+            "type": "data_files"
+          }
+        ]
+      },
+      "presentations": {
+        "data": [
+          {
+            "id": "20",
+            "type": "presentations"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "59",
+            "type": "publications"
+          }
+        ]
+      }
     }
+  }
 }

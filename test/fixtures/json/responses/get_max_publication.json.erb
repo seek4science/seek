@@ -4,7 +4,7 @@
     "type": "publications",
     "attributes": {
       "policy": {
-        "access": "view",
+        "access": "download",
         "permissions": [
         ]
       },
@@ -17,14 +17,13 @@
       ],
       "misc_links": [
         {
-          "id": "<%= res.discussion_link_ids.first %>",
+          "id": "<%= res.misc_link_ids.first %>",
           "label": "A link",
           "url": "http://www.slack.com/"
         }
       ],
       "title": "A Maximal Publication",
       "license": null,
-      "description": "Amazing insights into the mechanism of TF2",
       "latest_version": 1,
       "tags": [
       ],
@@ -32,11 +31,13 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/publications/<%= res.id %>?version=1"
+          "url": "http://localhost:3000/publications/<%= res.id %>?version=1",
+          "doi": "10.5072/abcd"
         }
       ],
       "version": 1,
       "revision_comments": null,
+      "doi": "10.5072/abcd",
       "created_at": "<%= res.find_version(1).created_at.as_json %>",
       "updated_at": "<%= res.find_version(1).updated_at.as_json %>",
       "content_blobs": [

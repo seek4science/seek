@@ -1,0 +1,46 @@
+{
+  "data": {
+    "type": "file_templates",
+    "id": "8",
+    "attributes": {
+      "title": "A Maximal FileTemplate",
+      "description": "This is the description",
+      "tags": [
+        "tag1",
+        "tag2"
+      ],
+      "license": "CC-BY-4.0",
+      "other_creators": "John Smith, Jane Smith",
+      "policy": {
+        "access": "download",
+        "permissions": [
+          {
+            "resource": {
+              "id": "818",
+              "type": "projects"
+            },
+            "access": "edit"
+          }
+        ]
+      }
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "750",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "818",
+            "type": "projects"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -21,6 +21,9 @@ Factory.define(:min_model, class: Model) do |f|
   f.with_project_contributor
   f.title 'A Minimal Model'
   f.projects { [Factory(:min_project)] }
+  f.after_create do |model|
+    model.content_blobs = [Factory.create(:non_sbml_xml_content_blob, asset: model, asset_version: model.version)]
+  end
 end
 
 Factory.define(:max_model, class: Model) do |f|

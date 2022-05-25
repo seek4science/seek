@@ -31,6 +31,12 @@
       <% else %>
         <td> Field not found </td>
       <% end %>
+    <% when "contributor" %>
+      <% if resource.respond_to?('contributor') %>
+        <td><%= link_to resource.contributor.name, resource.contributor %></td>
+      <% else %>
+        <td> Field not found </td>
+      <% end %>
     <% when "tags" %>
       <% if resource.respond_to?('tags') %>
         <td><%= resource.send(column).join(",") %></td>

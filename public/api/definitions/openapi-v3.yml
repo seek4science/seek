@@ -1,0 +1,219 @@
+openapi: 3.1.0
+info:
+  version: "0.3"
+  title: JSON API to FAIRDOM SEEK
+  license:
+    name: The 3-Clause BSD License
+    url: https://opensource.org/licenses/BSD-3-Clause
+  contact:
+    name: SEEK support
+    url: http://groups.google.com/group/seek4science
+    email: support@fair-dom.org
+  description:
+    $ref: ../descriptions/api.md
+  x-logo:
+    url: api/definitions/seek.png
+    backgroundColor: "#FFFFFF"
+security:
+  - OAuth2:
+      - read
+      - write
+  - apiToken: []
+  - basicAuth: []
+servers:
+  - url: https://fairdomhub.org
+tags:
+  - name: list
+    description:
+      $ref: ../descriptions/list.md
+    x-traitTag: true
+  - name: create
+    description:
+      $ref: ../descriptions/create.md
+    x-traitTag: true
+  - name: read
+    description:
+      $ref: ../descriptions/read.md
+    x-traitTag: true
+  - name: update
+    description:
+      $ref: ../descriptions/update.md
+    x-traitTag: true
+  - name: delete
+    description:
+      $ref: ../descriptions/delete.md
+    x-traitTag: true
+  - name: upload
+    description:
+      $ref: ../descriptions/upload.md
+    x-traitTag: true
+  - name: download
+    description:
+      $ref: ../descriptions/download.md
+    x-traitTag: true
+  - name: search
+    description:
+      $ref: ../descriptions/search.md
+  - name: institutions
+    description:
+      $ref: ../descriptions/institutions.md
+  - name: people
+    description:
+      $ref: ../descriptions/people.md
+  - name: programmes
+    description:
+      $ref: ../descriptions/programmes.md
+  - name: projects
+    description:
+      $ref: ../descriptions/projects.md
+  - name: investigations
+    description:
+      $ref: ../descriptions/investigations.md
+  - name: studies
+    description:
+      $ref: ../descriptions/studies.md
+  - name: assays
+    description:
+      $ref: ../descriptions/assays.md
+  - name: collections
+    description:
+      $ref: ../descriptions/collections.md
+  - name: contentBlobs
+    description:
+      $ref: ../descriptions/contentBlobs.md
+  - name: dataFiles
+    description:
+      $ref: ../descriptions/dataFiles.md
+  - name: documents
+    description:
+      $ref: ../descriptions/documents.md
+  - name: models
+    description:
+      $ref: ../descriptions/models.md
+  - name: publications
+    description:
+      $ref: ../descriptions/publications.md
+  - name: sops
+    description:
+      $ref: ../descriptions/sops.md
+  - name: events
+    description:
+      $ref: ../descriptions/events.md
+  - name: presentations
+    description:
+      $ref: ../descriptions/presentations.md
+  - name: organisms
+    description:
+      $ref: ../descriptions/organisms.md
+  - name: sampleTypes
+    description:
+      $ref: ../descriptions/sampleTypes.md
+  - name: samples
+    description:
+      $ref: ../descriptions/samples.md
+  - name: workflows
+    description:
+      $ref: ../descriptions/workflows.md
+x-tagGroups:
+  - name: operation types
+    tags:
+      - list
+      - create
+      - read
+      - update
+      - delete
+      - upload
+      - download
+  - name: Search
+    tags:
+      - search
+  - name: Yellow Pages
+    tags:
+      - institutions
+      - people
+      - programmes
+      - projects
+  - name: Experiments
+    tags:
+      - investigations
+      - studies
+      - assays
+  - name: Assets
+    tags:
+      - collections
+      - dataFiles
+      - documents
+      - models
+      - publications
+      - sops
+      - workflows
+      - contentBlobs
+  - name: Activities
+    tags:
+      - events
+      - presentations
+  - name: Samples
+    tags:
+      - organisms
+      - sampleTypes
+      - samples
+      - sampleAttributeTypes
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      description:
+        $ref: ../descriptions/authOAuth2.md
+      flows:
+        authorizationCode:
+          authorizationUrl: /oauth/authorize
+          tokenUrl: /oauth/token
+          scopes:
+            read: Read, download and list resources
+            write: Create, upload, update and delete resources
+    apiToken:
+      type: apiKey
+      in: header
+      name: Authorization
+      description:
+        $ref: ../descriptions/authToken.md
+    basicAuth:
+      type: http
+      description:
+        $ref: ../descriptions/authBasic.md
+      scheme: basic
+  schemas:
+    $ref: _schemas.yml
+  responses:
+    badRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/badRequestResponse"
+    forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/forbiddenResponse"
+    notFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/notFoundResponse"
+    unprocessableEntity:
+      description: Unprocessable entity
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/unprocessableEntityResponse"
+    notImplemented:
+      description: Not implemented
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/notImplementedResponse"
+paths:
+  $ref: _paths.yml

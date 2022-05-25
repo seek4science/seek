@@ -1,35 +1,39 @@
 {
-    "data": {
-        "id": "12",
-        "type": "collection_items",
-        "attributes": {
-            "comment": "...then run this workflow",
-            "order": 3
-        },
-        "relationships": {
-            "collection": {
-                "data": {
-                    "id": "2",
-                    "type": "collections"
-                }
-            },
-            "asset": {
-                "data": {
-                    "id": "60",
-                    "type": "workflows"
-                }
-            }
-        },
-        "links": {
-            "self": "/collections/2/items/12"
+  "data": {
+    "id": "7",
+    "type": "collection_items",
+    "attributes": {
+      "comment": "A document",
+      "order": 1
+    },
+    "relationships": {
+      "collection": {
+        "data": {
+          "id": "6",
+          "type": "collections"
+        }
+      },
+      "asset": {
+        "data": {
+          "id": "37",
+          "type": "documents"
         },
         "meta": {
-            "created": "2020-05-28T15:58:38.000Z",
-            "modified": "2020-05-28T15:58:38.000Z",
-            "api_version": "0.3"
+          "title": "This Document"
         }
+      }
     },
-    "jsonapi": {
-        "version": "1.0"
+    "links": {
+      "self": "/collections/6/items/7"
+    },
+    "meta": {
+      "created": "2022-05-13T14:38:58.000Z",
+      "modified": "2022-05-13T14:38:58.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000"
     }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
 }

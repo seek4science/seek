@@ -34,6 +34,7 @@ Factory.define(:max_data_file, class: DataFile) do |f|
   f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
   f.assays { [Factory(:public_assay)] }
   f.events {[Factory.build(:event, policy: Factory(:public_policy))]}
+  f.workflows {[Factory.build(:workflow, policy: Factory(:public_policy))]}
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
   f.after_create do |data_file|
     if data_file.content_blob.blank?

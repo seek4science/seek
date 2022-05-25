@@ -1,107 +1,135 @@
 {
-    "data": {
-        "id": "122",
-        "type": "investigations",
-        "attributes": {
-            "policy": {
-                "access": "download",
-                "permissions": [
-                    {
-                        "resource": {
-                            "id": "809",
-                            "type": "projects"
-                        },
-                        "access": "manage"
-                    },
-                    {
-                        "resource": {
-                            "id": "859",
-                            "type": "projects"
-                        },
-                        "access": "manage"
-                    }
-                ]
+  "data": {
+    "id": "91",
+    "type": "investigations",
+    "attributes": {
+      "policy": {
+        "access": "download",
+        "permissions": [
+          {
+            "resource": {
+              "id": "376",
+              "type": "projects"
             },
-            "title": "A Maximal Investigation",
-            "description": "This is a more complex investigation",
-            "other_creators": "Max Blumenthal, Ed Snowden"
-        },
-        "relationships": {
-            "creators": {
-                "data": [
-                    {
-                        "id": "555",
-                        "type": "people"
-                    }
-                ]
+            "access": "manage"
+          },
+          {
+            "resource": {
+              "id": "407",
+              "type": "projects"
             },
-            "submitter": {
-                "data": [
-                    {
-                        "id": "555",
-                        "type": "people"
-                    }
-                ]
-            },
-            "people": {
-                "data": [
-                    {
-                        "id": "555",
-                        "type": "people"
-                    }
-                ]
-            },
-            "projects": {
-                "data": [
-                    {
-                        "id": "809",
-                        "type": "projects"
-                    },
-                    {
-                        "id": "859",
-                        "type": "projects"
-                    }
-                ]
-            },
-            "studies": {
-                "data": []
-            },
-            "assays": {
-                "data": []
-            },
-            "data_files": {
-                "data": []
-            },
-            "models": {
-                "data": []
-            },
-            "sops": {
-                "data": []
-            },
-            "publications": {
-                "data": [
-                    {
-                        "id": "23",
-                        "type": "publications"
-                    }
-                ]
-            },
-            "documents": {
-                "data": []
-            }
-        },
-        "links": {
-            "self": "/investigations/122"
-        },
-        "meta": {
-            "created": "2018-04-27T14:31:15.345Z",
-            "modified": "2018-04-27T14:31:15.859Z",
-            "api_version": "0.1",
-            "uuid": "90a27200-2c55-0136-ec2f-08002734982f",
-            "base_url": "http://localhost:3000"
+            "access": "manage"
+          }
+        ]
+      },
+      "discussion_links": [
+
+      ],
+      "snapshots": [
+
+      ],
+      "title": "A Maximal Investigation",
+      "description": "This is a more complex investigation",
+      "other_creators": "Max Blumenthal, Ed Snowden",
+      "position": null,
+      "creators": [
+        {
+          "profile": "/people/351",
+          "family_name": "Last",
+          "given_name": "Person292",
+          "affiliation": "An Institution: 353, An Institution: 382",
+          "orcid": null
         }
+      ]
     },
-    "jsonapi": {
-        "version": "1.0"
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "351",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "351",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "351",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "376",
+            "type": "projects"
+          },
+          {
+            "id": "407",
+            "type": "projects"
+          }
+        ]
+      },
+      "studies": {
+        "data": [
+
+        ]
+      },
+      "assays": {
+        "data": [
+
+        ]
+      },
+      "data_files": {
+        "data": [
+
+        ]
+      },
+      "models": {
+        "data": [
+
+        ]
+      },
+      "sops": {
+        "data": [
+
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "42",
+            "type": "publications"
+          }
+        ]
+      },
+      "documents": {
+        "data": [
+
+        ]
+      }
+    },
+    "links": {
+      "self": "/investigations/91"
+    },
+    "meta": {
+      "created": "2022-05-13T14:38:29.000Z",
+      "modified": "2022-05-13T14:38:29.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "47bf2140-b4f8-013a-0f2b-0a81884ed284"
     }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
 }

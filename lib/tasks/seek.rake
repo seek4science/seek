@@ -161,4 +161,10 @@ namespace :seek do
     puts
     puts "Refreshed #{count} Workflows/versions"
   end
+
+  desc 'Create API examples'#
+  task create_api_examples: :environment do
+    puts "Writing API examples..."
+    system("RAILS_ENV=test SEEK_WRITE_EXAMPLES=true rails test test/integration/api -n /test_write_.+_example/")
+  end
 end
