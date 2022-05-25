@@ -200,10 +200,15 @@ class DataFilesController < ApplicationController
 
   def extract_samples
     if params[:confirm]
-      extractor = Seek::Samples::Extractor.new(@data_file, @sample_type)
-      @samples = extractor.persist.select(&:persisted?)
-      extractor.clear
-      @data_file.copy_assay_associations(@samples, params[:assay_ids]) if params[:assay_ids]
+      Rails.logger.info('Starting to persist samples')
+      time = Benchmark.measure do
+        extractor = Seek::Samples::Extractor.new(@data_file, @sample_type)
+        @samples = extractor.persist.select(&:persisted?)
+        extractor.clear
+        @data_file.copy_assay_associations(@samples, params[:assay_ids]) if params[:assay_ids]
+      end
+      Rails.logger.info("Benchmark for persist: #{time.to_s}")
+
       flash[:notice] = "#{@samples.count} samples extracted successfully"
     else
       SampleDataExtractionJob.new(@data_file, @sample_type, false).queue_job
