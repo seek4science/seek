@@ -1,3 +1,5 @@
+<div  style="margin:auto;width:70%;">
+
 <div class="alert alert-info">
   <p>
     <% project_names = current_user.person.projects_for_role(Seek::Roles::ASSET_GATEKEEPER).collect(&:title) %>
@@ -20,63 +22,38 @@
     <%= button_link_to "Back to your profile", 'back', person_path(params[:id].to_i) -%>
 <% else %>
     <%= form_tag :action => :gatekeeper_decide do %>
-        <% if @requested_approval_assets.count > 1 %>
-            <h2>The following items have been requested to be published</h2>
-        <% else %>
-            <h2>The following item has been requested to be published</h2>
-        <% end %>
-
-        <% isa_order = ['Investigation', 'Study', 'Assay']%>
-        <% @requested_approval_assets.sort_by { |a| [a.is_isa? ? -1 : 1, isa_order.index(a.class.name), a.class.name] }.each do |asset| %>
+    <h1><%= (@requested_approval_assets.count > 1)? 'The following items have been requested to be published' : 'The following item has been requested to be published' %></h1>
+        <% @requested_approval_assets.each do |asset| %>
             <div class="item_for_decision row">
-              <div class="col-sm-6">
-
+              <div class="col-sm-10">
                 <div class="type_and_title form-group">
-                  <label><%= text_for_resource asset -%></label>
-                  <p class="form-control-static">
-                    <%= link_to (asset.title), asset -%>
+                  <b><%= text_for_resource asset -%> : </b>
+                    <%= link_to(asset.title, asset,option={target: :_blank}) -%>
                     <%= list_item_visibility(asset) -%>
-                  </p>
                 </div>
 
                 <div class="request_info form-group">
-                  <label>Requested by</label>
-                  <p class="form-control-static">
+                  <label>Requested by </label>
                     <% asset.publish_requesters.each do |requester| %>
-                        <%= link_to(requester.name, requester) %>
+                        <%= link_to(requester.name, requester, option={target: :_blank}) %>
                         on
-                        <%
-                           log = ResourcePublishLog.where(["resource_type=? AND resource_id=? AND publish_state=? AND user_id=?",
-                                                           asset.class.name, asset.id, ResourcePublishLog::WAITING_FOR_APPROVAL, requester.user.id]).last
-                        %>
-                        <%= date_as_string(log.created_at,true) %>
+                        <%= date_as_string(asset.resource_publish_logs.last.created_at,true) %>
                     <% end %>
-                  </p>
                 </div>
 
+                <div class="container">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label class="radio-inline"><input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="1">Approve</label>
+                      <label class="radio-inline"><input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="0">Reject</label>
+                      <label class="radio-inline"><input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="-1" checked>Decide later</label></div>
+                    <div class="col-md-6">
+                        <label>Reason or other comments (optional)</label>
+                        <%= text_area_tag "gatekeeper_decide[#{asset.class.name}][#{asset.id}][comment]", nil,
+                                          :rows => 3, :class => 'form-control' -%>
 
-                <div class="form-group">
-                  <label>Decision</label>
-                  <div class="btn-group btn-group-justified" data-toggle="buttons">
-                    <label class="btn btn-default">
-                      <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="1" autocomplete="off"/>
-                      Approve
-                    </label>
-                    <label class="btn btn-default">
-                      <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="0" autocomplete="off"/>
-                      Reject
-                    </label>
-                    <label class="btn btn-default active">
-                      <input type="radio" name="gatekeeper_decide[<%= asset.class.name %>][<%= asset.id %>][decision]" value="-1" autocomplete="off" checked="checked"/>
-                      Decide later
-                    </label>
+                    </div>
                   </div>
-                </div>
-
-                <div class="form-group">
-                  <label>Reason or other comments (optional)</label>
-                  <%= text_area_tag "gatekeeper_decide[#{asset.class.name}][#{asset.id}][comment]", nil,
-                                    :rows => 3, :class => 'form-control' -%>
                 </div>
               </div>
             </div>
@@ -89,3 +66,4 @@
         </p>
     <% end %>
 <% end %>
+</div>
