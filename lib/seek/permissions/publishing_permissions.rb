@@ -85,7 +85,7 @@ module Seek
       end
 
       def is_updated_since_be_rejected?
-        is_rejected? && resource_publish_logs.where(publish_state: ResourcePublishLog::REJECTED).last.updated_at < updated_at
+        is_rejected? && resource_publish_logs.where(publish_state: ResourcePublishLog::REJECTED).where('created_at > ?', updated_at).none?
       end
 
       def gatekeeper_required?
