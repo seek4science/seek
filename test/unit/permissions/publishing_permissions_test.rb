@@ -20,9 +20,8 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
 
       ResourcePublishLog.add_log(ResourcePublishLog::REJECTED, df)
       assert df.is_rejected?
-      refute df.can_publish?
 
-      df.updated_at = Time.now+3.seconds
+      df.title = 'new title'
       df.save
 
       assert df.is_updated_since_be_rejected?
@@ -156,9 +155,8 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
       assert df.gatekeeper_required?, 'This item must require gatekeeper for the test to succeed'
       refute df.is_waiting_approval?(User.current_user), 'This item must be waiting for approval for the test to be meaningful'
       assert df.is_rejected?, 'This item must not be rejected for the test to succeed'
-      refute df.can_publish?, 'This item should not be publishable'
-      df.updated_at = Time.now+3.second
-      df.save!
+      df.title = 'new title'
+      df.save
       assert df.is_updated_since_be_rejected?
       assert df.can_publish?, 'This item should be publishable after update'
     end
