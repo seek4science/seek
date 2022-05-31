@@ -22,7 +22,7 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
       assert df.is_rejected?
 
       df.title = 'new title'
-      df.save
+      df.save!
 
       assert df.is_updated_since_be_rejected?
       assert df.can_publish?
@@ -156,7 +156,7 @@ class PublishingPermissionsTest < ActiveSupport::TestCase
       refute df.is_waiting_approval?(User.current_user), 'This item must be waiting for approval for the test to be meaningful'
       assert df.is_rejected?, 'This item must not be rejected for the test to succeed'
       df.title = 'new title'
-      df.save
+      df.save!
       assert df.is_updated_since_be_rejected?
       assert df.can_publish?, 'This item should be publishable after update'
     end
