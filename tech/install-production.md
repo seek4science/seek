@@ -24,25 +24,19 @@ To save time later there are also some additional packages to install:
 
     sudo apt-get install libapr1-dev libaprutil1-dev
 
-You will need to install SEEK as the www-data user. First, to make the
-installation simpler, give this user a dedicated home directory:
+First create a user to own the SEEK application:
 
-    sudo /etc/init.d/apache2 stop
-    sudo usermod -d /home/www-data www-data
-    sudo usermod -s /bin/bash www-data
-    sudo mkdir /home/www-data
-    sudo chown www-data /home/www-data
-    sudo /etc/init.d/apache2 start
+    sudo useradd -m seek
 
 We recommend installing SEEK in /srv/rails/seek - first you need to create
-this and grant permissions to www-data
+this and grant permissions to `seek`
 
     sudo mkdir -p /srv/rails
-    sudo chown www-data /srv/rails
+    sudo chown seek:seek /srv/rails
 
-Now switch to the www-data user
+Now switch to the `seek` user
 
-    sudo su - www-data
+    sudo su - seek
     cd /srv/rails
 
 Before following the standard INSTALL guide you need to set an environment
@@ -60,8 +54,19 @@ together with Apache, and also automating the required services.
 
 If you have problems with requiring a sudo password during the RVM steps -
 first setup RVM and ruby-1.9.3 as a user with sudo access, and repeat the
-steps as the www-data user. This means the required packages should then be
+steps as the `seek` user. This means the required packages should then be
 installed. At the time of writing this guide this shouldn't be necessary.
+
+## Set up an RVM alias
+
+To make switching Ruby versions easier in the future, you should create an "alias" using RVM.
+
+Create one with the current supported Ruby version for SEEK (2.7.5 at time of writing).
+
+    rvm alias create seek ruby-2.7.5
+
+In the future, you can re-run this command with a different Ruby version to switch the version used by SEEK, without
+having to change any configuration files.
 
 ## After you have installed SEEK
 
@@ -76,24 +81,37 @@ the following command. This can take some time, so be patient
 
 ### Serving SEEK through Apache
 
-First you need to setup [Passenger Phusion](https://www.phusionpassenger.com/)
-.Still as the www-data user, run the command:
+First you need to setup [Passenger Phusion](https://www.phusionpassenger.com/library/install/apache/install/oss/bionic/).
 
-    bundle exec passenger-install-apache2-module
+#### Install Passenger
 
-This will compile a module for Apache, and at the end present you with some
-lines that need adding to /etc/apache2/apache2.conf. These will look something
-like the following, but the paths will most likely be different:
+The following steps are taken from the above guide:
 
-    LoadModule passenger_module /home/www-data/.rvm/gems/ruby-2.2.7/gems/passenger-5.1.2/buildout/apache2/mod_passenger.so
-    <IfModule mod_passenger.c>
-      PassengerRoot /home/www-data/.rvm/gems/ruby-2.2.7/gems/passenger-5.1.2
-      PassengerDefaultRuby /home/www-data/.rvm/gems/ruby-2.2.7/wrappers/ruby
-    </IfModule>
+Install PGP key:
 
-You will need to be a user that has sudo permissions, and edit this file:
+    sudo apt-get install -y dirmngr gnupg
+    sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 561F9B9CAC40B2F7
+    sudo apt-get install -y apt-transport-https ca-certificates
 
-    sudo nano /etc/apache2/apache2.conf
+Add apt repository:
+
+    sudo sh -c 'echo deb https://oss-binaries.phusionpassenger.com/apt/passenger bionic main > /etc/apt/sources.list.d/passenger.list'
+    sudo apt-get update
+
+Install Apache module:
+
+    sudo apt-get install -y libapache2-mod-passenger
+
+Enable the module:
+
+    sudo a2enmod passenger
+    sudo apache2ctl restart
+
+Check everything worked:
+
+    sudo /usr/bin/passenger-config validate-install
+
+#### Apache configuration
 
 Now create a virtual host definition for SEEK:
 
@@ -104,6 +122,9 @@ ServerName appropriately):
 
     <VirtualHost *:80>
       ServerName www.yourhost.com
+
+      PassengerRuby /usr/local/rvm/rubies/seek/bin/ruby
+
       DocumentRoot /srv/rails/seek/public
        <Directory /srv/rails/seek/public>
           # This relaxes Apache security settings.
@@ -120,6 +141,8 @@ ServerName appropriately):
           ExpiresDefault "access plus 1 year"
        </LocationMatch>
     </VirtualHost>
+
+(Notice we are referencing our "seek" alias in the `PassengerRuby` directive.)
 
 The LocationMatch block tells Apache to serve up the assets (images, CSS,
 Javascript) with a long expiry time, leading to better performance since these
@@ -140,7 +163,7 @@ If you now visit http://localhost (note there is no 3000 port) - you should
 see SEEK.
 
 If you wish to restart SEEK, maybe after an upgrade, without restarting Apache
-you can do so by running (as www-data)
+you can do so by running (as the `seek` user)
 
     touch /srv/rails/seek/tmp/restart.txt
     
