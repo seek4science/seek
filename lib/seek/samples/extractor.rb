@@ -26,11 +26,11 @@ module Seek
             end
             last_id = Sample.last.try(:id) || 0
             sample_type = samples.first.sample_type
-            disable_authorization_checks { Sample.import(samples, validate: false, batch_size: 1000) }
+            disable_authorization_checks { Sample.import(samples, validate: false, batch_size: 2000) }
             SampleTypeUpdateJob.new(sample_type, false).queue_job
 
             # to get the created samples. There is a very small potential of picking up samples created from an overlapping process but it will just trigger some additional jobs
-            samples = Sample.where(sample_type:sample_type, title:samples.collect(&:title)).where('id > ?',last_id)
+            samples = Sample.where(sample_type: sample_type, title: samples.collect(&:title), contributor: User.current_user.person).where('id > ?',last_id)
             ReindexingQueue.enqueue(samples)
             AuthLookupUpdateQueue.enqueue(samples)
           end
