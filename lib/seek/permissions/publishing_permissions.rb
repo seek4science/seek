@@ -85,22 +85,6 @@ module Seek
       end
 
       def is_updated_since_be_rejected?
-        pp "++++++++ is_updated_since_be_rejected? begin+++++++++"
-
-        pp "self.updated_at"
-        pp self.updated_at
-
-        pp "resource_publish_logs"
-        pp resource_publish_logs
-
-        pp "resource_publish_logs.where(publish_state: ResourcePublishLog::REJECTED).where('created_at > ?', self.updated_at)"
-        pp resource_publish_logs.where(publish_state: ResourcePublishLog::REJECTED).where('created_at > ?', self.updated_at)
-
-        pp "is_rejected? && resource_publish_logs.where(publish_state: ResourcePublishLog::REJECTED).where('created_at > ?', updated_at).none?"
-        pp is_rejected? && resource_publish_logs.where(publish_state: ResourcePublishLog::REJECTED).where('created_at > ?', updated_at).none?
-
-        pp "+++++++++ is_updated_since_be_rejected end++++++++"
-
         is_rejected? && resource_publish_logs.where(publish_state: ResourcePublishLog::REJECTED).where('created_at > ?', updated_at).none?
       end
 
