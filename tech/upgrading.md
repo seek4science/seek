@@ -116,8 +116,7 @@ It is relatively straightforward and there are instructions on how to do this in
 
 ### Restarting background job services
 
-    bundle exec rake sunspot:solr:start
-    bundle exec rake tmp:clear 
+    bundle exec rake seek:workers:start    
 
 ## Stopping soffice
 

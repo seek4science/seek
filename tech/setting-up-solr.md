@@ -34,7 +34,7 @@ The Docker container will be named _seek-solr_ and the volume named _seek-solr-d
 
 Once running, and with search enabled, you can trigger jobs to reindex all searchable content with
 
-    bundle exec rake seek:index_all
+    bundle exec rake seek:reindex_all
 
 There is an additional script, [script/delete-docker-solr.sh](https://github.com/seek4science/seek/blob/v{{ site.current_seek_version }}/script/delete-docker-solr.sh), 
 that can be used to delete both the container and volume.
