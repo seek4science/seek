@@ -74,11 +74,13 @@
     }
 
 		function setSplitters() {
-			const splitter = $j('#widget').width('').height(768).split({
-				orientation: 'vertical',
-				limit: { leftUpper: 380, rightBottom: 1000 },
-				position: '25%'
-			});
+			if(!isMobile()) {
+				$j('#widget').width('').height(768).split({
+					orientation: 'vertical',
+					limit: { leftUpper: 350, rightBottom: 1000 },
+					position: '25%'
+				});
+			}
 		}
 
 		function updateContainerHeight() {
