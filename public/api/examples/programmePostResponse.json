@@ -1,88 +1,115 @@
 {
-    "data": {
-        "id": "3",
-        "type": "programmes",
-        "attributes": {
-            "avatar": null,
-            "title": "Post programme Max",
-            "description": "A very exciting programme",
-            "web_page": "http://www.synbiochem.co.uk",
-            "funding_details": "Someone is funding this for me",
-            "funding_codes": [
-                "BMBF",
-                "DFG"
-            ]
-        },
-        "relationships": {
-            "administrators": {
-                "data": [
-                    {
-                        "id": "486",
-                        "type": "people"
-                    },
-                    {
-                        "id": "487",
-                        "type": "people"
-                    }
-                ]
-            },
-            "people": {
-                "data": []
-            },
-            "projects": {
-                "data": [
-                    {
-                        "id": "692",
-                        "type": "projects"
-                    }
-                ]
-            },
-            "institutions": {
-                "data": []
-            },
-            "investigations": {
-                "data": []
-            },
-            "studies": {
-                "data": []
-            },
-            "assays": {
-                "data": []
-            },
-            "data_files": {
-                "data": []
-            },
-            "models": {
-                "data": []
-            },
-            "sops": {
-                "data": []
-            },
-            "publications": {
-                "data": []
-            },
-            "presentations": {
-                "data": []
-            },
-            "events": {
-                "data": []
-            },
-            "documents": {
-                "data": []
-            }
-        },
-        "links": {
-            "self": "/programmes/3"
-        },
-        "meta": {
-            "created": "2018-04-27T14:29:53.193Z",
-            "modified": "2018-04-27T14:29:53.193Z",
-            "api_version": "0.1",
-            "uuid": "5fb40220-2c55-0136-ec2f-08002734982f",
-            "base_url": "http://localhost:3000"
-        }
+  "data": {
+    "id": "14",
+    "type": "programmes",
+    "attributes": {
+      "discussion_links": [
+
+      ],
+      "avatar": null,
+      "title": "Post Programme Max",
+      "description": "A very exciting programme",
+      "web_page": "http://www.synbiochem.co.uk",
+      "funding_details": "Someone is funding this for me",
+      "funding_codes": [
+        "BMBF",
+        "DFG"
+      ]
     },
-    "jsonapi": {
-        "version": "1.0"
+    "relationships": {
+      "administrators": {
+        "data": [
+          {
+            "id": "814",
+            "type": "people"
+          },
+          {
+            "id": "815",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "879",
+            "type": "projects"
+          }
+        ]
+      },
+      "institutions": {
+        "data": [
+
+        ]
+      },
+      "investigations": {
+        "data": [
+
+        ]
+      },
+      "studies": {
+        "data": [
+
+        ]
+      },
+      "assays": {
+        "data": [
+
+        ]
+      },
+      "data_files": {
+        "data": [
+
+        ]
+      },
+      "models": {
+        "data": [
+
+        ]
+      },
+      "sops": {
+        "data": [
+
+        ]
+      },
+      "publications": {
+        "data": [
+
+        ]
+      },
+      "presentations": {
+        "data": [
+
+        ]
+      },
+      "events": {
+        "data": [
+
+        ]
+      },
+      "documents": {
+        "data": [
+
+        ]
+      }
+    },
+    "links": {
+      "self": "/programmes/14"
+    },
+    "meta": {
+      "created": "2022-05-13T14:39:45.000Z",
+      "modified": "2022-05-13T14:39:45.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "74af2dd0-b4f8-013a-0f2b-0a81884ed284"
     }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
 }

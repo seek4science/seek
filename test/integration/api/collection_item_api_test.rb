@@ -13,6 +13,10 @@ class CollectionItemApiTest < ActionDispatch::IntegrationTest
     @collection_item = Factory(:collection_item, collection: @collection)
   end
 
+  def index_response_fragment
+    "#/components/schemas/collectionItemsResponse"
+  end
+
   private
 
   def collection_url

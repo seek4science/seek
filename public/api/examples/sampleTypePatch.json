@@ -1,39 +1,36 @@
 {
   "data": {
-    "id": "60",
     "type": "sample_types",
+    "id": "23",
     "attributes": {
-      "title": "Update sample type",
-      "description": "Updated through API",
+      "title": "This is a new title.",
       "sample_attributes": [
         {
-          "id": "370",
-          "title": "Fish ID (updated)",
+          "id": "39",
+          "title": "This is a new attribute title",
           "sample_attribute_type": {
-            "title": "Integer"
-          },
-          "required": false,
-          "pos": "1",
-          "unit": null,
-          "is_title": true,
-          "sample_controlled_vocab_id": null,
-          "linked_sample_type_id": null
+            "title": "String attribute type 16"
+          }
         }
       ],
       "tags": [
-        "new tag"
+
       ]
     },
     "relationships": {
       "projects": {
         "data": [
           {
-            "id": "60",
+            "id": "875",
             "type": "projects"
-          },
+          }
+        ]
+      },
+      "assays": {
+        "data": [
           {
-            "id": "61",
-            "type": "projects"
+            "id": "125",
+            "type": "assays"
           }
         ]
       }

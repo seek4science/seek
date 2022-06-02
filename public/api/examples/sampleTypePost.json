@@ -2,54 +2,35 @@
   "data": {
     "type": "sample_types",
     "attributes": {
-      "title": "In vivo biometrics",
-      "description": "Template for in vivo biometrics data",
+      "title": "A Maximal SampleType",
+      "description": "A very new research",
       "sample_attributes": [
         {
-          "title": "Fish ID",
+          "title": "full name",
           "sample_attribute_type": {
-            "title": "Integer"
+            "title": "String attribute type 13"
           },
           "required": true,
-          "pos": "1",
+          "pos": 1,
           "unit": null,
-          "is_title": true,
-          "sample_controlled_vocab_id": null,
-          "linked_sample_type_id": null
-        },
-        {
-          "title": "Date",
-          "sample_attribute_type": {
-            "title": "Date"
-          },
-          "required": false,
-          "pos": "2",
-          "unit": null,
-          "is_title": false,
-          "sample_controlled_vocab_id": null,
-          "linked_sample_type_id": null
-        },
-        {
-          "title": "Exposure",
-          "sample_attribute_type": {
-            "title": "String"
-          },
-          "required": true,
-          "pos": "3",
-          "unit": null,
-          "is_title": false,
-          "sample_controlled_vocab_id": null,
-          "linked_sample_type_id": null
+          "is_title": true
         }
-      ],
-      "tags": []
+      ]
     },
     "relationships": {
       "projects": {
         "data": [
           {
-            "id": "60",
+            "id": "860",
             "type": "projects"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "120",
+            "type": "assays"
           }
         ]
       }

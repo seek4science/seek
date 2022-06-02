@@ -14,6 +14,7 @@ class DataFileApiTest < ActionDispatch::IntegrationTest
     @publication = Factory(:publication, projects: [@project])
     @event = Factory(:event, projects: [@project], policy: Factory(:public_policy))
     @data_file = Factory(:data_file, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
+    @workflow = Factory(:workflow, projects: [@project], policy: Factory(:public_policy))
   end
 
   test 'can add content to API-created data file' do
@@ -58,7 +59,7 @@ class DataFileApiTest < ActionDispatch::IntegrationTest
     put data_file_content_blob_path(df, df.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'a_pdf_file.pdf')) }
 
     assert_response :forbidden
-    validate_json response.body, '#/definitions/errors'
+    validate_json response.body, '#/components/schemas/forbiddenResponse'
     blob = df.content_blob.reload
     assert_nil blob.md5sum
     assert blob.no_content?
@@ -75,7 +76,7 @@ class DataFileApiTest < ActionDispatch::IntegrationTest
     put data_file_content_blob_path(df, df.content_blob), headers: { 'Accept' => 'application/json', 'RAW_POST_DATA' => File.binread(File.join(Rails.root, 'test', 'fixtures', 'files', 'another_pdf_file.pdf')) }
 
     assert_response :bad_request
-    validate_json response.body, '#/definitions/errors'
+    validate_json response.body, '#/components/schemas/badRequestResponse'
     blob = df.content_blob.reload
     assert_equal original_md5, blob.md5sum
     assert blob.file_size > 0
@@ -97,7 +98,7 @@ class DataFileApiTest < ActionDispatch::IntegrationTest
     assert_no_difference(-> { model.count }) do
       post "/#{plural_name}.json", params: to_post
       assert_response :unprocessable_entity
-      validate_json response.body, '#/definitions/errors'
+      validate_json response.body, '#/components/schemas/unprocessableEntityResponse'
     end
 
     h = JSON.parse(response.body)
@@ -121,8 +122,7 @@ class DataFileApiTest < ActionDispatch::IntegrationTest
       assert_no_difference(-> { model.count }) do
         post "/#{plural_name}.json", params: to_post
         assert_response :unprocessable_entity
-
-        validate_json response.body, '#/definitions/errors'
+        validate_json response.body, '#/components/schemas/unprocessableEntityResponse'
       end
     end
 

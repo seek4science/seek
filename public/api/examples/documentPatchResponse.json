@@ -1,105 +1,154 @@
 {
-    "data": {
-        "id": "25",
-        "type": "documents",
-        "attributes": {
-            "policy": {
-                "access": "manage",
-                "permissions": []
+  "data": {
+    "id": "47",
+    "type": "documents",
+    "attributes": {
+      "policy": {
+        "access": "no_access",
+        "permissions": [
+          {
+            "resource": {
+              "id": "677",
+              "type": "projects"
             },
-            "title": "This Document",
-            "description": "A report about the thing that happened",
-            "license": null,
-            "latest_version": 1,
-            "tags": [],
-            "versions": [
-                {
-                    "version": 1,
-                    "revision_comments": null,
-                    "url": "http://localhost:3000/documents/25?version=1",
-                    "doi": null
-                }
-            ],
-            "version": 1,
-            "revision_comments": null,
-            "doi": null,
-            "created_at": "2018-04-27T14:27:09.000Z",
-            "updated_at": "2018-04-27T14:27:15.000Z",
-            "content_blobs": [
-                {
-                    "original_filename": "file-17",
-                    "url": null,
-                    "md5sum": "443130e29a37e34e439a5b391efd1d42",
-                    "sha1sum": "3da9d44ef741dda15ef1194e949f6c3b02c597bd",
-                    "content_type": "application/pdf",
-                    "link": "http://localhost:3000/documents/25/content_blobs/59",
-                    "size": 9
-                }
-            ],
-            "other_creators": null
-        },
-        "relationships": {
-            "creators": {
-                "data": [
-                    {
-                        "id": "262",
-                        "type": "people"
-                    }
-                ]
-            },
-            "submitter": {
-                "data": [
-                    {
-                        "id": "261",
-                        "type": "people"
-                    }
-                ]
-            },
-            "people": {
-                "data": [
-                    {
-                        "id": "261",
-                        "type": "people"
-                    },
-                    {
-                        "id": "262",
-                        "type": "people"
-                    }
-                ]
-            },
-            "projects": {
-                "data": [
-                    {
-                        "id": "400",
-                        "type": "projects"
-                    }
-                ]
-            },
-            "investigations": {
-                "data": []
-            },
-            "studies": {
-                "data": []
-            },
-            "assays": {
-                "data": []
-            },
-            "publications": {
-                "data": []
-            }
-        },
-        "links": {
-            "self": "/documents/25?version=1"
-        },
-        "meta": {
-            "created": "2018-04-27T14:27:09.000Z",
-            "modified": "2018-04-27T14:27:12.000Z",
-            "api_version": "0.1",
-            "uuid": "fde626a0-2c54-0136-ec2f-08002734982f",
-            "base_url": "http://localhost:3000"
+            "access": "edit"
+          }
+        ]
+      },
+      "discussion_links": [
+
+      ],
+      "title": "A Maximally Patched Document",
+      "license": "CC-BY-4.0",
+      "description": "A report about the thing that happened",
+      "latest_version": 1,
+      "tags": [
+        "tag1",
+        "tag2",
+        "tag3"
+      ],
+      "versions": [
+        {
+          "version": 1,
+          "revision_comments": null,
+          "url": "http://localhost:3000/documents/47?version=1",
+          "doi": null
         }
+      ],
+      "version": 1,
+      "revision_comments": null,
+      "created_at": "2022-05-13T14:39:14.000Z",
+      "updated_at": "2022-05-13T14:39:14.000Z",
+      "doi": null,
+      "content_blobs": [
+        {
+          "original_filename": "file-43",
+          "url": null,
+          "md5sum": "1f26258a9b4e7769d94df9cb2abb855f",
+          "sha1sum": "42248f6404b1feae995377e24fde5929e6fbca03",
+          "content_type": "application/pdf",
+          "link": "http://localhost:3000/documents/47/content_blobs/292",
+          "size": 9
+        }
+      ],
+      "creators": [
+        {
+          "profile": "/people/629",
+          "family_name": "Last",
+          "given_name": "Person527",
+          "affiliation": "An Institution: 635",
+          "orcid": null
+        }
+      ],
+      "other_creators": "John Smith, Jane Smith"
     },
-    "jsonapi": {
-        "version": "1.0"
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "629",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "628",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "628",
+            "type": "people"
+          },
+          {
+            "id": "629",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "677",
+            "type": "projects"
+          }
+        ]
+      },
+      "investigations": {
+        "data": [
+          {
+            "id": "143",
+            "type": "investigations"
+          }
+        ]
+      },
+      "studies": {
+        "data": [
+          {
+            "id": "124",
+            "type": "studies"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "103",
+            "type": "assays"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+
+        ]
+      },
+      "workflows": {
+        "data": [
+          {
+            "id": "34",
+            "type": "workflows"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/documents/47?version=1"
+    },
+    "meta": {
+      "created": "2022-05-13T14:39:14.000Z",
+      "modified": "2022-05-13T14:39:14.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "621fff00-b4f8-013a-0f2b-0a81884ed284"
     }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
 }

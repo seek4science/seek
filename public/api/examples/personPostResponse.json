@@ -1,75 +1,100 @@
 {
-    "data": {
-        "id": "441",
-        "type": "people",
-        "attributes": {
-            "avatar": null,
-            "title": "Post Last",
-            "description": "A person with all possible details",
-            "first_name": "Post",
-            "last_name": "Last",
-            "orcid": "http://orcid.org/0000-0001-9842-9718",
-            "mbox_sha1sum": "d6b1a16fb3c8678069841a2e47f0f5bdd5103a6e",
-            "expertise": [
-                "modeling",
-                "programming"
-            ],
-            "tools": [
-                "CeriusII",
-                "Gromacs",
-                "Python"
-            ]
-        },
-        "relationships": {
-            "projects": {
-                "data": []
-            },
-            "institutions": {
-                "data": []
-            },
-            "investigations": {
-                "data": []
-            },
-            "studies": {
-                "data": []
-            },
-            "assays": {
-                "data": []
-            },
-            "data_files": {
-                "data": []
-            },
-            "models": {
-                "data": []
-            },
-            "sops": {
-                "data": []
-            },
-            "publications": {
-                "data": []
-            },
-            "presentations": {
-                "data": []
-            },
-            "events": {
-                "data": []
-            },
-            "documents": {
-                "data": []
-            }
-        },
-        "links": {
-            "self": "/people/441"
-        },
-        "meta": {
-            "created": "2018-04-27T14:29:10.153Z",
-            "modified": "2018-04-27T14:29:10.153Z",
-            "api_version": "0.1",
-            "uuid": "460c1550-2c55-0136-ec2f-08002734982f",
-            "base_url": "http://localhost:3000"
-        }
+  "data": {
+    "id": "328",
+    "type": "people",
+    "attributes": {
+      "avatar": null,
+      "title": "Post Person328",
+      "description": "A person with all possible details",
+      "first_name": "Post",
+      "last_name": "Person328",
+      "orcid": "https://orcid.org/0000-0001-9842-9718",
+      "mbox_sha1sum": "55635ff1c201d0d2c81780c55096505804bb8134",
+      "expertise": [
+        "modeling",
+        "programming"
+      ],
+      "tools": [
+        "CeriusII",
+        "Gromacs",
+        "Python"
+      ],
+      "login": null
     },
-    "jsonapi": {
-        "version": "1.0"
+    "relationships": {
+      "projects": {
+        "data": [
+
+        ]
+      },
+      "institutions": {
+        "data": [
+
+        ]
+      },
+      "investigations": {
+        "data": [
+
+        ]
+      },
+      "studies": {
+        "data": [
+
+        ]
+      },
+      "assays": {
+        "data": [
+
+        ]
+      },
+      "data_files": {
+        "data": [
+
+        ]
+      },
+      "models": {
+        "data": [
+
+        ]
+      },
+      "sops": {
+        "data": [
+
+        ]
+      },
+      "publications": {
+        "data": [
+
+        ]
+      },
+      "presentations": {
+        "data": [
+
+        ]
+      },
+      "events": {
+        "data": [
+
+        ]
+      },
+      "documents": {
+        "data": [
+
+        ]
+      }
+    },
+    "links": {
+      "self": "/people/328"
+    },
+    "meta": {
+      "created": "2022-05-13T14:38:19.000Z",
+      "modified": "2022-05-13T14:38:19.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "41d12550-b4f8-013a-0f2b-0a81884ed284"
     }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
 }

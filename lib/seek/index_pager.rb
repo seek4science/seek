@@ -3,7 +3,6 @@ module Seek
     def index
       respond_to do |format|
         format.html
-        format.xml
         format.json do
           render json: instance_variable_get("@#{controller_name}"),
                  each_serializer: SkeletonSerializer,
@@ -129,15 +128,15 @@ module Seek
     end
 
     def json_api_links
+      idx = controller_name.to_sym
       if @parent_resource
-        base = [@parent_resource, controller_name.to_sym]
+        idx = :items if @parent_resource.is_a?(Collection) # Collection items use ".../items" as their path
+        base = [@parent_resource, idx]
       else
-        base = controller_name.to_sym
+        base = idx
       end
 
-      {
-        self: polymorphic_path(base, page_and_sort_params)
-      }
+      { self: polymorphic_path(base, page_and_sort_params) }
     end
 
     def log_with_time(message, &block)

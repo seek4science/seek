@@ -76,6 +76,7 @@ Factory.define(:max_assay, class: Assay) do |f|
   f.description "A Western Blot Assay"
   f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
   f.other_creators "Anonymous creator"
+  f.technology_type_uri 'http://jermontology.org/ontology/JERMOntology#Technology_type'
   f.association :assay_class, factory: :modelling_assay_class
   f.association :contributor,  factory: :person
   f.assay_assets {[Factory(:assay_asset, asset: Factory(:data_file, policy: Factory(:public_policy))),

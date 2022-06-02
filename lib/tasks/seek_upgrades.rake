@@ -218,15 +218,17 @@ namespace :seek do
     a = Annotation.joins(:annotation_attribute).where(annotation_attribute: { name: ['additional_scale_info', 'scale'] })
     count = a.count
     a.destroy_all
+    AnnotationAttribute.where(name:['scale','additional_scale_info']).destroy_all
     puts "Removed #{count} scale related annotations" if count > 0
   end
 
   task(remove_spreadsheet_annotations: [:environment]) do
     annotations = Annotation.where(annotatable_type: 'CellRange')
     count = annotations.count
-    AnnotationAttribute.joins(:annotations).where(annotations: { annotatable_type: 'CellRange' }).destroy_all
-    TextValue.joins(:annotations).where(annotations: { annotatable_type: 'CellRange' }).destroy_all
+    values = TextValue.joins(:annotations).where(annotations: { annotatable_type: 'CellRange' })
+    values.select{|v| v.annotations.count == 1}.each(&:destroy)
     annotations.destroy_all
+    AnnotationAttribute.where(name:'annotation').destroy_all
     puts "Removed #{count} spreadsheet related annotations" if count > 0
   end
 

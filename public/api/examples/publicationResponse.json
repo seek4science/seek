@@ -1,106 +1,192 @@
 {
-    "data": {
-        "id": "240",
-        "type": "publications",
-        "attributes": {
-            "title": "Construction and validation of a detailed kinetic model of glycolysis in\n              Plasmodium falciparum",
-            "journal": "FEBS J",
-            "published_date": "2015-04-01",
-            "doi": "10.1111/febs.13237",
-            "pubmed_id": null,
-            "abstract": "The enzymes in the Embden\u2013Meyerhof\u2013Parnas pathway of Plasmodium falciparum trophozoites were kinetically characterized and their integrated activities analyzed in a mathematical model. For validation of the model, we compared model predictions for steady-state fluxes and metabolite concentrations of the hexose phosphates with experimental values for intact parasites. The model, which is completely based on kinetic parameters that were measured for the individual enzymes, gives an accurate prediction of the steady-state fluxes and intermediate concentrations. This is the first detailed kinetic model for glucose metabolism in P. falciparum, one of the most prolific malaria-causing protozoa, and the high predictive power of the model makes it a strong tool for future drug target identification studies. The modelling workflow is transparent and reproducible, and completely documented in the SEEK platform, where all experimental data and model files are available for download.",
-            "citation": "FEBS J 282(8) : 1481",
-            "link_to_pub": "https://www.ncbi.nlm.nih.gov/pubmed/",
-            "authors": [
-                "Gerald Penkler",
-                "Francois du Toit",
-                "Waldo Adams",
-                "Marina Rautenbach",
-                "Daniel C. Palm",
-                "Dawie Van Niekerk",
-                "Jacky Snoep"
-            ],
-            "content_blobs": null
-        },
-        "relationships": {
-            "people": {
-                "data": [
-                    {
-                        "id": "49",
-                        "type": "people"
-                    },
-                    {
-                        "id": "411",
-                        "type": "people"
-                    }
-                ]
-            },
-            "projects": {
-                "data": [
-                    {
-                        "id": "17",
-                        "type": "projects"
-                    }
-                ]
-            },
-            "investigations": {
-                "data": [
-                    {
-                        "id": "56",
-                        "type": "investigations"
-                    }
-                ]
-            },
-            "studies": {
-                "data": [
-                    {
-                        "id": "118",
-                        "type": "studies"
-                    },
-                    {
-                        "id": "119",
-                        "type": "studies"
-                    },
-                    {
-                        "id": "138",
-                        "type": "studies"
-                    }
-                ]
-            },
-            "assays": {
-                "data": []
-            },
-            "data_files": {
-                "data": []
-            },
-            "models": {
-                "data": []
-            },
-            "publications": {
-                "data": []
-            },
-            "presentations": {
-                "data": []
-            },
-            "events": {
-                "data": []
-            },
-            "workflows": {
-                "data": []
-            }
-        },
-        "links": {
-            "self": "/publications/240"
-        },
-        "meta": {
-            "created": "2015-07-09T15:30:55.000Z",
-            "modified": "2016-09-19T13:34:11.000Z",
-            "api_version": "0.1",
-            "uuid": "69bebf90-087d-0133-36e3-549f350973c0",
-            "base_url": "https://fairdomhub.org"
+  "data": {
+    "id": "19",
+    "type": "publications",
+    "attributes": {
+      "policy": {
+        "access": "download",
+        "permissions": [
+
+        ]
+      },
+      "discussion_links": [
+        {
+          "id": "19",
+          "label": "Slack",
+          "url": "http://www.slack.com/"
         }
+      ],
+      "misc_links": [
+        {
+          "id": "20",
+          "label": "A link",
+          "url": "http://www.slack.com/"
+        }
+      ],
+      "title": "A Maximal Publication",
+      "latest_version": 1,
+      "tags": [
+
+      ],
+      "versions": [
+        {
+          "version": 1,
+          "revision_comments": null,
+          "url": "http://localhost:3000/publications/19?version=1",
+          "doi": "10.5072/abcd"
+        }
+      ],
+      "version": 1,
+      "revision_comments": null,
+      "created_at": "2022-05-13T14:37:53.000Z",
+      "updated_at": "2022-05-13T14:37:53.000Z",
+      "doi": "10.5072/abcd",
+      "content_blobs": [
+        {
+          "original_filename": "min file",
+          "url": null,
+          "md5sum": "726de0a3f94d65056b909b9736e10349",
+          "sha1sum": "fbcc0dee4b5415de4c82ef5b137d8231fec1331b",
+          "content_type": "application/pdf",
+          "link": "http://localhost:3000/publications/19/content_blobs/70",
+          "size": 8
+        }
+      ],
+      "creators": [
+
+      ],
+      "other_creators": null,
+      "journal": "Journal of Molecular Biology",
+      "published_date": "2017-10-10",
+      "pubmed_id": 873864488,
+      "abstract": "Amazing insights into the mechanism of TF2",
+      "citation": "JMB Oct 2017, 12:234-245",
+      "editor": "Richling, S. and Baumann, M. and Heuveline, V.",
+      "booktitle": "Proceedings of the 3rd bwHPC-Symposium: Heidelberg 2016",
+      "publisher": "Heidelberg University Library, heiBOOKS",
+      "url": null,
+      "link_to_pub": "https://www.ncbi.nlm.nih.gov/pubmed/873864488",
+      "publication_type": "Journal",
+      "authors": [
+        "Author_non_registered LastNonReg",
+        "Author_registered LastReg"
+      ]
     },
-    "jsonapi": {
-        "version": "1.0"
+    "relationships": {
+      "creators": {
+        "data": [
+
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "193",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "193",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "211",
+            "type": "projects"
+          }
+        ]
+      },
+      "investigations": {
+        "data": [
+          {
+            "id": "49",
+            "type": "investigations"
+          }
+        ]
+      },
+      "studies": {
+        "data": [
+          {
+            "id": "42",
+            "type": "studies"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "30",
+            "type": "assays"
+          }
+        ]
+      },
+      "data_files": {
+        "data": [
+          {
+            "id": "8",
+            "type": "data_files"
+          }
+        ]
+      },
+      "models": {
+        "data": [
+          {
+            "id": "38",
+            "type": "models"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "18",
+            "type": "publications"
+          }
+        ]
+      },
+      "presentations": {
+        "data": [
+          {
+            "id": "4",
+            "type": "presentations"
+          }
+        ]
+      },
+      "events": {
+        "data": [
+          {
+            "id": "4",
+            "type": "events"
+          }
+        ]
+      },
+      "workflows": {
+        "data": [
+          {
+            "id": "10",
+            "type": "workflows"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/publications/19?version=1"
+    },
+    "meta": {
+      "created": "2022-05-13T14:37:53.000Z",
+      "modified": "2022-05-13T14:37:53.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "32489780-b4f8-013a-0f2b-0a81884ed284"
     }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
 }

@@ -1,108 +1,171 @@
 {
-    "data": {
-        "id": "68",
-        "type": "data_files",
-        "attributes": {
-            "policy": {
-                "access": "manage",
-                "permissions": []
+  "data": {
+    "id": "44",
+    "type": "data_files",
+    "attributes": {
+      "policy": {
+        "access": "no_access",
+        "permissions": [
+          {
+            "resource": {
+              "id": "636",
+              "type": "projects"
             },
-            "title": "A Data File_62",
-            "description": "Study of the Human Genome",
-            "license": null,
-            "latest_version": 1,
-            "tags": [],
-            "versions": [
-                {
-                    "version": 1,
-                    "revision_comments": null,
-                    "url": "http://localhost:3000/data_files/68?version=1",
-                    "doi": null
-                }
-            ],
-            "version": 1,
-            "revision_comments": null,
-            "doi": null,
-            "created_at": "2018-04-27T14:43:48.000Z",
-            "updated_at": "2018-04-27T14:43:52.000Z",
-            "content_blobs": [
-                {
-                    "original_filename": "a_pdf_file.pdf",
-                    "url": null,
-                    "md5sum": "565ae8a7a743c3bfd9f15c69647f5b8b",
-                    "sha1sum": "b9d2148740050b7f37975edd0fb97faa508ff767",
-                    "content_type": "application/pdf",
-                    "link": "http://localhost:3000/data_files/68/content_blobs/324",
-                    "size": 8827
-                }
-            ],
-            "other_creators": null
-        },
-        "relationships": {
-            "creators": {
-                "data": [
-                    {
-                        "id": "1413",
-                        "type": "people"
-                    }
-                ]
-            },
-            "submitter": {
-                "data": [
-                    {
-                        "id": "1412",
-                        "type": "people"
-                    }
-                ]
-            },
-            "people": {
-                "data": [
-                    {
-                        "id": "1412",
-                        "type": "people"
-                    },
-                    {
-                        "id": "1413",
-                        "type": "people"
-                    }
-                ]
-            },
-            "projects": {
-                "data": [
-                    {
-                        "id": "2117",
-                        "type": "projects"
-                    }
-                ]
-            },
-            "investigations": {
-                "data": []
-            },
-            "studies": {
-                "data": []
-            },
-            "assays": {
-                "data": []
-            },
-            "publications": {
-                "data": []
-            },
-            "events": {
-                "data": []
-            }
-        },
-        "links": {
-            "self": "/data_files/68?version=1"
-        },
-        "meta": {
-            "created": "2018-04-27T14:43:48.000Z",
-            "modified": "2018-04-27T14:43:49.000Z",
-            "api_version": "0.1",
-            "uuid": "51b0b600-2c57-0136-ec2f-08002734982f",
-            "base_url": "http://localhost:3000"
+            "access": "edit"
+          }
+        ]
+      },
+      "discussion_links": [
+
+      ],
+      "title": "A Maximally Patched Data File",
+      "license": "CC-BY-4.0",
+      "description": "Study of the Human Genome",
+      "latest_version": 1,
+      "tags": [
+        "tag1",
+        "tag2",
+        "tag3"
+      ],
+      "versions": [
+        {
+          "version": 1,
+          "revision_comments": null,
+          "url": "http://localhost:3000/data_files/44?version=1",
+          "doi": null
         }
+      ],
+      "version": 1,
+      "revision_comments": null,
+      "created_at": "2022-05-13T14:39:06.000Z",
+      "updated_at": "2022-05-13T14:39:06.000Z",
+      "doi": null,
+      "content_blobs": [
+        {
+          "original_filename": "a_pdf_file.pdf",
+          "url": null,
+          "md5sum": "565ae8a7a743c3bfd9f15c69647f5b8b",
+          "sha1sum": "b9d2148740050b7f37975edd0fb97faa508ff767",
+          "content_type": "application/pdf",
+          "link": "http://localhost:3000/data_files/44/content_blobs/275",
+          "size": 8827
+        }
+      ],
+      "creators": [
+        {
+          "profile": "/people/589",
+          "family_name": "Last",
+          "given_name": "Person495",
+          "affiliation": "An Institution: 595",
+          "orcid": null
+        }
+      ],
+      "other_creators": "John Smith, Jane Smith"
     },
-    "jsonapi": {
-        "version": "1.0"
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "589",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "588",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "588",
+            "type": "people"
+          },
+          {
+            "id": "589",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "636",
+            "type": "projects"
+          }
+        ]
+      },
+      "investigations": {
+        "data": [
+          {
+            "id": "136",
+            "type": "investigations"
+          }
+        ]
+      },
+      "studies": {
+        "data": [
+          {
+            "id": "117",
+            "type": "studies"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "96",
+            "type": "assays"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "65",
+            "type": "publications"
+          }
+        ]
+      },
+      "events": {
+        "data": [
+          {
+            "id": "28",
+            "type": "events"
+          }
+        ]
+      },
+      "workflows": {
+        "data": [
+          {
+            "id": "28",
+            "type": "workflows"
+          }
+        ]
+      },
+      "placeholder": {
+        "data": null
+      },
+      "file_template": {
+        "data": null
+      }
+    },
+    "links": {
+      "self": "/data_files/44?version=1"
+    },
+    "meta": {
+      "created": "2022-05-13T14:39:06.000Z",
+      "modified": "2022-05-13T14:39:06.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "5d7b3390-b4f8-013a-0f2b-0a81884ed284"
     }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
 }

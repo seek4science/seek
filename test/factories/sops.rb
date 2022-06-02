@@ -33,7 +33,9 @@ Factory.define(:max_sop, class: Sop) do |f|
   f.title 'A Maximal Sop'
   f.description 'How to run a simulation in GROMACS'
   f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
+  f.projects { [Factory(:max_project)] }
   f.assays { [Factory(:public_assay)] }
+  f.workflows {[Factory.build(:workflow, policy: Factory(:public_policy))]}
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
   f.after_create do |sop|
     sop.content_blob = Factory.create(:min_content_blob, content_type: 'application/pdf', asset: sop, asset_version: sop.version)

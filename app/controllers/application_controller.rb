@@ -5,6 +5,8 @@
 require 'authenticated_system'
 
 class ApplicationController < ActionController::Base
+  USER_CONTENT_CSP = "default-src 'self'"
+
   include Seek::Errors::ControllerErrorHandling
   include Seek::EnabledFeaturesFilter
   include Recaptcha::Verify
@@ -297,7 +299,7 @@ class ApplicationController < ActionController::Base
     return (params.has_key?(:view) && params[:view]!="default")||
       (!params.has_key?(:view) && session.has_key?(:view) && !session[:view].nil? && session[:view]!="default")
   end
-  
+
   helper_method :is_condensed_view
 
 
@@ -612,7 +614,7 @@ class ApplicationController < ActionController::Base
   # Stop hosted user content from running scripts etc.
   def secure_user_content
     if self.class.user_content_actions.include?(action_name.to_sym)
-      response.set_header('Content-Security-Policy', "default-src 'self'")
+      response.set_header('Content-Security-Policy', USER_CONTENT_CSP)
     end
   end
 

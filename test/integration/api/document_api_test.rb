@@ -10,6 +10,7 @@ class DocumentApiTest < ActionDispatch::IntegrationTest
     investigation = Factory(:investigation, projects: [@project], contributor: current_person)
     study = Factory(:study, investigation: investigation, contributor: current_person)
     @assay = Factory(:assay, study: study, contributor: current_person)
+    @workflow = Factory(:workflow, projects: [@project], contributor: current_person)
     @creator = Factory(:person)
     @document = Factory(:document, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
   end
