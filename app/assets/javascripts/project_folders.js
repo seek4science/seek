@@ -146,19 +146,18 @@ async function item_clicked(type, id, parent) {
   selectedItem.id = id;
   selectedItem.type = type;
   selectedItem.parent = parent;
+	$j("#item_contents").show();
   if (type == "sample") {
     loadItemDetails(`/assays/${parent.id}/samples`, { view: "default" });
   } else if (isa_study_element.includes(type)) {
     if ($j('a[data-target^="#study_design"]').toArray().length == 0) {
-      loadItemDetails(`/studies/${parent.id}`, { view: "default" });
+      await loadItemDetails(`/studies/${parent.id}`, { view: "default" });
     }
     $j('a[data-target^="#study_design"]').first().click();
     $j(`a[data-target^="#${type}"]`).first().click();
   } else {
     loadItemDetails(`/${pluralize(type)}/${id}`, { view: "default" });
   }
-
-  $j("#item_contents").show();
 }
 
 const loadAssaySamples = (view, table_cols) =>
@@ -166,7 +165,8 @@ const loadAssaySamples = (view, table_cols) =>
 
 const loadItemDetails = (url, params = {}) => {
   url = URL_ROOT + url;
-  $j.ajax({
+	// don't remove return. it causes an 'await'able promise to be returned
+  return $j.ajax({
     url,
     data: $j.extend(params, { only_content: true, single_page: pid }),
     cache: false,
