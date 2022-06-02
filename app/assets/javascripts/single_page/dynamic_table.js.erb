@@ -147,7 +147,6 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
       indexes.forEach((x) => (arr[x] = rowStatus.new));
       sampleLinkIndexes.forEach((x) => (arr[x] = []));
       this.table.row.add(arr).draw();
-			updateContainerHeight();
     },
     setAsDeleted: function () {
       const indexes = getStatusIndexes(this.table.settings()[0].aoColumns);

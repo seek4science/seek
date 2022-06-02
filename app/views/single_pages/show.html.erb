@@ -60,9 +60,6 @@
         projectDefaultPolicy = <%= project_policy_json(@project) %>
         uid = <%= current_user ? current_user.id : "null" %>
 				dynamicTableDataPath = '<%= Seek::Util.routes.dynamic_table_data_single_page_path(@project.id) %>'
-
-				setSplitters();
-				updateContainerHeight();
     });
 
     function toggleItem(e, type){
@@ -72,21 +69,5 @@
         $j("a[_type='" + type + "']").each((i, e) => $j("#single_page_tree").jstree(action, $j(e)))
         $j(e).toggleClass("active")
     }
-
-		function setSplitters() {
-			if(!isMobile()) {
-				$j('#widget').width('').height(768).split({
-					orientation: 'vertical',
-					limit: { leftUpper: 350, rightBottom: 1000 },
-					position: '25%'
-				});
-			}
-		}
-
-		function updateContainerHeight() {
-			const height = $j("#right-pane #container").height()
-			$j("#widget").height(height)
-			$j("#right-pane").height(height)
-		}
     
 </script>

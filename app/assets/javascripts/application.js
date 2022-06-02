@@ -73,4 +73,3 @@
 //= require admin
 //= require templates
 //= require git
-//= require jquery.splitter/jquery.splitter.min
