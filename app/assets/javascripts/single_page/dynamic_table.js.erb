@@ -76,14 +76,14 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
             {
                 extend: 'copyHtml5',
                 exportOptions: {
-                    columns: [ 2, ':visible:not(.text-center)' ]
+                    columns: options.readonly ? [':visible:not(.text-center)'] :[2, ':visible:not(.text-center)']
                 }
             },
             {
                 extend: 'csvHtml5',
                 exportOptions: {
 										// exclude checkbox column
-                    columns: [ 2, ':visible:not(.text-center)' ]
+                    columns: options.readonly ? [':visible:not(.text-center)'] :[2, ':visible:not(.text-center)']
                 }
             },
             'colvis'
