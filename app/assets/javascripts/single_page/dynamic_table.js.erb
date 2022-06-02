@@ -72,7 +72,22 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
           "<'row'<'col-sm-3'l><'col-sm-5'B><'col-sm-4'f>>" +
           "<'row'<'col-sm-12'tr>>" +
           "<'row'<'col-sm-5'i><'col-sm-7'p>>",
-        buttons: "main",
+        buttons: [
+            {
+                extend: 'copyHtml5',
+                exportOptions: {
+                    columns: [ 2, ':visible:not(.text-center)' ]
+                }
+            },
+            {
+                extend: 'csvHtml5',
+                exportOptions: {
+										// exclude checkbox column
+                    columns: [ 2, ':visible:not(.text-center)' ]
+                }
+            },
+            'colvis'
+        ],
         ajax: options.ajax
       });
       this.table.rows.add(rows.map((r) => [null, ...r])).draw();
