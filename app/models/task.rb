@@ -23,6 +23,10 @@ class Task < ApplicationRecord
     status == STATUS_CANCELLED
   end
 
+  def failed?
+    status == STATUS_FAILED
+  end
+
   def start
     return if persisted? && (pending? || in_progress?)
     update_attribute(:status, Task::STATUS_WAITING)
