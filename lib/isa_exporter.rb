@@ -111,6 +111,7 @@ module IsaExporter
 		def convert_assays(assays)
 			all_sample_types = assays.map(&:sample_type)
 			first_assay = assays.detect { |s| s.position.zero? }
+			raise 'No assay could be found!' unless first_assay
 
 			isa_assay = {}
 			isa_assay['@id'] = "#assay/#{assays.pluck(:id).join('_')}"
@@ -519,7 +520,7 @@ module IsaExporter
 		end
 
 		def get_derived_from_type(sample_type)
-			return nil if sample_type.samples.length == 0
+			raise 'There is no sample!' if sample_type.samples.length == 0
 
 			prev_sample_type = sample_type.samples[0]&.linked_samples[0]&.sample_type
 			return nil if prev_sample_type.blank?
