@@ -60,7 +60,7 @@
         projectDefaultPolicy = <%= project_policy_json(@project) %>
         uid = <%= current_user ? current_user.id : "null" %>
 				dynamicTableDataPath = '<%= Seek::Util.routes.dynamic_table_data_single_page_path(@project.id) %>'
-    });
+			});
 
     function toggleItem(e, type){
         let action
@@ -69,5 +69,12 @@
         $j("a[_type='" + type + "']").each((i, e) => $j("#single_page_tree").jstree(action, $j(e)))
         $j(e).toggleClass("active")
     }
+
+		// This is used after jstree loaded
+		function activateSelectedItem(){
+			const params = Object.fromEntries(new URLSearchParams(window.location.search).entries());
+			const parent = $j(`a[_type="${params.item_type}"][_id="${params.item_id}"]`)
+			$j(parent).addClass("jstree-clicked").click()
+		}
     
 </script>
