@@ -91,7 +91,13 @@ module SampleTypesHelper
     end
 
     if sample_type_attribute.controlled_vocab?
-      type += ' - ' + link_to(sample_type_attribute.sample_controlled_vocab.title, sample_type_attribute.sample_controlled_vocab)
+			title = 
+			if sample_type_attribute.sample_attribute_type.ontology?
+				sample_type_attribute.sample_controlled_vocab.ols_root_term_uri
+			else
+				sample_type_attribute.sample_controlled_vocab.title
+      end
+      type += ' - ' + link_to(title, sample_type_attribute.sample_controlled_vocab)
     end
     type
   end
