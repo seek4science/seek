@@ -16,14 +16,14 @@
       "tags": [
 
       ],
-      "created_at": "2022-05-13T14:39:14.000Z",
-      "updated_at": "2022-05-13T14:39:14.000Z",
+      "created_at": "2022-06-07T14:12:26.000Z",
+      "updated_at": "2022-06-07T14:12:26.000Z",
       "creators": [
         {
-          "profile": "/people/631",
+          "profile": "/people/37",
           "family_name": "Last",
-          "given_name": "Person528",
-          "affiliation": "An Institution: 637, An Institution: 639",
+          "given_name": "Person30",
+          "affiliation": "An Institution: 37, An Institution: 39",
           "orcid": null
         }
       ],
@@ -37,7 +37,7 @@
       "creators": {
         "data": [
           {
-            "id": "631",
+            "id": "37",
             "type": "people"
           }
         ]
@@ -45,7 +45,7 @@
       "submitter": {
         "data": [
           {
-            "id": "631",
+            "id": "37",
             "type": "people"
           }
         ]
@@ -59,7 +59,7 @@
       "projects": {
         "data": [
           {
-            "id": "682",
+            "id": "41",
             "type": "projects"
           }
         ]
@@ -69,15 +69,34 @@
 
         ]
       },
+      "investigations": {
+        "data": [
+          {
+            "id": "1",
+            "type": "investigations"
+          }
+        ]
+      },
+      "studies": {
+        "data": [
+          {
+            "id": "1",
+            "type": "studies"
+          }
+        ]
+      },
       "assays": {
         "data": [
-
+          {
+            "id": "1",
+            "type": "assays"
+          }
         ]
       },
       "people": {
         "data": [
           {
-            "id": "631",
+            "id": "37",
             "type": "people"
           }
         ]
@@ -87,11 +106,11 @@
       "self": "/samples/2"
     },
     "meta": {
-      "created": "2022-05-13T14:39:14.000Z",
-      "modified": "2022-05-13T14:39:14.000Z",
+      "created": "2022-06-07T14:12:26.000Z",
+      "modified": "2022-06-07T14:12:26.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "62a6c490-b4f8-013a-0f2b-0a81884ed284"
+      "uuid": "c86eb7a0-c899-013a-0f7e-0a81884ed284"
     }
   },
   "jsonapi": {

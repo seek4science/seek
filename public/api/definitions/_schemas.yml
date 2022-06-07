@@ -4415,6 +4415,10 @@ sampleResponse:
               $ref: "#/components/schemas/multipleReferences"
             assays:
               $ref: "#/components/schemas/multipleReferences"
+            studies:
+              $ref: "#/components/schemas/multipleReferences"
+            investigations:
+              $ref: "#/components/schemas/multipleReferences"
             sample_type:
               $ref: "#/components/schemas/singleReference"
           required:
@@ -4423,6 +4427,8 @@ sampleResponse:
             - people
             - creators
             - assays
+            - studies
+            - investigations
             - data_files
             - sample_type
           additionalProperties: false

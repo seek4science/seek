@@ -27,6 +27,8 @@ class SampleApiTest < ActionDispatch::IntegrationTest
     @sample_type.sample_attributes << Factory(:sample_attribute, title: 'the_title', is_title: true, required: true, sample_attribute_type: Factory(:string_sample_attribute_type), sample_type: Factory(:simple_sample_type))
     @sample_type.sample_attributes << Factory(:sample_attribute, title: 'a_real_number', sample_attribute_type: Factory(:float_sample_attribute_type), required: false, sample_type: @sample_type)
     @sample_type.save!
+
+    @assay = Factory(:assay, contributor: current_person)
   end
 
   test 'patching a couple of attributes retains others' do

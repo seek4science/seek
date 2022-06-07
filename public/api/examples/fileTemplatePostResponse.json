@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "796",
+              "id": "71",
               "type": "projects"
             },
             "access": "edit"
@@ -36,8 +36,8 @@
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2022-05-13T14:39:32.000Z",
-      "updated_at": "2022-05-13T14:39:32.000Z",
+      "created_at": "2022-06-07T14:12:30.000Z",
+      "updated_at": "2022-06-07T14:12:30.000Z",
       "doi": null,
       "content_blobs": [
         {
@@ -46,16 +46,16 @@
           "md5sum": null,
           "sha1sum": null,
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/file_templates/2/content_blobs/324",
+          "link": "http://localhost:3000/file_templates/2/content_blobs/26",
           "size": null
         }
       ],
       "creators": [
         {
-          "profile": "/people/728",
+          "profile": "/people/66",
           "family_name": "Last",
-          "given_name": "Person611",
-          "affiliation": "An Institution: 742",
+          "given_name": "Person55",
+          "affiliation": "An Institution: 70",
           "orcid": null
         }
       ],
@@ -67,7 +67,7 @@
       "creators": {
         "data": [
           {
-            "id": "728",
+            "id": "66",
             "type": "people"
           }
         ]
@@ -75,7 +75,7 @@
       "submitter": {
         "data": [
           {
-            "id": "727",
+            "id": "65",
             "type": "people"
           }
         ]
@@ -83,11 +83,11 @@
       "people": {
         "data": [
           {
-            "id": "727",
+            "id": "65",
             "type": "people"
           },
           {
-            "id": "728",
+            "id": "66",
             "type": "people"
           }
         ]
@@ -95,7 +95,7 @@
       "projects": {
         "data": [
           {
-            "id": "796",
+            "id": "71",
             "type": "projects"
           }
         ]
@@ -115,11 +115,11 @@
       "self": "/file_templates/2?version=1"
     },
     "meta": {
-      "created": "2022-05-13T14:39:32.000Z",
-      "modified": "2022-05-13T14:39:32.000Z",
+      "created": "2022-06-07T14:12:30.000Z",
+      "modified": "2022-06-07T14:12:30.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "6cd900c0-b4f8-013a-0f2b-0a81884ed284"
+      "uuid": "caba4b00-c899-013a-0f7e-0a81884ed284"
     }
   },
   "jsonapi": {

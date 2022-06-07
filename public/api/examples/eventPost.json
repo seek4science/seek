@@ -9,7 +9,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "556",
+              "id": "436",
               "type": "projects"
             },
             "access": "edit"
@@ -27,7 +27,7 @@
       "projects": {
         "data": [
           {
-            "id": "556",
+            "id": "436",
             "type": "projects"
           }
         ]
@@ -35,7 +35,7 @@
       "data_files": {
         "data": [
           {
-            "id": "31",
+            "id": "23",
             "type": "data_files"
           }
         ]
@@ -51,7 +51,7 @@
       "publications": {
         "data": [
           {
-            "id": "54",
+            "id": "29",
             "type": "publications"
           }
         ]
