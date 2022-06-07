@@ -126,23 +126,24 @@ module Seek
 
       # Parameters to rename
       RENAME = {
-          tags: :tag_list,
-          policy: :policy_attributes,
-          default_policy: :policy_attributes,
-          assay_class: :assay_class_id,
-          assay_type: :assay_type_uri,
-          technology_type: :technology_type_uri,
-          programme_ids: :programme_id,
-          model_type: :model_type_id,
-          model_format: :model_format_id,
-          environment: :recommended_environment_id,
-          data_file_ids: :data_files_attributes,
-          assay_ids: :assay_assets_attributes,
-          workflow_class: :workflow_class_id,
-          discussion_links: :discussion_links_attributes,
-          template: :template_attributes,
-          creators: :api_assets_creators,
-          administrator_ids: :programme_administrator_ids
+        tags: :tag_list,
+        policy: :policy_attributes,
+        default_policy: :policy_attributes,
+        assay_class: :assay_class_id,
+        assay_type: :assay_type_uri,
+        technology_type: :technology_type_uri,
+        programme_ids: :programme_id,
+        model_type: :model_type_id,
+        model_format: :model_format_id,
+        environment: :recommended_environment_id,
+        data_file_ids: :data_files_attributes,
+        assay_ids: :assay_assets_attributes,
+        workflow_class: :workflow_class_id,
+        discussion_links: :discussion_links_attributes,
+        template: :template_attributes,
+        creators: :api_assets_creators,
+        administrator_ids: :programme_administrator_ids,
+        attribute_map: :data
       }.freeze
 
       # Parameters to "elevate" out of params[bla] to the top-level.

@@ -206,9 +206,6 @@ class SamplesController < ApplicationController
 
   def sample_params(sample_type = nil, parameters = params)
     sample_type_param_keys = sample_type ? sample_type.sample_attributes.map(&:title).collect(&:to_sym) : []
-    if parameters[:sample][:attribute_map]
-      parameters[:sample][:data] = parameters[:sample].delete(:attribute_map)
-    end
     if (parameters[:sample][:assay_assets_attributes])
       parameters[:sample][:assay_ids] = parameters[:sample][:assay_assets_attributes].map { |x| x[:assay_id] }
     end
