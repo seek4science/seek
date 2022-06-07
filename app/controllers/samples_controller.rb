@@ -206,12 +206,9 @@ class SamplesController < ApplicationController
 
   def sample_params(sample_type = nil, parameters = params)
     sample_type_param_keys = sample_type ? sample_type.sample_attributes.map(&:title).collect(&:to_sym) : []
-    if (parameters[:sample][:assay_assets_attributes])
-      parameters[:sample][:assay_ids] = parameters[:sample][:assay_assets_attributes].map { |x| x[:assay_id] }
-    end
     parameters.require(:sample).permit(:sample_type_id, *creator_related_params,
                               { project_ids: [] }, { data: sample_type_param_keys },
-                              { assay_ids: [] },
+                              { assay_assets_attributes: [:assay_id] },
                               { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                               discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
