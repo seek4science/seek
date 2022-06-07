@@ -1,0 +1,24 @@
+<% assay ||= nil %>
+<ul class="nav nav-tabs">
+    <li class="active">
+        <a data-toggle="tab" data-target="#sample_collection"><i class="glyphicon glyphicon-list-alt"></i> Protocols</a>
+    </li>
+    <li>
+        <a data-toggle="tab" data-target="#assay_samples"><i class="glyphicon glyphicon-list-alt"></i> Samples</a>
+    </li>
+    <li>
+        <a data-toggle="tab" data-target="#assay_table"><i class="glyphicon glyphicon-list-alt"></i> Table</a>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <div id="sample_collection" class="tab-pane fade active in">
+        <%= render :partial=>"isa_assays/sop", locals: { assay: assay} -%>
+    </div>
+    <div id="assay_samples" class="tab-pane fade">
+        <%= render :partial=>"isa_assays/assay_samples", locals: { assay: assay} -%>
+    </div>
+     <div id="assay_table" class="tab-pane fade">
+        <%= render :partial=>"isa_assays/assay_table", locals: { assay: assay} -%>   
+    </div>
+</div>

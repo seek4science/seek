@@ -20,6 +20,9 @@ class Study < ApplicationRecord
   has_many :assays
   has_many :assay_publications, through: :assays, source: :publications
   has_one :external_asset, as: :seek_entity, dependent: :destroy
+  belongs_to :sop
+
+  has_and_belongs_to_many :sample_types
 
   validates :investigation, presence: { message: "Investigation is blank or invalid" }, projects: true
 

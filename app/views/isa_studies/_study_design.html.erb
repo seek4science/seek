@@ -1,0 +1,40 @@
+<% study ||= nil %>
+<ul class="nav nav-tabs">
+    <li class="active">
+        <a data-toggle="tab" data-target="#source_material" onClick="highlightTreeviewItem('source_material')"><em class="glyphicon glyphicon-list-alt"></em> Source material</a>
+    </li>
+    <li>
+        <a data-toggle="tab" data-target="#sample_collection" onClick="highlightTreeviewItem('sample_collection')"><em class="glyphicon glyphicon-list-alt"></em> Protocols</a>
+    </li>
+    <li>
+        <a data-toggle="tab" data-target="#study_samples" onClick="highlightTreeviewItem('study_samples')"><em class="glyphicon glyphicon-list-alt"></em> Samples</a>
+    </li>
+    <li>
+        <a data-toggle="tab" data-target="#study_table" onClick="highlightTreeviewItem('study_table')"><em class="glyphicon glyphicon-list-alt"></em> Table</a>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <div id="source_material" class="tab-pane fade active in">
+        <%= render :partial=>"isa_studies/source_material", locals: { study: study} -%>
+    </div>
+    <div id="sample_collection" class="tab-pane fade">
+        <%= render :partial=>"isa_studies/sop", locals: { study: study} -%>
+    </div>
+    <div id="study_samples" class="tab-pane fade">
+        <%= render :partial=>"isa_studies/study_samples", locals: { study: study} -%>
+    </div>
+     <div id="study_table" class="tab-pane fade">
+        <%= render :partial=>"isa_studies/study_table", locals: { study: study} -%>   
+    </div>
+</div>
+
+<script>
+    function highlightTreeviewItem(item){
+        $j(".jstree-clicked").removeClass("jstree-clicked")
+				const type = selectedItem.type == "study" ? "study" : selectedItem.parent.type
+				const id = selectedItem.type == "study" ? selectedItem.id : selectedItem.parent.id
+				const parent = $j(`a[_type="${type}"][_id="${id}"]`)
+				$j(parent).next().find(`a[_type="${item}"]`).addClass("jstree-clicked")
+    }
+</script>

@@ -18,10 +18,7 @@
   }
 }
 
-.git-browser-modal .modal-body {
-  max-height: calc(100vh - 190px);
-  overflow-y: auto;
-}
+.git-browser-modal .modal-body { }
 
 input.git-path {
   padding-left: 32px;
@@ -47,4 +44,15 @@ input.git-path {
 
 .git-image-preview {
   max-width: 100%;
+}
+
+.blob-display-container {
+  background: center center no-repeat url(asset-path("ajax-loader-large.gif")) rgba(255,255,255,0.6);
+
+  iframe {
+    border: none;
+    height: 100%;
+    width: 100%;
+    min-height: 80vh;
+  }
 }

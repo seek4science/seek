@@ -154,6 +154,11 @@ module PolicyHelper
     hash.to_json.html_safe
   end
 
+  def project_policy_json(project)
+    hash = policy_hash(project.default_policy, [project]) if project.use_default_policy
+    hash.to_json.html_safe
+  end
+
   def permission_title(permission, member_prefix: false, icon: false)
     if permission.is_a?(Permission)
       type = permission.contributor_type

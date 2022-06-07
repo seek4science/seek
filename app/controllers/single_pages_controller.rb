@@ -1,3 +1,4 @@
+require "isatab_converter"
 class SinglePagesController < ApplicationController
   include Seek::AssetsCommon
   before_action :set_up_instance_variable
@@ -7,9 +8,6 @@ class SinglePagesController < ApplicationController
   def show
     @project = Project.find(params[:id])
     @folders = project_folders
-    @investigation = Investigation.new
-    @study = Study.new
-    @assay = Assay.new
 
     respond_to do |format|
       format.html
@@ -34,6 +32,40 @@ class SinglePagesController < ApplicationController
     end
     project_folders
   end
+
+  def dynamic_table_data
+    begin
+      data = []
+      if (params[:sample_type_id])
+        sample_type = SampleType.find(params[:sample_type_id]) if params[:sample_type_id]
+        data = helpers.dt_data(sample_type)[:rows]
+      elsif (params[:study_id])
+        study = Study.find(params[:study_id]) if params[:study_id]
+        assay = Assay.find(params[:assay_id]) if params[:assay_id]
+        data = helpers.dt_aggregated(study, params[:include_all_assays], assay)[:rows]
+      end
+      data = data.map {|row| row.unshift("")} if params[:rows_pad]
+      render json: { data: data }
+    rescue Exception => e
+      render json: {status: :unprocessable_entity, error: e.message } 
+    end
+  end
+
+  def export_isa
+    inv = Investigation.find(params[:investigation_id])
+    exporter = IsaExporter::Exporter.new(inv)
+    isa = exporter.export
+    if isa.nil?
+      respond_to do |format|
+        flash[:error] = "No data to download!"
+        format.html { redirect_to single_page_path(@project) }
+      end
+    else
+      send_data isa, filename: "isa.json", type: "application/json", deposition: "attachment"
+    end
+  end
+
+  private
 
   def set_up_instance_variable
     @single_page = true

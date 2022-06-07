@@ -1,10 +1,8 @@
 module Seek
   module ContentExtraction
-
     include ContentTypeDetection
     include SysMODB::SpreadsheetExtractor
     include ContentSplit
-
 
     def pdf_contents_for_search
       content = []

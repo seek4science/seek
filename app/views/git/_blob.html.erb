@@ -40,13 +40,9 @@
 
 <hr/>
 
-<% if is_image_path?(@blob.path) %>
-  <% raw_path = polymorphic_path([@parent_resource, :git_raw], version: @git_version.version, path: @blob.path) %>
-  <%= link_to image_tag(raw_path, class: 'git-image-preview'), raw_path, title: 'Click for full' %>
+<% renderer = Seek::Renderers::RendererFactory.instance.renderer(@blob) %>
+<% if renderer.is_a?(Seek::Renderers::BlankRenderer) %>
+  <span class="subtle">Binary content not displayed</span>
 <% else %>
-  <% if @blob.binary? %>
-    <span class="subtle">Binary content not displayed</span>
-  <% else %>
-    <%= content_tag :pre, @blob.content %>
-  <% end %>
+  <%= renderer.render.html_safe %>
 <% end %>

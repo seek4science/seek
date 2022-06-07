@@ -66,7 +66,7 @@ class AssetsHelperTest < ActionView::TestCase
     assert rendered_asset_view(pres).blank?
 
     # nothing  for none slideshare
-    pres = Factory(:presentation, policy: Factory(:public_policy))
+    pres = Factory(:presentation, content_blob: Factory(:binary_content_blob), policy: Factory(:public_policy))
     assert rendered_asset_view(pres).blank?
   end
 

@@ -9,7 +9,7 @@ module Seek
     class HTTPHandler
       include Seek::UploadHandling::ContentInspection
 
-      attr_reader :url
+      attr_reader :url, :fallback_to_get
 
       def initialize(url, fallback_to_get: true)
         @url = url
@@ -38,8 +38,8 @@ module Seek
             content_type = response.headers[:content_tyspe]
             content_length = response.headers[:content_length]
             code = response.code
-          rescue RestClient::MethodNotAllowed,RestClient::NotFound => e # Try a GET if HEAD isn't allowed, but don't download anything
-            if @fallback_to_get
+          rescue RestClient::Exception => e # Try a GET if HEAD isn't allowed, but don't download anything
+            if fallback_to_get
               begin
                 uri = URI.parse(url)
                 Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == 'https') do |http|
@@ -56,8 +56,6 @@ module Seek
             else
               code = e.http_code
             end
-          rescue RestClient::Exception => e
-            code = e.http_code
           rescue SocketError, Errno::ECONNREFUSED, Errno::EHOSTUNREACH
             code = 404
           end

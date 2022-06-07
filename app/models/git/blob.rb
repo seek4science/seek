@@ -9,6 +9,7 @@ module Git
     delegate :git_repository, :version, :git_base, to: :git_version
 
     attr_reader :git_version, :path
+    alias_method :original_filename, :path
 
     def initialize(git_version, blob, path)
       @git_version = git_version
@@ -24,7 +25,15 @@ module Git
       git_version.remote_sources[path]
     end
 
-    def file_contents(fetch_remote: false, &block)
+    def read
+      file_contents(as_text: true)
+    end
+
+    def binread
+      file_contents
+    end
+
+    def file_contents(as_text: false, fetch_remote: false, &block)
       if fetch_remote && remote? && !fetched?
         if block_given?
           block.call(remote_content)
@@ -33,9 +42,9 @@ module Git
         end
       else
         if block_given?
-          block.call(StringIO.new(content)) # Rugged does not support streaming blobs :(
+          block.call(StringIO.new(as_text ? text : content)) # Rugged does not support streaming blobs :(
         else
-          content
+          as_text ? text : content
         end
       end
     end
@@ -87,6 +96,39 @@ module Git
       io = handler.fetch
       io.rewind
       io
+    end
+
+    def cache_key
+      "#{git_repository.cache_key}/blobs/#{oid}"
+    end
+
+    def content_path(opts = {})
+      opts.reverse_merge!(version: @git_version.version, path: path)
+      Seek::Util.routes.polymorphic_path([@git_version.resource, :git_raw], opts)
+    end
+
+    def file_extension
+      path.split('/').last&.split('.')&.last&.downcase
+    end
+
+    def content_type_file_extensions
+      [file_extension]
+    end
+
+    def content_type
+      @content_type ||= content_types.first
+    end
+
+    def content_types
+      mime_types_for_extension(file_extension)
+    end
+
+    def file_size
+      size
+    end
+
+    def is_text?
+      !binary?
     end
   end
 end

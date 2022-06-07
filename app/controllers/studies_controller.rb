@@ -1,6 +1,7 @@
 class StudiesController < ApplicationController
   include Seek::IndexPager
   include Seek::AssetsCommon
+  include DynamicTableHelper
 
   before_action :studies_enabled?
   before_action :find_assets, only: [:index]

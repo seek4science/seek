@@ -1,5 +1,6 @@
 <%
   object ||= resource_for_controller
+  object = resource_for_controller.isa_object if resource_for_controller.respond_to?("isa_object")
   policy = object.policy unless local_assigns.key?(:policy)
   policy ||= Policy.default
   resource_type = text_for_resource(object)

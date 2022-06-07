@@ -1,6 +1,7 @@
 var tree;
 var elementFolderIds = [];
 var displayed_folder_id = 0;
+const isa_study_element = ["source_material", "sample_collection", "study_samples", "study_table"];
 
 function setupFoldersTree(dataJson, container_id, drop_accept_class) {
   $j("#" + container_id)
@@ -131,6 +132,7 @@ function item_dropped_to_folder(item_element, dest_folder_id) {
 
 function folder_clicked(folder_id, project_id) {
   hideAllViews();
+  updateBreadcrumb("project");
   $j("#folder_contents").show();
   $j("#folder_contents").spinner("add");
   var path = URL_ROOT + "/projects/" + project_id + "/folders/" + folder_id + "/display_contents";
@@ -138,7 +140,7 @@ function folder_clicked(folder_id, project_id) {
   $j.ajax({ url: path, cache: false, dataType: "script" });
 }
 
-function item_clicked(type, id, parent) {
+async function item_clicked(type, id, parent) {
   hideAllViews();
   updateBreadcrumb(type);
   selectedItem.id = id;
@@ -146,6 +148,12 @@ function item_clicked(type, id, parent) {
   selectedItem.parent = parent;
   if (type == "sample") {
     loadItemDetails(`/assays/${parent.id}/samples`, { view: "default" });
+  } else if (isa_study_element.includes(type)) {
+    if ($j('a[data-target^="#study_design"]').toArray().length == 0) {
+      loadItemDetails(`/studies/${parent.id}`, { view: "default" });
+    }
+    $j('a[data-target^="#study_design"]').first().click();
+    $j(`a[data-target^="#${type}"]`).first().click();
   } else {
     loadItemDetails(`/${pluralize(type)}/${id}`, { view: "default" });
   }
@@ -157,10 +165,10 @@ const loadAssaySamples = (view, table_cols) =>
   loadItemDetails(`/assays/${selectedItem.parent.id}/samples`, { view, table_cols });
 
 const loadItemDetails = (url, params = {}) => {
-    url = URL_ROOT + url;
-    $j.ajax({
+  url = URL_ROOT + url;
+  $j.ajax({
     url,
-    data: $j.extend(params, { only_content: true, single_page: true }),
+    data: $j.extend(params, { only_content: true, single_page: pid }),
     cache: false,
     type: "get",
     success: (s) => $j("#item-layout").html(s),
@@ -171,7 +179,9 @@ const loadItemDetails = (url, params = {}) => {
       else if (e.status === 403) alert("You do not have permission to view this content!");
       else if (e.status !== 200)
         alert(`An error occurred while processing the request.\nDetails: ${e.responseText}`);
-      $j("#item-layout").html("Unavailable")
+      $j("#item-layout").html(
+        '<div class="landing_page"><h2 class="forbidden">The content is not visible to you.</h2><p class="text-center">You may need to login to access this content.</p></div>'
+      );
     }
   });
 };
@@ -209,7 +219,7 @@ $j.jstree.plugins.separate = function (options, parent) {
       if (n.data.id) $j(obj.childNodes[1]).attr("_id", n.data.id);
       if (n.state.separate) {
         var p = d.createElement("p");
-        p.innerHTML = n.state.separate.label;
+        p.innerHTML = "<span>" + n.state.separate.label + "</span>";
         p.className = "separator";
         if (n.state.separate.action) {
           var a = d.createElement("a");

@@ -140,7 +140,7 @@ class TemplatesControllerTest < ActionController::TestCase
   end
 
   test 'should not destroy template if has existing sample_types' do
-    Factory(:simple_sample_type, template: @template)
+    Factory(:simple_sample_type, isa_template: @template)
     refute @template.can_delete?
     
     assert_no_difference('Template.count') do
@@ -149,6 +149,27 @@ class TemplatesControllerTest < ActionController::TestCase
 
     assert_response :redirect
     refute_nil flash[:error]
+  end
+
+	test 'should show private template to the contributor' do
+    p = Factory :person
+		login_as p.user
+    template = Factory(:template, policy: Factory(:policy, access_type: Policy::NO_ACCESS ), contributor: p)
+    get :show, params: { id: template }
+    assert_response :success
+  end
+
+	test 'should not show private template to other users' do
+    template = Factory(:template, policy: Factory(:policy, access_type: Policy::NO_ACCESS ))
+    get :show, params: { id: template }
+    assert_response :forbidden
+  end
+
+	test 'should show public template to all users' do
+    template = Factory(:template, policy: Factory(:policy, access_type: Policy::VISIBLE ))
+		login_as Factory(:user)
+		get :show, params: { id: template }
+    assert_response :success
   end
 
 end

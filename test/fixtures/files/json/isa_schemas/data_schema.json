@@ -1,0 +1,39 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "title": "ISA data schema",
+    "description": "JSON-schema representing a data file in the ISA model",
+    "type": "object",
+    "properties": {
+        "@id": { "type": "string", "format": "uri" },
+        "name": {
+            "type": "string"
+        },
+        "type": {
+            "type": "string",
+            "enum": [
+                "Raw Data File",
+                "Derived Data File",
+                "Image File",
+                "Acquisition Parameter Data File",
+                "Derived Spectral Data File",
+                "Protein Assignment File",
+                "Raw Spectral Data File",
+                "Peptide Assignment File",
+                "Array Data File",
+                "Derived Array Data File",
+                "Post Translational Modification Assignment File",
+                "Derived Array Data Matrix File",
+                "Free Induction Decay Data File",
+                "Metabolite Assignment File",
+                "Array Data Matrix File"
+            ]
+        },
+        "comments" : {
+            "type": "array",
+            "items": {
+                "$ref": "comment_schema.json#"
+            }
+        }
+    },
+    "additionalProperties": false
+}

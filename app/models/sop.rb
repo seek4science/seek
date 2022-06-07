@@ -13,6 +13,8 @@ class Sop < ApplicationRecord
 
   has_and_belongs_to_many :workflows
 
+  belongs_to :study
+
   has_filter assay_type: Seek::Filtering::Filter.new(
       value_field: 'assays.assay_type_uri',
       label_mapping: Seek::Filterer::MAPPINGS[:assay_type_label],

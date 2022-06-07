@@ -61,14 +61,6 @@ class SampleControlledVocab < ApplicationRecord
     sample_types.each(&:queue_template_generation) unless new_record?
   end
 
-  def check_repository_standard(repo)
-    if _repository_standard = RepositoryStandard.where(title: repo["title"], group_tag: repo["group_tag"]).first
-      self.repository_standard = _repository_standard
-      return true
-    end
-    return false
-  end
-
   class SystemVocabs
 
     KEYS = {

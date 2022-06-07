@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_04_13_092221) do
+ActiveRecord::Schema.define(version: 2022_05_17_085632) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string "action"
@@ -1716,6 +1716,7 @@ ActiveRecord::Schema.define(version: 2022_04_13_092221) do
     t.integer "linked_sample_type_id"
     t.string "pid"
     t.text "description"
+    t.integer "isa_tag_id"
     t.index ["sample_type_id"], name: "index_sample_attributes_on_sample_type_id"
     t.index ["unit_id"], name: "index_sample_attributes_on_unit_id"
   end
@@ -1753,6 +1754,7 @@ ActiveRecord::Schema.define(version: 2022_04_13_092221) do
     t.string "short_name"
     t.integer "template_id"
     t.string "key"
+    t.boolean "custom_input", default: false
   end
 
   create_table "sample_resource_links", force: :cascade do |t|
@@ -1774,6 +1776,13 @@ ActiveRecord::Schema.define(version: 2022_04_13_092221) do
     t.integer "contributor_id"
     t.string "deleted_contributor"
     t.integer "template_id"
+  end
+
+  create_table "sample_types_studies", force: :cascade do |t|
+    t.bigint "sample_type_id"
+    t.bigint "study_id"
+    t.index ["sample_type_id"], name: "index_sample_types_studies_on_sample_type_id"
+    t.index ["study_id"], name: "index_sample_types_studies_on_study_id"
   end
 
   create_table "samples", force: :cascade do |t|
@@ -1993,6 +2002,7 @@ ActiveRecord::Schema.define(version: 2022_04_13_092221) do
     t.text "other_creators"
     t.string "deleted_contributor"
     t.integer "position"
+    t.integer "sop_id"
   end
 
   create_table "study_auth_lookup", force: :cascade do |t|

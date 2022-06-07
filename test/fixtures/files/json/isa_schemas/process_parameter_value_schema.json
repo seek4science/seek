@@ -1,0 +1,28 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "title" : "ISA process parameter value schema",
+    "description" : "JSON-schema representing a Parameter Value (associated with a Protocol REF) in the ISA model",
+    "type" : "object",
+    "properties" : {
+        "category" : {
+             "$ref": "protocol_parameter_schema.json#"
+            },
+        "value": {
+            "anyOf" : [
+                { "$ref": "ontology_annotation_schema.json#"},
+                { "type": "string"},
+                { "type": "number"}
+                ]
+        },
+        "unit": {
+            "$ref": "ontology_annotation_schema.json#"
+        },
+        "comments" : {
+            "type": "array",
+            "items": {
+                 "$ref": "comment_schema.json#"
+            }
+        }
+    },
+    "additionalProperties": false
+}

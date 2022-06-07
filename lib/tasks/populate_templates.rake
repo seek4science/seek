@@ -57,7 +57,8 @@ namespace :seek do
 									{
 										title: attribute['name'],
 										source_ontology: is_ontology ? attribute['ontology']['name'] : nil,
-										ols_root_term_uri: is_ontology ? attribute['ontology']['rootTermURI'] : nil
+										ols_root_term_uri: is_ontology ? attribute['ontology']['rootTermURI'] : nil,
+										custom_input: true
 									}
 								) if is_ontology || is_CV
 

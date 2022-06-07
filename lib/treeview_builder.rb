@@ -2,11 +2,12 @@ class TreeviewBuilder
     include ImagesHelper
     include ActionView::Helpers::SanitizeHelper
     def initialize(project, folders)
-    @project = project
-    @folders = folders
+        @project = project
+        @folders = folders
     end
 
     def build_tree_data
+        sp_advanced = Seek::Config.project_single_page_advanced_enabled
         inv, std, prj, asy, assay_assets = Array.new(5) {[]}
         bold = { 'style': 'font-weight:bold' }
         @project.investigations.each do |investigation|
@@ -26,6 +27,7 @@ class TreeviewBuilder
                     end
                     asy.push(create_node({text: assay.title, 
                                         _type: 'assay', 
+                                        label: 'Assay',
                                         _id: assay.id, 
                                         a_attr: bold, 
                                         children: assay_assets, 
@@ -36,8 +38,8 @@ class TreeviewBuilder
                                         _type: 'study', 
                                         _id: study.id, 
                                         a_attr: bold, 
-                                        label: asy.length>0 ? 'Assays' : nil, 
-                                        children: asy, 
+                                        label: 'Study', 
+                                        children: (sp_advanced ? load_isa_study_element(study) : []) + asy, 
                                         resource: study}))
                 asy = []
             end
@@ -45,8 +47,7 @@ class TreeviewBuilder
                                         _type: 'investigation', 
                                         _id: investigation.id, 
                                         a_attr: bold, 
-                                        label: 'Studies', 
-                                        action: '#', 
+                                        label: 'Investigation', 
                                         children: std, 
                                         resource: investigation}))
             std = []
@@ -59,8 +60,7 @@ class TreeviewBuilder
                                         _type: 'project',
                                         _id: @project.id,
                                         a_attr: bold, 
-                                        label: 'Investigations',
-                                        action: '#', 
+                                        label: 'Project',
                                         children: inv, 
                                         resource: @project}))
 
@@ -80,12 +80,11 @@ class TreeviewBuilder
         if(!obj[:resource].can_view?)
             obj[:text] = "hidden item"
             obj[:a_attr] = { 'style': 'font-style:italic;font-weight:bold;color:#ccc' }
-            obj[:action] = nil
         end
 
         node = { id: obj[:id], text: obj[:text], a_attr: obj[:a_attr], count: obj[:count],
             data: { id:obj[:_id], type: obj[:_type], project_id: obj[:project_id], folder_id: obj[:folder_id]},
-            state: { opened: true, separate: { label: obj[:label], action: obj[:action]}},
+            state: { opened: true, separate: { label: obj[:label]}},
             children: obj[:children], icon: get_icon(obj[:resource]) }
         deep_compact(node)
     end
@@ -100,6 +99,18 @@ class TreeviewBuilder
           next value unless value.class == Hash
           deep_compact(value)
         end.reject { |_k, v| v.blank? }
+    end
+
+    def load_isa_study_element (study)
+        elements = []
+        # TODO: Use the isa_order of sample_type instead
+        if (study.sop && study.sample_types.any?)
+            elements << create_node({text: "Source material", _type: 'source_material', _id: study.sample_types.first.id, resource: study.sample_types.first})
+            elements << create_node({text: "Sample collection", _type: 'sample_collection', _id: study.sop.id, resource: study.sop})
+            elements << create_node({text: "Study sample", _type: 'study_samples', _id: study.id, resource: study.sample_types.first})
+            elements << create_node({text: "Study table", _type: 'study_table', _id: study.id, resource: study.sample_types.first})
+        end
+        return elements
     end
 
 end
