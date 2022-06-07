@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "58",
+    "id": "52",
     "type": "assays",
     "attributes": {
       "policy": {
@@ -43,10 +43,10 @@
       ],
       "creators": [
         {
-          "profile": "/people/320",
+          "profile": "/people/328",
           "family_name": "Last",
           "given_name": "Person272",
-          "affiliation": "An Institution: 324",
+          "affiliation": "An Institution: 330",
           "orcid": null
         }
       ]
@@ -55,7 +55,7 @@
       "creators": {
         "data": [
           {
-            "id": "320",
+            "id": "328",
             "type": "people"
           }
         ]
@@ -63,7 +63,7 @@
       "submitter": {
         "data": [
           {
-            "id": "320",
+            "id": "328",
             "type": "people"
           }
         ]
@@ -71,7 +71,7 @@
       "organisms": {
         "data": [
           {
-            "id": "21",
+            "id": "13",
             "type": "organisms"
           }
         ]
@@ -84,7 +84,7 @@
       "people": {
         "data": [
           {
-            "id": "320",
+            "id": "328",
             "type": "people"
           }
         ]
@@ -99,13 +99,13 @@
       },
       "investigation": {
         "data": {
-          "id": "80",
+          "id": "59",
           "type": "investigations"
         }
       },
       "study": {
         "data": {
-          "id": "73",
+          "id": "57",
           "type": "studies"
         }
       },
@@ -125,7 +125,7 @@
       "sops": {
         "data": [
           {
-            "id": "24",
+            "id": "22",
             "type": "sops"
           }
         ]
@@ -133,7 +133,7 @@
       "publications": {
         "data": [
           {
-            "id": "37",
+            "id": "24",
             "type": "publications"
           }
         ]
@@ -146,21 +146,21 @@
       "documents": {
         "data": [
           {
-            "id": "16",
+            "id": "32",
             "type": "documents"
           }
         ]
       }
     },
     "links": {
-      "self": "/assays/58"
+      "self": "/assays/52"
     },
     "meta": {
-      "created": "2022-05-13T14:38:18.000Z",
-      "modified": "2022-05-13T14:38:19.000Z",
+      "created": "2022-06-07T14:13:12.000Z",
+      "modified": "2022-06-07T14:13:13.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "41193100-b4f8-013a-0f2b-0a81884ed284"
+      "uuid": "e3d848d0-c899-013a-0f7e-0a81884ed284"
     }
   },
   "jsonapi": {

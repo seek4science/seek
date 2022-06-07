@@ -44,7 +44,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "258",
+              "id": "463",
               "type": "projects"
             },
             "access": "edit"
@@ -56,7 +56,7 @@
       "creators": {
         "data": [
           {
-            "id": "243",
+            "id": "428",
             "type": "people"
           }
         ]
@@ -64,7 +64,7 @@
       "projects": {
         "data": [
           {
-            "id": "258",
+            "id": "463",
             "type": "projects"
           }
         ]
@@ -72,7 +72,7 @@
       "assays": {
         "data": [
           {
-            "id": "37",
+            "id": "63",
             "type": "assays"
           }
         ]
@@ -80,7 +80,7 @@
       "publications": {
         "data": [
           {
-            "id": "26",
+            "id": "35",
             "type": "publications"
           }
         ]
@@ -88,7 +88,7 @@
       "presentations": {
         "data": [
           {
-            "id": "5",
+            "id": "21",
             "type": "presentations"
           }
         ]
@@ -96,7 +96,7 @@
       "data_files": {
         "data": [
           {
-            "id": "9",
+            "id": "29",
             "type": "data_files"
           }
         ]
@@ -104,7 +104,7 @@
       "documents": {
         "data": [
           {
-            "id": "7",
+            "id": "37",
             "type": "documents"
           }
         ]
@@ -112,7 +112,7 @@
       "sops": {
         "data": [
           {
-            "id": "15",
+            "id": "27",
             "type": "sops"
           }
         ]

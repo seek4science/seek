@@ -1,7 +1,7 @@
 {
   "data": {
     "type": "sops",
-    "id": "14",
+    "id": "16",
     "attributes": {
       "title": "A Maximally Patched SOP",
       "description": "Protocol",
@@ -17,7 +17,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "165",
+              "id": "218",
               "type": "projects"
             },
             "access": "edit"
@@ -29,7 +29,7 @@
       "creators": {
         "data": [
           {
-            "id": "152",
+            "id": "205",
             "type": "people"
           }
         ]
@@ -37,7 +37,7 @@
       "projects": {
         "data": [
           {
-            "id": "165",
+            "id": "218",
             "type": "projects"
           }
         ]

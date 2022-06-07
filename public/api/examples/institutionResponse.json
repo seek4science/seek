@@ -1,11 +1,11 @@
 {
   "data": {
-    "id": "15",
+    "id": "638",
     "type": "institutions",
     "attributes": {
       "discussion_links": [
         {
-          "id": "2",
+          "id": "56",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
@@ -31,14 +31,14 @@
       }
     },
     "links": {
-      "self": "/institutions/15"
+      "self": "/institutions/638"
     },
     "meta": {
-      "created": "2022-05-13T14:37:21.000Z",
-      "modified": "2022-05-13T14:37:21.000Z",
+      "created": "2022-06-07T14:14:01.000Z",
+      "modified": "2022-06-07T14:14:01.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "1ef92470-b4f8-013a-0f2b-0a81884ed284"
+      "uuid": "00bfa1b0-c89a-013a-0f7e-0a81884ed284"
     }
   },
   "jsonapi": {

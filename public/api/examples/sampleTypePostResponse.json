@@ -33,7 +33,7 @@
       "projects": {
         "data": [
           {
-            "id": "860",
+            "id": "938",
             "type": "projects"
           }
         ]
@@ -46,7 +46,7 @@
       "submitter": {
         "data": [
           {
-            "id": "797",
+            "id": "857",
             "type": "people"
           }
         ]
@@ -54,7 +54,7 @@
       "assays": {
         "data": [
           {
-            "id": "120",
+            "id": "128",
             "type": "assays"
           }
         ]
@@ -64,11 +64,11 @@
       "self": "/sample_types/17"
     },
     "meta": {
-      "created": "2022-05-13T14:39:42.000Z",
-      "modified": "2022-05-13T14:39:42.000Z",
+      "created": "2022-06-07T14:14:35.000Z",
+      "modified": "2022-06-07T14:14:35.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "72f8de30-b4f8-013a-0f2b-0a81884ed284"
+      "uuid": "154f5710-c89a-013a-0f7e-0a81884ed284"
     }
   },
   "jsonapi": {
