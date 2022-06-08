@@ -132,14 +132,19 @@ class LogPublishingTest < ActionController::TestCase
     params[:gatekeeper_decide][df.class.name][df.id.to_s] ||= {}
     params[:gatekeeper_decide][df.class.name][df.id.to_s]['decision'] = 1
 
-    assert_difference ('ResourcePublishLog.count') do
+    assert_difference('ResourcePublishLog.count',1) do
       post :gatekeeper_decide, params: params.merge(id: @gatekeeper.id)
     end
 
-    publish_log = ResourcePublishLog.last
-    assert_equal ResourcePublishLog::PUBLISHED, publish_log.publish_state.to_i
-    assert_equal df, publish_log.resource
-    assert_equal @gatekeeper.user, publish_log.user
+
+    contributor_publish_log = df.resource_publish_logs.first
+    gatekeeper_publish_log = df.resource_publish_logs.last
+
+    assert_equal ResourcePublishLog::WAITING_FOR_APPROVAL, contributor_publish_log.publish_state.to_i
+    assert_equal df.contributor.user, contributor_publish_log.user
+
+    assert_equal df, contributor_publish_log.resource
+    assert_equal @gatekeeper.user, gatekeeper_publish_log.user
   end
 
   test 'gatekeeper cannot approve an item from another project' do
