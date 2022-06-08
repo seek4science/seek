@@ -211,7 +211,7 @@ class DataFilesController < ApplicationController
 
       flash[:notice] = "#{@samples.count} samples extracted successfully"
     else
-      SampleDataExtractionJob.new(@data_file, @sample_type, false).queue_job
+      SampleDataJob.new(@data_file, @sample_type, persist: false).queue_job
     end
 
     respond_to do |format|
@@ -253,7 +253,7 @@ class DataFilesController < ApplicationController
         @sample_type = @data_file.reload.possible_sample_types.last
 
         if @sample_type
-          SampleDataExtractionJob.new(@data_file, @sample_type, false, overwrite: true).queue_job
+          SampleDataJob.new(@data_file, @sample_type, persist: false, overwrite: true).queue_job
 
           respond_to do |format|
             format.html { redirect_to @data_file }
