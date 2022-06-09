@@ -1,8 +1,6 @@
-# job to asynchronously extract or persist samples from a datafile
-
-class SampleDataJob < TaskJob
+class SampleDataExtractionJob < TaskJob
   queue_as QueueNames::SAMPLES
-  def perform(data_file, sample_type, persist: false, overwrite: false)
+  def perform(data_file, sample_type, persist = false, overwrite: false)
     extractor = Seek::Samples::Extractor.new(data_file, sample_type)
 
     if persist

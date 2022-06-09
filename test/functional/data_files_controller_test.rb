@@ -2487,7 +2487,7 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_no_difference('Sample.count') do
       assert_difference('Task.count') do
-        assert_enqueued_jobs(1, only: SampleDataJob) do
+        assert_enqueued_jobs(1, only: SampleDataExtractionJob) do
           post :extract_samples, params: { id: data_file.id }
 
           assert data_file.reload.sample_extraction_task&.pending?
@@ -2698,7 +2698,7 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.content_blob.file_size
 
     assert_no_difference('Sample.count') do
-      assert_enqueued_jobs(1, only: SampleDataJob) do
+      assert_enqueued_jobs(1, only: SampleDataExtractionJob) do
         assert_difference('Task.count') do
           VCR.use_cassette('nels/get_sample_metadata') do
             post :retrieve_nels_sample_metadata, params: { id: data_file }
@@ -2723,7 +2723,7 @@ class DataFilesControllerTest < ActionController::TestCase
     refute data_file.content_blob.file_size
 
     assert_no_difference('Sample.count') do
-      assert_no_enqueued_jobs(only: SampleDataJob) do
+      assert_no_enqueued_jobs(only: SampleDataExtractionJob) do
         VCR.use_cassette('nels/missing_sample_metadata') do
           post :retrieve_nels_sample_metadata, params: { id: data_file }
 
@@ -2750,7 +2750,7 @@ class DataFilesControllerTest < ActionController::TestCase
                                             "data_file_id:#{data_file.id}")
 
     assert_no_difference('Sample.count') do
-      assert_no_enqueued_jobs(only: SampleDataJob) do
+      assert_no_enqueued_jobs(only: SampleDataExtractionJob) do
         VCR.use_cassette('nels/get_sample_metadata') do
           post :retrieve_nels_sample_metadata, params: { id: data_file }
 
