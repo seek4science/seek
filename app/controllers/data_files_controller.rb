@@ -200,7 +200,7 @@ class DataFilesController < ApplicationController
 
   def extract_samples
     if params[:confirm]
-      SampleDataPersistJob.new(@data_file, @sample_type, assay_ids: params["assay_ids"], contributor: User.current_user.person).queue_job
+      SampleDataPersistJob.new(@data_file, @sample_type, assay_ids: params["assay_ids"]).queue_job
       flash[:notice] = "Sample persistence started"
     else
       SampleDataExtractionJob.new(@data_file, @sample_type).queue_job
