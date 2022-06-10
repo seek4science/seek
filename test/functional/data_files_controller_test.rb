@@ -2330,6 +2330,44 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal Task::STATUS_QUEUED, data_file.sample_persistence_task.status
   end
 
+  test 'show persistence task status' do
+
+    person = Factory(:person)
+    other_person = Factory(:person)
+    df = Factory(:data_file, contributor: person, policy: Factory(:publicly_viewable_policy))
+    sample_type = Factory(:patient_sample_type)
+    SampleDataPersistJob.new(df, sample_type).queue_job
+    df.reload
+
+    login_as(other_person)
+    get :show, params: {id: df.id}
+    assert_response :success
+    assert_select '#sample-persistence-status .alert-info', count:0
+
+    login_as(person)
+    get :show, params: {id: df.id}
+    assert_response :success
+    assert_select '#sample-persistence-status' do
+      assert_select '.alert-info', text:/Queued/
+    end
+
+    df.sample_persistence_task.update_attribute(:status, Task::STATUS_ACTIVE)
+    get :show, params: {id: df.id}
+    assert_response :success
+    assert_select '#sample-persistence-status' do
+      assert_select '.alert-info', text:/Active/
+    end
+
+    df.sample_persistence_task.update_attribute(:status, Task::STATUS_DONE)
+    get :show, params: {id: df.id, previous_status: Task::STATUS_ACTIVE}
+    assert_response :success
+    assert_select '#sample-persistence-status' do
+      assert_select '.alert-info', text:/Sample creation complete/
+      assert_select '.alert-info a[href=?]', data_file_samples_path(df), text:/View Created Samples/
+    end
+
+  end
+
   test 'extract from data file with multiple matching sample types redirects to selection page' do
     create_sample_attribute_type
     person = Factory(:project_administrator)

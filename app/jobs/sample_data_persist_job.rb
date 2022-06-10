@@ -8,7 +8,7 @@ class SampleDataPersistJob < TaskJob
     time = Benchmark.measure do
       samples = extractor.persist.select(&:persisted?)
       extractor.clear
-      @data_file.copy_assay_associations(samples, assay_ids) unless assay_ids.blank?
+      data_file.copy_assay_associations(samples, assay_ids) unless assay_ids.blank?
     end
 
     Rails.logger.info("Benchmark for persist: #{time}")
