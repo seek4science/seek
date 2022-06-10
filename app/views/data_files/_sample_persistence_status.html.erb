@@ -1,7 +1,7 @@
 <% task =  data_file.sample_persistence_task %>
-<% return unless task %>
+<% return unless task&.persisted? %>
 
-<% job_status ||= task&.status %>
+<% job_status ||= task.status %>
 <% previous_status ||= params[:previous_status] %>
 <% in_progress = task.in_progress? %>
 <% just_finished = task.completed? && Task.status_in_progress?(previous_status) %>

@@ -1,5 +1,8 @@
-<% job_status ||= data_file.sample_extraction_task&.status %>
-<% in_progress = data_file.sample_extraction_task&.in_progress? %>
+<% task =  data_file.sample_extraction_task %>
+<% return unless task&.persisted? %>
+
+<% job_status ||= task.status %>
+<% in_progress = task.in_progress? %>
 <% persistence_in_progress = data_file.sample_persistence_task&.in_progress? %>
 
 <div id="sample-extraction-status">
