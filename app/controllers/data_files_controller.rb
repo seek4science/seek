@@ -231,11 +231,18 @@ class DataFilesController < ApplicationController
   end
 
   def extraction_status
-    @previous_status = params[:previous_status]
-    @job_status = @data_file.sample_extraction_task.status
+    job_status = @data_file.sample_extraction_task.status
 
     respond_to do |format|
-      format.html { render partial: 'data_files/sample_extraction_status', locals: { data_file: @data_file } }
+      format.html { render partial: 'data_files/sample_extraction_status', locals: { data_file: @data_file, job_status: job_status } }
+    end
+  end
+
+  def persistence_status
+    job_status = @data_file.sample_persistence_task.status
+
+    respond_to do |format|
+      format.html { render partial: 'data_files/sample_persistence_status', locals: { data_file: @data_file, job_status: job_status, previous_status: params[:previous_status] } }
     end
   end
 
