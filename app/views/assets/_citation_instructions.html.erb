@@ -11,6 +11,10 @@
             <strong>Eligible in:</strong> <%= time_ago_in_words(versioned_resource.doi_time_lock_end) %>
           </p>
         </div>
+    <% elsif !(versioned_resource.visibility == :public) %>
+      <div class="alert alert-warning">
+        <p>This version must be set to "<%= VersionHelper::VISIBILITY_LABELS[:public].downcase -%>" before being eligible for a DOI.</p>
+      </div>
     <% else %>
         <% if resource.is_published? %>
             <div class="alert alert-success">
