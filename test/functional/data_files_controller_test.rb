@@ -2342,20 +2342,20 @@ class DataFilesControllerTest < ActionController::TestCase
     login_as(other_person)
     get :show, params: {id: df.id}
     assert_response :success
-    assert_select '#sample-persistence-status .alert-info', count:0
+    assert_select '#sample-persistence-status .alert-info', count: 0
 
     login_as(person)
     get :show, params: {id: df.id}
     assert_response :success
     assert_select '#sample-persistence-status' do
-      assert_select '.alert-info', text:/Queued/
+      assert_select '.alert-info', text: /Queued/
     end
 
     df.sample_persistence_task.update_attribute(:status, Task::STATUS_ACTIVE)
     get :show, params: {id: df.id}
     assert_response :success
     assert_select '#sample-persistence-status' do
-      assert_select '.alert-info', text:/Active/
+      assert_select '.alert-info', text: /Active/
     end
 
     df.sample_persistence_task.update_attribute(:status, Task::STATUS_DONE)
@@ -2363,8 +2363,13 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_response :success
     assert_select '#sample-persistence-status' do
       assert_select '.alert-info', text:/Sample creation complete/
-      assert_select '.alert-info a[href=?]', data_file_samples_path(df), text:/View Created Samples/
+      assert_select '.alert-info a[href=?]', data_file_samples_path(df), text: /View Created Samples/
     end
+
+    df.sample_persistence_task.update_attribute(:status, Task::STATUS_DONE)
+    get :show, params: {id: df.id}
+    assert_response :success
+    assert_select '#sample-persistence-status .alert-info', count: 0
 
   end
 

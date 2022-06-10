@@ -1,10 +1,13 @@
-<% job_status ||= data_file.sample_persistence_task&.status %>
+<% task =  data_file.sample_persistence_task %>
+<% return unless task %>
+
+<% job_status ||= task&.status %>
 <% previous_status ||= params[:previous_status] %>
-<% in_progress = data_file.sample_persistence_task&.in_progress? %>
-<% finished = !in_progress && [Task::STATUS_QUEUED, Task::STATUS_ACTIVE ].include?(previous_status) %>
+<% in_progress = task.in_progress? %>
+<% just_finished = task.completed? && Task.status_in_progress?(previous_status) %>
 
 <div id="sample-persistence-status">
-  <% if data_file.can_manage? && (in_progress || finished) %>
+  <% if data_file.can_manage? && (in_progress || just_finished) %>
     <div class="alert alert-info" role="alert">
       <strong>Creating extracted samples:</strong>
       <% if in_progress %>
@@ -22,13 +25,15 @@
             }, 5000);
         </script>
       <% end %>
-      <% if finished %>
-        Sample creation complete
-        <p>
-          You can view the new samples by clicking the button below.
-        </p>
-        <%= link_to('View Created Samples', data_file_samples_path(data_file),
-                    class: 'btn btn-primary') %>
+      <% if just_finished %>
+        <% if task.success? %>
+          Sample creation complete
+          <p>
+            You can view the new samples by clicking the button below.
+          </p>
+          <%= link_to('View Created Samples', data_file_samples_path(data_file),
+                      class: 'btn btn-primary') %>
+        <% end %>
       <% end %>
     </div>
   <% end %>
