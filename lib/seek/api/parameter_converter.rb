@@ -101,6 +101,10 @@ module Seek
             value.map { |i| { asset_id: i }.with_indifferent_access }
           },
 
+          sample_ids: proc { |value|
+            value.map { |i| { asset_id: i }.with_indifferent_access }
+          },
+
           assay_ids: proc { |value|
             value.map { |i| { assay_id: i } }
           },
@@ -137,6 +141,7 @@ module Seek
         model_format: :model_format_id,
         environment: :recommended_environment_id,
         data_file_ids: :data_files_attributes,
+        sample_ids: :samples_attributes,
         assay_ids: :assay_assets_attributes,
         workflow_class: :workflow_class_id,
         discussion_links: :discussion_links_attributes,
