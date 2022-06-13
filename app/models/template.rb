@@ -3,6 +3,8 @@ class Template < ApplicationRecord
   
   has_many :template_attributes, -> { order(:pos) }, inverse_of: :template, dependent: :destroy
   has_many :sample_types
+	has_many :samples, through: :sample_types
+
   validates :title, presence: true
   validates :title, uniqueness: { scope: :group }
 
@@ -25,7 +27,7 @@ class Template < ApplicationRecord
     resolve_controlled_vocabs_inconsistencies
   end
 
-  private 
+  private
 
   # fixes the consistency of the attribute controlled vocabs where the attribute doesn't match.
   # this is to help when a controlled vocab has been selected in the form, but then the type has been changed
@@ -35,6 +37,6 @@ class Template < ApplicationRecord
       attribute.sample_controlled_vocab = nil unless attribute.sample_attribute_type.controlled_vocab?
     end
   end
-  
+	
 end
 

@@ -745,6 +745,7 @@ SEEK::Application.routes.draw do
       get :manage
       patch :manage_update
     end
+		resources :samples
   end
 
   ### SINGLE PAGE

@@ -236,6 +236,9 @@ class SamplesController < ApplicationController
     elsif params[:sample_type_id]
       @sample_type = SampleType.includes(:sample_attributes).find(params[:sample_type_id])
       @samples = @sample_type.samples.authorized_for('view')
+		elsif params[:template_id]
+      @template = Template.find(params[:template_id])
+      @samples = @template.samples.authorized_for('view')
     else
       find_assets
     end
