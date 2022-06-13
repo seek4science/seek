@@ -48,7 +48,7 @@ class SamplesController < ApplicationController
 
   def create
     @sample = Sample.new(sample_type_id: params[:sample][:sample_type_id], title: params[:sample][:title])
-    update_sample_with_params
+    @sample = update_sample_with_params
     if @sample.save
       respond_to do |format|
         flash[:notice] = 'The sample was successfully created.'
@@ -137,48 +137,63 @@ class SamplesController < ApplicationController
 
   def batch_create
     errors = []
+    results = []
     param_converter = Seek::Api::ParameterConverter.new("samples")
     Sample.transaction do
       params[:data].each do |par|
-        params =  param_converter.convert(par)
-        sample = Sample.new(sample_type_id: params[:sample][:sample_type_id], title: params[:sample][:title])
-        update_sample_with_params(params, sample)
-        errors.push({ ex_id: par[:ex_id], error: sample.errors.messages }) if !sample.save
+        converted_params = param_converter.convert(par)
+        sample_type = SampleType.find_by_id(converted_params.dig(:sample, :sample_type_id))
+        sample = Sample.new(sample_type: sample_type)
+        sample = update_sample_with_params(converted_params, sample)
+        if sample.save
+          results.push({ ex_id: par[:ex_id], id: sample.id })
+        else
+          errors.push({ ex_id: par[:ex_id], error: sample.errors.messages })
+        end
       end
-      raise ActiveRecord::Rollback if !errors.empty?
+      raise ActiveRecord::Rollback if errors.any?
     end
-    render json: { status: errors.empty? ? :ok : :unprocessable_entity, errors: errors }
+    status = errors.empty? ? :ok : :unprocessable_entity
+    render json: { status: status, errors: errors, results: results }, status: :ok
   end
 
   def batch_update
     errors = []
     param_converter = Seek::Api::ParameterConverter.new("samples")
-    params[:data].each do |par|
-      begin
-        params = param_converter.convert(par)
-        sample = Sample.find(par[:id])
-        update_sample_with_params(params, sample)
-        errors.push(par[:id]) if !sample.save
-      rescue 
-        errors.push(par[:id]) 
+    Sample.transaction do
+      params[:data].each do |par|
+        begin
+          converted_params = param_converter.convert(par)
+          sample = Sample.find(par[:id])
+          sample = update_sample_with_params(converted_params, sample)
+          saved = sample.save
+          errors.push({ ex_id: par[:ex_id], error: sample.errors.messages }) unless saved
+        rescue
+          errors.push({ ex_id: par[:ex_id], error: "Can not be updated." })
+        end
       end
+      raise ActiveRecord::Rollback if errors.any?
     end
-    render json: { status: errors.empty? ? :ok : :unprocessable_entity, errors: errors }
+    status = errors.empty? ? :ok : :unprocessable_entity
+    render json: { status: status, errors: errors }, status: :ok
   end
 
   def batch_delete
     errors = []
-    params[:data].each do |par|
-      begin
-        sample = Sample.find(par[:id])
-        errors.push(par[:id]) if !(sample.can_delete? && sample.destroy)
-      rescue 
-        errors.push(par[:id]) 
+    Sample.transaction do
+      params[:data].each do |par|
+        begin
+          sample = Sample.find(par[:id])
+          errors.push({ ex_id: par[:ex_id], error: "Can not be deleted." }) if !(sample.can_delete? && sample.destroy)
+        rescue 
+          errors.push({ ex_id: par[:ex_id], error: sample.errors.messages })
+        end         
       end
+      raise ActiveRecord::Rollback if errors.any?
     end
-    render json: { status: errors.empty? ? :ok : :unprocessable_entity, errors: errors }
+    status = errors.empty? ? :ok : :unprocessable_entity
+    render json: { status: status, errors: errors }, status: :ok
   end
-
 
   def typeahead
     sample_type = SampleType.find(params[:linked_sample_type_id])
@@ -196,29 +211,21 @@ class SamplesController < ApplicationController
 
   private
 
-  def sample_params(sample_type=nil, _params=nil)
-    _params ||= params
+  def sample_params(sample_type = nil, parameters = params)
     sample_type_param_keys = sample_type ? sample_type.sample_attributes.map(&:title).collect(&:to_sym) : []
-    if _params[:sample][:attribute_map]
-      _params[:sample][:data] = _params[:sample].delete(:attribute_map)
-    end
-    _params.require(:sample).permit(:sample_type_id, *creator_related_params, { project_ids: [] },
-                              { data: sample_type_param_keys },
+    parameters.require(:sample).permit(:sample_type_id, *creator_related_params,
+                              { project_ids: [] }, { data: sample_type_param_keys },
+                              { assay_assets_attributes: [:assay_id] },
                               { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                               discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
-  def update_sample_with_params(_params=nil, sample=nil)
-    sample ||= @sample
-    if _params.nil?
-      sample.update(sample_params(sample.sample_type))
-    else  
-      sample.assign_attributes(sample_params(sample.sample_type, _params))
-    end
-    update_sharing_policies sample
-    update_annotations(params[:tag_list], sample)
-    update_relationships(sample, params)
-    sample.save if _params.nil?
+  def update_sample_with_params(parameters = params, sample = @sample)
+    sample.assign_attributes(sample_params(sample.sample_type, parameters))
+    update_sharing_policies(sample, parameters)
+    update_annotations(parameters[:tag_list], sample)
+    update_relationships(sample, parameters)
+    sample
   end
 
   def find_index_assets
