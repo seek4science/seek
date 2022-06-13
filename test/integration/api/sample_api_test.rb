@@ -133,7 +133,6 @@ class SampleApiTest < ActionDispatch::IntegrationTest
   end
 
   test 'batch create' do 
-    skip
     person = Factory(:person)
     user_login(person)
     project = Factory(:project)
