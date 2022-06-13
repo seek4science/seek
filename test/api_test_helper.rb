@@ -248,11 +248,6 @@ module ApiTestHelper
   # Compares `result` against `expected`. If `expected` is a Hash, compare each each key/value pair with that in `result`. If `expected` is an Array, compare each value.
   # `key` is used to generate meaningful failure messages if the assertion fails.
   def deep_comparison(expected, actual, key)
-    puts ''
-    puts 'ACTUAL'
-    puts actual
-    puts 'EXPECTED'
-    puts expected
     if expected.is_a?(Hash)
       assert actual.is_a?(Hash), "#{key} was not a Hash, it was a #{actual.class.name}"
       expected.each do |expected_key, expected_value|

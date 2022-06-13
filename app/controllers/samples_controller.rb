@@ -79,7 +79,7 @@ class SamplesController < ApplicationController
 
   def update
     @sample = Sample.find(params[:id])
-    update_sample_with_params
+    @sample = update_sample_with_params
     respond_to do |format|
       if @sample.save
         flash[:notice] = 'The sample was successfully updated.'
