@@ -2343,7 +2343,13 @@ class DataFilesControllerTest < ActionController::TestCase
     sample_type.save!
 
     assert_difference('Sample.count', 3) do
-      post :extract_samples, params: { id: data_file.id, confirm: 'true' }
+      assert_difference('ReindexingQueue.count', 3) do
+        assert_difference('AuthLookupUpdateQueue.count', 3) do
+          with_config_value(:auth_lookup_enabled,true) do # needed to test added to queue
+            post :extract_samples, params: { id: data_file.id, confirm: 'true' }
+          end
+        end
+      end
     end
 
     assert_redirected_to data_file_path(data_file)
@@ -2967,7 +2973,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_equal [assay], df.assays
   end
 
-  test 'create metadata with associated assay ignores assay if not editable' do
+  test 'create metadata with associated assay fails if assay not editable' do
     assay = Factory(:assay)
     person = Factory(:person)
     login_as(person)
@@ -2983,8 +2989,8 @@ class DataFilesControllerTest < ActionController::TestCase
               content_blob_id: blob.id.to_s
     }
 
-    assert_difference('ActivityLog.count') do
-      assert_difference('DataFile.count') do
+    assert_no_difference('ActivityLog.count') do
+      assert_no_difference('DataFile.count') do
         assert_no_difference('Assay.count') do
           assert_no_difference('AssayAsset.count') do
             post :create_metadata, params: params
@@ -2993,8 +2999,8 @@ class DataFilesControllerTest < ActionController::TestCase
       end
     end
 
-    assert (df = assigns(:data_file))
-    assert_empty df.assays
+    assert_response :unprocessable_entity
+
   end
 
   test 'create metadata fails if content blob not on session' do

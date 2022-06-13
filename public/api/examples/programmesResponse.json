@@ -1,33 +1,33 @@
 {
   "data": [
     {
-      "id": "18",
+      "id": "8",
       "type": "programmes",
       "attributes": {
         "title": "A Maximal Programme"
       },
       "links": {
-        "self": "/programmes/18"
+        "self": "/programmes/8"
       }
     },
     {
-      "id": "17",
-      "type": "programmes",
-      "attributes": {
-        "title": "A Programme: 15"
-      },
-      "links": {
-        "self": "/programmes/17"
-      }
-    },
-    {
-      "id": "16",
+      "id": "6",
       "type": "programmes",
       "attributes": {
         "title": "A Minimal Programme"
       },
       "links": {
-        "self": "/programmes/16"
+        "self": "/programmes/6"
+      }
+    },
+    {
+      "id": "7",
+      "type": "programmes",
+      "attributes": {
+        "title": "A Programme: 5"
+      },
+      "links": {
+        "self": "/programmes/7"
       }
     }
   ],

@@ -1,7 +1,7 @@
 {
   "data": {
     "type": "assays",
-    "id": "58",
+    "id": "52",
     "attributes": {
       "title": "A Maximal Assay",
       "assay_class": {
@@ -34,14 +34,14 @@
     "relationships": {
       "study": {
         "data": {
-          "id": "73",
+          "id": "57",
           "type": "studies"
         }
       },
       "publications": {
         "data": [
           {
-            "id": "37",
+            "id": "24",
             "type": "publications"
           }
         ]
@@ -49,7 +49,7 @@
       "organisms": {
         "data": [
           {
-            "id": "21",
+            "id": "13",
             "type": "organisms"
           }
         ]
@@ -57,7 +57,7 @@
       "sops": {
         "data": [
           {
-            "id": "24",
+            "id": "22",
             "type": "sops"
           }
         ]
@@ -73,7 +73,7 @@
       "documents": {
         "data": [
           {
-            "id": "16",
+            "id": "32",
             "type": "documents"
           }
         ]
@@ -81,7 +81,7 @@
       "creators": {
         "data": [
           {
-            "id": "320",
+            "id": "328",
             "type": "people"
           }
         ]

@@ -191,7 +191,7 @@ GEM
     csl-styles (2.0.0)
       csl (~> 2.0)
     curb (0.9.11)
-    daemons (1.4.1)
+    daemons (1.1.9)
     database_cleaner (1.7.0)
     debug_inspector (1.1.0)
     delayed_job (4.1.10)
@@ -518,7 +518,7 @@ GEM
       nio4r (~> 2.0)
     pyu-ruby-sasl (0.0.3.3)
     racc (1.6.0)
-    rack (2.2.3)
+    rack (2.2.3.1)
     rack-attack (6.6.0)
       rack (>= 1.0, < 3)
     rack-cors (1.1.1)
@@ -915,7 +915,7 @@ DEPENDENCIES
   commonmarker
   country_select
   csl-styles (~> 2.0.0)
-  daemons
+  daemons (= 1.1.9)
   database_cleaner (~> 1.7.0)
   delayed_job_active_record
   docsplit

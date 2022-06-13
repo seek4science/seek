@@ -40,7 +40,8 @@ class SamplesController < ApplicationController
 
   def create
     @sample = Sample.new(sample_type_id: params[:sample][:sample_type_id], title: params[:sample][:title])
-    if update_sample_with_params
+    @sample = update_sample_with_params
+    if @sample.save
       respond_to do |format|
         flash[:notice] = 'The sample was successfully created.'
         format.html { redirect_to sample_path(@sample) }
@@ -70,8 +71,9 @@ class SamplesController < ApplicationController
 
   def update
     @sample = Sample.find(params[:id])
+    @sample = update_sample_with_params
     respond_to do |format|
-      if update_sample_with_params
+      if @sample.save
         flash[:notice] = 'The sample was successfully updated.'
         format.html { redirect_to sample_path(@sample) }
         format.json { render json: @sample }
@@ -126,14 +128,16 @@ class SamplesController < ApplicationController
   end
 
   def batch_create
-    errors, results = [], []
+    errors = []
+    results = []
     param_converter = Seek::Api::ParameterConverter.new("samples")
     Sample.transaction do
       params[:data].each do |par|
         converted_params = param_converter.convert(par)
         sample_type = SampleType.find_by_id(converted_params.dig(:sample, :sample_type_id))
         sample = Sample.new(sample_type: sample_type)
-        if update_sample_with_params(converted_params, sample)
+        sample = update_sample_with_params(converted_params, sample)
+        if sample.save
           results.push({ ex_id: par[:ex_id], id: sample.id })
         else
           errors.push({ ex_id: par[:ex_id], error: sample.errors.messages })
@@ -153,7 +157,8 @@ class SamplesController < ApplicationController
         begin
           converted_params = param_converter.convert(par)
           sample = Sample.find(par[:id])
-          saved = update_sample_with_params(converted_params, sample)
+          sample = update_sample_with_params(converted_params, sample)
+          saved = sample.save
           errors.push({ ex_id: par[:ex_id], error: sample.errors.messages }) unless saved
         rescue
           errors.push({ ex_id: par[:ex_id], error: "Can not be updated." })
@@ -201,15 +206,9 @@ class SamplesController < ApplicationController
 
   def sample_params(sample_type = nil, parameters = params)
     sample_type_param_keys = sample_type ? sample_type.sample_attributes.map(&:title).collect(&:to_sym) : []
-    if parameters[:sample][:attribute_map]
-      parameters[:sample][:data] = parameters[:sample].delete(:attribute_map)
-    end
-    if (parameters[:sample][:assay_assets_attributes])
-      parameters[:sample][:assay_ids] = parameters[:sample][:assay_assets_attributes].map { |x| x[:assay_id] }
-    end
     parameters.require(:sample).permit(:sample_type_id, *creator_related_params,
                               { project_ids: [] }, { data: sample_type_param_keys },
-                              { assay_ids: [] },
+                              { assay_assets_attributes: [:assay_id] },
                               { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                               discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
@@ -219,7 +218,7 @@ class SamplesController < ApplicationController
     update_sharing_policies(sample, parameters)
     update_annotations(parameters[:tag_list], sample)
     update_relationships(sample, parameters)
-    sample.save
+    sample
   end
 
   def find_index_assets

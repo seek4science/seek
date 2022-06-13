@@ -30,14 +30,12 @@ module Seek
                   new_assay_assets << existing.tap { |e| e.assign_attributes(attrs) }
                 else
                   assay = Assay.find_by_id(attrs['assay_id'])
-                  if assay&.can_edit?
-                    if is_a?(Model) # check the assay is a modelling analysis
-                      if assay.is_modelling?
-                        new_assay_assets << assay_assets.build(attrs)
-                      end
-                    else
+                  if is_a?(Model) # check the assay is a modelling analysis
+                    if assay.is_modelling?
                       new_assay_assets << assay_assets.build(attrs)
                     end
+                  else
+                    new_assay_assets << assay_assets.build(attrs)
                   end
                 end
               end
