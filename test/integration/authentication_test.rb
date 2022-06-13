@@ -2,7 +2,6 @@ require 'test_helper'
 
 class AuthenticationTest < ActionDispatch::IntegrationTest
   def setup
-    ActionController::Base.allow_forgery_protection = true
     @user = Factory(:user,
                     login: 'my-user',
                     password: 'my-password',
@@ -15,7 +14,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
   end
 
   test 'authenticate using HTTP basic' do
-    get document_path(@document), headers: { 'Accept' => 'application/json', 'Authorization' => basic_auth('my-user', 'my-password') }
+    get document_path(@document), headers: { 'Authorization' => basic_auth('my-user', 'my-password') }
 
     assert_response :success
     assert_equal @user.id, session[:user_id]
@@ -82,10 +81,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     assert_nil session[:user_id]
   end
 
-  teardown do
-    ActionController::Base.allow_forgery_protection = false
-  end
-  
+
   private
 
   def token_auth(token)
