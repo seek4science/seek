@@ -15,13 +15,6 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
   end
 
   test 'authenticate using HTTP basic' do
-    get document_path(@document), headers: { 'Authorization' => basic_auth('my-user', 'my-password') }
-
-    assert_response :success
-    assert_equal @user.id, session[:user_id]
-  end
-
-  test 'authenticate using HTTP basic' do
     get document_path(@document), headers: { 'Accept' => 'application/json', 'Authorization' => basic_auth('my-user', 'my-password') }
 
     assert_response :success
