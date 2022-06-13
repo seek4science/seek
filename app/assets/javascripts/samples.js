@@ -13,12 +13,20 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
     var options = $j.extend({}, opts, {
         "lengthMenu": [ 5, 10, 25, 50, 75, 100 ],
         "pageLength": 10,
-        dom: 'lr<"samples-table-container"t>ip', // Needed to place the buttons
+        dom: '<"row"<"col-sm-11"lr><"col-sm-1"B>><"samples-table-container"t>ip', // Needed to place the buttons
         "columnDefs": [{
             "targets": [ 0, 1 ],
             "visible": false,
             "searchable": false
-        }]
+        }],
+				buttons: [
+					{
+							extend: 'csvHtml5',
+							exportOptions: {
+									columns: [':visible:not(.text-center)']
+							}
+					}
+				]
         //"initComplete": function () {  // THIS IS TOO SLOW - CRASHES BROWSER
         //    console.log("Hiding empty columns");
         //    table.columns().flatten().each(function (columnIndex) {
