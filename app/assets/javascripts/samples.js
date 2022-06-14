@@ -23,7 +23,7 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
 					{
 							extend: 'csvHtml5',
 							exportOptions: {
-									columns: [':visible:not(.text-center)']
+									columns: [':visible']
 							}
 					}
 				]
