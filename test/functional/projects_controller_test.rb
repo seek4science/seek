@@ -3295,6 +3295,43 @@ class ProjectsControllerTest < ActionController::TestCase
                   order_investigations_project_path(project), count: 0
   end
 
+  test 'should update project edam topics' do
+    Factory(:edam_topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
+
+    project_admin = Factory(:project_administrator)
+    project = project_admin.projects.first
+    login_as(project_admin)
+
+    put :update, params: { id: project.id, project: { edam_topics: 'Chemistry, Sample collections' } }
+
+    assert_equal ['http://edamontology.org/topic_3314','http://edamontology.org/topic_3277'], assigns(:project).edam_topics
+
+  end
+
+  test 'show edam topics if set' do
+    Factory(:edam_topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
+
+    user = Factory(:user)
+    project = Factory(:project)
+    login_as(user)
+
+    get :show, params: {id: project.id}
+    assert_response :success
+    assert_select 'div.panel div.panel-heading',text:/EDAM Properties/i, count:0
+
+    project.edam_topics = "Chemistry"
+    project.save!
+
+    assert project.edam_annotations?
+
+    get :show, params: {id: project.id}
+    assert_response :success
+
+    assert_select 'div.panel div.panel-heading',text:/EDAM Properties/i, count:1
+    assert_select 'div.panel div.panel-body div strong',text:/Topics/, count:1
+    assert_select 'div.panel div.panel-body a[href=?]','https://edamontology.github.io/edam-browser/#topic_3314',text:/Chemistry/, count:1
+  end
+
   private
 
   def check_project(project)

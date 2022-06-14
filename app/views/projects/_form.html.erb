@@ -12,6 +12,8 @@
   <%= f.text_area :description, :rows => 5, :class=>"form-control rich-text-edit" -%>
 </div>
 
+<%= render partial: 'assets/edam_form_properties', locals: { resource: @project } %>
+
 <div class="form-group">
   <%= f.label :funding_codes -%>
   <%= tags_input('project[funding_codes]', @project.funding_codes) %>
