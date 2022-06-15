@@ -460,4 +460,19 @@ class DataFileTest < ActiveSupport::TestCase
       assert_equal aa1.direction, s1.assay_assets.where(assay_id: aa1.assay_id).first.direction
     end
   end
+
+  test 'edam annotation properties'do
+    data_file = Factory(:data_file)
+
+    assert data_file.supports_edam_annotations?
+    refute data_file.supports_edam_annotations?(:topics)
+    refute data_file.supports_edam_annotations?(:operations)
+    assert data_file.supports_edam_annotations?(:formats)
+    assert data_file.supports_edam_annotations?(:data)
+
+    refute data_file.respond_to?(:edam_topics)
+    refute data_file.respond_to?(:edam_operations)
+    assert data_file.respond_to?(:edam_formats)
+    assert data_file.respond_to?(:edam_data)
+  end
 end
