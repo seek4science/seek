@@ -2325,6 +2325,8 @@ projectPost:
               $ref: "#/components/schemas/nullableLicense"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
+            edam_topics:
+              $ref: "#/components/schemas/ontologyTermsList"
           required:
             - title
           additionalProperties: false
@@ -2374,6 +2376,8 @@ projectPatch:
               $ref: "#/components/schemas/nullableLicense"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
+            edam_topics:
+              $ref: "#/components/schemas/ontologyTermsList"
           additionalProperties: false
         relationships:
           type: object
@@ -4124,6 +4128,8 @@ projectResponse:
               $ref: "#/components/schemas/nullableLicense"
             discussion_links:
               $ref: "#/components/schemas/assetLinkList"
+            edam_topics:
+              $ref: "#/components/schemas/ontologyTermsList"
             start_date:
               $ref: "#/components/schemas/nullableDateString"
             end_date:
