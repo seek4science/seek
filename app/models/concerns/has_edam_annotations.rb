@@ -2,99 +2,141 @@ module HasEdamAnnotations
   extend ActiveSupport::Concern
 
   included do
-    def supports_edam_annotations?
-      respond_to?(:edam_topics) && respond_to?(:edam_operations) &&
-        respond_to?(:edam_data) && respond_to?(:edam_formats)
+    def supports_edam_annotations?(property = nil)
+      if property.nil?
+        self.class.supported_edam_properties.present?
+      else
+        self.class.supported_edam_properties.include?(property)
+      end
     end
 
     def edam_annotations?
       return false unless supports_edam_annotations?
-      edam_topics.any? || edam_operations.any? || edam_data.any? || edam_formats.any?
+
+      self.class.supported_edam_properties.detect do |prop|
+        send("edam_#{prop}").any?
+      end.present?
     end
   end
 
   class_methods do
-    def has_edam_annotations
+    def has_edam_annotations(*properties)
       include InstanceMethods
-      include Search
 
-      has_annotation_type :edam_topics
-      has_many :edam_topic_values, through: :edam_topics_annotations, source: :value,
-                                   source_type: 'SampleControlledVocabTerm'
-
-      has_annotation_type :edam_operations
-      has_many :edam_operation_values, through: :edam_operations_annotations, source: :value,
-                                       source_type: 'SampleControlledVocabTerm'
-
-      has_annotation_type :edam_data
-      has_many :edam_data_values, through: :edam_data_annotations, source: :value,
-                                   source_type: 'SampleControlledVocabTerm'
-
-      has_annotation_type :edam_formats
-      has_many :edam_format_values, through: :edam_formats_annotations, source: :value,
-                                   source_type: 'SampleControlledVocabTerm'
-
-      # this is needed, because it overrides a previously 'defined' method from has_annotation_type
-      # the topics  vals can be an array or comma seperated list of either labels or IRI's
-      define_method :edam_topics= do |vals|
-        associate_edam_topics vals
+      class << self
+        attr_reader :supported_edam_properties
       end
+      @supported_edam_properties = Array(properties) & %i[topics operations data formats]
 
-      # this is needed, because it overrides a previously 'defined' method from has_annotation_type
-      # the operation vals can be an array or comma seperated list of either labels or IRI's
-      define_method :edam_operations= do |vals|
-        associate_edam_operations vals
-      end
+      if @supported_edam_properties.include?(:topics)
+        has_annotation_type :edam_topics
+        has_many :edam_topic_values, through: :edam_topics_annotations, source: :value,
+                                     source_type: 'SampleControlledVocabTerm'
 
-      # this is needed, because it overrides a previously 'defined' method from has_annotation_type
-      # the data vals can be an array or comma seperated list of either labels or IRI's
-      define_method :edam_data= do |vals|
-        associate_edam_data vals
-      end
+        # this is needed, because it overrides a previously 'defined' method from has_annotation_type
+        # the topics  vals can be an array or comma seperated list of either labels or IRI's
+        define_method :edam_topics= do |vals|
+          associate_edam_topics vals
+        end
 
-      # this is needed, because it overrides a previously 'defined' method from has_annotation_type
-      # the format vals can be an array or comma seperated list of either labels or IRI's
-      define_method :edam_formats= do |vals|
-        associate_edam_formats vals
-      end
+        define_method :edam_topic_labels do
+          edam_topic_values.pluck(:label)
+        end
 
-      # INDEX filters. Unfortunately, these won't currently consider the hierarchy
-      has_filter edam_topic: Seek::Filtering::Filter.new(
-        value_field: 'sample_controlled_vocab_terms.label',
-        joins: [:edam_topic_values]
-      )
-
-      has_filter edam_operation: Seek::Filtering::Filter.new(
-        value_field: 'sample_controlled_vocab_terms.label',
-        joins: [:edam_operation_values]
-      )
-
-      has_filter edam_data: Seek::Filtering::Filter.new(
-        value_field: 'sample_controlled_vocab_terms.label',
-        joins: [:edam_data_values]
-      )
-
-      has_filter edam_format: Seek::Filtering::Filter.new(
-        value_field: 'sample_controlled_vocab_terms.label',
-        joins: [:edam_format_values]
-      )
-    end
-  end
-
-  module Search
-    def self.included(klass)
-      klass.class_eval do
+        # INDEX filters. Unfortunately, these won't currently consider the hierarchy
+        has_filter edam_topic: Seek::Filtering::Filter.new(
+          value_field: 'sample_controlled_vocab_terms.label',
+          joins: [:edam_topic_values]
+        )
         if Seek::Config.solr_enabled
           searchable(auto_index: false) do
             text :edam_topics do
               edam_topic_labels
             end
+          end
+        end
+      end
+
+      if @supported_edam_properties.include?(:operations)
+        has_annotation_type :edam_operations
+        has_many :edam_operation_values, through: :edam_operations_annotations, source: :value,
+                                         source_type: 'SampleControlledVocabTerm'
+
+        # this is needed, because it overrides a previously 'defined' method from has_annotation_type
+        # the operation vals can be an array or comma seperated list of either labels or IRI's
+        define_method :edam_operations= do |vals|
+          associate_edam_operations vals
+        end
+
+        define_method :edam_operation_labels do
+          edam_operation_values.pluck(:label)
+        end
+
+        has_filter edam_operation: Seek::Filtering::Filter.new(
+          value_field: 'sample_controlled_vocab_terms.label',
+          joins: [:edam_operation_values]
+        )
+
+        if Seek::Config.solr_enabled
+          searchable(auto_index: false) do
             text :edam_operations do
               edam_operation_labels
             end
+          end
+        end
+      end
+
+      if @supported_edam_properties.include?(:data)
+        has_annotation_type :edam_data
+        has_many :edam_data_values, through: :edam_data_annotations, source: :value,
+                                    source_type: 'SampleControlledVocabTerm'
+
+        # this is needed, because it overrides a previously 'defined' method from has_annotation_type
+        # the data vals can be an array or comma seperated list of either labels or IRI's
+        define_method :edam_data= do |vals|
+          associate_edam_data vals
+        end
+
+        define_method :edam_data_labels do
+          edam_data_values.pluck(:label)
+        end
+
+        has_filter edam_data: Seek::Filtering::Filter.new(
+          value_field: 'sample_controlled_vocab_terms.label',
+          joins: [:edam_data_values]
+        )
+
+        if Seek::Config.solr_enabled
+          searchable(auto_index: false) do
             text :edam_data do
               edam_data_labels
             end
+          end
+        end
+      end
+
+      if @supported_edam_properties.include?(:formats)
+        has_annotation_type :edam_formats
+        has_many :edam_format_values, through: :edam_formats_annotations, source: :value,
+                                      source_type: 'SampleControlledVocabTerm'
+
+        # this is needed, because it overrides a previously 'defined' method from has_annotation_type
+        # the format vals can be an array or comma seperated list of either labels or IRI's
+        define_method :edam_formats= do |vals|
+          associate_edam_formats vals
+        end
+
+        define_method :edam_format_labels do
+          edam_format_values.pluck(:label)
+        end
+
+        has_filter edam_format: Seek::Filtering::Filter.new(
+          value_field: 'sample_controlled_vocab_terms.label',
+          joins: [:edam_format_values]
+        )
+
+        if Seek::Config.solr_enabled
+          searchable(auto_index: false) do
             text :edam_formats do
               edam_format_labels
             end
@@ -105,6 +147,8 @@ module HasEdamAnnotations
   end
 
   module InstanceMethods
+    private
+
     def edam_topics_vocab
       SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
     end
@@ -117,35 +161,9 @@ module HasEdamAnnotations
       SampleControlledVocab::SystemVocabs.edam_data_controlled_vocab
     end
 
-    def edam_datum_labels
-      edam_data_labels
-    end
-  
-    def edam_datum_values
-      edam_data_values
-    end
-    
     def edam_formats_vocab
       SampleControlledVocab::SystemVocabs.edam_formats_controlled_vocab
     end
-
-    def edam_topic_labels
-      edam_topic_values.pluck(:label)
-    end
-
-    def edam_operation_labels
-      edam_operation_values.pluck(:label)
-    end
-
-    def edam_data_labels
-      edam_data_values.pluck(:label)
-    end
-
-    def edam_format_labels
-      edam_format_values.pluck(:label)
-    end
-
-    private
 
     # the topics can be an array or comma seperated list of either labels or IRI's
     def associate_edam_topics(vals)
@@ -209,7 +227,5 @@ module HasEdamAnnotations
 
       format_values
     end
-
-
   end
 end
