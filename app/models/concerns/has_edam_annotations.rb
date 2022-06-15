@@ -20,12 +20,13 @@ module HasEdamAnnotations
   end
 
   class_methods do
+
+
+    attr_reader :supported_edam_properties
+
     def has_edam_annotations(*properties)
       include InstanceMethods
 
-      class << self
-        attr_reader :supported_edam_properties
-      end
       @supported_edam_properties = Array(properties) & %i[topics operations data formats]
 
       if @supported_edam_properties.include?(:topics)
