@@ -101,13 +101,4 @@ class ContributedResourceSerializer < PCSSerializer
     @scope.try(:[],:requested_version) || object.try(:version)
   end
 
-  def edam_annotations(property)
-    terms = object.annotations_with_attribute(property, true).collect(&:value).sort_by(&:label)
-    terms.collect do |term|
-      {
-        label: term.label,
-        identifier: term.iri
-      }
-    end
-  end
 end

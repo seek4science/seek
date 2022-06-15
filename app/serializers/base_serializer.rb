@@ -121,6 +121,8 @@ class BaseSerializer < SimpleBaseSerializer
     return respond_to_policy && respond_to_manage && can_manage
   end
 
+  private
+
   def determine_submitter(object)
     return object.owner if object.respond_to?('owner')
     result = object.contributor if object.respond_to?('contributor') && !object.is_a?(Permission)
@@ -143,6 +145,16 @@ class BaseSerializer < SimpleBaseSerializer
         given_name: c.given_name,
         affiliation: c.affiliation,
         orcid: c.orcid }
+    end
+  end
+
+  def edam_annotations(property)
+    terms = object.annotations_with_attribute(property, true).collect(&:value).sort_by(&:label)
+    terms.collect do |term|
+      {
+        label: term.label,
+        identifier: term.iri
+      }
     end
   end
 end

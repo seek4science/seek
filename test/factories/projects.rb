@@ -30,9 +30,14 @@ Factory.define(:max_project, class: Project) do |f|
   f.documents {[Factory(:document, policy: Factory(:public_policy))]}
   f.workflows {[Factory(:workflow, policy: Factory(:public_policy))]}
   f.after_create do |p|
-    Factory(:person, project: p)
+    member = Factory(:person, project: p)
     p.reload
     p.default_policy = Factory(:private_policy)
+
+    User.with_current_user member.user do
+      p.edam_topics = ['Biomedical science','Chemistry']
+    end
+
     p.save!
   end
 end
