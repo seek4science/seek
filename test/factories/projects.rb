@@ -36,7 +36,7 @@ Factory.define(:max_project, class: Project) do |f|
 
     User.with_current_user member.user do
       p.edam_topics = ['Biomedical science','Chemistry']
-    end
+    end if SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
 
     p.save!
   end

@@ -121,21 +121,21 @@ class BaseSerializer < SimpleBaseSerializer
     return respond_to_policy && respond_to_manage && can_manage
   end
 
+  def submitter
+    result = determine_submitter object
+    if result.blank?
+      []
+    else
+      [result]
+    end
+  end
+
   private
 
   def determine_submitter(object)
     return object.owner if object.respond_to?('owner')
     result = object.contributor if object.respond_to?('contributor') && !object.is_a?(Permission)
     return result
-  end
-
-  def submitter
-    result = determine_submitter object
-    if result.blank?
-      return []
-    else
-      return [result]
-    end
   end
 
   def serialize_assets_creators
