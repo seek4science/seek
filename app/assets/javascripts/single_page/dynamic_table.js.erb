@@ -72,7 +72,22 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
           "<'row'<'col-sm-3'l><'col-sm-5'B><'col-sm-4'f>>" +
           "<'row'<'col-sm-12'tr>>" +
           "<'row'<'col-sm-5'i><'col-sm-7'p>>",
-        buttons: "main",
+        buttons: [
+            {
+                extend: 'copyHtml5',
+                exportOptions: {
+                    columns: options.readonly ? [':visible:not(.text-center)'] :[2, ':visible:not(.text-center)']
+                }
+            },
+            {
+                extend: 'csvHtml5',
+                exportOptions: {
+										// exclude checkbox column
+                    columns: options.readonly ? [':visible:not(.text-center)'] :[2, ':visible:not(.text-center)']
+                }
+            },
+            'colvis'
+        ],
         ajax: options.ajax
       });
       this.table.rows.add(rows.map((r) => [null, ...r])).draw();
@@ -109,15 +124,31 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
         const colsCount = this.table.columns().data().length;
         const splitter = text.includes("\r\n") ? "\r\n" : "\n";
         const delimeter = "\t";
+				const _defaultCols = defaultCols.map((c) => c.defaultValue || "")
+
+				const cols = this.table.settings()[0].aoColumns;
+				const sampleLinks = getSampleLinking(cols)
+				const sampleLinkIndexes = sampleLinks.map(x => x.idx).sort((a, b) => b - a)
+				const sampleLinksTitles = sampleLinks.map(x => x.title)
+
         const rows = text.split(splitter).map((r) => {
+					// Preserve row status and id
           let splitted = [rowStatus.new, ""].concat(r.split(delimeter));
           const missingColsCount = colsCount - defaultCols.length - splitted.length;
-          splitted = defaultCols.map((c) => c.defaultValue || "").concat(splitted);
+          splitted = _defaultCols.concat(splitted);
+
+					// Preserve empty placeholder for columns of type of 'Registered Sample (multiple)'
+					sampleLinkIndexes.forEach((x) => (splitted.splice(x, 0, [])));
+
           return missingColsCount < 0
             ? splitted.slice(0, colsCount)
             : splitted.concat(Array(missingColsCount).fill(""));
         });
         this.table.rows.add(rows).draw();
+
+				if (sampleLinksTitles.length)
+					alert("No value is pasted for the following column(s): \n" + 
+						sampleLinksTitles.map(x=>`"${x}"`).join(', ') + "\nYou need to manually input them.");
       });
     },
     newRow: function () {
@@ -127,10 +158,11 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
         .concat(Array(colsCount - defaultCols.length).fill(""));
       const cols = this.table.settings()[0].aoColumns;
       const indexes = getStatusIndexes(cols);
-      const sampleLinkIndexes = getSampleLinkingIndexes(cols);
+      const sampleLinkIndexes = getSampleLinking(cols).map( x => x.idx)
       indexes.forEach((x) => (arr[x] = rowStatus.new));
       sampleLinkIndexes.forEach((x) => (arr[x] = []));
       this.table.row.add(arr).draw();
+			updateContainerHeight();
     },
     setAsDeleted: function () {
       const indexes = getStatusIndexes(this.table.settings()[0].aoColumns);
@@ -270,8 +302,8 @@ function getStatusIndexes(arr) {
   return arr.filter((x) => x?.status).map((x) => x.idx);
 }
 
-function getSampleLinkingIndexes(arr) {
-  return arr.filter((x) => x.linked_sample_type).map((x) => x.idx);
+function getSampleLinking(arr) {
+  return arr.filter((x) => x.linked_sample_type).map(({ idx, title }) => ({ idx, title }));
 }
 
 function setTagsInput(item) {

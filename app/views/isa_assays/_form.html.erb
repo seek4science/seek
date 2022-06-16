@@ -1,6 +1,11 @@
 
 <% assay = params[:isa_assay] ? params[:isa_assay][:assay] : nil %>
 <% study = Study.find(params[:study_id] || assay[:study_id]) %>
+<% input_sample_type_id = study.sample_types.last.id
+	if !params[:is_source] && study.assays.present?
+		input_sample_type_id = study.assays.last.sample_type.id 
+	end
+%>
 
 <%= error_messages_for :isa_assay %>
 
@@ -43,19 +48,7 @@
 
 <%= folding_panel("Assay design") do %>
 
-  <div class="row">
-    <div class="col-md-6">
-      <%= folding_panel("Input Assay") do %>
-        <% if study.assays.length == 0 %>
-          <%= f.select :input_sample_type_id, [["<Study> #{study.title}", study.sample_types.last.id]], {}, { id:"isa_assay_input_sample_type_id",
-            name: "isa_assay[input_sample_type_id]", class:"form-control" } %> 
-        <% else %>
-          <%= f.select :input_sample_type_id, study.assays.map{|a| {id: a.sample_type.id, a_title: "<Assay> #{a.title}"}}.pluck(:a_title, :id),
-            {}, { id:"isa_assay_input_sample_type_id", name: "isa_assay[input_sample_type_id]", class:"form-control" } %>
-        <% end %>
-      <% end %>
-    </div>
-  </div>
+	<%= f.hidden_field :input_sample_type_id, value: input_sample_type_id  -%>
 
   <%= folding_panel("Outgoing sample template") do %>
     <%= render partial: 'isa_studies/sample_types_form', locals: {f: f, sample_type: @isa_assay.sample_type, id_suffix: "_sample_type", isa_element: "assay" } %>

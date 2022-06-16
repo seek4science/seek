@@ -527,3 +527,9 @@
     color:#fff
 }
 
+
+.container-fluid-single-page {
+	max-width: 100%;
+	padding-right:20px;
+	padding-left:20px
+}
