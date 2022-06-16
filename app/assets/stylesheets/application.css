@@ -42,4 +42,5 @@
 *= require git
 *= require associations
 *= require admin
+*= require jquery.splitter/jquery.splitter
 */

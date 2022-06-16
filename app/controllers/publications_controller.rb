@@ -40,7 +40,7 @@ class PublicationsController < ApplicationController
   # GET /publications/1
   def show
     respond_to do |format|
-      format.html # show.html.erb
+      format.html { render(params[:only_content] ? { layout: false } : {})} # show.html.erb
       format.rdf { render template: 'rdf/show' }
       format.json {render json: @publication, include: [params[:include]]}
       format.any( *Publication::EXPORT_TYPES.keys ) do

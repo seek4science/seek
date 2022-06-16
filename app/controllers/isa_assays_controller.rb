@@ -13,8 +13,9 @@ class IsaAssaysController < ApplicationController
     @isa_assay.sample_type.contributor = User.current_user.person
 
     if @isa_assay.save
-      redirect_to controller: "single_pages", action: "show", id: @isa_assay.assay.projects.first.id , notice: 'The ISA assay was created successfully!'
-    else
+			redirect_to single_page_path(id: @isa_assay.assay.projects.first, item_type: 'assay',
+				item_id: @isa_assay.assay, notice: 'The ISA assay was created successfully!') 
+		else
       respond_to do |format|
         format.html { render action: 'new' }
         format.json { render json: @isa_assay.errors, status: :unprocessable_entity}
