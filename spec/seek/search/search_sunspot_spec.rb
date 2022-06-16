@@ -20,6 +20,9 @@ describe DataFile do
   it { should have_searchable_field(:assay_type_titles) }
   it { should have_searchable_field(:technology_type_titles) }
 
+  it { should have_searchable_field(:edam_data) }
+  it { should have_searchable_field(:edam_formats) }
+
 end
 
 describe Sop do
@@ -155,6 +158,8 @@ describe Project do
 #  it { should have_searchable_field(:programme) }
   #all the assets associated with the project
 #  it { should have_searchable_field(:associated_assets) }
+
+  it { should have_searchable_field(:edam_topics) }
 end
 
 describe Institution do
@@ -238,5 +243,21 @@ describe SampleType do
   it { should have_searchable_field(:title) }
   it { should have_searchable_field(:content_blob) }
   it { should have_searchable_field(:attribute_search_terms) }
+end
+
+describe Workflow do
+  it { should have_searchable_field(:title) }
+  it { should have_searchable_field(:description) }
+  it { should have_searchable_field(:searchable_tags) }
+  it { should have_searchable_field(:contributor) }
+  it { should have_searchable_field(:projects) }
+  it { should have_searchable_field(:creators) }
+  it { should have_searchable_field(:unregistered_creators) }
+  it { should have_searchable_field(:content_blob) }
+  it { should have_searchable_field(:git_content) }
+
+  it { should have_searchable_field(:edam_topics) }
+  it { should have_searchable_field(:edam_operations) }
+
 end
 
