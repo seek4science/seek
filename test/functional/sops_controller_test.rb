@@ -988,6 +988,29 @@ class SopsControllerTest < ActionController::TestCase
     assert_select '#citation-instructions a[href=?]', mint_doi_confirm_sop_path(sop, version: sop.version), count: 1
   end
 
+  test 'does not show how to get a doi if the version is not set to visible to anyone' do
+
+    sop = Factory(:sop, contributor: @user.person)
+
+    assert_difference('Sop::Version.count', 1) do
+      post :create_version, params: { id: sop, sop: { title: sop.title }, content_blobs: [{ data: picture_file }], revision_comments: 'version 2' }
+    end
+
+    assert_equal 2, sop.versions.size
+
+    post :edit_version, params: { id: sop.id, version: 1, visibility: 'registered_users' }
+
+    assert_redirected_to sop
+
+    assert_equal :registered_users, sop.find_version(1).reload.visibility
+
+    get :show, params: { id: sop, version: 1 }
+
+    assert_response :success
+    assert_select '#citation-instructions', count: 1
+    assert_select 'div.alert-warning p', count: 1, text: /This version must be set to "#{VersionHelper::VISIBILITY_LABELS[:public].downcase}" before being eligible for a DOI./
+  end
+
   test 'does not show how to get a doi if no manage permission' do
     sop = Factory(:sop, policy: Factory(:publicly_viewable_policy))
     person = Factory(:person)

@@ -100,7 +100,7 @@ module Seek
         end
 
         def can_mint_doi?
-          Seek::Config.doi_minting_enabled && !doi_time_locked? && !has_doi?
+          Seek::Config.doi_minting_enabled && !doi_time_locked? && !has_doi? && visible?(nil)
         end
 
         def doi_time_locked?
