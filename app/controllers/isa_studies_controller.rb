@@ -14,8 +14,9 @@ class IsaStudiesController < ApplicationController
     @isa_study.study.sample_types = [@isa_study.source, @isa_study.sample_collection]
 
     if @isa_study.save
-      redirect_to controller: "single_pages", action: "show", id: @isa_study.study.projects.first.id , notice: 'The ISA study was created successfully!'
-    else
+			redirect_to single_page_path(id: @isa_study.study.projects.first, item_type: 'study',
+					item_id: @isa_study.study, notice: 'The ISA study was created successfully!') 
+		else
       respond_to do |format|
         format.html { render action: 'new' }
         format.json { render json: @isa_study.errors, status: :unprocessable_entity}
