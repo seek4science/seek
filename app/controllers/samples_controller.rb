@@ -19,7 +19,15 @@ class SamplesController < ApplicationController
     if @data_file || @sample_type
       respond_to do |format|
         format.html { render(params[:only_content] ? { layout: false } : {})}
-        format.json {render json: :not_implemented, status: :not_implemented }
+        format.json do
+          render json: instance_variable_get("@#{controller_name}"),
+                 each_serializer: SkeletonSerializer,
+                 links: json_api_links,
+                 meta: {
+                     base_url: Seek::Config.site_base_host,
+                     api_version: ActiveModel::Serializer.config.api_version
+                 }
+        end
       end
     else
       respond_to do |format|
@@ -186,7 +194,6 @@ class SamplesController < ApplicationController
     status = errors.empty? ? :ok : :unprocessable_entity
     render json: { status: status, errors: errors }, status: :ok
   end
-
 
   def typeahead
     sample_type = SampleType.find(params[:linked_sample_type_id])

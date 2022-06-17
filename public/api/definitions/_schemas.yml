@@ -838,6 +838,7 @@ anyType:
     - programmes
     - projects
     - publications
+    - samples
     - sample_types
     - sample_attribute_types
     - sops
@@ -1118,6 +1119,8 @@ assayPost:
               $ref: "#/components/schemas/multipleReferences"
             data_files:
               $ref: "#/components/schemas/multipleReferences"
+            samples:
+              $ref: "#/components/schemas/multipleReferences"
             documents:
               $ref: "#/components/schemas/multipleReferences"
             models:
@@ -1201,6 +1204,8 @@ assayPatch:
             publications:
               $ref: "#/components/schemas/multipleReferences"
             data_files:
+              $ref: "#/components/schemas/multipleReferences"
+            samples:
               $ref: "#/components/schemas/multipleReferences"
             documents:
               $ref: "#/components/schemas/multipleReferences"
@@ -3173,6 +3178,8 @@ assayResponse:
             study:
               $ref: "#/components/schemas/singleReference"
             data_files:
+              $ref: "#/components/schemas/multipleReferences"
+            samples:
               $ref: "#/components/schemas/multipleReferences"
             documents:
               $ref: "#/components/schemas/multipleReferences"
