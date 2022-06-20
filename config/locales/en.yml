@@ -150,6 +150,7 @@ en:
           other: "%{count} errors prohibited this %{model} from being saved"
         # The variable :count is also available
         body: "There were problems with the following fields:"
+        body: "There were problems with the following fields:"
     models:
       workflow_class: Workflow Type
     attributes:
@@ -179,6 +180,11 @@ en:
   git:
     modify_immutable_remote_error: 'You cannot make changes to an imported repository.'
     modify_immutable_error: 'You cannot make changes to a frozen version.'
+
+  index-table-columns:
+    assay_type_uri: 'Assay Type'
+    technology_type_uri: 'Technology Type'
+    doi: 'DOI'
 
   about_project: "You need to be a member of a <strong>%{project}</strong> before you can register content.
     A %{project} can contain one or more people, and gives some additional background details, and credit, about the content being registered. It can be used to describe and promote
