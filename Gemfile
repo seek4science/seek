@@ -128,7 +128,7 @@ gem 'request_store'
 
 gem 'bundler', '>= 1.8.4'
 
-gem 'ro-crate', '~> 0.4.16'
+gem 'ro-crate', '~> 0.4.17'
 
 gem 'rugged'
 gem 'i18n-js'
