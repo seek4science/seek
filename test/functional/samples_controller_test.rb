@@ -1070,6 +1070,81 @@ class SamplesControllerTest < ActionController::TestCase
     end
   end
 
+	test 'should show query form' do
+		get :query_form
+    assert_response :success
+  end
+
+	test 'should populate user projects in query form' do
+		person = Factory(:person)
+		person.add_to_project_and_institution(Factory(:project),Factory(:institution))
+		login_as(person)
+
+		get :query_form
+    assert_response :success
+		assert_not_equal 2, Project.all.length
+		assert_select '#projects' do |options|
+			assert_select options, "option", 2
+    end
+  end
+
+	test 'should not return private samples with basic query' do
+		person = Factory(:person)
+    template = Factory(:template)
+		sample_type = Factory(:simple_sample_type, template_id: template.id)
+    sample1 = Factory(:sample, sample_type: sample_type, contributor: person)
+		sample2 = Factory(:sample, sample_type: sample_type, contributor: person)
+		sample3 = Factory(:sample, sample_type: sample_type)
+
+    login_as(person)
+
+    post :query, xhr: true, params: { template_id: template.id }
+		assert_response :success
+    assert result = assigns(:result)
+    assert_equal 2, result.length
+  end
+
+	test 'should return max query result' do
+		person = Factory(:person)
+		project = Factory(:project)
+
+		template1 = Factory(:isa_source_template)
+		template2 = Factory(:isa_sample_collection_template)
+		template3 = Factory(:isa_assay_template)
+
+		type1 = Factory(:isa_source_sample_type,contributor: person, project_ids: [project.id], isa_template: template1)
+		type2 = Factory(:isa_sample_collection_sample_type, contributor: person, project_ids: [project.id], isa_template: template2, linked_sample_type: type1)
+		type3 = Factory(:isa_assay_sample_type, contributor: person, project_ids: [project.id], isa_template: template3, linked_sample_type: type2)
+
+		sample1 = Factory :sample, title: 'sample1', sample_type: type1, project_ids: [project.id], contributor: person,
+							data: { 'Source Name': 'Source Name', 'Source Characteristic 1': 'Source Characteristic 1', 'Source Characteristic 2': "Cox's Orange Pippin"}
+
+		sample2 = Factory :sample, title: 'sample2', sample_type: type2,  project_ids: [project.id], contributor: person,
+							data: { Input: [sample1.id], 'sample collection': 'sample collection', 'sample collection parameter value 1': 'sample collection parameter value 1', 'Sample Name': 'sample name', 'sample characteristic 1': 'sample characteristic 1' }
+
+		sample3 = Factory :sample, title: 'sample3', sample_type: type3, project_ids: [project.id], contributor: person,
+							data: { Input: [sample2.id], 'Protocol Assay 1': 'Protocol Assay 1', 'Assay 1 parameter value 1': 'Assay 1 parameter value 1', 'Extract Name': 'Extract Name', 'other material characteristic 1': 'other material characteristic 1'}
+
+    login_as(person)
+
+    post :query, xhr: true, params: { 
+			project_ids: [project.id],
+			template_id: template2.id,
+			template_attribute_id: template2.template_attributes.second.id,
+			template_attribute_value: 'collection',
+			input_template_id: template1.id,
+			input_attribute_id: template1.template_attributes.third.id,
+			input_attribute_value: "x's",
+			output_template_id: template3.id,
+			output_attribute_id: template3.template_attributes.second.id,
+			output_attribute_value: '1' 
+		}
+
+		assert_response :success
+    assert result = assigns(:result)
+    assert_equal 1, result.length
+  end
+
   private
 
   def populated_patient_sample
