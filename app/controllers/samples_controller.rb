@@ -202,7 +202,7 @@ class SamplesController < ApplicationController
     end
   end
 
-  def query_result
+  def query
     project_ids = params[:project_ids]&.map(&:to_i)
 
     @result = params[:template_id].present? ?
@@ -240,14 +240,16 @@ class SamplesController < ApplicationController
     end
 
     @result = @result.select { |s| (project_ids & s.project_ids).any? } if project_ids.present?
+		@total_samples = @result.length
     @result = @result.any? ? @result.authorized_for('view') : []
+		@visible_samples = @result.length
 
     respond_to do |format|
       format.js
     end
   end
 
-  def query
+  def query_form
     @result = []
     respond_to do |format|
       format.html

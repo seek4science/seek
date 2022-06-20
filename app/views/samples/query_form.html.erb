@@ -1,6 +1,6 @@
 
 <%= javascript_include_tag "single_page/index" %>
-<% projects = User.current_user.person.current_projects %>
+<% projects = User.logged_in? ? User.current_user.person.current_projects : [] %>
 <% templates = load_templates %>
 
 
@@ -105,6 +105,8 @@
 			<div class="row">
 				<div class="col-md-4" style="margin-top:20px">
 					<button id="btn_submit" class="btn btn-primary" onclick="submit()">Query</button>
+					<br>
+					<em id="sample-count"></em>
 				</div>
 			</div>
 
@@ -163,7 +165,7 @@
 			output_attribute_value: $j("#output_attribute_value").val(),
 		}
 		$j.ajax({
-				url: "<%=query_result_samples_path%>",
+				url: "<%=query_samples_path%>",
 				method: "POST",
 				data
 		})

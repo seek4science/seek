@@ -1,0 +1,3 @@
+$j('#samples-table').html('<%= escape_javascript(render(partial: "table_view", locals: { samples: @result, link: true })) -%>');
+$j('#sample-count').html('<%= "#{@visible_samples} samples visible to you out of #{@total_samples}" %>')
+Samples.initTable($j('#samples-table'));

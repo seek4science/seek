@@ -669,8 +669,8 @@ SEEK::Application.routes.draw do
       post :batch_create
       put :batch_update
       delete :batch_delete
-			get :query
-			post :query_result
+      get :query_form
+      post :query
     end
     resources :people, :programmes, :projects, :assays, :studies, :investigations, :data_files, :publications, :samples,
               :strains, :organisms, :collections, only: [:index]
