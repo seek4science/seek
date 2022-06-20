@@ -41,7 +41,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
       end
 
       assert :public, asset.find_version(1).visibility
-      asset.find_version(2).update_attributes!(visibility: :registered_users)
+      asset.find_version(2).update(visibility: :registered_users)
       assert_equal :registered_users, asset.find_version(2).reload.visibility
       refute asset.find_version(2).can_mint_doi?
     end

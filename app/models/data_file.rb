@@ -242,4 +242,5 @@ class DataFile < ApplicationRecord
   end
 
   has_task :sample_extraction
+  has_task :sample_persistence
 end

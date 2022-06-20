@@ -13,6 +13,8 @@ class ApplicationController < ActionController::Base
   include CommonSweepers
   include ResourceHelper
 
+  protect_from_forgery unless: -> { request.format.json? }
+
   # if the logged in user is currently partially registered, force the continuation of the registration process
   before_action :partially_registered?
 

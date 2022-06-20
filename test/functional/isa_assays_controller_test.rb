@@ -64,7 +64,8 @@ class IsaAssaysControllerTest < ActionController::TestCase
     end
     i = assigns(:isa_assay)
     assert_redirected_to controller: "single_pages", action: "show", id: i.assay.projects.first.id, 
-                         params: { notice: 'The ISA assay was created successfully!' }
+                         params: { notice: 'The ISA assay was created successfully!',
+													item_type: 'assay', item_id: Assay.last.id }
   end
 
   test 'should show new on incomplete params' do

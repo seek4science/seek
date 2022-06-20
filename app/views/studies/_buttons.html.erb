@@ -6,7 +6,7 @@
 
 <% if item.can_edit? -%>
   <% if displaying_single_page? %>
-    <%= button_link_to("Create #{t('assay')}", 'new', new_isa_assay_path(study_id: item.id, single_page: params[:single_page])) %>
+    <%= button_link_to("Create #{t('assay')}", 'new', new_isa_assay_path(study_id: item.id, single_page: params[:single_page], is_source: true)) %>
   <% else -%>
     <%= add_new_item_to_dropdown(item) %> 
   <% end -%>
