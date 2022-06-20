@@ -1082,9 +1082,8 @@ class SamplesControllerTest < ActionController::TestCase
 
 		get :query_form
     assert_response :success
-		assert_not_equal 2, Project.all.length
 		assert_select '#projects' do |options|
-			assert_select options, "option", 2
+			assert_select options, "option", Project.all.length
     end
   end
 
