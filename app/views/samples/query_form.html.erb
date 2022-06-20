@@ -1,6 +1,6 @@
 
 <%= javascript_include_tag "single_page/index" %>
-<% projects = User.logged_in? ? User.current_user.person.current_projects : [] %>
+<% projects = Project.all %>
 <% templates = load_templates %>
 
 
