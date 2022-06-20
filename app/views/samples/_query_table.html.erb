@@ -1,0 +1,39 @@
+<% sample_type = resource.first&.sample_type %>
+<% shown_attributes = sample_type ? sample_type.sample_attributes.includes(:sample_attribute_type) : [] %>
+
+<div id="query_samples_table" >
+	<div class="table-responsive">
+		<table class="table table-bordered samples-table" style="width: 100%" >
+			<% [:thead, :tfoot].each do |section| %>	
+				<%= content_tag(section) do %>
+					<tr>
+						<th>ID</th>
+						<th>Title</th>
+						<% shown_attributes.each do |attribute| %>
+								<th <%= 'data-title-column="true" ' if (attribute.is_title) -%>data-accessor-name="<%= attribute.accessor_name -%>" data-column-type="<%= attribute.sample_attribute_type.base_type-%>" data-search-title="<%= attribute.title %>">
+									<%= sample_attribute_display_title(attribute) %>
+								</th>
+						<% end %>
+					</tr>
+				<% end %>
+			<% end %>		
+			<tbody>
+				<% resource.each do |sample| %>
+					<%= content_tag(:tr) do %>
+						<td><%= sample.id %></td>
+						<td><%= sample.title %></td>
+						<% shown_attributes.each do |attribute| %>
+							<td><%= display_attribute(sample, attribute) %></td>
+						<% end %>
+					<% end %>
+				<% end %>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<script>
+	$j(document).ready(function () {
+		Samples.initTable($j('#query_samples_table'));
+	});
+</script>

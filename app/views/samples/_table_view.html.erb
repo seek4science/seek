@@ -1,5 +1,5 @@
-<% sample_type = samples.first.sample_type %>
-<% shown_attributes = sample_type.sample_attributes.includes(:sample_attribute_type) %>
+<% sample_type = samples.first&.sample_type %>
+<% shown_attributes = sample_type ? sample_type.sample_attributes.includes(:sample_attribute_type) : [] %>
 <% link ||= false %>
 <% source_url ||= false %>
 

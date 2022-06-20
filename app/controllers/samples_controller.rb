@@ -179,7 +179,7 @@ class SamplesController < ApplicationController
           errors.push({ ex_id: par[:ex_id], error: "Can not be deleted." }) if !(sample.can_delete? && sample.destroy)
         rescue 
           errors.push({ ex_id: par[:ex_id], error: sample.errors.messages })
-        end         
+        end
       end
       raise ActiveRecord::Rollback if errors.any?
     end
@@ -199,6 +199,58 @@ class SamplesController < ApplicationController
 
     respond_to do |format|
       format.json { render json: items.to_json }
+    end
+  end
+
+  def query_result
+    project_ids = params[:project_ids]&.map(&:to_i)
+
+    @result = params[:template_id].present? ?
+      Template.find(params[:template_id]).sample_types.map(&:samples).flatten : []
+
+    if params[:template_attribute_id].present?
+      attribute_title = TemplateAttribute.find(params[:template_attribute_id]).title
+      @result = @result.select { |s| s.get_value(attribute_title).include?(params[:template_attribute_value]) }
+    end
+
+    if params[:input_template_id].present? # linked
+      attribute_title = 
+        TemplateAttribute.find(params[:input_attribute_id]).title if params[:input_attribute_id].present?
+
+      @result = @result.select do |s|
+        s.linked_samples.any? do |x|
+          has_template = x.sample_type.template_id == params[:input_template_id].to_i
+          has_template &&= x.get_value(attribute_title).include?(params[:input_attribute_value]) if attribute_title.present?
+          has_template
+        end
+      end
+    end
+
+    if params[:output_template_id].present? # linking
+      attribute_title =
+        TemplateAttribute.find(params[:output_attribute_id]).title if params[:output_attribute_id].present?
+
+      @result = @result.select do |s|
+        s.linking_samples.any? do |x|
+          has_template = x.sample_type.template_id == params[:output_template_id].to_i
+          has_template &&= x.get_value(attribute_title).include?(params[:output_attribute_value]) if attribute_title.present?
+          has_template
+        end
+      end
+    end
+
+    @result = @result.select { |s| (project_ids & s.project_ids).any? } if project_ids.present?
+    @result = @result.any? ? @result.authorized_for('view') : []
+
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def query
+    @result = []
+    respond_to do |format|
+      format.html
     end
   end
 
@@ -236,7 +288,7 @@ class SamplesController < ApplicationController
     elsif params[:sample_type_id]
       @sample_type = SampleType.includes(:sample_attributes).find(params[:sample_type_id])
       @samples = @sample_type.samples.authorized_for('view')
-		elsif params[:template_id]
+    elsif params[:template_id]
       @template = Template.find(params[:template_id])
       @samples = @template.samples.authorized_for('view')
     else

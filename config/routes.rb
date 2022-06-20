@@ -669,6 +669,8 @@ SEEK::Application.routes.draw do
       post :batch_create
       put :batch_update
       delete :batch_delete
+			get :query
+			post :query_result
     end
     resources :people, :programmes, :projects, :assays, :studies, :investigations, :data_files, :publications, :samples,
               :strains, :organisms, :collections, only: [:index]
@@ -744,6 +746,7 @@ SEEK::Application.routes.draw do
     member do
       get :manage
       patch :manage_update
+			post :template_attributes
     end
 		resources :samples
   end

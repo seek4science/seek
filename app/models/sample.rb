@@ -130,6 +130,10 @@ class Sample < ApplicationRecord
     organism_ids | ncbi_linked_organisms.map(&:id)
   end
 
+	def get_value(attribute)
+		JSON.parse(json_metadata)[attribute]
+	end
+
   private
 
   # organisms linked through an NCBI attribute type
