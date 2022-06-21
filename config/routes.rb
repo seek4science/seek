@@ -479,6 +479,7 @@ SEEK::Application.routes.draw do
       get :select_sample_type
       get :confirm_extraction
       get :extraction_status
+      get :persistence_status
       post :extract_samples
       delete :cancel_extraction
       get :destroy_samples_confirm

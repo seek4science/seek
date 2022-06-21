@@ -42,7 +42,10 @@ class GitRepositoriesControllerTest < ActionController::TestCase
            "default" => true },
          { "name" => "add-license-1",
            "ref" => "refs/remotes/origin/add-license-1",
-           "sha" => "58fe5180070ab7b5387965c5f35b8b5657096c98" }],
+           "sha" => "58fe5180070ab7b5387965c5f35b8b5657096c98" },
+         { "name" => "symlink",
+           "ref" => "refs/remotes/origin/symlink",
+           "sha" => "728337a507db00b8b8ba9979330a4f53d6d43b18"}],
       "tags" =>
         [{ "name" => "v0.01",
            "ref" => "refs/tags/v0.01",

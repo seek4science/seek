@@ -66,13 +66,13 @@ class HasEdamAnnotationsTest < ActiveSupport::TestCase
   end
 
   test 'edam vocab present' do
-    refute @workflow.edam_topics_vocab
-    refute @workflow.edam_operations_vocab
+    refute @workflow.send(:edam_vocab, :topics)
+    refute @workflow.send(:edam_vocab, :operations)
 
     topics_vocab = Factory(:edam_topics_controlled_vocab)
     operations_vocab = Factory(:edam_operations_controlled_vocab)
 
-    assert_equal topics_vocab, @workflow.edam_topics_vocab
-    assert_equal operations_vocab, @workflow.edam_operations_vocab
+    assert_equal topics_vocab, @workflow.send(:edam_vocab, :topics)
+    assert_equal operations_vocab, @workflow.send(:edam_vocab, :operations)
   end
 end

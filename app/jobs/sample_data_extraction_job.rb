@@ -1,14 +1,9 @@
 class SampleDataExtractionJob < TaskJob
   queue_as QueueNames::SAMPLES
-  def perform(data_file, sample_type, persist = false, overwrite: false)
+  def perform(data_file, sample_type, overwrite: false)
     extractor = Seek::Samples::Extractor.new(data_file, sample_type)
-
-    if persist
-      extractor.persist
-    else
-      extractor.clear
-      extractor.extract(overwrite)
-    end
+    extractor.clear
+    extractor.extract(overwrite)
   end
 
   def task

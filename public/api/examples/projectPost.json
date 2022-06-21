@@ -13,33 +13,43 @@
         "permissions": [
           {
             "resource": {
-              "id": "725",
+              "id": "1039987324",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "786",
+              "id": "1022251552",
               "type": "projects"
             },
             "access": "download"
           },
           {
             "resource": {
-              "id": "740",
+              "id": "980191843",
               "type": "institutions"
             },
             "access": "view"
           }
         ]
-      }
+      },
+      "edam_topics": [
+        {
+          "label": "Biomedical science",
+          "identifier": "http://edamontology.org/topic_3344"
+        },
+        {
+          "label": "Chemistry",
+          "identifier": "http://edamontology.org/topic_3314"
+        }
+      ]
     },
     "relationships": {
       "programmes": {
         "data": [
           {
-            "id": "17",
+            "id": "26",
             "type": "programmes"
           }
         ]
@@ -47,7 +57,7 @@
       "organisms": {
         "data": [
           {
-            "id": "24",
+            "id": "627234334",
             "type": "organisms"
           }
         ]
