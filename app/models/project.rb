@@ -142,8 +142,9 @@ class Project < ApplicationRecord
   def columns_default
     super + ['web_page']
   end
+
   def columns_allowed
-    columns_default + ['wiki_page','start_date','end_date']
+    columns_default + ['start_date','end_date']
   end
 
   # returns people belong to the admin defined seek 'role' for this project
