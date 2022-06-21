@@ -92,7 +92,11 @@ class ContributedResourceSerializer < PCSSerializer
   end
 
   def get_version
-    @version ||= object.respond_to?(:find_version) ? @scope.try(:[], :requested_version) : object
+    @version ||= if object.respond_to?(:find_version)
+                   scope.try(:[], :requested_version) || object.latest_version
+                 else
+                   object
+                 end
   end
 
   private
