@@ -10,9 +10,9 @@ class LifeMonitorStatusJobTest < ActiveSupport::TestCase
     Seek::Config.life_monitor_enabled = @val
   end
   test 'perform' do
-    stub_request(:get, /https:\/\/localhost:8000\/workflows\/[-a-z0-9A-Z]+\/status/)
+    stub_request(:get, /https:\/\/localhost:8443\/workflows\/[-a-z0-9A-Z]+\/status/)
         .to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/life_monitor_status.json"), status: 200)
-    stub_request(:post, "https://localhost:8000/oauth2/token")
+    stub_request(:post, "https://localhost:8443/oauth2/token")
         .to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/life_monitor_token.json"), status: 200)
 
     # Create <BATCH_SIZE> + 1 monitored workflow versions, so 2 batches of emails will need to be sent
