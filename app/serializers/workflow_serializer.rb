@@ -28,7 +28,7 @@ class WorkflowSerializer < ContributedResourceSerializer
 
   attribute :internals
 
-  link(:diagram, if: -> { get_version.diagram_exists? }) do
-    diagram_workflow_path(object, version: get_version.version)
+  link(:diagram, if: -> () { (@scope.try(:[], :requested_version) || object).diagram_exists? }) do |s|
+    diagram_workflow_path(object, version: (@scope.try(:[], :requested_version) || object).version)
   end
 end

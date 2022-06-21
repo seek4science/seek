@@ -83,7 +83,7 @@ class ContributedResourceSerializer < PCSSerializer
   end
 
   link(:self) do
-    version_number = @scope.try(:[],:requested_version) || object.try(:version)
+    version_number = @scope.try(:[], :requested_version) || object.try(:version)
     if version_number
       polymorphic_path(object, version: version_number)
     else
@@ -92,13 +92,13 @@ class ContributedResourceSerializer < PCSSerializer
   end
 
   def get_version
-    @version ||= object.respond_to?(:find_version) ? object.find_version(version_number) : object
+    @version ||= object.respond_to?(:find_version) ? @scope.try(:[], :requested_version) : object
   end
 
   private
 
   def version_number
-    @scope.try(:[],:requested_version) || object.try(:version)
+    @scope&.[](:requested_version)&.version
   end
 
 end
