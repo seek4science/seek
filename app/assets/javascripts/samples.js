@@ -13,7 +13,7 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
     var options = $j.extend({}, opts, {
         "lengthMenu": [ 5, 10, 25, 50, 75, 100 ],
         "pageLength": 10,
-        dom: '<"row"<"col-sm-11"lr><"col-sm-1"B>><"samples-table-container"t>ip', // Needed to place the buttons
+        dom: '<"row"<"col-sm-10"lr><"col-sm-2 text-right"B>><"samples-table-container"t>ip', // Needed to place the buttons
         "columnDefs": [{
             "targets": [ 0, 1 ],
             "visible": false,
@@ -22,6 +22,7 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
 				buttons: [
 					{
 							extend: 'csvHtml5',
+							text: 'Export as CSV',
 							exportOptions: {
 									columns: [':visible']
 							}
