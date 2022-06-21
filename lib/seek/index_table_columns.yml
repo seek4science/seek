@@ -1,0 +1,25 @@
+columns:
+  general:
+    required: [title]
+    default: [creators, projects, version]
+    additional_allowed: [tags]
+
+  assay:
+    required: []
+    default: [assay_type_uri, technology_type_uri]
+    additional_allowed: []
+
+  data_file:
+    required: []
+    default: []
+    additional_allowed: [format_type, data_type, last_used_at, other_creators, doi, license, simulation_data]
+
+  person:
+    required: []
+    default: [first_name, last_name]
+    additional_allowed: [orcid]
+
+  project:
+    required: []
+    default: [web_page]
+    additional_allowed: [start_date, end_date]

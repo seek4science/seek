@@ -3,8 +3,8 @@
 <%
   # The user can keep a custom set of columns for each resource class
   resource = objects[0]
-  requiredColView = resource.columns_required
-  defaultColView = resource.columns_default
+  requiredColView = Seek::IndexTableColumnDefinitions.required_columns(resource)
+  defaultColView = Seek::IndexTableColumnDefinitions.default_columns(resource)
 
   # # Update stored column names
   if params.has_key?(:table_cols)
@@ -20,8 +20,7 @@
 
   # Prepare available columns for this particular resource type
   # First show the shown columns in order, and then the available ones. Required columns are never given as an option
-  availableColView = tableview_columns + (resource.columns_allowed - tableview_columns) - requiredColView
-  # availableColView = resource.columns_allowed
+  availableColView = tableview_columns + (Seek::IndexTableColumnDefinitions.allowed_columns(resource) - tableview_columns) - requiredColView
 
 %>
 
