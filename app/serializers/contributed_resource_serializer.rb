@@ -84,7 +84,7 @@ class ContributedResourceSerializer < PCSSerializer
 
   link(:self) do
     # No idea what the scope is here, but it cannot access the `version_number` method defined below
-    version_number = (@scope.try(:[], :requested_version) || object)&.version
+    version_number = (@scope.try(:[], :requested_version) || object).try(:version)
     if version_number
       polymorphic_path(object, version: version_number)
     else
