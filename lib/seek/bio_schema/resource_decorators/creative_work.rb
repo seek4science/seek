@@ -33,17 +33,18 @@ module Seek
         def all_creators
           # This should be greatly improved but would rely on SEEK being changed
           others = other_creators&.split(',')&.collect(&:strip)&.compact || []
-          others = others.collect { |name| { "@type": 'Person', "@id": "##{ROCrate::Entity.format_id(name)}", "name": name } }
-          all = (mini_definitions(creators) || []) + others
+          others = others.collect { |name| { "@type": 'Person',"@id": "##{ROCrate::Entity.format_id(name)}", "name": name } }
+          all = mini_definitions(assets_creators) + others
           return if all.empty?
 
           all
         end
-	
-	def previous_version_url
+
+
+        def previous_version_url
           return unless respond_to?(:previous_version) && resource.previous_version
-          
-	  resource_url(resource.previous_version)
+
+          resource_url(resource.previous_version)
         end
 
       end

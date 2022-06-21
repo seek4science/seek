@@ -13,7 +13,6 @@ module Seek
     module ClassMethods
       def acts_as_isa
         acts_as_favouritable
-        acts_as_scalable
         acts_as_authorized
         acts_as_uniquely_identifiable
         acts_as_discussable
@@ -36,7 +35,6 @@ module Seek
         include Seek::Search::CommonFields, Seek::Search::BackgroundReindexing
         include Seek::Subscribable
         include Seek::ResearchObjects::Packaging
-        include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
         has_many :programmes, ->{ distinct }, through: :projects
 
         extend Seek::ActsAsISA::SingletonMethods

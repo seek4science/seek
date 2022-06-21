@@ -1,0 +1,83 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "samples",
+    "attributes": {
+      "discussion_links": [],
+      "title": "Fred Bloggs",
+      "tags": [],
+      "created_at": "<%= res.created_at.as_json %>",
+      "updated_at": "<%= res.updated_at.as_json %>",
+      "other_creators": null,
+      "creators": [],
+      "attribute_map": {
+        "full_name": "Fred Bloggs"
+      }
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "sample_type": {
+        "data": {
+          "id": "<%= res.sample_type.id %>",
+          "type": "sample_types"
+        }
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= res.project_ids.first %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "data_files": {
+        "data": [
+        ]
+      },
+      "assays": {
+        "data": [
+        ]
+      },
+      "studies": {
+        "data": [
+        ]
+      },
+      "investigations": {
+        "data": [
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/samples/<%= res.id %>"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "api_version": "0.3",
+      "uuid": "<%= res.uuid %>",
+      "base_url": "http://localhost:3000"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

@@ -180,7 +180,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   test 'should show the other creators in -uploader and creators- box' do
     workflow = Factory(:workflow, policy: Factory(:public_policy), other_creators: 'another creator')
     get :show, params: { id: workflow }
-    assert_select 'li.author-list-item', text: 'another creator', count: 1
+    assert_select '#author-box .additional-credit', text: 'another creator', count: 1
   end
 
   test 'filter by people, including creators, using nested routes' do
@@ -227,7 +227,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     workflow = Factory :workflow, license: 'CC-BY-4.0', policy: Factory(:public_policy)
     workflowv = Factory :workflow_version_with_blob, workflow: workflow
 
-    workflow.update_attributes license: 'CC0-1.0'
+    workflow.update license: 'CC0-1.0'
 
     get :show, params: { id: workflow, version: 1 }
     assert_response :success
@@ -291,7 +291,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     # should be a temporary sharing link
     assert_select 'div#temporary_links', count:1
 
-    assert_select 'div#author_form', count:1
+    assert_select 'div#author-form', count:1
   end
 
   test 'cannot access manage page with edit rights' do
@@ -389,7 +389,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     login_as(person)
     assert_difference('ContentBlob.count') do
       post :create_content_blob, params: {
-          content_blobs: [{ data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl', 'application/x-yaml') }],
+          content_blobs: [{ data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl', 'application/x-yaml') }],
           workflow_class_id: cwl.id }
     end
     assert_response :success
@@ -403,7 +403,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     logout
     assert_no_difference('ContentBlob.count') do
       post :create_content_blob, params: {
-          content_blobs: [{ data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl', 'application/x-yaml') }],
+          content_blobs: [{ data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl', 'application/x-yaml') }],
           workflow_class_id: cwl.id }
     end
     assert_response :redirect
@@ -416,9 +416,9 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_difference('ContentBlob.count') do
       post :create_ro_crate, params: {
           ro_crate: {
-              workflow: { data: fixture_file_upload('files/checksums.txt') },
-                          diagram: { data: fixture_file_upload('files/file_picture.png') },
-              abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
+              workflow: { data: fixture_file_upload('checksums.txt') },
+                          diagram: { data: fixture_file_upload('file_picture.png') },
+              abstract_cwl: { data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl') }
           },
           workflow_class_id: cwl.id
       }
@@ -430,7 +430,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
   test 'extract metadata' do
     cwl = Factory(:cwl_workflow_class)
-    post :create_content_blob, params: { content_blobs: [{ data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl', 'text/plain') }], workflow_class_id: cwl.id }
+    post :create_content_blob, params: { content_blobs: [{ data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl', 'text/plain') }], workflow_class_id: cwl.id }
     assert_response :success
     assert_equal 5, assigns[:metadata][:internals][:inputs].length
   end
@@ -543,9 +543,9 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_difference('ContentBlob.count') do
       post :create_ro_crate, params: {
           ro_crate: {
-              workflow: { data: fixture_file_upload('files/file with spaces in name.txt') },
-              diagram: { data: fixture_file_upload('files/file_picture.png') },
-              abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
+              workflow: { data: fixture_file_upload('file with spaces in name.txt') },
+              diagram: { data: fixture_file_upload('file_picture.png') },
+              abstract_cwl: { data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl') }
           },
           workflow_class_id: cwl.id
       }
@@ -604,7 +604,7 @@ class WorkflowsControllerTest < ActionController::TestCase
                        license: 'MIT', other_creators: 'Jane Smith, John Smith', policy: Factory(:public_policy))
     disable_authorization_checks do
       workflow.save_as_new_version
-      workflow.update_attributes(title: 'V2 title', description: 'V2 description', workflow_class_id: Factory(:galaxy_workflow_class).id)
+      workflow.update(title: 'V2 title', description: 'V2 description', workflow_class_id: Factory(:galaxy_workflow_class).id)
       Factory(:generated_galaxy_ro_crate, asset: workflow, asset_version: 2)
     end
 
@@ -644,9 +644,9 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_difference('ContentBlob.count') do
       post :create_ro_crate, params: {
           ro_crate: {
-              workflow: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') },
-                          diagram: { data: fixture_file_upload('files/file_picture.png') },
-              abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
+              workflow: { data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl') },
+                          diagram: { data: fixture_file_upload('file_picture.png') },
+              abstract_cwl: { data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl') }
           },
           workflow_class_id: cwl.id
       }
@@ -807,7 +807,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'https://raw.githubusercontent.com/bob/workflow/master/abstract.cwl'
 
     galaxy = Factory(:galaxy_workflow_class)
-    post :create_content_blob, params: { content_blobs: [{ data: fixture_file_upload('files/workflows/all_remote.crate.zip', 'application/zip') }], workflow_class_id: galaxy.id }
+    post :create_content_blob, params: { content_blobs: [{ data: fixture_file_upload('workflows/all_remote.crate.zip', 'application/zip') }], workflow_class_id: galaxy.id }
     assert_response :success
     assert_equal 5, assigns[:metadata][:internals][:inputs].length
   end
@@ -856,7 +856,7 @@ class WorkflowsControllerTest < ActionController::TestCase
   test 'RO-Crate with no main workflow throws error' do
     assert_no_difference('Git::Repository.count') do
       post :create_from_ro_crate, params: {
-        ro_crate: { data: fixture_file_upload('files/workflows/no-main-workflow.crate.zip', 'application/zip') }
+        ro_crate: { data: fixture_file_upload('workflows/no-main-workflow.crate.zip', 'application/zip') }
       }
     end
 
@@ -919,6 +919,28 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'cannot update path to non-existent path' do
+    workflow = Factory(:git_version).resource
+    login_as(workflow.contributor)
+
+    assert_equal 'Common Workflow Language', workflow.workflow_class.title
+    assert_equal 'Common Workflow Language', workflow.latest_git_version.workflow_class.title
+    assert_nil workflow.main_workflow_path
+    assert_nil workflow.latest_git_version.main_workflow_path
+    assert_no_difference('Git::Annotation.count') do
+      patch :update_paths, params: { id: workflow.id,
+                                     git_version: { diagram_path: 'banananananana.png',
+                                                    main_workflow_path: 'concat_two_files.ga' },
+                                     workflow: { workflow_class_id: Factory(:galaxy_workflow_class).id } }
+
+      assert_response :unprocessable_entity
+      assert assigns(:display_workflow).errors.added?(:"git_annotations.path", 'not found in repository')
+      workflow.reload
+      assert_nil workflow.main_workflow_path
+      assert_nil workflow.latest_git_version.main_workflow_path
+    end
+  end
+
   test 'can update paths and extract metadata' do
     workflow = Factory(:git_version).resource
     login_as(workflow.contributor)
@@ -936,6 +958,36 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
 
     assert_equal 'Concat two files', assigns(:workflow).title
+  end
+
+  test 'can update paths and extract metadata for remote, unfetched workflow' do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'https://www.abc.com/workflow.cwl'
+    cwl = Factory(:cwl_workflow_class)
+
+    workflow = Factory(:git_version).resource
+    gv = workflow.git_version
+    login_as(workflow.contributor)
+
+
+    assert_difference('Git::Annotation.count', 1) do
+      assert_no_enqueued_jobs(only: RemoteGitContentFetchingJob) do
+        gv.add_remote_file('new-main-workflow.cwl', 'https://www.abc.com/workflow.cwl', fetch: false)
+        gv.save!
+      end
+    end
+
+    assert_equal 0, workflow.structure.inputs.count
+
+    assert_difference('Git::Annotation.count', 1) do
+      patch :update_paths, params: { id: workflow.id,
+                                     git_version: { main_workflow_path: 'new-main-workflow.cwl' },
+                                     workflow: { workflow_class_id: cwl.id },
+                                     extract_metadata: '1' }
+
+      assert_response :success
+    end
+
+    assert_equal 5, assigns(:workflow).structure.inputs.count
   end
 
   test 'new version form for git-versioned workflow redirect to new_git_version' do
@@ -1043,6 +1095,85 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_select "#files a.btn.disabled", text: 'Add file', count: 1
   end
 
+  test '404 response code for show and ro-crate if workflow not found' do
+    id = 999
+    assert_nil Workflow.find_by_id(id)
+
+    get :show, params: {id: id}
+    assert_response :not_found
+
+    get :ro_crate, params: {id: id}
+    assert_response :not_found
+  end
+
+  test 'json response code for missing version' do
+    user = Factory(:user)
+    workflow = Factory(:cwl_workflow, contributor: user.person)
+    login_as(user)
+
+    version = 999
+    assert_nil workflow.find_version(999)
+
+    get :show, params: {id: workflow.id, version: version}, format: :json
+    assert_response :not_found
+
+    get :ro_crate, params: {id: workflow.id, version: version}, format: :json
+    assert_response :not_found
+
+    workflow = Factory(:cwl_workflow, contributor: Factory(:person))
+    refute workflow.can_view?
+
+    get :show, params: {id: workflow.id, version: version}, format: :json
+    assert_response :forbidden
+
+    get :ro_crate, params: {id: workflow.id, version: version}, format: :json
+    assert_response :forbidden
+
+  end
+
+  test 'should update workflow edam annotations ' do
+    Factory(:edam_topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
+    Factory(:edam_operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_operations_controlled_vocab
+
+    user = Factory(:user)
+    workflow = Factory(:cwl_workflow, contributor: user.person)
+    login_as(user)
+    assert workflow.can_manage?
+
+    assert_equal 'Common Workflow Language', workflow.workflow_class_title
+
+    put :update, params: { id: workflow.id, workflow: { edam_topics: 'Chemistry, Sample collections',edam_operations:'Clustering, Expression correlation analysis' } }
+
+    assert_equal ['http://edamontology.org/topic_3314','http://edamontology.org/topic_3277'], assigns(:workflow).edam_topics
+    assert_equal ['http://edamontology.org/operation_3432','http://edamontology.org/operation_3463'], assigns(:workflow).edam_operations
+
+  end
+
+  test 'show edam annotations if set' do
+    Factory(:edam_topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
+    Factory(:edam_operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_operations_controlled_vocab
+
+    user = Factory(:user)
+    workflow = Factory(:cwl_workflow, contributor: user.person)
+    login_as(user)
+
+    get :show, params: {id: workflow.id}
+    assert_response :success
+    assert_select 'div.panel div.panel-heading',text:/EDAM Properties/i, count:0
+
+    workflow.edam_topics = "Chemistry"
+    workflow.save!
+
+    assert workflow.edam_annotations?
+
+    get :show, params: {id: workflow.id}
+    assert_response :success
+
+    assert_select 'div.panel div.panel-heading',text:/EDAM Properties/i, count:1
+    assert_select 'div.panel div.panel-body div strong',text:/Topics/, count:1
+    assert_select 'div.panel div.panel-body a[href=?]','https://edamontology.github.io/edam-browser/#topic_3314',text:/Chemistry/, count:1
+  end
+
   test 'should create with presentation and document links' do
     person = Factory(:person)
     presentation = Factory(:presentation, contributor: person)
@@ -1087,7 +1218,11 @@ class WorkflowsControllerTest < ActionController::TestCase
     login_as(person)
     blob = Factory(:content_blob)
     session[:uploaded_content_blob_id] = blob.id
-    workflow =  {title: 'workflow', project_ids: [person.projects.first.id], data_file_ids:[data_file.id] }
+    workflow = {
+      title: 'workflow',
+      project_ids: [person.projects.first.id],
+      workflow_data_files_attributes: ['',{data_file_id: data_file.id}]
+    }
 
     assert_difference('Workflow.count') do
       post :create_metadata, params: {workflow: workflow, content_blob_uuid: blob.uuid.to_s, policy_attributes: { access_type: Policy::VISIBLE }}
@@ -1191,8 +1326,29 @@ class WorkflowsControllerTest < ActionController::TestCase
     end
   end
 
-  def edit_max_object(workflow)
-    add_tags_to_test_object(workflow)
-    add_creator_to_test_object(workflow)
+  test 'get workflow as json-ld' do
+    person = Factory(:max_person, description: 'a lovely person')
+    login_as(person)
+    creator2 = Factory(:person)
+    current_time = Time.now.utc
+    workflow = travel_to(current_time) do
+      workflow = Factory(:cwl_packed_workflow,
+                         title: 'This workflow',
+                         description: 'This is a test workflow for bioschema generation',
+                         creators: [person, creator2],
+                         other_creators: 'Fred Bloggs, Steve Smith',
+                         contributor: person,
+                         license: 'APSL-2.0')
+
+      workflow.internals = workflow.extractor.metadata[:internals]
+
+      workflow.add_annotations('wibble', 'tag', User.first)
+      disable_authorization_checks { workflow.save! }
+      workflow
+    end
+
+    get :show, params: { id: workflow.id, format: :jsonld }
+    json = JSON.parse(response.body)
+    assert_equal Seek::BioSchema::Serializer.new(workflow.latest_version).json_representation, json
   end
 end

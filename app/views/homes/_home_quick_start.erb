@@ -1,0 +1,33 @@
+<%
+  path_create_project = guided_create_projects_path
+  path_join_project = guided_join_projects_path
+  create_project_text = can_create_projects? ? "Create a new #{t('project')}" : "Request to create a new #{t('project')}"
+%>
+<%= panel("Quick start", id: 'home-quick-start', body_options: { class: 'front-page-panel' }) do %>
+
+  <div class="row" style="display: flex;align-items: center;">
+    <div class="col-md-6 text-center" style="min-width: 150px;">
+      <a class="btn btn-primary quick-start-button" href="<%= path_create_project %>" role="button" aria-label="Left Align">
+        <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+        Create <br> <%= t('project') %>
+      </a>
+    </div>
+    <div class="col-md-6">
+      <%= create_project_text %>
+    </div>
+  </div>
+
+  <br/>
+
+  <div class="row" style="display: flex;align-items: center;">
+    <div class="col-md-6 text-center" style="min-width: 150px;">
+      <a class="btn btn-primary quick-start-button" href="<%= path_join_project %>" role="button" aria-label="Left Align">
+        <span class="glyphicon glyphicon-link" aria-hidden="true"></span>
+        Join <br> <%= t('project') %>
+      </a>
+    </div>
+    <div class="col-md-6">
+      Request membership of an existing <%= t('project') %>
+    </div>
+  </div>
+<% end %>

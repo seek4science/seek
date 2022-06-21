@@ -1,0 +1,72 @@
+<% study ||= nil %>
+<% valid_study = study && study.sample_types.any? && study&.sample_types&.second %>
+<% sample_type = study&.sample_types&.second %>
+
+<div style="padding:0 20px 20px 20px;">
+    <div class="row">
+        <div class="col-12">
+            <table class="table table-striped table-bordered display nowrap" id="study-samples-table" style="width:100%;"></table>
+        </div>
+    </div>
+</div>
+
+<div class="btn-group">
+    <input class="btn btn-default" type="button" value="Add row" onClick="SampleAddNewRow()" />
+    <input class="btn btn-default" type="button" value="Paste From Clipboard" onClick="SamplePasteFromClipboard()" />
+    <input class="btn btn-default" type="button" value="Delete selected" onClick="SampleSetAsDeleted()" />
+    <button class="btn btn-primary dt-action" id="btn_save_sample" onClick="SampleSave()">Save</button>
+</div>
+
+<% if valid_study %>
+    <script>
+        var sampleDynamicTable
+        let initialLoad = true;
+        $j(document).ready(function () {
+            const dt = <%= sanitize(dt_data(sample_type).to_json) %>
+            sampleDynamicTable = new $j.dynamicTable('#study-samples-table')
+            const elem = $j("#btn_save_sample")
+            const options = {
+               ajax:{
+										url: dynamicTableDataPath,
+                    data: function(d) { 
+                        if (initialLoad) {
+                            initialLoad = false;
+                            return;
+                        }
+                        d.sample_type_id = '<%=sample_type.id%>';
+                        d.rows_pad = "true"
+                    }
+                },
+                callback: () => studyDynamicTable.table.ajax.reload(),
+                enableLoading: () => {
+                    elem.append("<span class='loader' style='margin:2px 0 2px 5px'></span>")
+                    $j(".dt-action").addClass("disabled")
+                },
+                disableLoading: () => {
+                    elem.find(".loader").remove();
+                    $j(".dt-action").removeClass("disabled")
+                }
+            }
+            sampleDynamicTable.init(dt.rows, dt.columns, options)
+
+            $j(".dataTables_scrollBody").css("min-height", "300px")
+        });
+
+        function SamplePasteFromClipboard(){
+            sampleDynamicTable.pasteFromClipboard()
+        }
+
+        function SampleSave(){
+            sampleDynamicTable.save()
+        }
+
+        function SampleSetAsDeleted(){
+            sampleDynamicTable.setAsDeleted()
+        }
+
+        function SampleAddNewRow(){
+            sampleDynamicTable.newRow()
+        }
+																														
+    </script>
+<% end %>

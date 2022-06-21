@@ -1,0 +1,39 @@
+{
+  "data": {
+    "type": "sample_types",
+    "attributes": {
+      "title": "A Maximal SampleType",
+      "description": "A very new research",
+      "sample_attributes": [
+        {
+          "title": "full name",
+          "sample_attribute_type": {
+            "title": "<%= @sample_attribute_type.title %>"
+          },
+          "required": true,
+          "pos": 1,
+          "unit": null,
+          "is_title": true
+        }
+      ]
+    },
+    "relationships": {
+      "projects": {
+        "data": [
+          {
+            "id": "<%= @project.id %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "<%= @assay.id %>",
+            "type": "assays"
+          }
+        ]
+      }
+    }
+  }
+}

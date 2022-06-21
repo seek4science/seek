@@ -20,7 +20,7 @@
     <% elsif Seek::ProjectFormProgrammeOptions.managed_only? %>
       <%= hidden_field_tag :programme_id, Programme.site_managed_programme.id %>
       <div class="help-block">
-        Your new <%= t('project') %> will be linked to the <%= "#{Seek::Config.dm_project_name} managed #{t('programme')}" %>, <%= link_to Programme.site_managed_programme.title, Programme.site_managed_programme %>.
+        Your new <%= t('project') %> will be linked to the <%= "#{Seek::Config.instance_admins_name} managed #{t('programme')}" %>, <%= link_to Programme.site_managed_programme.title, Programme.site_managed_programme %>.
       </div>
     <% end %>
 

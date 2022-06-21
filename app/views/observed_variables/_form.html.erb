@@ -1,0 +1,95 @@
+<%
+  editing = @observed_variable.id.present?
+%>
+
+<%= f.error_messages %>
+
+<div class="form-group">
+  <%= f.label :observed_variable_set, class: 'required' -%>
+  <%= f.select :observed_variable_set_id, ObservedVariableSet.all.collect{|set| [set.title, set.id]}, { include_blank: 'Select set' }, :class=>"form-control"-%>
+</div>
+
+<div class="form-group">
+  <%= f.label 'variable id', class: 'required' -%>
+  <%= f.text_field :variable_id, :class=>"form-control"-%>
+</div>
+
+<div class="form-group">
+  <%= f.label :variable_name -%>
+  <%= f.text_field :variable_name, :class=>"form-control"-%>
+</div>
+
+<div class="form-group">
+  <%= f.label 'variable accession number' -%>
+  <%= f.text_field :variable_an, :class=>"form-control"-%>
+</div>
+
+<div class="form-group">
+  <%= f.label 'trait' -%>
+  <%= f.text_field :trait, :class=>"form-control"-%>
+</div>
+
+<div class="form-group">
+  <%= f.label 'trait accession number' -%>
+  <%= f.text_field :trait_an, :class=>"form-control"-%>
+</div>
+
+<div class="form-group">
+  <%= f.label 'trait entity' -%>
+  <%= f.text_field :trait_entity, :class=>"form-control"-%>
+</div>
+
+<div class="form-group">
+  <%= f.label 'trait entity accession number' -%>
+  <%= f.text_field :trait_entity_an, :class=>"form-control"-%>
+</div>
+
+<div class="form-group">
+  <%= f.label 'trait attribute' -%>
+  <%= f.text_field :trait_attribute, :class=>"form-control"-%>
+</div>
+
+<div class="form-group">
+  <%= f.label 'trait attribute accession number' -%>
+  <%= f.text_field :trait_attribute_an, :class=>"form-control"-%>
+</div>
+
+<div class="form-group">
+  <%= f.label 'method' -%>
+  <%= f.text_field :method, :class=>"form-control"-%>
+</div>
+
+<div class="form-group">
+  <%= f.label 'method accession number' -%>
+  <%= f.text_field :method_an, :class=>"form-control"-%>
+</div>
+
+<div class="form-group">
+  <%= f.label 'method description' -%>
+  <%= f.text_area :method_description, :class=>"form-control"-%>
+</div>
+
+<div class="form-group">
+  <%= f.label 'method reference' -%>
+  <%= f.text_field :method_reference, :class=>"form-control"-%>
+</div>
+
+<div class="form-group">
+  <%= f.label 'scale' -%>
+  <%= f.text_field :scale, :class=>"form-control"-%>
+</div>
+
+<div class="form-group">
+  <%= f.label 'scale accession number' -%>
+  <%= f.text_field :scale_an, :class=>"form-control"-%>
+</div>
+
+<div class="form-group">
+  <%= f.label 'timescale' -%>
+  <%= f.text_field :timescale, :class=>"form-control"-%>
+</div>
+
+<%= f.submit(editing ? "Update" : "Create",data: { disable_with: (editing ? "Updating..." : "Creating...") }, class: 'btn btn-primary') -%>
+or <%= cancel_button(editing ? observed_variable_path(@observed_variable.id) : observed_variables_path) -%>
+
+

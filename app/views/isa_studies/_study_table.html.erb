@@ -1,0 +1,52 @@
+<% study ||= nil %>
+<% valid_study = study && study.sample_types.any? && study&.sample_types&.second %>
+
+<div style="padding: 0 20px 20px 20px;">
+    <div class="row" id="options_container" style="margin-bottom:15px">
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <table class="table table-striped table-bordered display nowrap" id="study-table" style="width:100%;"></table>
+        </div>
+    </div>
+</div>
+
+<% if valid_study %>
+    <script>
+        var studyDynamicTable
+        let initialLoad = true;
+        $j(document).ready(function () {
+            const dt = <%= sanitize(dt_aggregated(study, false).to_json) %>
+            studyDynamicTable = new $j.dynamicTable('#study-table')
+            const ajax = {
+                url: dynamicTableDataPath,
+                data: function(d) { 
+                    if (initialLoad) {
+                        initialLoad = false;
+                        return;
+                    }
+                    d.study_id = '<%=study.id%>';
+                    d.include_all_assays = 'false';
+                    d.rows_pad = "true";
+                }
+            }
+            studyDynamicTable.init(dt.rows, dt.columns, { readonly: true, ajax })
+            const types = studyDynamicTable.getSampleTypes()
+            createSampleTypeOptions(types)
+
+            $j(".dataTables_scrollBody").css("min-height", "300px")
+        });	
+        
+        function createSampleTypeOptions(types){
+            types.forEach( t => {
+                const input = `<div style="display:inline-block"><input style="padding:3px" checked type="checkbox" id="checkbox-${t}" onClick="toggleSampleType(${t}, $j(this))"> <label style="margin-right:10px" for="checkbox-${t}">sample type ${t}</label> <div/>`
+                $j("#options_container").append(input)
+            })
+        }
+
+        function toggleSampleType(sample_type, e){
+            studyDynamicTable.toggleSampleType(sample_type, e.is(":checked"))
+        }
+
+    </script>
+<% end %>

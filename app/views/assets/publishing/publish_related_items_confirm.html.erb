@@ -1,51 +1,49 @@
 <%
-   allow_skip = @items_for_publishing.detect { |item| !item.is_published? }
+  allow_skip = @items_for_publishing.detect { |item| !item.is_published? }
 %>
 
-<div class="show_basic">
-  <%= show_title("Publish the associated items?") %>
+<%= show_title("Publish the associated items?") %>
 
-  <p>You have selected to make the following items public:</p>
-  <ul class="publishing_options">
+<p>You have selected to make the following items public:</p>
+<ul class="publishing_options">
 
-    <% @items_for_publishing.each do |item| %>
-        <% if item.is_a?(Assay) || !item.assays.empty? %>
-            <li class="type_and_title">
-              <%= text_for_resource item -%>: <%= link_to item.title, item, :target => "_blank" -%>
-              <% if item.is_published? %>
-                  <span style="color:green">(already published)</span>
-              <% end %>
-            </li>
+  <% @items_for_publishing.each do |item| %>
+    <% if item.is_a?(Assay) || !item.assays.empty? %>
+      <li class="type_and_title">
+        <%= text_for_resource item -%>: <%= link_to item.title, item, :target => "_blank" -%>
+        <% if item.is_published? %>
+          <span style="color:green">(already published)</span>
         <% end %>
+      </li>
     <% end %>
-  </ul>
-
-  <p>
-    Some of the items you selected to publish are associated with other items that may not have yet been published.
-
-    You are encouraged to also publish the associated items, where possible, as this provides a more complete picture of
-    the overall work.
-  </p>
-
-  <p style="font-weight:bolder;">
-    Would you like to review and publish the associated items?
-  </p>
-
-  <%= form_tag({:action => :publish_related_items}, :method => :post) do %>
-      <div style="display:none">
-        <% @items_for_publishing.each do |item| %>
-            <%= check_box_tag publishing_item_param(item), 1, true %>
-            <br/>
-        <% end %>
-      </div>
-
-      <br/>
-      <% resource = (controller_name == 'people') ? current_user.person : @asset %>
-      <%= submit_tag "OK", :class => 'btn btn-primary' -%>
-      <% if allow_skip %>
-          <%= submit_tag "Skip", :onclick => "this.form.action='check_gatekeeper_required'", :class => 'btn btn-default' -%>
-      <% end %>
-      <%= cancel_button(:back) -%>
   <% end %>
-</div>
+</ul>
+
+<p>
+  Some of the items you selected to publish are associated with other items that may not have yet been published.
+
+  You are encouraged to also publish the associated items, where possible, as this provides a more complete picture of
+  the overall work.
+</p>
+
+<p style="font-weight:bolder;">
+  Would you like to review and publish the associated items?
+</p>
+
+<%= form_tag({:action => :publish_related_items}, :method => :post) do %>
+  <div style="display:none">
+    <% @items_for_publishing.each do |item| %>
+      <%= check_box_tag publishing_item_param(item), 1, true %>
+      <br/>
+    <% end %>
+  </div>
+
+  <br/>
+  <% resource = (controller_name == 'people') ? current_user.person : @asset %>
+  <%= submit_tag "OK", :class => 'btn btn-primary' -%>
+  <% if allow_skip %>
+    <%= submit_tag "Skip", :onclick => "this.form.action='check_gatekeeper_required'", :class => 'btn btn-default' -%>
+  <% end %>
+  <%= cancel_button(:back) -%>
+<% end %>
 

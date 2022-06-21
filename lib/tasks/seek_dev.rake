@@ -36,6 +36,18 @@ namespace :seek_dev do
     puts output.read
   end
 
+  task(:dump_controlled_vocab, [:id] => :environment) do |_t, args|
+    vocab = SampleControlledVocab.find(args.id)
+    json = { title: vocab.title, description: vocab.description, ols_root_term_uri: vocab.ols_root_term_uri,
+             source_ontology: vocab.source_ontology, terms: [] }
+    vocab.sample_controlled_vocab_terms.each do |term|
+      json[:terms] << { label: term.label, iri: term.iri, parent_iri: term.parent_iri }
+    end
+    File.open("cv-dump-#{args.id}.json", 'w') do |f|
+      f.write(JSON.pretty_generate(json))
+    end
+  end
+
   task(dump_auth_lookup: :environment) do
     tables = Seek::Util.authorized_types.map(&:lookup_table_name)
 
@@ -94,7 +106,7 @@ namespace :seek_dev do
       project.save!
       institution.projects << project
       institution.save!
-      p.update_attributes('work_group_ids' => [project.work_groups.first.id.to_s])
+      p.update('work_group_ids' => [project.work_groups.first.id.to_s])
     end
   end
 
@@ -280,8 +292,7 @@ namespace :seek_dev do
   end
 
   task find_publications_without_publication_types: :environment do
-     base_url = "https://fairdomhub.org/"
-     #base_url = "https://0.0.0.0:3002/"
+    base_url = Seek::Config.site_base_url.to_s
     File.delete("./log/publications_without_publication_types.log") if File.exist?("./log/publications_without_publication_types.log")
     output = File.open( "./log/publications_without_publication_types.log","w" )
      pj_has_pubs = Project.all.select { |p| p.publications.size > 0 }
@@ -317,11 +328,12 @@ namespace :seek_dev do
   end
 
   task report_missing_related_items_routes: :environment do
+    routes = Seek::Util.routes
     Seek::RelatedItems::RELATABLE_TYPES.each do |type|
       klass = type.constantize
       methods = klass.related_type_methods
       methods.each_key do |assoc|
-        x = Rails.application.routes.url_helpers.send("#{type.underscore}_#{assoc.pluralize.underscore}_path", 1) rescue nil
+        x = routes.send("#{type.underscore}_#{assoc.pluralize.underscore}_path", 1) rescue nil
         puts "Missing! #{type.underscore}_#{assoc.pluralize.underscore}_path" if x.nil?
       end
     end

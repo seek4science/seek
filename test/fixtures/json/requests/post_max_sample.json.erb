@@ -1,0 +1,44 @@
+{
+  "data": {
+    "type": "samples",
+    "attributes": {
+      "attribute_map": {
+        "the_title": "Hello",
+        "a_real_number": "2.6"
+      },
+      "tags": []
+    },
+    "relationships": {
+      "sample_type": {
+        "data": {
+          "id": "<%= @sample_type.id %>",
+          "type": "sample_types"
+        }
+      },
+      "creators": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= @project.id %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "<%= @assay.id %>",
+            "type": "assays"
+          }
+        ]
+      }
+    }
+  }
+}

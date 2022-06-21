@@ -69,7 +69,7 @@ class CollectionTest < ActiveSupport::TestCase
       person.add_to_project_and_institution(Factory(:project), person.institutions.first)
       projects = person.projects
       assert_equal 2,projects.count
-      collection.update_attributes(project_ids: projects.map(&:id))
+      collection.update(project_ids: projects.map(&:id))
       collection.save!
       collection.reload
       assert_equal projects.sort, collection.projects.sort
@@ -173,6 +173,24 @@ class CollectionTest < ActiveSupport::TestCase
     end
     assert_difference('CollectionItem.count', -2) do
       disable_authorization_checks { document.destroy }
+    end
+  end
+
+  test 'can add all valid types to a collection' do
+    collection = Factory(:collection)
+    assert_empty collection.items
+    assert_empty collection.assets
+
+    types = Seek::Util.persistent_classes.select { |c| c.name != 'Project' && c.name != 'Collection' && c.method_defined?(:collections) }
+    types.each do |type|
+      opts = [type.name.underscore.to_sym]
+      opts << { policy: Factory(:public_policy) } if type.method_defined?(:policy)
+      asset = Factory(*opts)
+      assert_difference('CollectionItem.count', 1, "#{type.name} could not be added to collection") do
+        collection.items.create!(asset: asset)
+      end
+
+      assert_includes collection.reload.assets, asset
     end
   end
 end

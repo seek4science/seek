@@ -2,7 +2,7 @@ module Seek
   module DestroyHandling
     # common controller methods for destroy
     def destroy
-      asset = determine_asset_from_controller
+      asset = resource_for_controller
       respond_to do |format|
         respond_to_destruction(asset, format)
       end
@@ -25,7 +25,7 @@ module Seek
     end
 
     def destroy_version
-      asset = determine_asset_from_controller
+      asset = resource_for_controller
       if Seek::Config.delete_asset_version_enabled
         asset.destroy_version params[:version]
         flash[:notice] = "Version #{params[:version]} was deleted!"

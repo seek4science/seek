@@ -13,11 +13,11 @@
   </p>
 
   <p>
-    Please provide the details below, and your message will be forwarded to the <%= Seek::Config.dm_project_name %>
+    Please provide the details below, and your message will be forwarded to the <%= Seek::Config.instance_admins_name %>
     Team.
   </p>
 
-  <%= form_tag send_feedback_home_url do -%>
+  <%= form_tag send_feedback_home_path do -%>
 
       <div class="form-group">
         <%= label_tag :subject -%>

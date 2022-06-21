@@ -4,7 +4,6 @@ class AssaysControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
   include GeneralAuthorizationTestCases
@@ -12,21 +11,6 @@ class AssaysControllerTest < ActionController::TestCase
 
   def setup
     login_as(:quentin)
-  end
-
-  def rest_api_test_object
-    @object = Factory(:experimental_assay, policy: Factory(:public_policy))
-  end
-
-  test "shouldn't show unauthorized assays" do
-    login_as Factory(:user)
-    hidden = Factory(:experimental_assay, policy: Factory(:private_policy)) # ensure at least one hidden assay exists
-    get :index, params: { page: 'all', format: 'xml' }
-    assert_response :success
-    assert_equal assigns(:assays).sort_by(&:id),
-                 assigns(:assays).authorized_for('view', users(:aaron)).sort_by(&:id),
-                 "#{t('assays.assay').downcase.pluralize} haven't been authorized"
-    assert !assigns(:assays).include?(hidden)
   end
 
   def test_title
@@ -205,6 +189,8 @@ class AssaysControllerTest < ActionController::TestCase
     assert_response :success
     assert_not_nil assigns(:assay)
     assert_nil assigns(:assay).study
+    assert_select 'div.alert.alert-info', text: /No Study and Investigation available/, count: 0
+    assert_select 'a.btn[href=?]', new_investigation_path, count: 0
   end
 
   test 'should show new with study when id provided' do
@@ -563,16 +549,17 @@ class AssaysControllerTest < ActionController::TestCase
   end
 
   test 'should not delete assay with publication' do
-    login_as(:model_owner)
-    a = assays(:assay_with_a_publication)
+    login_as(Factory(:user))
+    one_assay_with_publication = Factory :assay, contributor: User.current_user.person, publications: [Factory(:publication)]
+
     assert_no_difference('ActivityLog.count') do
       assert_no_difference('Assay.count') do
-        delete :destroy, params: { id: a }
+        delete :destroy, params: { id: one_assay_with_publication.id }
       end
     end
 
     assert flash[:error]
-    assert_redirected_to a
+    assert_redirected_to one_assay_with_publication
   end
 
   test 'should not delete assay with sops' do
@@ -613,6 +600,28 @@ class AssaysControllerTest < ActionController::TestCase
     assert_select 'a', text: /An #{I18n.t('assays.experimental_assay')}/i, count: 0
     assert_select 'a[href=?]', new_assay_path(class: :modelling), count: 0
     assert_select 'a', text: /A #{I18n.t('assays.modelling_analysis')}/i, count: 0
+  end
+
+  test 'get new without investigation prompts user to create' do
+    disable_authorization_checks { Investigation.destroy_all }
+    Factory(:investigation, policy: Factory(:private_policy))
+    assert Investigation.authorized_for('view', User.current_user).none?
+
+    get :new
+    assert_response :success
+    assert_select 'div.alert.alert-info', text: /No Study and Investigation available/, count: 1
+    assert_select 'a.btn[href=?]', new_investigation_path
+  end
+
+  test 'get new without study prompts user to create' do
+    disable_authorization_checks { Study.destroy_all }
+    Factory(:study, policy: Factory(:private_policy))
+    assert Study.authorized_for('view', User.current_user).none?
+
+    get :new
+    assert_response :success
+    assert_select 'div.alert.alert-info', text: /No Study available/, count: 1
+    assert_select 'a.btn[href=?]', new_study_path
   end
 
   test 'links have nofollow in sop tabs' do
@@ -1231,40 +1240,6 @@ class AssaysControllerTest < ActionController::TestCase
     end
   end
 
-  test 'faceted browsing config for Assay' do
-    Factory(:assay, policy: Factory(:public_policy))
-    with_config_value :faceted_browsing_enabled, true do
-      get :index, params: { user_enable_facet: 'true' }
-      assert_select "div[data-ex-facet-class='TextSearch']", count: 1
-      assert_select "div[data-ex-role='facet'][data-ex-expression='.organism']", count: 1
-      assert_select "div[data-ex-role='facet'][data-ex-expression='.assay_type'][data-ex-facet-class='Exhibit.HierarchicalFacet']", count: 1
-      assert_select "div[data-ex-role='facet'][data-ex-expression='.technology_type'][data-ex-facet-class='Exhibit.HierarchicalFacet']", count: 1
-      assert_select "div[data-ex-role='facet'][data-ex-expression='.project']", count: 1
-      assert_select "div[data-ex-role='facet'][data-ex-expression='.for_test']", count: 0
-    end
-  end
-
-  test 'content config for Assay' do
-    with_config_value :faceted_browsing_enabled, true do
-      get :index, params: { user_enable_facet: 'true' }
-      assert_select "div[data-ex-role='exhibit-view'][data-ex-label='Tiles'][data-ex-paginate='true']", count: 1
-    end
-  end
-
-  test 'show only authorized items for faceted browsing' do
-    with_config_value :faceted_browsing_enabled, true do
-      assay1 = Factory(:assay, policy: Factory(:public_policy))
-      assay2 = Factory(:assay, policy: Factory(:private_policy))
-      assert assay1.can_view?
-      assert !assay2.can_view?
-      @request.env['HTTP_REFERER'] = '/assays/items_for_result'
-      post :items_for_result, xhr: true, params: { items: "Assay_#{assay1.id},Assay_#{assay2.id}" }
-      items_for_result = ActiveSupport::JSON.decode(@response.body)['items_for_result']
-      assert items_for_result.include?(assay1.title)
-      assert !items_for_result.include?(assay2.title)
-    end
-  end
-
   test 'should add creators' do
     assay = Factory(:assay, policy: Factory(:public_policy))
     creator = Factory(:person)
@@ -1298,8 +1273,7 @@ class AssaysControllerTest < ActionController::TestCase
 
     get :show, params: { id: assay.id }
     assert_response :success
-    assert_select 'li.author-list-item', text: 'john smith'
-    assert_select 'li.author-list-item', text: 'jane smith'
+    assert_select '#author-box .additional-credit', text: 'john smith, jane smith', count: 1
   end
 
   test 'programme assays through nested routing' do
@@ -1406,14 +1380,6 @@ class AssaysControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'a[href=?]', edit_assay_path, count: 1 # Can manage
     assert_select 'a[href=?]', assay_nels_path(assay_id: assay.id), count: 0 # But not browse NeLS
-  end
-
-  def edit_max_object(assay)
-    add_tags_to_test_object(assay)
-    add_creator_to_test_object(assay)
-
-    org = Factory(:organism)
-    assay.associate_organism(org)
   end
 
   test 'can delete an assay with subscriptions' do
@@ -1741,7 +1707,7 @@ class AssaysControllerTest < ActionController::TestCase
     #no sharing link, not for Investigation, Study and Assay
     assert_select 'div#temporary_links', count:0
 
-    assert_select 'div#author_form', count:1
+    assert_select 'div#author-form', count:1
   end
 
   test 'cannot access manage page with edit rights' do
@@ -1892,7 +1858,6 @@ class AssaysControllerTest < ActionController::TestCase
       get :show, params: { id: assay.id }
       assert_select 'ul#item-admin-menu li a',text: /add new document/i, count:0
     end
-
   end
 
 end

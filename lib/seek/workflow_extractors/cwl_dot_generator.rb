@@ -51,7 +51,7 @@ module Seek
       #
       # write a graph representing a workflow to the writer
       def write_graph(structure)
-        write_preamble()
+        write_preamble
         write_inputs(structure)
         write_outputs(structure)
         write_steps(structure)
@@ -105,9 +105,9 @@ module Seek
           # distinguish nested workflows
           is_subworkflow = false
           if (is_subworkflow)
-            write_line("  \"#{step.id}\" [label=\"#{label}\", fillcolor=\"#F3CEA1\"];")
+            write_line("  \"#{san(step.id)}\" [label=\"#{san(label)}\", fillcolor=\"#F3CEA1\"];")
           else
-            write_line("  \"#{step.id}\" [label=\"#{label}\"];")
+            write_line("  \"#{san(step.id)}\" [label=\"#{san(label)}\"];")
           end
         end
       end
@@ -120,13 +120,13 @@ module Seek
         structure.links.each do |link|
           if link.source_id.present?
             label = link.name || link.nice_id
-            write_line("  \"#{link.source.id}\" -> \"#{link.sink.id}\" [label=\"#{label}\"];")
+            write_line("  \"#{san(link.source.id)}\" -> \"#{san(link.sink.id)}\" [label=\"#{san(label)}\"];")
           elsif link.default_value.present?
             # collect default values
             label = link.name || link.nice_id
             default_label = link.default_value
-            write_line("  \"default#{default_count}\" -> \"#{link.sink.id}\" [label=\"#{label}\"];")
-            write_line("  \"default#{default_count}\" [label=\"#{default_label}\", fillcolor=\"#D5AEFC\"];")
+            write_line("  \"default#{default_count}\" -> \"#{san(link.sink.id)}\" [label=\"#{san(label)}\"];")
+            write_line("  \"default#{default_count}\" [label=\"#{san(default_label)}\", fillcolor=\"#D5AEFC\"];")
             default_count += 1
           end
         end
@@ -135,7 +135,7 @@ module Seek
         # Write links between outputs and penultimate steps
         structure.outputs.each do |output|
           output.sources.each do |source|
-            write_line("  \"#{source.id}\" -> \"#{output.id}\";")
+            write_line("  \"#{san(source.id)}\" -> \"#{san(output.id)}\";")
           end
         end
       end
@@ -148,11 +148,17 @@ module Seek
         # Use label if it is defined
         label = input_output.name || input_output.nice_id
         unless label.blank?
-          node_options << "label=\"#{label}\";"
+          node_options << "label=\"#{san(label)}\";"
         end
 
         # Write the line for the node
-        write_line("    \"#{input_output.id}\" [#{node_options.join(",")}];")
+        write_line("    \"#{san(input_output.id)}\" [#{node_options.join(",")}];")
+      end
+
+      private
+
+      def san(str)
+        str.to_s.gsub('"', '\"')
       end
     end
   end

@@ -29,5 +29,6 @@ SEEK::Application.configure do
   # http://filext.com/file-extension/EMBL
   Mime::Type.register "chemical/x-embl-dl-nucleotide", :embl
   Mime::Type.register "application/vnd.datacite.datacite+xml", :datacite_xml
+  Mime::Type.register "application/ld+json", :jsonld, ['application/vnd.schemaorg.ld+json']
 end
 

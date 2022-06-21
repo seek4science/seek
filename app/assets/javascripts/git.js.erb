@@ -17,7 +17,7 @@ $j(document).ready(function () {
                 nodeIds.forEach(function (nodeId) {
                     var node = tree.get_node(nodeId);
                     var element = tree.get_node(nodeId, true);
-                    if (!element || !node.data) {
+                    if (!element || !node.data || (!node.data.annotations && !node.data.childAnnotations)) {
                         return;
                     }
                     // Remove existing annotations
@@ -143,7 +143,8 @@ $j(document).ready(function () {
         var modal = $j(this).parents('.modal');
         var input = modal.data('targetInput');
         var jstree = $j('.jstree', modal).jstree(true);
-        input.val(jstree.get_selected());
+        var node = jstree.get_node(jstree.get_selected());
+        input.val(node.data.path);
         input.change();
         modal.modal('hide');
 
@@ -166,7 +167,7 @@ $j(document).ready(function () {
             jstreeElement.jstree(true).uncheck_all();
 
             if (input.val()) {
-                jstreeElement.jstree(true).select_node(input.val());
+                jstreeElement.jstree(true).select_node(Git.treeNamespace + input.val());
             }
 
             modal.modal();
@@ -186,6 +187,7 @@ $j(document).ready(function () {
 });
 
 var Git = {
+    treeNamespace: "<%= GitHelper::NAMESPACE %>",
     // Make a path URL-safe, but without encoding slashes (Apache doesn't like it).
     encodePath: function (path) {
         return path.split('/').map(function (component) {

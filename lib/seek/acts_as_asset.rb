@@ -23,12 +23,15 @@ module Seek
       is_asset? && is_downloadable?
     end
 
+    def have_misc_links?
+      self.class.have_misc_links?
+    end
+
     module ClassMethods
       def acts_as_asset
         attr_accessor :parent_name
         include Seek::Taggable
 
-        acts_as_scalable
         acts_as_authorized
         acts_as_uniquely_identifiable
         acts_as_favouritable
@@ -61,6 +64,10 @@ module Seek
 
       def is_asset?
         include?(Seek::ActsAsAsset::InstanceMethods)
+      end
+
+      def have_misc_links?
+        include?(Seek::ActsAsHavingMiscLinks::InstanceMethods)
       end
     end
 

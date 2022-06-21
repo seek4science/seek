@@ -1,0 +1,110 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "assays",
+    "attributes": {
+      "snapshots": [],
+      "policy": {
+        "access": "no_access",
+        "permissions": []
+      },
+      "other_creators": null,
+      "position": null,
+      "creators": [],
+      "title": "A Minimal Assay",
+      "description": null,
+      "assay_class": {
+        "title": "Experimental assay",
+        "key": "EXP",
+        "description": "An experimental assay class description"
+      },
+      "assay_type": {
+        "label": "Experimental assay type",
+        "uri": "http://jermontology.org/ontology/JERMOntology#Experimental_assay_type"
+      },
+      "technology_type": {
+        "label": "Technology type",
+        "uri": "http://jermontology.org/ontology/JERMOntology#Technology_type"
+      },
+      "discussion_links": []
+    },
+    "relationships": {
+      "creators": {
+        "data": []
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "organisms": {
+        "data": []
+      },
+      "human_diseases": {
+        "data": []
+      },
+      "people": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= res.project_ids.first %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "investigation": {
+        "data": {
+          "id": "<%= res.investigation.id %>",
+          "type": "investigations"
+        }
+      },
+      "study": {
+        "data": {
+          "id": "<%= res.study.id %>",
+          "type": "studies"
+        }
+      },
+      "data_files": {
+        "data": []
+      },
+      "placeholders": {
+        "data": []
+      },
+      "models": {
+        "data": []
+      },
+      "sops": {
+        "data": []
+      },
+      "publications": {
+        "data": []
+      },
+      "documents": {
+        "data": []
+      }
+    },
+    "links": {
+      "self": "/assays/<%= res.id %>"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "uuid": "<%= res.uuid %>",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.3"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

@@ -98,7 +98,7 @@ class ModelsController < ApplicationController
     update_sharing_policies @model
     update_relationships(@model, params)
     respond_to do |format|
-      if @model.update_attributes(model_params)
+      if @model.update(model_params)
         flash[:notice] = "#{t('model')} metadata was successfully updated."
         format.html { redirect_to model_path(@model) }
         format.json {render json: @model, include: [params[:include]]}
@@ -150,10 +150,9 @@ class ModelsController < ApplicationController
   def model_params
     params.require(:model).permit(:imported_source, :imported_url, :title, :description, { project_ids: [] }, :license,
                                   :model_type_id, :model_format_id, :recommended_environment_id, :organism_id, { organism_ids: []}, :human_disease_id,
-                                  :other_creators,
+                                  *creator_related_params,
                                   { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                  { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
-                                  { scale_extra_params: [] }, { publication_ids: [] },
+                                  { assay_assets_attributes: [:assay_id] }, { publication_ids: [] },
                                   discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 

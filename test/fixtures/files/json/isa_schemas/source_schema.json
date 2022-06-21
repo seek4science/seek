@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "title" : "ISA source schema",
+    "description" : "JSON-schema representing a source in the ISA model. Sources are considered as the starting biological material used in a study.",
+      "properties" : {
+        "@id": { "type": "string", "format": "uri" },
+        "name" : { "type" : "string" },
+        "characteristics" : {
+            "type" : "array",
+            "items" :  {
+                "$ref": "material_attribute_value_schema.json#"
+                }
+        },
+        "comments" : {
+            "type": "array",
+            "items": {
+                 "$ref": "comment_schema.json#"
+            }
+        }
+      },
+    "additionalProperties": false
+}

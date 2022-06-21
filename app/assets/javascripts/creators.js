@@ -1,55 +1,103 @@
-function updateCreatorSettings() {
-    var html = '';
-    var creators_arr = [''];
+var AuthorForm = {
+    recalculatePositions: function () {
+        $j('#author-form .author').each(function (index, item) {
+            $j('.author-position-label', $j(item)).html(index + 1);
+            $j('.author-handle input', $j(item)).val(index + 1);
+        });
+    },
 
-    for(var i = 0; i < creators.length; i++) {
-        var creator = creators[i];
-        html += HandlebarsTemplates['creator']({ creator: creator, prefix: resourceType });
-        creators_arr.push([creator.name, creator.id]);
-    }
+    bindSortable: function () {
+        $j('#author-list').sortable({
+            items: '.author',
+            handle: '.author-handle'
+        }).on('sortupdate', function () {
+            AuthorForm.recalculatePositions();
+        });
+    },
 
-    // update the page
-    if(html.length == 0) {
-        $j('#creators_list').html('<li class="association-list-item"><span class="none_text">No creators</span></li>');
-    }
-    else {
-        $j('#creators_list').html(html);
-    }
-
-    $j('#creators_list .delete').click(function () {
-        var id = $j(this).data('objectId');
-        for(var i = 0; i < creators.length; i++) {
-            if(creators[i].id == id) {
-                creators.splice(i, 1);
-                break;
+    add: function(creator) {
+        var list = $j('#author-list');
+        var index = 0;
+        $j('.author', list).each(function () {
+            var newIndex = parseInt($j(this).data('index'));
+            if (newIndex > index) {
+                index = newIndex;
+            }
+        });
+        index++;
+        creator.field = list.data('fieldName');
+        creator.index = index;
+        creator.identifier = AuthorForm.getCreatorIdentifier(creator);
+        if (creator.identifier) {
+            var duplicate = AuthorForm.checkDuplicate(creator);
+            if (duplicate) {
+                duplicate.highlight('red');
+            } else {
+                list.append(HandlebarsTemplates['associations/assets_creator'](creator));
             }
         }
-        // update the page
-        updateCreatorSettings();
-    });
-}
 
-function checkCreatorNotInList(creator) {
-    for(var i = 0; i < creators.length; i++) {
-        if (creators[i].id == creator.id)
-            return false;
-    }
-    return true;
-}
+        AuthorForm.recalculatePositions();
+        AuthorForm.toggleEmptyListText();
+    },
 
-function addCreator(creator) {
-    if(checkCreatorNotInList(creator)) {
-        creators.push(creator);
-        updateCreatorSettings();
-    }
-    else {
-        alert('The following creator was not added (already in the list of creators):\n\n' + creator.name);
+    remove: function () {
+        var author = $j(this).parents('.author');
+        var destroyToggle = $j('input[data-role="destroy"]', author);
+        if (destroyToggle.length) {
+            destroyToggle.val('1');
+            author.hide();
+        } else {
+            author.remove();
+        }
+
+        author.toggleClass('author'); // Needed or it will still affect the positions of remaining authors.
+
+        AuthorForm.recalculatePositions();
+        AuthorForm.toggleEmptyListText();
+    },
+
+    checkDuplicate: function (creator) {
+        var existing = $j('#author-list .author[data-identifier="' + creator.identifier.toString() + '"]');
+
+        return existing.length ? existing : false;
+    },
+
+    toggleEmptyListText: function () {
+        if ($j('#author-list .author').length) {
+            $j('#empty-change-list').hide();
+        } else {
+            $j('#empty-change-list').show();
+        }
+    },
+
+    openModal: function () {
+        $j('#new-author-modal').modal('show');
+        $j('#author-given-name').focus();
+    },
+
+    submitModal: function () {
+        var inputs = $j('#new-author-modal :input[type=text]');
+        var obj = {};
+        inputs.each(function (index, input) {
+            var i = $j(input);
+            obj[i.data('field')] = i.val();
+            i.val('');
+        });
+
+        AuthorForm.add(obj);
+        $j('#new-author-modal').modal('hide');
+    },
+
+    getCreatorIdentifier: function (creator) {
+        if (creator.creator_id) {
+            return creator.creator_id;
+        } else if (creator.orcid) {
+            return creator.orcid;
+        } else if (creator.given_name && creator.family_name) {
+            return creator.given_name + ' ' + creator.family_name;
+        } else {
+            return null;
+        }
     }
 }
-
-$j(function() {
-    $j('#creator-typeahead').on('itemAdded', function (event) {
-        addCreator(event.item);
-        $j(this).tagsinput('removeAll'); // clear the input
-    });
-});

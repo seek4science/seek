@@ -4,7 +4,6 @@ class PeopleController < ApplicationController
   include Seek::Publishing::PublishingCommon
   include Seek::Sharing::SharingCommon
   include Seek::Publishing::GatekeeperPublish
-  include Seek::FacetedBrowsing
   include Seek::DestroyHandling
   include Seek::AdminBulkAction
   include RelatedItemsHelper
@@ -28,12 +27,10 @@ class PeopleController < ApplicationController
   api_actions :index, :show, :create, :update, :destroy, :current
 
   # GET /people/1
-  # GET /people/1.xml
   def show
     respond_to do |format|
       format.html # show.html.erb
       format.rdf { render template: 'rdf/show' }
-      format.xml
       format.json {render json: @person, include: [params[:include]]}
     end
   end
@@ -57,12 +54,10 @@ class PeopleController < ApplicationController
   end
 
   # GET /people/new
-  # GET /people/new.xml
   def new
     @person = Person.new
     respond_to do |format|
       format.html { render action: 'new' }
-      format.xml  { render xml: @person }
     end
   end
 
@@ -113,7 +108,6 @@ class PeopleController < ApplicationController
   end
 
   # POST /people
-  # POST /people.xml
   def create
     @person = Person.new(person_params)
 
@@ -142,11 +136,10 @@ class PeopleController < ApplicationController
             end
 
           end
-          format.xml { render xml: @person, status: :created, location: @person }
           format.json {render json: @person, status: :created, location: @person, include: [params[:include]] }
         else
           Mailer.activation_request(current_user).deliver_later
-          MessageLog.log_activation_email(@person)
+          ActivationEmailMessageLog.log_activation_email(@person)
           flash[:notice] = 'An email has been sent to you to confirm your email address. You need to respond to this email before you can login'
           logout_user
           format.html { redirect_to controller: 'users', action: 'activation_required' }
@@ -154,14 +147,12 @@ class PeopleController < ApplicationController
         end
       else
         format.html { render redirect_action }
-        format.xml { render xml: @person.errors, status: :unprocessable_entity }
         format.json { render json: json_api_errors(@person), status: :unprocessable_entity }
       end
     end
   end
 
   # PUT /people/1
-  # PUT /people/1.xml
   def update
     @person.disciplines.clear if params[:discipline_ids].nil? #????
 
@@ -173,50 +164,18 @@ class PeopleController < ApplicationController
     end
 
     respond_to do |format|
-      if @person.update_attributes(person_params) && set_group_membership_project_position_ids(@person, params)
+      if @person.update(person_params)
         flash[:notice] = 'Person was successfully updated.'
         format.html { redirect_to(@person) }
-        format.xml  { head :ok }
         format.json {render json: @person, include: [params[:include]]}
       else
         format.html { render action: 'edit' }
-        format.xml  { render xml: @person.errors, status: :unprocessable_entity }
         format.json { render json: json_api_errors(@person), status: :unprocessable_entity }
       end
     end
   end
 
-  def set_group_membership_from_api_params(person,params)
-    person.group_memberships.each do |gr|
-      #gr.project_positions.clear ???
-      params[:person][:project_positions].each do |pos|
-        if (gr.project.id.to_s == pos[:project_id].to_s)
-          r = ProjectPosition.find(pos[:position_id])
-          gr.project_positions << r
-        end
-      end
-    end
-  end
-
-  def set_group_membership_project_position_ids(person, params)
-    if params[:person][:project_positions].nil?
-      prefix = 'group_membership_role_ids_'
-      person.group_memberships.each do |gr|
-        key = prefix + gr.id.to_s
-        gr.project_positions.clear
-        next unless params[key.to_sym]
-        params[key.to_sym].each do |r|
-          r = ProjectPosition.find(r)
-          gr.project_positions << r
-        end
-      end
-    else
-      set_group_membership_from_api_params(person, params)
-    end
-  end
-
   # DELETE /people/1
-  # DELETE /people/1.xml
   def destroy
     @person.destroy
 
@@ -228,7 +187,6 @@ class PeopleController < ApplicationController
         format.html { redirect_to(people_url) }
         format.json {render json: {status: :ok}, status: :ok}
       end
-      format.xml { head :ok }
     end
   end
 
@@ -253,15 +211,8 @@ class PeopleController < ApplicationController
 
   # For use in autocompleters
   def typeahead
-    # String concatenation varies across SQL implementations :(
-    concat_clause = if Seek::Util.database_type == 'sqlite3'
-                      "LOWER(first_name || ' ' || last_name)"
-                    else
-                      "LOWER(CONCAT(first_name, ' ', last_name))"
-                    end
+    results = Person.with_name(params[:query]).limit(params[:limit] || 10)
 
-    results = Person.where("#{concat_clause} LIKE :query OR LOWER(first_name) LIKE :query OR LOWER(last_name) LIKE :query",
-                           query: "#{params[:query].downcase}%").limit(params[:limit] || 10)
     items = results.map do |person|
       { id: person.id, name: person.name, projects: person.projects.collect(&:title).join(', '), hint: person.typeahead_hint }
     end
@@ -304,23 +255,6 @@ class PeopleController < ApplicationController
       expire_annotation_fragments('tool') if tools_changed
     else
       RebuildTagCloudsJob.new.queue_job
-    end
-  end
-
-  def set_project_related_roles(person)
-    return unless params[:roles]
-
-    # TODO: Replace this with `Project.authorized_for` after `auth_perf` merged
-    administered_project_ids = Project.all.select { |project| project.can_manage?(user) }.map { |p| p.id.to_s }
-
-    Seek::Roles::ProjectRelatedRoles.role_names.each do |role_name|
-      # remove for the project ids that can be administered
-      person.remove_roles(Seek::Roles::RoleInfo.new(role_name: role_name, items: administered_project_ids))
-
-      # add only the project ids that can be administered
-      if project_ids = (params[:roles][role_name] & administered_project_ids)
-        person.add_roles(Seek::Roles::RoleInfo.new(role_name: role_name, items: project_ids))
-      end
     end
   end
 

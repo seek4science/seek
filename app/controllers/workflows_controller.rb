@@ -17,7 +17,7 @@ class WorkflowsController < ApplicationController
   include RoCrateHandling
   include Legacy::WorkflowSupport
 
-  api_actions :index, :show, :create, :update, :destroy, :ro_crate
+  api_actions :index, :show, :create, :update, :destroy, :ro_crate, :create_version
   user_content_actions :diagram
 
   rescue_from ROCrate::ReadException do |e|
@@ -78,7 +78,7 @@ class WorkflowsController < ApplicationController
     update_relationships(@workflow,params)
 
     respond_to do |format|
-      if @workflow.update_attributes(workflow_params)
+      if @workflow.update(workflow_params)
         flash[:notice] = "#{t('workflow')} metadata was successfully updated."
         format.html { redirect_to workflow_path(@workflow) }
         format.json { render json: @workflow, include: [params[:include]] }
@@ -260,7 +260,7 @@ class WorkflowsController < ApplicationController
 
   def update_paths
     respond_to do |format|
-      if @workflow.update_attributes(workflow_params) && @display_workflow.reload.update_attributes(git_version_path_params)
+      if @workflow.update(workflow_params) && @display_workflow.reload.update(git_version_path_params)
         if params[:extract_metadata] == '1'
           extractor = @workflow.extractor
           @workflow.provide_metadata(extractor.metadata)
@@ -272,7 +272,7 @@ class WorkflowsController < ApplicationController
           format.json { render json: @workflow, include: [params[:include]] }
         end
       else
-        format.html { render action: 'edit' }
+        format.html { render action: 'edit_paths', status: :unprocessable_entity }
         format.json { render json: json_api_errors(@workflow), status: :unprocessable_entity }
       end
     end
@@ -336,17 +336,18 @@ class WorkflowsController < ApplicationController
 
   def workflow_params
     params.require(:workflow).permit(:title, :description, :workflow_class_id, # :metadata,
-                                     { project_ids: [] }, :license, :other_creators,
+                                     { project_ids: [] }, :license,
                                      { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                     { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
-                                     { publication_ids: [] }, { presentation_ids: [] }, { document_ids: [] },
-                                     { data_file_ids: [] }, { workflow_data_files_attributes:[:id, :data_file_id, :workflow_data_file_relationship_id, :_destroy] },
-                                     :internals, :maturity_level, :source_link_url,
+                                     { creator_ids: [] }, { assay_assets_attributes: [:assay_id] },
+                                     { publication_ids: [] }, { presentation_ids: [] }, { document_ids: [] }, { data_file_ids: [] }, { sop_ids: [] },
+                                     { workflow_data_files_attributes:[:id, :data_file_id, :workflow_data_file_relationship_id, :_destroy] },
+                                     :internals, :maturity_level, :source_link_url, :edam_topics, :edam_operations,
                                      { discussion_links_attributes: [:id, :url, :label, :_destroy] },
                                      { git_version_attributes: [:name, :comment, :ref, :commit, :root_path,
                                                                 :git_repository_id, :main_workflow_path,
                                                                 :abstract_cwl_path, :diagram_path, :remote,
-                                                                { remote_sources: {} }] }, :is_git_versioned)
+                                                                { remote_sources: {} }] }, :is_git_versioned,
+                                      *creator_related_params)
   end
 
   alias_method :asset_params, :workflow_params
@@ -363,5 +364,9 @@ class WorkflowsController < ApplicationController
 
   def git_version_path_params
     params.require(:git_version).permit(:main_workflow_path, :abstract_cwl_path, :diagram_path)
+  end
+
+  def param_converter_options
+    { skip: [:data_file_ids] }
   end
 end

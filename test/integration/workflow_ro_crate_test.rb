@@ -44,7 +44,7 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
       end
     end
 
-    RemoteGitContentFetchingJob.perform_now(v, 'blah.txt', 'http://internet.internet/file')
+    RemoteGitContentFetchingJob.perform_now(v, 'blah.txt')
 
     assert_equal 'http://internet.internet/file', v.remote_sources['blah.txt']
     assert_equal 'http://internet.internet/another_file', v.remote_sources['blah2.txt']
@@ -59,5 +59,18 @@ class WorkflowRoCrateTest < ActionDispatch::IntegrationTest
 
     remote1 = crate.get('http://internet.internet/another_file')
     assert remote1.is_a?(::ROCrate::File)
+  end
+
+  test 'generate Workflow RO-Crate for repository containing symlink' do
+    git_version = Factory(:remote_git_version, ref: 'refs/remotes/heads/symlink',
+                          commit: '728337a507db00b8b8ba9979330a4f53d6d43b18')
+    assert_nothing_raised do
+      zip = git_version.ro_crate_zip
+
+      Zip::File.open(zip) do |zipfile|
+        assert zipfile.find_entry('images/workflow-diagram.png').symlink?
+        refute zipfile.find_entry('diagram.png').symlink?
+      end
+    end
   end
 end

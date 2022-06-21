@@ -26,7 +26,7 @@ class ProjectsHelperTest < ActionView::TestCase
       end
     end
 
-    # no scenario will work without email enabled
+    # updated to work without email enabled
     with_config_value(:email_enabled,false) do
       User.with_current_user(project_administrator) do
         refute request_join_project_button_enabled?(project_with_admins)  #already a member
@@ -34,7 +34,7 @@ class ProjectsHelperTest < ActionView::TestCase
       end
 
       User.with_current_user(another_person) do
-        refute request_join_project_button_enabled?(project_with_admins)
+        assert request_join_project_button_enabled?(project_with_admins)
         refute request_join_project_button_enabled?(project_no_admins)
       end
 
@@ -48,11 +48,11 @@ class ProjectsHelperTest < ActionView::TestCase
     with_config_value(:email_enabled,true) do
       User.with_current_user(another_person) do
         travel_to 16.hours.ago do
-          MessageLog.create(subject:project_with_admins,sender:another_person,message_type:MessageLog::PROJECT_MEMBERSHIP_REQUEST)
+          ProjectMembershipMessageLog.create(subject:project_with_admins,sender:another_person)
         end
         assert request_join_project_button_enabled?(project_with_admins)
         travel_to 1.hour.ago do
-          MessageLog.create(subject:project_with_admins,sender:another_person,message_type:MessageLog::PROJECT_MEMBERSHIP_REQUEST)
+          ProjectMembershipMessageLog.create(subject:project_with_admins,sender:another_person)
         end
         refute request_join_project_button_enabled?(project_with_admins)
       end

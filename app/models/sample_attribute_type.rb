@@ -97,6 +97,10 @@ class SampleAttributeType < ApplicationRecord
     base_type == Seek::Samples::BaseType::SEEK_DATA_FILE
   end
 
+  def ontology?
+    controlled_vocab? && title == 'Ontology'
+  end
+
   def base_type_handler(additional_options = {})
     Seek::Samples::AttributeTypeHandlers::AttributeTypeHandlerFactory.instance.for_base_type(base_type, additional_options)
   end

@@ -9,11 +9,3 @@ annotation_2_content:
 annotation_3_content:
   version: 1
   text: "fish"
-
-annotation_for_studied_factor_growth_medium:
-  version: 1
-  text: "one value"
-
-annotation_for_experimental_condition_growth_medium:
-  version: 1
-  text: "one value"

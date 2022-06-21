@@ -51,18 +51,20 @@ function enable_search {
     fi
 }
 
-function start_soffice {
-    echo "STARTING SOFFICE"
-    soffice --headless --accept="socket,host=127.0.0.1,port=8100;urp;" --nofirststartwizard &
-}
-
 function start_search {
     if [ ! -z $SOLR_PORT ]
     then
       echo "USING SOLR CONTAINER"
-      enable_search
-      cp docker/sunspot.docker.yml config/sunspot.yml
+      enable_search      
     else
       echo "SINGLE CONTAINER SO SOLR IS DISABLED BY DEFAULT"      
     fi
+}
+
+function setup_and_start_cron {
+    echo "GENERATING CRONTAB"
+    bundle exec whenever > /seek/seek.crontab
+
+    echo "STARTING SUPERCRONIC"
+    supercronic /seek/seek.crontab &
 }

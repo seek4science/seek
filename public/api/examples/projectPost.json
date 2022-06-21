@@ -1,57 +1,67 @@
 {
-    "data": {
-        "type": "projects",
-        "attributes": {
-            "avatar": null,
-            "title": "Post Project Max",
-            "description": "A Taverna project",
-            "web_page": "http://www.taverna.org.uk",
-            "wiki_page": "http://www.mygrid.org.uk",
-            "default_license": "Other (Open)",
-            "default_policy": {
-                "access": "no_access",
-                "permissions": [
-                    {
-                        "resource": {
-                            "id": "1273",
-                            "type": "people"
-                        },
-                        "access": "manage"
-                    },
-                    {
-                        "resource": {
-                            "id": "1924",
-                            "type": "projects"
-                        },
-                        "access": "download"
-                    },
-                    {
-                        "resource": {
-                            "id": "1297",
-                            "type": "institutions"
-                        },
-                        "access": "view"
-                    }
-                ]
-            }
-        },
-        "relationships": {
-            "programmes": {
-                "data": [
-                    {
-                        "id": "27",
-                        "type": "programmes"
-                    }
-                ]
+  "data": {
+    "type": "projects",
+    "attributes": {
+      "avatar": null,
+      "title": "Post Project Max",
+      "description": "A Taverna project",
+      "web_page": "http://www.taverna.org.uk",
+      "wiki_page": "http://www.mygrid.org.uk",
+      "default_license": "Other (Open)",
+      "default_policy": {
+        "access": "no_access",
+        "permissions": [
+          {
+            "resource": {
+              "id": "1039987324",
+              "type": "people"
             },
-            "organisms": {
-                "data": [
-                    {
-                        "id": "5",
-                        "type": "organisms"
-                    }
-                ]
-            }
+            "access": "manage"
+          },
+          {
+            "resource": {
+              "id": "1022251552",
+              "type": "projects"
+            },
+            "access": "download"
+          },
+          {
+            "resource": {
+              "id": "980191843",
+              "type": "institutions"
+            },
+            "access": "view"
+          }
+        ]
+      },
+      "edam_topics": [
+        {
+          "label": "Biomedical science",
+          "identifier": "http://edamontology.org/topic_3344"
+        },
+        {
+          "label": "Chemistry",
+          "identifier": "http://edamontology.org/topic_3314"
         }
+      ]
+    },
+    "relationships": {
+      "programmes": {
+        "data": [
+          {
+            "id": "26",
+            "type": "programmes"
+          }
+        ]
+      },
+      "organisms": {
+        "data": [
+          {
+            "id": "627234334",
+            "type": "organisms"
+          }
+        ]
+      }
     }
+  }
 }

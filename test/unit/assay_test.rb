@@ -52,10 +52,6 @@ class AssayTest < ActiveSupport::TestCase
     assert !assays(:metabolomics_assay).is_asset?
   end
 
-  test 'sort by updated_at' do
-    assert_equal Assay.all.sort_by { |a| a.updated_at.to_i * -1 }, Assay.all
-  end
-
   test 'authorization supported?' do
     assert Assay.authorization_supported?
     assert assays(:metabolomics_assay).authorization_supported?
@@ -154,9 +150,7 @@ class AssayTest < ActiveSupport::TestCase
       assay = Factory(:experimental_assay)
       assay.organisms = []
 
-      as_not_virtualliver do
-        assert assay.valid?
-      end
+      assert assay.valid?
 
       assay.assay_organisms = [Factory(:assay_organism)]
       assert assay.valid?
@@ -233,7 +227,11 @@ class AssayTest < ActiveSupport::TestCase
   end
 
   test 'publications' do
-    assert_equal 1, assays(:assay_with_a_publication).publications.size
+    User.with_current_user Factory(:user) do
+    one_assay_with_publication = Factory :assay, publications: [Factory(:publication)]
+
+    assert_equal 1, one_assay_with_publication.publications.size
+    end
   end
 
   test 'can delete?' do
@@ -258,7 +256,8 @@ class AssayTest < ActiveSupport::TestCase
     assay = Factory(:assay, contributor: another_project_person)
     assert !assay.can_delete?(pal.user)
 
-    assert !assays(:assay_with_a_publication).can_delete?(users(:model_owner))
+    one_assay_with_publication = Factory :assay, contributor: User.current_user.person, publications: [Factory(:publication)]
+    assert !one_assay_with_publication.can_delete?(User.current_user.person)
   end
 
   test 'assets' do
@@ -423,33 +422,6 @@ class AssayTest < ActiveSupport::TestCase
     assert_includes assay.organisms, organism
     ao = assay.assay_organisms.find { |ao| ao.strain == strain }
     assert_equal culture_growth, ao.culture_growth_type
-  end
-
-  test 'associate assay with organism with tissue type' do
-    assay = Factory(:assay)
-    organism = Factory(:organism)
-    other_organism = Factory(:organism)
-
-    with_config_value :is_virtualliver, true do
-      assert_difference('AssayOrganism.count') do
-        assert_difference('TissueAndCellType.count') do
-          disable_authorization_checks { assay.associate_organism(organism, nil, nil, '', 'Fish Brains') }
-        end
-      end
-
-      assay.reload
-      type = assay.assay_organisms.last.tissue_and_cell_type
-      assert_equal 'Fish Brains', type.title
-
-      assert_difference('AssayOrganism.count') do
-        assert_no_difference('TissueAndCellType.count') do
-          disable_authorization_checks { assay.associate_organism(other_organism, nil, nil, '', 'Fish Brains') }
-        end
-      end
-
-      assay.reload
-      assert_equal type.id, assay.assay_organisms.last.tissue_and_cell_type_id
-    end
   end
 
   test 'test uuid generated' do

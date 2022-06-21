@@ -3,14 +3,9 @@ require 'test_helper'
 class SamplesControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include SharingFormTestHelper
   include HtmlHelper
   include GeneralAuthorizationTestCases
-
-  def rest_api_test_object
-    @object = Factory(:sample, policy: Factory(:public_policy))
-  end
 
   test 'should return 406 when requesting RDF' do
     login_as(Factory(:user))
@@ -48,6 +43,9 @@ class SamplesControllerTest < ActionController::TestCase
     assert_response :success
     assert assigns(:sample)
     assert_equal type, assigns(:sample).sample_type
+
+    # displays description if set
+    assert_select 'div label+p', text:/the weight of the patient/i, count:1
   end
 
   test 'create from form' do
@@ -774,7 +772,7 @@ class SamplesControllerTest < ActionController::TestCase
     # should be a temporary sharing link
     assert_select 'div#temporary_links', count:0
 
-    assert_select 'div#author_form', count:1
+    assert_select 'div#author-form', count:1
   end
 
   test 'cannot access manage page with edit rights' do
@@ -917,6 +915,121 @@ class SamplesControllerTest < ActionController::TestCase
     assert_equal 'http://www.slack.com/', sample.discussion_links.first.url
   end
 
+  test 'batch_create' do
+    person = Factory(:person)
+    login_as(person)
+    type = Factory(:patient_sample_type)
+    assay = Factory(:assay, contributor: person)
+    assert_difference('Sample.count', 2) do
+      assert_difference('AssayAsset.count', 1) do
+          post :batch_create, params: { data: [
+            { ex_id: "1", data: { type: "samples",
+                                  attributes: { attribute_map: { "full name": 'Fred Smith', "age": '22', "weight": '22.1', "postcode": 'M13 9PL' } },
+                                  relationships: { assays: { data: [{ id: assay.id, type: 'assays' }] },
+                                                    projects: { data: [{ id: person.projects.first.id, type: "projects" }] },
+                                                    sample_type: { data: { id: type.id, type: "sample_types" } } } } },
+            { ex_id: "2", data: { type: "samples",
+                                  attributes: { attribute_map: { "full name": 'David Tailor', "age": '33', "weight": '33.1', "postcode": 'M12 8PL' } },
+                                  relationships: { projects: { data: [{ id: person.projects.first.id, type: "projects" }] },
+                                                    sample_type: { data: { id: type.id, type: "sample_types" } } } } }] }
+      end
+    end
+
+    samples = Sample.last(2)
+    sample1 = samples.first
+    assert_equal 'Fred Smith', sample1.title
+    assert_equal 'Fred Smith', sample1.get_attribute_value('full name')
+    assert_equal '22', sample1.get_attribute_value(:age)
+    assert_equal '22.1', sample1.get_attribute_value(:weight)
+    assert_equal 'M13 9PL', sample1.get_attribute_value(:postcode)
+    assert_equal [assay], sample1.assays
+
+    sample2 = samples.last
+    assert_equal 'David Tailor', sample2.title
+    assert_equal 'David Tailor', sample2.get_attribute_value('full name')
+    assert_equal '33', sample2.get_attribute_value(:age)
+    assert_equal '33.1', sample2.get_attribute_value(:weight)
+    assert_equal 'M12 8PL', sample2.get_attribute_value(:postcode)
+  end
+
+  test 'terminate batch_create if error' do
+    person = Factory(:person)
+    creator = Factory(:person)
+    login_as(person)
+    type = Factory(:patient_sample_type)
+    assert_difference('Sample.count', 0) do
+        post :batch_create, params: {data:[
+        {ex_id: "1",data:{type: "samples", attributes:{attribute_map:{"full name": 'Fred Smith', "age": '22', "weight": '22.1' ,"postcode": 'M13 9PL'}},
+        tags: nil,relationships:{projects:{data:[{id: person.projects.first.id, type: "projects"}]},
+        sample_type:{ data:{id: type.id, type: "sample_types"}}}}},
+        {ex_id: "2", data:{type: "samples",attributes:{attribute_map:{"wrong attribute": 'David Tailor', "age": '33', "weight": '33.1' ,"postcode": 'M12 8PL'}},
+        tags: nil,relationships:{projects:{data:[{id: person.projects.first.id, type: "projects"}]},
+        sample_type:{data:{id: type.id, type: "sample_types"}}}}}]}
+    end
+
+    json_response = JSON.parse(response.body)
+    assert_equal 1, json_response["errors"].length
+    assert_equal "2", json_response["errors"][0]["ex_id"].to_s
+  end
+
+
+  test 'batch_update' do
+    login_as(Factory(:person))
+    creator = Factory(:person)
+    sample1 = populated_patient_sample
+    sample2 = populated_patient_sample
+    type_id1 = sample1.sample_type.id
+    type_id2 = sample2.sample_type.id
+    assert_empty sample1.creators
+
+    assert_no_difference('Sample.count') do
+      put :batch_update, params: {data:[
+        {id: sample1.id, data:{type: "samples", attributes:{ attribute_map:{ "full name": 'Alfred Marcus', "age": '22', "weight": '22.1' }, creator_ids: [creator.id]}}},
+        {id: sample2.id, data:{type: "samples", attributes:{ attribute_map:{ "full name": 'David Tailor', "age": '33', "weight": '33.1' }, creator_ids: [creator.id]}}}]}
+      assert_equal [creator], sample1.creators
+    end
+
+    samples = Sample.limit(2)
+
+    first_updated_sample = samples[0]
+    assert_equal type_id1, first_updated_sample.sample_type.id
+    assert_equal 'Alfred Marcus', first_updated_sample.title
+    assert_equal 'Alfred Marcus', first_updated_sample.get_attribute_value('full name')
+    assert_equal '22', first_updated_sample.get_attribute_value(:age)
+    assert_nil first_updated_sample.get_attribute_value(:postcode)
+    assert_equal '22.1', first_updated_sample.get_attribute_value(:weight)
+
+    last_updated_sample = samples[1]
+    assert_equal type_id2, last_updated_sample.sample_type.id
+    assert_equal 'David Tailor', last_updated_sample.title
+    assert_equal 'David Tailor', last_updated_sample.get_attribute_value('full name')
+    assert_equal '33', last_updated_sample.get_attribute_value(:age)
+    assert_nil last_updated_sample.get_attribute_value(:postcode)
+    assert_equal '33.1', last_updated_sample.get_attribute_value(:weight)
+  end
+
+  test 'batch_delete' do
+    person = Factory(:person)
+    sample1 = Factory(:patient_sample, contributor: person)
+    sample2 = Factory(:patient_sample, contributor: person)
+    type1 = sample1.sample_type
+    type2 = sample1.sample_type
+    login_as(person.user)
+    assert sample1.can_delete?
+    assert sample2.can_delete?
+    assert_difference('Sample.count', -2) do
+      delete :batch_delete, params: { data: [ {id: sample1.id}, {id: sample2.id}] }
+    end
+  end
+
+  test 'JS request does not raise CORS error' do
+    sample = Factory(:sample)
+    login_as(sample.contributor)
+
+    assert_raises(ActionController::UnknownFormat) do
+      get :show, params: { id: sample.id, format: :js }
+    end
+  end
 
   private
 

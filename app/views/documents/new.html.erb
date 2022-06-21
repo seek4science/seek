@@ -18,7 +18,7 @@
         <%= text_area_tag 'document[description]', document_description_value, :class=>"form-control rich-text-edit" -%>
       </div>
 
-      <%= render :partial => "projects/project_selector", :locals => { :resource => @document, :allow_nil => Seek::Config.is_virtualliver } %>
+      <%= render :partial => "projects/project_selector", :locals => { :resource => @document } %>
 
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @document } %>
 
@@ -28,9 +28,15 @@
 
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @document} -%>
 
-      <%= fancy_multiselect @document, :events, { other_projects_checkbox: true, sort_by: :start_date } %>
+      <% if Seek::Config.events_enabled %>
+        <%= fancy_multiselect @document, :events, { other_projects_checkbox: true, sort_by: :start_date } %>
+      <% end %>
 
       <%= fancy_multiselect @document, :workflows, :other_projects_checkbox=>true if Seek::Config.workflows_enabled %>
+
+      <% if displaying_single_page?%>
+        <input name="single_page" type="hidden" value=<%=params[:single_page]%> />
+      <% end %>
 
       <%= form_submit_buttons(@document) %>
 

@@ -54,8 +54,8 @@ class HumanDisease < ApplicationRecord
 
   validate do |human_disease|
     unless human_disease.bioportal_concept.nil? || human_disease.bioportal_concept.valid?
-      human_disease.bioportal_concept.errors.each do |attr, msg|
-        errors.add(attr, msg)
+      human_disease.bioportal_concept.errors.each do |error|
+        errors.add(error.attribute, error.message)
       end
     end
   end
@@ -148,6 +148,6 @@ class HumanDisease < ApplicationRecord
   private
 
   def get_json(url)
-    JSON.parse(open(url, "Authorization" => "apikey token=#{Seek::Config.bioportal_api_key}").read)
+    JSON.parse(URI.open(url, "Authorization" => "apikey token=#{Seek::Config.bioportal_api_key}").read)
   end
 end

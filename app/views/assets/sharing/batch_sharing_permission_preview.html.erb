@@ -5,17 +5,16 @@
   all_investigations_hash = SharingPermissionsHelper::ALL_INVESTIGATIONS_HASH
   all_investigations_hash[:children] = []
 
-  #remove the public items which don't need change sharing permissions
-  all_related_items_hash = get_related_resources(current_user.person).except!('Project', 'Institution','Publication')
+  #include items which can change sharing permissions, the 'publication' is intendedly excluded.
+  all_related_items_hash = get_related_resources(current_user.person).slice(*Seek::Util.authorized_types.map(&:name)).except!('Publication')
+
   items_not_in_isa = filter_items_not_in_ISA(all_related_items_hash)
 
   @policy_params = params[:policy_attributes]
 
 %>
 
-<div class="show_basic">
-  <%= show_title "Change permissions of items related to #{link_to(h(current_user.person.name),current_user.person)} in batch".html_safe -%>
-</div>
+<%= show_title "Change permissions of items related to #{link_to(h(current_user.person.name),current_user.person)} in batch".html_safe -%>
 
 <div class="alert alert-info">
   <ul>
@@ -52,7 +51,7 @@
     <% if resource_type == "Investigation" %>
       <%  resource_items[:items].each do |item| %>
         <% options ||= { depth: 4, parent_depth: nil, sibling_depth: nil, include_self: true } %>
-        <%  hash = Seek::IsaGraphGenerator.new(item).generate(options) %>
+        <%  hash = Seek::IsaGraphGenerator.new(item).generate(**options) %>
         <% tree = JSON.parse(build_tree_json(hash, item)) %>
         <% tree = add_permissions_to_tree_json (tree) %>
         <% investigation_tree =  eval(tree.join) %>

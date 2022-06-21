@@ -1,121 +1,132 @@
-<%= render :partial => "general/item_title",:locals=>{:item=>@assay, :buttons_partial => 'assays/buttons'} -%>
+<%= render partial: 'general/item_title', locals: { item: @assay, buttons_partial: 'assays/buttons' } -%>
 
-<%
-   assay_type_text = @assay.is_modelling? ? "Biological problem addressed" : "#{t('assays.assay')} type"
-%>
+<%= render partial: 'general/show_page_tab_definitions', locals: { resource: @assay } %>
 
-<div class="row">
-  <div class="col-md-9 col-sm-8 box_about_actor">
-    <% if @assay.study.nil? -%>
-        <div class="warning">
-          <%= image("warning") %><b style="color:red">WARNING</b>
-          <br/>
-          <br/>
-          An <%= t('assays.assay') %> may be edited by anybody, regardless of <%= t('project') %> membership, until it has been associated with a <%= t('study') %>
-        </div>
-    <% end -%>
-    <%= item_description @assay.description -%>
+<div class="tab-content">
+  <%= tab_pane('overview') do %>
+    <% assay_type_text = @assay.is_modelling? ? "Biological problem addressed" : "#{t('assays.assay')} type" %>
 
     <div class="row">
-      <div class="col-md-6">
-        <%= persistent_resource_id(@assay) %>
-        <% if Seek::Config.modelling_analysis_enabled %>
-            <p class="id">
-              <label>
-                Class:
-              </label>
-              <%= @assay.assay_class.title -%>
-            </p>
-        <% end %>
-        <% if @assay.contributor.can_view? %>
-            <p class="id">
-              <label>
-                <%= t('contributor').capitalize -%>:
-              </label>
-              <%= link_to @assay.contributor.name,@assay.contributor -%>
-            </p>
-        <% end %>
+      <div class="col-md-9 col-sm-8 box_about_actor">
+        <%= item_description @assay.description -%>
 
-        <%= render :partial => 'projects/show_project_relationship', :locals => {:resource => @assay}  %>
-        <p id="investigation">
-          <b><%= t('investigation') %>: </b>
-          <%= investigation_link(@assay.investigation) %>
-        </p>
-        <p id="study">
-          <b><%= t('study') %>: </b>
-          <%= study_link(@assay.study) %>
-        </p>
-        <p id="assay_type">
-          <b><%= assay_type_text -%>:</b>
-          <%= link_to_assay_type(@assay) -%>
-        </p>
-        <% unless @assay.is_modelling? -%>
-            <p id="technology_type">
-              <b>Technology type: </b>
-              <%= link_to_technology_type(@assay) -%>
+        <div class="row">
+          <div class="col-md-6">
+            <%= persistent_resource_id(@assay) %>
+            <% if Seek::Config.modelling_analysis_enabled %>
+              <p class="id">
+                <label>
+                  Class:
+                </label>
+                <%= @assay.assay_class.title -%>
+              </p>
+            <% end %>
+            <% if @assay.contributor.can_view? %>
+              <p class="id">
+                <label>
+                  <%= t('contributor').capitalize -%>:
+                </label>
+                <%= link_to @assay.contributor.name, @assay.contributor -%>
+              </p>
+            <% end %>
+
+            <%= render :partial => 'projects/show_project_relationship', :locals => { :resource => @assay } %>
+            <p id="investigation">
+              <b><%= t('investigation') %>: </b>
+              <%= investigation_link(@assay.investigation) %>
             </p>
-        <% end -%>
+            <p id="study">
+              <b><%= t('study') %>: </b>
+              <%= study_link(@assay.study) %>
+            </p>
+            <p id="position">
+              <b><%= "Assay position" %>: </b>
+              <%= @assay.position %>
+            </p>
+            <p id="assay_type">
+              <b><%= assay_type_text -%>:</b>
+              <%= link_to_assay_type(@assay) -%>
+            </p>
+            <% unless @assay.is_modelling? -%>
+              <p id="technology_type">
+                <b>Technology type: </b>
+                <%= link_to_technology_type(@assay) -%>
+              </p>
+            <% end -%>
 
-        <% if Seek::Config.organisms_enabled %>
-            <%= list_assay_organisms("Organisms", @assay.assay_organisms,{:id=>"organism"}) %>
-        <% end %>        
+            <% if Seek::Config.organisms_enabled %>
+              <%= list_assay_organisms("Organisms", @assay.assay_organisms, { :id => "organism" }) %>
+            <% end %>
 
-        <% if Seek::Config.human_diseases_enabled %>
-            <%= list_assay_human_diseases("Human Diseases", @assay.assay_human_diseases,{:id=>"human_disease"}) %>
-        <% end %>
-      </div>
-    </div>
-    <% if @assay.external_asset %>
-      <div class="row">
-        <div class="col-md-12">
-          <%= external_asset_details(@assay) %>
+            <% if Seek::Config.human_diseases_enabled %>
+              <%= list_assay_human_diseases("Human Diseases", @assay.assay_human_diseases, { :id => "human_disease" }) %>
+            <% end %>
+          </div>
         </div>
-      </div>
-    <% end %>
+        <% if @assay.external_asset %>
+          <div class="row">
+            <div class="col-md-12">
+              <%= external_asset_details(@assay) %>
+            </div>
+          </div>
+        <% end %>
 
-    <%= render partial: 'custom_metadata/custom_metadata_attribute_values', locals: {resource: @assay} %>
+        <%= render partial: 'custom_metadata/custom_metadata_attribute_values', locals: { resource: @assay } %>
 
-    <% if ((@assay.is_modelling?) && !@assay.models.empty? && !@assay.data_files.empty?) %><%#MODELLING ASSAY %>
-        <div class="data_model_relationship">
-          <% unless @assay.models.empty? %>
+        <% if ((@assay.is_modelling?) && !@assay.models.empty? && !@assay.data_files.empty?) %><%#MODELLING ASSAY %>
+          <div class="data_model_relationship">
+            <% unless @assay.models.empty? %>
               <b><%= @assay.models.size > 1 ? t('model').pluralize : t('model') %>:</b>
               <br/>
               <ul class="related_models">
                 <% @assay.models.each do |m| %>
-                    <li>
-                      <% if m.can_view? %>
-                          <%= link_to truncate(h(m.title), :length=>110), show_resource_path(m) %>
-                      <% else %>
-                          <span class="none_text">Hidden <%= t('model') %></span>
-                      <% end %>
-                    </li>
+                  <li>
+                    <% if m.can_view? %>
+                      <%= link_to truncate(h(m.title), :length => 110), show_resource_path(m) %>
+                    <% else %>
+                      <span class="none_text">Hidden <%= t('model') %></span>
+                    <% end %>
+                  </li>
                 <% end %>
               </ul>
-          <% end %>
-          <% unless @assay.data_files.empty? %>
-              <b>Data:</b>
-              <br/>
-              <ul class="related_data_files">
-                <% @assay.data_files.each do |d| %>
-                    <li>
-                      <% if d.can_view? %>
-                          <%= link_to truncate(h(d.title), :length=>110), show_resource_path(d) %>
-                      <% else %>
+                <% unless @assay.data_files.empty? %>
+                  <b>Data:</b>
+                  <br/>
+                  <ul class="related_data_files">
+                    <% @assay.data_files.each do |d| %>
+                      <li>
+                        <% if d.can_view? %>
+                          <%= link_to truncate(h(d.title), :length => 110), show_resource_path(d) %>
+                        <% else %>
                           <span class="none_text">Hidden <%= t('data_file') %></span><%= d.relationship_type(@assay) ? (" <span class='relationship_type'>(" + d.relationship_type(@assay).title + ")</span>").html_safe : "" %>
-                      <% end %>
-                    </li>
+                        <% end %>
+                      </li>
+                    <% end %>
+                  </ul>
                 <% end %>
-              </ul>
-          <% end %>
-        </div>
-    <% end %>
-    <%= render partial: 'general/isa_graph', locals: { root_item: @assay, options: { depth: 4 } } %>
-  </div>
+                </div>
+            <% end %>
+        <% end %>
+        <%= render partial: 'general/isa_graph', locals: { root_item: @assay, options: { depth: 4 } } %>
 
-  <div class="col-md-3 col-sm-4">
-    <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @assay } %>
-  </div>
+        <% if Seek::Config.project_single_page_advanced_enabled %>
+            <%= render partial: 'isa_studies/applied_templates', locals: { resource: @assay } -%>
+        <% end %>
+
+      </div>
+
+      <div class="col-md-3 col-sm-4">
+        <%= render :partial => "assets/resource_main_content_right", :locals => { :resource => @assay } %>
+      </div>
+    </div>
+  <% end %>
+
+  <%= tab_pane('related-items') do %>
+    <%= render partial: 'general/items_related_to', object: @assay %>
+  <% end %>
+	<% if Seek::Config.project_single_page_advanced_enabled && displaying_single_page? %>
+		<%= tab_pane('assay_design') do %>
+			<%= render :partial=>"isa_assays/assay_design", locals: { assay: @assay} -%>
+		<% end %>
+	<% end %>
 </div>
-
-
-<%= render :partial=>"general/items_related_to",:object => @assay %>

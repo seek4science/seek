@@ -24,8 +24,7 @@ module Seek
           return unless resource.respond_to?(:avatar)
           return if resource.avatar.blank?
 
-          "#{Seek::Config.site_base_host}/#{resource.class.table_name}" \
-            "/#{resource.id}/avatars/#{resource.avatar.id}?size=250"
+          polymorphic_url([resource, resource.avatar], size: 250, **Seek::Config.site_url_options)
         end
 
         # list of comma seperated tags, it the resource supports it
@@ -33,6 +32,7 @@ module Seek
           obj = resource.is_a_version? ? resource.parent : resource
           obj.tags_as_text_array.join(', ') if obj.respond_to?(:tags_as_text_array)
         end
+        
       end
     end
   end

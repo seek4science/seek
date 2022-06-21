@@ -5,25 +5,10 @@ class DocumentsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include SharingFormTestHelper
   include MockHelper
   include HtmlHelper
   include GeneralAuthorizationTestCases
-
-  def test_json_content
-    login_as(Factory(:user))
-    super
-  end
-
-  def rest_api_test_object
-    @object = Factory(:public_document)
-  end
-
-  def edit_max_object(document)
-    add_tags_to_test_object(document)
-    add_creator_to_test_object(document)
-  end
 
   test 'should return 406 when requesting RDF' do
     login_as(Factory(:user))
@@ -112,7 +97,7 @@ class DocumentsControllerTest < ActionController::TestCase
       assert_no_difference('Document.count') do
         assert_difference('Document::Version.count') do
           assert_difference('ContentBlob.count') do
-            post :create_version, params: { id: document.id, content_blobs: [{ data: fixture_file_upload('files/little_file.txt') }], revision_comments: 'new version!' }
+            post :create_version, params: { id: document.id, content_blobs: [{ data: fixture_file_upload('little_file.txt') }], revision_comments: 'new version!' }
           end
         end
       end
@@ -376,7 +361,7 @@ class DocumentsControllerTest < ActionController::TestCase
     # should be a temporary sharing link
     assert_select 'div#temporary_links', count:1
 
-    assert_select 'div#author_form', count:1
+    assert_select 'div#author-form', count:1
   end
 
   test 'cannot access manage page with edit rights' do
@@ -991,6 +976,58 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_equal [project_doc, old_project_doc], assigns(:documents).to_a
   end
 
+  test 'filtering a scoped collection' do
+    programme = Factory(:programme)
+    project1 = Factory(:project, programme: programme)
+    project2 = Factory(:project, programme: programme)
+    project3 = Factory(:project, programme: programme)
+    doc1 = Factory(:public_document, projects: [project1])
+    doc1.annotate_with('tag1', 'tag', doc1.contributor)
+    doc2 = Factory(:public_document, projects: [project2])
+    doc2.annotate_with('tag2', 'tag', doc2.contributor)
+    doc3 = Factory(:public_document, projects: [project1, project2])
+    doc3.annotate_with('tag3', 'tag', doc3.contributor)
+    disable_authorization_checks do
+      doc1.save!
+      doc2.save!
+      doc3.save!
+    end
+
+    get :index, params: { project_id: project1.id, order: 'created_at_asc' }
+    assert_equal [doc1, doc3], assigns(:documents).to_a
+
+    get :index, params: { project_id: project1.id, filter: { tag: 'tag1' }, order: 'created_at_asc' }
+    assert_equal [doc1], assigns(:documents).to_a
+
+    get :index, params: { project_id: project2.id, order: 'created_at_asc' }
+    assert_equal [doc2, doc3], assigns(:documents).to_a
+
+    get :index, params: { project_id: project2.id, filter: { tag: 'tag2' }, order: 'created_at_asc' }
+    assert_equal [doc2], assigns(:documents).to_a
+
+    get :index, params: { project_id: project2.id, filter: { tag: 'tag1' }, order: 'created_at_asc' }
+    assert_equal [], assigns(:documents).to_a
+
+    get :index, params: { project_id: project3.id, filter: { tag: 'tag1' }, order: 'created_at_asc' }
+    assert_equal [], assigns(:documents).to_a
+  end
+
+  test 'attempting to filter empty collection does not error' do
+    project = Factory(:project)
+    assert project.documents.none?
+
+    get :index, params: { project_id: project.id, filter: { tag: 'something' } }
+    assert_equal [], assigns(:documents).to_a
+
+    assert_select '.active-filters' do
+      assert_select '.active-filter-category-title', count: 1
+      assert_select ".filter-option[title='something'].filter-option-active" do
+        assert_select '[href=?]', project_documents_path(project_id: project.id)
+        assert_select '.filter-option-label', text: 'something'
+      end
+    end
+  end
+
   test 'should create with discussion link' do
     person = Factory(:person)
     login_as(person)
@@ -1101,7 +1138,6 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_redirected_to project_path(project)
   end
 
-  
   test "shouldn't return to unauthorised host" do
     person = Factory(:person)
     project = Factory(:project)
@@ -1115,6 +1151,61 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_redirected_to documents_path
   end
 
+  test 'shows creators in order in author box' do
+    person = Factory(:person, first_name: 'Jessica', last_name: 'Three')
+    document = Factory(:public_document)
+    disable_authorization_checks do
+      document.assets_creators.create!(given_name: 'Julia', family_name: 'Two', pos: 2, affiliation: 'University of Sheffield', orcid: 'https://orcid.org/0000-0001-8172-8981')
+      document.assets_creators.create!(creator: person, pos: 3)
+      document.assets_creators.create!(given_name: 'Jill', family_name: 'One', pos: 1)
+      document.assets_creators.create!(given_name: 'Jane', family_name: 'Four', pos: 4, affiliation: 'University of Edinburgh')
+    end
+
+    get :show, params: { id: document }
+
+    assert_select '#author-box ul' do
+      assert_select '.author-list-item:nth-child(1)', text: 'Jill One'
+
+      assert_select '.author-list-item:nth-child(2)', text: 'Julia Two'
+      assert_select '.author-list-item:nth-child(2)[title=?]', 'Julia Two, University of Sheffield'
+      assert_select '.author-list-item:nth-child(2) a.orcid-link[href=?]', 'https://orcid.org/0000-0001-8172-8981'
+
+      assert_select '.author-list-item:nth-child(3)', text: 'Jessica Three'
+      assert_select '.author-list-item:nth-child(3) a[href=?]', person_path(person)
+
+      assert_select '.author-list-item:nth-child(4)', text: 'Jane Four'
+      assert_select '.author-list-item:nth-child(4)[title=?]', 'Jane Four, University of Edinburgh'
+    end
+  end
+
+  test 'shows creators in order in resource list item' do
+    person = Factory(:person, first_name: 'Jessica', last_name: 'Three')
+    document = Factory(:public_document, other_creators: 'Joy Five')
+    disable_authorization_checks do
+      document.assets_creators.create!(given_name: 'Julia', family_name: 'Two', pos: 2, affiliation: 'University of Sheffield', orcid: 'https://orcid.org/0000-0001-8172-8981')
+      document.assets_creators.create!(creator: person, pos: 3)
+      document.assets_creators.create!(given_name: 'Jill', family_name: 'One', pos: 1)
+      document.assets_creators.create!(given_name: 'Jane', family_name: 'Four', pos: 4, affiliation: 'University of Edinburgh')
+    end
+
+    get :index
+
+    assert_select '.rli-person-list', text: 'Creators: Jill One, Julia Two, Jessica Three, Jane Four, Joy Five'
+    assert_select '.rli-person-list' do
+      assert_select ':nth-child(2)', text: 'Jill One'
+
+      assert_select ':nth-child(3)', text: 'Julia Two'
+      assert_select ':nth-child(3)[title=?]', 'Julia Two, University of Sheffield'
+      assert_select ':nth-child(3)[href=?]', 'https://orcid.org/0000-0001-8172-8981'
+
+      assert_select ':nth-child(4)', text: 'Jessica Three'
+      assert_select ':nth-child(4)[href=?]', person_path(person)
+
+      assert_select ':nth-child(5)', text: 'Jane Four'
+      assert_select ':nth-child(5)[title=?]', 'Jane Four, University of Edinburgh'
+    end
+  end
+
   private
 
   def valid_document
@@ -1122,6 +1213,6 @@ class DocumentsControllerTest < ActionController::TestCase
   end
 
   def valid_content_blob
-    { data: fixture_file_upload('files/a_pdf_file.pdf'), data_url: '' }
+    { data: fixture_file_upload('a_pdf_file.pdf'), data_url: '' }
   end
 end

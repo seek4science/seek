@@ -333,7 +333,7 @@ class SampleTypeTest < ActiveSupport::TestCase
   end
 
   test 'build from template' do
-    default_type = create_sample_attribute_type
+    default_type = SampleAttributeType.default || create_sample_attribute_type
 
     sample_type = SampleType.new title: 'from template', project_ids: @project_ids, contributor: @person
     sample_type.content_blob = Factory(:sample_type_template_content_blob)

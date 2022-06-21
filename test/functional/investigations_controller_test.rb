@@ -4,17 +4,12 @@ class InvestigationsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
   include GeneralAuthorizationTestCases
 
   def setup
     login_as(:quentin)
-  end
-
-  def rest_api_test_object
-    @object = Factory(:investigation, policy: Factory(:public_policy))
   end
 
   def test_title
@@ -32,7 +27,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     inv = Factory :investigation, contributor: User.current_user.person
     get :show, params: { id: inv, format: 'ro' }
     assert_response :success
-    assert_equal "attachment; filename=\"investigation-#{inv.id}.ro.zip\"", @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"investigation-#{inv.id}.ro.zip\"; filename*=UTF-8''investigation-#{inv.id}.ro.zip", @response.header['Content-Disposition']
     assert_equal 'application/vnd.wf4ever.robundle+zip', @response.header['Content-Type']
     assert @response.header['Content-Length'].to_i > 10
   end
@@ -360,7 +355,7 @@ class InvestigationsControllerTest < ActionController::TestCase
 
     get :show, params: { id: investigation.id }
     assert_response :success
-    assert_select 'li.author-list-item', text: 'john smith'
+    assert_select '#author-box .additional-credit', text: 'john smith', count: 1
   end
 
   test 'programme investigations through nested routing' do
@@ -512,7 +507,7 @@ class InvestigationsControllerTest < ActionController::TestCase
     #no sharing link, not for Investigation, Study and Assay
     assert_select 'div#temporary_links', count:0
 
-    assert_select 'div#author_form', count:1
+    assert_select 'div#author-form', count:1
   end
 
   test 'cannot access manage page with edit rights' do
@@ -661,11 +656,6 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   end
 
-  def edit_max_object(investigation)
-    investigation.creators = [Factory(:person)]
-    disable_authorization_checks { investigation.save! }
-  end
-
   test 'should create with discussion link' do
     person = Factory(:person)
     login_as(person)
@@ -718,4 +708,57 @@ class InvestigationsControllerTest < ActionController::TestCase
     assert_empty investigation.discussion_links
   end
 
+ test 'investigation needs more than one study for ordering' do
+    person = Factory(:admin)
+    login_as(person)
+    investigation = Factory(:investigation,
+                            policy: Factory(:public_policy),
+                            contributor: person)
+    get :show, params: { id: investigation.id }
+    
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_studies_investigation_path(investigation), count: 0
+
+    investigation.studies += [Factory(:study,
+                                      policy: Factory(:public_policy),
+                                      contributor: person)]
+    get :show, params: { id: investigation.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_studies_investigation_path(investigation), count: 0
+
+    investigation.studies +=  [Factory(:study,
+                                      policy: Factory(:public_policy),
+                                      contributor: person)]
+    get :show, params: { id: investigation.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_studies_investigation_path(investigation), count: 1
+  end
+
+  test 'ordering only by editor' do
+    person = Factory(:admin)
+    login_as(person)
+    investigation = Factory(:investigation,
+                            policy: Factory(:all_sysmo_viewable_policy),
+                            contributor: person)
+    investigation.studies += [Factory(:study,
+                                      policy: Factory(:public_policy),
+                                      contributor: person)]
+    investigation.studies += [Factory(:study,
+                                      policy: Factory(:public_policy),
+                                      contributor: person)]
+    get :show, params: { id: investigation.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_studies_investigation_path(investigation), count: 1
+
+    login_as(:aaron)
+    get :show, params: { id: investigation.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_studies_investigation_path(investigation), count: 0
+  end
+ 
 end

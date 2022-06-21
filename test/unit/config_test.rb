@@ -13,22 +13,10 @@ class ConfigTest < ActiveSupport::TestCase
     assert Seek::Config.solr_enabled
   end
 
-  test 'is_virtualliver' do
-    with_config_value 'is_virtualliver', true do
-      assert Seek::Config.is_virtualliver
-    end
-  end
-
   test 'read setting attributes' do
     attributes = Seek::Config.read_setting_attributes
     refute attributes.empty?
     assert_includes attributes, :events_enabled
-  end
-
-  test 'project_hierarchy_enabled' do
-    with_config_value 'project_hierarchy_enabled', true do
-      assert Seek::Config.project_hierarchy_enabled
-    end
   end
 
   test 'recaptcha setup?' do
@@ -49,10 +37,6 @@ class ConfigTest < ActiveSupport::TestCase
         refute Seek::Config.recaptcha_setup?
       end
     end
-  end
-
-  test 'scales' do
-    assert_equal %w(organism liver liverLobule intercellular cell), Seek::Config.scales
   end
 
   test 'seek_video_link' do
@@ -216,26 +200,22 @@ class ConfigTest < ActiveSupport::TestCase
 
   # Project
   test 'project_name' do
-    assert_equal 'Sysmo', Seek::Config.project_name
-  end
-  test 'project_type' do
-    assert_equal 'Consortium', Seek::Config.project_type
-  end
-  test 'project_link' do
-    assert_equal 'http://www.sysmo.net', Seek::Config.project_link
-  end
-  test 'project_long_name' do
-    assert_equal 'Sysmo Consortium', Seek::Config.project_long_name
-  end
-  test 'dm_project_name' do
-    assert_equal 'SysMO-DB', Seek::Config.dm_project_name
+    assert_equal 'Sysmo SEEK', Seek::Config.instance_name
   end
 
-  test 'dm_project_link' do
-    assert_equal 'http://www.sysmo-db.org', Seek::Config.dm_project_link
+  test 'instance_link' do
+    assert_equal 'http://www.sysmo.net', Seek::Config.instance_link
+  end
+
+  test 'instance_admins_name' do
+    assert_equal 'SysMO-DB', Seek::Config.instance_admins_name
+  end
+
+  test 'instance_admins_link' do
+    assert_equal 'http://www.sysmo-db.org', Seek::Config.instance_admins_link
   end
   test 'application_name' do
-    assert_equal 'Sysmo SEEK', Seek::Config.application_name
+    assert_equal 'FAIRDOM-SEEK', Seek::Config.application_name
   end
 
   test 'header_image_enabled' do
@@ -314,6 +294,26 @@ class ConfigTest < ActiveSupport::TestCase
     end
   end
 
+  test 'site_base_url' do
+    with_relative_root(nil) do
+      with_config_value(:site_base_host, 'https://secure.website:443') do
+        assert_equal 'https://secure.website:443/', Seek::Config.site_base_url.to_s
+      end
+    end
+
+    with_config_value(:site_base_host, 'http://somewhere.overtherainbow') do
+      with_relative_root('/seek') do
+        assert_equal 'http://somewhere.overtherainbow/seek/', Seek::Config.site_base_url.to_s
+      end
+    end
+
+    with_config_value(:site_base_host, 'http://localhost') do
+      with_relative_root('/seeks/seek1') do
+        assert_equal 'http://localhost/seeks/seek1/', Seek::Config.site_base_url.to_s
+      end
+    end
+  end
+
   test 'copyright_addendum_enabled' do
     assert !Seek::Config.copyright_addendum_enabled
   end
@@ -389,10 +389,6 @@ class ConfigTest < ActiveSupport::TestCase
     assert_equal 'Registration is not available, please contact your administrator', Seek::Config.registration_disabled_description
     Seek::Config.registration_disabled_description = 'A new description'
     assert_equal 'A new description', Seek::Config.registration_disabled_description
-  end
-
-  test 'sabiork_ws_base_url' do
-    assert_equal 'http://sabiork.h-its.org/sabioRestWebServices/', Seek::Config.sabiork_ws_base_url
   end
 
   test 'publish_button_enabled' do
@@ -549,18 +545,66 @@ class ConfigTest < ActiveSupport::TestCase
     end
   end
 
-  test 'enabled_for_type?' do
-    with_config_value 'events_enabled', true do
-      assert Seek::Config.enabled_for_type?(Event)
-      assert Seek::Config.enabled_for_type?('Event')
-    end
+  test 'transfer_setting' do
+    # old name has a value hanging around
+    Seek::Config.set_value(:old_name, "The INSTANCE name")
 
-    with_config_value 'events_enabled', false  do
-      refute Seek::Config.enabled_for_type?(Event)
-      refute Seek::Config.enabled_for_type?('Event')
-    end
+    refute_nil Settings.fetch(:old_name)
+    refute_nil Settings.global.fetch(:old_name)
+    assert_equal "The INSTANCE name",Seek::Config.get_value(:old_name)
+    assert_nil Seek::Config.get_value(:new_name)
 
-    # always enabled if there isn't a configuration option
-    assert Seek::Config.enabled_for_type?(Person)
+    Seek::Config.transfer_value(:old_name, :new_name)
+
+    assert_equal "The INSTANCE name",Seek::Config.get_value(:new_name)
+    assert_nil Seek::Config.get_value(:old_name)
+    assert_nil Settings.fetch(:old_name)
+    assert_nil Settings.global.fetch(:old_name)
+
+    # repeatable
+    Seek::Config.transfer_value(:old_name, :new_name)
+
+    assert_equal "The INSTANCE name",Seek::Config.get_value(:new_name)
+    assert_nil Seek::Config.get_value(:old_name)
+    assert_nil Settings.fetch(:old_name)
+    assert_nil Settings.global.fetch(:old_name)
+
+    # don't transfer default if not set
+    Seek::Config.default :old_name_2, 'The setting'
+    assert_equal "The setting",Seek::Config.get_value(:old_name_2)
+    assert_nil Settings.fetch(:old_name_2)
+    assert_nil Settings.global.fetch(:old_name_2)
+
+    Seek::Config.transfer_value(:old_name_2, :new_name_2)
+
+    assert_nil Settings.global.fetch(:old_name_2)
+    assert_nil Settings.global.fetch(:new_name_2)
+    assert_nil Seek::Config.get_value(:new_name_2)
+    assert_nil Seek::Config.get_value(:old_name_2)
+    assert_nil Settings.fetch(:old_name_2)
+    assert_nil Settings.fetch(:new_name_2)
+  end
+
+  test 'elixir AAI config' do
+    with_config_value(:site_base_host, 'https://secure.website:3001') do
+      with_config_value(:omniauth_elixir_aai_client_id, 'abc') do
+        with_config_value(:omniauth_elixir_aai_secret, '123') do
+          with_relative_root(nil) do
+            config = Seek::Config.omniauth_elixir_aai_config
+            assert_equal 'abc', config[:client_options][:identifier]
+            assert_equal '123', config[:client_options][:secret]
+            assert_equal '/identities/auth/elixir_aai/callback', config[:callback_path]
+            assert_equal 'https://secure.website:3001/identities/auth/elixir_aai/callback', config[:client_options][:redirect_uri]
+          end
+        end
+      end
+    end
+    with_config_value(:site_base_host, 'http://localhost') do
+      with_relative_root('/seeks/seek1') do
+        config = Seek::Config.omniauth_elixir_aai_config
+        assert_equal '/seeks/seek1/identities/auth/elixir_aai/callback', config[:callback_path]
+        assert_equal 'http://localhost/seeks/seek1/identities/auth/elixir_aai/callback', config[:client_options][:redirect_uri]
+      end
+    end
   end
 end

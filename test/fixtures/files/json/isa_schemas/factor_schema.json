@@ -1,0 +1,23 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "title": "ISA factor schema",
+    "name": "ISA factor schema",
+    "description": "JSON-schema representing a factor value in the ISA model",
+    "type": "object",
+    "properties": {
+        "@id": { "type": "string", "format": "uri" },
+        "factorName": {
+            "type": "string"
+        },
+        "factorType": {
+            "$ref": "ontology_annotation_schema.json#"
+        },
+        "comments" : {
+            "type": "array",
+            "items": {
+                 "$ref": "comment_schema.json#"
+            }
+        }
+    },
+    "additionalProperties": false
+}

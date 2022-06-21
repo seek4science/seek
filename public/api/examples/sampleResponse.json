@@ -1,18 +1,32 @@
 {
   "data": {
-    "id": "292",
+    "id": "7",
     "type": "samples",
     "attributes": {
-      "discussion_links": null,
+      "policy": {
+        "access": "no_access",
+        "permissions": [
+
+        ]
+      },
+      "discussion_links": [
+
+      ],
       "title": "Fred Bloggs",
-      "tags": null,
-      "created_at": "2021-08-31T13:38:39.000Z",
-      "updated_at": "2021-08-31T13:38:39.000Z",
+      "tags": [
+
+      ],
+      "created_at": "2022-06-07T14:12:29.000Z",
+      "updated_at": "2022-06-07T14:12:29.000Z",
+      "creators": [
+
+      ],
       "other_creators": null,
       "attribute_map": {
         "full_name": "Fred Bloggs",
-        "address": "3 School Road",
-        "postcode": "M13 9PL"
+        "address": "HD",
+        "postcode": "M13 9PL",
+        "CAPITAL key": "key must remain capitalised"
       }
     },
     "relationships": {
@@ -24,21 +38,21 @@
       "submitter": {
         "data": [
           {
-            "id": "1056",
+            "id": "59",
             "type": "people"
           }
         ]
       },
       "sample_type": {
         "data": {
-          "id": "354",
+          "id": "12",
           "type": "sample_types"
         }
       },
       "projects": {
         "data": [
           {
-            "id": "1042",
+            "id": "64",
             "type": "projects"
           }
         ]
@@ -48,32 +62,39 @@
 
         ]
       },
+      "investigations": {
+        "data": [
+
+        ]
+      },
+      "studies": {
+        "data": [
+
+        ]
+      },
       "assays": {
         "data": [
-          {
-            "id": "25",
-            "type": "assays"
-          }
+
         ]
       },
       "people": {
         "data": [
           {
-            "id": "1056",
+            "id": "59",
             "type": "people"
           }
         ]
       }
     },
     "links": {
-      "self": "/samples/292"
+      "self": "/samples/7"
     },
     "meta": {
-      "created": "2021-08-31T13:38:39.000Z",
-      "modified": "2021-08-31T13:38:39.000Z",
+      "created": "2022-06-07T14:12:29.000Z",
+      "modified": "2022-06-07T14:12:29.000Z",
       "api_version": "0.3",
-      "uuid": "ac934970-ec8e-0139-2586-000c29095f88",
-      "base_url": "http://localhost:3000"
+      "base_url": "http://localhost:3000",
+      "uuid": "ca06b9c0-c899-013a-0f7e-0a81884ed284"
     }
   },
   "jsonapi": {

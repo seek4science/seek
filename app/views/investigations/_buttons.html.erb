@@ -5,7 +5,12 @@
 <% end %>
 
 <% if item.can_edit? -%>
-  <%= add_new_item_to_dropdown(item) %>
+  <% if displaying_single_page? %>
+    <%= button_link_to("Create #{t('study')}", 'new', new_isa_study_path(investigation_id: item, single_page: params[:single_page])) %>
+    <%= button_link_to("Export ISA", 'download', export_isa_single_page_path(id: params[:single_page] , investigation_id: item)) %>
+  <% else -%>
+    <%= add_new_item_to_dropdown(item) %> 
+  <% end -%>
 <% end -%>
 
 <%= item_actions_dropdown do %>
@@ -21,6 +26,8 @@
     <% if (item.can_publish? || item.contains_publishable_items?) && item.can_manage? -%>
         <li><%= image_tag_for_key('publish', polymorphic_path(item, :action => :check_related_items), nil, {:method=>:post}, "Publish full #{t('investigation')}") -%></li>
     <% end -%>
+
+    <%= order_icon(item,current_user, order_studies_investigation_path(item), item.studies, 'study') -%>
 
     <%= delete_icon item,current_user -%>
 <% end -%>

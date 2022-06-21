@@ -1,41 +1,368 @@
 {
-    "data": [
-        {
-            "id": "1",
-            "type": "projects",
-            "attributes": {
-                "title": "BaCell-SysMO"
-            },
-            "links": {
-                "self": "/projects/1"
-            }
-        },
-        {
-            "id": "2",
-            "type": "projects",
-            "attributes": {
-                "title": "COSMIC"
-            },
-            "links": {
-                "self": "/projects/2"
-            }
-        },
-        {
-            "id": "3",
-            "type": "projects",
-            "attributes": {
-                "title": "SUMO"
-            },
-            "links": {
-                "self": "/projects/3"
-            }
-        }
-    ],
-    "jsonapi": {
-        "version": "1.0"
+  "data": [
+    {
+      "id": "1022251588",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -220"
+      },
+      "links": {
+        "self": "/projects/1022251588"
+      }
     },
-    "meta": {
-        "base_url": "https://fairdomhub.org",
-        "api_version": "0.1"
+    {
+      "id": "1022251589",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -221"
+      },
+      "links": {
+        "self": "/projects/1022251589"
+      }
+    },
+    {
+      "id": "1022251590",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -222"
+      },
+      "links": {
+        "self": "/projects/1022251590"
+      }
+    },
+    {
+      "id": "1022251591",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -223"
+      },
+      "links": {
+        "self": "/projects/1022251591"
+      }
+    },
+    {
+      "id": "1022251592",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -224"
+      },
+      "links": {
+        "self": "/projects/1022251592"
+      }
+    },
+    {
+      "id": "1022251593",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -225"
+      },
+      "links": {
+        "self": "/projects/1022251593"
+      }
+    },
+    {
+      "id": "1022251594",
+      "type": "projects",
+      "attributes": {
+        "title": "A Maximal Project"
+      },
+      "links": {
+        "self": "/projects/1022251594"
+      }
+    },
+    {
+      "id": "1022251581",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -213"
+      },
+      "links": {
+        "self": "/projects/1022251581"
+      }
+    },
+    {
+      "id": "1022251582",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -214"
+      },
+      "links": {
+        "self": "/projects/1022251582"
+      }
+    },
+    {
+      "id": "1022251583",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -215"
+      },
+      "links": {
+        "self": "/projects/1022251583"
+      }
+    },
+    {
+      "id": "1022251584",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -216"
+      },
+      "links": {
+        "self": "/projects/1022251584"
+      }
+    },
+    {
+      "id": "1022251585",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -217"
+      },
+      "links": {
+        "self": "/projects/1022251585"
+      }
+    },
+    {
+      "id": "1022251586",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -218"
+      },
+      "links": {
+        "self": "/projects/1022251586"
+      }
+    },
+    {
+      "id": "1022251587",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -219"
+      },
+      "links": {
+        "self": "/projects/1022251587"
+      }
+    },
+    {
+      "id": "1022251574",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -206"
+      },
+      "links": {
+        "self": "/projects/1022251574"
+      }
+    },
+    {
+      "id": "1022251575",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -207"
+      },
+      "links": {
+        "self": "/projects/1022251575"
+      }
+    },
+    {
+      "id": "1022251576",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -208"
+      },
+      "links": {
+        "self": "/projects/1022251576"
+      }
+    },
+    {
+      "id": "1022251577",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -209"
+      },
+      "links": {
+        "self": "/projects/1022251577"
+      }
+    },
+    {
+      "id": "1022251578",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -210"
+      },
+      "links": {
+        "self": "/projects/1022251578"
+      }
+    },
+    {
+      "id": "1022251579",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -211"
+      },
+      "links": {
+        "self": "/projects/1022251579"
+      }
+    },
+    {
+      "id": "1022251580",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -212"
+      },
+      "links": {
+        "self": "/projects/1022251580"
+      }
+    },
+    {
+      "id": "1022251568",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -200"
+      },
+      "links": {
+        "self": "/projects/1022251568"
+      }
+    },
+    {
+      "id": "1022251569",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -201"
+      },
+      "links": {
+        "self": "/projects/1022251569"
+      }
+    },
+    {
+      "id": "1022251570",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -202"
+      },
+      "links": {
+        "self": "/projects/1022251570"
+      }
+    },
+    {
+      "id": "1022251571",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -203"
+      },
+      "links": {
+        "self": "/projects/1022251571"
+      }
+    },
+    {
+      "id": "1022251572",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -204"
+      },
+      "links": {
+        "self": "/projects/1022251572"
+      }
+    },
+    {
+      "id": "1022251573",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -205"
+      },
+      "links": {
+        "self": "/projects/1022251573"
+      }
+    },
+    {
+      "id": "1022251560",
+      "type": "projects",
+      "attributes": {
+        "title": "A Minimal Project"
+      },
+      "links": {
+        "self": "/projects/1022251560"
+      }
+    },
+    {
+      "id": "1022251561",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -193"
+      },
+      "links": {
+        "self": "/projects/1022251561"
+      }
+    },
+    {
+      "id": "1022251562",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -194"
+      },
+      "links": {
+        "self": "/projects/1022251562"
+      }
+    },
+    {
+      "id": "1022251563",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -195"
+      },
+      "links": {
+        "self": "/projects/1022251563"
+      }
+    },
+    {
+      "id": "1022251564",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -196"
+      },
+      "links": {
+        "self": "/projects/1022251564"
+      }
+    },
+    {
+      "id": "1022251565",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -197"
+      },
+      "links": {
+        "self": "/projects/1022251565"
+      }
+    },
+    {
+      "id": "1022251566",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -198"
+      },
+      "links": {
+        "self": "/projects/1022251566"
+      }
+    },
+    {
+      "id": "1022251567",
+      "type": "projects",
+      "attributes": {
+        "title": "A Project: -199"
+      },
+      "links": {
+        "self": "/projects/1022251567"
+      }
     }
+  ],
+  "jsonapi": {
+    "version": "1.0"
+  },
+  "links": {
+    "self": "/projects?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "first": "/projects?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "prev": null,
+    "next": null,
+    "last": "/projects?page%5Bnumber%5D=1&page%5Bsize%5D=1000000"
+  },
+  "meta": {
+    "base_url": "http://localhost:3000",
+    "api_version": "0.3"
+  }
 }

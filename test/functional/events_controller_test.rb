@@ -3,17 +3,12 @@ require 'test_helper'
 class EventsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include GeneralAuthorizationTestCases
   include SharingFormTestHelper
 
   def setup
     login_as(:datafile_owner)
     @project = users(:datafile_owner).person.projects.first
-  end
-
-  def rest_api_test_object
-    @object = events(:event_with_no_files)
   end
 
   def test_title
@@ -251,7 +246,7 @@ class EventsControllerTest < ActionController::TestCase
     # should be a temporary sharing link
     assert_select 'div#temporary_links', count:1
 
-    assert_select 'div#author_form', count:0
+    assert_select 'div#author-form', count:0
   end
 
   test 'cannot access manage page with edit rights' do

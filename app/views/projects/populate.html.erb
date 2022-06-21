@@ -1,0 +1,39 @@
+<%= javascript_include_tag 'projects' %>
+<%= render :partial => "general/page_title",:locals=>{:title=>"Populating the structure of #{link_to(h(@project.title),@project)}".html_safe} %>
+<% if !@project.use_default_policy %>
+  <%= alert_box do %>
+    <p>The project does not use a default policy.
+      Please correct this by <a href='<%= edit_project_path(@project) %>'>managing the project</a>
+    </p>
+  <% end %>
+<% elsif @project.project_administrators.empty? %>
+  <%= alert_box do %>
+    <p>The project does not have any administrators. This may cause problems when managing the project, its structure and assets.
+    </p>
+  <% end %>
+<% end %>
+  <p>A compatible tsv file can be created and downloaded from <a href='https://tascu.vtt.fi/' target="_blank">TasCu</a>. The tsv file must then be uploaded to this project.</p>
+
+<% unless @project.spreadsheets.empty? %>
+  <%= form_tag({:action => :populate_from_spreadsheet}, :multipart => true) do -%>
+    <%= forward_params(:project) %>
+    <div class="asset_form">
+      <%= error_messages_for :project -%>
+      <%= panel('Spreadsheet selection', id: 'spreadsheet-panel') do %>
+        <div>
+          <div>
+            <%= select_tag "spreadsheet_id", options_from_collection_for_select(@project.spreadsheets, "id", "title") %>
+          </div>
+        </div>
+      <% end %>
+      <div>
+        <%= create_button id:"data_file_submit_btn",
+          onclick:"return validateResourceFields('project');",
+          class:'btn btn-primary',
+          button_text:'Populate',
+          'data-upload-file-text' => 'Populate' %>
+        or <%= cancel_button(project_path(@project)) -%>
+      </div>
+    </div>
+  <% end -%>
+<% end -%>

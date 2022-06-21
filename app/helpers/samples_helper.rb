@@ -1,77 +1,32 @@
 module SamplesHelper
-  def sample_form_field_for_attribute(attribute)
-    base_type = attribute.sample_attribute_type.base_type
-    clz = "sample_attribute_#{base_type.downcase}"
+  def sample_form_field_for_attribute(attribute, resource)
+    element_class = "sample_attribute_#{attribute.sample_attribute_type.base_type.downcase}"
     element_name = "sample[data][#{attribute.title}]"
-    value = @sample.get_attribute_value(attribute.title)
-    placeholder = "e.g. #{attribute.sample_attribute_type.placeholder}" unless attribute.sample_attribute_type.placeholder.blank?
 
-    case base_type
-    when Seek::Samples::BaseType::TEXT
-      text_area_tag element_name,value, class: "form-control #{clz}"
-    when Seek::Samples::BaseType::DATE_TIME
-      content_tag :div, style:'position:relative' do
-        text_field_tag element_name, value, data: { calendar: 'mixed' }, class: "calendar form-control #{clz}", placeholder: placeholder
-      end
-    when Seek::Samples::BaseType::DATE
-      content_tag :div, style: 'position:relative' do
-        text_field_tag element_name, value, data: { calendar: true }, class: "calendar form-control #{clz}", placeholder: placeholder
-      end
-    when Seek::Samples::BaseType::BOOLEAN
-      content_tag :div, class: 'form-check' do
-        unless attribute.required?
-          concat(text_field_tag(element_name, '', class: 'form-check-input', type: :radio, checked: value != true && value != false))
-          concat(label_tag(nil, "Unset", class: 'form-check-label', style:'padding-left:0.25em;padding-right:1em;'))
-        end
-
-        concat(text_field_tag(element_name, 'true', class: 'form-check-input', type: :radio, checked: value == true))
-        concat(label_tag(nil, "true", class: 'form-check-label', style:'padding-left:0.25em;padding-right:1em;'))
-
-        concat(text_field_tag(element_name, 'false', class: 'form-check-input', type: :radio, checked: value == false))
-        concat(label_tag(nil, "false", class: 'form-check-label', style:'padding-left:0.25em;padding-right:1em;'))
-      end
-    when Seek::Samples::BaseType::SEEK_STRAIN
-      options = option_groups_from_collection_for_select(Organism.all, :strains,
-                                                         :title, :id,
-                                                         :title, value.try(:[],'id'))
-      select_tag(element_name, options, include_blank: !attribute.required?, class: "form-control #{clz}")
-    when Seek::Samples::BaseType::SEEK_DATA_FILE
-      options = options_from_collection_for_select(DataFile.authorized_for(:view), :id,
-                                                         :title, value.try(:[],'id'))
-      select_tag(element_name, options, include_blank: !attribute.required?, class: "form-control #{clz}")
-    when Seek::Samples::BaseType::CV
-      controlled_vocab_form_field attribute, element_name, value
-    when Seek::Samples::BaseType::SEEK_SAMPLE
-      terms = attribute.linked_sample_type.samples.authorized_for('view').to_a
-      options = options_from_collection_for_select(terms, :id, :title, value.try(:[], 'id'))
-      select_tag element_name, options,
-                 include_blank: !attribute.required? , class: "form-control #{clz}"
-    when Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
-      sample_multi_form_field attribute, element_name, value
-    else
-      text_field_tag element_name,value, class: "form-control #{clz}", placeholder: placeholder
-    end
+    attribute_form_element(attribute, resource, element_name, element_class)
   end
 
-  def controlled_vocab_form_field(attribute, element_name, value)    
-    if attribute.sample_controlled_vocab.sample_controlled_vocab_terms.count < Seek::Config.cv_dropdown_limit
+  def controlled_vocab_form_field(sample_controlled_vocab, element_name, values, limit=1)
+    if sample_controlled_vocab.sample_controlled_vocab_terms.count < Seek::Config.cv_dropdown_limit && sample_controlled_vocab.source_ontology.blank?
       options = options_from_collection_for_select(
-        attribute.sample_controlled_vocab.sample_controlled_vocab_terms.sort_by(&:label),
+        sample_controlled_vocab.sample_controlled_vocab_terms.sort_by(&:label),
         :label, :label,
-        value
+        values
       )
       select_tag element_name,
                  options,                 
                  class: "form-control",
                  include_blank: ""
     else
-      scv_id = attribute.sample_controlled_vocab.id
-      existing_objects = []
-      existing_objects << Struct.new(:id, :name).new(value, value) if value
+      scv_id = sample_controlled_vocab.id
+      is_ontology = sample_controlled_vocab.source_ontology.present?
+      existing_objects = Array(values).collect do |value|
+        Struct.new(:id, :name).new(value, value)
+      end
       objects_input(element_name, existing_objects,
                     typeahead: { query_url: typeahead_sample_controlled_vocabs_path + "?query=%QUERY&scv_id=#{scv_id}", 
                     handlebars_template: 'typeahead/controlled_vocab_term' }, 
-                    limit: 1)
+                    limit: limit, ontology: is_ontology)
     end
   end
 
@@ -89,12 +44,17 @@ module SamplesHelper
     authorised_assets(Sample, projects)
   end
 
-  def sample_attribute_title_and_unit(attribute)
+  def sample_attribute_display_title(attribute)
     title = attribute.title
     if (unit = attribute.unit) && !unit.dimensionless?
       title += " ( #{unit} )"
     end
-    title
+    unless attribute.pid.blank?
+      title += content_tag(:small, 'data-tooltip'=>attribute.pid) do
+        " [ "+attribute.short_pid+ " ]"
+      end.html_safe
+    end
+    title.html_safe
   end
 
   def display_attribute(sample, attribute, options = {})
@@ -209,6 +169,59 @@ module SamplesHelper
   def ols_root_term_link(ols_id, term_uri)
     ols_link = "https://www.ebi.ac.uk/ols/ontologies/#{ols_id}/terms?iri=#{term_uri}"
     link_to(term_uri, ols_link, target: :_blank)
+  end
+
+  private
+
+  def attribute_form_element(attribute, resource, element_name, element_class )
+    value = resource.get_attribute_value(attribute.title)
+    placeholder = "e.g. #{attribute.sample_attribute_type.placeholder}" unless attribute.sample_attribute_type.placeholder.blank?
+
+    case attribute.sample_attribute_type.base_type
+    when Seek::Samples::BaseType::TEXT
+      text_area_tag element_name, value, class: "form-control #{element_class}"
+    when Seek::Samples::BaseType::DATE_TIME
+      content_tag :div, style: 'position:relative' do
+        text_field_tag element_name, value, data: { calendar: 'mixed' }, class: "calendar form-control #{element_class}", placeholder: placeholder
+      end
+    when Seek::Samples::BaseType::DATE
+      content_tag :div, style: 'position:relative' do
+        text_field_tag element_name, value, data: { calendar: true }, class: "calendar form-control #{element_class}", placeholder: placeholder
+      end
+    when Seek::Samples::BaseType::BOOLEAN
+      content_tag :div, class: 'form-check' do
+        unless attribute.required?
+          concat(text_field_tag(element_name, '', class: 'form-check-input', type: :radio, checked: value != true && value != false))
+          concat(label_tag(nil, "Unset", class: 'form-check-label', style: 'padding-left:0.25em;padding-right:1em;'))
+        end
+
+        concat(text_field_tag(element_name, 'true', class: 'form-check-input', type: :radio, checked: value == true))
+        concat(label_tag(nil, "true", class: 'form-check-label', style: 'padding-left:0.25em;padding-right:1em;'))
+
+        concat(text_field_tag(element_name, 'false', class: 'form-check-input', type: :radio, checked: value == false))
+        concat(label_tag(nil, "false", class: 'form-check-label', style: 'padding-left:0.25em;padding-right:1em;'))
+      end
+    when Seek::Samples::BaseType::SEEK_STRAIN
+      options = option_groups_from_collection_for_select(Organism.all, :strains,
+                                                         :title, :id,
+                                                         :title, value.try(:[], 'id'))
+      select_tag(element_name, options, include_blank: !attribute.required?, class: "form-control #{element_class}")
+    when Seek::Samples::BaseType::SEEK_DATA_FILE
+      options = options_from_collection_for_select(DataFile.authorized_for(:view), :id,
+                                                   :title, value.try(:[], 'id'))
+      select_tag(element_name, options, include_blank: !attribute.required?, class: "form-control #{element_class}")
+    when Seek::Samples::BaseType::CV
+      controlled_vocab_form_field attribute.sample_controlled_vocab, element_name, value
+    when Seek::Samples::BaseType::SEEK_SAMPLE
+      terms = attribute.linked_sample_type.samples.authorized_for('view').to_a
+      options = options_from_collection_for_select(terms, :id, :title, value.try(:[], 'id'))
+      select_tag element_name, options,
+                 include_blank: !attribute.required?, class: "form-control #{element_class}"
+    when Seek::Samples::BaseType::SEEK_SAMPLE_MULTI
+      sample_multi_form_field attribute, element_name, value
+    else
+      text_field_tag element_name, value, class: "form-control #{element_class}", placeholder: placeholder
+    end
   end
 
 end

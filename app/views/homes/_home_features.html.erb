@@ -1,0 +1,38 @@
+<div id="home-features">
+  <h2 class="text-center"><%= Seek::Config.instance_name %>: The better way to manage your data</h2>
+  <h3 class="text-center">Free and open platform for easier research data management</h3>
+  <div class="row seek-homepage-button-container" style="padding-top:10px">
+    <div class="col-sm-3 text-center">
+      <%= image('front_page_feature_organise', alt: 'Organise & Structure',class:'feature-icon') %>
+      <h3>Organise & Structure</h3>
+      <p>Organise documents and data to easily manage your research project</p>
+    </div>
+
+    <div class="col-sm-3 text-center">
+      <%= image('front_page_feature_collaborate', alt:'Collaborate & Manage access', class:'feature-icon') %>
+      <h3>Manage access</h3>
+      <p>There is a lot of flexibility and control over who can see, download or edit your items</p>
+    </div>
+
+    <div class="col-sm-3 text-center">
+      <%= image('front_page_feature_standardise', alt: 'Standardise research data',class:'feature-icon') %>
+      <h3>Standardise research data</h3>
+      <p>Use available standards to describe your dataset and make it ready for publication</p>
+    </div>
+
+    <div class="col-sm-3 text-center">
+      <%= image('front_page_feature_publish', alt:'Publish & Share data',class:'feature-icon') %>
+      <h3>Publish & Share data</h3>
+      <p> Publish your data and link them to your scientific article</p>
+    </div>
+  </div>
+  <br>
+  <div class="row" style="position: relative;">
+    <div class="col-sm-6">
+      <a class="btn btn-primary btn-lg" style="position: absolute;bottom: 0;" target="_blank" href="https://seek4science.org/" role="button" aria-label="Left Align" style="white-space: normal;"> Learn more </a>        
+    </div>
+    <div class="text-right">
+      <a class="btn btn-primary btn-lg" style="position: absolute;bottom: 0;right: 16px;" href=<%= signup_path %> role="button" aria-label="Left Align" style="white-space: normal;"> Register </a>
+    </div>
+  </div>
+</div>

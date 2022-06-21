@@ -11,7 +11,8 @@ Factory.define(:patient_sample_type, parent: :sample_type) do |f|
     # Not sure why i have to explicitly add the sample_type association
     type.sample_attributes << Factory.build(:sample_attribute, title: 'full name', sample_attribute_type: Factory(:full_name_sample_attribute_type), required: true, is_title: true, sample_type: type)
     type.sample_attributes << Factory.build(:sample_attribute, title: 'age', sample_attribute_type: Factory(:age_sample_attribute_type), required: true, sample_type: type)
-    type.sample_attributes << Factory.build(:sample_attribute, title: 'weight', sample_attribute_type: Factory(:weight_sample_attribute_type), unit: Unit.find_or_create_by(symbol:'g',comment:'gram'), required: false, sample_type: type)
+    type.sample_attributes << Factory.build(:sample_attribute, title: 'weight', sample_attribute_type: Factory(:weight_sample_attribute_type), unit: Unit.find_or_create_by(symbol: 'g', comment: 'gram'),
+                                            description: 'the weight of the patient', required: false, sample_type: type)
     type.sample_attributes << Factory.build(:sample_attribute, title: 'address', sample_attribute_type: Factory(:address_sample_attribute_type), required: false, sample_type: type)
     type.sample_attributes << Factory.build(:sample_attribute, title: 'postcode', sample_attribute_type: Factory(:postcode_sample_attribute_type), required: false, sample_type: type)
   end
@@ -105,14 +106,17 @@ end
 Factory.define(:max_sample_type, parent: :sample_type) do |f|
   f.title 'A Maximal SampleType'
   f.description 'A very new research'
-  f.tags ["tag1","tag2"]
-  f.assays {[Factory.build(:assay, policy: Factory(:public_policy))]}
+  f.assays { [Factory(:public_assay)] }
   f.after_build do |type|
     # Not sure why i have to explicitly add the sample_type association
-    type.sample_attributes << Factory.build(:sample_attribute, title: 'full_name', sample_attribute_type: Factory(:full_name_sample_attribute_type), required: true, is_title: true, sample_type: type)
+    type.sample_attributes << Factory.build(:sample_attribute, title: 'full_name', description: 'the persons full name', sample_attribute_type: Factory(:full_name_sample_attribute_type), required: true, is_title: true, sample_type: type)
     type.sample_attributes << Factory.build(:sample_attribute, title: 'address', sample_attribute_type: Factory(:address_sample_attribute_type), required: false, sample_type: type)
-    type.sample_attributes << Factory.build(:sample_attribute, title: 'postcode', sample_attribute_type: Factory(:postcode_sample_attribute_type), required: false, sample_type: type)
+    type.sample_attributes << Factory.build(:sample_attribute, title: 'postcode', pid: 'dc:postcode', sample_attribute_type: Factory(:postcode_sample_attribute_type), required: false, sample_type: type)
     type.sample_attributes << Factory.build(:sample_attribute, title: 'CAPITAL key', sample_attribute_type: Factory(:string_sample_attribute_type, title:'String'), required: false, sample_type: type)
+  end
+  f.after_create do |type|
+    type.annotate_with(['tag1', 'tag2'], 'sample_type_tag', type.contributor)
+    type.save!
   end
 end
 Factory.define(:sample_type_with_symbols, parent: :sample_type) do |f|
@@ -122,4 +126,50 @@ Factory.define(:sample_type_with_symbols, parent: :sample_type) do |f|
     type.sample_attributes << Factory.build(:sample_attribute, title: 'name ++##!', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, is_title: false, sample_type: type)
     type.sample_attributes << Factory.build(:sample_attribute, title: 'size range (bp)', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, is_title: false, sample_type: type)
   end
+end
+
+Factory.define(:isa_source_sample_type, parent: :sample_type) do |f|
+	f.sequence(:title) { |n| "ISA Source #{n}" }
+  f.after_build do |type|
+    type.sample_attributes << Factory.build(:sample_attribute, title: 'Source Name', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, is_title: true, isa_tag_id: IsaTag.find_by_title("source").id, sample_type: type)
+		type.sample_attributes << Factory.build(:sample_attribute, title: 'Source Characteristic 1', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, isa_tag_id: IsaTag.find_by_title("source_characteristic").id, sample_type: type)
+		type.sample_attributes << Factory.build(:sample_attribute, title: 'Source Characteristic 2', sample_attribute_type: Factory(:controlled_vocab_attribute_type), required: true, isa_tag_id: IsaTag.find_by_title("source_characteristic").id, sample_controlled_vocab: Factory(:apples_sample_controlled_vocab), sample_type: type)
+		type.sample_attributes << Factory.build(:sample_attribute, title: 'Source Characteristic 3', sample_attribute_type: Factory(:controlled_vocab_attribute_type, title:'Ontology'), isa_tag_id: IsaTag.find_by_title("source_characteristic").id, sample_controlled_vocab: Factory(:efo_ontology), pid: 'pid:pid', sample_type: type)
+	end
+end
+
+Factory.define(:isa_sample_collection_sample_type, parent: :sample_type) do |f|
+	f.ignore do
+    linked_sample_type nil
+  end
+	f.sequence(:title) { |n| "ISA sample collection #{n}" }
+  f.after_build do |type, eval|
+    type.sample_attributes << Factory.build(:sample_attribute, title: 'Input', sample_attribute_type: Factory(:sample_multi_sample_attribute_type), linked_sample_type: eval.linked_sample_type, required: true, sample_type: type)
+		type.sample_attributes << Factory.build(:sample_attribute, title: 'sample collection', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, isa_tag_id: IsaTag.find_by_title("protocol").id, sample_type: type)
+		type.sample_attributes << Factory.build(:sample_attribute, title: 'sample collection parameter value 1', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, isa_tag_id: IsaTag.find_by_title("parameter_value").id, sample_type: type)
+		type.sample_attributes << Factory.build(:sample_attribute, title: 'sample collection parameter value 2', sample_attribute_type: Factory(:controlled_vocab_attribute_type), isa_tag_id: IsaTag.find_by_title("parameter_value").id, sample_controlled_vocab: Factory(:apples_sample_controlled_vocab), sample_type: type)
+		type.sample_attributes << Factory.build(:sample_attribute, title: 'sample collection parameter value 3', sample_attribute_type: Factory(:controlled_vocab_attribute_type, title: 'Ontology'), isa_tag_id: IsaTag.find_by_title("parameter_value").id, sample_controlled_vocab: Factory(:efo_ontology), pid: 'pid:pid', sample_type: type)
+		type.sample_attributes << Factory.build(:sample_attribute, title: 'Sample Name', sample_attribute_type: Factory(:string_sample_attribute_type),is_title: true, required: true, isa_tag_id: IsaTag.find_by_title("sample").id, sample_type: type)
+		type.sample_attributes << Factory.build(:sample_attribute, title: 'sample characteristic 1', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, isa_tag_id: IsaTag.find_by_title("sample_characteristic").id, sample_type: type)
+		type.sample_attributes << Factory.build(:sample_attribute, title: 'sample characteristic 2', sample_attribute_type: Factory(:controlled_vocab_attribute_type), isa_tag_id: IsaTag.find_by_title("sample_characteristic").id, sample_controlled_vocab: Factory(:apples_sample_controlled_vocab), sample_type: type)
+		type.sample_attributes << Factory.build(:sample_attribute, title: 'sample characteristic 3', sample_attribute_type: Factory(:controlled_vocab_attribute_type, title: 'Ontology'), isa_tag_id: IsaTag.find_by_title("sample_characteristic").id, sample_controlled_vocab: Factory(:obi_ontology), pid: 'pid:pid', sample_type: type)
+	end
+end
+
+Factory.define(:isa_assay_sample_type, parent: :sample_type) do |f|
+	f.ignore do
+    linked_sample_type nil
+  end
+  f.sequence(:title) { |n| "ISA Assay #{n}" }
+  f.after_build do |type, eval|
+    type.sample_attributes << Factory.build(:sample_attribute, title: 'Input', sample_attribute_type: Factory(:sample_multi_sample_attribute_type), linked_sample_type: eval.linked_sample_type, required: true, sample_type: type)
+		type.sample_attributes << Factory.build(:sample_attribute, title: 'Protocol Assay 1', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, isa_tag_id: IsaTag.find_by_title("protocol").id, sample_type: type)
+		type.sample_attributes << Factory.build(:sample_attribute, title: 'Assay 1 parameter value 1', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, isa_tag_id: IsaTag.find_by_title("parameter_value").id, sample_type: type)
+		type.sample_attributes << Factory.build(:sample_attribute, title: 'Assay 1 parameter value 2', sample_attribute_type: Factory(:controlled_vocab_attribute_type), isa_tag_id: IsaTag.find_by_title("parameter_value").id, sample_controlled_vocab: Factory(:apples_sample_controlled_vocab), sample_type: type)
+		type.sample_attributes << Factory.build(:sample_attribute, title: 'Assay 1 parameter value 3', sample_attribute_type: Factory(:controlled_vocab_attribute_type, title: 'Ontology'), isa_tag_id: IsaTag.find_by_title("parameter_value").id, sample_controlled_vocab: Factory(:obi_ontology), pid: 'pid:pid', sample_type: type)
+		type.sample_attributes << Factory.build(:sample_attribute, title: 'Extract Name', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, is_title: true, isa_tag_id: IsaTag.find_by_title("other_material").id, sample_type: type)
+		type.sample_attributes << Factory.build(:sample_attribute, title: 'other material characteristic 1', sample_attribute_type: Factory(:string_sample_attribute_type), required: true, isa_tag_id: IsaTag.find_by_title("other_material_characteristic").id, sample_type: type)
+		type.sample_attributes << Factory.build(:sample_attribute, title: 'other material characteristic 2', sample_attribute_type: Factory(:controlled_vocab_attribute_type), isa_tag_id: IsaTag.find_by_title("other_material_characteristic").id, sample_controlled_vocab: Factory(:apples_sample_controlled_vocab), sample_type: type)
+		type.sample_attributes << Factory.build(:sample_attribute, title: 'other material characteristic 3', sample_attribute_type: Factory(:controlled_vocab_attribute_type, title: 'Ontology'), isa_tag_id: IsaTag.find_by_title("other_material_characteristic").id, sample_controlled_vocab: Factory(:efo_ontology), pid: 'pid:pid', sample_type: type)
+	end
 end

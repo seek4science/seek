@@ -228,7 +228,40 @@ class PolicyBasedAuthTest < ActiveSupport::TestCase
         Sop.remove_invalid_auth_lookup_entries
         assert_equal 1, Sop.lookup_count_for_user(user.id)
         assert_equal 2, Sop.connection.select_one('select count(*) from sop_auth_lookup;').values[0].to_i
+
+        # and remove duplicates
+        Sop.connection.execute("insert into sop_auth_lookup(user_id,asset_id,can_view,can_manage,can_edit,can_download,can_delete) values (#{user.id},#{sop.id},#{f},#{f},#{f},#{f},#{f});")
+        Sop.connection.execute("insert into sop_auth_lookup(user_id,asset_id,can_view,can_manage,can_edit,can_download,can_delete) values (#{user.id},#{sop.id},#{f},#{f},#{f},#{f},#{f});")
+        assert_equal 3, Sop.lookup_count_for_user(user.id)
+        assert_equal 4, Sop.connection.select_one('select count(*) from sop_auth_lookup;').values[0].to_i
+        refute_empty Sop.lookup_class.select(:asset_id, :user_id).group(:asset_id, :user_id).having("count(*) > 1")
+        Sop.remove_invalid_auth_lookup_entries
+        assert_equal 1, Sop.lookup_count_for_user(user.id)
+        assert_equal 2, Sop.connection.select_one('select count(*) from sop_auth_lookup;').values[0].to_i
+        assert_empty Sop.lookup_class.select(:asset_id, :user_id).group(:asset_id, :user_id).having("count(*) > 1")
+        assert_equal 1, Sop.lookup_class.where(asset_id:sop.id, user_id:user.id).size
       end
+    end
+  end
+
+  test 'items_missing_from_authlookup' do
+    with_config_value :auth_lookup_enabled, true do
+      user = Factory(:user)
+      user2 = Factory(:user)
+      doc = Factory(:document)
+      doc.update_lookup_table(user2)
+
+      assert_equal [doc],Document.items_missing_from_authlookup(user)
+      assert_empty Document.items_missing_from_authlookup(user2)
+
+      doc.update_lookup_table(user)
+      assert_empty Document.items_missing_from_authlookup(user)
+
+      # check for anonymous user
+      assert_empty Document.items_missing_from_authlookup(nil)
+      Document.lookup_class.where(user_id:0).last.delete
+      assert_equal [doc],Document.items_missing_from_authlookup(nil)
+
     end
   end
 

@@ -66,7 +66,7 @@ class AssetsHelperTest < ActionView::TestCase
     assert rendered_asset_view(pres).blank?
 
     # nothing  for none slideshare
-    pres = Factory(:presentation, policy: Factory(:public_policy))
+    pres = Factory(:presentation, content_blob: Factory(:binary_content_blob), policy: Factory(:public_policy))
     assert rendered_asset_view(pres).blank?
   end
 
@@ -125,11 +125,11 @@ class AssetsHelperTest < ActionView::TestCase
     with_config_value(:email_enabled,true) do
       User.with_current_user(requester.user) do
         travel_to 16.hours.ago do
-          MessageLog.create(subject:presentation,sender:requester,message_type:MessageLog::CONTACT_REQUEST)
+          ContactRequestMessageLog.create(subject:presentation,sender:requester)
         end
         assert request_contact_button_enabled?(presentation)
         travel_to 1.hour.ago do
-          MessageLog.create(subject:presentation,sender:requester,message_type:MessageLog::CONTACT_REQUEST)
+          ContactRequestMessageLog.create(subject:presentation,sender:requester)
         end
         refute request_contact_button_enabled?(presentation)
       end

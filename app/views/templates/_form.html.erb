@@ -1,0 +1,118 @@
+<%= javascript_include_tag "select2.full.min" %>
+<%= stylesheet_link_tag "select2.min.css" %>
+<%= stylesheet_link_tag "select2.bootstrap.min.css" %>
+<% tab ||= 'manual' %>
+
+<span id='modal-dialogues'>
+    <%= sample_controlled_vocab_model_dialog('cv-modal') %>
+</span>
+
+<%= form_for(@template, html: { multipart: true }) do |f| %>
+    <%= f.error_messages %>
+
+    <% if @template.new_record? %>
+        <%= folding_panel('Create template using existing template', false, {help_text: "Create template based on existing templates", :body_options => {:id => 'add_custom_attribute_panel'}}) do %>
+            <input type="button" value="Choose from existing templates" class="btn btn-primary" onClick="showTemplateModal()">
+        <% end %>
+    <% end %>
+
+    <div class="form-group">
+        <label>Title</label><%= required_span %>
+        <%= f.text_field :title, :class => 'form-control', :placeholder => 'Template name' %>
+    </div>
+
+    <div class="form-group">
+        <label>Description</label>
+        <%= f.text_area :description, :class=>"form-control rich-text-edit", rows: 5, id: "template-description" -%>
+    </div>
+
+    <%= render :partial => "projects/project_selector", :locals => { :resource => @template } -%>
+
+    <%= render partial: 'assets/manage_specific_attributes', locals:{f:f} if show_form_manage_specific_attributes? %>
+
+    <%= f.hidden_field :parent_id %>
+
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane<%= ' active'.html_safe if tab == 'manual' -%>" id="manual">
+            
+            <%= render :partial => "templates/template_modal" -%>
+
+            <h3>Attributes</h3>
+            <table class="table" id="attribute-table">
+                <thead>
+                    <tr>
+                        <th width="5em">Order</th>
+                        <th>Name<%= required_span %></th>
+                        <th width="5em">Required?</th>
+                        <th width="5em">Title?</th>
+                        <th>Type<%= required_span %></th>
+                        <th>Description</th>
+                        <th>IRI</th>
+                        <th>Unit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% @template.template_attributes.each_with_index do |template_attribute, index| %>
+                        <%= render :partial => 'template_attribute_form', :locals => { :index => index,
+                                                                                :template_attribute => template_attribute,
+                                                                                :template=>@template} %>
+                    <% end %>
+                    <tr id="add-attribute-row">
+                        <td colspan="6">
+                            <%= button_link_to('Add new attribute', 'add', '#', :id => 'add-attribute') %>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <%= form_submit_buttons(@template) %>
+
+<% end %>
+
+<table id="new-attribute-row" style="display: none">
+    <tbody>
+        <%= render :partial => 'template_attribute_form', :locals=> {:template=>@template} %>
+    </tbody>
+</table>
+
+<script>
+    //used to hold the element Id that needs updating after creating a new CV
+    $j(document).ready(function() {
+        SampleTypeControlledVocab.blankControlledVocabModelForm = $j('#cv-modal').clone();
+        SampleTypeControlledVocab.resetModalControlledVocabForm();
+        //Make rows sortable
+        SampleTypes.bindSortable();
+        SampleTypes.recalculatePositions();
+
+        $j('#add-attribute').click(function() {
+            var newRow = $j('#new-attribute-row tbody').clone().html();
+            var index = 0;
+            $j('#attribute-table tr.sample-attribute').each(function() {
+                var newIndex = parseInt($j(this).data('index'));
+                if (newIndex > index) {
+                    index = newIndex;
+                }
+            });
+            index++;
+            newRow = newRow.replace(/replace-me/g, index);
+            SampleTypes.unbindSortable();
+            $j('#attribute-table #add-attribute-row').before($j(newRow));
+            SampleTypes.recalculatePositions();
+            SampleTypes.bindSortable();
+            return false;
+        });
+
+        $j('#attribute-table').on('change', '.destroy-attribute', SampleTypes.removeAttribute);
+        $j('#attribute-table').on('change', '.sample-type-is-title', SampleTypes.singleIsTitle);
+        $j('#attribute-table').on('change', '.sample-type-attribute-type', SampleTypes.attributeTypeChanged);
+        $j('#attribute-table').on('change', '.controlled-vocab-selection', SampleTypeControlledVocab.controlledVocabChanged);
+        $j('.templates').select2({theme: "bootstrap"});
+
+        Templates.clearContext();
+        Templates.init($j('#template-attributes'));
+    });
+
+    const templates = <%= load_templates().to_json.html_safe %>
+</script>

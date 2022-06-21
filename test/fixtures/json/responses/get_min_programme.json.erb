@@ -1,0 +1,72 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "programmes",
+    "attributes": {
+      "avatar": null,
+      "title": "A Minimal Programme",
+      "description": null,
+      "web_page": null,
+      "funding_details": null,
+      "funding_codes": [],
+      "discussion_links": []
+    },
+    "relationships": {
+      "administrators": {
+        "data": []
+      },
+      "people": {
+        "data": []
+      },
+      "projects": {
+        "data": []
+      },
+      "institutions": {
+        "data": []
+      },
+      "investigations": {
+        "data": []
+      },
+      "studies": {
+        "data": []
+      },
+      "assays": {
+        "data": []
+      },
+      "data_files": {
+        "data": []
+      },
+      "models": {
+        "data": []
+      },
+      "sops": {
+        "data": []
+      },
+      "publications": {
+        "data": []
+      },
+      "presentations": {
+        "data": []
+      },
+      "events": {
+        "data": []
+      },
+      "documents": {
+        "data": []
+      }
+    },
+    "links": {
+      "self": "/programmes/<%= res.id %>"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "uuid": "<%= res.uuid %>",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.3"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

@@ -19,6 +19,7 @@ class RegularMaintenanceJob < ApplicationJob
     resend_activation_emails
     remove_unregistered_users
     trim_session
+    check_authlookup_consistency
   end
 
   private
@@ -60,11 +61,34 @@ class RegularMaintenanceJob < ApplicationJob
         logs = user.person.activation_email_logs
         if logs.count < MAX_ACTIVATION_EMAILS && (logs.empty? || logs.last.created_at < RESEND_ACTIVATION_EMAIL_DELAY.ago)
           Mailer.activation_request(user).deliver_later
-          MessageLog.log_activation_email(user.person)
+          ActivationEmailMessageLog.log_activation_email(user.person)
         end
       else
         Rails.logger.info("User with invalid person - #{user.id}")
-      end  
+      end
     end
+  end
+
+  # checks lookup_table_consistent? on each type for each user, and if not triggers a job to repopulate for that user
+  # if not already queued
+  def check_authlookup_consistency
+    found_types = [].to_set
+    items_for_queue = [].to_set
+    User.where.not(person_id: nil).to_a.push(nil).each do |user|
+
+      # will only deal with 1 type per user per run
+      found = Seek::Util.authorized_types.find do |type|
+        !type.lookup_table_consistent?(user)
+      end
+
+      next unless found.present?
+
+      found_types << found
+      missing = found.items_missing_from_authlookup(user)
+      items_for_queue.merge(missing)
+    end
+
+    found_types.each(&:remove_invalid_auth_lookup_entries)
+    AuthLookupUpdateQueue.enqueue(items_for_queue.to_a) unless items_for_queue.empty?
   end
 end

@@ -17,7 +17,8 @@ class AdminController < ApplicationController
 
   def update_admins
     admin_ids = params[:admins].split(',') || []
-    current_admins = Person.admins
+    # Don't let admin remove themselves or they won't be able to manage roles
+    current_admins = Person.admins.where.not(id: current_person)
     admins = admin_ids.map { |id| Person.find(id) }
     current_admins.each { |ca| ca.is_admin = false }
     admins.each { |admin| admin.is_admin = true }
@@ -38,6 +39,7 @@ class AdminController < ApplicationController
   def update_features_enabled
     Seek::Config.email_enabled = string_to_boolean params[:email_enabled]
     Seek::Config.pdf_conversion_enabled = string_to_boolean params[:pdf_conversion_enabled]
+    Seek::Config.fair_signposting_enabled = string_to_boolean params[:fair_signposting_enabled]
     # Seek::Config.delete_asset_version_enabled = string_to_boolean params[:delete_asset_version_enabled]
     Seek::Config.project_admin_sample_type_restriction = string_to_boolean params[:project_admin_sample_type_restriction]
     Seek::Config.programme_user_creation_enabled = string_to_boolean params[:programme_user_creation_enabled]
@@ -91,6 +93,8 @@ class AdminController < ApplicationController
 
     Seek::Config.ga4gh_trs_api_enabled = string_to_boolean(params[:ga4gh_trs_api_enabled])
     # Types enabled
+    Seek::Config.file_templates_enabled = string_to_boolean params[:file_templates_enabled]
+    Seek::Config.placeholders_enabled = string_to_boolean params[:placeholders_enabled]
     Seek::Config.collections_enabled = string_to_boolean params[:collections_enabled]
     Seek::Config.data_files_enabled = string_to_boolean params[:data_files_enabled]
     Seek::Config.documents_enabled = string_to_boolean params[:documents_enabled]
@@ -130,6 +134,9 @@ class AdminController < ApplicationController
 
     Seek::Config.openbis_enabled = string_to_boolean(params[:openbis_enabled])
     Seek::Config.copasi_enabled = string_to_boolean(params[:copasi_enabled])
+    Seek::Config.project_single_page_enabled = string_to_boolean(params[:project_single_page_enabled])
+    Seek::Config.project_single_page_advanced_enabled = string_to_boolean(params[:project_single_page_advanced_enabled])
+    Seek::Config.sample_type_template_enabled = string_to_boolean(params[:sample_type_template_enabled])
 
     Seek::Config.nels_enabled = string_to_boolean(params[:nels_enabled])
     Seek::Config.nels_client_id = params[:nels_client_id]&.strip
@@ -163,8 +170,16 @@ class AdminController < ApplicationController
     Seek::Config.news_number_of_entries = entries if is_entries_integer
 
     Seek::Config.home_description = params[:home_description]
+    Seek::Config.home_description_position = params[:home_description_position]
 
-    #    Seek::Config.front_page_buttons_enabled = params[:front_page_buttons_enabled]
+    Seek::Config.home_show_features = string_to_boolean params[:home_show_features]
+    Seek::Config.home_show_quickstart = string_to_boolean params[:home_show_quickstart]
+    Seek::Config.home_show_my_items = string_to_boolean params[:home_show_my_items]
+    Seek::Config.home_show_who_uses = string_to_boolean params[:home_show_who_uses]
+    Seek::Config.home_explore_projects = string_to_boolean params[:home_explore_projects]
+    Seek::Config.home_show_integrations = string_to_boolean params[:home_show_integrations]
+    add_carousel_form
+
     begin
       Seek::FeedReader.clear_cache
     rescue => e
@@ -178,6 +193,8 @@ class AdminController < ApplicationController
     Seek::Config.tag_cloud_enabled = string_to_boolean params[:tag_cloud_enabled]
     Seek::Config.workflow_class_list_enabled = string_to_boolean params[:workflow_class_list_enabled]
 
+    expire_annotation_fragments
+
     update_redirect_to (is_entries_integer && (only_integer tag_threshold, 'tag threshold') && (only_positive_integer max_visible_tags, 'maximum visible tags')), 'home_settings'
   end
 
@@ -188,21 +205,16 @@ class AdminController < ApplicationController
   end
 
   def update_rebrand
-    Seek::Config.project_name = params[:project_name]
-    Seek::Config.project_type = params[:project_type]
-    Seek::Config.project_link = params[:project_link]
-    Seek::Config.project_description = params[:project_description]
-    Seek::Config.project_keywords = params[:project_keywords].split(',').collect(&:strip).reject(&:blank?).join(', ')
-    Seek::Config.project_long_name = params[:project_long_name]
+    Seek::Config.instance_name = params[:instance_name]
+    Seek::Config.instance_link = params[:instance_link]
+    Seek::Config.instance_description = params[:instance_description]
+    Seek::Config.instance_keywords = params[:instance_keywords].split(',').collect(&:strip).reject(&:blank?).join(', ')
 
-    Seek::Config.dm_project_name = params[:dm_project_name]
-    Seek::Config.dm_project_link = params[:dm_project_link]
+    Seek::Config.instance_admins_name = params[:instance_admins_name]
+    Seek::Config.instance_admins_link = params[:instance_admins_link]
     Seek::Config.issue_tracker = params[:issue_tracker]
 
-    Seek::Config.application_name = params[:application_name]
-
     Seek::Config.header_image_enabled = string_to_boolean params[:header_image_enabled]
-    Seek::Config.header_image_link = params[:header_image_link]
     Seek::Config.header_image_title = params[:header_image_title]
     header_image_file
 
@@ -214,6 +226,13 @@ class AdminController < ApplicationController
 
     Seek::Config.about_page_enabled = string_to_boolean params[:about_page_enabled]
     Seek::Config.about_page = params[:about_page]
+
+    Seek::Config.about_instance_link_enabled = string_to_boolean params[:about_instance_link_enabled]
+    Seek::Config.about_instance_admins_link_enabled = string_to_boolean params[:about_instance_admins_link_enabled]
+    Seek::Config.cite_link = params[:cite_link]
+    Seek::Config.contact_link = params[:contact_link]
+
+    Seek::Config.funding_link = params[:funding_link]
 
     Seek::Config.terms_enabled = string_to_boolean params[:terms_enabled]
     Seek::Config.terms_page = params[:terms_page]
@@ -227,7 +246,7 @@ class AdminController < ApplicationController
 
   def update_pagination
     %w[people projects projects programmes institutions investigations
-        studies assays data_files models sops publications presentations events documents].each do |type|
+        studies assays data_files models sops publications presentations events documents file_templates placeholders].each do |type|
       Seek::Config.set_sorting_for(type, params[:sorting][type])
       Seek::Config.set_results_per_page_for(type, params[:results_per_page][type])
     end
@@ -248,17 +267,29 @@ class AdminController < ApplicationController
     if Seek::Config.tag_threshold.to_s != params[:tag_threshold] || Seek::Config.max_visible_tags.to_s != params[:max_visible_tags]
       expire_annotation_fragments
     end
-    Seek::Config.site_base_host = params[:site_base_host].chomp('/') unless params[:site_base_host].nil?
+    unless params[:site_base_host].nil?
+      u = URI.parse(params[:site_base_host])
+      u.path = ''
+      Seek::Config.site_base_host = u.to_s
+    end
     # check valid email
     pubmed_email = params[:pubmed_api_email]
     pubmed_email_valid = check_valid_email(pubmed_email, 'pubmed API email address')
     crossref_email = params[:crossref_api_email]
     crossref_email_valid = check_valid_email(crossref_email, 'crossref API email address')
+    Seek::Config.allow_publications_fulltext = string_to_boolean params[:allow_publications_fulltext]
+    Seek::Config.allow_edit_of_registered_publ = string_to_boolean params[:allow_edit_of_registered_publ]
     Seek::Config.pubmed_api_email = pubmed_email if pubmed_email == '' || pubmed_email_valid
     Seek::Config.crossref_api_email = crossref_email if crossref_email == '' || crossref_email_valid
 
+    if params[:session_store_timeout]
+      mins = params[:session_store_timeout].to_i
+      if mins >= 1
+        Seek::Config.session_store_timeout = mins.minutes
+      end
+    end
+
     Seek::Config.bioportal_api_key = params[:bioportal_api_key]
-    Seek::Config.sabiork_ws_base_url = params[:sabiork_ws_base_url] unless params[:sabiork_ws_base_url].nil?
     Seek::Config.recaptcha_enabled = string_to_boolean params[:recaptcha_enabled]
     Seek::Config.recaptcha_private_key = params[:recaptcha_private_key]
     Seek::Config.recaptcha_public_key = params[:recaptcha_public_key]
@@ -418,8 +449,6 @@ class AdminController < ApplicationController
     when 'invalid_users_profiles'
       partial = 'invalid_user_stats_list'
       invalid_users = {}
-      pal_position = ProjectPosition.pal_position
-      invalid_users[:pal_mismatch] = Person.all.reject { |p| p.is_pal_of_any_project? == p.project_positions.include?(pal_position) }
       invalid_users[:duplicates] = Person.duplicates
       invalid_users[:no_person] = User.without_profile
       collection = invalid_users
@@ -431,7 +460,7 @@ class AdminController < ApplicationController
     when 'non_project_members'
       partial = 'user_stats_list'
       collection = Person.without_group.registered
-      title = "Users are not in a #{Seek::Config.project_name} #{t('project')}"
+      title = "Users are not in a #{Seek::Config.instance_name} #{t('project')}"
     when 'profiles_without_users'
       partial = 'user_stats_list'
       collection = Person.userless_people
@@ -493,6 +522,50 @@ class AdminController < ApplicationController
         flash[:error] = 'There was an error updating the header image logo! There could be a problem with the image file. Please try again or try another image.'
       end
     end
+  end
+
+  def add_carousel_form
+    # Only add it if at least logo and title is given carousel inputs are filled
+    if (!params[:home_carousel_image].blank? && !params[:home_carousel_title].blank?)
+      file_io = params[:home_carousel_image]
+      avatar = Avatar.new(original_filename: file_io.original_filename, image_file: file_io, skip_owner_validation: true)
+      if avatar.save
+        if Seek::Config.home_carousel.blank?
+          Seek::Config.home_carousel = Array.new
+        end
+        # build new data to store
+        data = {:image => avatar.id, :title => params[:home_carousel_title],
+          :author => params[:home_carousel_author], :url => params[:home_carousel_url],
+          :description => params[:home_carousel_description]}
+        Seek::Config.home_carousel = Seek::Config.home_carousel << data
+      else
+        flash[:error] = 'There was an error adding an image to the carousel! There could be a problem with the image file. Please try again or try another image.'
+      end
+    # else
+    #   flash[:error] = 'Information was missing for the carousel configuration, no changes has been made to it.'
+    end
+  end
+
+  # Removes the carousel item with the given image id
+  def delete_carousel_form
+    carousel_index = Integer(params[:carousel_index], exception: false)
+    if carousel_index && request.post?
+      image_id = Seek::Config.home_carousel[carousel_index][:image]
+      Seek::Config.home_carousel = array_remove_at(Seek::Config.home_carousel,carousel_index)
+      Avatar.find(image_id).delete
+      flash.now[:notice] = "Carousel number #{carousel_index} deleted"
+    else
+      flash.now[:error] = 'Must be a post'
+    end
+    redirect_to :home_settings_admin
+  end
+
+  ## Helper function to retrieve arrays removing a given index
+  def array_remove_at(array, index)
+    if index<0 || index>=array.length
+      return array
+    end
+    return array.slice(0,index) + array.slice(index+1,array.length)
   end
 
   # this destroys any failed Delayed::Jobs

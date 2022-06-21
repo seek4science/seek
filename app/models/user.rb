@@ -117,7 +117,7 @@ class User < ApplicationRecord
   end
 
   def self.logged_in?
-    current_user && !current_user.guest?
+    current_user
   end
 
   # Activates the user in the database.
@@ -128,7 +128,7 @@ class User < ApplicationRecord
     save(validate: false)
 
     #clear message logs if associated with a person (might not be when automatically activated when activation is required)
-    MessageLog.activation_email_logs(person).destroy_all unless person.nil?
+    ActivationEmailMessageLog.activation_email_logs(person).destroy_all unless person.nil?
   end
 
   def assets
@@ -270,18 +270,6 @@ class User < ApplicationRecord
     ensure
       User.current_user = previous
     end
-  end
-
-  def self.guest
-    Seek::Config.magic_guest_enabled ? User.find_by_login('guest') : nil
-  end
-
-  def guest?
-    self == User.guest
-  end
-
-  def guest_project_member?
-    person.try(:guest_project_member?)
   end
 
   def reset_password

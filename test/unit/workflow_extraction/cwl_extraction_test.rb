@@ -46,4 +46,12 @@ class CWLExtractionTest < ActiveSupport::TestCase
     assert_equal 2, structure.steps.count
     assert_equal 6, structure.links.count
   end
+
+  test 'generates diagram' do
+    wf = open_fixture_file('workflows/with_quotes.cwl')
+    extractor = Seek::WorkflowExtractors::CWL.new(wf)
+    diagram = extractor.generate_diagram
+    assert diagram.length > 100
+    assert diagram[0..256].include?('<svg ')
+  end
 end

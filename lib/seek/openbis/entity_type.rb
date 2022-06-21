@@ -155,7 +155,7 @@ module Seek
       end
 
       def application_server_query_instance
-        Fairdom::OpenbisApi::ApplicationServerQuery.new(openbis_endpoint.as_endpoint, openbis_endpoint.session_token)
+        Fairdom::OpenbisApi::ApplicationServerQuery.new(openbis_endpoint.as_endpoint, openbis_endpoint.session_token, openbis_endpoint.is_test)
       end
     end
   end

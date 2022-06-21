@@ -1,6 +1,6 @@
 <h1>Edit <%= t('institution') -%>: <%= link_to @institution.title, institution_path(@institution) -%></h1>
 
-<div class="show_basic">
+<div class="asset_form">
 	<%= form_for(@institution) do |f| %>
 	  <%= render :partial => "form", :locals => { :f => f, :institution => @institution } -%>
 	<% end %>

@@ -1,0 +1,14 @@
+<%
+  return unless resource.supports_edam_annotations?(property)
+  with_edam= "edam_#{property}"
+  return unless resource.send("#{with_edam}").any?
+  values = resource.send("#{with_edam.singularize()}_values")
+  %>
+
+
+<div>
+  <strong><%= "#{property.capitalize}" %></strong>
+</div>
+<div>
+  <%= edam_ontology_items(values) %>
+</div>

@@ -12,7 +12,6 @@ class UuidsController < ApplicationController
       respond_to do |format|
         format.html { redirect_to obj }
         format.json { redirect_to obj }
-        format.xml { redirect_to obj, format: 'xml' }
       end
     else
       error('Not Found', "No resource found with UUID: #{uuid}", 404)

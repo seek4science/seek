@@ -5,14 +5,20 @@
 require 'authenticated_system'
 
 class ApplicationController < ActionController::Base
+  USER_CONTENT_CSP = "default-src 'self'"
+
   include Seek::Errors::ControllerErrorHandling
   include Seek::EnabledFeaturesFilter
   include Recaptcha::Verify
-
   include CommonSweepers
+  include ResourceHelper
+
+  protect_from_forgery unless: -> { request.format.json? }
 
   # if the logged in user is currently partially registered, force the continuation of the registration process
   before_action :partially_registered?
+
+  before_action :check_displaying_single_page
 
   after_action :log_event
 
@@ -26,14 +32,13 @@ class ApplicationController < ActionController::Base
 
   before_action :project_membership_required, only: [:create, :new]
 
-  before_action :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
-
   before_action :check_doorkeeper_scopes, if: :doorkeeper_token
   before_action :check_json_id_type, only: [:create, :update], if: :json_api_request?
   before_action :convert_json_params, only: [:update, :destroy, :create, :create_version], if: :json_api_request?
   before_action :secure_user_content
-
   before_action :rdf_enabled? #only allows through rdf calls to supported types
+
+  include FairSignposting
 
   helper :all
 
@@ -51,17 +56,6 @@ class ApplicationController < ActionController::Base
 
   def partially_registered?
     redirect_to register_people_path if current_user && !current_user.registration_complete?
-  end
-
-  def strip_root_for_xml_requests
-    # intended to use as a before filter on requests that lack a single root model.
-    # XML requests are required to have a single root node. This assumes the root node
-    # will be named xml. Turns a params hash like.. {:xml => {:param_one => "val", :param_two => "val2"}}
-    # into {:param_one => "val", :param_two => "val2"}
-
-    # This should probably be used with prepend_before_action, since some filters might need this to happen so they can check params.
-    # see sessions controller for an example usage
-    params[:xml].each { |k, v| params[k] = v } if request.format.xml? && params[:xml]
   end
 
   def set_no_layout
@@ -144,25 +138,12 @@ class ApplicationController < ActionController::Base
 
   private
 
-  # returns the model asset assigned to the standard object for that controller, e.g. @model for models_controller
-  def determine_asset_from_controller
-    name = controller_name.singularize
-    instance_variable_get("@#{name}")
-  end
-
-  def restrict_guest_user
-    if current_user && current_user.guest?
-      flash[:error] = 'You cannot perform this action as a Guest User. Please sign in or register for an account first.'
-      redirect_back fallback_location: main_app.root_path
-    end
-  end
-
   def project_membership_required
     unless User.logged_in_and_member? || admin_logged_in?
       flash[:error] = "Only members of #{t('project').downcase.pluralize} can create content."
       respond_to do |format|
         format.html do
-          object = determine_asset_from_controller
+          object = resource_for_controller
           if !object.nil? && object.try(:can_view?)
             redirect_to object
           else
@@ -177,19 +158,12 @@ class ApplicationController < ActionController::Base
           end
         end
         format.json { render json: {"title": "Unauthorized", "detail": flash[:error].to_s}, status: :unauthorized}
+        format.js { render json: {"title": "Unauthorized", "detail": flash[:error].to_s}, status: :unauthorized}
       end
     end
   end
 
   alias_method :project_membership_required_appended, :project_membership_required
-
-  # used to suppress elements that are for virtualliver only or are still currently being worked on
-  def virtualliver_only
-    unless Seek::Config.is_virtualliver
-      error('This feature is is not yet currently available', 'invalid route')
-      return false
-    end
-  end
 
   def check_allowed_to_manage_types
     unless Seek::Config.type_managers_enabled
@@ -210,12 +184,11 @@ class ApplicationController < ActionController::Base
   end
 
   #_status is mostly important for the json responses, default is 400 (Bad Request)
-  def error(notice, _message, _status=400)
+  def error(notice, message, status=400)
     flash[:error] = notice
     respond_to do |format|
       format.html { redirect_to root_url }
-      format.json { render json: { errors: [{ title: notice, detail: _message }] }, status:  _status }
-
+      format.json { render json: { errors: [{ title: notice, detail: message }] }, status:  status }
     end
   end
 
@@ -227,7 +200,6 @@ class ApplicationController < ActionController::Base
       respond_to do |format|
         flash[:error] = "The #{name.humanize} does not exist!"
         format.rdf { render plain: 'Not found', status: :not_found }
-        format.xml { render xml: '<error>404 Not found</error>', status: :not_found }
         format.json { render json: { errors: [{ title: 'Not found',
                                                 detail: "Couldn't find #{name.camelize} with 'id'=[#{params[:id]}]" }] },
                              status: :not_found }
@@ -266,7 +238,6 @@ class ApplicationController < ActionController::Base
           end
         end
         format.rdf { render plain: "You may not #{privilege} #{name}:#{params[:id]}", status: :forbidden }
-        format.xml { render plain: "<error>You may not #{privilege} #{name}:#{params[:id]}</error>", status: :forbidden }
         format.json { render json: { errors: [{ title: 'Forbidden',
                                                 details: "You may not #{privilege} #{name}:#{params[:id]}" }] },
                              status: :forbidden }
@@ -295,7 +266,6 @@ class ApplicationController < ActionController::Base
       end
 
       format.rdf { render plain: 'Not found', status: :not_found }
-      format.xml { render xml: '<error>404 Not found</error>', status: :not_found }
       format.json { render json: { errors: [{ title: 'Not found', detail: e.message }] }, status: :not_found }
     end
     false
@@ -331,7 +301,7 @@ class ApplicationController < ActionController::Base
     return (params.has_key?(:view) && params[:view]!="default")||
       (!params.has_key?(:view) && session.has_key?(:view) && !session[:view].nil? && session[:view]!="default")
   end
-  
+
   helper_method :is_condensed_view
 
 
@@ -397,7 +367,7 @@ class ApplicationController < ActionController::Base
                              data: activity_loggable.title)
         end
       when *Seek::Util.authorized_types.map { |t| t.name.underscore.pluralize.split('/').last } + ["sample_types"] # TODO: Find a nicer way of doing this...
-        action = 'create' if action == 'upload_for_tool' || action == 'create_metadata' || action == 'create_from_template'
+        action = 'create' if action == 'create_metadata' || action == 'create_from_template'
         action = 'update' if action == 'create_version'
         action = 'inline_view' if action == 'explore'
         if %w(show create update destroy download inline_view).include?(action)
@@ -494,8 +464,8 @@ class ApplicationController < ActionController::Base
 #    }
 #  end
 
-  def policy_params
-    params.slice(:policy_attributes).permit(
+  def policy_params(parameters=params)
+    parameters.slice(:policy_attributes).permit(
         policy_attributes: [:access_type,
                             { permissions_attributes: [:access_type,
                                                        :contributor_type,
@@ -548,8 +518,8 @@ class ApplicationController < ActionController::Base
 
   def json_api_errors(object)
     hash = { errors: [] }
-    hash[:errors] = object.errors.map do |attribute, message|
-      segments = attribute.to_s.split('.')
+    hash[:errors] = object.errors.map do |error|
+      segments = error.attribute.to_s.split('.')
       attr = segments.first
       if !['content_blobs', 'policy'].include?(attr) && object.class.reflect_on_association(attr)
         base = '/data/relationships'
@@ -559,7 +529,7 @@ class ApplicationController < ActionController::Base
 
       {
           source: { pointer: "#{base}/#{attr}" },
-          detail: "#{segments[1..-1].join(' ') + ' ' if segments.length > 1}#{message}"
+          detail: "#{segments[1..-1].join(' ') + ' ' if segments.length > 1}#{error.message}"
       }
     end
 
@@ -646,7 +616,41 @@ class ApplicationController < ActionController::Base
   # Stop hosted user content from running scripts etc.
   def secure_user_content
     if self.class.user_content_actions.include?(action_name.to_sym)
-      response.set_header('Content-Security-Policy', "default-src 'self'")
+      response.set_header('Content-Security-Policy', USER_CONTENT_CSP)
     end
+  end
+
+  def check_displaying_single_page
+    if params[:single_page]
+      @single_page = true
+    end
+  end
+
+  def displaying_single_page?
+    @single_page || false
+  end
+
+  helper_method :displaying_single_page?
+
+  def display_isa_graph?
+    !displaying_single_page?
+  end
+
+  helper_method :display_isa_graph?
+
+
+  def creator_related_params
+    [:other_creators,
+     # For directly assigning SEEK people (API):
+     { creator_ids: [] },
+     # For directly setting SEEK and non-SEEK people (API):
+     { api_assets_creators: [:creator_id, :given_name,
+                             :family_name, :affiliation,
+                             :orcid, :pos] },
+     # For incrementally adding, removing, modifying  SEEK and non-SEEK people (UI):
+     { assets_creators_attributes: [:id, :creator_id, :given_name,
+                                    :family_name, :affiliation,
+                                    :orcid, :pos, :_destroy] }
+    ]
   end
 end

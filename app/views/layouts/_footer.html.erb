@@ -12,14 +12,19 @@
         </div>
         <% cache cache_name, skip_digest: true do -%>
           <div class="ft-info">
-            <% if Seek::Config.dm_project_link != Seek::Config.project_link %>
-                <%= link_to "About #{Seek::Config.dm_project_name}", Seek::Config.dm_project_link, :target => '_blank' %> |
+            <% if (Seek::Config.instance_admins_link != Seek::Config.instance_link) && (Seek::Config.instance_admins_name != Seek::Config.instance_name) %>
+                <%= link_to "About #{Seek::Config.instance_admins_name}", Seek::Config.instance_admins_link, :target => '_blank' %> |
             <% end %>
-            <%= link_to Seek::Config.project_name, Seek::Config.project_link, :target => '_blank' %> |
+            <%= link_to "About #{Seek::Config.instance_name}", Seek::Config.instance_link, :target => '_blank' %> |
             <% if logged_in_and_registered? %>
                 <%= link_to 'Provide feedback', feedback_home_path -%> |
             <% end %>
-            <%= link_to 'Funding and Programmes', funding_home_path -%> |
+            <%= link_to 'Funding and Programmes', funding_home_path -%> | 
+            <% if !Seek::Config.funding_link.blank? %>
+              <a href="<%=Seek::Config.funding_link%>" target="_blank">
+                <%=Seek::Config.funding_link%>
+              </a> |
+            <% end %>
             <%= link_to 'Credits', Seek::Help::HelpDictionary.instance.help_link(:credits), :target => '_blank' -%>
             <% if Seek::Config.terms_enabled %>
                 | <%= link_to("Terms & Conditions", terms_home_path) %>
@@ -30,9 +35,16 @@
             <% if Seek::Config.imprint_enabled %>
                 | <%= link_to("Imprint", imprint_home_path) %>
             <% end %>
+            <% if !Seek::Config.cite_link.blank? %>
+              | <%= link_to "Cite us", Seek::Config.cite_link, :target => '_blank' -%>
+            <% end %>
+            <% if !Seek::Config.contact_link.blank? %>
+              | <%= link_to "Contact us", Seek::Config.contact_link, :target => '_blank' -%>
+            <% end %>
+
           </div>
           <div class="ft-info">
-            Copyright &copy; 2008 - 2021
+            Copyright &copy; 2008 - 2022
             <%= link_to "The University of Manchester", "http://www.manchester.ac.uk/", :target => '_blank' %> and
             <%= link_to "HITS gGmbH", "http://www.h-its.org/", :target => '_blank' %>
             <% if Seek::Config.copyright_addendum_enabled  %>
@@ -42,4 +54,3 @@
         <% end -%>
       </div>
     </div>
-

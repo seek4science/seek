@@ -70,7 +70,7 @@ class SnapshotTest < ActiveSupport::TestCase
     old_description = @investigation.description
     snapshot = @investigation.create_snapshot
 
-    @investigation.update_attributes(title: 'New title', description: 'New description')
+    @investigation.update(title: 'New title', description: 'New description')
 
     assert_equal 'New title', @investigation.title
     assert_equal 'New description', @investigation.description

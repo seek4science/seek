@@ -12,15 +12,6 @@
    avatar_content = avatar_partial.blank? ? nil : render(:partial=> avatar_partial,:locals=>{:resource => resource})
 
    access_based_css_class = "list_item"
-   if Seek::Config.is_virtualliver
-     access_based_css_class += if resource.respond_to?(:private?) && resource.private?
-                                               " private_list_item"
-                                             elsif resource.respond_to?(:public?) && resource.public?
-                                               " public_list_item"
-                                             else
-                                               ""
-                                             end
-   end
 
    content_grid_size = 9
    content_grid_size += 1 if avatar_content.blank?
@@ -56,8 +47,14 @@
               <% if column == 'creators'%>
                 <%= list_item_person_list resource.creators %>
               <% elsif column == 'projects'  && ![Event, Person, Project, Institution, Programme, Collection].include?(resource.class)%>
-                <b> Project: </b>
+                <b>Project:</b>
                 <%= resource.projects.uniq.map {|p| link_to p.title, p }.join(', ').html_safe %>
+              <% elsif column == "assay_type_uri"%>
+                <b><%= resource.is_modelling? ? "Biological problem addressed" : "#{t('assays.assay')} type" -%>:</b>
+                <%= link_to_assay_type(resource) %>
+              <% elsif column == "technology_type_uri"%>
+                <b>Technology type:</b>
+                <%= link_to_technology_type(resource) %>
               <% else %>
                 <b><%= t(column, default: column.to_s).titleize %>: </b>
                 <%= text_or_not_specified(resource.send(column),length: 300, auto_link: true, none_text: "") %>

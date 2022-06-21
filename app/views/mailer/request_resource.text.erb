@@ -1,7 +1,7 @@
 <% controller=@resource.class.name.underscore.pluralize -%>
 Hi <%= @owners.collect{|o| o.name}.join(", ") -%>,
 
-    The <%= Seek::Config.application_name %> user <%= @requester.name -%>, <%= person_url(@requester) -%>, has requested access to the file "<%= @resource.title -%>": <%= url_for(:action=>:show,:controller=>controller,:id=>@resource, :only_path => false) -%>.
+    The <%= Seek::Config.instance_name %> user <%= @requester.name -%>, <%= person_url(@requester) -%>, has requested access to the file "<%= @resource.title -%>": <%= url_for(:action=>:show,:controller=>controller,:id=>@resource, :only_path => false) -%>.
 
     This file is currently not downloadable by <%= @requester.first_name.capitalize -%> according to the sharing permissions. You can modify permissions for individual people using the Custom Sharing Permissions when managing the file.
 
@@ -15,4 +15,4 @@ Hi <%= @owners.collect{|o| o.name}.join(", ") -%>,
 
     This is an automated email.
 
-- <%= Seek::Config.dm_project_name %> Team
+- <%= Seek::Config.instance_admins_name %> Team

@@ -43,7 +43,7 @@ class WorkflowClassTest < ActiveSupport::TestCase
   test 'assigns unique keys' do
     c1 = WorkflowClass.create!(title: 'Custom Type')
     c2 = WorkflowClass.create!(title: 'Custom  Type')
-    c3 = WorkflowClass.create!(title: 'Custom type')
+    c3 = WorkflowClass.create!(title: 'Custom   type')
 
     assert c1.key.present?
     assert c2.key.present?

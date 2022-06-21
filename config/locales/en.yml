@@ -5,7 +5,7 @@ en:
   seek_id: "SEEK ID"
 
   login:
-    elixir_aai: 'ELIXIR AAI'
+    elixir_aai: 'LS Login'
     ldap: 'LDAP'
     github: 'GitHub'
 
@@ -16,6 +16,10 @@ en:
     assay: "Assay"
     experimental_assay: "Experimental assay"
     modelling_analysis:  "Modelling analysis"
+
+  isa_study: "ISA Study"  
+  study_design: "Study Design"
+  isa_assay: "ISA Assay"
 
   data_file: "Data file"
   discipline: "Discipline"
@@ -34,16 +38,18 @@ en:
       files: 'Upload/Import Files'
       git: 'Import Git Repository'
       ro_crate: 'Upload/Import Workflow RO-Crate'
-  node: "Workflow Node"
-  nodes:
-    node: "Workflow Node"
   publication: "Publication"
   presentation: "Presentation"
   event: "Event"
+  file_template: "File Template"
+  placeholder: "Placeholder"
   collection: "Collection"
+  collections:
+    info_text: "A collection is a group of items that are conceptually related to each other."
 
   sample: "Sample"
   sample_type: "Sample type"
+  template: "Template"
   strain: "Strain"
   scale: "Scale"
   organism: "Organism"
@@ -53,9 +59,13 @@ en:
   project: "Project"
   institution: "Institution"
   programme: "Programme"
-  profile: "Profile"
   avatar: "Avatar"
   private_asset: 'Hidden item'
+
+  openbis_endpoint: "OpenBis endpoint"
+
+  samples:
+    pid_info_text: 'The identifier assigns a unique and unequivocal meaning to the attribute name.'
 
   gadget:
     new_heading: "New or upload"
@@ -108,6 +118,11 @@ en:
   project_administrator: 'Project administrator'
   pal: 'PAL'
   programme_administrator: 'Programme administrator'
+  admin: 'Admin'
+
+  roles:
+    scopes:
+      system: 'System'
 
   contributor: 'submitter' # A person who submitted the resource to SEEK
   contribution: 'submission'
@@ -118,11 +133,23 @@ en:
 
   null_license: 'No license - no permission to use unless the owner grants a licence'
 
+  licenses:
+    other: 'Other'
+    recommended: 'Suggested'
+
   attributes: # Applies to attributes for any model
+    other_creators: Additional credit
     ro_crate: RO-Crate
     abstract_cwl: "Abstract CWL"
 
   activerecord:
+    errors:
+      template:
+        header:
+          one: "1 error prohibited this %{model} from being saved"
+          other: "%{count} errors prohibited this %{model} from being saved"
+        # The variable :count is also available
+        body: "There were problems with the following fields:"
     models:
       workflow_class: Workflow Type
     attributes:
@@ -179,3 +206,5 @@ you can choose to have a %{project} linked to a site managed %{programme} instea
   Alternatively, if you are unable to use the %{issue_tracker_link}, or the issue is of a private nature, then you can use the %{feedback_link}.
   <p>'
 
+  controlled_vocabs:
+    add_new_term_disabled_reason: "You are unable to add new terms when linked to an Ontology"

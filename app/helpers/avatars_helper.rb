@@ -19,7 +19,7 @@ module AvatarsHelper
     if return_image_tag_only
       img
     else
-      url ||= polymorphic_url(object)
+      url ||= polymorphic_path(object)
       link_to(img, url, 'data-tooltip' => tooltip(tooltip_text))
     end
   end

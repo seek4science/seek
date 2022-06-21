@@ -1,3 +1,5 @@
+<% object ||= nil %>
+
 <%= f.error_messages -%>
 
 <div class="form-group">
@@ -11,14 +13,22 @@
 </div>
 
 <%= render partial: 'custom_metadata/custom_metadata_type_selection', locals:{f:f, resource:@investigation} %>
+<div class="<%= "hidden" if displaying_single_page? %>">
+  <%= render :partial => 'projects/project_selector', :locals => {:resource => @investigation,:allow_nil=>false} if show_form_manage_specific_attributes? -%>
+</div>
 
-<%= render :partial => 'projects/project_selector', :locals => {:resource => @investigation,:allow_nil=>false} if show_form_manage_specific_attributes? -%>
+<div class="form-group">
+  <%= f.label "Investigation position" -%><br/>
+  <%= f.number_field :position, :rows => 5, :class=>"form-control"  -%>
+</div>
 
 <%= render partial: 'custom_metadata/custom_metadata_attribute_input', locals:{f:f,resource:@investigation} %>
 
-<%= render :partial => "scales/scales_selector",:locals=>{:object=>@investigation} if show_scales? %>
+<% if displaying_single_page?%>
+  <input name="single_page" type="hidden" value=<%=params[:single_page]%> />
+<% end %>
 
-<%= render partial: 'assets/manage_specific_attributes', locals:{f:f} if show_form_manage_specific_attributes? %>
+<%= render partial: 'assets/manage_specific_attributes', locals:{f:f, :object => object} if show_form_manage_specific_attributes? %>
 
 <%= f.fancy_multiselect :publications, { other_projects_checkbox: true } %>
 
@@ -27,3 +37,13 @@
 <!-- custom metadata experiment end -->
 
 <%= form_submit_buttons(@investigation) %>
+
+<script>
+    $j(document).ready(function () {   
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        const params = Object.fromEntries(urlSearchParams.entries());
+        const project_id = params["investigation[project_id]"]
+        if(project_id)
+          $j("#projects-selector-select").val(project_id).change();
+    }); 
+</script>

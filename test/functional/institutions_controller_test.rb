@@ -4,14 +4,9 @@ class InstitutionsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
 
   def setup
     login_as(:quentin)
-  end
-
-  def rest_api_test_object
-    @object = institutions(:ebi_inst)
   end
 
   def test_title
@@ -212,19 +207,13 @@ class InstitutionsControllerTest < ActionController::TestCase
     assert_equal person.user, log.culprit
   end
 
-  def edit_max_object(inst)
-    for i in 1..5 do
-      Factory(:person).add_to_project_and_institution(Factory(:project), inst)
-    end
-    add_avatar_to_test_object(inst)
-  end
-
   test 'should create with discussion link' do
     person = Factory(:admin)
     login_as(person)
     assert_difference('AssetLink.discussion.count') do
       assert_difference('Institution.count') do
         post :create, params: { institution: { title: 'test',
+                                               country: 'TH',
                                                discussion_links_attributes: [{url: "http://www.slack.com/"}]}, }
       end
     end

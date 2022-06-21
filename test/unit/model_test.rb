@@ -53,7 +53,6 @@ class ModelTest < ActiveSupport::TestCase
   end
 
   test 'content blob search terms' do
-    check_for_soffice
     m = Factory :teusink_model
     m.content_blobs << Factory.create(:doc_content_blob, original_filename: 'word.doc', asset: m, asset_version: m.version)
     m.reload
@@ -134,10 +133,6 @@ class ModelTest < ActiveSupport::TestCase
 
   end
 
-  test 'sort by updated_at' do
-    assert_equal Model.all.sort_by { |m| m.updated_at.to_i * -1 }, Model.all
-  end
-
   test 'validation' do
     asset = Model.new title: 'fred', projects: [projects(:sysmo_project)], policy: Factory(:private_policy)
     assert asset.valid?
@@ -145,11 +140,6 @@ class ModelTest < ActiveSupport::TestCase
     asset = Model.new projects: [projects(:sysmo_project)], policy: Factory(:private_policy)
     assert !asset.valid?
 
-    # VL only: allow no projects
-    as_virtualliver do
-      asset = Model.new title: 'fred', policy: Factory(:private_policy)
-      assert asset.valid?
-    end
   end
 
   test 'is asset?' do

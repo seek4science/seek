@@ -1,0 +1,51 @@
+<% assay ||= nil %>
+<% valid_assay = assay && !assay.sample_type.blank? && assay&.sample_type %>
+
+<div style="padding: 0 20px 20px 20px;">
+    <div class="row" id="options_container" style="margin-bottom:15px">
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <table class="table table-striped table-bordered display nowrap" id="assay-table" style="width:100%;"></table>
+        </div>
+    </div>
+</div>
+
+<% if valid_assay %>
+    <script>
+        var assayDynamicTable
+        let initialLoad = true;
+        $j(document).ready(function () {
+            const dt = <%= sanitize(dt_aggregated(assay.study, false, assay).to_json) %>
+            assayDynamicTable = new $j.dynamicTable('#assay-table')
+            const ajax = {
+								url: dynamicTableDataPath,
+                data: function(d) {
+                    if (initialLoad) {
+                        initialLoad = false;
+                        return;
+                    }
+                    d.study_id = '<%=assay.study.id%>';
+                    d.include_all_assays = 'false';
+                    d.assay_id = '<%=assay.id%>';
+                    d.rows_pad = "true";
+                }
+            }
+            assayDynamicTable.init(dt.rows, dt.columns, { readonly: true, ajax })
+            const types = assayDynamicTable.getSampleTypes()
+            createSampleTypeOptions(types)
+        });	
+        
+        function createSampleTypeOptions(types){
+            types.forEach( t => {
+                const input = `<div style="display:inline-block"><input style="padding:3px" checked type="checkbox" id="checkbox-${t}" onClick="toggleSampleType(${t}, $j(this))"> <label style="margin-right:10px" for="checkbox-${t}">sample type ${t}</label> <div/>`
+                $j("#options_container").append(input)
+            })
+        }
+
+        function toggleSampleType(sample_type, e){
+            assayDynamicTable.toggleSampleType(sample_type, e.is(":checked"))
+        }
+
+    </script>
+<% end %>

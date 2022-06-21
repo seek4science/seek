@@ -4,17 +4,12 @@ class StudiesControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
   include GeneralAuthorizationTestCases
 
   def setup
     login_as Factory(:admin).user
-  end
-
-  def rest_api_test_object
-    @object = Factory :study, policy: Factory(:public_policy)
   end
   
   test 'should get index' do
@@ -456,7 +451,7 @@ class StudiesControllerTest < ActionController::TestCase
 
     get :show, params: { id: study.id }
     assert_response :success
-    assert_select 'li.author-list-item', text: 'frodo baggins'
+    assert_select '#author-box .additional-credit', text: 'frodo baggins', count: 1
   end
 
   test 'should not multiply creators after calling show' do
@@ -491,10 +486,6 @@ class StudiesControllerTest < ActionController::TestCase
       assert_select 'a[href=?]', study_path(study), text: study.title
       assert_select 'a[href=?]', study_path(study2), text: study2.title, count: 0
     end
-  end
-
-  def edit_max_object(study)    
-    add_creator_to_test_object(study)
   end
 
   test 'can delete a study with subscriptions' do
@@ -617,7 +608,7 @@ class StudiesControllerTest < ActionController::TestCase
     #no sharing link, not for Investigation, Study and Assay
     assert_select 'div#temporary_links', count:0
 
-    assert_select 'div#author_form', count:1
+    assert_select 'div#author-form', count:1
   end
 
   test 'cannot access manage page with edit rights' do
@@ -927,4 +918,57 @@ class StudiesControllerTest < ActionController::TestCase
     assert_empty study.discussion_links
   end
 
+  test 'study needs more than one assay for ordering' do
+    person = Factory(:admin)
+    login_as(person)
+    study = Factory(:study,
+                            policy: Factory(:public_policy),
+                            contributor: person)
+    get :show, params: { id: study.id }
+    
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_assays_study_path(study), count: 0
+
+    study.assays += [Factory(:assay,
+                                      policy: Factory(:public_policy),
+                                      contributor: person)]
+    get :show, params: { id: study.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_assays_study_path(study), count: 0
+
+    study.assays +=  [Factory(:assay,
+                                      policy: Factory(:public_policy),
+                                      contributor: person)]
+    get :show, params: { id: study.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_assays_study_path(study), count: 1
+  end
+
+  test 'ordering only by editor' do
+    person = Factory(:admin)
+    login_as(person)
+    study = Factory(:study,
+                            policy: Factory(:all_sysmo_viewable_policy),
+                            contributor: person)
+    study.assays += [Factory(:assay,
+                                      policy: Factory(:public_policy),
+                                      contributor: person)]
+    study.assays += [Factory(:assay,
+                                      policy: Factory(:public_policy),
+                                      contributor: person)]
+    get :show, params: { id: study.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_assays_study_path(study), count: 1
+
+    login_as(:aaron)
+    get :show, params: { id: study.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_assays_study_path(study), count: 0
+  end
+ 
 end

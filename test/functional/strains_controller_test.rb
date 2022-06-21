@@ -4,17 +4,12 @@ class StrainsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include RdfTestCases
   include GeneralAuthorizationTestCases
   include HtmlHelper
 
   def setup
     login_as :owner_of_fully_public_policy
-  end
-
-  def rest_api_test_object
-    @object = Factory(:strain, organism_id: Factory(:organism, bioportal_concept: Factory(:bioportal_concept)).id)
   end
 
   test 'should get index' do
@@ -358,7 +353,7 @@ class StrainsControllerTest < ActionController::TestCase
     # should be a temporary sharing link
     assert_select 'div#temporary_links', count:0
 
-    assert_select 'div#author_form', count:0
+    assert_select 'div#author-form', count:0
   end
 
   test 'cannot access manage page with edit rights' do

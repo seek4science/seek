@@ -1,18 +1,13 @@
 # Collection
 Factory.define(:collection) do |f|
   f.title 'An empty collection'
-  f.association :contributor, factory: :person
-
-  f.after_build do |collection|
-    collection.projects = [collection.contributor.projects.first] if collection.projects.empty?
-  end
+  f.with_project_contributor
 end
 
 Factory.define(:populated_collection, parent: :collection) do |f|
   f.title 'A collection'
 
   f.after_build do |collection|
-    collection.projects = [collection.contributor.projects.first] if collection.projects.empty?
     collection.items.build(asset: Factory(:public_document))
   end
 end
@@ -47,8 +42,27 @@ Factory.define(:max_collection, class: Collection) do |f|
         Factory(:collection_item, comment: 'Data 2', collection: c, asset: Factory(:data_file, policy: Factory(:public_policy), title: 'Data 2')),
         Factory(:collection_item, comment: 'Bad data', collection: c, asset: Factory(:data_file, policy: Factory(:private_policy), title: 'Readme'))
     ]
+    c.annotate_with(['Collection-tag1', 'Collection-tag2', 'Collection-tag3', 'Collection-tag4', 'Collection-tag5'], 'tag', c.contributor)
+    c.save!
   end
   f.other_creators 'Joe Bloggs'
+  f.assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
+end
+
+Factory.define(:collection_with_all_types, parent: :public_collection) do |f|
+  f.after_create do |c|
+    c.items = [
+      Factory(:collection_item, comment: 'its a data_file', collection: c, asset: Factory(:data_file, policy: Factory(:public_policy))),
+      Factory(:collection_item, comment: 'its a sop', collection: c, asset: Factory(:sop, policy: Factory(:public_policy))),
+      Factory(:collection_item, comment: 'its a model', collection: c, asset: Factory(:model, policy: Factory(:public_policy))),
+      Factory(:collection_item, comment: 'its a document', collection: c, asset: Factory(:document, policy: Factory(:public_policy))),
+      Factory(:collection_item, comment: 'its a publication', collection: c, asset: Factory(:publication)),
+      Factory(:collection_item, comment: 'its a presentation', collection: c, asset: Factory(:presentation, policy: Factory(:public_policy))),
+      Factory(:collection_item, comment: 'its a sample', collection: c, asset: Factory(:sample, policy: Factory(:public_policy))),
+      Factory(:collection_item, comment: 'its a event', collection: c, asset: Factory(:event, policy: Factory(:public_policy))),
+      Factory(:collection_item, comment: 'its a workflow', collection: c, asset: Factory(:workflow, policy: Factory(:public_policy)))
+    ]
+  end
 end
 
 # CollectionItem

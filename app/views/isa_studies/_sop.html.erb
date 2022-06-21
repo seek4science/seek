@@ -1,0 +1,36 @@
+<% study ||= nil %>
+<% sop = study ? study.sop : nil %>
+
+<% if sop %>
+    <div style="padding: 20px;">
+        <div class="row">
+            <div class="col-12">
+                <%= render :partial => "general/item_title",:locals => {:item => sop, :version => sop.version} -%>
+                <p>
+                    <b>Description:</b>
+                    <%= sop.description %>
+                </p>
+                <p>
+                    <b>Link:</b>
+                    <%
+                        link_text = sop.content_blob.url
+                        link_text = truncate(link_text,:length=>550) if sop.content_blob.asset.respond_to?(:content_blobs)
+                    %>
+                    <%= link_to link_text, sop.content_blob.url, :target=>"_blank" -%>
+                </p>
+                <p>
+                    <b>File name:</b>
+                    <%= sop.content_blob.original_filename %>
+                </p>
+                <p>
+                    <b>Format:</b>
+                    <%= sop.content_blob.human_content_type %>
+                </p>
+                <p>
+                    <b>Version:</b>
+                    <%= sop.version %>
+                </p>
+            </div>
+        </div>
+    </div>
+<% end %>

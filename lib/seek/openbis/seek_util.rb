@@ -2,7 +2,7 @@ module Seek
   module Openbis
     # An ugly util class that contains most of the OpenBIS to SEEK logic.
     # could not think how to spread the code better, as Experiments registration may involve Sample registration
-    # and data files registration ... so all is in one bag. The contrrollers have very similar behaviour but still
+    # and data files registration ... so all is in one bag. The controllers have very similar behaviour but still
     # they are not exactly same.
     # On bright side, this logic can be tested without using the whole rails app internals
     class SeekUtil
@@ -130,8 +130,13 @@ if automatic synchronization was selected.'}
 
       def extract_err_message(exception)
         if exception.is_a? Fairdom::OpenbisApi::OpenbisQueryException
-          return 'Cannot connect to the OpenBIS server' if exception.message && exception.message.include?('java.net.ConnectException')
-          return 'Cannot access OpenBIS: Invalid username or password' if exception.message && exception.message.include?('Invalid username or password')
+
+          errorMessage = exception.message
+          if (exception.message["[MESSAGE]"] && exception.message["[/MESSAGE]"])
+            errorMessage = exception.message.split("[MESSAGE]").last.split("[/MESSAGE]").first
+          end
+          return 'Cannot connect to the OpenBIS server. Error given:' + errorMessage if exception.message && exception.message.include?('java.net.ConnectException')
+          return 'Cannot access OpenBIS: Invalid username or password. Error given:' + errorMessage if exception.message && exception.message.include?('Invalid username or password')
         end
 
         exception.class.to_s
@@ -233,10 +238,9 @@ if automatic synchronization was selected.'}
                    user = p.user
                    p
                  else
-                   raise "Cannot add new entities unsuported current_user type #{user.class}"
+                   raise "Cannot add new entities unsupported current_user type #{user.class}"
                  end
 
-        raise 'Cannot add new entities with guest current_user' if user.guest?
         person
       end
 
@@ -441,6 +445,8 @@ if automatic synchronization was selected.'}
 
         Seek::Openbis::EntityType.ExperimentType(openbis_endpoint).find_by_codes(study_codes)
       end
+
+      
     end
   end
 end

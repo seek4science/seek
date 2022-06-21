@@ -103,8 +103,8 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
         assert_no_difference('Task.count') do
           post create_from_files_workflows_path, params: {
               ro_crate: {
-                main_workflow: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl', 'text/plain') },
-                diagram: { data: fixture_file_upload('files/file_picture.png', 'image/png') }
+                main_workflow: { data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl', 'text/plain') },
+                diagram: { data: fixture_file_upload('file_picture.png', 'image/png') }
               },
               workflow_class_id: cwl.id
           } # Should go to metadata page...
@@ -166,7 +166,7 @@ class GitWorkflowCreationTest < ActionDispatch::IntegrationTest
       assert_difference('Git::Repository.count', 1) do
         assert_no_difference('Task.count') do
           post create_from_ro_crate_workflows_path, params: {
-              ro_crate: { data: fixture_file_upload('files/workflows/ro-crate-nf-core-ampliseq.crate.zip', 'application/zip') }
+              ro_crate: { data: fixture_file_upload('workflows/ro-crate-nf-core-ampliseq.crate.zip', 'application/zip') }
           } # Should go to metadata page...
         end
       end

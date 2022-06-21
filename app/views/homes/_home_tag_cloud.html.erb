@@ -1,0 +1,17 @@
+<div id="home_tag_cloud_home">
+  <% cache('tag_cloud') do %>
+    <% tags = tags_above_threshold %>
+    <%= render :partial => "tags/tag_cloud",
+               :locals => { tags: tags,
+                            no_tags_text: 'There are not yet any tags defined'
+               }
+    %>
+
+    <% if tags.any? %>
+      <div style="font-size:small; text-align: center"><%= link_to('(Show all)', all_anns_path) %></div>
+    <% end %>
+  <% end %>
+</div>
+
+
+

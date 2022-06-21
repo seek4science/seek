@@ -1,6 +1,4 @@
 class SearchController < ApplicationController
-  include Seek::FacetedBrowsing
-
   class InvalidSearchException < RuntimeError; end
 
   api_actions :index
@@ -21,26 +19,12 @@ class SearchController < ApplicationController
       end
     end
 
-    if Scale.any?
-      @scale_key = search_params[:scale] || 'all'
-      unless @scale_key == 'all'
-        @results.each do |type, results|
-          klass = type.constantize
-          if klass.reflect_on_association(:scales)
-            @results[type] = results.joins(:scales).where(scales: { key: @scale_key })
-          end
-        end
-      end
-    end
-
     matches = @results.values.sum(&:count) + @external_results.count
     if matches.zero?
       flash.now[:notice]="No matches found for '<b>#{@search_query}</b>'.".html_safe
     else
       flash.now[:notice]="#{matches} #{matches==1 ? 'item' : 'items'} matched '<b>#{@search_query}</b>' within their title or content.".html_safe
     end
-
-    view_context.ie_support_faceted_browsing? if Seek::Config.faceted_search_enabled
 
     respond_to do |format|
       format.html
@@ -96,6 +80,6 @@ class SearchController < ApplicationController
   private
 
   def search_params
-    params.permit(:search_type, :q, :search_query, :include_external_search, :scale)
+    params.permit(:search_type, :q, :search_query, :include_external_search)
   end
 end

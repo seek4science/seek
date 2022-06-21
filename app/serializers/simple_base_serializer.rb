@@ -25,6 +25,7 @@ class SimpleBaseSerializer < ActiveModel::Serializer
       {}
            end
     meta[:api_version] = ActiveModel::Serializer.config.api_version
+    meta[:base_url] = base_url
     meta
   end
 
@@ -37,27 +38,5 @@ class SimpleBaseSerializer < ActiveModel::Serializer
     end
     tags.sort!
     tags
-  end
-
-  def attributes(*args)
-    hash = super
-    hash.each do |key, value|
-      if !(value.equal? false)
-        hash[key] = value.presence
-      end
-    end
-    hash
-  end
-
-  # def serializable_hash(adapter_options = nil, options = {}, adapter_instance = self.class.serialization_adapter_instance)
-  #   hash = super
-  #   hash.each do |key, value|
-  #     hash[key] = value.presence
-  #   end
-  #   hash
-  # end
-
-  def to_json(options = {})
-    super
   end
 end

@@ -3,32 +3,25 @@ module Seek
   # Convention to create a new fallback is to name the method <setting_name>_fallback
   module Fallbacks
     # fallback attributes
-    def project_long_name_fallback
-      if project_type.blank?
-        project_name.to_s
-      else
-        "#{project_name} #{project_type}"
-      end
-    end
 
-    def dm_project_name_fallback
-      project_name
+    def instance_admins_name_fallback
+      instance_name
     end
     
-    def dm_project_link_fallback
-      project_link
+    def instance_admins_link_fallback
+      instance_link
     end
 
     def application_name_fallback
-      "#{project_name} SEEK"
+      "#{instance_name} SEEK"
     end
 
     def header_image_link_fallback
-      dm_project_link
+      instance_admins_link
     end
 
     def header_image_title_fallback
-      dm_project_name
+      instance_admins_name
     end
   end
 
@@ -36,10 +29,7 @@ module Seek
   # Convention for creating a new propagator is to add a method named <setting_name>_propagate
   module Propagators
     def site_base_host_propagate
-      script_name = (SEEK::Application.config.relative_url_root || '/')
-      ActionMailer::Base.default_url_options = { host: host_with_port,
-                                                 protocol: host_scheme,
-                                                 script_name: script_name }
+      Rails.application.default_url_options = site_url_options
     end
 
     def smtp_propagate
@@ -106,7 +96,7 @@ module Seek
         SEEK::Application.config.middleware.use ExceptionNotification::Rack,
                                                 email: {
                                                   sender_address: [noreply_sender],
-                                                  email_prefix: "[ #{application_name} ERROR ] ",
+                                                  email_prefix: "[ #{instance_name} ERROR ] ",
                                                   exception_recipients: exception_notification_recipients.nil? ? [] : exception_notification_recipients.split(/[, ]/)
                                                 }
       else
@@ -235,10 +225,6 @@ module Seek
       value
     end
 
-    def facet_enable_for_page(controller)
-      facet_enable_for_pages.with_indifferent_access[controller.to_s]
-    end
-
     def sorting_for(controller)
       hash = sorting.with_indifferent_access
       hash[controller.to_s]&.to_sym
@@ -279,6 +265,24 @@ module Seek
       URI(Seek::Config.site_base_host).scheme
     end
 
+    # Includes trailing slash so it can be used to safely append subpaths, e.g.
+    # `Seek::Config.site_base_url.join('data_files')`
+    def site_base_url
+      uri = Addressable::URI.parse(Seek::Config.site_base_host)
+      uri.path = (Rails.application.config.relative_url_root || '').chomp('/') + '/'
+      uri
+    end
+
+    def site_url_options
+      u = URI.parse(site_base_host)
+      {
+        host: u.host,
+        port: u.port,
+        protocol: u.scheme,
+        script_name: (SEEK::Application.config.relative_url_root || '/')
+      }
+    end
+
     def write_attr_encrypted_key
       File.open(attr_encrypted_key_path, 'wb') do |f|
         f << SecureRandom.random_bytes(32)
@@ -288,18 +292,6 @@ module Seek
     def write_secret_key_base
       File.open(secret_key_base_path, 'w') do |f|
         f << SecureRandom.hex(64)
-      end
-    end
-
-    def soffice_available?(cached=false)
-      @@soffice_available = nil unless cached
-      begin
-        port = ConvertOffice::ConvertOfficeConfig.options[:soffice_port]
-        soc = TCPSocket.new('localhost', port)
-        soc.close
-        true
-      rescue
-        false
       end
     end
 
@@ -316,10 +308,11 @@ module Seek
     end
 
     def omniauth_elixir_aai_config
-      callback_path = '/identities/auth/elixir_aai/callback'
+      # Cannot use url helpers here because routes are not loaded at this point :( -Finn
+      callback_path = 'identities/auth/elixir_aai/callback'
 
       {
-          callback_path: callback_path,
+          callback_path: "#{Rails.application.config.relative_url_root}/#{callback_path}",
           name: :elixir_aai,
           scope: [:openid, :email],
           response_type: 'code',
@@ -327,11 +320,12 @@ module Seek
           discovery: false,
           send_nonce: true,
           client_signing_alg: :RS256,
+          # The following is obtained from: https://login.elixir-czech.org/oidc/jwk
           client_jwk_signing_key: '{"keys":[{"kty":"RSA","e":"AQAB","kid":"rsa1","alg":"RS256","n":"uVHPfUHVEzpgOnDNi3e2pVsbK1hsINsTy_1mMT7sxDyP-1eQSjzYsGSUJ3GHq9LhiVndpwV8y7Enjdj0purywtwk_D8z9IIN36RJAh1yhFfbyhLPEZlCDdzxas5Dku9k0GrxQuV6i30Mid8OgRQ2q3pmsks414Afy6xugC6u3inyjLzLPrhR0oRPTGdNMXJbGw4sVTjnh5AzTgX-GrQWBHSjI7rMTcvqbbl7M8OOhE3MQ_gfVLXwmwSIoKHODC0RO-XnVhqd7Qf0teS1JiILKYLl5FS_7Uy2ClVrAYd2T6X9DIr_JlpRkwSD899pq6PR9nhKguipJE0qUXxamdY9nw"}]}',
           client_options: {
               identifier: omniauth_elixir_aai_client_id,
               secret: omniauth_elixir_aai_secret,
-              redirect_uri: "#{site_base_host.chomp('/')}#{callback_path}",
+              redirect_uri: site_base_url.join(callback_path).to_s,
               scheme: 'https',
               host: 'login.elixir-czech.org',
               port: 443,
@@ -394,12 +388,13 @@ module Seek
 
     if use_db
       def get_value(setting, conversion = nil)
-        result = Settings.global.fetch(setting)
-        if result
-          val = result.value
+        val = Settings.defaults[setting.to_s]
+        if Thread.current[:use_settings_cache]
+          result = settings_cache[setting]
         else
-          val = Settings.defaults[setting.to_s]
+          result = Settings.global.fetch(setting)
         end
+        val = result.value if result
         val = val.send(conversion) if conversion && val
         val
       end
@@ -425,6 +420,16 @@ module Seek
       result = Settings.merge!(var, value)
       send "#{var}_propagate" if respond_to? "#{var}_propagate"
       result
+    end
+
+    # transfers a setting value from the old_name to the new_name setting value, for use when renaming a setting.
+    # Creates a new record for the new setting (if set), and cleans up and removes the old record. Ignores any defaults that are set
+    def transfer_value(old_name, new_name)
+      if old_value = Settings.global.get(old_name)
+        set_value(new_name,old_value)
+        Settings.destroy(old_name)
+      end
+      Settings.defaults.delete(old_name.to_s)
     end
 
     def setting(setting, options = {})
@@ -503,14 +508,36 @@ module Seek
       true
     end
 
-    def self.enabled_for_type?(type)
-      method = type.to_s.tableize + '_enabled'
-      if respond_to?(method)
-        send(method)
-      else
-        true
+    def self.enable_cache!
+      Thread.current[:use_settings_cache] = true
+    end
+
+    def self.disable_cache!
+      Thread.current[:use_settings_cache] = nil
+    end
+
+    def self.settings_cache
+      RequestStore.fetch(:config_cache) do
+        Rails.cache.fetch(cache_key, expires_in: 1.week) do
+          cache_setting = Thread.current[:use_settings_cache]
+          begin
+            hash = {}
+            disable_cache! # Disable cache whilst loading settings to prevent infinite loop via `attr_encrypted_key_path`
+            Settings.global.to_a.each { |s| hash[s.var] = s }
+            hash
+          ensure
+            Thread.current[:use_settings_cache] = cache_setting
+          end
+        end
       end
     end
 
+    def self.clear_cache
+      Rails.cache.delete(cache_key)
+    end
+
+    def self.cache_key
+      'seek_config'
+    end
   end
 end

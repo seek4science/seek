@@ -116,7 +116,7 @@ class AdminControllerTest < ActionController::TestCase
       assert_select '#address[value=?]', '255.255.255.255'
       assert_select '#domain[value=?]', 'email.example.com'
     end
-  end  
+  end
 
   test 'update visible tags and threshold' do
     Seek::Config.max_visible_tags = 2
@@ -177,6 +177,7 @@ class AdminControllerTest < ActionController::TestCase
     assert !quentin.is_admin?
     assert aaron.is_admin?
     assert aaron.is_admin?
+    assert User.current_user.person.is_admin?
   end
 
   test 'get project content stats' do
@@ -244,7 +245,7 @@ class AdminControllerTest < ActionController::TestCase
   end
 
   test 'update home page settings' do
-    refute_nil 'This is the home description', Seek::Config.home_description
+    refute_equal 'This is the home description', Seek::Config.home_description
     post :update_home_settings, params: { home_description: 'This is the home description', news_number_of_entries: '3', news_enabled: '1', news_feed_urls: 'http://fish.com, http://goats.com' }
 
     assert_equal 'This is the home description', Seek::Config.home_description
@@ -342,35 +343,35 @@ class AdminControllerTest < ActionController::TestCase
 
   test 'update branding' do
     assert_nil Seek::Config.header_image_avatar_id
-    settings = {project_name: 'project name', project_type: 'project type', project_description: 'project description', project_keywords: 'project,    keywords, ',
-                project_link: 'http://project-link.com',application_name: 'app name',
-                dm_project_name: 'dm project name', dm_project_link: 'http://dm-project-link.com', issue_tracker: 'https://issues-galore.com',
+    settings = {instance_name: 'instance name', instance_description: 'instance description', instance_keywords: 'instance,    keywords, ',
+                instance_link: 'http://project-link.com',
+                instance_admins_name: 'instance admins name', instance_admins_link: 'http://dm-project-link.com', issue_tracker: 'https://issues-galore.com',
                 header_image_link: 'http://header-link.com/image.jpg', header_image_title: 'header image title',
                 copyright_addendum_content: 'copyright content', imprint_description: 'imprint description',
                 terms_page: 'terms page', privacy_page: 'privacy page', about_page: 'about page',
-                header_image_file: fixture_file_upload('files/file_picture.png', 'image/png') }
+                about_instance_link_enabled: 1, about_instance_admins_link_enabled: 1,
+                header_image_file: fixture_file_upload('file_picture.png', 'image/png') }
 
     assert_difference('Avatar.count', 1) do
       post :update_rebrand, params: settings
     end
     assert_redirected_to admin_path
 
-    assert_equal 'project name', Seek::Config.project_name
-    assert_equal 'project type', Seek::Config.project_type
-    assert_equal 'project description', Seek::Config.project_description
-    assert_equal 'project, keywords', Seek::Config.project_keywords
-    assert_equal 'http://project-link.com', Seek::Config.project_link
-    assert_equal 'app name', Seek::Config.application_name
-    assert_equal 'dm project name', Seek::Config.dm_project_name
-    assert_equal 'http://dm-project-link.com', Seek::Config.dm_project_link
+    assert_equal 'instance name', Seek::Config.instance_name
+    assert_equal 'instance description', Seek::Config.instance_description
+    assert_equal 'instance, keywords', Seek::Config.instance_keywords
+    assert_equal 'http://project-link.com', Seek::Config.instance_link
+    assert_equal 'instance admins name', Seek::Config.instance_admins_name
+    assert_equal 'http://dm-project-link.com', Seek::Config.instance_admins_link
     assert_equal 'https://issues-galore.com', Seek::Config.issue_tracker
-    assert_equal 'http://header-link.com/image.jpg', Seek::Config.header_image_link
     assert_equal 'header image title', Seek::Config.header_image_title
     assert_equal 'copyright content', Seek::Config.copyright_addendum_content
     assert_equal 'imprint description', Seek::Config.imprint_description
     assert_equal 'terms page', Seek::Config.terms_page
     assert_equal 'privacy page', Seek::Config.privacy_page
     assert_equal 'about page', Seek::Config.about_page
+    assert Seek::Config.about_instance_link_enabled
+    assert Seek::Config.about_instance_admins_link_enabled
     assert Seek::Config.header_image_avatar_id > 0
   end
 
@@ -490,6 +491,33 @@ class AdminControllerTest < ActionController::TestCase
     new_value = []
     post :update_settings, params: {recommended_software_licenses: new_value}
     assert_nil Seek::Config.recommended_software_licenses
+  end
+
+  test 'publication fulltext enabled' do
+    with_config_value(:allow_publications_fulltext, false) do
+      post :update_settings, params: { allow_publications_fulltext: '1' }
+      assert_equal true, Seek::Config.allow_publications_fulltext
+    end
+    with_config_value(:allow_publications_fulltext, true) do
+      post :update_settings, params: { allow_publications_fulltext: '0' }
+      assert_equal false, Seek::Config.allow_publications_fulltext
+    end
+  end
+
+  test 'update session store timeout' do
+    with_config_value(:session_store_timeout, 10.minutes) do
+      get :settings
+
+      assert_response :success
+      assert_select 'input#session_store_timeout',value:'10'
+
+      post :update_settings, params: {session_store_timeout:'60'}
+      assert_equal 1.hour, Seek::Config.session_store_timeout
+
+      # ignores if not a valid integer
+      post :update_settings, params: {session_store_timeout:'fish'}
+      assert_equal 1.hour, Seek::Config.session_store_timeout
+    end
   end
 
 end

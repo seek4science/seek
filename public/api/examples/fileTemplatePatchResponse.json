@@ -1,0 +1,128 @@
+{
+  "data": {
+    "id": "8",
+    "type": "file_templates",
+    "attributes": {
+      "policy": {
+        "access": "download",
+        "permissions": [
+          {
+            "resource": {
+              "id": "93",
+              "type": "projects"
+            },
+            "access": "edit"
+          }
+        ]
+      },
+      "discussion_links": [
+
+      ],
+      "title": "A Maximal FileTemplate",
+      "license": "CC-BY-4.0",
+      "description": "This is the description",
+      "latest_version": 1,
+      "tags": [
+        "tag1",
+        "tag2"
+      ],
+      "versions": [
+        {
+          "version": 1,
+          "revision_comments": null,
+          "url": "http://localhost:3000/file_templates/8?version=1",
+          "doi": null
+        }
+      ],
+      "version": 1,
+      "revision_comments": null,
+      "created_at": "2022-06-07T14:12:33.000Z",
+      "updated_at": "2022-06-07T14:12:33.000Z",
+      "doi": null,
+      "content_blobs": [
+        {
+          "original_filename": "file-16",
+          "url": null,
+          "md5sum": "a980a58403f8d0e7e4bb89baf110eabd",
+          "sha1sum": "95b1b45f4153883ad94142a5220eff9f8d6c647d",
+          "content_type": "application/pdf",
+          "link": "http://localhost:3000/file_templates/8/content_blobs/34",
+          "size": 9
+        }
+      ],
+      "creators": [
+        {
+          "profile": "/people/88",
+          "family_name": "Last",
+          "given_name": "Person72",
+          "affiliation": "An Institution: 92",
+          "orcid": null
+        }
+      ],
+      "other_creators": "John Smith, Jane Smith",
+      "data_type": "http://edamontology.org/data_0006",
+      "format_type": "http://edamontology.org/format_1915"
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "88",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "87",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "87",
+            "type": "people"
+          },
+          {
+            "id": "88",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "93",
+            "type": "projects"
+          }
+        ]
+      },
+      "data_files": {
+        "data": [
+
+        ]
+      },
+      "placeholders": {
+        "data": [
+
+        ]
+      }
+    },
+    "links": {
+      "self": "/file_templates/8?version=1"
+    },
+    "meta": {
+      "created": "2022-06-07T14:12:33.000Z",
+      "modified": "2022-06-07T14:12:33.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "cc5ad350-c899-013a-0f7e-0a81884ed284"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

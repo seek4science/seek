@@ -1,0 +1,44 @@
+div.admin_tasks ul{
+  margin-bottom: 1em;
+  padding-left: 0.5em;
+  li{
+    margin-left: 1em;
+  }
+}
+
+table#storage-stats {
+  min-width: 55em;
+  border: 1px solid #222;
+
+  tr, td, th {
+    border: 1px solid #555;
+    padding: 5px 5px;
+  }
+
+  th.storage-name {
+    min-width: 40em;
+  }
+
+  tr.programme-storage-stat {
+    font-style: italic;
+    font-weight: bolder;
+  }
+
+  tr.project-storage-stat td:first-child {
+    padding-left: 2em;
+  }
+
+  thead {
+    font-weight: bolder;
+  }
+}
+
+label.admin-checkbox {
+    font-weight: bold
+}
+
+.additional_settings {
+  padding-left: 2em;
+  margin: 1em;
+  border-left: 1px solid #ddd;
+}

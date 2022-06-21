@@ -10,11 +10,11 @@ end
 
 # fix those pesky Ordinary or Partial differential equations
 if model_type = ModelType.find_by(title: 'Ordinary differential equations')
-  model_type.update_attributes(title: 'Ordinary differential equations (ODE)')
+  model_type.update(title: 'Ordinary differential equations (ODE)')
 end
 
 if model_type = ModelType.find_by(title: 'Partial differential equations')
-  model_type.update_attributes(title: 'Partial differential equations (PDE)')
+  model_type.update(title: 'Partial differential equations (PDE)')
 end
 
 puts "Seeded #{ModelType.count - count} model types"

@@ -11,9 +11,22 @@ module Ga4gh
 
           assert_response :success
           r = JSON.parse(@response.body)
-          assert_equal Seek::Config.application_name, r['name']
+          assert_equal Seek::Config.instance_name, r['name']
           assert_equal "mailto:#{Seek::Config.support_email_address}", r['contactUrl']
           assert_equal "test", r['environment']
+          assert_equal "localhost", r['id']
+        end
+
+        test 'should generate id based on application base url' do
+          with_config_value(:site_base_host, 'http://test.host') do
+            with_relative_root('/seek/123') do
+              get :service_info
+
+              assert_response :success
+              r = JSON.parse(@response.body)
+              assert_equal "host.test.seek.123", r['id']
+            end
+          end
         end
 
         test 'should get tool classes' do

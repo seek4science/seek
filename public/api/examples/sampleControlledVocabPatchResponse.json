@@ -1,0 +1,44 @@
+{
+  "data": {
+    "id": "11",
+    "type": "sample_controlled_vocabs",
+    "attributes": {
+      "title": "new title",
+      "description": "new description",
+      "source_ontology": "new source ontology",
+      "ols_root_term_uri": "http://new-uri.org",
+      "required": true,
+      "short_name": "new short name",
+      "sample_controlled_vocab_terms_attributes": [
+        {
+          "id": "35",
+          "label": "new term label",
+          "iri": "new iri",
+          "parent_iri": "new parent_iri"
+        }
+      ]
+    },
+    "relationships": {
+      "sample_controlled_vocab_terms": {
+        "data": [
+          {
+            "id": "35",
+            "type": "sample_controlled_vocab_terms"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/sample_controlled_vocabs/11"
+    },
+    "meta": {
+      "created": "2022-06-07T14:14:38.000Z",
+      "modified": "2022-06-07T14:14:38.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

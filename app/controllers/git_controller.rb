@@ -1,4 +1,5 @@
 class GitController < ApplicationController
+  include RawDisplay
   include Seek::MimeTypes
 
   before_action :fetch_parent
@@ -6,7 +7,7 @@ class GitController < ApplicationController
   before_action :authorized_to_edit, only: [:add_file, :remove_file, :move_file, :freeze]
   before_action :fetch_git_version
   before_action :get_tree, only: [:tree]
-  before_action :get_blob, only: [:blob, :download, :raw]
+  before_action :get_blob, only: [:blob, :download, :raw, :notebook]
   before_action :coerce_format
 
   user_content_actions :raw
@@ -24,7 +25,7 @@ class GitController < ApplicationController
 
   def tree
     respond_to do |format|
-      format.json { render json: @tree, adapter: :attributes }
+      format.json { render json: @tree, adapter: :attributes, root: '' }
       if request.xhr?
         format.html { render partial: 'tree' }
       else
@@ -39,7 +40,7 @@ class GitController < ApplicationController
 
   def blob
     respond_to do |format|
-      format.json { render json: @blob, adapter: :attributes }
+      format.json { render json: @blob, adapter: :attributes, root: '' }
       if request.xhr?
         format.html { render partial: 'blob' }
       else
@@ -49,7 +50,9 @@ class GitController < ApplicationController
   end
 
   def raw
-    if @blob.binary?
+    if render_display?
+      render_display(@blob)
+    elsif @blob.binary?
       send_data(@blob.content, filename: path_param.split('/').last, disposition: 'inline')
     else
       # Set Content-Type if it's an image to allow use in img tags
@@ -92,7 +95,7 @@ class GitController < ApplicationController
   end
 
   def freeze
-    if @git_version.update_attributes(git_version_params) && @git_version.lock
+    if @git_version.update(git_version_params) && @git_version.lock
       flash[:notice] = "#{@git_version.name} was frozen"
     else
       flash[:error] = "Could not freeze #{@git_version.name} - #{@git_version.errors.full_messages.join(', ')}"
@@ -105,7 +108,7 @@ class GitController < ApplicationController
 
   def operation_response(notice = nil, status: 200)
     respond_to do |format|
-      format.json { render json: { }, status: status, adapter: :attributes }
+      format.json { render json: { }, status: status, adapter: :attributes, root: '' }
       format.html do
         if request.xhr?
           render partial: 'files', locals: { resource: @parent_resource, git_version: @git_version }, status: status
@@ -141,6 +144,9 @@ class GitController < ApplicationController
       end
       format.json do
         render json: { error: message }, status: status
+      end
+      format.all do
+        head status
       end
     end
   end

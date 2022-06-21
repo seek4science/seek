@@ -64,7 +64,8 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
               refresh_period_mins: '123',
               space_perm_id: 'space-id',
               study_types: 'ST1, ST2',
-              assay_types: 'ASSAY, DEFAULT'
+              assay_types: 'ASSAY, DEFAULT',
+              is_test: false
           }, policy_attributes: policy_attributes }
     end
 
@@ -79,6 +80,56 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
     assert_equal 'secret', ep.password
     assert_equal 123, ep.refresh_period_mins
     assert_equal 'space-id', ep.space_perm_id
+    assert_equal false, ep.is_test
+
+    assert_equal Policy::ACCESSIBLE, ep.policy.access_type
+    assert_equal 1, ep.policy.permissions.count
+
+    ep.policy.permissions.each do |permission|
+      assert_equal permission.contributor_type, 'Project'
+      assert_equal @project.id, permission.contributor_id
+      assert_equal permission.policy_id, ep.policy_id
+      assert_equal permission.access_type, Policy::ACCESSIBLE
+    end
+
+    assert_equal %w[ST1 ST2], ep.study_types
+    assert_equal %w[ASSAY DEFAULT], ep.assay_types
+  end
+
+  test 'create_with_test' do
+    login_as(@project_administrator)
+
+    policy_attributes = { access_type: Policy::ACCESSIBLE,
+                          permissions_attributes: project_permissions([@project], Policy::ACCESSIBLE) }
+
+    assert_difference('OpenbisEndpoint.count') do
+      post :create, params: { project_id: @project.id, openbis_endpoint:
+        {
+          as_endpoint: 'http://as.com',
+          dss_endpoint: 'http://dss.com',
+          web_endpoint: 'http://web.com',
+          username: 'fred',
+          password: 'secret',
+          refresh_period_mins: '123',
+          space_perm_id: 'space-id',
+          study_types: 'ST1, ST2',
+          assay_types: 'ASSAY, DEFAULT',
+          is_test: true
+        }, policy_attributes: policy_attributes }
+    end
+
+    assert assigns(:openbis_endpoint)
+    ep = assigns(:openbis_endpoint)
+    assert ep.due_cache_refresh?
+    assert ep.due_sync?
+    assert_equal 'http://as.com', ep.as_endpoint
+    assert_equal 'http://dss.com', ep.dss_endpoint
+    assert_equal 'http://web.com', ep.web_endpoint
+    assert_equal 'fred', ep.username
+    assert_equal 'secret', ep.password
+    assert_equal 123, ep.refresh_period_mins
+    assert_equal 'space-id', ep.space_perm_id
+    assert_equal true, ep.is_test
 
     assert_equal Policy::ACCESSIBLE, ep.policy.access_type
     assert_equal 1, ep.policy.permissions.count
@@ -143,7 +194,7 @@ class OpenbisEndpointsControllerTest < ActionController::TestCase
   # TZ adding is handled by datasets_controller
   #   test 'add dataset' do
   #     disable_authorization_checks do
-  #       @project.update_attributes(default_license: 'wibble')
+  #       @project.update(default_license: 'wibble')
   #     end
   #     endpoint = Factory(:openbis_endpoint, project: @project,
   # policy: Factory(:private_policy, permissions: [Factory(:permission, contributor: @project)]))

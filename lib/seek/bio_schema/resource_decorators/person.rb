@@ -15,10 +15,6 @@ module Seek
                         orcid: :orcid,
                         works_for: :worksFor
 
-        def schema_type
-          'Person'
-        end
-
         def conformance
           PERSON_PROFILE
         end

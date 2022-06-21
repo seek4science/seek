@@ -84,13 +84,20 @@ Factory.define(:max_workflow, class: Workflow) do |f|
   f.title 'A Maximal Workflow'
   f.description 'How to run a simulation in GROMACS'
   f.workflow_class { WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class) }
-  f.projects { [Factory.build(:max_project)] }
-  f.assays {[Factory.build(:max_assay, policy: Factory(:public_policy))]}
+  f.assays { [Factory(:public_assay)] }
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
+  f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
   f.after_create do |workflow|
     workflow.content_blob = Factory.create(:cwl_content_blob, asset: workflow, asset_version: workflow.version)
+    workflow.annotate_with(['Workflow-tag1', 'Workflow-tag2', 'Workflow-tag3', 'Workflow-tag4', 'Workflow-tag5'], 'tag', workflow.contributor)
+    User.with_current_user(workflow.contributor.user) do
+      workflow.edam_operations = 'Clustering'
+      workflow.edam_topics = 'Chemistry'
+    end
+    workflow.save!
   end
   f.other_creators 'Blogs, Joe'
+  f.assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
 end
 
 Factory.define(:cwl_workflow, parent: :workflow) do |f|

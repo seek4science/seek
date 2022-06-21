@@ -1,0 +1,12 @@
+<%= panel("EDAM Properties", body_options: { class: 'text-center' }) do %>
+
+  <%= render partial: "assets/edam_property_box", locals: {resource: resource, property: :topics} -%>
+
+  <%= render partial: "assets/edam_property_box", locals: {resource: resource, property: :operations} -%>
+
+  <%= render partial: "assets/edam_property_box", locals: {resource: resource, property: :data} -%>
+
+  <%= render partial: "assets/edam_property_box", locals: {resource: resource, property: formats} -%>
+
+
+<% end %>

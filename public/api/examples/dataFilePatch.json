@@ -1,9 +1,79 @@
 {
-    "data": {
-        "type": "data_files",
-        "id": "68",
-        "attributes": {
-            "description": "Study of the Human Genome"
-        }
+  "data": {
+    "type": "data_files",
+    "id": "52",
+    "attributes": {
+      "title": "A Maximally Patched Data File",
+      "description": "Study of the Human Genome",
+      "tags": [
+        "tag1",
+        "tag2",
+        "tag3"
+      ],
+      "license": "CC-BY-4.0",
+      "other_creators": "John Smith, Jane Smith",
+      "policy": {
+        "access": "no_access",
+        "permissions": [
+          {
+            "resource": {
+              "id": "780",
+              "type": "projects"
+            },
+            "access": "edit"
+          }
+        ]
+      }
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "719",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "780",
+            "type": "projects"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "114",
+            "type": "assays"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "66",
+            "type": "publications"
+          }
+        ]
+      },
+      "events": {
+        "data": [
+          {
+            "id": "30",
+            "type": "events"
+          }
+        ]
+      },
+      "workflows": {
+        "data": [
+          {
+            "id": "40",
+            "type": "workflows"
+          }
+        ]
+      }
     }
+  }
 }

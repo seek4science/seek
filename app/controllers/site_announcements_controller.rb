@@ -69,10 +69,8 @@ class SiteAnnouncementsController < ApplicationController
       if @site_announcement.save
         flash[:notice] = 'The Announcement was successfully announced.'
         format.html { redirect_to(@site_announcement) }
-        format.xml  { render xml: @site_announcement, status: :created, location: @site_announcement }
       else
         format.html { render action: 'new' }
-        format.xml  { render xml: @site_announcement.errors, status: :unprocessable_entity }
       end
     end
   end
@@ -85,13 +83,11 @@ class SiteAnnouncementsController < ApplicationController
     @site_announcement = SiteAnnouncement.find(params[:id])
 
     respond_to do |format|
-      if @site_announcement.update_attributes(site_announcement_params)
+      if @site_announcement.update(site_announcement_params)
         flash[:notice] = 'Announcement was successfully updated.'
         format.html { redirect_to(@site_announcement) }
-        format.xml  { head :ok }
       else
         format.html { render action: 'edit' }
-        format.xml  { render xml: @site_announcement.errors, status: :unprocessable_entity }
       end
     end
   end

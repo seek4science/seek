@@ -546,6 +546,37 @@ class SubscriptionTest < ActiveSupport::TestCase
     assert assay.subscribed?(current_person)
   end
 
+  test 'does not throw error if item does not exist when job is performed' do
+    proj = current_person.projects.first
+
+    # Arg format discovered by using "Job#send(:serialize)"
+    serialized_args = [
+      {'_aj_globalid' => "gid://seek/DataFile/#{DataFile.maximum(:id) + 1}"}, # Point to a non-existant data file
+      [{'_aj_globalid' => "gid://seek/Project/#{proj.id}"}]
+    ]
+
+    assert_nothing_raised do
+      x = SetSubscriptionsForItemJob.new
+      x.serialized_arguments = serialized_args
+      x.perform_now
+    end
+  end
+
+  test 'does throw error if there is a genuine deserialization error' do
+    proj = current_person.projects.first
+
+    serialized_args = [
+      {'_aj_globalid' => "gid://seek/Blooblaa/123"},
+      [{'_aj_globalid' => "gid://seek/Project/#{proj.id}"}]
+    ]
+
+    assert_raises(ActiveJob::DeserializationError) do
+      x = SetSubscriptionsForItemJob.new
+      x.serialized_arguments = serialized_args
+      x.perform_now
+    end
+  end
+
   private
 
   def current_person

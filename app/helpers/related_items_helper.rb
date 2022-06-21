@@ -43,8 +43,6 @@ module RelatedItemsHelper
 
   # Get a hash of appropriate related resources for the given resource. Also returns a hash of hidden resources
   def get_related_resources(resource, limit = nil)
-    return resource_hash_lazy_load(resource) if Seek::Config.tabs_lazy_load_enabled
-
     items_hash = {}
     resource.class.related_type_methods.each_key do |type|
       next if type == 'Organism' && !resource.is_a?(Sample)
@@ -73,9 +71,10 @@ module RelatedItemsHelper
 
   def related_items_hash(items_hash, limit = nil)
     hash = {}
-    items_hash.each do |type, items|
+    items_hash.each_key do |type|
+
       hash[type] = {}
-      hash[type][:items] = items
+      hash[type][:items] = items_hash[type]
       hash[type][:items_count] = hash[type][:items].count
       hash[type][:hidden_items] = []
       hash[type][:hidden_count] = 0

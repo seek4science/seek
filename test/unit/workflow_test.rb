@@ -75,8 +75,8 @@ class WorkflowTest < ActiveSupport::TestCase
     # assert_includes authors, 'John Smith'
     # assert_includes authors, 'Jane Smith'
     # assert crate.author.detect { |a| a['identifier'] == URI.join(Seek::Config.site_base_host, "people/#{creator.id}").to_s }
-
-    assert_equal URI.join(Seek::Config.site_base_host, "projects/#{workflow.projects.first.id}").to_s, crate.main_workflow['producer']['@id']
+    assert_equal Seek::Util.routes.project_url(workflow.projects.first.id),
+                 crate.main_workflow['producer']['@id']
   end
 
   test 'generates fresh RO-Crate for workflow/diagram/abstract workflow' do
@@ -354,7 +354,7 @@ class WorkflowTest < ActiveSupport::TestCase
 
     assert_equal 'concat_two_files.ga', v.main_workflow_path
     assert_equal 2, v.inputs.count
-    assert_equal 3, v.steps.count
+    assert_equal 1, v.steps.count
     assert_equal 1, v.outputs.count
 
     disable_authorization_checks do
@@ -364,8 +364,8 @@ class WorkflowTest < ActiveSupport::TestCase
     end
 
     assert_equal '1-PreProcessing.ga', v.main_workflow_path
-    assert_equal 1, v.inputs.length
-    assert_equal 17, v.steps.length
+    assert_equal 2, v.inputs.length
+    assert_equal 15, v.steps.length
     assert_equal 31, v.outputs.length
   end
 
@@ -528,7 +528,7 @@ class WorkflowTest < ActiveSupport::TestCase
     workflow = Factory(:annotationless_local_git_workflow, workflow_class: Factory(:unextractable_workflow_class))
     assert workflow.git_version.mutable
     disable_authorization_checks do
-      workflow.update_attributes!(title: 'new title')
+      workflow.update!(title: 'new title')
       assert_equal 'new title', workflow.reload.title
       assert_equal 'new title', workflow.git_version.reload.title
     end
@@ -539,9 +539,42 @@ class WorkflowTest < ActiveSupport::TestCase
     disable_authorization_checks do
       workflow.git_version.lock
       refute workflow.git_version.mutable
-      workflow.update_attributes!(title: 'new title')
+      workflow.update!(title: 'new title')
       assert_equal 'new title', workflow.reload.title
       assert_equal 'new title', workflow.git_version.reload.title
     end
+  end
+
+  test 'tags and edam in json api' do
+    Factory(:edam_topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
+    Factory(:edam_operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_operations_controlled_vocab
+
+    user = Factory(:user)
+
+    workflow = User.with_current_user(user) do
+      Factory(:max_workflow, contributor: user.person)
+    end
+
+    json = WorkflowSerializer.new(workflow).as_json
+
+    assert_equal ["Workflow-tag1", "Workflow-tag2", "Workflow-tag3", "Workflow-tag4", "Workflow-tag5"], json[:tags]
+
+    assert_equal [{label:'Clustering', identifier: 'http://edamontology.org/operation_3432'}], json[:edam_operations]
+    assert_equal [{label:'Chemistry', identifier: 'http://edamontology.org/topic_3314'}], json[:edam_topics]
+  end
+
+  test 'edam annotation properties'do
+    wf = Factory(:workflow)
+
+    assert wf.supports_edam_annotations?
+    assert wf.supports_edam_annotations?(:topics)
+    assert wf.supports_edam_annotations?(:operations)
+    refute wf.supports_edam_annotations?(:formats)
+    refute wf.supports_edam_annotations?(:data)
+
+    assert wf.respond_to?(:edam_topics)
+    assert wf.respond_to?(:edam_operations)
+    refute wf.respond_to?(:edam_formats)
+    refute wf.respond_to?(:edam_data)
   end
 end

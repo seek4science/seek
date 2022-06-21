@@ -30,7 +30,7 @@ module Git
 
     attr_writer :remote
 
-    delegate :tag_counts, :scales, :managers, :attributions, :creators, :assets_creators, :is_asset?,
+    delegate :tag_counts, :managers, :attributions, :creators, :assets_creators, :is_asset?,
              :authorization_supported?, :defines_own_avatar?, :use_mime_type_for_avatar?, :avatar_key,
              :show_contributor_avatars?, :can_see_hidden_item?, :related_people, :projects, :programmes, to: :parent
 
@@ -199,15 +199,23 @@ module Git
 
     def remote_sources= hash
       to_keep = []
+      to_update = []
       existing = find_git_annotations('remote_source').to_a
 
       hash.each do |path, url|
-        annotation = existing.detect { |a| a.path == path } || git_annotations.build(key: 'remote_source', path: path, value: url)
+        annotation = existing.detect { |a| a.path == path }
+        if annotation.nil? || annotation.value != url
+          annotation ||= git_annotations.build(key: 'remote_source', path: path)
+          annotation.value = url
+          to_update << annotation
+        end
+
         to_keep << annotation
       end
 
       to_destroy = existing - to_keep
       to_destroy.each(&:destroy)
+      to_update.each(&:save)
 
       hash
     end
@@ -252,9 +260,14 @@ module Git
       raise URI::InvalidURIError, "URL (#{url}) must be a valid, accessible remote URL" unless valid_url?(url)
 
       add_file(path, StringIO.new(''), message: message).tap do
-        git_annotations.create(key: 'remote_source', path: path, value: url)
-        RemoteGitContentFetchingJob.perform_later(self, path, url) if fetch
+        self.remote_sources = remote_sources.merge(path => url)
+        RemoteGitContentFetchingJob.perform_later(self, path) if fetch
       end
+    end
+
+    def fetch_remote_file(path)
+      io = get_blob(path)&.remote_content
+      add_file(path, io, message: "Fetched #{path} from URL") if io
     end
 
     def search_terms

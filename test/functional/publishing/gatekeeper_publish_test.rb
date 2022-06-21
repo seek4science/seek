@@ -86,7 +86,7 @@ class GatekeeperPublishTest < ActionController::TestCase
       assert_select 'a[href=?]', person_path(user.person), count: 3
     end
 
-    assert_select '.btn-group', count: 3 do
+    assert_select '.radio-inline', count: 9 do
       [df, model, sop].each do |asset|
         assert_select 'input[type=radio][name=?][value=?]', "gatekeeper_decide[#{asset.class.name}][#{asset.id}][decision]", '1'
         assert_select 'input[type=radio][name=?][value=?]', "gatekeeper_decide[#{asset.class.name}][#{asset.id}][decision]", '0'
@@ -101,9 +101,18 @@ class GatekeeperPublishTest < ActionController::TestCase
 
   test 'gatekeeper decide' do
     df, model, sop = requested_approval_assets_for @gatekeeper
+
+    assert df.is_waiting_approval?
+    assert df.is_waiting_approval?(df.contributor.user)
+    assert model.is_waiting_approval?
+    assert model.is_waiting_approval?(model.contributor.user)
+    assert sop.is_waiting_approval?
+    assert sop.is_waiting_approval?(sop.contributor.user)
+
     params = params_for df, model, sop
     login_as(@gatekeeper.user)
 
+    # the gatekeeper approved the data file to publish, rejected the model and decided sop later
     assert_difference('ResourcePublishLog.count', 2) do
       assert_enqueued_emails 2 do
         post :gatekeeper_decide, params: params.merge(id: @gatekeeper.id)
@@ -114,16 +123,73 @@ class GatekeeperPublishTest < ActionController::TestCase
 
     df.reload
     assert df.can_download?(nil)
+    assert df.is_published?
+    refute df.is_rejected?
+    refute df.is_waiting_approval?(df.contributor.user)
+    refute df.is_waiting_approval?
+    refute df.can_publish?
+
     model.reload
     assert !model.can_download?(nil)
+    refute model.is_published?
+    assert model.is_rejected?
+    refute model.is_waiting_approval?(model.contributor.user)
+    refute model.is_waiting_approval?
+    refute model.can_publish?
+
     sop.reload
     assert !sop.can_download?(nil)
+    refute sop.is_published?
+    refute sop.is_rejected?
+    assert sop.is_waiting_approval?
+    assert sop.is_waiting_approval?(sop.contributor.user)
+    assert sop.can_publish?
 
     approved_log = ResourcePublishLog.where(['publish_state=?', ResourcePublishLog::PUBLISHED]).last
     assert_equal 'ready', approved_log.comment
 
     rejected_log = ResourcePublishLog.where(['publish_state=?', ResourcePublishLog::REJECTED]).last
     assert_equal 'not ready', rejected_log.comment
+
+    # the user updated the model after it was rejected by the gatekeeper
+    login_as(model.contributor.user)
+
+    model.title = 'new title'
+    model.save
+
+    assert model.is_rejected?
+    assert model.is_updated_since_be_rejected?
+    assert model.can_publish?
+
+    model.resource_publish_logs.create(publish_state: ResourcePublishLog::WAITING_FOR_APPROVAL, user: model.contributor.user)
+    assert model.is_waiting_approval?
+    assert model.is_waiting_approval?(model.contributor.user)
+
+    # the gatekeeper approve the model to publish
+    params = { gatekeeper_decide: {} }
+    params[:gatekeeper_decide][model.class.name] ||= {}
+    params[:gatekeeper_decide][model.class.name][model.id.to_s] ||= {}
+    params[:gatekeeper_decide][model.class.name][model.id.to_s]['decision'] = 1
+    params[:gatekeeper_decide][model.class.name][model.id.to_s]['comment'] = 'ready'
+
+    login_as(@gatekeeper.user)
+
+    assert_difference('ResourcePublishLog.count', 1) do
+      assert_enqueued_emails 1 do
+        post :gatekeeper_decide, params: params.merge(id: @gatekeeper.id)
+      end
+    end
+
+    assert_response :success
+
+    model.reload
+    assert model.can_download?(nil)
+    assert model.is_published?
+    refute model.is_rejected?
+    refute model.is_waiting_approval?(model.contributor.user)
+    refute model.is_waiting_approval?
+    refute model.can_publish?
+
   end
 
   test 'only allow gatekeeper_decide the authorized items' do

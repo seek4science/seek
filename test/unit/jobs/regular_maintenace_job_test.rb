@@ -65,25 +65,25 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
     person1 = Factory(:not_activated_person)
     refute person1.user.active?
     travel_to(5.hours.ago) do
-      MessageLog.log_activation_email(person1)
-      MessageLog.log_activation_email(person1)
+      ActivationEmailMessageLog.log_activation_email(person1)
+      ActivationEmailMessageLog.log_activation_email(person1)
     end
 
     # person 2 - not activated, but 3 messages sent over 1 day ago
     person2 = Factory(:not_activated_person)
     travel_to(2.days.ago) do
-      MessageLog.log_activation_email(person2)
-      MessageLog.log_activation_email(person2)
-      MessageLog.log_activation_email(person2)
+      ActivationEmailMessageLog.log_activation_email(person2)
+      ActivationEmailMessageLog.log_activation_email(person2)
+      ActivationEmailMessageLog.log_activation_email(person2)
     end
 
     # person 3 - not activated, but 2 message sent, one 1 days ago but the latest 1 hour ago
     person3 = Factory(:not_activated_person)
     travel_to(1.day.ago) do
-      MessageLog.log_activation_email(person3)
+      ActivationEmailMessageLog.log_activation_email(person3)
     end
     travel_to(1.hour.ago) do
-      MessageLog.log_activation_email(person3)
+      ActivationEmailMessageLog.log_activation_email(person3)
     end
 
     # person 4 - not activated, and no message logs
@@ -98,17 +98,17 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
 
     # only person 1 and person 4 should have emails resent
     assert_enqueued_emails(2) do
-      assert_difference('MessageLog.count', 2) do
+      assert_difference('ActivationEmailMessageLog.count', 2) do
         RegularMaintenanceJob.perform_now
       end
     end
 
-    logs = MessageLog.last(2)
+    logs = ActivationEmailMessageLog.last(2)
     assert_equal [person1, person4].sort, logs.collect(&:subject).sort
 
     # running again should have no effect, as those due another email need to wait
     assert_enqueued_emails(0) do
-      assert_no_difference('MessageLog.count') do
+      assert_no_difference('ActivationEmailMessageLog.count') do
         RegularMaintenanceJob.perform_now
       end
     end
@@ -116,14 +116,73 @@ class RegularMaintenaceJobTest < ActiveSupport::TestCase
     # again in 5 hours forward, and person 3 and person 4 should get one, person1 has had the 3 max
     travel(5.hours) do
       assert_enqueued_emails(2) do
-        assert_difference('MessageLog.count', 2) do
+        assert_difference('ActivationEmailMessageLog.count', 2) do
           RegularMaintenanceJob.perform_now
         end
       end
     end
     
-    logs = MessageLog.last(2)
+    logs = ActivationEmailMessageLog.last(2)
     assert_equal [person3, person4].sort, logs.collect(&:subject).sort
+  end
+
+  test 'check authlookup consistency' do
+    #ensure a consistent initial state
+    disable_authorization_checks do
+      Seek::Util.authorized_types.each(&:destroy_all)
+      Seek::Util.authorized_types.each(&:clear_lookup_table)
+    end
+
+    User.destroy_all
+    p = Factory(:person)
+    p2 = Factory(:person)
+    u = Factory(:brand_new_user)
+
+    assert_nil u.person
+
+    with_config_value(:auth_lookup_enabled, true) do
+      assert AuthLookupUpdateQueue.queue_enabled?
+
+      doc1 = Factory(:document)
+      doc2 = Factory(:document)
+      AuthLookupUpdateJob.perform_now
+
+      assert Document.lookup_table_consistent?(p.user)
+      assert Document.lookup_table_consistent?(p2.user)
+      assert Document.lookup_table_consistent?(nil)
+
+      assert_no_enqueued_jobs do
+        assert_no_difference('AuthLookupUpdateQueue.count') do
+          RegularMaintenanceJob.perform_now
+        end
+      end
+
+      # delete a record
+      Document.lookup_class.where(user_id:p.user.id,asset_id:doc1.id).last.delete
+
+      #duplicate a record
+      Document.lookup_class.where(user_id:p2.user.id, asset_id:doc2.id).last.dup.save!
+
+      refute Document.lookup_table_consistent?(p.user)
+      refute Document.lookup_table_consistent?(p2.user)
+
+      #gets immmediately updated for anonymous user
+      assert Document.lookup_table_consistent?(nil)
+
+      assert_enqueued_jobs(1) do
+        assert_difference('AuthLookupUpdateQueue.count',1) do
+          RegularMaintenanceJob.perform_now
+        end
+      end
+
+      # double check it will be fixed when the job runs
+      AuthLookupUpdateJob.perform_now
+      assert Document.lookup_table_consistent?(p.user)
+      assert Document.lookup_table_consistent?(p2.user)
+      assert Document.lookup_table_consistent?(nil)
+    end
+
+
   end
 
   test 'cleans redundant repositories' do

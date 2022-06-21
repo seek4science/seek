@@ -1,17 +1,21 @@
 class BaseSerializer < SimpleBaseSerializer
-  include ApiHelper
   include PolicyHelper
   include RelatedItemsHelper
-  include Rails.application.routes.url_helpers
+  include Seek::Util.routes
 
   attribute :policy, if: :show_policy?
 
-  attribute :discussion_links,  if: -> { object.is_discussable? } do
+  attribute :discussion_links, if: -> { object.is_discussable? } do
     object.discussion_links.collect do |link|
-      {id:link.id, label: link.label, url: link.url}
+      { id: link.id.to_s, label: link.label, url: link.url }
     end
   end
 
+  attribute :misc_links, if: -> { object.have_misc_links? } do
+    object.misc_links.collect do |link|
+      { id: link.id.to_s, label: link.label, url: link.url }
+    end
+  end
 
   def policy
     BaseSerializer.convert_policy object.policy
@@ -23,7 +27,7 @@ class BaseSerializer < SimpleBaseSerializer
       @associated[name]
     else
       items = (object.class.name.include?('::Version') ? object.parent : object).get_related(name).authorized_for('view')
-      @associated[name] = items.empty? ? nil : items
+      @associated[name] = items.empty? ? [] : items
     end
   end
 
@@ -83,13 +87,7 @@ class BaseSerializer < SimpleBaseSerializer
     associated('Organism')
   end
 
-  def self_link
-    polymorphic_path(object)
-  end
-
-  def _links
-    { self: self_link }
-  end
+  link(:self) { polymorphic_path(object) }
 
   # avoid dash-erizing attribute names
   def format_name(attribute_name)
@@ -99,13 +97,12 @@ class BaseSerializer < SimpleBaseSerializer
   def _meta
     meta = super
     meta[:uuid] = object.uuid if object.respond_to?('uuid')
-    meta[:base_url] = base_url
     meta
   end
 
   def BaseSerializer.convert_policy policy
     { 'access' => (PolicyHelper::access_type_key policy.access_type),
-      'permissions' => (BaseSerializer.permits policy)}
+      'permissions' => (BaseSerializer.permits policy) }
   end
 
   def BaseSerializer.permits policy
@@ -127,9 +124,37 @@ class BaseSerializer < SimpleBaseSerializer
   def submitter
     result = determine_submitter object
     if result.blank?
-      return []
+      []
     else
-      return [result]
+      [result]
+    end
+  end
+
+  private
+
+  def determine_submitter(object)
+    return object.owner if object.respond_to?('owner')
+    result = object.contributor if object.respond_to?('contributor') && !object.is_a?(Permission)
+    return result
+  end
+
+  def serialize_assets_creators
+    object.assets_creators.map do |c|
+      { profile: c.creator_id ? person_path(c.creator_id) : nil,
+        family_name: c.family_name,
+        given_name: c.given_name,
+        affiliation: c.affiliation,
+        orcid: c.orcid }
+    end
+  end
+
+  def edam_annotations(property)
+    terms = object.annotations_with_attribute(property, true).collect(&:value).sort_by(&:label)
+    terms.collect do |term|
+      {
+        label: term.label,
+        identifier: term.iri
+      }
     end
   end
 end

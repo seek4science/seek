@@ -1,4 +1,6 @@
 <h1>Annotate Files</h1>
+<%= error_messages_for(@workflow) %>
+<%= error_messages_for(@display_workflow) %>
 
 <%= form_tag(update_paths_workflow_path(@workflow, version: @display_workflow.version), method: :patch) do %>
   <%= render partial: 'workflows/select_paths', locals: { field_prefix: 'git_version', workflow: @workflow, git_version: @display_workflow } %>

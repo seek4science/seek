@@ -128,7 +128,7 @@ module Seek
           text.gsub!(/[#{s[0..-2]}]/, s[-1..-1])
         end
 
-        codepoints = text.mb_chars.normalize(:d).split(//u)
+        codepoints = text.mb_chars.unicode_normalize(:nfd).split(//u)
         ascii = codepoints.map(&:to_s).reject { |e| e.length > 1 }.join
 
         ascii.first.capitalize

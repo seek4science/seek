@@ -1,4 +1,5 @@
 <%
+hide_title ||= 0
 version ||= params[:version]
 display_item = item.find_version(version) if version
 avatar = favouritable_icon(version ? display_item : item, 120)
@@ -40,7 +41,7 @@ col_width = buttons_partial.nil? && !content_for?(:buttons) ? 12 : 6
       <% end %>
     </h1>
     <% if @action=="show" && item.respond_to?(:private?) && item.respond_to?(:public?) && item.try(:can_manage?) %>
-        <div class="sharing_summary">
+        <div class="text-center">
           <%= sharing_text(item) %>
         </div>
     <% end %>

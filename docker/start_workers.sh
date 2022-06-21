@@ -7,11 +7,11 @@ use_mysql_db
 wait_for_mysql
 wait_for_database
 
-# Soffice service
-start_soffice
-
 # Search
 start_search
+
+# Cron
+setup_and_start_cron
 
 echo "STARTING WORKERS"
 bundle exec rake seek:workers:start

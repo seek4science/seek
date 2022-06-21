@@ -4,6 +4,8 @@ module Git
     belongs_to :contributor, class_name: 'Person'
 
     before_validation :assign_contributor
+
+    validates :key, uniqueness: { scope: [:git_version_id, :path, :value] }
     validate :check_valid_path
 
     def assign_contributor

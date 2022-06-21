@@ -66,6 +66,13 @@ module Seek
             end
           },
 
+          edam_operations: proc {|value|
+            value.collect{|v| v[:identifier]}.join(', ')
+          },
+          edam_topics: proc {|value|
+            value.collect{|v| v[:identifier]}.join(', ')
+          },
+
           funding_codes: proc { |value|
             if value
               value.join(', ')
@@ -91,7 +98,11 @@ module Seek
           },
 
           data_file_ids: proc { |value|
-            value.map { |i| { 'asset_id' => i }.with_indifferent_access }
+            value.map { |i| { asset_id: i }.with_indifferent_access }
+          },
+
+          sample_ids: proc { |value|
+            value.map { |i| { asset_id: i }.with_indifferent_access }
           },
 
           assay_ids: proc { |value|
@@ -103,28 +114,41 @@ module Seek
               WorkflowClass.where(key: value[:key]).pluck(:id).first
             end
           },
-          asset_type: proc { |value| value.classify }
+          asset_type: proc { |value| value.classify },
+
+          creators: proc { |value|
+            value.map.with_index do |attrs, i|
+              attrs[:pos] ||= (i + 1)
+              profile = attrs.delete(:profile)
+              attrs[:creator_id] = profile.split('/')&.last&.to_i if profile
+              attrs
+            end
+          }
       }
       CONVERSIONS[:default_policy] = CONVERSIONS[:policy]
       CONVERSIONS.freeze
 
       # Parameters to rename
       RENAME = {
-          tags: :tag_list,
-          policy: :policy_attributes,
-          default_policy: :policy_attributes,
-          assay_class: :assay_class_id,
-          assay_type: :assay_type_uri,
-          technology_type: :technology_type_uri,
-          programme_ids: :programme_id,
-          model_type: :model_type_id,
-          model_format: :model_format_id,
-          environment: :recommended_environment_id,
-          data_file_ids: :data_files_attributes,
-          assay_ids: :assay_assets_attributes,
-          workflow_class: :workflow_class_id,
-          discussion_links: :discussion_links_attributes,
-          repository_standard: :repository_standard_attributes
+        tags: :tag_list,
+        policy: :policy_attributes,
+        default_policy: :policy_attributes,
+        assay_class: :assay_class_id,
+        assay_type: :assay_type_uri,
+        technology_type: :technology_type_uri,
+        programme_ids: :programme_id,
+        model_type: :model_type_id,
+        model_format: :model_format_id,
+        environment: :recommended_environment_id,
+        data_file_ids: :data_files_attributes,
+        sample_ids: :samples_attributes,
+        assay_ids: :assay_assets_attributes,
+        workflow_class: :workflow_class_id,
+        discussion_links: :discussion_links_attributes,
+        template: :template_attributes,
+        creators: :api_assets_creators,
+        administrator_ids: :programme_administrator_ids,
+        attribute_map: :data
       }.freeze
 
       # Parameters to "elevate" out of params[bla] to the top-level.

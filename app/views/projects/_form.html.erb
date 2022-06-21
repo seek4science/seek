@@ -12,6 +12,8 @@
   <%= f.text_area :description, :rows => 5, :class=>"form-control rich-text-edit" -%>
 </div>
 
+<%= render partial: 'assets/edam_form_properties', locals: { resource: @project } %>
+
 <div class="form-group">
   <%= f.label :funding_codes -%>
   <%= tags_input('project[funding_codes]', @project.funding_codes) %>
@@ -41,13 +43,6 @@
   </div>
 
 </div>
-
-<% if Seek::Config.project_hierarchy_enabled -%>
-    <div class="form-group">
-      <%= f.label "Parent" -%>
-      <%= tree_single_select_tag Project, "id", @project ? @project.parent : nil, [@project] + @project.descendants, "parent_id" %>
-    </div>
-<% end -%>
 
 <% if Seek::Config.programmes_enabled &&
     (admin_or_programme_administrator_logged_in? ||

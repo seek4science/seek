@@ -1,8 +1,10 @@
 <%
+  return if !display_isa_graph?
   options ||= { depth: 4, parent_depth: nil, sibling_depth: nil, include_self: true }
-  hash = Seek::IsaGraphGenerator.new(root_item).generate(options)
+  hash = Seek::IsaGraphGenerator.new(root_item).generate(**options)
   elements = cytoscape_elements(hash)
   default_view ||= 'tree'
+  only_tree ||= false
   view = params[:graph_view] || default_view
   is_full_screen = params.key?(:fullscreen).present?
 %>
@@ -31,6 +33,7 @@
     <div id="isa-graph" class="panel panel-default">
       <div id="node_info"></div>
       <div class="isa-controls">
+	<% unless only_tree %>
         <div id="isa-view-controls">
           <div class="btn-group" data-toggle="buttons">
             <label class="btn btn-default btn-xs" id="isa-tree-view-btn" data-tooltip="Display with a folder like tree view">
@@ -48,6 +51,7 @@
           </button>
         </div>
         <br/>
+	<% end %>
         <button class="btn btn-default btn-xs" id="toggle-fullscreen-btn"  data-tooltip="Toggle between fullscreen and normal size">
           <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
           Fullscreen

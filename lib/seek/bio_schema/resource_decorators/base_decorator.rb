@@ -5,9 +5,8 @@ module Seek
       # The Decorator is an extension to the resource that provided or alters the properties of that resource
       # for Schema.org (Bioschemas.org)
       class BaseDecorator
-          
         include ActionView::Helpers::SanitizeHelper
-        include Rails.application.routes.url_helpers
+        include Seek::Util.routes
 
         attr_reader :resource
 
@@ -53,7 +52,7 @@ module Seek
 
         def resource_url(resource, opts = {})
           strip_version = opts.delete(:strip_version)
-          opts[:host] ||= Seek::Config.site_base_host
+          opts.reverse_merge!(Seek::Config.site_url_options)
           resource = Array(resource).map do |r|
             if r.is_a_version?
               opts[:version] = r.version unless strip_version

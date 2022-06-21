@@ -1,0 +1,37 @@
+{
+  "data": {
+    "type": "sample_types",
+    "id": "<%= id %>",
+    "attributes": {
+      "title": "This is a new title.",
+      "sample_attributes": [
+        {
+          "id": "<%= @sample_attribute.id %>",
+          "title": "This is a new attribute title",
+          "sample_attribute_type": {
+            "title": "<%= @sample_attribute_type.title %>"
+          }
+        }
+      ],
+      "tags": []
+    },
+    "relationships": {
+      "projects": {
+        "data": [
+          {
+            "id": "<%= @project.id %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "<%= @assay.id %>",
+            "type": "assays"
+          }
+        ]
+      }
+    }
+  }
+}

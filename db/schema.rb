@@ -2,15 +2,15 @@
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
 #
-# Note that this schema.rb definition is the authoritative source for your
-# database schema. If you need to create the application database on another
-# system, you should be using db:schema:load, not running all the migrations
-# from scratch. The latter is a flawed and unsustainable approach (the more migrations
-# you'll amass, the slower it'll run and the greater likelihood for issues).
+# This file is the source Rails uses to define your schema when running `bin/rails
+# db:schema:load`. When creating a new database, `bin/rails db:schema:load` tends to
+# be faster and is potentially less error prone than running all of your
+# migrations from scratch. Old migrations may fail to apply correctly if those
+# migrations use external dependencies or application code.
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_12_09_112856) do
+ActiveRecord::Schema.define(version: 2022_05_17_085632) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string "action"
@@ -25,7 +25,7 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.datetime "updated_at"
     t.string "http_referer"
     t.text "user_agent"
-    t.text "data", limit: 16777215
+    t.text "data"
     t.string "controller_name"
     t.index ["action"], name: "act_logs_action_index"
     t.index ["activity_loggable_type", "activity_loggable_id"], name: "act_logs_act_loggable_index"
@@ -110,6 +110,12 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.index ["user_id"], name: "index_api_tokens_on_user_id"
   end
 
+  create_table "application_status", force: :cascade do |t|
+    t.integer "running_jobs"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "assay_assets", force: :cascade do |t|
     t.integer "assay_id"
     t.integer "asset_id"
@@ -175,7 +181,6 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.integer "assay_class_id"
     t.string "uuid"
     t.integer "policy_id"
-    t.integer "institution_id"
     t.string "assay_type_uri"
     t.string "technology_type_uri"
     t.integer "suggested_assay_type_id"
@@ -183,6 +188,7 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.text "other_creators"
     t.string "deleted_contributor"
     t.integer "sample_type_id"
+    t.integer "position"
     t.index ["sample_type_id"], name: "index_assays_on_sample_type_id"
   end
 
@@ -225,6 +231,11 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.string "asset_type"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer "pos", default: 0
+    t.string "family_name"
+    t.string "given_name"
+    t.string "orcid"
+    t.text "affiliation"
     t.index ["asset_id", "asset_type"], name: "index_assets_creators_on_asset_id_and_asset_type"
   end
 
@@ -252,17 +263,6 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.text "cached_concept_yaml"
     t.integer "conceptable_id"
     t.string "conceptable_type"
-  end
-
-  create_table "cell_ranges", force: :cascade do |t|
-    t.integer "cell_range_id"
-    t.integer "worksheet_id"
-    t.integer "start_row"
-    t.integer "start_column"
-    t.integer "end_row"
-    t.integer "end_column"
-    t.datetime "created_at"
-    t.datetime "updated_at"
   end
 
   create_table "collection_auth_lookup", force: :cascade do |t|
@@ -373,6 +373,7 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.string "title"
     t.bigint "sample_controlled_vocab_id"
     t.text "description"
+    t.string "label"
     t.index ["custom_metadata_type_id"], name: "index_custom_metadata_attributes_on_custom_metadata_type_id"
     t.index ["sample_attribute_type_id"], name: "index_custom_metadata_attributes_on_sample_attribute_type_id"
     t.index ["sample_controlled_vocab_id"], name: "index_custom_metadata_attributes_on_sample_controlled_vocab_id"
@@ -442,6 +443,9 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.string "license"
     t.boolean "simulation_data", default: false
     t.string "deleted_contributor"
+    t.string "data_type", default: "http://edamontology.org/data_0006", null: false
+    t.string "format_type", default: "http://edamontology.org/format_1915", null: false
+    t.integer "file_template_id"
     t.index ["contributor_id"], name: "index_data_files_on_contributor"
   end
 
@@ -562,8 +566,8 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
   end
 
   create_table "documents_workflows", id: false, force: :cascade do |t|
-    t.integer "workflow_id", null: false
-    t.integer "document_id", null: false
+    t.bigint "workflow_id", null: false
+    t.bigint "document_id", null: false
     t.index ["document_id", "workflow_id"], name: "index_documents_workflows_on_doc_workflow"
     t.index ["workflow_id", "document_id"], name: "index_documents_workflows_on_workflow_doc"
   end
@@ -680,6 +684,76 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.datetime "updated_at"
   end
 
+  create_table "file_template_auth_lookup", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view", default: false
+    t.boolean "can_manage", default: false
+    t.boolean "can_edit", default: false
+    t.boolean "can_download", default: false
+    t.boolean "can_delete", default: false
+    t.index ["user_id", "asset_id", "can_view"], name: "index_ft_user_id_asset_id_can_view"
+    t.index ["user_id", "can_view"], name: "index_ft_auth_lookup_on_user_id_and_can_view"
+  end
+
+  create_table "file_template_versions", force: :cascade do |t|
+    t.integer "file_template_id"
+    t.integer "version"
+    t.text "revision_comments"
+    t.text "title"
+    t.text "description"
+    t.string "contributor_type"
+    t.integer "contributor_id"
+    t.string "first_letter", limit: 1
+    t.string "uuid"
+    t.bigint "policy_id"
+    t.string "doi"
+    t.string "license"
+    t.datetime "last_used_at"
+    t.text "other_creators"
+    t.integer "visibility"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.index ["contributor_id"], name: "index_ft_versions_on_contributor"
+    t.index ["file_template_id"], name: "index_ft_versions_on_ft_id"
+    t.index ["policy_id"], name: "index_file_template_versions_on_policy_id"
+  end
+
+  create_table "file_template_versions_projects", force: :cascade do |t|
+    t.bigint "version_id"
+    t.bigint "project_id"
+    t.index ["project_id"], name: "index_ft_versions_projects_on_project_id"
+    t.index ["version_id", "project_id"], name: "index_ft_versions_projects_on_v_id_and_p_id"
+    t.index ["version_id"], name: "index_ft_versions_projects_on_version_id"
+  end
+
+  create_table "file_templates", force: :cascade do |t|
+    t.text "title"
+    t.text "description"
+    t.integer "contributor_id"
+    t.integer "version"
+    t.string "first_letter", limit: 1
+    t.string "uuid"
+    t.bigint "policy_id"
+    t.string "doi"
+    t.string "license"
+    t.datetime "last_used_at"
+    t.text "other_creators"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string "data_type", default: "http://edamontology.org/data_0006", null: false
+    t.string "format_type", default: "http://edamontology.org/format_1915", null: false
+    t.index ["policy_id"], name: "index_file_templates_on_policy_id"
+  end
+
+  create_table "file_templates_projects", force: :cascade do |t|
+    t.bigint "file_template_id"
+    t.bigint "project_id"
+    t.index ["file_template_id", "project_id"], name: "index_ft_projects_on_ft_id_and_p_id"
+    t.index ["file_template_id"], name: "index_ft_projects_on_ft_id"
+    t.index ["project_id"], name: "index_ft_projects_on_p_id"
+  end
+
   create_table "genes", force: :cascade do |t|
     t.string "title"
     t.string "symbol"
@@ -752,11 +826,6 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.index ["person_id"], name: "index_group_memberships_on_person_id"
     t.index ["work_group_id", "person_id"], name: "index_group_memberships_on_work_group_id_and_person_id"
     t.index ["work_group_id"], name: "index_group_memberships_on_work_group_id"
-  end
-
-  create_table "group_memberships_project_positions", force: :cascade do |t|
-    t.integer "group_membership_id"
-    t.integer "project_position_id"
   end
 
   create_table "help_attachments", force: :cascade do |t|
@@ -867,6 +936,7 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.integer "contributor_id"
     t.text "other_creators"
     t.string "deleted_contributor"
+    t.integer "position"
   end
 
   create_table "investigations_projects", id: false, force: :cascade do |t|
@@ -874,6 +944,11 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.integer "investigation_id"
     t.index ["investigation_id", "project_id"], name: "index_investigations_projects_inv_proj_id"
     t.index ["project_id"], name: "index_investigations_projects_on_project_id"
+  end
+
+  create_table "isa_tags",  force: :cascade do |t|
+    t.string "title"
+    t.index ["title"], name: "index_isa_tags_title"
   end
 
   create_table "mapping_links", force: :cascade do |t|
@@ -1029,68 +1104,6 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.datetime "updated_at"
   end
 
-  create_table "node_auth_lookup", force: :cascade do |t|
-    t.integer "user_id"
-    t.integer "asset_id"
-    t.boolean "can_view", default: false
-    t.boolean "can_manage", default: false
-    t.boolean "can_edit", default: false
-    t.boolean "can_download", default: false
-    t.boolean "can_delete", default: false
-    t.index ["user_id", "asset_id", "can_view"], name: "index_n_auth_lookup_on_user_id_and_asset_id_and_can_view"
-    t.index ["user_id", "can_view"], name: "index_n_auth_lookup_on_user_id_and_can_view"
-  end
-
-  create_table "node_versions", force: :cascade do |t|
-    t.integer "node_id"
-    t.integer "version"
-    t.text "revision_comments"
-    t.integer "contributor_id"
-    t.string "title"
-    t.text "description"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.datetime "last_used_at"
-    t.string "first_letter", limit: 1
-    t.text "other_creators"
-    t.string "uuid"
-    t.integer "policy_id"
-    t.string "doi"
-    t.string "license"
-    t.string "deleted_contributor"
-    t.integer "visibility"
-    t.index ["contributor_id"], name: "index_node_versions_on_contributor"
-    t.index ["node_id"], name: "index_node_versions_on_node_id"
-  end
-
-  create_table "node_versions_projects", id: false, force: :cascade do |t|
-    t.integer "project_id"
-    t.integer "version_id"
-  end
-
-  create_table "nodes", force: :cascade do |t|
-    t.integer "contributor_id"
-    t.string "title"
-    t.text "description"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.datetime "last_used_at"
-    t.integer "version", default: 1
-    t.string "first_letter", limit: 1
-    t.text "other_creators"
-    t.string "uuid"
-    t.integer "policy_id"
-    t.string "doi"
-    t.string "license"
-    t.string "deleted_contributor"
-    t.index ["contributor_id"], name: "index_nodes_on_contributor"
-  end
-
-  create_table "nodes_projects", id: false, force: :cascade do |t|
-    t.integer "project_id"
-    t.integer "node_id"
-  end
-
   create_table "notifiee_infos", force: :cascade do |t|
     t.integer "notifiee_id"
     t.string "notifiee_type"
@@ -1176,6 +1189,36 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.index ["user_id"], name: "index_oauth_sessions_on_user_id"
   end
 
+  create_table "observed_variable_sets", force: :cascade do |t|
+    t.string "title"
+    t.integer "contributor_id"
+    t.string "project_ids"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "observed_variables", force: :cascade do |t|
+    t.integer "observed_variable_set_id"
+    t.string "variable_id"
+    t.string "variable_name"
+    t.string "variable_an"
+    t.string "trait"
+    t.string "trait_an"
+    t.string "trait_entity"
+    t.string "trait_entity_an"
+    t.string "trait_attribute"
+    t.string "trait_attribute_an"
+    t.string "method"
+    t.string "method_an"
+    t.text "method_description"
+    t.string "method_reference"
+    t.string "scale"
+    t.string "scale_an"
+    t.string "timescale"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "openbis_endpoints", force: :cascade do |t|
     t.string "as_endpoint"
     t.string "space_perm_id"
@@ -1192,6 +1235,7 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.text "meta_config_json"
     t.datetime "last_sync"
     t.datetime "last_cache_refresh"
+    t.boolean "is_test", default: false
   end
 
   create_table "organisms", force: :cascade do |t|
@@ -1243,6 +1287,49 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.integer "strain_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "placeholder_auth_lookup", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view", default: false
+    t.boolean "can_manage", default: false
+    t.boolean "can_edit", default: false
+    t.boolean "can_download", default: false
+    t.boolean "can_delete", default: false
+    t.index ["user_id", "asset_id", "can_view"], name: "index_p_user_id_asset_id_can_view"
+    t.index ["user_id", "can_view"], name: "index_p_auth_lookup_on_user_id_and_can_view"
+  end
+
+  create_table "placeholders", force: :cascade do |t|
+    t.text "title"
+    t.text "description"
+    t.integer "contributor_id"
+    t.string "first_letter", limit: 1
+    t.string "uuid"
+    t.bigint "policy_id"
+    t.string "license"
+    t.datetime "last_used_at"
+    t.text "other_creators"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.bigint "file_template_id"
+    t.bigint "project_id"
+    t.string "data_type", default: "http://edamontology.org/data_0006", null: false
+    t.string "format_type", default: "http://edamontology.org/format_1915", null: false
+    t.integer "data_file_id"
+    t.index ["contributor_id"], name: "index_ps_on_c"
+    t.index ["file_template_id"], name: "index_placeholders_on_file_template_id"
+    t.index ["policy_id"], name: "index_placeholders_on_policy_id"
+    t.index ["project_id"], name: "index_placeholders_on_project_id"
+  end
+
+  create_table "placeholders_projects", force: :cascade do |t|
+    t.bigint "placeholder_id"
+    t.bigint "project_id"
+    t.index ["placeholder_id", "project_id"], name: "index_ph_projects_on_ph_id_and_p_id"
+    t.index ["placeholder_id"], name: "index_ph_projects_on_ph_id"
+    t.index ["project_id"], name: "index_ph_projects_on_p_id"
   end
 
   create_table "policies", force: :cascade do |t|
@@ -1315,8 +1402,8 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
   end
 
   create_table "presentations_workflows", id: false, force: :cascade do |t|
-    t.integer "workflow_id", null: false
-    t.integer "presentation_id", null: false
+    t.bigint "workflow_id", null: false
+    t.bigint "presentation_id", null: false
     t.index ["presentation_id", "workflow_id"], name: "index_presentations_workflows_on_pres_workflow"
     t.index ["workflow_id", "presentation_id"], name: "index_presentations_workflows_on_workflow_pres"
   end
@@ -1334,11 +1421,6 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.boolean "is_activated", default: false
     t.text "activation_rejection_reason"
     t.boolean "open_for_projects", default: false
-  end
-
-  create_table "project_descendants", id: false, force: :cascade do |t|
-    t.integer "ancestor_id"
-    t.integer "descendant_id"
   end
 
   create_table "project_folder_assets", force: :cascade do |t|
@@ -1359,12 +1441,6 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.datetime "updated_at"
     t.boolean "incoming", default: false
     t.boolean "deletable", default: true
-  end
-
-  create_table "project_positions", force: :cascade do |t|
-    t.string "name"
-    t.datetime "created_at"
-    t.datetime "updated_at"
   end
 
   create_table "project_subscriptions", force: :cascade do |t|
@@ -1390,12 +1466,20 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.datetime "last_jerm_run"
     t.string "uuid"
     t.integer "programme_id"
-    t.integer "ancestor_id"
-    t.integer "parent_id"
     t.string "default_license", default: "CC-BY-4.0"
     t.boolean "use_default_policy", default: false
     t.date "start_date"
     t.date "end_date"
+  end
+
+  create_table "projects_observed_variable_sets", id: false, force: :cascade do |t|
+    t.integer "project_id"
+    t.integer "observed_variable_set_id"
+  end
+
+  create_table "projects_publication_versions", id: false, force: :cascade do |t|
+    t.integer "project_id"
+    t.integer "version_id"
   end
 
   create_table "projects_publications", id: false, force: :cascade do |t|
@@ -1430,6 +1514,13 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
   create_table "projects_strains", id: false, force: :cascade do |t|
     t.integer "project_id"
     t.integer "strain_id"
+  end
+
+  create_table "projects_templates",  force: :cascade do |t|
+    t.bigint "template_id"
+    t.bigint "project_id"
+    t.index ["project_id"], name: "index_projects_templates_on_project_id"
+    t.index ["template_id"], name: "index_projects_templates_on_template_id"
   end
 
   create_table "projects_workflow_versions", id: false, force: :cascade do |t|
@@ -1471,6 +1562,36 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "publication_versions", force: :cascade do |t|
+    t.integer "publication_id"
+    t.integer "version"
+    t.text "revision_comments"
+    t.integer "pubmed_id"
+    t.text "title"
+    t.text "abstract"
+    t.date "published_date"
+    t.string "journal"
+    t.string "first_letter", limit: 1
+    t.integer "contributor_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.datetime "last_used_at"
+    t.string "doi"
+    t.string "uuid"
+    t.integer "policy_id"
+    t.text "citation"
+    t.string "deleted_contributor"
+    t.integer "registered_mode"
+    t.text "booktitle"
+    t.string "publisher"
+    t.text "editor"
+    t.integer "publication_type_id"
+    t.text "url"
+    t.integer "visibility"
+    t.index ["contributor_id"], name: "index_publication_versions_on_contributor"
+    t.index ["publication_id"], name: "index_publication_versions_on_publication_id"
+  end
+
   create_table "publications", force: :cascade do |t|
     t.integer "pubmed_id"
     t.text "title"
@@ -1493,6 +1614,9 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.text "editor"
     t.integer "publication_type_id"
     t.text "url"
+    t.integer "version", default: 1
+    t.string "license"
+    t.text "other_creators"
     t.index ["contributor_id"], name: "index_publications_on_contributor"
   end
 
@@ -1539,16 +1663,7 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.datetime "updated_at"
   end
 
-  create_table "repository_standards", force: :cascade do |t|
-    t.string "title"
-    t.string "url"
-    t.string "group_tag"
-    t.string "repo_type"
-    t.text "description"
-    t.index ["title", "group_tag"], name: "index_repository_standards_title_group_tag"
-  end
-
-  create_table "resource_publish_logs", force: :cascade do |t|
+  create_table "resource_publish_logs", id: :integer,  force: :cascade do |t|
     t.string "resource_type"
     t.integer "resource_id"
     t.integer "user_id"
@@ -1559,6 +1674,19 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.index ["publish_state"], name: "index_resource_publish_logs_on_publish_state"
     t.index ["resource_type", "resource_id"], name: "index_resource_publish_logs_on_resource_type_and_resource_id"
     t.index ["user_id"], name: "index_resource_publish_logs_on_user_id"
+  end
+
+  create_table "roles", force: :cascade do |t|
+    t.integer "person_id"
+    t.integer "role_type_id"
+    t.string "scope_type"
+    t.integer "scope_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["person_id", "role_type_id"], name: "index_roles_on_person_id_and_role_type_id"
+    t.index ["person_id"], name: "index_roles_on_person_id"
+    t.index ["role_type_id"], name: "index_roles_on_role_type_id"
+    t.index ["scope_type", "scope_id"], name: "index_roles_on_scope"
   end
 
   create_table "sample_attribute_types", force: :cascade do |t|
@@ -1586,6 +1714,9 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.string "original_accessor_name"
     t.integer "sample_controlled_vocab_id"
     t.integer "linked_sample_type_id"
+    t.string "pid"
+    t.text "description"
+    t.integer "isa_tag_id"
     t.index ["sample_type_id"], name: "index_sample_attributes_on_sample_type_id"
     t.index ["unit_id"], name: "index_sample_attributes_on_unit_id"
   end
@@ -1621,7 +1752,9 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.string "ols_root_term_uri"
     t.boolean "required"
     t.string "short_name"
-    t.integer "repository_standard_id"
+    t.integer "template_id"
+    t.string "key"
+    t.boolean "custom_input", default: false
   end
 
   create_table "sample_resource_links", force: :cascade do |t|
@@ -1642,6 +1775,14 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.boolean "uploaded_template", default: false
     t.integer "contributor_id"
     t.string "deleted_contributor"
+    t.integer "template_id"
+  end
+
+  create_table "sample_types_studies", force: :cascade do |t|
+    t.bigint "sample_type_id"
+    t.bigint "study_id"
+    t.index ["sample_type_id"], name: "index_sample_types_studies_on_sample_type_id"
+    t.index ["study_id"], name: "index_sample_types_studies_on_study_id"
   end
 
   create_table "samples", force: :cascade do |t|
@@ -1666,24 +1807,6 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean "include_external_search", default: false
-  end
-
-  create_table "scales", force: :cascade do |t|
-    t.string "title"
-    t.string "key"
-    t.integer "pos", default: 1
-    t.string "image_name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "scalings", force: :cascade do |t|
-    t.integer "scale_id"
-    t.integer "scalable_id"
-    t.integer "person_id"
-    t.string "scalable_type"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -1870,7 +1993,6 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.integer "investigation_id"
     t.text "experimentalists"
     t.datetime "begin_date"
-    t.integer "person_responsible_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "first_letter", limit: 1
@@ -1879,6 +2001,8 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.integer "contributor_id"
     t.text "other_creators"
     t.string "deleted_contributor"
+    t.integer "position"
+    t.integer "sop_id"
   end
 
   create_table "study_auth_lookup", force: :cascade do |t|
@@ -1957,6 +2081,60 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.index ["resource_type", "resource_id"], name: "index_tasks_on_resource_type_and_resource_id"
   end
 
+  create_table "template_attributes",  force: :cascade do |t|
+    t.string "title"
+    t.string "short_name"
+    t.boolean "required", default: false
+    t.string "ontology_version"
+    t.text "description"
+    t.integer "template_id"
+    t.integer "sample_controlled_vocab_id"
+    t.integer "sample_attribute_type_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "unit_id"
+    t.integer "pos"
+    t.boolean "is_title", default: false
+    t.integer "isa_tag_id"
+    t.string "iri"
+    t.index ["template_id", "title"], name: "index_template_id_asset_id_title"
+  end
+
+  create_table "template_auth_lookup", id: :integer,  force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "asset_id"
+    t.boolean "can_view", default: false
+    t.boolean "can_manage", default: false
+    t.boolean "can_edit", default: false
+    t.boolean "can_download", default: false
+    t.boolean "can_delete", default: false
+    t.index ["user_id", "asset_id", "can_view"], name: "index_template_auth_lookup_user_id_asset_id"
+    t.index ["user_id", "can_view"], name: "index_template_auth_lookup_on_user_id_and_can_view"
+  end
+
+  create_table "templates",  force: :cascade do |t|
+    t.string "title"
+    t.string "group", default: "other"
+    t.integer "group_order"
+    t.string "temporary_name"
+    t.string "template_version"
+    t.string "isa_config"
+    t.string "isa_measurement_type"
+    t.string "isa_technology_type"
+    t.string "isa_protocol_type"
+    t.string "repo_schema_id"
+    t.string "organism", default: "other"
+    t.string "level", default: "other"
+    t.text "description"
+    t.integer "policy_id"
+    t.integer "contributor_id"
+    t.string "deleted_contributor"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "parent_id"
+    t.index ["title", "group"], name: "index_templates_title_group"
+  end
+
   create_table "text_values", force: :cascade do |t|
     t.integer "version"
     t.integer "version_creator_id"
@@ -1977,7 +2155,6 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.datetime "updated_at"
     t.string "symbol"
     t.string "comment"
-    t.boolean "factors_studied", default: true
     t.integer "order"
   end
 
@@ -2105,4 +2282,6 @@ ActiveRecord::Schema.define(version: 2021_12_09_112856) do
     t.integer "sheet_number"
   end
 
+  add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
+  add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
 end

@@ -1,9 +1,7 @@
 #Default values required for the automated unit, functional and integration testing to behave as expected.
 def load_seek_testing_defaults!
     silence_warnings do
-      Settings.defaults[:is_virtualliver] = false
-      Settings.defaults[:project_hierarchy_enabled] = true
-      Settings.defaults[:project_name] = 'Sysmo'
+      Settings.defaults[:instance_name] = 'Sysmo SEEK'
 
       Settings.defaults[:noreply_sender] ="no-reply@sysmo-db.org"
       Settings.defaults[:support_email_address] = 'support@seek.org'
@@ -24,16 +22,12 @@ def load_seek_testing_defaults!
       Settings.defaults[:filestore_path] = "tmp/testing-filestore"
       Settings.defaults[:tagging_enabled] = true
       Settings.defaults[:authorization_checks_enabled] = true
-      Settings.defaults[:magic_guest_enabled] = false
       Settings.defaults[:modelling_analysis_enabled] = true
       Settings.defaults[:show_as_external_link_enabled] = false
-      Settings.defaults[:factors_studied_enabled] = true
-      Settings.defaults[:experimental_conditions_enabled] = true
+      Settings.defaults[:allow_publications_fulltext] = true
+      Settings.defaults[:allow_edit_of_registered_publ] = false
       Settings.defaults[:programme_user_creation_enabled] = true
       Settings.defaults[:programmes_open_for_projects_enabled] = true
-
-      Settings.defaults[:project_hierarchy_enabled] = true
-      Settings.defaults[:tabs_lazy_load_enabled] = false
 
       # Types
       Settings.defaults[:collections_enabled] = true
@@ -48,15 +42,17 @@ def load_seek_testing_defaults!
       Settings.defaults[:samples_enabled] = true
       Settings.defaults[:workflows_enabled] = true
 
-      Settings.defaults[:project_link] = 'http://www.sysmo.net'
-      Settings.defaults[:application_name] = 'Sysmo SEEK'
-      Settings.defaults[:dm_project_name] = "SysMO-DB"
-      Settings.defaults[:dm_project_link] = "http://www.sysmo-db.org"
-      Settings.defaults[:project_type] = 'Consortium'
+      Settings.defaults[:instance_link] = 'http://www.sysmo.net'
+      Settings.defaults[:application_name] = 'FAIRDOM-SEEK'
+      Settings.defaults[:instance_admins_name] = "SysMO-DB"
+      Settings.defaults[:instance_admins_link] = "http://www.sysmo-db.org"
       Settings.defaults[:header_image_enabled] = true
       Settings.defaults[:header_image_title] =  "SysMO-DB"
       Settings.defaults[:header_image_link] = "http://www.sysmo-db.org"
       Settings.defaults[:bioportal_api_key]="fish"
+
+      Settings.defaults[:about_instance_link_enabled] = true
+      Settings.defaults[:about_instance_admins_link_enabled] = true
 
       Settings.defaults[:technology_type_ontology_file] = "file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
       Settings.defaults[:modelling_analysis_type_ontology_file] = "file:#{Rails.root}/test/fixtures/files/JERM-test.rdf"
@@ -73,10 +69,6 @@ def load_seek_testing_defaults!
       Seek::Config.fixed :css_prepended,''
       Seek::Config.fixed :css_appended,''
       Seek::Config.fixed :main_layout,'application'
-
-      Settings.defaults[:faceted_browsing_enabled] = false
-      Settings.defaults[:facet_enable_for_pages] = {:people => true, :projects => false, :institutions => false, :programmes => false, :investigations => false,:studies => false, :assays => true, :data_files => true, :models => true,:sops => true, :publications => true,:events => false, :strains => false, :presentations => false}
-      Settings.defaults[:faceted_search_enabled] =  false
 
       Settings.defaults[:recaptcha_enabled] = true
 
@@ -143,5 +135,6 @@ def load_seek_testing_defaults!
       Settings.defaults[:life_monitor_client_id] = 'xyz'
       Settings.defaults[:life_monitor_client_secret] = 'xyzabc'
       Settings.defaults[:git_support_enabled] = true
+      Settings.defaults[:fair_signposting_enabled] = true
     end
 end

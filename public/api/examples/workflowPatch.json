@@ -1,41 +1,118 @@
 {
-    "data": {
-        "id": "23",
-        "type": "workflows",
-        "attributes": {
-            "description": "This is a very important workflow!",
-            "tags": [
-                "tag1",
-                "tag2",
-                "tag3"
-            ]
+  "data": {
+    "type": "workflows",
+    "id": "30",
+    "attributes": {
+      "title": "A Maximally Patched Workflow",
+      "description": "A workflow to do important stuff",
+      "workflow_class": {
+        "key": "cwl"
+      },
+      "tags": [
+        "tag1",
+        "tag2",
+        "tag3"
+      ],
+      "edam_operations": [
+        {
+          "label": "Clustering",
+          "identifier": "http://edamontology.org/operation_3432"
         },
-        "relationships": {
-            "creators": {
-                "data": [
-                    {
-                        "id": "321",
-                        "type": "people"
-                    },
-                    {
-                        "id": "372",
-                        "type": "people"
-                    }
-                ]
-            }
-        },
-        "links": {
-            "self": "/workflows/23?version=1"
-        },
-        "meta": {
-            "created": "2020-01-31T14:07:09.000Z",
-            "modified": "2020-01-31T14:07:10.000Z",
-            "api_version": "0.2",
-            "uuid": "e5180ff0-2660-0138-94a4-74939ff51fe0",
-            "base_url": "http://localhost:3000"
+        {
+          "label": "Correlation",
+          "identifier": "http://edamontology.org/operation_3465"
         }
+      ],
+      "edam_topics": [
+        {
+          "label": "Chemistry",
+          "identifier": "http://edamontology.org/topic_3314"
+        },
+        {
+          "label": "Sample collections",
+          "identifier": "http://edamontology.org/topic_3277"
+        }
+      ],
+      "license": "CC-BY-4.0",
+      "other_creators": "John Smith, Jane Smith",
+      "policy": {
+        "access": "no_access",
+        "permissions": [
+          {
+            "resource": {
+              "id": "494",
+              "type": "projects"
+            },
+            "access": "edit"
+          }
+        ]
+      }
     },
-    "jsonapi": {
-        "version": "1.0"
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "457",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "494",
+            "type": "projects"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "68",
+            "type": "assays"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "40",
+            "type": "publications"
+          }
+        ]
+      },
+      "presentations": {
+        "data": [
+          {
+            "id": "24",
+            "type": "presentations"
+          }
+        ]
+      },
+      "data_files": {
+        "data": [
+          {
+            "id": "32",
+            "type": "data_files"
+          }
+        ]
+      },
+      "documents": {
+        "data": [
+          {
+            "id": "40",
+            "type": "documents"
+          }
+        ]
+      },
+      "sops": {
+        "data": [
+          {
+            "id": "30",
+            "type": "sops"
+          }
+        ]
+      }
     }
+  }
 }

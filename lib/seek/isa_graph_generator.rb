@@ -148,8 +148,9 @@ module Seek
 
     def children(object)
       associations = associations(object)
-      (associations[:children].map { |a| resolve_association(object, a) }.flatten +
-      associations[:related].map { |a| resolve_association(object, a) }.flatten).uniq
+      combined = (associations[:children].map { |a| resolve_association(object, a) }.flatten +
+                  associations[:related].map { |a| resolve_association(object, a) }.flatten).uniq
+      combined
     end
 
     def parents(object)
@@ -157,8 +158,14 @@ module Seek
     end
 
     def resolve_association(object, association)
-      return [] unless object.respond_to?(association)
-      associations = object.send(association)
+      if object.respond_to?('related_' + association.to_s)
+        associations = object.send('related_' + association.to_s)
+      elsif object.respond_to?(association)
+        associations = object.send(association)
+      else
+        return []
+      end
+
       associations = associations.respond_to?(:each) ? associations : [associations]
       associations.compact
     end
@@ -171,23 +178,23 @@ module Seek
         }
       when Project
         {
-          children: [:investigations],
+          children: %i[positioned_investigations project_assets],
           parents: [:programme]
         }
       when Investigation
         {
-          children: [:studies],
+          children: [:positioned_studies],
           related: [:publications]
         }
       when Study
         {
-          children: [:assays],
+          children: [:positioned_assays],
           parents: [:investigation],
           related: [:publications]
         }
       when Assay
         {
-          children: %i[data_files models sops publications documents],
+          children: %i[data_files models sops publications documents placeholders],
           parents: [:study],
           # related: [:publications],
           aggregated_children: { samples: :samples }

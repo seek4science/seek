@@ -1,0 +1,37 @@
+{
+  "data": {
+    "type": "investigations",
+    "attributes": {
+      "title": "A Maximal Investigation",
+      "policy": {
+        "access": "download",
+        "permissions":
+        <%= @projects.map { |p| { resource: { type: 'projects', id: p.id.to_s }, access: 'manage' } }.to_json %>
+      },
+      "description": "This is a more complex investigation",
+      "other_creators": "Max Blumenthal, Ed Snowden"
+    },
+    "relationships": {
+      "projects": {
+        "data":
+        <%= @projects.map { |p| { type: 'projects', id: p.id.to_s } }.to_json %>
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "<%= @publication.id %>",
+            "type": "publications"
+          }
+        ]
+      },
+      "creators": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      }
+    }
+  }
+}

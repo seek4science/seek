@@ -6,9 +6,9 @@ class WorkflowRepositoryBuilderTest < ActiveSupport::TestCase
   end
 
   test 'builds local file crate repository' do
-    params = { main_workflow: { data: fixture_file_upload('files/workflows/1-PreProcessing.ga') },
-               diagram: { data: fixture_file_upload('files/file_picture.png') },
-               abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
+    params = { main_workflow: { data: fixture_file_upload('workflows/1-PreProcessing.ga') },
+               diagram: { data: fixture_file_upload('file_picture.png') },
+               abstract_cwl: { data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl') }
     }
     builder = WorkflowRepositoryBuilder.new(params)
     builder.workflow_class = @galaxy
@@ -42,8 +42,8 @@ class WorkflowRepositoryBuilderTest < ActiveSupport::TestCase
   end
 
   test 'reports error with missing workflow' do
-    params = { diagram: { data: fixture_file_upload('files/file_picture.png') },
-               abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
+    params = { diagram: { data: fixture_file_upload('file_picture.png') },
+               abstract_cwl: { data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl') }
     }
     builder = WorkflowRepositoryBuilder.new(params)
     refute builder.valid?
@@ -53,8 +53,8 @@ class WorkflowRepositoryBuilderTest < ActiveSupport::TestCase
 
   test 'reports error with missing workflow params' do
     params = { main_workflow: { bla: true },
-               diagram: { data: fixture_file_upload('files/file_picture.png') },
-               abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
+               diagram: { data: fixture_file_upload('file_picture.png') },
+               abstract_cwl: { data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl') }
     }
     builder = WorkflowRepositoryBuilder.new(params)
     refute builder.valid?
@@ -79,16 +79,19 @@ class WorkflowRepositoryBuilderTest < ActiveSupport::TestCase
   end
 
   test 'does not create spurious entities' do
-    params = { main_workflow: { data: fixture_file_upload('files/workflows/1-PreProcessing.ga') },
-               diagram: { data: fixture_file_upload('files/file_picture.png') },
-               abstract_cwl: { data: fixture_file_upload('files/workflows/rp2-to-rp2path-packed.cwl') }
+    params = { main_workflow: { data: fixture_file_upload('workflows/1-PreProcessing.ga') },
+               diagram: { data: fixture_file_upload('file_picture.png') },
+               abstract_cwl: { data: fixture_file_upload('workflows/rp2-to-rp2path-packed.cwl') }
     }
     builder = WorkflowRepositoryBuilder.new(params)
     builder.workflow_class = @galaxy
     workflow = builder.build
+    workflow.title = "Test"
+    workflow.projects = [Factory(:project)]
+    disable_authorization_checks { workflow.save }
     crate = workflow.ro_crate
 
-    assert_equal 18, crate.entities.count
+    assert_equal 20, crate.entities.count # TODO: Change me to 19 when #960 resolved
     assert crate.get("ro-crate-metadata.json").is_a?(ROCrate::Metadata)
     assert crate.get("ro-crate-preview.html").is_a?(ROCrate::Preview)
     assert crate.get("./").is_a?(ROCrate::WorkflowCrate)

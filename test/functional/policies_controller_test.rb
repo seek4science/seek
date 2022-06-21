@@ -64,7 +64,7 @@ class PoliciesControllerTest < ActionController::TestCase
     login_as(sop.contributor)
     post :preview_permissions, params: { policy_attributes: projects_policy(Policy::VISIBLE, [gatekeeper.projects.first], Policy::ACCESSIBLE), resource_name: 'sop', resource_id: sop.id, project_ids: gatekeeper.projects.first.id.to_s }
 
-    assert_select '#preview_permissions div.alert', text: "An email will be sent to the Gatekeepers of the #{I18n.t('project').pluralize} associated with this #{I18n.t('sop')} to ask for publishing approval. This #{I18n.t('sop')} will not be published until one of the Gatekeepers has granted approval.", count: 1
+    assert_select '#preview_permissions div.alert', text: "An email will be sent to the #{I18n.t('asset_gatekeeper').pluralize.downcase} of the #{I18n.t('project').pluralize} associated with this #{I18n.t('sop')} to ask for publishing approval. This #{I18n.t('sop')} will not be published until one of the #{I18n.t('asset_gatekeeper').pluralize.downcase} has granted approval.", count: 1
   end
 
   test 'should show notice message when an item is requested to be published and the request was alread sent by this user' do
@@ -74,13 +74,13 @@ class PoliciesControllerTest < ActionController::TestCase
     ResourcePublishLog.add_log ResourcePublishLog::WAITING_FOR_APPROVAL, sop
     post :preview_permissions, params: { policy_attributes: { access_type: Policy::VISIBLE }, resource_name: 'sop', resource_id: sop.id, project_ids: gatekeeper.projects.first.id.to_s }
 
-    assert_select '#preview_permissions div.alert', text: "You requested the publishing approval from the Gatekeepers of the #{I18n.t('project').pluralize} associated with this #{I18n.t('sop')}, and it is waiting for the decision. This #{I18n.t('sop')} will not be published until one of the Gatekeepers has granted approval.", count: 1
+    assert_select '#preview_permissions div.alert', text: "You requested the publishing approval from one of the #{I18n.t('asset_gatekeeper').pluralize.downcase } of the #{I18n.t('project').pluralize} associated with this #{I18n.t('sop')}, and it is waiting for the decision. This #{I18n.t('sop')} will not be published until one of the #{I18n.t('asset_gatekeeper').pluralize.downcase } has granted approval.", count: 1
   end
 
   test 'should not show notice message when an item can be published right away' do
     post :preview_permissions, params: { policy_attributes: { access_type: Policy::VISIBLE }, resource_name: 'sop', project_ids: Factory(:project).id.to_s }
 
-    assert_select '#preview_permissions div.alert', text: "An email will be sent to the Gatekeepers of the  #{I18n.t('project').pluralize} associated with this #{I18n.t('sop')} to ask for publishing approval. This #{I18n.t('sop')} will not be published until one of the Gatekeepers has granted approval.", count: 0
+    assert_select '#preview_permissions div.alert', text: "An email will be sent to the #{I18n.t('asset_gatekeeper').pluralize.downcase} of the  #{I18n.t('project').pluralize} associated with this #{I18n.t('sop')} to ask for publishing approval. This #{I18n.t('sop')} will not be published until one of the #{I18n.t('asset_gatekeeper').pluralize.downcase } has granted approval.", count: 0
   end
 
   test 'when creating an item, can not publish the item if associate to it the project which has gatekeeper' do
@@ -107,35 +107,31 @@ class PoliciesControllerTest < ActionController::TestCase
   end
 
   test 'when updating an item, can not publish the item if associate to it the project which has gatekeeper' do
-    as_not_virtualliver do
-      gatekeeper = Factory(:asset_gatekeeper)
-      a_person = Factory(:person)
-      item = Factory(:sop, policy: Factory(:policy))
-      Factory(:permission, contributor: a_person, access_type: Policy::MANAGING, policy: item.policy)
-      item.reload
+    gatekeeper = Factory(:asset_gatekeeper)
+    a_person = Factory(:person)
+    item = Factory(:sop, policy: Factory(:policy))
+    Factory(:permission, contributor: a_person, access_type: Policy::MANAGING, policy: item.policy)
+    item.reload
 
-      login_as(a_person.user)
-      assert item.can_manage?
+    login_as(a_person.user)
+    assert item.can_manage?
 
-      updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(item, gatekeeper.projects.first)
-      assert !updated_can_publish_immediately
-    end
+    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(item, gatekeeper.projects.first)
+    assert !updated_can_publish_immediately
   end
 
   test 'when updating an item, can publish the item if dissociate to it the project which has gatekeeper' do
-    as_not_virtualliver do
-      gatekeeper = Factory(:asset_gatekeeper)
-      a_person = Factory(:person)
-      item = Factory(:sop, policy: Factory(:policy), project_ids: gatekeeper.projects.collect(&:id))
-      Factory(:permission, contributor: a_person, access_type: Policy::MANAGING, policy: item.policy)
-      item.reload
+    gatekeeper = Factory(:asset_gatekeeper)
+    a_person = Factory(:person)
+    item = Factory(:sop, policy: Factory(:policy), project_ids: gatekeeper.projects.collect(&:id))
+    Factory(:permission, contributor: a_person, access_type: Policy::MANAGING, policy: item.policy)
+    item.reload
 
-      login_as(a_person.user)
-      assert item.can_manage?
+    login_as(a_person.user)
+    assert item.can_manage?
 
-      updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(item, Factory(:project))
-      assert updated_can_publish_immediately
-    end
+    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(item, Factory(:project))
+    assert updated_can_publish_immediately
   end
 
   test 'can publish assay without study' do
@@ -150,23 +146,21 @@ class PoliciesControllerTest < ActionController::TestCase
   end
 
   test 'can not publish assay having project with gatekeeper' do
-    as_not_virtualliver do
-      gatekeeper = Factory(:asset_gatekeeper)
-      refute_empty gatekeeper.projects
-      a_person = Factory(:person, project: gatekeeper.projects.first)
-      inv = Factory(:investigation, contributor: gatekeeper)
-      study = Factory(:study, investigation: inv, contributor: gatekeeper)
-      assay = Assay.new
-      assay.study = study
+    gatekeeper = Factory(:asset_gatekeeper)
+    refute_empty gatekeeper.projects
+    a_person = Factory(:person, project: gatekeeper.projects.first)
+    inv = Factory(:investigation, contributor: gatekeeper)
+    study = Factory(:study, investigation: inv, contributor: gatekeeper)
+    assay = Assay.new
+    assay.study = study
 
-      assert_equal assay.projects, gatekeeper.projects
-      login_as(a_person.user)
-      assert assay.can_manage?
+    assert_equal assay.projects, gatekeeper.projects
+    login_as(a_person.user)
+    assert assay.can_manage?
 
-      # FIXME: can't test controller this way properly as it doesn't setup the @request and session properly
-      updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(assay, assay.study.projects)
-      refute updated_can_publish_immediately
-    end
+    # FIXME: can't test controller this way properly as it doesn't setup the @request and session properly
+    updated_can_publish_immediately = PoliciesController.new.updated_can_publish_immediately(assay, assay.study.projects)
+    refute updated_can_publish_immediately
   end
 
   test 'always can publish for the published item' do

@@ -122,12 +122,12 @@ class SpecialAuthCodesAccessTest < ActionDispatch::IntegrationTest
       Factory :special_auth_code, expiration_date: (Time.now + 1.days), asset: item
     end
 
-    get "/sops/#{item.id}/content_blobs/#{item.content_blob.id}/view_pdf_content"
+    get "/sops/#{item.id}/content_blobs/#{item.content_blob.id}/view_content"
     assert_redirected_to item
     assert_not_nil flash[:error]
 
     code = CGI.escape(auth_code.code)
-    get "/sops/#{item.id}/content_blobs/#{item.content_blob.id}/view_pdf_content?code=#{code}"
+    get "/sops/#{item.id}/content_blobs/#{item.content_blob.id}/view_content?code=#{code}"
     assert_response :success
   end
 

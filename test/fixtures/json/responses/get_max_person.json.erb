@@ -1,0 +1,134 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "people",
+    "attributes": {
+      "avatar": "/people/<%= res.id %>/avatars/<%= res.avatar_id %>",
+      "title": "Maximilian Maxi-Mum",
+      "description": "A person with all possible details",
+      "first_name": "Maximilian",
+      "last_name": "Maxi-Mum",
+      "orcid": "https://orcid.org/0000-0001-9842-9718",
+      "mbox_sha1sum": "a19916c29e3857b918504789a62950d3542f94ec",
+      "expertise": [
+        "golf",
+        "fishing"
+      ],
+      "tools": [
+        "fishing rod"
+      ],
+      "login": "max_person_user"
+    },
+    "relationships": {
+      "projects": {
+        "data": [
+          {
+            "id": "<%= res.project_ids.first %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "institutions": {
+        "data": [
+          {
+            "id": "<%= res.institution_ids.first %>",
+            "type": "institutions"
+          }
+        ]
+      },
+      "investigations": {
+        "data": [
+          {
+            "id": "<%= res.related_investigation_ids.first %>",
+            "type": "investigations"
+          }
+        ]
+      },
+      "studies": {
+        "data": [
+          {
+            "id": "<%= res.related_study_ids.first %>",
+            "type": "studies"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "<%= res.related_assay_ids.first %>",
+            "type": "assays"
+          }
+        ]
+      },
+      "data_files": {
+        "data": [
+          {
+            "id": "<%= res.related_data_file_ids.first %>",
+            "type": "data_files"
+          }
+        ]
+      },
+      "models": {
+        "data": [
+          {
+            "id": "<%= res.related_model_ids.first %>",
+            "type": "models"
+          }
+        ]
+      },
+      "sops": {
+        "data": [
+          {
+            "id": "<%= res.related_sop_ids.first %>",
+            "type": "sops"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "<%= res.related_publication_ids.first %>",
+            "type": "publications"
+          }
+        ]
+      },
+      "presentations": {
+        "data": [
+          {
+            "id": "<%= res.related_presentation_ids.first %>",
+            "type": "presentations"
+          }
+        ]
+      },
+      "events": {
+        "data": [
+          {
+            "id": "<%= res.related_event_ids.first %>",
+            "type": "events"
+          }
+        ]
+      },
+      "documents": {
+        "data": [
+          {
+            "id": "<%= res.related_document_ids.first %>",
+            "type": "documents"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/people/<%= res.id %>"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "uuid": "<%= res.uuid %>",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.3"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

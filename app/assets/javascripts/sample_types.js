@@ -1,14 +1,13 @@
 var SampleTypes = {
-
-    recalculatePositions: function () {
-        $j('#attribute-table tr.sample-attribute .attribute-position').each(function (index, item) {
+    recalculatePositions: function (selector = "#attribute-table") {
+        $j(selector + ' tr.sample-attribute .attribute-position').each(function (index, item) {
             $j('.attribute-position-label', $j(item)).html(index + 1);
             $j('input', $j(item)).val(index + 1);
         });
     },
 
-    bindSortable: function () {
-        $j('#attribute-table tbody').sortable({
+    bindSortable: function (selector = "#attribute-table") {
+        $j(selector + ' tbody').sortable({
             items: '.sample-attribute',
             helper: SampleTypes.fixHelper,
             handle: '.attribute-handle'
@@ -17,8 +16,8 @@ var SampleTypes = {
         });
     },
 
-    unbindSortable: function () {
-        $j('#attribute-table tbody').sortable('destroy');
+    unbindSortable: function (selector = "#attribute-table") {
+        $j(selector + ' tbody').sortable('destroy');
     },
 
     fixHelper: function(e, ui) {
@@ -29,25 +28,29 @@ var SampleTypes = {
     },
 
     singleIsTitle: function () {
+        const attributeTable = $j(this).closest("table")
         if ($j(this).is(':checked')) {
-            $j('.sample-type-is-title:not(#'+this.id+')').prop('checked',false);
+            const selector = attributeTable.find('.sample-type-is-title:not(#'+this.id+')')
+            $j(selector).prop('checked',false);
         }
         else {
-            if ($j('.sample-type-is-title:checked').length==0) {
+            if (attributeTable.find('.sample-type-is-title:checked').length==0) {
                 $j(this).prop('checked',true);
             }
         }
     },
 
     //make sure there is at least one attribute with title flag checked, particularly after remove
-    checkForIsTitle: function() {
-        if ($j('.sample-type-is-title:checked').length==0 && $j(".sample-attribute:not(.danger)").length>0) {
-            $j(".sample-attribute:not(.danger)").find(".sample-type-is-title")[0].checked=true;
+    checkForIsTitle: function(attributeTable) {
+        if (attributeTable.find('.sample-type-is-title:checked').length==0 
+            && attributeTable.find(".sample-attribute:not(.danger)").length>0) {
+            attributeTable.find(".sample-attribute:not(.danger)").find(".sample-type-is-title")[0].checked=true;
         }
     },
 
     removeAttribute: function () {
         var row = $j(this).parents('.sample-attribute');
+        const attributeTable = $j(this).closest("table")
         if($j(this).is(':checked')) {
             if (row.hasClass('success')) { // If it is a new attribute, just delete from the form - doesn't exist yet.
                 row.remove();
@@ -63,7 +66,7 @@ var SampleTypes = {
             row.removeClass('danger');
             $j(':input:not(.destroy-attribute)', row).prop('disabled', false);
         }
-        SampleTypes.checkForIsTitle();
+        SampleTypes.checkForIsTitle(attributeTable);
     },
 
     attributeTypeChanged: function () {

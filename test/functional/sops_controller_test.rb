@@ -5,7 +5,6 @@ class SopsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
   include HtmlHelper
@@ -15,10 +14,6 @@ class SopsControllerTest < ActionController::TestCase
     @user = users(:quentin)
     @project = @user.person.projects.first
     login_as(@user)
-  end
-
-  def rest_api_test_object
-    @object = sops(:downloadable_sop)
   end
 
   test 'creators do not show in list item' do
@@ -307,15 +302,15 @@ class SopsControllerTest < ActionController::TestCase
   test 'request contact' do
     s = Factory(:sop, contributor: Factory(:person), policy: Factory(:public_policy))
     assert_enqueued_emails(1) do
-      assert_difference('MessageLog.count') do
+      assert_difference('ContactRequestMessageLog.count') do
         post :request_contact, format: :js, params: { id:s, details:'blah blah' }
       end
     end
 
-    log = MessageLog.last
+    log = ContactRequestMessageLog.last
     assert_equal s, log.subject
     assert_equal User.current_user.person,log.sender
-    assert_equal MessageLog::CONTACT_REQUEST,log.message_type
+    assert log.contact_request?
 
   end
 
@@ -325,7 +320,7 @@ class SopsControllerTest < ActionController::TestCase
     # !!!description cannot be changed in new version but revision comments and file name,etc
 
     # create new version
-    post :create_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: fixture_file_upload('files/little_file_v2.txt', 'text/plain') }] }
+    post :create_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: fixture_file_upload('little_file_v2.txt', 'text/plain') }] }
     assert_redirected_to sop_path(assigns(:sop))
 
     s = Sop.find(s.id)
@@ -357,7 +352,7 @@ class SopsControllerTest < ActionController::TestCase
     al = ActivityLog.last
     assert_equal 'download', al.action
     assert_equal sop, al.activity_loggable
-    assert_equal "attachment; filename=\"ms_word_test.doc\"", @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"ms_word_test.doc\"; filename*=UTF-8''ms_word_test.doc", @response.header['Content-Disposition']
     assert_equal 'application/msword', @response.header['Content-Type']
     assert_equal '9216', @response.header['Content-Length']
   end
@@ -392,7 +387,7 @@ class SopsControllerTest < ActionController::TestCase
     refute s.can_edit?
 
     assert_no_difference('Sop::Version.count') do
-      post :create_version, params: { id: s, data: fixture_file_upload('files/file_picture.png'), revision_comments: 'This is a new revision' }
+      post :create_version, params: { id: s, data: fixture_file_upload('file_picture.png'), revision_comments: 'This is a new revision' }
     end
 
     assert_redirected_to sop_path(s)
@@ -401,48 +396,6 @@ class SopsControllerTest < ActionController::TestCase
     s = Sop.find(s.id)
     assert_equal current_version_count, s.versions.size
     assert_equal current_version, s.version
-  end
-
-  def test_should_duplicate_conditions_for_new_version
-    s = Factory :sop, contributor: User.current_user.person
-    condition1 = ExperimentalCondition.create(unit_id: units(:gram).id, measured_item_id: measured_items(:weight).id,
-                                              start_value: 1, sop_id: s.id, sop_version: s.version)
-    condition1.save!
-    s.reload
-    assert_equal 1, s.experimental_conditions.count
-    assert_difference('Sop::Version.count', 1) do
-      assert_difference('ExperimentalCondition.count', 1) do
-        post :create_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' } # v2
-      end
-    end
-
-    assert_equal 1, s.find_version(1).experimental_conditions.count
-    assert_equal 1, s.find_version(2).experimental_conditions.count
-    assert_not_equal s.find_version(1).experimental_conditions, s.find_version(2).experimental_conditions
-  end
-
-  def test_adding_new_conditions_to_different_versions
-    s = Factory(:sop, contributor:User.current_user.person)
-    assert s.can_edit?
-    condition1 = ExperimentalCondition.create(unit_id: units(:gram).id, measured_item: measured_items(:weight),
-                                              start_value: 1, sop_id: s.id, sop_version: s.version)
-    assert_difference('Sop::Version.count', 1) do
-      assert_difference('ExperimentalCondition.count', 1) do
-        post :create_version, params: { id: s, sop: { title: s.title }, content_blobs: [{ data: picture_file }], revision_comments: 'This is a new revision' } # v2
-      end
-    end
-
-    s.find_version(2).experimental_conditions.each(&:destroy)
-    assert_equal condition1, s.find_version(1).experimental_conditions.first
-    assert_equal 0, s.find_version(2).experimental_conditions.count
-
-    condition2 = ExperimentalCondition.create(unit_id: units(:gram).id, measured_item: measured_items(:weight),
-                                              start_value: 2, sop_id: s.id, sop_version: 2)
-
-    assert_not_equal 0, s.find_version(2).experimental_conditions.count
-    assert_equal condition2, s.find_version(2).experimental_conditions.first
-    assert_not_equal condition2, s.find_version(1).experimental_conditions.first
-    assert_equal condition1, s.find_version(1).experimental_conditions.first
   end
 
   def test_should_add_nofollow_to_links_in_show_page
@@ -585,18 +538,16 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should set the policy to projects_policy if the item is requested to be published, when creating new sop' do
-    as_not_virtualliver do
-      gatekeeper = Factory(:asset_gatekeeper)
-      @user.person.add_to_project_and_institution(gatekeeper.projects.first, Factory(:institution))
-      post :create, params: { sop: { title: 'test', project_ids: gatekeeper.projects.collect(&:id) }, content_blobs: [{ data: picture_file }], policy_attributes: { access_type: Policy::VISIBLE } }
-      sop = assigns(:sop)
-      assert_redirected_to (sop)
-      policy = sop.policy
-      assert_equal Policy::NO_ACCESS, policy.access_type
-      assert_equal 1, policy.permissions.count
-      assert_equal gatekeeper.projects.first, policy.permissions.first.contributor
-      assert_equal Policy::ACCESSIBLE, policy.permissions.first.access_type
-    end
+    gatekeeper = Factory(:asset_gatekeeper)
+    @user.person.add_to_project_and_institution(gatekeeper.projects.first, Factory(:institution))
+    post :create, params: { sop: { title: 'test', project_ids: gatekeeper.projects.collect(&:id) }, content_blobs: [{ data: picture_file }], policy_attributes: { access_type: Policy::VISIBLE } }
+    sop = assigns(:sop)
+    assert_redirected_to (sop)
+    policy = sop.policy
+    assert_equal Policy::NO_ACCESS, policy.access_type
+    assert_equal 1, policy.permissions.count
+    assert_equal gatekeeper.projects.first, policy.permissions.first.contributor
+    assert_equal Policy::ACCESSIBLE, policy.permissions.first.access_type
   end
 
   test 'should not change the policy if the item is requested to be published, when managing sop' do
@@ -623,24 +574,22 @@ class SopsControllerTest < ActionController::TestCase
   end
 
   test 'should be able to view ms/open office word content' do
-    Seek::Config.stub(:soffice_available?, true) do
-      ms_word_sop = Factory(:doc_sop, policy: Factory(:all_sysmo_downloadable_policy))
-      content_blob = ms_word_sop.content_blob
-      pdf_filepath = content_blob.filepath('pdf')
-      FileUtils.rm pdf_filepath if File.exist?(pdf_filepath)
-      assert content_blob.is_content_viewable?
-      get :show, params: { id: ms_word_sop.id }
-      assert_response :success
-      assert_select 'a', text: /View content/, count: 1
-      assert_select 'a.disabled', text: /View content/, count: 0
+    ms_word_sop = Factory(:doc_sop, policy: Factory(:all_sysmo_downloadable_policy))
+    content_blob = ms_word_sop.content_blob
+    pdf_filepath = content_blob.filepath('pdf')
+    FileUtils.rm pdf_filepath if File.exist?(pdf_filepath)
+    assert content_blob.is_content_viewable?
+    get :show, params: { id: ms_word_sop.id }
+    assert_response :success
+    assert_select 'a', text: /View content/, count: 1
+    assert_select 'a.disabled', text: /View content/, count: 0
 
-      openoffice_word_sop = Factory(:odt_sop, policy: Factory(:all_sysmo_downloadable_policy))
-      assert openoffice_word_sop.content_blob.is_content_viewable?
-      get :show, params: { id: openoffice_word_sop.id }
-      assert_response :success
-      assert_select 'a', text: /View content/, count: 1
-      assert_select 'a.disabled', text: /View content/, count: 0
-    end
+    openoffice_word_sop = Factory(:odt_sop, policy: Factory(:all_sysmo_downloadable_policy))
+    assert openoffice_word_sop.content_blob.is_content_viewable?
+    get :show, params: { id: openoffice_word_sop.id }
+    assert_response :success
+    assert_select 'a', text: /View content/, count: 1
+    assert_select 'a.disabled', text: /View content/, count: 0
   end
 
   test 'should disappear view content button for the document needing pdf conversion, when pdf_conversion_enabled is false' do
@@ -873,7 +822,7 @@ class SopsControllerTest < ActionController::TestCase
     sop = Factory :sop, license: 'CC-BY-4.0', policy: Factory(:public_policy)
     sopv = Factory :sop_version_with_blob, sop: sop
 
-    sop.update_attributes license: 'CC0-1.0'
+    sop.update license: 'CC0-1.0'
 
     get :show, params: { id: sop, version: 1 }
     assert_response :success
@@ -948,11 +897,6 @@ class SopsControllerTest < ActionController::TestCase
     assert_select '#citation', text: /Bacall, F/, count:1
   end
 
-  def edit_max_object(sop)
-    add_tags_to_test_object(sop)
-    add_creator_to_test_object(sop)
-  end
-
   test 'shows how to get doi for private sop' do
     sop = Factory(:sop, policy: Factory(:private_policy))
 
@@ -990,6 +934,29 @@ class SopsControllerTest < ActionController::TestCase
     assert_select '#citation-instructions a[href=?]', mint_doi_confirm_sop_path(sop, version: sop.version), count: 1
   end
 
+  test 'does not show how to get a doi if the version is not set to visible to anyone' do
+
+    sop = Factory(:sop, contributor: @user.person)
+
+    assert_difference('Sop::Version.count', 1) do
+      post :create_version, params: { id: sop, sop: { title: sop.title }, content_blobs: [{ data: picture_file }], revision_comments: 'version 2' }
+    end
+
+    assert_equal 2, sop.versions.size
+
+    post :edit_version, params: { id: sop.id, version: 1, visibility: 'registered_users' }
+
+    assert_redirected_to sop
+
+    assert_equal :registered_users, sop.find_version(1).reload.visibility
+
+    get :show, params: { id: sop, version: 1 }
+
+    assert_response :success
+    assert_select '#citation-instructions', count: 1
+    assert_select 'div.alert-warning p', count: 1, text: /This version must be set to "#{VersionHelper::VISIBILITY_LABELS[:public].downcase}" before being eligible for a DOI./
+  end
+
   test 'does not show how to get a doi if no manage permission' do
     sop = Factory(:sop, policy: Factory(:publicly_viewable_policy))
     person = Factory(:person)
@@ -1005,7 +972,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'content blob filename precedence should take user input first' do
     stub_request(:any, 'http://example.com/url_filename.txt')
-        .to_return(body: 'hi', headers: { 'Content-Disposition' => 'attachment; filename="server_filename.txt"' })
+        .to_return(body: 'hi', headers: { 'Content-Disposition' => "attachment; filename=\"server_filename.txt\"; filename*=UTF-8''server_filename.txt" })
     sop = { title: 'Test', project_ids: [@project.id] }
     blob = { data_url: 'http://example.com/url_filename.txt', original_filename: 'user_filename.txt' }
 
@@ -1020,7 +987,7 @@ class SopsControllerTest < ActionController::TestCase
 
   test 'content blob filename precedence should take server filename second' do
     stub_request(:any, 'http://example.com/url_filename.txt')
-        .to_return(body: 'hi', headers: { 'Content-Disposition' => 'attachment; filename="server_filename.txt"' })
+        .to_return(body: 'hi', headers: { 'Content-Disposition' => "attachment; filename=\"server_filename.txt\"; filename*=UTF-8''server_filename.txt" })
     sop = { title: 'Test', project_ids: [@project.id] }
     blob = { data_url: 'http://example.com/url_filename.txt' }
 
@@ -1304,7 +1271,7 @@ class SopsControllerTest < ActionController::TestCase
     # should be a temporary sharing link
     assert_select 'div#temporary_links', count:1
 
-    assert_select 'div#author_form', count:1
+    assert_select 'div#author-form', count:1
 
     # this is to check the SOP is all upper case in the sharing form
     assert_select 'div.alert-info', text: /the #{I18n.t('sop')}/
@@ -1663,6 +1630,125 @@ class SopsControllerTest < ActionController::TestCase
     assert_equal :public, sop.find_version(2).reload.visibility, 'Should not have changed visibility - latest version'
   end
 
+  test 'can add assets_creators via API' do
+    sop = Factory(:sop)
+    person = Factory(:person, first_name: 'Jane', last_name: 'Smith')
+    login_as(sop.contributor)
+    assert_difference('AssetsCreator.count', 2) do
+      disable_authorization_checks do
+        sop.api_assets_creators = [
+          {
+            given_name: "Joe",
+            family_name: "Bloggs",
+            affiliation: "School of Rock",
+            orcid: "https://orcid.org/0000-0002-5111-7263"
+          },
+          {
+            given_name: nil,
+            family_name: nil,
+            affiliation: nil,
+            orcid: nil,
+            creator_id: person.id
+          }
+        ]
+        assert sop.save
+      end
+    end
+  end
+
+  test 'can update assets_creators via API' do
+    person = Factory(:person, first_name: 'Jane', last_name: 'Smith')
+    person2 = Factory(:person, first_name: 'Sally', last_name: 'Smith')
+    sop = Factory(:sop)
+    ac1 = nil
+    ac2 = nil
+    ac3 = nil
+    disable_authorization_checks do
+      ac1 = sop.assets_creators.create(creator_id: person)
+      ac2 = sop.assets_creators.create(family_name: 'Smith', given_name: 'Bob')
+      ac3 = sop.assets_creators.create(family_name: 'Smith', given_name: 'Fred')
+    end
+    login_as(sop.contributor)
+    assert_difference('AssetsCreator.count', 1) do
+      disable_authorization_checks do
+        sop.api_assets_creators = [
+          {
+            given_name: "Joe",
+            family_name: "Bloggs"
+          },
+          {
+            given_name: "Bob",
+            family_name: "Smith"
+          },
+          {
+            given_name: nil,
+            family_name: nil,
+            affiliation: nil,
+            orcid: nil,
+            creator_id: person.id
+          },
+          {
+            given_name: nil,
+            family_name: nil,
+            affiliation: nil,
+            orcid: nil,
+            creator_id: person2.id
+          }
+        ]
+        assert sop.save
+        sop.reload
+        assert_equal 4, sop.assets_creators.count
+        assert_includes sop.assets_creators, ac1
+        assert_includes sop.assets_creators, ac2
+        assert ac3.destroyed?
+        names = sop.assets_creators.map(&:name)
+        assert_includes names, 'Joe Bloggs'
+        assert_includes names, 'Bob Smith'
+        assert_includes names, 'Sally Smith'
+        assert_includes names, 'Jane Smith'
+      end
+    end
+  end
+
+  test 'can adjust assets_creators positions in API without creating/deleting records' do
+    person = Factory(:person, first_name: 'Jane', last_name: 'Smith')
+    sop = Factory(:sop)
+    ac1 = nil
+    ac2 = nil
+    disable_authorization_checks do
+      ac2 = sop.assets_creators.create(pos: 1, family_name: 'Smith', given_name: 'Bob')
+      ac1 = sop.assets_creators.create(pos: 2, creator_id: person)
+    end
+    login_as(sop.contributor)
+    assert_no_difference('AssetsCreator.count') do
+      disable_authorization_checks do
+        sop.api_assets_creators = [
+          {
+            pos: 2,
+            given_name: "Bob",
+            family_name: "Smith"
+          },
+          {
+            pos: 1,
+            given_name: nil,
+            family_name: nil,
+            affiliation: nil,
+            orcid: nil,
+            creator_id: person.id
+          }
+        ]
+        assert sop.save
+        sop.reload
+        assert_equal 2, sop.assets_creators.count
+        assert_includes sop.assets_creator_ids, ac1.id
+        assert_includes sop.assets_creator_ids, ac2.id
+        names = sop.assets_creators.map(&:name)
+        assert_includes names, 'Bob Smith'
+        assert_includes names, 'Jane Smith'
+      end
+    end
+  end
+
   private
 
   def doi_citation_mock
@@ -1682,7 +1768,7 @@ class SopsControllerTest < ActionController::TestCase
   def picture_file(options = {})
     options.reverse_merge!({ filename: 'file_picture.png',
                              content_type: 'image/png',
-                             tempfile_fixture: 'files/file_picture.png' })
+                             tempfile_fixture: 'file_picture.png' })
     fixture_file_upload(options[:tempfile_fixture], options[:content_type])
   end
 

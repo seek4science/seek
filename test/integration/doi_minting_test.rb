@@ -13,7 +13,7 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
   end
 
   test 'doiable assets' do
-    assert_equal %w(data_file document model node sop workflow), DOIABLE_ASSETS
+    assert_equal %w(data_file document file_template model sop workflow), DOIABLE_ASSETS
   end
 
   test 'mint a DOI button' do
@@ -27,6 +27,23 @@ class DoiMintingTest < ActionDispatch::IntegrationTest
       assert_select '#buttons' do
         assert_select 'a[href=?]', polymorphic_path(asset, action: 'mint_doi_confirm', version: 1), text: /Generate a DOI/
       end
+    end
+  end
+
+  test 'hidden version can not mint a DOI' do
+    DOIABLE_ASSETS.each do |type|
+      asset = Factory(type.to_sym, policy: Factory(:public_policy))
+      assert asset.find_version(1).can_mint_doi?
+      login_as(asset.contributor.user)
+
+      disable_authorization_checks do
+        asset.save_as_new_version('new version')
+      end
+
+      assert :public, asset.find_version(1).visibility
+      asset.find_version(2).update(visibility: :registered_users)
+      assert_equal :registered_users, asset.find_version(2).reload.visibility
+      refute asset.find_version(2).can_mint_doi?
     end
   end
 

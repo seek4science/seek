@@ -10,7 +10,7 @@ module AssetsHelper
       options[:preview_permissions] = show_form_manage_specific_attributes?
     end
     options[:button_text] ||= submit_button_text(item)
-    options[:cancel_path] = polymorphic_path(item)
+    options[:cancel_path] = params[:single_page] ? single_page_path(id: params[:single_page]) : polymorphic_path(item)
     options[:resource_name] = item.class.name.underscore
     options[:button_id] ||= "#{options[:resource_name]}_submit_btn"
 
@@ -174,12 +174,12 @@ module AssetsHelper
 
   # provides a list of assets, according to the class, that are authorized according the 'action' which defaults to view
   # if projects is provided, only authorizes the assets for that project
-  # assets are sorted by title except if they are projects and scales (because of hierarchies)
+  # assets are sorted by title except if they are projects (because of hierarchies)
   def authorised_assets(asset_class, projects = nil, action = 'view')
     assets = asset_class
     assets = assets.filter_by_projects(projects) if projects
     assets = assets.authorized_for(action, User.current_user).to_a
-    assets = assets.sort_by(&:title) if !assets.blank? && !%w[Project Scale].include?(assets.first.class.name)
+    assets = assets.sort_by(&:title) if !assets.blank? && !%w[Project].include?(assets.first.class.name)
     assets
   end
 
@@ -279,22 +279,16 @@ module AssetsHelper
   def add_new_item_to_options(item)
     elements = []
     Seek::AddButtons.add_for_item(item).each do |type,param|
-      next unless Seek::Config.enabled_for_type?(type)
+      next unless type.feature_enabled?
       text="#{t('add_new_dropdown.option')} #{t(type.name.underscore)}"
-      path = new_polymorphic_path(type,param=>item.id)
+      parameters = { param=>item.id }
+      if (Seek::Config.project_single_page_enabled && params[:single_page])
+        parameters = parameters.merge({ single_page: params[:single_page] })
+      end
+      path = new_polymorphic_path(type,parameters)
       elements << yield(text,path)
     end
     elements
-  end
-
-  # whether the viewable content is available, or converted to pdf, or capable to be converted to pdf
-  def view_content_available?(content_blob)
-    return true if content_blob.is_text? || content_blob.is_pdf? || content_blob.is_cwl? || content_blob.is_image?
-    if content_blob.is_pdf_viewable?
-      content_blob.file_exists?('pdf') || Seek::Config.soffice_available?
-    else
-      false
-    end
   end
 
   def source_link_button(source_link)
@@ -324,7 +318,7 @@ module AssetsHelper
 
   # whether the request contact button should be showns
   def request_contact_button_enabled?(resource)
-    Seek::Config.email_enabled && logged_in_and_registered? && get_email_recipients(resource).present? && MessageLog.recent_contact_requests(User.current_user.try(:person),resource).empty?
+    Seek::Config.email_enabled && logged_in_and_registered? && get_email_recipients(resource).present? && ContactRequestMessageLog.recent_requests(User.current_user.try(:person),resource).empty?
   end
 
   # whether the request contact has been made within 12 hours
@@ -332,7 +326,14 @@ module AssetsHelper
     return nil unless logged_in_and_registered?
     return nil unless Seek::Config.email_enabled
     return nil unless get_email_recipients(resource).present?
-    MessageLog.recent_contact_requests(current_user.try(:person), resource).first
+    ContactRequestMessageLog.recent_requests(current_user.try(:person), resource).first
+  end
+
+  def edam_ontology_items(ontologyCVItems)
+    ontologyCVItems.collect do |item|
+      browser_url = "https://edamontology.github.io/edam-browser/#{URI.parse(item.iri).path.gsub('/','#')}"
+      link_to(item.label, browser_url, target: :_blank).html_safe
+    end.join(', ').html_safe
   end
 
 end

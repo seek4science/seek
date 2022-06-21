@@ -3,8 +3,8 @@ class OrganismsController < ApplicationController
   include Seek::DestroyHandling
 
   before_action :organisms_enabled?
-  before_action :find_requested_item, :only=>[:show,:edit,:visualise,:destroy, :update]
-  before_action :login_required,:except=>[:show,:index,:visualise]
+  before_action :find_requested_item, :only=>[:show,:edit,:destroy, :update]
+  before_action :login_required,:except=>[:show,:index]
   before_action :can_manage?,:only=>[:edit,:update]
   before_action :auth_to_create, :only=>[:new,:create, :destroy]
   before_action :find_assets, only: [:index]
@@ -22,16 +22,8 @@ class OrganismsController < ApplicationController
   def show
     respond_to do |format|
       format.html
-      format.xml
       format.rdf { render :template=>'rdf/show'}
       format.json {render json: @organism, include: [params[:include]]}
-    end
-  end
-
-  def visualise
-    @no_sidebar=true
-    respond_to do |format|
-      format.html
     end
   end
 
@@ -64,11 +56,9 @@ class OrganismsController < ApplicationController
       if @organism.save
         flash[:notice] = 'Organism was successfully created.'
         format.html { redirect_to organism_path(@organism) }
-        format.xml  { head :ok }
         format.json {render json: @organism, status: :created, location: @organism, include: [params[:include]]}
       else
         format.html { render :action => "new" }
-        format.xml  { render :xml => @organism.errors, :status => :unprocessable_entity }
         format.json  { render json: @organism.errors, status: :unprocessable_entity }
       end
     end
@@ -77,14 +67,12 @@ class OrganismsController < ApplicationController
   def update
 
     respond_to do |format|
-      if @organism.update_attributes(organism_params)
+      if @organism.update(organism_params)
         flash[:notice] = 'Organism was successfully updated.'
         format.html { redirect_to organism_path(@organism) }
-        format.xml  { head :ok }
         format.json {render json: @organism, include: [params[:include]]}
       else
         format.html { render :action => "edit" }
-        format.xml  { render :xml => @organism.errors, :status => :unprocessable_entity }
         format.json  { render json: @organism.errors, status: :unprocessable_entity }
       end
     end
@@ -93,7 +81,6 @@ class OrganismsController < ApplicationController
   def edit
     respond_to do |format|
       format.html
-      format.xml {render :xml=>@organism}
     end
   end
 
