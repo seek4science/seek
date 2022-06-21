@@ -9,9 +9,8 @@ class LifeMonitorStatusJobTest < ActiveSupport::TestCase
   def teardown
     Seek::Config.life_monitor_enabled = @val
   end
-
   test 'perform' do
-    stub_request(:get, /https:\/\/localhost:8000\/workflows\/[-a-z0-9A-Z]+\/1\/status/)
+    stub_request(:get, /https:\/\/localhost:8000\/workflows\/[-a-z0-9A-Z]+\/status/)
         .to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/life_monitor_status.json"), status: 200)
     stub_request(:post, "https://localhost:8000/oauth2/token")
         .to_return(body: File.new("#{Rails.root}/test/fixtures/files/mocking/life_monitor_token.json"), status: 200)

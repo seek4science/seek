@@ -1,0 +1,93 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://localhost:8443/workflows/86da0a30-d2cd-013a-a07d-000c29a94011/status
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (linux x86_64) ruby/2.7.5p203
+      Version:
+      - '1'
+      Content-Type:
+      - application/json
+      Authorization:
+      - Bearer FUY30D5gtDOeEPE2qu0MbWg2afrrst4whOOB1zHDtF
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - localhost:8443
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Tue, 21 Jun 2022 15:00:29 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '1399'
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Origin:
+      - "*"
+      X-Frame-Options:
+      - SAMEORIGIN
+    body:
+      encoding: UTF-8
+      string: |
+        {
+          "aggregate_test_status": "not_available",
+          "latest_builds": [],
+          "links": {
+            "self": "https://172.20.0.6:8000/workflows/86da0a30-d2cd-013a-a07d-000c29a94011/status"
+          },
+          "meta": {
+            "api_version": "0.7.3",
+            "base_url": "https://172.20.0.6:8000",
+            "created": "2022-06-21T14:33:08.067358",
+            "modified": "2022-06-21T14:33:08.351466",
+            "resource": "/workflows/86da0a30-d2cd-013a-a07d-000c29a94011/status"
+          },
+          "name": "Concat two files",
+          "public": true,
+          "reason": "No test suite configured for this workflow",
+          "registry": {
+            "name": "seek",
+            "type": "seek",
+            "uri": "https://myseek:3000",
+            "uuid": "44abf3e6-5eab-41f7-a31a-7231ef323765"
+          },
+          "subscriptions": [],
+          "uuid": "86da0a30-d2cd-013a-a07d-000c29a94011",
+          "version": {
+            "is_latest": true,
+            "links": {
+              "origin": "https://myseek:3000/workflows/293?version=1"
+            },
+            "name": "Concat two files",
+            "ro_crate": {
+              "links": {
+                "download": "https://172.20.0.6:8000/workflows/86da0a30-d2cd-013a-a07d-000c29a94011/rocrate/1/download",
+                "metadata": "https://172.20.0.6:8000/workflows/86da0a30-d2cd-013a-a07d-000c29a94011/rocrate/1/metadata",
+                "origin": "https://myseek:3000/workflows/293?version=1"
+              }
+            },
+            "submitter": {
+              "id": 2,
+              "username": "FinnBacall"
+            },
+            "uuid": "077b6467-9012-4f85-8339-570d8607445e",
+            "version": "1"
+          }
+        }
+    http_version: 
+  recorded_at: Tue, 21 Jun 2022 15:00:29 GMT
+recorded_with: VCR 2.9.3

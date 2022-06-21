@@ -17,7 +17,7 @@ module LifeMonitor
       end
 
       def status(workflow_version)
-        perform("/workflows/#{workflow_version.workflow.uuid}/status", :get, {
+        perform("/workflows/#{workflow_version.parent.uuid}/status", :get, {
           version: workflow_version.version
         })
       end
@@ -26,16 +26,16 @@ module LifeMonitor
         perform("/users/#{workflow_version.contributor.id}/workflows", :post,
                 content_type: :json,
                 body: {
-                    uuid: workflow_version.workflow.uuid,
+                    uuid: workflow_version.parent.uuid,
                     version: workflow_version.version.to_s,
-                    roc_link: ro_crate_workflow_url(workflow_version.workflow, version: workflow_version.version),
-                    name: workflow_version.workflow.title
+                    roc_link: ro_crate_workflow_url(workflow_version.parent, version: workflow_version.version),
+                    name: workflow_version.parent.title
                 })
       end
 
       def exists?(workflow_version)
         begin
-          perform("/workflows/#{workflow_version.workflow.uuid}", :get, params: {
+          perform("/workflows/#{workflow_version.parent.uuid}", :get, params: {
             version: workflow_version.version
           })
           true

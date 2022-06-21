@@ -4,6 +4,19 @@ require 'rest-client'
 module LifeMonitor
   module Oauth2
     class Client
+      # Possible scopes:
+      #  registry.info
+      #  registry.user
+      #  registry.workflow.read
+      #  registry.workflow.write
+      #  registry.user.workflow.read
+      #  registry.user.workflow.write
+      #  workflow.read workflow.write
+      #  testingService.read
+      #  testingService.write
+      #  user.profile
+      #  user.workflow.read
+
       attr_accessor :verify_ssl
 
       def initialize(client_id = nil, client_secret = nil, base = nil)
@@ -20,7 +33,7 @@ module LifeMonitor
             client_id: @client_id,
             client_secret: @client_secret,
             grant_type: 'client_credentials',
-            scope: 'read write',
+            scope: 'registry.info registry.user registry.workflow.read registry.user.workflow.read workflow.read workflow.write testingService.read user.profile user.workflow.read',
         }
 
         res = RestClient::Request.execute(method: :post,
