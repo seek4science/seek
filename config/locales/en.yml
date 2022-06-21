@@ -150,7 +150,6 @@ en:
           other: "%{count} errors prohibited this %{model} from being saved"
         # The variable :count is also available
         body: "There were problems with the following fields:"
-        body: "There were problems with the following fields:"
     models:
       workflow_class: Workflow Type
     attributes:
