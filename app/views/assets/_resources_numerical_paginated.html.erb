@@ -18,10 +18,13 @@
     tableview_columns = requiredColView + defaultColView
   end
 
+  tableview_columns = tableview_columns & (resource.columns_allowed + requiredColView)
+
   # Prepare available columns for this particular resource type
   # First show the shown columns in order, and then the available ones. Required columns are never given as an option
   availableColView = tableview_columns + (resource.columns_allowed - tableview_columns) - requiredColView
-  # availableColView = resource.columns_allowed
+
+
 
 %>
 
