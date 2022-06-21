@@ -67,10 +67,7 @@
         <thead>
           <tr>
             <% for column in tableview_columns -%>
-              <%
-                column_title = index_table_column_display_name(column)
-              %>
-              <th style="width:<%= 100/tableview_columns.length %>%"><%= column_title %></th>
+              <th style="width:<%= 100/tableview_columns.length %>%"><%= resource.class.human_attribute_name(column) %></th>
             <% end -%>
             <th>
               <div id="tableview-colselector" class="dropdown pull-right">
@@ -84,7 +81,7 @@
                                   checked
                                 <% end %>
                                 >
-                                <%= index_table_column_display_name(column) %>
+                                <%= resource.class.human_attribute_name(column) %>
                             </label>
                             <span class="glyphicon glyphicon-move handle" style="float: right;cursor: grab;"> </span>
                         </div>
