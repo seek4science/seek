@@ -1,5 +1,4 @@
 <% study ||= nil %>
-<% valid_study = study && study.sample_types.any? %>
 <% sample_type = study&.sample_types&.first %>
 
 <div style="padding:0 20px 20px 20px;">
@@ -17,11 +16,9 @@
     <button class="btn btn-primary dt-action" id="btn_save_source" onClick="SourceSave()">Save</button>
 </div>
 
-
-<% if valid_study %>
+<% if sample_type %>
     <script>
     // TODO: Load data in a separeta script tag and remove it after DT is loaded
-    
         var sourceDynamicTable 
         let initialLoad = true;
         $j(document).ready(function () {
