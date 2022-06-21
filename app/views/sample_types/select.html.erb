@@ -4,20 +4,20 @@
   your_projects = projects & current_user.person.projects
   other_projects = projects - your_projects
 	templates_enabled = Seek::Config.sample_type_template_enabled
-	col_width = templates_enabled ? 8 : 12
 %>
 <div class="row contribution-header">
-  <div class="col-md-<%= col_width -%>">
-		<h1>Select Sample Type</h1>
-		<p>
-			Use the filters to find the sample type you are looking for, and then click the New Sample button to create one of this type.
-		</p>
-	</div>
 	<% if templates_enabled %>
-		<div class="col-md-4 text-right-md">
-			<%= button_link_to("Query samples", 'index', query_form_samples_path) %>
+		<div class="col-md-12">
+			<%= link_to "Search by #{t('template').pluralize}", query_form_samples_path, class: "btn btn-default btn-lg" %>
+			<p style="font-size:20px;margin-top:20px">OR</p>
 		</div>
 	<% end %>
+  <div class="col-md-12">
+		<h1>Select <%=t('sample_type') %></h1>
+		<p>
+			Use the filters to find the <%=t('sample_type') %> you are looking for, and then click the New Sample button to create one of this type.
+		</p>
+	</div>
 </div>
 
 <div id="sample-type-filter-options">

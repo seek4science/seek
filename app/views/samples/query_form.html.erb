@@ -28,7 +28,7 @@
 						<% templates.pluck(:group).uniq.each do |group_name| %>
 							<optgroup label='<%= group_name %>'>
 								<% templates.select{|t| t[:group]==group_name}.each do |t| %>
-									<option value='<%= t[:template_id] %>'><%= t[:title] %></option>
+									<option value='<%= t[:template_id] %>'><%=t[:title]%></option>
 								<% end %>
 							</optgroup>
 						<% end %>
@@ -123,6 +123,12 @@
 	$j(document).ready(function () {
 		$j('.select2').select2({
 			theme: "bootstrap",
+			escapeMarkup: function(markup) {
+				return markup;
+			},
+			templateResult: function(data) {
+    		return data.id ? `${data.text} <em>(id: ${data.id})</em>` : data.text;
+  		},
 			dropdownParent: $j('#query_samples') });
 			Samples.initTable($j('#samples-table'));
 	});
