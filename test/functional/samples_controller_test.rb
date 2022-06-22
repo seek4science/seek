@@ -2,6 +2,8 @@ require 'test_helper'
 
 class SamplesControllerTest < ActionController::TestCase
 
+	fixtures :isa_tags
+
   include AuthenticatedTestHelper
   include SharingFormTestHelper
   include HtmlHelper
@@ -1136,12 +1138,43 @@ class SamplesControllerTest < ActionController::TestCase
 			input_attribute_value: "x's",
 			output_template_id: template3.id,
 			output_attribute_id: template3.template_attributes.second.id,
-			output_attribute_value: '1' 
+			output_attribute_value: '1'
 		}
 
 		assert_response :success
     assert result = assigns(:result)
     assert_equal 1, result.length
+
+		# Query for sample's grandparents
+		post :query, xhr: true, params: { 
+			project_ids: [project.id],
+			template_id: template3.id,
+			template_attribute_id: template3.template_attributes.second.id,
+			template_attribute_value: 'Protocol',
+			input_template_id: template1.id,
+			input_attribute_id: template1.template_attributes.third.id,
+			input_attribute_value: "x's"
+		}
+
+		assert_response :success
+    assert result = assigns(:result)
+    assert_equal 1, result.length
+
+		# Query for sample's grandchildren
+		post :query, xhr: true, params: { 
+			project_ids: [project.id],
+			template_id: template1.id,
+			template_attribute_id: template1.template_attributes.third.id,
+			template_attribute_value: "x's",
+			output_template_id: template3.id,
+			output_attribute_id: template3.template_attributes.second.id,
+			output_attribute_value: 'Protocol'
+		}
+
+		assert_response :success
+    assert result = assigns(:result)
+    assert_equal 1, result.length
+
   end
 
   private

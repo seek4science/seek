@@ -215,41 +215,33 @@ class SamplesController < ApplicationController
     @result = params[:template_id].present? ?
       Template.find(params[:template_id]).sample_types.map(&:samples).flatten : []
 
-    if params[:template_attribute_id].present?
+    if params[:template_attribute_id].present? && params[:template_attribute_value].present?
       attribute_title = TemplateAttribute.find(params[:template_attribute_id]).title
       @result = @result.select { |s| s.get_value(attribute_title)&.include?(params[:template_attribute_value]) }
     end
 
     if params[:input_template_id].present? # linked
-      attribute_title = 
-        TemplateAttribute.find(params[:input_attribute_id]).title if params[:input_attribute_id].present?
-
-      @result = @result.select do |s|
-        s.linked_samples.any? do |x|
-          has_template = x.sample_type.template_id == params[:input_template_id].to_i
-          has_template &&= x.get_value(attribute_title)&.include?(params[:input_attribute_value]) if attribute_title.present?
-          has_template
-        end
-      end
+			title =
+    		TemplateAttribute.find(params[:input_attribute_id]).title if params[:input_attribute_id].present?
+      @result = find_samples(@result, :linked_samples,
+        { attribute_id: params[:input_attribute_id],
+          attribute_value: params[:input_attribute_value],
+          template_id: params[:input_template_id] }, title)
     end
 
     if params[:output_template_id].present? # linking
-      attribute_title =
-        TemplateAttribute.find(params[:output_attribute_id]).title if params[:output_attribute_id].present?
-
-      @result = @result.select do |s|
-        s.linking_samples.any? do |x|
-          has_template = x.sample_type.template_id == params[:output_template_id].to_i
-          has_template &&= x.get_value(attribute_title)&.include?(params[:output_attribute_value]) if attribute_title.present?
-          has_template
-        end
-      end
+			title =
+   		 TemplateAttribute.find(params[:output_attribute_id]).title if params[:output_attribute_id].present?
+      @result = find_samples(@result, :linking_samples,
+        { attribute_id: params[:output_attribute_id],
+          attribute_value: params[:output_attribute_value],
+          template_id: params[:output_template_id] }, title)
     end
 
     @result = @result.select { |s| (project_ids & s.project_ids).any? } if project_ids.present?
-		@total_samples = @result.length
+    @total_samples = @result.length
     @result = @result.any? ? @result.authorized_for('view') : []
-		@visible_samples = @result.length
+    @visible_samples = @result.length
 
     respond_to do |format|
       format.js
@@ -302,6 +294,16 @@ class SamplesController < ApplicationController
       @samples = @template.samples.authorized_for('view')
     else
       find_assets
+    end
+  end
+
+  def find_samples(samples, link, options, title)
+    samples.select do |s|
+      s.send(link).any? do |x|
+        selected = x.sample_type.template_id == options[:template_id].to_i
+        selected = x.get_value(title)&.include?(options[:attribute_value]) if title.present? && selected
+        selected || find_samples([x], link, options, title).present?
+      end
     end
   end
 end
