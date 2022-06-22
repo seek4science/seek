@@ -22,7 +22,7 @@
 			</div>
 			<div class="row" style="padding-top:10px;padding-bottom:10px">
 				<div class="col-md-4">
-					<label>Select a Template</label>
+					<label>Select a Template<span class="required">*</span></label>
 					<select id="template" class="form-control select2">
 						<option value="">Not selected</option>
 						<% templates.pluck(:group).uniq.each do |group_name| %>
@@ -157,7 +157,15 @@
 		}	
 	}
 
+	$j("#template").on("change", function(){
+		$j(this).val() && $j(this).parent().removeClass("has-error")
+	})
+
 	function submit(){
+		if(!$j("#template").val()){
+			$j("#template").parent().addClass("has-error")
+			return alert('Template is required!')
+		}
 		const data = {
 			project_ids: $j('#projects').select2('data').map(x=>x.id),
 			template_id: $j("#template").val(),
