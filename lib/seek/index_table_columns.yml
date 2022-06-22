@@ -6,7 +6,7 @@ columns:
 
   assay:
     required: []
-    default: [assay_type_uri]
+    default: [creators, projects, assay_type_uri]
     additional_allowed: [ technology_type_uri ]
 
   data_file:
@@ -88,6 +88,7 @@ columns:
     required: []
     default: [first_name, last_name]
     additional_allowed: [orcid]
+    blocked: [created_at, updated_at]
 
   project:
     required: []

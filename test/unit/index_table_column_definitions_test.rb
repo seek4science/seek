@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class IndexTableColumnDefinitionsTest < ActiveSupport::TestCase
-
   def setup
     @assay = Factory(:experimental_assay)
     @data_file = Factory(:data_file)
@@ -17,21 +16,27 @@ class IndexTableColumnDefinitionsTest < ActiveSupport::TestCase
   end
 
   test 'default columns' do
-    assert_equal ['creators', 'projects', 'assay_type_uri','technology_type_uri'], Seek::IndexTableColumnDefinitions.default_columns(@assay)
-    assert_equal ['creators', 'projects', 'version'], Seek::IndexTableColumnDefinitions.default_columns(@data_file)
-    assert_equal ['projects','first_name','last_name'], Seek::IndexTableColumnDefinitions.default_columns(@person)
+    assert_equal %w[creators projects assay_type_uri], Seek::IndexTableColumnDefinitions.default_columns(@assay)
+    assert_equal %w[creators projects version license],
+                 Seek::IndexTableColumnDefinitions.default_columns(@data_file)
+    assert_equal %w[first_name last_name projects], Seek::IndexTableColumnDefinitions.default_columns(@person)
     assert_equal ['web_page'], Seek::IndexTableColumnDefinitions.default_columns(@project)
   end
 
   test 'allowed_columns' do
-    assert_equal ['title', 'creators', 'projects', 'assay_type_uri', 'technology_type_uri', 'tags'], Seek::IndexTableColumnDefinitions.allowed_columns(@assay)
-    assert_equal ['title', 'creators', 'projects', 'version','tags', 'format_type', 'data_type', 'last_used_at', 'other_creators','doi','license','simulation_data'], Seek::IndexTableColumnDefinitions.allowed_columns(@data_file)
-    assert_equal ['title', 'projects','first_name','last_name','orcid'], Seek::IndexTableColumnDefinitions.allowed_columns(@person)
-    assert_equal ['title','web_page','start_date','end_date'], Seek::IndexTableColumnDefinitions.allowed_columns(@project)
+    assert_equal %w[title creators projects assay_type_uri technology_type_uri contributor description created_at updated_at other_creators tags],
+                 Seek::IndexTableColumnDefinitions.allowed_columns(@assay)
+    assert_equal %w[title creators projects version license format_type data_type simulation_data contributor description created_at updated_at last_used_at other_creators doi tags],
+                 Seek::IndexTableColumnDefinitions.allowed_columns(@data_file)
+    assert_equal %w[title first_name last_name projects orcid description],
+                 Seek::IndexTableColumnDefinitions.allowed_columns(@person)
+    assert_equal %w[title web_page start_date end_date description created_at updated_at],
+                 Seek::IndexTableColumnDefinitions.allowed_columns(@project)
   end
 
   test 'sanity check and responds to' do
-    [Assay, Study, Investigation, Model, Sop, DataFile, FileTemplate, Placeholder, Presentation, Document, Workflow, Event, Publication, Organism, SampleType, Institution, Person, Project].each do |type|
+    [Assay, Study, Investigation, Model, Sop, DataFile, FileTemplate, Placeholder, Presentation, Document, Workflow,
+     Event, Publication, Organism, SampleType, Institution, Person, Project].each do |type|
       obj = type.new
       refute_empty Seek::IndexTableColumnDefinitions.default_columns(obj)
       refute_empty Seek::IndexTableColumnDefinitions.required_columns(obj)
@@ -42,5 +47,4 @@ class IndexTableColumnDefinitionsTest < ActiveSupport::TestCase
       end
     end
   end
-
 end

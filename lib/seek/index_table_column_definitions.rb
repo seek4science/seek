@@ -1,22 +1,29 @@
 module Seek
   class IndexTableColumnDefinitions
-
     def self.allowed_columns(resource)
-      columns = required_columns(resource) | default_columns(resource) | (definitions[resource.model_name.name.underscore]&.fetch(:additional_allowed) || []) | definitions[:general][:additional_allowed]
+      columns = required_columns(resource) | default_columns(resource)
+      columns |= definition_for(resource, :additional_allowed) | definitions[:general][:additional_allowed]
+      columns -= definition_for(resource, :blocked)
       check(columns, resource).uniq
     end
 
     def self.required_columns(resource)
-      columns = (definitions[resource.model_name.name.underscore]&.fetch(:required) || []) | definitions[:general][:required]
+      columns = definition_for(resource, :required) | definitions[:general][:required]
+      columns -= definition_for(resource, :blocked)
       check(columns, resource).uniq
     end
 
     def self.default_columns(resource)
-      columns = (definitions[resource.model_name.name.underscore]&.fetch(:default) || []) | definitions[:general][:default]
+      columns = definition_for(resource, :default) | definitions[:general][:default]
+      columns -= definition_for(resource, :blocked)
       check(columns, resource).uniq
     end
 
-    private
+    def self.definition_for(resource, category)
+      return [] unless definitions[resource.model_name.name.underscore]
+
+      definitions[resource.model_name.name.underscore][category] || []
+    end
 
     def self.definitions
       @definitions ||= load_yaml
@@ -32,12 +39,5 @@ module Seek
         resource.respond_to?(col)
       end
     end
-
-
-
-
-
-
-
   end
 end
