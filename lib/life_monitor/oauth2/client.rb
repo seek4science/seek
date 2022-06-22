@@ -11,7 +11,8 @@ module LifeMonitor
       #  registry.workflow.write
       #  registry.user.workflow.read
       #  registry.user.workflow.write
-      #  workflow.read workflow.write
+      #  workflow.read
+      #  workflow.write
       #  testingService.read
       #  testingService.write
       #  user.profile
@@ -33,7 +34,7 @@ module LifeMonitor
             client_id: @client_id,
             client_secret: @client_secret,
             grant_type: 'client_credentials',
-            scope: 'registry.info registry.user registry.workflow.read registry.user.workflow.read workflow.read workflow.write testingService.read user.profile user.workflow.read',
+            scope: %w[registry.info registry.user registry.workflow.read registry.workflow.write registry.user.workflow.read registry.user.workflow.write workflow.read workflow.write testingService.read user.profile user.workflow.read user.workflow.write].join(' '),
         }
 
         res = RestClient::Request.execute(method: :post,

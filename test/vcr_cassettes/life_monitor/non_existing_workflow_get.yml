@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://localhost:8443/workflows/f7536a50-d3a0-013a-377e-000c29a94011?version=1
+    uri: https://localhost:8443/workflows/86da0a30-d2cd-013a-a07d-000c29a94011/versions
     body:
       encoding: US-ASCII
       string: ''
@@ -27,21 +27,21 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Tue, 21 Jun 2022 15:01:34 GMT
+      - Wed, 22 Jun 2022 19:01:46 GMT
       Content-Type:
       - application/problem+json
       Content-Length:
-      - '311'
+      - '310'
       Connection:
       - keep-alive
       Access-Control-Allow-Origin:
       - "*"
     body:
       encoding: UTF-8
-      string: '{"extra_info": {"exception": "f7536a50-d3a0-013a-377e-000c29a94011_None"},
-        "instance": "https://localhost:8443/workflows/f7536a50-d3a0-013a-377e-000c29a94011?version=1",
-        "detail": "Workflow ''f7536a50-d3a0-013a-377e-000c29a94011'' (ver.None) not
-        found", "title": "Not Found", "type": "about:blank", "status": 404}'
+      string: '{"instance": "https://localhost:8443/workflows/86da0a30-d2cd-013a-a07d-000c29a94011/versions",
+        "title": "Not Found", "status": 404, "type": "about:blank", "extra_info":
+        {"exception": "86da0a30-d2cd-013a-a07d-000c29a94011_None"}, "detail": "Workflow
+        ''86da0a30-d2cd-013a-a07d-000c29a94011'' (ver.None) not found"}'
     http_version: 
-  recorded_at: Tue, 21 Jun 2022 15:01:34 GMT
+  recorded_at: Wed, 22 Jun 2022 19:01:46 GMT
 recorded_with: VCR 2.9.3

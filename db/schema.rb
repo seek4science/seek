@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_05_17_085632) do
+ActiveRecord::Schema.define(version: 2022_06_22_180050) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string "action"
@@ -946,7 +946,7 @@ ActiveRecord::Schema.define(version: 2022_05_17_085632) do
     t.index ["project_id"], name: "index_investigations_projects_on_project_id"
   end
 
-  create_table "isa_tags",  force: :cascade do |t|
+  create_table "isa_tags", force: :cascade do |t|
     t.string "title"
     t.index ["title"], name: "index_isa_tags_title"
   end
@@ -2247,7 +2247,6 @@ ActiveRecord::Schema.define(version: 2022_05_17_085632) do
     t.integer "workflow_class_id"
     t.integer "maturity_level"
     t.integer "visibility"
-    t.boolean "monitored"
     t.integer "test_status"
     t.index ["contributor_id"], name: "index_workflow_versions_on_contributor"
     t.index ["workflow_id"], name: "index_workflow_versions_on_workflow_id"

@@ -183,16 +183,12 @@ class WorkflowTest < ActiveSupport::TestCase
         assert workflow.can_download?(nil)
       end
 
-      if false # WIP
-        VCR.use_cassette('life_monitor/get_token') do
-          VCR.use_cassette('life_monitor/non_existing_workflow_get') do
-            VCR.use_cassette('life_monitor/submit_workflow') do
-              assert_nothing_raised do
-                User.current_user = workflow.contributor.user
-                refute workflow.latest_version.monitored
-                LifeMonitorSubmissionJob.perform_now(workflow.latest_version)
-                assert workflow.latest_version.reload.monitored
-              end
+      VCR.use_cassette('life_monitor/get_token') do
+        VCR.use_cassette('life_monitor/non_existing_workflow_get') do
+          VCR.use_cassette('life_monitor/submit_workflow') do
+            assert_nothing_raised do
+              User.current_user = workflow.contributor.user
+              LifeMonitorSubmissionJob.perform_now(workflow.latest_version)
             end
           end
         end
@@ -230,20 +226,6 @@ class WorkflowTest < ActiveSupport::TestCase
     end
   end
 
-  test 'does not create life monitor submission job if workflow already monitored' do
-    workflow = Factory(:workflow_with_tests, policy: Factory(:private_policy))
-    workflow.latest_version.update_column(:monitored, true)
-    workflow.policy.update_column(:access_type, Policy::ACCESSIBLE)
-    with_config_value(:life_monitor_enabled, true) do
-      assert_no_enqueued_jobs(only: LifeMonitorSubmissionJob) do
-        assert workflow.latest_version.has_tests?
-        assert workflow.latest_version.monitored
-        assert workflow.can_download?(nil)
-        disable_authorization_checks { workflow.save! }
-      end
-    end
-  end
-
   test 'creates lifemonitor submission job on update if workflow made public' do
     workflow = nil
     with_config_value(:life_monitor_enabled, true) do
@@ -252,7 +234,6 @@ class WorkflowTest < ActiveSupport::TestCase
         User.current_user = workflow.contributor.user
         assert workflow.latest_version.has_tests?
         refute workflow.can_download?(nil)
-        refute workflow.latest_version.monitored
       end
 
       assert_enqueued_with(job: LifeMonitorSubmissionJob) do
@@ -260,18 +241,13 @@ class WorkflowTest < ActiveSupport::TestCase
         disable_authorization_checks { workflow.save! }
         assert workflow.latest_version.has_tests?
         assert workflow.can_download?(nil)
-        refute workflow.latest_version.monitored
       end
 
-      if false # WIP
-        VCR.use_cassette('life_monitor/get_token') do
-          VCR.use_cassette('life_monitor/non_existing_workflow_get') do
-            VCR.use_cassette('life_monitor/submit_workflow') do
-              assert_nothing_raised do
-                refute workflow.latest_version.monitored
-                LifeMonitorSubmissionJob.perform_now(workflow.latest_version)
-                assert workflow.latest_version.reload.monitored
-              end
+      VCR.use_cassette('life_monitor/get_token') do
+        VCR.use_cassette('life_monitor/non_existing_workflow_get') do
+          VCR.use_cassette('life_monitor/submit_workflow') do
+            assert_nothing_raised do
+              LifeMonitorSubmissionJob.perform_now(workflow.latest_version)
             end
           end
         end
