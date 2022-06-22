@@ -30,4 +30,17 @@ class IndexTableColumnDefinitionsTest < ActiveSupport::TestCase
     assert_equal ['title','web_page','start_date','end_date'], Seek::IndexTableColumnDefinitions.allowed_columns(@project)
   end
 
+  test 'sanity check and responds to' do
+    [Assay, Study, Investigation, Model, Sop, DataFile, FileTemplate, Placeholder, Presentation, Document, Workflow, Event, Publication, Organism, SampleType, Institution, Person, Project].each do |type|
+      obj = type.new
+      refute_empty Seek::IndexTableColumnDefinitions.default_columns(obj)
+      refute_empty Seek::IndexTableColumnDefinitions.required_columns(obj)
+      allowed = Seek::IndexTableColumnDefinitions.allowed_columns(obj)
+      refute_empty allowed
+      allowed.each do |col|
+        assert obj.respond_to?(col)
+      end
+    end
+  end
+
 end

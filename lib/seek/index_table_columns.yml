@@ -14,6 +14,76 @@ columns:
     default: []
     additional_allowed: [format_type, data_type, last_used_at, other_creators, doi, license, simulation_data]
 
+  sop:
+    required: []
+    default: [version]
+    additional_allowed: [last_used_at, other_creators, doi, license]
+
+  presentation:
+    required: [ ]
+    default: [version, license ]
+    additional_allowed: [last_used_at, other_creators, doi, licence]
+
+  model:
+    required: [ ]
+    default: [ ]
+    additional_allowed: [ last_used_at, other_creators, doi, license ]
+
+  workflow:
+    required: [ ]
+    default: [ ]
+    additional_allowed: [description, created_at, updated_at ]
+
+  document:
+    required: [ ]
+    default: [ ]
+    additional_allowed: [ last_used_at, other_creators, doi, licence ]
+
+  event:
+    required: [ ]
+    default: [ city, country, start_date, end_date]
+    additional_allowed: [ address, url]
+
+  file_template:
+    required: [ ]
+    default: [format_type, data_type ]
+    additional_allowed: [ description, created_at, updated_at, doi, licence, last_used_at, other_creators ]
+
+  institution:
+    required: [ ]
+    default: [ city, county, web_page ]
+    additional_allowed: [ address ]
+
+  investigation:
+    required: [ ]
+    default: [ ]
+    additional_allowed: [ other_creators ]
+
+  organism:
+    required: [ ]
+    default: [ ]
+    additional_allowed: [ ]
+
+  placeholder:
+    required: [ ]
+    default: [ format_type, data_type ]
+    additional_allowed: [ description, created_at, updated_at, doi, licence, last_used_at, other_creators ]
+
+  publication:
+    required: [ ]
+    default: [ published_date, journal ]
+    additional_allowed: [ abstract, doi, last_used_at, citation, bookmark, publisher, editor, url ]
+
+  sample_type:
+    required: [ ]
+    default: [ uploaded_template ]
+    additional_allowed: [ description, created_at, updated_at]
+
+  study:
+    required: [ ]
+    default: [ ]
+    additional_allowed: [ other_creators ]
+
   person:
     required: []
     default: [first_name, last_name]
@@ -23,3 +93,4 @@ columns:
     required: []
     default: [web_page]
     additional_allowed: [start_date, end_date]
+
