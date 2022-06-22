@@ -1,8 +1,8 @@
 columns:
   general:
     required: [title]
-    default: [creators, projects, version]
-    additional_allowed: [tags]
+    default: [contributor, creators, projects, version]
+    additional_allowed: [description, created_at, updated_at, last_used_at, other_creators, doi, license, tags]
 
   assay:
     required: []
@@ -12,32 +12,32 @@ columns:
   data_file:
     required: []
     default: []
-    additional_allowed: [format_type, data_type, last_used_at, other_creators, doi, license, simulation_data]
+    additional_allowed: [format_type, data_type,  simulation_data]
 
   sop:
     required: []
-    default: [version]
-    additional_allowed: [last_used_at, other_creators, doi, license]
+    default: []
+    additional_allowed: []
 
   presentation:
     required: [ ]
-    default: [version, license ]
-    additional_allowed: [last_used_at, other_creators, doi, licence]
+    default: [ ]
+    additional_allowed: [ ]
 
   model:
     required: [ ]
     default: [ ]
-    additional_allowed: [ last_used_at, other_creators, doi, license ]
+    additional_allowed: [ ]
 
   workflow:
     required: [ ]
     default: [ ]
-    additional_allowed: [description, created_at, updated_at ]
+    additional_allowed: [ ]
 
   document:
     required: [ ]
     default: [ ]
-    additional_allowed: [ last_used_at, other_creators, doi, licence ]
+    additional_allowed: [  ]
 
   event:
     required: [ ]
@@ -47,7 +47,7 @@ columns:
   file_template:
     required: [ ]
     default: [format_type, data_type ]
-    additional_allowed: [ description, created_at, updated_at, doi, licence, last_used_at, other_creators ]
+    additional_allowed: [ ]
 
   institution:
     required: [ ]
@@ -57,7 +57,7 @@ columns:
   investigation:
     required: [ ]
     default: [ ]
-    additional_allowed: [ other_creators ]
+    additional_allowed: [ ]
 
   organism:
     required: [ ]
@@ -67,22 +67,22 @@ columns:
   placeholder:
     required: [ ]
     default: [ format_type, data_type ]
-    additional_allowed: [ description, created_at, updated_at, doi, licence, last_used_at, other_creators ]
+    additional_allowed: [ ]
 
   publication:
     required: [ ]
     default: [ published_date, journal ]
-    additional_allowed: [ abstract, doi, last_used_at, citation, bookmark, publisher, editor, url ]
+    additional_allowed: [ abstract, citation, bookmark, publisher, editor, url ]
 
   sample_type:
     required: [ ]
     default: [ uploaded_template ]
-    additional_allowed: [ description, created_at, updated_at]
+    additional_allowed: [ ]
 
   study:
     required: [ ]
     default: [ ]
-    additional_allowed: [ other_creators ]
+    additional_allowed: [ ]
 
   person:
     required: []
