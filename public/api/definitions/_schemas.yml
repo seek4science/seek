@@ -2047,6 +2047,7 @@ personPost:
           required:
             - first_name
             - last_name
+            - email
           additionalProperties: false
       required:
         - type
@@ -3894,10 +3895,15 @@ personResponse:
             login:
               $ref: "#/components/schemas/nullableNonEmptyString"
           required:
+            - avatar
             - title
+            - description
             - first_name
             - last_name
+            - orcid
             - mbox_sha1sum
+            - expertise
+            - tools
           additionalProperties: false
         relationships:
           type: object

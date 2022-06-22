@@ -65,11 +65,7 @@
         <thead>
           <tr>
             <% for column in tableview_columns -%>
-              <% if column=="assay_type_uri" %>
-                <th style="width:<%= 100/tableview_columns.length %>%"> Assay Type </th>   
-              <% else %>
-                <th style="width:<%= 100/tableview_columns.length %>%"><%= t(column, default: column.to_s).titleize %></th>
-              <% end %>
+              <th style="width:<%= 100/tableview_columns.length %>%"><%= resource.class.human_attribute_name(column) %></th>
             <% end -%>
             <th>
               <div id="tableview-colselector" class="dropdown pull-right">
@@ -83,11 +79,7 @@
                                   checked
                                 <% end %>
                                 >
-                                <% if column=="assay_type_uri" %>
-                                  Assay Type
-                                <% else %>
-                                  <%= t(column, default: column.to_s).titleize %>
-                                <% end %>
+                                <%= resource.class.human_attribute_name(column) %>
                             </label>
                             <span class="glyphicon glyphicon-move handle" style="float: right;cursor: grab;"> </span>
                         </div>
