@@ -1175,13 +1175,13 @@ class PeopleControllerTest < ActionController::TestCase
     with_config_value(:results_per_page, { 'people' => 3 }) do
       get :index, params: { view: 'table',table_cols:'created_at,first_name,last_name,description,email' }
       assert_response :success
-      assert_select '.list_items_container thead th', count: 7
+      assert_select '.list_items_container #resource-table-view thead th', count: 4 #only title, first_name, last_name allowed (plus th for options)
     end
     # When no columns are specified, resort to default, so it's never empty
     with_config_value(:results_per_page, { 'people' => 3 }) do
       get :index, params: { view: 'table',table_cols:'' }
       assert_response :success
-      assert_select '.list_items_container thead th',  minimum: 3
+      assert_select '.list_items_container #resource-table-view thead th',  minimum: 3
     end
     # Reset the view parameter
     session.delete(:view)
