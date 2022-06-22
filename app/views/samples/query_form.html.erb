@@ -12,7 +12,8 @@
 	
 			<div class="row" style="padding-top:10px">
 				<div class="col-md-4">
-					<label>Select the Project(s)</label>
+					<%= help_icon("Select one or more #{t('project').pluralize} to which the Samples must belong.") -%>
+					<label>Select Project(s)</label>
 					<select id="projects" class="form-control select2" multiple="multiple">
 						<% projects.each do |p| %>
 							<option value='<%= p[:id] %>'><%= p[:title] %></option>
@@ -22,6 +23,7 @@
 			</div>
 			<div class="row" style="padding-top:10px;padding-bottom:10px">
 				<div class="col-md-4">
+					<%= help_icon("Select the #{t('template')} used to create the Samples.") -%>
 					<label>Select a Template<span class="required">*</span></label>
 					<select id="template" class="form-control select2">
 						<option value="">Not selected</option>
@@ -45,9 +47,14 @@
 					<input id="attribute_value" class="form-control"/>
 				</div>
 			</div>
-			<hr style="margin-top:5px;margin-bottom:5px">
+			<hr style="margin:5px">
 			<div class="row">
-				<div class="col-md-4"><strong><h4>Input sample(s)</h4></strong></div>
+				<div class="col-md-4">
+					<h4>
+						<%= help_icon("Select the #{t('template')} used to create the parent samples from which your Samples of interest directly derived from.") -%>
+						Input sample(s)
+					</h4>
+				</div>
 			</div>
 			<div class="row">
 				<div class="col-md-4">
@@ -75,7 +82,12 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-md-4"><strong><h4>Output sample(s)</h4></strong></div>
+				<div class="col-md-4">
+					<h4>
+						<%= help_icon("Select the #{t('template')} used to create the child samples that directly derived from your Samples of interest.") -%>
+						Output sample(s)
+					</h4>
+				</div>
 			</div>
 			<div class="row">
 				<div class="col-md-4">
