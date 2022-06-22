@@ -1,22 +1,22 @@
 columns:
   general:
     required: [title]
-    default: [contributor, creators, projects, version]
-    additional_allowed: [description, created_at, updated_at, last_used_at, other_creators, doi, license, tags]
+    default: [creators, projects, version, license]
+    additional_allowed: [contributor, creators, projects, version, description, created_at, updated_at, last_used_at, other_creators, doi, license, tags]
 
   assay:
     required: []
-    default: [assay_type_uri, technology_type_uri]
-    additional_allowed: []
+    default: [assay_type_uri]
+    additional_allowed: [ technology_type_uri ]
 
   data_file:
     required: []
-    default: []
+    default: [ ]
     additional_allowed: [format_type, data_type,  simulation_data]
 
   sop:
     required: []
-    default: []
+    default: [ ]
     additional_allowed: []
 
   presentation:
