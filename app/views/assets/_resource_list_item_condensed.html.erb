@@ -47,7 +47,7 @@
               <% if column == 'creators'%>
                 <%= list_item_person_list resource.creators %>
               <% elsif column == 'projects'  && ![Event, Person, Project, Institution, Programme, Collection].include?(resource.class)%>
-                <b>Project:</b>
+                <b><%= t('project').pluralize(resource.projects.count).capitalize %></b>
                 <%= resource.projects.uniq.map {|p| link_to p.title, p }.join(', ').html_safe %>
               <% elsif column == "assay_type_uri"%>
                 <b><%= resource.is_modelling? ? "Biological problem addressed" : "#{t('assays.assay')} type" -%>:</b>
