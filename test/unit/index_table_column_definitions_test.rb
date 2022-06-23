@@ -1,6 +1,7 @@
 require 'test_helper'
 
 class IndexTableColumnDefinitionsTest < ActiveSupport::TestCase
+
   def setup
     @assay = Factory(:experimental_assay)
     @data_file = Factory(:data_file)
