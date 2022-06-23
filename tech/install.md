@@ -62,7 +62,7 @@ you will need this later.
 
 The remaining packages are:
 
-    sudo apt install build-essential git imagemagick libcurl4-gnutls-dev libgmp-dev \
+    sudo apt install build-essential cmake git imagemagick libcurl4-gnutls-dev libgmp-dev \
         libmagick++-dev libmysqlclient-dev libpq-dev libreadline-dev libreoffice libssl-dev \
         libxml++2.6-dev libxslt1-dev nodejs openjdk-11-jdk openssh-server poppler-utils zip
 
