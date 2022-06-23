@@ -7,7 +7,7 @@ namespace :seek do
 		begin
 			if ENV['wipe'] == 'yes'
 				puts 'Wiping templates data.....'
-				Template.delete_all
+				Template.all.each{|t| t.destroy}
 				TemplateAttribute.delete_all
 				SampleControlledVocab.delete_all
 				SampleControlledVocabTerm.delete_all
