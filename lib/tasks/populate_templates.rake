@@ -47,7 +47,7 @@ namespace :seek do
 								repo.save!
 							end
 
-						if (repo.id.blank?)
+						if repo.id.blank?
 							puts 'An error occured creating a template with the followign details: ', repo.errors.full_messages
 							puts '==================='
 							puts repo.inspect
@@ -108,20 +108,20 @@ namespace :seek do
 								p scv.errors unless scv.save(validate: false)
 							end
 
-							TemplateAttribute.find_or_create_by(
-								{
-									title: attribute['name'],
-									is_title: attribute['title'] || 0,
-									isa_tag_id: get_isa_tag_id(attribute['isaTag']),
-									short_name: attribute['short_name'],
-									required: attribute['required'],
-									description: attribute['description'],
-									sample_controlled_vocab_id: scv.blank? ? nil : scv.id,
-									template_id: repo.id,
-									iri: attribute['iri'],
-									sample_attribute_type_id: get_sample_attribute_type(attribute['dataType']) #Based on sample_attribute_type table
-								}
-							)
+							attribute = TemplateAttribute.find_or_create_by({ title: attribute['name'], template_id: repo.id })
+
+							if attribute.new_record?
+								is_title= attribute['title'] || 0
+								isa_tag_id= get_isa_tag_id(attribute['isaTag'])
+								short_name= attribute['short_name']
+								required= attribute['required']
+								description= attribute['description']
+								sample_controlled_vocab_id= scv&.id
+								iri= attribute['iri']
+								sample_attribute_type_id= get_sample_attribute_type(attribute['dataType']) #Based on sample_attribute_type table
+
+								attribute.save!
+							end
 						end
 					end
 				end
