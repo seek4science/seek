@@ -24,33 +24,30 @@ namespace :seek do
 					data_hash = JSON.parse(File.read(File.join(Rails.root, 'config/default_data/source_types/', filename)))
 					data_hash['data'].each do |item|
 						metadata = item['metadata']
-						repo =
-							Template.find_or_create_by(
-								{
-									title: metadata['name'],
-									group: metadata['group'],
-									group_order: metadata['group_order'],
-									temporary_name: metadata['temporary_name'],
-									template_version: metadata['template_version'],
-									isa_config: metadata['isa_config'],
-									isa_measurement_type: metadata['isa_measurement_type'],
-									isa_technology_type: metadata['isa_technology_type'],
-									isa_protocol_type: metadata['isa_protocol_type'],
-									repo_schema_id: metadata['r epo_schema_id'],
-									organism: metadata['organism'],
-									level: metadata['level']
-								}
-							)
-							if repo.new_record?
-								repo.projects = [project]
-								repo.policy = Policy.public_policy
-								repo.save!
-							end
+						template_details = {
+							title: metadata['name'],
+							group: metadata['group'],
+							group_order: metadata['group_order'],
+							temporary_name: metadata['temporary_name'],
+							template_version: metadata['template_version'],
+							isa_config: metadata['isa_config'],
+							isa_measurement_type: metadata['isa_measurement_type'],
+							isa_technology_type: metadata['isa_technology_type'],
+							isa_protocol_type: metadata['isa_protocol_type'],
+							repo_schema_id: metadata['r epo_schema_id'],
+							organism: metadata['organism'],
+							level: metadata['level']
+						}
+						tempalte = Template.find_by(template_details)
 
-						if repo.id.blank?
-							puts 'An error occured creating a template with the followign details: ', repo.errors.full_messages
+						if tempalte.blank?
+							tempalte = Template.create(template_details.merge({projects: [project], policy: Policy.public_policy}))
+						end
+
+						if tempalte.id.blank?
+							puts 'An error occured creating a template with the followign details: ', tempalte.errors.full_messages
 							puts '==================='
-							puts repo.inspect
+							puts tempalte.inspect
 							break
 						end
 
@@ -108,19 +105,19 @@ namespace :seek do
 								p scv.errors unless scv.save(validate: false)
 							end
 
-							attribute = TemplateAttribute.find_or_create_by({ title: attribute['name'], template_id: repo.id })
-
-							if attribute.new_record?
-								is_title= attribute['title'] || 0
-								isa_tag_id= get_isa_tag_id(attribute['isaTag'])
-								short_name= attribute['short_name']
-								required= attribute['required']
-								description= attribute['description']
-								sample_controlled_vocab_id= scv&.id
-								iri= attribute['iri']
-								sample_attribute_type_id= get_sample_attribute_type(attribute['dataType']) #Based on sample_attribute_type table
-
-								attribute.save!
+							tempalte_attribute_details = { title: attribute['name'], template_id: tempalte.id }
+							tempalte_attribute = TemplateAttribute.find_by(tempalte_attribute_details)
+							if tempalte_attribute.blank?
+								TemplateAttribute.create(tempalte_attribute_details.merge({
+									is_title: attribute['title'] || 0,
+									isa_tag_id: get_isa_tag_id(attribute['isaTag']),
+									short_name: attribute['short_name'],
+									required: attribute['required'],
+									description: attribute['description'],
+									sample_controlled_vocab_id: scv&.id,
+									iri: attribute['iri'],
+									sample_attribute_type_id: get_sample_attribute_type(attribute['dataType'])
+								}))
 							end
 						end
 					end
