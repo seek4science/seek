@@ -47,4 +47,11 @@ class IndexTableColumnDefinitionsTest < ActiveSupport::TestCase
       end
     end
   end
+
+  test 'via model accessor' do
+    assert_equal ['title'], @person.required_table_columns
+    assert_equal %w[title first_name last_name projects orcid description], @person.allowed_table_columns
+    assert_equal %w[first_name last_name projects], @person.default_table_columns
+  end
+
 end

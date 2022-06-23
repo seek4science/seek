@@ -160,4 +160,17 @@ class ApplicationRecord < ActiveRecord::Base
   def self.user_creatable?
     false
   end
+
+  def allowed_table_columns
+    Seek::IndexTableColumnDefinitions.allowed_columns(self)
+  end
+
+  def default_table_columns
+    Seek::IndexTableColumnDefinitions.default_columns(self)
+  end
+
+  def required_table_columns
+    Seek::IndexTableColumnDefinitions.required_columns(self)
+  end
+
 end

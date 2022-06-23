@@ -40,10 +40,10 @@
             </div>
           </div>
         </div>
-        <% for column in Seek::IndexTableColumnDefinitions.default_columns(resource).first(3) -%>
+        <% for column in resource.default_table_columns.first(3) -%>
           <% if resource.respond_to?(column) %>
             <%# if the number of columns is less than 3, increase width slightly %>
-            <div class="col-sm-<%= Seek::IndexTableColumnDefinitions.default_columns(resource).length()<3 ? '4' : '3' %>">
+            <div class="col-sm-<%= resource.default_table_columns.length()<3 ? '4' : '3' %>">
               <% if column == 'creators'%>
                 <%= list_item_person_list resource.creators %>
               <% elsif column == 'projects'  && ![Event, Person, Project, Institution, Programme, Collection].include?(resource.class)%>
