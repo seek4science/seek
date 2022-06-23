@@ -668,7 +668,7 @@ class ProjectsController < ApplicationController
   def project_params
     permitted_params = [:title, :web_page, :wiki_page, :description, { organism_ids: [] }, :parent_id, :start_date,
                         :end_date,
-                        :funding_codes, { human_disease_ids: [] },
+                        :funding_codes, { human_disease_ids: [] }, :edam_topics,
                         discussion_links_attributes:[:id, :url, :label, :_destroy]]
 
     if User.admin_logged_in?

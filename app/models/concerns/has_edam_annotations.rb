@@ -1,215 +1,115 @@
+# To support linking a model to the EDAM ontology, and for each branch of Topics, Operations, Formats and Data
 module HasEdamAnnotations
   extend ActiveSupport::Concern
 
   included do
-    def supports_edam_annotations?
-      respond_to?(:edam_topics) && respond_to?(:edam_operations) &&
-        respond_to?(:edam_data) && respond_to?(:edam_formats)
+    def supports_edam_annotations?(property = nil)
+      if property.nil?
+        self.class.supported_edam_properties.present?
+      else
+        self.class.supported_edam_properties.include?(property)
+      end
     end
 
     def edam_annotations?
       return false unless supports_edam_annotations?
-      edam_topics.any? || edam_operations.any? || edam_data.any? || edam_formats.any?
+
+      self.class.supported_edam_properties.detect do |prop|
+        send("edam_#{prop}").any?
+      end.present?
     end
   end
 
   class_methods do
-    def has_edam_annotations
+    attr_reader :supported_edam_properties
+
+    def has_edam_annotations(*properties)
       include InstanceMethods
-      include Search
 
-      has_annotation_type :edam_topics
-      has_many :edam_topic_values, through: :edam_topics_annotations, source: :value,
-                                   source_type: 'SampleControlledVocabTerm'
+      @supported_edam_properties = Array(properties) & %i[topics operations data formats]
 
-      has_annotation_type :edam_operations
-      has_many :edam_operation_values, through: :edam_operations_annotations, source: :value,
-                                       source_type: 'SampleControlledVocabTerm'
+      @supported_edam_properties.each do |property|
+        define_edam_associations(property)
 
-      has_annotation_type :edam_data
-      has_many :edam_data_values, through: :edam_data_annotations, source: :value,
-                                   source_type: 'SampleControlledVocabTerm'
+        define_edam_methods(property)
 
-      has_annotation_type :edam_formats
-      has_many :edam_format_values, through: :edam_formats_annotations, source: :value,
-                                   source_type: 'SampleControlledVocabTerm'
+        define_edam_index_filters(property)
 
-      # this is needed, because it overrides a previously 'defined' method from has_annotation_type
-      # the topics  vals can be an array or comma seperated list of either labels or IRI's
-      define_method :edam_topics= do |vals|
-        associate_edam_topics vals
+        define_edam_search_indexing(property)
       end
-
-      # this is needed, because it overrides a previously 'defined' method from has_annotation_type
-      # the operation vals can be an array or comma seperated list of either labels or IRI's
-      define_method :edam_operations= do |vals|
-        associate_edam_operations vals
-      end
-
-      # this is needed, because it overrides a previously 'defined' method from has_annotation_type
-      # the data vals can be an array or comma seperated list of either labels or IRI's
-      define_method :edam_data= do |vals|
-        associate_edam_data vals
-      end
-
-      # this is needed, because it overrides a previously 'defined' method from has_annotation_type
-      # the format vals can be an array or comma seperated list of either labels or IRI's
-      define_method :edam_formats= do |vals|
-        associate_edam_formats vals
-      end
-
-      # INDEX filters. Unfortunately, these won't currently consider the hierarchy
-      has_filter edam_topic: Seek::Filtering::Filter.new(
-        value_field: 'sample_controlled_vocab_terms.label',
-        joins: [:edam_topic_values]
-      )
-
-      has_filter edam_operation: Seek::Filtering::Filter.new(
-        value_field: 'sample_controlled_vocab_terms.label',
-        joins: [:edam_operation_values]
-      )
-
-      has_filter edam_data: Seek::Filtering::Filter.new(
-        value_field: 'sample_controlled_vocab_terms.label',
-        joins: [:edam_data_values]
-      )
-
-      has_filter edam_format: Seek::Filtering::Filter.new(
-        value_field: 'sample_controlled_vocab_terms.label',
-        joins: [:edam_format_values]
-      )
-    end
-  end
-
-  module Search
-    def self.included(klass)
-      klass.class_eval do
-        if Seek::Config.solr_enabled
-          searchable(auto_index: false) do
-            text :edam_topics do
-              edam_topic_labels
-            end
-            text :edam_operations do
-              edam_operation_labels
-            end
-            text :edam_data do
-              edam_data_labels
-            end
-            text :edam_formats do
-              edam_format_labels
-            end
-          end
-        end
-      end
-    end
-  end
-
-  module InstanceMethods
-    def edam_topics_vocab
-      SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
-    end
-
-    def edam_operations_vocab
-      SampleControlledVocab::SystemVocabs.edam_operations_controlled_vocab
-    end
-
-    def edam_data_vocab
-      SampleControlledVocab::SystemVocabs.edam_data_controlled_vocab
-    end
-
-    def edam_datum_labels
-      edam_data_labels
-    end
-  
-    def edam_datum_values
-      edam_data_values
-    end
-    
-    def edam_formats_vocab
-      SampleControlledVocab::SystemVocabs.edam_formats_controlled_vocab
-    end
-
-    def edam_topic_labels
-      edam_topic_values.pluck(:label)
-    end
-
-    def edam_operation_labels
-      edam_operation_values.pluck(:label)
-    end
-
-    def edam_data_labels
-      edam_data_values.pluck(:label)
-    end
-
-    def edam_format_labels
-      edam_format_values.pluck(:label)
     end
 
     private
 
+    def define_edam_search_indexing(property)
+      return unless Seek::Config.solr_enabled
+
+      searchable(auto_index: false) do
+        text "edam_#{property}".to_sym do
+          edam_labels(property)
+        end
+      end
+    end
+
+    def define_edam_associations(property)
+      has_annotation_type "edam_#{property}".to_sym
+      has_many "edam_#{property.to_s.singularize}_values".to_sym,
+               through: "edam_#{property}_annotations".to_sym, source: :value,
+               source_type: 'SampleControlledVocabTerm'
+    end
+
+    def define_edam_methods(property)
+      # the topics  vals can be an array or comma seperated list of either labels or IRI's
+      define_method "edam_#{property}=" do |vals|
+        associate_edam_values vals, property
+      end
+
+      define_method "edam_#{property.to_s.singularize}_labels" do
+        edam_labels(property)
+      end
+    end
+
+    def define_edam_index_filters(property)
+      # INDEX filters. Unfortunately, these won't currently consider the hierarchy
+      has_filter "edam_#{property.to_s.singularize}": Seek::Filtering::Filter.new(
+        value_field: 'sample_controlled_vocab_terms.label',
+        joins: ["edam_#{property.to_s.singularize}_values".to_sym]
+      )
+    end
+  end
+
+  module InstanceMethods
+    private
+
+    def edam_vocab(property)
+      SampleControlledVocab::SystemVocabs.send("edam_#{property}_controlled_vocab")
+    end
+
     # the topics can be an array or comma seperated list of either labels or IRI's
-    def associate_edam_topics(vals)
-      topic_values = Array(vals.split(',').flatten).map do |value|
+    def associate_edam_values(vals, property)
+      vocab = edam_vocab(property)
+      values = Array(vals.split(',').flatten).map do |value|
         value = value.strip
-        edam_topics_vocab.sample_controlled_vocab_terms.find_by_label(value) ||
-          edam_topics_vocab.sample_controlled_vocab_terms.find_by_iri(value)
+        vocab.sample_controlled_vocab_terms.find_by_label(value) ||
+          vocab.sample_controlled_vocab_terms.find_by_iri(value)
       end.compact.uniq
 
-      edam_topics_annotations.delete_all
-      self.edam_topics_annotations = topic_values.map do |annotation|
-        edam_topics_annotations.build(source: User.current_user, value: annotation)
+      annotations = send("edam_#{property}_annotations")
+
+      annotations.delete_all
+      values.map do |annotation|
+        annotations.build(source: User.current_user, value: annotation)
       end
 
-      topic_values
+      values
     end
 
-    def associate_edam_operations(vals)
-      operation_values = Array(vals.split(',').flatten).map do |value|
-        value = value.strip
-        edam_operations_vocab.sample_controlled_vocab_terms.find_by_label(value) ||
-          edam_operations_vocab.sample_controlled_vocab_terms.find_by_iri(value)
-      end.compact.uniq
-
-      edam_operations_annotations.delete_all
-      self.edam_operations_annotations = operation_values.map do |annotation|
-        edam_operations_annotations.build(source: User.current_user, value: annotation)
-      end
-
-      operation_values
+    def edam_labels(property)
+      edam_values(property).pluck(:label)
     end
 
-    # the data can be an array or comma seperated list of either labels or IRI's
-    def associate_edam_data(vals)
-      data_values = Array(vals.split(',').flatten).map do |value|
-        value = value.strip
-        edam_data_vocab.sample_controlled_vocab_terms.find_by_label(value) ||
-          edam_data_vocab.sample_controlled_vocab_terms.find_by_iri(value)
-      end.compact.uniq
-
-      edam_data_annotations.delete_all
-      self.edam_data_annotations = data_values.map do |annotation|
-        edam_data_annotations.build(source: User.current_user, value: annotation)
-      end
-
-      data_values
+    def edam_values(property)
+      send("edam_#{property.to_s.singularize}_values")
     end
-
-    # the formats can be an array or comma seperated list of either labels or IRI's
-    def associate_edam_formats(vals)
-      format_values = Array(vals.split(',').flatten).map do |value|
-        value = value.strip
-        edam_formats_vocab.sample_controlled_vocab_terms.find_by_label(value) ||
-          edam_formats_vocab.sample_controlled_vocab_terms.find_by_iri(value)
-      end.compact.uniq
-
-      edam_formats_annotations.delete_all
-      self.edam_formats_annotations = format_values.map do |annotation|
-        edam_formats_annotations.build(source: User.current_user, value: annotation)
-      end
-
-      format_values
-    end
-
-
   end
 end

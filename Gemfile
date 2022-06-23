@@ -23,7 +23,6 @@ gem 'factory_girl', '2.6.4'
 gem 'bio', '~> 1.5.1'
 gem 'sunspot_rails'
 gem 'progress_bar'
-gem 'progress_bar'
 gem 'savon', '1.1.0'
 gem 'delayed_job_active_record'
 gem 'daemons','1.1.9'
@@ -128,7 +127,7 @@ gem 'request_store'
 
 gem 'bundler', '>= 1.8.4'
 
-gem 'ro-crate', '~> 0.4.16'
+gem 'ro-crate', '~> 0.4.17'
 
 gem 'rugged'
 gem 'i18n-js'

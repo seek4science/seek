@@ -73,6 +73,8 @@ class Project < ApplicationRecord
   #  is to be used)
   belongs_to :default_policy, class_name: 'Policy', dependent: :destroy, autosave: true
 
+  has_edam_annotations :topics
+
   # FIXME: temporary handler, projects need to support multiple programmes
   def programmes
     Programme.where(id: programme_id)
@@ -128,8 +130,9 @@ class Project < ApplicationRecord
   def columns_default
     super + ['web_page']
   end
+
   def columns_allowed
-    columns_default + ['wiki_page','start_date','end_date']
+    columns_default + ['start_date','end_date']
   end
 
   def locations

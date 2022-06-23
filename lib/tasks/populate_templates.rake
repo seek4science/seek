@@ -13,6 +13,8 @@ namespace :seek do
 				SampleControlledVocabTerm.delete_all
 			end
 
+			seed_isa_tags
+
 			disable_authorization_checks do
 				client = Ebi::OlsClient.new
 				project = Project.find_or_create_by(title: 'Default Project')
@@ -23,7 +25,7 @@ namespace :seek do
 					data_hash['data'].each do |item|
 						metadata = item['metadata']
 						repo =
-							Template.create(
+							Template.find_or_create_by(
 								{
 									title: metadata['name'],
 									group: metadata['group'],
@@ -36,22 +38,25 @@ namespace :seek do
 									isa_protocol_type: metadata['isa_protocol_type'],
 									repo_schema_id: metadata['r epo_schema_id'],
 									organism: metadata['organism'],
-									level: metadata['level'],
-									projects: [project],
-									policy: Policy.public_policy
+									level: metadata['level']
 								}
 							)
+							if repo.new_record?
+								repo.projects = [project]
+								repo.policy = Policy.public_policy
+								repo.save!
+							end
 
-						if (repo.id.blank?)
+						if repo.id.blank?
 							puts 'An error occured creating a template with the followign details: ', repo.errors.full_messages
 							puts '==================='
 							puts repo.inspect
-							return
+							break
 						end
 
 						item['data'].each_with_index do |attribute, j|
 							is_ontology = !attribute['ontology'].blank?
-							is_CV = !attribute['CVList'].blank?
+							is_cv = !attribute['CVList'].blank?
 							scv =
 								SampleControlledVocab.new(
 									{
@@ -60,12 +65,12 @@ namespace :seek do
 										ols_root_term_uri: is_ontology ? attribute['ontology']['rootTermURI'] : nil,
 										custom_input: true
 									}
-								) if is_ontology || is_CV
+								) if is_ontology || is_cv
 
 							attribute_description = ''
 
 							if is_ontology
-								if !attribute['ontology']['rootTermURI'].blank?
+								if attribute['ontology']['rootTermURI'].present?
 									begin
 										terms = client.all_descendants(attribute['ontology']['name'], attribute['ontology']['rootTermURI'])
 									rescue Exception => e
@@ -74,12 +79,12 @@ namespace :seek do
 									end
 									terms.each_with_index do |term, i|
 										puts "#{j}) #{i + 1} FROM #{terms.length}"
-										if i == 0
+										if i.zero?
 											# Skip the parent name
 											des = term[:description]
 											scv[:description] = des.kind_of?(Array) ? des[0] : des
 										else
-											if (!term[:label].blank? && !term[:iri].blank?)
+											if term[:label].present? && term[:iri].present?
 												cvt =
 													SampleControlledVocabTerm.new(
 														{ label: term[:label], iri: term[:iri], parent_iri: term[:parent_iri] }
@@ -89,9 +94,9 @@ namespace :seek do
 										end
 									end
 								end
-							elsif is_CV
+							elsif is_cv
 								#the CV terms
-								if !attribute['CVList'].blank?
+								if attribute['CVList'].present?
 									attribute['CVList'].each do |term|
 										cvt = SampleControlledVocabTerm.new({ label: term })
 										scv.sample_controlled_vocab_terms << cvt
@@ -99,24 +104,24 @@ namespace :seek do
 								end
 							end
 
-							if is_ontology || is_CV
-								puts scv.errors.inspect if !scv.save(validate: false)
+							if is_ontology || is_cv
+								p scv.errors unless scv.save(validate: false)
 							end
 
-							TemplateAttribute.create(
-								{
-									title: attribute['name'],
-									is_title: attribute['title'] || 0,
-									isa_tag_id: get_isa_tag_id(attribute['isaTag']),
-									short_name: attribute['short_name'],
-									required: attribute['required'],
-									description: attribute['description'],
-									sample_controlled_vocab_id: scv.blank? ? nil : scv.id,
-									template_id: repo.id,
-									iri: attribute['iri'],
-									sample_attribute_type_id: get_sample_attribute_type(attribute['dataType']) #Based on sample_attribute_type table
-								}
-							)
+							attribute = TemplateAttribute.find_or_create_by({ title: attribute['name'], template_id: repo.id })
+
+							if attribute.new_record?
+								is_title= attribute['title'] || 0
+								isa_tag_id= get_isa_tag_id(attribute['isaTag'])
+								short_name= attribute['short_name']
+								required= attribute['required']
+								description= attribute['description']
+								sample_controlled_vocab_id= scv&.id
+								iri= attribute['iri']
+								sample_attribute_type_id= get_sample_attribute_type(attribute['dataType']) #Based on sample_attribute_type table
+
+								attribute.save!
+							end
 						end
 					end
 				end
@@ -133,5 +138,9 @@ namespace :seek do
 	def get_isa_tag_id(title)
 		return nil if title.blank?
 		IsaTag.where(title: title).first.id
+	end
+
+	def seed_isa_tags
+		Rake::Task['db:seed:015_isa_tags'].invoke if IsaTag.all.blank?
 	end
 end

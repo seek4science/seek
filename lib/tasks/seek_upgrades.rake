@@ -8,6 +8,7 @@ namespace :seek do
   # these are the tasks required for this version upgrade
   task upgrade_version_tasks: %i[
     environment
+    db:seed:007_sample_attribute_types
     db:seed:010_workflow_classes
     db:seed:011_edam_topics
     db:seed:012_edam_operations
@@ -17,6 +18,7 @@ namespace :seek do
     update_missing_publication_versions
     db:seed:013_edam_formats
     db:seed:014_edam_data
+    db:seed:015_isa_tags
     remove_orphaned_versions
     create_seek_sample_multi
     rename_seek_sample_attribute_types
