@@ -133,16 +133,8 @@
 
 <script>
 	$j(document).ready(function () {
-		$j('.select2').select2({
-			theme: "bootstrap",
-			escapeMarkup: function(markup) {
-				return markup;
-			},
-			templateResult: function(data) {
-    		return data.id ? `${data.text} <em>(id: ${data.id})</em>` : data.text;
-  		},
-			dropdownParent: $j('#query_samples') });
-			Samples.initTable($j('#samples-table'));
+		initSelect2($j('.select2'), $j('#query_samples'))
+		Samples.initTable($j('#samples-table'));
 	});
 
 	$j("#template").on("change", function(){

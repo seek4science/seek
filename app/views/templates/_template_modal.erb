@@ -52,7 +52,5 @@
 <% end %>
 
 <script>
-	$j('.templates').select2({
-		theme: "bootstrap",
-		dropdownParent: $j('#existing_templates') });
+	initSelect2($j('.templates'), $j('#existing_templates'))
 </script>

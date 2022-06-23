@@ -86,7 +86,7 @@ function loadTemplates(data) {
     return obj;
   }, {});
 
- 
+
   $j.each(Object.keys(categorized), (i, key) => {
     const elem = $j(`<optgroup label=${key}></optgroup>`);
     
@@ -209,3 +209,16 @@ const applyTemplate = () => {
 const showTemplateModal = () => {
   $j("#existing_templates").modal("show");
 };
+
+const initSelect2 = (elem, parentElem)=>{
+	elem.select2({
+		theme: "bootstrap",
+		escapeMarkup: function(markup) {
+			return markup;
+		},
+		templateResult: function(data) {
+			return data.id ? `${data.text} <em>(id: ${data.id})</em>` : data.text;
+		},
+		dropdownParent: parentElem
+	});
+}
