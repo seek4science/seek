@@ -80,30 +80,17 @@ const handleClick = (e) => (Templates.table.row($j(e).closest("tr")).data()[0] =
 
 function loadTemplates(data) {
   $j("#source_select").empty();
-  let categorizedData = data.reduce((obj, item) => {
+  let categorized = data.reduce((obj, item) => {
     obj[item.group] = obj[item.group] || [];
     obj[item.group].push(item);
     return obj;
   }, {});
 
  
-  const ordered = Object.keys(categorizedData).sort().reduce(
-    (obj, key) => { 
-      obj[key] = categorizedData[key]; 
-      obj[key].sort((a,b)=>{
-        if ( a.group_order < b.group_order )return -1;
-        else if ( a.group_order > b.group_order )return 1;
-        else return 0;
-      })
-      return obj;
-    }, 
-    {}
-  );
-
-  $j.each(Object.keys(ordered), (i, key) => {
+  $j.each(Object.keys(categorized), (i, key) => {
     const elem = $j(`<optgroup label=${key}></optgroup>`);
     
-    $j.each(ordered[key], (j, sub_item) => {
+    $j.each(categorized[key], (j, sub_item) => {
       elem.append(
         $j(`<option>${sub_item.title}</option>`).attr("value", sub_item.template_id).text(key.title)
       );
