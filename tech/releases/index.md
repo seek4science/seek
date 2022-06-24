@@ -13,7 +13,16 @@ If you have any comments or feedback about a release, then please [Contact Us](/
 
 ## Version 1.12.0
 
+Release date: _24th June 2022_
+
+For a full list, see [closed issues for 1.12.1](https://github.com/seek4science/seek/milestone/9?closed=1)
+
+## Version 1.12.0
+
 Release date: _6th May 2022_
+
+
+For a full list, see [closed issues for 1.12.0](https://github.com/seek4science/seek/milestone/6?closed=1)
 
 This version includes:
 
