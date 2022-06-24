@@ -172,4 +172,41 @@ class TemplatesControllerTest < ActionController::TestCase
     assert_response :success
   end
 
+	test 'authlookup item queued if creator changed' do
+		template = Factory(:template)
+    login_as(template.contributor)
+    creator = Factory(:person)
+
+    AuthLookupUpdateQueue.destroy_all
+
+    with_config_value(:auth_lookup_enabled, true) do
+      assert_difference('AuthLookupUpdateQueue.count', 1) do
+        put :update, params: {id: template.id, template: {title: 'fish', creator_ids: [creator.id.to_s]}}
+        assert_redirected_to template
+        assert_equal 'fish', assigns(:template).title
+        assert_equal [creator], assigns(:template).creators
+      end
+
+      AuthLookupUpdateQueue.destroy_all
+
+      # no job if no change to creators
+      assert_no_difference('AuthLookupUpdateQueue.count') do
+        put :update, params: {id: template.id, template: {title: 'horse', creator_ids: [creator.id.to_s]}}
+        assert_redirected_to template
+        assert_equal 'horse', assigns(:template).title
+        assert_equal [creator], assigns(:template).creators
+      end
+
+      AuthLookupUpdateQueue.destroy_all
+
+      # job if creator removed
+      assert_difference('AuthLookupUpdateQueue.count', 1) do
+        put :update, params: {id: template.id, template: {title: 'fish', creator_ids: ['']}}
+        assert_redirected_to template
+        assert_equal 'fish', assigns(:template).title
+        assert_equal [], assigns(:template).creators
+      end
+    end
+  end
+
 end

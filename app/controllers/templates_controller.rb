@@ -73,7 +73,7 @@ class TemplatesController < ApplicationController
     private
   
     def template_params
-      params.require(:template).permit(:title, :description, :group, :level, :organism, :iri, :parent_id,
+      params.require(:template).permit(:title, :description, :group, :level, :organism, :iri, :parent_id, *creator_related_params,
                                           { project_ids: [],
                                             template_attributes_attributes: [:id, :title, :pos, :required, :description,
                                                                           :sample_attribute_type_id, :isa_tag_id, :is_title,
