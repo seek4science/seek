@@ -55,16 +55,9 @@ You should run an update first
 
 Now install the packages:
 
-    sudo apt install mysql-server
-
-Pay attention to what you use for the 'MySQL root' password when requested -
-you will need this later.
-
-The remaining packages are:
-
     sudo apt install build-essential cmake git imagemagick libcurl4-gnutls-dev libgmp-dev \
         libmagick++-dev libmysqlclient-dev libpq-dev libreadline-dev libreoffice libssl-dev \
-        libxml++2.6-dev libxslt1-dev nodejs openjdk-11-jdk openssh-server poppler-utils zip
+        libxml++2.6-dev libxslt1-dev mysql-server nodejs openjdk-11-jdk openssh-server poppler-utils zip
 
 Installing these packages now will make installing Ruby easier later on:
 
@@ -117,25 +110,7 @@ Ruby and RubyGems version. Although you can use the version that comes with
 your linux distribution, it is more difficult to control the version you use
 and keep up to date.
 
-To install RVM follow the steps at <https://rvm.io/rvm/install> . The current
-basic installation method is to run:
-
-    \curl -L https://get.rvm.io | bash
-
-to save restarting your shell run:
-
-    source ~/.rvm/scripts/rvm
-
-if you already had RVM installed, bring it up to date with:
-
-    rvm get stable
-
-now install the appropriate version of Ruby
-
-    rvm install $(cat .ruby-version)
-
-you may be asked for your password so that some additional packages can be
-installed. You will then need to wait for Ruby to be downloaded and compiled.
+To install RVM on Ubuntu there is package available described at <https://github.com/rvm/ubuntu_rvm>, otherwise follow the steps at <https://rvm.io/rvm/install> .
 
 ## Installing Gems
 
@@ -159,10 +134,9 @@ default version of this and then edit it:
 Change this for each environment (development,production,test).
 
 Now you need to grant permissions for the user and password you just used
-(changing the example below appropriately). You will need the root password
-you created for mySQL when installing the package. e.g:
+(changing the example below appropriately). 
 
-    > mysql -uroot -p
+    > sudo mysql
     Enter password:
     Welcome to the MySQL monitor.  Commands end with ; or \g.
     Your MySQL connection id is 1522
