@@ -19,7 +19,7 @@ Small release with some bugfixes and small improvements. In particularly a secur
 
 * **An important security fix**
 * An overhaul and refresh of Gatekeeper behaviour, fixing bugs and allowing repeat requests to be sent following a previous rejection.
-* Fix to an error when interacting with the Ontology Lookup Error API, which affected creating and using sample types and controlled vocabularies in some cases.
+* Fix to an error when interacting with the Ontology Lookup Service API, which affected creating and using sample types and controlled vocabularies in some cases.
 * More tolerant URL checking when registering a remote asset. 
 
 For a full list, see [closed issues for 1.12.1](https://github.com/seek4science/seek/milestone/9?closed=1)
