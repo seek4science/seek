@@ -15,6 +15,13 @@ If you have any comments or feedback about a release, then please [Contact Us](/
 
 Release date: _24th June 2022_
 
+Small release with some bugfixes and small improvements. In particularly a security fix, and **we strongly recommend upgrading to this version**
+
+* **An important security fix**
+* An overhaul and refresh of Gatekeeper behaviour, fixing bugs and allowing repeat requests to be sent following a previous rejection.
+* Fix to an error when interacting with the Ontology Lookup Error API, which affected creating and using sample types and controlled vocabularies in some cases.
+* More tolerant URL checking when registering a remote asset. 
+
 For a full list, see [closed issues for 1.12.1](https://github.com/seek4science/seek/milestone/9?closed=1)
 
 ## Version 1.12.0
