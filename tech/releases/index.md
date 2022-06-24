@@ -11,7 +11,7 @@ Please see [Getting FAIRDOM-SEEK](/get-seek.html) for details about installing S
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html)
 
-## Version 1.12.0
+## Version 1.12.1
 
 Release date: _24th June 2022_
 
