@@ -20,7 +20,14 @@ module DynamicTableHelper
   private
 
   def dt_rows(sample_type)
-    sample_type.samples.map { |s| ['', s.id] + JSON(s.json_metadata).values }
+    sample_type.samples.map do |s|
+			['', s.id] +
+			if s.can_view?
+			  JSON(s.json_metadata).values
+			else
+			  Array.new(JSON(s.json_metadata).length, "#HIDDEN")
+			end
+		end
   end
 
   def dt_cols(sample_type)
@@ -50,7 +57,11 @@ module DynamicTableHelper
       full_row = []
       sample_id_set.each do |sample_id|
         sample = Sample.find(sample_id)
-        full_row.push(*JSON(sample.json_metadata).values.unshift(sample.id))
+				if sample.can_view?
+					full_row.push(*JSON(sample.json_metadata).values.unshift(sample.id))
+				else
+					full_row.push(*Array.new(JSON(sample.json_metadata).length, "#HIDDEN").unshift(sample.id))
+				end
       end
       aggregated_rows << full_row.fill('', full_row.length..col_count - 1)
     end
