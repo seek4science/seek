@@ -15,9 +15,8 @@ If you have any comments or feedback about a release, then please [Contact Us](/
 
 Release date: _24th June 2022_
 
-Small release with some bugfixes and small improvements. In particularly a security fix, and **we strongly recommend upgrading to this version**
+Small release with some bugfixes and small improvements. In particular a security fix, so **we recommend upgrading to this version**
 
-* **An important security fix**
 * An overhaul and refresh of Gatekeeper behaviour, fixing bugs and allowing repeat requests to be sent following a previous rejection.
 * Fix to an error when interacting with the Ontology Lookup Service API, which affected creating and using sample types and controlled vocabularies in some cases.
 * More tolerant URL checking when registering a remote asset. 
