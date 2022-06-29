@@ -9,7 +9,7 @@ class UtilTest < ActiveSupport::TestCase
   test 'creatable types' do
     types = Seek::Util.user_creatable_types
     # How to enable Placeholder?
-    expected = [Collection, DataFile, Document, FileTemplate, Model, Presentation, Publication, Sample, Sop, Assay, Investigation, Study, Event, SampleType, Strain, Workflow]
+    expected = [Collection, DataFile, Document, FileTemplate, Model, Presentation, Publication, Sample, Sop, Assay, Investigation, Study, Event, SampleType, Strain, Workflow, Template]
 
     # first as strings for more readable failed assertion message
     assert_equal expected.map(&:to_s).sort, types.map(&:to_s).sort
@@ -33,7 +33,7 @@ class UtilTest < ActiveSupport::TestCase
 
   test 'searchable types' do
     types = Seek::Util.searchable_types
-    expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, HumanDisease, Institution, Investigation, Model, Organism, Person, Presentation, Programme, Project, Publication, Sample, SampleType, Sop, Strain, Study, Workflow]
+    expected = [Assay, Collection, DataFile, Document, Event, FileTemplate, HumanDisease, Institution, Investigation, Model, Organism, Person, Presentation, Programme, Project, Publication, Sample, SampleType, Sop, Strain, Study, Workflow, Template]
 
     # first as strings for more readable failed assertion message
     assert_equal expected.map(&:to_s).sort, types.map(&:to_s).sort

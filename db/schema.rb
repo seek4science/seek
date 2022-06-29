@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_05_17_085632) do
+ActiveRecord::Schema.define(version: 2022_06_24_091053) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string "action"
@@ -946,7 +946,7 @@ ActiveRecord::Schema.define(version: 2022_05_17_085632) do
     t.index ["project_id"], name: "index_investigations_projects_on_project_id"
   end
 
-  create_table "isa_tags",  force: :cascade do |t|
+  create_table "isa_tags", force: :cascade do |t|
     t.string "title"
     t.index ["title"], name: "index_isa_tags_title"
   end
@@ -1516,7 +1516,7 @@ ActiveRecord::Schema.define(version: 2022_05_17_085632) do
     t.integer "strain_id"
   end
 
-  create_table "projects_templates",  force: :cascade do |t|
+  create_table "projects_templates", force: :cascade do |t|
     t.bigint "template_id"
     t.bigint "project_id"
     t.index ["project_id"], name: "index_projects_templates_on_project_id"
@@ -1663,7 +1663,7 @@ ActiveRecord::Schema.define(version: 2022_05_17_085632) do
     t.datetime "updated_at"
   end
 
-  create_table "resource_publish_logs", id: :integer,  force: :cascade do |t|
+  create_table "resource_publish_logs", force: :cascade do |t|
     t.string "resource_type"
     t.integer "resource_id"
     t.integer "user_id"
@@ -1677,10 +1677,10 @@ ActiveRecord::Schema.define(version: 2022_05_17_085632) do
   end
 
   create_table "roles", force: :cascade do |t|
-    t.integer "person_id"
-    t.integer "role_type_id"
+    t.bigint "person_id"
+    t.bigint "role_type_id"
     t.string "scope_type"
-    t.integer "scope_id"
+    t.bigint "scope_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["person_id", "role_type_id"], name: "index_roles_on_person_id_and_role_type_id"
@@ -1752,8 +1752,8 @@ ActiveRecord::Schema.define(version: 2022_05_17_085632) do
     t.string "ols_root_term_uri"
     t.boolean "required"
     t.string "short_name"
-    t.integer "template_id"
     t.string "key"
+    t.integer "template_id"
     t.boolean "custom_input", default: false
   end
 
@@ -1811,7 +1811,7 @@ ActiveRecord::Schema.define(version: 2022_05_17_085632) do
 
   create_table "sessions", force: :cascade do |t|
     t.string "session_id", null: false
-    t.text "data", limit: 16777215
+    t.text "data"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["session_id"], name: "index_sessions_on_session_id"
@@ -2081,7 +2081,7 @@ ActiveRecord::Schema.define(version: 2022_05_17_085632) do
     t.index ["resource_type", "resource_id"], name: "index_tasks_on_resource_type_and_resource_id"
   end
 
-  create_table "template_attributes",  force: :cascade do |t|
+  create_table "template_attributes", force: :cascade do |t|
     t.string "title"
     t.string "short_name"
     t.boolean "required", default: false
@@ -2100,7 +2100,7 @@ ActiveRecord::Schema.define(version: 2022_05_17_085632) do
     t.index ["template_id", "title"], name: "index_template_id_asset_id_title"
   end
 
-  create_table "template_auth_lookup", id: :integer,  force: :cascade do |t|
+  create_table "template_auth_lookup", force: :cascade do |t|
     t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view", default: false
@@ -2112,7 +2112,7 @@ ActiveRecord::Schema.define(version: 2022_05_17_085632) do
     t.index ["user_id", "can_view"], name: "index_template_auth_lookup_on_user_id_and_can_view"
   end
 
-  create_table "templates",  force: :cascade do |t|
+  create_table "templates", force: :cascade do |t|
     t.string "title"
     t.string "group", default: "other"
     t.integer "group_order"
@@ -2132,13 +2132,16 @@ ActiveRecord::Schema.define(version: 2022_05_17_085632) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "parent_id"
+    t.string "uuid"
+    t.string "first_letter", limit: 1
+    t.text "other_creators"
     t.index ["title", "group"], name: "index_templates_title_group"
   end
 
   create_table "text_values", force: :cascade do |t|
     t.integer "version"
     t.integer "version_creator_id"
-    t.text "text", limit: 16777215, null: false
+    t.text "text", null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
