@@ -146,6 +146,7 @@ en:
     edam_format_values: 'EDAM format types'
     edam_topic_values: 'EDAM topics'
     edam_operation_values: 'EDAM operations'
+    contributor: 'Submitter'
 
   activerecord:
     errors:
