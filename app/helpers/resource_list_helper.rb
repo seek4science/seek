@@ -1,5 +1,8 @@
 module ResourceListHelper
+  include ApplicationHelper
   include ResourceListItemHelper
+  include LicenseHelper
+  include OntologyHelper
 
   def resource_list_table_row(resource, tableview_columns)
     content_tag :tr, class: :list_item do

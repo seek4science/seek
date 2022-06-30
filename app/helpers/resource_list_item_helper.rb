@@ -1,6 +1,7 @@
 module ResourceListItemHelper
 
   include RelatedItemsHelper
+  include FavouritesHelper
 
   def get_list_item_content_partial(resource)
     get_original_model_name(resource).pluralize.underscore + '/resource_list_item'

@@ -1,0 +1,55 @@
+require 'test_helper'
+
+class ResourceListHelperTest < ActionView::TestCase
+
+  test 'resource_list_table_row' do
+    sop = Factory(:max_sop)
+    html = resource_list_table_row(sop, sop.allowed_table_columns)
+    assert_equal sop.allowed_table_columns.length, html.scan('<td>').count
+  end
+
+  test 'resource_list_table_column' do
+    data_file = Factory(:max_data_file, license: 'CC-BY-4.0')
+
+    assert_equal date_as_string(data_file.created_at, true), resource_list_table_column(data_file, 'created_at')
+    assert_equal date_as_string(data_file.updated_at, true), resource_list_table_column(data_file, 'updated_at')
+
+    assert_equal link_to(data_file.contributor.name, data_file.contributor),
+                 resource_list_table_column(data_file, 'contributor')
+    assert_equal link_to('Creative Commons Attribution 4.0', 'https://creativecommons.org/licenses/by/4.0/', target: :_blank),
+                 resource_list_table_column(data_file, 'license')
+
+    assert_match(/href="#{data_file_path(data_file)}".*#{data_file.title}/,
+                 resource_list_table_column(data_file, 'title'))
+    assert_equal data_file.description, resource_list_table_column(data_file, 'description')
+
+    creator = data_file.creators.first
+    refute_nil creator
+    assert_match(/href="#{person_path(creator)}".*#{creator.name}/, resource_list_table_column(data_file, 'creators'))
+
+    project = data_file.projects.first
+    assert_match(/href="#{project_path(project)}".*#{project.title}/,
+                 resource_list_table_column(data_file, 'projects'))
+
+    Factory(:edam_topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
+    unless SampleControlledVocab::SystemVocabs.edam_operations_controlled_vocab
+      Factory(:edam_operations_controlled_vocab)
+    end
+    workflow = Factory(:max_workflow)
+    assert_match(%r{href="https://edamontology.github.io/edam-browser/#topic_3314".*Chemistry},
+                 resource_list_table_column(workflow, 'edam_topic_values'))
+    assert_match(%r{href="https://edamontology.github.io/edam-browser/#operation_3432".*Clustering},
+                 resource_list_table_column(workflow, 'edam_operation_values'))
+
+    assay = Factory(:experimental_assay)
+    assert_match(%r{href="/technology_types\?label=Technology\+type.*".*Technology type},
+                 resource_list_table_column(assay, 'technology_type_uri'))
+    assert_match(%r{href="/assay_types\?label=Experimental\+assay\+type.*".*Experimental assay type},
+                 resource_list_table_column(assay, 'assay_type_uri'))
+
+    error = assert_raises(RuntimeError) do
+      resource_list_table_column(assay, 'id')
+    end
+    assert_equal 'Invalid column', error.message
+  end
+end
