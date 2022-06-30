@@ -17,44 +17,8 @@
    content_grid_size += 1 if avatar_content.blank?
    content_grid_size += 2 if actions_partial.blank?
 
-   title_options = {}
 %>
 
-<tr class="<%= access_based_css_class%>">
-  <% for column in tableview_columns -%>
-    <% case column %>
-    <% when "title" %>
-      <td><%= list_item_title resource, title_options %></td>
-    <% when "projects" %>
-      <% if resource.respond_to?('projects') %>
-        <td><%= resource.projects.uniq.map {|p| link_to p.title, p }.join(', ').html_safe %></td>
-      <% else %>
-        <td> Field not found </td>
-      <% end %>
-    <% when "contributor" %>
-      <% if resource.respond_to?('contributor') %>
-        <td><%= link_to resource.contributor.name, resource.contributor %></td>
-      <% else %>
-        <td> Field not found </td>
-      <% end %>
-    <% when "tags" %>
-      <% if resource.respond_to?('tags') %>
-        <td><%= resource.send(column).join(",") %></td>
-      <% else %>
-        <td> Field not found </td>
-      <% end %>
-    <% when "creators"%>
-      <td><%= table_item_person_list resource.creators %></td>
-    <% when "assay_type_uri"%>
-      <td><%= link_to_assay_type(resource) %></td>
-    <% when "technology_type_uri"%>
-      <td><%= link_to_technology_type(resource) %></td>
-    <% else  %>
-      <% if resource.respond_to?(column) %>
-        <td><%= text_or_not_specified(resource.send(column),length: 300, auto_link: true, none_text: "") %></td>
-      <% else %>
-        <td>Unknown Column parameter</td>
-      <% end %>
-    <% end %>
-  <% end -%>
-</tr>
+
+<%= list_view_table_row(resource, tableview_columns) %>
+

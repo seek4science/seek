@@ -266,6 +266,53 @@ module ResourceListItemHelper
     end
   end
 
+  def list_view_table_row(resource, tableview_columns)
+    content_tag :tr, class: :list_item do
+      tableview_columns.collect do |column|
+        content_tag :td do
+          list_view_table_column(resource, column)
+        end
+      end.join.html_safe
+    end
+  end
+
+  def list_view_table_column(resource, column)
+    case column
+    when 'title'
+      list_item_title resource, {}
+    when 'projects'
+      if resource.respond_to?('projects')
+        resource.projects.uniq.map { |p| link_to p.title, p }.join(', ').html_safe
+      else
+        'Field not found'
+      end
+    when 'contributor'
+      if resource.respond_to?('contributor')
+        link_to resource.contributor.name, resource.contributor
+      else
+        'Field not found'
+      end
+    when 'tags'
+      if resource.respond_to?('tags')
+        resource.send(column).join(',')
+      else
+        'Field not found'
+      end
+    when 'creators'
+      table_item_person_list resource.creators
+    when 'assay_type_uri'
+      link_to_assay_type(resource)
+    when 'technology_type_uri'
+      link_to_technology_type(resource)
+    else
+      if resource.respond_to?(column)
+        text_or_not_specified(resource.send(column), length: 300, auto_link: true, none_text: '')
+      else
+        'Unknown Column parameter'
+      end
+    end
+  end
+
   def table_item_person_list(contributors, other_contributors = nil, key = t('creator').capitalize)
     contributor_count = contributors.count
     contributor_count += 1 unless other_contributors.blank?
