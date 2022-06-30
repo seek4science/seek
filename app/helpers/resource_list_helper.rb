@@ -31,7 +31,9 @@ module ResourceListHelper
         date_as_string(column_value, true)
       else
         Array(column_value).collect do |value|
-          if value.kind_of?(ApplicationRecord)
+          if value.is_a?(SampleControlledVocabTerm)
+            edam_ontology_items(value)
+          elsif value.kind_of?(ApplicationRecord)
             link_to value.title, value
           else
             text_or_not_specified(value, length: 300, auto_link: true, none_text: '')

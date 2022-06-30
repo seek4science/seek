@@ -12,7 +12,7 @@ columns:
   data_file:
     required: []
     default: [ ]
-    additional_allowed: [format_type, data_type,  simulation_data]
+    additional_allowed: [edam_data_values, edam_format_values, simulation_data]
 
   sop:
     required: []
@@ -32,7 +32,7 @@ columns:
   workflow:
     required: [ ]
     default: [ ]
-    additional_allowed: [ ]
+    additional_allowed: [edam_topic_values, edam_operation_values]
 
   document:
     required: [ ]

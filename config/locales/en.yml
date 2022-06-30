@@ -142,6 +142,10 @@ en:
     ro_crate: RO-Crate
     abstract_cwl: "Abstract CWL"
     doi: DOI
+    edam_data_values: 'EDAM data types'
+    edam_format_values: 'EDAM format types'
+    edam_topic_values: 'EDAM topics'
+    edam_operation_values: 'EDAM operations'
 
   activerecord:
     errors:
