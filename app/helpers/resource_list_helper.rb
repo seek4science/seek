@@ -18,20 +18,26 @@ module ResourceListHelper
     case column
     when 'title'
       list_item_title resource, {}
-    when 'projects'
-      column_value.uniq.map { |p| link_to p.title, p }.join(', ').html_safe
-    when 'contributor'
-      link_to column_value.name, column_value
-    when 'tags'
-      column_value.join(',')
     when 'creators'
       table_item_person_list column_value
     when 'assay_type_uri'
       link_to_assay_type(resource)
     when 'technology_type_uri'
       link_to_technology_type(resource)
+    when 'license'
+      describe_license(column_value)
     else
-      text_or_not_specified(column_value, length: 300, auto_link: true, none_text: '')
+      if column_value.try(:acts_like_time?)
+        date_as_string(column_value, true)
+      else
+        Array(column_value).collect do |value|
+          if value.kind_of?(ApplicationRecord)
+            link_to value.title, value
+          else
+            text_or_not_specified(value, length: 300, auto_link: true, none_text: '')
+          end
+        end.join(',').html_safe
+      end
     end
   end
 
