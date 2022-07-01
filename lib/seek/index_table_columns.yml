@@ -51,7 +51,7 @@ columns:
 
   institution:
     required: [ ]
-    default: [ city, county, web_page ]
+    default: [ city, country, web_page ]
     additional_allowed: [ address ]
 
   investigation:

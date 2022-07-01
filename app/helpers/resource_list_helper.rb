@@ -3,6 +3,7 @@ module ResourceListHelper
   include ResourceListItemHelper
   include LicenseHelper
   include OntologyHelper
+  include CountriesHelper
 
   def resource_list_table_row(resource, tableview_columns)
     content_tag :tr, class: :list_item do
@@ -39,6 +40,8 @@ module ResourceListHelper
       link_to_technology_type(resource)
     when 'license'
       describe_license(column_value)
+    when 'country'
+      country_text_or_not_specified(column_value)
     else
       if column_value.try(:acts_like_time?)
         date_as_string(column_value, true)

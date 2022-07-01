@@ -16,6 +16,7 @@ class ResourceListHelperTest < ActionView::TestCase
   end
 
   test 'resource_list_column_display_value' do
+
     data_file = Factory(:max_data_file, license: 'CC-BY-4.0')
 
     assert_equal date_as_string(data_file.created_at, true), resource_list_column_display_value(data_file, 'created_at')
@@ -53,6 +54,10 @@ class ResourceListHelperTest < ActionView::TestCase
                  resource_list_column_display_value(assay, 'technology_type_uri'))
     assert_match(%r{href="/assay_types\?label=Experimental\+assay\+type.*".*Experimental assay type},
                  resource_list_column_display_value(assay, 'assay_type_uri'))
+
+    event = Factory(:event, country: 'US')
+    assert_match %r{href="/countries/US".*United States}, resource_list_column_display_value(event, 'country')
+    assert_match %r{<img.*us.png}, resource_list_column_display_value(event, 'country')
 
     error = assert_raises(RuntimeError) do
       resource_list_column_display_value(assay, 'id')
