@@ -8,28 +8,35 @@ class ResourceListHelperTest < ActionView::TestCase
     assert_equal sop.allowed_table_columns.length, html.scan('<td>').count
   end
 
-  test 'resource_list_table_column' do
+  test 'resource_list_condensed_row' do
+    event = Factory(:event)
+    assert event.default_table_columns.count >= 3
+    html = resource_list_condensed_row(event)
+    assert_equal 3, html.scan(/div class=\"col-sm-3\"/).count
+  end
+
+  test 'resource_list_column_display_value' do
     data_file = Factory(:max_data_file, license: 'CC-BY-4.0')
 
-    assert_equal date_as_string(data_file.created_at, true), resource_list_table_column(data_file, 'created_at')
-    assert_equal date_as_string(data_file.updated_at, true), resource_list_table_column(data_file, 'updated_at')
+    assert_equal date_as_string(data_file.created_at, true), resource_list_column_display_value(data_file, 'created_at')
+    assert_equal date_as_string(data_file.updated_at, true), resource_list_column_display_value(data_file, 'updated_at')
 
     assert_equal link_to(data_file.contributor.name, data_file.contributor),
-                 resource_list_table_column(data_file, 'contributor')
+                 resource_list_column_display_value(data_file, 'contributor')
     assert_equal link_to('Creative Commons Attribution 4.0', 'https://creativecommons.org/licenses/by/4.0/', target: :_blank),
-                 resource_list_table_column(data_file, 'license')
+                 resource_list_column_display_value(data_file, 'license')
 
     assert_match(/href="#{data_file_path(data_file)}".*#{data_file.title}/,
-                 resource_list_table_column(data_file, 'title'))
-    assert_equal data_file.description, resource_list_table_column(data_file, 'description')
+                 resource_list_column_display_value(data_file, 'title'))
+    assert_equal data_file.description, resource_list_column_display_value(data_file, 'description')
 
     creator = data_file.creators.first
     refute_nil creator
-    assert_match(/href="#{person_path(creator)}".*#{creator.name}/, resource_list_table_column(data_file, 'creators'))
+    assert_match(/href="#{person_path(creator)}".*#{creator.name}/, resource_list_column_display_value(data_file, 'creators'))
 
     project = data_file.projects.first
     assert_match(/href="#{project_path(project)}".*#{project.title}/,
-                 resource_list_table_column(data_file, 'projects'))
+                 resource_list_column_display_value(data_file, 'projects'))
 
     Factory(:edam_topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
     unless SampleControlledVocab::SystemVocabs.edam_operations_controlled_vocab
@@ -37,18 +44,18 @@ class ResourceListHelperTest < ActionView::TestCase
     end
     workflow = Factory(:max_workflow)
     assert_match(%r{href="https://edamontology.github.io/edam-browser/#topic_3314".*Chemistry},
-                 resource_list_table_column(workflow, 'edam_topic_values'))
+                 resource_list_column_display_value(workflow, 'edam_topic_values'))
     assert_match(%r{href="https://edamontology.github.io/edam-browser/#operation_3432".*Clustering},
-                 resource_list_table_column(workflow, 'edam_operation_values'))
+                 resource_list_column_display_value(workflow, 'edam_operation_values'))
 
     assay = Factory(:experimental_assay)
     assert_match(%r{href="/technology_types\?label=Technology\+type.*".*Technology type},
-                 resource_list_table_column(assay, 'technology_type_uri'))
+                 resource_list_column_display_value(assay, 'technology_type_uri'))
     assert_match(%r{href="/assay_types\?label=Experimental\+assay\+type.*".*Experimental assay type},
-                 resource_list_table_column(assay, 'assay_type_uri'))
+                 resource_list_column_display_value(assay, 'assay_type_uri'))
 
     error = assert_raises(RuntimeError) do
-      resource_list_table_column(assay, 'id')
+      resource_list_column_display_value(assay, 'id')
     end
     assert_equal 'Invalid column', error.message
   end

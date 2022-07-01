@@ -8,19 +8,29 @@ module ResourceListHelper
     content_tag :tr, class: :list_item do
       tableview_columns.collect do |column|
         content_tag :td do
-          resource_list_table_column(resource, column)
+          resource_list_column_display_value(resource, column)
         end
       end.join.html_safe
     end
   end
 
-  def resource_list_table_column(resource, column)
+  def resource_list_condensed_row(resource)
+    div_class = "col-sm-#{resource.default_table_columns.length < 3 ? '4' : '3'}"
+    resource.default_table_columns.first(3).collect do |column|
+      content_tag :div, class: div_class do
+        "<b>#{resource.class.human_attribute_name(column)}: </b>#{resource_list_column_display_value(resource,
+                                                                                                     column)}".html_safe
+      end
+    end.join.html_safe
+  end
+
+  def resource_list_column_display_value(resource, column)
     raise 'Invalid column' unless resource.allowed_table_columns.include?(column)
 
     column_value = resource.send(column)
     case column
     when 'title'
-      list_item_title resource, {}
+      list_item_title resource
     when 'creators'
       table_item_person_list column_value
     when 'assay_type_uri'
@@ -36,7 +46,7 @@ module ResourceListHelper
         Array(column_value).collect do |value|
           if value.is_a?(SampleControlledVocabTerm)
             edam_ontology_items(value)
-          elsif value.kind_of?(ApplicationRecord)
+          elsif value.is_a?(ApplicationRecord)
             link_to value.title, value
           else
             text_or_not_specified(value, length: 300, auto_link: true, none_text: '')
