@@ -93,11 +93,11 @@ gem 'citeproc-ruby', '~> 2.0.0'
 gem 'csl-styles', '~> 2.0.0'
 gem 'bibtex-ruby', '~> 5.1.0'
 
-gem 'omniauth'
-gem 'omniauth-ldap'
+gem 'omniauth', '~> 1.3.1'
+gem 'omniauth-ldap', '~> 1.0.5'
 gem 'omniauth_openid_connect'
-gem 'omniauth-rails_csrf_protection'
-gem 'omniauth-github'
+gem 'omniauth-rails_csrf_protection', '~> 0.1'
+gem 'omniauth-github', '~> 1.2.0'
 
 gem 'ransack'
 
