@@ -45,12 +45,12 @@ table, th, td {
     <% @file_list.each do |file_item| %>
       <tr>
         <td>
-          <span
-            class="<%= file_item["isFolder"] ? "nels-folder" : "glyphicon glyphicon-download nels-file" %>"
-            style="cursor: pointer;" path=<%= file_item["path"]%>
-          >
+          <%= icon_link_to('', 'big_download', {:action => :download_file,
+            :project_id => @project_id, :dataset_id => @dataset_id ,:subtype_name => @subtype,:path => file_item["path"] }, method: :get) %>
             <%= file_item["name"]%>
           </span>
+          <span style="float: right;"> <%= icon_link_to('Open in NeLS', 'git_repository_search', 'https://test-fe.cbu.uib.no/nels-web/#/sbi-storage',options = {target:'blank'})
+          %></span>
         </td>
         <td><%= file_item["size"]%></td>
       </tr>
@@ -85,7 +85,6 @@ table, th, td {
       pathHTML=pathHTML.concat(`/<a href="" onclick="return false;" path="${path}">${element}</a>`);
     });
     $j('#nels_breadcrumb').html(pathHTML)
-    // TODO: Add on click for each element in the breadcrumb
 
     function updateFolderList(path){
       $j('#nels-dataset').html('').spinner('add').show();
@@ -105,19 +104,16 @@ table, th, td {
     $j('.nels-folder').click(function() {
       updateFolderList($j(this).attr('path'));
     });
-    $j('.nels-file').click(function() {
-      alert(`trigger download for ${$j(this).attr('path')}`);
-    });
 
     $j('.upload_file').on('click', function () {
       // Show upload file form and populate the params as hidden fields
       $j('#upload-file').modal('show');
       button_id = $j(this).attr('id')
 
-      $j('#upload-file form').append(`<input type="hidden" name="project_id" value="${button_id.split("_")[2]}" />`);
-      $j('#upload-file form').append(`<input type="hidden" name="dataset_id" value="${button_id.split("_")[3]}" />`);
-      $j('#upload-file form').append(`<input type="hidden" name="subtype_name" value="${button_id.split("_")[4]}" />`);
-
+      $j('#upload-file form').append(`<input type="hidden" name="project_id" value="<%= @project_id %>" />`);
+      $j('#upload-file form').append(`<input type="hidden" name="dataset_id" value="<%= @dataset_id %>" />`);
+      $j('#upload-file form').append(`<input type="hidden" name="subtype_name" value="<%= @subtype %>" />`);
+      $j('#upload-file form').append(`<input type="hidden" name="file_path" value="<%= @path %>" />`);
       return false;
     });
   });

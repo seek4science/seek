@@ -80,11 +80,14 @@ class NelsController < ApplicationController
   end
 
   def upload_file
-    # @rest_client.upload_file(params[:project_id].to_i, params[:dataset_id].to_i,params[:subtype_name], params["content_blobs"][0]["data"].path)
-    redirect_to action: "index"
+    @rest_client.upload_file(params[:project_id].to_i, params[:dataset_id].to_i,params[:subtype_name],params[:file_path],params["content_blobs"][0]["data"].original_filename, params["content_blobs"][0]["data"].path)
   end
 
-  
+  def download_file
+    file_name, file_path = @rest_client.download_file(params[:project_id].to_i, params[:dataset_id].to_i,params[:subtype_name],params[:path],params[:file_name])
+    send_file file_path, filename: file_name, disposition: 'attachment'
+  end
+
   def projects
     @projects = @rest_client.projects
 
@@ -125,6 +128,7 @@ class NelsController < ApplicationController
   
   def subtype
     @project_id = params[:project_id].to_i
+    @dataset_id = params[:dataset_id].to_i
     @dataset = @rest_client.dataset(@project_id, params[:dataset_id].to_i)
     @path = params[:path]
     @subtype = params[:subtype]

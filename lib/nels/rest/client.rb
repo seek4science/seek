@@ -13,6 +13,14 @@ module Nels
         @base = RestClient::Resource.new(base)
       end
 
+      def sanitiseStoragePath(file_path)
+        # IMPORTANT! The file_path uses project,dataset names instead of ids, and there cannot be a trailing backslash (/)
+        if file_path[-1]=="/"
+          return file_path[0...-1]
+        end
+        return file_path
+      end
+
       def user_info
         perform('user-info', :get)
       end
@@ -95,13 +103,13 @@ module Nels
             }
           });
       end
-      # IMPORTANT! The file_path uses project,dataset names instead of ids, and there cannot be a trailing backslash (/)
+      
+      
       def sbi_storage_list(project_id, dataset_id, file_path)
         puts "sbi_storage_list function"
 
-        if file_path[-1]=="/"
-          file_path = file_path[0...-1]
-        end
+        # IMPORTANT! The file_path uses project,dataset names instead of ids, and there cannot be a trailing backslash (/)
+        file_path = sanitiseStoragePath(file_path)
         puts project_id
         puts dataset_id
         
@@ -117,7 +125,114 @@ module Nels
           })['elements'];
       end
 
-      private
+      # UPLOAD FILE FLOW
+      # 1. upload_get_reflink: get upload-reference-uri
+      # 2. Use upload-reference-uri to upload file
+      # 3. Upload file to retrieved URI
+      # 4. Once the file is uploaded, trigger transfer to next storage area
+      # 5. Return job-id, which can be used in upload_check_progress() to check progress
+      def upload_file(project_id, dataset_id,subtype_name, path, file_name, file_path)
+
+        path = sanitiseStoragePath(path)
+        file_path = sanitiseStoragePath(file_path)
+
+        # 1. Retrieve upload-reference-uri to upload the file to
+        response = perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/data/do", :post,
+          body: {
+            "method": "initiate_upload",
+            "payload":{
+              "location-in-sub-type": path,
+              "file-name": file_name,
+            }
+          }
+        );
+        puts (response)
+        reflink = response.url
+        job_id = response.job_id
+
+        # Upload the file, 204 if success (maybe 200 in new API) 400 with errors otherwise
+        if perform(reflink, :post, :body => IO.read(file_path)) != 400
+          # Once upload is done, trigger NeLS transfer
+          perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/data/do", :post,
+            body: {
+              "method": "upload_done",
+              "payload":{
+                "job_id": job_id,
+              }
+            });
+        else
+          # handle
+          return false
+        end
+
+        # At this point the data is being transfered from NeLS to storebioinfo
+        return job_id
+      end
+      
+      # returns {job_state: state-enums, completion: completion-percentage} 
+      # state-enums: SUCCESS(101), FAILURE(102), SUBMITTED(100), PROCESSING(103);
+      def upload_check_progress(project_id, dataset_id, subtype_name, path, job_id)
+        path = sanitiseStoragePath(path)
+
+        perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/data/do", :post,
+          body: {
+            "method": "job_state",
+            "payload":{
+              "job_id": job_id,
+            }
+          });
+      end
+
+      # DOWNLOAD FILE FLOW
+      # 1. fetch file to intermediate area
+      # 2. Use given job-id to check progress of transfer
+      # 3. Once status is 101, fetch download URI
+      # 4. Use one-time use download-URI to download file
+      def download_file(project_id, dataset_id,subtype_name, path, file_name)
+        path = sanitiseStoragePath(path)
+
+        # 1. Retrieve upload-reference-uri to upload the file to
+        response = perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/data/do", :post,
+          body: {
+            "method": "fetch_file",
+            "payload":{
+              "location-in-sub-type": path,
+              "file-name": file_name,
+            }
+          }
+        );
+        job_id = response.job_id;
+
+        # TODO: Poll given job_id until status is 101
+        response = perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/data/do", :post,
+          body: {
+            "method": "fetch_file",
+            "payload":{
+              "job_id": job_id
+            }
+          }
+        );
+        job_state = response.job_state
+        completion_percentage = response.completion
+        if (job_state == 101)
+          # Once the file has been transfered, request download-uri
+          response = perform("seek/sbi/projects/#{project_id}/datasets/#{dataset_id}/#{subtype_name}/data/do", :post,
+            body: {
+              "method": "download_reference",
+              "payload":{
+                "job_id": job_id
+              }
+            }
+          );
+          download_uri = response.download-uri
+          # download file from given one-time use URI
+          response_file = perform(download_uri, :get, skip_parse: true, raw_response: true)
+
+          tmp_file = Tempfile.new()
+          File.open(tmp_file.path, 'wb'){|f| f << response_file.to_str}
+          return file_name, tmp_file.path
+        end
+      end
 
       def perform(path, method, opts = {})
         opts[:content_type] ||= :json

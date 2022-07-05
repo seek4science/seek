@@ -459,6 +459,7 @@ SEEK::Application.routes.draw do
       post :create_dataset
       post :add_metadata
       post :upload_file
+      get :download_file
     end
   end
   # to be removed as STI does not work in too many places
