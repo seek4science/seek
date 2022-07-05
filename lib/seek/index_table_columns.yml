@@ -1,23 +1,38 @@
+# Definitions for the column options available for the table based index view
+#
+# - general: - these are a broad set of general configurations common to most resources. If a particular resource doesn't respond then the column is ignored.
+#     - required: these columns are always shown and cannot be added or removed
+#     - default: columns that are shown by default, but can be removed
+#     - additional_allowed: additional columns that are available to be selected, but not shown by default
+#
+# the other definitions relative to specific resource types, defined by the key, and are for defining columns specific to that particular resource type, or tweaking the order.
+# The options: required, default, and additional_allowed have the same meaning, and the columns are prepended to the start.
+# Columns previously defined under general can be bought to the front by redefining them here and any later duplicates are removed.
+# There is an additional option - 'blocked', which can be used to override and prevent columns defined under general being available for the specific resource type.
+#
+# NOTE that the first 3 default columns are currently used for the condensed view
+
+
 columns:
   general:
-    required: [title]
-    default: [creators, projects, version, license]
-    additional_allowed: [contributor, creators, projects, version, description, created_at, updated_at, last_used_at, other_creators, doi, license, tags]
+    required: [ title ]
+    default: [ creators, projects, version, license ]
+    additional_allowed: [ contributor, creators, projects, version, description, created_at, updated_at, last_used_at, other_creators, doi, license, tags ]
 
   assay:
-    required: []
-    default: [creators, projects, assay_type_uri]
+    required: [ ]
+    default: [ creators, projects, assay_type_uri ]
     additional_allowed: [ technology_type_uri ]
 
   data_file:
-    required: []
+    required: [ ]
     default: [ ]
-    additional_allowed: [edam_data_values, edam_format_values, simulation_data]
+    additional_allowed: [ edam_data_values, edam_format_values, simulation_data ]
 
   sop:
-    required: []
+    required: [ ]
     default: [ ]
-    additional_allowed: []
+    additional_allowed: [ ]
 
   presentation:
     required: [ ]
@@ -32,21 +47,21 @@ columns:
   workflow:
     required: [ ]
     default: [ ]
-    additional_allowed: [edam_topic_values, edam_operation_values]
+    additional_allowed: [ edam_topic_values, edam_operation_values ]
 
   document:
     required: [ ]
     default: [ ]
-    additional_allowed: [  ]
+    additional_allowed: [ ]
 
   event:
     required: [ ]
-    default: [ city, country, start_date, end_date]
-    additional_allowed: [ address, url]
+    default: [ city, country, start_date, end_date ]
+    additional_allowed: [ address, url ]
 
   file_template:
     required: [ ]
-    default: [format_type, data_type ]
+    default: [ edam_format_values, edam_data_values ]
     additional_allowed: [ ]
 
   institution:
@@ -66,7 +81,7 @@ columns:
 
   placeholder:
     required: [ ]
-    default: [ format_type, data_type ]
+    default: [ edam_format_values, edam_data_values ]
     additional_allowed: [ ]
 
   publication:
@@ -85,13 +100,13 @@ columns:
     additional_allowed: [ ]
 
   person:
-    required: []
-    default: [first_name, last_name]
-    additional_allowed: [orcid]
-    blocked: [created_at, updated_at]
+    required: [ ]
+    default: [ first_name, last_name ]
+    additional_allowed: [ orcid ]
+    blocked: [ created_at, updated_at ]
 
   project:
-    required: []
-    default: [web_page]
-    additional_allowed: [start_date, end_date]
+    required: [ ]
+    default: [ web_page ]
+    additional_allowed: [ start_date, end_date ]
 

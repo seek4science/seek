@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class IndexTableColumnDefinitionsTest < ActiveSupport::TestCase
-
   def setup
     @assay = Factory(:experimental_assay)
     @data_file = Factory(:data_file)
@@ -54,5 +53,4 @@ class IndexTableColumnDefinitionsTest < ActiveSupport::TestCase
     assert_equal %w[title first_name last_name projects orcid description], @person.allowed_table_columns
     assert_equal %w[first_name last_name projects], @person.default_table_columns
   end
-
 end
