@@ -3,55 +3,59 @@ class PeriodicSubscriptionEmailJob < ApplicationJob
 
   def perform(frequency)
     return unless Seek::Config.email_enabled
-    logs = find_relevant_logs(frequency)
-    subscribed_people(logs).each do |person|
+
+    since = DELAYS[frequency].ago
+    activity_logs = gather_logs(since)
+    group_by_subscriber(activity_logs, frequency).each do |person, logs|
       begin
-        collect_and_deliver_to_person(logs, person, frequency)
+        SubMailer.send_digest_subscription(person, logs, frequency).deliver_later
       rescue Exception => e
         raise("Error sending subscription emails to person #{person.id} - #{e.message}")
       end
     end
   end
 
-  def collect_and_deliver_to_person(logs, person, frequency)
-    activity_logs = collect_relevant_logs_for_person(logs, person, frequency)
-    SubMailer.send_digest_subscription(person, activity_logs, frequency).deliver_later if activity_logs.any?
-  end
+  # Group the given set of ActivityLogs by the people subscribed to the `activity_loggable`,
+  # ensuring they have permission to view.
+  def group_by_subscriber(logs, frequency)
+    group = {}
 
-  def collect_relevant_logs_for_person(logs, person, frequency)
-    # get only the logs for items that are visible to this person
-    logs_for_visible_items = logs.select { |log| log.activity_loggable.try(:can_view?, person.user) }
-
-    # get the logs for this persons subscribable items, where the subscription has the correct frequency
-    logs_for_visible_items.select do |log|
-      person.subscriptions.for_subscribable(log.activity_loggable).any? do |subscription|
-        subscription.frequency == frequency
+    logs.each do |log|
+      resource = log.activity_loggable
+      next unless resource # Skip resources that were destroyed
+      log.reload # Load the full record from the ActivityLog table, since it was pared down by `SELECT` previously.
+      subscribers(log).each do |person|
+        # Check if the person can view the resource, and if they have a subscription for the given frequency.
+        if resource.can_view?(person.user) &&
+          # TODO: Allow this frequency check to be done in a DB query, then it can be done in the `subscribers` method.
+          person.subscriptions.for_subscribable(resource).any? do |subscription|
+            subscription.frequency == frequency
+          end
+          group[person] ||= []
+          group[person] << log
+        end
       end
     end
+
+    group
   end
 
-  # limit to only the people subscribed to the items logged, and those that are set to receive notifications and are project members
-  def subscribed_people(logs)
-    people = people_subscribed_to_logged_items logs
-    people.select(&:receive_notifications?)
+  # Get create/update activity logs for subscribable resources in the given period,
+  # but limit to only the latest relevant log for each resource.
+  def gather_logs(since)
+    types = Seek::Util.persistent_classes.select(&:subscribable?).map(&:name)
+    ActivityLog.
+      where(activity_loggable_type: types, action: %w[create update]).
+      where.not(controller_name: 'sessions').
+      where('created_at >= ?', since).
+      select(ActivityLog.arel_table[:id].maximum.as('id'), :activity_loggable_id, :activity_loggable_type).
+      group([:activity_loggable_id, :activity_loggable_type])
   end
 
-  # returns an enumaration of the people subscribed to the items in the logs
-  def people_subscribed_to_logged_items(logs)
-    items = logs.collect(&:activity_loggable).uniq.compact
-    items.collect do |item|
-      Subscription.where(subscribable_type: item.class.name, subscribable_id: item.id).collect(&:person)
-    end.flatten.compact.uniq
-  end
-
-  def activity_logs_since(time_point)
-    ActivityLog.where(['created_at >= ? and action in (?) and controller_name != ?', time_point, %w[create update], 'sessions'])
-  end
-
-  def find_relevant_logs(frequency)
-    # strip the logs down to those that are relevant
-    activity_logs_since(DELAYS[frequency].ago).to_a.select do |log|
-      log.activity_loggable.try(:subscribable?)
-    end
+  # Get all the subscribers who should be notified about the given log event
+  def subscribers(log)
+    Person.notifiable.joins(:subscriptions).where(subscriptions: {
+      subscribable_type: log.activity_loggable_type,
+      subscribable_id: log.activity_loggable_id })
   end
 end

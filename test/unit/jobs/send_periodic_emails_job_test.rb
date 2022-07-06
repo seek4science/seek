@@ -11,12 +11,12 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
     Seek::Config.email_enabled = @val
   end
 
-  test 'activity_logs_since' do
+  test 'gather_logs' do
     count = 2
-    i = 0
     activity_loggable = Factory(:data_file)
+    other_activity_loggable = Factory(:data_file)
     culprit = activity_loggable.contributor
-    while i < count
+    count.times do
       Factory(:activity_log, action: 'create', activity_loggable: activity_loggable, culprit: culprit)
       Factory(:activity_log, action: 'update', activity_loggable: activity_loggable, culprit: culprit)
       Factory(:activity_log, action: 'show', activity_loggable: activity_loggable, culprit: culprit)
@@ -24,19 +24,18 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
       Factory(:activity_log, action: 'download', activity_loggable: activity_loggable, culprit: culprit)
       # session create
       Factory(:activity_log, action: 'create', controller_name: 'sessions', culprit: culprit)
-
-      i += 1
     end
     # only create and update actions are filtered
     # creation of session is excluded
-    assert_equal 2 * count, PeriodicSubscriptionEmailJob.new('daily').activity_logs_since(Time.now.yesterday.utc).count
-    assert_equal 2 * count, PeriodicSubscriptionEmailJob.new('weekly').activity_logs_since(7.days.ago).count
-    assert_equal 2 * count, PeriodicSubscriptionEmailJob.new('monthly').activity_logs_since(1.month.ago).count
+    # only the latest relevant log for each resource is returned
+    assert_equal 1, PeriodicSubscriptionEmailJob.new('daily').gather_logs(Time.now.yesterday.utc).length
+    assert_equal 1, PeriodicSubscriptionEmailJob.new('weekly').gather_logs(7.days.ago).length
+    assert_equal 1, PeriodicSubscriptionEmailJob.new('monthly').gather_logs(1.month.ago).length
 
-    Factory(:activity_log, action: 'create', activity_loggable: activity_loggable, culprit: culprit, created_at: 2.days.ago)
-    assert_equal 2 * count, PeriodicSubscriptionEmailJob.new('daily').activity_logs_since(Time.now.yesterday.utc).count
-    assert_equal 2 * count + 1, PeriodicSubscriptionEmailJob.new('weekly').activity_logs_since(7.days.ago).count
-    assert_equal 2 * count + 1, PeriodicSubscriptionEmailJob.new('monthly').activity_logs_since(1.month.ago).count
+    Factory(:activity_log, action: 'create', activity_loggable: other_activity_loggable, culprit: other_activity_loggable.contributor, created_at: 2.days.ago)
+    assert_equal 1, PeriodicSubscriptionEmailJob.new('daily').gather_logs(Time.now.yesterday.utc).length
+    assert_equal 2, PeriodicSubscriptionEmailJob.new('weekly').gather_logs(7.days.ago).length
+    assert_equal 2, PeriodicSubscriptionEmailJob.new('monthly').gather_logs(1.month.ago).length
   end
 
   test 'no follow on job after perform' do

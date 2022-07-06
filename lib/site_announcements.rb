@@ -16,7 +16,9 @@ module SiteAnnouncements
   end
 
   module SingletonMethods
-
+    def notifiable
+      includes(:notifiee_info).where(notifiee_infos: { receive_notifications: true })
+    end
   end
 
   module InstanceMethods
