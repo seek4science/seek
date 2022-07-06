@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_06_24_091053) do
+ActiveRecord::Schema.define(version: 2022_07_06_090950) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string "action"
@@ -443,8 +443,6 @@ ActiveRecord::Schema.define(version: 2022_06_24_091053) do
     t.string "license"
     t.boolean "simulation_data", default: false
     t.string "deleted_contributor"
-    t.string "data_type", default: "http://edamontology.org/data_0006", null: false
-    t.string "format_type", default: "http://edamontology.org/format_1915", null: false
     t.integer "file_template_id"
     t.index ["contributor_id"], name: "index_data_files_on_contributor"
   end
@@ -734,15 +732,13 @@ ActiveRecord::Schema.define(version: 2022_06_24_091053) do
     t.integer "version"
     t.string "first_letter", limit: 1
     t.string "uuid"
-    t.bigint "policy_id"
+    t.integer "policy_id"
     t.string "doi"
     t.string "license"
     t.datetime "last_used_at"
     t.text "other_creators"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string "data_type", default: "http://edamontology.org/data_0006", null: false
-    t.string "format_type", default: "http://edamontology.org/format_1915", null: false
     t.index ["policy_id"], name: "index_file_templates_on_policy_id"
   end
 
@@ -1307,16 +1303,14 @@ ActiveRecord::Schema.define(version: 2022_06_24_091053) do
     t.integer "contributor_id"
     t.string "first_letter", limit: 1
     t.string "uuid"
-    t.bigint "policy_id"
+    t.integer "policy_id"
     t.string "license"
     t.datetime "last_used_at"
     t.text "other_creators"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.bigint "file_template_id"
-    t.bigint "project_id"
-    t.string "data_type", default: "http://edamontology.org/data_0006", null: false
-    t.string "format_type", default: "http://edamontology.org/format_1915", null: false
+    t.integer "file_template_id"
+    t.integer "project_id"
     t.integer "data_file_id"
     t.index ["contributor_id"], name: "index_ps_on_c"
     t.index ["file_template_id"], name: "index_placeholders_on_file_template_id"
