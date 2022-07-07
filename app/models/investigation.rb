@@ -27,14 +27,6 @@ class Investigation < ApplicationRecord
     related_data_files + related_sops + related_models + related_publications + related_documents
   end
 
-  # Returns the columns to be shown on the table view for the resource
-  def columns_default
-    super + ['creators','projects']
-  end
-  def columns_allowed
-    columns_default+ ['other_creators']
-  end
-
   def clone_with_associations
     new_object = dup
     new_object.policy = policy.deep_copy

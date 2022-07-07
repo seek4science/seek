@@ -75,14 +75,6 @@ class SampleType < ApplicationRecord
     end
   end
 
-  # Returns the columns to be shown on the table view for the resource
-  def columns_default
-    super + ['uploaded_template']
-  end
-  def columns_allowed
-    columns_default + ['description','created_at','projects','contributor']
-  end
-
   # fixes inconsistencies following form submission that could cause validation errors
   # in particular removing linked controlled vocabs or seek_samples after the attribute type may have changed
   def resolve_inconsistencies
