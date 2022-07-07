@@ -59,9 +59,7 @@
           "orcid": null
         }
       ],
-      "other_creators": "John Smith, Jane Smith",
-      "data_type": "http://edamontology.org/data_0006",
-      "format_type": "http://edamontology.org/format_1915"
+      "other_creators": "John Smith, Jane Smith"
     },
     "relationships": {
       "creators": {
