@@ -8,8 +8,8 @@ class PlaceholderSerializer < ContributedResourceSerializer
   attribute :edam_data do
     edam_annotations('edam_data')
   end
-  attribute :edam_topics do
-    edam_annotations('edam_topics')
+  attribute :edam_formats do
+    edam_annotations('edam_formats')
   end
 
 end
