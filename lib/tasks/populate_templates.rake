@@ -37,7 +37,7 @@ namespace :seek do
             group: metadata['group'],
             group_order: metadata['group_order'],
             temporary_name: metadata['temporary_name'],
-            template_version: metadata['template_version'],
+            version: metadata['version'],
             isa_config: metadata['isa_config'],
             isa_measurement_type: metadata['isa_measurement_type'],
             isa_technology_type: metadata['isa_technology_type'],
@@ -138,12 +138,12 @@ namespace :seek do
 
   def template_exists?(template_details)
     tempalte = Template.find_by(title: template_details[:title], group: template_details[:group],
-                                template_version: template_details[:template_version])
+                                version: template_details[:version])
     tempalte.present?
   end
 
   def add_log(template_details, type)
-    "<li>#{type} >> <b>#{template_details[:title]}</b>, Group: <b>#{template_details[:group]}</b>, Version: <b>#{template_details[:template_version]}</b></li>"
+    "<li>#{type} >> <b>#{template_details[:title]}</b>, Group: <b>#{template_details[:group]}</b>, Version: <b>#{template_details[:version]}</b></li>"
   end
 
   def check_json_file(file)

@@ -1,0 +1,30 @@
+<% sample_type_count = SampleType.where(id: template.id).length -%>
+<div class="row">
+	<div class="col-md-6">
+		<p>
+			<strong>Version:</strong>
+			<%= template.version -%>
+		</p>
+		<p>
+			<strong>Group:</strong>
+			<%= template.group -%>
+		</p>
+		<p>
+			<em>
+				<%= sample_type_count -%> <%= sample_type_count > 0 ? t('sample_type').pluralize() : t('sample_type') %> are
+				referencing this template
+			</em>
+		</p>
+	</div>
+
+	<div class="col-md-6">
+		<p>
+			<strong>Level:</strong>
+			<%= template.level -%>
+		</p>
+		<p>
+			<strong>Organism:</strong>
+			<%= template.organism -%>
+		</p>
+	</div>
+</div>
