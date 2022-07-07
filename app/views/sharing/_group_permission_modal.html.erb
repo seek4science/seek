@@ -1,18 +1,18 @@
-<%= button_link_to("Share with a #{t('project').downcase}/#{t('institution').downcase}", 'add', '#', id: 'add-project-permission-button') %>
+<%= button_link_to("Share with a #{t('project')} / #{t('institution')}", 'add', '#', id: 'add-project-permission-button') %>
 
 <%= modal(id: 'add-project-permission-modal', size: 'm') do %>
-    <%= modal_header("Share with a #{t('project').downcase} and/or #{t('institution').downcase}") %>
+    <%= modal_header("Share with a #{t('project')} and/or #{t('institution')}") %>
     <%= modal_body do %>
         <div class="form-group">
           <label>Members of...</label>
           <%= select_tag('permission-project-id', projects_grouped_by_programme, name: nil,
-                         prompt: "any #{t('project').downcase}", class: 'form-control', autocomplete: 'off') -%>
+                         prompt: "any #{t('project')}", class: 'form-control', autocomplete: 'off') -%>
         </div>
         <div class="form-group">
           <label>working at...</label>
           <%= select_tag('permission-institution-id',
                          options_for_select(Institution.all.sort_by(&:title).map { |i| [i.title, i.id] }), name: nil,
-                         prompt: "any #{t('institution').downcase}", class: 'form-control', autocomplete: 'off') -%>
+                         prompt: "any #{t('institution')}", class: 'form-control', autocomplete: 'off') -%>
         </div>
         <div class="form-group">
           <label>can...</label>
@@ -94,7 +94,7 @@
           data: { 'id': projectId },
           success: function (data) {
             institutionSelect.html('');
-            institutionSelect.html('<option value="">any <%= t('institution').downcase -%></option>');
+            institutionSelect.html('<option value="">any <%= t('institution') -%></option>');
             data.institution_list.forEach(function (i) {
                 var opt = $j('<option>');
                 opt.attr('value', i[idIndex]);

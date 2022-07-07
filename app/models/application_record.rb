@@ -34,22 +34,6 @@ class ApplicationRecord < ActiveRecord::Base
   def self.is_taggable?
     false # defaults to false, unless it includes Taggable which will override this and check the configuration
   end
-  
-  # Returns the columns to be shown on the table view for the resource
-  # This columns will always be shown
-  def columns_required
-    ['title']
-  end
-  # default columns to be shown after required columns
-  def columns_default
-    []
-  end
-  # additional available columns to be shown as an option
-  def columns_allowed
-    columns_default + ['description','created_at','updated_at']
-  end
-
-  
 
   # takes and ignores arguments for use in :after_add => :update_timestamp, etc.
   def update_timestamp(*_args)
@@ -176,4 +160,17 @@ class ApplicationRecord < ActiveRecord::Base
   def self.user_creatable?
     false
   end
+
+  def allowed_table_columns
+    Seek::IndexTableColumnDefinitions.allowed_columns(self)
+  end
+
+  def default_table_columns
+    Seek::IndexTableColumnDefinitions.default_columns(self)
+  end
+
+  def required_table_columns
+    Seek::IndexTableColumnDefinitions.required_columns(self)
+  end
+
 end

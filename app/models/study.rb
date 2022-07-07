@@ -36,14 +36,6 @@ class Study < ApplicationRecord
   def assets
     related_data_files + related_sops + related_models + related_publications + related_documents
   end
-  
-  # Returns the columns to be shown on the table view for the resource
-  def columns_default
-    super + ['creators','projects']
-  end
-  def columns_allowed
-    columns_default + ['other_creators']
-  end
 
   def state_allows_delete? *args
     assays.empty? && super
