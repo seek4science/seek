@@ -1206,6 +1206,26 @@ class DocumentsControllerTest < ActionController::TestCase
     end
   end
 
+  test 'sharing with programme only shows if enabled' do
+    doc = Factory :document
+    login_as(doc.contributor)
+
+    with_config_value :programmes_enabled, true do
+      get :manage, params: { id: doc }
+      assert_response :success
+
+      assert_select 'a#add-programme-permission-button', text: /Share with a Programme/, count: 1
+    end
+
+    with_config_value :programmes_enabled, false do
+      get :manage, params: { id: doc }
+      assert_response :success
+
+      assert_select 'a#add-programme-permission-button', text: /Share with a Programme/, count: 0
+    end
+
+  end
+
   private
 
   def valid_document
