@@ -89,14 +89,6 @@ class DataFile < ApplicationRecord
     end
   end
 
-  # Returns the columns to be shown on the table view for the resource
-  def columns_default
-    super + ['creators','projects','version', 'format_type', 'data_type']
-  end
-  def columns_allowed
-    columns_default + ['last_used_at','other_creators','doi','license','simulation_data']
-  end
-
   def included_to_be_copied?(symbol)
     case symbol.to_s
     when 'activity_logs', 'versions', 'attributions', 'relationships', 'inverse_relationships', 'annotations'

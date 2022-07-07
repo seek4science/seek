@@ -1,4 +1,8 @@
 module FavouritesHelper
+
+  include AvatarsHelper
+  include AssetsHelper
+
   # A draggable icon for a thing that can be favourited
   def favouritable_icon(item, size = 100, options = {}, &block)
     options[:class] ||= 'favouritable'
