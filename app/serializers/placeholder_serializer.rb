@@ -5,6 +5,11 @@ class PlaceholderSerializer < ContributedResourceSerializer
   has_one :file_template
   has_one :data_file
 
-  attribute :data_type
-  attribute :format_type
+  attribute :edam_data do
+    edam_annotations('edam_data')
+  end
+  attribute :edam_topics do
+    edam_annotations('edam_topics')
+  end
+
 end
