@@ -72,7 +72,12 @@ module Seek
           edam_topics: proc {|value|
             value.collect{|v| v[:identifier]}.join(', ')
           },
-
+          edam_data: proc {|value|
+            value.collect{|v| v[:identifier]}.join(', ')
+          },
+          edam_formats: proc {|value|
+            value.collect{|v| v[:identifier]}.join(', ')
+          },
           funding_codes: proc { |value|
             if value
               value.join(', ')
