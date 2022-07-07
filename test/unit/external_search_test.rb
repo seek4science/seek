@@ -15,7 +15,7 @@ class ExternalSearchTest < ActiveSupport::TestCase
     an_instance = adaptors.find { |a| a.is_a?(Seek::TessSearch::SearchTessAdaptor) }
     assert an_instance.is_a?(Seek::AbstractSearchAdaptor)
     assert an_instance.enabled?
-    assert_equal 'Elixir Tess', an_instance.name
+    assert_equal 'ELIXIR TeSS Events', an_instance.name
 
     adaptors = Seek::ExternalSearch.instance.search_adaptors 'models'
     assert !adaptors.select { |a| a.is_a?(Seek::BiomodelsSearch::SearchBiomodelsAdaptor) }.empty?
@@ -29,10 +29,10 @@ class ExternalSearchTest < ActiveSupport::TestCase
   end
 
   test 'search adaptor names' do
-    assert (['BioModels Database', 'Elixir Tess'] - Seek::ExternalSearch.instance.search_adaptor_names('all')).blank?
-    assert (['BioModels Database', 'Elixir Tess'] - Seek::ExternalSearch.instance.search_adaptor_names).blank?
+    assert (['BioModels Database', 'ELIXIR TeSS Events'] - Seek::ExternalSearch.instance.search_adaptor_names('all')).blank?
+    assert (['BioModels Database', 'ELIXIR TeSS Events'] - Seek::ExternalSearch.instance.search_adaptor_names).blank?
     assert_equal ['BioModels Database'], Seek::ExternalSearch.instance.search_adaptor_names('models')
-    assert_equal ['Elixir Tess'], Seek::ExternalSearch.instance.search_adaptor_names('events')
+    assert_equal ['ELIXIR TeSS Events'], Seek::ExternalSearch.instance.search_adaptor_names('events')
     assert_equal [], Seek::ExternalSearch.instance.search_adaptor_names('sops')
   end
 

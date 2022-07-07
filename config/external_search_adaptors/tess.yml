@@ -1,4 +1,4 @@
-name: Elixir Tess
+name: ELIXIR TeSS Events
 adaptor_class_name: Seek::TessSearch::SearchTessAdaptor
 search_type: events
 enabled: true
