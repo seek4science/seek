@@ -746,6 +746,11 @@ SEEK::Application.routes.draw do
       get :manage
       patch :manage_update
     end
+		collection do
+      get :task_status
+      get :default_templates
+      post :populate_template
+		end
   end
 
   ### SINGLE PAGE

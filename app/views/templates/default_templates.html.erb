@@ -1,0 +1,46 @@
+<h1>Add default <%=t('template').pluralize()%></h1>
+
+<%= render :partial => "result" %>
+
+<%= form_tag populate_template_templates_path, method: "post", id: "template_upload_from", multipart: true do -%>
+	<%= folding_panel("Template JSON file", false, :body_options => {:id => 'add_template_file_fold_content'},
+										:help_text => "Here you can upload default templates JSON file to populate the #{t('template').pluralize()}.") do %>
+
+			<div role="tabpanel" data-role="seek-upload-field">
+			<ul class="nav nav-tabs" role="tablist">
+				<li role="presentation" class="upload-field-tab active">
+					<a data-role="seek-upload-field-tab" data-tab-target="local-file" role="tab" data-toggle="tab">Local file</a>
+				</li>
+			</ul>
+			<div class="tab-content">
+				<div role="tabpanel" class="tab-pane active" data-role="seek-upload-field-tab-pane" data-tab-id="local-file">
+					<div class="form-group">
+						<%= file_field_tag "template_json_file" -%>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+	<% end %>
+
+
+	<input value="Upload" type="submit" class="btn btn-primary" >
+	or
+  <%= cancel_button admin_path-%>
+<% end -%>
+
+<script>
+	$j(document).ready(function () {
+		$j("#template_upload_from").on("submit", function (e) {
+			const file = $j('input[type="file"][name="template_json_file"]').val();
+			if (!file ) {
+				alert("Please specify a file to upload or provide a URL.");
+				e.preventDefault();
+			} else {
+				setTimeout(() => {
+					window.location.reload()
+				}, 100);
+			}
+			})
+	});
+</script>

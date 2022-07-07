@@ -1,0 +1,81 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema",
+	"title": "ISA tempalte attribute schema",
+	"description": "JSON-schema representing an ISA template attribute in DataHub",
+	"type": "object",
+	"properties": {
+		"iri": {
+			"anyOf": [
+				{
+					"type": "string",
+					"format": "uri"
+				},
+				{
+					"type": "null"
+				}
+			]
+		},
+		"name": { "type": "string" },
+		"description": { "type": "string" },
+		"required": {
+			"anyOf": [
+				{
+					"type": "boolean"
+				},
+				{
+					"type": "null"
+				}
+			]
+		},
+		"ontology": {
+			"anyOf": [
+				{
+					"type": "object",
+					"properties": {
+						"name": { "type": "string" },
+						"version": {
+							"anyOf": [{ "type": "string" }, { "type": "number" }]
+						},
+						"description": { "type": "string" },
+						"rootTermURI": { "type": "string", "format": "uri" }
+					}
+				},
+				{
+					"type": "null"
+				}
+			]
+		},
+		"dataType": { "type": "string" },
+		"CVList": {
+			"anyOf": [
+				{
+					"type": "array"
+				},
+				{
+					"type": "null"
+				}
+			]
+		},
+		"isaTag": {
+			"anyOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "null"
+				}
+			]
+		},
+		"title": {
+			"anyOf": [
+				{
+					"type": "boolean"
+				},
+				{
+					"type": "null"
+				}
+			]
+		}
+	},
+	"additionalProperties": false
+}

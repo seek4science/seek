@@ -4,7 +4,7 @@ class Template < ApplicationRecord
   has_many :template_attributes, -> { order(:pos) }, inverse_of: :template, dependent: :destroy
   has_many :sample_types
   validates :title, presence: true
-  validates :title, uniqueness: { scope: :group }
+  validates :title, uniqueness: { scope: [:group, :template_version] }
 
   accepts_nested_attributes_for :template_attributes, allow_destroy: true
 
