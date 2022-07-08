@@ -147,4 +147,81 @@ class SendPeriodicEmailsJobTest < ActiveSupport::TestCase
       PeriodicSubscriptionEmailJob.perform_now('daily')
     end
   end
+
+  test 'select subscribers' do
+    activity_loggable = Factory(:data_file, policy: Factory(:public_policy))
+    p1 = activity_loggable.projects.first
+    other_activity_loggable = Factory(:sop, policy: Factory(:public_policy))
+    p2 = other_activity_loggable.projects.first
+    shared_activity_loggable = Factory(:model, projects: [p1, p2], contributor: activity_loggable.contributor, policy: Factory(:public_policy))
+    ActivityLog.delete_all
+
+    Factory(:activity_log, action: 'update', activity_loggable: activity_loggable, culprit: activity_loggable.contributor, created_at: 1.hour.ago)
+    Factory(:activity_log, action: 'update', activity_loggable: activity_loggable, culprit: activity_loggable.contributor, created_at: 3.days.ago)
+    Factory(:activity_log, action: 'update', activity_loggable: other_activity_loggable, culprit: other_activity_loggable.contributor, created_at: 3.days.ago)
+    Factory(:activity_log, action: 'update', activity_loggable: activity_loggable, culprit: activity_loggable.contributor, created_at: 3.weeks.ago)
+    Factory(:activity_log, action: 'update', activity_loggable: other_activity_loggable, culprit: other_activity_loggable.contributor, created_at: 3.weeks.ago)
+    Factory(:activity_log, action: 'update', activity_loggable: shared_activity_loggable, culprit: shared_activity_loggable.contributor, created_at: 3.weeks.ago)
+
+    p1_daily_subscriber = Factory(:person)
+    Factory(:project_subscription, person: p1_daily_subscriber, project_id: p1.id, frequency: 'daily').subscribe_to_all_in_project
+    assert p1_daily_subscriber.receive_notifications?
+
+    p1_monthly_subscriber = Factory(:person)
+    Factory(:project_subscription, person: p1_monthly_subscriber, project_id: p1.id, frequency: 'monthly').subscribe_to_all_in_project
+    assert p1_monthly_subscriber.receive_notifications?
+
+    p2_daily_subscriber = Factory(:person)
+    Factory(:project_subscription, person: p2_daily_subscriber, project_id: p2.id, frequency: 'daily').subscribe_to_all_in_project
+    assert p2_daily_subscriber.receive_notifications?
+
+    p2_monthly_subscriber_without_notification = Factory(:person)
+    p2_monthly_subscriber_without_notification.notifiee_info.update_column(:receive_notifications, false)
+    Factory(:project_subscription, person: p2_monthly_subscriber_without_notification, project_id: p2.id, frequency: 'monthly').subscribe_to_all_in_project
+    refute p2_monthly_subscriber_without_notification.receive_notifications?
+
+    # Daily
+    freq = 'daily'
+    job = PeriodicSubscriptionEmailJob.new(freq)
+    logs = job.gather_logs(PeriodicSubscriptionEmailJob::DELAYS[freq].ago)
+    assert_equal 1, logs.length
+    group = job.group_by_subscriber(logs, freq)
+    assert_equal 1, group.keys.length
+    assert_includes group.keys, p1_daily_subscriber
+    assert_equal 1, group[p1_daily_subscriber].length
+    assert_includes group[p1_daily_subscriber].map(&:activity_loggable), activity_loggable
+
+    # Weekly
+    freq = 'weekly'
+    job = PeriodicSubscriptionEmailJob.new(freq)
+    logs = job.gather_logs(PeriodicSubscriptionEmailJob::DELAYS[freq].ago)
+    assert_equal 2, logs.length
+    group = job.group_by_subscriber(logs, freq)
+    assert_equal 0, group.keys.length, 'There should be no weekly subscribers'
+
+    # Monthly
+    freq = 'monthly'
+    job = PeriodicSubscriptionEmailJob.new(freq)
+    logs = job.gather_logs(PeriodicSubscriptionEmailJob::DELAYS[freq].ago)
+    assert_equal 3, logs.length
+    group = job.group_by_subscriber(logs, freq)
+    assert_equal 1, group.keys.length
+    assert_includes group.keys, p1_monthly_subscriber
+    assert_not_includes group.keys, p2_monthly_subscriber_without_notification, 'Subscriber with notifications disabled should not be notified'
+    assert_equal 2, group[p1_monthly_subscriber].length
+    loggables = group[p1_monthly_subscriber].map(&:activity_loggable)
+    assert_includes loggables, activity_loggable
+    assert_includes loggables, shared_activity_loggable
+
+    # Should not show private things
+    disable_authorization_checks do
+      activity_loggable.policy.update_column(:access_type, Policy::PRIVATE)
+      freq = 'daily'
+      job = PeriodicSubscriptionEmailJob.new(freq)
+      logs = job.gather_logs(PeriodicSubscriptionEmailJob::DELAYS[freq].ago)
+      assert_equal 1, logs.length
+      group = job.group_by_subscriber(logs, freq)
+      assert_equal 0, group.keys.length
+    end
+  end
 end
