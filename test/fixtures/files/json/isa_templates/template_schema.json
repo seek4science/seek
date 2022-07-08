@@ -24,7 +24,8 @@
 							"repo_schema_id": { "anyOf": [{ "type": "string" }, { "type": "null" }] },
 							"organism": { "type": "string" },
 							"level": { "type": "string" }
-						}
+						},
+						"additionalProperties": false
 					},
 					"data": {
 						"type": "array",
