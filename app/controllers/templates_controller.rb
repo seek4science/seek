@@ -20,8 +20,8 @@ class TemplatesController < ApplicationController
     end
   end
 
-	def default_templates
-		set_status
+  def default_templates
+    set_status
     respond_to do |format|
       format.html
     end
@@ -143,11 +143,11 @@ class TemplatesController < ApplicationController
   end
 
   def lockfile
-    Rails.root.join('tmp', 'isa_templates', 'populate_templates.lock')
+    Rails.root.join('tmp', 'populate_templates.lock')
   end
 
   def resultfile
-    Rails.root.join('tmp', 'isa_templates', 'populate_templates.result')
+    Rails.root.join('tmp', 'populate_templates.result')
   end
 
   def running!

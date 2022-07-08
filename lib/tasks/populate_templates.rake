@@ -193,10 +193,10 @@ namespace :seek do
   end
 
   def lockfile
-    Rails.root.join('tmp', 'isa_templates', 'populate_templates.lock')
+    Rails.root.join('tmp', 'populate_templates.lock')
   end
 
   def resultfile
-    Rails.root.join('tmp', 'isa_templates', 'populate_templates.result')
+    Rails.root.join('tmp', 'populate_templates.result')
   end
 end
