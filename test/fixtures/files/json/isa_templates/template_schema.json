@@ -32,7 +32,8 @@
 							"$ref": "template_attributes_schema.json#"
 						}
 					}
-				}
+				},
+				"additionalProperties": false
 			}
 		}
 	},
