@@ -9,7 +9,7 @@ class ProjectSubscription < ApplicationRecord
   validates_inclusion_of :frequency, :in => Subscription::FREQUENCIES, :message => "must be one of: #{Subscription::FREQUENCIES.join(', ')}"
 
   after_initialize :default_frequency
-  after_create :subscribe_to_all_in_project
+  after_create :create_subscription_job
 
   def default_frequency
     self.frequency = 'weekly' if self.frequency.blank?
@@ -47,7 +47,17 @@ class ProjectSubscription < ApplicationRecord
     end
   end
 
-  def subscribe_to_all_in_project
+  def create_subscription_job
     ProjectSubscriptionJob.new(self).queue_job
+  end
+
+  def subscribe_to_all_in_project
+    disable_authorization_checks do
+      (project.investigations + project.studies + project.assays + project.assets).each do |item|
+        unless !item.subscribable? || item.subscribed?(person)
+          subscriptions.create(person: person, subscribable: item)
+        end
+      end
+    end
   end
 end
