@@ -14,7 +14,7 @@ class FileTemplate < ApplicationRecord
 
   acts_as_doi_parent(child_accessor: :versions)
 
-  has_edam_annotations
+  has_edam_annotations :data, :formats
 
   #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
   has_one :content_blob, -> (r) { where('content_blobs.asset_version = ?', r.version) }, :as => :asset, :foreign_key => :asset_id
@@ -22,7 +22,7 @@ class FileTemplate < ApplicationRecord
   has_many :data_files, inverse_of: :file_template
   has_many :placeholders, inverse_of: :file_template
 
-  explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi', 'data_type', 'format_type']) do
+  explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi']) do
     include Seek::Data::SpreadsheetExplorerRepresentation
     acts_as_doi_mintable(proxy: :parent, general_type: 'Text')
     acts_as_versioned_resource

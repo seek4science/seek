@@ -4,7 +4,7 @@ class Placeholder < ApplicationRecord
 
   acts_as_asset
 
-  has_edam_annotations
+  has_edam_annotations :data, :formats
 
   validates :projects, presence: true, projects: { self: true }
 

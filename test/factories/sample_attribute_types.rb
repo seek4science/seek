@@ -147,6 +147,28 @@ Factory.define(:edam_operations_controlled_vocab, parent: :sample_controlled_voc
   end
 end
 
+Factory.define(:edam_data_controlled_vocab, parent: :sample_controlled_vocab) do |f|
+  f.title 'EDAM Data'
+  f.ols_root_term_uri 'http://edamontology.org/data_0006'
+  f.key SampleControlledVocab::SystemVocabs::KEYS[:edam_data]
+  f.source_ontology 'edam'
+  f.after_build do |vocab|
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Data',iri:'http://edamontology.org/data_0006',parent_iri:'')
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Sequence features metadata',iri: 'http://edamontology.org/data_2914', parent_iri:'http://edamontology.org/data_0006')
+  end
+end
+
+Factory.define(:edam_formats_controlled_vocab, parent: :sample_controlled_vocab) do |f|
+  f.title 'EDAM Formats'
+  f.ols_root_term_uri 'http://edamontology.org/format_1915'
+  f.key SampleControlledVocab::SystemVocabs::KEYS[:edam_formats]
+  f.source_ontology 'edam'
+  f.after_build do |vocab|
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Format',iri:'http://edamontology.org/format_1915',parent_iri:'')
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'JSON',iri: 'http://edamontology.org/format_3464', parent_iri:'http://edamontology.org/format_1915')
+  end
+end
+
 Factory.define(:efo_ontology, class: SampleControlledVocab) do |f|
   f.sequence(:title) { |n| "EFO ontology #{n}" }
 	f.source_ontology 'EFO'

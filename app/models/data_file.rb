@@ -41,7 +41,7 @@ class DataFile < ApplicationRecord
       joins: [:assays]
   )
 
-  explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi', 'data_type', 'format_type', 'file_template_id']) do
+  explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi', 'file_template_id']) do
 
     include Seek::Data::SpreadsheetExplorerRepresentation
     acts_as_doi_mintable(proxy: :parent, type: 'Dataset', general_type: 'Dataset')
