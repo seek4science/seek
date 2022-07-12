@@ -32,7 +32,7 @@ module ResourceListItemHelper
 
     html = nil
 
-    cache_key = "rli_title_#{resource.cache_key}_#{resource.authorization_supported? && resource.can_manage?}"
+    cache_key = "#{resource.list_item_title_cache_key_prefix}_#{resource.authorization_supported? && resource.can_manage?}"
     result = Rails.cache.fetch(cache_key) do
       title = options[:title]
       url = options[:url]
