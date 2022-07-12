@@ -11,7 +11,7 @@
 		</p>
 		<p>
 			<em>
-				<%= sample_type_count -%> <%= sample_type_count > 0 ? t('sample_type').pluralize() : t('sample_type') %> are
+				<%= sample_type_count -%> <%= sample_type_count > 1 ? t('sample_type').pluralize() + " are" : t('sample_type') + " is" %>
 				referencing this template
 			</em>
 		</p>
