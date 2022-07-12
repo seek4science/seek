@@ -28,6 +28,32 @@ class SampleTypeUpdateJobTest < ActiveSupport::TestCase
     assert_equal updated_at, sample.updated_at
   end
 
+  test 'clear resource list item title cache' do
+    type = sample_type_with_samples
+
+    type.samples.each do |sample|
+      refute Rails.cache.exist?("#{sample.list_item_title_cache_key_prefix}_wibble")
+    end
+
+    type.samples.each do |sample|
+      Rails.cache.fetch("#{sample.list_item_title_cache_key_prefix}_wibble") do
+        "this is cached"
+      end
+      assert Rails.cache.exist?("#{sample.list_item_title_cache_key_prefix}_wibble")
+    end
+
+    # not cleared if refresh_samples = false
+    SampleTypeUpdateJob.perform_now(type, false)
+    type.samples.each do |sample|
+      assert Rails.cache.exist?("#{sample.list_item_title_cache_key_prefix}_wibble")
+    end
+
+    SampleTypeUpdateJob.perform_now(type, true)
+    type.samples.each do |sample|
+      refute Rails.cache.exist?("#{sample.list_item_title_cache_key_prefix}_wibble")
+    end
+  end
+
   test 'perform without refresh' do
     type = sample_type_with_samples
     sample = type.samples.first
