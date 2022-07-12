@@ -3978,6 +3978,10 @@ personResponse:
         relationships:
           type: object
           properties:
+            organisms:
+              $ref: "#/components/schemas/multipleReferences"
+            programmes:
+              $ref: "#/components/schemas/multipleReferences"
             projects:
               $ref: "#/components/schemas/multipleReferences"
             institutions:
@@ -4005,6 +4009,12 @@ personResponse:
             collections:
               $ref: "#/components/schemas/multipleReferences"
             workflows:
+              $ref: "#/components/schemas/multipleReferences"
+            file_templates:
+              $ref: "#/components/schemas/multipleReferences"
+            placeholders:
+              $ref: "#/components/schemas/multipleReferences"
+            human_diseases:
               $ref: "#/components/schemas/multipleReferences"
           required:
             - projects
@@ -4122,6 +4132,8 @@ programmeResponse:
           properties:
             administrators:
               $ref: "#/components/schemas/multipleReferences"
+            organisms:
+              $ref: "#/components/schemas/multipleReferences"
             people:
               $ref: "#/components/schemas/multipleReferences"
             projects:
@@ -4152,6 +4164,12 @@ programmeResponse:
               $ref: "#/components/schemas/multipleReferences"
             collections:
               $ref: "#/components/schemas/multipleReferences"
+            file_templates:
+              $ref: "#/components/schemas/multipleReferences"
+            placeholders:
+              $ref: "#/components/schemas/multipleReferences"
+            human_diseases:
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - people
             - projects
@@ -4168,6 +4186,7 @@ programmeResponse:
             - events
             - workflows
             - collections
+            - administrators
           additionalProperties: false
         links:
           $ref: "#/components/schemas/links"
@@ -4282,7 +4301,6 @@ projectResponse:
             asset_gatekeepers:
               $ref: "#/components/schemas/multipleReferences"
           required:
-            - organisms
             - people
             - institutions
             - investigations
