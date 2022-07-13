@@ -11,6 +11,8 @@ module Seek
 
     included do
       after_action :fair_signposting, only: [:show], if: -> { Seek::Config.fair_signposting_enabled }
+
+      user_content_actions :download
     end
 
     def find_display_asset(asset = instance_variable_get("@#{controller_name.singularize}"))

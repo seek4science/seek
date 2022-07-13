@@ -985,4 +985,10 @@ class ContentBlobTest < ActiveSupport::TestCase
       ContentBlob.new.destroy
     end
   end
+
+  test 'is_image_convertable?' do
+    assert Factory(:image_content_blob).is_image_convertable?
+    refute Factory(:svg_content_blob).is_image_convertable?
+    refute Factory(:pdf_content_blob).is_image_convertable?
+  end
 end

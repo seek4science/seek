@@ -478,7 +478,6 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   end
 
-
   test 'can view content of an image file' do
     df = Factory(:data_file, policy: Factory(:all_sysmo_downloadable_policy),
                              content_blob: Factory(:image_content_blob))
@@ -486,6 +485,30 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :download, params: { data_file_id: df.id, id: df.content_blob.id, disposition: 'inline', image_size: '900' }
 
     assert_response :success
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+  end
+
+  test 'can view content of an image file and resize to given param' do
+    df = Factory(:data_file, policy: Factory(:all_sysmo_downloadable_policy),
+                             content_blob: Factory(:image_content_blob))
+
+    get :download, params: { data_file_id: df.id, id: df.content_blob.id, disposition: 'inline', image_size: '10' }
+
+    assert_response :success
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert @response.header['Content-Length'].to_i < 2000, 'Image should have been resized'
+  end
+
+  test 'can view content of an SVG image file without converting' do
+    df = Factory(:data_file, policy: Factory(:all_sysmo_downloadable_policy),
+                             content_blob: Factory(:svg_content_blob))
+
+    get :download, params: { data_file_id: df.id, id: df.content_blob.id, disposition: 'inline', image_size: '900' }
+
+    assert_response :success
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert_equal 'image/svg+xml', @response.header['Content-Type']
+    assert_equal 6324, @response.header['Content-Length'].to_i
   end
 
   test 'should transparently redirect on download for 302 url' do
