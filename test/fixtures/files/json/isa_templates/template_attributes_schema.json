@@ -45,7 +45,26 @@
 				}
 			]
 		},
-		"dataType": { "type": "string" },
+		"dataType": {
+			"type": "string",
+			"enum": [
+				"Date time",
+				"Date",
+				"Real number",
+				"Integer",
+				"Web link",
+				"Email address",
+				"Text",
+				"String",
+				"Boolean",
+				"Registered Sample",
+				"Registered Sample (multiple)",
+				"Controlled Vocabulary",
+				"URI",
+				"Ontology",
+				"Registered Data file"
+			]
+		},
 		"CVList": {
 			"anyOf": [
 				{
@@ -59,7 +78,19 @@
 		"isaTag": {
 			"anyOf": [
 				{
-					"type": "string"
+					"type": "string",
+					"enum": [
+						"source",
+						"sample",
+						"protocol",
+						"source_characteristic",
+						"sample_characteristic",
+						"other_material",
+						"other_material_characteristic",
+						"data_file",
+						"data_file_comment",
+						"parameter_value"
+					]
 				},
 				{
 					"type": "null"

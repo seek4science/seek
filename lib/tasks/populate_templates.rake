@@ -148,24 +148,7 @@ namespace :seek do
 
   def check_json_file(file)
     res = valid_isa_json?(file)
-    return res.map { |r| "<li>#{r}</li>" }.join('') unless res.blank?
-
-    valid_isa_tags = IsaTag.all.map(&:title)
-    valid_data_types = SampleAttributeType.all.map(&:title)
-
-    json = JSON.parse(file, { symbolize_names: true })
-
-    json[:data].each do |d|
-      d[:data].each do |i|
-        unless valid_data_types.include? i[:dataType]
-          res << "<li><b>'#{i[:dataType]}'</b> is not a valid Seek data type.</li>"
-        end
-        if i[:isaTag].present? && !valid_isa_tags.include?(i[:isaTag])
-          res << "<li><b>'#{i[:isaTag]}'</b> is not a valid Seek ISA tag.</li>"
-        end
-      end
-    end
-    res.join('')
+    res.map { |r| "<li>#{r}</li>" }.join('')
   end
 
   def valid_isa_json?(json)
