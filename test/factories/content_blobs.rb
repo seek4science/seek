@@ -458,3 +458,9 @@ Factory.define(:jupyter_notebook_content_blob, parent: :content_blob) do |f|
   f.original_filename 'create_and_link_isa_datafile.ipynb'
   f.data { File.new("#{Rails.root}/test/fixtures/files/create_and_link_isa_datafile.ipynb", 'rb').read }
 end
+
+Factory.define(:svg_content_blob, parent: :content_blob) do |f|
+  f.content_type 'image/svg+xml'
+  f.original_filename 'transparent-fairdom-logo-square.svg'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/transparent-fairdom-logo-square.svg", 'rb').read }
+end
