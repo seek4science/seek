@@ -508,7 +508,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_response :success
     assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
     assert_equal 'image/svg+xml', @response.header['Content-Type']
-    assert_equal 6324, @response.header['Content-Length'].to_i
+    assert  @response.body[0..256].include?('<svg ')
   end
 
   test 'should transparently redirect on download for 302 url' do
