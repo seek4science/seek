@@ -122,6 +122,7 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
             .attr("data-container", "body");
         });
       $j('[data-toggle="tooltip"]').tooltip();
+			highlightTitleCol(this.table)
     },
     pasteFromClipboard: function () {
       navigator.clipboard.readText().then((text) => {
@@ -167,6 +168,7 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
       sampleLinkIndexes.forEach((x) => (arr[x] = []));
       this.table.row.add(arr).draw();
 			updateContainerHeight();
+			highlightTitleCol(this.table)
     },
     setAsDeleted: function () {
       const indexes = getStatusIndexes(this.table.settings()[0].aoColumns);
@@ -287,6 +289,11 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
     }
   };
 })(jQuery);
+
+function highlightTitleCol(table){
+  const colIdx = table.settings()[0].aoColumns.find((x) => x?.is_title)?.idx
+	if(colIdx) $j(table.column(colIdx).nodes()).addClass('highlight');
+}
 
 function checkSampleLink(value) {
   if (Array.isArray(value)) {
