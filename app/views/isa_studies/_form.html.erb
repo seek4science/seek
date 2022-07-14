@@ -43,7 +43,7 @@
                                                                           select_id: '#study_investigation_id',
                                                                           parents: Investigation.authorized_for('edit') } %>
     
-    <%= folding_panel("Source sample type") do %>
+    <%= folding_panel("Define Sample Type for Source") do %>
       <%= render partial: 'sample_types_form', locals: {f: f, sample_type: @isa_study.source, id_suffix: "_source_sample_type" } %>
     <% end %>
 
@@ -55,7 +55,7 @@
                               {class:"form-control", id:'isa_study_sop_selector', name: "isa_study[study][sop_id]"}) %>
     <% end %>
 
-    <%= folding_panel("Sample collection sample type") do %>
+    <%= folding_panel("Define Sample Type for Sample") do %>
       <%= render partial: 'sample_types_form', locals: {f: f, sample_type: @isa_study.sample_collection, id_suffix: "_sample_collection_sample_type"  } %>
     <% end %>
 

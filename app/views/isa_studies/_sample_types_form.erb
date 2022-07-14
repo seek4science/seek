@@ -7,8 +7,8 @@
 
 <%=  f.fields_for main_field_name, sample_type do |field| %>
 
-  <%= folding_panel('Create template using existing template', false, {help_text: "Create template based on existing templates", :body_options => {:id => 'add_custom_attribute_panel'}}) do %>
-    <input type="button" value="Choose from existing templates" class="btn btn-primary" onClick="initTemplateModal('<%=main_field_name%>')">
+  <%= folding_panel('Choose a Template to create a Sample Type', false, {help_text: "Create template based on existing templates", :body_options => {:id => 'add_custom_attribute_panel'}}) do %>
+    <input type="button" value="Existing Templates" class="btn btn-primary" onClick="initTemplateModal('<%=main_field_name%>')">
   <% end %>
 
   <div class="form-group">
