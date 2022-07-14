@@ -9,9 +9,9 @@ class SampleTypeUpdateJob < ApplicationJob
   def perform(sample_type, refresh_samples)
     if refresh_samples
       sample_type.refresh_samples
-      sample_type.samples.each do |sample|
-        Rails.cache.delete_matched(/#{sample.list_item_title_cache_key_prefix}.*/)
-      end
+
+      Rails.cache.delete_matched(/#{sample_type.list_item_title_cache_key_prefix}.*/)
+
     end
     Seek::Samples::SampleTypeEditingConstraints.new(sample_type).refresh_cache
   end

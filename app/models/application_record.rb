@@ -175,7 +175,7 @@ class ApplicationRecord < ActiveRecord::Base
 
   #TODO: this could potentially be moved into a module that pulls together all the generated cache keys into one place
   def list_item_title_cache_key_prefix
-    "rli_title_#{cache_key}"
+    "rli_title_#{cache_key_with_version}"
   end
 
 end

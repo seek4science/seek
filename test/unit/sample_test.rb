@@ -1162,4 +1162,20 @@ class SampleTest < ActiveSupport::TestCase
     assert_equal 'key must remain capitalised', attribute_map['CAPITAL key']
   end
 
+  test 'list_item_title_cache_key_prefix' do
+    sample = Factory(:sample)
+    sample_type = sample.sample_type
+
+    assert_equal "#{sample_type.list_item_title_cache_key_prefix}/#{sample.cache_key_with_version}", sample.list_item_title_cache_key_prefix
+
+    #check it changes
+    old = sample.list_item_title_cache_key_prefix
+    disable_authorization_checks { sample_type.update(title:'changed', updated_at: 1.minute.from_now) }
+    refute_equal old, sample.list_item_title_cache_key_prefix
+    old = sample.list_item_title_cache_key_prefix
+    disable_authorization_checks { sample.update(title:'changed', updated_at: 1.minute.from_now) }
+    refute_equal old, sample.list_item_title_cache_key_prefix
+
+  end
+
 end
