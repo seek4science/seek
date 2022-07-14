@@ -62,6 +62,7 @@ module SEEK
     # openbis_endpoints/26-20170404142724000000000...
     # openbis_endpoints/26-20170404142724224014370...
     config.active_record.cache_timestamp_format = :usec
+    config.active_record.cache_versioning = false
 
     config.action_mailer.deliver_later_queue_name = 'mailers'
 
