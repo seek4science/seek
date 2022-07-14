@@ -1166,7 +1166,7 @@ class SampleTest < ActiveSupport::TestCase
     sample = Factory(:sample)
     sample_type = sample.sample_type
 
-    assert_equal "#{sample_type.list_item_title_cache_key_prefix}/#{sample.cache_key_with_version}", sample.list_item_title_cache_key_prefix
+    assert_equal "#{sample_type.list_item_title_cache_key_prefix}/#{sample.cache_key}", sample.list_item_title_cache_key_prefix
 
     #check it changes
     old = sample.list_item_title_cache_key_prefix

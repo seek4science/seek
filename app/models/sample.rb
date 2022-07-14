@@ -132,7 +132,7 @@ class Sample < ApplicationRecord
 
   #overides default to include sample_type key at the start
   def list_item_title_cache_key_prefix
-    "#{sample_type.list_item_title_cache_key_prefix}/#{cache_key_with_version}"
+    "#{sample_type.list_item_title_cache_key_prefix}/#{cache_key}"
   end
 
   private
