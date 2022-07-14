@@ -31,6 +31,8 @@ class SampleTypeUpdateJobTest < ActiveSupport::TestCase
   test 'clear resource list item title cache' do
     type = sample_type_with_samples
 
+    refute type.samples.empty?
+
     type.samples.each do |sample|
       refute Rails.cache.exist?("#{sample.list_item_title_cache_key_prefix}_wibble")
     end
