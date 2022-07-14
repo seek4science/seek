@@ -130,6 +130,11 @@ class Sample < ApplicationRecord
     organism_ids | ncbi_linked_organisms.map(&:id)
   end
 
+  #overides default to include sample_type key at the start
+  def list_item_title_cache_key_prefix
+    "#{sample_type.list_item_title_cache_key_prefix}/#{cache_key_with_version}"
+  end
+
   private
 
   # organisms linked through an NCBI attribute type
@@ -181,4 +186,5 @@ class Sample < ApplicationRecord
   def attribute_class
     SampleAttribute
   end
+
 end
