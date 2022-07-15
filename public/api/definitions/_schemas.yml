@@ -2326,7 +2326,7 @@ projectPost:
               $ref: "#/components/schemas/nullableLicense"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
-            edam_topics:
+            topic_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
           required:
             - title
@@ -2377,7 +2377,7 @@ projectPatch:
               $ref: "#/components/schemas/nullableLicense"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
-            edam_topics:
+            topic_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
           additionalProperties: false
         relationships:
@@ -2883,9 +2883,9 @@ workflowPost:
           properties:
             tags:
               $ref: "#/components/schemas/tags"
-            edam_topics:
+            topic_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
-            edam_operations:
+            operation_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
             title:
               $ref: "#/components/schemas/nonEmptyString"
@@ -2961,9 +2961,9 @@ workflowPatch:
           properties:
             tags:
               $ref: "#/components/schemas/tags"
-            edam_topics:
+            topic_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
-            edam_operations:
+            operation_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
             title:
               $ref: "#/components/schemas/nonEmptyString"
@@ -4134,7 +4134,7 @@ projectResponse:
               $ref: "#/components/schemas/nullableLicense"
             discussion_links:
               $ref: "#/components/schemas/assetLinkList"
-            edam_topics:
+            topic_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
             start_date:
               $ref: "#/components/schemas/nullableDateString"
@@ -4758,9 +4758,9 @@ workflowResponse:
           properties:
             tags:
               $ref: "#/components/schemas/tags"
-            edam_topics:
+            topic_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
-            edam_operations:
+            operation_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
             title:
               $ref: "#/components/schemas/nonEmptyString"
