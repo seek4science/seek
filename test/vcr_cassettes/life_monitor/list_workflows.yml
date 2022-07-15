@@ -1,0 +1,145 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://localhost:8443/registries/current/workflows?status=true&versions=true
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (linux x86_64) ruby/2.7.5p203
+      Content-Type:
+      - application/json
+      Authorization:
+      - Bearer tTNFN2je7BQvVEZTEhvL3ceJGK6PiexxeN7XBNGKQH
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - localhost:8443
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Thu, 14 Jul 2022 13:42:35 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '5018'
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Origin:
+      - "*"
+      X-Frame-Options:
+      - SAMEORIGIN
+    body:
+      encoding: UTF-8
+      string: |
+        {
+          "items": [
+            {
+              "latest_version": "1",
+              "name": "Concat two files",
+              "public": true,
+              "status": {
+                "aggregate_test_status": "all_failing",
+                "latest_build": null,
+                "reason": ""
+              },
+              "uuid": "86da0a30-d2cd-013a-a07d-000c29a94011",
+              "versions": [
+                {
+                  "is_latest": true,
+                  "ro_crate": {
+                    "links": {
+                      "based_on": "https://github.com/seek4science/workflow-test-fixture",
+                      "download": "https://172.19.0.7:8000/workflows/86da0a30-d2cd-013a-a07d-000c29a94011/rocrate/1/download",
+                      "metadata": "https://172.19.0.7:8000/workflows/86da0a30-d2cd-013a-a07d-000c29a94011/rocrate/1/metadata",
+                      "origin": "https://myseek:3000/workflows/293/ro_crate?version=1",
+                      "registries": {
+                        "seek": "https://myseek:3000/workflows/293?version=1"
+                      }
+                    }
+                  },
+                  "status": {
+                    "aggregate_test_status": "all_failing",
+                    "latest_builds": [],
+                    "reason": "No test suite configured for this workflow"
+                  },
+                  "uuid": "077b6467-9012-4f85-8339-570d8607445e",
+                  "version": "1"
+                }
+              ]
+            },
+            {
+              "latest_version": "2",
+              "name": "sort-and-change-case",
+              "public": true,
+              "status": {
+                "aggregate_test_status": "all_passing",
+                "latest_build": null,
+                "reason": "[500] <TestingService http://example.org/jenkins, (d67f5c2f-bbe4-48a7-a7e3-b87b6cafa821)>: job[tests] does not exist: Unable to get resource 'job/tests/' from service 'http://example.org/jenkins'"
+              },
+              "uuid": "1493b330-d44b-013a-df8a-000c29a94011",
+              "versions": [
+                {
+                  "is_latest": true,
+                  "ro_crate": {
+                    "links": {
+                      "download": "https://172.19.0.7:8000/workflows/1493b330-d44b-013a-df8a-000c29a94011/rocrate/3/download",
+                      "metadata": "https://172.19.0.7:8000/workflows/1493b330-d44b-013a-df8a-000c29a94011/rocrate/3/metadata",
+                      "origin": "https://myseek:3000/workflows/294/ro_crate?version=3",
+                      "registries": {
+                        "seek": "https://myseek:3000/workflows/294?version=3"
+                      }
+                    }
+                  },
+                  "status": {
+                    "aggregate_test_status": "all_passing",
+                    "latest_builds": [],
+                    "reason": ""
+                  },
+                  "uuid": "442675c3-ba19-46ff-91e1-350ed4dfb266",
+                  "version": "2"
+                },
+                {
+                  "is_latest": false,
+                  "ro_crate": {
+                    "links": {
+                      "download": "https://172.19.0.7:8000/workflows/1493b330-d44b-013a-df8a-000c29a94011/rocrate/1/download",
+                      "metadata": "https://172.19.0.7:8000/workflows/1493b330-d44b-013a-df8a-000c29a94011/rocrate/1/metadata",
+                      "origin": "https://myseek:3000/workflows/294/ro_crate?version=1",
+                      "registries": {
+                        "seek": "https://myseek:3000/workflows/294?version=1"
+                      }
+                    }
+                  },
+                  "status": {
+                    "aggregate_test_status": "some_passing",
+                    "latest_builds": [],
+                    "reason": ""
+                  },
+                  "uuid": "4aeef6d3-00a6-4a52-93a6-1b60ca6525cd",
+                  "version": "1"
+                }
+              ]
+            }
+          ],
+          "links": {
+            "self": "https://172.19.0.7:8000/registries/current/workflows?status=true&versions=true"
+          },
+          "meta": {
+            "api_version": "0.8.0-beta1",
+            "base_url": "https://172.19.0.7:8000",
+            "resource": "/registries/current/workflows?status=true&versions=true"
+          }
+        }
+    http_version: 
+  recorded_at: Thu, 14 Jul 2022 13:42:35 GMT
+recorded_with: VCR 2.9.3

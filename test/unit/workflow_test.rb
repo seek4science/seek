@@ -322,6 +322,61 @@ class WorkflowTest < ActiveSupport::TestCase
     assert_nil v2.reload.test_status
   end
 
+  test 'test_status is not carried over to new git versions' do
+    workflow = Factory(:ro_crate_git_workflow)
+    disable_authorization_checks { workflow.update_test_status(:all_passing) }
+    v1 = workflow.find_version(1)
+    assert_equal :all_passing, v1.test_status
+    assert_equal :all_passing, workflow.reload.test_status
+
+    disable_authorization_checks do
+      s = workflow.save_as_new_git_version(ref: 'refs/heads/master')
+      assert s
+    end
+
+    assert_nil workflow.reload.test_status
+    assert_nil workflow.latest_version.test_status
+    assert_equal :all_passing, v1.test_status
+  end
+
+  test 'update test status for git versioned workflows' do
+    # Default latest version
+    workflow = Factory(:local_ro_crate_git_workflow, test_status: nil)
+    v1 = workflow.find_version(1)
+    disable_authorization_checks { workflow.save_as_new_git_version }
+    v2 = workflow.find_version(2)
+    assert_nil workflow.reload.test_status
+    assert_nil workflow.latest_version.reload.test_status
+    disable_authorization_checks { workflow.update_test_status(:all_failing) }
+    assert_equal :all_failing, workflow.reload.test_status
+    assert_nil v1.test_status
+    assert_equal :all_failing, v2.reload.test_status
+
+    # Explicit latest version
+    workflow = Factory(:local_ro_crate_git_workflow, test_status: nil)
+    v1 = workflow.find_version(1)
+    disable_authorization_checks { workflow.save_as_new_git_version }
+    v2 = workflow.find_version(2)
+    assert_nil workflow.reload.test_status
+    assert_nil workflow.latest_version.reload.test_status
+    disable_authorization_checks { workflow.update_test_status(:all_failing, 2) }
+    assert_equal :all_failing, workflow.reload.test_status
+    assert_nil v1.reload.test_status
+    assert_equal :all_failing, v2.reload.test_status
+
+    # Explicit non-latest version
+    workflow = Factory(:local_ro_crate_git_workflow, test_status: nil)
+    v1 = workflow.find_version(1)
+    disable_authorization_checks { workflow.save_as_new_git_version }
+    v2 = workflow.find_version(2)
+    assert_nil workflow.reload.test_status
+    assert_nil workflow.latest_version.reload.test_status
+    disable_authorization_checks { workflow.update_test_status(:all_failing, 1) }
+    assert_nil workflow.reload.test_status
+    assert_equal :all_failing, v1.reload.test_status
+    assert_nil v2.reload.test_status
+  end
+
   test 'changing main workflow path refreshes internals structure' do
     workflow = Factory(:local_git_workflow)
     v = workflow.git_version

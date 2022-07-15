@@ -36,8 +36,8 @@ class Workflow < ApplicationRecord
 
     before_save :refresh_internals, if: -> { main_workflow_path_changed? && !main_workflow_blob.empty? }
     after_save :clear_cached_diagram, if: -> { diagram_path_changed? }
-    # after_commit :submit_to_life_monitor, on: [:create, :update]
-    # after_commit :sync_test_status, on: [:create, :update]
+    after_commit :submit_to_life_monitor, on: [:create, :update]
+    after_commit :sync_test_status, on: [:create, :update]
 
     def maturity_level
       Workflow::MATURITY_LEVELS[super]
@@ -62,7 +62,7 @@ class Workflow < ApplicationRecord
     end
 
     def test_status= stat
-      super(Workflow::TEST_STATUS_INV[stat&.to_sym])
+      resource_attributes['test_status'] = (Workflow::TEST_STATUS_INV[stat&.to_sym])
     end
 
     def source_link_url
