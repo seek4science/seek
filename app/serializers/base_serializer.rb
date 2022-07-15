@@ -146,7 +146,7 @@ class BaseSerializer < SimpleBaseSerializer
     end
   end
 
-  def edam_annotations(property)
+  def ontology_annotations(property)
     terms = object.annotations_with_attribute(property, true).collect(&:value).sort_by(&:label)
     terms.collect do |term|
       {
