@@ -87,6 +87,10 @@ class BaseSerializer < SimpleBaseSerializer
     associated('Organism')
   end
 
+  def placeholders
+    associated('Placeholder')
+  end
+
   def workflows
     associated('Workflow')
   end
