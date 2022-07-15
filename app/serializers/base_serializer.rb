@@ -87,6 +87,10 @@ class BaseSerializer < SimpleBaseSerializer
     associated('Organism')
   end
 
+  def placeholders
+    associated('Placeholder')
+  end
+
   link(:self) { polymorphic_path(object) }
 
   # avoid dash-erizing attribute names

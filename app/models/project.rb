@@ -92,7 +92,7 @@ class Project < ApplicationRecord
   has_many :dependent_permissions, class_name: 'Permission', as: :contributor, dependent: :destroy
 
   def assets
-    data_files | sops | models | publications | presentations | documents | workflows | collections
+    data_files | sops | models | publications | presentations | documents | workflows | collections | file_templates | placeholders
   end
 
   def project_assets

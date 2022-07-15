@@ -2,6 +2,11 @@
 Factory.define(:placeholder) do |f|
   f.with_project_contributor
   f.sequence(:title) { |n| "A Placeholder #{n}" }
+
+  f.after_build do |placeholder|
+    placeholder.projects = [placeholder.contributor.projects.first] if placeholder.projects.empty?
+  end
+
 end
 
 Factory.define(:public_placeholder, parent: :placeholder) do |f|

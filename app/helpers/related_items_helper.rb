@@ -43,10 +43,14 @@ module RelatedItemsHelper
 
   # Get a hash of appropriate related resources for the given resource. Also returns a hash of hidden resources
   def get_related_resources(resource, limit = nil)
+    puts ('Checking ' + resource.class.name)
     items_hash = {}
     resource.class.related_type_methods.each_key do |type|
       next if type == 'Organism' && !resource.is_a?(Sample)
       enabled_method = "#{type.pluralize.underscore}_enabled"
+      if Seek::Config.respond_to?(enabled_method) && !Seek::Config.send(enabled_method)
+          puts (enabled_method + ' disabled')
+      end
       next if Seek::Config.respond_to?(enabled_method) && !Seek::Config.send(enabled_method)
 
       items_hash[type] = resource.get_related(type)

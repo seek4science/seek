@@ -46,8 +46,6 @@ class SimpleBaseSerializer < ActiveModel::Serializer
       klass.related_type_methods.each_key do |key|
         next if ['Strain', 'Sample'].include?(key)
         assoc = key.pluralize.underscore
-        enabled_method = "#{assoc}_enabled"
-        next if Seek::Config.respond_to?(enabled_method) && !Seek::Config.send(enabled_method)
         has_many assoc.to_sym do |s|
           s.associated(key)
         end
