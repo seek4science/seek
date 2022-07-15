@@ -40,7 +40,7 @@ class LifeMonitorStatusJobTest < ActiveSupport::TestCase
         workflow = Factory(:local_ro_crate_git_workflow, uuid: '1493b330-d44b-013a-df8a-000c29a94011', title: 'sort-and-change-case')
         all_failing = Factory(:local_ro_crate_git_workflow, uuid: '86da0a30-d2cd-013a-a07d-000c29a94011', title: 'Concat two files')
         disable_authorization_checks do
-          Factory(:ro_crate_with_tests, asset_version: 2, asset: workflow)
+          workflow.save_as_new_git_version
         end
         some_passing = workflow.find_version(1)
         all_passing = workflow.find_version(2)
