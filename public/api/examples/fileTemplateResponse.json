@@ -60,19 +60,7 @@
           "orcid": null
         }
       ],
-      "other_creators": "Blogs, Joe",
-      "edam_data": [
-        {
-          "label": "Sequence features metadata",
-          "identifier": "http://edamontology.org/data_2914"
-        }
-      ],
-      "edam_formats": [
-        {
-          "label": "JSON",
-          "identifier": "http://edamontology.org/format_3464"
-        }
-      ]
+      "other_creators": "Blogs, Joe"
     },
     "relationships": {
       "creators": {

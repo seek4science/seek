@@ -526,6 +526,32 @@ modelAttributes:
     - model_format
     - environment
   additionalProperties: false
+placeholderAttributes:
+  type: object
+  properties:
+    tags:
+      $ref: "#/components/schemas/tags"
+    title:
+      $ref: "#/components/schemas/nonEmptyString"
+    description:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    license:
+      $ref: "#/components/schemas/nullableLicense"
+    created_at:
+      $ref: "#/components/schemas/dateTimeString"
+    updated_at:
+      $ref: "#/components/schemas/dateTimeString"
+    policy:
+      $ref: "#/components/schemas/policy"
+    other_creators:
+      $ref: "#/components/schemas/nullableOtherCreatorsString"
+    creators:
+      $ref: "#/components/schemas/assetsCreatorsList"
+    discussion_links:
+      $ref: "#/components/schemas/assetLinkList"
+  required:
+    - title
+  additionalProperties: false
 assayAttributes:
   type: object
   properties:
@@ -834,6 +860,7 @@ anyType:
     - models
     - organisms
     - people
+    - placeholders
     - presentations
     - programmes
     - projects
@@ -1724,6 +1751,106 @@ eventPatch:
   additionalProperties: false
   example:
     $ref: ../examples/eventPatch.json
+fileTemplatePost:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/fileTemplateType"
+        attributes:
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tags"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            license:
+              $ref: "#/components/schemas/nullableLicense"
+            policy:
+              $ref: "#/components/schemas/policy"
+            content_blobs:
+              $ref: "#/components/schemas/contentBlobSlotsList"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPostList"
+          required:
+            - title
+            - content_blobs
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/multipleReferences"
+            projects:
+              $ref: "#/components/schemas/multipleReferences"
+          required:
+            - projects
+          additionalProperties: false
+      required:
+        - type
+        - attributes
+        - relationships
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/fileTemplatePost.json
+fileTemplatePatch:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/fileTemplateType"
+        attributes:
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tags"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            license:
+              $ref: "#/components/schemas/nullableLicense"
+            policy:
+              $ref: "#/components/schemas/policy"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPatchList"
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/multipleReferences"
+            projects:
+              $ref: "#/components/schemas/multipleReferences"
+          additionalProperties: false
+      required:
+        - id
+        - type
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+  example:
+    $ref: ../examples/fileTemplatePatch.json
 institutionPost:
   type: object
   properties:
@@ -2013,6 +2140,105 @@ modelPatch:
   additionalProperties: false
   example:
     $ref: ../examples/modelPatch.json
+placeholderPost:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        type:
+          $ref: "#/components/schemas/placeholderType"
+        attributes:
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tags"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            license:
+              $ref: "#/components/schemas/nullableLicense"
+            policy:
+              $ref: "#/components/schemas/policy"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPatchList"
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/multipleReferences"
+            projects:
+              $ref: "#/components/schemas/multipleReferences"
+            assays:
+              $ref: "#/components/schemas/multipleReferences"
+            file_template:
+              $ref: "#/components/schemas/singleReference"
+            data_file:
+              $ref: "#/components/schemas/singleReference"
+          additionalProperties: false
+      required:
+        - type
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
+placeholderPatch:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/placeholderType"
+        attributes:
+          type: object
+          properties:
+            tags:
+              $ref: "#/components/schemas/tags"
+            title:
+              $ref: "#/components/schemas/nonEmptyString"
+            description:
+              $ref: "#/components/schemas/nullableNonEmptyString"
+            license:
+              $ref: "#/components/schemas/nullableLicense"
+            policy:
+              $ref: "#/components/schemas/policy"
+            other_creators:
+              $ref: "#/components/schemas/nullableOtherCreatorsString"
+            creators:
+              $ref: "#/components/schemas/assetsCreatorsList"
+            discussion_links:
+              $ref: "#/components/schemas/assetLinkPatchList"
+          additionalProperties: false
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/multipleReferences"
+            projects:
+              $ref: "#/components/schemas/multipleReferences"
+            assays:
+              $ref: "#/components/schemas/multipleReferences"
+            file_template:
+              $ref: "#/components/schemas/singleReference"
+            data_file:
+              $ref: "#/components/schemas/singleReference"
+          additionalProperties: false
+      required:
+        - id
+        - type
+      additionalProperties: false
+  required:
+    - data
+  additionalProperties: false
 personPost:
   type: object
   properties:
@@ -3584,6 +3810,59 @@ eventResponse:
     - data
     - jsonapi
   additionalProperties: false
+fileTemplateResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/fileTemplateType"
+        attributes:
+          $ref: "#/components/schemas/contributedTypeAttributes"
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/multipleReferences"
+            submitter:
+              $ref: "#/components/schemas/multipleReferences"
+            people:
+              $ref: "#/components/schemas/multipleReferences"
+            projects:
+              $ref: "#/components/schemas/multipleReferences"
+            data_files:
+              $ref: "#/components/schemas/multipleReferences"
+            placeholders:
+              $ref: "#/components/schemas/multipleReferences"
+          required:
+            - creators
+            - submitter
+            - people
+            - projects
+            - data_files
+            - placeholders
+          additionalProperties: false
+        links:
+          $ref: "#/components/schemas/links"
+        meta:
+          $ref: "#/components/schemas/meta"
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+        - links
+        - meta
+      additionalProperties: false
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+  required:
+    - data
+    - jsonapi
+  additionalProperties: false
 institutionResponse:
   type: object
   properties:
@@ -3949,6 +4228,56 @@ personResponse:
           required:
             - projects
             - institutions
+          additionalProperties: false
+        links:
+          $ref: "#/components/schemas/links"
+        meta:
+          $ref: "#/components/schemas/meta"
+      required:
+        - id
+        - type
+        - attributes
+        - relationships
+        - links
+        - meta
+      additionalProperties: false
+    jsonapi:
+      $ref: "#/components/schemas/JsonApiVersion"
+  required:
+    - data
+    - jsonapi
+  additionalProperties: false
+placeholderResponse:
+  type: object
+  properties:
+    data:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/nonEmptyString"
+        type:
+          $ref: "#/components/schemas/placeholderType"
+        attributes:
+          $ref: "#/components/schemas/placeholderAttributes"
+        relationships:
+          type: object
+          properties:
+            creators:
+              $ref: "#/components/schemas/multipleReferences"
+            submitter:
+              $ref: "#/components/schemas/multipleReferences"
+            people:
+              $ref: "#/components/schemas/multipleReferences"
+            projects:
+              $ref: "#/components/schemas/multipleReferences"
+            assays:
+              $ref: "#/components/schemas/multipleReferences"
+            file_template:
+              $ref: "#/components/schemas/singleReference"
+            data_file:
+              $ref: "#/components/schemas/singleReference"
+          required:
+            - projects
           additionalProperties: false
         links:
           $ref: "#/components/schemas/links"

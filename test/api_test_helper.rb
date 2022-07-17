@@ -3,8 +3,6 @@ module ApiTestHelper
 
   include AuthenticatedTestHelper
 
-  require 'pry'
-  
   def model
     @_model ||= self.class.name.split('ApiTest').first.constantize
   end
@@ -209,7 +207,6 @@ module ApiTestHelper
       raise Minitest::Assertion, errors.join("\n") unless errors.empty?
     rescue JSON::Schema::SchemaError => e
       if e.message.start_with?("Invalid fragment resolution for :fragment option")
-        warn "#{singular_name}"
         warn "#{fragment} is missing from API spec, skipping validation"
       else
         raise e
