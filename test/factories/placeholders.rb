@@ -31,5 +31,12 @@ FactoryBot.define do
     assays { [FactoryBot.create(:public_assay)] }
     other_creators { 'Blogs, Joe' }
     assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: FactoryBot.create(:person, first_name: 'Some', last_name: 'One'))] }
+    file_template { FactoryBot.create(:public_file_template) }
+    data_file { FactoryBot.create(:public_data_file) }
+
+    after(:create) do |placeholder|
+      placeholder.annotate_with(['Placeholder-tag1', 'Placeholder-tag2', 'Placeholder-tag3', 'Placeholder-tag4', 'Placeholder-tag5'], 'tag', placeholder.contributor)
+      placeholder.save!
+    end
   end
 end

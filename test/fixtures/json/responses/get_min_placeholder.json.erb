@@ -1,0 +1,59 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "placeholders",
+    "attributes": {
+      "policy": {
+        "access": "download",
+        "permissions": []
+      },
+      "tags": [],
+      "title": "A Minimal Placeholder",
+      "description": null,
+      "license": null,
+      "created_at": "<%= res.created_at.as_json %>",
+      "updated_at": "<%= res.updated_at.as_json %>",
+      "other_creators": null,
+      "creators": []
+    },
+    "relationships": {
+      "submitter": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= res.project_ids.first %>",
+            "type": "projects"
+          }
+        ]
+      }
+   },
+    "links": {
+      "self": "/placeholders/<%= res.id %>"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "uuid": "<%= res.uuid %>",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.3"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}
