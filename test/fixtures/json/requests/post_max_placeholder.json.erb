@@ -1,9 +1,8 @@
 {
   "data": {
-    "type": "file_templates",
-    "id": "<%= id %>",
+    "type": "placeholders",
     "attributes": {
-      "title": "A Maximal FileTemplate",
+      "title": "A Maximal Placeholder",
       "description": "This is the description",
       "tags": [
         "tag1",
@@ -40,6 +39,12 @@
             "type": "projects"
           }
         ]
+      },
+      "file_template": {
+        "data" : {
+	  "id": "<%= @file_template.id %>",
+	  "type" : "file_templates"
+	}
       }
     }
   }
