@@ -82,7 +82,7 @@ module HasOntologyAnnotations
     private
 
     def ontology_annotation_vocab(property)
-      SampleControlledVocab::SystemVocabs.send("edam_#{property}_controlled_vocab")
+      SampleControlledVocab::SystemVocabs.send("#{property}_controlled_vocab")
     end
 
     # the topics can be an array or comma seperated list of either labels or IRI's

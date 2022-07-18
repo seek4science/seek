@@ -39,9 +39,9 @@ class ResourceListHelperTest < ActionView::TestCase
     assert_match(/href="#{project_path(project)}".*#{project.title}/,
                  resource_list_column_display_value(data_file, 'projects'))
 
-    Factory(:edam_topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
-    unless SampleControlledVocab::SystemVocabs.edam_operations_controlled_vocab
-      Factory(:edam_operations_controlled_vocab)
+    Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
+    unless SampleControlledVocab::SystemVocabs.operations_controlled_vocab
+      Factory(:operations_controlled_vocab)
     end
     workflow = Factory(:max_workflow)
     assert_match(%r{href="https://edamontology.github.io/edam-browser/#topic_3314".*Chemistry},

@@ -68,10 +68,10 @@ class SampleControlledVocab < ApplicationRecord
   class SystemVocabs
 
     KEYS = {
-      edam_topics: 'edam_topics',
-      edam_operations: 'edam_operations',
-      edam_formats: 'edam_formats',
-      edam_data: 'edam_data'
+      topics: 'edam_topics',
+      operations: 'edam_operations',
+      formats: 'edam_formats',
+      data: 'edam_data'
     }
 
     def self.key_known?(key)

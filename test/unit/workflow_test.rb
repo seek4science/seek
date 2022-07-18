@@ -546,8 +546,8 @@ class WorkflowTest < ActiveSupport::TestCase
   end
 
   test 'tags and ontology annotations in json api' do
-    Factory(:edam_topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
-    Factory(:edam_operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_operations_controlled_vocab
+    Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
+    Factory(:operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.operations_controlled_vocab
 
     user = Factory(:user)
 

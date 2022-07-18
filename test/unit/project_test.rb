@@ -941,7 +941,7 @@ class ProjectTest < ActiveSupport::TestCase
     refute project.respond_to?(:format_annotations)
     refute project.respond_to?(:data_annotation)
 
-    Factory(:edam_topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
+    Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
     refute project.ontology_annotations?
     project.topic_annotations = 'Chemistry'
     assert project.ontology_annotations?

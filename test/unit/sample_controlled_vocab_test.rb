@@ -282,7 +282,7 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     vocab = Factory(:apples_sample_controlled_vocab)
     refute vocab.ontology_based?
 
-    vocab = Factory(:edam_topics_controlled_vocab)
+    vocab = Factory(:topics_controlled_vocab)
     assert vocab.ontology_based?
   end
 
