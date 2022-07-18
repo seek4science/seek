@@ -3296,7 +3296,7 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   test 'should update project edam topics' do
-    Factory(:edam_topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
+    Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
 
     project_admin = Factory(:project_administrator)
     project = project_admin.projects.first
@@ -3309,7 +3309,7 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   test 'show edam topics if set' do
-    Factory(:edam_topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
+    Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
 
     user = Factory(:user)
     project = Factory(:project)

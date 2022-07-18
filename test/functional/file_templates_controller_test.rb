@@ -73,8 +73,8 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'should create file template' do
-    Factory(:edam_data_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_data_controlled_vocab
-    Factory(:edam_formats_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_formats_controlled_vocab
+    Factory(:data_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_controlled_vocab
+    Factory(:formats_controlled_vocab) unless SampleControlledVocab::SystemVocabs.formats_controlled_vocab
     person = Factory(:person)
     login_as(person)
 
@@ -116,8 +116,8 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'should update file template' do
-    Factory(:edam_data_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_data_controlled_vocab
-    Factory(:edam_formats_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_formats_controlled_vocab
+    Factory(:data_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_controlled_vocab
+    Factory(:formats_controlled_vocab) unless SampleControlledVocab::SystemVocabs.formats_controlled_vocab
 
     person = Factory(:person)
     ft = Factory(:file_template, contributor: person)

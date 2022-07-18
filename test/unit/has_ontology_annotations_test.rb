@@ -19,8 +19,8 @@ class HasOntologyAnnotationsTest < ActiveSupport::TestCase
   end
 
   test 'annotate with label' do
-    Factory(:edam_topics_controlled_vocab)
-    Factory(:edam_operations_controlled_vocab)
+    Factory(:topics_controlled_vocab)
+    Factory(:operations_controlled_vocab)
 
     refute @workflow.ontology_annotations?
 
@@ -43,8 +43,8 @@ class HasOntologyAnnotationsTest < ActiveSupport::TestCase
   end
 
   test 'annotate with iri' do
-    Factory(:edam_topics_controlled_vocab)
-    Factory(:edam_operations_controlled_vocab)
+    Factory(:topics_controlled_vocab)
+    Factory(:operations_controlled_vocab)
 
     refute @workflow.ontology_annotations?
 
@@ -69,8 +69,8 @@ class HasOntologyAnnotationsTest < ActiveSupport::TestCase
     refute @workflow.send(:ontology_annotation_vocab, :topics)
     refute @workflow.send(:ontology_annotation_vocab, :operations)
 
-    topics_vocab = Factory(:edam_topics_controlled_vocab)
-    operations_vocab = Factory(:edam_operations_controlled_vocab)
+    topics_vocab = Factory(:topics_controlled_vocab)
+    operations_vocab = Factory(:operations_controlled_vocab)
 
     assert_equal topics_vocab, @workflow.send(:ontology_annotation_vocab, :topics)
     assert_equal operations_vocab, @workflow.send(:ontology_annotation_vocab, :operations)
