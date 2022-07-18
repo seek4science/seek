@@ -28,8 +28,8 @@ class ProjectSerializer < AvatarObjSerializer
     BaseSerializer.convert_policy object.default_policy
   end
 
-  attribute :edam_topics do
-    edam_annotations('edam_topics')
+  attribute :topic_annotations do
+    ontology_annotations('edam_topics')
   end
 
   include_related_items

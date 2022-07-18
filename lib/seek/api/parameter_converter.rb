@@ -66,16 +66,16 @@ module Seek
             end
           },
 
-          edam_operations: proc {|value|
+          operation_annotations: proc {|value|
             value.collect{|v| v[:identifier]}.join(', ')
           },
-          edam_topics: proc {|value|
+          topic_annotations: proc {|value|
             value.collect{|v| v[:identifier]}.join(', ')
           },
-          edam_data: proc {|value|
+          data_annotations: proc {|value|
             value.collect{|v| v[:identifier]}.join(', ')
           },
-          edam_formats: proc {|value|
+          format_annotations: proc {|value|
             value.collect{|v| v[:identifier]}.join(', ')
           },
           funding_codes: proc { |value|
@@ -153,7 +153,11 @@ module Seek
         template: :template_attributes,
         creators: :api_assets_creators,
         administrator_ids: :programme_administrator_ids,
-        attribute_map: :data
+        attribute_map: :data,
+        topic_annotations: :edam_topics,
+        operation_annotations: :edam_operations,
+        data_annotations: :edam_data,
+        format_annotations: :edam_formats
       }.freeze
 
       # Parameters to "elevate" out of params[bla] to the top-level.

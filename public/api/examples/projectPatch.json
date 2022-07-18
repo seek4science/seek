@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "1022251637",
+    "id": "389",
     "type": "projects",
     "attributes": {
       "avatar": null,
@@ -14,28 +14,28 @@
         "permissions": [
           {
             "resource": {
-              "id": "1039987395",
+              "id": "320",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "1022251637",
+              "id": "389",
               "type": "projects"
             },
             "access": "download"
           },
           {
             "resource": {
-              "id": "980191917",
+              "id": "347",
               "type": "institutions"
             },
             "access": "view"
           }
         ]
       },
-      "edam_topics": [
+      "topic_annotations": [
         {
           "label": "Biomedical science",
           "identifier": "http://edamontology.org/topic_3344"
@@ -50,7 +50,7 @@
       "programmes": {
         "data": [
           {
-            "id": "31",
+            "id": "29",
             "type": "programmes"
           }
         ]
@@ -58,7 +58,7 @@
       "organisms": {
         "data": [
           {
-            "id": "627234339",
+            "id": "29",
             "type": "organisms"
           }
         ]
