@@ -1,5 +1,5 @@
 <%
-  return unless resource.supports_edam_annotations?(property)
+  return unless resource.supports_ontology_annotations?(property)
   with_edam= "edam_#{property}"
   return unless resource.send("#{with_edam}").any?
   values = resource.send("#{with_edam.singularize()}_values")

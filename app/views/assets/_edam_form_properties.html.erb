@@ -1,4 +1,4 @@
-<% return unless resource.supports_edam_annotations? %>
+<% return unless resource.supports_ontology_annotations? %>
 
 <%= render partial: "assets/edam_form_property", locals: {resource: resource, property: :topics} -%>
 

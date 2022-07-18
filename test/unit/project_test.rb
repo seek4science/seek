@@ -930,11 +930,11 @@ class ProjectTest < ActiveSupport::TestCase
   test 'edam annotation properties'do
     project = Factory(:project)
 
-    assert project.supports_edam_annotations?
-    assert project.supports_edam_annotations?(:topics)
-    refute project.supports_edam_annotations?(:operations)
-    refute project.supports_edam_annotations?(:formats)
-    refute project.supports_edam_annotations?(:data)
+    assert project.supports_ontology_annotations?
+    assert project.supports_ontology_annotations?(:topics)
+    refute project.supports_ontology_annotations?(:operations)
+    refute project.supports_ontology_annotations?(:formats)
+    refute project.supports_ontology_annotations?(:data)
 
     assert project.respond_to?(:edam_topics)
     refute project.respond_to?(:edam_operations)
@@ -942,9 +942,9 @@ class ProjectTest < ActiveSupport::TestCase
     refute project.respond_to?(:edam_data)
 
     Factory(:edam_topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
-    refute project.edam_annotations?
+    refute project.ontology_annotations?
     project.edam_topics = 'Chemistry'
-    assert project.edam_annotations?
+    assert project.ontology_annotations?
   end
   
 end

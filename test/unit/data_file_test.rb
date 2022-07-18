@@ -464,11 +464,11 @@ class DataFileTest < ActiveSupport::TestCase
   test 'edam annotation properties'do
     data_file = Factory(:data_file)
 
-    assert data_file.supports_edam_annotations?
-    refute data_file.supports_edam_annotations?(:topics)
-    refute data_file.supports_edam_annotations?(:operations)
-    assert data_file.supports_edam_annotations?(:formats)
-    assert data_file.supports_edam_annotations?(:data)
+    assert data_file.supports_ontology_annotations?
+    refute data_file.supports_ontology_annotations?(:topics)
+    refute data_file.supports_ontology_annotations?(:operations)
+    assert data_file.supports_ontology_annotations?(:formats)
+    assert data_file.supports_ontology_annotations?(:data)
 
     refute data_file.respond_to?(:edam_topics)
     refute data_file.respond_to?(:edam_operations)
