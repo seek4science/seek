@@ -1,7 +1,7 @@
 {
   "data": {
     "type": "workflows",
-    "id": "36",
+    "id": "73",
     "attributes": {
       "title": "A Maximally Patched Workflow",
       "description": "A workflow to do important stuff",
@@ -13,7 +13,7 @@
         "tag2",
         "tag3"
       ],
-      "edam_operations": [
+      "operation_annotations": [
         {
           "label": "Clustering",
           "identifier": "http://edamontology.org/operation_3432"
@@ -23,7 +23,7 @@
           "identifier": "http://edamontology.org/operation_3465"
         }
       ],
-      "edam_topics": [
+      "topic_annotations": [
         {
           "label": "Chemistry",
           "identifier": "http://edamontology.org/topic_3314"
@@ -40,7 +40,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "248",
+              "id": "693",
               "type": "projects"
             },
             "access": "edit"
@@ -52,7 +52,7 @@
       "creators": {
         "data": [
           {
-            "id": "245",
+            "id": "674",
             "type": "people"
           }
         ]
@@ -60,7 +60,7 @@
       "projects": {
         "data": [
           {
-            "id": "248",
+            "id": "693",
             "type": "projects"
           }
         ]
@@ -68,7 +68,7 @@
       "assays": {
         "data": [
           {
-            "id": "32",
+            "id": "89",
             "type": "assays"
           }
         ]
@@ -76,7 +76,7 @@
       "publications": {
         "data": [
           {
-            "id": "28",
+            "id": "69",
             "type": "publications"
           }
         ]
@@ -84,7 +84,7 @@
       "presentations": {
         "data": [
           {
-            "id": "24",
+            "id": "28",
             "type": "presentations"
           }
         ]
@@ -92,7 +92,7 @@
       "data_files": {
         "data": [
           {
-            "id": "24",
+            "id": "76",
             "type": "data_files"
           }
         ]
@@ -100,7 +100,7 @@
       "documents": {
         "data": [
           {
-            "id": "24",
+            "id": "32",
             "type": "documents"
           }
         ]
@@ -108,7 +108,7 @@
       "sops": {
         "data": [
           {
-            "id": "24",
+            "id": "32",
             "type": "sops"
           }
         ]
