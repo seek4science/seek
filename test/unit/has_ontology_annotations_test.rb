@@ -25,19 +25,19 @@ class HasOntologyAnnotationsTest < ActiveSupport::TestCase
     refute @workflow.ontology_annotations?
 
     # mixture of arrays and comma separated, including an unknown one
-    @workflow.edam_topics = ['Chemistry', 'Sample collections', 'Unknown']
-    @workflow.edam_operations = 'Correlation, Clustering, Unknown'
+    @workflow.topic_annotations = ['Chemistry', 'Sample collections', 'Unknown']
+    @workflow.operation_annotations = 'Correlation, Clustering, Unknown'
 
     assert_difference('Annotation.count', 4) do
       assert @workflow.save
     end
 
-    assert_equal ['http://edamontology.org/topic_3314', 'http://edamontology.org/topic_3277'], @workflow.edam_topics
+    assert_equal ['http://edamontology.org/topic_3314', 'http://edamontology.org/topic_3277'], @workflow.topic_annotations
     assert_equal ['http://edamontology.org/operation_3465', 'http://edamontology.org/operation_3432'],
-                 @workflow.edam_operations
+                 @workflow.operation_annotations
 
-    assert_equal ['Chemistry', 'Sample collections'], @workflow.edam_topic_labels
-    assert_equal %w[Correlation Clustering], @workflow.edam_operation_labels
+    assert_equal ['Chemistry', 'Sample collections'], @workflow.topic_annotation_labels
+    assert_equal %w[Correlation Clustering], @workflow.operation_annotation_labels
 
     assert @workflow.ontology_annotations?
   end
@@ -48,19 +48,19 @@ class HasOntologyAnnotationsTest < ActiveSupport::TestCase
 
     refute @workflow.ontology_annotations?
 
-    @workflow.edam_topics = ['http://edamontology.org/topic_3314', 'http://edamontology.org/topic_3277']
-    @workflow.edam_operations = 'http://edamontology.org/operation_3465, http://edamontology.org/operation_3432'
+    @workflow.topic_annotations = ['http://edamontology.org/topic_3314', 'http://edamontology.org/topic_3277']
+    @workflow.operation_annotations = 'http://edamontology.org/operation_3465, http://edamontology.org/operation_3432'
 
     assert_difference('Annotation.count', 4) do
       assert @workflow.save
     end
 
-    assert_equal ['http://edamontology.org/topic_3314', 'http://edamontology.org/topic_3277'], @workflow.edam_topics
+    assert_equal ['http://edamontology.org/topic_3314', 'http://edamontology.org/topic_3277'], @workflow.topic_annotations
     assert_equal ['http://edamontology.org/operation_3465', 'http://edamontology.org/operation_3432'],
-                 @workflow.edam_operations
+                 @workflow.operation_annotations
 
-    assert_equal ['Chemistry', 'Sample collections'], @workflow.edam_topic_labels
-    assert_equal %w[Correlation Clustering], @workflow.edam_operation_labels
+    assert_equal ['Chemistry', 'Sample collections'], @workflow.topic_annotation_labels
+    assert_equal %w[Correlation Clustering], @workflow.operation_annotation_labels
 
     assert @workflow.ontology_annotations?
   end

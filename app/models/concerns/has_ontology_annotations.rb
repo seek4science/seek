@@ -15,7 +15,7 @@ module HasOntologyAnnotations
       return false unless supports_ontology_annotations?
 
       self.class.supported_ontology_properties.detect do |prop|
-        send("edam_#{prop}").any?
+        send("#{prop.to_s.singularize}_annotations").any?
       end.present?
     end
   end
@@ -45,35 +45,35 @@ module HasOntologyAnnotations
       return unless Seek::Config.solr_enabled
 
       searchable(auto_index: false) do
-        text "edam_#{property}".to_sym do
+        text "#{property.to_s.singularize}_annotations".to_sym do
           ontology_annotation_labels(property)
         end
       end
     end
 
     def define_ontology_annotation_associations(property)
-      has_annotation_type "edam_#{property}".to_sym
-      has_many "edam_#{property.to_s.singularize}_values".to_sym,
-               through: "edam_#{property}_annotations".to_sym, source: :value,
+      has_annotation_type "#{property.to_s.singularize}_annotations".to_sym
+      has_many "#{property.to_s.singularize}_annotation_values".to_sym,
+               through: "#{property.to_s.singularize}_annotations_annotations".to_sym, source: :value,
                source_type: 'SampleControlledVocabTerm'
     end
 
     def define_ontology_annotation_methods(property)
       # the topics  vals can be an array or comma seperated list of either labels or IRI's
-      define_method "edam_#{property}=" do |vals|
+      define_method "#{property.to_s.singularize}_annotations=" do |vals|
         associate_ontology_annotation_values vals, property
       end
 
-      define_method "edam_#{property.to_s.singularize}_labels" do
+      define_method "#{property.to_s.singularize}_annotation_labels" do
         ontology_annotation_labels(property)
       end
     end
 
     def define_ontology_annotation_index_filters(property)
       # INDEX filters. Unfortunately, these won't currently consider the hierarchy
-      has_filter "edam_#{property.to_s.singularize}": Seek::Filtering::Filter.new(
+      has_filter "#{property.to_s.singularize}_annotation": Seek::Filtering::Filter.new(
         value_field: 'sample_controlled_vocab_terms.label',
-        joins: ["edam_#{property.to_s.singularize}_values".to_sym]
+        joins: ["#{property.to_s.singularize}_annotation_values".to_sym]
       )
     end
   end
@@ -94,7 +94,7 @@ module HasOntologyAnnotations
           vocab.sample_controlled_vocab_terms.find_by_iri(value)
       end.compact.uniq
 
-      annotations = send("edam_#{property}_annotations")
+      annotations = send("#{property.to_s.singularize}_annotations_annotations")
 
       annotations.delete_all
       values.map do |annotation|
@@ -109,7 +109,7 @@ module HasOntologyAnnotations
     end
 
     def ontology_annotation_values(property)
-      send("edam_#{property.to_s.singularize}_values")
+      send("#{property.to_s.singularize}_annotation_values")
     end
   end
 end
