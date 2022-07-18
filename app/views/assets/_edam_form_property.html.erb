@@ -1,5 +1,5 @@
 <%
-  return unless resource.supports_edam_annotations?(property)
+  return unless resource.supports_ontology_annotations?(property)
   with_edam= "edam_#{property}"
   vocab = resource.send("edam_vocab",property)
   return unless vocab

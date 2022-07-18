@@ -566,11 +566,11 @@ class WorkflowTest < ActiveSupport::TestCase
   test 'edam annotation properties'do
     wf = Factory(:workflow)
 
-    assert wf.supports_edam_annotations?
-    assert wf.supports_edam_annotations?(:topics)
-    assert wf.supports_edam_annotations?(:operations)
-    refute wf.supports_edam_annotations?(:formats)
-    refute wf.supports_edam_annotations?(:data)
+    assert wf.supports_ontology_annotations?
+    assert wf.supports_ontology_annotations?(:topics)
+    assert wf.supports_ontology_annotations?(:operations)
+    refute wf.supports_ontology_annotations?(:formats)
+    refute wf.supports_ontology_annotations?(:data)
 
     assert wf.respond_to?(:edam_topics)
     assert wf.respond_to?(:edam_operations)

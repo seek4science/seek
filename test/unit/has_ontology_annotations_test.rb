@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class HasEdamAnnotationsTest < ActiveSupport::TestCase
+class HasOntologyAnnotationsTest < ActiveSupport::TestCase
   include AuthenticatedTestHelper
 
   def setup
@@ -14,15 +14,15 @@ class HasEdamAnnotationsTest < ActiveSupport::TestCase
   end
 
   test 'supports edam annotations' do
-    assert @workflow.supports_edam_annotations?
-    refute Factory(:institution).supports_edam_annotations?
+    assert @workflow.supports_ontology_annotations?
+    refute Factory(:institution).supports_ontology_annotations?
   end
 
   test 'annotate with label' do
     Factory(:edam_topics_controlled_vocab)
     Factory(:edam_operations_controlled_vocab)
 
-    refute @workflow.edam_annotations?
+    refute @workflow.ontology_annotations?
 
     # mixture of arrays and comma separated, including an unknown one
     @workflow.edam_topics = ['Chemistry', 'Sample collections', 'Unknown']
@@ -39,14 +39,14 @@ class HasEdamAnnotationsTest < ActiveSupport::TestCase
     assert_equal ['Chemistry', 'Sample collections'], @workflow.edam_topic_labels
     assert_equal %w[Correlation Clustering], @workflow.edam_operation_labels
 
-    assert @workflow.edam_annotations?
+    assert @workflow.ontology_annotations?
   end
 
   test 'annotate with iri' do
     Factory(:edam_topics_controlled_vocab)
     Factory(:edam_operations_controlled_vocab)
 
-    refute @workflow.edam_annotations?
+    refute @workflow.ontology_annotations?
 
     @workflow.edam_topics = ['http://edamontology.org/topic_3314', 'http://edamontology.org/topic_3277']
     @workflow.edam_operations = 'http://edamontology.org/operation_3465, http://edamontology.org/operation_3432'
@@ -62,17 +62,17 @@ class HasEdamAnnotationsTest < ActiveSupport::TestCase
     assert_equal ['Chemistry', 'Sample collections'], @workflow.edam_topic_labels
     assert_equal %w[Correlation Clustering], @workflow.edam_operation_labels
 
-    assert @workflow.edam_annotations?
+    assert @workflow.ontology_annotations?
   end
 
   test 'edam vocab present' do
-    refute @workflow.send(:edam_vocab, :topics)
-    refute @workflow.send(:edam_vocab, :operations)
+    refute @workflow.send(:ontology_annotation_vocab, :topics)
+    refute @workflow.send(:ontology_annotation_vocab, :operations)
 
     topics_vocab = Factory(:edam_topics_controlled_vocab)
     operations_vocab = Factory(:edam_operations_controlled_vocab)
 
-    assert_equal topics_vocab, @workflow.send(:edam_vocab, :topics)
-    assert_equal operations_vocab, @workflow.send(:edam_vocab, :operations)
+    assert_equal topics_vocab, @workflow.send(:ontology_annotation_vocab, :topics)
+    assert_equal operations_vocab, @workflow.send(:ontology_annotation_vocab, :operations)
   end
 end
