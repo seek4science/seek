@@ -13,28 +13,28 @@
         "permissions": [
           {
             "resource": {
-              "id": "1039987324",
+              "id": "249",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "1022251552",
+              "id": "304",
               "type": "projects"
             },
             "access": "download"
           },
           {
             "resource": {
-              "id": "980191843",
+              "id": "273",
               "type": "institutions"
             },
             "access": "view"
           }
         ]
       },
-      "edam_topics": [
+      "topic_annotations": [
         {
           "label": "Biomedical science",
           "identifier": "http://edamontology.org/topic_3344"
@@ -49,7 +49,7 @@
       "programmes": {
         "data": [
           {
-            "id": "26",
+            "id": "24",
             "type": "programmes"
           }
         ]
@@ -57,7 +57,7 @@
       "organisms": {
         "data": [
           {
-            "id": "627234334",
+            "id": "24",
             "type": "organisms"
           }
         ]
