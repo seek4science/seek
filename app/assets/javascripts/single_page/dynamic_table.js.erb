@@ -113,7 +113,8 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
         .columns()
         .header()
         .each((x, i) => {
-          if (i && requiredCols.includes(i)) {
+					if (i == 0) $j(x).append(`<input type='checkbox' onClick='selectAll(this)'/>`)
+          else if (requiredCols.includes(i)) {
             $j(x).append("<span class='required-attribute'>*</span>");
           }
           $j(x)
@@ -358,6 +359,15 @@ function handleResponse(table, sampleTypes) {
     if (res.status == "ok") handleSuccess(table, sampleTypes, res);
     else handleFailure(table, res);
   };
+}
+
+function selectAll(e) {
+	const checked = $j(e).prop('checked')
+	const checkBoxes = $j(e).closest(".dataTables_scroll").find(".row-select")
+	$j.each(checkBoxes, function (i, c){
+		$j(c).prop('checked', checked);
+		handleCheck($j(c))
+	})	
 }
 
 const handleFailure = (table, res) => {
