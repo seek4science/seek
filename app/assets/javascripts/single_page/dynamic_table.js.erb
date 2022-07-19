@@ -137,7 +137,7 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
 				const sampleLinkIndexes = sampleLinks.map(x => x.idx).sort((a, b) => b - a)
 				const sampleLinksTitles = sampleLinks.map(x => x.title)
 
-        const rows = text.split(splitter).map((r) => {
+        const rows = text.split(splitter).filter(x => x).map((r) => {
 					// Preserve row status and id
           let splitted = [rowStatus.new, ""].concat(r.split(delimeter));
           const missingColsCount = colsCount - defaultCols.length - splitted.length;
@@ -149,7 +149,8 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
           return missingColsCount < 0
             ? splitted.slice(0, colsCount)
             : splitted.concat(Array(missingColsCount).fill(""));
-        });
+        }).filter(x => x)
+				
         this.table.rows.add(rows).draw();
 
 				if (sampleLinksTitles.length)
