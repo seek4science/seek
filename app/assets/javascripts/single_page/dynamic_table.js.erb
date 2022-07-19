@@ -1,4 +1,5 @@
 <% environment.context_class.instance_eval { include Seek::Util.routes } %>
+const instanceName = '<%= Seek::Config.instance_name %>'
 
 const rowStatus = { new: "new", delete: "delete", update: "update", empty: "empty", noAction: "" };
 const dtErrClass = "row-error",
@@ -54,6 +55,7 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
 						if(c.multi_link) setTagsInput($j(td));
 						if (cellData == "#HIDDEN") $j(td).addClass("disabled")
 					};
+					if(c.title == "id") c.title = instanceName + " id"
         });
 			const multi_link_idx = columns.reduce((t, c, i) => c.multi_link ? [...t, i + 1] : t, []).slice(1)
       columns.unshift(...defaultCols);
