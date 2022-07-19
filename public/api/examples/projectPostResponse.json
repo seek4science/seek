@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "1022251554",
+    "id": "306",
     "type": "projects",
     "attributes": {
       "discussion_links": [
@@ -19,21 +19,21 @@
         "permissions": [
           {
             "resource": {
-              "id": "1039987324",
+              "id": "249",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "1022251552",
+              "id": "304",
               "type": "projects"
             },
             "access": "download"
           },
           {
             "resource": {
-              "id": "980191843",
+              "id": "273",
               "type": "institutions"
             },
             "access": "view"
@@ -44,7 +44,7 @@
 
       ],
       "use_default_policy": false,
-      "edam_topics": [
+      "topic_annotations": [
         {
           "label": "Biomedical science",
           "identifier": "http://edamontology.org/topic_3344"
@@ -79,7 +79,7 @@
       "organisms": {
         "data": [
           {
-            "id": "627234334",
+            "id": "24",
             "type": "organisms"
           }
         ]
@@ -102,7 +102,7 @@
       "programmes": {
         "data": [
           {
-            "id": "26",
+            "id": "24",
             "type": "programmes"
           }
         ]
@@ -174,14 +174,14 @@
       }
     },
     "links": {
-      "self": "/projects/1022251554"
+      "self": "/projects/306"
     },
     "meta": {
-      "created": "2022-06-21T09:20:32.000Z",
-      "modified": "2022-06-21T09:20:32.000Z",
+      "created": "2022-07-18T09:02:29.000Z",
+      "modified": "2022-07-18T09:02:29.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "53106880-d371-013a-101d-0a81884ed284"
+      "uuid": "468ab490-e8a6-013a-1113-0a81884ed284"
     }
   },
   "jsonapi": {

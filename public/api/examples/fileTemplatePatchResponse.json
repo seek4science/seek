@@ -36,8 +36,8 @@
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2022-07-07T14:43:07.000Z",
-      "updated_at": "2022-07-07T14:43:07.000Z",
+      "created_at": "2022-07-18T09:02:07.000Z",
+      "updated_at": "2022-07-18T09:02:07.000Z",
       "doi": null,
       "content_blobs": [
         {
@@ -60,13 +60,13 @@
         }
       ],
       "other_creators": "John Smith, Jane Smith",
-      "edam_data": [
+      "data_annotations": [
         {
           "label": "Sequence features metadata",
           "identifier": "http://edamontology.org/data_2914"
         }
       ],
-      "edam_formats": [
+      "format_annotations": [
         {
           "label": "JSON",
           "identifier": "http://edamontology.org/format_3464"
@@ -125,11 +125,11 @@
       "self": "/file_templates/41?version=1"
     },
     "meta": {
-      "created": "2022-07-07T14:43:07.000Z",
-      "modified": "2022-07-07T14:43:07.000Z",
+      "created": "2022-07-18T09:02:07.000Z",
+      "modified": "2022-07-18T09:02:07.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "0a09b6a0-e031-013a-10e0-0a81884ed284"
+      "uuid": "39475b90-e8a6-013a-1113-0a81884ed284"
     }
   },
   "jsonapi": {

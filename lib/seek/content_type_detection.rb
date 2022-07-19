@@ -10,7 +10,8 @@ module Seek
     MAX_SIMULATABLE_SIZE = 5 * 1024 * 1024
     PDF_CONVERTABLE_FORMAT = %w(doc docx ppt pptx odt odp rtf xls xlsx)
     PDF_VIEWABLE_FORMAT = PDF_CONVERTABLE_FORMAT - %w(xls xlsx) + %w(pdf)
-    IMAGE_VIEWABLE_FORMAT = %w(gif jpeg png jpg bmp svg)
+    IMAGE_CONVERTABLE_FORMAT = %w(gif jpeg png jpg bmp)
+    IMAGE_VIEWABLE_FORMAT = IMAGE_CONVERTABLE_FORMAT + %w(svg)
     TEXT_MIME_TYPES = %w(text/plain text/csv text/x-comma-separated-values text/tab-separated-values
       application/sbml+xml application/xml text/xml application/json text/x-python application/matlab
       text/markdown application/x-ipynb+json)
@@ -103,6 +104,10 @@ module Seek
 
     def is_image?(blob = self)
       blob.content_type.try(:split, '/').try(:first) == 'image'
+    end
+
+    def is_image_convertable?(blob = self)
+      (IMAGE_CONVERTABLE_FORMAT & blob.content_type_file_extensions).any?
     end
 
     def is_pdf_convertable?(blob = self)

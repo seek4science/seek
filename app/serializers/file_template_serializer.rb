@@ -4,11 +4,11 @@ class FileTemplateSerializer < ContributedResourceSerializer
   has_many :data_files
   has_many :placeholders
 
-  attribute :edam_data do
-    edam_annotations('edam_data')
+  attribute :data_annotations do
+    ontology_annotations('edam_data')
   end
-  attribute :edam_formats do
-    edam_annotations('edam_formats')
+  attribute :format_annotations do
+    ontology_annotations('edam_formats')
   end
 
 end

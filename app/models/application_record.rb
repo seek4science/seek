@@ -173,4 +173,9 @@ class ApplicationRecord < ActiveRecord::Base
     Seek::IndexTableColumnDefinitions.required_columns(self)
   end
 
+  #TODO: this could potentially be moved into a module that pulls together all the generated cache keys into one place
+  def list_item_title_cache_key_prefix
+    "rli_title_#{cache_key}"
+  end
+
 end

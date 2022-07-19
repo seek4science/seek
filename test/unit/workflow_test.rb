@@ -559,8 +559,8 @@ class WorkflowTest < ActiveSupport::TestCase
 
     assert_equal ["Workflow-tag1", "Workflow-tag2", "Workflow-tag3", "Workflow-tag4", "Workflow-tag5"], json[:tags]
 
-    assert_equal [{label:'Clustering', identifier: 'http://edamontology.org/operation_3432'}], json[:edam_operations]
-    assert_equal [{label:'Chemistry', identifier: 'http://edamontology.org/topic_3314'}], json[:edam_topics]
+    assert_equal [{label:'Clustering', identifier: 'http://edamontology.org/operation_3432'}], json[:operation_annotations]
+    assert_equal [{label:'Chemistry', identifier: 'http://edamontology.org/topic_3314'}], json[:topic_annotations]
   end
 
   test 'edam annotation properties'do
