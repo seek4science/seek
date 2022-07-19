@@ -5,14 +5,13 @@ module DynamicTableHelper
     { columns: columns, rows: rows }
   end
 
-  def dt_aggregated(study, include_all_assays = nil, assay = nil)
-    sample_types = []
-    if assay
-      sample_types = study.assays.where("position <= #{assay.position}").order(:position).map(&:sample_type)
-    else
-      sample_types = study.sample_types.map(&:clone)
-      sample_types.push(*study.assays.map(&:sample_type)) if include_all_assays
-    end
+  def dt_aggregated(study, assay = nil)
+    sample_types =
+      if assay
+        study.assays.where("position <= #{assay.position}").order(:position).map(&:sample_type)
+      else
+        study.sample_types.map(&:clone)
+      end
     columns = dt_cumulative_cols(sample_types)
     rows = dt_cumulative_rows(sample_types, columns.length)
     { columns: columns, rows: rows, sample_types: sample_types.map { |s| { title: s.title, id: s.id } } }

@@ -17,7 +17,7 @@
         var assayDynamicTable
         let initialLoad = true;
         $j(document).ready(function () {
-            const dt = <%= sanitize(dt_aggregated(assay.study, false, assay).to_json) %>
+            const dt = <%= sanitize(dt_aggregated(assay.study, assay).to_json) %>
             assayDynamicTable = new $j.dynamicTable('#assay-table')
             const ajax = {
 								url: dynamicTableDataPath,
@@ -27,7 +27,6 @@
                         return;
                     }
                     d.study_id = '<%=assay.study.id%>';
-                    d.include_all_assays = 'false';
                     d.assay_id = '<%=assay.id%>';
                     d.rows_pad = "true";
                 }

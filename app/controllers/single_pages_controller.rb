@@ -42,7 +42,7 @@ class SinglePagesController < ApplicationController
       elsif params[:study_id]
         study = Study.find(params[:study_id]) if params[:study_id]
         assay = Assay.find(params[:assay_id]) if params[:assay_id]
-        data = helpers.dt_aggregated(study, params[:include_all_assays], assay)[:rows]
+        data = helpers.dt_aggregated(study, assay)[:rows]
       end
       data = data.map { |row| row.unshift('') } if params[:rows_pad]
       render json: { data: data }
