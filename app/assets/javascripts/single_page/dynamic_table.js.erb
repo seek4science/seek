@@ -55,11 +55,12 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
 						if (cellData == "#HIDDEN") $j(td).addClass("disabled")
 					};
         });
+			const multi_link_idx = columns.reduce((t, c, i) => c.multi_link ? [...t, i + 1] : t, []).slice(1)
       columns.unshift(...defaultCols);
       const columnDefs = [
         { orderable: false, targets: options.readonly ? [0] : [0, 1, 2] },
         {
-          targets: options.readonly ? [] : [1, 2],
+          targets: options.readonly ? multi_link_idx : [1, 2],
           visible: false,
           searchable: false
         }
