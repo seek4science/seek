@@ -27,7 +27,7 @@ columns:
   data_file:
     required: [ ]
     default: [ ]
-    additional_allowed: [ edam_data_values, edam_format_values, simulation_data ]
+    additional_allowed: [ data_annotation_values, format_annotation_values, simulation_data ]
 
   sop:
     required: [ ]
@@ -47,7 +47,7 @@ columns:
   workflow:
     required: [ ]
     default: [ ]
-    additional_allowed: [ edam_topic_values, edam_operation_values ]
+    additional_allowed: [ topic_annotation_values, operation_annotation_values ]
 
   document:
     required: [ ]
@@ -61,7 +61,7 @@ columns:
 
   file_template:
     required: [ ]
-    default: [ edam_format_values, edam_data_values ]
+    default: [ format_annotation_values, data_annotation_values ]
     additional_allowed: [ ]
 
   institution:
@@ -81,7 +81,7 @@ columns:
 
   placeholder:
     required: [ ]
-    default: [ edam_format_values, edam_data_values ]
+    default: [ format_annotation_values, data_annotation_values ]
     additional_allowed: [ ]
 
   publication:
@@ -108,5 +108,5 @@ columns:
   project:
     required: [ ]
     default: [ web_page ]
-    additional_allowed: [ start_date, end_date ]
+    additional_allowed: [ start_date, end_date, topic_annotation_values ]
 

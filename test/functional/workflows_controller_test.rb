@@ -1142,10 +1142,10 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     assert_equal 'Common Workflow Language', workflow.workflow_class_title
 
-    put :update, params: { id: workflow.id, workflow: { edam_topics: 'Chemistry, Sample collections',edam_operations:'Clustering, Expression correlation analysis' } }
+    put :update, params: { id: workflow.id, workflow: { topic_annotations: 'Chemistry, Sample collections', operation_annotations:'Clustering, Expression correlation analysis' } }
 
-    assert_equal ['http://edamontology.org/topic_3314','http://edamontology.org/topic_3277'], assigns(:workflow).edam_topics
-    assert_equal ['http://edamontology.org/operation_3432','http://edamontology.org/operation_3463'], assigns(:workflow).edam_operations
+    assert_equal ['http://edamontology.org/topic_3314','http://edamontology.org/topic_3277'], assigns(:workflow).topic_annotations
+    assert_equal ['http://edamontology.org/operation_3432','http://edamontology.org/operation_3463'], assigns(:workflow).operation_annotations
 
   end
 
@@ -1161,7 +1161,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'div.panel div.panel-heading',text:/EDAM Properties/i, count:0
 
-    workflow.edam_topics = "Chemistry"
+    workflow.topic_annotations = "Chemistry"
     workflow.save!
 
     assert workflow.ontology_annotations?
