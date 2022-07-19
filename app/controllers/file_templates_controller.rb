@@ -87,8 +87,7 @@ class FileTemplatesController < ApplicationController
     params.require(:file_template).permit(:title, :description, { project_ids: [] }, :license, :other_creators,
                                 { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                 { creator_ids: [] }, { assay_assets_attributes: [:assay_id] },
-                                :edam_formats,
-                                :edam_data,
+                                :format_annotations, :data_annotations,
                                 { publication_ids: [] }, { event_ids: [] },
                                 discussion_links_attributes:[:id, :url, :label, :_destroy])
   end

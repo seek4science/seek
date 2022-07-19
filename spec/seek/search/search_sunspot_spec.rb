@@ -20,8 +20,8 @@ describe DataFile do
   it { should have_searchable_field(:assay_type_titles) }
   it { should have_searchable_field(:technology_type_titles) }
 
-  it { should have_searchable_field(:edam_data) }
-  it { should have_searchable_field(:edam_formats) }
+  it { should have_searchable_field(:data_annotations) }
+  it { should have_searchable_field(:format_annotations) }
 
 end
 
@@ -159,7 +159,7 @@ describe Project do
   #all the assets associated with the project
 #  it { should have_searchable_field(:associated_assets) }
 
-  it { should have_searchable_field(:edam_topics) }
+  it { should have_searchable_field(:topic_annotations) }
 end
 
 describe Institution do
@@ -256,8 +256,8 @@ describe Workflow do
   it { should have_searchable_field(:content_blob) }
   it { should have_searchable_field(:git_content) }
 
-  it { should have_searchable_field(:edam_topics) }
-  it { should have_searchable_field(:edam_operations) }
+  it { should have_searchable_field(:topic_annotations) }
+  it { should have_searchable_field(:operation_annotations) }
 
 end
 

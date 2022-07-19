@@ -3302,9 +3302,9 @@ class ProjectsControllerTest < ActionController::TestCase
     project = project_admin.projects.first
     login_as(project_admin)
 
-    put :update, params: { id: project.id, project: { edam_topics: 'Chemistry, Sample collections' } }
+    put :update, params: { id: project.id, project: { topic_annotations: 'Chemistry, Sample collections' } }
 
-    assert_equal ['http://edamontology.org/topic_3314','http://edamontology.org/topic_3277'], assigns(:project).edam_topics
+    assert_equal ['http://edamontology.org/topic_3314','http://edamontology.org/topic_3277'], assigns(:project).topic_annotations
 
   end
 
@@ -3319,7 +3319,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'div.panel div.panel-heading',text:/EDAM Properties/i, count:0
 
-    project.edam_topics = "Chemistry"
+    project.topic_annotations = "Chemistry"
     project.save!
 
     assert project.ontology_annotations?

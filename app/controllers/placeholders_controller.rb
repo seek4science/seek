@@ -104,8 +104,7 @@ class PlaceholdersController < ApplicationController
                                 { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                 { creator_ids: [] }, { assay_assets_attributes: [:assay_id] },
                                 :file_template_id,
-                                :edam_formats,
-                                :edam_data,
+                                :format_annotations, :data_annotations,
                                 :data_file_id,
                                 discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
