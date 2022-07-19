@@ -470,9 +470,9 @@ class DataFileTest < ActiveSupport::TestCase
     assert data_file.supports_ontology_annotations?(:formats)
     assert data_file.supports_ontology_annotations?(:data)
 
-    refute data_file.respond_to?(:edam_topics)
-    refute data_file.respond_to?(:edam_operations)
-    assert data_file.respond_to?(:edam_formats)
-    assert data_file.respond_to?(:edam_data)
+    refute data_file.respond_to?(:topic_annotations)
+    refute data_file.respond_to?(:operation_annotations)
+    assert data_file.respond_to?(:format_annotations)
+    assert data_file.respond_to?(:data_annotations)
   end
 end
