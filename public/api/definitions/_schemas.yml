@@ -437,6 +437,59 @@ contributedTypeAttributes:
     - updated_at
     - content_blobs
   additionalProperties: false
+annotatedContributedTypeAttributes:
+  type: object
+  properties:
+    tags:
+      $ref: "#/components/schemas/tags"
+    title:
+      $ref: "#/components/schemas/nonEmptyString"
+    description:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    license:
+      $ref: "#/components/schemas/nullableLicense"
+    latest_version:
+      type: number
+    versions:
+      type: array
+      minItems: 1
+      uniqueItems: true
+      items:
+        $ref: "#/components/schemas/version"
+    version:
+      type: number
+    revision_comments:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    doi:
+      $ref: "#/components/schemas/nullableNonEmptyString"
+    created_at:
+      $ref: "#/components/schemas/dateTimeString"
+    updated_at:
+      $ref: "#/components/schemas/dateTimeString"
+    content_blobs:
+      $ref: "#/components/schemas/contentBlobsList"
+    policy:
+      $ref: "#/components/schemas/policy"
+    other_creators:
+      $ref: "#/components/schemas/nullableOtherCreatorsString"
+    creators:
+      $ref: "#/components/schemas/assetsCreatorsList"
+    data_annotations:
+      $ref: "#/components/schemas/ontologyTermsList"
+    format_annotations:
+      $ref: "#/components/schemas/ontologyTermsList"
+    discussion_links:
+      $ref: "#/components/schemas/assetLinkList"
+  required:
+    - title
+    - license
+    - latest_version
+    - versions
+    - version
+    - created_at
+    - updated_at
+    - content_blobs
+  additionalProperties: false
 collectionAttributes:
   type: object
   properties:
@@ -547,6 +600,10 @@ placeholderAttributes:
       $ref: "#/components/schemas/nullableOtherCreatorsString"
     creators:
       $ref: "#/components/schemas/assetsCreatorsList"
+    data_annotations:
+      $ref: "#/components/schemas/ontologyTermsList"
+    format_annotations:
+      $ref: "#/components/schemas/ontologyTermsList"
     discussion_links:
       $ref: "#/components/schemas/assetLinkList"
   required:
@@ -1444,6 +1501,10 @@ dataFilePost:
               $ref: "#/components/schemas/nullableOtherCreatorsString"
             creators:
               $ref: "#/components/schemas/assetsCreatorsList"
+            data_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
+            format_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
           required:
@@ -1505,6 +1566,10 @@ dataFilePatch:
               $ref: "#/components/schemas/nullableOtherCreatorsString"
             creators:
               $ref: "#/components/schemas/assetsCreatorsList"
+            data_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
+            format_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
           additionalProperties: false
@@ -1778,6 +1843,10 @@ fileTemplatePost:
               $ref: "#/components/schemas/nullableOtherCreatorsString"
             creators:
               $ref: "#/components/schemas/assetsCreatorsList"
+            data_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
+            format_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
           required:
@@ -1831,6 +1900,10 @@ fileTemplatePatch:
               $ref: "#/components/schemas/nullableOtherCreatorsString"
             creators:
               $ref: "#/components/schemas/assetsCreatorsList"
+            data_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
+            format_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
           additionalProperties: false
@@ -2165,6 +2238,10 @@ placeholderPost:
               $ref: "#/components/schemas/nullableOtherCreatorsString"
             creators:
               $ref: "#/components/schemas/assetsCreatorsList"
+            data_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
+            format_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
           additionalProperties: false
@@ -2215,6 +2292,10 @@ placeholderPatch:
               $ref: "#/components/schemas/nullableOtherCreatorsString"
             creators:
               $ref: "#/components/schemas/assetsCreatorsList"
+            data_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
+            format_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
           additionalProperties: false
@@ -3614,7 +3695,7 @@ dataFileResponse:
         type:
           $ref: "#/components/schemas/dataFileType"
         attributes:
-          $ref: "#/components/schemas/contributedTypeAttributes"
+          $ref: "#/components/schemas/annotatedContributedTypeAttributes"
         relationships:
           type: object
           properties:
@@ -3821,7 +3902,7 @@ fileTemplateResponse:
         type:
           $ref: "#/components/schemas/fileTemplateType"
         attributes:
-          $ref: "#/components/schemas/contributedTypeAttributes"
+          $ref: "#/components/schemas/annotatedContributedTypeAttributes"
         relationships:
           type: object
           properties:
