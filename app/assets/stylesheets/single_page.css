@@ -536,3 +536,11 @@
 td.highlight {
 	background-color: #eef6ff !important;
 }
+
+.sp-variant-0 {
+	box-shadow: inset 0px 2px #fff200
+}
+
+.sp-variant-1 {
+	box-shadow: inset 0px 2px #8000ff
+}

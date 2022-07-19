@@ -1,5 +1,6 @@
 <% environment.context_class.instance_eval { include Seek::Util.routes } %>
 const instanceName = '<%= Seek::Config.instance_name %>'
+const colorSet = ["#001f3f", "#7FDBFF", "#39CCCC", "#B10DC9", "#F012BE", "#85144b", "#FF851B", "#3D9970", "#01FF70", "#FFDC00"]
 
 const rowStatus = { new: "new", delete: "delete", update: "update", empty: "empty", noAction: "" };
 const dtErrClass = "row-error",
@@ -106,11 +107,24 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
         });
       }
       if (options.assayId) this.assayId = options.assayId;
-      this.initHeader(columns);
       this.options = options;
+			this.initHeader(columns);
     },
     initHeader: function (columns) {
       const requiredCols = columns.map((c, i) => c.required && i).filter((c) => c);
+			if (this.options.readonly){
+				const sampleTypes = this.getSampleTypes()
+				$j.each(sampleTypes, (i, s) => {
+					if (!isNaN(s)){
+						const colIdxs = this.table.columns(`${s}:name`)[0]
+						if (colIdxs.length) colIdxs.push(colIdxs[0]-1)
+						this.table.column(function ( idx, data, node ) {
+								if (colIdxs.includes(idx)) $j(node).addClass(`sp-variant-${s % 2}`)
+						})
+					}
+					
+				})
+			}
       this.table
         .columns()
         .header()
