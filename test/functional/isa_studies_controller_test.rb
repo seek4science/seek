@@ -65,9 +65,6 @@ class IsaStudiesControllerTest < ActionController::TestCase
     title = sample_types[0].sample_attributes.detect(&:is_title).title
     sample_multi = sample_types[1].sample_attributes.detect(&:seek_sample_multi?)
 
-    p SampleType.all.map(&:title)
-    p SampleType.last(2).map(&:title)
-
     assert_equal "Input (#{title})", sample_multi.title
   end
 end
