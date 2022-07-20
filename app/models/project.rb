@@ -73,7 +73,7 @@ class Project < ApplicationRecord
   #  is to be used)
   belongs_to :default_policy, class_name: 'Policy', dependent: :destroy, autosave: true
 
-  has_edam_annotations :topics
+  has_ontology_annotations :topics
 
   # FIXME: temporary handler, projects need to support multiple programmes
   def programmes

@@ -3308,7 +3308,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
   end
 
-  test 'show edam topics if set' do
+  test 'show annotated topics if set' do
     Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
 
     user = Factory(:user)
@@ -3317,7 +3317,7 @@ class ProjectsControllerTest < ActionController::TestCase
 
     get :show, params: {id: project.id}
     assert_response :success
-    assert_select 'div.panel div.panel-heading',text:/EDAM Properties/i, count:0
+    assert_select 'div.panel div.panel-heading',text:/Annotated Properties/i, count:0
 
     project.topic_annotations = "Chemistry"
     project.save!
@@ -3327,7 +3327,7 @@ class ProjectsControllerTest < ActionController::TestCase
     get :show, params: {id: project.id}
     assert_response :success
 
-    assert_select 'div.panel div.panel-heading',text:/EDAM Properties/i, count:1
+    assert_select 'div.panel div.panel-heading',text:/Annotated Properties/i, count:1
     assert_select 'div.panel div.panel-body div strong',text:/Topics/, count:1
     assert_select 'div.panel div.panel-body a[href=?]','https://edamontology.github.io/edam-browser/#topic_3314',text:/Chemistry/, count:1
   end

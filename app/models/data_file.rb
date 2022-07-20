@@ -9,7 +9,7 @@ class DataFile < ApplicationRecord
 
   acts_as_doi_parent(child_accessor: :versions)
 
-  has_edam_annotations :data, :formats
+  has_ontology_annotations :data, :formats
 
   validates :projects, presence: true, projects: { self: true }
 

@@ -10,14 +10,14 @@ namespace :seek do
     environment
     db:seed:007_sample_attribute_types
     db:seed:010_workflow_classes
-    db:seed:011_edam_topics
-    db:seed:012_edam_operations
+    db:seed:011_topics_controlled_vocab
+    db:seed:012_operations_controlled_vocab
     db:seed:013_workflow_data_file_relationships
     rename_branding_settings
     update_missing_openbis_istest
     update_missing_publication_versions
-    db:seed:013_edam_formats
-    db:seed:014_edam_data
+    db:seed:013_formats_controlled_vocab
+    db:seed:014_data_controlled_vocab
     db:seed:015_isa_tags
     remove_orphaned_versions
     create_seek_sample_multi
