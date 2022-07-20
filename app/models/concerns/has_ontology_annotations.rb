@@ -1,4 +1,4 @@
-# To support linking a model to the EDAM ontology, and for each branch of Topics, Operations, Formats and Data
+# To support linking a model to an ontology based controlled vocabulary, currently for Topics, Operations, Format types and Data types
 module HasOntologyAnnotations
   extend ActiveSupport::Concern
 
@@ -23,7 +23,7 @@ module HasOntologyAnnotations
   class_methods do
     attr_reader :supported_ontology_properties
 
-    def has_edam_annotations(*properties)
+    def has_ontology_annotations(*properties)
       include InstanceMethods
 
       @supported_ontology_properties = Array(properties) & %i[topics operations data formats]

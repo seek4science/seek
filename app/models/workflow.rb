@@ -13,7 +13,7 @@ class Workflow < ApplicationRecord
 
   acts_as_doi_parent(child_accessor: :versions)
 
-  has_edam_annotations :topics, :operations
+  has_ontology_annotations :topics, :operations
 
   validates :projects, presence: true, projects: { self: true }
 

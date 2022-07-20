@@ -1131,7 +1131,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
   end
 
-  test 'should update workflow edam annotations ' do
+  test 'should update workflow annotations ' do
     Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
     Factory(:operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.operations_controlled_vocab
 
@@ -1149,7 +1149,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
   end
 
-  test 'show edam annotations if set' do
+  test 'show annotations if set' do
     Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
     Factory(:operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.operations_controlled_vocab
 
@@ -1159,7 +1159,7 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     get :show, params: {id: workflow.id}
     assert_response :success
-    assert_select 'div.panel div.panel-heading',text:/EDAM Properties/i, count:0
+    assert_select 'div.panel div.panel-heading',text:/Annotated Properties/i, count:0
 
     workflow.topic_annotations = "Chemistry"
     workflow.save!
@@ -1169,7 +1169,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     get :show, params: {id: workflow.id}
     assert_response :success
 
-    assert_select 'div.panel div.panel-heading',text:/EDAM Properties/i, count:1
+    assert_select 'div.panel div.panel-heading',text:/Annotated Properties/i, count:1
     assert_select 'div.panel div.panel-body div strong',text:/Topics/, count:1
     assert_select 'div.panel div.panel-body a[href=?]','https://edamontology.github.io/edam-browser/#topic_3314',text:/Chemistry/, count:1
   end

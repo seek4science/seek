@@ -48,7 +48,7 @@ module ResourceListHelper
       else
         Array(column_value).collect do |value|
           if value.is_a?(SampleControlledVocabTerm)
-            edam_ontology_items(value)
+            ontology_annotation_items(value)
           elsif value.is_a?(ApplicationRecord)
             link_to value.title, value
           else
