@@ -23,7 +23,7 @@
 					<%= render :partial=>"isa_studies/source_material", locals: { study: study} -%>
 			</div>
 			<div id="sample_collection" class="tab-pane fade">
-					<%= render :partial=>"isa_studies/sop", locals: { study: study} -%>
+					<%= render :partial=>"isa_studies/sop", locals: { sop: study ? study.sop : nil} -%>
 			</div>
 			<div id="study_samples" class="tab-pane fade">
 					<%= render :partial=>"isa_studies/study_samples", locals: { study: study} -%>

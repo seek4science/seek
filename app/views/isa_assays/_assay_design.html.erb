@@ -18,7 +18,7 @@
 
 	<div class="tab-content">
 			<div id="sample_collection" class="tab-pane fade active in">
-					<%= render :partial=>"isa_assays/sop", locals: { assay: assay} -%>
+					<%= render :partial=>"isa_studies/sop", locals: { sop: assay ? assay.sops&.first : nil} -%>
 			</div>
 			<div id="assay_samples" class="tab-pane fade">
 					<%= render :partial=>"isa_assays/assay_samples", locals: { assay: assay} -%>

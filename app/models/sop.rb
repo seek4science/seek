@@ -46,4 +46,12 @@ class Sop < ApplicationRecord
   def use_mime_type_for_avatar?
     true
   end
+
+	def can_delete?(arg=nil)
+		if Seek::Config.project_single_page_advanced_enabled
+			super(arg) && Study.where(sop: self).blank?
+		else
+			super(arg)
+		end
+	end
 end

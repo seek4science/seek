@@ -76,7 +76,7 @@ module IsaExporter
 			with_tag_parameter_value_study =
 				study.sample_types.second.sample_attributes.select { |sa| sa.isa_tag&.isa_parameter_value? }
 			raise "Protocol ISA tag not found in study #{study.id}" if with_tag_protocol_study.blank?
-
+			raise "The Study with the title '#{study.title}' does not have an SOP" if study.sop.blank?
 			protocols << convert_protocol(study.sop, study.id, with_tag_protocol_study, with_tag_parameter_value_study)
 
 			study.assays.each do |a|
@@ -85,6 +85,7 @@ module IsaExporter
 				with_tag_parameter_value = a.sample_type.sample_attributes.select { |sa| sa.isa_tag&.isa_parameter_value? }
 				raise "Protocol ISA tag not found in assay #{a.id}" if with_tag_protocol.blank?
 
+				raise "The Study with the title '#{study.title}' does not have an SOP" if a.sops.balnk?
 				protocols << convert_protocol(a.sops.first, a.id, with_tag_protocol, with_tag_parameter_value)
 			end
 			isa_study[:protocols] = protocols
