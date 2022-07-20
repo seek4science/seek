@@ -28,6 +28,7 @@ namespace :seek do
     remove_spreadsheet_annotations
     strip_site_base_host_path
     convert_roles
+    update_edam_annotation_attributes
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -268,6 +269,22 @@ namespace :seek do
                        scope_type: 'Programme', scope_id: role.programme_id).first_or_create!
           end
         end
+      end
+    end
+  end
+
+  task(update_edam_annotation_attributes: [:environment]) do
+    defs = {
+      "edam_formats": "format_annotations",
+      "edam_topics": "topic_annotations",
+      "edam_operations": "operation_annotations",
+      "edam_data": "data_annotations"
+    }
+    defs.each do |old_name,new_name|
+      query = AnnotationAttribute.where(name: old_name)
+      if (count = query.count) > 0
+        puts "Updating #{count} EDAM based #{old_name} Annotation Attributes"
+        query.update_all(name: new_name)
       end
     end
   end
