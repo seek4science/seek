@@ -15,7 +15,7 @@
         <%= f.text_area :description, :class=>"form-control rich-text-edit", :rows => 5 -%>
       </div>
 
-      <%= render partial: 'assets/edam_form_properties', :locals => { :resource => (@file_template ? @file_template : FileTemplate.new) } -%>
+      <%= render partial: 'assets/ontology_annotations_form_properties', :locals => { :resource => (@file_template ? @file_template : FileTemplate.new) } -%>
 
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @file_template } %>
 

@@ -13,7 +13,7 @@
       :templates => authorised_assets(FileTemplate, nil, 'edit') } %>
       
     <% end %>
-      <%= render partial: 'assets/edam_form_properties', :locals => { :resource => @data_file } -%>
+      <%= render partial: 'assets/ontology_annotations_form_properties', :locals => { :resource => @data_file } -%>
 
     <%= cancel_button(data_files_path) -%>
     <div class='multi-step-buttons'>

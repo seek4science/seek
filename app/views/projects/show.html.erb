@@ -110,7 +110,7 @@
         <% end -%>
 
         <% if @project.ontology_annotations? %>
-          <%= render partial:'assets/edam_properties_box', :locals => { :resource => @project } %>
+          <%= render partial:'assets/ontology_annotations_properties_box', :locals => { :resource => @project } %>
         <% end %>
 
         <% if @project.can_manage? %>
