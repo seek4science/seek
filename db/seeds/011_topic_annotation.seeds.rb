@@ -1,9 +1,9 @@
-unless SampleControlledVocab.find_by_key(SampleControlledVocab::SystemVocabs::KEYS[:edam_formats])
-  puts "Seeding EDAM Formats ontology ..."
-  json = File.read(File.join(Rails.root, "config/default_data", "edam-formats-controlled-vocab.json"))
+unless SampleControlledVocab.find_by_key(SampleControlledVocab::SystemVocabs::KEYS[:edam_topics])
+  puts "Seeding EDAM Topics ontology ..."
+  json = File.read(File.join(Rails.root, "config/default_data", "topics-annotations-controlled-vocab.json"))
   data = JSON.parse(json).with_indifferent_access
   vocab = SampleControlledVocab.new(title: data[:title],
-                                    key: SampleControlledVocab::SystemVocabs::KEYS[:formats],
+                                    key: SampleControlledVocab::SystemVocabs::KEYS[:topics],
                                     description: data[:description],
                                     source_ontology: data[:source_ontology],
                                     ols_root_term_uri: data[:ols_root_term_uri])
@@ -17,5 +17,5 @@ unless SampleControlledVocab.find_by_key(SampleControlledVocab::SystemVocabs::KE
 
   puts "... Done"
 else
-  puts "EDAM Formats already exists"
+  puts "EDAM Topics already exists"
 end
