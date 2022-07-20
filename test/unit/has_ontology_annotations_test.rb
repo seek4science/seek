@@ -13,7 +13,7 @@ class HasOntologyAnnotationsTest < ActiveSupport::TestCase
     User.current_user = nil
   end
 
-  test 'supports edam annotations' do
+  test 'supports ontology annotations' do
     assert @workflow.supports_ontology_annotations?
     refute Factory(:institution).supports_ontology_annotations?
   end
@@ -65,7 +65,7 @@ class HasOntologyAnnotationsTest < ActiveSupport::TestCase
     assert @workflow.ontology_annotations?
   end
 
-  test 'edam vocab present' do
+  test 'ontology annotation vocab present' do
     refute @workflow.send(:ontology_annotation_vocab, :topics)
     refute @workflow.send(:ontology_annotation_vocab, :operations)
 

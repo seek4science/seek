@@ -11,14 +11,6 @@ class Placeholder < ApplicationRecord
   belongs_to :project
   belongs_to :file_template
   belongs_to :data_file
-
-  def edam_topics_vocab
-    nil
-  end
-  
-  def edam_operations_vocab
-    nil
-  end
   
   def avatar_key
     :programme

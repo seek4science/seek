@@ -461,7 +461,7 @@ class DataFileTest < ActiveSupport::TestCase
     end
   end
 
-  test 'edam annotation properties'do
+  test 'ontology cv annotation properties'do
     data_file = Factory(:data_file)
 
     assert data_file.supports_ontology_annotations?
