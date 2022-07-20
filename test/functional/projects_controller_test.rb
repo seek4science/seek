@@ -3295,7 +3295,7 @@ class ProjectsControllerTest < ActionController::TestCase
                   order_investigations_project_path(project), count: 0
   end
 
-  test 'should update project edam topics' do
+  test 'should update project annotated topics' do
     Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
 
     project_admin = Factory(:project_administrator)

@@ -1,4 +1,4 @@
-unless SampleControlledVocab.find_by_key(SampleControlledVocab::SystemVocabs::KEYS[:edam_topics])
+unless SampleControlledVocab.find_by_key(SampleControlledVocab::SystemVocabs::KEYS[:topics])
   puts "Seeding EDAM Topics ontology ..."
   json = File.read(File.join(Rails.root, "config/default_data", "topics-annotations-controlled-vocab.json"))
   data = JSON.parse(json).with_indifferent_access
