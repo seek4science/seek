@@ -1,5 +1,5 @@
 unless SampleControlledVocab.find_by_key(SampleControlledVocab::SystemVocabs::KEYS[:topics])
-  puts "Seeding EDAM Topics ontology ..."
+  puts "Seeding Topics controlled vocabulary ..."
   json = File.read(File.join(Rails.root, "config/default_data", "topics-annotations-controlled-vocab.json"))
   data = JSON.parse(json).with_indifferent_access
   vocab = SampleControlledVocab.new(title: data[:title],
@@ -17,5 +17,5 @@ unless SampleControlledVocab.find_by_key(SampleControlledVocab::SystemVocabs::KE
 
   puts "... Done"
 else
-  puts "EDAM Topics already exists"
+  puts "Topics controlled vocabulary already exists"
 end

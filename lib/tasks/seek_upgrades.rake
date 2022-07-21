@@ -10,12 +10,13 @@ namespace :seek do
     environment
     db:seed:007_sample_attribute_types
     db:seed:010_workflow_classes
-    db:seed:011_topics_controlled_vocab
-    db:seed:012_operations_controlled_vocab
     db:seed:013_workflow_data_file_relationships
     rename_branding_settings
     update_missing_openbis_istest
     update_missing_publication_versions
+    update_edam_controlled_vocab_keys
+    db:seed:011_topics_controlled_vocab
+    db:seed:012_operations_controlled_vocab
     db:seed:013_formats_controlled_vocab
     db:seed:014_data_controlled_vocab
     db:seed:015_isa_tags
@@ -282,10 +283,30 @@ namespace :seek do
     }
     defs.each do |old_name,new_name|
       query = AnnotationAttribute.where(name: old_name)
-      if (count = query.count) > 0
-        puts "Updating #{count} EDAM based #{old_name} Annotation Attributes"
+      if query.any?
+        puts "Updating EDAM based #{old_name} Annotation Attributes"
         query.update_all(name: new_name)
       end
     end
   end
+
+
+  task(update_edam_controlled_vocab_keys: [:environment]) do
+    defs = {
+      topics: 'edam_topics',
+      operations: 'edam_operations',
+      formats: 'edam_formats',
+      data: 'edam_data'
+    }
+
+    defs.each do |key, old_name|
+      new_name = SampleControlledVocab::SystemVocabs::KEYS[key]
+      query = SampleControlledVocab.where(key: old_name)
+      if query.any?
+        puts "Updating key for #{old_name} controlled vocabulary"
+        query.update_all(key: new_name)
+      end
+    end
+  end
+
 end
