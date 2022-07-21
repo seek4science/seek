@@ -1,13 +1,14 @@
 <%
   return unless resource.supports_ontology_annotations?(property)
-  annotations_accessor = "#{property.to_s.singularize}_annotations"
+  annotations_accessor = "#{property.to_s.singularize}_annotation_values"
   return unless resource.send("#{annotations_accessor}").any?
-  values = resource.send("#{annotations_accessor.singularize()}_values")
+  values = resource.send(annotations_accessor)
+  title = resource.class.human_attribute_name(annotations_accessor)
   %>
 
 
 <div>
-  <strong><%= "#{property.capitalize}" %></strong>
+  <strong><%= title %></strong>
 </div>
 <div>
   <%= ontology_annotation_items(values) %>

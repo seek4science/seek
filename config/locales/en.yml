@@ -142,10 +142,10 @@ en:
     ro_crate: RO-Crate
     abstract_cwl: "Abstract CWL"
     doi: DOI
-    data_annotation_values: 'Annotated data types'
-    format_annotation_values: 'Annotated format types'
-    topic_annotation_values: 'Annotated topics'
-    operation_annotation_values: 'Annotated operations'
+    data_annotation_values: 'Data type annotations'
+    format_annotation_values: 'Data format annotations'
+    topic_annotation_values: 'Topic annotations'
+    operation_annotation_values: 'Operation annotations'
     contributor: 'Submitter'
 
   activerecord:

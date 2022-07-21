@@ -1,14 +1,16 @@
 <%
   return unless resource.supports_ontology_annotations?(property)
-  annotations_accessor = "#{property.to_s.singularize}_annotations"
+  param_key = "#{property.to_s.singularize}_annotations"
+  annotations_accessor = "#{property.to_s.singularize}_annotation_values"
   vocab = resource.send("ontology_annotation_vocab",property)
   return unless vocab
-  values = resource.send("#{annotations_accessor.singularize()}_labels")
+  values = resource.send(annotations_accessor).pluck(:label)
+  title = resource.class.human_attribute_name(annotations_accessor)
   %>
 
 <% if vocab %>
   <div class="form-group">
-    <label><%= "Annotated #{property.capitalize()}" -%></label>
-    <%= controlled_vocab_form_field(vocab, "#{resource.class.model_name.singular}[#{annotations_accessor}]", values, 10 ) -%>
+    <label><%= title -%></label>
+    <%= controlled_vocab_form_field(vocab, "#{resource.class.model_name.singular}[#{param_key}]", values, 10 ) -%>
   </div>
 <% end %>

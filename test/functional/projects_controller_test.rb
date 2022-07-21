@@ -3328,7 +3328,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :success
 
     assert_select 'div.panel div.panel-heading',text:/Annotated Properties/i, count:1
-    assert_select 'div.panel div.panel-body div strong',text:/Topics/, count:1
+    assert_select 'div.panel div.panel-body div strong',text:/#{I18n.t('attributes.topic_annotation_values')}/, count:1
     assert_select 'div.panel div.panel-body a[href=?]','https://edamontology.github.io/edam-browser/#topic_3314',text:/Chemistry/, count:1
   end
 

@@ -71,7 +71,9 @@ module HasOntologyAnnotations
 
     def define_ontology_annotation_index_filters(property)
       # INDEX filters. Unfortunately, these won't currently consider the hierarchy
-      has_filter "#{property.to_s.singularize}_annotation": Seek::Filtering::Filter.new(
+
+      # key needs to match attribute defined in en.yml
+      has_filter "attributes.#{property.to_s.singularize}_annotation_values": Seek::Filtering::Filter.new(
         value_field: 'sample_controlled_vocab_terms.label',
         joins: ["#{property.to_s.singularize}_annotation_values".to_sym]
       )
