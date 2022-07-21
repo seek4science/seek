@@ -54,7 +54,7 @@ module ResourceListHelper
           else
             text_or_not_specified(value, length: 300, auto_link: true, none_text: '')
           end
-        end.join(',').html_safe
+        end.join(', ').html_safe
       end
     end
   end
