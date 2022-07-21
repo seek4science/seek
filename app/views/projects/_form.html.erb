@@ -12,6 +12,10 @@
   <%= f.text_area :description, :rows => 5, :class=>"form-control rich-text-edit" -%>
 </div>
 
+<%= render partial: 'custom_metadata/custom_metadata_type_selection', locals:{f:f, resource:@project} %>
+
+<%= render partial: 'custom_metadata/custom_metadata_attribute_input', locals:{f:f,resource:@project} %>
+
 <%= render partial: 'assets/edam_form_properties', locals: { resource: @project } %>
 
 <div class="form-group">

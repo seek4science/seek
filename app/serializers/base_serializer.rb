@@ -17,6 +17,10 @@ class BaseSerializer < SimpleBaseSerializer
     end
   end
 
+  attribute :custom_metadata, if: -> { object.respond_to?(:custom_metadata) } do
+    object.custom_metadata.data.to_hash
+  end
+  
   def policy
     BaseSerializer.convert_policy object.policy
   end

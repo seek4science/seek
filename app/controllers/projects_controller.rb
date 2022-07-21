@@ -669,7 +669,8 @@ class ProjectsController < ApplicationController
     permitted_params = [:title, :web_page, :wiki_page, :description, { organism_ids: [] }, :parent_id, :start_date,
                         :end_date,
                         :funding_codes, { human_disease_ids: [] }, :edam_topics,
-                        discussion_links_attributes:[:id, :url, :label, :_destroy]]
+                        discussion_links_attributes:[:id, :url, :label, :_destroy],
+                       custom_metadata_attributes: determine_custom_metadata_keys ]
 
     if User.admin_logged_in?
       permitted_params += [:site_root_uri, :site_username, :site_password, :nels_enabled]
