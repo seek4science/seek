@@ -66,12 +66,11 @@ class SampleControlledVocab < ApplicationRecord
   end
 
   class SystemVocabs
-
     KEYS = {
-      topics: 'edam_topics',
-      operations: 'edam_operations',
-      formats: 'edam_formats',
-      data: 'edam_data'
+      topics: 'topic_annotations',
+      operations: 'operation_annotations',
+      formats: 'data_format_annotations',
+      data: 'data_type_annotations'
     }
 
     def self.key_known?(key)
@@ -83,7 +82,6 @@ class SampleControlledVocab < ApplicationRecord
         SampleControlledVocab.find_by_key(v)
       end
     end
-
   end
   
 end
