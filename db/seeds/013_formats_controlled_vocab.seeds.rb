@@ -1,7 +1,8 @@
-unless SampleControlledVocab.find_by_key(SampleControlledVocab::SystemVocabs::KEYS[:formats])
+json = File.read(File.join(Rails.root, "config/default_data", "format-annotations-controlled-vocab.json"))
+data = JSON.parse(json).with_indifferent_access
+
+unless vocab = SampleControlledVocab.find_by_key(SampleControlledVocab::SystemVocabs::KEYS[:formats])
   puts "Seeding Format controlled vocabulary ..."
-  json = File.read(File.join(Rails.root, "config/default_data", "format-annotations-controlled-vocab.json"))
-  data = JSON.parse(json).with_indifferent_access
   vocab = SampleControlledVocab.new(title: data[:title],
                                     key: SampleControlledVocab::SystemVocabs::KEYS[:formats],
                                     description: data[:description],
@@ -17,5 +18,8 @@ unless SampleControlledVocab.find_by_key(SampleControlledVocab::SystemVocabs::KE
 
   puts "... Done"
 else
-  puts "Formats controlled vocabulary already exists"
+  puts "Formats controlled vocabulary already exists, updating its metadata"
+  disable_authorization_checks do
+    vocab.update(data.except(:terms))
+  end
 end
