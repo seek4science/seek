@@ -87,6 +87,7 @@ class DataFilesController < ApplicationController
       update_annotations(params[:tag_list], @data_file)
       update_relationships(@data_file, params)
       update_template() if params.key?(:file_template_id)
+      update_placeholder() if params.key?(:placeholder_id)
 
       if @data_file.save
         if !@data_file.parent_name.blank?
@@ -114,6 +115,7 @@ class DataFilesController < ApplicationController
     update_sharing_policies @data_file
     update_relationships(@data_file, params)
     update_template() if params.key?(:file_template_id)
+    update_placeholder() if params.key?(:placeholder_id)
 
     respond_to do |format|
       if @data_file.update(data_file_params)
@@ -134,6 +136,16 @@ class DataFilesController < ApplicationController
     else
       @data_file.file_template_id = params[:file_template_id]
       ft = FileTemplate.find(params[:file_template_id])
+    end
+  end
+  
+  def update_placeholder
+    if (params[:placeholder_id].empty?)
+      @data_file.placeholder_id = nil
+      ph = nil
+    else
+      @data_file.placeholder_id = params[:placeholder_id]
+      ph = Placeholder.find(params[:placeholder_id])
     end
   end
   
@@ -411,6 +423,7 @@ class DataFilesController < ApplicationController
     all_valid = all_valid && !@create_new_assay || (@assay.study.try(:can_edit?) && @assay.save)
 
     update_template() if params.key?(:file_template_id)
+    update_placeholder() if params.key?(:placeholder_id)
 
     # check the datafile can be saved, and also the content blob can be saved
     all_valid = all_valid && @data_file.save && blob.save
@@ -497,6 +510,7 @@ class DataFilesController < ApplicationController
                                       { assay_assets_attributes: [:assay_id, :relationship_type_id] },
                                       { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
                                       :file_template_id,
+                                      :placeholder_id,
                                       :edam_formats,
                                       :edam_data,
                                       { publication_ids: [] }, { workflow_ids: [] },
