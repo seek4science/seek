@@ -80,6 +80,7 @@ class DataFilesController < ApplicationController
       update_annotations(params[:tag_list], @data_file)
       update_relationships(@data_file, params)
       update_template() if params.key?(:file_template_id)
+      update_placeholder() if params.key?(:placeholder_id)
 
       if @data_file.save
         if !@data_file.parent_name.blank?
@@ -107,6 +108,7 @@ class DataFilesController < ApplicationController
     update_sharing_policies @data_file
     update_relationships(@data_file, params)
     update_template() if params.key?(:file_template_id)
+    update_placeholder() if params.key?(:placeholder_id)
 
     respond_to do |format|
       if @data_file.update(data_file_params)
@@ -127,6 +129,45 @@ class DataFilesController < ApplicationController
     else
       @data_file.file_template_id = params[:file_template_id]
       ft = FileTemplate.find(params[:file_template_id])
+    end
+  end
+
+  def update_placeholder
+    if (params[:placeholder_id].empty?)
+      @data_file.placeholder_id = nil
+      ph = nil
+    else
+      @data_file.placeholder_id = params[:placeholder_id]
+      ph = Placeholder.find(params[:placeholder_id])
+    end
+  end
+
+  def explore
+    #drop invalid explore params
+    [:page_rows, :page, :sheet].each do |param|
+      if params[param].present? && (params[param] =~ /\A\d+\Z/).nil?
+        params.delete(param)
+      end
+    end
+    if @display_data_file.contains_extractable_spreadsheet?
+      begin
+        @workbook = Rails.cache.fetch("spreadsheet-workbook-#{@display_data_file.content_blob.cache_key}") do
+          @display_data_file.spreadsheet
+        end
+        respond_to do |format|
+          format.html
+        end
+      rescue SysMODB::SpreadsheetExtractionException
+        respond_to do |format|
+          flash[:error] = "There was an error when processing the #{t('data_file')} to explore, perhaps it isn't a valid Excel spreadsheet"
+          format.html { redirect_to data_file_path(@data_file, version: @display_data_file.version) }
+        end
+      end
+    else
+      respond_to do |format|
+        flash[:error] = "Unable to explore contents of this #{t('data_file')}"
+        format.html { redirect_to data_file_path(@data_file, version: @display_data_file.version) }
+      end
     end
   end
 
@@ -375,14 +416,15 @@ class DataFilesController < ApplicationController
     all_valid = all_valid && !@create_new_assay || (@assay.study.try(:can_edit?) && @assay.save)
 
     update_template() if params.key?(:file_template_id)
+    update_placeholder() if params.key?(:placeholder_id)
 
     # check the datafile can be saved, and also the content blob can be saved
     all_valid = all_valid && @data_file.save && blob.save
 
     if all_valid
 
-      update_relationships(@data_file, params)      
-      
+      update_relationships(@data_file, params)
+
 
       respond_to do |format|
         flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
@@ -390,8 +432,8 @@ class DataFilesController < ApplicationController
 
         # the assay_id param can also contain the relationship type
         @data_file.assays << @assay if @create_new_assay
-        format.html { redirect_to params[:single_page] ? 
-          { controller: :single_pages, action: :show, id: params[:single_page] } 
+        format.html { redirect_to params[:single_page] ?
+          { controller: :single_pages, action: :show, id: params[:single_page] }
           : data_file_path(@data_file) }
         format.json { render json: @data_file, include: [params[:include]] }
       end
@@ -473,7 +515,7 @@ class DataFilesController < ApplicationController
                                       { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                       { assay_assets_attributes: [:assay_id, :relationship_type_id] },
                                       { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
-                                      :file_template_id,
+                                      :file_template_id, :placeholder_id,
                                       { data_format_annotations: [] }, { data_type_annotations: [] },
                                       { publication_ids: [] }, { workflow_ids: [] },
                                       { extended_metadata_attributes: determine_extended_metadata_keys },

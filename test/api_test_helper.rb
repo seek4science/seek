@@ -52,6 +52,7 @@ module ApiTestHelper
 
     # debug note: responds with redirect 302 if not really logged in.. could happen if database resets and has no users
     assert_difference(-> { model.count }, 1) do
+      puts template
       post collection_url, params: template, as: :json
       assert_response :success
     end
@@ -66,7 +67,7 @@ module ApiTestHelper
     expected['data']['relationships'] ||= {}
     expected['data']['relationships'].merge!(populate_extra_relationships(template))
 
-    if DEBUG
+    if true
       puts "Expected:\n #{expected.inspect}\n"
       puts "Actual:\n #{actual.inspect}"
     end

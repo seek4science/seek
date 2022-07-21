@@ -17,6 +17,8 @@ class DataFileApiTest < ActionDispatch::IntegrationTest
     @event = FactoryBot.create(:event, projects: [@project], policy: FactoryBot.create(:public_policy))
     @data_file = FactoryBot.create(:data_file, policy: FactoryBot.create(:public_policy), contributor: current_person, creators: [@creator])
     @workflow = FactoryBot.create(:workflow, projects: [@project], policy: FactoryBot.create(:public_policy))
+    @file_template = FactoryBot.create(:public_file_template, projects: [@project])
+    @placeholder = FactoryBot.create(:public_placeholder, projects: [@project])
   end
 
   test 'can add content to API-created data file' do
