@@ -16,8 +16,10 @@ class TreeviewBuilder
 
         study.assays.each do |assay|
           samples = assay.assets.select { |a| a.instance_of?(Sample) }
-          if Seek::Config.project_single_page_advanced_enabled
-            assay_assets.push(create_sample_node(assay.sample_type)) if assay.sample_type.samples.length.positive?
+          if sp_advanced
+            if assay.sample_type && assay.sample_type.samples.length.positive?
+              assay_assets.push(create_sample_node(assay.sample_type))
+            end
           else
             assay_assets.push(create_node({ text: 'samples', _type: 'sample', resource: Sample.new,
                                             count: samples.length }))
