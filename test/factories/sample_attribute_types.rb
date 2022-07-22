@@ -147,10 +147,10 @@ Factory.define(:operations_controlled_vocab, parent: :sample_controlled_vocab) d
   end
 end
 
-Factory.define(:data_controlled_vocab, parent: :sample_controlled_vocab) do |f|
+Factory.define(:data_types_controlled_vocab, parent: :sample_controlled_vocab) do |f|
   f.title 'Data'
   f.ols_root_term_uri 'http://edamontology.org/data_0006'
-  f.key SampleControlledVocab::SystemVocabs::KEYS[:data]
+  f.key SampleControlledVocab::SystemVocabs::KEYS[:data_types]
   f.source_ontology 'edam'
   f.after_build do |vocab|
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Data',iri:'http://edamontology.org/data_0006',parent_iri:'')
@@ -158,10 +158,10 @@ Factory.define(:data_controlled_vocab, parent: :sample_controlled_vocab) do |f|
   end
 end
 
-Factory.define(:formats_controlled_vocab, parent: :sample_controlled_vocab) do |f|
+Factory.define(:data_formats_controlled_vocab, parent: :sample_controlled_vocab) do |f|
   f.title 'Formats'
   f.ols_root_term_uri 'http://edamontology.org/format_1915'
-  f.key SampleControlledVocab::SystemVocabs::KEYS[:formats]
+  f.key SampleControlledVocab::SystemVocabs::KEYS[:data_formats]
   f.source_ontology 'edam'
   f.after_build do |vocab|
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Format',iri:'http://edamontology.org/format_1915',parent_iri:'')

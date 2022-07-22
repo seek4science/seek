@@ -569,12 +569,12 @@ class WorkflowTest < ActiveSupport::TestCase
     assert wf.supports_ontology_annotations?
     assert wf.supports_ontology_annotations?(:topics)
     assert wf.supports_ontology_annotations?(:operations)
-    refute wf.supports_ontology_annotations?(:formats)
-    refute wf.supports_ontology_annotations?(:data)
+    refute wf.supports_ontology_annotations?(:data_formats)
+    refute wf.supports_ontology_annotations?(:data_types)
 
     assert wf.respond_to?(:topic_annotations)
     assert wf.respond_to?(:operation_annotations)
-    refute wf.respond_to?(:format_annotations)
-    refute wf.respond_to?(:data_annotations)
+    refute wf.respond_to?(:data_format_annotations)
+    refute wf.respond_to?(:data_type_annotations)
   end
 end

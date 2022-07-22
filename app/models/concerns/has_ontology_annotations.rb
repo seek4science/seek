@@ -26,7 +26,7 @@ module HasOntologyAnnotations
     def has_ontology_annotations(*properties)
       include InstanceMethods
 
-      @supported_ontology_properties = Array(properties) & %i[topics operations data formats]
+      @supported_ontology_properties = Array(properties) & SampleControlledVocab::SystemVocabs.valid_keys
 
       @supported_ontology_properties.each do |property|
         define_ontology_annotation_associations(property)

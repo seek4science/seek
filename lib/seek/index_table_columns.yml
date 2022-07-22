@@ -27,7 +27,7 @@ columns:
   data_file:
     required: [ ]
     default: [ ]
-    additional_allowed: [ data_annotation_values, format_annotation_values, simulation_data ]
+    additional_allowed: [ data_type_annotation_values, data_format_annotation_values, simulation_data ]
 
   sop:
     required: [ ]
@@ -61,7 +61,7 @@ columns:
 
   file_template:
     required: [ ]
-    default: [ format_annotation_values, data_annotation_values ]
+    default: [ data_format_annotation_values, data_type_annotation_values ]
     additional_allowed: [ ]
 
   institution:
@@ -81,7 +81,7 @@ columns:
 
   placeholder:
     required: [ ]
-    default: [ format_annotation_values, data_annotation_values ]
+    default: [ data_format_annotation_values, data_type_annotation_values ]
     additional_allowed: [ ]
 
   publication:

@@ -276,10 +276,10 @@ namespace :seek do
 
   task(update_edam_annotation_attributes: [:environment]) do
     defs = {
-      "edam_formats": "format_annotations",
+      "edam_formats": "data_format_annotations",
       "edam_topics": "topic_annotations",
       "edam_operations": "operation_annotations",
-      "edam_data": "data_annotations"
+      "edam_data": "data_type_annotations"
     }
     defs.each do |old_name,new_name|
       query = AnnotationAttribute.where(name: old_name)
@@ -290,13 +290,12 @@ namespace :seek do
     end
   end
 
-
   task(update_edam_controlled_vocab_keys: [:environment]) do
     defs = {
       topics: 'edam_topics',
       operations: 'edam_operations',
-      formats: 'edam_formats',
-      data: 'edam_data'
+      data_formats: 'edam_formats',
+      data_types: 'edam_data'
     }
 
     defs.each do |key, old_name|
