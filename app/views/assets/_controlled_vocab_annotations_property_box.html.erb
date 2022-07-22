@@ -1,5 +1,5 @@
 <%
-  return unless resource.supports_ontology_annotations?(property)
+  return unless resource.supports_controlled_vocab_annotations?(property)
   annotations_accessor = "#{property.to_s.singularize}_annotation_values"
   return unless resource.send("#{annotations_accessor}").any?
   values = resource.send(annotations_accessor)
@@ -11,5 +11,5 @@
   <strong><%= title %></strong>
 </div>
 <div>
-  <%= ontology_annotation_items(values) %>
+  <%= controlled_vocab_annotation_items(values) %>
 </div>

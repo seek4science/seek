@@ -19,7 +19,7 @@
       
 	<%= render :partial => "resolve", :locals => {:resource => (@placeholder ? @placeholder : Placeholder.new) } -%>
 	
-      <%= render partial: 'assets/ontology_annotations_form_properties', :locals => { :resource => (@placeholder ? @placeholder : Placeholder.new) } -%>
+      <%= render partial: 'assets/controlled_vocab_annotations_form_properties', :locals => { :resource => (@placeholder ? @placeholder : Placeholder.new) } -%>
 
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @placeholder } %>
 

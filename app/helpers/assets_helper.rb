@@ -329,10 +329,10 @@ module AssetsHelper
     ContactRequestMessageLog.recent_requests(current_user.try(:person), resource).first
   end
 
-  def ontology_annotation_items(ontologyCVItems)
-    Array(ontologyCVItems).collect do |item|
-      browser_url = "https://edamontology.github.io/edam-browser/#{URI.parse(item.iri).path.gsub('/','#')}"
-      link_to(item.label, browser_url, target: :_blank).html_safe
+  def controlled_vocab_annotation_items(controlled_vocab_terms)
+    Array(controlled_vocab_terms).collect do |term|
+      browser_url = "https://edamontology.github.io/edam-browser/#{URI.parse(term.iri).path.gsub('/','#')}"
+      link_to(term.label, browser_url, target: :_blank).html_safe
     end.join(', ').html_safe
   end
 

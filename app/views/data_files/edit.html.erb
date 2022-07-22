@@ -29,7 +29,7 @@
 	:templates => authorised_assets(FileTemplate, nil, 'edit') } %>
       <% end %>
       
-      <%= render partial: 'assets/ontology_annotations_form_properties', :locals => { :resource => (@data_file ? @data_file : DataFile.new) } -%>
+      <%= render partial: 'assets/controlled_vocab_annotations_form_properties', :locals => { :resource => (@data_file ? @data_file : DataFile.new) } -%>
 
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @data_file } %>
 

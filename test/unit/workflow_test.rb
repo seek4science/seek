@@ -566,11 +566,11 @@ class WorkflowTest < ActiveSupport::TestCase
   test 'ontology annotation properties'do
     wf = Factory(:workflow)
 
-    assert wf.supports_ontology_annotations?
-    assert wf.supports_ontology_annotations?(:topics)
-    assert wf.supports_ontology_annotations?(:operations)
-    refute wf.supports_ontology_annotations?(:data_formats)
-    refute wf.supports_ontology_annotations?(:data_types)
+    assert wf.supports_controlled_vocab_annotations?
+    assert wf.supports_controlled_vocab_annotations?(:topics)
+    assert wf.supports_controlled_vocab_annotations?(:operations)
+    refute wf.supports_controlled_vocab_annotations?(:data_formats)
+    refute wf.supports_controlled_vocab_annotations?(:data_types)
 
     assert wf.respond_to?(:topic_annotations)
     assert wf.respond_to?(:operation_annotations)

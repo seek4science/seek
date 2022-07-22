@@ -3322,7 +3322,7 @@ class ProjectsControllerTest < ActionController::TestCase
     project.topic_annotations = "Chemistry"
     project.save!
 
-    assert project.ontology_annotations?
+    assert project.controlled_vocab_annotations?
 
     get :show, params: {id: project.id}
     assert_response :success
