@@ -2,7 +2,7 @@
   return unless resource.supports_controlled_vocab_annotations?(property)
   param_key = "#{property.to_s.singularize}_annotations"
   annotations_accessor = "#{property.to_s.singularize}_annotation_values"
-  vocab = resource.send("controlled_vocab_annotation_vocab",property)
+  vocab = resource.annotation_controlled_vocab(property)
   return unless vocab
   values = resource.send(annotations_accessor).pluck(:label)
   title = resource.class.human_attribute_name(annotations_accessor)

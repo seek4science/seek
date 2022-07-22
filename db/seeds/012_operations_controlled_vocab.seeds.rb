@@ -1,10 +1,10 @@
 json = File.read(File.join(Rails.root, "config/default_data", "operation-annotations-controlled-vocab.json"))
 data = JSON.parse(json).with_indifferent_access
 
-unless vocab = SampleControlledVocab.find_by_key(SampleControlledVocab::SystemVocabs::KEYS[:operations])
+unless vocab = SampleControlledVocab::SystemVocabs.vocab_for_property(:operations)
   puts "Seeding Operations controlled vocabulary ..."
   vocab = SampleControlledVocab.new(title: data[:title],
-                                    key: SampleControlledVocab::SystemVocabs::KEYS[:operations],
+                                    key: SampleControlledVocab::SystemVocabs.database_key_for_property(:operations),
                                     description: data[:description],
                                     source_ontology: data[:source_ontology],
                                     ols_root_term_uri: data[:ols_root_term_uri])

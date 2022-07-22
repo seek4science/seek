@@ -1,10 +1,10 @@
 json = File.read(File.join(Rails.root, "config/default_data", "format-annotations-controlled-vocab.json"))
 data = JSON.parse(json).with_indifferent_access
 
-unless vocab = SampleControlledVocab.find_by_key(SampleControlledVocab::SystemVocabs::KEYS[:formats])
+unless vocab = SampleControlledVocab::SystemVocabs.vocab_for_property(:data_formats)
   puts "Seeding Format controlled vocabulary ..."
   vocab = SampleControlledVocab.new(title: data[:title],
-                                    key: SampleControlledVocab::SystemVocabs::KEYS[:formats],
+                                    key: SampleControlledVocab::SystemVocabs.database_key_for_property(:data_formats),
                                     description: data[:description],
                                     source_ontology: data[:source_ontology],
                                     ols_root_term_uri: data[:ols_root_term_uri])

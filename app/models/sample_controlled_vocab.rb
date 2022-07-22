@@ -19,7 +19,7 @@ class SampleControlledVocab < ApplicationRecord
   validates :key, uniqueness: { allow_blank: true }
 
   accepts_nested_attributes_for :sample_controlled_vocab_terms, allow_destroy: true
-  accepts_nested_attributes_for :repository_standard, :reject_if => :check_repository_standard
+  accepts_nested_attributes_for :repository_standard, reject_if: :check_repository_standard
 
   grouped_pagination
 
@@ -46,7 +46,7 @@ class SampleControlledVocab < ApplicationRecord
   # a vocabulary that is built in and seeded, and that other parts are dependent upon
   def system_vocab?
     # currently determined by whether it has a special key, which cannot be set by user defined CV's
-    key.present? && SystemVocabs.key_known?(key)
+    key.present? && SystemVocabs.database_key_known?(key)
   end
 
   def self.can_create?
@@ -66,26 +66,36 @@ class SampleControlledVocab < ApplicationRecord
   end
 
   class SystemVocabs
-    KEYS = {
+    # property -> database key
+    MAPPING = {
       topics: 'topic_annotations',
       operations: 'operation_annotations',
       data_formats: 'data_format_annotations',
       data_types: 'data_type_annotations'
     }
 
-    def self.valid_keys
-      KEYS.keys
+    def self.vocab_for_property(property)
+      SampleControlledVocab.find_by_key(database_key_for_property(property))
     end
 
-    def self.key_known?(key)
-      KEYS.values.include?(key)
+    def self.database_key_for_property(property)
+      raise 'Invalid property' unless valid_properties.include(property)
+
+      MAPPING[property]
     end
 
-    KEYS.each do |k, v|
-      define_singleton_method "#{k}_controlled_vocab" do
-        SampleControlledVocab.find_by_key(v)
+    def self.valid_properties
+      MAPPING.keys
+    end
+
+    def self.database_key_known?(key)
+      MAPPING.values.include?(key)
+    end
+
+    MAPPING.each_key do |property|
+      define_singleton_method "#{property}_controlled_vocab" do
+        vocab_for_property(property)
       end
     end
   end
-  
 end
