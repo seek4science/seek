@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class HasOntologyAnnotationsTest < ActiveSupport::TestCase
+class HasControlledVocabularyAnnotationsTest < ActiveSupport::TestCase
   include AuthenticatedTestHelper
 
   def setup
@@ -13,16 +13,16 @@ class HasOntologyAnnotationsTest < ActiveSupport::TestCase
     User.current_user = nil
   end
 
-  test 'supports ontology annotations' do
-    assert @workflow.supports_ontology_annotations?
-    refute Factory(:institution).supports_ontology_annotations?
+  test 'supports controlled vocab annotations' do
+    assert @workflow.supports_controlled_vocab_annotations?
+    refute Factory(:institution).supports_controlled_vocab_annotations?
   end
 
   test 'annotate with label' do
     Factory(:topics_controlled_vocab)
     Factory(:operations_controlled_vocab)
 
-    refute @workflow.ontology_annotations?
+    refute @workflow.controlled_vocab_annotations?
 
     # mixture of arrays and comma separated, including an unknown one
     @workflow.topic_annotations = ['Chemistry', 'Sample collections', 'Unknown']
@@ -39,14 +39,14 @@ class HasOntologyAnnotationsTest < ActiveSupport::TestCase
     assert_equal ['Chemistry', 'Sample collections'], @workflow.topic_annotation_labels
     assert_equal %w[Correlation Clustering], @workflow.operation_annotation_labels
 
-    assert @workflow.ontology_annotations?
+    assert @workflow.controlled_vocab_annotations?
   end
 
   test 'annotate with iri' do
     Factory(:topics_controlled_vocab)
     Factory(:operations_controlled_vocab)
 
-    refute @workflow.ontology_annotations?
+    refute @workflow.controlled_vocab_annotations?
 
     @workflow.topic_annotations = ['http://edamontology.org/topic_3314', 'http://edamontology.org/topic_3277']
     @workflow.operation_annotations = 'http://edamontology.org/operation_3465, http://edamontology.org/operation_3432'
@@ -62,17 +62,17 @@ class HasOntologyAnnotationsTest < ActiveSupport::TestCase
     assert_equal ['Chemistry', 'Sample collections'], @workflow.topic_annotation_labels
     assert_equal %w[Correlation Clustering], @workflow.operation_annotation_labels
 
-    assert @workflow.ontology_annotations?
+    assert @workflow.controlled_vocab_annotations?
   end
 
-  test 'ontology annotation vocab present' do
-    refute @workflow.send(:ontology_annotation_vocab, :topics)
-    refute @workflow.send(:ontology_annotation_vocab, :operations)
+  test 'controlled vocab annotation vocab present' do
+    refute @workflow.send(:controlled_vocab_annotation_vocab, :topics)
+    refute @workflow.send(:controlled_vocab_annotation_vocab, :operations)
 
     topics_vocab = Factory(:topics_controlled_vocab)
     operations_vocab = Factory(:operations_controlled_vocab)
 
-    assert_equal topics_vocab, @workflow.send(:ontology_annotation_vocab, :topics)
-    assert_equal operations_vocab, @workflow.send(:ontology_annotation_vocab, :operations)
+    assert_equal topics_vocab, @workflow.send(:controlled_vocab_annotation_vocab, :topics)
+    assert_equal operations_vocab, @workflow.send(:controlled_vocab_annotation_vocab, :operations)
   end
 end

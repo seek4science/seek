@@ -464,11 +464,11 @@ class DataFileTest < ActiveSupport::TestCase
   test 'ontology cv annotation properties'do
     data_file = Factory(:data_file)
 
-    assert data_file.supports_ontology_annotations?
-    refute data_file.supports_ontology_annotations?(:topics)
-    refute data_file.supports_ontology_annotations?(:operations)
-    assert data_file.supports_ontology_annotations?(:data_formats)
-    assert data_file.supports_ontology_annotations?(:data_types)
+    assert data_file.supports_controlled_vocab_annotations?
+    refute data_file.supports_controlled_vocab_annotations?(:topics)
+    refute data_file.supports_controlled_vocab_annotations?(:operations)
+    assert data_file.supports_controlled_vocab_annotations?(:data_formats)
+    assert data_file.supports_controlled_vocab_annotations?(:data_types)
 
     refute data_file.respond_to?(:topic_annotations)
     refute data_file.respond_to?(:operation_annotations)

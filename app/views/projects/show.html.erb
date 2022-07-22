@@ -109,8 +109,8 @@
           <% end -%>
         <% end -%>
 
-        <% if @project.ontology_annotations? %>
-          <%= render partial:'assets/ontology_annotations_properties_box', :locals => { :resource => @project } %>
+        <% if @project.controlled_vocab_annotations? %>
+          <%= render partial:'assets/controlled_vocab_annotations_properties_box', :locals => { :resource => @project } %>
         <% end %>
 
         <% if @project.can_manage? %>

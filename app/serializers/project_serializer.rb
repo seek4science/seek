@@ -29,7 +29,7 @@ class ProjectSerializer < AvatarObjSerializer
   end
 
   attribute :topic_annotations do
-    ontology_annotations('topic_annotations')
+    controlled_vocab_annotations('topic_annotations')
   end
 
   has_many :organisms,  include_data: true

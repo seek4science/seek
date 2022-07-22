@@ -1164,7 +1164,7 @@ class WorkflowsControllerTest < ActionController::TestCase
     workflow.topic_annotations = "Chemistry"
     workflow.save!
 
-    assert workflow.ontology_annotations?
+    assert workflow.controlled_vocab_annotations?
 
     get :show, params: {id: workflow.id}
     assert_response :success
