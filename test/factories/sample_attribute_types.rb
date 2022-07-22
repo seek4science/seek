@@ -150,7 +150,7 @@ end
 Factory.define(:data_types_controlled_vocab, parent: :sample_controlled_vocab) do |f|
   f.title 'Data'
   f.ols_root_term_uri 'http://edamontology.org/data_0006'
-  f.key SampleControlledVocab::SystemVocabs::MAPPING[:data_types]
+  f.key SampleControlledVocab::SystemVocabs.database_key_for_property(:data_types)
   f.source_ontology 'edam'
   f.after_build do |vocab|
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Data',iri:'http://edamontology.org/data_0006',parent_iri:'')
