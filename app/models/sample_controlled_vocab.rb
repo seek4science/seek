@@ -75,7 +75,7 @@ class SampleControlledVocab < ApplicationRecord
     end
 
     def self.database_key_for_property(property)
-      raise 'Invalid property' unless valid_properties.include(property)
+      raise 'Invalid property' unless valid_properties.include?(property)
 
       MAPPING[property]
     end
