@@ -20,8 +20,8 @@ describe DataFile do
   it { should have_searchable_field(:assay_type_titles) }
   it { should have_searchable_field(:technology_type_titles) }
 
-  it { should have_searchable_field(:data_annotations) }
-  it { should have_searchable_field(:format_annotations) }
+  it { should have_searchable_field(:data_type_annotations) }
+  it { should have_searchable_field(:data_format_annotations) }
 
 end
 

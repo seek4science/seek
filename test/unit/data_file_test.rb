@@ -467,12 +467,12 @@ class DataFileTest < ActiveSupport::TestCase
     assert data_file.supports_ontology_annotations?
     refute data_file.supports_ontology_annotations?(:topics)
     refute data_file.supports_ontology_annotations?(:operations)
-    assert data_file.supports_ontology_annotations?(:formats)
-    assert data_file.supports_ontology_annotations?(:data)
+    assert data_file.supports_ontology_annotations?(:data_formats)
+    assert data_file.supports_ontology_annotations?(:data_types)
 
     refute data_file.respond_to?(:topic_annotations)
     refute data_file.respond_to?(:operation_annotations)
-    assert data_file.respond_to?(:format_annotations)
-    assert data_file.respond_to?(:data_annotations)
+    assert data_file.respond_to?(:data_format_annotations)
+    assert data_file.respond_to?(:data_type_annotations)
   end
 end

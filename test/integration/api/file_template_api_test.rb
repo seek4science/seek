@@ -8,8 +8,8 @@ class FileTemplateApiTest < ActionDispatch::IntegrationTest
     user_login
     @project = @current_user.person.projects.first
     @creator = Factory(:person)
-    Factory(:data_controlled_vocab)
-    Factory(:formats_controlled_vocab)
+    Factory(:data_types_controlled_vocab)
+    Factory(:data_formats_controlled_vocab)
     @file_template = Factory(:file_template, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
   end
 

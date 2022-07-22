@@ -72,10 +72,10 @@ module Seek
           topic_annotations: proc {|value|
             value.collect{|v| v[:identifier]}.join(', ')
           },
-          data_annotations: proc {|value|
+          data_type_annotations: proc {|value|
             value.collect{|v| v[:identifier]}.join(', ')
           },
-          format_annotations: proc {|value|
+          data_format_annotations: proc {|value|
             value.collect{|v| v[:identifier]}.join(', ')
           },
           funding_codes: proc { |value|

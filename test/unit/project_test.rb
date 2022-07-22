@@ -933,13 +933,13 @@ class ProjectTest < ActiveSupport::TestCase
     assert project.supports_ontology_annotations?
     assert project.supports_ontology_annotations?(:topics)
     refute project.supports_ontology_annotations?(:operations)
-    refute project.supports_ontology_annotations?(:formats)
-    refute project.supports_ontology_annotations?(:data)
+    refute project.supports_ontology_annotations?(:data_formats)
+    refute project.supports_ontology_annotations?(:data_types)
 
     assert project.respond_to?(:topic_annotations)
     refute project.respond_to?(:operation_annotations)
-    refute project.respond_to?(:format_annotations)
-    refute project.respond_to?(:data_annotation)
+    refute project.respond_to?(:data_format_annotations)
+    refute project.respond_to?(:data_type_annotation)
 
     Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
     refute project.ontology_annotations?

@@ -48,8 +48,8 @@ Factory.define(:max_file_template, class: FileTemplate) do |f|
     ft.content_blob = Factory.create(:min_content_blob, content_type: 'application/pdf', asset: ft, asset_version: ft.version)
     ft.annotate_with(['FileTemplate-tag1', 'FileTemplate-tag2', 'FileTemplate-tag3', 'FileTemplate-tag4', 'FileTemplate-tag5'], 'tag', ft.contributor)
     User.with_current_user(ft.contributor.user) do
-      ft.data_annotations = 'Sequence features metadata'
-      ft.format_annotations = 'JSON'
+      ft.data_type_annotations = 'Sequence features metadata'
+      ft.data_format_annotations = 'JSON'
     end
     ft.save!
   end

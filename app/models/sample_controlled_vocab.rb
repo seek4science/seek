@@ -69,9 +69,13 @@ class SampleControlledVocab < ApplicationRecord
     KEYS = {
       topics: 'topic_annotations',
       operations: 'operation_annotations',
-      formats: 'data_format_annotations',
-      data: 'data_type_annotations'
+      data_formats: 'data_format_annotations',
+      data_types: 'data_type_annotations'
     }
+
+    def self.valid_keys
+      KEYS.keys
+    end
 
     def self.key_known?(key)
       KEYS.values.include?(key)

@@ -4,7 +4,7 @@ class Placeholder < ApplicationRecord
 
   acts_as_asset
 
-  has_ontology_annotations :data, :formats
+  has_ontology_annotations :data_types, :data_formats
 
   validates :projects, presence: true, projects: { self: true }
 
