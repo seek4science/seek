@@ -26,7 +26,7 @@ module HasControlledVocabularyAnnotations
     def has_controlled_vocab_annotations(*properties)
       include InstanceMethods
 
-      @supported_controlled_vocab_properties = Array(properties) & SampleControlledVocab::SystemVocabs.valid_keys
+      @supported_controlled_vocab_properties = Array(properties) & SampleControlledVocab::SystemVocabs.valid_properties
 
       @supported_controlled_vocab_properties.each do |property|
         define_controlled_vocab_annotation_associations(property)
@@ -81,15 +81,15 @@ module HasControlledVocabularyAnnotations
   end
 
   module InstanceMethods
-    private
-
-    def controlled_vocab_annotation_vocab(property)
-      SampleControlledVocab::SystemVocabs.send("#{property}_controlled_vocab")
+    def annotation_controlled_vocab(property)
+      SampleControlledVocab::SystemVocabs.vocab_for_property(property)
     end
+
+    private
 
     # the topics can be an array or comma seperated list of either labels or IRI's
     def associate_controlled_vocab_annotation_values(vals, property)
-      vocab = controlled_vocab_annotation_vocab(property)
+      vocab = annotation_controlled_vocab(property)
       values = Array(vals.split(',').flatten).map do |value|
         value = value.strip
         vocab.sample_controlled_vocab_terms.find_by_label(value) ||

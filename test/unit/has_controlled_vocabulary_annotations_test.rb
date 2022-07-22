@@ -65,14 +65,14 @@ class HasControlledVocabularyAnnotationsTest < ActiveSupport::TestCase
     assert @workflow.controlled_vocab_annotations?
   end
 
-  test 'controlled vocab annotation vocab present' do
-    refute @workflow.send(:controlled_vocab_annotation_vocab, :topics)
-    refute @workflow.send(:controlled_vocab_annotation_vocab, :operations)
+  test 'annotation controlled vocab present' do
+    refute @workflow.annotation_controlled_vocab(:topics)
+    refute @workflow.annotation_controlled_vocab(:operations)
 
     topics_vocab = Factory(:topics_controlled_vocab)
     operations_vocab = Factory(:operations_controlled_vocab)
 
-    assert_equal topics_vocab, @workflow.send(:controlled_vocab_annotation_vocab, :topics)
-    assert_equal operations_vocab, @workflow.send(:controlled_vocab_annotation_vocab, :operations)
+    assert_equal topics_vocab, @workflow.annotation_controlled_vocab(:topics)
+    assert_equal operations_vocab, @workflow.annotation_controlled_vocab(:operations)
   end
 end

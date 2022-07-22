@@ -124,7 +124,7 @@ end
 Factory.define(:topics_controlled_vocab, parent: :sample_controlled_vocab) do |f|
   f.title 'Topics'
   f.ols_root_term_uri 'http://edamontology.org/topic_0003'
-  f.key SampleControlledVocab::SystemVocabs::KEYS[:topics]
+  f.key SampleControlledVocab::SystemVocabs.database_key_for_property(:topics)
   f.source_ontology 'edam'
   f.after_build do |vocab|
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Topic',iri:'http://edamontology.org/topic_0003',parent_iri:'')
@@ -137,7 +137,7 @@ end
 Factory.define(:operations_controlled_vocab, parent: :sample_controlled_vocab) do |f|
   f.title 'Operations'
   f.ols_root_term_uri 'http://edamontology.org/operation_0004'
-  f.key SampleControlledVocab::SystemVocabs::KEYS[:operations]
+  f.key SampleControlledVocab::SystemVocabs.database_key_for_property(:operations)
   f.source_ontology 'edam'
   f.after_build do |vocab|
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Operation',iri:'http://edamontology.org/operation_0004',parent_iri:'')
@@ -150,7 +150,7 @@ end
 Factory.define(:data_types_controlled_vocab, parent: :sample_controlled_vocab) do |f|
   f.title 'Data'
   f.ols_root_term_uri 'http://edamontology.org/data_0006'
-  f.key SampleControlledVocab::SystemVocabs::KEYS[:data_types]
+  f.key SampleControlledVocab::SystemVocabs::MAPPING[:data_types]
   f.source_ontology 'edam'
   f.after_build do |vocab|
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Data',iri:'http://edamontology.org/data_0006',parent_iri:'')
@@ -161,7 +161,7 @@ end
 Factory.define(:data_formats_controlled_vocab, parent: :sample_controlled_vocab) do |f|
   f.title 'Formats'
   f.ols_root_term_uri 'http://edamontology.org/format_1915'
-  f.key SampleControlledVocab::SystemVocabs::KEYS[:data_formats]
+  f.key SampleControlledVocab::SystemVocabs.database_key_for_property(:data_formats)
   f.source_ontology 'edam'
   f.after_build do |vocab|
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Format',iri:'http://edamontology.org/format_1915',parent_iri:'')

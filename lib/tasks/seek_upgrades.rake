@@ -298,12 +298,12 @@ namespace :seek do
       data_types: 'edam_data'
     }
 
-    defs.each do |key, old_name|
-      new_name = SampleControlledVocab::SystemVocabs::KEYS[key]
-      query = SampleControlledVocab.where(key: old_name)
+    defs.each do |property, old_key|
+      new_key = SampleControlledVocab::SystemVocabs.database_key_for_property(property)
+      query = SampleControlledVocab.where(key: old_key)
       if query.any?
-        puts "Updating key for #{old_name} controlled vocabulary"
-        query.update_all(key: new_name)
+        puts "Updating key for #{old_key} controlled vocabulary"
+        query.update_all(key: new_key)
       end
     end
   end
