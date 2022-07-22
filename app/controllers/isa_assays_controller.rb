@@ -1,5 +1,7 @@
 class IsaAssaysController < ApplicationController
   include Seek::AssetsCommon
+	include Seek::Publishing::PublishingCommon
+	
   before_action :set_up_instance_variable
   
   def new

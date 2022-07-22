@@ -52,7 +52,7 @@
 	<%= render partial: 'isa_studies/sample_types_form', locals: {f: f, sample_type: @isa_assay.sample_type, id_suffix: "_sample_type", isa_element: "assay" } %>
 <% end %>
  
-<%= f.submit "Create", :class => 'btn btn-primary'  %>
+<%= form_submit_buttons(@isa_assay.assay) %>
 
 
 <%= render partial: 'projects/implicit_project_selector', locals: { action: :new,

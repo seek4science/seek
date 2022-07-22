@@ -64,7 +64,7 @@
 
 
  
-<%= f.submit "Create", :class => 'btn btn-primary'  %>
+<%= form_submit_buttons(@isa_study.study) %>
 
 <script>
     const templates = <%= load_templates().to_json.html_safe %>
