@@ -36,7 +36,11 @@ class SampleControlledVocab < ApplicationRecord
   end
 
   def can_edit?(user = User.current_user)
-    !system_vocab? && samples.empty? && user && (!Seek::Config.project_admin_sample_type_restriction || user.is_admin_or_project_administrator?) && Seek::Config.samples_enabled
+    return false unless Seek::Config.samples_enabled
+    return false unless user
+    return true if user.is_admin?
+
+    !system_vocab? && samples.empty? && (!Seek::Config.project_admin_sample_type_restriction || user.is_admin_or_project_administrator?)
   end
 
   # a vocabulary that is built in and seeded, and that other parts are dependent upon
