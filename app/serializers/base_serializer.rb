@@ -114,11 +114,9 @@ class BaseSerializer < SimpleBaseSerializer
   end
 
   def show_policy?
-    respond_to_manage = object.respond_to?('can_manage?')
-    respond_to_policy = object.respond_to?('policy')
-    current_user = User.current_user
-    can_manage = object.can_manage?(current_user)
-    return respond_to_policy && respond_to_manage && can_manage
+    return false unless object.respond_to?('can_manage?')
+    return false unless object.respond_to?('policy')
+    return object.can_manage?(User.current_user)
   end
 
   def submitter
@@ -148,7 +146,7 @@ class BaseSerializer < SimpleBaseSerializer
     end
   end
 
-  def edam_annotations(property)
+  def ontology_annotations(property)
     terms = object.annotations_with_attribute(property, true).collect(&:value).sort_by(&:label)
     terms.collect do |term|
       {

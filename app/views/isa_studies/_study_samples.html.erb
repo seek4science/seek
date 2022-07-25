@@ -1,5 +1,4 @@
 <% study ||= nil %>
-<% valid_study = study && study.sample_types.any? && study&.sample_types&.second %>
 <% sample_type = study&.sample_types&.second %>
 
 <div style="padding:0 20px 20px 20px;">
@@ -17,7 +16,7 @@
     <button class="btn btn-primary dt-action" id="btn_save_sample" onClick="SampleSave()">Save</button>
 </div>
 
-<% if valid_study %>
+<% if sample_type %>
     <script>
         var sampleDynamicTable
         let initialLoad = true;

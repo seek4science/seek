@@ -1228,13 +1228,22 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'explore earlier version' do
-    df = data_files(:downloadable_spreadsheet_data_file)
-    assert df.can_edit?
-    df.versions.first.content_blob.save # Need to do this as file_size isn't set when loading from fixture
-    assert df.can_download?
-    get :explore, params: { id: df, version: 1 }
+
+    df = Factory(:small_test_spreadsheet_datafile)
+    login_as(df.contributor.user)
+
+    assert df.save_as_new_version('no comment')
+    Factory(:pdf_content_blob, asset_version: df.version, asset: df)
+    df.reload
+
+    assert_equal 2, df.versions.count
+    assert df.find_version(1).content_blob.is_extractable_excel?
+    refute df.find_version(2).content_blob.is_extractable_excel?
+
+    get :explore, params: {id: df, version: 1}
 
     assert_response :success
+
   end
 
   test 'gracefully handles explore with no spreadsheet' do

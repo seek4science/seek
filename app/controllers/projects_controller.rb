@@ -743,7 +743,7 @@ class ProjectsController < ApplicationController
           membership.update(time_left_at: left_at)
         end
         member = Person.find(membership.person_id)
-        Rails.cache.delete_matched("rli_title_#{member.cache_key}_.*")
+        Rails.cache.delete_matched(/#{member.list_item_title_cache_key_prefix}.*/)
       end
     end
   end

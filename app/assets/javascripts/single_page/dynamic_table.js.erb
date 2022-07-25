@@ -30,26 +30,30 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
   $j.dynamicTable.prototype = {
     init: function (rows, columns, options = {}) {
       columns
-        .filter((c) => c.multi_link)
         .forEach((c) => {
           c["mRender"] = function (data, type, full) {
-            const existingObjectsJSON = (data && Array.isArray(data) ? data : [data]).map(
-              ({ id, title }) => ({
-                id: id,
-                name: title
-              })
-            );
-            const existingObjects = JSON.stringify(existingObjectsJSON);
-            const url = typeaheadUrl.replace("%LINKED%", c.linked_sample_type);
-            if (options.readonly) {
-              return existingObjectsJSON.map((e) => `<span class="badge">${e.name}</span>`).join(" ");
-            } else {
-              return objectInput.replace("%EXISTING%", existingObjects).replace("%URL%", url);
-            }
+						if(c.multi_link) {
+							data = data && Array.isArray(data) ? data : [data]
+							data = data[0]?.id ? data : []
+							const existingObjectsJSON = (data).map(
+								({ id, title }) => ({
+									id: id,
+									name: title
+								})
+							);
+							const existingObjects = JSON.stringify(existingObjectsJSON);
+							const url = typeaheadUrl.replace("%LINKED%", c.linked_sample_type);
+							if (options.readonly) {
+								return existingObjectsJSON.map((e) => `<span class="badge">${e.name}</span>`).join(" ");
+							} else {
+								return objectInput.replace("%EXISTING%", existingObjects).replace("%URL%", url);
+							}
+						} else return data == "#HIDDEN" ? "<em><small>Hidden</small></em>" : data
           };
-          c["createdCell"] = function (td, cellData, rowData, row, col) {
-            setTagsInput($j(td));
-          };
+					c["createdCell"] = function (td, cellData, rowData, row, col) {
+						if(c.multi_link) setTagsInput($j(td));
+						if (cellData == "#HIDDEN") $j(td).addClass("disabled")
+					};
         });
       columns.unshift(...defaultCols);
       const columnDefs = [

@@ -1,6 +1,6 @@
 class Template < ApplicationRecord
-  acts_as_authorized
-  
+  acts_as_asset
+
   has_many :template_attributes, -> { order(:pos) }, inverse_of: :template, dependent: :destroy
   has_many :sample_types
 	has_many :samples, through: :sample_types

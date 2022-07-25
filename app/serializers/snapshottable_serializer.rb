@@ -1,4 +1,7 @@
-class SnapshottableSerializer  < PCSSerializer
+class SnapshottableSerializer  < BaseSerializer
+
+  has_many :creators
+  has_many :submitter
 
   attribute :snapshots do
     snapshots_data = []

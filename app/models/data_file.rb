@@ -41,7 +41,7 @@ class DataFile < ApplicationRecord
       joins: [:assays]
   )
 
-  explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi', 'data_type', 'format_type', 'file_template_id']) do
+  explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi', 'file_template_id']) do
 
     include Seek::Data::SpreadsheetExplorerRepresentation
     acts_as_doi_mintable(proxy: :parent, type: 'Dataset', general_type: 'Dataset')
@@ -87,14 +87,6 @@ class DataFile < ApplicationRecord
         self.workflow_data_files.build(attr)
       end
     end
-  end
-
-  # Returns the columns to be shown on the table view for the resource
-  def columns_default
-    super + ['creators','projects','version', 'format_type', 'data_type']
-  end
-  def columns_allowed
-    columns_default + ['last_used_at','other_creators','doi','license','simulation_data']
   end
 
   def included_to_be_copied?(symbol)

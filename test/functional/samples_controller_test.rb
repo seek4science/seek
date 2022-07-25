@@ -976,6 +976,11 @@ class SamplesControllerTest < ActionController::TestCase
       end
     end
 
+		# For the Single Page to work properly, these must be included in the response
+		assert response.body.include?('results')
+		assert response.body.include?('errors')
+		assert response.body.include?('status')
+
     samples = Sample.last(2)
     sample1 = samples.first
     assert_equal 'Fred Smith', sample1.title
@@ -1030,6 +1035,10 @@ class SamplesControllerTest < ActionController::TestCase
       assert_equal [creator], sample1.creators
     end
 
+		# For the Single Page to work properly, these must be included in the response
+		assert response.body.include?('errors')
+		assert response.body.include?('status')
+
     samples = Sample.limit(2)
 
     first_updated_sample = samples[0]
@@ -1061,6 +1070,10 @@ class SamplesControllerTest < ActionController::TestCase
     assert_difference('Sample.count', -2) do
       delete :batch_delete, params: { data: [ {id: sample1.id}, {id: sample2.id}] }
     end
+
+			# For the Single Page to work properly, these must be included in the response
+			assert response.body.include?('errors')
+			assert response.body.include?('status')
   end
 
   test 'JS request does not raise CORS error' do

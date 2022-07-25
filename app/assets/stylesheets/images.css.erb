@@ -142,3 +142,15 @@
   vertical-align: middle;
   display:inline-block;
 }
+
+/* Add some min/max sizes to lightbox images to handle SVGs without size info */
+.lb-outerContainer, .lb-image {
+    max-width: 1500px !important;
+    min-width: 300px !important;
+    min-height: 300px !important;
+}
+
+/* For images with transparent backgrounds */
+.lb-image {
+    background: white;
+}

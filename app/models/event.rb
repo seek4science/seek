@@ -52,14 +52,6 @@ class Event < ApplicationRecord
     false
   end
 
-  # Returns the columns to be shown on the table view for the resource
-  def columns_default
-    super + ['city','country','start_date','end_date']
-  end
-  def columns_allowed
-    columns_default + ['address','url','title']
-  end
-
   def self.user_creatable?
     Seek::Config.events_enabled
   end
