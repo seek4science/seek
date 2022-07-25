@@ -13,17 +13,20 @@ class SearchController < ApplicationController
       rescue InvalidSearchException => e
         flash.now[:error] = e.message
       rescue RSolr::Error::ConnectionRefused => e
-        flash.now[:error] = "The search service is currently not running, and we've been notified of the problem. Please try again later"
+        flash.now[:error] =
+          "The search service is currently not running, and we've been notified of the problem. Please try again later"
 
-        Seek::Errors::ExceptionForwarder.send_notification(e, env: request.env, data: { message: 'An error with search occurred, SOLR connection refused.' })
+        Seek::Errors::ExceptionForwarder.send_notification(e, env: request.env,
+                                                              data: { message: 'An error with search occurred, SOLR connection refused.' })
       end
     end
 
     matches = @results.values.sum(&:count) + @external_results.count
     if matches.zero?
-      flash.now[:notice]="No matches found for '<b>#{@search_query}</b>'.".html_safe
+      flash.now[:notice] = "No matches found for '<b>#{@search_query}</b>'.".html_safe
     else
-      flash.now[:notice]="#{matches} #{matches==1 ? 'item' : 'items'} matched '<b>#{@search_query}</b>' within their title or content.".html_safe
+      flash.now[:notice] =
+        "#{matches} #{matches == 1 ? 'item' : 'items'} matched '<b>#{@search_query}</b>' within their title or content.".html_safe
     end
 
     respond_to do |format|
@@ -33,8 +36,8 @@ class SearchController < ApplicationController
                each_serializer: SkeletonSerializer,
                links: { self: search_path(search_params) },
                meta: {
-                   base_url: Seek::Config.site_base_host,
-                   api_version: ActiveModel::Serializer.config.api_version
+                 base_url: Seek::Config.site_base_host,
+                 api_version: ActiveModel::Serializer.config.api_version
                }
       end
     end
@@ -43,7 +46,7 @@ class SearchController < ApplicationController
   def perform_search
     @search_query = ActionController::Base.helpers.sanitize(search_params[:q] || search_params[:search_query])
     @search = @search_query # used for logging, and logs the origin search query - see ApplicationController#log_event
-    @search_query ||=""
+    @search_query ||= ''
     @search_type = search_params[:search_type] || 'all'
     type = @search_type&.downcase
 
@@ -53,15 +56,18 @@ class SearchController < ApplicationController
 
     searchable_types = Seek::Util.searchable_types
 
-    raise InvalidSearchException.new("Query string is empty or blank") if downcase_query.blank?
+    raise InvalidSearchException, 'Query string is empty or blank' if downcase_query.blank?
 
     if Seek::Config.solr_enabled
-      if type == "all"
+      if type == 'all'
         sources = searchable_types
         sources -= [Strain, Sample] if request.format.json?
       else
         type_name = type.singularize.camelize
-        raise InvalidSearchException.new("#{type} is not a valid search type") unless searchable_types.map(&:to_s).include?(type_name)
+        unless searchable_types.map(&:to_s).include?(type_name)
+          raise InvalidSearchException, "#{type} is not a valid search type"
+        end
+
         sources = [type_name.constantize]
       end
 
@@ -69,7 +75,7 @@ class SearchController < ApplicationController
         @results[source.to_s] = source.with_search_query(downcase_query).authorized_for('view')
       end
 
-      if search_params[:include_external_search] == "1"
+      if search_params[:include_external_search] == '1'
         @external_results = Seek::ExternalSearch.instance.external_search(downcase_query, type)
       end
 
