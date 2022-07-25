@@ -183,6 +183,42 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     end
   end
 
+  test 'admin can edit system controlled vocab' do
+    admin = Factory(:admin)
+    person = Factory(:person)
+
+    vocab = Factory(:apples_sample_controlled_vocab)
+    sys_vocab = Factory(:edam_topics_controlled_vocab)
+
+    refute vocab.system_vocab?
+    assert sys_vocab.system_vocab?
+
+    assert vocab.can_edit?(admin.user)
+    assert vocab.can_edit?(person.user)
+
+    assert sys_vocab.can_edit?(admin.user)
+    refute sys_vocab.can_edit?(person.user)
+  end
+
+  test 'admin can edit even if there are samples' do
+    contributor=Factory(:person)
+    another_person = Factory(:person)
+    admin = Factory(:admin)
+
+    sample = Sample.new(sample_type: Factory(:apples_controlled_vocab_sample_type, title: 'type for can_edit test2'),
+                        title: 'testing cv can edit', project_ids: contributor.projects.collect(&:id), contributor: contributor)
+    sample.set_attribute_value(:apples, 'Bramley')
+    disable_authorization_checks do
+      assert sample.save!
+    end
+
+    cv_with_samples = sample.sample_type.sample_attributes.first.sample_controlled_vocab
+
+    refute cv_with_samples.can_edit?(contributor)
+    refute cv_with_samples.can_edit?(another_person)
+    assert cv_with_samples.can_edit?(admin)
+  end
+
   test 'can create' do
     admin = Factory(:admin)
     none_admin = Factory(:person)
@@ -249,4 +285,5 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     vocab = Factory(:edam_topics_controlled_vocab)
     assert vocab.ontology_based?
   end
+
 end
