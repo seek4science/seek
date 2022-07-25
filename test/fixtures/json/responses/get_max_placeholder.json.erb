@@ -1,0 +1,105 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "placeholders",
+    "attributes": {
+      "policy": {
+        "access": "download",
+        "permissions": []
+      },
+      "tags": [
+        "Placeholder-tag1",
+        "Placeholder-tag2",
+        "Placeholder-tag3",
+        "Placeholder-tag4",
+        "Placeholder-tag5"
+      ],
+      "title": "A Maximal Placeholder",
+      "description": "The Maximal Placeholder",
+      "license": null,
+      "created_at": "<%= res.created_at.as_json %>",
+      "updated_at": "<%= res.updated_at.as_json %>",
+      "other_creators": "Blogs, Joe",
+      "creators": [
+        {
+          "profile": "/people/<%= res.assets_creators.first.creator_id %>",
+          "family_name": "<%= res.assets_creators.first.family_name %>",
+          "given_name": "<%= res.assets_creators.first.given_name %>",
+          "affiliation": "<%= res.assets_creators.first.affiliation %>",
+          "orcid": null
+        }
+      ]
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "<%= res.creator_ids.first %>",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "<%= res.creator_ids.first %>",
+            "type": "people"
+          },
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= res.project_ids.first %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "<%= res.assay_ids.first %>",
+            "type": "assays"
+          }
+        ]
+      },
+      "file_template": {
+        "data": {
+          "id": "<%= res.file_template_id %>",
+          "type": "file_templates"
+        }
+      },
+      "data_file": {
+        "data": {
+          "id": "<%= res.data_file_id %>",
+          "type": "data_files"
+        }
+      }
+    },
+    "links": {
+      "self": "/placeholders/<%= res.id %>"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "uuid": "<%= res.uuid %>",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.3"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

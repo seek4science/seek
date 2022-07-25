@@ -32,25 +32,7 @@ class ProjectSerializer < AvatarObjSerializer
     ontology_annotations('edam_topics')
   end
 
-  has_many :organisms,  include_data: true
-  has_many :human_diseases, include_data: true
-
-  has_many :people
-  has_many :institutions
-  has_many :programmes
-  has_many :investigations
-  has_many :studies
-  has_many :assays
-  has_many :data_files
-  has_many :file_templates
-  has_many :placeholders
-  has_many :models
-  has_many :sops
-  has_many :publications
-  has_many :presentations
-  has_many :events
-  has_many :documents
-  has_many :workflows
+  include_related_items
 
   def show_default_policy?
     has_default_policy = !object.default_policy.nil?

@@ -1,39 +1,21 @@
 {
   "data": {
-    "type": "file_templates",
+    "type": "placeholders",
     "attributes": {
-      "title": "A Maximal FileTemplate",
+      "title": "A Maximal Placeholder",
       "description": "This is the description",
       "tags": [
         "tag1",
         "tag2"
       ],
-      "format_annotations": [
-        {
-          "label": "JSON",
-          "identifier": "http://edamontology.org/format_3464"
-        }
-      ],
-      "data_annotations": [
-        {
-          "label": "Sequence features metadata",
-          "identifier": "http://edamontology.org/data_2914"
-        }
-      ],
       "license": "CC-BY-4.0",
       "other_creators": "John Smith, Jane Smith",
-      "content_blobs": [
-        {
-          "original_filename": "a_pdf_file.pdf",
-          "content_type": "application/pdf"
-        }
-      ],
       "policy": {
         "access": "download",
         "permissions": [
           {
             "resource": {
-              "id": "89",
+              "id": "<%= @project.id %>",
               "type": "projects"
             },
             "access": "edit"
@@ -45,7 +27,7 @@
       "creators": {
         "data": [
           {
-            "id": "90",
+            "id": "<%= @creator.id %>",
             "type": "people"
           }
         ]
@@ -53,10 +35,16 @@
       "projects": {
         "data": [
           {
-            "id": "89",
+            "id": "<%= @project.id %>",
             "type": "projects"
           }
         ]
+      },
+      "file_template": {
+        "data" : {
+	  "id": "<%= @file_template.id %>",
+	  "type" : "file_templates"
+	}
       }
     }
   }

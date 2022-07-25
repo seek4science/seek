@@ -121,6 +121,8 @@
       </div>
     </div>
 
+    <%= render partial: 'custom_metadata/custom_metadata_attribute_values', locals: {resource: @project} %>
+
   <% end %>
 
   <%= tab_pane('related-items') do %>

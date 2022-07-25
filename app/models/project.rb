@@ -6,6 +6,8 @@ class Project < ApplicationRecord
   acts_as_yellow_pages
   title_trimmer
 
+  has_extended_custom_metadata
+
   has_and_belongs_to_many :investigations
   has_many :studies, through: :investigations
   has_many :assays, through: :studies
@@ -92,7 +94,7 @@ class Project < ApplicationRecord
   has_many :dependent_permissions, class_name: 'Permission', as: :contributor, dependent: :destroy
 
   def assets
-    data_files | sops | models | publications | presentations | documents | workflows | collections
+    data_files | sops | models | publications | presentations | documents | workflows | collections | file_templates | placeholders
   end
 
   def project_assets
