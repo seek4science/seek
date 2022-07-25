@@ -14,6 +14,8 @@ class DataFileApiTest < ActionDispatch::IntegrationTest
     @publication = Factory(:publication, projects: [@project])
     @event = Factory(:event, projects: [@project], policy: Factory(:public_policy))
     @data_file = Factory(:data_file, policy: Factory(:public_policy), contributor: current_person, creators: [@creator])
+    @file_template = Factory(:public_file_template, projects: [@project])
+    @placeholder = Factory(:public_placeholder, projects: [@project])
     @workflow = Factory(:workflow, projects: [@project], policy: Factory(:public_policy))
   end
 

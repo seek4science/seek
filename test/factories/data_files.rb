@@ -36,15 +36,26 @@ Factory.define(:max_data_file, class: DataFile) do |f|
   f.events {[Factory.build(:event, policy: Factory(:public_policy))]}
   f.workflows {[Factory.build(:workflow, policy: Factory(:public_policy))]}
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
+  f.other_creators 'Blogs, Joe'
+  f.assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
+
   f.after_create do |data_file|
     if data_file.content_blob.blank?
       data_file.content_blob = Factory.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
     end
+
+    if data_file.placeholder.blank?
+      data_file.placeholder = Factory.create(:public_placeholder, projects: data_file.projects)
+      data_file.placeholder.save
+    end
+
+    if data_file.file_template.blank?
+      data_file.file_template = Factory.create(:public_file_template, projects: data_file.projects)
+      data_file.file_template.save
+    end
     data_file.annotate_with(['DataFile-tag1', 'DataFile-tag2', 'DataFile-tag3', 'DataFile-tag4', 'DataFile-tag5'], 'tag', data_file.contributor)
     data_file.save!
   end
-  f.other_creators 'Blogs, Joe'
-  f.assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
 end
 
 Factory.define(:rightfield_datafile, parent: :data_file) do |f|

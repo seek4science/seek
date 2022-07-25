@@ -1527,6 +1527,10 @@ dataFilePost:
               $ref: "#/components/schemas/multipleReferences"
             events:
               $ref: "#/components/schemas/multipleReferences"
+            file_template:
+              $ref: "#/components/schemas/singleReference"
+            placeholder:
+              $ref: "#/components/schemas/singleReference"
             workflows:
               $ref: "#/components/schemas/multipleReferences"
           required:
@@ -1589,6 +1593,10 @@ dataFilePatch:
               $ref: "#/components/schemas/multipleReferences"
             events:
               $ref: "#/components/schemas/multipleReferences"
+            file_template:
+              $ref: "#/components/schemas/singleReference"
+            placeholder:
+              $ref: "#/components/schemas/singleReference"
             workflows:
               $ref: "#/components/schemas/multipleReferences"
           additionalProperties: false
