@@ -11,8 +11,12 @@ class SearchController < ApplicationController
       begin
         determine_query
         sources = determine_sources
-        perform_search(sources)
-        respond_with_search_results
+        if sources.count == 1 && search_params[:include_external_search] != '1'
+          redirect_to polymorphic_path(sources[0], 'filter[query]': @search_query)
+        else
+          perform_search(sources)
+          respond_with_search_results
+        end
       rescue InvalidSearchException => e
         flash.now[:error] = e.message
       rescue RSolr::Error::ConnectionRefused => e
