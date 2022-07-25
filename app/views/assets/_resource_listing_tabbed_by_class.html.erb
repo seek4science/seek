@@ -13,6 +13,8 @@
 
    ordered_resource_types = prepare_resource_hash(resource_hash)
 
+   query = index_params.dig(:filter, :query)
+
    any = resource_hash.any? { |key, res| res[:items_count] > 0 || res[:hidden_count] > 0 }
 %>
 
@@ -24,6 +26,15 @@
         <% ordered_resource_types.each_with_index do |type, i| -%>
             <% unless type[:items].empty? && (type[:hidden_count] == 0) %>
                 <div id="<%= type[:tab_id] -%>" role="tabpanel" class="tab-pane <%= 'active' if active -%>">
+                  <% if !type[:is_external] && query && !['Sample','SampleType'].include?(type[:type]) %>
+
+                      <%= link_to "Advanced #{type[:visible_resource_type]} search with filtering ...",
+                                  polymorphic_path(type[:type].tableize.to_sym,
+                                                   'filter[query]':query),
+                      class:'btn btn-info pull-right' %>
+
+                  <% end %>
+
                   <% unless type[:items].empty? %>
                       <%= render :partial => "assets/resource_list", :locals => { :collection => type[:items],
                                                                                   :authorization_for_showing_already_done => true,
