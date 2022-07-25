@@ -69,6 +69,7 @@ Templates.init = function (elem) {
   loadFilterSelectors(templates);
   loadTemplates(templates);
   setTemplate();
+	setDefaultLevel()
 };
 
 const remove = (e) =>{
@@ -222,3 +223,10 @@ const applyTemplate = () => {
 const showTemplateModal = () => {
   $j("#existing_templates").modal("show");
 };
+
+const setDefaultLevel = () => {
+	let level, href = window.location.href
+	if (href.includes("isa_studies")) level = "study"
+	else if (href.includes("isa_assays")) level = "assay"
+	if (level) $j("#templates_type_select").val(level).change()
+}
