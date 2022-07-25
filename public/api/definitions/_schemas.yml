@@ -957,6 +957,8 @@ programmeDataType:
       $ref: "#/components/schemas/tags"
     discussion_links:
       $ref: "#/components/schemas/assetLinkList"
+    open_for_projects:
+      type: boolean
   required:
     - avatar
     - title
@@ -964,6 +966,7 @@ programmeDataType:
     - web_page
     - funding_details
     - funding_codes
+    - open_for_projects
   additionalProperties: false
 projectType:
   type: string
@@ -2236,6 +2239,8 @@ programmePost:
               $ref: "#/components/schemas/tags"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
+            open_for_projects:
+              type: boolean
           required:
             - title
           additionalProperties: false
@@ -2281,6 +2286,8 @@ programmePatch:
               $ref: "#/components/schemas/tags"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
+            open_for_projects:
+              type: boolean
           additionalProperties: false
         relationships:
           type: object
@@ -4072,6 +4079,16 @@ programmeResponse:
               $ref: "#/components/schemas/multipleReferences"
             events:
               $ref: "#/components/schemas/multipleReferences"
+            workflows:
+              $ref: "#/components/schemas/multipleReferences"
+            collections:
+              $ref: "#/components/schemas/multipleReferences"
+            samples:
+              $ref: "#/components/schemas/multipleReferences"
+            file_templates:
+              $ref: "#/components/schemas/multipleReferences"
+            placeholders:
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - people
             - projects
@@ -4086,6 +4103,11 @@ programmeResponse:
             - publications
             - presentations
             - events
+            - workflows
+            - collections
+            - samples
+            - file_templates
+            - placeholders
           additionalProperties: false
         links:
           $ref: "#/components/schemas/links"
