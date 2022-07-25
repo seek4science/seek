@@ -22,7 +22,7 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
 				buttons: [
 					{
 							extend: 'csvHtml5',
-							text: 'Export as CSV',
+							text: 'Export table',
 							exportOptions: {
 									columns: [':visible']
 							}

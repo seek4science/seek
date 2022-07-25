@@ -533,3 +533,15 @@
 	padding-right:20px;
 	padding-left:20px
 }
+
+.dt-btn-container {
+  text-align: right;
+}
+
+.dt-btn-item, .dt-btn-item-last {
+  display: inline-block;
+}
+
+.dt-btn-item-last {
+	margin-left: 5px;
+}
