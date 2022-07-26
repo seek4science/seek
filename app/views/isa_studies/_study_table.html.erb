@@ -39,8 +39,8 @@
         
 				function createSampleTypeOptions(types){
 					$j("#options_container").append('<div id="checkbox_group" class="btn-group" data-toggle="buttons"></div>')
-						types.forEach( t => {
-							let elem = `<label class="btn btn-default active"><input id="checkbox-${t.id}" type="checkbox" checked onchange="toggleSampleType(${t.id}, $j(this))" />${t.title}</label>`
+						types.forEach( (t, i) => {
+							let elem = `<label class="btn btn-default active sp-btn-variant-${i}"><input id="checkbox-${t.id}" type="checkbox" checked onchange="toggleSampleType(${t.id}, $j(this))" />${t.title}</label>`
 							$j("#checkbox_group").append(elem)
 						})		
         }
