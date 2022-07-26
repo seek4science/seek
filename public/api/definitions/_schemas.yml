@@ -4328,10 +4328,10 @@ personResponse:
             - presentations
             - events
             - workflows
-	    - collections
-	    - file_templates
-	    - placeholders
-	    - human_diseases
+            - collections
+            - file_templates
+            - placeholders
+            - human_diseases
           additionalProperties: false
         links:
           $ref: "#/components/schemas/links"
@@ -4536,11 +4536,11 @@ programmeResponse:
             - publications
             - presentations
             - events
-	    - workflows
-	    - collections
-	    - file_templates
-	    - placeholders
-	    - human_diseases
+            - workflows
+            - collections
+            - file_templates
+            - placeholders
+            - human_diseases
           additionalProperties: false
         links:
           $ref: "#/components/schemas/links"
