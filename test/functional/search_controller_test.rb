@@ -20,6 +20,15 @@ class SearchControllerTest < ActionController::TestCase
     end
   end
 
+  test 'search result order retained' do
+    FactoryGirl.create_list(:public_document, 3)
+    order = [Document.last, Document.third_to_last, Document.second_to_last]
+    Document.stub(:solr_cache, -> (q) { order.collect(&:id) }) do
+      get :index, params: { q: 'test' }
+    end
+    assert_equal order, assigns(:results)['Document']
+  end
+
   test 'can limit rendered search results' do
     FactoryGirl.create_list(:public_document, 3)
 
