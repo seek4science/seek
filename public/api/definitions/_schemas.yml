@@ -4317,6 +4317,21 @@ personResponse:
           required:
             - projects
             - institutions
+            - investigations
+            - studies
+            - assays
+            - data_files
+            - documents
+            - models
+            - sops
+            - publications
+            - presentations
+            - events
+            - workflows
+	    - collections
+	    - file_templates
+	    - placeholders
+	    - human_diseases
           additionalProperties: false
         links:
           $ref: "#/components/schemas/links"
@@ -4511,6 +4526,21 @@ programmeResponse:
             - projects
             - institutions
             - administrators
+            - investigations
+            - studies
+            - assays
+            - data_files
+            - documents
+            - models
+            - sops
+            - publications
+            - presentations
+            - events
+	    - workflows
+	    - collections
+	    - file_templates
+	    - placeholders
+	    - human_diseases
           additionalProperties: false
         links:
           $ref: "#/components/schemas/links"
@@ -4625,8 +4655,23 @@ projectResponse:
             asset_gatekeepers:
               $ref: "#/components/schemas/multipleReferences"
           required:
+            - organisms
             - people
             - institutions
+            - investigations
+            - studies
+            - assays
+            - data_files
+            - documents
+            - models
+            - sops
+            - publications
+            - presentations
+            - events
+            - programmes
+            - file_templates
+            - placeholders
+            - human_diseases
             - project_administrators
             - pals
             - asset_housekeepers
