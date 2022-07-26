@@ -1,6 +1,5 @@
 <% environment.context_class.instance_eval { include Seek::Util.routes } %>
 const instanceName = '<%= Seek::Config.instance_name %>'
-const colorSet = ["#001f3f", "#7FDBFF", "#39CCCC", "#B10DC9", "#F012BE", "#85144b", "#FF851B", "#3D9970", "#01FF70", "#FFDC00"]
 
 const rowStatus = { new: "new", delete: "delete", update: "update", empty: "empty", noAction: "" };
 const dtErrClass = "row-error",
@@ -309,9 +308,10 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
   };
 })(jQuery);
 
-function highlightTitleCol(table){
-  const colIdx = table.settings()[0].aoColumns.find((x) => x?.is_title)?.idx
-	if(colIdx) $j(table.column(colIdx).nodes()).addClass('highlight');
+function highlightTitleCol(table) {
+	table.settings()[0].aoColumns.forEach((c, i) => {
+		if(c.is_title) $j(table.column(i).nodes()).addClass('highlight');
+	})
 }
 
 function checkSampleLink(value) {
