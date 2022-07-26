@@ -331,8 +331,13 @@ module AssetsHelper
 
   def controlled_vocab_annotation_items(controlled_vocab_terms)
     Array(controlled_vocab_terms).collect do |term|
-      browser_url = "https://edamontology.github.io/edam-browser/#{URI.parse(term.iri).path.gsub('/','#')}"
-      link_to(term.label, browser_url, target: :_blank).html_safe
+      if term.iri&.start_with?('http://edamontology.org/')
+        browser_url = "https://edamontology.github.io/edam-browser/#{URI.parse(term.iri).path.gsub('/','#')}"
+        link_to(term.label, browser_url, target: :_blank).html_safe
+      else
+        term.label
+      end
+
     end.join(', ').html_safe
   end
 
