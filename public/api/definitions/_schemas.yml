@@ -3523,7 +3523,6 @@ assayResponse:
             - sops
             - publications
             - placeholders
-            - human_diseases
           additionalProperties: false
         links:
           $ref: "#/components/schemas/links"
@@ -4331,7 +4330,6 @@ personResponse:
             - collections
             - file_templates
             - placeholders
-            - human_diseases
           additionalProperties: false
         links:
           $ref: "#/components/schemas/links"
@@ -4540,7 +4538,6 @@ programmeResponse:
             - collections
             - file_templates
             - placeholders
-            - human_diseases
           additionalProperties: false
         links:
           $ref: "#/components/schemas/links"
@@ -4671,7 +4668,6 @@ projectResponse:
             - programmes
             - file_templates
             - placeholders
-            - human_diseases
             - project_administrators
             - pals
             - asset_housekeepers
