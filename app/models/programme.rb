@@ -24,7 +24,7 @@ class Programme < ApplicationRecord
   has_many :investigations, -> { distinct }, through: :projects
   has_many :studies, -> { distinct }, through: :investigations
   has_many :assays, -> { distinct }, through: :studies
-  %i[data_files documents models sops presentations events publications samples workflows].each do |type|
+  %i[data_files documents models sops presentations events publications samples workflows collections file_templates placeholders].each do |type|
     has_many type, -> { distinct }, through: :projects
   end
   has_many :programme_administrator_roles, -> { where(role_type_id: RoleType.find_by_key!(:programme_administrator)) }, as: :scope, class_name: 'Role', inverse_of: :scope
