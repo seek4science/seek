@@ -95,10 +95,6 @@ class ApplicationRecord < ActiveRecord::Base
     self.class.supports_doi?
   end
 
-  def is_a_version?
-    false
-  end
-
   def self.with_search_query(q)
     if searchable? && Seek::Config.solr_enabled
       search = search do |query|
