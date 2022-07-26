@@ -71,7 +71,7 @@ module RelatedItemsHelper
     person_id
   end
 
-  def related_items_hash(items_hash, limit = nil)
+  def related_items_hash(items_hash, limit = nil, sort = true)
     hash = {}
     items_hash.each_key do |type|
 
@@ -90,7 +90,9 @@ module RelatedItemsHelper
         hash[type][:hidden_count] = total_count - hash[type][:items_count]
         hash[type][:hidden_items] = total - hash[type][:items]
 
-        hash[type][:items] = Seek::ListSorter.sort_by_order(hash[type][:items], Seek::ListSorter.order_for_view(type, :related))
+        if sort
+          hash[type][:items] = Seek::ListSorter.sort_by_order(hash[type][:items], Seek::ListSorter.order_for_view(type, :related))
+        end
 
         if limit && hash[type][:items_count] > limit
           hash[type][:items] = hash[type][:items].first(limit)
