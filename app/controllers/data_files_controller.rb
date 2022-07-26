@@ -510,7 +510,6 @@ class DataFilesController < ApplicationController
                                       { assay_assets_attributes: [:assay_id, :relationship_type_id] },
                                       { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
                                       :file_template_id,
-                                      :placeholder_id,
                                       :edam_formats,
                                       :edam_data,
                                       { publication_ids: [] }, { workflow_ids: [] },
