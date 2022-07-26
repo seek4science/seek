@@ -27,7 +27,10 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
 									columns: [':visible']
 							}
 					}
-				]
+				],
+				initComplete: function () {
+					if(opts.hideEmptyColumns) hideEmptyColumns(this);
+				}
         //"initComplete": function () {  // THIS IS TOO SLOW - CRASHES BROWSER
         //    console.log("Hiding empty columns");
         //    table.columns().flatten().each(function (columnIndex) {
@@ -177,3 +180,10 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
     });
     return table;
 };
+
+function hideEmptyColumns(selector) {
+	const table = $j(selector).DataTable()
+	table.columns().every(function(idx) {
+		if (!this.data().toArray().some(x=>x)) table.column(idx).visible(false)
+	});
+}

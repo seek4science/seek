@@ -7,122 +7,121 @@
 <h1>Query Samples</h1>
 
 <div id="query_samples">
-
-	<%= folding_panel('Query options', false) do %>
 	
-			<div class="row" style="padding-top:10px">
-				<div class="col-md-4">
-					<%= help_icon("Select one or more #{t('project').pluralize} to which the Samples must belong.") -%>
-					<label>Select Project(s)</label>
-					<select id="projects" class="form-control select2" multiple="multiple">
-						<% projects.each do |p| %>
-							<option value='<%= p[:id] %>'><%= p[:title] %></option>
+	<div class="row" style="padding-top:10px">
+		<div class="col-md-4">
+			<%= help_icon("Select one or more #{t('project').pluralize} to which the Samples must belong.") -%>
+			<label>Select Project(s)</label>
+			<select id="projects" class="form-control select2" multiple="multiple">
+				<% projects.each do |p| %>
+					<option value='<%= p[:id] %>'><%= p[:title] %></option>
+				<% end %>
+			</select>
+		</div>
+	</div>
+	<div class="row" style="padding-top:10px;padding-bottom:10px">
+		<div class="col-md-4">
+			<%= help_icon("Select the #{t('template')} used to create the Samples.") -%>
+			<label>Select a Template<span class="required">*</span></label>
+			<select id="template" class="form-control select2">
+				<option value="">Not selected</option>
+				<% templates.pluck(:group).uniq.each do |group_name| %>
+					<optgroup label='<%= group_name %>'>
+						<% templates.select{|t| t[:group]==group_name}.each do |t| %>
+							<option value='<%= t[:template_id] %>'><%=t[:title]%></option>
 						<% end %>
-					</select>
-				</div>
+					</optgroup>
+				<% end %>
+			</select>
+		</div>
+		<div class="col-md-4">
+			<label>Select an Attribute</label>
+			<select id="template_attribute" class="form-control select2">
+				<option value="">Not selected</option>
+			</select>
+		</div>
+		<div class="col-md-4">
+			<label>Enter value</label>
+			<input id="attribute_value" class="form-control"/>
+		</div>
+	</div>
+	
+	<%= folding_panel('Advanced filtering', false, { style: "margin-top:15px" }) do %>
+		<div class="row">
+			<div class="col-md-4">
+				<h4>
+					<%= help_icon("Select the #{t('template')} used to create the parent Samples from which your Samples of interest derive from.") -%>
+					Input sample(s)
+				</h4>
 			</div>
-			<div class="row" style="padding-top:10px;padding-bottom:10px">
-				<div class="col-md-4">
-					<%= help_icon("Select the #{t('template')} used to create the Samples.") -%>
-					<label>Select a Template<span class="required">*</span></label>
-					<select id="template" class="form-control select2">
-						<option value="">Not selected</option>
-						<% templates.pluck(:group).uniq.each do |group_name| %>
-							<optgroup label='<%= group_name %>'>
-								<% templates.select{|t| t[:group]==group_name}.each do |t| %>
-									<option value='<%= t[:template_id] %>'><%=t[:title]%></option>
-								<% end %>
-							</optgroup>
-						<% end %>
-					</select>
-				</div>
-				<div class="col-md-4">
-					<label>Select an Attribute</label>
-					<select id="template_attribute" class="form-control select2">
-						<option value="">Not selected</option>
-					</select>
-				</div>
-				<div class="col-md-4">
-					<label>Enter value</label>
-					<input id="attribute_value" class="form-control"/>
-				</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4">
+				<label>Select a Template</label>
+				<select id="input_template" class="form-control select2">
+					<option value="">Not selected</option>
+					<% templates.pluck(:group).uniq.each do |group_name| %>
+						<optgroup label='<%= group_name %>'>
+							<% templates.select{|t| t[:group]==group_name}.each do |t| %>
+								<option value='<%= t[:template_id] %>'><%= t[:title] %></option>
+							<% end %>
+						</optgroup>
+					<% end %>
+				</select>
 			</div>
-			<hr style="margin:5px">
-			<div class="row">
-				<div class="col-md-4">
-					<h4>
-						<%= help_icon("Select the #{t('template')} used to create the parent samples from which your Samples of interest directly derived from.") -%>
-						Input sample(s)
-					</h4>
-				</div>
+			<div class="col-md-4">
+				<label>Select an Attribute</label>
+				<select id="input_template_attribute" class="form-control select2">
+					<option value="">Not selected</option>
+				</select>
 			</div>
-			<div class="row">
-				<div class="col-md-4">
-					<label>Select a Template</label>
-					<select id="input_template" class="form-control select2">
-						<option value="">Not selected</option>
-						<% templates.pluck(:group).uniq.each do |group_name| %>
-							<optgroup label='<%= group_name %>'>
-								<% templates.select{|t| t[:group]==group_name}.each do |t| %>
-									<option value='<%= t[:template_id] %>'><%= t[:title] %></option>
-								<% end %>
-							</optgroup>
-						<% end %>
-					</select>
-				</div>
-				<div class="col-md-4">
-					<label>Select an Attribute</label>
-					<select id="input_template_attribute" class="form-control select2">
-						<option value="">Not selected</option>
-					</select>
-				</div>
-				<div class="col-md-4">
-					<label>Enter value</label>
-					<input id="input_attribute_value" class="form-control"/>
-				</div>
+			<div class="col-md-4">
+				<label>Enter value</label>
+				<input id="input_attribute_value" class="form-control"/>
 			</div>
-			<div class="row">
-				<div class="col-md-4">
-					<h4>
-						<%= help_icon("Select the #{t('template')} used to create the child samples that directly derived from your Samples of interest.") -%>
-						Output sample(s)
-					</h4>
-				</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4">
+				<h4>
+					<%= help_icon("Select the #{t('template')} used to create the child Samples that derive from your Samples of interest.") -%>
+					Output sample(s)
+				</h4>
 			</div>
-			<div class="row">
-				<div class="col-md-4">
-					<label>Select a Template</label>
-					<select id="output_template" class="form-control select2">
-						<option value="">Not selected</option>
-						<% templates.pluck(:group).uniq.each do |group_name| %>
-							<optgroup label='<%= group_name %>'>
-								<% templates.select{|t| t[:group]==group_name}.each do |t| %>
-									<option value='<%= t[:template_id] %>'><%= t[:title] %></option>
-								<% end %>
-							</optgroup>
-						<% end %>
-					</select>
-				</div>
-				<div class="col-md-4">
-					<label>Select an Attribute</label>
-					<select id="output_template_attribute" class="form-control select2">
-						<option value="">Not selected</option>
-					</select>
-				</div>
-				<div class="col-md-4">
-					<label>Enter value</label>
-					<input id="output_attribute_value" class="form-control"/>
-				</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4">
+				<label>Select a Template</label>
+				<select id="output_template" class="form-control select2">
+					<option value="">Not selected</option>
+					<% templates.pluck(:group).uniq.each do |group_name| %>
+						<optgroup label='<%= group_name %>'>
+							<% templates.select{|t| t[:group]==group_name}.each do |t| %>
+								<option value='<%= t[:template_id] %>'><%= t[:title] %></option>
+							<% end %>
+						</optgroup>
+					<% end %>
+				</select>
 			</div>
-			<div class="row">
-				<div class="col-md-4" style="margin-top:20px">
-					<button id="btn_submit" class="btn btn-primary" onclick="submit()">Query</button>
-					<br>
-					<em id="sample-count"></em>
-				</div>
+			<div class="col-md-4">
+				<label>Select an Attribute</label>
+				<select id="output_template_attribute" class="form-control select2">
+					<option value="">Not selected</option>
+				</select>
 			</div>
-
+			<div class="col-md-4">
+				<label>Enter value</label>
+				<input id="output_attribute_value" class="form-control"/>
+			</div>
+		</div>
 	<% end %>
+
+	<div class="row">
+		<div class="col-md-4" style="margin-bottom:20px">
+			<button id="btn_submit" class="btn btn-primary" onclick="submit()">Query</button>
+			<br>
+			<em id="sample-count"></em>
+		</div>
+	</div>
 
 	<div id="samples-table">
 		<%= render partial: "samples/table_view", locals: { samples: @result, link: true }%>
