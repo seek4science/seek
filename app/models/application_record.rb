@@ -97,15 +97,15 @@ class ApplicationRecord < ActiveRecord::Base
 
   def self.with_search_query(q)
     if searchable? && Seek::Config.solr_enabled
-      search = search do |query|
-        query.keywords(q)
-        query.paginate(page: 1, per_page: unscoped.count)
-      end
-      solr_cache(q) do
+      ids = solr_cache(q) do
+        search = search do |query|
+          query.keywords(q)
+          query.paginate(page: 1, per_page: unscoped.count)
+        end
         search.hits.map(&:primary_key)
       end
 
-      search.results
+      find(ids)
     else
       all
     end
