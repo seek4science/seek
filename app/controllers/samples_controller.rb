@@ -8,6 +8,7 @@ class SamplesController < ApplicationController
   before_action :samples_enabled?
   before_action :find_index_assets, only: :index
   before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview]
+	before_action :templates_enabled?, only: [:query, :query_form]
   
   before_action :auth_to_create, only: [:new, :create]
 
@@ -304,6 +305,13 @@ class SamplesController < ApplicationController
         selected = x.get_attribute_value(title)&.include?(options[:attribute_value]) if title.present? && selected
         selected || find_samples([x], link, options, title).present?
       end
+    end
+  end
+
+	def templates_enabled?
+    unless Seek::Config.sample_type_template_enabled
+      flash[:error] = 'Not available'
+      redirect_to select_sample_types_path
     end
   end
 end
