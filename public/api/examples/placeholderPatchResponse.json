@@ -1,49 +1,50 @@
 {
   "data": {
-    "id": "23",
-    "type": "collections",
+    "id": "340",
+    "type": "placeholders",
     "attributes": {
       "policy": {
         "access": "no_access",
         "permissions": [
           {
             "resource": {
-              "id": "1022256860",
+              "id": "1022256539",
               "type": "projects"
             },
             "access": "edit"
           }
         ]
       },
-      "discussion_links": [
+      "title": "A Patched Maximal Placeholder",
+      "license": "CC-BY-4.0",
+      "description": "The Patched Maximal Placeholder",
+      "tags": [
 
       ],
-      "title": "A Maximally Patched Collection",
-      "license": "CC-BY-4.0",
-      "description": "A collection of very interesting things",
-      "tags": [
-        "tag1",
-        "tag2",
-        "tag3"
-      ],
-      "created_at": "2022-07-26T12:41:02.000Z",
-      "updated_at": "2022-07-26T12:41:02.000Z",
+      "created_at": "2022-07-26T12:39:25.000Z",
+      "updated_at": "2022-07-26T12:39:25.000Z",
       "creators": [
         {
-          "profile": "/people/1039993835",
+          "profile": "/people/1039993520",
           "family_name": "Last",
-          "given_name": "Person368",
-          "affiliation": "An Institution: 426",
+          "given_name": "Person91",
+          "affiliation": "An Institution: 111",
           "orcid": null
         }
       ],
-      "other_creators": "John Smith, Jane Smith"
+      "other_creators": "John Smith, Jane Smith",
+      "data_annotations": [
+
+      ],
+      "format_annotations": [
+
+      ]
     },
     "relationships": {
       "creators": {
         "data": [
           {
-            "id": "1039993835",
+            "id": "1039993520",
             "type": "people"
           }
         ]
@@ -51,7 +52,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039993834",
+            "id": "1039993519",
             "type": "people"
           }
         ]
@@ -59,11 +60,11 @@
       "people": {
         "data": [
           {
-            "id": "1039993834",
+            "id": "1039993519",
             "type": "people"
           },
           {
-            "id": "1039993835",
+            "id": "1039993520",
             "type": "people"
           }
         ]
@@ -71,32 +72,38 @@
       "projects": {
         "data": [
           {
-            "id": "1022256860",
+            "id": "1022256539",
             "type": "projects"
           }
         ]
       },
-      "publications": {
+      "assays": {
         "data": [
 
         ]
       },
-      "items": {
-        "data": [
-
-        ]
+      "file_template": {
+        "data": {
+          "id": "348",
+          "type": "file_templates"
+        }
+      },
+      "data_file": {
+        "data": {
+          "id": "883655137",
+          "type": "data_files"
+        }
       }
     },
     "links": {
-      "self": "/collections/23",
-      "items": "/collections/23/items"
+      "self": "/placeholders/340"
     },
     "meta": {
-      "created": "2022-07-26T12:41:02.000Z",
-      "modified": "2022-07-26T12:41:02.000Z",
+      "created": "2022-07-26T12:39:25.000Z",
+      "modified": "2022-07-26T12:39:25.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "21919290-ef0e-013a-3b0d-000c29ced288"
+      "uuid": "e7d7ec40-ef0d-013a-3b0d-000c29ced288"
     }
   },
   "jsonapi": {
