@@ -30,7 +30,7 @@
 
                     <%= link_to "Advanced #{type[:visible_resource_type]} search with filtering ...",
                                 polymorphic_path(type[:type].tableize.to_sym,
-                                                 'filter[query]':query)  %>
+                                                 'filter[query]':query), class:'pull-right'  %>
 
                   <% end %>
 
