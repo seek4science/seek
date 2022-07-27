@@ -26,12 +26,11 @@
         <% ordered_resource_types.each_with_index do |type, i| -%>
             <% unless type[:items].empty? && (type[:hidden_count] == 0) %>
                 <div id="<%= type[:tab_id] -%>" role="tabpanel" class="tab-pane <%= 'active' if active -%>">
-                  <% if !type[:is_external] && query && !['Sample','SampleType'].include?(type[:type]) %>
+                  <% if !type[:is_external] && query && type[:items].first.class.available_filters.any? %>
 
-                      <%= link_to "Advanced #{type[:visible_resource_type]} search with filtering ...",
-                                  polymorphic_path(type[:type].tableize.to_sym,
-                                                   'filter[query]':query),
-                      class:'btn btn-info pull-right' %>
+                    <%= link_to "Advanced #{type[:visible_resource_type]} search with filtering ...",
+                                polymorphic_path(type[:type].tableize.to_sym,
+                                                 'filter[query]':query)  %>
 
                   <% end %>
 
