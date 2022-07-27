@@ -114,14 +114,13 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
 			if (this.options.readonly){
 				const sampleTypes = this.getSampleTypes()
 				$j.each(sampleTypes, (i, s) => {
-					if (!isNaN(s)){
+					if (!isNaN(s)) {
 						const colIdxs = this.table.columns(`${s}:name`)[0]
 						if (colIdxs.length) colIdxs.push(colIdxs[0]-1)
 						this.table.column(function ( idx, data, node ) {
-								if (colIdxs.includes(idx)) $j(node).addClass(`sp-variant-${s % 2}`)
+								if (colIdxs.includes(idx)) $j(node).addClass(`sp-variant-${i % 2}`)
 						})
 					}
-					
 				})
 			}
       this.table
