@@ -31,7 +31,7 @@
                     d.rows_pad = "true";
                 }
             }
-            assayDynamicTable.init(dt.rows, dt.columns, { readonly: true, ajax })
+            assayDynamicTable.init(dt.rows, dt.columns, { readonly: true, level: "assay", ajax })
             const types = assayDynamicTable.getSampleTypes()
             createSampleTypeOptions(dt.sample_types)
         });	
