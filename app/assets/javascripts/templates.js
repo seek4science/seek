@@ -225,8 +225,12 @@ const showTemplateModal = () => {
 };
 
 const setDefaultLevel = () => {
-	let level, href = window.location.href
-	if (href.includes("isa_studies")) level = "study"
-	else if (href.includes("isa_assays")) level = "assay"
-	if (level) $j("#templates_type_select").val(level).change()
-}
+	const href = window.location.href;
+	if (href.includes("isa_studies")) {
+		$j("#templates_type_select").val("study").change();
+		$j("#templates_type_select option[value='assay']").attr("disabled","disabled")
+	} else if (href.includes("isa_assays")) {
+		$j("#templates_type_select").val("assay").change();
+		$j("#templates_type_select option[value='study']").attr("disabled","disabled")
+	}
+};
