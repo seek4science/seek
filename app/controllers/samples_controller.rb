@@ -217,7 +217,7 @@ class SamplesController < ApplicationController
 
     if params[:template_attribute_id].present? && params[:template_attribute_value].present?
       attribute_title = TemplateAttribute.find(params[:template_attribute_id]).title
-      @result = @result.select { |s| s.get_value(attribute_title)&.include?(params[:template_attribute_value]) }
+      @result = @result.select { |s| s.get_attribute_value(attribute_title)&.include?(params[:template_attribute_value]) }
     end
 
     if params[:input_template_id].present? # linked
@@ -301,7 +301,7 @@ class SamplesController < ApplicationController
     samples.select do |s|
       s.send(link).any? do |x|
         selected = x.sample_type.template_id == options[:template_id].to_i
-        selected = x.get_value(title)&.include?(options[:attribute_value]) if title.present? && selected
+        selected = x.get_attribute_value(title)&.include?(options[:attribute_value]) if title.present? && selected
         selected || find_samples([x], link, options, title).present?
       end
     end

@@ -130,10 +130,6 @@ class Sample < ApplicationRecord
     organism_ids | ncbi_linked_organisms.map(&:id)
   end
 
-	def get_value(attribute)
-		JSON.parse(json_metadata)[attribute]
-	end
-	
   #overides default to include sample_type key at the start
   def list_item_title_cache_key_prefix
     "#{sample_type.list_item_title_cache_key_prefix}/#{cache_key}"
