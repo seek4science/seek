@@ -1,0 +1,57 @@
+{
+  "data": {
+    "id": "340",
+    "type": "placeholders",
+    "attributes": {
+      "policy": {
+        "access": "no_access",
+        "permissions": [
+          {
+            "resource": {
+              "id": "1022256539",
+              "type": "projects"
+            },
+            "access": "edit"
+          }
+        ]
+      },
+      "title": "A Patched Maximal Placeholder",
+      "description": "The Patched Maximal Placeholder",
+      "tags": [
+
+      ],
+      "license": "CC-BY-4.0",
+      "other_creators": "John Smith, Jane Smith"
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "1039993520",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "1022256539",
+            "type": "projects"
+          }
+        ]
+      },
+      "file_template": {
+        "data": {
+          "id": "348",
+          "type": "file_templates"
+        }
+      },
+      "data_file": {
+        "data": {
+          "id": "883655137",
+          "type": "data_files"
+        }
+      }
+    }
+  }
+}

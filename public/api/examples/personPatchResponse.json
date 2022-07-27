@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "118",
+    "id": "1039994263",
     "type": "people",
     "attributes": {
       "avatar": null,
@@ -19,13 +19,18 @@
         "Gromacs",
         "Python"
       ],
-      "login": "user114"
+      "login": "user846"
     },
     "relationships": {
+      "programmes": {
+        "data": [
+
+        ]
+      },
       "projects": {
         "data": [
           {
-            "id": "126",
+            "id": "1022257320",
             "type": "projects"
           }
         ]
@@ -33,7 +38,7 @@
       "institutions": {
         "data": [
           {
-            "id": "120",
+            "id": "980198808",
             "type": "institutions"
           }
         ]
@@ -54,6 +59,11 @@
         ]
       },
       "data_files": {
+        "data": [
+
+        ]
+      },
+      "documents": {
         "data": [
 
         ]
@@ -83,21 +93,36 @@
 
         ]
       },
-      "documents": {
+      "workflows": {
+        "data": [
+
+        ]
+      },
+      "collections": {
+        "data": [
+
+        ]
+      },
+      "file_templates": {
+        "data": [
+
+        ]
+      },
+      "placeholders": {
         "data": [
 
         ]
       }
     },
     "links": {
-      "self": "/people/118"
+      "self": "/people/1039994263"
     },
     "meta": {
-      "created": "2022-06-07T14:12:39.000Z",
-      "modified": "2022-06-07T14:12:39.000Z",
+      "created": "2022-07-26T12:43:17.000Z",
+      "modified": "2022-07-26T12:43:17.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "cfe6b7f0-c899-013a-0f7e-0a81884ed284"
+      "uuid": "72221ff0-ef0e-013a-3b0d-000c29ced288"
     }
   },
   "jsonapi": {

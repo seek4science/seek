@@ -1,9 +1,9 @@
 {
   "data": {
-    "id": "115",
+    "id": "1039994260",
     "type": "people",
     "attributes": {
-      "avatar": "/people/115/avatars/2",
+      "avatar": "/people/1039994260/avatars/24",
       "title": "Maximilian Maxi-Mum",
       "description": "A person with all possible details",
       "first_name": "Maximilian",
@@ -20,10 +20,15 @@
       "login": "max_person_user"
     },
     "relationships": {
+      "programmes": {
+        "data": [
+
+        ]
+      },
       "projects": {
         "data": [
           {
-            "id": "121",
+            "id": "1022257315",
             "type": "projects"
           }
         ]
@@ -31,7 +36,7 @@
       "institutions": {
         "data": [
           {
-            "id": "116",
+            "id": "980198804",
             "type": "institutions"
           }
         ]
@@ -39,7 +44,7 @@
       "investigations": {
         "data": [
           {
-            "id": "12",
+            "id": "973655784",
             "type": "investigations"
           }
         ]
@@ -47,7 +52,7 @@
       "studies": {
         "data": [
           {
-            "id": "12",
+            "id": "1060385796",
             "type": "studies"
           }
         ]
@@ -55,7 +60,7 @@
       "assays": {
         "data": [
           {
-            "id": "12",
+            "id": "1035387534",
             "type": "assays"
           }
         ]
@@ -63,15 +68,23 @@
       "data_files": {
         "data": [
           {
-            "id": "8",
+            "id": "883655182",
             "type": "data_files"
+          }
+        ]
+      },
+      "documents": {
+        "data": [
+          {
+            "id": "130",
+            "type": "documents"
           }
         ]
       },
       "models": {
         "data": [
           {
-            "id": "10",
+            "id": "1004285855",
             "type": "models"
           }
         ]
@@ -79,7 +92,7 @@
       "sops": {
         "data": [
           {
-            "id": "4",
+            "id": "1055250541",
             "type": "sops"
           }
         ]
@@ -87,7 +100,7 @@
       "publications": {
         "data": [
           {
-            "id": "4",
+            "id": "738",
             "type": "publications"
           }
         ]
@@ -95,7 +108,7 @@
       "presentations": {
         "data": [
           {
-            "id": "2",
+            "id": "60",
             "type": "presentations"
           }
         ]
@@ -103,29 +116,41 @@
       "events": {
         "data": [
           {
-            "id": "2",
+            "id": "1025619299",
             "type": "events"
           }
         ]
       },
-      "documents": {
+      "workflows": {
         "data": [
-          {
-            "id": "14",
-            "type": "documents"
-          }
+
+        ]
+      },
+      "collections": {
+        "data": [
+
+        ]
+      },
+      "file_templates": {
+        "data": [
+
+        ]
+      },
+      "placeholders": {
+        "data": [
+
         ]
       }
     },
     "links": {
-      "self": "/people/115"
+      "self": "/people/1039994260"
     },
     "meta": {
-      "created": "2022-06-07T14:12:38.000Z",
-      "modified": "2022-06-07T14:12:38.000Z",
+      "created": "2022-07-26T12:43:15.000Z",
+      "modified": "2022-07-26T12:43:15.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "cf443e30-c899-013a-0f7e-0a81884ed284"
+      "uuid": "70e18fc0-ef0e-013a-3b0d-000c29ced288"
     }
   },
   "jsonapi": {

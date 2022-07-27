@@ -1,0 +1,38 @@
+{
+  "data": [
+    {
+      "id": "337",
+      "type": "placeholders",
+      "attributes": {
+        "title": "A Maximal Placeholder"
+      },
+      "links": {
+        "self": "/placeholders/337"
+      }
+    },
+    {
+      "id": "336",
+      "type": "placeholders",
+      "attributes": {
+        "title": "A Minimal Placeholder"
+      },
+      "links": {
+        "self": "/placeholders/336"
+      }
+    }
+  ],
+  "jsonapi": {
+    "version": "1.0"
+  },
+  "links": {
+    "self": "/placeholders?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "first": "/placeholders?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "prev": null,
+    "next": null,
+    "last": "/placeholders?page%5Bnumber%5D=1&page%5Bsize%5D=1000000"
+  },
+  "meta": {
+    "base_url": "http://localhost:3000",
+    "api_version": "0.3"
+  }
+}

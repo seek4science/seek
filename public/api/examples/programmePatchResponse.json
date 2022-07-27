@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "12",
+    "id": "71",
     "type": "programmes",
     "attributes": {
       "discussion_links": [
@@ -19,7 +19,7 @@
       "administrators": {
         "data": [
           {
-            "id": "404",
+            "id": "1039994351",
             "type": "people"
           }
         ]
@@ -32,7 +32,7 @@
       "projects": {
         "data": [
           {
-            "id": "433",
+            "id": "1022257421",
             "type": "projects"
           }
         ]
@@ -62,6 +62,11 @@
 
         ]
       },
+      "documents": {
+        "data": [
+
+        ]
+      },
       "models": {
         "data": [
 
@@ -87,21 +92,46 @@
 
         ]
       },
-      "documents": {
+      "organisms": {
+        "data": [
+
+        ]
+      },
+      "workflows": {
+        "data": [
+
+        ]
+      },
+      "collections": {
+        "data": [
+
+        ]
+      },
+      "human_diseases": {
+        "data": [
+
+        ]
+      },
+      "file_templates": {
+        "data": [
+
+        ]
+      },
+      "placeholders": {
         "data": [
 
         ]
       }
     },
     "links": {
-      "self": "/programmes/12"
+      "self": "/programmes/71"
     },
     "meta": {
-      "created": "2022-06-07T14:13:24.000Z",
-      "modified": "2022-06-07T14:13:24.000Z",
+      "created": "2022-07-26T12:43:42.000Z",
+      "modified": "2022-07-26T12:43:43.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "eab6f6e0-c899-013a-0f7e-0a81884ed284"
+      "uuid": "8176c440-ef0e-013a-3b0d-000c29ced288"
     }
   },
   "jsonapi": {

@@ -1,23 +1,21 @@
 {
   "data": {
-    "type": "documents",
-    "id": "103",
+    "type": "placeholders",
     "attributes": {
-      "title": "A Maximally Patched Document",
-      "description": "A report about the thing that happened",
+      "title": "A Maximal Placeholder",
+      "description": "This is the description",
       "tags": [
         "tag1",
-        "tag2",
-        "tag3"
+        "tag2"
       ],
       "license": "CC-BY-4.0",
       "other_creators": "John Smith, Jane Smith",
       "policy": {
-        "access": "no_access",
+        "access": "download",
         "permissions": [
           {
             "resource": {
-              "id": "1022256893",
+              "id": "1022256509",
               "type": "projects"
             },
             "access": "edit"
@@ -29,7 +27,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039993866",
+            "id": "1039993490",
             "type": "people"
           }
         ]
@@ -37,26 +35,16 @@
       "projects": {
         "data": [
           {
-            "id": "1022256893",
+            "id": "1022256509",
             "type": "projects"
           }
         ]
       },
-      "assays": {
-        "data": [
-          {
-            "id": "1035387467",
-            "type": "assays"
-          }
-        ]
-      },
-      "workflows": {
-        "data": [
-          {
-            "id": "637",
-            "type": "workflows"
-          }
-        ]
+      "file_template": {
+        "data": {
+          "id": "343",
+          "type": "file_templates"
+        }
       }
     }
   }
