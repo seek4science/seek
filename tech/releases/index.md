@@ -11,6 +11,17 @@ Please see [Getting FAIRDOM-SEEK](/get-seek.html) for details about installing S
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html)
 
+## Version 1.12.2
+
+Release date: _28th July 2022_
+
+Small update release that includes
+
+* A fix to search results not being correctly displayed in order of relevance
+* A fix that correctly displays the tab, when linking to a tab (such as related items) using the bookmark (e.g <https://fairdomhub.org/programmes/20#projects> )
+
+For a full list, see [closed issues for 1.12.2](https://github.com/seek4science/seek/milestone/11?closed=1)
+
 ## Version 1.12.1
 
 Release date: _24th June 2022_
