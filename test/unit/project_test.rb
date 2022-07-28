@@ -927,24 +927,24 @@ class ProjectTest < ActiveSupport::TestCase
     end
   end
 
-  test 'edam annotation properties'do
+  test 'ontology annotation properties'do
     project = Factory(:project)
 
-    assert project.supports_edam_annotations?
-    assert project.supports_edam_annotations?(:topics)
-    refute project.supports_edam_annotations?(:operations)
-    refute project.supports_edam_annotations?(:formats)
-    refute project.supports_edam_annotations?(:data)
+    assert project.supports_controlled_vocab_annotations?
+    assert project.supports_controlled_vocab_annotations?(:topics)
+    refute project.supports_controlled_vocab_annotations?(:operations)
+    refute project.supports_controlled_vocab_annotations?(:data_formats)
+    refute project.supports_controlled_vocab_annotations?(:data_types)
 
-    assert project.respond_to?(:edam_topics)
-    refute project.respond_to?(:edam_operations)
-    refute project.respond_to?(:edam_formats)
-    refute project.respond_to?(:edam_data)
+    assert project.respond_to?(:topic_annotations)
+    refute project.respond_to?(:operation_annotations)
+    refute project.respond_to?(:data_format_annotations)
+    refute project.respond_to?(:data_type_annotation)
 
-    Factory(:edam_topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
-    refute project.edam_annotations?
-    project.edam_topics = 'Chemistry'
-    assert project.edam_annotations?
+    Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
+    refute project.controlled_vocab_annotations?
+    project.topic_annotations = 'Chemistry'
+    assert project.controlled_vocab_annotations?
   end
   
 end

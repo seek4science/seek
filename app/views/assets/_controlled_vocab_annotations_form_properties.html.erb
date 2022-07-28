@@ -1,0 +1,10 @@
+<% return unless resource.supports_controlled_vocab_annotations? %>
+
+<%= render partial: "assets/controlled_vocab_annotations_form_property", locals: { resource: resource, property: :topics} -%>
+
+<%= render partial: "assets/controlled_vocab_annotations_form_property", locals: { resource: resource, property: :operations} -%>
+
+<%= render partial: "assets/controlled_vocab_annotations_form_property", locals: { resource: resource, property: :data_types} -%>
+
+<%= render partial: "assets/controlled_vocab_annotations_form_property", locals: { resource: resource, property: :data_formats} -%>
+
