@@ -188,7 +188,7 @@ class SampleControlledVocabTest < ActiveSupport::TestCase
     person = Factory(:person)
 
     vocab = Factory(:apples_sample_controlled_vocab)
-    sys_vocab = Factory(:edam_topics_controlled_vocab)
+    sys_vocab = Factory(:topics_controlled_vocab)
 
     refute vocab.system_vocab?
     assert sys_vocab.system_vocab?
