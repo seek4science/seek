@@ -204,6 +204,7 @@ const applyTemplate = () => {
 
   SampleTypes.recalculatePositions();
   SampleTypes.bindSortable();
+	$j(".sample-type-attribute-type").trigger("change", [false]);
 };
 
 const showTemplateModal = () => {

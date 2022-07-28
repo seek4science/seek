@@ -113,6 +113,7 @@
         $j('#attribute-table').on('change', '.sample-type-is-title', SampleTypes.singleIsTitle);
         $j('#attribute-table').on('change', '.sample-type-attribute-type', SampleTypes.attributeTypeChanged);
         $j('#attribute-table').on('change', '.controlled-vocab-selection', SampleTypeControlledVocab.controlledVocabChanged);
-        $j('.controlled-vocab-selection').change();
+        $j('#attribute-table .sample-type-attribute-type').trigger("change", [false]);
+				$j('.controlled-vocab-selection').change();
     });
 </script>
