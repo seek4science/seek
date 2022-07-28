@@ -5,7 +5,7 @@ module Seek
       module InstanceMethods
         def add_new_to_folder
           projects.each do |project|
-            pf = ProjectFolder.new_items_folder project
+            pf = ProjectFolder.new_items_folder(project, self)
             pf.add_assets self unless pf.nil?
           end
         end
