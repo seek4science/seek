@@ -69,6 +69,15 @@ class TemplatesController < ApplicationController
     end
 
     def manage; end
+
+		#post
+		def template_attributes
+			template = Template.find(params[:id])
+			items = template.template_attributes.map{ |a| { id: a.id, title: a.title } }
+			respond_to do |format|
+				format.json { render json: items.to_json }
+			end
+		end
   
     private
   
