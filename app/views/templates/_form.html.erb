@@ -105,6 +105,8 @@
         $j('#attribute-table').on('change', '.sample-type-is-title', SampleTypes.singleIsTitle);
         $j('#attribute-table').on('change', '.sample-type-attribute-type', SampleTypes.attributeTypeChanged);
         $j('#attribute-table').on('change', '.controlled-vocab-selection', SampleTypeControlledVocab.controlledVocabChanged);
+        $j('#attribute-table .sample-type-attribute-type').trigger("change", [false]);
+				$j('.templates').select2({theme: "bootstrap"});
 				initSelect2($j('.templates'), $j('#existing_templates'))
 
         Templates.clearContext();
