@@ -27,7 +27,7 @@ class ProjectFolder < ApplicationRecord
 
    #assets that are not associated to any assay
   def authorized_hanging_assets
-    assets.select{ |a| a.assays.length == 0 }.select(&:can_view?)
+    assets.select{ |a| a.respond_to?(:assays) && a.assays.empty? && a.can_view? }
   end
 
   #what is displayed in the tree

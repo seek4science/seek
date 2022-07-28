@@ -10,8 +10,8 @@ class WorkflowApiTest < ActionDispatch::IntegrationTest
     @project = @current_user.person.projects.first
     investigation = Factory(:investigation, projects: [@project], contributor: current_person)
     study = Factory(:study, investigation: investigation, contributor: current_person)
-    Factory(:edam_topics_controlled_vocab)
-    Factory(:edam_operations_controlled_vocab)
+    Factory(:topics_controlled_vocab)
+    Factory(:operations_controlled_vocab)
     @assay = Factory(:assay, study: study, contributor: current_person)
     @creator = Factory(:person)
     @publication = Factory(:publication, projects: [@project])

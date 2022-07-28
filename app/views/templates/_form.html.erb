@@ -1,6 +1,3 @@
-<%= javascript_include_tag "select2.full.min" %>
-<%= stylesheet_link_tag "select2.min.css" %>
-<%= stylesheet_link_tag "select2.bootstrap.min.css" %>
 <% tab ||= 'manual' %>
 
 <span id='modal-dialogues'>
@@ -110,6 +107,7 @@
         $j('#attribute-table').on('change', '.controlled-vocab-selection', SampleTypeControlledVocab.controlledVocabChanged);
         $j('#attribute-table .sample-type-attribute-type').trigger("change", [false]);
 				$j('.templates').select2({theme: "bootstrap"});
+				initSelect2($j('.templates'), $j('#existing_templates'))
 
         Templates.clearContext();
         Templates.init($j('#template-attributes'));
