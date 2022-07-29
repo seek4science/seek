@@ -30,8 +30,8 @@
                       <%= link_to "Advanced #{type[:visible_resource_type]} search with filtering ...",
                                   polymorphic_path(type[:type].tableize.to_sym,
                                                    'filter[query]':query), class:'pull-right'  %>
-                    <% elseif item %>
-                      <%= link_to "Advanced #{type[:visible_resource_type]} list for this #{item.model_name.human} with search and filtering ...",
+                    <% elsif item %>
+                      <%= link_to "Advanced #{type[:visible_resource_type]} list for this #{internationalized_resource_name(item.model_name.to_s, false)} with search and filtering ...",
                                   [item, type[:type].tableize.to_sym], class:'pull-right'  %>
 
                     <% end %>
