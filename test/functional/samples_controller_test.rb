@@ -714,7 +714,7 @@ class SamplesControllerTest < ActionController::TestCase
     end
 
     assert_response :success
-    assert_select 'div.related-items a[href=?]', sample_samples_path(sample), text: "View all 2 items"
+    assert_select 'div.related-items a[href=?]', sample_samples_path(sample), text: "Advanced Samples list for this Sample with search and filtering ..."
   end
 
   test 'related samples index page works correctly' do
