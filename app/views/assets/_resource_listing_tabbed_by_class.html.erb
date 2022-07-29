@@ -2,8 +2,7 @@
 <%# different types of assets will be placed in different tabs based on their class; -%>
 <%# the partial requires 3 parameters to be defined: -%>
 <%# - resource_hash: a hash of all resource instances, where keys are resource class names and values are arrays of resource instances of that class -%>
-<%# - narrow_view: type of the partial to use for asset listings: 'false' to use the same partial with much info as on SOPs listing page -%>
-<%#                                                               'true' to use a partial with fewer information; suitable for 'show' pages for people/projects -%>
+
 <%
    actions_partial_disable ||= false
    item ||= nil
@@ -31,7 +30,7 @@
                       <%= link_to "Advanced #{type[:visible_resource_type]} search with filtering ...",
                                   polymorphic_path(type[:type].tableize.to_sym,
                                                    'filter[query]':query), class:'pull-right'  %>
-                    <% else %>
+                    <% elseif item %>
                       <%= link_to "Advanced #{type[:visible_resource_type]} list for this #{item.model_name.human} with search and filtering ...",
                                   [item, type[:type].tableize.to_sym], class:'pull-right'  %>
 
