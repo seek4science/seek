@@ -43,7 +43,7 @@ class Sample < ApplicationRecord
   after_destroy :queue_sample_type_update_job
 
 
-  has_filter :sample_type, :programme
+  has_filter :sample_type
 
   def sample_type=(type)
     super
