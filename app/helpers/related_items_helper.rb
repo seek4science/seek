@@ -13,7 +13,7 @@ module RelatedItemsHelper
 
   def update_resource_type(resource_type)
     resource_type[:hidden_count] ||= 0
-    resource_type[:items] || []
+    resource_type[:items] ||= []
     resource_type[:extra_count] ||= 0
     resource_type[:is_external] ||= false
 

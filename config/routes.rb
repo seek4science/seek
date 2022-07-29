@@ -750,6 +750,7 @@ SEEK::Application.routes.draw do
 			post :template_attributes
     end
 		resources :samples
+    resources :projects, :people, only: [:index]
   end
 
   ### SINGLE PAGE

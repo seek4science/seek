@@ -24,7 +24,7 @@
         <% ordered_resource_types.each_with_index do |type, i| -%>
             <% unless type[:items].empty? && (type[:hidden_count] == 0) %>
                 <div id="<%= type[:tab_id] -%>" role="tabpanel" class="tab-pane <%= 'active' if active -%>">
-                  <% if !type[:is_external] && type[:items].first.class.available_filters.any? %>
+                  <% if !type[:is_external] && type[:type].constantize.available_filters.any? %>
                     <% if query  %>
 
                       <%= link_to "Advanced #{type[:visible_resource_type]} search with filtering ...",
