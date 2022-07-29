@@ -91,8 +91,8 @@ Factory.define(:max_workflow, class: Workflow) do |f|
     workflow.content_blob = Factory.create(:cwl_content_blob, asset: workflow, asset_version: workflow.version)
     workflow.annotate_with(['Workflow-tag1', 'Workflow-tag2', 'Workflow-tag3', 'Workflow-tag4', 'Workflow-tag5'], 'tag', workflow.contributor)
     User.with_current_user(workflow.contributor.user) do
-      workflow.edam_operations = 'Clustering'
-      workflow.edam_topics = 'Chemistry'
+      workflow.operation_annotations = 'Clustering'
+      workflow.topic_annotations = 'Chemistry'
     end
     workflow.save!
   end

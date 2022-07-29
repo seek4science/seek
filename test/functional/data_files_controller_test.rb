@@ -1228,13 +1228,22 @@ class DataFilesControllerTest < ActionController::TestCase
   end
 
   test 'explore earlier version' do
-    df = data_files(:downloadable_spreadsheet_data_file)
-    assert df.can_edit?
-    df.versions.first.content_blob.save # Need to do this as file_size isn't set when loading from fixture
-    assert df.can_download?
-    get :explore, params: { id: df, version: 1 }
+
+    df = Factory(:small_test_spreadsheet_datafile)
+    login_as(df.contributor.user)
+
+    assert df.save_as_new_version('no comment')
+    Factory(:pdf_content_blob, asset_version: df.version, asset: df)
+    df.reload
+
+    assert_equal 2, df.versions.count
+    assert df.find_version(1).content_blob.is_extractable_excel?
+    refute df.find_version(2).content_blob.is_extractable_excel?
+
+    get :explore, params: {id: df, version: 1}
 
     assert_response :success
+
   end
 
   test 'gracefully handles explore with no spreadsheet' do
@@ -2294,37 +2303,7 @@ class DataFilesControllerTest < ActionController::TestCase
     assert_not_empty flash[:error]
   end
 
-  test 'strain samples successfully extracted from spreadsheet' do
-    create_sample_attribute_type
-    person = Factory(:project_administrator)
-    login_as(person)
-
-    data_file = Factory :data_file, content_blob: Factory(:strain_sample_data_content_blob),
-                        policy: Factory(:private_policy), contributor: person
-    refute data_file.sample_template?
-    assert_empty data_file.possible_sample_types
-
-    sample_type = SampleType.new title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person
-    sample_type.content_blob = Factory(:strain_sample_data_content_blob)
-    sample_type.build_attributes_from_template
-    attribute_type = sample_type.sample_attributes[-2]
-    attribute_type.sample_attribute_type = Factory(:strain_sample_attribute_type)
-    attribute_type.required = true
-    attribute_type = sample_type.sample_attributes[-1]
-    attribute_type.sample_attribute_type = Factory(:strain_sample_attribute_type)
-    attribute_type.required = false
-    sample_type.save!
-
-    assert_difference('Sample.count', 3) do
-      post :extract_samples, params: { id: data_file.id, confirm: 'true' }
-    end
-
-    assert(samples = assigns(:samples))
-    assert_equal 3, samples.count
-    assert_equal samples.sort, data_file.extracted_samples.sort
-  end
-
-  test 'extract from data file' do
+  test 'persist extracted samples from data file triggers job' do
     create_sample_attribute_type
     person = Factory(:project_administrator)
     login_as(person)
@@ -2342,11 +2321,13 @@ class DataFilesControllerTest < ActionController::TestCase
     sample_type.sample_attributes[1].sample_attribute_type = Factory(:datetime_sample_attribute_type)
     sample_type.save!
 
-    assert_difference('Sample.count', 3) do
-      assert_difference('ReindexingQueue.count', 3) do
-        assert_difference('AuthLookupUpdateQueue.count', 3) do
-          with_config_value(:auth_lookup_enabled,true) do # needed to test added to queue
-            post :extract_samples, params: { id: data_file.id, confirm: 'true' }
+    assert_no_difference('Sample.count') do
+      assert_no_difference('ReindexingQueue.count') do
+        assert_no_difference('AuthLookupUpdateQueue.count') do
+          assert_enqueued_jobs(1, only: SampleDataPersistJob) do
+            assert_difference('Task.count',1) do
+              post :extract_samples, params: { id: data_file.id, confirm: 'true' }
+            end
           end
         end
       end
@@ -2354,17 +2335,51 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_redirected_to data_file_path(data_file)
 
-    assert(samples = assigns(:samples))
-    assert_equal 3, samples.count
-    assert_not_includes samples.map { |s| s.get_attribute_value('full name') }, 'Bob'
+    data_file.reload
+    assert_equal Task::STATUS_QUEUED, data_file.sample_persistence_task.status
+  end
 
-    samples.each do |sample|
-      assert_equal data_file, sample.originating_data_file
+  test 'show persistence task status' do
+
+    person = Factory(:person)
+    other_person = Factory(:person)
+    df = Factory(:data_file, contributor: person, policy: Factory(:publicly_viewable_policy))
+    sample_type = Factory(:patient_sample_type)
+    SampleDataPersistJob.new(df, sample_type).queue_job
+    df.reload
+
+    login_as(other_person)
+    get :show, params: {id: df.id}
+    assert_response :success
+    assert_select '#sample-persistence-status .alert-info', count: 0
+
+    login_as(person)
+    get :show, params: {id: df.id}
+    assert_response :success
+    assert_select '#sample-persistence-status' do
+      assert_select '.alert-info', text: /Queued/
     end
 
-    data_file.reload
+    df.sample_persistence_task.update_attribute(:status, Task::STATUS_ACTIVE)
+    get :show, params: {id: df.id}
+    assert_response :success
+    assert_select '#sample-persistence-status' do
+      assert_select '.alert-info', text: /Active/
+    end
 
-    assert_equal samples.sort, data_file.extracted_samples.sort
+    df.sample_persistence_task.update_attribute(:status, Task::STATUS_DONE)
+    get :show, params: {id: df.id, previous_status: Task::STATUS_ACTIVE}
+    assert_response :success
+    assert_select '#sample-persistence-status' do
+      assert_select '.alert-info', text:/Sample creation complete/
+      assert_select '.alert-info a[href=?]', data_file_samples_path(df), text: /View Created Samples/
+    end
+
+    df.sample_persistence_task.update_attribute(:status, Task::STATUS_DONE)
+    get :show, params: {id: df.id}
+    assert_response :success
+    assert_select '#sample-persistence-status .alert-info', count: 0
+
   end
 
   test 'extract from data file with multiple matching sample types redirects to selection page' do
@@ -2787,35 +2802,6 @@ class DataFilesControllerTest < ActionController::TestCase
 
     assert_redirected_to data_file_path(df)
     assert_nil df.reload.policy.sharing_scope
-  end
-
-  test 'extract from data file and associate with assay' do
-    person = Factory(:project_administrator)
-    login_as(person)
-
-    Factory(:string_sample_attribute_type, title: 'String')
-
-    data_file = Factory(:data_file, content_blob: Factory(:sample_type_populated_template_content_blob),
-                        policy: Factory(:private_policy), contributor: person)
-
-    assay_asset1 = Factory(:assay_asset, asset: data_file, direction: AssayAsset::Direction::INCOMING,assay:Factory(:assay,contributor:person))
-    assay_asset2 = Factory(:assay_asset, asset: data_file, direction: AssayAsset::Direction::OUTGOING,assay:Factory(:assay,contributor:person))
-
-    sample_type = SampleType.new(title: 'from template', uploaded_template: true, project_ids: [person.projects.first.id], contributor: person)
-    sample_type.content_blob = Factory(:sample_type_template_content_blob)
-    sample_type.build_attributes_from_template
-    sample_type.save!
-
-    assert_difference('AssayAsset.count', 4) do
-      assert_difference('Sample.count', 4) do
-        post :extract_samples, params: { id: data_file.id, confirm: 'true', assay_ids: [assay_asset1.assay_id] }
-      end
-    end
-
-    assigns(:samples).each do |sample|
-      assert_equal [assay_asset1.assay], sample.assays
-      assert_equal assay_asset1.direction, sample.assay_assets.first.direction
-    end
   end
 
   test 'create content blob' do

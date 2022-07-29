@@ -1,12 +1,12 @@
-<%= button_link_to('Share with a person', 'add', '#', id: 'add-person-permission-button') %>
+<%= button_link_to("Share with a #{t('person')}", 'add', '#', id: 'add-person-permission-button') %>
 
 <%= modal(id: 'add-person-permission-modal', size: 'm') do %>
-    <%= modal_header('Share with people') %>
+    <%= modal_header("Share with #{t('person').pluralize}") %>
     <%= modal_body do %>
         <div class="form-group">
-          <label>The following people...</label>
+          <label>The following <%= t('person').pluralize %>...</label>
           <%= objects_input('permission-people-ids', [], typeahead: { values: Person.all.map { |p| { id: p.id, name: p.name, hint: p.typeahead_hint } } }, name: nil) -%>
-          <p class="help-block">Start typing a person's name and select from the list that appears. You can select multiple people.</p>
+          <p class="help-block">Start typing a <%= t('person') %>'s name and select from the list that appears. You can select multiple <%= t('person').pluralize %>.</p>
         </div>
         <div class="form-group">
           <label>can...</label>

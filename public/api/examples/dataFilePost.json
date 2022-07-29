@@ -21,7 +21,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "745",
+              "id": "130",
               "type": "projects"
             },
             "access": "edit"
@@ -33,7 +33,7 @@
       "creators": {
         "data": [
           {
-            "id": "680",
+            "id": "179",
             "type": "people"
           }
         ]
@@ -41,7 +41,7 @@
       "projects": {
         "data": [
           {
-            "id": "745",
+            "id": "130",
             "type": "projects"
           }
         ]
@@ -49,7 +49,7 @@
       "assays": {
         "data": [
           {
-            "id": "109",
+            "id": "28",
             "type": "assays"
           }
         ]
@@ -57,7 +57,7 @@
       "publications": {
         "data": [
           {
-            "id": "61",
+            "id": "28",
             "type": "publications"
           }
         ]
@@ -65,7 +65,7 @@
       "events": {
         "data": [
           {
-            "id": "25",
+            "id": "28",
             "type": "events"
           }
         ]
@@ -73,7 +73,7 @@
       "workflows": {
         "data": [
           {
-            "id": "35",
+            "id": "28",
             "type": "workflows"
           }
         ]

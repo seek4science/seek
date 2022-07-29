@@ -200,18 +200,10 @@ class DataFilesController < ApplicationController
 
   def extract_samples
     if params[:confirm]
-      Rails.logger.info('Starting to persist samples')
-      time = Benchmark.measure do
-        extractor = Seek::Samples::Extractor.new(@data_file, @sample_type)
-        @samples = extractor.persist.select(&:persisted?)
-        extractor.clear
-        @data_file.copy_assay_associations(@samples, params[:assay_ids]) if params[:assay_ids]
-      end
-      Rails.logger.info("Benchmark for persist: #{time.to_s}")
-
-      flash[:notice] = "#{@samples.count} samples extracted successfully"
+      SampleDataPersistJob.new(@data_file, @sample_type, assay_ids: params["assay_ids"]).queue_job
+      flash[:notice] = 'Started creating extracted samples'
     else
-      SampleDataExtractionJob.new(@data_file, @sample_type, false).queue_job
+      SampleDataExtractionJob.new(@data_file, @sample_type).queue_job
     end
 
     respond_to do |format|
@@ -239,11 +231,18 @@ class DataFilesController < ApplicationController
   end
 
   def extraction_status
-    @previous_status = params[:previous_status]
-    @job_status = @data_file.sample_extraction_task.status
+    job_status = @data_file.sample_extraction_task.status
 
     respond_to do |format|
-      format.html { render partial: 'data_files/sample_extraction_status', locals: { data_file: @data_file } }
+      format.html { render partial: 'data_files/sample_extraction_status', locals: { data_file: @data_file, job_status: job_status } }
+    end
+  end
+
+  def persistence_status
+    job_status = @data_file.sample_persistence_task.status
+
+    respond_to do |format|
+      format.html { render partial: 'data_files/sample_persistence_status', locals: { data_file: @data_file, job_status: job_status, previous_status: params[:previous_status] } }
     end
   end
 
@@ -253,7 +252,7 @@ class DataFilesController < ApplicationController
         @sample_type = @data_file.reload.possible_sample_types.last
 
         if @sample_type
-          SampleDataExtractionJob.new(@data_file, @sample_type, false, overwrite: true).queue_job
+          SampleDataExtractionJob.new(@data_file, @sample_type, overwrite: true).queue_job
 
           respond_to do |format|
             format.html { redirect_to @data_file }
@@ -497,9 +496,7 @@ class DataFilesController < ApplicationController
                                       { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                       { assay_assets_attributes: [:assay_id, :relationship_type_id] },
                                       { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
-                                      :file_template_id,
-                                      :edam_formats,
-                                      :edam_data,
+                                      :file_template_id, :data_format_annotations, :data_type_annotations,
                                       { publication_ids: [] }, { workflow_ids: [] },
                                       { workflow_data_files_attributes:[:id, :workflow_id, :workflow_data_file_relationship_id, :_destroy] },
                                       discussion_links_attributes:[:id, :url, :label, :_destroy])

@@ -13,33 +13,43 @@
         "permissions": [
           {
             "resource": {
-              "id": "725",
+              "id": "249",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "786",
+              "id": "304",
               "type": "projects"
             },
             "access": "download"
           },
           {
             "resource": {
-              "id": "740",
+              "id": "273",
               "type": "institutions"
             },
             "access": "view"
           }
         ]
-      }
+      },
+      "topic_annotations": [
+        {
+          "label": "Biomedical science",
+          "identifier": "http://edamontology.org/topic_3344"
+        },
+        {
+          "label": "Chemistry",
+          "identifier": "http://edamontology.org/topic_3314"
+        }
+      ]
     },
     "relationships": {
       "programmes": {
         "data": [
           {
-            "id": "17",
+            "id": "24",
             "type": "programmes"
           }
         ]

@@ -1,5 +1,5 @@
 <% assay ||= nil %>
-<% valid_assay = assay && !assay.sample_type.blank? && assay&.sample_type %>
+<% valid_assay = assay&.sample_type.present? %>
 
 <div style="padding: 0 20px 20px 20px;">
     <div class="row" id="options_container" style="margin-bottom:15px">

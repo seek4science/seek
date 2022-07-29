@@ -460,4 +460,19 @@ class DataFileTest < ActiveSupport::TestCase
       assert_equal aa1.direction, s1.assay_assets.where(assay_id: aa1.assay_id).first.direction
     end
   end
+
+  test 'ontology cv annotation properties'do
+    data_file = Factory(:data_file)
+
+    assert data_file.supports_controlled_vocab_annotations?
+    refute data_file.supports_controlled_vocab_annotations?(:topics)
+    refute data_file.supports_controlled_vocab_annotations?(:operations)
+    assert data_file.supports_controlled_vocab_annotations?(:data_formats)
+    assert data_file.supports_controlled_vocab_annotations?(:data_types)
+
+    refute data_file.respond_to?(:topic_annotations)
+    refute data_file.respond_to?(:operation_annotations)
+    assert data_file.respond_to?(:data_format_annotations)
+    assert data_file.respond_to?(:data_type_annotations)
+  end
 end

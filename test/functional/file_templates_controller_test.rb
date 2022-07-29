@@ -73,6 +73,8 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'should create file template' do
+    Factory(:data_types_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_types_controlled_vocab
+    Factory(:data_formats_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_formats_controlled_vocab
     person = Factory(:person)
     login_as(person)
 
@@ -80,13 +82,17 @@ class FileTemplatesControllerTest < ActionController::TestCase
       assert_difference('FileTemplate.count') do
         assert_difference('FileTemplate::Version.count') do
           assert_difference('ContentBlob.count') do
-            post :create, params: { file_template: { title: 'File Template', project_ids: [person.projects.first.id]}, content_blobs: [valid_content_blob], policy_attributes: valid_sharing }
+            post :create, params: { file_template: { title: 'File Template', project_ids: [person.projects.first.id], data_format_annotations:'JSON', data_type_annotations:'Sequence features metadata'}, content_blobs: [valid_content_blob], policy_attributes: valid_sharing }
           end
         end
       end
     end
 
-    assert_redirected_to file_template_path(assigns(:file_template))
+    template = assigns(:file_template)
+    assert_redirected_to file_template_path(template)
+
+    assert_equal ['http://edamontology.org/data_2914'], template.data_type_annotations
+    assert_equal ['http://edamontology.org/format_3464'], template.data_format_annotations
   end
 
   test 'should create file template version' do
@@ -110,16 +116,23 @@ class FileTemplatesControllerTest < ActionController::TestCase
   end
 
   test 'should update file template' do
+    Factory(:data_types_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_types_controlled_vocab
+    Factory(:data_formats_controlled_vocab) unless SampleControlledVocab::SystemVocabs.data_formats_controlled_vocab
+
     person = Factory(:person)
     ft = Factory(:file_template, contributor: person)
     login_as(person)
 
     assert_difference('ActivityLog.count') do
-      put :update, params: { id: ft.id, file_template: { title: 'Different title', project_ids: [person.projects.first.id]} }
+      put :update, params: { id: ft.id, file_template: { title: 'Different title', project_ids: [person.projects.first.id], data_format_annotations:'JSON', data_type_annotations:'Sequence features metadata'} }
     end
 
-    assert_redirected_to file_template_path(assigns(:file_template))
-    assert_equal 'Different title', assigns(:file_template).title
+    template = assigns(:file_template)
+    assert_redirected_to file_template_path(template)
+    assert_equal 'Different title', template.title
+
+    assert_equal ['http://edamontology.org/data_2914'], template.data_type_annotations
+    assert_equal ['http://edamontology.org/format_3464'], template.data_format_annotations
   end
 
   test 'should destroy file template' do

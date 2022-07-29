@@ -25,7 +25,7 @@ class ApplicationRecord < ActiveRecord::Base
   include Seek::Permissions::ActsAsAuthorized
   include Seek::RelatedItems
   include HasTasks
-  include HasEdamAnnotations
+  include HasControlledVocabularyAnnotations
 
   include Annotations::Acts::Annotatable
   include Annotations::Acts::AnnotationSource
@@ -34,22 +34,6 @@ class ApplicationRecord < ActiveRecord::Base
   def self.is_taggable?
     false # defaults to false, unless it includes Taggable which will override this and check the configuration
   end
-  
-  # Returns the columns to be shown on the table view for the resource
-  # This columns will always be shown
-  def columns_required
-    ['title']
-  end
-  # default columns to be shown after required columns
-  def columns_default
-    []
-  end
-  # additional available columns to be shown as an option
-  def columns_allowed
-    columns_default + ['description','created_at','updated_at']
-  end
-
-  
 
   # takes and ignores arguments for use in :after_add => :update_timestamp, etc.
   def update_timestamp(*_args)
@@ -111,10 +95,6 @@ class ApplicationRecord < ActiveRecord::Base
     self.class.supports_doi?
   end
 
-  def is_a_version?
-    false
-  end
-
   def self.with_search_query(q)
     if searchable? && Seek::Config.solr_enabled
       ids = solr_cache(q) do
@@ -122,11 +102,10 @@ class ApplicationRecord < ActiveRecord::Base
           query.keywords(q)
           query.paginate(page: 1, per_page: unscoped.count)
         end
-
         search.hits.map(&:primary_key)
       end
 
-      where(id: ids)
+      find(ids)
     else
       all
     end
@@ -176,4 +155,22 @@ class ApplicationRecord < ActiveRecord::Base
   def self.user_creatable?
     false
   end
+
+  def allowed_table_columns
+    Seek::IndexTableColumnDefinitions.allowed_columns(self)
+  end
+
+  def default_table_columns
+    Seek::IndexTableColumnDefinitions.default_columns(self)
+  end
+
+  def required_table_columns
+    Seek::IndexTableColumnDefinitions.required_columns(self)
+  end
+
+  #TODO: this could potentially be moved into a module that pulls together all the generated cache keys into one place
+  def list_item_title_cache_key_prefix
+    "rli_title_#{cache_key}"
+  end
+
 end

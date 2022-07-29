@@ -73,6 +73,8 @@ class Project < ApplicationRecord
   #  is to be used)
   belongs_to :default_policy, class_name: 'Policy', dependent: :destroy, autosave: true
 
+  has_controlled_vocab_annotations :topics
+
   # FIXME: temporary handler, projects need to support multiple programmes
   def programmes
     Programme.where(id: programme_id)
@@ -124,13 +126,6 @@ class Project < ApplicationRecord
 
   has_many :asset_gatekeeper_roles, -> { where(role_type_id: RoleType.find_by_key!(:asset_gatekeeper)) }, as: :scope, class_name: 'Role'
   has_many :asset_gatekeepers, through: :asset_gatekeeper_roles, class_name: 'Person', source: :person
-
-  def columns_default
-    super + ['web_page']
-  end
-  def columns_allowed
-    columns_default + ['wiki_page','start_date','end_date']
-  end
 
   def locations
     # infer all project's locations from the institutions where the person is member of

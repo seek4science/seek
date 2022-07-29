@@ -121,10 +121,10 @@ Factory.define(:ontology_sample_controlled_vocab, parent: :sample_controlled_voc
   end
 end
 
-Factory.define(:edam_topics_controlled_vocab, parent: :sample_controlled_vocab) do |f|
-  f.title 'EDAM Topics'
+Factory.define(:topics_controlled_vocab, parent: :sample_controlled_vocab) do |f|
+  f.title 'Topics'
   f.ols_root_term_uri 'http://edamontology.org/topic_0003'
-  f.key SampleControlledVocab::SystemVocabs::KEYS[:edam_topics]
+  f.key SampleControlledVocab::SystemVocabs.database_key_for_property(:topics)
   f.source_ontology 'edam'
   f.after_build do |vocab|
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Topic',iri:'http://edamontology.org/topic_0003',parent_iri:'')
@@ -134,16 +134,38 @@ Factory.define(:edam_topics_controlled_vocab, parent: :sample_controlled_vocab) 
   end
 end
 
-Factory.define(:edam_operations_controlled_vocab, parent: :sample_controlled_vocab) do |f|
-  f.title 'EDAM Operations'
+Factory.define(:operations_controlled_vocab, parent: :sample_controlled_vocab) do |f|
+  f.title 'Operations'
   f.ols_root_term_uri 'http://edamontology.org/operation_0004'
-  f.key SampleControlledVocab::SystemVocabs::KEYS[:edam_operations]
+  f.key SampleControlledVocab::SystemVocabs.database_key_for_property(:operations)
   f.source_ontology 'edam'
   f.after_build do |vocab|
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Operation',iri:'http://edamontology.org/operation_0004',parent_iri:'')
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Correlation',iri:'http://edamontology.org/operation_3465',parent_iri:'http://edamontology.org/operation_0004')
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Clustering',iri:'http://edamontology.org/operation_3432',parent_iri:'http://edamontology.org/operation_0004')
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Expression correlation analysis',iri:'http://edamontology.org/operation_3463',parent_iri:'http://edamontology.org/operation_3465')
+  end
+end
+
+Factory.define(:data_types_controlled_vocab, parent: :sample_controlled_vocab) do |f|
+  f.title 'Data'
+  f.ols_root_term_uri 'http://edamontology.org/data_0006'
+  f.key SampleControlledVocab::SystemVocabs.database_key_for_property(:data_types)
+  f.source_ontology 'edam'
+  f.after_build do |vocab|
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Data',iri:'http://edamontology.org/data_0006',parent_iri:'')
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Sequence features metadata',iri: 'http://edamontology.org/data_2914', parent_iri:'http://edamontology.org/data_0006')
+  end
+end
+
+Factory.define(:data_formats_controlled_vocab, parent: :sample_controlled_vocab) do |f|
+  f.title 'Formats'
+  f.ols_root_term_uri 'http://edamontology.org/format_1915'
+  f.key SampleControlledVocab::SystemVocabs.database_key_for_property(:data_formats)
+  f.source_ontology 'edam'
+  f.after_build do |vocab|
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Format',iri:'http://edamontology.org/format_1915',parent_iri:'')
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'JSON',iri: 'http://edamontology.org/format_3464', parent_iri:'http://edamontology.org/format_1915')
   end
 end
 

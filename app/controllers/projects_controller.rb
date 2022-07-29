@@ -668,7 +668,7 @@ class ProjectsController < ApplicationController
   def project_params
     permitted_params = [:title, :web_page, :wiki_page, :description, { organism_ids: [] }, :parent_id, :start_date,
                         :end_date,
-                        :funding_codes, { human_disease_ids: [] },
+                        :funding_codes, { human_disease_ids: [] }, :topic_annotations,
                         discussion_links_attributes:[:id, :url, :label, :_destroy]]
 
     if User.admin_logged_in?
@@ -743,7 +743,7 @@ class ProjectsController < ApplicationController
           membership.update(time_left_at: left_at)
         end
         member = Person.find(membership.person_id)
-        Rails.cache.delete_matched("rli_title_#{member.cache_key}_.*")
+        Rails.cache.delete_matched(/#{member.list_item_title_cache_key_prefix}.*/)
       end
     end
   end

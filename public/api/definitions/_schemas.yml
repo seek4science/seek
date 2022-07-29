@@ -2047,6 +2047,7 @@ personPost:
           required:
             - first_name
             - last_name
+            - email
           additionalProperties: false
       required:
         - type
@@ -2325,6 +2326,8 @@ projectPost:
               $ref: "#/components/schemas/nullableLicense"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
+            topic_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
           required:
             - title
           additionalProperties: false
@@ -2374,6 +2377,8 @@ projectPatch:
               $ref: "#/components/schemas/nullableLicense"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
+            topic_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
           additionalProperties: false
         relationships:
           type: object
@@ -2878,9 +2883,9 @@ workflowPost:
           properties:
             tags:
               $ref: "#/components/schemas/tags"
-            edam_topics:
+            topic_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
-            edam_operations:
+            operation_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
             title:
               $ref: "#/components/schemas/nonEmptyString"
@@ -2956,9 +2961,9 @@ workflowPatch:
           properties:
             tags:
               $ref: "#/components/schemas/tags"
-            edam_topics:
+            topic_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
-            edam_operations:
+            operation_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
             title:
               $ref: "#/components/schemas/nonEmptyString"
@@ -3890,10 +3895,15 @@ personResponse:
             login:
               $ref: "#/components/schemas/nullableNonEmptyString"
           required:
+            - avatar
             - title
+            - description
             - first_name
             - last_name
+            - orcid
             - mbox_sha1sum
+            - expertise
+            - tools
           additionalProperties: false
         relationships:
           type: object
@@ -4124,6 +4134,8 @@ projectResponse:
               $ref: "#/components/schemas/nullableLicense"
             discussion_links:
               $ref: "#/components/schemas/assetLinkList"
+            topic_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
             start_date:
               $ref: "#/components/schemas/nullableDateString"
             end_date:
@@ -4746,9 +4758,9 @@ workflowResponse:
           properties:
             tags:
               $ref: "#/components/schemas/tags"
-            edam_topics:
+            topic_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
-            edam_operations:
+            operation_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
             title:
               $ref: "#/components/schemas/nonEmptyString"

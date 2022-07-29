@@ -171,6 +171,19 @@ module SamplesHelper
     link_to(term_uri, ols_link, target: :_blank)
   end
 
+  def get_extra_info(sample)
+		studies = sample.sample_type.studies.authorized_for('view')
+		assays = sample.sample_type.assays.authorized_for('view')
+    {
+      project_ids: sample.project_ids.join(','),
+      project_names: sample.projects.map { |p| link_to(p.title, p, target: :_blank) }.join(',').html_safe,
+      study_ids: studies.map(&:id).join(','),
+      study_names: studies.map { |s| link_to(s.title, s, target: :_blank) }.join(',').html_safe,
+      assay_ids: assays.map(&:id).join(','),
+      assay_names: assays.map { |a| link_to(a.title, a, target: :_blank) }.join(',').html_safe
+    }
+  end
+
   private
 
   def attribute_form_element(attribute, resource, element_name, element_class )

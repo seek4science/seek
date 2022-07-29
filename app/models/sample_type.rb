@@ -35,6 +35,7 @@ class SampleType < ApplicationRecord
   belongs_to :isa_template, class_name: 'Template', foreign_key: 'template_id'
 
   has_many :assays
+	has_and_belongs_to_many :studies
 
   validates :title, presence: true
   validates :title, length: { maximum: 255 }
@@ -73,14 +74,6 @@ class SampleType < ApplicationRecord
       Sample.record_timestamps = true
       Sample.set_callback :save, :after, :queue_sample_type_update_job
     end
-  end
-
-  # Returns the columns to be shown on the table view for the resource
-  def columns_default
-    super + ['uploaded_template']
-  end
-  def columns_allowed
-    columns_default + ['description','created_at','projects','contributor']
   end
 
   # fixes inconsistencies following form submission that could cause validation errors

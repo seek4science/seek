@@ -66,13 +66,18 @@ module Seek
             end
           },
 
-          edam_operations: proc {|value|
+          operation_annotations: proc {|value|
             value.collect{|v| v[:identifier]}.join(', ')
           },
-          edam_topics: proc {|value|
+          topic_annotations: proc {|value|
             value.collect{|v| v[:identifier]}.join(', ')
           },
-
+          data_type_annotations: proc {|value|
+            value.collect{|v| v[:identifier]}.join(', ')
+          },
+          data_format_annotations: proc {|value|
+            value.collect{|v| v[:identifier]}.join(', ')
+          },
           funding_codes: proc { |value|
             if value
               value.join(', ')

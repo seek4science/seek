@@ -3295,6 +3295,43 @@ class ProjectsControllerTest < ActionController::TestCase
                   order_investigations_project_path(project), count: 0
   end
 
+  test 'should update project annotated topics' do
+    Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
+
+    project_admin = Factory(:project_administrator)
+    project = project_admin.projects.first
+    login_as(project_admin)
+
+    put :update, params: { id: project.id, project: { topic_annotations: 'Chemistry, Sample collections' } }
+
+    assert_equal ['http://edamontology.org/topic_3314','http://edamontology.org/topic_3277'], assigns(:project).topic_annotations
+
+  end
+
+  test 'show annotated topics if set' do
+    Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
+
+    user = Factory(:user)
+    project = Factory(:project)
+    login_as(user)
+
+    get :show, params: {id: project.id}
+    assert_response :success
+    assert_select 'div.panel div.panel-heading',text:/Annotated Properties/i, count:0
+
+    project.topic_annotations = "Chemistry"
+    project.save!
+
+    assert project.controlled_vocab_annotations?
+
+    get :show, params: {id: project.id}
+    assert_response :success
+
+    assert_select 'div.panel div.panel-heading',text:/Annotated Properties/i, count:1
+    assert_select 'div.panel div.panel-body div strong',text:/#{I18n.t('attributes.topic_annotation_values')}/, count:1
+    assert_select 'div.panel div.panel-body a[href=?]','https://edamontology.github.io/edam-browser/#topic_3314',text:/Chemistry/, count:1
+  end
+
   private
 
   def check_project(project)

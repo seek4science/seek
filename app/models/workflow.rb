@@ -13,7 +13,7 @@ class Workflow < ApplicationRecord
 
   acts_as_doi_parent(child_accessor: :versions)
 
-  has_edam_annotations
+  has_controlled_vocab_annotations :topics, :operations
 
   validates :projects, presence: true, projects: { self: true }
 
@@ -184,11 +184,4 @@ class Workflow < ApplicationRecord
       }
   )
 
-  def edam_data_vocab
-    nil
-  end
-
-  def edam_formats_vocab
-    nil
-  end
 end

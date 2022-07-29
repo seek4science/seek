@@ -13,8 +13,7 @@
         "access": "no_access",
         "permissions": []
       },
-      "members":
-      <%= res.current_group_memberships.includes(:institution).map { |g| { person_id: g.person_id.to_s, institution_id: g.institution.id.to_s } }.to_json %>,
+      "members": <%= res.current_group_memberships.includes(:institution).map { |g| { person_id: g.person_id.to_s, institution_id: g.institution.id.to_s } }.to_json %>,
       "start_date": "2010-01-01",
       "end_date": "2014-06-21",
       "use_default_policy": true,
@@ -24,6 +23,16 @@
           "<%= res.discussion_link_ids.first %>",
           "url": "http://www.slack.com/",
           "label": "Slack"
+        }
+      ],
+      "topic_annotations": [
+        {
+          "label": "Biomedical science",
+          "identifier": "http://edamontology.org/topic_3344"
+        },
+        {
+          "label": "Chemistry",
+          "identifier": "http://edamontology.org/topic_3314"
         }
       ]
     },

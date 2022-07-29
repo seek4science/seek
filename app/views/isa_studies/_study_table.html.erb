@@ -1,5 +1,5 @@
 <% study ||= nil %>
-<% valid_study = study && study.sample_types.any? && study&.sample_types&.second %>
+<% valid_study = study&.sample_types&.second %>
 
 <div style="padding: 0 20px 20px 20px;">
     <div class="row" id="options_container" style="margin-bottom:15px">

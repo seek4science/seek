@@ -73,3 +73,5 @@
 //= require admin
 //= require templates
 //= require git
+//= require jquery.splitter/jquery.splitter.min
+//= require select2.full.min

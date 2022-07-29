@@ -2,65 +2,65 @@ require 'test_helper'
 
 class DynamicTableHelperTest < ActionView::TestCase
   include AuthenticatedTestHelper
-  
   test "Should return the dynamic table columns and rows" do
     person = Factory(:person)
     project = person.projects.first
 
     User.with_current_user(person.user) do
-      inv = Factory(:investigation, projects: [project], contributor:person)
+      inv = Factory(:investigation, projects: [project], contributor: person)
 
-      sample_A1 = Factory(:max_sample)
-      type_A = sample_A1.sample_type
-      sample_A2 = Factory(:max_sample, sample_type: type_A)
-      sample_A3 = Factory(:max_sample, sample_type: type_A)
+      sample_a1 = Factory(:max_sample)
+      type_a = sample_a1.sample_type
+      sample_a2 = Factory(:max_sample, sample_type: type_a)
+      sample_a3 = Factory(:max_sample, sample_type: type_a)
 
-      type_B = Factory(:multi_linked_sample_type, project_ids: [project.id])
-      type_B.sample_attributes.last.linked_sample_type = type_A
-      type_B.save!
+      type_b = Factory(:multi_linked_sample_type, project_ids: [project.id])
+      type_b.sample_attributes.last.linked_sample_type = type_a
+      type_b.save!
 
-      sample_B1 = Sample.new(sample_type: type_B, project_ids: [project.id])
-      sample_B1.set_attribute_value(:title, 'sample_B1')
-      sample_B1.set_attribute_value(:patient, [sample_A1.id])
-      disable_authorization_checks { sample_B1.save! }
+      sample_b1 = Sample.new(sample_type: type_b, project_ids: [project.id])
+      sample_b1.set_attribute_value(:title, 'sample_b1')
+      sample_b1.set_attribute_value(:patient, [sample_a1.id])
+      disable_authorization_checks { sample_b1.save! }
 
-      sample_B2 = Sample.new(sample_type: type_B, project_ids: [project.id])
-      sample_B2.set_attribute_value(:title, 'sample_B2')
-      sample_B2.set_attribute_value(:patient, [sample_A2.id])
-      disable_authorization_checks { sample_B2.save! }
+      sample_b2 = Sample.new(sample_type: type_b, project_ids: [project.id])
+      sample_b2.set_attribute_value(:title, 'sample_b2')
+      sample_b2.set_attribute_value(:patient, [sample_a2.id])
+      disable_authorization_checks { sample_b2.save! }
 
-      type_C = Factory(:multi_linked_sample_type, project_ids: [project.id])
-      type_C.sample_attributes.last.linked_sample_type = type_B
-      type_C.save!
+      type_c = Factory(:multi_linked_sample_type, project_ids: [project.id])
+      type_c.sample_attributes.last.linked_sample_type = type_b
+      type_c.save!
 
-      sample_C1 = Sample.new(sample_type: type_C, project_ids: [project.id])
-      sample_C1.set_attribute_value(:title, 'sample_C1')
-      sample_C1.set_attribute_value(:patient, [sample_B1.id])
-      disable_authorization_checks { sample_C1.save! }
+      sample_c1 = Sample.new(sample_type: type_c, project_ids: [project.id])
+      sample_c1.set_attribute_value(:title, 'sample_c1')
+      sample_c1.set_attribute_value(:patient, [sample_b1.id])
+      disable_authorization_checks { sample_c1.save! }
 
-      study = Factory(:study, investigation: inv, contributor: person, sample_types: [type_A, type_B])
+      study = Factory(:study, investigation: inv, contributor: person, sample_types: [type_a, type_b])
+			assay = Factory(:assay, study: study, contributor: person, sample_type: type_c)
 
-      dt = dt_aggregated(study)
-      columns_count = study.sample_types.reduce(0) {|s,n| s + n.sample_attributes.length }
+      dt = dt_aggregated(study, true)
+			# Each sample types' attributes length + the sample.id
+      columns_count = study.sample_types[0].sample_attributes.length + 1
+			columns_count += study.sample_types[1].sample_attributes.length + 1
+			columns_count += assay.sample_type.sample_attributes.length + 1
 
-      assert_equal type_A.samples.length , dt[:rows].length
-      assert_equal columns_count , dt[:columns].length
-      dt[:rows].each {|r| assert_equal columns_count, r.length}
+      assert_equal type_a.samples.length, dt[:rows].length
+      assert_equal columns_count, dt[:columns].length
+      dt[:rows].each { |r| assert_equal columns_count, r.length }
 
-      assert_equal false, dt[:rows][0].any? { |x| x == "" }
-      assert_equal false, dt[:rows][1].any? { |x| x == "" }
-      assert_equal true, dt[:rows][2].any? { |x| x == "" }
-
+      assert_equal false, (dt[:rows][0].any? { |x| x == '' })
+      assert_equal true, (dt[:rows][1].any? { |x| x == '' })
+      assert_equal true, (dt[:rows][2].any? { |x| x == '' })
     end
 
     # |-------------------------------------------------------------------------|
-    # |         type_A         |         type_B         |         type_C        |
+    # |         type_a         |         type_b         |         type_c        |
     # |------------------------|------------------------|-----------------------|
-    # |  (status)(id)sample_A1 | (status)(id)sample_B1  | (status)(id)sample_C1 |
-    # |  (status)(id)sample_A2 | (status)(id)sample_B2  | x                     |
-    # |  (status)(id)sample_A3 | x                      | x                     |
+    # |  (status)(id)sample_a1 | (status)(id)sample_b1  | (status)(id)sample_c1 |
+    # |  (status)(id)sample_a2 | (status)(id)sample_b2  | x                     |
+    # |  (status)(id)sample_a3 | x                      | x                     |
     # |-------------------------------------------------------------------------|
-    
   end
-
 end
