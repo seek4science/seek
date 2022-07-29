@@ -11,7 +11,7 @@ class SearchController < ApplicationController
       begin
         determine_query
         sources = determine_sources
-        if sources.count == 1 && search_params[:include_external_search] != '1'
+        if jump_straight_to_filtered_view?(sources)
           redirect_to polymorphic_path(sources[0], 'filter[query]': @search_query)
         else
           perform_search(sources)
@@ -44,6 +44,10 @@ class SearchController < ApplicationController
   end
 
   private
+
+  def jump_straight_to_filtered_view?(sources)
+    !request.format.json? && sources.count == 1 && search_params[:include_external_search] != '1'
+  end
 
   def determine_query
     @search_query = ActionController::Base.helpers.sanitize(search_params[:q] || search_params[:search_query])
