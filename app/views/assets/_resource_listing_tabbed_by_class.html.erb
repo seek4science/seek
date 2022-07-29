@@ -22,8 +22,14 @@
       <div class="tab-content">
         <% active = true %>
         <% ordered_resource_types.each_with_index do |type, i| -%>
+
             <% unless type[:items].empty? && (type[:hidden_count] == 0) %>
                 <div id="<%= type[:tab_id] -%>" role="tabpanel" class="tab-pane <%= 'active' if active -%>">
+
+                  <% if type[:extra_count] > 0 %>
+                    Showing <%= type[:items_count] %> out of a possible <%= pluralize(resource_type_total_visible_count(type),'item') %>
+                  <% end %>
+
                   <% if !type[:is_external] && type[:type].constantize.available_filters.any? %>
                     <% if query  %>
 
