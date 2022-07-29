@@ -69,6 +69,13 @@ class StudyTest < ActiveSupport::TestCase
     assert_equal [pub1, pub2, pub3], study.related_publications.sort_by(&:id)
   end
 
+  test 'directly associated sop' do
+    study = studies(:metabolomics_study)
+    sop = Factory(:sop)
+    study.sop = sop
+    assert_equal 3, study.related_sops.size
+  end
+
   test 'sops through assays' do
     study = studies(:metabolomics_study)
     assert_equal 2, study.related_sops.size
