@@ -176,7 +176,10 @@ const loadItemDetails = (url, params = {}) => {
 		type: "get",
 		success: (s) => $j("#item-layout").html(s),
 		beforeSend: () => $j("#loader").show(),
-		complete: () => $j("#loader").fadeOut(100),
+		complete: () => {
+			$j("#loader").fadeOut(100);
+			bindTooltips('body');
+		},
 		error: (e) => {
 			if (e.status === 401) alert("You are not logged in!");
 			else if (e.status === 403) alert("You do not have permission to view this content!");
