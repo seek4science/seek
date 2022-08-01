@@ -6,8 +6,10 @@
 
 <% if item.can_edit? -%>
   <% if displaying_single_page? %>
-    <%= button_link_to("Design #{t('assay')}", 'new', new_isa_assay_path(study_id: item.id, single_page: params[:single_page], is_source: true)) %>
-  <% else -%>
+		<% if item&.sample_types.present? %>
+    	<%= button_link_to("Design #{t('assay')}", 'new', new_isa_assay_path(study_id: item.id, single_page: params[:single_page], is_source: true)) %>
+		<% end -%>
+	<% else -%>
     <%= add_new_item_to_dropdown(item) %> 
   <% end -%>
 <% end -%>
