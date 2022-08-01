@@ -25,9 +25,15 @@ class ProjectFolder < ApplicationRecord
     assets.select(&:can_view?)
   end
 
-   #assets that are not associated to any assay
+  # assets that are not associated to any assay
   def authorized_hanging_assets
-		assets.select { |a| a.class.name != 'Sample' && a.can_view? }
+    assets.select do |a|
+      is_sample = a.instance_of?(Sample)
+      linked_to_assays = a.assays.present?
+      linked_to_studies = a.studies.present? || (a.study.present? if a.respond_to?(:study))
+
+      !is_sample && !linked_to_assays && !linked_to_studies && a.can_view?
+    end
   end
 
   #what is displayed in the tree
