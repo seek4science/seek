@@ -39,13 +39,8 @@ class ProjectFolder < ApplicationRecord
     authorized_hanging_assets.count
   end
 
-  def self.new_items_folder(project, asset=nil)
-		if asset.present?
-			folder_name = I18n.t(asset.class.name.underscore.downcase).pluralize
-			ProjectFolder.where(:project_id=>project.id, :title=>folder_name).first
-		else
-      ProjectFolder.where(:project_id=>project.id,:incoming=>true).first
-		end
+  def self.new_items_folder(project)
+    ProjectFolder.where(project_id: project.id, incoming: true).first
   end
 
   #constucts the default project folders for a given project from a yaml file, by default using Rails.root/config/default_data/default_project_folders.yml
