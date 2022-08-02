@@ -35,8 +35,8 @@ Factory.define(:max_project, class: Project) do |f|
     p.default_policy = Factory(:private_policy)
 
     User.with_current_user member.user do
-      p.edam_topics = ['Biomedical science','Chemistry']
-    end if SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
+      p.topic_annotations = ['Biomedical science','Chemistry']
+    end if SampleControlledVocab::SystemVocabs.topics_controlled_vocab
 
     p.save!
   end

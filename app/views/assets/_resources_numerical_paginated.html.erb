@@ -72,14 +72,15 @@
                   <a href="#" class="dropdown-toggle"><span class="glyphicon glyphicon-cog"></span></a>
                   <div id="sortable-colselector" class="dropdown-menu" style="padding:0px;">
                     <% for column in availableColView -%>
+                      <% column_title = resource.class.human_attribute_name(column) %>
                         <div class="checkbox list-group-item" style="margin-top:0px;">
-                            <label style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;max-width: 110px;">
+                            <label style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;max-width: 110px;" data-tooltip="<%= column_title %>">
                                 <input type="checkbox" value="<%= column %>"
                                 <% if tableview_columns.include?(column) %>
                                   checked
                                 <% end %>
                                 >
-                                <%= resource.class.human_attribute_name(column) %>
+                                <%= column_title %>
                             </label>
                             <span class="glyphicon glyphicon-move handle" style="float: right;cursor: grab;"> </span>
                         </div>

@@ -1131,9 +1131,9 @@ class WorkflowsControllerTest < ActionController::TestCase
 
   end
 
-  test 'should update workflow edam annotations ' do
-    Factory(:edam_topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
-    Factory(:edam_operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_operations_controlled_vocab
+  test 'should update workflow annotations ' do
+    Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
+    Factory(:operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.operations_controlled_vocab
 
     user = Factory(:user)
     workflow = Factory(:cwl_workflow, contributor: user.person)
@@ -1142,16 +1142,16 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     assert_equal 'Common Workflow Language', workflow.workflow_class_title
 
-    put :update, params: { id: workflow.id, workflow: { edam_topics: 'Chemistry, Sample collections',edam_operations:'Clustering, Expression correlation analysis' } }
+    put :update, params: { id: workflow.id, workflow: { topic_annotations: 'Chemistry, Sample collections', operation_annotations:'Clustering, Expression correlation analysis' } }
 
-    assert_equal ['http://edamontology.org/topic_3314','http://edamontology.org/topic_3277'], assigns(:workflow).edam_topics
-    assert_equal ['http://edamontology.org/operation_3432','http://edamontology.org/operation_3463'], assigns(:workflow).edam_operations
+    assert_equal ['http://edamontology.org/topic_3314','http://edamontology.org/topic_3277'], assigns(:workflow).topic_annotations
+    assert_equal ['http://edamontology.org/operation_3432','http://edamontology.org/operation_3463'], assigns(:workflow).operation_annotations
 
   end
 
-  test 'show edam annotations if set' do
-    Factory(:edam_topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
-    Factory(:edam_operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_operations_controlled_vocab
+  test 'show annotations if set' do
+    Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
+    Factory(:operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.operations_controlled_vocab
 
     user = Factory(:user)
     workflow = Factory(:cwl_workflow, contributor: user.person)
@@ -1159,19 +1159,19 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     get :show, params: {id: workflow.id}
     assert_response :success
-    assert_select 'div.panel div.panel-heading',text:/EDAM Properties/i, count:0
+    assert_select 'div.panel div.panel-heading',text:/Annotated Properties/i, count:0
 
-    workflow.edam_topics = "Chemistry"
+    workflow.topic_annotations = "Chemistry"
     workflow.save!
 
-    assert workflow.edam_annotations?
+    assert workflow.controlled_vocab_annotations?
 
     get :show, params: {id: workflow.id}
     assert_response :success
 
-    assert_select 'div.panel div.panel-heading',text:/EDAM Properties/i, count:1
-    assert_select 'div.panel div.panel-body div strong',text:/Topics/, count:1
-    assert_select 'div.panel div.panel-body a[href=?]','https://edamontology.github.io/edam-browser/#topic_3314',text:/Chemistry/, count:1
+    assert_select 'div.panel div.panel-heading', text:/Annotated Properties/i, count:1
+    assert_select 'div.panel div.panel-body div strong', text:/#{I18n.t('attributes.topic_annotation_values')}/, count:1
+    assert_select 'div.panel div.panel-body a[href=?]', 'https://edamontology.github.io/edam-browser/#topic_3314',text:/Chemistry/, count:1
   end
 
   test 'should create with presentation and document links' do

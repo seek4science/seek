@@ -72,10 +72,10 @@ module Seek
           topic_annotations: proc {|value|
             value.collect{|v| v[:identifier]}.join(', ')
           },
-          data_annotations: proc {|value|
+          data_type_annotations: proc {|value|
             value.collect{|v| v[:identifier]}.join(', ')
           },
-          format_annotations: proc {|value|
+          data_format_annotations: proc {|value|
             value.collect{|v| v[:identifier]}.join(', ')
           },
           funding_codes: proc { |value|
@@ -153,11 +153,7 @@ module Seek
         template: :template_attributes,
         creators: :api_assets_creators,
         administrator_ids: :programme_administrator_ids,
-        attribute_map: :data,
-        topic_annotations: :edam_topics,
-        operation_annotations: :edam_operations,
-        data_annotations: :edam_data,
-        format_annotations: :edam_formats
+        attribute_map: :data
       }.freeze
 
       # Parameters to "elevate" out of params[bla] to the top-level.

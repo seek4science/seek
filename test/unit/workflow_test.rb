@@ -545,9 +545,9 @@ class WorkflowTest < ActiveSupport::TestCase
     end
   end
 
-  test 'tags and edam in json api' do
-    Factory(:edam_topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_topics_controlled_vocab
-    Factory(:edam_operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.edam_operations_controlled_vocab
+  test 'tags and ontology annotations in json api' do
+    Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
+    Factory(:operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.operations_controlled_vocab
 
     user = Factory(:user)
 
@@ -563,18 +563,18 @@ class WorkflowTest < ActiveSupport::TestCase
     assert_equal [{label:'Chemistry', identifier: 'http://edamontology.org/topic_3314'}], json[:topic_annotations]
   end
 
-  test 'edam annotation properties'do
+  test 'ontology annotation properties'do
     wf = Factory(:workflow)
 
-    assert wf.supports_edam_annotations?
-    assert wf.supports_edam_annotations?(:topics)
-    assert wf.supports_edam_annotations?(:operations)
-    refute wf.supports_edam_annotations?(:formats)
-    refute wf.supports_edam_annotations?(:data)
+    assert wf.supports_controlled_vocab_annotations?
+    assert wf.supports_controlled_vocab_annotations?(:topics)
+    assert wf.supports_controlled_vocab_annotations?(:operations)
+    refute wf.supports_controlled_vocab_annotations?(:data_formats)
+    refute wf.supports_controlled_vocab_annotations?(:data_types)
 
-    assert wf.respond_to?(:edam_topics)
-    assert wf.respond_to?(:edam_operations)
-    refute wf.respond_to?(:edam_formats)
-    refute wf.respond_to?(:edam_data)
+    assert wf.respond_to?(:topic_annotations)
+    assert wf.respond_to?(:operation_annotations)
+    refute wf.respond_to?(:data_format_annotations)
+    refute wf.respond_to?(:data_type_annotations)
   end
 end

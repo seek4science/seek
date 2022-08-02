@@ -1,0 +1,15 @@
+<%
+  return unless resource.supports_controlled_vocab_annotations?(property)
+  annotations_accessor = "#{property.to_s.singularize}_annotation_values"
+  return unless resource.send("#{annotations_accessor}").any?
+  values = resource.send(annotations_accessor)
+  title = resource.class.human_attribute_name(annotations_accessor)
+  %>
+
+
+<div>
+  <strong><%= title %></strong>
+</div>
+<div>
+  <%= controlled_vocab_annotation_items(values) %>
+</div>

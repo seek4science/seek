@@ -552,3 +552,14 @@ td.highlight {
 .sp-btn-variant-1 {
 	border-top: 2px solid #476074 !important
 }
+.dt-btn-container {
+  text-align: right;
+}
+
+.dt-btn-item, .dt-btn-item-last {
+  display: inline-block;
+}
+
+.dt-btn-item-last {
+	margin-left: 5px;
+}

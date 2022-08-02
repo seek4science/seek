@@ -94,6 +94,30 @@ class TemplatesController < ApplicationController
 
     File.open(Rails.root.join(dir, uploaded_file.original_filename), 'wb') do |file|
       file.write(uploaded_file.read)
+    def manage; end
+
+		#post
+		def template_attributes
+			template = Template.find(params[:id])
+			items = template.template_attributes.map{ |a| { id: a.id, title: a.title } }
+			respond_to do |format|
+				format.json { render json: items.to_json }
+			end
+		end
+  
+    private
+  
+    def template_params
+      params.require(:template).permit(:title, :description, :group, :level, :organism, :iri, :parent_id, *creator_related_params,
+                                          { project_ids: [],
+                                            template_attributes_attributes: [:id, :title, :pos, :required, :description,
+                                                                          :sample_attribute_type_id, :isa_tag_id, :is_title,
+                                                                          :sample_controlled_vocab_id, :iri,
+                                                                          :unit_id, :_destroy]})
+    end
+  
+    def find_template
+      @template = Template.find(params[:id])
     end
 
     unless running?

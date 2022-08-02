@@ -79,18 +79,13 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
         order: [[options.readonly ? 1 : 3, "asc"]],
         pageLength: 25,
         dom:
-          "<'row'<'col-sm-3'l><'col-sm-5'B><'col-sm-4'f>>" +
+          "<'row'<'col-sm-3'l><'col-sm-9 dt-btn-container'<'dt-btn-item'f><'dt-btn-item-last'B>>>" +
           "<'row'<'col-sm-12'tr>>" +
           "<'row'<'col-sm-5'i><'col-sm-7'p>>",
         buttons: [
             {
-                extend: 'copyHtml5',
-                exportOptions: {
-                    columns: options.readonly ? [':visible:not(.text-center)'] :[2, ':visible:not(.text-center)']
-                }
-            },
-            {
                 extend: 'csvHtml5',
+								text: 'Export table',
                 exportOptions: {
 										// exclude checkbox column
                     columns: options.readonly ? [':visible:not(.text-center)'] :[2, ':visible:not(.text-center)']
