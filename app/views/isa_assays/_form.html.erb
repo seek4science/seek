@@ -48,7 +48,7 @@
 
 <%= f.hidden_field :input_sample_type_id, value: input_sample_type_id  -%>
 
-<%= folding_panel("Define Sample Type for Assay") do %>
+<%= folding_panel("Define #{t(:sample_type)} for #{t(:assay)}") do %>
 	<%= render partial: 'isa_studies/sample_types_form', locals: {f: f, sample_type: @isa_assay.sample_type, id_suffix: "_sample_type", isa_element: "assay" } %>
 <% end %>
  

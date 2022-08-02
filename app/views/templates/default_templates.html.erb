@@ -4,7 +4,7 @@
 
 <%= form_tag populate_template_templates_path, method: "post", id: "template_upload_from", multipart: true do -%>
 	<%= folding_panel("Template JSON file", false, :body_options => {:id => 'add_template_file_fold_content'},
-										:help_text => "Here you can upload default templates JSON file to populate the #{t('template').pluralize()}.") do %>
+										:help_text => "Here you can upload default #{t('template').pluralize()} JSON file to populate the #{t('template').pluralize()}.") do %>
 
 			<div role="tabpanel" data-role="seek-upload-field">
 			<ul class="nav nav-tabs" role="tablist">
