@@ -15,7 +15,7 @@ class TreeviewBuilder
         next unless study.assays
 
         study.assays.each do |assay|
-          samples = assay.assets.select { |a| a.instance_of?(Sample) }
+          samples = assay.samples
           if sp_advanced
             if assay.sample_type && assay.sample_type.samples.length.positive?
               assay_assets.push(create_sample_node(assay.sample_type))
