@@ -153,7 +153,7 @@ namespace :seek do
 
   def valid_isa_json?(json)
     definitions_path =
-      File.join(Rails.root, 'test', 'fixtures', 'files', 'json', 'isa_templates', 'template_schema.json')
+      File.join(Rails.root, 'lib', 'tasks', 'isa_templates', 'template_schema.json')
     if File.readable?(definitions_path)
       JSON::Validator.fully_validate_json(definitions_path, json)
     else
