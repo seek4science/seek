@@ -84,10 +84,11 @@ module RelatedItemsHelper
       hash[type][:extra_count] = 0
 
       if hash[type][:items].any?
-        order = Seek::ListSorter.order_from_keys(order) if order.is_a?(Symbol)
-        order = Seek::ListSorter.order_for_view(type, :related) if order.nil?
-        if order
-          hash[type][:items] = Seek::ListSorter.sort_by_order(hash[type][:items], order)
+        type_order = nil
+        type_order = Seek::ListSorter.order_from_keys(order) if order.is_a?(Symbol)
+        type_order = Seek::ListSorter.order_for_view(type, :related) if order.nil?
+        if type_order
+          hash[type][:items] = Seek::ListSorter.sort_by_order(hash[type][:items], type_order)
         end
         total = hash[type][:items].to_a
         total_count = hash[type][:items_count]
