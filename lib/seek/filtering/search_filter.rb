@@ -7,10 +7,7 @@ module Seek
         q ||= ''
         q = Seek::Search::SearchTermFilter.filter(q)
         q = q.downcase
-        results = collection.with_search_query(q)
-
-        # needs to return a relation for chaining, the order will be fixed from the solr cache once other filters have been applied
-        collection.where(id: results.collect(&:id))
+        collection.with_search_query(q)
       end
 
       def options(collection, active_values)

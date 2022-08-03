@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'minitest/mock'
 
 class ListSorterTest < ActiveSupport::TestCase
   test 'rules' do
@@ -103,6 +104,20 @@ class ListSorterTest < ActiveSupport::TestCase
 
     assert_equal [s1, s3, s2], Seek::ListSorter.sort_by_order(sops, 'LOWER(title)')
     assert_equal [s3, s2, s1], Seek::ListSorter.sort_by_order(sops)
+
+    d1 = Factory(:document, title: 'document a', updated_at: 5.days.ago)
+    d2 = Factory(:document, title: 'document b', updated_at: 4.days.ago)
+    d3 = Factory(:document, title: 'document c', updated_at: 3.days.ago)
+    d4 = Factory(:document, title: 'document d', updated_at: 2.days.ago)
+    d5 = Factory(:document, title: 'document e', updated_at: 1.days.ago)
+
+    docs = [d1, d2, d3, d4, d5]
+    relevance_ordered = [d3, d1, d2, d4, d5]
+
+    Document.stub(:solr_cache, -> (q) { relevance_ordered.collect { |d| d.id.to_s } }) do
+      assert_equal relevance_ordered, Seek::ListSorter.sort_by_order(docs, '--relevance')
+      assert_equal [d5, d4, d3, d2, d1], Seek::ListSorter.sort_by_order(docs)
+    end
   end
 
   test 'complex sorting' do

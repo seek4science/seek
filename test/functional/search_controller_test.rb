@@ -3,6 +3,7 @@ require 'minitest/mock'
 
 class SearchControllerTest < ActionController::TestCase
   include JsonTestHelper
+  include RelatedItemsHelper
 
   test 'can render search results' do
     docs = FactoryGirl.create_list(:public_document, 3)
@@ -23,10 +24,15 @@ class SearchControllerTest < ActionController::TestCase
   test 'search result order retained' do
     FactoryGirl.create_list(:public_document, 3)
     order = [Document.last, Document.third_to_last, Document.second_to_last]
-    Document.stub(:solr_cache, -> (q) { order.collect(&:id) }) do
+    Document.stub(:solr_cache, -> (q) { order.collect { |d| d.id.to_s } }) do
       get :index, params: { q: 'test' }
     end
-    assert_equal order, assigns(:results)['Document']
+
+    order.each_with_index do |doc, idx|
+      assert_select "#documents div.list_item[#{idx + 1}]" do
+        assert_select 'a[href=?]', document_path(doc)
+      end
+    end
   end
 
   test 'can limit rendered search results' do
