@@ -9,13 +9,13 @@
         "tag1",
         "tag2"
       ],
-      "data_annotations": [
+      "data_type_annotations": [
         {
           "label": "Sequence features metadata",
           "identifier": "http://edamontology.org/data_2914"
         }
       ],
-      "format_annotations": [
+      "data_format_annotations": [
         {
           "label": "JSON",
           "identifier": "http://edamontology.org/format_3464"
@@ -28,7 +28,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "111",
+              "id": "278",
               "type": "projects"
             },
             "access": "edit"
@@ -40,7 +40,7 @@
       "creators": {
         "data": [
           {
-            "id": "112",
+            "id": "333",
             "type": "people"
           }
         ]
@@ -48,7 +48,7 @@
       "projects": {
         "data": [
           {
-            "id": "111",
+            "id": "278",
             "type": "projects"
           }
         ]

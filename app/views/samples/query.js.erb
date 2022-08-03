@@ -1,0 +1,3 @@
+$j('#samples-table').html('<%= escape_javascript(render(partial: "table_view", locals: { samples: @result, link: true, show_extra_info: true })) -%>');
+$j('#sample-count').html('<%= "#{@visible_samples} sample(s) visible to you" %>')
+Samples.initTable($j('#samples-table'), false, { hideEmptyColumns: true });
