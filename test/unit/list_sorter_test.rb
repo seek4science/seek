@@ -105,11 +105,16 @@ class ListSorterTest < ActiveSupport::TestCase
     assert_equal [s1, s3, s2], Seek::ListSorter.sort_by_order(sops, 'LOWER(title)')
     assert_equal [s3, s2, s1], Seek::ListSorter.sort_by_order(sops)
 
-    d1 = Factory(:document, title: 'document a', updated_at: 5.days.ago)
-    d2 = Factory(:document, title: 'document b', updated_at: 4.days.ago)
-    d3 = Factory(:document, title: 'document c', updated_at: 3.days.ago)
-    d4 = Factory(:document, title: 'document d', updated_at: 2.days.ago)
-    d5 = Factory(:document, title: 'document e', updated_at: 1.days.ago)
+    d1 = Factory(:document, title: 'document a')
+    d2 = Factory(:document, title: 'document b')
+    d3 = Factory(:document, title: 'document c')
+    d4 = Factory(:document, title: 'document d')
+    d5 = Factory(:document, title: 'document e')
+    d1.update_attribute(:updated_at, 5.days.ago)
+    d2.update_attribute(:updated_at, 4.days.ago)
+    d3.update_attribute(:updated_at, 3.days.ago)
+    d4.update_attribute(:updated_at, 2.days.ago)
+    d5.update_attribute(:updated_at, 1.days.ago)
 
     docs = [d1, d2, d3, d4, d5]
     relevance_ordered = [d3, d1, d2, d4, d5]
