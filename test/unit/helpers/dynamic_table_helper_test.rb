@@ -2,7 +2,7 @@ require 'test_helper'
 
 class DynamicTableHelperTest < ActionView::TestCase
   include AuthenticatedTestHelper
-  test "Should return the dynamic table columns and rows" do
+  test 'Should return the dynamic table columns and rows' do
     person = Factory(:person)
     project = person.projects.first
 
@@ -38,13 +38,13 @@ class DynamicTableHelperTest < ActionView::TestCase
       disable_authorization_checks { sample_c1.save! }
 
       study = Factory(:study, investigation: inv, contributor: person, sample_types: [type_a, type_b])
-			assay = Factory(:assay, study: study, contributor: person, sample_type: type_c)
+      assay = Factory(:assay, study: study, contributor: person, sample_type: type_c)
 
       dt = dt_aggregated(study, true)
-			# Each sample types' attributes length + the sample.id
+      # Each sample types' attributes length + the sample.id
       columns_count = study.sample_types[0].sample_attributes.length + 1
-			columns_count += study.sample_types[1].sample_attributes.length + 1
-			columns_count += assay.sample_type.sample_attributes.length + 1
+      columns_count += study.sample_types[1].sample_attributes.length + 1
+      columns_count += assay.sample_type.sample_attributes.length + 1
 
       assert_equal type_a.samples.length, dt[:rows].length
       assert_equal columns_count, dt[:columns].length
@@ -62,5 +62,18 @@ class DynamicTableHelperTest < ActionView::TestCase
     # |  (status)(id)sample_a2 | (status)(id)sample_b2  | x                     |
     # |  (status)(id)sample_a3 | x                      | x                     |
     # |-------------------------------------------------------------------------|
+  end
+
+  test 'Should return the sequence of sample_type links' do
+    type1 = Factory(:simple_sample_type)
+    type2 = Factory(:multi_linked_sample_type)
+    type3 = Factory(:multi_linked_sample_type)
+    type2.sample_attributes.detect(&:seek_sample_multi?).linked_sample_type = type1
+    type3.sample_attributes.detect(&:seek_sample_multi?).linked_sample_type = type2
+    type2.save!
+    type3.save!
+
+    sequence = link_sequence(type3)
+    assert_equal sequence, [type3, type2, type1]
   end
 end
