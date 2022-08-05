@@ -11,6 +11,12 @@ Please see [Getting FAIRDOM-SEEK](/get-seek.html) for details about installing S
 
 If you have any comments or feedback about a release, then please [Contact Us](/contacting-us.html)
 
+## Version 1.12.3
+
+Release date: _5th August 2022_
+
+Small bug fix release that patches an issue introduced by the previous release causing a 404 when trying to filter using a search term.
+
 ## Version 1.12.2
 
 Release date: _28th July 2022_
