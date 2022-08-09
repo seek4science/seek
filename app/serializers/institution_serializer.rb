@@ -15,4 +15,5 @@ class InstitutionSerializer < AvatarObjSerializer
 
   has_many :people
   has_many :projects
+  has_many :facilities
 end

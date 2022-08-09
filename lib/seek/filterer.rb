@@ -4,6 +4,7 @@ module Seek
     AVAILABLE_FILTERS = {
         Publication: [:query, :programme, :project, :published_year, :publication_type, :author, :organism, :human_disease, :tag],
         Event: [:query, :created_at, :country],
+        Facility: [:query, :created_at],
         Person: [:query, :programme, :project, :institution, :location, :expertise, :tool]
     }.freeze
 

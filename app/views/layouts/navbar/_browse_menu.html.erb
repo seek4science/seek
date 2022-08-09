@@ -10,7 +10,9 @@
         [t('programme').pluralize, programmes_path, Seek::Config.programmes_enabled],
         [t('project').pluralize, projects_path, true],
         [t('institution').pluralize, institutions_path, true],
-        [t('person').pluralize, people_path, true]
+        [t('person').pluralize, people_path, true],
+        [t('facility').pluralize, facilities_path, true],
+        [t('service').pluralize, services_path, true]
     ]) %>
 
     <%= render_menu_group(t('menu.isa'), [

@@ -1,0 +1,29 @@
+<%# this partial expects the following parameters to be set: -%>
+
+<%
+  allow_nil ||= false
+  allow_all ||= false
+  resource ||= nil
+
+  selected_facility = resource ? resource.facility : nil
+  selected_facility_id = selected_facility&.id
+  possible_facilities = Facility.all
+
+  field_name = "#{resource.class.name.underscore}[facility_id]"
+  title = t('facility')
+  title += '<span class="required">*</span>'.html_safe unless allow_nil
+
+%>
+
+<%= folding_panel(title, false, id: "select_facility_form",
+                  help_text: "Here you can associate the #{t('service')} with a specific #{t('facility').downcase}.") do %>
+    <p class="help-block">
+      The following <%= t('facility').downcase -%> is associated with this <%= t('service') -%>:
+    </p>
+    <div id="facility-selector">
+      <%= f.select "facility_id",
+	  options_from_collection_for_select(possible_facilities, "id", "title", selected_facility_id ),
+	  {},
+	  {:multiple => false, :size => 5} %>
+    </div>
+<% end %>

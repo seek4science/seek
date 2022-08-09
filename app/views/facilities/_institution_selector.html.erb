@@ -1,0 +1,29 @@
+<%# this partial expects the following parameters to be set: -%>
+
+<%
+  allow_nil ||= false
+  allow_all ||= false
+  resource ||= nil
+
+  selected_institutions = resource ? resource.institutions.to_a : []
+  selected_institution_ids = selected_institutions.collect { |x| x.id }
+  possible_institutions = Institution.all
+
+  field_name = "#{resource.class.name.underscore}[institution_ids][]"
+  title = t('institution').pluralize
+  title += '<span class="required">*</span>'.html_safe unless allow_nil
+
+%>
+
+<%= folding_panel(title, false, id: "add_institutions_form",
+                  help_text: "Here you can associate the #{t('facility')} with specific #{t('institution').downcase.pluralize}.") do %>
+    <p class="help-block">
+      The following <%= t('institution').downcase.pluralize -%> are associated with this <%= t('facility') -%>:
+    </p>
+    <div id="institution-selector">
+      <%= f.select "institution_ids",
+	  options_from_collection_for_select(possible_institutions, "id", "title", selected_institution_ids ),
+	  {},
+	  {:multiple => true, :size => 5} %>
+    </div>
+<% end %>

@@ -1,0 +1,7 @@
+<h1>Edit <%= t('facility') -%>: <%= link_to @facility.title, facility_path(@facility) -%></h1>
+
+<div class="asset_form">
+	<%= form_for(@facility) do |f| %>
+	  <%= render :partial => "form", :locals => { :f => f, :facility => @facility } -%>
+	<% end %>
+</div>

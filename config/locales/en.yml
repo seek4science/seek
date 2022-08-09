@@ -58,6 +58,8 @@ en:
   person: "Person"
   project: "Project"
   institution: "Institution"
+  facility: "Facility"
+  service: "Service"
   programme: "Programme"
   avatar: "Avatar"
   private_asset: 'Hidden item'

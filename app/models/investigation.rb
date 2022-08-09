@@ -13,6 +13,8 @@ class Investigation < ApplicationRecord
 
   enum status: [:planned, :running, :completed, :cancelled, :failed]
   belongs_to :assignee, class_name: 'Person'
+  belongs_to :service
+  
   
   def state_allows_delete?(*args)
     studies.empty? && super

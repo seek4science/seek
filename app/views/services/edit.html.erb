@@ -1,0 +1,7 @@
+<h1>Edit <%= t('service') -%>: <%= link_to @service.title, service_path(@service) -%></h1>
+
+<div class="asset_form">
+	<%= form_for(@service) do |f| %>
+	  <%= render :partial => "form", :locals => { :f => f, :service => @service } -%>
+	<% end %>
+</div>

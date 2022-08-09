@@ -1,0 +1,5 @@
+<h1>New <%= t('facility') %></h1>
+
+<%= form_for @facility do |f| %>
+    <%= render :partial => "form", :locals => { :f => f, :facility => nil } -%>
+<% end -%>

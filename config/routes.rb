@@ -300,6 +300,21 @@ SEEK::Application.routes.draw do
     end
   end
 
+  resources :facilities do
+    collection do
+    end
+    member do
+    end
+    resources :services, only: [:index]
+  end
+
+  resources :services do
+    collection do
+    end
+    member do
+    end
+  end
+
   resources :projects do
     collection do
       get :request_institutions
@@ -388,7 +403,7 @@ SEEK::Application.routes.draw do
       get :request_all_sharing_form
       get  :typeahead
     end
-    resources :people, :programmes, :projects, :specimens, only: [:index]
+    resources :people, :programmes, :projects, :facilities, :specimens, only: [:index]
     resources :avatars do
       member do
         post :select

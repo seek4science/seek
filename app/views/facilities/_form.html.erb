@@ -1,0 +1,18 @@
+<%= javascript_include_tag "projects" %>
+
+<%= f.error_messages %>
+
+<div class="form-group">
+  <%= f.label :title, class: 'required' -%>
+  <%= f.text_field :title, :class=>"form-control"-%>
+</div>
+
+<div class="form-group">
+  <%= f.label :description -%>
+  <%= f.text_area :description, :rows => 5, :class=>"form-control rich-text-edit" -%>
+</div>
+
+<%= render :partial=>"facilities/institution_selector", :locals=>{:f=>f, :resource => facility } -%>
+
+<%= f.submit(facility ? "Update" : "Create",data: { disable_with: (facility ? "Updating..." : "Creating...") }, :class => 'btn btn-primary') -%>
+ or <%= cancel_button(facility ? facility_path(facility.id) : facilities_path) -%>

@@ -9,6 +9,12 @@ module Seek
       'Institution' => {
           defaults: { index: :title_asc, related: :title_asc },
           options: [:title_asc, :title_desc] },
+      'Facility' => {
+          defaults: { index: :title_asc, related: :title_asc },
+          options: [:title_asc, :title_desc] },
+      'Service' => {
+          defaults: { index: :title_asc, related: :title_asc },
+          options: [:title_asc, :title_desc] },
       'Event' => {
           defaults: { index: :start_date_desc, related: :start_date_desc },
           options: [:start_date_asc, :start_date_desc, :title_asc, :title_desc] },

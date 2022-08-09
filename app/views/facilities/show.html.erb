@@ -1,0 +1,17 @@
+<%= render partial: 'general/item_title',locals: { item: @facility, buttons_partial: 'facilities/buttons' } %>
+
+<%= render partial: 'general/show_page_tab_definitions' %>
+
+<div class="tab-content">
+  <%= tab_pane('overview') do %>
+    <div class="row">
+      <div class="col-md-9 col-sm-8 box_about_actor">
+        <%= item_description @facility.description -%>
+      </div>
+    </div>
+  <% end %>
+
+  <%= tab_pane('related-items') do %>
+    <%= render partial: 'general/items_related_to', object: @facility %>
+  <% end %>
+</div>

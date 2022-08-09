@@ -10,6 +10,7 @@ class InvestigationSerializer < SnapshottableSerializer
   has_many :sops
   has_many :publications
   has_many :documents
+  has_one :service
 
   attribute :creators do
     serialize_assets_creators

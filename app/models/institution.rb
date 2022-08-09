@@ -17,6 +17,8 @@ class Institution < ApplicationRecord
   has_many :people, -> { order('last_name ASC').distinct }, through: :group_memberships, inverse_of: :institutions
   has_many :dependent_permissions, class_name: 'Permission', as: :contributor, dependent: :destroy
 
+  has_and_belongs_to_many :facilities
+  
   searchable(auto_index: false) do
     text :city, :address
   end if Seek::Config.solr_enabled
