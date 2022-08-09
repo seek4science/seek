@@ -928,6 +928,8 @@ anyType:
     - sops
     - studies
     - workflows
+    - facilities
+    - services
 assetType:
   type: string
   minLength: 1
@@ -994,6 +996,11 @@ institutionType:
   minLength: 1
   enum:
     - institutions
+facilityType:
+  type: string
+  minLength: 1
+  enum:
+    - facilities
 modelType:
   type: string
   minLength: 1

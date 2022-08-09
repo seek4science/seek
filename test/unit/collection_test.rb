@@ -181,7 +181,7 @@ class CollectionTest < ActiveSupport::TestCase
     assert_empty collection.items
     assert_empty collection.assets
 
-    types = Seek::Util.persistent_classes.select { |c| c.name != 'Project' && c.name != 'Collection' && c.method_defined?(:collections) }
+    types = Seek::Util.persistent_classes.select { |c| c.name != 'Project' && c.name != 'Collection' && c.name != 'Programme' && c.method_defined?(:collections) }
     types.each do |type|
       opts = [type.name.underscore.to_sym]
       opts << { policy: Factory(:public_policy) } if type.method_defined?(:policy)
