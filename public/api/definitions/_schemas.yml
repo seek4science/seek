@@ -1041,8 +1041,6 @@ programmeDataType:
       $ref: "#/components/schemas/tags"
     discussion_links:
       $ref: "#/components/schemas/assetLinkList"
-    open_for_projects:
-      type: boolean
   required:
     - avatar
     - title
@@ -1050,7 +1048,6 @@ programmeDataType:
     - web_page
     - funding_details
     - funding_codes
-    - open_for_projects
   additionalProperties: false
 projectType:
   type: string
@@ -2554,8 +2551,6 @@ programmePost:
               $ref: "#/components/schemas/tags"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
-            open_for_projects:
-              type: boolean
           required:
             - title
           additionalProperties: false
@@ -2601,8 +2596,6 @@ programmePatch:
               $ref: "#/components/schemas/tags"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
-            open_for_projects:
-              type: boolean
           additionalProperties: false
         relationships:
           type: object
@@ -4002,9 +3995,12 @@ institutionResponse:
               $ref: "#/components/schemas/multipleReferences"
             projects:
               $ref: "#/components/schemas/multipleReferences"
+            facilities:
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - people
             - projects
+            - facilities
           additionalProperties: false
         links:
           $ref: "#/components/schemas/links"
