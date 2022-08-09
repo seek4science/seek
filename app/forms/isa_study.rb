@@ -26,20 +26,12 @@ class IsaStudy
   def save
     if valid?
       if @study.new_record?
-        @sample_collection_sample_type.sample_attributes.detect do |a|
-          a.seek_sample_multi?
-        end.linked_sample_type = @source_sample_type
-        @study.save
-        @source_sample_type.save
-        @sample_collection_sample_type.save
-
+        @sample_collection_sample_type.sample_attributes.detect(&:seek_sample_multi?).linked_sample_type = @source_sample_type
         @study.sample_types = [@source_sample_type, @sample_collection_sample_type]
-        @study.save
-      else
-        @study.save
-        @source_sample_type.save
-        @sample_collection_sample_type.save
       end
+      @study.save
+      @source_sample_type.save
+      @sample_collection_sample_type.save
     else
       false
     end
