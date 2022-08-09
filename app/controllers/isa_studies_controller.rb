@@ -26,8 +26,8 @@ class IsaStudiesController < ApplicationController
   end
 
   def edit
-    @isa_study.source = nil unless authorize_requested_item(@isa_study.source)
-    @isa_study.sample_collection = nil unless authorize_requested_item(@isa_study.sample_collection)
+    @isa_study.source = nil unless requested_item_authorized?(@isa_study.source)
+    @isa_study.sample_collection = nil unless requested_item_authorized?(@isa_study.sample_collection)
 
     respond_to do |format|
       format.html
@@ -41,13 +41,13 @@ class IsaStudiesController < ApplicationController
     update_relationships(@isa_study.study, isa_study_params[:study])
 
     # update the source
-    if authorize_requested_item(@isa_study.source)
+    if requested_item_authorized?(@isa_study.source)
       @isa_study.source.update(isa_study_params[:source_sample_type])
       @isa_study.source.resolve_inconsistencies
     end
 
     # update the sample collection
-    if authorize_requested_item(@isa_study.sample_collection)
+    if requested_item_authorized?(@isa_study.sample_collection)
       @isa_study.sample_collection.update(isa_study_params[:sample_collection_sample_type])
       @isa_study.sample_collection.resolve_inconsistencies
     end
@@ -117,22 +117,10 @@ class IsaStudiesController < ApplicationController
     @single_page = true
   end
 
-  def authorize_requested_item(object)
-    privilege = Seek::Permissions::Translator.translate(:edit)
-
-    return if privilege.nil?
-
-    if is_auth?(object, privilege)
-      true
-    else
-      false
-    end
-  end
-
   def find_requested_item
     @isa_study = IsaStudy.new
     @isa_study.populate(params[:id])
-    unless authorize_requested_item(@isa_study.study)
+    unless requested_item_authorized?(@isa_study.study)
       flash[:error] = "You are not authorized to edit this #{t('isa_study')}"
       redirect_to single_page_path(id: @isa_study.study.projects.first, item_type: 'study',
                                    item_id: @isa_study.study)
