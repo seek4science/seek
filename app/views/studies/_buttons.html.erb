@@ -16,7 +16,11 @@
 
 <%= item_actions_dropdown do %>
   <% if item.can_edit? %>
-    <li><%= image_tag_for_key('edit', edit_study_path(item), "Edit #{t('study')}", nil, "Edit #{t('study')}") -%></li>
+		<% if displaying_single_page? %>
+			<li><%= image_tag_for_key('edit', edit_isa_study_path(item, single_page: params[:single_page]), "Edit #{t('isa_study')}", nil, "Edit #{t('isa_study')}") -%></li>
+		<% else %>
+			<li><%= image_tag_for_key('edit', edit_study_path(item), "Edit #{t('study')}", nil, "Edit #{t('study')}") -%></li>
+		<% end %>
   <% end %>
 
   <% if item.can_manage? -%>
