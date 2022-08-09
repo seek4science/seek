@@ -1,16 +1,16 @@
 {
   "data": {
-    "id": "385",
+    "id": "1022259323",
     "type": "projects",
     "attributes": {
       "discussion_links": [
         {
-          "id": "20",
+          "id": "193",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
       ],
-      "avatar": "/projects/385/avatars/4",
+      "avatar": "/projects/1022259323/avatars/53",
       "title": "A Maximal Project",
       "description": "A Taverna project",
       "web_page": "http://www.taverna.org.uk",
@@ -26,8 +26,8 @@
       },
       "members": [
         {
-          "person_id": "317",
-          "institution_id": "343"
+          "person_id": "1039994774",
+          "institution_id": "980199404"
         }
       ],
       "use_default_policy": true,
@@ -63,44 +63,34 @@
 
         ]
       },
-      "organisms": {
-        "data": [
-
-        ]
-      },
-      "human_diseases": {
-        "data": [
-
-        ]
-      },
       "people": {
         "data": [
           {
-            "id": "317",
+            "id": "1039994774",
             "type": "people"
-          }
-        ]
-      },
-      "institutions": {
-        "data": [
-          {
-            "id": "343",
-            "type": "institutions"
           }
         ]
       },
       "programmes": {
         "data": [
           {
-            "id": "28",
+            "id": "199",
             "type": "programmes"
+          }
+        ]
+      },
+      "institutions": {
+        "data": [
+          {
+            "id": "980199404",
+            "type": "institutions"
           }
         ]
       },
       "investigations": {
         "data": [
           {
-            "id": "36",
+            "id": "973655819",
             "type": "investigations"
           }
         ]
@@ -108,7 +98,7 @@
       "studies": {
         "data": [
           {
-            "id": "32",
+            "id": "1060385785",
             "type": "studies"
           }
         ]
@@ -116,7 +106,7 @@
       "assays": {
         "data": [
           {
-            "id": "28",
+            "id": "1035387458",
             "type": "assays"
           }
         ]
@@ -124,9 +114,80 @@
       "data_files": {
         "data": [
           {
-            "id": "8",
+            "id": "883654906",
             "type": "data_files"
           }
+        ]
+      },
+      "documents": {
+        "data": [
+          {
+            "id": "272",
+            "type": "documents"
+          }
+        ]
+      },
+      "models": {
+        "data": [
+          {
+            "id": "1004285993",
+            "type": "models"
+          }
+        ]
+      },
+      "sops": {
+        "data": [
+          {
+            "id": "1055250817",
+            "type": "sops"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "370",
+            "type": "publications"
+          }
+        ]
+      },
+      "presentations": {
+        "data": [
+          {
+            "id": "130",
+            "type": "presentations"
+          }
+        ]
+      },
+      "events": {
+        "data": [
+          {
+            "id": "1025618862",
+            "type": "events"
+          }
+        ]
+      },
+      "organisms": {
+        "data": [
+
+        ]
+      },
+      "workflows": {
+        "data": [
+          {
+            "id": "308",
+            "type": "workflows"
+          }
+        ]
+      },
+      "collections": {
+        "data": [
+
+        ]
+      },
+      "human_diseases": {
+        "data": [
+
         ]
       },
       "file_templates": {
@@ -138,73 +199,17 @@
         "data": [
 
         ]
-      },
-      "models": {
-        "data": [
-          {
-            "id": "32",
-            "type": "models"
-          }
-        ]
-      },
-      "sops": {
-        "data": [
-          {
-            "id": "8",
-            "type": "sops"
-          }
-        ]
-      },
-      "publications": {
-        "data": [
-          {
-            "id": "8",
-            "type": "publications"
-          }
-        ]
-      },
-      "presentations": {
-        "data": [
-          {
-            "id": "4",
-            "type": "presentations"
-          }
-        ]
-      },
-      "events": {
-        "data": [
-          {
-            "id": "4",
-            "type": "events"
-          }
-        ]
-      },
-      "documents": {
-        "data": [
-          {
-            "id": "8",
-            "type": "documents"
-          }
-        ]
-      },
-      "workflows": {
-        "data": [
-          {
-            "id": "4",
-            "type": "workflows"
-          }
-        ]
       }
     },
     "links": {
-      "self": "/projects/385"
+      "self": "/projects/1022259323"
     },
     "meta": {
-      "created": "2022-07-18T09:02:41.000Z",
-      "modified": "2022-07-18T09:02:41.000Z",
+      "created": "2022-08-09T16:49:40.000Z",
+      "modified": "2022-08-09T16:49:40.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "4d7f4ed0-e8a6-013a-1113-0a81884ed284"
+      "uuid": "2f3b8800-fa31-013a-73ae-000c29ced288"
     }
   },
   "jsonapi": {

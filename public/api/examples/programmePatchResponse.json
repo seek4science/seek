@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "12",
+    "id": "194",
     "type": "programmes",
     "attributes": {
       "discussion_links": [
@@ -11,6 +11,7 @@
       "description": "A very exciting programme patched!",
       "web_page": "http://www.synbiochem.co.uk",
       "funding_details": "Someone ELSE is funding this for me",
+      "open_for_projects": false,
       "funding_codes": [
         "AVH"
       ]
@@ -19,7 +20,7 @@
       "administrators": {
         "data": [
           {
-            "id": "404",
+            "id": "1039994554",
             "type": "people"
           }
         ]
@@ -32,7 +33,7 @@
       "projects": {
         "data": [
           {
-            "id": "433",
+            "id": "1022259076",
             "type": "projects"
           }
         ]
@@ -62,6 +63,11 @@
 
         ]
       },
+      "documents": {
+        "data": [
+
+        ]
+      },
       "models": {
         "data": [
 
@@ -87,21 +93,46 @@
 
         ]
       },
-      "documents": {
+      "organisms": {
+        "data": [
+
+        ]
+      },
+      "workflows": {
+        "data": [
+
+        ]
+      },
+      "collections": {
+        "data": [
+
+        ]
+      },
+      "human_diseases": {
+        "data": [
+
+        ]
+      },
+      "file_templates": {
+        "data": [
+
+        ]
+      },
+      "placeholders": {
         "data": [
 
         ]
       }
     },
     "links": {
-      "self": "/programmes/12"
+      "self": "/programmes/194"
     },
     "meta": {
-      "created": "2022-06-07T14:13:24.000Z",
-      "modified": "2022-06-07T14:13:24.000Z",
+      "created": "2022-08-09T16:48:24.000Z",
+      "modified": "2022-08-09T16:48:24.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "eab6f6e0-c899-013a-0f7e-0a81884ed284"
+      "uuid": "02500230-fa31-013a-73ae-000c29ced288"
     }
   },
   "jsonapi": {

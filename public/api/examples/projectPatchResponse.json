@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "389",
+    "id": "1022259327",
     "type": "projects",
     "attributes": {
       "discussion_links": [
@@ -19,21 +19,21 @@
         "permissions": [
           {
             "resource": {
-              "id": "320",
+              "id": "1039994777",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "389",
+              "id": "1022259327",
               "type": "projects"
             },
             "access": "download"
           },
           {
             "resource": {
-              "id": "347",
+              "id": "980199408",
               "type": "institutions"
             },
             "access": "view"
@@ -76,25 +76,7 @@
 
         ]
       },
-      "organisms": {
-        "data": [
-          {
-            "id": "29",
-            "type": "organisms"
-          }
-        ]
-      },
-      "human_diseases": {
-        "data": [
-
-        ]
-      },
       "people": {
-        "data": [
-
-        ]
-      },
-      "institutions": {
         "data": [
 
         ]
@@ -102,9 +84,14 @@
       "programmes": {
         "data": [
           {
-            "id": "29",
+            "id": "200",
             "type": "programmes"
           }
+        ]
+      },
+      "institutions": {
+        "data": [
+
         ]
       },
       "investigations": {
@@ -127,12 +114,7 @@
 
         ]
       },
-      "file_templates": {
-        "data": [
-
-        ]
-      },
-      "placeholders": {
+      "documents": {
         "data": [
 
         ]
@@ -162,26 +144,49 @@
 
         ]
       },
-      "documents": {
+      "organisms": {
         "data": [
-
+          {
+            "id": "627234432",
+            "type": "organisms"
+          }
         ]
       },
       "workflows": {
         "data": [
 
         ]
+      },
+      "collections": {
+        "data": [
+
+        ]
+      },
+      "human_diseases": {
+        "data": [
+
+        ]
+      },
+      "file_templates": {
+        "data": [
+
+        ]
+      },
+      "placeholders": {
+        "data": [
+
+        ]
       }
     },
     "links": {
-      "self": "/projects/389"
+      "self": "/projects/1022259327"
     },
     "meta": {
-      "created": "2022-07-18T09:02:41.000Z",
-      "modified": "2022-07-18T09:02:41.000Z",
+      "created": "2022-08-09T16:49:41.000Z",
+      "modified": "2022-08-09T16:49:41.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "4dd08e20-e8a6-013a-1113-0a81884ed284"
+      "uuid": "2fd63940-fa31-013a-73ae-000c29ced288"
     }
   },
   "jsonapi": {

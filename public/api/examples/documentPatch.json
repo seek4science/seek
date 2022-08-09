@@ -1,7 +1,7 @@
 {
   "data": {
     "type": "documents",
-    "id": "26",
+    "id": "245",
     "attributes": {
       "title": "A Maximally Patched Document",
       "description": "A report about the thing that happened",
@@ -17,7 +17,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "251",
+              "id": "1022258984",
               "type": "projects"
             },
             "access": "edit"
@@ -29,7 +29,7 @@
       "creators": {
         "data": [
           {
-            "id": "236",
+            "id": "1039994476",
             "type": "people"
           }
         ]
@@ -37,7 +37,7 @@
       "projects": {
         "data": [
           {
-            "id": "251",
+            "id": "1022258984",
             "type": "projects"
           }
         ]
@@ -45,7 +45,7 @@
       "assays": {
         "data": [
           {
-            "id": "34",
+            "id": "1035387408",
             "type": "assays"
           }
         ]
@@ -53,7 +53,7 @@
       "workflows": {
         "data": [
           {
-            "id": "14",
+            "id": "304",
             "type": "workflows"
           }
         ]

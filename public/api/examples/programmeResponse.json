@@ -1,11 +1,11 @@
 {
   "data": {
-    "id": "11",
+    "id": "193",
     "type": "programmes",
     "attributes": {
       "discussion_links": [
         {
-          "id": "30",
+          "id": "181",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
@@ -15,6 +15,7 @@
       "description": "A very exciting programme",
       "web_page": "http://www.synbiochem.co.uk",
       "funding_details": "Someone is funding this for me",
+      "open_for_projects": false,
       "funding_codes": [
         "DFG"
       ]
@@ -23,7 +24,7 @@
       "administrators": {
         "data": [
           {
-            "id": "401",
+            "id": "1039994551",
             "type": "people"
           }
         ]
@@ -31,7 +32,7 @@
       "people": {
         "data": [
           {
-            "id": "400",
+            "id": "1039994550",
             "type": "people"
           }
         ]
@@ -39,7 +40,7 @@
       "projects": {
         "data": [
           {
-            "id": "428",
+            "id": "1022259071",
             "type": "projects"
           }
         ]
@@ -47,7 +48,7 @@
       "institutions": {
         "data": [
           {
-            "id": "402",
+            "id": "980199171",
             "type": "institutions"
           }
         ]
@@ -55,7 +56,7 @@
       "investigations": {
         "data": [
           {
-            "id": "73",
+            "id": "973655774",
             "type": "investigations"
           }
         ]
@@ -63,7 +64,7 @@
       "studies": {
         "data": [
           {
-            "id": "69",
+            "id": "1060385742",
             "type": "studies"
           }
         ]
@@ -71,7 +72,7 @@
       "assays": {
         "data": [
           {
-            "id": "62",
+            "id": "1035387420",
             "type": "assays"
           }
         ]
@@ -79,15 +80,23 @@
       "data_files": {
         "data": [
           {
-            "id": "22",
+            "id": "883654888",
             "type": "data_files"
+          }
+        ]
+      },
+      "documents": {
+        "data": [
+          {
+            "id": "249",
+            "type": "documents"
           }
         ]
       },
       "models": {
         "data": [
           {
-            "id": "58",
+            "id": "1004285969",
             "type": "models"
           }
         ]
@@ -95,7 +104,7 @@
       "sops": {
         "data": [
           {
-            "id": "26",
+            "id": "1055250801",
             "type": "sops"
           }
         ]
@@ -103,7 +112,7 @@
       "publications": {
         "data": [
           {
-            "id": "28",
+            "id": "352",
             "type": "publications"
           }
         ]
@@ -111,7 +120,7 @@
       "presentations": {
         "data": [
           {
-            "id": "14",
+            "id": "120",
             "type": "presentations"
           }
         ]
@@ -119,29 +128,54 @@
       "events": {
         "data": [
           {
-            "id": "12",
+            "id": "1025618850",
             "type": "events"
           }
         ]
       },
-      "documents": {
+      "organisms": {
+        "data": [
+
+        ]
+      },
+      "workflows": {
         "data": [
           {
-            "id": "36",
-            "type": "documents"
+            "id": "306",
+            "type": "workflows"
           }
+        ]
+      },
+      "collections": {
+        "data": [
+
+        ]
+      },
+      "human_diseases": {
+        "data": [
+
+        ]
+      },
+      "file_templates": {
+        "data": [
+
+        ]
+      },
+      "placeholders": {
+        "data": [
+
         ]
       }
     },
     "links": {
-      "self": "/programmes/11"
+      "self": "/programmes/193"
     },
     "meta": {
-      "created": "2022-06-07T14:13:23.000Z",
-      "modified": "2022-06-07T14:13:23.000Z",
+      "created": "2022-08-09T16:48:23.000Z",
+      "modified": "2022-08-09T16:48:23.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "ea7137c0-c899-013a-0f7e-0a81884ed284"
+      "uuid": "01cce610-fa31-013a-73ae-000c29ced288"
     }
   },
   "jsonapi": {

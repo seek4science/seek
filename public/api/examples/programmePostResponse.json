@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "4",
+    "id": "186",
     "type": "programmes",
     "attributes": {
       "discussion_links": [
@@ -11,6 +11,7 @@
       "description": "A very exciting programme",
       "web_page": "http://www.synbiochem.co.uk",
       "funding_details": "Someone is funding this for me",
+      "open_for_projects": false,
       "funding_codes": [
         "BMBF",
         "DFG"
@@ -20,11 +21,11 @@
       "administrators": {
         "data": [
           {
-            "id": "334",
+            "id": "1039994478",
             "type": "people"
           },
           {
-            "id": "335",
+            "id": "1039994479",
             "type": "people"
           }
         ]
@@ -37,7 +38,7 @@
       "projects": {
         "data": [
           {
-            "id": "352",
+            "id": "1022258989",
             "type": "projects"
           }
         ]
@@ -67,6 +68,11 @@
 
         ]
       },
+      "documents": {
+        "data": [
+
+        ]
+      },
       "models": {
         "data": [
 
@@ -92,21 +98,46 @@
 
         ]
       },
-      "documents": {
+      "organisms": {
+        "data": [
+
+        ]
+      },
+      "workflows": {
+        "data": [
+
+        ]
+      },
+      "collections": {
+        "data": [
+
+        ]
+      },
+      "human_diseases": {
+        "data": [
+
+        ]
+      },
+      "file_templates": {
+        "data": [
+
+        ]
+      },
+      "placeholders": {
         "data": [
 
         ]
       }
     },
     "links": {
-      "self": "/programmes/4"
+      "self": "/programmes/186"
     },
     "meta": {
-      "created": "2022-06-07T14:13:13.000Z",
-      "modified": "2022-06-07T14:13:13.000Z",
+      "created": "2022-08-09T16:48:01.000Z",
+      "modified": "2022-08-09T16:48:01.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "e48569d0-c899-013a-0f7e-0a81884ed284"
+      "uuid": "f42dd800-fa30-013a-73ae-000c29ced288"
     }
   },
   "jsonapi": {

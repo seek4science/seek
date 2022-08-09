@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "316",
+    "id": "1050455356",
     "type": "content_blobs",
     "attributes": {
       "original_filename": "min file",
@@ -13,21 +13,21 @@
     "relationships": {
       "asset": {
         "data": {
-          "id": "45",
+          "id": "1055250820",
           "type": "sops"
         }
       }
     },
     "links": {
-      "self": "/sops/45/content_blobs/316",
-      "download": "/sops/45/content_blobs/316/download"
+      "self": "/sops/1055250820/content_blobs/1050455356",
+      "download": "/sops/1055250820/content_blobs/1050455356/download"
     },
     "meta": {
-      "created": "2022-06-07T14:14:09.000Z",
-      "modified": "2022-06-07T14:14:09.000Z",
+      "created": "2022-08-09T16:49:47.000Z",
+      "modified": "2022-08-09T16:49:47.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "05bf37b0-c89a-013a-0f7e-0a81884ed284"
+      "uuid": "338d0db0-fa31-013a-73ae-000c29ced288"
     }
   },
   "jsonapi": {

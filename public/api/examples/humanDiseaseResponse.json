@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "3",
+    "id": "647916205",
     "type": "human_diseases",
     "attributes": {
       "title": "A Maximal Human Disease",
@@ -11,7 +11,7 @@
       "projects": {
         "data": [
           {
-            "id": "934",
+            "id": "1022259347",
             "type": "projects"
           }
         ]
@@ -19,7 +19,7 @@
       "assays": {
         "data": [
           {
-            "id": "127",
+            "id": "1035387461",
             "type": "assays"
           }
         ]
@@ -27,7 +27,7 @@
       "models": {
         "data": [
           {
-            "id": "137",
+            "id": "1004285996",
             "type": "models"
           }
         ]
@@ -44,14 +44,14 @@
       }
     },
     "links": {
-      "self": "/human_diseases/3"
+      "self": "/human_diseases/647916205"
     },
     "meta": {
-      "created": "2022-06-07T14:14:35.000Z",
-      "modified": "2022-06-07T14:14:35.000Z",
+      "created": "2022-08-09T16:49:45.000Z",
+      "modified": "2022-08-09T16:49:45.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "15063e40-c89a-013a-0f7e-0a81884ed284"
+      "uuid": "329f4070-fa31-013a-73ae-000c29ced288"
     }
   },
   "jsonapi": {

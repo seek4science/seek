@@ -15,7 +15,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "2",
+              "id": "1022259358",
               "type": "projects"
             },
             "access": "edit"
@@ -27,7 +27,7 @@
       "creators": {
         "data": [
           {
-            "id": "3",
+            "id": "1039994805",
             "type": "people"
           }
         ]
@@ -35,7 +35,7 @@
       "projects": {
         "data": [
           {
-            "id": "2",
+            "id": "1022259358",
             "type": "projects"
           }
         ]
