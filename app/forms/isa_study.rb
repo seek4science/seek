@@ -55,11 +55,6 @@ class IsaStudy
     @study
   end
 
-  # respond to find_and_authorize_requested_item
-  def self.find(id)
-    Study.find(id)
-  end
-
   def populate(id)
     @study = Study.find(id)
     @source_sample_type = @study.sample_types.first
