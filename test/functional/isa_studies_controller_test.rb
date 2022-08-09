@@ -58,8 +58,7 @@ class IsaStudiesControllerTest < ActionController::TestCase
     end
     i = assigns(:isa_study)
     assert_redirected_to controller: 'single_pages', action: 'show', id: i.study.projects.first.id,
-                         params: { notice: 'The ISA study was created successfully!',
-                                   item_type: 'study', item_id: Study.last.id }
+                         params: { item_type: 'study', item_id: Study.last.id }
   end
 
   test 'should edit isa study' do
