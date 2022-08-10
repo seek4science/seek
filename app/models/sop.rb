@@ -49,7 +49,7 @@ class Sop < ApplicationRecord
 
   def can_delete?(user = User.current_user)
     if Seek::Config.project_single_page_advanced_enabled
-      super && Study.where(sop: self).blank?
+      super && study.blank?
     else
       super
     end
