@@ -89,8 +89,11 @@ class TemplatesController < ApplicationController
     uploaded_file = params[:template_json_file]
     dir = Rails.root.join('config', 'default_data', 'source_types')
 
-    FileUtils.rm_rf(dir) if Dir.exist?(dir)
-    FileUtils.mkdir_p(dir)
+    if Dir.exist?(dir)
+      `rm #{dir}/*`
+    else
+      FileUtils.mkdir_p(dir)
+    end
 
     File.open(Rails.root.join(dir, uploaded_file.original_filename), 'wb') do |file|
       file.write(uploaded_file.read)
@@ -99,9 +102,7 @@ class TemplatesController < ApplicationController
     unless running?
       begin
         running!
-        Thread.new do
-          system 'bundle exec rake seek:populate_templates'
-        end
+        PopulateTemplatesJob.new.queue_job
       rescue StandardError
         done!
       end
