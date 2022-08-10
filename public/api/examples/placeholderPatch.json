@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "91",
+    "id": "153",
     "type": "placeholders",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "1022258638",
+              "id": "1022267096",
               "type": "projects"
             },
             "access": "edit"
@@ -27,7 +27,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039994142",
+            "id": "1040002148",
             "type": "people"
           }
         ]
@@ -35,20 +35,20 @@
       "projects": {
         "data": [
           {
-            "id": "1022258638",
+            "id": "1022267096",
             "type": "projects"
           }
         ]
       },
       "file_template": {
         "data": {
-          "id": "121",
+          "id": "207",
           "type": "file_templates"
         }
       },
       "data_file": {
         "data": {
-          "id": "883654864",
+          "id": "883655325",
           "type": "data_files"
         }
       }

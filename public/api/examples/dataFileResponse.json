@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "883654871",
+    "id": "883655318",
     "type": "data_files",
     "attributes": {
       "policy": {
@@ -11,7 +11,7 @@
       },
       "discussion_links": [
         {
-          "id": "149",
+          "id": "456",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
@@ -31,14 +31,14 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/data_files/883654871?version=1",
+          "url": "http://localhost:3000/data_files/883655318?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2022-08-09T16:46:22.000Z",
-      "updated_at": "2022-08-09T16:46:22.000Z",
+      "created_at": "2022-08-09T20:26:32.000Z",
+      "updated_at": "2022-08-09T20:26:32.000Z",
       "doi": null,
       "content_blobs": [
         {
@@ -47,13 +47,13 @@
           "md5sum": "565ae8a7a743c3bfd9f15c69647f5b8b",
           "sha1sum": "b9d2148740050b7f37975edd0fb97faa508ff767",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/data_files/883654871/content_blobs/1050455109",
+          "link": "http://localhost:3000/data_files/883655318/content_blobs/1050457376",
           "size": 8827
         }
       ],
       "creators": [
         {
-          "profile": "/people/1039994190",
+          "profile": "/people/1040002059",
           "family_name": "One",
           "given_name": "Some",
           "affiliation": "University of Somewhere",
@@ -66,7 +66,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039994190",
+            "id": "1040002059",
             "type": "people"
           }
         ]
@@ -74,7 +74,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039994191",
+            "id": "1040002060",
             "type": "people"
           }
         ]
@@ -82,11 +82,11 @@
       "people": {
         "data": [
           {
-            "id": "1039994190",
+            "id": "1040002059",
             "type": "people"
           },
           {
-            "id": "1039994191",
+            "id": "1040002060",
             "type": "people"
           }
         ]
@@ -94,7 +94,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022258680",
+            "id": "1022267019",
             "type": "projects"
           }
         ]
@@ -102,7 +102,7 @@
       "investigations": {
         "data": [
           {
-            "id": "973655688",
+            "id": "973656785",
             "type": "investigations"
           }
         ]
@@ -110,7 +110,7 @@
       "studies": {
         "data": [
           {
-            "id": "1060385665",
+            "id": "1060386644",
             "type": "studies"
           }
         ]
@@ -118,7 +118,7 @@
       "assays": {
         "data": [
           {
-            "id": "1035387357",
+            "id": "1035388192",
             "type": "assays"
           }
         ]
@@ -126,7 +126,7 @@
       "publications": {
         "data": [
           {
-            "id": "320",
+            "id": "696",
             "type": "publications"
           }
         ]
@@ -134,7 +134,7 @@
       "events": {
         "data": [
           {
-            "id": "1025618843",
+            "id": "1025619001",
             "type": "events"
           }
         ]
@@ -142,33 +142,33 @@
       "workflows": {
         "data": [
           {
-            "id": "279",
+            "id": "548",
             "type": "workflows"
           }
         ]
       },
       "placeholder": {
         "data": {
-          "id": "96",
+          "id": "144",
           "type": "placeholders"
         }
       },
       "file_template": {
         "data": {
-          "id": "126",
+          "id": "200",
           "type": "file_templates"
         }
       }
     },
     "links": {
-      "self": "/data_files/883654871?version=1"
+      "self": "/data_files/883655318?version=1"
     },
     "meta": {
-      "created": "2022-08-09T16:46:21.000Z",
-      "modified": "2022-08-09T16:46:22.000Z",
+      "created": "2022-08-09T20:26:32.000Z",
+      "modified": "2022-08-09T20:26:33.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "b908d7f0-fa30-013a-73ae-000c29ced288"
+      "uuid": "7b11cc90-fa4f-013a-73c8-000c29ced288"
     }
   },
   "jsonapi": {

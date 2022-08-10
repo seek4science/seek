@@ -1,23 +1,23 @@
 {
   "data": [
     {
-      "id": "973655648",
+      "id": "973656823",
       "type": "investigations",
       "attributes": {
-        "title": "Investigation24"
+        "title": "Investigation44"
       },
       "links": {
-        "self": "/investigations/973655648"
+        "self": "/investigations/973656823"
       }
     },
     {
-      "id": "973655642",
+      "id": "973656817",
       "type": "investigations",
       "attributes": {
         "title": "A Minimal Investigation"
       },
       "links": {
-        "self": "/investigations/973655642"
+        "self": "/investigations/973656817"
       }
     }
   ],

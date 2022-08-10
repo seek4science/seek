@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "186",
+    "id": "351",
     "type": "programmes",
     "attributes": {
       "discussion_links": [
@@ -11,7 +11,6 @@
       "description": "A very exciting programme",
       "web_page": "http://www.synbiochem.co.uk",
       "funding_details": "Someone is funding this for me",
-      "open_for_projects": false,
       "funding_codes": [
         "BMBF",
         "DFG"
@@ -21,11 +20,11 @@
       "administrators": {
         "data": [
           {
-            "id": "1039994478",
+            "id": "1040002584",
             "type": "people"
           },
           {
-            "id": "1039994479",
+            "id": "1040002585",
             "type": "people"
           }
         ]
@@ -38,7 +37,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022258989",
+            "id": "1022267577",
             "type": "projects"
           }
         ]
@@ -130,14 +129,14 @@
       }
     },
     "links": {
-      "self": "/programmes/186"
+      "self": "/programmes/351"
     },
     "meta": {
-      "created": "2022-08-09T16:48:01.000Z",
-      "modified": "2022-08-09T16:48:01.000Z",
+      "created": "2022-08-09T20:29:20.000Z",
+      "modified": "2022-08-09T20:29:20.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "f42dd800-fa30-013a-73ae-000c29ced288"
+      "uuid": "df654630-fa4f-013a-73c8-000c29ced288"
     }
   },
   "jsonapi": {

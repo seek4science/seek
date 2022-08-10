@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "245",
+    "id": "552",
     "type": "documents",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "1022258984",
+              "id": "1022267131",
               "type": "projects"
             },
             "access": "edit"
@@ -31,32 +31,32 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/documents/245?version=1",
+          "url": "http://localhost:3000/documents/552?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2022-08-09T16:47:59.000Z",
-      "updated_at": "2022-08-09T16:48:00.000Z",
+      "created_at": "2022-08-09T20:27:06.000Z",
+      "updated_at": "2022-08-09T20:27:07.000Z",
       "doi": null,
       "content_blobs": [
         {
-          "original_filename": "file-40",
+          "original_filename": "file-24",
           "url": null,
-          "md5sum": "9b6f96d430c7579bc6d356d49c4c364d",
-          "sha1sum": "e9a3124ff7b0a3205d3ce3e28a820850e780d2e0",
+          "md5sum": "67307af5b4d8f1f46cc609fc52f1ba77",
+          "sha1sum": "a9308773844438286818f2bb90e55383795ed6f3",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/documents/245/content_blobs/1050455225",
+          "link": "http://localhost:3000/documents/552/content_blobs/1050457424",
           "size": 9
         }
       ],
       "creators": [
         {
-          "profile": "/people/1039994476",
+          "profile": "/people/1040002181",
           "family_name": "Last",
-          "given_name": "Person565",
-          "affiliation": "An Institution: 663",
+          "given_name": "Person196",
+          "affiliation": "An Institution: 240",
           "orcid": null
         }
       ],
@@ -66,7 +66,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039994476",
+            "id": "1040002181",
             "type": "people"
           }
         ]
@@ -74,7 +74,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039994475",
+            "id": "1040002180",
             "type": "people"
           }
         ]
@@ -82,11 +82,11 @@
       "people": {
         "data": [
           {
-            "id": "1039994475",
+            "id": "1040002180",
             "type": "people"
           },
           {
-            "id": "1039994476",
+            "id": "1040002181",
             "type": "people"
           }
         ]
@@ -94,7 +94,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022258984",
+            "id": "1022267131",
             "type": "projects"
           }
         ]
@@ -102,7 +102,7 @@
       "investigations": {
         "data": [
           {
-            "id": "973655758",
+            "id": "973656796",
             "type": "investigations"
           }
         ]
@@ -110,7 +110,7 @@
       "studies": {
         "data": [
           {
-            "id": "1060385728",
+            "id": "1060386655",
             "type": "studies"
           }
         ]
@@ -118,7 +118,7 @@
       "assays": {
         "data": [
           {
-            "id": "1035387408",
+            "id": "1035388203",
             "type": "assays"
           }
         ]
@@ -131,21 +131,21 @@
       "workflows": {
         "data": [
           {
-            "id": "304",
+            "id": "561",
             "type": "workflows"
           }
         ]
       }
     },
     "links": {
-      "self": "/documents/245?version=1"
+      "self": "/documents/552?version=1"
     },
     "meta": {
-      "created": "2022-08-09T16:47:59.000Z",
-      "modified": "2022-08-09T16:48:00.000Z",
+      "created": "2022-08-09T20:27:06.000Z",
+      "modified": "2022-08-09T20:27:07.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "f37a0490-fa30-013a-73ae-000c29ced288"
+      "uuid": "8fa0c3c0-fa4f-013a-73c8-000c29ced288"
     }
   },
   "jsonapi": {

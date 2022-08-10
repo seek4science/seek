@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "1004285905",
+    "id": "1004286612",
     "type": "models",
     "attributes": {
       "policy": {
@@ -11,7 +11,7 @@
       },
       "discussion_links": [
         {
-          "id": "145",
+          "id": "498",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
@@ -31,14 +31,14 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/models/1004285905?version=1",
+          "url": "http://localhost:3000/models/1004286612?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2022-08-09T16:45:57.000Z",
-      "updated_at": "2022-08-09T16:45:57.000Z",
+      "created_at": "2022-08-09T20:29:08.000Z",
+      "updated_at": "2022-08-09T20:29:09.000Z",
       "doi": null,
       "content_blobs": [
         {
@@ -47,7 +47,7 @@
           "md5sum": "6b9283ed4ca52a081398b715aaeb8113",
           "sha1sum": "454e4b6067f577b680bb8538772b12ebcdb6c4a4",
           "content_type": "application/xml",
-          "link": "http://localhost:3000/models/1004285905/content_blobs/1050455076",
+          "link": "http://localhost:3000/models/1004286612/content_blobs/1050457562",
           "size": 5933
         },
         {
@@ -56,13 +56,13 @@
           "md5sum": "01788bca93265d80e8127ca0039bb69b",
           "sha1sum": "ffd634ac7564083ab7b66bc3eb2053cbc3d608f5",
           "content_type": "application/vnd.ms-excel",
-          "link": "http://localhost:3000/models/1004285905/content_blobs/1050455077",
+          "link": "http://localhost:3000/models/1004286612/content_blobs/1050457563",
           "size": 9216
         }
       ],
       "creators": [
         {
-          "profile": "/people/1039994102",
+          "profile": "/people/1040002547",
           "family_name": "One",
           "given_name": "Some",
           "affiliation": "University of Somewhere",
@@ -79,7 +79,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039994102",
+            "id": "1040002547",
             "type": "people"
           }
         ]
@@ -87,7 +87,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039994103",
+            "id": "1040002548",
             "type": "people"
           }
         ]
@@ -95,7 +95,7 @@
       "organisms": {
         "data": [
           {
-            "id": "627234413",
+            "id": "627234569",
             "type": "organisms"
           }
         ]
@@ -103,11 +103,11 @@
       "people": {
         "data": [
           {
-            "id": "1039994102",
+            "id": "1040002547",
             "type": "people"
           },
           {
-            "id": "1039994103",
+            "id": "1040002548",
             "type": "people"
           }
         ]
@@ -115,7 +115,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022258601",
+            "id": "1022267536",
             "type": "projects"
           }
         ]
@@ -123,7 +123,7 @@
       "investigations": {
         "data": [
           {
-            "id": "973655680",
+            "id": "973656905",
             "type": "investigations"
           }
         ]
@@ -131,7 +131,7 @@
       "studies": {
         "data": [
           {
-            "id": "1060385657",
+            "id": "1060386747",
             "type": "studies"
           }
         ]
@@ -139,7 +139,7 @@
       "assays": {
         "data": [
           {
-            "id": "1035387349",
+            "id": "1035388276",
             "type": "assays"
           }
         ]
@@ -147,21 +147,21 @@
       "publications": {
         "data": [
           {
-            "id": "314",
+            "id": "743",
             "type": "publications"
           }
         ]
       }
     },
     "links": {
-      "self": "/models/1004285905?version=1"
+      "self": "/models/1004286612?version=1"
     },
     "meta": {
-      "created": "2022-08-09T16:45:57.000Z",
-      "modified": "2022-08-09T16:45:57.000Z",
+      "created": "2022-08-09T20:29:08.000Z",
+      "modified": "2022-08-09T20:29:09.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "aa98be60-fa30-013a-73ae-000c29ced288"
+      "uuid": "d8504e30-fa4f-013a-73c8-000c29ced288"
     }
   },
   "jsonapi": {

@@ -1,23 +1,23 @@
 {
   "data": [
     {
-      "id": "112",
+      "id": "192",
       "type": "file_templates",
       "attributes": {
         "title": "A Maximal FileTemplate"
       },
       "links": {
-        "self": "/file_templates/112"
+        "self": "/file_templates/192"
       }
     },
     {
-      "id": "111",
+      "id": "191",
       "type": "file_templates",
       "attributes": {
         "title": "A Minimal FileTemplate"
       },
       "links": {
-        "self": "/file_templates/111"
+        "self": "/file_templates/191"
       }
     }
   ],

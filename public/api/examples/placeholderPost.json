@@ -15,7 +15,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "1022258608",
+              "id": "1022267066",
               "type": "projects"
             },
             "access": "edit"
@@ -27,7 +27,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039994112",
+            "id": "1040002118",
             "type": "people"
           }
         ]
@@ -35,14 +35,14 @@
       "projects": {
         "data": [
           {
-            "id": "1022258608",
+            "id": "1022267066",
             "type": "projects"
           }
         ]
       },
       "file_template": {
         "data": {
-          "id": "116",
+          "id": "202",
           "type": "file_templates"
         }
       }

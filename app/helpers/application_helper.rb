@@ -509,6 +509,8 @@ module ApplicationHelper
   PAGE_TITLES = { 'home' => 'Home',
                   'projects' => I18n.t('project').pluralize,
                   'institutions' => I18n.t('institution').pluralize,
+                  'facilities' => I18n.t('facility').pluralize,
+                  'services' => I18n.t('service').pluralize,
                   'people' => 'People',
                   'sessions' => 'Login',
                   'users' => { 'new' => 'Signup', '*' => 'Account' },

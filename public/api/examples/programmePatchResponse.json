@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "194",
+    "id": "359",
     "type": "programmes",
     "attributes": {
       "discussion_links": [
@@ -11,7 +11,6 @@
       "description": "A very exciting programme patched!",
       "web_page": "http://www.synbiochem.co.uk",
       "funding_details": "Someone ELSE is funding this for me",
-      "open_for_projects": false,
       "funding_codes": [
         "AVH"
       ]
@@ -20,7 +19,7 @@
       "administrators": {
         "data": [
           {
-            "id": "1039994554",
+            "id": "1040002660",
             "type": "people"
           }
         ]
@@ -33,7 +32,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022259076",
+            "id": "1022267664",
             "type": "projects"
           }
         ]
@@ -125,14 +124,14 @@
       }
     },
     "links": {
-      "self": "/programmes/194"
+      "self": "/programmes/359"
     },
     "meta": {
-      "created": "2022-08-09T16:48:24.000Z",
-      "modified": "2022-08-09T16:48:24.000Z",
+      "created": "2022-08-09T20:29:43.000Z",
+      "modified": "2022-08-09T20:29:43.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "02500230-fa31-013a-73ae-000c29ced288"
+      "uuid": "ece83580-fa4f-013a-73c8-000c29ced288"
     }
   },
   "jsonapi": {

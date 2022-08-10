@@ -1,8 +1,7 @@
 class ProgrammeSerializer < AvatarObjSerializer
   attributes :title, :description,
              :web_page,
-             :funding_details,
-             :open_for_projects
+             :funding_details
 
   attribute :tags, key: :funding_codes do
     serialize_annotations(object, context = 'funding_code')

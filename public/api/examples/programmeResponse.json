@@ -1,11 +1,11 @@
 {
   "data": {
-    "id": "193",
+    "id": "358",
     "type": "programmes",
     "attributes": {
       "discussion_links": [
         {
-          "id": "181",
+          "id": "510",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
@@ -15,7 +15,6 @@
       "description": "A very exciting programme",
       "web_page": "http://www.synbiochem.co.uk",
       "funding_details": "Someone is funding this for me",
-      "open_for_projects": false,
       "funding_codes": [
         "DFG"
       ]
@@ -24,7 +23,7 @@
       "administrators": {
         "data": [
           {
-            "id": "1039994551",
+            "id": "1040002657",
             "type": "people"
           }
         ]
@@ -32,7 +31,7 @@
       "people": {
         "data": [
           {
-            "id": "1039994550",
+            "id": "1040002656",
             "type": "people"
           }
         ]
@@ -40,7 +39,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022259071",
+            "id": "1022267659",
             "type": "projects"
           }
         ]
@@ -48,7 +47,7 @@
       "institutions": {
         "data": [
           {
-            "id": "980199171",
+            "id": "980207377",
             "type": "institutions"
           }
         ]
@@ -56,7 +55,7 @@
       "investigations": {
         "data": [
           {
-            "id": "973655774",
+            "id": "973656928",
             "type": "investigations"
           }
         ]
@@ -64,7 +63,7 @@
       "studies": {
         "data": [
           {
-            "id": "1060385742",
+            "id": "1060386768",
             "type": "studies"
           }
         ]
@@ -72,7 +71,7 @@
       "assays": {
         "data": [
           {
-            "id": "1035387420",
+            "id": "1035388295",
             "type": "assays"
           }
         ]
@@ -80,7 +79,7 @@
       "data_files": {
         "data": [
           {
-            "id": "883654888",
+            "id": "883655349",
             "type": "data_files"
           }
         ]
@@ -88,7 +87,7 @@
       "documents": {
         "data": [
           {
-            "id": "249",
+            "id": "574",
             "type": "documents"
           }
         ]
@@ -96,7 +95,7 @@
       "models": {
         "data": [
           {
-            "id": "1004285969",
+            "id": "1004286630",
             "type": "models"
           }
         ]
@@ -104,7 +103,7 @@
       "sops": {
         "data": [
           {
-            "id": "1055250801",
+            "id": "1055251072",
             "type": "sops"
           }
         ]
@@ -112,7 +111,7 @@
       "publications": {
         "data": [
           {
-            "id": "352",
+            "id": "748",
             "type": "publications"
           }
         ]
@@ -120,7 +119,7 @@
       "presentations": {
         "data": [
           {
-            "id": "120",
+            "id": "253",
             "type": "presentations"
           }
         ]
@@ -128,7 +127,7 @@
       "events": {
         "data": [
           {
-            "id": "1025618850",
+            "id": "1025619020",
             "type": "events"
           }
         ]
@@ -141,7 +140,7 @@
       "workflows": {
         "data": [
           {
-            "id": "306",
+            "id": "569",
             "type": "workflows"
           }
         ]
@@ -168,14 +167,14 @@
       }
     },
     "links": {
-      "self": "/programmes/193"
+      "self": "/programmes/358"
     },
     "meta": {
-      "created": "2022-08-09T16:48:23.000Z",
-      "modified": "2022-08-09T16:48:23.000Z",
+      "created": "2022-08-09T20:29:42.000Z",
+      "modified": "2022-08-09T20:29:42.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "01cce610-fa31-013a-73ae-000c29ced288"
+      "uuid": "ec6dd6d0-fa4f-013a-73c8-000c29ced288"
     }
   },
   "jsonapi": {

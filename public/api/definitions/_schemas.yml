@@ -1001,6 +1001,11 @@ facilityType:
   minLength: 1
   enum:
     - facilities
+serviceType:
+  type: string
+  minLength: 1
+  enum:
+    - services
 modelType:
   type: string
   minLength: 1
@@ -2042,6 +2047,8 @@ investigationPost:
               $ref: "#/components/schemas/multipleReferences"
             publications:
               $ref: "#/components/schemas/multipleReferences"
+            service:
+              $ref: "#/components/schemas/singleReference"
           required:
             - projects
           additionalProperties: false
@@ -2090,6 +2097,8 @@ investigationPatch:
               $ref: "#/components/schemas/multipleReferences"
             publications:
               $ref: "#/components/schemas/multipleReferences"
+            service:
+              $ref: "#/components/schemas/singleReference"
           additionalProperties: false
       required:
         - id
@@ -3744,8 +3753,6 @@ dataFileResponse:
             - assays
             - publications
             - events
-            - file_template
-            - placeholder
             - workflows
           additionalProperties: false
         links:
@@ -4080,6 +4087,8 @@ investigationResponse:
               $ref: "#/components/schemas/multipleReferences"
             publications:
               $ref: "#/components/schemas/multipleReferences"
+            service:
+               #ref: "#/components/schemas/singleReference"
           required:
             - creators
             - submitter
@@ -4506,8 +4515,6 @@ programmeResponse:
               $ref: "#/components/schemas/multipleReferences"
             collections:
               $ref: "#/components/schemas/multipleReferences"
-            samples:
-              $ref: "#/components/schemas/multipleReferences"
             file_templates:
               $ref: "#/components/schemas/multipleReferences"
             placeholders:
@@ -4530,7 +4537,6 @@ programmeResponse:
             - events
             - workflows
             - collections
-            - samples
             - file_templates
             - placeholders
             - administrators
