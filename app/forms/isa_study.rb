@@ -27,7 +27,7 @@ class IsaStudy
     if valid?
       input_attribute = @sample_collection_sample_type.sample_attributes.detect(&:seek_sample_multi?)
       input_attribute.linked_sample_type = @source_sample_type
-			title = @source_sample_type.sample_attributes.detect(&:is_title).title
+      title = @source_sample_type.sample_attributes.detect(&:is_title).title
       input_attribute.title = "Input (#{title})"
 
       @study.save

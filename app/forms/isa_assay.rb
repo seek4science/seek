@@ -21,7 +21,7 @@ class IsaAssay
       input_attribute = @sample_type.sample_attributes.detect(&:seek_sample_multi?)
       input_attribute.linked_sample_type_id = @input_sample_type_id
       title = SampleType.find(@input_sample_type_id).sample_attributes.detect(&:is_title).title 
-			input_attribute.title = "Input (#{title})"
+      input_attribute.title = "Input (#{title})"
 
       @assay.save
       @sample_type.save

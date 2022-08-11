@@ -48,8 +48,8 @@ class DynamicTableHelperTest < ActionView::TestCase
       # |  (status)(id)sample_a2 | (status)(id)sample_b2  |
       # |  (status)(id)sample_a3 | x                      |
       # |-------------------------------------------------|
-      
-			dt = dt_aggregated(study)
+
+      dt = dt_aggregated(study)
       # Each sample types' attributes count + the sample.id
       columns_count = study.sample_types[0].sample_attributes.length + 1
       columns_count += study.sample_types[1].sample_attributes.length + 1
@@ -69,7 +69,7 @@ class DynamicTableHelperTest < ActionView::TestCase
       # | (status)(id)sample_c1 |
       # |-----------------------|
 
-			dt = dt_aggregated(study, assay)
+      dt = dt_aggregated(study, assay)
       # Each sample types' attributes count + the sample.id
       columns_count = assay.sample_type.sample_attributes.length + 1
 

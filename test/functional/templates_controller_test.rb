@@ -224,13 +224,13 @@ class TemplatesControllerTest < ActionController::TestCase
     assert_equal 'not_started', status
 
     File.open(@controller.send(:resultfile), 'w+') { |f| f.write('content') }
-		@controller.send(:set_status)
-		status = assigns(:status)
+    @controller.send(:set_status)
+    status = assigns(:status)
     assert_equal 'content', status
 
     @controller.send(:running!)
     status = assigns(:status)
-		@controller.send(:done!)
+    @controller.send(:done!)
     assert_equal 'working', status
   end
 end

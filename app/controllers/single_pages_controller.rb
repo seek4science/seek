@@ -45,16 +45,16 @@ class SinglePagesController < ApplicationController
   end
 
   def export_isa
-		begin
-			inv = Investigation.find(params[:investigation_id])
-			isa = IsaExporter::Exporter.new(inv).export
-			send_data isa, filename: 'isa.json', type: 'application/json', deposition: 'attachment'
-		rescue Exception => ex
-			respond_to do |format|
-				flash[:error] = ex.message
-				format.html { redirect_to single_page_path(Project.find(params[:id])) }
-			end
-		end
+    begin
+      inv = Investigation.find(params[:investigation_id])
+      isa = IsaExporter::Exporter.new(inv).export
+      send_data isa, filename: 'isa.json', type: 'application/json', deposition: 'attachment'
+    rescue Exception => ex
+      respond_to do |format|
+        flash[:error] = ex.message
+        format.html { redirect_to single_page_path(Project.find(params[:id])) }
+      end
+    end
   end
 
   private
