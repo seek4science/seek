@@ -38,30 +38,47 @@ class DynamicTableHelperTest < ActionView::TestCase
       disable_authorization_checks { sample_c1.save! }
 
       study = Factory(:study, investigation: inv, contributor: person, sample_types: [type_a, type_b])
-      assay = Factory(:assay, study: study, contributor: person, sample_type: type_c)
+      assay = Factory(:assay, study: study, contributor: person, sample_type: type_c, position: 1)
 
-      dt = dt_aggregated(study, true)
-      # Each sample types' attributes length + the sample.id
+      # Query with the Study:
+      # |-------------------------------------------------|
+      # |         type_a         |         type_b         |
+      # |------------------------|------------------------|
+      # |  (status)(id)sample_a1 | (status)(id)sample_b1  |
+      # |  (status)(id)sample_a2 | (status)(id)sample_b2  |
+      # |  (status)(id)sample_a3 | x                      |
+      # |-------------------------------------------------|
+
+      dt = dt_aggregated(study)
+      # Each sample types' attributes count + the sample.id
       columns_count = study.sample_types[0].sample_attributes.length + 1
       columns_count += study.sample_types[1].sample_attributes.length + 1
-      columns_count += assay.sample_type.sample_attributes.length + 1
 
       assert_equal type_a.samples.length, dt[:rows].length
       assert_equal columns_count, dt[:columns].length
       dt[:rows].each { |r| assert_equal columns_count, r.length }
 
       assert_equal false, (dt[:rows][0].any? { |x| x == '' })
-      assert_equal true, (dt[:rows][1].any? { |x| x == '' })
+      assert_equal false, (dt[:rows][1].any? { |x| x == '' })
       assert_equal true, (dt[:rows][2].any? { |x| x == '' })
-    end
 
-    # |-------------------------------------------------------------------------|
-    # |         type_a         |         type_b         |         type_c        |
-    # |------------------------|------------------------|-----------------------|
-    # |  (status)(id)sample_a1 | (status)(id)sample_b1  | (status)(id)sample_c1 |
-    # |  (status)(id)sample_a2 | (status)(id)sample_b2  | x                     |
-    # |  (status)(id)sample_a3 | x                      | x                     |
-    # |-------------------------------------------------------------------------|
+      # Query with the Assay:
+      # |-----------------------|
+      # |         type_c        |
+      # |-----------------------|
+      # | (status)(id)sample_c1 |
+      # |-----------------------|
+
+      dt = dt_aggregated(study, assay)
+      # Each sample types' attributes count + the sample.id
+      columns_count = assay.sample_type.sample_attributes.length + 1
+
+      assert_equal type_c.samples.length, dt[:rows].length
+      assert_equal columns_count, dt[:columns].length
+      dt[:rows].each { |r| assert_equal columns_count, r.length }
+
+      assert_equal false, (dt[:rows][0].any? { |x| x == '' })
+    end
   end
 
   test 'Should return the sequence of sample_type links' do

@@ -101,7 +101,7 @@ class Project < ApplicationRecord
 
   def spreadsheets
     data_files.select { |d| d.contains_extractable_spreadsheet?}
-  end	  
+  end    
 
   def institutions=(new_institutions)
     new_institutions = Array(new_institutions).map do |i|

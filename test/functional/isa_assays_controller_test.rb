@@ -26,9 +26,10 @@ class IsaAssaysControllerTest < ActionController::TestCase
     inv = Factory(:investigation, projects: projects, contributor: User.current_user.person)
     study = Factory(:study, investigation_id: inv.id, contributor: User.current_user.person)
 
-    source_sample_type = Factory(:simple_sample_type)
+    source_sample_type = Factory(:simple_sample_type, title: 'source sample_type')
 
-    sample_collection_sample_type = Factory(:multi_linked_sample_type, project_ids: [projects.first.id])
+    sample_collection_sample_type = Factory(:multi_linked_sample_type, project_ids: [projects.first.id],
+                                                                       title: 'sample_collection sample_type')
     sample_collection_sample_type.sample_attributes.last.linked_sample_type = source_sample_type
 
     study.sample_types = [source_sample_type, sample_collection_sample_type]
@@ -64,9 +65,15 @@ class IsaAssaysControllerTest < ActionController::TestCase
     assert_redirected_to controller: 'single_pages', action: 'show', id: i.assay.projects.first.id,
                          params: { notice: 'The ISA assay was created successfully!',
                                    item_type: 'assay', item_id: Assay.last.id }
+
+    sample_types = SampleType.last(2)
+    title = sample_types[0].sample_attributes.detect(&:is_title).title
+    sample_multi = sample_types[1].sample_attributes.detect(&:seek_sample_multi?)
+
+    assert_equal "Input (#{title})", sample_multi.title
   end
 
-  test 'should show new on incomplete params' do
+  test 'should show new when parameters are incomplete' do
     projects = User.current_user.person.projects
     inv = Factory(:investigation, projects: projects, contributor: User.current_user.person)
     study = Factory(:study, investigation_id: inv.id, contributor: User.current_user.person)

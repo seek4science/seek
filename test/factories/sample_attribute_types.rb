@@ -171,8 +171,8 @@ end
 
 Factory.define(:efo_ontology, class: SampleControlledVocab) do |f|
   f.sequence(:title) { |n| "EFO ontology #{n}" }
-	f.source_ontology 'EFO'
-	f.ols_root_term_uri 'http://www.ebi.ac.uk/efo/EFO_0000635'
+  f.source_ontology 'EFO'
+  f.ols_root_term_uri 'http://www.ebi.ac.uk/efo/EFO_0000635'
   f.after_build do |vocab|
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'anatomical entity')
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'retroperitoneal space')
@@ -182,13 +182,13 @@ end
 
 Factory.define(:obi_ontology, class: SampleControlledVocab) do |f|
   f.sequence(:title) { |n| "OBI ontology #{n}" }
-	f.source_ontology 'OBI'
-	f.ols_root_term_uri 'http://purl.obolibrary.org/obo/OBI_0000094'
+  f.source_ontology 'OBI'
+  f.ols_root_term_uri 'http://purl.obolibrary.org/obo/OBI_0000094'
   f.after_build do |vocab|
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'dissection')
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'enzymatic cleavage')
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'non specific enzymatic cleavage')
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'protease cleavage')
-		vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'DNA restriction enzyme digestion')
-	end
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'DNA restriction enzyme digestion')
+  end
 end

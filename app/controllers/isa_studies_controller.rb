@@ -1,5 +1,7 @@
 class IsaStudiesController < ApplicationController
   include Seek::AssetsCommon
+  include Seek::Publishing::PublishingCommon
+
   before_action :set_up_instance_variable
   before_action :find_requested_item, only: %i[edit update]
 

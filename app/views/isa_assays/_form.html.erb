@@ -49,14 +49,11 @@ input_sample_type_id ||=
 
 <% end -%> 
 
-<%= folding_panel("Assay design") do %>
+<%= f.hidden_field :input_sample_type_id, value: input_sample_type_id  -%>
 
-	<%= f.hidden_field :input_sample_type_id, value: input_sample_type_id   -%>
-
-  <% if @isa_assay.sample_type %>
-    <%= folding_panel("Outgoing sample template") do %>
-      <%= render partial: 'isa_studies/sample_types_form', locals: {f: f, sample_type: @isa_assay.sample_type, id_suffix: "_sample_type", isa_element: "assay", action: action} %>
-    <% end %>
+<% if @isa_assay.sample_type %>
+  <%= folding_panel("Define #{t(:sample_type)} for #{t(:assay)}") do %>
+    <%= render partial: 'isa_studies/sample_types_form', locals: {f: f, sample_type: @isa_assay.sample_type, id_suffix: "_sample_type", isa_element: "assay", action: action} %>
   <% end %>
 <% end %>
  

@@ -17,16 +17,19 @@ class IsaStudy
 
     unless params[:source_sample_type]
       @source_sample_type.sample_attributes.build(is_title: true, required: true)
-    end # Initial attribute
+    end
     unless params[:sample_collection_sample_type]
       @sample_collection_sample_type.sample_attributes.build(is_title: true, required: true)
-    end # Initial attribute
+    end
   end
 
   def save
     if valid?
       if @study.new_record?
-        @sample_collection_sample_type.sample_attributes.detect(&:seek_sample_multi?).linked_sample_type = @source_sample_type
+        input_attribute = @sample_collection_sample_type.sample_attributes.detect(&:seek_sample_multi?)
+        input_attribute.linked_sample_type = @source_sample_type
+        title = @source_sample_type.sample_attributes.detect(&:is_title).title
+        input_attribute.title = "Input (#{title})"
         @study.sample_types = [@source_sample_type, @sample_collection_sample_type]
       end
       @study.save
@@ -85,7 +88,7 @@ class IsaStudy
       errors[:base] << '[Sample type]: An attribute with sample ISA tag is not provided'
     end
 
-    unless @sample_collection_sample_type.sample_attributes.any? { |a| a.seek_sample_multi? }
+    unless @sample_collection_sample_type.sample_attributes.any?(&:seek_sample_multi?)
       errors[:base] << '[Sample Collection sample type]: SEEK Sample Multi attribute is not provided'
     end
   end

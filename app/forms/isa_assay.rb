@@ -19,7 +19,10 @@ class IsaAssay
     if valid?
       if @assay.new_record?
         # connect the sample type multi link attribute to the last sample type of the assay's study
-        @sample_type.sample_attributes.detect(&:seek_sample_multi?).linked_sample_type_id = @input_sample_type_id
+        input_attribute = @sample_type.sample_attributes.detect(&:seek_sample_multi?)
+        input_attribute.linked_sample_type_id = @input_sample_type_id
+        title = SampleType.find(@input_sample_type_id).sample_attributes.detect(&:is_title).title
+        input_attribute.title = "Input (#{title})"
       end
       @assay.save
       @sample_type.save
@@ -52,7 +55,7 @@ class IsaAssay
 
     @sample_type.errors.full_messages.each { |e| errors[:base] << "[Sample type]: #{e}" } unless @sample_type.valid?
 
-    unless @sample_type.sample_attributes.any? { |a| a.seek_sample_multi? }
+    unless @sample_type.sample_attributes.any?(&:seek_sample_multi?)
       errors[:base] << '[Sample type]: SEEK Sample Multi attribute is not provided'
     end
 
