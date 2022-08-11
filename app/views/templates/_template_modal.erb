@@ -1,12 +1,11 @@
 <%= modal(id: 'existing_templates', size: 'xl') do %>
-    <%= modal_header('Create template using existing template') %>
     <%= modal_body do %>
         <%= folding_panel('Filter templates', false, {help_text: "Narrow down your selection by filtering templates", :body_options => {:id => 'filter_repository_templates'}}) do %>
             <div class="row">
                 <div class="col-xs-12 col-sm-4 col-lg-2">
                     <div class="form-group">
                         <label>Repository name</label>
-                        <select data-key="group" id="templates_repository_name_select" autocomplete="off" id="projects-selector-select" class="form-control">
+                        <select data-key="group" id="templates_repository_name_select" class="form-control">
                             <option selected="selected">not selected</option>
                         </select>
                     </div>
@@ -14,7 +13,7 @@
                 <div class="col-xs-12 col-sm-4 col-lg-2">
                     <div class="form-group">
                         <label>Type</label>
-                        <select data-key="level" id="templates_type_select" autocomplete="off" id="projects-selector-select" class="form-control">
+                        <select data-key="level" id="templates_type_select" class="form-control">
                             <option selected="selected">not selected</option>
                         </select>
                     </div>
@@ -22,7 +21,7 @@
                 <div class="col-xs-12 col-sm-4 col-lg-2">
                     <div class="form-group">
                         <label>Organism</label>
-                        <select data-key="organism" id="templates_organism_select" autocomplete="off" id="projects-selector-select" class="form-control">
+                        <select data-key="organism" id="templates_organism_select" class="form-control">
                             <option selected="selected">not selected</option>
                         </select>
                     </div>

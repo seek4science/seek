@@ -172,8 +172,8 @@ module SamplesHelper
   end
 
   def get_extra_info(sample)
-		studies = sample.sample_type.studies.authorized_for('view')
-		assays = sample.sample_type.assays.authorized_for('view')
+    studies = sample.sample_type.studies.authorized_for('view')
+    assays = sample.sample_type.assays.authorized_for('view')
     {
       project_ids: sample.project_ids.join(','),
       project_names: sample.projects.map { |p| link_to(p.title, p, target: :_blank) }.join(',').html_safe,

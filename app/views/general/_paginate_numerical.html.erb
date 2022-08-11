@@ -1,3 +1,14 @@
 <nav class="pagination-container">
   <%= will_paginate(objects, renderer: BootstrapPagination::Rails, class: 'pagination-sm') %>
 </nav>
+
+<% if displaying_single_page?%>
+	<script>
+		$j(document).ready(function() {
+			$j(".pagination li a").unbind().click(function(e){
+				e.preventDefault();
+				loadItemDetails($j(this).attr('href'))
+			})
+		});
+	</script>
+<% end %>

@@ -1,8 +1,10 @@
 
 
-<%= render :partial => "general/item_title", :locals => {:item => @template,:buttons_partial => 'buttons'} %>
+<%= render partial: "general/item_title", locals: { item: @template, buttons_partial: 'buttons' } %>
+
 <%= item_description h(@template.description) -%>
 
+<%= render partial: "template_details", locals: { template: @template } %>
 
 <h2>Attributes</h2>
 
@@ -14,4 +16,4 @@
 %>
 </ul>
 
-<%= render :partial=>"general/items_related_to",:object => @template %>
+<%= render partial: "general/items_related_to", object: @template %>

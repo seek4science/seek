@@ -1,6 +1,3 @@
-<% study ||= nil %>
-<% sop = study ? study.sop : nil %>
-
 <% if sop %>
     <div style="padding: 20px;">
         <div class="row">
@@ -33,4 +30,10 @@
             </div>
         </div>
     </div>
+<% else %>
+	<p>
+		<em>
+			Warning: A Protocol is missing. Associate a Protocol before exporting ISA.
+		</em>
+	</p>
 <% end %>
