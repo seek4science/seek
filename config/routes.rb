@@ -747,14 +747,14 @@ SEEK::Application.routes.draw do
     member do
       get :manage
       patch :manage_update
-			post :template_attributes
+      post :template_attributes
     end
-		collection do
+    collection do
       get :task_status
       get :default_templates
       post :populate_template
-		end
-		resources :samples
+    end
+    resources :samples
   end
 
   ### SINGLE PAGE
