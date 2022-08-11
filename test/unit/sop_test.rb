@@ -349,14 +349,18 @@ class SopTest < ActiveSupport::TestCase
       sop = Factory(:sop, contributor: person)
       assert_equal true, sop.can_delete?(person)
       study = Factory(:study, sop: sop)
-      sop.study = study
-      sop.save!
+      disable_authorization_checks do
+        sop.study = study
+        sop.save!
+      end
       assert_equal false, sop.can_delete?(person)
     end
     sop = Factory(:sop, contributor: person)
     study = Factory(:study, sop: sop)
-    sop.study = study
-    sop.save!
+    disable_authorization_checks do
+      sop.study = study
+      sop.save!
+    end
     assert_equal true, sop.can_delete?(person)
   end
 end
