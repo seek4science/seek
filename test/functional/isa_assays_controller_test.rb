@@ -43,7 +43,7 @@ class IsaAssaysControllerTest < ActionController::TestCase
                                                       sop_ids: [Factory(:sop, policy: Factory(:public_policy)).id],
                                                       position: 0, assay_class_id: 1, policy_attributes: policy_attributes },
                                              input_sample_type_id: sample_collection_sample_type.id,
-                                             sample_type: { title: 'source', project_ids: [projects.first.id], template_id: 1,
+                                             sample_type: { title: 'assay sample_type', project_ids: [projects.first.id], template_id: 1,
                                                             sample_attributes_attributes: {
                                                               '0' => {
                                                                 pos: '1', title: 'a string', required: '1', is_title: '1',
