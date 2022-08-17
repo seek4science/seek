@@ -78,7 +78,7 @@ module WorkflowsHelper
   end
 
   def run_workflow_url(workflow_version)
-    if workflow_version.workflow_class_title == 'Galaxy'
+    if workflow_version.workflow_class&.key == 'galaxy'
       "#{Seek::Config.galaxy_instance_trs_import_url}&trs_id=#{workflow_version.parent.id}&trs_version=#{workflow_version.version}"
     end
   end

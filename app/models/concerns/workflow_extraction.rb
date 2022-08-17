@@ -58,7 +58,26 @@ module WorkflowExtraction
   delegate :inputs, :outputs, :steps, to: :structure
 
   def can_run?
-    can_download?(nil) && workflow_class_title == 'Galaxy' && Seek::Config.galaxy_instance_trs_import_url.present?
+    can_download?(nil) && workflow_class&.key == 'galaxy' && run_url.present?
+  end
+
+  def run_url
+    if workflow_class&.key == 'galaxy'
+      base = execution_instance_url || Seek::Config.galaxy_instance_default
+      return if base.nil?
+
+      parent_id = is_a_version? ? parent.id : id
+      url = URI(base)
+      url.path = '/trs_import'
+      params = {
+        trs_server: Seek::Config.galaxy_instance_trs_server,
+        run_form: true,
+        trs_id: parent_id,
+        trs_version: version
+      }
+      url.query = URI.encode_www_form(params)
+      url.to_s
+    end
   end
 
   def diagram_exists?

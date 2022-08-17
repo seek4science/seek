@@ -1775,4 +1775,23 @@ class WorkflowsControllerTest < ActionController::TestCase
       assert flash[:error].include?('disabled')
     end
   end
+
+  test 'shows run button for galaxy workflows using default galaxy endpoint' do
+    workflow = Factory(:existing_galaxy_ro_crate_workflow, policy: Factory(:public_policy))
+
+    get :show, params: { id: workflow.id }
+
+    assert workflow.can_run?
+    assert_equal 'https://usegalaxy.eu', Seek::Config.galaxy_instance_default
+    assert_select 'a.btn[href=?]', "https://usegalaxy.eu/trs_import?trs_server=testseek.test&run_form=true&trs_id=#{workflow.id}&trs_version=1", { text: 'Run on Galaxy' }
+  end
+
+  test 'shows run button for galaxy workflows using specified galaxy endpoint' do
+    workflow = Factory(:existing_galaxy_ro_crate_workflow, policy: Factory(:public_policy), execution_instance_url: 'https://galaxygalaxy.org/')
+
+    get :show, params: { id: workflow.id }
+
+    assert workflow.can_run?
+    assert_select 'a.btn[href=?]', "https://galaxygalaxy.org/trs_import?trs_server=testseek.test&run_form=true&trs_id=#{workflow.id}&trs_version=1", { text: 'Run on Galaxy' }
+  end
 end
