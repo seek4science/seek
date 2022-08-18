@@ -9,9 +9,9 @@ en:
     ldap: 'LDAP'
     github: 'GitHub'
 
-  investigation: "Investigation"
-  study: "Study"
-  assay: "Assay"
+  investigation: &investigation "Investigation"
+  study: &study "Study"
+  assay: &assay "Assay"
   assays:
     assay: "Assay"
     experimental_assay: "Experimental assay"
@@ -21,12 +21,12 @@ en:
   study_design: "Study Design"
   isa_assay: "ISA Assay"
 
-  data_file: "Data file"
+  data_file: &data_file "Data file"
   discipline: "Discipline"
-  document: "Document"
-  model: "Model"
-  sop: "SOP"
-  workflow: "Workflow"
+  document: &document "Document"
+  model: &model "Model"
+  sop: &sop "SOP"
+  workflow: &workflow "Workflow"
   workflow_class: "Workflow Type"
   workflows:
     workflow: "Workflow"
@@ -38,27 +38,29 @@ en:
       files: 'Upload/Import Files'
       git: 'Import Git Repository'
       ro_crate: 'Upload/Import Workflow RO-Crate'
-  publication: "Publication"
-  presentation: "Presentation"
-  event: "Event"
-  file_template: "File Template"
+  publication: &publication "Publication"
+  publications:
+    info_text: "Information about a publication. Can include the publication itself or a link to it."
+  presentation: &presentation "Presentation"
+  event: &event "Event"
+  file_template: &file_template "File Template"
   placeholder: "Placeholder"
-  collection: "Collection"
+  collection: &collection "Collection"
   collections:
     info_text: "A collection is a group of items that are conceptually related to each other."
 
-  sample: "Sample"
-  sample_type: "Sample type"
-  template: "Template"
-  strain: "Strain"
+  sample: &sample "Sample"
+  sample_type: &sample_type "Sample type"
+  template: &template "Template"
+  strain: &strain "Strain"
   scale: "Scale"
-  organism: "Organism"
+  organism: &organism "Organism"
   human_disease: "Human Disease"
 
-  person: "Person"
-  project: "Project"
-  institution: "Institution"
-  programme: "Programme"
+  person: &person "Person"
+  project: &project "Project"
+  institution: &institution "Institution"
+  programme: &programme "Programme"
   avatar: "Avatar"
   private_asset: 'Hidden item'
 
@@ -158,6 +160,28 @@ en:
         body: "There were problems with the following fields:"
     models:
       workflow_class: Workflow Type
+      programme: *programme
+      project: *project
+      institution: *institution
+      person: *person
+      investigation: *investigation
+      study: *study
+      assay: *assay
+      data_file: *data_file
+      model: *model
+      sop: *sop
+      workflow: *workflow
+      publication: *publication
+      document: *document
+      file_template: *file_template
+      collection: *collection
+      presentation: *presentation
+      event: *event
+      sample: *sample
+      template: *template
+      sample_type: *sample_type
+      strain: *strain
+      organism: *organism
     attributes:
       person:
         title: "Full name"

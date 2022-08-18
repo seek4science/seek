@@ -47,7 +47,7 @@ SEEK::Application.configure do
     puts "#" * 40
     puts "\n" * 3
   end
-
+=begin
   #Need to load defaut_locale file for internationalization used in Inflector below
   #coz this file is loaded at a later point
   I18n.load_path << File.join(File.dirname(__FILE__), "../locales/en.yml")
@@ -71,8 +71,10 @@ SEEK::Application.configure do
     inflect.human 'event', I18n.t('event')
     inflect.human 'Project', I18n.t('project')
     inflect.human 'project', I18n.t('project')
+    inflect.human 'Person', I18n.t('person')
+    inflect.human 'person', I18n.t('person')
   end
-
+=end
 
   Annotations::Config.attribute_names_to_allow_duplicates.concat(["tag"])
   Annotations::Config.versioning_enabled = false
