@@ -1,7 +1,8 @@
 var tree;
 var elementFolderIds = [];
 var displayed_folder_id = 0;
-const isa_study_element = ["source_material", "sample_collection", "study_samples", "study_table"];
+const isa_study_element = ["source_table", "study_protocol", "study_samples_table", "study_experiment_overview"];
+const isa_assay_element = ["assay_protocol", "assay_samples_table", "assay_experiment_overview"];
 
 function setupFoldersTree(dataJson, container_id, drop_accept_class) {
 	$j("#" + container_id)
@@ -153,13 +154,15 @@ async function item_clicked(type, id, parent) {
 	if (type == "sample") {
 		if (id) loadItemDetails(`/sample_types/${id}/samples`, { view: "default" });
 		else loadItemDetails(`/assays/${parent.id}/samples`, { view: "default" });
-	} else if (isa_study_element.includes(type)) {
-		if ($j('a[data-target^="#study_design"]').toArray().length == 0) {
+	} else if ([...isa_study_element, ...isa_assay_element].includes(type)) {
+    const item_type = isa_study_element.includes(type) ? "study" : "assay"
+     // check if the Assay page is loaded
+		if ($j(`a[data-target^="#${item_type}_design"]`).toArray().length == 0) {
 			await loadItemDetails(`/studies/${parent.id}`, { view: "default" });
 		}
-		$j('a[data-target^="#study_design"]').first().click();
+		$j(`a[data-target^="#${item_type}_design"]`).first().click();
 		$j(`a[data-target^="#${type}"]`).first().click();
-	} else {
+  } else {
 		loadItemDetails(`/${pluralize(type)}/${id}`, { view: "default" });
 	}
 }
