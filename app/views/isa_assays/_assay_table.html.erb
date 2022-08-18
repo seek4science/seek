@@ -3,6 +3,7 @@
 
 <div style="padding: 0 20px 20px 20px;">
     <div class="row" id="options_container" style="margin-bottom:15px">
+			<b><%= t('sample_type').pluralize %>: </b>&nbsp;
     </div>
     <div class="row">
         <div class="col-12">
@@ -16,7 +17,7 @@
         var assayDynamicTable
         let initialLoad = true;
         $j(document).ready(function () {
-            const dt = <%= sanitize(dt_aggregated(assay.study, false, assay).to_json) %>
+            const dt = <%= sanitize(dt_aggregated(assay.study, assay).to_json) %>
             assayDynamicTable = new $j.dynamicTable('#assay-table')
             const ajax = {
 								url: dynamicTableDataPath,
@@ -26,21 +27,21 @@
                         return;
                     }
                     d.study_id = '<%=assay.study.id%>';
-                    d.include_all_assays = 'false';
                     d.assay_id = '<%=assay.id%>';
                     d.rows_pad = "true";
                 }
             }
-            assayDynamicTable.init(dt.rows, dt.columns, { readonly: true, ajax })
+            assayDynamicTable.init(dt.rows, dt.columns, { readonly: true, level: "assay", ajax })
             const types = assayDynamicTable.getSampleTypes()
-            createSampleTypeOptions(types)
+            createSampleTypeOptions(dt.sample_types)
         });	
         
         function createSampleTypeOptions(types){
-            types.forEach( t => {
-                const input = `<div style="display:inline-block"><input style="padding:3px" checked type="checkbox" id="checkbox-${t}" onClick="toggleSampleType(${t}, $j(this))"> <label style="margin-right:10px" for="checkbox-${t}">sample type ${t}</label> <div/>`
-                $j("#options_container").append(input)
-            })
+					$j("#options_container").append('<div id="checkbox_group" class="btn-group" data-toggle="buttons"></div>')
+						types.forEach( (t, i) => {
+							let elem = `<label class="btn btn-default active sp-btn-variant-${i%2}"><input id="checkbox-${t.id}" type="checkbox" checked onchange="toggleSampleType(${t.id}, $j(this))" />${t.title}</label>`
+							$j("#checkbox_group").append(elem)
+						})	
         }
 
         function toggleSampleType(sample_type, e){

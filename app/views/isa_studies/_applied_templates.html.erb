@@ -3,12 +3,13 @@
  
 <% if applied_templates.any? %>
   <div>
-    <h3>Applied template<%=applied_templates.second ? "s" : "" %></h3>
+    <h3>Applied <%=applied_templates.second ? t('template').pluralize() :  t('template') %></h3>
     <div>
     <ul>
       <% applied_templates.each do |t| %>
         <li> 
-					<%= link_to "#{t.title} (id: #{t.id})", template_path(t.id), { target: "_blank" }  %>
+					<%= link_to "#{t.title} #{t.version}", template_path(t.id), { target: "_blank" }  %>
+					<%= " (id: #{t.id})"%>
         </li>
       <% end %>
       </ul>

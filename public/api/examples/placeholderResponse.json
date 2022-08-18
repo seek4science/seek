@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "339",
+    "id": "13",
     "type": "placeholders",
     "attributes": {
       "policy": {
@@ -19,11 +19,11 @@
         "Placeholder-tag4",
         "Placeholder-tag5"
       ],
-      "created_at": "2022-07-26T12:39:24.000Z",
-      "updated_at": "2022-07-26T12:39:24.000Z",
+      "created_at": "2022-08-18T10:10:06.000Z",
+      "updated_at": "2022-08-18T10:10:06.000Z",
       "creators": [
         {
-          "profile": "/people/1039993514",
+          "profile": "/people/961",
           "family_name": "One",
           "given_name": "Some",
           "affiliation": "University of Somewhere",
@@ -31,10 +31,10 @@
         }
       ],
       "other_creators": "Blogs, Joe",
-      "data_annotations": [
+      "data_type_annotations": [
 
       ],
-      "format_annotations": [
+      "data_format_annotations": [
 
       ]
     },
@@ -42,7 +42,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039993514",
+            "id": "961",
             "type": "people"
           }
         ]
@@ -50,7 +50,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039993517",
+            "id": "964",
             "type": "people"
           }
         ]
@@ -58,11 +58,11 @@
       "people": {
         "data": [
           {
-            "id": "1039993514",
+            "id": "961",
             "type": "people"
           },
           {
-            "id": "1039993517",
+            "id": "964",
             "type": "people"
           }
         ]
@@ -70,7 +70,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022256537",
+            "id": "1038",
             "type": "projects"
           }
         ]
@@ -78,33 +78,33 @@
       "assays": {
         "data": [
           {
-            "id": "1035387421",
+            "id": "150",
             "type": "assays"
           }
         ]
       },
       "file_template": {
         "data": {
-          "id": "347",
+          "id": "19",
           "type": "file_templates"
         }
       },
       "data_file": {
         "data": {
-          "id": "883655136",
+          "id": "63",
           "type": "data_files"
         }
       }
     },
     "links": {
-      "self": "/placeholders/339"
+      "self": "/placeholders/13"
     },
     "meta": {
-      "created": "2022-07-26T12:39:24.000Z",
-      "modified": "2022-07-26T12:39:24.000Z",
+      "created": "2022-08-18T10:10:06.000Z",
+      "modified": "2022-08-18T10:10:06.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "e76ef760-ef0d-013a-3b0d-000c29ced288"
+      "uuid": "db467550-010b-013b-77b5-000c29ced288"
     }
   },
   "jsonapi": {

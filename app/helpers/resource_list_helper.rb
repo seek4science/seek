@@ -48,13 +48,13 @@ module ResourceListHelper
       else
         Array(column_value).collect do |value|
           if value.is_a?(SampleControlledVocabTerm)
-            edam_ontology_items(value)
+            controlled_vocab_annotation_items(value)
           elsif value.is_a?(ApplicationRecord)
             link_to value.title, value
           else
             text_or_not_specified(value, length: 300, auto_link: true, none_text: '')
           end
-        end.join(',').html_safe
+        end.join(', ').html_safe
       end
     end
   end

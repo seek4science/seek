@@ -29,7 +29,7 @@ class ProjectSerializer < AvatarObjSerializer
   end
 
   attribute :topic_annotations do
-    ontology_annotations('edam_topics')
+    controlled_vocab_annotations('topic_annotations')
   end
 
   include_related_items

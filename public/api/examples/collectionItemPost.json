@@ -8,7 +8,7 @@
     "relationships": {
       "asset": {
         "data": {
-          "id": "1055250514",
+          "id": "18",
           "type": "sops"
         }
       }

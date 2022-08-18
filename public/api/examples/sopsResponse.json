@@ -1,23 +1,23 @@
 {
   "data": [
     {
-      "id": "1055250523",
+      "id": "29",
       "type": "sops",
       "attributes": {
         "title": "This Sop"
       },
       "links": {
-        "self": "/sops/1055250523"
+        "self": "/sops/29"
       }
     },
     {
-      "id": "1055250522",
+      "id": "28",
       "type": "sops",
       "attributes": {
         "title": "This Sop"
       },
       "links": {
-        "self": "/sops/1055250522"
+        "self": "/sops/28"
       }
     }
   ],

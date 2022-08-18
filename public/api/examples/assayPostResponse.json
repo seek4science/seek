@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "1035387423",
+    "id": "2",
     "type": "assays",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "1022256544",
+              "id": "2",
               "type": "projects"
             },
             "access": "manage"
@@ -28,7 +28,7 @@
       "assay_class": {
         "title": "Experimental assay",
         "key": "EXP",
-        "description": null
+        "description": "An experimental assay class description"
       },
       "assay_type": {
         "label": "Transcriptomics",
@@ -43,10 +43,10 @@
       ],
       "creators": [
         {
-          "profile": "/people/1039993524",
+          "profile": "/people/2",
           "family_name": "Last",
-          "given_name": "Person94",
-          "affiliation": "An Institution: 115",
+          "given_name": "Person1",
+          "affiliation": "An Institution: 2",
           "orcid": null
         }
       ]
@@ -55,7 +55,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039993524",
+            "id": "2",
             "type": "people"
           }
         ]
@@ -63,7 +63,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039993524",
+            "id": "2",
             "type": "people"
           }
         ]
@@ -71,7 +71,7 @@
       "organisms": {
         "data": [
           {
-            "id": "627234364",
+            "id": "1",
             "type": "organisms"
           }
         ]
@@ -84,7 +84,7 @@
       "people": {
         "data": [
           {
-            "id": "1039993524",
+            "id": "2",
             "type": "people"
           }
         ]
@@ -92,27 +92,27 @@
       "projects": {
         "data": [
           {
-            "id": "1022256544",
+            "id": "2",
             "type": "projects"
           }
         ]
       },
       "investigation": {
         "data": {
-          "id": "973655633",
+          "id": "2",
           "type": "investigations"
         }
       },
       "study": {
         "data": {
-          "id": "1060385664",
+          "id": "2",
           "type": "studies"
         }
       },
       "data_files": {
         "data": [
           {
-            "id": "883655138",
+            "id": "1",
             "type": "data_files"
           }
         ]
@@ -120,7 +120,7 @@
       "samples": {
         "data": [
           {
-            "id": "39",
+            "id": "1",
             "type": "samples"
           }
         ]
@@ -133,7 +133,7 @@
       "sops": {
         "data": [
           {
-            "id": "1055250501",
+            "id": "1",
             "type": "sops"
           }
         ]
@@ -141,7 +141,7 @@
       "publications": {
         "data": [
           {
-            "id": "670",
+            "id": "1",
             "type": "publications"
           }
         ]
@@ -154,21 +154,21 @@
       "documents": {
         "data": [
           {
-            "id": "76",
+            "id": "1",
             "type": "documents"
           }
         ]
       }
     },
     "links": {
-      "self": "/assays/1035387423"
+      "self": "/assays/2"
     },
     "meta": {
-      "created": "2022-07-26T12:39:29.000Z",
-      "modified": "2022-07-26T12:39:29.000Z",
+      "created": "2022-08-18T10:05:22.000Z",
+      "modified": "2022-08-18T10:05:22.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "ea8ec560-ef0d-013a-3b0d-000c29ced288"
+      "uuid": "32082fa0-010b-013b-77b5-000c29ced288"
     }
   },
   "jsonapi": {

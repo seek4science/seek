@@ -1,23 +1,23 @@
 {
   "data": [
     {
-      "id": "100",
+      "id": "11",
       "type": "documents",
       "attributes": {
         "title": "A Maximal Document"
       },
       "links": {
-        "self": "/documents/100"
+        "self": "/documents/11"
       }
     },
     {
-      "id": "99",
+      "id": "10",
       "type": "documents",
       "attributes": {
         "title": "A Minimal Document"
       },
       "links": {
-        "self": "/documents/99"
+        "self": "/documents/10"
       }
     }
   ],

@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "334",
+    "id": "8",
     "type": "placeholders",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "1022256509",
+              "id": "1010",
               "type": "projects"
             },
             "access": "edit"
@@ -22,22 +22,22 @@
         "tag1",
         "tag2"
       ],
-      "created_at": "2022-07-26T12:39:18.000Z",
-      "updated_at": "2022-07-26T12:39:18.000Z",
+      "created_at": "2022-08-18T10:10:00.000Z",
+      "updated_at": "2022-08-18T10:10:00.000Z",
       "creators": [
         {
-          "profile": "/people/1039993490",
+          "profile": "/people/937",
           "family_name": "Last",
-          "given_name": "Person66",
-          "affiliation": "An Institution: 81",
+          "given_name": "Person798",
+          "affiliation": "An Institution: 951",
           "orcid": null
         }
       ],
       "other_creators": "John Smith, Jane Smith",
-      "data_annotations": [
+      "data_type_annotations": [
 
       ],
-      "format_annotations": [
+      "data_format_annotations": [
 
       ]
     },
@@ -45,7 +45,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039993490",
+            "id": "937",
             "type": "people"
           }
         ]
@@ -53,7 +53,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1039993489",
+            "id": "936",
             "type": "people"
           }
         ]
@@ -61,11 +61,11 @@
       "people": {
         "data": [
           {
-            "id": "1039993489",
+            "id": "936",
             "type": "people"
           },
           {
-            "id": "1039993490",
+            "id": "937",
             "type": "people"
           }
         ]
@@ -73,7 +73,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022256509",
+            "id": "1010",
             "type": "projects"
           }
         ]
@@ -85,7 +85,7 @@
       },
       "file_template": {
         "data": {
-          "id": "343",
+          "id": "15",
           "type": "file_templates"
         }
       },
@@ -94,14 +94,14 @@
       }
     },
     "links": {
-      "self": "/placeholders/334"
+      "self": "/placeholders/8"
     },
     "meta": {
-      "created": "2022-07-26T12:39:18.000Z",
-      "modified": "2022-07-26T12:39:18.000Z",
+      "created": "2022-08-18T10:10:00.000Z",
+      "modified": "2022-08-18T10:10:00.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "e40d92f0-ef0d-013a-3b0d-000c29ced288"
+      "uuid": "d81229b0-010b-013b-77b5-000c29ced288"
     }
   },
   "jsonapi": {

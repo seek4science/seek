@@ -26,11 +26,11 @@ class IndexTableColumnDefinitionsTest < ActiveSupport::TestCase
   test 'allowed_columns' do
     assert_equal %w[title creators projects assay_type_uri technology_type_uri contributor description created_at updated_at other_creators tags],
                  Seek::IndexTableColumnDefinitions.allowed_columns(@assay)
-    assert_equal %w[title creators projects version license edam_data_values edam_format_values simulation_data contributor description created_at updated_at last_used_at other_creators doi tags],
+    assert_equal %w[title creators projects version license data_type_annotation_values data_format_annotation_values simulation_data contributor description created_at updated_at last_used_at other_creators doi tags],
                  Seek::IndexTableColumnDefinitions.allowed_columns(@data_file)
     assert_equal %w[title first_name last_name projects orcid description],
                  Seek::IndexTableColumnDefinitions.allowed_columns(@person)
-    assert_equal %w[title web_page start_date end_date description created_at updated_at],
+    assert_equal %w[title web_page start_date end_date topic_annotation_values description created_at updated_at],
                  Seek::IndexTableColumnDefinitions.allowed_columns(@project)
   end
 

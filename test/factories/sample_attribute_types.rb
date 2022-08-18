@@ -121,10 +121,10 @@ Factory.define(:ontology_sample_controlled_vocab, parent: :sample_controlled_voc
   end
 end
 
-Factory.define(:edam_topics_controlled_vocab, parent: :sample_controlled_vocab) do |f|
-  f.title 'EDAM Topics'
+Factory.define(:topics_controlled_vocab, parent: :sample_controlled_vocab) do |f|
+  f.title 'Topics'
   f.ols_root_term_uri 'http://edamontology.org/topic_0003'
-  f.key SampleControlledVocab::SystemVocabs::KEYS[:edam_topics]
+  f.key SampleControlledVocab::SystemVocabs.database_key_for_property(:topics)
   f.source_ontology 'edam'
   f.after_build do |vocab|
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Topic',iri:'http://edamontology.org/topic_0003',parent_iri:'')
@@ -134,10 +134,10 @@ Factory.define(:edam_topics_controlled_vocab, parent: :sample_controlled_vocab) 
   end
 end
 
-Factory.define(:edam_operations_controlled_vocab, parent: :sample_controlled_vocab) do |f|
-  f.title 'EDAM Operations'
+Factory.define(:operations_controlled_vocab, parent: :sample_controlled_vocab) do |f|
+  f.title 'Operations'
   f.ols_root_term_uri 'http://edamontology.org/operation_0004'
-  f.key SampleControlledVocab::SystemVocabs::KEYS[:edam_operations]
+  f.key SampleControlledVocab::SystemVocabs.database_key_for_property(:operations)
   f.source_ontology 'edam'
   f.after_build do |vocab|
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Operation',iri:'http://edamontology.org/operation_0004',parent_iri:'')
@@ -147,10 +147,10 @@ Factory.define(:edam_operations_controlled_vocab, parent: :sample_controlled_voc
   end
 end
 
-Factory.define(:edam_data_controlled_vocab, parent: :sample_controlled_vocab) do |f|
-  f.title 'EDAM Data'
+Factory.define(:data_types_controlled_vocab, parent: :sample_controlled_vocab) do |f|
+  f.title 'Data'
   f.ols_root_term_uri 'http://edamontology.org/data_0006'
-  f.key SampleControlledVocab::SystemVocabs::KEYS[:edam_data]
+  f.key SampleControlledVocab::SystemVocabs.database_key_for_property(:data_types)
   f.source_ontology 'edam'
   f.after_build do |vocab|
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Data',iri:'http://edamontology.org/data_0006',parent_iri:'')
@@ -158,10 +158,10 @@ Factory.define(:edam_data_controlled_vocab, parent: :sample_controlled_vocab) do
   end
 end
 
-Factory.define(:edam_formats_controlled_vocab, parent: :sample_controlled_vocab) do |f|
-  f.title 'EDAM Formats'
+Factory.define(:data_formats_controlled_vocab, parent: :sample_controlled_vocab) do |f|
+  f.title 'Formats'
   f.ols_root_term_uri 'http://edamontology.org/format_1915'
-  f.key SampleControlledVocab::SystemVocabs::KEYS[:edam_formats]
+  f.key SampleControlledVocab::SystemVocabs.database_key_for_property(:data_formats)
   f.source_ontology 'edam'
   f.after_build do |vocab|
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'Format',iri:'http://edamontology.org/format_1915',parent_iri:'')
@@ -171,8 +171,8 @@ end
 
 Factory.define(:efo_ontology, class: SampleControlledVocab) do |f|
   f.sequence(:title) { |n| "EFO ontology #{n}" }
-	f.source_ontology 'EFO'
-	f.ols_root_term_uri 'http://www.ebi.ac.uk/efo/EFO_0000635'
+  f.source_ontology 'EFO'
+  f.ols_root_term_uri 'http://www.ebi.ac.uk/efo/EFO_0000635'
   f.after_build do |vocab|
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'anatomical entity')
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'retroperitoneal space')
@@ -182,13 +182,13 @@ end
 
 Factory.define(:obi_ontology, class: SampleControlledVocab) do |f|
   f.sequence(:title) { |n| "OBI ontology #{n}" }
-	f.source_ontology 'OBI'
-	f.ols_root_term_uri 'http://purl.obolibrary.org/obo/OBI_0000094'
+  f.source_ontology 'OBI'
+  f.ols_root_term_uri 'http://purl.obolibrary.org/obo/OBI_0000094'
   f.after_build do |vocab|
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'dissection')
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'enzymatic cleavage')
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'non specific enzymatic cleavage')
     vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'protease cleavage')
-		vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'DNA restriction enzyme digestion')
-	end
+    vocab.sample_controlled_vocab_terms << Factory.build(:sample_controlled_vocab_term, label: 'DNA restriction enzyme digestion')
+  end
 end

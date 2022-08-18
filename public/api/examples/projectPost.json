@@ -13,21 +13,21 @@
         "permissions": [
           {
             "resource": {
-              "id": "1039993416",
+              "id": "280",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "1022256421",
+              "id": "301",
               "type": "projects"
             },
             "access": "download"
           },
           {
             "resource": {
-              "id": "980197956",
+              "id": "289",
               "type": "institutions"
             },
             "access": "view"
@@ -49,7 +49,7 @@
       "programmes": {
         "data": [
           {
-            "id": "50",
+            "id": "11",
             "type": "programmes"
           }
         ]
@@ -57,7 +57,7 @@
       "organisms": {
         "data": [
           {
-            "id": "627234358",
+            "id": "9",
             "type": "organisms"
           }
         ]

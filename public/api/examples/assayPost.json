@@ -19,7 +19,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "1022256544",
+              "id": "2",
               "type": "projects"
             },
             "access": "manage"
@@ -33,14 +33,14 @@
     "relationships": {
       "study": {
         "data": {
-          "id": "1060385664",
+          "id": "2",
           "type": "studies"
         }
       },
       "publications": {
         "data": [
           {
-            "id": "670",
+            "id": "1",
             "type": "publications"
           }
         ]
@@ -48,7 +48,7 @@
       "organisms": {
         "data": [
           {
-            "id": "627234364",
+            "id": "1",
             "type": "organisms"
           }
         ]
@@ -56,7 +56,7 @@
       "sops": {
         "data": [
           {
-            "id": "1055250501",
+            "id": "1",
             "type": "sops"
           }
         ]
@@ -64,7 +64,7 @@
       "data_files": {
         "data": [
           {
-            "id": "883655138",
+            "id": "1",
             "type": "data_files"
           }
         ]
@@ -72,7 +72,7 @@
       "samples": {
         "data": [
           {
-            "id": "39",
+            "id": "1",
             "type": "samples"
           }
         ]
@@ -80,7 +80,7 @@
       "documents": {
         "data": [
           {
-            "id": "76",
+            "id": "1",
             "type": "documents"
           }
         ]
@@ -88,7 +88,7 @@
       "creators": {
         "data": [
           {
-            "id": "1039993524",
+            "id": "2",
             "type": "people"
           }
         ]

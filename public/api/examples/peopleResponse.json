@@ -1,413 +1,63 @@
 {
   "data": [
     {
-      "id": "940849572",
-      "type": "people",
-      "attributes": {
-        "title": "Fred Aardvark"
-      },
-      "links": {
-        "self": "/people/940849572"
-      }
-    },
-    {
-      "id": "943873801",
-      "type": "people",
-      "attributes": {
-        "title": "Fred Azbo"
-      },
-      "links": {
-        "self": "/people/943873801"
-      }
-    },
-    {
-      "id": "913531622",
-      "type": "people",
-      "attributes": {
-        "title": "Fred David Bloggs"
-      },
-      "links": {
-        "self": "/people/913531622"
-      }
-    },
-    {
-      "id": "975827294",
-      "type": "people",
-      "attributes": {
-        "title": "Fred Blogs"
-      },
-      "links": {
-        "self": "/people/975827294"
-      }
-    },
-    {
-      "id": "643213978",
-      "type": "people",
-      "attributes": {
-        "title": "Johan Bollen"
-      },
-      "links": {
-        "self": "/people/643213978"
-      }
-    },
-    {
-      "id": "241477277",
-      "type": "people",
-      "attributes": {
-        "title": "Spam Bot"
-      },
-      "links": {
-        "self": "/people/241477277"
-      }
-    },
-    {
-      "id": "982117865",
-      "type": "people",
-      "attributes": {
-        "title": "OwnerOf DownloadForAllSysmoUsersPolicy"
-      },
-      "links": {
-        "self": "/people/982117865"
-      }
-    },
-    {
-      "id": "128215185",
-      "type": "people",
-      "attributes": {
-        "title": "I Am a Duplicate"
-      },
-      "links": {
-        "self": "/people/128215185"
-      }
-    },
-    {
-      "id": "514668853",
-      "type": "people",
-      "attributes": {
-        "title": "I Am a Duplicate"
-      },
-      "links": {
-        "self": "/people/514668853"
-      }
-    },
-    {
-      "id": "730501549",
-      "type": "people",
-      "attributes": {
-        "title": "OwnerOf EditingForAllSysMOUsersPolicy"
-      },
-      "links": {
-        "self": "/people/730501549"
-      }
-    },
-    {
-      "id": "601503375",
-      "type": "people",
-      "attributes": {
-        "title": "OwnerOf FullyPublicPolicy"
-      },
-      "links": {
-        "self": "/people/601503375"
-      }
-    },
-    {
-      "id": "198969080",
-      "type": "people",
-      "attributes": {
-        "title": "Alice Graeter"
-      },
-      "links": {
-        "self": "/people/198969080"
-      }
-    },
-    {
-      "id": "511000120",
-      "type": "people",
-      "attributes": {
-        "title": "SysMO-User InBlacklist"
-      },
-      "links": {
-        "self": "/people/511000120"
-      }
-    },
-    {
-      "id": "512755392",
-      "type": "people",
-      "attributes": {
-        "title": "SysMO-User InWhitelistAndBlacklist"
-      },
-      "links": {
-        "self": "/people/512755392"
-      }
-    },
-    {
-      "id": "701696858",
-      "type": "people",
-      "attributes": {
-        "title": "Quentin Jones"
-      },
-      "links": {
-        "self": "/people/701696858"
-      }
-    },
-    {
-      "id": "1039994250",
+      "id": "402",
       "type": "people",
       "attributes": {
         "title": "default admin Last"
       },
       "links": {
-        "self": "/people/1039994250"
+        "self": "/people/402"
       }
     },
     {
-      "id": "1039994251",
+      "id": "403",
       "type": "people",
       "attributes": {
-        "title": "Person719 Last"
+        "title": "Person346 Last"
       },
       "links": {
-        "self": "/people/1039994251"
+        "self": "/people/403"
       }
     },
     {
-      "id": "1039994252",
+      "id": "404",
       "type": "people",
       "attributes": {
-        "title": "Person720 Last"
+        "title": "Person347 Last"
       },
       "links": {
-        "self": "/people/1039994252"
+        "self": "/people/404"
       }
     },
     {
-      "id": "1039994254",
+      "id": "406",
       "type": "people",
       "attributes": {
-        "title": "Person721 Last"
+        "title": "Person348 Last"
       },
       "links": {
-        "self": "/people/1039994254"
+        "self": "/people/406"
       }
     },
     {
-      "id": "12247987",
-      "type": "people",
-      "attributes": {
-        "title": "Lastname"
-      },
-      "links": {
-        "self": "/people/12247987"
-      }
-    },
-    {
-      "id": "1039994255",
+      "id": "407",
       "type": "people",
       "attributes": {
         "title": "Maximilian Maxi-Mum"
       },
       "links": {
-        "self": "/people/1039994255"
+        "self": "/people/407"
       }
     },
     {
-      "id": "1039994253",
+      "id": "405",
       "type": "people",
       "attributes": {
         "title": "Minimal"
       },
       "links": {
-        "self": "/people/1039994253"
-      }
-    },
-    {
-      "id": "773249994",
-      "type": "people",
-      "attributes": {
-        "title": "Bob Müller"
-      },
-      "links": {
-        "self": "/people/773249994"
-      }
-    },
-    {
-      "id": "194977880",
-      "type": "people",
-      "attributes": {
-        "title": "OwnerOf MyFirstSop"
-      },
-      "links": {
-        "self": "/people/194977880"
-      }
-    },
-    {
-      "id": "363971859",
-      "type": "people",
-      "attributes": {
-        "title": "TestAccessor OnlyInBlacklist"
-      },
-      "links": {
-        "self": "/people/363971859"
-      }
-    },
-    {
-      "id": "631246577",
-      "type": "people",
-      "attributes": {
-        "title": "TestAccessor OnlyInWhitelist"
-      },
-      "links": {
-        "self": "/people/631246577"
-      }
-    },
-    {
-      "id": "522086294",
-      "type": "people",
-      "attributes": {
-        "title": "Datafile Owner"
-      },
-      "links": {
-        "self": "/people/522086294"
-      }
-    },
-    {
-      "id": "574165609",
-      "type": "people",
-      "attributes": {
-        "title": "Model Owner"
-      },
-      "links": {
-        "self": "/people/574165609"
-      }
-    },
-    {
-      "id": "1038269682",
-      "type": "people",
-      "attributes": {
-        "title": "Random Person"
-      },
-      "links": {
-        "self": "/people/1038269682"
-      }
-    },
-    {
-      "id": "249179401",
-      "type": "people",
-      "attributes": {
-        "title": "Person Place_holder"
-      },
-      "links": {
-        "self": "/people/249179401"
-      }
-    },
-    {
-      "id": "921288942",
-      "type": "people",
-      "attributes": {
-        "title": "OwnerOf PrivatePolicyUsingCustomSharing"
-      },
-      "links": {
-        "self": "/people/921288942"
-      }
-    },
-    {
-      "id": "113629430",
-      "type": "people",
-      "attributes": {
-        "title": "No_user Smith"
-      },
-      "links": {
-        "self": "/people/113629430"
-      }
-    },
-    {
-      "id": "847710731",
-      "type": "people",
-      "attributes": {
-        "title": "Fred Smith Jones"
-      },
-      "links": {
-        "self": "/people/847710731"
-      }
-    },
-    {
-      "id": "262742470",
-      "type": "people",
-      "attributes": {
-        "title": "Fred Smith-Jones"
-      },
-      "links": {
-        "self": "/people/262742470"
-      }
-    },
-    {
-      "id": "1039986468",
-      "type": "people",
-      "attributes": {
-        "title": "Aaron Spiggle"
-      },
-      "links": {
-        "self": "/people/1039986468"
-      }
-    },
-    {
-      "id": "408848532",
-      "type": "people",
-      "attributes": {
-        "title": "Free Spirit"
-      },
-      "links": {
-        "self": "/people/408848532"
-      }
-    },
-    {
-      "id": "382405343",
-      "type": "people",
-      "attributes": {
-        "title": "Registered-User WantsToAccessManyThingsAndHasSomePermissions"
-      },
-      "links": {
-        "self": "/people/382405343"
-      }
-    },
-    {
-      "id": "528771254",
-      "type": "people",
-      "attributes": {
-        "title": "Firstname"
-      },
-      "links": {
-        "self": "/people/528771254"
-      }
-    },
-    {
-      "id": "272240831",
-      "type": "people",
-      "attributes": {
-        "title": "Lonely"
-      },
-      "links": {
-        "self": "/people/272240831"
-      }
-    },
-    {
-      "id": "872873870",
-      "type": "people",
-      "attributes": {
-        "title": "Modeller"
-      },
-      "links": {
-        "self": "/people/872873870"
-      }
-    },
-    {
-      "id": "171291580",
-      "type": "people",
-      "attributes": {
-        "title": "Userless"
-      },
-      "links": {
-        "self": "/people/171291580"
+        "self": "/people/405"
       }
     }
   ],

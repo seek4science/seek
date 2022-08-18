@@ -1,6 +1,6 @@
 {
-  "title": "EDAM Topics",
-  "description": "The Topics branch of the EDAM Ontology. EDAM is a simple ontology of well established, familiar concepts that are prevalent within bioinformatics, including types of data and data identifiers, data formats, operations and topics. EDAM provides a set of terms with synonyms and definitions - organised into an intuitive hierarchy for convenient use.",
+  "title": "Topics",
+  "description": "Topics, used for annotating. Describes the domain, field of interest, of study, application, work, data, or technology. Initially seeded from the EDAM ontology.",
   "ols_root_term_uri": "http://edamontology.org/topic_0003",
   "source_ontology": "edam",
   "terms": [

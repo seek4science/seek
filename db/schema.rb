@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_07_06_090950) do
+ActiveRecord::Schema.define(version: 2022_07_07_145032) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string "action"
@@ -1657,7 +1657,7 @@ ActiveRecord::Schema.define(version: 2022_07_06_090950) do
     t.datetime "updated_at"
   end
 
-  create_table "resource_publish_logs", force: :cascade do |t|
+  create_table "resource_publish_logs", id: :integer, force: :cascade do |t|
     t.string "resource_type"
     t.integer "resource_id"
     t.integer "user_id"
@@ -1671,10 +1671,10 @@ ActiveRecord::Schema.define(version: 2022_07_06_090950) do
   end
 
   create_table "roles", force: :cascade do |t|
-    t.bigint "person_id"
-    t.bigint "role_type_id"
+    t.integer "person_id"
+    t.integer "role_type_id"
     t.string "scope_type"
-    t.bigint "scope_id"
+    t.integer "scope_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["person_id", "role_type_id"], name: "index_roles_on_person_id_and_role_type_id"
@@ -1746,8 +1746,8 @@ ActiveRecord::Schema.define(version: 2022_07_06_090950) do
     t.string "ols_root_term_uri"
     t.boolean "required"
     t.string "short_name"
-    t.string "key"
     t.integer "template_id"
+    t.string "key"
     t.boolean "custom_input", default: false
   end
 
@@ -1805,7 +1805,7 @@ ActiveRecord::Schema.define(version: 2022_07_06_090950) do
 
   create_table "sessions", force: :cascade do |t|
     t.string "session_id", null: false
-    t.text "data"
+    t.text "data", size: :medium
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["session_id"], name: "index_sessions_on_session_id"
@@ -2094,7 +2094,7 @@ ActiveRecord::Schema.define(version: 2022_07_06_090950) do
     t.index ["template_id", "title"], name: "index_template_id_asset_id_title"
   end
 
-  create_table "template_auth_lookup", force: :cascade do |t|
+  create_table "template_auth_lookup", id: :integer, force: :cascade do |t|
     t.integer "user_id"
     t.integer "asset_id"
     t.boolean "can_view", default: false
@@ -2111,7 +2111,7 @@ ActiveRecord::Schema.define(version: 2022_07_06_090950) do
     t.string "group", default: "other"
     t.integer "group_order"
     t.string "temporary_name"
-    t.string "template_version"
+    t.string "version"
     t.string "isa_config"
     t.string "isa_measurement_type"
     t.string "isa_technology_type"
@@ -2135,7 +2135,7 @@ ActiveRecord::Schema.define(version: 2022_07_06_090950) do
   create_table "text_values", force: :cascade do |t|
     t.integer "version"
     t.integer "version_creator_id"
-    t.text "text", null: false
+    t.text "text", size: :medium, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

@@ -25,7 +25,7 @@ class ApplicationRecord < ActiveRecord::Base
   include Seek::Permissions::ActsAsAuthorized
   include Seek::RelatedItems
   include HasTasks
-  include HasEdamAnnotations
+  include HasControlledVocabularyAnnotations
 
   include Annotations::Acts::Annotatable
   include Annotations::Acts::AnnotationSource
@@ -95,10 +95,6 @@ class ApplicationRecord < ActiveRecord::Base
     self.class.supports_doi?
   end
 
-  def is_a_version?
-    false
-  end
-
   def self.with_search_query(q)
     if searchable? && Seek::Config.solr_enabled
       ids = solr_cache(q) do
@@ -106,7 +102,6 @@ class ApplicationRecord < ActiveRecord::Base
           query.keywords(q)
           query.paginate(page: 1, per_page: unscoped.count)
         end
-
         search.hits.map(&:primary_key)
       end
 

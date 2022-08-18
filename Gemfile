@@ -139,6 +139,8 @@ gem 'rack-cors', require: 'rack/cors'
 
 gem 'addressable'
 
+gem 'json-schema'
+
 group :production do
   gem 'passenger'
 end
@@ -171,7 +173,6 @@ group :test do
   gem 'rails-controller-testing'
   gem 'simplecov'
   gem 'whenever-test'
-  gem 'json-schema'
   # Easy installation and use of web drivers to run system tests with browsers
   gem 'webdrivers'
 end

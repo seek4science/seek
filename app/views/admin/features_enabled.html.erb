@@ -113,7 +113,10 @@
   </div>
 
   <%= admin_checkbox_setting(:sample_type_template_enabled, 1, Seek::Config.sample_type_template_enabled,
-                             "Sample type template enabled", "Whether users can create and manage #{t(:template).pluralize} for Sample Types") %>
+                             "#{t(:sample_type)} #{t(:template)} enabled", "Whether users can create and manage #{t(:template).pluralize} for #{t(:sample_type).pluralize}", :onchange=>toggle_appear_javascript('add_default_templates')) %>
+  <div id="add_default_templates" class="additional_settings" style="<%= show_or_hide_block Seek::Config.sample_type_template_enabled -%>">
+		<%= link_to("Add default #{t(:template).pluralize}", default_templates_templates_path, class: 'btn btn-default', id: 'add_default_templates_btn', disabled: !Seek::Config.sample_type_template_enabled) %>
+	</div>
                              
   <%= admin_checkbox_setting(:google_analytics_enabled, 1, Seek::Config.google_analytics_enabled,
                              "Google analytics enabled", "Allows you to keep track of site traffic using Google Analytics. You need to register with Google Analytics and get a tracker ID.",
