@@ -10,12 +10,8 @@ class InvestigationSerializer < SnapshottableSerializer
   has_many :sops
   has_many :publications
   has_many :documents
-  has_one :service, if: -> {has_a_service?}
+  has_many :services
 
-  def has_a_service?
-    true if object.service
-  end
-  
   attribute :creators do
     serialize_assets_creators
   end

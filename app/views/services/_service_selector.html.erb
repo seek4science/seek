@@ -5,25 +5,25 @@
   allow_all ||= false
   resource ||= nil
 
-  selected_service = resource ? resource.service : nil
-  selected_service_id = selected_service&.id
+  selected_services = resource ? resource.services.to_a : []
+  selected_service_ids = selected_services.collect { |x| x.id }
   possible_services = Service.all
 
-  field_name = "#{resource.class.name.underscore}[service_id]"
-  title = t('service')
+  field_name = "#{resource.class.name.underscore}[service_ids][]"
+  title = t('service').pluralize
   title += '<span class="required">*</span>'.html_safe unless allow_nil
 
 %>
 
-<%= folding_panel(title, false, id: "select_service_form",
-                  help_text: "Here you can associate the object with a specific #{t('service').downcase}.") do %>
+<%= folding_panel(title, false, id: "add_services_form",
+                  help_text: "Here you can associate the #{t('assay')} with specific #{t('service').downcase.pluralize}.") do %>
     <p class="help-block">
-      The following <%= t('service').downcase -%> is associated with this object:
+      The following <%= t('service').downcase.pluralize -%> are associated with this <%= t('assay') -%>:
     </p>
     <div id="service-selector">
-      <%= f.select "service_id",
-	  options_from_collection_for_select(possible_services, "id", "title", selected_service_id ),
+      <%= f.select "service_ids",
+	  options_from_collection_for_select(possible_services, "id", "title", selected_service_ids ),
 	  {},
-	  {:multiple => false, :size => 5} %>
+	  {:multiple => true, :size => 5} %>
     </div>
 <% end %>

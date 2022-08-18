@@ -8,13 +8,12 @@ class Investigation < ApplicationRecord
   has_many :study_publications, through: :studies, source: :publications
   has_many :assays, through: :studies
   has_many :assay_publications, through: :assays, source: :publications
+  has_many :services, through: :assays, source: :services
 
   validates :projects, presence: true, projects: { self: true }
 
   enum status: [:planned, :running, :completed, :cancelled, :failed]
   belongs_to :assignee, class_name: 'Person'
-  belongs_to :service
-  
   
   def state_allows_delete?(*args)
     studies.empty? && super

@@ -69,7 +69,7 @@ class FacilitiesController < ApplicationController
   private
 
   def facility_params
-    params.require(:facility).permit(:description, :title, { institution_ids: [] })
+    params.require(:facility).permit(:description, :title, :web_page, :address, :city, :country, { institution_ids: [] })
   end
 
 end

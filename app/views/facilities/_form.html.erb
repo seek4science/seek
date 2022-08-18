@@ -12,6 +12,26 @@
   <%= f.text_area :description, :rows => 5, :class=>"form-control rich-text-edit" -%>
 </div>
 
+<div class="form-group">
+  <%= f.label :web_page -%>
+  <%= f.text_field :web_page, :class=>"form-control" -%>
+</div>
+
+<div class="form-group">
+  <%= f.label :address -%>
+  <%= f.text_area :address, :rows => 5, :class=>"form-control" -%>
+</div>
+
+<div class="form-group">
+  <%= f.label :city -%>
+  <%= f.text_field :city, :class=>"form-control" -%>
+</div>
+
+<div class="form-group">
+  <%= f.label :country -%>
+  <%= f.country_select :country, nil, { :include_blank => 'Please select...' }, :class=>"form-control" -%>
+</div>
+
 <%= render :partial=>"facilities/institution_selector", :locals=>{:f=>f, :resource => facility } -%>
 
 <%= f.submit(facility ? "Update" : "Create",data: { disable_with: (facility ? "Updating..." : "Creating...") }, :class => 'btn btn-primary') -%>

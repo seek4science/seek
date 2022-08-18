@@ -19,6 +19,7 @@ class Study < ApplicationRecord
 
   has_many :assays
   has_many :assay_publications, through: :assays, source: :publications
+  has_many :services, through: :assays, source: :services
   has_one :external_asset, as: :seek_entity, dependent: :destroy
   belongs_to :sop
 

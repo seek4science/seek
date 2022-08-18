@@ -1,1 +1,4 @@
 <%= list_item_description resource.description %>
+<%= list_item_attribute "Country", (country_text_or_not_specified  resource.country) %>
+<%= list_item_optional_attribute "City", h(resource.city) %>
+<%= list_item_optional_attribute "Web page", h(resource.web_page), h(resource.web_page) %>

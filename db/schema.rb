@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_08_08_094658) do
+ActiveRecord::Schema.define(version: 2022_08_13_205708) do
 
   create_table "activity_logs", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "action"
@@ -190,6 +190,11 @@ ActiveRecord::Schema.define(version: 2022_08_08_094658) do
     t.integer "sample_type_id"
     t.integer "position"
     t.index ["sample_type_id"], name: "index_assays_on_sample_type_id"
+  end
+
+  create_table "assays_services", id: false, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.bigint "service_id", null: false
+    t.bigint "assay_id", null: false
   end
 
   create_table "asset_doi_logs", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -664,6 +669,10 @@ ActiveRecord::Schema.define(version: 2022_08_08_094658) do
     t.text "description"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.text "address"
+    t.string "city"
+    t.text "web_page"
+    t.string "country"
   end
 
   create_table "facilities_institutions", id: false, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -945,8 +954,6 @@ ActiveRecord::Schema.define(version: 2022_08_08_094658) do
     t.text "other_creators"
     t.string "deleted_contributor"
     t.integer "position"
-    t.bigint "service_id"
-    t.index ["service_id"], name: "index_investigations_on_service_id"
   end
 
   create_table "investigations_projects", id: false, charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -2302,7 +2309,6 @@ ActiveRecord::Schema.define(version: 2022_08_08_094658) do
     t.integer "sheet_number"
   end
 
-  add_foreign_key "investigations", "services"
   add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
   add_foreign_key "services", "facilities"

@@ -38,6 +38,8 @@ class Assay < ApplicationRecord
   has_many :strains, through: :assay_organisms
   has_many :tissue_and_cell_types, through: :assay_organisms
 
+  has_and_belongs_to_many :services
+
   before_save { assay_assets.each(&:set_version) }
   has_many :assay_assets, dependent: :destroy, inverse_of: :assay, autosave: true
 

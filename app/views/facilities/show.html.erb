@@ -7,6 +7,21 @@
     <div class="row">
       <div class="col-md-9 col-sm-8 box_about_actor">
         <%= item_description @facility.description -%>
+        <p class="web_page">
+          <strong>Web page: </strong><%= text_or_not_specified(@facility.web_page, :external_link => true) -%>
+        </p>
+
+        <p class="country">
+          <strong>Country: </strong><%= country_text_or_not_specified @facility.country -%>
+        </p>
+
+        <p class="city">
+          <strong>City: </strong><%= text_or_not_specified @facility.city %>
+        </p>
+
+        <p class="address">
+          <strong>Address: </strong><%= text_or_not_specified @facility.address, :address => true %>
+        </p>
       </div>
     </div>
   <% end %>
