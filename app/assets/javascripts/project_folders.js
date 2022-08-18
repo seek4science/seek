@@ -158,7 +158,7 @@ async function item_clicked(type, id, parent) {
     const item_type = isa_study_element.includes(type) ? "study" : "assay"
      // check if the Assay page is loaded
 		if ($j(`a[data-target^="#${item_type}_design"]`).toArray().length == 0) {
-			await loadItemDetails(`/studies/${parent.id}`, { view: "default" });
+			await loadItemDetails(`/${pluralize(item_type)}/${parent.id}`, { view: "default" });
 		}
 		$j(`a[data-target^="#${item_type}_design"]`).first().click();
 		$j(`a[data-target^="#${type}"]`).first().click();
