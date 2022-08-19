@@ -474,10 +474,6 @@ annotatedContributedTypeAttributes:
       $ref: "#/components/schemas/nullableOtherCreatorsString"
     creators:
       $ref: "#/components/schemas/assetsCreatorsList"
-    data_annotations:
-      $ref: "#/components/schemas/ontologyTermsList"
-    format_annotations:
-      $ref: "#/components/schemas/ontologyTermsList"
     discussion_links:
       $ref: "#/components/schemas/assetLinkList"
   required:
@@ -1888,8 +1884,6 @@ fileTemplatePost:
   required:
     - data
   additionalProperties: false
-  example:
-    $ref: ../examples/fileTemplatePost.json
 fileTemplatePatch:
   type: object
   properties:
@@ -1939,8 +1933,6 @@ fileTemplatePatch:
   required:
     - data
   additionalProperties: false
-  example:
-    $ref: ../examples/fileTemplatePatch.json
 institutionPost:
   type: object
   properties:

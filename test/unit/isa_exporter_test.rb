@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class IsaExporterTest < ActionController::TestCase
+class IsaExporterTest < ActiveSupport::TestCase
   test 'find sample origin' do
     current_user = FactoryBot.create(:user)
     controller = IsaExporter::Exporter.new(FactoryBot.create(:investigation), current_user)
