@@ -1,7 +1,7 @@
 {
   "data": {
     "type": "data_files",
-    "id": "56",
+    "id": "883654662",
     "attributes": {
       "title": "A Maximally Patched Data File",
       "description": "Study of the Human Genome",
@@ -17,7 +17,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "950",
+              "id": "1022258154",
               "type": "projects"
             },
             "access": "edit"
@@ -29,7 +29,7 @@
       "creators": {
         "data": [
           {
-            "id": "880",
+            "id": "1039993498",
             "type": "people"
           }
         ]
@@ -37,7 +37,7 @@
       "projects": {
         "data": [
           {
-            "id": "950",
+            "id": "1022258154",
             "type": "projects"
           }
         ]
@@ -45,7 +45,7 @@
       "assays": {
         "data": [
           {
-            "id": "136",
+            "id": "1035387471",
             "type": "assays"
           }
         ]
@@ -53,7 +53,7 @@
       "publications": {
         "data": [
           {
-            "id": "71",
+            "id": "501",
             "type": "publications"
           }
         ]
@@ -61,7 +61,7 @@
       "events": {
         "data": [
           {
-            "id": "34",
+            "id": "1025618835",
             "type": "events"
           }
         ]
@@ -69,7 +69,7 @@
       "workflows": {
         "data": [
           {
-            "id": "44",
+            "id": "328",
             "type": "workflows"
           }
         ]

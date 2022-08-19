@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "14",
+    "id": "80",
     "type": "placeholders",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "1040",
+              "id": "1022258189",
               "type": "projects"
             },
             "access": "edit"
@@ -21,30 +21,24 @@
       "tags": [
 
       ],
-      "created_at": "2022-08-18T10:10:06.000Z",
-      "updated_at": "2022-08-18T10:10:07.000Z",
+      "created_at": "2022-08-19T15:53:35.000Z",
+      "updated_at": "2022-08-19T15:53:35.000Z",
       "creators": [
         {
-          "profile": "/people/967",
+          "profile": "/people/1039993536",
           "family_name": "Last",
-          "given_name": "Person823",
-          "affiliation": "An Institution: 981",
+          "given_name": "Person333",
+          "affiliation": "An Institution: 393",
           "orcid": null
         }
       ],
-      "other_creators": "John Smith, Jane Smith",
-      "data_type_annotations": [
-
-      ],
-      "data_format_annotations": [
-
-      ]
+      "other_creators": "John Smith, Jane Smith"
     },
     "relationships": {
       "creators": {
         "data": [
           {
-            "id": "967",
+            "id": "1039993536",
             "type": "people"
           }
         ]
@@ -52,7 +46,7 @@
       "submitter": {
         "data": [
           {
-            "id": "966",
+            "id": "1039993535",
             "type": "people"
           }
         ]
@@ -60,11 +54,11 @@
       "people": {
         "data": [
           {
-            "id": "966",
+            "id": "1039993535",
             "type": "people"
           },
           {
-            "id": "967",
+            "id": "1039993536",
             "type": "people"
           }
         ]
@@ -72,7 +66,7 @@
       "projects": {
         "data": [
           {
-            "id": "1040",
+            "id": "1022258189",
             "type": "projects"
           }
         ]
@@ -84,26 +78,26 @@
       },
       "file_template": {
         "data": {
-          "id": "20",
+          "id": "109",
           "type": "file_templates"
         }
       },
       "data_file": {
         "data": {
-          "id": "64",
+          "id": "883654668",
           "type": "data_files"
         }
       }
     },
     "links": {
-      "self": "/placeholders/14"
+      "self": "/placeholders/80"
     },
     "meta": {
-      "created": "2022-08-18T10:10:06.000Z",
-      "modified": "2022-08-18T10:10:07.000Z",
+      "created": "2022-08-19T15:53:35.000Z",
+      "modified": "2022-08-19T15:53:35.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "dbb2eec0-010b-013b-77b5-000c29ced288"
+      "uuid": "019e2f50-0205-013b-77bf-000c29ced288"
     }
   },
   "jsonapi": {

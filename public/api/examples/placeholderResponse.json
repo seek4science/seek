@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "13",
+    "id": "79",
     "type": "placeholders",
     "attributes": {
       "policy": {
@@ -19,30 +19,24 @@
         "Placeholder-tag4",
         "Placeholder-tag5"
       ],
-      "created_at": "2022-08-18T10:10:06.000Z",
-      "updated_at": "2022-08-18T10:10:06.000Z",
+      "created_at": "2022-08-19T15:53:34.000Z",
+      "updated_at": "2022-08-19T15:53:34.000Z",
       "creators": [
         {
-          "profile": "/people/961",
+          "profile": "/people/1039993530",
           "family_name": "One",
           "given_name": "Some",
           "affiliation": "University of Somewhere",
           "orcid": null
         }
       ],
-      "other_creators": "Blogs, Joe",
-      "data_type_annotations": [
-
-      ],
-      "data_format_annotations": [
-
-      ]
+      "other_creators": "Blogs, Joe"
     },
     "relationships": {
       "creators": {
         "data": [
           {
-            "id": "961",
+            "id": "1039993530",
             "type": "people"
           }
         ]
@@ -50,7 +44,7 @@
       "submitter": {
         "data": [
           {
-            "id": "964",
+            "id": "1039993533",
             "type": "people"
           }
         ]
@@ -58,11 +52,11 @@
       "people": {
         "data": [
           {
-            "id": "961",
+            "id": "1039993530",
             "type": "people"
           },
           {
-            "id": "964",
+            "id": "1039993533",
             "type": "people"
           }
         ]
@@ -70,7 +64,7 @@
       "projects": {
         "data": [
           {
-            "id": "1038",
+            "id": "1022258187",
             "type": "projects"
           }
         ]
@@ -78,33 +72,33 @@
       "assays": {
         "data": [
           {
-            "id": "150",
+            "id": "1035387473",
             "type": "assays"
           }
         ]
       },
       "file_template": {
         "data": {
-          "id": "19",
+          "id": "108",
           "type": "file_templates"
         }
       },
       "data_file": {
         "data": {
-          "id": "63",
+          "id": "883654667",
           "type": "data_files"
         }
       }
     },
     "links": {
-      "self": "/placeholders/13"
+      "self": "/placeholders/79"
     },
     "meta": {
-      "created": "2022-08-18T10:10:06.000Z",
-      "modified": "2022-08-18T10:10:06.000Z",
+      "created": "2022-08-19T15:53:34.000Z",
+      "modified": "2022-08-19T15:53:34.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "db467550-010b-013b-77b5-000c29ced288"
+      "uuid": "012ae4b0-0205-013b-77bf-000c29ced288"
     }
   },
   "jsonapi": {

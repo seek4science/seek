@@ -9,7 +9,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "858",
+              "id": "1022258413",
               "type": "projects"
             },
             "access": "edit"
@@ -27,7 +27,7 @@
       "projects": {
         "data": [
           {
-            "id": "858",
+            "id": "1022258413",
             "type": "projects"
           }
         ]
@@ -35,7 +35,7 @@
       "data_files": {
         "data": [
           {
-            "id": "43",
+            "id": "883654679",
             "type": "data_files"
           }
         ]
@@ -43,7 +43,7 @@
       "presentations": {
         "data": [
           {
-            "id": "27",
+            "id": "185",
             "type": "presentations"
           }
         ]
@@ -51,7 +51,7 @@
       "publications": {
         "data": [
           {
-            "id": "60",
+            "id": "514",
             "type": "publications"
           }
         ]

@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "386",
+    "id": "1022258111",
     "type": "projects",
     "attributes": {
       "discussion_links": [
@@ -19,21 +19,21 @@
         "permissions": [
           {
             "resource": {
-              "id": "351",
+              "id": "1039993446",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "386",
+              "id": "1022258111",
               "type": "projects"
             },
             "access": "download"
           },
           {
             "resource": {
-              "id": "363",
+              "id": "980198056",
               "type": "institutions"
             },
             "access": "view"
@@ -84,7 +84,7 @@
       "programmes": {
         "data": [
           {
-            "id": "16",
+            "id": "163",
             "type": "programmes"
           }
         ]
@@ -147,7 +147,7 @@
       "organisms": {
         "data": [
           {
-            "id": "14",
+            "id": "627234478",
             "type": "organisms"
           }
         ]
@@ -179,14 +179,14 @@
       }
     },
     "links": {
-      "self": "/projects/386"
+      "self": "/projects/1022258111"
     },
     "meta": {
-      "created": "2022-08-18T10:06:59.000Z",
-      "modified": "2022-08-18T10:06:59.000Z",
+      "created": "2022-08-19T15:53:10.000Z",
+      "modified": "2022-08-19T15:53:10.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "6bd0a890-010b-013b-77b5-000c29ced288"
+      "uuid": "f2eba450-0204-013b-77bf-000c29ced288"
     }
   },
   "jsonapi": {

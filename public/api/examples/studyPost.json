@@ -11,7 +11,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "955",
+              "id": "1022257845",
               "type": "projects"
             },
             "access": "view"
@@ -22,14 +22,14 @@
     "relationships": {
       "investigation": {
         "data": {
-          "id": "174",
+          "id": "973655804",
           "type": "investigations"
         }
       },
       "publications": {
         "data": [
           {
-            "id": "72",
+            "id": "471",
             "type": "publications"
           }
         ]
@@ -37,7 +37,7 @@
       "creators": {
         "data": [
           {
-            "id": "887",
+            "id": "1039993201",
             "type": "people"
           }
         ]

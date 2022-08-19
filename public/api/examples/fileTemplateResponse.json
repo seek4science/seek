@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "7",
+    "id": "116",
     "type": "file_templates",
     "attributes": {
       "policy": {
@@ -11,7 +11,7 @@
       },
       "discussion_links": [
         {
-          "id": "68",
+          "id": "439",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
@@ -31,14 +31,14 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/file_templates/7?version=1",
+          "url": "http://localhost:3000/file_templates/116?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2022-08-18T10:09:26.000Z",
-      "updated_at": "2022-08-18T10:09:26.000Z",
+      "created_at": "2022-08-19T15:55:20.000Z",
+      "updated_at": "2022-08-19T15:55:20.000Z",
       "doi": null,
       "content_blobs": [
         {
@@ -47,38 +47,26 @@
           "md5sum": "726de0a3f94d65056b909b9736e10349",
           "sha1sum": "fbcc0dee4b5415de4c82ef5b137d8231fec1331b",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/file_templates/7/content_blobs/354",
+          "link": "http://localhost:3000/file_templates/116/content_blobs/1050455217",
           "size": 8
         }
       ],
       "creators": [
         {
-          "profile": "/people/824",
+          "profile": "/people/1039993872",
           "family_name": "One",
           "given_name": "Some",
           "affiliation": "University of Somewhere",
           "orcid": null
         }
       ],
-      "other_creators": "Blogs, Joe",
-      "data_type_annotations": [
-        {
-          "label": "Sequence features metadata",
-          "identifier": "http://edamontology.org/data_2914"
-        }
-      ],
-      "data_format_annotations": [
-        {
-          "label": "JSON",
-          "identifier": "http://edamontology.org/format_3464"
-        }
-      ]
+      "other_creators": "Blogs, Joe"
     },
     "relationships": {
       "creators": {
         "data": [
           {
-            "id": "824",
+            "id": "1039993872",
             "type": "people"
           }
         ]
@@ -86,7 +74,7 @@
       "submitter": {
         "data": [
           {
-            "id": "825",
+            "id": "1039993873",
             "type": "people"
           }
         ]
@@ -94,11 +82,11 @@
       "people": {
         "data": [
           {
-            "id": "824",
+            "id": "1039993872",
             "type": "people"
           },
           {
-            "id": "825",
+            "id": "1039993873",
             "type": "people"
           }
         ]
@@ -106,7 +94,7 @@
       "projects": {
         "data": [
           {
-            "id": "905",
+            "id": "1022258556",
             "type": "projects"
           }
         ]
@@ -123,14 +111,14 @@
       }
     },
     "links": {
-      "self": "/file_templates/7?version=1"
+      "self": "/file_templates/116?version=1"
     },
     "meta": {
-      "created": "2022-08-18T10:09:26.000Z",
-      "modified": "2022-08-18T10:09:26.000Z",
+      "created": "2022-08-19T15:55:20.000Z",
+      "modified": "2022-08-19T15:55:20.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "c3d09070-010b-013b-77b5-000c29ced288"
+      "uuid": "406f0a90-0205-013b-77bf-000c29ced288"
     }
   },
   "jsonapi": {

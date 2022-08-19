@@ -1,7 +1,7 @@
 {
   "data": {
     "type": "collections",
-    "id": "15",
+    "id": "88",
     "attributes": {
       "title": "A Maximally Patched Collection",
       "description": "A collection of very interesting things",
@@ -17,7 +17,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "838",
+              "id": "1022257842",
               "type": "projects"
             },
             "access": "edit"
@@ -29,7 +29,7 @@
       "creators": {
         "data": [
           {
-            "id": "765",
+            "id": "1039993199",
             "type": "people"
           }
         ]
@@ -37,7 +37,7 @@
       "projects": {
         "data": [
           {
-            "id": "838",
+            "id": "1022257842",
             "type": "projects"
           }
         ]

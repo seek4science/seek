@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "12",
+    "id": "212",
     "type": "samples",
     "attributes": {
       "policy": {
@@ -16,14 +16,14 @@
       "tags": [
 
       ],
-      "created_at": "2022-08-18T10:07:06.000Z",
-      "updated_at": "2022-08-18T10:07:06.000Z",
+      "created_at": "2022-08-19T15:55:00.000Z",
+      "updated_at": "2022-08-19T15:55:00.000Z",
       "creators": [
         {
-          "profile": "/people/371",
+          "profile": "/people/1039993801",
           "family_name": "Last",
-          "given_name": "Person320",
-          "affiliation": "An Institution: 379, An Institution: 381",
+          "given_name": "Person553",
+          "affiliation": "An Institution: 660, An Institution: 662",
           "orcid": null
         }
       ],
@@ -37,7 +37,7 @@
       "creators": {
         "data": [
           {
-            "id": "371",
+            "id": "1039993801",
             "type": "people"
           }
         ]
@@ -45,21 +45,21 @@
       "submitter": {
         "data": [
           {
-            "id": "371",
+            "id": "1039993801",
             "type": "people"
           }
         ]
       },
       "sample_type": {
         "data": {
-          "id": "13",
+          "id": "327",
           "type": "sample_types"
         }
       },
       "projects": {
         "data": [
           {
-            "id": "409",
+            "id": "1022258481",
             "type": "projects"
           }
         ]
@@ -72,7 +72,7 @@
       "investigations": {
         "data": [
           {
-            "id": "68",
+            "id": "973655911",
             "type": "investigations"
           }
         ]
@@ -80,7 +80,7 @@
       "studies": {
         "data": [
           {
-            "id": "62",
+            "id": "1060385850",
             "type": "studies"
           }
         ]
@@ -88,7 +88,7 @@
       "assays": {
         "data": [
           {
-            "id": "53",
+            "id": "1035387512",
             "type": "assays"
           }
         ]
@@ -96,21 +96,21 @@
       "people": {
         "data": [
           {
-            "id": "371",
+            "id": "1039993801",
             "type": "people"
           }
         ]
       }
     },
     "links": {
-      "self": "/samples/12"
+      "self": "/samples/212"
     },
     "meta": {
-      "created": "2022-08-18T10:07:06.000Z",
-      "modified": "2022-08-18T10:07:06.000Z",
+      "created": "2022-08-19T15:55:00.000Z",
+      "modified": "2022-08-19T15:55:00.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "70533f60-010b-013b-77b5-000c29ced288"
+      "uuid": "349ed840-0205-013b-77bf-000c29ced288"
     }
   },
   "jsonapi": {

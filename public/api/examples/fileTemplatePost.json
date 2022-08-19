@@ -8,18 +8,6 @@
         "tag1",
         "tag2"
       ],
-      "data_format_annotations": [
-        {
-          "label": "JSON",
-          "identifier": "http://edamontology.org/format_3464"
-        }
-      ],
-      "data_type_annotations": [
-        {
-          "label": "Sequence features metadata",
-          "identifier": "http://edamontology.org/data_2914"
-        }
-      ],
       "license": "CC-BY-4.0",
       "other_creators": "John Smith, Jane Smith",
       "content_blobs": [
@@ -33,7 +21,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "885",
+              "id": "1022258536",
               "type": "projects"
             },
             "access": "edit"
@@ -45,7 +33,7 @@
       "creators": {
         "data": [
           {
-            "id": "806",
+            "id": "1039993854",
             "type": "people"
           }
         ]
@@ -53,7 +41,7 @@
       "projects": {
         "data": [
           {
-            "id": "885",
+            "id": "1022258536",
             "type": "projects"
           }
         ]

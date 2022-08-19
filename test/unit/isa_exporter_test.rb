@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class IsaExporterTest < ActionController::TestCase
+class IsaExporterTest < ActiveSupport::TestCase
   test 'find sample origin' do
     controller = IsaExporter::Exporter.new Factory(:investigation)
     project = Factory(:project)
