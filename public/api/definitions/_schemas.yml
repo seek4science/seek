@@ -1225,6 +1225,8 @@ assayPost:
               $ref: "#/components/schemas/multipleReferences"
             organisms:
               $ref: "#/components/schemas/multipleReferences"
+            services:
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - study
           additionalProperties: false
@@ -1310,6 +1312,8 @@ assayPatch:
             sops:
               $ref: "#/components/schemas/multipleReferences"
             organisms:
+              $ref: "#/components/schemas/multipleReferences"
+            services:
               $ref: "#/components/schemas/multipleReferences"
           additionalProperties: false
       required:
@@ -2047,8 +2051,6 @@ investigationPost:
               $ref: "#/components/schemas/multipleReferences"
             publications:
               $ref: "#/components/schemas/multipleReferences"
-            service:
-              $ref: "#/components/schemas/singleReference"
           required:
             - projects
           additionalProperties: false
@@ -2097,8 +2099,6 @@ investigationPatch:
               $ref: "#/components/schemas/multipleReferences"
             publications:
               $ref: "#/components/schemas/multipleReferences"
-            service:
-              $ref: "#/components/schemas/singleReference"
           additionalProperties: false
       required:
         - id
@@ -3521,6 +3521,8 @@ assayResponse:
               $ref: "#/components/schemas/multipleReferences"
             human_diseases:
               $ref: "#/components/schemas/multipleReferences"
+            services:
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - creators
             - submitter
@@ -4087,8 +4089,8 @@ investigationResponse:
               $ref: "#/components/schemas/multipleReferences"
             publications:
               $ref: "#/components/schemas/multipleReferences"
-            service:
-               #ref: "#/components/schemas/singleReference"
+            services:
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - creators
             - submitter
@@ -4653,6 +4655,8 @@ projectResponse:
               $ref: "#/components/schemas/multipleReferences"
             asset_gatekeepers:
               $ref: "#/components/schemas/multipleReferences"
+            services:
+              $ref: "#/components/schemas/multipleReferences"
           required:
             - people
             - institutions
@@ -5152,6 +5156,8 @@ studyResponse:
             sops:
               $ref: "#/components/schemas/multipleReferences"
             publications:
+              $ref: "#/components/schemas/multipleReferences"
+            services:
               $ref: "#/components/schemas/multipleReferences"
           required:
             - creators

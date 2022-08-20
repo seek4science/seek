@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "1004286601",
+    "id": "1004285576",
     "type": "models",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "1022267504",
+              "id": "1022251467",
               "type": "projects"
             },
             "access": "edit"
@@ -17,7 +17,7 @@
       },
       "discussion_links": [
         {
-          "id": "494",
+          "id": "48",
           "label": "Google",
           "url": "http://google.com"
         }
@@ -34,14 +34,14 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/models/1004286601?version=1",
+          "url": "http://localhost:3000/models/1004285576?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2022-08-09T20:29:00.000Z",
-      "updated_at": "2022-08-09T20:29:00.000Z",
+      "created_at": "2022-08-20T17:54:00.000Z",
+      "updated_at": "2022-08-20T17:54:00.000Z",
       "doi": null,
       "content_blobs": [
         {
@@ -50,7 +50,7 @@
           "md5sum": null,
           "sha1sum": null,
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/models/1004286601/content_blobs/1050457549",
+          "link": "http://localhost:3000/models/1004285576/content_blobs/1050452824",
           "size": null
         },
         {
@@ -59,16 +59,16 @@
           "md5sum": null,
           "sha1sum": null,
           "content_type": "application/xml",
-          "link": "http://localhost:3000/models/1004286601/content_blobs/1050457550",
+          "link": "http://localhost:3000/models/1004285576/content_blobs/1050452825",
           "size": null
         }
       ],
       "creators": [
         {
-          "profile": "/people/1040002516",
+          "profile": "/people/1039987265",
           "family_name": "Last",
-          "given_name": "Person492",
-          "affiliation": "An Institution: 579",
+          "given_name": "Person490",
+          "affiliation": "An Institution: 589",
           "orcid": null
         }
       ],
@@ -82,7 +82,7 @@
       "creators": {
         "data": [
           {
-            "id": "1040002516",
+            "id": "1039987265",
             "type": "people"
           }
         ]
@@ -90,7 +90,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1040002515",
+            "id": "1039987264",
             "type": "people"
           }
         ]
@@ -98,7 +98,7 @@
       "organisms": {
         "data": [
           {
-            "id": "627234565",
+            "id": "627234323",
             "type": "organisms"
           }
         ]
@@ -106,11 +106,11 @@
       "people": {
         "data": [
           {
-            "id": "1040002515",
+            "id": "1039987264",
             "type": "people"
           },
           {
-            "id": "1040002516",
+            "id": "1039987265",
             "type": "people"
           }
         ]
@@ -118,7 +118,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022267504",
+            "id": "1022251467",
             "type": "projects"
           }
         ]
@@ -126,7 +126,7 @@
       "investigations": {
         "data": [
           {
-            "id": "973656901",
+            "id": "973655022",
             "type": "investigations"
           }
         ]
@@ -134,7 +134,7 @@
       "studies": {
         "data": [
           {
-            "id": "1060386743",
+            "id": "1060385065",
             "type": "studies"
           }
         ]
@@ -142,7 +142,7 @@
       "assays": {
         "data": [
           {
-            "id": "1035388272",
+            "id": "1035386836",
             "type": "assays"
           }
         ]
@@ -150,21 +150,21 @@
       "publications": {
         "data": [
           {
-            "id": "739",
+            "id": "51",
             "type": "publications"
           }
         ]
       }
     },
     "links": {
-      "self": "/models/1004286601?version=1"
+      "self": "/models/1004285576?version=1"
     },
     "meta": {
-      "created": "2022-08-09T20:29:00.000Z",
-      "modified": "2022-08-09T20:29:00.000Z",
+      "created": "2022-08-20T17:54:00.000Z",
+      "modified": "2022-08-20T17:54:00.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "d39373f0-fa4f-013a-73c8-000c29ced288"
+      "uuid": "fec24650-02de-013b-a52a-000c29ced288"
     }
   },
   "jsonapi": {

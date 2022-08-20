@@ -21,7 +21,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "1022267750",
+              "id": "1022251234",
               "type": "projects"
             },
             "access": "edit"
@@ -33,7 +33,7 @@
       "creators": {
         "data": [
           {
-            "id": "1040002738",
+            "id": "1039987032",
             "type": "people"
           }
         ]
@@ -41,7 +41,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022267750",
+            "id": "1022251234",
             "type": "projects"
           }
         ]
@@ -49,7 +49,7 @@
       "assays": {
         "data": [
           {
-            "id": "1035388306",
+            "id": "1035386792",
             "type": "assays"
           }
         ]
@@ -57,7 +57,7 @@
       "workflows": {
         "data": [
           {
-            "id": "570",
+            "id": "19",
             "type": "workflows"
           }
         ]

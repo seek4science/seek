@@ -1,23 +1,23 @@
 {
   "data": [
     {
-      "id": "150",
+      "id": "11",
       "type": "placeholders",
       "attributes": {
         "title": "A Maximal Placeholder"
       },
       "links": {
-        "self": "/placeholders/150"
+        "self": "/placeholders/11"
       }
     },
     {
-      "id": "149",
+      "id": "10",
       "type": "placeholders",
       "attributes": {
         "title": "A Minimal Placeholder"
       },
       "links": {
-        "self": "/placeholders/149"
+        "self": "/placeholders/10"
       }
     }
   ],

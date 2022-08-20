@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "1040002735",
+    "id": "1039987197",
     "type": "people",
     "attributes": {
       "avatar": null,
@@ -19,7 +19,7 @@
         "Gromacs",
         "Python"
       ],
-      "login": "user786"
+      "login": "user507"
     },
     "relationships": {
       "programmes": {
@@ -30,7 +30,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022267748",
+            "id": "1022251394",
             "type": "projects"
           }
         ]
@@ -38,7 +38,7 @@
       "institutions": {
         "data": [
           {
-            "id": "980207454",
+            "id": "980191706",
             "type": "institutions"
           }
         ]
@@ -115,14 +115,14 @@
       }
     },
     "links": {
-      "self": "/people/1040002735"
+      "self": "/people/1039987197"
     },
     "meta": {
-      "created": "2022-08-09T20:30:06.000Z",
-      "modified": "2022-08-09T20:30:07.000Z",
+      "created": "2022-08-20T17:53:38.000Z",
+      "modified": "2022-08-20T17:53:39.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "faf07f20-fa4f-013a-73c8-000c29ced288"
+      "uuid": "f1d4c0d0-02de-013b-a52a-000c29ced288"
     }
   },
   "jsonapi": {

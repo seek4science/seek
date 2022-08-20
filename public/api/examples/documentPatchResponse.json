@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "552",
+    "id": "37",
     "type": "documents",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "1022267131",
+              "id": "1022251217",
               "type": "projects"
             },
             "access": "edit"
@@ -31,32 +31,32 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/documents/552?version=1",
+          "url": "http://localhost:3000/documents/37?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2022-08-09T20:27:06.000Z",
-      "updated_at": "2022-08-09T20:27:07.000Z",
+      "created_at": "2022-08-20T17:52:44.000Z",
+      "updated_at": "2022-08-20T17:52:44.000Z",
       "doi": null,
       "content_blobs": [
         {
-          "original_filename": "file-24",
+          "original_filename": "file-29",
           "url": null,
-          "md5sum": "67307af5b4d8f1f46cc609fc52f1ba77",
-          "sha1sum": "a9308773844438286818f2bb90e55383795ed6f3",
+          "md5sum": "c85462e4c52935bfac842f5e0cc2d33d",
+          "sha1sum": "cbedd5831f2748ab352e0b3645a6f9a7d54e2447",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/documents/552/content_blobs/1050457424",
+          "link": "http://localhost:3000/documents/37/content_blobs/1050452719",
           "size": 9
         }
       ],
       "creators": [
         {
-          "profile": "/people/1040002181",
+          "profile": "/people/1039987017",
           "family_name": "Last",
-          "given_name": "Person196",
-          "affiliation": "An Institution: 240",
+          "given_name": "Person277",
+          "affiliation": "An Institution: 343",
           "orcid": null
         }
       ],
@@ -66,7 +66,7 @@
       "creators": {
         "data": [
           {
-            "id": "1040002181",
+            "id": "1039987017",
             "type": "people"
           }
         ]
@@ -74,7 +74,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1040002180",
+            "id": "1039987016",
             "type": "people"
           }
         ]
@@ -82,11 +82,11 @@
       "people": {
         "data": [
           {
-            "id": "1040002180",
+            "id": "1039987016",
             "type": "people"
           },
           {
-            "id": "1040002181",
+            "id": "1039987017",
             "type": "people"
           }
         ]
@@ -94,7 +94,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022267131",
+            "id": "1022251217",
             "type": "projects"
           }
         ]
@@ -102,7 +102,7 @@
       "investigations": {
         "data": [
           {
-            "id": "973656796",
+            "id": "973654968",
             "type": "investigations"
           }
         ]
@@ -110,7 +110,7 @@
       "studies": {
         "data": [
           {
-            "id": "1060386655",
+            "id": "1060385013",
             "type": "studies"
           }
         ]
@@ -118,7 +118,7 @@
       "assays": {
         "data": [
           {
-            "id": "1035388203",
+            "id": "1035386789",
             "type": "assays"
           }
         ]
@@ -131,21 +131,21 @@
       "workflows": {
         "data": [
           {
-            "id": "561",
+            "id": "18",
             "type": "workflows"
           }
         ]
       }
     },
     "links": {
-      "self": "/documents/552?version=1"
+      "self": "/documents/37?version=1"
     },
     "meta": {
-      "created": "2022-08-09T20:27:06.000Z",
-      "modified": "2022-08-09T20:27:07.000Z",
+      "created": "2022-08-20T17:52:44.000Z",
+      "modified": "2022-08-20T17:52:44.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "8fa0c3c0-fa4f-013a-73c8-000c29ced288"
+      "uuid": "d1441400-02de-013b-a52a-000c29ced288"
     }
   },
   "jsonapi": {

@@ -25,7 +25,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "1022267504",
+              "id": "1022251467",
               "type": "projects"
             },
             "access": "edit"
@@ -46,7 +46,7 @@
       "creators": {
         "data": [
           {
-            "id": "1040002516",
+            "id": "1039987265",
             "type": "people"
           }
         ]
@@ -54,7 +54,7 @@
       "organisms": {
         "data": [
           {
-            "id": "627234565",
+            "id": "627234323",
             "type": "organisms"
           }
         ]
@@ -62,7 +62,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022267504",
+            "id": "1022251467",
             "type": "projects"
           }
         ]
@@ -70,7 +70,7 @@
       "assays": {
         "data": [
           {
-            "id": "1035388272",
+            "id": "1035386836",
             "type": "assays"
           }
         ]
@@ -78,7 +78,7 @@
       "publications": {
         "data": [
           {
-            "id": "739",
+            "id": "51",
             "type": "publications"
           }
         ]

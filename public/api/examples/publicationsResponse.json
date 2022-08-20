@@ -1,33 +1,33 @@
 {
   "data": [
     {
-      "id": "723",
+      "id": "68",
       "type": "publications",
       "attributes": {
         "title": "A Maximal Publication"
       },
       "links": {
-        "self": "/publications/723"
+        "self": "/publications/68"
       }
     },
     {
-      "id": "721",
+      "id": "66",
       "type": "publications",
       "attributes": {
         "title": "A Minimal Publication"
       },
       "links": {
-        "self": "/publications/721"
+        "self": "/publications/66"
       }
     },
     {
-      "id": "722",
+      "id": "67",
       "type": "publications",
       "attributes": {
-        "title": "A Publication 36"
+        "title": "A Publication 64"
       },
       "links": {
-        "self": "/publications/722"
+        "self": "/publications/67"
       }
     }
   ],

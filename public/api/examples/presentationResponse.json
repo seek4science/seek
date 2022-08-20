@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "244",
+    "id": "27",
     "type": "presentations",
     "attributes": {
       "policy": {
@@ -11,7 +11,7 @@
       },
       "discussion_links": [
         {
-          "id": "458",
+          "id": "66",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
@@ -31,13 +31,13 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/presentations/244?version=1"
+          "url": "http://localhost:3000/presentations/27?version=1"
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2022-08-09T20:26:45.000Z",
-      "updated_at": "2022-08-09T20:26:45.000Z",
+      "created_at": "2022-08-20T17:55:01.000Z",
+      "updated_at": "2022-08-20T17:55:01.000Z",
       "content_blobs": [
         {
           "original_filename": "test.pdf",
@@ -45,13 +45,13 @@
           "md5sum": "726de0a3f94d65056b909b9736e10349",
           "sha1sum": "fbcc0dee4b5415de4c82ef5b137d8231fec1331b",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/presentations/244/content_blobs/1050457394",
+          "link": "http://localhost:3000/presentations/27/content_blobs/1050452912",
           "size": 8
         }
       ],
       "creators": [
         {
-          "profile": "/people/1040002108",
+          "profile": "/people/1039987501",
           "family_name": "One",
           "given_name": "Some",
           "affiliation": "University of Somewhere",
@@ -64,7 +64,7 @@
       "creators": {
         "data": [
           {
-            "id": "1040002108",
+            "id": "1039987501",
             "type": "people"
           }
         ]
@@ -72,7 +72,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1040002109",
+            "id": "1039987502",
             "type": "people"
           }
         ]
@@ -80,11 +80,11 @@
       "people": {
         "data": [
           {
-            "id": "1040002108",
+            "id": "1039987501",
             "type": "people"
           },
           {
-            "id": "1040002109",
+            "id": "1039987502",
             "type": "people"
           }
         ]
@@ -92,7 +92,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022267060",
+            "id": "1022251711",
             "type": "projects"
           }
         ]
@@ -100,7 +100,7 @@
       "investigations": {
         "data": [
           {
-            "id": "973656788",
+            "id": "973655060",
             "type": "investigations"
           }
         ]
@@ -108,7 +108,7 @@
       "studies": {
         "data": [
           {
-            "id": "1060386647",
+            "id": "1060385098",
             "type": "studies"
           }
         ]
@@ -116,7 +116,7 @@
       "assays": {
         "data": [
           {
-            "id": "1035388195",
+            "id": "1035386859",
             "type": "assays"
           }
         ]
@@ -124,7 +124,7 @@
       "publications": {
         "data": [
           {
-            "id": "702",
+            "id": "76",
             "type": "publications"
           }
         ]
@@ -132,7 +132,7 @@
       "events": {
         "data": [
           {
-            "id": "1025619007",
+            "id": "1025618686",
             "type": "events"
           }
         ]
@@ -140,21 +140,21 @@
       "workflows": {
         "data": [
           {
-            "id": "554",
+            "id": "39",
             "type": "workflows"
           }
         ]
       }
     },
     "links": {
-      "self": "/presentations/244?version=1"
+      "self": "/presentations/27?version=1"
     },
     "meta": {
-      "created": "2022-08-09T20:26:45.000Z",
-      "modified": "2022-08-09T20:26:45.000Z",
+      "created": "2022-08-20T17:55:01.000Z",
+      "modified": "2022-08-20T17:55:01.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "832617a0-fa4f-013a-73c8-000c29ced288"
+      "uuid": "2313c1e0-02df-013b-a52a-000c29ced288"
     }
   },
   "jsonapi": {

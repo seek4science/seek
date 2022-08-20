@@ -1,16 +1,16 @@
 {
   "data": {
-    "id": "1022267932",
+    "id": "1022251917",
     "type": "projects",
     "attributes": {
       "discussion_links": [
         {
-          "id": "528",
+          "id": "86",
           "label": "Slack",
           "url": "http://www.slack.com/"
         }
       ],
-      "avatar": "/projects/1022267932/avatars/105",
+      "avatar": "/projects/1022251917/avatars/12",
       "title": "A Maximal Project",
       "description": "A Taverna project",
       "web_page": "http://www.taverna.org.uk",
@@ -26,8 +26,8 @@
       },
       "members": [
         {
-          "person_id": "1040002899",
-          "institution_id": "980207621"
+          "person_id": "1039987682",
+          "institution_id": "980192194"
         }
       ],
       "use_default_policy": true,
@@ -66,7 +66,7 @@
       "people": {
         "data": [
           {
-            "id": "1040002899",
+            "id": "1039987682",
             "type": "people"
           }
         ]
@@ -74,7 +74,7 @@
       "programmes": {
         "data": [
           {
-            "id": "366",
+            "id": "22",
             "type": "programmes"
           }
         ]
@@ -82,7 +82,7 @@
       "institutions": {
         "data": [
           {
-            "id": "980207621",
+            "id": "980192194",
             "type": "institutions"
           }
         ]
@@ -90,7 +90,7 @@
       "investigations": {
         "data": [
           {
-            "id": "973656976",
+            "id": "973655094",
             "type": "investigations"
           }
         ]
@@ -98,7 +98,7 @@
       "studies": {
         "data": [
           {
-            "id": "1060386812",
+            "id": "1060385128",
             "type": "studies"
           }
         ]
@@ -106,7 +106,7 @@
       "assays": {
         "data": [
           {
-            "id": "1035388335",
+            "id": "1035386885",
             "type": "assays"
           }
         ]
@@ -114,7 +114,7 @@
       "data_files": {
         "data": [
           {
-            "id": "883655365",
+            "id": "883654336",
             "type": "data_files"
           }
         ]
@@ -122,7 +122,7 @@
       "documents": {
         "data": [
           {
-            "id": "584",
+            "id": "71",
             "type": "documents"
           }
         ]
@@ -130,7 +130,7 @@
       "models": {
         "data": [
           {
-            "id": "1004286666",
+            "id": "1004285645",
             "type": "models"
           }
         ]
@@ -138,7 +138,7 @@
       "sops": {
         "data": [
           {
-            "id": "1055251093",
+            "id": "1055250502",
             "type": "sops"
           }
         ]
@@ -146,7 +146,7 @@
       "publications": {
         "data": [
           {
-            "id": "766",
+            "id": "85",
             "type": "publications"
           }
         ]
@@ -154,7 +154,7 @@
       "presentations": {
         "data": [
           {
-            "id": "265",
+            "id": "32",
             "type": "presentations"
           }
         ]
@@ -162,7 +162,7 @@
       "events": {
         "data": [
           {
-            "id": "1025619034",
+            "id": "1025618691",
             "type": "events"
           }
         ]
@@ -175,7 +175,7 @@
       "workflows": {
         "data": [
           {
-            "id": "579",
+            "id": "44",
             "type": "workflows"
           }
         ]
@@ -199,17 +199,22 @@
         "data": [
 
         ]
+      },
+      "services": {
+        "data": [
+
+        ]
       }
     },
     "links": {
-      "self": "/projects/1022267932"
+      "self": "/projects/1022251917"
     },
     "meta": {
-      "created": "2022-08-09T20:30:59.000Z",
-      "modified": "2022-08-09T20:30:59.000Z",
+      "created": "2022-08-20T17:55:50.000Z",
+      "modified": "2022-08-20T17:55:50.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "1a53b620-fa50-013a-73c8-000c29ced288"
+      "uuid": "3ff62850-02df-013b-a52a-000c29ced288"
     }
   },
   "jsonapi": {

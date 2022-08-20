@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "195",
+    "id": "20",
     "type": "file_templates",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "1022266979",
+              "id": "1022251739",
               "type": "projects"
             },
             "access": "edit"
@@ -30,32 +30,32 @@
         {
           "version": 1,
           "revision_comments": null,
-          "url": "http://localhost:3000/file_templates/195?version=1",
+          "url": "http://localhost:3000/file_templates/20?version=1",
           "doi": null
         }
       ],
       "version": 1,
       "revision_comments": null,
-      "created_at": "2022-08-09T20:26:19.000Z",
-      "updated_at": "2022-08-09T20:26:19.000Z",
+      "created_at": "2022-08-20T17:55:09.000Z",
+      "updated_at": "2022-08-20T17:55:09.000Z",
       "doi": null,
       "content_blobs": [
         {
-          "original_filename": "file-8",
+          "original_filename": "file-71",
           "url": null,
-          "md5sum": "56dce90d15d94f2b2b4454eeeddc9404",
-          "sha1sum": "88e8c79d1455a6634e68917029ba8d613bacef8a",
+          "md5sum": "aca627090e2d499351db9f80ac5ea982",
+          "sha1sum": "428401db193b8087aa69778d2b15f0712c91810f",
           "content_type": "application/pdf",
-          "link": "http://localhost:3000/file_templates/195/content_blobs/1050457358",
-          "size": 9
+          "link": "http://localhost:3000/file_templates/20/content_blobs/1050452924",
+          "size": 10
         }
       ],
       "creators": [
         {
-          "profile": "/people/1040002013",
+          "profile": "/people/1039987533",
           "family_name": "Last",
-          "given_name": "Person52",
-          "affiliation": "An Institution: 72",
+          "given_name": "Person719",
+          "affiliation": "An Institution: 857",
           "orcid": null
         }
       ],
@@ -77,7 +77,7 @@
       "creators": {
         "data": [
           {
-            "id": "1040002013",
+            "id": "1039987533",
             "type": "people"
           }
         ]
@@ -85,7 +85,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1040002012",
+            "id": "1039987532",
             "type": "people"
           }
         ]
@@ -93,11 +93,11 @@
       "people": {
         "data": [
           {
-            "id": "1040002012",
+            "id": "1039987532",
             "type": "people"
           },
           {
-            "id": "1040002013",
+            "id": "1039987533",
             "type": "people"
           }
         ]
@@ -105,7 +105,7 @@
       "projects": {
         "data": [
           {
-            "id": "1022266979",
+            "id": "1022251739",
             "type": "projects"
           }
         ]
@@ -122,14 +122,14 @@
       }
     },
     "links": {
-      "self": "/file_templates/195?version=1"
+      "self": "/file_templates/20?version=1"
     },
     "meta": {
-      "created": "2022-08-09T20:26:19.000Z",
-      "modified": "2022-08-09T20:26:19.000Z",
+      "created": "2022-08-20T17:55:09.000Z",
+      "modified": "2022-08-20T17:55:09.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "7347b510-fa4f-013a-73c8-000c29ced288"
+      "uuid": "27de12a0-02df-013b-a52a-000c29ced288"
     }
   },
   "jsonapi": {

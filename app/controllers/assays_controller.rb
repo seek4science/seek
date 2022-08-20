@@ -174,7 +174,7 @@ class AssaysController < ApplicationController
 				  { discussion_links_attributes:[:id, :url, :label, :_destroy] }
                                   ).tap do |assay_params|
       assay_params[:document_ids].select! { |id| Document.find_by_id(id).try(:can_view?) } if assay_params.key?(:document_ids)
-      assay_params[:service_ids].select! { |id| Service.find_by_id(id).try(:can_view?) }
+      assay_params[:service_ids].select! { |id| Service.find_by_id(id).try(:can_view?) } if assay_params.key?(:service_ids)
       assay_params[:sop_ids].select! { |id| Sop.find_by_id(id).try(:can_view?) } if assay_params.key?(:sop_ids)
       assay_params[:model_ids].select! { |id| Model.find_by_id(id).try(:can_view?) } if assay_params.key?(:model_ids)
     end

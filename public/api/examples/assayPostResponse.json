@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "1035388255",
+    "id": "1035386819",
     "type": "assays",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "1022267433",
+              "id": "1022251396",
               "type": "projects"
             },
             "access": "manage"
@@ -43,10 +43,10 @@
       ],
       "creators": [
         {
-          "profile": "/people/1040002450",
+          "profile": "/people/1039987199",
           "family_name": "Last",
-          "given_name": "Person432",
-          "affiliation": "An Institution: 513",
+          "given_name": "Person430",
+          "affiliation": "An Institution: 523",
           "orcid": null
         }
       ]
@@ -55,7 +55,7 @@
       "creators": {
         "data": [
           {
-            "id": "1040002450",
+            "id": "1039987199",
             "type": "people"
           }
         ]
@@ -63,7 +63,7 @@
       "submitter": {
         "data": [
           {
-            "id": "1040002450",
+            "id": "1039987199",
             "type": "people"
           }
         ]
@@ -71,7 +71,7 @@
       "organisms": {
         "data": [
           {
-            "id": "627234559",
+            "id": "627234317",
             "type": "organisms"
           }
         ]
@@ -84,7 +84,7 @@
       "people": {
         "data": [
           {
-            "id": "1040002450",
+            "id": "1039987199",
             "type": "people"
           }
         ]
@@ -92,27 +92,27 @@
       "projects": {
         "data": [
           {
-            "id": "1022267433",
+            "id": "1022251396",
             "type": "projects"
           }
         ]
       },
       "investigation": {
         "data": {
-          "id": "973656881",
+          "id": "973655002",
           "type": "investigations"
         }
       },
       "study": {
         "data": {
-          "id": "1060386723",
+          "id": "1060385045",
           "type": "studies"
         }
       },
       "data_files": {
         "data": [
           {
-            "id": "883655340",
+            "id": "883654307",
             "type": "data_files"
           }
         ]
@@ -120,7 +120,7 @@
       "samples": {
         "data": [
           {
-            "id": "391",
+            "id": "17",
             "type": "samples"
           }
         ]
@@ -133,7 +133,7 @@
       "sops": {
         "data": [
           {
-            "id": "1055251063",
+            "id": "1055250485",
             "type": "sops"
           }
         ]
@@ -141,7 +141,7 @@
       "publications": {
         "data": [
           {
-            "id": "733",
+            "id": "45",
             "type": "publications"
           }
         ]
@@ -154,21 +154,26 @@
       "documents": {
         "data": [
           {
-            "id": "565",
+            "id": "44",
             "type": "documents"
           }
+        ]
+      },
+      "services": {
+        "data": [
+
         ]
       }
     },
     "links": {
-      "self": "/assays/1035388255"
+      "self": "/assays/1035386819"
     },
     "meta": {
-      "created": "2022-08-09T20:28:39.000Z",
-      "modified": "2022-08-09T20:28:39.000Z",
+      "created": "2022-08-20T17:53:41.000Z",
+      "modified": "2022-08-20T17:53:41.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "c6b27810-fa4f-013a-73c8-000c29ced288"
+      "uuid": "f33e3020-02de-013b-a52a-000c29ced288"
     }
   },
   "jsonapi": {
