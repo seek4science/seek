@@ -13,9 +13,8 @@ class SinglePagesController < ApplicationController
       format.html
     end
   end
-  
-  def index
-  end
+
+  def index; end
 
   def project_folders
     project_folders = ProjectFolder.root_folders(@project)
@@ -27,33 +26,29 @@ class SinglePagesController < ApplicationController
   end
 
   def dynamic_table_data
-    begin
-      data = []
-      if params[:sample_type_id]
-        sample_type = SampleType.find(params[:sample_type_id]) if params[:sample_type_id]
-        data = helpers.dt_data(sample_type)[:rows]
-      elsif params[:study_id]
-        study = Study.find(params[:study_id]) if params[:study_id]
-        assay = Assay.find(params[:assay_id]) if params[:assay_id]
-        data = helpers.dt_aggregated(study, assay)[:rows]
-      end
-      data = data.map { |row| row.unshift('') } if params[:rows_pad]
-      render json: { data: data }
-    rescue Exception => e
-      render json: { status: :unprocessable_entity, error: e.message } 
+    data = []
+    if params[:sample_type_id]
+      sample_type = SampleType.find(params[:sample_type_id]) if params[:sample_type_id]
+      data = helpers.dt_data(sample_type)[:rows]
+    elsif params[:study_id]
+      study = Study.find(params[:study_id]) if params[:study_id]
+      assay = Assay.find(params[:assay_id]) if params[:assay_id]
+      data = helpers.dt_aggregated(study, assay)[:rows]
     end
+    data = data.map { |row| row.unshift('') } if params[:rows_pad]
+    render json: { data: data }
+  rescue Exception => e
+    render json: { status: :unprocessable_entity, error: e.message }
   end
 
   def export_isa
-    begin
-      inv = Investigation.find(params[:investigation_id])
-      isa = IsaExporter::Exporter.new(inv).export
-      send_data isa, filename: 'isa.json', type: 'application/json', deposition: 'attachment'
-    rescue Exception => ex
-      respond_to do |format|
-        flash[:error] = ex.message
-        format.html { redirect_to single_page_path(Project.find(params[:id])) }
-      end
+    inv = Investigation.find(params[:investigation_id])
+    isa = IsaExporter::Exporter.new(inv).export
+    send_data isa, filename: 'isa.json', type: 'application/json', deposition: 'attachment'
+  rescue Exception => e
+    respond_to do |format|
+      flash[:error] = e.message
+      format.html { redirect_to single_page_path(Project.find(params[:id])) }
     end
   end
 
