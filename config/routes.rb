@@ -304,6 +304,7 @@ SEEK::Application.routes.draw do
     collection do
     end
     member do
+      post :update_annotations_ajax
     end
     resources :services, only: [:index]
   end
@@ -312,6 +313,7 @@ SEEK::Application.routes.draw do
     collection do
     end
     member do
+      post :update_annotations_ajax
     end
   end
 

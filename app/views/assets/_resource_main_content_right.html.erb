@@ -48,8 +48,10 @@
   <%= render :partial => "assets/license_box", :locals => { :resource => resource, :versioned_resource=> versioned_resource } -%>
 <% end %>
 
-<%= render :partial => "assets/usage_info_box",:locals => { :resource => resource } -%>
-
+<% if resource.respond_to?(:view_count) %>
+  <%= render :partial => "assets/usage_info_box",:locals => { :resource => resource } -%>
+<% end %>
+  
 <% if resource.edam_annotations? %>
   <%= render partial:'assets/edam_properties_box', :locals => { :resource => resource } -%>
 <% end %>

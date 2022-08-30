@@ -14,5 +14,7 @@
 
 <%= render :partial=>"services/facility_selector", :locals=>{:f=>f, :resource => service } -%>
 
+<%= render :partial=>"assets/select_tags" -%>
+
 <%= f.submit(service ? "Update" : "Create",data: { disable_with: (service ? "Updating..." : "Creating...") }, :class => 'btn btn-primary') -%>
  or <%= cancel_button(service ? service_path(service.id) : services_path) -%>

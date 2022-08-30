@@ -1,5 +1,7 @@
 class Facility < ApplicationRecord
 
+  include Seek::Taggable
+  
   validates :title, uniqueness: true
 
   has_and_belongs_to_many :institutions

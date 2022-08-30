@@ -18,7 +18,7 @@ Factory.define(:max_template, parent: :template) do |f|
   f.group 'arrayexpress'
   f.group_order 4
   f.temporary_name '4_arrayexpress_library_construction'
-  f.template_version '1.2.0'
+  f.version '1.2.0'
   f.isa_config 'genome_seq_default_v2015-07-02'
   f.isa_measurement_type 'transcription profiling'
   f.isa_technology_type 'transcription profiling'

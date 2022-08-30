@@ -8,6 +8,9 @@
       <div class="col-md-9 col-sm-8 box_about_actor">
         <%= item_description @service.description -%>
       </div>
+      <div class="col-md-3 col-sm-4">
+        <%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @service } %>
+      </div>
     </div>
   <% end %>
 

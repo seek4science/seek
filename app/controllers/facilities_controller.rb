@@ -16,6 +16,7 @@ class FacilitiesController < ApplicationController
   def create
     @facility = Facility.new
     @facility.assign_attributes(facility_params)
+    update_annotations(params[:tag_list], @facility)
     respond_to do |format|
       if @facility.save
         flash[:notice] = "#{t('facility')} was successfully created."
@@ -29,6 +30,7 @@ class FacilitiesController < ApplicationController
   end
 
   def update
+    update_annotations(params[:tag_list], @facility) if params.key?(:tag_list)
     respond_to do |format|
       if @facility.update(facility_params)
         flash[:notice] = "The #{t('facility').capitalize} was successfully updated"

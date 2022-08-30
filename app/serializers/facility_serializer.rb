@@ -15,4 +15,8 @@ class FacilitySerializer < BaseSerializer
   has_many :institutions
   has_many :services
 
+  attribute :tags do
+    serialize_annotations(object, context ='tag')
+  end
+
 end

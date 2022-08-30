@@ -3,4 +3,8 @@ class ServiceSerializer < BaseSerializer
 
   has_one :facility
 
+  attribute :tags do
+    serialize_annotations(object, context ='tag')
+  end
+
 end

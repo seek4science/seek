@@ -18,6 +18,7 @@ class Institution < ApplicationRecord
   has_many :dependent_permissions, class_name: 'Permission', as: :contributor, dependent: :destroy
 
   has_and_belongs_to_many :facilities
+  has_many :services, through: :facilities
   
   searchable(auto_index: false) do
     text :city, :address

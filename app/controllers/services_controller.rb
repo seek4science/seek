@@ -16,6 +16,7 @@ class ServicesController < ApplicationController
   def create
     @service = Service.new
     @service.assign_attributes(service_params)
+    update_annotations(params[:tag_list], @service)
     respond_to do |format|
       if @service.save
         flash[:notice] = "#{t('service')} was successfully created."
@@ -29,6 +30,7 @@ class ServicesController < ApplicationController
   end
 
   def update
+    update_annotations(params[:tag_list], @service) if params.key?(:tag_list)
     respond_to do |format|
       if @service.update(service_params)
         flash[:notice] = "The #{t('service').capitalize} was successfully updated"
