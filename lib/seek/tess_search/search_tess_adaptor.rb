@@ -8,13 +8,9 @@ module Seek
       def perform_search(query)
         
         json = RestClient.get(TESS_BASE_URL + "/events.json_api?q=#{CGI.escape(query)}").body
-
-        puts 'Here is the RestClient result'
-        puts json
         
         json = JSON.parse(json)
         json['data'].collect do |result|
-          puts result
           TessSearchResult.new result
         end.compact.reject do |tess_result|
           tess_result.title.blank?
