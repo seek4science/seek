@@ -8,12 +8,12 @@ class TemplatesHelperTest < ActionView::TestCase
     
     test 'should load templates' do
         templates = load_templates
-				
-				assert_not_nil templates
-				assert_not_equal 0, templates.length
+        
+        assert_not_nil templates
+        assert_not_equal 0, templates.length
 
         test_template = templates.find { |i| i[:title] == "A Maximal Template"}
-				assert_not_nil test_template
+        assert_not_nil test_template
 
         assert_equal 'A Maximal Template', test_template[:title]
         assert_equal 'assay', test_template[:level]
@@ -22,8 +22,8 @@ class TemplatesHelperTest < ActionView::TestCase
     end
 
     test 'should not show private templates' do
-				assert_equal Template.all.length, load_templates.length
-				Factory(:template, policy: Factory(:policy, access_type: Policy::NO_ACCESS ))
-				assert_not_equal Template.all.length, load_templates.length
+        assert_equal Template.all.length, load_templates.length
+        Factory(:template, policy: Factory(:policy, access_type: Policy::NO_ACCESS ))
+        assert_not_equal Template.all.length, load_templates.length
     end
 end

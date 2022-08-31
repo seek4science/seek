@@ -2,7 +2,7 @@ require 'test_helper'
 
 class SamplesControllerTest < ActionController::TestCase
 
-	fixtures :isa_tags
+  fixtures :isa_tags
 
   include AuthenticatedTestHelper
   include SharingFormTestHelper
@@ -475,7 +475,7 @@ class SamplesControllerTest < ActionController::TestCase
     assert_routing 'sample_types/7/samples', controller: 'samples', action: 'index', sample_type_id: '7'
   end
 
-	test 'filter by tempalte route' do
+  test 'filter by tempalte route' do
     assert_routing 'templates/7/samples', controller: 'samples', action: 'index', template_id: '7'
   end
 
@@ -492,9 +492,9 @@ class SamplesControllerTest < ActionController::TestCase
     refute_includes samples, sample2
   end
 
-	test 'filter by template' do
-		template1 = Factory(:template, policy: Factory(:public_policy ))
-		template2 = Factory(:template, policy: Factory(:public_policy ))
+  test 'filter by template' do
+    template1 = Factory(:template, policy: Factory(:public_policy ))
+    template2 = Factory(:template, policy: Factory(:public_policy ))
     sample_type1 = Factory(:simple_sample_type, template_id: template1.id)
     sample_type2 = Factory(:simple_sample_type, template_id: template2.id)
     sample1 = Factory(:sample, sample_type: sample_type1, policy: Factory(:public_policy), title: 'SAMPLE 1')
@@ -544,9 +544,9 @@ class SamplesControllerTest < ActionController::TestCase
     assert_select '#samples-table tbody tr', count: 2
   end
 
-	test 'should get table view for template' do
+  test 'should get table view for template' do
     person = Factory(:person)
-		template =  Factory(:template, policy: Factory(:public_policy ))
+    template =  Factory(:template, policy: Factory(:public_policy ))
     sample_type = Factory(:simple_sample_type, template_id: template.id)
     2.times do # public
       Factory(:sample, sample_type: sample_type, contributor: person, policy: Factory(:private_policy))
@@ -976,10 +976,10 @@ class SamplesControllerTest < ActionController::TestCase
       end
     end
 
-		# For the Single Page to work properly, these must be included in the response
-		assert response.body.include?('results')
-		assert response.body.include?('errors')
-		assert response.body.include?('status')
+    # For the Single Page to work properly, these must be included in the response
+    assert response.body.include?('results')
+    assert response.body.include?('errors')
+    assert response.body.include?('status')
 
     samples = Sample.last(2)
     sample1 = samples.first
@@ -1035,9 +1035,9 @@ class SamplesControllerTest < ActionController::TestCase
       assert_equal [creator], sample1.creators
     end
 
-		# For the Single Page to work properly, these must be included in the response
-		assert response.body.include?('errors')
-		assert response.body.include?('status')
+    # For the Single Page to work properly, these must be included in the response
+    assert response.body.include?('errors')
+    assert response.body.include?('status')
 
     samples = Sample.limit(2)
 
@@ -1071,9 +1071,9 @@ class SamplesControllerTest < ActionController::TestCase
       delete :batch_delete, params: { data: [ {id: sample1.id}, {id: sample2.id}] }
     end
 
-			# For the Single Page to work properly, these must be included in the response
-			assert response.body.include?('errors')
-			assert response.body.include?('status')
+      # For the Single Page to work properly, these must be included in the response
+      assert response.body.include?('errors')
+      assert response.body.include?('status')
   end
 
   test 'JS request does not raise CORS error' do

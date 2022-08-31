@@ -2,7 +2,7 @@ require 'isatab_converter'
 class SinglePagesController < ApplicationController
   include Seek::AssetsCommon
   before_action :set_up_instance_variable
-  before_action :single_page_enabled
+  before_action :project_single_page_enabled?
   respond_to :html, :js
 
   def show
@@ -15,13 +15,6 @@ class SinglePagesController < ApplicationController
   end
   
   def index
-  end
-
-  def single_page_enabled
-    unless Seek::Config.project_single_page_enabled
-      flash[:error] = 'Not available'
-      redirect_to Project.find(params[:id])
-    end
   end
 
   def project_folders
@@ -42,7 +35,7 @@ class SinglePagesController < ApplicationController
       elsif params[:study_id]
         study = Study.find(params[:study_id]) if params[:study_id]
         assay = Assay.find(params[:assay_id]) if params[:assay_id]
-        data = helpers.dt_aggregated(study, params[:include_all_assays], assay)[:rows]
+        data = helpers.dt_aggregated(study, assay)[:rows]
       end
       data = data.map { |row| row.unshift('') } if params[:rows_pad]
       render json: { data: data }
@@ -52,16 +45,16 @@ class SinglePagesController < ApplicationController
   end
 
   def export_isa
-		begin
-			inv = Investigation.find(params[:investigation_id])
-			isa = IsaExporter::Exporter.new(inv).export
-			send_data isa, filename: 'isa.json', type: 'application/json', deposition: 'attachment'
-		rescue Exception => ex
-			respond_to do |format|
-				flash[:error] = ex.message
-				format.html { redirect_to single_page_path(Project.find(params[:id])) }
-			end
-		end
+    begin
+      inv = Investigation.find(params[:investigation_id])
+      isa = IsaExporter::Exporter.new(inv).export
+      send_data isa, filename: 'isa.json', type: 'application/json', deposition: 'attachment'
+    rescue Exception => ex
+      respond_to do |format|
+        flash[:error] = ex.message
+        format.html { redirect_to single_page_path(Project.find(params[:id])) }
+      end
+    end
   end
 
   private

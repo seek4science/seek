@@ -3,10 +3,10 @@ class Template < ApplicationRecord
 
   has_many :template_attributes, -> { order(:pos) }, inverse_of: :template, dependent: :destroy
   has_many :sample_types
-	has_many :samples, through: :sample_types
+  has_many :samples, through: :sample_types
 
   validates :title, presence: true
-  validates :title, uniqueness: { scope: :group }
+  validates :title, uniqueness: { scope: [:group, :version] }
 
   accepts_nested_attributes_for :template_attributes, allow_destroy: true
 
@@ -37,6 +37,6 @@ class Template < ApplicationRecord
       attribute.sample_controlled_vocab = nil unless attribute.sample_attribute_type.controlled_vocab?
     end
   end
-	
+  
 end
 

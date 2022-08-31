@@ -69,6 +69,7 @@ Templates.init = function (elem) {
   loadFilterSelectors(templates);
   loadTemplates(templates);
   setTemplate();
+	setDefaultLevel()
 };
 
 const remove = (e) =>{
@@ -211,6 +212,16 @@ const showTemplateModal = () => {
   $j("#existing_templates").modal("show");
 };
 
+const setDefaultLevel = () => {
+	const href = window.location.href;
+	if (href.includes("isa_studies")) {
+		$j("#templates_type_select").val("study").change();
+		$j("#templates_type_select option[value='assay']").attr("disabled","disabled")
+	} else if (href.includes("isa_assays")) {
+		$j("#templates_type_select").val("assay").change();
+		$j("#templates_type_select option[value='study']").attr("disabled","disabled")
+	}
+};
 const initSelect2 = (elem, parentElem)=>{
 	elem.select2({
 		theme: "bootstrap",

@@ -8,7 +8,7 @@ class SamplesController < ApplicationController
   before_action :samples_enabled?
   before_action :find_index_assets, only: :index
   before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview]
-	before_action :templates_enabled?, only: [:query, :query_form]
+  before_action :templates_enabled?, only: [:query, :query_form]
   
   before_action :auth_to_create, only: [:new, :create]
 
@@ -222,8 +222,8 @@ class SamplesController < ApplicationController
     end
 
     if params[:input_template_id].present? # linked
-			title =
-    		TemplateAttribute.find(params[:input_attribute_id]).title if params[:input_attribute_id].present?
+      title =
+        TemplateAttribute.find(params[:input_attribute_id]).title if params[:input_attribute_id].present?
       @result = find_samples(@result, :linked_samples,
         { attribute_id: params[:input_attribute_id],
           attribute_value: params[:input_attribute_value],
@@ -231,8 +231,8 @@ class SamplesController < ApplicationController
     end
 
     if params[:output_template_id].present? # linking
-			title =
-   		 TemplateAttribute.find(params[:output_attribute_id]).title if params[:output_attribute_id].present?
+      title =
+        TemplateAttribute.find(params[:output_attribute_id]).title if params[:output_attribute_id].present?
       @result = find_samples(@result, :linking_samples,
         { attribute_id: params[:output_attribute_id],
           attribute_value: params[:output_attribute_value],
@@ -308,7 +308,7 @@ class SamplesController < ApplicationController
     end
   end
 
-	def templates_enabled?
+  def templates_enabled?
     unless Seek::Config.sample_type_template_enabled
       flash[:error] = 'Not available'
       redirect_to select_sample_types_path

@@ -105,7 +105,7 @@ class ApplicationRecord < ActiveRecord::Base
         search.hits.map(&:primary_key)
       end
 
-      find(ids)
+      where(id: ids)
     else
       all
     end

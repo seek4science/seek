@@ -69,7 +69,8 @@ module RelatedItemsHelper
     person_id
   end
 
-  def related_items_hash(items_hash, limit = nil, reorder = true)
+  # Use order: false to prevent ordering
+  def related_items_hash(items_hash, limit = nil, order: nil)
     hash = {}
     items_hash.each_key do |type|
 
@@ -81,16 +82,18 @@ module RelatedItemsHelper
       hash[type][:extra_count] = 0
 
       if hash[type][:items].any?
+        type_order = nil
+        type_order = Seek::ListSorter.order_from_keys(order) if order.is_a?(Symbol)
+        type_order = Seek::ListSorter.order_for_view(type, :related) if order.nil?
+        if type_order
+          hash[type][:items] = Seek::ListSorter.sort_by_order(hash[type][:items], type_order)
+        end
         total = hash[type][:items].to_a
         total_count = hash[type][:items_count]
         hash[type][:items] = hash[type][:items].authorized_for('view', User.current_user).to_a
         hash[type][:items_count] = hash[type][:items].count
         hash[type][:hidden_count] = total_count - hash[type][:items_count]
         hash[type][:hidden_items] = total - hash[type][:items]
-
-        if reorder
-          hash[type][:items] = Seek::ListSorter.sort_by_order(hash[type][:items], Seek::ListSorter.order_for_view(type, :related))
-        end
 
         if limit && hash[type][:items_count] > limit
           hash[type][:items] = hash[type][:items].first(limit)
