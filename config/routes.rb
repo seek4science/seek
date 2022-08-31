@@ -755,6 +755,7 @@ SEEK::Application.routes.draw do
       post :populate_template
     end
     resources :samples
+    resources :projects, :people, only: [:index]
   end
 
   ### SINGLE PAGE

@@ -42,6 +42,9 @@ class Sample < ApplicationRecord
   after_save :queue_sample_type_update_job
   after_destroy :queue_sample_type_update_job
 
+
+  has_filter :sample_type
+
   def sample_type=(type)
     super
     @data = Seek::JSONMetadata::Data.new(type)
