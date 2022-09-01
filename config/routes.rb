@@ -405,7 +405,7 @@ SEEK::Application.routes.draw do
       get :request_all_sharing_form
       get  :typeahead
     end
-    resources :people, :programmes, :projects, :facilities, :specimens, only: [:index]
+    resources :people, :programmes, :projects, :facilities, :services, :specimens, only: [:index]
     resources :avatars do
       member do
         post :select
