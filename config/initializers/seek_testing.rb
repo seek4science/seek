@@ -131,9 +131,9 @@ def load_seek_testing_defaults!
 
       Settings.defaults[:ga4gh_trs_api_enabled] = true
 
-      Settings.defaults[:life_monitor_url] = 'https://localhost:8000'
-      Settings.defaults[:life_monitor_client_id] = 'xyz'
-      Settings.defaults[:life_monitor_client_secret] = 'xyzabc'
+      Settings.defaults[:life_monitor_url] = 'https://localhost:8443'
+      Settings.defaults[:life_monitor_client_id] = 'fWWLbOAw0pLlRKIWOQlkO4b4'
+      Settings.defaults[:life_monitor_client_secret] = 'Ne1kK6NljWRayqzDfgMWBfVplkRGZto6MCjdfhK1jY7r8RVp'
       Settings.defaults[:git_support_enabled] = true
       Settings.defaults[:fair_signposting_enabled] = true
     end

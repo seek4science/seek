@@ -1657,7 +1657,7 @@ ActiveRecord::Schema.define(version: 2022_07_07_145032) do
     t.datetime "updated_at"
   end
 
-  create_table "resource_publish_logs", id: :integer, force: :cascade do |t|
+  create_table "resource_publish_logs", id: :integer,  force: :cascade do |t|
     t.string "resource_type"
     t.integer "resource_id"
     t.integer "user_id"
@@ -1805,7 +1805,7 @@ ActiveRecord::Schema.define(version: 2022_07_07_145032) do
 
   create_table "sessions", force: :cascade do |t|
     t.string "session_id", null: false
-    t.text "data", size: :medium
+    t.text "data", limit: 16777215
     t.datetime "created_at"
     t.datetime "updated_at"
     t.index ["session_id"], name: "index_sessions_on_session_id"
@@ -2135,7 +2135,7 @@ ActiveRecord::Schema.define(version: 2022_07_07_145032) do
   create_table "text_values", force: :cascade do |t|
     t.integer "version"
     t.integer "version_creator_id"
-    t.text "text", size: :medium, null: false
+    t.text "text", limit: 16777215, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

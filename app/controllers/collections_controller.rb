@@ -16,7 +16,7 @@ class CollectionsController < ApplicationController
     respond_to do |format|
       format.html
       format.rdf { render template: 'rdf/show' }
-      format.json { render json: @collection, scope: { requested_version: params[:version] }, include: json_api_include_param }
+      format.json { render json: @collection, include: json_api_include_param }
     end
   end
 
