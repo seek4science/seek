@@ -5,7 +5,7 @@
         <% if @programme %>
           <% if @programme.id.nil? %>
             <%
-              mail_recipients = "#{Seek::Config.instance_admins_name} administrators"
+              mail_recipients = "#{Seek::Config.instance_name} administrators"
               to_be_created = "#{t('programme')} and #{t('project')}"
             %>
             <p>
@@ -61,10 +61,11 @@
   </div>
 </div>
 
-
-<p class="text-center">
-  <strong>
-  An email has been sent to the <%= mail_recipients %> and you will receive an email when the <%= to_be_created %> has been created,
-  or an email about why your request was declined.
-  </strong>
-</p>
+<% if Seek::Config.email_enabled %>
+  <p class="text-center">
+    <strong>
+    An email has been sent to the <%= mail_recipients %> and you will receive an email when the <%= to_be_created %> has been created,
+    or an email about why your request was declined.
+    </strong>
+  </p>
+<% end %>

@@ -1,0 +1,33 @@
+<h1>New <%= t('placeholder') %></h1>
+
+<%= form_tag({:action => :create}, :multipart => true) do -%>
+    <div class="asset_form">
+      <%= error_messages_for :placeholder -%>
+
+      <div class="form-group">
+        <label class="required">Title</label>
+        <% placeholder_title_value = (params[:placeholder].blank? || params[:placeholder][:title].blank?) ? nil : params[:placeholder][:title] -%>
+        <%= text_field_tag 'placeholder[title]', placeholder_title_value, :class=>"form-control" -%>
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <% placeholder_description_value = (params[:placeholder].blank? || params[:placeholder][:description].blank?) ? nil : params[:placeholder][:description] -%>
+        <%= text_area_tag 'placeholder[description]', placeholder_description_value, :class=>"form-control rich-text-edit" -%>
+      </div>
+
+      <%= render :partial => "assets/select_template", :locals => {:resource => @placeholder,
+      :templates => FileTemplate.all } %>
+      
+      <%= render :partial => "projects/project_selector", :locals => { :resource => @placeholder } %>
+
+      <%= render partial: 'assets/controlled_vocab_annotations_form_properties', :locals => { :resource => @placeholder } -%>
+
+      <%= render :partial => 'assets/license_selector', :locals => { :resource => @placeholder } %>
+
+      <%= fields_for(@placeholder) { |f| render :partial=>"assets/asset_form_bottom", :locals=> {:show_publications=>false, :f => f} }-%>
+
+      <%= form_submit_buttons(@placeholder) %>
+
+    </div>
+<% end -%>

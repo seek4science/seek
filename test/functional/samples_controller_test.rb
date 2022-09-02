@@ -2,15 +2,12 @@ require 'test_helper'
 
 class SamplesControllerTest < ActionController::TestCase
 
+  fixtures :isa_tags
+
   include AuthenticatedTestHelper
-  include RestTestCases
   include SharingFormTestHelper
   include HtmlHelper
   include GeneralAuthorizationTestCases
-
-  def rest_api_test_object
-    @object = Factory(:sample, policy: Factory(:public_policy))
-  end
 
   test 'should return 406 when requesting RDF' do
     login_as(Factory(:user))
@@ -478,6 +475,10 @@ class SamplesControllerTest < ActionController::TestCase
     assert_routing 'sample_types/7/samples', controller: 'samples', action: 'index', sample_type_id: '7'
   end
 
+  test 'filter by tempalte route' do
+    assert_routing 'templates/7/samples', controller: 'samples', action: 'index', template_id: '7'
+  end
+
   test 'filter by sample type' do
     sample_type1 = Factory(:simple_sample_type)
     sample_type2 = Factory(:simple_sample_type)
@@ -485,6 +486,21 @@ class SamplesControllerTest < ActionController::TestCase
     sample2 = Factory(:sample, sample_type: sample_type2, policy: Factory(:public_policy), title: 'SAMPLE 2')
 
     get :index, params: { sample_type_id: sample_type1.id }
+    assert_response :success
+    assert samples = assigns(:samples)
+    assert_includes samples, sample1
+    refute_includes samples, sample2
+  end
+
+  test 'filter by template' do
+    template1 = Factory(:template, policy: Factory(:public_policy ))
+    template2 = Factory(:template, policy: Factory(:public_policy ))
+    sample_type1 = Factory(:simple_sample_type, template_id: template1.id)
+    sample_type2 = Factory(:simple_sample_type, template_id: template2.id)
+    sample1 = Factory(:sample, sample_type: sample_type1, policy: Factory(:public_policy), title: 'SAMPLE 1')
+    sample2 = Factory(:sample, sample_type: sample_type2, policy: Factory(:public_policy), title: 'SAMPLE 2')
+
+    get :index, params: { template_id: template1.id }
     assert_response :success
     assert samples = assigns(:samples)
     assert_includes samples, sample1
@@ -522,6 +538,26 @@ class SamplesControllerTest < ActionController::TestCase
     login_as(person.user)
 
     get :index, params: { sample_type_id: sample_type.id }
+
+    assert_response :success
+
+    assert_select '#samples-table tbody tr', count: 2
+  end
+
+  test 'should get table view for template' do
+    person = Factory(:person)
+    template =  Factory(:template, policy: Factory(:public_policy ))
+    sample_type = Factory(:simple_sample_type, template_id: template.id)
+    2.times do # public
+      Factory(:sample, sample_type: sample_type, contributor: person, policy: Factory(:private_policy))
+    end
+    3.times do # private
+      Factory(:sample, sample_type: sample_type, policy: Factory(:private_policy))
+    end
+
+    login_as(person.user)
+
+    get :index, params: { template_id: template.id }
 
     assert_response :success
 
@@ -678,7 +714,7 @@ class SamplesControllerTest < ActionController::TestCase
     end
 
     assert_response :success
-    assert_select 'div.related-items a[href=?]', sample_samples_path(sample), text: "View all 2 items"
+    assert_select 'div.related-items a[href=?]', sample_samples_path(sample), text: "Advanced Samples list for this Sample with search and filtering ..."
   end
 
   test 'related samples index page works correctly' do
@@ -922,27 +958,39 @@ class SamplesControllerTest < ActionController::TestCase
 
   test 'batch_create' do
     person = Factory(:person)
-    creator = Factory(:person)
     login_as(person)
     type = Factory(:patient_sample_type)
+    assay = Factory(:assay, contributor: person)
     assert_difference('Sample.count', 2) do
-        post :batch_create, params: {data:[
-        {ex_id: "1",data:{type: "samples", attributes:{attribute_map:{"full name": 'Fred Smith', "age": '22', "weight": '22.1' ,"postcode": 'M13 9PL'}},
-        tags: nil,relationships:{projects:{data:[{id: person.projects.first.id, type: "projects"}]},
-        sample_type:{ data:{id: type.id, type: "sample_types"}}}}},
-        {ex_id: "2", data:{type: "samples",attributes:{attribute_map:{"full name": 'David Tailor', "age": '33', "weight": '33.1' ,"postcode": 'M12 8PL'}},
-        tags: nil,relationships:{projects:{data:[{id: person.projects.first.id, type: "projects"}]},
-        sample_type:{data:{id: type.id, type: "sample_types"}}}}}]}
+      assert_difference('AssayAsset.count', 1) do
+          post :batch_create, params: { data: [
+            { ex_id: "1", data: { type: "samples",
+                                  attributes: { attribute_map: { "full name": 'Fred Smith', "age": '22', "weight": '22.1', "postcode": 'M13 9PL' } },
+                                  relationships: { assays: { data: [{ id: assay.id, type: 'assays' }] },
+                                                    projects: { data: [{ id: person.projects.first.id, type: "projects" }] },
+                                                    sample_type: { data: { id: type.id, type: "sample_types" } } } } },
+            { ex_id: "2", data: { type: "samples",
+                                  attributes: { attribute_map: { "full name": 'David Tailor', "age": '33', "weight": '33.1', "postcode": 'M12 8PL' } },
+                                  relationships: { projects: { data: [{ id: person.projects.first.id, type: "projects" }] },
+                                                    sample_type: { data: { id: type.id, type: "sample_types" } } } } }] }
+      end
     end
 
-    sample1 = Sample.all.first
+    # For the Single Page to work properly, these must be included in the response
+    assert response.body.include?('results')
+    assert response.body.include?('errors')
+    assert response.body.include?('status')
+
+    samples = Sample.last(2)
+    sample1 = samples.first
     assert_equal 'Fred Smith', sample1.title
     assert_equal 'Fred Smith', sample1.get_attribute_value('full name')
     assert_equal '22', sample1.get_attribute_value(:age)
     assert_equal '22.1', sample1.get_attribute_value(:weight)
     assert_equal 'M13 9PL', sample1.get_attribute_value(:postcode)
+    assert_equal [assay], sample1.assays
 
-    sample2 = Sample.limit(2)[1]
+    sample2 = samples.last
     assert_equal 'David Tailor', sample2.title
     assert_equal 'David Tailor', sample2.get_attribute_value('full name')
     assert_equal '33', sample2.get_attribute_value(:age)
@@ -987,6 +1035,10 @@ class SamplesControllerTest < ActionController::TestCase
       assert_equal [creator], sample1.creators
     end
 
+    # For the Single Page to work properly, these must be included in the response
+    assert response.body.include?('errors')
+    assert response.body.include?('status')
+
     samples = Sample.limit(2)
 
     first_updated_sample = samples[0]
@@ -1018,8 +1070,134 @@ class SamplesControllerTest < ActionController::TestCase
     assert_difference('Sample.count', -2) do
       delete :batch_delete, params: { data: [ {id: sample1.id}, {id: sample2.id}] }
     end
+
+      # For the Single Page to work properly, these must be included in the response
+      assert response.body.include?('errors')
+      assert response.body.include?('status')
   end
 
+  test 'JS request does not raise CORS error' do
+    sample = Factory(:sample)
+    login_as(sample.contributor)
+
+    assert_raises(ActionController::UnknownFormat) do
+      get :show, params: { id: sample.id, format: :js }
+    end
+  end
+
+  test 'should show query form' do
+    with_config_value(:sample_type_template_enabled, true) do
+      get :query_form
+      assert_response :success
+    end
+  end
+
+  test 'should populate user projects in query form' do
+    with_config_value(:sample_type_template_enabled, true) do
+      person = Factory(:person)
+      person.add_to_project_and_institution(Factory(:project), Factory(:institution))
+      login_as(person)
+
+      get :query_form
+      assert_response :success
+      assert_select '#projects' do |options|
+        assert_select options, 'option', Project.all.length
+      end
+    end
+  end
+
+  test 'should not return private samples with basic query' do
+    with_config_value(:sample_type_template_enabled, true) do
+      person = Factory(:person)
+      template = Factory(:template)
+      sample_type = Factory(:simple_sample_type, template_id: template.id)
+      sample1 = Factory(:sample, sample_type: sample_type, contributor: person)
+      sample2 = Factory(:sample, sample_type: sample_type, contributor: person)
+      sample3 = Factory(:sample, sample_type: sample_type)
+
+      login_as(person)
+
+      post :query, xhr: true, params: { template_id: template.id }
+      assert_response :success
+      assert result = assigns(:result)
+      assert_equal 2, result.length
+    end
+  end
+
+  test 'should return max query result' do
+    with_config_value(:sample_type_template_enabled, true) do
+      person = Factory(:person)
+      project = Factory(:project)
+
+      template1 = Factory(:isa_source_template)
+      template2 = Factory(:isa_sample_collection_template)
+      template3 = Factory(:isa_assay_template)
+
+      type1 = Factory(:isa_source_sample_type, contributor: person, project_ids: [project.id], isa_template: template1)
+      type2 = Factory(:isa_sample_collection_sample_type, contributor: person, project_ids: [project.id],
+                                                          isa_template: template2, linked_sample_type: type1)
+      type3 = Factory(:isa_assay_sample_type, contributor: person, project_ids: [project.id], isa_template: template3,
+                                              linked_sample_type: type2)
+
+      sample1 = Factory :sample, title: 'sample1', sample_type: type1, project_ids: [project.id], contributor: person,
+                                 data: { 'Source Name': 'Source Name', 'Source Characteristic 1': 'Source Characteristic 1', 'Source Characteristic 2': "Cox's Orange Pippin" }
+
+      sample2 = Factory :sample, title: 'sample2', sample_type: type2, project_ids: [project.id], contributor: person,
+                                 data: { Input: [sample1.id], 'sample collection': 'sample collection', 'sample collection parameter value 1': 'sample collection parameter value 1', 'Sample Name': 'sample name', 'sample characteristic 1': 'sample characteristic 1' }
+
+      sample3 = Factory :sample, title: 'sample3', sample_type: type3, project_ids: [project.id], contributor: person,
+                                 data: { Input: [sample2.id], 'Protocol Assay 1': 'Protocol Assay 1', 'Assay 1 parameter value 1': 'Assay 1 parameter value 1', 'Extract Name': 'Extract Name', 'other material characteristic 1': 'other material characteristic 1' }
+
+      login_as(person)
+
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template2.id,
+        template_attribute_id: template2.template_attributes.second.id,
+        template_attribute_value: 'collection',
+        input_template_id: template1.id,
+        input_attribute_id: template1.template_attributes.third.id,
+        input_attribute_value: "x's",
+        output_template_id: template3.id,
+        output_attribute_id: template3.template_attributes.second.id,
+        output_attribute_value: '1'
+      }
+
+      assert_response :success
+      assert result = assigns(:result)
+      assert_equal 1, result.length
+
+      # Query for sample's grandparents
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template3.id,
+        template_attribute_id: template3.template_attributes.second.id,
+        template_attribute_value: 'Protocol',
+        input_template_id: template1.id,
+        input_attribute_id: template1.template_attributes.third.id,
+        input_attribute_value: "x's"
+      }
+
+      assert_response :success
+      assert result = assigns(:result)
+      assert_equal 1, result.length
+
+      # Query for sample's grandchildren
+      post :query, xhr: true, params: {
+        project_ids: [project.id],
+        template_id: template1.id,
+        template_attribute_id: template1.template_attributes.third.id,
+        template_attribute_value: "x's",
+        output_template_id: template3.id,
+        output_attribute_id: template3.template_attributes.second.id,
+        output_attribute_value: 'Protocol'
+      }
+
+      assert_response :success
+      assert result = assigns(:result)
+      assert_equal 1, result.length
+    end
+  end
 
   private
 

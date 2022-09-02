@@ -6,19 +6,31 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
     opts = opts || {};
 
     $j('table tfoot th', selector).each( function () {
-        var title = $j(this).text();
+        var title = $j(this).data().searchTitle;
         $j(this).html('<input type="text" class="form-control" placeholder="Search '+title+'" />');
     });
 
     var options = $j.extend({}, opts, {
         "lengthMenu": [ 5, 10, 25, 50, 75, 100 ],
         "pageLength": 10,
-        dom: 'lr<"samples-table-container"t>ip', // Needed to place the buttons
+        dom: '<"row"<"col-sm-10"lr><"col-sm-2 text-right"B>><"samples-table-container"t>ip', // Needed to place the buttons
         "columnDefs": [{
             "targets": [ 0, 1 ],
             "visible": false,
             "searchable": false
-        }]
+        }],
+				buttons: [
+					{
+							extend: 'csvHtml5',
+							text: 'Export table',
+							exportOptions: {
+									columns: [':visible']
+							}
+					}
+				],
+				initComplete: function () {
+					if(opts.hideEmptyColumns) hideEmptyColumns(this);
+				}
         //"initComplete": function () {  // THIS IS TOO SLOW - CRASHES BROWSER
         //    console.log("Hiding empty columns");
         //    table.columns().flatten().each(function (columnIndex) {
@@ -168,3 +180,10 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
     });
     return table;
 };
+
+function hideEmptyColumns(selector) {
+	const table = $j(selector).DataTable()
+	table.columns().every(function(idx) {
+		if (!this.data().toArray().some(x=>x)) table.column(idx).visible(false)
+	});
+}

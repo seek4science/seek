@@ -1,0 +1,27 @@
+<h1>Freeze Version</h1>
+
+<div class="row">
+  <div class="col-sm-6">
+    <h2>Version Information</h2>
+    <%= form_for(@git_version, as: :git_version, url: polymorphic_path([@parent_resource, :git_freeze], version: @git_version.version), method: :post) do |f| %>
+      <div class="form-group">
+        <label>Name</label>
+        <%= f.text_field(:name, class: 'form-control') %>
+      </div>
+
+      <div class="form-group">
+        <label>Comment</label>
+        <%= f.text_area(:comment, class: 'form-control') %>
+      </div>
+
+      <%= f.submit('Freeze', class: 'btn btn-primary') %> or <%= cancel_button(@parent_resource) %>
+    <% end %>
+  </div>
+  <div class="col-sm-6">
+    <h2>Contents</h2>
+    <strong>Total size: </strong> <%= number_to_human_size @git_version.total_size -%><br/>
+    <strong>Commit: </strong> <code><%= @git_version.commit %></code><br/>
+    <hr/>
+    <%= render partial: 'git/jstree', locals: { tree: @git_version.tree } %>
+  </div>
+</div>

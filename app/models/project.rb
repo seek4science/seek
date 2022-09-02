@@ -1,6 +1,7 @@
 class Project < ApplicationRecord
   include Seek::Annotatable
   include HasSettings
+  include Seek::Roles::Scope
 
   acts_as_yellow_pages
   title_trimmer
@@ -12,7 +13,6 @@ class Project < ApplicationRecord
   has_and_belongs_to_many :models
   has_and_belongs_to_many :sops
   has_and_belongs_to_many :workflows
-  has_and_belongs_to_many :nodes
   has_and_belongs_to_many :publications
   has_and_belongs_to_many :events
   has_and_belongs_to_many :presentations
@@ -20,13 +20,15 @@ class Project < ApplicationRecord
   has_and_belongs_to_many :samples
   has_and_belongs_to_many :sample_types
   has_and_belongs_to_many :documents
+  has_and_belongs_to_many :file_templates
+  has_and_belongs_to_many :placeholders
   has_and_belongs_to_many :collections
+  has_and_belongs_to_many :templates
 
   has_many :work_groups, dependent: :destroy, inverse_of: :project
   has_many :institutions, through: :work_groups, inverse_of: :projects
   has_many :group_memberships, through: :work_groups, inverse_of: :project
-  # OVERRIDDEN in Seek::ProjectHierarchy if Seek::Config.project_hierarchy_enabled
-  has_many :people, -> { distinct }, through: :group_memberships
+  has_many :people, -> { distinct }, through: :group_memberships, inverse_of: :projects
 
   has_many :former_group_memberships, -> { where('time_left_at IS NOT NULL AND time_left_at <= ?', Time.now) },
            through: :work_groups, source: :group_memberships
@@ -36,25 +38,19 @@ class Project < ApplicationRecord
            through: :work_groups, source: :group_memberships
   has_many :current_people, through: :current_group_memberships, source: :person
 
-  has_many :admin_defined_role_projects
-
   has_many :openbis_endpoints
 
   has_annotation_type :funding_code
 
+  enum status: [:planned, :running, :completed, :cancelled, :failed]
+  belongs_to :assignee, class_name: 'Person'
+  
   belongs_to :programme
   has_filter programme: Seek::Filtering::Filter.new(
       value_field: 'programmes.id',
       label_field: 'programmes.title',
       joins: [:programme]
   )
-
-  # for handling the assignment for roles
-  attr_accessor :project_administrator_ids, :asset_gatekeeper_ids, :pal_ids, :asset_housekeeper_ids
-  after_save :handle_project_administrator_ids, if: -> { @project_administrator_ids }
-  after_save :handle_asset_gatekeeper_ids, if: -> { @asset_gatekeeper_ids }
-  after_save :handle_pal_ids, if: -> { @pal_ids }
-  after_save :handle_asset_housekeeper_ids, if: -> { @asset_housekeeper_ids }
 
   scope :without_programme, -> { where('programme_id IS NULL') }
 
@@ -77,6 +73,8 @@ class Project < ApplicationRecord
   #  is to be used)
   belongs_to :default_policy, class_name: 'Policy', dependent: :destroy, autosave: true
 
+  has_controlled_vocab_annotations :topics
+
   # FIXME: temporary handler, projects need to support multiple programmes
   def programmes
     Programme.where(id: programme_id)
@@ -94,8 +92,16 @@ class Project < ApplicationRecord
   has_many :dependent_permissions, class_name: 'Permission', as: :contributor, dependent: :destroy
 
   def assets
-    data_files | sops | models | publications | presentations | documents | workflows | nodes | collections
+    data_files | sops | models | publications | presentations | documents | workflows | collections
   end
+
+  def project_assets
+    assets.select { |a| a.investigations.empty? }
+  end
+
+  def spreadsheets
+    data_files.select { |d| d.contains_extractable_spreadsheet?}
+  end    
 
   def institutions=(new_institutions)
     new_institutions = Array(new_institutions).map do |i|
@@ -109,43 +115,17 @@ class Project < ApplicationRecord
     end
   end
 
-  # this is project role
-  def pis
-    pi_role = ProjectPosition.find_by_name('PI')
-    people.select { |p| p.project_positions_of_project(self).include?(pi_role) }
-  end
+  has_many :pal_roles, -> { where(role_type_id: RoleType.find_by_key!(:pal)) }, as: :scope, class_name: 'Role'
+  has_many :pals, through: :pal_roles, class_name: 'Person', source: :person
 
-  # this is seek role
-  def asset_housekeepers
-    people_with_the_role(Seek::Roles::ASSET_HOUSEKEEPER)
-  end
+  has_many :project_administrator_roles, -> { where(role_type_id: RoleType.find_by_key!(:project_administrator)) }, as: :scope, class_name: 'Role'
+  has_many :project_administrators, through: :project_administrator_roles, class_name: 'Person', source: :person
 
-  # this is seek role
-  def project_administrators
-    people_with_the_role(Seek::Roles::PROJECT_ADMINISTRATOR)
-  end
+  has_many :asset_housekeeper_roles, -> { where(role_type_id: RoleType.find_by_key!(:asset_housekeeper)) }, as: :scope, class_name: 'Role'
+  has_many :asset_housekeepers, through: :asset_housekeeper_roles, class_name: 'Person', source: :person
 
-  # this is seek role
-  def asset_gatekeepers
-    people_with_the_role(Seek::Roles::ASSET_GATEKEEPER)
-  end
-
-  def pals
-    people_with_the_role(Seek::Roles::PAL)
-  end
-    
-  # Returns the columns to be shown on the table view for the resource
-  def columns_default
-    super + ['web_page']
-  end
-  def columns_allowed
-    columns_default + ['wiki_page','start_date','end_date']
-  end
-
-  # returns people belong to the admin defined seek 'role' for this project
-  def people_with_the_role(role)
-    Seek::Roles::ProjectRelatedRoles.instance.people_with_project_and_role(self, role)
-  end
+  has_many :asset_gatekeeper_roles, -> { where(role_type_id: RoleType.find_by_key!(:asset_gatekeeper)) }, as: :scope, class_name: 'Role'
+  has_many :asset_gatekeepers, through: :asset_gatekeeper_roles, class_name: 'Person', source: :person
 
   def locations
     # infer all project's locations from the institutions where the person is member of
@@ -218,13 +198,6 @@ class Project < ApplicationRecord
     end
   end
 
-  def person_roles(person)
-    # Get intersection of all project memberships + person's memberships to find project membership
-    project_memberships = work_groups.collect(&:group_memberships).flatten
-    person_project_membership = person.group_memberships & project_memberships
-    person_project_membership.project_positions
-  end
-
   def can_edit?(user = User.current_user)
     return false unless user
     return true if new_record? && self.class.can_create?
@@ -246,44 +219,6 @@ class Project < ApplicationRecord
     User.admin_logged_in? ||
       User.activated_programme_administrator_logged_in? ||
         (user && Programme.any? { |p| p.allows_user_projects? })
-  end
-
-  # set the administrators, assigned from the params to :project_administrator_ids
-  def handle_project_administrator_ids
-    handle_admin_role_ids Seek::Roles::PROJECT_ADMINISTRATOR
-  end
-
-  # set the gatekeepers, assigned from the params to :asset_gatekeeper_ids
-  def handle_asset_gatekeeper_ids
-    handle_admin_role_ids Seek::Roles::ASSET_GATEKEEPER
-  end
-
-  # set the pals, assigned from the params to :pal_ids
-  def handle_pal_ids
-    handle_admin_role_ids Seek::Roles::PAL
-  end
-
-  # set the asset housekeepers, assigned from the params to :asset_housekeeper_ids
-  def handle_asset_housekeeper_ids
-    handle_admin_role_ids Seek::Roles::ASSET_HOUSEKEEPER
-  end
-
-  # general method for assigning the people with roles, according to the role passed in.
-  # e.g. for a role of :gatekeeper, gatekeeper_ids attribute is used to set the people for that role
-  def handle_admin_role_ids(role)
-    current_members = send(role.to_s.pluralize)
-    new_members = Person.find(send("#{role}_ids"))
-
-    to_add = new_members - current_members
-    to_remove = current_members - new_members
-    to_add.each do |person|
-      person.send("is_#{role}=", [true, self])
-      disable_authorization_checks { person.save! }
-    end
-    to_remove.each do |person|
-      person.send("is_#{role}=", [false, self])
-      disable_authorization_checks { person.save! }
-    end
   end
 
   def total_asset_size
@@ -326,9 +261,4 @@ class Project < ApplicationRecord
     end
   end
 
-  # should put below at the bottom in order to override methods for hierarchies,
-  # Try to find a better way for overriding methods regardless where to include the module
-  if Seek::Config.project_hierarchy_enabled
-    include Seek::ProjectHierarchies::ProjectExtension
-  end
 end

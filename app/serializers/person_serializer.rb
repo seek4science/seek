@@ -15,18 +15,6 @@ class PersonSerializer < AvatarObjSerializer
     object.orcid_uri
   end
 
-  attribute :project_positions do
-    positions = []
-    object.group_memberships.each do |gm|
-      gm.project_positions.each do |pos|
-        positions.append({ project_id: gm.project.id.to_s,
-                    position_id:  pos.id.to_s,
-                    position_name: pos.name })
-      end
-    end
-    positions
-  end
-
   attribute :login, if: -> { User.current_user&.is_admin? } do
     object&.user&.login
   end

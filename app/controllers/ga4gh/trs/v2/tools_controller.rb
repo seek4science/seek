@@ -6,11 +6,11 @@ module Ga4gh
         before_action :get_tool, only: [:show]
 
         def show
-          respond_with(@tool, adapter: :attributes)
+          respond_with(@tool, adapter: :attributes, root: '')
         end
 
         def index
-          respond_with(@tools, adapter: :attributes)
+          respond_with(@tools, adapter: :attributes, root: '')
         end
 
         private

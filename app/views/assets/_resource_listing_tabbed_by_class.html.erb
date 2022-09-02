@@ -2,45 +2,53 @@
 <%# different types of assets will be placed in different tabs based on their class; -%>
 <%# the partial requires 3 parameters to be defined: -%>
 <%# - resource_hash: a hash of all resource instances, where keys are resource class names and values are arrays of resource instances of that class -%>
-<%# - narrow_view: type of the partial to use for asset listings: 'false' to use the same partial with much info as on SOPs listing page -%>
-<%#                                                               'true' to use a partial with fewer information; suitable for 'show' pages for people/projects -%>
+
 <%
    actions_partial_disable ||= false
    item ||= nil
-   hide_view_all ||= false
    display_immediately ||= false
    index_params ||= {}
 
    ordered_resource_types = prepare_resource_hash(resource_hash)
 
-   any = resource_hash.any? { |key, res| res[:items_count] > 0 || res[:hidden_count] > 0 }
+   query = index_params.dig(:filter, :query)
+
+   any_list_items = resource_hash.any? { |key, res| res[:items_count] > 0 || res[:hidden_count] > 0 }
 %>
 
-<% if any %>
+<% if any_list_items %>
     <div class="tabpanel related-items">
       <%= render :partial => 'assets/resource_listing_tab_nav', :locals => { :types => ordered_resource_types } %>
       <div class="tab-content">
         <% active = true %>
         <% ordered_resource_types.each_with_index do |type, i| -%>
+
             <% unless type[:items].empty? && (type[:hidden_count] == 0) %>
                 <div id="<%= type[:tab_id] -%>" role="tabpanel" class="tab-pane <%= 'active' if active -%>">
+
+                  <% if type[:extra_count] > 0 %>
+                    Showing <%= type[:items_count] %> out of a possible <%= pluralize(resource_type_total_visible_count(type),'item') %>
+                  <% end %>
+
+                  <% if !type[:is_external] && type[:type].constantize.available_filters.any? %>
+                    <% if query  %>
+
+                      <%= link_to "Advanced #{type[:visible_resource_type]} search with filtering ...",
+                                  polymorphic_path(type[:type].tableize.to_sym,
+                                                   'filter[query]':query), class:'pull-right'  %>
+                    <% elsif item %>
+                      <%= link_to "Advanced #{type[:visible_resource_type]} list for this #{internationalized_resource_name(item.model_name.to_s, false)} with search and filtering ...",
+                                  [item, type[:type].tableize.to_sym], class:'pull-right'  %>
+
+                    <% end %>
+                  <% end %>
+
                   <% unless type[:items].empty? %>
                       <%= render :partial => "assets/resource_list", :locals => { :collection => type[:items],
                                                                                   :authorization_for_showing_already_done => true,
                                                                                   :actions_partial_disable => actions_partial_disable} -%>
-                      <div id="<%= type[:type] %>_view_all"></div>
                   <% end %>
-                  <% if type[:extra_count] > 0 %>
-                      <div class="list_items_container">
-                        <div class="hidden_list_item" id="view_list_items">
-                          <% if item %>
-                              <%= link_to "View all #{pluralize(type[:total_visible], 'item')}", [item, type[:type].tableize.to_sym] -%>
-                          <% elsif !hide_view_all %>
-                              <%= link_to "View all #{pluralize(type[:total_visible], 'item')}", polymorphic_path(type[:type].pluralize.underscore.to_sym, index_params) %>
-                          <% end-%>
-                        </div>
-                      </div>
-                  <% end %>
+
                   <% if type[:hidden_count] > 0 %>
                       <div class="list_items_container">
                         <div class="hidden_list_item">

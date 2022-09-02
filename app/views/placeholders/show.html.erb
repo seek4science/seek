@@ -1,0 +1,49 @@
+<ul class="nav nav-tabs">
+  <li class="active ">
+    <a data-toggle="tab" href="#details"><i class="glyphicon glyphicon-list-alt"></i> Details</a>
+  </li>
+  <li>
+    <a data-toggle="tab" href="#related-items">
+      <i class="glyphicon glyphicon-th-list"></i> Related items
+    </a>
+  </li>
+</ul>
+<div class="tab-content">
+  <div id="details" class="tab-pane fade in active">
+    <%= render :partial => "general/item_title",:locals => {:item => @placeholder,
+    :buttons_partial => 'assets/asset_buttons'} -%>
+
+    <div class="row">
+      <div class="col-md-9 col-sm-8 box_about_actor">
+	<%= item_description @placeholder.description -%>
+
+	<strong>Resolution: </strong>
+	<% if @placeholder.data_file %>
+	<%= link_to(@placeholder.data_file.title, @placeholder.data_file) %>
+	<%  else %>
+	Not specified
+	<% end %>
+	<div class="row">
+	  <div class="col-md-6">
+	    <%= persistent_resource_id(@placeholder) %>
+
+	    <%= render :partial => "assets/special_auth_code_display", :locals => {:resource => @placeholder} %>
+
+	  </div>
+	</div>
+	<%= render :partial=>"general/isa_graph", :locals => {:root_item => @placeholder, :deep => true, :include_parents => true} %>
+      </div>
+
+      <div class="col-md-3 col-sm-4">
+	<%= render :partial=>"assets/resource_main_content_right",:locals => { :resource => @placeholder } %>
+      </div>
+    </div>
+
+  </div>
+  
+  <div id="related-items" class="tab-pane fade">
+    <%# get, classify and authorize all assets for this project -%>
+    <%= render :partial=>"general/items_related_to",:object => @placeholder %>
+  </div>
+  
+</div>

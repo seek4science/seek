@@ -16,7 +16,7 @@ module Seek
         Seek::SampleTemplates.generate(sheet_name, sheet_index, define_columns, base_template_path, tmp_file)
         create_content_blob(template_blob_attributes)
         sample_attributes.each_with_index do |attribute, index|
-          attribute.update_attributes(template_column_index: index + 1)
+          attribute.update(template_column_index: index + 1)
         end
       end
 

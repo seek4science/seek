@@ -1,0 +1,140 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "collections",
+    "attributes": {
+      "title": "A Maximal Collection",
+      "description": "A collection of very interesting things",
+      "license": null,
+      "tags": [
+        "Collection-tag1",
+        "Collection-tag2",
+        "Collection-tag3",
+        "Collection-tag4",
+        "Collection-tag5"
+      ],
+      "created_at": "<%= res.created_at.as_json %>",
+      "updated_at": "<%= res.updated_at.as_json %>",
+      "other_creators": "Joe Bloggs",
+      "creators": [
+        {
+          "profile": "/people/<%= res.assets_creators.first.creator_id %>",
+          "family_name": "<%= res.assets_creators.first.family_name %>",
+          "given_name": "<%= res.assets_creators.first.given_name %>",
+          "affiliation": "<%= res.assets_creators.first.affiliation %>",
+          "orcid": null
+        }
+      ],
+      "discussion_links": [
+        {
+          "id":
+          "<%= res.discussion_link_ids.first %>",
+          "url": "http://www.slack.com/",
+          "label": "Slack"
+        }
+      ]
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "<%= res.creator_ids.first %>",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "<%= res.creator_ids.first %>",
+            "type": "people"
+          },
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= res.project_ids.first %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "<%= res.publication_ids.first %>",
+            "type": "publications"
+          }
+        ]
+      },
+      "items": {
+        "data": <%= res.items.map { |c| { id: c.id.to_s, type: 'collection_items' } }.to_json %>
+      }
+    },
+    "links": {
+      "self": "/collections/<%= res.id %>",
+      "items": "/collections/<%= res.id %>/items"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "api_version": "0.3",
+      "uuid": "<%= res.uuid %>",
+      "base_url": "http://localhost:3000"
+    }
+  },
+  "included": [
+  <% res.items.each_with_index do |c, i| %>
+    {
+      "id": "<%= c.id %>",
+      "type": "collection_items",
+      "attributes": {
+        "comment": "<%= c.comment %>",
+        "order": <%= c.order %>
+      },
+      "relationships": {
+        "collection": {
+          "data": {
+            "id": "<%= res.id %>",
+            "type": "collections"
+          }
+
+        }<% unless c.asset.private? %>,
+        "asset": {
+          "data": {
+            "id": "<%= c.asset_id %>",
+            "type": "<%= c.asset_type.underscore.pluralize %>"
+          },
+          "meta": {
+            "title": "<%= c.asset.title %>"
+          }
+        }
+        <% end %>
+      },
+      "links": {
+        "self": "/collections/<%= res.id %>/items/<%= c.id %>"
+      },
+      "meta": {
+        "created": "<%= c.created_at.as_json %>",
+        "modified": "<%= c.updated_at.as_json %>",
+        "api_version": "0.3"
+      }
+    }<%= ',' unless i == res.items.length - 1%>
+  <% end %>
+  ],
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

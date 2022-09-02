@@ -1,7 +1,6 @@
-require_relative './password_helper.rb'
+require_relative './factories_helper.rb'
 
-include ActionDispatch::TestProcess::FixtureFile
-include PasswordHelper
+include FactoriesHelper
 
 FactoryGirl.define do
   trait :with_project_contributor do

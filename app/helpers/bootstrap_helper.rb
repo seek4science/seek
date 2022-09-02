@@ -4,24 +4,27 @@ module BootstrapHelper
   # A link with an icon next to it
   def icon_link_to(text, icon_key, url, options = {})
     icon = icon_tag(icon_key, options.delete(:icon_options) || {})
-    unless url
-      content_tag(:a, (icon + text).html_safe, options)
+    disabled_reason = options.delete(:disabled_reason)
+    options[:class] = "#{options[:class]} disabled".strip if disabled_reason
+    inner = unless url
+              content_tag(:a, (icon + text).html_safe, options)
+            else
+              link_to((icon + text).html_safe, url, options)
+            end
+
+    if disabled_reason
+      content_tag(:span, 'data-tooltip' => disabled_reason, onclick: "alert('#{disabled_reason}');") do
+        inner
+      end
     else
-      link_to((icon + text).html_safe, url, options)
+      inner
     end
   end
 
   # A button with an icon and text
   def button_link_to(text, icon, url, options = {})
     options[:class] = "btn #{options[:type] || 'btn-default'} #{options[:class]}".strip
-    if (reason = options.delete(:disabled_reason))
-      options[:class] += ' disabled'
-      content_tag(:span, 'data-tooltip' => reason, onclick: "alert('#{reason}');") do
-        icon_link_to(text, icon, url, options)
-      end
-    else
-      icon_link_to(text, icon, url, options)
-    end
+    icon_link_to(text, icon, url, options)
   end
 
   # A collapsible panel
@@ -131,6 +134,7 @@ module BootstrapHelper
   def objects_input(name, existing_objects = [], options = {})
     options['data-role'] = 'seek-objectsinput'
     options['data-tags-limit'] = options.delete(:limit) if options[:limit]
+    options['data-ontology'] = options.delete(:ontology) if options[:ontology]
     options.merge!(typeahead_options(options.delete(:typeahead))) if options[:typeahead]
 
     unless existing_objects.empty?
@@ -173,13 +177,42 @@ module BootstrapHelper
   def modal_body(options = {})
     opts = merge_options({ class: 'modal-body' }, options)
     content_tag(:div, opts) do
-      yield
+      yield if block_given?
     end
   end
 
   def modal_footer(options = {})
     opts = merge_options({ class: 'modal-footer' }, options)
     content_tag(:div, opts) do
+      yield if block_given?
+    end
+  end
+
+  def tab(*args)
+    if block_given?
+      tab_id, selected = *args
+      title = nil
+    else
+      title, tab_id, selected = *args
+    end
+
+    selected = show_page_tab == tab_id if selected.nil?
+
+    content_tag(:li, class: selected ? 'active' : '') do
+      if block_given?
+        content_tag(:a, data: { target: "##{tab_id}", toggle: 'tab' }, aria: { controls: tab_id }, role: 'tab') do
+          yield
+        end
+      else
+        content_tag(:a, title, data: { target: "##{tab_id}", toggle: 'tab' }, aria: { controls: tab_id }, role: 'tab')
+      end
+    end
+  end
+
+  def tab_pane(tab_id, selected = nil)
+    selected = show_page_tab == tab_id if selected.nil?
+
+    content_tag(:div, id: tab_id, class: selected ? 'tab-pane fade in active' : 'tab-pane fade') do
       yield
     end
   end

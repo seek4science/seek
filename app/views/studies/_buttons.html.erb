@@ -5,13 +5,16 @@
 <% end %>
 
 <% if item.can_edit? -%>
-  <%= add_new_item_to_dropdown(item) %>
+  <% if displaying_single_page? %>
+    <%= button_link_to("Design #{t('assay')}", 'new', new_isa_assay_path(study_id: item.id, single_page: params[:single_page], is_source: true)) %>
+  <% else -%>
+    <%= add_new_item_to_dropdown(item) %> 
+  <% end -%>
 <% end -%>
 
 <%= item_actions_dropdown do %>
   <% if item.can_edit? %>
     <li><%= image_tag_for_key('edit', edit_study_path(item), "Edit #{t('study')}", nil, "Edit #{t('study')}") -%></li>
-    <li><%= image_tag_for_key('order', order_assays_study_path(item), "Order #{t('assay').pluralize}", nil, "Order #{t('assay').pluralize}") -%></li>
   <% end %>
 
   <% if item.can_manage? -%>
@@ -19,6 +22,7 @@
     <%= render :partial => 'snapshots/new_snapshot_link', :locals => { :item => item } %>
   <% end -%>
 
-
+    <%= order_icon(item,current_user, order_assays_study_path(item), item.assays, 'assay') -%>
+ 
   <%= delete_icon item,current_user -%>
 <% end -%>

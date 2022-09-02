@@ -1,11 +1,12 @@
 <%= javascript_include_tag "single_page/index" %>
+<%= javascript_include_tag "single_page/dynamic_table" %>
 <%= javascript_include_tag "project_folders" %>
 <%
     default_folder = initial_folder(@project)
 %>
-<div class="show_basic single-page-folder">
-    <div class="row">
-        <div class="col-md-4">
+<div class="single-page-folder">
+    <div id="widget" class="row">
+        <div id="left-pane" class="col-md-3" style="padding:0 5px 0 0">
             <div id="folder_column">
                 <div id="folders">
                     <ul class="bcrumb">
@@ -14,12 +15,18 @@
                     <li ><a href="#"><span>Study</span></a></li>
                     <li ><a href="#"><span>Assay</span></a></li>
                     </ul>
-                    <div id="demo_tree" class="new-design"></div>
+                    <div class="treeview-toggle">
+                        Toggle: 
+                        <button class="active" onClick="toggleItem(this, 'investigation')">Investigations</button>
+                        <button class="active" onClick="toggleItem(this, 'study')">Studies</button>
+                        <button class="active" onClick="toggleItem(this, 'assay')">Assays</button>
+                    </div>
+                    <div id="single_page_tree" class="new-design"></div>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-8">
+        <div id="right-pane" class="col-md-9" style="padding:0">
             <div id="container" style="position:relative" class="tv">
                 <div id="loader"></div>
                 <div id="folder_contents" class="row" style="display:none">
@@ -37,53 +44,56 @@
         </div>
     </div>
 
-    <div id="provide-metadata-content">
-     </div>
+    <div id="provide-metadata-content"></div>
+</div>
 
-    <div class="modal" tabindex="-1" role="dialog" id="data-file-modal-inv">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <%= render :partial=>"investigations/new" %>
-                    <div class="row" style="padding:15px">
-                        <a id="submit_investigation" type="button" onclick="submitInvestigation()" class="btn btn-primary">Create</a>
-                        &nbsp;
-                        <a type="button" class="btn btn-default">Cancel</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<script type="text/javascript">
+    var selectedItem = {type:"",id:""}, pid, uid, projectDefaultPolicy, dynamicTableDataPath
+		
+		$j(document).ready(function() {
+			  $j("#content .container-fluid").removeClass("container-fluid").addClass("container-fluid-single-page")
 
-    <div class="modal" tabindex="-1" role="dialog" id="data-file-modal-std">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <%= render :partial=>"studies/new" %>
-                    <div class="row" style="padding:15px">
-                        <a id="submit_study" type="button" onclick="submitStudy()" class="btn btn-primary">Create</a>
-                        &nbsp;
-                        <a type="button" class="btn btn-default">Cancel</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+        setupFoldersTree( <%= ((TreeviewBuilder.new(@project, @folders)).build_tree_data).html_safe -%> , 'single_page_tree', 'draggable_folder_item');
+        $j("#item-layout").html("<%= escape_javascript(render template: 'projects/show' ) %>");
+        $j("#item_contents").show();
+        pid = <%= @project.id %>
+        projectDefaultPolicy = <%= project_policy_json(@project) %>
+        uid = <%= current_user ? current_user.id : "null" %>
+				dynamicTableDataPath = '<%= Seek::Util.routes.dynamic_table_data_single_page_path(@project.id) %>'
 
-    <script type="text/javascript">
-        var selectedItem = {type:"",id:""}, pid, uid
-        $j(document).ready(function() {
-            setupFoldersTree( <%= ((TreeviewBuilder.new(@project, @folders)).build_tree_data).html_safe -%> , 'demo_tree', 'draggable_folder_item');
-            $j("#item-layout").html("<%= escape_javascript(render template: 'projects/show' ) %>");
-            $j("#item_contents").show();
-            pid = <%= @project.id %>
-            uid = <%= current_user.id if current_user %>
+				setSplitters();
+				updateContainerHeight();
+    });
 
-            $j("a:contains('Cancel')").click(function (e) {
-                e.preventDefault();
-                $j("#data-file-modal-inv").modal("hide");
-                $j("#data-file-modal-std").modal("hide");
-            });
-        });
-        
-    </script>
+    function toggleItem(e, type){
+        let action
+        if($j(e).hasClass("active")) action = "close_node"
+        else action = "open_node"
+        $j("a[_type='" + type + "']").each((i, e) => $j("#single_page_tree").jstree(action, $j(e)))
+        $j(e).toggleClass("active")
+    }
+
+		// This is used after jstree loaded
+		function activateSelectedItem(){
+			const params = Object.fromEntries(new URLSearchParams(window.location.search).entries());
+			const parent = $j(`a[_type="${params.item_type}"][_id="${params.item_id}"]`)
+			$j(parent).addClass("jstree-clicked").click()
+		}
+		
+		function setSplitters() {
+			if(!isMobile()) {
+				$j('#widget').width('').height(768).split({
+					orientation: 'vertical',
+					limit: { leftUpper: 350, rightBottom: 1000 },
+					position: '25%'
+				});
+			}
+		}
+
+		function updateContainerHeight() {
+			const height = $j("#right-pane #container").height()
+			$j("#widget").height(height)
+			$j("#right-pane").height(height)
+		}
+    
+</script>

@@ -1,25 +1,43 @@
 class WorkflowDiagram
-  class UnsupportedFormat < RuntimeError; end
+  include Seek::MimeTypes
 
-  attr_reader :workflow, :version, :path, :format, :content_type
+  attr_reader :workflow, :path
 
-  def initialize(workflow, version, path, format, content_type)
+  def initialize(workflow, path)
     @workflow = workflow
-    @version = version
     @path = path
-    @format = format
-    @content_type = content_type
   end
 
   def filename
-    "workflow-diagram-#{@workflow.id}-#{@version}.#{@format}"
+    "#{workflow.cache_key_fragment}-diagram.#{extension}"
+  end
+
+  def extension
+    path.split('.').last.downcase
+  end
+
+  def content_type
+    mime_types_for_extension(extension).first
   end
 
   def size
-    File.size(@path)
+    File.size(path)
   end
 
   def exists?
-    File.exist?(@path)
+    File.exist?(path)
+  end
+
+  def sha1sum
+    digest = Digest::SHA1.new
+    digest.file(path)
+    digest.hexdigest
+  end
+
+  def to_crate_entity(crate, type: ::ROCrate::WorkflowDiagram, properties: {})
+    type.new(crate, path, filename).tap do |entity|
+      entity['contentSize'] = size
+      entity.properties = entity.raw_properties.merge(properties)
+    end
   end
 end

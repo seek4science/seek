@@ -5,9 +5,9 @@
         <div id="search_box">
 
           <div class="input-group">
-            <%= text_field_tag :q, @search_query, :class=>"form-control", :placeholder=>"Search here..." %>
+            <%= text_field_tag :q, @search_query, class: "form-control", placeholder: "Search here..." %>
             <div class="input-group-btn">
-              <%= submit_tag "Search", :name => nil, :class => 'btn btn-default' -%>
+              <%= submit_tag "Search", name: nil, class: 'btn btn-default' -%>
               <button id="adv-search-btn" data-tooltip="<%= tooltip('Click for more search options') -%>" type="button" class="btn btn-default" data-toggle="button" aria-pressed="false">
                 &nbsp;<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>&nbsp;
               </button>
@@ -17,20 +17,12 @@
           <div id="advanced-search" style="display: none">
             <div class="form-group">
               <%= select_tag :search_type, options_for_select(search_type_options,@search_type),
-                             :class => 'form-control' %>
+                             class: 'form-control' %>
             </div>
-            <% if show_scales? && Seek::Config.is_virtualliver %>
-                <div class="form-group">
-                  <%= select_tag :scale,
-                                 (options_for_select({"All" => 'all'}, :selected => (params[:scale] ? nil : 'all')) +
-                                         options_from_collection_for_select(Scale.all.reverse, :key, :title, params[:scale])),
-                                 :class => 'form-control' %>
-                </div>
-            <% end %>
             <% if external_search_supported? %>
                 <div class="checkbox">
                   <label data-tooltip="<%= tooltip(external_search_tooltip_text) -%>">
-                    <%= check_box_tag :include_external_search, 1, @include_external_search, :class => "checkbox" -%> External
+                    <%= check_box_tag :include_external_search, 1, @include_external_search, class: "checkbox" -%> External
                   </label>
                 </div>
             <% end %>

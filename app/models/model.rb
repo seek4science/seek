@@ -18,7 +18,7 @@ class Model < ApplicationRecord
 
   acts_as_asset
 
-  validates :projects, presence: true, projects: { self: true }, unless: Proc.new {Seek::Config.is_virtualliver }
+  validates :projects, presence: true, projects: { self: true }
 
   acts_as_doi_parent(child_accessor: :versions)
 
@@ -54,15 +54,6 @@ class Model < ApplicationRecord
       },
       joins: [:assays]
   )
-
-
-  # Returns the columns to be shown on the table view for the resource
-  def columns_default
-    super + ['creators','projects','version']
-  end
-  def columns_allowed
-    columns_default + ['last_used_at','other_creators','imported_source','imported_url','doi','license']
-  end
 
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi']) do
     include Seek::Models::ModelExtraction

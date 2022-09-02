@@ -1,4 +1,6 @@
 class CollectionItemsController < ApplicationController
+  include Seek::IndexPager
+
   before_action :collections_enabled?
   before_action :find_and_authorize_collection
   before_action :find_collection_item, except: [:index, :create]
@@ -12,7 +14,7 @@ class CollectionItemsController < ApplicationController
       format.json do
         render json: @items, include: [params[:include]],
                each_serializer: CollectionItemSerializer,
-               links: { self: collection_items_path(@collection) },
+               links: json_api_links,
                meta: {
                    base_url: Seek::Config.site_base_host,
                    api_version: ActiveModel::Serializer.config.api_version
@@ -29,7 +31,6 @@ class CollectionItemsController < ApplicationController
 
   def create
     @item = @collection.items.build(item_params)
-    pp @item.valid?
 
     respond_to do |format|
       if !@item.valid?
@@ -64,7 +65,7 @@ class CollectionItemsController < ApplicationController
     @item = @collection.items.find_by_id(params[:id])
 
     respond_to do |format|
-      if @item.update_attributes(item_params)
+      if @item.update(item_params)
         format.json { render json: @item, include: [params[:include]] }
       else
         format.json { render json: json_api_errors(@item), status: :unprocessable_entity }

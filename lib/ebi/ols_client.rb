@@ -16,7 +16,8 @@ module Ebi
     def all_children(term_json, parent_iri = nil)
       @collected_iris << term_json['iri']
       term = { iri: term_json['iri'],
-               label: term_json['label'] }
+               label: term_json['label'],
+               description: term_json['description'] }
 
       term[:parent_iri] = parent_iri if parent_iri
 
@@ -59,6 +60,13 @@ module Ebi
       ontology_list ||= JSON.parse(File.read(Rails.root.join('config', 'ontologies', 'ebi_ontologies.json')))
 
       @ontologies = ontology_list.dig('_embedded', 'ontologies')
+    end
+
+    # processes the JSON to return [ [title, namespace], ... ] filtering any without a title
+    def self.ontology_choices
+      opts = ontologies.map { |ontology| [ontology.dig('config', 'title'), ontology.dig('config', 'namespace')] }
+
+      opts.sort_by { |o| o[0] || '' }.delete_if{|o| o[0].blank? }
     end
 
     def self.ontology_keys

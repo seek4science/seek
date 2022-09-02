@@ -1,0 +1,15 @@
+<% possible_data_files = resource&.projects[0].data_files.select { |d| (d.placeholder.blank?) }
+%>
+<%= folding_panel('Resolve', true, :body_options => {:id => 'resolve'}) do %>
+<% if resource&.data_file %>
+<p> <%= resource.title %> is resolved to <%= resource&.data_file.title %></p>
+<% else %>
+<% if resource&.projects.blank? || possible_data_files.blank? %>
+<p>No resolution is possible</p>
+<% else %>
+<%= select_tag 'data_file_id', options_for_select(possible_data_files.collect{ |d| [d.title, d.id] } ) %>
+<% end %>
+<% end %>
+
+<% end %>
+

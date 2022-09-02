@@ -6,7 +6,6 @@ module ImagesHelper
 
   def image_tag_for_key(key, url = nil, alt = nil, html_options = {}, label = key.humanize, remote = false, size = nil)
     label = 'Delete' if label == 'Destroy'
-
     return nil unless (filename = icon_filename_for_key(key.downcase))
 
     image_options = alt ? { alt: alt } : { alt: key.humanize }
@@ -49,10 +48,6 @@ module ImagesHelper
     image_tag(filename, options)
   end
 
-  def help_icon(text, _delay = 200, extra_style = '')
-    image('info', :alt => 'help', 'data-tooltip' => tooltip(text), :style => "vertical-align: middle;#{extra_style}")
-  end
-
   def flag_icon(country, text = country, margin_right = '0.3em')
     return '' unless country && !country.empty?
 
@@ -65,14 +60,6 @@ module ImagesHelper
     else
       ''
     end
-  end
-
-  def model_image_url(model_instance, model_image_id, size = nil)
-    basic_url = model_model_image_path(model_instance, model_image_id)
-
-    basic_url = append_size_parameter(basic_url, size)
-
-    basic_url
   end
 
   def append_size_parameter(url, size)
@@ -102,7 +89,28 @@ module ImagesHelper
     end
   end
 
-  def file_type_icon(item)
+ def order_icon(model_item, user, full_url, subitems, subitem_name)
+   subitem_name = "#{t(subitem_name).capitalize.pluralize}"
+   item_name = text_for_resource model_item
+   explanation = ""
+   if !model_item.can_edit?(user)
+     explanation = "You cannot edit this #{item_name}"
+   elsif subitems.size < 2
+     explanation = "The #{item_name} must contain two or more #{subitem_name.pluralize}"
+   end
+
+   if !explanation.empty?
+            html = "<li><span class='disabled_icon disabled' onclick='javascript:alert(\"#{explanation}\")' data-tooltip='#{tooltip(explanation)}' >" + image('order', alt: 'Order', class: 'disabled') + " Order #{subitem_name} </span></li>"
+      return html.html_safe
+   end
+
+   html = content_tag(:li) do
+     image_tag_for_key('order', full_url, "Order #{subitem_name.pluralize}", nil, "Order #{subitem_name.pluralize}")
+     end
+   html.html_safe
+ end
+
+ def file_type_icon(item)
     url = file_type_icon_url(item)
     image_tag url, class: 'icon'
   end

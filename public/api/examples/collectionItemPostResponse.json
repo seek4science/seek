@@ -1,35 +1,39 @@
 {
-    "data": {
-        "id": "12",
-        "type": "collection_items",
-        "attributes": {
-            "comment": "...then run this workflow",
-            "order": 3
-        },
-        "relationships": {
-            "collection": {
-                "data": {
-                    "id": "2",
-                    "type": "collections"
-                }
-            },
-            "asset": {
-                "data": {
-                    "id": "60",
-                    "type": "workflows"
-                }
-            }
-        },
-        "links": {
-            "self": "/collections/2/items/12"
+  "data": {
+    "id": "14",
+    "type": "collection_items",
+    "attributes": {
+      "comment": "A fine addition to the collection indeed",
+      "order": 3
+    },
+    "relationships": {
+      "collection": {
+        "data": {
+          "id": "9",
+          "type": "collections"
+        }
+      },
+      "asset": {
+        "data": {
+          "id": "50",
+          "type": "sops"
         },
         "meta": {
-            "created": "2020-05-28T15:58:38.000Z",
-            "modified": "2020-05-28T15:58:38.000Z",
-            "api_version": "0.3"
+          "title": "This Sop"
         }
+      }
     },
-    "jsonapi": {
-        "version": "1.0"
+    "links": {
+      "self": "/collections/9/items/14"
+    },
+    "meta": {
+      "created": "2022-06-07T14:14:27.000Z",
+      "modified": "2022-06-07T14:14:27.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000"
     }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
 }

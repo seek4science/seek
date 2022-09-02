@@ -13,9 +13,9 @@ class Workflow < ApplicationRecord
 
   acts_as_doi_parent(child_accessor: :versions)
 
-  has_edam_annotations
+  has_controlled_vocab_annotations :topics, :operations
 
-  validates :projects, presence: true, projects: { self: true }, unless: Proc.new {Seek::Config.is_virtualliver }
+  validates :projects, presence: true, projects: { self: true }
 
   #don't add a dependent=>:destroy, as the content_blob needs to remain to detect future duplicates
   has_one :content_blob, -> (r) { where('content_blobs.asset_version =?', r.version) }, :as => :asset, :foreign_key => :asset_id
@@ -28,6 +28,60 @@ class Workflow < ApplicationRecord
   has_many :data_files, ->{ distinct }, through: :workflow_data_files
 
   accepts_nested_attributes_for :workflow_data_files
+
+  git_versioning(sync_ignore_columns: ['test_status']) do
+    include WorkflowExtraction
+
+    acts_as_doi_mintable(proxy: :parent, general_type: 'Workflow')
+
+    before_save :refresh_internals, if: -> { main_workflow_path_changed? && !main_workflow_blob.empty? }
+    after_save :clear_cached_diagram, if: -> { diagram_path_changed? }
+    after_commit :submit_to_life_monitor, on: [:create, :update]
+    after_commit :sync_test_status, on: [:create, :update]
+
+    def maturity_level
+      Workflow::MATURITY_LEVELS[super]
+    end
+
+    def workflow_class
+      WorkflowClass.find_by_id(workflow_class_id)
+    end
+
+    def search_terms
+      terms = []
+
+      main = main_workflow_blob
+      terms += main_workflow_blob.text_contents_for_search if main
+      readme = git_version.get_blob('README.md')
+      terms += readme.text_contents_for_search if readme
+      terms
+    end
+
+    def test_status
+      Workflow::TEST_STATUS[super]
+    end
+
+    def test_status= stat
+      resource_attributes['test_status'] = (Workflow::TEST_STATUS_INV[stat&.to_sym])
+    end
+
+    def source_link_url
+      parent&.source_link&.url
+    end
+
+    def submit_to_life_monitor
+      if Seek::Config.life_monitor_enabled && extractor.has_tests? && workflow.can_download?(nil)
+        LifeMonitorSubmissionJob.perform_later(self)
+      end
+    end
+
+    # This does two things:
+    # 1. If a version's test_status was updated, and it was the latest version, set the test_status on the parent too.
+    # 2. If a new version was created, set the parent's test_status to nil, since it will not apply anymore.
+    def sync_test_status
+      parent.update_column(:test_status, Workflow::TEST_STATUS_INV[test_status]) if latest_git_version?
+    end
+  end
 
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi', 'test_status']) do
     after_commit :submit_to_life_monitor, on: [:create, :update]
@@ -65,7 +119,8 @@ class Workflow < ApplicationRecord
     end
 
     def submit_to_life_monitor
-      if Seek::Config.life_monitor_enabled && !monitored && extractor.has_tests? && workflow.can_download?(nil)
+      return if parent.is_git_versioned?
+      if Seek::Config.life_monitor_enabled && extractor.has_tests? && workflow.can_download?(nil)
         LifeMonitorSubmissionJob.perform_later(self)
       end
     end
@@ -74,8 +129,15 @@ class Workflow < ApplicationRecord
     # 1. If a version's test_status was updated, and it was the latest version, set the test_status on the parent too.
     # 2. If a new version was created, set the parent's test_status to nil, since it will not apply anymore.
     def sync_test_status
+      return if parent.is_git_versioned?
       parent.update_column(:test_status, Workflow::TEST_STATUS_INV[test_status]) if latest_version?
     end
+  end
+
+  attr_reader :extracted_metadata
+  def provide_metadata(metadata)
+    @extracted_metadata = metadata
+    assign_attributes(metadata)
   end
 
   def workflow_data_files_attributes=(attributes)
@@ -150,4 +212,5 @@ class Workflow < ApplicationRecord
         end
       }
   )
+
 end

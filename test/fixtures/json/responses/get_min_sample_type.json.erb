@@ -1,0 +1,68 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "sample_types",
+    "attributes": {
+      "title": "A Minimal SampleType",
+      "description": null,
+      "sample_attributes": [
+        {
+          "id": "<%= res.sample_attribute_ids.first %>",
+          "title": "full_name",
+          "description": null,
+          "pid": null,
+          "sample_attribute_type": {
+            "id": "<%= res.sample_attributes.first.sample_attribute_type_id %>",
+            "title": "Full name",
+            "base_type": "String",
+            "regexp": "[A-Z][a-z]+[ ][A-Z][a-z]+"
+          },
+          "required": true,
+          "pos": 1,
+          "unit": null,
+          "is_title": true,
+          "sample_controlled_vocab_id": null,
+          "linked_sample_type_id": null
+        }
+      ],
+      "tags": []
+    },
+    "relationships": {
+      "projects": {
+        "data": [
+          {
+            "id": "<%= res.project_ids.first %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "samples": {
+        "data": []
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "assays": {
+        "data": []
+      }
+    },
+    "links": {
+      "self": "/sample_types/<%= res.id %>"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "api_version": "0.3",
+      "uuid": "<%= res.uuid %>",
+      "base_url": "http://localhost:3000"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

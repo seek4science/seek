@@ -10,4 +10,4 @@
   Currently supported workflow types are: <%= WorkflowClass.order(:title).pluck(:title).join(', ') %>.
 <% end %>
 
-<%= render partial: 'upload_form', locals: { new_version: true, cancel_path: workflow_path(@workflow) } %>
+<%= render partial: 'legacy_upload_form', locals: { new_version: true, cancel_path: workflow_path(@workflow) } %>

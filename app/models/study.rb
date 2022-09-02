@@ -1,8 +1,10 @@
 class Study < ApplicationRecord
 
   include Seek::Rdf::RdfGeneration
-  include Seek::ProjectHierarchies::ItemsProjectsExtension if Seek::Config.project_hierarchy_enabled
 
+  enum status: [:planned, :running, :completed, :cancelled, :failed]
+  belongs_to :assignee, class_name: 'Person'
+  
   searchable(:auto_index => false) do
     text :experimentalists
   end if Seek::Config.solr_enabled
@@ -18,6 +20,9 @@ class Study < ApplicationRecord
   has_many :assays
   has_many :assay_publications, through: :assays, source: :publications
   has_one :external_asset, as: :seek_entity, dependent: :destroy
+  belongs_to :sop
+
+  has_and_belongs_to_many :sample_types
 
   validates :investigation, presence: { message: "Investigation is blank or invalid" }, projects: true
 
@@ -30,14 +35,6 @@ class Study < ApplicationRecord
 
   def assets
     related_data_files + related_sops + related_models + related_publications + related_documents
-  end
-  
-  # Returns the columns to be shown on the table view for the resource
-  def columns_default
-    super + ['creators','projects']
-  end
-  def columns_allowed
-    columns_default + ['other_creators']
   end
 
   def state_allows_delete? *args
@@ -63,11 +60,17 @@ class Study < ApplicationRecord
     publication_ids | assay_publication_ids
   end
 
+  def related_person_ids
+    ids = super
+    ids.uniq
+  end
+
   def positioned_assays
     assays.order(position: :asc)
   end
   
   def self.user_creatable?
     Seek::Config.studies_enabled
+
   end
 end

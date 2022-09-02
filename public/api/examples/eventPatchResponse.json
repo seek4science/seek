@@ -1,60 +1,83 @@
 {
-    "data": {
-        "id": "14",
-        "type": "events",
-        "attributes": {
-            "policy": {
-                "access": "manage",
-                "permissions": []
+  "data": {
+    "id": "20",
+    "type": "events",
+    "attributes": {
+      "policy": {
+        "access": "no_access",
+        "permissions": [
+          {
+            "resource": {
+              "id": "459",
+              "type": "projects"
             },
-            "title": "An Event",
-            "description": "A thing that will happen",
-            "url": null,
-            "address": null,
-            "city": null,
-            "country": null,
-            "start_date": "2018-04-27T14:24:49.000Z",
-            "end_date": "2018-04-28T14:24:49.000Z"
-        },
-        "relationships": {
-            "submitter": {
-                "data": [
-                    {
-                        "id": "205",
-                        "type": "people"
-                    }
-                ]
-            },
-            "projects": {
-                "data": [
-                    {
-                        "id": "310",
-                        "type": "projects"
-                    }
-                ]
-            },
-            "data_files": {
-                "data": []
-            },
-            "publications": {
-                "data": []
-            },
-            "presentations": {
-                "data": []
-            }
-        },
-        "links": {
-            "self": "/events/14"
-        },
-        "meta": {
-            "created": "2018-04-27T14:25:29.000Z",
-            "modified": "2018-04-27T14:25:30.000Z",
-            "api_version": "0.1",
-            "uuid": "c2d344b0-2c54-0136-ec2f-08002734982f",
-            "base_url": "http://localhost:3000"
-        }
+            "access": "edit"
+          }
+        ]
+      },
+      "title": "A Maximally Patched Event",
+      "description": "A thing happening",
+      "url": "http://www.example.com/events/123",
+      "address": "Sofienstr 2",
+      "city": "Heidelberg",
+      "country": "Germany",
+      "start_date": "2017-01-01T00:20:00.000Z",
+      "end_date": "2017-01-01T00:22:00.000Z"
     },
-    "jsonapi": {
-        "version": "1.0"
+    "relationships": {
+      "submitter": {
+        "data": [
+          {
+            "id": "424",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "459",
+            "type": "projects"
+          }
+        ]
+      },
+      "data_files": {
+        "data": [
+          {
+            "id": "28",
+            "type": "data_files"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "34",
+            "type": "publications"
+          }
+        ]
+      },
+      "presentations": {
+        "data": [
+          {
+            "id": "20",
+            "type": "presentations"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/events/20"
+    },
+    "meta": {
+      "created": "2022-06-07T14:13:27.000Z",
+      "modified": "2022-06-07T14:13:27.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "ecc58c30-c899-013a-0f7e-0a81884ed284"
     }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
 }

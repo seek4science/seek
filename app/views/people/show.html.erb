@@ -1,14 +1,12 @@
 <%
   admin_or_me = (current_user.try(:person) == @person || admin_logged_in?)
 %>
+<%= render partial: 'general/item_title', locals: { item: @person, buttons_partial: 'people/buttons' } %>
+
 <%= render partial: 'general/show_page_tab_definitions' %>
 
 <div class="tab-content">
-
-  <div id="details" class="tab-pane fade in active">
-
-    <%= render :partial => "general/item_title", :locals => { :item => @person, :buttons_partial => 'people/buttons' } %>
-
+  <%= tab_pane('overview') do %>
     <div class="row">
       <div class="col-md-9 col-sm-8 box_about_actor">
         <%= item_description @person.description, :label => "About #{@person.name}" %>
@@ -71,16 +69,12 @@
           <%= render :partial => "contact_details" %>
         </div>
       <% end %>
-      <div class="col-md-6">
-        <%= render :partial => "project_positions" %>
-      </div>
     </div>
     <%= render :partial => "people/project_subscriptions", :locals => { :person => @person } if (mine?(@person) || current_user.try(:person).try(:is_admin?)) %>
 
-  </div>
+  <% end %>
 
-  <div id="related-items" class="tab-pane fade">
-    <%= render :partial => "general/items_related_to", :object => @person %>
-  </div>
-
+  <%= tab_pane('related-items') do %>
+    <%= render partial: 'general/items_related_to', object: @person %>
+  <% end %>
 </div>

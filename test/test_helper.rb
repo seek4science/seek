@@ -1,12 +1,9 @@
 require 'simplecov'
 SimpleCov.start 'rails'
 ENV['RAILS_ENV'] ||= 'test'
-
-require File.expand_path(File.dirname(__FILE__) + '/../config/environment')
+require_relative '../config/environment'
 require 'rails/test_help'
 
-require 'rest_test_cases'
-require 'rdf_test_cases'
 require 'sharing_form_test_helper'
 require 'general_authorization_test_cases'
 require 'ruby-prof'
@@ -22,7 +19,10 @@ require 'minitest/reporters'
 require 'minitest'
 require 'ostruct'
 require 'pry'
-require 'json_test_helper'
+require 'api_test_helper'
+require 'integration/api/read_api_test_suite'
+require 'integration/api/write_api_test_suite'
+require 'rdf_test_cases'
 
 Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new(fast_fail: true,
                                                                    color: true,
@@ -41,19 +41,6 @@ end
 FactoryGirl.find_definitions # It looks like requiring factory_girl _should_ do this automatically, but it doesn't seem to work
 
 Kernel.class_eval do
-  def as_virtualliver
-    vl = Seek::Config.is_virtualliver
-    Seek::Config.is_virtualliver = true
-    yield
-    Seek::Config.is_virtualliver = vl
-  end
-
-  def as_not_virtualliver
-    vl = Seek::Config.is_virtualliver
-    Seek::Config.is_virtualliver = false
-    yield
-    Seek::Config.is_virtualliver = vl
-  end
 
   def with_auth_lookup_enabled
     val = Seek::Config.auth_lookup_enabled
@@ -86,6 +73,15 @@ Kernel.class_eval do
     yield
     Seek::Config.send("#{config}=", oldval)
   end
+
+  def with_relative_root(root)
+    oldval = Rails.application.config.relative_url_root
+    Rails.application.config.relative_url_root = root
+    Rails.application.default_url_options = Seek::Config.site_url_options
+    yield
+    Rails.application.config.relative_url_root = oldval
+    Rails.application.default_url_options = Seek::Config.site_url_options
+  end
 end
 
 class ActiveSupport::TestCase
@@ -96,13 +92,7 @@ class ActiveSupport::TestCase
   teardown :clear_current_user
 
   def file_for_upload
-    fixture_file_upload('files/little_file_v2.txt', 'text/plain')
-  end
-
-  def check_for_soffice
-    unless Seek::Config.soffice_available?(true)
-      skip("soffice is not available on port #{ConvertOffice::ConvertOfficeConfig.options[:soffice_port]}, skipping test")
-    end
+    fixture_file_upload('little_file_v2.txt', 'text/plain')
   end
 
   def skip_rest_schema_check?
@@ -112,7 +102,7 @@ class ActiveSupport::TestCase
   # always create initial person, as this will always be an admin. Avoid some confusion in the tests where a person
   # is unexpectedly an admin
   def create_initial_person
-    Factory(:admin, first_name: 'default admin')
+    disable_authorization_checks { Factory(:admin, first_name: 'default admin') }
   end
 
   # At least one sample attribute type is needed for building sample types from spreadsheets
@@ -129,28 +119,13 @@ class ActiveSupport::TestCase
     User.current_user = nil
   end
 
-  def add_avatar_to_test_object(obj)
-    disable_authorization_checks do
-      obj.avatar = Factory(:avatar, owner: obj)
-      obj.save!
-    end
+  def perform_jsonapi_checks
+    assert_response :success
+    assert_equal 'application/vnd.api+json', @response.media_type
+    assert JSON::Validator.validate(File.join(Rails.root, 'public', 'api', 'jsonapi-schema-v1'),
+                                    @response.body), 'Response did not validate against JSON-API schema'
   end
 
-  def add_tags_to_test_object(obj)
-    name = obj.class.to_s
-    #for i in 1..5 do
-    [1,2,3,4,5].each do |i|
-      tag = Factory :tag, value: "#{name}-tag#{i}", source: User.current_user, annotatable: obj
-      obj.reload
-    end
-  end
-
-  def add_creator_to_test_object(obj)
-    disable_authorization_checks do
-      obj.creators = [Factory(:person)]
-      obj.save!
-    end
-  end
   # Transactional fixtures accelerate your tests by wrapping each test method
   # in a transaction that's rolled back on completion.  This ensures that the
   # test database remains unchanged so your fixtures don't have to be reloaded
@@ -271,3 +246,8 @@ VCR.configure do |config|
 end
 
 WebMock.disable_net_connect!(allow_localhost: true) # Need to comment this line out when running VCRs for the first time
+
+# Clear testing filestore before test run (but check its under tmp for safety)
+if File.expand_path(Seek::Config.filestore_path).start_with?(File.expand_path(File.join(Rails.root, 'tmp')))
+  FileUtils.rm_r(Seek::Config.filestore_path)
+end

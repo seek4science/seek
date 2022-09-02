@@ -1,0 +1,143 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "programmes",
+    "attributes": {
+      "avatar": null,
+      "title": "A Maximal Programme",
+      "description": "A very exciting programme",
+      "web_page": "http://www.synbiochem.co.uk",
+      "funding_details": "Someone is funding this for me",
+      "funding_codes": [
+        "DFG"
+      ],
+      "discussion_links": [
+        {
+          "id":
+          "<%= res.discussion_link_ids.first %>",
+          "url": "http://www.slack.com/",
+          "label": "Slack"
+        }
+      ]
+    },
+    "relationships": {
+      "administrators": {
+        "data": [
+          {
+            "id": "<%= res.programme_administrator_ids.first %>",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data":
+        <%= res.people.map { |p| { id: p.id.to_s, type: 'people' } }.to_json %>
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= res.project_ids.first %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "institutions": {
+        "data":
+        <%= res.institutions.map { |i| { id: i.id.to_s, type: 'institutions' } }.to_json %>
+      },
+      "investigations": {
+        "data": [
+          {
+            "id": "<%= res.investigation_ids.first %>",
+            "type": "investigations"
+          }
+        ]
+      },
+      "studies": {
+        "data": [
+          {
+            "id": "<%= res.study_ids.first %>",
+            "type": "studies"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "<%= res.assay_ids.first %>",
+            "type": "assays"
+          }
+        ]
+      },
+      "data_files": {
+        "data": [
+          {
+            "id": "<%= res.data_file_ids.first %>",
+            "type": "data_files"
+          }
+        ]
+      },
+      "models": {
+        "data": [
+          {
+            "id": "<%= res.model_ids.first %>",
+            "type": "models"
+          }
+        ]
+      },
+      "sops": {
+        "data": [
+          {
+            "id": "<%= res.sop_ids.first %>",
+            "type": "sops"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+          {
+            "id": "<%= res.publication_ids.first %>",
+            "type": "publications"
+          }
+        ]
+      },
+      "presentations": {
+        "data": [
+          {
+            "id": "<%= res.presentation_ids.first %>",
+            "type": "presentations"
+          }
+        ]
+      },
+      "events": {
+        "data": [
+          {
+            "id": "<%= res.event_ids.first %>",
+            "type": "events"
+          }
+        ]
+      },
+      "documents": {
+        "data": [
+          {
+            "id": "<%= res.document_ids.first %>",
+            "type": "documents"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/programmes/<%= res.id %>"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "uuid": "<%= res.uuid %>",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.3"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

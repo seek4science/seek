@@ -1,0 +1,112 @@
+<%
+  has_direction ||= false
+  has_relationships ||= false
+  resource_text ||= text_for_resource(resource)
+
+  if params[:placeholders] && params[:placeholders].any?
+    collapse_panel = false
+    associated_placeholders_json = associations_json_from_params(Placeholder, params[:placeholders])
+  elsif resource.respond_to?(:assay_assets)
+    assay_assets = resource.assay_assets.select { |aa| aa.asset_type == 'Placeholder' }
+    field_name = "#{resource.class.name.underscore}[placeholders_attributes]"
+    collapse_panel = assay_assets.empty?
+    associated_placeholders_json = associations_json_from_assay_assets(assay_assets, fieldName: field_name)
+  else
+    field_name = "placeholders"
+    collapse_panel = resource.placeholders.empty?
+    associated_placeholders_json = associations_json_from_relationship(resource.placeholders, fieldName: field_name)
+  end
+-%>
+
+<%= folding_panel("Placeholders", collapse_panel, :body_options => {:id => 'associate_placeholders_fold_content'},
+                  :help_text => "Here you associate Placeholders in SEEK to this #{resource_text}.") do %>
+
+    <p>The following Placeholders are involved in this <%= resource_text -%>:</p>
+
+    <%= hidden_field_tag "#{field_name}[]" %>
+
+    <% if has_direction -%>
+        <%= associations_list_group('placeholders_to_list', 'direction.value', associated_placeholders_json) do %>
+            <div class="row">
+              <div class="col-md-4">
+                <h3>Incoming</h3>
+                <%= associations_list('incoming-data-file-list', 'associations/data_file', '',
+                                      empty_text: 'No incoming data',
+                                      'data-field-name' => field_name,
+                                      'data-multilist-group-value' => AssayAsset::Direction::INCOMING) %>
+              </div>
+              <div class="col-md-4">
+                <h3>Outgoing</h3>
+                <%= associations_list('outgoing-data-file-list', 'associations/data_file', '',
+                                      empty_text: 'No outgoing data',
+                                      'data-field-name' => field_name,
+                                      'data-multilist-group-value' => AssayAsset::Direction::OUTGOING) %>
+              </div>
+              <div class="col-md-4">
+                <h3>No direction</h3>
+                <%= associations_list('other-data-file-list', 'associations/data_file', '',
+                                      empty_text: 'No other data',
+                                      'data-field-name' => field_name,
+                                      'data-multilist-group-value' => AssayAsset::Direction::NODIRECTION) %>
+              </div>
+            </div>
+        <% end %>
+    <% else %>
+        <%= associations_list('placeholders_to_list', 'associations/data_file', associated_placeholders_json,
+                              'data-field-name' => field_name,
+                              empty_text: 'No data files') %>
+    <% end %>
+
+    <hr/>
+
+    <%= association_selector('placeholders_to_list', 'Associate placeholders', 'Associate placeholders', size: 'md') do %>
+        <% if has_relationships -%>
+            <div class="form-group">
+              <%= label_tag "How was the placeholder used in this #{resource_text}?" %>
+              <%= select_tag :relationship_type, options_for_select([['Not specified',0]] + RelationshipType.all.collect{|r| [r.title,r.id]}),
+                             class: 'form-control', 'data-role' => 'seek-association-common-field'
+              %>
+            </div>
+        <% end %>
+
+        <hr/>
+
+        <label>Select placeholders</label>
+        <div class="form-group" data-role="seek-association-filter-group" data-filter-url="<%= filter_placeholders_path(assay_id: resource.id) -%>">
+          <%= association_select_filter %>
+
+          <div class="checkbox">
+            <label>
+              <%= check_box_tag(:all_projects, '1', false, 'data-role' => 'seek-association-filter-field') %>
+              <strong>Show placeholders from all <%= t('project').downcase.pluralize -%>?</strong>
+            </label>
+          </div>
+
+          <%= check_box_tag(:simulation_data, '1', false, style: 'display: none', 'data-role' => 'seek-association-filter-field') %>
+
+          <%= association_select_results %>
+        </div>
+
+        <% if has_direction -%>
+            <hr/>
+
+            <div class="form-group">
+              <label>Select direction</label>
+              <%= select_tag(:direction, direction_options, :class => 'form-control', 'data-role' => 'seek-association-common-field') %>
+            </div>
+        <% end %>
+    <% end %>
+<% end %>
+
+<% if has_relationships -%>
+    <script>
+      $j(document).ready(function () {
+        var simulationRelationshipTypeId = '<%= RelationshipType.find_by_key(RelationshipType::SIMULATION).id -%>';
+
+        $j('#modalAssociateData #relationship_type').change(function () {
+          $j('#modalAssociateData #simulation_data').prop('checked', ($j(this).val() == simulationRelationshipTypeId));
+          $j('#modalAssociateData [data-role="seek-association-filter-group"]').data('filterGroup').filter();
+        });
+      });
+    </script>
+<% end %>

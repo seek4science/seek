@@ -12,11 +12,11 @@
 
   <% if object.instance_of?(Person) -%>
     <div>
-      <a href="#" data-toggle="modal" data-target="#project-roles">
+      <a href="#" data-toggle="modal" data-target="#person-roles">
         <%= seek_role_icons(object) -%>
       </a>
 
-      <%= render partial: 'people/project_roles_modal', locals: { person: object } %>
+      <%= render partial: 'people/roles_modal', locals: { person: object } %>
     </div>
   <% end -%>
 <% end %>

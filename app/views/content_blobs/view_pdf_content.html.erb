@@ -32,7 +32,7 @@ limitations under the License.
   <%= javascript_include_tag 'pdfjs/compatibility', 'pdfjs/debugger', 'pdfjs/l10n', 'pdfjs/pdf', 'pdfjs/viewer' %>
 
   <script type="text/javascript">
-      DEFAULT_URL = '<%= @pdf_url %>'
+      DEFAULT_URL = '<%= @pdf_url.html_safe %>'
   </script>
 </head>
 

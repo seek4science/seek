@@ -1,0 +1,139 @@
+{
+  "data": {
+    "id": "40",
+    "type": "file_templates",
+    "attributes": {
+      "policy": {
+        "access": "download",
+        "permissions": [
+
+        ]
+      },
+      "discussion_links": [
+        {
+          "id": "8",
+          "label": "Slack",
+          "url": "http://www.slack.com/"
+        }
+      ],
+      "title": "A Maximal FileTemplate",
+      "license": null,
+      "description": "The important report we did for ~important-milestone~",
+      "latest_version": 1,
+      "tags": [
+        "FileTemplate-tag1",
+        "FileTemplate-tag2",
+        "FileTemplate-tag3",
+        "FileTemplate-tag4",
+        "FileTemplate-tag5"
+      ],
+      "versions": [
+        {
+          "version": 1,
+          "revision_comments": null,
+          "url": "http://localhost:3000/file_templates/40?version=1",
+          "doi": null
+        }
+      ],
+      "version": 1,
+      "revision_comments": null,
+      "created_at": "2022-07-22T12:42:27.000Z",
+      "updated_at": "2022-07-22T12:42:27.000Z",
+      "doi": null,
+      "content_blobs": [
+        {
+          "original_filename": "min file",
+          "url": null,
+          "md5sum": "726de0a3f94d65056b909b9736e10349",
+          "sha1sum": "fbcc0dee4b5415de4c82ef5b137d8231fec1331b",
+          "content_type": "application/pdf",
+          "link": "http://localhost:3000/file_templates/40/content_blobs/125",
+          "size": 8
+        }
+      ],
+      "creators": [
+        {
+          "profile": "/people/329",
+          "family_name": "One",
+          "given_name": "Some",
+          "affiliation": "University of Somewhere",
+          "orcid": null
+        }
+      ],
+      "other_creators": "Blogs, Joe",
+      "data_type_annotations": [
+        {
+          "label": "Sequence features metadata",
+          "identifier": "http://edamontology.org/data_2914"
+        }
+      ],
+      "data_format_annotations": [
+        {
+          "label": "JSON",
+          "identifier": "http://edamontology.org/format_3464"
+        }
+      ]
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "329",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "330",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "329",
+            "type": "people"
+          },
+          {
+            "id": "330",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "276",
+            "type": "projects"
+          }
+        ]
+      },
+      "data_files": {
+        "data": [
+
+        ]
+      },
+      "placeholders": {
+        "data": [
+
+        ]
+      }
+    },
+    "links": {
+      "self": "/file_templates/40?version=1"
+    },
+    "meta": {
+      "created": "2022-07-22T12:42:27.000Z",
+      "modified": "2022-07-22T12:42:27.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "aab736b0-ebe9-013a-1162-0a81884ed284"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

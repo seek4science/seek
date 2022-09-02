@@ -17,7 +17,7 @@ module Zenodo
           if @oauth_session.expired?
             begin
               hash = @zenodo_oauth_client.refresh(oauth_session.refresh_token)
-              @oauth_session.update_attributes(
+              @oauth_session.update(
                   access_token: hash['access_token'],
                   expires_in: hash['expires_in'],
                   refresh_token: hash['refresh_token']

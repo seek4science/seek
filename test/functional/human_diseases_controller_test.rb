@@ -4,7 +4,6 @@ class HumanDiseasesControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  # include RestTestCases
 
   def setup
     login_as(:aaron)
@@ -14,10 +13,6 @@ class HumanDiseasesControllerTest < ActionController::TestCase
 
   def teardown
     Seek::Config.human_diseases_enabled = @old_enabled_status
-  end
-
-  def rest_api_test_object
-    @object = Factory(:human_disease, bioportal_concept: Factory(:human_disease_bioportal_concept))
   end
 
   test 'new human disease route' do
@@ -265,13 +260,6 @@ class HumanDiseasesControllerTest < ActionController::TestCase
       delete :destroy, params: { id: d }
     end
     refute_nil flash[:error]
-  end
-
-  test 'visualise available when logged out' do
-    logout
-    d = Factory(:human_disease, bioportal_concept: Factory(:human_disease_bioportal_concept))
-    get :visualise, params: { id: d }
-    assert_response :success
   end
 
   test 'cannot delete associated human disease' do

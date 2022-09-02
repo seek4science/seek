@@ -1,7 +1,8 @@
-<% sample_type = samples.first.sample_type %>
-<% shown_attributes = sample_type.sample_attributes.includes(:sample_attribute_type) %>
+<% sample_type = samples.first&.sample_type %>
+<% shown_attributes = sample_type ? sample_type.sample_attributes.includes(:sample_attribute_type) : [] %>
 <% link ||= false %>
 <% source_url ||= false %>
+<% show_extra_info ||= false %>
 
 <div data-role="seek-association-candidate-list">
   <div class="table-responsive">
@@ -11,8 +12,18 @@
               <tr>
                 <th>ID</th>
                 <th>Title</th>
+								<% if show_extra_info %>
+									<th>Project IDs</th>
+									<th>Project Names</th>
+									<th>Study IDs</th>
+									<th>Study Names</th>
+									<th>Assay IDs</th>
+									<th>Assay Names</th>
+								<% end %>
                 <% shown_attributes.each do |attribute| %>
-                    <th <%= 'data-title-column="true" ' if (attribute.is_title && link) -%>data-accessor-name="<%= attribute.accessor_name -%>" data-column-type="<%= attribute.sample_attribute_type.base_type-%>"><%= attribute.title %></th>
+                    <th <%= 'data-title-column="true" ' if (attribute.is_title && link) -%>data-accessor-name="<%= attribute.accessor_name -%>" data-column-type="<%= attribute.sample_attribute_type.base_type-%>" data-search-title="<%= attribute.title %>">
+                      <%= sample_attribute_display_title(attribute) %>
+                    </th>
                 <% end %>
               </tr>
           <% end %>
@@ -23,6 +34,15 @@
               <%= content_tag(:tr) do %>
                   <td><%= sample.id %></td>
                   <td><%= sample.title %></td>
+									<% if show_extra_info %>
+										<% info = get_extra_info(sample) %>
+										<td><%= info[:project_ids] %></td>
+										<td><%= info[:project_names] %></td>
+										<td><%= info[:study_ids] %></td>
+										<td><%= info[:study_names] %></td>
+										<td><%= info[:assay_ids] %></td>
+										<td><%= info[:assay_names] %></td>
+									<% end %>
                   <% shown_attributes.each do |attribute| %>
                       <% if (errors = sample.errors[attribute.title]).any? %>
                           <td class="sample-field-error">

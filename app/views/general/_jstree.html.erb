@@ -1,20 +1,15 @@
-
 <div id="jstree"></div>
-
 
 <script type="text/javascript">
     $j(document).ready(function () {
-
         $j('#jstree').bind('loaded.jstree', function (event, data) {
+            if (ISA.originNode) {
+                // expand the current node (above and children)
+                ISA.expandNodeByDataNodeId(ISA.originNode.data('id'));
 
-
-            // expand the current node (above and children)
-            ISA.expandNodeByDataNodeId(ISA.originNode.data('id'));
-
-
-            // highlight the relevant part of the tree
-            $j('li[data-node-id=' + ISA.originNode.data('id') + ']').addClass('isa-highlight');
-
+                // highlight the relevant part of the tree
+                $j('li[data-node-id=' + ISA.originNode.data('id') + ']').addClass('isa-highlight');
+            }
         }).jstree({
             'core': {
                 'check_callback': true,
@@ -41,9 +36,11 @@
             var node = ISA.getNode(id);
             ISA.visitNode(node);
         }).on('redraw.jstree', function (event) {
-            $j('li[data-node-id=' + ISA.originNode.data('id') + ']').each(function () {
-                $j(this).addClass('isa-highlight');
-            });
+            if (ISA.originNode) {
+                $j('li[data-node-id=' + ISA.originNode.data('id') + ']').each(function () {
+                    $j(this).addClass('isa-highlight');
+                });
+            }
         });
     });
 </script>

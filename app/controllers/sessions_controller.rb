@@ -3,10 +3,8 @@ require 'securerandom' # to set the seek user password to something random when 
 # This controller handles the login/logout function of the site.
 class SessionsController < ApplicationController
   before_action :redirect_to_sign_up_when_no_user, only: :new
-  skip_before_action :restrict_guest_user
   skip_before_action :project_membership_required
   skip_before_action :partially_registered?, only: %i[create new]
-  prepend_before_action :strip_root_for_xml_requests
 
   # render new.html.erb
   def new
@@ -105,7 +103,6 @@ class SessionsController < ApplicationController
         default_path = is_search ? root_path : return_to_path || root_path
         redirect_back_or_default(default_path)
       end
-      format.xml { session[:xml_login] = true; head :ok }
     end
     clear_return_to
   end
@@ -138,7 +135,6 @@ class SessionsController < ApplicationController
     respond_to do |format|
       return_to = params[:called_from] ? params[:called_from][:path] : nil
       format.html { redirect_to(login_path(return_to: return_to)) }
-      format.xml { head :not_found }
     end
   end
 

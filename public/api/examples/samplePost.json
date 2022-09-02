@@ -3,39 +3,41 @@
     "type": "samples",
     "attributes": {
       "attribute_map": {
-        "full_name": "Fred Bloggs",
-        "address": "3 Oxford Road",
-        "postcode": "M13 9PL"
-      }
+        "the_title": "Hello",
+        "a_real_number": "2.6"
+      },
+      "tags": [
+
+      ]
     },
     "relationships": {
+      "sample_type": {
+        "data": {
+          "id": "3",
+          "type": "sample_types"
+        }
+      },
       "creators": {
         "data": [
           {
-            "id": "5",
+            "id": "37",
             "type": "people"
           }
         ]
       },
-      "sample_type": {
-        "data": {
-          "id": "354",
-          "type": "sample_types"
-        }
-      },
       "projects": {
         "data": [
           {
-            "id": "1042",
+            "id": "41",
             "type": "projects"
           }
         ]
       },
-      "data_files": {
+      "assays": {
         "data": [
           {
-            "id": "15",
-            "type": "data_files"
+            "id": "1",
+            "type": "assays"
           }
         ]
       }

@@ -1,0 +1,38 @@
+<% assay ||= nil %>
+<% valid_study = assay&.study&.sample_types.present? %>
+<% valid_assay = assay&.sample_type.present? %>
+
+<% if valid_study && valid_assay %>
+
+	<ul class="nav nav-tabs">
+			<li class="active">
+					<a data-toggle="tab" data-target="#sample_collection"><i class="glyphicon glyphicon-list-alt"></i> Protocol</a>
+			</li>
+			<li>
+					<a data-toggle="tab" data-target="#assay_samples"><i class="glyphicon glyphicon-list-alt"></i> Samples table</a>
+			</li>
+			<li>
+					<a data-toggle="tab" data-target="#assay_table"><i class="glyphicon glyphicon-list-alt"></i> Experiment overview</a>
+			</li>
+	</ul>
+
+	<div class="tab-content">
+			<div id="sample_collection" class="tab-pane fade active in">
+					<%= render :partial=>"isa_studies/sop", locals: { sop: assay ? assay.sops&.first : nil} -%>
+			</div>
+			<div id="assay_samples" class="tab-pane fade">
+					<%= render :partial=>"isa_assays/assay_samples", locals: { assay: assay} -%>
+			</div>
+			<div id="assay_table" class="tab-pane fade">
+					<%= render :partial=>"isa_assays/assay_table", locals: { assay: assay} -%>   
+			</div>
+	</div>
+
+<% else %>
+	<p>
+		<em>
+			This <%="#{t(:assay)}"%> has not been created in Single Page. 
+			Please, create the <%="#{t(:assay)}"%> by using the <strong>Design <%="#{t(:assay)}"%></strong> button at the <%="#{t(:study)}"%> level.
+		</em>
+	</p>
+<% end %>

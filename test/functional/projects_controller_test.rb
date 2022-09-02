@@ -4,7 +4,6 @@ require 'libxml'
 class ProjectsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include RdfTestCases
   include ActionView::Helpers::NumberHelper
   include SharingFormTestHelper
@@ -13,10 +12,6 @@ class ProjectsControllerTest < ActionController::TestCase
 
   def setup
     login_as(Factory(:admin))
-  end
-
-  def rest_api_test_object
-    @object = projects(:sysmo_project)
   end
 
   def test_title
@@ -58,16 +53,6 @@ class ProjectsControllerTest < ActionController::TestCase
         end
       end
     end
-  end
-
-  def test_should_create_project_with_hierarchy
-    parent = Factory(:project, title: 'Test Parent')
-    assert_difference('Project.count') do
-      post :create, params: { project: { title: 'test', parent_id: parent.id } }
-    end
-
-    assert_redirected_to project_path(assigns(:project))
-    assert_includes assigns(:project).ancestors, parent
   end
 
   test 'create project with default license' do
@@ -275,11 +260,6 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_redirected_to projects_path
   end
 
-  def test_admin_can_manage
-    get :manage, params: { id: Factory(:project) }
-    assert_response :success
-  end
-
   def test_non_admin_should_not_destroy_project
     login_as(:aaron)
     project = projects(:four)
@@ -313,12 +293,6 @@ class ProjectsControllerTest < ActionController::TestCase
       end
     end
 
-  end
-  
-  def test_non_admin_should_not_manage_projects
-    login_as(:aaron)
-    get :manage, params: { id: Factory(:project) }
-    assert_not_nil flash[:error]
   end
 
   test 'asset report with stuff in it can be accessed' do
@@ -1309,7 +1283,12 @@ class ProjectsControllerTest < ActionController::TestCase
 
     ids = "#{person.id},#{person2.id}"
 
-    post :update_members, params: { id: project, project: { project_administrator_ids: ids, asset_gatekeeper_ids: ids, asset_housekeeper_ids: ids, pal_ids: ids } }
+    assert_difference('Role.count', 4 * 2) do
+      post :update_members, params: { id: project, project: { project_administrator_ids: ids,
+                                                              asset_gatekeeper_ids: ids,
+                                                              asset_housekeeper_ids: ids,
+                                                              pal_ids: ids } }
+    end
 
     assert_redirected_to project_path(project)
     assert_nil flash[:error]
@@ -1364,8 +1343,10 @@ class ProjectsControllerTest < ActionController::TestCase
     person = Factory(:programme_administrator_not_in_project)
     institution = Factory(:institution)
     login_as(person)
-    assert_difference('Project.count') do
-      post :create, params: { project: { title: 'test2' }, default_member: { add_to_project: '1', institution_id: institution.id } }
+    assert_difference('Role.count', 1) do
+      assert_difference('Project.count') do
+        post :create, params: { project: { title: 'test2' }, default_member: { add_to_project: '1', institution_id: institution.id } }
+      end
     end
 
     assert project = assigns(:project)
@@ -1791,7 +1772,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'input#managed_programme', count:0
     assert_select 'select#programme_id' do
-      assert_select 'option',count:2      
+      assert_select 'option',count:2
       assert_select 'option',value:managed_prog.id,text:managed_prog.title
       assert_select 'option',value:admin_prog.id,text:admin_prog.title
       assert_select 'option',value:person_prog.id,text:person_prog.title, count:0
@@ -1913,7 +1894,7 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal 2, programme.programme_administrators.count
 
     institution = Factory(:institution)
-    
+
     refute programme.programme_administrators.select(&:is_admin?).any?
     login_as(person)
     with_config_value(:managed_programme_id, programme.id) do
@@ -2075,7 +2056,7 @@ class ProjectsControllerTest < ActionController::TestCase
     created_inst = Factory(:institution,title:'my institution')
     get :administer_join_request, params:{id:project.id,message_log_id:log.id}
     assert_response :success
-    
+
     assert_select 'input#institution_title', count: 0
     assert_select 'input#institution_id', value: created_inst.id, count: 1
   end
@@ -2166,6 +2147,7 @@ class ProjectsControllerTest < ActionController::TestCase
                                    country:'DE'
                                   })
     log = ProjectMembershipMessageLog.log_request(sender:sender, project:project, institution:institution, comments:'some comments')
+    login_as(person)
 
     params = {
         message_log_id: log.id,
@@ -2208,6 +2190,7 @@ class ProjectsControllerTest < ActionController::TestCase
                                       country:'DE'
                                   })
     log = ProjectMembershipMessageLog.log_request(sender:sender, project:project, institution:institution, comments:'some comments')
+    login_as(person)
 
     params = {
         message_log_id: log.id,
@@ -2240,11 +2223,12 @@ class ProjectsControllerTest < ActionController::TestCase
     institution = Factory(:institution)
     sender = Factory(:person)
     log = ProjectMembershipMessageLog.log_request(sender:sender, project:project, institution:institution, comments:'some comments')
+    login_as(person)
 
     params = {
         message_log_id: log.id,
         reject_details: 'bad request',
-        institution:{id:institution.id},
+        institution: { id:institution.id },
         id:project.id
     }
 
@@ -2267,6 +2251,70 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_equal 'bad request',log.response
   end
 
+  test 'respond join request deleted' do
+    person = Factory(:project_administrator)
+    project = person.projects.first
+    institution = Factory(:institution)
+    sender = Factory(:person)
+    log = ProjectMembershipMessageLog.log_request(sender: sender, project: project, institution: institution, comments: 'some comments')
+    login_as(person)
+
+    params = {
+      message_log_id: log.id,
+      institution: { id: institution.id },
+      id: project.id,
+      delete_request: '1'
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Institution.count') do
+        assert_no_difference('GroupMembership.count') do
+          assert_difference('ProjectMembershipMessageLog.count', -1) do
+            post :respond_join_request, params:params
+          end
+        end
+      end
+    end
+
+    assert_redirected_to(project_path(project))
+    refute_nil flash[:notice]
+    project.reload
+    refute_includes project.people, sender
+    refute_includes project.institutions, institution
+  end
+
+  test 'respond join request cannot delete without rights' do
+    person = Factory(:person)
+    project = Factory(:project)
+    institution = Factory(:institution)
+    sender = Factory(:person)
+    log = ProjectMembershipMessageLog.log_request(sender: sender, project: project, institution: institution, comments: 'some comments')
+    login_as(person)
+
+    params = {
+      message_log_id: log.id,
+      institution: {id: institution.id },
+      id: project.id,
+      delete_request: '1'
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Institution.count') do
+        assert_no_difference('GroupMembership.count') do
+          assert_no_difference('ProjectMembershipMessageLog.count') do
+            post :respond_join_request, params:params
+          end
+        end
+      end
+    end
+
+    assert_redirected_to :root
+    refute_nil flash[:error]
+    project.reload
+    refute_includes project.people, sender
+    refute_includes project.institutions, institution
+  end
+
   test 'administer create request project with new programme and institution' do
     person = Factory(:admin)
     login_as(person)
@@ -2279,7 +2327,7 @@ class ProjectsControllerTest < ActionController::TestCase
   end
 
   test 'administer create request project with institution already created' do
-    # when a new institution when requested, but it has then been created before the request is handled 
+    # when a new institution when requested, but it has then been created before the request is handled
     person = Factory(:admin)
     login_as(person)
     project = Project.new(title:'new project')
@@ -2382,7 +2430,7 @@ class ProjectsControllerTest < ActionController::TestCase
             assert_difference('GroupMembership.count') do
               assert_difference('WorkGroup.count') do
                 post :respond_create_project_request, params:params
-              end              
+              end
             end
           end
         end
@@ -2538,7 +2586,7 @@ class ProjectsControllerTest < ActionController::TestCase
             assert_no_difference('GroupMembership.count') do
               assert_no_difference('WorkGroup.count') do
                 post :respond_create_project_request, params:params
-              end              
+              end
             end
           end
         end
@@ -2694,6 +2742,91 @@ class ProjectsControllerTest < ActionController::TestCase
 
     assert_redirected_to :root
     assert_equal "Project creation cancelled",flash[:notice]
+  end
+
+  test 'respond create project request - delete' do
+    person = Factory(:programme_administrator)
+    programme = person.programmes.first
+    institution = Factory(:institution)
+    login_as(person)
+    project = Project.new(title: 'new project', web_page: 'my new project')
+    requester = Factory(:person)
+    log = ProjectCreationMessageLog.log_request(sender: requester, programme: programme, project: project, institution: institution)
+    refute log.sent_by_self?
+    params = {
+      message_log_id:log.id,
+      project:{
+        title:'new project',
+        web_page:'http://proj.org'
+      },
+      programme:{
+        id:programme.id
+      },
+      institution:{
+        id:institution.id
+      },
+      delete_request: '1'
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('GroupMembership.count') do
+              assert_difference('ProjectCreationMessageLog.count',-1) do
+                post :respond_create_project_request, params:params
+              end
+            end
+          end
+        end
+      end
+    end
+
+    assert_redirected_to :root
+    assert_equal "Project creation cancelled",flash[:notice]
+  end
+
+  test 'respond create project request - cannot delete without rights' do
+    person = Factory(:person)
+    programme = Factory(:programme)
+    institution = Factory(:institution)
+    login_as(person)
+    project = Project.new(title: 'new project', web_page: 'my new project')
+    requester = Factory(:person)
+    log = ProjectCreationMessageLog.log_request(sender: requester, programme: programme, project: project, institution: institution)
+    refute log.sent_by_self?
+    refute programme.can_manage?
+    params = {
+      message_log_id:log.id,
+      project:{
+        title:'new project',
+        web_page:'http://proj.org'
+      },
+      programme:{
+        id:programme.id
+      },
+      institution:{
+        id:institution.id
+      },
+      delete_request: '1'
+    }
+
+    assert_enqueued_emails(0) do
+      assert_no_difference('Programme.count') do
+        assert_no_difference('Project.count') do
+          assert_no_difference('Institution.count') do
+            assert_no_difference('GroupMembership.count') do
+              assert_no_difference('ProjectCreationMessageLog.count') do
+                post :respond_create_project_request, params:params
+              end
+            end
+          end
+        end
+      end
+    end
+
+    assert_redirected_to :root
+    refute_nil flash[:error]
   end
 
   test 'respond create project request - existing programme need prog admin rights' do
@@ -2962,19 +3095,273 @@ class ProjectsControllerTest < ActionController::TestCase
     assert_empty project.discussion_links
   end
 
-    private
+  test 'should not populate if no policy' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.first
+    login_as(project_administrator.user)
+    df = Factory(:xlsx_population_datafile, projects: [project])
+    flash.clear
+    refute flash.key? :error
+    put :populate_from_spreadsheet, params: {id: project.id, :spreadsheet_id => df.id }
+    assert flash.key? :error
+    assert flash[:error] == "Project does not have a default policy"
+  end
 
-  def edit_max_object(project)
-    for i in 1..5
-      Factory(:person).add_to_project_and_institution(project, Factory(:institution))
-    end
-    project.default_policy = Factory(:private_policy)
-    project.programme_id = (Factory(:programme)).id
-    add_avatar_to_test_object(project)
+  test 'should populate if policy' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.first
+    login_as(project_administrator.user)
+    df = Factory(:xlsx_population_datafile, projects: [project])
+
+    project.use_default_policy = true
+    project.default_policy = Factory(:public_policy)
+    project.save!
+    refute project.default_policy.blank?
+    flash.clear
+    refute flash.key? :error
+    put :populate_from_spreadsheet, params: {id: project.id, :spreadsheet_id => df.id }
+    refute flash.key? :error
+  end
+
+  test 'should not populate if no header' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.first
+    login_as(project_administrator.user)
+    df = Factory(:xlsx_population_no_header_datafile, projects: [project])
+
+    project.use_default_policy = true
+    project.default_policy = Factory(:public_policy)
+    project.save!
+    refute project.default_policy.blank?
+    flash.clear
+    refute flash.key? :error
+    put :populate_from_spreadsheet, params: {id: project.id, :spreadsheet_id => df.id }
+    assert flash.key? :error
+    assert flash[:error].starts_with?("Unable to find header cells")
+  end
+
+  test 'should not populate if a header missing' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.first
+    login_as(project_administrator.user)
+    df = Factory(:xlsx_population_no_study_header_datafile, projects: [project])
+
+    project.use_default_policy = true
+    project.default_policy = Factory(:public_policy)
+    project.save!
+    refute project.default_policy.blank?
+    flash.clear
+    refute flash.key? :error
+    put :populate_from_spreadsheet, params: {id: project.id, :spreadsheet_id => df.id }
+    assert flash.key? :error
+    assert flash[:error].starts_with?("Investigation, Study or Assay column is missing")
+  end
+
+  test 'should not populate if no investigation' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.first
+    login_as(project_administrator.user)
+    df = Factory(:xlsx_population_no_investigation_datafile, projects: [project])
+
+    project.use_default_policy = true
+    project.default_policy = Factory(:public_policy)
+    project.save!
+    refute project.default_policy.blank?
+    flash.clear
+    refute flash.key? :error
+    put :populate_from_spreadsheet, params: {id: project.id, :spreadsheet_id => df.id }
+    assert flash.key? :error
+    assert flash[:error].starts_with?("Study specified without Investigation")
+  end
+
+  test 'should not populate if no study' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.first
+    login_as(project_administrator.user)
+    df = Factory(:xlsx_population_no_study_datafile, projects: [project])
+
+    project.use_default_policy = true
+    project.default_policy = Factory(:public_policy)
+    project.save!
+    refute project.default_policy.blank?
+    flash.clear
+    refute flash.key? :error
+    put :populate_from_spreadsheet, params: {id: project.id, :spreadsheet_id => df.id }
+    assert flash.key? :error
+    assert flash[:error].starts_with?("Assay specified without Study")
+  end
+
+  test 'should populate correctly from xlsx' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.first
+    login_as(project_administrator.user)
+    df = Factory(:xlsx_population_datafile, projects: [project])
+
+    project.use_default_policy = true
+    project.default_policy = Factory(:public_policy)
+    project.save!
+    put :populate_from_spreadsheet, params: {id: project.id, :spreadsheet_id => df.id }
+
+    check_project(project)
+  end
+
+  test 'should populate correctly from csv' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.first
+    login_as(project_administrator.user)
+    df = Factory(:csv_population_datafile, projects: [project])
+
+    project.use_default_policy = true
+    project.default_policy = Factory(:public_policy)
+    project.save!
+    put :populate_from_spreadsheet, params: {id: project.id, :spreadsheet_id => df.id }
+
+    check_project(project)
+  end
+
+  test 'should populate correctly from tsv' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.first
+    login_as(project_administrator.user)
+    df = Factory(:tsv_population_datafile, projects: [project])
+
+    project.use_default_policy = true
+    project.default_policy = Factory(:public_policy)
+    project.save!
+    put :populate_from_spreadsheet, params: {id: project.id, :spreadsheet_id => df.id }
+
+    check_project(project)
+  end
+
+  test 'should populate just isa' do
+    project_administrator = Factory(:project_administrator)
+    project = project_administrator.projects.first
+    login_as(project_administrator.user)
+    df = Factory(:xlsx_population_just_isa_datafile, projects: [project])
+
+    project.use_default_policy = true
+    project.default_policy = Factory(:public_policy)
+    project.save!
+    put :populate_from_spreadsheet, params: {id: project.id, :spreadsheet_id => df.id }
+
+    check_project(project)
+  end
+
+  test 'project needs more than one investigation for ordering' do
+    person = Factory(:admin)
+    login_as(person)
+    project = Factory(:project)
+    get :show, params: { id: project.id }
+    
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_investigations_project_path(project), count: 0
+
+    project.investigations += [Factory(:investigation, contributor:person)]
+    get :show, params: { id: project.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_investigations_project_path(project), count: 0
+
+    project.investigations += [Factory(:investigation, contributor:person)]
+    get :show, params: { id: project.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_investigations_project_path(project), count: 1
+  end
+
+  test 'ordering only by editor' do
+    person = Factory(:admin)
+    login_as(person)
+    project = Factory(:project)
+    project.investigations += [Factory(:investigation, contributor:person)]
+    project.investigations += [Factory(:investigation, contributor:person)]
+    get :show, params: { id: project.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_investigations_project_path(project), count: 1
+
+    # Can order if the project is editable, even if some investigations are not editable
+    project.investigations += [Factory(:investigation)]
+    get :show, params: { id: project.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_investigations_project_path(project), count: 1
+    
+    login_as(:aaron)
+    get :show, params: { id: project.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_investigations_project_path(project), count: 0
+  end
+
+  test 'should update project annotated topics' do
+    Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
+
+    project_admin = Factory(:project_administrator)
+    project = project_admin.projects.first
+    login_as(project_admin)
+
+    put :update, params: { id: project.id, project: { topic_annotations: 'Chemistry, Sample collections' } }
+
+    assert_equal ['http://edamontology.org/topic_3314','http://edamontology.org/topic_3277'], assigns(:project).topic_annotations
+
+  end
+
+  test 'show annotated topics if set' do
+    Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
+
+    user = Factory(:user)
+    project = Factory(:project)
+    login_as(user)
+
+    get :show, params: {id: project.id}
+    assert_response :success
+    assert_select 'div.panel div.panel-heading',text:/Annotated Properties/i, count:0
+
+    project.topic_annotations = "Chemistry"
+    project.save!
+
+    assert project.controlled_vocab_annotations?
+
+    get :show, params: {id: project.id}
+    assert_response :success
+
+    assert_select 'div.panel div.panel-heading',text:/Annotated Properties/i, count:1
+    assert_select 'div.panel div.panel-body div strong',text:/#{I18n.t('attributes.topic_annotation_values')}/, count:1
+    assert_select 'div.panel div.panel-body a[href=?]','https://edamontology.github.io/edam-browser/#topic_3314',text:/Chemistry/, count:1
+  end
+
+  private
+
+  def check_project(project)
+    assert project.investigations.size == 2
+    check_investigation_0(project.investigations[0])
+    check_investigation_1(project.investigations[1])
+  end
+
+  def check_investigation_0(investigation)
+    assert investigation.title == "Select host and product"
+    assert investigation.studies.size == 4
+  end
+
+  def check_investigation_1(investigation)
+    assert investigation.title == "Design"
+    assert investigation.studies.size == 1
+    check_study_1_0(investigation.studies[0])
+  end
+
+  def check_study_1_0(study)
+    assert study.title == "Receive input from select host and products step"
+    assert study.assays.size == 2
+    check_assay_1_0_1(study.assays[1])
+  end
+
+  def check_assay_1_0_1(assay)
+    assert assay.title == "Obtain SBML models for production hosts"
   end
 
   def valid_project
     { title: "a title" }
-  end  
-  
+  end
 end

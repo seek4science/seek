@@ -1,20 +1,19 @@
 class BaseSerializer < SimpleBaseSerializer
-  include ApiHelper
   include PolicyHelper
   include RelatedItemsHelper
-  include Rails.application.routes.url_helpers
+  include Seek::Util.routes
 
   attribute :policy, if: :show_policy?
 
   attribute :discussion_links, if: -> { object.is_discussable? } do
     object.discussion_links.collect do |link|
-      { id: link.id, label: link.label, url: link.url }
+      { id: link.id.to_s, label: link.label, url: link.url }
     end
   end
 
   attribute :misc_links, if: -> { object.have_misc_links? } do
     object.misc_links.collect do |link|
-      { id: link.id, label: link.label, url: link.url }
+      { id: link.id.to_s, label: link.label, url: link.url }
     end
   end
 
@@ -88,13 +87,7 @@ class BaseSerializer < SimpleBaseSerializer
     associated('Organism')
   end
 
-  def self_link
-    polymorphic_path(object)
-  end
-
-  def _links
-    { self: self_link }
-  end
+  link(:self) { polymorphic_path(object) }
 
   # avoid dash-erizing attribute names
   def format_name(attribute_name)
@@ -104,7 +97,6 @@ class BaseSerializer < SimpleBaseSerializer
   def _meta
     meta = super
     meta[:uuid] = object.uuid if object.respond_to?('uuid')
-    meta[:base_url] = base_url
     meta
   end
 
@@ -122,20 +114,26 @@ class BaseSerializer < SimpleBaseSerializer
   end
 
   def show_policy?
-    respond_to_manage = object.respond_to?('can_manage?')
-    respond_to_policy = object.respond_to?('policy')
-    current_user = User.current_user
-    can_manage = object.can_manage?(current_user)
-    return respond_to_policy && respond_to_manage && can_manage
+    return false unless object.respond_to?('can_manage?')
+    return false unless object.respond_to?('policy')
+    return object.can_manage?(User.current_user)
   end
 
   def submitter
     result = determine_submitter object
     if result.blank?
-      return []
+      []
     else
-      return [result]
+      [result]
     end
+  end
+
+  private
+
+  def determine_submitter(object)
+    return object.owner if object.respond_to?('owner')
+    result = object.contributor if object.respond_to?('contributor') && !object.is_a?(Permission)
+    return result
   end
 
   def serialize_assets_creators
@@ -145,6 +143,16 @@ class BaseSerializer < SimpleBaseSerializer
         given_name: c.given_name,
         affiliation: c.affiliation,
         orcid: c.orcid }
+    end
+  end
+
+  def controlled_vocab_annotations(property)
+    terms = object.annotations_with_attribute(property, true).collect(&:value).sort_by(&:label)
+    terms.collect do |term|
+      {
+        label: term.label,
+        identifier: term.iri
+      }
     end
   end
 end

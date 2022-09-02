@@ -42,7 +42,6 @@ class TagsController < ApplicationController
       flash[:error] = 'The Tag does not exist'
       respond_to do |format|
         format.html { redirect_to all_anns_path }
-        format.xml { head status: 404 }
       end
     end
   end

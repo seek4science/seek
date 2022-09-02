@@ -3,17 +3,12 @@ require 'test_helper'
 class EventsControllerTest < ActionController::TestCase
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include GeneralAuthorizationTestCases
   include SharingFormTestHelper
 
   def setup
     login_as(:datafile_owner)
     @project = users(:datafile_owner).person.projects.first
-  end
-
-  def rest_api_test_object
-    @object = events(:event_with_no_files)
   end
 
   def test_title

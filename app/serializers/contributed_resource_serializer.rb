@@ -1,21 +1,34 @@
-class ContributedResourceSerializer < PCSSerializer
+class ContributedResourceSerializer < BaseSerializer
+
+  has_many :creators
+  has_many :submitter
+
   attributes :title
-  attribute :license, if: -> {object.respond_to?(:license)}
-  attribute :description, if: -> {object.respond_to?(:description)}
+  attribute :license, if: -> { object.respond_to?(:license) && !object.is_a?(Publication) }
+  attribute :description, if: -> { object.respond_to?(:description) && !object.is_a?(Publication) }
 
   attribute :version, key: :latest_version, if: -> { object.respond_to?(:version) }
 
   attribute :tags do
-    serialize_annotations(object)
+    serialize_annotations(object, context ='tag')
   end
 
   attribute :versions, if: -> { object.respond_to?(:versions) } do
     versions_data = []
     object.visible_versions.each do |v|
-      path = polymorphic_path(object, version: v.version)
-      versions_data.append(version: v.version,
-                           revision_comments: v.revision_comments.presence,
-                           url: "#{base_url}#{path}")
+      data = {
+        version: v.version,
+        revision_comments: v.revision_comments.presence,
+        url: polymorphic_url(object, version: v.version)
+      }
+      if v.is_git_versioned?
+        data[:remote] = v.remote if v.remote?
+        data[:commit] = v.commit
+        data[:ref] = v.ref
+        data[:tree] = polymorphic_path([object, :git_tree], version: v.version)
+      end
+      data[:doi] = v.doi if v.respond_to?(:doi)
+      versions_data.append(data)
     end
     versions_data
   end
@@ -34,6 +47,9 @@ class ContributedResourceSerializer < PCSSerializer
   attribute :updated_at do
     get_version.updated_at
   end
+  attribute :doi, if: -> { object.supports_doi? } do
+    get_version.doi
+  end
 
   def get_correct_blob_content(requested_version)
     blobs = if requested_version.respond_to?(:content_blobs)
@@ -43,7 +59,6 @@ class ContributedResourceSerializer < PCSSerializer
             else
               []
             end
-
     blobs.map { |cb| convert_content_blob_to_json(cb) }
   end
 
@@ -60,19 +75,20 @@ class ContributedResourceSerializer < PCSSerializer
   attribute :other_creators
 
   def convert_content_blob_to_json(cb)
-    path = polymorphic_path([cb.asset, cb])
     {
       original_filename: cb.original_filename,
       url: cb.url,
       md5sum: cb.md5sum,
       sha1sum: cb.sha1sum,
       content_type: cb.content_type,
-      link: "#{base_url}#{path}",
+      link: polymorphic_url([cb.asset, cb]),
       size: cb.file_size
     }
   end
 
-  def self_link
+  link(:self) do
+    # No idea what the scope is here, but it cannot access the `version_number` method defined below
+    version_number = (@scope.try(:[], :requested_version) || object).try(:version)
     if version_number
       polymorphic_path(object, version: version_number)
     else
@@ -81,12 +97,17 @@ class ContributedResourceSerializer < PCSSerializer
   end
 
   def get_version
-    @version ||= object.respond_to?(:find_version) ? object.find_version(version_number) : object
+    @version ||= if object.respond_to?(:find_version)
+                   scope.try(:[], :requested_version) || object.latest_version
+                 else
+                   object
+                 end
   end
 
   private
 
   def version_number
-    @scope.try(:[],:requested_version) || object.try(:version)
+    (@scope.try(:[], :requested_version) || object)&.version
   end
+
 end

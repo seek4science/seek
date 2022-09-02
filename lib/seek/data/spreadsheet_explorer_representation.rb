@@ -20,10 +20,6 @@ module Seek
         content_blob.is_extractable_excel?
       end
 
-      def spreadsheet_annotations
-        content_blob.worksheets.collect { |w| w.cell_ranges.collect(&:annotations) }.flatten
-      end
-
       # Return the data file's spreadsheet
       # If it doesn't exist yet, it gets created
       def spreadsheet
@@ -31,13 +27,12 @@ module Seek
           workbook = parse_spreadsheet
           if content_blob.worksheets.empty?
             workbook.sheets.each_with_index do |sheet, sheet_number|
-              content_blob.worksheets << Worksheet.create(sheet_number: sheet_number, last_row: sheet.last_row, last_column: sheet.last_col)
+              content_blob.worksheets << Worksheet.create(sheet_number: sheet_number, last_row: sheet.last_row,
+                                                          last_column: sheet.last_col)
             end
             content_blob.save
           end
-          return workbook
-        else
-          return nil
+          workbook
         end
       end
 
@@ -59,13 +54,11 @@ module Seek
 
       def parse_spreadsheet
         if content_blob.is_excel?
-          return parse_spreadsheet_xml(spreadsheet_xml)
+          parse_spreadsheet_xml(spreadsheet_xml)
         elsif content_blob.is_csv?
-          return parse_spreadsheet_csv(spreadsheet_csv)
+          parse_spreadsheet_csv(spreadsheet_csv)
         elsif content_blob.is_tsv?
-          return parse_spreadsheet_csv(spreadsheet_csv, "\t")
-        else
-          return nil          
+          parse_spreadsheet_csv(spreadsheet_csv, "\t")
         end
       end
 
@@ -87,6 +80,7 @@ module Seek
 
         doc.find('//ss:sheet').each do |s|
           next if s['hidden'] == 'true' || s['very_hidden'] == 'true'
+
           sheet = Sheet.new(s['name'])
           workbook.sheets << sheet
           # Load into memory
@@ -103,7 +97,7 @@ module Seek
           end
           # Pad columns (so it's at least 10 cols wide)
           if col_index < min_cols
-            for i in ((col_index + 1)..min_cols)
+            ((col_index + 1)..min_cols).each do |i|
               col = Column.new(i, 2964.to_s)
               sheet.columns << col
             end
@@ -128,7 +122,7 @@ module Seek
           end
           # Pad rows
           if row_index < min_rows
-            for i in ((row_index + 1)..min_rows)
+            ((row_index + 1)..min_rows).each do |i|
               row = Row.new(i, 1000.to_s)
               sheet.rows << row
             end
@@ -142,25 +136,25 @@ module Seek
 
         workbook
       end
-      
+
       # Takes in a string containing the csv representation of a spreadsheet and returns
       # a Workbook object
-      def parse_spreadsheet_csv(spreadsheet_csv, col_sep=nil)
+      def parse_spreadsheet_csv(spreadsheet_csv, col_sep = nil)
         workbook = Workbook.new
 
-        if col_sep.nil?
-          csv = CSV.parse(spreadsheet_csv, quote_char: "\x00")
-        else
-          csv = CSV.parse(spreadsheet_csv, col_sep: col_sep, quote_char: "\x00")
-        end
+        csv = if col_sep.nil?
+                CSV.parse(spreadsheet_csv, quote_char: "\x00")
+              else
+                CSV.parse(spreadsheet_csv, col_sep: col_sep, quote_char: "\x00")
+              end
 
         sheet = Sheet.new('Sheet1')
         workbook.sheets << sheet
 
         # set a default style
-        style = Style.new("default")
-        style.attributes["font-size"] = "11pt"
-        style.attributes["color"] = "#000000"
+        style = Style.new('default')
+        style.attributes['font-size'] = '11pt'
+        style.attributes['color'] = '#000000'
         workbook.styles[style.name] = style
 
         # Load into memory
@@ -168,8 +162,8 @@ module Seek
         min_cols = MIN_COLS
 
         # Initialise column width to default width
-        col_index=0
-        csv[0].each_with_index do |c, index|
+        col_index = 0
+        csv[0].each_with_index do |_c, index|
           col_index = index + 1
           col = Column.new(col_index, 2964.to_s)
           sheet.columns << col
@@ -177,14 +171,14 @@ module Seek
 
         # Pad columns (so it's at least 10 cols wide)
         if csv[0].length < min_cols
-          for i in ((col_index + 1)..min_cols)
+          ((col_index + 1)..min_cols).each do |i|
             col = Column.new(i, 2964.to_s)
             sheet.columns << col
           end
         else
           min_cols = csv[0].length
         end
-        
+
         # Grab rows
         row_index = 0
         csv.each_with_index do |r, index|
@@ -205,7 +199,7 @@ module Seek
 
         # Pad rows
         if row_index < min_rows
-          for i in ((row_index + 1)..min_rows)
+          ((row_index + 1)..min_rows).each do |i|
             row = Row.new(i, 1000.to_s)
             sheet.rows << row
           end
@@ -219,13 +213,12 @@ module Seek
         workbook
       end
 
-
       # Turns a numeric column ID into an Excel letter representation
       # eg. 1 > A, 10 > J, 28 > AB etc.
       def to_alpha(col)
         result = ''
         col -= 1
-        while (col >= 0)
+        while col >= 0
           result = ((col % 26) + 65).chr + result
           col = (col / 26) - 1
         end
@@ -244,14 +237,11 @@ module Seek
       end
 
       class Workbook
-        attr_accessor :sheets
-        attr_accessor :styles
-        attr_accessor :annotations
+        attr_accessor :sheets, :styles
 
         def initialize
           @sheets = []
           @styles = {}
-          @annotations = []
         end
 
         def [](x)
@@ -259,17 +249,16 @@ module Seek
         end
 
         def sheet(x)
-          if x.class.name == 'String'
+          if x.instance_of?(String)
             @sheets.find { |s| s.name == x }
-          elsif x.class.name == 'Fixnum'
+          elsif x.instance_of?(Integer)
             @sheets[x]
           end
         end
       end
 
       class Style
-        attr_accessor :name
-        attr_accessor :attributes
+        attr_accessor :name, :attributes
 
         def initialize(name)
           @name = name
@@ -282,11 +271,7 @@ module Seek
       end
 
       class Sheet
-        attr_accessor :rows
-        attr_accessor :columns
-        attr_accessor :name
-        attr_accessor :last_row
-        attr_accessor :last_col
+        attr_accessor :rows, :columns, :name, :last_row, :last_col
 
         def initialize(n = nil, h = 0)
           @rows = []
@@ -322,8 +307,7 @@ module Seek
       end
 
       class Column
-        attr_accessor :index
-        attr_accessor :width
+        attr_accessor :index, :width
 
         def initialize(c = nil, w = nil)
           @index = c
@@ -332,9 +316,7 @@ module Seek
       end
 
       class Row
-        attr_accessor :cells
-        attr_accessor :index
-        attr_accessor :height
+        attr_accessor :cells, :index, :height
 
         def initialize(r = nil, h = nil)
           @cells = []
@@ -357,11 +339,7 @@ module Seek
       end
 
       class Cell
-        attr_accessor :value
-        attr_accessor :row
-        attr_accessor :column
-        attr_accessor :formula
-        attr_accessor :style
+        attr_accessor :value, :row, :column, :formula, :style
 
         def initialize(v = nil, r = nil, c = nil, f = nil, s = nil)
           @value = v
@@ -372,10 +350,10 @@ module Seek
         end
 
         def pretty_value
-          if @value.class == Float
-            return @value.round(3)
+          if @value.instance_of?(Float)
+            @value.round(3)
           else
-            return @value
+            @value
           end
         end
       end

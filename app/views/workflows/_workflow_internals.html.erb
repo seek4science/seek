@@ -1,5 +1,5 @@
 <div class="workflow-internals">
-  <% if workflow.inputs.any? %>
+  <% if structure.inputs.any? %>
     <h2>Inputs</h2>
     <div class="table-responsive">
       <table class="table table-striped table-hover steps">
@@ -12,9 +12,9 @@
         </tr>
         </thead>
         <tbody>
-        <% workflow.inputs.each do |input| %>
+        <% structure.inputs.each do |input| %>
           <tr>
-            <td class="id"><%= text_or_not_specified(input.id, none_text: 'n/a') %></td>
+            <td class="id"><%= text_or_not_specified(input.nice_id, none_text: 'n/a') %></td>
             <td class="name"><%= text_or_not_specified(input.name, none_text: 'n/a') %></td>
             <td class="description"><%= text_or_not_specified(input.description, none_text: 'n/a') %></td>
             <td class="type"><%= port_types(input) %></td>
@@ -24,7 +24,7 @@
       </table>
     </div>
   <% end %>
-  <% if workflow.steps.any? %>
+  <% if structure.steps.any? %>
     <h2>Steps</h2>
     <div class="table-responsive">
       <table class="table table-striped table-hover steps">
@@ -36,18 +36,18 @@
         </tr>
         </thead>
         <tbody>
-        <% workflow.steps.each do |step| %>
+        <% structure.steps.each do |step| %>
           <tr>
-            <td class="id"><%= step.id %></td>
-            <td class="name"><%= step.name %></td>
-            <td class="description"><%= step.description %></td>
+            <td class="id"><%= text_or_not_specified(step.nice_id, none_text: 'n/a') %></td>
+            <td class="name"><%= text_or_not_specified(step.name, none_text: 'n/a') %></td>
+            <td class="description"><%= text_or_not_specified(step.description, none_text: 'n/a') %></td>
           </tr>
         <% end %>
         </tbody>
       </table>
     </div>
   <% end %>
-  <% if workflow.outputs.any? %>
+  <% if structure.outputs.any? %>
     <h2>Outputs</h2>
     <div class="table-responsive">
       <table class="table table-striped table-hover steps">
@@ -60,9 +60,9 @@
         </tr>
         </thead>
         <tbody>
-        <% workflow.outputs.each do |output| %>
+        <% structure.outputs.each do |output| %>
           <tr>
-            <td class="id"><%= text_or_not_specified(output.id, none_text: 'n/a') %></td>
+            <td class="id"><%= text_or_not_specified(output.nice_id, none_text: 'n/a') %></td>
             <td class="name"><%= text_or_not_specified(output.name, none_text: 'n/a') %></td>
             <td class="description"><%= text_or_not_specified(output.description, none_text: 'n/a') %></td>
             <td class="type"><%= port_types(output) %></td>

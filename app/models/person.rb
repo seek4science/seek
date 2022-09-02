@@ -3,7 +3,7 @@ class Person < ApplicationRecord
   acts_as_annotation_source
 
   include Seek::Annotatable
-  include Seek::Roles::AdminDefinedRoles
+  include Seek::Roles::Target
 
   auto_strip_attributes :email, :first_name, :last_name, :web_page
 
@@ -11,7 +11,8 @@ class Person < ApplicationRecord
 
   acts_as_yellow_pages
 
-  before_save :first_person_admin_and_add_to_default_project
+  before_save :first_person_add_to_default_project
+  after_save :first_person_admin
 
   acts_as_notifiee
 
@@ -38,16 +39,9 @@ class Person < ApplicationRecord
            class_name: 'GroupMembership', dependent: :destroy
   has_many :current_work_groups, class_name: 'WorkGroup', through: :current_group_memberships,
                                  source: :work_group
+  
 
-  has_many :group_memberships_project_positions, -> { distinct }, through: :group_memberships
-  has_many :project_positions, -> { distinct }, through: :group_memberships_project_positions
-  has_filter project_position: Seek::Filtering::Filter.new(
-      value_field: 'project_positions.id',
-      label_field: 'project_positions.name',
-      joins: [:project_positions]
-  )
-
-  has_many :projects, -> { distinct }, through: :work_groups
+  has_many :projects, -> { distinct }, through: :group_memberships, inverse_of: :people
   has_many :current_projects,  -> { distinct }, through: :current_work_groups, source: :project
   has_many :former_projects,  -> { distinct }, through: :former_work_groups, source: :project
 
@@ -65,7 +59,7 @@ class Person < ApplicationRecord
   has_many :assets_creators, dependent: :destroy, foreign_key: 'creator_id'
 
   RELATED_RESOURCE_TYPES = %w[DataFile Sop Model Document Publication Presentation
-                              Sample Event Investigation Study Assay Strain Workflow Node Collection].freeze
+                              Sample Event Investigation Study Assay Strain Workflow Collection FileTemplate Placeholder].freeze
 
   RELATED_RESOURCE_TYPES.each do |type|
     plural = type.tableize
@@ -106,7 +100,8 @@ class Person < ApplicationRecord
 
   if Seek::Config.solr_enabled
     searchable(auto_index: false) do
-      text :project_positions
+      text :expertise
+      text :tools
       text :disciplines do
         disciplines.map(&:title)
       end
@@ -126,21 +121,12 @@ class Person < ApplicationRecord
   after_commit :queue_update_auth_table
 
   has_many :dependent_permissions, class_name: 'Permission', as: :contributor, dependent: :destroy
-  before_destroy :reassign_contribution_permissions
   after_destroy :updated_contributed_items_contributor_after_destroy
   after_destroy :update_publication_authors_after_destroy
 
   # to make it look like a User
   def person
     self
-  end
-    
-  # Returns the columns to be shown on the table view for the resource
-  def columns_default
-    super + ['first_name','last_name']
-  end
-  def columns_allowed
-    columns_default + ['email','phone','skype_name','web_page','orcid']
   end
 
   # not registered profiles that match this email
@@ -270,7 +256,7 @@ class Person < ApplicationRecord
 
   # returns true this is an admin person, and they are the only one defined - indicating they are person creating during setting up SEEK
   def only_first_admin_person?
-    Person.count == 1 && [self] == Person.all && Person.first.is_admin?
+    Person.count == 1 && Person.first == self && is_admin?
   end
 
   def update_first_letter
@@ -279,10 +265,6 @@ class Person < ApplicationRecord
     first_letter = strip_first_letter(name) if no_last_name
     # first_letter = "Other" unless ("A".."Z").to_a.include?(first_letter)
     self.first_letter = first_letter
-  end
-
-  def project_positions_of_project(projects_or_project)
-    project_positions.joins(group_memberships: :work_group).where(work_groups: { project_id: projects_or_project }).distinct.to_a
   end
 
   # all items, assets, ISA and samples that are linked to this person as a creator
@@ -301,10 +283,6 @@ class Person < ApplicationRecord
     user && user == User.current_user
   end
 
-  def can_view?(user = User.current_user)
-    !user.nil? || !Seek::Config.is_virtualliver
-  end
-
   # can be edited by:
   # (admin or project managers of this person) and (this person does not have a user or not the other admin)
   # themself
@@ -312,7 +290,7 @@ class Person < ApplicationRecord
     return false unless user
     return true if new_record? && self.class.can_create?
     user = user.user if user.is_a?(Person)
-    (user == self.user) || user.is_admin? || (is_project_administered_by?(user) && self.user.nil?)
+    (user == self.user) || user.is_admin? || (is_project_administered_by?(user.person) && self.user.nil?)
   end
 
   # admin can administer other people, project manager can administer other people except other admins and themself
@@ -361,44 +339,13 @@ class Person < ApplicationRecord
     permissions.each(&:destroy)
   end
 
-  def reassign_contribution_permissions
-    # retrieve the items that this person is contributor (owner for assay), and that also has policy authorization
-    person_related_items = contributed_items.select{|item| item.respond_to?(:policy)}
-
-    # check if anyone has manage right on the related_items
-    # if not or if only the contributor then assign the manage right to pis||pals
-    person_related_items.each do |item|
-      people_can_manage_item = item.people_can_manage
-      next unless people_can_manage_item.blank? || (people_can_manage_item == [[id, name.to_s, Policy::MANAGING]])
-      # find the projects which this person and item belong to
-      projects_in_common = projects & item.projects
-      pis = projects_in_common.collect(&:pis).flatten.uniq
-      pis.reject! { |pi| pi.id == id }
-      policy = item.policy
-      if pis.blank?
-        pals = projects_in_common.collect(&:pals).flatten.uniq
-        pals.reject! { |pal| pal.id == id }
-        pals.each do |pal|
-          policy.permissions.build(contributor: pal, access_type: Policy::MANAGING)
-          policy.save
-        end
-      else
-        pis.each do |pi|
-          policy.permissions.build(contributor: pi, access_type: Policy::MANAGING)
-          policy.save
-        end
-      end
-    end
-  end
-
-  # a utitlity method to simply add a person to a project and institution
+  # a utility method to simply add a person to a project and institution
   # will automatically handle the WorkGroup and GroupMembership, and avoid creating duplicates
   def add_to_project_and_institution(project, institution)
     group = WorkGroup.where(project_id: project.id, institution_id: institution.id).first
     group ||= WorkGroup.new project: project, institution: institution
 
-
-    membership = GroupMembership.where(person_id: id, work_group_id: group.id).first
+    membership = GroupMembership.where(person: self, work_group: group).first
     membership ||= GroupMembership.new person: self, work_group: group
 
     group_memberships << membership
@@ -414,7 +361,7 @@ class Person < ApplicationRecord
 
   # projects this person is project admin of
   def administered_projects
-    projects.select{|proj| person.is_project_administrator?(proj)}
+    projects.select{|project| person.is_project_administrator?(project)}
   end
 
   # activation email logs associated with this person
@@ -436,12 +383,21 @@ class Person < ApplicationRecord
   private
 
   # a before_save trigger, that checks if the person is the first one created, and if so defines it as admin
-  def first_person_admin_and_add_to_default_project
+  def first_person_add_to_default_project
     if Person.count.zero?
-      self.is_admin = true
-      project = Project.first
-      if project && project.institutions.any?
-        add_to_project_and_institution(project, project.institutions.first)
+      disable_authorization_checks do
+        project = Project.first
+        if project && project.institutions.any?
+          add_to_project_and_institution(project, project.institutions.first)
+        end
+      end
+    end
+  end
+
+  def first_person_admin
+    if Person.count == 1 && Person.first == self && !is_admin?
+      disable_authorization_checks do
+        self.is_admin = true
       end
     end
   end
@@ -472,6 +428,4 @@ class Person < ApplicationRecord
       end
     end
   end
-
-  include Seek::ProjectHierarchies::PersonExtension if Seek::Config.project_hierarchy_enabled
 end

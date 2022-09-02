@@ -2,11 +2,11 @@ module Seek
   module Renderers
     class YoutubeRenderer < BlobRenderer
       def can_render?
-        content_blob && content_blob.url && is_youtube_url?(content_blob.url) && extract_video_code(content_blob.url)
+        blob.url && is_youtube_url?(blob.url) && extract_video_code(blob.url)
       end
 
       def render_content
-        code = extract_video_code(content_blob.url)
+        code = extract_video_code(blob.url)
         "<iframe width=\"560\" height=\"315\" src=\"https://www.youtube.com/embed/#{code}\" frameborder=\"0\" allowfullscreen></iframe>"
       end
 

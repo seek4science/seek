@@ -1,92 +1,106 @@
 {
-    "data": {
-        "id": "472",
-        "type": "people",
-        "attributes": {
-            "avatar": null,
-            "title": "Patched Name",
-            "description": "A person with all possible details",
-            "first_name": "Patched",
-            "last_name": "Name",
-            "orcid": "http://orcid.org/0000-0001-9842-9718",
-            "mbox_sha1sum": "5f9cd9691c643af7e4506ff02cdb6629b9bb880f",
-            "expertise": [
-                "modeling",
-                "programming"
-            ],
-            "tools": [
-                "CeriusII",
-                "Gromacs",
-                "Python"
-            ],
-            "project_positions": [
-                {
-                    "project_id": "676",
-                    "position_id": "1",
-                    "position_name": "A Role"
-                }
-            ]
-        },
-        "relationships": {
-            "projects": {
-                "data": [
-                    {
-                        "id": "676",
-                        "type": "projects"
-                    }
-                ]
-            },
-            "institutions": {
-                "data": [
-                    {
-                        "id": "473",
-                        "type": "institutions"
-                    }
-                ]
-            },
-            "investigations": {
-                "data": []
-            },
-            "studies": {
-                "data": []
-            },
-            "assays": {
-                "data": []
-            },
-            "data_files": {
-                "data": []
-            },
-            "models": {
-                "data": []
-            },
-            "sops": {
-                "data": []
-            },
-            "publications": {
-                "data": []
-            },
-            "presentations": {
-                "data": []
-            },
-            "events": {
-                "data": []
-            },
-            "documents": {
-                "data": []
-            }
-        },
-        "links": {
-            "self": "/people/472"
-        },
-        "meta": {
-            "created": "2018-04-27T14:29:35.000Z",
-            "modified": "2018-04-27T14:29:39.205Z",
-            "api_version": "0.1",
-            "uuid": "552d8ab0-2c55-0136-ec2f-08002734982f",
-            "base_url": "http://localhost:3000"
-        }
+  "data": {
+    "id": "118",
+    "type": "people",
+    "attributes": {
+      "avatar": null,
+      "title": "Patched Name",
+      "description": "A person with all possible details",
+      "first_name": "Patched",
+      "last_name": "Name",
+      "orcid": "https://orcid.org/0000-0001-9842-9718",
+      "mbox_sha1sum": "5f9cd9691c643af7e4506ff02cdb6629b9bb880f",
+      "expertise": [
+        "modeling",
+        "programming"
+      ],
+      "tools": [
+        "CeriusII",
+        "Gromacs",
+        "Python"
+      ],
+      "login": "user114"
     },
-    "jsonapi": {
-        "version": "1.0"
+    "relationships": {
+      "projects": {
+        "data": [
+          {
+            "id": "126",
+            "type": "projects"
+          }
+        ]
+      },
+      "institutions": {
+        "data": [
+          {
+            "id": "120",
+            "type": "institutions"
+          }
+        ]
+      },
+      "investigations": {
+        "data": [
+
+        ]
+      },
+      "studies": {
+        "data": [
+
+        ]
+      },
+      "assays": {
+        "data": [
+
+        ]
+      },
+      "data_files": {
+        "data": [
+
+        ]
+      },
+      "models": {
+        "data": [
+
+        ]
+      },
+      "sops": {
+        "data": [
+
+        ]
+      },
+      "publications": {
+        "data": [
+
+        ]
+      },
+      "presentations": {
+        "data": [
+
+        ]
+      },
+      "events": {
+        "data": [
+
+        ]
+      },
+      "documents": {
+        "data": [
+
+        ]
+      }
+    },
+    "links": {
+      "self": "/people/118"
+    },
+    "meta": {
+      "created": "2022-06-07T14:12:39.000Z",
+      "modified": "2022-06-07T14:12:39.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "cfe6b7f0-c899-013a-0f7e-0a81884ed284"
     }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
 }

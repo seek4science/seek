@@ -1,0 +1,58 @@
+@import 'variables';
+
+.jstree[data-role='seek-git-jstree'] {
+  i.jstree-checkbox {
+    display: none;
+  }
+  &.allow-root-select .git-jstree-root > i.jstree-checkbox {
+    display: inherit;
+  }
+  &.allow-tree-select .git-jstree-tree > i.jstree-checkbox {
+    display: inherit;
+  }
+  &.allow-blob-select .git-jstree-blob > i.jstree-checkbox {
+    display: inherit;
+  }
+  &.allow-blob-preview .jstree-leaf:hover .git-jstree-blob {
+    text-decoration: underline;
+  }
+}
+
+.git-browser-modal .modal-body { }
+
+input.git-path {
+  padding-left: 32px;
+  background-image: url(asset-path("famfamfam_silk/folder_magnify.png"));
+  background-repeat: no-repeat;
+  background-position: 8px 8px;
+}
+
+.git-annotated > a {
+  font-weight: bold;
+}
+
+.git-annotated-parent > .git-annotation {
+  opacity: 0.3;
+}
+
+.git-annotation {
+  position: relative;
+  margin-right: 2px;
+  background-color: $label-default-bg;
+  &[data-annotation-key="main_workflow"] { background-color: $label-primary-bg; }
+}
+
+.git-image-preview {
+  max-width: 100%;
+}
+
+.blob-display-container {
+  background: center center no-repeat url(asset-path("ajax-loader-large.gif")) rgba(255,255,255,0.6);
+
+  iframe {
+    border: none;
+    height: 100%;
+    width: 100%;
+    min-height: 80vh;
+  }
+}

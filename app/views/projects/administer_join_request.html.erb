@@ -67,6 +67,10 @@
       </div>
 
       <%= submit_tag('Accept', class: 'btn btn-success',id:'submit-button') %>
+      <span style="display:none">
+            <%= check_box_tag 'delete_request','1',false %>
+          </span>
+      <%= submit_tag('Delete without response', class: 'btn btn-danger',id:'delete-button', style:'display:none;') %>
     </div>
   </div>
 
@@ -80,10 +84,12 @@
       if ($j('input#accept_request').is(':checked')) {
           $j('#submit-button').val('Accept');
           $j('#submit-button').addClass('btn-success').removeClass('btn-danger');
+          $j('#delete-button').hide();
       }
       else {
           $j('#submit-button').val('Reject');
           $j('#submit-button').addClass('btn-danger').removeClass('btn-success');
+          $j('#delete-button').show();
       }
     }
 
@@ -101,8 +107,20 @@
         submitButtonStatus();
         rejectDetailsStatus();
       })
+
+      $j('input#delete-button').on('click', function() {
+          if (confirm("Are you sure? This will permanently delete the request, and the requester won't be notified")) {
+              $j('input#accept_request').prop( "checked", false );
+              $j('input#delete_request').prop( "checked", true );
+          }
+          else {
+              return false;
+          }
+      });
+
       submitButtonStatus();
       rejectDetailsStatus();
+
     });
 
 </script>

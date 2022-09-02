@@ -213,6 +213,8 @@ class ProjectTest < ActiveSupport::TestCase
     assert project.publications.include?(threePubl)
   end
 
+
+
   def test_can_be_edited_by
     u = Factory(:project_administrator).user
     p = u.person.projects.first
@@ -290,141 +292,145 @@ class ProjectTest < ActiveSupport::TestCase
   end
 
   test 'update with attributes for project_administrator_ids ids' do
-    person = Factory(:person)
-    another_person = Factory(:person)
+    disable_authorization_checks do
+      person = Factory(:person)
+      another_person = Factory(:person)
 
-    project = person.projects.first
-    refute_nil project
+      project = person.projects.first
+      refute_nil project
 
-    another_person.add_to_project_and_institution(project, Factory(:institution))
-    another_person.save!
+      another_person.add_to_project_and_institution(project, Factory(:institution))
+      another_person.save!
 
-    refute_includes project.project_administrators, person
-    refute_includes project.project_administrators, another_person
+      refute_includes project.project_administrators, person
+      refute_includes project.project_administrators, another_person
 
-    project.update_attributes(project_administrator_ids: [person.id.to_s])
+      assert project.update(project_administrator_ids: [person.id.to_s])
 
-    assert_includes project.project_administrators, person
-    refute_includes project.project_administrators, another_person
+      assert_includes project.project_administrators, person
+      refute_includes project.project_administrators, another_person
 
-    project.update_attributes(project_administrator_ids: [another_person.id.to_s])
+      assert project.update(project_administrator_ids: [another_person.id.to_s])
 
-    refute_includes project.project_administrators, person
-    assert_includes project.project_administrators, another_person
+      refute_includes project.project_administrators, person
+      assert_includes project.project_administrators, another_person
 
-    # cannot change to a person from another project
-    person_in_other_project = Factory(:person)
-    project.update_attributes(project_administrator_ids: [person_in_other_project.id.to_s])
-
-    refute_includes project.project_administrators, person
-    refute_includes project.project_administrators, another_person
-    refute_includes project.project_administrators, person_in_other_project
+      # cannot change to a person from another project
+      person_in_other_project = Factory(:person)
+      assert_raise(ActiveRecord::RecordInvalid) do
+        project.update(project_administrator_ids: [person_in_other_project.id.to_s])
+      end
+      refute_includes project.project_administrators, person_in_other_project
+    end
   end
 
   test 'update with attributes for gatekeeper ids' do
-    person = Factory(:person)
-    another_person = Factory(:person)
+    disable_authorization_checks do
+      person = Factory(:person)
+      another_person = Factory(:person)
 
-    project = person.projects.first
-    refute_nil project
+      project = person.projects.first
+      refute_nil project
 
-    another_person.add_to_project_and_institution(project, Factory(:institution))
-    another_person.save!
+      another_person.add_to_project_and_institution(project, Factory(:institution))
+      another_person.save!
 
-    refute_includes project.asset_gatekeepers, person
-    refute_includes project.asset_gatekeepers, another_person
+      refute_includes project.asset_gatekeepers, person
+      refute_includes project.asset_gatekeepers, another_person
 
-    project.update_attributes(asset_gatekeeper_ids: [person.id.to_s])
+      assert project.update(asset_gatekeeper_ids: [person.id.to_s])
 
-    assert_includes project.asset_gatekeepers, person
-    refute_includes project.asset_gatekeepers, another_person
+      assert_includes project.asset_gatekeepers, person
+      refute_includes project.asset_gatekeepers, another_person
 
-    project.update_attributes(asset_gatekeeper_ids: [another_person.id.to_s])
+      assert project.update(asset_gatekeeper_ids: [another_person.id.to_s])
 
-    refute_includes project.asset_gatekeepers, person
-    assert_includes project.asset_gatekeepers, another_person
+      refute_includes project.asset_gatekeepers, person
+      assert_includes project.asset_gatekeepers, another_person
 
-    # 2 at once
-    project.update_attributes(asset_gatekeeper_ids: [person.id.to_s, another_person.id.to_s])
-    assert_includes project.asset_gatekeepers, person
-    assert_includes project.asset_gatekeepers, another_person
+      # 2 at once
+      assert project.update(asset_gatekeeper_ids: [person.id.to_s, another_person.id.to_s])
+      assert_includes project.asset_gatekeepers, person
+      assert_includes project.asset_gatekeepers, another_person
 
-    # cannot change to a person from another project
-    person_in_other_project = Factory(:person)
-    project.update_attributes(asset_gatekeeper_ids: [person_in_other_project.id.to_s])
-
-    refute_includes project.asset_gatekeepers, person
-    refute_includes project.asset_gatekeepers, another_person
-    refute_includes project.asset_gatekeepers, person_in_other_project
+      # cannot change to a person from another project
+      person_in_other_project = Factory(:person)
+      assert_raise(ActiveRecord::RecordInvalid) do
+        project.update(asset_gatekeeper_ids: [person_in_other_project.id.to_s])
+      end
+      refute_includes project.asset_gatekeepers, person_in_other_project
+    end
   end
 
   test 'update with attributes for pal ids' do
-    person = Factory(:person)
-    another_person = Factory(:person)
+    disable_authorization_checks do
+      person = Factory(:person)
+      another_person = Factory(:person)
 
-    project = person.projects.first
-    refute_nil project
+      project = person.projects.first
+      refute_nil project
 
-    another_person.add_to_project_and_institution(project, Factory(:institution))
-    another_person.save!
+      another_person.add_to_project_and_institution(project, Factory(:institution))
+      another_person.save!
 
-    refute_includes project.pals, person
-    refute_includes project.pals, another_person
+      refute_includes project.pals, person
+      refute_includes project.pals, another_person
 
-    project.update_attributes(pal_ids: [person.id.to_s])
+      assert project.update(pal_ids: [person.id.to_s])
 
-    assert_includes project.pals, person
-    refute_includes project.pals, another_person
+      assert_includes project.pals, person
+      refute_includes project.pals, another_person
 
-    project.update_attributes(pal_ids: [another_person.id.to_s])
+      assert project.update(pal_ids: [another_person.id.to_s])
 
-    refute_includes project.pals, person
-    assert_includes project.pals, another_person
+      refute_includes project.pals, person
+      assert_includes project.pals, another_person
 
-    # cannot change to a person from another project
-    person_in_other_project = Factory(:person)
-    project.update_attributes(pal_ids: [person_in_other_project.id.to_s])
-
-    refute_includes project.pals, person
-    refute_includes project.pals, another_person
-    refute_includes project.pals, person_in_other_project
+      # cannot change to a person from another project
+      person_in_other_project = Factory(:person)
+      assert_raise(ActiveRecord::RecordInvalid) do
+        project.update(pal_ids: [person_in_other_project.id.to_s])
+      end
+      refute_includes project.pals, person_in_other_project
+    end
   end
 
   test 'update with attributes for asset housekeeper ids' do
-    person = Factory(:person)
-    another_person = Factory(:person)
+    disable_authorization_checks do
+      person = Factory(:person)
+      another_person = Factory(:person)
 
-    project = person.projects.first
-    refute_nil project
+      project = person.projects.first
+      refute_nil project
 
-    another_person.add_to_project_and_institution(project, Factory(:institution))
-    another_person.save!
+      another_person.add_to_project_and_institution(project, Factory(:institution))
+      another_person.save!
 
-    refute_includes project.asset_housekeepers, person
-    refute_includes project.asset_housekeepers, another_person
+      refute_includes project.asset_housekeepers, person
+      refute_includes project.asset_housekeepers, another_person
 
-    project.update_attributes(asset_housekeeper_ids: [person.id.to_s])
+      assert project.update(asset_housekeeper_ids: [person.id.to_s])
 
-    assert_includes project.asset_housekeepers, person
-    refute_includes project.asset_housekeepers, another_person
+      assert_includes project.asset_housekeepers, person
+      refute_includes project.asset_housekeepers, another_person
 
-    project.update_attributes(asset_housekeeper_ids: [another_person.id.to_s])
+      assert project.update(asset_housekeeper_ids: [another_person.id.to_s])
 
-    refute_includes project.asset_housekeepers, person
-    assert_includes project.asset_housekeepers, another_person
+      refute_includes project.asset_housekeepers, person
+      assert_includes project.asset_housekeepers, another_person
 
-    # 2 at once
-    project.update_attributes(asset_housekeeper_ids: [person.id.to_s, another_person.id.to_s])
-    assert_includes project.asset_housekeepers, person
-    assert_includes project.asset_housekeepers, another_person
+      # 2 at once
+      assert project.update(asset_housekeeper_ids: [person.id.to_s, another_person.id.to_s])
+      assert_includes project.asset_housekeepers, person
+      assert_includes project.asset_housekeepers, another_person
 
-    # cannot change to a person from another project
-    person_in_other_project = Factory(:person)
-    project.update_attributes(asset_housekeeper_ids: [person_in_other_project.id.to_s])
-
-    refute_includes project.asset_housekeepers, person
-    refute_includes project.asset_housekeepers, another_person
-    refute_includes project.asset_housekeepers, person_in_other_project
+      # cannot change to a person from another project
+      person_in_other_project = Factory(:person)
+      assert_raise(ActiveRecord::RecordInvalid) do
+        project.update(asset_housekeeper_ids: [person_in_other_project.id.to_s])
+      end
+      refute_includes project.asset_housekeepers, person_in_other_project
+    end
   end
 
   def test_update_first_letter
@@ -597,13 +603,6 @@ class ProjectTest < ActiveSupport::TestCase
     refute project.can_delete?(user)
 
     project = Factory(:project)
-    Factory(:node, projects:[project])
-    project.work_groups.clear
-    project.reload
-    refute_empty project.nodes
-    refute project.can_delete?(user)
-
-    project = Factory(:project)
     Factory(:sample, projects:[project])
     project.work_groups.clear
     project.reload
@@ -738,12 +737,7 @@ class ProjectTest < ActiveSupport::TestCase
       web_page: 'http://webpage.com',
       organism_ids: [organism.id],
       institution_ids: [institution.id],
-      parent_id: [other_project.id],
-      description: 'Project description',
-      project_administrator_ids: [person.id],
-      asset_gatekeeper_ids: [person.id],
-      pal_ids: [person.id],
-      asset_housekeeper_ids: [person.id]
+      description: 'Project description'
     }
 
     project = Project.create(attr)
@@ -768,7 +762,7 @@ class ProjectTest < ActiveSupport::TestCase
       pal_ids: [person.id],
       asset_housekeeper_ids: [person.id]
     }
-    project.update_attributes(attr)
+    disable_authorization_checks { project.update(attr) }
 
     assert_includes project.project_administrators, person
     assert_includes project.asset_gatekeepers, person
@@ -780,7 +774,7 @@ class ProjectTest < ActiveSupport::TestCase
     project_administrator = Factory(:project_administrator).reload
     project = project_administrator.projects.first
 
-    assert_includes project_administrator.roles, 'project_administrator'
+    assert_includes project_administrator.role_names, 'project_administrator'
     assert_includes project.project_administrators, project_administrator
     assert project_administrator.is_project_administrator?(project)
     assert project_administrator.user.is_project_administrator?(project)
@@ -790,7 +784,7 @@ class ProjectTest < ActiveSupport::TestCase
     project_administrator.group_memberships.destroy_all
     project_administrator = project_administrator.reload
 
-    assert_not_includes project_administrator.roles, 'project_administrator'
+    assert_not_includes project_administrator.role_names, 'project_administrator'
     assert_not_includes project.project_administrators, project_administrator
     assert !project_administrator.is_project_administrator?(project)
     assert !project.can_manage?(project_administrator.user)
@@ -800,17 +794,17 @@ class ProjectTest < ActiveSupport::TestCase
     project_administrator = Factory(:project_administrator).reload
     project = project_administrator.projects.first
 
-    assert_includes project_administrator.roles, 'project_administrator'
+    assert_includes project_administrator.role_names, 'project_administrator'
     assert_includes project.project_administrators, project_administrator
     assert project_administrator.is_project_administrator?(project)
     assert project_administrator.user.is_project_administrator?(project)
     assert project_administrator.user.person.is_project_administrator?(project)
     assert project.can_manage?(project_administrator.user)
 
-    project_administrator.group_memberships.first.update_attributes(time_left_at: 1.day.ago)
+    project_administrator.group_memberships.first.update(time_left_at: 1.day.ago)
     project_administrator = project_administrator.reload
 
-    assert_not_includes project_administrator.roles, 'project_administrator'
+    assert_not_includes project_administrator.role_names, 'project_administrator'
     assert_not_includes project.project_administrators, project_administrator
     assert !project_administrator.is_project_administrator?(project)
     assert !project.can_manage?(project_administrator.user)
@@ -834,7 +828,7 @@ class ProjectTest < ActiveSupport::TestCase
     assert_nil project.nels_enabled
 
     assert_difference('Settings.count') do
-      project.update_attributes(nels_enabled: true)
+      project.update(nels_enabled: true)
     end
 
     assert project.nels_enabled
@@ -910,7 +904,47 @@ class ProjectTest < ActiveSupport::TestCase
       proj.update_attribute(:funding_codes,'a,b')
       assert_equal ['a','b'],proj.funding_codes.sort
     end
-
-
   end
+
+  test 'project assets' do
+    disable_authorization_checks do
+      assay = Factory(:assay)
+      project = assay.projects.first
+      df = Factory(:data_file, projects:[project])
+      assay.data_files << df
+      assay.save!
+
+      assert project.assets.include? df
+      refute project.project_assets.include? df
+
+      unused_df = Factory(:data_file, projects:[project])
+      assert unused_df.investigations.empty?
+
+      project.reload
+
+      assert project.assets.include? unused_df
+      assert project.project_assets.include? unused_df
+    end
+  end
+
+  test 'ontology annotation properties'do
+    project = Factory(:project)
+
+    assert project.supports_controlled_vocab_annotations?
+    assert project.supports_controlled_vocab_annotations?(:topics)
+    refute project.supports_controlled_vocab_annotations?(:operations)
+    refute project.supports_controlled_vocab_annotations?(:data_formats)
+    refute project.supports_controlled_vocab_annotations?(:data_types)
+
+    assert project.respond_to?(:topic_annotations)
+    refute project.respond_to?(:operation_annotations)
+    refute project.respond_to?(:data_format_annotations)
+    refute project.respond_to?(:data_type_annotation)
+
+    Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
+    refute project.controlled_vocab_annotations?
+    project.topic_annotations = 'Chemistry'
+    assert project.controlled_vocab_annotations?
+  end
+  
 end

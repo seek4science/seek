@@ -6,15 +6,13 @@ class DataFilesController < ApplicationController
   include Seek::IndexPager
   include SysMODB::SpreadsheetExtractor
   include MimeTypesHelper
-  include ApiHelper
 
   include Seek::AssetsCommon
 
   before_action :find_assets, only: [:index]
-  before_action :find_and_authorize_requested_item, except: [:index, :new, :upload_for_tool, :upload_from_email, :create, :create_content_blob,
+  before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :create_content_blob,
                                                              :preview, :update_annotations_ajax, :rightfield_extraction_ajax, :provide_metadata]
   before_action :find_display_asset, only: [:show, :explore, :download]
-  before_action :xml_login_only, only: [:upload_for_tool, :upload_from_email]
   before_action :get_sample_type, only: :extract_samples
   before_action :check_already_extracted, only: :extract_samples
   before_action :forbid_new_version_if_samples, :only => :create_version
@@ -67,13 +65,6 @@ class DataFilesController < ApplicationController
 
       respond_to do |format|
         if @data_file.save_as_new_version(comments)
-          # Duplicate studied factors
-          factors = @data_file.find_version(@data_file.version - 1).studied_factors
-          factors.each do |f|
-            new_f = f.dup
-            new_f.data_file_version = @data_file.version
-            new_f.save
-          end
           flash[:notice] = "New version uploaded - now on version #{@data_file.version}"
         else
           flash[:error] = 'Unable to save newflash[:error] version'
@@ -87,49 +78,6 @@ class DataFilesController < ApplicationController
     end
   end
 
-  def upload_for_tool
-    params[:data_file][:project_ids] = [params[:data_file].delete(:project_id)] if params[:data_file][:project_id]
-    @data_file = DataFile.new(data_file_params)
-
-    if handle_upload_data
-      @data_file.policy = Policy.new_for_upload_tool(@data_file, params[:recipient_id])
-
-      if @data_file.save
-        @data_file.creators = [current_person]
-        # send email to the file uploader and receiver
-        Mailer.file_uploaded(current_user, Person.find(params[:recipient_id]), @data_file).deliver_later
-
-        flash.now[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
-        render plain: flash.now[:notice]
-      else
-        errors = (@data_file.errors.map { |e| e.join(' ') }.join("\n"))
-        render plain: errors, status: 500
-      end
-    end
-  end
-
-  def upload_from_email
-    if current_user.is_admin? && Seek::Config.admin_impersonation_enabled
-      User.with_current_user Person.find(params[:sender_id]).user do
-        @data_file = DataFile.new(data_file_params)
-        if handle_upload_data
-          @data_file.policy = Policy.new_from_email(@data_file, params[:recipient_ids], params[:cc_ids])
-
-          if @data_file.save
-            @data_file.creators = [User.current_user.person]
-            flash.now[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
-            render plain: flash.now[:notice]
-          else
-            errors = (@data_file.errors.map { |e| e.join(' ') }.join("\n"))
-            render plain: errors, status: 500
-          end
-        end
-      end
-    else
-      render plain: 'This user is not permitted to act on behalf of other users', status: :forbidden
-    end
-  end
-
   def create
     @data_file = DataFile.new(data_file_params)
 
@@ -138,6 +86,7 @@ class DataFilesController < ApplicationController
 
       update_annotations(params[:tag_list], @data_file)
       update_relationships(@data_file, params)
+      update_template() if params.key?(:file_template_id)
 
       if @data_file.save
         if !@data_file.parent_name.blank?
@@ -164,9 +113,10 @@ class DataFilesController < ApplicationController
     update_annotations(params[:tag_list], @data_file) if params.key?(:tag_list)
     update_sharing_policies @data_file
     update_relationships(@data_file, params)
+    update_template() if params.key?(:file_template_id)
 
     respond_to do |format|
-      if @data_file.update_attributes(data_file_params)
+      if @data_file.update(data_file_params)
         flash[:notice] = "#{t('data_file')} metadata was successfully updated."
         format.html { redirect_to data_file_path(@data_file) }
         format.json {render json: @data_file, include: [params[:include]]}
@@ -177,6 +127,16 @@ class DataFilesController < ApplicationController
     end
   end
 
+  def update_template
+    if (params[:file_template_id].empty?)
+      @data_file.file_template_id = nil
+      ft = nil
+    else
+      @data_file.file_template_id = params[:file_template_id]
+      ft = FileTemplate.find(params[:file_template_id])
+    end
+  end
+  
   def explore
     #drop invalid explore params
     [:page_rows, :page, :sheet].each do |param|
@@ -240,13 +200,10 @@ class DataFilesController < ApplicationController
 
   def extract_samples
     if params[:confirm]
-      extractor = Seek::Samples::Extractor.new(@data_file, @sample_type)
-      @samples = extractor.persist.select(&:persisted?)
-      extractor.clear
-      @data_file.copy_assay_associations(@samples, params[:assay_ids]) if params[:assay_ids]
-      flash[:notice] = "#{@samples.count} samples extracted successfully"
+      SampleDataPersistJob.new(@data_file, @sample_type, assay_ids: params["assay_ids"]).queue_job
+      flash[:notice] = 'Started creating extracted samples'
     else
-      SampleDataExtractionJob.new(@data_file, @sample_type, false).queue_job
+      SampleDataExtractionJob.new(@data_file, @sample_type).queue_job
     end
 
     respond_to do |format|
@@ -274,11 +231,18 @@ class DataFilesController < ApplicationController
   end
 
   def extraction_status
-    @previous_status = params[:previous_status]
-    @job_status = @data_file.sample_extraction_task.status
+    job_status = @data_file.sample_extraction_task.status
 
     respond_to do |format|
-      format.html { render partial: 'data_files/sample_extraction_status', locals: { data_file: @data_file } }
+      format.html { render partial: 'data_files/sample_extraction_status', locals: { data_file: @data_file, job_status: job_status } }
+    end
+  end
+
+  def persistence_status
+    job_status = @data_file.sample_persistence_task.status
+
+    respond_to do |format|
+      format.html { render partial: 'data_files/sample_persistence_status', locals: { data_file: @data_file, job_status: job_status, previous_status: params[:previous_status] } }
     end
   end
 
@@ -288,7 +252,7 @@ class DataFilesController < ApplicationController
         @sample_type = @data_file.reload.possible_sample_types.last
 
         if @sample_type
-          SampleDataExtractionJob.new(@data_file, @sample_type, false, overwrite: true).queue_job
+          SampleDataExtractionJob.new(@data_file, @sample_type, overwrite: true).queue_job
 
           respond_to do |format|
             format.html { redirect_to @data_file }
@@ -334,7 +298,7 @@ class DataFilesController < ApplicationController
       if handle_upload_data && @data_file.content_blob.save
         session[:uploaded_content_blob_id] = @data_file.content_blob.id
         format.js
-        format.html {}
+        format.html { {params: params[:single_page]} if params[:single_page] }
       else
         session.delete(:uploaded_content_blob_id)
         format.js
@@ -446,12 +410,15 @@ class DataFilesController < ApplicationController
     # if creating a new assay, check it is valid and the associated study is editable
     all_valid = all_valid && !@create_new_assay || (@assay.study.try(:can_edit?) && @assay.save)
 
+    update_template() if params.key?(:file_template_id)
+
     # check the datafile can be saved, and also the content blob can be saved
     all_valid = all_valid && @data_file.save && blob.save
 
     if all_valid
 
       update_relationships(@data_file, params)      
+      
 
       respond_to do |format|
         flash[:notice] = "#{t('data_file')} was successfully uploaded and saved." if flash.now[:notice].nil?
@@ -459,7 +426,9 @@ class DataFilesController < ApplicationController
 
         # the assay_id param can also contain the relationship type
         @data_file.assays << @assay if @create_new_assay
-        format.html { redirect_to data_file_path(@data_file) }
+        format.html { redirect_to params[:single_page] ? 
+          { controller: :single_pages, action: :show, id: params[:single_page] } 
+          : data_file_path(@data_file) }
         format.json { render json: @data_file, include: [params[:include]] }
       end
 
@@ -470,23 +439,16 @@ class DataFilesController < ApplicationController
       # - want the avoid the user fixing one set of validation only to be presented with a new set
       @assay.valid? if @create_new_assay
       @data_file.valid? if uploaded_blob_matches
-
+      param = params[:single_page] ? {single_page: params[:single_page]} : {}
       respond_to do |format|
         format.html do
-          render :provide_metadata, status: :unprocessable_entity
+          render :provide_metadata, params: param, status: :unprocessable_entity
         end
       end
     end
   end
 
   protected
-
-  def xml_login_only
-    unless session[:xml_login]
-      flash[:error] = 'Only available when logged in via xml'
-      redirect_to root_url
-    end
-  end
 
   def get_sample_type
     if params[:sample_type_id] || @data_file.possible_sample_types.count == 1
@@ -533,7 +495,9 @@ class DataFilesController < ApplicationController
                                       :license, *creator_related_params, { event_ids: [] },
                                       { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                       { assay_assets_attributes: [:assay_id, :relationship_type_id] },
-                                      { scales: [] }, { publication_ids: [] }, { workflow_ids: [] },
+                                      { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
+                                      :file_template_id, :data_format_annotations, :data_type_annotations,
+                                      { publication_ids: [] }, { workflow_ids: [] },
                                       { workflow_data_files_attributes:[:id, :workflow_id, :workflow_data_file_relationship_id, :_destroy] },
                                       discussion_links_attributes:[:id, :url, :label, :_destroy])
   end

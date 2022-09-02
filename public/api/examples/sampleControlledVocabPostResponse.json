@@ -1,0 +1,44 @@
+{
+  "data": {
+    "id": "10",
+    "type": "sample_controlled_vocabs",
+    "attributes": {
+      "title": "New Vocab Max",
+      "description": "some description",
+      "source_ontology": "EFO",
+      "ols_root_term_uri": null,
+      "required": true,
+      "short_name": "short_name",
+      "sample_controlled_vocab_terms_attributes": [
+        {
+          "id": "34",
+          "label": "organism",
+          "iri": "http://some_iri",
+          "parent_iri": "http://another_iri"
+        }
+      ]
+    },
+    "relationships": {
+      "sample_controlled_vocab_terms": {
+        "data": [
+          {
+            "id": "34",
+            "type": "sample_controlled_vocab_terms"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/sample_controlled_vocabs/10"
+    },
+    "meta": {
+      "created": "2022-06-07T14:14:38.000Z",
+      "modified": "2022-06-07T14:14:38.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

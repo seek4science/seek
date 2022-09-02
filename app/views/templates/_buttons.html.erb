@@ -1,0 +1,14 @@
+<% if item.can_view? -%>
+	<%= button_link_to("View #{t('sample').pluralize}", 'index', template_samples_path(item)) %>
+<% end -%>
+<%= item_actions_dropdown do %>
+	<% if item.can_edit? -%>
+			<li><%= image_tag_for_key('edit', edit_template_path(item), nil, nil, "Edit Template") -%></li>
+	<% end -%>
+	<% if item.can_manage? %>
+			<li><%= image_tag_for_key('manage', manage_template_path(item), "Manage Template", nil, 'Manage Template') %></li>
+	<% end %>
+	<% if item.can_delete? %>
+			<%= delete_icon(item, current_user) %>
+	<% end %>
+<% end %>

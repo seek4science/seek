@@ -1,0 +1,22 @@
+{
+  "data": {
+    "type": "samples",
+    "id": "<%= id %>",
+    "attributes": {
+      "attribute_map": {
+        "the_title": "changed title"
+      },
+      "tags": []
+    },
+    "relationships": {
+      "projects": {
+        "data": [
+          {
+            "id": "<%= @project.id %>",
+            "type": "projects"
+          }
+        ]
+      }
+    }
+  }
+}

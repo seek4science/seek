@@ -1,0 +1,46 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "institutions",
+    "attributes": {
+      "avatar": null,
+      "title": "A Maximal Institution",
+      "country": "United Kingdom",
+      "country_code": "GB",
+      "city": "Manchester",
+      "address": "Manchester Centre for Integrative Systems Biology, MIB/CEAS, The University of Manchester Faraday Building, Sackville Street, Manchester M60 1QD United Kingdom",
+      "web_page": "http://www.mib.ac.uk/",
+      "discussion_links": [
+        {
+          "id":
+          "<%= res.discussion_link_ids.first %>",
+          "url": "http://www.slack.com/",
+          "label": "Slack"
+        }
+      ]
+    },
+    "relationships": {
+      "people": {
+        "data":
+        <%= res.people.map { |p| { id: p.id.to_s, type: 'people' } }.to_json %>
+      },
+      "projects": {
+        "data":
+        <%= res.projects.map { |p| { id: p.id.to_s, type: 'projects' } }.to_json %>
+      }
+    },
+    "links": {
+      "self": "/institutions/<%= res.id %>"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "uuid": "<%= res.uuid %>",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.3"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

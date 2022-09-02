@@ -1,4 +1,4 @@
-<% environment.context_class.instance_eval { include Rails.application.routes.url_helpers } %>
+<% environment.context_class.instance_eval { include Seek::Util.routes } %>
 
 var SampleTypeControlledVocab = {
     controlledVocabSelectionTagId: "",

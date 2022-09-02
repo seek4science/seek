@@ -19,7 +19,7 @@ module ROCrate
           crate.main_workflow.cwl_description = create_data_entity(crate, ROCrate::WorkflowDescription, source, cwl)
         end
       else
-        warn 'Main workflow not found!'
+        Rails.logger.warn 'Main workflow not found!'
       end
 
       super

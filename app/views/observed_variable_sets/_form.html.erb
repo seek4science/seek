@@ -1,0 +1,15 @@
+<%
+  editing = @observed_variable_set.id.present?
+%>
+
+<%= f.error_messages %>
+
+
+
+<div class="form-group">
+  <%= f.label :title, class: 'required' -%>
+  <%= f.text_field :title, :class=>"form-control"-%>
+</div>
+
+<%= f.submit(editing ? "Update" : "Create",data: { disable_with: (editing ? "Updating..." : "Creating...") }, :class => 'btn btn-primary') -%>
+or <%= cancel_button(editing ? observed_variable_set_path(@observed_variable_set.id) : observed_variable_sets_path) -%>

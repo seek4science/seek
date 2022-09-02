@@ -36,17 +36,6 @@
         <div id="existing_strains_for_assay_organism"></div>
       </div>
 
-      <% if Seek::Config.is_virtualliver %>
-          <div class="association_step">
-            <b>Step 4</b> - <span class="assay_tissue_and_cell_type_info">  Select or specify a cell type or tissue (optional)</span> <br/>
-            <%= select_tag :possible_tissue_and_cell_types,
-                           options_for_select(all_tissue_and_cell_types.collect { |o| [truncate(h(o.title), length: select_truncate_length), o.id] }),
-                           prompt: 'Select Tissue or Cell Type ...', class: 'form-control', onchange: "$j('#tissue_and_cell_type').val('');" -%>
-            <%= text_field_tag :tissue_and_cell_type, nil, onfocus: "$j('#possible_tissue_and_cell_types').val('');", class: 'form-control', placeholder: '... or enter a new one' %>
-            <br/>
-          </div>
-      <% end %>
-
       <%= button_link_to "Include in the #{@assay_text}", 'new', '#', id: 'add-organism-btn' %>
     </div>
 <% end %>

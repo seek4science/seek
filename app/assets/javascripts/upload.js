@@ -103,6 +103,7 @@ $j(document).ready(function () {
                 var json = $j('script', result);
                 if (json.length) {
                     var info = JSON.parse($j('script', result).html());
+                    checker.trigger('urlChecked', [info]);
                     if (info.allow_copy) {
                         copyDialog.show();
                     } else {

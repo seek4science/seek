@@ -23,7 +23,7 @@ class CitationStyleTest < ActionDispatch::IntegrationTest
 
     new_style = 'journal-of-infectious-diseases'
 
-    get citation_path(@doi, style: new_style, format: :js)
+    get citation_path(@doi, style: new_style, format: :js), xhr: true
 
     get model_path(@model)
     assert_select '#citation' do

@@ -19,7 +19,7 @@
       Choose whether to search by PubMed ID or DOI using the dropdown menu below, then enter the document identifier into the text box and click "Fetch".<br>
       If SEEK successfully retrieves your publication, click "Register" to process to the next step.
     </p>
-    <div id="publication_error" class="error_div alert alert-danger" style="display:none"></div>
+    <div id="publication_error" class="alert alert-danger" style="display:none"></div>
 
       <div class="form-group">
         <div class="row">
@@ -51,7 +51,7 @@
     </p>
 
     <%= fields_for(@publication) {|f|  f.hidden_field :parent_name } -%>
-    <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication, :allow_nil => Seek::Config.is_virtualliver } -%>
+    <%= render :partial => 'projects/project_selector', :locals => {:resource => @publication } -%>
 
     <%= submit_tag 'Fetch',:id=>"fetch_button", :class => 'btn btn-default' %>
     <%= image_tag "ajax-loader.gif", :id => 'spinner', :style => 'display:none;' -%>

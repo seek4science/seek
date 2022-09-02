@@ -126,7 +126,7 @@ module Seek
     def handle_download(disposition = 'attachment', image_size = nil)
       if @content_blob.url.blank?
         if @content_blob.file_exists?
-          if image_size && @content_blob.is_image?
+          if image_size && @content_blob.is_image_convertable?
             @content_blob.resize_image(image_size)
             filepath = @content_blob.full_cache_path(image_size)
             headers['Content-Length'] = File.size(filepath).to_s
@@ -208,7 +208,7 @@ module Seek
     end
 
     def stream_with(streamer)
-      response.headers['Content-Type'] ||= @content_blob.content_type
+      response.headers['Content-Type'] = @content_blob.content_type
       response.headers['Content-Disposition'] = "attachment; filename=#{@content_blob.original_filename}"
       response.headers['Last-Modified'] = Time.now.ctime.to_s
 

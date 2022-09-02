@@ -42,6 +42,11 @@ Factory.define(:unextractable_workflow_class, class: WorkflowClass) do |f|
   f.description 'Mysterious'
 end
 
+Factory.define(:jupyter_workflow_class, class: WorkflowClass) do |f|
+  f.title 'Jupyter Notebook'
+  f.description 'Jupyter Notebook'
+end
+
 # Workflow
 Factory.define(:workflow) do |f|
   f.title 'This Workflow'
@@ -79,13 +84,20 @@ Factory.define(:max_workflow, class: Workflow) do |f|
   f.title 'A Maximal Workflow'
   f.description 'How to run a simulation in GROMACS'
   f.workflow_class { WorkflowClass.find_by_key('cwl') || Factory(:cwl_workflow_class) }
-  f.projects { [Factory.build(:max_project)] }
-  f.assays {[Factory.build(:max_assay, policy: Factory(:public_policy))]}
+  f.assays { [Factory(:public_assay)] }
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
+  f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
   f.after_create do |workflow|
     workflow.content_blob = Factory.create(:cwl_content_blob, asset: workflow, asset_version: workflow.version)
+    workflow.annotate_with(['Workflow-tag1', 'Workflow-tag2', 'Workflow-tag3', 'Workflow-tag4', 'Workflow-tag5'], 'tag', workflow.contributor)
+    User.with_current_user(workflow.contributor.user) do
+      workflow.operation_annotations = 'Clustering'
+      workflow.topic_annotations = 'Chemistry'
+    end
+    workflow.save!
   end
   f.other_creators 'Blogs, Joe'
+  f.assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
 end
 
 Factory.define(:cwl_workflow, parent: :workflow) do |f|
@@ -162,10 +174,112 @@ Factory.define(:workflow_with_tests, parent: :workflow) do |f|
   f.association :content_blob, factory: :ro_crate_with_tests
 end
 
-Factory.define(:monitored_workflow, parent: :workflow) do |f|
-  f.association :content_blob, factory: :ro_crate_with_tests
-  f.after_create do |workflow|
-    workflow.latest_version.update_column(:monitored, true)
+Factory.define(:spaces_ro_crate_workflow, parent: :workflow) do |f|
+  f.association :content_blob, factory: :spaces_ro_crate
+  f.workflow_class { WorkflowClass.find_by_title('Jupyter Notebook') || Factory(:jupyter_workflow_class) }
+end
+
+Factory.define(:dots_ro_crate_workflow, parent: :workflow) do |f|
+  f.association :content_blob, factory: :dots_ro_crate
+  f.workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
+end
+
+Factory.define(:remote_git_workflow, class: Workflow) do |f|
+  f.title 'Concat two files'
+  f.with_project_contributor
+  f.workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
+  f.git_version_attributes {
+    repo = Factory(:remote_repository)
+    { git_repository_id: repo.id,
+      ref: 'refs/heads/main',
+      commit: 'b6312caabe582d156dd351fab98ce78356c4b74c',
+      main_workflow_path: 'concat_two_files.ga',
+      diagram_path: 'diagram.png',
+    }
+  }
+end
+
+Factory.define(:annotationless_local_git_workflow, class: Workflow) do |f|
+  f.title 'Concat two files'
+  f.with_project_contributor
+  f.workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
+  f.git_version_attributes do
+    repo = Factory(:unlinked_local_repository)
+    { git_repository_id: repo.id,
+      ref: 'refs/heads/master',
+      commit: '96aee188b2f9c145860f21dc182608fec5084a8a',
+      mutable: true
+    }
+  end
+end
+
+Factory.define(:local_git_workflow, class: Workflow) do |f|
+  f.title 'Concat two files'
+  f.with_project_contributor
+  f.workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
+  f.git_version_attributes do
+    repo = Factory(:unlinked_local_repository)
+    { git_repository_id: repo.id,
+      ref: 'refs/heads/master',
+      commit: '96aee188b2f9c145860f21dc182608fec5084a8a',
+      main_workflow_path: 'concat_two_files.ga',
+      diagram_path: 'diagram.png',
+      mutable: true
+    }
+  end
+end
+
+Factory.define(:ro_crate_git_workflow, class: Workflow) do |f|
+  f.title 'Sort and change case'
+  f.with_project_contributor
+  f.workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
+  f.git_version_attributes do
+    repo = Factory(:remote_workflow_ro_crate_repository)
+    { git_repository_id: repo.id,
+      ref: 'refs/heads/master',
+      commit: 'a321b6e',
+      main_workflow_path: 'sort-and-change-case.ga',
+      mutable: false
+    }
+  end
+end
+
+Factory.define(:local_ro_crate_git_workflow, class: Workflow) do |f|
+  f.title 'Sort and change case'
+  f.with_project_contributor
+  f.workflow_class { WorkflowClass.find_by_key('galaxy') || Factory(:galaxy_workflow_class) }
+  f.git_version_attributes do
+    repo = Factory(:workflow_ro_crate_repository)
+    { git_repository_id: repo.id,
+      ref: 'refs/heads/master',
+      commit: 'a321b6e',
+      main_workflow_path: 'sort-and-change-case.ga',
+      mutable: false
+    }
+  end
+end
+
+Factory.define(:nfcore_git_workflow, class: Workflow) do |f|
+  f.title 'nf-core/ampliseq'
+  f.with_project_contributor
+  f.workflow_class { WorkflowClass.find_by_key('nextflow') || Factory(:nextflow_workflow_class) }
+  f.git_version_attributes do
+    repo = Factory(:nfcore_local_rocrate_repository)
+    { git_repository_id: repo.id,
+      ref: 'refs/heads/master',
+      commit: 'fda2a6add4b4c2a9ec02b40485adbce690cf4429',
+      main_workflow_path: 'main.nf',
+      mutable: true
+    }
+  end
+end
+
+Factory.define(:empty_git_workflow, class: Workflow) do |f|
+  f.title 'Empty Workflow'
+  f.with_project_contributor
+  f.git_version_attributes do
+    repo = Factory(:blank_repository)
+    { git_repository_id: repo.id, mutable: true }
   end
 end
 

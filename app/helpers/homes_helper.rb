@@ -176,10 +176,6 @@ module HomesHelper
     [icon, tt]
   end
 
-  def guest_login_link(text)
-    link_to(text, session_path(login: 'guest', password: 'guest'), method: :post)
-  end
-
   def frontpage_button(link, image_path = nil, opts = {})
     link_to link, opts.reverse_merge(class: 'seek-homepage-button') do
       if image_path
@@ -198,8 +194,8 @@ module HomesHelper
   def integration_definitions
     [
       {
-        key: 'front_page_integration_elixir_aai',
-        url: 'https://elixir-europe.org/services/compute/aai',
+        key: 'front_page_integration_ls_aai',
+        url: 'https://lifescience-ri.eu/ls-login.html',
         label: 'Authentication'
       },
       {

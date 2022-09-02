@@ -14,30 +14,26 @@
     <% end %>
   <% end %>
 <% end %>
+<%= render partial: 'general/item_title', locals: { item: @organism } %>
 
 <%= render partial: 'general/show_page_tab_definitions' %>
 
 <div class="tab-content">
+  <%= tab_pane('overview') do %>
+    <% if @organism.concept -%>
+      <h2>Details about this organism</h2>
+      <%= render :partial => "bioportal_concept_details", :locals => { :concept => @organism.concept } -%>
+      <br/>
+    <% end -%>
 
-  <div id="details" class="tab-pane fade in active">
+    <% if @organism.ncbi_id %>
+      <%= link_to_ncbi_taxonomy_browser @organism, "NCBI taxonomy browser", :popup => true %>
+    <% end %>
 
-    <%= render :partial => "general/item_title", :locals => { :item => @organism } %>
-
-    <div class="show_basic">
-
-      <% if @organism.concept -%>
-        <h2>Details about this organism</h2>
-        <%= render :partial => "bioportal_concept_details", :locals => { :concept => @organism.concept } -%>
-        <br/>
-      <% end -%>
-
-      <% if @organism.ncbi_id %>
-        <%= link_to_ncbi_taxonomy_browser @organism, "NCBI taxonomy browser", :popup => true %>
-      <% end %>
-
-      <h2>Strain details</h2>
-      <table class="strain_list" style="width:100%;">
-        <thead>
+    <h2>Strain details</h2>
+    <table class="strain_list" style="width:100%;">
+      <thead>
+      <tr>
         <th>Name</th>
         <th>Provider name</th>
         <th>Provider's strain ID</th>
@@ -46,14 +42,13 @@
         <th>Synonym</th>
         <th>Comments</th>
         <th>Based on</th>
-        </thead>
-        <%= render :partial => "strain_information_row", :collection => @organism.strains.without_default.select(&:can_view?) -%>
-      </table>
-    </div>
-  </div>
+      </tr>
+      </thead>
+      <%= render :partial => "strain_information_row", :collection => @organism.strains.without_default.select(&:can_view?) -%>
+    </table>
+  <% end %>
 
-  <div id="related-items" class="tab-pane fade">
-    <%= render :partial => "general/items_related_to", :object => @organism %>
-  </div>
-
+  <%= tab_pane('related-items') do %>
+    <%= render partial: 'general/items_related_to', object: @organism %>
+  <% end %>
 </div>

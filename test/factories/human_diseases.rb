@@ -3,13 +3,13 @@ Factory.define(:human_disease) do |f|
   f.title 'An Human Disease'
 end
 
-Factory.define(:min_humandisease, class: HumanDisease) do |f|
+Factory.define(:min_human_disease, class: HumanDisease) do |f|
   f.title 'A Minimal Human Disease'
 end
 
-Factory.define(:max_humandisease, class: HumanDisease) do |f|
+Factory.define(:max_human_disease, class: HumanDisease) do |f|
   f.title 'A Maximal Human Disease'
-  f.projects { [ Factory(:max_project) ] }
+  f.projects { [ Factory(:project) ] }
   f.concept_uri 'http://purl.bioontology.org/obo/DOID_1909'
   f.ontology_id '23'
   f.assays { [ Factory.build(:assay, policy: Factory(:public_policy)) ] }

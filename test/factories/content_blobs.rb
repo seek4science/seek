@@ -330,7 +330,7 @@ end
 Factory.define(:cwl_content_blob, parent: :content_blob) do |f|
   f.original_filename 'rp2-to-rp2path.cwl'
   f.content_type 'application/x-yaml'
-  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path.cwl", 'rb').read }
+  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/rp2/workflows/rp2-to-rp2path.cwl", 'rb').read }
 end
 
 Factory.define(:cwl_packed_content_blob, parent: :content_blob) do |f|
@@ -340,6 +340,7 @@ Factory.define(:cwl_packed_content_blob, parent: :content_blob) do |f|
 end
 
 Factory.define(:url_cwl_content_blob, parent: :content_blob) do |f|
+  f.original_filename 'rp2-to-rp2path.cwl'
   f.url 'https://www.abc.com/workflow.cwl'
   f.data nil
 end
@@ -389,4 +390,77 @@ Factory.define(:ro_crate_with_tests, parent: :content_blob) do |f|
   f.original_filename 'ro_crate_with_tests.crate.zip'
   f.content_type 'application/zip'
   f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/ro-crate-with-tests.crate.zip", 'rb').read }
+end
+
+Factory.define(:xlsx_population_content_blob, parent: :content_blob) do |f|
+  f.content_type 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  f.original_filename 'population.xlsx'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/population.xlsx", 'rb').read }
+end
+
+Factory.define(:csv_population_content_blob, parent: :content_blob) do |f|
+  f.content_type 'text/csv'
+  f.original_filename 'population.csv'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/population.csv", 'rb').read }
+end
+
+Factory.define(:tsv_population_content_blob, parent: :content_blob) do |f|
+  f.content_type 'text/tsv'
+  f.original_filename 'population.tsv'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/population.tsv", 'rb').read }
+end
+
+Factory.define(:xlsx_population_no_header_content_blob, parent: :xlsx_population_content_blob) do |f|
+  f.original_filename 'population_no_header.xlsx'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/population_no_header.xlsx", 'rb').read }
+end
+
+Factory.define(:xlsx_population_no_study_header_content_blob, parent: :xlsx_population_content_blob) do |f|
+  f.original_filename 'population_no_study_header.xlsx'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/population_no_study_header.xlsx", 'rb').read }
+end
+
+Factory.define(:xlsx_population_no_investigation_content_blob, parent: :xlsx_population_content_blob) do |f|
+  f.original_filename 'population_no_investigation.xlsx'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/population_no_investigation.xlsx", 'rb').read }
+end
+
+Factory.define(:xlsx_population_no_study_content_blob, parent: :xlsx_population_content_blob) do |f|
+  f.original_filename 'population_no_study.xlsx'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/population_no_study.xlsx", 'rb').read }
+end
+
+Factory.define(:xlsx_population_just_isa, parent: :xlsx_population_content_blob) do |f|
+  f.original_filename 'population_just_isa.xlsx'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/population_just_isa.xlsx", 'rb').read }
+end
+
+Factory.define(:spaces_ro_crate, parent: :content_blob) do |f|
+  f.original_filename 'with-spaces.crate.zip'
+  f.content_type 'application/zip'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/with-spaces.crate.zip", 'rb').read }
+end
+
+Factory.define(:dots_ro_crate, parent: :content_blob) do |f|
+  f.original_filename 'with-dots.crate.zip'
+  f.content_type 'application/zip'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/workflows/with-dots.crate.zip", 'rb').read }
+end
+
+Factory.define(:markdown_content_blob, parent: :content_blob) do |f|
+  f.content_type 'text/markdown'
+  f.original_filename 'README.md'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/README.md", 'rb').read }
+end
+
+Factory.define(:jupyter_notebook_content_blob, parent: :content_blob) do |f|
+  f.content_type 'application/x-ipynb+json'
+  f.original_filename 'create_and_link_isa_datafile.ipynb'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/create_and_link_isa_datafile.ipynb", 'rb').read }
+end
+
+Factory.define(:svg_content_blob, parent: :content_blob) do |f|
+  f.content_type 'image/svg+xml'
+  f.original_filename 'transparent-fairdom-logo-square.svg'
+  f.data { File.new("#{Rails.root}/test/fixtures/files/transparent-fairdom-logo-square.svg", 'rb').read }
 end

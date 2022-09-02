@@ -1,0 +1,46 @@
+---
+http_interactions:
+- request:
+    method: put
+    uri: https://localhost:8443/workflows/86da0a30-d2cd-013a-a07d-000c29a94011/versions/1
+    body:
+      encoding: UTF-8
+      string: '{"name":"This Workflow","version":"1"}'
+    headers:
+      Accept:
+      - "*/*"
+      User-Agent:
+      - rest-client/2.1.0 (linux x86_64) ruby/2.7.5p203
+      Content-Type:
+      - application/json
+      Authorization:
+      - Bearer FUY30D5gtDOeEPE2qu0MbWg2afrrst4whOOB1zHDtF
+      Content-Length:
+      - '38'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Host:
+      - localhost:8443
+  response:
+    status:
+      code: 204
+      message: NO CONTENT
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Wed, 22 Jun 2022 18:13:50 GMT
+      Content-Type:
+      - application/json
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Origin:
+      - "*"
+      X-Frame-Options:
+      - SAMEORIGIN
+    body:
+      encoding: UTF-8
+      string: ''
+    http_version: 
+  recorded_at: Wed, 22 Jun 2022 18:13:50 GMT
+recorded_with: VCR 2.9.3

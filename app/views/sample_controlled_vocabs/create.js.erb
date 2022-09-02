@@ -1,11 +1,11 @@
-$j('#controlled-vocab-errors .errorExplanation').remove();
+$j('#controlled-vocab-errors .error_explanation').remove();
 
 <% if @sample_controlled_vocab.errors.any? %>
 
-    $j('#controlled-vocab-errors').append('<div class="errorExplanation" id="errorExplanation"></div>');
+    $j('#controlled-vocab-errors').append('<div class="error_explanation" id="error_explanation"></div>');
     <% msg = "#{pluralize(@sample_controlled_vocab.errors.count, 'error')} prohibited this sample controlled vocab from being saved" %>
-    $j('#controlled-vocab-errors .errorExplanation').append('<h2><%= msg %></h2>');
-    $j('#controlled-vocab-errors .errorExplanation').append('<ul class="error-messages"></ul>');
+    $j('#controlled-vocab-errors .error_explanation').append('<h2><%= msg %></h2>');
+    $j('#controlled-vocab-errors .error_explanation').append('<ul class="error-messages"></ul>');
     <% @sample_controlled_vocab.errors.full_messages.each do |msg| %>
         $j('#controlled-vocab-errors .error-messages').append('<li><%= escape_javascript msg %></li>');
     <% end %>

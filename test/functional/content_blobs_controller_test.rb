@@ -6,19 +6,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
 
   def setup
     login_as(:quentin)
-  end
-
-  # Is this still needed?
-  def rest_api_test_object
-    Factory(:pdf_sop, policy: Factory(:downloadable_public_policy)).content_blob
-  end
-
-  def rest_show_url_options(object = rest_api_test_object)
-    { sop_id: object.asset_id }
   end
 
   test 'should resolve to json' do
@@ -30,14 +20,11 @@ class ContentBlobsControllerTest < ActionController::TestCase
     perform_jsonapi_checks
   end
 
-  test 'html and xml not acceptable' do
+  test 'html and rdf not acceptable' do
     sop = Factory(:pdf_sop, policy: Factory(:all_sysmo_downloadable_policy))
     blob = sop.content_blob
 
     get :show, params: { id: blob.id, sop_id: sop.id }
-    assert_response :not_acceptable
-
-    get :show, params: { id: blob.id, sop_id: sop.id, format: 'xml' }
     assert_response :not_acceptable
 
     get :show, params: { id: blob.id, sop_id: sop.id, format: 'rdf' }
@@ -64,10 +51,6 @@ class ContentBlobsControllerTest < ActionController::TestCase
     assert_not_nil flash[:error]
   end
 
-  def test_index_json
-    # nothing to do, no indexes for content blobs
-  end
-
   test 'examine url to file' do
     # test successful request to file
     stub_request(:head, 'http://mockedlocation.com/a-piccy.png').to_return(status: 200, headers: { 'Content-Type' => 'image/png' })
@@ -91,7 +74,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'examine url to github' do
     stub_request(:any, 'https://github.com/bob/workflows/blob/master/dir/the_workflow.cwl').to_return(status: 200)
     stub_request(:any, 'https://raw.githubusercontent.com/bob/workflows/master/dir/the_workflow.cwl').to_return(
-        body: File.new("#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path.cwl"),
+        body: File.new("#{Rails.root}/test/fixtures/files/workflows/rp2/workflows/rp2-to-rp2path.cwl"),
         status: 200,
         headers: { 'Content-Length' => 1118,
                    'Content-Type' => 'text/plain' })
@@ -116,7 +99,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
         status: 200,
         headers: { 'Content-Length' => 40296,
                    'Content-Type' => 'text/plain',
-                   'Content-Disposition' => 'attachment; filename="1-PreProcessing.ga"'})
+                   'Content-Disposition' => "attachment; filename=\"1-PreProcessing.ga\"; filename*=UTF-8''1-PreProcessing.ga"})
 
     suite = -> (url) {
       get :examine_url, xhr: true, params: { data_url: url }
@@ -139,6 +122,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'examine url forbidden' do
     # forbidden
     stub_request(:head, 'http://unauth.com/file.pdf').to_return(status: 403, headers: { 'Content-Type' => 'application/pdf' })
+    stub_request(:get, 'http://unauth.com/file.pdf').to_return(status: 403, headers: { 'Content-Type' => 'application/pdf' })
     get :examine_url, xhr: true, params: { data_url: 'http://unauth.com/file.pdf' }
     assert_response 200
     assert_equal 403, assigns(:info)[:code]
@@ -150,6 +134,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'examine url unauthorized' do
     # unauthorized
     stub_request(:head, 'http://unauth.com/file.pdf').to_return(status: 401, headers: { 'Content-Type' => 'application/pdf' })
+    stub_request(:get, 'http://unauth.com/file.pdf').to_return(status: 401, headers: { 'Content-Type' => 'application/pdf' })
     get :examine_url, xhr: true, params: { data_url: 'http://unauth.com/file.pdf' }
     assert_response :success
     assert @response.body.include?('Access to this link is unauthorized')
@@ -289,13 +274,12 @@ class ContentBlobsControllerTest < ActionController::TestCase
       get :download, params: { model_id: model.id, id: model.content_blobs.first.id }
     end
     assert_response :success
-    assert_equal 'attachment; filename="file_with_no_extension"', @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"file_with_no_extension\"; filename*=UTF-8''file_with_no_extension", @response.header['Content-Disposition']
     assert_equal 'application/octet-stream', @response.header['Content-Type']
     assert_equal '31', @response.header['Content-Length']
   end
 
   test 'get_pdf' do
-    check_for_soffice
     ms_word_sop = Factory(:doc_sop, policy: Factory(:all_sysmo_downloadable_policy))
     pdf_path = ms_word_sop.content_blob.filepath('pdf')
     FileUtils.rm pdf_path if File.exist?(pdf_path)
@@ -305,28 +289,13 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :get_pdf, params: { sop_id: ms_word_sop.id, id: ms_word_sop.content_blob.id }
     assert_response :success
 
-    assert_equal 'attachment; filename="ms_word_test.pdf"', @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"ms_word_test.pdf\"; filename*=UTF-8''ms_word_test.pdf", @response.header['Content-Disposition']
     assert_equal 'application/pdf', @response.header['Content-Type']
 
     assert_includes 8000..9300, @response.header['Content-Length'].to_i, 'the content length should fall within the rage 8000-9300 bytes'
 
     assert File.exist?(ms_word_sop.content_blob.filepath)
     assert File.exist?(pdf_path)
-  end
-
-  test 'get_pdf raises exception if soffice not running and conversion is needed' do
-    check_for_soffice
-    ms_word_sop = Factory(:doc_sop, policy: Factory(:all_sysmo_downloadable_policy))
-    pdf_path = ms_word_sop.content_blob.filepath('pdf')
-    FileUtils.rm pdf_path if File.exist?(pdf_path)
-    assert !File.exist?(pdf_path)
-    assert ms_word_sop.can_download?
-
-    Seek::Config.stub(:soffice_available?, false) do
-      assert_raises(RuntimeError) do
-        get :get_pdf, params: { sop_id: ms_word_sop.id, id: ms_word_sop.content_blob.id }
-      end
-    end
   end
 
   test 'get_pdf from url' do
@@ -349,7 +318,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
     assert_response :success
 
-    assert_equal 'attachment; filename="a_pdf_file.pdf"', @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"a_pdf_file.pdf\"; filename*=UTF-8''a_pdf_file.pdf", @response.header['Content-Disposition']
     assert_equal 'application/pdf', @response.header['Content-Type']
     assert_equal '8827', @response.header['Content-Length']
 
@@ -358,7 +327,6 @@ class ContentBlobsControllerTest < ActionController::TestCase
   end
 
   test 'get_pdf of a doc file from url' do
-    check_for_soffice
     mock_remote_file "#{Rails.root}/test/fixtures/files/ms_word_test.doc",
                      'http://somewhere.com/piccy.doc',
                      'Content-Type' => 'application/pdf',
@@ -373,7 +341,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
       get :get_pdf, params: { sop_id: doc_sop.id, id: doc_sop.content_blob.id }
     end
     assert_response :success
-    assert_equal 'attachment; filename="ms_word_test.pdf"', @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"ms_word_test.pdf\"; filename*=UTF-8''ms_word_test.pdf", @response.header['Content-Disposition']
     assert_equal 'application/pdf', @response.header['Content-Type']
     assert_includes 8000..9300, @response.header['Content-Length'].to_i, 'the content length should fall within the rage 8000-9300 bytes'
 
@@ -417,7 +385,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
     assert_response :success
 
-    download_path = download_sop_content_blob_path(sop, sop.content_blob.id, format: :pdf, intent: :inline_view)
+    download_path = download_sop_content_blob_path(sop, sop.content_blob.id, format: :pdf, disposition: :inline, intent: :inline_view)
     assert @response.body.include?("DEFAULT_URL = '#{download_path}'")
 
     al = ActivityLog.last
@@ -454,12 +422,12 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :view_content, params: { data_file_id: df.id, id: df.content_blob.id }
     assert_response :success
     assert @response.body.include?('1,2,3,4,5')
-    assert_equal 'text/plain', @response.content_type
+    assert_equal 'text/plain', @response.media_type
 
     df = Factory(:data_file, content_blob: Factory(:doc_content_blob), policy: Factory(:all_sysmo_downloadable_policy))
     get :view_content, params: { data_file_id: df.id, id: df.content_blob.id }
     assert_response :success
-    assert_equal 'text/html', @response.content_type
+    assert_equal 'text/html', @response.media_type
   end
 
   test 'can fetch csv content blob as csv' do
@@ -467,7 +435,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'csv' }
     assert_response :success
 
-    assert @response.content_type, 'text/csv'
+    assert @response.media_type, 'text/csv'
 
     csv = @response.body
     assert csv.include?(%(1,2,3,4,5))
@@ -479,7 +447,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'csv' }
     assert_response :success
 
-    assert @response.content_type, 'text/csv'
+    assert @response.media_type, 'text/csv'
 
     csv = @response.body
     assert csv.include?(%(,"some stuff"))
@@ -491,7 +459,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'csv' }
     assert_response :not_acceptable
 
-    assert @response.content_type, 'text/csv'
+    assert @response.media_type, 'text/csv'
 
     csv = @response.body
     assert csv.include?(%(Unable to view))
@@ -503,13 +471,12 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :show, params: { data_file_id: df.id, id: df.content_blob.id, format: 'csv' }
     assert_response :not_found
 
-    assert @response.content_type, 'text/csv'
+    assert @response.media_type, 'text/csv'
 
     csv = @response.body
     assert csv.include?(%(No content))
 
   end
-
 
   test 'can view content of an image file' do
     df = Factory(:data_file, policy: Factory(:all_sysmo_downloadable_policy),
@@ -518,6 +485,30 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :download, params: { data_file_id: df.id, id: df.content_blob.id, disposition: 'inline', image_size: '900' }
 
     assert_response :success
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+  end
+
+  test 'can view content of an image file and resize to given param' do
+    df = Factory(:data_file, policy: Factory(:all_sysmo_downloadable_policy),
+                             content_blob: Factory(:image_content_blob))
+
+    get :download, params: { data_file_id: df.id, id: df.content_blob.id, disposition: 'inline', image_size: '10' }
+
+    assert_response :success
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert @response.header['Content-Length'].to_i < 2000, 'Image should have been resized'
+  end
+
+  test 'can view content of an SVG image file without converting' do
+    df = Factory(:data_file, policy: Factory(:all_sysmo_downloadable_policy),
+                             content_blob: Factory(:svg_content_blob))
+
+    get :download, params: { data_file_id: df.id, id: df.content_blob.id, disposition: 'inline', image_size: '900' }
+
+    assert_response :success
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert_equal 'image/svg+xml', @response.header['Content-Type']
+    assert  @response.body[0..256].include?('<svg ')
   end
 
   test 'should transparently redirect on download for 302 url' do
@@ -553,7 +544,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
       get :download, params: { data_file_id: df, id: df.content_blob }
     end
     assert_response :success
-    assert_equal 'attachment; filename="small-test-spreadsheet.xls"', @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"small-test-spreadsheet.xls\"; filename*=UTF-8''small-test-spreadsheet.xls", @response.header['Content-Disposition']
     assert_equal 'application/vnd.ms-excel', @response.header['Content-Type']
     assert_equal '7168', @response.header['Content-Length']
   end
@@ -666,7 +657,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
       get :download, params: { model_id: model.id, id: first_content_blob.id }
     end
     assert_response :success
-    assert_equal "attachment; filename=\"#{first_content_blob.original_filename}\"", @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"#{first_content_blob.original_filename}\"; filename*=UTF-8''#{first_content_blob.original_filename}", @response.header['Content-Disposition']
     assert_equal first_content_blob.content_type, @response.header['Content-Type']
     assert_equal first_content_blob.file_size.to_s, @response.header['Content-Length']
   end
@@ -701,7 +692,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
     end
 
     assert_response :success
-    assert_equal "attachment; filename=\"#{sample_type.template.original_filename}\"", @response.header['Content-Disposition']
+    assert_equal "attachment; filename=\"#{sample_type.template.original_filename}\"; filename*=UTF-8''#{sample_type.template.original_filename}", @response.header['Content-Disposition']
 
     assert_equal sample_type, ActivityLog.last.activity_loggable
     assert_equal 'download',ActivityLog.last.action
@@ -718,6 +709,93 @@ class ContentBlobsControllerTest < ActionController::TestCase
     end
 
     assert_response :redirect
+  end
+
+  test 'should view content for pdf blob' do
+    sop = Factory(:public_sop)
+    blob = Factory(:pdf_content_blob, asset: sop)
+
+    get :view_content, params: { sop_id: sop.id, id: blob.id }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_nil @response.header['Content-Security-Policy']
+    assert_select 'iframe', count: 0
+    assert_select '#outerContainer'
+  end
+
+  test 'should view content for markdown blob' do
+    sop = Factory(:public_sop)
+    blob = Factory(:markdown_content_blob, asset: sop)
+
+    get :view_content, params: { sop_id: sop.id, id: blob.id }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert_select 'iframe', count: 0
+    assert_select '#navbar', count: 0
+    assert_select '.markdown-body h1', text: 'FAIRDOM-SEEK'
+  end
+
+  test 'should view content for jupyter blob renderer' do
+    sop = Factory(:public_sop)
+    blob = Factory(:jupyter_notebook_content_blob, asset: sop)
+
+    get :view_content, params: { sop_id: sop.id, id: blob.id }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_equal "default-src 'self'; img-src * data:; style-src 'unsafe-inline';", @response.header['Content-Security-Policy']
+    assert_select 'iframe', count: 0
+    assert_select '#navbar', count: 0
+    assert_select 'body.jp-Notebook'
+    assert_select 'div.jp-MarkdownOutput p', text: 'Import the libraries so that they can be used within the notebook'
+  end
+
+  test 'should view content for text blob' do
+    sop = Factory(:public_sop)
+    blob = Factory(:txt_content_blob, asset: sop)
+
+    get :view_content, params: { sop_id: sop.id, id: blob.id }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/plain')
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert_equal "This is a txt format\n", response.body
+  end
+
+  test 'should view content for image blob' do
+    sop = Factory(:public_sop)
+    blob = Factory(:image_content_blob, asset: sop)
+
+    get :view_content, params: { sop_id: sop.id, id: blob.id }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert_select 'img.git-image-preview[src=?]', download_sop_content_blob_path(sop, blob, disposition: 'inline')
+  end
+
+  test 'should view content for jupyter blob as text if requested' do
+    sop = Factory(:public_sop)
+    blob = Factory(:jupyter_notebook_content_blob, asset: sop)
+
+    get :view_content, params: { sop_id: sop.id, id: blob.id, display: 'text' }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/plain')
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert response.body[0..20].include?('"nbformat": 4')
+  end
+
+  test 'should through 406 if trying to view content for pdf blob as text' do
+    sop = Factory(:public_sop)
+    blob = Factory(:pdf_content_blob, asset: sop)
+
+    assert_raises(ActionController::UnknownFormat) do
+      get :view_content, params: { sop_id: sop.id, id: blob.id, display: 'text' }
+    end
   end
 
   private

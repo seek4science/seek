@@ -259,7 +259,7 @@ class Annotation < ApplicationRecord
       attr_name = attribute_name.downcase
       if Annotations::Config.valid_value_types.key?(attr_name) &&
          ![Annotations::Config.valid_value_types[attr_name]].flatten.include?(value.class.name)
-        errors[:base] << "Annotation value is of an invalid type for attribute name: '#{attr_name}'. Provided value is a #{value.class.name}."
+        errors.add(:base, "Annotation value is of an invalid type for attribute name: '#{attr_name}'. Provided value is a #{value.class.name}.")
         ok = false
       end
     end
@@ -277,7 +277,7 @@ class Annotation < ApplicationRecord
         return true
       else
         if value.class.has_duplicate_annotation?(self)
-          errors[:base] << 'This annotation already exists and is not allowed to be created again.'
+          errors.add(:base, 'This annotation already exists and is not allowed to be created again.')
           return false
         else
           return true
@@ -302,7 +302,7 @@ class Annotation < ApplicationRecord
         anns = found_annotatable.annotations_with_attribute_and_by_source(attr_name, source)
 
         if anns.length >= max
-          errors[:base] << 'The limit has been reached for annotations with this attribute and by this source.'
+          errors.add(:base, 'The limit has been reached for annotations with this attribute and by this source.')
           return false
         else
           return true
@@ -326,14 +326,14 @@ class Annotation < ApplicationRecord
             if options[:in].map(&:downcase).include?(content_to_check.downcase)
               return true
             else
-              errors[:base] << (options[:error_message])
+              errors.add(:base, options[:error_message])
               return false
             end
           else
             if options[:in].include?(content_to_check)
               return true
             else
-              errors[:base] << (options[:error_message])
+              errors.add(:base, options[:error_message])
               return false
             end
           end
@@ -344,14 +344,14 @@ class Annotation < ApplicationRecord
             if options[:in] === 0
               return true
             else
-              errors[:base] << (options[:error_message])
+              errors.add(:base, options[:error_message])
               return false
             end
           else
             if options[:in] === content_to_check.to_i
               return true
             else
-              errors[:base] << (options[:error_message])
+              errors.add(:base, options[:error_message])
               return false
             end
           end
