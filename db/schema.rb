@@ -1829,8 +1829,7 @@ ActiveRecord::Schema.define(version: 2022_08_13_205708) do
     t.text "description"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.bigint "facility_id"
-    t.index ["facility_id"], name: "index_services_on_facility_id"
+    t.integer "facility_id"
   end
 
   create_table "sessions", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
@@ -2311,5 +2310,4 @@ ActiveRecord::Schema.define(version: 2022_08_13_205708) do
 
   add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
-  add_foreign_key "services", "facilities"
 end
