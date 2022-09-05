@@ -220,5 +220,14 @@ class InvestigationTest < ActiveSupport::TestCase
     )
     assert_equal ['James','25'].sort, item.custom_metadata_attribute_values_for_search.sort
   end
+  
+  test 'related sop ids' do
+    investigation = Factory(:investigation)
+    study = Factory(:study, investigation: investigation)
+    assay = Factory(:assay, study: study)
+    assay_sop = Factory(:sop, assays: [assay])
+    study_sop = Factory(:sop, study: study)
+    assert_equal investigation.related_sop_ids.sort, [assay_sop.id, study_sop.id].sort
+  end
 
 end
