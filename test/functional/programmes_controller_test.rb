@@ -314,6 +314,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_select 'a[href=?]', programme_path(p1), text: p1.title, count: 1
     assert_select 'a[href=?]', programme_path(p2), text: p2.title, count: 0
     assert_select 'a[href=?]', programme_path(p3), text: p3.title, count: 0
+    assert_equal 1, assigns(:programmes).count
 
     login_as(Factory(:person))
     get :index
@@ -321,6 +322,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_select 'a[href=?]', programme_path(p1), text: p1.title, count: 1
     assert_select 'a[href=?]', programme_path(p2), text: p2.title, count: 0
     assert_select 'a[href=?]', programme_path(p3), text: p3.title, count: 0
+    assert_equal 1, assigns(:programmes).count
     logout
 
     login_as(Factory(:admin))
@@ -329,6 +331,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_select 'a[href=?]', programme_path(p1), text: p1.title, count: 1
     assert_select 'a[href=?]', programme_path(p2), text: p2.title, count: 1
     assert_select 'a[href=?]', programme_path(p3), text: p3.title, count: 1
+    assert_equal 3, assigns(:programmes).count
     logout
 
     login_as(programme_admin)
@@ -337,6 +340,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_select 'a[href=?]', programme_path(p1), text: p1.title, count: 1
     assert_select 'a[href=?]', programme_path(p2), text: p2.title, count: 1
     assert_select 'a[href=?]', programme_path(p3), text: p3.title, count: 0
+    assert_equal 2, assigns(:programmes).count
     logout
   end
 
