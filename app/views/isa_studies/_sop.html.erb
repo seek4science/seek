@@ -3,9 +3,9 @@
         <div class="row">
             <div class="col-12">
                 <%= render :partial => "general/item_title",:locals => {:item => sop, :version => sop.version} -%>
+                <%= item_description sop.description -%>
                 <p>
-                    <b>Description:</b>
-                    <%= sop.description %>
+                  <%= persistent_resource_id(sop) %>
                 </p>
                 <p>
                     <b>Link:</b>
@@ -15,18 +15,7 @@
                     %>
                     <%= link_to link_text, sop.content_blob.url, :target=>"_blank" -%>
                 </p>
-                <p>
-                    <b>File name:</b>
-                    <%= sop.content_blob.original_filename %>
-                </p>
-                <p>
-                    <b>Format:</b>
-                    <%= sop.content_blob.human_content_type %>
-                </p>
-                <p>
-                    <b>Version:</b>
-                    <%= sop.version %>
-                </p>
+                <%= render :partial => 'assets/fileinfo',:object=>sop.content_blob -%>
             </div>
         </div>
     </div>

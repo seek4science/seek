@@ -17,12 +17,13 @@ class IsaAssay
 
   def save
     if valid?
-      # connect the sample type multi link attribute to the last sample type of the assay's study
-      input_attribute = @sample_type.sample_attributes.detect(&:seek_sample_multi?)
-      input_attribute.linked_sample_type_id = @input_sample_type_id
-      title = SampleType.find(@input_sample_type_id).sample_attributes.detect(&:is_title).title 
-      input_attribute.title = "Input (#{title})"
-
+      if @assay.new_record?
+        # connect the sample type multi link attribute to the last sample type of the assay's study
+        input_attribute = @sample_type.sample_attributes.detect(&:seek_sample_multi?)
+        input_attribute.linked_sample_type_id = @input_sample_type_id
+        title = SampleType.find(@input_sample_type_id).sample_attributes.detect(&:is_title).title
+        input_attribute.title = "Input (#{title})"
+      end
       @assay.save
       @sample_type.save
     else
@@ -40,11 +41,17 @@ class IsaAssay
     @assay
   end
 
+  def populate(id)
+    @assay = Assay.find(id)
+    @sample_type = @assay.sample_type
+    @input_sample_type_id = @sample_type.sample_attributes.detect(&:seek_sample_multi?).linked_sample_type_id
+  end
+
   private
 
   def validate_objects
-    @assay.errors.each { |e| errors[:base] << "[Assay]: #{e}" } unless @assay.valid?
-    errors[:base] << 'SOP is required' if @assay.sop_ids.blank?
+    @assay.errors.each { |e| errors[:base] << "[Assay]: #{e.full_message}" } unless @assay.valid?
+    errors[:base] << '[SOP]: SOP is required' if @assay.sop_ids.blank?
 
     @sample_type.errors.full_messages.each { |e| errors[:base] << "[Sample type]: #{e}" } unless @sample_type.valid?
 

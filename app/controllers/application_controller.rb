@@ -246,6 +246,17 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def requested_item_authorized?(object)
+    privilege = Seek::Permissions::Translator.translate(action_name)
+    return false if privilege.nil?
+
+    if is_auth?(object, privilege)
+      true
+    else
+      false
+    end
+  end
+
   def handle_authorization_failure_redirect(object, privilege)
     redirect_to(object)
   end

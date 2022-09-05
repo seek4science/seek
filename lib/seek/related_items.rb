@@ -4,14 +4,14 @@ module Seek
 
     RELATABLE_TYPES = ['Person', 'Programme', 'Project', 'Institution', 'Investigation', 'Study', 'Assay', 'DataFile',
                        'Document', 'Model', 'Sop', 'Publication', 'Presentation', 'Event', 'Organism', 'Strain', 'Sample',
-                       'Workflow', 'Collection', 'HumanDisease', 'FileTemplate', 'Placeholder'].freeze
+                       'Workflow', 'Collection', 'HumanDisease', 'FileTemplate', 'Placeholder', 'Template'].freeze
 
     class_methods do
       def related_type_methods
         @related_type_methods ||= {}.tap do |hash|
           RELATABLE_TYPES.each do |type|
             method_name = type.underscore.pluralize
-
+						
             method = if method_defined?("related_#{method_name}")
                        "related_#{method_name}"
                      elsif method_defined?("related_#{method_name.singularize}")

@@ -19,6 +19,10 @@ class Study < ApplicationRecord
 
   has_many :assays
   has_many :assay_publications, through: :assays, source: :publications
+
+  has_many :assay_sops, through: :assays, source: :sops
+  has_many :sop_versions, through: :assays
+
   has_one :external_asset, as: :seek_entity, dependent: :destroy
   belongs_to :sop
 
@@ -28,7 +32,7 @@ class Study < ApplicationRecord
 
   enforce_authorization_on_association :investigation, :view
 
-  %w[data_file sop model document].each do |type|
+  %w[data_file model document].each do |type|
     has_many "#{type}_versions".to_sym, -> { distinct }, through: :assays
     has_many "related_#{type.pluralize}".to_sym, -> { distinct }, through: :assays, source: type.pluralize.to_sym
   end
@@ -63,6 +67,10 @@ class Study < ApplicationRecord
   def related_person_ids
     ids = super
     ids.uniq
+  end
+
+  def related_sop_ids
+    Array(sop_id) | assay_sop_ids
   end
 
   def positioned_assays

@@ -22,21 +22,7 @@ module Seek
 
             data_hash = JSON.parse(file)
             data_hash['data'].each do |item|
-              metadata = item['metadata']
-              template_details = {
-                title: metadata['name'],
-                group: metadata['group'],
-                group_order: metadata['group_order'],
-                temporary_name: metadata['temporary_name'],
-                version: metadata['version'],
-                isa_config: metadata['isa_config'],
-                isa_measurement_type: metadata['isa_measurement_type'],
-                isa_technology_type: metadata['isa_technology_type'],
-                isa_protocol_type: metadata['isa_protocol_type'],
-                repo_schema_id: metadata['r epo_schema_id'],
-                organism: metadata['organism'],
-                level: metadata['level']
-              }
+              template_details = init_template(item['metadata'])
 
               if template_exists?(template_details)
                 result << add_log(template_details, 'Skipped')
@@ -45,11 +31,11 @@ module Seek
                 result << add_log(template_details, 'Created')
               end
 
-              tempalte = Template.create(template_details.merge({ projects: [project], policy: Policy.public_policy }))
+              template = Template.create(template_details.merge({ projects: [project], policy: Policy.public_policy }))
 
               item['data'].each_with_index do |attribute, j|
-                is_ontology = !attribute['ontology'].blank?
-                is_cv = !attribute['CVList'].blank?
+                is_ontology = attribute['ontology'].present?
+                is_cv = attribute['CVList'].present?
                 if is_ontology || is_cv
                   scv =
                     SampleControlledVocab.new(
@@ -98,9 +84,9 @@ module Seek
 
                 p scv.errors if (is_ontology || is_cv) && !scv.save(validate: false)
 
-                tempalte_attribute_details = { title: attribute['name'], template_id: tempalte.id }
+                template_attribute_details = { title: attribute['name'], template_id: template.id }
 
-                TemplateAttribute.create(tempalte_attribute_details.merge({
+                TemplateAttribute.create(template_attribute_details.merge({
                                                                             is_title: attribute['title'] || 0,
                                                                             isa_tag_id: get_isa_tag_id(attribute['isaTag']),
                                                                             short_name: attribute['short_name'],
@@ -122,14 +108,30 @@ module Seek
         `rm -f #{lockfile}`
       end
 
+      def self.init_template(metadata)
+        {
+          title: metadata['name'],
+          group: metadata['group'],
+          group_order: metadata['group_order'],
+          temporary_name: metadata['temporary_name'],
+          version: metadata['version'],
+          isa_config: metadata['isa_config'],
+          isa_measurement_type: metadata['isa_measurement_type'],
+          isa_technology_type: metadata['isa_technology_type'],
+          isa_protocol_type: metadata['isa_protocol_type'],
+          repo_schema_id: metadata['r epo_schema_id'],
+          organism: metadata['organism'],
+          level: metadata['level']
+        }
+      end
+
       def self.write_result(result)
         File.open(resultfile, 'w') { |file| file.write result }
       end
 
       def self.template_exists?(template_details)
-        tempalte = Template.find_by(title: template_details[:title], group: template_details[:group],
-                                    version: template_details[:version])
-        tempalte.present?
+        Template.find_by(title: template_details[:title], group: template_details[:group],
+                         version: template_details[:version]).present?
       end
 
       def self.add_log(template_details, type)
