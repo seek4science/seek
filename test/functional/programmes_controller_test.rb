@@ -818,4 +818,19 @@ class ProgrammesControllerTest < ActionController::TestCase
     end
   end
 
+  test 'sample type programmes through nested routing' do
+    assert_routing 'sample_types/2/programmes', controller: 'programmes', action: 'index', sample_type_id: '2'
+    programme = Factory(:programme)
+    programme2 = Factory(:programme, projects: [Factory(:project)])
+    sample_type = Factory(:patient_sample_type, projects:[programme.projects.first])
+
+    get :index, params: { sample_type_id: sample_type.id }
+
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', programme_path(programme), text: programme.title
+      assert_select 'a[href=?]', programme_path(programme2), text: programme2.title, count: 0
+    end
+  end
+
 end
