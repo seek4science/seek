@@ -43,7 +43,8 @@ class SinglePagesController < ApplicationController
   end
 
   def export_isa
-    raise "The investigation cannot be found!" if @inv.blank?
+    raise 'The investigation cannot be found!' if @inv.blank?
+
     isa = IsaExporter::Exporter.new(@inv).export
     send_data isa, filename: 'isa.json', type: 'application/json', deposition: 'attachment'
   rescue Exception => e
@@ -61,8 +62,6 @@ class SinglePagesController < ApplicationController
 
   def find_authorized_investigation
     investigation = Investigation.find(params[:investigation_id])
-    if investigation.can_edit?
-      @inv = investigation
-    end
+    @inv = investigation if investigation.can_edit?
   end
 end
