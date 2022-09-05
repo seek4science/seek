@@ -3,6 +3,7 @@ class SinglePagesController < ApplicationController
   include Seek::AssetsCommon
   before_action :set_up_instance_variable
   before_action :project_single_page_enabled?
+  before_action :find_authorized_investigation, only: :export_isa
   respond_to :html, :js
 
   def show
@@ -42,8 +43,8 @@ class SinglePagesController < ApplicationController
   end
 
   def export_isa
-    inv = Investigation.find(params[:investigation_id])
-    isa = IsaExporter::Exporter.new(inv).export
+    raise "The investigation cannot be found!" if @inv.blank?
+    isa = IsaExporter::Exporter.new(@inv).export
     send_data isa, filename: 'isa.json', type: 'application/json', deposition: 'attachment'
   rescue Exception => e
     respond_to do |format|
@@ -56,5 +57,12 @@ class SinglePagesController < ApplicationController
 
   def set_up_instance_variable
     @single_page = true
+  end
+
+  def find_authorized_investigation
+    investigation = Investigation.find(params[:investigation_id])
+    if investigation.can_edit?
+      @inv = investigation
+    end
   end
 end
