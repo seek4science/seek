@@ -55,8 +55,3 @@ In general :
 5. Create a new Pull Request
 
 For more details on how and what you can contribute to SEEK please visit [Contributing](http://docs.seek4science.org/contributing.html)
-
-
-
-
-
