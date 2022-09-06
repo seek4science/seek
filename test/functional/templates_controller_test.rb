@@ -98,7 +98,6 @@ class TemplatesControllerTest < ActionController::TestCase
 
   test 'update changing from a CV attribute' do
     template = Factory(:apples_controlled_vocab_template, project_ids: @project_ids, contributor: @person)
-    puts template.inspect
     assert template.valid?
     assert template.can_edit?
     assert_equal 1, template.template_attributes.count
