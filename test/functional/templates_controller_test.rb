@@ -233,4 +233,25 @@ class TemplatesControllerTest < ActionController::TestCase
     @controller.send(:done!)
     assert_equal 'working', status
   end
+
+  test 'sample type templates through nested routing' do
+    assert_routing 'sample_types/2/templates', controller: 'templates', action: 'index', sample_type_id: '2'
+
+
+    template = Factory(:min_template, project_ids: @project_ids, contributor: @person, title:'related template')
+    template2 = Factory(:min_template, project_ids: @project_ids, contributor: @person, title:'unrelated template')
+    sample_type = Factory(:simple_sample_type, isa_template: template, project_ids: @project_ids, contributor: @person)
+
+    assert_equal template, sample_type.isa_template
+
+    get :index, params: { sample_type_id: sample_type.id }
+
+    assert_response :success
+
+    # FIXME: this fails as it can't find the templates - see https://github.com/seek4science/seek/issues/1163
+    # assert_select 'div.list_item_title' do
+    #   assert_select 'a[href=?]', template_path(template), text: template.title
+    #   assert_select 'a[href=?]', template_path(template2), text: template2.title, count: 0
+    # end
+  end
 end

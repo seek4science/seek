@@ -695,7 +695,7 @@ SEEK::Application.routes.draw do
         get :download
       end
     end
-    resources :projects, :programmes, only: [:index]
+    resources :projects, :programmes, :templates, only: [:index]
   end
 
   ### SAMPLE ATTRIBUTE TYPES ###
