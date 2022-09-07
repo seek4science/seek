@@ -6,24 +6,24 @@
 
 	<ul class="nav nav-tabs">
 			<li class="active">
-					<a data-toggle="tab" data-target="#sample_collection"><i class="glyphicon glyphicon-list-alt"></i> Protocol</a>
+					<a data-toggle="tab" data-target="#assay_protocol"><i class="glyphicon glyphicon-list-alt"></i> Protocol</a>
 			</li>
 			<li>
-					<a data-toggle="tab" data-target="#assay_samples"><i class="glyphicon glyphicon-list-alt"></i> Samples table</a>
+					<a data-toggle="tab" data-target="#assay_samples_table"><i class="glyphicon glyphicon-list-alt"></i> Samples table</a>
 			</li>
 			<li>
-					<a data-toggle="tab" data-target="#assay_table"><i class="glyphicon glyphicon-list-alt"></i> Experiment overview</a>
+					<a data-toggle="tab" data-target="#assay_experiment_overview"><i class="glyphicon glyphicon-list-alt"></i> Experiment overview</a>
 			</li>
 	</ul>
 
 	<div class="tab-content">
-			<div id="sample_collection" class="tab-pane fade active in">
+			<div id="assay_protocol" class="tab-pane fade active in">
 					<%= render :partial=>"isa_studies/sop", locals: { sop: assay ? assay.sops&.first : nil} -%>
 			</div>
-			<div id="assay_samples" class="tab-pane fade">
+			<div id="assay_samples_table" class="tab-pane fade">
 					<%= render :partial=>"isa_assays/assay_samples", locals: { assay: assay} -%>
 			</div>
-			<div id="assay_table" class="tab-pane fade">
+			<div id="assay_experiment_overview" class="tab-pane fade">
 					<%= render :partial=>"isa_assays/assay_table", locals: { assay: assay} -%>   
 			</div>
 	</div>

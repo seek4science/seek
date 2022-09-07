@@ -314,6 +314,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_select 'a[href=?]', programme_path(p1), text: p1.title, count: 1
     assert_select 'a[href=?]', programme_path(p2), text: p2.title, count: 0
     assert_select 'a[href=?]', programme_path(p3), text: p3.title, count: 0
+    assert_equal 1, assigns(:programmes).count
 
     login_as(Factory(:person))
     get :index
@@ -321,6 +322,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_select 'a[href=?]', programme_path(p1), text: p1.title, count: 1
     assert_select 'a[href=?]', programme_path(p2), text: p2.title, count: 0
     assert_select 'a[href=?]', programme_path(p3), text: p3.title, count: 0
+    assert_equal 1, assigns(:programmes).count
     logout
 
     login_as(Factory(:admin))
@@ -329,6 +331,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_select 'a[href=?]', programme_path(p1), text: p1.title, count: 1
     assert_select 'a[href=?]', programme_path(p2), text: p2.title, count: 1
     assert_select 'a[href=?]', programme_path(p3), text: p3.title, count: 1
+    assert_equal 3, assigns(:programmes).count
     logout
 
     login_as(programme_admin)
@@ -337,6 +340,7 @@ class ProgrammesControllerTest < ActionController::TestCase
     assert_select 'a[href=?]', programme_path(p1), text: p1.title, count: 1
     assert_select 'a[href=?]', programme_path(p2), text: p2.title, count: 1
     assert_select 'a[href=?]', programme_path(p3), text: p3.title, count: 0
+    assert_equal 2, assigns(:programmes).count
     logout
   end
 
@@ -815,6 +819,21 @@ class ProgrammesControllerTest < ActionController::TestCase
       get :edit, params: {id: programme}
       assert_response :success
       assert_select 'input#programme_open_for_projects', count: 0
+    end
+  end
+
+  test 'sample type programmes through nested routing' do
+    assert_routing 'sample_types/2/programmes', controller: 'programmes', action: 'index', sample_type_id: '2'
+    programme = Factory(:programme)
+    programme2 = Factory(:programme, projects: [Factory(:project)])
+    sample_type = Factory(:patient_sample_type, projects:[programme.projects.first])
+
+    get :index, params: { sample_type_id: sample_type.id }
+
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', programme_path(programme), text: programme.title
+      assert_select 'a[href=?]', programme_path(programme2), text: programme2.title, count: 0
     end
   end
 

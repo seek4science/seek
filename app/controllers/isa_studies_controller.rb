@@ -3,6 +3,7 @@ class IsaStudiesController < ApplicationController
   include Seek::Publishing::PublishingCommon
 
   before_action :set_up_instance_variable
+  before_action :find_requested_item, only: %i[edit update]
 
   def new
     @isa_study = IsaStudy.new
@@ -17,10 +18,48 @@ class IsaStudiesController < ApplicationController
 
     if @isa_study.save
       redirect_to single_page_path(id: @isa_study.study.projects.first, item_type: 'study',
-                                   item_id: @isa_study.study, notice: 'The ISA study was created successfully!')
+                                   item_id: @isa_study.study)
     else
       respond_to do |format|
         format.html { render action: 'new' }
+        format.json { render json: @isa_study.errors, status: :unprocessable_entity }
+      end
+    end
+  end
+
+  def edit
+    @isa_study.source = nil unless requested_item_authorized?(@isa_study.source)
+    @isa_study.sample_collection = nil unless requested_item_authorized?(@isa_study.sample_collection)
+
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  def update
+    # update the study
+    @isa_study.study.attributes = isa_study_params[:study]
+    update_sharing_policies @isa_study.study
+    update_relationships(@isa_study.study, isa_study_params[:study])
+
+    # update the source
+    if requested_item_authorized?(@isa_study.source)
+      @isa_study.source.update(isa_study_params[:source_sample_type])
+      @isa_study.source.resolve_inconsistencies
+    end
+
+    # update the sample collection
+    if requested_item_authorized?(@isa_study.sample_collection)
+      @isa_study.sample_collection.update(isa_study_params[:sample_collection_sample_type])
+      @isa_study.sample_collection.resolve_inconsistencies
+    end
+
+    if @isa_study.save
+      redirect_to single_page_path(id: @isa_study.study.projects.first, item_type: 'study',
+                                   item_id: @isa_study.study.id)
+    else
+      respond_to do |format|
+        format.html { render action: 'edit', status: :unprocessable_entity }
         format.json { render json: @isa_study.errors, status: :unprocessable_entity }
       end
     end
@@ -78,5 +117,15 @@ class IsaStudiesController < ApplicationController
 
   def set_up_instance_variable
     @single_page = true
+  end
+
+  def find_requested_item
+    @isa_study = IsaStudy.new
+    @isa_study.populate(params[:id])
+    unless requested_item_authorized?(@isa_study.study)
+      flash[:error] = "You are not authorized to edit this #{t('isa_study')}"
+      redirect_to single_page_path(id: @isa_study.study.projects.first, item_type: 'study',
+                                   item_id: @isa_study.study)
+    end
   end
 end

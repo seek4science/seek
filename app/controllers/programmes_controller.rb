@@ -134,12 +134,14 @@ class ProgrammesController < ApplicationController
   end
 
   def fetch_assets
-    if User.admin_logged_in?
-      @programmes = Programme.all
-    elsif User.programme_administrator_logged_in?
-      @programmes = Programme.activated | current_person.administered_programmes
+    @programmes = super
+    return @programmes if User.admin_logged_in?
+
+    if User.programme_administrator_logged_in?
+       @programmes = @programmes.all if @programmes.eql?(Programme) #necessary because the super can return the class to defer calling .all, here it is ok to do so
+       @programmes = @programmes.activated | (@programmes & current_person.administered_programmes)
     else
-      @programmes = Programme.activated
+       @programmes = @programmes.activated
     end
   end
 

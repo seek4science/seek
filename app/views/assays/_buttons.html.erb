@@ -2,10 +2,12 @@
 <%= render :partial => "subscriptions/subscribe", :locals => {:object => item} %>
 <% if logged_in_and_member? %>
   <% if displaying_single_page? %>
-	  <% if item.study.assays.where('position > ?', item.position).empty? %>
-      <%= button_link_to("Design the next #{t('assay')}", 'new', new_isa_assay_path(study_id: item.study.id, single_page: params[:single_page])) %>
+		<% valid_study = item&.study&.sample_types.present? %>
+		<% valid_assay = item&.sample_type.present? %>
+		<% if valid_study && valid_assay %>
+    	<%= button_link_to("Design the next #{t('assay')}", 'new', new_isa_assay_path(source_assay_id: item.id, study_id: item.study.id, single_page: params[:single_page])) %>
 		<% end %>
-  <% else %>
+	<% else %>
     <%= button_link_to("New #{assay_word} based on this one", 'new', new_object_based_on_existing_one_assay_path(item, :controller_name => "assays")) %>
   <% end %>
   <% if item.can_edit? %>
@@ -18,7 +20,11 @@
 
 <%= item_actions_dropdown do %>
   <% if item.can_edit? %>
-    <li><%= image_tag_for_key('edit', edit_assay_path(item), "Edit #{assay_word}", nil, "Edit #{assay_word}") -%></li>
+    <% if displaying_single_page? %>
+      <li><%= image_tag_for_key('edit', edit_isa_assay_path(item, source_assay_id: item.id, study_id: item.study.id, single_page: params[:single_page]), "Edit #{t('isa_assay')}", nil, "Edit #{t('isa_assay')}") -%></li>
+    <% else %>
+      <li><%= image_tag_for_key('edit', edit_assay_path(item), "Edit #{assay_word}", nil, "Edit #{assay_word}") -%></li>
+    <% end %>
   <% end %>
 
   <% if item.can_manage? -%>

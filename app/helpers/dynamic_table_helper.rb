@@ -8,7 +8,7 @@ module DynamicTableHelper
   def dt_aggregated(study, assay = nil)
     sample_types =
       if assay
-        study.assays.where("position <= #{assay.position}").order(:position).map(&:sample_type)
+        link_sequence(assay.sample_type).reverse.drop(2)
       else
         study.sample_types.map(&:clone)
       end
@@ -18,6 +18,15 @@ module DynamicTableHelper
   end
 
   private
+
+  def link_sequence(sample_type)
+    sequence = [sample_type]
+    while link = sample_type.sample_attributes.detect(&:seek_sample_multi?)&.linked_sample_type
+      sequence << link
+      sample_type = link
+    end
+    sequence
+  end
 
   def dt_rows(sample_type)
     sample_type.samples.map do |s|

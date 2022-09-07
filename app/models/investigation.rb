@@ -13,12 +13,16 @@ class Investigation < ApplicationRecord
 
   enum status: [:planned, :running, :completed, :cancelled, :failed]
   belongs_to :assignee, class_name: 'Person'
+
+  has_many :study_sops, through: :studies, source: :sop
+  has_many :assay_sops, through: :assays, source: :sops
+  has_many :sop_versions, through: :studies
   
   def state_allows_delete?(*args)
     studies.empty? && super
   end
 
-  %w[data_file sop model document].each do |type|
+  %w[data_file model document].each do |type|
     has_many "#{type}_versions".to_sym, -> { distinct }, through: :studies
     has_many "related_#{type.pluralize}".to_sym, -> { distinct }, through: :studies
   end
@@ -37,6 +41,10 @@ class Investigation < ApplicationRecord
 
   def related_publication_ids
     publication_ids | study_publication_ids | assay_publication_ids
+  end
+
+  def related_sop_ids
+    study_sop_ids | assay_sop_ids
   end
 
   def positioned_studies

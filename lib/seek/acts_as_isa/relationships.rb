@@ -16,6 +16,10 @@ module Seek
           ids << contributor_id
           ids.uniq
         end
+
+        def related_sops
+          Sop.where(id: related_sop_ids)
+        end
       end
 
       module Associations
