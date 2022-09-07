@@ -48,6 +48,11 @@ class Event < ApplicationRecord
     errors.add(:end_date, 'is before start date.') unless end_date.nil? || start_date.nil? || end_date >= start_date
   end
 
+  validate :validate_time_zone 
+  def validate_time_zone
+    errors.add(:time_zone, 'is not valid.') unless time_zone_valid?
+  end
+
   def show_contributor_avatars?
     false
   end
@@ -59,4 +64,9 @@ class Event < ApplicationRecord
   def self.can_create?
     Seek::Config.events_enabled && User.logged_in_and_member?
   end
+
+  def time_zone_valid?
+    time_zone.blank? || (ActiveSupport::TimeZone.all.map{ |t| t.tzinfo.name }.include? time_zone)
+  end
+
 end

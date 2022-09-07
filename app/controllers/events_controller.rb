@@ -64,11 +64,14 @@ class EventsController < ApplicationController
   end
 
   def set_timezone
-    start_date = params[:event][:start_date]
-    end_date = params[:event][:end_date]
     time_zone = params[:event][:time_zone]
-    params[:event][:start_date] = start_date.in_time_zone(time_zone) if start_date.present?
-    params[:event][:end_date] = end_date.in_time_zone(time_zone) if end_date.present?
+    if time_zone.present? && (ActiveSupport::TimeZone.all.map{ |t| t.tzinfo.name }.include? time_zone)
+      start_date = params[:event][:start_date]
+      end_date = params[:event][:end_date]
+
+      params[:event][:start_date] = start_date.in_time_zone(time_zone) if start_date.present?
+      params[:event][:end_date] = end_date.in_time_zone(time_zone) if end_date.present?
+    end
   end
 
 end

@@ -182,4 +182,13 @@ class EventTest < ActiveSupport::TestCase
     assert_equal 'DE',event.country
 
   end
+
+  test 'time zone validation' do
+    person = Factory(:person)
+    event = Factory.build(:event)
+    assert event.valid?
+    event.time_zone = 'invalid/time_zone'
+    refute event.valid?
+  end
+  
 end
