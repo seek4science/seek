@@ -52,7 +52,7 @@ module ApplicationHelper
     js.empty? ? '' : javascript_include_tag(*js)
   end
 
-  def date_as_string(date, show_time_of_day = false, year_only_1st_jan = false)
+  def date_as_string(date, show_time_of_day = false, year_only_1st_jan = false, time_zone = nil)
     # for publications, if it is the first of jan, then it can be assumed it is just the year (unlikely have a publication on New Years Day)
 
     if date.to_s == nil
@@ -66,6 +66,12 @@ module ApplicationHelper
       else
         str = date.localtime.strftime("#{date.day.ordinalize} %b %Y")
         str = date.localtime.strftime("#{str} at %H:%M") if show_time_of_day
+        if time_zone.present?
+          date_in_tz = date.in_time_zone(time_zone)
+          tz_str = date_in_tz.strftime("#{date_in_tz.day.ordinalize} %b %Y")
+          tz_str = date_in_tz.strftime("#{tz_str} at %H:%M") if show_time_of_day
+          str += "\t(#{tz_str} (#{time_zone}))"
+        end
       end
     end
 

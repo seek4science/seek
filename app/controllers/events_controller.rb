@@ -36,6 +36,7 @@ class EventsController < ApplicationController
     re_render_view = is_new ? 'events/new' : 'events/edit'
 
     update_sharing_policies @event
+    set_timezone
 
     respond_to do | format |
       if @event.update(event_params) && @event.save
@@ -52,7 +53,7 @@ class EventsController < ApplicationController
   private
 
   def event_params
-    params.require(:event).permit(:title, :description, :start_date, :end_date, :url, :address, :city, :country,
+    params.require(:event).permit(:title, :description, :start_date, :end_date, :url, :address, :city, :country, :time_zone,
                                   { project_ids: [] }, { publication_ids: [] }, { presentation_ids: [] },
                                   { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                   { data_file_ids: [] },{document_ids: []}, { publication_ids: [] })
@@ -60,6 +61,14 @@ class EventsController < ApplicationController
 
   def param_converter_options
     { skip: [:data_file_ids] }
+  end
+
+  def set_timezone
+    start_date = params[:event][:start_date]
+    end_date = params[:event][:end_date]
+    time_zone = params[:event][:time_zone]
+    params[:event][:start_date] = start_date.in_time_zone(time_zone)
+    params[:event][:end_date] = end_date.in_time_zone(time_zone)
   end
 
 end

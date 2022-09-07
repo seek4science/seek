@@ -10,9 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_09_01_133247) do
+ActiveRecord::Schema.define(version: 2022_09_07_085132) do
 
-  create_table "activity_logs", id: :integer, force: :cascade do |t|
+  create_table "activity_logs", force: :cascade do |t|
     t.string "action"
     t.string "format"
     t.string "activity_loggable_type"
@@ -25,7 +25,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.datetime "updated_at"
     t.string "http_referer"
     t.text "user_agent"
-    t.text "data", size: :medium
+    t.text "data"
     t.string "controller_name"
     t.index ["action"], name: "act_logs_action_index"
     t.index ["activity_loggable_type", "activity_loggable_id"], name: "act_logs_act_loggable_index"
@@ -34,19 +34,19 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["referenced_type", "referenced_id"], name: "act_logs_referenced_index"
   end
 
-  create_table "admin_defined_role_programmes", id: :integer, force: :cascade do |t|
+  create_table "admin_defined_role_programmes", force: :cascade do |t|
     t.integer "programme_id"
     t.integer "person_id"
     t.integer "role_mask"
   end
 
-  create_table "admin_defined_role_projects", id: :integer, force: :cascade do |t|
+  create_table "admin_defined_role_projects", force: :cascade do |t|
     t.integer "project_id"
     t.integer "role_mask"
     t.integer "person_id"
   end
 
-  create_table "annotation_attributes", id: :integer, force: :cascade do |t|
+  create_table "annotation_attributes", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -54,7 +54,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["name"], name: "index_annotation_attributes_on_name"
   end
 
-  create_table "annotation_value_seeds", id: :integer, force: :cascade do |t|
+  create_table "annotation_value_seeds", force: :cascade do |t|
     t.integer "attribute_id", null: false
     t.string "old_value"
     t.datetime "created_at"
@@ -64,7 +64,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["attribute_id"], name: "index_annotation_value_seeds_on_attribute_id"
   end
 
-  create_table "annotation_versions", id: :integer, force: :cascade do |t|
+  create_table "annotation_versions", force: :cascade do |t|
     t.integer "annotation_id", null: false
     t.integer "version", null: false
     t.integer "version_creator_id"
@@ -81,7 +81,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["annotation_id"], name: "index_annotation_versions_on_annotation_id"
   end
 
-  create_table "annotations", id: :integer, force: :cascade do |t|
+  create_table "annotations", force: :cascade do |t|
     t.string "source_type", null: false
     t.integer "source_id", null: false
     t.string "annotatable_type", limit: 50, null: false
@@ -116,7 +116,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "assay_assets", id: :integer, force: :cascade do |t|
+  create_table "assay_assets", force: :cascade do |t|
     t.integer "assay_id"
     t.integer "asset_id"
     t.integer "version"
@@ -141,7 +141,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["user_id", "can_view"], name: "index_assay_auth_lookup_on_user_id_and_can_view"
   end
 
-  create_table "assay_classes", id: :integer, force: :cascade do |t|
+  create_table "assay_classes", force: :cascade do |t|
     t.string "title"
     t.text "description"
     t.datetime "created_at"
@@ -149,7 +149,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.string "key", limit: 10
   end
 
-  create_table "assay_human_diseases", id: :integer, force: :cascade do |t|
+  create_table "assay_human_diseases", force: :cascade do |t|
     t.integer "assay_id"
     t.integer "human_disease_id"
     t.datetime "created_at"
@@ -158,7 +158,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["human_disease_id"], name: "index_assay_diseases_on_disease_id"
   end
 
-  create_table "assay_organisms", id: :integer, force: :cascade do |t|
+  create_table "assay_organisms", force: :cascade do |t|
     t.integer "assay_id"
     t.integer "organism_id"
     t.integer "culture_growth_type_id"
@@ -170,7 +170,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["organism_id"], name: "index_assay_organisms_on_organism_id"
   end
 
-  create_table "assays", id: :integer, force: :cascade do |t|
+  create_table "assays", force: :cascade do |t|
     t.text "title"
     t.text "description"
     t.datetime "created_at"
@@ -192,7 +192,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["sample_type_id"], name: "index_assays_on_sample_type_id"
   end
 
-  create_table "asset_doi_logs", id: :integer, force: :cascade do |t|
+  create_table "asset_doi_logs", force: :cascade do |t|
     t.string "asset_type"
     t.integer "asset_id"
     t.integer "asset_version"
@@ -215,7 +215,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["asset_id", "asset_type"], name: "index_asset_links_on_asset_id_and_asset_type"
   end
 
-  create_table "assets", id: :integer, force: :cascade do |t|
+  create_table "assets", force: :cascade do |t|
     t.integer "project_id"
     t.string "resource_type"
     t.integer "resource_id"
@@ -225,7 +225,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.datetime "last_used_at"
   end
 
-  create_table "assets_creators", id: :integer, force: :cascade do |t|
+  create_table "assets_creators", force: :cascade do |t|
     t.integer "asset_id"
     t.integer "creator_id"
     t.string "asset_type"
@@ -239,7 +239,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["asset_id", "asset_type"], name: "index_assets_creators_on_asset_id_and_asset_type"
   end
 
-  create_table "auth_lookup_update_queues", id: :integer, force: :cascade do |t|
+  create_table "auth_lookup_update_queues", force: :cascade do |t|
     t.integer "item_id"
     t.string "item_type"
     t.datetime "created_at"
@@ -248,7 +248,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["item_id", "item_type"], name: "index_auth_lookup_update_queues_on_item_id_and_item_type"
   end
 
-  create_table "avatars", id: :integer, force: :cascade do |t|
+  create_table "avatars", force: :cascade do |t|
     t.string "owner_type"
     t.integer "owner_id"
     t.string "original_filename"
@@ -257,7 +257,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["owner_type", "owner_id"], name: "index_avatars_on_owner_type_and_owner_id"
   end
 
-  create_table "bioportal_concepts", id: :integer, force: :cascade do |t|
+  create_table "bioportal_concepts", force: :cascade do |t|
     t.string "ontology_id"
     t.string "concept_uri"
     t.text "cached_concept_yaml"
@@ -316,13 +316,13 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["project_id"], name: "index_collections_projects_on_project_id"
   end
 
-  create_table "compounds", id: :integer, force: :cascade do |t|
+  create_table "compounds", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "content_blobs", id: :integer, force: :cascade do |t|
+  create_table "content_blobs", force: :cascade do |t|
     t.string "md5sum"
     t.text "url"
     t.string "uuid"
@@ -340,13 +340,13 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["asset_id", "asset_type"], name: "index_content_blobs_on_asset_id_and_asset_type"
   end
 
-  create_table "culture_growth_types", id: :integer, force: :cascade do |t|
+  create_table "culture_growth_types", force: :cascade do |t|
     t.string "title"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "cultures", id: :integer, force: :cascade do |t|
+  create_table "cultures", force: :cascade do |t|
     t.integer "organism_id"
     t.integer "sop_id"
     t.datetime "date_at_sampling"
@@ -397,7 +397,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["user_id", "can_view"], name: "index_data_file_auth_lookup_on_user_id_and_can_view"
   end
 
-  create_table "data_file_versions", id: :integer, force: :cascade do |t|
+  create_table "data_file_versions", force: :cascade do |t|
     t.integer "data_file_id"
     t.integer "version"
     t.text "revision_comments"
@@ -426,7 +426,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.integer "version_id"
   end
 
-  create_table "data_files", id: :integer, force: :cascade do |t|
+  create_table "data_files", force: :cascade do |t|
     t.integer "contributor_id"
     t.string "title"
     t.text "description"
@@ -459,11 +459,11 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["project_id"], name: "index_data_files_projects_on_project_id"
   end
 
-  create_table "db_files", id: :integer, force: :cascade do |t|
+  create_table "db_files", force: :cascade do |t|
     t.binary "data"
   end
 
-  create_table "delayed_jobs", id: :integer, force: :cascade do |t|
+  create_table "delayed_jobs", force: :cascade do |t|
     t.integer "priority", default: 0
     t.integer "attempts", default: 0
     t.text "handler"
@@ -478,7 +478,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["priority", "run_at"], name: "delayed_jobs_priority"
   end
 
-  create_table "disciplines", id: :integer, force: :cascade do |t|
+  create_table "disciplines", force: :cascade do |t|
     t.string "title"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -502,7 +502,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["user_id", "can_view"], name: "index_document_auth_lookup_on_user_id_and_can_view"
   end
 
-  create_table "document_versions", id: :integer, force: :cascade do |t|
+  create_table "document_versions", force: :cascade do |t|
     t.integer "document_id"
     t.integer "version"
     t.text "revision_comments"
@@ -524,14 +524,14 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["document_id"], name: "index_document_versions_on_document_id"
   end
 
-  create_table "document_versions_projects", id: :integer, force: :cascade do |t|
+  create_table "document_versions_projects", force: :cascade do |t|
     t.integer "version_id"
     t.integer "project_id"
     t.index ["project_id"], name: "index_document_versions_projects_on_project_id"
     t.index ["version_id", "project_id"], name: "index_document_versions_projects_on_version_id_and_project_id"
   end
 
-  create_table "documents", id: :integer, force: :cascade do |t|
+  create_table "documents", force: :cascade do |t|
     t.text "title"
     t.text "description"
     t.integer "contributor_id"
@@ -556,7 +556,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["event_id", "document_id"], name: "index_documents_events_on_event_id_and_document_id"
   end
 
-  create_table "documents_projects", id: :integer, force: :cascade do |t|
+  create_table "documents_projects", force: :cascade do |t|
     t.integer "document_id"
     t.integer "project_id"
     t.index ["document_id", "project_id"], name: "index_documents_projects_on_document_id_and_project_id"
@@ -582,7 +582,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["user_id", "can_view"], name: "index_event_auth_lookup_on_user_id_and_can_view"
   end
 
-  create_table "events", id: :integer, force: :cascade do |t|
+  create_table "events", force: :cascade do |t|
     t.datetime "start_date"
     t.datetime "end_date"
     t.text "address"
@@ -598,6 +598,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.string "first_letter", limit: 1
     t.string "uuid"
     t.string "deleted_contributor"
+    t.string "time_zone"
   end
 
   create_table "events_presentations", id: false, force: :cascade do |t|
@@ -617,7 +618,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.integer "event_id"
   end
 
-  create_table "experimental_condition_links", id: :integer, force: :cascade do |t|
+  create_table "experimental_condition_links", force: :cascade do |t|
     t.string "substance_type"
     t.integer "substance_id"
     t.integer "experimental_condition_id"
@@ -625,7 +626,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.datetime "updated_at"
   end
 
-  create_table "experimental_conditions", id: :integer, force: :cascade do |t|
+  create_table "experimental_conditions", force: :cascade do |t|
     t.integer "measured_item_id"
     t.float "start_value"
     t.float "end_value"
@@ -637,7 +638,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["sop_id"], name: "index_experimental_conditions_on_sop_id"
   end
 
-  create_table "external_assets", id: :integer, force: :cascade do |t|
+  create_table "external_assets", force: :cascade do |t|
     t.string "external_service", null: false
     t.string "external_id", null: false
     t.string "external_mod_stamp"
@@ -659,7 +660,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["seek_service_type", "seek_service_id"], name: "index_external_assets_on_seek_service_type_and_seek_service_id"
   end
 
-  create_table "favourite_group_memberships", id: :integer, force: :cascade do |t|
+  create_table "favourite_group_memberships", force: :cascade do |t|
     t.integer "person_id"
     t.integer "favourite_group_id"
     t.integer "access_type", limit: 1
@@ -667,14 +668,14 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.datetime "updated_at"
   end
 
-  create_table "favourite_groups", id: :integer, force: :cascade do |t|
+  create_table "favourite_groups", force: :cascade do |t|
     t.integer "user_id"
     t.string "name"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "favourites", id: :integer, force: :cascade do |t|
+  create_table "favourites", force: :cascade do |t|
     t.integer "resource_id"
     t.integer "user_id"
     t.string "resource_type"
@@ -732,7 +733,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.integer "version"
     t.string "first_letter", limit: 1
     t.string "uuid"
-    t.bigint "policy_id"
+    t.integer "policy_id"
     t.string "doi"
     t.string "license"
     t.datetime "last_used_at"
@@ -750,7 +751,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["project_id"], name: "index_ft_projects_on_p_id"
   end
 
-  create_table "genes", id: :integer, force: :cascade do |t|
+  create_table "genes", force: :cascade do |t|
     t.string "title"
     t.string "symbol"
     t.text "description"
@@ -758,7 +759,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.datetime "updated_at"
   end
 
-  create_table "genotypes", id: :integer, force: :cascade do |t|
+  create_table "genotypes", force: :cascade do |t|
     t.integer "gene_id"
     t.integer "modification_id"
     t.integer "strain_id"
@@ -812,7 +813,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["resource_type", "resource_id"], name: "index_versions_on_resource"
   end
 
-  create_table "group_memberships", id: :integer, force: :cascade do |t|
+  create_table "group_memberships", force: :cascade do |t|
     t.integer "person_id"
     t.integer "work_group_id"
     t.datetime "created_at"
@@ -824,7 +825,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["work_group_id"], name: "index_group_memberships_on_work_group_id"
   end
 
-  create_table "help_attachments", id: :integer, force: :cascade do |t|
+  create_table "help_attachments", force: :cascade do |t|
     t.integer "help_document_id"
     t.string "title"
     t.string "content_type"
@@ -835,7 +836,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.datetime "updated_at"
   end
 
-  create_table "help_documents", id: :integer, force: :cascade do |t|
+  create_table "help_documents", force: :cascade do |t|
     t.string "identifier"
     t.string "title"
     t.text "body"
@@ -843,7 +844,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.datetime "updated_at"
   end
 
-  create_table "help_images", id: :integer, force: :cascade do |t|
+  create_table "help_images", force: :cascade do |t|
     t.integer "help_document_id"
     t.string "content_type"
     t.string "filename"
@@ -863,7 +864,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["parent_id"], name: "index_disease_parents_on_parent_id"
   end
 
-  create_table "human_diseases", id: :integer, force: :cascade do |t|
+  create_table "human_diseases", force: :cascade do |t|
     t.string "title"
     t.string "doid_id"
     t.datetime "created_at"
@@ -886,7 +887,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["publication_id"], name: "index_diseases_publications_on_publication_id"
   end
 
-  create_table "identities", id: :integer, force: :cascade do |t|
+  create_table "identities", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "provider"
@@ -896,7 +897,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["user_id"], name: "index_identities_on_user_id"
   end
 
-  create_table "institutions", id: :integer, force: :cascade do |t|
+  create_table "institutions", force: :cascade do |t|
     t.string "title"
     t.text "address"
     t.string "city"
@@ -921,7 +922,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["user_id", "can_view"], name: "index_investigation_auth_lookup_on_user_id_and_can_view"
   end
 
-  create_table "investigations", id: :integer, force: :cascade do |t|
+  create_table "investigations", force: :cascade do |t|
     t.string "title"
     t.text "description"
     t.datetime "created_at"
@@ -947,7 +948,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["title"], name: "index_isa_tags_title"
   end
 
-  create_table "mapping_links", id: :integer, force: :cascade do |t|
+  create_table "mapping_links", force: :cascade do |t|
     t.string "substance_type"
     t.integer "substance_id"
     t.integer "mapping_id"
@@ -955,7 +956,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.datetime "updated_at"
   end
 
-  create_table "mappings", id: :integer, force: :cascade do |t|
+  create_table "mappings", force: :cascade do |t|
     t.integer "sabiork_id"
     t.string "chebi_id"
     t.string "kegg_id"
@@ -963,14 +964,14 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.datetime "updated_at"
   end
 
-  create_table "measured_items", id: :integer, force: :cascade do |t|
+  create_table "measured_items", force: :cascade do |t|
     t.string "title"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean "factors_studied", default: true
   end
 
-  create_table "message_logs", id: :integer, force: :cascade do |t|
+  create_table "message_logs", force: :cascade do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer "message_type"
@@ -995,13 +996,13 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["user_id", "can_view"], name: "index_model_auth_lookup_on_user_id_and_can_view"
   end
 
-  create_table "model_formats", id: :integer, force: :cascade do |t|
+  create_table "model_formats", force: :cascade do |t|
     t.string "title"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "model_images", id: :integer, force: :cascade do |t|
+  create_table "model_images", force: :cascade do |t|
     t.integer "model_id"
     t.string "original_filename"
     t.string "content_type"
@@ -1011,13 +1012,13 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.integer "image_height"
   end
 
-  create_table "model_types", id: :integer, force: :cascade do |t|
+  create_table "model_types", force: :cascade do |t|
     t.string "title"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "model_versions", id: :integer, force: :cascade do |t|
+  create_table "model_versions", force: :cascade do |t|
     t.integer "model_id"
     t.integer "version"
     t.text "revision_comments"
@@ -1052,7 +1053,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.integer "version_id"
   end
 
-  create_table "models", id: :integer, force: :cascade do |t|
+  create_table "models", force: :cascade do |t|
     t.integer "contributor_id"
     t.string "title"
     t.text "description"
@@ -1085,13 +1086,13 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["project_id"], name: "index_models_projects_on_project_id"
   end
 
-  create_table "moderatorships", id: :integer, force: :cascade do |t|
+  create_table "moderatorships", force: :cascade do |t|
     t.integer "forum_id"
     t.integer "user_id"
     t.index ["forum_id"], name: "index_moderatorships_on_forum_id"
   end
 
-  create_table "modifications", id: :integer, force: :cascade do |t|
+  create_table "modifications", force: :cascade do |t|
     t.string "title"
     t.string "symbol"
     t.text "description"
@@ -1100,7 +1101,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.datetime "updated_at"
   end
 
-  create_table "notifiee_infos", id: :integer, force: :cascade do |t|
+  create_table "notifiee_infos", force: :cascade do |t|
     t.integer "notifiee_id"
     t.string "notifiee_type"
     t.string "unique_key"
@@ -1109,7 +1110,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.datetime "updated_at"
   end
 
-  create_table "number_value_versions", id: :integer, force: :cascade do |t|
+  create_table "number_value_versions", force: :cascade do |t|
     t.integer "number_value_id", null: false
     t.integer "version", null: false
     t.integer "version_creator_id"
@@ -1119,7 +1120,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["number_value_id"], name: "index_number_value_versions_on_number_value_id"
   end
 
-  create_table "number_values", id: :integer, force: :cascade do |t|
+  create_table "number_values", force: :cascade do |t|
     t.integer "version"
     t.integer "version_creator_id"
     t.integer "number", null: false
@@ -1174,7 +1175,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["uid"], name: "index_oauth_applications_on_uid", unique: true
   end
 
-  create_table "oauth_sessions", id: :integer, force: :cascade do |t|
+  create_table "oauth_sessions", force: :cascade do |t|
     t.integer "user_id"
     t.string "provider"
     t.string "access_token"
@@ -1215,7 +1216,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "openbis_endpoints", id: :integer, force: :cascade do |t|
+  create_table "openbis_endpoints", force: :cascade do |t|
     t.string "as_endpoint"
     t.string "space_perm_id"
     t.string "username"
@@ -1234,7 +1235,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.boolean "is_test", default: false
   end
 
-  create_table "organisms", id: :integer, force: :cascade do |t|
+  create_table "organisms", force: :cascade do |t|
     t.string "title"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -1249,7 +1250,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["project_id"], name: "index_organisms_projects_on_project_id"
   end
 
-  create_table "people", id: :integer, force: :cascade do |t|
+  create_table "people", force: :cascade do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string "first_name"
@@ -1267,7 +1268,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.string "orcid"
   end
 
-  create_table "permissions", id: :integer, force: :cascade do |t|
+  create_table "permissions", force: :cascade do |t|
     t.string "contributor_type"
     t.integer "contributor_id"
     t.integer "policy_id"
@@ -1277,7 +1278,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["policy_id"], name: "index_permissions_on_policy_id"
   end
 
-  create_table "phenotypes", id: :integer, force: :cascade do |t|
+  create_table "phenotypes", force: :cascade do |t|
     t.text "description"
     t.text "comment"
     t.integer "strain_id"
@@ -1303,14 +1304,14 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.integer "contributor_id"
     t.string "first_letter", limit: 1
     t.string "uuid"
-    t.bigint "policy_id"
+    t.integer "policy_id"
     t.string "license"
     t.datetime "last_used_at"
     t.text "other_creators"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.bigint "file_template_id"
-    t.bigint "project_id"
+    t.integer "file_template_id"
+    t.integer "project_id"
     t.integer "data_file_id"
     t.index ["contributor_id"], name: "index_ps_on_c"
     t.index ["file_template_id"], name: "index_placeholders_on_file_template_id"
@@ -1326,7 +1327,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["project_id"], name: "index_ph_projects_on_p_id"
   end
 
-  create_table "policies", id: :integer, force: :cascade do |t|
+  create_table "policies", force: :cascade do |t|
     t.string "name"
     t.integer "sharing_scope", limit: 1
     t.integer "access_type", limit: 1
@@ -1348,7 +1349,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["user_id", "can_view"], name: "index_presentation_auth_lookup_on_user_id_and_can_view"
   end
 
-  create_table "presentation_versions", id: :integer, force: :cascade do |t|
+  create_table "presentation_versions", force: :cascade do |t|
     t.integer "presentation_id"
     t.integer "version"
     t.text "revision_comments"
@@ -1372,7 +1373,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.integer "version_id"
   end
 
-  create_table "presentations", id: :integer, force: :cascade do |t|
+  create_table "presentations", force: :cascade do |t|
     t.integer "contributor_id"
     t.string "title"
     t.text "description"
@@ -1402,7 +1403,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["workflow_id", "presentation_id"], name: "index_presentations_workflows_on_workflow_pres"
   end
 
-  create_table "programmes", id: :integer, force: :cascade do |t|
+  create_table "programmes", force: :cascade do |t|
     t.string "title"
     t.text "description"
     t.integer "avatar_id"
@@ -1417,7 +1418,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.boolean "open_for_projects", default: false
   end
 
-  create_table "project_folder_assets", id: :integer, force: :cascade do |t|
+  create_table "project_folder_assets", force: :cascade do |t|
     t.integer "asset_id"
     t.string "asset_type"
     t.integer "project_folder_id"
@@ -1425,7 +1426,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.datetime "updated_at"
   end
 
-  create_table "project_folders", id: :integer, force: :cascade do |t|
+  create_table "project_folders", force: :cascade do |t|
     t.integer "project_id"
     t.string "title"
     t.text "description"
@@ -1437,7 +1438,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.boolean "deletable", default: true
   end
 
-  create_table "project_subscriptions", id: :integer, force: :cascade do |t|
+  create_table "project_subscriptions", force: :cascade do |t|
     t.integer "person_id"
     t.integer "project_id"
     t.string "unsubscribed_types"
@@ -1445,7 +1446,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["person_id", "project_id"], name: "index_project_subscriptions_on_person_id_and_project_id"
   end
 
-  create_table "projects", id: :integer, force: :cascade do |t|
+  create_table "projects", force: :cascade do |t|
     t.string "title"
     t.text "web_page"
     t.text "wiki_page"
@@ -1539,7 +1540,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["user_id", "can_view"], name: "index_publication_auth_lookup_on_user_id_and_can_view"
   end
 
-  create_table "publication_authors", id: :integer, force: :cascade do |t|
+  create_table "publication_authors", force: :cascade do |t|
     t.string "first_name"
     t.string "last_name"
     t.integer "publication_id"
@@ -1549,7 +1550,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.integer "person_id"
   end
 
-  create_table "publication_types", id: :integer, force: :cascade do |t|
+  create_table "publication_types", force: :cascade do |t|
     t.string "title"
     t.string "key"
     t.datetime "created_at", null: false
@@ -1586,7 +1587,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["publication_id"], name: "index_publication_versions_on_publication_id"
   end
 
-  create_table "publications", id: :integer, force: :cascade do |t|
+  create_table "publications", force: :cascade do |t|
     t.integer "pubmed_id"
     t.text "title"
     t.text "abstract"
@@ -1624,13 +1625,13 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["item_id", "item_type"], name: "index_rdf_generation_queues_on_item_id_and_item_type"
   end
 
-  create_table "recommended_model_environments", id: :integer, force: :cascade do |t|
+  create_table "recommended_model_environments", force: :cascade do |t|
     t.string "title"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "reindexing_queues", id: :integer, force: :cascade do |t|
+  create_table "reindexing_queues", force: :cascade do |t|
     t.string "item_type"
     t.integer "item_id"
     t.datetime "created_at"
@@ -1639,7 +1640,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["item_id", "item_type"], name: "index_reindexing_queues_on_item_id_and_item_type"
   end
 
-  create_table "relationship_types", id: :integer, force: :cascade do |t|
+  create_table "relationship_types", force: :cascade do |t|
     t.string "title"
     t.text "description"
     t.datetime "created_at"
@@ -1647,7 +1648,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.string "key"
   end
 
-  create_table "relationships", id: :integer, force: :cascade do |t|
+  create_table "relationships", force: :cascade do |t|
     t.string "subject_type", null: false
     t.integer "subject_id", null: false
     t.string "predicate", null: false
@@ -1671,10 +1672,10 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
   end
 
   create_table "roles", force: :cascade do |t|
-    t.bigint "person_id"
-    t.bigint "role_type_id"
+    t.integer "person_id"
+    t.integer "role_type_id"
     t.string "scope_type"
-    t.bigint "scope_id"
+    t.integer "scope_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["person_id", "role_type_id"], name: "index_roles_on_person_id_and_role_type_id"
@@ -1683,7 +1684,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["scope_type", "scope_id"], name: "index_roles_on_scope"
   end
 
-  create_table "sample_attribute_types", id: :integer, force: :cascade do |t|
+  create_table "sample_attribute_types", force: :cascade do |t|
     t.string "title"
     t.string "base_type"
     t.text "regexp"
@@ -1694,7 +1695,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.string "resolution"
   end
 
-  create_table "sample_attributes", id: :integer, force: :cascade do |t|
+  create_table "sample_attributes", force: :cascade do |t|
     t.string "title"
     t.integer "sample_attribute_type_id"
     t.boolean "required", default: false
@@ -1727,7 +1728,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["user_id", "can_view"], name: "index_sample_auth_lookup_on_user_id_and_can_view"
   end
 
-  create_table "sample_controlled_vocab_terms", id: :integer, force: :cascade do |t|
+  create_table "sample_controlled_vocab_terms", force: :cascade do |t|
     t.text "label"
     t.integer "sample_controlled_vocab_id"
     t.datetime "created_at", null: false
@@ -1736,7 +1737,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.string "parent_iri"
   end
 
-  create_table "sample_controlled_vocabs", id: :integer, force: :cascade do |t|
+  create_table "sample_controlled_vocabs", force: :cascade do |t|
     t.string "title"
     t.text "description"
     t.datetime "created_at", null: false
@@ -1746,12 +1747,12 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.string "ols_root_term_uri"
     t.boolean "required"
     t.string "short_name"
-    t.string "key"
     t.integer "template_id"
+    t.string "key"
     t.boolean "custom_input", default: false
   end
 
-  create_table "sample_resource_links", id: :integer, force: :cascade do |t|
+  create_table "sample_resource_links", force: :cascade do |t|
     t.integer "sample_id"
     t.integer "resource_id"
     t.string "resource_type"
@@ -1759,7 +1760,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["sample_id"], name: "index_sample_resource_links_on_sample_id"
   end
 
-  create_table "sample_types", id: :integer, force: :cascade do |t|
+  create_table "sample_types", force: :cascade do |t|
     t.string "title"
     t.string "uuid"
     t.datetime "created_at", null: false
@@ -1779,7 +1780,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["study_id"], name: "index_sample_types_studies_on_study_id"
   end
 
-  create_table "samples", id: :integer, force: :cascade do |t|
+  create_table "samples", force: :cascade do |t|
     t.string "title"
     t.integer "sample_type_id"
     t.text "json_metadata"
@@ -1794,7 +1795,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.string "deleted_contributor"
   end
 
-  create_table "saved_searches", id: :integer, force: :cascade do |t|
+  create_table "saved_searches", force: :cascade do |t|
     t.integer "user_id"
     t.text "search_query"
     t.text "search_type"
@@ -1803,7 +1804,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.boolean "include_external_search", default: false
   end
 
-  create_table "sessions", id: :integer, force: :cascade do |t|
+  create_table "sessions", force: :cascade do |t|
     t.string "session_id", null: false
     t.text "data", size: :medium
     t.datetime "created_at"
@@ -1812,7 +1813,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["updated_at"], name: "index_sessions_on_updated_at"
   end
 
-  create_table "settings", id: :integer, force: :cascade do |t|
+  create_table "settings", force: :cascade do |t|
     t.string "var", null: false
     t.text "value"
     t.integer "target_id"
@@ -1824,14 +1825,14 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["target_type", "target_id", "var"], name: "index_settings_on_target_type_and_target_id_and_var", unique: true
   end
 
-  create_table "site_announcement_categories", id: :integer, force: :cascade do |t|
+  create_table "site_announcement_categories", force: :cascade do |t|
     t.string "title"
     t.string "icon_key"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "site_announcements", id: :integer, force: :cascade do |t|
+  create_table "site_announcements", force: :cascade do |t|
     t.integer "announcer_id"
     t.string "announcer_type"
     t.string "title"
@@ -1845,7 +1846,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.datetime "updated_at"
   end
 
-  create_table "snapshots", id: :integer, force: :cascade do |t|
+  create_table "snapshots", force: :cascade do |t|
     t.string "resource_type"
     t.integer "resource_id"
     t.string "doi"
@@ -1868,7 +1869,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["user_id", "can_view"], name: "index_sop_auth_lookup_on_user_id_and_can_view"
   end
 
-  create_table "sop_versions", id: :integer, force: :cascade do |t|
+  create_table "sop_versions", force: :cascade do |t|
     t.integer "sop_id"
     t.integer "version"
     t.text "revision_comments"
@@ -1890,7 +1891,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["sop_id"], name: "index_sop_versions_on_sop_id"
   end
 
-  create_table "sops", id: :integer, force: :cascade do |t|
+  create_table "sops", force: :cascade do |t|
     t.integer "contributor_id"
     t.string "title"
     t.text "description"
@@ -1915,7 +1916,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["workflow_id"], name: "index_sops_workflows_on_workflow_id"
   end
 
-  create_table "special_auth_codes", id: :integer, force: :cascade do |t|
+  create_table "special_auth_codes", force: :cascade do |t|
     t.string "code"
     t.date "expiration_date"
     t.string "asset_type"
@@ -1941,7 +1942,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.integer "descendant_id"
   end
 
-  create_table "strains", id: :integer, force: :cascade do |t|
+  create_table "strains", force: :cascade do |t|
     t.string "title"
     t.integer "organism_id"
     t.datetime "created_at"
@@ -1959,7 +1960,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.string "deleted_contributor"
   end
 
-  create_table "studied_factor_links", id: :integer, force: :cascade do |t|
+  create_table "studied_factor_links", force: :cascade do |t|
     t.string "substance_type"
     t.integer "substance_id"
     t.integer "studied_factor_id"
@@ -1967,7 +1968,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.datetime "updated_at"
   end
 
-  create_table "studied_factors", id: :integer, force: :cascade do |t|
+  create_table "studied_factors", force: :cascade do |t|
     t.integer "measured_item_id"
     t.float "start_value"
     t.float "end_value"
@@ -1981,7 +1982,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["data_file_id"], name: "index_studied_factors_on_data_file_id"
   end
 
-  create_table "studies", id: :integer, force: :cascade do |t|
+  create_table "studies", force: :cascade do |t|
     t.text "title"
     t.text "description"
     t.integer "investigation_id"
@@ -2011,7 +2012,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["user_id", "can_view"], name: "index_study_auth_lookup_on_user_id_and_can_view"
   end
 
-  create_table "subscriptions", id: :integer, force: :cascade do |t|
+  create_table "subscriptions", force: :cascade do |t|
     t.integer "person_id"
     t.integer "subscribable_id"
     t.string "subscribable_type"
@@ -2021,7 +2022,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.integer "project_subscription_id"
   end
 
-  create_table "suggested_assay_types", id: :integer, force: :cascade do |t|
+  create_table "suggested_assay_types", force: :cascade do |t|
     t.string "label"
     t.string "ontology_uri"
     t.integer "contributor_id"
@@ -2030,7 +2031,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.integer "parent_id"
   end
 
-  create_table "suggested_technology_types", id: :integer, force: :cascade do |t|
+  create_table "suggested_technology_types", force: :cascade do |t|
     t.string "label"
     t.string "ontology_uri"
     t.integer "contributor_id"
@@ -2039,7 +2040,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.integer "parent_id"
   end
 
-  create_table "synonyms", id: :integer, force: :cascade do |t|
+  create_table "synonyms", force: :cascade do |t|
     t.string "name"
     t.integer "substance_id"
     t.string "substance_type"
@@ -2048,7 +2049,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["substance_id", "substance_type"], name: "index_synonyms_on_substance_id_and_substance_type"
   end
 
-  create_table "taggings", id: :integer, force: :cascade do |t|
+  create_table "taggings", force: :cascade do |t|
     t.integer "tag_id"
     t.integer "taggable_id"
     t.integer "tagger_id"
@@ -2060,7 +2061,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["taggable_id", "taggable_type", "context"], name: "index_taggings_on_taggable_id_and_taggable_type_and_context"
   end
 
-  create_table "tags", id: :integer, force: :cascade do |t|
+  create_table "tags", force: :cascade do |t|
     t.string "name"
   end
 
@@ -2132,7 +2133,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["title", "group"], name: "index_templates_title_group"
   end
 
-  create_table "text_values", id: :integer, force: :cascade do |t|
+  create_table "text_values", force: :cascade do |t|
     t.integer "version"
     t.integer "version_creator_id"
     t.text "text", size: :medium, null: false
@@ -2140,13 +2141,13 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.datetime "updated_at"
   end
 
-  create_table "tissue_and_cell_types", id: :integer, force: :cascade do |t|
+  create_table "tissue_and_cell_types", force: :cascade do |t|
     t.string "title"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "units", id: :integer, force: :cascade do |t|
+  create_table "units", force: :cascade do |t|
     t.string "title"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -2155,7 +2156,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.integer "order"
   end
 
-  create_table "users", id: :integer, force: :cascade do |t|
+  create_table "users", force: :cascade do |t|
     t.string "login"
     t.string "crypted_password", limit: 64
     t.string "salt", limit: 40
@@ -2173,7 +2174,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.string "uuid"
   end
 
-  create_table "work_groups", id: :integer, force: :cascade do |t|
+  create_table "work_groups", force: :cascade do |t|
     t.string "name"
     t.integer "institution_id"
     t.integer "project_id"
@@ -2194,7 +2195,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["user_id", "can_view"], name: "index_w_auth_lookup_on_user_id_and_can_view"
   end
 
-  create_table "workflow_classes", id: :integer, force: :cascade do |t|
+  create_table "workflow_classes", force: :cascade do |t|
     t.string "title"
     t.text "description"
     t.string "key"
@@ -2223,7 +2224,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["workflow_id", "data_file_id"], name: "index_data_files_workflows_on_workflow_data_file"
   end
 
-  create_table "workflow_versions", id: :integer, force: :cascade do |t|
+  create_table "workflow_versions", force: :cascade do |t|
     t.integer "workflow_id"
     t.integer "version"
     t.text "revision_comments"
@@ -2249,7 +2250,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["workflow_id"], name: "index_workflow_versions_on_workflow_id"
   end
 
-  create_table "workflows", id: :integer, force: :cascade do |t|
+  create_table "workflows", force: :cascade do |t|
     t.integer "contributor_id"
     t.string "title"
     t.text "description"
@@ -2271,7 +2272,7 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["contributor_id"], name: "index_workflows_on_contributor"
   end
 
-  create_table "worksheets", id: :integer, force: :cascade do |t|
+  create_table "worksheets", force: :cascade do |t|
     t.integer "content_blob_id"
     t.integer "last_row"
     t.integer "last_column"
