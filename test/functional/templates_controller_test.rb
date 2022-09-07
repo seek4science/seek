@@ -247,10 +247,9 @@ class TemplatesControllerTest < ActionController::TestCase
 
     assert_response :success
 
-    # FIXME: this fails as it can't find the templates - see https://github.com/seek4science/seek/issues/1163
-    # assert_select 'div.list_item_title' do
-    #   assert_select 'a[href=?]', template_path(template), text: template.title
-    #   assert_select 'a[href=?]', template_path(template2), text: template2.title, count: 0
-    # end
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', template_path(template), text: template.title
+      assert_select 'a[href=?]', template_path(template2), text: template2.title, count: 0
+    end
   end
 end
