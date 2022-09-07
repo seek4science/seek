@@ -61,6 +61,10 @@ class SampleType < ApplicationRecord
     [contributor]
   end
 
+  def related_templates
+    [isa_template].compact
+  end
+
   # refreshes existing samples following a change to the sample type. For example when changing the title field
   def refresh_samples
     Sample.record_timestamps = false
