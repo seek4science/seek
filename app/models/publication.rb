@@ -37,6 +37,7 @@ class Publication < ApplicationRecord
   acts_as_asset
   # publications shouldn't have related publications, which has been added in acts_as_asset
   undef :publications
+
   validates :title, length: { maximum: 65_535 }
 
   acts_as_having_misc_links
