@@ -6,8 +6,7 @@ class ScheduleTest < ActionDispatch::IntegrationTest
   test 'related items routes' do
     # searchable_types covers all creatable types, plus some others that can be displayed and my have related items
     Seek::Util.searchable_types.each do |type|
-      related_type_methods = type.related_type_methods
-      related_type_methods.each_key do |related_type|
+      type.related_type_methods.each_key do |related_type|
         controller = related_type.tableize
         parent = type.name.tableize
         parent_key = "#{parent.singularize}_id".to_sym

@@ -41,6 +41,9 @@ def load_seek_testing_defaults!
       Settings.defaults[:publications_enabled] = true
       Settings.defaults[:samples_enabled] = true
       Settings.defaults[:workflows_enabled] = true
+      Settings.defaults[:sample_type_template_enabled] = true
+      Settings.defaults[:placeholders_enabled] = true
+      Settings.defaults[:file_templates_enabled] = true
 
       Settings.defaults[:instance_link] = 'http://www.sysmo.net'
       Settings.defaults[:application_name] = 'FAIRDOM-SEEK'
