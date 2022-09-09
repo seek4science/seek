@@ -1,33 +1,23 @@
 {
   "data": [
     {
-      "id": "74",
+      "id": "12",
       "type": "publications",
       "attributes": {
         "title": "A Maximal Publication"
       },
       "links": {
-        "self": "/publications/74"
+        "self": "/publications/12"
       }
     },
     {
-      "id": "72",
+      "id": "11",
       "type": "publications",
       "attributes": {
         "title": "A Minimal Publication"
       },
       "links": {
-        "self": "/publications/72"
-      }
-    },
-    {
-      "id": "73",
-      "type": "publications",
-      "attributes": {
-        "title": "A Publication 72"
-      },
-      "links": {
-        "self": "/publications/73"
+        "self": "/publications/11"
       }
     }
   ],
