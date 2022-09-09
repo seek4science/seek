@@ -21,7 +21,7 @@ module Seek
                      elsif type != 'Person' && method_defined?(method_name.singularize) # check is to avoid Person.person
                        method_name.singularize
                      end
-            hash[type] = method.to_sym if method
+            hash[type] = method.to_sym if method && !attribute_method?(method)
           end
         end
       end
