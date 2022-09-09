@@ -34,10 +34,10 @@
         }
       ],
       "other_creators": "John Smith, Jane Smith",
-      "data_annotations": [
+      "data_type_annotations": [
 
       ],
-      "format_annotations": [
+      "data_format_annotations": [
 
       ]
     },

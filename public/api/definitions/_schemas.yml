@@ -474,9 +474,9 @@ annotatedContributedTypeAttributes:
       $ref: "#/components/schemas/nullableOtherCreatorsString"
     creators:
       $ref: "#/components/schemas/assetsCreatorsList"
-    data_annotations:
+    data_type_annotations:
       $ref: "#/components/schemas/ontologyTermsList"
-    format_annotations:
+    data_format_annotations:
       $ref: "#/components/schemas/ontologyTermsList"
     discussion_links:
       $ref: "#/components/schemas/assetLinkList"
@@ -600,9 +600,9 @@ placeholderAttributes:
       $ref: "#/components/schemas/nullableOtherCreatorsString"
     creators:
       $ref: "#/components/schemas/assetsCreatorsList"
-    data_annotations:
+    data_type_annotations:
       $ref: "#/components/schemas/ontologyTermsList"
-    format_annotations:
+    data_format_annotations:
       $ref: "#/components/schemas/ontologyTermsList"
     discussion_links:
       $ref: "#/components/schemas/assetLinkList"
@@ -1517,9 +1517,9 @@ dataFilePost:
               $ref: "#/components/schemas/nullableOtherCreatorsString"
             creators:
               $ref: "#/components/schemas/assetsCreatorsList"
-            data_annotations:
+            data_type_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
-            format_annotations:
+            data_format_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
@@ -1584,9 +1584,9 @@ dataFilePatch:
               $ref: "#/components/schemas/nullableOtherCreatorsString"
             creators:
               $ref: "#/components/schemas/assetsCreatorsList"
-            data_annotations:
+            data_type_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
-            format_annotations:
+            data_format_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
@@ -1863,9 +1863,9 @@ fileTemplatePost:
               $ref: "#/components/schemas/nullableOtherCreatorsString"
             creators:
               $ref: "#/components/schemas/assetsCreatorsList"
-            data_annotations:
+            data_type_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
-            format_annotations:
+            data_format_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
@@ -1920,9 +1920,9 @@ fileTemplatePatch:
               $ref: "#/components/schemas/nullableOtherCreatorsString"
             creators:
               $ref: "#/components/schemas/assetsCreatorsList"
-            data_annotations:
+            data_type_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
-            format_annotations:
+            data_format_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
@@ -2258,9 +2258,9 @@ placeholderPost:
               $ref: "#/components/schemas/nullableOtherCreatorsString"
             creators:
               $ref: "#/components/schemas/assetsCreatorsList"
-            data_annotations:
+            data_type_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
-            format_annotations:
+            data_format_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
@@ -2312,9 +2312,9 @@ placeholderPatch:
               $ref: "#/components/schemas/nullableOtherCreatorsString"
             creators:
               $ref: "#/components/schemas/assetsCreatorsList"
-            data_annotations:
+            data_type_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
-            format_annotations:
+            data_format_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
