@@ -43,7 +43,6 @@ class PublicationSerializer < ContributedResourceSerializer
   has_many :assays
   has_many :data_files
   has_many :models
-  has_many :publications
   has_many :presentations
   has_many :events
   has_many :workflows
