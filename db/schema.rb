@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_08_13_205708) do
+ActiveRecord::Schema.define(version: 2022_09_01_133247) do
 
   create_table "activity_logs", force: :cascade do |t|
     t.string "action"
@@ -808,7 +808,7 @@ ActiveRecord::Schema.define(version: 2022_08_13_205708) do
     t.datetime "last_fetch"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["resource_type", "resource_id"], name: "index_git_repositories_on_resource_type_and_resource_id"
+    t.index ["resource_type", "resource_id"], name: "index_git_repositories_on_resource"
   end
 
   create_table "git_versions", force: :cascade do |t|
@@ -830,7 +830,7 @@ ActiveRecord::Schema.define(version: 2022_08_13_205708) do
     t.bigint "contributor_id"
     t.index ["contributor_id"], name: "index_git_versions_on_contributor_id"
     t.index ["git_repository_id"], name: "index_git_versions_on_git_repository_id"
-    t.index ["resource_type", "resource_id"], name: "index_git_versions_on_resource_type_and_resource_id"
+    t.index ["resource_type", "resource_id"], name: "index_versions_on_resource"
   end
 
   create_table "group_memberships", force: :cascade do |t|
@@ -2273,7 +2273,6 @@ ActiveRecord::Schema.define(version: 2022_08_13_205708) do
     t.integer "workflow_class_id"
     t.integer "maturity_level"
     t.integer "visibility"
-    t.boolean "monitored"
     t.integer "test_status"
     t.index ["contributor_id"], name: "index_workflow_versions_on_contributor"
     t.index ["workflow_id"], name: "index_workflow_versions_on_workflow_id"
