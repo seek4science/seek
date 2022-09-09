@@ -71,8 +71,8 @@ class InvestigationsController < ApplicationController
       respond_to do |format|
         flash[:notice] = "The #{t('investigation')} was successfully created."
         format.html { redirect_to params[:single_page] ?
-					single_page_path(id: params[:single_page], item_type: 'investigation', item_id: @investigation) 
-					: investigation_path(@investigation) }
+          single_page_path(id: params[:single_page], item_type: 'investigation', item_id: @investigation) 
+          : investigation_path(@investigation) }
         format.json { render json: @investigation }
       end
     else

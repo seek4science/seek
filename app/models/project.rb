@@ -77,7 +77,7 @@ class Project < ApplicationRecord
   #  is to be used)
   belongs_to :default_policy, class_name: 'Policy', dependent: :destroy, autosave: true
 
-  has_edam_annotations :topics
+  has_controlled_vocab_annotations :topics
 
   # FIXME: temporary handler, projects need to support multiple programmes
   def programmes
@@ -105,7 +105,7 @@ class Project < ApplicationRecord
 
   def spreadsheets
     data_files.select { |d| d.contains_extractable_spreadsheet?}
-  end	  
+  end    
 
   def institutions=(new_institutions)
     new_institutions = Array(new_institutions).map do |i|

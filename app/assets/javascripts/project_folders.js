@@ -1,7 +1,8 @@
 var tree;
 var elementFolderIds = [];
 var displayed_folder_id = 0;
-const isa_study_element = ["source_material", "sample_collection", "study_samples", "study_table"];
+const isa_study_element = ["source_table", "study_protocol", "study_samples_table", "study_experiment_overview"];
+const isa_assay_element = ["assay_protocol", "assay_samples_table", "assay_experiment_overview"];
 
 function setupFoldersTree(dataJson, container_id, drop_accept_class) {
 	$j("#" + container_id)
@@ -138,9 +139,9 @@ function folder_clicked(folder_id, project_id) {
 	updateBreadcrumb("project");
 	$j("#folder_contents").show();
 	$j("#folder_contents").spinner("add");
-	var path = URL_ROOT + "/projects/" + project_id + "/folders/" + folder_id + "/display_contents";
+	const url = URL_ROOT + "/projects/" + project_id + "/folders/" + folder_id + "/display_contents";
 	displayed_folder_id = folder_id;
-	$j.ajax({ url: path, cache: false, dataType: "script" });
+	$j.ajax({ url, cache: false, dataType: "script" });
 }
 
 async function item_clicked(type, id, parent) {
@@ -151,14 +152,17 @@ async function item_clicked(type, id, parent) {
 	selectedItem.parent = parent;
 	$j("#item_contents").show();
 	if (type == "sample") {
-		loadItemDetails(`/assays/${parent.id}/samples`, { view: "default" });
-	} else if (isa_study_element.includes(type)) {
-		if ($j('a[data-target^="#study_design"]').toArray().length == 0) {
-			await loadItemDetails(`/studies/${parent.id}`, { view: "default" });
+		if (id) loadItemDetails(`/sample_types/${id}/samples`, { view: "default" });
+		else loadItemDetails(`/assays/${parent.id}/samples`, { view: "default" });
+	} else if ([...isa_study_element, ...isa_assay_element].includes(type)) {
+    const item_type = isa_study_element.includes(type) ? "study" : "assay"
+     // check if the Assay page is loaded
+		if ($j(`a[data-target^="#${item_type}_design"]`).toArray().length == 0) {
+			await loadItemDetails(`/${pluralize(item_type)}/${parent.id}`, { view: "default" });
 		}
-		$j('a[data-target^="#study_design"]').first().click();
+		$j(`a[data-target^="#${item_type}_design"]`).first().click();
 		$j(`a[data-target^="#${type}"]`).first().click();
-	} else {
+  } else {
 		loadItemDetails(`/${pluralize(type)}/${id}`, { view: "default" });
 	}
 }
@@ -176,12 +180,14 @@ const loadItemDetails = (url, params = {}) => {
 		type: "get",
 		success: (s) => $j("#item-layout").html(s),
 		beforeSend: () => $j("#loader").show(),
-		complete: () => $j("#loader").fadeOut(100),
+		complete: () => {
+			$j("#loader").fadeOut(100);
+			bindTooltips('body');
+		},
 		error: (e) => {
 			if (e.status === 401) alert("You are not logged in!");
 			else if (e.status === 403) alert("You do not have permission to view this content!");
-			else if (e.status !== 200) 
-				alert(`An error occurred while processing the request.\nDetails: ${e.responseText}`);
+			else if (e.status !== 200) alert(`An error occurred while processing the request.\nDetails: ${e.responseText}`);
 			$j("#item-layout").html(
 				'<div class="landing_page"><h2 class="forbidden">The content is not visible to you.</h2><p class="text-center">You may need to login to access this content.</p></div>'
 			);

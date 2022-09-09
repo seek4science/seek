@@ -2,6 +2,8 @@ require 'test_helper'
 require 'minitest/mock'
 
 class SearchControllerTest < ActionController::TestCase
+  include RelatedItemsHelper
+
   test 'can render search results' do
     docs = FactoryGirl.create_list(:public_document, 3)
 
@@ -18,6 +20,20 @@ class SearchControllerTest < ActionController::TestCase
     end
   end
 
+  test 'search result order retained' do
+    FactoryGirl.create_list(:public_document, 3)
+    order = [Document.last, Document.third_to_last, Document.second_to_last]
+    Document.stub(:solr_cache, -> (q) { order.collect { |d| d.id.to_s } }) do
+      get :index, params: { q: 'test' }
+    end
+
+    order.each_with_index do |doc, idx|
+      assert_select "#documents div.list_item[#{idx + 1}]" do
+        assert_select 'a[href=?]', document_path(doc)
+      end
+    end
+  end
+
   test 'can limit rendered search results' do
     FactoryGirl.create_list(:public_document, 3)
 
@@ -29,7 +45,16 @@ class SearchControllerTest < ActionController::TestCase
 
     assert_equal 3, assigns(:results)['Document'].count
     assert_select '#documents .list_item_title', count: 1
-    assert_select '#documents a[href=?]', documents_path(filter: { query: 'test' }), text: 'View all 3 items'
+  end
+
+  test 'advanced search and filtering link' do
+    FactoryGirl.create_list(:public_document, 3)
+
+    Document.stub(:solr_cache, -> (q) { Document.pluck(:id).last(3) }) do
+      get :index, params: { q: 'test' }
+    end
+
+    assert_select '#documents a[href=?]', documents_path(filter: { query: 'test' }), text: 'Advanced Documents search with filtering ...'
   end
 
   test 'can render external search results' do

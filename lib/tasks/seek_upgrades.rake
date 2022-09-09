@@ -10,14 +10,15 @@ namespace :seek do
     environment
     db:seed:007_sample_attribute_types
     db:seed:010_workflow_classes
-    db:seed:011_edam_topics
-    db:seed:012_edam_operations
     db:seed:013_workflow_data_file_relationships
     rename_branding_settings
     update_missing_openbis_istest
     update_missing_publication_versions
-    db:seed:013_edam_formats
-    db:seed:014_edam_data
+    update_edam_controlled_vocab_keys
+    db:seed:011_topics_controlled_vocab
+    db:seed:012_operations_controlled_vocab
+    db:seed:013_formats_controlled_vocab
+    db:seed:014_data_controlled_vocab
     db:seed:015_isa_tags
     remove_orphaned_versions
     create_seek_sample_multi
@@ -28,6 +29,7 @@ namespace :seek do
     remove_spreadsheet_annotations
     strip_site_base_host_path
     convert_roles
+    update_edam_annotation_attributes
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -271,4 +273,39 @@ namespace :seek do
       end
     end
   end
+
+  task(update_edam_annotation_attributes: [:environment]) do
+    defs = {
+      "edam_formats": "data_format_annotations",
+      "edam_topics": "topic_annotations",
+      "edam_operations": "operation_annotations",
+      "edam_data": "data_type_annotations"
+    }
+    defs.each do |old_name,new_name|
+      query = AnnotationAttribute.where(name: old_name)
+      if query.any?
+        puts "Updating EDAM based #{old_name} Annotation Attributes"
+        query.update_all(name: new_name)
+      end
+    end
+  end
+
+  task(update_edam_controlled_vocab_keys: [:environment]) do
+    defs = {
+      topics: 'edam_topics',
+      operations: 'edam_operations',
+      data_formats: 'edam_formats',
+      data_types: 'edam_data'
+    }
+
+    defs.each do |property, old_key|
+      new_key = SampleControlledVocab::SystemVocabs.database_key_for_property(property)
+      query = SampleControlledVocab.where(key: old_key)
+      if query.any?
+        puts "Updating key for #{old_key} controlled vocabulary"
+        query.update_all(key: new_key)
+      end
+    end
+  end
+
 end

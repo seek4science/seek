@@ -44,18 +44,40 @@ module Seek
       created_at_desc: { title: 'Creation date (Descending)', order: 'created_at DESC' },
       position_asc: { title: 'Position (Ascending)', order: 'position' },
       position_desc: { title: 'Position (Descending)', order: 'position DESC' },
-      relevance: { title: 'Relevance', order: '--relevance', proc: -> (items) {
-        ids = items.solr_cache(items.last_solr_query)
-        return [] if ids.empty?
-        case ActiveRecord::Base.connection.instance_values["config"][:adapter]
-        when 'mysql2'
-          Arel.sql("FIELD(#{items.arel_table.name}.id,#{ids.join(',')})")
-        when 'postgresql'
-          Arel.sql("position(#{items.arel_table.name}.id::text in '#{ids.join(',')}')")
-        else
-          ids.map { |id| Arel::Nodes::Descending.new(items.arel_table[:id].eq(id)) }
-        end
-      } }
+      relevance: { title: 'Relevance', order: '--relevance',
+                   relation_proc: -> (items) {
+                     ids = items.solr_cache(items.last_solr_query)
+                     return [] if ids.empty?
+                     case ActiveRecord::Base.connection.instance_values["config"][:adapter]
+                     when 'mysql2'
+                       Arel.sql("FIELD(#{items.arel_table.name}.id,#{ids.join(',')})")
+                     when 'postgresql'
+                       Arel.sql("position(#{items.arel_table.name}.id::text in '#{ids.join(',')}')")
+                     else
+                       ids.map { |id| Arel::Nodes::Descending.new(items.arel_table[:id].eq(id)) }
+                     end
+                   },
+                   enum_proc: -> (items) { # Curry a sorting function that sorts two items: a and b based on search relevance
+                     return nil if items.empty?
+                     type = items.first.class
+                     ids = type.solr_cache(type.last_solr_query)
+                     -> (a, b) {
+                       x = ids.index(a&.id&.to_s)
+                       y = ids.index(b&.id&.to_s)
+                       if x.nil?
+                         if y.nil?
+                           0
+                         else
+                           1
+                         end
+                       elsif y.nil?
+                         -1
+                       else
+                         x <=> y
+                       end
+                     }
+                   }
+      }
     }.with_indifferent_access.freeze
 
     # sort items in the related items hash according the rule for its type
@@ -86,7 +108,7 @@ module Seek
         end
         items.select(columns).order(orderings)
       else
-        items.sort(&strategy_for_enum(order))
+        items.sort(&strategy_for_enum(order, items))
       end
     end
 
@@ -140,7 +162,7 @@ module Seek
       fields_and_directions = order.split(',').flat_map do |f|
         field, order = f.strip.split(' ', 2)
         if field.start_with?('--')
-          ORDER_OPTIONS[field.sub('--', '').to_sym][:proc].call(relation)
+          ORDER_OPTIONS[field.sub('--', '').to_sym][:relation_proc].call(relation)
         else
           m = field.match(/LOWER\((.+)\)/)
           field = m[1] if m
@@ -164,16 +186,22 @@ module Seek
     end
 
     # Creates a proc from the given order string, which can be used to sort an Array e.g.
-    #   `array.sort(&strategy_for_enum(order))`
-    def self.strategy_for_enum(order)
+    #   `array.sort(&strategy_for_enum(order, array))`
+    def self.strategy_for_enum(order, array)
       # Create an array of pairs: [<field>, <sort direction>]
       # Direction 1 is ascending (default), -1 is descending
       fields_and_directions = order.split(',').map do |f|
         field, order = f.strip.split(' ', 2)
-        m = field.match(/LOWER\((.+)\)/)
-        field = m[1] if m
-        next if order == 'IS NULL'
-        [field, order&.match?(/desc/i) ? -1 : 1]
+        if field.start_with?('--')
+          sorter = ORDER_OPTIONS[field.sub('--', '').to_sym][:enum_proc].call(array)
+          next unless sorter
+          [sorter, 1]
+        else
+          m = field.match(/LOWER\((.+)\)/)
+          field = m[1] if m
+          next if order == 'IS NULL'
+          [field, order&.match?(/desc/i) ? -1 : 1]
+        end
       end.compact
 
       fields_and_directions << [:id, 1] # See above note
@@ -186,19 +214,23 @@ module Seek
         #
         # nil values are always sorted to the end, regardless of direction.
         fields_and_directions.each do |field, direction|
-          x = a.send(field)
-          y = b.send(field)
-          val = if x.nil?
-                  if y.nil?
-                    0
+          if field.respond_to?(:call)
+            val = field.call(a, b)
+          else
+            x = a.send(field)
+            y = b.send(field)
+            val = if x.nil?
+                    if y.nil?
+                      0
+                    else
+                      1
+                    end
+                  elsif y.nil?
+                    -1
                   else
-                    1
+                    (x.is_a?(String) && y.is_a?(String) ? x.casecmp(y) : x <=> y) * direction  # A direction of -1 inverts the sorting.
                   end
-                elsif y.nil?
-                  -1
-                else
-                  (x.is_a?(String) && y.is_a?(String) ? x.casecmp(y) : x <=> y) * direction  # A direction of -1 inverts the sorting.
-                end
+          end
           break if val != 0
         end
         val

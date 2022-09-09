@@ -246,6 +246,17 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def requested_item_authorized?(object)
+    privilege = Seek::Permissions::Translator.translate(action_name)
+    return false if privilege.nil?
+
+    if is_auth?(object, privilege)
+      true
+    else
+      false
+    end
+  end
+
   def handle_authorization_failure_redirect(object, privilege)
     redirect_to(object)
   end
@@ -402,7 +413,9 @@ class ApplicationController < ActionController::Base
 
   # determines and returns the object related to controller, e.g. @data_file
   def object_for_request
-    instance_variable_get("@#{controller_name.singularize}")
+    ctl_name = controller_name.singularize
+    var = instance_variable_get("@#{ctl_name}")
+    ctl_name.include?('isa') ? var.send(ctl_name.sub('isa_', '')) : var
   end
 
   def expire_activity_fragment_cache(controller, action)
@@ -640,4 +653,5 @@ class ApplicationController < ActionController::Base
                                     :orcid, :pos, :_destroy] }
     ]
   end
+
 end

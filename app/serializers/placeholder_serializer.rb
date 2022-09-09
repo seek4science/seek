@@ -13,11 +13,12 @@ class PlaceholderSerializer < ContributedResourceSerializer
     true if object.data_file
   end
   
-  attribute :data_annotations do
-    ontology_annotations('edam_data')
+  attribute :data_type_annotations do
+    controlled_vocab_annotations('data_type_annotations')
   end
-  attribute :format_annotations do
-    ontology_annotations('edam_formats')
+
+  attribute :data_format_annotations do
+    controlled_vocab_annotations('data_format_annotations')
   end
 
 end

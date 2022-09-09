@@ -4,6 +4,5 @@
 <% title ||= 'Related items' %>
 <h2><%= title %></h2>
 <%= render :partial => "assets/resource_listing_tabbed_by_class", :locals => {:resource_hash => resource_hash,
-                                                                              :narrow_view => true,
                                                                               :item => item,
                                                                               :actions_partial_disable => false} -%>

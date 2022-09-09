@@ -1,6 +1,6 @@
 <%= index_title -%>
 
-<% if @data_file || @sample_type %>
+<% if @data_file || @sample_type || @template %>
   <% if @sample_type %>
     <p>
       Showing for Sample Type: <%= link_to @sample_type.title,@sample_type %>
@@ -27,5 +27,5 @@
       </script>
   <% end %>
 <% else %>
-    <%= render partial: "general/index_paged" %>
+    <%= render partial: "general/index" %>
 <% end %>

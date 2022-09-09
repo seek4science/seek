@@ -266,4 +266,8 @@ class Assay < ApplicationRecord
   def related_publication_ids
     publication_ids
   end
+
+  def related_sop_ids
+    sop_ids
+  end
 end

@@ -35,6 +35,7 @@ class SampleType < ApplicationRecord
   belongs_to :isa_template, class_name: 'Template', foreign_key: 'template_id'
 
   has_many :assays
+  has_and_belongs_to_many :studies
 
   validates :title, presence: true
   validates :title, length: { maximum: 255 }
@@ -58,6 +59,10 @@ class SampleType < ApplicationRecord
 
   def contributors
     [contributor]
+  end
+
+  def related_templates
+    [isa_template].compact
   end
 
   # refreshes existing samples following a change to the sample type. For example when changing the title field

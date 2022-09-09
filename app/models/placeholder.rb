@@ -4,21 +4,13 @@ class Placeholder < ApplicationRecord
 
   acts_as_asset
 
-  has_edam_annotations :data, :formats
+  has_controlled_vocab_annotations :data_types, :data_formats
 
   validates :projects, presence: true, projects: { self: true }
 
   belongs_to :project
   belongs_to :file_template
   belongs_to :data_file
-
-  def edam_topics_vocab
-    nil
-  end
-  
-  def edam_operations_vocab
-    nil
-  end
   
   def avatar_key
     :programme

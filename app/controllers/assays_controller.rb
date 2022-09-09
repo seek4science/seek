@@ -171,7 +171,7 @@ class AssaysController < ApplicationController
                                   { publication_ids: [] },
                                   { service_ids: [] },
                                   { custom_metadata_attributes: determine_custom_metadata_keys },
-				  { discussion_links_attributes:[:id, :url, :label, :_destroy] }
+          { discussion_links_attributes:[:id, :url, :label, :_destroy] }
                                   ).tap do |assay_params|
       assay_params[:document_ids].select! { |id| Document.find_by_id(id).try(:can_view?) } if assay_params.key?(:document_ids)
       assay_params[:service_ids].select! { |id| Service.find_by_id(id).try(:can_view?) } if assay_params.key?(:service_ids)

@@ -346,7 +346,7 @@ SEEK::Application.routes.draw do
       get :guided_join
     end
     resources :programmes, :people, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :data_files, :presentations,
-              :publications, :events, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :file_templates, :placeholders, :collections, only: [:index]
+              :publications, :events, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :file_templates, :placeholders, :collections, :templates, only: [:index]
 
     resources :openbis_endpoints do
       collection do
@@ -687,6 +687,8 @@ SEEK::Application.routes.draw do
       post :batch_create
       put :batch_update
       delete :batch_delete
+      get :query_form
+      post :query
     end
     resources :people, :programmes, :projects, :assays, :studies, :investigations, :data_files, :publications, :samples,
               :strains, :organisms, :collections, only: [:index]
@@ -710,7 +712,7 @@ SEEK::Application.routes.draw do
         get :download
       end
     end
-    resources :projects, only: [:index]
+    resources :projects, :programmes, :templates, :studies, :assays, only: [:index]
   end
 
   ### SAMPLE ATTRIBUTE TYPES ###
@@ -762,7 +764,15 @@ SEEK::Application.routes.draw do
     member do
       get :manage
       patch :manage_update
+      post :template_attributes
     end
+    collection do
+      get :task_status
+      get :default_templates
+      post :populate_template
+    end
+    resources :samples
+    resources :projects, :people, only: [:index]
   end
 
   ### SINGLE PAGE

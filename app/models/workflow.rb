@@ -13,7 +13,7 @@ class Workflow < ApplicationRecord
 
   acts_as_doi_parent(child_accessor: :versions)
 
-  has_edam_annotations :topics, :operations
+  has_controlled_vocab_annotations :topics, :operations
 
   validates :projects, presence: true, projects: { self: true }
 
@@ -36,6 +36,8 @@ class Workflow < ApplicationRecord
 
     before_save :refresh_internals, if: -> { main_workflow_path_changed? && !main_workflow_blob.empty? }
     after_save :clear_cached_diagram, if: -> { diagram_path_changed? }
+    after_commit :submit_to_life_monitor, on: [:create, :update]
+    after_commit :sync_test_status, on: [:create, :update]
 
     def maturity_level
       Workflow::MATURITY_LEVELS[super]
@@ -53,6 +55,31 @@ class Workflow < ApplicationRecord
       readme = git_version.get_blob('README.md')
       terms += readme.text_contents_for_search if readme
       terms
+    end
+
+    def test_status
+      Workflow::TEST_STATUS[super]
+    end
+
+    def test_status= stat
+      resource_attributes['test_status'] = (Workflow::TEST_STATUS_INV[stat&.to_sym])
+    end
+
+    def source_link_url
+      parent&.source_link&.url
+    end
+
+    def submit_to_life_monitor
+      if Seek::Config.life_monitor_enabled && extractor.has_tests? && workflow.can_download?(nil)
+        LifeMonitorSubmissionJob.perform_later(self)
+      end
+    end
+
+    # This does two things:
+    # 1. If a version's test_status was updated, and it was the latest version, set the test_status on the parent too.
+    # 2. If a new version was created, set the parent's test_status to nil, since it will not apply anymore.
+    def sync_test_status
+      parent.update_column(:test_status, Workflow::TEST_STATUS_INV[test_status]) if latest_git_version?
     end
   end
 
@@ -92,7 +119,8 @@ class Workflow < ApplicationRecord
     end
 
     def submit_to_life_monitor
-      if Seek::Config.life_monitor_enabled && !monitored && extractor.has_tests? && workflow.can_download?(nil)
+      return if parent.is_git_versioned?
+      if Seek::Config.life_monitor_enabled && extractor.has_tests? && workflow.can_download?(nil)
         LifeMonitorSubmissionJob.perform_later(self)
       end
     end
@@ -101,6 +129,7 @@ class Workflow < ApplicationRecord
     # 1. If a version's test_status was updated, and it was the latest version, set the test_status on the parent too.
     # 2. If a new version was created, set the parent's test_status to nil, since it will not apply anymore.
     def sync_test_status
+      return if parent.is_git_versioned?
       parent.update_column(:test_status, Workflow::TEST_STATUS_INV[test_status]) if latest_version?
     end
   end

@@ -5,30 +5,30 @@
 
 	<ul class="nav nav-tabs">
 			<li class="active">
-					<a data-toggle="tab" data-target="#source_material" onClick="highlightTreeviewItem('source_material')"><em class="glyphicon glyphicon-list-alt"></em> Source material</a>
+					<a data-toggle="tab" data-target="#source_table" onClick="highlightTreeviewItem('source_material')"><em class="glyphicon glyphicon-list-alt"></em> Sources table</a>
 			</li>
 			<li>
-					<a data-toggle="tab" data-target="#sample_collection" onClick="highlightTreeviewItem('sample_collection')"><em class="glyphicon glyphicon-list-alt"></em> Protocols</a>
+					<a data-toggle="tab" data-target="#study_protocol" onClick="highlightTreeviewItem('sample_collection')"><em class="glyphicon glyphicon-list-alt"></em> Protocol</a>
 			</li>
 			<li>
-					<a data-toggle="tab" data-target="#study_samples" onClick="highlightTreeviewItem('study_samples')"><em class="glyphicon glyphicon-list-alt"></em> Samples</a>
+					<a data-toggle="tab" data-target="#study_samples_table" onClick="highlightTreeviewItem('study_samples')"><em class="glyphicon glyphicon-list-alt"></em> Samples table</a>
 			</li>
 			<li>
-					<a data-toggle="tab" data-target="#study_table" onClick="highlightTreeviewItem('study_table')"><em class="glyphicon glyphicon-list-alt"></em> Table</a>
+					<a data-toggle="tab" data-target="#study_experiment_overview" onClick="highlightTreeviewItem('study_table')"><em class="glyphicon glyphicon-list-alt"></em> Experiment overview</a>
 			</li>
 	</ul>
 
 	<div class="tab-content">
-			<div id="source_material" class="tab-pane fade active in">
+			<div id="source_table" class="tab-pane fade active in">
 					<%= render :partial=>"isa_studies/source_material", locals: { study: study} -%>
 			</div>
-			<div id="sample_collection" class="tab-pane fade">
-					<%= render :partial=>"isa_studies/sop", locals: { study: study} -%>
+			<div id="study_protocol" class="tab-pane fade">
+					<%= render :partial=>"isa_studies/sop", locals: { sop: study ? study.sop : nil} -%>
 			</div>
-			<div id="study_samples" class="tab-pane fade">
+			<div id="study_samples_table" class="tab-pane fade">
 					<%= render :partial=>"isa_studies/study_samples", locals: { study: study} -%>
 			</div>
-			<div id="study_table" class="tab-pane fade">
+			<div id="study_experiment_overview" class="tab-pane fade">
 					<%= render :partial=>"isa_studies/study_table", locals: { study: study} -%>   
 			</div>
 	</div>
@@ -47,8 +47,8 @@
 <% else %>
 	<p>
 		<em>
-			This <%= "#{t('study')}" %>	has not been created in Single Page. 
-			Please, create the Study by using the <strong>Design Study</strong> button at the <%= "#{t('investigation')}" %> level.
+			This <%="#{t(:study)}"%>	has not been created in Single Page. 
+			Please, create the <%="#{t(:study)}"%> by using the <strong>Design <%="#{t(:study)}"%></strong> button at the <%="#{t(:investigation)}"%> level.
 		</em>
 	</p>
 <% end %>

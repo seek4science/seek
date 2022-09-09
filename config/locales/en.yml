@@ -144,10 +144,10 @@ en:
     ro_crate: RO-Crate
     abstract_cwl: "Abstract CWL"
     doi: DOI
-    edam_data_values: 'EDAM data types'
-    edam_format_values: 'EDAM format types'
-    edam_topic_values: 'EDAM topics'
-    edam_operation_values: 'EDAM operations'
+    data_type_annotation_values: 'Data type annotations'
+    data_format_annotation_values: 'Data format annotations'
+    topic_annotation_values: 'Topic annotations'
+    operation_annotation_values: 'Operation annotations'
     contributor: 'Submitter'
 
   activerecord:

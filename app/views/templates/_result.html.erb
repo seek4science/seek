@@ -1,0 +1,27 @@
+<div id="task-status">
+	<% if @status == "not_started" %>
+	<div class="alert alert-warning">No task is running.</div>
+	<% elsif @status == "working" %>
+	<div class="alert alert-info" role="alert">The templates population task is running... <%= image 'spinner' %></div>
+	<script>
+		setTimeout(function () {
+			$j.ajax("<%= task_status_templates_path %>", {
+				data: {},
+				success: function (html) {
+					$j("#task-status").replaceWith(html);
+				}
+			});
+		}, 5000);
+	</script>
+	<% elsif @status.starts_with? "error" %>
+	<div class="alert alert-danger" role="alert"><%= sanitize @status %></div>
+	<% else %>
+	<div class="alert alert-success" role="success">
+		The template population task was ended successfully!
+		<br />
+		<ul>
+			<%= sanitize @status %>
+		</ul>
+	</div>
+	<% end %>
+</div>

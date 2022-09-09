@@ -2,7 +2,7 @@ require 'test_helper'
 
 class DynamicTableHelperTest < ActionView::TestCase
   include AuthenticatedTestHelper
-  test "Should return the dynamic table columns and rows" do
+  test 'Should return the dynamic table columns and rows' do
     person = Factory(:person)
     project = person.projects.first
 
@@ -38,9 +38,21 @@ class DynamicTableHelperTest < ActionView::TestCase
       disable_authorization_checks { sample_c1.save! }
 
       study = Factory(:study, investigation: inv, contributor: person, sample_types: [type_a, type_b])
+      assay = Factory(:assay, study: study, contributor: person, sample_type: type_c, position: 1)
+
+      # Query with the Study:
+      # |-------------------------------------------------|
+      # |         type_a         |         type_b         |
+      # |------------------------|------------------------|
+      # |  (status)(id)sample_a1 | (status)(id)sample_b1  |
+      # |  (status)(id)sample_a2 | (status)(id)sample_b2  |
+      # |  (status)(id)sample_a3 | x                      |
+      # |-------------------------------------------------|
 
       dt = dt_aggregated(study)
-      columns_count = study.sample_types.reduce(0) { |s, n| s + n.sample_attributes.length } + study.sample_types.length
+      # Each sample types' attributes count + the sample.id
+      columns_count = study.sample_types[0].sample_attributes.length + 1
+      columns_count += study.sample_types[1].sample_attributes.length + 1
 
       assert_equal type_a.samples.length, dt[:rows].length
       assert_equal columns_count, dt[:columns].length
@@ -49,14 +61,36 @@ class DynamicTableHelperTest < ActionView::TestCase
       assert_equal false, (dt[:rows][0].any? { |x| x == '' })
       assert_equal false, (dt[:rows][1].any? { |x| x == '' })
       assert_equal true, (dt[:rows][2].any? { |x| x == '' })
-    end
 
-    # |-------------------------------------------------------------------------|
-    # |         type_a         |         type_b         |         type_c        |
-    # |------------------------|------------------------|-----------------------|
-    # |  (status)(id)sample_a1 | (status)(id)sample_b1  | (status)(id)sample_c1 |
-    # |  (status)(id)sample_a2 | (status)(id)sample_b2  | x                     |
-    # |  (status)(id)sample_a3 | x                      | x                     |
-    # |-------------------------------------------------------------------------|
+      # Query with the Assay:
+      # |-----------------------|
+      # |         type_c        |
+      # |-----------------------|
+      # | (status)(id)sample_c1 |
+      # |-----------------------|
+
+      dt = dt_aggregated(study, assay)
+      # Each sample types' attributes count + the sample.id
+      columns_count = assay.sample_type.sample_attributes.length + 1
+
+      assert_equal type_c.samples.length, dt[:rows].length
+      assert_equal columns_count, dt[:columns].length
+      dt[:rows].each { |r| assert_equal columns_count, r.length }
+
+      assert_equal false, (dt[:rows][0].any? { |x| x == '' })
+    end
+  end
+
+  test 'Should return the sequence of sample_type links' do
+    type1 = Factory(:simple_sample_type)
+    type2 = Factory(:multi_linked_sample_type)
+    type3 = Factory(:multi_linked_sample_type)
+    type2.sample_attributes.detect(&:seek_sample_multi?).linked_sample_type = type1
+    type3.sample_attributes.detect(&:seek_sample_multi?).linked_sample_type = type2
+    type2.save!
+    type3.save!
+
+    sequence = link_sequence(type3)
+    assert_equal sequence, [type3, type2, type1]
   end
 end

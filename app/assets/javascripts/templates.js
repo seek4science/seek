@@ -69,6 +69,7 @@ Templates.init = function (elem) {
   loadFilterSelectors(templates);
   loadTemplates(templates);
   setTemplate();
+	setDefaultLevel()
 };
 
 const remove = (e) =>{
@@ -80,30 +81,17 @@ const handleClick = (e) => (Templates.table.row($j(e).closest("tr")).data()[0] =
 
 function loadTemplates(data) {
   $j("#source_select").empty();
-  let categorizedData = data.reduce((obj, item) => {
+  let categorized = data.reduce((obj, item) => {
     obj[item.group] = obj[item.group] || [];
     obj[item.group].push(item);
     return obj;
   }, {});
 
- 
-  const ordered = Object.keys(categorizedData).sort().reduce(
-    (obj, key) => { 
-      obj[key] = categorizedData[key]; 
-      obj[key].sort((a,b)=>{
-        if ( a.group_order < b.group_order )return -1;
-        else if ( a.group_order > b.group_order )return 1;
-        else return 0;
-      })
-      return obj;
-    }, 
-    {}
-  );
 
-  $j.each(Object.keys(ordered), (i, key) => {
+  $j.each(Object.keys(categorized), (i, key) => {
     const elem = $j(`<optgroup label=${key}></optgroup>`);
     
-    $j.each(ordered[key], (j, sub_item) => {
+    $j.each(categorized[key], (j, sub_item) => {
       elem.append(
         $j(`<option>${sub_item.title}</option>`).attr("value", sub_item.template_id).text(key.title)
       );
@@ -217,8 +205,32 @@ const applyTemplate = () => {
 
   SampleTypes.recalculatePositions();
   SampleTypes.bindSortable();
+	$j(".sample-type-attribute-type").trigger("change", [false]);
 };
 
 const showTemplateModal = () => {
   $j("#existing_templates").modal("show");
 };
+
+const setDefaultLevel = () => {
+	const href = window.location.href;
+	if (href.includes("isa_studies")) {
+		$j("#templates_type_select").val("study").change();
+		$j("#templates_type_select option[value='assay']").attr("disabled","disabled")
+	} else if (href.includes("isa_assays")) {
+		$j("#templates_type_select").val("assay").change();
+		$j("#templates_type_select option[value='study']").attr("disabled","disabled")
+	}
+};
+const initSelect2 = (elem, parentElem)=>{
+	elem.select2({
+		theme: "bootstrap",
+		escapeMarkup: function(markup) {
+			return markup;
+		},
+		templateResult: function(data) {
+			return data.id ? `${data.text} <em>(id: ${data.id})</em>` : data.text;
+		},
+		dropdownParent: parentElem
+	});
+}

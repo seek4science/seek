@@ -1,6 +1,6 @@
 <%
   limit ||= Seek::Config.search_results_limit
-  resource_hash = related_items_hash(@results, limit)
+  resource_hash = related_items_hash(@results, limit, order: :relevance)
   if @external_results.any?
     c = classify_for_tabs(@external_results)
     resource_hash.merge!(c)
@@ -23,5 +23,5 @@
   <%= render partial: "assets/resource_listing_tabbed_by_class",
              locals: { resource_hash: resource_hash,
                        display_immediately: true,
-                       index_params: { filter: { query: params[:search_query] || params[:q] } } } -%>
+                       index_params: { filter: { query: @search_query || params[:q] } } } -%>
 <% end %>

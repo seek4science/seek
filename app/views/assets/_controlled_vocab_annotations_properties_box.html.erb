@@ -1,0 +1,11 @@
+<%= panel("Annotated Properties", body_options: { class: 'text-center' }) do %>
+
+  <%= render partial: "assets/controlled_vocab_annotations_property_box", locals: { resource: resource, property: :topics} -%>
+
+  <%= render partial: "assets/controlled_vocab_annotations_property_box", locals: { resource: resource, property: :operations} -%>
+
+  <%= render partial: "assets/controlled_vocab_annotations_property_box", locals: { resource: resource, property: :data_types} -%>
+
+  <%= render partial: "assets/controlled_vocab_annotations_property_box", locals: { resource: resource, property: :data_formats} -%>
+
+<% end %>

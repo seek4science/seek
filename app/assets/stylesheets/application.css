@@ -43,4 +43,6 @@
 *= require associations
 *= require admin
 *= require jquery.splitter/jquery.splitter
+*= require select2.min
+*= require select2.bootstrap.min
 */
