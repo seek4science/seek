@@ -9,6 +9,8 @@ class Service < ApplicationRecord
   
   has_many :samples, through: :assays
   
+  has_many :data_files, through: :assays
+  
   def self.can_create?(user = User.current_user)
     user&.is_admin?
   end

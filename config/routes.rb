@@ -306,7 +306,8 @@ SEEK::Application.routes.draw do
     member do
       post :update_annotations_ajax
     end
-    resources :services, only: [:index]
+    resources :institutions, :services, only: [:index]
+    
   end
 
   resources :services do
@@ -315,6 +316,7 @@ SEEK::Application.routes.draw do
     member do
       post :update_annotations_ajax
     end
+    resources :institutions, :facilities, :assays, :data_files, :samples, only: [:index]
   end
 
   resources :projects do
@@ -346,7 +348,7 @@ SEEK::Application.routes.draw do
       get :guided_join
     end
     resources :programmes, :people, :institutions, :assays, :studies, :investigations, :models, :sops, :workflows, :data_files, :presentations,
-              :publications, :events, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :file_templates, :placeholders, :collections, :templates, only: [:index]
+              :publications, :events, :samples, :specimens, :strains, :search, :organisms, :human_diseases, :documents, :file_templates, :placeholders, :collections, :templates, :services, only: [:index]
 
     resources :openbis_endpoints do
       collection do
@@ -416,7 +418,7 @@ SEEK::Application.routes.draw do
   ### ISA ###
 
   resources :investigations, concerns: [:publishable, :has_snapshots, :isa] do
-    resources :people, :programmes, :projects, :assays, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, only: [:index]
+    resources :people, :programmes, :projects, :assays, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, :services, only: [:index]
     member do
       get :export_isatab_json
       get :manage
@@ -455,7 +457,7 @@ SEEK::Application.routes.draw do
       get :order_assays
       patch :manage_update
     end
-    resources :people, :programmes, :projects, :assays, :investigations, :models, :sops, :workflows, :data_files, :publications, :documents, only: [:index]
+    resources :people, :programmes, :projects, :assays, :investigations, :models, :sops, :workflows, :data_files, :publications, :documents, :services, only: [:index]
   end
 
   resources :assays, concerns: [:publishable, :has_snapshots, :isa] do
@@ -467,7 +469,7 @@ SEEK::Application.routes.draw do
         post :register
       end
     end
-    resources :people, :programmes, :projects, :investigations, :samples, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, :placeholders, only: [:index]
+    resources :people, :programmes, :projects, :investigations, :samples, :studies, :models, :sops, :workflows, :data_files, :publications, :documents, :strains, :organisms, :human_diseases, :placeholders, :services, only: [:index]
   end
 
   # to be removed as STI does not work in too many places
