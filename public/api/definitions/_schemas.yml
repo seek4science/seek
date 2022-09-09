@@ -4335,8 +4335,6 @@ publicationResponse:
               $ref: "#/components/schemas/multipleReferences"
             models:
               $ref: "#/components/schemas/multipleReferences"
-            publications:
-              $ref: "#/components/schemas/multipleReferences"
             presentations:
               $ref: "#/components/schemas/multipleReferences"
             events:
@@ -4355,7 +4353,6 @@ publicationResponse:
             - assays
             - data_files
             - models
-            - publications
             - presentations
             - events
             - workflows
