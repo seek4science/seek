@@ -929,7 +929,6 @@ anyType:
     - services
     - sops
     - studies
-    - templates
     - workflows
 assetType:
   type: string
@@ -1140,11 +1139,6 @@ studyType:
   minLength: 1
   enum:
     - studies
-templateType:
-  type: string
-  minLength: 1
-  enum:
-    - templates
 workflowType:
   type: string
   minLength: 1
@@ -4336,8 +4330,6 @@ personResponse:
             placeholders:
               $ref: "#/components/schemas/multipleReferences"
             human_diseases:
-              $ref: "#/components/schemas/multipleReferences"
-            templates:
               $ref: "#/components/schemas/multipleReferences"
           required:
             - projects

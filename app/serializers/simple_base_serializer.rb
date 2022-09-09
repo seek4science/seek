@@ -44,7 +44,7 @@ class SimpleBaseSerializer < ActiveModel::Serializer
     klass = ApplicationRecord.const_get(name.chomp('Serializer')) rescue nil
     if klass
       klass.related_type_methods.each_key do |key|
-        next if ['Strain', 'Sample'].include?(key)
+        next if ['Strain', 'Sample', 'Template'].include?(key)
         assoc = key.pluralize.underscore
         has_many assoc.to_sym do |s|
           s.associated(key)
