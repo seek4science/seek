@@ -6,6 +6,8 @@ class Event < ApplicationRecord
 
   before_destroy {documents.clear}
 
+  before_save :set_timezone
+
   enforce_authorization_on_association :documents, :view
 
   include Seek::Subscribable
@@ -67,6 +69,17 @@ class Event < ApplicationRecord
 
   def time_zone_valid?
     time_zone.blank? || (ActiveSupport::TimeZone.all.map{ |t| t.tzinfo.name }.include? time_zone)
+  end
+
+  def set_timezone
+    if time_zone.present? && time_zone_valid?
+      if start_date.present? && (start_date_changed? || time_zone_changed?)
+        self.start_date = start_date.to_s(:db).in_time_zone(time_zone)
+      end
+      if end_date.present? && (end_date_changed? || time_zone_changed?)
+        self.end_date = end_date.to_s(:db).in_time_zone(time_zone)
+      end
+    end
   end
 
 end

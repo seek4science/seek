@@ -31,7 +31,7 @@
           <% if @event.end_date.nil? %>
             <%= text_or_not_specified nil %>
           <% else %>
-            <%= date_as_string(@event.end_date,!(@event.end_date.hour == 0 and @event.end_date.min == 0 and @event.end_date.sec == 0), false, @event.time_zone) -%>
+            <%= date_as_string(@event.end_date, !(@event.end_date.hour == 0 and @event.end_date.min == 0 and @event.end_date.sec == 0), false, @event.time_zone) -%>
           <% end %>
         </p>
       </div>

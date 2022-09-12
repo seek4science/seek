@@ -36,7 +36,6 @@ class EventsController < ApplicationController
     re_render_view = is_new ? 'events/new' : 'events/edit'
 
     update_sharing_policies @event
-    set_timezone
 
     respond_to do | format |
       if @event.update(event_params) && @event.save
@@ -61,17 +60,6 @@ class EventsController < ApplicationController
 
   def param_converter_options
     { skip: [:data_file_ids] }
-  end
-
-  def set_timezone
-    time_zone = params[:event][:time_zone]
-    if time_zone.present? && (ActiveSupport::TimeZone.all.map{ |t| t.tzinfo.name }.include? time_zone)
-      start_date = params[:event][:start_date]
-      end_date = params[:event][:end_date]
-
-      params[:event][:start_date] = start_date.in_time_zone(time_zone) if start_date.present?
-      params[:event][:end_date] = end_date.in_time_zone(time_zone) if end_date.present?
-    end
   end
 
 end

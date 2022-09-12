@@ -76,3 +76,29 @@
 
     </div>
 <% end %>
+
+<script>
+  $j(document).ready(function() {
+    const timeZone = $j("#event_time_zone").val()
+    const startDate = $j("#event_start_date").val()
+    const endDate = $j("#event_end_date").val()
+    
+    if (startDate) $j("#event_start_date").val(convertTZ(startDate + " UTC", timeZone))
+    if (endDate) $j("#event_end_date").val(convertTZ(endDate+ " UTC", timeZone))
+  });
+
+	function convertTZ(date, timeZone) {
+		const d = new Date(date).toLocaleString("en-US", {
+			timeZone,
+			year: "numeric",
+			month: "2-digit",
+			day: "2-digit",
+			hour: "2-digit",
+			minute: "2-digit",
+			hourCycle: "h23"
+		});
+		const [convertedDate, convertedTime] = d.split(",");
+		const [month, day, year] = convertedDate.split("/");
+		return `${year}-${month}-${day}${convertedTime}`;
+	}
+</script>
