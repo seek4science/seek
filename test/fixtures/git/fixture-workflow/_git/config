@@ -4,5 +4,5 @@
 	filemode = true
 	logallrefupdates = true
 [remote "origin"]
-	url = https://github.com/seek4science/workflow-test-fixture
+	url = https://github.com/seek4science/workflow-test-fixture.git
 	fetch = +refs/heads/*:refs/remotes/origin/*

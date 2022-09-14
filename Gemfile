@@ -141,6 +141,8 @@ gem 'addressable'
 
 gem 'json-schema'
 
+gem 'cff', '~> 0.9.0'
+
 group :production do
   gem 'passenger'
 end
