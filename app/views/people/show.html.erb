@@ -1,8 +1,6 @@
 <%
    admin_or_me = (current_user.try(:person) == @person || admin_logged_in?)
 %>
-
-
 <%= render :partial => "general/item_title", :locals => {:item=>@person, :buttons_partial => 'people/buttons'} %>
 
 <div class="row">

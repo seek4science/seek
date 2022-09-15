@@ -13,7 +13,9 @@
 
           <ul>
             <% projects.each do |project| %>
-              <li><%= link_to(project.title, project) %></li>
+	      <% unless project.blank? %>
+                <li><%= link_to(project.title, project) %></li>
+              <% end %>
             <% end %>
           </ul>
         <% end %>

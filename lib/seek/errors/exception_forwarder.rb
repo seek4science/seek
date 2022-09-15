@@ -8,6 +8,7 @@ module Seek
       # information
       def self.send_notification(exception, options = {}, user = User.current_user)
         Rails.logger.error "Sending execption ERROR - #{exception.class.name} (#{exception.message})"
+        Rails.logger.error "#{exception.backtrace}"
         return unless Seek::Config.exception_notification_enabled
         env = options[:env]
         data = default_data(user).merge(options[:data] || {})

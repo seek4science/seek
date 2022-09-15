@@ -140,7 +140,7 @@ class Person < ApplicationRecord
     super + ['first_name','last_name']
   end
   def columns_allowed
-    columns_default + ['email','phone','skype_name','web_page','orcid']
+    columns_default + ['orcid']
   end
 
   # not registered profiles that match this email
