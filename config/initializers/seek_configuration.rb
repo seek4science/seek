@@ -85,7 +85,7 @@ def load_seek_config_defaults!
   Seek::Config.default :sops_enabled, true
   Seek::Config.default :workflows_enabled, false
   Seek::Config.default :collections_enabled, true
-  Seek::Config.default :file_templates_enabled, true
+  Seek::Config.default :file_templates_enabled, false
   Seek::Config.default :placeholders_enabled, false
 
   #Observered variables
