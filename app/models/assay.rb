@@ -225,14 +225,17 @@ class Assay < ApplicationRecord
   end
 
   def samples_attributes= attributes
+    puts 'Setting samples'
     set_assay_assets_for('Sample', attributes)
   end
 
   def data_files_attributes= attributes
+    puts 'Setting data files'
     set_assay_assets_for('DataFile', attributes)
   end
 
   def placeholders_attributes= attributes
+    puts 'Setting placeholders'
     set_assay_assets_for('Placeholder', attributes)
   end
 

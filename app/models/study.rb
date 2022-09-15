@@ -19,7 +19,7 @@ class Study < ApplicationRecord
 
   has_many :assays
   has_many :assay_publications, through: :assays, source: :publications
-  has_many :services, through: :assays, source: :services
+  has_many :services,  -> { order(:title).distinct }, through: :assays, source: :services
 
   has_many :assay_sops, through: :assays, source: :sops
   has_many :sop_versions, through: :assays
