@@ -33,6 +33,7 @@ def load_seek_testing_defaults!
       Settings.defaults[:collections_enabled] = true
       Settings.defaults[:documents_enabled] = true
       Settings.defaults[:events_enabled] = true
+      Settings.defaults[:file_templates_enabled] = true
       Settings.defaults[:human_diseases_enabled] = true
       Settings.defaults[:isa_enabled] = true
       Settings.defaults[:models_enabled] = true
