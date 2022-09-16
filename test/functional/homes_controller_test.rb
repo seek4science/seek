@@ -455,7 +455,8 @@ class HomesControllerTest < ActionController::TestCase
     assert_select 'div#my-recent-contributions .panel-body ul li a[href=?]', sop_path(sop), text: /A new sop/, count: 0
   end
 
-  test 'can enabled/disable front page buttons' do
+  test 'can enabled/disable front page buttons' do 
+    skip 'IBISBA specific styling'
     login_as Factory(:user)
     with_config_value :front_page_buttons_enabled, true do
       get :index

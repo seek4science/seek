@@ -1248,6 +1248,7 @@ class PeopleControllerTest < ActionController::TestCase
   end
 
   test 'table view column selection' do
+    skip 'IBISBA-specific styling'
     # Title is always added, and there is an extra header for dropdown selection
     with_config_value(:results_per_page, { 'people' => 3 }) do
       get :index, params: { view: 'table',table_cols:'created_at,first_name,last_name,description,email' }
