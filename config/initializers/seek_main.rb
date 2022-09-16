@@ -50,7 +50,7 @@ SEEK::Application.configure do
 
   #Need to load defaut_locale file for internationalization used in Inflector below
   #coz this file is loaded at a later point
-  I18n.load_path << File.join(File.dirname(__FILE__), "../locales/en.yml")
+  #I18n.load_path << File.join(File.dirname(__FILE__), "../locales/en.yml")
 =begin
   #these inflections are put here, because the config variables are just loaded after the propagation
   ActiveSupport::Inflector.inflections do |inflect|
