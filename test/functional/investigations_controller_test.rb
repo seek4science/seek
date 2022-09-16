@@ -10,6 +10,8 @@ class InvestigationsControllerTest < ActionController::TestCase
 
   def setup
     login_as(:quentin)
+
+    I18n.load_path << File.join(File.dirname(__FILE__), "../../locales/en.yml")
   end
 
   def test_title

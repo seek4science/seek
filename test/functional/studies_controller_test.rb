@@ -10,6 +10,8 @@ class StudiesControllerTest < ActionController::TestCase
 
   def setup
     login_as Factory(:admin).user
+
+    I18n.load_path << File.join(File.dirname(__FILE__), "../../locales/en.yml")
   end
   
   test 'should get index' do

@@ -69,7 +69,7 @@ module SEEK
     config.active_job.queue_adapter = :delayed_job
 
     # Ignore translation overrides when testing
-    config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'overrides', '**', '*.{rb,yml}')] # unless Rails.env.test?
+    config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'overrides', '**', '*.{rb,yml}')] unless Rails.env.test?
 
     config.active_record.belongs_to_required_by_default = false
     config.action_mailer.delivery_job = 'ActionMailer::MailDeliveryJob' # Can remove after updating defaults

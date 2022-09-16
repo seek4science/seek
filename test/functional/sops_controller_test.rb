@@ -14,6 +14,8 @@ class SopsControllerTest < ActionController::TestCase
     @user = users(:quentin)
     @project = @user.person.projects.first
     login_as(@user)
+
+    I18n.load_path << File.join(File.dirname(__FILE__), "../../locales/en.yml")
   end
 
   test 'creators do not show in list item' do
