@@ -118,7 +118,7 @@ class ActiveSupport::TestCase
   end
 
   def load_translation
-    I18n.load_path << File.join(File.dirname(__FILE__), "../../locales/en.yml")
+    I18n.load_path << File.join(File.dirname(__FILE__), "../locales/en.yml")
   end
 
   def clear_current_user
