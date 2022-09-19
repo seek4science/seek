@@ -95,5 +95,14 @@
 			$j("#widget").height(height)
 			$j("#right-pane").height(height)
 		}
+
+    function highlightTreeviewItem(item) {
+      $j(".jstree-clicked").removeClass("jstree-clicked")
+      const type = selectedItem.type == "study" ? "study" : selectedItem.parent.type
+      const id = selectedItem.type == "study" ? selectedItem.id : selectedItem.parent.id
+      const parent = $j(`a[_type="${type}"][_id="${id}"]`)
+      $j(parent).next().find(`a[_type="${item}"]`).addClass("jstree-clicked")
+      setTimeout(() => updateContainerHeight(), 1000)
+    }
     
 </script>
