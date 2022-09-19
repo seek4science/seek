@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_09_01_133247) do
+ActiveRecord::Schema.define(version: 2022_09_15_090713) do
 
   create_table "activity_logs", id: :integer, force: :cascade do |t|
     t.string "action"
@@ -1908,6 +1908,13 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.index ["contributor_id"], name: "index_sops_on_contributor"
   end
 
+  create_table "sops_studies", force: :cascade do |t|
+    t.bigint "sop_id"
+    t.bigint "study_id"
+    t.index ["sop_id"], name: "index_sops_studies_on_sop_id"
+    t.index ["study_id"], name: "index_sops_studies_on_study_id"
+  end
+
   create_table "sops_workflows", id: false, force: :cascade do |t|
     t.integer "workflow_id", null: false
     t.integer "sop_id", null: false
@@ -1996,7 +2003,6 @@ ActiveRecord::Schema.define(version: 2022_09_01_133247) do
     t.text "other_creators"
     t.string "deleted_contributor"
     t.integer "position"
-    t.integer "sop_id"
   end
 
   create_table "study_auth_lookup", force: :cascade do |t|
