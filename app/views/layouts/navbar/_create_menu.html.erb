@@ -11,7 +11,7 @@
         [t('programme'), new_programme_path, can_create_programmes?],
         [t('project'), guided_create_projects_path, true],
         [t('institution'), new_institution_path, can_create_institutions?],
-        [t('profile'), new_person_path, can_create_profiles?]
+        [t('person'), new_person_path, can_create_profiles?]
     ]) %>
 
     <% if can_create_new_items? %>
@@ -40,6 +40,7 @@
 
       <%= render_menu_group(t('menu.samples'), [
           [t('sample'), select_sample_types_path, Sample.can_create?],
+          [t('template'), new_template_path, Seek::Config.sample_type_template_enabled],
           [t('sample_type'), new_sample_type_path, SampleType.can_create?],
           [t('strain'), new_strain_path,  Seek::Config.organisms_enabled && can_create_organisms?],
           [t('organism'), new_organism_path,  Seek::Config.organisms_enabled && can_create_organisms?],

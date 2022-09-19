@@ -4,7 +4,6 @@ class AssaysControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
   include GeneralAuthorizationTestCases
@@ -12,10 +11,6 @@ class AssaysControllerTest < ActionController::TestCase
 
   def setup
     login_as(:quentin)
-  end
-
-  def rest_api_test_object
-    @object = Factory(:experimental_assay, policy: Factory(:public_policy))
   end
 
   def test_title
@@ -1385,14 +1380,6 @@ class AssaysControllerTest < ActionController::TestCase
     assert_response :success
     assert_select 'a[href=?]', edit_assay_path, count: 1 # Can manage
     assert_select 'a[href=?]', assay_nels_path(assay_id: assay.id), count: 0 # But not browse NeLS
-  end
-
-  def edit_max_object(assay)
-    add_tags_to_test_object(assay)
-    add_creator_to_test_object(assay)
-
-    org = Factory(:organism)
-    assay.associate_organism(org)
   end
 
   test 'can delete an assay with subscriptions' do

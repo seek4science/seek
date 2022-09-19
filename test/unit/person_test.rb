@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class PersonTest < ActiveSupport::TestCase
-  fixtures :users, :people
+  fixtures :users, :people, :roles
 
   def test_work_groups
     p = Factory(:person_in_multiple_projects)
@@ -271,8 +271,8 @@ class PersonTest < ActiveSupport::TestCase
     person = Factory :admin
     assert person.only_first_admin_person?
 
-    person.is_admin = false
     disable_authorization_checks { person.save! }
+    person.is_admin = false
     refute person.only_first_admin_person?
     person.is_admin = true
     disable_authorization_checks { person.save! }
@@ -687,17 +687,6 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal 'B', p.disciplines[1].title
   end
 
-  test 'project through association' do
-    # test that you can correctly access the associated projects through .projects without being saved first
-    p = Factory.build(:person_not_in_project)
-    project = Factory(:project)
-    p.group_memberships.build(project: project, institution: Factory.build(:institution))
-    p.group_memberships.build(project: project, institution: Factory.build(:institution))
-    p.work_groups.build(project: project, institution: Factory.build(:institution))
-    p.work_groups.build(project: project, institution: Factory.build(:institution))
-    assert_equal [project], p.projects
-  end
-
   def test_update_first_letter
     p = Factory(:brand_new_person, first_name: 'Fred', last_name: 'Monkhouse', email: 'blahblah@email.com')
     assert p.valid?, 'The new person should be valid'
@@ -776,13 +765,6 @@ class PersonTest < ActiveSupport::TestCase
     uuid = x.attributes['uuid']
     x.save
     assert_equal x.uuid, uuid
-  end
-
-  test 'projects method notices changes via both group_memberships and work_groups' do
-    person = Factory.build(:person, group_memberships: [Factory(:group_membership)])
-    group_membership_projects = person.group_memberships.map(&:work_group).map(&:project).uniq.sort_by(&:title)
-    work_group_projects = person.work_groups.map(&:project).uniq.sort_by(&:title)
-    assert_equal (group_membership_projects | work_group_projects), person.projects.sort_by(&:title)
   end
 
   test 'should retrieve the list of people who have the manage right on the item' do
@@ -1254,9 +1236,12 @@ class PersonTest < ActiveSupport::TestCase
     assert_equal '....@world.com',p.typeahead_hint
 
     p = Factory(:person, project:Factory(:project,title:'wibble'))
+    p.save!
     assert_equal 'wibble',p.typeahead_hint
 
     p.add_to_project_and_institution(Factory(:project,title:'wobble'),p.institutions.first)
+    p.save!
+    p.reload
     assert_equal 'wibble, wobble',p.typeahead_hint
   end
 
@@ -1384,12 +1369,15 @@ class PersonTest < ActiveSupport::TestCase
 
     project2 = Factory(:project)
     person.add_to_project_and_institution(project2,Factory(:institution))
-    person.is_project_administrator = true, project2
+    disable_authorization_checks { person.is_project_administrator = true, project2 }
+    assert person.is_project_administrator?(project2)
     project3 = Factory(:project)
     person.add_to_project_and_institution(project3,Factory(:institution))
-    person.save!
 
-    assert_equal [project,project2],person.administered_projects.sort_by(&:id)
+    disable_authorization_checks { person.save! }
+    person.reload
+
+    assert_equal [project, project2, project3], person.projects.sort_by(&:id)
+    assert_equal [project,project2], person.administered_projects.sort_by(&:id)
   end
-
 end

@@ -7,7 +7,6 @@ class ProjectsController < ApplicationController
   include Seek::IndexPager
   include CommonSweepers
   include Seek::DestroyHandling
-  include ApiHelper
   include Seek::Projects::Population
 
   before_action :login_required, only: [:guided_join, :guided_create, :request_join, :request_create,
@@ -117,17 +116,29 @@ class ProjectsController < ApplicationController
       unless validation_error_msg
         requester.add_to_project_and_institution(@project,@institution)
         requester.save!
-        Mailer.notify_user_projects_assigned(requester,[@project]).deliver_later
-        Mailer.notify_admins_project_join_accepted(current_person, requester, @project).deliver_later
-        flash[:notice]="Request accepted and #{requester.name} added to #{t('project')} and notified"
+        if Seek::Config.email_enabled
+          Mailer.notify_user_projects_assigned(requester,[@project]).deliver_later
+          Mailer.notify_admins_project_join_accepted(current_person, requester, @project).deliver_later
+        end
+        flash[:notice] = "Request accepted and #{requester.name} added to #{t('project')}"
+        flash[:notice] += " and notified" if Seek::Config.email_enabled
         @message_log.respond('Accepted')
       end
     else
-      comments = params['reject_details']
-      @message_log.respond(comments)
-      Mailer.join_project_rejected(requester,@project,comments).deliver_later
-      Mailer.notify_admins_project_join_rejected(current_person, requester, @project, comments).deliver_later
-      flash[:notice]="Request rejected and #{requester.name} has been notified"
+      if params[:delete_request] == '1'
+        @message_log.destroy
+        flash[:notice]="#{t('project')} join request deleted"
+      else
+        comments = params[:reject_details]
+        @message_log.respond(comments)
+        if Seek::Config.email_enabled
+          Mailer.join_project_rejected(requester,@project,comments).deliver_later
+          Mailer.notify_admins_project_join_rejected(current_person, requester, @project, comments).deliver_later
+          flash[:notice]="Request rejected and #{requester.name} has been notified"
+        else
+          flash[:notice]="Request rejected"
+        end
+      end
     end
 
     if validation_error_msg
@@ -142,7 +153,6 @@ class ProjectsController < ApplicationController
   def request_join
     @projects = params[:projects].split(',').collect{|id| Project.find(id)}
     raise 'no projects defined' if @projects.empty?
-    raise 'email is disabled' unless Seek::Config.email_enabled
     @institution = Institution.find_by_id(params[:institution][:id])
     if @institution.nil?
       inst_params = params.require(:institution).permit([:id, :title, :web_page, :city, :country])
@@ -153,10 +163,9 @@ class ProjectsController < ApplicationController
     @projects.each do |project|
       if project.allow_request_membership? # protects against malicious spamming
         log = ProjectMembershipMessageLog.log_request(sender:current_user.person, project:project, institution:@institution, comments:@comments)
-        Mailer.request_join_project(current_user, project, @institution.to_json, @comments, log).deliver_later
+        Mailer.request_join_project(current_user, project, @institution.to_json, @comments, log).deliver_later if Seek::Config.email_enabled
       end
     end
-
     flash.now[:notice]="Thank you, your request to join has been sent"
     respond_to do |format|
       format.html
@@ -182,7 +191,9 @@ class ProjectsController < ApplicationController
         log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
       elsif @programme.site_managed?
         log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
-        Mailer.request_create_project_for_programme(current_user, @programme, @project.to_json, @institution.to_json, log).deliver_later
+        if Seek::Config.email_enabled
+          Mailer.request_create_project_for_programme(current_user, @programme, @project.to_json, @institution.to_json, log).deliver_later
+        end
         flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
       else
         raise 'Invalid Programme'
@@ -192,7 +203,7 @@ class ProjectsController < ApplicationController
       prog_params = params.require(:programme).permit([:title])
       @programme = Programme.new(prog_params)
       log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
-      unless User.admin_logged_in?
+      if  Seek::Config.email_enabled && !User.admin_logged_in?
         Mailer.request_create_project_and_programme(current_user, @programme.to_json, @project.to_json, @institution.to_json, log).deliver_later
       end
       flash.now[:notice] = "Thank you, your request for a new #{t('programme')} and #{t('project')} has been sent"
@@ -200,7 +211,7 @@ class ProjectsController < ApplicationController
     elsif !Seek::ProjectFormProgrammeOptions.show_programme_box?
       @programme=nil
       log = ProjectCreationMessageLog.log_request(sender:current_person, programme:@programme, project:@project, institution:@institution)
-      unless User.admin_logged_in?
+      if Seek::Config.email_enabled && !User.admin_logged_in?
         Mailer.request_create_project(current_user, @project.to_json, @institution.to_json, log).deliver_later
       end
       flash.now[:notice]="Thank you, your request for a new #{t('project')} has been sent"
@@ -352,9 +363,11 @@ class ProjectsController < ApplicationController
         if params[:default_member] && params[:default_member][:add_to_project] && params[:default_member][:add_to_project] == '1'
           institution = Institution.find(params[:default_member][:institution_id])
           person = current_person
-          person.add_to_project_and_institution(@project, institution)
-          person.is_project_administrator = true, @project
-          disable_authorization_checks { person.save }
+          disable_authorization_checks do
+            person.add_to_project_and_institution(@project, institution)
+            person.is_project_administrator = true, @project
+            person.save!
+          end
         end
         members = params[:project][:members]
         if members.nil?
@@ -368,7 +381,6 @@ class ProjectsController < ApplicationController
             person.save!
           end
         }
-        update_administrative_roles
         flash[:notice] = "#{t('project')} was successfully created."
         format.html { redirect_to(@project) }
         # format.json {render json: @project, adapter: :json, status: 200 }
@@ -389,15 +401,17 @@ class ProjectsController < ApplicationController
 
   # PUT /projects/1   , polymorphic: [:organism]
   def update
-    if params[:project][:ordered_investigation_ids]
+    if params[:project]&.[](:ordered_investigation_ids)
       a1 = params[:project][:ordered_investigation_ids]
       a1.permit!
       pos = 0
       a1.each_pair do |key, value |
-        investigation = Investigation.find (value)
-        investigation.position = pos
-        pos += 1
-        investigation.save!
+        disable_authorization_checks {
+          investigation = Investigation.find (value)
+          investigation.position = pos
+          pos += 1
+          investigation.save!
+        }
       end
       respond_to do |format|
         format.html { redirect_to(@project) }
@@ -582,9 +596,13 @@ class ProjectsController < ApplicationController
           flash[:notice]="#{t('project')} created"
         else
           @message_log.respond('Accepted')
-          flash[:notice]="Request accepted and #{requester.name} added to #{t('project')} and notified"
-          Mailer.notify_user_projects_assigned(requester,[@project]).deliver_later
-          Mailer.notify_admins_project_creation_accepted(current_person, requester, @project).deliver_later
+          if Seek::Config.email_enabled
+            flash[:notice]="Request accepted and #{requester.name} added to #{t('project')} and notified"
+            Mailer.notify_user_projects_assigned(requester,[@project]).deliver_later
+            Mailer.notify_admins_project_creation_accepted(current_person, requester, @project).deliver_later
+          else
+            flash[:notice]="Request accepted and #{requester.name} added to #{t('project')}"
+          end
         end
 
         redirect_to(@project)
@@ -594,16 +612,21 @@ class ProjectsController < ApplicationController
       end
 
     else
-      if @message_log.sent_by_self?
+      if @message_log.sent_by_self? || params['delete_request'] == '1'
         @message_log.destroy
         flash[:notice]="#{t('project')} creation cancelled"
       else
         comments = params['reject_details']
         @message_log.respond(comments)
         project_name = JSON.parse(@message_log.details)['project']['title']
-        Mailer.create_project_rejected(requester,project_name,comments).deliver_later
-        Mailer.notify_admins_project_creation_rejected(current_person, requester, project_name, @programme&.to_json, comments).deliver_later
-        flash[:notice] = "Request rejected and #{requester.name} has been notified"
+        if Seek::Config.email_enabled
+          Mailer.create_project_rejected(requester,project_name,comments).deliver_later
+          Mailer.notify_admins_project_creation_rejected(current_person, requester, project_name, @programme&.to_json, comments).deliver_later
+          flash[:notice] = "Request rejected and #{requester.name} has been notified"
+        else
+          flash[:notice] = "Request rejected"
+        end
+
       end
 
       redirect_to :root
@@ -628,24 +651,24 @@ class ProjectsController < ApplicationController
   private
 
   def project_role_params
-    params[:project].keys.each do |k|
-      unless params[:project][k].nil?
-        params[:project][k] = params[:project][k].split(',')
+    permitted_roles = [:project_administrator_ids, :asset_gatekeeper_ids, :asset_housekeeper_ids, :pal_ids]
+    permitted_roles.each do |k|
+      if params[:project][k].present?
+        if params[:project][k].is_a?(String)
+          params[:project][k] = params[:project][k].split(',')
+        end
       else
         params[:project][k] = []
       end
     end
 
-    params.require(:project).permit({ project_administrator_ids: [] },
-                                    { asset_gatekeeper_ids: [] },
-                                    { asset_housekeeper_ids: [] },
-                                    pal_ids: [])
+    params.require(:project).permit(*permitted_roles.map { |r| { r => [] }})
   end
 
   def project_params
     permitted_params = [:title, :web_page, :wiki_page, :description, { organism_ids: [] }, :parent_id, :start_date,
                         :end_date,
-                        :funding_codes, { human_disease_ids: [] },
+                        :funding_codes, { human_disease_ids: [] }, :topic_annotations,
                         discussion_links_attributes:[:id, :url, :label, :_destroy]]
 
     if User.admin_logged_in?
@@ -654,8 +677,7 @@ class ProjectsController < ApplicationController
 
     if @project.new_record? || @project.can_manage?(current_user)
       permitted_params += [:use_default_policy, :default_policy, :default_license,
-                           { members: [:person_id, :institution_id] }, { project_administrator_ids: [] },
-                           { asset_gatekeeper_ids: [] }, { asset_housekeeper_ids: [] }, { pal_ids: [] }]
+                           { members: [:person_id, :institution_id] }]
     end
 
     if params[:project][:programme_id].present?
@@ -721,7 +743,7 @@ class ProjectsController < ApplicationController
           membership.update(time_left_at: left_at)
         end
         member = Person.find(membership.person_id)
-        Rails.cache.delete_matched("rli_title_#{member.cache_key}_.*")
+        Rails.cache.delete_matched(/#{member.list_item_title_cache_key_prefix}.*/)
       end
     end
   end
@@ -777,7 +799,7 @@ class ProjectsController < ApplicationController
     error_msg ||= "message log not found" unless @message_log
     error_msg ||= ("incorrect type of message log" unless @message_log.project_creation_request?)
     error_msg ||= ("message has already been responded to" if @message_log.responded?)
-    
+
     if error_msg
       error(error_msg, error_msg)
       return false
@@ -795,7 +817,7 @@ class ProjectsController < ApplicationController
     if @institution.new_record?
       # override with existing institution if already exists with same title, it could have been created since the request was made
       @institution = Institution.find_by(title: @institution.title) if Institution.find_by(title: @institution.title)
-    end 
+    end
   end
 
   # check programme permissions for responding to a MessageLog

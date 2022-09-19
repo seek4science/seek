@@ -175,20 +175,6 @@ function digValue(object, path) {
             elements.removeClass(cssClass)
         }, 1100);
     };
-
-    $j.fn.easyTabs = function () {
-        return this.each(function(i, container) {
-            $j(this).find('> ul.easytabs-nav > li').click(function () {
-                $j(container).find('> .easytabs-pane').removeClass('active');
-                $j(container).find('> .easytabs-pane:eq(' +  $j(this).index() + ')').addClass('active');
-                $j(this).siblings().removeClass('active');
-                $j(this).addClass('active');
-            });
-            // Show first tab by default
-            $j(this).find('> ul.easytabs-nav > li:eq(0)').addClass('active');
-            $j(this).find('> .easytabs-pane:eq(0)').addClass('active');
-        });
-    };
 }(jQuery));
 
 $j(document).ready(function () {
@@ -367,3 +353,5 @@ $j(document).ready(function () {
         }
     });
 });
+
+var URL_ROOT = '<%= Rails.application.config.relative_url_root %>';

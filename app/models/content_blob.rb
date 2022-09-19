@@ -75,10 +75,6 @@ class ContentBlob < ApplicationRecord
     end
   end
 
-  def spreadsheet_annotations
-    worksheets.map { |worksheet| worksheet.cell_ranges.map(&:annotations) }.flatten
-  end
-
   # allows you to run something on a temporary copy of the blob file, which is deleted once finished
   # e.g. blob.with_temporary_copy{|copy_path| <some stuff with the copy>}
   def with_temporary_copy
@@ -91,7 +87,7 @@ class ContentBlob < ApplicationRecord
   end
 
   def file_extension
-    original_filename && original_filename.split('.').last
+    original_filename&.split('.')&.last&.downcase
   end
 
   def make_temp_copy
@@ -245,6 +241,15 @@ class ContentBlob < ApplicationRecord
   end
 
   has_task :remote_content_fetch
+
+  def content_path(opts = {})
+    opts.reverse_merge!(action: 'download', disposition: 'inline')
+    Seek::Util.routes.polymorphic_path([asset, self], opts)
+  end
+
+  def content_type_file_extensions
+    mime_extensions(content_type)
+  end
 
   private
 

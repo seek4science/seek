@@ -4,17 +4,12 @@ class StudiesControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
   include GeneralAuthorizationTestCases
 
   def setup
     login_as Factory(:admin).user
-  end
-
-  def rest_api_test_object
-    @object = Factory :study, policy: Factory(:public_policy)
   end
   
   test 'should get index' do
@@ -493,10 +488,6 @@ class StudiesControllerTest < ActionController::TestCase
     end
   end
 
-  def edit_max_object(study)
-    add_creator_to_test_object(study)
-  end
-
   test 'can delete a study with subscriptions' do
     study = Factory(:study, policy: Factory(:public_policy, access_type: Policy::VISIBLE))
     p = Factory(:person)
@@ -927,4 +918,78 @@ class StudiesControllerTest < ActionController::TestCase
     assert_empty study.discussion_links
   end
 
+  test 'study needs more than one assay for ordering' do
+    person = Factory(:admin)
+    login_as(person)
+    study = Factory(:study,
+                            policy: Factory(:public_policy),
+                            contributor: person)
+    get :show, params: { id: study.id }
+    
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_assays_study_path(study), count: 0
+
+    study.assays += [Factory(:assay,
+                                      policy: Factory(:public_policy),
+                                      contributor: person)]
+    get :show, params: { id: study.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_assays_study_path(study), count: 0
+
+    study.assays +=  [Factory(:assay,
+                                      policy: Factory(:public_policy),
+                                      contributor: person)]
+    get :show, params: { id: study.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_assays_study_path(study), count: 1
+  end
+
+  test 'ordering only by editor' do
+    person = Factory(:admin)
+    login_as(person)
+    study = Factory(:study,
+                            policy: Factory(:all_sysmo_viewable_policy),
+                            contributor: person)
+    study.assays += [Factory(:assay,
+                                      policy: Factory(:public_policy),
+                                      contributor: person)]
+    study.assays += [Factory(:assay,
+                                      policy: Factory(:public_policy),
+                                      contributor: person)]
+    get :show, params: { id: study.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_assays_study_path(study), count: 1
+
+    login_as(:aaron)
+    get :show, params: { id: study.id }
+    assert_response :success
+    assert_select 'a[href=?]',
+                  order_assays_study_path(study), count: 0
+  end
+
+  test 'sample type studies through nested routing' do
+    person = Factory(:person)
+    login_as(person)
+    assert_routing 'sample_types/2/studies', controller: 'studies', action: 'index', sample_type_id: '2'
+    study = Factory(:study, contributor: person)
+    study2 = Factory(:study, contributor: person)
+    sample_type = Factory(:patient_sample_type, studies: [study], contributor: person)
+
+    assert_equal [study], sample_type.studies
+    study.reload
+    assert_equal [sample_type], study.sample_types
+
+    get :index, params: { sample_type_id: sample_type.id }
+
+    assert_response :success
+    assert_select 'div.list_item_title' do
+      assert_select 'a[href=?]', study_path(study), text: study.title
+      assert_select 'a[href=?]', study_path(study2), text: study2.title, count: 0
+    end
+  end
+ 
 end

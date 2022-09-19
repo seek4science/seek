@@ -1,6 +1,6 @@
 <%
   limit ||= Seek::Config.search_results_limit
-  resource_hash = related_items_hash(@results, limit)
+  resource_hash = related_items_hash(@results, limit, order: :relevance)
   if @external_results.any?
     c = classify_for_tabs(@external_results)
     resource_hash.merge!(c)
@@ -9,21 +9,19 @@
   any = resource_hash.any? { |key, res| res[:items_count] > 0 || res[:hidden_count] > 0 }
 %>
 
-<div class="show_basic">
-  <% unless !logged_in? || params[:saved_search] %>
-    <%= alert_box do %>
-      <%= savable_search_icon(search_path, 24, { search_query: params[:search_query] || params[:q],
-                                                 search_type: params[:search_type],
-                                                 include_external_search: params[:include_external_search] },
-                              { class: "search favouritable" }) -%>
-      Drag this icon over to your Favourites to save this search.
-    <% end %>
+<% unless !logged_in? || params[:saved_search] %>
+  <%= alert_box do %>
+    <%= savable_search_icon(search_path, 24, { search_query: params[:search_query] || params[:q],
+                                               search_type: params[:search_type],
+                                               include_external_search: params[:include_external_search] },
+                            { class: "search favouritable" }) -%>
+    Drag this icon over to your Favourites to save this search.
   <% end %>
+<% end %>
 
-  <% if any %>
-    <%= render partial: "assets/resource_listing_tabbed_by_class",
-               locals: { resource_hash: resource_hash,
-                         display_immediately: true,
-                         index_params: { filter: { query: params[:search_query] || params[:q] } } } -%>
-  <% end %>
-</div>
+<% if any %>
+  <%= render partial: "assets/resource_listing_tabbed_by_class",
+             locals: { resource_hash: resource_hash,
+                       display_immediately: true,
+                       index_params: { filter: { query: @search_query || params[:q] } } } -%>
+<% end %>

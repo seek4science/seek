@@ -6,19 +6,9 @@ class ContentBlobsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
 
   def setup
     login_as(:quentin)
-  end
-
-  # Is this still needed?
-  def rest_api_test_object
-    Factory(:pdf_sop, policy: Factory(:downloadable_public_policy)).content_blob
-  end
-
-  def rest_show_url_options(object = rest_api_test_object)
-    { sop_id: object.asset_id }
   end
 
   test 'should resolve to json' do
@@ -59,10 +49,6 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :get_pdf, params: { sop_id: sop2.id, id: sop2.content_blob.id }
     assert_redirected_to sop2
     assert_not_nil flash[:error]
-  end
-
-  def test_index_json
-    # nothing to do, no indexes for content blobs
   end
 
   test 'examine url to file' do
@@ -136,6 +122,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'examine url forbidden' do
     # forbidden
     stub_request(:head, 'http://unauth.com/file.pdf').to_return(status: 403, headers: { 'Content-Type' => 'application/pdf' })
+    stub_request(:get, 'http://unauth.com/file.pdf').to_return(status: 403, headers: { 'Content-Type' => 'application/pdf' })
     get :examine_url, xhr: true, params: { data_url: 'http://unauth.com/file.pdf' }
     assert_response 200
     assert_equal 403, assigns(:info)[:code]
@@ -147,6 +134,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
   test 'examine url unauthorized' do
     # unauthorized
     stub_request(:head, 'http://unauth.com/file.pdf').to_return(status: 401, headers: { 'Content-Type' => 'application/pdf' })
+    stub_request(:get, 'http://unauth.com/file.pdf').to_return(status: 401, headers: { 'Content-Type' => 'application/pdf' })
     get :examine_url, xhr: true, params: { data_url: 'http://unauth.com/file.pdf' }
     assert_response :success
     assert @response.body.include?('Access to this link is unauthorized')
@@ -397,7 +385,7 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
     assert_response :success
 
-    download_path = download_sop_content_blob_path(sop, sop.content_blob.id, format: :pdf, intent: :inline_view)
+    download_path = download_sop_content_blob_path(sop, sop.content_blob.id, format: :pdf, disposition: :inline, intent: :inline_view)
     assert @response.body.include?("DEFAULT_URL = '#{download_path}'")
 
     al = ActivityLog.last
@@ -490,7 +478,6 @@ class ContentBlobsControllerTest < ActionController::TestCase
 
   end
 
-
   test 'can view content of an image file' do
     df = Factory(:data_file, policy: Factory(:all_sysmo_downloadable_policy),
                              content_blob: Factory(:image_content_blob))
@@ -498,6 +485,30 @@ class ContentBlobsControllerTest < ActionController::TestCase
     get :download, params: { data_file_id: df.id, id: df.content_blob.id, disposition: 'inline', image_size: '900' }
 
     assert_response :success
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+  end
+
+  test 'can view content of an image file and resize to given param' do
+    df = Factory(:data_file, policy: Factory(:all_sysmo_downloadable_policy),
+                             content_blob: Factory(:image_content_blob))
+
+    get :download, params: { data_file_id: df.id, id: df.content_blob.id, disposition: 'inline', image_size: '10' }
+
+    assert_response :success
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert @response.header['Content-Length'].to_i < 2000, 'Image should have been resized'
+  end
+
+  test 'can view content of an SVG image file without converting' do
+    df = Factory(:data_file, policy: Factory(:all_sysmo_downloadable_policy),
+                             content_blob: Factory(:svg_content_blob))
+
+    get :download, params: { data_file_id: df.id, id: df.content_blob.id, disposition: 'inline', image_size: '900' }
+
+    assert_response :success
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert_equal 'image/svg+xml', @response.header['Content-Type']
+    assert  @response.body[0..256].include?('<svg ')
   end
 
   test 'should transparently redirect on download for 302 url' do
@@ -698,6 +709,93 @@ class ContentBlobsControllerTest < ActionController::TestCase
     end
 
     assert_response :redirect
+  end
+
+  test 'should view content for pdf blob' do
+    sop = Factory(:public_sop)
+    blob = Factory(:pdf_content_blob, asset: sop)
+
+    get :view_content, params: { sop_id: sop.id, id: blob.id }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_nil @response.header['Content-Security-Policy']
+    assert_select 'iframe', count: 0
+    assert_select '#outerContainer'
+  end
+
+  test 'should view content for markdown blob' do
+    sop = Factory(:public_sop)
+    blob = Factory(:markdown_content_blob, asset: sop)
+
+    get :view_content, params: { sop_id: sop.id, id: blob.id }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert_select 'iframe', count: 0
+    assert_select '#navbar', count: 0
+    assert_select '.markdown-body h1', text: 'FAIRDOM-SEEK'
+  end
+
+  test 'should view content for jupyter blob renderer' do
+    sop = Factory(:public_sop)
+    blob = Factory(:jupyter_notebook_content_blob, asset: sop)
+
+    get :view_content, params: { sop_id: sop.id, id: blob.id }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_equal "default-src 'self'; img-src * data:; style-src 'unsafe-inline';", @response.header['Content-Security-Policy']
+    assert_select 'iframe', count: 0
+    assert_select '#navbar', count: 0
+    assert_select 'body.jp-Notebook'
+    assert_select 'div.jp-MarkdownOutput p', text: 'Import the libraries so that they can be used within the notebook'
+  end
+
+  test 'should view content for text blob' do
+    sop = Factory(:public_sop)
+    blob = Factory(:txt_content_blob, asset: sop)
+
+    get :view_content, params: { sop_id: sop.id, id: blob.id }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/plain')
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert_equal "This is a txt format\n", response.body
+  end
+
+  test 'should view content for image blob' do
+    sop = Factory(:public_sop)
+    blob = Factory(:image_content_blob, asset: sop)
+
+    get :view_content, params: { sop_id: sop.id, id: blob.id }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/html')
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert_select 'img.git-image-preview[src=?]', download_sop_content_blob_path(sop, blob, disposition: 'inline')
+  end
+
+  test 'should view content for jupyter blob as text if requested' do
+    sop = Factory(:public_sop)
+    blob = Factory(:jupyter_notebook_content_blob, asset: sop)
+
+    get :view_content, params: { sop_id: sop.id, id: blob.id, display: 'text' }
+
+    assert_response :success
+    assert @response.header['Content-Type'].start_with?('text/plain')
+    assert_equal ApplicationController::USER_CONTENT_CSP, @response.header['Content-Security-Policy']
+    assert response.body[0..20].include?('"nbformat": 4')
+  end
+
+  test 'should through 406 if trying to view content for pdf blob as text' do
+    sop = Factory(:public_sop)
+    blob = Factory(:pdf_content_blob, asset: sop)
+
+    assert_raises(ActionController::UnknownFormat) do
+      get :view_content, params: { sop_id: sop.id, id: blob.id, display: 'text' }
+    end
   end
 
   private

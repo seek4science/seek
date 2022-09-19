@@ -44,6 +44,8 @@ def load_seek_config_defaults!
   Seek::Config.default :auth_lookup_enabled,true
   Seek::Config.default :external_search_enabled, true
   Seek::Config.default :project_single_page_enabled, false
+  Seek::Config.default :project_single_page_advanced_enabled, false
+  Seek::Config.default :sample_type_template_enabled, false
   Seek::Config.default :project_browser_enabled,false
   Seek::Config.default :experimental_features_enabled,false
   Seek::Config.default :pdf_conversion_enabled,true
@@ -83,7 +85,7 @@ def load_seek_config_defaults!
   Seek::Config.default :sops_enabled, true
   Seek::Config.default :workflows_enabled, false
   Seek::Config.default :collections_enabled, true
-  Seek::Config.default :file_templates_enabled, true
+  Seek::Config.default :file_templates_enabled, false
   Seek::Config.default :placeholders_enabled, false
 
   #Observered variables
@@ -101,7 +103,7 @@ def load_seek_config_defaults!
 #time in minutes that the feeds on the front page are cached for
   Seek::Config.default :home_feeds_cache_timeout,30
 # Branding
-  Seek::Config.default :instance_name,'FAIRDOM'
+  Seek::Config.default :instance_name,'FAIRDOM-SEEK'
   Seek::Config.default :instance_link,'http://www.fair-dom.org'
 
   Seek::Config.default :instance_admins_name,"FAIRDOM"
@@ -161,14 +163,8 @@ def load_seek_config_defaults!
   Seek::Config.default :session_store_timeout, 1.hour
   Seek::Config.default :cv_dropdown_limit, 100
 
-  #MERGENOTE - why are these here? they should be in the database under the Scale model. Maybe an old relic
-  Seek::Config.default :scales,["organism","liver","liverLobule","intercellular","cell"]
-
   # Admin setting to allow user impersonation, useful for debugging
   Seek::Config.default :admin_impersonation_enabled, false
-
-  #magic guest is a special user required by BioVel, where a logged out user adopts a special guest user, but still appears to be logged out
-  Seek::Config.default :magic_guest_enabled,false
 
   Seek::Config.default :recaptcha_enabled, false
 

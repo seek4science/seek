@@ -3,8 +3,8 @@ class OrganismsController < ApplicationController
   include Seek::DestroyHandling
 
   before_action :organisms_enabled?
-  before_action :find_requested_item, :only=>[:show,:edit,:visualise,:destroy, :update]
-  before_action :login_required,:except=>[:show,:index,:visualise]
+  before_action :find_requested_item, :only=>[:show,:edit,:destroy, :update]
+  before_action :login_required,:except=>[:show,:index]
   before_action :can_manage?,:only=>[:edit,:update]
   before_action :auth_to_create, :only=>[:new,:create, :destroy]
   before_action :find_assets, only: [:index]
@@ -24,13 +24,6 @@ class OrganismsController < ApplicationController
       format.html
       format.rdf { render :template=>'rdf/show'}
       format.json {render json: @organism, include: [params[:include]]}
-    end
-  end
-
-  def visualise
-    @no_sidebar=true
-    respond_to do |format|
-      format.html
     end
   end
 

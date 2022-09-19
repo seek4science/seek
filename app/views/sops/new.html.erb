@@ -20,8 +20,6 @@
 
       <%= render :partial => "projects/project_selector", :locals => { :resource => @sop } %>
 
-      <%= render :partial => "scales/scales_selector",:locals=>{:object=>@sop} if show_scales?%>
-
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @sop } %>
 
       <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @sop} -%>
@@ -31,6 +29,10 @@
       <%= render :partial => "assays/associate_assays", :locals=>{:resource => @sop} -%>
 
       <%= fancy_multiselect @sop, :workflows, { other_projects_checkbox: false } -%>
+
+      <% if displaying_single_page?%>
+        <input name="single_page" type="hidden" value=<%=params[:single_page]%> />
+      <% end %>
 
       <%= form_submit_buttons(@sop) %>
 

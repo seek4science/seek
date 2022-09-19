@@ -5,25 +5,10 @@ class CollectionsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include SharingFormTestHelper
   include MockHelper
   include HtmlHelper
   include GeneralAuthorizationTestCases
-
-  def test_json_content
-    login_as(Factory(:user))
-    super
-  end
-
-  def rest_api_test_object
-    @object = Factory(:public_collection)
-  end
-
-  def edit_max_object(collection)
-    add_tags_to_test_object(collection)
-    add_creator_to_test_object(collection)
-  end
 
   test 'should return 406 when requesting RDF' do
     login_as(Factory(:user))

@@ -29,6 +29,7 @@ class Settings < ActiveRecord::Base
 
   attr_encrypted :value, key: proc { Seek::Config.attr_encrypted_key }, marshal: true, marshaler: Marshal
   before_save :ensure_no_plaintext, if: :encrypt?
+  after_commit :clear_cache, on: %i[create update destroy]
 
   # Support old plugin
   if defined?(SettingsDefaults::DEFAULTS)
@@ -51,7 +52,7 @@ class Settings < ActiveRecord::Base
     vars = vars.where("var LIKE ?", "'#{starting_with}%'") if starting_with
 
     result = HashWithIndifferentAccess.new
-    vars.each do |record|
+    vars.to_a.each do |record|
       result[record.var] = record.value
     end
     result
@@ -151,5 +152,9 @@ class Settings < ActiveRecord::Base
 
   def ensure_no_plaintext
     self[:value] = nil if will_save_change_to_encrypted_value?
+  end
+
+  def clear_cache
+    Seek::Config.clear_cache if target_id.nil? && target_type.nil?
   end
 end

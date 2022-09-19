@@ -51,19 +51,19 @@ module ProjectsHelper
   end
 
   def project_administrators_input_box(project)
-    project_role_input_box project, Seek::Roles::PROJECT_ADMINISTRATOR
+    project_role_input_box project, :project_administrator
   end
 
   def project_asset_gatekeepers_input_box(project)
-    project_role_input_box project, Seek::Roles::ASSET_GATEKEEPER
+    project_role_input_box project, :asset_gatekeeper
   end
 
   def project_asset_housekeepers_input_box(project)
-    project_role_input_box project, Seek::Roles::ASSET_HOUSEKEEPER
+    project_role_input_box project, :asset_housekeeper
   end
 
   def project_pals_input_box(project)
-    project_role_input_box project, Seek::Roles::PAL
+    project_role_input_box project, :pal
   end
 
   def project_role_input_box(project, role)
@@ -99,7 +99,7 @@ module ProjectsHelper
 
   def projects_grouped_by_programme(selected = nil)
     if Seek::Config.programmes_enabled
-      array = Project.order(:title).to_a.group_by { |p| p.programme.try(:title) || "Independent #{I18n.t('project').downcase.pluralize}" }.each_value do |projects|
+      array = Project.order(:title).to_a.group_by { |p| p.programme.try(:title) || "#{I18n.t('project').pluralize} without a #{t('programme')}" }.each_value do |projects|
         projects.map! { |p| [p.title, p.id] }
       end.to_a
 
@@ -119,7 +119,6 @@ module ProjectsHelper
 
   # whether the request membership button should be shown
   def request_join_project_button_enabled?(project)
-    Seek::Config.email_enabled &&
       project.allow_request_membership?
   end
 

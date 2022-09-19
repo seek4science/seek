@@ -1,54 +1,6 @@
 
-<% resource = resource_list_item_table
+<% resource = resource_list_item_table %>
 
-   content_partial = get_list_item_content_partial(resource)
 
-   actions_partial_disable ||= false
-   actions_partial = actions_partial_disable ? nil : get_list_item_actions_partial(resource)
-   avatar_partial = get_list_item_avatar_partial(resource) if avatar_partial.nil?
+<%= resource_list_table_row(resource, tableview_columns) %>
 
-   #dont show JERM avatar for strain without contributor, as there are strains without contributor and are not harvested
-   avatar_partial = nil if (resource.kind_of?(Strain) && resource.contributor.try(:person).nil?) || resource.is_a?(Organism)
-   avatar_content = avatar_partial.blank? ? nil : render(:partial=> avatar_partial,:locals=>{:resource => resource})
-
-   access_based_css_class = "list_item"
-
-   content_grid_size = 9
-   content_grid_size += 1 if avatar_content.blank?
-   content_grid_size += 2 if actions_partial.blank?
-
-   title_options = {}
-%>
-
-<tr class="<%= access_based_css_class%>">
-  <% for column in tableview_columns -%>
-    <% case column %>
-    <% when "title" %>
-      <td><%= list_item_title resource, title_options %></td>
-    <% when "projects" %>
-      <% if resource.respond_to?('projects') %>
-        <td><%= resource.projects.uniq.map {|p| link_to p.title, p }.join(', ').html_safe %></td>
-      <% else %>
-        <td> Field not found </td>
-      <% end %>
-    <% when "tags" %>
-      <% if resource.respond_to?('tags') %>
-        <td><%= resource.send(column).join(",") %></td>
-      <% else %>
-        <td> Field not found </td>
-      <% end %>
-    <% when "creators"%>
-      <td><%= table_item_person_list resource.creators %></td>
-    <% when "assay_type_uri"%>
-      <td><%= link_to_assay_type(resource) %></td>
-    <% when "technology_type_uri"%>
-      <td><%= link_to_technology_type(resource) %></td>
-    <% else  %>
-      <% if resource.respond_to?(column) %>
-        <td><%= text_or_not_specified(resource.send(column),length: 300, auto_link: true, none_text: "") %></td>
-      <% else %>
-        <td>Unknown Column parameter</td>
-      <% end %>
-    <% end %>
-  <% end -%>
-</tr>

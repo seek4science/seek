@@ -5,18 +5,11 @@ class DataFile < ApplicationRecord
   include Seek::Rdf::RdfGeneration
   include Seek::BioSchema::Support
 
-  # searchable must come before acts_as_asset call
-  if Seek::Config.solr_enabled
-    searchable(auto_index: false) do
-      text :spreadsheet_annotation_search_fields, :fs_search_fields
-    end
-  end
-
   acts_as_asset
 
   acts_as_doi_parent(child_accessor: :versions)
 
-  has_edam_annotations
+  has_controlled_vocab_annotations :data_types, :data_formats
 
   validates :projects, presence: true, projects: { self: true }
 
@@ -48,7 +41,7 @@ class DataFile < ApplicationRecord
       joins: [:assays]
   )
 
-  explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi', 'data_type', 'format_type', 'file_template_id']) do
+  explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi', 'file_template_id']) do
 
     include Seek::Data::SpreadsheetExplorerRepresentation
     acts_as_doi_mintable(proxy: :parent, type: 'Dataset', general_type: 'Dataset')
@@ -96,22 +89,6 @@ class DataFile < ApplicationRecord
     end
   end
 
-  # Returns the columns to be shown on the table view for the resource
-  def columns_default
-    super + ['creators','projects','version', 'format_type', 'data_type']
-  end
-  def columns_allowed
-    columns_default + ['last_used_at','other_creators','doi','license','simulation_data']
-  end
-
-  def edam_topics_vocab
-    nil
-  end
-  
-  def edam_operations_vocab
-    nil
-  end
-  
   def included_to_be_copied?(symbol)
     case symbol.to_s
     when 'activity_logs', 'versions', 'attributions', 'relationships', 'inverse_relationships', 'annotations'
@@ -128,19 +105,6 @@ class DataFile < ApplicationRecord
 
   def use_mime_type_for_avatar?
     true
-  end
-
-  # the annotation string values to be included in search indexing
-  def spreadsheet_annotation_search_fields
-    annotations = []
-    if content_blob
-      content_blob.worksheets.each do |ws|
-        ws.cell_ranges.each do |cell_range|
-          annotations |= cell_range.annotations.collect { |a| a.value.text }
-        end
-      end
-    end
-    annotations
   end
 
   # FIXME: bad name, its not whether it IS a template, but whether it originates from a template
@@ -262,4 +226,5 @@ class DataFile < ApplicationRecord
   end
 
   has_task :sample_extraction
+  has_task :sample_persistence
 end

@@ -1,0 +1,38 @@
+{
+  "data": [
+    {
+      "id": "38",
+      "type": "file_templates",
+      "attributes": {
+        "title": "A Maximal FileTemplate"
+      },
+      "links": {
+        "self": "/file_templates/38"
+      }
+    },
+    {
+      "id": "37",
+      "type": "file_templates",
+      "attributes": {
+        "title": "A Minimal FileTemplate"
+      },
+      "links": {
+        "self": "/file_templates/37"
+      }
+    }
+  ],
+  "jsonapi": {
+    "version": "1.0"
+  },
+  "links": {
+    "self": "/file_templates?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "first": "/file_templates?page%5Bnumber%5D=1&page%5Bsize%5D=1000000",
+    "prev": null,
+    "next": null,
+    "last": "/file_templates?page%5Bnumber%5D=1&page%5Bsize%5D=1000000"
+  },
+  "meta": {
+    "base_url": "http://localhost:3000",
+    "api_version": "0.3"
+  }
+}

@@ -13,6 +13,8 @@ class Sop < ApplicationRecord
 
   has_and_belongs_to_many :workflows
 
+  has_one :study, foreign_key: 'sop_id'
+
   has_filter assay_type: Seek::Filtering::Filter.new(
       value_field: 'assays.assay_type_uri',
       label_mapping: Seek::Filterer::MAPPINGS[:assay_type_label],
@@ -23,14 +25,6 @@ class Sop < ApplicationRecord
       label_mapping: Seek::Filterer::MAPPINGS[:technology_type_label],
       joins: [:assays]
   )
-  
-  # Returns the columns to be shown on the table view for the resource
-  def columns_default
-    super + ['version']
-  end
-  def columns_allowed
-    columns_default + ['last_used_at','other_creators','doi','license']
-  end
 
   explicit_versioning(version_column: 'version', sync_ignore_columns: ['doi']) do
     acts_as_doi_mintable(proxy: :parent, general_type: 'Text')
@@ -51,5 +45,13 @@ class Sop < ApplicationRecord
 
   def use_mime_type_for_avatar?
     true
+  end
+
+  def can_delete?(user = User.current_user)
+    if Seek::Config.project_single_page_advanced_enabled
+      super && study.blank?
+    else
+      super
+    end
   end
 end

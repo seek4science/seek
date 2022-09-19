@@ -7,20 +7,11 @@ module Seek
 
     def new
       setup_new_asset
-      #associate_by_presented_params
       respond_for_new
     end
 
-    def associate_by_presented_params
-      item = object_for_request
-      return unless item && params[:assay_ids] && params[:assay_ids].any?
-      assays = Assay.find(params[:assay_ids])
-      assays = assays.select{|assay| assay.assay_class.is_modelling?}.select{|assay| assay.can_edit?}
-      item.assign_attributes({assay_ids:assays.collect(&:id)})
-    end
-
     def show
-      asset = determine_asset_from_controller
+      asset = resource_for_controller
       # store timestamp of the previous last usage
       @last_used_before_now = asset.last_used_at
 
@@ -32,7 +23,7 @@ module Seek
         format.html { render(params[:only_content] ? { layout: false } : {})}
         format.xml
         format.rdf { render template: 'rdf/show' }
-        format.json { render json: asset, scope: { requested_version: params[:version] }, include: json_api_include_param }
+        format.json { render json: asset, scope: { requested_version: asset_version }, include: json_api_include_param }
         format.datacite_xml { render xml: asset_version.datacite_metadata.to_s } if asset_version.respond_to?(:datacite_metadata)
         format.jsonld { render json: Seek::BioSchema::Serializer.new(asset_version).json_representation, adapter: :attributes } if asset_version.respond_to?(:to_schema_ld)
       end
@@ -44,6 +35,10 @@ module Seek
         attr = send("#{controller_name.singularize}_params")
       end
       item = class_for_controller_name.new(attr)
+
+      # filter out any non editable associated assays
+      item.assay_assets = item.assay_assets.select{|aa| aa.assay&.can_edit?} if item.respond_to?(:assay_assets)
+
       item.parent_name = params[:parent_name] if item.respond_to?(:parent_name)
       set_shared_item_variable(item)
       @content_blob = ContentBlob.new
@@ -64,7 +59,7 @@ module Seek
 
     # handles update for manage properties, the action for the manage form
     def manage_update
-      item = determine_asset_from_controller
+      item = resource_for_controller
       raise 'shouldnt get this far without manage rights' unless item.can_manage?
       item.update(params_for_controller)
       update_sharing_policies item
@@ -111,7 +106,9 @@ module Seek
         unless return_to_fancy_parent(item)
           flash[:notice] = "#{t(item.class.name.underscore)} was successfully uploaded and saved."
           respond_to do |format|
-            format.html { redirect_to item }
+            format.html { redirect_to params[:single_page] ?
+              { controller: :single_pages, action: :show, id: params[:single_page] } 
+              : item }
             format.json { render json: item, include: json_api_include_param }
           end
         end
@@ -128,8 +125,8 @@ module Seek
       asset.projects = asset.projects & user.person.projects
     end
 
-    def update_sharing_policies(item)
-      item.policy.set_attributes_with_sharing(policy_params) if policy_params.present?
+    def update_sharing_policies(item, parameters = params)
+      item.policy.set_attributes_with_sharing(policy_params(parameters)) if policy_params(parameters).present?
     end
 
     def initialize_asset

@@ -1,17 +1,21 @@
-<% @job_status ||= data_file.sample_extraction_task&.status %>
-<% in_progress = data_file.sample_extraction_task&.in_progress? %>
+<% task =  data_file.sample_extraction_task %>
+<% return unless task&.persisted? %>
+
+<% job_status ||= task.status %>
+<% in_progress = task.in_progress? %>
+<% persistence_in_progress = data_file.sample_persistence_task&.in_progress? %>
 
 <div id="sample-extraction-status">
-  <% if data_file.can_manage? && (in_progress || !Seek::Samples::Extractor.new(data_file).fetch.nil?) %>
+  <% if data_file.can_manage? && !persistence_in_progress && (in_progress || !Seek::Samples::Extractor.new(data_file).fetch.nil?) %>
       <div class="alert alert-info" role="alert">
         <strong>Sample extraction:</strong>
         <% if in_progress %>
-            <%= @job_status.to_s.humanize %>
+            <%= job_status.to_s.humanize %>
             <%= image 'spinner' %>
             <script>
               setTimeout(function () {
                 $j.ajax('<%= extraction_status_data_file_path(data_file) %>', {
-                      data: { 'previous_status': '<%= @job_status -%>' },
+                      data: { 'previous_status': '<%= job_status -%>' },
                       success: function (html) {
                         $j('#sample-extraction-status').replaceWith(html);
                       }

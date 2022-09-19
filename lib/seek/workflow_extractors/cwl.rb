@@ -29,15 +29,19 @@ module Seek
           Seek::WorkflowExtractors::CwlDotGenerator.new(f).write_graph(wf)
           f.rewind
           out = ''
+          err = ''
           Open4.open4('dot -Tsvg') do |pid, stdin, stdout, stderr|
             stdin.puts(f.read)
             stdin.close
             out = stdout.read
+            err = stderr.read
             stdout.close
             stderr.close
           end
+          Rails.logger.error(err) if err.length > 0
           out
         rescue StandardError => e
+          Rails.logger.error(e)
           nil
         end
       end
@@ -141,12 +145,14 @@ module Seek
         return [] if i.nil?
 
         if i.is_a?(Hash)
-          i = i.flat_map do |id, s|
-            if s.is_a?(String)
-              { 'id' => id, 'source' => s }
-            else
-              s['id'] ||= id
-              s
+          i = i.flat_map do |id, source|
+            (source.is_a?(Array) ? source : [source]).map do |s|
+              if s.is_a?(String)
+                { 'id' => id, 'source' => s }
+              else
+                s['id'] ||= id
+                s
+              end
             end
           end
         end

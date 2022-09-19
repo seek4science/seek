@@ -2,8 +2,8 @@ class HumanDiseasesController < ApplicationController
   include Seek::DestroyHandling
 
   before_action :human_diseases_enabled?
-  before_action :find_requested_item, :only=>[:show,:tree,:edit,:visualise,:destroy, :update]
-  before_action :login_required,:except=>[:show,:tree,:index,:visualise]
+  before_action :find_requested_item, :only=>[:show,:tree,:edit,:destroy, :update]
+  before_action :login_required,:except=>[:show,:tree,:index]
   before_action :can_manage?,:only=>[:edit,:update]
   before_action :auth_to_create, :only=>[:new,:create, :destroy]
   before_action :find_assets, only: [:index]
@@ -43,13 +43,6 @@ class HumanDiseasesController < ApplicationController
           }.compact.to_json
         }
       end
-    end
-  end
-
-  def visualise
-    @no_sidebar=true
-    respond_to do |format|
-      format.html
     end
   end
 

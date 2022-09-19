@@ -960,6 +960,36 @@ class WorkflowsControllerTest < ActionController::TestCase
     assert_equal 'Concat two files', assigns(:workflow).title
   end
 
+  test 'can update paths and extract metadata for remote, unfetched workflow' do
+    mock_remote_file "#{Rails.root}/test/fixtures/files/workflows/rp2-to-rp2path-packed.cwl", 'https://www.abc.com/workflow.cwl'
+    cwl = Factory(:cwl_workflow_class)
+
+    workflow = Factory(:git_version).resource
+    gv = workflow.git_version
+    login_as(workflow.contributor)
+
+
+    assert_difference('Git::Annotation.count', 1) do
+      assert_no_enqueued_jobs(only: RemoteGitContentFetchingJob) do
+        gv.add_remote_file('new-main-workflow.cwl', 'https://www.abc.com/workflow.cwl', fetch: false)
+        gv.save!
+      end
+    end
+
+    assert_equal 0, workflow.structure.inputs.count
+
+    assert_difference('Git::Annotation.count', 1) do
+      patch :update_paths, params: { id: workflow.id,
+                                     git_version: { main_workflow_path: 'new-main-workflow.cwl' },
+                                     workflow: { workflow_class_id: cwl.id },
+                                     extract_metadata: '1' }
+
+      assert_response :success
+    end
+
+    assert_equal 5, assigns(:workflow).structure.inputs.count
+  end
+
   test 'new version form for git-versioned workflow redirect to new_git_version' do
     with_config_value(:git_support_enabled, false) do
       workflow = Factory(:git_version).resource
@@ -1101,9 +1131,9 @@ class WorkflowsControllerTest < ActionController::TestCase
 
   end
 
-  test 'should update workflow edam annotations ' do
-    Factory(:edam_topics_controlled_vocab)
-    Factory(:edam_operations_controlled_vocab)
+  test 'should update workflow annotations ' do
+    Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
+    Factory(:operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.operations_controlled_vocab
 
     user = Factory(:user)
     workflow = Factory(:cwl_workflow, contributor: user.person)
@@ -1112,16 +1142,16 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     assert_equal 'Common Workflow Language', workflow.workflow_class_title
 
-    put :update, params: { id: workflow.id, workflow: { edam_topics: 'Chemistry, Sample collections',edam_operations:'Clustering, Expression correlation analysis' } }
+    put :update, params: { id: workflow.id, workflow: { topic_annotations: 'Chemistry, Sample collections', operation_annotations:'Clustering, Expression correlation analysis' } }
 
-    assert_equal ['http://edamontology.org/topic_3314','http://edamontology.org/topic_3277'], assigns(:workflow).edam_topics
-    assert_equal ['http://edamontology.org/operation_3432','http://edamontology.org/operation_3463'], assigns(:workflow).edam_operations
+    assert_equal ['http://edamontology.org/topic_3314','http://edamontology.org/topic_3277'], assigns(:workflow).topic_annotations
+    assert_equal ['http://edamontology.org/operation_3432','http://edamontology.org/operation_3463'], assigns(:workflow).operation_annotations
 
   end
 
-  test 'show edam annotations if set' do
-    Factory(:edam_topics_controlled_vocab)
-    Factory(:edam_operations_controlled_vocab)
+  test 'show annotations if set' do
+    Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
+    Factory(:operations_controlled_vocab) unless SampleControlledVocab::SystemVocabs.operations_controlled_vocab
 
     user = Factory(:user)
     workflow = Factory(:cwl_workflow, contributor: user.person)
@@ -1129,19 +1159,19 @@ class WorkflowsControllerTest < ActionController::TestCase
 
     get :show, params: {id: workflow.id}
     assert_response :success
-    assert_select 'div.panel div.panel-heading',text:/EDAM Properties/i, count:0
+    assert_select 'div.panel div.panel-heading',text:/Annotated Properties/i, count:0
 
-    workflow.edam_topics = "Chemistry"
+    workflow.topic_annotations = "Chemistry"
     workflow.save!
 
-    assert workflow.edam_annotations?
+    assert workflow.controlled_vocab_annotations?
 
     get :show, params: {id: workflow.id}
     assert_response :success
 
-    assert_select 'div.panel div.panel-heading',text:/EDAM Properties/i, count:1
-    assert_select 'div.panel div.panel-body div strong',text:/Topics/, count:1
-    assert_select 'div.panel div.panel-body a[href=?]','https://edamontology.github.io/edam-browser/#topic_3314',text:/Chemistry/, count:1
+    assert_select 'div.panel div.panel-heading', text:/Annotated Properties/i, count:1
+    assert_select 'div.panel div.panel-body div strong', text:/#{I18n.t('attributes.topic_annotation_values')}/, count:1
+    assert_select 'div.panel div.panel-body a[href=?]', 'https://edamontology.github.io/edam-browser/#topic_3314',text:/Chemistry/, count:1
   end
 
   test 'should create with presentation and document links' do
@@ -1188,7 +1218,11 @@ class WorkflowsControllerTest < ActionController::TestCase
     login_as(person)
     blob = Factory(:content_blob)
     session[:uploaded_content_blob_id] = blob.id
-    workflow =  {title: 'workflow', project_ids: [person.projects.first.id], data_file_ids:[data_file.id] }
+    workflow = {
+      title: 'workflow',
+      project_ids: [person.projects.first.id],
+      workflow_data_files_attributes: ['',{data_file_id: data_file.id}]
+    }
 
     assert_difference('Workflow.count') do
       post :create_metadata, params: {workflow: workflow, content_blob_uuid: blob.uuid.to_s, policy_attributes: { access_type: Policy::VISIBLE }}
@@ -1316,10 +1350,5 @@ class WorkflowsControllerTest < ActionController::TestCase
     get :show, params: { id: workflow.id, format: :jsonld }
     json = JSON.parse(response.body)
     assert_equal Seek::BioSchema::Serializer.new(workflow.latest_version).json_representation, json
-  end
-
-  def edit_max_object(workflow)
-    add_tags_to_test_object(workflow)
-    add_creator_to_test_object(workflow)
   end
 end

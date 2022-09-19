@@ -258,23 +258,6 @@ class PeopleController < ApplicationController
     end
   end
 
-  def set_project_related_roles(person)
-    return unless params[:roles]
-
-    # TODO: Replace this with `Project.authorized_for` after `auth_perf` merged
-    administered_project_ids = Project.all.select { |project| project.can_manage?(user) }.map { |p| p.id.to_s }
-
-    Seek::Roles::ProjectRelatedRoles.role_names.each do |role_name|
-      # remove for the project ids that can be administered
-      person.remove_roles(Seek::Roles::RoleInfo.new(role_name: role_name, items: administered_project_ids))
-
-      # add only the project ids that can be administered
-      if project_ids = (params[:roles][role_name] & administered_project_ids)
-        person.add_roles(Seek::Roles::RoleInfo.new(role_name: role_name, items: project_ids))
-      end
-    end
-  end
-
   def is_user_admin_or_personless
     unless User.admin_logged_in? || !current_user.registration_complete?
       error('You do not have permission to create new people', 'Is invalid (not admin)')

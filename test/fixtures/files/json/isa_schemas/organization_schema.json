@@ -1,0 +1,12 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "title" : "ISA organization schema",
+    "description" : "JSON-schema representing an organization in the ISA model v1.0",
+    "type" : "object",
+    "properties" : {
+       "name" : {
+           "type" : "string"
+       }
+    },
+  "additionalProperties": false
+}

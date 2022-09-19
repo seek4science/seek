@@ -1,0 +1,35 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "content_blobs",
+    "attributes": {
+      "original_filename": "min file",
+      "url": "http://example.com/remote.txt",
+      "md5sum": "726de0a3f94d65056b909b9736e10349",
+      "sha1sum": "fbcc0dee4b5415de4c82ef5b137d8231fec1331b",
+      "content_type": "text/plain",
+      "size": 8
+    },
+    "relationships": {
+      "asset": {
+        "data": {
+          "id": "<%= res.asset_id %>",
+          "type": "sops"
+        }
+      }
+    },
+    "links": {
+      "self": "/sops/<%= res.asset_id %>/content_blobs/<%= res.id %>"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "api_version": "0.3",
+      "uuid": "<%= res.uuid %>",
+      "base_url": "http://localhost:3000"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

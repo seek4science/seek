@@ -4,18 +4,11 @@ require 'minitest/mock'
 class PresentationsControllerTest < ActionController::TestCase
   include AuthenticatedTestHelper
   include SharingFormTestHelper
-  include RestTestCases
   include GeneralAuthorizationTestCases
 
   def setup
     login_as Factory(:user)
     @project = User.current_user.person.projects.first
-  end
-
-  def rest_api_test_object
-    @object = Factory :presentation, contributor: User.current_user.person
-    @object.annotate_with 'tag1'
-    @object
   end
 
   test 'index' do
@@ -592,10 +585,5 @@ class PresentationsControllerTest < ActionController::TestCase
     end
     assert_redirected_to presentation_path(presentation = assigns(:presentation ))
     assert_empty presentation.discussion_links
-  end
-
-  def edit_max_object(presentation)
-    add_tags_to_test_object(presentation)
-    add_creator_to_test_object(presentation)
   end
 end

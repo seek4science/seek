@@ -1,6 +1,4 @@
-<div class="show_basic">
-  <%= show_title "New sharing policy and permissions" -%>
-</div>
+<%= show_title "New sharing policy and permissions" -%>
 
 <%= form_tag :action => :batch_sharing_permission_changed do %>
   <% resource = (controller_name == 'people') ? current_user.person : @asset %>

@@ -63,14 +63,6 @@ module Seek
       cache('searchable_types') { filter_disabled(user_creatable_types | extras).sort_by(&:name) }
     end
 
-    def self.scalable_types
-      cache('scalable_types') do
-        persistent_classes.select do |c|
-          c.included_modules.include?(Seek::Scalable::InstanceMethods)
-        end.sort_by(&:name)
-      end
-    end
-
     def self.rdf_capable_types
       cache('rdf_capable_types') do
         Seek::Rdf::JERMVocab.defined_types.keys
@@ -85,7 +77,7 @@ module Seek
 
     def self.inline_viewable_content_types
       # FIXME: needs to be discovered rather than hard-code classes here
-      [DataFile, Document, FileTemplate, Model, Presentation, Sop, Workflow]
+      [DataFile, Document, FileTemplate, Model, Presentation, Sop]
     end
 
     def self.multi_files_asset_types
@@ -146,6 +138,11 @@ module Seek
         file = path.sub("#{directory}/", '').sub('.pid', '')
         Daemons::PidFile.new(directory, file)
       end
+    end
+
+    # Use this to avoid needlessly regenerating the url helper module each time a route needs to be accessed
+    def self.routes
+      @_routes ||= Rails.application.routes.url_helpers
     end
 
     private

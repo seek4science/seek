@@ -3,7 +3,6 @@ require 'securerandom' # to set the seek user password to something random when 
 # This controller handles the login/logout function of the site.
 class SessionsController < ApplicationController
   before_action :redirect_to_sign_up_when_no_user, only: :new
-  skip_before_action :restrict_guest_user
   skip_before_action :project_membership_required
   skip_before_action :partially_registered?, only: %i[create new]
 

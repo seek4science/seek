@@ -1,0 +1,3057 @@
+/search:
+  parameters:
+    - name: q
+      in: query
+      required: true
+      description: |
+        The text to search for
+      schema:
+        type: string
+      example: lactate inhibition
+    - name: search_type
+      in: query
+      required: false
+      description: The type of resource to return
+      schema:
+        type: string
+        enum:
+          - assays
+          - collections
+          - data_files
+          - events
+          - institutions
+          - investigations
+          - models
+          - people
+          - presentations
+          - programmes
+          - projects
+          - publications
+          - sample_types
+          - sops
+          - studies
+          - workflows
+      example: data_files
+  get:
+    operationId: search
+    summary: Search SEEK for a given query
+    description:
+      $ref: ../descriptions/searchOperation.md
+    tags:
+      - search
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/searchResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/searchResponse.json
+/assays:
+  get:
+    operationId: listAssays
+    summary: List assays
+    description:
+      $ref: ../descriptions/listAssays.md
+    tags:
+      - list
+      - assays
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/indexResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/assaysResponse.json
+      "501":
+        $ref: "#/components/responses/notImplemented"
+  post:
+    operationId: createAssay
+    summary: Create a new assay
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/createAssay.md
+    tags:
+      - create
+      - assays
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/assayPost"
+      description: The assay to create.
+    responses:
+      "201":
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/assayResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/assayPostResponse.json
+      "400":
+        $ref: "#/components/responses/badRequest"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+"/assays/{id}":
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The assay to be fetched, updated or deleted
+      schema:
+        type: integer
+  patch:
+    operationId: updateAssay
+    summary: Update an assay
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/updateAssay.md
+    tags:
+      - update
+      - assays
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/assayPatch"
+      description: The assay to patch
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/assayResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/assayPatchResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+  get:
+    operationId: readAssay
+    summary: Fetch an assay
+    description:
+      $ref: ../descriptions/readAssay.md
+    tags:
+      - read
+      - assays
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/assayResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/assayResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+  delete:
+    operationId: deleteAssay
+    summary: Delete an assay
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/deleteAssay.md
+    tags:
+      - delete
+      - assays
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/okResponse"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+/collections:
+  get:
+    operationId: listCollections
+    summary: List collections
+    description:
+      $ref: ../descriptions/listCollections.md
+    tags:
+      - list
+      - collections
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/indexResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/collectionsResponse.json
+      "501":
+        $ref: "#/components/responses/notImplemented"
+  post:
+    operationId: createCollection
+    summary: Create a new collection
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/createCollection.md
+    tags:
+      - create
+      - collections
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/collectionPost"
+      description: The collection to create.
+    responses:
+      "201":
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/collectionResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/collectionPostResponse.json
+      "400":
+        $ref: "#/components/responses/badRequest"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+"/collections/{id}":
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The collection to fetch
+      schema:
+        type: integer
+      example: 1152
+  get:
+    operationId: readCollection
+    summary: Fetch a collection
+    description:
+      $ref: ../descriptions/readCollection.md
+    tags:
+      - read
+      - collections
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/collectionResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/collectionResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+  patch:
+    operationId: updateCollection
+    summary: Update a collection
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/updateCollection.md
+    tags:
+      - update
+      - collections
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/collectionPatch"
+      description: The collection to patch.
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/collectionResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/collectionPatchResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+  delete:
+    operationId: deleteCollection
+    summary: Delete a collection
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/deleteCollection.md
+    tags:
+      - delete
+      - collections
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/okResponse"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+"/collections/{collection_id}/items":
+  parameters:
+    - name: collection_id
+      in: path
+      required: true
+      description: The ID of the collection
+      schema:
+        type: integer
+      example: 123
+  get:
+    operationId: listCollectionItems
+    summary: List translation items in a collection
+    description:
+      $ref: ../descriptions/listCollectionItems.md
+    tags:
+      - list
+      - collections
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/collectionItemsResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/collectionItemsResponse.json
+      "501":
+        $ref: "#/components/responses/notImplemented"
+  post:
+    operationId: createCollectionItem
+    summary: Add a new item to a collection
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/createCollectionItem.md
+    tags:
+      - create
+      - collections
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/collectionItemPost"
+      description: The collection item to create.
+    responses:
+      "201":
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/collectionItemResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/collectionItemPostResponse.json
+      "400":
+        $ref: "#/components/responses/badRequest"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+"/collections/{collection_id}/items/{id}":
+  parameters:
+    - name: collection_id
+      in: path
+      required: true
+      description: The ID of the collection
+      schema:
+        type: integer
+      example: 123
+    - name: id
+      in: path
+      required: true
+      description: The ID of the item in the collection
+      schema:
+        type: integer
+      example: 1152
+  get:
+    operationId: readCollectionItem
+    summary: Fetch an item from a collection
+    description:
+      $ref: ../descriptions/readCollectionItem.md
+    tags:
+      - read
+      - collections
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/collectionItemResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/collectionItemResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+  patch:
+    operationId: updateCollectionItem
+    summary: Update an item in a collection
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/updateCollectionItem.md
+    tags:
+      - update
+      - collections
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/collectionItemPatch"
+      description: The collection item to patch.
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/collectionItemResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/collectionItemPatchResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+  delete:
+    operationId: deleteCollectionItem
+    summary: Remove an item from a collection
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/deleteCollectionItem.md
+    tags:
+      - delete
+      - collections
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/okResponse"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+/data_files:
+  get:
+    operationId: listDataFiles
+    summary: List data files
+    description:
+      $ref: ../descriptions/listDataFiles.md
+    tags:
+      - list
+      - dataFiles
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/indexResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/dataFilesResponse.json
+      "501":
+        $ref: "#/components/responses/notImplemented"
+  post:
+    operationId: createDataFile
+    summary: Create a new data file
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/createDataFile.md
+    tags:
+      - create
+      - dataFiles
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/dataFilePost"
+      description: The dataFile to create.
+    responses:
+      "201":
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/dataFileResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/dataFilePostResponse.json
+      "400":
+        $ref: "#/components/responses/badRequest"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+"/data_files/{id}":
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The data file to fetch
+      schema:
+        type: integer
+      example: 1152
+  get:
+    operationId: readDataFile
+    summary: Fetch a data file
+    description:
+      $ref: ../descriptions/readDataFile.md
+    parameters:
+      - name: version
+        in: query
+        required: true
+        description: The version of the data file to get
+        schema:
+          type: integer
+        example: 2
+    tags:
+      - read
+      - dataFiles
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/dataFileResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/dataFileResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+  patch:
+    operationId: updateDataFile
+    summary: Update a data file
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/updateDataFile.md
+    tags:
+      - update
+      - dataFiles
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/dataFilePatch"
+      description: The data file to patch
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/dataFileResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/dataFilePatchResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+  delete:
+    operationId: deleteDataFile
+    summary: Delete a data file
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/deleteDataFile.md
+    tags:
+      - delete
+      - dataFiles
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/okResponse"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+"/{asset_types}/{id}/content_blobs/{blob_id}":
+  parameters:
+    - name: asset_types
+      in: path
+      required: true
+      description: The types of asset being fetched, uploaded or downloaded
+      schema:
+        type: string
+      example: data_files
+    - name: id
+      in: path
+      required: true
+      description: The asset content to fetch, upload or download
+      schema:
+        type: integer
+      example: 1152
+    - name: blob_id
+      in: path
+      required: true
+      description: The asset identifier to fetch, upload or download
+      schema:
+        type: integer
+      example: 1831
+  put:
+    operationId: uploadAssetContent
+    summary: Upload content to an existing content blob placeholder
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/uploadAssetContent.md
+    tags:
+      - upload
+      - contentBlobs
+    requestBody:
+      content:
+        application/octet-stream:
+          schema:
+            type: string
+            format: binary
+      description: The blob content to fetch, upload or download
+    responses:
+      "200":
+        description: Success
+  get:
+    operationId: readContentBlob
+    summary: Fetch information on a content blob
+    description:
+      $ref: ../descriptions/readContentBlob.md
+    tags:
+      - read
+      - contentBlobs
+    responses:
+      "200":
+        description: Success
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/contentBlobResponse"
+          text/csv:
+            schema:
+              $ref: "#/components/schemas/contentBlobResponse"
+      "403":
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/forbiddenResponse"
+          text/csv:
+            schema:
+              $ref: "#/components/schemas/forbiddenResponse"
+      "404":
+        description: Not found
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/notFoundResponse"
+          text/csv:
+            schema:
+              $ref: "#/components/schemas/notFoundResponse"
+"/{asset_types}/{id}/content_blobs/{blob_id}/download":
+  parameters:
+    - name: asset_types
+      in: path
+      required: true
+      description: The typs of asset being downloaded
+      schema:
+        type: string
+      example: data_files
+    - name: id
+      in: path
+      required: true
+      description: The asset to fetch
+      schema:
+        type: integer
+      example: 1152
+    - name: blob_id
+      in: path
+      required: true
+      description: The blob to download
+      schema:
+        type: integer
+      example: 1831
+  get:
+    operationId: downloadAssetContent
+    summary: Download content
+    description:
+      $ref: ../descriptions/downloadAssetContent.md
+    tags:
+      - download
+      - contentBlobs
+    responses:
+      "200":
+        description: Success
+      "403":
+        description: Forbidden
+        content:
+          "*/*":
+            schema:
+              $ref: "#/components/schemas/forbiddenResponse"
+      "404":
+        description: Not found
+        content:
+          "*/*":
+            schema:
+              $ref: "#/components/schemas/notFoundResponse"
+/documents:
+  get:
+    operationId: listDocuments
+    summary: List documents
+    description:
+      $ref: ../descriptions/listDocuments.md
+    tags:
+      - list
+      - documents
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/indexResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/documentsResponse.json
+      "501":
+        $ref: "#/components/responses/notImplemented"
+  post:
+    operationId: createDocument
+    summary: Create a new document
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/createDocument.md
+    tags:
+      - create
+      - documents
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/documentPost"
+      description: The document to create.
+    responses:
+      "201":
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/documentResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/documentPostResponse.json
+      "400":
+        $ref: "#/components/responses/badRequest"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+"/documents/{id}":
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The document to fetch
+      schema:
+        type: integer
+      example: 1152
+  get:
+    operationId: readDocument
+    summary: Fetch a document
+    description:
+      $ref: ../descriptions/readDocument.md
+    tags:
+      - read
+      - documents
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/documentResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/documentResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+  patch:
+    operationId: updateDocument
+    summary: Update a document
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/updateDocument.md
+    tags:
+      - update
+      - documents
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/documentPatch"
+      description: The document to patch.
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/documentResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/documentPatchResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+  delete:
+    operationId: deleteDocument
+    summary: Delete a document
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/deleteDocument.md
+    tags:
+      - delete
+      - documents
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/okResponse"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+/events:
+  get:
+    operationId: listEvents
+    summary: List events
+    description:
+      $ref: ../descriptions/listEvents.md
+    tags:
+      - list
+      - events
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/indexResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/eventsResponse.json
+      "501":
+        $ref: "#/components/responses/notImplemented"
+  post:
+    operationId: createEvent
+    summary: Create a new event
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/createEvent.md
+    tags:
+      - create
+      - events
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/eventPost"
+      description: The event to create.
+    responses:
+      "201":
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/eventResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/eventPostResponse.json
+      "400":
+        $ref: "#/components/responses/badRequest"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+"/events/{id}":
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The event to fetch
+      schema:
+        type: integer
+      example: 75
+  get:
+    operationId: readEvent
+    summary: Fetch an event
+    description:
+      $ref: ../descriptions/readEvent.md
+    tags:
+      - read
+      - events
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/eventResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/eventResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+  patch:
+    operationId: updateEvent
+    summary: Update an event
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/updateEvent.md
+    tags:
+      - update
+      - events
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/eventPatch"
+      description: The event to update.
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/eventResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/eventPatchResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+  delete:
+    operationId: deleteEvent
+    summary: Delete an event
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/deleteEvent.md
+    tags:
+      - delete
+      - events
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/okResponse"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+/institutions:
+  get:
+    operationId: listInstitutions
+    summary: List institutions
+    description:
+      $ref: ../descriptions/listInstitutions.md
+    tags:
+      - list
+      - institutions
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/indexResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/institutionsResponse.json
+      "501":
+        $ref: "#/components/responses/notImplemented"
+  post:
+    operationId: createInstitution
+    summary: Create a new institution
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/createInstitution.md
+    tags:
+      - create
+      - institutions
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/institutionPost"
+      description: The institution to create.
+    responses:
+      "201":
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/institutionResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/institutionPostResponse.json
+      "400":
+        $ref: "#/components/responses/badRequest"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+"/institutions/{id}":
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The institution to fetch, patch or delete
+      schema:
+        type: integer
+      example: 142
+  get:
+    operationId: readInstitution
+    summary: Fetch an institution
+    description:
+      $ref: ../descriptions/readInstitution.md
+    tags:
+      - read
+      - institutions
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/institutionResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/institutionResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+  patch:
+    operationId: updateInstitution
+    summary: Update an institution
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/updateInstitution.md
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/institutionPatch"
+      description: The data with which to update the institution.
+    tags:
+      - update
+      - institutions
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/institutionResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/institutionPatchResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+  delete:
+    operationId: deleteInstitution
+    summary: Delete an institution
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/deleteInstitution.md
+    tags:
+      - delete
+      - institutions
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/okResponse"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+/investigations:
+  get:
+    operationId: listInvestigations
+    summary: List investigations
+    description:
+      $ref: ../descriptions/listInvestigations.md
+    tags:
+      - list
+      - investigations
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/indexResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/investigationsResponse.json
+      "501":
+        $ref: "#/components/responses/notImplemented"
+  post:
+    operationId: createInvestigation
+    summary: Create a new investigation
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/createInvestigation.md
+    tags:
+      - create
+      - investigations
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/investigationPost"
+      description: The investigation to create.
+    responses:
+      "201":
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/investigationResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/investigationPostResponse.json
+      "400":
+        $ref: "#/components/responses/badRequest"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+"/investigations/{id}":
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The investigation to fetch, patch or delete
+      schema:
+        type: integer
+      example: 56
+  get:
+    operationId: readInvestigation
+    summary: Fetch an investigation
+    description:
+      $ref: ../descriptions/readInvestigation.md
+    tags:
+      - read
+      - investigations
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/investigationResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/investigationResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+  patch:
+    operationId: updateInvestigation
+    summary: Update an investigation
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/updateInvestigation.md
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/investigationPatch"
+      description: The investigation to patch.
+    tags:
+      - update
+      - investigations
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/investigationResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/investigationPatchResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+  delete:
+    operationId: deleteInvestigation
+    summary: Delete an investigation
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/deleteInvestigation.md
+    tags:
+      - delete
+      - investigations
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/okResponse"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+/models:
+  get:
+    operationId: listModels
+    summary: List models
+    description:
+      $ref: ../descriptions/listModels.md
+    tags:
+      - list
+      - models
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/indexResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/modelsResponse.json
+      "501":
+        $ref: "#/components/responses/notImplemented"
+  post:
+    operationId: createModel
+    summary: Create a new model
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/createModel.md
+    tags:
+      - create
+      - models
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/modelPost"
+      description: The model to create.
+    responses:
+      "201":
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/modelResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/modelPostResponse.json
+      "400":
+        $ref: "#/components/responses/badRequest"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+"/models/{id}":
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The model to fetch, patch or delete
+      schema:
+        type: integer
+      example: 139
+  get:
+    operationId: readModel
+    summary: Fetch a model
+    description:
+      $ref: ../descriptions/readModel.md
+    parameters:
+      - name: version
+        in: query
+        required: true
+        description: The version of the model to get
+        schema:
+          type: integer
+        example: 2
+    tags:
+      - read
+      - models
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/modelResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/modelResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+  patch:
+    operationId: updateModel
+    summary: Update a model
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/updateModel.md
+    tags:
+      - update
+      - models
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/modelPatch"
+      description: The model to patch.
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/modelResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/modelPatchResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+  delete:
+    operationId: deleteModel
+    summary: Delete a model
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/deleteModel.md
+    tags:
+      - delete
+      - models
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/okResponse"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+/organisms:
+  get:
+    operationId: listOrganisms
+    summary: List organisms
+    description:
+      $ref: ../descriptions/listOrganisms.md
+    tags:
+      - list
+      - organisms
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/indexResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/organismsResponse.json
+      "501":
+        $ref: "#/components/responses/notImplemented"
+"/organisms/{id}":
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The organism to fetch, patch or delete
+      schema:
+        type: integer
+      example: 1933753696
+  get:
+    operationId: readOrganism
+    summary: Fetch an organism
+    description:
+      $ref: ../descriptions/readOrganism.md
+    tags:
+      - read
+      - organisms
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/organismResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/organismResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+/people:
+  get:
+    operationId: listPeople
+    summary: List people
+    description:
+      $ref: ../descriptions/listPeople.md
+    tags:
+      - list
+      - people
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/indexResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/peopleResponse.json
+      "501":
+        $ref: "#/components/responses/notImplemented"
+  post:
+    operationId: createPerson
+    summary: Create a new person
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/createPerson.md
+    tags:
+      - create
+      - people
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/personPost"
+      description: The person to create.
+    responses:
+      "201":
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/personResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/personPostResponse.json
+      "400":
+        $ref: "#/components/responses/badRequest"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+/people/current:
+  get:
+    operationId: currentPerson
+    summary: Fetch the currently authenticated user
+    description:
+      $ref: ../descriptions/currentPerson.md
+    tags:
+      - read
+      - people
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/personResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/personResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+"/people/{id}":
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The person to fetch, patch or delete
+      schema:
+        type: integer
+      example: 433
+  get:
+    operationId: readPerson
+    summary: Fetch a person
+    description:
+      $ref: ../descriptions/readPerson.md
+    tags:
+      - read
+      - people
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/personResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/personResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+  patch:
+    operationId: updatePerson
+    summary: Update a person
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/updatePerson.md
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/personPatch"
+      description: The data with which to update the person.
+    tags:
+      - update
+      - people
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/personResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/personPatchResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+  delete:
+    operationId: deletePerson
+    summary: Delete a person
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/deletePerson.md
+    tags:
+      - delete
+      - people
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/okResponse"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+/presentations:
+  get:
+    operationId: listPresentations
+    summary: List presentations
+    description:
+      $ref: ../descriptions/listPresentations.md
+    tags:
+      - list
+      - presentations
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/indexResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/presentationsResponse.json
+      "501":
+        $ref: "#/components/responses/notImplemented"
+  post:
+    operationId: createPresentation
+    summary: Create a new presentation
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/createPresentation.md
+    tags:
+      - create
+      - presentations
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/presentationPost"
+      description: The presentation to create.
+    responses:
+      "201":
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/presentationResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/presentationPostResponse.json
+      "400":
+        $ref: "#/components/responses/badRequest"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+"/presentations/{id}":
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The presentation to fetch, patch or delete
+      schema:
+        type: integer
+      example: 253
+  get:
+    operationId: readPresentation
+    summary: Fetch a presentation
+    description:
+      $ref: ../descriptions/readPresentation.md
+    parameters:
+      - name: version
+        in: query
+        required: true
+        description: The version of the presentation to get
+        schema:
+          type: integer
+        example: 1
+    tags:
+      - read
+      - presentations
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/presentationResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/presentationResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+  patch:
+    operationId: updatePresentation
+    summary: Update a presentation
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/updatePresentation.md
+    tags:
+      - update
+      - presentations
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/presentationPatch"
+      description: The presentation to update.
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/presentationResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/presentationPatchResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+  delete:
+    operationId: deletePresentation
+    summary: Delete a presentation
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/deletePresentation.md
+    tags:
+      - delete
+      - presentations
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/okResponse"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+/programmes:
+  get:
+    operationId: listProgrammes
+    summary: List programmes
+    description:
+      $ref: ../descriptions/listProgrammes.md
+    tags:
+      - list
+      - programmes
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/indexResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/programmesResponse.json
+      "501":
+        $ref: "#/components/responses/notImplemented"
+  post:
+    operationId: createProgramme
+    summary: Create a new programme
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/createProgramme.md
+    tags:
+      - create
+      - programmes
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/programmePost"
+      description: The programme to create.
+    responses:
+      "201":
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/programmeResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/programmePostResponse.json
+      "400":
+        $ref: "#/components/responses/badRequest"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+"/programmes/{id}":
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The programme to fetch, patch or delete
+      schema:
+        type: integer
+      example: 3
+  get:
+    operationId: readProgramme
+    summary: Fetch a programme
+    description:
+      $ref: ../descriptions/readProgramme.md
+    tags:
+      - read
+      - programmes
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/programmeResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/programmeResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+  patch:
+    operationId: updateProgramme
+    summary: Update a programme
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/updateProgramme.md
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/programmePatch"
+      description: The data with which to update the programme.
+    tags:
+      - update
+      - programmes
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/programmeResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/programmePatchResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+  delete:
+    operationId: deleteProgramme
+    summary: Delete a programme
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/deleteProgramme.md
+    tags:
+      - delete
+      - programmes
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/okResponse"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+/projects:
+  get:
+    operationId: listProjects
+    summary: List projects
+    description:
+      $ref: ../descriptions/listProjects.md
+    tags:
+      - list
+      - projects
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/indexResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/projectsResponse.json
+      "501":
+        $ref: "#/components/responses/notImplemented"
+  post:
+    operationId: createProject
+    summary: Create a new project
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/createProject.md
+    tags:
+      - create
+      - projects
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/projectPost"
+      description: The project to create.
+    responses:
+      "201":
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/projectResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/projectPostResponse.json
+      "400":
+        $ref: "#/components/responses/badRequest"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+"/projects/{id}":
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The project to fetch, patch or delete
+      schema:
+        type: integer
+      example: 17
+  get:
+    operationId: readProject
+    summary: Fetch a project
+    description:
+      $ref: ../descriptions/readProject.md
+    tags:
+      - read
+      - projects
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/projectResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/projectResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+  patch:
+    operationId: updateProject
+    summary: Update a project
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/updateProject.md
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/projectPatch"
+      description: The data with which to update the project.
+    tags:
+      - update
+      - projects
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/projectResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/projectPatchResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+  delete:
+    operationId: deleteProject
+    summary: Delete a project
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/deleteProject.md
+    tags:
+      - delete
+      - projects
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/okResponse"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+/publications:
+  get:
+    operationId: listPublications
+    summary: List publications
+    description:
+      $ref: ../descriptions/listPublications.md
+    tags:
+      - list
+      - publications
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/indexResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/publicationsResponse.json
+      "501":
+        $ref: "#/components/responses/notImplemented"
+"/publications/{id}":
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The publication to fetch, patch or delete
+      schema:
+        type: integer
+      example: 240
+  get:
+    operationId: readPublication
+    summary: Fetch a publication
+    description:
+      $ref: ../descriptions/readPublication.md
+    tags:
+      - read
+      - publications
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/publicationResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/publicationResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+/samples:
+  post:
+    operationId: createSample
+    summary: Create a new sample
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/createSample.md
+    tags:
+      - create
+      - samples
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/samplePost"
+      description: The sample to create.
+    responses:
+      "201":
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/sampleResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/samplePostResponse.json
+      "400":
+        $ref: "#/components/responses/badRequest"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+"/samples/{id}":
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The sample to fetch, patch or delete
+      schema:
+        type: integer
+  get:
+    operationId: readSample
+    summary: Fetch a sample
+    description:
+      $ref: ../descriptions/readSample.md
+    tags:
+      - read
+      - samples
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/sampleResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/sampleResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+  patch:
+    operationId: updateSample
+    summary: Update a sample
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/updateSample.md
+    tags:
+      - update
+      - samples
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/samplePatch"
+      description: The sample to update.
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/sampleResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/samplePatchResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+  delete:
+    operationId: deleteSample
+    summary: Delete a sample
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/deleteSample.md
+    tags:
+      - delete
+      - samples
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/okResponse"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+/sample_attribute_types:
+  get:
+    operationId: listSampleAttributeTypes
+    summary: List possible sample attribute types
+    description:
+      $ref: ../descriptions/listSampleAttributeTypes.md
+    tags:
+      - list
+      - sampleAttributeTypes
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/indexResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/sampleAttributeTypesResponse.json
+      "501":
+        $ref: "#/components/responses/notImplemented"
+/sample_types:
+  get:
+    operationId: listSampleTypes
+    summary: List sample types
+    description:
+      $ref: ../descriptions/listSampleTypes.md
+    tags:
+      - list
+      - sampleTypes
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/indexResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/sampleTypesResponse.json
+      "501":
+        $ref: "#/components/responses/notImplemented"
+  post:
+    operationId: createSampleType
+    summary: Create a new sample type
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/createSampleType.md
+    tags:
+      - create
+      - sampleTypes
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/sampleTypePost"
+      description: The sampleType to create.
+    responses:
+      "201":
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/sampleTypeResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/sampleTypePostResponse.json
+      "400":
+        $ref: "#/components/responses/badRequest"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+"/sample_types/{id}":
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The sample type to be fetched, updated or deleted
+      schema:
+        type: integer
+  get:
+    operationId: readSampleType
+    summary: Fetch a sample type
+    description:
+      $ref: ../descriptions/readSampleType.md
+    tags:
+      - read
+      - sampleTypes
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/sampleTypeResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/sampleTypeResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+  patch:
+    operationId: updateSampleType
+    summary: Update a sample type
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/updateSampleType.md
+    tags:
+      - update
+      - sampleTypes
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/sampleTypePatch"
+      description: The sample type to patch
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/sampleTypeResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/sampleTypePatchResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+  delete:
+    operationId: deleteSampleType
+    summary: Delete a sample type
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/deleteSampleType.md
+    tags:
+      - delete
+      - sampleTypes
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/okResponse"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+/sops:
+  get:
+    operationId: listSops
+    summary: List sops
+    description:
+      $ref: ../descriptions/listSops.md
+    tags:
+      - list
+      - sops
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/indexResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/sopsResponse.json
+      "501":
+        $ref: "#/components/responses/notImplemented"
+  post:
+    operationId: createSop
+    summary: Create a new sop
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/createSop.md
+    tags:
+      - create
+      - sops
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/sopPost"
+      description: The sop to create.
+    responses:
+      "201":
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/sopResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/sopPostResponse.json
+      "400":
+        $ref: "#/components/responses/badRequest"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+"/sops/{id}":
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The SOP to fetch, patch or delete
+      schema:
+        type: integer
+      example: 203
+  get:
+    operationId: readSop
+    summary: Fetch a sop
+    description:
+      $ref: ../descriptions/readSop.md
+    parameters:
+      - name: version
+        in: query
+        required: true
+        description: The version of the sop to get
+        schema:
+          type: integer
+        example: 1
+    tags:
+      - read
+      - sops
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/sopResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/sopResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+  patch:
+    operationId: updateSop
+    summary: Update a sop
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/updateSop.md
+    tags:
+      - update
+      - sops
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/sopPatch"
+      description: The sop to update.
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/sopResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/sopPatchResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+  delete:
+    operationId: deleteSop
+    summary: Delete a sop
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/deleteSop.md
+    tags:
+      - delete
+      - sops
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/okResponse"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+/studies:
+  get:
+    operationId: listStudies
+    summary: List studies
+    description:
+      $ref: ../descriptions/listStudies.md
+    tags:
+      - list
+      - studies
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/indexResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/studiesResponse.json
+      "501":
+        $ref: "#/components/responses/notImplemented"
+  post:
+    operationId: createStudy
+    summary: Create a new study
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/createStudy.md
+    tags:
+      - create
+      - studies
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/studyPost"
+      description: The study to create.
+    responses:
+      "201":
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/studyResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/studyPostResponse.json
+      "400":
+        $ref: "#/components/responses/badRequest"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+"/studies/{id}":
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The study to fetch, patch or delete
+      schema:
+        type: integer
+      example: 138
+  get:
+    operationId: readStudy
+    summary: Fetch a study
+    description:
+      $ref: ../descriptions/readStudy.md
+    tags:
+      - read
+      - studies
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/studyResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/studyResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+  patch:
+    operationId: updateStudy
+    summary: Update a study
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/updateStudy.md
+    tags:
+      - update
+      - studies
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/studyPatch"
+      description: The study to update.
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/studyResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/studyPatchResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+  delete:
+    operationId: deleteStudy
+    summary: Delete a study
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/deleteStudy.md
+    tags:
+      - delete
+      - studies
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/okResponse"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+/workflows:
+  get:
+    operationId: listWorkflows
+    summary: List workflows
+    description:
+      $ref: ../descriptions/listWorkflows.md
+    tags:
+      - list
+      - workflows
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/indexResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/workflowsResponse.json
+      "501":
+        $ref: "#/components/responses/notImplemented"
+  post:
+    operationId: createWorkflow
+    summary: Create a new workflow
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/createWorkflow.md
+    tags:
+      - create
+      - workflows
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/workflowPost"
+      description: The workflow to create.
+    responses:
+      "201":
+        description: Created
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/workflowResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/workflowPostResponse.json
+      "400":
+        $ref: "#/components/responses/badRequest"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+"/workflows/{id}":
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: The workflow to fetch, patch or delete
+      schema:
+        type: integer
+      example: 138
+  get:
+    operationId: readWorkflow
+    summary: Fetch a workflow
+    description:
+      $ref: ../descriptions/readWorkflow.md
+    tags:
+      - read
+      - workflows
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/workflowResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/workflowResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+  patch:
+    operationId: updateWorkflow
+    summary: Update a workflow
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/updateWorkflow.md
+    tags:
+      - update
+      - workflows
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/workflowPatch"
+      description: The workflow to update.
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/workflowResponse"
+            examples:
+              response:
+                value:
+                  $ref: ../examples/workflowPatchResponse.json
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"
+      "422":
+        $ref: "#/components/responses/unprocessableEntity"
+  delete:
+    operationId: deleteWorkflow
+    summary: Delete a workflow
+    security:
+      - OAuth2:
+          - write
+      - apiToken: [ ]
+      - basicAuth: [ ]
+    description:
+      $ref: ../descriptions/deleteWorkflow.md
+    tags:
+      - delete
+      - workflows
+    responses:
+      "200":
+        description: OK
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/okResponse"
+      "403":
+        $ref: "#/components/responses/forbidden"
+      "404":
+        $ref: "#/components/responses/notFound"

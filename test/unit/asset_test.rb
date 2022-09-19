@@ -489,4 +489,14 @@ class AssetTest < ActiveSupport::TestCase
     assert ActiveRecord::Relation,Investigation.filter_by_projects(projects).is_a?(ActiveRecord::Relation)
   end
 
+  test 'cache key includes version' do
+    df = Factory(:data_file)
+
+    # check it hasn't be overridden
+    assert_nil df.method(:cache_key).super_method
+
+    assert_equal df.cache_key_with_version, df.cache_key
+    refute ActiveRecord::Base.cache_versioning
+  end
+
 end

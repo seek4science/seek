@@ -5,11 +5,15 @@
 require 'authenticated_system'
 
 class ApplicationController < ActionController::Base
+  USER_CONTENT_CSP = "default-src 'self'"
+
   include Seek::Errors::ControllerErrorHandling
   include Seek::EnabledFeaturesFilter
   include Recaptcha::Verify
-
   include CommonSweepers
+  include ResourceHelper
+
+  protect_from_forgery unless: -> { request.format.json? }
 
   # if the logged in user is currently partially registered, force the continuation of the registration process
   before_action :partially_registered?
@@ -28,14 +32,13 @@ class ApplicationController < ActionController::Base
 
   before_action :project_membership_required, only: [:create, :new]
 
-  before_action :restrict_guest_user, only: [:new, :edit, :batch_publishing_preview]
-
   before_action :check_doorkeeper_scopes, if: :doorkeeper_token
   before_action :check_json_id_type, only: [:create, :update], if: :json_api_request?
   before_action :convert_json_params, only: [:update, :destroy, :create, :create_version], if: :json_api_request?
   before_action :secure_user_content
-
   before_action :rdf_enabled? #only allows through rdf calls to supported types
+
+  include FairSignposting
 
   helper :all
 
@@ -135,25 +138,12 @@ class ApplicationController < ActionController::Base
 
   private
 
-  # returns the model asset assigned to the standard object for that controller, e.g. @model for models_controller
-  def determine_asset_from_controller
-    name = controller_name.singularize
-    instance_variable_get("@#{name}")
-  end
-
-  def restrict_guest_user
-    if current_user && current_user.guest?
-      flash[:error] = 'You cannot perform this action as a Guest User. Please sign in or register for an account first.'
-      redirect_back fallback_location: main_app.root_path
-    end
-  end
-
   def project_membership_required
     unless User.logged_in_and_member? || admin_logged_in?
       flash[:error] = "Only members of #{t('project').downcase.pluralize} can create content."
       respond_to do |format|
         format.html do
-          object = determine_asset_from_controller
+          object = resource_for_controller
           if !object.nil? && object.try(:can_view?)
             redirect_to object
           else
@@ -256,6 +246,17 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def requested_item_authorized?(object)
+    privilege = Seek::Permissions::Translator.translate(action_name)
+    return false if privilege.nil?
+
+    if is_auth?(object, privilege)
+      true
+    else
+      false
+    end
+  end
+
   def handle_authorization_failure_redirect(object, privilege)
     redirect_to(object)
   end
@@ -311,7 +312,7 @@ class ApplicationController < ActionController::Base
     return (params.has_key?(:view) && params[:view]!="default")||
       (!params.has_key?(:view) && session.has_key?(:view) && !session[:view].nil? && session[:view]!="default")
   end
-  
+
   helper_method :is_condensed_view
 
 
@@ -412,7 +413,9 @@ class ApplicationController < ActionController::Base
 
   # determines and returns the object related to controller, e.g. @data_file
   def object_for_request
-    instance_variable_get("@#{controller_name.singularize}")
+    ctl_name = controller_name.singularize
+    var = instance_variable_get("@#{ctl_name}")
+    ctl_name.include?('isa') ? var.send(ctl_name.sub('isa_', '')) : var
   end
 
   def expire_activity_fragment_cache(controller, action)
@@ -474,8 +477,8 @@ class ApplicationController < ActionController::Base
 #    }
 #  end
 
-  def policy_params
-    params.slice(:policy_attributes).permit(
+  def policy_params(parameters=params)
+    parameters.slice(:policy_attributes).permit(
         policy_attributes: [:access_type,
                             { permissions_attributes: [:access_type,
                                                        :contributor_type,
@@ -565,19 +568,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def determine_custom_metadata_keys
-    keys = []
-    root_key = controller_name.singularize.to_sym
-    attribute_params = params[root_key][:custom_metadata_attributes]
-    if attribute_params && attribute_params[:custom_metadata_type_id].present?
-      metadata_type = CustomMetadataType.find(attribute_params[:custom_metadata_type_id])
-      if metadata_type
-        keys = [:custom_metadata_type_id] + metadata_type.custom_metadata_attributes.collect(&:method_name)
-      end
-    end
-    keys
-  end
-
   # Dynamically get parent resource from URL.
   # i.e. /data_files/123/some_sub_resource/456
   # would fetch DataFile with ID 123
@@ -626,7 +616,7 @@ class ApplicationController < ActionController::Base
   # Stop hosted user content from running scripts etc.
   def secure_user_content
     if self.class.user_content_actions.include?(action_name.to_sym)
-      response.set_header('Content-Security-Policy', "default-src 'self'")
+      response.set_header('Content-Security-Policy', USER_CONTENT_CSP)
     end
   end
 
@@ -663,4 +653,5 @@ class ApplicationController < ActionController::Base
                                     :orcid, :pos, :_destroy] }
     ]
   end
+
 end

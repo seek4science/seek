@@ -4,8 +4,6 @@ ENV['RAILS_ENV'] ||= 'test'
 require_relative '../config/environment'
 require 'rails/test_help'
 
-require 'rest_test_cases'
-require 'rdf_test_cases'
 require 'sharing_form_test_helper'
 require 'general_authorization_test_cases'
 require 'ruby-prof'
@@ -21,7 +19,10 @@ require 'minitest/reporters'
 require 'minitest'
 require 'ostruct'
 require 'pry'
-require 'json_test_helper'
+require 'api_test_helper'
+require 'integration/api/read_api_test_suite'
+require 'integration/api/write_api_test_suite'
+require 'rdf_test_cases'
 
 Minitest::Reporters.use! [Minitest::Reporters::DefaultReporter.new(fast_fail: true,
                                                                    color: true,
@@ -74,6 +75,15 @@ Kernel.class_eval do
     yield
     Seek::Config.send("#{config}=", oldval)
   end
+
+  def with_relative_root(root)
+    oldval = Rails.application.config.relative_url_root
+    Rails.application.config.relative_url_root = root
+    Rails.application.default_url_options = Seek::Config.site_url_options
+    yield
+    Rails.application.config.relative_url_root = oldval
+    Rails.application.default_url_options = Seek::Config.site_url_options
+  end
 end
 
 class ActiveSupport::TestCase
@@ -94,7 +104,7 @@ class ActiveSupport::TestCase
   # always create initial person, as this will always be an admin. Avoid some confusion in the tests where a person
   # is unexpectedly an admin
   def create_initial_person
-    Factory(:admin, first_name: 'default admin')
+    disable_authorization_checks { Factory(:admin, first_name: 'default admin') }
   end
 
   # At least one sample attribute type is needed for building sample types from spreadsheets
@@ -111,28 +121,13 @@ class ActiveSupport::TestCase
     User.current_user = nil
   end
 
-  def add_avatar_to_test_object(obj)
-    disable_authorization_checks do
-      obj.avatar = Factory(:avatar, owner: obj)
-      obj.save!
-    end
+  def perform_jsonapi_checks
+    assert_response :success
+    assert_equal 'application/vnd.api+json', @response.media_type
+    assert JSON::Validator.validate(File.join(Rails.root, 'public', 'api', 'jsonapi-schema-v1'),
+                                    @response.body), 'Response did not validate against JSON-API schema'
   end
 
-  def add_tags_to_test_object(obj)
-    name = obj.class.to_s
-    #for i in 1..5 do
-    [1,2,3,4,5].each do |i|
-      tag = Factory :tag, value: "#{name}-tag#{i}", source: User.current_user, annotatable: obj
-      obj.reload
-    end
-  end
-
-  def add_creator_to_test_object(obj)
-    disable_authorization_checks do
-      obj.creators = [Factory(:person)]
-      obj.save!
-    end
-  end
   # Transactional fixtures accelerate your tests by wrapping each test method
   # in a transaction that's rolled back on completion.  This ensures that the
   # test database remains unchanged so your fixtures don't have to be reloaded

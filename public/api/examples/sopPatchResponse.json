@@ -1,103 +1,154 @@
 {
-    "data": {
-        "id": "49",
-        "type": "sops",
-        "attributes": {
-            "policy": {
-                "access": "manage",
-                "permissions": []
+  "data": {
+    "id": "16",
+    "type": "sops",
+    "attributes": {
+      "policy": {
+        "access": "no_access",
+        "permissions": [
+          {
+            "resource": {
+              "id": "218",
+              "type": "projects"
             },
-            "title": "This Sop",
-            "description": "Protocol",
-            "license": null,
-            "latest_version": 1,
-            "tags": [],
-            "versions": [
-                {
-                    "version": 1,
-                    "revision_comments": null,
-                    "url": "http://localhost:3000/sops/49?version=1"
-                }
-            ],
-            "version": 1,
-            "revision_comments": null,
-            "created_at": "2018-04-27T14:42:16.000Z",
-            "updated_at": "2018-04-27T14:42:21.000Z",
-            "content_blobs": [
-                {
-                    "original_filename": "file-97",
-                    "url": null,
-                    "md5sum": "479e5c9c6807e8de11ab91b273c0eae7",
-                    "sha1sum": "2977f9e45eb27e83c8389ea18e663ab7d840b19c",
-                    "content_type": "application/pdf",
-                    "link": "http://localhost:3000/sops/49/content_blobs/296",
-                    "size": 10
-                }
-            ],
-            "other_creators": null
-        },
-        "relationships": {
-            "creators": {
-                "data": [
-                    {
-                        "id": "1333",
-                        "type": "people"
-                    }
-                ]
-            },
-            "submitter": {
-                "data": [
-                    {
-                        "id": "1332",
-                        "type": "people"
-                    }
-                ]
-            },
-            "people": {
-                "data": [
-                    {
-                        "id": "1332",
-                        "type": "people"
-                    },
-                    {
-                        "id": "1333",
-                        "type": "people"
-                    }
-                ]
-            },
-            "projects": {
-                "data": [
-                    {
-                        "id": "2010",
-                        "type": "projects"
-                    }
-                ]
-            },
-            "investigations": {
-                "data": []
-            },
-            "studies": {
-                "data": []
-            },
-            "assays": {
-                "data": []
-            },
-            "publications": {
-                "data": []
-            }
-        },
-        "links": {
-            "self": "/sops/49?version=1"
-        },
-        "meta": {
-            "created": "2018-04-27T14:42:15.000Z",
-            "modified": "2018-04-27T14:42:17.000Z",
-            "api_version": "0.1",
-            "uuid": "1a593b30-2c57-0136-ec2f-08002734982f",
-            "base_url": "http://localhost:3000"
+            "access": "edit"
+          }
+        ]
+      },
+      "discussion_links": [
+
+      ],
+      "title": "A Maximally Patched SOP",
+      "license": "CC-BY-4.0",
+      "description": "Protocol",
+      "latest_version": 1,
+      "tags": [
+        "tag1",
+        "tag2",
+        "tag3"
+      ],
+      "versions": [
+        {
+          "version": 1,
+          "revision_comments": null,
+          "url": "http://localhost:3000/sops/16?version=1",
+          "doi": null
         }
+      ],
+      "version": 1,
+      "revision_comments": null,
+      "created_at": "2022-06-07T14:12:53.000Z",
+      "updated_at": "2022-06-07T14:12:53.000Z",
+      "doi": null,
+      "content_blobs": [
+        {
+          "original_filename": "sop.pdf",
+          "url": null,
+          "md5sum": "63f964868d572e9de7e5a61b2dc27cfa",
+          "sha1sum": "77197c545a4465cedfc6d75258b7c2765869010c",
+          "content_type": "application/pdf",
+          "link": "http://localhost:3000/sops/16/content_blobs/89",
+          "size": 9
+        }
+      ],
+      "creators": [
+        {
+          "profile": "/people/205",
+          "family_name": "Last",
+          "given_name": "Person167",
+          "affiliation": "An Institution: 207",
+          "orcid": null
+        }
+      ],
+      "other_creators": "John Smith, Jane Smith"
     },
-    "jsonapi": {
-        "version": "1.0"
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "205",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "204",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "204",
+            "type": "people"
+          },
+          {
+            "id": "205",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "218",
+            "type": "projects"
+          }
+        ]
+      },
+      "investigations": {
+        "data": [
+          {
+            "id": "32",
+            "type": "investigations"
+          }
+        ]
+      },
+      "studies": {
+        "data": [
+          {
+            "id": "30",
+            "type": "studies"
+          }
+        ]
+      },
+      "assays": {
+        "data": [
+          {
+            "id": "28",
+            "type": "assays"
+          }
+        ]
+      },
+      "publications": {
+        "data": [
+
+        ]
+      },
+      "workflows": {
+        "data": [
+          {
+            "id": "8",
+            "type": "workflows"
+          }
+        ]
+      }
+    },
+    "links": {
+      "self": "/sops/16?version=1"
+    },
+    "meta": {
+      "created": "2022-06-07T14:12:53.000Z",
+      "modified": "2022-06-07T14:12:53.000Z",
+      "api_version": "0.3",
+      "base_url": "http://localhost:3000",
+      "uuid": "d838c140-c899-013a-0f7e-0a81884ed284"
     }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
 }

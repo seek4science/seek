@@ -64,6 +64,8 @@ recaptcha_enabled:
 publish_button_enabled:
 project_browser_enabled:
 project_single_page_enabled:
+project_single_page_advanced_enabled:
+sample_type_template_enabled:
 experimental_features_enabled:
 pdf_conversion_enabled:
 admin_impersonation_enabled:
@@ -72,7 +74,6 @@ guide_box_enabled:
 documentation_enabled:
 tagging_enabled:
 authorization_checks_enabled:
-magic_guest_enabled:
 assay_type_ontology_file:
 technology_type_ontology_file:
 modelling_analysis_type_ontology_file:
@@ -243,7 +244,6 @@ workflow_class_list_enabled:
 git_support_enabled:
 immediate_git_fetch:
 home_description_position:
-
 observed_variables_enabled:
 observed_variable_sets_enabled:
-
+fair_signposting_enabled:

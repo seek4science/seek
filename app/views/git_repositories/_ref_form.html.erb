@@ -1,5 +1,3 @@
-<% in_progress = git_repository.remote_git_fetch_task&.in_progress? %>
-
 <div id="repo-ref-form" data-field-name="<%= name -%>">
   <div id="repo-fetching-status" style="display: none">
     <div class="alert alert-info" role="alert">
@@ -25,10 +23,6 @@
       <div role="tabpanel" class="tab-pane select-ref-pane active" id="refs-branches"></div>
       <div role="tabpanel" class="tab-pane select-ref-pane" id="refs-tags"></div>
     </div>
-
-    <hr/>
-
-    <%= create_button class: 'btn btn-primary'-%>
   </div>
 </div>
 
@@ -74,6 +68,7 @@
         var field = $j('#repo-ref-form').data('fieldName');
         $j('#repo-fetching-status').hide();
         $j('#repo-ref-list').show();
+        $j('#git-create-button').show();
         var branches = $j('#refs-branches');
         refs.branches.forEach(function (ref) {
             branches.append(HandlebarsTemplates['git/ref']({ ref: ref, field: field }));
@@ -84,9 +79,11 @@
         });
     };
 
-    <% if in_progress %>
+    <% if git_repository.remote_git_fetch_task&.in_progress? %>
     $j('#repo-fetching-status').show();
     GitRepository.pollInterval = setInterval(GitRepository.fetchStatus, 2000);
+    <% elsif git_repository.remote_git_fetch_task&.failed? %>
+    GitRepository.error("An error occurred whilst trying to fetch the git repository refs.");
     <% else %>
     GitRepository.fetchRefs();
     <% end %>

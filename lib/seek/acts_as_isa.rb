@@ -13,7 +13,6 @@ module Seek
     module ClassMethods
       def acts_as_isa
         acts_as_favouritable
-        acts_as_scalable
         acts_as_authorized
         acts_as_uniquely_identifiable
         acts_as_discussable

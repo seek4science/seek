@@ -8,23 +8,32 @@ class Task < ApplicationRecord
   belongs_to :resource, polymorphic: true, inverse_of: :tasks
 
   def completed?
-    status == STATUS_DONE || status == STATUS_FAILED
+    [STATUS_DONE, STATUS_FAILED].include?(status)
   end
 
   def pending?
-    status == STATUS_WAITING || status == STATUS_QUEUED
+    [STATUS_WAITING, STATUS_QUEUED].include?(status)
   end
 
   def in_progress?
-    status == STATUS_QUEUED || status == STATUS_ACTIVE
+    Task.status_in_progress?(status)
   end
 
   def cancelled?
     status == STATUS_CANCELLED
   end
 
+  def success?
+    status == STATUS_DONE
+  end
+
+  def failed?
+    status == STATUS_FAILED
+  end
+
   def start
     return if persisted? && (pending? || in_progress?)
+
     update_attribute(:status, Task::STATUS_WAITING)
     yield if block_given?
   end
@@ -32,5 +41,8 @@ class Task < ApplicationRecord
   def cancel
     update_attribute(:status, Task::STATUS_CANCELLED)
   end
-end
 
+  def self.status_in_progress?(current_status)
+    [STATUS_QUEUED, STATUS_ACTIVE].include?(current_status)
+  end
+end

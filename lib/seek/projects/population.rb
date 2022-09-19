@@ -115,7 +115,7 @@ module Seek
 
             set_assignees(assay, r, assignee_indices)
 
-            if r.cell(protocol_index)&.value.present?
+            if protocol_index.present? && r.cell(protocol_index)&.value.present?
               set_protocol(assay, r, protocol_index)
             end
             assay.save!

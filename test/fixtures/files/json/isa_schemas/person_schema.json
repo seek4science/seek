@@ -1,0 +1,30 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema",
+    "title" : "ISA person schema",
+    "description" : "JSON-schema representing a person in the ISA model",
+    "type" : "object",
+    "properties" : {
+        "@id": { "type": "string", "format": "uri" },
+        "lastName" : { "type" : "string"},
+        "firstName" : { "type" : "string"},
+        "midInitials" : { "type" : "string" },
+        "email" : { "type" : "string", "format" : "email"},
+        "phone" : { "type": "string"},
+        "fax" : { "type" : "string" },
+        "address" : { "type" : "string" },
+        "affiliation" : { "type" : "string" },
+        "roles" : {
+            "type" : "array",
+            "items" : {
+                "$ref": "ontology_annotation_schema.json#"
+            }
+        },
+        "comments" : {
+            "type": "array",
+            "items": {
+                 "$ref": "comment_schema.json#"
+            }
+        }
+    },
+    "additionalProperties": false
+}

@@ -3,7 +3,7 @@ class Person < ApplicationRecord
   acts_as_annotation_source
 
   include Seek::Annotatable
-  include Seek::Roles::AdminDefinedRoles
+  include Seek::Roles::Target
 
   auto_strip_attributes :email, :first_name, :last_name, :web_page
 
@@ -11,7 +11,8 @@ class Person < ApplicationRecord
 
   acts_as_yellow_pages
 
-  before_save :first_person_admin_and_add_to_default_project
+  before_save :first_person_add_to_default_project
+  after_save :first_person_admin
 
   acts_as_notifiee
 
@@ -58,7 +59,7 @@ class Person < ApplicationRecord
   has_many :assets_creators, dependent: :destroy, foreign_key: 'creator_id'
 
   RELATED_RESOURCE_TYPES = %w[DataFile Sop Model Document Publication Presentation
-                              Sample Event Investigation Study Assay Strain Workflow Collection FileTemplate Placeholder].freeze
+                              Sample Event Investigation Study Assay Strain Workflow Collection FileTemplate Placeholder Template].freeze
 
   RELATED_RESOURCE_TYPES.each do |type|
     plural = type.tableize
@@ -126,19 +127,6 @@ class Person < ApplicationRecord
   # to make it look like a User
   def person
     self
-  end
-
-  def projects
-    # you can't access these through .projects nested associations until they have been saved
-    work_groups.collect(&:project).uniq | group_memberships.collect { |gm| gm.work_group.project }
-  end
-
-  # Returns the columns to be shown on the table view for the resource
-  def columns_default
-    super + ['first_name','last_name']
-  end
-  def columns_allowed
-    columns_default + ['email','phone','skype_name','web_page','orcid']
   end
 
   # not registered profiles that match this email
@@ -268,7 +256,7 @@ class Person < ApplicationRecord
 
   # returns true this is an admin person, and they are the only one defined - indicating they are person creating during setting up SEEK
   def only_first_admin_person?
-    Person.count == 1 && [self] == Person.all && Person.first.is_admin?
+    Person.count == 1 && Person.first == self && is_admin?
   end
 
   def update_first_letter
@@ -295,10 +283,6 @@ class Person < ApplicationRecord
     user && user == User.current_user
   end
 
-  def can_view?(user = User.current_user)
-    true
-  end
-
   # can be edited by:
   # (admin or project managers of this person) and (this person does not have a user or not the other admin)
   # themself
@@ -306,7 +290,7 @@ class Person < ApplicationRecord
     return false unless user
     return true if new_record? && self.class.can_create?
     user = user.user if user.is_a?(Person)
-    (user == self.user) || user.is_admin? || (is_project_administered_by?(user) && self.user.nil?)
+    (user == self.user) || user.is_admin? || (is_project_administered_by?(user.person) && self.user.nil?)
   end
 
   # admin can administer other people, project manager can administer other people except other admins and themself
@@ -355,14 +339,13 @@ class Person < ApplicationRecord
     permissions.each(&:destroy)
   end
 
-  # a utitlity method to simply add a person to a project and institution
+  # a utility method to simply add a person to a project and institution
   # will automatically handle the WorkGroup and GroupMembership, and avoid creating duplicates
   def add_to_project_and_institution(project, institution)
     group = WorkGroup.where(project_id: project.id, institution_id: institution.id).first
     group ||= WorkGroup.new project: project, institution: institution
 
-
-    membership = GroupMembership.where(person_id: id, work_group_id: group.id).first
+    membership = GroupMembership.where(person: self, work_group: group).first
     membership ||= GroupMembership.new person: self, work_group: group
 
     group_memberships << membership
@@ -378,7 +361,7 @@ class Person < ApplicationRecord
 
   # projects this person is project admin of
   def administered_projects
-    projects.select{|proj| person.is_project_administrator?(proj)}
+    projects.select{|project| person.is_project_administrator?(project)}
   end
 
   # activation email logs associated with this person
@@ -400,12 +383,21 @@ class Person < ApplicationRecord
   private
 
   # a before_save trigger, that checks if the person is the first one created, and if so defines it as admin
-  def first_person_admin_and_add_to_default_project
+  def first_person_add_to_default_project
     if Person.count.zero?
-      self.is_admin = true
-      project = Project.first
-      if project && project.institutions.any?
-        add_to_project_and_institution(project, project.institutions.first)
+      disable_authorization_checks do
+        project = Project.first
+        if project && project.institutions.any?
+          add_to_project_and_institution(project, project.institutions.first)
+        end
+      end
+    end
+  end
+
+  def first_person_admin
+    if Person.count == 1 && Person.first == self && !is_admin?
+      disable_authorization_checks do
+        self.is_admin = true
       end
     end
   end

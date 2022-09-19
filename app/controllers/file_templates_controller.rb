@@ -44,7 +44,7 @@ class FileTemplatesController < ApplicationController
   end
 
   def update
-
+    update_annotations(params[:tag_list], @file_template) if params.key?(:tag_list)
     update_sharing_policies @file_template
     update_relationships(@file_template,params)
 
@@ -86,9 +86,8 @@ class FileTemplatesController < ApplicationController
   def file_template_params
     params.require(:file_template).permit(:title, :description, { project_ids: [] }, :license, :other_creators,
                                 { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
-                                :edam_formats,
-                                :edam_data,
+                                { creator_ids: [] }, { assay_assets_attributes: [:assay_id] },
+                                :data_format_annotations, :data_type_annotations,
                                 { publication_ids: [] }, { event_ids: [] },
                                 discussion_links_attributes:[:id, :url, :label, :_destroy])
   end

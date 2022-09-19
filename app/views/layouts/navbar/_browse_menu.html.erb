@@ -10,7 +10,7 @@
         [t('programme').pluralize, programmes_path, Seek::Config.programmes_enabled],
         [t('project').pluralize, projects_path, true],
         [t('institution').pluralize, institutions_path, true],
-        [t('profile').pluralize, people_path, true]
+        [t('person').pluralize, people_path, true]
     ]) %>
 
     <%= render_menu_group(t('menu.isa'), [
@@ -35,7 +35,9 @@
       [t('event').pluralize, events_path, Seek::Config.events_enabled],
     ]) %>
 
-    <%= render_menu_group(t('menu.samples'), [       
+    <%= render_menu_group(t('menu.samples'), [
+        [t('sample').pluralize, select_sample_types_path, Seek::Config.samples_enabled],
+        [t('template').pluralize, templates_path, Seek::Config.sample_type_template_enabled],
         [t('sample_type').pluralize, sample_types_path, Seek::Config.samples_enabled],
         [t('strain').pluralize, strains_path,  Seek::Config.organisms_enabled],
         [t('organism').pluralize, organisms_path,  Seek::Config.organisms_enabled],

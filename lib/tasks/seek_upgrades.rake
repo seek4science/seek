@@ -8,19 +8,21 @@ namespace :seek do
   # these are the tasks required for this version upgrade
   task upgrade_version_tasks: %i[
     environment
-    db:seed:010_workflow_classes
-    db:seed:011_edam_topics
-    db:seed:012_edam_operations   
-    db:seed:013_workflow_data_file_relationships
-    rename_branding_settings
+    db:seed:007_sample_attribute_types
     update_missing_openbis_istest
     update_missing_publication_versions
-    db:seed:013_edam_formats
-    db:seed:014_edam_data
+    update_edam_controlled_vocab_keys
+    db:seed:011_topics_controlled_vocab
+    db:seed:012_operations_controlled_vocab
+    db:seed:013_formats_controlled_vocab
+    db:seed:014_data_controlled_vocab
+    db:seed:015_isa_tags
     remove_orphaned_versions
-    create_seek_sample_multi
-    rename_seek_sample_attribute_types
     seek:rebuild_workflow_internals
+    remove_scale_annotations
+    remove_spreadsheet_annotations
+    convert_roles
+    update_edam_annotation_attributes
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -31,10 +33,10 @@ namespace :seek do
 
   desc('upgrades SEEK from the last released version to the latest released version')
   task(upgrade: [:environment]) do
-    puts "Starting upgrade ..."
-    puts "... trimming old session data ..."
+    puts 'Starting upgrade ...'
+    puts '... trimming old session data ...'
     Rake::Task['db:sessions:trim'].invoke
-    puts "... migrating database ..."
+    puts '... migrating database ...'
     Rake::Task['db:migrate'].invoke
     Rake::Task['tmp:clear'].invoke
 
@@ -42,12 +44,12 @@ namespace :seek do
     Seek::Config.solr_enabled = false
 
     begin
-      puts "... performing upgrade tasks ..."
+      puts '... performing upgrade tasks ...'
       Rake::Task['seek:standard_upgrade_tasks'].invoke
       Rake::Task['seek:upgrade_version_tasks'].invoke
 
       Seek::Config.solr_enabled = solr
-      puts "... queuing search reindexing jobs ..."
+      puts '... queuing search reindexing jobs ...'
       Rake::Task['seek:reindex_all'].invoke if solr
 
       puts 'Upgrade completed successfully'
@@ -56,17 +58,7 @@ namespace :seek do
     end
   end
 
-  task(rename_branding_settings: [:environment]) do
-    Seek::Config.transfer_value :project_link, :instance_link
-    Seek::Config.transfer_value :project_name, :instance_name
-    Seek::Config.transfer_value :project_description, :instance_description
-    Seek::Config.transfer_value :project_keywords, :instance_keywords
-
-    Seek::Config.transfer_value :dm_project_name, :instance_admins_name
-    Seek::Config.transfer_value :dm_project_link, :instance_admins_link
-  end
-
- task(update_missing_openbis_istest: :environment) do
+  task(update_missing_openbis_istest: :environment) do
     puts '... creating missing is_test for OpenbisEndpoint...'
     create = 0
     disable_authorization_checks do
@@ -120,27 +112,6 @@ namespace :seek do
     puts "... finished removing #{count} orphaned versions"
   end
 
-  task(create_seek_sample_multi: [:environment]) do
-    if SampleAttributeType.where(base_type: Seek::Samples::BaseType::SEEK_SAMPLE_MULTI).empty?
-      seek_sample_multi_type = SampleAttributeType.find_or_initialize_by(title:'Registered Sample (multiple)')
-      seek_sample_multi_type.update(base_type: Seek::Samples::BaseType::SEEK_SAMPLE_MULTI)
-    end
-  end
-
-  task(rename_seek_sample_attribute_types: [:environment]) do
-    type = SampleAttributeType.where(base_type: Seek::Samples::BaseType::SEEK_SAMPLE).first
-    type&.update_column(:title, 'Registered Sample')
-
-    type = SampleAttributeType.where(base_type: Seek::Samples::BaseType::SEEK_SAMPLE_MULTI).first
-    type&.update_column(:title, 'Registered Sample (multiple)')
-
-    type = SampleAttributeType.where(base_type: Seek::Samples::BaseType::SEEK_STRAIN).first
-    type&.update_column(:title, 'Registered Strain')
-
-    type = SampleAttributeType.where(base_type: Seek::Samples::BaseType::SEEK_DATA_FILE).first
-    type&.update_column(:title, 'Registered Data file')
-  end
-
   task(convert_mysql_charset: [:environment]) do
     if ActiveRecord::Base.connection.instance_values["config"][:adapter] == 'mysql2'
       puts "Attempting MySQL database conversion"
@@ -176,4 +147,95 @@ namespace :seek do
       puts "Database adapter is: #{ActiveRecord::Base.connection.instance_values["config"][:adapter]}, doing nothing"
     end
   end
+
+  task(remove_scale_annotations: [:environment]) do
+    a = Annotation.joins(:annotation_attribute).where(annotation_attribute: { name: ['additional_scale_info', 'scale'] })
+    count = a.count
+    a.destroy_all
+    AnnotationAttribute.where(name:['scale','additional_scale_info']).destroy_all
+    puts "Removed #{count} scale related annotations" if count > 0
+  end
+
+  task(remove_spreadsheet_annotations: [:environment]) do
+    annotations = Annotation.where(annotatable_type: 'CellRange')
+    count = annotations.count
+    values = TextValue.joins(:annotations).where(annotations: { annotatable_type: 'CellRange' })
+    values.select{|v| v.annotations.count == 1}.each(&:destroy)
+    annotations.destroy_all
+    AnnotationAttribute.where(name:'annotation').destroy_all
+    puts "Removed #{count} spreadsheet related annotations" if count > 0
+  end
+
+  task(convert_roles: [:environment]) do
+    puts 'Converting roles...'
+    disable_authorization_checks do
+      Person.find_each do |person|
+        RoleType.for_system.each do |rt|
+          mask = rt.id
+          if (person.roles_mask & mask) != 0
+            Role.where(role_type_id: rt.id, person_id: person.id, scope: nil).first_or_create!
+          end
+        end
+      end
+
+      class AdminDefinedRoleProject < ActiveRecord::Base; end
+
+      AdminDefinedRoleProject.find_each do |role|
+        RoleType.for_projects.each do |rt|
+          mask = rt.id
+          if (role.role_mask & mask) != 0
+            Role.where(role_type_id: rt.id, person_id: role.person_id,
+                       scope_type: 'Project', scope_id: role.project_id).first_or_create!
+          end
+        end
+      end
+
+      class AdminDefinedRoleProgramme < ActiveRecord::Base; end
+
+      AdminDefinedRoleProgramme.find_each do |role|
+        RoleType.for_programmes.each do |rt|
+          mask = rt.id
+          if (role.role_mask & mask) != 0
+            Role.where(role_type_id: rt.id, person_id: role.person_id,
+                       scope_type: 'Programme', scope_id: role.programme_id).first_or_create!
+          end
+        end
+      end
+    end
+  end
+
+  task(update_edam_annotation_attributes: [:environment]) do
+    defs = {
+      "edam_formats": "data_format_annotations",
+      "edam_topics": "topic_annotations",
+      "edam_operations": "operation_annotations",
+      "edam_data": "data_type_annotations"
+    }
+    defs.each do |old_name,new_name|
+      query = AnnotationAttribute.where(name: old_name)
+      if query.any?
+        puts "Updating EDAM based #{old_name} Annotation Attributes"
+        query.update_all(name: new_name)
+      end
+    end
+  end
+
+  task(update_edam_controlled_vocab_keys: [:environment]) do
+    defs = {
+      topics: 'edam_topics',
+      operations: 'edam_operations',
+      data_formats: 'edam_formats',
+      data_types: 'edam_data'
+    }
+
+    defs.each do |property, old_key|
+      new_key = SampleControlledVocab::SystemVocabs.database_key_for_property(property)
+      query = SampleControlledVocab.where(key: old_key)
+      if query.any?
+        puts "Updating key for #{old_key} controlled vocabulary"
+        query.update_all(key: new_key)
+      end
+    end
+  end
+
 end

@@ -1,0 +1,132 @@
+{
+  "data": {
+    "id": "<%= res.id %>",
+    "type": "file_templates",
+    "attributes": {
+      "policy": {
+        "access": "download",
+        "permissions": []
+      },
+      "tags": [
+        "FileTemplate-tag1",
+        "FileTemplate-tag2",
+        "FileTemplate-tag3",
+        "FileTemplate-tag4",
+        "FileTemplate-tag5"
+      ],
+      "creators": [
+        {
+          "profile": "/people/<%= res.assets_creators.first.creator_id %>",
+          "family_name": "<%= res.assets_creators.first.family_name %>",
+          "given_name": "<%= res.assets_creators.first.given_name %>",
+          "affiliation": "<%= res.assets_creators.first.affiliation %>",
+          "orcid": null
+        }
+      ],
+      "title": "A Maximal FileTemplate",
+      "description": "The important report we did for ~important-milestone~",
+      "data_type_annotations": [
+        {
+          "label": "Sequence features metadata",
+          "identifier": "http://edamontology.org/data_2914"
+        }
+      ],
+      "data_format_annotations": [
+        {
+          "label": "JSON",
+          "identifier": "http://edamontology.org/format_3464"
+        }
+      ],
+      "license": null,
+      "latest_version": 1,
+      "versions": [
+        {
+          "version": 1,
+          "revision_comments": null,
+          "url": "http://localhost:3000/file_templates/<%= res.id %>?version=1"
+        }
+      ],
+      "version": 1,
+      "revision_comments": null,
+      "created_at": "<%= res.find_version(1).created_at.as_json %>",
+      "updated_at": "<%= res.find_version(1).updated_at.as_json %>",
+      "content_blobs": [
+        {
+          "original_filename": "min file",
+          "url": null,
+          "md5sum": "726de0a3f94d65056b909b9736e10349",
+          "sha1sum": "fbcc0dee4b5415de4c82ef5b137d8231fec1331b",
+          "content_type": "application/pdf",
+          "link": "http://localhost:3000/file_templates/<%= res.id %>/content_blobs/<%= res.content_blob.id %>",
+          "size": 8
+        }
+      ],
+      "other_creators": "Blogs, Joe",
+      "discussion_links": [
+        {
+          "id":
+          "<%= res.discussion_link_ids.first %>",
+          "url": "http://www.slack.com/",
+          "label": "Slack"
+        }
+      ]
+    },
+    "relationships": {
+      "creators": {
+        "data": [
+          {
+            "id": "<%= res.creator_ids.first %>",
+            "type": "people"
+          }
+        ]
+      },
+      "submitter": {
+        "data": [
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "people": {
+        "data": [
+          {
+            "id": "<%= res.creator_ids.first %>",
+            "type": "people"
+          },
+          {
+            "id": "<%= current_person.id %>",
+            "type": "people"
+          }
+        ]
+      },
+      "projects": {
+        "data": [
+          {
+            "id": "<%= res.project_ids.first %>",
+            "type": "projects"
+          }
+        ]
+      },
+      "data_files": {
+        "data": []
+      },
+      "placeholders": {
+        "data": []
+      }
+    },
+    "links": {
+      "self": "/file_templates/<%= res.id %>?version=1"
+    },
+    "meta": {
+      "created": "<%= res.created_at.as_json %>",
+      "modified": "<%= res.updated_at.as_json %>",
+      "uuid": "<%= res.uuid %>",
+      "base_url": "http://localhost:3000",
+      "api_version": "0.3"
+    }
+  },
+  "jsonapi": {
+    "version": "1.0"
+  }
+}

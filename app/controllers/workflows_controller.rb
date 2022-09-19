@@ -17,7 +17,7 @@ class WorkflowsController < ApplicationController
   include RoCrateHandling
   include Legacy::WorkflowSupport
 
-  api_actions :index, :show, :create, :update, :destroy, :ro_crate
+  api_actions :index, :show, :create, :update, :destroy, :ro_crate, :create_version
   user_content_actions :diagram
 
   rescue_from ROCrate::ReadException do |e|
@@ -338,10 +338,10 @@ class WorkflowsController < ApplicationController
     params.require(:workflow).permit(:title, :description, :workflow_class_id, # :metadata,
                                      { project_ids: [] }, :license,
                                      { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
-                                     { creator_ids: [] }, { assay_assets_attributes: [:assay_id] }, { scales: [] },
-                                     { publication_ids: [] }, { presentation_ids: [] }, { document_ids: [] }, { data_file_ids: [] },
-                                     { data_file_ids: [] }, { workflow_data_files_attributes:[:id, :data_file_id, :workflow_data_file_relationship_id, :_destroy] },
-                                     :internals, :maturity_level, :source_link_url, :edam_topics, :edam_operations,
+                                     { creator_ids: [] }, { assay_assets_attributes: [:assay_id] },
+                                     { publication_ids: [] }, { presentation_ids: [] }, { document_ids: [] }, { data_file_ids: [] }, { sop_ids: [] },
+                                     { workflow_data_files_attributes:[:id, :data_file_id, :workflow_data_file_relationship_id, :_destroy] },
+                                     :internals, :maturity_level, :source_link_url, :topic_annotations, :operation_annotations,
                                      { discussion_links_attributes: [:id, :url, :label, :_destroy] },
                                      { git_version_attributes: [:name, :comment, :ref, :commit, :root_path,
                                                                 :git_repository_id, :main_workflow_path,
@@ -364,5 +364,9 @@ class WorkflowsController < ApplicationController
 
   def git_version_path_params
     params.require(:git_version).permit(:main_workflow_path, :abstract_cwl_path, :diagram_path)
+  end
+
+  def param_converter_options
+    { skip: [:data_file_ids] }
   end
 end

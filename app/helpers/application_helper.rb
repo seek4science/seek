@@ -78,9 +78,9 @@ module ApplicationHelper
     # FIXME: this contains some duplication of Seek::Rdf::RdfGeneration#rdf_resource - however not every model includes that Module at this time.
     # ... its also a bit messy handling the version
     url = if resource.is_a_version?
-            URI.join(Seek::Config.site_base_host + '/', "#{resource.parent.class.name.tableize}/", "#{resource.parent.id}?version=#{resource.version}").to_s
+            polymorphic_url(resource.parent, version: resource.version, **Seek::Config.site_url_options)
           else
-            URI.join(Seek::Config.site_base_host + '/', "#{resource.class.name.tableize}/", resource.id.to_s).to_s
+            polymorphic_url(resource, **Seek::Config.site_url_options)
           end
 
     content_tag :p, class: :id do
@@ -430,16 +430,6 @@ module ApplicationHelper
     c.singularize.camelize.constantize
   end
 
-  # returns the instance for the resource for the controller, e.g @data_file for data_files
-  def resource_for_controller(c = controller_name)
-    instance_variable_get("@#{c.singularize}")
-  end
-
-  # returns the current version of the resource for the controller, e.g @display_data_file for data_files
-  def versioned_resource_for_controller(c = controller_name)
-    instance_variable_get("@display_#{c.singularize}")
-  end
-
   def cancel_button(path, html_options = {})
     html_options[:class] ||= ''
     html_options[:class] << ' btn btn-default'
@@ -520,7 +510,7 @@ module ApplicationHelper
                   'people' => 'People', 'sessions' => 'Login', 'users' => { 'new' => 'Signup', '*' => 'Account' }, 'search' => 'Search',
                   'assays' => I18n.t('assays.assay').pluralize.capitalize, 'sops' => I18n.t('sop').pluralize, 'models' => I18n.t('model').pluralize, 'data_files' => I18n.t('data_file').pluralize, 'documents' => 'Documents',
                   'publications' => 'Publications', 'investigations' => I18n.t('investigation').pluralize, 'studies' => I18n.t('study').pluralize,
-                  'samples' => 'Samples', 'strains' => 'Strains', 'organisms' => 'Organisms', 'human_disease' => 'Human Diseases', 'biosamples' => 'Biosamples', 'sample_types' => 'Sample Types',
+                  'samples' => 'Samples', 'strains' => 'Strains', 'organisms' => 'Organisms', 'human_disease' => 'Human Diseases', 'biosamples' => 'Biosamples', 'sample_types' => 'Sample Types','templates' => 'Templates',
                   'presentations' => I18n.t('presentation').pluralize, 'programmes' => I18n.t('programme').pluralize, 'events' => I18n.t('event').pluralize, 'help_documents' => 'Help' }.freeze
 
   def show_page_tab

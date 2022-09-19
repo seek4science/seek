@@ -1,5 +1,7 @@
 module RdfHelper
   include ApplicationHelper
+  include ResourceHelper
+
   def asset_rdf
     resource_for_controller.to_rdf
   end

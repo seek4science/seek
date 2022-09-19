@@ -5,17 +5,12 @@ class ModelsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include SharingFormTestHelper
   include RdfTestCases
   include GeneralAuthorizationTestCases
 
   def setup
     login_as(:model_owner)
-  end
-
-  def rest_api_test_object
-    @object = Factory :model_2_files, contributor: User.current_user.person, policy: Factory(:private_policy), organism: Factory(:organism)
   end
 
   test 'should get index' do
@@ -234,60 +229,6 @@ class ModelsControllerTest < ActionController::TestCase
     new_assay.reload
     refute_includes original_assay.models, m
     assert_includes new_assay.models, m
-  end
-
-  test 'association of scales' do
-    scale1 = Factory :scale, pos: 1
-    scale2 = Factory :scale, pos: 2
-    model_params = valid_model
-
-    assert_difference('Model.count') do
-      post :create, params: { model: model_params.merge(scales: [scale1.id.to_s, scale2.id.to_s]), content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing }
-    end
-    m = assigns(:model)
-    assert_not_nil m
-    assert_equal [scale1, scale2], m.scales
-    scale3 = Factory(:scale)
-
-    put :update, params: { id: m.id, model: { title: m.title, scales: [scale3.id.to_s] } }
-    m = assigns(:model)
-    assert_equal [scale3], m.scales
-  end
-
-  test 'association of scales with params' do
-    scale1 = Factory :scale, pos: 1
-    scale2 = Factory :scale, pos: 2
-    model_params = valid_model
-    scale_ids_and_params = ["{\"scale_id\":\"#{scale1.id}\",\"param\":\"fish\",\"unit\":\"meter\"}",
-                            "{\"scale_id\":\"#{scale2.id}\",\"param\":\"carrot\",\"unit\":\"cm\"}",
-                            "{\"scale_id\":\"#{scale1.id}\",\"param\":\"soup\",\"unit\":\"minute\"}"]
-
-    model_and_scale_params = model_params.merge(
-                   scale_extra_params: scale_ids_and_params,
-                   scales: [scale1.id.to_s, scale2.id.to_s]
-    )
-
-    assert_difference('Model.count') do
-      post :create, params: { model: model_and_scale_params, content_blobs: [{ data: file_for_upload }], policy_attributes: valid_sharing }
-    end
-    m = assigns(:model)
-    assert_not_nil m
-    assert_equal [scale1, scale2], m.scales
-
-    info = m.fetch_additional_scale_info(scale1.id)
-    assert_equal 2, info.count
-    info.sort! { |a, b| a['param'] <=> b['param'] }
-
-    assert_equal 'fish', info[0]['param']
-    assert_equal 'meter', info[0]['unit']
-    assert_equal 'soup', info[1]['param']
-    assert_equal 'minute', info[1]['unit']
-
-    info = m.fetch_additional_scale_info(scale2.id)
-    assert_equal 1, info.count
-    info = info.first
-    assert_equal 'carrot', info['param']
-    assert_equal 'cm', info['unit']
   end
 
   test 'should create model' do
@@ -1407,13 +1348,6 @@ class ModelsControllerTest < ActionController::TestCase
   def valid_model_with_url
     mock_remote_file "#{Rails.root}/test/fixtures/files/file_picture.png", 'http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png'
     [{ title: 'Test', project_ids: [projects(:sysmo_project).id] }, { data_url: 'http://www.sysmo-db.org/images/sysmo-db-logo-grad2.png', original_filename: 'sysmo-db-logo-grad2.png', make_local_copy: '0' }]
-  end
-
-  def edit_max_object(model)
-    add_tags_to_test_object(model)
-    model[:model_type_id] = (model_types(:ODE)).id
-    model[:recommended_environment_id] = recommended_model_environments(:jws).id
-    add_creator_to_test_object(model)
   end
 
   def doi_citation_mock

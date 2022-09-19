@@ -19,10 +19,6 @@
           <%= render :partial => "projects/project_selector", :locals => { :resource => @presentation } -%>
       <% end -%>
 
-      <% if show_scales? %>
-          <%= render :partial => "scales/scales_selector",:locals=>{:object=>@presentation} %>
-      <% end %>
-
       <%= render :partial => 'assets/license_selector', :locals => { :resource => @presentation } %>
 
       <%= render :partial=> "assets/discussion_links_form", :locals=>{:resource => @presentation} -%>

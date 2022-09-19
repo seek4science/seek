@@ -8,6 +8,7 @@ class SamplesController < ApplicationController
   before_action :samples_enabled?
   before_action :find_index_assets, only: :index
   before_action :find_and_authorize_requested_item, except: [:index, :new, :create, :preview]
+  before_action :templates_enabled?, only: [:query, :query_form]
   
   before_action :auth_to_create, only: [:new, :create]
 
@@ -19,7 +20,15 @@ class SamplesController < ApplicationController
     if @data_file || @sample_type
       respond_to do |format|
         format.html { render(params[:only_content] ? { layout: false } : {})}
-        format.json {render json: :not_implemented, status: :not_implemented }
+        format.json do
+          render json: instance_variable_get("@#{controller_name}"),
+                 each_serializer: SkeletonSerializer,
+                 links: json_api_links,
+                 meta: {
+                     base_url: Seek::Config.site_base_host,
+                     api_version: ActiveModel::Serializer.config.api_version
+                 }
+        end
       end
     else
       respond_to do |format|
@@ -40,7 +49,7 @@ class SamplesController < ApplicationController
 
   def create
     @sample = Sample.new(sample_type_id: params[:sample][:sample_type_id], title: params[:sample][:title])
-    update_sample_with_params
+    @sample = update_sample_with_params
     if @sample.save
       respond_to do |format|
         flash[:notice] = 'The sample was successfully created.'
@@ -59,7 +68,6 @@ class SamplesController < ApplicationController
   def show
     @sample = Sample.find(params[:id])
     respond_to do |format|
-      format.js
       format.html
       format.json {render json: @sample, include: [params[:include]]}
     end
@@ -72,7 +80,7 @@ class SamplesController < ApplicationController
 
   def update
     @sample = Sample.find(params[:id])
-    update_sample_with_params
+    @sample = update_sample_with_params
     respond_to do |format|
       if @sample.save
         flash[:notice] = 'The sample was successfully updated.'
@@ -130,48 +138,63 @@ class SamplesController < ApplicationController
 
   def batch_create
     errors = []
+    results = []
     param_converter = Seek::Api::ParameterConverter.new("samples")
     Sample.transaction do
       params[:data].each do |par|
-        params =  param_converter.convert(par)
-        sample = Sample.new(sample_type_id: params[:sample][:sample_type_id], title: params[:sample][:title])
-        update_sample_with_params(params, sample)
-        errors.push({ ex_id: par[:ex_id], error: sample.errors.messages }) if !sample.save
+        converted_params = param_converter.convert(par)
+        sample_type = SampleType.find_by_id(converted_params.dig(:sample, :sample_type_id))
+        sample = Sample.new(sample_type: sample_type)
+        sample = update_sample_with_params(converted_params, sample)
+        if sample.save
+          results.push({ ex_id: par[:ex_id], id: sample.id })
+        else
+          errors.push({ ex_id: par[:ex_id], error: sample.errors.messages })
+        end
       end
-      raise ActiveRecord::Rollback if !errors.empty?
+      raise ActiveRecord::Rollback if errors.any?
     end
-    render json: { status: errors.empty? ? :ok : :unprocessable_entity, errors: errors }
+    status = errors.empty? ? :ok : :unprocessable_entity
+    render json: { status: status, errors: errors, results: results }, status: :ok
   end
 
   def batch_update
     errors = []
     param_converter = Seek::Api::ParameterConverter.new("samples")
-    params[:data].each do |par|
-      begin
-        params = param_converter.convert(par)
-        sample = Sample.find(par[:id])
-        update_sample_with_params(params, sample)
-        errors.push(par[:id]) if !sample.save
-      rescue 
-        errors.push(par[:id]) 
+    Sample.transaction do
+      params[:data].each do |par|
+        begin
+          converted_params = param_converter.convert(par)
+          sample = Sample.find(par[:id])
+          sample = update_sample_with_params(converted_params, sample)
+          saved = sample.save
+          errors.push({ ex_id: par[:ex_id], error: sample.errors.messages }) unless saved
+        rescue
+          errors.push({ ex_id: par[:ex_id], error: "Can not be updated." })
+        end
       end
+      raise ActiveRecord::Rollback if errors.any?
     end
-    render json: { status: errors.empty? ? :ok : :unprocessable_entity, errors: errors }
+    status = errors.empty? ? :ok : :unprocessable_entity
+    render json: { status: status, errors: errors }, status: :ok
   end
 
   def batch_delete
     errors = []
-    params[:data].each do |par|
-      begin
-        sample = Sample.find(par[:id])
-        errors.push(par[:id]) if !(sample.can_delete? && sample.destroy)
-      rescue 
-        errors.push(par[:id]) 
+    Sample.transaction do
+      params[:data].each do |par|
+        begin
+          sample = Sample.find(par[:id])
+          errors.push({ ex_id: par[:ex_id], error: "Can not be deleted." }) if !(sample.can_delete? && sample.destroy)
+        rescue 
+          errors.push({ ex_id: par[:ex_id], error: sample.errors.messages })
+        end
       end
+      raise ActiveRecord::Rollback if errors.any?
     end
-    render json: { status: errors.empty? ? :ok : :unprocessable_entity, errors: errors }
+    status = errors.empty? ? :ok : :unprocessable_entity
+    render json: { status: status, errors: errors }, status: :ok
   end
-
 
   def typeahead
     sample_type = SampleType.find(params[:linked_sample_type_id])
@@ -187,31 +210,69 @@ class SamplesController < ApplicationController
     end
   end
 
+  def query
+    project_ids = params[:project_ids]&.map(&:to_i)
+
+    @result = params[:template_id].present? ?
+      Template.find(params[:template_id]).sample_types.map(&:samples).flatten : []
+
+    if params[:template_attribute_id].present? && params[:template_attribute_value].present?
+      attribute_title = TemplateAttribute.find(params[:template_attribute_id]).title
+      @result = @result.select { |s| s.get_attribute_value(attribute_title)&.include?(params[:template_attribute_value]) }
+    end
+
+    if params[:input_template_id].present? # linked
+      title =
+        TemplateAttribute.find(params[:input_attribute_id]).title if params[:input_attribute_id].present?
+      @result = find_samples(@result, :linked_samples,
+        { attribute_id: params[:input_attribute_id],
+          attribute_value: params[:input_attribute_value],
+          template_id: params[:input_template_id] }, title)
+    end
+
+    if params[:output_template_id].present? # linking
+      title =
+        TemplateAttribute.find(params[:output_attribute_id]).title if params[:output_attribute_id].present?
+      @result = find_samples(@result, :linking_samples,
+        { attribute_id: params[:output_attribute_id],
+          attribute_value: params[:output_attribute_value],
+          template_id: params[:output_template_id] }, title)
+    end
+
+    @result = @result.select { |s| (project_ids & s.project_ids).any? } if project_ids.present?
+    @total_samples = @result.length
+    @result = @result.any? ? @result.authorized_for('view') : []
+    @visible_samples = @result.length
+
+    respond_to do |format|
+      format.js
+    end
+  end
+
+  def query_form
+    @result = []
+    respond_to do |format|
+      format.html
+    end
+  end
+
   private
 
-  def sample_params(sample_type=nil, _params=nil)
-    _params ||= params
+  def sample_params(sample_type = nil, parameters = params)
     sample_type_param_keys = sample_type ? sample_type.sample_attributes.map(&:title).collect(&:to_sym) : []
-    if _params[:sample][:attribute_map]
-      _params[:sample][:data] = _params[:sample].delete(:attribute_map)
-    end
-    _params.require(:sample).permit(:sample_type_id, *creator_related_params, { project_ids: [] },
-                              { data: sample_type_param_keys },
+    parameters.require(:sample).permit(:sample_type_id, *creator_related_params,
+                              { project_ids: [] }, { data: sample_type_param_keys },
+                              { assay_assets_attributes: [:assay_id] },
                               { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                               discussion_links_attributes:[:id, :url, :label, :_destroy])
   end
 
-  def update_sample_with_params(_params=nil, sample=nil)
-    sample ||= @sample
-    if _params.nil?
-      sample.update(sample_params(sample.sample_type))
-    else  
-      sample.assign_attributes(sample_params(sample.sample_type, _params))
-    end
-    update_sharing_policies sample
-    update_annotations(params[:tag_list], sample)
-    update_relationships(sample, params)
-    sample.save if _params.nil?
+  def update_sample_with_params(parameters = params, sample = @sample)
+    sample.assign_attributes(sample_params(sample.sample_type, parameters))
+    update_sharing_policies(sample, parameters)
+    update_annotations(parameters[:tag_list], sample)
+    update_relationships(sample, parameters)
+    sample
   end
 
   def find_index_assets
@@ -229,8 +290,28 @@ class SamplesController < ApplicationController
     elsif params[:sample_type_id]
       @sample_type = SampleType.includes(:sample_attributes).find(params[:sample_type_id])
       @samples = @sample_type.samples.authorized_for('view')
+    elsif params[:template_id]
+      @template = Template.find(params[:template_id])
+      @samples = @template.samples.authorized_for('view')
     else
       find_assets
+    end
+  end
+
+  def find_samples(samples, link, options, title)
+    samples.select do |s|
+      s.send(link).any? do |x|
+        selected = x.sample_type.template_id == options[:template_id].to_i
+        selected = x.get_attribute_value(title)&.include?(options[:attribute_value]) if title.present? && selected
+        selected || find_samples([x], link, options, title).present?
+      end
+    end
+  end
+
+  def templates_enabled?
+    unless Seek::Config.sample_type_template_enabled
+      flash[:error] = 'Not available'
+      redirect_to select_sample_types_path
     end
   end
 end

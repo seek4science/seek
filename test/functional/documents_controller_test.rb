@@ -5,25 +5,10 @@ class DocumentsControllerTest < ActionController::TestCase
   fixtures :all
 
   include AuthenticatedTestHelper
-  include RestTestCases
   include SharingFormTestHelper
   include MockHelper
   include HtmlHelper
   include GeneralAuthorizationTestCases
-
-  def test_json_content
-    login_as(Factory(:user))
-    super
-  end
-
-  def rest_api_test_object
-    @object = Factory(:public_document)
-  end
-
-  def edit_max_object(document)
-    add_tags_to_test_object(document)
-    add_creator_to_test_object(document)
-  end
 
   test 'should return 406 when requesting RDF' do
     login_as(Factory(:user))
@@ -991,6 +976,58 @@ class DocumentsControllerTest < ActionController::TestCase
     assert_equal [project_doc, old_project_doc], assigns(:documents).to_a
   end
 
+  test 'filtering a scoped collection' do
+    programme = Factory(:programme)
+    project1 = Factory(:project, programme: programme)
+    project2 = Factory(:project, programme: programme)
+    project3 = Factory(:project, programme: programme)
+    doc1 = Factory(:public_document, projects: [project1])
+    doc1.annotate_with('tag1', 'tag', doc1.contributor)
+    doc2 = Factory(:public_document, projects: [project2])
+    doc2.annotate_with('tag2', 'tag', doc2.contributor)
+    doc3 = Factory(:public_document, projects: [project1, project2])
+    doc3.annotate_with('tag3', 'tag', doc3.contributor)
+    disable_authorization_checks do
+      doc1.save!
+      doc2.save!
+      doc3.save!
+    end
+
+    get :index, params: { project_id: project1.id, order: 'created_at_asc' }
+    assert_equal [doc1, doc3], assigns(:documents).to_a
+
+    get :index, params: { project_id: project1.id, filter: { tag: 'tag1' }, order: 'created_at_asc' }
+    assert_equal [doc1], assigns(:documents).to_a
+
+    get :index, params: { project_id: project2.id, order: 'created_at_asc' }
+    assert_equal [doc2, doc3], assigns(:documents).to_a
+
+    get :index, params: { project_id: project2.id, filter: { tag: 'tag2' }, order: 'created_at_asc' }
+    assert_equal [doc2], assigns(:documents).to_a
+
+    get :index, params: { project_id: project2.id, filter: { tag: 'tag1' }, order: 'created_at_asc' }
+    assert_equal [], assigns(:documents).to_a
+
+    get :index, params: { project_id: project3.id, filter: { tag: 'tag1' }, order: 'created_at_asc' }
+    assert_equal [], assigns(:documents).to_a
+  end
+
+  test 'attempting to filter empty collection does not error' do
+    project = Factory(:project)
+    assert project.documents.none?
+
+    get :index, params: { project_id: project.id, filter: { tag: 'something' } }
+    assert_equal [], assigns(:documents).to_a
+
+    assert_select '.active-filters' do
+      assert_select '.active-filter-category-title', count: 1
+      assert_select ".filter-option[title='something'].filter-option-active" do
+        assert_select '[href=?]', project_documents_path(project_id: project.id)
+        assert_select '.filter-option-label', text: 'something'
+      end
+    end
+  end
+
   test 'should create with discussion link' do
     person = Factory(:person)
     login_as(person)
@@ -1167,6 +1204,26 @@ class DocumentsControllerTest < ActionController::TestCase
       assert_select ':nth-child(5)', text: 'Jane Four'
       assert_select ':nth-child(5)[title=?]', 'Jane Four, University of Edinburgh'
     end
+  end
+
+  test 'sharing with programme only shows if enabled' do
+    doc = Factory :document
+    login_as(doc.contributor)
+
+    with_config_value :programmes_enabled, true do
+      get :manage, params: { id: doc }
+      assert_response :success
+
+      assert_select 'a#add-programme-permission-button', text: /Share with a Programme/, count: 1
+    end
+
+    with_config_value :programmes_enabled, false do
+      get :manage, params: { id: doc }
+      assert_response :success
+
+      assert_select 'a#add-programme-permission-button', text: /Share with a Programme/, count: 0
+    end
+
   end
 
   private

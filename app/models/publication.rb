@@ -35,6 +35,9 @@ class Publication < ApplicationRecord
   has_filter :human_disease
 
   acts_as_asset
+  # publications shouldn't have related publications, which has been added in acts_as_asset
+  undef :publications
+
   validates :title, length: { maximum: 65_535 }
 
   acts_as_having_misc_links
@@ -48,7 +51,13 @@ class Publication < ApplicationRecord
     acts_as_versioned_resource
     has_one :content_blob, -> (r) { where('content_blobs.asset_version =? AND content_blobs.asset_type =?', r.version, r.parent.class.name) },
             :primary_key => :publication_id,:foreign_key => :asset_id
-  end
+
+    def doi_uri
+      "https://doi.org/#{doi}" if doi
+    end
+
+    alias_method :doi_identifier, :doi_uri
+end
 
   belongs_to :publication_type
 
@@ -125,15 +134,6 @@ class Publication < ApplicationRecord
 
   end
 
-  # Returns the columns to be shown on the table view for the resource
-  def columns_default
-    super + ['published_date','journal']
-  end
-
-  def columns_allowed
-    columns_default + ['abstract','last_used_at','doi','citation','booktitle','publisher','editor','url']
-  end
-
   def pubmed_uri
     "https://www.ncbi.nlm.nih.gov/pubmed/#{pubmed_id}" if pubmed_id
   end
@@ -141,6 +141,7 @@ class Publication < ApplicationRecord
   def doi_uri
     "https://doi.org/#{doi}" if doi
   end
+  alias_method :doi_identifier, :doi_uri
 
   # Automatically extract the actual DOI if the user put in the full URL
   def doi=(doi)

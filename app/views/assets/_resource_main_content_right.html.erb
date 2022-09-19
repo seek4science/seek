@@ -50,8 +50,8 @@
 
 <%= render :partial => "assets/usage_info_box",:locals => { :resource => resource } -%>
 
-<% if resource.edam_annotations? %>
-  <%= render partial:'assets/edam_properties_box', :locals => { :resource => resource } -%>
+<% if resource.controlled_vocab_annotations? %>
+  <%= render partial:'assets/controlled_vocab_annotations_properties_box', :locals => { :resource => resource } -%>
 <% end %>
 
 <% if resource.class.is_taggable? %>
@@ -67,6 +67,3 @@
 <% if resource.respond_to?(:collections) && resource.collections.any? -%>
     <%= render partial: 'assets/resource_collections_box', locals: { resource: resource } -%>
 <% end -%>
-
-<%= render :partial => "assets/resource_scales_box", :locals => { :resource => resource} if resource.respond_to?(:scales) && show_scales?-%>
-

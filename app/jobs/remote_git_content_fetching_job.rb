@@ -3,12 +3,10 @@ class RemoteGitContentFetchingJob < ApplicationJob
 
   retry_on Seek::DownloadHandling::BadResponseCodeException, wait: 1.minute, attempts: 3
 
-  def perform(git_version, path, url)
-    handler = ContentBlob.remote_content_handler_for(url)
-    return unless handler
-    io = handler.fetch
-    io.rewind
-    git_version.add_file(path, io, message: "Fetched #{path} from URL")
-    disable_authorization_checks { git_version.save! }
+  def perform(git_version, path, _ = nil)
+    disable_authorization_checks do
+      git_version.fetch_remote_file(path)
+      git_version.save!
+    end
   end
 end

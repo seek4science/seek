@@ -32,16 +32,19 @@ Factory.define(:max_data_file, class: DataFile) do |f|
   f.title 'A Maximal DataFile'
   f.description 'Results - Sampling conformations of ATP-Mg inside the binding pocket'
   f.discussion_links { [Factory.build(:discussion_link, label:'Slack')] }
-  f.projects { [Factory(:max_project)] }
-  f.assays {[Factory.build(:max_assay, policy: Factory(:public_policy))]}
+  f.assays { [Factory(:public_assay)] }
   f.events {[Factory.build(:event, policy: Factory(:public_policy))]}
+  f.workflows {[Factory.build(:workflow, policy: Factory(:public_policy))]}
   f.relationships {[Factory(:relationship, predicate: Relationship::RELATED_TO_PUBLICATION, other_object: Factory(:publication))]}
   f.after_create do |data_file|
     if data_file.content_blob.blank?
       data_file.content_blob = Factory.create(:pdf_content_blob, asset: data_file, asset_version: data_file.version)
     end
+    data_file.annotate_with(['DataFile-tag1', 'DataFile-tag2', 'DataFile-tag3', 'DataFile-tag4', 'DataFile-tag5'], 'tag', data_file.contributor)
+    data_file.save!
   end
   f.other_creators 'Blogs, Joe'
+  f.assets_creators { [AssetsCreator.new(affiliation: 'University of Somewhere', creator: Factory(:person, first_name: 'Some', last_name: 'One'))] }
 end
 
 Factory.define(:rightfield_datafile, parent: :data_file) do |f|
@@ -99,6 +102,10 @@ end
 
 Factory.define(:xlsx_population_no_study_datafile, parent: :data_file) do |f|
   f.association :content_blob, factory: :xlsx_population_no_study_content_blob
+end
+
+Factory.define(:xlsx_population_just_isa_datafile, parent: :data_file) do |f|
+  f.association :content_blob, factory: :xlsx_population_just_isa
 end
 
 Factory.define(:small_test_spreadsheet_datafile, parent: :data_file) do |f|

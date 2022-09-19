@@ -1,6 +1,7 @@
 require_relative 'boot'
 
 require 'rails/all'
+require_relative '../lib/rack/settings_cache'
 
 if defined?(Bundler)
   # If you precompile assets before deploying to production, use this line
@@ -47,6 +48,7 @@ module SEEK
                           include: %w(text/html application/xml application/json text/css application/javascript)
     config.middleware.use Rack::Attack
     config.middleware.use I18n::JS::Middleware
+    config.middleware.use Rack::SettingsCache
 
     config.exceptions_app = self.routes
 
@@ -60,6 +62,7 @@ module SEEK
     # openbis_endpoints/26-20170404142724000000000...
     # openbis_endpoints/26-20170404142724224014370...
     config.active_record.cache_timestamp_format = :usec
+    config.active_record.cache_versioning = false
 
     config.action_mailer.deliver_later_queue_name = 'mailers'
 
@@ -70,9 +73,5 @@ module SEEK
 
     config.active_record.belongs_to_required_by_default = false
     config.action_mailer.delivery_job = 'ActionMailer::MailDeliveryJob' # Can remove after updating defaults
-
-    # pass forward the relative url root, if set. Needed for generating correct non-relative URL's. See https://github.com/rails/rails/issues/40237
-    routes.default_url_options[:relative_url_root] = config.relative_url_root
-
   end
 end

@@ -7,6 +7,14 @@ class WorkflowSerializer < ContributedResourceSerializer
     }
   end
 
+  attribute :operation_annotations do
+    controlled_vocab_annotations('operation_annotations')
+  end
+  attribute :topic_annotations do
+    controlled_vocab_annotations('topic_annotations')
+  end
+
+
   has_many :people
   has_many :projects
   has_many :investigations
@@ -14,10 +22,13 @@ class WorkflowSerializer < ContributedResourceSerializer
   has_many :assays
   has_many :publications
   has_many :sops
+  has_many :presentations
+  has_many :data_files
+  has_many :documents
 
   attribute :internals
 
-  link(:diagram, if: -> { get_version.diagram_exists? }) do
-    diagram_workflow_path(object, version: get_version.version)
+  link(:diagram, if: -> () { (@scope.try(:[], :requested_version) || object).diagram_exists? }) do |s|
+    diagram_workflow_path(object, version: (@scope.try(:[], :requested_version) || object).version)
   end
 end

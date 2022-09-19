@@ -45,7 +45,7 @@
         association association_ids= methods, which reject 'blank' values automatically.%>
       <%= hidden_field_tag field_name, '' %>
       <div class="box_editing_inner">
-        <ul class="related_asset_list">
+        <ul class="associations-list">
           <span v-if="selected.length == 0" class="none_text">None</span>
           <li class="association-list-item" v-for="(project, index) in selected">
             <span :title="project.title">{{ project.title }}</span>
@@ -60,7 +60,7 @@
         <div class="form-group">
           <select autocomplete="off" class="form-control" id="projects-selector-select">
             <option selected="selected">Select a <%= t('project').downcase -%>...</option>
-            <option v-for="project in possibilities" :value="project.id">{{ project.title }}</option>
+            <option v-for="project in sortedPossibilities" :value="project.id">{{ project.title }}</option>
           </select>
         </div>
       </div>
@@ -80,6 +80,13 @@
     data: {
       possibilities: JSON.parse($j('#project-selector-possibilities-json').text()),
       selected: JSON.parse($j('#project-selector-selected-json').text())
+    },
+    computed: {
+        sortedPossibilities: function () {
+            return this.possibilities.sort(function (a, b) {
+                return a.title.toLowerCase().localeCompare(b.title.toLowerCase());
+            });
+        }
     },
     methods: {
       remove: function (project, index) {
@@ -102,6 +109,7 @@
                 }
             }
             this.possibilities.splice(i, 1);
+            return false;
           }
         }
       }

@@ -37,19 +37,3 @@ Factory.define :worksheet do |f|
   f.last_row 10
   f.last_column 10
 end
-
-# CellRange
-Factory.define :cell_range do |f|
-  f.cell_range 'A1:B3'
-  f.association :worksheet
-end
-
-# Scale
-Factory.define :scale do |f|
-  f.sequence(:title) { |n| "scale #{n}" }
-  f.sequence(:pos) { |n| n }
-  f.sequence(:key) { |n| "scale_key_#{n}" }
-  f.sequence(:image_name) { |n| %w(style_images/ui-icons_222222_256x240.png
-                    style_images/ui-bg_flat_75_ffffff_40x100.png style_images/ui-icons_888888_256x240.png
-                    style_images/ui-bg_glass_75_e6e6e6_1x400.png style_images/ui-icons_454545_256x240.png)[(n % 5) - 1] }
-end

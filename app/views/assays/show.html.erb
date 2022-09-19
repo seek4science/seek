@@ -1,6 +1,6 @@
 <%= render partial: 'general/item_title', locals: { item: @assay, buttons_partial: 'assays/buttons' } -%>
 
-<%= render partial: 'general/show_page_tab_definitions' %>
+<%= render partial: 'general/show_page_tab_definitions', locals: { resource: @assay } %>
 
 <div class="tab-content">
   <%= tab_pane('overview') do %>
@@ -8,15 +8,6 @@
 
     <div class="row">
       <div class="col-md-9 col-sm-8 box_about_actor">
-        <% if @assay.study.nil? -%>
-          <div class="warning">
-            <%= image("warning") %><b style="color:red">WARNING</b>
-            <br/>
-            <br/>
-            An <%= t('assays.assay') %> may be edited by anybody, regardless of <%= t('project') %> membership, until it
-            has been associated with a <%= t('study') %>
-          </div>
-        <% end -%>
         <%= item_description @assay.description -%>
 
         <div class="row">
@@ -117,6 +108,11 @@
             <% end %>
         <% end %>
         <%= render partial: 'general/isa_graph', locals: { root_item: @assay, options: { depth: 4 } } %>
+
+        <% if Seek::Config.project_single_page_advanced_enabled %>
+            <%= render partial: 'isa_studies/applied_templates', locals: { resource: @assay } -%>
+        <% end %>
+
       </div>
 
       <div class="col-md-3 col-sm-4">
@@ -128,4 +124,9 @@
   <%= tab_pane('related-items') do %>
     <%= render partial: 'general/items_related_to', object: @assay %>
   <% end %>
+	<% if Seek::Config.project_single_page_advanced_enabled && displaying_single_page? %>
+		<%= tab_pane('assay_design') do %>
+			<%= render :partial=>"isa_assays/assay_design", locals: { assay: @assay} -%>
+		<% end %>
+	<% end %>
 </div>
