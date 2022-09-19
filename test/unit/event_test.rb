@@ -184,11 +184,61 @@ class EventTest < ActiveSupport::TestCase
   end
 
   test 'time zone validation' do
-    person = Factory(:person)
     event = Factory.build(:event)
     assert event.valid?
     event.time_zone = 'invalid/time_zone'
     refute event.valid?
+  end
+
+  test 'time should change according to the time zone' do
+    event = Factory(:event, start_date: '2022-02-25 14:11:00', end_date: '2022-12-25 2:58:00',
+                            time_zone: 'Europe/Paris')
+
+    start_date = event.start_date
+    end_date =  event.end_date
+    new_time_zone = 'Asia/Tehran'
+
+    disable_authorization_checks do
+      event.time_zone = new_time_zone
+      event.save!
+    end
+
+    assert_equal start_date.to_s(:db).in_time_zone(new_time_zone), event.start_date
+    assert_equal end_date.to_s(:db).in_time_zone(new_time_zone), event.end_date
+  end
+
+  test 'should not shift times on subsequent saves' do
+    event = Factory(:event, time_zone: 'Europe/Paris')
+
+    start_date = event.start_date
+    end_date = event.end_date
+    disable_authorization_checks do
+      event.description = 'New description on first save.'
+      event.save!
+    end
+    assert_equal start_date, event.start_date
+    assert_equal end_date, event.end_date
+
+    disable_authorization_checks do
+      event.description = 'New description on second save.'
+      event.save!
+    end
+    assert_equal start_date, event.start_date
+    assert_equal end_date, event.end_date
+  end
+
+  test 'should update date time on time zone change' do
+    event = Factory(:event, time_zone: 'Europe/Paris')
+    start_date = event.start_date
+    end_date = event.end_date
+
+    disable_authorization_checks do
+      event.time_zone = 'Asia/Tehran'
+      event.save!
+    end
+
+    assert_not_equal start_date, event.start_date
+    assert_not_equal end_date, event.end_date
   end
   
 end
