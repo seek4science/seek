@@ -461,6 +461,8 @@ GEM
     mysql2 (0.5.3)
     namae (1.1.1)
     nesty (1.0.2)
+    net-http (0.2.2)
+      uri
     net-http-digest_auth (1.4.1)
     net-http-persistent (4.0.1)
       connection_pool (~> 2.2)
@@ -871,6 +873,7 @@ GEM
     unicorn-rails (2.2.1)
       rack
       unicorn
+    uri (0.11.0)
     uuid (2.3.9)
       macaddr (~> 1.0)
     validate_email (0.1.6)
@@ -988,6 +991,7 @@ DEPENDENCIES
   minitest-reporters
   my_responds_to_parent!
   mysql2
+  net-http
   nokogiri (~> 1.13.6)
   omniauth (~> 1.9.2)
   omniauth-github
