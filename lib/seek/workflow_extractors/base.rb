@@ -50,7 +50,7 @@ module Seek
             author[:given_name] = given_name if given_name.present?
             author[:family_name] = family_name if family_name.present?
           end
-        elsif obj.is_a?(Hash)
+        else
           name = obj['name'] || obj['@id'] || ''
           given_name, family_name = name.split(' ', 2)
           family_name = obj['familyName'] if obj['familyName'].present?
@@ -58,9 +58,10 @@ module Seek
           affiliation = obj['affiliation']
           if affiliation.present?
             if affiliation.is_a?(String)
-              obj[:affiliation] = affiliation
+              author[:affiliation] = affiliation
             else
-              obj[:affiliation] = affiliation['name'] if affiliation['name'].present?
+              affiliation = affiliation.dereference if affiliation.respond_to?(:dereference)
+              author[:affiliation] = affiliation['name'] if affiliation && affiliation['name'].present?
             end
           end
           orcid = obj['identifier'] || obj['@id']
