@@ -1,4 +1,5 @@
 <% current_user_authorized_to_manage = @event.new_record?|| @event.can_manage? -%>
+<% default_time_zone = 'Etc/UTC' -%>
 
 <h1><%= @event.new_record? ? "New #{t('event')}" : ("Editing #{t('event')}: ".html_safe + link_to(@event.title, event_path(@event))) -%></h1>
 <%= form_for @event do |f| %>
@@ -16,16 +17,24 @@
       </div>
 
       <div class="form-group">
-        <%= f.label :start_date, class: 'required' %>
-        <div style="position: relative">
-          <%= f.text_field :start_date, data: { calendar: 'mixed' }, class: 'calendar form-control' %>
+        <div class="row">
+          <div class="col-md-8 col-xs-12">
+            <%= f.label :start_date, class: 'required' %>
+            <%= f.text_field :start_date, data: { calendar: 'mixed' }, class: 'calendar form-control' %>
+          </div>
+          <div class="col-md-4 col-xs-12">
+            <%= f.label :time_zone %>
+            <%= f.select :time_zone, options_for_select(ActiveSupport::TimeZone.all.map { |z| [z.to_s, z.tzinfo.name] }, selected: f.object.time_zone || default_time_zone), {}, class: 'form-control' %>
+          </div>
         </div>
       </div>
 
       <div class="form-group">
-        <%= f.label :end_date %>
-        <div style="position: relative">
-          <%= f.text_field :end_date, data: { calendar: 'mixed' }, class: 'calendar form-control' %>
+        <div class="row">
+          <div class="col-md-8 col-xs-12">
+            <%= f.label :end_date %>
+            <%= f.text_field :end_date, data: { calendar: 'mixed' }, class: 'calendar form-control' %>
+          </div>
         </div>
       </div>
 
@@ -67,3 +76,29 @@
 
     </div>
 <% end %>
+
+<script>
+  $j(document).ready(function() {
+    const timeZone = $j("#event_time_zone").val()
+    const startDate = $j("#event_start_date").val()
+    const endDate = $j("#event_end_date").val()
+    
+    if (startDate) $j("#event_start_date").val(convertTZ(startDate + " UTC", timeZone))
+    if (endDate) $j("#event_end_date").val(convertTZ(endDate+ " UTC", timeZone))
+  });
+
+	function convertTZ(date, timeZone) {
+		const d = new Date(date).toLocaleString("en-US", {
+			timeZone,
+			year: "numeric",
+			month: "2-digit",
+			day: "2-digit",
+			hour: "2-digit",
+			minute: "2-digit",
+			hourCycle: "h23"
+		});
+		const [convertedDate, convertedTime] = d.split(",");
+		const [month, day, year] = convertedDate.split("/");
+		return `${year}-${month}-${day}${convertedTime}`;
+	}
+</script>
