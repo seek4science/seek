@@ -71,8 +71,7 @@ class StudyTest < ActiveSupport::TestCase
 
   test 'directly associated sops' do
     study = studies(:metabolomics_study)
-    sop = Factory(:sop)
-    study.sops << sop
+    study.sop_ids = [Factory(:sop).id]
     assert_equal 3, study.related_sops.size
   end
 
