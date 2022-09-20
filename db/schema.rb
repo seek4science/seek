@@ -598,6 +598,7 @@ ActiveRecord::Schema.define(version: 2022_09_15_090713) do
     t.string "first_letter", limit: 1
     t.string "uuid"
     t.string "deleted_contributor"
+    t.string "time_zone"
   end
 
   create_table "events_presentations", id: false, force: :cascade do |t|

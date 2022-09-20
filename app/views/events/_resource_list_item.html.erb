@@ -2,8 +2,8 @@
 
 <div class="row">
   <div class="col-sm-6">
-    <%= list_item_attribute "Start Date", date_as_string(resource.start_date) %>
-    <%= list_item_attribute "End Date", resource.end_date.nil? ? text_or_not_specified(nil) : date_as_string(resource.end_date) %>
+    <%= list_item_attribute "Start Date", date_as_string(resource.start_date, false, false, resource.time_zone) %>
+    <%= list_item_attribute "End Date", resource.end_date.nil? ? text_or_not_specified(nil) : date_as_string(resource.end_date, false, false, resource.time_zone) %>
     <%= list_item_optional_attribute "#{t('event')} Website", h(resource.url), h(resource.url) %>
   </div>
 
