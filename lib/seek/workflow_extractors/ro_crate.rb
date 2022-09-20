@@ -68,22 +68,20 @@ module Seek
           if crate.author.present?
             other_creators = []
             authors = crate.author
+            authors = authors.split(',').map(&:strip) if authors.is_a?(String)
             authors = authors.is_a?(Array) ? authors : [authors]
             authors.each_with_index do |author_meta, i|
-              if author_meta.is_a?(::ROCrate::Person)
-                author = extract_author(author_meta.properties)
+              if author_meta.is_a?(::ROCrate::ContextualEntity) && !author_meta.is_a?(::ROCrate::Person)
+                other_creators << author_meta['name'] if author_meta['name'].present?
+              else
+                author = extract_author(author_meta)
                 unless author.blank?
                   m[:assets_creators_attributes] ||= {}
                   m[:assets_creators_attributes][i.to_s] = author.merge(pos: i)
                 end
-              elsif author_meta.is_a?(::ROCrate::ContextualEntity)
-                other_creators << author_meta['name'] if author_meta['name'].present?
-              elsif author_meta.is_a?(String)
-                other_creators << author_meta
               end
             end
-            other_creators.reject!(&:blank?)
-            m[:other_creators] = other_creators.join(', ') if other_creators.present?
+            m[:other_creators] = other_creators.join(', ') if other_creators.any?
           end
 
           source_url = crate['isBasedOn'] || crate['url'] || crate.main_workflow['url']
