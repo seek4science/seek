@@ -69,9 +69,9 @@ module SEEK
     config.active_job.queue_adapter = :delayed_job
 
     # Ignore translation overrides when testing
-    config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'overrides', '**', '*.{rb,yml}')] unless Rails.env.test?
-
-    if Rails.env.test?
+    unless Rails.env.test?
+      config.i18n.load_path += Dir[Rails.root.join('config', 'locales', 'overrides', '**', '*.{rb,yml}')] 
+    else
       I18n.load_path += Dir[Rails.root.join('config', 'locales', '*.{rb,yml}')]
     end
 
