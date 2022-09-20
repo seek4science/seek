@@ -90,7 +90,7 @@ class ActiveSupport::TestCase
   include ActiveJob::TestHelper
   include ActionMailer::TestHelper
 
-  setup :clear_rails_cache, :create_initial_person, :load_translation
+  setup :clear_rails_cache, :create_initial_person
   teardown :clear_current_user
 
   def file_for_upload
@@ -115,10 +115,6 @@ class ActiveSupport::TestCase
   def clear_rails_cache
     Rails.cache.clear
     Seek::Config.clear_temporary_filestore
-  end
-
-  def load_translation
-    I18n.load_path << File.join(File.dirname(__FILE__), "../../locales/en.yml")
   end
 
   def clear_current_user
