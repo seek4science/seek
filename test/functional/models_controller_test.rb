@@ -11,6 +11,8 @@ class ModelsControllerTest < ActionController::TestCase
 
   def setup
     login_as(:model_owner)
+
+    I18n.load_path << File.join(File.dirname(__FILE__), "../../locales/en.yml")
   end
 
   test 'should get index' do
