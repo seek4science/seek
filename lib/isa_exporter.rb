@@ -33,11 +33,11 @@ module IsaExporter
 			people = []
 			@investigation.related_people.each { |p| people << convert_person(p) }
 			isa_investigation[:people] = people
-
+     
 			studies = []
 			@investigation.studies.each { |s| studies << convert_study(s) }
 			isa_investigation[:studies] = studies
-
+      
 			@OBJECT_MAP[:investigation] = isa_investigation
 
 			isa_investigation
@@ -76,8 +76,8 @@ module IsaExporter
 			with_tag_parameter_value_study =
 				study.sample_types.second.sample_attributes.select { |sa| sa.isa_tag&.isa_parameter_value? }
 			raise "Protocol ISA tag not found in #{t(:study)} #{study.id}" if with_tag_protocol_study.blank?
-			raise "The Study with the title '#{study.title}' does not have an SOP" if study.sop.blank?
-			protocols << convert_protocol(study.sop, study.id, with_tag_protocol_study, with_tag_parameter_value_study)
+			# raise "The Study with the title '#{study.title}' does not have any SOP" if study.sops.blank?
+			protocols << convert_protocol(study.sops, study.id, with_tag_protocol_study, with_tag_parameter_value_study)
 
 			study.assays.each do |a|
 				# There should be only one attribute with isa_tag == protocol
@@ -85,12 +85,12 @@ module IsaExporter
 				with_tag_parameter_value = a.sample_type.sample_attributes.select { |sa| sa.isa_tag&.isa_parameter_value? }
 				raise "Protocol ISA tag not found in #{t(:assay)} #{a.id}" if with_tag_protocol.blank?
 
-				raise "The #{t(:study)} with the title '#{study.title}' does not have an SOP" if a.sops.blank?
-				protocols << convert_protocol(a.sops.first, a.id, with_tag_protocol, with_tag_parameter_value)
+				# raise "The #{t(:study)} with the title '#{study.title}' does not have an SOP" if a.sops.blank?
+				protocols << convert_protocol(a.sops, a.id, with_tag_protocol, with_tag_parameter_value)
 			end
 			isa_study[:protocols] = protocols
 
-			isa_study[:processSequence] = convert_process_sequence(study.sample_types.second, study.sop, study.id)
+			isa_study[:processSequence] = convert_process_sequence(study.sample_types.second, study.sops.map(&:id).join("_"), study.id)
 
 			isa_study[:assays] = [convert_assays(study.assays)]
 
@@ -128,7 +128,7 @@ module IsaExporter
 				otherMaterials: convert_other_materials(all_sample_types)
 			}
 			isa_assay[:processSequence] =
-				assays.map { |a| convert_process_sequence(a.sample_type, a.sops.first, a.id) }.flatten
+				assays.map { |a| convert_process_sequence(a.sample_type, a.sops.map(&:id).join("_"), a.id) }.flatten
 			isa_assay[:dataFiles] = convert_data_files(all_sample_types)
 			isa_assay[:unitCategories] = []
 			isa_assay
@@ -179,11 +179,10 @@ module IsaExporter
 			source_ontologies.uniq.map { |s| { name: s, file: '', version: '', description: '' } }
 		end
 
-		def convert_protocol(sop, id, protocol, parameter_values)
+		def convert_protocol(sops, id, protocol, parameter_values)
 			isa_protocol = {}
 
-			#   sop = assay.sops.first
-			isa_protocol['@id'] = "#protocol/#{sop.id}_#{id}"
+			isa_protocol['@id'] = "#protocol/#{sops.map(&:id)}_#{id}"
 			isa_protocol[:name] = protocol.title # sop.title
 
 			ontology = get_ontology_details(protocol, protocol.title, false)
@@ -193,7 +192,7 @@ module IsaExporter
 				termAccession: ontology[:termAccession],
 				termSource: ontology[:termSource]
 			}
-			isa_protocol[:description] = sop.description || ''
+			isa_protocol[:description] = sops&.first&.description || ''
 			isa_protocol[:uri] = ontology[:termAccession]
 			isa_protocol[:version] = ''
 			isa_protocol[:parameters] =
@@ -305,7 +304,7 @@ module IsaExporter
 			end
 		end
 
-		def convert_process_sequence(sample_type, sop, id)
+		def convert_process_sequence(sample_type, sop_ids, id)
 			# This method is meant to be used for both Studies and Assays
 			return [] unless sample_type.samples.any?
 
@@ -321,7 +320,7 @@ module IsaExporter
 					'@id': normalize_id("#process/#{with_tag_protocol.title}/#{s.id}"),
 					name: '',
 					executesProtocol: {
-						'@id': "#protocol/#{sop.id}_#{id}"
+						'@id': "#protocol/#{sop_ids}_#{id}"
 					},
 					parameterValues: convert_parameter_values(s, with_tag_isa_parameter_value),
 					performer: '',
