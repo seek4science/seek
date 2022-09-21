@@ -68,7 +68,7 @@ module LicenseHelper
   end
 
   def license_values(opts = {})
-    opts.delete(:source) || Seek::License::OPENDEFINITION[:all]
+    opts.delete(:source) || Seek::License.open_definition[:all]
   end
 
   def license_options(opts = {})
