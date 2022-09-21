@@ -100,8 +100,6 @@ gem 'gitlab_omniauth-ldap', git: 'https://gitlab.com/gitlab-org/omniauth-ldap.gi
 gem 'omniauth_openid_connect'
 gem 'omniauth-rails_csrf_protection'
 gem 'omniauth-github'
-gem 'net-http'
-gem 'uri', '0.10.0'
 
 gem 'ransack'
 
