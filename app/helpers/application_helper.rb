@@ -291,12 +291,12 @@ module ApplicationHelper
     resource = resource_for_controller
     if resource && resource.respond_to?(:title) && resource.title
       h(resource.title)
-    elsif PAGE_TITLES[controller_name]
+    elsif (page_title = get_page_title).present?
       title = ''
       if @parent_resource
         title << "#{h(@parent_resource.title)} - "
       end
-      t = PAGE_TITLES[controller_name]
+      t = page_title
       if t.is_a?(Hash)
         t = t[action_name] || t['*']
       end
@@ -506,17 +506,25 @@ module ApplicationHelper
     html
   end
 
-  PAGE_TITLES = { 'home' => 'Home', 'projects' => I18n.t('project').pluralize, 'institutions' => I18n.t('institution').pluralize,
-                  'people' => 'People', 'sessions' => 'Login', 'users' => { 'new' => 'Signup', '*' => 'Account' }, 'search' => 'Search',
-                  'assays' => I18n.t('assays.assay').pluralize.capitalize, 'sops' => I18n.t('sop').pluralize, 'models' => I18n.t('model').pluralize, 'data_files' => I18n.t('data_file').pluralize, 'documents' => 'Documents',
-                  'publications' => 'Publications', 'investigations' => I18n.t('investigation').pluralize, 'studies' => I18n.t('study').pluralize,
-                  'samples' => 'Samples', 'strains' => 'Strains', 'organisms' => 'Organisms', 'human_disease' => 'Human Diseases', 'biosamples' => 'Biosamples', 'sample_types' => 'Sample Types','templates' => 'Templates',
-                  'presentations' => I18n.t('presentation').pluralize, 'programmes' => I18n.t('programme').pluralize, 'events' => I18n.t('event').pluralize, 'help_documents' => 'Help' }.freeze
+  PAGE_TITLES = { 'home' => 'Home', 'sessions' => 'Login', 'users' => { 'new' => 'Signup', '*' => 'Account' },
+                  'search' => 'Search', 'biosamples' => 'Biosamples', 'help_documents' => 'Help' }.freeze
 
   def show_page_tab
     return 'overview' unless params.key?(:tab)
 
     params[:tab]
+  end
+
+  def get_page_title
+    class_name = controller_name.classify
+
+    if PAGE_TITLES.key?(controller_name)
+      PAGE_TITLES[controller_name]
+    elsif Seek::Util.searchable_types.any? { |t| t.name == class_name }
+      I18n.t(class_name.underscore).pluralize
+    else
+      nil
+    end
   end
 end
 

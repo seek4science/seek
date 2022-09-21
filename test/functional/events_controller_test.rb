@@ -9,8 +9,6 @@ class EventsControllerTest < ActionController::TestCase
   def setup
     login_as(:datafile_owner)
     @project = users(:datafile_owner).person.projects.first
-
-    I18n.load_path << File.join(File.dirname(__FILE__), "../../locales/en.yml")
   end
 
   def test_title

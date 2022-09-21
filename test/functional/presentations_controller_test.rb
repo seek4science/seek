@@ -9,8 +9,6 @@ class PresentationsControllerTest < ActionController::TestCase
   def setup
     login_as Factory(:user)
     @project = User.current_user.person.projects.first
-
-    I18n.load_path << File.join(File.dirname(__FILE__), "../../locales/en.yml")
   end
 
   test 'index' do

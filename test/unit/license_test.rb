@@ -4,8 +4,6 @@ class LicenseTest < ActiveSupport::TestCase
   setup do
     @zenodo = Seek::License::ZENODO[:all]
     @od = Seek::License::OPENDEFINITION[:all]
-
-    I18n.load_path << File.join(File.dirname(__FILE__), "../../locales/en.yml")
   end
 
   test 'can find licenses in zenodo vocab' do
