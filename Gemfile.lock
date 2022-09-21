@@ -873,7 +873,7 @@ GEM
     unicorn-rails (2.2.1)
       rack
       unicorn
-    uri (0.11.0)
+    uri (0.10.0)
     uuid (2.3.9)
       macaddr (~> 1.0)
     validate_email (0.1.6)
@@ -1051,6 +1051,7 @@ DEPENDENCIES
   terser (~> 1.1, >= 1.1.1)
   test-prof
   unicorn-rails
+  uri (= 0.10.0)
   uuid (~> 2.3)
   validate_url
   vcr (~> 2.9)
