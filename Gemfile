@@ -96,7 +96,7 @@ gem 'csl-styles', '~> 2.0.0'
 gem 'bibtex-ruby', '~> 5.1.0'
 
 gem 'omniauth', '~> 2.1.0'
-gem 'gitlab_omniauth-ldap', git: 'https://gitlab.com/gitlab-org/omniauth-ldap.git', ref:'2584e8703418f9608ba35e1c0634515b242c2c35'
+gem 'gitlab_omniauth-ldap', '~> 2.2.0'
 gem 'omniauth_openid_connect'
 gem 'openid_connect','1.3.0'
 gem 'omniauth-rails_csrf_protection'
