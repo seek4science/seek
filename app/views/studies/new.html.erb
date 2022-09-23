@@ -7,6 +7,8 @@
 <% else %>
 	<h1>New <%= t('study') %></h1>
 
+	<%= index_and_new_help_icon klass_from_controller(controller_name) %>
+
 	<% if show_batch_miappe_button? %>
 		<h4>Upload studies from file:</h4>
 		<%= link_to "MIAPPE Study batch upload", batch_uploader_studies_path, class: "btn btn-primary" %>

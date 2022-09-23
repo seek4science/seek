@@ -26,7 +26,7 @@ module HelpHelper
   end
 
   def index_and_new_help_icon(clz)
-    key = clz.to_s.underscore.pluralize + ".info_text"
+    key = "info_text." + clz.to_s.underscore
     if (I18n.exists?(key))
       help_icon_with_link(clz.to_s, t(key))
     end
@@ -34,7 +34,12 @@ module HelpHelper
 
   def help_icon_with_link(key, text, _delay = 200, extra_style = '')
     name = translate_resource_type(key)
-    link_to content_tag(:span,'',class:'help_icon') + "What is #{name.indefinite_article} #{name}?", Seek::Help::HelpDictionary.instance.help_link(key), "data-tooltip"=>text ,target: :_blank
+    link = Seek::Help::HelpDictionary.instance.help_link(key)
+    unless link.nil?
+      link_to content_tag(:span,'',class:'help_icon') + "What is #{name.indefinite_article} #{name}?", link, "data-tooltip"=> text ,target: :_blank
+    else
+      content_tag(:span, content_tag(:span,'',class:'help_icon') + "What is #{name.indefinite_article} #{name}?", :"data-tooltip"=> text)
+    end
   end
 
 end

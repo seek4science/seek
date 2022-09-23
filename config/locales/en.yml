@@ -16,7 +16,7 @@ en:
     assay: "Assay"
     experimental_assay: "Experimental assay"
     modelling_analysis:  "Modelling analysis"
-
+  
   isa_study: "ISA Study"  
   study_design: "Study Design"
   isa_assay: "ISA Assay"
@@ -39,15 +39,12 @@ en:
       git: 'Import Git Repository'
       ro_crate: 'Upload/Import Workflow RO-Crate'
   publication: &publication "Publication"
-  publications:
-    info_text: "Information about a publication. Can include the publication itself or a link to it."
+  
   presentation: &presentation "Presentation"
   event: &event "Event"
   file_template: &file_template "File Template"
   placeholder: "Placeholder"
   collection: &collection "Collection"
-  collections:
-    info_text: "A collection is a group of items that are conceptually related to each other."
 
   sample: &sample "Sample"
   sample_type: &sample_type "Sample type"
@@ -241,3 +238,25 @@ you can choose to have a %{project} linked to a site managed %{programme} instea
 
   controlled_vocabs:
     add_new_term_disabled_reason: "You are unable to add new terms when linked to an Ontology"
+
+  info_text:
+    institution: "An Institution in SEEK is where someone is employed or works or a person’s affiliation."
+    person: "A Person (People) in SEEK is a registered user or a Profile of a person that has not registered with SEEK. A Person is someone who participates directly or indirectly in the scientific research described within SEEK."
+    programme: "A Programme is an umbrella to group one or more Projects.  A Programme is usually, but not always, associated with a particular funded piece of research (Funding details)."
+    project: "A Project is a research carried out as part of a Programme. Project creator and Project members must provide one Institution they are associated with in relation to the Project. To allow users to request membership of a Project, the Project must have a Project administrator. A Project can have one or more Investigations."
+    investigation: "Investigation is a high level description of the research carried out within a particular Project and typically reflects the general aims of the research. If your research project has several “sub-projects” that do not share any data, you should define an Investigation for each within the same SEEK Project. Investigation must be associated with one or more Projects (with exceptions in Single Page) and it can contain one or more Studies."
+    study: "A Study is a particular biological hypothesis, which you are planning to test in various ways, using various techniques, which could be experimental, informatics, modelling, or a mixture. A Study must belong to one Investigation and it can contain one or more Assays."
+    assay: "An Assay is in general the application of a protocol (SOP) that converts an input material or data (incoming samples) into a new material or data (outgoing samples). An Assay must belong to one Study. Assays can be of two types: Experimental assay or Modelling analyses."
+    model: "A Model is a file containing a computer model of a biological or biochemical network or process. A Model file must be associated with one or more Projects and can be associated with one or more Modelling analyses (a type of Assay)."
+    sop: "SOP stands for Standard Operating Procedure and it describes a protocol. SOP files can be in any format (word files, e-lab notebooks, code, annotated spreadsheets etc). A SOP file must be associated with one or more Projects and can be associated with one or more Assays (with exceptions in Single Page). If associated with an Assay, the SOP describes the protocol to reproduce the Assay it is associated with."
+    data_file: "Data files can be any file containing data relevant to Projects and/or to Assays (raw data, processed data, calibration information etc). They can be in any format (word files, e-lab notebooks, code, annotated spreadsheets etc). A Data file must be associated with one or more Projects and can be associated with one or more Assays, assets and activities."
+    publication: "Publications can be registered in SEEK. A Publication must be associated with one or more Projects and can be associated with assets, experiments and activities."
+    workflow: "A Computational Workflow describes the complex multi-step methods that are used for data collection, data preparation, analytics, predictive modelling, and simulation that lead to new data products. Workflow can be registered in SEEK by referencing or uploading files in several formats. A Workflow must be associated with one or more Teams (Projects)."
+    document: "Documents can be registered in SEEK. A Document can be any descriptive documentation that describes experiments, assets and activities. A Document must be associated with one or more Projects and can be associated with experiments, assets and activities."
+    collection: "A collection is a group of items that are conceptually related to each other."
+    presentation: "Presentations can be registered in SEEK. A Presentation can be in any format, it must be associated with  one or more Projects and can be associated to assets and activities."
+    event: "Events can be registered in SEEK. An Event must be associated with one or more Projects, happening on specified dates and at a specific location, actual or virtual."
+    sample: "Samples can be registered in SEEK. ​A Sample is an entity (material or data) that is converted into a new item (material or data) via a process (physical or computational). Samples must be associated with one or more Projects. Samples can be linked to Assay (and also to Study in Single Page)."
+    sample_type: "Sample Types are templates that detail the key information that needs to be included to describe a given sample correctly. A Sample type must be associated with one or more Projects (with exceptions in Single Page)."
+    template: "Templates consist of a set of defined attributes needed to create Sample Types in Single Page. Templates act as blueprints that can be shared, reused and applied for creating Sample Types in Single Page. Templates must be associated with one or more Projects."
+    organism: "Organisms can be registered in SEEK. An Organism is an organism as identified by an entry in the NCBI ontology."

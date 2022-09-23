@@ -13,3 +13,16 @@ data_file_wizard: https://docs.seek4science.org/help/user-guide/data-file-upload
 dashboard: https://docs.seek4science.org/help/user-guide/project-dashboard.html
 report_bugs_and_features: https://docs.seek4science.org/tech/reporting-bugs-and-features.html
 Collection: https://docs.seek4science.org/help/user-guide/collections.html
+Institution: https://docs.seek4science.org/help/user-guide/create-a-project.html
+Person: https://docs.seek4science.org/help/user-guide/registering.html
+Programme: https://docs.seek4science.org/help/user-guide/create-a-project.html
+Project: https://docs.seek4science.org/help/user-guide/create-a-project.html
+Investigation: https://docs.seek4science.org/help/isa-guide.html
+Study: https://docs.seek4science.org/help/isa-guide.html
+Assay: https://docs.seek4science.org/help/isa-guide.html
+Data file: https://docs.seek4science.org/help/user-guide/general-attributes.html#data-files
+SOP: https://docs.seek4science.org/help/user-guide/general-attributes.html#sops 
+Publication: https://docs.seek4science.org/help/user-guide/general-attributes.html#publications
+Sample: https://docs.seek4science.org/help/user-guide/samples.html
+Sample_type: https://docs.seek4science.org/help/user-guide/create-sample-type.html
+Organism: https://docs.seek4science.org/help/user-guide/general-attributes.html#organisms

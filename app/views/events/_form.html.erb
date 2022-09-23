@@ -1,6 +1,9 @@
 <% current_user_authorized_to_manage = @event.new_record?|| @event.can_manage? -%>
 
 <h1><%= @event.new_record? ? "New #{t('event')}" : ("Editing #{t('event')}: ".html_safe + link_to(@event.title, event_path(@event))) -%></h1>
+
+<%= index_and_new_help_icon klass_from_controller(controller_name) %>
+
 <%= form_for @event do |f| %>
     <div class="asset_form">
       <%= f.error_messages %>
