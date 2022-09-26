@@ -12,7 +12,8 @@
 <% linked_sample_type_id = sample_attribute ? sample_attribute.linked_sample_type_id : nil %>
 <% unit_id = sample_attribute ? sample_attribute.unit_id : nil %>
 <% template_column_index = sample_attribute ? sample_attribute.template_column_index : nil %>
-<% field_name_prefix = "sample_type[sample_attributes_attributes][#{index}]" %>
+<% prefix ||= 'sample_type' %>
+<% field_name_prefix = "#{prefix}[sample_attributes_attributes][#{index}]" %>
 <% constraints = sample_type.editing_constraints %>
 <% allow_required = constraints.allow_required?(sample_attribute) %>
 <% allow_attribute_removal = constraints.allow_attribute_removal?(sample_attribute)  %>
@@ -20,7 +21,10 @@
 <% allow_name_change = constraints.allow_name_change?(sample_attribute) %>
 <% seek_sample_multi = sample_attribute.try(:seek_sample_multi?) %>
 <% link_to_self = sample_attribute && sample_attribute.deferred_link_to_self %>
-<tr class="sample-attribute <%= 'success' if sample_attribute.nil? -%>" data-index="<%= index-%>">
+<% hide_seek_sample_multi = seek_sample_multi && displaying_single_page? %>
+<% isa_tag_id = sample_attribute&.isa_tag_id %>
+
+<tr class="sample-attribute <%= 'success' if sample_attribute.nil? -%><%='hidden' if hide_seek_sample_multi -%>" data-index="<%= index-%>">
   <th scope="row" class="attribute-position">
     <div class="btn btn-info attribute-handle">
       <span class="glyphicon glyphicon-sort" aria-hidden="true"></span>
@@ -31,13 +35,13 @@
   <td>
 
     <%= text_field_tag "#{field_name_prefix}[title]", title, class: 'form-control',
-                       placeholder: 'Attribute name',disabled: !allow_name_change %>
+                       placeholder: 'Attribute name', disabled: !allow_name_change, data: { attr: "title" } %>
   </td>
 
   <td class="text-center">
     <div class="checkbox-inline">
       <%= hidden_field_tag "#{field_name_prefix}[required]", '0' %>
-      <%= check_box_tag "#{field_name_prefix}[required]", '1', required,disabled: !allow_required %>
+      <%= check_box_tag "#{field_name_prefix}[required]", '1', required, disabled: !allow_required, data: { attr: "required" } %>
     </div>
   </td>
   <td class="text-center">
@@ -48,17 +52,17 @@
   </td>
   <td>
     <%= select_tag "#{field_name_prefix}[sample_attribute_type_id]",
-                   options_for_select(SampleAttributeType.all.sort_by(&:title).sort_by { |t| t.default? ? 0 : 1 }.map { |t| [t.title, t.id,{'data-is-cv'=>t.controlled_vocab?, 'data-is-seek-sample'=>t.seek_sample? || t.seek_sample_multi? }] }, attribute_type_id),
+                   options_for_select(SampleAttributeType.all.sort_by(&:title).sort_by { |t| t.default? ? 0 : 1 }.map { |t| [t.title, t.id,{'data-is-cv'=>t.controlled_vocab?,'data-is-ontology'=>t.ontology?, 'data-is-seek-sample'=>t.seek_sample? || t.seek_sample_multi? }] }, attribute_type_id),
                    class: 'form-control sample-type-attribute-type',
-                   disabled: !allow_type_change %>
+                   disabled: !allow_type_change, data: { attr: "type" } %>
     <div class='controlled-vocab-block' style="<%= 'display:none;' unless sample_attribute.try(:controlled_vocab?) %>">
       <br/>
       <%= select_tag "#{field_name_prefix}[sample_controlled_vocab_id]",
-                     options_for_select(SampleControlledVocab.all.map { |t| [t.title, t.id, {'data-editable'=>t.can_edit?}] },
+                     options_for_select(SampleControlledVocab.all.map { |t| [t.title, t.id, {'data-editable'=>t.can_edit?, 'data-is-ontology'=>t.custom_input}] },
                                         sample_controlled_vocab_id),
                      include_blank: true,
                      class: 'form-control controlled-vocab-selection',
-                     disabled: !allow_type_change %>
+                     disabled: !allow_type_change, data: { attr: "cv_id" }%>
       <% if allow_type_change %>
         <%= button_link_to('Edit', 'edit', '#', class:'cv-edit-button', disabled: true, target: :_blank) %>        
         <%= create_sample_controlled_vocab_modal_button  %>
@@ -85,11 +89,11 @@
   </td>
   <td>
     <%= text_area_tag "#{field_name_prefix}[description]", description, class: 'form-control',
-                      style:'height:4em;width:20em;', placeholder: 'Description' %>
+                      style:'height:4em;width:20em;', placeholder: 'Description', data: { attr: "description" } %>
   </td>
   <td>
     <%= text_field_tag "#{field_name_prefix}[pid]", pid, class: 'form-control',
-                       placeholder: 'Identifier URI' %>
+                       placeholder: 'Identifier URI',  data: { attr: "pid" } %>
   </td>
   <td>
     <%= select_tag "#{field_name_prefix}[unit_id]",
@@ -97,11 +101,13 @@
                                       unit_id),
                    include_blank: true,
                    class: 'form-control',
-                   disabled: !allow_type_change %>
+                   disabled: !allow_type_change, data: { attr: "unit" } %>
   </td>
+
 
   <td>
     <% if allow_attribute_removal %>
+      <%= hidden_field_tag "#{field_name_prefix}[isa_tag_id]", isa_tag_id, data: { attr: "isa_tag_id" }  %>
       <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', autocomplete: 'off' %>
       <div class="btn-group" data-toggle="buttons">
         <label class="btn btn-danger">

@@ -19,10 +19,10 @@ class TreeviewBuilderTest < ActionController::TestCase
     controller = TreeviewBuilder.new p, f
 
     assert_equal controller.send(:create_node, {text: node_text, _type: node_type, count: node_count, resource:p,
-        _id: node_id, a_attr: { style: node_style }, opened: node_state_opened, label: node_label, action: node_action}),
+        _id: node_id, a_attr: { style: node_style }, opened: node_state_opened, label: node_label }),
 
         text: node_text, a_attr: {style: node_style}, count: node_count, data: {id: node_id, type: node_type},
-          state: {opened: true, separate: {label: node_label, action: node_action}},
+          state: {opened: true, separate: {label: node_label }},
           icon: "/assets/avatars/avatar-project.png"
   end
 

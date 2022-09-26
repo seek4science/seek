@@ -15,14 +15,13 @@ The following resources have just been created or updated in <%= Seek::Config.in
 <% end %>
 <br/>
 <br/>
-
+<% subscribed_projects = @person.subscribed_projects.to_a %>
 <% @activity_logs.group_by(&:action).each do |action, logs| %>
-    <label style="color:#f0342a;"><b>Resources <%= action.capitalize%>d:</b></label>
-    <div id="new_resources" class="new_resources" >
-       <table border="1px" cellpadding="5" style="border-collapse: collapse;
-              font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
-              width: 100%;">
-
+  <label style="color:#f0342a;"><b>Resources <%= action.capitalize%>d:</b></label>
+  <div id="new_resources" class="new_resources" >
+    <table border="1px" cellpadding="5" style="border-collapse: collapse;
+      font-family: 'Lucida Grande', Tahoma, Arial, Helvetica, sans-serif;
+      width: 100%;">
       <tr>
         <th align="left"><%= t('project') %> Names</th>
         <th align="left">Resource Type</th>
@@ -31,36 +30,34 @@ The following resources have just been created or updated in <%= Seek::Config.in
         <th align="left">Date <%= action.capitalize%>d</th>
         <th align="left">Unsubscribe?</th>
       </tr>
-         <%
-            removed_duplicated_logs = []
-            logs.sort { |a, b| b.updated_at <=> a.updated_at }.each do |log|
-              removed_duplicated_logs << log unless removed_duplicated_logs.collect(&:activity_loggable).include?(log.activity_loggable)
-            end
-         %>
-         <% removed_duplicated_logs.each do |log| %>
-             <% resource_projects = log.try(:activity_loggable).try(:projects)
-                person_subscribed_projects = @person.project_subscriptions.collect(&:project)
-                reported_projects = resource_projects.to_a & person_subscribed_projects
-                project_names = reported_projects.collect(&:title).join(',')
-             %>
-
-             <tr>
-               <td><%= project_names.blank? ? "<span style='font-style:italic;color:#666666'>Not Specified</span>" : project_names %></td>
-               <td><%= log.activity_loggable_type.humanize %></td>
-               <td><%= try_block { link_to(log.activity_loggable.title, polymorphic_url(log.activity_loggable)) } || log.activity_loggable.title %></td>
-               <td><%= link_to try_block { log.culprit.person.name }, person_url(log.culprit.person.id) %></td>
-               <td> <%= date_as_string(log.created_at,true) %></td>
-               <td> <%= link_to "Unsubscribe", polymorphic_url(log.activity_loggable) %></td>
-             </tr>
-
-         <% end %>
-       </table>
-    </div>
-    <br style="clear:both"/>
+      <% logs.each do |log| %>
+        <%
+          resource_projects = log.activity_loggable.projects
+          reported_projects = resource_projects.to_a & subscribed_projects
+          project_names = reported_projects.collect(&:title).join(',')
+        %>
+        <tr>
+          <td>
+            <% if project_names.blank? %>
+              <span style="font-style: italic; color: #666666">Not Specified</span>
+            <% else %>
+              <%= project_names %>
+            <% end  %>
+          </td>
+          <td><%= log.activity_loggable_type.humanize %></td>
+          <td><%= link_to(log.activity_loggable.title, polymorphic_url(log.activity_loggable)) %></td>
+          <td><%= link_to(log.culprit.person.name, person_url(log.culprit.person)) if log.culprit&.person %></td>
+          <td><%= date_as_string(log.created_at, true) %></td>
+          <td><%= link_to 'Unsubscribe', polymorphic_url(log.activity_loggable) %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+  <br style="clear:both"/>
 <% end %>
 <br/>
 You can change your subscription setting by editing your profile:
-<%= link_to('Edit profile', send("edit_#{@person.class.name.underscore}_url", @person.id)) -%>.
+<%= link_to('Edit profile', edit_person_url(@person)) -%>.
 <br/>
 
 You can unsubscribe from a particular resource by clicking on the Unsubscribe link in the subscription report above

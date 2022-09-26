@@ -114,26 +114,26 @@ class BaseSerializer < SimpleBaseSerializer
   end
 
   def show_policy?
-    respond_to_manage = object.respond_to?('can_manage?')
-    respond_to_policy = object.respond_to?('policy')
-    current_user = User.current_user
-    can_manage = object.can_manage?(current_user)
-    return respond_to_policy && respond_to_manage && can_manage
-  end
-
-  def determine_submitter(object)
-    return object.owner if object.respond_to?('owner')
-    result = object.contributor if object.respond_to?('contributor') && !object.is_a?(Permission)
-    return result
+    return false unless object.respond_to?('can_manage?')
+    return false unless object.respond_to?('policy')
+    return object.can_manage?(User.current_user)
   end
 
   def submitter
     result = determine_submitter object
     if result.blank?
-      return []
+      []
     else
-      return [result]
+      [result]
     end
+  end
+
+  private
+
+  def determine_submitter(object)
+    return object.owner if object.respond_to?('owner')
+    result = object.contributor if object.respond_to?('contributor') && !object.is_a?(Permission)
+    return result
   end
 
   def serialize_assets_creators
@@ -143,6 +143,16 @@ class BaseSerializer < SimpleBaseSerializer
         given_name: c.given_name,
         affiliation: c.affiliation,
         orcid: c.orcid }
+    end
+  end
+
+  def controlled_vocab_annotations(property)
+    terms = object.annotations_with_attribute(property, true).collect(&:value).sort_by(&:label)
+    terms.collect do |term|
+      {
+        label: term.label,
+        identifier: term.iri
+      }
     end
   end
 end

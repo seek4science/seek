@@ -5,6 +5,12 @@ class PlaceholderSerializer < ContributedResourceSerializer
   has_one :file_template
   has_one :data_file
 
-  attribute :data_type
-  attribute :format_type
+  attribute :data_type_annotations do
+    controlled_vocab_annotations('data_type_annotations')
+  end
+
+  attribute :data_format_annotations do
+    controlled_vocab_annotations('data_format_annotations')
+  end
+
 end

@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title" : "ISA material node schema",
+  "description" : "JSON-schema representing a material node in the ISA model, which is not a source or a sample (as they have specific schemas) - this will correspond to 'Extract Name', 'Labeled Extract Name'",
+  "type" : "object",
+  "properties" : {
+    "@id": { "type": "string", "format": "uri" },
+    "name" : { "type" : "string" },
+    "type": {
+      "type": "string",
+      "enum": [
+        "Extract Name",
+        "Labeled Extract Name"
+      ]
+    },
+    "characteristics" : {
+      "type" : "array",
+      "items" :  {
+        "$ref": "material_attribute_value_schema.json#"
+      }
+    },
+    "derivesFrom": {
+      "type" : "array",
+      "items" : {
+        "$ref": "material_schema.json#"
+      }
+    },
+    "comments" : {
+        "type": "array",
+        "items": {
+             "$ref": "comment_schema.json#"
+        }
+    }
+  },
+  "additionalProperties": false
+}

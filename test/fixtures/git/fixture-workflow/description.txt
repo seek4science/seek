@@ -1,5 +1,5 @@
 # Basic galaxy workflow
-# Branches: main, add-license-1
+# Branches: main, add-license-1, symlink
 # Tags: v0.01
 # Files on branch "main":
 concat_two_files.ga

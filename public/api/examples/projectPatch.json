@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "793",
+    "id": "389",
     "type": "projects",
     "attributes": {
       "avatar": null,
@@ -14,33 +14,43 @@
         "permissions": [
           {
             "resource": {
-              "id": "725",
+              "id": "320",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "793",
+              "id": "389",
               "type": "projects"
             },
             "access": "download"
           },
           {
             "resource": {
-              "id": "743",
+              "id": "347",
               "type": "institutions"
             },
             "access": "view"
           }
         ]
-      }
+      },
+      "topic_annotations": [
+        {
+          "label": "Biomedical science",
+          "identifier": "http://edamontology.org/topic_3344"
+        },
+        {
+          "label": "Chemistry",
+          "identifier": "http://edamontology.org/topic_3314"
+        }
+      ]
     },
     "relationships": {
       "programmes": {
         "data": [
           {
-            "id": "12",
+            "id": "29",
             "type": "programmes"
           }
         ]
@@ -48,7 +58,7 @@
       "organisms": {
         "data": [
           {
-            "id": "33",
+            "id": "29",
             "type": "organisms"
           }
         ]

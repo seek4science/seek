@@ -11,7 +11,7 @@
       "projects": {
         "data": [
           {
-            "id": "24",
+            "id": "108",
             "type": "projects"
           }
         ]
@@ -19,7 +19,7 @@
       "assays": {
         "data": [
           {
-            "id": "2",
+            "id": "10",
             "type": "assays"
           }
         ]
@@ -27,7 +27,7 @@
       "models": {
         "data": [
           {
-            "id": "4",
+            "id": "8",
             "type": "models"
           }
         ]
@@ -37,11 +37,11 @@
       "self": "/organisms/5"
     },
     "meta": {
-      "created": "2022-05-13T14:37:23.000Z",
-      "modified": "2022-05-13T14:37:23.000Z",
+      "created": "2022-06-07T14:12:34.000Z",
+      "modified": "2022-06-07T14:12:34.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "20404a20-b4f8-013a-0f2b-0a81884ed284"
+      "uuid": "cd394ea0-c899-013a-0f7e-0a81884ed284"
     }
   },
   "jsonapi": {

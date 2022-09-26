@@ -35,6 +35,9 @@ class Publication < ApplicationRecord
   has_filter :human_disease
 
   acts_as_asset
+  # publications shouldn't have related publications, which has been added in acts_as_asset
+  undef :publications
+
   validates :title, length: { maximum: 65_535 }
 
   acts_as_having_misc_links
@@ -129,15 +132,6 @@ end
 
     def event_ids=(events_ids); end
 
-  end
-
-  # Returns the columns to be shown on the table view for the resource
-  def columns_default
-    super + ['published_date','journal']
-  end
-
-  def columns_allowed
-    columns_default + ['abstract','last_used_at','doi','citation','booktitle','publisher','editor','url']
   end
 
   def pubmed_uri

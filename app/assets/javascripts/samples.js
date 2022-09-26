@@ -13,12 +13,24 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
     var options = $j.extend({}, opts, {
         "lengthMenu": [ 5, 10, 25, 50, 75, 100 ],
         "pageLength": 10,
-        dom: 'lr<"samples-table-container"t>ip', // Needed to place the buttons
+        dom: '<"row"<"col-sm-10"lr><"col-sm-2 text-right"B>><"samples-table-container"t>ip', // Needed to place the buttons
         "columnDefs": [{
             "targets": [ 0, 1 ],
             "visible": false,
             "searchable": false
-        }]
+        }],
+				buttons: [
+					{
+							extend: 'csvHtml5',
+							text: 'Export table',
+							exportOptions: {
+									columns: [':visible']
+							}
+					}
+				],
+				initComplete: function () {
+					if(opts.hideEmptyColumns) hideEmptyColumns(this);
+				}
         //"initComplete": function () {  // THIS IS TOO SLOW - CRASHES BROWSER
         //    console.log("Hiding empty columns");
         //    table.columns().flatten().each(function (columnIndex) {
@@ -168,3 +180,10 @@ Samples.initTable = function (selector, enableRowSelection, opts) {
     });
     return table;
 };
+
+function hideEmptyColumns(selector) {
+	const table = $j(selector).DataTable()
+	table.columns().every(function(idx) {
+		if (!this.data().toArray().some(x=>x)) table.column(idx).visible(false)
+	});
+}

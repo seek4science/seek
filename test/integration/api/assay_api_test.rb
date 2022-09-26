@@ -21,6 +21,7 @@ class AssayApiTest < ActionDispatch::IntegrationTest
     @sop = Factory(:sop, policy: Factory(:public_policy))
     @data_file = Factory(:data_file, policy: Factory(:public_policy))
     @document = Factory(:document, policy: Factory(:public_policy))
+    @sample = Factory(:sample, policy: Factory(:public_policy))
   end
 
   test 'should not delete assay when not project member' do

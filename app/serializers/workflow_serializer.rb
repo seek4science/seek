@@ -7,11 +7,11 @@ class WorkflowSerializer < ContributedResourceSerializer
     }
   end
 
-  attribute :edam_operations do
-    edam_annotations('edam_operations')
+  attribute :operation_annotations do
+    controlled_vocab_annotations('operation_annotations')
   end
-  attribute :edam_topics do
-    edam_annotations('edam_topics')
+  attribute :topic_annotations do
+    controlled_vocab_annotations('topic_annotations')
   end
 
 
@@ -28,7 +28,7 @@ class WorkflowSerializer < ContributedResourceSerializer
 
   attribute :internals
 
-  link(:diagram, if: -> { get_version.diagram_exists? }) do
-    diagram_workflow_path(object, version: get_version.version)
+  link(:diagram, if: -> () { (@scope.try(:[], :requested_version) || object).diagram_exists? }) do |s|
+    diagram_workflow_path(object, version: (@scope.try(:[], :requested_version) || object).version)
   end
 end

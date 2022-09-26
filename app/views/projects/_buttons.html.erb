@@ -1,5 +1,7 @@
-<% if Seek::Config.project_single_page_enabled && logged_in_and_registered? && current_user.person.member_of?(item) %>
+<% if !displaying_single_page? && Seek::Config.project_single_page_enabled %>
+  <span>
     <%= button_link_to("Single Page", 'sop', single_page_path(item.id)) -%>
+  </span>
 <% end -%>
 <% if Seek::Config.project_browser_enabled && logged_in_and_registered? && current_user.person.member_of?(item) %>
     <%= button_link_to("Organize", 'organise', project_folders_path(item.id)) -%>
@@ -27,6 +29,14 @@
     <span data-tooltip='<%= reason %>'>
       <%= button_link_to("Request membership", "message", '#', disabled: true) %>
     </span>
+<% end -%>
+
+<% if item.can_edit? -%>
+  <% if displaying_single_page? %>
+    <%= button_link_to("Create #{t('investigation')}", 'new', new_investigation_path("investigation[project_id]": item.id, single_page: params[:id])) %> 
+  <% else -%>
+    <%= add_new_item_to_dropdown(item) %> 
+  <% end -%>
 <% end -%>
 
 <%= item_actions_dropdown do %>

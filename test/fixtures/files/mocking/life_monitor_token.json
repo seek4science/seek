@@ -1,6 +1,6 @@
 {
-  "access_token": "kdBWY27j5DA7hkHPmAj5MyjOedrLrT1rcJK5WMDu0A",
+  "access_token": "FUY30D5gtDOeEPE2qu0MbWg2afrrst4whOOB1zHDtF",
   "expires_in": 864000,
-  "scope": "read write",
+  "scope": "registry.info registry.user registry.workflow.read registry.workflow.write registry.user.workflow.read registry.user.workflow.write workflow.read workflow.write testingService.read testingService.write user.profile user.workflow.read",
   "token_type": "Bearer"
 }

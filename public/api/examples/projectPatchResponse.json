@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "793",
+    "id": "389",
     "type": "projects",
     "attributes": {
       "discussion_links": [
@@ -19,21 +19,21 @@
         "permissions": [
           {
             "resource": {
-              "id": "725",
+              "id": "320",
               "type": "people"
             },
             "access": "manage"
           },
           {
             "resource": {
-              "id": "793",
+              "id": "389",
               "type": "projects"
             },
             "access": "download"
           },
           {
             "resource": {
-              "id": "743",
+              "id": "347",
               "type": "institutions"
             },
             "access": "view"
@@ -43,7 +43,17 @@
       "members": [
 
       ],
-      "use_default_policy": false
+      "use_default_policy": false,
+      "topic_annotations": [
+        {
+          "label": "Biomedical science",
+          "identifier": "http://edamontology.org/topic_3344"
+        },
+        {
+          "label": "Chemistry",
+          "identifier": "http://edamontology.org/topic_3314"
+        }
+      ]
     },
     "relationships": {
       "project_administrators": {
@@ -69,7 +79,7 @@
       "organisms": {
         "data": [
           {
-            "id": "33",
+            "id": "29",
             "type": "organisms"
           }
         ]
@@ -92,7 +102,7 @@
       "programmes": {
         "data": [
           {
-            "id": "12",
+            "id": "29",
             "type": "programmes"
           }
         ]
@@ -164,14 +174,14 @@
       }
     },
     "links": {
-      "self": "/projects/793"
+      "self": "/projects/389"
     },
     "meta": {
-      "created": "2022-05-13T14:39:31.000Z",
-      "modified": "2022-05-13T14:39:31.000Z",
+      "created": "2022-07-18T09:02:41.000Z",
+      "modified": "2022-07-18T09:02:41.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "6c738bc0-b4f8-013a-0f2b-0a81884ed284"
+      "uuid": "4dd08e20-e8a6-013a-1113-0a81884ed284"
     }
   },
   "jsonapi": {

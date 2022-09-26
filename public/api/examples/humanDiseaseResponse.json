@@ -11,7 +11,7 @@
       "projects": {
         "data": [
           {
-            "id": "643",
+            "id": "934",
             "type": "projects"
           }
         ]
@@ -19,7 +19,7 @@
       "assays": {
         "data": [
           {
-            "id": "97",
+            "id": "127",
             "type": "assays"
           }
         ]
@@ -27,7 +27,7 @@
       "models": {
         "data": [
           {
-            "id": "109",
+            "id": "137",
             "type": "models"
           }
         ]
@@ -47,11 +47,11 @@
       "self": "/human_diseases/3"
     },
     "meta": {
-      "created": "2022-05-13T14:39:07.000Z",
-      "modified": "2022-05-13T14:39:07.000Z",
+      "created": "2022-06-07T14:14:35.000Z",
+      "modified": "2022-06-07T14:14:35.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "5e264d70-b4f8-013a-0f2b-0a81884ed284"
+      "uuid": "15063e40-c89a-013a-0f7e-0a81884ed284"
     }
   },
   "jsonapi": {

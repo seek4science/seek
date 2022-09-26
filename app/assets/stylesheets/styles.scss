@@ -105,6 +105,12 @@ body {
     padding-left: 10px;
     float: right;
   }
+
+	#elixir-belgium-credit {
+		text-align: center;
+		padding-right: 10px;
+		float: left;
+	}	
 }
 
 a[disabled] {
@@ -761,4 +767,9 @@ ul.workflow-port-type {
 
 div#super_tag_cloud {
   font-size: x-large;
+}
+
+.flex-center {
+	display: flex;
+	align-items: center
 }

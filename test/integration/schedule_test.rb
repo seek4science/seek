@@ -33,12 +33,6 @@ class ScheduleTest < ActionDispatch::IntegrationTest
     news_refresh = @schedule.jobs[:runner].detect { |job| job[:task] == "NewsFeedRefreshJob.set(priority: 3).perform_later" }
     assert news_refresh
     assert_equal [Seek::Config.home_feeds_cache_timeout.minutes], news_refresh[:every]
-    with_config_value(:home_feeds_cache_timeout, 731) do
-      reloaded_schedule = Whenever::Test::Schedule.new(file: 'config/schedule.rb')
-      news_refresh = reloaded_schedule.jobs[:runner].detect { |job| job[:task] == "NewsFeedRefreshJob.set(priority: 3).perform_later" }
-      assert news_refresh
-      assert_equal [731.minutes], news_refresh[:every]
-    end
 
     # General
     general = @schedule.jobs[:runner].detect { |job| job[:task] == "ApplicationJob.queue_timed_jobs" }
@@ -72,6 +66,14 @@ class ScheduleTest < ActionDispatch::IntegrationTest
           end
         end
       end
+    end
+  end
+
+  test 'news feed refresh changes with config' do
+    with_config_value(:home_feeds_cache_timeout, 731) do
+      news_refresh = Whenever::Test::Schedule.new(file: 'config/schedule.rb').jobs[:runner].detect { |job| job[:task] == "NewsFeedRefreshJob.set(priority: 3).perform_later" }
+      assert_equal [Seek::Config.home_feeds_cache_timeout.minutes], news_refresh[:every]
+      assert_equal [731.minutes], news_refresh[:every]
     end
   end
 end

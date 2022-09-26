@@ -28,14 +28,6 @@ class Presentation < ApplicationRecord
   # Parameters:
   # - user - user that performs the action; this is required for authorization
 
-  # Returns the columns to be shown on the table view for the resource
-  def columns_default
-    super + ['version','license']
-  end
-  def columns_allowed
-    columns_default + ['last_used_at','other_creators']
-  end
-
   def use_mime_type_for_avatar?
     true
   end

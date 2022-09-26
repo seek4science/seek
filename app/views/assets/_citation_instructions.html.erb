@@ -19,6 +19,10 @@
           <%= button_link_to('Freeze version', 'freeze', polymorphic_path([resource, :git_freeze_preview], version: versioned_resource.version)) %>
         </p>
       </div>
+    <% elsif !(versioned_resource.visibility == :public) %>
+      <div class="alert alert-warning">
+        <p>This version must be set to "<%= VersionHelper::VISIBILITY_LABELS[:public].downcase -%>" before being eligible for a DOI.</p>
+      </div>
     <% else %>
         <% if resource.is_published? %>
             <div class="alert alert-success">

@@ -200,13 +200,10 @@ class DataFilesController < ApplicationController
 
   def extract_samples
     if params[:confirm]
-      extractor = Seek::Samples::Extractor.new(@data_file, @sample_type)
-      @samples = extractor.persist.select(&:persisted?)
-      extractor.clear
-      @data_file.copy_assay_associations(@samples, params[:assay_ids]) if params[:assay_ids]
-      flash[:notice] = "#{@samples.count} samples extracted successfully"
+      SampleDataPersistJob.new(@data_file, @sample_type, assay_ids: params["assay_ids"]).queue_job
+      flash[:notice] = 'Started creating extracted samples'
     else
-      SampleDataExtractionJob.new(@data_file, @sample_type, false).queue_job
+      SampleDataExtractionJob.new(@data_file, @sample_type).queue_job
     end
 
     respond_to do |format|
@@ -234,11 +231,18 @@ class DataFilesController < ApplicationController
   end
 
   def extraction_status
-    @previous_status = params[:previous_status]
-    @job_status = @data_file.sample_extraction_task.status
+    job_status = @data_file.sample_extraction_task.status
 
     respond_to do |format|
-      format.html { render partial: 'data_files/sample_extraction_status', locals: { data_file: @data_file } }
+      format.html { render partial: 'data_files/sample_extraction_status', locals: { data_file: @data_file, job_status: job_status } }
+    end
+  end
+
+  def persistence_status
+    job_status = @data_file.sample_persistence_task.status
+
+    respond_to do |format|
+      format.html { render partial: 'data_files/sample_persistence_status', locals: { data_file: @data_file, job_status: job_status, previous_status: params[:previous_status] } }
     end
   end
 
@@ -248,7 +252,7 @@ class DataFilesController < ApplicationController
         @sample_type = @data_file.reload.possible_sample_types.last
 
         if @sample_type
-          SampleDataExtractionJob.new(@data_file, @sample_type, false, overwrite: true).queue_job
+          SampleDataExtractionJob.new(@data_file, @sample_type, overwrite: true).queue_job
 
           respond_to do |format|
             format.html { redirect_to @data_file }
@@ -294,7 +298,7 @@ class DataFilesController < ApplicationController
       if handle_upload_data && @data_file.content_blob.save
         session[:uploaded_content_blob_id] = @data_file.content_blob.id
         format.js
-        format.html {}
+        format.html { {params: params[:single_page]} if params[:single_page] }
       else
         session.delete(:uploaded_content_blob_id)
         format.js
@@ -422,7 +426,9 @@ class DataFilesController < ApplicationController
 
         # the assay_id param can also contain the relationship type
         @data_file.assays << @assay if @create_new_assay
-        format.html { redirect_to data_file_path(@data_file) }
+        format.html { redirect_to params[:single_page] ? 
+          { controller: :single_pages, action: :show, id: params[:single_page] } 
+          : data_file_path(@data_file) }
         format.json { render json: @data_file, include: [params[:include]] }
       end
 
@@ -433,10 +439,10 @@ class DataFilesController < ApplicationController
       # - want the avoid the user fixing one set of validation only to be presented with a new set
       @assay.valid? if @create_new_assay
       @data_file.valid? if uploaded_blob_matches
-
+      param = params[:single_page] ? {single_page: params[:single_page]} : {}
       respond_to do |format|
         format.html do
-          render :provide_metadata, status: :unprocessable_entity
+          render :provide_metadata, params: param, status: :unprocessable_entity
         end
       end
     end
@@ -490,9 +496,7 @@ class DataFilesController < ApplicationController
                                       { special_auth_codes_attributes: [:code, :expiration_date, :id, :_destroy] },
                                       { assay_assets_attributes: [:assay_id, :relationship_type_id] },
                                       { creator_ids: [] }, { assay_assets_attributes: [:assay_id, :relationship_type_id] },
-                                      :file_template_id,
-                                      :edam_formats,
-                                      :edam_data,
+                                      :file_template_id, :data_format_annotations, :data_type_annotations,
                                       { publication_ids: [] }, { workflow_ids: [] },
                                       { workflow_data_files_attributes:[:id, :workflow_id, :workflow_data_file_relationship_id, :_destroy] },
                                       discussion_links_attributes:[:id, :url, :label, :_destroy])

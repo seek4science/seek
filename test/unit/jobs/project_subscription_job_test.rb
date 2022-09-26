@@ -1,28 +1,6 @@
 require 'test_helper'
 
 class ProjectSubscriptionJobTest < ActiveSupport::TestCase
-  test 'all_in_project' do
-    person = Factory(:person)
-    project = person.projects.first
-    ps = Factory(:project_subscription, project: project)
-    assets = ProjectSubscriptionJob.new(1).send(:all_in_project, project)
-    assert assets.empty?
-
-    # create items for project
-    ps.subscribable_types.collect(&:name).reject { |t| t == 'Assay' || t == 'Study' }.each do |type|
-      Factory(type.underscore.tr('/', '_').to_s, projects: [project], contributor: person)
-    end
-    project.reload
-    # study
-    study = Factory(:study, investigation: project.investigations.first, contributor: person)
-    # assay
-    Factory(:assay, study: study, contributor: person)
-
-    assets = ProjectSubscriptionJob.new(1).all_in_project project
-    # cause without openbis
-    assert_equal ps.subscribable_types.count, assets.count
-  end
-
   test 'perform' do
     User.current_user = Factory(:user)
     proj = Factory(:project)

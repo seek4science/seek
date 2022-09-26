@@ -32,9 +32,10 @@ class SampleType < ApplicationRecord
   has_many :linked_sample_attributes, class_name: 'SampleAttribute', foreign_key: 'linked_sample_type_id'
 
   belongs_to :contributor, class_name: 'Person'
-  belongs_to :template
+  belongs_to :isa_template, class_name: 'Template', foreign_key: 'template_id'
 
   has_many :assays
+  has_and_belongs_to_many :studies
 
   validates :title, presence: true
   validates :title, length: { maximum: 255 }
@@ -60,6 +61,10 @@ class SampleType < ApplicationRecord
     [contributor]
   end
 
+  def related_templates
+    [isa_template].compact
+  end
+
   # refreshes existing samples following a change to the sample type. For example when changing the title field
   def refresh_samples
     Sample.record_timestamps = false
@@ -73,14 +78,6 @@ class SampleType < ApplicationRecord
       Sample.record_timestamps = true
       Sample.set_callback :save, :after, :queue_sample_type_update_job
     end
-  end
-
-  # Returns the columns to be shown on the table view for the resource
-  def columns_default
-    super + ['uploaded_template']
-  end
-  def columns_allowed
-    columns_default + ['description','created_at','projects','contributor']
   end
 
   # fixes inconsistencies following form submission that could cause validation errors

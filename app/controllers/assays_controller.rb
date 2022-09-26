@@ -11,7 +11,6 @@ class AssaysController < ApplicationController
   #defined in the application controller
   before_action :project_membership_required_appended, :only=>[:new_object_based_on_existing_one]
 
-
   include Seek::Publishing::PublishingCommon
 
   include Seek::IsaGraphExtensions
@@ -171,7 +170,7 @@ class AssaysController < ApplicationController
                                   { placeholders_attributes: [:asset_id, :direction, :relationship_type_id] },
                                   { publication_ids: [] },
                                   { custom_metadata_attributes: determine_custom_metadata_keys },
-				  { discussion_links_attributes:[:id, :url, :label, :_destroy] }
+          { discussion_links_attributes:[:id, :url, :label, :_destroy] }
                                   ).tap do |assay_params|
       assay_params[:document_ids].select! { |id| Document.find_by_id(id).try(:can_view?) } if assay_params.key?(:document_ids)
       assay_params[:sop_ids].select! { |id| Sop.find_by_id(id).try(:can_view?) } if assay_params.key?(:sop_ids)

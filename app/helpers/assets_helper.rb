@@ -10,7 +10,7 @@ module AssetsHelper
       options[:preview_permissions] = show_form_manage_specific_attributes?
     end
     options[:button_text] ||= submit_button_text(item)
-    options[:cancel_path] = polymorphic_path(item)
+    options[:cancel_path] = params[:single_page] ? single_page_path(id: params[:single_page]) : polymorphic_path(item)
     options[:resource_name] = item.class.name.underscore
     options[:button_id] ||= "#{options[:resource_name]}_submit_btn"
 
@@ -281,16 +281,14 @@ module AssetsHelper
     Seek::AddButtons.add_for_item(item).each do |type,param|
       next unless type.feature_enabled?
       text="#{t('add_new_dropdown.option')} #{t(type.name.underscore)}"
-      path = new_polymorphic_path(type,param=>item.id)
+      parameters = { param=>item.id }
+      if (Seek::Config.project_single_page_enabled && params[:single_page])
+        parameters = parameters.merge({ single_page: params[:single_page] })
+      end
+      path = new_polymorphic_path(type,parameters)
       elements << yield(text,path)
     end
     elements
-  end
-
-  # whether the viewable content is available, or converted to pdf, or capable to be converted to pdf
-  def view_content_available?(content_blob)
-    return true if content_blob.is_text? || content_blob.is_pdf? || content_blob.is_cwl? || content_blob.is_image?
-    content_blob.is_pdf_viewable?
   end
 
   def source_link_button(source_link)
@@ -331,10 +329,15 @@ module AssetsHelper
     ContactRequestMessageLog.recent_requests(current_user.try(:person), resource).first
   end
 
-  def edam_ontology_items(ontologyCVItems)
-    ontologyCVItems.collect do |item|
-      browser_url = "https://edamontology.github.io/edam-browser/#{URI.parse(item.iri).path.gsub('/','#')}"
-      link_to(item.label, browser_url, target: :_blank).html_safe
+  def controlled_vocab_annotation_items(controlled_vocab_terms)
+    Array(controlled_vocab_terms).collect do |term|
+      if term.iri&.start_with?('http://edamontology.org/')
+        browser_url = "https://edamontology.github.io/edam-browser/#{URI.parse(term.iri).path.gsub('/','#')}"
+        link_to(term.label, browser_url, target: :_blank).html_safe
+      else
+        term.label
+      end
+
     end.join(', ').html_safe
   end
 

@@ -8,24 +8,21 @@ namespace :seek do
   # these are the tasks required for this version upgrade
   task upgrade_version_tasks: %i[
     environment
-    db:seed:010_workflow_classes
-    db:seed:011_edam_topics
-    db:seed:012_edam_operations
-    db:seed:013_workflow_data_file_relationships
-    rename_branding_settings
+    db:seed:007_sample_attribute_types
     update_missing_openbis_istest
     update_missing_publication_versions
-    db:seed:013_edam_formats
-    db:seed:014_edam_data
+    update_edam_controlled_vocab_keys
+    db:seed:011_topics_controlled_vocab
+    db:seed:012_operations_controlled_vocab
+    db:seed:013_formats_controlled_vocab
+    db:seed:014_data_controlled_vocab
+    db:seed:015_isa_tags
     remove_orphaned_versions
-    create_seek_sample_multi
-    rename_seek_sample_attribute_types
     seek:rebuild_workflow_internals
-    update_thesis_related_publication_types
     remove_scale_annotations
     remove_spreadsheet_annotations
-    strip_site_base_host_path
     convert_roles
+    update_edam_annotation_attributes
   ]
 
   # these are the tasks that are executes for each upgrade as standard, and rarely change
@@ -59,16 +56,6 @@ namespace :seek do
     ensure
       Seek::Config.solr_enabled = solr
     end
-  end
-
-  task(rename_branding_settings: [:environment]) do
-    Seek::Config.transfer_value :project_link, :instance_link
-    Seek::Config.transfer_value :project_name, :instance_name
-    Seek::Config.transfer_value :project_description, :instance_description
-    Seek::Config.transfer_value :project_keywords, :instance_keywords
-
-    Seek::Config.transfer_value :dm_project_name, :instance_admins_name
-    Seek::Config.transfer_value :dm_project_link, :instance_admins_link
   end
 
   task(update_missing_openbis_istest: :environment) do
@@ -125,27 +112,6 @@ namespace :seek do
     puts "... finished removing #{count} orphaned versions"
   end
 
-  task(create_seek_sample_multi: [:environment]) do
-    if SampleAttributeType.where(base_type: Seek::Samples::BaseType::SEEK_SAMPLE_MULTI).empty?
-      seek_sample_multi_type = SampleAttributeType.find_or_initialize_by(title:'Registered Sample (multiple)')
-      seek_sample_multi_type.update(base_type: Seek::Samples::BaseType::SEEK_SAMPLE_MULTI)
-    end
-  end
-
-  task(rename_seek_sample_attribute_types: [:environment]) do
-    type = SampleAttributeType.where(base_type: Seek::Samples::BaseType::SEEK_SAMPLE).first
-    type&.update_column(:title, 'Registered Sample')
-
-    type = SampleAttributeType.where(base_type: Seek::Samples::BaseType::SEEK_SAMPLE_MULTI).first
-    type&.update_column(:title, 'Registered Sample (multiple)')
-
-    type = SampleAttributeType.where(base_type: Seek::Samples::BaseType::SEEK_STRAIN).first
-    type&.update_column(:title, 'Registered Strain')
-
-    type = SampleAttributeType.where(base_type: Seek::Samples::BaseType::SEEK_DATA_FILE).first
-    type&.update_column(:title, 'Registered Data file')
-  end
-
   task(convert_mysql_charset: [:environment]) do
     if ActiveRecord::Base.connection.instance_values["config"][:adapter] == 'mysql2'
       puts "Attempting MySQL database conversion"
@@ -179,38 +145,6 @@ namespace :seek do
       puts "Done"
     else
       puts "Database adapter is: #{ActiveRecord::Base.connection.instance_values["config"][:adapter]}, doing nothing"
-    end
-  end
-
-  task(update_thesis_related_publication_types: [:environment]) do
-    puts 'Updating publication types ...'
-
-    unless PublicationType.find_by(title:"Masters Thesis").nil?
-      PublicationType.find_by(key:"mastersthesis").update(title:"Master's Thesis")
-      puts 'Changing Masters Thesis to '+PublicationType.find_by(key:"mastersthesis").title
-    end
-
-    unless PublicationType.find_by(title:"Bachelors Thesis").nil?
-      PublicationType.find_by(key:"bachelorsthesis").update(title:"Bachelor's Thesis")
-      puts 'Changing Bachelors Thesis to '+PublicationType.find_by(key:"bachelorsthesis").title
-    end
-
-    unless PublicationType.find_by(title:"Phd Thesis").nil?
-      PublicationType.find_by(key:"phdthesis").update(title:"Doctoral Thesis")
-      puts 'Changing Phd Thesis to '+PublicationType.find_by(key:"phdthesis").title
-    end
-
-    if PublicationType.find_by(key:"diplomthesis").nil?
-      PublicationType.find_or_initialize_by(key: "diplomthesis").update(title:"Diplom Thesis", key: "diplomthesis")
-      puts 'Add new type '+PublicationType.find_by(key:"diplomthesis").title
-    end
-  end
-
-  task(strip_site_base_host_path: [:environment]) do
-    if Seek::Config.site_base_host
-      u = URI.parse(Seek::Config.site_base_host)
-      u.path = ''
-      Seek::Config.site_base_host = u.to_s
     end
   end
 
@@ -269,4 +203,39 @@ namespace :seek do
       end
     end
   end
+
+  task(update_edam_annotation_attributes: [:environment]) do
+    defs = {
+      "edam_formats": "data_format_annotations",
+      "edam_topics": "topic_annotations",
+      "edam_operations": "operation_annotations",
+      "edam_data": "data_type_annotations"
+    }
+    defs.each do |old_name,new_name|
+      query = AnnotationAttribute.where(name: old_name)
+      if query.any?
+        puts "Updating EDAM based #{old_name} Annotation Attributes"
+        query.update_all(name: new_name)
+      end
+    end
+  end
+
+  task(update_edam_controlled_vocab_keys: [:environment]) do
+    defs = {
+      topics: 'edam_topics',
+      operations: 'edam_operations',
+      data_formats: 'edam_formats',
+      data_types: 'edam_data'
+    }
+
+    defs.each do |property, old_key|
+      new_key = SampleControlledVocab::SystemVocabs.database_key_for_property(property)
+      query = SampleControlledVocab.where(key: old_key)
+      if query.any?
+        puts "Updating key for #{old_key} controlled vocabulary"
+        query.update_all(key: new_key)
+      end
+    end
+  end
+
 end

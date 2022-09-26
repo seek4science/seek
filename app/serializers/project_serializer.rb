@@ -28,6 +28,10 @@ class ProjectSerializer < AvatarObjSerializer
     BaseSerializer.convert_policy object.default_policy
   end
 
+  attribute :topic_annotations do
+    controlled_vocab_annotations('topic_annotations')
+  end
+
   has_many :organisms,  include_data: true
   has_many :human_diseases, include_data: true
 

@@ -1,6 +1,6 @@
 {
   "data": {
-    "id": "15",
+    "id": "8",
     "type": "collections",
     "attributes": {
       "policy": {
@@ -8,7 +8,7 @@
         "permissions": [
           {
             "resource": {
-              "id": "997",
+              "id": "36",
               "type": "projects"
             },
             "access": "edit"
@@ -26,14 +26,14 @@
         "tag2",
         "tag3"
       ],
-      "created_at": "2022-05-13T14:40:03.000Z",
-      "updated_at": "2022-05-13T14:40:03.000Z",
+      "created_at": "2022-06-07T14:12:25.000Z",
+      "updated_at": "2022-06-07T14:12:25.000Z",
       "creators": [
         {
-          "profile": "/people/919",
+          "profile": "/people/35",
           "family_name": "Last",
-          "given_name": "Person771",
-          "affiliation": "An Institution: 933",
+          "given_name": "Person29",
+          "affiliation": "An Institution: 35",
           "orcid": null
         }
       ],
@@ -43,7 +43,7 @@
       "creators": {
         "data": [
           {
-            "id": "919",
+            "id": "35",
             "type": "people"
           }
         ]
@@ -51,7 +51,7 @@
       "submitter": {
         "data": [
           {
-            "id": "918",
+            "id": "34",
             "type": "people"
           }
         ]
@@ -59,11 +59,11 @@
       "people": {
         "data": [
           {
-            "id": "918",
+            "id": "34",
             "type": "people"
           },
           {
-            "id": "919",
+            "id": "35",
             "type": "people"
           }
         ]
@@ -71,7 +71,7 @@
       "projects": {
         "data": [
           {
-            "id": "997",
+            "id": "36",
             "type": "projects"
           }
         ]
@@ -88,15 +88,15 @@
       }
     },
     "links": {
-      "self": "/collections/15",
-      "items": "/collections/15/items"
+      "self": "/collections/8",
+      "items": "/collections/8/items"
     },
     "meta": {
-      "created": "2022-05-13T14:40:03.000Z",
-      "modified": "2022-05-13T14:40:03.000Z",
+      "created": "2022-06-07T14:12:25.000Z",
+      "modified": "2022-06-07T14:12:25.000Z",
       "api_version": "0.3",
       "base_url": "http://localhost:3000",
-      "uuid": "7f77d930-b4f8-013a-0f2b-0a81884ed284"
+      "uuid": "c79a7a60-c899-013a-0f7e-0a81884ed284"
     }
   },
   "jsonapi": {

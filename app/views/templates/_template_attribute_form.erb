@@ -13,6 +13,7 @@
 <% field_name_prefix = "template[template_attributes_attributes][#{index}]" %> 
 <% seek_sample_multi = template_attribute.try(:seek_sample_multi?) %>
 <% is_title = template_attribute ? template_attribute.is_title : false %>
+<% isa_tag_id = template_attribute&.isa_tag_id %>
 
 
 <tr class="sample-attribute <%= 'success' if template_attribute.nil? -%>" data-index="<%= index-%>">
@@ -25,12 +26,12 @@
   </th>
   <td>
     <%= text_field_tag "#{field_name_prefix}[title]", title, class: 'form-control',
-                       placeholder: 'Attribute name', id: "template_attribute_title" %>
+                       placeholder: 'Attribute name', data: {attr: "title"} %>
   </td>
   <td class="text-center">
     <div class="checkbox-inline">
       <%= hidden_field_tag "#{field_name_prefix}[required]", '0' %>
-      <%= check_box_tag "#{field_name_prefix}[required]", '1', required, id: "template_attribute_required" %>
+      <%= check_box_tag "#{field_name_prefix}[required]", '1', required, data: {attr: "required"} %>
     </div>
   </td>
    <td class="text-center">
@@ -41,15 +42,15 @@
   </td>
   <td>
     <%= select_tag "#{field_name_prefix}[sample_attribute_type_id]",
-                   options_for_select(SampleAttributeType.all.sort_by { |t| t.default? ? 0 : 1 }.map { |t| [t.title, t.id,{'data-is-cv'=>t.controlled_vocab?}] }, attribute_type_id),
-                   class: 'form-control sample-type-attribute-type', id: "template_attribute_type" %>
+                   options_for_select(SampleAttributeType.all.sort_by(&:title).sort_by { |t| t.default? ? 0 : 1 }.map { |t| [t.title, t.id,{'data-is-cv'=>t.controlled_vocab?,'data-is-ontology'=>t.ontology?, 'data-is-seek-sample'=>t.seek_sample? || t.seek_sample_multi? }] }, attribute_type_id),
+                   class: 'form-control sample-type-attribute-type', data: {attr: "type"} %>
 
     <div class='controlled-vocab-block' style="<%= 'display:none;' unless template_attribute.try(:controlled_vocab?) %>">
       <br/>
       <%= select_tag "#{field_name_prefix}[sample_controlled_vocab_id]",
-                     options_for_select(SampleControlledVocab.all.map { |t| [t.title, t.id, {'data-editable'=>t.can_edit?}] },
+                     options_for_select(SampleControlledVocab.all.map { |t| [t.title, t.id, {'data-editable'=>t.can_edit?, 'data-is-ontology'=>t.custom_input}] },
                       sample_controlled_vocab_id),include_blank: true,
-                     class: 'form-control controlled-vocab-selection' , id: "template_attribute_cv_id" %>
+                     class: 'form-control controlled-vocab-selection', data: {attr: "cv_id"} %>
 
       <%= button_link_to('Edit', 'edit', '#', class:'cv-edit-button', disabled: true, target: :_blank) %>        
       <%= create_sample_controlled_vocab_modal_button  %>
@@ -58,25 +59,39 @@
       <%= button_link_to('Browse', 'index', sample_controlled_vocabs_path, target: :_blank) %>
 
     </div>
-
-  </td>
-  <td>
-    <%= select_tag "#{field_name_prefix}[unit_id]",
-                   options_for_select(Unit.order(:order).map { |u| ["#{u.symbol} #{u.title}", "#{u.id}"] },
-                   unit_id),include_blank: true, class: 'form-control' , id: "template_attribute_unit" %>
+     <div class='sample-type-block' style="<%= 'display:none;' unless template_attribute.try(:seek_sample?) || seek_sample_multi %>">
+      <br/>
+      <%
+        options = sample_type_grouped_options
+        #if a new record, then include the option to link to itself
+        if template.new_record?
+          options = [['Special',[['<This Sample Type>','self']]]] + options
+        end
+      %>
+      <%= select_tag "#{field_name_prefix}[linked_sample_type_id]",
+                     grouped_options_for_select(options, nil),
+                     include_blank: true,
+                     class: 'form-control linked-sample-type-selection' %>
+    </div>
   </td>
   <td>
     <%= text_field_tag "#{field_name_prefix}[description]", description, class: 'form-control',
-                       placeholder: 'Description', id: "template_attribute_description" %>
+                    placeholder: 'Description', data: {attr: "description"} %>
+  </td>
+  <td>
+    <%= text_field_tag "#{field_name_prefix}[iri]", iri, class: 'form-control',
+                    placeholder: 'IRI', data: {attr: "iri"} %>
   </td>
 
-   <td>
-    <%= text_field_tag "#{field_name_prefix}[iri]", iri, class: 'form-control',
-                       placeholder: 'IRI', id: "template_attribute_iri" %>
+  <td>
+    <%= select_tag "#{field_name_prefix}[unit_id]",
+                    options_for_select(Unit.order(:order).map { |u| ["#{u.symbol} #{u.title}", "#{u.id}"] },
+                    unit_id),include_blank: true, class: 'form-control', data: {attr: "unit"} %>
   </td>
 
   <td>
     <div class="btn-group" data-toggle="buttons">
+      <%= hidden_field_tag "#{field_name_prefix}[isa_tag_id]", isa_tag_id,  data: { attr: "isa_tag_id" }  %>
       <%= hidden_field_tag "#{field_name_prefix}[_destroy]", '0', autocomplete: 'off' %>
       <label class="btn btn-danger">
         Remove

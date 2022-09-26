@@ -59,7 +59,7 @@ class Person < ApplicationRecord
   has_many :assets_creators, dependent: :destroy, foreign_key: 'creator_id'
 
   RELATED_RESOURCE_TYPES = %w[DataFile Sop Model Document Publication Presentation
-                              Sample Event Investigation Study Assay Strain Workflow Collection FileTemplate Placeholder].freeze
+                              Sample Event Investigation Study Assay Strain Workflow Collection FileTemplate Placeholder Template].freeze
 
   RELATED_RESOURCE_TYPES.each do |type|
     plural = type.tableize
@@ -127,14 +127,6 @@ class Person < ApplicationRecord
   # to make it look like a User
   def person
     self
-  end
-
-  # Returns the columns to be shown on the table view for the resource
-  def columns_default
-    super + ['first_name','last_name']
-  end
-  def columns_allowed
-    columns_default + ['email','phone','skype_name','web_page','orcid']
   end
 
   # not registered profiles that match this email

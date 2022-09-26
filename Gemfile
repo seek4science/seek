@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-gem 'rails', '~> 6.1.5', '>= 6.1.5.1'
+gem 'rails', '~> 6.1.7'
 gem 'rdoc'
 
 #database adaptors
@@ -25,7 +25,7 @@ gem 'sunspot_rails'
 gem 'progress_bar'
 gem 'savon', '1.1.0'
 gem 'delayed_job_active_record'
-gem 'daemons'
+gem 'daemons','1.1.9'
 gem 'linkeddata', '~> 3.2.0'
 gem 'indefinite_article'
 
@@ -50,7 +50,7 @@ gem 'will_paginate', '~> 3.1'
 gem 'yaml_db'
 gem 'rails_autolink'
 gem 'rfc-822'
-gem 'nokogiri', '~> 1.13.4'
+gem 'nokogiri', '~> 1.13.6'
 gem 'rdf-virtuoso', '>= 0.2.0'
 gem 'terrapin'
 gem 'lograge'
@@ -101,7 +101,7 @@ gem 'omniauth-github', '~> 1.2.0'
 
 gem 'ransack'
 
-gem 'uglifier'
+gem 'terser', '~> 1.1', '>= 1.1.1'
 
 # Rails 4 upgrade
 gem 'activerecord-session_store'
@@ -127,7 +127,7 @@ gem 'request_store'
 
 gem 'bundler', '>= 1.8.4'
 
-gem 'ro-crate', '~> 0.4.16'
+gem 'ro-crate', '~> 0.4.17'
 
 gem 'rugged'
 gem 'i18n-js'
@@ -138,6 +138,10 @@ gem 'commonmarker'
 gem 'rack-cors', require: 'rack/cors'
 
 gem 'addressable'
+
+gem 'json-schema'
+
+gem 'cff', '~> 0.9.0'
 
 group :production do
   gem 'passenger'
@@ -171,7 +175,6 @@ group :test do
   gem 'rails-controller-testing'
   gem 'simplecov'
   gem 'whenever-test'
-  gem 'json-schema'
   # Easy installation and use of web drivers to run system tests with browsers
   gem 'webdrivers'
 end

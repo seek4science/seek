@@ -30,7 +30,10 @@
         });
 
         request.done(function (data) {
-            window.location='<%= provide_metadata_data_files_path %>'
+            <% sp = params[:single_page]%>
+            window.location='<%= sp ? 
+              provide_metadata_data_files_path(single_page: sp) 
+              : provide_metadata_data_files_path %>'
         }).fail(function (jqXHR, textStatus,errorThrown) {
             alert(errorThrown);
             alert(textStatus);

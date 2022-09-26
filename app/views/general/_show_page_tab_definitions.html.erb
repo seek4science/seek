@@ -1,4 +1,6 @@
 <% versioned_resource ||= nil %>
+<% resource ||= nil %>
+<% resource_name = resource ? resource.class.name : nil %>
 
 <ul class="nav nav-tabs">
   <%= tab('overview') do %>
@@ -14,4 +16,10 @@
   <%= tab('related-items') do %>
     <span class="glyphicon glyphicon-th-list"></span> Related items
   <% end %>
+
+	<% if Seek::Config.project_single_page_advanced_enabled && displaying_single_page? && resource %>
+		<%= tab(resource_name&.downcase + "_design") do %>
+			<span class="glyphicon glyphicon-th-list"></span> <%=resource_name&.camelize%> design
+		<% end %>
+	<% end %>
 </ul>

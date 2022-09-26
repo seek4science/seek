@@ -1,4 +1,8 @@
-class ContributedResourceSerializer < PCSSerializer
+class ContributedResourceSerializer < BaseSerializer
+
+  has_many :creators
+  has_many :submitter
+
   attributes :title
   attribute :license, if: -> { object.respond_to?(:license) && !object.is_a?(Publication) }
   attribute :description, if: -> { object.respond_to?(:description) && !object.is_a?(Publication) }
@@ -83,7 +87,8 @@ class ContributedResourceSerializer < PCSSerializer
   end
 
   link(:self) do
-    version_number = @scope.try(:[],:requested_version) || object.try(:version)
+    # No idea what the scope is here, but it cannot access the `version_number` method defined below
+    version_number = (@scope.try(:[], :requested_version) || object).try(:version)
     if version_number
       polymorphic_path(object, version: version_number)
     else
@@ -92,22 +97,17 @@ class ContributedResourceSerializer < PCSSerializer
   end
 
   def get_version
-    @version ||= object.respond_to?(:find_version) ? object.find_version(version_number) : object
+    @version ||= if object.respond_to?(:find_version)
+                   scope.try(:[], :requested_version) || object.latest_version
+                 else
+                   object
+                 end
   end
 
   private
 
   def version_number
-    @scope.try(:[],:requested_version) || object.try(:version)
+    (@scope.try(:[], :requested_version) || object)&.version
   end
 
-  def edam_annotations(property)
-    terms = object.annotations_with_attribute(property, true).collect(&:value).sort_by(&:label)
-    terms.collect do |term|
-      {
-        label: term.label,
-        identifier: term.iri
-      }
-    end
-  end
 end

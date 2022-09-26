@@ -8,8 +8,6 @@ class ResourcePublishLog < ApplicationRecord
   UNPUBLISHED = 3
   REJECTED = 4
 
-  CONSIDERING_TIME = 3.months
-
   def self.add_log(publish_state, resource, comment = '', user = User.current_user)
     ResourcePublishLog.create(
       user: user,
@@ -26,7 +24,8 @@ class ResourcePublishLog < ApplicationRecord
     requested_approval_assets = requested_approval_logs.collect(&:resource).compact
     requested_approval_assets.reject!(&:is_published?)
     requested_approval_assets.select! { |asset| gatekeeper.is_asset_gatekeeper_of? asset }
-    requested_approval_assets.uniq
+    requested_approval_assets.uniq.sort_by{ |asset| asset.resource_publish_logs.last.created_at}.reverse!
+
   end
 
   def self.waiting_approval_assets_for(user)

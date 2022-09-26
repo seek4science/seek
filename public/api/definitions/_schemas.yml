@@ -838,6 +838,7 @@ anyType:
     - programmes
     - projects
     - publications
+    - samples
     - sample_types
     - sample_attribute_types
     - sops
@@ -1118,6 +1119,8 @@ assayPost:
               $ref: "#/components/schemas/multipleReferences"
             data_files:
               $ref: "#/components/schemas/multipleReferences"
+            samples:
+              $ref: "#/components/schemas/multipleReferences"
             documents:
               $ref: "#/components/schemas/multipleReferences"
             models:
@@ -1201,6 +1204,8 @@ assayPatch:
             publications:
               $ref: "#/components/schemas/multipleReferences"
             data_files:
+              $ref: "#/components/schemas/multipleReferences"
+            samples:
               $ref: "#/components/schemas/multipleReferences"
             documents:
               $ref: "#/components/schemas/multipleReferences"
@@ -2042,6 +2047,7 @@ personPost:
           required:
             - first_name
             - last_name
+            - email
           additionalProperties: false
       required:
         - type
@@ -2320,6 +2326,8 @@ projectPost:
               $ref: "#/components/schemas/nullableLicense"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPostList"
+            topic_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
           required:
             - title
           additionalProperties: false
@@ -2369,6 +2377,8 @@ projectPatch:
               $ref: "#/components/schemas/nullableLicense"
             discussion_links:
               $ref: "#/components/schemas/assetLinkPatchList"
+            topic_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
           additionalProperties: false
         relationships:
           type: object
@@ -2873,9 +2883,9 @@ workflowPost:
           properties:
             tags:
               $ref: "#/components/schemas/tags"
-            edam_topics:
+            topic_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
-            edam_operations:
+            operation_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
             title:
               $ref: "#/components/schemas/nonEmptyString"
@@ -2951,9 +2961,9 @@ workflowPatch:
           properties:
             tags:
               $ref: "#/components/schemas/tags"
-            edam_topics:
+            topic_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
-            edam_operations:
+            operation_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
             title:
               $ref: "#/components/schemas/nonEmptyString"
@@ -3169,6 +3179,8 @@ assayResponse:
             study:
               $ref: "#/components/schemas/singleReference"
             data_files:
+              $ref: "#/components/schemas/multipleReferences"
+            samples:
               $ref: "#/components/schemas/multipleReferences"
             documents:
               $ref: "#/components/schemas/multipleReferences"
@@ -3883,10 +3895,15 @@ personResponse:
             login:
               $ref: "#/components/schemas/nullableNonEmptyString"
           required:
+            - avatar
             - title
+            - description
             - first_name
             - last_name
+            - orcid
             - mbox_sha1sum
+            - expertise
+            - tools
           additionalProperties: false
         relationships:
           type: object
@@ -4117,6 +4134,8 @@ projectResponse:
               $ref: "#/components/schemas/nullableLicense"
             discussion_links:
               $ref: "#/components/schemas/assetLinkList"
+            topic_annotations:
+              $ref: "#/components/schemas/ontologyTermsList"
             start_date:
               $ref: "#/components/schemas/nullableDateString"
             end_date:
@@ -4316,8 +4335,6 @@ publicationResponse:
               $ref: "#/components/schemas/multipleReferences"
             models:
               $ref: "#/components/schemas/multipleReferences"
-            publications:
-              $ref: "#/components/schemas/multipleReferences"
             presentations:
               $ref: "#/components/schemas/multipleReferences"
             events:
@@ -4336,7 +4353,6 @@ publicationResponse:
             - assays
             - data_files
             - models
-            - publications
             - presentations
             - events
             - workflows
@@ -4415,6 +4431,10 @@ sampleResponse:
               $ref: "#/components/schemas/multipleReferences"
             assays:
               $ref: "#/components/schemas/multipleReferences"
+            studies:
+              $ref: "#/components/schemas/multipleReferences"
+            investigations:
+              $ref: "#/components/schemas/multipleReferences"
             sample_type:
               $ref: "#/components/schemas/singleReference"
           required:
@@ -4423,6 +4443,8 @@ sampleResponse:
             - people
             - creators
             - assays
+            - studies
+            - investigations
             - data_files
             - sample_type
           additionalProperties: false
@@ -4733,9 +4755,9 @@ workflowResponse:
           properties:
             tags:
               $ref: "#/components/schemas/tags"
-            edam_topics:
+            topic_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
-            edam_operations:
+            operation_annotations:
               $ref: "#/components/schemas/ontologyTermsList"
             title:
               $ref: "#/components/schemas/nonEmptyString"

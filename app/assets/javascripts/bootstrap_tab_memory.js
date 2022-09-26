@@ -15,6 +15,16 @@ function showTabFromHistory() {
         var activeTab = $j('[href="' + location.hash + '"]');
         if (activeTab.length) {
             activeTab.tab('show');
+            // Go through the parent tabs that contain this tab and ensure they are opened.
+            activeTab.parents('.tab-pane').each(function () {
+                var pane = $j(this);
+                [$j('[data-toggle="tab"][href="#' + pane.attr('id') + '"]'),
+                 $j('[data-toggle="tab"][data-target="#' + pane.attr('id') + '"]')].forEach(function (selector) {
+                     if (selector.length) {
+                        selector.tab('show');
+                     }
+                });
+            });
         } else {
             $j('.nav-tabs a:first').tab('show');
         }

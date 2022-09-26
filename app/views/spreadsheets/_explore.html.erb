@@ -26,8 +26,8 @@
         resource.spreadsheet
       end
     %>
-    <%= render :partial => "spreadsheets/spreadsheet_styles", :locals => { :styles => spreadsheet.styles } %>
-    <%= render :partial => "spreadsheets/spreadsheet", :locals => { :workbook => spreadsheet } %>
+    <%= render partial: "spreadsheets/spreadsheet_styles", locals: { styles: spreadsheet.styles } %>
+    <%= render partial: "spreadsheets/spreadsheet", locals: { workbook: spreadsheet } %>
 
   </div>
 </div>

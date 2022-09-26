@@ -7,6 +7,8 @@ class ProjectApiTest < ActionDispatch::IntegrationTest
   def setup
     admin_login
 
+    Factory(:topics_controlled_vocab) unless SampleControlledVocab::SystemVocabs.topics_controlled_vocab
+
     @person = Factory(:person)
     @project = Factory(:project)
     @institution = Factory(:institution)
