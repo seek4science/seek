@@ -324,7 +324,6 @@ class OmniauthTest < ActionDispatch::IntegrationTest
 
   test 'LDAP auth failure should redirect to login page and show error' do
     OmniAuth.config.mock_auth[:ldap] = :invalid_credentials
-    OmniAuth.config.on_failure = Proc.new { |env| OmniAuth::FailureEndpoint.new(env).redirect_to_failure }
 
     assert_no_difference('User.count') do
       assert_no_difference('Identity.count') do
@@ -341,7 +340,6 @@ class OmniauthTest < ActionDispatch::IntegrationTest
 
   test 'LS AAI auth failure should redirect to login page and show error' do
     OmniAuth.config.mock_auth[:elixir_aai] = :invalid_credentials
-    OmniAuth.config.on_failure = Proc.new { |env| OmniAuth::FailureEndpoint.new(env).redirect_to_failure }
 
     assert_no_difference('User.count') do
       assert_no_difference('Identity.count') do

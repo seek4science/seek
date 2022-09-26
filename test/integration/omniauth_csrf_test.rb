@@ -15,9 +15,8 @@ class OmniauthCsrfTest < ActionDispatch::IntegrationTest
   end
 
   test 'should not accept POST requests with invalid CSRF tokens to OmniAuth endpoint' do
-    assert_raises(ActionController::InvalidAuthenticityToken) do
-      post '/auth/elixir_aai'
-    end
+    post '/auth/elixir_aai'
+    assert_redirected_to(omniauth_failure_path(strategy: 'elixir_aai', message: 'ActionController::InvalidAuthenticityToken'))
   end
 
   teardown do
