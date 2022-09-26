@@ -1,0 +1,142 @@
+- hosts: [servers]
+  become: true
+  become_user: '{{user_var}}'
+  vars_files:
+    - group_vars/vars.yml
+    - group_vars/sensitive_vars.yml
+
+  environment: 
+    PATH: '{{ruby_275_path}}:{{ ansible_env.PATH }}:{{rvm_path}}'
+
+  tasks: 
+
+########## Update and install dependencies
+    - name: Update all packages to their latest version
+      become: true
+      become_user: root
+      ansible.builtin.apt:
+        name: "*"
+        state: latest
+
+    - name: Install a list of packages
+      become: true
+      become_user: root
+      ansible.builtin.apt:
+        pkg:
+        - build-essential
+        - cmake
+        - git
+        - imagemagick
+        - libcurl4-gnutls-dev
+        - libgmp-dev
+        - libmagick++-dev
+        - libmysqlclient-dev
+        - libpq-dev
+        - libreadline-dev
+        - libreoffice
+        - libssl-dev
+        - libxml++2.6-dev
+        - libxslt1-dev
+        - mysql-server
+        - nodejs
+        - openjdk-8-jre
+        - openjdk-11-jdk
+        - openssh-server
+        - poppler-utils
+        - zip
+        - autoconf
+        - automake
+        - bison
+        - curl
+        - gawk
+        - libffi-dev
+        - libgdbm-dev
+        - libncurses5-dev
+        - libsqlite3-dev
+        - libyaml-dev
+        - sqlite3
+
+    - name: Correct java version selected
+      become: true
+      become_user: root
+      community.general.alternatives:
+        name: java
+        path: /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
+
+########## Install rvm and ruby 2.7.5
+    - name: Add repository to install rvm
+      become: true
+      become_user: root
+      ansible.builtin.apt_repository:
+        repo: ppa:rael-gc/rvm
+
+    - name: Install rvm
+      become: true
+      become_user: root
+      ansible.builtin.apt:
+        pkg:
+        - software-properties-common
+        - rvm
+
+    - name: Activate user rvm
+      become: true
+      become_user: root
+      shell: >
+        usermod -a -G rvm '{{user_var}}'
+
+    - name: Cleanup rvm
+      shell: >
+        export rvmsudo_secure_path=1 &&
+        printf '{{local_vm_become_password}}' | rvmsudo -S rvm cleanup all
+
+    - name: Update ssl
+      become: true
+      become_user: root
+      shell: >
+        command curl -sSL https://rvm.io/mpapis.asc | sudo gpg --import - &&
+        command curl -sSL https://rvm.io/pkuczynski.asc | sudo gpg --import -
+
+    - name: Update rvm
+      shell: >
+        printf '{{local_vm_become_password}}' | rvmsudo -S rvm get head
+
+    - name: Reset connection  #To allow user changes to affect 'current login user'
+      meta: reset_connection
+
+    - name: Install openssl for Ruby 2.7.5
+      shell: >
+        rvm pkg install openssl
+    
+    - name: Install Ruby 2.7.5
+      shell: >
+        rvm install "ruby-2.7.5" --with-openssl-dir=/usr/share/rvm/usr/
+    
+    - name: Make Ruby 2.7.5 default
+      shell: >
+        rvm alias create default ruby-2.7.5 && 
+        rvm --default use ruby-2.7.5
+        
+    - name: Install bundler
+      shell: >
+        gem install bundler
+
+########## Clone and install SEEK
+
+    - name: Clone SEEK git repo
+      ansible.builtin.git:
+        repo: 'https://github.com/seek4science/seek.git'
+        dest: '{{git_dest}}/SEEK'
+        version: 'v1.12.3'
+        force: yes
+
+    - name: Configure git
+      shell: >
+        git config --global --add safe.directory '{{git_dest}}/SEEK'
+      run_once: true
+
+    - name: Install SEEK Gems
+      shell: >
+        bundle install
+      args:
+        chdir: '{{git_dest}}/SEEK'
+
