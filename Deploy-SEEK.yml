@@ -83,38 +83,30 @@
       become_user: root
       shell: >
         usermod -a -G rvm '{{user_var}}'
-
-    - name: Cleanup rvm
-      shell: >
-        export rvmsudo_secure_path=1 &&
-        printf '{{local_vm_become_password}}' | rvmsudo -S rvm cleanup all
-
-    - name: Update ssl
+    
+    - name: Install openssl for Ruby 2.7.5
       become: true
       become_user: root
-      shell: >
-        command curl -sSL https://rvm.io/mpapis.asc | sudo gpg --import - &&
-        command curl -sSL https://rvm.io/pkuczynski.asc | sudo gpg --import -
-
-    - name: Update rvm
-      shell: >
-        printf '{{local_vm_become_password}}' | rvmsudo -S rvm get head
+      ansible.builtin.apt:
+        pkg:
+        - libssl-dev=1.1.1l-1ubuntu1.4
+        force: yes
 
     - name: Reset connection  #To allow user changes to affect 'current login user'
       meta: reset_connection
-
-    - name: Install openssl for Ruby 2.7.5
-      shell: >
-        rvm pkg install openssl
     
     - name: Install Ruby 2.7.5
       shell: >
-        rvm install "ruby-2.7.5" --with-openssl-dir=/usr/share/rvm/usr/
-    
+        rvm install "ruby-2.7.5"
+        
     - name: Make Ruby 2.7.5 default
       shell: >
         rvm alias create default ruby-2.7.5 && 
         rvm --default use ruby-2.7.5
+      
+    - name: Generate docs
+      shell: >
+        rvm all do rvm docs generate
         
     - name: Install bundler
       shell: >
@@ -139,4 +131,3 @@
         bundle install
       args:
         chdir: '{{git_dest}}/SEEK'
-
