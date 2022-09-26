@@ -55,6 +55,7 @@
         - libsqlite3-dev
         - libyaml-dev
         - sqlite3
+        - python3-pymysql
 
     - name: Correct java version selected
       become: true
@@ -131,3 +132,33 @@
         bundle install
       args:
         chdir: '{{git_dest}}/SEEK'
+
+########## Configure database
+
+    - name: Copy default database config
+      ansible.builtin.copy:
+        src: '{{git_dest}}/SEEK/config/database.default.yml'
+        dest: '{{git_dest}}/SEEK/config/database.yml'
+        remote_src: yes
+
+    - name: Configure database user
+      ansible.builtin.replace:
+        path: '{{git_dest}}/SEEK/config/database.yml'
+        regexp: 'mysqluser'
+        replace: '{{sql_user}}'
+
+    - name: Configure database password
+      ansible.builtin.replace:
+        path: '{{git_dest}}/SEEK/config/database.yml'
+        regexp: 'mysqlpassword'
+        replace: '{{sql_password}}'
+
+    - name: Create database user
+      become: true
+      become_user: root
+      mysql_user:
+        name: '{{sql_user}}'
+        password: '{{sql_password}}'
+        priv: '*.*:ALL,GRANT'
+        state: present
+        login_unix_socket: /run/mysqld/mysqld.sock

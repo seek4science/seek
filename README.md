@@ -2,7 +2,7 @@
 
 Ansible script to install SEEK and all its dependencies.
 
-Tested on fresh ubuntu install. 
+Tested on fresh Ubuntu install version: 22.04.1. 
 
 
 ## Host, user and password set up
@@ -19,6 +19,10 @@ Set the ***local_vm_become_password*** variable in the *group_vars/sensitive_var
  - Create a file *group_vars/sensitive_vars.yml.ignore* with your passwords in plain text. 
     -- Note: If you choose a different name, update the *ansible.cfg* file.
  - Encrypt your variables by running ```ansible-vault encrypt group_vars/sensitive_vars.yml.ignore --output group_vars/sensitive_vars.yml```.
+
+### Database configuration
+
+The database default values are copied to *config/database.yml* and the username and password are configured for the values set in the variables ***sql_user*** and ***sql_password***.- Again, it is reccommended that the password is encrypted in the *group_vars/sensitive_vars.yml* file.
 
 
 Install SEEK and all its dependencies by running
