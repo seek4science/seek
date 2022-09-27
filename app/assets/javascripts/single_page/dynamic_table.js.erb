@@ -85,7 +85,17 @@ const handleCheck = (e) => (e.parents("table").DataTable().row(e.closest("tr")).
 						text: "Export table",
 						exportOptions: {
 							// exclude checkbox column
-							columns: options.readonly ? [":visible:not(.text-center)"] : [2, ":visible:not(.text-center)"]
+							columns: options.readonly ? [":visible:not(.text-center)"] : [2, ":visible:not(.text-center)"],
+              format: {
+                body: function ( data ) {
+                    // Get data from tags-input
+                    return data.toString().includes("td")
+										? JSON.parse($j(data).find("input").attr("data-existing-objects"))
+												.map((x) => x.name)
+												.join(",")
+										: data;
+                }
+              }
 						}
 					},
 					"colvis"
