@@ -47,6 +47,7 @@ module RelatedItemsHelper
 
     items_hash = {}
     resource.class.related_type_methods.each_key do |type|
+      next if type == 'Node'
       next if type == 'Organism' && !resource.is_a?(Sample)
       enabled_method = "#{type.pluralize.underscore}_enabled"
       next if Seek::Config.respond_to?(enabled_method) && !Seek::Config.send(enabled_method)
