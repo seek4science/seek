@@ -193,6 +193,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'ids of scales list should be the same as scales defined in Seek::Config.scales' do
+    skip
     as_virtualliver do
       get :index
       assert_response :success
@@ -225,6 +226,7 @@ class HomesControllerTest < ActionController::TestCase
   end
 
   test 'scales slider on home page' do
+    skip
     as_virtualliver do
       Seek::Config.solr_enabled = true
       get :index
