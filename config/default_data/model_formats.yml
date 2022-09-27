@@ -4,6 +4,9 @@ BioPAX:
 CellML:
   title: CellML
 
+Copasi:
+  title: Copasi
+
 FieldML:
   title: FieldML
 
@@ -19,6 +22,9 @@ KGML:
 Mathematica:
   title: Mathematica
 
+MathML:
+  title: MathML
+
 Matlab:
   title: Matlab package
 
@@ -28,8 +34,14 @@ MFAML:
 PDF:
   title: PDF (Model description)
 
+Python:
+  title: Python code
+
 R:
   title: R package
+
+SBGN-ML-PD:
+  title: SBGN-ML PD
 
 SBML:
   title: SBML
@@ -49,17 +61,8 @@ SXML:
 VCML:
   title: Virtual Cell Markup Language (VCML)
 
-XPP:
-  title: XPP
-
-Copasi:
-  title: Copasi
-
-MathML:
-  title: "MathML"
-
 XGMML:
   title: XGMML
 
-SBGN-ML PD:
-  title: "SBGN-ML PD"
+XPP:
+  title: XPP
