@@ -26,6 +26,12 @@ would be beneficial if it is new to you. Documentation and resources
 describing Ruby on Rails can be found at http://rubyonrails.org/documentation
 .
 
+<div class="alert alert-warning">
+Note that we don't currently support Ubuntu 22.04 due to a problem installing Ruby with RVM (openssl version mismatch).
+
+This is something we are looking into and hoping to address soon.
+</div>
+
 SEEK is built upon the 5.2 version of Rails, and requires Ruby 2.7.
 
 We recommend that you run SEEK on a Linux system. This guide is based on an
@@ -34,6 +40,8 @@ main difference is the name of the required packages that have to be installed
 for that distribution, other than that the steps will be the same. If you want
 to install on different distribution or version please visit [Other
 Distributions](other-distributions.html) and see if it is listed there.
+
+
 
 You will need to have *sudo* access on the machine you are installing SEEK, or
 be able to login as root. You will also need an active internet connection
@@ -111,6 +119,10 @@ your linux distribution, it is more difficult to control the version you use
 and keep up to date.
 
 To install RVM on Ubuntu there is package available described at <https://github.com/rvm/ubuntu_rvm>, otherwise follow the steps at <https://rvm.io/rvm/install> .
+
+now install the appropriate version of Ruby
+
+    rvm install $(cat .ruby-version)
 
 ## Installing Gems
 
