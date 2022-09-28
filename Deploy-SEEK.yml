@@ -162,3 +162,17 @@
         priv: '*.*:ALL,GRANT'
         state: present
         login_unix_socket: /run/mysqld/mysqld.sock
+
+########## Setup and launch
+
+    - name: Rake db:setup
+      shell: >
+        bundle exec rake db:setup
+      args:
+        chdir: '{{git_dest}}/SEEK'
+
+    # - name: Rails server
+    #   shell: >
+    #     bundle exec rails server
+    #   args:
+    #     chdir: '{{git_dest}}/SEEK'
