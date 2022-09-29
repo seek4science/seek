@@ -5,9 +5,6 @@
     - group_vars/vars.yml
     - group_vars/sensitive_vars.yml
 
-  environment: 
-    PATH: '{{ruby_275_path}}:{{ ansible_env.PATH }}:{{rvm_path}}'
-
   tasks: 
 
 ########## Update and install dependencies
@@ -94,23 +91,27 @@
 
     - name: Reset connection  #To allow user changes to affect 'current login user'
       meta: reset_connection
-    
-    - name: Install Ruby 2.7.5
-      shell: >
-        rvm install "ruby-2.7.5"
-        
+
+    - name:  Install Ruby 2.7.5
+      shell: bash -lc "{{ item }}"    #The bash -lc "{{ item }}" wrapper around the shell commands (items) makes sure rvm environment variables are available.
+      with_items:
+        - rvm install "ruby-2.7.5"
+
     - name: Make Ruby 2.7.5 default
-      shell: >
-        rvm alias create default ruby-2.7.5 && 
-        rvm --default use ruby-2.7.5
+      shell: bash -lc "{{ item }}"
+      with_items:
+        - rvm alias create default ruby-2.7.5
+        - rvm --default use ruby-2.7.5
       
     - name: Generate docs
-      shell: >
-        rvm all do rvm docs generate
+      shell: bash -lc "{{ item }}"
+      with_items:
+        - rvm all do rvm docs generate
         
     - name: Install bundler
-      shell: >
-        gem install bundler
+      shell: bash -lc "{{ item }}"
+      with_items:
+        - gem install bundler
 
 ########## Clone and install SEEK
 
@@ -127,8 +128,12 @@
       run_once: true
 
     - name: Install SEEK Gems
-      shell: >
-        bundle install
+      shell: bash -lc "{{ item }}"
+      with_items:
+        - bundle install
+      args:
+        chdir: '{{git_dest}}/SEEK'
+
 ########## Install python tools
     - name: Add repository to install python3.7
       become: true
@@ -192,9 +197,10 @@
 
 ########## Setup and launch
 
-    - name: Rake db:setup
-      shell: >
-        bundle exec rake db:setup
+    - name:  Rake db:setup
+      shell: bash -lc "{{ item }}"
+      with_items:
+        - bundle exec rake db:setup
       args:
         chdir: '{{git_dest}}/SEEK'
 
