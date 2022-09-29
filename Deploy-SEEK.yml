@@ -60,7 +60,7 @@
         name: java
         path: /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
 
-########## Install rvm and ruby 2.7.5
+########## Install rvm
     - name: Add repository to install rvm
       become: true
       become_user: root
@@ -80,40 +80,8 @@
       become_user: root
       shell: >
         usermod -a -G rvm '{{user_var}}'
-    
-    - name: Install openssl for Ruby 2.7.5
-      become: true
-      become_user: root
-      ansible.builtin.apt:
-        pkg:
-        - libssl-dev=1.1.1l-1ubuntu1.4
-        force: yes
 
-    - name: Reset connection  #To allow user changes to affect 'current login user'
-      meta: reset_connection
-
-    - name:  Install Ruby 2.7.5
-      shell: bash -lc "{{ item }}"    #The bash -lc "{{ item }}" wrapper around the shell commands (items) makes sure rvm environment variables are available.
-      with_items:
-        - rvm install "ruby-2.7.5"
-
-    - name: Make Ruby 2.7.5 default
-      shell: bash -lc "{{ item }}"
-      with_items:
-        - rvm alias create default ruby-2.7.5
-        - rvm --default use ruby-2.7.5
-      
-    - name: Generate docs
-      shell: bash -lc "{{ item }}"
-      with_items:
-        - rvm all do rvm docs generate
-        
-    - name: Install bundler
-      shell: bash -lc "{{ item }}"
-      with_items:
-        - gem install bundler
-
-########## Clone and install SEEK
+########## Clone SEEK
 
     - name: Clone SEEK git repo
       ansible.builtin.git:
@@ -126,6 +94,44 @@
       shell: >
         git config --global --add safe.directory '{{git_dest}}/SEEK'
       run_once: true
+
+########## Install ruby
+
+    - name: Install openssl for Ruby 2.7.x
+      become: true
+      become_user: root
+      ansible.builtin.apt:
+        pkg:
+        - libssl-dev=1.1.1l-1ubuntu1.4
+        force: yes
+
+    - name: Reset connection  #To allow user changes to affect 'current login user'
+      meta: reset_connection
+
+    - name:  Install Ruby
+      shell: bash -lc "{{ item }}"    #The bash -lc "{{ item }}" wrapper around the shell commands (items) makes sure rvm environment variables are available.
+      with_items:
+        - rvm install $(cat '{{git_dest}}/SEEK/.ruby-version')
+
+    - name: Set default Ruby
+      shell: bash -lc "{{ item }}"
+      with_items:
+        - rvm alias create default $(cat '{{git_dest}}/SEEK/.ruby-version')
+        - rvm --default use $(cat '{{git_dest}}/SEEK/.ruby-version')
+      
+    - name: Generate docs
+      shell: bash -lc "{{ item }}"
+      with_items:
+        - rvm all do rvm docs generate
+        
+    - name: Install bundler
+      shell: bash -lc "{{ item }}"
+      with_items:
+        - gem install bundler
+#when: ansible_distribution_version is version('22.04', '>=')
+# ! "bundle" from bundler conflicts with /usr/share/rvm/rubies/ruby-2.7.5/bin/bundle      #Error in Ubuntu 20.04. If I ssh then install it works fine... reset connection doesn't help
+
+########## Install SEEK Gems
 
     - name: Install SEEK Gems
       shell: bash -lc "{{ item }}"
