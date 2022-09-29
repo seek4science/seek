@@ -1,5 +1,3 @@
 user_var: francisco
 git_dest: /home/francisco
-rvm_path: '/usr/share/rvm/bin'
-ruby_275_path: '/usr/share/rvm/gems/ruby-2.7.5/bin:/usr/share/rvm/gems/ruby-2.7.5@global/bin:/usr/share/rvm/rubies/ruby-2.7.5/bin'
 sql_user: francisco
