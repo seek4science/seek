@@ -55,7 +55,6 @@
         - libsqlite3-dev
         - libyaml-dev
         - sqlite3
-        - python3-pymysql
 
     - name: Correct java version selected
       become: true
@@ -130,6 +129,34 @@
     - name: Install SEEK Gems
       shell: >
         bundle install
+########## Install python tools
+    - name: Add repository to install python3.7
+      become: true
+      become_user: root
+      ansible.builtin.apt_repository:
+        repo: ppa:deadsnakes/ppa
+
+    - name: Install python tools
+      become: true
+      become_user: root
+      ansible.builtin.apt:
+        pkg:
+        - python3 
+        - python3-pip
+        - python3-setuptools
+        - python3-wheel
+        - python3-psutil
+        - python3.7
+        - python3-pymysql
+
+    - name: Force-reinstall setuptools<58.0
+      ansible.builtin.pip:
+        name: 'setuptools<58.0.0'
+        state: forcereinstall
+
+    - name: Install SEEK's python requirements
+      ansible.builtin.pip:
+        requirements: requirements.txt
       args:
         chdir: '{{git_dest}}/SEEK'
 
